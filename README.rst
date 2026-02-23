@@ -1,52 +1,111 @@
-======
-Django
-======
+# Django
 
-Django is a high-level Python web framework that encourages rapid development
-and clean, pragmatic design. Thanks for checking it out.
+## Overview
 
-All documentation is in the "``docs``" directory and online at
-https://docs.djangoproject.com/en/stable/. If you're just getting started,
-here's how we recommend you read the docs:
+Django is a high‑level Python web framework that encourages rapid development and clean, pragmatic design. It provides a batteries‑included set of components for building robust, secure, and scalable web applications, including an ORM, templating engine, routing, authentication, admin interface, and more.
 
-* First, read ``docs/intro/install.txt`` for instructions on installing Django.
+The source code lives in the `django/` Python package. Core sub‑packages include:
 
-* Next, work through the tutorials in order (``docs/intro/tutorial01.txt``,
-  ``docs/intro/tutorial02.txt``, etc.).
+- **django.apps** – Application registry and configuration utilities.
+- **django.conf** – Settings handling and global defaults.
+- **django.__main__** – Entry point for the `python -m django` command.
 
-* If you want to set up an actual deployment server, read
-  ``docs/howto/deployment/index.txt`` for instructions.
+For detailed documentation, see the `docs/` directory or the online docs at https://docs.djangoproject.com/en/stable/.
 
-* You'll probably want to read through the topical guides (in ``docs/topics``)
-  next; from there you can jump to the HOWTOs (in ``docs/howto``) for specific
-  problems, and check out the reference (``docs/ref``) for gory details.
+---
 
-* See ``docs/README`` for instructions on building an HTML version of the docs.
+## Installation
 
-Docs are updated rigorously. If you find any problems in the docs, or think
-they should be clarified in any way, please take 30 seconds to fill out a
-ticket here: https://code.djangoproject.com/newticket
+Django is distributed on PyPI and can be installed with `pip`:
 
-To get more help:
+```bash
+python -m pip install Django
+```
 
-* Join the `Django Discord community <https://chat.djangoproject.com>`_.
+You can also install the latest development version directly from the repository:
 
-* Join the community on the `Django Forum <https://forum.djangoproject.com/>`_.
+```bash
+git clone https://github.com/django/django.git
+cd django
+python -m pip install -e .
+```
 
-To contribute to Django:
+> **Note**: The editable install (`-e`) points the installed package to the checkout, allowing you to modify the code and immediately see the changes.
 
-* Check out https://docs.djangoproject.com/en/dev/internals/contributing/ for
-  information about getting involved.
+---
 
-To run Django's test suite:
+## Quick Start / Usage
 
-* Follow the instructions in the "Unit tests" section of
-  ``docs/internals/contributing/writing-code/unit-tests.txt``, published online at
-  https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#running-the-unit-tests
+Below is a minimal example that demonstrates how to create a new Django project and run the development server.
 
-Supporting the Development of Django
-====================================
+1. **Create a project**
+   ```bash
+   django-admin startproject mysite
+   cd mysite
+   ```
 
-Django's development depends on your contributions.
+2. **Apply migrations** (sets up the default database tables)
+   ```bash
+   python manage.py migrate
+   ```
 
-If you depend on Django, remember to support the Django Software Foundation: https://www.djangoproject.com/fundraising/
+3. **Start the development server**
+   ```bash
+   python manage.py runserver
+   ```
+
+   Visit `http://127.0.0.1:8000/` in your browser to see the default welcome page.
+
+### Running Django as a module
+
+The repository includes a `__main__.py` that enables the following command, useful for debugging or tooling:
+
+```bash
+python -m django --version
+```
+
+This prints the currently installed Django version.
+
+---
+
+## Contributing
+
+We welcome contributions! Please read the following resources before getting started:
+
+- **Contributing guide** – https://docs.djangoproject.com/en/dev/internals/contributing/
+- **Code of conduct** – https://www.djangoproject.com/community/committers/
+- **Development documentation** – located under `docs/` (see `docs/internals/` for architecture details).
+
+### Typical workflow
+
+1. Fork the repository and clone your fork.
+2. Create a virtual environment and install the development dependencies:
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate
+   python -m pip install -e .[test]
+   ```
+3. Run the test suite to ensure everything works:
+   ```bash
+   ./runtests.py
+   ```
+4. Make your changes, add tests, and ensure all tests pass.
+5. Submit a pull request targeting the `main` branch.
+
+### Reporting issues
+
+If you encounter a bug in the documentation or the code, please open a ticket at https://code.djangoproject.com/newticket.
+
+---
+
+## Community & Support
+
+- **Discord** – https://chat.djangoproject.com
+- **Forum** – https://forum.djangoproject.com/
+- **Mailing lists** – https://www.djangoproject.com/community/#mailing-lists
+
+---
+
+## License
+
+Django is released under the BSD license. See the `LICENSE` file for full details.
