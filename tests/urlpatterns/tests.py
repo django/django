@@ -216,6 +216,43 @@ class SimplifiedURLTests(SimpleTestCase):
         finally:
             REGISTERED_CONVERTERS.pop("base64", None)
 
+    def test_converter_missing_regex(self):
+        class NoRegexConverter:
+            def to_python(self, value):
+                return value
+
+            def to_url(self, value):
+                return str(value)
+
+        msg = "Converter 'no_regex' must define a 'regex' class attribute."
+        with self.assertRaisesMessage(ValueError, msg):
+            register_converter(NoRegexConverter, "no_regex")
+        self.assertNotIn("no_regex", REGISTERED_CONVERTERS)
+
+    def test_converter_missing_to_python(self):
+        class NoToPythonConverter:
+            regex = "[0-9]+"
+
+            def to_url(self, value):
+                return str(value)
+
+        msg = "Converter 'no_to_python' must define a 'to_python()' method."
+        with self.assertRaisesMessage(ValueError, msg):
+            register_converter(NoToPythonConverter, "no_to_python")
+        self.assertNotIn("no_to_python", REGISTERED_CONVERTERS)
+
+    def test_converter_missing_to_url(self):
+        class NoToUrlConverter:
+            regex = "[0-9]+"
+
+            def to_python(self, value):
+                return value
+
+        msg = "Converter 'no_to_url' must define a 'to_url()' method."
+        with self.assertRaisesMessage(ValueError, msg):
+            register_converter(NoToUrlConverter, "no_to_url")
+        self.assertNotIn("no_to_url", REGISTERED_CONVERTERS)
+
     def test_invalid_view(self):
         msg = "view must be a callable or a list/tuple in the case of include()."
         with self.assertRaisesMessage(TypeError, msg):
