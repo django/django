@@ -807,7 +807,7 @@ ol.breadcrumbs a:focus, ol.breadcrumbs a:hover {
 
 .changelink, .inlinechangelink {
     padding-left: 16px;
-    background: url(../img/icon-changelink.svg) 0 1px no-repeat;
+    background: url(../img/icon-changelink.svg) 0 2px no-repeat;
 }
 
 .deletelink {
