@@ -820,7 +820,6 @@ testing. It depends on transactions and therefore must be used within
 :class:`~django.test.TestCase`.
 
 This setting exists to allow for testing of primary/replica
-(referred to as master/slave by some databases)
 configurations of multiple databases. See the documentation on
 :ref:`testing primary/replica configurations
 <topics-testing-primaryreplica>` for details.

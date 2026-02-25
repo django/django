@@ -188,7 +188,7 @@ Testing primary/replica configurations
 --------------------------------------
 
 If you're testing a multiple database configuration with primary/replica
-(referred to as master/slave by some databases) replication, this strategy of
+replication, this strategy of
 creating test databases poses a problem.
 When the test databases are created, there won't be any replication,
 and as a result, data created on the primary won't be seen on the

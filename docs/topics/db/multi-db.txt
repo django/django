@@ -266,8 +266,7 @@ An example
     introduce referential integrity problems that Django can't
     currently handle.
 
-    The primary/replica (referred to as master/slave by some databases)
-    configuration described is also flawed -- it
+    The primary/replica configuration described is also flawed -- it
     doesn't provide any solution for handling replication lag (i.e.,
     query inconsistencies introduced because of the time taken for a
     write to propagate to the replicas). It also doesn't consider the
