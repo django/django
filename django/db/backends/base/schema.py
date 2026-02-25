@@ -1682,8 +1682,8 @@ class BaseDatabaseSchemaEditor:
         return output
 
     def _field_should_be_altered(self, old_field, new_field, ignore=None):
-        if (not (old_field.concrete or old_field.many_to_many)) and (
-            not (new_field.concrete or new_field.many_to_many)
+        if (not (getattr(old_field, 'concrete', None) or old_field.many_to_many)) and (
+            not (getattr(new_field, 'concrete', None) or new_field.many_to_many)
         ):
             return False
         ignore = ignore or set()
