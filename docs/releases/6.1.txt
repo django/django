@@ -150,7 +150,9 @@ Minor features
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :class:`~django.contrib.sessions.backends.base.SessionBase` now supports
+  boolean evaluation via
+  :meth:`~django.contrib.sessions.backends.base.SessionBase.__bool__`.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -284,6 +286,13 @@ Models
 * The :data:`~django.db.models.signals.m2m_changed` signal now receives a
   ``raw`` argument.
 
+* :class:`~django.db.models.StringAgg` now supports ``distinct=True`` on SQLite
+  when using the default delimiter ``Value(",")`` only.
+
+* The new :attr:`.QuerySet.totally_ordered` property returns ``True`` if the
+  :class:`~django.db.models.query.QuerySet` is ordered and the ordering is
+  deterministic.
+
 Pagination
 ~~~~~~~~~~
 
@@ -292,7 +301,8 @@ Pagination
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :attr:`HttpRequest.multipart_parser_class <django.http.HttpRequest.multipart_parser_class>`
+  can now be customized to use a different multipart parser class.
 
 Security
 ~~~~~~~~
@@ -367,12 +377,15 @@ backends.
   ``db_on_delete``) as values. ``db_on_delete`` is one of the database-level
   delete options e.g. :attr:`~django.db.models.DB_CASCADE`.
 
+* Set the new ``DatabaseFeatures.supports_inspectdb`` attribute to ``False``
+  if the management command isn't supported.
+
 :mod:`django.contrib.gis`
 -------------------------
 
 * Support for PostGIS 3.1 is removed.
 
-* Support for GEOS 3.8 is removed.
+* Support for GEOS 3.8 and 3.9 is removed.
 
 * Support for GDAL 3.1 and 3.2 is removed.
 
@@ -421,6 +434,10 @@ Miscellaneous
   :class:`~django.db.models.JSONField` key transforms now matches JSON
   ``null``, to match the behavior of :lookup:`exact=None <exact>` on key
   transforms. Previously, it was interpreted as an :lookup:`isnull` lookup.
+
+* :meth:`~.QuerySet.first` and :meth:`~.QuerySet.last` no longer order by the
+  primary key when a ``QuerySet``'s ordering has been forcibly cleared by
+  calling :meth:`~.QuerySet.order_by` with no arguments.
 
 .. _deprecated-features-6.1:
 

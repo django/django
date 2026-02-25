@@ -2,11 +2,23 @@
 Django 6.0.3 release notes
 ==========================
 
-*Expected March 3, 2026*
+*March 3, 2026*
 
-Django 6.0.3 fixes several bugs in 6.0.2.
+Django 6.0.3 fixes a security issue with severity "moderate", a security issue
+with severity "low", and several bugs in 6.0.2.
 
 Bugfixes
 ========
 
-* ...
+* Fixed :exc:`NameError` when inspecting functions making use of deferred
+  annotations in Python 3.14 (:ticket:`36903`).
+
+* Fixed :exc:`AttributeError` when subclassing builtin lookups and neglecting
+  to :ref:`override<tuple-for-params>` ``as_sql()`` to accept any sequence
+  (:ticket:`36934`).
+
+* Fixed a visual regression where fieldset legends were misaligned in the admin
+  (:ticket:`36920`).
+
+* Prevented the :data:`django.tasks.signals.task_finished` signal from writing
+  extraneous log messages when no exceptions are encountered (:ticket:`36951`).

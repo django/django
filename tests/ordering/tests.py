@@ -18,11 +18,12 @@ from django.db.models import (
     When,
 )
 from django.db.models.functions import Length, Upper
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 
 from .models import (
     Article,
     Author,
+    BarcodedArticle,
     ChildArticle,
     OrderedByExpression,
     OrderedByExpressionChild,
@@ -583,8 +584,8 @@ class OrderingTests(TestCase):
         self.a2.author = second_author
         self.a2.second_author = first_author
         self.a2.save()
-        r1 = Reference.objects.create(article_id=self.a1.pk)
-        r2 = Reference.objects.create(article_id=self.a2.pk)
+        r1 = Reference.objects.create(article_id=self.a1.pk, proof_id=self.a1.pk)
+        r2 = Reference.objects.create(article_id=self.a2.pk, proof_id=self.a2.pk)
         self.assertSequenceEqual(Reference.objects.all(), [r2, r1])
 
     def test_default_ordering_by_f_expression(self):
@@ -688,3 +689,45 @@ class OrderingTests(TestCase):
             F("num").desc(), "pk"
         )
         self.assertCountEqual(qs, qs.iterator())
+
+
+class TotallyOrderedTests(SimpleTestCase):
+    def test_basic_ordering(self):
+        self.assertIs(Author.objects.all().totally_ordered, True)
+        self.assertIs(Author.objects.order_by("name").totally_ordered, False)
+        self.assertIs(BarcodedArticle.objects.order_by("rank").totally_ordered, False)
+        self.assertIs(
+            BarcodedArticle.objects.order_by("rank", "pk").totally_ordered, True
+        )
+
+    def test_composite_constraints(self):
+        qs = BarcodedArticle.objects.order_by("pub_date", "rank")
+        self.assertIs(qs.totally_ordered, False)
+        qs = BarcodedArticle.objects.order_by("headline", "slug")
+        self.assertIs(qs.totally_ordered, True)
+
+    def test_reverse_ordering(self):
+        self.assertIs(Author.objects.order_by("-pk").totally_ordered, True)
+
+    def test_f_expressions(self):
+        self.assertIs(Author.objects.order_by(F("pk")).totally_ordered, True)
+        self.assertIs(Author.objects.order_by(F("name")).totally_ordered, False)
+
+    def test_one_to_one_relation(self):
+        qs = Reference.objects.order_by("proof")
+        self.assertIs(qs.totally_ordered, False)
+        qs = Reference.objects.order_by("proof_id")
+        self.assertIs(qs.totally_ordered, True)
+
+    def test_relation_traversal(self):
+        self.assertIs(Article.objects.order_by("author__pk").totally_ordered, False)
+
+    def test_conditional_constraints(self):
+        self.assertIs(BarcodedArticle.objects.order_by("rank").totally_ordered, False)
+        self.assertIs(BarcodedArticle.objects.order_by("barcode").totally_ordered, True)
+
+    def test_totally_ordered_none(self):
+        qs = Author.objects.order_by().none()
+        self.assertIs(qs.totally_ordered, False)
+        qs = Author.objects.order_by("pk").none()
+        self.assertIs(qs.totally_ordered, True)

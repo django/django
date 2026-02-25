@@ -961,7 +961,7 @@ class _Manager(models.Manager):
 
 class FilteredManager(models.Model):
     def __str__(self):
-        return "PK=%d" % self.pk
+        return "PK=%s" % self.pk
 
     pk_gt_1 = _Manager()
     objects = models.Manager()

@@ -1160,7 +1160,7 @@ class FormattingTests(SimpleTestCase):
 
     def test_uncommon_locale_formats(self):
         testcases = {
-            # French Canadian locale uses 'h' as time format seperator.
+            # French Canadian locale uses 'h' as time format separator.
             ("fr-ca", time_format, (self.t, "TIME_FORMAT")): "10\xa0h\xa015",
             (
                 "fr-ca",

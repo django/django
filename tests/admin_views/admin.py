@@ -617,7 +617,7 @@ class PostAdmin(admin.ModelAdmin):
     @admin.display
     def coolness(self, instance):
         if instance.pk:
-            return "%d amount of cool." % instance.pk
+            return "%s amount of cool." % instance.pk
         else:
             return "Unknown coolness."
 
@@ -708,6 +708,8 @@ class CoverLetterAdmin(admin.ModelAdmin):
     instances. Note that the CoverLetter model defines a __str__ method.
     For testing fix for ticket #14529.
     """
+
+    formfield_overrides = {models.CharField: {"strip": False}}
 
     def get_queryset(self, request):
         return super().get_queryset(request).defer("date_written")

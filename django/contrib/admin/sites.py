@@ -5,6 +5,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.admin import ModelAdmin, actions
 from django.contrib.admin.exceptions import AlreadyRegistered, NotRegistered
+from django.contrib.admin.options import EMPTY_VALUE_STRING
 from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_not_required
@@ -50,7 +51,7 @@ class AdminSite:
 
     enable_nav_sidebar = True
 
-    empty_value_display = "-"
+    empty_value_display = EMPTY_VALUE_STRING
 
     login_form = None
     index_template = None

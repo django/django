@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.models import User as AuthUser
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks, management
-from django.db import DEFAULT_DB_ALIAS, models
+from django.db import DEFAULT_DB_ALIAS, models, transaction
 from django.db.models import signals
 from django.test import TestCase, override_settings
 from django.test.utils import isolate_apps
@@ -104,8 +104,8 @@ class ProxyModelTests(TestCase):
 
     def test_proxy_included_in_ancestors(self):
         """
-        Proxy models are included in the ancestors for a model's DoesNotExist
-        and MultipleObjectsReturned
+        Proxy models are included in the ancestors for a model's DoesNotExist,
+        MultipleObjectsReturned, and NotUpdated
         """
         Person.objects.create(name="Foo McBar")
         MyPerson.objects.create(name="Bazza del Frob")
@@ -118,6 +118,8 @@ class ProxyModelTests(TestCase):
             MyPersonProxy.objects.get(id__lt=max_id + 1)
         with self.assertRaises(Person.DoesNotExist):
             StatusPerson.objects.get(name="Zathras")
+        with self.assertRaises(Person.NotUpdated), transaction.atomic():
+            StatusPerson(id=999).save(update_fields={"name"})
 
         StatusPerson.objects.create(name="Bazza Jr.")
         StatusPerson.objects.create(name="Foo Jr.")

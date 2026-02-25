@@ -400,6 +400,9 @@ class BaseDatabaseFeatures:
     supports_on_delete_db_default = True
     supports_on_delete_db_null = True
 
+    # Does the backend support the inspectdb management command?
+    supports_inspectdb = True
+
     # Collation names for use by the Django test suite.
     test_collations = {
         "ci": None,  # Case-insensitive.

@@ -114,6 +114,7 @@ OPERATORS = {
 # Assign 'id' to each:
 for key, op in OPERATORS.items():
     op.id = key
+del key, op
 
 
 class Literal(TokenBase):

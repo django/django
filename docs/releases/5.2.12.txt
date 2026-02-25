@@ -1,0 +1,15 @@
+===========================
+Django 5.2.12 release notes
+===========================
+
+*March 3, 2026*
+
+Django 5.2.12 fixes a security issue with severity "moderate" and a security
+issue with severity "low" in 5.2.11. It also fixes one bug related to support
+for Python 3.14.
+
+Bugfixes
+========
+
+* Fixed :exc:`NameError` when inspecting functions making use of deferred
+  annotations in Python 3.14 (:ticket:`36903`).

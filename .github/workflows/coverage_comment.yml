@@ -45,8 +45,15 @@ jobs:
             let body = 'No coverage data available.';
             if (fs.existsSync(reportPath)) {
               body = fs.readFileSync(reportPath, 'utf8');
+              const divider = '-------------';
+              // Start after the second divder, where changed files are listed.
+              const start = body.indexOf(divider, 1);
+              body = body.substring(start);
             }
-            const commentBody = '### 📊 Coverage Report for Changed Files\n\n```\n' + body + '\n```\n\n**Note:** Missing lines are warnings only. Some lines may not be covered by SQLite tests as they are database-specific.\n\nFor more information about code coverage on pull requests, see the [contributing documentation](https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#code-coverage-on-pull-requests).';
+            const commentBody = (
+              '#### Uncovered lines in changed files\n\n```\n' + body + '```\n' +
+              '**Note:** Missing lines are warnings only. Some database-specific lines may not be measured. [More information](https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#code-coverage-on-pull-requests)'
+            );
 
             const prNumber = parseInt(process.env.PR_NUMBER);
             if (isNaN(prNumber)) {
