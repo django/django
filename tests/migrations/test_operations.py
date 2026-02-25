@@ -5809,6 +5809,7 @@ class OperationTests(OperationTestBase):
         with self.assertRaisesMessage(ValueError, msg):
             migrations.RunPython(code=migrations.RunPython.noop, reverse_code="invalid")
 
+    @skipUnlessDBFeature("supports_transactions")
     def test_run_python_atomic(self):
         """
         Tests the RunPython operation correctly handles the "atomic" keyword

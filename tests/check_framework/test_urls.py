@@ -1,3 +1,5 @@
+import unittest
+
 from django.conf import settings
 from django.core.checks.messages import Error, Warning
 from django.core.checks.urls import (
@@ -10,6 +12,7 @@ from django.core.checks.urls import (
 )
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
+from django.utils.version import PY314
 
 
 class CheckUrlConfigTests(SimpleTestCase):
@@ -320,6 +323,14 @@ class CheckCustomErrorHandlersTests(SimpleTestCase):
         ROOT_URLCONF="check_framework.urls.good_function_based_error_handlers",
     )
     def test_good_function_based_handlers(self):
+        result = check_custom_error_handlers(None)
+        self.assertEqual(result, [])
+
+    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
+    @override_settings(
+        ROOT_URLCONF="check_framework.urls.good_error_handler_deferred_annotations",
+    )
+    def test_good_function_based_handlers_deferred_annotations(self):
         result = check_custom_error_handlers(None)
         self.assertEqual(result, [])
 

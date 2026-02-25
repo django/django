@@ -169,17 +169,12 @@ backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
 ~~~~~~~~~~~~~~~~
 
 A string containing a dotted path to a function (or any callable) that defines
-how to compose a prefix, version and key into a final cache key. The default
-implementation is equivalent to the function::
-
-    def make_key(key, key_prefix, version):
-        return ":".join([key_prefix, str(version), key])
+how to compose a key, prefix, and version into a final cache key. The default
+function converts the components to strings and joins them with colons, as
+shown in the :ref:`cache documentation <cache_key_transformation>`.
 
 You may use any key function you want, as long as it has the same
 argument signature.
-
-See the :ref:`cache documentation <cache_key_transformation>` for more
-information.
 
 .. setting:: CACHES-KEY_PREFIX
 

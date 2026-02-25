@@ -170,6 +170,18 @@ Here's the formal declaration of a ``QuerySet``:
         :meth:`order_by` clause or a default ordering on the model.
         ``False`` otherwise.
 
+    .. attribute:: totally_ordered
+
+        .. versionadded:: 6.1
+
+        Returns ``True`` if the ``QuerySet`` is ordered and the ordering is
+        deterministic. This requires that the ordering includes a field
+        (or set of fields) that is unique and non-nullable.
+
+        For queries involving a ``GROUP BY`` clause, the model's default
+        ordering is ignored. Ordering specified via ``.extra(order_by=...)``
+        is also ignored.
+
     .. attribute:: db
 
         The database that will be used if this query is executed now.
@@ -2774,8 +2786,9 @@ the direction is changed.
 *Asynchronous version*: ``afirst()``
 
 Returns the first object matched by the queryset, or ``None`` if there
-is no matching object. If the ``QuerySet`` has no ordering defined, then the
-queryset is automatically ordered by the primary key. This can affect
+is no matching object. If the ``QuerySet`` has no ordering defined (and has not
+had ordering forcibly cleared by calling :meth:`order_by` with no arguments),
+then the queryset is automatically ordered by the primary key. This can affect
 aggregation results as described in :ref:`aggregation-ordering-interaction`.
 
 Example::
@@ -2789,6 +2802,12 @@ equivalent to the above example::
         p = Article.objects.order_by("title", "pub_date")[0]
     except IndexError:
         p = None
+
+.. versionchanged:: 6.1
+
+    ``first()`` and :meth:`last` no longer order by the primary key when
+    ordering has been forcibly cleared by calling :meth:`order_by` with no
+    arguments.
 
 ``last()``
 ~~~~~~~~~~
@@ -4168,7 +4187,14 @@ by the aggregate.
     .. attribute:: delimiter
 
         A ``Value`` or expression representing the string that should separate
-        each of the values. For example, ``Value(",")``.
+        each of the values. For example, ``Value(",")``. (On SQLite, the
+        literal delimiter ``Value(",")`` is the only delimiter compatible with
+        ``distinct=True``.)
+
+        .. versionchanged:: 6.1
+
+            Support for using ``distinct=True`` with a delimiter of
+            ``Value(",")`` on SQLite was added.
 
 Query-related tools
 ===================

@@ -170,7 +170,7 @@ def data_compare(testcase, pk, klass, data):
         testcase.assertEqual(
             bytes(data),
             bytes(instance.data),
-            "Objects with PK=%d not equal; expected '%s' (%s), got '%s' (%s)"
+            "Objects with PK=%s not equal; expected '%s' (%s), got '%s' (%s)"
             % (
                 pk,
                 repr(bytes(data)),
@@ -183,7 +183,7 @@ def data_compare(testcase, pk, klass, data):
         testcase.assertEqual(
             data,
             instance.data,
-            "Objects with PK=%d not equal; expected '%s' (%s), got '%s' (%s)"
+            "Objects with PK=%s not equal; expected '%s' (%s), got '%s' (%s)"
             % (
                 pk,
                 data,

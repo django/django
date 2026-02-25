@@ -2860,8 +2860,7 @@ Newlines in the HTML content will be preserved.
 .. admonition:: Size of input string
 
     Processing large, potentially malformed HTML strings can be
-    resource-intensive and impact service performance. ``truncatechars_html``
-    limits input to the first five million characters.
+    resource-intensive and impact service performance.
 
 .. templatefilter:: truncatewords
 
@@ -2908,8 +2907,7 @@ Newlines in the HTML content will be preserved.
 .. admonition:: Size of input string
 
     Processing large, potentially malformed HTML strings can be
-    resource-intensive and impact service performance. ``truncatewords_html``
-    limits input to the first five million characters.
+    resource-intensive and impact service performance.
 
 .. templatefilter:: unordered_list
 

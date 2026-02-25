@@ -187,6 +187,7 @@ form .aligned select + div.help {
 
 form .aligned select option:checked {
     background-color: var(--selected-row);
+    color: var(--body-fg);
 }
 
 form .aligned ul li {
@@ -217,7 +218,8 @@ fieldset .fieldBox {
 
 /* WIDE FIELDSETS */
 
-.wide label {
+.wide label,
+.wide legend {
     width: 200px;
 }
 
@@ -512,6 +514,14 @@ form .related-widget-wrapper ul {
     display: inline-block;
     margin-left: 0;
     padding-left: 0;
+}
+
+form .related-widget-wrapper a.change-related img {
+    transform: scale(0.85);
+}
+
+form .related-widget-wrapper a.view-related img {
+    transform: scale(0.95);
 }
 
 .clearable-file-input input {
