@@ -98,3 +98,28 @@ To use nonces in your CSP policy, beside the basic config, you need to:
    generated within the same request and not served from cache. See the
    reference documentation on :ref:`csp-nonce` for implementation details and
    important caching considerations.
+
+.. _csp-form-media-nonce:
+
+Form media and nonces
+---------------------
+
+.. versionadded:: 6.1
+
+When the :func:`~django.template.context_processors.csp` context processor is
+enabled, nonces may be injected into every ``<script>`` and
+``<link>`` element rendered by
+:ref:`form media<assets-as-a-static-definition>`. This applies for both
+:class:`~django.forms.Script` objects and plain string paths.
+
+Sample usage:
+
+.. code-block:: html+django
+
+    <head>
+        {% csp_nonce form.media.css %}
+    </head>
+    <body>
+        <!-- ... -->
+        {% csp_nonce form.media.js %}
+    </body>

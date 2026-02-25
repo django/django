@@ -93,6 +93,23 @@ Sample usage:
 
 ``comment`` tags cannot be nested.
 
+.. versionadded:: 6.1
+.. templatetag:: csp_nonce
+
+``csp_nonce``
+--------------
+
+This tag is used for CSP protection, as described in the documentation for
+:doc:`Content Security Policy </ref/csp>`.
+
+Sample usage:
+
+.. code-block:: html+django
+
+    <script {% csp_nonce %}>
+        // This inline JavaScript will be allowed by the CSP policy.
+    </script>
+
 .. templatetag:: csrf_token
 
 ``csrf_token``

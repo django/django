@@ -95,6 +95,32 @@ class CsrfTokenNode(Node):
             return ""
 
 
+class CSPNonceNode(Node):
+    child_nodelists = ()
+
+    def __init__(self, media_object=None):
+        self.media_object = media_object
+
+    def render(self, context):
+        nonce = context.get("csp_nonce", None)
+        if self.media_object:
+            if media := self.media_object.resolve(context):
+                try:
+                    return media.render(nonce=nonce)
+                except AttributeError as exc:
+                    raise TypeError(
+                        f"{self.media_object!r} must reference a Media object,"
+                        f" not a {type(media)}."
+                    ) from exc
+            else:
+                raise ValueError(
+                    f"{self.media_object!r} must reference a Media object."
+                )
+        if nonce:
+            return format_html('nonce="{}"', nonce)
+        return mark_safe("")
+
+
 class CycleNode(Node):
     def __init__(self, cyclevars, variable_name=None, silent=False):
         self.cyclevars = cyclevars
@@ -704,6 +730,20 @@ def cycle(parser, token):
 @register.tag
 def csrf_token(parser, token):
     return CsrfTokenNode()
+
+
+@register.tag
+def csp_nonce(parser, token):
+    bits = token.split_contents()[1:]
+    match len(bits):
+        case 0:
+            return CSPNonceNode()
+        case 1:
+            return CSPNonceNode(parser.compile_filter(bits[0]))
+        case _:
+            raise TemplateSyntaxError(
+                "'csp_nonce' statement takes at most one argument"
+            )
 
 
 @register.tag
