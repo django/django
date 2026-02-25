@@ -2756,6 +2756,10 @@ Newlines in the HTML content will be preserved.
     Processing large, potentially malformed HTML strings can be
     resource-intensive and impact service performance.
 
+.. versionchanged:: 5.1
+
+    The input limit of five million characters was removed.
+
 .. templatefilter:: truncatewords
 
 ``truncatewords``
@@ -2802,6 +2806,10 @@ Newlines in the HTML content will be preserved.
 
     Processing large, potentially malformed HTML strings can be
     resource-intensive and impact service performance.
+
+.. versionchanged:: 5.1
+
+    The input limit of five million characters was removed.
 
 .. templatefilter:: unordered_list
 
