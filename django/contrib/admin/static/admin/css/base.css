@@ -767,7 +767,6 @@ ol.breadcrumbs li {
     display: inline-block;
     font-size: 0.875rem;
     padding: 0;
-    line-height: 0;
 }
 
 ol.breadcrumbs li:not([aria-current="page"])::after {
