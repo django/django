@@ -1,16 +1,9 @@
 from django.forms import CharField, Form, Media, MultiWidget, TextInput
-from django.forms.widgets import MediaAsset, Script
+from django.forms.widgets import CSS, MediaAsset, Script
 from django.template import Context, Template
+from django.template.base import NonceRenderable
 from django.test import SimpleTestCase, override_settings
 from django.utils.html import html_safe
-
-
-class CSS(MediaAsset):
-    element_template = '<link href="{path}"{attributes}>'
-
-    def __init__(self, href, **attributes):
-        super().__init__(href, **attributes)
-        self.attributes["rel"] = "stylesheet"
 
 
 @override_settings(STATIC_URL="http://media.example.com/static/")
@@ -31,7 +24,9 @@ class MediaAssetTestCase(SimpleTestCase):
 
         self.assertNotEqual(MediaAsset("path/to/css"), MediaAsset("path/to/other.css"))
         self.assertNotEqual(MediaAsset("path/to/css"), "path/to/other.css")
-        self.assertNotEqual(MediaAsset("path/to/css", media="all"), CSS("path/to/css"))
+        self.assertNotEqual(
+            MediaAsset("path/to/css", media="all"), CSS("path/to/css", "all")
+        )
 
     def test_hash(self):
         self.assertEqual(hash(MediaAsset("path/to/css")), hash("path/to/css"))
@@ -71,6 +66,32 @@ class MediaAssetTestCase(SimpleTestCase):
 
         asset = MediaAsset("//absolute/path/to/css")
         self.assertEqual(asset.path, "//absolute/path/to/css")
+
+    def test_is_nonce_renderable(self):
+        self.assertIsInstance(MediaAsset("path/to/css"), NonceRenderable)
+
+    def test_render(self):
+        asset = MediaAsset("path/to/css")
+        self.assertEqual(
+            asset.render(),
+            "http://media.example.com/static/path/to/css",
+        )
+
+    def test_render_with_nonce(self):
+        asset = CSS("path/to/css", media="all")
+        self.assertHTMLEqual(
+            asset.render(nonce="abc123"),
+            '<link href="http://media.example.com/static/path/to/css"'
+            ' media="all" nonce="abc123" rel="stylesheet">',
+        )
+
+    def test_render_with_nonce_is_none(self):
+        asset = CSS("path/to/css", media="all")
+        self.assertHTMLEqual(
+            asset.render(nonce=None),
+            '<link href="http://media.example.com/static/path/to/css"'
+            ' media="all" rel="stylesheet">',
+        )
 
 
 @override_settings(STATIC_URL="http://media.example.com/static/")
@@ -904,4 +925,101 @@ class FormsMediaObjectTestCase(SimpleTestCase):
             str(media),
             '<link href="/path/to/css1" media="all" rel="stylesheet">\n'
             '<script src="/path/to/js1"></script>',
+        )
+
+    def test_is_nonce_renderable(self):
+        class MyForm(Form):
+            class Media:
+                pass
+
+        self.assertIsInstance(MyForm().media, NonceRenderable)
+
+    def test_form_media_render_with_csp_nonce(self):
+        class MyWidget(TextInput):
+            class Media:
+                css = {"all": (CSS("/path/to/style.css", media="all"),)}
+                js = (
+                    "/path/to/app.js",
+                    Script(
+                        "/path/to/analytics.js",
+                        integrity="9d947b87fdeb25030d56d01f7aa75800",
+                    ),
+                )
+
+        class MyForm(Form):
+            field = CharField(widget=MyWidget())
+
+        form = MyForm()
+        context = Context({"form": form, "csp_nonce": "testNonce123"})
+        self.assertHTMLEqual(
+            Template("{{ form.media }}").render(context),
+            '<link href="/path/to/style.css" media="all" nonce="testNonce123"'
+            ' rel="stylesheet">\n'
+            '<script src="/path/to/app.js" nonce="testNonce123"></script>\n'
+            '<script src="/path/to/analytics.js"'
+            ' integrity="9d947b87fdeb25030d56d01f7aa75800"'
+            ' nonce="testNonce123"></script>',
+        )
+        self.assertHTMLEqual(
+            Template("{{ form.media }}").render(Context({"form": form})),
+            '<link href="/path/to/style.css" media="all"'
+            ' rel="stylesheet">\n'
+            '<script src="/path/to/app.js"></script>\n'
+            '<script src="/path/to/analytics.js"'
+            ' integrity="9d947b87fdeb25030d56d01f7aa75800"'
+            "></script>",
+        )
+
+    def test_form_media_render_with_csp_nonce_none(self):
+        class MyWidget(TextInput):
+            class Media:
+                css = {"all": (CSS("/path/to/style.css", media="all"),)}
+                js = (
+                    "/path/to/app.js",
+                    Script(
+                        "/path/to/analytics.js",
+                        integrity="9d947b87fdeb25030d56d01f7aa75800",
+                    ),
+                )
+
+        class MyForm(Form):
+            field = CharField(widget=MyWidget())
+
+        form = MyForm()
+        context = Context({"form": form, "csp_nonce": None})
+        self.assertHTMLEqual(
+            Template("{{ form.media }}").render(context),
+            '<link href="/path/to/style.css" media="all"'
+            ' rel="stylesheet">\n'
+            '<script src="/path/to/app.js"></script>\n'
+            '<script src="/path/to/analytics.js"'
+            ' integrity="9d947b87fdeb25030d56d01f7aa75800"'
+            "></script>",
+        )
+
+    def test_form_media_render_without_csp_nonce_none(self):
+        class MyWidget(TextInput):
+            class Media:
+                css = {"all": (CSS("/path/to/style.css", media="all"),)}
+                js = (
+                    "/path/to/app.js",
+                    Script(
+                        "/path/to/analytics.js",
+                        integrity="9d947b87fdeb25030d56d01f7aa75800",
+                    ),
+                )
+
+        class MyForm(Form):
+            field = CharField(widget=MyWidget())
+
+        form = MyForm()
+        context = Context({"form": form})
+        self.assertHTMLEqual(
+            Template("{{ form.media }}").render(context),
+            '<link href="/path/to/style.css" media="all"'
+            ' rel="stylesheet">\n'
+            '<script src="/path/to/app.js"></script>\n'
+            '<script src="/path/to/analytics.js"'
+            ' integrity="9d947b87fdeb25030d56d01f7aa75800"'
+            "></script>",
         )

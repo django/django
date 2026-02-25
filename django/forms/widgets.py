@@ -10,6 +10,7 @@ from graphlib import CycleError, TopologicalSorter
 from itertools import chain
 
 from django.forms.utils import flatatt, to_current_timezone
+from django.template.base import NonceRenderable
 from django.templatetags.static import static
 from django.utils import formats
 from django.utils.choices import normalize_choices
@@ -63,7 +64,7 @@ class MediaOrderConflictWarning(RuntimeWarning):
 
 
 @html_safe
-class MediaAsset:
+class MediaAsset(NonceRenderable):
     element_template = "{path}"
 
     def __init__(self, path, **attributes):
@@ -82,14 +83,17 @@ class MediaAsset:
         return hash(self._path)
 
     def __str__(self):
-        return format_html(
-            self.element_template,
-            path=self.path,
-            attributes=flatatt(self.attributes),
-        )
+        return self.render()
 
     def __repr__(self):
         return f"{type(self).__qualname__}({self._path!r})"
+
+    def render(self, *, nonce=None):
+        return format_html(
+            self.element_template,
+            path=self.path,
+            attributes=flatatt({"nonce": nonce} | self.attributes),
+        )
 
     @property
     def path(self):
@@ -110,8 +114,15 @@ class Script(MediaAsset):
         super().__init__(src, **attributes)
 
 
+class CSS(MediaAsset):
+    element_template = '<link href="{path}"{attributes}>'
+
+    def __init__(self, href, media, **attributes):
+        super().__init__(href, media=media, rel="stylesheet", **attributes)
+
+
 @html_safe
-class Media:
+class Media(NonceRenderable):
     def __init__(self, media=None, css=None, js=None):
         if media is not None:
             css = getattr(media, "css", {})
@@ -142,38 +153,42 @@ class Media:
     def _js(self):
         return self.merge(*self._js_lists)
 
-    def render(self):
+    def render(self, *, nonce=None):
         return mark_safe(
             "\n".join(
                 chain.from_iterable(
-                    getattr(self, "render_" + name)() for name in MEDIA_TYPES
+                    getattr(self, "render_" + name)(nonce=nonce) for name in MEDIA_TYPES
                 )
             )
         )
 
-    def render_js(self):
+    def render_js(self, *, nonce=None):
         return [
             (
-                path.__html__()
-                if hasattr(path, "__html__")
-                else format_html('<script src="{}"></script>', self.absolute_path(path))
+                path.render(nonce=nonce)
+                if isinstance(path, MediaAsset)
+                else (
+                    path.__html__()
+                    if hasattr(path, "__html__")
+                    else Script(path).render(nonce=nonce)
+                )
             )
             for path in self._js
         ]
 
-    def render_css(self):
+    def render_css(self, *, nonce=None):
         # To keep rendering order consistent, we can't just iterate over
         # items(). We need to sort the keys, and iterate over the sorted list.
         media = sorted(self._css)
         return chain.from_iterable(
             [
                 (
-                    path.__html__()
-                    if hasattr(path, "__html__")
-                    else format_html(
-                        '<link href="{}" media="{}" rel="stylesheet">',
-                        self.absolute_path(path),
-                        medium,
+                    path.render(nonce=nonce)
+                    if isinstance(path, MediaAsset)
+                    else (
+                        path.__html__()
+                        if hasattr(path, "__html__")
+                        else CSS(path, medium).render(nonce=nonce)
                     )
                 )
                 for path in self._css[medium]
