@@ -445,11 +445,15 @@ input[type="submit"], button {
         margin-top: 30px;
     }
 
-    .object-tools {
-        text-align: left;
+    /* Forms */
+
+    .titles-and-tools {
+        flex-direction: column;
     }
 
-    /* Forms */
+    .object-tools {
+        margin-top: 10px;
+    }
 
     .form-row {
         padding: 15px 0;

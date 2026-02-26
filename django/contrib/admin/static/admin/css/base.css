@@ -164,7 +164,7 @@ h1,h2,h3,h4,h5 {
 }
 
 h1 {
-    margin: 0 0 20px;
+    margin: 0;
     font-weight: 300;
     font-size: 1.25rem;
 }
@@ -823,18 +823,26 @@ a.deletelink:focus, a.deletelink:hover {
     text-decoration: none;
 }
 
+/* TITLES */
+
+.titles-and-tools {
+    display: flex;
+    margin: 0 0 10px;
+}
+
+.titles {
+    flex-grow: 1;
+}
+
 /* OBJECT TOOLS */
 
 .object-tools {
     padding: 0;
-    overflow: hidden;
-    text-align: right;
-    margin: 0 0 15px;
+    margin: 0;
 }
 
 .object-tools li {
     display: inline-block;
-    height: auto;
 }
 
 .object-tools li + li {
