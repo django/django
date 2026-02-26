@@ -347,8 +347,10 @@ will not issue patches or new releases for those versions.
 Security issue severity levels
 ==============================
 
-The severity level of a security vulnerability is determined by the attack
-type.
+The severity level of a security vulnerability is determined primarily by the
+attack type. The Django Security Team retains the authority to adjust severity
+levels based on the specific characteristics, context, and potential real-world
+impact of individual vulnerabilities.
 
 Severity levels are:
 
@@ -361,15 +363,20 @@ Severity levels are:
 
   * Cross site scripting (XSS)
   * Cross site request forgery (CSRF)
-  * Denial-of-service attacks
   * Broken authentication
 
 * **Low**
 
+  * Denial-of-service attacks
   * Sensitive data exposure
   * Broken session management
   * Unvalidated redirects/forwards
   * Issues requiring an uncommon configuration option
+
+For example, a denial-of-service vulnerability that is exploitable by
+unauthenticated attackers and affects default Django configurations, causing
+severe performance degradation or service unavailability, may be elevated to
+**Moderate**, given the potential impact across the Django ecosystem.
 
 .. _security-disclosure:
 
