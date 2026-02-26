@@ -134,6 +134,7 @@ class AdminScriptTestCase(SimpleTestCase):
         python_path.extend(ext_backend_base_dirs)
         test_environ["PYTHONPATH"] = os.pathsep.join(python_path)
         test_environ["PYTHONWARNINGS"] = ""
+        test_environ["PYTHON_COLORS"] = "0"
 
         p = subprocess.run(
             [sys.executable, *args],
@@ -2551,6 +2552,7 @@ class ArgumentOrder(AdminScriptTestCase):
         )
 
 
+@mock.patch.dict(os.environ, {"PYTHON_COLORS": "0"})
 class ExecuteFromCommandLine(SimpleTestCase):
     def test_program_name_from_argv(self):
         """
