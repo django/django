@@ -51,10 +51,11 @@ class EnvelopeTest(unittest.TestCase):
 
     def test02b_wkt_significant_figures(self):
         "Testing Envelope WKT uses %.15g formatting for coordinates."
-        # Decimal coordinates should be represented without floating-point artifacts.
+        # Decimal coordinates should use at most 15 significant figures.
         e = Envelope(0.523, 0.217, 253.23, 523.69)
         self.assertEqual(
-            "POLYGON((0.523 0.217,0.523 523.69,253.23 523.69,253.23 0.217,0.523 0.217))",
+            "POLYGON((0.523 0.217,0.523 523.69,"
+            "253.23 523.69,253.23 0.217,0.523 0.217))",
             e.wkt,
         )
 

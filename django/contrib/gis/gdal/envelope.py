@@ -190,9 +190,11 @@ class Envelope:
     @property
     def wkt(self):
         "Return WKT representing a Polygon for this envelope."
-        return "POLYGON((%(min_x)s %(min_y)s,%(min_x)s %(max_y)s,%(max_x)s %(max_y)s,%(max_x)s %(min_y)s,%(min_x)s %(min_y)s))" % {
-            "min_x": "%.15g" % self.min_x,
-            "min_y": "%.15g" % self.min_y,
-            "max_x": "%.15g" % self.max_x,
-            "max_y": "%.15g" % self.max_y,
-        }
+        min_x = "%.15g" % self.min_x
+        min_y = "%.15g" % self.min_y
+        max_x = "%.15g" % self.max_x
+        max_y = "%.15g" % self.max_y
+        return (
+            f"POLYGON(({min_x} {min_y},{min_x} {max_y},"
+            f"{max_x} {max_y},{max_x} {min_y},{min_x} {min_y}))"
+        )
