@@ -850,6 +850,7 @@ class SQLCompiler:
                         # Don't raise an exception when database doesn't
                         # support transactions, as it's a noop.
                         and features.supports_transactions
+                        and not self.query.subquery
                     ):
                         raise TransactionManagementError(
                             "select_for_update cannot be used outside of a transaction."

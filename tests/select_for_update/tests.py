@@ -1,7 +1,6 @@
 import threading
 import time
 from unittest import mock
-
 from multiple_database.routers import TestRouter
 
 from django.core.exceptions import FieldError
@@ -13,6 +12,7 @@ from django.db import (
     router,
     transaction,
 )
+from django.db.transaction import TransactionManagementError
 from django.db.models import F, Value
 from django.db.models.functions import Concat
 from django.test import (
@@ -674,3 +674,26 @@ class SelectForUpdateTests(TransactionTestCase):
                 id__in=Person.objects.order_by("-id").select_for_update()
             )
             self.assertIn("ORDER BY", str(qs.query))
+    @skipUnlessDBFeature('has_select_for_update')        
+    def test_select_for_update_in_subquery_of_update(self):
+        """
+        select_for_update() used as a subquery inside .update()
+        should not raise TransactionManagementError because
+        the DML statement creates an implicit transaction.
+        """
+        # This should NOT raise TransactionManagementError
+        Person.objects.filter(
+            pk__in=Person.objects.filter(
+                name='Reinhardt'
+            ).select_for_update()
+        ).update(name='Updated')
+    @skipUnlessDBFeature('has_select_for_update')
+    def test_select_for_update_standalone_still_raises(self):
+        """
+        select_for_update() used standalone outside of a
+        transaction should still raise TransactionManagementError.
+        """
+        with self.assertRaises(TransactionManagementError):
+            list(Person.objects.all().select_for_update())
+        
+
