@@ -339,8 +339,28 @@ class HttpRequest:
         self._encoding = val
         if hasattr(self, "GET"):
             del self.GET
+
         if hasattr(self, "_post"):
-            del self._post
+            if self._read_started and not hasattr(self, "_body"):
+                # We are dealing with multipart/form-data and the
+                # stream is empty. We cannot re-parse it, so we
+                # must re-decode the existing data.
+                old_post = self._post
+                self._post = QueryDict(mutable=True)
+                for key, values in old_post.lists():
+                    new_key = key.encode(old_post.encoding).decode(val, "replace")
+                    for value in values:
+                        new_value = value.encode(old_post.encoding).decode(
+                            val, "replace"
+                        )
+                        self._post.appendlist(new_key, new_value)
+                self._post._mutable = False
+            else:
+                del self._post
+
+        # Safely clear the cached properties (used by WSGIRequest)
+        self.__dict__.pop("POST", None)
+        self.__dict__.pop("FILES", None)
 
     def _initialize_handlers(self):
         self._upload_handlers = [

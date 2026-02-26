@@ -1072,9 +1072,7 @@ class RequestsTests(SimpleTestCase):
         )
         self.assertEqual(request.POST, {"name": ["Hello Günter"]})
         request.encoding = "iso-8859-16"
-        # FIXME: POST should be accessible after changing the encoding
-        # (refs #14035).
-        # self.assertEqual(request.POST, {"name": ["Hello GĂŒnter"]})
+        self.assertEqual(request.POST, {"name": ["Hello GĂŒnter"]})
 
     def test_set_encoding_clears_GET(self):
         payload = FakePayload("")
