@@ -1192,8 +1192,11 @@ class RequestFactoryTest(SimpleTestCase):
         for method in tests:
             with self.subTest(method=method):
                 factory = getattr(self.request_factory, method)
-                request = factory("/somewhere", query_params={"example": "data"})
+                request = factory(
+                    "/somewhere", query_params={"example": "data", "empty": []}
+                )
                 self.assertEqual(request.GET["example"], "data")
+                self.assertNotIn("empty", request.GET)
 
 
 @override_settings(ROOT_URLCONF="test_client.urls")
