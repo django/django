@@ -720,35 +720,27 @@ filter_re = _lazy_re_compile(filter_raw_string, re.VERBOSE)
 
 
 class FilterExpression:
-    """
-    Parse a variable token and its optional filters (all as a single string),
-    and return a list of tuples of the filter name and arguments.
-    Sample::
-
-        >>> token = 'variable|default:"Default value"|date:"Y-m-d"'
-        >>> p = Parser('')
-        >>> fe = FilterExpression(token, p)
-        >>> len(fe.filters)
-        2
-        >>> fe.var
-        <Variable: 'variable'>
-    """
-
-    __slots__ = ("token", "filters", "var", "is_var")
+    __slots__ = ("token", "filters", "var", "is_var", "strict")
 
     def __init__(self, token, parser):
+        from django.conf import settings
+        self.strict = getattr(settings, "STRICT_TEMPLATE_VARIABLES", False)
+
         self.token = token
         matches = filter_re.finditer(token)
         var_obj = None
         filters = []
         upto = 0
+
         for match in matches:
             start = match.start()
+
             if upto != start:
                 raise TemplateSyntaxError(
                     "Could not parse some characters: "
                     "%s|%s|%s" % (token[:upto], token[upto:start], token[start:])
                 )
+
             if var_obj is None:
                 if constant := match["constant"]:
                     try:
@@ -760,18 +752,26 @@ class FilterExpression:
                         "Could not find variable at start of %s." % token
                     )
                 else:
-                    var_obj = Variable(var)
+                   if var.endswith("!"):
+                       var = var[:-1]
+                       self.strict = True
+
+                   var_obj = Variable(var)
             else:
                 filter_name = match["filter_name"]
                 args = []
+
                 if constant_arg := match["constant_arg"]:
                     args.append((False, Variable(constant_arg).resolve({})))
                 elif var_arg := match["var_arg"]:
                     args.append((True, Variable(var_arg)))
+
                 filter_func = parser.find_filter(filter_name)
                 self.args_check(filter_name, filter_func, args)
                 filters.append((filter_func, args))
+
             upto = match.end()
+
         if upto != len(token):
             raise TemplateSyntaxError(
                 "Could not parse the remainder: '%s' "
@@ -787,6 +787,8 @@ class FilterExpression:
             try:
                 obj = self.var.resolve(context)
             except VariableDoesNotExist:
+                if self.strict:
+                    raise
                 if ignore_failures:
                     obj = None
                 else:
@@ -796,10 +798,10 @@ class FilterExpression:
                             return string_if_invalid % self.var
                         else:
                             return string_if_invalid
-                    else:
-                        obj = string_if_invalid
+                    obj = string_if_invalid
         else:
             obj = self.var
+
         for func, args in self.filters:
             arg_vals = []
             for lookup, arg in args:
@@ -807,38 +809,42 @@ class FilterExpression:
                     arg_vals.append(mark_safe(arg))
                 else:
                     arg_vals.append(arg.resolve(context))
+
             if getattr(func, "expects_localtime", False):
                 obj = template_localtime(obj, context.use_tz)
+
             if getattr(func, "needs_autoescape", False):
                 new_obj = func(obj, autoescape=context.autoescape, *arg_vals)
             else:
                 new_obj = func(obj, *arg_vals)
+
             if getattr(func, "is_safe", False) and isinstance(obj, SafeData):
                 obj = mark_safe(new_obj)
             else:
                 obj = new_obj
+
         return obj
 
+    @staticmethod
     def args_check(name, func, provided):
         provided = list(provided)
-        # First argument, filter input, is implied.
         plen = len(provided) + 1
-        # Check to see if a decorator is providing the real function.
+
         func = inspect.unwrap(func)
 
         with lazy_annotations():
             args, _, _, defaults, _, _, _ = inspect.getfullargspec(func)
+
         alen = len(args)
         dlen = len(defaults or [])
-        # Not enough OR Too many
+
         if plen < (alen - dlen) or plen > alen:
             raise TemplateSyntaxError(
-                "%s requires %d arguments, %d provided" % (name, alen - dlen, plen)
+                "%s requires %d arguments, %d provided"
+                % (name, alen - dlen, plen)
             )
 
         return True
-
-    args_check = staticmethod(args_check)
 
     def __str__(self):
         return self.token
