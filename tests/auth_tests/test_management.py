@@ -255,6 +255,118 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         User.objects.create_user(username="J\xfalia", password="qwerty")
         call_command("changepassword", username="J\xfalia", stdout=self.stdout)
 
+    @mock.patch(
+        "django.contrib.auth.management.commands.changepassword.sys.stdin.readline",
+        return_value="not qwerty",
+    )
+    def test_that_stdin_pipe_is_allowed(self, _):
+        """
+        Executing the changepassword command with the --stdin option
+        should change joe's password.
+        """
+        joe = User.objects.get(username="joe")
+        self.assertFalse(joe.check_password("not qwerty"))
+
+        call_command(
+            "changepassword",
+            username="joe",
+            stdout=self.stdout,
+            stdin=True,
+            interactive=False,
+        )
+        command_output = self.stdout.getvalue().strip()
+
+        self.assertEqual(
+            command_output,
+            "Changing password for user 'joe'\n"
+            "Password changed successfully for user 'joe'",
+        )
+        joe.refresh_from_db()
+        self.assertTrue(joe.check_password("not qwerty"))
+
+    @mock.patch(
+        "django.contrib.auth.management.commands.changepassword.sys.stdin.readline",
+        return_value="1234",
+    )
+    def test_that_stdin_pipe_validates_only_once(self, _):
+        """
+        A CommandError should be raised if the password value read with --stdin
+        fail validation, with only one error message.
+        """
+        joe = User.objects.get(username="joe")
+        self.assertTrue(joe.check_password("qwerty"))
+
+        abort_msg = "Aborting password change for user 'joe' after 1 attempt"
+        with self.assertRaisesMessage(CommandError, abort_msg):
+            call_command(
+                "changepassword",
+                username="joe",
+                stdout=self.stdout,
+                stderr=self.stderr,
+                stdin=True,
+                interactive=False,
+            )
+
+        self.assertEqual(
+            self.stdout.getvalue().strip(),
+            "Changing password for user 'joe'",
+        )
+        self.assertIn(
+            "This password is entirely numeric.",
+            self.stderr.getvalue(),
+        )
+
+        joe.refresh_from_db()
+        self.assertTrue(joe.check_password("qwerty"))
+
+    @mock.patch(
+        "django.contrib.auth.management.commands.changepassword.sys.stdin.readline",
+        side_effect=RuntimeError("stop"),
+    )
+    def test_that_stdin_pipe_can_fail_gracefully(self, _):
+        """
+        Executing the changepassword command with the --stdin option
+        with the call to stdin failing,
+        should raise a CommandError and leave the password unchanged.
+        """
+        joe = User.objects.get(username="joe")
+        self.assertFalse(joe.check_password("not qwerty"))
+
+        msg = "aborted"
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command(
+                "changepassword",
+                username="joe",
+                stdout=self.stdout,
+                stderr=self.stderr,
+                stdin=True,
+                interactive=False,
+            )
+
+        joe.refresh_from_db()
+        self.assertFalse(joe.check_password("not qwerty"))
+
+    def test_that_stdin_and_noinput_options_must_be_used_together(self):
+        with self.assertRaisesMessage(CommandError, ""):
+            call_command(
+                "changepassword",
+                username="joe",
+                stdout=self.stdout,
+                stderr=self.stderr,
+                stdin=True,
+                interactive=True,
+            )
+
+        with self.assertRaisesMessage(CommandError, ""):
+            call_command(
+                "changepassword",
+                username="joe",
+                stdout=self.stdout,
+                stderr=self.stderr,
+                stdin=False,
+                interactive=False,
+            )
+
 
 class MultiDBChangepasswordManagementCommandTestCase(TestCase):
     databases = {"default", "other"}
