@@ -709,6 +709,7 @@ for d in _connector_combinations:
     for connector, field_types in d.items():
         for lhs, rhs, result in field_types:
             register_combinable_fields(lhs, connector, rhs, result)
+del d, connector, field_types, lhs, rhs, result
 
 
 @functools.lru_cache(maxsize=128)
