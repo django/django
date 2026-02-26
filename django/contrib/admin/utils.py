@@ -287,20 +287,18 @@ def lookup_field(name, obj, model_admin=None):
     except (FieldDoesNotExist, FieldIsAForeignKeyColumnName):
         # For non-regular field values, the value is either a method,
         # property, related field, or returned via a callable.
+        f = None
         if callable(name):
             attr = name
             value = attr(obj)
-            f = None
         elif hasattr(model_admin, name) and name != "__str__":
             attr = getattr(model_admin, name)
             value = attr(obj)
-            f = None
         else:
             sentinel = object()
             attr = getattr(obj, name, sentinel)
             if callable(attr):
                 value = attr()
-                f = None
             else:
                 if attr is sentinel:
                     attr = obj
@@ -316,12 +314,9 @@ def lookup_field(name, obj, model_admin=None):
                             fields = get_fields_from_path(opts.model, name)
                             f = fields[-1]
                         except (FieldDoesNotExist, AttributeError):
-                            f = None
-                    else:
-                        f = None
+                            pass
                 else:
                     value = attr
-                    f = None
             if (
                 f is None
                 and hasattr(model_admin, "model")

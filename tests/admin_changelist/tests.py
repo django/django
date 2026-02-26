@@ -1785,19 +1785,18 @@ class ChangeListTests(TestCase):
         should display boolean icons instead of "True"/"False" (#36926).
         """
         parent = Parent.objects.create(name="Test Parent")
-        Child.objects.create(name="Active Child", parent=parent, is_active=True)
-        Child.objects.create(name="Inactive Child", parent=parent, is_active=False)
+        child_active = Child.objects.create(
+            name="Active Child", parent=parent, is_active=True
+        )
+        child_inactive = Child.objects.create(
+            name="Inactive Child", parent=parent, is_active=False
+        )
 
         class GrandChildAdmin(admin.ModelAdmin):
             list_display = ["name", "parent__is_active"]
 
-        GrandChild.objects.create(
-            name="GrandChild of Active", parent=Child.objects.get(name="Active Child")
-        )
-        GrandChild.objects.create(
-            name="GrandChild of Inactive",
-            parent=Child.objects.get(name="Inactive Child"),
-        )
+        GrandChild.objects.create(name="GrandChild of Active", parent=child_active)
+        GrandChild.objects.create(name="GrandChild of Inactive", parent=child_inactive)
 
         m = GrandChildAdmin(GrandChild, custom_site)
         request = self._mocked_authenticated_request("/grandchild/", self.superuser)
