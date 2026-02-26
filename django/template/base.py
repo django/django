@@ -724,6 +724,7 @@ class FilterExpression:
 
     def __init__(self, token, parser):
         from django.conf import settings
+
         self.strict = getattr(settings, "STRICT_TEMPLATE_VARIABLES", False)
 
         self.token = token
@@ -752,11 +753,11 @@ class FilterExpression:
                         "Could not find variable at start of %s." % token
                     )
                 else:
-                   if var.endswith("!"):
-                       var = var[:-1]
-                       self.strict = True
+                    if var.endswith("!"):
+                        var = var[:-1]
+                        self.strict = True
 
-                   var_obj = Variable(var)
+                    var_obj = Variable(var)
             else:
                 filter_name = match["filter_name"]
                 args = []
@@ -840,8 +841,7 @@ class FilterExpression:
 
         if plen < (alen - dlen) or plen > alen:
             raise TemplateSyntaxError(
-                "%s requires %d arguments, %d provided"
-                % (name, alen - dlen, plen)
+                "%s requires %d arguments, %d provided" % (name, alen - dlen, plen)
             )
 
         return True
