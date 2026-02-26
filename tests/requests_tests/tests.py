@@ -455,11 +455,18 @@ class RequestsTests(SimpleTestCase):
             request.body
 
     def test_malformed_multipart_header(self):
-        for header in [
-            'Content-Disposition : form-data; name="name"',
-            'Content-Disposition:form-data; name="name"',
-            'Content-Disposition :form-data; name="name"',
-        ]:
+        tests = [
+            ('Content-Disposition : form-data; name="name"', {"name": ["value"]}),
+            ('Content-Disposition:form-data; name="name"', {"name": ["value"]}),
+            ('Content-Disposition :form-data; name="name"', {"name": ["value"]}),
+            # The invalid encoding causes the entire part to be skipped.
+            (
+                'Content-Disposition: form-data; name="name"; '
+                "filename*=BOGUS''test%20file.txt",
+                {},
+            ),
+        ]
+        for header, expected_post in tests:
             with self.subTest(header):
                 payload = FakePayload(
                     "\r\n".join(
@@ -480,7 +487,7 @@ class RequestsTests(SimpleTestCase):
                         "wsgi.input": payload,
                     }
                 )
-                self.assertEqual(request.POST, {"name": ["value"]})
+                self.assertEqual(request.POST, expected_post)
 
     def test_body_after_POST_multipart_related(self):
         """
