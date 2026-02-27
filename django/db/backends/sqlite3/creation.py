@@ -142,8 +142,9 @@ class DatabaseCreation(BaseDatabaseCreation):
             connection_str = (
                 f"file:memorydb_{alias}_{_worker_id}?mode=memory&cache=shared"
             )
+            source_db_name = settings_dict["NAME"]
             source_db = self.connection.Database.connect(
-                f"file:{alias}_{_worker_id}.sqlite3?mode=ro", uri=True
+                f"file:{source_db_name}?mode=ro", uri=True
             )
             target_db = sqlite3.connect(connection_str, uri=True)
             source_db.backup(target_db)
