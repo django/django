@@ -5,6 +5,7 @@ Requires psycopg2 >= 2.9.9 or psycopg >= 3.1.12
 """
 
 import asyncio
+import os
 import threading
 import warnings
 from contextlib import contextmanager
@@ -189,9 +190,22 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # PostgreSQL backend-specific attributes.
     _named_cursor_idx = 0
     _connection_pools = {}
+    _fork_registered = False
+
+    @classmethod
+    def _clear_pools_on_fork(cls):
+        # Clear the registry in the child process to prevent sharing
+        # inherited sockets across multiple processes after a fork()
+        cls._connection_pools.clear()
 
     @property
     def pool(self):
+        if not DatabaseWrapper._fork_registered:
+            register_hook = getattr(os, "register_at_fork", None)
+            if register_hook:
+                register_hook(after_in_child=self._clear_pools_on_fork)
+            DatabaseWrapper._fork_registered = True
+
         pool_options = self.settings_dict["OPTIONS"].get("pool")
         if self.alias == NO_DB_ALIAS or not pool_options:
             return None
