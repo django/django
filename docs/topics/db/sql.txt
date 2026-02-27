@@ -10,6 +10,11 @@ you can avoid the model layer entirely and `execute custom SQL directly`__.
 
 __ `performing raw queries`_
 __ `executing custom SQL directly`_
+A third option for including raw SQL in queries is the
+:class:`~django.db.models.expressions.RawSQL` expression. ``RawSQL``
+can be used within ``QuerySet`` methods such as ``annotate()`` and
+``filter()`` to inject custom SQL fragments while still using the ORM.
+See :ref:`query-expressions` for more details.
 
 .. admonition:: Explore the ORM before using raw SQL!
 
