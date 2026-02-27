@@ -1848,8 +1848,7 @@ class TestInlineWithFieldsets(TestDataMixin, TestCase):
             for y, inline_admin_form in enumerate(inline_admin_formset):
                 y_plus_one = y + 1
                 form_heading = (
-                    f'<h3><b>Photo:</b> <span class="inline_label">#{y_plus_one}</span>'
-                    "</h3>"
+                    f'<h3><span class="inline_label">#{y_plus_one}</span></h3>'
                 )
                 self.assertContains(response, form_heading, html=True)
 
@@ -2572,3 +2571,38 @@ class SeleniumTests(AdminSeleniumTestCase):
         m2m_widget = self.selenium.find_element(By.CSS_SELECTOR, "div.selector")
         self.assertTrue(m2m_widget.is_displayed())
         self.take_screenshot("tabular")
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_long_title_with_inlines_layout(self):
+        from selenium.webdriver.common.by import By
+
+        person = Person.objects.create(firstname="Lee")
+        Author.objects.create(name="very " + "long " * 30 + "title", person=person)
+        self.admin_login(username="super", password="secret")
+        url = reverse("admin:admin_inlines_person_change", args=(person.pk,))
+        self.selenium.get(self.live_server_url + url)
+
+        object_str = self.selenium.find_element(
+            By.CSS_SELECTOR, "fieldset.module tbody tr td.original p"
+        )
+        links = self.selenium.find_elements(
+            By.CSS_SELECTOR, "fieldset.module tbody tr td.original a"
+        )
+        self.assertTrue(object_str.is_displayed())
+        self.assertGreater(len(object_str.text), 100)
+        self.assertEqual(len(links), 2)
+        self.take_screenshot("tabular")
+
+        url = reverse("admin5:admin_inlines_person_change", args=(person.pk,))
+        self.selenium.get(self.live_server_url + url)
+
+        object_str = self.selenium.find_element(
+            By.CSS_SELECTOR, "fieldset.module div.inline-related h3 span"
+        )
+        links = self.selenium.find_elements(
+            By.CSS_SELECTOR, "fieldset.module div.inline-related div.inline-links a"
+        )
+        self.assertTrue(object_str.is_displayed())
+        self.assertGreater(len(object_str.text), 100)
+        self.assertEqual(len(links), 2)
+        self.take_screenshot("stacked")
