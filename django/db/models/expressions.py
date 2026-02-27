@@ -769,7 +769,7 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         # order of precedence
         expression_wrapper = "(%s)"
         sql = connection.ops.combine_expression(self.connector, expressions)
-        return expression_wrapper % sql, expression_params
+        return expression_wrapper % sql, tuple(expression_params)
 
     def resolve_expression(
         self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
@@ -835,7 +835,7 @@ class DurationExpression(CombinedExpression):
         # order of precedence
         expression_wrapper = "(%s)"
         sql = connection.ops.combine_duration_expression(self.connector, expressions)
-        return expression_wrapper % sql, expression_params
+        return expression_wrapper % sql, tuple(expression_params)
 
     def as_sqlite(self, compiler, connection, **extra_context):
         sql, params = self.as_sql(compiler, connection, **extra_context)
@@ -1179,8 +1179,8 @@ class Value(Expression):
             # oracledb does not always convert None to the appropriate
             # NULL type (like in case expressions using numbers), so we
             # use a literal SQL NULL
-            return "NULL", []
-        return "%s", [val]
+            return "NULL", ()
+        return "%s", (val,)
 
     def as_sqlite(self, compiler, connection, **extra_context):
         sql, params = self.as_sql(compiler, connection, **extra_context)
@@ -1273,7 +1273,7 @@ class Star(Expression):
         return "'*'"
 
     def as_sql(self, compiler, connection):
-        return "*", []
+        return "*", ()
 
 
 class DatabaseDefault(Expression):
@@ -1313,7 +1313,7 @@ class DatabaseDefault(Expression):
     def as_sql(self, compiler, connection):
         if not connection.features.supports_default_keyword_in_insert:
             return compiler.compile(self.expression)
-        return "DEFAULT", []
+        return "DEFAULT", ()
 
 
 class Col(Expression):
@@ -1398,7 +1398,7 @@ class ColPairs(Expression):
             cols_sql.append(sql)
             cols_params.extend(params)
 
-        return ", ".join(cols_sql), cols_params
+        return ", ".join(cols_sql), tuple(cols_params)
 
     def relabeled_clone(self, relabels):
         return self.__class__(
@@ -1447,7 +1447,7 @@ class Ref(Expression):
         return clone
 
     def as_sql(self, compiler, connection):
-        return connection.ops.quote_name(self.refs), []
+        return connection.ops.quote_name(self.refs), ()
 
     def get_group_by_cols(self):
         return [self]
@@ -1764,7 +1764,7 @@ class Case(SQLiteNumericMixin, Expression):
         sql = template % template_params
         if self._output_field_or_none is not None:
             sql = connection.ops.unification_cast_sql(self.output_field) % sql
-        return sql, sql_params
+        return sql, tuple(sql_params)
 
     def get_group_by_cols(self):
         if not self.cases:
@@ -2148,7 +2148,7 @@ class WindowFrame(Expression):
                 "end": end,
                 "exclude": self.get_exclusion(),
             },
-            [],
+            (),
         )
 
     def __repr__(self):
