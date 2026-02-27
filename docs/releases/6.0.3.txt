@@ -17,6 +17,9 @@ Bugfixes
   to :ref:`override<tuple-for-params>` ``as_sql()`` to accept any sequence
   (:ticket:`36934`).
 
+* Fixed :exc:`TypeError` when deprecation warnings are emitted in environments
+  importing Django by namespace (:ticket:`36961`).
+
 * Fixed a visual regression where fieldset legends were misaligned in the admin
   (:ticket:`36920`).
 

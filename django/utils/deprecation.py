@@ -17,6 +17,8 @@ def django_file_prefixes():
         file = django.__file__
     except AttributeError:
         return ()
+    if file is None:
+        return ()
     return (os.path.dirname(file),)
 
 
