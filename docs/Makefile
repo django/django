@@ -170,10 +170,15 @@ spelling:
 
 black:
 	@mkdir -p $(BUILDDIR)/black
-	find . -name "*.txt" -not -path "./_build/*" -not -path "./_theme/*" \
+	@find . -name "*.txt" -not -path "./_build/*" -not -path "./_theme/*" \
 		| xargs blacken-docs --rst-literal-block; echo $$? > "$(BUILDDIR)/black/output.txt"
-	@echo
-	@echo "Code blocks reformatted"
+	@RESULT=`cat $(BUILDDIR)/black/output.txt`; \
+	if [ "$$RESULT" -gt 0 ]; then \
+		echo "💥 📢 Code blocks in documentation must be reformatted with blacken-docs 📢 💥"; \
+		exit $$RESULT; \
+	else \
+		echo "Code blocks in documentation are properly formatted ✅"; \
+	fi
 
 check: spelling black
 	@echo
