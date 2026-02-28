@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <meta name="color-scheme" content="light" />
+  <meta name="color-scheme" content="light dark" />
   <meta name="robots" content="NONE,NOARCHIVE">
   <title>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}
          {% if request %} at {{ request.path_info }}{% endif %}</title>
@@ -67,6 +67,44 @@
     pre.exception_value { font-family: sans-serif; color: #575757; font-size: 1.5rem; margin: 10px 0 10px 0; }
     .append-bottom { margin-bottom: 10px; }
     .fname { user-select: all; }
+    @media (prefers-color-scheme: dark) {
+      body { background-color: #121212; color: #e0e0e0; }
+      body > header, body > main, body > footer { border-bottom-color: #444; }
+      h1, h2, h3, h4 { color: #e0e0e0; }
+      #summary { background: #2b2b2b; }
+      #summary h2 { color: #aaa; }
+      #explanation { background: #1f1f1f; }
+      #traceback { background: #121212; }
+      #template, #template-not-exist { background: #1e1e1e; }
+      #unicode-hint { background: #1e1e1e; }
+      #requestinfo { background: #1e1e1e; }
+      table { background: #1e1e1e; border-color: #444; }
+      thead th { background: #2a2a2a; border-color: #444; color: #e0e0e0; }
+      tbody th { color: #aaa; }
+      table.source th { color: #aaa; }
+      table.source td { border-bottom-color: #444; }
+      div.context ol li { color: #e0e0e0; background: #121212; }
+      div.context ol li pre { color: #e0e0e0; }
+      div.context ol.context-line li { color: #fff; background-color: #333333; box-shadow: 2px 0 0 #ff6b6b inset; }
+      .user div.context ol.context-line li { background-color: #444; color: #fff; }
+      .user div.context ol li { color: #bbb; }
+      ul.traceback { color: #e0e0e0; }
+      ul.traceback li.frame { color: #bbb; }
+      ul.traceback li.user { background-color: #2a2a2a; color: #e0e0e0; }
+      table.vars, table.req { background: #1e1e1e; }
+      table.vars td, table.vars th, table.req td, table.req th { border-color: #444; }
+      div.commands a, summary.commands { color: #aaa; }
+      .user div.commands a { color: #e0e0e0; }
+      a { color: #81d4fa; }
+      pre.exception_value { color: #e0e0e0; }
+      .specific { color: #ff6b6b; }
+      .error { background: #3d3d00; }
+      span.commands a:link { color: #a29bfe; }
+      #pastebinTraceback { background: #1e1e1e; }
+      textarea { background: #1e1e1e; color: #e0e0e0; border: 1px solid #444; }
+      input[type="submit"] { background: #333; color: #e0e0e0; border: 1px solid #555; }
+      code { color: #e0e0e0; }
+    }
   </style>
   {% if not is_email %}
   <script>
