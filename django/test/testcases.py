@@ -575,6 +575,8 @@ class SimpleTestCase(unittest.TestCase):
 
         if response.streaming:
             content = b"".join(response.streaming_content)
+            # Reset the response's content so we can check it again:
+            response.streaming_content = [content]
         else:
             content = response.content
         response_content = content
