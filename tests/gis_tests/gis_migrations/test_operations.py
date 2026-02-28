@@ -396,6 +396,75 @@ class OperationTests(OperationTestCase):
         )
         self.assertFalse(Neighborhood.objects.first().geom.hasz)
 
+    @skipUnlessDBFeature("can_alter_geometry_field")
+    def test_alter_geom_field_geography(self):
+        """
+        Altering from geography to geometry should include a USING
+        expression. Test migrating both directions (#23902).
+        """
+
+        if not connection.ops.postgis:
+            self.skipTest("PostGIS-specific test.")
+
+        from django.db.backends.postgresql.psycopg_any import sql
+
+        MODEL_NAME = "Neighborhood"
+        COLUMN = "geom"
+        Neighborhood = self.current_state.apps.get_model("gis", MODEL_NAME)
+        p1 = Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)))
+        mp = MultiPolygon(p1, p1)
+        Neighborhood.objects.create(name="TestGeography", geom=mp)
+
+        def _alter_and_verify_geo_columns(geography=True):
+            # 3 to capture ALTER, wrapped by BEGIN and COMMIT.
+            with self.assertNumQueries(3) as ctx:
+                # Alter to geography=True.
+                self.alter_gis_model(
+                    migrations.AlterField,
+                    MODEL_NAME,
+                    COLUMN,
+                    fields.MultiPolygonField,
+                    field_class_kwargs={"geography": geography},
+                )
+
+            if geography:
+                # geometry -> geography, USING is not invoked.
+                self.assertNotIn(" USING ", ctx.captured_queries[1]["sql"])
+
+            else:
+                # geography -> geometry, USING is needed.
+                self.assertIn(" USING ", ctx.captured_queries[1]["sql"])
+
+            # `geography` doesn't get stored on geom itself, only on
+            # the model field, which seems to get cached.
+            # So, inspect the DB directly. Table and column names
+            # change, accordingly.
+            geo_type = "geography" if geography else "geometry"
+            geo_cols = sql.Identifier(f"{geo_type}_columns")
+            geo_col = sql.Identifier(f"f_{geo_type}_column")
+
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    sql.SQL(
+                        """
+                    SELECT COUNT(*) FROM {geo_cols}
+                    WHERE f_table_name = %s AND {geo_col} = %s
+                """
+                    ).format(geo_cols=geo_cols, geo_col=geo_col),
+                    (Neighborhood._meta.db_table, COLUMN),
+                )
+
+                self.assertEqual(cursor.fetchone(), (1,))
+
+            # Shape should still look right.
+            self.assertEqual(Neighborhood.objects.first().geom.wkt, mp.wkt)
+
+        # Switch to geography, geom should appear in geography_columns.
+        _alter_and_verify_geo_columns(geography=True)
+
+        # Switch back to geometry, geom should now show up in geometry_columns.
+        _alter_and_verify_geo_columns(geography=False)
+
     @skipUnlessDBFeature(
         "supports_column_check_constraints", "can_introspect_check_constraints"
     )
