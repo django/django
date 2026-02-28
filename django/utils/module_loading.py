@@ -29,6 +29,10 @@ def import_string(dotted_path):
     try:
         return cached_import(module_path, class_name)
     except AttributeError as err:
+        # If the error name exists and doesn't match the class we want,
+        # it's a real bug inside the module. Let it bubble up!
+        if err.name and err.name != class_name:
+            raise
         raise ImportError(
             'Module "%s" does not define a "%s" attribute/class'
             % (module_path, class_name)
