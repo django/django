@@ -22,6 +22,8 @@ class MessageEncoder(json.JSONEncoder):
             message = [self.message_key, is_safedata, obj.level, obj.message]
             if obj.extra_tags is not None:
                 message.append(obj.extra_tags)
+            if obj.extra_kwargs is not None:
+                message.append(obj.extra_kwargs)
             return message
         return super().default(obj)
 
@@ -36,6 +38,9 @@ class MessageDecoder(json.JSONDecoder):
             if obj[0] == MessageEncoder.message_key:
                 if obj[1]:
                     obj[3] = mark_safe(obj[3])
+                # this conditional looks for extra_kwargs
+                if isinstance(obj[-1], str) and len(obj) > 5:
+                    obj[-1] = json.loads(obj[-1])
                 return Message(*obj[2:])
             return [self.process_messages(item) for item in obj]
         if isinstance(obj, dict):

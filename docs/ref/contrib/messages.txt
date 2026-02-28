@@ -91,6 +91,49 @@ To write your own storage class, subclass the ``BaseStorage`` class in
 ``django.contrib.messages.storage.base`` and implement the ``_get`` and
 ``_store`` methods.
 
+.. _custom-storage-class:
+
+Custom Storage Classes
+----------------------
+
+Here is an example of a custom storage class which uses ``extra_kwargs``
+passed to the message to specify whether a message should be permanent and
+therefore never expire after a single request::
+
+    class PermanentStorage(SessionStorage):
+        """
+        Example storage of allowing permanent messages
+        """
+
+        def __iter__(self):
+            self.used = True
+            if self._queued_messages:
+                self._loaded_messages.extend(self._queued_messages)
+                self._queued_messages = []
+            for message in self._loaded_messages:
+                # re-add permanent messages to _queued_messages
+                if (
+                    hasattr(message, "extra_kwargs")
+                    and message.extra_kwargs
+                    and message.extra_kwargs.get("permanent")
+                ):
+                    self._queued_messages.append(message)
+            return iter(self._loaded_messages)
+
+We would then set this in settings::
+
+    MESSAGE_STORAGE = "myapp.messages_storage.PermanentStorage"
+
+Finally we could then pass the extra kwargs in a view::
+
+    from django.contrib import messages
+
+
+    def my_view(request):
+        messages.info(request, "A temporary message")
+        messages.info(request, "A permanent message", extra_kwargs={"permanent": True})
+
+
 .. _message-level:
 
 Message levels
@@ -156,7 +199,11 @@ tags for the levels you wish to override::
 Using messages in views and templates
 =====================================
 
-.. function:: add_message(request, level, message, extra_tags='', fail_silently=False)
+.. function:: add_message(request, level, message, extra_tags='', fail_silently=False, extra_kwargs=None)
+
+.. versionchanged:: 6.1
+
+    ``extra_kwargs`` was added.
 
 Adding a message
 ----------------
@@ -257,6 +304,16 @@ The ``Message`` class
     * ``level_tag``: The string representation of the level. By default, it's
       the lowercase version of the name of the associated constant, but this
       can be changed if you need by using the :setting:`MESSAGE_TAGS` setting.
+
+    * ``extra_kwargs``: This variable accepts all further keyword arguments
+      to the Message class. The default behavior is that this does nothing,
+      but allows third-party storage classes to extend the behavior of this
+      class.
+
+
+    .. versionchanged:: 6.1
+
+        ``extra_kwargs`` was added.
 
 Creating custom message levels
 ------------------------------

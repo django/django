@@ -156,6 +156,23 @@ class AssertMessagesTest(MessagesTestMixin, SimpleTestCase):
             ],
         )
 
+    def test_with_extra_kwargs(self):
+        response = FakeResponse()
+        add_message(
+            response.wsgi_request,
+            constants.INFO,
+            "INFO message.",
+            extra_kwargs={"permanent": True},
+        )
+        self.assertMessages(
+            response,
+            [
+                Message(
+                    constants.INFO, "INFO message.", extra_kwargs={"permanent": True}
+                ),
+            ],
+        )
+
     @override_settings(MESSAGE_TAGS={42: "CUSTOM"})
     def test_custom_levelname(self):
         response = FakeResponse()

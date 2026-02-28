@@ -1,3 +1,5 @@
+import json
+
 from django.conf import settings
 from django.contrib.messages import constants, utils
 from django.utils.functional import SimpleLazyObject
@@ -12,10 +14,11 @@ class Message:
     or template.
     """
 
-    def __init__(self, level, message, extra_tags=None):
+    def __init__(self, level, message, extra_tags=None, extra_kwargs=None):
         self.level = int(level)
         self.message = message
         self.extra_tags = extra_tags
+        self.extra_kwargs = extra_kwargs
 
     def _prepare(self):
         """
@@ -24,6 +27,10 @@ class Message:
         """
         self.message = str(self.message)
         self.extra_tags = str(self.extra_tags) if self.extra_tags is not None else None
+        if self.extra_kwargs is not None and isinstance(self.extra_kwargs, dict):
+            self.extra_kwargs = json.dumps(self.extra_kwargs)
+        else:
+            self.extra_kwargs = None
 
     def __eq__(self, other):
         if not isinstance(other, Message):
@@ -35,7 +42,11 @@ class Message:
 
     def __repr__(self):
         extra_tags = f", extra_tags={self.extra_tags!r}" if self.extra_tags else ""
-        return f"Message(level={self.level}, message={self.message!r}{extra_tags})"
+        extra_kwargs = (
+            f", extra_kwargs={self.extra_kwargs!r}" if self.extra_kwargs else ""
+        )
+        message = f"{self.message!r}{extra_tags}{extra_kwargs}"
+        return f"Message(level={self.level}, message={message})"
 
     @property
     def tags(self):
@@ -54,6 +65,8 @@ class BaseStorage:
     subclassed and the two methods ``_get`` and ``_store`` overridden.
     """
 
+    message_class = Message
+
     def __init__(self, request, *args, **kwargs):
         self.request = request
         self._queued_messages = []
@@ -65,6 +78,16 @@ class BaseStorage:
         return len(self._loaded_messages) + len(self._queued_messages)
 
     def __iter__(self):
+        """
+        Iterate over all messages to attempt to display them.
+
+        Any new messages (via _queued_messages) are added to any previously
+        stored messages (via _loaded_messaged). All messages are then returned
+        to be iterated over externally (typically via a template).
+
+        This method can be altered by a subclass to alter the logic of when
+        a message would be cleared from storage.
+        """
         self.used = True
         if self._queued_messages:
             self._loaded_messages.extend(self._queued_messages)
@@ -125,6 +148,12 @@ class BaseStorage:
         for message in messages:
             message._prepare()
 
+    def get_message_class(self):
+        return self.message_class
+
+    def get_message(self, *args, **kwargs):
+        return self.get_message_class()(*args, **kwargs)
+
     def update(self, response):
         """
         Store all unread messages.
@@ -139,7 +168,7 @@ class BaseStorage:
             messages = self._loaded_messages + self._queued_messages
             return self._store(messages, response)
 
-    def add(self, level, message, extra_tags=""):
+    def add(self, level, message, extra_tags="", extra_kwargs=None):
         """
         Queue a message to be stored.
 
@@ -154,7 +183,9 @@ class BaseStorage:
             return
         # Add the message.
         self.added_new = True
-        message = Message(level, message, extra_tags=extra_tags)
+        message = self.get_message(
+            level, message, extra_tags=extra_tags, extra_kwargs=extra_kwargs
+        )
         self._queued_messages.append(message)
 
     def _get_level(self):
