@@ -164,7 +164,7 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
         prev = OGRGeometry("POINT(0 0)")
         for ls in self.geometries.linestrings:
             linestr = OGRGeometry(ls.wkt)
-            self.assertEqual(2, linestr.geom_type)
+            self.assertEqual(ls.geom_type, linestr.geom_type)
             self.assertEqual("LINESTRING", linestr.geom_name)
             self.assertEqual(ls.n_p, linestr.point_count)
             self.assertEqual(ls.coords, linestr.tuple)
@@ -175,9 +175,15 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
                 linestr.__getitem__(len(linestr))
             prev = linestr
 
-            # Testing the x, y properties.
-            x = [tmpx for tmpx, tmpy in ls.coords]
-            y = [tmpy for tmpx, tmpy in ls.coords]
+            # Testing the x, y, z properties.
+            if ls.geom_type == 2:
+                x = [tmpx for tmpx, tmpy in ls.coords]
+                y = [tmpy for tmpx, tmpy in ls.coords]
+            else:
+                x = [tmpx for tmpx, tmpy, tmpz in ls.coords]
+                y = [tmpy for tmpx, tmpy, tmpz in ls.coords]
+                z = [tmpz for tmpx, tmpy, tmpz in ls.coords]
+                self.assertEqual(z, linestr.z)
             self.assertEqual(x, linestr.x)
             self.assertEqual(y, linestr.y)
 

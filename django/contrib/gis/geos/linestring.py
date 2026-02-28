@@ -1,3 +1,5 @@
+from ctypes import c_double
+
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq
 from django.contrib.gis.geos.error import GEOSException
@@ -61,16 +63,22 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
                 raise TypeError("Too many dimensions.")
             self._checkdim(shape[1])
             ndim = shape[1]
+            flat_coords = coords.flatten()
         else:
             # Getting the number of coords and the number of dimensions, which
             #  must stay the same, e.g., no LineString((1, 2), (1, 2, 3)).
             ndim = None
+            flat_coords = []
             # Incrementing through each of the coordinates and verifying
             for coord in coords:
                 if not isinstance(coord, (tuple, list, Point)):
                     raise TypeError(
                         "Each coordinate should be a sequence (list or tuple)"
                     )
+                if isinstance(coord, Point):
+                    flat_coords.extend(coord.tuple)
+                else:
+                    flat_coords.extend(coord)
 
                 if ndim is None:
                     ndim = len(coord)
@@ -78,23 +86,14 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
                 elif len(coord) != ndim:
                     raise TypeError("Dimension mismatch.")
 
-        # Creating a coordinate sequence object because it is easier to
-        # set the points using its methods.
-        cs = GEOSCoordSeq(capi.create_cs(ncoords, ndim), z=bool(ndim == 3))
-        point_setter = cs._set_point_3d if ndim == 3 else cs._set_point_2d
-
-        for i in range(ncoords):
-            if numpy_coords:
-                point_coords = coords[i, :]
-            elif isinstance(coords[i], Point):
-                point_coords = coords[i].tuple
-            else:
-                point_coords = coords[i]
-            point_setter(i, point_coords)
-
-        # Calling the base geometry initialization with the returned pointer
-        #  from the function.
-        super().__init__(self._init_func(cs.ptr), srid=srid)
+        coords_buffer = (c_double * len(flat_coords))(*flat_coords)
+        cs_ptr = capi.coordseq_from_buffer(
+            coords_buffer,
+            ncoords,
+            int(ndim == 3),
+            0,  # hasM not yet supported.
+        )
+        super().__init__(self._init_func(cs_ptr), srid=srid)
 
     def __iter__(self):
         "Allow iteration over this LineString."
