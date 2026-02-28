@@ -13,8 +13,8 @@ from django.utils.functional import cached_property
 
 
 class BaseMemcachedCache(BaseCache):
-    def __init__(self, server, params, library, value_not_found_exception):
-        super().__init__(params)
+    def __init__(self, server, params, library, value_not_found_exception, **kwargs):
+        super().__init__(params, **kwargs)
         if isinstance(server, str):
             self._servers = re.split("[;,]", server)
         else:
@@ -145,11 +145,15 @@ class BaseMemcachedCache(BaseCache):
 class PyLibMCCache(BaseMemcachedCache):
     "An implementation of a cache binding using pylibmc"
 
-    def __init__(self, server, params):
+    def __init__(self, server, params, **kwargs):
         import pylibmc
 
         super().__init__(
-            server, params, library=pylibmc, value_not_found_exception=pylibmc.NotFound
+            server,
+            params,
+            library=pylibmc,
+            value_not_found_exception=pylibmc.NotFound,
+            **kwargs,
         )
 
     @property
@@ -174,11 +178,15 @@ class PyLibMCCache(BaseMemcachedCache):
 class PyMemcacheCache(BaseMemcachedCache):
     """An implementation of a cache binding using pymemcache."""
 
-    def __init__(self, server, params):
+    def __init__(self, server, params, **kwargs):
         import pymemcache.serde
 
         super().__init__(
-            server, params, library=pymemcache, value_not_found_exception=KeyError
+            server,
+            params,
+            library=pymemcache,
+            value_not_found_exception=KeyError,
+            **kwargs,
         )
         self._class = self._lib.HashClient
         self._options = {

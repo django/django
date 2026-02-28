@@ -198,7 +198,7 @@ Asynchronous views
 Cache
 ~~~~~
 
-* ...
+* cache backends now receive the alias name when being instantiated.
 
 CSP
 ~~~

@@ -171,8 +171,8 @@ class RedisCacheClient:
 
 
 class RedisCache(BaseCache):
-    def __init__(self, server, params):
-        super().__init__(params)
+    def __init__(self, server, params, **kwargs):
+        super().__init__(params, **kwargs)
         if isinstance(server, str):
             self._servers = re.split("[;,]", server)
         else:
