@@ -811,7 +811,7 @@ Backend     SQL Equivalent
 ==========  ==================================================
 PostGIS     ``ST_Distance/ST_Distance_Sphere(poly, geom) > 5``
 MariaDB     ``ST_Distance(poly, geom) > 5``
-MySQL       ``ST_Distance(poly, geom) > 5``
+MySQL       ``ST_Distance/ST_Distance_Sphere(poly, geom) > 5``
 Oracle      ``SDO_GEOM.SDO_DISTANCE(poly, geom, 0.05) > 5``
 SpatiaLite  ``Distance(poly, geom) > 5``
 ==========  ==================================================
@@ -833,7 +833,7 @@ Backend     SQL Equivalent
 ==========  ===================================================
 PostGIS     ``ST_Distance/ST_Distance_Sphere(poly, geom) >= 5``
 MariaDB     ``ST_Distance(poly, geom) >= 5``
-MySQL       ``ST_Distance(poly, geom) >= 5``
+MySQL       ``ST_Distance/ST_Distance_Sphere(poly, geom) >= 5``
 Oracle      ``SDO_GEOM.SDO_DISTANCE(poly, geom, 0.05) >= 5``
 SpatiaLite  ``Distance(poly, geom) >= 5``
 ==========  ===================================================
@@ -855,7 +855,7 @@ Backend     SQL Equivalent
 ==========  ==================================================
 PostGIS     ``ST_Distance/ST_Distance_Sphere(poly, geom) < 5``
 MariaDB     ``ST_Distance(poly, geom) < 5``
-MySQL       ``ST_Distance(poly, geom) < 5``
+MySQL       ``ST_Distance/ST_Distance_Sphere(poly, geom) < 5``
 Oracle      ``SDO_GEOM.SDO_DISTANCE(poly, geom, 0.05) < 5``
 SpatiaLite  ``Distance(poly, geom) < 5``
 ==========  ==================================================
@@ -877,7 +877,7 @@ Backend     SQL Equivalent
 ==========  ===================================================
 PostGIS     ``ST_Distance/ST_Distance_Sphere(poly, geom) <= 5``
 MariaDB     ``ST_Distance(poly, geom) <= 5``
-MySQL       ``ST_Distance(poly, geom) <= 5``
+MySQL       ``ST_Distance/ST_Distance_Sphere(poly, geom) <= 5``
 Oracle      ``SDO_GEOM.SDO_DISTANCE(poly, geom, 0.05) <= 5``
 SpatiaLite  ``Distance(poly, geom) <= 5``
 ==========  ===================================================

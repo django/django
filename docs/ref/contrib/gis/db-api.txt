@@ -26,6 +26,15 @@ Django supports spatial functions operating on real geometries available in
 modern MySQL versions. However, the spatial functions are not as rich as other
 backends like PostGIS.
 
+MySQL supports ``ST_Distance_Sphere`` for calculating spherical distances
+between point geometries on geodetic coordinate systems. However, distance
+parameters must be numeric values in degree units rather than
+:class:`~django.contrib.gis.measure.Distance` objects.
+
+.. versionchanged:: 6.1
+
+    ``ST_Distance_Sphere`` support was added on MySQL.
+
 Raster Support
 --------------
 
@@ -275,6 +284,8 @@ to be in the units of the field.
 
     In PostGIS, ``ST_Distance_Sphere`` does *not* limit the geometry types
     geographic distance queries are performed with. [#fndistsphere15]_
+    In MySQL, distance parameters must be specified as numeric degree values
+    rather than :class:`~django.contrib.gis.measure.Distance` objects.
     However, these queries may take a long time, as great-circle distances must
     be calculated on the fly for *every* row in the query. This is because the
     spatial index on traditional geometry fields cannot be used.
