@@ -1,3 +1,8 @@
+const moduleConst2 = "module2";
+export default moduleConst2;
+export const moduleConst = "module";
+// export keyword test
+
 // Static imports.
 import rootConst from "/static/absolute_root.js";
 import testConst from "./module_test.js";
@@ -18,7 +23,7 @@ import relativeModule from "../nested/js/nested.js";
 const dynamicModule = import("./module_test.js");
 
 // Modules exports to aggregate modules.
-export * from "./module_test.js";
+export * from "./module_test.js";  // export keyword test
 export { testConst } from "./module_test.js";
 export {
     firstVar as firstVarAlias,

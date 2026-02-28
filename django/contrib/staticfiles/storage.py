@@ -204,7 +204,7 @@ class HashedFilesMixin:
         """
         return self._url(self.stored_name, name, force)
 
-    def url_converter(self, name, hashed_files, template=None):
+    def url_converter(self, name, hashed_files, hashed_imports_exports, template=None):
         """
         Return the custom URL converter for the given file name.
         """
@@ -221,6 +221,10 @@ class HashedFilesMixin:
             matches = matchobj.groupdict()
             matched = matches["matched"]
             url = matches["url"]
+
+            # Ignore already hashed imports and exports
+            if url in hashed_imports_exports:
+                return matched
 
             # Ignore absolute/protocol-relative and data-uri URLs.
             if re.match(r"^[a-z]+:", url) or url.startswith("//"):
@@ -268,6 +272,7 @@ class HashedFilesMixin:
 
             # Return the hashed version to the file
             matches["url"] = unquote(transformed_url)
+            hashed_imports_exports.add(matches["url"])
             return template % matches
 
         return converter
@@ -367,6 +372,7 @@ class HashedFilesMixin:
                 # ..to apply each replacement pattern to the content
                 if name in adjustable_paths:
                     old_hashed_name = hashed_name
+                    hashed_imports_exports = set()
                     try:
                         content = original_file.read().decode("utf-8")
                     except UnicodeDecodeError as exc:
@@ -375,7 +381,7 @@ class HashedFilesMixin:
                         if matches_patterns(path, (extension,)):
                             for pattern, template in patterns:
                                 converter = self.url_converter(
-                                    name, hashed_files, template
+                                    name, hashed_files, hashed_imports_exports, template
                                 )
                                 try:
                                     content = pattern.sub(converter, content)
