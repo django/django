@@ -166,7 +166,6 @@ class RemoteUserMiddleware:
         if user:
             # User is valid. Set request.user and persist user in the session
             # by logging the user in.
-            request.user = user
             auth.login(request, user)
 
     async def __acall__(self, request):
