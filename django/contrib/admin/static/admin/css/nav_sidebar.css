@@ -117,13 +117,18 @@
 }
 
 @media (max-width: 767px) {
-    #nav-sidebar, #toggle-nav-sidebar {
-        display: none;
+    #container > .main.shifted {
+        overflow-x: hidden;
+        flex: 0 1 auto;
     }
 
-    .main > #nav-sidebar + .content,
-    .main.shifted > #nav-sidebar + .content {
-        max-width: 100%;
+    .main.shifted #nav-sidebar {
+        flex: none;
+    }
+
+    #nav-sidebar {
+        width: calc(100% - 23px);
+        height: 100%;
     }
 }
 

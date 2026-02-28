@@ -2,9 +2,10 @@
 {
     const toggleNavSidebar = document.getElementById('toggle-nav-sidebar');
     if (toggleNavSidebar !== null) {
+        const isMobile = window.innerWidth <= 768;
         const navSidebar = document.getElementById('nav-sidebar');
         const main = document.getElementById('main');
-        let navSidebarIsOpen = localStorage.getItem('django.admin.navSidebarIsOpen');
+        let navSidebarIsOpen = isMobile ? false : localStorage.getItem('django.admin.navSidebarIsOpen');
         if (navSidebarIsOpen === null) {
             navSidebarIsOpen = 'true';
         }
