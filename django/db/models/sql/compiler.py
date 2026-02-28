@@ -411,6 +411,8 @@ class SQLCompiler:
             if expr := self.query.annotations.get(col):
                 ref = col
                 transforms = []
+            elif col in self.query._filtered_relations:
+                expr = None  # Let find_ordering_name handle the join
             else:
                 ref, *transforms = col.split(LOOKUP_SEP)
                 expr = self.query.annotations.get(ref)
@@ -1074,7 +1076,10 @@ class SQLCompiler:
         """
         name, order = get_order_dir(name, default_order)
         descending = order == "DESC"
-        pieces = name.split(LOOKUP_SEP)
+        if name in self.query._filtered_relations:
+            pieces = [name]
+        else:
+            pieces = name.split(LOOKUP_SEP)
         (
             field,
             targets,
