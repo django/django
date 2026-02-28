@@ -2080,7 +2080,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         """
         The "Add another XXX" link correctly adds items to the inline form.
         """
-        from selenium.webdriver.common.by import By
+        from selenium.webdriver.common.by import By # type: ignore
 
         self.admin_login(username="super", password="secret")
         self.selenium.get(
@@ -2102,11 +2102,17 @@ class SeleniumTests(AdminSeleniumTestCase):
             ".dynamic-profile_set#profile_set-0 input[name=profile_set-0-last_name]", 1
         )
 
+        # NEWLY ADDED
+        initial_rows = self.selenium.find_elements(
+    By.CSS_SELECTOR, ".dynamic-profile_set"
+)
+        initial_count = len(initial_rows)
+
         # Add an inline
         self.selenium.find_element(By.LINK_TEXT, "Add another Profile").click()
         # NEWLY ADDED
         rows = self.selenium.find_elements(By.CSS_SELECTOR, ".dynamic-profile_set")
-        self.assertEqual(len(rows), expected_count)
+        self.assertEqual(len(rows), initial_count + 1)
 
         # The inline has been added, it has the right id, and it contains the
         # correct fields.
