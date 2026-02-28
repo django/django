@@ -8,6 +8,7 @@ import warnings
 from pathlib import Path
 
 from django.conf import settings
+from django.core.exceptions import TooManyFieldsSent, TooManyFilesSent
 from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
 from django.template.defaultfilters import pprint
@@ -410,8 +411,17 @@ class ExceptionReporter:
             "postmortem": self.postmortem,
         }
         if self.request is not None:
-            c["request_GET_items"] = self.request.GET.items()
-            c["request_FILES_items"] = self.request.FILES.items()
+            try:
+                c["request_GET_items"] = self.request.GET.items()
+                c["request_GET_error"] = None
+            except TooManyFieldsSent as e:
+                c["request_GET_items"] = []
+                c["request_GET_error"] = str(e)
+            try:
+                c["request_FILES_items"] = self.request.FILES.items()
+            except TooManyFilesSent as e:
+                c["request_FILES_items"] = []
+                c["request_FILES_error"] = str(e)
             c["request_insecure_uri"] = self._get_raw_insecure_uri()
             c["raising_view_name"] = get_caller(self.request)
 
