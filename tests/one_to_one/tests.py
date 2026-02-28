@@ -1,6 +1,8 @@
+from unittest.mock import patch
+
 from django.core.exceptions import FieldFetchBlocked
 from django.db import IntegrityError, connection, transaction
-from django.db.models import FETCH_PEERS, RAISE
+from django.db.models import FETCH_PEERS, RAISE, QuerySet
 from django.test import TestCase
 
 from .models import (
@@ -695,3 +697,168 @@ class OneToOneTests(TestCase):
             p1.restaurant._state.fetch_mode,
             FETCH_PEERS,
         )
+
+    def test_get_or_create_race_keeps_reverse_o2o_cache_consistent(self):
+        """
+        Regression test for #36489.
+
+        Simulate two concurrent Restaurant.get_or_create(place=...) calls
+        racing on the same OneToOneField. The loser of the insert must not
+        leave an unsaved instance cached on the reverse side (place.restaurant
+        with pk=None). After get_or_create(), place.restaurant must resolve to
+        the saved row.
+        """
+        place = Place.objects.create(name="Race Diner", address="Somewhere")
+
+        # We’ll inject a concurrent get_or_create inside the first one by
+        # patching QuerySet._extract_model_params
+        original = QuerySet._extract_model_params
+        triggered = {"done": False}
+
+        def side_effect(self, defaults=None, **kwargs):
+            # Only re-enter once, and only for the same place kwarg.
+            if not triggered["done"] and kwargs.get("place") == place:
+                triggered["done"] = True
+                # Use a *fresh* instance of place to emulate a separate thread.
+                Restaurant.objects.get_or_create(
+                    place=Place.objects.get(pk=place.pk),
+                    defaults={"serves_hot_dogs": True, "serves_pizza": False},
+                )
+            return original(self, defaults, **kwargs)
+
+        with patch(
+            "django.db.models.query.QuerySet._extract_model_params",
+            side_effect,
+        ):
+            restaurant, created = Restaurant.objects.get_or_create(
+                place=place,
+                defaults={"serves_hot_dogs": True, "serves_pizza": False},
+            )
+            self.assertFalse(created)
+
+        # The reverse cache must not contain an unsaved Restaurant.
+        # Accessing place.restaurant should yield a saved row with a pk,
+        # and it should be the same row returned above.
+        self.assertIsNotNone(restaurant.pk)
+        self.assertIsNotNone(place.restaurant.pk)
+        self.assertEqual(place.restaurant.pk, restaurant.pk)
+        self.assertEqual(restaurant.place_id, place.pk)
+
+    def test_get_or_create_race_does_not_clear_valid_select_related_cache(self):
+        place = Place.objects.create(name="Silver Square", address="Somewhere")
+        Restaurant.objects.create(place=place, serves_hot_dogs=True, serves_pizza=False)
+
+        # Prime a valid forward cache via select_related()
+        # (we don't clear this path).
+        fetched = Restaurant.objects.select_related("place").get(place=place)
+
+        # Run a no-op get_or_create (no IntegrityError path taken).
+        _, created = Restaurant.objects.get_or_create(
+            place=place, defaults={"serves_hot_dogs": False, "serves_pizza": False}
+        )
+        self.assertFalse(created)
+
+        # Using the forward cache should not cause a query.
+        with self.assertNumQueries(0):
+            _ = fetched.place.id
+
+    def test_update_or_create_race_keeps_reverse_o2o_cache_consistent(self):
+        """
+        Regression test for #36489 (update_or_create path).
+
+        Simulate two concurrent Restaurant.update_or_create(place=...) calls
+        racing on the same OneToOneField. The loser of the insert must not
+        leave an unsaved instance cached on the reverse side (place.restaurant
+        with pk=None). After update_or_create(), place.restaurant must resolve
+        to the saved row.
+        """
+        place = Place.objects.create(name="Update Race Diner", address="Somewhere")
+
+        # Inject a concurrent update_or_create inside the first one by
+        # patching QuerySet._extract_model_params.
+        original = QuerySet._extract_model_params
+        triggered = {"done": False}
+
+        def side_effect(self, defaults=None, **kwargs):
+            if not triggered["done"] and kwargs.get("place") == place:
+                triggered["done"] = True
+                # Use a fresh instance of place to emulate a separate thread.
+                Restaurant.objects.update_or_create(
+                    place=Place.objects.get(pk=place.pk),
+                    defaults={"serves_hot_dogs": True, "serves_pizza": False},
+                )
+            return original(self, defaults, **kwargs)
+
+        with patch(
+            "django.db.models.query.QuerySet._extract_model_params", side_effect
+        ):
+            restaurant, created = Restaurant.objects.update_or_create(
+                place=place,
+                defaults={"serves_hot_dogs": False, "serves_pizza": True},
+            )
+            self.assertFalse(created)
+
+        # The reverse cache must not contain an unsaved Restaurant.
+        # Accessing place.restaurant should yield a saved row with a pk,
+        # and it should be the same row returned above.
+        self.assertIsNotNone(restaurant.pk)
+        self.assertIsNotNone(place.restaurant.pk)
+        self.assertEqual(place.restaurant.pk, restaurant.pk)
+        self.assertEqual(restaurant.place_id, place.pk)
+
+    def test_update_or_create_race_with_defaults_reverse_o2o_cache_consistent(self):
+        """
+        Regression test for #36489 (defaults/create_defaults path).
+
+        Simulate two concurrent Restaurant.update_or_create(place=...) calls
+        with non-trivial defaults. The loser of the insert must not leave an
+        unsaved instance cached on the reverse side
+        (place.restaurant with pk=None).
+        After update_or_create(), place.restaurant must resolve
+        to the saved row, and the defaults must be consistent
+        with the actual saved object.
+        """
+        place = Place.objects.create(name="Defaults Diner", address="Anywhere")
+
+        # Unique UUID in defaults to detect stale cache.
+        default_context = {"serves_hot_dogs": True, "serves_pizza": False}
+        alt_context = {"serves_hot_dogs": False, "serves_pizza": True}
+
+        # Inject a concurrent update_or_create inside the first one.
+        original = QuerySet._extract_model_params
+        triggered = {"done": False}
+
+        def side_effect(self, defaults=None, **kwargs):
+            if not triggered["done"] and kwargs.get("place") == place:
+                triggered["done"] = True
+                Restaurant.objects.update_or_create(
+                    place=Place.objects.get(pk=place.pk),
+                    defaults=alt_context,
+                )
+            return original(self, defaults, **kwargs)
+
+        with patch(
+            "django.db.models.query.QuerySet._extract_model_params", side_effect
+        ):
+            restaurant, created = Restaurant.objects.update_or_create(
+                place=place,
+                defaults=default_context,
+            )
+            self.assertFalse(created)
+
+        # The reverse cache must not contain an unsaved Restaurant.
+        self.assertIsNotNone(restaurant.pk)
+        self.assertIsNotNone(place.restaurant.pk)
+        self.assertEqual(place.restaurant.pk, restaurant.pk)
+
+        # The object in the cache must be the same row we got back.
+        self.assertEqual(place.restaurant.pk, restaurant.pk)
+        self.assertEqual(restaurant.place_id, place.pk)
+
+        # Ensure the actual persisted defaults match the winning insert,
+        # not some stale in-memory values.
+        db_restaurant = Restaurant.objects.get(pk=restaurant.pk)
+        self.assertEqual(
+            db_restaurant.serves_hot_dogs, place.restaurant.serves_hot_dogs
+        )
+        self.assertEqual(db_restaurant.serves_pizza, place.restaurant.serves_pizza)
