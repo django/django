@@ -1,7 +1,10 @@
+import copy
+
 from django.apps import apps
 from django.conf import settings
-from django.db import connection
+from django.db import connection, models
 from django.test import TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.test.utils import isolate_apps
 
 from .models.tablespaces import (
     Article,
@@ -133,3 +136,47 @@ class TablespacesTests(TransactionTestCase):
         # The ManyToManyField declares db_tablespace, its indexes go there.
         self.assertNumContains(sql, "tbl_tbsp", 0)
         self.assertNumContains(sql, "idx_tbsp", 2)
+
+
+class DefaultTablespaceTests(TransactionTestCase):
+    available_apps = ["model_options"]
+
+    def assertNumContains(self, haystack, needle, count):
+        real_count = haystack.count(needle)
+        self.assertEqual(
+            real_count,
+            count,
+            "Found %d instances of '%s', expected %d" % (real_count, needle, count),
+        )
+
+    @skipUnlessDBFeature("supports_tablespaces")
+    @isolate_apps("model_options")
+    def test_default_tablespace(self):
+        tablespace = "default_tablespace"
+        databases = copy.deepcopy(settings.DATABASES)
+        databases["default"]["DEFAULT_TABLESPACE"] = tablespace
+        with self.settings(DATABASES=databases):
+
+            class ScientistRef(models.Model):
+                name = models.CharField(max_length=50)
+
+            sql = sql_for_table(ScientistRef).lower()
+
+        # 1 for the table + 1 for the index on the primary key
+        self.assertNumContains(sql, tablespace, 2)
+
+    @skipUnlessDBFeature("supports_tablespaces")
+    @isolate_apps("model_options")
+    def test_default_index_tablespace(self):
+        index_tablespace = "default_index_tablespace"
+        databases = copy.deepcopy(settings.DATABASES)
+        databases["default"]["DEFAULT_INDEX_TABLESPACE"] = index_tablespace
+        with self.settings(DATABASES=databases):
+
+            class ScientistRef(models.Model):
+                name = models.CharField(max_length=50)
+
+            sql = sql_for_table(ScientistRef).lower()
+
+        # 1 for the index on the primary key
+        self.assertNumContains(sql, index_tablespace, 1)

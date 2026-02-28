@@ -16,11 +16,21 @@ from pathlib import Path
 import django
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 DEFAULT_STORAGE_ALIAS = "default"
 STATICFILES_STORAGE_ALIAS = "staticfiles"
+
+# RemovedInDjango60Warning.
+FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG = (
+    "The FORMS_URLFIELD_ASSUME_HTTPS transitional setting is deprecated."
+)
+DEFAULT_TABLESPACE_DEPRECATED_MSG = "The DEFAULT_TABLESPACE setting is deprecated."
+DEFAULT_INDEX_TABLESPACE_DEPRECATED_MSG = (
+    "The DEFAULT_INDEX_TABLESPACE setting is deprecated."
+)
 
 
 class SettingsReference(str):
@@ -75,6 +85,16 @@ class LazySettings(LazyObject):
             self._setup(name)
             _wrapped = self._wrapped
         val = getattr(_wrapped, name)
+        if name == "DEFAULT_TABLESPACE":
+            self._show_deprecation_warning(
+                DEFAULT_TABLESPACE_DEPRECATED_MSG,
+                RemovedInDjango70Warning,
+            )
+        elif name == "DEFAULT_INDEX_TABLESPACE":
+            self._show_deprecation_warning(
+                DEFAULT_INDEX_TABLESPACE_DEPRECATED_MSG,
+                RemovedInDjango70Warning,
+            )
 
         # Special case some settings which require further modification.
         # This is done here for performance reasons so the modified value is
@@ -139,6 +159,8 @@ class LazySettings(LazyObject):
         return self._wrapped is not empty
 
     def _show_deprecation_warning(self, message, category):
+        if not self.configured:
+            return
         stack = traceback.extract_stack()
         # Show a warning if the setting is used outside of Django.
         # Stack index: -1 this line, -2 the property, -3 the
@@ -181,6 +203,12 @@ class Settings:
                     )
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
+
+        if self.is_overridden("FORMS_URLFIELD_ASSUME_HTTPS"):
+            warnings.warn(
+                FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG,
+                RemovedInDjango70Warning,
+            )
 
         if hasattr(time, "tzset") and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
@@ -226,6 +254,13 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
+
+        if name == "FORMS_URLFIELD_ASSUME_HTTPS":
+            warnings.warn(
+                FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG,
+                RemovedInDjango70Warning,
+            )
+
         super().__setattr__(name, value)
 
     def __delattr__(self, name):
