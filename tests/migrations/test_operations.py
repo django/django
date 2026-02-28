@@ -2,7 +2,14 @@ import math
 from decimal import Decimal
 
 from django.core.exceptions import FieldDoesNotExist
-from django.db import IntegrityError, connection, migrations, models, transaction
+from django.db import (
+    DatabaseError,
+    IntegrityError,
+    connection,
+    migrations,
+    models,
+    transaction,
+)
 from django.db.migrations.migration import Migration
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.operations.fields import FieldOperation
@@ -6681,6 +6688,58 @@ class OperationTests(OperationTestBase):
         obj_2 = Pony.objects.get(id=obj_2.id)
         self.assertEqual(obj_2.id, 2)
         self.assertEqual(obj_2.pk, obj_2.id)
+
+    @skipUnlessDBFeature("supports_foreign_keys")
+    def test_delete_model_fails_on_fk(self):
+        """
+        DeleteModel raises a Database/IntegrityError if the model is still
+        referenced by a ForeignKey.
+        """
+        app_label = "test_dm_fk"
+        project_state = self.apply_operations(
+            app_label,
+            ProjectState(),
+            operations=[
+                migrations.CreateModel(
+                    "Author",
+                    fields=[("id", models.AutoField(primary_key=True))],
+                ),
+                migrations.CreateModel(
+                    "Book",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                        (
+                            "author",
+                            models.ForeignKey(f"{app_label}.Author", models.CASCADE),
+                        ),
+                    ],
+                ),
+            ],
+        )
+        Author = project_state.apps.get_model(app_label, "Author")
+        Book = project_state.apps.get_model(app_label, "Book")
+
+        author = Author.objects.create()
+        Book.objects.create(author=author)
+
+        operation = migrations.DeleteModel(name="Author")
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+
+        try:
+            with (
+                self.assertRaises((IntegrityError, DatabaseError)),
+                transaction.atomic(using=connection.alias),
+                connection.schema_editor() as editor,
+            ):
+                operation.database_forwards(app_label, editor, project_state, new_state)
+        finally:
+            with connection.schema_editor() as editor:
+                for model in [Book, Author]:
+                    try:
+                        editor.delete_model(model)
+                    except DatabaseError:
+                        pass
 
 
 class SwappableOperationTests(OperationTestBase):

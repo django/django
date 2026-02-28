@@ -269,7 +269,9 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* :class:`~django.db.backends.base.schema.BaseDatabaseSchemaEditor`,
+  Oracle, MySQL, and PostgreSQL backends no longer use ``CASCADE`` when
+  dropping a table.
 
 Models
 ~~~~~~
