@@ -573,6 +573,10 @@ class SetupConfigureLogging(SimpleTestCase):
     Calling django.setup() initializes the logging configuration.
     """
 
+    def tearDown(self):
+        super().tearDown()
+        dictConfig.called = False
+
     def test_configure_initializes_logging(self):
         from django import setup
 
@@ -585,6 +589,44 @@ class SetupConfigureLogging(SimpleTestCase):
             # Restore logging from settings.
             setup()
         self.assertTrue(dictConfig.called)
+
+    def test_logging_settings_changed(self):
+        """
+        Logging is reconfigured when LOGGING or LOGGING_CONFIG changes.
+        """
+        new_logging_info = {
+            "version": 1,
+            "disable_existing_loggers": False,
+            "loggers": {
+                "django.test_custom_logger": {
+                    "level": "INFO",
+                }
+            },
+        }
+        new_logging_warning = {
+            "version": 1,
+            "disable_existing_loggers": False,
+            "loggers": {
+                "django.test_custom_logger": {
+                    "level": "WARNING",
+                }
+            },
+        }
+        logger = logging.getLogger("django.test_custom_logger")
+
+        with override_settings(LOGGING=new_logging_info):
+            self.assertEqual(logger.level, logging.INFO)
+
+        # Repeating the operation works.
+        with override_settings(LOGGING=new_logging_warning):
+            self.assertEqual(logger.level, logging.WARNING)
+
+        # The default unconfigured level is NOTSET.
+        self.assertEqual(logger.level, logging.NOTSET)
+
+        self.assertIs(dictConfig.called, False)
+        with override_settings(LOGGING_CONFIG="logging_tests.tests.dictConfig"):
+            self.assertIs(dictConfig.called, True)
 
 
 @override_settings(DEBUG=True, ROOT_URLCONF="logging_tests.urls")
