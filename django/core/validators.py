@@ -249,13 +249,29 @@ class EmailValidator:
 
         user_part, domain_part = value.rsplit("@", 1)
 
-        if not self.user_regex.match(user_part):
-            raise ValidationError(self.message, code=self.code, params={"value": value})
-
-        if domain_part not in self.domain_allowlist and not self.validate_domain_part(
+        if not self.validate_username(user_part) or not self.validate_domain(
             domain_part
         ):
             raise ValidationError(self.message, code=self.code, params={"value": value})
+
+    def validate_username(self, user_part):
+        if self.user_regex.match(user_part):
+            return True
+
+    def validate_domain(self, domain_part):
+        if domain_part in self.domain_allowlist or self.domain_regex.match(domain_part):
+            return True
+
+        literal_match = self.literal_regex.match(domain_part)
+        if literal_match:
+            ip_address = literal_match[1]
+            try:
+                validate_ipv46_address(ip_address)
+                return True
+            except ValidationError:
+                pass
+
+        return False
 
     def validate_domain_part(self, domain_part):
         if self.domain_regex.match(domain_part):
