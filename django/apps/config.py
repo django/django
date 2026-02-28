@@ -189,8 +189,12 @@ class AppConfig:
                     msg += " Choices are: %s." % ", ".join(candidates)
                 raise ImportError(msg)
             else:
-                # Re-trigger the module import exception.
-                import_module(entry)
+                try:
+                    # Re-trigger the module import exception.
+                    import_module(entry)
+                except ModuleNotFoundError:
+                    raise ImportError(
+                        f"The following module was not found, install the dependency or remove it from INSTALLED_APPS: {entry}")
 
         # Check for obvious errors. (This check prevents duck typing, but
         # it could be removed if it became a problem in practice.)
