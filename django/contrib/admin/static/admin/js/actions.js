@@ -107,7 +107,7 @@
             updateCounter(actionCheckboxes, options);
         });
 
-        document.querySelectorAll(options.acrossQuestions + " a").forEach(function(el) {
+        document.querySelectorAll(options.acrossQuestions + ' button').forEach(function(el) {
             el.addEventListener('click', function(event) {
                 event.preventDefault();
                 const acrossInputs = document.querySelectorAll(options.acrossInput);
@@ -118,7 +118,7 @@
             });
         });
 
-        document.querySelectorAll(options.acrossClears + " a").forEach(function(el) {
+        document.querySelectorAll(options.acrossClears + ' button').forEach(function(el) {
             el.addEventListener('click', function(event) {
                 event.preventDefault();
                 document.getElementById(options.allToggleId).checked = false;

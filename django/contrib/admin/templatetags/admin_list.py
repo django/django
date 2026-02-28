@@ -43,12 +43,12 @@ def paginator_number(cl, i):
         return format_html("{} ", cl.paginator.ELLIPSIS)
     elif i == cl.page_num:
         return format_html(
-            '<a role="button" href="" aria-current="page">{}</a> ',
+            '<a href="" aria-current="page">{}</a> ',
             i,
         )
     else:
         return format_html(
-            '<a role="button" href="{}">{}</a> ',
+            '<a href="{}">{}</a> ',
             cl.get_query_string({PAGE_VAR: i}),
             i,
         )

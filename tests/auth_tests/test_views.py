@@ -1536,7 +1536,7 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
         response = self.client.get(user_change_url)
         # Test the link inside password field help_text.
         rel_link = re.search(
-            r'<a role="button" class="button" href="([^"]*)">Reset password</a>',
+            r'<a class="button" href="([^"]*)">Reset password</a>',
             response.text,
         )[1]
         self.assertEqual(urljoin(user_change_url, rel_link), password_change_url)
@@ -1640,7 +1640,7 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
         response = self.client.get(user_change_url)
         # Test the link inside password field help_text.
         rel_link = re.search(
-            r'<a role="button" class="button" href="([^"]*)">Set password</a>',
+            r'<a class="button" href="([^"]*)">Set password</a>',
             response.text,
         )[1]
         self.assertEqual(urljoin(user_change_url, rel_link), password_change_url)
@@ -1732,7 +1732,7 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
         )
         self.assertNotContains(
             response,
-            '<a role="button" class="button" href="../password/">Reset password</a>',
+            '<a class="button" href="../password/">Reset password</a>',
         )
         # Value in POST data is ignored.
         data = self.get_user_data(u)

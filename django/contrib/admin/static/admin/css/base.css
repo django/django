@@ -126,11 +126,14 @@ a:focus {
 }
 
 a:not(
-    [role="button"],
     #header a,
     #nav-sidebar a,
     #content-main.app-list a,
-    .object-tools a
+    .object-tools a,
+    .submit-row a,
+    .paginator a:not(.showall),
+    th .text a,
+    a.button
 ) {
     text-decoration: underline;
 }
