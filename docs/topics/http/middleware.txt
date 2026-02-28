@@ -66,10 +66,15 @@ just that it represents whatever comes next.
 
 The above is a slight simplification -- the ``get_response`` callable for the
 last middleware in the chain won't be the actual view but rather a wrapper
-method from the handler which takes care of applying :ref:`view middleware
-<view-middleware>`, calling the view with appropriate URL arguments, and
-applying :ref:`template-response <template-response-middleware>` and
-:ref:`exception <exception-middleware>` middleware.
+method from Django's internal request handler. This wrapper is responsible for
+managing the complete request/response lifecycle, including applying
+:ref:`view middleware <view-middleware>`, calling the view with appropriate URL
+arguments, and applying :ref:`template-response <template-response-middleware>`
+and :ref:`exception <exception-middleware>` middleware.
+
+In other words, even though middleware often appears to call the view directly,
+Django internally coordinates additional processing steps before and after the
+view is executed.
 
 Middleware can either support only synchronous Python (the default), only
 asynchronous Python, or both. See :ref:`async-middleware` for details of how to
