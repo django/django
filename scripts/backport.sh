@@ -19,8 +19,8 @@ REV=$1
 
 TMPFILE=tmplog.tmp
 
-# Cherry-pick the commit
-git cherry-pick ${REV}
+# Cherry-pick the commit, but skip hooks
+git -c core.hooksPath=/dev/null cherry-pick ${REV}
 
 # Create new log message by modifying the old one
 git log --pretty=format:"[${BRANCH_NAME}] %s%n%n%b%nBackport of ${REV} from main." HEAD^..HEAD \
