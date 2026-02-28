@@ -854,6 +854,14 @@ class BaseDatabaseSchemaEditor:
         """
         if not self._field_should_be_altered(old_field, new_field):
             return
+        old_is_non_concrete = not (old_field.concrete or old_field.many_to_many)
+        new_is_non_concrete = not (new_field.concrete or new_field.many_to_many)
+        if old_is_non_concrete and not new_is_non_concrete:
+            self.add_field(model, new_field)
+            return
+        if not old_is_non_concrete and new_is_non_concrete:
+            self.remove_field(model, old_field)
+            return
         # Ensure this field is even column-based
         old_db_params = old_field.db_parameters(connection=self.connection)
         old_type = old_db_params["type"]
