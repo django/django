@@ -51,7 +51,7 @@ class Extract(TimezoneMixin, Transform):
         super().__init__(expression, **extra)
 
     def as_sql(self, compiler, connection):
-        sql, params = compiler.compile(self.lhs)
+        sql, params = self.process_lhs(compiler, connection)
         lhs_output_field = self.lhs.output_field
         if isinstance(lhs_output_field, DateTimeField):
             tzname = self.get_tzname()
@@ -258,7 +258,7 @@ class TruncBase(TimezoneMixin, Transform):
         super().__init__(expression, output_field=output_field, **extra)
 
     def as_sql(self, compiler, connection):
-        sql, params = compiler.compile(self.lhs)
+        sql, params = self.process_lhs(compiler, connection)
         tzname = None
         if isinstance(self.lhs.output_field, DateTimeField):
             tzname = self.get_tzname()
@@ -405,7 +405,7 @@ class TruncDate(TruncBase):
 
     def as_sql(self, compiler, connection):
         # Cast to date rather than truncate to date.
-        sql, params = compiler.compile(self.lhs)
+        sql, params = self.process_lhs(compiler, connection)
         tzname = self.get_tzname()
         return connection.ops.datetime_cast_date_sql(sql, tuple(params), tzname)
 
@@ -417,7 +417,7 @@ class TruncTime(TruncBase):
 
     def as_sql(self, compiler, connection):
         # Cast to time rather than truncate to time.
-        sql, params = compiler.compile(self.lhs)
+        sql, params = self.process_lhs(compiler, connection)
         tzname = self.get_tzname()
         return connection.ops.datetime_cast_time_sql(sql, tuple(params), tzname)
 
