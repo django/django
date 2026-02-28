@@ -2,6 +2,7 @@
 
 import glob
 import os
+import pathlib
 import pickle
 import random
 import tempfile
@@ -9,7 +10,9 @@ import time
 import zlib
 from hashlib import md5
 
+from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
+from django.core.checks import Warning
 from django.core.files import locks
 from django.core.files.move import file_move_safe
 
@@ -38,6 +41,57 @@ class FileBasedCache(BaseCache):
         except FileNotFoundError:
             pass
         return default
+
+    def check(self, alias, config, **kwargs):
+        return [
+            *self._check_cache_location_is_not_exposed(alias, config),
+            *self._check_location_is_not_relative(alias, config),
+        ]
+
+    def _check_cache_location_is_not_exposed(self, alias, config):
+        errors = []
+        for name in ("MEDIA_ROOT", "STATIC_ROOT", "STATICFILES_DIRS"):
+            setting = getattr(settings, name, None)
+            if not setting:
+                continue
+            if name == "STATICFILES_DIRS":
+                paths = set()
+                for staticfiles_dir in setting:
+                    if isinstance(staticfiles_dir, (list, tuple)):
+                        _, staticfiles_dir = staticfiles_dir
+                    paths.add(pathlib.Path(staticfiles_dir).resolve())
+            else:
+                paths = {pathlib.Path(setting).resolve()}
+            cache_path = pathlib.Path(self._dir).resolve()
+            if any(path == cache_path for path in paths):
+                relation = "matches"
+            elif any(path in cache_path.parents for path in paths):
+                relation = "is inside"
+            elif any(cache_path in path.parents for path in paths):
+                relation = "contains"
+            else:
+                continue
+            errors.append(
+                Warning(
+                    f"Your '{alias}' cache configuration might expose your cache "
+                    f"or lead to corruption of your data because its LOCATION "
+                    f"{relation} {name}.",
+                    id="caches.W002",
+                )
+            )
+        return errors
+
+    def _check_location_is_not_relative(self, alias, config):
+        location = config["LOCATION"]
+        if not os.path.isabs(location):
+            return [
+                Warning(
+                    f"Your '{alias}' cache LOCATION path is relative. Use an "
+                    f"absolute path instead.",
+                    id="caches.W003",
+                )
+            ]
+        return []
 
     def _write_content(self, file, timeout, value):
         expiry = self.get_backend_timeout(timeout)
