@@ -2104,6 +2104,9 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # Add an inline
         self.selenium.find_element(By.LINK_TEXT, "Add another Profile").click()
+        # NEWLY ADDED
+        rows = self.selenium.find_elements(By.CSS_SELECTOR, ".dynamic-profile_set")
+        self.assertEqual(len(rows), expected_count)
 
         # The inline has been added, it has the right id, and it contains the
         # correct fields.
