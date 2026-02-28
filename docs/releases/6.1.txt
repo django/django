@@ -183,7 +183,9 @@ Minor features
 :mod:`django.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` can
+  now handle circular dependencies when doing substitutions. It can also ignore
+  urls found in comments in CSS and JavaScript files.
 
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,8 +1,10 @@
 import json
 import os
+import re
 import shutil
 import sys
 import tempfile
+import textwrap
 import unittest
 from io import StringIO
 from pathlib import Path
@@ -101,7 +103,7 @@ class TestHashedFiles:
 
     def test_path_with_querystring_and_fragment(self):
         relpath = self.hashed_file_path("cached/css/fragments.css")
-        self.assertEqual(relpath, "cached/css/fragments.7fe344dee895.css")
+        self.assertEqual(relpath, "cached/css/fragments.f79c9b1f7afb.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertIn(b"fonts/font.b9b105392eb8.eot?#iefix", content)
@@ -119,7 +121,7 @@ class TestHashedFiles:
 
     def test_template_tag_absolute(self):
         relpath = self.hashed_file_path("cached/absolute.css")
-        self.assertEqual(relpath, "cached/absolute.eb04def9f9a4.css")
+        self.assertEqual(relpath, "cached/absolute.8f5d0e644e9a.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertNotIn(b"/static/cached/styles.css", content)
@@ -143,23 +145,48 @@ class TestHashedFiles:
         self.assertPostCondition()
 
     def test_template_tag_relative(self):
+        relpath = self.hashed_file_path("cached/other.css")
+        self.assertEqual(relpath, "cached/other.d41d8cd98f00.css")
+        relpath = self.hashed_file_path("cached/styles.css")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            self.assertIn(b'@import url("other.d41d8cd98f00.css");', content)
+
+        self.assertEqual(relpath, "cached/styles.5e0040571e1a.css")
         relpath = self.hashed_file_path("cached/relative.css")
-        self.assertEqual(relpath, "cached/relative.c3e9e1ea6f2e.css")
+        self.assertEqual(relpath, "cached/relative.34327b3618b2.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertNotIn(b"../cached/styles.css", content)
             self.assertNotIn(b'@import "styles.css"', content)
             self.assertNotIn(b"url(img/relative.png)", content)
-            self.assertIn(b'url("img/relative.acae32e4532b.png")', content)
+            self.assertIn(b"url(img/relative.acae32e4532b.png)", content)
             self.assertIn(b"../cached/styles.5e0040571e1a.css", content)
         self.assertPostCondition()
 
     def test_import_replacement(self):
         "See #18050"
         relpath = self.hashed_file_path("cached/import.css")
-        self.assertEqual(relpath, "cached/import.f53576679e5a.css")
+        self.assertEqual(relpath, "cached/import.43b91f9f84d7.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
-            self.assertIn(b"""import url("styles.5e0040571e1a.css")""", relfile.read())
+            content = relfile.read()
+            self.assertIn(b"""@import 'styles.5e0040571e1a.css'""", content)
+            self.assertIn(
+                b"""@import url("/static/styles_root.401f2509a628.css");""", content
+            )
+            self.assertIn(
+                b"""@import url(styles.5e0040571e1a.css) layer(default);""", content
+            )
+            self.assertIn(
+                b'@import url("styles.5e0040571e1a.css") screen and '
+                b"(orientation: landscape);",
+                content,
+            )
+            self.assertIn(
+                b"""@import url("styles.5e0040571e1a.css") supports""", content
+            )
+            self.assertIn(b"""/* @import url("/static/m/css/base.css"); */""", content)
+            self.assertIn(b"""/* @import url("m/css/base.css"); */""", content)
         self.assertPostCondition()
 
     def test_template_tag_deep_relative(self):
@@ -178,18 +205,19 @@ class TestHashedFiles:
             self.assertIn(b"https://", relfile.read())
         self.assertPostCondition()
 
-    @override_settings(
-        STATICFILES_DIRS=[os.path.join(TEST_ROOT, "project", "loop")],
-        STATICFILES_FINDERS=["django.contrib.staticfiles.finders.FileSystemFinder"],
-    )
     def test_import_loop(self):
-        finders.get_finder.cache_clear()
-        err = StringIO()
-        with self.assertRaisesMessage(RuntimeError, "Max post-process passes exceeded"):
-            call_command("collectstatic", interactive=False, verbosity=0, stderr=err)
-        self.assertEqual(
-            "Post-processing 'bar.css, foo.css' failed!\n\n", err.getvalue()
-        )
+        relpath = self.hashed_file_path("loop/bar.css")
+        self.assertEqual(relpath, "loop/bar.0dff9359c324.css")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            self.assertIn(b"foo.0dff9359c324.css", content)
+            self.assertIn(b"baz.f67a7bd3d4b0.css", content)
+
+        relpath = self.hashed_file_path("loop/foo.css")
+        self.assertEqual(relpath, "loop/foo.0dff9359c324.css")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            self.assertIn(b"bar.0dff9359c324.css", content)
         self.assertPostCondition()
 
     def test_post_processing(self):
@@ -229,7 +257,7 @@ class TestHashedFiles:
 
     def test_css_import_case_insensitive(self):
         relpath = self.hashed_file_path("cached/styles_insensitive.css")
-        self.assertEqual(relpath, "cached/styles_insensitive.3fa427592a53.css")
+        self.assertEqual(relpath, "cached/styles_insensitive.b76e982a2972.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertNotIn(b"cached/other.css", content)
@@ -245,24 +273,24 @@ class TestHashedFiles:
 
     def test_css_source_map(self):
         relpath = self.hashed_file_path("cached/source_map.css")
-        self.assertEqual(relpath, "cached/source_map.b2fceaf426aa.css")
+        self.assertEqual(relpath, "cached/source_map.71fc17082a18.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertNotIn(b"/*# sourceMappingURL=source_map.css.map*/", content)
             self.assertIn(
-                b"/*# sourceMappingURL=source_map.css.99914b932bd3.map */",
+                b"/*# sourceMappingURL=source_map.css.99914b932bd3.map*/",
                 content,
             )
         self.assertPostCondition()
 
     def test_css_source_map_tabs(self):
         relpath = self.hashed_file_path("cached/source_map_tabs.css")
-        self.assertEqual(relpath, "cached/source_map_tabs.b2fceaf426aa.css")
+        self.assertEqual(relpath, "cached/source_map_tabs.3cfab363b8cc.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertNotIn(b"/*#\tsourceMappingURL=source_map.css.map\t*/", content)
             self.assertIn(
-                b"/*# sourceMappingURL=source_map.css.99914b932bd3.map */",
+                b"/*#\tsourceMappingURL=source_map.css.99914b932bd3.map\t*/",
                 content,
             )
         self.assertPostCondition()
@@ -306,13 +334,13 @@ class TestHashedFiles:
     def test_js_source_map_trailing_whitespace(self):
         relpath = self.hashed_file_path("cached/source_map_trailing_whitespace.js")
         self.assertEqual(
-            relpath, "cached/source_map_trailing_whitespace.cd45b8534a87.js"
+            relpath, "cached/source_map_trailing_whitespace.223547dfd723.js"
         )
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertNotIn(b"//# sourceMappingURL=source_map.js.map\t ", content)
             self.assertIn(
-                b"//# sourceMappingURL=source_map.js.99914b932bd3.map",
+                b"//# sourceMappingURL=source_map.js.99914b932bd3.map\t",
                 content,
             )
         self.assertPostCondition()
@@ -367,42 +395,6 @@ class TestHashedFiles:
             call_command("collectstatic", interactive=False, verbosity=0, stderr=err)
         self.assertEqual("Post-processing 'nonutf8.css' failed!\n\n", err.getvalue())
         self.assertPostCondition()
-
-
-@override_settings(
-    STORAGES={
-        **settings.STORAGES,
-        STATICFILES_STORAGE_ALIAS: {
-            "BACKEND": "staticfiles_tests.storage.ExtraPatternsStorage",
-        },
-    }
-)
-class TestExtraPatternsStorage(CollectionTestCase):
-    def setUp(self):
-        storage.staticfiles_storage.hashed_files.clear()  # avoid cache interference
-        super().setUp()
-
-    def cached_file_path(self, path):
-        fullpath = self.render_template(self.static_template_snippet(path))
-        return fullpath.replace(settings.STATIC_URL, "")
-
-    def test_multi_extension_patterns(self):
-        """
-        With storage classes having several file extension patterns, only the
-        files matching a specific file pattern should be affected by the
-        substitution (#19670).
-        """
-        # CSS files shouldn't be touched by JS patterns.
-        relpath = self.cached_file_path("cached/import.css")
-        self.assertEqual(relpath, "cached/import.f53576679e5a.css")
-        with storage.staticfiles_storage.open(relpath) as relfile:
-            self.assertIn(b'import url("styles.5e0040571e1a.css")', relfile.read())
-
-        # Confirm JS patterns have been applied to JS files.
-        relpath = self.cached_file_path("cached/test.js")
-        self.assertEqual(relpath, "cached/test.388d7a790d46.js")
-        with storage.staticfiles_storage.open(relpath) as relfile:
-            self.assertIn(b'JS_URL("import.f53576679e5a.css")', relfile.read())
 
 
 @override_settings(
@@ -630,23 +622,6 @@ class TestCollectionNoneHashStorage(CollectionTestCase):
     STORAGES={
         **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
-            "BACKEND": "staticfiles_tests.storage.NoPostProcessReplacedPathStorage",
-        },
-    }
-)
-class TestCollectionNoPostProcessReplacedPaths(CollectionTestCase):
-    run_collectstatic_in_setUp = False
-
-    def test_collectstatistic_no_post_process_replaced_paths(self):
-        stdout = StringIO()
-        self.run_collectstatic(verbosity=1, stdout=stdout)
-        self.assertIn("post-processed", stdout.getvalue())
-
-
-@override_settings(
-    STORAGES={
-        **settings.STORAGES,
-        STATICFILES_STORAGE_ALIAS: {
             "BACKEND": "staticfiles_tests.storage.SimpleStorage",
         },
     }
@@ -696,9 +671,18 @@ class JSModuleImportAggregationManifestStorage(storage.ManifestStaticFilesStorag
 class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase):
     hashed_file_path = hashed_file_path
 
+    def _get_filename_path(self, filename):
+        return os.path.join(self._temp_dir, "test", filename)
+
+    def setUp(self):
+        super().setUp()
+        self._temp_dir = temp_dir = tempfile.mkdtemp()
+        os.makedirs(os.path.join(temp_dir, "test"))
+        self.addCleanup(shutil.rmtree, temp_dir)
+
     def test_module_import(self):
         relpath = self.hashed_file_path("cached/module.js")
-        self.assertEqual(relpath, "cached/module.4326210cf0bd.js")
+        self.assertEqual(relpath, "cached/module.5960f712d6bb.js")
         tests = [
             # Relative imports.
             b'import testConst from "./module_test.477bbebe77f0.js";',
@@ -708,6 +692,8 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
             b'import rootConst from "/static/absolute_root.5586327fe78c.js";',
             # Dynamic import.
             b'const dynamicModule = import("./module_test.477bbebe77f0.js");',
+            b"const dynamicModule = import('./module_test.477bbebe77f0.js');",
+            b"const dynamicModule = import(`./module_test.477bbebe77f0.js`);",
             # Creating a module object.
             b'import * as NewModule from "./module_test.477bbebe77f0.js";',
             # Creating a minified module object.
@@ -721,6 +707,19 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
             b"    firstVar1 as firstVarAlias,\n"
             b"    $second_var_2 as secondVarAlias\n"
             b'} from "./module_test.477bbebe77f0.js";',
+            # With Assert
+            b'import k from"./other.d41d8cd98f00.css"assert{type:"css"};',
+            # Unprocessed
+            b'// @returns {import("./non-existent-1").something}',
+            b'/* @returns {import("./non-existent-2").something} */',
+            b"'import(\"./non-existent-3\")'",
+            b"\"import('./non-existent-4')\"",
+            b'`import("./non-existent-5")`',
+            b"r = /import/;",
+            b"/**\n"
+            b" * @param {HTMLElement} elt\n"
+            b' * @returns {import("./htmx").HtmxTriggerSpecification[]}\n'
+            b" */",
         ]
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
@@ -730,7 +729,7 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
 
     def test_aggregating_modules(self):
         relpath = self.hashed_file_path("cached/module.js")
-        self.assertEqual(relpath, "cached/module.4326210cf0bd.js")
+        self.assertEqual(relpath, "cached/module.5960f712d6bb.js")
         tests = [
             b'export * from "./module_test.477bbebe77f0.js";',
             b'export { testConst } from "./module_test.477bbebe77f0.js";',
@@ -744,6 +743,93 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
             for module_import in tests:
                 with self.subTest(module_import=module_import):
                     self.assertIn(module_import, content)
+
+    def test_template_literal_with_variables(self):
+        """
+        Test that template literals with variables raise an appropriate error.
+        """
+        # Create initial static files.
+        file_contents = (
+            ("dynamic_import.js", "import(`./${module_name}`);"),
+            ("module.js", "this"),
+        )
+        for filename, content in file_contents:
+            with open(self._get_filename_path(filename), "w") as f:
+                f.write(content)
+
+        with self.modify_settings(STATICFILES_DIRS={"append": self._temp_dir}):
+            finders.get_finder.cache_clear()
+            err = StringIO()
+            # Expect ValueError with message about template literals
+            error_message = "Found a template literal with a variable: ./${module_name}"
+
+            with self.assertRaisesMessage(ValueError, error_message):
+                call_command(
+                    "collectstatic", interactive=False, verbosity=0, stderr=err
+                )
+
+
+class CustomExtractorStorage(storage.ManifestStaticFilesStorage):
+    """Test storage that extracts custom JS_URL() patterns."""
+
+    def _extract_txt_urls(self, name, content):
+        urls = []
+        for match in re.finditer(r'JS_URL\(["\']([^"\']+)["\']\)', content):
+            urls.append((match.group(1), match.start(1)))
+        return urls
+
+    @property
+    def url_finders(self):
+        return {
+            **super().url_finders,
+            "*.txt": [self._extract_txt_urls],
+        }
+
+
+@override_settings(
+    STORAGES={
+        **settings.STORAGES,
+        STATICFILES_STORAGE_ALIAS: {
+            "BACKEND": "staticfiles_tests.test_storage.CustomExtractorStorage",
+        },
+    }
+)
+class TestCustomExtractorStorage(CollectionTestCase):
+    """Test the url_finders property for custom URL extraction."""
+
+    hashed_file_path = hashed_file_path
+
+    def _get_filename_path(self, filename):
+        return os.path.join(self._temp_dir, "test", filename)
+
+    def setUp(self):
+        super().setUp()
+        self._temp_dir = temp_dir = tempfile.mkdtemp()
+        os.makedirs(os.path.join(temp_dir, "test"))
+        self.addCleanup(shutil.rmtree, temp_dir)
+
+    def test_custom_extractor(self):
+        """Test that custom URL extractors work correctly."""
+        file_contents = (
+            ("image.png", "fake image content"),
+            ("config.txt", 'var icon = JS_URL("image.png");'),
+        )
+        for filename, content in file_contents:
+            with open(self._get_filename_path(filename), "w") as f:
+                f.write(content)
+
+        with self.modify_settings(STATICFILES_DIRS={"append": self._temp_dir}):
+            finders.get_finder.cache_clear()
+            call_command("collectstatic", interactive=False, verbosity=0)
+
+            # Verify the custom pattern was processed
+            relpath = self.hashed_file_path("test/config.txt")
+            with storage.staticfiles_storage.open(relpath) as relfile:
+                content = relfile.read()
+                # Should contain hashed image reference
+                self.assertIn(b"image.", content)
+                self.assertIn(b".png", content)
+                self.assertNotIn(b'JS_URL("image.png")', content)
 
 
 class CustomManifestStorage(storage.ManifestStaticFilesStorage):
@@ -920,7 +1006,10 @@ class TestCollectionHashedFilesCache(CollectionTestCase):
         # Create initial static files.
         file_contents = (
             ("foo.png", "foo"),
-            ("bar.css", 'url("foo.png")\nurl("xyz.png")'),
+            (
+                "bar.css",
+                'div{background:url("foo.png");}span{background:url("xyz.png");}',
+            ),
             ("xyz.png", "xyz"),
         )
         for filename, content in file_contents:
@@ -951,3 +1040,129 @@ class TestCollectionHashedFilesCache(CollectionTestCase):
                 content = relfile.read()
                 self.assertIn(b"foo.57a5cb9ba68d.png", content)
                 self.assertIn(b"xyz.57a5cb9ba68d.png", content)
+
+    def test_file_missing_during_collectstatic(self):
+        # Create initial static files.
+        file_contents = (
+            ("foo.png", "foo"),
+            (
+                "bar.css",
+                'div{background:url("foo.png");}span{background:url("xyz.png");}',
+            ),
+        )
+        for filename, content in file_contents:
+            with open(self._get_filename_path(filename), "w") as f:
+                f.write(content)
+
+        with self.modify_settings(STATICFILES_DIRS={"append": self._temp_dir}):
+            finders.get_finder.cache_clear()
+            err = StringIO()
+            configured_storage = storage.staticfiles_storage
+            _expected_error_msg = textwrap.dedent(
+                """\
+                The file '{missing}' could not be found with {storage}.
+
+                The {ext} file '{filename}' references a file which could not be found:
+                  {missing}
+
+                Please check the URL references in this {ext} file, particularly any
+                relative paths which might be pointing to the wrong location.
+                """
+            )
+            err_msg = _expected_error_msg.format(
+                missing="test/xyz.png",
+                storage=configured_storage._wrapped,
+                filename=os.path.join("test", "bar.css"),
+                ext="CSS",
+                url="xyz.png",
+            )
+            with self.assertRaisesMessage(ValueError, err_msg):
+                call_command(
+                    "collectstatic", interactive=False, verbosity=0, stderr=err
+                )
+
+    def test_circular_dependencies(self):
+        """
+        Test handling of circular dependencies between CSS files with changes
+        """
+        # Create initial static files with circular dependencies
+        file_contents = (
+            ("style1.css", "@import url('style2.css');\n.style1 { color: red; }"),
+            (
+                "style2.css",
+                "@import url('style1.css');\n@import url('common.css');\n"
+                ".style2 { color: blue; }",
+            ),
+            ("common.css", ".common { color: green; }"),
+        )
+
+        for filename, content in file_contents:
+            with open(self._get_filename_path(filename), "w") as f:
+                f.write(content)
+
+        with self.modify_settings(STATICFILES_DIRS={"append": self._temp_dir}):
+            finders.get_finder.cache_clear()
+            err = StringIO()
+
+            call_command("collectstatic", interactive=False, verbosity=0, stderr=err)
+
+            # Get the hashed paths for the files
+            style1_path = self.hashed_file_path("test/style1.css")
+            style2_path = self.hashed_file_path("test/style2.css")
+            common_path = self.hashed_file_path("test/common.css")
+
+            # Extract hash parts from the filenames
+            style1_hash = style1_path.split(".")[-2]
+            style2_hash = style2_path.split(".")[-2]
+            common_hash = common_path.split(".")[-2]
+
+            # 1. Verify that style1.css and style2.css have the same hash
+            self.assertEqual(
+                style1_hash,
+                style2_hash,
+                "Files with circular dependencies should have the same hash",
+            )
+
+            # 2. style1.css references the hashed version of style2.css
+            with storage.staticfiles_storage.open(style1_path) as relfile:
+                content = relfile.read()
+                self.assertIn(f"style2.{style2_hash}.css".encode(), content)
+
+            # 3. style2.css references the hashed versions style1 & common.css
+            with storage.staticfiles_storage.open(style2_path) as relfile:
+                content = relfile.read()
+                self.assertIn(f"style1.{style1_hash}.css".encode(), content)
+
+                # 4. style2.css correctly references common.css
+                self.assertIn(f"common.{common_hash}.css".encode(), content)
+
+            # Update the content of common.css
+            with open(self._get_filename_path("common.css"), "w+b") as f:
+                f.write(b".common { color: black; }")
+
+            # a second collectstatic.
+            call_command("collectstatic", interactive=False, verbosity=0, stderr=err)
+            style1_path = self.hashed_file_path("test/style1.css")
+            style2_path = self.hashed_file_path("test/style2.css")
+            common_path = self.hashed_file_path("test/common.css")
+
+            style1_hash_changed = style1_path.split(".")[-2]
+            style2_hash_changed = style2_path.split(".")[-2]
+            common_hash_changed = common_path.split(".")[-2]
+
+            # hashes should all have changed
+            self.assertNotEqual(style1_hash, style1_hash_changed)
+            self.assertNotEqual(style2_hash, style2_hash_changed)
+            self.assertNotEqual(common_hash, common_hash_changed)
+
+            with storage.staticfiles_storage.open(style1_path) as relfile:
+                content = relfile.read()
+                self.assertIn(f"style2.{style2_hash_changed}.css".encode(), content)
+
+            # 3. style2.css references the hashed versions style1 & common.css
+            with storage.staticfiles_storage.open(style2_path) as relfile:
+                content = relfile.read()
+                self.assertIn(f"style1.{style1_hash_changed}.css".encode(), content)
+
+                # 4. style2.css correctly references common.css
+                self.assertIn(f"common.{common_hash_changed}.css".encode(), content)
