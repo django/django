@@ -86,6 +86,16 @@ To use nonces in your CSP policy, beside the basic config, you need to:
         // This inline JavaScript will be allowed.
       </script>
 
+.. _csp-form-media-nonce:
+
+Form media and nonces
+---------------------
+
+When the :func:`~django.template.context_processors.csp` context processor is
+enabled, nonces are automatically injected into every ``<script>`` and
+``<link>`` element rendered by form media — for both
+:class:`~django.forms.Script` objects and plain string paths.
+
 .. admonition:: Caching and Nonce Reuse
 
    The :class:`~django.middleware.csp.ContentSecurityPolicyMiddleware`

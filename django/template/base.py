@@ -1120,6 +1120,13 @@ class TextNode(Node):
         return self.s
 
 
+class NonceRenderable:
+    """An object that can render itself with a CSP nonce."""
+
+    def render(self, *, nonce=None) -> str:
+        return NotImplemented
+
+
 def render_value_in_context(value, context):
     """
     Convert any value to a string to become part of a rendered template. This
@@ -1129,6 +1136,8 @@ def render_value_in_context(value, context):
     value = template_localtime(value, use_tz=context.use_tz)
     value = localize(value, use_l10n=context.use_l10n)
     if context.autoescape:
+        if isinstance(value, NonceRenderable):
+            return value.render(nonce=context.get("csp_nonce"))
         if not issubclass(type(value), str):
             value = str(value)
         return conditional_escape(value)
