@@ -359,6 +359,9 @@ Running tests in parallel
 As long as your tests are properly isolated, you can run them in parallel to
 gain a speed up on multi-core hardware. See :option:`test --parallel`.
 
+See :option:`test --keepdb` for a known limitation when combining these options
+(:ticket:`26822`).
+
 Password hashing
 ~~~~~~~~~~~~~~~~
 
