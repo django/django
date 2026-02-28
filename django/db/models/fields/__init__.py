@@ -599,68 +599,73 @@ class Field(RegisterLookupMixin):
         arguments over positional ones, and omit parameters with their default
         values.
         """
-        # Short-form way of fetching all the default parameters
+        # Work out path - we shorten it for known Django core fields
+        path = f"{self.__class__.__module__}.{self.__class__.__qualname__}"
+        if path.startswith("django.db.models.fields."):
+            submodule, _, remainder = path.removeprefix(
+                "django.db.models.fields."
+            ).partition(".")
+            if submodule in (
+                "related",
+                "files",
+                "generated",
+                "json",
+                "proxy",
+                "composite",
+            ):
+                path = f"django.db.models.{remainder}"
+            else:
+                path = "django.db.models" + path.removeprefix("django.db.models.fields")
+
+        # Build keywords dict of non-default values
         keywords = {}
-        possibles = {
-            "verbose_name": None,
-            "primary_key": False,
-            "max_length": None,
-            "unique": False,
-            "blank": False,
-            "null": False,
-            "db_index": False,
-            "default": NOT_PROVIDED,
-            "db_default": NOT_PROVIDED,
-            "editable": True,
-            "serialize": True,
-            "unique_for_date": None,
-            "unique_for_month": None,
-            "unique_for_year": None,
-            "choices": None,
-            "help_text": "",
-            "db_column": None,
-            "db_comment": None,
-            "db_tablespace": None,
-            "auto_created": False,
-            "validators": [],
-            "error_messages": None,
-        }
-        attr_overrides = {
-            "unique": "_unique",
-            "error_messages": "_error_messages",
-            "validators": "_validators",
-            "verbose_name": "_verbose_name",
-            "db_tablespace": "_db_tablespace",
-        }
-        equals_comparison = {"choices", "validators"}
-        for name, default in possibles.items():
-            value = getattr(self, attr_overrides.get(name, name))
+        if (value := self._verbose_name) is not None:
+            keywords["verbose_name"] = value
+        if (value := self.primary_key) is not False:
+            keywords["primary_key"] = value
+        if (value := self.max_length) is not None:
+            keywords["max_length"] = value
+        if (value := self._unique) is not False:
+            keywords["unique"] = value
+        if (value := self.blank) is not False:
+            keywords["blank"] = value
+        if (value := self.null) is not False:
+            keywords["null"] = value
+        if (value := self.db_index) is not False:
+            keywords["db_index"] = value
+        if (value := self.default) is not NOT_PROVIDED:
+            keywords["default"] = value
+        if (value := self.db_default) is not NOT_PROVIDED:
+            keywords["db_default"] = value
+        if (value := self.editable) is not True:
+            keywords["editable"] = value
+        if (value := self.serialize) is not True:
+            keywords["serialize"] = value
+        if (value := self.unique_for_date) is not None:
+            keywords["unique_for_date"] = value
+        if (value := self.unique_for_month) is not None:
+            keywords["unique_for_month"] = value
+        if (value := self.unique_for_year) is not None:
+            keywords["unique_for_year"] = value
+        if (value := self.choices) is not None:
             if isinstance(value, CallableChoiceIterator):
                 value = value.func
-            # Do correct kind of comparison
-            if name in equals_comparison:
-                if value != default:
-                    keywords[name] = value
-            else:
-                if value is not default:
-                    keywords[name] = value
-        # Work out path - we shorten it for known Django core fields
-        path = "%s.%s" % (self.__class__.__module__, self.__class__.__qualname__)
-        if path.startswith("django.db.models.fields.related"):
-            path = path.replace("django.db.models.fields.related", "django.db.models")
-        elif path.startswith("django.db.models.fields.files"):
-            path = path.replace("django.db.models.fields.files", "django.db.models")
-        elif path.startswith("django.db.models.fields.generated"):
-            path = path.replace("django.db.models.fields.generated", "django.db.models")
-        elif path.startswith("django.db.models.fields.json"):
-            path = path.replace("django.db.models.fields.json", "django.db.models")
-        elif path.startswith("django.db.models.fields.proxy"):
-            path = path.replace("django.db.models.fields.proxy", "django.db.models")
-        elif path.startswith("django.db.models.fields.composite"):
-            path = path.replace("django.db.models.fields.composite", "django.db.models")
-        elif path.startswith("django.db.models.fields"):
-            path = path.replace("django.db.models.fields", "django.db.models")
-        # Return basic info - other fields should override this.
+            keywords["choices"] = value
+        if (value := self.help_text) != "":
+            keywords["help_text"] = value
+        if (value := self.db_column) is not None:
+            keywords["db_column"] = value
+        if (value := self.db_comment) is not None:
+            keywords["db_comment"] = value
+        if (value := self._db_tablespace) is not None:
+            keywords["db_tablespace"] = value
+        if (value := self.auto_created) is not False:
+            keywords["auto_created"] = value
+        if (value := self._validators) != []:
+            keywords["validators"] = value
+        if (value := self._error_messages) is not None:
+            keywords["error_messages"] = value
+
         return (self.name, path, [], keywords)
 
     def clone(self):
