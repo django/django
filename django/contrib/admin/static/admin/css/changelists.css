@@ -233,6 +233,11 @@
     word-break: break-word;
 }
 
+#changelist-filter summary,
+#changelist-filter a {
+    overflow-wrap: anywhere;
+}
+
 #changelist-filter li.selected {
     border-left: 5px solid var(--hairline-color);
     padding-left: 10px;
