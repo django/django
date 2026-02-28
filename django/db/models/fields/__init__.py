@@ -1106,10 +1106,12 @@ class Field(RegisterLookupMixin):
         }
         if self.has_default():
             if callable(self.default):
-                defaults["initial"] = self.default
+                if not self.many_to_many:
+                    defaults["initial"] = self.default
                 defaults["show_hidden_initial"] = True
             else:
-                defaults["initial"] = self.get_default()
+                if not self.many_to_many:
+                    defaults["initial"] = self.get_default()
         if self.choices is not None:
             # Fields with choices get special treatment.
             include_blank = self.blank or not (
