@@ -203,21 +203,133 @@ class DatabaseCreation(BaseDatabaseCreation):
             self.log("Tests cancelled -- test database cannot be recreated.")
             sys.exit(1)
 
-    def _destroy_test_db(self, test_database_name, verbosity=1):
+    def _clone_test_db(self, suffix, verbosity, keepdb=False):
+        """
+        Create a cloned test database (tablespace + user) for parallel testing.
+        """
+        parameters = self._get_test_db_params(suffix)
+
+        with self._maindb_connection.cursor() as cursor:
+            if self._test_database_create():
+                try:
+                    self._execute_test_db_creation(
+                        cursor, parameters, verbosity, keepdb
+                    )
+                except Exception as e:
+                    if "ORA-01543" not in str(e):
+                        # Errors except "tablespace exists" cancel tests
+                        self.log(
+                            "Got an error creating the cloned test database: %s" % e
+                        )
+                        sys.exit(2)
+                    if not keepdb:
+                        raise
+
+            if self._test_user_create():
+                try:
+                    self._create_test_user(cursor, parameters, verbosity, keepdb)
+                except Exception as e:
+                    if "ORA-01920" not in str(e):
+                        # All errors except "user already exists" cancel tests
+                        self.log("Got an error creating the cloned test user: %s" % e)
+                        sys.exit(2)
+                    if not keepdb:
+                        # Destroy and recreate if user exists and not keeping
+                        self._destroy_test_user(cursor, parameters, verbosity)
+                        self._create_test_user(cursor, parameters, verbosity, keepdb)
+
+        # Run migrations on the cloned database to create tables
+        if not keepdb:
+            self._run_migrations_on_clone(suffix, verbosity)
+
+    def _run_migrations_on_clone(self, suffix, verbosity):
+        """
+        Run migrations on the cloned database to create the schema.
+
+        This approach avoids external dependencies like exp/imp or expdp/impdp.
+        Each clone gets its own fresh migration run.
+        """
+        from django.apps import apps
+        from django.core.management import call_command
+
+        # Temporarily switch the connection to the cloned database
+        clone_settings = self.get_test_db_clone_settings(suffix)
+        original_settings = self.connection.settings_dict.copy()
+
+        try:
+            # Update connection to point to the clone
+            self.connection.close()
+            self.connection.settings_dict.update(clone_settings)
+
+            # Run migrations on the clone
+            if self.connection.settings_dict["TEST"].get("MIGRATE", True) is False:
+                # Disable migrations for all apps
+                old_migration_modules = settings.MIGRATION_MODULES
+                settings.MIGRATION_MODULES = {
+                    app.label: None for app in apps.get_app_configs()
+                }
+
+            try:
+                call_command(
+                    "migrate",
+                    verbosity=max(verbosity - 1, 0),
+                    interactive=False,
+                    database=self.connection.alias,
+                    run_syncdb=True,
+                )
+            finally:
+                if self.connection.settings_dict["TEST"].get("MIGRATE", True) is False:
+                    settings.MIGRATION_MODULES = old_migration_modules
+
+            # Create cache table
+            call_command("createcachetable", database=self.connection.alias)
+
+        finally:
+            # Restore original connection settings
+            self.connection.close()
+            self.connection.settings_dict.update(original_settings)
+
+    def get_test_db_clone_settings(self, suffix):
+        """
+        Return a modified connection settings dict for the n-th clone of a DB.
+        """
+        orig = self.connection.settings_dict
+        user = self._test_database_user(suffix)
+        return {
+            **orig,
+            "USER": user,
+        }
+
+    def destroy_test_db(
+        self, old_database_name=None, verbosity=1, keepdb=False, suffix=None
+    ):
         """
         Destroy a test database, prompting the user for confirmation if the
-        database already exists. Return the name of the test database created.
+        database already exists.
         """
-        if not self.connection.is_pool:
-            self.connection.settings_dict["USER"] = self.connection.settings_dict[
-                "SAVED_USER"
-            ]
-            self.connection.settings_dict["PASSWORD"] = self.connection.settings_dict[
-                "SAVED_PASSWORD"
-            ]
-        self.connection.close()
+        # Restore main user credentials for cleanup (main test db only).
+        if suffix is None and not self.connection.is_pool:
+            saved_user = self.connection.settings_dict.get("SAVED_USER")
+            saved_password = self.connection.settings_dict.get("SAVED_PASSWORD")
+            if saved_user:
+                self.connection.settings_dict["USER"] = saved_user
+            if saved_password:
+                self.connection.settings_dict["PASSWORD"] = saved_password
+        # Store suffix so _destroy_test_db can use it.
+        self._suffix = suffix
+        super().destroy_test_db(old_database_name, verbosity, keepdb, suffix)
+
+    def _destroy_test_db(self, test_database_name, verbosity=1):
+        """
+        Internal implementation - remove the test db tables.
+
+        For Oracle, this drops the test user and tablespace. Uses
+        self._suffix (set by destroy_test_db) to determine which
+        user/tablespace to drop.
+        """
         self.connection.close_pool()
-        parameters = self._get_test_db_params()
+        parameters = self._get_test_db_params(self._suffix)
+
         with self._maindb_connection.cursor() as cursor:
             if self._test_user_create():
                 if verbosity >= 1:
@@ -366,15 +478,19 @@ class DatabaseCreation(BaseDatabaseCreation):
                 raise
             return False
 
-    def _get_test_db_params(self):
+    def _get_test_db_params(self, suffix=None):
         return {
             "dbname": self._test_database_name(),
-            "user": self._test_database_user(),
-            "password": self._test_database_passwd(),
-            "tblspace": self._test_database_tblspace(),
-            "tblspace_temp": self._test_database_tblspace_tmp(),
-            "datafile": self._test_database_tblspace_datafile(),
-            "datafile_tmp": self._test_database_tblspace_tmp_datafile(),
+            "user": self._test_database_user(suffix),
+            "password": (
+                self.connection.settings_dict["PASSWORD"]
+                if suffix
+                else self._test_database_passwd()
+            ),
+            "tblspace": self._test_database_tblspace(suffix),
+            "tblspace_temp": self._test_database_tblspace_tmp(suffix),
+            "datafile": self._test_database_tblspace_datafile(suffix),
+            "datafile_tmp": self._test_database_tblspace_tmp_datafile(suffix),
             "maxsize": self._test_database_tblspace_maxsize(),
             "maxsize_tmp": self._test_database_tblspace_tmp_maxsize(),
             "size": self._test_database_tblspace_size(),
@@ -403,8 +519,11 @@ class DatabaseCreation(BaseDatabaseCreation):
     def _test_user_create(self):
         return self._test_settings_get("CREATE_USER", default=True)
 
-    def _test_database_user(self):
-        return self._test_settings_get("USER", prefixed="USER")
+    def _test_database_user(self, suffix=None):
+        user = self._test_settings_get("USER", prefixed="USER")
+        if suffix:
+            user = f"{user}_{suffix}"
+        return user
 
     def _test_database_passwd(self):
         password = self._test_settings_get("PASSWORD")
@@ -414,22 +533,36 @@ class DatabaseCreation(BaseDatabaseCreation):
             password = get_random_string(30)
         return password
 
-    def _test_database_tblspace(self):
-        return self._test_settings_get("TBLSPACE", prefixed="USER")
+    def _test_database_tblspace(self, suffix=None):
+        tblspace = self._test_settings_get("TBLSPACE", prefixed="USER")
+        if suffix:
+            tblspace = f"{tblspace}_{suffix}"
+        return tblspace
 
-    def _test_database_tblspace_tmp(self):
+    def _test_database_tblspace_tmp(self, suffix=None):
         settings_dict = self.connection.settings_dict
-        return settings_dict["TEST"].get(
+        tblspace_tmp = settings_dict["TEST"].get(
             "TBLSPACE_TMP", TEST_DATABASE_PREFIX + settings_dict["USER"] + "_temp"
         )
+        if suffix:
+            tblspace_tmp = f"{tblspace_tmp}_{suffix}"
+        return tblspace_tmp
 
-    def _test_database_tblspace_datafile(self):
-        tblspace = "%s.dbf" % self._test_database_tblspace()
-        return self._test_settings_get("DATAFILE", default=tblspace)
+    def _test_database_tblspace_datafile(self, suffix=None):
+        default = "%s.dbf" % self._test_database_tblspace(suffix)
+        datafile = self._test_settings_get("DATAFILE", default=default)
+        if suffix and datafile != default:
+            path, ext = datafile.rsplit(".", 1)
+            datafile = f"{path}_{suffix}.{ext}"
+        return datafile
 
-    def _test_database_tblspace_tmp_datafile(self):
-        tblspace = "%s.dbf" % self._test_database_tblspace_tmp()
-        return self._test_settings_get("DATAFILE_TMP", default=tblspace)
+    def _test_database_tblspace_tmp_datafile(self, suffix=None):
+        default = "%s.dbf" % self._test_database_tblspace_tmp(suffix)
+        datafile = self._test_settings_get("DATAFILE_TMP", default=default)
+        if suffix and datafile != default:
+            path, ext = datafile.rsplit(".", 1)
+            datafile = f"{path}_{suffix}.{ext}"
+        return datafile
 
     def _test_database_tblspace_maxsize(self):
         return self._test_settings_get("DATAFILE_MAXSIZE", default="500M")
