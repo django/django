@@ -251,29 +251,48 @@ before passing it to the email functions.
 If a ``message`` contains headers at the start of the string, the headers will
 be printed as the first bit of the email message.
 
-Here's an example view that takes a ``subject``, ``message`` and ``from_email``
-from the request's POST data, sends that to ``admin@example.com`` and redirects
-to "/contact/thanks/" when it's done::
+Including a recipient's name in an email address (for example,
+``"John Doe <john@example.com>"``) is a common practice. However, email
+addresses should not be constructed manually using string formatting::
+
+    # Incorrect: unsafe manual construction
+    to = [f"{name} <{email}>"]
+
+Manually formatting addresses can lead to improperly quoted values or invalid
+headers if the name or email address contains special characters, and may
+result in header values that are rejected by Django's email functions. Instead,
+Python's standard library provides ``email.utils.formataddr()``, which
+correctly formats email addresses with display names, handling quoting and
+escaping as required. The returned value can be passed directly to Django's
+email functions::
+
+    from email.utils import formataddr
+
+    to = [formataddr((name, email))]
+
+Here's an example view that processes a simple contact form, sends the message
+to a fixed site address, safely includes the user's name and email address for
+replies, and redirects to ``/contact/thanks/`` on success::
 
     from django.core.mail import send_mail
-    from django.http import HttpResponse, HttpResponseRedirect
+    from email.utils import formataddr
+    from django.http import HttpResponseRedirect
 
 
     def send_email(request):
-        subject = request.POST.get("subject", "")
+        name = request.POST.get("name", "")
+        email = request.POST.get("email", "")
         message = request.POST.get("message", "")
-        from_email = request.POST.get("from_email", "")
-        if subject and message and from_email:
-            try:
-                send_mail(subject, message, from_email, ["admin@example.com"])
-            except ValueError:
-                return HttpResponse("Invalid header found.")
-            return HttpResponseRedirect("/contact/thanks/")
-        else:
-            # In reality we'd use a form class
-            # to get proper validation errors.
-            return HttpResponse("Make sure all fields are entered and valid.")
 
+        if name and email and message:
+            send_mail(
+                subject="Contact form submission",
+                message=message,
+                from_email="contact-form@example.com",
+                recipient_list=["admin@example.com"],
+                reply_to=[formataddr((name, email))],
+            )
+            return HttpResponseRedirect("/contact/thanks/")
 
 .. versionchanged:: 6.0
 
