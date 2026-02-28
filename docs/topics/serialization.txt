@@ -87,23 +87,23 @@ model will be serialized. For example, consider the following models::
 
     class Place(models.Model):
         name = models.CharField(max_length=50)
+        address = models.CharField(max_length=200)
 
 
     class Restaurant(Place):
         serves_hot_dogs = models.BooleanField(default=False)
 
-If you only serialize the Restaurant model::
+Querying and serializing ``Restaurant`` model along with the parent’s fields::
 
-    data = serializers.serialize("json", Restaurant.objects.all())
+    data = Restaurant.objects.values("id", "name", "address", "serves_hot_dogs")
+    output = json.dumps(list(data), indent=2)
 
-the fields on the serialized output will only contain the ``serves_hot_dogs``
-attribute. The ``name`` attribute of the base class will be ignored.
+produces::
 
-In order to fully serialize your ``Restaurant`` instances, you will need to
-serialize the ``Place`` models as well::
+    [{"id": 1, "name": "Django Diner", "address": "123 Main St", "serves_hot_dogs": true}]
 
-    all_objects = [*Restaurant.objects.all(), *Place.objects.all()]
-    data = serializers.serialize("json", all_objects)
+This pattern is often more useful than the default serializer output when you
+need to expose related fields from both parent and child models.
 
 Deserializing data
 ==================
