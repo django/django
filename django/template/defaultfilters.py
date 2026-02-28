@@ -874,11 +874,11 @@ def yesno(value, arg=None):
     ==========  ======================  ==================================
     """
     if arg is None:
-        # Translators: Please do not add spaces around commas.
+        # Translators: separate the 3 values with ascii commas (no spaces).
         arg = gettext("yes,no,maybe")
     bits = arg.split(",")
     if len(bits) < 2:
-        return value  # Invalid arg.
+        bits = "yes,no,maybe".split(",")  # Fallback to default.
     try:
         yes, no, maybe = bits
     except ValueError:
