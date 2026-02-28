@@ -76,14 +76,8 @@ class LazySettings(LazyObject):
             _wrapped = self._wrapped
         val = getattr(_wrapped, name)
 
-        # Special case some settings which require further modification.
-        # This is done here for performance reasons so the modified value is
-        # cached.
-        if name in {"MEDIA_URL", "STATIC_URL"} and val is not None:
-            val = self._add_script_prefix(val)
-        elif name == "SECRET_KEY" and not val:
+        if name == "SECRET_KEY" and not val:
             raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
-
         self.__dict__[name] = val
         return val
 
@@ -146,6 +140,14 @@ class LazySettings(LazyObject):
         filename, _, _, _ = stack[-4]
         if not filename.startswith(os.path.dirname(django.__file__)):
             warnings.warn(message, category, stacklevel=2)
+
+    @property
+    def STATIC_URL(self):
+        return self._add_script_prefix(self.__getattr__("STATIC_URL"))
+
+    @property
+    def MEDIA_URL(self):
+        return self._add_script_prefix(self.__getattr__("MEDIA_URL"))
 
 
 class Settings:
