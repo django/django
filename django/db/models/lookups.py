@@ -255,8 +255,12 @@ class FieldGetDbPrepValueMixin:
 
     def get_db_prep_lookup(self, value, connection):
         # For relational fields, use the 'target_field' attribute of the
-        # output_field.
-        field = getattr(self.lhs.output_field, "target_field", None)
+        # output_field. If the field provides a get_effective_target_field
+        # method, use that.
+        if hasattr(self.lhs.output_field, "get_effective_target_field"):
+            field = self.lhs.output_field.get_effective_target_field()
+        else:
+            field = getattr(self.lhs.output_field, "target_field", None)
         get_db_prep_value = (
             getattr(field, "get_db_prep_value", None)
             or self.lhs.output_field.get_db_prep_value
