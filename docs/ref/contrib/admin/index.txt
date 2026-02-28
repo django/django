@@ -428,7 +428,8 @@ subclass::
 
         Fieldsets with a name and the ``collapse`` style will be initially
         collapsed, using an expandable widget with a toggle for switching
-        their visibility.
+        their visibility. Add the ``collapse-open`` class to have the fieldset
+        initially expanded.
 
         .. versionchanged:: 6.1
 
@@ -2333,7 +2334,8 @@ The ``InlineModelAdmin`` class adds or customizes:
     A list or tuple containing extra CSS classes to apply to the fieldset that
     is rendered for the inlines. Defaults to ``None``. As with classes
     configured in :attr:`~ModelAdmin.fieldsets`, inlines with a ``collapse``
-    class will be initially collapsed using an expandable widget.
+    class will be initially collapsed using an expandable widget. Add the
+    ``collapse-open`` class to have the inline initially expanded.
 
 .. attribute:: InlineModelAdmin.extra
 
