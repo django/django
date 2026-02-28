@@ -1021,7 +1021,16 @@ class Variable:
             )
 
             if getattr(e, "silent_variable_failure", False):
-                current = context.template.engine.string_if_invalid
+                should_raise = getattr(
+                    getattr(context, "template", None), "engine", None
+                ) and getattr(
+                    context.template.engine, "raise_on_missing_variable", False
+                )
+                if should_raise:
+                    raise
+                current = getattr(
+                    getattr(context, "template", None), "engine", None
+                ) and getattr(context.template.engine, "string_if_invalid", "")
             else:
                 raise
 
