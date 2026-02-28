@@ -262,17 +262,17 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     self.ops.max_name_length(),
                 )
             )
+        options = settings_dict["OPTIONS"].copy()
         if settings_dict["NAME"]:
             conn_params = {
                 "dbname": settings_dict["NAME"],
-                **settings_dict["OPTIONS"],
+                **options,
             }
         elif settings_dict["NAME"] is None:
             # Connect to the default 'postgres' db.
-            settings_dict["OPTIONS"].pop("service", None)
-            conn_params = {"dbname": "postgres", **settings_dict["OPTIONS"]}
+            conn_params = {"dbname": "postgres", **options}
         else:
-            conn_params = {**settings_dict["OPTIONS"]}
+            conn_params = {**options}
         conn_params["client_encoding"] = "UTF8"
 
         conn_params.pop("assume_role", None)
