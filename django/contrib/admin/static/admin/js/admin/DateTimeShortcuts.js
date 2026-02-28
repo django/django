@@ -19,6 +19,7 @@
         },
         dismissClockFunc: [],
         dismissCalendarFunc: [],
+        lastFocusedElement: null, // Store the last focused element before opening popup
         calendarDivName1: 'calendarbox', // name of calendar <div> that gets toggled
         calendarDivName2: 'calendarin', // name of <div> that contains calendar
         calendarLinkName: 'calendarlink', // name of the link that is used to toggle
@@ -124,6 +125,7 @@
             const clock_link = document.createElement('a');
             clock_link.href = '#';
             clock_link.id = DateTimeShortcuts.clockLinkName + num;
+            clock_link.setAttribute('title', gettext('Choose a Time'));
             clock_link.addEventListener('click', function(e) {
                 e.preventDefault();
                 // avoid triggering the document click handler to dismiss the clock
@@ -133,8 +135,7 @@
 
             quickElement(
                 'span', clock_link, '',
-                'class', 'clock-icon',
-                'title', gettext('Choose a Time')
+                'class', 'clock-icon'
             );
             shortcuts_span.appendChild(document.createTextNode('\u00A0'));
             shortcuts_span.appendChild(now_link);
@@ -161,6 +162,7 @@
             clock_box.style.position = 'absolute';
             clock_box.className = 'clockbox module';
             clock_box.id = DateTimeShortcuts.clockDivName + num;
+            clock_box.tabIndex = -1; // Make focusable but not in tab order
             document.body.appendChild(clock_box);
             clock_box.addEventListener('click', function(e) { e.stopPropagation(); });
 
@@ -172,7 +174,8 @@
             // where name is the name attribute of the <input>.
             const name = typeof DateTimeShortcuts.clockHours[inp.name] === 'undefined' ? 'default_' : inp.name;
             DateTimeShortcuts.clockHours[name].forEach(function(element) {
-                const time_link = quickElement('a', quickElement('li', time_list), gettext(element[0]), 'role', 'button', 'href', '#');
+                const list_item = quickElement('li', time_list);
+                const time_link = quickElement('a', list_item, gettext(element[0]), 'role', 'button', 'href', '#');
                 time_link.addEventListener('click', function(e) {
                     e.preventDefault();
                     DateTimeShortcuts.handleClockQuicklink(num, element[1]);
@@ -199,6 +202,9 @@
             const clock_box = document.getElementById(DateTimeShortcuts.clockDivName + num);
             const clock_link = document.getElementById(DateTimeShortcuts.clockLinkName + num);
 
+            // Store the currently focused element before opening popup
+            DateTimeShortcuts.lastFocusedElement = clock_link;
+
             // Recalculate the clockbox position
             // is it left-to-right or right-to-left layout ?
             if (window.getComputedStyle(document.body).direction !== 'rtl') {
@@ -213,11 +219,21 @@
 
             // Show the clock box
             clock_box.style.display = 'block';
+            
+            // Add focus loop for keyboard navigation
+            DateTimeShortcuts.addFocusLoop(clock_box);
+            
+            // Focus on the "Now" option for better screen reader experience
+            // Screen readers can then navigate the dialog naturally
+            clock_box.querySelector('button, [role="button"]').focus();
+            
             document.addEventListener('click', DateTimeShortcuts.dismissClockFunc[num]);
         },
         dismissClock: function(num) {
-            document.getElementById(DateTimeShortcuts.clockDivName + num).style.display = 'none';
-            document.removeEventListener('click', DateTimeShortcuts.dismissClockFunc[num]);
+            const clock_box = document.getElementById(DateTimeShortcuts.clockDivName + num);
+            clock_box.style.display = 'none';
+            const trigger = document.querySelector(`[aria-controls="${clock_box.id}"]`);
+            trigger.focus();
         },
         handleClockQuicklink: function(num, val) {
             let d;
@@ -253,6 +269,7 @@
             const cal_link = document.createElement('a');
             cal_link.href = '#';
             cal_link.id = DateTimeShortcuts.calendarLinkName + num;
+            cal_link.setAttribute('title', gettext('Choose a Date'));
             cal_link.addEventListener('click', function(e) {
                 e.preventDefault();
                 // avoid triggering the document click handler to dismiss the calendar
@@ -261,8 +278,7 @@
             });
             quickElement(
                 'span', cal_link, '',
-                'class', 'date-icon',
-                'title', gettext('Choose a Date')
+                'class', 'date-icon'
             );
             shortcuts_span.appendChild(document.createTextNode('\u00A0'));
             shortcuts_span.appendChild(today_link);
@@ -291,6 +307,7 @@
             cal_box.style.position = 'absolute';
             cal_box.className = 'calendarbox module';
             cal_box.id = DateTimeShortcuts.calendarDivName1 + num;
+            cal_box.tabIndex = -1; // Make focusable but not in tab order
             document.body.appendChild(cal_box);
             cal_box.addEventListener('click', function(e) { e.stopPropagation(); });
 
@@ -298,6 +315,8 @@
             const cal_nav = quickElement('div', cal_box);
             const cal_nav_prev = quickElement('a', cal_nav, '<', 'href', '#');
             cal_nav_prev.className = 'calendarnav-previous';
+            cal_nav_prev.setAttribute('role', 'button');
+            cal_nav_prev.setAttribute('title', gettext('Previous month'));
             cal_nav_prev.addEventListener('click', function(e) {
                 e.preventDefault();
                 DateTimeShortcuts.drawPrev(num);
@@ -305,6 +324,8 @@
 
             const cal_nav_next = quickElement('a', cal_nav, '>', 'href', '#');
             cal_nav_next.className = 'calendarnav-next';
+            cal_nav_next.setAttribute('role', 'button');
+            cal_nav_next.setAttribute('title', gettext('Next month'));
             cal_nav_next.addEventListener('click', function(e) {
                 e.preventDefault();
                 DateTimeShortcuts.drawNext(num);
@@ -357,7 +378,10 @@
             const cal_box = document.getElementById(DateTimeShortcuts.calendarDivName1 + num);
             const cal_link = document.getElementById(DateTimeShortcuts.calendarLinkName + num);
             const inp = DateTimeShortcuts.calendarInputs[num];
-
+            
+            // Store the currently focused element before opening popup
+            DateTimeShortcuts.lastFocusedElement = cal_link;
+            
             // Determine if the current value in the input has a valid date.
             // If so, draw the calendar with that date's year and month.
             if (inp.value) {
@@ -371,7 +395,7 @@
                 }
             }
 
-            // Recalculate the clockbox position
+            // Recalculate the calendarbox position
             // is it left-to-right or right-to-left layout ?
             if (window.getComputedStyle(document.body).direction !== 'rtl') {
                 cal_box.style.left = findPosX(cal_link) + 17 + 'px';
@@ -384,11 +408,109 @@
             cal_box.style.top = Math.max(0, findPosY(cal_link) - 75) + 'px';
 
             cal_box.style.display = 'block';
+            
+            // Add focus loop for keyboard navigation
+            DateTimeShortcuts.addFocusLoop(cal_box);
+            
+            // For screen readers, focus on the most relevant date:
+            // 1. If input has a valid date, focus on that date (using selected class)
+            // 2. Otherwise, focus on today's date if visible
+            // 3. Fallback to first available date
+            let focusTarget = null;
+            
+            // Check if there's a selected date (using the selected class)
+            focusTarget = cal_box.querySelector('td.selected a');
+            if (!focusTarget) {
+                // look for selected class on the link itself
+                focusTarget = cal_box.querySelector('td a.selected');
+            }
+            
+            // If no selected date found, try to focus on today's date
+            if (!focusTarget) {
+                const today = DateTimeShortcuts.now(); // Use server-time aware date
+                const todayDay = today.getDate();
+                
+                const allDateCells = cal_box.querySelectorAll('td a');
+                for (const dateCell of allDateCells) {
+                    const cellText = dateCell.textContent.trim();
+                    if (cellText === todayDay.toString()) {
+                        const cellParent = dateCell.parentElement;
+                        if (!cellParent.classList.contains('other') && !cellParent.classList.contains('noday')) {
+                            focusTarget = dateCell;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // Final fallback: focus on first available date
+            if (!focusTarget) {
+                focusTarget = cal_box.querySelector('td a');
+            }
+            
+            // Focus on the determined target
+            if (focusTarget) {
+                focusTarget.focus();
+            } else {
+                // Ultimate fallback to first focusable element
+                const firstFocusableElement = cal_box.querySelector('a[href], button, [tabindex]:not([tabindex="-1"])');
+                if (firstFocusableElement) {
+                    firstFocusableElement.focus();
+                } else {
+                    cal_box.focus();
+                }
+            }
+
             document.addEventListener('click', DateTimeShortcuts.dismissCalendarFunc[num]);
         },
         dismissCalendar: function(num) {
-            document.getElementById(DateTimeShortcuts.calendarDivName1 + num).style.display = 'none';
+            const cal_box = document.getElementById(DateTimeShortcuts.calendarDivName1 + num);
+            cal_box.style.display = 'none';
+            
+            // Remove focus loop
+            DateTimeShortcuts.removeFocusLoop(cal_box);
+            
+            // Restore focus to the trigger button
+            if (DateTimeShortcuts.lastFocusedElement) {
+                DateTimeShortcuts.lastFocusedElement.focus();
+                DateTimeShortcuts.lastFocusedElement = null;
+            }
+            
             document.removeEventListener('click', DateTimeShortcuts.dismissCalendarFunc[num]);
+        },
+        // Add focus loop to keep focus within the popup even after reaching the last focusable element
+        addFocusLoop: function(container) {
+            const focusableElements = container.querySelectorAll(
+                'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+            const firstFocusable = focusableElements[0];
+            const lastFocusable = focusableElements[focusableElements.length - 1];
+            
+            function loopFocus(e) {
+                if (e.key === 'Tab') {
+                    if (e.shiftKey) { // Shift + Tab
+                        if (document.activeElement === firstFocusable) {
+                            e.preventDefault();
+                            lastFocusable.focus();
+                        }
+                    } else { // Tab
+                        if (document.activeElement === lastFocusable) {
+                            e.preventDefault();
+                            firstFocusable.focus();
+                        }
+                    }
+                }
+            }
+            
+            container.addEventListener('keydown', loopFocus);
+            container.focusloopHandler = loopFocus; // Store reference for cleanup
+        },
+        // Remove focus loop
+        removeFocusLoop: function(container) {
+            if (container.focusloopHandler) {
+                container.removeEventListener('keydown', container.focusloopHandler);
+                delete container.focusloopHandler;
+            }
         },
         drawPrev: function(num) {
             DateTimeShortcuts.calendars[num].drawPreviousMonth();
