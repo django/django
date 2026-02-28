@@ -70,7 +70,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_nulls_distinct_unique_constraints = True
     supports_no_precision_decimalfield = True
     can_rename_index = True
-    prohibits_dollar_signs_in_column_aliases = True
     test_collations = {
         "deterministic": "C",
         "non_default": "sv-x-icu",
