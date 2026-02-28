@@ -188,7 +188,7 @@
             });
 
             document.addEventListener('keyup', function(event) {
-                if (event.which === 27) {
+                if (event.key === 'Escape') {
                     // ESC key closes popup
                     DateTimeShortcuts.dismissClock(num);
                     event.preventDefault();
@@ -346,7 +346,7 @@
                 DateTimeShortcuts.dismissCalendar(num);
             });
             document.addEventListener('keyup', function(event) {
-                if (event.which === 27) {
+                if (event.key === 'Escape') {
                     // ESC key closes popup
                     DateTimeShortcuts.dismissCalendar(num);
                     event.preventDefault();
