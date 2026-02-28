@@ -1167,14 +1167,16 @@ class Value(Expression):
     def as_sql(self, compiler, connection):
         connection.ops.check_expression_support(self)
         val = self.value
-        output_field = self._output_field_or_none
-        if output_field is not None:
+        try:
+            output_field = self.output_field
             if self.for_save:
                 val = output_field.get_db_prep_save(val, connection=connection)
             else:
                 val = output_field.get_db_prep_value(val, connection=connection)
             if hasattr(output_field, "get_placeholder"):
                 return output_field.get_placeholder(val, compiler, connection), [val]
+        except OutputFieldIsNoneError:
+            pass
         if val is None:
             # oracledb does not always convert None to the appropriate
             # NULL type (like in case expressions using numbers), so we
