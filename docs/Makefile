@@ -171,16 +171,33 @@ spelling:
 
 black:
 	@mkdir -p $(BUILDDIR)/black
-	find . -name "*.txt" -not -path "./_build/*" -not -path "./_theme/*" \
+	@find . -name "*.txt" -not -path "./_build/*" -not -path "./_theme/*" \
 		| xargs blacken-docs --rst-literal-block; echo $$? > "$(BUILDDIR)/black/output.txt"
-	@echo
-	@echo "Code blocks reformatted"
+	@RESULT=`cat $(BUILDDIR)/black/output.txt`; \
+	if [ "$$RESULT" -gt 0 ]; then \
+		echo "💥 📢 Code blocks in documentation must be reformatted with blacken-docs 📢 💥"; \
+		exit $$RESULT; \
+	else \
+		echo "Code blocks in documentation are properly formatted ✅"; \
+	fi
 
 lint:
 	$(PYTHON) lint.py
 	@echo
 	@echo "Documentation lint complete."
 
-check: spelling black lint
-	@echo
-	@echo "Style and spelling checks completed."
+check:
+	@echo "=== Spelling check ==="; \
+	$(MAKE) --no-print-directory SPHINXOPTS="-q -W" spelling; SPELLING=$$?; \
+	echo ""; \
+	echo "=== Code formatting check ==="; \
+	$(MAKE) --no-print-directory black; BLACK=$$?; \
+	echo ""; \
+	echo "=== Lint check ==="; \
+	$(MAKE) --no-print-directory lint; LINT=$$?; \
+	echo ""; \
+	if [ $$SPELLING -ne 0 ] || [ $$BLACK -ne 0 ] || [ $$LINT -ne 0 ]; then \
+		echo "Some checks failed."; \
+		exit 1; \
+	fi; \
+	echo "All style and spelling checks passed."
