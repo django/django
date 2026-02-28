@@ -35,6 +35,18 @@ class QuestionerTests(SimpleTestCase):
         question = questioner.ask_not_null_alteration("field_name", "model_name")
         self.assertEqual(question, NOT_PROVIDED)
 
+    def test_ask_not_null_removal(self):
+        questioner = MigrationQuestioner()
+        self.assertIsNone(questioner.ask_not_null_removal("field_name", "model_name"))
+
+    @mock.patch("builtins.input", return_value="2")
+    def test_ask_not_null_removal_not_provided(self, mock):
+        questioner = InteractiveMigrationQuestioner(
+            prompt_output=OutputWrapper(StringIO())
+        )
+        question = questioner.ask_not_null_removal("field_name", "model_name")
+        self.assertEqual(question, NOT_PROVIDED)
+
 
 class QuestionerHelperMethodsTests(SimpleTestCase):
     def setUp(self):
