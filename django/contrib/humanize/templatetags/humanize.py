@@ -17,7 +17,10 @@ from django.utils.translation import (
     round_away_from_one,
 )
 
+_integer_re = re.compile(r"-?\d+")
 register = template.Library()
+_triple_integer_re = re.compile(r"\d{3}")
+_intcomma_leading_comma_re = re.compile(r"^(-?),")
 
 
 @register.filter(is_safe=True)
@@ -82,12 +85,11 @@ def intcomma(value, use_l10n=True):
         else:
             return number_format(value, use_l10n=True, force_grouping=True)
     result = str(value)
-    match = re.match(r"-?\d+", result)
-    if match:
+    if match := _integer_re.match(result):
         prefix = match[0]
-        prefix_with_commas = re.sub(r"\d{3}", r"\g<0>,", prefix[::-1])[::-1]
+        prefix_with_commas = _triple_integer_re.sub(r"\g<0>,", prefix[::-1])[::-1]
         # Remove a leading comma, if needed.
-        prefix_with_commas = re.sub(r"^(-?),", r"\1", prefix_with_commas)
+        prefix_with_commas = _intcomma_leading_comma_re.sub(r"\1", prefix_with_commas)
         result = prefix_with_commas + result[len(prefix) :]
     return result
 

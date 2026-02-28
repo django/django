@@ -13,11 +13,13 @@ from django.db.migrations.operations.models import AlterModelOptions
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.utils import (
-    COMPILED_REGEX_TYPE,
     RegexObject,
     resolve_relation,
 )
 from django.utils.functional import cached_property
+
+_squashed_migration_re = re.compile(r".*_squashed_(\d+)")
+_number_prefix_re = re.compile(r"^\d+")
 
 
 class OperationDependency(
@@ -89,7 +91,7 @@ class MigrationAutodetector:
                 self.deep_deconstruct(obj.args),
                 self.deep_deconstruct(obj.keywords),
             )
-        elif isinstance(obj, COMPILED_REGEX_TYPE):
+        elif isinstance(obj, re.Pattern):
             return RegexObject(obj)
         elif isinstance(obj, type):
             # If this is a type that implements 'deconstruct' as an instance
@@ -2058,9 +2060,9 @@ class MigrationAutodetector:
         it. For a squashed migration such as '0001_squashed_0004…', return the
         second number. If no number is found, return None.
         """
-        if squashed_match := re.search(r".*_squashed_(\d+)", name):
+        if squashed_match := _squashed_migration_re.search(name):
             return int(squashed_match[1])
-        match = re.match(r"^\d+", name)
+        match = _number_prefix_re.match(name)
         if match:
             return int(match[0])
         return None

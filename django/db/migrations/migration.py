@@ -1,7 +1,6 @@
-import re
-
 from django.db.migrations.utils import get_migration_name_timestamp
 from django.db.transaction import atomic
+from django.utils.text import replace_non_word_chars
 
 from .exceptions import IrreversibleError
 
@@ -206,8 +205,11 @@ class Migration:
         if self.initial:
             return "initial"
 
-        raw_fragments = [op.migration_name_fragment for op in self.operations]
-        fragments = [re.sub(r"\W+", "_", name) for name in raw_fragments if name]
+        fragments = [
+            replace_non_word_chars("_", op.migration_name_fragment)
+            for op in self.operations
+            if op.migration_name_fragment
+        ]
 
         if not fragments or len(fragments) != len(self.operations):
             return "auto_%s" % get_migration_name_timestamp()

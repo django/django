@@ -1,6 +1,5 @@
 import json
 import os
-import re
 from pathlib import Path
 
 from django.apps import apps
@@ -10,11 +9,14 @@ from django.template import Context, Engine
 from django.urls import translate_url
 from django.utils.formats import get_format
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.translation import check_for_language, get_language
 from django.utils.translation.trans_real import DjangoTranslation
 from django.views.generic import View
 
 LANGUAGE_QUERY_PARAMETER = "language"
+
+_num_plurals_re = _lazy_re_compile(r"nplurals=\s*(\d+)")
 
 
 def builtin_template_path(name):
@@ -146,7 +148,7 @@ class JavaScriptCatalog(View):
         Return the number of plurals for this catalog language, or 2 if no
         plural string is available.
         """
-        match = re.search(r"nplurals=\s*(\d+)", self._plural_string or "")
+        match = _num_plurals_re.search(self._plural_string or "")
         if match:
             return int(match[1])
         return 2

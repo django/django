@@ -2,10 +2,10 @@
 
 import pickle
 import random
-import re
 
 import django
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
+from django.core.cache.utils import server_separator_re
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
@@ -174,7 +174,7 @@ class RedisCache(BaseCache):
     def __init__(self, server, params):
         super().__init__(params)
         if isinstance(server, str):
-            self._servers = re.split("[;,]", server)
+            self._servers = server_separator_re.split(server)
         else:
             self._servers = server
 

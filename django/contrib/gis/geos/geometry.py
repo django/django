@@ -3,7 +3,6 @@ This module contains the 'base' GEOSGeometry object -- all GEOS Geometries
 inherit from this object.
 """
 
-import re
 from ctypes import addressof, byref, c_double
 
 from django.contrib.gis import gdal
@@ -18,6 +17,9 @@ from django.contrib.gis.geos.prepared import PreparedGeometry
 from django.contrib.gis.geos.prototypes.io import ewkb_w, wkb_r, wkb_w, wkt_r, wkt_w
 from django.utils.deconstruct import deconstructible
 from django.utils.encoding import force_bytes, force_str
+from django.utils.regex_helper import _lazy_re_compile
+
+_srid_re = _lazy_re_compile(rb"SRID=(?P<srid>\-?\d+)")
 
 
 class GEOSGeometryBase(GEOSBase):
@@ -124,7 +126,7 @@ class GEOSGeometryBase(GEOSBase):
         parts = ewkt.split(b";", 1)
         if len(parts) == 2:
             srid_part, wkt = parts
-            match = re.match(rb"SRID=(?P<srid>\-?\d+)", srid_part)
+            match = _srid_re.match(srid_part)
             if not match:
                 raise ValueError("EWKT has invalid SRID part.")
             srid = int(match["srid"])

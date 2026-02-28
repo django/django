@@ -11,6 +11,9 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, storages
 from django.utils.functional import LazyObject
+from django.utils.regex_helper import _lazy_re_compile
+
+_protocol_prefix_re = _lazy_re_compile(r"^[a-z]+:")
 
 
 class StaticFilesStorage(FileSystemStorage):
@@ -223,7 +226,7 @@ class HashedFilesMixin:
             url = matches["url"]
 
             # Ignore absolute/protocol-relative and data-uri URLs.
-            if re.match(r"^[a-z]+:", url) or url.startswith("//"):
+            if _protocol_prefix_re.match(url) or url.startswith("//"):
                 return matched
 
             # Ignore absolute URLs that don't point to a static file (dynamic

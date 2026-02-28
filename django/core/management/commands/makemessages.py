@@ -26,6 +26,10 @@ from django.utils.translation import templatize
 plural_forms_re = _lazy_re_compile(
     r'^(?P<value>"Plural-Forms.+?\\n")\s*$', re.MULTILINE | re.DOTALL
 )
+locale_re = _lazy_re_compile(r"^[a-z]+$|^[a-z]+_[A-Z0-9].*$")
+locale_separator_re = _lazy_re_compile(
+    r"^(?P<language>[a-zA-Z]+)(?P<separator>[^a-zA-Z])(?P<territory>.+)$"
+)
 STATUS_OK = 0
 NO_LOCALE_DIR = object()
 
@@ -40,7 +44,7 @@ def check_programs(*programs):
 
 
 def is_valid_locale(locale):
-    return re.match(r"^[a-z]+$", locale) or re.match(r"^[a-z]+_[A-Z0-9].*$", locale)
+    return bool(locale_re.match(locale))
 
 
 @total_ordering
@@ -207,6 +211,8 @@ class Command(BaseCommand):
 
     translatable_file_class = TranslatableFile
     build_file_class = BuildFile
+
+    gettext_version_re = _lazy_re_compile(r"(\d+)\.(\d+)\.?(\d+)?")
 
     requires_system_checks = []
 
@@ -396,14 +402,13 @@ class Command(BaseCommand):
                 os.makedirs(self.default_locale_path, exist_ok=True)
 
         # Build locale list
-        looks_like_locale = re.compile(r"[a-z]{2}")
         locale_dirs = filter(
             os.path.isdir, glob.glob("%s/*" % self.default_locale_path)
         )
         all_locales = [
             lang_code
             for lang_code in map(os.path.basename, locale_dirs)
-            if looks_like_locale.match(lang_code)
+            if locale_re.match(lang_code)
         ]
 
         # Account for excluded locales
@@ -430,13 +435,7 @@ class Command(BaseCommand):
 
                     # Search for characters followed by a non character (i.e.
                     # separator)
-                    match = re.match(
-                        r"^(?P<language>[a-zA-Z]+)"
-                        r"(?P<separator>[^a-zA-Z])"
-                        r"(?P<territory>.+)$",
-                        locale,
-                    )
-                    if match:
+                    if match := locale_separator_re.match(locale):
                         locale_parts = match.groupdict()
                         language = locale_parts["language"].lower()
                         territory = (
@@ -478,8 +477,7 @@ class Command(BaseCommand):
             ["xgettext", "--version"],
             stdout_encoding=DEFAULT_LOCALE_ENCODING,
         )
-        m = re.search(r"(\d+)\.(\d+)\.?(\d+)?", out)
-        if m:
+        if m := self.gettext_version_re.search(out):
             return tuple(int(d) for d in m.groups() if d is not None)
         else:
             raise CommandError("Unable to get gettext version. Is it installed?")

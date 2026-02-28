@@ -1,10 +1,13 @@
 import keyword
-import re
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import DatabaseOnDelete
+from django.utils.regex_helper import _lazy_re_compile
+from django.utils.text import _non_word_re
+
+_non_identifier_re = _lazy_re_compile(r"[^a-zA-Z0-9]")
 
 
 class Command(BaseCommand):
@@ -288,7 +291,7 @@ class Command(BaseCommand):
             else:
                 field_params["db_column"] = col_name
 
-        new_name, num_repl = re.subn(r"\W", "_", new_name)
+        new_name, num_repl = _non_word_re.subn("_", new_name)
         if num_repl > 0:
             field_notes.append("Field renamed to remove unsuitable characters.")
 
@@ -334,7 +337,7 @@ class Command(BaseCommand):
 
     def normalize_table_name(self, table_name):
         """Translate the table name to a Python-compatible model name."""
-        return re.sub(r"[^a-zA-Z0-9]", "", table_name.title())
+        return _non_identifier_re.sub("", table_name.title())
 
     def get_field_type(self, connection, table_name, row):
         """
