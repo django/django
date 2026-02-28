@@ -884,6 +884,16 @@ class ClientTest(TestCase):
         )
         self.assertEqual(response.content, b"hostname2")
 
+    @override_settings(PREPEND_WWW=True, ALLOWED_HOSTS=["*"])
+    def test_prepend_www_follow_redirect(self):
+        response = self.client.get("/get_view/", follow=True)
+        self.assertRedirects(
+            response,
+            "http://www.testserver/get_view/",
+            status_code=301,
+            target_status_code=200,
+        )
+
     def test_external_redirect_without_trailing_slash(self):
         """
         Client._handle_redirects() with an empty path.
