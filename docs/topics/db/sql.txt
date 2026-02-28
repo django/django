@@ -4,9 +4,11 @@ Performing raw SQL queries
 
 .. currentmodule:: django.db.models
 
-Django gives you two ways of performing raw SQL queries: you can use
-:meth:`Manager.raw` to `perform raw queries and return model instances`__, or
-you can avoid the model layer entirely and `execute custom SQL directly`__.
+Django gives you three ways of performing raw SQL queries: you can embed raw
+SQL fragments into ORM queries using
+:class:`~django.db.models.expressions.RawSQL` (see :ref:`raw-sql-fragments`),
+use :meth:`Manager.raw` to `perform raw queries and return model instances`__,
+or avoid the model layer entirely and `execute custom SQL directly`__.
 
 __ `performing raw queries`_
 __ `executing custom SQL directly`_
@@ -33,6 +35,20 @@ __ `executing custom SQL directly`_
     by using ``params`` in order to protect against SQL injection attacks.
     Please read more about :ref:`SQL injection protection
     <sql-injection-protection>`.
+
+.. _raw-sql-fragments:
+
+Raw SQL fragments
+=================
+
+In some cases, you may need to embed raw SQL fragments directly into ORM
+queries, such as in :meth:`~django.db.models.query.QuerySet.annotate` or
+:meth:`~django.db.models.query.QuerySet.filter` calls. For this, use
+:class:`~django.db.models.expressions.RawSQL`.
+
+``RawSQL`` allows you to include parameterized SQL fragments in annotations,
+filters, and other query expressions. For usage examples and important security
+considerations, see :class:`~django.db.models.expressions.RawSQL`.
 
 .. _executing-raw-queries:
 
