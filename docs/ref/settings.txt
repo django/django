@@ -1279,6 +1279,13 @@ Default: ``'``:class:`django.db.models.BigAutoField`\ ``'``
 Default primary key field type to use for models that don't have a field with
 :attr:`primary_key=True <django.db.models.Field.primary_key>`.
 
+Built-in options include:
+
+* :class:`django.db.models.AutoField`
+* :class:`django.db.models.BigAutoField`
+* :class:`django.db.models.SmallAutoField`
+* :class:`django.db.models.UUIDAutoField`
+
 .. versionchanged:: 6.0
 
     In older versions, the default value is

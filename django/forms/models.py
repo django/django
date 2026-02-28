@@ -62,6 +62,7 @@ def construct_instance(form, instance, fields=None, exclude=None):
         if (
             not f.editable
             or isinstance(f, models.AutoField)
+            or getattr(f, "db_returning", False)
             or f.name not in cleaned_data
         ):
             continue

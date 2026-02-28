@@ -68,6 +68,7 @@ __all__ = [
     "TextField",
     "TimeField",
     "URLField",
+    "UUIDAutoField",
     "UUIDField",
 ]
 
@@ -2921,6 +2922,27 @@ class BigAutoField(AutoFieldMixin, BigIntegerField):
 
     def rel_db_type(self, connection):
         return BigIntegerField().db_type(connection=connection)
+
+
+class UUIDAutoField(AutoFieldMixin, UUIDField):
+    def __init__(self, *args, **kwargs):
+        from django.db.models.functions import UUID4
+
+        if "db_default" not in kwargs:
+            kwargs["db_default"] = UUID4()
+        super().__init__(*args, **kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super().deconstruct()
+        # Remove db_default from deconstruction since it's set automatically
+        kwargs.pop("db_default", None)
+        return name, path, args, kwargs
+
+    def get_internal_type(self):
+        return "UUIDAutoField"
+
+    def rel_db_type(self, connection):
+        return UUIDField().db_type(connection=connection)
 
 
 class SmallAutoField(AutoFieldMixin, SmallIntegerField):
