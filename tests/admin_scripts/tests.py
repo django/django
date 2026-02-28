@@ -2775,6 +2775,21 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, "run.py")))
 
+    def test_custom_project_template_from_tarball_by_url_bad_filename(self):
+        """
+        The startproject management command will raise SuspiciousFileOperation
+        on ill-formed remote template archive filename.
+        """
+        template_url = "%s/bad_template_filename.tgz" % self.live_server_url
+
+        args = ["startproject", "--template", template_url, "urltestproject"]
+
+        out, err = self.run_django_admin(args)
+        self.assertOutput(
+            err,
+            "is located outside of the base path component",
+        )
+
     def test_custom_project_template_from_tarball_by_url_django_user_agent(self):
         user_agent = None
 
