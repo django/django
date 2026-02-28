@@ -1,6 +1,6 @@
 from inspect import iscoroutinefunction
 
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
 from django.test import SimpleTestCase
 from django.views.decorators.gzip import gzip_page
 
@@ -44,3 +44,16 @@ class GzipPageTests(SimpleTestCase):
         response = await async_view(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get("Content-Encoding"), "gzip")
+
+    def test_streaming_response_yields_chunks_incrementally(self):
+        @gzip_page
+        def stream_view(request):
+            return StreamingHttpResponse(self.content.encode() for _ in range(5))
+
+        request = HttpRequest()
+        request.META["HTTP_ACCEPT_ENCODING"] = "gzip"
+        response = stream_view(request)
+        compressed_chunks = list(response)
+        # Each input chunk should produce compressed output, not buffer
+        # everything into a single chunk.
+        self.assertGreater(len(compressed_chunks), 2)
