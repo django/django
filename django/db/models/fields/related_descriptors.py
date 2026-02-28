@@ -840,7 +840,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 pks = []
                 for obj in objs:
                     check_and_update_obj(obj)
-                    if obj._state.adding or obj._state.db != db:
+                    if obj._state.adding:
                         raise ValueError(
                             "%r instance isn't saved. Use bulk=False or save "
                             "the object first." % obj

@@ -1142,10 +1142,6 @@ class QueryTestCase(TestCase):
             review1.content_object = dive
 
         # Add to a foreign key set with an object from a different database
-        msg = (
-            "<Review: Python Monthly> instance isn't saved. "
-            "Use bulk=False or save the object first."
-        )
         with self.assertRaisesMessage(ValueError, msg):
             with transaction.atomic(using="other"):
                 dive.reviews.add(review1)
@@ -1519,18 +1515,15 @@ class RouterTestCase(TestCase):
         self.assertEqual(Book.objects.using("default").count(), 1)
         self.assertEqual(Book.objects.using("other").count(), 1)
 
-    def test_invalid_set_foreign_key_assignment(self):
+    def test_invalid_set_unsaved_assignment(self):
         marty = Person.objects.using("default").create(name="Marty Alchin")
-        dive = Book.objects.using("other").create(
+        dive = Book(
             title="Dive into Python",
             published=datetime.date(2009, 5, 4),
         )
         # Set a foreign key set with an object from a different database
-        msg = (
-            "<Book: Dive into Python> instance isn't saved. Use bulk=False or save the "
-            "object first."
-        )
-        with self.assertRaisesMessage(ValueError, msg):
+        msg = "Model instances without primary key value are unhashable"
+        with self.assertRaisesMessage(TypeError, msg):
             marty.edited.set([dive])
 
     def test_foreign_key_cross_database_protection(self):
@@ -2592,3 +2585,95 @@ class RelationAssignmentTests(SimpleTestCase):
         profile = UserProfile()
         with self.assertRaisesMessage(ValueError, self.router_prevents_msg):
             user.userprofile = profile
+
+
+@override_settings(DATABASE_ROUTERS=[TestRouter()])
+class ReadWriteClusterTests(TestCase):
+    """see ticket #35974"""
+
+    databases = {"default", "other"}
+    fixtures = ["replica"]
+
+    def test_reverse_many_to_one_add(self):
+        person = Person.objects.get(name="Tim Graham")
+        book = Book.objects.get(title="The Definitive Guide to Django")
+        person.edited.add(book)
+        self.assertEqual(
+            list(Person.objects.using("default").get(name="Tim Graham").edited.all()),
+            [book],
+        )
+
+    def test_reverse_many_to_one_set(self):
+        person = Person.objects.get(name="Tim Graham")
+        book = Book.objects.get(title="The Definitive Guide to Django")
+        person.edited.set([book])
+        self.assertEqual(
+            list(Person.objects.using("default").get(name="Tim Graham").edited.all()),
+            [book],
+        )
+
+    def test_reverse_many_to_one_add_unsaved(self):
+        person = Person.objects.get(name="Tim Graham")
+        book = Book(
+            title="The Definitive Guide to Django",
+            published=datetime.date(2009, 7, 8),
+        )
+        msg = (
+            "<Book: The Definitive Guide to Django> instance isn't saved."
+            " Use bulk=False or save the object first."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            person.edited.add(book)
+
+    def test_reverse_many_to_one_set_unsaved(self):
+        person = Person.objects.get(name="Tim Graham")
+        book = Book(
+            title="The Definitive Guide to Django",
+            published=datetime.date(2009, 7, 8),
+        )
+        msg = "Model instances without primary key value are unhashable"
+        with self.assertRaisesMessage(TypeError, msg):
+            person.edited.set([book])
+
+    def test_generic_related_add(self):
+        book = Book.objects.get(title="The Definitive Guide to Django")
+        review = Review.objects.get(source="Python Weekly")
+        book.reviews.add(review)
+        self.assertEqual(
+            list(
+                Book.objects.using("default")
+                .get(title="The Definitive Guide to Django")
+                .reviews.all()
+            ),
+            [review],
+        )
+
+    def test_generic_related_set(self):
+        book = Book.objects.get(title="The Definitive Guide to Django")
+        review = Review.objects.get(source="Python Weekly")
+        book.reviews.set([review])
+        self.assertEqual(
+            list(
+                Book.objects.using("default")
+                .get(title="The Definitive Guide to Django")
+                .reviews.all()
+            ),
+            [review],
+        )
+
+    def test_generic_related_add_unsaved(self):
+        book = Book.objects.get(title="The Definitive Guide to Django")
+        review = Review(source="Python Weekly")
+        msg = (
+            "<Review: Python Weekly> instance isn't saved."
+            " Use bulk=False or save the object first."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            book.reviews.add(review)
+
+    def test_generic_related_set_unsaved(self):
+        book = Book.objects.get(title="The Definitive Guide to Django")
+        review = Review(source="Python Weekly")
+        msg = "Model instances without primary key value are unhashable"
+        with self.assertRaisesMessage(TypeError, msg):
+            book.reviews.set([review])
