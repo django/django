@@ -13,3 +13,11 @@ class SimpleModel(models.Model):
 
 class ManyToManyModel(models.Model):
     simples = models.ManyToManyField("SimpleModel")
+
+
+class IncrementASaveModel(models.Model):
+    field = models.IntegerField()
+
+    async def asave(self, *args, **kwargs):
+        self.field += 1
+        await super().asave(*args, **kwargs)
