@@ -17,10 +17,13 @@ Task definition
 The ``task`` decorator
 ----------------------
 
-.. function:: task(*, priority=0, queue_name="default", backend="default", takes_context=False)
+.. function:: task(**kwargs)
 
-    The ``@task`` decorator defines a :class:`Task` instance. This has the
-    following optional arguments:
+    The ``@task`` decorator defines a :class:`Task` instance. All keyword
+    arguments are passed directly to the backend's ``task_class`` (which
+    defaults to :class:`Task`).
+
+    The following standard arguments are supported:
 
     * ``priority``: Sets the :attr:`~Task.priority` of the ``Task``. Defaults
       to 0.
@@ -31,6 +34,13 @@ The ``task`` decorator
     * ``takes_context``: Controls whether the ``Task`` function accepts a
       :class:`TaskContext`. Defaults to ``False``. See :ref:`Task context
       <task-context>` for details.
+
+    Custom Task backends may define a custom ``task_class`` that accepts
+    additional arguments. These can be passed through the ``@task`` decorator::
+
+        @task(foo=5, bar=600)
+        def my_task():
+            pass
 
     If the defined ``Task`` is not valid according to the backend,
     :exc:`~django.tasks.exceptions.InvalidTask` is raised.
@@ -74,6 +84,8 @@ The ``task`` decorator
         :class:`timedelta <datetime.timedelta>`, which is used relative to the
         current time, a timezone-aware :class:`datetime <datetime.datetime>`,
         or ``None`` if not constrained. Defaults to ``None``.
+
+        This attribute can be set using :meth:`~Task.using`.
 
         The backend must have :attr:`.supports_defer` set to ``True`` to use
         this feature. Otherwise,
@@ -290,6 +302,13 @@ Base backend
 .. class:: BaseTaskBackend
 
     ``BaseTaskBackend`` is the parent class for all Task backends.
+
+    .. attribute:: BaseTaskBackend.task_class
+
+        The :class:`~django.tasks.Task` subclass to use when creating tasks
+        with the :func:`~django.tasks.task` decorator. Defaults to
+        :class:`~django.tasks.Task`. Custom backends can override this to use
+        a custom ``Task`` subclass with additional attributes.
 
     .. attribute:: BaseTaskBackend.options
 
