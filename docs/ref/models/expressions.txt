@@ -890,8 +890,7 @@ the same studio in the same genre and release year:
     >>> Movie.objects.annotate(
     ...     avg_rating=Window(
     ...         expression=Avg("rating"),
-    ...         partition_by=[F("studio"), F("genre")],
-    ...         order_by="released__year",
+    ...         partition_by=[F("studio"), F("genre"), F("released__year")],
     ...     ),
     ... )
 
@@ -908,8 +907,7 @@ to reduce repetition:
 
     >>> from django.db.models import Avg, F, Max, Min, Window
     >>> window = {
-    ...     "partition_by": [F("studio"), F("genre")],
-    ...     "order_by": "released__year",
+    ...     "partition_by": [F("studio"), F("genre"), F("released__year")],
     ... }
     >>> Movie.objects.annotate(
     ...     avg_rating=Window(
@@ -1040,8 +1038,7 @@ with the average rating of a movie's two prior and two following peers:
     >>> Movie.objects.annotate(
     ...     avg_rating=Window(
     ...         expression=Avg("rating"),
-    ...         partition_by=[F("studio"), F("genre")],
-    ...         order_by="released__year",
+    ...         partition_by=[F("studio"), F("genre"), F("released__year")],
     ...         frame=RowRange(start=-2, end=2),
     ...     ),
     ... )
@@ -1058,8 +1055,7 @@ released between twelve months before and twelve months after each movie:
     >>> Movie.objects.annotate(
     ...     avg_rating=Window(
     ...         expression=Avg("rating"),
-    ...         partition_by=[F("studio"), F("genre")],
-    ...         order_by="released__year",
+    ...         partition_by=[F("studio"), F("genre"), F("released__year")],
     ...         frame=ValueRange(start=-12, end=12),
     ...     ),
     ... )
