@@ -18,6 +18,12 @@
     </script>
   </p>
 
+  <p id="gettext_empty_array">
+    <script>
+    document.write(gettext("empty"));
+    </script>
+  </p>
+
   <p id="ngettext_sing">
     <script>
     document.write(interpolate(ngettext("%s item", "%s items", 1), [1]));
@@ -35,6 +41,20 @@
       <script>
           document.write(interpolate(ngettext("Image", "Images", 5), [1]));
       </script>
+  </p>
+
+  <p id="ngettext_empty_array">
+      <!-- The po file contains empty array on "%s element" id. -->
+    <script>
+    document.write(interpolate(ngettext("%s element", "%s elements", 1), [1]));
+    </script>
+  </p>
+
+  <p id="ngettext_plural_empty_array">
+      <!-- The po file contains empty array on "%s element" id. -->
+    <script>
+    document.write(interpolate(ngettext("%s element", "%s elements", 455), [455]));
+    </script>
   </p>
 
   <p id="pgettext">

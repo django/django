@@ -27,22 +27,40 @@
   }
   {% endif %}
 
+  function getValueFromCatalog(msgid, index) {
+    const value = django.catalog[msgid];
+
+    // if value in catalog is a string, return it
+    if (typeof value === 'string' && value) {
+      return value;
+    }
+
+    // if value in catalog is an array and index is present, return the array index if exists
+    if (value && value.constructor === Array && index !== undefined) {
+      const text = value[index];
+
+      if (typeof text === 'string' && text) {
+        return text;
+      }
+    }
+
+    return undefined;
+  }
+
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      const value = django.catalog[msgid];
-      if (typeof value === 'undefined') {
-        return msgid;
-      } else {
-        return (typeof value === 'string') ? value : value[0];
-      }
+      const value = getValueFromCatalog(msgid, 0);
+
+      return value !== undefined ? value : msgid;
     };
 
     django.ngettext = function(singular, plural, count) {
-      const value = django.catalog[singular];
-      if (typeof value === 'undefined') {
-        return (count == 1) ? singular : plural;
+      const value = getValueFromCatalog(singular, django.pluralidx(count));
+
+      if (value !== undefined) {
+        return value;
       } else {
-        return value.constructor === Array ? value[django.pluralidx(count)] : value;
+        return (count == 1) ? singular : plural;
       }
     };
 
