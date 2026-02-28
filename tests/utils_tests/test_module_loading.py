@@ -13,6 +13,13 @@ from django.utils.module_loading import (
 )
 
 
+class AttributeErrorModule:
+    @property
+    def attr(self):
+        # This is the "internal bug"
+        return self.non_existent_attr
+
+
 class DefaultLoader(unittest.TestCase):
     def test_loader(self):
         "Normal module existence can be tested"
@@ -139,6 +146,21 @@ class ModuleImportTests(SimpleTestCase):
         msg = 'Module "utils_tests" does not define a "unexistent" attribute'
         with self.assertRaisesMessage(ImportError, msg):
             import_string("utils_tests.unexistent")
+
+    def test_import_string_internal_attribute_error(self):
+        """
+        #36956 -- import_string() should let internal AttributeErrors bubble up
+        if they don't match the requested attribute name.
+        """
+        # We point to the helper class that contains a deliberate bug.
+        path = "utils_tests.test_module_loading.AttributeErrorModule"
+        # NOT the misleading ImportError.
+        with self.assertRaises(AttributeError) as cm:
+            cls = import_string(path)
+            cls().attr
+        # Verify the error is about the internal typo ('non_existent_attr')
+        # and not the class we were trying to import ('AttributeErrorModule').
+        self.assertEqual(cm.exception.name, "non_existent_attr")
 
 
 @modify_settings(INSTALLED_APPS={"append": "utils_tests.test_module"})
