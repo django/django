@@ -586,6 +586,31 @@ class SetupConfigureLogging(SimpleTestCase):
             setup()
         self.assertTrue(dictConfig.called)
 
+    def test_logging_settings_changed(self):
+        """
+        Logging configuration should be reconfigured when LOGGING or
+        LOGGING_CONFIG settings are changed.
+        """
+        new_logging = {
+            "version": 1,
+            "disable_existing_loggers": False,
+            "loggers": {
+                "django.test_custom_logger": {
+                    "level": "WARNING",
+                }
+            },
+        }
+        logger = logging.getLogger("django.test_custom_logger")
+        original_level = logger.level
+
+        with override_settings(LOGGING=new_logging):
+            self.assertEqual(logger.level, logging.WARNING)
+        self.assertEqual(logger.level, original_level)
+
+        dictConfig.called = False
+        with override_settings(LOGGING_CONFIG="logging_tests.tests.dictConfig"):
+            self.assertTrue(dictConfig.called)
+
 
 @override_settings(DEBUG=True, ROOT_URLCONF="logging_tests.urls")
 class SecurityLoggerTest(LoggingAssertionMixin, SimpleTestCase):
