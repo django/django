@@ -42,30 +42,13 @@ Raw SQL fragments
 =================
 
 In some cases, you may need to embed raw SQL fragments directly into ORM
-queries, such as in :meth:`django.db.models.query.QuerySet.annotate` or
-:meth:`django.db.models.query.QuerySet.filter` calls.
+queries, such as in :meth:`~django.db.models.query.QuerySet.annotate` or
+:meth:`~django.db.models.query.QuerySet.filter` calls. For this, use
+:class:`~django.db.models.expressions.RawSQL`.
 
-Django provides two tools for this: :ref:`Func() expressions
-<func-expressions>` and :class:`~django.db.models.expressions.RawSQL`.
-:ref:`Func() expressions <func-expressions>` are useful for calling standard
-SQL functions across backends, while
-:class:`~django.db.models.expressions.RawSQL` provides more flexibility for
-database-specific or complex expressions.
-
-For example::
-
-    from django.db.models.expressions import RawSQL
-
-    Entry.objects.annotate(
-        val=RawSQL("SELECT col FROM sometable WHERE othercol = %s", (param,))
-    )
-
-The second argument to ``RawSQL`` is a list or tuple of parameters that will be
-safely bound to the query, similar to the ``params`` argument to
-:meth:`Manager.raw`. Use ``%s`` placeholders in the SQL string for parameters.
-
-For full documentation, see the :doc:`RawSQL reference
-</ref/models/expressions>`.
+``RawSQL`` allows you to include parameterized SQL fragments in annotations,
+filters, and other query expressions. For usage examples and important security
+considerations, see :class:`~django.db.models.expressions.RawSQL`.
 
 .. _executing-raw-queries:
 
