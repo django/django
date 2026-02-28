@@ -47,6 +47,12 @@ class DatabaseCache(BaseDatabaseCache):
     # conversion and adaptation infrastructure is then used to avoid comparing
     # aware and naive datetimes accidentally.
 
+    def __init__(self, table, params):
+        super().__init__(table, params)
+        # Settings to control frequency of cull operation.
+        self._cull_n = 5
+        self._cull_counter = 0
+
     pickle_protocol = pickle.HIGHEST_PROTOCOL
 
     def get(self, key, default=None, version=None):
@@ -128,8 +134,13 @@ class DatabaseCache(BaseDatabaseCache):
                 tz = UTC if settings.USE_TZ else None
                 exp = datetime.fromtimestamp(timeout, tz=tz)
             exp = exp.replace(microsecond=0)
-            if num > self._max_entries:
+            cull_check = True
+            if self._cull_n > 0:
+                self._cull_counter += 1
+                cull_check = self._cull_counter == self._cull_n
+            if num > self._max_entries and cull_check:
                 self._cull(db, cursor, now, num)
+                self._cull_counter = 0
             pickled = pickle.dumps(value, self.pickle_protocol)
             # The DB column is expecting a string, so make sure the value is a
             # string, not bytes. Refs #19274.
