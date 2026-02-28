@@ -7,6 +7,10 @@ from django.http import HttpResponse, StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 
+def index(request):
+    return HttpResponse(b"Index")
+
+
 def regular(request):
     return HttpResponse(b"regular content")
 
