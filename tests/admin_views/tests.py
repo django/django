@@ -8468,7 +8468,9 @@ class DateHierarchyTests(TestCase):
         url = reverse("admin:admin_views_podcast_changelist")
         response = self.client.get(url)
         for date in DATES:
-            self.assert_contains_day_link(response, date)
+            # NEWLY ADDED
+            with self.subTest(date=date):
+                self.assert_contains_day_link(response, date)
         self.assert_non_localized_year(response, 2000)
 
     def test_within_year(self):
