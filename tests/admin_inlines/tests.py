@@ -2080,7 +2080,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         """
         The "Add another XXX" link correctly adds items to the inline form.
         """
-        from selenium.webdriver.common.by import By # type: ignore
+        from selenium.webdriver.common.by import By  # type: ignore
 
         self.admin_login(username="super", password="secret")
         self.selenium.get(
@@ -2104,8 +2104,8 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # NEWLY ADDED
         initial_rows = self.selenium.find_elements(
-    By.CSS_SELECTOR, ".dynamic-profile_set"
-)
+            By.CSS_SELECTOR, ".dynamic-profile_set"
+        )
         initial_count = len(initial_rows)
 
         # Add an inline
