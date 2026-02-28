@@ -2,10 +2,12 @@ from datetime import date, datetime, timedelta
 from operator import attrgetter
 
 from django.db import IntegrityError
+from django.forms.models import inlineformset_factory
 from django.test import TestCase
 
 from .models import (
     CustomMembership,
+    DoubleProxyMembership,
     Employee,
     Event,
     Friendship,
@@ -16,6 +18,9 @@ from .models import (
     Person,
     PersonChild,
     PersonSelfRefM2M,
+    ProxyGroup,
+    ProxyMembership,
+    ProxyPerson,
     Recipe,
     RecipeIngredient,
     Relationship,
@@ -542,3 +547,114 @@ class M2mThroughToFieldsTests(TestCase):
     def test_exists(self):
         self.assertTrue(self.curry.ingredients.exists())
         self.assertTrue(self.tomato.recipes.exists())
+
+
+class M2mThroughProxyTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.person = Person.objects.create(name="Alice")
+        cls.proxy_person = ProxyPerson.objects.create(name="Bob")
+        cls.group = Group.objects.create(name="Team")
+        cls.proxy_group = ProxyGroup.objects.create(name="Proxy Team")
+
+    def test_forward(self):
+        test_cases = [
+            (
+                ProxyMembership,
+                {"proxy_person": self.person, "group": self.group},
+                self.group,
+                "proxy_members",
+                [self.person],
+            ),
+            (
+                DoubleProxyMembership,
+                {"proxy_person": self.proxy_person, "proxy_group": self.proxy_group},
+                self.proxy_group,
+                "double_proxy_members",
+                [self.proxy_person],
+            ),
+        ]
+        for model, create_kwargs, parent, attr, expected in test_cases:
+            with self.subTest(model=model.__name__):
+                model.objects.create(**create_kwargs)
+                self.assertSequenceEqual(list(getattr(parent, attr).all()), expected)
+
+    def test_reverse(self):
+        test_cases = [
+            (
+                ProxyMembership,
+                {"proxy_person": self.person, "group": self.group},
+                self.person,
+                "proxy_groups",
+                [self.group],
+            ),
+            (
+                DoubleProxyMembership,
+                {"proxy_person": self.proxy_person, "proxy_group": self.proxy_group},
+                self.proxy_person,
+                "double_proxy_groups",
+                [self.proxy_group],
+            ),
+        ]
+        for model, create_kwargs, related, attr, expected in test_cases:
+            with self.subTest(model=model.__name__):
+                model.objects.create(**create_kwargs)
+                self.assertSequenceEqual(list(getattr(related, attr).all()), expected)
+
+    def test_add(self):
+        test_cases = [
+            (
+                self.group,
+                "proxy_members",
+                self.person,
+                ProxyMembership,
+                {"proxy_person": self.person, "group": self.group},
+            ),
+            (
+                self.proxy_group,
+                "double_proxy_members",
+                self.proxy_person,
+                DoubleProxyMembership,
+                {"proxy_person": self.proxy_person, "proxy_group": self.proxy_group},
+            ),
+        ]
+        for parent, attr, member, model, filter_kwargs in test_cases:
+            with self.subTest(model=model.__name__):
+                getattr(parent, attr).add(member)
+                self.assertTrue(model.objects.filter(**filter_kwargs).exists())
+
+    def test_remove(self):
+        test_cases = [
+            (
+                ProxyMembership,
+                {"proxy_person": self.person, "group": self.group},
+                self.group,
+                "proxy_members",
+                self.person,
+            ),
+            (
+                DoubleProxyMembership,
+                {"proxy_person": self.proxy_person, "proxy_group": self.proxy_group},
+                self.proxy_group,
+                "double_proxy_members",
+                self.proxy_person,
+            ),
+        ]
+        for model, create_kwargs, parent, attr, member in test_cases:
+            with self.subTest(model=model.__name__):
+                model.objects.create(**create_kwargs)
+                getattr(parent, attr).remove(member)
+                self.assertFalse(model.objects.filter(**create_kwargs).exists())
+
+    def test_inlineformset(self):
+        test_cases = [
+            (Group, ProxyMembership, self.group),
+            (ProxyGroup, DoubleProxyMembership, self.proxy_group),
+        ]
+        for parent_model, through_model, instance in test_cases:
+            with self.subTest(through_model=through_model.__name__):
+                FormSet = inlineformset_factory(
+                    parent_model, through_model, fields=["proxy_person"]
+                )
+                formset = FormSet(instance=instance)
+                self.assertEqual(formset.model, through_model)
