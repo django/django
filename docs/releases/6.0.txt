@@ -240,6 +240,33 @@ Minor features
 Email
 ~~~~~
 
+Dictionary based ``EMAIL_PROVIDERS`` settings
+---------------------------------------------
+
+Instead of a list of ``EMAIL_...`` settings, email providers must be configured
+using a dictionary. This allows to configure multiple email providers and use
+them concurrently. A typical email configuration now looks like:
+
+.. code-block:: python
+
+    EMAIL_PROVIDERS = {
+        "default": {
+            "BACKEND": "...",
+            "OPTIONS": {
+                "...": "...",
+            },
+        },
+        "secondary": {
+            "BACKEND": "...",
+            "OPTIONS": {
+                "...": "...",
+            },
+        },
+    }
+
+where ``BACKEND`` is the chosen email backend, and ``OPTIONS`` are the settings
+specific to that backend.
+
 * The new ``policy`` argument for :meth:`EmailMessage.message()
   <django.core.mail.EmailMessage.message>` allows specifying the email policy,
   the set of rules for updating and serializing the representation of the

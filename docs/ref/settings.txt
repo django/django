@@ -1387,10 +1387,68 @@ that are not allowed to visit any page, systemwide. Use this for bots/crawlers.
 This is only used if ``CommonMiddleware`` is installed (see
 :doc:`/topics/http/middleware`).
 
+.. setting:: EMAIL_PROVIDERS
+
+``EMAIL_PROVIDERS``
+-------------------
+
+Default::
+
+    EMAIL_PROVIDERS = {
+        "default": {
+            "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+        }
+    }
+
+A dictionary containing the settings for all email providers to be used with
+Django. It is a nested dictionary whose contents map an email provider alias
+to a dictionary containing a sub-dictionary ``OPTIONS`` to override the
+defaults of each individual backend. Check the backend's documentation for
+details.
+
+The :setting:`EMAIL_PROVIDERS` setting must configure a ``default`` provider;
+any number of additional providers may also be specified. When sending emails,
+an alternative provider can be selected by passing the given alias.
+
+``BACKEND``
+~~~~~~~~~~~
+
+Default: Not defined
+
+The email backend to use. The built-in email backends are:
+
+* ``django.core.mail.backends.console.EmailBackend``
+* ``django.core.mail.backends.dummy.EmailBackend``
+* ``django.core.mail.backends.filebased.EmailBackend``
+* ``django.core.mail.backends.locmem.EmailBackend``
+* ``django.core.mail.backends.smtp.EmailBackend``
+
+You can use an email backend that doesn't ship with Django by setting
+``BACKEND`` to a fully-qualified path (i.e. ``'mypackage.whatever.Backend'``).
+
+``OPTIONS``
+~~~~~~~~~~~
+
+Default: ``{}`` (Empty dict)
+
+Extra parameters to pass to the email backend. Available parameters vary
+depending on the email backend. Check the implementation details of the backend
+for their available options.
+
+``USE_LOCALTIME``
+~~~~~~~~~~~~~~~~~
+
+Default: ``False``
+
+Whether to send the SMTP ``Date`` header of email messages in the local time
+zone (``True``) or in UTC (``False``).
+
 .. setting:: EMAIL_BACKEND
 
 ``EMAIL_BACKEND``
 -----------------
+
+.. deprecated:: 6.0
 
 Default: ``'``:class:`django.core.mail.backends.smtp.EmailBackend`\ ``'``
 
@@ -1412,6 +1470,8 @@ to store output files.
 ``EMAIL_HOST``
 --------------
 
+.. deprecated:: 6.0
+
 Default: ``'localhost'``
 
 The host to use for sending email.
@@ -1422,6 +1482,8 @@ See also :setting:`EMAIL_PORT`.
 
 ``EMAIL_HOST_PASSWORD``
 -----------------------
+
+.. deprecated:: 6.0
 
 Default: ``''`` (Empty string)
 
@@ -1437,6 +1499,8 @@ See also :setting:`EMAIL_HOST_USER`.
 ``EMAIL_HOST_USER``
 -------------------
 
+.. deprecated:: 6.0
+
 Default: ``''`` (Empty string)
 
 Username to use for the SMTP server defined in :setting:`EMAIL_HOST`.
@@ -1448,6 +1512,8 @@ See also :setting:`EMAIL_HOST_PASSWORD`.
 
 ``EMAIL_PORT``
 --------------
+
+.. deprecated:: 6.0
 
 Default: ``25``
 
@@ -1471,13 +1537,15 @@ probably want to include the trailing space.
 
 Default: ``False``
 
-Whether to send the SMTP ``Date`` header of email messages in the local time
-zone (``True``) or in UTC (``False``).
+Whether to send the SMTP ``Date`` header of email messages in the server's
+local time zone (``True``) or in UTC (``False``).
 
 .. setting:: EMAIL_USE_TLS
 
 ``EMAIL_USE_TLS``
 -----------------
+
+.. deprecated:: 6.0
 
 Default: ``False``
 
@@ -1490,6 +1558,8 @@ experiencing hanging connections, see the implicit TLS setting
 
 ``EMAIL_USE_SSL``
 -----------------
+
+.. deprecated:: 6.0
 
 Default: ``False``
 
@@ -1505,6 +1575,8 @@ exclusive, so only set one of those settings to ``True``.
 
 ``EMAIL_SSL_CERTFILE``
 ----------------------
+
+.. deprecated:: 6.0
 
 Default: ``None``
 
@@ -1532,6 +1604,8 @@ root certificates to its ``ssl_context`` using
 ``EMAIL_SSL_KEYFILE``
 ---------------------
 
+.. deprecated:: 6.0
+
 Default: ``None``
 
 If :setting:`EMAIL_USE_SSL` or :setting:`EMAIL_USE_TLS` is ``True``, you can
@@ -1548,6 +1622,8 @@ for details on how the certificate chain file and private key file are handled.
 
 ``EMAIL_TIMEOUT``
 -----------------
+
+.. deprecated:: 6.0
 
 Default: ``None``
 

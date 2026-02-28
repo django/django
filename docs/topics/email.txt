@@ -27,6 +27,14 @@ plain text message::
         ["to@example.com"],
     )
 
+
+
+Mail is sent using the email backend as configured in the
+:setting:`EMAIL_PROVIDERS`. Check the implementation details of the
+given provider. If more than one provider is configured, pass the argument
+``provider="alternative"`` when invoking the function to send the email using
+the alternative provider.
+
 When additional email sending functionality is needed, use
 :class:`EmailMessage` or :class:`EmailMultiAlternatives`. For example, to send
 a multipart email that includes both HTML and plain text versions with a
@@ -61,11 +69,15 @@ specific template and custom headers, you can use the following approach::
     msg.send()
 
 Mail is sent using the SMTP host and port specified in the
-:setting:`EMAIL_HOST` and :setting:`EMAIL_PORT` settings. The
-:setting:`EMAIL_HOST_USER` and :setting:`EMAIL_HOST_PASSWORD` settings, if
-set, are used to authenticate to the SMTP server, and the
-:setting:`EMAIL_USE_TLS` and :setting:`EMAIL_USE_SSL` settings control whether
-a secure connection is used.
+:setting:`EMAIL_PROVIDERS` using
+``EMAIL_PROVIDERS["default"]["OPTIONS"]["host"]`` and
+``EMAIL_PROVIDERS["default"]["OPTIONS"]["port"]`` settings. The
+settings ``EMAIL_PROVIDERS["default"]["OPTIONS"]["username"]`` and
+``EMAIL_PROVIDERS["default"]["OPTIONS"]["password"]`` are used to authenticate
+to the SMTP server. The settings
+``EMAIL_PROVIDERS["default"]["OPTIONS"]["use_tls"]`` and
+``EMAIL_PROVIDERS["default"]["OPTIONS"]["use_ssl"]`` are used to control
+whether a secure connection is used.
 
 .. note::
 
@@ -75,7 +87,7 @@ a secure connection is used.
 ``send_mail()``
 ===============
 
-.. function:: send_mail(subject, message, from_email, recipient_list, *, fail_silently=False, auth_user=None, auth_password=None, connection=None, html_message=None)
+.. function:: send_mail(subject, message, from_email, recipient_list, *, fail_silently=False, html_message=None, provider=None)
 
 In most cases, you can send email using ``django.core.mail.send_mail()``.
 
@@ -97,6 +109,15 @@ if used.
   an :exc:`smtplib.SMTPException` if an error occurs. See the :mod:`smtplib`
   docs for a list of possible exceptions, all of which are subclasses of
   :exc:`~smtplib.SMTPException`.
+* ``html_message``: If ``html_message`` is provided, the resulting email will
+  be a :mimetype:`multipart/alternative` email with ``message`` as the
+  :mimetype:`text/plain` content type and ``html_message`` as the
+  :mimetype:`text/html` content type.
+* ``provider``: A string used as alias for the preferred email provider. If
+  unset the default provider is used.
+
+These parameters are deprecated and will be removed in Django-7.0:
+
 * ``auth_user``: The optional username to use to authenticate to the SMTP
   server. If this isn't provided, Django will use the value of the
   :setting:`EMAIL_HOST_USER` setting.
@@ -123,7 +144,7 @@ can be ``0`` or ``1`` since it can only send one message).
 ``send_mass_mail()``
 ====================
 
-.. function:: send_mass_mail(datatuple, *, fail_silently=False, auth_user=None, auth_password=None, connection=None)
+.. function:: send_mass_mail(datatuple, *, fail_silently=False, provider=None)
 
 ``django.core.mail.send_mass_mail()`` is intended to handle mass emailing.
 
@@ -131,9 +152,8 @@ can be ``0`` or ``1`` since it can only send one message).
 
     (subject, message, from_email, recipient_list)
 
-``fail_silently``, ``auth_user``, ``auth_password`` and ``connection`` have the
-same functions as in :func:`send_mail`. They must be given as keyword arguments
-if used.
+``fail_silently`` and ``provider`` have the same functions as in
+:func:`send_mail`. They must be given as keyword arguments if used.
 
 Each separate element of ``datatuple`` results in a separate email message.
 As in :func:`send_mail`, recipients in the same ``recipient_list`` will all see
@@ -175,7 +195,7 @@ messages. This makes :func:`send_mass_mail` slightly more efficient.
 ``mail_admins()``
 =================
 
-.. function:: mail_admins(subject, message, *, fail_silently=False, connection=None, html_message=None)
+.. function:: mail_admins(subject, message, *, fail_silently=False, html_message=None, provider=None)
 
 ``django.core.mail.mail_admins()`` is a shortcut for sending an email to the
 site admins, as defined in the :setting:`ADMINS` setting.
@@ -201,7 +221,7 @@ If ``html_message`` is provided, the resulting email will be a
 ``mail_managers()``
 ===================
 
-.. function:: mail_managers(subject, message, *, fail_silently=False, connection=None, html_message=None)
+.. function:: mail_managers(subject, message, *, fail_silently=False, html_message=None, provider=None)
 
 ``django.core.mail.mail_managers()`` is just like ``mail_admins()``, except it
 sends an email to the site managers, as defined in the :setting:`MANAGERS`
@@ -661,11 +681,12 @@ Obtaining an instance of an email backend
 The :func:`get_connection` function in ``django.core.mail`` returns an
 instance of the email backend that you can use.
 
-.. function:: get_connection(backend=None, *, fail_silently=False, **kwargs)
+.. function:: get_connection(backend=None, *, fail_silently=False, provider=None, **kwargs)
 
 By default, a call to ``get_connection()`` will return an instance of the
-email backend specified in :setting:`EMAIL_BACKEND`. If you specify the
-``backend`` argument, an instance of that backend will be instantiated.
+default email backend as specified in :setting:`EMAIL_PROVIDERS`. If you
+specify the ``provider`` argument, an alternatively configured backend will be
+instantiated. Arguments ``backend`` and ``provider`` are mutually exclusive.
 
 The keyword-only ``fail_silently`` argument controls how the backend should
 handle errors. If ``fail_silently`` is True, exceptions during the email
@@ -690,28 +711,43 @@ SMTP backend
 
 .. class:: backends.smtp.EmailBackend(host=None, port=None, username=None, password=None, use_tls=None, fail_silently=False, use_ssl=None, timeout=None, ssl_keyfile=None, ssl_certfile=None, **kwargs)
 
-    This is the default backend. Email will be sent through a SMTP server.
+This is the default backend. Email will be sent through a SMTP server.
 
-    The value for each argument is retrieved from the matching setting if the
-    argument is ``None``:
+The value for each argument is retrieved from the matching setting if the
+argument is ``None``:
 
-    * ``host``: :setting:`EMAIL_HOST`
-    * ``port``: :setting:`EMAIL_PORT`
-    * ``username``: :setting:`EMAIL_HOST_USER`
-    * ``password``: :setting:`EMAIL_HOST_PASSWORD`
-    * ``use_tls``: :setting:`EMAIL_USE_TLS`
-    * ``use_ssl``: :setting:`EMAIL_USE_SSL`
-    * ``timeout``: :setting:`EMAIL_TIMEOUT`
-    * ``ssl_keyfile``: :setting:`EMAIL_SSL_KEYFILE`
-    * ``ssl_certfile``: :setting:`EMAIL_SSL_CERTFILE`
+* ``host``: ``OPTIONS["host"]``
+* ``port``: ``OPTIONS["port"]``
+* ``username``: ``OPTIONS["username"]``
+* ``password``: ``OPTIONS["password"]``
+* ``use_tls``: ``OPTIONS["use_tls"]``
+* ``use_ssl``: ``OPTIONS["use_ssl"]``
+* ``ssl_keyfile``: ``OPTIONS["ssl_keyfile"]``
+* ``ssl_certfile``: ``OPTIONS["ssl_certfile"]``
+* ``timeout``: ``OPTIONS["timeout"]``
 
-    The SMTP backend is the default configuration inherited by Django. If you
-    want to specify it explicitly, put the following in your settings::
+The SMTP backend is the default configuration inherited by Django. If you
+want to specify an alternative, put the following in your settings::
 
-        EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_PROVIDERS = {
+        "default": {
+            "BACKEND": "django.core.mail.backends.console.EmailBackend",
+        },
+        "alternative": {
+            "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+            "OPTIONS": {
+                "host": "smtp.example.com",
+                "port": 587,
+                "username": "myuser",
+                "password": "password",
+                "use_tls": True,
+                "timeout": 10,
+            },
+        },
+    }
 
-    If unspecified, the default ``timeout`` will be the one provided by
-    :func:`socket.getdefaulttimeout`, which defaults to ``None`` (no timeout).
+If unspecified, the default ``timeout`` will be the one provided by
+:func:`socket.getdefaulttimeout`, which defaults to ``None`` (no timeout).
 
 .. _topic-email-console-backend:
 
@@ -725,7 +761,7 @@ providing the ``stream`` keyword argument when constructing the connection.
 
 To specify this backend, put the following in your settings::
 
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+  EMAIL_PROVIDERS["default"]["BACKEND"] = "django.core.mail.backends.console.EmailBackend"
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
@@ -737,13 +773,18 @@ File backend
 
 The file backend writes emails to a file. A new file is created for each new
 session that is opened on this backend. The directory to which the files are
-written is either taken from the :setting:`EMAIL_FILE_PATH` setting or from the
-``file_path`` keyword when creating a connection with :func:`get_connection`.
+written is either taken from the :setting:`EMAIL_PROVIDERS`, actually the
+setting ``EMAIL_PROVIDERS["default"]["file_path"]``, or from the ``file_path``
+keyword when creating a connection with :func:`get_connection`.
 
 To specify this backend, put the following in your settings::
 
-    EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
-    EMAIL_FILE_PATH = "/tmp/app-messages"  # change this to a proper location
+  EMAIL_PROVIDERS["default"][
+      "BACKEND"
+  ] = "django.core.mail.backends.filebased.EmailBackend"
+  EMAIL_PROVIDERS["default"][
+      "file_path"
+  ] = "/tmp/app-messages"  # change this to a proper location
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
@@ -776,7 +817,7 @@ Dummy backend
 As the name suggests the dummy backend does nothing with your messages. To
 specify this backend, put the following in your settings::
 
-   EMAIL_BACKEND = "django.core.mail.backends.dummy.EmailBackend"
+  EMAIL_BACKEND = "django.core.mail.backends.dummy.EmailBackend"
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.

@@ -49,16 +49,49 @@ __all__ = [
 
 
 @deprecate_posargs(RemovedInDjango70Warning, ["fail_silently"])
-def get_connection(backend=None, *, fail_silently=False, **kwds):
+def get_connection(backend=None, *, fail_silently=False, provider=None, **kwargs):
     """Load an email backend and return an instance of it.
 
-    If backend is None (default), use settings.EMAIL_BACKEND.
+    If backend is None (default), use
+    settings.EMAIL_PROVIDERS[provider]["BACKEND"]`
+    If provider is None as well, use
+    settings.EMAIL_PROVIDERS["default"]["BACKEND"].
 
     Both fail_silently and other keyword arguments are used in the
     constructor of the backend.
     """
-    klass = import_string(backend or settings.EMAIL_BACKEND)
-    return klass(fail_silently=fail_silently, **kwds)
+    if backend and provider:
+        raise ValueError("Specify `backend` or `provider`, not both.")
+
+    options = {}
+
+    # RemovedInDjango70Warning: Use deprecated EMAIL_BACKEND if set.
+    if not backend and not provider:
+        backend = getattr(settings, "EMAIL_BACKEND", None)
+
+    if not backend:
+        provider = provider or settings.DEFAULT_EMAIL_PROVIDER_ALIAS
+        try:
+            provider_dict = settings.EMAIL_PROVIDERS[provider]
+        except KeyError:
+            raise ImproperlyConfigured(
+                f"Unknown EMAIL_PROVIDERS alias {provider!r}. "
+            ) from None
+        try:
+            backend = provider_dict["BACKEND"]
+        except KeyError:
+            raise ImproperlyConfigured(
+                f'EMAIL_PROVIDERS["{provider}"] does not specify a BACKEND.'
+            ) from None
+        try:
+            options.update(provider_dict["OPTIONS"])
+        except KeyError:
+            pass
+
+    # Any kwargs override OPTIONS.
+    options.update(kwargs)
+    klass = import_string(backend)
+    return klass(fail_silently=fail_silently, **options, provider=provider)
 
 
 @deprecate_posargs(
@@ -82,6 +115,7 @@ def send_mail(
     auth_password=None,
     connection=None,
     html_message=None,
+    provider=None,
 ):
     """
     Easy wrapper for sending a single message to a recipient list. All members
@@ -94,11 +128,16 @@ def send_mail(
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.
     """
-    connection = connection or get_connection(
-        username=auth_user,
-        password=auth_password,
-        fail_silently=fail_silently,
-    )
+    if connection and provider:
+        raise ValueError("Specify `connection` or `provider`, not both.")
+    if not connection:
+        connection = get_connection(
+            provider=provider,
+            fail_silently=fail_silently,
+            username=auth_user,
+            password=auth_password,
+        )
+
     mail = EmailMultiAlternatives(
         subject, message, from_email, recipient_list, connection=connection
     )
@@ -124,6 +163,7 @@ def send_mass_mail(
     auth_user=None,
     auth_password=None,
     connection=None,
+    provider=None,
 ):
     """
     Given a datatuple of (subject, message, from_email, recipient_list), send
@@ -137,11 +177,16 @@ def send_mass_mail(
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.
     """
-    connection = connection or get_connection(
-        username=auth_user,
-        password=auth_password,
-        fail_silently=fail_silently,
-    )
+    if connection and provider:
+        raise ValueError("Specify `connection` or `provider`, not both.")
+    if not connection:
+        connection = get_connection(
+            provider=provider,
+            fail_silently=fail_silently,
+            username=auth_user,
+            password=auth_password,
+        )
+
     messages = [
         EmailMessage(subject, message, sender, recipient, connection=connection)
         for subject, message, sender, recipient in datatuple
@@ -157,6 +202,7 @@ def _send_server_message(
     html_message=None,
     fail_silently=False,
     connection=None,
+    provider=None,
 ):
     recipients = getattr(settings, setting_name)
     if not recipients:
@@ -185,6 +231,7 @@ def _send_server_message(
         from_email=settings.SERVER_EMAIL,
         to=recipients,
         connection=connection,
+        provider=provider,
     )
     if html_message:
         mail.attach_alternative(html_message, "text/html")
@@ -195,7 +242,13 @@ def _send_server_message(
     RemovedInDjango70Warning, ["fail_silently", "connection", "html_message"]
 )
 def mail_admins(
-    subject, message, *, fail_silently=False, connection=None, html_message=None
+    subject,
+    message,
+    *,
+    fail_silently=False,
+    connection=None,
+    html_message=None,
+    provider=None,
 ):
     """Send a message to the admins, as defined by the ADMINS setting."""
     _send_server_message(
@@ -205,6 +258,7 @@ def mail_admins(
         html_message=html_message,
         fail_silently=fail_silently,
         connection=connection,
+        provider=provider,
     )
 
 
@@ -212,7 +266,13 @@ def mail_admins(
     RemovedInDjango70Warning, ["fail_silently", "connection", "html_message"]
 )
 def mail_managers(
-    subject, message, *, fail_silently=False, connection=None, html_message=None
+    subject,
+    message,
+    *,
+    fail_silently=False,
+    connection=None,
+    html_message=None,
+    provider=None,
 ):
     """Send a message to the managers, as defined by the MANAGERS setting."""
     _send_server_message(
@@ -222,6 +282,7 @@ def mail_managers(
         html_message=html_message,
         fail_silently=fail_silently,
         connection=connection,
+        provider=provider,
     )
 
 

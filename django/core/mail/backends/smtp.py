@@ -18,6 +18,9 @@ class EmailBackend(BaseEmailBackend):
     A wrapper that manages the SMTP network connection.
     """
 
+    DEFAULT_HOST = "localhost"
+    DEFAULT_PORT = 25
+
     def __init__(
         self,
         host=None,
@@ -30,25 +33,66 @@ class EmailBackend(BaseEmailBackend):
         timeout=None,
         ssl_keyfile=None,
         ssl_certfile=None,
+        *,
+        provider=None,
         **kwargs,
     ):
         super().__init__(fail_silently=fail_silently)
-        self.host = host or settings.EMAIL_HOST
-        self.port = port or settings.EMAIL_PORT
-        self.username = settings.EMAIL_HOST_USER if username is None else username
-        self.password = settings.EMAIL_HOST_PASSWORD if password is None else password
-        self.use_tls = settings.EMAIL_USE_TLS if use_tls is None else use_tls
-        self.use_ssl = settings.EMAIL_USE_SSL if use_ssl is None else use_ssl
-        self.timeout = settings.EMAIL_TIMEOUT if timeout is None else timeout
-        self.ssl_keyfile = (
-            settings.EMAIL_SSL_KEYFILE if ssl_keyfile is None else ssl_keyfile
-        )
-        self.ssl_certfile = (
-            settings.EMAIL_SSL_CERTFILE if ssl_certfile is None else ssl_certfile
-        )
+
+        if provider is not None:
+            # Being initialized from EMAIL_PROVIDERS.
+            options = settings.EMAIL_PROVIDERS[provider].get("OPTIONS", {})
+            self.host = host or options.get("host", self.DEFAULT_HOST)
+            self.port = port or options.get("port", self.DEFAULT_PORT)
+            self.username = options.get("username") if username is None else username
+            self.password = options.get("password") if password is None else password
+            self.use_tls = options.get("use_tls") if use_tls is None else use_tls
+            self.use_ssl = options.get("use_ssl") if use_ssl is None else use_ssl
+            self.ssl_keyfile = (
+                options.get("ssl_keyfile") if ssl_keyfile is None else ssl_keyfile
+            )
+            self.ssl_certfile = (
+                options.get("ssl_certfile") if ssl_certfile is None else ssl_certfile
+            )
+            self.timeout = options.get("timeout") if timeout is None else timeout
+        else:
+            # RemovedInDjango70Warning.
+            # Not being initialized from EMAIL_PROVIDERS.
+            self.host = host or getattr(settings, "EMAIL_HOST", self.DEFAULT_HOST)
+            self.port = port or getattr(settings, "EMAIL_PORT", self.DEFAULT_PORT)
+            self.username = (
+                getattr(settings, "EMAIL_HOST_USER", None)
+                if username is None
+                else username
+            )
+            self.password = (
+                getattr(settings, "EMAIL_HOST_PASSWORD", None)
+                if password is None
+                else password
+            )
+            self.use_tls = (
+                getattr(settings, "EMAIL_USE_TLS", None) if use_tls is None else use_tls
+            )
+            self.use_ssl = (
+                getattr(settings, "EMAIL_USE_SSL", None) if use_ssl is None else use_ssl
+            )
+            self.timeout = (
+                getattr(settings, "EMAIL_TIMEOUT", None) if timeout is None else timeout
+            )
+            self.ssl_keyfile = (
+                getattr(settings, "EMAIL_SSL_KEYFILE", None)
+                if ssl_keyfile is None
+                else ssl_keyfile
+            )
+            self.ssl_certfile = (
+                getattr(settings, "EMAIL_SSL_CERTFILE", None)
+                if ssl_certfile is None
+                else ssl_certfile
+            )
+
         if self.use_ssl and self.use_tls:
             raise ValueError(
-                "EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so only set "
+                "use_tls/use_ssl are mutually exclusive, so only set "
                 "one of those settings to True."
             )
         self.connection = None
@@ -69,7 +113,7 @@ class EmailBackend(BaseEmailBackend):
 
     def open(self):
         """
-        Ensure an open connection to the email server. Return whether or not a
+        Ensure an open connection to the email server. Return whether a
         new connection was required (True or False) or None if an exception
         passed silently.
         """

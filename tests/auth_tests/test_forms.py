@@ -1380,7 +1380,13 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
             )
         )
 
-    @override_settings(EMAIL_BACKEND="mail.custombackend.FailingEmailBackend")
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "default": {
+                "BACKEND": "mail.custombackend.FailingEmailBackend",
+            },
+        },
+    )
     def test_save_send_email_exceptions_are_catched_and_logged(self):
         user, username, email = self.create_dummy_user()
         form = PasswordResetForm({"email": email})
