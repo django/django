@@ -438,6 +438,8 @@ class RequestFactory:
     def _encode_data(self, data, content_type):
         if content_type is MULTIPART_CONTENT:
             return encode_multipart(BOUNDARY, data)
+        elif content_type is None:
+            return force_bytes(data, encoding=settings.DEFAULT_CHARSET)
         else:
             # Encode the content so that the byte representation is correct.
             match = CONTENT_TYPE_RE.match(content_type)
@@ -452,8 +454,10 @@ class RequestFactory:
         Return encoded JSON if data is a dict, list, or tuple and content_type
         is application/json.
         """
-        should_encode = JSON_CONTENT_TYPE_RE.match(content_type) and isinstance(
-            data, (dict, list, tuple)
+        should_encode = (
+            content_type is not None
+            and JSON_CONTENT_TYPE_RE.match(content_type)
+            and isinstance(data, (dict, list, tuple))
         )
         return json.dumps(data, cls=self.json_encoder) if should_encode else data
 
@@ -493,6 +497,8 @@ class RequestFactory:
         **extra,
     ):
         """Construct a POST request."""
+        if content_type is None:
+            content_type = MULTIPART_CONTENT
         data = self._encode_json({} if data is None else data, content_type)
         post_data = self._encode_data(data, content_type)
 
@@ -547,6 +553,8 @@ class RequestFactory:
         **extra,
     ):
         "Construct an OPTIONS request."
+        if content_type is None:
+            content_type = "application/octet-stream"
         return self.generic(
             "OPTIONS",
             path,
@@ -570,6 +578,8 @@ class RequestFactory:
         **extra,
     ):
         """Construct a PUT request."""
+        if content_type is None:
+            content_type = "application/octet-stream"
         data = self._encode_json(data, content_type)
         return self.generic(
             "PUT",
@@ -594,6 +604,8 @@ class RequestFactory:
         **extra,
     ):
         """Construct a PATCH request."""
+        if content_type is None:
+            content_type = "application/octet-stream"
         data = self._encode_json(data, content_type)
         return self.generic(
             "PATCH",
@@ -618,6 +630,8 @@ class RequestFactory:
         **extra,
     ):
         """Construct a DELETE request."""
+        if content_type is None:
+            content_type = "application/octet-stream"
         data = self._encode_json(data, content_type)
         return self.generic(
             "DELETE",
@@ -643,6 +657,8 @@ class RequestFactory:
         **extra,
     ):
         """Construct an arbitrary HTTP request."""
+        if content_type is None:
+            content_type = "application/octet-stream"
         parsed = urlsplit(str(path))  # path can be lazy
         data = force_bytes(data, settings.DEFAULT_CHARSET)
         r = {
@@ -743,6 +759,8 @@ class AsyncRequestFactory(RequestFactory):
         **extra,
     ):
         """Construct an arbitrary HTTP request."""
+        if content_type is None:
+            content_type = "application/octet-stream"
         parsed = urlsplit(str(path))  # path can be lazy.
         data = force_bytes(data, settings.DEFAULT_CHARSET)
         s = {
