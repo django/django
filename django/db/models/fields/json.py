@@ -535,6 +535,25 @@ class KeyTransform(ProcessJSONLHSMixin, Transform):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
         return self._process_as_sqlite(lhs, params, connection, key_transforms)
 
+    def select_format(self, compiler, sql, params):
+        if hasattr(self, "output_field") and isinstance(self.output_field, TextField):
+            return super().select_format(compiler, sql, params)
+        if compiler.connection.vendor == "sqlite":
+            lhs, params, key_transforms = self.preprocess_lhs(
+                compiler, compiler.connection
+            )
+            json_path = compiler.connection.ops.compile_json_path(key_transforms)
+            args = tuple(params) + (json_path,)
+            return (
+                f"CASE JSON_TYPE({lhs}, %s) "
+                f"WHEN 'text' THEN JSON_QUOTE(JSON_EXTRACT({lhs}, %s)) "
+                f"WHEN 'true' THEN 'true' "
+                f"WHEN 'false' THEN 'false' "
+                f"ELSE JSON_EXTRACT({lhs}, %s) END",
+                args * 3,
+            )
+        return super().select_format(compiler, sql, params)
+
 
 class KeyTextTransform(KeyTransform):
     postgres_operator = "->>"
