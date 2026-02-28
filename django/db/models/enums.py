@@ -56,6 +56,9 @@ class Choices(enum.Enum, metaclass=ChoicesType):
 
     do_not_call_in_templates = enum.nonmember(True)
 
+    def __str__(self):
+        return str(self.value)
+
     @enum_property
     def label(self):
         return self._label_
