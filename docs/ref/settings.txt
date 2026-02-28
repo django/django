@@ -1697,13 +1697,16 @@ generate correct URLs when ``FORCE_SCRIPT_NAME`` is provided.
 
 Default: ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``
 
-The class that renders forms and form widgets. It must implement
+The default class that renders forms and form widgets. It must implement
 :ref:`the low-level render API <low-level-widget-render-api>`. Included form
 renderers are:
 
 * ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``
 * ``'``:class:`django.forms.renderers.Jinja2`\ ``'``
 * ``'``:class:`django.forms.renderers.TemplatesSetting`\ ``'``
+
+Note that changing this setting affects all forms using the default renderer,
+including those in :doc:`the admin site </ref/contrib/admin/index>`.
 
 .. setting:: FORMAT_MODULE_PATH
 
