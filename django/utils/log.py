@@ -132,7 +132,7 @@ class AdminEmailHandler(logging.Handler):
             reporter.get_traceback_text(),
         )
         html_message = reporter.get_traceback_html() if self.include_html else None
-        self.send_mail(subject, message, fail_silently=True, html_message=html_message)
+        self.send_mail(subject, message, html_message=html_message)
 
     def send_mail(self, subject, message, *args, **kwargs):
         mail.mail_admins(
