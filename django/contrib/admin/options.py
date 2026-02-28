@@ -235,6 +235,14 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         """
         Get a form Field for a database Field that has declared choices.
         """
+        # Check if user has explicitly defined formfield_overrides for this
+        # field type (not just inherited from FORMFIELD_FOR_DBFIELD_DEFAULTS).
+        # We check the class attribute directly to see user-defined overrides.
+        for klass in db_field.__class__.mro():
+            if klass in self.__class__.formfield_overrides:
+                kwargs = {**copy.deepcopy(self.formfield_overrides[klass]), **kwargs}
+                break
+
         # If the field is named as a radio_field, use a RadioSelect
         if db_field.name in self.radio_fields:
             # Avoid stomping on custom widget/choices arguments.
