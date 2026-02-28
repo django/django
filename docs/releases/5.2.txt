@@ -238,6 +238,9 @@ Email
   returns a boolean indicating whether a provided text is contained in the
   email ``body`` and in all attached MIME type ``text/*`` alternatives.
 
+* The SMTP :class:`~django.core.mail.backends.smtp.EmailBackend` now supports
+  certificate validation by setting the new ``ssl_cafile`` parameter.
+
 Error Reporting
 ~~~~~~~~~~~~~~~
 
