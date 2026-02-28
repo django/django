@@ -72,23 +72,28 @@
                 return;
             }
 
-            let message;
+            const serverTimezone = document.body.dataset.adminServerTimezone;
+            const timezoneMessage = interpolate(
+                gettext('Note: Enter times in the %s timezone.'), [serverTimezone || gettext('server')]
+            );
+            let offsetMessage;
             if (timezoneOffset > 0) {
-                message = ngettext(
-                    'Note: You are %s hour ahead of server time.',
-                    'Note: You are %s hours ahead of server time.',
+                offsetMessage = ngettext(
+                    ' (You are %s hour ahead)',
+                    ' (You are %s hours ahead)',
                     timezoneOffset
                 );
             }
             else {
                 timezoneOffset *= -1;
-                message = ngettext(
-                    'Note: You are %s hour behind server time.',
-                    'Note: You are %s hours behind server time.',
+                offsetMessage = ngettext(
+                    ' (You are %s hour behind)',
+                    ' (You are %s hours behind)',
                     timezoneOffset
                 );
             }
-            message = interpolate(message, [timezoneOffset]);
+            offsetMessage = interpolate(offsetMessage, [timezoneOffset]);
+            const message = timezoneMessage + offsetMessage;
 
             const warning = document.createElement('div');
             const id = inp.id;

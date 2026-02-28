@@ -25,7 +25,8 @@
 </head>
 
 <body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}"
-  data-admin-utc-offset="{% now "Z" %}">
+  data-admin-utc-offset="{% now "Z" %}"
+  data-admin-server-timezone="{{ server_timezone }}">
 <a href="#content-start" class="skip-to-content-link">{% translate 'Skip to main content' %}</a>
 <!-- Container -->
 <div id="container">
