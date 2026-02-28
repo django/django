@@ -85,7 +85,8 @@
         acrossQuestions: "div.actions span.question",
         acrossClears: "div.actions span.clear",
         allToggleId: "action-toggle",
-        selectedClass: "selected"
+        selectedClass: "selected",
+        inline: false,
     };
 
     window.Actions = function(actionCheckboxes, options) {
@@ -102,32 +103,6 @@
             shiftPressed = event.shiftKey;
         });
 
-        document.getElementById(options.allToggleId).addEventListener('click', function(event) {
-            checker(actionCheckboxes, options, this.checked);
-            updateCounter(actionCheckboxes, options);
-        });
-
-        document.querySelectorAll(options.acrossQuestions + " a").forEach(function(el) {
-            el.addEventListener('click', function(event) {
-                event.preventDefault();
-                const acrossInputs = document.querySelectorAll(options.acrossInput);
-                acrossInputs.forEach(function(acrossInput) {
-                    acrossInput.value = 1;
-                });
-                showClear(options);
-            });
-        });
-
-        document.querySelectorAll(options.acrossClears + " a").forEach(function(el) {
-            el.addEventListener('click', function(event) {
-                event.preventDefault();
-                document.getElementById(options.allToggleId).checked = false;
-                clearAcross(options);
-                checker(actionCheckboxes, options, false);
-                updateCounter(actionCheckboxes, options);
-            });
-        });
-
         function affectedCheckboxes(target, withModifier) {
             const multiSelect = (lastChecked && withModifier && lastChecked !== target);
             if (!multiSelect) {
@@ -138,32 +113,91 @@
             const lastCheckedIndex = checkboxes.findIndex(el => el === lastChecked);
             const startIndex = Math.min(targetIndex, lastCheckedIndex);
             const endIndex = Math.max(targetIndex, lastCheckedIndex);
-            const filtered = checkboxes.filter((el, index) => (startIndex <= index) && (index <= endIndex));
-            return filtered;
-        };
+            return checkboxes.filter((el, index) => (startIndex <= index) && (index <= endIndex));
+        }
 
-        Array.from(document.getElementById('result_list').tBodies).forEach(function(el) {
-            el.addEventListener('change', function(event) {
-                const target = event.target;
-                if (target.classList.contains('action-select')) {
-                    const checkboxes = affectedCheckboxes(target, shiftPressed);
-                    checker(checkboxes, options, target.checked);
+        if (!options.inline) {
+            document.querySelectorAll(options.acrossQuestions + " a").forEach(function(el) {
+                el.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const acrossInputs = document.querySelectorAll(options.acrossInput);
+                    acrossInputs.forEach(function(acrossInput) {
+                        acrossInput.value = 1;
+                    });
+                    showClear(options);
+                });
+            });
+            document.querySelectorAll(options.acrossClears + " a").forEach(function(el) {
+                el.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    document.getElementById(options.allToggleId).checked = false;
+                    clearAcross(options);
+                    checker(actionCheckboxes, options, false);
                     updateCounter(actionCheckboxes, options);
-                    lastChecked = target;
-                } else {
-                    list_editable_changed = true;
+                });
+            });
+            document.getElementById(options.allToggleId).addEventListener('click', function(event) {
+                checker(actionCheckboxes, options, this.checked);
+                updateCounter(actionCheckboxes, options);
+            });
+
+            Array.from(document.getElementById('result_list').tBodies).forEach(
+                function(el) {
+                    el.addEventListener('change', function(event) {
+                        const target = event.target;
+                        if (target.classList.contains('action-select')) {
+                            const checkboxes = affectedCheckboxes(target, shiftPressed);
+                            checker(checkboxes, options, target.checked);
+                            updateCounter(actionCheckboxes, options);
+                            lastChecked = target;
+                        } else {
+                            list_editable_changed = true;
+                        }
+                    });
+                });
+
+            document.querySelector('#changelist-form button[name=index]').addEventListener('click', function(event) {
+                if (list_editable_changed) {
+                    const confirmed = confirm(gettext("You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost."));
+                    if (!confirmed) {
+                        event.preventDefault();
+                    }
                 }
             });
-        });
+            // Sync counter when navigating to the page, such as through the back
+            // button.
+            window.addEventListener('pageshow', (event) => updateCounter(actionCheckboxes, options));
+        } else if (options.inline) {
+            const handleCheckboxChange = (event) => {
+                const target = event.target;
 
-        document.querySelector('#changelist-form button[name=index]').addEventListener('click', function(event) {
-            if (list_editable_changed) {
-                const confirmed = confirm(gettext("You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost."));
-                if (!confirmed) {
-                    event.preventDefault();
+                if (!lastChecked || !target.name.endsWith('-DELETE')) {
+                    lastChecked = target;
+                    return;
                 }
-            }
-        });
+
+                if (lastChecked.name.slice(0, -9) === target.name.slice(0, -9)) {
+                    // Checking for if clicked checkboxes are in the same form with forms common prefix.
+                    const checkboxes = affectedCheckboxes(target, shiftPressed);
+                    checker(checkboxes, options, target.checked);
+                }
+
+                lastChecked = target;
+            };
+
+            const attachChangeListener = (element) => {
+                if (!element) {
+                    return;
+                }
+                element.addEventListener('change', handleCheckboxChange);
+            };
+
+            // Handle tabular inline tables
+            document.querySelectorAll('.tabular tbody').forEach(attachChangeListener);
+
+            // Handle stacked inlines
+            document.querySelectorAll('.inline-related').forEach(attachChangeListener);
+        }
 
         const el = document.querySelector('#changelist-form input[name=_save]');
         // The button does not exist if no fields are editable.
@@ -179,9 +213,6 @@
                 }
             });
         }
-        // Sync counter when navigating to the page, such as through the back
-        // button.
-        window.addEventListener('pageshow', (event) => updateCounter(actionCheckboxes, options));
     };
 
     // Call function fn when the DOM is loaded and ready. If it is already
@@ -199,6 +230,17 @@
         const actionsEls = document.querySelectorAll('tr input.action-select');
         if (actionsEls.length > 0) {
             Actions(actionsEls);
+        }
+        const tabularActionsEls = document.querySelectorAll(
+            'td.delete input[type="checkbox"]');
+        if (tabularActionsEls.length > 0) {
+            defaults.inline = true;
+            Actions(tabularActionsEls);
+        }
+        const stackedActionsEls = document.querySelectorAll('span.delete input[type="checkbox"]');
+        if (stackedActionsEls.length > 0) {
+            defaults.inline = true;
+            Actions(stackedActionsEls);
         }
     });
 }
