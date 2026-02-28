@@ -223,7 +223,9 @@ Email
 Error Reporting
 ~~~~~~~~~~~~~~~
 
-* ...
+* The technical 500 debug page now uses :mod:`reprlib` to limit the size of
+  variable representations, preventing high CPU and memory consumption when
+  displaying large variables in exception tracebacks.
 
 File Storage
 ~~~~~~~~~~~~
