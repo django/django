@@ -64,6 +64,9 @@ details on these changes.
   :class:`~django.db.models.JSONNull` to query for a JSON ``null`` value
   instead.
 
+* The ``use_returning_into`` option for the Oracle database backend will be
+  removed.
+
 .. _deprecation-removed-in-6.1:
 
 6.1

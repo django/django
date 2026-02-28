@@ -479,6 +479,9 @@ Miscellaneous
   used as the top-level value. :lookup:`Key and index lookups <jsonfield.key>`
   are unaffected by this deprecation.
 
+* The ``use_returning_into`` option for the Oracle database backend is
+  deprecated.
+
 Features removed in 6.1
 =======================
 
