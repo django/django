@@ -1290,6 +1290,19 @@ class TestQuerying(TestCase):
         )
         self.assertQuerySetEqual(qs, all_objects)
 
+    def test_numeric_lookup_with_expression(self):
+        qs_f = NullableJSONModel.objects.filter(value__c__gt=F("value__c"))
+        self.assertIs(qs_f.exists(), False)
+        qs_val = NullableJSONModel.objects.filter(
+            value__c__gt=Value(999, output_field=IntegerField())
+        )
+        self.assertIs(qs_val.exists(), False)
+        sub = Subquery(
+            NullableJSONModel.objects.filter(pk=OuterRef("pk")).values("value__c")
+        )
+        qs_sub = NullableJSONModel.objects.filter(value__c__gt=sub)
+        self.assertIs(qs_sub.exists(), False)
+
 
 @skipUnlessDBFeature("supports_primitives_in_json_field")
 class JSONNullTests(TestCase):
