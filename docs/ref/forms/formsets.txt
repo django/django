@@ -8,11 +8,87 @@ Formset API reference. For introductory material about formsets, see the
 .. module:: django.forms.formsets
    :synopsis: Django's functions for building formsets.
 
+Creating Formsets
+=================
+
+``BaseFormSet``
+---------------
+
+.. class:: BaseFormSet
+
+    It is the base class from which every FormSet class is derived.
+
+    Following attributes and methods are available in this class
+    see the :doc:`topics</topics/forms/formsets>` page for examples on
+    how to use them
+
+There are two ways to create formsets in Django:
+
 ``formset_factory``
-===================
+-------------------
 
 .. function:: formset_factory(form, formset=BaseFormSet, extra=1, can_order=False, can_delete=False, max_num=None, validate_max=False, min_num=None, validate_min=False, absolute_max=None, can_delete_extra=True, renderer=None)
 
     Returns a ``FormSet`` class for the given ``form`` class.
 
+    Arguments:
+
+    - ``form``: The form class to use in the formset.
+    - ``formset``: The formset class to use as the base formset
+      (defaults to ``BaseFormSet``).
+    - ``extra``: The number of extra empty forms to display
+      (defaults to 1).
+    - ``can_order``: Whether the forms can be ordered
+      (defaults to False).
+    - ``can_delete``: Whether the forms can be deleted
+      (defaults to False).
+    - ``max_num``: The maximum number of forms allowed
+      (defaults to 1000).
+    - ``validate_max``: Whether to validate the maximum number of forms
+      (defaults to False).
+    - ``min_num``: The minimum number of forms required (defaults to 0).
+    - ``validate_min``: Whether to validate the minimum number of forms
+      (defaults to False).
+    - ``absolute_max``: The absolute maximum number of forms allowed
+      (defaults to ``max_num`` + 1000).
+    - ``can_delete_extra``: Whether extra forms can be deleted
+      (defaults to True).
+    - ``renderer``: The formset renderer to use (defaults to None).
+
     See :doc:`formsets </topics/forms/formsets>` for example usage.
+
+Declarative ``FormSet``
+-----------------------
+
+.. class:: FormSet
+
+    A BaseFormSet subclass that allows declarative declaration of formsets.
+
+    .. versionadded:: 5.1
+
+    Returns a ``FormSet`` class for the given ``form`` class.
+
+    The same arguments that can be passed to the ``formset_factory`` function
+    can also be passed to the declarative syntax.
+
+    Example of a declarative formset:
+
+    .. code-block:: pycon
+
+        >>> from django.forms import formsets
+        >>> from myapp.forms import MyForm
+
+        >>> class MyFormSet(formsets.FormSet):
+        ...     form = MyForm
+        ...     extra = 2
+        ...     can_order = True
+        ...     can_delete = True
+        ...     max_num = 10
+        ...     validate_max = True
+        ...     min_num = 3
+        ...     validate_min = True
+        ...     absolute_max = 15
+        ...     can_delete_extra = False
+        ...     renderer = None
+        ...
+
