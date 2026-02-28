@@ -822,13 +822,224 @@ file-like object:
 Passing iterators
 ~~~~~~~~~~~~~~~~~
 
-Finally, you can pass ``HttpResponse`` an iterator rather than strings.
+You can pass ``HttpResponse`` an iterator rather than strings.
 ``HttpResponse`` will consume the iterator immediately, store its content as a
 string, and discard it. Objects with a ``close()`` method such as files and
 generators are immediately closed.
 
 If you need the response to be streamed from the iterator to the client, you
 must use the :class:`StreamingHttpResponse` class instead.
+
+If you're using an async server you are likely to need
+:class:`StreamingAcmgrHttpResponse` instead
+
+.. _streaming-with-taskgroups:
+
+``StreamingAcmgrHttpResponse`` objects
+======================================
+
+.. class:: StreamingAcmgrHttpResponse
+
+.. versionadded:: 6.1
+
+When working with asynchronous views you may need to combine multiple
+streams of data using structured concurrency
+with task groups (such as ``anyio.create_task_group()`` or
+``asyncio.TaskGroup``).
+However, standard async generators cannot be used directly inside task groups
+because they don't properly handle cancellation when the task group exits.
+
+For more details on the underlying issue, see :pep:`789` which discusses the
+limitations of async generators in task group contexts.
+
+The Problem: Illegal Use of Yield Inside TaskGroups
+----------------------------------------------------
+
+The following code appears logical but **does not work** and will cause
+issues::
+
+    import anyio
+    from anyio.streams.memory import MemoryObjectSendStream
+    from django.http import StreamingHttpResponse, HttpRequest
+    from typing import AsyncGenerator
+
+
+    async def news_and_weather(request: HttpRequest) -> StreamingHttpResponse:
+        async def gen() -> AsyncGenerator[bytes, None]:
+            async def push(ws_url: str, tx: MemoryObjectSendStream) -> None:
+                async with tx, connect_ws(ws_url) as conn:
+                    async for msg in conn:
+                        await tx.send(msg)
+
+            async with anyio.create_task_group() as tg:
+                tx, rx = anyio.create_memory_object_stream[bytes]()
+                with tx, rx:
+                    tg.start_soon(push, "ws://example.com/news", tx.clone())
+                    tg.start_soon(push, "ws://example.com/weather", tx.clone())
+                    tx.close()
+                    async for msg in rx:
+                        yield msg  # ILLEGAL: yield inside async generator within TaskGroup!
+
+        return StreamingHttpResponse(gen())
+
+**Why this fails:** Using ``yield`` in an async generator that is not a context
+manager prevents the TaskGroup from properly canceling tasks and catching
+cancellation errors. When the client disconnects or the stream ends, calling
+``aclose()`` on the async generator is not sufficient for the TaskGroup to
+clean up properly. See :pep:`789` for a detailed explanation of this
+limitation.
+
+The Solution: Using Async Context Managers
+-------------------------------------------
+
+Instead of passing an async generator directly to
+:class:`StreamingHttpResponse` use :class:`StreamingAcmgrHttpResponse`
+and wrap your streaming logic in an async context manager that yields an
+async iterator bytes resource for example an async generator.
+This allows proper cleanup and cancellation handling.
+
+Example with AnyIO
+~~~~~~~~~~~~~~~~~~
+
+Here's the correct way to combine multiple streams using ``anyio``::
+
+    import contextlib
+    from typing import AsyncGenerator
+    from django.http import StreamingAcmgrHttpResponse, HttpRequest
+    import anyio
+    from anyio.streams.memory import MemoryObjectSendStream, MemoryObjectReceiveStream
+
+
+    async def news_and_weather(request: HttpRequest) -> StreamingAcmgrHttpResponse:
+        @contextlib.asynccontextmanager
+        async def stream_manager() -> (
+            AsyncGenerator[MemoryObjectReceiveStream[bytes], None]
+        ):
+            """Context manager that combines multiple WebSocket streams."""
+
+            async def push(ws_url: str, tx: MemoryObjectSendStream[bytes]) -> None:
+                """Worker task that pushes data from a WebSocket to the send stream."""
+                async with tx:  # Ensure send stream is closed when this task finishes
+                    async with connect_ws(ws_url) as conn:
+                        async for msg in conn:
+                            await tx.send(msg)  # Send each message to the stream
+
+            # Create a TaskGroup for structured concurrency
+            async with anyio.create_task_group() as tg:
+                # Create a memory stream pair with backpressure (max 0 items buffered)
+                tx, rx = anyio.create_memory_object_stream[bytes]()
+
+                async with tx, rx:  # Ensure both streams are properly closed
+                    # Start concurrent tasks to push from multiple sources
+                    tg.start_soon(push, "ws://example.com/news", tx.clone())
+                    tg.start_soon(push, "ws://example.com/weather", tx.clone())
+
+                    # Close the original send stream (workers have clones)
+                    tx.close()
+
+                    # Yield the receive stream - consumer will iterate over it
+                    yield rx  # LEGAL: yield inside async context manager
+
+                # TaskGroup waits here for all tasks to complete or cancel properly
+
+        return StreamingAcmgrHttpResponse(stream_manager())
+
+Example with asyncio
+~~~~~~~~~~~~~~~~~~~~
+
+Here's the equivalent implementation using Python's built-in ``asyncio``::
+
+    class Eof(object):
+        pass
+
+
+    async def news_and_weather(request: HttpRequest) -> StreamingAcmgrHttpResponse:
+        @contextlib.asynccontextmanager
+        async def acmgr_gen() -> AsyncGenerator[AsyncGenerator[bytes]]:
+            async def push(ws_url: str, q: asyncio.Queue[Eof | bytes], eof: Eof) -> None:
+                async with connect_ws(ws_url) as conn:
+                    async for msg in conn:
+                        await q.put(msg)
+                    await q.put(eof)
+
+            async with asyncio.TaskGroup() as tg:
+                # Create a Queue with backpressure (max 0 items buffered)
+                q = asyncio.Queue[Eof | bytes](0)
+                eof_1 = Eof()
+                eof_2 = Eof()
+                eofs = {eof_1, eof_2}
+
+                tg.create_task(push("ws://example.com/news", q, eof_1))
+                tg.create_task(push("ws://example.com/weather", q, eof_2))
+
+                async def agen_fn() -> AsyncGenerator[bytes]:
+                    while True:
+                        v = await q.get()
+                        if isinstance(v, bytes):
+                            yield v
+                        else:
+                            eofs.discard(v)
+                            if not eofs:
+                                return
+
+                yield agen_fn()  # yield inside asynccontextmanager, permitted inside TaskGroup
+
+        return StreamingAcmgrHttpResponse(acmgr_gen())
+
+
+How It Works
+------------
+
+When you pass an async context manager to
+:class:`~django.http.StreamingAcmgrHttpResponse`, Django:
+
+1. Enters the async context manager by calling ``__aenter__()``
+2. Expects the context manager to yield an async iterator bytes resource
+3. Iterates over that async iterator to stream chunks to the client
+4. calls ``.aclose()`` on the resource then ``__aexit__()`` when streaming
+   completes, fails, or the client disconnects
+
+This pattern ensures that:
+
+* The task group can properly cancel all tasks when streaming ends
+* Resources are cleaned up correctly via the context manager protocol
+* Cancellation errors are handled appropriately
+* Workers are terminated when the client disconnects
+
+Requirements
+------------
+
+To use this feature, your async context manager must:
+
+* Be an async context manager (implement ``__aenter__`` and ``__aexit__``)
+* Yield an object that is async iterator bytes resource
+  (implements ``__aiter__`` and ``aclose``)
+* Handle cleanup properly in ``__aexit__``, including when cancelled
+
+Note that both ``anyio.MemoryObjectReceiveStream`` and async generators are
+already async iterator bytes resources, so they can be yielded directly.
+
+Type Hints
+----------
+
+For proper type checking, specify the return type of your context manager
+using :class:`~typing.AsyncGenerator`. The yielded value should be an async
+iterator bytes resource.
+
+Performance Considerations
+--------------------------
+
+**Queue sizing:** Use bounded queues (``maxsize=0``) to provide backpressure.
+This prevents fast producers from consuming unlimited memory if the client
+is slow to consume.
+
+**Buffer sizes:** For ``anyio``, use ``max_buffer_size`` parameter. For
+``asyncio.Queue``, use ``maxsize`` parameter. A value of 0 is
+a good starting point.
+
+**Cleanup:** The context manager ensures proper cleanup even if the client
+disconnects early. The TaskGroup will cancel all worker tasks and wait for
+them to terminate.
 
 .. _setting-header-fields:
 
