@@ -657,6 +657,35 @@ class OptimizerTests(OptimizerTestBase):
             ],
         )
 
+    def test_rename_model_referenced_by_fk(self):
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("Author", []),
+                migrations.CreateModel(
+                    "Book",
+                    [
+                        (
+                            "author",
+                            models.ForeignKey("migrations.author", models.CASCADE),
+                        ),
+                    ],
+                ),
+                migrations.RenameModel("Author", "Person"),
+            ],
+            [
+                migrations.CreateModel("Person", []),
+                migrations.CreateModel(
+                    "Book",
+                    [
+                        (
+                            "author",
+                            models.ForeignKey("migrations.person", models.CASCADE),
+                        ),
+                    ],
+                ),
+            ],
+        )
+
     def test_create_model_alter_field(self):
         """
         AlterField should optimize into CreateModel.
