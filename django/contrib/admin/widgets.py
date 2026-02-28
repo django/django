@@ -13,6 +13,7 @@ from django.db.models import CASCADE, UUIDField
 from django.forms.widgets import Select
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
+from django.utils.formats import get_format
 from django.utils.html import smart_urlquote
 from django.utils.http import urlencode
 from django.utils.text import Truncator
@@ -69,6 +70,15 @@ class BaseAdminDateWidget(DateTimeWidgetContextMixin, forms.DateInput):
     def __init__(self, attrs=None, format=None):
         attrs = {"class": "vDateField", "size": "10", **(attrs or {})}
         super().__init__(attrs=attrs, format=format)
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        val = get_format("FIRST_DAY_OF_WEEK")
+        firstday = (
+            int(val) if val is not None and val != "" else settings.FIRST_DAY_OF_WEEK
+        )
+        context["widget"]["attrs"]["data-first-day-of-week"] = firstday
+        return context
 
 
 class AdminDateWidget(BaseAdminDateWidget):

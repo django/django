@@ -108,6 +108,7 @@ depends on core.js for utility functions like removeChildren or quickElement
             month = parseInt(month);
             year = parseInt(year);
             const calDiv = document.getElementById(div_id);
+            const firstDay = parseInt(calDiv.parentElement.dataset.firstDayOfWeek);
             removeChildren(calDiv);
             const calTable = document.createElement('table');
             quickElement('caption', calTable, CalendarNamespace.monthsOfYear[month - 1] + ' ' + year);
@@ -116,10 +117,10 @@ depends on core.js for utility functions like removeChildren or quickElement
             // Draw days-of-week header
             let tableRow = quickElement('tr', tableBody);
             for (let i = 0; i < 7; i++) {
-                quickElement('th', tableRow, CalendarNamespace.daysOfWeekInitial[(i + CalendarNamespace.firstDayOfWeek) % 7]);
+                quickElement('th', tableRow, CalendarNamespace.daysOfWeekInitial[(i + firstDay) % 7]);
             }
 
-            const startingPos = new Date(year, month - 1, 1 - CalendarNamespace.firstDayOfWeek).getDay();
+            const startingPos = new Date(year, month - 1, 1 - firstDay).getDay();
             const days = CalendarNamespace.getDaysInMonth(month, year);
 
             let nonDayCell;
