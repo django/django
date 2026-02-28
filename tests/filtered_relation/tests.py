@@ -229,6 +229,40 @@ class FilteredRelationTests(TestCase):
                 }
             )
 
+    def test_values_shadowing_relationship(self):
+        qs = Author.objects.annotate(
+            book__title=FilteredRelation(
+                "book", condition=Q(book__title__icontains="Poem")
+            )
+        ).values("book__title")
+
+        self.assertEqual(qs[0]["book__title"], self.book1.pk)
+
+    def test_order_by_shadowing_relationship(self):
+        alias = "book__title"
+        qs = Author.objects.annotate(
+            **{
+                alias: FilteredRelation(
+                    "book", condition=Q(book__title__icontains="Poem")
+                )
+            }
+        ).order_by(alias)
+
+        sql = str(qs.query)
+        self.assertIn("book__title", sql)
+
+    def test_values_path_off_shadowed_alias(self):
+        alias = "book__editor"
+        qs = Author.objects.annotate(
+            **{
+                alias: FilteredRelation(
+                    "book", condition=Q(book__title__icontains="Poem")
+                )
+            }
+        ).values(f"{alias}__title")
+
+        self.assertEqual(qs[0][f"{alias}__title"], "Poem by Alice")
+
     def test_multiple(self):
         qs = (
             Author.objects.annotate(
