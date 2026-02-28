@@ -1281,6 +1281,18 @@ implementation details see :ref:`using-the-views`.
       :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
       For more on sites, see :doc:`/ref/contrib/sites`.
 
+    To provide a logout link in a template, use a ``POST`` form:
+
+    .. code-block:: html+django
+
+        <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit">Log out</button>
+        </form>
+
+    Use this view instead of ``admin:logout`` when logging users out outside
+    the admin site.
+
 .. function:: logout_then_login(request, login_url=None)
 
     Logs a user out on ``POST`` requests, then redirects to the login page.
