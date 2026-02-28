@@ -8,7 +8,7 @@ from django.db.models.fields.related_lookups import RelatedGreaterThan
 from django.db.models.functions import Lower
 from django.db.models.lookups import EndsWith, StartsWith
 from django.test import SimpleTestCase, TestCase, override_settings
-from django.test.utils import register_lookup
+from django.test.utils import register_lookup, unregister_lookup
 from django.utils import timezone
 
 from .models import Article, Author, MySQLUnixTimestamp
@@ -774,3 +774,24 @@ class RegisterLookupTests(SimpleTestCase):
         with register_lookup(article_author, RelatedMoreThan):
             self.assertEqual(article_author.get_lookup("rmt"), RelatedMoreThan)
         self.assertIsNone(article_author.get_lookup("rmt"))
+
+    def test_unregister_class_lookup(self):
+        msg = (
+            "Unsupported lookup 'startswith' for CharField or join on the "
+            "field not permitted, perhaps you meant istartswith?"
+        )
+        author_name = Author._meta.get_field("name")
+        with unregister_lookup(models.CharField, StartsWith):
+            self.assertIsNone(author_name.get_lookup("startswith"))
+            self.assertEqual(models.Field().get_lookup("startswith"), StartsWith)
+            with self.assertRaisesMessage(FieldError, msg):
+                Author.objects.filter(name__startswith="John")
+        self.assertEqual(author_name.get_lookup("startswith"), StartsWith)
+
+    def test_unregister_instance_lookup(self):
+        author_name = Author._meta.get_field("name")
+        author_alias = Author._meta.get_field("alias")
+        with unregister_lookup(author_name, StartsWith):
+            self.assertEqual(author_name.instance_lookups, {"startswith": None})
+            self.assertEqual(author_alias.get_lookup("startswith"), StartsWith)
+            self.assertIsNone(author_name.get_lookup("startswith"))
