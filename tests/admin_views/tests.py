@@ -3141,6 +3141,41 @@ class AdminViewPermissionsTest(TestCase):
         formset = response.context["inline_admin_formsets"][0]
         self.assertEqual(len(formset.forms), 3)
 
+    def test_save_as_new_with_view_only_inlines(self):
+        self.viewuser.user_permissions.add(
+            get_perm(Section, get_permission_codename("add", Section._meta))
+        )
+        self.client.force_login(self.viewuser)
+        model_admin = site._registry[Section]
+        get_formset_kwargs = model_admin.get_formset_kwargs
+
+        def get_immutable_formset_kwargs(request, obj, inline, prefix):
+            kwargs = get_formset_kwargs(request, obj, inline, prefix)
+            kwargs["data"] = request.POST
+            return kwargs
+
+        # Simulate immutable formset data to ensure save_as_new copies it
+        # before omitting the inline.
+        with mock.patch.object(
+            model_admin,
+            "get_formset_kwargs",
+            side_effect=get_immutable_formset_kwargs,
+        ):
+            response = self.client.post(
+                reverse("admin:admin_views_section_change", args=(self.s1.pk,)),
+                {
+                    "_saveasnew": "Save as new",
+                    "name": "",
+                    "article_set-TOTAL_FORMS": 1,
+                    "article_set-INITIAL_FORMS": 1,
+                },
+            )
+        self.assertContains(response, "Please correct the error below.")
+        inline_formset = response.context["inline_admin_formsets"][0]
+        self.assertEqual(inline_formset.formset.total_form_count(), 0)
+        self.assertEqual(inline_formset.formset.initial_form_count(), 0)
+        self.assertNotContains(response, self.a1.content)
+
     def test_change_view_with_view_only_last_inline(self):
         self.viewuser.user_permissions.add(
             get_perm(Section, get_permission_codename("view", Section._meta))
