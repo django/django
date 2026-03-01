@@ -283,7 +283,7 @@
     window.showAddAnotherPopup = showRelatedObjectPopup;
     window.dismissAddAnotherPopup = dismissAddRelatedObjectPopup;
 
-    window.addEventListener("unload", function (evt) {
+    window.addEventListener("pagehide", function (evt) {
         window.dismissChildPopups();
     });
 
