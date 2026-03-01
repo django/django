@@ -1044,16 +1044,16 @@ For example, to create an Atom 1.0 feed and print it to standard output:
     >>> f = feedgenerator.Atom1Feed(
     ...     title="My Blog",
     ...     link="https://www.example.com/",
-    ...     description="In which I write about what I ate today.",
+    ...     description="In which I write about what I grow in my garden.",
     ...     language="en",
     ...     author_name="Myself",
     ...     feed_url="https://example.com/atom.xml",
     ... )
     >>> f.add_item(
-    ...     title="Hot dog today",
+    ...     title="Garden update: first tomatoes",
     ...     link="https://www.example.com/entries/1/",
     ...     pubdate=datetime.now(),
-    ...     description="<p>Today I had a Vienna Beef hot dog. It was pink, plump and perfect.</p>",
+    ...     description="<p>Today I harvested the first ripe tomatoes from my garden.</p>",
     ... )
     >>> print(f.writeString("UTF-8"))
     <?xml version="1.0" encoding="UTF-8"?>
