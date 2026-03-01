@@ -12,7 +12,6 @@ from django.db.models.lookups import (
     PostgresOperatorLookup,
     Transform,
 )
-from django.utils.deconstruct import deconstructible
 from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.translation import gettext_lazy as _
 
@@ -149,28 +148,6 @@ class JSONField(CheckFieldDefaultMixin, Field):
                 **kwargs,
             }
         )
-
-
-@deconstructible(path="django.db.models.JSONNull")
-class JSONNull(expressions.Value):
-    """Represent JSON `null` primitive."""
-
-    def __init__(self):
-        super().__init__(None, output_field=JSONField())
-
-    def __repr__(self):
-        return f"{self.__class__.__name__}()"
-
-    def as_sql(self, compiler, connection):
-        value = self.output_field.get_db_prep_value(self.value, connection)
-        if value is None:
-            value = "null"
-        return "%s", (value,)
-
-    def as_mysql(self, compiler, connection):
-        sql, params = self.as_sql(compiler, connection)
-        sql = "JSON_EXTRACT(%s, '$')"
-        return sql, params
 
 
 class DataContains(FieldGetDbPrepValueMixin, PostgresOperatorLookup):
@@ -357,7 +334,9 @@ class JSONExact(lookups.Exact):
         # Treat None lookup values as null.
         if rhs == "%s" and (*rhs_params,) == (None,):
             rhs_params = ("null",)
-        if connection.vendor == "mysql" and not isinstance(self.rhs, JSONNull):
+        if connection.vendor == "mysql" and not isinstance(
+            self.rhs, expressions.JSONNull
+        ):
             func = ["JSON_EXTRACT(%s, '$')"] * len(rhs_params)
             rhs %= tuple(func)
         return rhs, rhs_params
@@ -464,7 +443,7 @@ class JSONIn(ProcessJSONLHSMixin, lookups.In):
         if (
             connection.features.supports_primitives_in_json_field
             and isinstance(self.rhs, expressions.ExpressionList)
-            and JSONNull() in self.rhs.get_source_expressions()
+            and expressions.JSONNull() in self.rhs.get_source_expressions()
         ):
             # Break the lookup into multiple exact lookups combined with OR, as
             # Oracle does not support directly extracting JSON scalar null as a
