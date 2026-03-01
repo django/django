@@ -40,6 +40,7 @@ class ResponseHeaders(CaseInsensitiveMapping):
         Populate the initial data using __setitem__ to ensure values are
         correctly encoded.
         """
+        super().__init__()
         self._store = {}
         if data:
             for header, value in self._unpack_items(data):

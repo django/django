@@ -1888,11 +1888,14 @@ class OrderBy(Expression):
             raise ValueError("nulls_first and nulls_last are mutually exclusive")
         if nulls_first is False or nulls_last is False:
             raise ValueError("nulls_first and nulls_last values must be True or None.")
+        if not hasattr(expression, "resolve_expression"):
+            raise ValueError("expression must be an expression type")
+        # Initialize the base Expression/BaseExpression to ensure standard
+        # expression state is set up (e.g. output_field and source expressions).
+        super().__init__(output_field=getattr(expression, "output_field", None))
         self.nulls_first = nulls_first
         self.nulls_last = nulls_last
         self.descending = descending
-        if not hasattr(expression, "resolve_expression"):
-            raise ValueError("expression must be an expression type")
         self.expression = expression
 
     def __repr__(self):

@@ -47,6 +47,7 @@ class ASGIRequest(HttpRequest):
     body_receive_timeout = 60
 
     def __init__(self, scope, body_file):
+        super().__init__()
         self.scope = scope
         self._post_parse_error = False
         self._read_started = False

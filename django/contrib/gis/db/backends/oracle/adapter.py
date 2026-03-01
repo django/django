@@ -24,8 +24,7 @@ class OracleSpatialAdapter(WKTAdapter):
             ):
                 geom = self._fix_geometry_collection(geom)
 
-        self.wkt = geom.wkt
-        self.srid = geom.srid
+        super().__init__(geom)
 
     @staticmethod
     def _polygon_must_be_fixed(poly):
