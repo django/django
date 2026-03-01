@@ -179,3 +179,23 @@ class SeleniumTests(AdminSeleniumTestCase):
             m2m_to.get_attribute("innerHTML"),
             f"""<option title="{name}" value="{id_value}">{name}</option>""",
         )
+
+    def test_child_popup_closed_on_parent_navigation(self):
+        from selenium.webdriver.common.by import By
+
+        album_add_url = reverse("admin:admin_views_album_add")
+        self.selenium.get(self.live_server_url + album_add_url)
+
+        # Open a popup window using the "+" icon next to the "owner" field.
+        self.selenium.find_element(By.ID, "add_id_owner").click()
+        self.wait_for_and_switch_to_popup()
+
+        # Switch back to the main window.
+        self.selenium.switch_to.window(self.selenium.window_handles[0])
+        self.assertEqual(len(self.selenium.window_handles), 2)
+
+        # Navigate the main window away.
+        self.selenium.get(self.live_server_url + reverse("admin:index"))
+
+        # The popup should be closed by dismissChildPopups().
+        self.wait_until(lambda d: len(d.window_handles) == 1, 5)
