@@ -24,12 +24,16 @@ class BaseGeometryWidget(Widget):
     template_name = ""  # set on subclasses
 
     def __init__(self, attrs=None):
-        self.attrs = {
+        # Initialize base Widget attributes first.
+        super().__init__(attrs)
+        # Apply default geometry-related attributes, without overriding any
+        # attributes explicitly provided via attrs.
+        default_attrs = {
             key: getattr(self, key)
             for key in ("base_layer", "geom_type", "map_srid", "display_raw")
         }
-        if attrs:
-            self.attrs.update(attrs)
+        for key, value in default_attrs.items():
+            self.attrs.setdefault(key, value)
 
     def serialize(self, value):
         return value.wkt if value else ""
