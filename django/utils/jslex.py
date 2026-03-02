@@ -158,12 +158,10 @@ class JsLexer(Lexer):
         ),
         Tok(
             "punct",
-            literals(
-                """
+            literals("""
                 >>>= === !== >>> <<= >>= <= >= == != << >> &&= && => ?. ??= ??
                 **=  ** ||= || += -= *= %= &= |= ^=
-                """
-            ),
+                """),
             next="reg",
         ),
         Tok("punct", literals("++ -- ) ]"), next="div"),

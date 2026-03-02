@@ -565,11 +565,12 @@ class HashedFilesMixin:
             hash_key = self.hash_key(self.clean_name(name))
             circular_hashes[hash_key] = hashed_name
 
+        combined_hashes = {**hashed_files, **circular_hashes}
+
         # Third pass: Process all URLs (including circular ones) and save files
         for name in circular_deps:
             content = original_contents[name]
 
-            combined_hashes = {**hashed_files, **circular_hashes}
             content = self._process_file_content(
                 name, content, substitutions_dict.get(name, []), combined_hashes
             )
@@ -654,8 +655,7 @@ class HashedFilesMixin:
         r"^Error processing the url (.+)\nThe file '(.+)' could not be found"
     )
 
-    _error_msg = textwrap.dedent(
-        """\
+    _error_msg = textwrap.dedent("""\
         {orig_message}
 
         The {ext} file '{filename}' references a file which could not be found:
@@ -663,8 +663,7 @@ class HashedFilesMixin:
 
         Please check the URL references in this {ext} file, particularly any
         relative paths which might be pointing to the wrong location.
-        """
-    )
+        """)
 
     def clean_name(self, name):
         return name.replace("\\", "/")
