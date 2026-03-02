@@ -65,8 +65,6 @@ class BaseStorage:
     subclassed and the two methods ``_get`` and ``_store`` overridden.
     """
 
-    message_class = Message
-
     def __init__(self, request, *args, **kwargs):
         self.request = request
         self._queued_messages = []
@@ -148,12 +146,6 @@ class BaseStorage:
         for message in messages:
             message._prepare()
 
-    def get_message_class(self):
-        return self.message_class
-
-    def get_message(self, *args, **kwargs):
-        return self.get_message_class()(*args, **kwargs)
-
     def update(self, response):
         """
         Store all unread messages.
@@ -183,7 +175,7 @@ class BaseStorage:
             return
         # Add the message.
         self.added_new = True
-        message = self.get_message(
+        message = Message(
             level, message, extra_tags=extra_tags, extra_kwargs=extra_kwargs
         )
         self._queued_messages.append(message)
