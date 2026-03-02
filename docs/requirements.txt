@@ -1,4 +1,5 @@
 pyenchant
 Sphinx>=4.5.0
 sphinxcontrib-spelling
+black==25.12.0
 blacken-docs
