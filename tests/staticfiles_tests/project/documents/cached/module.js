@@ -20,8 +20,8 @@ const dynamicModule = import("./module_test.js");
 const dynamicModule = import('./module_test.js');
 const dynamicModule = import(`./module_test.js`);
 
-// import with assert
-import k from"./other.css"assert{type:"css"};
+// import using the with attribute
+import k from"./other.css"with{type:"css"};
 
 import*as l from "/static/absolute_root.js";
 import*as h from "/static/absolute_root.js";

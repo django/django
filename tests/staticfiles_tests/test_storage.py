@@ -682,7 +682,7 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
 
     def test_module_import(self):
         relpath = self.hashed_file_path("cached/module.js")
-        self.assertEqual(relpath, "cached/module.5960f712d6bb.js")
+        self.assertEqual(relpath, "cached/module.7a0f6282224e.js")
         tests = [
             # Relative imports.
             b'import testConst from "./module_test.477bbebe77f0.js";',
@@ -707,8 +707,8 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
             b"    firstVar1 as firstVarAlias,\n"
             b"    $second_var_2 as secondVarAlias\n"
             b'} from "./module_test.477bbebe77f0.js";',
-            # With Assert
-            b'import k from"./other.d41d8cd98f00.css"assert{type:"css"};',
+            # With attribute
+            b'import k from"./other.d41d8cd98f00.css"with{type:"css"};',
             # Unprocessed
             b'// @returns {import("./non-existent-1").something}',
             b'/* @returns {import("./non-existent-2").something} */',
@@ -729,7 +729,7 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
 
     def test_aggregating_modules(self):
         relpath = self.hashed_file_path("cached/module.js")
-        self.assertEqual(relpath, "cached/module.5960f712d6bb.js")
+        self.assertEqual(relpath, "cached/module.7a0f6282224e.js")
         tests = [
             b'export * from "./module_test.477bbebe77f0.js";',
             b'export { testConst } from "./module_test.477bbebe77f0.js";',
