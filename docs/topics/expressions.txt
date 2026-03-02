@@ -1,0 +1,91 @@
+.. _topics-expressions:
+
+===========
+Expressions
+===========
+
+Expressions allow you to describe computations and values that are executed
+directly by the database. Instead of retrieving data into Python and
+performing calculations there, expressions let the database perform the work
+efficiently.
+
+Using expressions can improve performance, reduce the number of queries,
+and help avoid race conditions.
+
+Why use expressions?
+====================
+
+Expressions are useful when you want to:
+
+* Compare one field to another field.
+* Perform arithmetic in the database.
+* Annotate querysets with calculated values.
+* Execute efficient bulk updates.
+* Use database functions such as aggregation or window functions.
+
+Basic examples
+==============
+
+Comparing fields using ``F()``
+------------------------------
+
+The :class:`~django.db.models.F` expression allows referencing model fields
+directly in queries:
+
+.. code-block:: python
+
+    from django.db.models import F
+
+    Company.objects.filter(num_employees__gt=F("num_chairs"))
+
+This compares two fields in the database without pulling values into Python.
+
+Updating fields efficiently
+----------------------------
+
+Expressions can be used to perform updates directly in SQL:
+
+.. code-block:: python
+
+    from django.db.models import F
+
+    Company.objects.update(num_employees=F("num_employees") + 1)
+
+This performs the increment in the database in a single query.
+
+Using expressions with ``annotate()``
+-------------------------------------
+
+Expressions are commonly used with
+:meth:`~django.db.models.query.QuerySet.annotate`:
+
+.. code-block:: python
+
+    from django.db.models import Count
+
+    Company.objects.annotate(num_products=Count("products"))
+
+This adds a calculated field to each object in the queryset.
+
+Other expression types
+======================
+
+Django provides several built-in expression classes:
+
+* :class:`~django.db.models.F` for referencing model fields.
+* :class:`~django.db.models.Func` for calling database functions.
+* :class:`~django.db.models.Aggregate` for grouped computations.
+* :class:`~django.db.models.Subquery` and :class:`~django.db.models.Exists`
+  for nested queries.
+* :class:`~django.db.models.expressions.Window` for window functions.
+
+These expressions can be combined to build complex database queries while
+keeping the computation inside the database.
+
+Further reading
+===============
+
+For a complete reference of expression classes and advanced usage, see:
+
+* :doc:`/ref/models/expressions`
+* :doc:`/ref/models/querysets`

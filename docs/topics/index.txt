@@ -10,6 +10,7 @@ Introductions to all the key parts of Django you'll need to know:
    install
    db/index
    http/index
+   expressions
    forms/index
    templates
    class-based-views/index
