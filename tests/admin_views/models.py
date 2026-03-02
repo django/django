@@ -1,4 +1,5 @@
 import datetime
+import os
 import tempfile
 import uuid
 
@@ -367,6 +368,19 @@ class Child(models.Model):
     def clean(self):
         if self.name == "_invalid":
             raise ValidationError("invalid")
+
+
+class FilePathParent(models.Model):
+    name = models.CharField(max_length=128)
+
+
+class FilePathChild(models.Model):
+    parent = models.ForeignKey(FilePathParent, models.CASCADE, editable=False)
+    path = models.FilePathField(
+        path=os.path.dirname(__file__),
+        match=r"models.py",
+        blank=False,
+    )
 
 
 class PKChild(models.Model):
