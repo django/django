@@ -1,7 +1,7 @@
 import copy
+import unittest
 from io import StringIO
 from types import SimpleNamespace
-import unittest
 from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured

@@ -54,9 +54,7 @@ try:
 
         def __init__(self, oid, context=None):
             super().__init__(oid, context)
-            self._optimized_load = _get_optimized_timestamptz_loader_load(
-                oid, context
-            )
+            self._optimized_load = _get_optimized_timestamptz_loader_load(oid, context)
 
         def load(self, data):
             if self._optimized_load is not None:
