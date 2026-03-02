@@ -19,8 +19,8 @@ from django.forms.models import (
     construct_instance,
     fields_for_model,
     model_to_dict,
-    modelformset_factory,
     modelform_factory,
+    modelformset_factory,
 )
 from django.template import Context, Template
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
@@ -2744,7 +2744,9 @@ class FileAndImageFieldTests(TestCase):
         Form = modelform_factory(FilePathRequiredModel, fields="__all__")
         form = Form()
         self.assertTrue(form.fields["path"].required)
-        self.assertNotIn("---------", [label for _, label in form.fields["path"].choices])
+        self.assertNotIn(
+            "---------", [label for _, label in form.fields["path"].choices]
+        )
 
         FormSet = modelformset_factory(FilePathRequiredModel, fields=["path"], extra=1)
 
