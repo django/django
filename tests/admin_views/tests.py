@@ -81,9 +81,9 @@ from .models import (
     EmptyModel,
     Fabric,
     FancyDoodad,
+    FieldOverridePost,
     FilePathChild,
     FilePathParent,
-    FieldOverridePost,
     FilteredManager,
     FooAccount,
     FoodDelivery,
@@ -460,7 +460,11 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertEqual(response.status_code, 302)  # redirect somewhere
 
     def test_inline_filepath_field_extra_form_unchanged(self):
-        """Regression test for #16328. Ensures that an extra inline form containing a FilePathField(blank=False) can be left unchanged without breaking admin submission."""
+        """
+        Regression test for #16328. Ensures that an extra inline form
+        containing a FilePathField(blank=False) can be left unchanged without
+        breaking admin submission.
+        """
         url = reverse("admin:admin_views_filepathparent_add")
         post_data = {
             "name": "Parent object",
