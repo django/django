@@ -22,6 +22,28 @@ try:
             return ClientCursor(cursor.connection).mogrify(sql, params)
 
     # Adapters.
+    def _get_optimized_timestamptz_loader_load(oid, context):
+        adapters_map = getattr(context, "adapters", None)
+        if adapters_map is None:
+            return None
+
+        get_optimized = getattr(adapters_map, "_get_optimised", None)
+        if get_optimized is None:
+            return None
+
+        try:
+            optimized_loader = get_optimized(TimestamptzLoader)
+        except Exception:
+            return None
+
+        if optimized_loader is TimestamptzLoader:
+            return None
+
+        try:
+            return optimized_loader(oid, context).load
+        except Exception:
+            return None
+
     class BaseTzLoader(TimestamptzLoader):
         """
         Load a PostgreSQL timestamptz using the a specific timezone.
@@ -30,8 +52,17 @@ try:
 
         timezone = None
 
+        def __init__(self, oid, context=None):
+            super().__init__(oid, context)
+            self._optimized_load = _get_optimized_timestamptz_loader_load(
+                oid, context
+            )
+
         def load(self, data):
-            res = super().load(data)
+            if self._optimized_load is not None:
+                res = self._optimized_load(data)
+            else:
+                res = super().load(data)
             return res.replace(tzinfo=self.timezone)
 
     def register_tzloader(tz, context):

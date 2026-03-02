@@ -1,6 +1,7 @@
 import copy
-import unittest
 from io import StringIO
+from types import SimpleNamespace
+import unittest
 from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
@@ -13,7 +14,7 @@ from django.db import (
     connections,
 )
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 
 try:
     from django.db.backends.postgresql.psycopg_any import errors, is_psycopg3
@@ -28,6 +29,71 @@ def no_pool_connection(alias=None):
     # of a hack, but we cannot easily change the pool connections.
     new_connection.settings_dict["OPTIONS"]["pool"] = False
     return new_connection
+
+
+@unittest.skipUnless(is_psycopg3, "psycopg3 specific test")
+class PsycopgAnyTests(SimpleTestCase):
+    def test_get_optimized_timestamptz_loader_load(self):
+        from django.db.backends.postgresql.psycopg_any import (
+            TimestamptzLoader,
+            _get_optimized_timestamptz_loader_load,
+        )
+
+        sentinel = object()
+
+        class OptimizedLoader:
+            def __init__(self, oid, context):
+                self.oid = oid
+                self.context = context
+
+            def load(self, data):
+                return sentinel
+
+        class Adapters:
+            def __init__(self):
+                self.loader = None
+
+            def _get_optimised(self, loader):
+                self.loader = loader
+                return OptimizedLoader
+
+        context = SimpleNamespace(adapters=Adapters())
+        load = _get_optimized_timestamptz_loader_load(oid=1, context=context)
+
+        self.assertEqual(load(b"raw"), sentinel)
+        self.assertIs(context.adapters.loader, TimestamptzLoader)
+
+    def test_get_optimized_timestamptz_loader_load_no_private_api(self):
+        from django.db.backends.postgresql.psycopg_any import (
+            _get_optimized_timestamptz_loader_load,
+        )
+
+        context = SimpleNamespace(adapters=SimpleNamespace())
+
+        self.assertIsNone(
+            _get_optimized_timestamptz_loader_load(oid=1, context=context)
+        )
+
+    def test_get_optimized_timestamptz_loader_load_when_not_optimized(self):
+        from django.db.backends.postgresql.psycopg_any import (
+            TimestamptzLoader,
+            _get_optimized_timestamptz_loader_load,
+        )
+
+        class Adapters:
+            def __init__(self):
+                self.loader = None
+
+            def _get_optimised(self, loader):
+                self.loader = loader
+                return loader
+
+        context = SimpleNamespace(adapters=Adapters())
+
+        self.assertIsNone(
+            _get_optimized_timestamptz_loader_load(oid=1, context=context)
+        )
+        self.assertIs(context.adapters.loader, TimestamptzLoader)
 
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL tests")
