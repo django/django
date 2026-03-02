@@ -244,6 +244,8 @@ kwargs
 Kyrgyz
 latin
 lawrence
+lexeme
+lexemes
 Libera
 lifecycle
 lifecycles
@@ -347,6 +349,7 @@ plaintext
 pluggable
 pluralizations
 pooler
+positionally
 postfix
 postgres
 pragma
@@ -429,6 +432,7 @@ reverter
 roadmap
 Roald
 rss
+runnable
 Sandvik
 savepoint
 savepoints
@@ -530,6 +534,7 @@ unapplied
 unapplying
 uncategorized
 unclaim
+unclosed
 uncopyable
 unencoded
 unencrypted
