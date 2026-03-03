@@ -819,8 +819,8 @@ class DayArchiveViewTests(TestDataMixin, TestCase):
     def test_day_view_null_date_field(self):
         """
         If the date field value is None (e.g. from MySQL's 0000-00-00 converted
-        to None by the ORM), the view returns None for next/previous day instead
-        of raising AttributeError (#22536).
+        to None by the ORM), the view returns None for next/previous day
+        instead of raising AttributeError (#22536).
         """
         Book.objects.create(name="Nulldate", slug="nulldate", pages=1, pubdate=None)
         res = self.client.get("/dates/books/2008/oct/01/")
