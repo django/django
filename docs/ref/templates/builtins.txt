@@ -2950,6 +2950,9 @@ For example:
 
 If ``value`` is ``"Joel is a slug"``, the output will be ``"JOEL IS A SLUG"``.
 
+.. note::
+    The upper filter does not work as expected on html.
+
 .. templatefilter:: urlencode
 
 ``urlencode``
