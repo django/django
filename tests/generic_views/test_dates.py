@@ -816,6 +816,18 @@ class DayArchiveViewTests(TestDataMixin, TestCase):
         res = self.client.get("/dates/booksignings/2008/apr/2/")
         self.assertEqual(res.status_code, 404)
 
+    def test_day_view_null_date_field(self):
+        """
+        If the date field value is None (e.g. from MySQL's 0000-00-00 converted
+        to None by the ORM), the view returns None for next/previous day instead
+        of raising AttributeError (#22536).
+        """
+        Book.objects.create(name="Nulldate", slug="nulldate", pages=1, pubdate=None)
+        res = self.client.get("/dates/books/2008/oct/01/")
+        self.assertEqual(res.status_code, 200)
+        self.assertIsNone(res.context["next_day"])
+        self.assertEqual(res.context["previous_day"], datetime.date(2006, 5, 1))
+
 
 @override_settings(ROOT_URLCONF="generic_views.urls")
 class DateDetailViewTests(TestDataMixin, TestCase):
