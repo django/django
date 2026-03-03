@@ -798,7 +798,9 @@ class URLField(CharField):
             if not url_fields[0]:
                 # If no URL scheme given, add a scheme.
                 url_fields[0] = self.assume_scheme
-            if not url_fields[1] and url_fields[0] in ("http", "https", "ftp", "ftps"):
+            if not url_fields[1] and url_fields[0] in (
+                "http", "https", "ftp", "ftps"
+            ):
                 # Assume that if no domain is provided, that the path segment
                 # contains the domain. Only for hierarchical schemes like http/https.
                 url_fields[1] = url_fields[2]
