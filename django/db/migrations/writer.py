@@ -14,6 +14,8 @@ from django.utils.inspect import get_func_args
 from django.utils.module_loading import module_dir
 from django.utils.timezone import now
 
+_import_re = re.compile(r"^import (.*)\.\d+[^\s]*$")
+
 
 class OperationWriter:
     def __init__(self, operation, indentation=2):
@@ -164,7 +166,7 @@ class MigrationWriter:
         # files for comments
         migration_imports = set()
         for line in list(imports):
-            if re.match(r"^import (.*)\.\d+[^\s]*$", line):
+            if _import_re.match(line):
                 migration_imports.add(line.split("import")[1].strip())
                 imports.remove(line)
                 self.needs_manual_porting = True

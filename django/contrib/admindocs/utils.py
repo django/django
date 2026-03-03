@@ -20,6 +20,9 @@ else:
     docutils_is_available = True
 
 
+_docstring_parts_re = _lazy_re_compile(r"\n{2,}")
+
+
 def get_view_name(view_func):
     if hasattr(view_func, "view_class"):
         klass = view_func.view_class
@@ -36,7 +39,7 @@ def parse_docstring(docstring):
     if not docstring:
         return "", "", {}
     docstring = cleandoc(docstring)
-    parts = re.split(r"\n{2,}", docstring)
+    parts = _docstring_parts_re.split(docstring)
     title = parts[0]
     if len(parts) == 1:
         body = ""
@@ -177,12 +180,14 @@ if docutils_is_available:
 named_group_matcher = _lazy_re_compile(r"\(\?P(<\w+>)")
 unnamed_group_matcher = _lazy_re_compile(r"\(")
 non_capturing_group_matcher = _lazy_re_compile(r"\(\?\:")
+unescaped_metacharacters_matcher = _lazy_re_compile(
+    r"((?:^|(?<!\\))(?:\\\\)*)(\\?)([?*+^$]|\\[bBAZ])"
+)
 
 
 def replace_metacharacters(pattern):
     """Remove unescaped metacharacters from the pattern."""
-    return re.sub(
-        r"((?:^|(?<!\\))(?:\\\\)*)(\\?)([?*+^$]|\\[bBAZ])",
+    return unescaped_metacharacters_matcher.sub(
         lambda m: m[1] + m[3] if m[2] else m[1],
         pattern,
     )

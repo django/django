@@ -30,6 +30,10 @@ DEBUG_ENGINE = Engine(
     libraries={"i18n": "django.templatetags.i18n"},
 )
 
+# File coding may be specified. Match pattern from PEP-263
+# (https://www.python.org/dev/peps/pep-0263/)
+_pep_263_encoding_re = _lazy_re_compile(rb"coding[:=]\s*([-\w.]+)")
+
 
 def builtin_template_path(name):
     """
@@ -476,9 +480,7 @@ class ExceptionReporter:
         if isinstance(source[0], bytes):
             encoding = "ascii"
             for line in source[:2]:
-                # File coding may be specified. Match pattern from PEP-263
-                # (https://www.python.org/dev/peps/pep-0263/)
-                match = re.search(rb"coding[:=]\s*([-\w.]+)", line)
+                match = _pep_263_encoding_re.search(line)
                 if match:
                     encoding = match[1].decode("ascii")
                     break
