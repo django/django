@@ -33,6 +33,8 @@ logger = logging.getLogger("django.utils.autoreload")
 # file paths to allow watching them in the future.
 _error_files = []
 _exception = None
+# Exception raised while loading the URLConf.
+_url_module_exception = None
 
 try:
     import termios
@@ -62,7 +64,7 @@ def check_errors(fn):
         global _exception
         try:
             fn(*args, **kwargs)
-        except Exception:
+        except Exception as e:
             _exception = sys.exc_info()
 
             et, ev, tb = _exception
@@ -75,8 +77,10 @@ def check_errors(fn):
 
             if filename not in _error_files:
                 _error_files.append(filename)
+            if _url_module_exception is not None:
+                raise e from _url_module_exception
 
-            raise
+            raise e
 
     return wrapper
 
@@ -339,6 +343,7 @@ class BaseReloader:
             return False
 
     def run(self, django_main_thread):
+        global _url_module_exception
         logger.debug("Waiting for apps ready_event.")
         self.wait_for_apps_ready(apps, django_main_thread)
         from django.urls import get_resolver
@@ -347,10 +352,10 @@ class BaseReloader:
         # reloader starts by accessing the urlconf_module property.
         try:
             get_resolver().urlconf_module
-        except Exception:
+        except Exception as e:
             # Loading the urlconf can result in errors during development.
-            # If this occurs then swallow the error and continue.
-            pass
+            # If this occurs then store the error and continue.
+            _url_module_exception = e
         logger.debug("Apps ready_event triggered. Sending autoreload_started signal.")
         autoreload_started.send(sender=self)
         self.run_loop()
