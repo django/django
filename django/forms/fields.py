@@ -805,7 +805,8 @@ class URLField(CharField):
                 "ftps",
             ):
                 # Assume that if no domain is provided, that the path segment
-                # contains the domain. Only for hierarchical schemes like http/https.
+                # contains the domain. Only for hierarchical schemes like
+                # http/https.
                 url_fields[1] = url_fields[2]
                 url_fields[2] = ""
                 # Rebuild the url_fields list, since the domain segment may now
