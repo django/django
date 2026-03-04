@@ -349,9 +349,7 @@ that's really what happens. ``cd`` to the Django ``tests/`` directory and run:
 
     $ ./runtests.py shortcuts
 
-On Windows, run::
-
-    python runtests.py shortcuts
+On Windows, run ``python runtests.py shortcuts``.
 
 If the tests ran correctly, you should see one failure corresponding to the
 test method we added, with this error:
