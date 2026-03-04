@@ -90,8 +90,12 @@ to be reused. This will help keep the number of simultaneous connections to
 this database small.
 
 The development server creates a new thread for each request it handles,
-negating the effect of persistent connections. Don't enable them during
-development.
+which may limit the effectiveness of persistent connections. While
+persistent connections can still be observed when :setting:`CONN_MAX_AGE`
+is enabled, the development server frequently restarts due to autoreload
+and uses a thread-per-request model. As a result, connection reuse may be
+inconsistent and may not reflect production behavior. Persistent
+connections are therefore not recommended during development.
 
 When Django establishes a connection to the database, it sets up appropriate
 parameters, depending on the backend being used. If you enable persistent
