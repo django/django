@@ -24,3 +24,14 @@ export {
     firstVar as firstVarAlias,
     secondVar as secondVarAlias
 } from "./module_test.js";
+
+// ignore block comments
+/* export * from "./module_test_missing.js"; */
+/*
+import rootConst from "/static/absolute_root_missing.js";
+const dynamicModule = import("./module_test_missing.js");
+*/
+
+// ignore line comments
+// import testConst from "./module_test_missing.js";
+// const dynamicModule = import("./module_test_missing.js");
