@@ -171,7 +171,6 @@ In addition, each generated form field has attributes set as follows:
    arguments passed by ``RelatedField.formfield()``. These may include
    parameters such as ``limit_choices_to``. Custom form fields that don't
    accept these arguments may raise errors when the form is constructed.
-   
 Finally, note that you can override the form field used for a given model
 field. See `Overriding the default fields`_ below.
 
