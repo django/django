@@ -247,6 +247,39 @@ class IterableSerializer(BaseSerializer):
         return value % (", ".join(strings)), imports
 
 
+class LazySerializer(BaseSerializer):
+    def serialize(self):
+        _, (func, args, kwargs, *resultclasses) = self.value.__reduce__()
+        imports = {"from django.utils.functional import lazy"}
+        func_string, func_imports = serializer_factory(func).serialize()
+        imports.update(func_imports)
+
+        serialized_types = []
+        for cls in resultclasses:
+            cls_string, cls_imports = serializer_factory(cls).serialize()
+            serialized_types.append(cls_string)
+            imports.update(cls_imports)
+        result_classes_str = ", ".join(serialized_types)
+
+        args_string, args_imports = serializer_factory(args).serialize()
+        imports.update(args_imports)
+        kwargs_string, kwargs_imports = serializer_factory(kwargs).serialize()
+        imports.update(kwargs_imports)
+
+        args_str = f"*{args_string}" if args else ""
+        kwargs_str = f"**{kwargs_string}" if kwargs else ""
+        params = ", ".join(filter(None, [args_str, kwargs_str]))
+        return (
+            "lazy(%s, %s)(%s)"
+            % (
+                func_string,
+                result_classes_str,
+                params,
+            ),
+            imports,
+        )
+
+
 class ModelFieldSerializer(DeconstructibleSerializer):
     def serialize(self):
         attr_name, path, args, kwargs = self.value.deconstruct()
@@ -400,7 +433,13 @@ class Serializer:
 
 def serializer_factory(value):
     if isinstance(value, Promise):
-        value = str(value)
+        _, (func, args, kwargs, *resultclasses) = value.__reduce__()
+        if any(issubclass(cls, str) for cls in resultclasses):
+            value = str(value)
+        elif any(issubclass(cls, bytes) for cls in resultclasses):
+            value = bytes(value)
+        else:
+            return LazySerializer(value)
     elif isinstance(value, LazyObject):
         # The unwrapped value is returned as the first item of the arguments
         # tuple.
