@@ -232,6 +232,21 @@ cases, no instance hint will be provided at all. The router checks for
 the existence of an instance hint, and determine if that hint should be
 used to alter routing behavior.
 
+Related object access
+~~~~~~~~~~~~~~~~~~~~~
+
+When accessing related objects, Django typically uses the same database
+as the instance that initiated the relation.
+
+For example, if an object was retrieved from a database selected by a
+router, accessing its related objects will usually use the same
+database. This behavior relies on the instance's ``_state.db`` attribute,
+which stores the database from which the object was loaded.
+
+Routers may also receive hints such as the instance involved in the
+operation, allowing them to determine the appropriate database for
+related queries.
+
 Using routers
 -------------
 
