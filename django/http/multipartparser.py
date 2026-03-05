@@ -305,15 +305,18 @@ class MultiPartParser:
                                 # We should always decode base64 chunks by
                                 # multiple of 4, ignoring whitespace.
 
-                                stripped_chunk = b"".join(chunk.split())
+                                stripped_parts = [b"".join(chunk.split())]
+                                stripped_length = len(stripped_parts[0])
 
-                                remaining = len(stripped_chunk) % 4
-                                while remaining != 0:
-                                    over_chunk = field_stream.read(4 - remaining)
+                                while stripped_length % 4 != 0:
+                                    over_chunk = field_stream.read(self._chunk_size)
                                     if not over_chunk:
                                         break
-                                    stripped_chunk += b"".join(over_chunk.split())
-                                    remaining = len(stripped_chunk) % 4
+                                    over_stripped = b"".join(over_chunk.split())
+                                    stripped_parts.append(over_stripped)
+                                    stripped_length += len(over_stripped)
+
+                                stripped_chunk = b"".join(stripped_parts)
 
                                 try:
                                     chunk = base64.b64decode(stripped_chunk)
