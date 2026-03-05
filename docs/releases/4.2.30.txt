@@ -46,3 +46,13 @@ instances to be created via forged ``POST`` data.
 
 This issue has severity "low" according to the :ref:`Django security policy
 <security-disclosure>`.
+
+CVE-2026-33033: Potential denial-of-service vulnerability in ``MultiPartParser`` via base64-encoded file upload
+===============================================================================================================
+
+When using ``django.http.multipartparser.MultiPartParser``, multipart uploads
+with ``Content-Transfer-Encoding: base64`` that include excessive whitespace
+may trigger repeated memory copying, potentially degrading performance.
+
+This issue has severity "moderate" according to the :ref:`Django security
+policy <security-disclosure>`.
