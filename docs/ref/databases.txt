@@ -92,7 +92,7 @@ this database small.
 The development server may create a new thread for each request it handles.
 Sequential requests typically reuse the same thread and database connection,
 but concurrent requests may create separate connections. In addition, the
-autoreloader may restart the server process, causing connections to be
+auto-reloader may restart the server process, causing connections to be
 re-established. For these reasons, persistent connections are generally not
 recommended during development.
 
