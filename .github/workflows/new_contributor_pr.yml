@@ -32,7 +32,7 @@ jobs:
 
             If you're fixing a ticket [from Trac](https://code.djangoproject.com/) make sure to set the _"Has patch"_ flag and include a link to this PR in the ticket!
 
-            If you have any design or process questions then you can ask in the [Django forum](https://forum.djangoproject.com/c/internals/5).
+            If you have any design or process questions then you can ask in the [Django forum](https://forum.djangoproject.com/c/internals/5). You may also get help on the [Django Discord](https://chat.djangoproject.com) server's #contributing-getting-started channel.
 
             Welcome aboard ⛵️!
 
