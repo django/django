@@ -176,6 +176,16 @@ We align with similar policies adopted by other major open-source projects,
 which have identified unverified AI-generated contributions as disruptive,
 counterproductive, and a drain on limited maintainer time.
 
+Automated AI Reviews
+^^^^^^^^^^^^^^^^^^^^
+
+Do not request automated AI reviews (for example GitHub Copilot or similar
+tools) on pull requests submitted to the Django repository. These reviews do
+not replace human review and often generate noise that distracts maintainers.
+
+You are free to use such tools in your own fork before submitting a pull
+request to the Django repository.
+
 Note for AI Tools
 ^^^^^^^^^^^^^^^^^
 
