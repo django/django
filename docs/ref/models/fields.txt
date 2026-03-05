@@ -2138,10 +2138,10 @@ that control how the relationship functions.
 
             class Supply(models.Model):
                 supplier = models.ForeignKey(
-                    Manufacturer, models.CASCADE, related_name="supplies_given"
+                    Manufacturer, on_delete=models.CASCADE, related_name="supplies_given"
                 )
                 client = models.ForeignKey(
-                    Manufacturer, models.CASCADE, related_name="supplies_received"
+                    Manufacturer, on_delete=models.CASCADE, related_name="supplies_received"
                 )
                 product = models.CharField(max_length=255)
 
