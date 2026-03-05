@@ -8,7 +8,7 @@ Provide a concise overview of the issue or rationale behind the proposed changes
 
 #### Checklist
 - [ ] This PR targets the `main` branch. <!-- Backports will be evaluated and done by mergers, when necessary. -->
-- [ ] The commit message is written in past tense, mentions the ticket number, and ends with a period.
+- [ ] The commit message is written in past tense, mentions the ticket number, and ends with a period (see [guidelines](https://docs.djangoproject.com/en/dev/internals/contributing/committing-code/#committing-guidelines)).
 - [ ] I have checked the "Has patch" ticket flag in the Trac system.
 - [ ] I have added or updated relevant tests.
 - [ ] I have added or updated relevant docs, including release notes if applicable.

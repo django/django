@@ -3,8 +3,10 @@ Committing code
 ===============
 
 This section is addressed to the mergers and to anyone interested in knowing
-how code gets committed into Django. If you're a community member who wants to
-contribute code to Django, look at
+how code gets committed into Django. The :ref:`committing-guidelines` apply
+to all contributors, with or without commit rights.
+
+If you're a community member who wants to contribute code to Django, look at
 :doc:`/internals/contributing/writing-code/working-with-git` instead.
 
 .. _handling-pull-requests:
@@ -102,8 +104,8 @@ community, getting work done, and having a usable commit history.
 Committing guidelines
 =====================
 
-In addition, please follow the following guidelines when committing code to
-Django's Git repository:
+These guidelines apply to all commits to Django's Git repository, whether
+submitted by a contributor via a pull request or landed directly by a merger:
 
 * Never change the published history of ``django/django`` branches by force
   pushing. If you absolutely must (for security reasons for example), first
@@ -119,16 +121,27 @@ Django's Git repository:
   discussions immediately, so you may have to wait a couple of days before
   getting a response.
 
-* Write detailed commit messages in the past tense, not present tense.
+* Write detailed commit messages in the past tense, not present tense, and
+  end the subject line with a period.
 
-  * Good: "Fixed Unicode bug in RSS API."
-  * Bad: "Fixes Unicode bug in RSS API."
-  * Bad: "Fixing Unicode bug in RSS API."
+  * Correct: "Fixed Unicode bug in RSS API."
+  * Incorrect: "Fixes Unicode bug in RSS API." (present tense)
+  * Incorrect: "Fixing Unicode bug in RSS API." ("-ing" form)
+  * Incorrect: "Fixed Unicode bug in RSS API" (missing trailing period)
 
   The commit message should be in lines of 72 chars maximum. There should be
   a subject line, separated by a blank line and then paragraphs of 72 char
-  lines. The limits are soft. For the subject line, shorter is better. In the
-  body of the commit message more detail is better than less:
+  lines. The limits are soft. For the subject line, shorter is better.
+
+  In the body of the commit message more detail is better than less, and should
+  explain *why* the change was made, not *what* was changed or *how*. The code
+  itself shows what changed; the commit message should provide the context and
+  reasoning that the code cannot.
+
+  Credit the contributors in the commit message: "Thanks A for the report and B
+  for review." Use git's `Co-Authored-By`_ as appropriate.
+
+  For example:
 
   .. code-block:: none
 
@@ -138,8 +151,7 @@ Django's Git repository:
       specific tasks. Added guidelines of how to use Git, GitHub, and
       how to use pull request together with Trac instead.
 
-  Credit the contributors in the commit message: "Thanks A for the report and B
-  for review." Use git's `Co-Authored-By`_ as appropriate.
+      Thanks to Full Name for the report, and to Reviewer for reviews.
 
   .. _Co-Authored-By: https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors
 

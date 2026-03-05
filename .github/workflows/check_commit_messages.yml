@@ -68,3 +68,39 @@ jobs:
           fi
 
           echo "✅ All commits have the required prefix."
+
+  check-commit-suffix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Fetch relevant branches
+        run: |
+          git fetch origin $BASE:base
+          git fetch origin pull/${{ github.event.pull_request.number }}/head:pr
+
+      - name: Check commit messages suffix
+        run: |
+          COMMITS=$(git rev-list base..pr)
+          echo "Checking commit messages for trailing period"
+          FAIL=0
+          for SHA in $COMMITS; do
+            MSG=$(git log -1 --pretty=%s $SHA)
+            echo "Checking commit $SHA: $MSG"
+            if [[ "${MSG: -1}" != "." ]]; then
+              echo "❌ Commit $SHA must end with a period."
+              echo "Refer to the guidelines linked in the PR checklist for commit message format."
+              echo "For how to rewrite commit messages, see https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/working-with-git/#editing-commit-messages"
+              FAIL=1
+            fi
+          done
+
+          if [[ $FAIL -eq 1 ]]; then
+            echo "One or more commit messages are missing a trailing period."
+            exit 1
+          fi
+
+          echo "✅ All commits have the required trailing period."
