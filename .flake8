@@ -1,5 +1,5 @@
 [flake8]
-exclude = build,.git,.tox,./tests/.env
+exclude = build,.git,.tox,./tests/.env,venv,.venv,__pycache__
 extend-ignore = E203
 max-line-length = 88
 max-doc-length = 79
