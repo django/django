@@ -1,6 +1,7 @@
 import copy
 from io import BytesIO
 from itertools import chain
+from unittest import mock
 from urllib.parse import urlencode
 
 from django.core.exceptions import DisallowedHost
@@ -11,10 +12,10 @@ from django.http import (
     RawPostDataException,
     UnreadablePostError,
 )
-from django.http.multipartparser import MultiPartParserError
+from django.http.multipartparser import LazyStream, MultiPartParserError
 from django.http.request import split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
-from django.test.client import FakePayload
+from django.test.client import BOUNDARY, MULTIPART_CONTENT, FakePayload
 
 
 class RequestsTests(SimpleTestCase):
@@ -536,6 +537,115 @@ class RequestsTests(SimpleTestCase):
         request.body  # evaluate
         self.assertEqual(request.read(1), b"n")
         self.assertEqual(request.POST, {"name": ["value"]})
+
+    def test_multipart_post_field_with_base64(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="name"',
+                    "Content-Transfer-Encoding: base64",
+                    "",
+                    "dmFsdWU=",
+                    f"--{BOUNDARY}--",
+                    "",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": MULTIPART_CONTENT,
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        request.body  # evaluate
+        self.assertEqual(request.POST, {"name": ["value"]})
+
+    def test_multipart_post_field_with_invalid_base64(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="name"',
+                    "Content-Transfer-Encoding: base64",
+                    "",
+                    "123",
+                    f"--{BOUNDARY}--",
+                    "",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": MULTIPART_CONTENT,
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        request.body  # evaluate
+        self.assertEqual(request.POST, {"name": ["123"]})
+
+    def test_multipart_file_upload_base64_whitespace_heavy(self):
+        # Fake a file upload with base64-encoded content including mostly
+        # whitespaces across chunk boundaries.
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="file"; filename="test.txt"',
+                    "Content-Type: application/octet-stream",
+                    "Content-Transfer-Encoding: base64",
+                    "",
+                ]
+            )
+        )
+        # "AAAA" decodes to b"\x00\x00\x00". Whitespace (70000 bytes) spans the
+        # default 64KB chunk boundary, hence the alignment loop is exercised.
+        payload.write(b"\r\n" + b"AAA" + b" " * 70000 + b"A" + b"\r\n")
+        payload.write("--" + BOUNDARY + "--\r\n")
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": MULTIPART_CONTENT,
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        reads = []
+        original_read = LazyStream.read
+
+        def counting_read(self_stream, size=None):
+            reads.append(size)
+            return original_read(self_stream, size)
+
+        with mock.patch.object(LazyStream, "read", counting_read):
+            files = request.FILES
+
+        self.assertEqual(len(files), 1)
+        self.assertEqual(files["file"].read(), b"\x00\x00\x00")
+
+        # The alignment loop must read in `chunk-sized` units rather than one
+        # byte at a time, otherwise each whitespace byte triggers a separate
+        # read() call with a costly internal unget() cycle.
+        # Parsing this payload should issue exactly 8 LazyStream.read() calls:
+        # 1. main_stream.read(1)     -- BoundaryIter.__init__ probe, preamble
+        # 2. sub_stream.read(1024)   -- parse_boundary_stream, preamble headers
+        # 3. main_stream.read(1)     -- BoundaryIter.__init__ probe, file field
+        # 4. field_stream.read(1024) -- parse_boundary_stream, file headers
+        # 5. field_stream.read(65536)-- base64 alignment loop: one chunk-sized
+        #                               read to find the non-whitespace bytes
+        #                               needed to complete the 4-byte base64
+        #                               group that spans the chunk boundary
+        # 6. main_stream.read(1)     -- BoundaryIter.__init__ probe, epilogue
+        # 7. sub_stream.read(1024)   -- parse_boundary_stream, epilogue headers
+        # 8. main_stream.read(1)     -- BoundaryIter.__init__ probe, exhausted
+        #                               stream; returns b"" and stops iteration
+        # A byte-at-a-time implementation of read() in step 5 would do instead
+        # one read(1) per whitespace byte past the chunk boundary (4488 calls).
+        self.assertEqual(reads, [1, 1024, 1, 1024, 65536, 1, 1024, 1])
 
     def test_POST_after_body_read_and_stream_read_multipart(self):
         """
