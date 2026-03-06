@@ -403,7 +403,7 @@ email backend API :ref:`provides an alternative
         an exception. It will return ``1`` if the message was sent
         successfully, otherwise ``0``.
 
-    .. method:: message(policy=email.policy.default)
+    .. method:: message(*, policy=email.policy.default)
 
         Constructs and returns a Python :class:`email.message.EmailMessage`
         object representing the message to be sent.
