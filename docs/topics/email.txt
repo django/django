@@ -120,6 +120,12 @@ can be ``0`` or ``1`` since it can only send one message).
     Passing ``fail_silently`` and later parameters as positional arguments is
     deprecated.
 
+.. versionchanged:: 6.1
+
+    Older versions ignored ``fail_silently``, ``auth_user``, and
+    ``auth_password`` when a ``connection`` was also provided.
+    This now raises a ``TypeError``.
+
 ``send_mass_mail()``
 ====================
 
@@ -164,6 +170,13 @@ The return value will be the number of successfully delivered messages.
     Passing ``fail_silently`` and later parameters as positional arguments is
     deprecated.
 
+
+.. versionchanged:: 6.1
+
+    Older versions ignored ``fail_silently``, ``auth_user``, and
+    ``auth_password`` when a ``connection`` was also provided.
+    This now raises a ``TypeError``.
+
 ``send_mass_mail()`` vs. ``send_mail()``
 ----------------------------------------
 
@@ -198,6 +211,11 @@ If ``html_message`` is provided, the resulting email will be a
     Passing ``fail_silently`` and later parameters as positional arguments is
     deprecated.
 
+.. versionchanged:: 6.1
+
+    Older versions ignored ``fail_silently`` when a ``connection`` was
+    also provided. This now raises a ``TypeError``.
+
 ``mail_managers()``
 ===================
 
@@ -211,6 +229,11 @@ setting.
 
     Passing ``fail_silently`` and later parameters as positional arguments is
     deprecated.
+
+.. versionchanged:: 6.1
+
+    Older versions ignored ``fail_silently`` when a ``connection`` was
+    also provided. This now raises a ``TypeError``.
 
 Examples
 ========
@@ -402,6 +425,11 @@ email backend API :ref:`provides an alternative
         the message will be quashed. An empty list of recipients will not raise
         an exception. It will return ``1`` if the message was sent
         successfully, otherwise ``0``.
+
+        .. versionchanged:: 6.1
+
+            Older versions ignored ``fail_silently`` when a ``connection`` was
+            also provided. This now raises a ``TypeError``.
 
     .. method:: message(policy=email.policy.default)
 

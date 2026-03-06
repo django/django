@@ -1999,6 +1999,107 @@ class MailTests(MailTestsMixin, SimpleTestCase):
             message.as_string(policy=policy.compat32),
         )
 
+    def test_send_mail_fail_silently_conflict(self):
+        msg = (
+            "fail_silently cannot be used with a connection. "
+            "Pass fail_silently to get_connection() instead."
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            mail.send_mail(
+                "Subject",
+                "Body",
+                "from@example.com",
+                ["to@example.com"],
+                fail_silently=True,
+                connection=mail.get_connection(),
+            )
+
+    def test_send_mail_auth_conflict(self):
+        msg = (
+            "auth_user and auth_password cannot be used with a connection. "
+            "Pass auth_user and auth_password to get_connection() instead."
+        )
+        for param in ["auth_user", "auth_password"]:
+            with (
+                self.subTest(param=param),
+                self.assertRaisesMessage(TypeError, msg),
+            ):
+                mail.send_mail(
+                    "subject",
+                    "body",
+                    "from@example.com",
+                    ["to@example.com"],
+                    **{param: "value"},
+                    connection=mail.get_connection(),
+                )
+
+    def test_email_message_send_fail_silently_conflict(self):
+        email = mail.EmailMessage(
+            "Subject",
+            "Body",
+            "from@example.com",
+            ["to@example.com"],
+            connection=mail.get_connection(),
+        )
+        msg = (
+            "fail_silently cannot be used with a connection. "
+            "Pass fail_silently to get_connection() instead."
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            email.send(fail_silently=True)
+
+    def test_send_mass_mail_fail_silently_conflict(self):
+        datatuple = (("Subject", "Message", "from@example.com", ["to@example.com"]),)
+        msg = (
+            "fail_silently cannot be used with a connection. "
+            "Pass fail_silently to get_connection() instead."
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            mail.send_mass_mail(
+                datatuple, fail_silently=True, connection=mail.get_connection()
+            )
+
+    def test_send_mass_mail_auth_conflict(self):
+        datatuple = (("Subject", "Message", "from@example.com", ["to@example.com"]),)
+        msg = (
+            "auth_user and auth_password cannot be used with a connection. "
+            "Pass auth_user and auth_password to get_connection() instead."
+        )
+        for param in ["auth_user", "auth_password"]:
+            with (
+                self.subTest(param=param),
+                self.assertRaisesMessage(TypeError, msg),
+            ):
+                mail.send_mass_mail(
+                    datatuple, **{param: "value"}, connection=mail.get_connection()
+                )
+
+    def test_mail_admins_fail_silently_conflict(self):
+        msg = (
+            "fail_silently cannot be used with a connection. "
+            "Pass fail_silently to get_connection() instead."
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            mail.mail_admins(
+                "Subject",
+                "Message",
+                fail_silently=True,
+                connection=mail.get_connection(),
+            )
+
+    def test_mail_managers_fail_silently_conflict(self):
+        msg = (
+            "fail_silently cannot be used with a connection. "
+            "Pass fail_silently to get_connection() instead."
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            mail.mail_managers(
+                "Subject",
+                "Message",
+                fail_silently=True,
+                connection=mail.get_connection(),
+            )
+
 
 # RemovedInDjango70Warning.
 class MailDeprecatedPositionalArgsTests(SimpleTestCase):
@@ -2029,9 +2130,9 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
                 "from@example.com",
                 ["to@example.com"],
                 # Deprecated positional args:
-                True,
-                "username",
-                "password",
+                None,
+                None,
+                None,
                 mail.get_connection(),
                 "html message",
             )
@@ -2044,9 +2145,9 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
             send_mass_mail(
                 [],
                 # Deprecated positional args:
-                True,
-                "username",
-                "password",
+                None,
+                None,
+                None,
                 mail.get_connection(),
             )
 
@@ -2058,7 +2159,7 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
                 "subject",
                 "message",
                 # Deprecated positional args:
-                True,
+                None,
                 mail.get_connection(),
                 "html message",
             )
@@ -2071,7 +2172,7 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
                 "subject",
                 "message",
                 # Deprecated positional args:
-                True,
+                None,
                 mail.get_connection(),
                 "html message",
             )
