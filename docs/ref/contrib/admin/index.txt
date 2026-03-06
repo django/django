@@ -2833,7 +2833,7 @@ Root and login templates
 
 If you wish to change the index, login or logout templates, you are better off
 creating your own ``AdminSite`` instance (see below), and changing the
-:attr:`AdminSite.index_template` , :attr:`AdminSite.login_template` or
+:attr:`AdminSite.index_template`, :attr:`AdminSite.login_template` or
 :attr:`AdminSite.logout_template` properties.
 
 .. _admin-theming:
