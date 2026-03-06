@@ -584,9 +584,9 @@ The timezone offset for Melbourne in the example date above is +10:00. The
 values returned when this timezone is active will be:
 
 * "year": 2015-01-01 00:00:00+11:00
-* "quarter": 2015-04-01 00:00:00+10:00
+* "quarter": 2015-04-01 00:00:00+11:00
 * "month": 2015-06-01 00:00:00+10:00
-* "week": 2015-06-16 00:00:00+10:00
+* "week": 2015-06-15 00:00:00+10:00
 * "day": 2015-06-16 00:00:00+10:00
 * "hour": 2015-06-16 00:00:00+10:00
 * "minute": 2015-06-16 00:30:00+10:00
@@ -633,6 +633,54 @@ Usage example:
     ...
     2015-06-15 14:30:50.000321
     2015-06-15 14:40:02.000123
+
+.. warning::
+
+    ``Trunc`` functions, at the database level, return a timezone naive value
+    which is converted to a timezone aware value by the ORM. When you use a
+    ``Trunc`` function in a filter you will need to remember that it is a
+    timezone naive value. This can lead to unexpected results if you are using
+    timezones other than UTC. Django will store date/time values in the
+    database in the UTC timezone. The following example demonstrates what
+    happens when "Europe/Berlin" is active in Django (in settings
+    :setting:`TIME_ZONE`) and how to adjust for this:
+
+    .. code-block:: pycon
+
+        >>> from django.utils import timezone
+        >>> from datetime import datetime
+        >>> from django.db.models.functions import TruncSecond
+        >>> import zoneinfo
+        >>> start = datetime(2015, 6, 15, 14, 30, 50, 321)
+        >>> start = timezone.make_aware(start)
+        >>> exp = Experiment.objects.create(start_datetime=start)
+        >>> find_this_exp = Experiment.objects.annotate(
+        ...     trunc_start=TruncSecond("start_datetime")
+        ... ).filter(trunc_start__lte=start)
+        >>> find_this_exp.count()
+        0  # We expect to find one result but 0 are found
+        >>> start_adjusted = timezone.localtime(start).replace(tzinfo=zoneinfo.ZoneInfo(key="UTC"))
+        >>> find_this_exp_adjusted = Experiment.objects.annotate(
+        ...     trunc_start=TruncSecond("start_datetime")
+        ... ).filter(trunc_start__lte=start_adjusted)
+        >>> find_this_exp.count()
+        1
+
+    .. admonition:: The value of ``trunc_start``
+
+        A timezone aware value for ``start`` is stored as
+        ``2015-06-15T12:30:50.321Z`` (the UTC timezone) in the database. When
+        Django runs the annotate ``TruncSecond`` the result is a timezone naive
+        value converted to the local timezone which becomes
+        ``2015-06-15T14:30:50``. When we filter using
+        ``.filter(trunc_start__lte=start)`` we are expecting
+        ``2015-06-15T14:30:50+2 <= 2015-06-15T14:30:50.321+2`` which would
+        return the row, but instead the comparison is
+        ``2015-06-15T14:30:50 <= 2015-06-15T12:30:50.321`` which doesn't find
+        the row. Converting ``start`` to ``start_adjusted`` creates a UTC
+        value for the start time so that we are comparing
+        ``2015-06-15T14:30:50 <= 2015-06-15T14:30:50.321`` which returns the
+        expected value.
 
 ``DateField`` truncation
 ~~~~~~~~~~~~~~~~~~~~~~~~
