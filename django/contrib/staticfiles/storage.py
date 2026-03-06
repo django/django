@@ -11,6 +11,12 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, storages
 from django.utils.functional import LazyObject
+from django.utils.regex_helper import _lazy_re_compile
+
+comment_re = _lazy_re_compile(r"\/\*[^*]*\*+([^/*][^*]*\*+)*\/", re.DOTALL)
+line_comment_re = _lazy_re_compile(
+    r"\/\*[^*]*\*+([^/*][^*]*\*+)*\/|\/\/[^\n]*", re.DOTALL
+)
 
 
 class StaticFilesStorage(FileSystemStorage):
@@ -204,7 +210,22 @@ class HashedFilesMixin:
         """
         return self._url(self.stored_name, name, force)
 
-    def url_converter(self, name, hashed_files, template=None):
+    def get_comment_blocks(self, content, include_line_comments=False):
+        """
+        Return a list of (start, end) tuples for each comment block.
+        """
+        pattern = line_comment_re if include_line_comments else comment_re
+        return [(match.start(), match.end()) for match in re.finditer(pattern, content)]
+
+    def is_in_comment(self, pos, comments):
+        for start, end in comments:
+            if start < pos and pos < end:
+                return True
+            if pos < start:
+                return False
+        return False
+
+    def url_converter(self, name, hashed_files, template=None, comment_blocks=None):
         """
         Return the custom URL converter for the given file name.
         """
@@ -221,6 +242,10 @@ class HashedFilesMixin:
             matches = matchobj.groupdict()
             matched = matches["matched"]
             url = matches["url"]
+
+            # Ignore URLs in comments.
+            if comment_blocks and self.is_in_comment(matchobj.start(), comment_blocks):
+                return matched
 
             # Ignore absolute/protocol-relative and data-uri URLs.
             if re.match(r"^[a-z]+:", url) or url.startswith("//"):
@@ -375,7 +400,13 @@ class HashedFilesMixin:
                         if matches_patterns(path, (extension,)):
                             for pattern, template in patterns:
                                 converter = self.url_converter(
-                                    name, hashed_files, template
+                                    name,
+                                    hashed_files,
+                                    template,
+                                    self.get_comment_blocks(
+                                        content,
+                                        include_line_comments=path.endswith(".js"),
+                                    ),
                                 )
                                 try:
                                     content = pattern.sub(converter, content)
