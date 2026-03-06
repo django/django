@@ -277,6 +277,10 @@ Models
 * :meth:`.QuerySet.in_bulk` now supports chaining after
   :meth:`.QuerySet.values` and :meth:`.QuerySet.values_list`.
 
+* :meth:`.QuerySet.select_for_update` with ``of=("self",)`` now locks the
+  queryset's model even when used after :meth:`.QuerySet.values` or
+  :meth:`.QuerySet.values_list` selecting only related model fields.
+
 * The new :class:`~django.db.models.JSONNull` expression provides an explicit
   way to represent the JSON scalar ``null``. It can be used when saving a
   top-level :class:`~django.db.models.JSONField` value, or querying for
