@@ -1117,6 +1117,7 @@ class BaseDatabaseSchemaEditor:
             or (
                 self.connection.features.supports_comments
                 and old_field.db_comment != new_field.db_comment
+                and not self.connection.features.supports_independent_comment_alteration
             )
         ):
             fragment, other_actions = self._alter_column_type_sql(
@@ -1124,6 +1125,15 @@ class BaseDatabaseSchemaEditor:
             )
             actions.append(fragment)
             post_actions.extend(other_actions)
+        elif (
+            self.connection.features.supports_comments
+            and old_field.db_comment != new_field.db_comment
+            and self.connection.features.supports_independent_comment_alteration
+        ):
+            sql, params = self._alter_column_comment_sql(
+                model, new_field, new_type, new_field.db_comment
+            )
+            post_actions.append((sql, params))
 
         if new_field.has_db_default():
             if (
