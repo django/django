@@ -154,7 +154,7 @@ class DistanceTest(TestCase):
         )
         self.assertEqual(["77002", "77025", "77401"], self.get_names(qs))
 
-    @skipUnlessDBFeature("supports_distances_lookups", "supports_distance_geodetic")
+    @skipUnlessDBFeature("supports_distances_lookups", "supports_distance_spheroid")
     def test_geodetic_distance_lookups(self):
         """
         Test distance lookups on geodetic coordinate systems.
@@ -236,7 +236,7 @@ class DistanceTest(TestCase):
             cities = self.get_names(qs)
             self.assertEqual(cities, ["Adelaide", "Hobart", "Shellharbour", "Thirroul"])
 
-    @skipUnlessDBFeature("supports_distances_lookups")
+    @skipUnlessDBFeature("supports_distances_lookups", "supports_distance_spheroid")
     def test_distance_lookups_with_expression_rhs(self):
         stx_pnt = self.stx_pnt.transform(
             SouthTexasCity._meta.get_field("point").srid, clone=True
@@ -320,8 +320,18 @@ class DistanceTest(TestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             AustraliaCity.objects.filter(
-                point__distance_lte=(Point(0, 0), D(m=100))
+                point__dwithin=(Point(0, 0), D(m=100))
             ).exists()
+
+    def test_mysql_radius_distance(self):
+        if not connection.ops.mysql:
+            self.skipTest("This is a MySQL-specific test.")
+        qs = AustraliaCity.objects.filter(point__distance_lte=(Point(0, 0), 0.01))
+        self.assertEqual(qs.count(), 0)
+
+        au_point = Point(151.2093, -33.8688)
+        qs_sydney = AustraliaCity.objects.filter(point__distance_lte=(au_point, 0.5))
+        self.assertEqual(qs_sydney.count(), 2)
 
     @skipUnlessGISLookup("dwithin")
     @skipUnlessDBFeature("has_Transform_function")
@@ -504,6 +514,8 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         """
         Test the `Distance` function on geodetic coordinate systems.
         """
+        if connection.vendor == "mysql":
+            self.skipTest("MySQL's ST_Distance_Sphere doesn't support LineStrings.")
         # Testing geodetic distance calculation with a non-point geometry
         # (a LineString of Wollongong and Shellharbour coords).
         ls = LineString(((150.902, -34.4245), (150.87, -34.5789)), srid=4326)
@@ -540,7 +552,7 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
                 tol = -3 if connection.ops.spatialite else 0
                 self.assertAlmostEqual(distance, city.distance.m, tol)
 
-    @skipUnlessDBFeature("has_Distance_function", "supports_distance_geodetic")
+    @skipUnlessDBFeature("has_Distance_function", "supports_distance_spheroid")
     def test_distance_geodetic_spheroid(self):
         tol = 2 if connection.ops.oracle else 4
 
