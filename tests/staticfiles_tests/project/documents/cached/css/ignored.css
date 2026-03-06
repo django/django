@@ -8,3 +8,24 @@ body {
     background: url();
 }
 
+/* @import url("non_exist.css") */
+
+/* url("non_exist.png") */
+
+/*
+
+@import url("non_exist.css")
+
+url("non_exist.png")
+
+@import url(other.css)
+
+*/
+
+body {
+    background: #d3d6d8 /*url("does.not.exist.png")*/ url(/static/cached/img/relative.png);
+}
+
+body {
+    background: #d3d6d8 /* url("does.not.exist.png") */ url(/static/cached/img/relative.png) /*url("does.not.exist.either.png")*/;
+}
