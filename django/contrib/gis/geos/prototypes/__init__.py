@@ -5,6 +5,7 @@ via ctypes.
 """
 
 from django.contrib.gis.geos.prototypes.coordseq import (  # NOQA
+    coordseq_from_buffer,
     create_cs,
     cs_clone,
     cs_getdims,
