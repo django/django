@@ -16,11 +16,59 @@ from pathlib import Path
 import django
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import LazyObject, empty
+from django.utils.module_loading import import_string
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 DEFAULT_STORAGE_ALIAS = "default"
 STATICFILES_STORAGE_ALIAS = "staticfiles"
+DEFAULT_EMAIL_PROVIDER_ALIAS = "default"
+
+# RemovedInDjango70Warning.
+DEPRECATED_EMAIL_SETTINGS = {
+    "EMAIL_BACKEND",
+    "EMAIL_HOST",
+    "EMAIL_PORT",
+    "EMAIL_HOST_USER",
+    "EMAIL_HOST_PASSWORD",
+    "EMAIL_USE_TLS",
+    "EMAIL_USE_SSL",
+    "EMAIL_SSL_CERTFILE",
+    "EMAIL_SSL_KEYFILE",
+    "EMAIL_TIMEOUT",
+    "EMAIL_FILE_PATH",
+}
+
+
+# RemovedInDjango70Warning.
+def warn_about_deprecated_email_setting(deprecated_setting):
+    assert deprecated_setting in DEPRECATED_EMAIL_SETTINGS
+    if deprecated_setting == "EMAIL_BACKEND":
+        replacement = "EMAIL_PROVIDERS[DEFAULT_EMAIL_PROVIDER_ALIAS]['BACKEND']"
+    elif deprecated_setting == "EMAIL_HOST_USER":
+        replacement = (
+            "EMAIL_PROVIDERS[DEFAULT_EMAIL_PROVIDER_ALIAS]['OPTIONS']['username']"
+        )
+    elif deprecated_setting == "EMAIL_HOST_PASSWORD":
+        replacement = (
+            "EMAIL_PROVIDERS[DEFAULT_EMAIL_PROVIDER_ALIAS]['OPTIONS']['password']"
+        )
+    else:
+        replacement = (
+            "EMAIL_PROVIDERS[DEFAULT_EMAIL_PROVIDER_ALIAS]['OPTIONS']"
+            f"['{deprecated_setting[6:].lower()}']"
+        )
+    warnings.warn(
+        f"{deprecated_setting} is deprecated. Use {replacement} instead.",
+        RemovedInDjango70Warning,
+    )
+
+
+# RemovedInDjango70Warning.
+class EmailImproperlyConfigured(ImproperlyConfigured):
+    def __init__(self, property_name):
+        super().__init__(f"{property_name} and EMAIL_PROVIDERS are mutually exclusive.")
 
 
 class SettingsReference(str):
@@ -74,7 +122,29 @@ class LazySettings(LazyObject):
         if (_wrapped := self._wrapped) is empty:
             self._setup(name)
             _wrapped = self._wrapped
-        val = getattr(_wrapped, name)
+        try:
+            val = getattr(_wrapped, name)
+        except AttributeError:
+            # Special case for EMAIL_* settings. To avoid breaking existing
+            # third-party apps accessing the current Django settings.
+            # RemovedInDjango70Warning.
+            if name == "EMAIL_BACKEND":
+                warnings.warn(
+                    "EMAIL_BACKEND is deprecated. Use "
+                    "EMAIL_PROVIDERS[DEFAULT_EMAIL_PROVIDER_ALIAS]['BACKEND'] instead.",
+                    RemovedInDjango70Warning,
+                )
+                return self.EMAIL_PROVIDERS[DEFAULT_EMAIL_PROVIDER_ALIAS]["BACKEND"]
+            if name in DEPRECATED_EMAIL_SETTINGS:
+                backend = import_string(getattr(self, "EMAIL_BACKEND"))(
+                    provider="default"
+                )
+                if name == "EMAIL_HOST_USER":
+                    return backend.username
+                if name == "EMAIL_HOST_PASSWORD":
+                    return backend.password
+                return getattr(backend, f"{name[6:].lower()}")
+            raise
 
         # Special case some settings which require further modification.
         # This is done here for performance reasons so the modified value is
@@ -182,6 +252,14 @@ class Settings:
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
+        # RemovedInDjango70Warning.
+        is_overridden_EMAIL_PROVIDERS = self.is_overridden("EMAIL_PROVIDERS")
+        for deprecated_setting in DEPRECATED_EMAIL_SETTINGS:
+            if self.is_overridden(deprecated_setting):
+                if is_overridden_EMAIL_PROVIDERS:
+                    raise EmailImproperlyConfigured(deprecated_setting)
+                warn_about_deprecated_email_setting(deprecated_setting)
+
         if hasattr(time, "tzset") and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
             # this file, no check happens and it's harmless.
@@ -226,6 +304,17 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
+
+        # RemovedInDjango70Warning.
+        if name == "EMAIL_PROVIDERS" and any(
+            self.is_overridden(f) for f in DEPRECATED_EMAIL_SETTINGS
+        ):
+            raise EmailImproperlyConfigured(name)
+        if name in DEPRECATED_EMAIL_SETTINGS:
+            if self.is_overridden("EMAIL_PROVIDERS"):
+                raise EmailImproperlyConfigured(name)
+            warn_about_deprecated_email_setting(name)
+
         super().__setattr__(name, value)
 
     def __delattr__(self, name):
