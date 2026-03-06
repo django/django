@@ -164,8 +164,18 @@ In addition, each generated form field has attributes set as follows:
   field has ``blank=False`` and an explicit ``default`` value (the
   ``default`` value will be initially selected instead).
 
+.. note::
+
+    When overriding the form field used for a ``ForeignKey`` in a
+    ``ModelForm``, the custom form field must be able to accept the keyword
+    arguments passed by ``RelatedField.formfield()``. These may include
+    parameters such as ``limit_choices_to``. Custom form fields that don't
+    accept these arguments may raise errors when the form is constructed.
+
 Finally, note that you can override the form field used for a given model
-field. See `Overriding the default fields`_ below.
+field.
+
+See `Overriding the default fields`_ below.
 
 A full example
 --------------
