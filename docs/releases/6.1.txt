@@ -193,7 +193,12 @@ Minor features
 Asynchronous views
 ~~~~~~~~~~~~~~~~~~
 
-* ...
+* :class:`~django.http.StreamingAcmgrHttpResponse` now supports async context
+  managers that yield async iterables, enabling safe use of structured
+  concurrency with task groups (``asyncio.TaskGroup`` or
+  ``anyio.create_task_group()``). This allows combining multiple concurrent
+  data streams while ensuring proper cleanup and cancellation handling. See
+  :ref:`streaming-with-taskgroups` for details.
 
 Cache
 ~~~~~

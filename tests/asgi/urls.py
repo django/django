@@ -1,8 +1,14 @@
 import asyncio
+import contextlib
 import threading
 import time
 
-from django.http import FileResponse, HttpResponse, StreamingHttpResponse
+from django.http import (
+    FileResponse,
+    HttpResponse,
+    StreamingAcmgrHttpResponse,
+    StreamingHttpResponse,
+)
 from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
 
@@ -62,6 +68,38 @@ async def streaming_view(request):
     return StreamingHttpResponse(streaming_inner(sleep_time))
 
 
+@contextlib.asynccontextmanager
+async def streaming_acmgr_inner(sleep_time):
+    eof = object()
+    q = asyncio.Queue(0)
+
+    async def push():
+        await q.put(b"first\n")
+        await asyncio.sleep(sleep_time)
+        await q.put(b"last\n")
+        await q.put(eof)
+
+    async def agen():
+        while True:
+            v = await q.get()
+            if v is eof:
+                return
+            yield v
+
+    async with asyncio.TaskGroup() as tg:
+        tg.create_task(push())
+        yield agen()
+
+
+async def streaming_acmgr_view(request):
+    sleep_time = float(request.GET["sleep"])
+    return StreamingAcmgrHttpResponse(streaming_acmgr_inner(sleep_time))
+
+
+async def streaming_noop_acmgr_view(request):
+    return StreamingAcmgrHttpResponse()
+
+
 test_filename = __file__
 
 
@@ -74,4 +112,6 @@ urlpatterns = [
     path("wait/", sync_waiter),
     path("delayed_hello/", hello_with_delay),
     path("streaming/", streaming_view),
+    path("streaming_acmgr/", streaming_acmgr_view),
+    path("streaming_noop_acmgr/", streaming_noop_acmgr_view),
 ]
