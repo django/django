@@ -964,7 +964,10 @@ class FormsMediaObjectTestCase(SimpleTestCase):
     def test_form_media_render_with_csp_nonce__no_autoescape(self):
         class MyWidget(TextInput):
             class Media:
-                css = {"all": (CSS("/path/to/style.css", media="all"),)}
+                css = {
+                    "all": [CSS("/path/to/style.css", media="all")],
+                    "print": ["relative/path/to/print.css"],
+                }
                 js = (
                     "/path/to/app.js",
                     Script(
@@ -984,6 +987,8 @@ class FormsMediaObjectTestCase(SimpleTestCase):
             ),
             '<link href="/path/to/style.css" media="all" nonce="testNonce123"'
             ' rel="stylesheet">\n'
+            '<link href="http://media.example.com/static/relative/path/to/print.css"'
+            ' media="print" nonce="testNonce123" rel="stylesheet">\n'
             '<script src="/path/to/app.js" nonce="testNonce123"></script>\n'
             '<script src="/path/to/analytics.js"'
             ' integrity="9d947b87fdeb25030d56d01f7aa75800"'

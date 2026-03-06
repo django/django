@@ -1123,8 +1123,8 @@ class TextNode(Node):
 class NonceRenderable:
     """An object that can render itself with a CSP nonce."""
 
-    def render(self, *, nonce=None) -> str:
-        return NotImplemented
+    def render(self, *, nonce=None):
+        """Return HTML-safe string."""
 
 
 def render_value_in_context(value, context):
