@@ -1,0 +1,129 @@
+===================
+User profile models
+===================
+
+Overview
+--------
+
+Django's default :class:`~django.contrib.auth.models.User` model provides
+basic fields for authentication and authorization, but many applications need
+to store additional user information. A common pattern is to create a profile
+model with a :class:`~django.db.models.OneToOneField` to the user model.
+
+This approach keeps your authentication model simple while allowing you to
+store app-specific user data in a separate model. For cases requiring changes
+to authentication fields, a :ref:`custom user model <auth-custom-user>` may be
+more appropriate.
+
+Defining a profile model
+------------------------
+
+To define a profile model, create a model with a
+:class:`~django.db.models.OneToOneField` to :setting:`AUTH_USER_MODEL`:
+
+.. code-block:: python
+
+    from django.conf import settings
+    from django.db import models
+
+
+    class Profile(models.Model):
+        user = models.OneToOneField(
+            settings.AUTH_USER_MODEL,
+            on_delete=models.CASCADE,
+        )
+        display_name = models.CharField(max_length=100, blank=True)
+        avatar = models.ImageField(upload_to="avatars/", blank=True)
+        bio = models.TextField(max_length=500, blank=True)
+        birth_date = models.DateField(null=True, blank=True)
+
+        def __str__(self):
+            return self.display_name
+
+The :attr:`~django.db.models.ForeignKey.on_delete` parameter determines what
+happens to the profile when the user is deleted. Using ``models.CASCADE``
+ensures the profile is deleted when the user is deleted.
+
+Ignoring first_name and last_name
+----------------------------------
+
+The default :class:`~django.contrib.auth.models.User` model includes
+``first_name`` and ``last_name`` fields, but these fields may not be suitable
+for all applications or naming conventions.
+
+It's acceptable to ignore these fields and store name-related data in your
+profile model instead. For example, you might add a ``display_name`` field:
+
+.. code-block:: python
+
+    class Profile(models.Model):
+        user = models.OneToOneField(
+            settings.AUTH_USER_MODEL,
+            on_delete=models.CASCADE,
+        )
+        display_name = models.CharField(max_length=100)
+
+This provides flexibility for users to specify how they want their name
+displayed.
+
+Creating profile instances
+--------------------------
+
+Profile instances are often created when a user is created. The most reliable
+way to do this is with a :data:`~django.db.models.signals.post_save` signal:
+
+.. code-block:: python
+
+    from django.conf import settings
+    from django.db.models.signals import post_save
+    from django.dispatch import receiver
+
+
+    @receiver(post_save, sender=settings.AUTH_USER_MODEL)
+    def create_user_profile(sender, instance, created, **kwargs):
+        if created:
+            Profile.objects.create(user=instance)
+
+Signal receivers are commonly defined in a ``signals`` module and imported in
+the :meth:`AppConfig.ready() <django.apps.AppConfig.ready>` method.
+
+Alternatively, you can create profile instances manually using
+``Profile.objects.get_or_create()`` in views, or by using admin inlines to
+allow profile editing alongside the user in the admin interface.
+
+Accessing profile data
+----------------------
+
+Once created, you can access profile data through the reverse relation:
+
+.. code-block:: python
+
+    from django.contrib.auth import get_user_model
+
+    User = get_user_model()
+    user = User.objects.get(username="john")
+    display_name = user.profile.display_name
+
+In templates, you can access profile attributes directly:
+
+.. code-block:: html+django
+
+    <p>Welcome, {{ user.profile.display_name }}!</p>
+
+Caching profile fragments
+--------------------------
+
+If you frequently display profile information, consider caching template
+fragments to reduce database queries:
+
+.. code-block:: html+django
+
+    {% load cache %}
+    {% cache 600 user_profile user.id %}
+        <div class="profile">
+            <h2>{{ user.profile.display_name }}</h2>
+            <p>{{ user.profile.bio }}</p>
+        </div>
+    {% endcache %}
+
+The cache is keyed by the user ID and expires after 600 seconds (10 minutes).
