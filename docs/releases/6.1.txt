@@ -401,6 +401,8 @@ backends.
 
 * The ``wide`` class is removed, as it was made obsolete by the new layout.
 
+* The ``object-tools`` block is hoisted out of the ``content`` block in forms.
+
 :mod:`django.contrib.gis`
 -------------------------
 

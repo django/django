@@ -36,6 +36,29 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+March 3, 2026 - :cve:`2026-25673`
+---------------------------------
+
+Potential denial-of-service vulnerability in ``URLField`` via Unicode
+normalization on Windows.
+`Full description
+<https://www.djangoproject.com/weblog/2026/mar/03/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <b1444d9acf43db9de96e0da2b4737ad56af0eb76>`
+* Django 5.2 :commit:`(patch) <4d3c184686626d224d9a87451410ecf802b41f7c>`
+* Django 4.2 :commit:`(patch) <b3e8ec8cc310489fe80174b14b11edb970d682ea>`
+
+March 3, 2026 - :cve:`2026-25674`
+---------------------------------
+
+Potential incorrect permissions on newly created file system objects.
+`Full description
+<https://www.djangoproject.com/weblog/2026/mar/03/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <264d5c70ef3281a8869cb2ad45a3a52d5adbe790>`
+* Django 5.2 :commit:`(patch) <b07ed2a1e445efde54fc64cb8c37e0f4f7fe53e5>`
+* Django 4.2 :commit:`(patch) <54b50bf7d6dcbf02d4c01f853627cc9299d4934d>`
+
 February 3, 2026 - :cve:`2025-13473`
 ------------------------------------
 

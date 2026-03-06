@@ -1233,6 +1233,30 @@ class Value(Expression):
         return self.value
 
 
+@deconstructible(path="django.db.models.JSONNull")
+class JSONNull(Value):
+    """Represent JSON `null` primitive."""
+
+    def __init__(self):
+        from django.db.models import JSONField
+
+        super().__init__(None, output_field=JSONField())
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}()"
+
+    def as_sql(self, compiler, connection):
+        value = self.output_field.get_db_prep_value(self.value, connection)
+        if value is None:
+            value = "null"
+        return "%s", (value,)
+
+    def as_mysql(self, compiler, connection):
+        sql, params = self.as_sql(compiler, connection)
+        sql = "JSON_EXTRACT(%s, '$')"
+        return sql, params
+
+
 class RawSQL(Expression):
     allowed_default = True
 

@@ -18,6 +18,11 @@
     vertical-align: 0;
 }
 
+.form-row select option:checked {
+    background-color: var(--selected-row);
+    color: var(--body-fg);
+}
+
 form .form-row p {
     padding-left: 0;
 }
@@ -147,11 +152,6 @@ form .aligned p.help:last-child,
 form .aligned div.help:last-child {
     margin-bottom: 0;
     padding-bottom: 0;
-}
-
-form .aligned select option:checked {
-    background-color: var(--selected-row);
-    color: var(--body-fg);
 }
 
 form .aligned ul li {

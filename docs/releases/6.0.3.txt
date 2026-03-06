@@ -7,6 +7,43 @@ Django 6.0.3 release notes
 Django 6.0.3 fixes a security issue with severity "moderate", a security issue
 with severity "low", and several bugs in 6.0.2.
 
+CVE-2026-25673: Potential denial-of-service vulnerability in ``URLField`` via Unicode normalization on Windows
+==============================================================================================================
+
+The :class:`~django.forms.URLField` form field's ``to_python()`` method used
+:func:`~urllib.parse.urlsplit` to determine whether to prepend a URL scheme to
+the submitted value. On Windows, ``urlsplit()`` performs
+:func:`NFKC normalization <python:unicodedata.normalize>`, which can be
+disproportionately slow for large inputs containing certain characters.
+
+``URLField.to_python()`` now uses a simplified scheme detection, avoiding
+Unicode normalization entirely and deferring URL validation to the appropriate
+layers. As a result, while leading and trailing whitespace is still stripped by
+default, characters such as newlines, tabs, and other control characters within
+the value are no longer handled by ``URLField.to_python()``. When using the
+default :class:`~django.core.validators.URLValidator`, these values will
+continue to raise :exc:`~django.core.exceptions.ValidationError` during
+validation, but if you rely on custom validators, ensure they do not depend on
+the previous behavior of ``URLField.to_python()``.
+
+This issue has severity "moderate" according to the :ref:`Django security
+policy <security-disclosure>`.
+
+CVE-2026-25674: Potential incorrect permissions on newly created file system objects
+====================================================================================
+
+Django's file-system storage and file-based cache backends used the process
+``umask`` to control permissions when creating directories. In multi-threaded
+environments, one thread's temporary umask change can affect other threads'
+file and directory creation, resulting in file system objects being created
+with unintended permissions.
+
+Django now applies the requested permissions via :func:`~os.chmod` after
+:func:`~os.mkdir`, removing the dependency on the process-wide umask.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<security-disclosure>`.
+
 Bugfixes
 ========
 
@@ -16,6 +53,9 @@ Bugfixes
 * Fixed :exc:`AttributeError` when subclassing builtin lookups and neglecting
   to :ref:`override<tuple-for-params>` ``as_sql()`` to accept any sequence
   (:ticket:`36934`).
+
+* Fixed :exc:`TypeError` when deprecation warnings are emitted in environments
+  importing Django by namespace (:ticket:`36961`).
 
 * Fixed a visual regression where fieldset legends were misaligned in the admin
   (:ticket:`36920`).
