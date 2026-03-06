@@ -25,7 +25,7 @@ class MediaAssetTestCase(SimpleTestCase):
         self.assertNotEqual(MediaAsset("path/to/css"), MediaAsset("path/to/other.css"))
         self.assertNotEqual(MediaAsset("path/to/css"), "path/to/other.css")
         self.assertNotEqual(
-            MediaAsset("path/to/css", media="all"), CSS("path/to/css", "all")
+            MediaAsset("path/to/css", media="all"), CSS("path/to/css", media="all")
         )
 
     def test_hash(self):
@@ -960,14 +960,34 @@ class FormsMediaObjectTestCase(SimpleTestCase):
             ' integrity="9d947b87fdeb25030d56d01f7aa75800"'
             ' nonce="testNonce123"></script>',
         )
+
+    def test_form_media_render_with_csp_nonce__no_autoescape(self):
+        class MyWidget(TextInput):
+            class Media:
+                css = {"all": (CSS("/path/to/style.css", media="all"),)}
+                js = (
+                    "/path/to/app.js",
+                    Script(
+                        "/path/to/analytics.js",
+                        integrity="9d947b87fdeb25030d56d01f7aa75800",
+                    ),
+                )
+
+        class MyForm(Form):
+            field = CharField(widget=MyWidget())
+
+        form = MyForm()
+        context = Context({"form": form, "csp_nonce": "testNonce123"})
         self.assertHTMLEqual(
-            Template("{{ form.media }}").render(Context({"form": form})),
-            '<link href="/path/to/style.css" media="all"'
+            Template("{% autoescape off %}{{ form.media }}{% endautoescape %}").render(
+                context
+            ),
+            '<link href="/path/to/style.css" media="all" nonce="testNonce123"'
             ' rel="stylesheet">\n'
-            '<script src="/path/to/app.js"></script>\n'
+            '<script src="/path/to/app.js" nonce="testNonce123"></script>\n'
             '<script src="/path/to/analytics.js"'
             ' integrity="9d947b87fdeb25030d56d01f7aa75800"'
-            "></script>",
+            ' nonce="testNonce123"></script>',
         )
 
     def test_form_media_render_with_csp_nonce_none(self):

@@ -117,8 +117,8 @@ class Script(MediaAsset):
 class CSS(MediaAsset):
     element_template = '<link href="{path}"{attributes}>'
 
-    def __init__(self, href, media, **attributes):
-        super().__init__(href, media=media, rel="stylesheet", **attributes)
+    def __init__(self, href, *, media, **attributes):
+        super().__init__(href, **{"media": media, "rel": "stylesheet"} | attributes)
 
 
 @html_safe
@@ -163,38 +163,35 @@ class Media(NonceRenderable):
         )
 
     def render_js(self, *, nonce=None):
-        return [
+        for path in (
             (
-                path.render(nonce=nonce)
-                if isinstance(path, MediaAsset)
-                else (
-                    path.__html__()
-                    if hasattr(path, "__html__")
-                    else Script(path).render(nonce=nonce)
-                )
+                path
+                if isinstance(path, MediaAsset) or hasattr(path, "__html__")
+                else Script(path)
             )
             for path in self._js
-        ]
+        ):
+            try:
+                yield path.render(nonce=nonce)
+            except AttributeError:
+                yield path.__html__()
 
     def render_css(self, *, nonce=None):
         # To keep rendering order consistent, we can't just iterate over
         # items(). We need to sort the keys, and iterate over the sorted list.
-        media = sorted(self._css)
-        return chain.from_iterable(
-            [
-                (
-                    path.render(nonce=nonce)
-                    if isinstance(path, MediaAsset)
-                    else (
-                        path.__html__()
-                        if hasattr(path, "__html__")
-                        else CSS(path, medium).render(nonce=nonce)
-                    )
-                )
-                for path in self._css[medium]
-            ]
-            for medium in media
-        )
+        for path in (
+            (
+                path
+                if isinstance(path, MediaAsset) or hasattr(path, "__html__")
+                else CSS(path, media=medium)
+            )
+            for medium in sorted(self._css)
+            for path in self._css[medium]
+        ):
+            try:
+                yield path.render(nonce=nonce)
+            except AttributeError:
+                yield path.__html__()
 
     def absolute_path(self, path):
         """

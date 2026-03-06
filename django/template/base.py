@@ -1142,6 +1142,8 @@ def render_value_in_context(value, context):
             value = str(value)
         return conditional_escape(value)
     else:
+        if isinstance(value, NonceRenderable):
+            return value.render(nonce=context.get("csp_nonce"))
         return str(value)
 
 
