@@ -345,7 +345,8 @@ Signals
 Tasks
 ~~~~~
 
-* ...
+* :class:`~django.tasks.Task` and :class:`~django.tasks.TaskResult` instances
+  can now be pickled and unpickled.
 
 Templates
 ~~~~~~~~~
