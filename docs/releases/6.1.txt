@@ -203,7 +203,11 @@ Cache
 CSP
 ~~~
 
-* ...
+* :class:`~django.forms.Script` objects and string-based JS/CSS paths in
+  :doc:`Media </topics/forms/media>` now support CSP nonce injection when the
+  :func:`~django.template.context_processors.csp` context processor is enabled
+  and ``csp_nonce`` is present in the template context. See
+  :ref:`csp-form-media-nonce` for details.
 
 CSRF
 ~~~~
