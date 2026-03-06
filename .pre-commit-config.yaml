@@ -13,7 +13,7 @@ repos:
         files: 'docs/.*\.txt$'
         args: ["--rst-literal-block"]
   - repo: https://github.com/PyCQA/isort
-    rev: 7.0.0
+    rev: 8.0.1
     hooks:
       - id: isort
   - repo: https://github.com/PyCQA/flake8
@@ -21,10 +21,10 @@ repos:
     hooks:
       - id: flake8
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.39.1
+    rev: v10.0.2
     hooks:
       - id: eslint
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: v1.19.0
+    rev: v1.22.0
     hooks:
     - id: zizmor
