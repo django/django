@@ -172,8 +172,8 @@ Now, our ``my_receiver`` function will be called each time a request finishes.
 
     The :meth:`~django.apps.AppConfig.ready` method may be executed more than
     once during testing, so you may want to :ref:`guard your signals from
-    duplication <preventing-duplicate-signals>`, especially if you're planning
-    to send them within tests.
+    duplication <preventing-duplicate-signals>` if your receiver is a bound
+    method on an instance that may be recreated.
 
 .. _connecting-to-specific-signals:
 
@@ -211,20 +211,31 @@ each particular signal.
 Preventing duplicate signals
 ----------------------------
 
-In some circumstances, the code connecting receivers to signals may run
-multiple times. This can cause your receiver function to be registered more
-than once, and thus called as many times for a signal event. For example, the
-:meth:`~django.apps.AppConfig.ready` method may be executed more than once
-during testing. More generally, this occurs everywhere your project imports the
-module where you define the signals, because signal registration runs as many
-times as it is imported.
+When ``dispatch_uid`` is not provided, Django identifies each receiver using
+its Python object identity, and silently skips it if it has already been
+registered. For module-level functions, static methods, and class methods, the
+identity is stable, so connecting the same receiver more than once has no
+effect::
 
-If this behavior is problematic (such as when using signals to
-send an email whenever a model is saved), pass a unique identifier as
-the ``dispatch_uid`` argument to identify your receiver function. This
-identifier will usually be a string, although any hashable object will
-suffice. The end result is that your receiver function will only be
-bound to the signal once for each unique ``dispatch_uid`` value::
+    def my_handler(sender, **kwargs): ...
+
+
+    # my_handler is only registered once, even if this line runs again.
+    my_signal.connect(my_handler)
+
+Bound methods are different: accessing ``self.method`` creates a new object
+each time. If the connection code creates a new instance on each execution,
+Django sees each bound method as a distinct receiver and registers it again::
+
+    class MyAppConfig(AppConfig):
+        def ready(self):
+            handler = MyHandler()  # New instance each time.
+            my_signal.connect(handler.on_signal)  # Duplicate registration.
+
+In cases like this, pass a unique ``dispatch_uid`` to identify the receiver
+explicitly. This identifier will usually be a string, although any hashable
+object will suffice. The receiver will only be bound to the signal once for
+each unique ``dispatch_uid`` value::
 
     from django.core.signals import request_finished
 
