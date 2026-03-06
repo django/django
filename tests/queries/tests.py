@@ -1859,6 +1859,7 @@ class Queries5Tests(TestCase):
             [self.rank1, self.rank2, self.rank3],
         )
 
+    def test_ordering_with_extra(self):
         # Ordering of extra() pieces is possible, too and you can mix extra
         # fields and model fields in the ordering.
         self.assertSequenceEqual(
