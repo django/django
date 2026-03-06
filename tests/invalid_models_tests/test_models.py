@@ -3123,3 +3123,16 @@ class RelatedFieldTests(SimpleTestCase):
             artist = models.ForeignKey(Artist, models.DB_CASCADE)
 
         self.assertEqual(Song.check(databases=self.databases), [])
+
+@isolate_apps("invalid_models_tests")
+class ManagerConflictTests(SimpleTestCase):
+    def test_related_name_manager_conflict(self):
+        class Author(models.Model):
+            book_set = models.Manager()
+
+        class Book(models.Model):
+            author = models.ForeignKey(Author, on_delete=models.CASCADE)
+
+        errors = Author.check()
+
+        self.assertTrue(any(e.id == "fields.E348" for e in errors))
