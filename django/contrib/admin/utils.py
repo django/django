@@ -371,7 +371,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False, form=None)
     except FieldDoesNotExist:
         if name == "__str__":
             label = str(model._meta.verbose_name)
-            attr = str
+            attr = model.__str__
         else:
             if callable(name):
                 attr = name
