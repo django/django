@@ -307,7 +307,7 @@ the :meth:`~BaseCommand.handle` method must be implemented.
     It may return a string which will be printed to ``stdout`` (wrapped
     by ``BEGIN;`` and ``COMMIT;`` if :attr:`output_transaction` is ``True``).
 
-.. method:: BaseCommand.check(app_configs=None, tags=None,display_num_errors=False, include_deployment_checks=False, fail_level=checks.ERROR, databases=None)
+.. method:: BaseCommand.check(app_configs=None, tags=None, display_num_errors=False, include_deployment_checks=False, fail_level=checks.ERROR, databases=None)
 
     Uses the system check framework to inspect the entire Django project for
     potential problems. Serious problems are raised as a :exc:`CommandError`;
