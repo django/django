@@ -815,13 +815,42 @@ Model formsets
 
 Like :doc:`regular formsets </topics/forms/formsets>`, Django provides a couple
 of enhanced formset classes to make working with Django models more
-convenient. Let's reuse the ``Author`` model from above:
+convenient. To create a model formset out of the ``Author`` model from above,
+you have two options:
+
+Method 1: Using ``modelformset_factory``
+----------------------------------------
 
 .. code-block:: pycon
 
     >>> from django.forms import modelformset_factory
     >>> from myapp.models import Author
     >>> AuthorFormSet = modelformset_factory(Author, fields=["name", "title"])
+
+
+Method 2: Using ``ModelFormSet`` class
+--------------------------------------
+
+.. code-block:: pycon
+
+    >>> from django.forms import models
+    >>> from myapp.models import Author
+    >>> class AuthorFormSet(models.ModelFormSet):
+    ...     model = Author
+    ...     fields = ("name", "title")
+    ...
+
+Using the declarative syntax, you're able to define the formset directly as a
+class, similar to how you declare models.
+
+.. note::
+
+    When creating model formsets, you have the flexibility to customize their
+    behavior by overriding methods. This can be done on either
+    ``BaseModelFormSet`` or ``ModelFormSet``, depending on the method you
+    choose to use. It's important to note that both approaches end up giving
+    you the same end results.
+
 
 Using ``fields`` restricts the formset to use only the given fields.
 Alternatively, you can take an "opt-out" approach, specifying which fields to
@@ -1265,7 +1294,10 @@ you have these two models::
         title = models.CharField(max_length=100)
 
 If you want to create a formset that allows you to edit books belonging to
-a particular author, you could do this:
+a particular author, you have two options:
+
+Method 1: Using ``inlineformset_factory``
+-----------------------------------------
 
 .. code-block:: pycon
 
@@ -1273,6 +1305,32 @@ a particular author, you could do this:
     >>> BookFormSet = inlineformset_factory(Author, Book, fields=["title"])
     >>> author = Author.objects.get(name="Mike Royko")
     >>> formset = BookFormSet(instance=author)
+
+Method 2: Using ``InlineFormSet`` class
+---------------------------------------
+
+.. code-block:: pycon
+
+    >>> from django.forms import models
+    >>> class BookFormSet(models.InlineFormSet):
+    ...     parent_model = Author
+    ...     model = Book
+    ...     fields = ("title",)
+    ...
+    >>> author = Author.objects.get(name="Mike Royko")
+    >>> formset = BookFormSet(instance=author)
+
+Using the declarative syntax, you're able to define the formset directly as a
+class, similar to how you declare models.
+
+.. note::
+
+    When creating inline formsets, you have the flexibility to customize
+    their behavior by overriding methods. This can be done on either
+    ``BaseInlineFormSet`` or ``InlineFormSet``, depending on the method you
+    choose to use. It's important to note that both approaches end up giving
+    you the same end results.
+
 
 ``BookFormSet``'s :ref:`prefix <formset-prefix>` is ``'book_set'``
 (``<model name>_set`` ). If ``Book``'s ``ForeignKey`` to ``Author`` has a
