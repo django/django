@@ -28,11 +28,17 @@ Next, clone your fork, install some requirements, and run the tests:
 
 .. console::
 
-   $ git clone https://github.com/YourGitHubName/django.git django-repo
+   $ git clone https://github.com/srimajaya123-blip/django.git django-repo
    $ cd django-repo/tests
    $ python -m pip install -e ..
    $ python -m pip install -r requirements/py3.txt
    $ ./runtests.py
+
+Windows users can run the equivalent command:
+
+.. code-block:: doscon
+
+   ...\> python runtests.py
 
 Installing the requirements will likely require some operating system packages
 that your computer doesn't have installed. You can usually figure out which
