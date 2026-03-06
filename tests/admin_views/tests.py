@@ -2869,7 +2869,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, "<label>Extra form field:</label>")
         self.assertContains(
             response,
-            '<a role="button" href="/test_admin/admin/admin_views/article/" '
+            '<a href="/test_admin/admin/admin_views/article/" '
             'class="closelink">Close</a>',
         )
         self.assertEqual(response.context["title"], "View article")
@@ -3024,7 +3024,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, "<h1>View article</h1>")
         self.assertContains(
             response,
-            '<a role="button" href="/test_admin/admin9/admin_views/article/" '
+            '<a href="/test_admin/admin9/admin_views/article/" '
             'class="closelink">Close</a>',
         )
 
@@ -6271,9 +6271,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(num_initial_select2_inputs, 4)
 
         # Add an inline
-        self.selenium.find_elements(By.LINK_TEXT, "Add another Related prepopulated")[
-            0
-        ].click()
+        self.selenium.find_elements(
+            By.XPATH, "//button[contains(text(), 'Add another Related prepopulated')]"
+        )[0].click()
         self.assertEqual(
             len(self.selenium.find_elements(By.CLASS_NAME, "select2-selection")),
             num_initial_select2_inputs + 2,
@@ -6334,7 +6334,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         # Add an inline
         # Button may be outside the browser frame.
         element = self.selenium.find_elements(
-            By.LINK_TEXT, "Add another Related prepopulated"
+            By.XPATH, "//button[contains(text(), 'Add another Related prepopulated')]"
         )[1]
         self.selenium.execute_script("window.scrollTo(0, %s);" % element.location["y"])
         element.click()
@@ -6365,9 +6365,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         # Add an inline without an initial inline.
         # The button is outside of the browser frame.
         self.selenium.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        self.selenium.find_elements(By.LINK_TEXT, "Add another Related prepopulated")[
-            2
-        ].click()
+        self.selenium.find_elements(
+            By.XPATH, "//button[contains(text(), 'Add another Related prepopulated')]"
+        )[2].click()
         self.assertEqual(
             len(self.selenium.find_elements(By.CLASS_NAME, "select2-selection")),
             num_initial_select2_inputs + 6,
@@ -6392,12 +6392,10 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(slug1, "stacked-inline-2011-12-12")
         self.assertEqual(slug2, "option-one")
         # Add inline.
-        add_link = self.selenium.find_elements(
-            By.LINK_TEXT,
-            "Add another Related prepopulated",
-        )[3]
-        self.selenium.execute_script("arguments[0].scrollIntoView();", add_link)
-        add_link.click()
+        self.selenium.find_elements(
+            By.XPATH,
+            "//button[contains(text(), 'Add another Related prepopulated')]",
+        )[3].click()
         row_id = "id_relatedprepopulated_set-4-1-"
         self.selenium.find_element(By.ID, f"{row_id}pubdate").send_keys("1999-01-20")
         status = self.selenium.find_element(By.ID, f"{row_id}status")
@@ -8914,7 +8912,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         # Check the delete link.
         delete_link = re.search(
-            '<a role="button" href="(.*?)" class="deletelink">Delete</a>', response.text
+            '<a href="(.*?)" class="deletelink">Delete</a>', response.text
         )
         self.assertURLEqual(delete_link[1], self.get_delete_url())
 
@@ -8954,7 +8952,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         self.client.force_login(viewuser)
         response = self.client.get(self.get_change_url())
         close_link = re.search(
-            '<a role="button" href="(.*?)" class="closelink">Close</a>', response.text
+            '<a href="(.*?)" class="closelink">Close</a>', response.text
         )
         close_link = close_link[1].replace("&amp;", "&")
         self.assertURLEqual(close_link, self.get_changelist_url())

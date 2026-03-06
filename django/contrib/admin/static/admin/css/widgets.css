@@ -461,7 +461,7 @@ span.clearable-file-input label {
     border-bottom: none;
 }
 
-.calendar td.selected a {
+.calendar td.selected button {
     background: var(--secondary);
     color: var(--button-fg);
 }
@@ -470,25 +470,30 @@ span.clearable-file-input label {
     background: var(--darkened-bg);
 }
 
-.calendar td.today a {
+.calendar td.today button {
     font-weight: 700;
 }
 
-.calendar td a, .timelist a {
+.calendar td button, .timelist button {
     display: block;
+    width: 100%;
+    height: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
     font-weight: 400;
     padding: 6px;
     text-decoration: none;
     color: var(--body-quiet-color);
 }
 
-.calendar td a:focus, .timelist a:focus,
-.calendar td a:hover, .timelist a:hover {
+.calendar td button:focus, .timelist button:focus,
+.calendar td button:hover, .timelist button:hover {
     background: var(--primary);
     color: white;
 }
 
-.calendar td a:active, .timelist a:active {
+.calendar td button:active, .timelist button:active {
     background: var(--header-bg);
     color: white;
 }
@@ -518,6 +523,8 @@ span.clearable-file-input label {
 .calendarbox .calendarnav-previous, .calendarbox .calendarnav-next {
     display: block;
     position: absolute;
+    border: none;
+    cursor: pointer;
     top: 8px;
     width: 15px;
     height: 15px;
@@ -537,7 +544,6 @@ span.clearable-file-input label {
 
 .calendar-cancel {
     margin: 0;
-    padding: 4px 0;
     font-size: 0.75rem;
     background: var(--close-button-bg);
     border-top: 1px solid var(--border-color);
@@ -548,9 +554,30 @@ span.clearable-file-input label {
     background: var(--close-button-hover-bg);
 }
 
-.calendar-cancel a {
+.calendar-cancel button[type="button"] {
     color: var(--button-fg);
+    padding: 4px 0;
+    width: 100%;
+    height: 100%;
     display: block;
+    background: none;
+    border: none;
+}
+
+.datetimeshortcuts button,
+.calendar-shortcuts button,
+.calendar-cancel button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--link-fg);
+}
+
+.datetimeshortcuts button:hover,
+.datetimeshortcuts button:focus,
+.calendar-shortcuts button:hover,
+.calendar-shortcuts button:focus {
+    color: var(--link-hover-color);
 }
 
 ul.timelist, .timelist li {
