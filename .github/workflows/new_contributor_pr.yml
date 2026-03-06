@@ -32,6 +32,14 @@ jobs:
 
             If you're fixing a ticket [from Trac](https://code.djangoproject.com/) make sure to set the _"Has patch"_ flag and include a link to this PR in the ticket!
 
-            If you have any design or process questions then you can ask in the [Django forum](https://forum.djangoproject.com/c/internals/5).
+            If you have any design or process questions then you can ask in the [Django forum](https://forum.djangoproject.com/c/internals/5). You may also get help on the [Django Discord](https://chat.djangoproject.com) server's #contributing-getting-started channel.
 
             Welcome aboard ⛵️!
+
+            ---
+
+            Please be aware that Django is a volunteer-driven project and the [queue of PRs](https://dashboard.djangoproject.com/#:~:text=Patches) is long. This means feedback can take weeks or months. In the meantime, there are other impactful ways to contribute beyond this repository:
+
+            - [Review other open PRs](https://code.djangoproject.com/query?status=!closed&needs_better_patch=0&needs_tests=0&needs_docs=0&has_patch=1&stage=Accepted&desc=1&order=changetime)
+            - Contribute to packages in the [Django ecosystem](https://www.djangoproject.com/community/ecosystem/)
+            - Explore [other opportunities to contribute](https://djangonaut.space/contribute/opportunities/) to the Django community.
