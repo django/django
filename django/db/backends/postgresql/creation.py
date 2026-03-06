@@ -7,6 +7,15 @@ from django.db.backends.utils import strip_quotes
 
 
 class DatabaseCreation(BaseDatabaseCreation):
+    def _get_test_db_name(self):
+        if (
+            not self.connection.settings_dict["NAME"]
+            and (service := self.connection.settings_dict["OPTIONS"].get("service"))
+            and not self.connection.settings_dict["TEST"]["NAME"]
+        ):
+            return "test_" + service
+        return super()._get_test_db_name()
+
     def _quote_name(self, name):
         return self.connection.ops.quote_name(name)
 
