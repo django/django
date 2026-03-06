@@ -342,6 +342,18 @@ def parse_header_parameters(line, max_length=MAX_HEADER_LENGTH):
     if max_length is not None and len(line) > max_length:
         raise ValueError("Unable to parse header parameters (value too long).")
 
+    if ";" not in line:
+        return line.strip().lower(), {}
+
+    if '"' not in line and "*" not in line and "\\" not in line:
+        key, *parts = line.split(";")
+        pdict = {}
+        for p in parts:
+            name, sep, value = p.partition("=")
+            if sep and (name := name.strip()):
+                pdict[name.lower()] = value.strip()
+        return key.strip().lower(), pdict
+
     parts = _parseparam(";" + line)
     key = parts.__next__().lower()
     pdict = {}
