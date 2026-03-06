@@ -683,10 +683,10 @@ class ForeignObject(RelatedField):
 
         if not has_unique_constraint:
             if len(self.foreign_related_fields) > 1:
-                field_combination = ", ".join(
+                field_combination=", ".join(
                     f"'{rel_field.name}'" for rel_field in self.foreign_related_fields
                 )
-                model_name = self.remote_field.model.__name__
+                model_name=self.remote_field.model.__name__
                 return [
                     checks.Error(
                         f"No subset of the fields {field_combination} on model "
@@ -702,8 +702,8 @@ class ForeignObject(RelatedField):
                     )
                 ]
             else:
-                field_name = self.foreign_related_fields[0].name
-                model_name = self.remote_field.model.__name__
+                field_name=self.foreign_related_fields[0].name
+                model_name=self.remote_field.model.__name__
                 return [
                     checks.Error(
                         f"'{model_name}.{field_name}' must be unique because it is "
@@ -721,14 +721,26 @@ class ForeignObject(RelatedField):
 
     def _check_conflict_with_managers(self):
         errors = []
-        manager_names = {manager.name for manager in self.opts.managers}
-        for rel_objs in self.model._meta.related_objects:
-            related_object_name = rel_objs.name
-            if related_object_name in manager_names:
-                field_name = f"{self.model._meta.object_name}.{self.name}"
+        # Skip nonexistent models.
+        if isinstance(self.remote_field.model, str):
+            return []
+        
+        # Get the target model where the reverse relation will be created
+        target_model=self.remote_field.model
+        
+        # Only check if this is NOT a self-referential relationship
+        # (self-referential cases are handled by the model-level check)
+        if target_model._meta.label!=self.model._meta.label:
+            manager_names={manager.name for manager in target_model._meta.managers}
+            
+            # Get the related name that will be used for the reverse relation
+            related_name=self.remote_field.get_accessor_name()
+            
+            if related_name in manager_names:
+                field_name=f"{self.model._meta.object_name}.{self.name}"
                 errors.append(
                     checks.Error(
-                        f"Related name '{related_object_name}' for '{field_name}' "
+                        f"Related name '{related_name}' for '{field_name}' "
                         "clashes with the name of a model manager.",
                         hint=(
                             "Rename the model manager or change the related_name "
