@@ -4,6 +4,7 @@ from django.template import Context, Template
 from django.template.base import NonceRenderable
 from django.test import SimpleTestCase, override_settings
 from django.utils.html import html_safe
+from django.utils.safestring import mark_safe
 
 
 @override_settings(STATIC_URL="http://media.example.com/static/")
@@ -966,7 +967,12 @@ class FormsMediaObjectTestCase(SimpleTestCase):
             class Media:
                 css = {
                     "all": [CSS("/path/to/style.css", media="all")],
-                    "print": ["relative/path/to/print.css"],
+                    "print": [
+                        mark_safe(
+                            "<link href='http://media.example.com/static/"
+                            "path/to/print.css' media='print' rel='stylesheet'>"
+                        )
+                    ],
                 }
                 js = (
                     "/path/to/app.js",
@@ -987,8 +993,8 @@ class FormsMediaObjectTestCase(SimpleTestCase):
             ),
             '<link href="/path/to/style.css" media="all" nonce="testNonce123"'
             ' rel="stylesheet">\n'
-            '<link href="http://media.example.com/static/relative/path/to/print.css"'
-            ' media="print" nonce="testNonce123" rel="stylesheet">\n'
+            '<link href="http://media.example.com/static/path/to/print.css"'
+            ' media="print" rel="stylesheet">\n'
             '<script src="/path/to/app.js" nonce="testNonce123"></script>\n'
             '<script src="/path/to/analytics.js"'
             ' integrity="9d947b87fdeb25030d56d01f7aa75800"'
