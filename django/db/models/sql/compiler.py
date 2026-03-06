@@ -640,6 +640,16 @@ class SQLCompiler:
 
     def _get_combinator_part_sql(self, compiler):
         features = self.connection.features
+        # Some backends (e.g. Oracle) don't allow unnecessary ORDER BY in
+        # subqueries used as compound statement components.
+        if (
+            self.query.subquery
+            and not features.ignores_unnecessary_order_by_in_subqueries
+        ):
+            compiler.query = compiler.query.clone()
+            compiler.query.clear_ordering(force=False)
+            for query in compiler.query.combined_queries:
+                query.clear_ordering(force=False)
         # If the columns list is limited, then all combined queries
         # must have the same columns list. Set the selects defined on
         # the query on all combined queries, if not already set.
