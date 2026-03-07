@@ -360,6 +360,18 @@ Aggregates can also participate in filters. Any ``filter()`` (or
 ``exclude()``) applied to normal model fields will have the effect of
 constraining the objects that are considered for aggregation.
 
+.. note::
+
+    When filtering across multi-valued relationships (for example
+    ``ManyToManyField`` or reverse ``ForeignKey`` relations), chaining
+    multiple ``filter()`` calls may result in additional joins being added
+    to the query. This can affect the results of aggregation or annotation
+    queries because each ``filter()`` may operate on a separate join.
+
+    If you intend multiple conditions to apply to the same related object,
+    consider combining them in a single ``filter()`` call or using
+    :class:`~django.db.models.Q` objects.
+
 When used with an ``annotate()`` clause, a filter has the effect of
 constraining the objects for which an annotation is calculated. For example,
 you can generate an annotated list of all books that have a title starting
