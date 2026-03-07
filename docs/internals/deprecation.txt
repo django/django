@@ -7,6 +7,16 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
+.. _deprecation-removed-in-7.1:
+
+7.1
+---
+
+See the :ref:`Django 6.1 release notes <deprecated-features-6.1>` for more
+details on these changes.
+
+* The ``django.db.models.fields.BLANK_CHOICE_DASH`` constant will be removed.
+
 .. _deprecation-removed-in-7.0:
 
 7.0

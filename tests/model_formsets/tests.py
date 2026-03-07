@@ -1267,9 +1267,9 @@ class ModelFormsetTest(TestCase):
             formset.forms[0].as_p(),
             '<p><label for="id_form-0-owner">Owner:</label>'
             '<select name="form-0-owner" id="id_form-0-owner">'
-            '<option value="" selected>---------</option>'
-            '<option value="%s">Joe Perry at Giordanos</option>'
-            '<option value="%s">Jack Berry at Giordanos</option>'
+            '<option value="" selected>- Select an option -</option>'
+            '<option value="%d">Joe Perry at Giordanos</option>'
+            '<option value="%d">Jack Berry at Giordanos</option>'
             "</select></p>"
             '<p><label for="id_form-0-age">Age:</label>'
             '<input type="number" name="form-0-age" id="id_form-0-age" min="0"></p>'

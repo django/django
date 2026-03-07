@@ -1,11 +1,13 @@
 import pickle
 
 from django import forms
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.test import SimpleTestCase, TestCase
 from django.utils.choices import CallableChoiceIterator
 from django.utils.functional import lazy
+from django.utils.translation import gettext as _
 
 from .models import (
     Bar,
@@ -354,7 +356,9 @@ class GetChoicesTests(SimpleTestCase):
     def test_lazy_strings_not_evaluated(self):
         lazy_func = lazy(lambda x: 0 / 0, int)  # raises ZeroDivisionError if evaluated.
         f = models.CharField(choices=[(lazy_func("group"), [("a", "A"), ("b", "B")])])
-        self.assertEqual(f.get_choices(include_blank=True)[0], ("", "---------"))
+        self.assertEqual(
+            f.get_choices(include_blank=True)[0], ("", _(settings.BLANK_CHOICE_LABEL))
+        )
 
 
 class GetChoicesOrderingTests(TestCase):

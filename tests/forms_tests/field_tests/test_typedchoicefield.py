@@ -1,8 +1,10 @@
 import decimal
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.forms import TypedChoiceField
 from django.test import SimpleTestCase
+from django.utils.translation import gettext as _
 
 
 class TypedChoiceFieldTest(SimpleTestCase):
@@ -62,7 +64,11 @@ class TypedChoiceFieldTest(SimpleTestCase):
         self.assertFalse(f.has_changed("1", "1"))
 
         f = TypedChoiceField(
-            choices=[("", "---------"), ("a", "a"), ("b", "b")],
+            choices=[
+                ("", _(settings.BLANK_CHOICE_LABEL)),
+                ("a", "a"),
+                ("b", "b"),
+            ],
             coerce=str,
             required=False,
             initial=None,
