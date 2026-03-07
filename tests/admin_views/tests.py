@@ -4650,7 +4650,10 @@ class AdminViewListEditable(TestCase):
         response = self.client.get(reverse("admin:admin_views_person_changelist"))
         self.assertContains(
             response,
-            'class="action-counter" data-actions-icnt="3" aria-live="polite" aria-atomic="true"',
+            (
+                'class="action-counter" data-actions-icnt="3" '
+                'aria-live="polite" aria-atomic="true"'
+            ),
         )
 
     def test_post_messages(self):
