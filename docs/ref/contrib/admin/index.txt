@@ -922,6 +922,14 @@ subclass::
     activate filtering upon, but several more advanced options as available.
     See :ref:`modeladmin-list-filters` for the details.
 
+    .. note::
+
+        When ``ModelAdmin.list_filter`` includes a ``ForeignKey`` field in a
+        multi-database setup, the admin may query the default database to
+        retrieve the list of related objects. In such cases, configuring a
+        database router may be required so that the query is executed against
+        the correct database.
+
 .. attribute:: ModelAdmin.list_max_show_all
 
     Set ``list_max_show_all`` to control how many items can appear on a "Show
