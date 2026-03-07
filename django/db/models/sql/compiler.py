@@ -578,12 +578,8 @@ class SQLCompiler:
         return r
 
     def compile(self, node):
-        vendor_impl = getattr(node, "as_" + self.connection.vendor, None)
-        if vendor_impl:
-            sql, params = vendor_impl(self, self.connection)
-        else:
-            sql, params = node.as_sql(self, self.connection)
-        return sql, params
+        as_sql = getattr(node, f"as_{self.connection.vendor}", None) or node.as_sql
+        return as_sql(self, self.connection)
 
     def get_combinator_sql(self, combinator, all):
         features = self.connection.features
