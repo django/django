@@ -10,6 +10,7 @@ from django.db.models.lookups import EndsWith, StartsWith
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import register_lookup
 from django.utils import timezone
+from django.utils.functional import cached_property
 
 from .models import Article, Author, MySQLUnixTimestamp
 
@@ -75,14 +76,11 @@ class UpperBilateralTransform(models.Transform):
 class YearTransform(models.Transform):
     # Use a name that avoids collision with the built-in year lookup.
     lookup_name = "testyear"
+    output_field = models.IntegerField()
 
     def as_sql(self, compiler, connection):
         lhs_sql, params = compiler.compile(self.lhs)
         return connection.ops.date_extract_sql("year", lhs_sql, params)
-
-    @property
-    def output_field(self):
-        return models.IntegerField()
 
 
 @YearTransform.register_lookup
@@ -142,7 +140,7 @@ class SQLFuncMixin:
     def as_sql(self, compiler, connection):
         return "%s()" % self.name, []
 
-    @property
+    @cached_property
     def output_field(self):
         return CustomField()
 
@@ -213,10 +211,7 @@ class InMonth(models.lookups.Lookup):
 
 class DateTimeTransform(models.Transform):
     lookup_name = "as_datetime"
-
-    @property
-    def output_field(self):
-        return models.DateTimeField()
+    output_field = models.DateTimeField()
 
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
@@ -616,14 +611,11 @@ class TrackCallsYearTransform(YearTransform):
     # Use a name that avoids collision with the built-in year lookup.
     lookup_name = "testyear"
     call_order = []
+    output_field = models.IntegerField()
 
     def as_sql(self, compiler, connection):
         lhs_sql, params = compiler.compile(self.lhs)
         return connection.ops.date_extract_sql("year", lhs_sql), params
-
-    @property
-    def output_field(self):
-        return models.IntegerField()
 
     def get_lookup(self, lookup_name):
         self.call_order.append("lookup")
