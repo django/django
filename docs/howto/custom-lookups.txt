@@ -170,13 +170,14 @@ that the transform returns a ``FloatField`` type for further lookups. This can
 be done by adding an ``output_field`` attribute to the transform::
 
     from django.db.models import FloatField, Transform
+    from django.utils.functional import cached_property
 
 
     class AbsoluteValue(Transform):
         lookup_name = "abs"
         function = "ABS"
 
-        @property
+        @cached_property
         def output_field(self):
             return FloatField()
 
