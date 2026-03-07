@@ -223,19 +223,20 @@ effect::
     # my_handler is only registered once, even if this line runs again.
     my_signal.connect(my_handler)
 
-Bound methods are different: accessing ``self.method`` creates a new object
-each time. If the connection code creates a new instance on each execution,
-Django sees each bound method as a distinct receiver and registers it again::
+Bound methods, which take a ``self`` argument, are different. Their identity
+is tied to the specific instance, so connecting the same method from a new
+instance registers it as an additional receiver::
 
-    class MyAppConfig(AppConfig):
-        def ready(self):
-            handler = MyHandler()  # New instance each time.
-            my_signal.connect(handler.on_signal)  # Duplicate registration.
+    handler = MyHandler()
+    my_signal.connect(handler.on_signal)
 
-In cases like this, pass a unique ``dispatch_uid`` to identify the receiver
-explicitly. This identifier will usually be a string, although any hashable
-object will suffice. The receiver will only be bound to the signal once for
-each unique ``dispatch_uid`` value::
+    new_handler = MyHandler()
+    my_signal.connect(new_handler.on_signal)  # A separate receiver.
+
+When using a bound method as a receiver, pass a unique ``dispatch_uid`` to
+identify it explicitly. This identifier will usually be a string, although
+any hashable object will suffice. The receiver will only be bound to the
+signal once for each unique ``dispatch_uid`` value::
 
     from django.core.signals import request_finished
 
