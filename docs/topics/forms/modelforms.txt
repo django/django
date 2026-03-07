@@ -685,6 +685,25 @@ the field declaratively and setting its ``validators`` parameter::
     See the :doc:`form field documentation </ref/forms/fields>` for more
     information on fields and their arguments.
 
+.. note::
+
+    When overriding the default form field for a
+    :class:`~django.db.models.ForeignKey` or
+    :class:`~django.db.models.ManyToManyField`, the custom form field must
+    accept any keyword arguments passed by
+    :meth:`~django.db.models.fields.related.RelatedField.formfield`, such as
+    ``limit_choices_to``, ``queryset``, and ``to_field_name``. Failure to
+    handle these keyword arguments will result in a ``TypeError`` when the
+    form is instantiated. A simple way to handle this is to accept
+    ``**kwargs`` in the custom field's ``__init__`` method::
+
+        class CustomIntegerField(forms.IntegerField):
+            def __init__(self, **kwargs):
+                kwargs.pop("queryset", None)
+                kwargs.pop("limit_choices_to", None)
+                kwargs.pop("to_field_name", None)
+                super().__init__(**kwargs)
+
 .. _modelforms-enabling-localization-of-fields:
 
 Enabling localization of fields
