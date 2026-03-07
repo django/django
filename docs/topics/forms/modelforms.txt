@@ -690,8 +690,7 @@ the field declaratively and setting its ``validators`` parameter::
     When overriding the default form field for a
     :class:`~django.db.models.ForeignKey` or
     :class:`~django.db.models.ManyToManyField`, the custom form field must
-    accept any keyword arguments passed by
-    :meth:`~django.db.models.ForeignKey.formfield`, such as
+    accept any keyword arguments passed by ``RelatedField.formfield()``, such as
     ``limit_choices_to``, ``queryset``, and ``to_field_name``. Failure to
     handle these keyword arguments will result in a ``TypeError`` when the
     form is instantiated. A simple way to handle this is to accept
