@@ -822,7 +822,9 @@ class DiscoverRunner:
             metavar="N",
             help=(
                 "Run tests using up to N parallel processes. Use the value "
-                '"auto" to run one test process for each processor core.'
+                '"auto" to run one test process for each processor core. '
+                "On Windows, use --parallel 1 to avoid multiprocessing errors "
+                "such as PermissionError or TypeError: cannot pickle traceback."
             ),
         )
         parser.add_argument(
