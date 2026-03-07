@@ -13,7 +13,7 @@ from django.contrib.staticfiles import finders, storage
 from django.contrib.staticfiles.management.commands.collectstatic import (
     Command as CollectstaticCommand,
 )
-from django.core.management import call_command
+from django.core.management import CommandError, call_command
 from django.test import SimpleTestCase, override_settings
 
 from .cases import CollectionTestCase
@@ -201,8 +201,10 @@ class TestHashedFiles:
     def test_import_loop(self):
         finders.get_finder.cache_clear()
         err = StringIO()
-        with self.assertRaisesMessage(RuntimeError, "Max post-process passes exceeded"):
+        msg = "Max post-process passes exceeded"
+        with self.assertRaisesMessage(CommandError, msg) as cm:
             call_command("collectstatic", interactive=False, verbosity=0, stderr=err)
+        self.assertIsInstance(cm.exception.__cause__, RuntimeError)
         self.assertEqual(
             "Post-processing 'bar.css, foo.css' failed!\n\n", err.getvalue()
         )
@@ -367,9 +369,14 @@ class TestHashedFiles:
         """
         finders.get_finder.cache_clear()
         err = StringIO()
-        with self.assertRaises(Exception):
+        with self.assertRaises(CommandError) as cm:
             call_command("collectstatic", interactive=False, verbosity=0, stderr=err)
         self.assertEqual("Post-processing 'faulty.css' failed!\n\n", err.getvalue())
+        self.assertIsInstance(cm.exception.__cause__, ValueError)
+        exc_message = str(cm.exception)
+        self.assertIn("faulty.css", exc_message)
+        self.assertIn("missing.css", exc_message)
+        self.assertIn("1:", exc_message)  # line 1 reported
         self.assertPostCondition()
 
     @override_settings(
@@ -379,8 +386,9 @@ class TestHashedFiles:
     def test_post_processing_nonutf8(self):
         finders.get_finder.cache_clear()
         err = StringIO()
-        with self.assertRaises(UnicodeDecodeError):
+        with self.assertRaises(CommandError) as cm:
             call_command("collectstatic", interactive=False, verbosity=0, stderr=err)
+        self.assertIsInstance(cm.exception.__cause__, UnicodeDecodeError)
         self.assertEqual("Post-processing 'nonutf8.css' failed!\n\n", err.getvalue())
         self.assertPostCondition()
 

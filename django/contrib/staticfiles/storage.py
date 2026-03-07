@@ -232,6 +232,16 @@ class HashedFilesMixin:
         if template is None:
             template = self.default_template
 
+        def _line_at_position(content, position):
+            start = content.rfind("\n", 0, position) + 1
+            end = content.find("\n", position)
+            end = end if end != -1 else len(content)
+            line_num = content.count("\n", 0, start) + 1
+            msg = f"\n{line_num}: {content[start:end]}"
+            if len(msg) > 79:
+                return f"\n{line_num}"
+            return msg
+
         def converter(matchobj):
             """
             Convert the matched URL to a normalized and hashed URL.
@@ -276,12 +286,18 @@ class HashedFilesMixin:
 
             # Determine the hashed name of the target file with the storage
             # backend.
-            hashed_url = self._url(
-                self._stored_name,
-                unquote(target_name),
-                force=True,
-                hashed_files=hashed_files,
-            )
+            try:
+                hashed_url = self._url(
+                    self._stored_name,
+                    unquote(target_name),
+                    force=True,
+                    hashed_files=hashed_files,
+                )
+            except ValueError as exc:
+                line = _line_at_position(matchobj.string, matchobj.start())
+                note = f"{name!r} contains this reference {matched!r} on line {line}"
+                exc.add_note(note)
+                raise exc
 
             transformed_url = "/".join(
                 url_path.split("/")[:-1] + hashed_url.split("/")[-1:]
