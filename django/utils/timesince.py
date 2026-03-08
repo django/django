@@ -1,3 +1,4 @@
+import calendar
 import datetime
 
 from django.utils.html import avoid_wrapping
@@ -97,7 +98,7 @@ def timesince(d, now=None, reversed=False, time_strings=None, depth=2):
         pivot = datetime.datetime(
             pivot_year,
             pivot_month,
-            min(MONTHS_DAYS[pivot_month - 1], d.day),
+            min(calendar.monthrange(pivot_year, pivot_month)[1], d.day),
             d.hour,
             d.minute,
             d.second,

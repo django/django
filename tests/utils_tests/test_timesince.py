@@ -157,6 +157,22 @@ class TimesinceTests(TestCase):
         self.assertEqual(timeuntil(start_date + self.oneweek, start_date), "1\xa0week")
         self.assertEqual(timesince(start_date, start_date + self.oneweek), "1\xa0week")
 
+    def test_leap_year_february_pivot(self):
+        """
+        When the pivot month is February of a leap year and d.day > 28,
+        the pivot must clamp to 29 (not 28). Without the fix, remaining_time
+        is ~86400 seconds too large, producing a spurious "1 day" extra.
+
+        Regression test for the MONTHS_DAYS leap year bug:
+        d=2019-01-29, now=2020-02-29 yields years=1, months=1.
+        pivot_month=2, pivot_year=2020 (a leap year) → correct max day is 29.
+        Old code clamps to 28, giving pivot=2020-02-28 and remaining=86400s (1 day).
+        Fixed code uses 29, giving pivot=2020-02-29 and remaining=0s.
+        """
+        d = datetime.datetime(2019, 1, 29)
+        now = datetime.datetime(2020, 2, 29)
+        self.assertEqual(timesince(d, now), "1\xa0year, 1\xa0month")
+
     def test_leap_year_new_years_eve(self):
         t = datetime.date(2016, 12, 31)
         now = datetime.datetime(2016, 12, 31, 18, 0, 0)
