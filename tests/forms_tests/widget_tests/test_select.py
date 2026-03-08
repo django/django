@@ -433,3 +433,19 @@ class SelectTest(ChoiceWidgetTest):
             '<option value="R">Ringo</option></select></div>',
             form.render(),
         )
+
+    def test_escaping_of_html_entities_in_labels(self):
+        """
+        HTML entities in choice labels should not be double-escaped
+        if explicitly marked as safe. Ticket #10449.
+        """
+        from django.utils.safestring import mark_safe
+
+        # Test with a string explicitly marked safe
+        widget = Select(choices=[("2", mark_safe("Sesi&oacute;n"))])
+        self.assertHTMLEqual(
+            widget.render("name", "2"),
+            '<select name="name">'
+            '<option value="2" selected>Sesi&oacute;n</option>'
+            "</select>",
+        )
