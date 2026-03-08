@@ -278,6 +278,17 @@ class TimesinceTests(TestCase):
             with self.subTest(value):
                 self.assertEqual(timesince(value, now_utc), expected)
 
+    def test_leap_year_february_pivot(self):
+        """
+        When pivot month is February of a leap year and d.day > 28, the
+        pivot must use 29, not 28 (leap year February has 29 days).
+        """
+        # 2024 is a leap year; going from Jan 29, 2023 to Feb 28, 2024
+        # should be exactly "1 year, 1 month" (not "1 year, 1 month, 4 weeks").
+        d = datetime.datetime(2023, 1, 29)
+        now = datetime.datetime(2024, 2, 28)
+        self.assertEqual(timesince(d, now), "1\xa0year, 1\xa0month")
+
 
 @requires_tz_support
 @override_settings(USE_TZ=True)
