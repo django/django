@@ -2,7 +2,8 @@ import uuid
 from datetime import datetime
 from time import sleep
 
-from django.contrib.postgres.functions import RandomUUID, TransactionNow
+from django.contrib.postgres.functions import GenerateSeries, RandomUUID, TransactionNow
+from django.db.models import Value
 
 from . import PostgreSQLTestCase
 from .models import NowTestModel, UUIDTestModel
@@ -37,3 +38,29 @@ class TestRandomUUID(PostgreSQLTestCase):
         m2.refresh_from_db()
         self.assertIsInstance(m1.uuid, uuid.UUID)
         self.assertNotEqual(m1.uuid, m2.uuid)
+
+
+class TestGenerateSeries(PostgreSQLTestCase):
+    def test_generate_series_annotation(self):
+        """Annotations using :class:`GenerateSeries` expand rows correctly."""
+        # create a single row to annotate against
+        m = NowTestModel.objects.create()
+        qs = NowTestModel.objects.annotate(
+            gs=GenerateSeries(Value(1), Value(3))
+        ).filter(pk=m.pk)
+
+        # three values returned (1, 2, 3), so the queryset should contain three
+        # rows and ``count()`` should equal ``len(qs)``.
+        self.assertEqual(qs.count(), len(qs))
+        self.assertEqual(list(qs.values_list("gs", flat=True)), [1, 2, 3])
+
+        # passing datetime values should infer a DateTimeField output
+        from datetime import datetime
+
+        qs2 = NowTestModel.objects.annotate(
+            gs=GenerateSeries(
+                Value(datetime(2020, 1, 1)),
+                Value(datetime(2020, 1, 3)),
+            )
+        ).filter(pk=m.pk)
+        self.assertEqual(qs2.count(), len(qs2))

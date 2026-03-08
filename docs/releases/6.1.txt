@@ -158,6 +158,11 @@ Minor features
 * :class:`~django.contrib.postgres.constraints.ExclusionConstraint` now
   supports the Hash index type.
 
+* Added :class:`~django.contrib.postgres.functions.GenerateSeries`, a
+  helper for the PostgreSQL ``generate_series()`` set-returning function.
+  The expression sets ``set_returning=True`` so that annotations using the
+  function expand rows correctly.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
