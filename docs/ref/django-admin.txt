@@ -1191,8 +1191,10 @@ Specifies the database for which to print the SQL. Defaults to ``default``.
 .. django-admin:: sqlmigrate app_label migration_name
 
 Prints the SQL for the named migration. This requires an active database
-connection, which it will use to resolve constraint names; this means you must
-generate the SQL against a copy of the database you wish to later apply it on.
+connection, which it will use to resolve constraint names. Because
+constraint and index names may depend on the existing database schema,
+``sqlmigrate`` may inspect the current database to determine them before
+generating SQL (for example when producing SQL to drop them).
 
 Note that ``sqlmigrate`` doesn't colorize its output.
 
@@ -1204,6 +1206,7 @@ for running the migration in the forwards direction.
 .. django-admin-option:: --database DATABASE
 
 Specifies the database for which to generate the SQL. Defaults to ``default``.
+
 
 ``sqlsequencereset``
 --------------------
