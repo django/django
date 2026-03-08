@@ -313,7 +313,9 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertRedirects(response, add_url, status_code=301)
 
     def test_actions_counter_is_live_region(self):
-        """The action counter should be an ARIA live region for accessibility."""
+        """
+        The action counter should be an ARIA live region.
+        """
         response = self.client.get(reverse("admin:admin_views_article_changelist"))
         self.assertContains(response, 'aria-live="polite"')
         self.assertContains(response, 'aria-atomic="true"')
