@@ -12,6 +12,25 @@ have certain differences and advantages when compared to function-based views:
 * Object oriented techniques such as mixins (multiple inheritance) can be
   used to factor code into reusable components.
 
+When to use class-based views
+=============================
+
+Class-based views are particularly useful when multiple views share similar
+behavior or when a view must handle several HTTP methods. By organizing
+logic into separate methods such as ``get()`` and ``post()``, they help keep
+code structured and reusable.
+
+They are often a good choice when:
+
+* You want to reuse behavior through inheritance or mixins.
+* Several views share common functionality.
+* Your view handles multiple HTTP methods.
+* You want to take advantage of Django's built-in generic views.
+
+For simpler views with minimal logic, function-based views may be easier to
+read and maintain. Both approaches are supported and can coexist in the same
+project.
+
 The relationship and history of generic views, class-based views, and class-based generic views
 ===============================================================================================
 
