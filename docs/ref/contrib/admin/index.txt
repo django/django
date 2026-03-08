@@ -1254,8 +1254,8 @@ subclass::
         search_fields = ["user__email"]
 
     When somebody does a search in the admin search box, Django splits the
-    search query into words and returns all objects that contain each of the
-    words in at least one of ``search_fields``. By default, the
+    search query into search terms and returns all objects that contain each
+    of them in at least one of ``search_fields``. By default, the
     :lookup:`icontains` lookup is used for text fields. For non-text fields
     with an explicit lookup (e.g., ``age__exact``), the specified lookup is
     used, and search terms that are invalid for that field type are skipped.
