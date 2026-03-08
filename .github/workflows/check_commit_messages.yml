@@ -43,8 +43,8 @@ jobs:
 
       - name: Fetch relevant branches
         run: |
-          git fetch origin $BASE:base
-          git fetch origin pull/${{ github.event.pull_request.number }}/head:pr
+          git fetch origin $BASE:base --depth=1
+          git fetch origin pull/${{ github.event.pull_request.number }}/head:pr --depth=1
 
       - name: Check commit messages prefix
         env:
@@ -79,8 +79,8 @@ jobs:
 
       - name: Fetch relevant branches
         run: |
-          git fetch origin $BASE:base
-          git fetch origin pull/${{ github.event.pull_request.number }}/head:pr
+          git fetch origin $BASE:base --depth=1
+          git fetch origin pull/${{ github.event.pull_request.number }}/head:pr --depth=1
 
       - name: Check commit messages suffix
         run: |
