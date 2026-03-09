@@ -4,14 +4,14 @@
 # Bakhtawar Barzan, 2021
 # Bakhtawar Barzan, 2021
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2023
-# Swara <swara09@gmail.com>, 2022-2024
+# Swara <swara09@gmail.com>, 2022-2026
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2024-01-20 07:59+0000\n"
-"Last-Translator: Swara <swara09@gmail.com>, 2022-2024\n"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2026-03-09 07:59+0000\n"
+"Last-Translator: Swara <swara09@gmail.com>, 2022-2026\n"
 "Language-Team: Central Kurdish (http://app.transifex.com/django/django/"
 "language/ckb/)\n"
 "MIME-Version: 1.0\n"
@@ -26,12 +26,10 @@ msgstr "%sە بەردەستەکان"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"ئەمە لیستی بەردەستی %s . دەتوانیت هەندێکیان هەڵبژێریت بە هەڵبژاردنییان لەم "
-"بوخچەی خوارەوە و پاشان کرتەکردن لەسەر ئاراستەی \"هەڵبژێرە\" لە نێوان هەردوو "
-"بوخچەکەدا."
+" %sهەڵبژێرە، بە هەڵبژاردنی ئەوانەو پاشان دوگمەی ئاراتەی \"هەڵبژاردن\" "
+"هەڵبژێرە."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -40,18 +38,17 @@ msgstr "لەم بوخچەدا بنووسە بۆ ئەوەی لیستی بەردە
 msgid "Filter"
 msgstr "پاڵاوتن"
 
-msgid "Choose all"
-msgstr "هەمووی هەڵبژێرە"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "هەمووی %sهەڵبژێرە"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "کرتە بکە بۆ هەڵبژاردنی هەموو %s بەیەکجار."
+msgid "Choose selected %s"
+msgstr "%sدیاریکراو هەڵبژێرە"
 
-msgid "Choose"
-msgstr "‌هەڵبژاردن"
-
-msgid "Remove"
-msgstr "لابردن"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "%sدیاریکراو بسڕەوە"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -59,23 +56,20 @@ msgstr "%s هەڵبژێردراوەکان"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"ئەمە لیستی هەڵبژێردراوی %s. دەتوانیت هەندێکیان لاببەیت بە هەڵبژاردنییان لەم "
-"بوخچەی خوارەوە و پاشان کرتەکردن لەسەر ئاراستەی \"لابردن\" لە نێوان هەردوو "
-"بوخچەکەدا."
+"%s بسڕەوە بە هەڵبژاردنیان و پاشان دوگمەی ئاراستەی \"سڕینەوە\" هەڵبژێرە."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "لەم بوخچەدا بنووسە بۆ ئەوەی لیستی هەڵبژێردراوەکان بپاڵێویت %s."
 
-msgid "Remove all"
-msgstr "لابردنی هەمووی"
+msgid "(click to clear)"
+msgstr "(کرتە بکە بۆ پاککردنەوە)"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "کرتە بکە بۆ لابردنی هەموو ئەوانەی هەڵبژێردراون %sبە یەکجار."
+msgid "Remove all %s"
+msgstr "%sهەمووی بسڕەوە"
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -321,9 +315,3 @@ msgstr "هە"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "ش"
-
-msgid "Show"
-msgstr "پیشاندان"
-
-msgid "Hide"
-msgstr "شاردنەوە"

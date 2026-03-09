@@ -4,22 +4,21 @@
 # 534b44a19bf18d20b71ecc4eb77c572f_db336e9 <f8268c65f822ec11a3a2e5d482cd7ead_175>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Meir Kriheli <mkriheli@gmail.com>, 2011-2012,2014-2015,2017,2020,2023
-# Yaron Shahrabani <sh.yaron@gmail.com>, 2021
+# Yaron Shahrabani <sh.yaron@gmail.com>, 2021,2026
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-04 07:59+0000\n"
-"Last-Translator: Meir Kriheli <mkriheli@gmail.com>, "
-"2011-2012,2014-2015,2017,2020,2023\n"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2026-03-09 07:59+0000\n"
+"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2021,2026\n"
 "Language-Team: Hebrew (http://app.transifex.com/django/django/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: he\n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
-"1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
+"Plural-Forms: nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
+"1 == 0) ? 1: 2;\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -27,11 +26,8 @@ msgstr "אפשרויות %s זמינות"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"זו רשימת %s הזמינים לבחירה. ניתן לבחור חלק ע\"י סימון בתיבה מתחת ולחיצה על "
-"חץ  \"בחר\" בין שתי התיבות."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -40,18 +36,17 @@ msgstr "ניתן להקליד בתיבה זו כדי לסנן %s."
 msgid "Filter"
 msgstr "סינון"
 
-msgid "Choose all"
-msgstr "בחירת הכל"
+#, javascript-format
+msgid "Choose all %s"
+msgstr ""
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "בחירת כל ה%s בבת אחת."
+msgid "Choose selected %s"
+msgstr ""
 
-msgid "Choose"
-msgstr "בחר"
-
-msgid "Remove"
-msgstr "הסרה"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr ""
 
 #, javascript-format
 msgid "Chosen %s"
@@ -59,22 +54,19 @@ msgstr "%s אשר נבחרו"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"זו רשימת %s אשר נבחרו. ניתן להסיר חלק ע\"י בחירה בתיבה מתחת ולחיצה על חץ "
-"\"הסרה\" בין שתי התיבות."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "ניתן להקליד בתיבה זו כדי לסנן את רשימת %s הנבחרים."
 
-msgid "Remove all"
-msgstr "הסרת הכל"
+msgid "(click to clear)"
+msgstr ""
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "הסרת כל %s אשר נבחרו בבת אחת."
+msgid "Remove all %s"
+msgstr "להסיר את כל %s"
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -82,14 +74,12 @@ msgid_plural "%s selected options not visible"
 msgstr[0] "אפשרות נבחרת %s אינה גלויה."
 msgstr[1] "%s אפשרויות נבחרות אינן גלויות."
 msgstr[2] "%s אפשרויות נבחרות אינן גלויות."
-msgstr[3] "%s אפשרויות נבחרות אינן גלויות."
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s מ %(cnt)s נבחרות"
 msgstr[1] "%(sel)s מ %(cnt)s נבחרות"
 msgstr[2] "%(sel)s מ %(cnt)s נבחרות"
-msgstr[3] "%(sel)s מ %(cnt)s נבחרות"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
@@ -135,7 +125,6 @@ msgid_plural "Note: You are %s hours ahead of server time."
 msgstr[0] "הערה: את/ה %s שעה לפני זמן השרת."
 msgstr[1] "הערה: את/ה %s שעות לפני זמן השרת."
 msgstr[2] "הערה: את/ה %s שעות לפני זמן השרת."
-msgstr[3] "הערה: את/ה %s שעות לפני זמן השרת."
 
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
@@ -143,7 +132,6 @@ msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "הערה: את/ה %s שעה אחרי זמן השרת."
 msgstr[1] "הערה: את/ה %s שעות אחרי זמן השרת."
 msgstr[2] "הערה: את/ה %s שעות אחרי זמן השרת."
-msgstr[3] "הערה: את/ה %s שעות אחרי זמן השרת."
 
 msgid "Choose a Time"
 msgstr "בחירת שעה"
@@ -326,9 +314,3 @@ msgstr "ו"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "ש"
-
-msgid "Show"
-msgstr "הצג"
-
-msgid "Hide"
-msgstr "הסתר"

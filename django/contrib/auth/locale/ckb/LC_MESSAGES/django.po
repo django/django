@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Swara <swara09@gmail.com>, 2022,2024
+# Swara <swara09@gmail.com>, 2022,2024,2026
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 08:09+0000\n"
-"Last-Translator: Swara <swara09@gmail.com>, 2022,2024\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2026-03-09 08:09+0000\n"
+"Last-Translator: Swara <swara09@gmail.com>, 2022,2024,2026\n"
 "Language-Team: Central Kurdish (http://app.transifex.com/django/django/"
 "language/ckb/)\n"
 "MIME-Version: 1.0\n"
@@ -56,11 +56,11 @@ msgstr "تێپەڕەوشە"
 msgid "last login"
 msgstr "دوا چوونەژوورەوە"
 
-msgid "No password set."
-msgstr "تێپەڕەوشە جێگیرنەکراوە."
-
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "شێوازی تێپەڕەوشە نادروستە یان ئەلگۆریتمێکی هاشکراوی نەناسراوە."
+
+msgid "No password set."
+msgstr "تێپەڕەوشە جێگیرنەکراوە."
 
 msgid "Reset password"
 msgstr "دانانەوەی تێپەڕەوشە"
@@ -71,15 +71,6 @@ msgstr "دانانی تێپەڕەوشە"
 msgid "The two password fields didn’t match."
 msgstr "هەردوو خانەی تێپەڕەوشە وەک یەک نین."
 
-msgid ""
-"Whether the user will be able to authenticate using a password or not. If "
-"disabled, they may still be able to authenticate using other backends, such "
-"as Single Sign-On or LDAP."
-msgstr ""
-"ئایا بەکارهێنەر دەتوانێت بە بەکارهێنانی تێپەڕەوشە خۆی بناسێنێت یان نا. ئەگەر "
-"ناچالاک کرابێت، لەوانەیە هێشتا بتوانێت خۆی بناسێنێت بە بەکارهێنانی سیستەمی "
-"تر لە پشتەوە، وەک چوونەژوورەوەی یەکجار Single Sign-On یان LDAP."
-
 msgid "Password"
 msgstr "تێپەڕەوشە"
 
@@ -88,6 +79,15 @@ msgstr "دووپاتکردنەوەی تێپەڕەوشە"
 
 msgid "Enter the same password as before, for verification."
 msgstr "بۆ پشتڕاستکردنەوە هەمان تێپەڕەوشەی پێشوو بنوسە."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"ئایا بەکارهێنەر دەتوانێت بە بەکارهێنانی تێپەڕەوشە خۆی بناسێنێت یان نا. ئەگەر "
+"ناچالاک کرابێت، لەوانەیە هێشتا بتوانێت خۆی بناسێنێت بە بەکارهێنانی سیستەمی "
+"تر لە پشتەوە، وەک چوونەژوورەوەی یەکجار Single Sign-On یان LDAP."
 
 msgid "Password-based authentication"
 msgstr "ڕەسەنایەتی لەسەر بنەمای تێپەڕەوشە"
@@ -262,16 +262,11 @@ msgid "users"
 msgstr "بەکارهێنەر"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] ""
-"ئەم تێپەڕەوشە زۆر کورتە. دەبێت لانیکەم پێکبێت لە %(min_length)d نوسە."
-msgstr[1] ""
-"ئەم تێپەڕەوشە زۆر کورتە. دەبێت لانیکەم پێکبێت لە %(min_length)d نوسە."
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "ئەم تێپەڕەوشەیە زۆر کورتە. دەبێت لانیکەم پێکبێت لە %d نوسە."
+msgstr[1] "ئەم تێپەڕەوشەیە زۆر کورتە. دەبێت لانیکەم پێکبێت لە %d نوسە."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."

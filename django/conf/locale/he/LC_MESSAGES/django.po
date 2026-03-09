@@ -7,23 +7,22 @@
 # Menachem G., 2021
 # Menachem G., 2021
 # אורי רודברג <uri@speedy.net>, 2021
-# Yaron Shahrabani <sh.yaron@gmail.com>, 2021
+# Yaron Shahrabani <sh.yaron@gmail.com>, 2021,2026
 # אורי רודברג <uri@speedy.net>, 2020,2022-2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: Meir Kriheli <mkriheli@gmail.com>, "
-"2011-2015,2017,2019-2020,2023,2025\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2026-03-09 06:49+0000\n"
+"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2021,2026\n"
 "Language-Team: Hebrew (http://app.transifex.com/django/django/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: he\n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
-"1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
+"Plural-Forms: nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
+"1 == 0) ? 1: 2;\n"
 
 msgid "Afrikaans"
 msgstr "אפריקאנס"
@@ -147,6 +146,9 @@ msgstr "קרואטית"
 
 msgid "Upper Sorbian"
 msgstr "סורבית עילית"
+
+msgid "Haitian Creole"
+msgstr "קריאולית האיטית"
 
 msgid "Hungarian"
 msgstr "הונגרית"
@@ -556,11 +558,11 @@ msgstr "תאריך (ללא שעה)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
-"הערך \"%(value)s\" מכיל פורמט לא חוקי. הוא חייב להיות בפורמטYYYY-MM-DD HH:"
-"MM[:ss[.uuuuuu]][TZ]."
+"הערך \"%(value)s\" מכיל פורמט לא חוקי. הוא חייב להיות בפורמטYYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ]."
 
 #, python-format
 msgid ""
@@ -582,8 +584,8 @@ msgstr "מספר עשרוני"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "הערך \"%(value)s\" מכיל פורמט לא חוקי. הוא חייב להיות בפורמט  [DD] "
 "[[HH:]MM:]ss[.uuuuuu]."
@@ -651,8 +653,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"הערך “%(value)s” מכיל פורמט לא חוקי. הוא חייב להיות בפורמט HH:MM[:ss[."
-"uuuuuu]]."
+"הערך “%(value)s” מכיל פורמט לא חוקי. הוא חייב להיות בפורמט "
+"HH:MM[:ss[.uuuuuu]]."
 
 #, python-format
 msgid ""
@@ -711,8 +713,8 @@ msgid "Many-to-many relationship"
 msgstr "יחס של רבים לרבים"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -871,6 +873,22 @@ msgstr "כן"
 
 msgid "No"
 msgstr "לא"
+
+msgctxt "Task"
+msgid "Ready"
+msgstr "בהמתנה"
+
+msgctxt "Task"
+msgid "Running"
+msgstr "רצה"
+
+msgctxt "Task"
+msgid "Failed"
+msgstr "נכשלה"
+
+msgctxt "Task"
+msgid "Successful"
+msgstr "מוצלחת"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1263,11 +1281,11 @@ msgstr "לא נמצאו %(verbose_name_plural)s"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"לא נמצאו %(verbose_name_plural)s בזמן עתיד מאחר ש-%(class_name)s."
-"allow_future מוגדר False."
+"לא נמצאו %(verbose_name_plural)s בזמן עתיד מאחר "
+"ש-%(class_name)s.allow_future מוגדר False."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
