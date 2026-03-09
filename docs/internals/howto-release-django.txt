@@ -479,17 +479,11 @@ Building the artifacts
 
         $ PGP_KEY_ID=<key-id> PGP_KEY_URL=<key-url> DEST_FOLDER=~/releases scripts/do_django_release.py
 
-    * Test new version script:
+    * Verify the release (after artifacts were uploaded):
 
     .. code-block:: shell
 
-        $ VERSION=5.2.1 scripts/test_new_version.sh
-
-    * Confirm release signature script:
-
-    .. code-block:: shell
-
-        $ VERSION=5.2.1 scripts/confirm_release.sh
+        $ VERSION=5.2.1 scripts/verify_release.sh
 
 #. Tag the release using ``git tag``. For example:
 
