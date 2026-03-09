@@ -355,18 +355,6 @@ This attribute provides a single hash that changes whenever a file in the
 manifest changes. This can be useful to communicate to SPAs that the assets on
 the server have changed (due to a new deployment).
 
-.. attribute:: storage.ManifestStaticFilesStorage.max_post_process_passes
-
-Since static files might reference other static files that need to have their
-paths replaced, multiple passes of replacing paths may be needed until the file
-hashes converge. To prevent an infinite loop due to hashes not converging (for
-example, if ``'foo.css'`` references ``'bar.css'`` which references
-``'foo.css'``) there is a maximum number of passes before post-processing is
-abandoned. In cases with a large number of references, a higher number of
-passes might be needed. Increase the maximum number of passes by subclassing
-``ManifestStaticFilesStorage`` and setting the ``max_post_process_passes``
-attribute. It defaults to 5.
-
 To enable the ``ManifestStaticFilesStorage`` you have to make sure the
 following requirements are met:
 
