@@ -464,12 +464,20 @@ Building the artifacts
 
 .. admonition:: Optionally use helper scripts
 
-    You can streamline some of the steps below using helper scripts from the Wiki:
+    You can streamline some of the steps below using helper scripts from the
+    ``scripts`` folder:
 
-    * `Release script
-      <https://code.djangoproject.com/wiki/ReleaseScript>`_
-    * `Test new version script
-      <https://code.djangoproject.com/wiki/ReleaseTestNewVersion>`_
+    * Release script example run:
+
+    .. code-block:: shell
+
+        $ PGP_KEY_ID=<key-id> PGP_KEY_URL=<key-url> DEST_FOLDER=~/releases scripts/do_django_release.py
+
+    * Verify the release (after artifacts were uploaded):
+
+    .. code-block:: shell
+
+        $ VERSION=5.2.1 scripts/verify_release.sh
 
 #. Tag the release using ``git tag``. For example:
 
