@@ -41,3 +41,4 @@ that your configurations are suitable.
    wsgi/index
    asgi/index
    checklist
+   fastcgi

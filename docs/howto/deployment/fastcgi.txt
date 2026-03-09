@@ -1,0 +1,13 @@
+FastCGI via WSGI
+================
+
+Although Django's ``runfcgi`` command has been deprecated, FastCGI can
+still be used with Django through WSGI-compatible servers such as
+uWSGI.
+
+Example::
+
+    uwsgi --fastcgi-socket :3031 --wsgi-file myproject/wsgi.py
+
+Refer to the uWSGI documentation for more details on configuring
+FastCGI deployments.
