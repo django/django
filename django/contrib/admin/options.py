@@ -1042,7 +1042,7 @@ class ModelAdmin(BaseModelAdmin):
                 filtered_actions.append(action)
         return filtered_actions
 
-    def get_actions(self, request):
+    def get_actions(self, request, is_change_view=False):
         """
         Return a dictionary mapping the names of all actions for this
         ModelAdmin to a tuple of (callable, name, description) for each action.
@@ -1051,24 +1051,27 @@ class ModelAdmin(BaseModelAdmin):
         # this page.
         if self.actions is None or IS_POPUP_VAR in request.GET:
             return {}
-        is_change_view = request.resolver_match.url_name.endswith("change")
         actions = self._filter_actions_by_permissions(
             request, self._get_base_actions(is_change_view)
         )
         return {name: (func, name, desc) for func, name, desc in actions}
 
-    def get_action_choices(self, request, default_choices=models.BLANK_CHOICE_DASH):
+    def get_action_choices(
+        self, request, default_choices=models.BLANK_CHOICE_DASH, is_change_view=False
+    ):
         """
         Return a list of choices for use in a form object. Each choice is a
         tuple (name, description).
         """
         choices = [*default_choices]
-        for func, name, description in self.get_actions(request).values():
+        for func, name, description in self.get_actions(
+            request, is_change_view
+        ).values():
             choice = (name, description % model_format_dict(self.opts))
             choices.append(choice)
         return choices
 
-    def get_action(self, action, is_change_view):
+    def get_action(self, action, is_change_view=False):
         """
         Return a given action from a parameter, which can either be a callable,
         or the name of a method on the ModelAdmin. Return is a tuple of
@@ -1983,7 +1986,9 @@ class ModelAdmin(BaseModelAdmin):
         # Build the action form and populate it with available actions.
         if actions and not add:
             action_form = self.action_form(auto_id=None)
-            action_form.fields["action"].choices = self.get_action_choices(request)
+            action_form.fields["action"].choices = self.get_action_choices(
+                request, is_change_view=True
+            )
             media += action_form.media
         else:
             action_form = None

@@ -730,3 +730,13 @@ class AdminDetailActionsTest(TestCase):
             response.url,
             reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
         )
+
+    def test_popup_change_form_has_no_actions(self):
+        """Actions aren't shown on the change form when opened as a popup."""
+        change_url = reverse(
+            "admin:admin_views_externalsubscriber_change", args=[self.s1.pk]
+        )
+        response = self.client.get(change_url)
+        self.assertIsNotNone(response.context["action_form"])
+        response = self.client.get(change_url + "?%s" % IS_POPUP_VAR)
+        self.assertIsNone(response.context["action_form"])

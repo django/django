@@ -165,7 +165,7 @@ The ``show_on_change_form`` argument controls where the action is available
 in the admin interface. When ``show_on_change_form`` is ``False``, the
 action is only available on the admin changelist page. When
 ``show_on_change_form`` is ``True``, the action is available on the
-admin changelist and the admin change form. Defaults to ``True``.
+admin changelist and the admin change form. Defaults to ``False``.
 
 When ``show_on_change_form`` is ``True``, ``description`` is used for the
 admin change form, and ``description_plural`` is used for the admin
