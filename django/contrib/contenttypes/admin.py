@@ -100,9 +100,12 @@ class GenericInlineModelAdmin(InlineModelAdmin):
             fields = kwargs.pop("fields")
         else:
             fields = flatten_fieldsets(self.get_fieldsets(request, obj))
-        exclude = [*(self.exclude or []), *self.get_readonly_fields(request, obj)]
+        exclude = [
+            *(self.get_exclude(request, obj) or []),
+            *self.get_readonly_fields(request, obj),
+        ]
         if (
-            self.exclude is None
+            self.get_exclude(request, obj) is None
             and hasattr(self.form, "_meta")
             and self.form._meta.exclude
         ):
