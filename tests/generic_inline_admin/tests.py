@@ -484,7 +484,6 @@ class GenericInlineModelAdminTest(SimpleTestCase):
         """
         GenericInlineModelAdmin.get_formset() respects get_exclude().
         """
-        
 
         class GetExcludeInline(GenericTabularInline):
             model = Media
