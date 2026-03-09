@@ -14,6 +14,7 @@
 # Shinichi Katsumata <shinichi.katsumata@gmail.com>, 2019
 # Shinya Okano <tokibito@gmail.com>, 2012-2019,2021,2023-2025
 # TANIGUCHI Taichi, 2022
+# TAKAHASHI Shuuji <shuuji3@gmail.com>, 2026
 # Takuro Onoue <kusanaginoturugi@gmail.com>, 2020
 # Takuya N <takninnovationresearch@gmail.com>, 2020
 # Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
@@ -21,10 +22,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2025-03-19 11:30-0500\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>, "
-"2012-2019,2021,2023-2025\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2026-03-09 06:49+0000\n"
+"Last-Translator: TAKAHASHI Shuuji <shuuji3@gmail.com>, 2026\n"
 "Language-Team: Japanese (http://app.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -155,6 +155,9 @@ msgstr "クロアチア語"
 
 msgid "Upper Sorbian"
 msgstr "高地ソルブ語"
+
+msgid "Haitian Creole"
+msgstr "ハイチ・クレオール語"
 
 msgid "Hungarian"
 msgstr "ハンガリー語"
@@ -556,8 +559,8 @@ msgstr "日付"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "“%(value)s” は無効な形式の値です。 YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] 形式で"
 "なければなりません。"
@@ -582,8 +585,8 @@ msgstr "10 進数 (小数可)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "“%(value)s” は無効な形式の値です。 [DD] [HH:[MM:]]ss[.uuuuuu] 形式でなければ"
 "なりません。"
@@ -712,8 +715,8 @@ msgid "Many-to-many relationship"
 msgstr "多対多の関連"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -874,6 +877,22 @@ msgstr "はい"
 
 msgid "No"
 msgstr "いいえ"
+
+msgctxt "Task"
+msgid "Ready"
+msgstr "実行待ち"
+
+msgctxt "Task"
+msgid "Running"
+msgstr "実行中"
+
+msgctxt "Task"
+msgid "Failed"
+msgstr "失敗"
+
+msgctxt "Task"
+msgid "Successful"
+msgstr "完了"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1255,8 +1274,8 @@ msgstr "%(verbose_name_plural)s は利用できません"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
 "%(class_name)s.allow_futureがFalseであるため、未来の%(verbose_name_plural)sは"
 "利用できません。"

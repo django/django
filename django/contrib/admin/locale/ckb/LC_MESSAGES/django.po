@@ -6,14 +6,14 @@
 # Bakhtawar Barzan, 2021
 # Kosar Tofiq Saeed <kosar.belana@gmail.com>, 2020
 # pejar hewrami <gumle@protonmail.com>, 2020
-# Swara <swara09@gmail.com>, 2022,2024
+# Swara <swara09@gmail.com>, 2022,2024-2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 07:05+0000\n"
-"Last-Translator: Swara <swara09@gmail.com>, 2022,2024\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2026-03-09 07:05+0000\n"
+"Last-Translator: Swara <swara09@gmail.com>, 2022,2024-2025\n"
 "Language-Team: Central Kurdish (http://app.transifex.com/django/django/"
 "language/ckb/)\n"
 "MIME-Version: 1.0\n"
@@ -34,8 +34,8 @@ msgstr "سەرکەوتووانە %(count)d %(items)sی سڕییەوە."
 msgid "Cannot delete %(name)s"
 msgstr "ناتوانرێت %(name)s بسڕێتەوە"
 
-msgid "Are you sure?"
-msgstr "ئایا تۆ دڵنیایت؟"
+msgid "Delete multiple objects"
+msgstr "سڕینەوەی چەندین ئۆبجێکت"
 
 msgid "Administration"
 msgstr "بەڕێوەبەرایەتی"
@@ -268,6 +268,9 @@ msgstr[1] "هەمووی %(total_count)s هەڵبژێردراون"
 msgid "0 of %(cnt)s selected"
 msgstr "0 لە %(cnt)s هەڵبژێردراوە"
 
+msgid "Delete"
+msgstr "سڕینەوە"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "مێژووی گۆڕین: %s"
@@ -328,11 +331,8 @@ msgstr ""
 "هەڵەیەک بوونی هەبووە. ڕاپۆرت دراوە بە پێگەی بەڕێوەبەرایەتی لەڕێی ئیمەیڵەوە و "
 "دەبێت بەزوویی  چاکبکرێت. سوپاس بۆ ئارامگرتنت."
 
-msgid "Run the selected action"
-msgstr "کرداری هەڵبژێردراو جێبەجێ بکە"
-
-msgid "Go"
-msgstr "بڕۆ"
+msgid "Run"
+msgstr "جێبەجێکردن"
 
 msgid "Click here to select the objects across all pages"
 msgstr "کرتە لێرە بکە بۆ هەڵبژاردنی ئۆبجێکتەکان لە تەواوی هەموو پەڕەکان"
@@ -351,6 +351,15 @@ msgstr "وردەنان"
 msgid "Models in the %(name)s application"
 msgstr "مۆدێلەکان لە بەرنامەی %(name)s"
 
+msgid "Model name"
+msgstr "ناوی یەکە"
+
+msgid "Add link"
+msgstr "زیادکردنی بەستەر"
+
+msgid "Change or view list link"
+msgstr "گۆڕین یان بینینی لیستی بەستەر"
+
 msgid "Add"
 msgstr "زیادکردن"
 
@@ -360,15 +369,13 @@ msgstr "بینین"
 msgid "You don’t have permission to view or edit anything."
 msgstr "تۆ ڕێگەپێدراو نیت بۆ بینین یان دەستکاری هیچ شتێک."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"سەرەتا، ناوی بەکارهێنەر و تێپەڕەوشە بنوسە. پاشان دەتوانیت دەستکاری زیاتری "
-"هەڵبژاردنەکانی بەکارهێنەر بکەیت."
+"دوای ئەوەی بەکارهێنەرت زیادکرد، توانات هەیە بۆ دەستکاری زیاتری هەڵبژاردەکانی "
+"بەکارهێنەر."
 
-msgid "Enter a username and password."
-msgstr "ناوی بەکارهێنەر و تێپەڕەوشە بنوسە"
+msgid "Error:"
+msgstr "هەڵە:"
 
 msgid "Change password"
 msgstr "گۆڕینی تێپەڕەوشە"
@@ -435,6 +442,9 @@ msgstr "ژماردن پیشانبدە"
 msgid "Clear all filters"
 msgstr "پاکردنەوەی هەموو پاڵاوتنەکان"
 
+msgid "Save"
+msgstr "پاشەکەوتکردن"
+
 msgid "Remove from sorting"
 msgstr "لابردن لە ڕیزکردن"
 
@@ -454,34 +464,31 @@ msgstr "گۆڕینی ڕووکار (ڕووکاری ئێستا: ڕووناک)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "گۆڕینی ڕووکار (ڕووکاری ئێستا: تاریک)"
 
-msgid "Delete"
-msgstr "سڕینەوە"
-
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"سڕینەوەی %(object_name)s ‘%(escaped_object)s‘ دەبێتە هۆی سڕینەوەی ئۆبجێکتی "
-"پەیوەندیدار، بەڵام هەژمارەکەت ڕێگەپێدراو نییە بۆ سڕینەوەی ئەم جۆرە "
-"ئۆبجێکتانەی تر:"
+"سڕینەوەی %(object_name)s “%(escaped_object)s” لە ئەنجامدا شتە "
+"پەیوەندیدارەکان دەسڕێتەوە, بەڵام هەژمارەکەت دەسەڵاتی سڕینەوەی ئەم جۆرانەی "
+"خوارەوەی نییە:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"سڕینەوەی %(object_name)sی ‘%(escaped_object)s‘ پێویستیی بە سڕینەوەی ئەم "
-"ئۆبجێکتە پەیوەندیدارە پارێزراوانەیە:"
+"سڕینەوەی %(object_name)s “%(escaped_object)s” پێویستی بە سڕینەوەی ئەم تۆمارە "
+"پەیوەندیدارە پارێزراوانەی خوارەوە دەبێت:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"ئایا تۆ دڵنیایت کە دەتەوێت %(object_name)sی \"%(escaped_object)s\" بسڕیتەوە؟ "
-"هەموو ئەم ئۆبجێکتە پەیوەندیدارانەش دەسڕێتەوە:"
+"ئایا دەتەوێت %(object_name)s “%(escaped_object)s”بسڕیتەوە؟ هەموو ئەم تۆمارە "
+"پەیوەندیدارانەی خوارەوەش دەسڕێنەوە:"
 
 msgid "Objects"
 msgstr "ئۆبجێکتەکان"
@@ -491,9 +498,6 @@ msgstr "بەڵێ، من دڵنیام"
 
 msgid "No, take me back"
 msgstr "نەخێر، من بگەڕێنەرەوە دواوە"
-
-msgid "Delete multiple objects"
-msgstr "سڕینەوەی چەندین ئۆبجێکت"
 
 #, python-format
 msgid ""
@@ -569,8 +573,8 @@ msgstr ""
 "تۆ ڕەسەنایەتیت هەیە وەکو %(username)s, بەڵام ڕێگەپێدراو نیت بۆ ئەم لاپەڕەیە. "
 "دەتەوێت بە هەژمارێکی تر بچیتەژوورەوە؟"
 
-msgid "Forgotten your password or username?"
-msgstr "تێپەڕەوشە یان ناوی بەکارهێنەرەکەت بیرچۆتەوە؟"
+msgid "Forgotten your login credentials?"
+msgstr "زانیارییەکانی چونەژوورەوەت لەبیرکردووە؟"
 
 msgid "Toggle navigation"
 msgstr "کردنەوەو داخستنی ڕێنیشاندەر"
@@ -593,6 +597,10 @@ msgstr "بەکارهێنەر"
 msgid "Action"
 msgstr "کردار"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr "پەڕەکردنی %(name)s بابەت"
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "تۆمار"
@@ -605,14 +613,19 @@ msgstr ""
 "ئەم ئۆبجێکتە مێژووی گۆڕانکاری نییە. ڕەنگە لە ڕێگەی بەڕێەوەبەری ئەم پێگەیەوە "
 "زیادنەکرابێت."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr "پەڕەکردنی %(name)s"
+
 msgid "Show all"
 msgstr "پیشاندانی هەمووی"
 
-msgid "Save"
-msgstr "پاشەکەوتکردن"
-
 msgid "Popup closing…"
 msgstr "پەنجەرەکە دادەخرێت..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr "گەڕان %(name)s"
 
 msgid "Search"
 msgstr "گەڕان"
@@ -735,8 +748,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "تکایە بڕۆ بۆ پەڕەی دیاریکراو و تێپەڕەوشەیەکی نوێ هەڵبژێرە:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "ناوی بەکارهێنەری تۆ، لە کاتێکدا بیرت چووبێتەوە:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "لە ئەگەری ئەوەی لەبیرت چووبێت، تۆ:"
 
 msgid "Thanks for using our site!"
 msgstr "سوپاس بۆ بەکارهێنانی پێگەکەمان!"
