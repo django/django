@@ -61,14 +61,16 @@ logic for different HTTP methods in a clean and reusable way.
 
 They are especially helpful when:
 
-You want to reuse behavior across multiple views using inheritance or mixins.
+* You want to reuse behavior across multiple views using inheritance
+  or mixins.
+* Your view needs to handle multiple HTTP methods such as ``GET`` and
+  ``POST`` in a structured manner.
 * You want to take advantage of Django's built-in generic class-based
-  views like ``ListView``, ``DetailView``, ``CreateView`` or ``UpdateView``.
-You want to take advantage of Django's built-in generic class-based views
-like ``ListView``, ``DetailView``, ``CreateView`` or ``UpdateView``.
+  views such as ``ListView``, ``DetailView``, ``CreateView``,
+  or ``UpdateView``.
 
-However, function-based views may still be preferable when the view logic is
-very simple and introducing a class would add unnecessary complexity.
+However, function-based views may still be preferable when the view logic
+is very simple and introducing a class would add unnecessary complexity.
 
 Using class-based views
 =======================
