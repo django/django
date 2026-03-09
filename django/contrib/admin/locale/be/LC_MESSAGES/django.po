@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 07:05+0000\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2026-03-09 07:05+0000\n"
 "Last-Translator: znotdead <zhirafchik@gmail.com>, "
 "2016-2017,2019-2021,2023-2025\n"
 "Language-Team: Belarusian (http://app.transifex.com/django/django/language/"
@@ -329,10 +329,7 @@ msgstr ""
 "сайту па электроннай пошце і яна павінна быць выпраўлена ў бліжэйшы час. "
 "Дзякуй за ваша цярпенне."
 
-msgid "Run the selected action"
-msgstr "Выканаць абранае дзеяньне"
-
-msgid "Go"
+msgid "Run"
 msgstr "Выканаць"
 
 msgid "Click here to select the objects across all pages"
@@ -445,6 +442,9 @@ msgstr "Паказаць падлік"
 msgid "Clear all filters"
 msgstr "Ачысьціць усе фільтры"
 
+msgid "Save"
+msgstr "Захаваць"
+
 msgid "Remove from sorting"
 msgstr "Прыбраць з упарадкаванага"
 
@@ -466,28 +466,28 @@ msgstr "Пераключыць тэму (бягучая тэма: цёмная)"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Калі выдаліць %(object_name)s «%(escaped_object)s», выдаляцца зьвязаныя "
-"аб’екты, але ваш рахунак ня мае дазволу выдаляць наступныя віды аб’ектаў:"
+"Калі выдаліць %(object_name)s \"%(escaped_object)s\", выдаляцца зьвязаныя "
+"аб’екты, але ваш рахунак ня мае дазволу выдаляць наступныя віды аб’ектаў:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Каб выдаліць %(object_name)s «%(escaped_object)s», трэба выдаліць і "
+"Каб выдаліць %(object_name)s \"%(escaped_object)s\", трэба выдаліць і "
 "зьвязаныя абароненыя аб’екты:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Ці выдаліць %(object_name)s «%(escaped_object)s»? Усе наступныя зьвязаныя "
-"складнікі выдаляцца:"
+"Вы ўпэўнены что жадаеце выдаліць %(object_name)s \"%(escaped_object)s\"? Усе "
+"наступныя зьвязаныя складнікі выдаляцца:"
 
 msgid "Objects"
 msgstr "Аб'екты"
@@ -594,6 +594,10 @@ msgstr "Карыстальнік"
 msgid "Action"
 msgstr "Дзеяньне"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr "Пагінацыя %(name)s запісаў"
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "запіс"
@@ -608,14 +612,19 @@ msgstr ""
 "Аб’ект ня мае гісторыі зьменаў. Мажліва, яго дадавалі не праз кіраўнічую "
 "пляцоўку."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr "Пагінацыя %(name)s"
+
 msgid "Show all"
 msgstr "Паказаць усё"
 
-msgid "Save"
-msgstr "Захаваць"
-
 msgid "Popup closing…"
 msgstr "Усплывальнае акно зачыняецца..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr "Пошук %(name)s"
 
 msgid "Search"
 msgstr "Шукаць"

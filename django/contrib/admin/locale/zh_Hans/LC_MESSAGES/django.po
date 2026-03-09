@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# funcy39, 2026
 # lanbla <lanlinwen@buaa.edu.cn>, 2021
 # Brian Wang <singeeking@gmail.com>, 2018
 # Fulong Sun <sunfulong@neusoft.edu.cn>, 2016
@@ -37,8 +38,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 07:05+0000\n"
-"Last-Translator: DWXXX, 2025\n"
+"PO-Revision-Date: 2026-03-09 07:05+0000\n"
+"Last-Translator: funcy39, 2026\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -109,7 +110,7 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
-"请输入一个正确的工作人员账户 %(username)s 和密码. 注意他们都是区分大小写的."
+"请输入一个正确的工作人员账户 %(username)s 和密码。注意两者都区分大小写。"
 
 msgid "Action:"
 msgstr "动作"
@@ -344,7 +345,7 @@ msgstr ""
 "等待。"
 
 msgid "Run"
-msgstr ""
+msgstr "运行"
 
 msgid "Click here to select the objects across all pages"
 msgstr "点击此处选择所有页面中包含的对象。"
@@ -477,18 +478,23 @@ msgid ""
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
+"删除 %(object_name)s  “%(escaped_object)s” 会导致删除相关的对象，但你的帐号无"
+"权删除下列类型的对象："
 
 #, python-format
 msgid ""
 "Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
+"删除%(object_name)s \"%(escaped_object)s\" 将需要删除以下受保护的相关对象: "
 
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
+"你确认想要删除 %(object_name)s \"%(escaped_object)s\"吗？ 下列所有相关的项目"
+"都将被删除："
 
 msgid "Objects"
 msgstr "对象"
@@ -595,7 +601,7 @@ msgstr "动作"
 
 #, python-format
 msgid "Pagination %(name)s entries"
-msgstr ""
+msgstr "%(name)s分页条目"
 
 msgid "entry"
 msgid_plural "entries"
@@ -608,7 +614,7 @@ msgstr "此对象没有修改历史。它可能不是通过管理站点添加的
 
 #, python-format
 msgid "Pagination %(name)s"
-msgstr ""
+msgstr "%(name)s分页"
 
 msgid "Show all"
 msgstr "显示全部"
@@ -618,7 +624,7 @@ msgstr "弹窗关闭中..."
 
 #, python-format
 msgid "Search %(name)s"
-msgstr ""
+msgstr "搜索 %(name)s"
 
 msgid "Search"
 msgstr "搜索"

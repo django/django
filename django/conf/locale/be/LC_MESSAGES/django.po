@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 06:49+0000\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2026-03-09 06:49+0000\n"
 "Last-Translator: znotdead <zhirafchik@gmail.com>, "
 "2016-2017,2019-2021,2023-2025\n"
 "Language-Team: Belarusian (http://app.transifex.com/django/django/language/"
@@ -144,6 +144,9 @@ msgstr "Харвацкая"
 
 msgid "Upper Sorbian"
 msgstr "Верхнелужыцкая"
+
+msgid "Haitian Creole"
+msgstr "Гаіцянская крэольская"
 
 msgid "Hungarian"
 msgstr "Вугорская"
@@ -577,8 +580,8 @@ msgstr "Дата (бяз часу)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "Значэнне “%(value)s” мае няправільны фармат. Яно павінна быць у фармаце ГГГГ-"
 "ММ-ДД ГГ:ХХ[:сс[.мммммм]][ЧА], дзе ЧА — часавы абсяг."
@@ -603,8 +606,8 @@ msgstr "Дзесятковы лік"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "Значэньне “%(value)s” мае няправільны фармат. Яно павінна быць у фармаце "
 "[ДД] [ГГ:[ХХ:]]сс[.мммммм]."
@@ -672,8 +675,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"Значэньне “%(value)s” мае няправільны фармат. Яно павінна быць у фармаце ГГ:"
-"ХХ[:сс[.мммммм]]."
+"Значэньне “%(value)s” мае няправільны фармат. Яно павінна быць у фармаце "
+"ГГ:ХХ[:сс[.мммммм]]."
 
 #, python-format
 msgid ""
@@ -734,8 +737,8 @@ msgid "Many-to-many relationship"
 msgstr "Сувязь «некалькі да некалькіх»"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -907,6 +910,22 @@ msgstr "Так"
 
 msgid "No"
 msgstr "Не"
+
+msgctxt "Task"
+msgid "Ready"
+msgstr "Гатова"
+
+msgctxt "Task"
+msgid "Running"
+msgstr "Выконваецца"
+
+msgctxt "Task"
+msgid "Failed"
+msgstr "Правалілася"
+
+msgctxt "Task"
+msgid "Successful"
+msgstr "Паспяхова"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1310,11 +1329,11 @@ msgstr "Няма доступу да %(verbose_name_plural)s"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"Няма доступу да %(verbose_name_plural)s, якія будуць, бо «%(class_name)s."
-"allow_future» мае значэньне «не сапраўдна»."
+"Няма доступу да %(verbose_name_plural)s, якія будуць, бо "
+"«%(class_name)s.allow_future» мае значэньне «не сапраўдна»."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
