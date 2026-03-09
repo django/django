@@ -531,6 +531,12 @@ When you save an object, Django performs the following steps:
 #. **Insert the data into the database.** The preprocessed, prepared data is
    composed into an SQL statement for insertion into the database.
 
+   Note that the values stored on the model instance after calling
+   ``save()`` are not necessarily converted to the same Python types that
+   would be returned when the object is retrieved from the database.
+   If you require the values exactly as stored in the database,
+   reload the instance using :meth:`~Model.refresh_from_db`.
+
 #. **Emit a post-save signal.** The :data:`~django.db.models.signals.post_save`
    signal is sent, allowing any functions listening for that signal to do
    something.
