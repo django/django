@@ -126,6 +126,10 @@ Minor features
 * :attr:`.Permission.name` and :attr:`.Permission.codename` values are now
   renamed when renaming models via a migration.
 
+* The :djadmin:`createsuperuser` and :djadmin:`changepassword` management
+  commands now display ``*`` for each character typed during password input
+  on Python 3.14+.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
