@@ -2119,3 +2119,23 @@ Finally, it's important to note that the Django database layer is merely an
 interface to your database. You can access your database via other tools,
 programming languages or database frameworks; there's nothing Django-specific
 about your database.
+
+Using Django ORM with multiprocessing
+-------------------------------------
+
+When using Python's ``multiprocessing`` module with Django, database
+connections should not be shared across processes. Each process should
+establish its own database connection.
+
+Before spawning child processes, it can be helpful to close existing
+connections::
+
+    from django.db import close_old_connections
+
+    close_old_connections()
+
+This ensures that each process creates a fresh database connection when
+interacting with the ORM.
+
+
+
