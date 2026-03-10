@@ -4,6 +4,7 @@ retrieval.
 """
 
 from django.core.exceptions import FieldError
+from django.db.models.expressions import Col
 from django.db.models.sql.constants import (
     GET_ITERATOR_CHUNK_SIZE,
     NO_RESULTS,
@@ -98,6 +99,20 @@ class UpdateQuery(Query):
                     % field
                 )
             if model is not self.get_meta().concrete_model:
+                if hasattr(val, "resolve_expression"):
+                    resolved = val.resolve_expression(
+                        self, allow_joins=False, for_save=True
+                    )
+                    for expr in resolved.flatten():
+                        if (
+                            isinstance(expr, Col)
+                            and expr.target.model._meta.concrete_model
+                            is not model
+                        ):
+                            raise FieldError(
+                                "Joined field references are not permitted in "
+                                "this query"
+                            )
                 self.add_related_update(model, field, val)
                 continue
             values_seq.append((field, model, val))
