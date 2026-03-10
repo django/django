@@ -18,3 +18,8 @@ Bugfixes
 * Fixed a regression in Django 6.0 in admin forms where
   ``RelatedFieldWidgetWrapper`` incorrectly wrapped all widgets in a
   ``<fieldset>`` (:ticket:`36949`).
+
+* Fixed a bug in Django 6.0 where the ``fields.E348`` system check did not
+  detect name clashes between model managers and
+  :attr:`~django.db.models.ForeignKey.related_name`\s for non-self-referential
+  relationships (:ticket:`36973`).
