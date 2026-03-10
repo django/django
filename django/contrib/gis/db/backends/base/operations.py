@@ -115,6 +115,10 @@ class BaseSpatialOperations:
             "Distance operations not available on this spatial backend."
         )
 
+    @staticmethod
+    def _must_transform_value(value, field):
+        return value is not None and value.srid != field.srid
+
     def get_geom_placeholder_sql(self, f, value, compiler):
         """
         Return the placeholder for the given geometry field with the given
@@ -122,18 +126,14 @@ class BaseSpatialOperations:
         stored procedure call to the transformation function of the spatial
         backend.
         """
-
-        def must_transform_value(value, field):
-            return value is not None and value.srid != field.srid
-
         if hasattr(value, "as_sql"):
             sql, params = compiler.compile(value)
-            if must_transform_value(value.output_field, f):
+            if self._must_transform_value(value.output_field, f):
                 transform_func = self.spatial_function_name("Transform")
                 sql = f"{transform_func}({sql}, %s)"
                 params = (*params, f.srid)
             return sql, params
-        elif must_transform_value(value, f):
+        elif self._must_transform_value(value, f):
             transform_func = self.spatial_function_name("Transform")
             sql = f"{transform_func}({self.from_text}(%s, %s), %s)"
             params = (value, value.srid, f.srid)
