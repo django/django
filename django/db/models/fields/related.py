@@ -721,14 +721,25 @@ class ForeignObject(RelatedField):
 
     def _check_conflict_with_managers(self):
         errors = []
-        manager_names = {manager.name for manager in self.opts.managers}
-        for rel_objs in self.model._meta.related_objects:
-            related_object_name = rel_objs.name
-            if related_object_name in manager_names:
+        try:
+            related_opts = self.related_model._meta
+        except AttributeError:
+            # Model reference cannot be resolved, likely due to a fields.E300.
+            return errors
+        # The reverse accessor is added to self.related_model (the FK target).
+        # So we need to walk related_objects on self.related_model to find
+        # relations whose accessor_name clashes with a manager on that same
+        # model.
+        for rel in related_opts.related_objects:
+            accessor = rel.get_accessor_name()
+            if not accessor:
+                continue
+            manager_names = {m.name for m in self.related_model._meta.managers}
+            if accessor in manager_names:
                 field_name = f"{self.model._meta.object_name}.{self.name}"
                 errors.append(
                     checks.Error(
-                        f"Related name '{related_object_name}' for '{field_name}' "
+                        f"Related name '{accessor}' for '{field_name}' "
                         "clashes with the name of a model manager.",
                         hint=(
                             "Rename the model manager or change the related_name "
