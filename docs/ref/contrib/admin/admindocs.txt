@@ -89,8 +89,8 @@ View reference
 ==============
 
 Each URL in your site has a separate entry in the ``admindocs`` page, and
-clicking on a given URL will show you the corresponding view. Helpful things
-you can document in your view function docstrings include:
+clicking on a given URL will show you the corresponding view. You can document
+the following information in your view function docstrings:
 
 * A short description of what the view does.
 * The **context**, or a list of variables available in the view's template.
