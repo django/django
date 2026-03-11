@@ -204,7 +204,10 @@ class TemplateCommand(BaseCommand):
                         content = template_file.read()
                     template = Engine().from_string(content)
                     if target and new_path.endswith("apps.py"):
-                        context.__setitem__("app_name", target.replace("/", ".").lower())
+                        context.__setitem__(
+                            "app_name", 
+                            target.replace("/", ".").lower()
+                       )
                     content = template.render(context)
                     with open(new_path, "w", encoding="utf-8") as new_file:
                         new_file.write(content)
