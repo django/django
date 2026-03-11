@@ -1,0 +1,56 @@
+=================
+Query Expressions
+=================
+
+Django provides a powerful system of query expressions that allow
+database operations to be expressed using Python objects.
+
+Expressions can be used in annotations, filters, updates, and ordering
+to perform computations directly in the database.
+
+F expressions
+-------------
+
+``F()`` objects reference model field values directly in the database.
+
+Example::
+
+    from django.db.models import F
+
+    Entry.objects.update(number_of_comments=F("number_of_comments") + 1)
+
+Value expressions
+-----------------
+
+``Value()`` represents a literal value in a query expression.
+
+Example::
+
+    from django.db.models import Value
+
+    Entry.objects.annotate(constant_value=Value(1))
+
+Func expressions
+----------------
+
+``Func()`` can be used to call database functions.
+
+Example::
+
+    from django.db.models import Func, F
+
+    Entry.objects.annotate(lower_name=Func(F("name"), function="LOWER"))
+
+ExpressionWrapper
+-----------------
+
+``ExpressionWrapper`` is used when Django needs help determining the
+output type of an expression.
+
+Example::
+
+    from django.db.models import ExpressionWrapper, IntegerField, F
+
+    Entry.objects.annotate(
+        new_value=ExpressionWrapper(F("value") + 1, output_field=IntegerField())
+    )
