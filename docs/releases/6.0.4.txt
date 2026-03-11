@@ -57,6 +57,17 @@ may trigger repeated memory copying, potentially degrading performance.
 This issue has severity "moderate" according to the :ref:`Django security
 policy <security-disclosure>`.
 
+CVE-2026-33034: Potential denial-of-service vulnerability in ASGI requests via memory upload limit bypass
+=========================================================================================================
+
+ASGI requests with a missing or understated ``Content-Length`` header could
+bypass the :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE` limit when reading
+``HttpRequest.body``, potentially loading an unbounded request body into
+memory and causing service degradation.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<security-disclosure>`.
+
 Bugfixes
 ========
 
