@@ -18,6 +18,8 @@ requests without a Trac ticket.
 See the :doc:`/internals/contributing/writing-code/working-with-git` for more
 details on how to use pull requests.
 
+.. _claiming-tickets:
+
 "Claiming" tickets
 ==================
 
@@ -40,13 +42,14 @@ and time availability), claim it by following these steps:
   `ticket tracker`_. Remember that proposals for new features should follow
   the :ref:`process for suggesting new features <requesting-features>`.
 
-* If a ticket for this issue already exists, make sure nobody else has
-  claimed it. To do this, look at the "Owned by" section of the ticket.
-  If it's assigned to "nobody," then it's available to be claimed.
+* If a ticket for this issue already exists and has been accepted, make sure
+  nobody else has claimed it. To do this, look at the "Owned by" section of
+  the ticket. If it's assigned to "nobody," then it's available to be claimed.
   Otherwise, somebody else may be working on this ticket. Either find another
   bug/feature to work on, or contact the developer working on the ticket to
   offer your help. If a ticket has been assigned for weeks or months without
-  any activity, it's probably safe to reassign it to yourself.
+  any activity, it's probably safe to reassign it to yourself. If a ticket
+  hasn't been approved yet, join the conversation.
 
 * Log into your account, if you haven't already, by clicking "GitHub Login"
   or "DjangoProject Login" in the upper left of the ticket page. Once logged
