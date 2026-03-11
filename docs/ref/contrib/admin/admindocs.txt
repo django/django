@@ -30,7 +30,13 @@ the following:
 Once those steps are complete, you can start browsing the documentation by
 going to your admin interface and clicking the "Documentation" link in the
 upper right of the page.
+.. note::
 
+    The ``admindocs`` application is primarily intended for development and
+    debugging. It exposes information about models, views, and templates in
+    your project, so it is generally recommended not to enable it in
+    production environments.
+    
 .. _admindocs-helpers:
 
 Documentation helpers
