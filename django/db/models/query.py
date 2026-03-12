@@ -717,7 +717,20 @@ class QuerySet(AltersData):
     create.alters_data = True
 
     async def acreate(self, **kwargs):
-        return await sync_to_async(self.create)(**kwargs)
+        reverse_one_to_one_fields = frozenset(kwargs).intersection(
+            self.model._meta._reverse_one_to_one_field_names
+        )
+        if reverse_one_to_one_fields:
+            raise ValueError(
+                "The following fields do not exist in this model: %s"
+                % ", ".join(reverse_one_to_one_fields)
+            )
+
+        obj = await sync_to_async(self.model)(**kwargs)
+        self._for_write = True
+        await obj.asave(force_insert=True, using=self.db)
+        obj._state.fetch_mode = self._fetch_mode
+        return obj
 
     acreate.alters_data = True
 
