@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from . import get_user_model
 from .checks import check_middleware, check_models_permissions, check_user_model
-from .management import create_permissions
+from .management import create_permissions, rename_permissions_after_model_rename
 from .signals import user_logged_in
 
 
@@ -16,6 +16,10 @@ class AuthConfig(AppConfig):
     verbose_name = _("Authentication and Authorization")
 
     def ready(self):
+        post_migrate.connect(
+            rename_permissions_after_model_rename,
+            dispatch_uid="django.contrib.auth.management.rename_permissions",
+        )
         post_migrate.connect(
             create_permissions,
             dispatch_uid="django.contrib.auth.management.create_permissions",

@@ -7,8 +7,12 @@ from io import StringIO
 from unittest import mock
 
 from django.apps import apps
+from django.conf import settings
 from django.contrib.auth import get_permission_codename, management
-from django.contrib.auth.management import create_permissions, get_default_username
+from django.contrib.auth.management import (
+    create_permissions,
+    get_default_username,
+)
 from django.contrib.auth.management.commands import changepassword, createsuperuser
 from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
@@ -16,6 +20,7 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.db import migrations
 from django.test import TestCase, override_settings
+from django.test.testcases import TransactionTestCase
 from django.utils.translation import gettext_lazy as _
 
 from .models import (
@@ -1525,6 +1530,276 @@ class CreatePermissionsTests(TestCase):
                 content_type__app_label=opts.app_label,
                 codename=codename,
             ).exists()
+        )
+
+
+@override_settings(
+    MIGRATION_MODULES=dict(
+        settings.MIGRATION_MODULES,
+        auth_tests="auth_tests.operations_migrations",
+    ),
+)
+class PermissionRenameOperationsTests(TransactionTestCase):
+    available_apps = [
+        "django.contrib.contenttypes",
+        "django.contrib.auth",
+        "auth_tests",
+    ]
+
+    databases = {"default", "other"}
+
+    def setUp(self):
+        self.stdout = StringIO()
+        self.addCleanup(self.stdout.close)
+
+    def test_permission_rename(self):
+        # Create initial content type and permissions for OldModel.
+        call_command("migrate", "auth_tests", "0001", verbosity=0)
+        # Apply the migration that renames OldModel to NewModel.
+        call_command("migrate", "auth_tests", "0002", verbosity=0)
+
+        actions = ContentType._meta.default_permissions
+
+        for action in actions:
+            self.assertFalse(
+                Permission.objects.filter(codename=f"{action}_oldmodel").exists()
+            )
+            self.assertTrue(
+                Permission.objects.filter(codename=f"{action}_newmodel").exists()
+            )
+
+        # Unapply that migration, renaming NewModel back to OldModel.
+        call_command(
+            "migrate",
+            "auth_tests",
+            "0001",
+            database="default",
+            interactive=False,
+            verbosity=0,
+        )
+
+        for action in actions:
+            self.assertTrue(
+                Permission.objects.filter(codename=f"{action}_oldmodel").exists()
+            )
+            self.assertFalse(
+                Permission.objects.filter(codename=f"{action}_newmodel").exists()
+            )
+
+        call_command(
+            "migrate",
+            "auth_tests",
+            "zero",
+            database="default",
+            interactive=False,
+            verbosity=0,
+        )
+
+    @mock.patch(
+        "django.db.router.allow_migrate_model",
+        return_value=False,
+    )
+    def test_rename_skipped_if_router_disallows(self, _):
+        # Create them manually, auto permissions won't create
+        # since router disallows
+
+        ct = ContentType.objects.create(app_label="auth_tests", model="oldmodel")
+        Permission.objects.create(
+            codename="change_oldmodel",
+            name="Can change old model",
+            content_type=ct,
+        )
+
+        # Create initial content type and permissions for OldModel.
+        call_command("migrate", "auth_tests", "0001", verbosity=0)
+        # Apply the migration that renames OldModel to NewModel.
+        call_command("migrate", "auth_tests", "0002", verbosity=0)
+
+        self.assertTrue(Permission.objects.filter(codename="change_oldmodel").exists())
+        self.assertFalse(Permission.objects.filter(codename="change_newmodel").exists())
+
+        call_command(
+            "migrate",
+            "auth_tests",
+            "zero",
+            database="default",
+            interactive=False,
+            verbosity=0,
+        )
+
+    def test_rename_backward_without_permissions(self):
+        """
+        Backward migration handles the case where permissions
+        don't exist (e.g., they were manually deleted).
+        """
+        # Create initial content type and permissions for OldModel.
+        call_command("migrate", "auth_tests", "0001", verbosity=0)
+        # Apply the migration that renames OldModel to NewModel.
+        call_command("migrate", "auth_tests", "0002", verbosity=0)
+
+        Permission.objects.filter(content_type__app_label="auth_tests").delete()
+
+        call_command(
+            "migrate",
+            "auth_tests",
+            "zero",
+            database="default",
+            interactive=False,
+            verbosity=0,
+        )
+        self.assertFalse(
+            Permission.objects.filter(
+                codename__in=["change_oldmodel", "change_newmodel"]
+            ).exists()
+        )
+
+        call_command(
+            "migrate",
+            "auth_tests",
+            "zero",
+            database="default",
+            interactive=False,
+            verbosity=0,
+        )
+
+    def test_rename_permission_conflict(self):
+        # Create initial content type and permissions for OldModel.
+        call_command("migrate", "auth_tests", "0001", verbosity=0)
+
+        ct = ContentType.objects.get(app_label="auth_tests", model="oldmodel")
+        old_perm = Permission.objects.get(
+            codename="change_oldmodel",
+            name="Can change old model",
+        )
+        conflicting_perm = Permission.objects.create(
+            codename="change_newmodel",
+            name="Can change new model",
+            content_type=ct,
+        )
+
+        with self.assertRaises(RuntimeError):
+            # Apply the migration that renames OldModel to NewModel.
+            call_command(
+                "migrate",
+                "auth_tests",
+                "0002",
+                database="default",
+                interactive=False,
+                stdout=self.stdout,
+            )
+
+        command_output = self.stdout.getvalue()
+
+        self.assertIn(
+            f"Failed to rename permission {old_perm.pk} "
+            f"from '{old_perm.codename}' to '{conflicting_perm.codename}'. "
+            f"Please resolve the conflict manually.",
+            command_output,
+        )
+
+        self.assertTrue(Permission.objects.filter(codename="change_oldmodel").exists())
+
+        with self.assertRaises(RuntimeError):
+            call_command(
+                "migrate",
+                "auth_tests",
+                "zero",
+                database="default",
+                interactive=False,
+                verbosity=0,
+            )
+
+    def test_permission_rename_respects_other_db(self):
+        # Create initial content type and permissions for OldModel.
+        call_command("migrate", "auth_tests", "0001", verbosity=0)
+
+        permission = Permission.objects.using("default").get(
+            codename="add_oldmodel",
+            name="Can add old model",
+        )
+
+        # Create initial content type and permissions for OldModel.
+        call_command("migrate", "auth_tests", "0001", verbosity=0, database="other")
+        # Apply the migration that renames OldModel to NewModel.
+        call_command("migrate", "auth_tests", "0002", verbosity=0, database="other")
+
+        permission.refresh_from_db()
+        self.assertEqual(permission.codename, "add_oldmodel")
+        self.assertFalse(
+            Permission.objects.using("other").filter(codename="add_oldmodel").exists()
+        )
+        self.assertTrue(
+            Permission.objects.using("other").filter(codename="add_newmodel").exists()
+        )
+
+        call_command(
+            "migrate",
+            "auth_tests",
+            "zero",
+            database="other",
+            interactive=False,
+            verbosity=0,
+        )
+        call_command(
+            "migrate",
+            "auth_tests",
+            "zero",
+            database="default",
+            interactive=False,
+            verbosity=0,
+        )
+
+    def test_verbosity_prints(self):
+        # Create initial content type and permissions for OldModel.
+        call_command("migrate", "auth_tests", "0001", verbosity=0)
+        # Apply the migration that renames OldModel to NewModel.
+        call_command("migrate", "auth_tests", "0002", verbosity=2, stdout=self.stdout)
+
+        command_output = self.stdout.getvalue()
+        self.assertIn(
+            "Renamed permission(s): auth_tests.add_oldmodel → add_newmodel",
+            command_output,
+        )
+        self.assertIn(
+            "Renamed permission(s): auth_tests.change_oldmodel → change_newmodel",
+            command_output,
+        )
+        self.assertIn(
+            "Renamed permission(s): auth_tests.view_oldmodel → view_newmodel",
+            command_output,
+        )
+        self.assertIn(
+            "Renamed permission(s): auth_tests.delete_oldmodel → delete_newmodel",
+            command_output,
+        )
+
+        call_command("migrate", "auth_tests", "0001", verbosity=2, stdout=self.stdout)
+
+        command_output = self.stdout.getvalue()
+        self.assertIn(
+            "Renamed permission(s): auth_tests.add_newmodel → add_oldmodel",
+            command_output,
+        )
+        self.assertIn(
+            "Renamed permission(s): auth_tests.change_newmodel → change_oldmodel",
+            command_output,
+        )
+        self.assertIn(
+            "Renamed permission(s): auth_tests.view_newmodel → view_oldmodel",
+            command_output,
+        )
+        self.assertIn(
+            "Renamed permission(s): auth_tests.delete_newmodel → delete_oldmodel",
+            command_output,
+        )
+
+        call_command(
+            "migrate",
+            "auth_tests",
+            "zero",
+            database="default",
+            interactive=False,
+            verbosity=0,
         )
 
 

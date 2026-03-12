@@ -13,9 +13,8 @@ from django.utils.inspect import signature
 
 @functools.cache
 def django_file_prefixes():
-    try:
-        file = django.__file__
-    except AttributeError:
+    file = getattr(django, "__file__", None)
+    if file is None:
         return ()
     return (os.path.dirname(file),)
 

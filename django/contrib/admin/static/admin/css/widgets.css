@@ -302,7 +302,8 @@ p.datetime {
 }
 
 p.datetime label {
-    display: inline;
+    display: block;
+    padding: 0.5rem 0;
 }
 
 .datetime span {
@@ -313,7 +314,6 @@ p.datetime label {
 }
 
 .datetime input, .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
-    margin-left: 5px;
     margin-bottom: 4px;
 }
 
