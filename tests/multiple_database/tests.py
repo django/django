@@ -13,7 +13,14 @@ from django.db.utils import ConnectionRouter
 from django.test import SimpleTestCase, TestCase, override_settings
 
 from .models import Book, Person, Pet, Review, UserProfile
-from .routers import AuthRouter, TestRouter, WriteRouter
+from .routers import (
+    AuthRouter,
+    DenyRelationRouter,
+    NoRelationOpinionRouter,
+    ReadWriteRouter,
+    TestRouter,
+    WriteRouter,
+)
 
 
 class QueryTestCase(TestCase):
@@ -1141,10 +1148,13 @@ class QueryTestCase(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             review1.content_object = dive
 
-        # Add to a foreign key set with an object from a different database
+        # Add to a foreign key set with an object from a different database.
+        # This now fails because the router's allow_relation() check rejects
+        # cross-database relations, instead of being treated as an "unsaved"
+        # instance error as in the previous implementation.
         msg = (
-            "<Review: Python Monthly> instance isn't saved. "
-            "Use bulk=False or save the object first."
+            'Cannot add "<Review: Python Monthly>": the current database router '
+            "does not allow this relation."
         )
         with self.assertRaisesMessage(ValueError, msg):
             with transaction.atomic(using="other"):
@@ -1525,13 +1535,13 @@ class RouterTestCase(TestCase):
             title="Dive into Python",
             published=datetime.date(2009, 5, 4),
         )
-        # Set a foreign key set with an object from a different database
-        msg = (
-            "<Book: Dive into Python> instance isn't saved. Use bulk=False or save the "
-            "object first."
-        )
-        with self.assertRaisesMessage(ValueError, msg):
-            marty.edited.set([dive])
+
+        # Set a foreign key set with an object from a different database.
+        # Previously this raised an error because cross-database relations
+        # were blocked; after introducing explicit router.allow_relation()
+        # checks, TestRouter now allows this relation between "default"
+        # and "other", so the operation should succeed without error.
+        marty.edited.set([dive])
 
     def test_foreign_key_cross_database_protection(self):
         """
@@ -2592,3 +2602,301 @@ class RelationAssignmentTests(SimpleTestCase):
         profile = UserProfile()
         with self.assertRaisesMessage(ValueError, self.router_prevents_msg):
             user.userprofile = profile
+
+
+@override_settings(DATABASE_ROUTERS=[ReadWriteRouter()])
+class ReadWriteRouterTests(TestCase):
+    """
+    Read and Write databases are different,
+    but relations are allowed between them.
+    This setup can be used for using 'default' as the 'write' db
+    and 'other' as a 'read' replica.
+    Or to simply define relationships between two separate db.
+    """
+
+    databases = {"default", "other"}
+    fixtures = ["replica"]
+
+    def test_reverse_fk_add_across_different_databases(self):
+        # create person instance in the default db
+        person = Person.objects.create(name="Some Person")
+
+        # create book instance in the "other" db
+        book = Book.objects.using("other").create(
+            title="Some random book", published=datetime.date(2026, 3, 11)
+        )
+
+        # Verify the instances are in different databases
+        self.assertEqual(person._state.db, "default")
+        self.assertEqual(book._state.db, "other")
+
+        # This should not raise errors
+        # because relationship is allowed
+        person.edited.add(book)
+
+        """
+        In this test setup, there's no
+        real time replication between the databases,
+        So the editor count for the book
+        will be 0 in the default database.
+        However, this query should run without raising any errors
+        """
+        self.assertEqual(Book.objects.filter(editor=person).count(), 0)
+
+    def test_reverse_fk_add_across_replicas(self):
+        # Simulating a real replica.
+        # Fixture loads identical data into both databases.
+        # ReadWriteRouter.db_for_read returns "other",
+        # so .get() reads from "other".
+        person = Person.objects.get(name="John Doe")
+        book = Book.objects.get(title="A Django book")
+
+        # verify database
+        self.assertEqual(person._state.db, "other")
+        self.assertEqual(book._state.db, "other")
+
+        # add() writes to "default" (db_for_write).
+        # Since the fixture put the same pk=1 data in "default" too.
+        # The UPDATE actually matches and modifies the row
+        person.edited.add(book)
+        book.refresh_from_db()
+
+        # Verify the relationship was actually created on the 'write' database
+        self.assertSequenceEqual(
+            Book.objects.using("default").filter(editor=person), [book]
+        )
+
+    def test_reverse_fk_set_across_different_databases(self):
+        person = Person.objects.create(name="Some Person")
+        book = Book.objects.using("other").create(
+            title="Some Random Book",
+            published=datetime.date(2026, 3, 11),
+        )
+
+        # This should NOT raise ValueError.
+        person.edited.set([book])
+
+    def test_reverse_fk_set_across_replicas(self):
+        # Same as test_reverse_fk_add_across_replicas but using set()
+        person = Person.objects.get(name="John Doe")
+        book = Book.objects.get(title="A Django book")
+
+        person.edited.set([book])
+
+        # Verify the relationship was created on the 'write' database
+        self.assertSequenceEqual(
+            Book.objects.using("default").filter(editor=person), [book]
+        )
+
+    def test_reverse_fk_add_bulk_false_across_databases(self):
+        # With bulk=False, add() calls save() on each object individually.
+        person = Person.objects.create(name="Some Person")
+        book = Book.objects.using("other").create(
+            title="Some Random Book",
+            published=datetime.date(2026, 3, 11),
+        )
+
+        person.edited.add(book, bulk=False)
+
+        # With bulk=False the book gets saved to "default"
+        # which is where 'person' is created
+        self.assertSequenceEqual(
+            Book.objects.using("default").filter(editor=person),
+            [book],
+        )
+
+    def test_generic_relation_add_across_databases(self):
+        # Book has `reviews = GenericRelation(Review)`
+        book = Book.objects.using("other").get(pk=1)
+        review = Review.objects.using("default").create(
+            source="Python Monthly",
+            content_type=ContentType.objects.db_manager("default").get_for_model(Book),
+            object_id=book.pk,
+        )
+
+        self.assertEqual(book._state.db, "other")
+        self.assertEqual(review._state.db, "default")
+
+        # This should NOT raise ValueError
+        book.reviews.add(review)
+
+    def test_generic_relation_add_across_replicas(self):
+        # Fixture loads both book and review into both databases
+        book = Book.objects.get(pk=1)
+        review = Review.objects.get(pk=1)
+
+        book.reviews.add(review)
+
+        # Verify the relationship was created on the 'write' database
+        self.assertEqual(
+            list(
+                Book.objects.using("default").get(pk=1).reviews.using("default").all()
+            ),
+            [review],
+        )
+
+    def test_generic_relation_set_across_databases(self):
+        book = Book.objects.get(pk=1)
+        review = Review.objects.create(
+            source="Python Monthly",
+            content_type=ContentType.objects.db_manager("default").get_for_model(Book),
+            object_id=book.pk,
+        )
+
+        # This should NOT raise ValueError
+        book.reviews.set([review])
+
+    def test_generic_relation_set_across_replicas(self):
+        book = Book.objects.get(pk=1)
+        review = Review.objects.create(
+            source="Python Monthly",
+            content_type=ContentType.objects.db_manager("default").get_for_model(Book),
+            object_id=book.pk,
+        )
+
+        # This should NOT raise ValueError
+        book.reviews.set([review])
+
+    def test_reverse_fk_add_unsaved_raises(self):
+        person = Person.objects.create(name="Some Random Person")
+        unsaved_book = Book(
+            title="Unsaved Book",
+            published=datetime.date(2026, 3, 12),
+        )
+        msg = (
+            "<Book: Unsaved Book> instance isn't saved. Use bulk=False or "
+            "save the object first."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            person.edited.add(unsaved_book)
+
+    def test_reverse_fk_set_unsaved_raises(self):
+        person = Person.objects.create(name="Some Random Person")
+        unsaved_book = Book(
+            title="Unsaved Book",
+            published=datetime.date(2026, 3, 12),
+        )
+        msg = "Model instances without primary key value are unhashable"
+        with self.assertRaisesMessage(TypeError, msg):
+            person.edited.set([unsaved_book])
+
+    def test_generic_relation_add_unsaved_raises(self):
+        book = Book.objects.get(pk=1)
+        unsaved_review = Review(source="Python Monthly")
+        msg = (
+            "<Review: Python Monthly> instance isn't saved. Use bulk=False or "
+            "save the object first."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            book.reviews.add(unsaved_review)
+
+
+@override_settings(DATABASE_ROUTERS=[DenyRelationRouter()])
+class DenyRelationRouterTests(TestCase):
+    databases = {"default", "other"}
+
+    def test_reverse_fk_add_denied_by_router(self):
+        person = Person.objects.create(name="Some Person")
+        book = Book.objects.using("other").create(
+            title="Some Book",
+            published=datetime.date(2024, 1, 1),
+        )
+
+        msg = (
+            'Cannot assign "<Person: Some Person>": the current database '
+            "router prevents this relation."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            person.edited.add(book)
+
+    def test_generic_relation_add_denied_by_router(self):
+        book = Book.objects.using("other").create(
+            title="Some Book",
+            published=datetime.date(2024, 1, 1),
+        )
+        review = Review.objects.using("default").create(
+            source="Python Monthly",
+            content_type=ContentType.objects.db_manager("default").get_for_model(Book),
+            object_id=book.pk,
+        )
+        msg = (
+            'Cannot add "<Review: Python Monthly>": the current database '
+            "router does not allow this relation."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            book.reviews.add(review)
+
+
+@override_settings(DATABASE_ROUTERS=[NoRelationOpinionRouter()])
+class NoRelationOpinionRouterTests(TestCase):
+    """
+    When the router returns None for allow_relation, Django's
+    default behavior allows relations between objects on the
+    same database.
+    """
+
+    databases = {"default", "other"}
+
+    def test_reverse_fk_add_same_db_allowed(self):
+        # Creating both instances in the default db
+        person = Person.objects.create(name="Some Person")
+        book = Book.objects.create(
+            title="Some Book",
+            published=datetime.date(2026, 3, 13),
+        )
+
+        person.edited.add(book)
+        self.assertSequenceEqual(
+            Book.objects.using("default").filter(editor=person),
+            [book],
+        )
+
+    def test_reverse_fk_add_cross_db_denied(self):
+        person = Person.objects.create(name="Some Person")
+        book = Book.objects.using("other").create(
+            title="Some Book",
+            published=datetime.date(2024, 1, 1),
+        )
+
+        msg = (
+            'Cannot assign "<Person: Some Person>": the current '
+            "database router prevents this relation."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            person.edited.add(book)
+
+    def test_generic_relation_add_same_db_allowed(self):
+        book = Book.objects.create(
+            title="Some Book",
+            published=datetime.date(2024, 1, 1),
+        )
+        review = Review.objects.create(
+            source="Python Monthly",
+            content_type=ContentType.objects.db_manager("default").get_for_model(Book),
+            object_id=book.pk,
+        )
+
+        book.reviews.add(review)
+        updated_review = Review.objects.using("default").get(pk=review.pk)
+        self.assertEqual(updated_review.object_id, book.pk)
+        self.assertEqual(
+            updated_review.content_type,
+            ContentType.objects.db_manager("default").get_for_model(Book),
+        )
+
+    def test_generic_relation_add_cross_db_denied(self):
+        book = Book.objects.using("other").create(
+            title="Some Book",
+            published=datetime.date(2024, 1, 1),
+        )
+        review = Review.objects.using("default").create(
+            source="Python Monthly",
+            content_type=ContentType.objects.db_manager("default").get_for_model(Book),
+            object_id=book.pk,
+        )
+        msg = (
+            'Cannot add "<Review: Python Monthly>": the current '
+            "database router does not allow this relation."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            book.reviews.add(review)
