@@ -13,6 +13,7 @@ import uuid
 from decimal import Decimal, DecimalException
 from io import BytesIO
 
+from django.conf import settings
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.forms.boundfield import BoundField
@@ -1198,7 +1199,7 @@ class FilePathField(ChoiceField):
         if self.required:
             self.choices = []
         else:
-            self.choices = [("", "---------")]
+            self.choices = [("", _(settings.BLANK_CHOICE_LABEL))]
 
         if self.match is not None:
             self.match_re = re.compile(self.match)

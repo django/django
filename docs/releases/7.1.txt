@@ -1,0 +1,8 @@
+============================================
+Django 7.1 release notes - UNDER DEVELOPMENT
+============================================
+
+Features removed in 7.1
+=======================
+
+* The ``django.db.models.fields.BLANK_CHOICE_DASH`` constant has been removed.

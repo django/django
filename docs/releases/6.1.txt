@@ -238,7 +238,9 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* The new setting :setting:`BLANK_CHOICE_LABEL` defines a more
+  accessible, translatable label for the blank choice in forms. It is appended
+  to most ``choices`` lists.
 
 Generic Views
 ~~~~~~~~~~~~~
@@ -480,6 +482,9 @@ Miscellaneous
   of the deprecation period, ``None`` values compile to SQL ``IS NULL`` when
   used as the top-level value. :lookup:`Key and index lookups <jsonfield.key>`
   are unaffected by this deprecation.
+
+* The ``django.db.models.fields.BLANK_CHOICE_DASH`` constant is deprecated.
+  Use the :setting:`BLANK_CHOICE_LABEL` setting instead.
 
 Features removed in 6.1
 =======================

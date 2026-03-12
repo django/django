@@ -5,6 +5,7 @@ and database field objects.
 
 from itertools import chain
 
+from django.conf import settings
 from django.core.exceptions import (
     NON_FIELD_ERRORS,
     FieldError,
@@ -1480,7 +1481,7 @@ class ModelChoiceField(ChoiceField):
         self,
         queryset,
         *,
-        empty_label="---------",
+        empty_label="",
         required=True,
         widget=None,
         label=None,
@@ -1507,6 +1508,8 @@ class ModelChoiceField(ChoiceField):
         ):
             self.empty_label = None
         else:
+            if empty_label == "":
+                empty_label = _(settings.BLANK_CHOICE_LABEL)
             self.empty_label = empty_label
         self.queryset = queryset
         self.limit_choices_to = limit_choices_to  # limit the queryset later.
