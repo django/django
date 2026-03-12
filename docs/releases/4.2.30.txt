@@ -26,3 +26,13 @@ behavior of :pypi:`Daphne <daphne>`, the reference server for ASGI.
 
 This issue has severity "low" according to the :ref:`Django security policy
 <security-disclosure>`.
+
+CVE-2026-4277: Privilege abuse in ``GenericInlineModelAdmin``
+=============================================================
+
+Add permissions on inline model instances were not validated on submission of
+forged ``POST`` data in
+:class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin`.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<security-disclosure>`.
