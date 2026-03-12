@@ -570,9 +570,11 @@ def construct_change_message(form, formsets, add):
     # DD/MM/YYYY.
     elif changed_data := form.changed_data:
         with translation_override(None):
-            # Deactivate translations while fetching verbose_name for form
-            # field labels and using `field_name`, if verbose_name is not
-            # provided. Translations will happen later on LogEntry access.
+            # Deactivate translations while fetching verbose_name. For
+            # ModelForms, the model field's verbose_name is used directly
+            # for reliable translation catalog lookup. For non-model fields,
+            # the form label or field_name is used as fallback.
+            # Translations will happen later on LogEntry access.
             changed_field_labels = _get_changed_field_labels_from_form(
                 form, changed_data
             )
@@ -616,9 +618,26 @@ def construct_change_message(form, formsets, add):
 def _get_changed_field_labels_from_form(form, changed_data):
     changed_field_labels = []
     for field_name in changed_data:
-        try:
-            verbose_field_name = form.fields[field_name].label or field_name
-        except KeyError:
-            verbose_field_name = field_name
+        verbose_field_name = field_name
+        if hasattr(form, "_meta") and form._meta.model:
+            try:
+                # Use model verbose_name for reliable translation catalog
+                # lookup. The form label has capfirst() applied, which may
+                # not match the translation catalog's msgid.
+                verbose_field_name = form._meta.model._meta.get_field(
+                    field_name
+                ).verbose_name
+            except FieldDoesNotExist:
+                # Field not on the model (e.g., form-only field). Fall back
+                # to form label or field_name.
+                try:
+                    verbose_field_name = form.fields[field_name].label or field_name
+                except KeyError:
+                    pass
+        else:
+            try:
+                verbose_field_name = form.fields[field_name].label or field_name
+            except KeyError:
+                pass
         changed_field_labels.append(str(verbose_field_name))
     return changed_field_labels
