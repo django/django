@@ -7,8 +7,29 @@ basis for other serializers.
 from django.apps import apps
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
-from django.db.models import CompositePrimaryKey
 from django.utils.encoding import is_protected_type
+
+from .utils import ClassLookupDict
+
+
+class FieldSerializer:
+    @classmethod
+    def serialize(cls, field, obj, serializer):
+        value = field.value_from_object(obj)
+        # Protected types (i.e., primitives like None, numbers, dates, and
+        # Decimals) are passed through as is. All other values are converted to
+        # string.
+        return value if is_protected_type(value) else field.value_to_string(obj)
+
+    @classmethod
+    def deserialize(cls, field, value, deserializer):
+        return field.to_python(value)
+
+
+class CompositePrimaryKeySerializer(FieldSerializer):
+    @classmethod
+    def serialize(cls, field, obj, serializer):
+        return [serializer.serialize_field(f, obj) for f in field]
 
 
 class Serializer(base.Serializer):
@@ -17,6 +38,11 @@ class Serializer(base.Serializer):
     """
 
     internal_use_only = True
+
+    field_mapping = {
+        models.Field: FieldSerializer,
+        models.CompositePrimaryKey: CompositePrimaryKeySerializer,
+    }
 
     def start_serialization(self):
         self._current = None
@@ -35,21 +61,12 @@ class Serializer(base.Serializer):
     def get_dump_object(self, obj):
         data = {"model": str(obj._meta)}
         if not self.use_natural_primary_keys or not self._resolve_natural_key(obj):
-            data["pk"] = self._value_from_field(obj, obj._meta.pk)
+            data["pk"] = self.serialize_field(obj._meta.pk, obj)
         data["fields"] = self._current
         return data
 
-    def _value_from_field(self, obj, field):
-        if isinstance(field, CompositePrimaryKey):
-            return [self._value_from_field(obj, f) for f in field]
-        value = field.value_from_object(obj)
-        # Protected types (i.e., primitives like None, numbers, dates,
-        # and Decimals) are passed through as is. All other values are
-        # converted to string first.
-        return value if is_protected_type(value) else field.value_to_string(obj)
-
     def handle_field(self, obj, field):
-        self._current[field.name] = self._value_from_field(obj, field)
+        self._current[field.name] = self.serialize_field(field, obj)
 
     def handle_fk_field(self, obj, field):
         if self.use_natural_foreign_keys and (
@@ -57,7 +74,7 @@ class Serializer(base.Serializer):
         ):
             value = natural_key_value
         else:
-            value = self._value_from_field(obj, field)
+            value = self.serialize_field(field, obj)
         self._current[field.name] = value
 
     def handle_m2m_field(self, obj, field):
@@ -70,7 +87,7 @@ class Serializer(base.Serializer):
                     if natural := value.natural_key():
                         return natural
                     else:
-                        return self._value_from_field(value, value._meta.pk)
+                        return self.serialize_field(value._meta.pk, value)
 
                 def queryset_iterator(obj, field):
                     attr = getattr(obj, field.name)
@@ -90,7 +107,7 @@ class Serializer(base.Serializer):
             else:
 
                 def m2m_value(value):
-                    return self._value_from_field(value, value._meta.pk)
+                    return self.serialize_field(value._meta.pk, value)
 
                 def queryset_iterator(obj, field):
                     query_set = getattr(obj, field.name).select_related(None).only("pk")
@@ -131,6 +148,7 @@ class Deserializer(base.Deserializer):
         self.ignorenonexistent = ignorenonexistent
         self.field_names_cache = {}  # Model: <list of field_names>
         self._iterator = None
+        self.field_deserializers = ClassLookupDict(Serializer.field_mapping)
 
     def __iter__(self):
         for obj in self.stream:
@@ -206,7 +224,7 @@ class Deserializer(base.Deserializer):
             # Handle all other fields
             else:
                 try:
-                    data[field.name] = field.to_python(field_value)
+                    data[field.name] = self.deserialize_field(field, field_value, self)
                 except Exception as e:
                     raise base.DeserializationError.WithData(
                         e, obj["model"], obj.get("pk"), field_value
