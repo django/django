@@ -1386,6 +1386,13 @@ default templates used by the :class:`ModelAdmin` views:
     for displaying a confirmation page when deleting one or more objects. See
     the :doc:`actions documentation</ref/contrib/admin/actions>`.
 
+.. attribute:: ModelAdmin.delete_confirmation_max_objects
+
+    Set ``delete_confirmation_max_objects`` to control how many objects are
+    shown on the delete confirmation pages before truncating the remainder with
+    an ellipsis. This applies to both :meth:`delete_view` and the
+    ``delete_selected`` action. By default, this is ``None`` (no truncation).
+
 .. attribute:: ModelAdmin.object_history_template
 
     Path to a custom template, used by :meth:`history_view`.

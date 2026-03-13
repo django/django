@@ -70,6 +70,7 @@ def delete_selected(modeladmin, request, queryset):
         "subtitle": None,
         "objects_name": str(objects_name),
         "deletable_objects": [deletable_objects],
+        "delete_confirmation_max_objects": modeladmin.delete_confirmation_max_objects,
         "model_count": dict(model_count).items(),
         "queryset": queryset,
         "perms_lacking": perms_needed,

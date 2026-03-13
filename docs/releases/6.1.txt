@@ -99,6 +99,11 @@ Minor features
   preserve :ref:`named groups <field-choices-named-groups>` (e.g.
   ``choices=[("Group", [("1", "Item")]), ...]``).
 
+* The :attr:`~django.contrib.admin.ModelAdmin.delete_confirmation_max_objects`
+  option allows customizing how many objects are displayed on admin delete
+  confirmation pages before the remainder is truncated. The default is
+  ``None`` (no truncation).
+
 * In order to improve accessibility of the admin change forms:
 
   * Form fields are now shown below their respective labels instead of next to

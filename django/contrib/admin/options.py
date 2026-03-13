@@ -660,6 +660,7 @@ class ModelAdmin(BaseModelAdmin):
     add_form_template = None
     change_form_template = None
     change_list_template = None
+    delete_confirmation_max_objects = None
     delete_confirmation_template = None
     delete_selected_confirmation_template = None
     object_history_template = None
@@ -2264,6 +2265,7 @@ class ModelAdmin(BaseModelAdmin):
             "object": obj,
             "escaped_object": display_for_value(str(obj), EMPTY_VALUE_STRING),
             "deleted_objects": deleted_objects,
+            "delete_confirmation_max_objects": self.delete_confirmation_max_objects,
             "model_count": dict(model_count).items(),
             "perms_lacking": perms_needed,
             "protected": protected,

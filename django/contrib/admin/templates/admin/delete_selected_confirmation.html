@@ -30,7 +30,7 @@
     {% include "admin/includes/object_delete_summary.html" %}
     <h2>{% translate "Objects" %}</h2>
     {% for deletable_object in deletable_objects %}
-        <ul>{{ deletable_object|unordered_list }}</ul>
+        <ul>{{ deletable_object|truncated_unordered_list:delete_confirmation_max_objects }}</ul>
     {% endfor %}
     <form method="post">{% csrf_token %}
     <div>

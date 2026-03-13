@@ -60,8 +60,15 @@ class CustomPwdTemplateUserAdmin(UserAdmin):
 
 
 class BookAdmin(admin.ModelAdmin):
+    delete_confirmation_max_objects = 1
+
     def get_deleted_objects(self, objs, request):
-        return ["a deletable object"], {"books": 1}, set(), []
+        return (
+            ["a deletable object", "another object", "last object"],
+            {"books": 1},
+            set(),
+            [],
+        )
 
 
 site = Admin2(name="admin2")

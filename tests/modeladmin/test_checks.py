@@ -1020,6 +1020,50 @@ class ListMaxShowAllCheckTests(CheckTestCase):
         self.assertIsValid(TestModelAdmin, ValidationTestModel)
 
 
+class DeleteConfirmationMaxObjectsCheckTests(CheckTestCase):
+    def test_not_integer(self):
+        class TestModelAdmin(ModelAdmin):
+            delete_confirmation_max_objects = "hello"
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            ValidationTestModel,
+            (
+                "The value of "
+                "'delete_confirmation_max_objects'"
+                " must be a non-negative integer or None."
+            ),
+            "admin.E131",
+        )
+
+    def test_negative_integer(self):
+        class TestModelAdmin(ModelAdmin):
+            delete_confirmation_max_objects = -1
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            ValidationTestModel,
+            (
+                "The value of "
+                "'delete_confirmation_max_objects'"
+                " must be a non-negative integer or None."
+            ),
+            "admin.E131",
+        )
+
+    def test_valid_case(self):
+        class TestModelAdmin(ModelAdmin):
+            delete_confirmation_max_objects = 100
+
+        self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
+    def test_valid_none(self):
+        class TestModelAdmin(ModelAdmin):
+            delete_confirmation_max_objects = None
+
+        self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
+
 class SearchFieldsCheckTests(CheckTestCase):
     def test_not_iterable(self):
         class TestModelAdmin(ModelAdmin):

@@ -35,7 +35,7 @@
     <p>{% blocktranslate %}Are you sure you want to delete the {{ object_name }} “{{ escaped_object }}”? All of the following related items will be deleted:{% endblocktranslate %}</p>
     {% include "admin/includes/object_delete_summary.html" %}
     <h2>{% translate "Objects" %}</h2>
-    <ul id="deleted-objects">{{ deleted_objects|unordered_list }}</ul>
+    <ul id="deleted-objects">{{ deleted_objects|truncated_unordered_list:delete_confirmation_max_objects }}</ul>
     <form method="post">{% csrf_token %}
     <div>
     <input type="hidden" name="post" value="yes">
