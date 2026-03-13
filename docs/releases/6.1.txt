@@ -348,6 +348,17 @@ Serialization
   :exc:`~django.core.exceptions.SuspiciousOperation` when it encounters
   unexpected nested tags.
 
+* New model field methods allow more advanced customization of serialization
+  and deserialization.
+
+  For serializers that inherit from the Python serializer (``json``, ``jsonl``,
+  and ``yaml``): :meth:`~.Field.serialize_to_python`,
+  :meth:`~.Field.deserialize_from_python`
+
+  For the XML serializer: :meth:`~.Field.serialize_to_xml`,
+  :meth:`~.Field.deserialize_from_xml`
+
+
 Signals
 ~~~~~~~
 

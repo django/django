@@ -32,6 +32,7 @@ from django.utils.dateparse import (
 )
 from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.duration import duration_string
+from django.utils.encoding import is_protected_type
 from django.utils.functional import Promise, cached_property
 from django.utils.ipv6 import MAX_IPV6_ADDRESS_LENGTH, clean_ipv6_address
 from django.utils.text import capfirst
@@ -1120,6 +1121,35 @@ class Field(RegisterLookupMixin):
         This is used by the serialization framework.
         """
         return str(self.value_from_object(obj))
+
+    def serialize_to_python(self, obj, serializer):
+        """
+        Return the serialized value for the serializers that inherit the Python
+        serializer (json, jsonl, yaml).
+        """
+        value = self.value_from_object(obj)
+        # Protected types (i.e., primitives like None, numbers, dates, and
+        # Decimals) are passed through as is. All other values are converted to
+        # string.
+        return value if is_protected_type(value) else self.value_to_string(obj)
+
+    def deserialize_from_python(self, value):
+        """
+        Return the deserialized value for the serializers that inherit the
+        Python serializer (json, jsonl, yaml).
+        """
+        return self.to_python(value)
+
+    def serialize_to_xml(self, obj, serializer):
+        """Return the serialized value for the XML serializer."""
+        return self.value_to_string(obj)
+
+    def deserialize_from_xml(self, field_node):
+        """Return the deserialized value for the XML serializer."""
+        from django.core.serializers.xml_serializer import getInnerText
+
+        value = getInnerText(field_node).strip()
+        return self.to_python(value)
 
     @property
     def flatchoices(self):

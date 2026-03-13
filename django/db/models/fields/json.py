@@ -139,6 +139,17 @@ class JSONField(CheckFieldDefaultMixin, Field):
     def value_to_string(self, obj):
         return self.value_from_object(obj)
 
+    def deserialize_from_xml(self, value):
+        value = super().deserialize_from_xml(value)
+        # Load value since JSONField.to_python() isn't defined to convert
+        # strings to Python values.
+        return json.loads(value, cls=self.decoder)
+
+    def serialize_to_xml(self, obj, serializer):
+        value = super().serialize_to_xml(obj, serializer)
+        # Dump value since value_to_string() doesn't output strings.
+        return json.dumps(value, cls=self.encoder)
+
     def formfield(self, **kwargs):
         return super().formfield(
             **{

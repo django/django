@@ -2,7 +2,6 @@
 XML serializer.
 """
 
-import json
 from contextlib import contextmanager
 from xml.dom import minidom, pulldom
 from xml.sax import handler
@@ -110,11 +109,7 @@ class Serializer(base.Serializer):
 
         # Get a "string version" of the object's data.
         if getattr(obj, field.name) is not None:
-            value = field.value_to_string(obj)
-            if field.get_internal_type() == "JSONField":
-                # Dump value since JSONField.value_to_string() doesn't output
-                # strings.
-                value = json.dumps(value, cls=field.encoder)
+            value = field.serialize_to_xml(obj, self)
             try:
                 self.xml.characters(value)
             except UnserializableContentError:
@@ -347,10 +342,7 @@ class Deserializer(base.Deserializer):
                 if field_node.getElementsByTagName("None"):
                     value = None
                 else:
-                    value = field.to_python(getInnerText(field_node).strip())
-                    # Load value since JSONField.to_python() outputs strings.
-                    if field.get_internal_type() == "JSONField":
-                        value = json.loads(value, cls=field.decoder)
+                    value = field.deserialize_from_xml(field_node)
                 data[field.name] = value
 
         obj = base.build_instance(Model, data, self.db)
