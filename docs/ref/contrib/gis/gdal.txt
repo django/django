@@ -1077,7 +1077,7 @@ Coordinate System Objects
     interpreted as (latitude, longitude) instead of the traditional GIS
     (longitude, latitude) order. Django uses ``AxisOrder.TRADITIONAL`` by
     default to preserve backwards-compatible behavior. If you need to use
-    the authority axis order (e.g. when interoperating with systems that
+    the authority axis order (e.g. when working with systems that
     follow the EPSG convention), pass ``axis_order=AxisOrder.AUTHORITY`` to
     :class:`SpatialReference`. See :ref:`gdal-axis-order` for examples.
 
