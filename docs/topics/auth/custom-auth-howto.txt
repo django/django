@@ -1,0 +1,33 @@
+====================================================
+How to build a basic authentication system
+====================================================
+
+This guide provides a step-by-step tutorial on implementing 
+the most common authentication features in Django.
+
+Configuring URLs
+================
+
+To use Django's built-in auth views, add them to your ``urls.py``:
+
+.. code-block:: python
+
+    from django.urls import path, include
+
+    urlpatterns = [
+        path('accounts/', include('django.contrib.auth.urls')),
+    ]
+
+The Login View
+==============
+
+Django provides a built-in ``LoginView``. By default, it looks 
+for a template at ``registration/login.html``.
+
+.. code-block:: html
+
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Login</button>
+    </form>
