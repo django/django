@@ -43,7 +43,7 @@ class CreateExtension(Operation):
             )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        if not router.allow_migrate(
+        if schema_editor.connection.vendor != "postgresql" or not router.allow_migrate(
             schema_editor.connection.alias, app_label, **self.hints
         ):
             return
@@ -229,7 +229,9 @@ class CreateCollation(CollationOperation):
         self.create_collation(schema_editor)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        if not router.allow_migrate(schema_editor.connection.alias, app_label):
+        if schema_editor.connection.vendor != "postgresql" or not router.allow_migrate(
+            schema_editor.connection.alias, app_label
+        ):
             return
         self.remove_collation(schema_editor)
 
@@ -259,7 +261,9 @@ class RemoveCollation(CollationOperation):
         self.remove_collation(schema_editor)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        if not router.allow_migrate(schema_editor.connection.alias, app_label):
+        if schema_editor.connection.vendor != "postgresql" or not router.allow_migrate(
+            schema_editor.connection.alias, app_label
+        ):
             return
         self.create_collation(schema_editor)
 
