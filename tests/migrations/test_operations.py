@@ -1,4 +1,5 @@
 import math
+import unittest
 from decimal import Decimal
 
 from django.core.exceptions import FieldDoesNotExist
@@ -6919,3 +6920,58 @@ class BaseOperationTests(SimpleTestCase):
     def test_formatted_description_no_category(self):
         operation = Operation()
         self.assertEqual(operation.formatted_description(), "? Operation: ((), {})")
+
+
+try:
+    from django.contrib.postgres.operations import (
+        CreateCollation,
+        CreateExtension,
+        RemoveCollation,
+    )
+
+    has_postgres_operations = True
+except ImportError:
+    has_postgres_operations = False
+
+
+@unittest.skipIf(connection.vendor == "postgresql", "Non-PostgreSQL specific tests.")
+class PostgresOperationsOnNonPostgreSQLTests(OperationTestBase):
+    """
+    PostgreSQL-specific migration operations should be no-ops when reversed
+    on non-PostgreSQL databases.
+    """
+
+    available_apps = ["migrations"]
+
+    @classmethod
+    def setUpClass(cls):
+        if not has_postgres_operations:
+            raise unittest.SkipTest("PostgreSQL-specific modules not available.")
+        super().setUpClass()
+
+    def test_create_extension_backwards_noop(self):
+        operation = CreateExtension("pg_trgm")
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        with connection.schema_editor(atomic=False) as editor:
+            operation.database_backwards(
+                "test_crebw", editor, new_state, project_state
+            )
+
+    def test_create_collation_backwards_noop(self):
+        operation = CreateCollation("C_test", locale="C")
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        with connection.schema_editor(atomic=False) as editor:
+            operation.database_backwards(
+                "test_crcobw", editor, new_state, project_state
+            )
+
+    def test_remove_collation_backwards_noop(self):
+        operation = RemoveCollation("C_test", locale="C")
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        with connection.schema_editor(atomic=False) as editor:
+            operation.database_backwards(
+                "test_rmcobw", editor, new_state, project_state
+            )
