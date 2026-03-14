@@ -614,7 +614,7 @@ password resets. You must then provide some key implementation details:
             ``password`` as these fields will always be prompted for.
 
         .. note::
- 
+
             If ``REQUIRED_FIELDS`` contains a
             :class:`~django.db.models.ForeignKey`, the
             :djadmin:`createsuperuser` prompt will ask for the value of the
