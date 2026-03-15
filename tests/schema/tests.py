@@ -2615,6 +2615,33 @@ class SchemaTests(TransactionTestCase):
     def test_m2m_create_inherited(self):
         self._test_m2m_create(InheritedManyToManyField)
 
+    @skipIfDBFeature("indexes_foreign_keys")
+    def test_m2m_create_skips_redundant_source_fk_index(self):
+        class LocalBookWithM2M(Model):
+            tags = ManyToManyField("TagM2MTest", related_name="books")
+
+            class Meta:
+                app_label = "schema"
+                apps = new_apps
+
+        self.local_models = [LocalBookWithM2M]
+
+        with connection.schema_editor() as editor:
+            editor.create_model(TagM2MTest)
+            editor.create_model(LocalBookWithM2M)
+
+        through = LocalBookWithM2M._meta.get_field("tags").remote_field.through
+        through_table = through._meta.db_table
+
+        self.assertNotIn("localbookwithm2m_id", self.get_indexes(through_table))
+        self.assertIn("tagm2mtest_id", self.get_indexes(through_table))
+
+        constraints = self.get_constraints(through_table).values()
+        unique_columns = [
+            constraint["columns"] for constraint in constraints if constraint["unique"]
+        ]
+        self.assertIn(["localbookwithm2m_id", "tagm2mtest_id"], unique_columns)
+
     def _test_m2m_create_through(self, M2MFieldClass):
         """
         Tests M2M fields on models during creation with through models
