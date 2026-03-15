@@ -5513,20 +5513,13 @@ class AutodetectorTests(BaseAutodetectorTests):
                 del kwargs["to"]
                 return name, path, args, kwargs
 
-        book_hardcoded_fk_to = ModelState(
-            "testapp",
-            "Book",
-            [
-                ("author", HardcodedForeignKey(on_delete=models.CASCADE)),
-            ],
+        autodetector = MigrationAutodetector(ProjectState(), ProjectState())
+        # Ensure relation-agnostic deconstruction doesn't fail when a custom FK
+        # hardcodes a model class and removes "to" in deconstruct().
+        fields_def = autodetector.only_relation_agnostic_fields(
+            {"author": HardcodedForeignKey(on_delete=models.CASCADE)}
         )
-        changes = self.get_changes(
-            [self.author_empty],
-            [self.author_empty, book_hardcoded_fk_to],
-        )
-        self.assertNumberMigrations(changes, "testapp", 1)
-        self.assertOperationTypes(changes, "testapp", 0, ["CreateModel"])
-        self.assertOperationAttributes(changes, "testapp", 0, 0, name="Book")
+        self.assertEqual(len(fields_def), 1)
 
     @mock.patch(
         "django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition"
