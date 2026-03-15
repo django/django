@@ -16,7 +16,7 @@ To activate per-field filtering, set :attr:`ModelAdmin.list_filter` to a list
 or tuple of elements, where each element is one of the following types:
 
 - A field name.
-- A subclass of ``django.contrib.admin.SimpleListFilter``.
+- A subclass of ``django.contrib.admin.ListFilter`` (including ``django.contrib.admin.SimpleListFilter``).
 - A 2-tuple containing a field name and a subclass of
   ``django.contrib.admin.FieldListFilter``.
 
