@@ -1326,9 +1326,7 @@ class MailTests(MailTestsMixin, SimpleTestCase):
             )
         self.assertIsInstance(mail.get_connection(), locmem.EmailBackend)
 
-    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_connection_arg_send_mail(self):
-        mail.outbox = []
         # Send using non-default connection.
         connection = mail.get_connection("mail.custombackend.EmailBackend")
         send_mail(
@@ -1342,9 +1340,7 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(len(connection.test_outbox), 1)
         self.assertEqual(connection.test_outbox[0].subject, "Subject")
 
-    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_connection_arg_send_mass_mail(self):
-        mail.outbox = []
         # Send using non-default connection.
         connection = mail.get_connection("mail.custombackend.EmailBackend")
         send_mass_mail(
@@ -1359,12 +1355,8 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(connection.test_outbox[0].subject, "Subject1")
         self.assertEqual(connection.test_outbox[1].subject, "Subject2")
 
-    @override_settings(
-        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
-        ADMINS=["nobody@example.com"],
-    )
+    @override_settings(ADMINS=["nobody@example.com"])
     def test_connection_arg_mail_admins(self):
-        mail.outbox = []
         # Send using non-default connection.
         connection = mail.get_connection("mail.custombackend.EmailBackend")
         mail_admins("Admin message", "Content", connection=connection)
@@ -1372,12 +1364,8 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(len(connection.test_outbox), 1)
         self.assertEqual(connection.test_outbox[0].subject, "[Django] Admin message")
 
-    @override_settings(
-        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
-        MANAGERS=["nobody@example.com"],
-    )
+    @override_settings(MANAGERS=["nobody@example.com"])
     def test_connection_arg_mail_managers(self):
-        mail.outbox = []
         # Send using non-default connection.
         connection = mail.get_connection("mail.custombackend.EmailBackend")
         mail_managers("Manager message", "Content", connection=connection)
