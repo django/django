@@ -1,4 +1,4 @@
-/*global gettext, pgettext, get_format, quickElement, removeChildren*/
+/*global gettext, pgettext, get_format, interpolate, quickElement, removeChildren*/
 /*
 calendar.js - Calendar functions by Adrian Holovaty
 depends on core.js for utility functions like removeChildren or quickElement
@@ -82,6 +82,13 @@ depends on core.js for utility functions like removeChildren or quickElement
             }
             return days;
         },
+        formatDate: function(day, month, year) {
+            return interpolate(gettext('%(month)s %(day)s, %(year)s'), {
+                month: CalendarNamespace.monthsOfYear[month - 1],
+                day: day,
+                year: year
+            }, true);
+        },
         draw: function(month, year, div_id, callback, selected) { // month = 1-12, year = 1-9999
             const today = new Date();
             const todayDay = today.getDate();
@@ -116,7 +123,10 @@ depends on core.js for utility functions like removeChildren or quickElement
             // Draw days-of-week header
             let tableRow = quickElement('tr', tableBody);
             for (let i = 0; i < 7; i++) {
-                quickElement('th', tableRow, CalendarNamespace.daysOfWeekInitial[(i + CalendarNamespace.firstDayOfWeek) % 7]);
+                const dayAbbrev = CalendarNamespace.daysOfWeekAbbrev[(i + CalendarNamespace.firstDayOfWeek) % 7];
+                const dayInitial = CalendarNamespace.daysOfWeekInitial[(i + CalendarNamespace.firstDayOfWeek) % 7];
+                const th = quickElement('th', tableRow, dayInitial);
+                th.setAttribute('aria-label', dayAbbrev);
             }
 
             const startingPos = new Date(year, month - 1, 1 - CalendarNamespace.firstDayOfWeek).getDay();
@@ -161,6 +171,7 @@ depends on core.js for utility functions like removeChildren or quickElement
 
                 const cell = quickElement('td', tableRow, '', 'class', todayClass);
                 const link = quickElement('a', cell, currentDay, 'role', 'button', 'href', '#');
+                link.setAttribute('aria-label', CalendarNamespace.formatDate(currentDay, month, year));
                 link.addEventListener('click', calendarMonth(year, month));
                 currentDay++;
             }
