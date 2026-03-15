@@ -76,3 +76,20 @@ class MultipleChoiceFieldTest(SimpleTestCase):
     def test_disabled_has_changed(self):
         f = MultipleChoiceField(choices=[("1", "One"), ("2", "Two")], disabled=True)
         self.assertIs(f.has_changed("x", "y"), False)
+
+    def test_validate_duplicated_values(self):
+        f = MultipleChoiceField(
+            choices=[
+                ("1", "One"),
+                ("2", "Two"),
+                ("3", "Three"),
+                ("4", "Four"),
+                ("5", "Five"),
+            ]
+        )
+        self.assertIsNone(f.validate(["4", "4", "5", "5"]))
+
+    def test_validate_duplicated_invalid_value(self):
+        f = MultipleChoiceField(choices=[("1", "one"), ("2", "Two")])
+        with self.assertRaises(ValidationError):
+            f.validate(["1", "1", "invalid"])
