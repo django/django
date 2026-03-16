@@ -34,6 +34,7 @@ from django.contrib.admin.utils import (
 from django.contrib.admin.widgets import AutocompleteSelect, AutocompleteSelectMultiple
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import (
+    BadRequest,
     FieldDoesNotExist,
     FieldError,
     PermissionDenied,
@@ -2119,6 +2120,8 @@ class ModelAdmin(BaseModelAdmin):
                     for form in cl.formset.forms:
                         if form.has_changed():
                             obj = self.save_form(request, form, change=True)
+                            if obj._state.adding:
+                                raise BadRequest("list_editable does not allow adding.")
                             self.save_model(request, obj, form, change=True)
                             self.save_related(request, form, formsets=[], change=True)
                             change_msg = self.construct_change_message(

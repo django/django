@@ -36,3 +36,13 @@ forged ``POST`` data in
 
 This issue has severity "low" according to the :ref:`Django security policy
 <security-disclosure>`.
+
+CVE-2026-4292: Privilege abuse in ``ModelAdmin.list_editable``
+==============================================================
+
+Admin changelist forms using
+:attr:`~django.contrib.admin.ModelAdmin.list_editable` incorrectly allowed new
+instances to be created via forged ``POST`` data.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<security-disclosure>`.
