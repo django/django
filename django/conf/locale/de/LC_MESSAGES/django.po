@@ -1367,6 +1367,3 @@ msgstr "Django-Community"
 
 msgid "Connect, get help, or contribute"
 msgstr "Nimm Kontakt auf, erhalte Hilfe oder arbeite an Django mit"
-
-msgid "- Select an option -"
-msgstr "- Wähle eine Option -"
