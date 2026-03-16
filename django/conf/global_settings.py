@@ -187,29 +187,16 @@ DATABASES = {}
 # Classes used to implement DB routing behavior.
 DATABASE_ROUTERS = []
 
-# The email backend to use. For possible shortcuts see django.core.mail.
-# The default is to use the SMTP backend.
-# Third-party backends can be specified by providing a Python path
-# to a module that defines an EmailBackend class.
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-
-# Host for sending email.
-EMAIL_HOST = "localhost"
-
-# Port for sending email.
-EMAIL_PORT = 25
+# The email provider settings. If left empty, will default to the SMTP backend.
+# For possible shortcuts see django.core.mail.
+EMAIL_PROVIDERS = {
+    "default": {
+        "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+    },
+}
 
 # Whether to send SMTP 'Date' header in the local time zone or in UTC.
 EMAIL_USE_LOCALTIME = False
-
-# Optional SMTP authentication information for EMAIL_HOST.
-EMAIL_HOST_USER = ""
-EMAIL_HOST_PASSWORD = ""
-EMAIL_USE_TLS = False
-EMAIL_USE_SSL = False
-EMAIL_SSL_CERTFILE = None
-EMAIL_SSL_KEYFILE = None
-EMAIL_TIMEOUT = None
 
 # List of strings representing installed apps.
 INSTALLED_APPS = []
