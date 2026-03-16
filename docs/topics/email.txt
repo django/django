@@ -431,7 +431,7 @@ email backend API :ref:`provides an alternative
             Older versions ignored ``fail_silently=True`` when a ``connection``
             was also provided. This now raises a ``TypeError``.
 
-    .. method:: message(policy=email.policy.default)
+    .. method:: message(*, policy=email.policy.default)
 
         Constructs and returns a Python :class:`email.message.EmailMessage`
         object representing the message to be sent.
