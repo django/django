@@ -16,7 +16,10 @@ from django.db.models.functions import Cast, JSONObject, Upper
 from django.test import TransactionTestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils import timezone
+from django.test import TestCase
 from django.utils.deprecation import RemovedInDjango70Warning
+from django.contrib.postgres.fields import ArrayField
+from .models import IntegerArrayModel
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase, PostgreSQLWidgetTestCase
 from .models import (
@@ -1615,3 +1618,32 @@ class TestJSONFieldQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             OtherTypesArrayModel.objects.filter(json__1__0__isnull=True), []
         )
+
+from django.test import TestCase, skipUnlessDBFeature
+
+from django.db import connection
+from unittest import skipUnless
+from django.test import TestCase
+
+
+class ArrayFieldTests(TestCase):
+
+    def test_array_pointfield_returns_list(self):
+        try:
+            from django.contrib.gis.geos import Point
+            from django.contrib.gis.db import models
+        except Exception:
+            self.skipTest("GeoDjango libraries (GDAL/GEOS) not installed")
+
+        from django.contrib.postgres.fields import ArrayField
+
+        class TempModel(models.Model):
+            points = ArrayField(models.PointField())
+
+            class Meta:
+                app_label = "postgres_tests"
+
+        obj = TempModel.objects.create(points=[Point(1, 1), Point(2, 2)])
+        obj = TempModel.objects.get(pk=obj.pk)
+
+        self.assertIsInstance(obj.points, list)
