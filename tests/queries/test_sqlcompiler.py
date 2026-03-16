@@ -4,6 +4,7 @@ from django.db import DEFAULT_DB_ALIAS, DatabaseError, connection
 from django.db.models.sql import Query
 from django.db.models.sql.compiler import SQLCompiler
 from django.test import TestCase
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import Item
 
@@ -39,3 +40,19 @@ class SQLCompilerTest(TestCase):
         self.assertIs(exc, execute_err)
         self.assertIsNone(exc.__cause__)
         self.assertTrue(exc.__suppress_context__)
+
+    # RemovedInDjango70Warning: When the deprecation ends, remove this
+    # test.
+    def test_quote_name_unless_alias_deprecation(self):
+        query = Query(Item)
+        compiler = SQLCompiler(query, connection, None)
+        msg = (
+            "SQLCompiler.quote_name_unless_alias() is deprecated. "
+            "Use .quote_name() instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg) as ctx:
+            self.assertEqual(
+                compiler.quote_name_unless_alias("name"),
+                compiler.quote_name("name"),
+            )
+        self.assertEqual(ctx.filename, __file__)

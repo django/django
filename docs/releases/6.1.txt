@@ -519,6 +519,11 @@ Miscellaneous
   to be provided expressions meant to be compiled via the provided ``compiler``
   argument.
 
+* The ``quote_name_unless_alias()`` method of ``SQLCompiler``, the type of
+  object passed as the ``compiler`` argument to the ``as_sql()`` method of
+  :ref:`expressions <writing-your-own-query-expressions>`, is deprecated in
+  favor of the newly introduced ``quote_name()`` method.
+
 Features removed in 6.1
 =======================
 

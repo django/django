@@ -1,6 +1,7 @@
 import collections
 import json
 import re
+import warnings
 from functools import partial
 from itertools import chain
 
@@ -23,6 +24,7 @@ from django.db.models.sql.constants import (
 )
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
+from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 from django.utils.regex_helper import _lazy_re_compile
@@ -556,8 +558,17 @@ class SQLCompiler:
         self.quote_cache[name] = quoted
         return quoted
 
-    # Kept for backward compatiblity until duly done deprecation.
-    quote_name_unless_alias = quote_name
+    # RemovedInDjango70Warning: When the deprecation ends, remove.
+    def quote_name_unless_alias(self, name):
+        warnings.warn(
+            (
+                "SQLCompiler.quote_name_unless_alias() is deprecated. "
+                "Use .quote_name() instead."
+            ),
+            category=RemovedInDjango70Warning,
+            skip_file_prefixes=django_file_prefixes(),
+        )
+        return self.quote_name(name)
 
     def compile(self, node):
         vendor_impl = getattr(node, "as_" + self.connection.vendor, None)
