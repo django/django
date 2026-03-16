@@ -13,7 +13,8 @@ permissions:
 
 jobs:
   check-commit-prefix:
-    if: startsWith(github.event.pull_request.base.ref, 'stable/')
+    # Only trigger on the main Django repository
+    if: github.repository == 'django/django' && startsWith(github.event.pull_request.base.ref, 'stable/')
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -70,6 +71,8 @@ jobs:
           echo "✅ All commits have the required prefix."
 
   check-commit-suffix:
+    # Only trigger on the main Django repository
+    if: github.repository == 'django/django'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
