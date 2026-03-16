@@ -51,13 +51,13 @@ like in JSON:
         "model": "myapp.person",
         "pk": 2,
         "fields": {
-          "first_name": "Paul",
+          "first_name": "Paul", 
           "last_name": "McCartney"
         }
       }
     ]
 
-And here's that same fixture as YAML:
+And here's that same fixture as YAML   :
 
 .. code-block:: yaml
 
