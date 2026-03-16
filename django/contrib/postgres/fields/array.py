@@ -163,10 +163,16 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
     def _from_db_value(self, value, expression, connection):
         if value is None:
             return value
-        return [
-            self.base_field.from_db_value(item, expression, connection)
-            for item in value
-        ]
+
+        result = []
+        for item in value:
+            if hasattr(self.base_field, "from_db_value"):
+                item = self.base_field.from_db_value(item, expression, connection)
+        else:
+                item = self.base_field.to_python(item)
+        result.append(item)
+        
+        return result
 
     def value_to_string(self, obj):
         values = []
