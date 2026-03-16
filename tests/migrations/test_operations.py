@@ -3861,6 +3861,62 @@ class OperationTests(OperationTestBase):
             operation.describe(), "Alter unique_together for Pony (0 constraint(s))"
         )
 
+    def test_alter_unique_together_deferred(self):
+        """
+        AlterUniqueTogether handles deferred SQL constraints from previous
+        operations. Regression test for #31317.
+        """
+        app_label = "test_aluntod"
+        self.apply_operations(
+            app_label,
+            ProjectState(),
+            operations=[
+                migrations.CreateModel(
+                    "Pony",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                        ("pink", models.IntegerField(default=3)),
+                        ("weight", models.FloatField()),
+                    ],
+                    options={"unique_together": {("pink",)}},
+                ),
+                migrations.AlterUniqueTogether(
+                    name="Pony",
+                    unique_together={("pink", "weight")},
+                ),
+            ],
+        )
+
+        table_name = f"{app_label}_pony"
+        self.assertUniqueConstraintExists(table_name, ("pink", "weight"), value=True)
+        self.assertUniqueConstraintExists(table_name, ("pink",), value=False)
+
+    def test_alter_unique_together_deferred_overlapping_columns(self):
+        app_label = "test_aluntodoc"
+        self.apply_operations(
+            app_label,
+            ProjectState(),
+            operations=[
+                migrations.CreateModel(
+                    "Pony",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                        ("pink", models.IntegerField(default=3)),
+                        ("weight", models.FloatField()),
+                    ],
+                    options={"unique_together": [("pink", "weight"), ("pink",)]},
+                ),
+                migrations.AlterUniqueTogether(
+                    name="Pony",
+                    unique_together={("pink", "weight")},
+                ),
+            ],
+        )
+
+        table_name = f"{app_label}_pony"
+        self.assertUniqueConstraintExists(table_name, ("pink", "weight"), value=True)
+        self.assertUniqueConstraintExists(table_name, ("pink",), value=False)
+
     @skipUnlessDBFeature("allows_multiple_constraints_on_same_fields")
     def test_remove_unique_together_on_pk_field(self):
         app_label = "test_rutopkf"
@@ -4451,6 +4507,35 @@ class OperationTests(OperationTestBase):
             operation.database_forwards(app_label, editor, project_state, new_state)
         self.assertIndexNotExists(table_name, ["pink", "weight"])
         self.assertUniqueConstraintExists(table_name, ["pink", "weight"])
+
+    def test_alter_index_together_deferred_overlapping_columns(self):
+        app_label = "test_alintodoc"
+        self.apply_operations(
+            app_label,
+            ProjectState(),
+            operations=[
+                migrations.CreateModel(
+                    "Pony",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                        ("pink", models.IntegerField(default=3)),
+                        ("weight", models.FloatField()),
+                    ],
+                    options={
+                        "unique_together": [("pink",)],
+                        "index_together": [("pink",)],
+                    },
+                ),
+                migrations.AlterIndexTogether(
+                    name="Pony",
+                    index_together=set(),
+                ),
+            ],
+        )
+
+        table_name = f"{app_label}_pony"
+        self.assertIndexNotExists(table_name, ["pink"])
+        self.assertUniqueConstraintExists(table_name, ("pink",), value=True)
 
     def test_add_constraint(self):
         project_state = self.set_up_test_model("test_addconstraint")
