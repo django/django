@@ -38,7 +38,7 @@ from django.utils.translation import gettext_lazy as _
 
 __all__ = [
     "AutoField",
-    # RemovedInDjango71Warning
+    # RemovedInDjango70Warning
     "BLANK_CHOICE_DASH",
     "BigAutoField",
     "BigIntegerField",
@@ -81,10 +81,10 @@ class NOT_PROVIDED:
     pass
 
 
-# RemovedInDjango71Warning: From Django 6.1, the values to use for "blank"
+# RemovedInDjango70Warning: From Django 6.1, the values to use for "blank"
 # in SelectFields will be defined in the BLANK_CHOICE_LABEL setting.
 # Will be appended to the start of most "choices" lists.
-# BLANK_CHOICE_DASH is still available as a constant in Django 6.1 and 7.0.
+# BLANK_CHOICE_DASH is still available as a constant in Django 6.1.
 BLANK_CHOICE_DASH = [("", "---------")]
 
 
