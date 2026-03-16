@@ -249,7 +249,9 @@ class MigrationExecutor:
                 applied, state = self.detect_soft_applied(state, migration)
                 if applied:
                     fake = True
-            if not fake:
+            if not fake and router.allow_migrate(
+                self.connection.alias, app_label=migration.app_label
+            ):
                 # Alright, do it normally
                 with self.connection.schema_editor(
                     atomic=migration.atomic
@@ -280,7 +282,9 @@ class MigrationExecutor:
         """Run a migration backwards."""
         if self.progress_callback:
             self.progress_callback("unapply_start", migration, fake)
-        if not fake:
+        if not fake and router.allow_migrate(
+            self.connection.alias, app_label=migration.app_label
+        ):
             with self.connection.schema_editor(
                 atomic=migration.atomic
             ) as schema_editor:
