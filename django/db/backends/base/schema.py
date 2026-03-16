@@ -661,6 +661,26 @@ class BaseDatabaseSchemaEditor:
         }
         meta_index_names = {constraint.name for constraint in model._meta.indexes}
         columns = [model._meta.get_field(field).column for field in fields]
+
+        # Check if the constraint is still in deferred_sql. This happens when
+        # CreateModel with unique_together is followed by AlterUniqueTogether
+        # in the same migration. index_together is not affected because its
+        # indexes are created immediately in CreateModel.database_forwards.
+        is_unique_constraint = constraint_kwargs.get("unique") is True
+        table = model._meta.db_table
+        if is_unique_constraint:
+            for deferred in list(self.deferred_sql):
+                if (
+                    isinstance(deferred, Statement)
+                    and deferred.references_table(table)
+                    and all(
+                        deferred.references_column(table, column) for column in columns
+                    )
+                    and deferred.parts["columns"].columns == columns
+                ):
+                    self.deferred_sql.remove(deferred)
+                    return
+
         constraint_names = self._constraint_names(
             model,
             columns,
@@ -668,7 +688,7 @@ class BaseDatabaseSchemaEditor:
             **constraint_kwargs,
         )
         if (
-            constraint_kwargs.get("unique") is True
+            is_unique_constraint
             and constraint_names
             and self.connection.features.allows_multiple_constraints_on_same_fields
         ):
