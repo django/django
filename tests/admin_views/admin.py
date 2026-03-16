@@ -369,6 +369,14 @@ class PersonAdmin(admin.ModelAdmin):
         return super().get_queryset(request).order_by("age")
 
 
+class ParentWithUUIDPKAdmin(admin.ModelAdmin):
+    list_display = ("id", "title")
+    list_editable = ("title",)
+
+    def has_add_permission(self, request):
+        return False
+
+
 class FooAccountAdmin(admin.StackedInline):
     model = FooAccount
     extra = 1
@@ -1286,7 +1294,7 @@ site.register(ReferencedByInline)
 site.register(InlineReferer, InlineRefererAdmin)
 site.register(ReferencedByGenRel)
 site.register(GenRelReference)
-site.register(ParentWithUUIDPK)
+site.register(ParentWithUUIDPK, ParentWithUUIDPKAdmin)
 site.register(RelatedPrepopulated, search_fields=["name"])
 site.register(RelatedWithUUIDPKModel)
 site.register(ReadOnlyRelatedField, ReadOnlyRelatedFieldAdmin)
