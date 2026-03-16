@@ -60,5 +60,9 @@ class EnumField(models.CharField):
 
 
 class OffByOneField(models.IntegerField):
-    def get_placeholder(self, value, compiler, connection):
-        return "(%s + 1)"
+    def get_placeholder_sql(self, value, compiler, connection):
+        if hasattr(value, "as_sql"):
+            sql, params = compiler.compile(value)
+        else:
+            sql, params = "%s", (value,)
+        return f"({sql} + %s)", (*params, 1)
