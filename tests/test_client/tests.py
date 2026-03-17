@@ -27,6 +27,7 @@ from unittest import mock
 
 from django.contrib.auth.models import Permission, User
 from django.core import mail
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpResponse, HttpResponseNotAllowed
 from django.test import (
     AsyncRequestFactory,
@@ -38,6 +39,7 @@ from django.test import (
     override_settings,
 )
 from django.urls import reverse_lazy
+from django.utils.datastructures import MultiValueDict
 from django.utils.decorators import async_only_middleware
 from django.views.generic import RedirectView
 
@@ -1044,6 +1046,23 @@ class ClientTest(TestCase):
                 data={"named_temp_file": test_file},
             )
         self.assertEqual(response.content, b"named_temp_file")
+
+    def test_uploading_file_and_field_with_same_name(self):
+        """
+        A form field and file uploads sharing the same name in a
+        MultiValueDict are both preserved when posted by the test client.
+        """
+        file = SimpleUploadedFile("file.txt", b"content")
+        response = self.client.post(
+            "/upload_view/",
+            data=MultiValueDict({"shared": ["field_value", file]}),
+        )
+        request = response.wsgi_request
+        self.assertEqual(request.POST.getlist("shared"), ["field_value"])
+        self.assertEqual(
+            [f.name for f in request.FILES.getlist("shared")],
+            ["file.txt"],
+        )
 
     def test_query_params(self):
         tests = (
