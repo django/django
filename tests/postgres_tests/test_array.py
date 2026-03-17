@@ -16,10 +16,8 @@ from django.db.models.functions import Cast, JSONObject, Upper
 from django.test import TransactionTestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils import timezone
-from django.test import TestCase
 from django.utils.deprecation import RemovedInDjango70Warning
 from django.contrib.postgres.fields import ArrayField
-from .models import IntegerArrayModel
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase, PostgreSQLWidgetTestCase
 from .models import (
@@ -39,7 +37,6 @@ from .models import (
 try:
     from django.contrib.postgres.aggregates import ArrayAgg
     from django.contrib.postgres.expressions import ArraySubquery
-    from django.contrib.postgres.fields import ArrayField
     from django.contrib.postgres.fields.array import IndexTransform, SliceTransform
     from django.contrib.postgres.forms import (
         SimpleArrayField,
@@ -1618,3 +1615,4 @@ class TestJSONFieldQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             OtherTypesArrayModel.objects.filter(json__1__0__isnull=True), []
         )
+        
