@@ -27,6 +27,9 @@ or Jinja2_, you should feel right at home with Django's templates.
     below are supported by default (although you can add :doc:`your own
     extensions </howto/custom-template-tags>` to the template language as
     needed).
+    The Django template system is intentionally limited: it is
+    designed for *presentation* only. Business logic should live
+    in your Python views, not in your templates.
 
 .. _`The Django template language: For Python programmers`: ../templates_python/
 .. _Smarty: https://www.smarty.net/
