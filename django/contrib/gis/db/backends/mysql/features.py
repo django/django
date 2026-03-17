@@ -26,3 +26,22 @@ class DatabaseFeatures(BaseSpatialFeatures, MySQLDatabaseFeatures):
     @cached_property
     def supports_add_srs_entry(self):
         return self.connection.mysql_version >= (8, 0)
+
+    @cached_property
+    def supports_srid_constraints(self):
+        """
+        Return True if the storage engine supports SRID constraints.
+        InnoDB supports them, MyISAM does not.
+        """
+        if not (
+            self.connection.mysql_version >= (8, 0)
+            and not self.connection.mysql_is_mariadb
+        ):
+            return False
+        try:
+            with self.connection.cursor() as cursor:
+                cursor.execute("SELECT @@default_storage_engine")
+                engine = cursor.fetchone()[0]
+                return engine == "InnoDB"
+        except Exception:
+            return False
