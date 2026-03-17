@@ -295,6 +295,14 @@ class BoundField(RenderableFieldMixin):
             attrs["disabled"] = True
         if not widget.is_hidden and self.errors:
             attrs["aria-invalid"] = "true"
+        if (
+            self._should_add_fieldset_aria_labelledby(widget)
+            and not attrs.get("aria-label")
+            and not attrs.get("aria-labelledby")
+            and not widget.attrs.get("aria-label")
+            and not widget.attrs.get("aria-labelledby")
+        ):
+            attrs.setdefault("aria-labelledby", f"{self.auto_id}_legend")
         # Preserve aria-describedby provided by the attrs argument so user
         # can set the desired order.
         if not attrs.get("aria-describedby") and not self.use_fieldset:
@@ -327,6 +335,27 @@ class BoundField(RenderableFieldMixin):
         Return the value of this BoundField widget's use_fieldset attribute.
         """
         return self.field.widget.use_fieldset
+
+    @property
+    def use_legend_id(self):
+        """Return whether fieldset legend should have an id for aria-labelledby."""
+        return self._should_add_fieldset_aria_labelledby(self.field.widget)
+
+    @property
+    def legend_tag_with_id(self):
+        """Render a <legend> with id used by fieldset select widgets."""
+        attrs = {"id": f"{self.auto_id}_legend"} if self.auto_id else None
+        return self.legend_tag(attrs=attrs)
+
+    def _should_add_fieldset_aria_labelledby(self, widget):
+        return (
+            self.use_fieldset
+            and self.auto_id
+            and self.label
+            and not widget.is_hidden
+            and not isinstance(widget, MultiWidget)
+            and getattr(widget, "input_type", None) == "select"
+        )
 
 
 @html_safe

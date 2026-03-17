@@ -708,15 +708,15 @@ class SelectDateWidgetTest(WidgetTest):
         form = TestForm()
         self.assertIs(self.widget.use_fieldset, True)
         self.assertHTMLEqual(
-            "<div><fieldset><legend>Field:</legend>"
-            '<select name="field_month" required id="id_field_month">'
+            '<div><fieldset><legend id="id_field_legend">Field:</legend>'
+            '<select name="field_month" required aria-labelledby="id_field_legend" id="id_field_month">'
             '<option value="1">January</option><option value="2">February</option>'
             '<option value="3">March</option><option value="4">April</option>'
             '<option value="5">May</option><option value="6">June</option>'
             '<option value="7">July</option><option value="8">August</option>'
             '<option value="9">September</option><option value="10">October</option>'
             '<option value="11">November</option><option value="12">December</option>'
-            '</select><select name="field_day" required id="id_field_day">'
+            '</select><select name="field_day" required aria-labelledby="id_field_legend" id="id_field_day">'
             '<option value="1">1</option><option value="2">2</option>'
             '<option value="3">3</option><option value="4">4</option>'
             '<option value="5">5</option><option value="6">6</option>'
@@ -733,7 +733,7 @@ class SelectDateWidgetTest(WidgetTest):
             '<option value="27">27</option><option value="28">28</option>'
             '<option value="29">29</option><option value="30">30</option>'
             '<option value="31">31</option></select>'
-            '<select name="field_year" required id="id_field_year">'
+            '<select name="field_year" required aria-labelledby="id_field_legend" id="id_field_year">'
             '<option value="2007">2007</option><option value="2008">2008</option>'
             '<option value="2009">2009</option><option value="2010">2010</option>'
             '<option value="2011">2011</option><option value="2012">2012</option>'

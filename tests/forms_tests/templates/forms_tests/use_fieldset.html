@@ -2,7 +2,7 @@
   <div>
     {% if field.use_fieldset %}
       <fieldset>
-      {% if field.label %}{{ field.legend_tag }}{% endif %}
+      {% if field.label %}{% if field.use_legend_id %}{{ field.legend_tag_with_id }}{% else %}{{ field.legend_tag }}{% endif %}{% endif %}
     {% else %}
       {% if field.label %}{{ field.label_tag }}{% endif %}
     {% endif %}
