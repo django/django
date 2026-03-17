@@ -740,8 +740,8 @@ def unordered_list(value, autoescape=True, max_items: int | None = None):
 
         if truncated_count > 0:
             msg = ngettext(
-                "\u2026and %(count)d more.",
-                "\u2026and %(count)d more.",
+                "…and %(count)d more.",
+                "…and %(count)d more.",
                 truncated_count,
             ) % {"count": truncated_count}
             output.append('%s<li class="quiet">%s</li>' % (indent, msg))
