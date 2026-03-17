@@ -1615,4 +1615,4 @@ class TestJSONFieldQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             OtherTypesArrayModel.objects.filter(json__1__0__isnull=True), []
         )
-        
+
