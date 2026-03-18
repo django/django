@@ -431,6 +431,24 @@ method. See :ref:`overriding-model-methods` for more details.
 
 The model save process also has some subtleties; see the sections below.
 
+Type consistency after saving instances
+--------------------------------------
+
+When assigning values to model fields, Django does not always
+convert them to the exact Python types returned by the database
+after saving.
+
+For example, assigning a string to a ``UUIDField`` or
+``DateTimeField`` may be accepted and stored correctly in the
+database. However, the in-memory model instance may still hold
+the original value without conversion.
+
+Values accepted by the database may not always be valid in other
+parts of Django that rely on specific Python types.
+
+If you require the exact database representation, call
+``refresh_from_db()`` after saving.
+
 Auto-incrementing primary keys
 ------------------------------
 
