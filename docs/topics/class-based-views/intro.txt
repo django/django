@@ -13,6 +13,18 @@ have certain differences and advantages when compared to function-based views:
   used to factor code into reusable components.
 
 The relationship and history of generic views, class-based views, and class-based generic views
+
+Why use class-based views?
+
+Class-based views provide a way to organize view logic into reusable and extendable components. They are especially useful when you need to reuse common patterns such as displaying lists, handling forms, or creating detail views.
+
+When to use class-based views vs function-based views:
+
+- Use class-based views when you want reusable, structured, and extensible code.
+- Use function-based views when the logic is simple and straightforward.
+
+Choosing between them depends on the complexity and reusability needs of your application.
+
 ===============================================================================================
 
 In the beginning there was only the view function contract, Django passed your
