@@ -56,7 +56,7 @@ def truncated_unordered_list(value, max_items, autoescape=True):
                 "…and %(count)d more.",
                 truncated_count,
             ) % {"count": truncated_count}
-            output.append('%s<li class="quiet">%s</li>' % (indent, msg))
+            output.append("%s<li>%s</li>" % (indent, msg))
 
         return "\n".join(output)
 
