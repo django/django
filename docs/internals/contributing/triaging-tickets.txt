@@ -438,6 +438,8 @@ the ticket database:
 .. _password reset page: https://www.djangoproject.com/accounts/password/reset/
 .. _Django Forum: https://forum.djangoproject.com/
 
+.. _bisecting-a-regression:
+
 Bisecting a regression
 ======================
 
