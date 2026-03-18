@@ -152,6 +152,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return is_psycopg3 and options.get("server_side_binding") is True
 
     @cached_property
+    def max_query_params(self):
+        if self.uses_server_side_binding:
+            return 2**16 - 1
+        return None
+
+    @cached_property
     def prohibits_null_characters_in_text_exception(self):
         if is_psycopg3:
             return DataError, "PostgreSQL text fields cannot contain NUL (0x00) bytes"

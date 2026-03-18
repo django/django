@@ -288,7 +288,7 @@ class BaseForm(RenderableFormMixin):
             if field is not None:
                 raise TypeError(
                     "The argument `field` must be `None` when the `error` "
-                    "argument contains errors for multiple fields."
+                    "argument is a dictionary."
                 )
             else:
                 error = error.error_dict

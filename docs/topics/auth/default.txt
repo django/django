@@ -219,6 +219,18 @@ permissions for new models each time you run :djadmin:`manage.py migrate
 <migrate>` (the function that creates permissions is connected to the
 :data:`~django.db.models.signals.post_migrate` signal).
 
+When a model is renamed in an installed application, Django automatically
+updates the associated default permissions to match the new model name when
+you run :djadmin:`manage.py migrate <migrate>`.
+
+If a permission with the new codename already exists
+(for example, due to a leftover permission from a previous migration),
+Django raises an error with next steps.
+
+.. versionchanged:: 6.1
+
+    Updating permissions when models are renamed was added.
+
 Assuming you have an application with an
 :attr:`~django.db.models.Options.app_label` ``foo`` and a model named ``Bar``,
 to test for basic permissions you should use:

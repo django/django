@@ -1204,7 +1204,7 @@ Miscellaneous
 * Private ``FileField`` methods ``get_directory_name()`` and ``get_filename()``
   are deprecated in favor of performing this work in
   :meth:`Storage.generate_filename()
-  <django.core.files.storage.Storage.generate_filename>`).
+  <django.core.files.storage.Storage.generate_filename>`.
 
 * Old-style middleware that uses  ``settings.MIDDLEWARE_CLASSES`` are
   deprecated. :ref:`Adapt old, custom middleware <upgrading-middleware>` and

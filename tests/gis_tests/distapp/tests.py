@@ -22,7 +22,7 @@ from django.db.models import (
 )
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from ..utils import FuncTestMixin
+from ..utils import FuncTestMixin, skipUnlessGISLookup
 from .models import (
     AustraliaCity,
     CensusZipcode,
@@ -65,7 +65,8 @@ class DistanceTest(TestCase):
         self.assertEqual(1, Interstate.objects.count())
         self.assertEqual(1, SouthTexasInterstate.objects.count())
 
-    @skipUnlessDBFeature("supports_dwithin_lookup")
+    @skipUnlessGISLookup("dwithin")
+    @skipUnlessDBFeature("has_Transform_function")
     def test_dwithin(self):
         """
         Test the `dwithin` lookup type.
@@ -322,7 +323,8 @@ class DistanceTest(TestCase):
                 point__distance_lte=(Point(0, 0), D(m=100))
             ).exists()
 
-    @skipUnlessDBFeature("supports_dwithin_lookup")
+    @skipUnlessGISLookup("dwithin")
+    @skipUnlessDBFeature("has_Transform_function")
     def test_dwithin_subquery(self):
         """dwithin lookup in a subquery using OuterRef as a parameter."""
         qs = CensusZipcode.objects.annotate(
@@ -334,7 +336,8 @@ class DistanceTest(TestCase):
         ).filter(annotated_value=True)
         self.assertEqual(self.get_names(qs), ["77002", "77025", "77401"])
 
-    @skipUnlessDBFeature("supports_dwithin_lookup", "supports_dwithin_distance_expr")
+    @skipUnlessGISLookup("dwithin")
+    @skipUnlessDBFeature("supports_dwithin_distance_expr")
     def test_dwithin_with_expression_rhs(self):
         # LineString of Wollongong and Adelaide coords.
         ls = LineString(((150.902, -34.4245), (138.6, -34.9258)), srid=4326)

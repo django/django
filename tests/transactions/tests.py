@@ -467,6 +467,7 @@ class AtomicMiscTests(TransactionTestCase):
                 # exists.
                 connection.savepoint_rollback(sid)
 
+    @skipUnlessDBFeature("supports_transactions")
     def test_mark_for_rollback_on_error_in_transaction(self):
         with transaction.atomic(savepoint=False):
             # Swallow the intentional error raised.
@@ -512,6 +513,7 @@ class AtomicMiscTests(TransactionTestCase):
         Reporter.objects.create()
 
 
+@skipUnlessDBFeature("supports_transactions")
 class NonAutocommitTests(TransactionTestCase):
     available_apps = []
 
@@ -520,6 +522,7 @@ class NonAutocommitTests(TransactionTestCase):
         self.addCleanup(transaction.set_autocommit, True)
         self.addCleanup(transaction.rollback)
 
+    @skipUnlessDBFeature("supports_foreign_keys")
     def test_orm_query_after_error_and_rollback(self):
         """
         ORM queries are allowed after an error and a rollback in non-autocommit

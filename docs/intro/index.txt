@@ -32,7 +32,7 @@ place: read this material to quickly get up and running.
     `list of Python resources for non-programmers`_
 
     If you already know a few other languages and want to get up to speed with
-    Python quickly, we recommend referring the official
+    Python quickly, we recommend referring to the official
     `Python documentation`_, which provides comprehensive and authoritative
     information about the language, as well as links to other resources such as
     a list of `books about Python`_.

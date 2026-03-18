@@ -59,6 +59,7 @@ class ChildArticle(Article):
 
 class Reference(models.Model):
     article = models.ForeignKey(OrderedByAuthorArticle, models.CASCADE)
+    proof = models.OneToOneField(Article, models.CASCADE, related_name="+")
 
     class Meta:
         ordering = ("article",)
@@ -80,3 +81,31 @@ class OrderedByExpressionChild(models.Model):
 
 class OrderedByExpressionGrandChild(models.Model):
     parent = models.ForeignKey(OrderedByExpressionChild, models.CASCADE)
+
+
+class BarcodedArticle(models.Model):
+    rank = models.IntegerField(unique=True, null=True)
+    headline = models.CharField(max_length=100)
+    slug = models.CharField(max_length=100, default="slug")
+    pub_date = models.DateField(null=True)
+    barcode = models.CharField(max_length=30, default="bar")
+
+    class Meta:
+        required_db_features = {"supports_partial_indexes"}
+        unique_together = (("headline", "slug"),)
+        constraints = [
+            models.UniqueConstraint(
+                fields=["pub_date", "rank"],
+                name="unique_pub_date_rank",
+            ),
+            models.UniqueConstraint(
+                fields=["rank"],
+                condition=models.Q(rank__gt=0),
+                name="unique_rank_conditional",
+            ),
+            models.UniqueConstraint(
+                fields=["barcode"],
+                condition=models.Q(),
+                name="unique_barcode_empty_condition",
+            ),
+        ]

@@ -741,6 +741,13 @@ class AutodetectorTests(BaseAutodetectorTests):
             ("publishers", models.ManyToManyField("testapp.Publisher", blank=True)),
         ],
     )
+    other_publisher = ModelState(
+        "testapp",
+        "OtherPublisher",
+        [
+            ("id", models.AutoField(primary_key=True)),
+        ],
+    )
     author_with_m2m_through = ModelState(
         "testapp",
         "Author",
@@ -4557,6 +4564,46 @@ class AutodetectorTests(BaseAutodetectorTests):
         )
         self.assertOperationFieldAttributes(changes, "testapp", 0, 2, max_length=100)
 
+    def test_m2m_target_change_generates_remove_and_add(self):
+        before = [
+            self.publisher,
+            self.other_publisher,
+            self.author_with_m2m,  # m2m to self.publisher.
+        ]
+
+        after = [
+            self.publisher,
+            self.other_publisher,
+            ModelState(
+                "testapp",
+                "Author",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    # Repoint m2m to self.other_publisher.
+                    ("publishers", models.ManyToManyField("testapp.OtherPublisher")),
+                ],
+            ),
+        ]
+        changes = self.get_changes(before, after)
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["RemoveField", "AddField"])
+        self.assertOperationAttributes(
+            changes,
+            "testapp",
+            0,
+            0,
+            name="publishers",
+            model_name="author",
+        )
+        self.assertOperationAttributes(
+            changes,
+            "testapp",
+            0,
+            1,
+            name="publishers",
+            model_name="author",
+        )
+
     def test_non_circular_foreignkey_dependency_removal(self):
         """
         If two models with a ForeignKey from one to the other are removed at
@@ -5541,6 +5588,51 @@ class AutodetectorTests(BaseAutodetectorTests):
             name="id",
             model_name="foo",
             preserve_default=True,
+        )
+
+    def test_does_not_crash_after_rename_on_unique_together(self):
+        fields = ("first", "second")
+        before = self.make_project_state(
+            [
+                ModelState(
+                    "app",
+                    "Foo",
+                    [
+                        ("id", models.AutoField(primary_key=True)),
+                        ("first", models.IntegerField()),
+                        ("second", models.IntegerField()),
+                    ],
+                    options={"unique_together": {fields}},
+                ),
+            ]
+        )
+        after = before.clone()
+        after.rename_field("app", "foo", "first", "first_renamed")
+
+        changes = MigrationAutodetector(
+            before, after, MigrationQuestioner({"ask_rename": True})
+        )._detect_changes()
+
+        self.assertNumberMigrations(changes, "app", 1)
+        self.assertOperationTypes(
+            changes, "app", 0, ["RenameField", "AlterUniqueTogether"]
+        )
+        self.assertOperationAttributes(
+            changes,
+            "app",
+            0,
+            0,
+            model_name="foo",
+            old_name="first",
+            new_name="first_renamed",
+        )
+        self.assertOperationAttributes(
+            changes,
+            "app",
+            0,
+            1,
+            name="foo",
+            unique_together={("first_renamed", "second")},
         )
 
 

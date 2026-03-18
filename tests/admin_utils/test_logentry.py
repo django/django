@@ -224,7 +224,7 @@ class LogEntryTests(TestCase):
             "admin:admin_utils_article_change", args=(quote(self.a1.pk),)
         )
         self.assertEqual(logentry.get_admin_url(), expected_url)
-        self.assertIn("article/%d/change/" % self.a1.pk, logentry.get_admin_url())
+        self.assertIn("article/%s/change/" % self.a1.pk, logentry.get_admin_url())
 
         logentry.content_type.model = "nonexistent"
         self.assertIsNone(logentry.get_admin_url())

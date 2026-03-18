@@ -71,13 +71,14 @@ class LazyNonce(SimpleLazyObject):
     """
 
     def __init__(self):
-        super().__init__(self._generate)
-
-    def _generate(self):
-        return secrets.token_urlsafe(16)
+        super().__init__(generate_nonce)
 
     def __bool__(self):
         return self._wrapped is not empty
+
+
+def generate_nonce():
+    return secrets.token_urlsafe(16)
 
 
 def build_policy(config, nonce=None):

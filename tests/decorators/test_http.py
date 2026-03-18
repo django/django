@@ -1,6 +1,5 @@
 import datetime
-
-from asgiref.sync import iscoroutinefunction
+from inspect import iscoroutinefunction
 
 from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
 from django.test import SimpleTestCase

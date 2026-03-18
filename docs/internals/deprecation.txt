@@ -62,6 +62,14 @@ details on these changes.
 * The setting ``TEMPLATE_TAGS_MULTILINE`` will be removed, making multiline
   template tags mandatory.
 
+* The use of ``None`` when querying a :class:`~django.db.models.JSONField`
+  top-level value will compile to SQL ``IS NULL``. Use
+  :class:`~django.db.models.JSONNull` to query for a JSON ``null`` value
+  instead.
+
+* The ``Field.get_placeholder_sql`` shim over the deprecated
+  ``get_placeholder`` method will be removed.
+
 .. _deprecation-removed-in-6.1:
 
 6.1

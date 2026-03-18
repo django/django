@@ -412,7 +412,7 @@ class SchemaTests(TransactionTestCase):
             ]
         )
 
-    @skipUnlessDBFeature("can_create_inline_fk")
+    @skipUnlessDBFeature("can_create_inline_fk", "supports_on_delete_db_cascade")
     def test_inline_fk_db_on_delete(self):
         with connection.schema_editor() as editor:
             editor.create_model(Author)
@@ -602,7 +602,11 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Author, new_field2, new_field, strict=True)
         self.assertForeignKeyNotExists(Author, "tag_id", "schema_tag")
 
-    @skipUnlessDBFeature("supports_foreign_keys", "can_introspect_foreign_keys")
+    @skipUnlessDBFeature(
+        "supports_foreign_keys",
+        "can_introspect_foreign_keys",
+        "supports_on_delete_db_cascade",
+    )
     def test_fk_alter_on_delete(self):
         with connection.schema_editor() as editor:
             editor.create_model(Author)
@@ -3801,8 +3805,14 @@ class SchemaTests(TransactionTestCase):
             with self.assertRaises(DatabaseError):
                 editor.add_constraint(Author, constraint)
 
-    @skipUnlessDBFeature("supports_nulls_distinct_unique_constraints")
+    @skipUnlessDBFeature(
+        "supports_expression_indexes", "supports_nulls_distinct_unique_constraints"
+    )
     def test_unique_constraint_index_nulls_distinct(self):
+        """
+        For a UniqueConstraint with expressions, the backend executes:
+        CREATE UNIQUE INDEX ...
+        """
         with connection.schema_editor() as editor:
             editor.create_model(Author)
         nulls_distinct = UniqueConstraint(
@@ -3827,6 +3837,10 @@ class SchemaTests(TransactionTestCase):
 
     @skipUnlessDBFeature("supports_nulls_distinct_unique_constraints")
     def test_unique_constraint_nulls_distinct(self):
+        """
+        For UniqueConstraint(fields=...), the backend executes:
+        ALTER TABLE "schema_author" ADD CONSTRAINT ...
+        """
         with connection.schema_editor() as editor:
             editor.create_model(Author)
         constraint = UniqueConstraint(

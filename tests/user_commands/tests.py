@@ -470,6 +470,34 @@ class CommandTests(SimpleTestCase):
         )
         self.assertFalse(parser.suggest_on_error)
 
+    @unittest.skipUnless(PY314, "Only relevant for Python 3.14+")
+    def test_color_enabled_by_default(self):
+        with mock.patch.dict(os.environ, {}, clear=True):
+            command = BaseCommand()
+            parser = command.create_parser("prog_name", "subcommand")
+            self.assertTrue(parser.color)
+
+    @unittest.skipUnless(PY314, "Only relevant for Python 3.14+")
+    def test_color_disabled_with_django_colors_nocolor(self):
+        with mock.patch.dict(os.environ, {"DJANGO_COLORS": "nocolor"}):
+            command = BaseCommand()
+            parser = command.create_parser("prog_name", "subcommand")
+            self.assertFalse(parser.color)
+
+    @unittest.skipUnless(PY314, "Only relevant for Python 3.14+")
+    def test_force_color_does_not_affect_argparse_color(self):
+        with mock.patch.dict(os.environ, {}, clear=True):
+            command = BaseCommand(force_color=True)
+            parser = command.create_parser("prog_name", "subcommand")
+            self.assertTrue(parser.color)
+
+    @unittest.skipUnless(PY314, "Only relevant for Python 3.14+")
+    def test_no_color_flag_disables_color(self):
+        with mock.patch.object(sys, "argv", ["manage.py", "mycommand", "--no-color"]):
+            command = BaseCommand()
+            parser = command.create_parser("manage.py", "mycommand")
+            self.assertFalse(parser.color)
+
 
 class CommandRunTests(AdminScriptTestCase):
     """

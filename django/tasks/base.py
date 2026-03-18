@@ -1,7 +1,8 @@
+from collections.abc import Callable
 from dataclasses import dataclass, field, replace
 from datetime import datetime
 from inspect import isclass, iscoroutinefunction
-from typing import Any, Callable, Dict, Optional
+from typing import Any
 
 from asgiref.sync import async_to_sync, sync_to_async
 
@@ -43,10 +44,10 @@ class TaskResultStatus(TextChoices):
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Task:
     priority: int
-    func: Callable  # The Task function.
+    func: Callable[..., Any]  # The Task function.
     backend: str
     queue_name: str
-    run_after: Optional[datetime]  # The earliest this Task will run.
+    run_after: datetime | None  # The earliest this Task will run.
 
     # Whether the Task receives the Task context when executed.
     takes_context: bool = False
@@ -180,20 +181,20 @@ class TaskResult:
 
     id: str  # Unique identifier for the task result.
     status: TaskResultStatus
-    enqueued_at: Optional[datetime]  # Time the task was enqueued.
-    started_at: Optional[datetime]  # Time the task was started.
-    finished_at: Optional[datetime]  # Time the task was finished.
+    enqueued_at: datetime | None  # Time the task was enqueued.
+    started_at: datetime | None  # Time the task was started.
+    finished_at: datetime | None  # Time the task was finished.
 
     # Time the task was last attempted to be run.
-    last_attempted_at: Optional[datetime]
+    last_attempted_at: datetime | None
 
-    args: list  # Arguments to pass to the task function.
-    kwargs: Dict[str, Any]  # Keyword arguments to pass to the task function.
+    args: list[Any]  # Arguments to pass to the task function.
+    kwargs: dict[str, Any]  # Keyword arguments to pass to the task function.
     backend: str
     errors: list[TaskError]  # Errors raised when running the task.
     worker_ids: list[str]  # Workers which have processed the task.
 
-    _return_value: Optional[Any] = field(init=False, default=None)
+    _return_value: Any | None = field(init=False, default=None)
 
     def __post_init__(self):
         object.__setattr__(self, "args", normalize_json(self.args))

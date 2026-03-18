@@ -1160,7 +1160,7 @@ class FormattingTests(SimpleTestCase):
 
     def test_uncommon_locale_formats(self):
         testcases = {
-            # French Canadian locale uses 'h' as time format seperator.
+            # French Canadian locale uses 'h' as time format separator.
             ("fr-ca", time_format, (self.t, "TIME_FORMAT")): "10\xa0h\xa015",
             (
                 "fr-ca",
@@ -1178,6 +1178,26 @@ class FormattingTests(SimpleTestCase):
             with self.subTest(locale=locale, expected=expected):
                 with translation.override(locale, deactivate=True):
                     self.assertEqual(expected, format_function(*format_args))
+
+    def test_basque_date_formats(self):
+        # Basque locale uses parenthetical suffixes for conditional declension:
+        # (e)ko for years and declined month/day forms.
+        with translation.override("eu", deactivate=True):
+            self.assertEqual(date_format(self.d), "2009(e)ko abe.k 31")
+            self.assertEqual(
+                date_format(self.dt, "DATETIME_FORMAT"),
+                "2009(e)ko abe.k 31, 20:50",
+            )
+            self.assertEqual(
+                date_format(self.d, "YEAR_MONTH_FORMAT"), "2009(e)ko abendua"
+            )
+            self.assertEqual(date_format(self.d, "MONTH_DAY_FORMAT"), "abenduaren 31a")
+            # Day 11 (hamaika in Basque) ends in 'a' as a word, but the
+            # numeral form does not, so appending 'a' is correct here.
+            self.assertEqual(
+                date_format(datetime.date(2009, 12, 11), "MONTH_DAY_FORMAT"),
+                "abenduaren 11a",
+            )
 
     def test_sub_locales(self):
         """

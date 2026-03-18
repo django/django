@@ -1855,6 +1855,12 @@ class LookupQueryingTests(TestCase):
                     Season.objects.filter(In(F("year"), years)).order_by("pk"), seasons
                 )
 
+    def test_in_lookup_in_filter_expression_string(self):
+        self.assertCountEqual(
+            Season.objects.filter(In(F("year"), [F("year"), 2042])),
+            [self.s1, self.s2, self.s3],
+        )
+
     def test_filter_lookup_lhs(self):
         qs = Season.objects.annotate(before_20=LessThan(F("year"), 2000)).filter(
             before_20=LessThan(F("year"), 1900),

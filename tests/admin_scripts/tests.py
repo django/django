@@ -134,6 +134,7 @@ class AdminScriptTestCase(SimpleTestCase):
         python_path.extend(ext_backend_base_dirs)
         test_environ["PYTHONPATH"] = os.pathsep.join(python_path)
         test_environ["PYTHONWARNINGS"] = ""
+        test_environ["PYTHON_COLORS"] = "0"
 
         p = subprocess.run(
             [sys.executable, *args],
@@ -1624,7 +1625,7 @@ class ManageRunserver(SimpleTestCase):
         self.cmd._raw_ipv6 = False
         self.cmd.on_bind("8000")
         self.assertIn(
-            "Starting development server at http://0.0.0.0:8000/",
+            "Starting WSGI development server at http://0.0.0.0:8000/",
             self.output.getvalue(),
         )
         docs_version = get_docs_version()
@@ -1643,7 +1644,7 @@ class ManageRunserver(SimpleTestCase):
         self.cmd._raw_ipv6 = False
         self.cmd.on_bind("14437")
         self.assertIn(
-            "Starting development server at http://127.0.0.1:14437/",
+            "Starting WSGI development server at http://127.0.0.1:14437/",
             self.output.getvalue(),
         )
         docs_version = get_docs_version()
@@ -1662,7 +1663,7 @@ class ManageRunserver(SimpleTestCase):
         self.cmd._raw_ipv6 = False
         self.cmd.on_bind("8000")
         self.assertIn(
-            "Starting development server at http://0.0.0.0:8000/",
+            "Starting WSGI development server at http://0.0.0.0:8000/",
             self.output.getvalue(),
         )
         docs_version = get_docs_version()
@@ -2551,6 +2552,7 @@ class ArgumentOrder(AdminScriptTestCase):
         )
 
 
+@mock.patch.dict(os.environ, {"PYTHON_COLORS": "0"})
 class ExecuteFromCommandLine(SimpleTestCase):
     def test_program_name_from_argv(self):
         """

@@ -1,6 +1,7 @@
 import logging
 
 from django.contrib.gis import gdal
+from django.contrib.gis.gdal import GDALException
 from django.contrib.gis.geometry import json_regex
 from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.forms.widgets import Widget
@@ -36,7 +37,7 @@ class BaseGeometryWidget(Widget):
     def deserialize(self, value):
         try:
             return GEOSGeometry(value)
-        except (GEOSException, ValueError, TypeError) as err:
+        except (GEOSException, GDALException, ValueError, TypeError) as err:
             logger.error("Error creating geometry from value '%s' (%s)", value, err)
         return None
 

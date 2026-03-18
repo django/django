@@ -1,5 +1,7 @@
 import sys
+import unittest
 from datetime import date
+from typing import TYPE_CHECKING
 from unittest import mock
 from unittest.mock import patch
 
@@ -30,6 +32,7 @@ from django.test import (
     override_settings,
 )
 from django.urls import reverse
+from django.utils.version import PY314
 from django.views.debug import ExceptionReporter, technical_500_response
 from django.views.decorators.debug import sensitive_variables
 
@@ -40,6 +43,10 @@ from .models import (
     ExtensionUser,
     UUIDUser,
 )
+
+if TYPE_CHECKING:
+    type AnnotatedUsername = str
+    type AnnotatedPassword = str
 
 
 class FilteredExceptionReporter(ExceptionReporter):
@@ -1284,6 +1291,29 @@ class AuthenticateTests(TestCase):
     )
     def test_skips_backends_with_decorated_method(self):
         self.assertEqual(authenticate(username="test", password="test"), self.user1)
+
+    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
+    @override_settings(
+        AUTHENTICATION_BACKENDS=[
+            "auth_tests.test_auth_backends.AnnotatedBackend",
+        ],
+    )
+    def test_backend_uses_deferred_annotations(self):
+        class AnnotatedBackend:
+            invariant_user = self.user1
+
+            def authenticate(
+                self,
+                request: HttpRequest,
+                username: AnnotatedUsername,
+                password: AnnotatedPassword,
+            ) -> User | None:
+                return self.invariant_user
+
+        with unittest.mock.patch(
+            "django.contrib.auth.import_string", return_value=AnnotatedBackend
+        ):
+            self.assertEqual(authenticate(username="test", password="test"), self.user1)
 
 
 class ImproperlyConfiguredUserModelTest(TestCase):
