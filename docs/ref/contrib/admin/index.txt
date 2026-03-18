@@ -1393,6 +1393,10 @@ default templates used by the :class:`ModelAdmin` views:
     an ellipsis. This applies to both :meth:`delete_view` and the
     ``delete_selected`` action. By default, this is ``None`` (no truncation).
 
+    .. versionchanged:: 6.1
+
+        Added the ``delete_confirmation_max_objects`` attribute.
+
 .. attribute:: ModelAdmin.object_history_template
 
     Path to a custom template, used by :meth:`history_view`.
