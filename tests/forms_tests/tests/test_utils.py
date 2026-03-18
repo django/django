@@ -1,6 +1,7 @@
 import copy
 import json
 
+from django import forms
 from django.core.exceptions import ValidationError
 from django.forms.renderers import DjangoTemplates
 from django.forms.utils import (
@@ -10,6 +11,7 @@ from django.forms.utils import (
     RenderableMixin,
     flatatt,
     pretty_name,
+    widget_has_aria_label,
 )
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
@@ -315,3 +317,15 @@ class FormsUtilsTestCase(SimpleTestCase):
         self.assertEqual(pretty_name("john_doe"), "John doe")
         self.assertEqual(pretty_name(None), "")
         self.assertEqual(pretty_name(""), "")
+
+    def test_widget_has_aria_label(self):
+        widget = forms.TextInput()
+        self.assertIs(widget_has_aria_label(widget, {}), False)
+
+        widget_with_label = forms.TextInput(attrs={"aria-label": "Custom label"})
+        self.assertIs(widget_has_aria_label(widget_with_label, {}), True)
+
+        self.assertIs(
+            widget_has_aria_label(widget, {"aria-labelledby": "custom-labelledby"}),
+            True,
+        )

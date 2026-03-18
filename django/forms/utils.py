@@ -42,6 +42,21 @@ def flatatt(attrs):
     )
 
 
+def widget_has_aria_label(widget, attrs):
+    attrs = attrs or {}
+    if attrs.get("aria-label") or attrs.get("aria-labelledby"):
+        return True
+
+    seen = set()
+    while widget is not None and id(widget) not in seen:
+        seen.add(id(widget))
+        widget_attrs = getattr(widget, "attrs", {})
+        if widget_attrs.get("aria-label") or widget_attrs.get("aria-labelledby"):
+            return True
+        widget = getattr(widget, "widget", None)
+    return False
+
+
 class RenderableMixin:
     def get_context(self):
         raise NotImplementedError(

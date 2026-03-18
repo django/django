@@ -1,7 +1,7 @@
 import re
 
 from django.core.exceptions import ValidationError
-from django.forms.utils import RenderableFieldMixin, pretty_name
+from django.forms.utils import RenderableFieldMixin, pretty_name, widget_has_aria_label
 from django.forms.widgets import MultiWidget, Textarea, TextInput
 from django.utils.functional import cached_property
 from django.utils.html import format_html, html_safe
@@ -297,10 +297,7 @@ class BoundField(RenderableFieldMixin):
             attrs["aria-invalid"] = "true"
         if (
             self._should_add_fieldset_aria_labelledby(widget)
-            and not attrs.get("aria-label")
-            and not attrs.get("aria-labelledby")
-            and not widget.attrs.get("aria-label")
-            and not widget.attrs.get("aria-labelledby")
+            and not widget_has_aria_label(widget, attrs)
         ):
             attrs.setdefault("aria-labelledby", f"{self.auto_id}_legend")
         # Preserve aria-describedby provided by the attrs argument so user
@@ -347,7 +344,11 @@ class BoundField(RenderableFieldMixin):
         attrs = {"id": f"{self.auto_id}_legend"} if self.auto_id else None
         return self.legend_tag(attrs=attrs)
 
+    def _fieldset_widget(self, widget):
+        return getattr(widget, "widget", widget)
+
     def _should_add_fieldset_aria_labelledby(self, widget):
+        widget = self._fieldset_widget(widget)
         return (
             self.use_fieldset
             and self.auto_id

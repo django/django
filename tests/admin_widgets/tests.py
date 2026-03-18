@@ -993,6 +993,32 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
         self.assertFalse(wrapper.can_change_related)
         self.assertFalse(wrapper.can_delete_related)
 
+    def test_bound_field_uses_wrapped_widget_use_fieldset(self):
+        rel = Individual._meta.get_field("parent").remote_field
+        wrapper = widgets.RelatedFieldWidgetWrapper(
+            forms.SelectMultiple(), rel, widget_admin_site
+        )
+
+        class TestForm(forms.Form):
+            field = forms.MultipleChoiceField(widget=wrapper)
+
+        self.assertIs(TestForm()["field"].use_fieldset, True)
+
+    def test_fieldset_select_wrapper_adds_aria_labelledby(self):
+        rel = Individual._meta.get_field("parent").remote_field
+
+        class FieldsetSelect(forms.Select):
+            use_fieldset = True
+
+        wrapper = widgets.RelatedFieldWidgetWrapper(
+            FieldsetSelect(), rel, widget_admin_site
+        )
+
+        class TestForm(forms.Form):
+            field = forms.ChoiceField(widget=wrapper, choices=[("", "---------")])
+
+        self.assertIn('aria-labelledby="id_field_legend"', str(TestForm()["field"]))
+
 
 @override_settings(ROOT_URLCONF="admin_widgets.urls")
 class AdminWidgetSeleniumTestCase(AdminSeleniumTestCase):

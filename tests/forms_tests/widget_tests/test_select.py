@@ -454,6 +454,41 @@ class SelectTest(ChoiceWidgetTest):
             form.render(),
         )
 
+    def test_fieldset_as_widget_with_aria_label(self):
+        class FieldsetSelect(self.widget):
+            use_fieldset = True
+
+        class TestForm(Form):
+            field = ChoiceField(widget=FieldsetSelect, choices=self.beatles)
+
+        form = TestForm()
+        html = form["field"].as_widget(attrs={"aria-label": "Custom label"})
+        self.assertIn('aria-label="Custom label"', html)
+        self.assertNotIn('aria-labelledby="', html)
+
+    def test_fieldset_as_widget_with_aria_labelledby(self):
+        class FieldsetSelect(self.widget):
+            use_fieldset = True
+
+        class TestForm(Form):
+            field = ChoiceField(widget=FieldsetSelect, choices=self.beatles)
+
+        form = TestForm()
+        html = form["field"].as_widget(attrs={"aria-labelledby": "custom-labelledby"})
+        self.assertIn('aria-labelledby="custom-labelledby"', html)
+        self.assertNotIn('aria-labelledby="id_field_legend"', html)
+
+    def test_fieldset_as_widget_adds_aria_labelledby(self):
+        class FieldsetSelect(self.widget):
+            use_fieldset = True
+
+        class TestForm(Form):
+            field = ChoiceField(widget=FieldsetSelect, choices=self.beatles)
+
+        form = TestForm()
+        html = form["field"].as_widget()
+        self.assertIn('aria-labelledby="id_field_legend"', html)
+
     def test_fieldset_preserves_custom_aria_labelledby(self):
         class FieldsetSelect(self.widget):
             use_fieldset = True
