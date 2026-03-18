@@ -47,13 +47,12 @@ def widget_has_aria_label(widget, attrs):
     if attrs.get("aria-label") or attrs.get("aria-labelledby"):
         return True
 
-    seen = set()
-    while widget is not None and id(widget) not in seen:
-        seen.add(id(widget))
-        widget_attrs = getattr(widget, "attrs", {})
+    for candidate in (widget, getattr(widget, "widget", None)):
+        if candidate is None:
+            continue
+        widget_attrs = getattr(candidate, "attrs", {}) or {}
         if widget_attrs.get("aria-label") or widget_attrs.get("aria-labelledby"):
             return True
-        widget = getattr(widget, "widget", None)
     return False
 
 

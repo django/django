@@ -335,7 +335,10 @@ class BoundField(RenderableFieldMixin):
 
     @property
     def use_legend_id(self):
-        """Return whether fieldset legend should have an id for aria-labelledby."""
+        """
+        Return whether fieldset legend should have an id for
+        aria-labelledby.
+        """
         return self._should_add_fieldset_aria_labelledby(self.field.widget)
 
     @property

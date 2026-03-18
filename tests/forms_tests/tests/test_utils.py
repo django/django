@@ -329,3 +329,22 @@ class FormsUtilsTestCase(SimpleTestCase):
             widget_has_aria_label(widget, {"aria-labelledby": "custom-labelledby"}),
             True,
         )
+
+        class WidgetWrapper:
+            def __init__(self, widget, attrs=None):
+                self.widget = widget
+                self.attrs = attrs or {}
+
+        wrapped_widget = WidgetWrapper(
+            forms.TextInput(attrs={"aria-label": "Wrapped label"})
+        )
+        self.assertIs(widget_has_aria_label(wrapped_widget, {}), True)
+
+        wrapped_widget_with_attrs = WidgetWrapper(
+            forms.TextInput(),
+            attrs={"aria-labelledby": "wrapped-labelledby"},
+        )
+        self.assertIs(widget_has_aria_label(wrapped_widget_with_attrs, {}), True)
+
+        wrapped_widget_no_label = WidgetWrapper(forms.TextInput())
+        self.assertIs(widget_has_aria_label(wrapped_widget_no_label, {}), False)
