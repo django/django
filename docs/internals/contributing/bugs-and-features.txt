@@ -173,6 +173,73 @@ Roughly translated, these votes mean:
 Although these votes are informal, they'll be taken very seriously. After a
 suitable voting period, if an obvious consensus arises we'll follow the votes.
 
+.. _testing-pre-releases:
+
+How to test pre-release versions of Django
+==========================================
+
+Testing pre-releases is a great way to contribute to Django. Early testers
+help catch bugs before the final release, ensuring a smoother upgrade
+experience for everyone.
+
+Prerequisites
+~~~~~~~~~~~~~
+
+Before testing a pre-release, it is a reasonable prerequisite that your project
+is running smoothly on the latest stable release of Django. See the
+:doc:`/howto/upgrade-version` guide for instructions on getting your codebase
+up to date.
+
+Installing a pre-release
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can install the latest pre-release (Alpha, Beta, or Release Candidate)
+using ``pip``:
+
+.. code-block:: console
+
+    $ python -m pip install --pre Django
+
+Testing your project
+~~~~~~~~~~~~~~~~~~~~
+
+Once installed, run your project's test suite. Rather than just checking
+if tests pass, it is helpful to pay attention to the following:
+
+* **Read the release notes:** Review the :doc:`/releases/index` for the
+  upcoming version to identify any backward-incompatible changes.
+
+* **Enable deprecation warnings:** Run your tests with deprecation warnings
+  enabled to catch features that will be removed in future releases:
+
+  .. code-block:: console
+
+      $ python -Wa manage.py test
+
+* **Check dependencies:** Check the Django version classifiers on PyPI to
+  see if your major third-party dependencies support the new release.
+  Since those projects also value early bug reports, don't let a lack
+  of support prevent you from testing.
+
+* **Monitor test performance:** Pay attention to any tests that are
+  dramatically slower. You can run your tests with the
+  :option:`test --durations` flag to help identify potential performance
+  regressions in Django.
+
+Automating tests in CI
+~~~~~~~~~~~~~~~~~~~~~~
+
+You can also set up scheduled jobs in your Continuous Integration (CI)
+pipeline to test against Django's main branch.
+
+Reporting issues
+~~~~~~~~~~~~~~~~
+
+If you discover a bug, please report it to the `Django issue tracker
+<https://code.djangoproject.com/>`_ so it can be fixed before the final
+release. If you suspect a regression, it's very helpful to bisect it.
+See :ref:`bisecting-a-regression` for instructions.
+
 .. _searching: https://code.djangoproject.com/search
 .. _custom queries: https://code.djangoproject.com/query
 .. _Django Forum: https://forum.djangoproject.com/
