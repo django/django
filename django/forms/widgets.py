@@ -73,9 +73,9 @@ class MediaAsset:
     def __eq__(self, other):
         # Compare the path only, to ensure performant comparison in
         # Media.merge.
-        return (self.__class__ is other.__class__ and self.path == other.path) or (
-            isinstance(other, str) and self._path == other
-        )
+        return (
+            self.__class__ is other.__class__ and self.path == other.path
+        ) or (isinstance(other, str) and self._path == other)
 
     def __hash__(self):
         # Hash the path only, to ensure performant comparison in Media.merge.
@@ -156,7 +156,9 @@ class Media:
             (
                 path.__html__()
                 if hasattr(path, "__html__")
-                else format_html('<script src="{}"></script>', self.absolute_path(path))
+                else format_html(
+                    '<script src="{}"></script>', self.absolute_path(path)
+                )
             )
             for path in self._js
         ]
@@ -223,7 +225,9 @@ class Media:
                 ),
                 MediaOrderConflictWarning,
             )
-            return list(dict.fromkeys(chain.from_iterable(filter(None, lists))))
+            return list(
+                dict.fromkeys(chain.from_iterable(filter(None, lists)))
+            )
 
     def __add__(self, other):
         combined = Media()
@@ -280,7 +284,9 @@ class MediaDefiningClass(type):
 
 
 class Widget(metaclass=MediaDefiningClass):
-    needs_multipart_form = False  # Determines does this widget need multipart form
+    needs_multipart_form = (
+        False  # Determines does this widget need multipart form
+    )
     is_localized = False
     is_required = False
     supports_microseconds = True
@@ -297,7 +303,11 @@ class Widget(metaclass=MediaDefiningClass):
 
     @property
     def is_hidden(self):
-        return self.input_type == "hidden" if hasattr(self, "input_type") else False
+        return (
+            self.input_type == "hidden"
+            if hasattr(self, "input_type")
+            else False
+        )
 
     def subwidgets(self, name, value, attrs=None):
         context = self.get_context(name, value, attrs)
@@ -461,7 +471,9 @@ class MultipleHiddenInput(HiddenInput):
                 widget_attrs["id"] = "%s_%s" % (id_, index)
             widget = HiddenInput()
             widget.is_required = self.is_required
-            subwidgets.append(widget.get_context(name, value_, widget_attrs)["widget"])
+            subwidgets.append(
+                widget.get_context(name, value_, widget_attrs)["widget"]
+            )
 
         context["widget"]["subwidgets"] = subwidgets
         return context
@@ -737,9 +749,9 @@ class ChoiceWidget(Widget):
             groups.append((group_name, subgroup, index))
 
             for subvalue, sublabel in choices:
-                selected = (not has_selected or self.allow_multiple_selected) and str(
-                    subvalue
-                ) in value
+                selected = (
+                    not has_selected or self.allow_multiple_selected
+                ) and str(subvalue) in value
                 has_selected |= selected
                 subgroup.append(
                     self.create_option(
@@ -761,7 +773,9 @@ class ChoiceWidget(Widget):
     ):
         index = str(index) if subindex is None else "%s_%s" % (index, subindex)
         option_attrs = (
-            self.build_attrs(self.attrs, attrs) if self.option_inherits_attrs else {}
+            self.build_attrs(self.attrs, attrs)
+            if self.option_inherits_attrs
+            else {}
         )
         if selected:
             option_attrs.update(self.checked_attribute)
@@ -841,22 +855,36 @@ class Select(ChoiceWidget):
         value, _ = choice
         return value is None or value == ""
 
-    def use_required_attribute(self, initial):
-        """
-        Don't render 'required' if the first <option> has a value, as that's
-        invalid HTML.
-        """
-        use_required_attribute = super().use_required_attribute(initial)
-        # 'required' is always okay for <select multiple>.
-        if self.allow_multiple_selected:
-            return use_required_attribute
 
-        first_choice = next(iter(self.choices), None)
-        return (
-            use_required_attribute
-            and first_choice is not None
-            and self._choice_has_empty_value(first_choice)
-        )
+def use_required_attribute(self, initial):
+    """
+    Don't render 'required' if the first <option> has a value, as that's
+    invalid HTML.
+    """
+    use_required_attribute = super().use_required_attribute(initial)
+
+    # 'required' is always okay for <select multiple>.
+    if self.allow_multiple_selected:
+        return use_required_attribute
+
+    iterator = iter(self.choices)
+
+    # Avoid triggering an additional database query
+    # when using ModelChoiceIterator
+    try:
+        empty_label = iterator.field.empty_label
+    except AttributeError:
+        empty_label = None
+
+    if empty_label is not None:
+        return use_required_attribute
+
+    first_choice = next(iterator, None)
+    return (
+        use_required_attribute
+        and first_choice is not None
+        and self._choice_has_empty_value(first_choice)
+    )
 
 
 class NullBooleanSelect(Select):
@@ -967,7 +995,9 @@ class MultiWidget(Widget):
 
     def __init__(self, widgets, attrs=None):
         if isinstance(widgets, dict):
-            self.widgets_names = [("_%s" % name) if name else "" for name in widgets]
+            self.widgets_names = [
+                ("_%s" % name) if name else "" for name in widgets
+            ]
             widgets = widgets.values()
         else:
             self.widgets_names = ["_%s" % i for i in range(len(widgets))]
@@ -1008,7 +1038,9 @@ class MultiWidget(Widget):
             else:
                 widget_attrs = final_attrs
             subwidgets.append(
-                widget.get_context(widget_name, widget_value, widget_attrs)["widget"]
+                widget.get_context(widget_name, widget_value, widget_attrs)[
+                    "widget"
+                ]
             )
         context["widget"]["subwidgets"] = subwidgets
         return context
@@ -1108,7 +1140,9 @@ class SplitHiddenDateTimeWidget(SplitDateTimeWidget):
         date_attrs=None,
         time_attrs=None,
     ):
-        super().__init__(attrs, date_format, time_format, date_attrs, time_attrs)
+        super().__init__(
+            attrs, date_format, time_format, date_attrs, time_attrs
+        )
         for widget in self.widgets:
             widget.input_type = "hidden"
 
@@ -1150,7 +1184,9 @@ class SelectDateWidget(Widget):
         # Optional string, list, or tuple to use as empty_label.
         if isinstance(empty_label, (list, tuple)):
             if not len(empty_label) == 3:
-                raise ValueError("empty_label list/tuple must have 3 elements.")
+                raise ValueError(
+                    "empty_label list/tuple must have 3 elements."
+                )
 
             self.year_none_value = ("", empty_label[0])
             self.month_none_value = ("", empty_label[1])
