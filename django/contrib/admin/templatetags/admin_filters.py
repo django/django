@@ -25,12 +25,14 @@ def truncated_unordered_list(value, max_items, autoescape=True):
 
         {{ deleted_objects|truncated_unordered_list:100 }}
     """
-    try:
-        max_items = int(max_items)
-    except (TypeError, ValueError):
-        max_items = None
+    max_items = int(max_items)
 
-    escaper = conditional_escape if autoescape else (lambda x: x)
+    if autoescape:
+        escaper = conditional_escape
+    else:
+
+        def escaper(x):
+            return x
 
     def list_formatter(item_list, tabs=1):
         indent = "\t" * tabs
