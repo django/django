@@ -521,6 +521,32 @@ class ParseHeaderParameterTests(unittest.TestCase):
             parsed = parse_header_parameters(raw_line)
             self.assertEqual(parsed[1]["title"], expected_title)
 
+    def test_rfc2231_invalid_encoding(self):
+        """
+        Invalid encoding in RFC 2231 parameter should be gracefully ignored
+        instead of raising LookupError (#36991).
+        """
+        test_data = [
+            # Bogus encoding with percent-encoded bytes triggers LookupError.
+            (
+                "text/plain; charset*=BOGUS''foo-%c3%a4.html",
+                ("text/plain", {}),
+            ),
+            # Invalid encoding with valid parameter following.
+            (
+                "text/plain; charset*=BOGUS''foo-%c3%a4; boundary=something",
+                ("text/plain", {"boundary": "something"}),
+            ),
+            # The reproduction case from the ticket.
+            (
+                ";*=''%",
+                ("", {}),
+            ),
+        ]
+        for header, expected in test_data:
+            with self.subTest(header=header):
+                self.assertEqual(parse_header_parameters(header), expected)
+
     def test_header_max_length(self):
         base_header = "Content-Type: application/x-stuff; title*="
         base_header_len = len(base_header)
