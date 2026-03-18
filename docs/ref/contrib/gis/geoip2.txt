@@ -69,7 +69,7 @@ Here is an example of its usage:
 API Reference
 =============
 
-.. class:: GeoIP2(path=None, cache=0, country=None, city=None)
+.. class:: GeoIP2(path=None, cache=0, country=None, city=None, supported_types=None)
 
 The ``GeoIP`` object does not require any parameters to use the default
 settings. However, at the very least the :setting:`GEOIP_PATH` setting
@@ -99,7 +99,15 @@ Keyword Arguments    Description
 ``city``             The name of the GeoIP city data file. Defaults to
                      ``GeoLite2-City.mmdb``. Setting this keyword overrides
                      the :setting:`GEOIP_CITY` setting.
+
+``supported_types``  An iterable of allowed database edition names. Defaults
+                     to :data:`SUPPORTED_DATABASE_TYPES`.
 ===================  =======================================================
+
+.. versionchanged:: 6.1
+
+    The ``supported_types`` parameter was added. Support for ``DBIP-City``
+    and ``DBIP-Country`` was added.
 
 Methods
 =======
@@ -174,6 +182,41 @@ The basename to use for the GeoIP country data file. Defaults to
 
 The basename to use for the GeoIP city data file. Defaults to
 ``'GeoLite2-City.mmdb'``.
+
+Database Editions
+=================
+
+.. data:: SUPPORTED_DATABASE_TYPES
+
+A set of supported MaxMind DB edition names:
+
+* ``'DBIP-City'``
+* ``'DBIP-City-Lite'``
+* ``'DBIP-Country'``
+* ``'DBIP-Country-Lite'``
+* ``'GeoIP2-City'``
+* ``'GeoIP2-Country'``
+* ``'GeoLite2-City'``
+* ``'GeoLite2-Country'``
+
+If you are using an alternative or third-party database edition (such as
+``'Geoacumen-Country'``), you can register it with
+:data:`~django.contrib.gis.geoip2.SUPPORTED_DATABASE_TYPES`, typically in your
+application configuration's :meth:`~django.apps.AppConfig.ready` method:
+
+.. code-block:: python
+
+    from django.apps import AppConfig
+    from django.contrib.gis.geoip2 import SUPPORTED_DATABASE_TYPES
+
+
+    class MyGeoIPConfig(AppConfig):
+        name = "my_app"
+
+        def ready(self):
+            SUPPORTED_DATABASE_TYPES.add("Geoacumen-Country")
+
+Alternatively, pass ``supported_types`` to :class:`GeoIP2` directly.
 
 Exceptions
 ==========
