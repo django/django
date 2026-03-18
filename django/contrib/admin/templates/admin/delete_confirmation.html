@@ -23,12 +23,12 @@
 {% if perms_lacking %}
   {% block delete_forbidden %}
     <p>{% blocktranslate %}Deleting the {{ object_name }} “{{ escaped_object }}” would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:{% endblocktranslate %}</p>
-    <ul id="deleted-objects">{{ perms_lacking|unordered_list }}</ul>
+    <ul id="deleted-objects">{{ perms_lacking|truncated_unordered_list:delete_confirmation_max_objects }}</ul>
   {% endblock %}
 {% elif protected %}
   {% block delete_protected %}
     <p>{% blocktranslate %}Deleting the {{ object_name }} “{{ escaped_object }}” would require deleting the following protected related objects:{% endblocktranslate %}</p>
-    <ul id="deleted-objects">{{ protected|unordered_list }}</ul>
+    <ul id="deleted-objects">{{ protected|truncated_unordered_list:delete_confirmation_max_objects }}</ul>
   {% endblock %}
 {% else %}
   {% block delete_confirm %}
