@@ -29,3 +29,8 @@ body {
 body {
     background: #d3d6d8 /* url("does.not.exist.png") */ url(/static/cached/img/relative.png) /*url("does.not.exist.either.png")*/;
 }
+
+body {
+    content: "url(non_exist.png)";
+    content: 'url(non_exist.png)';
+}
