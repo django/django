@@ -141,6 +141,9 @@ Minor features
 * :class:`~django.contrib.gis.gdal.DataSource` now preserves millisecond
   precision when reading time and datetime fields.
 
+* :class:`~django.contrib.gis.geoip2.GeoIP2` now supports commercial DB-IP
+  (``'DBIP-City'`` and ``'DBIP-Country'``) database editions by default.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
