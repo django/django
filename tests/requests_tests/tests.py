@@ -459,11 +459,12 @@ class RequestsTests(SimpleTestCase):
             ('Content-Disposition : form-data; name="name"', {"name": ["value"]}),
             ('Content-Disposition:form-data; name="name"', {"name": ["value"]}),
             ('Content-Disposition :form-data; name="name"', {"name": ["value"]}),
-            # The invalid encoding causes the entire part to be skipped.
+            # The invalid encoding causes the filename parameter to be
+            # skipped, but the rest of the part is still parsed (#36991).
             (
                 'Content-Disposition: form-data; name="name"; '
                 "filename*=BOGUS''test%20file.txt",
-                {},
+                {"name": ["value"]},
             ),
         ]
         for header, expected_post in tests:
