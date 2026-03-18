@@ -123,6 +123,10 @@ notes fresh in your mind, it may also be a good time to take advantage of new
 features in Django by refactoring your code to eliminate any deprecation
 warnings.
 
+If you are upgrading to an alpha, beta, or release candidate, please see our
+guide on :ref:`testing-pre-releases` for more specific tips about catching
+regressions and reporting bugs.
+
 Deployment
 ==========
 
