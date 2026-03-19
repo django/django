@@ -143,8 +143,8 @@ Minor features
 
 * The :attr:`~django.contrib.admin.ModelAdmin.delete_confirmation_max_display`
   option allows customizing how many objects are displayed on admin delete
-  confirmation pages before the remainder is truncated. The default is
-  ``None`` (no truncation).
+  confirmation pages and inline protected deletion errors before the remainder
+  is truncated. The default is ``None`` (no truncation).
 
 * In order to improve accessibility of the admin change forms:
 
