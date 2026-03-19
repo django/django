@@ -295,10 +295,9 @@ class BoundField(RenderableFieldMixin):
             attrs["disabled"] = True
         if not widget.is_hidden and self.errors:
             attrs["aria-invalid"] = "true"
-        if (
-            self._should_add_fieldset_aria_labelledby(widget)
-            and not widget_has_aria_label(widget, attrs)
-        ):
+        if self._should_add_fieldset_aria_labelledby(
+            widget
+        ) and not widget_has_aria_label(widget, attrs):
             attrs.setdefault("aria-labelledby", f"{self.auto_id}_legend")
         # Preserve aria-describedby provided by the attrs argument so user
         # can set the desired order.
