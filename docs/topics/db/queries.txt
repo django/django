@@ -2123,19 +2123,22 @@ about your database.
 Using Django ORM with multiprocessing
 -------------------------------------
 
-When using Python's ``multiprocessing`` module with Django, database
-connections should not be shared across processes. Each process should
-establish its own database connection.
+When using Python's ``multiprocessing`` module with Django, each process
+must establish its own database connection. Database connections should
+not be shared across processes created with ``fork()``.
 
-Before spawning child processes, it can be helpful to close existing
-connections::
+To ensure this, close existing connections before spawning child
+processes::
 
     from django.db import close_old_connections
 
     close_old_connections()
 
-This ensures that each process creates a fresh database connection when
-interacting with the ORM.
+This allows each child process to create a fresh database connection
+when interacting with the ORM.
+
+
+
 
 
 
