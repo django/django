@@ -117,9 +117,12 @@ Minor features
   * Checkboxes are an exception to the above changes and continue to be
     displayed in their original layout.
 
+<<<<<<< HEAD
 * :attr:`~django.contrib.admin.ModelAdmin.list_display` now uses boolean icons
   for boolean fields on related models.
 
+=======
+>>>>>>> 0091eb0818 (Updated release notes for 6.1)
 * Inline admin formsets will now limit the number of delete-protected objects
   displayed in the validation message to 100.
 
