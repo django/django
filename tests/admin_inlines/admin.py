@@ -296,6 +296,7 @@ class PollAdmin(admin.ModelAdmin):
 class ChapterInline(admin.TabularInline):
     model = Chapter
     readonly_fields = ["call_me"]
+    delete_confirmation_max_display = 3
 
     def call_me(self, obj):
         return "Callable in ChapterInline"
