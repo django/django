@@ -2524,8 +2524,9 @@ class InlineModelAdmin(BaseModelAdmin):
                     collector.collect([self.instance])
                     if collector.protected:
                         objs = []
-                        protected = itertools.islice(collector.protected,
-                                                     INLINE_PROTECTED_ERROR_MAX_OBJECTS)
+                        protected = itertools.islice(
+                            collector.protected, INLINE_PROTECTED_ERROR_MAX_OBJECTS
+                        )
                         for p in protected:
                             objs.append(
                                 # Translators: Model verbose name and instance
@@ -2538,13 +2539,17 @@ class InlineModelAdmin(BaseModelAdmin):
                             "class_name": self._meta.model._meta.verbose_name,
                             "instance": self.instance,
                         }
-                        deleted_diff = (len(collector.protected) -
-                                        INLINE_PROTECTED_ERROR_MAX_OBJECTS)
+                        deleted_diff = (
+                            len(collector.protected)
+                            - INLINE_PROTECTED_ERROR_MAX_OBJECTS
+                        )
                         if deleted_diff > 0:
                             # Translators: This string is used as a separator
                             # between list elements
-                            related = (_(", ").join(str(i) for i in objs) +
-                                       _(' and %d more') % deleted_diff)
+                            related = (
+                                _(", ").join(str(i) for i in objs)
+                                + _(" and %d more") % deleted_diff
+                            )
                         else:
                             related = get_text_list(objs, _("and"))
                         params["related_objects"] = related
