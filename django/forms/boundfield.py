@@ -347,11 +347,10 @@ class BoundField(RenderableFieldMixin):
         attrs = {"id": f"{self.auto_id}_legend"} if self.auto_id else None
         return self.legend_tag(attrs=attrs)
 
-    def _fieldset_widget(self, widget):
-        return getattr(widget, "widget", widget)
-
     def _should_add_fieldset_aria_labelledby(self, widget):
-        widget = self._fieldset_widget(widget)
+        # RelatedFieldWidgetWrapper (admin) stores the real widget on .widget.
+        # Unwrap before checking attributes.
+        widget = getattr(widget, "widget", widget)
         return (
             self.use_fieldset
             and self.auto_id
