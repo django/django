@@ -112,6 +112,9 @@ Minor features
   * Checkboxes are an exception to the above changes and continue to be
     displayed in their original layout.
 
+* Inline admin formsets will now limit the number of delete-protected objects
+  displayed in the validation message to 100.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
