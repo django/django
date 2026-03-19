@@ -184,6 +184,20 @@ class MailTestsMixin:
                 "First string doesn't end with the second.",
             )
 
+    def get_outbox_message(self, index=0, expected_count=1):
+        """
+        Return a (Django) EmailMessage from the locmem outbox.
+
+        If expected_count is not None, first assert that the outbox has exactly
+        the expected number of messages.
+        """
+        if expected_count is not None:
+            assert expected_count > index  # Require valid args.
+            self.assertEqual(len(mail.outbox), expected_count)
+        else:
+            self.assertGreater(len(mail.outbox), index)
+        return mail.outbox[index].message()
+
     def get_raw_attachments(self, django_message):
         """
         Return a list of the raw attachment parts in the MIME message generated
@@ -1291,6 +1305,39 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
             s = msg.message().as_bytes()
             self.assertIn(b"Content-Transfer-Encoding: quoted-printable", s)
 
+    def test_long_lines(self):
+        """
+        Email line length is limited to 998 chars by the RFC 5322 Section
+        2.1.1. A message body containing longer lines is converted to
+        quoted-printable or base64 (whichever is shorter), to avoid having to
+        insert newlines in a way that alters the intended text.
+        """
+        cases = [
+            # (body, expected_cte)
+            ("В южных морях " * 60, "base64"),
+            ("I de sørlige hav " * 58, "quoted-printable"),
+        ]
+        for body, expected_cte in cases:
+            mail.outbox = []
+            with self.subTest(body=f"{body[:10]}…", expected_cte=expected_cte):
+                # Test precondition: Body is a single line < 998 characters,
+                # but utf-8 encoding of body is > 998 octets (forcing a CTE
+                # that avoids inserting newlines).
+                self.assertLess(len(body), 998)
+                self.assertGreater(len(body.encode()), 998)
+
+                email = EmailMessage(body=body, to=["to@example.com"])
+                email.send()
+                message = self.get_outbox_message()
+                self.assertMessageHasHeaders(
+                    message,
+                    {
+                        ("MIME-Version", "1.0"),
+                        ("Content-Type", 'text/plain; charset="utf-8"'),
+                        ("Content-Transfer-Encoding", expected_cte),
+                    },
+                )
+
     def test_address_header_handling(self):
         # This verifies the modern email API's address header handling.
         cases = [
@@ -1399,6 +1446,23 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
                     with self.assertRaisesMessage(ValueError, msg):
                         email.message()
 
+    def test_idn_addresses(self):
+        """
+        IDNA encoding is applied to non-ASCII domains in address headers
+        (#14301).
+
+        See also test_address_header_handling() for several variations in the
+        to field.
+        """
+        email = EmailMessage(
+            from_email="from@öäü.com", to=["to@öäü.com"], cc=["cc@öäü.com"]
+        )
+        email.send()
+        message = self.get_outbox_message()
+        self.assertEqual(message.get("from"), "from@xn--4ca9at.com")
+        self.assertEqual(message.get("to"), "to@xn--4ca9at.com")
+        self.assertEqual(message.get("cc"), "cc@xn--4ca9at.com")
+
     def test_localpart_only_address(self):
         """
         Django allows sending to a localpart-only email address
@@ -1406,11 +1470,39 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
         is accepted by some SMTP servers for local delivery.
         Regression for #15042.
         """
-        email = EmailMessage(to=["localpartonly"])
+        email = EmailMessage(from_email="django", to=["localpartonly"])
         parsed = message_from_bytes(email.message().as_bytes())
+        self.assertEqual(
+            parsed["From"].addresses, (Address(username="django", domain=""),)
+        )
         self.assertEqual(
             parsed["To"].addresses, (Address(username="localpartonly", domain=""),)
         )
+
+    def test_lazy_addresses(self):
+        """
+        Email sending should support lazy email addresses (#24416).
+        """
+        _ = gettext_lazy
+        email = EmailMessage(
+            from_email=_("tester"),
+            to=[_("to1"), _("to2")],
+            cc=[_("cc1"), _("cc2")],
+            bcc=[_("bcc")],
+            reply_to=[_("reply")],
+        )
+        self.assertEqual(email.recipients(), ["to1", "to2", "cc1", "cc2", "bcc"])
+        email.send()
+        message = self.get_outbox_message()
+        self.assertEqual(message.get("from"), "tester")
+        self.assertEqual(message.get("to"), "to1, to2")
+        self.assertEqual(message.get("cc"), "cc1, cc2")
+        self.assertEqual(message.get("Reply-To"), "reply")
+
+    def test_unicode_display_name_in_from_email(self):
+        email = EmailMessage(from_email='"Firstname Sürname" <from@example.com>')
+        parsed = message_from_bytes(email.message().as_bytes())
+        self.assertEqual(parsed["From"], "Firstname Sürname <from@example.com>")
 
     def test_email_multi_alternatives_content_mimetype_none(self):
         email_msg = EmailMultiAlternatives()
@@ -1748,10 +1840,64 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
             email.send(fail_silently=True)
 
 
-class SendMailTests(SimpleTestCase):
+class SendMailTests(SimpleTestCase, MailTestsMixin):
     """
     Tests for django.core.mail.send_mail().
     """
+
+    def test_plaintext_send_mail(self):
+        """
+        Test send_mail without the html_message
+        regression test for adding html_message parameter to send_mail()
+        """
+        send_mail("Subject", "Content\n", "sender@example.com", ["nobody@example.com"])
+        message = self.get_outbox_message()
+
+        self.assertEqual(message.get("subject"), "Subject")
+        self.assertEqual(message.get_all("to"), ["nobody@example.com"])
+        self.assertFalse(message.is_multipart())
+        self.assertEqual(message.get_content(), "Content\n")
+        self.assertEqual(message.get_content_type(), "text/plain")
+
+    def test_html_send_mail(self):
+        """Test html_message argument to send_mail"""
+        send_mail(
+            "Subject",
+            "Content\n",
+            "sender@example.com",
+            ["nobody@example.com"],
+            html_message="HTML Content\n",
+        )
+        message = self.get_outbox_message()
+
+        self.assertEqual(message.get("subject"), "Subject")
+        self.assertEqual(message.get_all("to"), ["nobody@example.com"])
+        self.assertTrue(message.is_multipart())
+        self.assertEqual(len(message.get_payload()), 2)
+        self.assertEqual(message.get_payload(0).get_content(), "Content\n")
+        self.assertEqual(message.get_payload(0).get_content_type(), "text/plain")
+        self.assertEqual(message.get_payload(1).get_content(), "HTML Content\n")
+        self.assertEqual(message.get_payload(1).get_content_type(), "text/html")
+
+    def test_idn_addresses(self):
+        """
+        IDNA encoding is applied to non-ASCII domains in address headers
+        (#14301).
+        """
+        self.assertTrue(send_mail("Subject", "Content", "from@öäü.com", ["to@öäü.com"]))
+        message = self.get_outbox_message()
+        self.assertEqual(message.get("from"), "from@xn--4ca9at.com")
+        self.assertEqual(message.get("to"), "to@xn--4ca9at.com")
+
+    def test_lazy_addresses(self):
+        """
+        Email sending should support lazy email addresses (#24416).
+        """
+        _ = gettext_lazy
+        self.assertTrue(send_mail("Subject", "Content", _("tester"), [_("django")]))
+        message = self.get_outbox_message()
+        self.assertEqual(message.get("from"), "tester")
+        self.assertEqual(message.get("to"), "django")
 
     def test_connection_arg(self):
         # Send using non-default connection.
@@ -1849,10 +1995,151 @@ class SendMassMailTests(SimpleTestCase):
                 )
 
 
-class MailAdminsAndManagersTests(SimpleTestCase):
+class MailAdminsAndManagersTests(SimpleTestCase, MailTestsMixin):
     """
     Tests for django.core.mail.mail_admins() and mail_managers().
     """
+
+    def test_mail_admins_and_managers(self):
+        tests = (
+            # The ADMINS and MANAGERS settings are lists of email strings.
+            ['"Name, Full" <test@example.com>'],
+            # Lists and tuples are interchangeable.
+            ["test@example.com", "other@example.com"],
+            ("test@example.com", "other@example.com"),
+            # Lazy strings are supported.
+            [gettext_lazy("test@example.com")],
+        )
+        for setting, mail_func in (
+            ("ADMINS", mail_admins),
+            ("MANAGERS", mail_managers),
+        ):
+            for value in tests:
+                mail.outbox = []
+                with (
+                    self.subTest(setting=setting, value=value),
+                    self.settings(**{setting: value}),
+                ):
+                    mail_func("subject", "content")
+                    message = self.get_outbox_message()
+                    expected_to = ", ".join([str(address) for address in value])
+                    self.assertEqual(message.get_all("to"), [expected_to])
+
+    @override_settings(MANAGERS=["nobody@example.com"])
+    def test_html_mail_managers(self):
+        """Test html_message argument to mail_managers"""
+        mail_managers("Subject", "Content\n", html_message="HTML Content\n")
+        message = self.get_outbox_message()
+
+        self.assertEqual(message.get("subject"), "[Django] Subject")
+        self.assertEqual(message.get_all("to"), ["nobody@example.com"])
+        self.assertTrue(message.is_multipart())
+        self.assertEqual(len(message.get_payload()), 2)
+        self.assertEqual(message.get_payload(0).get_content(), "Content\n")
+        self.assertEqual(message.get_payload(0).get_content_type(), "text/plain")
+        self.assertEqual(message.get_payload(1).get_content(), "HTML Content\n")
+        self.assertEqual(message.get_payload(1).get_content_type(), "text/html")
+
+    @override_settings(ADMINS=["nobody@example.com"])
+    def test_html_mail_admins(self):
+        """Test html_message argument to mail_admins"""
+        mail_admins("Subject", "Content\n", html_message="HTML Content\n")
+        message = self.get_outbox_message()
+
+        self.assertEqual(message.get("subject"), "[Django] Subject")
+        self.assertEqual(message.get_all("to"), ["nobody@example.com"])
+        self.assertTrue(message.is_multipart())
+        self.assertEqual(len(message.get_payload()), 2)
+        self.assertEqual(message.get_payload(0).get_content(), "Content\n")
+        self.assertEqual(message.get_payload(0).get_content_type(), "text/plain")
+        self.assertEqual(message.get_payload(1).get_content(), "HTML Content\n")
+        self.assertEqual(message.get_payload(1).get_content_type(), "text/html")
+
+    @override_settings(
+        ADMINS=["nobody+admin@example.com"],
+        MANAGERS=["nobody+manager@example.com"],
+    )
+    def test_manager_and_admin_mail_prefix(self):
+        """
+        String prefix + lazy translated subject = bad output
+        Regression for #13494
+        """
+        for mail_func in [mail_managers, mail_admins]:
+            mail.outbox = []
+            with self.subTest(mail_func=mail_func):
+                mail_func(gettext_lazy("Subject"), "Content")
+                message = self.get_outbox_message()
+                self.assertEqual(message.get("subject"), "[Django] Subject")
+
+    @override_settings(ADMINS=[], MANAGERS=[])
+    def test_empty_admins(self):
+        """
+        mail_admins/mail_managers doesn't connect to the mail server
+        if there are no recipients (#9383)
+        """
+        for mail_func in [mail_managers, mail_admins]:
+            mail.outbox = []
+            with self.subTest(mail_func=mail_func):
+                mail_func("hi", "there")
+                self.assertEqual(mail.outbox, [])
+
+    # RemovedInDjango70Warning.
+    def test_deprecated_admins_managers_tuples(self):
+        tests = (
+            [("nobody", "nobody@example.com"), ("other", "other@example.com")],
+            [["nobody", "nobody@example.com"], ["other", "other@example.com"]],
+        )
+        for setting, mail_func in (
+            ("ADMINS", mail_admins),
+            ("MANAGERS", mail_managers),
+        ):
+            msg = (
+                f"Using (name, address) pairs in the {setting} setting is deprecated."
+                " Replace with a list of email address strings."
+            )
+            for value in tests:
+                mail.outbox = []
+                with (
+                    self.subTest(setting=setting, value=value),
+                    self.settings(**{setting: value}),
+                ):
+                    with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+                        mail_func("subject", "content")
+                    message = self.get_outbox_message()
+                    expected_to = ", ".join([str(address) for _, address in value])
+                    self.assertEqual(message.get_all("to"), [expected_to])
+
+    def test_wrong_admins_managers(self):
+        tests = (
+            "test@example.com",
+            gettext_lazy("test@example.com"),
+            # RemovedInDjango70Warning: uncomment these cases when support for
+            # deprecated (name, address) tuples is removed.
+            #    [
+            #        ("nobody", "nobody@example.com"),
+            #        ("other", "other@example.com")
+            #    ],
+            #    [
+            #        ["nobody", "nobody@example.com"],
+            #        ["other", "other@example.com"]
+            #    ],
+            [("name", "test", "example.com")],
+            [("Name <test@example.com",)],
+            [[]],
+        )
+        for setting, mail_func in (
+            ("ADMINS", mail_admins),
+            ("MANAGERS", mail_managers),
+        ):
+            msg = f"The {setting} setting must be a list of email address strings."
+            for value in tests:
+                mail.outbox = []
+                with (
+                    self.subTest(setting=setting, value=value),
+                    self.settings(**{setting: value}),
+                ):
+                    with self.assertRaisesMessage(ImproperlyConfigured, msg):
+                        mail_func("subject", "content")
 
     @override_settings(ADMINS=["nobody@example.com"])
     def test_connection_arg_mail_admins(self):
@@ -2337,39 +2624,6 @@ class BaseEmailBackendTests(MailTestsMixin):
         self.assertEqual(message["subject"], "Chère maman")
         self.assertEqual(message.get_content(), "Je t'aime très fort\n")
 
-    def test_send_long_lines(self):
-        """
-        Email line length is limited to 998 chars by the RFC 5322 Section
-        2.1.1. A message body containing longer lines is converted to
-        quoted-printable or base64 (whichever is shorter), to avoid having to
-        insert newlines in a way that alters the intended text.
-        """
-        cases = [
-            # (body, expected_cte)
-            ("В южных морях " * 60, "base64"),
-            ("I de sørlige hav " * 58, "quoted-printable"),
-        ]
-        for body, expected_cte in cases:
-            with self.subTest(body=f"{body[:10]}…", expected_cte=expected_cte):
-                self.flush_mailbox()
-                # Test precondition: Body is a single line < 998 characters,
-                # but utf-8 encoding of body is > 998 octets (forcing a CTE
-                # that avoids inserting newlines).
-                self.assertLess(len(body), 998)
-                self.assertGreater(len(body.encode()), 998)
-
-                email = EmailMessage(body=body, to=["to@example.com"])
-                email.send()
-                message = self.get_the_message()
-                self.assertMessageHasHeaders(
-                    message,
-                    {
-                        ("MIME-Version", "1.0"),
-                        ("Content-Type", 'text/plain; charset="utf-8"'),
-                        ("Content-Transfer-Encoding", expected_cte),
-                    },
-                )
-
     def test_send_many(self):
         email1 = EmailMessage(to=["to-1@example.com"])
         email2 = EmailMessage(to=["to-2@example.com"])
@@ -2384,269 +2638,6 @@ class BaseEmailBackendTests(MailTestsMixin):
                 self.assertEqual(messages[0]["To"], "to-1@example.com")
                 self.assertEqual(messages[1]["To"], "to-2@example.com")
                 self.flush_mailbox()
-
-    def test_send_verbose_name(self):
-        email = EmailMessage(
-            from_email='"Firstname Sürname" <from@example.com>',
-            to=["to@example.com"],
-        )
-        email.send()
-        message = self.get_the_message()
-        self.assertEqual(message["from"], "Firstname Sürname <from@example.com>")
-
-    def test_plaintext_send_mail(self):
-        """
-        Test send_mail without the html_message
-        regression test for adding html_message parameter to send_mail()
-        """
-        send_mail("Subject", "Content\n", "sender@example.com", ["nobody@example.com"])
-        message = self.get_the_message()
-
-        self.assertEqual(message.get("subject"), "Subject")
-        self.assertEqual(message.get_all("to"), ["nobody@example.com"])
-        self.assertFalse(message.is_multipart())
-        self.assertEqual(message.get_content(), "Content\n")
-        self.assertEqual(message.get_content_type(), "text/plain")
-
-    def test_html_send_mail(self):
-        """Test html_message argument to send_mail"""
-        send_mail(
-            "Subject",
-            "Content\n",
-            "sender@example.com",
-            ["nobody@example.com"],
-            html_message="HTML Content\n",
-        )
-        message = self.get_the_message()
-
-        self.assertEqual(message.get("subject"), "Subject")
-        self.assertEqual(message.get_all("to"), ["nobody@example.com"])
-        self.assertTrue(message.is_multipart())
-        self.assertEqual(len(message.get_payload()), 2)
-        self.assertEqual(message.get_payload(0).get_content(), "Content\n")
-        self.assertEqual(message.get_payload(0).get_content_type(), "text/plain")
-        self.assertEqual(message.get_payload(1).get_content(), "HTML Content\n")
-        self.assertEqual(message.get_payload(1).get_content_type(), "text/html")
-
-    def test_mail_admins_and_managers(self):
-        tests = (
-            # The ADMINS and MANAGERS settings are lists of email strings.
-            ['"Name, Full" <test@example.com>'],
-            # Lists and tuples are interchangeable.
-            ["test@example.com", "other@example.com"],
-            ("test@example.com", "other@example.com"),
-            # Lazy strings are supported.
-            [gettext_lazy("test@example.com")],
-        )
-        for setting, mail_func in (
-            ("ADMINS", mail_admins),
-            ("MANAGERS", mail_managers),
-        ):
-            for value in tests:
-                self.flush_mailbox()
-                with (
-                    self.subTest(setting=setting, value=value),
-                    self.settings(**{setting: value}),
-                ):
-                    mail_func("subject", "content")
-                    message = self.get_the_message()
-                    expected_to = ", ".join([str(address) for address in value])
-                    self.assertEqual(message.get_all("to"), [expected_to])
-
-    @override_settings(MANAGERS=["nobody@example.com"])
-    def test_html_mail_managers(self):
-        """Test html_message argument to mail_managers"""
-        mail_managers("Subject", "Content\n", html_message="HTML Content\n")
-        message = self.get_the_message()
-
-        self.assertEqual(message.get("subject"), "[Django] Subject")
-        self.assertEqual(message.get_all("to"), ["nobody@example.com"])
-        self.assertTrue(message.is_multipart())
-        self.assertEqual(len(message.get_payload()), 2)
-        self.assertEqual(message.get_payload(0).get_content(), "Content\n")
-        self.assertEqual(message.get_payload(0).get_content_type(), "text/plain")
-        self.assertEqual(message.get_payload(1).get_content(), "HTML Content\n")
-        self.assertEqual(message.get_payload(1).get_content_type(), "text/html")
-
-    @override_settings(ADMINS=["nobody@example.com"])
-    def test_html_mail_admins(self):
-        """Test html_message argument to mail_admins"""
-        mail_admins("Subject", "Content\n", html_message="HTML Content\n")
-        message = self.get_the_message()
-
-        self.assertEqual(message.get("subject"), "[Django] Subject")
-        self.assertEqual(message.get_all("to"), ["nobody@example.com"])
-        self.assertTrue(message.is_multipart())
-        self.assertEqual(len(message.get_payload()), 2)
-        self.assertEqual(message.get_payload(0).get_content(), "Content\n")
-        self.assertEqual(message.get_payload(0).get_content_type(), "text/plain")
-        self.assertEqual(message.get_payload(1).get_content(), "HTML Content\n")
-        self.assertEqual(message.get_payload(1).get_content_type(), "text/html")
-
-    @override_settings(
-        ADMINS=["nobody+admin@example.com"],
-        MANAGERS=["nobody+manager@example.com"],
-    )
-    def test_manager_and_admin_mail_prefix(self):
-        """
-        String prefix + lazy translated subject = bad output
-        Regression for #13494
-        """
-        for mail_func in [mail_managers, mail_admins]:
-            with self.subTest(mail_func=mail_func):
-                mail_func(gettext_lazy("Subject"), "Content")
-                message = self.get_the_message()
-                self.assertEqual(message.get("subject"), "[Django] Subject")
-                self.flush_mailbox()
-
-    @override_settings(ADMINS=[], MANAGERS=[])
-    def test_empty_admins(self):
-        """
-        mail_admins/mail_managers doesn't connect to the mail server
-        if there are no recipients (#9383)
-        """
-        for mail_func in [mail_managers, mail_admins]:
-            with self.subTest(mail_func=mail_func):
-                mail_func("hi", "there")
-                self.assertEqual(self.get_mailbox_content(), [])
-
-    # RemovedInDjango70Warning.
-    def test_deprecated_admins_managers_tuples(self):
-        tests = (
-            [("nobody", "nobody@example.com"), ("other", "other@example.com")],
-            [["nobody", "nobody@example.com"], ["other", "other@example.com"]],
-        )
-        for setting, mail_func in (
-            ("ADMINS", mail_admins),
-            ("MANAGERS", mail_managers),
-        ):
-            msg = (
-                f"Using (name, address) pairs in the {setting} setting is deprecated."
-                " Replace with a list of email address strings."
-            )
-            for value in tests:
-                self.flush_mailbox()
-                with (
-                    self.subTest(setting=setting, value=value),
-                    self.settings(**{setting: value}),
-                ):
-                    with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
-                        mail_func("subject", "content")
-                    message = self.get_the_message()
-                    expected_to = ", ".join([str(address) for _, address in value])
-                    self.assertEqual(message.get_all("to"), [expected_to])
-
-    def test_wrong_admins_managers(self):
-        tests = (
-            "test@example.com",
-            gettext_lazy("test@example.com"),
-            # RemovedInDjango70Warning: uncomment these cases when support for
-            # deprecated (name, address) tuples is removed.
-            #    [
-            #        ("nobody", "nobody@example.com"),
-            #        ("other", "other@example.com")
-            #    ],
-            #    [
-            #        ["nobody", "nobody@example.com"],
-            #        ["other", "other@example.com"]
-            #    ],
-            [("name", "test", "example.com")],
-            [("Name <test@example.com",)],
-            [[]],
-        )
-        for setting, mail_func in (
-            ("ADMINS", mail_admins),
-            ("MANAGERS", mail_managers),
-        ):
-            msg = f"The {setting} setting must be a list of email address strings."
-            for value in tests:
-                with (
-                    self.subTest(setting=setting, value=value),
-                    self.settings(**{setting: value}),
-                ):
-                    with self.assertRaisesMessage(ImproperlyConfigured, msg):
-                        mail_func("subject", "content")
-
-    def test_message_cc_header(self):
-        """
-        Regression test for #7722
-        """
-        email = EmailMessage(
-            "Subject",
-            "Content",
-            "from@example.com",
-            ["to@example.com"],
-            cc=["cc@example.com"],
-        )
-        mail.get_connection().send_messages([email])
-        message = self.get_the_message()
-        self.assertMessageHasHeaders(
-            message,
-            {
-                ("MIME-Version", "1.0"),
-                ("Content-Type", 'text/plain; charset="utf-8"'),
-                ("Content-Transfer-Encoding", "7bit"),
-                ("Subject", "Subject"),
-                ("From", "from@example.com"),
-                ("To", "to@example.com"),
-                ("Cc", "cc@example.com"),
-            },
-        )
-        self.assertIn("\nDate: ", message.as_string())
-
-    def test_idn_send(self):
-        """
-        Regression test for #14301
-        """
-        self.assertTrue(send_mail("Subject", "Content", "from@öäü.com", ["to@öäü.com"]))
-        message = self.get_the_message()
-        self.assertEqual(message.get("from"), "from@xn--4ca9at.com")
-        self.assertEqual(message.get("to"), "to@xn--4ca9at.com")
-
-        self.flush_mailbox()
-        m = EmailMessage(
-            from_email="from@öäü.com", to=["to@öäü.com"], cc=["cc@öäü.com"]
-        )
-        m.send()
-        message = self.get_the_message()
-        self.assertEqual(message.get("from"), "from@xn--4ca9at.com")
-        self.assertEqual(message.get("to"), "to@xn--4ca9at.com")
-        self.assertEqual(message.get("cc"), "cc@xn--4ca9at.com")
-
-    def test_recipient_without_domain(self):
-        """
-        Regression test for #15042
-        """
-        self.assertTrue(send_mail("Subject", "Content", "tester", ["django"]))
-        message = self.get_the_message()
-        self.assertEqual(message.get("from"), "tester")
-        self.assertEqual(message.get("to"), "django")
-
-    def test_lazy_addresses(self):
-        """
-        Email sending should support lazy email addresses (#24416).
-        """
-        _ = gettext_lazy
-        self.assertTrue(send_mail("Subject", "Content", _("tester"), [_("django")]))
-        message = self.get_the_message()
-        self.assertEqual(message.get("from"), "tester")
-        self.assertEqual(message.get("to"), "django")
-
-        self.flush_mailbox()
-        m = EmailMessage(
-            from_email=_("tester"),
-            to=[_("to1"), _("to2")],
-            cc=[_("cc1"), _("cc2")],
-            bcc=[_("bcc")],
-            reply_to=[_("reply")],
-        )
-        self.assertEqual(m.recipients(), ["to1", "to2", "cc1", "cc2", "bcc"])
-        m.send()
-        message = self.get_the_message()
-        self.assertEqual(message.get("from"), "tester")
-        self.assertEqual(message.get("to"), "to1, to2")
-        self.assertEqual(message.get("cc"), "cc1, cc2")
-        self.assertEqual(message.get("Reply-To"), "reply")
 
     def test_close_connection(self):
         """
@@ -2722,7 +2713,8 @@ class LocmemBackendTests(BaseEmailBackendTests, SimpleTestCase):
         self.assertEqual(len(mail.outbox), 2)
 
     def test_validate_multiline_headers(self):
-        # Ticket #18861 - Validate emails when using the locmem backend
+        # Headers are validated when using the locmem backend (#18861).
+        # (See also EmailMessageTests.test_header_injection().)
         with self.assertRaises(ValueError):
             send_mail(
                 "Subject\nMultiline", "Content", "from@example.com", ["to@example.com"]
@@ -2804,6 +2796,10 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
 
 class FileBackendPathLibTests(FileBackendTests):
+    """
+    Repeat FileBackendTests cases using a Path object as file_path.
+    """
+
     def mkdtemp(self):
         tmp_dir = super().mkdtemp()
         return Path(tmp_dir)
