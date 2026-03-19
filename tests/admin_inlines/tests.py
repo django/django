@@ -12,6 +12,7 @@ from .admin import InnerInline
 from .admin import site as admin_site
 from .models import (
     Author,
+    BankAccount,
     BinaryTree,
     Book,
     BothVerboseNameProfile,
@@ -31,6 +32,7 @@ from .models import (
     Inner3,
     Inner4Stacked,
     Inner4Tabular,
+    Invoice,
     Novel,
     OutfitItem,
     Parent,
@@ -44,11 +46,12 @@ from .models import (
     Sighting,
     SomeChildModel,
     SomeParentModel,
+    Subject,
     Teacher,
     UUIDChild,
     UUIDParent,
     VerboseNamePluralProfile,
-    VerboseNameProfile, Subject, BankAccount, Invoice,
+    VerboseNameProfile
 )
 
 INLINE_CHANGELINK_HTML = 'class="inlinechangelink">Change</a>'
@@ -831,7 +834,8 @@ class TestInline(TestDataMixin, TestCase):
         self.assertIs(parent.show_inlines, True)
 
     def test_delete_protected_message_limits_number_of_objects_displayed(self):
-        # admin limits the amount of displayed objects to 100, so we create 102 invoices
+        # admin limits the amount of displayed objects to 100, so we create
+        # 102 invoices
         subject = Subject.objects.create(name="Subject")
         bank_account = BankAccount.objects.create(subject=subject,
                                                   account_number="000000000")
@@ -857,9 +861,10 @@ class TestInline(TestDataMixin, TestCase):
         inline_formset = response.context_data['inline_admin_formsets'][0]
         self.assertEqual(1, len(inline_formset.non_form_errors()))
         error_message = inline_formset.non_form_errors()[0]
-        self.assertTrue(error_message.startswith('Deleting bank account 000000000 would '
-                                                 'require deleting the following '
-                                                 'protected related objects:'),
+        self.assertTrue(error_message.startswith('Deleting bank account 000000000 '
+                                                 'would require deleting the '
+                                                 'following protected related '
+                                                 'objects:'),
                         error_message)
         self.assertEqual(error_message.count('invoice'), 100, error_message)
         self.assertTrue(error_message.endswith(' and 2 more'), error_message)
@@ -890,9 +895,10 @@ class TestInline(TestDataMixin, TestCase):
         inline_formset = response.context_data['inline_admin_formsets'][0]
         self.assertEqual(1, len(inline_formset.non_form_errors()))
         error_message = inline_formset.non_form_errors()[0]
-        self.assertTrue(error_message.startswith('Deleting bank account 000000000 would '
-                                                 'require deleting the following '
-                                                 'protected related objects:'),
+        self.assertTrue(error_message.startswith('Deleting bank account 000000000 '
+                                                 'would require deleting the '
+                                                 'following protected related '
+                                                 'objects:'),
                         error_message)
         self.assertIn('invoice 0', error_message)
         self.assertIn('invoice 1', error_message)
