@@ -414,6 +414,7 @@ class ClassStackedHorizontal(admin.StackedInline):
 
 # Admin for #36984
 
+
 class BankAccountInline(admin.TabularInline):
     model = BankAccount
     protected_error_max_objects = 2

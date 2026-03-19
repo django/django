@@ -370,6 +370,7 @@ class CourseProxy2(Course):
 
 # models for #36984
 
+
 class Subject(models.Model):
     name = models.CharField(max_length=100)
 
