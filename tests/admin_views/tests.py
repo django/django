@@ -82,6 +82,8 @@ from .models import (
     Fabric,
     FancyDoodad,
     FieldOverridePost,
+    FilePathChild,
+    FilePathParent,
     FilteredManager,
     FooAccount,
     FoodDelivery,
@@ -456,6 +458,27 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         }
         response = self.client.post(reverse("admin:admin_views_section_add"), post_data)
         self.assertEqual(response.status_code, 302)  # redirect somewhere
+
+    def test_inline_filepath_field_extra_form_unchanged(self):
+        """
+        Regression test for #16328. Ensures that an extra inline form
+        containing a FilePathField(blank=False) can be left unchanged without
+        breaking admin submission.
+        """
+        url = reverse("admin:admin_views_filepathparent_add")
+        post_data = {
+            "name": "Parent object",
+            "filepathchild_set-TOTAL_FORMS": "1",
+            "filepathchild_set-INITIAL_FORMS": "0",
+            "filepathchild_set-MIN_NUM_FORMS": "0",
+            "filepathchild_set-MAX_NUM_FORMS": "1000",
+        }
+        response = self.client.post(url, post_data)
+        self.assertRedirects(
+            response, reverse("admin:admin_views_filepathparent_changelist")
+        )
+        self.assertEqual(FilePathParent.objects.count(), 1)
+        self.assertEqual(FilePathChild.objects.count(), 0)
 
     def test_popup_add_POST(self):
         """HTTP response from a popup is properly escaped."""

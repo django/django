@@ -20,6 +20,7 @@ from django.forms.models import (
     fields_for_model,
     model_to_dict,
     modelform_factory,
+    modelformset_factory,
 )
 from django.template import Context, Template
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
@@ -2729,6 +2730,36 @@ class FileAndImageFieldTests(TestCase):
         self.assertEqual(
             [name for _, name in form["path"].field.choices], ["---------", "models.py"]
         )
+
+    @isolate_apps("model_forms")
+    def test_file_path_field_required_formset_extra_unchanged(self):
+        class FilePathRequiredModel(models.Model):
+            path = models.FilePathField(
+                path=os.path.dirname(__file__), match=r"tests.py", blank=False
+            )
+
+            class Meta:
+                app_label = "model_forms"
+
+        Form = modelform_factory(FilePathRequiredModel, fields="__all__")
+        form = Form()
+        self.assertTrue(form.fields["path"].required)
+        self.assertNotIn(
+            "---------", [label for _, label in form.fields["path"].choices]
+        )
+
+        FormSet = modelformset_factory(FilePathRequiredModel, fields=["path"], extra=1)
+
+        formset = FormSet(
+            data={
+                "form-TOTAL_FORMS": "1",
+                "form-INITIAL_FORMS": "0",
+                "form-MIN_NUM_FORMS": "0",
+                "form-MAX_NUM_FORMS": "1000",
+            },
+            queryset=FilePathRequiredModel.objects.none(),
+        )
+        self.assertTrue(formset.is_valid())
 
     @skipUnless(test_images, "Pillow not installed")
     def test_image_field(self):
