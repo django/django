@@ -5,6 +5,7 @@ from django.db import models
 
 from .models import (
     Author,
+    BankAccount,
     BinaryTree,
     CapoFamiglia,
     Chapter,
@@ -54,11 +55,12 @@ from .models import (
     SomeChildModel,
     SomeParentModel,
     SottoCapo,
+    Subject,
     Teacher,
     Title,
     TitleCollection,
     UUIDChild,
-    UUIDParent, BankAccount, Subject,
+    UUIDParent,
 )
 
 site = admin.AdminSite(name="admin")

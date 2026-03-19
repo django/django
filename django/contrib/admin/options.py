@@ -2516,8 +2516,8 @@ class InlineModelAdmin(BaseModelAdmin):
                         deleted_diff = (len(collector.protected) -
                                         INLINE_PROTECTED_ERROR_MAX_OBJECTS)
                         if deleted_diff > 0:
-                            # Translators: This string is used as a separator between
-                            # list elements
+                            # Translators: This string is used as a separator
+                            # between list elements
                             related = (_(", ").join(str(i) for i in objs) +
                                        _(' and %d more') % deleted_diff)
                         else:
