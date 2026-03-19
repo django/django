@@ -235,9 +235,9 @@ class MailTestsMixin:
         return "".join(structure)
 
 
-class MailTests(MailTestsMixin, SimpleTestCase):
+class EmailMessageTests(MailTestsMixin, SimpleTestCase):
     """
-    Non-backend specific tests.
+    Tests for django.core.mail.EmailMessage and EmailMultiAlternative.
     """
 
     def test_ascii(self):
@@ -249,44 +249,6 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(message.get_payload(), "Content\n")
         self.assertEqual(message["From"], "from@example.com")
         self.assertEqual(message["To"], "to@example.com")
-
-    # RemovedInDjango70Warning.
-    @ignore_warnings(category=RemovedInDjango70Warning)
-    @mock.patch("django.core.mail.message.MIMEText.set_payload")
-    def test_nonascii_as_string_with_ascii_charset(self, mock_set_payload):
-        """Line length check should encode the payload supporting
-        `surrogateescape`.
-
-        Following https://github.com/python/cpython/issues/76511, newer
-        versions of Python (3.12.3 and 3.13+) ensure that a message's
-        payload is encoded with the provided charset and `surrogateescape` is
-        used as the error handling strategy.
-
-        This test is heavily based on the test from the fix for the bug above.
-        Line length checks in SafeMIMEText's set_payload should also use the
-        same error handling strategy to avoid errors such as:
-
-        UnicodeEncodeError: 'utf-8' codec can't encode <...>: surrogates not
-        allowed
-
-        """
-        # This test is specific to Python's legacy MIMEText. This can be safely
-        # removed when EmailMessage.message() uses Python's modern email API.
-        # (Using surrogateescape for non-utf8 is covered in test_encoding().)
-        from django.core.mail import SafeMIMEText
-
-        def simplified_set_payload(instance, payload, charset):
-            instance._payload = payload
-
-        mock_set_payload.side_effect = simplified_set_payload
-
-        text = (
-            "Text heavily based in Python's text for non-ascii messages: Föö bär"
-        ).encode("iso-8859-1")
-        body = text.decode("ascii", errors="surrogateescape")
-        message = SafeMIMEText(body, "plain", "ascii")
-        mock_set_payload.assert_called_once()
-        self.assertEqual(message.get_payload(decode=True), text)
 
     def test_multiple_recipients(self):
         email = EmailMessage(
@@ -528,6 +490,31 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(message["Date"], "Fri, 09 Nov 2001 01:08:47 +0000")
         # Not the default ISO format from force_str(strings_only=False).
         self.assertNotEqual(message["Date"], "2001-11-09 01:08:47+00:00")
+
+    @requires_tz_support
+    @override_settings(
+        EMAIL_USE_LOCALTIME=False, USE_TZ=True, TIME_ZONE="Africa/Algiers"
+    )
+    def test_date_header_utc(self):
+        """
+        EMAIL_USE_LOCALTIME=False creates a datetime in UTC.
+        """
+        email = EmailMessage()
+        # Per RFC 2822/5322 section 3.3, "The form '+0000' SHOULD be used
+        # to indicate a time zone at Universal Time."
+        self.assertEndsWith(email.message()["Date"], "+0000")
+
+    @requires_tz_support
+    @override_settings(
+        EMAIL_USE_LOCALTIME=True, USE_TZ=True, TIME_ZONE="Africa/Algiers"
+    )
+    def test_date_header_localtime(self):
+        """
+        EMAIL_USE_LOCALTIME=True creates a datetime in the local time zone.
+        """
+        email = EmailMessage()
+        # Africa/Algiers is UTC+1 year round.
+        self.assertEndsWith(email.message()["Date"], "+0100")
 
     def test_from_header(self):
         """
@@ -1271,114 +1258,6 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             email_msg.attach("file.txt", mimetype="application/pdf")
 
-    def test_dummy_backend(self):
-        """
-        Make sure that dummy backends returns correct number of sent messages
-        """
-        connection = dummy.EmailBackend()
-        email = EmailMessage(to=["to@example.com"])
-        self.assertEqual(connection.send_messages([email, email, email]), 3)
-
-    def test_arbitrary_keyword(self):
-        """
-        Make sure that get_connection() accepts arbitrary keyword that might be
-        used with custom backends.
-        """
-        c = mail.get_connection(fail_silently=True, foo="bar")
-        self.assertTrue(c.fail_silently)
-
-    def test_custom_backend(self):
-        """Test custom backend defined in this suite."""
-        conn = mail.get_connection("mail.custombackend.EmailBackend")
-        self.assertTrue(hasattr(conn, "test_outbox"))
-        email = EmailMessage(to=["to@example.com"])
-        conn.send_messages([email])
-        self.assertEqual(len(conn.test_outbox), 1)
-
-    def test_backend_arg(self):
-        """Test backend argument of mail.get_connection()"""
-        cases = [
-            ("django.core.mail.backends.smtp.EmailBackend", smtp.EmailBackend),
-            ("django.core.mail.backends.locmem.EmailBackend", locmem.EmailBackend),
-            ("django.core.mail.backends.dummy.EmailBackend", dummy.EmailBackend),
-            ("django.core.mail.backends.console.EmailBackend", console.EmailBackend),
-        ]
-        for backend_path, backend_class in cases:
-            with self.subTest(backend_path=backend_path):
-                self.assertIsInstance(
-                    mail.get_connection(backend_path),
-                    backend_class,
-                )
-
-        # The filebased EmailBackend requires a file_path arg.
-        with (
-            self.subTest(
-                backend_path="django.core.mail.backends.filebased.EmailBackend"
-            ),
-            tempfile.TemporaryDirectory() as tmp_dir,
-        ):
-            self.assertIsInstance(
-                mail.get_connection(
-                    "django.core.mail.backends.filebased.EmailBackend",
-                    file_path=tmp_dir,
-                ),
-                filebased.EmailBackend,
-            )
-
-    def test_get_connection_raises_error_from_backend_init(self):
-        msg = " not object"
-        with self.assertRaisesMessage(TypeError, msg):
-            mail.get_connection(
-                "django.core.mail.backends.filebased.EmailBackend", file_path=object()
-            )
-
-    def test_connection_arg_send_mail(self):
-        # Send using non-default connection.
-        connection = mail.get_connection("mail.custombackend.EmailBackend")
-        send_mail(
-            "Subject",
-            "Content",
-            "from@example.com",
-            ["to@example.com"],
-            connection=connection,
-        )
-        self.assertEqual(mail.outbox, [])
-        self.assertEqual(len(connection.test_outbox), 1)
-        self.assertEqual(connection.test_outbox[0].subject, "Subject")
-
-    def test_connection_arg_send_mass_mail(self):
-        # Send using non-default connection.
-        connection = mail.get_connection("mail.custombackend.EmailBackend")
-        send_mass_mail(
-            [
-                ("Subject1", "Content1", "from1@example.com", ["to1@example.com"]),
-                ("Subject2", "Content2", "from2@example.com", ["to2@example.com"]),
-            ],
-            connection=connection,
-        )
-        self.assertEqual(mail.outbox, [])
-        self.assertEqual(len(connection.test_outbox), 2)
-        self.assertEqual(connection.test_outbox[0].subject, "Subject1")
-        self.assertEqual(connection.test_outbox[1].subject, "Subject2")
-
-    @override_settings(ADMINS=["nobody@example.com"])
-    def test_connection_arg_mail_admins(self):
-        # Send using non-default connection.
-        connection = mail.get_connection("mail.custombackend.EmailBackend")
-        mail_admins("Admin message", "Content", connection=connection)
-        self.assertEqual(mail.outbox, [])
-        self.assertEqual(len(connection.test_outbox), 1)
-        self.assertEqual(connection.test_outbox[0].subject, "[Django] Admin message")
-
-    @override_settings(MANAGERS=["nobody@example.com"])
-    def test_connection_arg_mail_managers(self):
-        # Send using non-default connection.
-        connection = mail.get_connection("mail.custombackend.EmailBackend")
-        mail_managers("Manager message", "Content", connection=connection)
-        self.assertEqual(mail.outbox, [])
-        self.assertEqual(len(connection.test_outbox), 1)
-        self.assertEqual(connection.test_outbox[0].subject, "[Django] Manager message")
-
     def test_dont_mangle_from_in_body(self):
         # Regression for #13433 - Make sure that EmailMessage doesn't mangle
         # 'From ' in message body.
@@ -1411,148 +1290,6 @@ class MailTests(MailTestsMixin, SimpleTestCase):
             msg = EmailMessage(body=body)
             s = msg.message().as_bytes()
             self.assertIn(b"Content-Transfer-Encoding: quoted-printable", s)
-
-    # RemovedInDjango70Warning.
-    @ignore_warnings(category=RemovedInDjango70Warning)
-    def test_sanitize_address(self):
-        """Email addresses are properly sanitized."""
-        # Tests the internal sanitize_address() function. Many of these cases
-        # are duplicated in test_address_header_handling(), which verifies
-        # headers in the generated message.
-        from django.core.mail.message import sanitize_address
-
-        for email_address, encoding, expected_result in (
-            # ASCII addresses.
-            ("to@example.com", "ascii", "to@example.com"),
-            ("to@example.com", "utf-8", "to@example.com"),
-            (("A name", "to@example.com"), "ascii", "A name <to@example.com>"),
-            (
-                ("A name", "to@example.com"),
-                "utf-8",
-                "A name <to@example.com>",
-            ),
-            ("localpartonly", "ascii", "localpartonly"),
-            # ASCII addresses with display names.
-            ("A name <to@example.com>", "ascii", "A name <to@example.com>"),
-            ("A name <to@example.com>", "utf-8", "A name <to@example.com>"),
-            ('"A name" <to@example.com>', "ascii", "A name <to@example.com>"),
-            ('"A name" <to@example.com>', "utf-8", "A name <to@example.com>"),
-            # Unicode addresses: IDNA encoded domain supported per RFC-5890.
-            ("to@éxample.com", "utf-8", "to@xn--xample-9ua.com"),
-            # The next three cases should be removed when fixing #35713.
-            # (An 'encoded-word' localpart is prohibited by RFC-2047, and not
-            # supported by any known mail service.)
-            ("tó@example.com", "utf-8", "=?utf-8?b?dMOz?=@example.com"),
-            (
-                ("Tó Example", "tó@example.com"),
-                "utf-8",
-                "=?utf-8?q?T=C3=B3_Example?= <=?utf-8?b?dMOz?=@example.com>",
-            ),
-            (
-                "Tó Example <tó@example.com>",
-                "utf-8",
-                # (Not RFC-2047 compliant.)
-                "=?utf-8?q?T=C3=B3_Example?= <=?utf-8?b?dMOz?=@example.com>",
-            ),
-            # IDNA addresses with display names.
-            (
-                "To Example <to@éxample.com>",
-                "ascii",
-                "To Example <to@xn--xample-9ua.com>",
-            ),
-            (
-                "To Example <to@éxample.com>",
-                "utf-8",
-                "To Example <to@xn--xample-9ua.com>",
-            ),
-            # Addresses with two @ signs.
-            ('"to@other.com"@example.com', "utf-8", r'"to@other.com"@example.com'),
-            (
-                '"to@other.com" <to@example.com>',
-                "utf-8",
-                '"to@other.com" <to@example.com>',
-            ),
-            (
-                ("To Example", "to@other.com@example.com"),
-                "utf-8",
-                'To Example <"to@other.com"@example.com>',
-            ),
-            # Addresses with long unicode display names.
-            (
-                "Tó Example very long" * 4 + " <to@example.com>",
-                "utf-8",
-                "=?utf-8?q?T=C3=B3_Example_very_longT=C3=B3_Example_very_longT"
-                "=C3=B3_Example_?=\n"
-                " =?utf-8?q?very_longT=C3=B3_Example_very_long?= "
-                "<to@example.com>",
-            ),
-            (
-                ("Tó Example very long" * 4, "to@example.com"),
-                "utf-8",
-                "=?utf-8?q?T=C3=B3_Example_very_longT=C3=B3_Example_very_longT"
-                "=C3=B3_Example_?=\n"
-                " =?utf-8?q?very_longT=C3=B3_Example_very_long?= "
-                "<to@example.com>",
-            ),
-            # Address with long display name and unicode domain.
-            (
-                ("To Example very long" * 4, "to@exampl€.com"),
-                "utf-8",
-                "To Example very longTo Example very longTo Example very longT"
-                "o Example very\n"
-                " long <to@xn--exampl-nc1c.com>",
-            ),
-        ):
-            with self.subTest(email_address=email_address, encoding=encoding):
-                self.assertEqual(
-                    sanitize_address(email_address, encoding), expected_result
-                )
-
-    # RemovedInDjango70Warning.
-    @ignore_warnings(category=RemovedInDjango70Warning)
-    def test_sanitize_address_invalid(self):
-        # Tests the internal sanitize_address() function. Note that Django's
-        # EmailMessage.message() will not catch these cases, as it only calls
-        # sanitize_address() if an address also includes non-ASCII chars.
-        # Django detects these cases in the SMTP EmailBackend during sending.
-        # See SMTPBackendTests.test_avoids_sending_to_invalid_addresses()
-        # below.
-        from django.core.mail.message import sanitize_address
-
-        for email_address in (
-            # Invalid address with two @ signs.
-            "to@other.com@example.com",
-            # Invalid address without the quotes.
-            "to@other.com <to@example.com>",
-            # Other invalid addresses.
-            "@",
-            "to@",
-            "@example.com",
-            ("", ""),
-        ):
-            with self.subTest(email_address=email_address):
-                with self.assertRaisesMessage(ValueError, "Invalid address"):
-                    sanitize_address(email_address, encoding="utf-8")
-
-    # RemovedInDjango70Warning.
-    @ignore_warnings(category=RemovedInDjango70Warning)
-    def test_sanitize_address_header_injection(self):
-        # Tests the internal sanitize_address() function. These cases are
-        # duplicated in test_address_header_handling(), which verifies headers
-        # in the generated message.
-        from django.core.mail.message import sanitize_address
-
-        msg = "Invalid address; address parts cannot contain newlines."
-        tests = [
-            "Name\nInjection <to@example.com>",
-            ("Name\nInjection", "to@xample.com"),
-            "Name <to\ninjection@example.com>",
-            ("Name", "to\ninjection@example.com"),
-        ]
-        for email_address in tests:
-            with self.subTest(email_address=email_address):
-                with self.assertRaisesMessage(ValueError, msg):
-                    sanitize_address(email_address, encoding="utf-8")
 
     def test_address_header_handling(self):
         # This verifies the modern email API's address header handling.
@@ -1995,7 +1732,42 @@ class MailTests(MailTestsMixin, SimpleTestCase):
             message.as_string(policy=policy.compat32),
         )
 
-    def test_send_mail_fail_silently_conflict(self):
+    def test_send_fail_silently_conflict(self):
+        email = mail.EmailMessage(
+            "Subject",
+            "Body",
+            "from@example.com",
+            ["to@example.com"],
+            connection=mail.get_connection(),
+        )
+        msg = (
+            "fail_silently cannot be used with a connection. "
+            "Pass fail_silently to get_connection() instead."
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            email.send(fail_silently=True)
+
+
+class SendMailTests(SimpleTestCase):
+    """
+    Tests for django.core.mail.send_mail().
+    """
+
+    def test_connection_arg(self):
+        # Send using non-default connection.
+        connection = mail.get_connection("mail.custombackend.EmailBackend")
+        send_mail(
+            "Subject",
+            "Content",
+            "from@example.com",
+            ["to@example.com"],
+            connection=connection,
+        )
+        self.assertEqual(mail.outbox, [])
+        self.assertEqual(len(connection.test_outbox), 1)
+        self.assertEqual(connection.test_outbox[0].subject, "Subject")
+
+    def test_fail_silently_conflict(self):
         msg = (
             "fail_silently cannot be used with a connection. "
             "Pass fail_silently to get_connection() instead."
@@ -2010,7 +1782,7 @@ class MailTests(MailTestsMixin, SimpleTestCase):
                 connection=mail.get_connection(),
             )
 
-    def test_send_mail_auth_conflict(self):
+    def test_auth_conflict(self):
         msg = (
             "auth_user and auth_password cannot be used with a connection. "
             "Pass auth_user and auth_password to get_connection() instead."
@@ -2029,22 +1801,28 @@ class MailTests(MailTestsMixin, SimpleTestCase):
                     connection=mail.get_connection(),
                 )
 
-    def test_email_message_send_fail_silently_conflict(self):
-        email = mail.EmailMessage(
-            "Subject",
-            "Body",
-            "from@example.com",
-            ["to@example.com"],
-            connection=mail.get_connection(),
-        )
-        msg = (
-            "fail_silently cannot be used with a connection. "
-            "Pass fail_silently to get_connection() instead."
-        )
-        with self.assertRaisesMessage(TypeError, msg):
-            email.send(fail_silently=True)
 
-    def test_send_mass_mail_fail_silently_conflict(self):
+class SendMassMailTests(SimpleTestCase):
+    """
+    Tests for django.core.mail.send_mass_mail().
+    """
+
+    def test_connection_arg(self):
+        # Send using non-default connection.
+        connection = mail.get_connection("mail.custombackend.EmailBackend")
+        send_mass_mail(
+            [
+                ("Subject1", "Content1", "from1@example.com", ["to1@example.com"]),
+                ("Subject2", "Content2", "from2@example.com", ["to2@example.com"]),
+            ],
+            connection=connection,
+        )
+        self.assertEqual(mail.outbox, [])
+        self.assertEqual(len(connection.test_outbox), 2)
+        self.assertEqual(connection.test_outbox[0].subject, "Subject1")
+        self.assertEqual(connection.test_outbox[1].subject, "Subject2")
+
+    def test_send_fail_silently_conflict(self):
         datatuple = (("Subject", "Message", "from@example.com", ["to@example.com"]),)
         msg = (
             "fail_silently cannot be used with a connection. "
@@ -2055,7 +1833,7 @@ class MailTests(MailTestsMixin, SimpleTestCase):
                 datatuple, fail_silently=True, connection=mail.get_connection()
             )
 
-    def test_send_mass_mail_auth_conflict(self):
+    def test_send_auth_conflict(self):
         datatuple = (("Subject", "Message", "from@example.com", ["to@example.com"]),)
         msg = (
             "auth_user and auth_password cannot be used with a connection. "
@@ -2069,6 +1847,30 @@ class MailTests(MailTestsMixin, SimpleTestCase):
                 mail.send_mass_mail(
                     datatuple, **{param: "value"}, connection=mail.get_connection()
                 )
+
+
+class MailAdminsAndManagersTests(SimpleTestCase):
+    """
+    Tests for django.core.mail.mail_admins() and mail_managers().
+    """
+
+    @override_settings(ADMINS=["nobody@example.com"])
+    def test_connection_arg_mail_admins(self):
+        # Send using non-default connection.
+        connection = mail.get_connection("mail.custombackend.EmailBackend")
+        mail_admins("Admin message", "Content", connection=connection)
+        self.assertEqual(mail.outbox, [])
+        self.assertEqual(len(connection.test_outbox), 1)
+        self.assertEqual(connection.test_outbox[0].subject, "[Django] Admin message")
+
+    @override_settings(MANAGERS=["nobody@example.com"])
+    def test_connection_arg_mail_managers(self):
+        # Send using non-default connection.
+        connection = mail.get_connection("mail.custombackend.EmailBackend")
+        mail_managers("Manager message", "Content", connection=connection)
+        self.assertEqual(mail.outbox, [])
+        self.assertEqual(len(connection.test_outbox), 1)
+        self.assertEqual(connection.test_outbox[0].subject, "[Django] Manager message")
 
     def test_mail_admins_fail_silently_conflict(self):
         msg = (
@@ -2095,6 +1897,244 @@ class MailTests(MailTestsMixin, SimpleTestCase):
                 fail_silently=True,
                 connection=mail.get_connection(),
             )
+
+
+class GetConnectionTests(SimpleTestCase):
+    """
+    Tests for django.core.mail.get_connection().
+    """
+
+    def test_backend_arg(self):
+        """Test backend argument of mail.get_connection()"""
+        cases = [
+            ("django.core.mail.backends.smtp.EmailBackend", smtp.EmailBackend),
+            ("django.core.mail.backends.locmem.EmailBackend", locmem.EmailBackend),
+            ("django.core.mail.backends.dummy.EmailBackend", dummy.EmailBackend),
+            ("django.core.mail.backends.console.EmailBackend", console.EmailBackend),
+        ]
+        for backend_path, backend_class in cases:
+            with self.subTest(backend_path=backend_path):
+                self.assertIsInstance(
+                    mail.get_connection(backend_path),
+                    backend_class,
+                )
+
+        # The filebased EmailBackend requires a file_path arg.
+        with (
+            self.subTest(
+                backend_path="django.core.mail.backends.filebased.EmailBackend"
+            ),
+            tempfile.TemporaryDirectory() as tmp_dir,
+        ):
+            self.assertIsInstance(
+                mail.get_connection(
+                    "django.core.mail.backends.filebased.EmailBackend",
+                    file_path=tmp_dir,
+                ),
+                filebased.EmailBackend,
+            )
+
+    def test_custom_backend(self):
+        """Test custom backend defined in this suite."""
+        conn = mail.get_connection("mail.custombackend.EmailBackend")
+        self.assertTrue(hasattr(conn, "test_outbox"))
+        email = EmailMessage(to=["to@example.com"])
+        conn.send_messages([email])
+        self.assertEqual(len(conn.test_outbox), 1)
+
+    def test_raises_error_from_backend_init(self):
+        msg = " not object"
+        with self.assertRaisesMessage(TypeError, msg):
+            mail.get_connection(
+                "django.core.mail.backends.filebased.EmailBackend", file_path=object()
+            )
+
+    def test_arbitrary_keyword(self):
+        """
+        Make sure that get_connection() accepts arbitrary keyword that might be
+        used with custom backends.
+        """
+        c = mail.get_connection(fail_silently=True, foo="bar")
+        self.assertTrue(c.fail_silently)
+
+
+# RemovedInDjango70Warning.
+class DeprecatedInternalsTests(SimpleTestCase):
+    @ignore_warnings(category=RemovedInDjango70Warning)
+    @mock.patch("django.core.mail.message.MIMEText.set_payload")
+    def test_nonascii_as_string_with_ascii_charset(self, mock_set_payload):
+        """Line length check should encode the payload supporting
+        `surrogateescape`.
+
+        Following https://github.com/python/cpython/issues/76511, newer
+        versions of Python (3.12.3 and 3.13+) ensure that a message's
+        payload is encoded with the provided charset and `surrogateescape` is
+        used as the error handling strategy.
+
+        This test is heavily based on the test from the fix for the bug above.
+        Line length checks in SafeMIMEText's set_payload should also use the
+        same error handling strategy to avoid errors such as:
+
+        UnicodeEncodeError: 'utf-8' codec can't encode <...>: surrogates not
+        allowed
+
+        """
+        # This test is specific to Python's legacy MIMEText. This can be safely
+        # removed when EmailMessage.message() uses Python's modern email API.
+        # (Using surrogateescape for non-utf8 is covered in test_encoding().)
+        from django.core.mail import SafeMIMEText
+
+        def simplified_set_payload(instance, payload, charset):
+            instance._payload = payload
+
+        mock_set_payload.side_effect = simplified_set_payload
+
+        text = (
+            "Text heavily based in Python's text for non-ascii messages: Föö bär"
+        ).encode("iso-8859-1")
+        body = text.decode("ascii", errors="surrogateescape")
+        message = SafeMIMEText(body, "plain", "ascii")
+        mock_set_payload.assert_called_once()
+        self.assertEqual(message.get_payload(decode=True), text)
+
+    @ignore_warnings(category=RemovedInDjango70Warning)
+    def test_sanitize_address(self):
+        """Email addresses are properly sanitized."""
+        # Tests the internal sanitize_address() function. Many of these cases
+        # are duplicated in test_address_header_handling(), which verifies
+        # headers in the generated message.
+        from django.core.mail.message import sanitize_address
+
+        for email_address, encoding, expected_result in (
+            # ASCII addresses.
+            ("to@example.com", "ascii", "to@example.com"),
+            ("to@example.com", "utf-8", "to@example.com"),
+            (("A name", "to@example.com"), "ascii", "A name <to@example.com>"),
+            (
+                ("A name", "to@example.com"),
+                "utf-8",
+                "A name <to@example.com>",
+            ),
+            ("localpartonly", "ascii", "localpartonly"),
+            # ASCII addresses with display names.
+            ("A name <to@example.com>", "ascii", "A name <to@example.com>"),
+            ("A name <to@example.com>", "utf-8", "A name <to@example.com>"),
+            ('"A name" <to@example.com>', "ascii", "A name <to@example.com>"),
+            ('"A name" <to@example.com>', "utf-8", "A name <to@example.com>"),
+            # Unicode addresses: IDNA encoded domain supported per RFC-5890.
+            ("to@éxample.com", "utf-8", "to@xn--xample-9ua.com"),
+            # The next three cases should be removed when fixing #35713.
+            # (An 'encoded-word' localpart is prohibited by RFC-2047, and not
+            # supported by any known mail service.)
+            ("tó@example.com", "utf-8", "=?utf-8?b?dMOz?=@example.com"),
+            (
+                ("Tó Example", "tó@example.com"),
+                "utf-8",
+                "=?utf-8?q?T=C3=B3_Example?= <=?utf-8?b?dMOz?=@example.com>",
+            ),
+            (
+                "Tó Example <tó@example.com>",
+                "utf-8",
+                # (Not RFC-2047 compliant.)
+                "=?utf-8?q?T=C3=B3_Example?= <=?utf-8?b?dMOz?=@example.com>",
+            ),
+            # IDNA addresses with display names.
+            (
+                "To Example <to@éxample.com>",
+                "ascii",
+                "To Example <to@xn--xample-9ua.com>",
+            ),
+            (
+                "To Example <to@éxample.com>",
+                "utf-8",
+                "To Example <to@xn--xample-9ua.com>",
+            ),
+            # Addresses with two @ signs.
+            ('"to@other.com"@example.com', "utf-8", r'"to@other.com"@example.com'),
+            (
+                '"to@other.com" <to@example.com>',
+                "utf-8",
+                '"to@other.com" <to@example.com>',
+            ),
+            (
+                ("To Example", "to@other.com@example.com"),
+                "utf-8",
+                'To Example <"to@other.com"@example.com>',
+            ),
+            # Addresses with long unicode display names.
+            (
+                "Tó Example very long" * 4 + " <to@example.com>",
+                "utf-8",
+                "=?utf-8?q?T=C3=B3_Example_very_longT=C3=B3_Example_very_longT"
+                "=C3=B3_Example_?=\n"
+                " =?utf-8?q?very_longT=C3=B3_Example_very_long?= "
+                "<to@example.com>",
+            ),
+            (
+                ("Tó Example very long" * 4, "to@example.com"),
+                "utf-8",
+                "=?utf-8?q?T=C3=B3_Example_very_longT=C3=B3_Example_very_longT"
+                "=C3=B3_Example_?=\n"
+                " =?utf-8?q?very_longT=C3=B3_Example_very_long?= "
+                "<to@example.com>",
+            ),
+            # Address with long display name and unicode domain.
+            (
+                ("To Example very long" * 4, "to@exampl€.com"),
+                "utf-8",
+                "To Example very longTo Example very longTo Example very longT"
+                "o Example very\n"
+                " long <to@xn--exampl-nc1c.com>",
+            ),
+        ):
+            with self.subTest(email_address=email_address, encoding=encoding):
+                self.assertEqual(
+                    sanitize_address(email_address, encoding), expected_result
+                )
+
+    @ignore_warnings(category=RemovedInDjango70Warning)
+    def test_sanitize_address_invalid(self):
+        # Tests the internal sanitize_address() function. Note that Django's
+        # EmailMessage.message() will not catch these cases, as it only calls
+        # sanitize_address() if an address also includes non-ASCII chars.
+        # Django detects these cases in the SMTP EmailBackend during sending.
+        # See SMTPBackendTests.test_avoids_sending_to_invalid_addresses()
+        # below.
+        from django.core.mail.message import sanitize_address
+
+        for email_address in (
+            # Invalid address with two @ signs.
+            "to@other.com@example.com",
+            # Invalid address without the quotes.
+            "to@other.com <to@example.com>",
+            # Other invalid addresses.
+            "@",
+            "to@",
+            "@example.com",
+            ("", ""),
+        ):
+            with self.subTest(email_address=email_address):
+                with self.assertRaisesMessage(ValueError, "Invalid address"):
+                    sanitize_address(email_address, encoding="utf-8")
+
+    @ignore_warnings(category=RemovedInDjango70Warning)
+    def test_sanitize_address_header_injection(self):
+        # Tests the internal sanitize_address() function. These cases are
+        # duplicated in test_address_header_handling(), which verifies headers
+        # in the generated message.
+        from django.core.mail.message import sanitize_address
+
+        msg = "Invalid address; address parts cannot contain newlines."
+        tests = [
+            "Name\nInjection <to@example.com>",
+            ("Name\nInjection", "to@xample.com"),
+            "Name <to\ninjection@example.com>",
+            ("Name", "to\ninjection@example.com"),
+        ]
+        for email_address in tests:
+            with self.subTest(email_address=email_address):
+                with self.assertRaisesMessage(ValueError, msg):
+                    sanitize_address(email_address, encoding="utf-8")
 
 
 # RemovedInDjango70Warning.
@@ -2212,32 +2252,6 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
                 ["cc@example.com"],
                 ["reply-to@example.com"],
             )
-
-
-@requires_tz_support
-class MailTimeZoneTests(MailTestsMixin, SimpleTestCase):
-    @override_settings(
-        EMAIL_USE_LOCALTIME=False, USE_TZ=True, TIME_ZONE="Africa/Algiers"
-    )
-    def test_date_header_utc(self):
-        """
-        EMAIL_USE_LOCALTIME=False creates a datetime in UTC.
-        """
-        email = EmailMessage()
-        # Per RFC 2822/5322 section 3.3, "The form '+0000' SHOULD be used
-        # to indicate a time zone at Universal Time."
-        self.assertEndsWith(email.message()["Date"], "+0000")
-
-    @override_settings(
-        EMAIL_USE_LOCALTIME=True, USE_TZ=True, TIME_ZONE="Africa/Algiers"
-    )
-    def test_date_header_localtime(self):
-        """
-        EMAIL_USE_LOCALTIME=True creates a datetime in the local time zone.
-        """
-        email = EmailMessage()
-        # Africa/Algiers is UTC+1 year round.
-        self.assertEndsWith(email.message()["Date"], "+0100")
 
 
 # RemovedInDjango70Warning.
@@ -2663,6 +2677,24 @@ class BaseEmailBackendTests(MailTestsMixin):
             self.assertIs(same_conn, conn)
             self.assertFalse(closed[0])
         self.assertTrue(closed[0])
+
+
+class DummyBackendTests(BaseEmailBackendTests, SimpleTestCase):
+    email_backend = "django.core.mail.backends.dummy.EmailBackend"
+
+    def get_mailbox_content(self):
+        # Shared tests that examine the content of sent messages are not
+        # meaningful: the dummy backend immediately discards sent messages,
+        # so it's not possible to retrieve them.
+        self.skipTest("Dummy backend discards sent messages")
+
+    def flush_mailbox(self):
+        pass
+
+    def test_send_messages_returns_sent_count(self):
+        connection = dummy.EmailBackend()
+        email = EmailMessage(to=["to@example.com"])
+        self.assertEqual(connection.send_messages([email, email, email]), 3)
 
 
 class LocmemBackendTests(BaseEmailBackendTests, SimpleTestCase):
