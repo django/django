@@ -498,9 +498,12 @@ probably use:
     even ``"BeAtlES blOG"``.
 
 :lookup:`contains`
-    Case-sensitive containment test. For example::
+    Case-sensitive containment test. Returns entries where the given value is found within the field. 
+
+    For example::
 
         Entry.objects.get(headline__contains="Lennon")
+
 
     Roughly translates to this SQL:
 
