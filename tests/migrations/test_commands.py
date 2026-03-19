@@ -3214,29 +3214,41 @@ class SquashMigrationsTests(MigrationTestBase):
         are not, then migrate should not fail with
         InconsistentMigrationHistory.
         """
+
+        def call_command_and_invalidate_cache(*args, **kwargs):
+            """
+            This test triggers a race condition between disk writes and
+            Python's import cache. Freshly generated migration modules are not
+            visible to the importer, causing tests to fail
+            non-deterministically.
+            """
+            result = call_command(*args, **kwargs)
+            importlib.invalidate_caches()
+            return result
+
         with self.temporary_migration_module():
-            call_command(
+            call_command_and_invalidate_cache(
                 "makemigrations",
                 "migrations",
                 "--empty",
                 interactive=False,
                 verbosity=0,
             )
-            call_command(
+            call_command_and_invalidate_cache(
                 "makemigrations",
                 "migrations",
                 "--empty",
                 interactive=False,
                 verbosity=0,
             )
-            call_command(
+            call_command_and_invalidate_cache(
                 "makemigrations",
                 "migrations",
                 "--empty",
                 interactive=False,
                 verbosity=0,
             )
-            call_command(
+            call_command_and_invalidate_cache(
                 "makemigrations",
                 "migrations",
                 "--empty",
@@ -3244,7 +3256,7 @@ class SquashMigrationsTests(MigrationTestBase):
                 verbosity=0,
             )
             call_command("migrate", "migrations", interactive=False, verbosity=0)
-            call_command(
+            call_command_and_invalidate_cache(
                 "squashmigrations",
                 "migrations",
                 "0001",
@@ -3252,7 +3264,7 @@ class SquashMigrationsTests(MigrationTestBase):
                 interactive=False,
                 verbosity=0,
             )
-            call_command(
+            call_command_and_invalidate_cache(
                 "squashmigrations",
                 "migrations",
                 "0001_initial_squashed",
