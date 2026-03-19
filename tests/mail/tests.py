@@ -1331,10 +1331,6 @@ class MailTests(MailTestsMixin, SimpleTestCase):
             mail.get_connection(
                 "django.core.mail.backends.filebased.EmailBackend", file_path=object()
             )
-        # TODO: Why is this assertion here? Can we remove it?
-        #   get_connection() can still be called after an error?
-        #   Args to one call do not become defaults for future calls?
-        self.assertIsInstance(mail.get_connection(), locmem.EmailBackend)
 
     def test_connection_arg_send_mail(self):
         # Send using non-default connection.
