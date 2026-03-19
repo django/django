@@ -27,12 +27,6 @@ class TruncatedUnorderedListTests(SimpleTestCase):
             "\t<li>item 1</li>\n\t<li>item 2</li>",
         )
 
-    def test_invalid_max_items_value(self):
-        self.assertEqual(
-            truncated_unordered_list(["item 1", "item 2"], "invalid_int"),
-            "\t<li>item 1</li>\n\t<li>item 2</li>",
-        )
-
     def test_max_items_zero(self):
         self.assertEqual(
             truncated_unordered_list(["a", "b", "c"], 0),

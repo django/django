@@ -25,7 +25,9 @@ def truncated_unordered_list(value, max_items, autoescape=True):
 
         {{ deleted_objects|truncated_unordered_list:100 }}
     """
-    max_items = int(max_items)
+
+    if max_items is not None:
+        max_items = int(max_items)
 
     if autoescape:
         escaper = conditional_escape
