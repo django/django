@@ -183,7 +183,7 @@ class BaseForm(RenderableFormMixin):
             field = self.fields[name]
         except KeyError:
             raise KeyError(
-                "Key '%s' not found in '%s'. Choices are: %s."
+                "Field '%s' not found in form '%s'. Available fields are: %s."
                 % (
                     name,
                     self.__class__.__name__,
@@ -296,7 +296,7 @@ class BaseForm(RenderableFormMixin):
             error = {field or NON_FIELD_ERRORS: error.error_list}
 
         for field, error_list in error.items():
-            if field not in self.errors:
+            if field not in self._errors:
                 if field != NON_FIELD_ERRORS and field not in self.fields:
                     raise ValueError(
                         "'%s' has no field named '%s'."
