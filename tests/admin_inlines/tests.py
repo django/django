@@ -12,6 +12,7 @@ from .admin import InnerInline
 from .admin import site as admin_site
 from .models import (
     Author,
+    BankAccount,
     BinaryTree,
     Book,
     BothVerboseNameProfile,
@@ -31,6 +32,7 @@ from .models import (
     Inner3,
     Inner4Stacked,
     Inner4Tabular,
+    Invoice,
     Novel,
     OutfitItem,
     Parent,
@@ -44,6 +46,7 @@ from .models import (
     Sighting,
     SomeChildModel,
     SomeParentModel,
+    Subject,
     Teacher,
     UUIDChild,
     UUIDParent,
@@ -829,6 +832,88 @@ class TestInline(TestDataMixin, TestCase):
         self.assertEqual(response.status_code, 302)
         parent.refresh_from_db()
         self.assertIs(parent.show_inlines, True)
+
+    def test_delete_protected_message_limits_number_of_objects_displayed(self):
+        # admin limits the amount of displayed objects to 100, so we create
+        # 102 invoices
+        subject = Subject.objects.create(name="Subject")
+        bank_account = BankAccount.objects.create(
+            subject=subject, account_number="000000000"
+        )
+        invoices = [
+            Invoice(subject=subject, account=bank_account, number=str(i))
+            for i in range(102)
+        ]
+        Invoice.objects.bulk_create(invoices)
+
+        response = self.client.post(
+            reverse("admin:admin_inlines_subject_change", args=(subject.pk,)),
+            data={
+                "name": "Subject",
+                "bankaccount_set-TOTAL_FORMS": "1",
+                "bankaccount_set-INITIAL_FORMS": "1",
+                "bankaccount_set-MAX_NUM_FORMS": "1000",
+                "bankaccount_set-MIN_NUM_FORMS": "0",
+                "bankaccount_set-0-account_number": "000000000",
+                "bankaccount_set-0-id": bank_account.pk,
+                "bankaccount_set-0-DELETE": "on",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        inline_formset = response.context_data["inline_admin_formsets"][0]
+        self.assertEqual(1, len(inline_formset.non_form_errors()))
+        error_message = inline_formset.non_form_errors()[0]
+        self.assertTrue(
+            error_message.startswith(
+                "Deleting bank account 000000000 would require deleting the "
+                "following protected related objects:"
+            ),
+            error_message,
+        )
+        self.assertEqual(error_message.count("invoice"), 100, error_message)
+        self.assertTrue(error_message.endswith(" and 2 more"), error_message)
+
+    def test_delete_protected_message_does_not_limits_small_amount_of_objects(self):
+        subject = Subject.objects.create(name="Subject")
+        bank_account = BankAccount.objects.create(
+            subject=subject, account_number="000000000"
+        )
+        invoices = [
+            Invoice(subject=subject, account=bank_account, number=str(i))
+            for i in range(3)
+        ]
+        Invoice.objects.bulk_create(invoices)
+
+        response = self.client.post(
+            reverse("admin:admin_inlines_subject_change", args=(subject.pk,)),
+            data={
+                "name": "Subject",
+                "bankaccount_set-TOTAL_FORMS": "1",
+                "bankaccount_set-INITIAL_FORMS": "1",
+                "bankaccount_set-MAX_NUM_FORMS": "1000",
+                "bankaccount_set-MIN_NUM_FORMS": "0",
+                "bankaccount_set-0-account_number": "000000000",
+                "bankaccount_set-0-id": bank_account.pk,
+                "bankaccount_set-0-DELETE": "on",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        inline_formset = response.context_data["inline_admin_formsets"][0]
+        self.assertEqual(1, len(inline_formset.non_form_errors()))
+        error_message = inline_formset.non_form_errors()[0]
+        self.assertTrue(
+            error_message.startswith(
+                "Deleting bank account 000000000 "
+                "would require deleting the "
+                "following protected related "
+                "objects:"
+            ),
+            error_message,
+        )
+        self.assertIn("invoice 0", error_message)
+        self.assertIn("invoice 1", error_message)
+        self.assertIn("invoice 2", error_message)
+        self.assertNotIn("more", error_message)
 
 
 @override_settings(ROOT_URLCONF="admin_inlines.urls")

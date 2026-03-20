@@ -5,6 +5,7 @@ from django.db import models
 
 from .models import (
     Author,
+    BankAccount,
     BinaryTree,
     CapoFamiglia,
     Chapter,
@@ -54,6 +55,7 @@ from .models import (
     SomeChildModel,
     SomeParentModel,
     SottoCapo,
+    Subject,
     Teacher,
     Title,
     TitleCollection,
@@ -410,6 +412,18 @@ class ClassStackedHorizontal(admin.StackedInline):
     filter_horizontal = ["person"]
 
 
+# Admin for #36984
+
+
+class BankAccountInline(admin.TabularInline):
+    model = BankAccount
+    protected_error_max_objects = 2
+
+
+class SubjectAdmin(admin.ModelAdmin):
+    inlines = [BankAccountInline]
+
+
 class ClassAdminStackedHorizontal(admin.ModelAdmin):
     inlines = [ClassStackedHorizontal]
 
@@ -530,6 +544,7 @@ site.register(CourseProxy1, ClassAdminTabularVertical)
 site.register(CourseProxy2, ClassAdminTabularHorizontal)
 site.register(ShowInlineParent, ShowInlineParentAdmin)
 site.register(UUIDParent, UUIDParentModelAdmin)
+site.register(Subject, SubjectAdmin)
 # Used to test hidden fields in tabular and stacked inlines.
 site2 = admin.AdminSite(name="tabular_inline_hidden_field_admin")
 site2.register(SomeParentModel, inlines=[ChildHiddenFieldTabularInline])

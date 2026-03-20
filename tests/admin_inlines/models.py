@@ -368,6 +368,33 @@ class CourseProxy2(Course):
         proxy = True
 
 
+# models for #36984
+
+
+class Subject(models.Model):
+    name = models.CharField(max_length=100)
+
+
+class BankAccount(models.Model):
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    account_number = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.account_number
+
+
+class Invoice(models.Model):
+    subject = models.ForeignKey(Subject, on_delete=models.PROTECT)
+    account = models.ForeignKey(BankAccount, on_delete=models.PROTECT)
+    number = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ("number",)
+
+    def __str__(self):
+        return self.number
+
+
 # Other models
 class ShowInlineParent(models.Model):
     show_inlines = models.BooleanField(default=False)
