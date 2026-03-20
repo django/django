@@ -64,6 +64,23 @@ class AsyncUnsafeTest(SimpleTestCase):
         except SynchronousOnlyOperation:
             self.fail("SynchronousOnlyOperation should not be raised.")
 
+    async def test_async_unsafe_custom_message(self):
+        custom_msg = "Do not call this in async land!"
+
+        @async_unsafe(custom_msg)
+        def guarded():
+            return True
+
+        with self.assertRaisesMessage(SynchronousOnlyOperation, custom_msg):
+            guarded()
+
+    def test_async_unsafe_custom_message_sync(self):
+        @async_unsafe("custom message")
+        def guarded():
+            return 42
+
+        self.assertEqual(guarded(), 42)
+
 
 class SyncView(View):
     def get(self, request, *args, **kwargs):

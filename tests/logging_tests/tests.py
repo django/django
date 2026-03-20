@@ -21,6 +21,7 @@ from django.utils.log import (
     RequireDebugFalse,
     RequireDebugTrue,
     ServerFormatter,
+    log_message,
     log_response,
 )
 from django.views.debug import ExceptionReporter
@@ -924,3 +925,62 @@ class LogResponseRealLoggerTests(LoggingAssertionMixin, TestCase):
                 )
                 # Log record is always a single line.
                 self.assertEqual(len(record.getMessage().splitlines()), 1)
+
+
+class LogMessageTests(SimpleTestCase):
+    def setUp(self):
+        self.logger = logging.getLogger("django.log_message.test")
+        self.logger.setLevel(logging.DEBUG)
+
+    def test_default_level_is_info(self):
+        with self.assertLogs(self.logger, level="INFO") as cm:
+            log_message(self.logger, "hello %s", "world")
+        self.assertIn("hello world", cm.output[0])
+
+    def test_level_based_on_status_code_500(self):
+        with self.assertLogs(self.logger, level="ERROR") as cm:
+            log_message(self.logger, "server error", status_code=500)
+        self.assertEqual(cm.records[0].levelno, logging.ERROR)
+
+    def test_level_based_on_status_code_404(self):
+        with self.assertLogs(self.logger, level="WARNING") as cm:
+            log_message(self.logger, "not found", status_code=404)
+        self.assertEqual(cm.records[0].levelno, logging.WARNING)
+
+    def test_level_based_on_status_code_200(self):
+        with self.assertLogs(self.logger, level="INFO") as cm:
+            log_message(self.logger, "ok", status_code=200)
+        self.assertEqual(cm.records[0].levelno, logging.INFO)
+
+    def test_explicit_level_overrides_status_code(self):
+        with self.assertLogs(self.logger, level="DEBUG") as cm:
+            log_message(self.logger, "debug msg", level="debug", status_code=500)
+        self.assertEqual(cm.records[0].levelno, logging.DEBUG)
+
+    def test_status_code_in_extra(self):
+        with self.assertLogs(self.logger, level="INFO") as cm:
+            log_message(self.logger, "test", status_code=201)
+        self.assertEqual(cm.records[0].status_code, 201)
+
+    def test_request_in_extra(self):
+        factory = RequestFactory()
+        request = factory.get("/test/")
+        with self.assertLogs(self.logger, level="INFO") as cm:
+            log_message(self.logger, "with request", request=request)
+        self.assertEqual(cm.records[0].request, request)
+
+    def test_exception_passed_as_exc_info(self):
+        try:
+            raise ValueError("boom")
+        except ValueError:
+            import sys
+
+            exc_info = sys.exc_info()
+            with self.assertLogs(self.logger, level="ERROR") as cm:
+                log_message(self.logger, "error", level="error", exception=exc_info)
+            self.assertIsNotNone(cm.records[0].exc_info)
+
+    def test_args_are_escaped(self):
+        with self.assertLogs(self.logger, level="INFO") as cm:
+            log_message(self.logger, "path: %s", "test\nnewline")
+        self.assertNotIn("\n", cm.records[0].getMessage())

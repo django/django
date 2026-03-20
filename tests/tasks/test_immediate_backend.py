@@ -1,7 +1,10 @@
+from unittest import mock
+
 from django.db import transaction
 from django.tasks import TaskResultStatus, default_task_backend, task_backends
 from django.tasks.backends.immediate import ImmediateBackend
 from django.tasks.exceptions import InvalidTask
+from django.tasks.signals import task_enqueued, task_finished, task_started
 from django.test import SimpleTestCase, TransactionTestCase, override_settings
 from django.utils import timezone
 
@@ -281,6 +284,55 @@ class ImmediateBackendTestCase(SimpleTestCase):
                 InvalidTask, "Queue 'unknown_queue' is not valid for backend"
             ):
                 await task_with_custom_queue_name.aenqueue()
+
+    def test_signal_task_enqueued_sent(self):
+        handler = mock.Mock()
+        task_enqueued.connect(handler)
+        self.addCleanup(task_enqueued.disconnect, handler)
+
+        result = test_tasks.noop_task.enqueue()
+
+        handler.assert_called_once()
+        call_kwargs = handler.call_args[1]
+        self.assertEqual(call_kwargs["task_result"].id, result.id)
+        self.assertIs(call_kwargs["sender"], ImmediateBackend)
+
+    def test_signal_task_started_sent(self):
+        handler = mock.Mock()
+        task_started.connect(handler)
+        self.addCleanup(task_started.disconnect, handler)
+
+        result = test_tasks.noop_task.enqueue()
+
+        handler.assert_called_once()
+        call_kwargs = handler.call_args[1]
+        self.assertEqual(call_kwargs["task_result"].id, result.id)
+        self.assertIs(call_kwargs["sender"], ImmediateBackend)
+
+    def test_signal_task_finished_sent_on_success(self):
+        handler = mock.Mock()
+        task_finished.connect(handler)
+        self.addCleanup(task_finished.disconnect, handler)
+
+        result = test_tasks.noop_task.enqueue()
+
+        handler.assert_called_once()
+        call_kwargs = handler.call_args[1]
+        self.assertEqual(call_kwargs["task_result"].id, result.id)
+        self.assertEqual(call_kwargs["task_result"].status, TaskResultStatus.SUCCESSFUL)
+
+    def test_signal_task_finished_sent_on_failure(self):
+        handler = mock.Mock()
+        task_finished.connect(handler)
+        self.addCleanup(task_finished.disconnect, handler)
+
+        with self.assertLogs("django.tasks", level="ERROR"):
+            result = test_tasks.failing_task_value_error.enqueue()
+
+        handler.assert_called_once()
+        call_kwargs = handler.call_args[1]
+        self.assertEqual(call_kwargs["task_result"].id, result.id)
+        self.assertEqual(call_kwargs["task_result"].status, TaskResultStatus.FAILED)
 
 
 class ImmediateBackendTransactionTestCase(TransactionTestCase):

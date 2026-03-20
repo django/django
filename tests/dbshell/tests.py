@@ -15,3 +15,14 @@ class DbshellCommandTestCase(SimpleTestCase):
         with self.assertRaisesMessage(CommandError, msg):
             with mock.patch("subprocess.run", side_effect=FileNotFoundError):
                 call_command("dbshell")
+
+    def test_command_success(self):
+        with mock.patch("subprocess.run", return_value=mock.Mock(returncode=0)):
+            call_command("dbshell")
+
+    def test_command_with_parameters(self):
+        with mock.patch("subprocess.run", return_value=mock.Mock(returncode=0)) as m:
+            call_command("dbshell", "--", "-e", "SELECT 1")
+            args = m.call_args[0][0]
+            self.assertIn("-e", args)
+            self.assertIn("SELECT 1", args)

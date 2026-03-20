@@ -81,3 +81,39 @@ class M2MMultipleTests(TestCase):
             ],
             lambda a: a.headline,
         )
+
+    def test_add_remove(self):
+        c = Category.objects.create(name="Tech")
+        a = Article.objects.create(headline="Tech news", pub_date=datetime(2023, 1, 1))
+        a.primary_categories.add(c)
+        self.assertIn(c, a.primary_categories.all())
+        a.primary_categories.remove(c)
+        self.assertNotIn(c, a.primary_categories.all())
+
+    def test_clear(self):
+        c1 = Category.objects.create(name="A")
+        c2 = Category.objects.create(name="B")
+        a = Article.objects.create(headline="Clear test", pub_date=datetime(2023, 2, 1))
+        a.primary_categories.add(c1, c2)
+        self.assertEqual(a.primary_categories.count(), 2)
+        a.primary_categories.clear()
+        self.assertEqual(a.primary_categories.count(), 0)
+
+    def test_reverse_query(self):
+        c = Category.objects.create(name="Science")
+        a1 = Article.objects.create(headline="Physics", pub_date=datetime(2023, 3, 1))
+        a2 = Article.objects.create(headline="Chemistry", pub_date=datetime(2023, 3, 2))
+        a1.secondary_categories.add(c)
+        a2.secondary_categories.add(c)
+        self.assertEqual(c.secondary_article_set.count(), 2)
+
+    def test_set(self):
+        c1 = Category.objects.create(name="X")
+        c2 = Category.objects.create(name="Y")
+        c3 = Category.objects.create(name="Z")
+        a = Article.objects.create(headline="Set test", pub_date=datetime(2023, 4, 1))
+        a.primary_categories.set([c1, c2])
+        self.assertEqual(a.primary_categories.count(), 2)
+        a.primary_categories.set([c3])
+        self.assertEqual(a.primary_categories.count(), 1)
+        self.assertIn(c3, a.primary_categories.all())

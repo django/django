@@ -3,6 +3,7 @@ from datetime import datetime
 
 from django.tasks import (
     DEFAULT_TASK_QUEUE_NAME,
+    TaskContext,
     TaskResultStatus,
     default_task_backend,
     task,
@@ -312,3 +313,63 @@ class TaskTestCase(SimpleTestCase):
             "Task takes context but does not have a first argument of 'context'.",
         ):
             task(takes_context=True)(test_tasks.calculate_meaning_of_life.func)
+
+    @override_settings(
+        TASKS={
+            "default": {
+                "BACKEND": "django.tasks.backends.dummy.DummyBackend",
+            }
+        }
+    )
+    def test_check_tasks_valid_config(self):
+        from django.tasks.checks import check_tasks
+
+        errors = list(check_tasks())
+        self.assertEqual(errors, [])
+
+    @override_settings(
+        TASKS={
+            "default": {
+                "BACKEND": "django.tasks.backends.dummy.DummyBackend",
+            }
+        }
+    )
+    def test_check_tasks_returns_backend_check_results(self):
+        errors = list(default_task_backend.check())
+        self.assertEqual(errors, [])
+
+    def test_task_error_valid_exception_class(self):
+        with self.assertLogs("django.tasks"):
+            result = test_tasks.failing_task_value_error.using(
+                backend="immediate"
+            ).enqueue()
+
+        self.assertEqual(len(result.errors), 1)
+        self.assertIs(result.errors[0].exception_class, ValueError)
+
+    def test_task_context_dataclass(self):
+        result = test_tasks.noop_task.enqueue()
+        ctx = TaskContext(task_result=result)
+        self.assertIs(ctx.task_result, result)
+        self.assertEqual(ctx.attempt, result.attempts)
+
+    @override_settings(
+        TASKS={
+            "default": {
+                "BACKEND": "django.tasks.backends.dummy.DummyBackend",
+            }
+        }
+    )
+    def test_clear_tasks_handlers_on_setting_change(self):
+        backend_before = task_backends["default"]
+        self.assertIsInstance(backend_before, DummyBackend)
+
+        with override_settings(
+            TASKS={
+                "default": {
+                    "BACKEND": "django.tasks.backends.immediate.ImmediateBackend",
+                }
+            }
+        ):
+            backend_after = task_backends["default"]
+            self.assertIsInstance(backend_after, ImmediateBackend)

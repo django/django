@@ -185,6 +185,39 @@ class DummyBackendTestCase(SimpleTestCase):
             ):
                 await task_with_custom_queue_name.aenqueue()
 
+    def test_task_result_is_finished_states(self):
+        result = test_tasks.noop_task.enqueue()
+        self.assertIs(result.is_finished, False)
+        self.assertEqual(result.status, TaskResultStatus.READY)
+
+        enqueued_result = default_task_backend.results[0]
+
+        object.__setattr__(enqueued_result, "status", TaskResultStatus.RUNNING)
+        result.refresh()
+        self.assertIs(result.is_finished, False)
+
+        object.__setattr__(enqueued_result, "status", TaskResultStatus.SUCCESSFUL)
+        result.refresh()
+        self.assertIs(result.is_finished, True)
+
+        object.__setattr__(enqueued_result, "status", TaskResultStatus.FAILED)
+        result.refresh()
+        self.assertIs(result.is_finished, True)
+
+    def test_task_result_return_value_ready(self):
+        result = test_tasks.noop_task.enqueue()
+        self.assertEqual(result.status, TaskResultStatus.READY)
+        with self.assertRaisesMessage(ValueError, "Task has not finished yet"):
+            result.return_value
+
+    def test_task_result_return_value_failed(self):
+        result = test_tasks.noop_task.enqueue()
+        enqueued_result = default_task_backend.results[0]
+        object.__setattr__(enqueued_result, "status", TaskResultStatus.FAILED)
+        result.refresh()
+        with self.assertRaisesMessage(ValueError, "Task failed"):
+            result.return_value
+
 
 class DummyBackendTransactionTestCase(TransactionTestCase):
     available_apps = []

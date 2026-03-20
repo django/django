@@ -19,3 +19,13 @@ class SchemaEditorTests(SimpleTestCase):
 
         field = MyCharField(max_length=1, default=MyStr)
         self.assertEqual(BaseDatabaseSchemaEditor._effective_default(field), MyStr)
+
+    def test_effective_default_none(self):
+        field = models.CharField(max_length=10, default=None)
+        result = BaseDatabaseSchemaEditor._effective_default(field)
+        self.assertIsNone(result)
+
+    def test_effective_default_static_value(self):
+        field = models.IntegerField(default=42)
+        result = BaseDatabaseSchemaEditor._effective_default(field)
+        self.assertEqual(result, 42)

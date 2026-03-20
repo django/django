@@ -42,3 +42,16 @@ class StaticFilesFormsMediaTestCase(SimpleTestCase):
             '<script src="https://secure.other.com/path/to/js3"></script>\n'
             '<script src="https://example.com/assets/relative/path/to/js4"></script>',
         )
+
+    def test_relative_css_url(self):
+        m = Media(css={"all": ("style.css",)})
+        output = str(m)
+        self.assertIn("https://example.com/assets/style.css", output)
+
+    def test_media_combination(self):
+        m1 = Media(js=("a.js",))
+        m2 = Media(js=("b.js",))
+        combined = m1 + m2
+        output = str(combined)
+        self.assertIn("a.js", output)
+        self.assertIn("b.js", output)
