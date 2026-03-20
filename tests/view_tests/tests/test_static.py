@@ -157,6 +157,19 @@ class StaticTests(SimpleTestCase):
         response = self.client.get("/%s/" % self.prefix)
         self.assertEqual(response.content, b"Test index")
 
+    def test_serve_closes_fd_on_fileresponse_error(self):
+        """
+        If FileResponse raises an exception, the file handle opened in serve()
+        should be closed to avoid leaking file descriptors.
+        """
+        file_name = "file.txt"
+        with mock.patch(
+            "django.views.static.FileResponse",
+            side_effect=ValueError("simulated error"),
+        ):
+            with self.assertRaises(ValueError):
+                self.client.get("/%s/%s" % (self.prefix, file_name))
+
     def test_template_encoding(self):
         """
         The template is loaded directly, not via a template loader, and should
