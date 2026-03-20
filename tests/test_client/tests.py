@@ -906,6 +906,45 @@ class ClientTest(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             self.assertRedirects(response, "https://www.djangoproject.com/")
 
+    def test_redirect_regex(self):
+        """assertRedirectsRegex matches the redirect URL against a pattern."""
+        response = self.client.get("/redirect_view/")
+        self.assertRedirectsRegex(response, r"/get_view/")
+
+    def test_redirect_regex_with_pattern(self):
+        """assertRedirectsRegex works with dynamic URL patterns."""
+        response = self.client.get("/redirect_view/", {"var": "value"})
+        self.assertRedirectsRegex(response, r"/get_view/\?var=value")
+
+    def test_redirect_regex_with_compiled_pattern(self):
+        """assertRedirectsRegex accepts a compiled regex."""
+        import re
+
+        response = self.client.get("/redirect_view/")
+        self.assertRedirectsRegex(response, re.compile(r"/get_\w+/"))
+
+    def test_redirect_regex_no_match(self):
+        """assertRedirectsRegex fails when the URL doesn't match."""
+        response = self.client.get("/redirect_view/")
+        with self.assertRaises(AssertionError):
+            self.assertRedirectsRegex(response, r"/nonexistent/")
+
+    def test_redirect_regex_follow(self):
+        """assertRedirectsRegex works with followed redirects."""
+        response = self.client.get("/double_redirect_view/", follow=True)
+        self.assertRedirectsRegex(
+            response, r"/get_view/", status_code=302, target_status_code=200
+        )
+
+    def test_redirect_regex_external(self):
+        """assertRedirectsRegex works with external redirects."""
+        response = self.client.get("/django_project_redirect/")
+        self.assertRedirectsRegex(
+            response,
+            r"https://www\.djangoproject\.com/",
+            fetch_redirect_response=False,
+        )
+
     def test_session_modifying_view(self):
         "Request a page that modifies the session"
         # Session value isn't set initially
