@@ -140,6 +140,48 @@ class MiddlewareTests(SimpleTestCase):
 
 
 @override_settings(ROOT_URLCONF="middleware_exceptions.urls")
+class FunctionalMiddlewareHooksTests(SimpleTestCase):
+    @override_settings(
+        MIDDLEWARE=[
+            "middleware_exceptions.middleware.functional_process_view_middleware",
+        ]
+    )
+    def test_process_view(self):
+        response = self.client.get("/middleware_exceptions/view/")
+        self.assertEqual(response.content, b"Processed view normal_view")
+
+    @override_settings(
+        MIDDLEWARE=[
+            "middleware_exceptions.middleware.functional_process_exception_middleware",
+        ]
+    )
+    def test_process_exception(self):
+        response = self.client.get("/middleware_exceptions/error/")
+        self.assertEqual(response.content, b"Exception caught")
+
+    @override_settings(
+        MIDDLEWARE=[
+            "middleware_exceptions.middleware.functional_template_response_middleware",
+        ]
+    )
+    def test_process_template_response(self):
+        response = self.client.get("/middleware_exceptions/template_response/")
+        self.assertEqual(
+            response.content,
+            b"template_response OK\nfunctional_template_response_middleware",
+        )
+
+    @override_settings(
+        MIDDLEWARE=[
+            "middleware_exceptions.middleware.functional_process_exception_middleware",
+        ]
+    )
+    def test_process_exception_from_render(self):
+        response = self.client.get("/middleware_exceptions/exception_in_render/")
+        self.assertEqual(response.content, b"Exception caught")
+
+
+@override_settings(ROOT_URLCONF="middleware_exceptions.urls")
 class RootUrlconfTests(SimpleTestCase):
     @override_settings(ROOT_URLCONF=None)
     def test_missing_root_urlconf(self):

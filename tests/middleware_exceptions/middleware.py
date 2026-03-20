@@ -125,6 +125,40 @@ def async_payment_middleware(get_response):
     return middleware
 
 
+def functional_process_view_middleware(get_response):
+    def middleware(request):
+        return get_response(request)
+
+    def process_view(request, view_func, view_args, view_kwargs):
+        return HttpResponse("Processed view %s" % view_func.__name__)
+
+    middleware.process_view = process_view
+    return middleware
+
+
+def functional_process_exception_middleware(get_response):
+    def middleware(request):
+        return get_response(request)
+
+    def process_exception(request, exception):
+        return HttpResponse("Exception caught")
+
+    middleware.process_exception = process_exception
+    return middleware
+
+
+def functional_template_response_middleware(get_response):
+    def middleware(request):
+        return get_response(request)
+
+    def process_template_response(request, response):
+        response.context_data["mw"].append("functional_template_response_middleware")
+        return response
+
+    middleware.process_template_response = process_template_response
+    return middleware
+
+
 @sync_and_async_middleware
 class SyncAndAsyncMiddleware(BaseMiddleware):
     pass
