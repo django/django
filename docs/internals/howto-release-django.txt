@@ -495,6 +495,13 @@ Building the artifacts
 
 #. Make sure you have an absolutely clean tree by running ``git clean -dfx``.
 
+   .. warning::
+
+      This command will permanently delete all files and directories
+      not tracked by Git in your working tree.
+      in your working tree. Ensure you have no important uncommitted or
+      changes not tracked by Git before running it.
+
 #. Run ``python -m build`` to generate the release packages. This will create
    the release artifacts (tarball and wheel) in a ``dist/`` directory.
 
