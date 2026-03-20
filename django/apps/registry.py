@@ -153,6 +153,12 @@ class Apps:
 
         Raise LookupError if no application exists with this label.
         """
+        if not isinstance(app_label, str):
+            raise TypeError(
+                "app_label must be a string, not %s." % type(app_label).__name__
+            )
+        if not app_label:
+            raise ValueError("app_label must not be empty.")
         self.check_apps_ready()
         try:
             return self.app_configs[app_label]
@@ -197,6 +203,18 @@ class Apps:
         model exists with this name in the application. Raise ValueError if
         called with a single argument that doesn't contain exactly one dot.
         """
+        if not isinstance(app_label, str):
+            raise TypeError(
+                "app_label must be a string, not %s." % type(app_label).__name__
+            )
+        if not app_label:
+            raise ValueError("app_label must not be empty.")
+        if model_name is not None and not isinstance(model_name, str):
+            raise TypeError(
+                "model_name must be a string, not %s." % type(model_name).__name__
+            )
+        if model_name is not None and not model_name:
+            raise ValueError("model_name must not be empty.")
         if require_ready:
             self.check_models_ready()
         else:
@@ -216,6 +234,12 @@ class Apps:
         # Since this method is called when models are imported, it cannot
         # perform imports because of the risk of import loops. It mustn't
         # call get_app_config().
+        if not isinstance(app_label, str):
+            raise TypeError(
+                "app_label must be a string, not %s." % type(app_label).__name__
+            )
+        if not app_label:
+            raise ValueError("app_label must not be empty.")
         model_name = model._meta.model_name
         app_models = self.all_models[app_label]
         if model_name in app_models:
@@ -245,6 +269,12 @@ class Apps:
 
         app_name is the full name of the app e.g. 'django.contrib.admin'.
         """
+        if not isinstance(app_name, str):
+            raise TypeError(
+                "app_name must be a string, not %s." % type(app_name).__name__
+            )
+        if not app_name:
+            raise ValueError("app_name must not be empty.")
         self.check_apps_ready()
         return any(ac.name == app_name for ac in self.app_configs.values())
 
@@ -394,6 +424,29 @@ class Apps:
         The function passed to this method must accept exactly n models as
         arguments, where n=len(model_keys).
         """
+        if not callable(function):
+            raise TypeError(
+                "function must be callable, not %s." % type(function).__name__
+            )
+        for model_key in model_keys:
+            if not isinstance(model_key, tuple) or len(model_key) != 2:
+                raise ValueError(
+                    "Each model_key must be a 2-tuple of (app_label, model_name), "
+                    "got %r instead." % (model_key,)
+                )
+            app_label, model_name = model_key
+            if not isinstance(app_label, str):
+                raise TypeError(
+                    "app_label must be a string, not %s." % type(app_label).__name__
+                )
+            if not app_label:
+                raise ValueError("app_label must not be empty.")
+            if not isinstance(model_name, str):
+                raise TypeError(
+                    "model_name must be a string, not %s." % type(model_name).__name__
+                )
+            if not model_name:
+                raise ValueError("model_name must not be empty.")
         # Base case: no arguments, just execute the function.
         if not model_keys:
             function()
