@@ -2265,7 +2265,9 @@ found, ``get_or_create()`` returns a tuple of that object and ``False``.
 
     This method is atomic assuming that the database enforces uniqueness of the
     keyword arguments (see :attr:`~django.db.models.Field.unique` or
-    :attr:`~django.db.models.Options.unique_together`). If the fields used in
+    :attr:`~django.db.models.Options.unique_together`, keep in mind that NULL
+    values are not comparable in SQL and that may lead to duplicates even with
+    database constraint, check database docs). If the fields used in
     the keyword arguments do not have a uniqueness constraint, concurrent calls
     to this method may result in multiple rows with the same parameters being
     inserted.
