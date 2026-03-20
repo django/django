@@ -52,6 +52,26 @@ attribute, to a fully dynamic, callable hook. These options seem to add hollow
 complexity for simple situations, but without them, more advanced designs would
 be limited.
 
+
+When to use class-based views
+=============================
+
+Class-based views are particularly useful when you want to organize related
+logic for different HTTP methods in a clean and reusable way.
+
+They are especially helpful when:
+
+* You want to reuse behavior across multiple views using inheritance
+  or mixins.
+* Your view needs to handle multiple HTTP methods such as ``GET`` and
+  ``POST`` in a structured manner.
+* You want to take advantage of Django's built-in generic class-based
+  views such as ``ListView``, ``DetailView``, ``CreateView``,
+  or ``UpdateView``.
+
+However, function-based views may still be preferable when the view logic
+is very simple and introducing a class would add unnecessary complexity.
+
 Using class-based views
 =======================
 
@@ -326,3 +346,6 @@ can be obtained by using
     as parameters to the decorated method on the class. If your method
     does not accept a compatible set of parameters it will raise a
     ``TypeError`` exception.
+
+
+
