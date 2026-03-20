@@ -117,8 +117,8 @@ class FormsTestCase(SimpleTestCase):
         )
 
         msg = (
-            "Key 'nonexistentfield' not found in 'Person'. Choices are: birthday, "
-            "first_name, last_name."
+            "Key 'nonexistentfield' not found in 'Person'. Choices are: first_name, "
+            "last_name, birthday."
         )
         with self.assertRaisesMessage(KeyError, msg):
             p["nonexistentfield"]

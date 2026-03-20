@@ -187,7 +187,7 @@ class BaseForm(RenderableFormMixin):
                 % (
                     name,
                     self.__class__.__name__,
-                    ", ".join(sorted(self.fields)),
+                    ", ".join(self.fields),
                 )
             )
         if name not in self._bound_fields_cache:
@@ -296,7 +296,7 @@ class BaseForm(RenderableFormMixin):
             error = {field or NON_FIELD_ERRORS: error.error_list}
 
         for field, error_list in error.items():
-            if field not in self.errors:
+            if field not in self._errors:
                 if field != NON_FIELD_ERRORS and field not in self.fields:
                     raise ValueError(
                         "'%s' has no field named '%s'."
