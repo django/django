@@ -428,6 +428,17 @@ For each field, we describe the default widget used if you don't specify
 ``widget``. We also specify the value returned when you provide an empty value
 (see the section on ``required`` above to understand what that means).
 
+.. warning::
+
+    Validation arguments such as ``max_value``, ``min_value``,
+    ``max_length``, and ``min_length`` are intended to be passed as
+    initialization arguments when the field is created (e.g.,
+    ``IntegerField(max_value=10)``). They are not intended to be
+    modified as attributes on the field instance after creation.
+    Dynamically changing them at runtime (e.g.,
+    ``self.fields['amount'].max_value = 10``) will not correctly
+    update the field's validators.
+
 ``BooleanField``
 ----------------
 
