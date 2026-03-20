@@ -18,6 +18,12 @@ from .exception import convert_exception_to_response
 logger = logging.getLogger("django.request")
 
 
+def _get_middleware_name(middleware_method) -> str:
+    if slf := getattr(middleware_method, "__self__", None):  # Bound classmethod
+        return slf.__class__.__name__
+    return type(middleware_method).__name__
+
+
 class BaseHandler:
     _view_middleware = None
     _template_response_middleware = None
@@ -215,8 +221,8 @@ class BaseHandler:
                 self.check_response(
                     response,
                     middleware_method,
-                    name="%s.process_template_response"
-                    % (middleware_method.__self__.__class__.__name__,),
+                    name=f"{_get_middleware_name(middleware_method)}"
+                    ".process_template_response",
                 )
             try:
                 response = response.render()
@@ -276,8 +282,8 @@ class BaseHandler:
                 self.check_response(
                     response,
                     middleware_method,
-                    name="%s.process_template_response"
-                    % (middleware_method.__self__.__class__.__name__,),
+                    name=f"{_get_middleware_name(middleware_method)}"
+                    f".process_template_response",
                 )
             try:
                 if iscoroutinefunction(response.render):
