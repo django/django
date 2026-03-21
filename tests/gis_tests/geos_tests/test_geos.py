@@ -23,7 +23,9 @@ from django.contrib.gis.geos import (
     fromfile,
     fromstr,
 )
+from django.contrib.gis.geos.error import GEOSLibraryError
 from django.contrib.gis.geos.libgeos import geos_version_tuple
+from django.contrib.gis.geos.prototypes import geos_isclosed, get_nrings
 from django.contrib.gis.shortcuts import numpy
 from django.template import Context
 from django.template.engine import Engine
@@ -34,7 +36,6 @@ from ..test_data import TestDataMixin
 
 
 class GEOSTest(SimpleTestCase, TestDataMixin):
-
     error_checking_geom = (
         'Error encountered checking Geometry returned from GEOS C function "{}".'
     )
@@ -122,6 +123,58 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 self.assertRaisesMessage((GEOSException, ValueError), err.msg),
             ):
                 fromstr(err.wkt)
+
+        msg = (
+            "Error encountered checking Geometry returned from GEOS C "
+            'function "GEOSWKTReader_read_r".'
+        )
+        with self.assertRaisesMessage(GEOSException, msg) as context:
+            GEOSGeometry("Point(5, 2)")
+        self.assertIsInstance(context.exception.__cause__, GEOSLibraryError)
+        self.assertEqual(
+            str(context.exception.__cause__),
+            "ParseException: Expected number but encountered ','",
+        )
+
+        point = Point(0, 0)
+        msg = 'Error encountered in GEOS C function "GEOSGetNumInteriorRings_r".'
+        with self.assertRaisesMessage(GEOSException, msg) as context:
+            get_nrings(point.ptr)
+        self.assertIsInstance(context.exception.__cause__, GEOSLibraryError)
+        if geos_version_tuple() < (3, 13):
+            msg = "IllegalArgumentException: Argument is not a Polygon"
+        else:
+            msg = "IllegalArgumentException: Argument is not a Surface"
+        self.assertEqual(str(context.exception.__cause__), msg)
+
+        msg = 'Error encountered on GEOS C predicate function "GEOSisClosed_r".'
+        with self.assertRaisesMessage(GEOSException, msg) as context:
+            geos_isclosed(point.ptr)
+        self.assertIsInstance(context.exception.__cause__, GEOSLibraryError)
+        if geos_version_tuple() < (3, 13):
+            msg = (
+                "IllegalArgumentException: Argument "
+                "is not a LineString or MultiLineString"
+            )
+        else:
+            msg = (
+                "IllegalArgumentException: Argument is not "
+                "a Curve, MultiLineString, or MultiCurve"
+            )
+        self.assertEqual(str(context.exception.__cause__), msg)
+
+        invalid_wkb = "01990000"
+        msg = (
+            "Error encountered checking Geometry returned from "
+            'GEOS C function "GEOSWKBReader_readHEX_r".'
+        )
+        with self.assertRaisesMessage(GEOSException, msg) as context:
+            GEOSGeometry(invalid_wkb)
+        self.assertIsInstance(context.exception.__cause__, GEOSLibraryError)
+        self.assertEqual(
+            str(context.exception.__cause__),
+            "ParseException: Unexpected EOF parsing WKB",
+        )
 
         # Bad WKB
         with self.assertRaisesMessage(
