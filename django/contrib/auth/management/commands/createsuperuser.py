@@ -14,6 +14,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.utils.functional import cached_property
 from django.utils.text import capfirst
+from django.utils.version import PY314
 
 
 class NotRunningInTTYException(Exception):
@@ -171,8 +172,12 @@ class Command(BaseCommand):
 
                 # Prompt for a password if the model has one.
                 while PASSWORD_FIELD in user_data and user_data[PASSWORD_FIELD] is None:
-                    password = getpass.getpass()
-                    password2 = getpass.getpass("Password (again): ")
+                    if PY314:
+                        password = getpass.getpass(echo_char="*")
+                        password2 = getpass.getpass("Password (again): ", echo_char="*")
+                    else:
+                        password = getpass.getpass()
+                        password2 = getpass.getpass("Password (again): ")
                     if password != password2:
                         self.stderr.write("Error: Your passwords didn't match.")
                         # Don't validate passwords that don't match.
