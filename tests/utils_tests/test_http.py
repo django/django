@@ -521,6 +521,20 @@ class ParseHeaderParameterTests(unittest.TestCase):
             parsed = parse_header_parameters(raw_line)
             self.assertEqual(parsed[1]["title"], expected_title)
 
+    def test_rfc2231_invalid_encoding(self):
+        test_data = [
+            # Invalid encoding name with percent-encoded value
+            "text/plain; charset*=BOGUS''%20",
+            # Another invalid encoding with different value
+            "text/plain; filename*=INVALID''%s%s%s",
+            # Invalid encoding with multi-line encoded content
+            "text/plain; title*=NOTACODEC''%E2%80%A6",
+        ]
+        msg = "Invalid encoding"
+        for header in test_data:
+            with self.subTest(raw_line=header), self.assertRaisesRegex(ValueError, msg):
+                parse_header_parameters(header)
+
     def test_header_max_length(self):
         base_header = "Content-Type: application/x-stuff; title*="
         base_header_len = len(base_header)
