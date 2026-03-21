@@ -22,12 +22,18 @@ ancestor classes are  documented under the section title of **Ancestors
     class. It isn't strictly a generic view and thus can also be imported from
     ``django.views``.
 
-    **Method Flowchart**
+       **Method Flowchart**
 
-    #. :meth:`setup`
-    #. :meth:`dispatch`
-    #. :meth:`http_method_not_allowed`
-    #. :meth:`options`
+    * :meth:`setup`
+      * :meth:`dispatch`
+
+        * If the HTTP method is supported, :meth:`dispatch` delegates to the
+          corresponding handler method (``get()``, ``post()``, etc.).
+        * If the HTTP method isn't supported:
+          * :meth:`http_method_not_allowed`
+        * If the request uses the ``OPTIONS`` method:
+          * :meth:`options`
+
 
     **Example views.py**::
 
@@ -143,12 +149,15 @@ ancestor classes are  documented under the section title of **Ancestors
     * :class:`django.views.generic.base.ContextMixin`
     * :class:`django.views.generic.base.View`
 
-    **Method Flowchart**
+        **Method Flowchart**
 
-    #. :meth:`~django.views.generic.base.View.setup`
-    #. :meth:`~django.views.generic.base.View.dispatch`
-    #. :meth:`~django.views.generic.base.View.http_method_not_allowed`
-    #. :meth:`~django.views.generic.base.ContextMixin.get_context_data`
+    * :meth:`~django.views.generic.base.View.setup`
+      * :meth:`~django.views.generic.base.View.dispatch`
+
+        * If the HTTP method isn't supported:
+          * :meth:`~django.views.generic.base.View.http_method_not_allowed`
+        * For ``GET`` requests:
+          * :meth:`~django.views.generic.base.ContextMixin.get_context_data`
 
     **Example views.py**::
 
@@ -205,12 +214,15 @@ ancestor classes are  documented under the section title of **Ancestors
 
     * :class:`django.views.generic.base.View`
 
-    **Method Flowchart**
+        **Method Flowchart**
 
-    #. :meth:`~django.views.generic.base.View.setup`
-    #. :meth:`~django.views.generic.base.View.dispatch`
-    #. :meth:`~django.views.generic.base.View.http_method_not_allowed`
-    #. :meth:`get_redirect_url`
+    * :meth:`~django.views.generic.base.View.setup`
+      * :meth:`~django.views.generic.base.View.dispatch`
+
+        * If the HTTP method isn't supported:
+          * :meth:`~django.views.generic.base.View.http_method_not_allowed`
+        * For ``GET`` requests:
+          * :meth:`get_redirect_url`
 
     **Example views.py**::
 
