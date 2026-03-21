@@ -2,6 +2,7 @@ import json
 import os
 import posixpath
 import re
+from graphlib import CycleError, TopologicalSorter
 from hashlib import md5
 from urllib.parse import unquote, urldefrag, urlsplit, urlunsplit
 
@@ -52,7 +53,6 @@ class StaticFilesStorage(FileSystemStorage):
 
 class HashedFilesMixin:
     default_template = """url("%(url)s")"""
-    max_post_process_passes = 5
     support_js_module_import_aggregation = False
     _js_module_import_aggregation_patterns = (
         "*.js",
@@ -111,7 +111,6 @@ class HashedFilesMixin:
             ),
         ),
     )
-    keep_intermediate_files = True
 
     def __init__(self, *args, **kwargs):
         if self.support_js_module_import_aggregation:
@@ -225,9 +224,14 @@ class HashedFilesMixin:
                 return False
         return False
 
-    def url_converter(self, name, hashed_files, template=None, comment_blocks=None):
+    def _make_url_handler(self, name, hashed_files, template=None, comment_blocks=None):
         """
-        Return the custom URL converter for the given file name.
+        Return a (handle_match, substitutions) pair for the given file.
+
+        handle_match is a regex match callback that rewrites each matched URL
+        to its hashed version. substitutions is the list that handle_match
+        populates with (matched, replacement, hash_key, old_filename) tuples
+        as it runs.
         """
         if template is None:
             template = self.default_template
@@ -242,13 +246,9 @@ class HashedFilesMixin:
                 return f"\n{line_num}"
             return msg
 
-        def converter(matchobj):
-            """
-            Convert the matched URL to a normalized and hashed URL.
+        substitutions = []
 
-            This requires figuring out which files the matched URL resolves
-            to and calling the url() method of the storage.
-            """
+        def handle_match(matchobj):
             matches = matchobj.groupdict()
             matched = matches["matched"]
             url = matches["url"]
@@ -307,11 +307,18 @@ class HashedFilesMixin:
             if fragment:
                 transformed_url += ("?#" if "?#" in url else "#") + fragment
 
-            # Return the hashed version to the file
             matches["url"] = unquote(transformed_url)
-            return template % matches
+            replacement = template % matches
 
-        return converter
+            hash_key = self.hash_key(
+                self.clean_name(posixpath.normpath(unquote(target_name).strip()))
+            )
+            old_filename = hashed_url.split("/")[-1]
+            substitutions.append((matched, replacement, hash_key, old_filename))
+
+            return replacement
+
+        return handle_match, substitutions
 
     def post_process(self, paths, dry_run=False, **options):
         """
@@ -339,126 +346,180 @@ class HashedFilesMixin:
             path for path in paths if matches_patterns(path, self._patterns)
         ]
 
-        # Adjustable files to yield at end, keyed by the original path.
-        processed_adjustable_paths = {}
+        adjustable_set = set(adjustable_paths)
 
-        # Do a single pass first. Post-process all files once, yielding not
-        # adjustable files and exceptions, and collecting adjustable files.
-        for name, hashed_name, processed, _ in self._post_process(
-            paths, adjustable_paths, hashed_files
-        ):
-            if name not in adjustable_paths or isinstance(processed, Exception):
-                yield name, hashed_name, processed
-            else:
-                processed_adjustable_paths[name] = (name, hashed_name, processed)
-
-        paths = {path: paths[path] for path in adjustable_paths}
-        unresolved_paths = []
-        for i in range(self.max_post_process_passes):
-            unresolved_paths = []
-            for name, hashed_name, processed, subst in self._post_process(
-                paths, adjustable_paths, hashed_files
+        # Scan all adjustable files once to collect substitutions and build
+        # the dependency graph.
+        file_subs = {}
+        if adjustable_paths:
+            for error in self._scan_substitutions(
+                paths, adjustable_paths, hashed_files, file_subs
             ):
-                # Overwrite since hashed_name may be newer.
-                processed_adjustable_paths[name] = (name, hashed_name, processed)
-                if subst:
-                    unresolved_paths.append(name)
+                yield error
 
-            if not unresolved_paths:
-                break
+        # Step 1: Process non-adjustable files
+        non_adjustable_paths = {
+            name: paths[name] for name in paths if name not in adjustable_set
+        }
+        for name, hashed_name, processed in self._post_process(
+            non_adjustable_paths, hashed_files, file_subs
+        ):
+            yield name, hashed_name, processed
 
-        if unresolved_paths:
-            problem_paths = ", ".join(sorted(unresolved_paths))
-            yield problem_paths, None, RuntimeError("Max post-process passes exceeded.")
+        # Step 2: Process adjustable files
+        if adjustable_paths:
+            clean_to_name = {self.clean_name(name): name for name in adjustable_paths}
+            clean_adjustable = set(clean_to_name)
+            graph = {
+                name: {
+                    clean_to_name[hk]
+                    for _, _, hk, _ in file_subs.get(name, [])
+                    if hk in clean_adjustable
+                }
+                for name in adjustable_paths
+            }
 
-        # Store the processed paths
+            processing_order = self._sort_adjustable_paths(graph)
+
+            ordered_paths = {name: paths[name] for name in processing_order}
+            for name, hashed_name, processed in self._post_process(
+                ordered_paths, hashed_files, file_subs
+            ):
+                yield name, hashed_name, processed
+
+            # Process and yield circular dependencies.
+            circular_nodes = set(graph) - set(processing_order)
+            if circular_nodes:
+                circular_nodes = sorted(circular_nodes)
+                circular_paths = {name: paths[name] for name in circular_nodes}
+                self._calculate_combined_hash(
+                    circular_nodes, paths, hashed_files, file_subs
+                )
+                for name, hashed_name, processed in self._post_process(
+                    circular_paths, hashed_files, file_subs
+                ):
+                    yield name, hashed_name, processed
+
+        # Store the processed paths.
         self.hashed_files.update(hashed_files)
 
-        # Yield adjustable files with final, hashed name.
-        yield from processed_adjustable_paths.values()
-
-    def _post_process(self, paths, adjustable_paths, hashed_files):
-        # Sort the files by directory level
-        def path_level(name):
-            return len(name.split(os.sep))
-
-        for name in sorted(paths, key=path_level, reverse=True):
-            substitutions = True
+    def _post_process(self, paths, hashed_files, file_subs):
+        for name in paths:
             # use the original, local file, not the copied-but-unprocessed
             # file, which might be somewhere far away, like S3
             storage, path = paths[name]
             with storage.open(path) as original_file:
                 cleaned_name = self.clean_name(name)
                 hash_key = self.hash_key(cleaned_name)
-
-                # generate the hash with the original content, even for
-                # adjustable files.
-                if hash_key not in hashed_files:
-                    hashed_name = self.hashed_name(name, original_file)
-                else:
-                    hashed_name = hashed_files[hash_key]
-
-                # then get the original's file content..
-                if hasattr(original_file, "seek"):
-                    original_file.seek(0)
-
-                hashed_file_exists = self.exists(hashed_name)
-                processed = False
-
-                # ..to apply each replacement pattern to the content
-                if name in adjustable_paths:
-                    old_hashed_name = hashed_name
-                    try:
-                        content = original_file.read().decode("utf-8")
-                    except UnicodeDecodeError as exc:
-                        yield name, None, exc, False
-                    for extension, patterns in self._patterns.items():
-                        if matches_patterns(path, (extension,)):
-                            for pattern, template in patterns:
-                                converter = self.url_converter(
-                                    name,
-                                    hashed_files,
-                                    template,
-                                    self.get_comment_blocks(
-                                        content,
-                                        include_line_comments=path.endswith(".js"),
-                                    ),
-                                )
-                                try:
-                                    content = pattern.sub(converter, content)
-                                except ValueError as exc:
-                                    yield name, None, exc, False
-                    if hashed_file_exists:
-                        self.delete(hashed_name)
-                    # then save the processed result
+                subs = file_subs.get(name)
+                if subs:
+                    content = original_file.read().decode("utf-8")
+                    content = self._apply_substitutions(content, subs, hashed_files)
                     content_file = ContentFile(content.encode())
-                    if self.keep_intermediate_files:
-                        # Save intermediate file for reference
-                        self._save(hashed_name, content_file)
-                    hashed_name = self.hashed_name(name, content_file)
-
-                    if self.exists(hashed_name):
-                        self.delete(hashed_name)
-
+                    # Use pre-computed hashed name if available (circular deps)
+                    hashed_name = hashed_files.get(hash_key) or self.hashed_name(
+                        name, content_file
+                    )
+                    processed = True
+                else:
+                    hashed_name = self.hashed_name(name, original_file)
+                    if hasattr(original_file, "seek"):
+                        original_file.seek(0)
+                    content_file = original_file
+                    processed = False
+                if not self.exists(hashed_name):
+                    processed = True
                     saved_name = self._save(hashed_name, content_file)
                     hashed_name = self.clean_name(saved_name)
-                    # If the file hash stayed the same, this file didn't change
-                    if old_hashed_name == hashed_name:
-                        substitutions = False
-                    processed = True
-
-                if not processed:
-                    # or handle the case in which neither processing nor
-                    # a change to the original file happened
-                    if not hashed_file_exists:
-                        processed = True
-                        saved_name = self._save(hashed_name, original_file)
-                        hashed_name = self.clean_name(saved_name)
-
-                # and then set the cache accordingly
                 hashed_files[hash_key] = hashed_name
+                yield name, hashed_name, processed
 
-                yield name, hashed_name, processed, substitutions
+    def _sort_adjustable_paths(self, graph):
+        # Topological sort; process and return linear dependencies.
+        sorter = TopologicalSorter(graph)
+        try:
+            sorter.prepare()
+        except CycleError:
+            pass
+
+        processing_order = []
+        while sorter.is_active():
+            node_group = sorter.get_ready()
+            processing_order.extend(node_group)
+            sorter.done(*node_group)
+        return processing_order
+
+    def _scan_substitutions(self, paths, adjustable_paths, hashed_files, file_subs):
+        # Read each adjustable file once, running url patterns to collect
+        # substitutions and build the dependency graph data.
+        for name in adjustable_paths:
+            storage, path = paths[name]
+            with storage.open(path) as f:
+                try:
+                    content = f.read().decode("utf-8")
+                except UnicodeDecodeError as exc:
+                    yield name, None, exc
+            subs = []
+            try:
+                for extension, patterns in self._patterns.items():
+                    if matches_patterns(path, (extension,)):
+                        comment_blocks = self.get_comment_blocks(
+                            content,
+                            include_line_comments=path.endswith(".js"),
+                        )
+                        for pattern, template in patterns:
+                            handler, handler_subs = self._make_url_handler(
+                                name, hashed_files, template, comment_blocks
+                            )
+                            for matchobj in pattern.finditer(content):
+                                handler(matchobj)
+                            subs.extend(handler_subs)
+            except ValueError as exc:
+                yield name, None, exc
+            file_subs[name] = subs
+
+    def _apply_substitutions(self, content, subs, hashed_files):
+        # Apply stored substitutions, updating any hashed filenames that have
+        # changed since the scan (e.g. adjustable files processed before this
+        # one whose final hash differed from the unprocessed hash).
+        for matched, replacement_text, hash_key, old_filename in subs:
+            new_hashed_name = hashed_files.get(hash_key)
+            if new_hashed_name:
+                new_filename = new_hashed_name.split("/")[-1]
+                if new_filename != old_filename:
+                    replacement_text = replacement_text.replace(
+                        old_filename, new_filename
+                    )
+            content = content.replace(matched, replacement_text)
+        return content
+
+    def _calculate_combined_hash(self, circular_nodes, paths, hashed_files, file_subs):
+        # Resolve linear dependencies in circular file contents so the
+        # combined hash changes when any linear dependency changes.
+        circular_contents = {}
+        for name in circular_nodes:
+            storage_inst, path = paths[name]
+            with storage_inst.open(path) as original_file:
+                content = original_file.read().decode("utf-8")
+                subs = file_subs.get(name, [])
+                content = self._apply_substitutions(content, subs, hashed_files)
+                circular_contents[name] = content
+
+        # Calculate a stable hash for all circular dependencies combined
+        combined_content = "".join(circular_contents[name] for name in circular_nodes)
+        combined_file = ContentFile(combined_content.encode())
+        combined_hash = self.file_hash("_combined", combined_file)
+
+        # Register hashed names for circular files using the combined hash.
+        for name in circular_nodes:
+            cleaned_name = self.clean_name(name)
+            hash_key = self.hash_key(cleaned_name)
+            file_path, filename = os.path.split(cleaned_name)
+            root, ext = os.path.splitext(filename)
+            hashed_name = os.path.join(
+                file_path, "%s.%s%s" % (root, combined_hash, ext)
+            )
+            hashed_files[hash_key] = hashed_name
 
     def clean_name(self, name):
         return name.replace("\\", "/")
@@ -478,36 +539,11 @@ class HashedFilesMixin:
             cache_name = self.clean_name(self.hashed_name(name))
         return cache_name
 
-    def stored_name(self, name):
-        cleaned_name = self.clean_name(name)
-        hash_key = self.hash_key(cleaned_name)
-        cache_name = self.hashed_files.get(hash_key)
-        if cache_name:
-            return cache_name
-        # No cached name found, recalculate it from the files.
-        intermediate_name = name
-        for i in range(self.max_post_process_passes + 1):
-            cache_name = self.clean_name(
-                self.hashed_name(name, content=None, filename=intermediate_name)
-            )
-            if intermediate_name == cache_name:
-                # Store the hashed name if there was a miss.
-                self.hashed_files[hash_key] = cache_name
-                return cache_name
-            else:
-                # Move on to the next intermediate file.
-                intermediate_name = cache_name
-        # If the cache name can't be determined after the max number of passes,
-        # the intermediate files on disk may be corrupt; avoid an infinite
-        # loop.
-        raise ValueError("The name '%s' could not be hashed with %r." % (name, self))
-
 
 class ManifestFilesMixin(HashedFilesMixin):
     manifest_version = "1.1"  # the manifest format standard
     manifest_name = "staticfiles.json"
     manifest_strict = True
-    keep_intermediate_files = False
 
     def __init__(self, *args, manifest_storage=None, **kwargs):
         super().__init__(*args, **kwargs)
