@@ -115,7 +115,9 @@ class CursorWrapper:
 
 
 class CursorDebugWrapper(CursorWrapper):
-    # XXX callproc isn't instrumented at this time.
+    def callproc(self, procname, params=None, kparams=None):
+        with self.debug_sql(procname, params):
+            return super().callproc(procname, params, kparams)
 
     def execute(self, sql, params=None):
         with self.debug_sql(sql, params, use_last_executed_query=True):
