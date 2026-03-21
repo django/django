@@ -220,6 +220,19 @@ class AdminActionsTest(TestCase):
         # BookAdmin.get_deleted_objects() returns custom text.
         self.assertContains(response, "a deletable object")
 
+    def test_delete_selected_uses_delete_confirmation_max_objects(self):
+        book = Book.objects.create(name="Test Book")
+        data = {
+            ACTION_CHECKBOX_NAME: [book.pk],
+            "action": "delete_selected",
+            "index": 0,
+        }
+        response = self.client.post(reverse("admin2:admin_views_book_changelist"), data)
+        self.assertContains(response, "a deletable object")
+        self.assertContains(response, "…and 2 more.")
+        self.assertNotContains(response, "another object")
+        self.assertNotContains(response, "last object")
+
     def test_custom_function_mail_action(self):
         """A custom action may be defined in a function."""
         action_data = {
