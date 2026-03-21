@@ -1,7 +1,7 @@
 import re
 
 from django.core.exceptions import ValidationError
-from django.forms.utils import RenderableFieldMixin, pretty_name
+from django.forms.utils import RenderableFieldMixin, pretty_name, widget_has_aria_label
 from django.forms.widgets import MultiWidget, Textarea, TextInput
 from django.utils.functional import cached_property
 from django.utils.html import format_html, html_safe
@@ -295,6 +295,10 @@ class BoundField(RenderableFieldMixin):
             attrs["disabled"] = True
         if not widget.is_hidden and self.errors:
             attrs["aria-invalid"] = "true"
+        if self._should_add_fieldset_aria_labelledby(
+            widget
+        ) and not widget_has_aria_label(widget, attrs):
+            attrs.setdefault("aria-labelledby", f"{self.auto_id}_legend")
         # Preserve aria-describedby provided by the attrs argument so user
         # can set the desired order.
         if not attrs.get("aria-describedby") and not self.use_fieldset:
@@ -327,6 +331,33 @@ class BoundField(RenderableFieldMixin):
         Return the value of this BoundField widget's use_fieldset attribute.
         """
         return self.field.widget.use_fieldset
+
+    @property
+    def use_legend_id(self):
+        """
+        Return whether fieldset legend should have an id for
+        aria-labelledby.
+        """
+        return self._should_add_fieldset_aria_labelledby(self.field.widget)
+
+    @property
+    def legend_tag_with_id(self):
+        """Render a <legend> with id used by fieldset select widgets."""
+        attrs = {"id": f"{self.auto_id}_legend"} if self.auto_id else None
+        return self.legend_tag(attrs=attrs)
+
+    def _should_add_fieldset_aria_labelledby(self, widget):
+        # RelatedFieldWidgetWrapper (admin) stores the real widget on .widget.
+        # Unwrap before checking attributes.
+        widget = getattr(widget, "widget", widget)
+        return (
+            self.use_fieldset
+            and self.auto_id
+            and self.label
+            and not widget.is_hidden
+            and not isinstance(widget, MultiWidget)
+            and getattr(widget, "input_type", None) == "select"
+        )
 
 
 @html_safe

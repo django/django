@@ -186,6 +186,8 @@ class AdminField:
         if not self.is_first:
             classes.append("inline")
         attrs = {"class": " ".join(classes)} if classes else {}
+        if self.is_fieldset and self.field.use_legend_id and self.field.auto_id:
+            attrs.setdefault("id", f"{self.field.auto_id}_legend")
         tag = "legend" if self.is_fieldset else None
         # checkboxes should not have a label suffix as the checkbox appears
         # to the left of the label.

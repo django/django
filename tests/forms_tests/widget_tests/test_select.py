@@ -433,3 +433,99 @@ class SelectTest(ChoiceWidgetTest):
             '<option value="R">Ringo</option></select></div>',
             form.render(),
         )
+
+    def test_fieldset_with_select_aria_labelledby(self):
+        class FieldsetSelect(self.widget):
+            use_fieldset = True
+
+        class TestForm(Form):
+            template_name = "forms_tests/use_fieldset.html"
+            field = ChoiceField(widget=FieldsetSelect, choices=self.beatles)
+
+        form = TestForm()
+        self.assertIs(form.fields["field"].widget.use_fieldset, True)
+        self.assertHTMLEqual(
+            '<div><fieldset><legend id="id_field_legend">Field:</legend>'
+            '<select name="field" aria-labelledby="id_field_legend" id="id_field">'
+            '<option value="J">John</option>  '
+            '<option value="P">Paul</option>'
+            '<option value="G">George</option>'
+            '<option value="R">Ringo</option></select></fieldset></div>',
+            form.render(),
+        )
+
+    def test_fieldset_as_widget_with_aria_label(self):
+        class FieldsetSelect(self.widget):
+            use_fieldset = True
+
+        class TestForm(Form):
+            field = ChoiceField(widget=FieldsetSelect, choices=self.beatles)
+
+        form = TestForm()
+        html = form["field"].as_widget(attrs={"aria-label": "Custom label"})
+        self.assertIn('aria-label="Custom label"', html)
+        self.assertNotIn('aria-labelledby="', html)
+
+    def test_fieldset_as_widget_with_aria_labelledby(self):
+        class FieldsetSelect(self.widget):
+            use_fieldset = True
+
+        class TestForm(Form):
+            field = ChoiceField(widget=FieldsetSelect, choices=self.beatles)
+
+        form = TestForm()
+        html = form["field"].as_widget(attrs={"aria-labelledby": "custom-labelledby"})
+        self.assertIn('aria-labelledby="custom-labelledby"', html)
+        self.assertNotIn('aria-labelledby="id_field_legend"', html)
+
+    def test_fieldset_as_widget_adds_aria_labelledby(self):
+        class FieldsetSelect(self.widget):
+            use_fieldset = True
+
+        class TestForm(Form):
+            field = ChoiceField(widget=FieldsetSelect, choices=self.beatles)
+
+        form = TestForm()
+        html = form["field"].as_widget()
+        self.assertIn('aria-labelledby="id_field_legend"', html)
+
+    def test_fieldset_preserves_custom_aria_labelledby(self):
+        class FieldsetSelect(self.widget):
+            use_fieldset = True
+
+        class TestForm(Form):
+            template_name = "forms_tests/use_fieldset.html"
+            field = ChoiceField(
+                widget=FieldsetSelect(attrs={"aria-labelledby": "custom-label"}),
+                choices=self.beatles,
+            )
+
+        form = TestForm()
+        self.assertHTMLEqual(
+            '<div><fieldset><legend id="id_field_legend">Field:</legend>'
+            '<select name="field" aria-labelledby="custom-label" id="id_field">'
+            '<option value="J">John</option>  '
+            '<option value="P">Paul</option>'
+            '<option value="G">George</option>'
+            '<option value="R">Ringo</option></select></fieldset></div>',
+            form.render(),
+        )
+
+    def test_fieldset_with_empty_label_does_not_add_aria_labelledby(self):
+        class FieldsetSelect(self.widget):
+            use_fieldset = True
+
+        class TestForm(Form):
+            template_name = "forms_tests/use_fieldset.html"
+            field = ChoiceField(widget=FieldsetSelect, choices=self.beatles, label="")
+
+        form = TestForm()
+        self.assertHTMLEqual(
+            "<div><fieldset>"
+            '<select name="field" id="id_field">'
+            '<option value="J">John</option>  '
+            '<option value="P">Paul</option>'
+            '<option value="G">George</option>'
+            '<option value="R">Ringo</option></select></fieldset></div>',
+            form.render(),
+        )
