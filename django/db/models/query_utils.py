@@ -60,7 +60,6 @@ class Q(tree.Node):
             negated=_negated,
         )
         
-    """
     @classmethod
     def create(cls, children=None, connector=None, negated=False):
         obj = cls()
@@ -68,7 +67,6 @@ class Q(tree.Node):
             connector_reprs = ", ".join(f"{conn!r}" for conn in obj.connectors[1:])
             raise ValueError(f"connector must be one of {connector_reprs}, or None.")
         super().create(children=children, connector=connector, negated=negated)
-    """
 
     def _combine(self, other, conn):
         if getattr(other, "conditional", False) is False:
