@@ -1,4 +1,5 @@
 import json
+import warnings
 
 from django import forms
 from django.contrib.admin.utils import (
@@ -51,6 +52,15 @@ class AdminForm:
             {"field": form[field_name], "dependencies": [form[f] for f in dependencies]}
             for field_name, dependencies in prepopulated_fields.items()
         ]
+        if model_admin is None:
+            from django.utils.deprecation import RemovedInDjango70Warning
+
+            warnings.warn(
+                "Passing model_admin=None to AdminForm is deprecated. "
+                "Provide a ModelAdmin instance instead.",
+                category=RemovedInDjango70Warning,
+                stacklevel=2,
+            )
         self.model_admin = model_admin
         if readonly_fields is None:
             readonly_fields = ()
@@ -237,7 +247,19 @@ class AdminReadonlyField:
         self.is_first = is_first
         self.is_checkbox = False
         self.is_readonly = True
-        self.empty_value_display = model_admin.get_empty_value_display()
+        if model_admin is None:
+            from django.contrib.admin.sites import AdminSite
+            from django.utils.deprecation import RemovedInDjango70Warning
+
+            warnings.warn(
+                "Passing model_admin=None to AdminReadonlyField is deprecated. "
+                "Provide a ModelAdmin instance instead.",
+                category=RemovedInDjango70Warning,
+                stacklevel=2,
+            )
+            self.empty_value_display = mark_safe(AdminSite.empty_value_display)
+        else:
+            self.empty_value_display = model_admin.get_empty_value_display()
 
     def label_tag(self):
         attrs = {}
@@ -257,10 +279,15 @@ class AdminReadonlyField:
             remote_field.model._meta.model_name,
         )
         try:
+            current_app = (
+                self.model_admin.admin_site.name
+                if self.model_admin is not None
+                else None
+            )
             url = reverse(
                 url_name,
                 args=[quote(remote_obj.pk)],
-                current_app=self.model_admin.admin_site.name,
+                current_app=current_app,
             )
             return format_html('<a href="{}">{}</a>', url, remote_obj)
         except NoReverseMatch:
