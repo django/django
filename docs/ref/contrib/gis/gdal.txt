@@ -1049,10 +1049,76 @@ coordinate transformation:
 Coordinate System Objects
 =========================
 
+``AxisOrder``
+-------------
+
+.. class:: AxisOrder
+
+    An enumeration to control the axis order strategy of a
+    :class:`SpatialReference`. Corresponds to GDAL's
+    ``OSRAxisMappingStrategy``.
+
+    .. attribute:: TRADITIONAL
+
+        Maintains the traditional GIS axis order (longitude, latitude), which
+        was the default behavior prior to GDAL 3. This is the default in
+        Django.
+
+    .. attribute:: AUTHORITY
+
+        Honors the axis ordering defined by the authority (e.g. EPSG). For
+        ``EPSG:4326`` (WGS 84), the authority defines the axis order as
+        (latitude, longitude), which is the default in GDAL 3.
+
+.. note::
+
+    GDAL 3 changed the default axis ordering strategy to honor the authority
+    axis order. For ``EPSG:4326`` (WGS 84), this means coordinates are
+    interpreted as (latitude, longitude) instead of the traditional GIS
+    (longitude, latitude) order. Django uses ``AxisOrder.TRADITIONAL`` by
+    default to preserve backwards-compatible behavior. If you need to use
+    the authority axis order (e.g. when working with systems that
+    follow the EPSG convention), pass ``axis_order=AxisOrder.AUTHORITY`` to
+    :class:`SpatialReference`. See :ref:`gdal-axis-order` for examples.
+
+.. _gdal-axis-order:
+
+Axis Order and GDAL 3
+---------------------
+
+GDAL 3 introduced a change in the default axis ordering strategy. Previously,
+GDAL always used traditional GIS ordering (longitude, latitude). GDAL 3 now
+honors the axis order defined by the authority, so ``EPSG:4326`` is interpreted
+as (latitude, longitude).
+
+Django defaults to ``AxisOrder.TRADITIONAL`` to preserve existing behavior.
+To transform a geometry using the authority axis ordering strategy (as GDAL 3
+defines by default), use ``AxisOrder.AUTHORITY`` when creating a
+:class:`SpatialReference`::
+
+    from django.contrib.gis.gdal import AxisOrder, CoordTransform, SpatialReference
+
+    # Source SRS using authority axis order (latitude, longitude for EPSG:4326)
+    source = SpatialReference(4326, axis_order=AxisOrder.AUTHORITY)
+    # Target SRS
+    target = SpatialReference(3857, axis_order=AxisOrder.AUTHORITY)
+    ct = CoordTransform(source, target)
+    # Now transform a geometry using the authority axis strategy
+    geom.transform(ct)
+
+If you want to preserve the traditional GIS axis order (longitude, latitude),
+use the default ``AxisOrder.TRADITIONAL`` (or omit the ``axis_order``
+argument entirely)::
+
+    source = SpatialReference(4326)  # defaults to AxisOrder.TRADITIONAL
+    target = SpatialReference(3857)
+    ct = CoordTransform(source, target)
+    geom.transform(ct)
+
 ``SpatialReference``
 --------------------
 
-.. class:: SpatialReference(srs_input)
+.. class:: SpatialReference(srs_input, axis_order=None)
 
     Spatial reference objects are initialized on the given ``srs_input``,
     which may be one of the following:
@@ -1062,6 +1128,10 @@ Coordinate System Objects
     * PROJ string
     * A shorthand string for well-known standards (``'WGS84'``, ``'WGS72'``,
       ``'NAD27'``, ``'NAD83'``)
+
+    The optional ``axis_order`` parameter accepts an :class:`AxisOrder`
+    instance and controls how GDAL interprets axis ordering for this spatial
+    reference. Defaults to ``AxisOrder.TRADITIONAL``.
 
     Example:
 
