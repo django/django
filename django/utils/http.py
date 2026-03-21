@@ -362,7 +362,12 @@ def parse_header_parameters(line, max_length=MAX_HEADER_LENGTH):
                 value = value.replace("\\\\", "\\").replace('\\"', '"')
             if has_encoding:
                 encoding, lang, value = value.split("'")
-                value = unquote(value, encoding=encoding)
+                try:
+                    value = unquote(value, encoding=encoding)
+                except (LookupError, UnicodeDecodeError):
+                    raise ValueError(
+                        f"Invalid encoding '{encoding}' in Content-Type parameter."
+                    )
             pdict[name] = value
     return key, pdict
 
