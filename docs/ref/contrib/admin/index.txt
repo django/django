@@ -1386,11 +1386,11 @@ default templates used by the :class:`ModelAdmin` views:
     for displaying a confirmation page when deleting one or more objects. See
     the :doc:`actions documentation</ref/contrib/admin/actions>`.
 
-.. attribute:: ModelAdmin.delete_confirmation_max_objects
+.. attribute:: ModelAdmin.delete_confirmation_max_display
 
     .. versionadded:: 6.1
 
-    Set ``delete_confirmation_max_objects`` to control how many objects are
+    Set ``delete_confirmation_max_display`` to control how many objects are
     displayed on the delete confirmation pages before truncating the remainder
     with an ellipsis.
 
@@ -2299,7 +2299,7 @@ adds some of its own (the shared features are actually defined in the
 - :attr:`~ModelAdmin.fieldsets`
 - :attr:`~ModelAdmin.fields`
 - :attr:`~ModelAdmin.formfield_overrides`
-- :attr:`~ModelAdmin.delete_confirmation_max_objects`
+- :attr:`~ModelAdmin.delete_confirmation_max_display`
 - :attr:`~ModelAdmin.exclude`
 - :attr:`~ModelAdmin.filter_horizontal`
 - :attr:`~ModelAdmin.filter_vertical`

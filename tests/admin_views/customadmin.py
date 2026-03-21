@@ -60,7 +60,7 @@ class CustomPwdTemplateUserAdmin(UserAdmin):
 
 
 class BookAdmin(admin.ModelAdmin):
-    delete_confirmation_max_objects = 1
+    delete_confirmation_max_display = 1
 
     def get_deleted_objects(self, objs, request):
         return (

@@ -1091,18 +1091,18 @@ class ModelAdminChecks(BaseModelAdminChecks):
             return []
 
     def _check_delete_confirmation_max_objects(self, obj):
-        """Check that delete_confirmation_max_objects is
+        """Check that delete_confirmation_max_display is
         a non-negative integer or None."""
 
-        if obj.delete_confirmation_max_objects is None:
+        if obj.delete_confirmation_max_display is None:
             return []
         if (
-            not isinstance(obj.delete_confirmation_max_objects, int)
-            or obj.delete_confirmation_max_objects < 0
+            not isinstance(obj.delete_confirmation_max_display, int)
+            or obj.delete_confirmation_max_display < 0
         ):
             return must_be(
                 "a non-negative integer or None",
-                option="delete_confirmation_max_objects",
+                option="delete_confirmation_max_display",
                 obj=obj,
                 id="admin.E131",
             )
