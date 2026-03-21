@@ -43,6 +43,16 @@ def add_template_response(request, message_type):
 
 
 @never_cache
+def add_template_response_extra(request, message_type):
+    is_perm = request.POST.getlist("permanent")
+    for idx, msg in enumerate(request.POST.getlist("messages")):
+        getattr(messages, message_type)(
+            request, msg, extra_kwargs={"permanent": is_perm[idx] == "True"}
+        )
+    return HttpResponseRedirect(reverse("show_template_response"))
+
+
+@never_cache
 def show(request):
     template = engines["django"].from_string(TEMPLATE)
     return HttpResponse(template.render(request=request))
@@ -84,6 +94,11 @@ urlpatterns = [
         "^template_response/add/(debug|info|success|warning|error)/$",
         add_template_response,
         name="add_template_response",
+    ),
+    re_path(
+        "^template_response_extra/add/(debug|info|success|warning|error)/$",
+        add_template_response_extra,
+        name="add_template_response_extra",
     ),
     path(
         "template_response/show/", show_template_response, name="show_template_response"
