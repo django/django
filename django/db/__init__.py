@@ -1,3 +1,5 @@
+import os
+
 from django.core import signals
 from django.db.utils import (
     DEFAULT_DB_ALIAS,
@@ -61,3 +63,23 @@ def close_old_connections(**kwargs):
 
 signals.request_started.connect(close_old_connections)
 signals.request_finished.connect(close_old_connections)
+
+
+# After fork, the child inherits the parent's DB connection objects. The
+# underlying sockets/FDs are shared with the parent, so using them from both
+# processes corrupts the communication.
+def _reset_connections_after_fork():
+    for conn in connections.all(initialized_only=True):
+        pool_dict = getattr(type(conn), "_connection_pools", None)
+        if pool_dict is not None:
+            pool_dict.clear()
+
+    for alias in connections:
+        try:
+            delattr(connections._connections, alias)
+        except AttributeError:
+            pass
+
+
+if hasattr(os, "register_at_fork"):
+    os.register_at_fork(after_in_child=_reset_connections_after_fork)
