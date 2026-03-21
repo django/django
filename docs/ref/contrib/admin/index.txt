@@ -1395,12 +1395,12 @@ default templates used by the :class:`ModelAdmin` views:
     with an ellipsis.
 
     The limit applies per relationship depth, so a maximum
-    of 20 allows up to 20 objects at each depth level of the relationship hierarchy,
-    and is purely a display setting that does not affect the total number of
-    objects retrieved from the database.
+    of 20 allows up to 20 objects at each depth level of the relationship
+    hierarchy, and is purely a display setting that does not affect the
+    total number of objects retrieved from the database.
 
-    This applies to both :meth:`delete_view` and the ``delete_selected`` action.
-    By default, this is ``None`` (no truncation).
+    This applies to both :meth:`delete_view` and the ``delete_selected``
+    action. By default, this is ``None`` (no truncation).
 
 .. attribute:: ModelAdmin.object_history_template
 
