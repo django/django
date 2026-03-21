@@ -1948,3 +1948,109 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
             DTModel.objects.annotate(
                 hour_melb=Trunc("start_time", "hour", tzinfo=melb),
             ).get()
+
+    def test_trunc_in_filter(self):
+        """
+        When TruncSecond is used in a filter it can behave unexpectedly
+        because the function at the database level returns a timezone-naive
+        value. The documentation at docs/ref/models/database-functions.txt
+        describes the problem and provides a work-around in specific cases.
+        """
+        # UTC: No adjustment required to filtering for TruncSecond
+        now = timezone.now()
+        two_hours = datetime.timedelta(hours=2)
+        later = now + two_hours
+        non_utc_model = self.create_model(now, later)
+        models_qs = DTModel.objects.annotate(
+            start_trunc=TruncSecond("start_datetime")
+        ).filter(id=non_utc_model.id, start_trunc__lte=now)
+        self.assertEqual(models_qs.count(), 1)
+        test_timezones = [
+            zoneinfo.ZoneInfo("Europe/Berlin"),
+            zoneinfo.ZoneInfo("Australia/Melbourne"),
+        ]
+        for test_tz in test_timezones:
+            with timezone.override(test_tz):
+                now = timezone.now()
+                later = now + two_hours
+                non_utc_model = self.create_model(now, later)
+                models_qs = DTModel.objects.annotate(
+                    start_trunc=TruncSecond("start_datetime")
+                ).filter(id=non_utc_model.id, start_trunc__lte=now)
+                self.assertNotEqual(models_qs.count(), 1)
+                adjusted_now = timezone.localtime(now).replace(
+                    tzinfo=zoneinfo.ZoneInfo(key="UTC")
+                )
+                models_qs = DTModel.objects.annotate(
+                    start_trunc=TruncSecond("start_datetime")
+                ).filter(id=non_utc_model.id, start_trunc__lte=adjusted_now)
+                self.assertEqual(models_qs.count(), 1)
+
+
+class Ticket34699Tests(TestCase):
+    def test_docs_example(self):
+        self.assertSequenceEqual(DTModel.objects.all(), [])
+
+        dt = datetime.datetime(2015, 6, 15, 14, 30, 50, 321, zoneinfo.ZoneInfo("UTC"))
+        # From the docs: Given the datetime 2015-06-15 14:30:50.000321+00:00...
+        docs_dt = "2015-06-15T14:30:50.000321+00:00"
+        self.assertEqual(dt.isoformat(), docs_dt)
+
+        utc = {
+            "year": "2015-01-01T00:00:00+00:00",
+            "quarter": "2015-04-01T00:00:00+00:00",
+            "month": "2015-06-01T00:00:00+00:00",
+            "week": "2015-06-15T00:00:00+00:00",
+            "day": "2015-06-15T00:00:00+00:00",
+            "hour": "2015-06-15T14:00:00+00:00",
+            "minute": "2015-06-15T14:30:00+00:00",
+            "second": "2015-06-15T14:30:50+00:00",
+        }
+        melbourne = {
+            "year": "2015-01-01T00:00:00+11:00",
+            "quarter": "2015-04-01T00:00:00+11:00",
+            "month": "2015-06-01T00:00:00+10:00",
+            "week": "2015-06-15T00:00:00+10:00",
+            "day": "2015-06-16T00:00:00+10:00",
+            "hour": "2015-06-16T00:00:00+10:00",
+            "minute": "2015-06-16T00:30:00+10:00",
+            "second": "2015-06-16T00:30:50+10:00",
+        }
+        for tz, cases in [("UTC", utc), ("Australia/Melbourne", melbourne)]:
+            for kind, expected in cases.items():
+                with (
+                    self.settings(USE_TZ=True, TIME_ZONE="UTC"),
+                    self.subTest(kind=kind, tz=tz, with_tzinfo=True),
+                ):
+                    test_zone = zoneinfo.ZoneInfo(tz)
+                    instance = DTModel.objects.create(start_datetime=dt)
+                    self.assertEqual(instance.start_datetime.isoformat(), docs_dt)
+
+                    result = DTModel.objects.annotate(
+                        truncated=Trunc(
+                            "start_datetime",
+                            kind,
+                            output_field=DateTimeField(),
+                            tzinfo=test_zone,
+                        )
+                    ).get()
+                    self.assertEqual(result.truncated.isoformat(), expected)
+
+                DTModel.objects.all().delete()
+        for tz, cases in [("UTC", utc), ("Australia/Melbourne", melbourne)]:
+            for kind, expected in cases.items():
+                with (
+                    self.settings(USE_TZ=True, TIME_ZONE=tz),
+                    self.subTest(kind=kind, tz=tz, with_tzinfo=False),
+                ):
+                    instance = DTModel.objects.create(start_datetime=dt)
+                    self.assertEqual(instance.start_datetime.isoformat(), docs_dt)
+
+                    result = DTModel.objects.annotate(
+                        truncated=Trunc(
+                            "start_datetime", kind, output_field=DateTimeField()
+                        )
+                    ).get()
+                    self.assertEqual(result.truncated.isoformat(), expected)
+
+                DTModel.objects.all().delete()
