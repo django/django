@@ -209,7 +209,6 @@ def punycode(domain):
     """Return the Punycode of the given domain if it's non-ASCII."""
     return domain.encode("idna").decode("ascii")
 
-
 def repercent_broken_unicode(path):
     """
     As per RFC 3987 Section 3.2, step three of converting a URI into an IRI,
@@ -217,17 +216,31 @@ def repercent_broken_unicode(path):
     UTF-8 octet sequence.
     """
     changed_parts = []
+    indices_to_replace = []
+    faulty_strings = []
+    DELIMETER = b'#'
     while True:
         try:
             path.decode()
         except UnicodeDecodeError as e:
             # CVE-2019-14235: A recursion shouldn't be used since the exception
             # handling uses massive amounts of memory
-            repercent = quote(path[e.start : e.end], safe=b"/#%[]=:;$&()+,!?*@'~")
-            changed_parts.append(path[: e.start] + repercent.encode())
+            changed_parts.append(path[: e.start])
+            changed_parts.append(None)
+            indices_to_replace.append(len(changed_parts) - 1)
+            faulty_strings.append(path[e.start : e.end])
+
             path = path[e.end :]
         else:
-            return b"".join(changed_parts) + path
+            safe_strings = quote(DELIMETER.join(faulty_strings), safe=b"/#%[]=:;$&()+,!?*@'~")
+            safe_strings = safe_strings.encode()
+            safe_strings = safe_strings.split(DELIMETER)
+
+            for idx, changed_part_idx in enumerate(indices_to_replace):
+                changed_parts[changed_part_idx] = safe_strings[idx]
+
+            changed_parts.append(path)
+            return b"".join(changed_parts)
 
 
 def filepath_to_uri(path):
