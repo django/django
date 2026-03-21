@@ -1,4 +1,4 @@
-<p class="datetime">
-  <label {% if widget.attrs.id %}for="{{ widget.subwidgets.0.attrs.id }}"{% endif %}>{{ date_label }}</label> {% with widget=widget.subwidgets.0 %}{% include widget.template_name %}{% endwith %}<br>
-  <label {% if widget.attrs.id %}for="{{ widget.subwidgets.1.attrs.id }}"{% endif %}>{{ time_label }}</label> {% with widget=widget.subwidgets.1 %}{% include widget.template_name %}{% endwith %}
-</p>
+<div class="datetime">
+  <div><label {% if widget.attrs.id %}for="{{ widget.subwidgets.0.attrs.id }}"{% endif %}{% if widget.required %} class="required"{% endif %}>{{ date_label }}</label> {% with widget=widget.subwidgets.0 %}{% include widget.template_name %}{% endwith %}</div>
+  <div><label {% if widget.attrs.id %}for="{{ widget.subwidgets.1.attrs.id }}"{% endif %}{% if widget.required %} class="required"{% endif %}>{{ time_label }}</label> {% with widget=widget.subwidgets.1 %}{% include widget.template_name %}{% endwith %}</div>
+</div>
