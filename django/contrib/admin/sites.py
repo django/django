@@ -9,6 +9,7 @@ from django.contrib.admin.options import EMPTY_VALUE_STRING
 from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_not_required
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.base import ModelBase
 from django.http import Http404, HttpResponsePermanentRedirect, HttpResponseRedirect
@@ -333,10 +334,15 @@ class AdminSite:
         For sites running on a subpath, use the SCRIPT_NAME value if site_url
         hasn't been customized.
         """
-        script_name = request.META["SCRIPT_NAME"]
-        site_url = (
-            script_name if self.site_url == "/" and script_name else self.site_url
-        )
+        if self.site_url != "/":
+            site_url = self.site_url
+        else:
+            script_name = request.META["SCRIPT_NAME"]
+            site_url = (
+                script_name
+                if script_name
+                else f"{request.scheme}/{get_current_site(request)}"
+            )
         return {
             "site_title": self.site_title,
             "site_header": self.site_header,
