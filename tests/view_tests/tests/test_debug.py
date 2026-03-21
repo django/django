@@ -1604,6 +1604,13 @@ class ExceptionReporterFilterTests(
         "MY_AUTH",
     ]
 
+    sensitive_post_parameters = [
+        "password",
+        "old_password",
+        "new_password1",
+        "new_password2",
+    ]
+
     def test_non_sensitive_request(self):
         """
         Everything (request info and frame variables) can bee seen
@@ -1832,6 +1839,19 @@ class ExceptionReporterFilterTests(
                     self.assertNotContains(
                         response, "should not be displayed", status_code=500
                     )
+
+    def test_sensitive_post_parameters(self):
+        """
+        The debug page should not show some POST sensitive parameter
+        (password, old_password, new_password1, new_password2).
+        """
+        data = {"password": "pass123", "old-password": "old-pass1234"}
+        for setting in self.sensitive_post_parameters:
+            with self.subTest(setting=setting):
+                with self.settings(DEBUG=True, **{setting: "should not be displayed"}):
+                    response = self.client.post("/raises/", data)
+                    self.assertNotContains(response, "pass123", status_code=500)
+                    self.assertNotContains(response, "old-pass1234", status_code=500)
 
     def test_settings_with_sensitive_keys(self):
         """
