@@ -2299,6 +2299,7 @@ adds some of its own (the shared features are actually defined in the
 - :attr:`~ModelAdmin.fieldsets`
 - :attr:`~ModelAdmin.fields`
 - :attr:`~ModelAdmin.formfield_overrides`
+- :attr:`~ModelAdmin.delete_confirmation_max_objects`
 - :attr:`~ModelAdmin.exclude`
 - :attr:`~ModelAdmin.filter_horizontal`
 - :attr:`~ModelAdmin.filter_vertical`
