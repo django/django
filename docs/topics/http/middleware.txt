@@ -154,7 +154,9 @@ Other middleware hooks
 ======================
 
 Besides the basic request/response middleware pattern described earlier, you
-can add three other special methods to class-based middleware:
+can add three other special methods to class-based middleware. These hooks can
+also be added as attributes on the callable returned by a function-based
+middleware factory:
 
 .. _view-middleware:
 
