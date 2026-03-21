@@ -84,6 +84,14 @@
 
     <div class="main" id="main">
       {% if not is_popup and is_nav_sidebar_enabled %}
+        <script>
+            {
+              const ls = localStorage.getItem('django.admin.navSidebarIsOpen');
+              if (ls === null || ls === 'true') {
+                document.getElementById('main').classList.add('shifted');
+              }
+            }
+          </script>
         {% block nav-sidebar %}
           {% include "admin/nav_sidebar.html" %}
         {% endblock %}
