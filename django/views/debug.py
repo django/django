@@ -119,6 +119,9 @@ class SafeExceptionReporterFilter:
     hidden_settings = _lazy_re_compile(
         "API|AUTH|TOKEN|KEY|SECRET|PASS|SIGNATURE|HTTP_COOKIE", flags=re.I
     )
+    hidden_post_parameters = _lazy_re_compile(
+        "password|old_password|new_password1|new_password2", flags=re.I
+    )
 
     def cleanse_setting(self, key, value):
         """
@@ -210,6 +213,7 @@ class SafeExceptionReporterFilter:
             sensitive_post_parameters = getattr(
                 request, "sensitive_post_parameters", []
             )
+
             if self.is_active(request) and sensitive_post_parameters:
                 cleansed = request.POST.copy()
                 if sensitive_post_parameters == "__ALL__":
@@ -224,7 +228,11 @@ class SafeExceptionReporterFilter:
                             cleansed[param] = self.cleansed_substitute
                     return cleansed
             else:
-                return request.POST
+                cleansed = request.POST.copy()
+                for param in cleansed:
+                    if self.hidden_post_parameters.search(param):
+                        cleansed[param] = self.cleansed_substitute
+                return cleansed
 
     def cleanse_special_types(self, request, value):
         try:
