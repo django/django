@@ -2260,6 +2260,22 @@ class CommandTypes(AdminScriptTestCase):
         # Test connections have been closed
         self.assertTrue(mock_connections.close_all.called)
 
+    def test_run_from_argv_logs_non_command_error_exceptions(self):
+        """
+        Non-CommandError exceptions raised in management commands are logged.
+        """
+
+        def raise_type_error(*args, **kwargs):
+            raise TypeError("Some unexpected error")
+
+        command = BaseCommand(stderr=StringIO())
+        command.execute = raise_type_error
+
+        with self.assertLogs("django.core.management", level="ERROR") as cm:
+            with self.assertRaises(TypeError):
+                command.run_from_argv(["manage.py", "somecommand"])
+        self.assertIn("Error executing management command 'somecommand'.", cm.output[0])
+
     def test_noargs(self):
         "NoArg Commands can be executed"
         args = ["noargs_command"]

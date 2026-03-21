@@ -4,6 +4,7 @@ be executed through ``django-admin`` or ``manage.py``).
 """
 
 import argparse
+import logging
 import os
 import sys
 from argparse import ArgumentParser, HelpFormatter
@@ -16,6 +17,8 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.utils.version import PY314, PY315
+
+logger = logging.getLogger("django.core.management")
 
 ALL_CHECKS = "__all__"
 
@@ -430,6 +433,9 @@ class BaseCommand:
             else:
                 self.stderr.write("%s: %s" % (e.__class__.__name__, e))
             sys.exit(e.returncode)
+        except Exception:
+            logger.exception("Error executing management command '%s'.", argv[1])
+            raise
         finally:
             try:
                 connections.close_all()
