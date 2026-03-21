@@ -53,14 +53,23 @@ class Q(tree.Node):
     connectors = (None, AND, OR, XOR)
 
     def __init__(self, *args, _connector=None, _negated=False, **kwargs):
-        if _connector not in self.connectors:
-            connector_reprs = ", ".join(f"{conn!r}" for conn in self.connectors[1:])
-            raise ValueError(f"_connector must be one of {connector_reprs}, or None.")
+        self._check_connector(_connector)
         super().__init__(
             children=[*args, *sorted(kwargs.items())],
             connector=_connector,
             negated=_negated,
         )
+
+    @classmethod
+    def create(cls, children=None, connector=None, negated=False):
+        cls._check_connector(connector)
+        return super().create(children=children, connector=connector, negated=negated)
+
+    @classmethod
+    def _check_connector(cls, connector):
+        if connector not in cls.connectors:
+            connector_reprs = ", ".join(f"{conn!r}" for conn in cls.connectors[1:])
+            raise ValueError(f"connector must be one of {connector_reprs}, or None.")
 
     def _combine(self, other, conn):
         if getattr(other, "conditional", False) is False:
