@@ -6,6 +6,7 @@ User authentication in Django
    :hidden:
 
    default
+   user_profile
    passwords
    customizing
 
@@ -83,6 +84,8 @@ Usage
 * :ref:`Managing users in the admin <auth-admin>`
 
 :doc:`API reference for the default implementation </ref/contrib/auth>`
+
+:doc:`User profile models </topics/auth/user_profile>`
 
 :doc:`Customizing Users and authentication </topics/auth/customizing>`
 
