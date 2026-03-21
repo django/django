@@ -59,6 +59,9 @@
         },
         // Add a warning when the time zone in the browser and backend do not match.
         addTimezoneWarning: function(inp) {
+            const isDatetime = inp.closest('div.datetime');
+            const fieldBody = isDatetime ? inp.parentNode.parentNode : inp.parentNode;
+            const container = fieldBody.parentNode;
             const warningClass = DateTimeShortcuts.timezoneWarningClass;
             let timezoneOffset = DateTimeShortcuts.timezoneOffset / 3600;
 
@@ -68,7 +71,7 @@
             }
 
             // Check if warning is already there.
-            if (inp.parentNode.parentNode.querySelectorAll('.' + warningClass).length) {
+            if (container.querySelectorAll('.' + warningClass).length) {
                 return;
             }
 
@@ -92,15 +95,15 @@
 
             const warning = document.createElement('div');
             const id = inp.id;
-            const field_id = inp.closest('p.datetime') ? id.slice(0, id.lastIndexOf("_")) : id;
+            const field_id = isDatetime ? id.slice(0, id.lastIndexOf("_")) : id;
             warning.classList.add('help', warningClass);
             warning.id = `${field_id}_timezone_warning_helptext`;
             warning.textContent = message;
-            const errorList = inp.parentNode.parentNode.querySelector('ul.errorlist');
+            const errorList = container.querySelector('ul.errorlist');
             if (errorList) {
                 errorList.before(warning);
             } else {
-                inp.parentNode.before(warning);
+                fieldBody.before(warning);
             }
         },
         // Add clock widget to a given field
