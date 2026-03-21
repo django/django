@@ -1591,6 +1591,29 @@ class RelatedQueryNameClashWithManagerTests(SimpleTestCase):
             ],
         )
 
+    def test_clash_btwn_rel_name_and_manager_non_self_referential(self):
+        class Thing(models.Model):
+            items = models.Manager()
+
+        class Item(models.Model):
+            thing = models.ForeignKey(Thing, models.CASCADE, related_name="items")
+
+        self.assertEqual(
+            Item.check(),
+            [
+                Error(
+                    "Related name 'items' for 'Item.thing' clashes with the name of a "
+                    "model manager.",
+                    hint=(
+                        "Rename the model manager or change the related_name argument "
+                        "in the definition for field 'Item.thing'."
+                    ),
+                    obj=Item._meta.get_field("thing"),
+                    id="fields.E348",
+                )
+            ],
+        )
+
 
 @isolate_apps("invalid_models_tests")
 class SelfReferentialM2MClashTests(SimpleTestCase):
