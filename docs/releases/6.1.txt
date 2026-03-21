@@ -309,6 +309,10 @@ Models
   :class:`~django.db.models.query.QuerySet` is ordered and the ordering is
   deterministic.
 
+* The new :attr:`DecimalField.context <django.db.models.DecimalField.context>`
+  attribute allows customizing the creation of  ``Decimal`` instances from
+  floats.
+
 Pagination
 ~~~~~~~~~~
 
