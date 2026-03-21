@@ -723,7 +723,7 @@ class ForeignObject(RelatedField):
         errors = []
         manager_names = {manager.name for manager in self.opts.managers}
         for rel_objs in self.model._meta.related_objects:
-            related_object_name = rel_objs.name
+            related_object_name = rel_objs.accessor_name
             if related_object_name in manager_names:
                 field_name = f"{self.model._meta.object_name}.{self.name}"
                 errors.append(
