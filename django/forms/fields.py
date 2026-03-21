@@ -965,7 +965,7 @@ class MultipleChoiceField(ChoiceField):
         if self.required and not value:
             raise ValidationError(self.error_messages["required"], code="required")
         # Validate that each value in the value list is in self.choices.
-        for val in value:
+        for val in set(value):
             if not self.valid_value(val):
                 raise ValidationError(
                     self.error_messages["invalid_choice"],
