@@ -53,7 +53,7 @@ legend, label {
 }
 
 .required legend, legend.required,
-.required label, label.required {
+.required label, label.required, span.required {
     font-weight: bold;
 }
 
@@ -116,7 +116,7 @@ fieldset .inline-heading,
     padding: 0.5rem 0;
 }
 
-.aligned label + p, .aligned .checkbox-row + div.help, .aligned label + div.readonly {
+.aligned .checkbox-row + div.help, .aligned label + div.readonly {
     padding: 6px 0;
     margin-top: 0;
     margin-bottom: 0;
@@ -402,6 +402,11 @@ body.popup .submit-row {
 
 .inline-group .tabular td {
     font-size: 1rem;
+}
+
+.inline-group .tabular td div:not(.help),
+.inline-group .tabular td a {
+    font-size: 0.8125rem;
 }
 
 .inline-group .tabular td.original p {
