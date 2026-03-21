@@ -1390,8 +1390,6 @@ default templates used by the :class:`ModelAdmin` views:
 
     .. versionadded:: 6.1
 
-        Added the ``delete_confirmation_max_objects`` attribute.
-
     Set ``delete_confirmation_max_objects`` to control how many objects are
     displayed on the delete confirmation pages before truncating the remainder
     with an ellipsis.
