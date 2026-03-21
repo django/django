@@ -2292,6 +2292,10 @@ adds some of its own (the shared features are actually defined in the
 - :meth:`~ModelAdmin.get_queryset`
 - :attr:`~ModelAdmin.radio_fields`
 - :attr:`~ModelAdmin.readonly_fields`
+- :attr:`~ModelAdmin.sortable_by`
+- :attr:`~ModelAdmin.view_on_site`
+- :attr:`~ModelAdmin.empty_value_display`
+- :attr:`~ModelAdmin.autocomplete_fields`
 - :attr:`~InlineModelAdmin.raw_id_fields`
 - :meth:`~ModelAdmin.formfield_for_choice_field`
 - :meth:`~ModelAdmin.formfield_for_foreignkey`
