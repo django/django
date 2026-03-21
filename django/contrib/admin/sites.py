@@ -346,6 +346,7 @@ class AdminSite:
             "is_popup": False,
             "is_nav_sidebar_enabled": self.enable_nav_sidebar,
             "log_entries": self.get_log_entries(request),
+            "server_timezone": settings.TIME_ZONE,
         }
 
     def password_change(self, request, extra_context=None):
