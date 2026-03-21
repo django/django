@@ -3715,6 +3715,36 @@ class OperationTests(OperationTestBase):
             operation.describe(), "Alter unique_together for Pony (0 constraint(s))"
         )
 
+    def test_alter_unique_together_deferred(self):
+        """
+        AlterUniqueTogether handles deferred SQL constraints from previous
+        operations. Regression test for #31317.
+        """
+        app_label = "test_aluntod"
+        self.apply_operations(
+            app_label,
+            ProjectState(),
+            operations=[
+                migrations.CreateModel(
+                    "Pony",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                        ("pink", models.IntegerField(default=3)),
+                        ("weight", models.FloatField()),
+                    ],
+                    options={"unique_together": {("pink",)}},
+                ),
+                migrations.AlterUniqueTogether(
+                    name="Pony",
+                    unique_together={("pink", "weight")},
+                ),
+            ],
+        )
+
+        table_name = f"{app_label}_pony"
+        self.assertUniqueConstraintExists(table_name, ("pink", "weight"), value=True)
+        self.assertUniqueConstraintExists(table_name, ("pink",), value=False)
+
     @skipUnlessDBFeature("allows_multiple_constraints_on_same_fields")
     def test_remove_unique_together_on_pk_field(self):
         app_label = "test_rutopkf"
