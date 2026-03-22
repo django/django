@@ -2120,8 +2120,8 @@ interface to your database. You can access your database via other tools,
 programming languages or database frameworks; there's nothing Django-specific
 about your database.
 
-Using Django ORM with multiprocessing
--------------------------------------
+Using multiprocessing with Django
+--------------------------------
 
 When using Python's ``multiprocessing`` module with Django, each process
 must establish its own database connection. Database connections should
@@ -2130,13 +2130,13 @@ not be shared across processes created with ``fork()``.
 To ensure this, close existing connections before spawning child
 processes::
 
-    from django.db import close_old_connections
+    from django.db import connections
 
-    close_old_connections()
+    for conn in connections.all():
+        conn.close()
 
 This allows each child process to create a fresh database connection
-when interacting with the ORM.
-
+when interacting with the database.
 
 
 
