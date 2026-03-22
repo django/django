@@ -801,6 +801,12 @@ def firstof(parser, token):
     if len(bits) >= 2 and bits[-2] == "as":
         asvar = bits[-1]
         bits = bits[:-2]
+    if not bits:
+        raise TemplateSyntaxError(
+            "'firstof' statement requires at least one argument before 'as'"
+            if asvar
+            else "'firstof' statement requires at least one argument"
+        )
     return FirstOfNode([parser.compile_filter(bit) for bit in bits], asvar)
 
 

@@ -88,3 +88,11 @@ class FirstOfTagTests(SimpleTestCase):
         output = self.engine.render_to_string("firstof16", ctx)
         self.assertEqual(ctx["myvar"], "")
         self.assertEqual(output, "")
+
+    @setup({"firstof17": "{% firstof as myvar %}"})
+    def test_no_arguments_with_asvar(self):
+        with self.assertRaisesMessage(
+            TemplateSyntaxError,
+            "'firstof' statement requires at least one argument before 'as'",
+        ):
+            self.engine.get_template("firstof17")
