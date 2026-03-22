@@ -19,7 +19,7 @@ there; otherwise, they can be added to a new app. When a Django app is added
 to :setting:`INSTALLED_APPS`, any tags it defines in the conventional location
 described below are automatically made available to load within templates.
 
-The app should contain a ``templatetags`` directory, at the same level as
+The Django app should contain a ``templatetags`` directory, at the same level as
 ``models.py``, ``views.py``, etc. If this doesn't already exist, create it -
 don't forget the ``__init__.py`` file to ensure the directory is treated as a
 Python package.
