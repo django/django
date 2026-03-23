@@ -47,6 +47,7 @@ from django.test import (
 from django.utils import timezone
 
 from ..models import Author, DTModel, Fan
+from django.test import skipUnlessDBFeature
 
 
 def truncate_to(value, kind, tzinfo=None):
@@ -1948,3 +1949,24 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
             DTModel.objects.annotate(
                 hour_melb=Trunc("start_time", "hour", tzinfo=melb),
             ).get()
+
+    @skipUnlessDBFeature("supports_timezones")
+    def test_trunc_day_filter_with_timezone(self):
+        import datetime
+        from django.db.models.functions import TruncDay
+        import zoneinfo
+
+        tz = zoneinfo.ZoneInfo("Europe/Berlin")
+
+        DTModel.objects.create(
+            start_datetime=datetime.datetime(2018, 10, 24, 5, 13, tzinfo=tz),
+            end_datetime=datetime.datetime(2018, 10, 24, 6, 0, tzinfo=tz),
+        )
+
+        qs = DTModel.objects.annotate(
+            day=TruncDay("start_datetime", tzinfo=tz)
+        ).filter(
+            day=datetime.datetime(2018, 10, 24, tzinfo=tz)
+        )
+
+        self.assertEqual(qs.count(), 1)
