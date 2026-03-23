@@ -48,6 +48,7 @@ from django.utils import timezone
 
 from ..models import Author, DTModel, Fan
 
+
 def truncate_to(value, kind, tzinfo=None):
     # Convert to target timezone before truncation
     if tzinfo is not None:
@@ -1968,4 +1969,3 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         )
 
         self.assertEqual(qs.count(), 1)
-        
