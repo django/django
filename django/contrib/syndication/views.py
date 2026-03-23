@@ -1,9 +1,8 @@
 from inspect import getattr_static, unwrap
-from os import link
 
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django.http import Http404, HttpResponse, request
+from django.http import Http404, HttpResponse
 from django.template import TemplateDoesNotExist, loader
 from django.utils import feedgenerator
 from django.utils.encoding import iri_to_uri
@@ -143,9 +142,7 @@ class Feed:
         link = self._get_dynamic_attr("link", obj)
 
         if link is None:
-            raise ImproperlyConfigured(
-        "Feed class must define a 'link' attribute."
-        )
+            raise ImproperlyConfigured("Feed class must define a 'link' attribute.")
 
         link = add_domain(current_site.domain, link, request.is_secure())
 
