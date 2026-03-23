@@ -844,3 +844,22 @@ class SyndicationFeedTest(FeedTestCase):
     def test_get_non_existent_object(self):
         response = self.client.get("/syndication/rss2/articles/0/")
         self.assertEqual(response.status_code, 404)
+    
+    def test_feed_without_link_raises_improperly_configured(self):
+        """
+        A Feed without a 'link' attribute should raise ImproperlyConfigured
+        instead of failing with AttributeError.
+        """
+        class NoLinkFeed(views.Feed):
+            title = "Test Feed"
+            # link intentionally missing
+
+        request = self.client.get("/syndication/rss2/").wsgi_request
+
+        feed = NoLinkFeed()
+
+        with self.assertRaisesMessage(
+            ImproperlyConfigured,
+            "Feed class must define a 'link' attribute.",
+        ):
+            feed.get_feed(None, request)
