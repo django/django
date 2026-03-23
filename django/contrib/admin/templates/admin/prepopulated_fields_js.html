@@ -1,5 +1,6 @@
-{% load static %}
+{% load static admin_list %}
 <script id="django-admin-prepopulated-fields-constants"
         src="{% static "admin/js/prepopulate_init.js" %}"
-        data-prepopulated-fields="{{ prepopulated_fields_json }}">
+        data-prepopulated-fields="{{ prepopulated_fields_json }}"
+        {% csp_nonce_attr %}>
 </script>

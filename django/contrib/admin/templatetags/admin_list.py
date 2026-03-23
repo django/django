@@ -19,6 +19,7 @@ from django.contrib.admin.views.main import (
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
+from django.middleware.csp import get_nonce
 from django.template import Library
 from django.template.loader import get_template
 from django.templatetags.static import static
@@ -553,3 +554,12 @@ def change_list_object_tools_tag(parser, token):
         func=lambda context: context,
         template_name="change_list_object_tools.html",
     )
+
+
+@register.simple_tag(name="csp_nonce_attr", takes_context=True)
+def csp_nonce_attr(context):
+    request = context.get("request")
+    nonce = str(get_nonce(request))
+    if nonce != "None":
+        return mark_safe(f' nonce="{nonce}"')
+    return ""
