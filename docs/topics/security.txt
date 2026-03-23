@@ -369,6 +369,19 @@ security protection of the web server, operating system and other components.
 * Mozilla discusses various topics regarding `web security`_. Their
   pages also include security principles that apply to any system.
 
+Malformed Content-Length headers
+--------------------------------
+
+If a client sends a request with a Content-Length header larger than the actual payload, Django may appear to hang while reading ``request.body``.
+
+This occurs because Django relies on the WSGI server to read the request stream, which blocks until the specified number of bytes is received. If fewer bytes are sent than declared, the read operation does not complete.
+
+This behavior originates from the WSGI layer (e.g., ``wsgiref`` or ``gunicorn``), and the WSGI specification does not define handling for cases where Content-Length exceeds the actual payload.
+
+In production, this issue is typically mitigated by deploying Django behind a reverse proxy such as nginx, which buffers and validates incoming requests.
+
+The development server is not intended to handle malformed or malicious HTTP requests.
+
 .. _LimitRequestBody: https://httpd.apache.org/docs/2.4/mod/core.html#limitrequestbody
 .. _Top 10 list: https://owasp.org/Top10/
 .. _web security: https://infosec.mozilla.org/guidelines/web_security.html
