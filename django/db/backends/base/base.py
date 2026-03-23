@@ -101,6 +101,14 @@ class BaseDatabaseWrapper:
         # specifies whether it's allowed for the function to fail.
         self.run_on_commit = []
 
+        # A list of open server-side cursors. Each entry is a (sids, cursor)
+        # tuple where sids is a frozenset of the active savepoint IDs when the
+        # cursor was opened. Cursors are closed eagerly on savepoint rollback
+        # to prevent delayed GC-triggered closes from sending a CLOSE command
+        # for a cursor that no longer exists on the server (which would abort
+        # the transaction).
+        self.server_side_cursors = []
+
         # Should we run the on-commit hooks the next time set_autocommit(True)
         # is called?
         self.run_commit_hooks_on_set_autocommit_on = False
@@ -259,6 +267,7 @@ class BaseDatabaseWrapper:
         connection_created.send(sender=self.__class__, connection=self)
 
         self.run_on_commit = []
+        self.server_side_cursors = []
 
     def check_settings(self):
         if self.settings_dict["TIME_ZONE"] is not None and not settings.USE_TZ:
@@ -339,12 +348,14 @@ class BaseDatabaseWrapper:
         self.errors_occurred = False
         self.needs_rollback = False
         self.run_on_commit = []
+        self.server_side_cursors = []
 
     @async_unsafe
     def close(self):
         """Close the connection to the database."""
         self.validate_thread_sharing()
         self.run_on_commit = []
+        self.server_side_cursors = []
 
         # Don't call validate_no_atomic_block() to avoid making it difficult
         # to get rid of a connection in an invalid state. The next connect()
@@ -410,6 +421,23 @@ class BaseDatabaseWrapper:
             return
 
         self.validate_thread_sharing()
+
+        # Close any server-side cursors opened since this savepoint, before
+        # rolling back. Closing them now (while the cursor still exists on the
+        # server) avoids a later GC-triggered close sending a CLOSE command for
+        # a cursor that the rollback already destroyed, which would abort the
+        # transaction with InvalidCursorName.
+        remaining = []
+        for sids, cursor in self.server_side_cursors:
+            if sid in sids:
+                try:
+                    cursor.close()
+                except Exception:
+                    pass
+            else:
+                remaining.append((sids, cursor))
+        self.server_side_cursors = remaining
+
         self._savepoint_rollback(sid)
 
         # Remove any callbacks registered while this savepoint was active.

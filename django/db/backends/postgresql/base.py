@@ -468,7 +468,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         else:
             task_ident = "sync"
         # Use that and the thread ident to get a unique name
-        return self._cursor(
+        cursor = self._cursor(
             name="_django_curs_%d_%s_%d"
             % (
                 # Avoid reusing name in other threads / tasks
@@ -477,6 +477,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 self._named_cursor_idx,
             )
         )
+        # Register the cursor so savepoint_rollback() can close it eagerly
+        # before rolling back, preventing a delayed GC-triggered close from
+        # sending CLOSE for a cursor that the rollback already destroyed.
+        self.server_side_cursors.append((frozenset(self.savepoint_ids), cursor))
+        return cursor
 
     def _set_autocommit(self, autocommit):
         with self.wrap_database_errors:

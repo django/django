@@ -3,7 +3,7 @@ import unittest
 from collections import namedtuple
 from contextlib import contextmanager
 
-from django.db import connection, models
+from django.db import connection, models, transaction
 from django.db.utils import ProgrammingError
 from django.test import TestCase
 from django.test.utils import garbage_collect
@@ -114,6 +114,47 @@ class ServerSideCursorsPostgres(TestCase):
         # collection breaks the transaction wrapping the test.
         with self.override_db_setting(DISABLE_SERVER_SIDE_CURSORS=True):
             self.assertNotUsesCursor(Person.objects.iterator())
+
+    def test_server_side_cursor_closed_on_savepoint_rollback(self):
+        """
+        A server-side cursor opened inside a savepoint is closed eagerly when
+        the savepoint is rolled back, preventing a later GC-triggered close
+        from sending CLOSE for a cursor the rollback already destroyed, which
+        would abort the transaction with InvalidCursorName (#37000).
+        """
+        try:
+            with transaction.atomic():
+                persons = Person.objects.iterator()
+                next(persons)  # Open the server-side cursor.
+                # Cursor is registered on the connection.
+                self.assertEqual(len(connection.server_side_cursors), 1)
+                raise ValueError("trigger savepoint rollback")
+        except ValueError:
+            pass
+        # savepoint_rollback() closed the cursor eagerly before rolling back;
+        # the connection's server_side_cursors list is now empty.
+        self.assertEqual(len(connection.server_side_cursors), 0)
+        # The transaction must still be usable after the savepoint rollback.
+        self.assertEqual(Person.objects.count(), 2)
+
+    def test_server_side_cursor_subsequent_query_after_savepoint_rollback(self):
+        """
+        DB operations succeed after a savepoint rolls back while a server-side
+        cursor was open (#37000). Without the fix a GC-triggered cursor close
+        would send CLOSE for a non-existent cursor, aborting the transaction
+        and causing InFailedSqlTransaction on subsequent queries.
+        """
+        created = None
+        try:
+            with transaction.atomic():
+                persons = Person.objects.iterator()
+                next(persons)  # Open the server-side cursor.
+                raise ValueError("trigger savepoint rollback")
+        except ValueError:
+            pass
+        # This must succeed: the transaction must not be aborted.
+        created = Person.objects.create(first_name="c", last_name="c")
+        self.assertIsNotNone(created.pk)
 
     @unittest.skipUnless(
         is_psycopg3, "The server_side_binding option is only effective on psycopg >= 3."

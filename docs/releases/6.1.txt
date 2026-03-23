@@ -524,6 +524,18 @@ Miscellaneous
   :ref:`expressions <writing-your-own-query-expressions>`, is deprecated in
   favor of the newly introduced ``quote_name()`` method.
 
+Bugfixes
+========
+
+* Fixed a bug where :meth:`.QuerySet.iterator` used inside a nested
+  :func:`~django.db.transaction.atomic` block (e.g. with
+  ``ATOMIC_REQUESTS=True``) could abort the outer transaction when an
+  exception interrupted the iteration. The server-side cursor opened by the
+  iterator was not closed before the savepoint rollback destroyed it on the
+  PostgreSQL side, causing a delayed GC-triggered ``CLOSE`` to fail with
+  ``InvalidCursorName`` and put the connection into a failed state
+  (:ticket:`37000`).
+
 Features removed in 6.1
 =======================
 
