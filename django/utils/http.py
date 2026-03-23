@@ -366,7 +366,8 @@ def parse_header_parameters(line, max_length=MAX_HEADER_LENGTH):
                     value = unquote(value, encoding=encoding)
                 except (LookupError, UnicodeDecodeError):
                     raise ValueError(
-                        f"Invalid encoding '{encoding}' in Content-Type parameter."
+                        f"Invalid encoding '{encoding}'."
+                        f"Unable to decode RFC 2231 parameter value."
                     )
             pdict[name] = value
     return key, pdict

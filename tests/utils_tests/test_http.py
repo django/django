@@ -522,9 +522,7 @@ class ParseHeaderParameterTests(unittest.TestCase):
             self.assertEqual(parsed[1]["title"], expected_title)
 
     def test_rfc2231_invalid_encoding(self):
-        """
-        Test that invalid encoding names RFC 2231 parameters
-        """
+
         test_data = [
             # Invalid encoding name with percent-encoded value
             "text/plain; charset*=BOGUS''%20",

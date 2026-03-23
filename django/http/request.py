@@ -159,7 +159,7 @@ class HttpRequest:
                 meta.get("CONTENT_TYPE", "")
             )
         except ValueError as exc:
-            raise BadRequest(str(exc)) from exc
+            raise BadRequest("Invalid Content-Type header.") from exc
         if "charset" in self.content_params:
             try:
                 codecs.lookup(self.content_params["charset"])
