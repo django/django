@@ -454,6 +454,7 @@ def _init_worker(
         setup_test_environment(debug=debug_mode)
 
     db_aliases = used_aliases if used_aliases is not None else connections
+
     for alias in db_aliases:
         connection = connections[alias]
         if is_spawn_or_forkserver:
@@ -461,6 +462,7 @@ def _init_worker(
             connection.settings_dict.update(initial_settings[alias])
             if value := serialized_contents.get(alias):
                 connection._test_serialized_contents = value
+
         connection.creation.setup_worker_connection(_worker_id)
         if (
             is_spawn_or_forkserver
@@ -586,7 +588,12 @@ class ParallelTestSuite(unittest.TestSuite):
                     subsuite_index, events = test_results.next(timeout=0.1)
                 except multiprocessing.TimeoutError as err:
                     if counter.value < 0:
-                        err.add_note("ERROR: _init_worker failed, see prior traceback")
+                        err.add_note(
+                            "ERROR: Parallel test worker failed to initialize. "
+                            "This may be due to issues with parallel test execution "
+                            "or unexpected worker restarts. "
+                            "Try running tests with --parallel=1 for more details."
+                        )
                         raise
                     continue
                 except StopIteration:
