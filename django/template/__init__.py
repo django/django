@@ -10,7 +10,7 @@ The django.template namespace contains two independent subsystems:
 
 Ideally these subsystems would be implemented in distinct packages. However
 keeping them together made the implementation of Multiple Template Engines
-less disruptive .
+less disruptive.
 
 Here's a breakdown of which modules belong to which subsystem.
 
@@ -36,7 +36,6 @@ Django Template Language:
 Shared:
 
 - django.template.utils
-
 """
 
 # Multiple Template Engines
@@ -72,4 +71,11 @@ from .library import Library  # NOQA isort:skip
 # Import the .autoreload module to trigger the registrations of signals.
 from . import autoreload  # NOQA isort:skip
 
-__all__ += ("Template", "Context", "RequestContext")
+
+# ✅ Updated public API exports
+__all__ += (
+    "Template",
+    "Context",
+    "RequestContext",
+    "Library",
+)
