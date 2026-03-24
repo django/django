@@ -8,7 +8,6 @@ import logging
 import sys
 import unicodedata
 
-
 from django.apps import apps as global_apps
 from django.contrib.auth import get_permission_codename
 from django.contrib.contenttypes.management import create_contenttypes
