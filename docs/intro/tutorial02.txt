@@ -95,10 +95,9 @@ additional metadata.
    Django follows the :ref:`DRY Principle <dry>`. The goal is to define your
    data model in one place and automatically derive things from it.
 
-   This includes the migrations - unlike in Ruby On Rails, for example,
-   migrations are entirely derived from your models file, and are essentially a
-   history that Django can roll through to update your database schema to
-   match your current models.
+   This includes the migrations, which are derived from your models file.
+   They form a history that Django uses to update your database schema
+   to match your current models.
 
 In our poll app, we'll create two models: ``Question`` and ``Choice``. A
 ``Question`` has a question and a publication date. A ``Choice`` has two
