@@ -2532,11 +2532,10 @@ them, but it has a few caveats:
   before executing any queries. This can require more memory than expected. To
   reduce memory usage, you can use an approach like this::
 
-    from itertools import islice
 
     batch_size = 100
-    ids_iter = range(1000)
-    while ids := list(islice(ids_iter, batch_size)):
+    for i in range(0, 1000, batch_size):
+    ids = list(range(i,min(i + batch_size, 1000)))
         batch = Entry.objects.filter(ids__in=ids)
         for entry in batch:
             entry.headline = f"Updated headline {entry.pk}"
