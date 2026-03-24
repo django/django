@@ -1402,6 +1402,18 @@ second argument.
 For more on Vary headers, see the :rfc:`official Vary spec
 <9110#section-12.5.5>`.
 
+.. admonition:: ``CacheMiddleware`` varies on ``Authorization`` automatically
+
+    Although varying on ``Authorization`` is not strictly necessary given that
+    :rfc:`9111#section-3.5` allows caches to avoid reusing authenticated
+    responses, Django's ``CacheMiddleware`` adds ``Authorization`` to the
+    ``Vary`` header to simplify construction of cache keys.
+
+.. versionchanged:: 6.0.6
+
+    Previously, ``UpdateCacheMiddleware`` did not vary on ``Authorization`` for
+    requests bearing that header.
+
 Controlling cache: Using other headers
 ======================================
 
