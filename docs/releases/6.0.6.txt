@@ -53,6 +53,19 @@ where ``Cache-Control`` is set manually.
 This issue has severity "low" according to the :ref:`Django security policy
 <severity-levels>`.
 
+CVE-2026-35193: Potential exposure of private data via missing ``Vary: Authorization``
+======================================================================================
+
+:class:`~django.middleware.cache.UpdateCacheMiddleware` and
+:func:`~django.views.decorators.cache.cache_page` decorator allowed responses
+to requests bearing an ``Authorization`` header (and without ``Cache-Control:
+public``) to be cached. To conform with the existing mechanism for constructing
+cache keys, responses to these requests will now :ref:`vary on
+<using-vary-headers>` ``Authorization``.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
 Bugfixes
 ========
 
