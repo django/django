@@ -189,9 +189,8 @@ class Envelope:
 
     @property
     def wkt(self):
-        "Return WKT representing a Polygon for this envelope."
-        # TODO: Fix significant figures.
-        return "POLYGON((%s %s,%s %s,%s %s,%s %s,%s %s))" % (
+        "Return WKT representing a Polygon for this envelope with fixed precision."
+        return "POLYGON((%.6f %.6f, %.6f %.6f, %.6f %.6f, %.6f %.6f, %.6f %.6f))" % (
             self.min_x,
             self.min_y,
             self.min_x,
