@@ -57,6 +57,7 @@ from django.test.utils import CaptureQueriesContext
 from django.utils import timezone, translation
 from django.utils.cache import (
     get_cache_key,
+    has_vary_header,
     learn_cache_key,
     patch_cache_control,
     patch_vary_headers,
@@ -2775,6 +2776,30 @@ class CacheMiddlewareTest(SimpleTestCase):
                 self.assertEqual(response.content, b"Hello World 1")
                 response = view(request, "2")
                 self.assertEqual(response.content, b"Hello World 2")
+
+    def test_vary_on_authorization_for_authorization_header(self):
+        view_with_cache = cache_page(3)(hello_world_view)
+        request = self.factory.get("/view/", headers={"Authorization": "token"})
+        response = view_with_cache(request, "1")
+        self.assertIs(has_vary_header(response, "Authorization"), True)
+
+    def test_no_vary_on_authorization_for_empty_authorization_header(self):
+        view_with_cache = cache_page(3)(hello_world_view)
+        request = self.factory.get("/view/", headers={"Authorization": ""})
+        response = view_with_cache(request, "1")
+        self.assertIs(has_vary_header(response, "Authorization"), False)
+
+    def test_authorization_header_exceptions(self):
+        """
+        Responses to requests with an ``Authorization`` header are not made to
+        vary on ``Authorization`` when ``Cache-Control: public`` is present.
+        ``s-maxage`` and ``must-revalidate`` are also exceptions per RFC 9111,
+        Section 3.5, but Django does not implement them.
+        """
+        view_with_cache = cache_page(3)(cache_control(public=True)(hello_world_view))
+        request = self.factory.get("/view/", headers={"Authorization": "token"})
+        response = view_with_cache(request, "1")
+        self.assertIs(has_vary_header(response, "Authorization"), False)
 
     def test_sensitive_cookie_not_cached(self):
         """
