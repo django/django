@@ -52,9 +52,11 @@ expected. Updating a patch is both useful and important! See more on
 Write some documentation
 ------------------------
 
-Django's documentation is great but it can always be improved. Did you find a
-typo? Do you think that something should be clarified? Go ahead and suggest a
-documentation patch! See also the guide on
+Django's documentation is great but it can always be improved. Did you find
+a typo or a minor documentation issue? For small changes (such as simple
+typo fixes), you may mark the PR field as "N/A - typo". Do you think that
+something should be clarified? Go ahead and suggest a documentation patch!
+See also the guide on
 :doc:`/internals/contributing/writing-documentation`.
 
 .. note::
