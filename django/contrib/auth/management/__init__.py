@@ -4,8 +4,10 @@ them on model renames.
 """
 
 import getpass
+import logging
 import sys
 import unicodedata
+
 
 from django.apps import apps as global_apps
 from django.contrib.auth import get_permission_codename
@@ -13,6 +15,8 @@ from django.contrib.contenttypes.management import create_contenttypes
 from django.core import exceptions
 from django.core.management.color import color_style
 from django.db import DEFAULT_DB_ALIAS, migrations, router, transaction
+
+logger = logging.getLogger(__name__)
 
 
 def _get_all_permissions(opts):
@@ -232,15 +236,13 @@ def get_system_username():
     username could not be determined.
     """
     try:
-        result = getpass.getuser()
+        return getpass.getuser()
     except (ImportError, KeyError, OSError):
-        # TODO: Drop ImportError and KeyError when dropping support for PY312.
-        # KeyError (Python <3.13) or OSError (Python 3.13+) will be raised by
-        # os.getpwuid() (called by getuser()) if there is no corresponding
-        # entry in the /etc/passwd file (for example, in a very restricted
-        # chroot environment).
+        logger.debug(
+            "Unable to determine system username using getpass.getuser()",
+            exc_info=True,
+        )
         return ""
-    return result
 
 
 def get_default_username(check_db=True, database=DEFAULT_DB_ALIAS):
