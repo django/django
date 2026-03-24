@@ -355,7 +355,11 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* :meth:`~django.test.SimpleTestCase.assertContains` and
+  :meth:`~django.test.SimpleTestCase.assertNotContains` can now be called
+  multiple times on the same :class:`~django.http.StreamingHttpResponse`.
+  Previously, they would consume the streaming response's content, causing
+  subsequent calls to fail.
 
 URLs
 ~~~~
@@ -396,6 +400,18 @@ backends.
 * Set the new ``DatabaseFeatures.supports_inspectdb`` attribute to ``False``
   if the management command isn't supported.
 
+* The ``DatabaseFeatures.prohibits_dollar_signs_in_column_aliases`` feature
+  flag is removed.
+
+* The ``DatabaseOperations.binary_placeholder_sql()`` method now expects a
+  query compiler as an extra positional argument and should return a
+  two-elements tuple composed of an SQL format string and a tuple of associated
+  parameters.
+
+* The ``BaseSpatialOperations.get_geom_placeholder()`` method is renamed to
+  ``get_geom_placeholder_sql`` and is expected to return a two-elements tuple
+  composed of an SQL format string and a tuple of associated parameters.
+
 :mod:`django.contrib.admin`
 ---------------------------
 
@@ -420,6 +436,16 @@ backends.
   :class:`~django.db.models.JSONField` base field are now saved as SQL ``NULL``
   instead of the JSON ``null`` primitive. This matches the behavior of a
   standalone :class:`~django.db.models.JSONField` when storing ``None`` values.
+
+Models
+------
+
+* SQL ``SELECT`` aliases originating from :meth:`.QuerySet.annotate`
+  calls as well as table and ``JOIN`` aliases are now systematically quoted to
+  prevent special character collisions. Because quoted aliases are
+  case-sensitive, *raw* SQL references to aliases mixing case, such as when
+  using :class:`.RawSQL`, might have to be adjusted to also make use of
+  quoting.
 
 System checks
 -------------
@@ -447,6 +473,10 @@ short-term maintenance releases. Django 6.1 supports MariaDB 10.11 and higher.
 
 Miscellaneous
 -------------
+
+* Providing ``fail_silently=True``, ``auth_user``, or ``auth_password`` to mail
+  sending functions (such as :func:`~django.core.mail.send_mail`) while also
+  providing a ``connection`` now raises a ``TypeError``.
 
 * :class:`~django.contrib.contenttypes.fields.GenericForeignKey` now uses a
   separate descriptor class: the private ``GenericForeignKeyDescriptor``.
@@ -480,6 +510,19 @@ Miscellaneous
   of the deprecation period, ``None`` values compile to SQL ``IS NULL`` when
   used as the top-level value. :lookup:`Key and index lookups <jsonfield.key>`
   are unaffected by this deprecation.
+
+* The undocumented ``get_placeholder`` method of
+  :class:`~django.db.models.Field` is deprecated in favor of the newly
+  introduced ``get_placeholder_sql`` method, which has the same input signature
+  but is expected to return a two-elements tuple composed of an SQL format
+  string and a tuple of associated parameters. This method should now expect
+  to be provided expressions meant to be compiled via the provided ``compiler``
+  argument.
+
+* The ``quote_name_unless_alias()`` method of ``SQLCompiler``, the type of
+  object passed as the ``compiler`` argument to the ``as_sql()`` method of
+  :ref:`expressions <writing-your-own-query-expressions>`, is deprecated in
+  favor of the newly introduced ``quote_name()`` method.
 
 Features removed in 6.1
 =======================

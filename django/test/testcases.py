@@ -575,6 +575,8 @@ class SimpleTestCase(unittest.TestCase):
 
         if response.streaming:
             content = b"".join(response.streaming_content)
+            # Reset the content so it can be checked again (idempotency).
+            response.streaming_content = [content]
         else:
             content = response.content
         response_content = content

@@ -306,10 +306,12 @@ class DatabaseOperations(BaseDatabaseOperations):
             value = uuid.UUID(value)
         return value
 
-    def binary_placeholder_sql(self, value):
-        return (
-            "_binary %s" if value is not None and not hasattr(value, "as_sql") else "%s"
-        )
+    def binary_placeholder_sql(self, value, compiler):
+        if value is None:
+            return "%s", (None,)
+        elif hasattr(value, "as_sql"):
+            return compiler.compile(value)
+        return "_binary %s", (value,)
 
     def subtract_temporals(self, internal_type, lhs, rhs):
         lhs_sql, lhs_params = lhs

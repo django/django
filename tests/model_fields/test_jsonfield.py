@@ -40,7 +40,7 @@ from django.db.models.fields.json import (
     KeyTransformFactory,
     KeyTransformTextLookupMixin,
 )
-from django.db.models.functions import Cast
+from django.db.models.functions import Cast, Coalesce
 from django.test import (
     SimpleTestCase,
     TestCase,
@@ -1289,6 +1289,20 @@ class TestQuerying(TestCase):
             data__foo="bar"
         )
         self.assertQuerySetEqual(qs, all_objects)
+
+    @skipUnlessDBFeature("supports_primitives_in_json_field")
+    def test_json_type_casting_with_coalesce(self):
+        RelatedJSONModel.objects.create(
+            summary='"This is valid JSON primitive."',
+            value={"text": "test"},
+            json_model=self.objs[4],
+        )
+        result = RelatedJSONModel.objects.annotate(
+            coalesced_value=Coalesce(
+                Cast("summary", JSONField()), "value", output_field=JSONField()
+            )
+        ).first()
+        self.assertEqual(result.coalesced_value, "This is valid JSON primitive.")
 
 
 @skipUnlessDBFeature("supports_primitives_in_json_field")
