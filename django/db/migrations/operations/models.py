@@ -95,8 +95,9 @@ class CreateModel(ModelOperation):
         )
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        model = to_state.apps.get_model(app_label, self.name)
-        if self.allow_migrate_model(schema_editor.connection.alias, model):
+        model_state = to_state.get_model(app_label, self.name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model_state):
+            model = to_state.apps.get_model(app_label, self.name)
             schema_editor.create_model(model)
             # While the `index_together` option has been deprecated some
             # historical migrations might still have references to them.
@@ -111,8 +112,9 @@ class CreateModel(ModelOperation):
                 )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        model = from_state.apps.get_model(app_label, self.name)
-        if self.allow_migrate_model(schema_editor.connection.alias, model):
+        model_state = from_state.get_model(app_label, self.name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model_state):
+            model = from_state.apps.get_model(app_label, self.name)
             schema_editor.delete_model(model)
 
     def describe(self):
@@ -394,13 +396,15 @@ class DeleteModel(ModelOperation):
         state.remove_model(app_label, self.name_lower)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        model = from_state.apps.get_model(app_label, self.name)
-        if self.allow_migrate_model(schema_editor.connection.alias, model):
+        model_state = from_state.get_model(app_label, self.name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model_state):
+            model = from_state.apps.get_model(app_label, self.name)
             schema_editor.delete_model(model)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        model = to_state.apps.get_model(app_label, self.name)
-        if self.allow_migrate_model(schema_editor.connection.alias, model):
+        model_state = to_state.get_model(app_label, self.name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model_state):
+            model = to_state.apps.get_model(app_label, self.name)
             schema_editor.create_model(model)
 
     def references_model(self, name, app_label):
@@ -901,13 +905,15 @@ class AddIndex(IndexOperation):
         state.add_index(app_label, self.model_name_lower, self.index)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        model = to_state.apps.get_model(app_label, self.model_name)
-        if self.allow_migrate_model(schema_editor.connection.alias, model):
+        model_state = to_state.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model_state):
+            model = to_state.apps.get_model(app_label, self.model_name)
             schema_editor.add_index(model, self.index)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        model = from_state.apps.get_model(app_label, self.model_name)
-        if self.allow_migrate_model(schema_editor.connection.alias, model):
+        model_state = from_state.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model_state):
+            model = from_state.apps.get_model(app_label, self.model_name)
             schema_editor.remove_index(model, self.index)
 
     def deconstruct(self):
@@ -961,15 +967,17 @@ class RemoveIndex(IndexOperation):
         state.remove_index(app_label, self.model_name_lower, self.name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        model = from_state.apps.get_model(app_label, self.model_name)
-        if self.allow_migrate_model(schema_editor.connection.alias, model):
+        model_state = from_state.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model_state):
+            model = from_state.apps.get_model(app_label, self.model_name)
             from_model_state = from_state.models[app_label, self.model_name_lower]
             index = from_model_state.get_index_by_name(self.name)
             schema_editor.remove_index(model, index)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        model = to_state.apps.get_model(app_label, self.model_name)
-        if self.allow_migrate_model(schema_editor.connection.alias, model):
+        model_state = to_state.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model_state):
+            model = to_state.apps.get_model(app_label, self.model_name)
             to_model_state = to_state.models[app_label, self.model_name_lower]
             index = to_model_state.get_index_by_name(self.name)
             schema_editor.add_index(model, index)
@@ -1051,8 +1059,8 @@ class RenameIndex(IndexOperation):
             )
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        model = to_state.apps.get_model(app_label, self.model_name)
-        if not self.allow_migrate_model(schema_editor.connection.alias, model):
+        model_state = to_state.get_model(app_label, self.model_name)
+        if not self.allow_migrate_model(schema_editor.connection.alias, model_state):
             return
 
         if self.old_fields:
@@ -1088,6 +1096,7 @@ class RenameIndex(IndexOperation):
 
         to_model_state = to_state.models[app_label, self.model_name_lower]
         new_index = to_model_state.get_index_by_name(self.new_name)
+        model = to_state.apps.get_model(app_label, self.model_name)
         schema_editor.rename_index(model, old_index, new_index)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
@@ -1152,13 +1161,15 @@ class AddConstraint(IndexOperation):
         state.add_constraint(app_label, self.model_name_lower, self.constraint)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        model = to_state.apps.get_model(app_label, self.model_name)
-        if self.allow_migrate_model(schema_editor.connection.alias, model):
+        model_state = to_state.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model_state):
+            model = to_state.apps.get_model(app_label, self.model_name)
             schema_editor.add_constraint(model, self.constraint)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        model = to_state.apps.get_model(app_label, self.model_name)
-        if self.allow_migrate_model(schema_editor.connection.alias, model):
+        model_state = to_state.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model_state):
+            model = to_state.apps.get_model(app_label, self.model_name)
             schema_editor.remove_constraint(model, self.constraint)
 
     def deconstruct(self):
@@ -1209,15 +1220,17 @@ class RemoveConstraint(IndexOperation):
         state.remove_constraint(app_label, self.model_name_lower, self.name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        model = to_state.apps.get_model(app_label, self.model_name)
-        if self.allow_migrate_model(schema_editor.connection.alias, model):
+        model_state = to_state.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model_state):
+            model = to_state.apps.get_model(app_label, self.model_name)
             from_model_state = from_state.models[app_label, self.model_name_lower]
             constraint = from_model_state.get_constraint_by_name(self.name)
             schema_editor.remove_constraint(model, constraint)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        model = to_state.apps.get_model(app_label, self.model_name)
-        if self.allow_migrate_model(schema_editor.connection.alias, model):
+        model_state = to_state.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model_state):
+            model = to_state.apps.get_model(app_label, self.model_name)
             to_model_state = to_state.models[app_label, self.model_name_lower]
             constraint = to_model_state.get_constraint_by_name(self.name)
             schema_editor.add_constraint(model, constraint)

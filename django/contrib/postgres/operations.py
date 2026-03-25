@@ -135,14 +135,16 @@ class AddIndexConcurrently(NotInTransactionMixin, AddIndex):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         self._ensure_not_in_transaction(schema_editor)
-        model = to_state.apps.get_model(app_label, self.model_name)
-        if self.allow_migrate_model(schema_editor.connection.alias, model):
+        to_model_state = to_state.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, to_model_state):
+            model = to_state.apps.get_model(app_label, self.model_name)
             schema_editor.add_index(model, self.index, concurrently=True)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         self._ensure_not_in_transaction(schema_editor)
-        model = from_state.apps.get_model(app_label, self.model_name)
-        if self.allow_migrate_model(schema_editor.connection.alias, model):
+        from_model_state = to_state.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, from_model_state):
+            model = from_state.apps.get_model(app_label, self.model_name)
             schema_editor.remove_index(model, self.index, concurrently=True)
 
 
@@ -157,16 +159,18 @@ class RemoveIndexConcurrently(NotInTransactionMixin, RemoveIndex):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         self._ensure_not_in_transaction(schema_editor)
-        model = from_state.apps.get_model(app_label, self.model_name)
-        if self.allow_migrate_model(schema_editor.connection.alias, model):
+        model_state = from_state.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model_state):
+            model = from_state.apps.get_model(app_label, self.model_name)
             from_model_state = from_state.models[app_label, self.model_name_lower]
             index = from_model_state.get_index_by_name(self.name)
             schema_editor.remove_index(model, index, concurrently=True)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         self._ensure_not_in_transaction(schema_editor)
-        model = to_state.apps.get_model(app_label, self.model_name)
-        if self.allow_migrate_model(schema_editor.connection.alias, model):
+        model_state = to_state.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model_state):
+            model = to_state.apps.get_model(app_label, self.model_name)
             to_model_state = to_state.models[app_label, self.model_name_lower]
             index = to_model_state.get_index_by_name(self.name)
             schema_editor.add_index(model, index, concurrently=True)
@@ -293,8 +297,9 @@ class AddConstraintNotValid(AddConstraint):
         )
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        model = from_state.apps.get_model(app_label, self.model_name)
-        if self.allow_migrate_model(schema_editor.connection.alias, model):
+        model_state = from_state.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model_state):
+            model = from_state.apps.get_model(app_label, self.model_name)
             constraint_sql = self.constraint.create_sql(model, schema_editor)
             if constraint_sql:
                 # Constraint.create_sql returns interpolated SQL which makes
@@ -320,8 +325,9 @@ class ValidateConstraint(Operation):
         return "Validate constraint %s on model %s" % (self.name, self.model_name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        model = from_state.apps.get_model(app_label, self.model_name)
-        if self.allow_migrate_model(schema_editor.connection.alias, model):
+        model_state = from_state.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model_state):
+            model = from_state.apps.get_model(app_label, self.model_name)
             schema_editor.execute(
                 "ALTER TABLE %s VALIDATE CONSTRAINT %s"
                 % (
