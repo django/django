@@ -2,6 +2,10 @@ import sys
 import threading
 import time
 from unittest import skipIf, skipUnless
+from django.db import transaction, connection
+from django.test import TestCase
+from django.db import models
+import gc
 
 from django.db import (
     DatabaseError,
@@ -586,3 +590,27 @@ class DurableTransactionTests(DurableTestsBase, TransactionTestCase):
 
 class DurableTests(DurableTestsBase, TestCase):
     pass
+
+class CursorIteratorBugTest(TestCase):
+    class Item(models.Model):
+        value = models.CharField(max_length=50)
+
+    def test_cursor_cleanup_after_exception(self):
+        for i in range(50):
+            self.Item.objects.create(value=str(i))
+
+        try:
+            with transaction.atomic():
+                with transaction.atomic():
+                    iterator = self.Item.objects.iterator(chunk_size=10)
+                    for obj in iterator:
+                        if obj.value == "10":
+                            raise ValueError("trigger")
+                   
+        except ValueError:
+            pass
+        gc.collect()
+        try:
+            self.Item.objects.create(value="after")
+        except Exception as e:
+            self.fail(f"Database unusable after iterator exception: {e}")
