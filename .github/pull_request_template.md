@@ -1,6 +1,6 @@
 #### Trac ticket number
 <!-- Replace XXXXX with the corresponding Trac ticket number. -->
-<!-- Or delete the line and write "N/A" if this is a trivial PR. -->
+<!-- Or delete the line and write "N/A - typo" for typo fixes. -->
 
 ticket-XXXXX
 
