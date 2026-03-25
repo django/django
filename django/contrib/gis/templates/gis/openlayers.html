@@ -10,3 +10,13 @@
     {{ widget.attrs|json_script:script_id }}
     {% endwith %}
 </div>
+<script>
+console.log("Map loaded");
+
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("DOM ready");
+
+    const mapDiv = document.querySelector('.dj_map');
+    console.log("Map div:", mapDiv);
+});
+</script>
