@@ -431,15 +431,15 @@ Then add the module containing the serializer definitions to your
         "json": "django.core.serializers.json",
     }
 
-    .. note::
+.. note::
 
     Custom serializers with ``internal_use_only = True`` are not available
     for use with management commands such as :djadmin:`dumpdata`.
 
     To make a custom serializer usable from the command line, ensure that
     ``internal_use_only = False`` is set on the serializer class.
+    
 
-.. _topics-serialization-natural-keys:
 
 Natural keys
 ============
