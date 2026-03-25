@@ -430,6 +430,7 @@ Then add the module containing the serializer definitions to your
         "csv": "path.to.custom_csv_serializer",
         "json": "django.core.serializers.json",
     }
+
     .. note::
 
     Custom serializers with ``internal_use_only = True`` are not available
