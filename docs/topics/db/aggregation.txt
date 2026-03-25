@@ -493,6 +493,39 @@ It's difficult to intuit how the ORM will translate complex querysets into SQL
 queries so when in doubt, inspect the SQL with ``str(queryset.query)`` and
 write plenty of tests.
 
+.. admonition:: Multiple ``filter()`` calls on related fields
+
+    When filtering across multi-valued relationships (e.g. reverse
+    ``ForeignKey`` or ``ManyToManyField``), chaining multiple
+    ``filter()`` calls can produce unexpected results when combined
+    with aggregation.
+
+    For example, the following two queries are **not equivalent**:
+
+    .. code-block:: python
+
+        Author.objects.filter(
+            book__pages__gt=100,
+            book__pages__lt=200,
+        ).annotate(num_books=Count("book"))
+
+        Author.objects.filter(
+            book__pages__gt=100,
+        ).filter(
+            book__pages__lt=200,
+        ).annotate(num_books=Count("book"))
+
+    In the first query, both conditions apply to the same related row,
+    resulting in an intersection of conditions.
+
+    In the second query, Django creates separate joins for each
+    ``filter()`` call. As a result, the conditions may match different
+    related rows, which can lead to unexpected aggregation results
+    (such as counting duplicates).
+
+    If you intend to apply multiple conditions to the same related
+    object, combine them within a single ``filter()`` call.
+
 ``order_by()``
 --------------
 
