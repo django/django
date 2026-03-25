@@ -1,14 +1,13 @@
 import datetime
 
-from django.conf import settings
+from django.db.models.utils import get_blank_choice_label
 from django.forms import ChoiceField, Form, MultiWidget, RadioSelect, TextInput
 from django.test import override_settings
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext as _
 
 from .test_choicewidget import ChoiceWidgetTest
 
-BLANK_CHOICE = (("", _(settings.BLANK_CHOICE_LABEL)),)
+BLANK_CHOICE = (("", get_blank_choice_label()),)
 
 
 class RadioSelectTest(ChoiceWidgetTest):

@@ -81,11 +81,13 @@ class NOT_PROVIDED:
     pass
 
 
-# RemovedInDjango71Warning: From Django 6.1, the values to use for "blank"
-# in SelectFields will be defined in the BLANK_CHOICE_LABEL setting.
+# RemovedInDjango70Warning: From Django 6.1, the values to use for "blank"
+# in SelectFields will be defined by the below BLANK_CHOICE_LABEL constant.
 # Will be appended to the start of most "choices" lists.
 # BLANK_CHOICE_DASH is still available as a constant in Django 6.1 and 7.0.
 BLANK_CHOICE_DASH = [("", "---------")]
+# This allows any app's ready() method to overwrite BLANK_CHOICE_LABEL.
+BLANK_CHOICE_LABEL = _("- Select an option -")
 
 
 def _load_field(app_label, model_name, field_name):
@@ -1068,7 +1070,7 @@ class Field(RegisterLookupMixin):
         as <select> choices for this field.
         """
         if blank_choice is None:
-            blank_choice = [("", _(settings.BLANK_CHOICE_LABEL))]
+            blank_choice = [("", BLANK_CHOICE_LABEL)]
         if self.choices is not None:
             if include_blank:
                 return BlankChoiceIterator(self.choices, blank_choice)

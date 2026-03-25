@@ -1,6 +1,6 @@
 import re
 
-from django.conf import settings
+from django.db.models.utils import get_blank_choice_label
 from django.forms import (
     CharField,
     ChoiceField,
@@ -129,7 +129,7 @@ class FormsI18nTests(SimpleTestCase):
         class SomeForm(Form):
             somechoices = ChoiceField(
                 choices=(
-                    ("0", gettext_lazy(settings.BLANK_CHOICE_LABEL)),
+                    ("0", get_blank_choice_label()),
                     ("1", "Test 1"),
                     ("2", "Test 2"),
                 )

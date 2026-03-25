@@ -42,6 +42,7 @@ from django.core.exceptions import (
 from django.core.paginator import Paginator
 from django.db import models, router, transaction
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.utils import get_blank_choice_label
 from django.forms.formsets import DELETION_FIELD_NAME, all_valid
 from django.forms.models import (
     BaseInlineFormSet,
@@ -1054,7 +1055,7 @@ class ModelAdmin(BaseModelAdmin):
         tuple (name, description).
         """
         if default_choices is None:
-            default_choices = [("", _(settings.BLANK_CHOICE_LABEL))]
+            default_choices = [("", get_blank_choice_label())]
         choices = [*default_choices]
         for func, name, description in self.get_actions(request).values():
             choice = (name, description % model_format_dict(self.opts))

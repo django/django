@@ -1,13 +1,12 @@
 import datetime
 
 from django import forms
-from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db.models.utils import get_blank_choice_label
 from django.forms.models import ModelChoiceIterator, ModelChoiceIteratorValue
 from django.forms.widgets import CheckboxSelectMultiple
 from django.template import Context, Template
 from django.test import TestCase
-from django.utils.translation import gettext as _
 
 from .models import Article, Author, Book, Category, ExplicitPK, Writer
 
@@ -26,7 +25,7 @@ class ModelChoiceFieldTests(TestCase):
         self.assertEqual(
             list(f.choices),
             [
-                ("", _(settings.BLANK_CHOICE_LABEL)),
+                ("", get_blank_choice_label()),
                 (self.c1.pk, "Entertainment"),
                 (self.c2.pk, "A test"),
                 (self.c3.pk, "Third"),
@@ -104,7 +103,7 @@ class ModelChoiceFieldTests(TestCase):
         self.assertEqual(
             list(f.choices),
             [
-                ("", _(settings.BLANK_CHOICE_LABEL)),
+                ("", get_blank_choice_label()),
                 (self.c1.pk, "Entertainment"),
                 (self.c2.pk, "A test"),
             ],
@@ -120,7 +119,7 @@ class ModelChoiceFieldTests(TestCase):
         self.assertEqual(
             list(gen_two),
             [
-                ("", _(settings.BLANK_CHOICE_LABEL)),
+                ("", get_blank_choice_label()),
                 (self.c1.pk, "Entertainment"),
                 (self.c2.pk, "A test"),
             ],
@@ -132,7 +131,7 @@ class ModelChoiceFieldTests(TestCase):
         self.assertEqual(
             list(f.choices),
             [
-                ("", _(settings.BLANK_CHOICE_LABEL)),
+                ("", get_blank_choice_label()),
                 (self.c1.pk, "category Entertainment"),
                 (self.c2.pk, "category A test"),
                 (self.c3.pk, "category Third"),
@@ -145,7 +144,7 @@ class ModelChoiceFieldTests(TestCase):
         self.assertEqual(
             list(f.choices),
             [
-                ("", _(settings.BLANK_CHOICE_LABEL)),
+                ("", get_blank_choice_label()),
                 (self.c1.pk, "Entertainment"),
                 (self.c2.pk, "A test"),
                 (self.c3.pk, "Third"),
@@ -156,7 +155,7 @@ class ModelChoiceFieldTests(TestCase):
         self.assertEqual(
             list(f.choices),
             [
-                ("", _(settings.BLANK_CHOICE_LABEL)),
+                ("", get_blank_choice_label()),
                 (self.c1.pk, "Entertainment"),
                 (self.c2.pk, "A test"),
                 (self.c3.pk, "Third"),
@@ -176,7 +175,7 @@ class ModelChoiceFieldTests(TestCase):
         self.assertIs(bool(f.choices), True)
 
     def test_choices_radio_blank(self):
-        blank_choice = [("", _(settings.BLANK_CHOICE_LABEL))]
+        blank_choice = [("", get_blank_choice_label())]
         choices = [
             (self.c1.pk, "Entertainment"),
             (self.c2.pk, "A test"),
@@ -427,7 +426,7 @@ class ModelChoiceFieldTests(TestCase):
         self.assertCountEqual(
             list(f.choices),
             [
-                ("", _(settings.BLANK_CHOICE_LABEL)),
+                ("", get_blank_choice_label()),
                 (self.c1.pk, "Entertainment"),
                 (self.c2.pk, "A test"),
                 (self.c3.pk, "Third"),

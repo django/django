@@ -5,7 +5,6 @@ from decimal import Decimal
 from unittest import mock, skipUnless
 
 from django import forms
-from django.conf import settings
 from django.core.exceptions import (
     NON_FIELD_ERRORS,
     FieldError,
@@ -15,6 +14,7 @@ from django.core.exceptions import (
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection, models
 from django.db.models.query import EmptyQuerySet
+from django.db.models.utils import get_blank_choice_label
 from django.forms.models import (
     ModelFormMetaclass,
     construct_instance,
@@ -26,7 +26,6 @@ from django.template import Context, Template
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils.choices import BlankChoiceIterator
-from django.utils.translation import gettext as _
 from django.utils.version import PY314, PYPY
 
 from .models import (
@@ -345,7 +344,7 @@ class ModelFormBaseTest(TestCase):
         self.assertEqual(
             list(form.fields["author"].choices),
             [
-                ("", _(settings.BLANK_CHOICE_LABEL)),
+                ("", get_blank_choice_label()),
                 (writer.pk, "Joe Doe"),
             ],
         )
@@ -2046,8 +2045,7 @@ class ModelFormBasicTests(TestCase):
         self.assertEqual(call_count, 0)
         self.assertEqual(
             form.fields["animal"].choices,
-            [("", _(settings.BLANK_CHOICE_LABEL))]
-            + [("LION", "Lion"), ("ZEBRA", "Zebra")],
+            [("", get_blank_choice_label())] + [("LION", "Lion"), ("ZEBRA", "Zebra")],
         )
         self.assertEqual(call_count, 1)
 
@@ -2731,7 +2729,7 @@ class FileAndImageFieldTests(TestCase):
         form = FPForm()
         self.assertEqual(
             [name for _, name in form["path"].field.choices],
-            [_(settings.BLANK_CHOICE_LABEL), "models.py"],
+            [get_blank_choice_label(), "models.py"],
         )
 
     @skipUnless(test_images, "Pillow not installed")
@@ -3031,7 +3029,7 @@ class OtherModelFormTests(TestCase):
             self.assertEqual(
                 tuple(field.choices),
                 (
-                    ("", _(settings.BLANK_CHOICE_LABEL)),
+                    ("", get_blank_choice_label()),
                     (multicolor_item.pk, "blue, red"),
                     (red_item.pk, "red"),
                 ),
@@ -3046,7 +3044,7 @@ class OtherModelFormTests(TestCase):
         self.assertEqual(
             tuple(field.choices),
             (
-                ("", _(settings.BLANK_CHOICE_LABEL)),
+                ("", get_blank_choice_label()),
                 (86, "Apple"),
                 (87, "Core"),
                 (22, "Pear"),

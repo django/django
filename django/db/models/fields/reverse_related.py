@@ -9,12 +9,11 @@ They also act as reverse fields for the purposes of the Meta API because
 they're the closest concept currently available.
 """
 
-from django.conf import settings
 from django.core import exceptions
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
-from django.utils.translation import gettext_lazy as _
 
+from ..utils import get_blank_choice_label
 from .mixins import FieldCacheMixin
 
 
@@ -185,7 +184,7 @@ class ForeignObjectRel(FieldCacheMixin):
         initially for utilization by RelatedFieldListFilter.
         """
         if blank_choice is None:
-            blank_choice = [("", _(settings.BLANK_CHOICE_LABEL))]
+            blank_choice = [("", get_blank_choice_label())]
         limit_choices_to = limit_choices_to or self.limit_choices_to
         qs = self.related_model._default_manager.complex_filter(limit_choices_to)
         if ordering:

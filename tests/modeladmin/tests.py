@@ -1,7 +1,6 @@
 from datetime import date
 
 from django import forms
-from django.conf import settings
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.contrib.admin.options import (
     HORIZONTAL,
@@ -19,10 +18,10 @@ from django.contrib.admin.widgets import (
 )
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.utils import get_blank_choice_label
 from django.forms.widgets import Select
 from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.test.utils import isolate_apps
-from django.utils.translation import gettext as _
 
 from .models import Band, Concert, Song
 
@@ -711,7 +710,7 @@ class ModelAdminTests(TestCase):
         # RelatedFieldWidgetWrapper so they need to be handled properly when
         # type checking. For Select fields, all of the choices lists have a
         # first entry of a translatable blank choice label.
-        blank_option = ("", _(settings.BLANK_CHOICE_LABEL))
+        blank_option = ("", get_blank_choice_label())
         cma = ModelAdmin(Concert, self.site)
         cmafa = cma.get_form(request)
 
