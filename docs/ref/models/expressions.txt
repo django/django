@@ -11,6 +11,25 @@ are a number of built-in expressions (documented below) that can be used to
 help you write queries. Expressions can be combined, or in some cases nested,
 to form more complex computations.
 
+Basic example
+-------------
+
+Expressions allow database-level operations without retrieving objects into Python.
+
+For example::
+
+    from django.db.models import F
+
+    # Increase all product prices by 10%
+    Product.objects.update(price=F("price") * 1.1)
+
+This operation is executed directly in the database, which can be more efficient
+than performing calculations in Python.
+
+Expressions can also be used in filters::
+
+    Company.objects.filter(num_employees__gt=F("num_chairs"))
+
 Supported arithmetic
 ====================
 
