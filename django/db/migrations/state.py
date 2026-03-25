@@ -9,7 +9,7 @@ from django.apps.registry import Apps
 from django.apps.registry import apps as global_apps
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
-from django.db import models
+from django.db import connections, models
 from django.db.migrations.utils import field_is_referenced, get_references
 from django.db.models import NOT_PROVIDED
 from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
@@ -124,6 +124,14 @@ class ProjectState:
             self.resolve_model_relations(model_key)
         if "apps" in self.__dict__:  # hasattr would cache the property
             self.reload_model(*model_key)
+
+    def get_model(self, app_label, model_name):
+        try:
+            model = self.models[app_label, model_name.lower()]
+        except KeyError:
+            # modebl = self.apps.get_model(app_label, model_name)
+            model = ModelState.from_model(global_apps.get_model(app_label, model_name))
+        return model
 
     def remove_model(self, app_label, model_name):
         model_key = app_label, model_name
@@ -1019,3 +1027,123 @@ class ModelState:
             and (self.bases == other.bases)
             and (self.managers == other.managers)
         )
+
+    def can_migrate(self, connection):
+        """
+        Return True if the model can/should be migrated on the `connection`.
+        `connection` can be either a real connection or a connection alias.
+
+        Duplicate of function on `ModelBase`
+        """
+
+        if (
+            self.options["proxy"]
+            or self.options["swapped"]
+            or not self.options["managed"]
+        ):
+            return False
+        if isinstance(connection, str):
+            connection = connections[connection]
+        if self.options["required_db_vendor"]:
+            return self.required_db_vendor == connection.vendor
+        if self.options["required_db_features"]:
+            return all(
+                getattr(connection.features, feat, False)
+                for feat in self.options["required_db_features"]
+            )
+        return True
+
+    @cached_property
+    def _meta(self):
+        return ModelStateOptions(self)
+
+
+class ModelStateOptions:
+    """
+    A class to map from ModelState stored information to a format that can
+    be understood by methods that currently expect some of the functions
+    exposed on django.db.models.options.Options.
+    """
+
+    def __init__(self, model_state):
+        self.model_state = model_state
+
+    @cached_property
+    def proxy(self):
+        return self.model_state.options.get("proxy", False)
+
+    @cached_property
+    def swappable(self):
+        return self.model_state.options.get("swappable", None)
+
+    @cached_property
+    def managed(self):
+        return self.model_state.options.get("managed", True)
+
+    @cached_property
+    def required_db_vendor(self):
+        return self.model_state.options.get("required_db_vendor", None)
+
+    @cached_property
+    def required_db_features(self):
+        return self.model_state.options.get("required_db_features", [])
+
+    @property
+    def app_label(self):
+        return self.model_state.app_label
+
+    @property
+    def model_name(self):
+        return self.model_state.name_lower
+
+    @property
+    def label_lower(self):
+        return "%s.%s" % (self.app_label, self.model_name)
+
+    @cached_property
+    def swapped(self):
+        """
+        Has this model been swapped out for another? If so, return the model
+        name of the replacement; otherwise, return None.
+
+        For historical reasons, model name lookups using get_model() are
+        case insensitive, so we make sure we are case insensitive here.
+
+        Taken from django.db.models.options.Options
+        """
+        if self.swappable:
+            swapped_for = getattr(settings, self.swappable, None)
+            if swapped_for:
+                try:
+                    swapped_label, swapped_object = swapped_for.split(".")
+                except ValueError:
+                    # setting not in the format app_label.model_name
+                    # raising ImproperlyConfigured here causes problems with
+                    # test cleanup code - instead it is raised in
+                    # get_user_model or as part of validation.
+                    return swapped_for
+
+                if (
+                    "%s.%s" % (swapped_label, swapped_object.lower())
+                    != self.label_lower
+                ):
+                    return swapped_for
+        return None
+
+    def can_migrate(self, connection):
+        """
+        Return True if the model can/should be migrated on the `connection`.
+        `connection` can be either a real connection or a connection alias.
+        """
+        if self.proxy or self.swapped or not self.managed:
+            return False
+        if isinstance(connection, str):
+            connection = connections[connection]
+        if self.required_db_vendor:
+            return self.required_db_vendor == connection.vendor
+        if self.required_db_features:
+            return all(
+                getattr(connection.features, feat, False)
+                for feat in self.required_db_features
+            )
+        return True
