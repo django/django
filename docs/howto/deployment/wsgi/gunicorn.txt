@@ -13,7 +13,7 @@ Installing Gunicorn
 Install gunicorn by running ``python -m pip install gunicorn``. For more
 details, see the `gunicorn documentation`_.
 
-.. _gunicorn documentation: https://gunicorn.org/reference/settings/
+.. _gunicorn documentation: https://gunicorn.org/
 
 Running Django in Gunicorn as a generic WSGI application
 ========================================================
