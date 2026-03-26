@@ -217,6 +217,19 @@ when defining form errors.
 Note that ``Form.add_error()`` automatically removes the relevant field from
 ``cleaned_data``.
 
+For example::
+
+    from django import forms
+
+    class MyForm(forms.Form):
+        name = forms.CharField()
+
+        def clean(self):
+            cleaned_data = super().clean()
+            if cleaned_data.get("name") == "admin":
+                self.add_error("name", "This name is not allowed.")
+            return cleaned_data
+
 .. method:: Form.has_error(field, code=None)
 
 This method returns a boolean designating whether a field has an error with
