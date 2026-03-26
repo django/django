@@ -1,7 +1,10 @@
+import asyncio
+import contextlib
 import copy
 import json
 import os
 import pickle
+import sys
 import unittest
 import uuid
 
@@ -807,6 +810,101 @@ class StreamingHttpResponseTests(SimpleTestCase):
         )
         with self.assertWarnsMessage(Warning, msg):
             self.assertEqual(b"hello", await anext(aiter(r)))
+
+    async def test_async_context_manager_streaming_response(self):
+        @contextlib.asynccontextmanager
+        async def acmgr():
+            async def iterator():
+                yield b"hello"
+                yield b"world"
+
+            yield iterator()
+
+        r = StreamingHttpResponse(acmgr())
+        self.assertTrue(r.is_acmgr)
+        self.assertTrue(r.is_async)
+
+        chunks = []
+        async with r as content:
+            async for chunk in content:
+                chunks.append(chunk)
+        self.assertEqual(chunks, [b"hello", b"world"])
+
+    async def test_acmgr_streaming_content_raises(self):
+        @contextlib.asynccontextmanager
+        async def acmgr():
+            async def iterator():
+                yield b"hello"
+
+            yield iterator()
+
+        r = StreamingHttpResponse(acmgr())
+        msg = (
+            "This StreamingHttpResponse instance uses an async context manager "
+            "and does not support direct iteration via streaming_content. "
+            "Use `async with` instead."
+        )
+        with self.assertRaisesMessage(AttributeError, msg):
+            r.streaming_content  # noqa: B018
+
+    async def test_acmgr_aexit_called_on_error(self):
+        exited = []
+
+        @contextlib.asynccontextmanager
+        async def acmgr():
+            try:
+                async def iterator():
+                    yield b"hello"
+                    raise ValueError("boom")
+
+                yield iterator()
+            finally:
+                exited.append(True)
+
+        r = StreamingHttpResponse(acmgr())
+        with self.assertRaises(ValueError):
+            async with r as content:
+                async for _ in content:
+                    pass
+        self.assertEqual(exited, [True])
+
+    @unittest.skipUnless(
+        sys.version_info >= (3, 11), "asyncio.TaskGroup requires Python 3.11+"
+    )
+    async def test_taskgroup_queue_streaming_response(self):
+        """
+        StreamingHttpResponse works with asyncio.TaskGroup and asyncio.Queue,
+        the canonical pattern for background-task-driven streaming.
+        """
+
+        @contextlib.asynccontextmanager
+        async def taskgroup_stream():
+            queue = asyncio.Queue()
+
+            async def producer():
+                for chunk in [b"hello", b"world"]:
+                    await queue.put(chunk)
+                await queue.put(None)  # sentinel
+
+            async def generator():
+                while True:
+                    chunk = await queue.get()
+                    if chunk is None:
+                        break
+                    yield chunk
+
+            async with asyncio.TaskGroup() as tg:
+                tg.create_task(producer())
+                yield generator()
+
+        r = StreamingHttpResponse(taskgroup_stream())
+        self.assertTrue(r.is_acmgr)
+
+        chunks = []
+        async with r as content:
+            async for chunk in content:
+                chunks.append(chunk)
+        self.assertEqual(chunks, [b"hello", b"world"])
 
     def test_text_attribute_error(self):
         r = StreamingHttpResponse(iter(["hello", "world"]))

@@ -1,3 +1,4 @@
+import contextlib
 import gzip
 import random
 import re
@@ -931,6 +932,37 @@ class GZipMiddlewareTest(SimpleTestCase):
         r = await GZipMiddleware(get_stream_response)(self.req)
         self.assertEqual(
             self.decompress(b"".join([chunk async for chunk in r])),
+            b"".join(self.sequence),
+        )
+        self.assertEqual(r.get("Content-Encoding"), "gzip")
+        self.assertFalse(r.has_header("Content-Length"))
+
+    async def test_compress_acmgr_streaming_response(self):
+        """
+        Compression is performed on responses with async context manager content.
+        """
+
+        async def get_stream_response(request):
+            @contextlib.asynccontextmanager
+            async def acmgr():
+                async def iterator():
+                    for chunk in self.sequence:
+                        yield chunk
+
+                yield iterator()
+
+            resp = StreamingHttpResponse(acmgr())
+            resp["Content-Type"] = "text/html; charset=UTF-8"
+            return resp
+
+        r = await GZipMiddleware(get_stream_response)(self.req)
+        self.assertTrue(r.is_acmgr)
+        chunks = []
+        async with r as content:
+            async for chunk in content:
+                chunks.append(chunk)
+        self.assertEqual(
+            self.decompress(b"".join(chunks)),
             b"".join(self.sequence),
         )
         self.assertEqual(r.get("Content-Encoding"), "gzip")

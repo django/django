@@ -480,6 +480,12 @@ class StreamingHttpResponse(HttpResponseBase):
     @property
     def streaming_content(self):
         if self.is_async:
+            if self.is_acmgr:
+                raise AttributeError(
+                    "This %s instance uses an async context manager and does not "
+                    "support direct iteration via streaming_content. Use `async with` "
+                    "instead." % self.__class__.__name__
+                )
             # pull to lexical scope to capture fixed reference in case
             # streaming_content is set again later.
             _iterator = self._iterator
@@ -498,6 +504,12 @@ class StreamingHttpResponse(HttpResponseBase):
 
     def _set_streaming_content(self, value):
         # Ensure we can never iterate on "value" more than once.
+        if hasattr(value, "__aenter__") and hasattr(value, "__aexit__"):
+            self.acmgr = value
+            self.is_acmgr = True
+            self.is_async = True
+            return
+        self.is_acmgr = False
         try:
             self._iterator = iter(value)
             self.is_async = False
@@ -506,6 +518,21 @@ class StreamingHttpResponse(HttpResponseBase):
             self.is_async = True
         if hasattr(value, "close"):
             self._resource_closers.append(value.close)
+
+    async def __aenter__(self):
+        if self.is_acmgr:
+            self.__agen = await self.acmgr.__aenter__()
+        else:
+            self.__agen = aiter(self)
+        return self.__agen
+
+    async def __aexit__(self, *exc_info):
+        try:
+            await self.__agen.aclose()
+        finally:
+            if self.is_acmgr:
+                return await self.acmgr.__aexit__(*exc_info)
+        return None
 
     def __iter__(self):
         try:
