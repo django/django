@@ -192,9 +192,9 @@ directly in HTML.
 
 .. method:: Form.errors.get_json_data(escape_html=False)
 
-Returns the errors as a dictionary suitable for serializing to JSON.
+Returns the errors as a dictionary that can be easily serialized to JSON.
 :meth:`Form.errors.as_json` returns serialized JSON, while this returns the
-error data before it's serialized.
+error data before it is serialized.
 
 The ``escape_html`` parameter behaves as described in
 :meth:`Form.errors.as_json`.
@@ -206,7 +206,7 @@ This method allows adding errors to specific fields from within the
 from a view.
 
 The ``field`` argument is the name of the field to which the errors
-should be added. If its value is ``None`` the error will be treated as
+should be added. If its value is ``None``, the error will be treated as
 a non-field error as returned by :meth:`Form.non_field_errors()
 <django.forms.Form.non_field_errors>`.
 
