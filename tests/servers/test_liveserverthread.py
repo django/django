@@ -32,7 +32,7 @@ class LiveServerThreadTest(TransactionTestCase):
 
     def test_server_class(self):
         class FakeServer:
-            def __init__(*args, **kwargs):
+            def __init__(self, *args, **kwargs):
                 pass
 
         class MyServerThread(LiveServerThread):
