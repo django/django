@@ -56,9 +56,11 @@ jobs:
 
       - name: Organize screenshots
         run: |
-          mkdir --parents "/tmp/screenshots/${{ github.event.pull_request.head.sha }}"
-          mv tests/screenshots/* "/tmp/screenshots/${{ github.event.pull_request.head.sha }}/"
+          mkdir --parents "/tmp/screenshots/${PR_HEAD_SHA}"
+          mv tests/screenshots/* "/tmp/screenshots/${PR_HEAD_SHA}/"
 
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
       - name: Upload screenshots
         uses: actions/upload-artifact@v4
         with:

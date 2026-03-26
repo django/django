@@ -68,7 +68,7 @@ jobs:
         with:
           persist-credentials: false
       - name: black
-        uses: psf/black@stable
+        uses: psf/black@35ea67920b7f6ac8e09be1c47278752b1e827f76 # stable
 
   zizmor:
     runs-on: ubuntu-latest
