@@ -91,5 +91,5 @@ class MultipleChoiceFieldTest(SimpleTestCase):
 
     def test_validate_duplicated_invalid_values(self):
         f = MultipleChoiceField(choices=[("1", "one"), ("2", "Two")])
-        with self.assertRaises(ValidationError):
-            f.validate(["1", "1", "invalid", "invalid"])
+        with self.assertRaisesMessage(ValidationError, "invalid-one"):
+            f.validate(["invalid-one", "invalid-one", "invalid-two"])
