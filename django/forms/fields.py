@@ -40,6 +40,7 @@ from django.forms.widgets import (
 )
 from django.utils import formats
 from django.utils.choices import normalize_choices
+from django.utils.datastructures import OrderedSet
 from django.utils.dateparse import parse_datetime, parse_duration
 from django.utils.duration import duration_string
 from django.utils.ipv6 import MAX_IPV6_ADDRESS_LENGTH, clean_ipv6_address
@@ -965,8 +966,8 @@ class MultipleChoiceField(ChoiceField):
         if self.required and not value:
             raise ValidationError(self.error_messages["required"], code="required")
         # Validate that each value in the value list is in self.choices.
-        # Use set() to avoid redundant validation.
-        for val in set(value):
+        # Avoid redundant validation, and keep elements ordered.
+        for val in OrderedSet(value):
             if not self.valid_value(val):
                 raise ValidationError(
                     self.error_messages["invalid_choice"],
