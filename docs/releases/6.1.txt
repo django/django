@@ -217,7 +217,11 @@ Cache
 CSP
 ~~~
 
-* ...
+* The new :ttag:`csp_nonce_attr` template tag renders the CSP nonce attribute
+  on ``<script>`` and ``<link>`` elements, or renders a
+  :class:`~django.forms.Media` object's assets with the nonce applied, when the
+  :func:`~django.template.context_processors.csp` context processor is
+  configured. See :ref:`csp-nonce` for details.
 
 CSRF
 ~~~~

@@ -72,6 +72,18 @@ class MediaAssetTestCase(SimpleTestCase):
         asset = MediaAsset("//absolute/path/to/css")
         self.assertEqual(asset.path, "//absolute/path/to/css")
 
+    def test_render_attrs_conflict(self):
+        asset = MediaAsset("/path/to/asset", nonce="static")
+        msg = "MediaAsset has conflicting attributes: nonce"
+        with self.assertRaisesMessage(ValueError, msg):
+            asset.render(attrs={"nonce": "dynamic"})
+
+    def test_render_attrs_multiple_conflicts(self):
+        asset = MediaAsset("/path/to/asset", integrity="sha256-abc", nonce="static")
+        msg = "MediaAsset has conflicting attributes: integrity, nonce"
+        with self.assertRaisesMessage(ValueError, msg):
+            asset.render(attrs={"integrity": "sha256-xyz", "nonce": "dynamic"})
+
 
 @override_settings(STATIC_URL="http://media.example.com/static/")
 class ScriptTestCase(SimpleTestCase):
@@ -89,6 +101,35 @@ class ScriptTestCase(SimpleTestCase):
             str(Script("path/to/js", **{"async": True, "deferred": False})),
             '<script src="http://media.example.com/static/path/to/js" async></script>',
         )
+
+    def test_render_with_attrs(self):
+        script = Script("/path/to/js", integrity="sha256-abc")
+        self.assertHTMLEqual(
+            script.render(attrs={"nonce": "abc123"}),
+            '<script src="/path/to/js" integrity="sha256-abc" nonce="abc123"></script>',
+        )
+
+    def test_render_attrs_conflict(self):
+        script = Script("/path/to/js", nonce="static")
+        msg = "Script has conflicting attributes: nonce"
+        with self.assertRaisesMessage(ValueError, msg):
+            script.render(attrs={"nonce": "dynamic"})
+
+
+@override_settings(STATIC_URL="http://media.example.com/static/")
+class CSSTestCase(SimpleTestCase):
+    def test_render_with_attrs(self):
+        asset = CSS("/path/to/css")
+        self.assertHTMLEqual(
+            asset.render(attrs={"nonce": "abc123"}),
+            '<link href="/path/to/css" nonce="abc123" rel="stylesheet">',
+        )
+
+    def test_render_attrs_conflict(self):
+        asset = CSS("/path/to/css", nonce="static")
+        msg = "CSS has conflicting attributes: nonce"
+        with self.assertRaisesMessage(ValueError, msg):
+            asset.render(attrs={"nonce": "dynamic"})
 
 
 @override_settings(
@@ -798,6 +839,43 @@ class FormsMediaTestCase(SimpleTestCase):
         merged = media + empty_media
         self.assertEqual(merged._css_lists, [{"screen": ["a.css"]}])
         self.assertEqual(merged._js_lists, [["a"]])
+
+    def test_render_js_with_attrs(self):
+        media = Media(js=[Script("/path/to/js", integrity="sha256-abc")])
+        self.assertHTMLEqual(
+            media.render(attrs={"nonce": "abc123"}),
+            '<script src="/path/to/js" integrity="sha256-abc" nonce="abc123"></script>',
+        )
+
+    def test_render_css_with_attrs(self):
+        media = Media(css={"all": [CSS("/path/to/css", media="print")]})
+        self.assertHTMLEqual(
+            media.render(attrs={"nonce": "abc123"}),
+            '<link href="/path/to/css" media="print" nonce="abc123" rel="stylesheet">',
+        )
+
+    def test_render_css_string_path_with_attrs(self):
+        media = Media(css={"all": ["/path/to/css"]})
+        self.assertHTMLEqual(
+            media.render(attrs={"nonce": "abc123"}),
+            '<link href="/path/to/css" media="all" nonce="abc123" rel="stylesheet">',
+        )
+
+    def test_render_attrs_conflict(self):
+        cases = [
+            (
+                Media(js=[Script("/path/to/js", nonce="static")]),
+                "Script has conflicting attributes: nonce",
+            ),
+            (
+                Media(css={"all": [CSS("/path/to/css", nonce="static")]}),
+                "CSS has conflicting attributes: nonce",
+            ),
+        ]
+        for media, msg in cases:
+            with self.subTest(msg=msg):
+                with self.assertRaisesMessage(ValueError, msg):
+                    media.render(attrs={"nonce": "dynamic"})
 
 
 @override_settings(

@@ -322,6 +322,10 @@ HTML:
 ``Media`` objects
 =================
 
+.. class:: Media
+
+    Represents a collection of media assets required by a widget or form.
+
 When you interrogate the ``media`` attribute of a widget or form, the
 value that is returned is a ``forms.Media`` object. As we have already
 seen, the string representation of a ``Media`` object is the HTML

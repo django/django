@@ -101,6 +101,36 @@ Sample usage:
 This tag is used for CSRF protection, as described in the documentation for
 :doc:`Cross Site Request Forgeries </ref/csrf>`.
 
+.. templatetag:: csp_nonce_attr
+
+``csp_nonce_attr``
+------------------
+
+.. versionadded:: 6.1
+
+When called without arguments, renders a ``nonce="<value>"`` HTML attribute
+when the :func:`~django.template.context_processors.csp` context processor is
+configured, and an empty string otherwise. Use it in ``<script>`` or
+``<link>`` elements to allow them under a nonce-based Content Security Policy:
+
+.. code-block:: html+django
+
+    <script src="/path/to/script.js" {% csp_nonce_attr %}></script>
+    <link rel="stylesheet" href="/path/to/style.css" {% csp_nonce_attr %}>
+
+When called with a :class:`~django.forms.Media` object as the argument,
+renders its assets with the CSP nonce applied to each ``<script>`` and
+``<link>`` element:
+
+.. code-block:: html+django
+
+    {% csp_nonce_attr form.media %}
+
+In both forms, if the context processor is not configured, assets are rendered
+without a nonce attribute.
+
+See :ref:`csp-nonce` for full configuration details.
+
 .. templatetag:: cycle
 
 ``cycle``

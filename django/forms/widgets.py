@@ -82,14 +82,27 @@ class MediaAsset:
         return hash(self._path)
 
     def __str__(self):
-        return format_html(
-            self.element_template,
-            path=self.path,
-            attributes=flatatt(self.attributes),
-        )
+        return self.render()
 
     def __repr__(self):
         return f"{type(self).__qualname__}({self._path!r})"
+
+    def render(self, *, attrs=None):
+        if (
+            attrs
+            and self.attributes
+            and (conflicts := attrs.keys() & self.attributes.keys())
+        ):
+            conflicts = ", ".join(sorted(conflicts))
+            raise ValueError(
+                f"{self.__class__.__qualname__} has conflicting attributes: "
+                f"{conflicts}"
+            )
+        return format_html(
+            self.element_template,
+            path=self.path,
+            attributes=flatatt({**(attrs or {}), **self.attributes}),
+        )
 
     @property
     def path(self):
@@ -142,38 +155,47 @@ class Media:
     def _js(self):
         return self.merge(*self._js_lists)
 
-    def render(self):
+    def render(self, *, attrs=None):
         return mark_safe(
             "\n".join(
                 chain.from_iterable(
-                    getattr(self, "render_" + name)() for name in MEDIA_TYPES
+                    getattr(self, "render_" + name)(attrs=attrs) for name in MEDIA_TYPES
                 )
             )
         )
 
-    def render_js(self):
+    def render_js(self, *, attrs=None):
         return [
             (
-                path.__html__()
-                if hasattr(path, "__html__")
-                else format_html('<script src="{}"></script>', self.absolute_path(path))
+                path.render(attrs=attrs)
+                if isinstance(path, MediaAsset)
+                else (
+                    path.__html__()
+                    if hasattr(path, "__html__")
+                    else Script(path).render(attrs=attrs)
+                )
             )
             for path in self._js
         ]
 
-    def render_css(self):
+    def render_css(self, *, attrs=None):
         # To keep rendering order consistent, we can't just iterate over
         # items(). We need to sort the keys, and iterate over the sorted list.
         media = sorted(self._css)
         return chain.from_iterable(
             [
                 (
-                    path.__html__()
-                    if hasattr(path, "__html__")
-                    else format_html(
-                        '<link href="{}" media="{}" rel="stylesheet">',
-                        self.absolute_path(path),
-                        medium,
+                    path.render(attrs=attrs)
+                    if isinstance(path, MediaAsset)
+                    else (
+                        path.__html__()
+                        if hasattr(path, "__html__")
+                        else format_html(
+                            '<link href="{}" media="{}"{} rel="stylesheet">',
+                            self.absolute_path(path),
+                            medium,
+                            flatatt(attrs) if attrs else "",
+                        )
                     )
                 )
                 for path in self._css[medium]
