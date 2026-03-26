@@ -2121,9 +2121,9 @@ programming languages or database frameworks; there's nothing Django-specific
 about your database.
 
 Using multiprocessing with Django
---------------------------------
+---------------------------------
 
-When using Python's ``multiprocessing`` module with Django, each process
+When using Python's :mod:`multiprocessing` module with Django, each process
 must establish its own database connection. Database connections should
 not be shared across processes created with ``fork()``.
 
@@ -2137,8 +2137,3 @@ processes::
 
 This allows each child process to create a fresh database connection
 when interacting with the database.
-
-
-
-
-
