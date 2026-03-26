@@ -509,6 +509,7 @@ class StreamingHttpResponse(HttpResponseBase):
             self.is_acmgr = True
             self.is_async = True
             return
+        self.acmgr = None
         self.is_acmgr = False
         try:
             self._iterator = iter(value)
@@ -522,15 +523,24 @@ class StreamingHttpResponse(HttpResponseBase):
     async def __aenter__(self):
         if self.is_acmgr:
             self.__agen = await self.acmgr.__aenter__()
+
+            async def awrapper():
+                async for part in self.__agen:
+                    yield self.make_bytes(part)
+
+            self.__aiter = awrapper()
         else:
-            self.__agen = aiter(self)
-        return self.__agen
+            self.__aiter = aiter(self)
+        return self.__aiter
 
     async def __aexit__(self, *exc_info):
         try:
-            await self.__agen.aclose()
+            if hasattr(self.__aiter, "aclose"):
+                await self.__aiter.aclose()
         finally:
             if self.is_acmgr:
+                if hasattr(self.__agen, "aclose"):
+                    await self.__agen.aclose()
                 return await self.acmgr.__aexit__(*exc_info)
         return None
 

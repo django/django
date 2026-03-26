@@ -868,6 +868,36 @@ class StreamingHttpResponseTests(SimpleTestCase):
                     pass
         self.assertEqual(exited, [True])
 
+    async def test_acmgr_chunks_are_bytes(self):
+        @contextlib.asynccontextmanager
+        async def acmgr():
+            async def iterator():
+                yield "hello"
+                yield "world"
+
+            yield iterator()
+
+        r = StreamingHttpResponse(acmgr())
+        chunks = []
+        async with r as content:
+            async for chunk in content:
+                chunks.append(chunk)
+        self.assertEqual(chunks, [b"hello", b"world"])
+
+    async def test_acmgr_flag_cleared_on_reassignment(self):
+        @contextlib.asynccontextmanager
+        async def acmgr():
+            async def iterator():
+                yield b"hello"
+
+            yield iterator()
+
+        r = StreamingHttpResponse(acmgr())
+        self.assertTrue(r.is_acmgr)
+        r.streaming_content = [b"a", b"b"]
+        self.assertFalse(r.is_acmgr)
+        self.assertIsNone(r.acmgr)
+
     @unittest.skipUnless(
         sys.version_info >= (3, 11), "asyncio.TaskGroup requires Python 3.11+"
     )
