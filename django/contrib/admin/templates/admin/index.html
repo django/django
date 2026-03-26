@@ -1,7 +1,7 @@
 {% extends "admin/base_site.html" %}
-{% load i18n static admin_filters %}
+{% load i18n static admin_filters csp %}
 
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/dashboard.css" %}">{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/dashboard.css" %}" {% csp_nonce %}>{% endblock %}
 
 {% block coltype %}colMS{% endblock %}
 

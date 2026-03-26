@@ -115,6 +115,10 @@ Minor features
 * :attr:`~django.contrib.admin.ModelAdmin.list_display` now uses boolean icons
   for boolean fields on related models.
 
+* Templates now include the CSP nonce on ``<script>`` and ``<link>`` elements
+  when the :func:`~django.template.context_processors.csp` context processor is
+  configured. See :ref:`csp-nonce-config` for setup instructions.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

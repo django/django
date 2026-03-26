@@ -1,8 +1,8 @@
 {% extends "admin/base_site.html" %}
-{% load i18n static %}
+{% load i18n static csp %}
 
 {% block title %}{% if form.errors %}{% translate "Error:" %} {% endif %}{{ block.super }}{% endblock %}
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/login.css" %}">
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/login.css" %}" {% csp_nonce %}>
 {{ form.media }}
 {% endblock %}
 
