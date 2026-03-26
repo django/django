@@ -206,7 +206,10 @@ Cache
 CSP
 ~~~
 
-* ...
+* The new ``{% csp_nonce %}`` and ``{% csp_media %}`` template tags, available
+  via ``{% load csp %}``, render the CSP nonce attribute on ``<script>`` and
+  ``<link>`` elements when the :func:`~django.template.context_processors.csp`
+  context processor is configured. See :ref:`csp-nonce` for details.
 
 CSRF
 ~~~~
@@ -241,7 +244,10 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* :class:`~django.forms.Media`\'s ``render()``, ``render_js()``, and
+  ``render_css()`` methods now accept an ``attrs`` keyword argument for passing
+  additional HTML attributes to each rendered asset element. See
+  :ref:`form-media-render-attrs` for details.
 
 Generic Views
 ~~~~~~~~~~~~~

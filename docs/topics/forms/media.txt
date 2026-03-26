@@ -322,6 +322,8 @@ HTML:
 ``Media`` objects
 =================
 
+.. class:: Media
+
 When you interrogate the ``media`` attribute of a widget or form, the
 value that is returned is a ``forms.Media`` object. As we have already
 seen, the string representation of a ``Media`` object is the HTML
@@ -349,6 +351,29 @@ operator to filter out a medium of interest. For example:
 
 When you use the subscript operator, the value that is returned is a
 new ``Media`` object -- but one that only contains the media of interest.
+
+.. _form-media-render-attrs:
+
+Rendering with extra attributes
+--------------------------------
+
+``Media.render()``, ``Media.render_js()``, and ``Media.render_css()`` accept an
+optional ``attrs`` keyword argument -- a dictionary of extra HTML attributes to
+apply to each rendered asset element. This is useful for adding attributes such
+as ``nonce`` for Content Security Policy compliance:
+
+.. code-block:: pycon
+
+    >>> w = CalendarWidget()
+    >>> print(w.media.render(attrs={"nonce": "abc123"}))
+    <link href="https://static.example.com/pretty.css" media="all" nonce="abc123" rel="stylesheet">
+    <script src="https://static.example.com/animations.js" nonce="abc123"></script>
+    <script src="https://static.example.com/actions.js" nonce="abc123"></script>
+
+In practice, the nonce value comes from Django's CSP support. The
+:ttag:`csp_media` template tag handles this automatically when the
+:func:`~django.template.context_processors.csp` context processor is
+configured.
 
 Combining ``Media`` objects
 ---------------------------
