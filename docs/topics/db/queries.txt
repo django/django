@@ -1831,7 +1831,7 @@ Example:
     >>> b.entry_set.all()  # Returns all Entry objects related to Blog.
 
     # b.entry_set is a Manager that returns QuerySets.
-    >>> b.entry_set.filter(headline__contains="Lennon")
+v    >>> b.entry_set.filter(headline__contains="Lennon")
     >>> b.entry_set.count()
 
 You can override the ``FOO_set`` name by setting the
@@ -2107,22 +2107,9 @@ three queries would be identical::
     Entry.objects.filter(blog=b.id)  # Query using id from instance
     Entry.objects.filter(blog=5)  # Query using id directly
 
-Falling back to raw SQL
-=======================
-
-If you find yourself needing to write an SQL query that is too complex for
-Django's database-mapper to handle, you can fall back on writing SQL by hand.
-Django has a couple of options for writing raw SQL queries; see
-:doc:`/topics/db/sql`.
-
-Finally, it's important to note that the Django database layer is merely an
-interface to your database. You can access your database via other tools,
-programming languages or database frameworks; there's nothing Django-specific
-about your database.
-
-Using multiprocessing with Django
----------------------------------
-
+Using multiprocessing
+---------------------
+    
 When using Python's :mod:`multiprocessing` module with Django, each process
 must establish its own database connection. Database connections should
 not be shared across processes created with ``fork()``.
@@ -2137,3 +2124,24 @@ processes::
 
 This allows each child process to create a fresh database connection
 when interacting with the database.
+
+
+Falling back to raw SQL
+=======================
+
+If you find yourself needing to write an SQL query that is too complex for
+Django's database-mapper to handle, you can fall back on writing SQL by hand.
+Django has a couple of options for writing raw SQL queries; see
+:doc:`/topics/db/sql`.
+
+Finally, it's important to note that the Django database layer is merely an
+interface to your database. You can access your database via other tools,
+programming languages or database frameworks; there's nothing Django-specific
+about your database.
+
+
+
+
+
+
+
