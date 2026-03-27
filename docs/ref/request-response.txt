@@ -373,6 +373,7 @@ Methods
     and ``SERVER_PORT`` ``META`` variables, in that order.
 
 .. method:: HttpRequest.get_full_path()
+Returns the full path including the query string. The return value is always a string.
 
     Returns the ``path``, plus an appended query string, if applicable.
 
