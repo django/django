@@ -1,0 +1,8 @@
+===========================
+Django 4.2.30 release notes
+===========================
+
+*April 7, 2026*
+
+Django 4.2.30 fixes one security issue with severity "moderate" and four
+security issues with severity "low" in 4.2.29.
