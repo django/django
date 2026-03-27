@@ -230,6 +230,11 @@ so::
 
     Entry.objects.filter(pub_date__year=2006)
 
+To get entries that were *not* published in 2006, use
+:meth:`~django.db.models.query.QuerySet.exclude`::
+
+    Entry.objects.exclude(pub_date__year=2006)
+
 With the default manager class, it is the same as::
 
     Entry.objects.all().filter(pub_date__year=2006)
