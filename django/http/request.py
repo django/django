@@ -213,10 +213,10 @@ class HttpRequest:
             port = self.META["SERVER_PORT"]
         return str(port)
 
-    def get_full_path(self) -> str:(self, force_append_slash=False):
+    def get_full_path(self,force_append_slash=False) -> str:
         return self._get_full_path(self.path, force_append_slash)
 
-    def get_full_path_info(self) -> str:(self, force_append_slash=False):
+    def get_full_path_info(self,force_append_slash=False) -> str:
         return self._get_full_path(self.path_info, force_append_slash)
 
     def _get_full_path(self, path, force_append_slash):
