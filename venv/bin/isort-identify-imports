@@ -1,0 +1,6 @@
+#!/workspaces/django/venv/bin/python
+import sys
+from isort.main import identify_imports_main
+if __name__ == '__main__':
+    sys.argv[0] = sys.argv[0].removesuffix('.exe')
+    sys.exit(identify_imports_main())

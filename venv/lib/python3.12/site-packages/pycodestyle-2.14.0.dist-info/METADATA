@@ -1,0 +1,130 @@
+Metadata-Version: 2.1
+Name: pycodestyle
+Version: 2.14.0
+Summary: Python style guide checker
+Home-page: https://pycodestyle.pycqa.org/
+Author: Johann C. Rocholl
+Author-email: johann@rocholl.net
+Maintainer: Ian Lee
+Maintainer-email: IanLee1521@gmail.com
+License: MIT
+Project-URL: Changes, https://pycodestyle.pycqa.org/en/latest/developer.html#changes
+Keywords: pycodestyle,pep8,PEP 8,PEP-8,PEP8
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.9
+Description-Content-Type: text/x-rst
+License-File: LICENSE
+
+pycodestyle (formerly called pep8) - Python style guide checker
+===============================================================
+
+.. image:: https://github.com/PyCQA/pycodestyle/actions/workflows/main.yml/badge.svg
+   :target: https://github.com/PyCQA/pycodestyle/actions/workflows/main.yml
+   :alt: Build status
+
+.. image:: https://readthedocs.org/projects/pycodestyle/badge/?version=latest
+    :target: https://pycodestyle.pycqa.org
+    :alt: Documentation Status
+
+.. image:: https://img.shields.io/pypi/wheel/pycodestyle.svg
+   :target: https://pypi.org/project/pycodestyle/
+   :alt: Wheel Status
+
+.. image:: https://badges.gitter.im/PyCQA/pycodestyle.svg
+   :alt: Join the chat at https://gitter.im/PyCQA/pycodestyle
+   :target: https://gitter.im/PyCQA/pycodestyle?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+
+pycodestyle is a tool to check your Python code against some of the style
+conventions in `PEP 8`_.
+
+.. _PEP 8: http://www.python.org/dev/peps/pep-0008/
+
+.. note::
+
+    This package used to be called ``pep8`` but was renamed to ``pycodestyle``
+    to reduce confusion. Further discussion can be found `in the issue where
+    Guido requested this
+    change <https://github.com/PyCQA/pycodestyle/issues/466>`_, or in the
+    lightning talk at PyCon 2016 by @IanLee1521:
+    `slides <https://speakerdeck.com/ianlee1521/pep8-vs-pep-8>`_
+    `video <https://youtu.be/PulzIT8KYLk?t=36m>`_.
+
+Features
+--------
+
+* Plugin architecture: Adding new checks is easy.
+
+* Parseable output: Jump to error location in your editor.
+
+* Small: Just one Python file, requires only stdlib. You can use just
+  the ``pycodestyle.py`` file for this purpose.
+
+* Comes with a comprehensive test suite.
+
+Installation
+------------
+
+You can install, upgrade, and uninstall ``pycodestyle.py`` with these commands::
+
+  $ pip install pycodestyle
+  $ pip install --upgrade pycodestyle
+  $ pip uninstall pycodestyle
+
+There's also a package for Debian/Ubuntu, but it's not always the
+latest version.
+
+Example usage and output
+------------------------
+
+::
+
+  $ pycodestyle --first optparse.py
+  optparse.py:69:11: E401 multiple imports on one line
+  optparse.py:77:1: E302 expected 2 blank lines, found 1
+  optparse.py:88:5: E301 expected 1 blank line, found 0
+  optparse.py:347:31: E211 whitespace before '('
+  optparse.py:357:17: E201 whitespace after '{'
+  optparse.py:472:29: E221 multiple spaces before operator
+
+You can also make ``pycodestyle.py`` show the source code for each error, and
+even the relevant text from PEP 8::
+
+  $ pycodestyle --show-source --show-pep8 testing/data/E40.py
+  testing/data/E40.py:2:10: E401 multiple imports on one line
+  import os, sys
+           ^
+      Imports should usually be on separate lines.
+
+      Okay: import os\nimport sys
+      E401: import sys, os
+
+
+Or you can display how often each error was found::
+
+  $ pycodestyle --statistics -qq Python-2.5/Lib
+  232     E201 whitespace after '['
+  599     E202 whitespace before ')'
+  631     E203 whitespace before ','
+  842     E211 whitespace before '('
+  2531    E221 multiple spaces before operator
+  4473    E301 expected 1 blank line, found 0
+  4006    E302 expected 2 blank lines, found 1
+  165     E303 too many blank lines (4)
+  325     E401 multiple imports on one line
+  3615    E501 line too long (82 characters)
+
+Links
+-----
+
+* `Read the documentation <https://pycodestyle.pycqa.org/>`_
+
+* `Fork me on GitHub <http://github.com/PyCQA/pycodestyle>`_

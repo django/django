@@ -183,7 +183,7 @@ class HttpRequest:
                 host = "%s:%s" % (host, server_port)
         return host
 
-    def get_host(self):
+    def get_host(self) -> str:
         """Return the HTTP host using the environment or request headers."""
         host = self._get_raw_host()
 
@@ -213,10 +213,10 @@ class HttpRequest:
             port = self.META["SERVER_PORT"]
         return str(port)
 
-    def get_full_path(self, force_append_slash=False):
+    def get_full_path(self) -> str:(self, force_append_slash=False):
         return self._get_full_path(self.path, force_append_slash)
 
-    def get_full_path_info(self, force_append_slash=False):
+    def get_full_path_info(self) -> str:(self, force_append_slash=False):
         return self._get_full_path(self.path_info, force_append_slash)
 
     def _get_full_path(self, path, force_append_slash):

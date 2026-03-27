@@ -1,0 +1,6 @@
+#!/workspaces/django/venv/bin/python
+import sys
+from blackd import patched_main
+if __name__ == '__main__':
+    sys.argv[0] = sys.argv[0].removesuffix('.exe')
+    sys.exit(patched_main())
