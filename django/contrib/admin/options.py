@@ -1,5 +1,6 @@
 import copy
 import enum
+import itertools
 import json
 import re
 from functools import partial, update_wrapper
@@ -76,6 +77,7 @@ SOURCE_MODEL_VAR = "_source_model"
 TO_FIELD_VAR = "_to_field"
 IS_FACETS_VAR = "_facets"
 EMPTY_VALUE_STRING = "-"
+INLINE_PROTECTED_ERROR_MAX_OBJECTS = 100
 
 
 class ShowFacets(enum.Enum):
@@ -2497,7 +2499,10 @@ class InlineModelAdmin(BaseModelAdmin):
                     collector.collect([self.instance])
                     if collector.protected:
                         objs = []
-                        for p in collector.protected:
+                        protected = itertools.islice(
+                            collector.protected, INLINE_PROTECTED_ERROR_MAX_OBJECTS
+                        )
+                        for p in protected:
                             objs.append(
                                 # Translators: Model verbose name and instance
                                 # representation, suitable to be an item in a
@@ -2508,8 +2513,21 @@ class InlineModelAdmin(BaseModelAdmin):
                         params = {
                             "class_name": self._meta.model._meta.verbose_name,
                             "instance": self.instance,
-                            "related_objects": get_text_list(objs, _("and")),
                         }
+                        deleted_diff = (
+                            len(collector.protected)
+                            - INLINE_PROTECTED_ERROR_MAX_OBJECTS
+                        )
+                        if deleted_diff > 0:
+                            # Translators: This string is used as a separator
+                            # between list elements
+                            related = (
+                                _(", ").join(str(i) for i in objs)
+                                + _(" and %d more") % deleted_diff
+                            )
+                        else:
+                            related = get_text_list(objs, _("and"))
+                        params["related_objects"] = related
                         msg = _(
                             "Deleting %(class_name)s %(instance)s would require "
                             "deleting the following protected related objects: "
