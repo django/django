@@ -776,12 +776,12 @@ ol.breadcrumbs a:focus, ol.breadcrumbs a:hover {
 
 .viewlink, .inlineviewlink {
     padding-left: 16px;
-    background: url(../img/icon-viewlink.svg) 0 1px no-repeat;
+    background: url(../img/icon-viewlink.svg) 0 center no-repeat;
 }
 
 .hidelink {
     padding-left: 16px;
-    background: url(../img/icon-hidelink.svg) 0 1px no-repeat;
+    background: url(../img/icon-hidelink.svg) 0 center no-repeat;
 }
 
 .addlink {
