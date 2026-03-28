@@ -2535,7 +2535,7 @@ them, but it has a few caveats:
     from itertools import islice
 
     batch_size = 100
-    ids_iter = range(1000)
+    ids_iter = iter(range(1000))
     while ids := list(islice(ids_iter, batch_size)):
         batch = Entry.objects.filter(ids__in=ids)
         for entry in batch:
