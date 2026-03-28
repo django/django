@@ -374,7 +374,9 @@ Methods
 
 .. method:: HttpRequest.get_full_path()
 
-    Returns the ``path``, plus an appended query string, if applicable.
+   Returns the full path including the query string. The return value is always a string.
+
+Returns the ``path``, plus an appended query string, if applicable.
 
     Example: ``"/minfo/music/bands/the_beatles/?print=true"``
 
