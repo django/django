@@ -1,5 +1,7 @@
 """A custom backend for testing."""
 
+from django.core import mail
+from django.core.mail.backends import locmem
 from django.core.mail.backends.base import BaseEmailBackend
 
 
@@ -16,5 +18,30 @@ class EmailBackend(BaseEmailBackend):
 
 class FailingEmailBackend(BaseEmailBackend):
 
+    def __init__(self, fail_silently=False, **kwargs):
+        super().__init__(**kwargs)
+        self.fail_silently = fail_silently
+
     def send_messages(self, email_messages):
+        if self.fail_silently:
+            return 0
         raise ValueError("FailingEmailBackend is doomed to fail.")
+
+
+class OptionsCapturingBackend(locmem.EmailBackend):
+    """Capture the kwargs used to initialize the backend.
+
+    Extend the testing backend to add a `backend_init_kwargs` property to each
+    mail.outbox entry, set to the kwargs used to initialize the backend.
+    """
+
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs.copy()
+        super().__init__(**kwargs)
+
+    def send_messages(self, email_messages):
+        previous_outbox_len = len(mail.outbox)
+        result = super().send_messages(email_messages)
+        for email in mail.outbox[previous_outbox_len:]:
+            email.backend_init_kwargs = self.kwargs
+        return result
