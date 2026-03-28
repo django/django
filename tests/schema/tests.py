@@ -2615,10 +2615,9 @@ class SchemaTests(TransactionTestCase):
     def test_m2m_create_inherited(self):
         self._test_m2m_create(InheritedManyToManyField)
 
-    @skipIfDBFeature("indexes_foreign_keys")
-    def test_m2m_create_skips_redundant_source_fk_index(self):
+    def _test_m2m_create_skips_redundant_source_fk_index(self, M2MFieldClass):
         class LocalBookWithM2M(Model):
-            tags = ManyToManyField("TagM2MTest", related_name="books")
+            tags = M2MFieldClass("TagM2MTest", related_name="books")
 
             class Meta:
                 app_label = "schema"
@@ -2641,6 +2640,15 @@ class SchemaTests(TransactionTestCase):
             constraint["columns"] for constraint in constraints if constraint["unique"]
         ]
         self.assertIn(["localbookwithm2m_id", "tagm2mtest_id"], unique_columns)
+
+    def test_m2m_create_skips_redundant_source_fk_index(self):
+        self._test_m2m_create_skips_redundant_source_fk_index(ManyToManyField)
+
+    def test_m2m_create_skips_redundant_source_fk_index_custom(self):
+        self._test_m2m_create_skips_redundant_source_fk_index(CustomManyToManyField)
+
+    def test_m2m_create_skips_redundant_source_fk_index_inherited(self):
+        self._test_m2m_create_skips_redundant_source_fk_index(InheritedManyToManyField)
 
     def _test_m2m_create_through(self, M2MFieldClass):
         """

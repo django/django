@@ -1438,8 +1438,6 @@ def create_many_to_many_intermediary_model(field, klass):
                 related_name="%s+" % name,
                 db_tablespace=field.db_tablespace,
                 db_constraint=field.remote_field.db_constraint,
-                # unique_together=(from_, to) already creates a composite index
-                # that covers lookups on the left-most from_ column.
                 db_index=False,
                 on_delete=CASCADE,
             ),
