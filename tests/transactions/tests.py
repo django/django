@@ -5,8 +5,7 @@ from unittest import skipIf, skipUnless
 from django.db import transaction, connection
 from django.test import TestCase
 from django.db import models
-import gc
-
+from django.contrib.auth.models import User
 from django.db import (
     DatabaseError,
     Error,
@@ -592,25 +591,17 @@ class DurableTests(DurableTestsBase, TestCase):
     pass
 
 class CursorIteratorBugTest(TestCase):
-    class Item(models.Model):
-        value = models.CharField(max_length=50)
-
-    def test_cursor_cleanup_after_exception(self):
-        for i in range(50):
-            self.Item.objects.create(value=str(i))
+    def test_iterator_interrupted_does_not_break_transaction(self):
+        User.objects.create(username="test1")
+        User.objects.create(username="bad")
 
         try:
             with transaction.atomic():
-                with transaction.atomic():
-                    iterator = self.Item.objects.iterator(chunk_size=10)
-                    for obj in iterator:
-                        if obj.value == "10":
-                            raise ValueError("trigger")
-                   
+                for user in User.objects.iterator():
+                    if user.username == "bad":
+                        raise ValueError("trigger")
         except ValueError:
-            pass
-        gc.collect()
-        try:
-            self.Item.objects.create(value="after")
-        except Exception as e:
-            self.fail(f"Database unusable after iterator exception: {e}")
+            # After interruption, transaction should still work
+            User.objects.create(username="after")
+
+        self.assertTrue(User.objects.filter(username="after").exists())

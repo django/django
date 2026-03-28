@@ -12,6 +12,7 @@ from django.db.models.fields import AutoField, composite
 from django.db.models.functions import Cast, Random
 from django.db.models.lookups import Lookup
 from django.db.models.query_utils import select_related_descend
+from psycopg import errors as psycopg_errors
 from django.db.models.sql.constants import (
     CURSOR,
     GET_ITERATOR_CHUNK_SIZE,
@@ -2258,28 +2259,18 @@ class SQLAggregateCompiler(SQLCompiler):
         params += inner_query_params
         return sql, params
 
-
 def cursor_iter(cursor, sentinel, col_count, itersize):
     """
     Yield blocks of rows from a cursor and ensure the cursor is closed when
     done.
     """
-    closed = False
-
-    def close_cursor():
-        nonlocal closed
-        if not closed:
-            try:
-                cursor.close()
-            except Exception:
-                pass
-            closed = True
-
     try:
         for rows in iter((lambda: cursor.fetchmany(itersize)), sentinel):
             yield rows if col_count is None else [r[:col_count] for r in rows]
     finally:
         try:
             cursor.close()
-        except Exception:
-            pass
+        except Exception as e:
+            # Ignore error if cursor already invalid (e.g., after rollback)
+            if "InvalidCursorName" not in str(e):
+                raise
