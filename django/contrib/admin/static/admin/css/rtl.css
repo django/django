@@ -16,7 +16,7 @@ th {
 .viewlink, .addlink, .changelink, .hidelink {
     padding-left: 0;
     padding-right: 16px;
-    background-position: 100% 1px;
+    background-position-x: 100%;
 }
 
 .deletelink {
