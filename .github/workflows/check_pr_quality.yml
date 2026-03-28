@@ -1,0 +1,48 @@
+name: PR Quality Checks
+
+on:
+  pull_request_target:
+    types: [ edited, opened, reopened, ready_for_review, synchronize ]
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  pr_quality:
+    name: Run Quality Checks on a PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          # Checking out the default branch (not the PR head) is what makes
+          # pull_request_target safe: the workflow code always comes from the
+          # base repo, so a malicious PR cannot alter it.
+          ref: ${{ github.event.repository.default_branch }}
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Run PR quality checks
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_CREATED_AT: ${{ github.event.pull_request.created_at }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_REPO: ${{ github.repository }}
+          # Only close PRs on the main Django repository; on forks the workflow
+          # runs in warning-only mode so contributors can test their PRs.
+          AUTOCLOSE: ${{ github.repository == 'django/django' }}
+          PYTHONPATH: scripts
+        run: python scripts/pr_quality/check_pr.py
