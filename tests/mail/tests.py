@@ -107,6 +107,18 @@ def message_from_bytes(s):
     return message
 
 
+def spy_on(klass, method_name="__init__"):
+    """
+    Observe a class instance's method while retaining its original behavior.
+    """
+    return mock.patch.object(
+        klass,
+        method_name,
+        autospec=True,
+        side_effect=getattr(klass, method_name),
+    )
+
+
 class MailTestsMixin:
     def assertMessageHasHeaders(self, message, headers):
         """
@@ -1684,8 +1696,8 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
         """
         # This is meant to verify EmailMessage.__init__() doesn't apply any
         # special processing that would be missing for properties set later.
-        original_connection = mail.get_connection(username="original")
-        new_connection = mail.get_connection(username="new")
+        original_connection = mail.get_connection()
+        new_connection = mail.get_connection()
         email = EmailMessage(
             "original subject",
             "original body\n",
@@ -1895,6 +1907,27 @@ class SendMailTests(SimpleTestCase, MailTestsMixin):
         self.assertEqual(len(connection.test_outbox), 1)
         self.assertEqual(connection.test_outbox[0].subject, "Subject")
 
+    @spy_on(locmem.EmailBackend)
+    def test_backend_options(self, mock_backend_init):
+        """
+        auth_user, auth_password, and fail_silently are passed to backend as
+        username, password and, fail_silently.
+        """
+        send_mail(
+            "Subject",
+            "Content",
+            "from@example.com",
+            ["to@example.com"],
+            auth_user="user",
+            auth_password="password",
+            fail_silently=True,
+        )
+        mock_backend_init.assert_called_once()
+        init_kwargs = mock_backend_init.call_args.kwargs
+        self.assertEqual(init_kwargs["username"], "user")
+        self.assertEqual(init_kwargs["password"], "password")
+        self.assertIs(init_kwargs["fail_silently"], True)
+
     def test_fail_silently_conflict(self):
         msg = (
             "fail_silently cannot be used with a connection. "
@@ -1935,6 +1968,29 @@ class SendMassMailTests(SimpleTestCase):
     Tests for django.core.mail.send_mass_mail().
     """
 
+    def test_send_mass_mail(self):
+        count = send_mass_mail(
+            [
+                ("Subject1", "Content1", "from1@example.com", ["to1@example.com"]),
+                (
+                    "Subject2",
+                    "Content2",
+                    "from2@example.com",
+                    ["to2a@example.com", "to2b@example.com"],
+                ),
+            ],
+        )
+        self.assertEqual(count, 2)
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(mail.outbox[0].subject, "Subject1")
+        self.assertEqual(mail.outbox[0].body, "Content1")
+        self.assertEqual(mail.outbox[0].from_email, "from1@example.com")
+        self.assertEqual(mail.outbox[0].to, ["to1@example.com"])
+        self.assertEqual(mail.outbox[1].subject, "Subject2")
+        self.assertEqual(mail.outbox[1].body, "Content2")
+        self.assertEqual(mail.outbox[1].from_email, "from2@example.com")
+        self.assertEqual(mail.outbox[1].to, ["to2a@example.com", "to2b@example.com"])
+
     def test_connection_arg(self):
         # Send using non-default connection.
         connection = mail.get_connection("mail.custombackend.EmailBackend")
@@ -1949,6 +2005,24 @@ class SendMassMailTests(SimpleTestCase):
         self.assertEqual(len(connection.test_outbox), 2)
         self.assertEqual(connection.test_outbox[0].subject, "Subject1")
         self.assertEqual(connection.test_outbox[1].subject, "Subject2")
+
+    @spy_on(locmem.EmailBackend)
+    def test_backend_options(self, mock_backend_init):
+        """
+        auth_user, auth_password, and fail_silently are passed to backend as
+        username, password, and fail_silently.
+        """
+        send_mass_mail(
+            [("Subject1", "Content1", "from1@example.com", ["to1@example.com"])],
+            auth_user="user",
+            auth_password="password",
+            fail_silently=True,
+        )
+        mock_backend_init.assert_called_once()
+        init_kwargs = mock_backend_init.call_args.kwargs
+        self.assertEqual(init_kwargs["username"], "user")
+        self.assertEqual(init_kwargs["password"], "password")
+        self.assertIs(init_kwargs["fail_silently"], True)
 
     def test_send_fail_silently_conflict(self):
         datatuple = (("Subject", "Message", "from@example.com", ["to@example.com"]),)
@@ -2172,6 +2246,17 @@ class GetConnectionTests(SimpleTestCase):
     """
     Tests for django.core.mail.get_connection().
     """
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.console.EmailBackend")
+    def test_uses_email_backend_setting(self):
+        connection = mail.get_connection()
+        self.assertIsInstance(connection, console.EmailBackend)
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend")
+    def test_backend_specific_kwargs(self):
+        connection = mail.get_connection(host="mail.example.com")
+        self.assertIsInstance(connection, smtp.EmailBackend)
+        self.assertEqual(connection.host, "mail.example.com")
 
     def test_backend_arg(self):
         """Test backend argument of mail.get_connection()"""
