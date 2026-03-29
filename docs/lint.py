@@ -47,7 +47,7 @@ _IS_METHOD_RE = re.compile(r"^ *([\w.]+)\([\w ,*]*\)\s*$")
 # underscore works as well, but that would create a named reference instead of
 # an anonymous one. Named references typically do not have a benefit when the
 # URL is embedded. Moreover, they have the disadvantage that you must make sure
-# that you do not use the same “Link text” for another link in your document.
+# that you do not use the same "Link text" for another link in your document.
 _HYPERLINK_DANGLING_RE = re.compile(r"^\s*<https?://[^>]+>`__?[\.,;]?$")
 
 
@@ -124,7 +124,7 @@ _PYTHON_DOMAIN = re.compile(f":py:{SIMPLENAME}:`{_ROLE_BODY}`")
 @sphinxlint_checker(".rst", enabled=False, rst_only=True)
 def check_python_domain_in_roles(file, lines, options=None):
     """
-    :py: indicates the Python language domain. This means code writen in
+    :py: indicates the Python language domain. This means code written in
     Python, not Python built-ins in particular.
 
     Bad:    :py:class:`email.message.EmailMessage`
