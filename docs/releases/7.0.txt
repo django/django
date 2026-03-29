@@ -6,3 +6,5 @@ Features removed in 7.0
 =======================
 
 * The ``django.db.models.fields.BLANK_CHOICE_DASH`` constant has been removed.
+
+* The ``USE_BLANK_CHOICE_DASH`` transitional setting has been removed.

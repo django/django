@@ -1705,18 +1705,13 @@ renderers are:
 * ``'``:class:`django.forms.renderers.Jinja2`\ ``'``
 * ``'``:class:`django.forms.renderers.TemplatesSetting`\ ``'``
 
-.. setting:: BLANK_CHOICE_LABEL
+.. setting:: USE_BLANK_CHOICE_DASH
 
-``BLANK_CHOICE_LABEL``
+``USE_BLANK_CHOICE_DASH``
 ------------------------------------
 
-Default: ``'- Select an option -'`` (Translated)
-
-The default label for the blank choice option used by ``<select>`` elements in
-forms.
-
-This value can be a regular or a translatable string, and can be overridden
-individually per form.
+Set this transitional setting to ``True`` to revert back to the old default
+blank choice label in forms.
 
 .. setting:: FORMAT_MODULE_PATH
 

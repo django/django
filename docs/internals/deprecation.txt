@@ -66,6 +66,8 @@ details on these changes.
 
 * The ``django.db.models.fields.BLANK_CHOICE_DASH`` constant will be removed.
 
+* The ``USE_BLANK_CHOICE_DASH`` transitional setting will be removed.
+
 .. _deprecation-removed-in-6.1:
 
 6.1
