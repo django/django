@@ -257,7 +257,7 @@ class ConditionalGet(SimpleTestCase):
         self.assertEqual(response_quoted["ETag"], response_unquoted["ETag"])
 
     # It's possible that the matching algorithm could use the wrong value even
-    # if the ETag header is set correctly correctly (as tested by
+    # if the ETag header is set correctly (as tested by
     # test_unquoted()), so check that the unquoted value is matched.
     def test_unquoted_if_none_match(self):
         self.client.defaults["HTTP_IF_NONE_MATCH"] = ETAG

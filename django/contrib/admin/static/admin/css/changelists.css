@@ -230,6 +230,10 @@
 #changelist-filter a {
     display: block;
     color: var(--body-quiet-color);
+}
+
+#changelist-filter summary,
+#changelist-filter a {
     word-break: break-word;
 }
 

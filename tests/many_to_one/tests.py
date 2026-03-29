@@ -278,33 +278,6 @@ class ManyToOneTests(TestCase):
             ),
             [new_article1, self.a],
         )
-        # The underlying query only makes one join when a related table is
-        # referenced twice.
-        queryset = Article.objects.filter(
-            reporter__first_name__exact="John", reporter__last_name__exact="Smith"
-        )
-        self.assertNumQueries(1, list, queryset)
-        self.assertEqual(
-            queryset.query.get_compiler(queryset.db).as_sql()[0].count("INNER JOIN"), 1
-        )
-
-        # The automatically joined table has a predictable name.
-        self.assertSequenceEqual(
-            Article.objects.filter(reporter__first_name__exact="John").extra(
-                where=["many_to_one_reporter.last_name='Smith'"]
-            ),
-            [new_article1, self.a],
-        )
-        # ... and should work fine with the string that comes out of
-        # forms.Form.cleaned_data.
-        self.assertQuerySetEqual(
-            (
-                Article.objects.filter(reporter__first_name__exact="John").extra(
-                    where=["many_to_one_reporter.last_name='%s'" % "Smith"]
-                )
-            ),
-            [new_article1, self.a],
-        )
         # Find all Articles for a Reporter.
         # Use direct ID check, pk check, and object comparison
         self.assertSequenceEqual(
@@ -340,6 +313,45 @@ class ManyToOneTests(TestCase):
                 .values("pk")
                 .query
             ).distinct(),
+            [new_article1, self.a],
+        )
+
+    def test_joined_sql(self):
+        # The underlying query only makes one join when a related table is
+        # referenced twice.
+        queryset = Article.objects.filter(
+            reporter__first_name__exact="John", reporter__last_name__exact="Smith"
+        )
+        self.assertNumQueries(1, list, queryset)
+        self.assertEqual(
+            queryset.query.get_compiler(queryset.db).as_sql()[0].count("INNER JOIN"), 1
+        )
+
+    def test_joined_extra(self):
+        new_article1 = self.r.article_set.create(
+            headline="John's second story",
+            pub_date=datetime.date(2005, 7, 29),
+        )
+        self.r2.article_set.create(
+            headline="Paul's story",
+            pub_date=datetime.date(2006, 1, 17),
+        )
+        # The automatically joined table has a predictable name.
+        self.assertSequenceEqual(
+            Article.objects.filter(reporter__first_name__exact="John").extra(
+                where=["many_to_one_reporter.last_name='Smith'"]
+            ),
+            [new_article1, self.a],
+        )
+        # ... and should work fine with the string that comes out of
+        # forms.Form.cleaned_data.
+        self.assertQuerySetEqual(
+            (
+                Article.objects.filter(reporter__first_name__exact="John").extra(
+                    where=["many_to_one_reporter.last_name=%s"],
+                    params=["Smith"],
+                )
+            ),
             [new_article1, self.a],
         )
 

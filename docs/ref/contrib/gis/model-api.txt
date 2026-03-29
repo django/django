@@ -159,8 +159,7 @@ calculations.
 
 Additional Resources:
 
-* `spatialreference.org`__: A Django-powered database of spatial reference
-  systems.
+* `spatialreference.org`__: A database of spatial reference systems.
 * `The State Plane Coordinate System`__: A website covering the various
   projection systems used in the United States. Much of the U.S. spatial
   data encountered will be in one of these coordinate systems rather than

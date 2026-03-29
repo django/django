@@ -7,7 +7,6 @@ on:
       - completed
 
 permissions:
-  contents: read
   actions: read
   pull-requests: write
 
@@ -68,7 +67,7 @@ jobs:
             });
             
             for (const c of comments) {
-              if ((c.body || '').includes('📊 Coverage Report for Changed Files')) {
+              if ((c.body || '').includes('Uncovered lines in changed files')) {
                 await github.rest.issues.deleteComment({
                   owner: context.repo.owner,
                   repo: context.repo.repo,

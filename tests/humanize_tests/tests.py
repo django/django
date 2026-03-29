@@ -1,4 +1,5 @@
 import datetime
+import os
 from decimal import Decimal
 
 from django.contrib.humanize.templatetags import humanize
@@ -9,10 +10,10 @@ from django.utils.html import escape
 from django.utils.timezone import get_fixed_timezone
 from django.utils.translation import gettext as _
 
+here = os.path.dirname(os.path.abspath(__file__))
 # Mock out datetime in some tests so they don't fail occasionally when they
 # run too slow. Use a fixed datetime for datetime.now(). DST change in
 # America/Chicago (the default time zone) happened on March 11th in 2012.
-
 now = datetime.datetime(2012, 3, 9, 22, 30)
 
 
@@ -83,6 +84,7 @@ class HumanizeTests(SimpleTestCase):
         with translation.override("en"):
             self.humanize_tester(test_list, result_list, "ordinal")
 
+    @override_settings(LOCALE_PATHS=[os.path.join(here, "locale")])
     def test_i18n_html_ordinal(self):
         """Allow html in output on i18n strings"""
         test_list = (
@@ -93,6 +95,8 @@ class HumanizeTests(SimpleTestCase):
             "11",
             "12",
             "13",
+            "21",
+            "31",
             "101",
             "102",
             "103",
@@ -108,7 +112,9 @@ class HumanizeTests(SimpleTestCase):
             "11<sup>e</sup>",
             "12<sup>e</sup>",
             "13<sup>e</sup>",
-            "101<sup>er</sup>",
+            "21<sup>e</sup>",
+            "31<sup>e</sup>",
+            "101<sup>e</sup>",
             "102<sup>e</sup>",
             "103<sup>e</sup>",
             "111<sup>e</sup>",

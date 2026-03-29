@@ -121,6 +121,10 @@ The ticket has not been reviewed by anyone who felt qualified to make a
 judgment about whether the ticket contained a valid issue or ought to be closed
 for any reasons. Unreviewed tickets appear in the "triage" queue.
 
+Unreviewed tickets may receive additional refinement before being accepted.
+Unless you are both the author of the ticket and intending to submit a patch,
+unreviewed tickets should not be :ref:`claimed <claiming-tickets>`.
+
 Accepted
 --------
 

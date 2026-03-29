@@ -9,7 +9,7 @@
     {% endblock %}
     {% block actions-counter %}
     {% if actions_selection_counter %}
-        <span class="action-counter" data-actions-icnt="{{ cl.result_list|length }}">{{ selection_note }}</span>
+        <span class="action-counter" data-actions-icnt="{{ cl.result_list|length }}" aria-live="polite" aria-atomic="true">{{ selection_note }}</span>
         {% if cl.result_count != cl.result_list|length %}
         <span class="all hidden">{{ selection_note_all }}</span>
         <span class="question hidden">
