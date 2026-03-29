@@ -60,11 +60,6 @@ DEFAULT_LOGGING = {
             "level": "INFO",
             "propagate": False,
         },
-        "django.db.migrations": {
-            "handlers": [],
-            "level": "INFO",
-            "propagate": False,
-        },
     },
 }
 
