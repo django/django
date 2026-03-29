@@ -1438,8 +1438,10 @@ def create_many_to_many_intermediary_model(field, klass):
                 related_name="%s+" % name,
                 db_tablespace=field.db_tablespace,
                 db_constraint=field.remote_field.db_constraint,
-                db_index=False,
                 on_delete=CASCADE,
+                # Ticket #22125: index is redundant with
+                # unique_together (from_, to).
+                db_index=False,
             ),
             to: models.ForeignKey(
                 to_model,
