@@ -92,6 +92,14 @@
     flex-grow: 1;
 }
 
+.selector-filter .selector-filter-status {
+    flex-shrink: 0;
+    align-self: center;
+    color: var(--body-quiet-color);
+    font-size: 0.6875rem;
+    white-space: nowrap;
+}
+
 .selector ul.selector-chooser {
     align-self: center;
     width: 30px;

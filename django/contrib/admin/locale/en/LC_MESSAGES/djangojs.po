@@ -41,40 +41,55 @@ msgstr ""
 
 #: contrib/admin/static/admin/js/SelectFilter2.js:84
 #, javascript-format
-msgid "Choose selected %s"
+msgid "Choose all displayed %s"
 msgstr ""
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:91
+#: contrib/admin/static/admin/js/SelectFilter2.js:95
 #, javascript-format
-msgid "Remove selected %s"
+msgid "Choose selected %s"
 msgstr ""
 
 #: contrib/admin/static/admin/js/SelectFilter2.js:102
 #, javascript-format
+msgid "Remove selected %s"
+msgstr ""
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:113
+#, javascript-format
 msgid "Chosen %s"
 msgstr ""
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:106
+#: contrib/admin/static/admin/js/SelectFilter2.js:117
 #, javascript-format
 msgid ""
 "Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:118
+#: contrib/admin/static/admin/js/SelectFilter2.js:129
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr ""
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:139
+#: contrib/admin/static/admin/js/SelectFilter2.js:154
 msgid "(click to clear)"
 msgstr ""
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:143
+#: contrib/admin/static/admin/js/SelectFilter2.js:158
 #, javascript-format
 msgid "Remove all %s"
 msgstr ""
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:236
+#: contrib/admin/static/admin/js/SelectFilter2.js:161
+#, javascript-format
+msgid "Remove all displayed %s"
+msgstr ""
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:278
+#, python-format
+msgid "%(displayed)s of %(total)s shown"
+msgstr ""
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:255
 #, javascript-format
 msgid "%s selected option not visible"
 msgid_plural "%s selected options not visible"
