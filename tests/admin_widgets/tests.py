@@ -1772,7 +1772,9 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             self.trigger_resize()
 
             students_input = self.selenium.find_element(By.ID, "id_students_input")
-            students_status = self.selenium.find_element(By.ID, "id_students_filter_status")
+            students_status = self.selenium.find_element(
+                By.ID, "id_students_filter_status"
+            )
             students_input.send_keys("a")
             self.assertEqual(students_status.text, "2 of 6 shown")
             students_input.send_keys(Keys.ESCAPE)
@@ -1798,7 +1800,9 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             alumni_selected_status = self.selenium.find_element(
                 By.ID, "id_alumni_filter_selected_status"
             )
-            remove_all_button = self.selenium.find_element(By.ID, "id_alumni_remove_all")
+            remove_all_button = self.selenium.find_element(
+                By.ID, "id_alumni_remove_all"
+            )
             alumni_selected_input.send_keys("li")
             self.assertEqual(alumni_selected_status.text, "1 of 2 shown")
             self.assertEqual(remove_all_button.text, "Remove all displayed alumni")
