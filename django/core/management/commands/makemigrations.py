@@ -1,3 +1,4 @@
+import importlib
 import os
 import sys
 import warnings
@@ -395,6 +396,7 @@ class Command(BaseCommand):
                     )
                     self.log(writer.as_string())
         run_formatters(self.written_files, stderr=self.stderr)
+        importlib.invalidate_caches()
 
     @staticmethod
     def get_relative_path(path):
@@ -502,6 +504,7 @@ class Command(BaseCommand):
                     with open(writer.path, "w", encoding="utf-8") as fh:
                         fh.write(writer.as_string())
                     run_formatters([writer.path], stderr=self.stderr)
+                    importlib.invalidate_caches()
                     if self.verbosity > 0:
                         self.log("\nCreated new merge migration %s" % writer.path)
                         if self.scriptable:
