@@ -1196,7 +1196,6 @@ class FilePathField(ChoiceField):
         self.path, self.match, self.recursive = path, match, recursive
         self.allow_files, self.allow_folders = allow_files, allow_folders
         super().__init__(choices=(), **kwargs)
-
         self.set_choices()
         
     def set_choices(self):
@@ -1237,6 +1236,7 @@ class FilePathField(ChoiceField):
             self.choices.extend(choices)
 
         self.widget.choices = self.choices
+
 
 class SplitDateTimeField(MultiValueField):
     widget = SplitDateTimeWidget
