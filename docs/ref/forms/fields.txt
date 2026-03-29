@@ -724,6 +724,26 @@ For each field, we describe the default widget used if you don't specify
         whether folders in the specified location should be included. Either
         this or :attr:`allow_files` must be ``True``.
 
+    ``FilePathField`` has the following method:
+
+    .. method:: set_choices()
+
+        .. versionadded:: 6.1
+
+        Scans the directory at :attr:`path` and refreshes the field's
+        choices. This is called automatically during ``__init__()``, but it can
+        also be called explicitly to pick up files added to the directory
+        after the field was first instantiated (usually at server startup). For
+        example, call it in a form's ``__init__()`` to get fresh choices per
+        request::
+
+            class MyForm(forms.Form):
+                my_file = forms.FilePathField(path="/path/to/dir")
+
+                def __init__(self, *args, **kwargs):
+                    super().__init__(*args, **kwargs)
+                    self.fields["my_file"].set_choices()
+
 ``FloatField``
 --------------
 
