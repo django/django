@@ -258,6 +258,12 @@ Forms
   :setting:`USE_BLANK_CHOICE_DASH` allows you to revert back to the old
   default label.
 
+* :class:`~django.forms.FilePathField` now provides a
+  :meth:`~django.forms.FilePathField.set_choices` method to scan the
+  directory at :attr:`~django.forms.FilePathField.path` and refresh the
+  field's choices. This allows per-request refreshing when called in a form's
+  ``__init__()``.
+
 Generic Views
 ~~~~~~~~~~~~~
 

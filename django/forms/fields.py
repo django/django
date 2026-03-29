@@ -1197,7 +1197,9 @@ class FilePathField(ChoiceField):
         self.path, self.match, self.recursive = path, match, recursive
         self.allow_files, self.allow_folders = allow_files, allow_folders
         super().__init__(choices=(), **kwargs)
+        self.set_choices()
 
+    def set_choices(self):
         if self.required:
             self.choices = []
         else:
@@ -1206,20 +1208,20 @@ class FilePathField(ChoiceField):
         if self.match is not None:
             self.match_re = re.compile(self.match)
 
-        if recursive:
+        if self.recursive:
             for root, dirs, files in sorted(os.walk(self.path)):
                 if self.allow_files:
                     for f in sorted(files):
                         if self.match is None or self.match_re.search(f):
                             f = os.path.join(root, f)
-                            self.choices.append((f, f.replace(path, "", 1)))
+                            self.choices.append((f, f.replace(self.path, "", 1)))
                 if self.allow_folders:
                     for f in sorted(dirs):
                         if f == "__pycache__":
                             continue
                         if self.match is None or self.match_re.search(f):
                             f = os.path.join(root, f)
-                            self.choices.append((f, f.replace(path, "", 1)))
+                            self.choices.append((f, f.replace(self.path, "", 1)))
         else:
             choices = []
             with os.scandir(self.path) as entries:
