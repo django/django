@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="color-scheme" content="light" />
   <meta name="robots" content="NONE,NOARCHIVE">
   <title>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}
          {% if request %} at {{ request.path_info }}{% endif %}</title>
@@ -10,7 +11,7 @@
     body * { padding:10px 20px; }
     body * * { padding:0; }
     body { font-family: sans-serif; background-color:#fff; color:#000; }
-    body > :where(header, main, footer) { border-bottom:1px solid #ddd; }
+    body > header, body > main, body > footer { border-bottom:1px solid #ddd; }
     h1 { font-weight:normal; }
     h2 { margin-bottom:.8em; }
     h3 { margin:1em 0 .5em 0; }

@@ -3371,11 +3371,11 @@ class OperationTests(OperationTestBase):
         # unique_together has the renamed column.
         self.assertIn(
             "blue",
-            new_state.models["test_rnflut", "pony"].options["unique_together"][0],
+            list(new_state.models["test_rnflut", "pony"].options["unique_together"])[0],
         )
         self.assertNotIn(
             "pink",
-            new_state.models["test_rnflut", "pony"].options["unique_together"][0],
+            list(new_state.models["test_rnflut", "pony"].options["unique_together"])[0],
         )
         # Rename field.
         self.assertColumnExists("test_rnflut_pony", "pink")
@@ -3412,7 +3412,7 @@ class OperationTests(OperationTestBase):
                     ("weight", models.FloatField()),
                 ],
                 options={
-                    "index_together": [("weight", "pink")],
+                    "index_together": {("weight", "pink")},
                 },
             ),
         ]
@@ -3425,10 +3425,12 @@ class OperationTests(OperationTestBase):
         self.assertNotIn("pink", new_state.models["test_rnflit", "pony"].fields)
         # index_together has the renamed column.
         self.assertIn(
-            "blue", new_state.models["test_rnflit", "pony"].options["index_together"][0]
+            "blue",
+            list(new_state.models["test_rnflit", "pony"].options["index_together"])[0],
         )
         self.assertNotIn(
-            "pink", new_state.models["test_rnflit", "pony"].options["index_together"][0]
+            "pink",
+            list(new_state.models["test_rnflit", "pony"].options["index_together"])[0],
         )
 
         # Rename field.
@@ -3987,7 +3989,7 @@ class OperationTests(OperationTestBase):
                     ("weight", models.FloatField()),
                 ],
                 options={
-                    "index_together": [("weight", "pink")],
+                    "index_together": {("weight", "pink")},
                 },
             ),
         ]
@@ -4007,6 +4009,11 @@ class OperationTests(OperationTestBase):
         )
         new_state = project_state.clone()
         operation.state_forwards(app_label, new_state)
+        # Ensure the model state has the correct type for the index_together
+        # option.
+        self.assertIsInstance(
+            new_state.models[app_label, "pony"].options["index_together"], set
+        )
         # Rename index.
         with connection.schema_editor() as editor:
             operation.database_forwards(app_label, editor, project_state, new_state)
@@ -4114,7 +4121,7 @@ class OperationTests(OperationTestBase):
                     ("weight", models.FloatField()),
                 ],
                 options={
-                    "index_together": [("weight", "pink")],
+                    "index_together": {("weight", "pink")},
                 },
             ),
         ]
@@ -5571,6 +5578,10 @@ class OperationTests(OperationTestBase):
         elidable_operation = migrations.RunSQL("SELECT 1 FROM void;", elidable=True)
         self.assertEqual(elidable_operation.reduce(operation, []), [operation])
 
+        # Test elidable deconstruction
+        definition = elidable_operation.deconstruct()
+        self.assertIs(definition[2]["elidable"], True)
+
     def test_run_sql_params(self):
         """
         #23426 - RunSQL should accept parameters.
@@ -5824,11 +5835,16 @@ class OperationTests(OperationTestBase):
         elidable_operation = migrations.RunPython(inner_method, elidable=True)
         self.assertEqual(elidable_operation.reduce(operation, []), [operation])
 
+        # Test elidable deconstruction
+        definition = elidable_operation.deconstruct()
+        self.assertIs(definition[2]["elidable"], True)
+
     def test_run_python_invalid_reverse_code(self):
         msg = "RunPython must be supplied with callable arguments"
         with self.assertRaisesMessage(ValueError, msg):
             migrations.RunPython(code=migrations.RunPython.noop, reverse_code="invalid")
 
+    @skipUnlessDBFeature("supports_transactions")
     def test_run_python_atomic(self):
         """
         Tests the RunPython operation correctly handles the "atomic" keyword

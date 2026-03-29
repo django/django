@@ -4,6 +4,8 @@ Django's Tasks framework
 
 .. versionadded:: 6.0
 
+    For older Django versions, the :pypi:`django-tasks` backport is available.
+
 For a web application, there's often more than just turning HTTP requests into
 HTTP responses. For some functionality, it may be beneficial to run code
 outside the request-response cycle.
@@ -113,8 +115,13 @@ Third-party backends
 
 As mentioned at the beginning of this section, Django includes backends
 suitable for development and testing only. Production systems should rely on
-backends that supply a worker process and durable queue implementation. To use
-an external Task backend with Django, use the Python import path as the
+backends that supply a worker process and a durable queue implementation.
+Available third-party backends are listed on the `Community Ecosystem page
+<https://www.djangoproject.com/community/ecosystem/#tasks>`__ and the `Tasks
+framework grid from Django Packages
+<https://djangopackages.org/grids/g/task-framework/>`__.
+
+To use an external Task backend with Django, use the Python import path as the
 :setting:`BACKEND <TASKS-BACKEND>` of the :setting:`TASKS` setting, like so::
 
     TASKS = {
@@ -206,7 +213,6 @@ To receive the Task context as an argument to your Task function, pass
     import logging
     from django.core.mail import send_mail
     from django.tasks import task
-
 
     logger = logging.getLogger(__name__)
 
@@ -327,7 +333,6 @@ committed to the database, use :func:`transaction.on_commit()
     from functools import partial
 
     from django.db import transaction
-
 
     with transaction.atomic():
         Thing.objects.create(num=1)

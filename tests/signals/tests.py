@@ -1,7 +1,6 @@
 import contextvars
+from inspect import markcoroutinefunction
 from unittest import mock
-
-from asgiref.sync import markcoroutinefunction
 
 from django import dispatch
 from django.apps.registry import Apps

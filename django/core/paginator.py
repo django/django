@@ -3,7 +3,7 @@ import inspect
 import warnings
 from math import ceil
 
-from asgiref.sync import iscoroutinefunction, sync_to_async
+from asgiref.sync import sync_to_async
 
 from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import cached_property
@@ -103,29 +103,22 @@ class BasePaginator:
             1, 2, …, 40, 41, 42, 43, 44, 45, 46, …, 49, 50.
         """
         if num_pages <= (on_each_side + on_ends) * 2:
-            for page in page_range:
-                yield page
+            yield from page_range
             return
 
         if number > (1 + on_each_side + on_ends) + 1:
-            for page in range(1, on_ends + 1):
-                yield page
+            yield from range(1, on_ends + 1)
             yield self.ELLIPSIS
-            for page in range(number - on_each_side, number + 1):
-                yield page
+            yield from range(number - on_each_side, number + 1)
         else:
-            for page in range(1, number + 1):
-                yield page
+            yield from range(1, number + 1)
 
         if number < (num_pages - on_each_side - on_ends) - 1:
-            for page in range(number + 1, number + on_each_side + 1):
-                yield page
+            yield from range(number + 1, number + on_each_side + 1)
             yield self.ELLIPSIS
-            for page in range(num_pages - on_ends + 1, num_pages + 1):
-                yield page
+            yield from range(num_pages - on_ends + 1, num_pages + 1)
         else:
-            for page in range(number + 1, num_pages + 1):
-                yield page
+            yield from range(number + 1, num_pages + 1)
 
     def _get_page(self, *args, **kwargs):
         """
@@ -266,7 +259,7 @@ class AsyncPaginator(BasePaginator):
             return self._cache_acount
         c = getattr(self.object_list, "acount", None)
         if (
-            iscoroutinefunction(c)
+            inspect.iscoroutinefunction(c)
             and not inspect.isbuiltin(c)
             and method_has_no_args(c)
         ):

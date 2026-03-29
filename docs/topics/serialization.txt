@@ -198,7 +198,8 @@ lowercase name of the model ("session") separated by a dot.
 
 Each field of the object is serialized as a ``<field>``-element sporting the
 fields "type" and "name". The text content of the element represents the value
-that should be stored.
+that should be stored. (If the element contains child tags,
+:exc:`~django.core.exceptions.SuspiciousOperation` is raised.)
 
 Foreign keys and other relational fields are treated a little bit differently:
 
@@ -236,6 +237,11 @@ This example links the given user with the permission models with PKs 46 and
     :exc:`ValueError` exception. Read also the W3C's explanation of `HTML,
     XHTML, XML and Control Codes
     <https://www.w3.org/International/questions/qa-controls>`_.
+
+.. versionchanged:: 6.1
+
+    :exc:`~django.core.exceptions.SuspiciousOperation` is raised when
+    unexpected nested tags are found.
 
 .. _serialization-formats-json:
 

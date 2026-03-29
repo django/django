@@ -3,8 +3,9 @@ import contextvars
 import logging
 import threading
 import weakref
+from inspect import iscoroutinefunction
 
-from asgiref.sync import async_to_sync, iscoroutinefunction, sync_to_async
+from asgiref.sync import async_to_sync, sync_to_async
 
 from django.utils.inspect import func_accepts_kwargs
 
@@ -153,13 +154,10 @@ class Signal:
 
         if weak:
             ref = weakref.ref
-            receiver_object = receiver
             # Check for bound methods
             if hasattr(receiver, "__self__") and hasattr(receiver, "__func__"):
                 ref = weakref.WeakMethod
-                receiver_object = receiver.__self__
-            receiver = ref(receiver)
-            weakref.finalize(receiver_object, self._flag_dead_receivers)
+            receiver = ref(receiver, self._flag_dead_receivers)
 
         # Keep a weakref to sender if possible to ensure associated receivers
         # are cleared if it gets garbage collected. This ensures there is no

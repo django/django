@@ -13,7 +13,11 @@ from django.http import (
     RawPostDataException,
     UnreadablePostError,
 )
-from django.http.multipartparser import MAX_TOTAL_HEADER_SIZE, MultiPartParserError
+from django.http.multipartparser import (
+    MAX_TOTAL_HEADER_SIZE,
+    MultiPartParser,
+    MultiPartParserError,
+)
 from django.http.request import split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import BOUNDARY, MULTIPART_CONTENT, FakePayload
@@ -451,11 +455,18 @@ class RequestsTests(SimpleTestCase):
             request.body
 
     def test_malformed_multipart_header(self):
-        for header in [
-            'Content-Disposition : form-data; name="name"',
-            'Content-Disposition:form-data; name="name"',
-            'Content-Disposition :form-data; name="name"',
-        ]:
+        tests = [
+            ('Content-Disposition : form-data; name="name"', {"name": ["value"]}),
+            ('Content-Disposition:form-data; name="name"', {"name": ["value"]}),
+            ('Content-Disposition :form-data; name="name"', {"name": ["value"]}),
+            # The invalid encoding causes the entire part to be skipped.
+            (
+                'Content-Disposition: form-data; name="name"; '
+                "filename*=BOGUS''test%20file.txt",
+                {},
+            ),
+        ]
+        for header, expected_post in tests:
             with self.subTest(header):
                 payload = FakePayload(
                     "\r\n".join(
@@ -476,7 +487,7 @@ class RequestsTests(SimpleTestCase):
                         "wsgi.input": payload,
                     }
                 )
-                self.assertEqual(request.POST, {"name": ["value"]})
+                self.assertEqual(request.POST, expected_post)
 
     def test_body_after_POST_multipart_related(self):
         """
@@ -1111,6 +1122,72 @@ class RequestsTests(SimpleTestCase):
         request_copy = copy.deepcopy(request)
         request.session["key"] = "value"
         self.assertEqual(request_copy.session, {})
+
+    def test_custom_multipart_parser_class(self):
+
+        class CustomMultiPartParser(MultiPartParser):
+            def parse(self):
+                post, files = super().parse()
+                post._mutable = True
+                post["custom_parser_used"] = "yes"
+                post._mutable = False
+                return post, files
+
+        class CustomWSGIRequest(WSGIRequest):
+            multipart_parser_class = CustomMultiPartParser
+
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    "--boundary",
+                    'Content-Disposition: form-data; name="name"',
+                    "",
+                    "value",
+                    "--boundary--",
+                ]
+            )
+        )
+        request = CustomWSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": "multipart/form-data; boundary=boundary",
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        self.assertEqual(request.POST.get("custom_parser_used"), "yes")
+        self.assertEqual(request.POST.get("name"), "value")
+
+    def test_multipart_parser_class_immutable_after_parse(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    "--boundary",
+                    'Content-Disposition: form-data; name="name"',
+                    "",
+                    "value",
+                    "--boundary--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": "multipart/form-data; boundary=boundary",
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+
+        # Access POST to trigger parsing.
+        request.POST
+
+        msg = (
+            "You cannot set the multipart parser class after the upload has been "
+            "processed."
+        )
+        with self.assertRaisesMessage(RuntimeError, msg):
+            request.multipart_parser_class = MultiPartParser
 
 
 class HostValidationTests(SimpleTestCase):

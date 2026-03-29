@@ -1,7 +1,6 @@
 import datetime
 import uuid
 from functools import lru_cache
-from itertools import chain
 
 from django.conf import settings
 from django.db import NotSupportedError
@@ -9,7 +8,6 @@ from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import split_tzname_delta, strip_quotes, truncate_name
 from django.db.models import (
     AutoField,
-    CompositePrimaryKey,
     Exists,
     ExpressionWrapper,
     Lookup,
@@ -706,18 +704,6 @@ END;
                 params,
             )
         return super().subtract_temporals(internal_type, lhs, rhs)
-
-    def bulk_batch_size(self, fields, objs):
-        """Oracle restricts the number of parameters in a query."""
-        fields = list(
-            chain.from_iterable(
-                field.fields if isinstance(field, CompositePrimaryKey) else [field]
-                for field in fields
-            )
-        )
-        if fields:
-            return self.connection.features.max_query_params // len(fields)
-        return len(objs)
 
     def conditional_expression_supported_in_where_clause(self, expression):
         """

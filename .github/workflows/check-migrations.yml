@@ -1,0 +1,68 @@
+name: Check migrations
+
+on:
+  pull_request:
+    paths:
+      - 'tests/**/models.py'
+      - 'tests/**/migrations/**'
+      - 'tests/**/*migrations/**/*.py'
+      - 'scripts/check_migrations.py'
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check-migrations:
+    name: Check test migrations
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: django
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+          cache: 'pip'
+          cache-dependency-path: 'tests/requirements/py3.txt'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip wheel
+          python -m pip install -e . psycopg[binary]
+
+      - name: Create PostgreSQL settings file
+        run: mv ./.github/workflows/data/test_postgres.py.tpl ./tests/test_postgres.py
+
+      - name: Check for missing migrations
+        env:
+          DJANGO_SETTINGS_MODULE: test_postgres
+          PYTHONPATH: ${{ github.workspace }}/tests:${{ github.workspace }}
+        run: |
+          python scripts/check_migrations.py

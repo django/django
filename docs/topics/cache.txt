@@ -653,7 +653,7 @@ disable caching for a view (using the
 .. _i18n-cache-key:
 
 If :setting:`USE_I18N` is set to ``True`` then the generated cache key will
-include the name of the active :term:`language<language code>` -- see also
+include the name of the active :term:`language<language code>` (see also
 :ref:`how-django-discovers-language-preference`). This allows you to easily
 cache multilingual sites without having to create the cache key yourself.
 

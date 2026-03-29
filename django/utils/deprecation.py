@@ -3,17 +3,18 @@ import inspect
 import os
 import warnings
 from collections import Counter
+from inspect import iscoroutinefunction, markcoroutinefunction
 
-from asgiref.sync import iscoroutinefunction, markcoroutinefunction, sync_to_async
+from asgiref.sync import sync_to_async
 
 import django
+from django.utils.inspect import signature
 
 
 @functools.cache
 def django_file_prefixes():
-    try:
-        file = django.__file__
-    except AttributeError:
+    file = getattr(django, "__file__", None)
+    if file is None:
         return ()
     return (os.path.dirname(file),)
 
@@ -162,7 +163,7 @@ def deprecate_posargs(deprecation_warning, remappable_names, /):
         if isinstance(func, staticmethod):
             raise TypeError("Apply @staticmethod before @deprecate_posargs.")
 
-        params = inspect.signature(func).parameters
+        params = signature(func).parameters
         num_by_kind = Counter(param.kind for param in params.values())
 
         if num_by_kind[inspect.Parameter.VAR_POSITIONAL] > 0:

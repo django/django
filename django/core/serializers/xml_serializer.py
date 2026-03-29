@@ -10,7 +10,7 @@ from xml.sax.expatreader import ExpatParser as _ExpatParser
 
 from django.apps import apps
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, SuspiciousOperation
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
 from django.utils.xmlutils import SimplerXMLGenerator, UnserializableContentError
@@ -177,7 +177,15 @@ class Serializer(base.Serializer):
                     chunk_size = (
                         2000 if getattr(attr, "prefetch_cache_name", None) else None
                     )
-                    return attr.iterator(chunk_size)
+                    query_set = attr.all()
+                    if not query_set.totally_ordered:
+                        current_ordering = (
+                            query_set.query.order_by
+                            or query_set.model._meta.ordering
+                            or []
+                        )
+                        query_set = query_set.order_by(*current_ordering, "pk")
+                    return query_set.iterator(chunk_size)
 
             else:
 
@@ -186,6 +194,13 @@ class Serializer(base.Serializer):
 
                 def queryset_iterator(obj, field):
                     query_set = getattr(obj, field.name).select_related(None).only("pk")
+                    if not query_set.totally_ordered:
+                        current_ordering = (
+                            query_set.query.order_by
+                            or query_set.model._meta.ordering
+                            or []
+                        )
+                        query_set = query_set.order_by(*current_ordering, "pk")
                     chunk_size = 2000 if query_set._prefetch_related_lookups else None
                     return query_set.iterator(chunk_size=chunk_size)
 
@@ -411,6 +426,8 @@ class Deserializer(base.Deserializer):
         try:
             for c in node.getElementsByTagName("object"):
                 values.append(m2m_convert(c))
+        except SuspiciousOperation:
+            raise
         except Exception as e:
             if isinstance(e, ObjectDoesNotExist) and self.handle_forward_references:
                 return base.DEFER_FIELD
@@ -439,17 +456,15 @@ class Deserializer(base.Deserializer):
             )
 
 
+def check_element_type(element):
+    if element.childNodes:
+        raise SuspiciousOperation(f"Unexpected element: {element.tagName!r}")
+    return element.nodeType in (element.TEXT_NODE, element.CDATA_SECTION_NODE)
+
+
 def getInnerText(node):
-    """Get the inner text of a DOM node and any children one level deep."""
-    # inspired by
-    # https://mail.python.org/pipermail/xml-sig/2005-March/011022.html
     return "".join(
-        [
-            element.data
-            for child in node.childNodes
-            for element in (child, *child.childNodes)
-            if element.nodeType in (element.TEXT_NODE, element.CDATA_SECTION_NODE)
-        ]
+        [child.data for child in node.childNodes if check_element_type(child)]
     )
 
 

@@ -187,7 +187,7 @@ LANG_INFO = {
         "bidi": False,
         "code": "eu",
         "name": "Basque",
-        "name_local": "Basque",
+        "name_local": "euskara",
     },
     "fa": {
         "bidi": True,

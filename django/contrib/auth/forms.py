@@ -158,7 +158,7 @@ class SetUnusablePasswordMixin:
             required=False,
             initial="true",
             choices={"true": _("Enabled"), "false": _("Disabled")},
-            widget=forms.RadioSelect(attrs={"class": "radiolist inline"}),
+            widget=forms.RadioSelect(attrs={"class": "radiolist"}),
             help_text=help_text,
         )
 
