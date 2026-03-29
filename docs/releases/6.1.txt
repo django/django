@@ -269,10 +269,10 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* Fixed a race condition on filesystems with non-deterministic mtime flushing
-  (e.g. WSL/HyperV) where :djadmin:`makemigrations` and
-  :djadmin:`squashmigrations` could write migration files that were not
-  immediately visible to the import system.
+* Fixed a race condition where :djadmin:`makemigrations` and
+  :djadmin:`squashmigrations` could write migration files not immediately
+  visible to subsequent import system lookups due to delayed filesystem
+  modification time updates.
 
 Models
 ~~~~~~
