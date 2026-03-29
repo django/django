@@ -679,19 +679,23 @@ def create_generic_related_manager(superclass, rel):
             queryset = querysets[0] if querysets else super().get_queryset()
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
-            # Group instances by content types.
-            content_type_queries = [
-                models.Q.create(
-                    [
-                        (f"{self.content_type_field_name}__pk", content_type_id),
-                        (f"{self.object_id_field_name}__in", {obj.pk for obj in objs}),
-                    ]
+            # Sort instances by content type
+            sorted_instances = sorted(
+                instances,
+                key=lambda obj: self.get_content_type(obj).pk,
+            )
+            content_type_queries = []
+            for content_type_id, group in itertools.groupby(
+                sorted_instances,
+                key=lambda obj: self.get_content_type(obj).pk,
+            ):
+                object_ids = {obj.pk for obj in group}
+                content_type_queries.append(
+                    (f"{self.content_type_field_name}__pk", content_type_id)
                 )
-                for content_type_id, objs in itertools.groupby(
-                    sorted(instances, key=lambda obj: self.get_content_type(obj).pk),
-                    lambda obj: self.get_content_type(obj).pk,
+                content_type_queries.append(
+                    (f"{self.object_id_field_name}__in", object_ids)
                 )
-            ]
             query = models.Q.create(content_type_queries, connector=models.Q.OR)
             # We (possibly) need to convert object IDs to the type of the
             # instances' PK in order to match up instances:
