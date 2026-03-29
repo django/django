@@ -726,7 +726,7 @@ For each field, we describe the default widget used if you don't specify
 
     .. method:: set_choices()
 
-        Rescans the directory at :attr:`path` and refreshes the field's
+        Scans the directory at :attr:`path` and refreshes the field's
         choices. This is called automatically during ``__init__``, but can
         also be called explicitly to pick up files added to the directory
         after the field was first instantiated. For example, call it in a

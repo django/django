@@ -1197,7 +1197,7 @@ class FilePathField(ChoiceField):
         self.allow_files, self.allow_folders = allow_files, allow_folders
         super().__init__(choices=(), **kwargs)
         self.set_choices()
-        
+
     def set_choices(self):
         if self.required:
             self.choices = []
