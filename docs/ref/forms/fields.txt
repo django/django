@@ -112,8 +112,9 @@ field. This is used when the ``Field`` is displayed in a ``Form``.
 
 As explained in :ref:`ref-forms-api-outputting-html`, the default label for a
 ``Field`` is generated from the field name by converting all underscores to
-spaces and upper-casing the first letter. Specify ``label`` if that default
-behavior doesn't result in an adequate label.
+spaces and upper-casing the first letter. Specify a string for ``label`` if
+that default behavior doesn't result in an adequate label. Use an empty string
+(``""``) to hide the label.
 
 Here's a full example ``Form`` that implements ``label`` for two of its fields.
 We've specified ``auto_id=False`` to simplify the output:

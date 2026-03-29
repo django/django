@@ -40,7 +40,7 @@ from django.db.models.fields.json import (
     KeyTransformFactory,
     KeyTransformTextLookupMixin,
 )
-from django.db.models.functions import Cast
+from django.db.models.functions import Cast, Coalesce
 from django.test import (
     SimpleTestCase,
     TestCase,
@@ -1289,6 +1289,49 @@ class TestQuerying(TestCase):
             data__foo="bar"
         )
         self.assertQuerySetEqual(qs, all_objects)
+
+    @skipUnlessDBFeature("supports_primitives_in_json_field")
+    def test_json_type_casting_with_coalesce(self):
+        RelatedJSONModel.objects.create(
+            summary='"This is valid JSON primitive."',
+            value={"text": "test"},
+            json_model=self.objs[4],
+        )
+        result = RelatedJSONModel.objects.annotate(
+            coalesced_value=Coalesce(
+                Cast("summary", JSONField()), "value", output_field=JSONField()
+            )
+        ).first()
+        self.assertEqual(result.coalesced_value, "This is valid JSON primitive.")
+
+    def test_numeric_lookups_with_expression(self):
+        obj_greater = NullableJSONModel.objects.create(
+            value={"target": 5, "comparison": 2}
+        )
+        obj_lesser = NullableJSONModel.objects.create(
+            value={"target": 2, "comparison": 5}
+        )
+        obj_equal = NullableJSONModel.objects.create(
+            value={"target": 2, "comparison": 2}
+        )
+        objs = [obj_greater.pk, obj_lesser.pk, obj_equal.pk]
+
+        tests = [
+            ("gt", [obj_greater]),
+            ("lt", [obj_lesser]),
+            ("gte", [obj_greater, obj_equal]),
+            ("lte", [obj_lesser, obj_equal]),
+        ]
+
+        for lookup, expected in tests:
+            with self.subTest(lookup=lookup):
+                self.assertCountEqual(
+                    NullableJSONModel.objects.filter(
+                        id__in=objs,
+                        **{f"value__target__{lookup}": F("value__comparison")},
+                    ),
+                    expected,
+                )
 
 
 @skipUnlessDBFeature("supports_primitives_in_json_field")

@@ -25,10 +25,6 @@ th {
     background-position: 100% 1px;
 }
 
-.object-tools {
-    text-align: left;
-}
-
 .object-tools li + li {
     margin-right: 15px;
     margin-left: 0;

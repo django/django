@@ -84,8 +84,8 @@ Where the UI changes could affect those modalities, also test with:
 * Touch-only navigation. Common issues include:
 
   * A touch target (interactive element) is too small.
-  * Hover-based based interaction which does not translate to touch, such as a
-    hover only tooltip.
+  * Hover-based interaction that does not translate to touch, such as a
+    hover-only tooltip.
 
 * 400% browser zoom. Common issues include:
 

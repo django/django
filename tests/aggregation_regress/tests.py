@@ -636,10 +636,11 @@ class AggregationTests(TestCase):
                 Max("foo")
             )
 
-    def test_more(self):
+    def test_count_after_count_function(self):
         # Old-style count aggregations can be mixed with new-style
         self.assertEqual(Book.objects.annotate(num_authors=Count("authors")).count(), 6)
 
+    def test_aggregates_over_annotations(self):
         # Non-ordinal, non-computed Aggregates over annotations correctly
         # inherit the annotation's internal type if the annotation is ordinal
         # or computed
@@ -653,10 +654,12 @@ class AggregationTests(TestCase):
         )
         self.assertEqual(vals, {"avg_price__max": 75.0})
 
+    def test_aliases_quoted(self):
         # Aliases are quoted to protected aliases that might be reserved names
         vals = Book.objects.aggregate(number=Max("pages"), select=Max("pages"))
         self.assertEqual(vals, {"number": 1132, "select": 1132})
 
+    def test_select_related(self):
         # Regression for #10064: select_related() plays nice with aggregates
         obj = (
             Book.objects.select_related("publisher")
@@ -680,6 +683,7 @@ class AggregationTests(TestCase):
             },
         )
 
+    def test_exclude_on_aggregate(self):
         # Regression for #10010: exclude on an aggregate field is correctly
         # negated
         self.assertEqual(len(Book.objects.annotate(num_authors=Count("authors"))), 6)

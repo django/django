@@ -13,7 +13,7 @@ from django.contrib.staticfiles import finders, storage
 from django.contrib.staticfiles.management.commands.collectstatic import (
     Command as CollectstaticCommand,
 )
-from django.core.management import call_command
+from django.core.management import CommandError, call_command
 from django.test import SimpleTestCase, override_settings
 
 from .cases import CollectionTestCase
@@ -65,7 +65,7 @@ class TestHashedFiles:
 
     def test_path_ignored_completely(self):
         relpath = self.hashed_file_path("cached/css/ignored.css")
-        self.assertEqual(relpath, "cached/css/ignored.55e7c226dda1.css")
+        self.assertEqual(relpath, "cached/css/ignored.0e15ac4a4fb4.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertIn(b"#foobar", content)
@@ -75,6 +75,22 @@ class TestHashedFiles:
             self.assertIn(b"chrome:foobar", content)
             self.assertIn(b"//foobar", content)
             self.assertIn(b"url()", content)
+            self.assertIn(b'/* @import url("non_exist.css") */', content)
+            self.assertIn(b'/* url("non_exist.png") */', content)
+            self.assertIn(b'@import url("non_exist.css")', content)
+            self.assertIn(b'url("non_exist.png")', content)
+            self.assertIn(b"@import url(other.css)", content)
+            self.assertIn(
+                b'background: #d3d6d8 /*url("does.not.exist.png")*/ '
+                b'url("/static/cached/img/relative.acae32e4532b.png");',
+                content,
+            )
+            self.assertIn(
+                b'background: #d3d6d8 /* url("does.not.exist.png") */ '
+                b'url("/static/cached/img/relative.acae32e4532b.png") '
+                b'/*url("does.not.exist.either.png")*/',
+                content,
+            )
         self.assertPostCondition()
 
     def test_path_with_querystring(self):
@@ -185,8 +201,10 @@ class TestHashedFiles:
     def test_import_loop(self):
         finders.get_finder.cache_clear()
         err = StringIO()
-        with self.assertRaisesMessage(RuntimeError, "Max post-process passes exceeded"):
+        msg = "Max post-process passes exceeded"
+        with self.assertRaisesMessage(CommandError, msg) as cm:
             call_command("collectstatic", interactive=False, verbosity=0, stderr=err)
+        self.assertIsInstance(cm.exception.__cause__, RuntimeError)
         self.assertEqual(
             "Post-processing 'bar.css, foo.css' failed!\n\n", err.getvalue()
         )
@@ -351,9 +369,14 @@ class TestHashedFiles:
         """
         finders.get_finder.cache_clear()
         err = StringIO()
-        with self.assertRaises(Exception):
+        with self.assertRaises(CommandError) as cm:
             call_command("collectstatic", interactive=False, verbosity=0, stderr=err)
         self.assertEqual("Post-processing 'faulty.css' failed!\n\n", err.getvalue())
+        self.assertIsInstance(cm.exception.__cause__, ValueError)
+        exc_message = str(cm.exception)
+        self.assertIn("faulty.css", exc_message)
+        self.assertIn("missing.css", exc_message)
+        self.assertIn("1:", exc_message)  # line 1 reported
         self.assertPostCondition()
 
     @override_settings(
@@ -363,8 +386,9 @@ class TestHashedFiles:
     def test_post_processing_nonutf8(self):
         finders.get_finder.cache_clear()
         err = StringIO()
-        with self.assertRaises(UnicodeDecodeError):
+        with self.assertRaises(CommandError) as cm:
             call_command("collectstatic", interactive=False, verbosity=0, stderr=err)
+        self.assertIsInstance(cm.exception.__cause__, UnicodeDecodeError)
         self.assertEqual("Post-processing 'nonutf8.css' failed!\n\n", err.getvalue())
         self.assertPostCondition()
 
@@ -698,7 +722,7 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
 
     def test_module_import(self):
         relpath = self.hashed_file_path("cached/module.js")
-        self.assertEqual(relpath, "cached/module.4326210cf0bd.js")
+        self.assertEqual(relpath, "cached/module.eaa407b94311.js")
         tests = [
             # Relative imports.
             b'import testConst from "./module_test.477bbebe77f0.js";',
@@ -721,6 +745,15 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
             b"    firstVar1 as firstVarAlias,\n"
             b"    $second_var_2 as secondVarAlias\n"
             b'} from "./module_test.477bbebe77f0.js";',
+            # Ignore block comments
+            b'/* export * from "./module_test_missing.js"; */',
+            b"/*\n"
+            b'import rootConst from "/static/absolute_root_missing.js";\n'
+            b'const dynamicModule = import("./module_test_missing.js");\n'
+            b"*/",
+            # Ignore line comments
+            b'// import testConst from "./module_test_missing.js";',
+            b'// const dynamicModule = import("./module_test_missing.js");',
         ]
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
@@ -730,7 +763,7 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
 
     def test_aggregating_modules(self):
         relpath = self.hashed_file_path("cached/module.js")
-        self.assertEqual(relpath, "cached/module.4326210cf0bd.js")
+        self.assertEqual(relpath, "cached/module.eaa407b94311.js")
         tests = [
             b'export * from "./module_test.477bbebe77f0.js";',
             b'export { testConst } from "./module_test.477bbebe77f0.js";',
