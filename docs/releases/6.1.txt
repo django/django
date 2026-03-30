@@ -112,6 +112,9 @@ Minor features
   * Checkboxes are an exception to the above changes and continue to be
     displayed in their original layout.
 
+* :attr:`~django.contrib.admin.ModelAdmin.list_display` now uses boolean icons
+  for boolean fields on related models.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
