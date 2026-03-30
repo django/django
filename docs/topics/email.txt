@@ -93,10 +93,9 @@ are required.
 The following parameters are optional, and must be given as keyword arguments
 if used.
 
-* ``fail_silently``: A boolean. When it's ``False``, ``send_mail()`` will raise
-  an :exc:`smtplib.SMTPException` if an error occurs. See the :mod:`smtplib`
-  docs for a list of possible exceptions, all of which are subclasses of
-  :exc:`~smtplib.SMTPException`.
+* ``fail_silently``: A boolean. If ``True``, exceptions raised during email
+  sending are suppressed and execution continues. If ``False``, an
+  :exc:`smtplib.SMTPException` is raised when an error occurs.
 * ``auth_user``: The optional username to use to authenticate to the SMTP
   server. If this isn't provided, Django will use the value of the
   :setting:`EMAIL_HOST_USER` setting.
