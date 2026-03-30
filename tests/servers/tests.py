@@ -106,6 +106,7 @@ class LiveServerTestCloseConnectionTest(LiveServerBase):
         self.assertIsNone(conn.connection)
 
 
+@unittest.skip("Flaky test as described in https://code.djangoproject.com/ticket/36770")
 @unittest.skipUnless(connection.vendor == "sqlite", "SQLite specific test.")
 class LiveServerInMemoryDatabaseLockTest(LiveServerBase):
     def test_in_memory_database_lock(self):
