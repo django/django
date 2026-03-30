@@ -14,3 +14,7 @@ Bugfixes
   and :func:`~django.contrib.auth.alogout` did not respectively set or clear
   ``request.user`` if it had already been materialized (e.g., by sync
   middleware) (:ticket:`37017`).
+
+* Fixed a regression in Django 6.0 in admin forms where
+  ``RelatedFieldWidgetWrapper`` incorrectly wrapped all widgets in a
+  ``<fieldset>`` (:ticket:`36949`).
