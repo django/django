@@ -28,6 +28,8 @@ class FilteredSelectMultiple(forms.SelectMultiple):
     catalog has been loaded in the page
     """
 
+    use_fieldset = True
+
     class Media:
         js = [
             "admin/js/core.js",
@@ -300,7 +302,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         self.can_view_related = supported and can_view_related
         # To check if the related object is registered with this AdminSite.
         self.admin_site = admin_site
-        self.use_fieldset = True
+        self.use_fieldset = widget.use_fieldset
 
     def __deepcopy__(self, memo):
         obj = copy.copy(self)
