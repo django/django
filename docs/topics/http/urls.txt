@@ -187,8 +187,9 @@ Register custom converter classes in your URLconf using
 Using regular expressions
 =========================
 
-If the paths and converters syntax isn't sufficient for defining your URL
-patterns, you can also use regular expressions. To do so, use
+If the path() syntax and converters are not sufficient for defining your URL
+patterns, you can use regular expressions with re_path() for more flexible
+matching. To do so, use
 :func:`~django.urls.re_path` instead of :func:`~django.urls.path`.
 
 In Python regular expressions, the syntax for named regular expression groups
