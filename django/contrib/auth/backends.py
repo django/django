@@ -1,6 +1,10 @@
 from asgiref.sync import sync_to_async
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import (
+    aget_user_with_mitigation,
+    get_user_model,
+    get_user_with_mitigation,
+)
 from django.contrib.auth.models import Permission
 from django.db.models import Exists, OuterRef, Q
 
@@ -59,34 +63,27 @@ class ModelBackend(BaseBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
         if username is None:
             username = kwargs.get(UserModel.USERNAME_FIELD)
+
         if username is None or password is None:
             return
-        try:
-            user = UserModel._default_manager.get_by_natural_key(username)
-        except UserModel.DoesNotExist:
-            # Run the default password hasher once to reduce the timing
-            # difference between an existing and a nonexistent user (#20760).
-            UserModel().set_password(password)
-        else:
-            if user.check_password(password) and self.user_can_authenticate(user):
-                return user
+        user = get_user_with_mitigation(username, password)
+
+        if user and user.check_password(password) and self.user_can_authenticate(user):
+            return user
 
     async def aauthenticate(self, request, username=None, password=None, **kwargs):
         if username is None:
             username = kwargs.get(UserModel.USERNAME_FIELD)
         if username is None or password is None:
             return
-        try:
-            user = await UserModel._default_manager.aget_by_natural_key(username)
-        except UserModel.DoesNotExist:
-            # Run the default password hasher once to reduce the timing
-            # difference between an existing and a nonexistent user (#20760).
-            UserModel().set_password(password)
-        else:
-            if await user.acheck_password(password) and self.user_can_authenticate(
-                user
-            ):
-                return user
+
+        user = await aget_user_with_mitigation(username, password)
+        if (
+            user
+            and await user.acheck_password(password)
+            and self.user_can_authenticate(user)
+        ):
+            return user
 
     def user_can_authenticate(self, user):
         """
