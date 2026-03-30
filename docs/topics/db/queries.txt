@@ -74,6 +74,18 @@ is an example:
 This performs an ``INSERT`` SQL statement behind the scenes. Django doesn't hit
 the database until you explicitly call :meth:`~django.db.models.Model.save`.
 
+.. note::
+
+    When creating model instances, Django does not always cast input values
+    to the exact Python type returned when retrieving values from the database.
+
+    For example, providing a float value to a ``DecimalField`` during object
+    creation may result in the model instance temporarily holding a float,
+    even though the database stores it as a ``Decimal``.
+
+    To avoid inconsistencies, ensure that values passed to model fields match
+    the expected Python types.
+
 The :meth:`~django.db.models.Model.save` method has no return value.
 
 .. seealso::
