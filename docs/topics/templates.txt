@@ -15,8 +15,8 @@ A Django project can be configured with one or several template engines (or
 even zero if you don't use templates). Django ships built-in backends for its
 own template system, creatively called the Django template language (DTL), and
 for the popular alternative Jinja2_. Backends for other template languages may
-be available from third-parties. You can also write your own custom backend,
-see :doc:`Custom template backend </howto/custom-template-backend>`
+be available from third-parties. You can also write your own custom backend;
+see :doc:`Custom template backend </howto/custom-template-backend>`.
 
 Django defines a standard API for loading and rendering templates regardless
 of the backend. Loading consists of finding the template for a given identifier
