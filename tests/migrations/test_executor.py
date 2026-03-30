@@ -1013,7 +1013,6 @@ class ExecutorLoggingTests(MigrationTestBase):
         with self.assertLogs("django.db.migrations.executor", level="INFO") as cm:
             executor.migrate([("migrations", "0001_initial")])
 
-        self.assertGreater(len(cm.records), 0)
         self.assertEqual(cm.records[0].levelname, "INFO")
         self.assertIn("Applied migration", cm.records[0].message)
         self.assertIn("0001_initial", cm.records[0].message)
