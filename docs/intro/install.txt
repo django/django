@@ -4,7 +4,7 @@ Quick install guide
 
 Before you can use Django, you'll need to get it installed. We have a
 :doc:`complete installation guide </topics/install>` that covers all the
-possibilities; this guide will guide you to a minimal installation that'll work
+possibilities; this guide will walk you through a minimal installation that'll work
 while you walk through the introduction.
 
 Install Python
