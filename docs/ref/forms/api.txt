@@ -202,11 +202,11 @@ The ``escape_html`` parameter behaves as described in
 .. method:: Form.add_error(field, error)
 
 This method allows adding errors to specific fields from within the
-``Form.clean()`` method, or from outside the form altogether; for instance
+``Form.clean()`` method, or from outside the form altogether; for instance,
 from a view.
 
 The ``field`` argument is the name of the field to which the errors
-should be added. If its value is ``None`` the error will be treated as
+should be added. If its value is ``None``, the error will be treated as
 a non-field error as returned by :meth:`Form.non_field_errors()
 <django.forms.Form.non_field_errors>`.
 
@@ -216,6 +216,14 @@ when defining form errors.
 
 Note that ``Form.add_error()`` automatically removes the relevant field from
 ``cleaned_data``.
+
+Example::
+
+    form.add_error('email', 'Invalid email address')
+    form.add_error(None, 'Something went wrong')
+
+In the first case, the error is associated with a specific field (``email``).
+In the second case, passing ``None`` adds a non-field error, which is not tied to any particular field.
 
 .. method:: Form.has_error(field, code=None)
 
