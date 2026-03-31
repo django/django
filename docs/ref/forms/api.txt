@@ -223,6 +223,11 @@ This method returns a boolean designating whether a field has an error with
 a specific error ``code``. If ``code`` is ``None``, it will return ``True``
 if the field contains any errors at all.
 
+Example::
+
+    form.has_error('email')  # Returns True if ``email`` has any errors
+    form.has_error('email', code='invalid')  # Check for a specific error code
+
 To check for non-field errors use
 :data:`~django.core.exceptions.NON_FIELD_ERRORS` as the ``field`` parameter.
 
