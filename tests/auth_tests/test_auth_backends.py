@@ -1146,6 +1146,38 @@ class AuthenticateTests(TestCase):
             status_code=500,
         )
 
+    @override_settings(
+        AUTHENTICATION_BACKENDS=["auth_tests.test_auth_backends.TypeErrorBackend"]
+    )
+    def test_authenticate_sensitive_variables_include_html(self):
+        """password is filtered from email HTML when include_html=True."""
+        try:
+            authenticate(username="testusername", password=self.sensitive_password)
+        except TypeError:
+            exc_info = sys.exc_info()
+        rf = RequestFactory()
+        reporter = ExceptionReporter(rf.get("/"), is_email=True, *exc_info)
+        html = reporter.get_traceback_html()
+        self.assertNotIn(self.sensitive_password, html)
+        self.assertIn("TypeErrorBackend", html)
+
+    @override_settings(
+        AUTHENTICATION_BACKENDS=["auth_tests.test_auth_backends.TypeErrorBackend"]
+    )
+    async def test_aauthenticate_sensitive_variables_include_html(self):
+        """password is filtered from email HTML when include_html=True."""
+        try:
+            await aauthenticate(
+                username="testusername", password=self.sensitive_password
+            )
+        except TypeError:
+            exc_info = sys.exc_info()
+        rf = RequestFactory()
+        reporter = ExceptionReporter(rf.get("/"), is_email=True, *exc_info)
+        html = reporter.get_traceback_html()
+        self.assertNotIn(self.sensitive_password, html)
+        self.assertIn("TypeErrorBackend", html)
+
     def test_clean_credentials_sensitive_variables(self):
         try:
             # Passing in a list to cause an exception
