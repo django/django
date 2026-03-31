@@ -131,6 +131,12 @@ not been sanitized::
         q = MyModel.objects.extra(select={"id": query})
         return HttpResponse(q.values())
 
+Some HTTP headers must also be sanitized by a web server or fronting proxy
+before they can be used, such as ``Remote-User`` and ``X-Forwarded-*``. For
+instance, under ASGI, it is a deployment misconfiguration (rather than any flaw
+in Django) for Django to be the direct HTTP endpoint when
+:class:`~django.contrib.auth.middleware.RemoteUserMiddleware` is used.
+
 Request headers and URLs must be under 8K bytes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
