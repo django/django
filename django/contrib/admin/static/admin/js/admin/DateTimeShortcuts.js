@@ -136,8 +136,8 @@
                 e.preventDefault();
                 DateTimeShortcuts.handleClockQuicklink(num, -1);
             });
-            const clock_link = document.createElement("a");
-            clock_link.href = "#";
+            const clock_link = document.createElement("button");
+            clock_link.type = "button";
             clock_link.id = DateTimeShortcuts.clockLinkName + num;
             clock_link.addEventListener("click", function (e) {
                 e.preventDefault();
@@ -169,7 +169,7 @@
             // Create clock link div
             //
             // Markup looks like:
-            // <div id="clockbox1" class="clockbox module" role="dialog"
+            // <dialog id="clockbox1" class="clockbox module" role="dialog"
             //     aria-label="Choose a time">
             //     <h2>Choose a time</h2>
             //     <ul class="timelist">
@@ -182,11 +182,9 @@
             //     <p class="calendar-cancel">
             //         <a href="#" role="button" aria-label="Close Clock">Cancel</a>
             //     </p>
-            // </div>
+            // </dialog>
 
-            const clock_box = document.createElement("div");
-            clock_box.style.display = "none";
-            clock_box.style.position = "absolute";
+            const clock_box = document.createElement("dialog");
             clock_box.className = "clockbox module";
             clock_box.id = DateTimeShortcuts.clockDivName + num;
             clock_box.setAttribute("role", "dialog");
@@ -239,7 +237,7 @@
             });
 
             document.addEventListener("keyup", function (event) {
-                if (event.which === 27) {
+                if (event.key === "Escape") {
                     // ESC key closes popup
                     DateTimeShortcuts.dismissClock(num);
                     event.preventDefault();
@@ -261,25 +259,17 @@
             } else {
                 // since style's width is in em, it'd be tough to calculate
                 // px value of it. let's use an estimated px for now
-                clock_box.style.left = findPosX(clock_link) - 110 + "px";
+                clock_box.style.right = findPosX(clock_link) - 110 + "px";
             }
             clock_box.style.top = Math.max(0, findPosY(clock_link) - 30) + "px";
 
             // Show the clock box
-            clock_box.style.display = "block";
-            document.addEventListener(
-                "click",
-                DateTimeShortcuts.dismissClockFunc[num],
-            );
+            clock_box.showModal();
         },
         dismissClock: function (num) {
-            document.getElementById(
-                DateTimeShortcuts.clockDivName + num,
-            ).style.display = "none";
-            document.removeEventListener(
-                "click",
-                DateTimeShortcuts.dismissClockFunc[num],
-            );
+            document
+                .getElementById(DateTimeShortcuts.clockDivName + num)
+                .close();
         },
         handleClockQuicklink: function (num, val) {
             let d;
@@ -333,8 +323,8 @@
                 e.preventDefault();
                 DateTimeShortcuts.handleCalendarQuickLink(num, 0);
             });
-            const cal_link = document.createElement("a");
-            cal_link.href = "#";
+            const cal_link = document.createElement("button");
+            cal_link.type = "button";
             cal_link.id = DateTimeShortcuts.calendarLinkName + num;
             cal_link.addEventListener("click", function (e) {
                 e.preventDefault();
@@ -367,7 +357,7 @@
             //
             // Markup looks like:
             //
-            // <div id="calendarbox3" class="calendarbox module"
+            // <dialog id="calendarbox3" class="calendarbox module"
             //      role="dialog" aria-label="Choose a Date">
             //     <div>
             //         <a href="#" class="calendarnav-previous"
@@ -391,10 +381,8 @@
             //     <p class="calendar-cancel">
             //         <a href="#" role="button" aria-label="Close Calendar">Cancel</a>
             //     </p>
-            // </div>
-            const cal_box = document.createElement("div");
-            cal_box.style.display = "none";
-            cal_box.style.position = "absolute";
+            // </dialog>
+            const cal_box = document.createElement("dialog");
             cal_box.className = "calendarbox module";
             cal_box.id = DateTimeShortcuts.calendarDivName1 + num;
             cal_box.setAttribute("role", "dialog");
@@ -403,7 +391,46 @@
             cal_box.addEventListener("click", function (e) {
                 e.stopPropagation();
             });
+            // Handle arrow key navigation within the calendar
+            cal_box.addEventListener("keydown", function (event) {
+                const focused = cal_box.querySelector("a:focus");
+                if (!focused) return;
+                const cells = Array.from(cal_box.querySelectorAll("td a"));
+                const currentIndex = cells.indexOf(focused);
+                if (currentIndex === -1) return;
 
+                const ltr =
+                    window.getComputedStyle(document.body).direction !== "rtl";
+                const forward = ltr
+                    ? event.key === "ArrowRight"
+                    : event.key === "ArrowLeft";
+                const backward = ltr
+                    ? event.key === "ArrowLeft"
+                    : event.key === "ArrowRight";
+                let nextCell = null;
+                const cellsPerRow = 7;
+
+                if (forward && currentIndex < cells.length - 1) {
+                    nextCell = cells[currentIndex + 1];
+                } else if (backward && currentIndex > 0) {
+                    nextCell = cells[currentIndex - 1];
+                } else if (
+                    event.key === "ArrowDown" &&
+                    currentIndex + cellsPerRow < cells.length
+                ) {
+                    nextCell = cells[currentIndex + cellsPerRow];
+                } else if (
+                    event.key === "ArrowUp" &&
+                    currentIndex - cellsPerRow >= 0
+                ) {
+                    nextCell = cells[currentIndex - cellsPerRow];
+                }
+
+                if (nextCell) {
+                    event.preventDefault();
+                    nextCell.focus();
+                }
+            });
             // next-prev links
             const cal_nav = quickElement("div", cal_box);
             const cal_nav_prev = quickElement("a", cal_nav, "<", "href", "#");
@@ -521,7 +548,7 @@
                 DateTimeShortcuts.dismissCalendar(num);
             });
             document.addEventListener("keyup", function (event) {
-                if (event.which === 27) {
+                if (event.key === "Escape") {
                     // ESC key closes popup
                     DateTimeShortcuts.dismissCalendar(num);
                     event.preventDefault();
@@ -589,32 +616,35 @@
                 }
             }
 
-            // Recalculate the clockbox position
+            // Recalculate the calendarbox position
             // is it left-to-right or right-to-left layout ?
             if (window.getComputedStyle(document.body).direction !== "rtl") {
                 cal_box.style.left = findPosX(cal_link) + 17 + "px";
             } else {
                 // since style's width is in em, it'd be tough to calculate
                 // px value of it. let's use an estimated px for now
-                cal_box.style.left = findPosX(cal_link) - 180 + "px";
+                cal_box.style.right = findPosX(cal_link) - 180 + "px";
             }
             cal_box.style.top = Math.max(0, findPosY(cal_link) - 75) + "px";
 
-            cal_box.style.display = "block";
+            cal_box.showModal();
             DateTimeShortcuts.updateNavAriaLabels(num);
-            document.addEventListener(
-                "click",
-                DateTimeShortcuts.dismissCalendarFunc[num],
+            const calendarDiv = cal_box.querySelector(
+                "#" + DateTimeShortcuts.calendarDivName2 + num,
             );
+            if (calendarDiv) {
+                // Focus on selected date, today, or first available date
+                const focusElement =
+                    cal_box.querySelector("td.selected a") ||
+                    cal_box.querySelector("td.today a") ||
+                    cal_box.querySelector("td a");
+                focusElement?.focus();
+            }
         },
         dismissCalendar: function (num) {
-            document.getElementById(
-                DateTimeShortcuts.calendarDivName1 + num,
-            ).style.display = "none";
-            document.removeEventListener(
-                "click",
-                DateTimeShortcuts.dismissCalendarFunc[num],
-            );
+            document
+                .getElementById(DateTimeShortcuts.calendarDivName1 + num)
+                .close();
         },
         drawPrev: function (num) {
             DateTimeShortcuts.calendars[num].drawPreviousMonth();

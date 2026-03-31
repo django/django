@@ -780,18 +780,6 @@ button {
         overflow: visible;
     }
 
-    .calendarbox:before,
-    .clockbox:before {
-        content: "";
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.75);
-        transform: translate(-50%, -50%);
-    }
-
     .calendarbox > *,
     .clockbox > * {
         position: relative;
