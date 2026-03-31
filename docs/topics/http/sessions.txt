@@ -195,8 +195,8 @@ You can edit it multiple times.
 
       .. versionadded:: 6.1
 
-      Returns the inverse of :meth:`is_empty`. This allows checking if a
-      session has data::
+      Returns the inverse of :meth:`is_empty`. This allows developers to easily check whether a session contains any data:
+
 
           if request.session:
               # Session has data or a key
