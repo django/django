@@ -345,6 +345,13 @@ table p.datetime {
     padding-left: 0;
 }
 
+.datetimeshortcuts button {
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+}
+
 .datetimeshortcuts .clock-icon,
 .datetimeshortcuts .date-icon {
     position: relative;
@@ -360,8 +367,8 @@ table p.datetime {
     background-size: 24px auto;
 }
 
-.datetimeshortcuts a:focus .clock-icon,
-.datetimeshortcuts a:hover .clock-icon {
+.datetimeshortcuts button:focus .clock-icon,
+.datetimeshortcuts button:hover .clock-icon {
     background-position: 0 -24px;
 }
 
@@ -371,8 +378,8 @@ table p.datetime {
     top: -1px;
 }
 
-.datetimeshortcuts a:focus .date-icon,
-.datetimeshortcuts a:hover .date-icon {
+.datetimeshortcuts button:focus .date-icon,
+.datetimeshortcuts button:hover .date-icon {
     background-position: 0 -24px;
 }
 

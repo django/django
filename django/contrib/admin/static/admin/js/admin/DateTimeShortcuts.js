@@ -19,6 +19,7 @@
         },
         dismissClockFunc: [],
         dismissCalendarFunc: [],
+        focusTrapFunc: [],
         calendarDivName1: "calendarbox", // name of calendar <div> that gets toggled
         calendarDivName2: "calendarin", // name of <div> that contains calendar
         calendarLinkName: "calendarlink", // name of the link that is used to toggle
@@ -49,6 +50,56 @@
                     DateTimeShortcuts.addTimezoneWarning(inp);
                 }
             }
+        },
+        createFocusTrap: function (box, num) {
+            return function (e) {
+                if (box.style.display === "none") {
+                    return;
+                }
+                const cal = box.querySelector(
+                    "#" + DateTimeShortcuts.calendarDivName2 + num,
+                );
+                const dates = cal
+                    ? Array.from(cal.querySelectorAll("table a"))
+                    : [];
+                const idx = dates.indexOf(document.activeElement);
+                const move = {
+                    ArrowLeft: -1,
+                    ArrowUp: -7,
+                    ArrowRight: 1,
+                    ArrowDown: 7,
+                };
+
+                if (e.key === "Tab") {
+                    // Trap focus within the popup by wrapping to the opposite end
+                    // when tabbing beyond the first or last focusable element
+                    const f = box.querySelectorAll("a, button");
+                    if (
+                        (e.shiftKey && document.activeElement === f[0]) ||
+                        (!e.shiftKey &&
+                            document.activeElement === f[f.length - 1])
+                    ) {
+                        e.preventDefault();
+                        f[e.shiftKey ? f.length - 1 : 0].focus();
+                    }
+                } else if (move[e.key] && idx >= 0) {
+                    e.preventDefault();
+                    const newIdx = idx + move[e.key];
+                    if (newIdx >= 0 && newIdx < dates.length) {
+                        dates[newIdx].focus();
+                    } else if (e.key === "ArrowLeft" && idx === 0) {
+                        DateTimeShortcuts.drawPrev(num);
+                        const links = cal.querySelectorAll("table a");
+                        links[links.length - 1].focus();
+                    } else if (
+                        e.key === "ArrowRight" &&
+                        idx === dates.length - 1
+                    ) {
+                        DateTimeShortcuts.drawNext(num);
+                        cal.querySelectorAll("table a")[0].focus();
+                    }
+                }
+            };
         },
         // Return the current time while accounting for the server timezone.
         now: function () {
@@ -131,6 +182,7 @@
             DateTimeShortcuts.clockInputs[num] = inp;
             DateTimeShortcuts.dismissClockFunc[num] = function () {
                 DateTimeShortcuts.dismissClock(num);
+                DateTimeShortcuts.restoreClockLinkFocus(num);
                 return true;
             };
 
@@ -146,8 +198,7 @@
                 e.preventDefault();
                 DateTimeShortcuts.handleClockQuicklink(num, -1);
             });
-            const clock_link = document.createElement("a");
-            clock_link.href = "#";
+            const clock_link = document.createElement("button");
             clock_link.id = DateTimeShortcuts.clockLinkName + num;
             clock_link.addEventListener("click", function (e) {
                 e.preventDefault();
@@ -237,13 +288,20 @@
             cancel_link.addEventListener("click", function (e) {
                 e.preventDefault();
                 DateTimeShortcuts.dismissClock(num);
+                DateTimeShortcuts.restoreClockLinkFocus(num);
             });
 
             document.addEventListener("keyup", function (event) {
-                if (event.which === 27) {
+                if (event.key === "Escape") {
                     // ESC key closes popup
-                    DateTimeShortcuts.dismissClock(num);
-                    event.preventDefault();
+                    const box = document.getElementById(
+                        DateTimeShortcuts.clockDivName + num,
+                    );
+                    if (box && box.style.display !== "none") {
+                        DateTimeShortcuts.dismissClock(num);
+                        DateTimeShortcuts.restoreClockLinkFocus(num);
+                        event.preventDefault();
+                    }
                 }
             });
         },
@@ -272,6 +330,16 @@
                 "click",
                 DateTimeShortcuts.dismissClockFunc[num],
             );
+            const nowLink = clock_box.querySelector("a");
+            if (nowLink) {
+                nowLink.focus();
+            }
+            DateTimeShortcuts.focusTrapFunc[num] =
+                DateTimeShortcuts.createFocusTrap(clock_box, num);
+            document.addEventListener(
+                "keydown",
+                DateTimeShortcuts.focusTrapFunc[num],
+            );
         },
         dismissClock: function (num) {
             document.getElementById(
@@ -281,6 +349,15 @@
                 "click",
                 DateTimeShortcuts.dismissClockFunc[num],
             );
+            document.removeEventListener(
+                "keydown",
+                DateTimeShortcuts.focusTrapFunc[num],
+            );
+        },
+        restoreClockLinkFocus: function (num) {
+            document
+                .getElementById(DateTimeShortcuts.clockLinkName + num)
+                .focus();
         },
         handleClockQuicklink: function (num, val) {
             let d;
@@ -302,6 +379,7 @@
             DateTimeShortcuts.calendarInputs[num] = inp;
             DateTimeShortcuts.dismissCalendarFunc[num] = function () {
                 DateTimeShortcuts.dismissCalendar(num);
+                DateTimeShortcuts.restoreCalendarLinkFocus(num);
                 return true;
             };
 
@@ -317,8 +395,7 @@
                 e.preventDefault();
                 DateTimeShortcuts.handleCalendarQuickLink(num, 0);
             });
-            const cal_link = document.createElement("a");
-            cal_link.href = "#";
+            const cal_link = document.createElement("button");
             cal_link.id = DateTimeShortcuts.calendarLinkName + num;
             cal_link.addEventListener("click", function (e) {
                 e.preventDefault();
@@ -460,12 +537,19 @@
             cancel_link.addEventListener("click", function (e) {
                 e.preventDefault();
                 DateTimeShortcuts.dismissCalendar(num);
+                DateTimeShortcuts.restoreCalendarLinkFocus(num);
             });
             document.addEventListener("keyup", function (event) {
-                if (event.which === 27) {
+                if (event.key === "Escape") {
                     // ESC key closes popup
-                    DateTimeShortcuts.dismissCalendar(num);
-                    event.preventDefault();
+                    const box = document.getElementById(
+                        DateTimeShortcuts.calendarDivName1 + num,
+                    );
+                    if (box && box.style.display !== "none") {
+                        DateTimeShortcuts.dismissCalendar(num);
+                        DateTimeShortcuts.restoreCalendarLinkFocus(num);
+                        event.preventDefault();
+                    }
                 }
             });
         },
@@ -511,6 +595,22 @@
                 "click",
                 DateTimeShortcuts.dismissCalendarFunc[num],
             );
+            const calendarDiv = cal_box.querySelector(
+                "#" + DateTimeShortcuts.calendarDivName2 + num,
+            );
+            if (calendarDiv) {
+                const selected = cal_box.querySelector("td.selected a");
+                const focusElement = selected
+                    ? selected
+                    : cal_box.querySelector("td.today a");
+                focusElement.focus();
+            }
+            DateTimeShortcuts.focusTrapFunc[num] =
+                DateTimeShortcuts.createFocusTrap(cal_box, num);
+            document.addEventListener(
+                "keydown",
+                DateTimeShortcuts.focusTrapFunc[num],
+            );
         },
         dismissCalendar: function (num) {
             document.getElementById(
@@ -520,6 +620,15 @@
                 "click",
                 DateTimeShortcuts.dismissCalendarFunc[num],
             );
+            document.removeEventListener(
+                "keydown",
+                DateTimeShortcuts.focusTrapFunc[num],
+            );
+        },
+        restoreCalendarLinkFocus: function (num) {
+            document
+                .getElementById(DateTimeShortcuts.calendarLinkName + num)
+                .focus();
         },
         drawPrev: function (num) {
             DateTimeShortcuts.calendars[num].drawPreviousMonth();
@@ -536,9 +645,7 @@
                     d,
                 ).strftime(format);
                 DateTimeShortcuts.calendarInputs[num].focus();
-                document.getElementById(
-                    DateTimeShortcuts.calendarDivName1 + num,
-                ).style.display = "none";
+                DateTimeShortcuts.dismissCalendar(num);
             };
         },
         handleCalendarQuickLink: function (num, offset) {
