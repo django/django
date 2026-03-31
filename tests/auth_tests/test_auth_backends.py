@@ -1146,6 +1146,42 @@ class AuthenticateTests(TestCase):
             status_code=500,
         )
 
+    @override_settings(AUTH_USER_MODEL="auth_tests.ErrorAdminUser")
+    def test_model_backend_authenticate_sensitive_variables(self):
+        try:
+            authenticate(username="testusername", password=self.sensitive_password)
+        except TypeError:
+            exc_info = sys.exc_info()
+        rf = RequestFactory()
+        response = technical_500_response(rf.get("/"), *exc_info)
+        self.assertNotContains(response, self.sensitive_password, status_code=500)
+        self.assertContains(
+            response,
+            '<tr><td>password</td><td class="code">'
+            "<pre>&#39;********************&#39;</pre></td></tr>",
+            html=True,
+            status_code=500,
+        )
+
+    @override_settings(AUTH_USER_MODEL="auth_tests.ErrorAdminUser")
+    async def test_model_backend_async_authenticate_sensitive_variables(self):
+        try:
+            await aauthenticate(
+                username="testusername", password=self.sensitive_password
+            )
+        except TypeError:
+            exc_info = sys.exc_info()
+        rf = RequestFactory()
+        response = technical_500_response(rf.get("/"), *exc_info)
+        self.assertNotContains(response, self.sensitive_password, status_code=500)
+        self.assertContains(
+            response,
+            '<tr><td>password</td><td class="code">'
+            "<pre>&#39;********************&#39;</pre></td></tr>",
+            html=True,
+            status_code=500,
+        )
+
     def test_clean_credentials_sensitive_variables(self):
         try:
             # Passing in a list to cause an exception
