@@ -580,7 +580,7 @@ Middleware for utilizing web server provided authentication. See
 
 Middleware for utilizing web server provided authentication when enabled only
 on the login page. See :ref:`persistent-remote-user-middleware-howto` for usage
-details.
+details, including security considerations.
 
 CSRF protection middleware
 --------------------------
