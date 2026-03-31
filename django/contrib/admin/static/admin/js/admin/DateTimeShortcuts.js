@@ -19,6 +19,7 @@
         },
         dismissClockFunc: [],
         dismissCalendarFunc: [],
+        focusTrapFunc: [],
         calendarDivName1: 'calendarbox', // name of calendar <div> that gets toggled
         calendarDivName2: 'calendarin', // name of <div> that contains calendar
         calendarLinkName: 'calendarlink', // name of the link that is used to toggle
@@ -44,6 +45,37 @@
                     DateTimeShortcuts.addTimezoneWarning(inp);
                 }
             }
+        },
+        createFocusTrap: function(box, num) {
+            return function(e) {
+                if (box.style.display === 'none') {
+                    return;
+                }
+                const cal = box.querySelector('#' + DateTimeShortcuts.calendarDivName2 + num);
+                const dates = cal ? Array.from(cal.querySelectorAll('table a')) : [];
+                const idx = dates.indexOf(document.activeElement);
+                const move = {37: -1, 38: -7, 39: 1, 40: 7};
+
+                if (e.which === 9) {
+                    const f = Array.from(box.querySelectorAll('a, button'));
+                    if ((e.shiftKey && document.activeElement === f[0]) || (!e.shiftKey && document.activeElement === f[f.length - 1])) {
+                        e.preventDefault();
+                        f[e.shiftKey ? f.length - 1 : 0].focus();
+                    }
+                } else if (move[e.which] && idx >= 0) {
+                    e.preventDefault();
+                    const newIdx = idx + move[e.which];
+                    if (newIdx >= 0 && newIdx < dates.length) {
+                        dates[newIdx].focus();
+                    } else if (e.which === 37 && idx === 0) {
+                        DateTimeShortcuts.drawPrev(num);
+                        setTimeout(() => Array.from(cal.querySelectorAll('table a')).pop().focus(), 0);
+                    } else if (e.which === 39 && idx === dates.length - 1) {
+                        DateTimeShortcuts.drawNext(num);
+                        setTimeout(() => Array.from(cal.querySelectorAll('table a'))[0].focus(), 0);
+                    }
+                }
+            };
         },
         // Return the current time while accounting for the server timezone.
         now: function() {
@@ -130,6 +162,13 @@
                 e.stopPropagation();
                 DateTimeShortcuts.openClock(num);
             });
+            clock_link.addEventListener('keydown', function(e) {
+                if (e.which === 13 || e.which === 32) {
+                    //Space or Enter Key opens the popup
+                    e.preventDefault();
+                    DateTimeShortcuts.openClock(num);
+                }
+            });
 
             quickElement(
                 'span', clock_link, '',
@@ -190,8 +229,11 @@
             document.addEventListener('keyup', function(event) {
                 if (event.which === 27) {
                     // ESC key closes popup
-                    DateTimeShortcuts.dismissClock(num);
-                    event.preventDefault();
+                    const box = document.getElementById(DateTimeShortcuts.clockDivName + num);
+                    if (box && box.style.display !== 'none') {
+                        DateTimeShortcuts.dismissClock(num);
+                        event.preventDefault();
+                    }
                 }
             });
         },
@@ -214,10 +256,20 @@
             // Show the clock box
             clock_box.style.display = 'block';
             document.addEventListener('click', DateTimeShortcuts.dismissClockFunc[num]);
+            const nowLink = clock_box.querySelector('a');
+            if (nowLink) {
+                nowLink.focus();
+            }
+            DateTimeShortcuts.focusTrapFunc[num] = DateTimeShortcuts.createFocusTrap(clock_box, num);
+            document.addEventListener('keydown', DateTimeShortcuts.focusTrapFunc[num]);
         },
-        dismissClock: function(num) {
+        dismissClock: function(num, restoreFocus = true) {
             document.getElementById(DateTimeShortcuts.clockDivName + num).style.display = 'none';
             document.removeEventListener('click', DateTimeShortcuts.dismissClockFunc[num]);
+            document.removeEventListener('keydown', DateTimeShortcuts.focusTrapFunc[num]);
+            if (restoreFocus) {
+                document.getElementById(DateTimeShortcuts.clockLinkName + num).focus();
+            }
         },
         handleClockQuicklink: function(num, val) {
             let d;
@@ -229,7 +281,7 @@
             }
             DateTimeShortcuts.clockInputs[num].value = d.strftime(get_format('TIME_INPUT_FORMATS')[0]);
             DateTimeShortcuts.clockInputs[num].focus();
-            DateTimeShortcuts.dismissClock(num);
+            DateTimeShortcuts.dismissClock(num, false);
         },
         // Add calendar widget to a given field.
         addCalendar: function(inp) {
@@ -258,6 +310,13 @@
                 // avoid triggering the document click handler to dismiss the calendar
                 e.stopPropagation();
                 DateTimeShortcuts.openCalendar(num);
+            });
+            cal_link.addEventListener('keydown', function(e) {
+                if (e.which === 13 || e.which === 32) {
+                    //Space or Enter Key opens the popup
+                    e.preventDefault();
+                    DateTimeShortcuts.openCalendar(num);
+                }
             });
             quickElement(
                 'span', cal_link, '',
@@ -348,8 +407,11 @@
             document.addEventListener('keyup', function(event) {
                 if (event.which === 27) {
                     // ESC key closes popup
-                    DateTimeShortcuts.dismissCalendar(num);
-                    event.preventDefault();
+                    const box = document.getElementById(DateTimeShortcuts.calendarDivName1 + num);
+                    if (box && box.style.display !== 'none') {
+                        DateTimeShortcuts.dismissCalendar(num, true);
+                        event.preventDefault();
+                    }
                 }
             });
         },
@@ -385,10 +447,22 @@
 
             cal_box.style.display = 'block';
             document.addEventListener('click', DateTimeShortcuts.dismissCalendarFunc[num]);
+            const calendarDiv = cal_box.querySelector('#' + DateTimeShortcuts.calendarDivName2 + num);
+            if (calendarDiv) {
+                const selected = cal_box.querySelector('td.selected a');
+                const focusElement = selected ? selected : cal_box.querySelector('td.today a');
+                focusElement.focus();
+            }
+            DateTimeShortcuts.focusTrapFunc[num] = DateTimeShortcuts.createFocusTrap(cal_box, num);
+            document.addEventListener('keydown', DateTimeShortcuts.focusTrapFunc[num]);
         },
-        dismissCalendar: function(num) {
+        dismissCalendar: function(num, restoreFocus = true) {
             document.getElementById(DateTimeShortcuts.calendarDivName1 + num).style.display = 'none';
             document.removeEventListener('click', DateTimeShortcuts.dismissCalendarFunc[num]);
+            document.removeEventListener('keydown', DateTimeShortcuts.focusTrapFunc[num]);
+            if (restoreFocus) {
+                document.getElementById(DateTimeShortcuts.calendarLinkName + num).focus();
+            }
         },
         drawPrev: function(num) {
             DateTimeShortcuts.calendars[num].drawPreviousMonth();
@@ -401,7 +475,7 @@
             return function(y, m, d) {
                 DateTimeShortcuts.calendarInputs[num].value = new Date(y, m - 1, d).strftime(format);
                 DateTimeShortcuts.calendarInputs[num].focus();
-                document.getElementById(DateTimeShortcuts.calendarDivName1 + num).style.display = 'none';
+                DateTimeShortcuts.dismissCalendar(num, false);
             };
         },
         handleCalendarQuickLink: function(num, offset) {
@@ -409,7 +483,7 @@
             d.setDate(d.getDate() + offset);
             DateTimeShortcuts.calendarInputs[num].value = d.strftime(get_format('DATE_INPUT_FORMATS')[0]);
             DateTimeShortcuts.calendarInputs[num].focus();
-            DateTimeShortcuts.dismissCalendar(num);
+            DateTimeShortcuts.dismissCalendar(num, false);
         }
     };
 
