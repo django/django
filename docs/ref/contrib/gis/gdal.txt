@@ -1070,17 +1070,6 @@ Coordinate System Objects
         ``EPSG:4326`` (WGS 84), the authority defines the axis order as
         (latitude, longitude), which is the default in GDAL 3.
 
-.. note::
-
-    GDAL 3 changed the default axis ordering strategy to honor the authority
-    axis order. For ``EPSG:4326`` (WGS 84), this means coordinates are
-    interpreted as (latitude, longitude) instead of the traditional GIS
-    (longitude, latitude) order. Django uses ``AxisOrder.TRADITIONAL`` by
-    default to preserve backwards-compatible behavior. If you need to use
-    the authority axis order (e.g. when working with systems that
-    follow the EPSG convention), pass ``axis_order=AxisOrder.AUTHORITY`` to
-    :class:`SpatialReference`. See :ref:`gdal-axis-order` for examples.
-
 .. _gdal-axis-order:
 
 Axis Order and GDAL 3
@@ -1118,7 +1107,7 @@ argument entirely)::
 ``SpatialReference``
 --------------------
 
-.. class:: SpatialReference(srs_input, axis_order=None)
+.. class:: SpatialReference(srs_input="", srs_type="user", axis_order=None)
 
     Spatial reference objects are initialized on the given ``srs_input``,
     which may be one of the following:
