@@ -10,4 +10,7 @@ issues with severity "low", and several bugs in 6.0.3.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 6.0 where :func:`~django.contrib.auth.alogin`
+  and :func:`~django.contrib.auth.alogout` did not respectively set or clear
+  ``request.user`` if it had already been materialized (e.g., by sync
+  middleware) (:ticket:`37017`).
