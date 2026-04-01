@@ -391,7 +391,10 @@ class ChangeListTests(TestCase):
             table_output,
         )
         self.assertNotIn("&lt;strong", table_output)
-        self.assertNotIn("<td class=\"field-parent nowrap\">parent</td>", table_output)
+        self.assertNotIn(
+            '<td class="field-parent nowrap">parent</td>',
+            table_output,
+        )
 
     def test_action_checkbox_for_model_with_dunder_html(self):
         grandchild = GrandChild.objects.create(name="name")
