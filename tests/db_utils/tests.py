@@ -1,9 +1,11 @@
 """Tests for django.db.utils."""
 
+import multiprocessing
+import os
 import unittest
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db import DEFAULT_DB_ALIAS, ProgrammingError, connection
+from django.db import DEFAULT_DB_ALIAS, ProgrammingError, connection, connections
 from django.db.utils import ConnectionHandler, load_backend
 from django.test import SimpleTestCase, TestCase
 from django.utils.connection import ConnectionDoesNotExist
@@ -90,3 +92,31 @@ class LoadBackendTests(SimpleTestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg) as cm:
             load_backend("foo")
         self.assertEqual(str(cm.exception.__cause__), "No module named 'foo'")
+
+
+class DatabaseConnectionForkedTests(TestCase):
+
+    @unittest.skipUnless(
+        hasattr(os, "register_at_fork"),
+        "Tests nothing if os.register_at_fork() isn't available.",
+    )
+    def test_connections_cleared_after_fork(self):
+        alias = DEFAULT_DB_ALIAS
+        conn = connections[alias]
+
+        conn.ensure_connection()
+
+        def child_process(result_queue):
+            is_cleared = not hasattr(connections._connections, alias)
+            result_queue.put(is_cleared)
+
+        ctx = multiprocessing.get_context("fork")  # Use 'fork' as start method
+        q = ctx.Queue()
+        p = ctx.Process(target=child_process, args=(q,))
+        p.start()
+
+        is_cleared_in_child = q.get()
+        p.join()
+
+        self.assertTrue(is_cleared_in_child)
+        self.assertTrue(hasattr(connections._connections, alias))
