@@ -387,7 +387,11 @@ class ChangeListTests(TestCase):
             table_output = template.render(context)
 
         self.assertInHTML(
-            '<td class="field-parent nowrap"><strong class="parent-name">parent</strong></td>',
+            (
+                '<td class="field-parent nowrap">'
+                '<strong class="parent-name">parent</strong>'
+                '</td>'
+            ),
             table_output,
         )
         self.assertNotIn("&lt;strong", table_output)
