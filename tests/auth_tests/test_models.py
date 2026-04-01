@@ -252,6 +252,11 @@ class AbstractBaseUserTests(SimpleTestCase):
 
 
 class AbstractUserTestCase(TestCase):
+    @override_settings(
+        MAILERS={
+            "default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}
+        }
+    )
     def test_email_user(self):
         # valid send_mail parameters
         kwargs = {

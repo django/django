@@ -2034,17 +2034,19 @@ creates.
 Email services
 ==============
 
-If any of your Django views send email using :doc:`Django's email
-functionality </topics/email>`, you probably don't want to send email each time
-you run a test using that view. For this reason, Django's test runner
-automatically redirects all Django-sent email to a dummy outbox. This lets you
-test every aspect of sending email -- from the number of messages sent to the
-contents of each message -- without actually sending the messages.
+If any of your code sends email using :doc:`Django's email functionality
+</topics/email>`, you probably don't want to send email each time you run a
+test that exercises that code. For this reason, Django's test runner
+automatically redirects all Django-sent email to an in-memory outbox. This lets
+you test every aspect of sending email -- from the number of messages sent to
+the contents of each message -- without actually sending the messages.
 
-The test runner accomplishes this by transparently replacing the normal
-email backend with a testing backend.
-(Don't worry -- this has no effect on any other email senders outside of
-Django, such as your machine's mail server, if you're running one.)
+The test runner accomplishes this by transparently replacing the
+:setting:`BACKEND <MAILERS-BACKEND>` for each configured :setting:`MAILERS`
+alias with the ``'locmem'`` :ref:`memory email backend
+<topic-email-memory-backend>`. (Don't worry -- this has no effect on any other
+email senders outside of Django, such as your machine's mail server, if you're
+running one.)
 
 .. currentmodule:: django.core.mail
 
@@ -2081,6 +2083,13 @@ and contents::
 
             # Verify that the subject of the first message is correct.
             self.assertEqual(mail.outbox[0].subject, "Subject here")
+
+            # Verify the message was sent with the "default" mailer.
+            self.assertEqual(mail.outbox[0].sent_using, "default")
+
+.. versionchanged:: 6.1
+
+    The ``sent_using`` attribute was added to messages in the outbox.
 
 As noted :ref:`previously <emptying-test-outbox>`, the test outbox is emptied
 at the start of every test in a Django ``*TestCase``. To empty the outbox

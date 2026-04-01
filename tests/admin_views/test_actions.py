@@ -28,7 +28,10 @@ from .models import (
 )
 
 
-@override_settings(ROOT_URLCONF="admin_views.urls")
+@override_settings(
+    ROOT_URLCONF="admin_views.urls",
+    MAILERS={"default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}},
+)
 class AdminActionsTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -566,7 +569,10 @@ class AdminActionsPermissionTests(TestCase):
         self.assertEqual(response.status_code, 403)
 
 
-@override_settings(ROOT_URLCONF="admin_views.urls")
+@override_settings(
+    ROOT_URLCONF="admin_views.urls",
+    MAILERS={"default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}},
+)
 class AdminDetailActionsTest(TestCase):
     @classmethod
     def setUpTestData(cls):

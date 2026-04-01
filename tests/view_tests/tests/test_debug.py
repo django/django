@@ -496,6 +496,14 @@ class DebugViewTests(SimpleTestCase):
             response = self.client.get("/raises500/", headers={"accept": "text/plain"})
         self.assertContains(response, "Oh dear, an error occurred!", status_code=500)
 
+    # RemovedInDjango70Warning.
+    @override_settings(MAILERS={})
+    def test_works_with_mailers_defined(self):
+        with self.assertLogs("django.request", "ERROR"):
+            response = self.client.get("/raises500/")
+        self.assertContains(response, "MAILERS", status_code=500)
+        self.assertNotContains(response, "EMAIL_BACKEND", status_code=500)
+
 
 class DebugViewQueriesAllowedTests(SimpleTestCase):
     # May need a query to initialize MySQL connection
@@ -1586,7 +1594,10 @@ class ExceptionReportTestMixin:
                 self.assertNotIn(v, body)
 
 
-@override_settings(ROOT_URLCONF="view_tests.urls")
+@override_settings(
+    ROOT_URLCONF="view_tests.urls",
+    MAILERS={"default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}},
+)
 class ExceptionReporterFilterTests(
     ExceptionReportTestMixin, LoggingCaptureMixin, SimpleTestCase
 ):

@@ -1,3 +1,4 @@
+import copy
 import os
 import sys
 import threading
@@ -37,6 +38,7 @@ from django.test import (
     SimpleTestCase,
     TestCase,
     TransactionTestCase,
+    ignore_warnings,
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
@@ -51,6 +53,7 @@ from django.test.utils import (
     teardown_test_environment,
 )
 from django.urls import NoReverseMatch, path, reverse, reverse_lazy
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.html import VOID_ELEMENTS
 
 from .models import Car, Person, PossessedCar
@@ -1841,6 +1844,8 @@ class SetupTestEnvironmentTests(SimpleTestCase):
                     setup_test_environment()
                     self.assertEqual(settings.ALLOWED_HOSTS, ["*", "testserver"])
 
+    # RemovedInDjango70Warning.
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_email_backend_override(self):
         with (
             self.mock_test_state(),
@@ -1853,11 +1858,46 @@ class SetupTestEnvironmentTests(SimpleTestCase):
                 settings.EMAIL_BACKEND,
                 "django.core.mail.backends.locmem.EmailBackend",
             )
+            self.assertFalse(hasattr(settings, "MAILERS"))
             teardown_test_environment()
             self.assertEqual(
                 settings.EMAIL_BACKEND,
                 "django.core.mail.backends.console.EmailBackend",
             )
+            self.assertFalse(hasattr(settings, "MAILERS"))
+
+    def test_mailers_override(self):
+        expected_value = {
+            "default": {
+                "OPTIONS": {"host": "localhost"},
+            },
+            "custom": {
+                "BACKEND": "path.to.custom.EmailBackend",
+                "OPTIONS": {"custom": "option"},
+            },
+        }
+        settings_value = copy.deepcopy(expected_value)
+        with self.mock_test_state(), self.settings(MAILERS=settings_value):
+            setup_test_environment()
+            self.assertEqual(
+                settings.MAILERS,
+                {
+                    "default": {
+                        "BACKEND": "django.core.mail.backends.locmem.EmailBackend"
+                    },
+                    "custom": {
+                        "BACKEND": "django.core.mail.backends.locmem.EmailBackend"
+                    },
+                },
+            )
+            # setup_test_environment() shouldn't mutate original setting value.
+            self.assertEqual(settings_value, expected_value)
+            # RemovedInDjango70Warning: Remove both EMAIL_BACKEND assertions.
+            self.assertFalse(hasattr(settings, "EMAIL_BACKEND"))
+
+            teardown_test_environment()
+            self.assertEqual(settings.MAILERS, expected_value)
+            self.assertFalse(hasattr(settings, "EMAIL_BACKEND"))
 
 
 class OverrideSettingsTests(SimpleTestCase):

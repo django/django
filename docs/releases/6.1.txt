@@ -86,6 +86,43 @@ Python-level options, as Django does not need to load objects before deleting
 them. As a consequence, the :attr:`~django.db.models.DB_CASCADE` option does
 not trigger the ``pre_delete`` or ``post_delete`` signals.
 
+Mailers
+-------
+
+The new :setting:`MAILERS` setting supports configuring multiple email backends
+with different options, similar to existing mechanisms for :setting:`CACHES`,
+:setting:`DATABASES`, :setting:`STORAGES`, and :setting:`TASKS`::
+
+    MAILERS = {
+        "default": {
+            "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+            "OPTIONS": {"host": "smtp.example.com", "use_tls": True},
+        },
+        "marketing": {
+            "BACKEND": "example_ses.EmailBackend",
+            "OPTIONS": {"region": "us-east-1"},
+        },
+    }
+
+You can select a mailer with the new ``using`` argument to :ref:`email sending
+<topic-email-sending>` functions, or obtain an email backend instance with
+:data:`mail.mailers[alias] <django.core.mail.mailers>`. See
+:doc:`/topics/email` for more details.
+
+:setting:`MAILERS` is not yet enabled by default in existing projects. It will
+replace :setting:`EMAIL_BACKEND` and related ``EMAIL_*`` settings in Django
+7.0. Until then, the older settings will continue to work but will issue
+deprecation warnings: see the list of :ref:`email deprecations
+<mailers-deprecations>` below.
+
+You can opt into the new feature at any time before Django 7.0; see
+:ref:`migrating-to-mailers`. To ease the transition,
+:data:`mail.mailers["default"] <django.core.mail.mailers.default>` works with
+either :setting:`MAILERS` or the deprecated :setting:`EMAIL_BACKEND` setting
+defined. The deprecated :func:`~django.core.mail.get_connection` function will
+also return an instance of the default mailer when :setting:`MAILERS` is
+defined.
+
 Minor features
 --------------
 
@@ -561,12 +598,22 @@ Dropped support for MariaDB < 10.11
 Upstream support for MariaDB 10.6 ends in July 2026, and MariaDB 10.7-10.10 are
 short-term maintenance releases. Django 6.1 supports MariaDB 10.11 and higher.
 
-Miscellaneous
--------------
+Email
+-----
 
 * Providing ``fail_silently=True``, ``auth_user``, or ``auth_password`` to mail
   sending functions (such as :func:`~django.core.mail.send_mail`) while also
   providing a ``connection`` now raises a ``TypeError``.
+
+* The undocumented ``EmailMessage.get_connection()`` method is no longer used.
+  Defining it in a subclass or trying to call it now causes an error.
+
+* :meth:`.EmailMessage.send` no longer sets the ``connection`` property on the
+  ``EmailMessage``. (This behavior was never documented. The ``send()`` method
+  will still *use* a ``connection`` that is set on the message before sending.)
+
+Miscellaneous
+-------------
 
 * :class:`~django.contrib.contenttypes.fields.GenericForeignKey` now uses a
   separate descriptor class: the private ``GenericForeignKeyDescriptor``.
@@ -592,6 +639,17 @@ Miscellaneous
   ``SimpleUploadedFile`` retain the previous behavior of evaluating based on
   the ``name`` attribute.
 
+* The undocumented ``connection()`` method of :class:`.log.AdminEmailHandler`
+  has been removed and is no longer called. Subclasses overriding
+  :meth:`.AdminEmailHandler.send_mail` should avoid calling ``connection()``.
+  See :ref:`migrating-to-mailers-get-connection` if specific connection
+  configuration is needed.
+
+* The internal implementation of :class:`.BrokenLinkEmailsMiddleware` has been
+  updated for mailers. If you have subclassed it to customize email sending
+  behavior (as suggested in :doc:`/howto/error-reporting`), you may want to
+  review the updates in the base :class:`.BrokenLinkEmailsMiddleware` class.
+
 * ``django.http.multipartparser.MultiPartParser`` now uses strict Base64
   validation when decoding encoded request data. Previously, invalid data could
   be silently ignored or result in empty values. Invalid data now raises
@@ -608,6 +666,54 @@ Miscellaneous
 
 Features deprecated in 6.1
 ==========================
+
+.. _mailers-deprecations:
+
+Email
+-----
+
+* The :setting:`EMAIL_BACKEND`, :setting:`EMAIL_FILE_PATH`,
+  :setting:`EMAIL_HOST`, :setting:`EMAIL_HOST_PASSWORD`,
+  :setting:`EMAIL_HOST_USER`, :setting:`EMAIL_PORT`,
+  :setting:`EMAIL_USE_TLS`, :setting:`EMAIL_USE_SSL`,
+  :setting:`EMAIL_SSL_CERTFILE`, :setting:`EMAIL_SSL_KEYFILE`, and
+  :setting:`EMAIL_TIMEOUT` settings are deprecated. Replace them with an
+  :setting:`MAILERS` configuration dictionary as described in
+  :ref:`migrating-to-mailers`.
+
+* :func:`.mail.get_connection` is deprecated. See
+  :ref:`migrating-to-mailers-get-connection` for replacement options.
+
+* The ``connection`` argument to :func:`.send_mail`, :func:`.send_mass_mail`,
+  :func:`.mail_admins`, :func:`.mail_managers`, and :class:`.EmailMessage` is
+  deprecated. The ``EmailMessage.connection`` attribute is also deprecated.
+  Switch to the ``using`` argument with a :setting:`MAILERS` alias.
+
+* The ``fail_silently`` argument to :func:`.send_mail`,
+  :func:`.send_mass_mail`, :func:`.mail_admins`, :func:`.mail_managers`, and
+  :meth:`.EmailMessage.send` is deprecated. See
+  :ref:`migrating-to-mailers-fail-silently` for alternatives.
+
+* The ``auth_user`` and ``auth_password`` arguments to :func:`.send_mail` and
+  :func:`.send_mass_mail` are deprecated. Replace them with ``"username"`` and
+  ``"password"`` :setting:`OPTIONS <MAILERS-OPTIONS>` in :setting:`MAILERS`.
+  See :ref:`migrating-to-mailers-auth`.
+
+* Directly constructing and using instances of the
+  :ref:`smtp.EmailBackend <topic-email-smtp-backend>` class is deprecated. Use
+  :data:`.mail.mailers` to obtain email backend instances.
+
+* The ``BaseEmailBackend.__init__()`` constructor no longer silently ignores
+  unknown keyword arguments. Custom email backend subclasses should ensure they
+  have consumed all supported ``**kwargs`` before forwarding the remainder to
+  superclass init. The base class now issues a deprecation warning for unknown
+  arguments, and it will treat them as errors starting in Django 7.0. See
+  :ref:`migrating-to-mailers-email-backends`.
+
+* Support for ``fail_silently`` in the ``BaseEmailBackend`` is deprecated.
+  A custom email backend that wants to support ``fail_silently`` should manage
+  its own local attribute, not pass it to the base backend constructor. See
+  :ref:`migrating-to-mailers-email-backends`.
 
 Miscellaneous
 -------------
@@ -648,6 +754,9 @@ Miscellaneous
   object passed as the ``compiler`` argument to the ``as_sql()`` method of
   :ref:`expressions <writing-your-own-query-expressions>`, is deprecated in
   favor of the newly introduced ``quote_name()`` method.
+
+* The ``email_backend`` argument of :class:`.log.AdminEmailHandler` is
+  deprecated in favor of the newly introduced ``using`` argument.
 
 * The ``BitAnd``, ``BitOr``, and ``BitXor`` classes in
   ``django.contrib.postgres.aggregates`` are deprecated in favor of the

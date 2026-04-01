@@ -18,6 +18,8 @@ class EmailBackend(BaseEmailBackend):
     The dummy outbox is accessible through the outbox instance attribute.
     """
 
+    # RemovedInDjango70Warning: *args. (The only supported posarg will be
+    # removed from BaseEmailBackend in Django 7.0.)
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if not hasattr(mail, "outbox"):
@@ -26,8 +28,10 @@ class EmailBackend(BaseEmailBackend):
     def send_messages(self, messages):
         """Redirect messages to the dummy outbox"""
         msg_count = 0
-        for message in messages:  # .message() triggers header validation
-            message.message()
-            mail.outbox.append(copy.deepcopy(message))
+        for message in messages:
+            message.message()  # Trigger header validation.
+            msg_copy = copy.deepcopy(message)
+            msg_copy.sent_using = self.alias
+            mail.outbox.append(msg_copy)
             msg_count += 1
         return msg_count
