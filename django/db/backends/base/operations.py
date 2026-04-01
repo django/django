@@ -7,7 +7,7 @@ from itertools import chain
 import sqlparse
 
 from django.conf import settings
-from django.db import NotSupportedError, transaction
+from django.db import NotSupportedError, models, transaction
 from django.db.models.expressions import Col
 from django.db.models.fields.composite import CompositePrimaryKey
 from django.utils import timezone
@@ -684,6 +684,25 @@ class BaseDatabaseOperations:
         if value is not None:
             return datetime.timedelta(0, 0, value)
 
+    def convert_trunc_expression(self, value, expression):
+        if isinstance(expression.output_field, models.DateTimeField):
+            if not settings.USE_TZ:
+                pass
+            elif value is not None:
+                value = value.replace(tzinfo=None)
+                value = timezone.make_aware(value, expression.tzinfo)
+            elif not self.connection.features.has_zoneinfo_database:
+                raise ValueError(
+                    "Database returned an invalid datetime value. Are time "
+                    "zone definitions for your database installed?"
+                )
+        elif isinstance(value, datetime.datetime):
+            if isinstance(expression.output_field, models.DateField):
+                value = value.date()
+            elif isinstance(expression.output_field, models.TimeField):
+                value = value.time()
+        return value
+
     def check_expression_support(self, expression):
         """
         Check that the backend supports the provided expression.
@@ -715,12 +734,14 @@ class BaseDatabaseOperations:
     def combine_duration_expression(self, connector, sub_expressions):
         return self.combine_expression(connector, sub_expressions)
 
-    def binary_placeholder_sql(self, value):
+    def binary_placeholder_sql(self, value, compiler):
         """
         Some backends require special syntax to insert binary content (MySQL
         for example uses '_binary %s').
         """
-        return "%s"
+        if hasattr(value, "as_sql"):
+            return compiler.compile(value)
+        return "%s", (value,)
 
     def modify_insert_params(self, placeholder, params):
         """

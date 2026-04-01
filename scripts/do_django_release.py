@@ -206,12 +206,9 @@ print(
     f"* Signed checksum {checksum_file_path}.asc"
 )
 
-# Test the new version and confirm the signature using Jenkins.
-print("\n==> ACTION Test the release artifacts:")
-print(f"VERSION={django_version} test_new_version.sh")
-
-print("\n==> ACTION Run confirm-release job:")
-print(f"VERSION={django_version} confirm_release.sh")
+# Verify the release artifacts (GPG signature, checksums, and smoke test).
+print("\n==> ACTION Verify the release artifacts:")
+print(f"VERSION={django_version} verify_release.sh")
 
 # Upload to PyPI.
 print("\n==> ACTION Upload to PyPI, ensure your release venv is activated:")

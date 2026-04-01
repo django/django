@@ -705,10 +705,14 @@ def register_combinable_fields(lhs, connector, rhs, result):
     _connector_combinators[connector].append((lhs, rhs, result))
 
 
-for d in _connector_combinations:
-    for connector, field_types in d.items():
-        for lhs, rhs, result in field_types:
-            register_combinable_fields(lhs, connector, rhs, result)
+def _register_combinable_fields():
+    for d in _connector_combinations:
+        for connector, field_types in d.items():
+            for lhs, rhs, result in field_types:
+                register_combinable_fields(lhs, connector, rhs, result)
+
+
+_register_combinable_fields()
 
 
 @functools.lru_cache(maxsize=128)
@@ -769,7 +773,7 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         # order of precedence
         expression_wrapper = "(%s)"
         sql = connection.ops.combine_expression(self.connector, expressions)
-        return expression_wrapper % sql, expression_params
+        return expression_wrapper % sql, tuple(expression_params)
 
     def resolve_expression(
         self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
@@ -835,7 +839,7 @@ class DurationExpression(CombinedExpression):
         # order of precedence
         expression_wrapper = "(%s)"
         sql = connection.ops.combine_duration_expression(self.connector, expressions)
-        return expression_wrapper % sql, expression_params
+        return expression_wrapper % sql, tuple(expression_params)
 
     def as_sqlite(self, compiler, connection, **extra_context):
         sql, params = self.as_sql(compiler, connection, **extra_context)
@@ -1173,14 +1177,18 @@ class Value(Expression):
                 val = output_field.get_db_prep_save(val, connection=connection)
             else:
                 val = output_field.get_db_prep_value(val, connection=connection)
-            if hasattr(output_field, "get_placeholder"):
-                return output_field.get_placeholder(val, compiler, connection), [val]
+            try:
+                get_placeholder_sql = output_field.get_placeholder_sql
+            except AttributeError:
+                pass
+            else:
+                return get_placeholder_sql(val, compiler, connection)
         if val is None:
             # oracledb does not always convert None to the appropriate
             # NULL type (like in case expressions using numbers), so we
             # use a literal SQL NULL
-            return "NULL", []
-        return "%s", [val]
+            return "NULL", ()
+        return "%s", (val,)
 
     def as_sqlite(self, compiler, connection, **extra_context):
         sql, params = self.as_sql(compiler, connection, **extra_context)
@@ -1233,6 +1241,30 @@ class Value(Expression):
         return self.value
 
 
+@deconstructible(path="django.db.models.JSONNull")
+class JSONNull(Value):
+    """Represent JSON `null` primitive."""
+
+    def __init__(self):
+        from django.db.models import JSONField
+
+        super().__init__(None, output_field=JSONField())
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}()"
+
+    def as_sql(self, compiler, connection):
+        value = self.output_field.get_db_prep_value(self.value, connection)
+        if value is None:
+            value = "null"
+        return "%s", (value,)
+
+    def as_mysql(self, compiler, connection):
+        sql, params = self.as_sql(compiler, connection)
+        sql = "JSON_EXTRACT(%s, '$')"
+        return sql, params
+
+
 class RawSQL(Expression):
     allowed_default = True
 
@@ -1273,7 +1305,7 @@ class Star(Expression):
         return "'*'"
 
     def as_sql(self, compiler, connection):
-        return "*", []
+        return "*", ()
 
 
 class DatabaseDefault(Expression):
@@ -1313,7 +1345,7 @@ class DatabaseDefault(Expression):
     def as_sql(self, compiler, connection):
         if not connection.features.supports_default_keyword_in_insert:
             return compiler.compile(self.expression)
-        return "DEFAULT", []
+        return "DEFAULT", ()
 
 
 class Col(Expression):
@@ -1334,7 +1366,7 @@ class Col(Expression):
     def as_sql(self, compiler, connection):
         alias, column = self.alias, self.target.column
         identifiers = (alias, column) if alias else (column,)
-        sql = ".".join(map(compiler.quote_name_unless_alias, identifiers))
+        sql = ".".join(map(compiler.quote_name, identifiers))
         return sql, ()
 
     def relabeled_clone(self, relabels):
@@ -1398,7 +1430,7 @@ class ColPairs(Expression):
             cols_sql.append(sql)
             cols_params.extend(params)
 
-        return ", ".join(cols_sql), cols_params
+        return ", ".join(cols_sql), tuple(cols_params)
 
     def relabeled_clone(self, relabels):
         return self.__class__(
@@ -1447,7 +1479,7 @@ class Ref(Expression):
         return clone
 
     def as_sql(self, compiler, connection):
-        return connection.ops.quote_name(self.refs), []
+        return connection.ops.quote_name(self.refs), ()
 
     def get_group_by_cols(self):
         return [self]
@@ -1764,7 +1796,7 @@ class Case(SQLiteNumericMixin, Expression):
         sql = template % template_params
         if self._output_field_or_none is not None:
             sql = connection.ops.unification_cast_sql(self.output_field) % sql
-        return sql, sql_params
+        return sql, tuple(sql_params)
 
     def get_group_by_cols(self):
         if not self.cases:
@@ -2148,7 +2180,7 @@ class WindowFrame(Expression):
                 "end": end,
                 "exclude": self.get_exclusion(),
             },
-            [],
+            (),
         )
 
     def __repr__(self):

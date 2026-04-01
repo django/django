@@ -2,6 +2,7 @@ from unittest import mock
 
 from django.apps.registry import apps as global_apps
 from django.db import DatabaseError, connection, migrations, models
+from django.db.backends.base.introspection import BaseDatabaseIntrospection
 from django.db.migrations.exceptions import InvalidMigrationPlan
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.graph import MigrationGraph
@@ -401,10 +402,12 @@ class ExecutorTests(MigrationTestBase):
             # Change table_names to not return auth_user during this as it
             # wouldn't be there in a normal run, and ensure migrations.Author
             # exists in the global app registry temporarily.
-            old_table_names = connection.introspection.table_names
-            connection.introspection.table_names = lambda c: [
-                x for x in old_table_names(c) if x != "auth_user"
-            ]
+            with connection.cursor() as cursor:
+                mock_existing_tables = [
+                    x
+                    for x in connection.introspection.table_names(cursor)
+                    if x != "auth_user"
+                ]
             migrations_apps = executor.loader.project_state(
                 ("migrations", "0001_initial"),
             ).apps
@@ -412,10 +415,14 @@ class ExecutorTests(MigrationTestBase):
                 migrations_apps.get_model("migrations", "author")
             )
             try:
-                migration = executor.loader.get_migration("auth", "0001_initial")
+                with mock.patch.object(
+                    BaseDatabaseIntrospection,
+                    "table_names",
+                    return_value=mock_existing_tables,
+                ):
+                    migration = executor.loader.get_migration("auth", "0001_initial")
                 self.assertIs(executor.detect_soft_applied(None, migration)[0], True)
             finally:
-                connection.introspection.table_names = old_table_names
                 del global_apps.get_app_config("migrations").models["author"]
                 # Migrate back to clean up the database.
                 executor.loader.build_graph()

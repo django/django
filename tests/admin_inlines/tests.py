@@ -384,21 +384,23 @@ class TestInline(TestDataMixin, TestCase):
         response = self.client.get(url)
         # The whole line containing name + position fields is not hidden.
         self.assertContains(
-            response, '<div class="form-row field-name field-position">'
+            response,
+            "<div class="
+            '"form-row flex-container form-multiline field-name field-position">',
         )
         # The div containing the position field is hidden.
         self.assertInHTML(
-            '<div class="flex-container fieldBox field-position hidden">'
+            '<div class="flex-container field-position fieldBox hidden">'
             '<label class="inline">Position:</label>'
-            '<div class="readonly">0</div></div>'
-            '<div class="help hidden"><div>Position help_text.</div></div>',
+            '<div class="help hidden"><div>Position help_text.</div></div>'
+            '<div class="readonly">0</div></div>',
             response.rendered_content,
         )
         self.assertInHTML(
-            '<div class="flex-container fieldBox field-position hidden">'
+            '<div class="flex-container field-position fieldBox hidden">'
             '<label class="inline">Position:</label>'
-            '<div class="readonly">1</div></div>'
-            '<div class="help hidden"><div>Position help_text.</div></div>',
+            '<div class="help hidden"><div>Position help_text.</div></div>'
+            '<div class="readonly">1</div></div>',
             response.rendered_content,
         )
 
@@ -419,17 +421,17 @@ class TestInline(TestDataMixin, TestCase):
         # The whole line containing position field is hidden.
         self.assertInHTML(
             '<div class="form-row hidden field-position">'
-            '<div><div class="flex-container"><label>Position:</label>'
-            '<div class="readonly">0</div></div>'
+            '<div class="flex-container"><label>Position:</label>'
             '<div class="help hidden"><div>Position help_text.</div></div>'
+            '<div class="readonly">0</div>'
             "</div></div>",
             response.rendered_content,
         )
         self.assertInHTML(
             '<div class="form-row hidden field-position">'
-            '<div><div class="flex-container"><label>Position:</label>'
-            '<div class="readonly">1</div></div>'
+            '<div class="flex-container"><label>Position:</label>'
             '<div class="help hidden"><div>Position help_text.</div></div>'
+            '<div class="readonly">1</div>'
             "</div></div>",
             response.rendered_content,
         )
@@ -2570,3 +2572,19 @@ class SeleniumTests(AdminSeleniumTestCase):
         m2m_widget = self.selenium.find_element(By.CSS_SELECTOR, "div.selector")
         self.assertTrue(m2m_widget.is_displayed())
         self.take_screenshot("tabular")
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_tabular_inline_m2m_widget_option_bg(self):
+        from selenium.webdriver.common.by import By
+
+        Person.objects.create(firstname="Lee")
+        self.admin_login(username="super", password="secret")
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_inlines_courseproxy2_add")
+        )
+        selector = self.selenium.find_element(By.CSS_SELECTOR, "div.selector")
+        options = selector.find_elements(By.CSS_SELECTOR, "select option")
+        self.assertGreater(len(options), 0)
+        options[0].click()
+        selector.find_element(By.CSS_SELECTOR, "p.selector-filter input").click()
+        self.take_screenshot("focus_out")

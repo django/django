@@ -418,21 +418,22 @@ subclass::
     * ``classes``
         A list or tuple containing extra CSS classes to apply to the fieldset.
         This can include any custom CSS class defined in the project, as well
-        as any of the CSS classes provided by Django. Within the default admin
-        site CSS stylesheet, two particularly useful classes are defined:
-        ``collapse`` and ``wide``.
+        as the CSS class provided by Django: ``collapse``.
 
         Example::
 
             {
-                "classes": ["wide", "collapse"],
+                "classes": ["collapse"],
             }
 
-        Fieldsets with the ``wide`` style will be given extra horizontal
-        space in the admin interface.
         Fieldsets with a name and the ``collapse`` style will be initially
         collapsed, using an expandable widget with a toggle for switching
         their visibility.
+
+        .. versionchanged:: 6.1
+
+            The ``wide`` class has been removed, as it was made obsolete by the
+            new admin layout.
 
     * ``description``
         A string of optional extra text to be displayed at the top of each

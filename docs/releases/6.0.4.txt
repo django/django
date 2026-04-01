@@ -1,0 +1,13 @@
+==========================
+Django 6.0.4 release notes
+==========================
+
+*April 7, 2026*
+
+Django 6.0.4 fixes one security issue with severity "moderate", four security
+issues with severity "low", and several bugs in 6.0.3.
+
+Bugfixes
+========
+
+* ...

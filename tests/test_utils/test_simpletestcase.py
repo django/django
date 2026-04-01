@@ -1,3 +1,4 @@
+import os
 import unittest
 from io import StringIO
 from unittest import mock
@@ -19,6 +20,7 @@ class ErrorTestCase(SimpleTestCase):
         pass
 
 
+@mock.patch.dict(os.environ, {"PYTHON_COLORS": "0"})
 @mock.patch.object(ErrorTestCase, "_post_teardown")
 @mock.patch.object(ErrorTestCase, "_pre_setup")
 class DebugInvocationTests(SimpleTestCase):

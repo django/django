@@ -998,6 +998,7 @@ class ClientMixin:
             request_method = self.get
             data = QueryDict(url.query)
             content_type = None
+            query_params = None
 
         return request_method(
             path,

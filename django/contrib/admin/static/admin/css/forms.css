@@ -18,21 +18,29 @@
     vertical-align: 0;
 }
 
+.form-row select option:checked {
+    background-color: var(--selected-row);
+    color: var(--body-fg);
+}
+
 form .form-row p {
     padding-left: 0;
 }
 
 .flex-container {
     display: flex;
+    gap: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.flex-container div.checkbox {
+    display: flex;
 }
 
 .form-multiline {
     flex-wrap: wrap;
-}
-
-.form-multiline > div,
-.form-multiline > fieldset {
-    padding-bottom: 10px;
+    flex-direction: row;
 }
 
 /* FORM LABELS */
@@ -41,6 +49,7 @@ legend, label {
     font-weight: normal;
     color: var(--body-quiet-color);
     font-size: 0.8125rem;
+    padding: 0;
 }
 
 .required legend, legend.required,
@@ -59,7 +68,8 @@ form div.radiolist.inline div {
 }
 
 form div.radiolist label {
-    width: auto;
+    display: inline-block;
+    padding: 4px 10px 0 0;
 }
 
 form div.radiolist input[type="radio"] {
@@ -94,7 +104,6 @@ fieldset .inline-heading,
 /* ALIGNED FIELDSETS */
 
 .aligned fieldset {
-    flex-grow: 1;
     border-top: none;
 }
 
@@ -104,21 +113,7 @@ fieldset .inline-heading,
 
 .aligned legend {
     float: inline-start;
-}
-
-.aligned legend,
-.aligned label {
-    display: block;
-    padding: 4px 10px 0 0;
-    min-width: 160px;
-    width: 160px;
-    word-wrap: break-word;
-}
-
-.aligned label:not(.vCheckboxLabel):after {
-    content: '';
-    display: inline-block;
-    vertical-align: middle;
+    padding: 0.5rem 0;
 }
 
 .aligned label + p, .aligned .checkbox-row + div.help, .aligned label + div.readonly {
@@ -143,30 +138,14 @@ fieldset .inline-heading,
     width: 350px;
 }
 
-form .aligned ul {
-    margin-left: 160px;
-    padding-left: 10px;
-}
-
 form .aligned div.radiolist {
     display: block;
     margin: 0;
     padding: 0;
 }
 
-form .aligned p.help,
-form .aligned div.help {
-    margin-top: 0;
-    margin-left: 160px;
-    padding-left: 10px;
-}
-
-form .aligned p.date div.help.timezonewarning,
-form .aligned p.datetime div.help.timezonewarning,
-form .aligned p.time div.help.timezonewarning {
+form .aligned fieldset div.help {
     margin-left: 0;
-    padding-left: 0;
-    font-weight: normal;
 }
 
 form .aligned p.help:last-child,
@@ -175,23 +154,13 @@ form .aligned div.help:last-child {
     padding-bottom: 0;
 }
 
-form .aligned input + p.help,
-form .aligned textarea + p.help,
-form .aligned select + p.help,
-form .aligned input + div.help,
-form .aligned textarea + div.help,
-form .aligned select + div.help {
-    margin-left: 160px;
-    padding-left: 10px;
-}
-
-form .aligned select option:checked {
-    background-color: var(--selected-row);
-    color: var(--body-fg);
-}
-
 form .aligned ul li {
     list-style: none;
+}
+
+form .aligned div.help ul {
+    padding-left: 0;
+    margin-left: 0;
 }
 
 form .aligned table p {
@@ -210,32 +179,6 @@ form .aligned table p {
 
 .colM .aligned .vLargeTextField, .colM .aligned .vXMLLargeTextField {
     width: 610px;
-}
-
-fieldset .fieldBox {
-    margin-right: 20px;
-}
-
-/* WIDE FIELDSETS */
-
-.wide label,
-.wide legend {
-    width: 200px;
-}
-
-form .wide p.help,
-form .wide ul.errorlist,
-form .wide div.help {
-    padding-left: 50px;
-}
-
-form div.help ul {
-    padding-left: 0;
-    margin-left: 0;
-}
-
-.colM fieldset.wide .vLargeTextField, .colM fieldset.wide .vXMLLargeTextField {
-    width: 450px;
 }
 
 /* COLLAPSIBLE FIELDSETS */

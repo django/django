@@ -1773,6 +1773,46 @@ class ModelFormsetTest(TestCase):
         formset = FormSet(initial=[{"authors": Author.objects.all()}], data=data)
         self.assertFalse(formset.extra_forms[0].has_changed())
 
+    def test_get_queryset_falls_back_to_pk_when_no_ordering_defined(self):
+        # Product has no Meta.ordering, so the default queryset is not
+        # totally ordered.
+        self.assertIs(Product._default_manager.get_queryset().totally_ordered, False)
+
+        ProductFormSet = modelformset_factory(Product, fields="__all__")
+        formset = ProductFormSet()
+
+        queryset = formset.get_queryset()
+        self.assertEqual(queryset.query.order_by, ("pk",))
+
+    def test_get_queryset_appends_pk_to_explicit_queryset_ordering(self):
+        # Author.name is non-unique, so order_by("name") is not totally
+        # ordered.
+        AuthorFormSet = modelformset_factory(Author, fields="__all__")
+        formset = AuthorFormSet(queryset=Author.objects.order_by("name"))
+
+        queryset = formset.get_queryset()
+        self.assertEqual(queryset.query.order_by, ("name", "pk"))
+
+    def test_get_queryset_appends_pk_to_meta_ordering(self):
+        # Author has Meta.ordering = ("name",) which is not deterministic
+        # by itself.
+        AuthorFormSet = modelformset_factory(Author, fields="__all__")
+        formset = AuthorFormSet()
+
+        queryset = formset.get_queryset()
+        self.assertEqual(queryset.query.order_by, ("name", "pk"))
+
+    def test_get_queryset_unchanged_when_already_totally_ordered(self):
+        # Ordering by pk is already totally ordered; pk must not be
+        # appended again.
+        AuthorFormSet = modelformset_factory(Author, fields="__all__")
+        formset = AuthorFormSet(queryset=Author.objects.order_by("pk"))
+
+        queryset = formset.get_queryset()
+        # Must be exactly ("pk",), not ("pk", "pk").
+        self.assertEqual(queryset.query.order_by, ("pk",))
+        self.assertIs(queryset.totally_ordered, True)
+
     def test_prevent_duplicates_from_with_the_same_formset(self):
         FormSet = modelformset_factory(Product, fields="__all__", extra=2)
         data = {
