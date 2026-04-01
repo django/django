@@ -1797,6 +1797,43 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
                 hour_melb=Extract("start_time", "hour", tzinfo=melb),
             ).get()
 
+    def test_extract_in_filter(self):
+        """
+        When Extract is used in a filter, it can behave unexpectedly
+        because the function at the database level returns a timezone-naive
+        value. ExtractHour is the version that is most impacted by this.
+        """
+        # UTC: No adjustment required to filtering for Extract
+        now = timezone.now()
+        two_hours = datetime.timedelta(hours=2)
+        later = now + two_hours
+        non_utc_model = self.create_model(now, later)
+        models_qs = DTModel.objects.annotate(
+            start_extract_hour=ExtractHour("start_datetime")
+        ).filter(id=non_utc_model.id, start_extract_hour=now.hour)
+        self.assertEqual(models_qs.count(), 1)
+        test_timezones = [
+            zoneinfo.ZoneInfo("Europe/Berlin"),
+            zoneinfo.ZoneInfo("Australia/Melbourne"),
+            zoneinfo.ZoneInfo("America/Chicago"),
+        ]
+        for test_tz in test_timezones:
+            with timezone.override(test_tz):
+                now = timezone.now()
+                later = now + two_hours
+                non_utc_model = self.create_model(now, later)
+                models_qs = DTModel.objects.annotate(
+                    start_extract_hour=ExtractHour("start_datetime")
+                ).filter(id=non_utc_model.id, start_extract_hour=now.hour)
+                self.assertNotEqual(models_qs.count(), 1)
+                adjusted_now = timezone.localtime(now).replace(
+                    tzinfo=zoneinfo.ZoneInfo(key="UTC")
+                )
+                models_qs = DTModel.objects.annotate(
+                    start_extract_hour=ExtractHour("start_datetime")
+                ).filter(id=non_utc_model.id, start_extract_hour=adjusted_now.hour)
+                self.assertEqual(models_qs.count(), 1)
+
     def test_trunc_timezone_applied_before_truncation(self):
         start_datetime = datetime.datetime(2016, 1, 1, 1, 30, 50, 321)
         end_datetime = datetime.datetime(2016, 6, 15, 14, 10, 50, 123)
@@ -1951,7 +1988,7 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
 
     def test_trunc_in_filter(self):
         """
-        When TruncSecond is used in a filter it can behave unexpectedly
+        When TruncSecond is used in a filter, it can behave unexpectedly
         because the function at the database level returns a timezone-naive
         value. The documentation at docs/ref/models/database-functions.txt
         describes the problem and provides a work-around in specific cases.
@@ -1968,23 +2005,39 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         test_timezones = [
             zoneinfo.ZoneInfo("Europe/Berlin"),
             zoneinfo.ZoneInfo("Australia/Melbourne"),
+            zoneinfo.ZoneInfo("America/Chicago"),
         ]
         for test_tz in test_timezones:
             with timezone.override(test_tz):
                 now = timezone.now()
-                later = now + two_hours
-                non_utc_model = self.create_model(now, later)
-                models_qs = DTModel.objects.annotate(
-                    start_trunc=TruncSecond("start_datetime")
-                ).filter(id=non_utc_model.id, start_trunc__lte=now)
-                self.assertNotEqual(models_qs.count(), 1)
+                offset = test_tz.utcoffset(now).total_seconds()
+                # The test is adjusted based on if we're ahead or behind UTC
+                now_diff = now + two_hours  # this is the end time
+                non_utc_model = self.create_model(now, now_diff)
+                if offset > 0:
+                    models_qs = DTModel.objects.annotate(
+                        start_trunc=TruncSecond("start_datetime")
+                    ).filter(id=non_utc_model.id, start_trunc__lte=now)
+                elif offset < 0:
+                    # Note: when working in negative timezones, we cannot use the lte
+                    # A fair check is to make the "now" use a trunc second like value
+                    models_qs = DTModel.objects.annotate(
+                        start_trunc=TruncSecond("start_datetime")
+                    ).filter(
+                        id=non_utc_model.id, start_trunc=now.replace(microsecond=0)
+                    )
+                else:
+                    self.assertNotEqual(offset, 0, "Choose a timezone that is not UTC")
+                self.assertNotEqual(
+                    models_qs.count(), 1, "time zone: {}".format(test_tz)
+                )
                 adjusted_now = timezone.localtime(now).replace(
                     tzinfo=zoneinfo.ZoneInfo(key="UTC")
                 )
                 models_qs = DTModel.objects.annotate(
                     start_trunc=TruncSecond("start_datetime")
                 ).filter(id=non_utc_model.id, start_trunc__lte=adjusted_now)
-                self.assertEqual(models_qs.count(), 1)
+                self.assertEqual(models_qs.count(), 1, "time zone: {}".format(test_tz))
 
 
 class Ticket34699Tests(TestCase):
