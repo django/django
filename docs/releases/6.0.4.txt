@@ -10,4 +10,8 @@ issues with severity "low", and several bugs in 6.0.3.
 Bugfixes
 ========
 
-* ...
+* The :djadmin:`makemigrations` command now properly tracks all changes to
+    unmanaged models, including field additions, removals, alterations,
+    constraints, and model renames. After upgrading, you may see new
+    migrations detected for unmanaged models that have pending changes
+    (:ticket:`35813`).
