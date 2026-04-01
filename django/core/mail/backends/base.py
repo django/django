@@ -1,11 +1,17 @@
 """Base email backend class."""
 
+from django.core.mail import InvalidMailer
+from django.utils.deprecation import RemovedInDjango70Warning, warn_about_external_use
+
 
 class BaseEmailBackend:
     """
     Base class for email backend implementations.
 
-    Subclasses must at least overwrite send_messages().
+    Subclasses must implement at least send_messages().
+
+    Subclass __init__() should pass alias and unknown **kwargs to
+    super().__init__() for proper error reporting.
 
     open() and close() can be called indirectly by using a backend object as a
     context manager:
@@ -15,8 +21,32 @@ class BaseEmailBackend:
            pass
     """
 
-    def __init__(self, fail_silently=False, **kwargs):
+    def __init__(self, fail_silently=False, *, alias=None, **kwargs):
+        self.alias = alias
         self.fail_silently = fail_silently
+
+        if kwargs:
+            kwarg_names = ", ".join(repr(key) for key in kwargs.keys())
+
+            # RemovedInDjango70Warning.
+            if alias is None:
+                # Not being initialized from mail.mailers. Unknown kwargs are
+                # ignored -- with a deprecation warning if they originated from
+                # outside Django (either direct construction of a built-in
+                # backend or a super.__init__() call from a custom subclass).
+                # Use something more precise than self.__class__.__name__,
+                # which is often just "EmailBackend".
+                class_name = f"{type(self).__module__}.{type(self).__qualname__}"
+                warn_about_external_use(
+                    f"{class_name}.__init__() does not support {kwarg_names}. "
+                    "In Django 7.0, BaseEmailBackend will raise a TypeError "
+                    "for unknown keyword arguments.",
+                    RemovedInDjango70Warning,
+                    skip_name_prefixes="django.core.mail.backends",
+                )
+                return
+
+            raise InvalidMailer(f"Unknown options {kwarg_names}.", alias=alias)
 
     def open(self):
         """
