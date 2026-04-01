@@ -10,10 +10,11 @@ from ssl import SSLError
 from unittest import SkipTest, mock, skipUnless
 
 from django.core import mail
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, InvalidEmailProvider
 from django.core.mail.backends import console, dummy, filebased, locmem, smtp
 from django.core.mail.backends.base import BaseEmailBackend
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase, ignore_warnings, override_settings
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .tests import MailTestsMixin, message_from_bytes
 
@@ -28,6 +29,11 @@ except ImportError:
 class BaseEmailBackendTests(SimpleTestCase):
     """BaseEmailBackend provides a stable API for subclasses."""
 
+    def test_alias(self):
+        """BaseEmailBackend constructor accepts an alias argument."""
+        backend = BaseEmailBackend(alias="test_alias")
+        self.assertEqual(backend.alias, "test_alias")
+
     def test_fail_silently(self):
         """BaseEmailBackend constructor accepts a fail_silently argument."""
         with self.subTest(fail_silently=True):
@@ -39,12 +45,32 @@ class BaseEmailBackendTests(SimpleTestCase):
 
     def test_unknown_kwargs(self):
         """
-        BaseEmailBackend constructor accepts and ignores unknown keyword
-        arguments.
+        BaseEmailBackend constructor reports extra keyword arguments as
+        unknown EMAIL_PROVIDER OPTIONS.
         """
-        backend = BaseEmailBackend(unknown_kwarg="foo")
-        self.assertIsInstance(backend, BaseEmailBackend)
-        self.assertFalse(hasattr(backend, "unknown_kwarg"))
+        msg = (
+            "Unknown OPTIONS for EMAIL_PROVIDERS['test_alias']: "
+            "'oops_typo', 'unknown'."
+        )
+        with self.assertRaisesMessage(InvalidEmailProvider, msg):
+            BaseEmailBackend(alias="test_alias", oops_typo="foo", unknown="bar")
+
+    # RemovedInDjango70Warning.
+    def test_unknown_kwargs_compatibility(self):
+        """
+        BaseEmailBackend constructor accepts and ignores unknown keyword
+        arguments in compatibility mode (without alias) but warns about them.
+        """
+        msg = (
+            "BaseEmailBackend.__init__() does not support 'oops_typo', "
+            "'unknown'. In Django 7.0, BaseEmailBackend will raise a "
+            "TypeError for unknown keyword arguments."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            backend = BaseEmailBackend(oops_typo="foo", unknown="foo")
+            self.assertIsInstance(backend, BaseEmailBackend)
+            self.assertFalse(hasattr(backend, "oops_typo"))
+            self.assertFalse(hasattr(backend, "unknown"))
 
 
 class SharedEmailBackendTests(MailTestsMixin):
@@ -59,6 +85,10 @@ class SharedEmailBackendTests(MailTestsMixin):
     backend_test_kwargs = {}
 
     def create_backend(self, **extra_kwargs):
+        """
+        Create a testable backend instance as if initialized from
+        mail.providers (without examining deprecated settings).
+        """
         if self.backend_class is None:
             raise NotImplementedError(
                 "subclasses of SharedEmailBackendTests must provide a "
@@ -66,6 +96,7 @@ class SharedEmailBackendTests(MailTestsMixin):
             )
 
         kwargs = self.backend_test_kwargs | extra_kwargs
+        kwargs.setdefault("alias", "test_alias")
         return self.backend_class(**kwargs)
 
     def get_mailbox_content(self):
@@ -89,6 +120,18 @@ class SharedEmailBackendTests(MailTestsMixin):
             % (len(mailbox), [m.as_string() for m in mailbox]),
         )
         return mailbox[0]
+
+    def test_accepts_alias(self):
+        backend = self.backend_class(alias="this-alias", **self.backend_test_kwargs)
+        self.assertEqual(backend.alias, "this-alias")
+
+    # RemovedInDjango70Warning.
+    def test_alias_optional(self):
+        # Backends may be initialized without an alias during the transition
+        # to mail.providers.
+        assert "alias" not in self.backend_test_kwargs  # Test precondition.
+        backend = self.backend_class(**self.backend_test_kwargs)
+        self.assertIsNone(backend.alias)
 
     def test_send(self):
         email = EmailMessage(
@@ -162,9 +205,33 @@ class SharedEmailBackendTests(MailTestsMixin):
             self.assertFalse(backend.fail_silently)
 
     def test_unknown_kwargs(self):
-        """Backend constructor ignores unknown keyword arguments."""
-        backend = self.create_backend(unknown_kwarg="foo")
-        self.assertFalse(hasattr(backend, "unknown_kwarg"))
+        """Backend constructor rejects unknown keyword arguments."""
+        msg = (
+            "Unknown OPTIONS for EMAIL_PROVIDERS['test_alias']: "
+            "'oops_typo', 'unknown'."
+        )
+        with self.assertRaisesMessage(InvalidEmailProvider, msg):
+            self.create_backend(oops_typo=True, unknown="foo")
+
+    def test_unknown_kwargs_without_alias(self):
+        """
+        Backend constructor ignores unknown keyword arguments when initialized
+        in compatibility mode (without alias).
+        """
+        # RemovedInDjango70Warning: change to expect TypeError "got unexpected
+        # keyword argument(s): 'unknown_kwarg'."
+        backend_module = self.backend_class.__module__
+        msg = (
+            f"{backend_module}.EmailBackend.__init__() does not support "
+            "'unknown_kwarg'. In Django 7.0, BaseEmailBackend will raise a "
+            "TypeError for unknown keyword arguments."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            # (Can't call self.create_backend()--it includes alias argument.)
+            backend = self.backend_class(
+                **self.backend_test_kwargs, unknown_kwarg="foo"
+            )
+            self.assertFalse(hasattr(backend, "unknown_kwarg"))
 
 
 class DummyBackendTests(SharedEmailBackendTests, SimpleTestCase):
@@ -229,6 +296,21 @@ class LocmemBackendTests(SharedEmailBackendTests, SimpleTestCase):
         self.assertEqual(mail.outbox[0].subject, "correct subject")
         self.assertEqual(mail.outbox[0].to, ["to@example.com"])
 
+    def test_adds_sent_using_property(self):
+        email = EmailMessage("to@example.com")
+        locmem.EmailBackend(alias="custom").send_messages([email])
+        locmem.EmailBackend().send_messages([email])
+
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(mail.outbox[0].sent_using, "custom")
+        self.assertIsNone(mail.outbox[1].sent_using)
+
+    def test_init_kwargs_only(self):
+        with self.assertRaisesMessage(
+            TypeError, "takes 1 positional argument but 2 were given"
+        ):
+            self.backend_class(True)
+
 
 class FileBackendTests(SharedEmailBackendTests, SimpleTestCase):
     backend_class = filebased.EmailBackend
@@ -278,6 +360,13 @@ class FileBackendTests(SharedEmailBackendTests, SimpleTestCase):
         with override_settings(EMAIL_FILE_PATH=file_path_settings):
             backend = filebased.EmailBackend(file_path=file_path_override)
         self.assertEqual(backend.file_path, str(file_path_override))
+
+    # RemovedInDjango70Warning.
+    @ignore_warnings(category=RemovedInDjango70Warning)
+    @override_settings(EMAIL_FILE_PATH="/this/path/does/not/exist")
+    def test_ignores_settings_when_initialized_with_alias(self):
+        backend = self.backend_class(alias="test_alias", file_path=self.tmp_dir)
+        self.assertEqual(backend.file_path, str(self.tmp_dir))
 
     def test_new_file_per_instance(self):
         """
@@ -343,6 +432,12 @@ class FileBackendTests(SharedEmailBackendTests, SimpleTestCase):
         self.assertEqual(messages[0]["to"], "one@example.com")
         self.assertEqual(messages[1]["to"], "two@example.com")
 
+    def test_init_kwargs_only(self):
+        with self.assertRaisesMessage(
+            TypeError, "takes 1 positional argument but 2 were given"
+        ):
+            self.backend_class(True)
+
 
 class FileBackendPathLibTests(FileBackendTests):
     """
@@ -388,6 +483,12 @@ class ConsoleBackendTests(SharedEmailBackendTests, SimpleTestCase):
             {("To", "to@example.com")},
         )
         self.assertIn(b"\nDate: ", message)
+
+    def test_init_kwargs_only(self):
+        with self.assertRaisesMessage(
+            TypeError, "takes 1 positional argument but 2 were given"
+        ):
+            self.backend_class(True)
 
 
 class SMTPHandler:
@@ -467,6 +568,57 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
 
     def get_smtp_envelopes(self):
         return self.smtp_handler.smtp_envelopes
+
+    # RemovedInDjango70Warning.
+    @ignore_warnings(category=RemovedInDjango70Warning)
+    @override_settings(
+        EMAIL_HOST="mail.example.com",
+        EMAIL_PORT=822,
+        EMAIL_HOST_USER="username",
+        EMAIL_HOST_PASSWORD="password",
+        EMAIL_USE_TLS=True,
+        EMAIL_USE_SSL=None,
+        EMAIL_SSL_CERTFILE="foo",
+        EMAIL_SSL_KEYFILE="bar",
+    )
+    def test_ignores_settings_when_initialized_with_alias(self):
+        backend = self.backend_class(alias="test_alias", host="local.mail")
+        # All properties (except host) should be defaults.
+        self.assertEqual(backend.host, "local.mail")
+        self.assertEqual(backend.port, 25)
+        self.assertIsNone(backend.username)
+        self.assertIsNone(backend.password)
+        self.assertIsNone(backend.use_tls)
+        self.assertIsNone(backend.use_ssl)
+        self.assertIsNone(backend.ssl_certfile)
+        self.assertIsNone(backend.ssl_keyfile)
+
+    def test_host_option_required(self):
+        msg = "EMAIL_PROVIDERS['test_alias'] requires a 'host' in its OPTIONS."
+        with self.assertRaisesMessage(InvalidEmailProvider, msg):
+            self.backend_class(alias="test_alias")
+
+    def test_port_default_dynamic(self):
+        """
+        When initialized through EMAIL_PROVIDERS, the default port adapts to
+        the security in use.
+        """
+        for case, kwargs, expected_port in [
+            ("default", {}, 25),
+            ("SSL", {"use_ssl": True}, 465),
+            ("TLS", {"use_tls": True}, 587),
+        ]:
+            with self.subTest(case):
+                backend = self.backend_class(
+                    alias="test_alias", host="mail.example.com", **kwargs
+                )
+                self.assertEqual(backend.port, expected_port)
+
+    def test_init_kwargs_only(self):
+        with self.assertRaisesMessage(
+            TypeError, "takes 1 positional argument but 3 were given"
+        ):
+            self.backend_class("mail.example.com", 2525)
 
     @override_settings(
         EMAIL_HOST="mail.example.com",
@@ -569,11 +721,20 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
 
     def test_ssl_tls_mutually_exclusive(self):
         msg = (
+            "The 'use_ssl' and 'use_tls' OPTIONS are incompatible in "
+            "EMAIL_PROVIDERS['test_alias']. Set at most one of them to True."
+        )
+        with self.assertRaisesMessage(InvalidEmailProvider, msg):
+            self.create_backend(use_ssl=True, use_tls=True)
+
+    @override_settings(EMAIL_USE_SSL=True, EMAIL_USE_TLS=True)
+    def test_ssl_tls_settings_mutually_exclusive(self):
+        msg = (
             "EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so only set "
             "one of those settings to True."
         )
         with self.assertRaisesMessage(ValueError, msg):
-            self.create_backend(use_ssl=True, use_tls=True)
+            smtp.EmailBackend()
 
     @override_settings(EMAIL_USE_SSL=True)
     def test_email_ssl_use_settings(self):
@@ -828,8 +989,12 @@ class SMTPBackendStoppedServerTests(SMTPBackendTestsBase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        # RemovedInDjango70Warning: alias argument can be removed (needed
+        # during mail.providers transition to prevent compatibility mode).
         cls.backend = smtp.EmailBackend(
-            host=cls.smtp_controller.hostname, port=cls.smtp_controller.port
+            alias="test_alias",
+            host=cls.smtp_controller.hostname,
+            port=cls.smtp_controller.port,
         )
         cls.smtp_controller.stop()
 

@@ -69,6 +69,9 @@ details on these changes.
 
 * The ``SQLCompiler.quote_name_unless_alias()`` method will be removed.
 
+* The ``BaseEmailBackend.__init__()`` method will raise errors for unknown
+  keyword arguments.
+
 .. _deprecation-removed-in-6.1:
 
 6.1

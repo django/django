@@ -6,6 +6,7 @@ import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.core.mail.handler import InvalidEmailProvider
 
 # Imported for backwards compatibility and for the sake
 # of a cleaner namespace. These symbols used to be in
@@ -26,6 +27,7 @@ from django.utils.functional import Promise
 from django.utils.module_loading import import_string
 
 __all__ = [
+    "InvalidEmailProvider",
     "CachedDnsName",
     "DNS_NAME",
     "EmailMessage",
@@ -94,7 +96,14 @@ def send_mail(
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.
     """
-    if connection is not None:
+    if connection is None:
+        options = {"fail_silently": fail_silently}
+        if auth_user is not None:
+            options["username"] = auth_user
+        if auth_password is not None:
+            options["password"] = auth_password
+        connection = get_connection(**options)
+    else:
         if fail_silently:
             raise TypeError(
                 "fail_silently cannot be used with a connection. "
@@ -105,11 +114,6 @@ def send_mail(
                 "auth_user and auth_password cannot be used with a connection. "
                 "Pass auth_user and auth_password to get_connection() instead."
             )
-    connection = connection or get_connection(
-        username=auth_user,
-        password=auth_password,
-        fail_silently=fail_silently,
-    )
     mail = EmailMultiAlternatives(
         subject, message, from_email, recipient_list, connection=connection
     )
@@ -148,7 +152,14 @@ def send_mass_mail(
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.
     """
-    if connection is not None:
+    if connection is None:
+        options = {"fail_silently": fail_silently}
+        if auth_user is not None:
+            options["username"] = auth_user
+        if auth_password is not None:
+            options["password"] = auth_password
+        connection = get_connection(**options)
+    else:
         if fail_silently:
             raise TypeError(
                 "fail_silently cannot be used with a connection. "
@@ -159,11 +170,6 @@ def send_mass_mail(
                 "auth_user and auth_password cannot be used with a connection. "
                 "Pass auth_user and auth_password to get_connection() instead."
             )
-    connection = connection or get_connection(
-        username=auth_user,
-        password=auth_password,
-        fail_silently=fail_silently,
-    )
     messages = [
         EmailMessage(subject, message, sender, recipient)
         for subject, message, sender, recipient in datatuple

@@ -9,10 +9,10 @@ from django.core.mail.backends.base import BaseEmailBackend
 
 
 class EmailBackend(BaseEmailBackend):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         self.stream = kwargs.pop("stream", sys.stdout)
         self._lock = threading.RLock()
-        super().__init__(*args, **kwargs)
+        super().__init__(**kwargs)
 
     def write_message(self, message):
         msg = message.message()

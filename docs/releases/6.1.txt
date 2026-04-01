@@ -471,12 +471,23 @@ Dropped support for MariaDB < 10.11
 Upstream support for MariaDB 10.6 ends in July 2026, and MariaDB 10.7-10.10 are
 short-term maintenance releases. Django 6.1 supports MariaDB 10.11 and higher.
 
-Miscellaneous
--------------
+Email
+-----
 
 * Providing ``fail_silently=True``, ``auth_user``, or ``auth_password`` to mail
   sending functions (such as :func:`~django.core.mail.send_mail`) while also
   providing a ``connection`` now raises a ``TypeError``.
+
+* Django's built-in ``EmailBackend`` classes now require keyword arguments in
+  their ``__init__()`` methods. Undocumented use of positional arguments will
+  raise a ``TypeError``. This does not affect calls to
+  :func:`mail.get_connection <django.core.mail.get_connection>` or other mail
+  APIs, but could require changes to code that constructs email backend
+  instances directly or to ``super().__init__(...)`` calls in custom email
+  backend subclasses.
+
+Miscellaneous
+-------------
 
 * :class:`~django.contrib.contenttypes.fields.GenericForeignKey` now uses a
   separate descriptor class: the private ``GenericForeignKeyDescriptor``.
@@ -496,6 +507,16 @@ Miscellaneous
 
 Features deprecated in 6.1
 ==========================
+
+Email
+-----
+
+* The ``BaseEmailBackend.__init__()`` constructor no longer silently ignores
+  unknown keyword arguments. Custom email backend subclasses should ensure they
+  have consumed all supported ``**kwargs`` before forwarding the remainder to
+  superclass init. The base class now issues a deprecation warning for unknown
+  arguments, and it will treat them as errors starting in Django 7.0.
+
 
 Miscellaneous
 -------------

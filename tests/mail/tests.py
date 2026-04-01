@@ -2311,12 +2311,18 @@ class GetConnectionTests(SimpleTestCase):
                 "django.core.mail.backends.filebased.EmailBackend", file_path=object()
             )
 
+    # RemovedInDjango70Warning.
     def test_arbitrary_keyword(self):
         """
         Make sure that get_connection() accepts arbitrary keyword that might be
         used with custom backends.
         """
-        c = mail.get_connection(fail_silently=True, foo="bar")
+        msg = (
+            "locmem.EmailBackend.__init__() does not support 'foo'. In Django 7.0, "
+            "BaseEmailBackend will raise a TypeError for unknown keyword arguments."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            c = mail.get_connection(fail_silently=True, foo="bar")
         self.assertTrue(c.fail_silently)
 
 
