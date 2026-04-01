@@ -1777,6 +1777,18 @@ class Query(BaseExpression):
         that weren't found (which are likely transforms and the final lookup).
         """
         path, names_with_path = [], []
+        # Check if a prefix of names forms a multi-part filtered relation alias
+        # (e.g., alias "book__title" would appear as ["book", "title", ...]).
+        # If so, collapse those parts into a single name so the filtered
+        # relation is recognized correctly.
+        if self._filtered_relations:
+            combined = LOOKUP_SEP.join(names)
+            for fr_alias in self._filtered_relations:
+                if combined == fr_alias or combined.startswith(fr_alias + LOOKUP_SEP):
+                    num_parts = fr_alias.count(LOOKUP_SEP) + 1
+                    if num_parts > 1:
+                        names = [fr_alias] + list(names[num_parts:])
+                    break
         for pos, name in enumerate(names):
             cur_names_with_path = (name, [])
             if name == "pk" and opts is not None:
@@ -1784,26 +1796,27 @@ class Query(BaseExpression):
 
             field = None
             filtered_relation = None
-            try:
-                if opts is None:
-                    raise FieldDoesNotExist
-                field = opts.get_field(name)
-            except FieldDoesNotExist:
-                if name in self.annotation_select:
-                    field = self.annotation_select[name].output_field
-                elif name in self._filtered_relations and pos == 0:
-                    filtered_relation = self._filtered_relations[name]
-                    if LOOKUP_SEP in filtered_relation.relation_name:
-                        parts = filtered_relation.relation_name.split(LOOKUP_SEP)
-                        filtered_relation_path, field, _, _ = self.names_to_path(
-                            parts,
-                            opts,
-                            allow_many,
-                            fail_on_missing,
-                        )
-                        path.extend(filtered_relation_path[:-1])
-                    else:
-                        field = opts.get_field(filtered_relation.relation_name)
+            if name in self._filtered_relations and pos == 0:
+                filtered_relation = self._filtered_relations[name]
+                if LOOKUP_SEP in filtered_relation.relation_name:
+                    parts = filtered_relation.relation_name.split(LOOKUP_SEP)
+                    filtered_relation_path, field, _, _ = self.names_to_path(
+                        parts,
+                        opts,
+                        allow_many,
+                        fail_on_missing,
+                    )
+                    path.extend(filtered_relation_path[:-1])
+                else:
+                    field = opts.get_field(filtered_relation.relation_name)
+            if field is None:
+                try:
+                    if opts is None:
+                        raise FieldDoesNotExist
+                    field = opts.get_field(name)
+                except FieldDoesNotExist:
+                    if name in self.annotation_select:
+                        field = self.annotation_select[name].output_field
             if field is not None:
                 # Fields that contain one-to-many relations with a generic
                 # model (like a GenericForeignKey) cannot generate reverse
@@ -2072,7 +2085,11 @@ class Query(BaseExpression):
             else:
                 return annotation
         else:
-            field_list = name.split(LOOKUP_SEP)
+            # Check for FilteredRelation alias before splitting
+            if name in self._filtered_relations:
+                field_list = [name]
+            else:
+                field_list = name.split(LOOKUP_SEP)
             annotation = self.annotations.get(field_list[0])
             if annotation is not None:
                 for transform in field_list[1:]:
@@ -2265,11 +2282,14 @@ class Query(BaseExpression):
         try:
             cols = []
             for name in field_names:
+                parts = (
+                    [name]
+                    if name in self._filtered_relations
+                    else name.split(LOOKUP_SEP)
+                )
                 # Join promotion note - we must not remove any rows here, so
                 # if there is no existing joins, use outer join.
-                join_info = self.setup_joins(
-                    name.split(LOOKUP_SEP), opts, alias, allow_many=allow_m2m
-                )
+                join_info = self.setup_joins(parts, opts, alias, allow_many=allow_m2m)
                 targets, final_alias, joins = self.trim_joins(
                     join_info.targets,
                     join_info.joins,
@@ -2580,7 +2600,7 @@ class Query(BaseExpression):
             field_names = []
             extra_names = []
             annotation_names = []
-            if not self.extra and not self.annotations:
+            if not self.extra and not self.annotations and not self._filtered_relations:
                 # Shortcut - if there are no extra or annotations, then
                 # the values() clause must be just field names.
                 field_names = list(fields)
@@ -2610,8 +2630,13 @@ class Query(BaseExpression):
                         # Call `names_to_path` to ensure a FieldError including
                         # annotations about to be masked as valid choices if
                         # `f` is not resolvable.
+                        parts = (
+                            [f]
+                            if f in self._filtered_relations
+                            else f.split(LOOKUP_SEP)
+                        )
                         if self.annotation_select:
-                            self.names_to_path(f.split(LOOKUP_SEP), self.model._meta)
+                            self.names_to_path(parts, self.model._meta)
                         selected[f] = len(field_names)
                         field_names.append(f)
             self.set_extra_mask(extra_names)
