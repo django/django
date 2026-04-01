@@ -390,7 +390,7 @@ class ChangeListTests(TestCase):
             (
                 '<td class="field-parent nowrap">'
                 '<strong class="parent-name">parent</strong>'
-                '</td>'
+                "</td>"
             ),
             table_output,
         )
