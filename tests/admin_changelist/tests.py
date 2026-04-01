@@ -362,6 +362,37 @@ class ChangeListTests(TestCase):
             table_output,
         )
 
+    def test_result_list_related_field_uses_html_representation(self):
+        """
+        Regression test for #24580: related model fields in list_display keep
+        object HTML rendering.
+        """
+        new_parent = Parent.objects.create(name="parent")
+        Child.objects.create(name="name", parent=new_parent)
+        request = self.factory.get("/child/")
+        request.user = self.superuser
+        m = ChildAdmin(Child, custom_site)
+        cl = m.get_changelist_instance(request)
+        template = Template(
+            "{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}"
+        )
+        context = Context({"cl": cl, "opts": Child._meta})
+
+        with mock.patch.object(
+            Parent,
+            "__html__",
+            create=True,
+            return_value='<strong class="parent-name">parent</strong>',
+        ):
+            table_output = template.render(context)
+
+        self.assertInHTML(
+            '<td class="field-parent nowrap"><strong class="parent-name">parent</strong></td>',
+            table_output,
+        )
+        self.assertNotIn("&lt;strong", table_output)
+        self.assertNotIn("<td class=\"field-parent nowrap\">parent</td>", table_output)
+
     def test_action_checkbox_for_model_with_dunder_html(self):
         grandchild = GrandChild.objects.create(name="name")
         request = self._mocked_authenticated_request("/grandchild/", self.superuser)
