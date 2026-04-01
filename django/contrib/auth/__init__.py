@@ -234,6 +234,8 @@ async def alogin(request, user, backend=None):
     await request.session.aset(SESSION_KEY, user._meta.pk.value_to_string(user))
     await request.session.aset(BACKEND_SESSION_KEY, backend)
     await request.session.aset(HASH_SESSION_KEY, session_auth_hash)
+    if hasattr(request, "user"):
+        request.user = user
     if hasattr(request, "auser"):
 
         async def auser():
@@ -273,13 +275,21 @@ async def alogout(request):
             user = None
     await user_logged_out.asend(sender=user.__class__, request=request, user=user)
     await request.session.aflush()
-    if hasattr(request, "auser"):
+
+    has_user = hasattr(request, "user")
+    has_auser = hasattr(request, "auser")
+    if has_user or has_auser:
         from django.contrib.auth.models import AnonymousUser
 
-        async def auser():
-            return AnonymousUser()
+        anon = AnonymousUser()
+        if has_user:
+            request.user = anon
+        if has_auser:
 
-        request.auser = auser
+            async def auser():
+                return anon
+
+            request.auser = auser
 
 
 def get_user_model():
