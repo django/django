@@ -726,7 +726,9 @@ You're almost done! All that's left to do now is:
       .. code-block:: shell
 
          $ cd django
-         $ django-admin makemessages -l en --domain=djangojs --domain=django
+         $ django-admin makemessages -l en --domain=django
+         processing locale en
+         $ django-admin makemessages -l en --domain=djangojs
          processing locale en
 
    #. Review the diff before pushing and avoid committing changes to the
