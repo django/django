@@ -12,7 +12,7 @@ from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import fields
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.query_utils import Q
+from django.db.models.query_utils import PROHIBITED_FILTER_KWARGS, Q
 from django.utils.deconstruct import deconstructible
 from django.utils.functional import cached_property, classproperty
 from django.utils.hashable import make_hashable
@@ -1640,6 +1640,9 @@ class When(Expression):
 
     def __init__(self, condition=None, then=None, **lookups):
         if lookups:
+            if invalid_kwargs := PROHIBITED_FILTER_KWARGS.intersection(lookups):
+                invalid_str = ", ".join(f"'{k}'" for k in sorted(invalid_kwargs))
+                raise TypeError(f"The following kwargs are invalid: {invalid_str}")
             if condition is None:
                 condition, lookups = Q(**lookups), None
             elif getattr(condition, "conditional", False):
