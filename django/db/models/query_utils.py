@@ -21,6 +21,8 @@ from django.utils.hashable import make_hashable
 
 logger = logging.getLogger("django.db.models")
 
+PROHIBITED_FILTER_KWARGS = frozenset(["_connector", "_negated"])
+
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both
 # sides of the relation. The join_field is the field backing the relation.
