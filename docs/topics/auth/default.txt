@@ -246,9 +246,9 @@ directly.
 .. versionadded:: 6.1
 
 The :class:`~django.contrib.auth.models.Permission` model provides a helper
-function,  :meth:`~django.contrib.auth.models.Permission.user_perm_str` that returns the string
-representation that can be used to check permission using the `has_perm`
-method.
+function,  :meth:`~django.contrib.auth.models.Permission.user_perm_str`
+that returns the string representation that can be used to check permission
+using the `has_perm` method.
 
 Groups
 ------
