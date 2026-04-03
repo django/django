@@ -141,7 +141,7 @@ QUnit.test('selecting option', function(assert) {
     // move to the right
     const done = assert.async();
     $('#select_from')[0].selectedIndex = 0;
-    const event = new KeyboardEvent('keydown', {'keyCode': 39, 'charCode': 39});
+    const event = new KeyboardEvent('keydown', {'key': 'ArrowRight'});
     SelectFilter.filter_key_down(event, 'select', '_from', '_to');
     setTimeout(() => {
         assert.equal($('#select_from option').length, 2);
@@ -164,11 +164,63 @@ QUnit.test('deselecting option', function(assert) {
     // move back to the left
     const done_left = assert.async();
     $('#select_to')[0].selectedIndex = 0;
-    const event_left = new KeyboardEvent('keydown', {'keyCode': 37, 'charCode': 37});
+    const event_left = new KeyboardEvent('keydown', {'key': 'ArrowLeft'});
     SelectFilter.filter_key_down(event_left, 'select', '_to', '_from');
     setTimeout(() => {
         assert.equal($('#select_from option').length, 3);
         assert.equal($('#select_to option').length, 0);
         done_left();
     });
+});
+
+QUnit.test('Enter key moves selected option', function(assert) {
+    const $ = django.jQuery;
+    $('<form><select multiple id="select"></select></form>').appendTo('#qunit-fixture');
+    $('<option value="1" title="Red">Red</option>').appendTo('#select');
+    $('<option value="2" title="Blue">Blue</option>').appendTo('#select');
+    SelectFilter.init('select', 'items', 0);
+    assert.equal($('#select_from option').length, 2);
+    assert.equal($('#select_to option').length, 0);
+    const done = assert.async();
+    $('#select_from')[0].selectedIndex = 0;
+    const event = new KeyboardEvent('keydown', {'key': 'Enter'});
+    SelectFilter.filter_key_down(event, 'select', '_from', '_to');
+    setTimeout(() => {
+        assert.equal($('#select_from option').length, 1);
+        assert.equal($('#select_to option').length, 1);
+        assert.equal($('#select_to option')[0].value, '1');
+        done();
+    });
+});
+
+QUnit.test('ArrowDown wraps around in select box', function(assert) {
+    const $ = django.jQuery;
+    $('<form><select multiple id="select"></select></form>').appendTo('#qunit-fixture');
+    $('<option value="1" title="Red">Red</option>').appendTo('#select');
+    $('<option value="2" title="Blue">Blue</option>').appendTo('#select');
+    $('<option value="3" title="Green">Green</option>').appendTo('#select');
+    SelectFilter.init('select', 'items', 0);
+    const source_box = $('#select_from')[0];
+    // Start at the last option
+    source_box.selectedIndex = 2;
+    const event = new KeyboardEvent('keydown', {'key': 'ArrowDown'});
+    SelectFilter.filter_key_down(event, 'select', '_from', '_to');
+    // Should wrap around to the first option
+    assert.equal(source_box.selectedIndex, 0);
+});
+
+QUnit.test('ArrowUp wraps around in select box', function(assert) {
+    const $ = django.jQuery;
+    $('<form><select multiple id="select"></select></form>').appendTo('#qunit-fixture');
+    $('<option value="1" title="Red">Red</option>').appendTo('#select');
+    $('<option value="2" title="Blue">Blue</option>').appendTo('#select');
+    $('<option value="3" title="Green">Green</option>').appendTo('#select');
+    SelectFilter.init('select', 'items', 0);
+    const source_box = $('#select_from')[0];
+    // Start at the first option
+    source_box.selectedIndex = 0;
+    const event = new KeyboardEvent('keydown', {'key': 'ArrowUp'});
+    SelectFilter.filter_key_down(event, 'select', '_from', '_to');
+    // Should wrap around to the last option
+    assert.equal(source_box.selectedIndex, 2);
 });
