@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
 from django.db import DEFAULT_DB_ALIAS, router, transaction
+from django.db.migrations import state
 from django.db.models import signals
 from django.db.utils import ConnectionRouter
 from django.test import SimpleTestCase, TestCase, override_settings
@@ -1967,6 +1968,71 @@ class RouterTestCase(TestCase):
             Book.objects.using("default").get(pk=b.pk).published,
             datetime.date(2009, 5, 4),
         )
+
+    def test_migrate_selection_model_state(self):
+        "Synchronization behavior is predictable"
+
+        user_model_state = state.ModelState.from_model(User)
+        book_model_state = state.ModelState.from_model(Book)
+
+        self.assertTrue(router.allow_migrate_model("default", user_model_state))
+        self.assertTrue(router.allow_migrate_model("default", book_model_state))
+
+        self.assertTrue(router.allow_migrate_model("other", user_model_state))
+        self.assertTrue(router.allow_migrate_model("other", book_model_state))
+
+        with override_settings(DATABASE_ROUTERS=[TestRouter(), AuthRouter()]):
+            # Add the auth router to the chain. TestRouter is a universal
+            # synchronizer, so it should have no effect.
+            self.assertTrue(router.allow_migrate_model("default", user_model_state))
+            self.assertTrue(router.allow_migrate_model("default", book_model_state))
+
+            self.assertTrue(router.allow_migrate_model("other", user_model_state))
+            self.assertTrue(router.allow_migrate_model("other", book_model_state))
+
+        with override_settings(DATABASE_ROUTERS=[AuthRouter(), TestRouter()]):
+            # Now check what happens if the router order is reversed.
+            self.assertFalse(router.allow_migrate_model("default", user_model_state))
+            self.assertTrue(router.allow_migrate_model("default", book_model_state))
+
+            self.assertTrue(router.allow_migrate_model("other", user_model_state))
+            self.assertTrue(router.allow_migrate_model("other", book_model_state))
+
+    def test_partial_router_model_state(self):
+        "A router can choose to implement a subset of methods"
+        dive = Book.objects.using("other").create(
+            title="Dive into Python", published=datetime.date(2009, 5, 4)
+        )
+
+        # First check the baseline behavior.
+
+        self.assertEqual(router.db_for_read(User), "other")
+        self.assertEqual(router.db_for_read(Book), "other")
+
+        self.assertEqual(router.db_for_write(User), "default")
+        self.assertEqual(router.db_for_write(Book), "default")
+
+        self.assertTrue(router.allow_relation(dive, dive))
+
+        user_model_state = state.ModelState.from_model(User)
+        book_model_state = state.ModelState.from_model(Book)
+
+        self.assertTrue(router.allow_migrate_model("default", user_model_state))
+        self.assertTrue(router.allow_migrate_model("default", book_model_state))
+
+        with override_settings(
+            DATABASE_ROUTERS=[WriteRouter(), AuthRouter(), TestRouter()]
+        ):
+            self.assertEqual(router.db_for_read(User), "default")
+            self.assertEqual(router.db_for_read(Book), "other")
+
+            self.assertEqual(router.db_for_write(User), "writer")
+            self.assertEqual(router.db_for_write(Book), "writer")
+
+            self.assertTrue(router.allow_relation(dive, dive))
+
+            self.assertFalse(router.allow_migrate_model("default", user_model_state))
+            self.assertTrue(router.allow_migrate_model("default", book_model_state))
 
 
 @override_settings(DATABASE_ROUTERS=[AuthRouter()])
