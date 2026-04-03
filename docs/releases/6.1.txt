@@ -241,7 +241,11 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* :class:`~django.forms.FilePathField` now provides a
+  :meth:`~django.forms.FilePathField.set_choices` method to scan the
+  directory at :attr:`~django.forms.FilePathField.path` and refresh the
+  field's choices. This allows per-request refresh when called in a form's
+  ``__init__``.
 
 Generic Views
 ~~~~~~~~~~~~~
