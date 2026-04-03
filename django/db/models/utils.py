@@ -67,3 +67,15 @@ class AltersData:
                         break
 
         super().__init_subclass__(**kwargs)
+
+
+def get_blank_choice_label():
+    # RemovedInDjango70Warning: At the end of the deprecation, remove import
+    # and if block.
+    from django.conf import settings
+
+    from .fields import BLANK_CHOICE_DASH, BLANK_CHOICE_LABEL
+
+    if settings.USE_BLANK_CHOICE_DASH:
+        return BLANK_CHOICE_DASH[0][1]
+    return BLANK_CHOICE_LABEL

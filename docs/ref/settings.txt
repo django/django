@@ -1705,6 +1705,14 @@ renderers are:
 * ``'``:class:`django.forms.renderers.Jinja2`\ ``'``
 * ``'``:class:`django.forms.renderers.TemplatesSetting`\ ``'``
 
+.. setting:: USE_BLANK_CHOICE_DASH
+
+``USE_BLANK_CHOICE_DASH``
+------------------------------------
+
+Set this transitional setting to ``True`` to revert back to the old default
+blank choice label in forms.
+
 .. setting:: FORMAT_MODULE_PATH
 
 ``FORMAT_MODULE_PATH``

@@ -39,6 +39,7 @@ from django.utils.translation import gettext_lazy as _
 
 __all__ = [
     "AutoField",
+    # RemovedInDjango70Warning
     "BLANK_CHOICE_DASH",
     "BigAutoField",
     "BigIntegerField",
@@ -81,9 +82,13 @@ class NOT_PROVIDED:
     pass
 
 
-# The values to use for "blank" in SelectFields. Will be appended to the start
-# of most "choices" lists.
+# RemovedInDjango70Warning: From Django 6.1, the values to use for "blank"
+# in SelectFields will be defined by the below BLANK_CHOICE_LABEL constant.
+# Will be appended to the start of most "choices" lists.
+# BLANK_CHOICE_DASH is still available as a constant in Django 6.1.
 BLANK_CHOICE_DASH = [("", "---------")]
+# This allows any app's ready() method to overwrite BLANK_CHOICE_LABEL.
+BLANK_CHOICE_LABEL = _("- Select an option -")
 
 
 def _load_field(app_label, model_name, field_name):
@@ -1088,7 +1093,7 @@ class Field(RegisterLookupMixin):
     def get_choices(
         self,
         include_blank=True,
-        blank_choice=BLANK_CHOICE_DASH,
+        blank_choice=None,
         limit_choices_to=None,
         ordering=(),
     ):
@@ -1096,6 +1101,8 @@ class Field(RegisterLookupMixin):
         Return choices with a default blank choices included, for use
         as <select> choices for this field.
         """
+        if blank_choice is None:
+            blank_choice = [("", BLANK_CHOICE_LABEL)]
         if self.choices is not None:
             if include_blank:
                 return BlankChoiceIterator(self.choices, blank_choice)
