@@ -3,6 +3,7 @@ import json
 import logging
 import pickle
 import posixpath
+import re
 import sys
 import threading
 import unittest
@@ -405,26 +406,18 @@ class SimpleTestCase(unittest.TestCase):
         """
         return modify_settings(**kwargs)
 
-    def assertRedirects(
+    def _assert_redirect_response(
         self,
         response,
-        expected_url,
         status_code=302,
         target_status_code=200,
         msg_prefix="",
         fetch_redirect_response=True,
     ):
         """
-        Assert that a response redirected to a specific URL and that the
-        redirect URL can be loaded.
-
-        Won't work for external links since it uses the test client to do a
-        request (use fetch_redirect_response=False to check such links without
-        fetching them).
+        Validate the redirect status codes and optionally fetch the redirect
+        target. Return the final redirect URL.
         """
-        if msg_prefix:
-            msg_prefix += ": "
-
         if hasattr(response, "redirect_chain"):
             # The request was a followed redirect
             self.assertTrue(
@@ -517,12 +510,79 @@ class SimpleTestCase(unittest.TestCase):
                     % (path, redirect_response.status_code, target_status_code),
                 )
 
+        return url
+
+    def assertRedirects(
+        self,
+        response,
+        expected_url,
+        status_code=302,
+        target_status_code=200,
+        msg_prefix="",
+        fetch_redirect_response=True,
+    ):
+        """
+        Assert that a response redirected to a specific URL and that the
+        redirect URL can be loaded.
+
+        Won't work for external links since it uses the test client to do a
+        request (use fetch_redirect_response=False to check such links without
+        fetching them).
+        """
+        if msg_prefix:
+            msg_prefix += ": "
+
+        url = self._assert_redirect_response(
+            response,
+            status_code,
+            target_status_code,
+            msg_prefix,
+            fetch_redirect_response,
+        )
+
         self.assertURLEqual(
             url,
             expected_url,
             msg_prefix
             + "Response redirected to '%s', expected '%s'" % (url, expected_url),
         )
+
+    def assertRedirectsRegex(
+        self,
+        response,
+        expected_url_regex,
+        status_code=302,
+        target_status_code=200,
+        msg_prefix="",
+        fetch_redirect_response=True,
+    ):
+        """
+        Assert that a response redirected to a URL that matches the given
+        regex pattern, and that the redirect URL can be loaded.
+
+        Won't work for external links since it uses the test client to do a
+        request (use fetch_redirect_response=False to check such links without
+        fetching them).
+        """
+        if msg_prefix:
+            msg_prefix += ": "
+
+        url = self._assert_redirect_response(
+            response,
+            status_code,
+            target_status_code,
+            msg_prefix,
+            fetch_redirect_response,
+        )
+
+        if isinstance(expected_url_regex, str):
+            expected_url_regex = re.compile(expected_url_regex)
+        if not expected_url_regex.search(url):
+            self.fail(
+                msg_prefix
+                + "Response redirected to '%s', expected a match for regex '%s'"
+                % (url, expected_url_regex.pattern),
+            )
 
     def assertURLEqual(self, url1, url2, msg_prefix=""):
         """
