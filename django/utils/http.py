@@ -362,7 +362,13 @@ def parse_header_parameters(line, max_length=MAX_HEADER_LENGTH):
                 value = value.replace("\\\\", "\\").replace('\\"', '"')
             if has_encoding:
                 encoding, lang, value = value.split("'")
-                value = unquote(value, encoding=encoding)
+                try:
+                    value = unquote(value, encoding=encoding)
+                except (LookupError, UnicodeDecodeError):
+                    raise ValueError(
+                        f"Invalid encoding '{encoding}'."
+                        f"Unable to decode RFC 2231 parameter value."
+                    )
             pdict[name] = value
     return key, pdict
 
