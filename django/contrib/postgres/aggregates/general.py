@@ -5,6 +5,7 @@ from django.db.models import Aggregate, BooleanField, JSONField
 from django.db.models import StringAgg as _StringAgg
 from django.db.models import Value
 from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.functional import cached_property
 
 __all__ = [
     "ArrayAgg",
@@ -23,7 +24,7 @@ class ArrayAgg(Aggregate):
     allow_distinct = True
     allow_order_by = True
 
-    @property
+    @cached_property
     def output_field(self):
         return ArrayField(self.source_expressions[0].output_field)
 

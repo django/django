@@ -10,6 +10,7 @@ from django.db.models.lookups import EndsWith, StartsWith
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import register_lookup
 from django.utils import timezone
+from django.utils.functional import cached_property
 
 from .models import Article, Author, MySQLUnixTimestamp
 
@@ -80,7 +81,7 @@ class YearTransform(models.Transform):
         lhs_sql, params = compiler.compile(self.lhs)
         return connection.ops.date_extract_sql("year", lhs_sql, params)
 
-    @property
+    @cached_property
     def output_field(self):
         return models.IntegerField()
 
@@ -142,7 +143,7 @@ class SQLFuncMixin:
     def as_sql(self, compiler, connection):
         return "%s()" % self.name, []
 
-    @property
+    @cached_property
     def output_field(self):
         return CustomField()
 
@@ -214,7 +215,7 @@ class InMonth(models.lookups.Lookup):
 class DateTimeTransform(models.Transform):
     lookup_name = "as_datetime"
 
-    @property
+    @cached_property
     def output_field(self):
         return models.DateTimeField()
 
@@ -621,7 +622,7 @@ class TrackCallsYearTransform(YearTransform):
         lhs_sql, params = compiler.compile(self.lhs)
         return connection.ops.date_extract_sql("year", lhs_sql), params
 
-    @property
+    @cached_property
     def output_field(self):
         return models.IntegerField()
 
