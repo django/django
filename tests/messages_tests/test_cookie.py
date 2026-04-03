@@ -207,6 +207,18 @@ class CookieTests(BaseTests, SimpleTestCase):
                     extra_tags,
                 )
 
+    def test_signer_is_not_accessible(self):
+        """
+        The signer is not accessible through the template context.
+        """
+        storage = self.get_storage()
+        # Verify that the signer is a private attribute
+        self.assertTrue(hasattr(storage, "_signer"))
+        self.assertFalse(hasattr(storage, "signer"))
+        # Verify that the signer key is not accessible
+        with self.assertRaises(AttributeError):
+            storage.signer.key
+
 
 class BisectTests(TestCase):
     def test_bisect_keep_left(self):
