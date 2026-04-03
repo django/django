@@ -2,6 +2,7 @@ import re
 
 from django.apps import apps as django_apps
 from django.conf import settings
+from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.middleware.csrf import rotate_token
 from django.utils.crypto import constant_time_compare
@@ -391,3 +392,47 @@ async def aupdate_session_auth_hash(request, user):
     await request.session.acycle_key()
     if hasattr(user, "get_session_auth_hash") and await request.auser() == user:
         await request.session.aset(HASH_SESSION_KEY, user.get_session_auth_hash())
+
+
+def get_user_with_mitigation(username, password=""):
+    """
+    Return the UserModel instance for `username`.
+
+    If no matching user exists, return None,
+    If user is inactive return the object user.
+    in both case the default password hasher is run to mitigate timing attacks.
+
+    """
+
+    UserModel = django_apps.get_model(settings.AUTH_USER_MODEL, require_ready=False)
+    try:
+        user = UserModel._default_manager.get_by_natural_key(username)
+    except UserModel.DoesNotExist:
+        user = None
+
+    # Trigger hash password if the user is missing OR if they exist but are
+    # inactive.
+    is_inactive = not getattr(user, "is_active", False)
+
+    if user is None or is_inactive:
+        # Run the default password hasher once to reduce the timing difference
+        # between existing/active and nonexistent/inactive users (#20760).
+        make_password(password)
+
+    return user
+
+
+async def aget_user_with_mitigation(username, password=""):
+    """See get_user_with_mitigation()."""
+
+    UserModel = django_apps.get_model(settings.AUTH_USER_MODEL, require_ready=False)
+    try:
+        user = await UserModel._default_manager.aget_by_natural_key(username)
+    except UserModel.DoesNotExist:
+        user = None
+
+    is_inactive = not getattr(user, "is_active", False)
+    if user is None or is_inactive:
+        make_password(password)
+
+    return user
