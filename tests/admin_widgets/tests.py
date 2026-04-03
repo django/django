@@ -1746,6 +1746,74 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertEqual(list(self.school.students.all()), [self.jason, self.peter])
         self.assertEqual(list(self.school.alumni.all()), [self.jason, self.peter])
 
+    def test_filter_feedback_and_clear_shortcut(self):
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.common.keys import Keys
+
+        self.school.students.set([self.lisa, self.peter])
+        self.school.alumni.set([self.lisa, self.peter])
+
+        expected_unselected_values = [
+            str(self.arthur.id),
+            str(self.bob.id),
+            str(self.cliff.id),
+            str(self.jason.id),
+            str(self.jenny.id),
+            str(self.john.id),
+        ]
+
+        with self.small_screen_size():
+            self.admin_login(username="super", password="secret", login_url="/")
+            self.selenium.get(
+                self.live_server_url
+                + reverse("admin:admin_widgets_school_change", args=(self.school.id,))
+            )
+            self.wait_page_ready()
+            self.trigger_resize()
+
+            students_input = self.selenium.find_element(By.ID, "id_students_input")
+            students_status = self.selenium.find_element(
+                By.ID, "id_students_filter_status"
+            )
+            students_input.send_keys("a")
+            self.assertEqual(students_status.text, "2 of 6 shown")
+            students_input.send_keys(Keys.ESCAPE)
+            self.assertEqual(students_input.get_attribute("value"), "")
+            self.assertEqual(students_status.text, "")
+            self.assertSelectOptions("#id_students_from", expected_unselected_values)
+
+            alumni_input = self.selenium.find_element(By.ID, "id_alumni_input")
+            alumni_status = self.selenium.find_element(By.ID, "id_alumni_filter_status")
+            choose_all_button = self.selenium.find_element(By.ID, "id_alumni_add_all")
+            alumni_input.send_keys("a")
+            self.assertEqual(alumni_status.text, "2 of 6 shown")
+            self.assertEqual(choose_all_button.text, "Choose all displayed alumni")
+            alumni_input.send_keys(Keys.ESCAPE)
+            self.assertEqual(alumni_input.get_attribute("value"), "")
+            self.assertEqual(alumni_status.text, "")
+            self.assertEqual(choose_all_button.text, "Choose all alumni")
+            self.assertSelectOptions("#id_alumni_from", expected_unselected_values)
+
+            alumni_selected_input = self.selenium.find_element(
+                By.ID, "id_alumni_selected_input"
+            )
+            alumni_selected_status = self.selenium.find_element(
+                By.ID, "id_alumni_filter_selected_status"
+            )
+            remove_all_button = self.selenium.find_element(
+                By.ID, "id_alumni_remove_all"
+            )
+            alumni_selected_input.send_keys("li")
+            self.assertEqual(alumni_selected_status.text, "1 of 2 shown")
+            self.assertEqual(remove_all_button.text, "Remove all displayed alumni")
+            alumni_selected_input.send_keys(Keys.ESCAPE)
+            self.assertEqual(alumni_selected_input.get_attribute("value"), "")
+            self.assertEqual(alumni_selected_status.text, "")
+            self.assertEqual(remove_all_button.text, "Remove all alumni")
+            self.assertSelectOptions(
+                "#id_alumni_to", [str(self.lisa.id), str(self.peter.id)]
+            )
+
     def test_back_button_bug(self):
         """
         Some browsers had a bug where navigating away from the change page

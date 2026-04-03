@@ -61,6 +61,9 @@ Requires core.js and SelectBox.js.
 
             const filter_input = quickElement('input', filter_p, '', 'type', 'text', 'placeholder', gettext("Filter"));
             filter_input.id = field_id + '_input';
+            const filter_status = quickElement('span', filter_p, '', 'id', field_id + '_filter_status', 'class', 'selector-filter-status');
+            filter_status.setAttribute('aria-live', 'polite');
+            filter_status.hidden = true;
 
             selector_available.appendChild(from_box);
             const choose_all = quickElement(
@@ -71,6 +74,7 @@ Requires core.js and SelectBox.js.
                 'class', 'selector-chooseall',
                 'type', 'button'
             );
+            choose_all.dataset.fieldName = field_name;
 
             // <ul class="selector-chooser">
             const selector_chooser = quickElement('ul', selector_div);
@@ -113,7 +117,7 @@ Requires core.js and SelectBox.js.
                 interpolate(gettext('Remove %s by selecting them and then select the "Remove" arrow button.'), [field_name]),
                 'id', `${field_id}_remove_helptext`, 'class', 'helptext'
             );
-            
+
             const filter_selected_p = quickElement('p', selector_chosen, '', 'id', field_id + '_filter_selected');
             filter_selected_p.className = 'selector-filter';
 
@@ -129,6 +133,9 @@ Requires core.js and SelectBox.js.
 
             const filter_selected_input = quickElement('input', filter_selected_p, '', 'type', 'text', 'placeholder', gettext("Filter"));
             filter_selected_input.id = field_id + '_selected_input';
+            const filter_selected_status = quickElement('span', filter_selected_p, '', 'id', field_id + '_filter_selected_status', 'class', 'selector-filter-status');
+            filter_selected_status.setAttribute('aria-live', 'polite');
+            filter_selected_status.hidden = true;
 
             quickElement(
                 'select',
@@ -153,6 +160,7 @@ Requires core.js and SelectBox.js.
                 'class', 'selector-clearall',
                 'type', 'button'
             );
+            clear_all.dataset.fieldName = field_name;
 
             from_box.name = from_box.name + '_old';
 
@@ -160,9 +168,8 @@ Requires core.js and SelectBox.js.
             const move_selection = function(e, elem, move_func, from, to) {
                 if (!elem.hasAttribute('disabled')) {
                     move_func(from, to);
-                    SelectFilter.refresh_icons(field_id);
                     SelectFilter.refresh_filtered_selects(field_id);
-                    SelectFilter.refresh_filtered_warning(field_id);
+                    SelectFilter.refresh_state(field_id);
                 }
                 e.preventDefault();
             };
@@ -179,10 +186,7 @@ Requires core.js and SelectBox.js.
                 move_selection(e, this, SelectBox.move_all, field_id + '_to', field_id + '_from');
             });
             warning_footer.addEventListener('click', function(e) {
-                filter_selected_input.value = '';
-                SelectBox.filter(field_id + '_to', '');
-                SelectFilter.refresh_filtered_warning(field_id);
-                SelectFilter.refresh_icons(field_id);
+                SelectFilter.clear_filter(field_id, '_selected_input', '_to');
             });
             filter_input.addEventListener('keypress', function(e) {
                 SelectFilter.filter_key_press(e, field_id, '_from', '_to');
@@ -214,7 +218,8 @@ Requires core.js and SelectBox.js.
                     } else {
                         SelectBox.move(field_id + '_from', field_id + '_to');
                     }
-                    SelectFilter.refresh_icons(field_id);
+                    SelectFilter.refresh_filtered_selects(field_id);
+                    SelectFilter.refresh_state(field_id);
                 }
             });
             from_box.closest('form').addEventListener('submit', function() {
@@ -227,7 +232,7 @@ Requires core.js and SelectBox.js.
             SelectBox.move(field_id + '_from', field_id + '_to');
 
             // Initial icon refresh
-            SelectFilter.refresh_icons(field_id);
+            SelectFilter.refresh_state(field_id);
         },
         any_selected: function(field) {
             // Temporarily add the required attribute and check validity.
@@ -235,6 +240,12 @@ Requires core.js and SelectBox.js.
             const any_selected = field.checkValidity();
             field.required = false;
             return any_selected;
+        },
+        refresh_state: function(field_id) {
+            SelectFilter.refresh_filtered_warning(field_id);
+            SelectFilter.refresh_filter_status(field_id);
+            SelectFilter.refresh_action_labels(field_id);
+            SelectFilter.refresh_icons(field_id);
         },
         refresh_filtered_warning: function(field_id) {
             const count = SelectBox.get_hidden_node_count(field_id + '_to');
@@ -250,9 +261,36 @@ Requires core.js and SelectBox.js.
                 selector.className += ' selector-chosen--with-filtered';
             }
         },
+        refresh_filter_status: function(field_id) {
+            SelectFilter.refresh_filter_status_for_box(field_id + '_from', field_id + '_input', field_id + '_filter_status');
+            SelectFilter.refresh_filter_status_for_box(field_id + '_to', field_id + '_selected_input', field_id + '_filter_selected_status');
+        },
+        refresh_filter_status_for_box: function(select_id, input_id, status_id) {
+            const filter_active = document.getElementById(input_id).value.trim() !== '';
+            const status = document.getElementById(status_id);
+            if (!filter_active) {
+                status.hidden = true;
+                status.textContent = '';
+                return;
+            }
+            const total = SelectBox.cache[select_id].length;
+            const displayed = total - SelectBox.get_hidden_node_count(select_id);
+            status.textContent = interpolate(gettext('%(displayed)s of %(total)s shown'), {displayed, total}, true);
+            status.hidden = false;
+        },
         refresh_filtered_selects: function(field_id) {
             SelectBox.filter(field_id + '_from', document.getElementById(field_id + "_input").value);
             SelectBox.filter(field_id + '_to', document.getElementById(field_id + "_selected_input").value);
+        },
+        refresh_action_labels: function(field_id) {
+            SelectFilter.refresh_action_label(field_id, '_input', '_add_all', 'Choose all %s', 'Choose all displayed %s');
+            SelectFilter.refresh_action_label(field_id, '_selected_input', '_remove_all', 'Remove all %s', 'Remove all displayed %s');
+        },
+        refresh_action_label: function(field_id, input_suffix, button_suffix, default_label, filtered_label) {
+            const button = document.getElementById(field_id + button_suffix);
+            const has_filter = document.getElementById(field_id + input_suffix).value.trim() !== '';
+            const label = has_filter ? filtered_label : default_label;
+            button.textContent = interpolate(gettext(label), [button.dataset.fieldName]);
         },
         refresh_icons: function(field_id) {
             const from = document.getElementById(field_id + '_from');
@@ -280,19 +318,26 @@ Requires core.js and SelectBox.js.
             const temp = source_box.selectedIndex;
             SelectBox.filter(field_id + source, document.getElementById(field_id + input).value);
             source_box.selectedIndex = temp;
-            SelectFilter.refresh_filtered_warning(field_id);
-            SelectFilter.refresh_icons(field_id);
+            SelectFilter.refresh_state(field_id);
         },
         filter_key_down: function(event, field_id, source, target) {
             const source_box = document.getElementById(field_id + source);
+            const input = source === '_from' ? '_input' : '_selected_input';
             // right key (39) or left key (37)
             const direction = source === '_from' ? 39 : 37;
+            // escape key -- clear filter
+            if ((event.which && event.which === 27) || (event.keyCode && event.keyCode === 27)) {
+                if (SelectFilter.clear_filter(field_id, input, source)) {
+                    event.preventDefault();
+                }
+                return;
+            }
             // right arrow -- move across
             if ((event.which && event.which === direction) || (event.keyCode && event.keyCode === direction)) {
                 const old_index = source_box.selectedIndex;
                 SelectBox.move(field_id + source, field_id + target);
                 SelectFilter.refresh_filtered_selects(field_id);
-                SelectFilter.refresh_filtered_warning(field_id);
+                SelectFilter.refresh_state(field_id);
                 source_box.selectedIndex = (old_index === source_box.length) ? source_box.length - 1 : old_index;
                 return;
             }
@@ -304,6 +349,16 @@ Requires core.js and SelectBox.js.
             if ((event.which && event.which === 38) || (event.keyCode && event.keyCode === 38)) {
                 source_box.selectedIndex = (source_box.selectedIndex === 0) ? source_box.length - 1 : source_box.selectedIndex - 1;
             }
+        },
+        clear_filter: function(field_id, input_suffix, select_suffix) {
+            const input = document.getElementById(field_id + input_suffix);
+            if (input.value.trim() === '') {
+                return false;
+            }
+            input.value = '';
+            SelectBox.filter(field_id + select_suffix, '');
+            SelectFilter.refresh_state(field_id);
+            return true;
         }
     };
 
