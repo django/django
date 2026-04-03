@@ -1,7 +1,7 @@
 from django.contrib.gis.db import models
 from django.db import connection
-from django.db.models import Index
-from django.test import TransactionTestCase
+from django.db.models import Index, Q
+from django.test import TransactionTestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 
 from .models import City
@@ -10,6 +10,12 @@ from .models import City
 class SchemaIndexesTests(TransactionTestCase):
     available_apps = []
     models = [City]
+    get_opclass_query = """
+        SELECT opcname, c.relname FROM pg_opclass AS oc
+        JOIN pg_index as i on oc.oid = ANY(i.indclass)
+        JOIN pg_class as c on c.oid = i.indexrelid
+        WHERE c.relname = %s
+    """
 
     def get_indexes(self, table):
         with connection.cursor() as cursor:
@@ -74,4 +80,64 @@ class SchemaIndexesTests(TransactionTestCase):
             indexes = self.get_indexes(City._meta.db_table)
             self.assertIn(index_name, indexes)
             self.assertEqual(indexes[index_name], ["point"])
+            editor.remove_index(City, index)
+
+    @skipUnlessDBFeature("supports_partial_indexes")
+    def test_partial_index(self):
+        name = "city_point_partial_on_name_idx"
+        index = Index(fields=["point"], name=name, condition=Q(name="Harahetania"))
+        with connection.schema_editor() as editor:
+            index_sql = str(index.create_sql(City, editor))
+            self.assertIn("WHERE %s" % editor.quote_name("name"), index_sql)
+            editor.add_index(City, index)
+            indexes = self.get_indexes(City._meta.db_table)
+            self.assertIn(index.name, indexes)
+            editor.remove_index(City, index)
+
+    def test_tablespace(self):
+        if not connection.ops.postgis:
+            self.skipTest("PostGIS-specific test.")
+        index_name = "city_point_partial_tblspce_idx"
+        index = Index(
+            name=index_name,
+            fields=["point"],
+            db_tablespace="pg_default",
+            condition=Q(name="Harahetania"),
+        )
+        with connection.schema_editor() as editor:
+            editor.add_index(City, index)
+            self.assertIn(
+                'TABLESPACE "pg_default" ',
+                str(index.create_sql(City, editor)),
+            )
+            editor.remove_index(City, index)
+
+    @skipUnlessDBFeature("supports_covering_indexes")
+    def test_covering_index(self):
+        index_name = "city_point_covering_name_idx"
+        index = Index(fields=["point"], include=["name"], name=index_name)
+        with connection.schema_editor() as editor:
+            index_sql = str(index.create_sql(City, editor))
+            self.assertIn(
+                "(%s) INCLUDE (%s)"
+                % (editor.quote_name("point"), editor.quote_name("name")),
+                index_sql,
+            )
+            editor.add_index(City, index)
+            indexes = self.get_indexes(City._meta.db_table)
+            self.assertIn(index.name, indexes)
+            self.assertEqual(indexes[index.name], ["point", "name"])
+            editor.remove_index(City, index)
+
+    def test_specified_opclass_is_used(self):
+        if not connection.ops.postgis:
+            self.skipTest("PostGIS-specific test.")
+        index_name = "city_point_geom_3d_idx"
+        index = Index(
+            fields=["point"], name=index_name, opclasses=["gist_geometry_ops_nd"]
+        )
+        with connection.schema_editor() as editor, connection.cursor() as cursor:
+            editor.add_index(City, index)
+            cursor.execute(self.get_opclass_query, [index_name])
+            self.assertEqual(cursor.fetchall(), [("gist_geometry_ops_nd", index_name)])
             editor.remove_index(City, index)
