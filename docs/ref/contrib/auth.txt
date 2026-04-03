@@ -405,6 +405,16 @@ Methods
 :class:`~django.contrib.auth.models.Permission` objects have the standard
 data-access methods like any other :doc:`Django model </ref/models/instances>`.
 
+.. class:: models.Permission
+    :noindex:
+
+    .. attribute:: user_perm_str
+
+        .. versionadded:: 6.1
+
+        Returns the string representation for use in :meth:`has_perm
+        <django.contrib.auth.models.User.has_perm>`.
+
 ``Group`` model
 ===============
 
