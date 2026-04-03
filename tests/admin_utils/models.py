@@ -97,3 +97,13 @@ class VehicleMixin(Vehicle):
 
 class Car(VehicleMixin):
     pass
+
+
+class StrAdminOrderModel(models.Model):
+    class Meta:
+        app_label = "admin_utils"
+
+    def __str__(self):
+        return "instance"
+
+    __str__.admin_order_field = "dummy_field"
