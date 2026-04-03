@@ -849,7 +849,8 @@ class ModelAdminTests(TestCase):
             'class="related-widget-wrapper" data-model-ref="band"><select '
             'name="main_band" data-context="available-source" required '
             'id="id_main_band" data-custom-widget="true" multiple>'
-            '<option value="">---------</option><option value="1">The Doors</option>'
+            '<option value="">---------</option>'
+            f'<option value="{self.band.pk}">The Doors</option>'
             "</select></div></div>"
         )
         self.assertInHTML(expected, cmafa().render())
@@ -873,9 +874,10 @@ class ModelAdminTests(TestCase):
         expected = (
             '<fieldset><legend>Main band:</legend><div class="related-widget-wrapper" '
             'data-model-ref="band"><div id="id_main_band"><div><label '
-            'for="id_main_band_0"><input type="radio" name="main_band" value="1" '
-            'data-context="available-source" required id="id_main_band_0" '
-            'use_fieldset="true">The Doors</label></div></div></div></fieldset>'
+            'for="id_main_band_0"><input type="radio" name="main_band" '
+            f'value="{self.band.pk}" data-context="available-source" '
+            'required id="id_main_band_0" use_fieldset="true">The Doors</label>'
+            "</div></div></div></fieldset>"
         )
         self.assertInHTML(expected, cmafa().render())
 
