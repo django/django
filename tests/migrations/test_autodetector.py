@@ -4604,6 +4604,108 @@ class AutodetectorTests(BaseAutodetectorTests):
             model_name="author",
         )
 
+    def test_alter_field_foreignobject_to_concrete(self):
+        before = [
+            ModelState(
+                "testapp",
+                "Target",
+                [("id", models.AutoField(primary_key=True))],
+            ),
+            ModelState(
+                "testapp",
+                "Source",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("target_id", models.IntegerField()),
+                    (
+                        "target",
+                        models.ForeignObject(
+                            "testapp.Target",
+                            models.CASCADE,
+                            from_fields=("target_id",),
+                            to_fields=("id",),
+                        ),
+                    ),
+                ],
+            ),
+        ]
+        after = [
+            ModelState(
+                "testapp",
+                "Target",
+                [("id", models.AutoField(primary_key=True))],
+            ),
+            ModelState(
+                "testapp",
+                "Source",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("target_id", models.IntegerField()),
+                    ("target", models.IntegerField(null=True)),
+                ],
+            ),
+        ]
+        changes = self.get_changes(before, after)
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["RemoveField", "AddField"])
+        self.assertOperationAttributes(
+            changes, "testapp", 0, 0, name="target", model_name="source"
+        )
+        self.assertOperationAttributes(
+            changes, "testapp", 0, 1, name="target", model_name="source"
+        )
+
+    def test_alter_field_concrete_to_foreignobject(self):
+        before = [
+            ModelState(
+                "testapp",
+                "Target",
+                [("id", models.AutoField(primary_key=True))],
+            ),
+            ModelState(
+                "testapp",
+                "Source",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("target_id", models.IntegerField()),
+                    ("target", models.IntegerField(null=True)),
+                ],
+            ),
+        ]
+        after = [
+            ModelState(
+                "testapp",
+                "Target",
+                [("id", models.AutoField(primary_key=True))],
+            ),
+            ModelState(
+                "testapp",
+                "Source",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("target_id", models.IntegerField()),
+                    (
+                        "target",
+                        models.ForeignObject(
+                            "testapp.Target",
+                            models.CASCADE,
+                            from_fields=("target_id",),
+                            to_fields=("id",),
+                        ),
+                    ),
+                ],
+            ),
+        ]
+        changes = self.get_changes(before, after)
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["RemoveField", "AddField"])
+        self.assertOperationAttributes(
+            changes, "testapp", 0, 0, name="target", model_name="source"
+        )
+        self.assertOperationAttributes(
+            changes, "testapp", 0, 1, name="target", model_name="source"
+        )
+
     def test_non_circular_foreignkey_dependency_removal(self):
         """
         If two models with a ForeignKey from one to the other are removed at

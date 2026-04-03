@@ -1249,6 +1249,14 @@ class MigrationAutodetector:
             ],
         )
 
+    @staticmethod
+    def _field_is_concrete(field, field_name):
+        if hasattr(field, "concrete"):
+            return field.concrete
+        field.name = field.name or field_name
+        _, column = field.get_attname_column()
+        return column is not None
+
     def generate_altered_fields(self):
         """
         Make AlterField operations, or possibly RemovedField/AddField if alter
@@ -1339,10 +1347,23 @@ class MigrationAutodetector:
             if old_field_dec != new_field_dec and old_field_name == field_name:
                 both_m2m = old_field.many_to_many and new_field.many_to_many
                 neither_m2m = not old_field.many_to_many and not new_field.many_to_many
+                old_is_non_concrete = not (
+                    self._field_is_concrete(old_field, old_field_name)
+                    or old_field.many_to_many
+                )
+                new_is_non_concrete = not (
+                    self._field_is_concrete(new_field, field_name)
+                    or new_field.many_to_many
+                )
+                concreteness_changed = old_is_non_concrete != new_is_non_concrete
                 target_changed = (
                     both_m2m and new_field_dec[2]["to"] != old_field_dec[2]["to"]
                 )
-                if (both_m2m or neither_m2m) and not target_changed:
+                if (
+                    (both_m2m or neither_m2m)
+                    and not target_changed
+                    and not concreteness_changed
+                ):
                     # Either both fields are m2m or neither is
                     preserve_default = True
                     if (
@@ -1372,7 +1393,8 @@ class MigrationAutodetector:
                         dependencies=dependencies,
                     )
                 else:
-                    # We cannot alter between m2m and concrete fields
+                    # We cannot alter between m2m and concrete fields,
+                    # or between non-concrete and concrete fields.
                     self._generate_removed_field(app_label, model_name, field_name)
                     self._generate_added_field(app_label, model_name, field_name)
 
