@@ -259,10 +259,6 @@
     border-bottom: 1px solid var(--hairline-color);
 }
 
-#changelist-filter-extra-actions a.viewlink,
-#changelist-filter-extra-actions a.hidelink {
-    background-position: left center;
-}
 
 /* DATE DRILLDOWN */
 
