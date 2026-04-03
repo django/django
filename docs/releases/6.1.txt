@@ -527,6 +527,10 @@ Miscellaneous
   :ref:`expressions <writing-your-own-query-expressions>`, is deprecated in
   favor of the newly introduced ``quote_name()`` method.
 
+* Support for a double-dot variable lookup like ``{{ book..title }}`` which
+  maps to a lookup of the empty string before the next lookup of the named
+  attribute is deprecated.
+
 Features removed in 6.1
 =======================
 
