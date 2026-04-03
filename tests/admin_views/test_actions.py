@@ -229,7 +229,7 @@ class AdminActionsTest(TestCase):
         }
         response = self.client.post(reverse("admin2:admin_views_book_changelist"), data)
         self.assertContains(response, "a deletable object")
-        self.assertContains(response, "…and 2 more.")
+        self.assertContains(response, "…and 2 more objects.")
         self.assertNotContains(response, "another object")
         self.assertNotContains(response, "last object")
 

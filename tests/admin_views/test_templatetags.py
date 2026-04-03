@@ -22,16 +22,14 @@ from .tests import AdminViewBasicTestCase, get_perm
 
 class TruncatedUnorderedListTests(SimpleTestCase):
     def test_no_max_items(self):
-        self.assertEqual(
-            truncated_unordered_list(["item 1", "item 2"], None),
-            ("\t<li>item 1</li>\n" "\t<li>item 2</li>"),
-        )
+        result = truncated_unordered_list(["item 1", "item 2"], None)
+        self.assertEqual(result, ("\t<li>item 1</li>\n" "\t<li>item 2</li>"))
+        self.assertNotIn("more object", result)
 
     def test_max_items_zero(self):
-        self.assertEqual(
-            truncated_unordered_list(["a", "b", "c"], 0),
-            "\t<li>…and 3 more.</li>",
-        )
+        result = truncated_unordered_list(["a", "b", "c"], 0)
+        self.assertEqual(result, "")
+        self.assertNotIn("more object", result)
 
     def test_flat_list_truncated(self):
         self.assertEqual(
@@ -40,7 +38,7 @@ class TruncatedUnorderedListTests(SimpleTestCase):
                 "\t<li>a</li>\n"
                 "\t<li>b</li>\n"
                 "\t<li>c</li>\n"
-                "\t<li>…and 2 more.</li>"
+                "\t<li>…and 2 more objects.</li>"
             ),
         )
 
@@ -54,9 +52,7 @@ class TruncatedUnorderedListTests(SimpleTestCase):
                 "\t\t<li>a2</li>\n"
                 "\t</ul>\n"
                 "\t</li>\n"
-                "\t<li>b</li>\n"
-                "\t<li>c</li>\n"
-                "\t<li>…and 2 more.</li>"
+                "\t<li>…and 4 more objects.</li>"
             ),
         )
 
@@ -71,13 +67,9 @@ class TruncatedUnorderedListTests(SimpleTestCase):
                 "\t<ul>\n"
                 "\t\t<li>n1</li>\n"
                 "\t\t<li>n2</li>\n"
-                "\t\t<li>n3</li>\n"
-                "\t\t<li>…and 2 more.</li>\n"
                 "\t</ul>\n"
                 "\t</li>\n"
-                "\t<li>b</li>\n"
-                "\t<li>c</li>\n"
-                "\t<li>…and 2 more.</li>"
+                "\t<li>…and 7 more objects.</li>"
             ),
         )
 
@@ -94,9 +86,7 @@ class TruncatedUnorderedListTests(SimpleTestCase):
                 "\t\t</li>\n"
                 "\t</ul>\n"
                 "\t</li>\n"
-                "\t<li>b</li>\n"
-                "\t<li>c</li>\n"
-                "\t<li>…and 2 more.</li>"
+                "\t<li>…and 4 more objects.</li>"
             ),
         )
 
@@ -115,19 +105,19 @@ class TruncatedUnorderedListTests(SimpleTestCase):
     def test_truncated_single_remaining(self):
         self.assertEqual(
             truncated_unordered_list(["a", "b", "c"], 2),
-            ("\t<li>a</li>\n" "\t<li>b</li>\n" "\t<li>…and 1 more.</li>"),
+            ("\t<li>a</li>\n" "\t<li>b</li>\n" "\t<li>…and 1 more object.</li>"),
         )
 
     def test_autoescape(self):
         self.assertEqual(
             truncated_unordered_list(["<a>item</a>", "safe"], 1),
-            ("\t<li>&lt;a&gt;item&lt;/a&gt;</li>\n" "\t<li>…and 1 more.</li>"),
+            ("\t<li>&lt;a&gt;item&lt;/a&gt;</li>\n" "\t<li>…and 1 more object.</li>"),
         )
 
     def test_autoescape_off(self):
         self.assertEqual(
             truncated_unordered_list(["<a>item</a>", "safe"], 1, autoescape=False),
-            ("\t<li><a>item</a></li>\n" "\t<li>…and 1 more.</li>"),
+            ("\t<li><a>item</a></li>\n" "\t<li>…and 1 more object.</li>"),
         )
 
     def test_empty_list(self):
@@ -140,7 +130,7 @@ class TruncatedUnorderedListTests(SimpleTestCase):
         result = t.render(template.Context({"items": ["a", "b", "c"]}))
         self.assertIn("<li>a</li>", result)
         self.assertIn("<li>b</li>", result)
-        self.assertIn("…and 1 more.", result)
+        self.assertIn("<li>…and 1 more object.</li>", result)
         self.assertNotIn("<li>c</li>", result)
 
 
