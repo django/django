@@ -180,11 +180,13 @@ class TestHashedFiles:
 
     def test_template_tag_deep_relative(self):
         relpath = self.hashed_file_path("cached/css/window.css")
-        self.assertEqual(relpath, "cached/css/window.5d5c10836967.css")
+        self.assertEqual(relpath, "cached/css/window.5b34ef58c5a5.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertNotIn(b"url(img/window.png)", content)
             self.assertIn(b'url("img/window.acae32e4532b.png")', content)
+            self.assertNotIn(b"../styles.css", content)
+            self.assertIn(b"styles.5e0040571e1a.css", content)
         self.assertPostCondition()
 
     def test_template_tag_url(self):
@@ -201,13 +203,21 @@ class TestHashedFiles:
     def test_import_loop(self):
         finders.get_finder.cache_clear()
         err = StringIO()
-        msg = "Max post-process passes exceeded"
-        with self.assertRaisesMessage(CommandError, msg) as cm:
-            call_command("collectstatic", interactive=False, verbosity=0, stderr=err)
-        self.assertIsInstance(cm.exception.__cause__, RuntimeError)
-        self.assertEqual(
-            "Post-processing 'bar.css, foo.css' failed!\n\n", err.getvalue()
-        )
+        call_command("collectstatic", interactive=False, verbosity=0, stderr=err)
+        self.assertEqual(err.getvalue(), "")
+        # Both circular files get the same combined hash.
+        foo_relpath = self.hashed_file_path("foo.css")
+        bar_relpath = self.hashed_file_path("bar.css")
+        foo_hash = foo_relpath.split(".")[1]
+        bar_hash = bar_relpath.split(".")[1]
+        self.assertEqual(foo_hash, bar_hash)
+        # References inside the files are resolved to the combined-hash names.
+        with storage.staticfiles_storage.open(foo_relpath) as f:
+            foo_content = f.read()
+            self.assertIn(os.path.basename(bar_relpath).encode(), foo_content)
+        with storage.staticfiles_storage.open(bar_relpath) as f:
+            bar_content = f.read()
+            self.assertIn(os.path.basename(foo_relpath).encode(), bar_content)
         self.assertPostCondition()
 
     def test_post_processing(self):
@@ -648,23 +658,6 @@ class TestCollectionNoneHashStorage(CollectionTestCase):
     def test_hashed_name(self):
         relpath = self.hashed_file_path("cached/styles.css")
         self.assertEqual(relpath, "cached/styles.css")
-
-
-@override_settings(
-    STORAGES={
-        **settings.STORAGES,
-        STATICFILES_STORAGE_ALIAS: {
-            "BACKEND": "staticfiles_tests.storage.NoPostProcessReplacedPathStorage",
-        },
-    }
-)
-class TestCollectionNoPostProcessReplacedPaths(CollectionTestCase):
-    run_collectstatic_in_setUp = False
-
-    def test_collectstatistic_no_post_process_replaced_paths(self):
-        stdout = StringIO()
-        self.run_collectstatic(verbosity=1, stdout=stdout)
-        self.assertIn("post-processed", stdout.getvalue())
 
 
 @override_settings(
