@@ -1,13 +1,13 @@
 {% extends "admin/base_site.html" %}
-{% load i18n admin_urls static admin_modify admin_filters %}
+{% load i18n admin_urls static admin_modify admin_filters csp %}
 
 {% block title %}{% if errors %}{% translate "Error:" %} {% endif %}{{ block.super }}{% endblock %}
 {% block extrahead %}{{ block.super }}
-<script src="{% url 'admin:jsi18n' %}"></script>
+<script src="{% url 'admin:jsi18n' %}" {% csp_nonce %}></script>
 {{ media }}
 {% endblock %}
 
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/forms.css" %}">{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/forms.css" %}" {% csp_nonce %}>{% endblock %}
 
 {% block coltype %}colM{% endblock %}
 
@@ -72,6 +72,7 @@
             {% if adminform and add %}
                 data-model-name="{{ opts.model_name }}"
             {% endif %}
+            {% csp_nonce %}
             async>
     </script>
 {% endblock %}

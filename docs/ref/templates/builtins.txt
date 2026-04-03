@@ -3188,6 +3188,44 @@ template with the :ttag:`{% load %}<load>` tag.
 A set of Django template filters useful for adding a "human touch" to data. See
 :doc:`/ref/contrib/humanize`.
 
+``csp``
+-------
+
+.. versionadded:: 6.1
+
+.. templatetag:: csp_nonce
+
+``csp_nonce``
+~~~~~~~~~~~~~
+
+Renders a ``nonce="<value>"`` HTML attribute when the
+:func:`~django.template.context_processors.csp` context processor is
+configured, and an empty string otherwise. Use it in ``<script>`` or
+``<link>`` elements to allow them under a nonce-based Content Security Policy:
+
+.. code-block:: html+django
+
+    {% load csp %}
+    <script src="/path/to/script.js" {% csp_nonce %}></script>
+    <link rel="stylesheet" href="/path/to/style.css" {% csp_nonce %}>
+
+.. templatetag:: csp_media
+
+``csp_media``
+~~~~~~~~~~~~~
+
+Renders a :class:`~django.forms.Media` object's assets with the CSP nonce
+applied to each ``<script>`` and ``<link>`` element:
+
+.. code-block:: html+django
+
+    {% load csp %}
+    {% csp_media form.media %}
+
+Requires the :func:`~django.template.context_processors.csp` context
+processor to inject the nonce. If the context processor is not configured,
+assets are rendered without a nonce attribute.
+
 ``static``
 ----------
 
