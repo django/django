@@ -1290,8 +1290,7 @@ implementation details see :ref:`using-the-views`.
         <button type="submit">Log out</button>
         </form>
 
-    Use this view instead of ``admin:logout`` when logging users out outside
-    the admin site.
+    Then use CSS to style the form button as a link.
 
 .. function:: logout_then_login(request, login_url=None)
 
