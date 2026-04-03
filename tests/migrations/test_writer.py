@@ -631,6 +631,23 @@ class WriterTests(SimpleTestCase):
         string = MigrationWriter.serialize(field)[0]
         self.assertEqual(string, "models.FilePathField(path=%r)" % path_like.path)
 
+    def test_serialize_decimal_context(self):
+        decimal_context = decimal.Context(
+            prec=7,
+            rounding=decimal.ROUND_FLOOR,
+            traps=[decimal.InvalidOperation, decimal.Overflow],
+        )
+        self.assertSerializedResultEqual(
+            decimal_context,
+            (
+                repr(decimal_context),
+                {
+                    "from decimal import ROUND_FLOOR, Context, InvalidOperation, "
+                    "Overflow"
+                },
+            ),
+        )
+
     def test_serialize_zoneinfo(self):
         self.assertSerializedEqual(zoneinfo.ZoneInfo("Asia/Kolkata"))
         self.assertSerializedResultEqual(
