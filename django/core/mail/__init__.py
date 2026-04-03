@@ -165,7 +165,7 @@ def send_mass_mail(
         fail_silently=fail_silently,
     )
     messages = [
-        EmailMessage(subject, message, sender, recipient, connection=connection)
+        EmailMessage(subject, message, sender, recipient)
         for subject, message, sender, recipient in datatuple
     ]
     return connection.send_messages(messages)
