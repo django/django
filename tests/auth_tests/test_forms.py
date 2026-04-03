@@ -1093,9 +1093,7 @@ class UserChangeFormTest(TestDataMixin, TestCase):
                 "Set password",
             ),
         ]
-        password_reset_link = (
-            r'<a role="button" class="button" href="([^"]*)">([^<]*)</a>'
-        )
+        password_reset_link = r'<a class="button" href="([^"]*)">([^<]*)</a>'
         for username, expected_help_text, expected_button_label in cases:
             with self.subTest(username=username):
                 user = User.objects.get(username=username)
@@ -1444,7 +1442,7 @@ class ReadOnlyPasswordHashTest(SimpleTestCase):
             "    <strong>hash</strong>: "
             "       <bdi>WmCkn9**************************************</bdi>"
             "  </p>"
-            '  <p><a role="button" class="button" href="../password/">'
+            '  <p><a class="button" href="../password/">'
             "Reset password</a></p>"
             "</div>",
         )
@@ -1454,7 +1452,7 @@ class ReadOnlyPasswordHashTest(SimpleTestCase):
         self.assertHTMLEqual(
             widget.render("name", None, {}),
             "<div><p><strong>No password set.</p><p>"
-            '<a role="button" class="button" href="../password/">Set password</a>'
+            '<a class="button" href="../password/">Set password</a>'
             "</p></div>",
         )
 
@@ -1468,7 +1466,7 @@ class ReadOnlyPasswordHashTest(SimpleTestCase):
             widget.render("name", value, {}),
             "<div><p>"
             "<strong>Invalid password format or unknown hashing algorithm.</strong>"
-            '</p><p><a role="button" class="button" href="../password/">Reset password'
+            '</p><p><a class="button" href="../password/">Reset password'
             "</a></p></div>",
         )
 
