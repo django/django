@@ -1,4 +1,5 @@
 import dataclasses
+import pickle
 from datetime import datetime
 
 from django.tasks import (
@@ -268,6 +269,21 @@ class TaskTestCase(SimpleTestCase):
             import_string(test_tasks.noop_task_async.module_path),
             test_tasks.noop_task_async,
         )
+
+    def test_pickle_task(self):
+        pickled_task = pickle.dumps(test_tasks.noop_task)
+        unpickled_task = pickle.loads(pickled_task)
+
+        self.assertEqual(unpickled_task, test_tasks.noop_task)
+        self.assertIs(unpickled_task.func, test_tasks.noop_task.func)
+
+    def test_pickle_task_result(self):
+        result = test_tasks.noop_task.enqueue()
+        pickled_result = pickle.dumps(result)
+        unpickled_result = pickle.loads(pickled_result)
+
+        self.assertEqual(unpickled_result, result)
+        self.assertEqual(unpickled_result.task, result.task)
 
     @override_settings(TASKS={})
     def test_no_backends(self):
