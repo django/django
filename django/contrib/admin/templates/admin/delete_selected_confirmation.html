@@ -1,10 +1,10 @@
 {% extends "admin/base_site.html" %}
-{% load i18n l10n admin_urls static %}
+{% load i18n l10n admin_urls static admin_list %}
 
 {% block extrahead %}
     {{ block.super }}
     {{ media }}
-    <script src="{% static 'admin/js/cancel.js' %}" async></script>
+    <script src="{% static 'admin/js/cancel.js' %}"{% csp_nonce_attr %} async></script>
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation delete-selected-confirmation{% endblock %}
