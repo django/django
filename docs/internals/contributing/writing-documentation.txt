@@ -296,6 +296,29 @@ so on. People's experience may not match your expectations, and they may become
 frustrated when they do not find a step as "straightforward" or "simple" as it
 is implied to be.
 
+.. _documentation-voice:
+
+Voice
+=====
+
+Django's documentation is written in the voice of an experienced user of the
+framework addressing a peer developer, even if that developer is new to Django
+or new to web development.
+
+Avoid:
+
+* Platitudes: Remember you are speaking to another developer.
+
+* Overly digested, zippy advice: Although concision is important, artificially
+  concise text expressed in predictable rhythms of bullet points sound more
+  like advertising than technical documentation.
+
+* Architectural superlatives: Overusing words like *robust*, *clear*, and
+  *structured* can ring false by making too much out of very little, or
+  glossing over the fact that opinions differ about what makes software
+  well-designed. The author should not appear unaware of alternative viewpoints
+  or inherent design trade-offs.
+
 Commonly used terms
 ===================
 
