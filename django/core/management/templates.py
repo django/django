@@ -18,6 +18,7 @@ from django.core.management.utils import (
 )
 from django.template import Context, Engine
 from django.utils import archive
+from django.utils._os import safe_join
 from django.utils.http import parse_header_parameters
 from django.utils.version import get_docs_version
 
@@ -345,7 +346,7 @@ class TemplateCommand(BaseCommand):
         # Move the temporary file to a filename that has better
         # chances of being recognized by the archive utils
         if used_name != guessed_filename:
-            guessed_path = os.path.join(tempdir, guessed_filename)
+            guessed_path = safe_join(tempdir, guessed_filename)
             shutil.move(the_path, guessed_path)
             return guessed_path
 
