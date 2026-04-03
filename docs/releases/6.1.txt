@@ -129,6 +129,9 @@ Minor features
 * :attr:`.Permission.name` and :attr:`.Permission.codename` values are now
   renamed when renaming models via a migration.
 
+* The new :attr:`.Permission.user_perm_str` property returns the string
+  suitable to use with :meth:`.User.has_perm`.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
