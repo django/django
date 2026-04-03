@@ -216,6 +216,9 @@ INSTALLED_APPS = []
 
 TEMPLATES = []
 
+# RemovedInDjango70Warning: When the deprecation ends, remove this setting.
+TEMPLATE_TAGS_MULTILINE = True
+
 # Default form rendering class.
 FORM_RENDERER = "django.forms.renderers.DjangoTemplates"
 

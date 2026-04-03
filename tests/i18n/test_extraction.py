@@ -443,6 +443,9 @@ class BasicExtractorTests(ExtractorTests):
                 po_contents,
             )
 
+    # RemovedInDjango70Warning: When the deprecation ends, remove this settings
+    # override.
+    @override_settings(TEMPLATE_TAGS_MULTILINE=True)
     def test_template_comments(self):
         """
         Template comment tags on the same line of other constructs (#19552)
