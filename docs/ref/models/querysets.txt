@@ -2425,7 +2425,8 @@ exists in the database, an :exc:`~django.db.IntegrityError` is raised.
 
 This method inserts the provided list of objects into the database in an
 efficient manner (generally only 1 query, no matter how many objects there
-are), and returns created objects as a list, in the same order as provided:
+are), and returns all provided objects as a list in the same order.
+If ``ignore_conflics`` is set, the conflicted objects will be included as well.
 
 .. code-block:: pycon
 
