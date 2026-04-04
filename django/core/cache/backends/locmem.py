@@ -2,7 +2,6 @@
 
 import pickle
 import time
-from collections import OrderedDict
 from threading import Lock
 
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
@@ -19,7 +18,7 @@ class LocMemCache(BaseCache):
 
     def __init__(self, name, params):
         super().__init__(params)
-        self._cache = _caches.setdefault(name, OrderedDict())
+        self._cache = _caches.setdefault(name, {})
         self._expire_info = _expire_info.setdefault(name, {})
         self._lock = _locks.setdefault(name, Lock())
 
