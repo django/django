@@ -111,6 +111,23 @@ class SharedEmailBackendTests(MailTestsMixin):
         backend = self.create_backend(alias=None)
         self.assertIsNone(backend.alias)
 
+    def test_create_from_mailers(self, required_options=None):
+        # Subclasses must override this test case if any options are required.
+        backend_import_path = (
+            f"{self.backend_class.__module__}.{self.backend_class.__name__}"
+        )
+        with self.settings(
+            MAILERS={
+                "custom": {
+                    "BACKEND": backend_import_path,
+                    "OPTIONS": required_options or {},
+                }
+            }
+        ):
+            backend = mail.mailers["custom"]
+            self.assertIsInstance(backend, self.backend_class)
+            self.assertEqual(backend.alias, "custom")
+
     def test_send(self):
         email = EmailMessage(
             "Subject", "Content\n", "from@example.com", ["to@example.com"]
@@ -299,6 +316,9 @@ class FileBackendTests(SharedEmailBackendTests, SimpleTestCase):
         for filename in self.get_filenames():
             messages.extend(self.get_messages_from_filename(filename))
         return messages
+
+    def test_create_from_mailers(self):
+        super().test_create_from_mailers(required_options={"file_path": self.tmp_dir})
 
     def test_email_file_path_use_settings(self):
         file_path_settings = self.mkdtemp()
@@ -568,6 +588,9 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
 
     def get_smtp_envelopes(self):
         return self.smtp_handler.smtp_envelopes
+
+    def test_create_from_mailers(self):
+        super().test_create_from_mailers(required_options={"host": "example.com"})
 
     @override_settings(
         EMAIL_HOST="mail.example.com",
