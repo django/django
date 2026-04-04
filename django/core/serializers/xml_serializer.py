@@ -199,6 +199,8 @@ class Serializer(base.Serializer):
             else:
 
                 def handle_m2m(value):
+                    # Put each object on its own line.
+                    self.indent(self.indent_level + 1)
                     self.xml.addQuickElement("object", attrs={"pk": str(value.pk)})
 
                 def queryset_iterator(obj, field):
@@ -217,9 +219,13 @@ class Serializer(base.Serializer):
                 field.name,
                 queryset_iterator(obj, field),
             )
+            relobj = None
             for relobj in m2m_iter:
                 handle_m2m(relobj)
-
+            if relobj:
+                # If there are related objects (which appear each on their own
+                # line), put the closing </field> on the next line.
+                self.indent(self.indent_level)
             self.xml.endElement("field")
             self.indent_level -= 1
 
