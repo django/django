@@ -72,10 +72,33 @@ a secure connection is used.
     The character set of email sent with ``django.core.mail`` will be set to
     the value of your :setting:`DEFAULT_CHARSET` setting.
 
+.. _email-providers:
+
+Configuring email providers
+===========================
+
+.. versionadded:: 6.1
+
+**TODO: DOCS**
+
+How (and why) to configure email providers:
+
+* No default: Django doesn't know how you want to send email.
+  (How to resolve ``EmailProviderDoesNotExist`` error that "the email provider
+  ``'default'`` is not configured.")
+
+* Example.
+
+* Backend choices: SMTP built-in (details and OPTIONS reference below) or
+  third-party for production; other built-in for dev and testing (details
+  below); custom for either.
+
+How to migrate from older settings.
+
 ``send_mail()``
 ===============
 
-.. function:: send_mail(subject, message, from_email, recipient_list, *, fail_silently=False, auth_user=None, auth_password=None, connection=None, html_message=None)
+.. function:: send_mail(subject, message, from_email, recipient_list, *, fail_silently=False, auth_user=None, auth_password=None, connection=None, html_message=None, using=None)
 
 In most cases, you can send email using ``django.core.mail.send_mail()``.
 
@@ -111,6 +134,11 @@ if used.
   be a :mimetype:`multipart/alternative` email with ``message`` as the
   :mimetype:`text/plain` content type and ``html_message`` as the
   :mimetype:`text/html` content type.
+* ``using``: An optional :setting:`EMAIL_PROVIDERS` alias to use to send the
+  mail. If unspecified, the default email provider will be used.
+
+``fail_silently``, ``auth_user``, ``auth_password``, and ``connection`` are not
+allowed with the ``using`` argument.
 
 The return value will be the number of successfully delivered messages (which
 can be ``0`` or ``1`` since it can only send one message).
@@ -122,6 +150,8 @@ can be ``0`` or ``1`` since it can only send one message).
 
 .. versionchanged:: 6.1
 
+    The ``using`` argument was added.
+
     Older versions ignored ``fail_silently=True``, ``auth_user``,
     and ``auth_password`` when a ``connection`` was also provided.
     This now raises a ``TypeError``.
@@ -129,7 +159,7 @@ can be ``0`` or ``1`` since it can only send one message).
 ``send_mass_mail()``
 ====================
 
-.. function:: send_mass_mail(datatuple, *, fail_silently=False, auth_user=None, auth_password=None, connection=None)
+.. function:: send_mass_mail(datatuple, *, fail_silently=False, auth_user=None, auth_password=None, connection=None, using=None)
 
 ``django.core.mail.send_mass_mail()`` is intended to handle mass emailing.
 
@@ -139,7 +169,11 @@ can be ``0`` or ``1`` since it can only send one message).
 
 ``fail_silently``, ``auth_user``, ``auth_password`` and ``connection`` have the
 same functions as in :func:`send_mail`. They must be given as keyword arguments
-if used.
+if used, and are not allowed with the ``using`` argument.
+
+The keyword argument ``using`` is an optional :setting:`EMAIL_PROVIDERS` alias
+to use to send the mail. If unspecified, the default email provider will be
+used.
 
 Each separate element of ``datatuple`` results in a separate email message.
 As in :func:`send_mail`, recipients in the same ``recipient_list`` will all see
@@ -173,6 +207,8 @@ The return value will be the number of successfully delivered messages.
 
 .. versionchanged:: 6.1
 
+    The ``using`` argument was added.
+
     Older versions ignored ``fail_silently=True``, ``auth_user``,
     and ``auth_password`` when a ``connection`` was also provided.
     This now raises a ``TypeError``.
@@ -188,7 +224,7 @@ messages. This makes :func:`send_mass_mail` slightly more efficient.
 ``mail_admins()``
 =================
 
-.. function:: mail_admins(subject, message, *, fail_silently=False, connection=None, html_message=None)
+.. function:: mail_admins(subject, message, *, fail_silently=False, connection=None, html_message=None, using=None)
 
 ``django.core.mail.mail_admins()`` is a shortcut for sending an email to the
 site admins, as defined in the :setting:`ADMINS` setting.
@@ -206,6 +242,10 @@ If ``html_message`` is provided, the resulting email will be a
 :mimetype:`text/plain` content type and ``html_message`` as the
 :mimetype:`text/html` content type.
 
+The keyword argument ``using`` is an optional :setting:`EMAIL_PROVIDERS` alias
+to use to send the mail. If unspecified, the default email provider will be
+used.
+
 .. deprecated:: 6.0
 
     Passing ``fail_silently`` and later parameters as positional arguments is
@@ -213,13 +253,15 @@ If ``html_message`` is provided, the resulting email will be a
 
 .. versionchanged:: 6.1
 
+    The ``using`` argument was added.
+
     Older versions ignored ``fail_silently=True`` when a ``connection``
     was also provided. This now raises a ``TypeError``.
 
 ``mail_managers()``
 ===================
 
-.. function:: mail_managers(subject, message, *, fail_silently=False, connection=None, html_message=None)
+.. function:: mail_managers(subject, message, *, fail_silently=False, connection=None, html_message=None, using=None)
 
 ``django.core.mail.mail_managers()`` is just like ``mail_admins()``, except it
 sends an email to the site managers, as defined in the :setting:`MANAGERS`
@@ -231,6 +273,8 @@ setting.
     deprecated.
 
 .. versionchanged:: 6.1
+
+    The ``using`` argument was added.
 
     Older versions ignored ``fail_silently=True`` when a ``connection``
     was also provided. This now raises a ``TypeError``.
