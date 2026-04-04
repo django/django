@@ -23,36 +23,33 @@ except ImportError:
 
 
 class DjangoSafeDumper(SafeDumper):
+    # The "safe" serializer is used for better interoperability.
+
     def represent_decimal(self, data):
         return self.represent_scalar("tag:yaml.org,2002:str", str(data))
 
     def represent_ordered_dict(self, data):
         return self.represent_mapping("tag:yaml.org,2002:map", data.items())
 
+    def represent_time(self, data):
+        # Base YAML doesn't support serialization of time types (as opposed to
+        # dates or datetimes, which it does support). Converting them to
+        # strings isn't perfect, but it's better than a "!!python/time" type
+        # which would prevent deserialization under any other language.
+        return self.represent_scalar("tag:yaml.org,2002:str", str(data))
+
 
 DjangoSafeDumper.add_representer(decimal.Decimal, DjangoSafeDumper.represent_decimal)
 DjangoSafeDumper.add_representer(
     collections.OrderedDict, DjangoSafeDumper.represent_ordered_dict
 )
+DjangoSafeDumper.add_representer(datetime.time, DjangoSafeDumper.represent_time)
 
 
 class Serializer(PythonSerializer):
     """Convert a queryset to YAML."""
 
     internal_use_only = False
-
-    def _value_from_field(self, obj, field):
-        # A nasty special case: base YAML doesn't support serialization of time
-        # types (as opposed to dates or datetimes, which it does support).
-        # Since we want to use the "safe" serializer for better
-        # interoperability, we need to do something with those pesky times.
-        # Converting 'em to strings isn't perfect, but it's better than a
-        # "!!python/time" type which would halt deserialization under any other
-        # language.
-        value = super()._value_from_field(obj, field)
-        if isinstance(value, datetime.time):
-            value = str(value)
-        return value
 
     def end_serialization(self):
         self.options.setdefault("allow_unicode", True)
