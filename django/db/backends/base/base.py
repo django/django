@@ -595,6 +595,13 @@ class BaseDatabaseWrapper:
         """
         if self.connection is not None:
             self.health_check_done = False
+
+            # If the connection is in an atomic block avoid closing
+            # unless it's unusable.
+            if self.in_atomic_block and self.is_usable():
+                self.health_check_done = True
+                return
+
             # If the application didn't restore the original autocommit
             # setting, don't take chances, drop the connection.
             if self.get_autocommit() != self.settings_dict["AUTOCOMMIT"]:
