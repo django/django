@@ -48,6 +48,10 @@ class Serializer(base.Serializer):
         """
         Start serialization -- open the XML document and the root element.
         """
+        # Increment the indent_level before each startElement() and decrement
+        # it following each endElement(). If the closing tag should appear on
+        # its own line, use self.indent(self.indent_level) before endElement().
+        self.indent_level = 0
         self.xml = SimplerXMLGenerator(
             self.stream, self.options.get("encoding", settings.DEFAULT_CHARSET)
         )
@@ -58,7 +62,7 @@ class Serializer(base.Serializer):
         """
         End serialization -- end the document.
         """
-        self.indent(0)
+        self.indent(self.indent_level)
         self.xml.endElement("django-objects")
         self.xml.endDocument()
 
@@ -71,7 +75,8 @@ class Serializer(base.Serializer):
                 "Non-model object (%s) encountered during serialization" % type(obj)
             )
 
-        self.indent(1)
+        self.indent_level += 1
+        self.indent(self.indent_level)
         attrs = {"model": str(obj._meta)}
         if not self.use_natural_primary_keys or not self._resolve_natural_key(obj):
             obj_pk = obj.pk
@@ -84,15 +89,17 @@ class Serializer(base.Serializer):
         """
         Called after handling all fields for an object.
         """
-        self.indent(1)
+        self.indent(self.indent_level)
         self.xml.endElement("object")
+        self.indent_level -= 1
 
     def handle_field(self, obj, field):
         """
         Handle each field on an object (except for ForeignKeys and
         ManyToManyFields).
         """
-        self.indent(2)
+        self.indent_level += 1
+        self.indent(self.indent_level)
         self.xml.startElement(
             "field",
             {
@@ -119,6 +126,7 @@ class Serializer(base.Serializer):
             self.xml.addQuickElement("None")
 
         self.xml.endElement("field")
+        self.indent_level -= 1
 
     def handle_fk_field(self, obj, field):
         """
@@ -144,6 +152,7 @@ class Serializer(base.Serializer):
         else:
             self.xml.addQuickElement("None")
         self.xml.endElement("field")
+        self.indent_level -= 1
 
     def handle_m2m_field(self, obj, field):
         """
@@ -212,10 +221,12 @@ class Serializer(base.Serializer):
                 handle_m2m(relobj)
 
             self.xml.endElement("field")
+            self.indent_level -= 1
 
     def _start_relational_field(self, field):
         """Output the <field> element for relational fields."""
-        self.indent(2)
+        self.indent_level += 1
+        self.indent(self.indent_level)
         self.xml.startElement(
             "field",
             {
