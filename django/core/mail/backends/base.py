@@ -21,9 +21,17 @@ class BaseEmailBackend:
            pass
     """
 
-    def __init__(self, fail_silently=False, *, alias=None, **kwargs):
+    # RemovedInDjango70Warning: _ignore_unknown_kwargs.
+    def __init__(
+        self, fail_silently=False, *, alias=None, _ignore_unknown_kwargs=None, **kwargs
+    ):
         self.alias = alias
         self.fail_silently = fail_silently
+
+        # RemovedInDjango70Warning.
+        if _ignore_unknown_kwargs:
+            for ignored in _ignore_unknown_kwargs:
+                kwargs.pop(ignored, None)
 
         if kwargs:
             kwarg_names = ", ".join(repr(key) for key in kwargs.keys())

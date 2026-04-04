@@ -23,6 +23,8 @@ from django.utils.deprecation import RemovedInDjango70Warning, deprecate_posargs
 from django.utils.encoding import force_bytes, force_str, punycode
 from django.utils.timezone import get_current_timezone
 
+from .deprecation import report_using_incompatibility
+
 # RemovedInDjango70Warning.
 # Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
 # some spam filters.
@@ -305,13 +307,6 @@ class EmailMessage:
         self.extra_headers = headers or {}
         self.connection = connection
 
-    def get_connection(self, fail_silently=False):
-        from django.core.mail import get_connection
-
-        if not self.connection:
-            self.connection = get_connection(fail_silently=fail_silently)
-        return self.connection
-
     def message(self, *, policy=email.policy.default):
         msg = email.message.EmailMessage(policy=policy)
         self._add_bodies(msg)
@@ -349,20 +344,40 @@ class EmailMessage:
         """
         return [email for email in (self.to + self.cc + self.bcc) if email]
 
-    def send(self, fail_silently=False):
+    def send(self, fail_silently=False, *, using=None):
         """Send the email message."""
         if not self.recipients():
             # Don't bother creating the network connection if there's nobody to
             # send to.
             return 0
 
-        if fail_silently and self.connection:
-            raise TypeError(
-                "fail_silently cannot be used with a connection. "
-                "Pass fail_silently to get_connection() instead."
+        # RemovedInDjango70Warning: replace the remainder of this method with:
+        #   from django.core.mail import providers
+        #   provider = providers.default if using is None else providers[using]
+        #   return provider.send_messages([self])
+
+        from django.core import mail
+
+        if hasattr(self, "get_connection"):
+            raise AttributeError(
+                "EmailMessage no longer supports the undocumented "
+                "get_connection() method."
             )
 
-        return self.get_connection(fail_silently).send_messages([self])
+        if using is not None:
+            report_using_incompatibility(self.connection, fail_silently)
+            connection = mail.providers[using]
+        elif self.connection:
+            connection = self.connection
+            if fail_silently:
+                raise TypeError(
+                    "fail_silently cannot be used with a connection. "
+                    "Pass fail_silently to get_connection() instead."
+                )
+        else:
+            connection = mail.get_connection(fail_silently=fail_silently)
+
+        return connection.send_messages([self])
 
     def attach(self, filename=None, content=None, mimetype=None):
         """

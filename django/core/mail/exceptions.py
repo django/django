@@ -8,3 +8,11 @@ class InvalidEmailProvider(ImproperlyConfigured):
         if alias is not None:
             msg = f"EMAIL_PROVIDERS[{alias!r}]: {msg}"
         super().__init__(msg)
+
+
+class EmailProviderDoesNotExist(InvalidEmailProvider, KeyError):
+    """The requested alias is not defined in settings.EMAIL_PROVIDERS."""
+
+    def __init__(self, *, alias):
+        # This is the only permitted use for this exception.
+        super().__init__(f"The email provider '{alias}' is not configured.")
