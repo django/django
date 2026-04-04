@@ -34,9 +34,6 @@ DjangoSafeDumper.add_representer(decimal.Decimal, DjangoSafeDumper.represent_dec
 DjangoSafeDumper.add_representer(
     collections.OrderedDict, DjangoSafeDumper.represent_ordered_dict
 )
-# Workaround to represent dictionaries in insertion order.
-# See https://github.com/yaml/pyyaml/pull/143.
-DjangoSafeDumper.add_representer(dict, DjangoSafeDumper.represent_ordered_dict)
 
 
 class Serializer(PythonSerializer):
@@ -59,7 +56,13 @@ class Serializer(PythonSerializer):
 
     def end_serialization(self):
         self.options.setdefault("allow_unicode", True)
-        yaml.dump(self.objects, self.stream, Dumper=DjangoSafeDumper, **self.options)
+        yaml.dump(
+            self.objects,
+            self.stream,
+            Dumper=DjangoSafeDumper,
+            sort_keys=False,
+            **self.options,
+        )
 
     def getvalue(self):
         # Grandparent super
