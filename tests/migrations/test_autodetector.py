@@ -5501,6 +5501,26 @@ class AutodetectorTests(BaseAutodetectorTests):
         self.assertOperationTypes(changes, "testapp", 0, ["CreateModel"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="Book")
 
+    def test_add_custom_fk_with_hardcoded_to_model_class(self):
+        class HardcodedForeignKey(models.ForeignKey):
+            def __init__(self, *args, **kwargs):
+                # Regression for #24434.
+                kwargs["to"] = apps.get_model(settings.AUTH_USER_MODEL)
+                super().__init__(*args, **kwargs)
+
+            def deconstruct(self):
+                name, path, args, kwargs = super().deconstruct()
+                del kwargs["to"]
+                return name, path, args, kwargs
+
+        autodetector = MigrationAutodetector(ProjectState(), ProjectState())
+        # Ensure relation-agnostic deconstruction doesn't fail when a custom FK
+        # hardcodes a model class and removes "to" in deconstruct().
+        fields_def = autodetector.only_relation_agnostic_fields(
+            {"author": HardcodedForeignKey(on_delete=models.CASCADE)}
+        )
+        self.assertEqual(len(fields_def), 1)
+
     @mock.patch(
         "django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition"
     )
