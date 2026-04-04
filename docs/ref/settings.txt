@@ -1387,6 +1387,17 @@ that are not allowed to visit any page, systemwide. Use this for bots/crawlers.
 This is only used if ``CommonMiddleware`` is installed (see
 :doc:`/topics/http/middleware`).
 
+.. setting:: EMAIL_PROVIDERS
+
+``EMAIL_PROVIDERS``
+-------------------
+
+**TODO: DOCS**
+
+See :ref:`email-providers` for more information.
+
+.. versionadded:: 6.1
+
 .. setting:: EMAIL_BACKEND
 
 ``EMAIL_BACKEND``

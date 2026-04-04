@@ -486,6 +486,13 @@ Email
   instances directly or to ``super().__init__(...)`` calls in custom email
   backend subclasses.
 
+* The undocumented ``EmailMessage.get_connection()`` method is no longer used.
+  Defining it in a subclass or trying to call it now causes an error.
+
+* :meth:`~django.core.mail.EmailMessage.send` no longer sets the ``connection``
+  property on the ``EmailMessage``. (This behavior was never documented. The
+  ``send()`` method will still *use* a ``connection`` set before sending.)
+
 Miscellaneous
 -------------
 
