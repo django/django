@@ -666,6 +666,31 @@ def slice_filter(value, arg):
         return value  # Fail silently.
 
 
+def _walk_items(item_list):
+    item_iterator = iter(item_list)
+    try:
+        item = next(item_iterator)
+        while True:
+            try:
+                next_item = next(item_iterator)
+            except StopIteration:
+                yield item, None
+                break
+            if isinstance(next_item, (list, tuple, types.GeneratorType)):
+                try:
+                    iter(next_item)
+                except TypeError:
+                    pass
+                else:
+                    yield item, next_item
+                    item = next(item_iterator)
+                    continue
+            yield item, None
+            item = next_item
+    except StopIteration:
+        pass
+
+
 @register.filter(is_safe=True, needs_autoescape=True)
 def unordered_list(value, autoescape=True):
     """
@@ -695,34 +720,10 @@ def unordered_list(value, autoescape=True):
         def escaper(x):
             return x
 
-    def walk_items(item_list):
-        item_iterator = iter(item_list)
-        try:
-            item = next(item_iterator)
-            while True:
-                try:
-                    next_item = next(item_iterator)
-                except StopIteration:
-                    yield item, None
-                    break
-                if isinstance(next_item, (list, tuple, types.GeneratorType)):
-                    try:
-                        iter(next_item)
-                    except TypeError:
-                        pass
-                    else:
-                        yield item, next_item
-                        item = next(item_iterator)
-                        continue
-                yield item, None
-                item = next_item
-        except StopIteration:
-            pass
-
     def list_formatter(item_list, tabs=1):
         indent = "\t" * tabs
         output = []
-        for item, children in walk_items(item_list):
+        for item, children in _walk_items(item_list):
             sublist = ""
             if children:
                 sublist = "\n%s<ul>\n%s\n%s</ul>\n%s" % (
