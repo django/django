@@ -102,6 +102,21 @@ class UndocumentedFeatureErrorTests(SimpleTestCase):
         with self.assertRaisesMessage(AttributeError, msg):
             email.message()
 
+    def test_undocumented_get_connection_override_no_longer_supported(self):
+
+        class CustomEmailMessage(EmailMessage):
+            def get_connection(self, fail_silently=False):
+                return None
+
+        email = CustomEmailMessage(to=["to@example.com"])
+
+        msg = (
+            "EmailMessage no longer supports the undocumented "
+            "get_connection() method."
+        )
+        with self.assertRaisesMessage(AttributeError, msg):
+            email.send()
+
 
 @ignore_warnings(category=RemovedInDjango70Warning)
 class DeprecatedCompatibilityTests(SimpleTestCase):

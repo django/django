@@ -1,7 +1,7 @@
 """A custom backend for testing."""
 
 from django.core import mail
-from django.core.mail.backends import locmem
+from django.core.mail.backends import dummy, locmem
 from django.core.mail.backends.base import BaseEmailBackend
 from django.test import ignore_warnings
 from django.utils.deprecation import RemovedInDjango70Warning
@@ -49,3 +49,12 @@ class OptionsCapturingBackend(locmem.EmailBackend):
         for email in mail.outbox[previous_outbox_len:]:
             email.backend_init_kwargs = self.kwargs
         return result
+
+
+class InitCheckBackend(dummy.EmailBackend):
+
+    init_kwargs = None
+
+    def __init__(self, alias=None, **kwargs):
+        super().__init__(alias=alias)
+        self.__class__.init_kwargs = kwargs
