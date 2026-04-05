@@ -419,6 +419,10 @@ Then, you can help out by:
 However, we do ask the following of all general community members working in
 the ticket database:
 
+* Please **don't** promote your own tickets to "Accepted". Another community
+  member should review the report and set this stage after reproducing and
+  confirming the issue.
+
 * Please **don't** promote your own tickets to "Ready for checkin". You
   may mark other people's tickets that you've reviewed as "Ready for
   checkin", but you should get at minimum one other community member to
