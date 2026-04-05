@@ -92,6 +92,9 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+* ``ModelAdmin.get_deleted_objects()`` now falls back to checking a user's
+  model delete permissions if the model is not registered in the admin.
+
 * The admin site login view now redirects authenticated users to the next URL,
   if available, instead of always redirecting to the admin index page.
 
