@@ -4,7 +4,7 @@ from decimal import Decimal
 from django import forms
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.admin import helpers
+from django.contrib.admin import AdminSite, helpers
 from django.contrib.admin.utils import (
     NestedObjects,
     build_q_object_from_lookup_parameters,
@@ -12,22 +12,31 @@ from django.contrib.admin.utils import (
     display_for_value,
     flatten,
     flatten_fieldsets,
+    get_deleted_objects,
     help_text_for_field,
     label_for_field,
     lookup_field,
     quote,
 )
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission, User
 from django.contrib.auth.templatetags.auth import render_password_as_hash
+from django.contrib.contenttypes.models import ContentType
 from django.core.validators import EMPTY_VALUES
 from django.db import DEFAULT_DB_ALIAS, models
-from django.test import SimpleTestCase, TestCase, override_settings, skipUnlessDBFeature
+from django.test import (
+    RequestFactory,
+    SimpleTestCase,
+    TestCase,
+    override_settings,
+    skipUnlessDBFeature,
+)
 from django.test.utils import isolate_apps
 from django.utils.formats import localize
 from django.utils.safestring import mark_safe
 
 from .models import (
     Article,
+    ArticleProxy,
     Car,
     Cascade,
     DBCascade,
@@ -521,3 +530,38 @@ class UtilsTests(SimpleTestCase):
             & models.Q(hist__iexact="history")
             & (models.Q(site__pk=1) | models.Q(site__pk=2)),
         )
+
+
+class ProxyModelTests(TestCase):
+    def test_get_deleted_objects_proxy_permissions(self):
+        """
+        Regression test for #20151: get_deleted_objects should check
+        permissions for proxy models even if they aren't in the admin.
+        """
+        site = Site.objects.create(domain="example.com")
+        article = Article.objects.create(site=site, title="Test", hist="Test hist")
+        article_proxy = ArticleProxy.objects.get(pk=article.pk)
+
+        user = User.objects.create_user(
+            username="testuser", password="testpass", is_staff=True
+        )
+        article_ct = ContentType.objects.get_for_model(Article)
+
+        # Give permission for Article, but NOT for ArticleProxy
+        delete_perm = Permission.objects.get(
+            content_type=article_ct, codename="delete_article"
+        )
+        user.user_permissions.add(delete_perm)
+
+        # Create a request with the user
+        request = RequestFactory().get("/")
+        request.user = user
+
+        # The function should now identify that the user doesn't have
+        # permission to delete the ArticleProxy instance
+        _, _, perms_needed, _ = get_deleted_objects(
+            [article_proxy], request, AdminSite()
+        )
+        # Verify that the permission needed for ArticleProxy is included in
+        # the perms_needed list.
+        self.assertIn("article proxy", perms_needed)
