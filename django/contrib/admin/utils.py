@@ -175,25 +175,11 @@ def get_deleted_objects(objs, request, admin_site):
                 obj_display,
             )
         else:
-            opts = obj._meta
-
-            # Check if the concrete model is registered in the admin,
-            # and if so, whether the user has delete permissions for it.
-            concrete_model = opts.concrete_model
-            obj_admin = admin_site._registry.get(concrete_model)
-
-            # If the concrete model is registered, \
-            # check delete permissions for it.
-            if obj_admin and not obj_admin.has_delete_permission(request, obj):
+            # If the model is not registered,
+            # check if the user has delete permissions for the model.
+            p = "%s.delete_%s" % (opts.app_label, opts.model_name)
+            if not request.user.has_perm(p):
                 perms_needed.add(opts.verbose_name)
-            else:
-                # Fallback to checking permissions
-                # for the model of the object itself,
-                # If the concrete model isn't registered,
-                # check delete permissions for the model of the object itself.
-                p = "%s.delete_%s" % (opts.app_label, opts.model_name)
-                if not request.user.has_perm(p):
-                    perms_needed.add(opts.verbose_name)
 
             return no_edit_link
 

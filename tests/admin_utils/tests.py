@@ -37,6 +37,7 @@ from django.utils.safestring import mark_safe
 from .models import (
     Article,
     ArticleProxy,
+    ArticleProxy2,
     Car,
     Cascade,
     DBCascade,
@@ -533,35 +534,48 @@ class UtilsTests(SimpleTestCase):
 
 
 class ProxyModelTests(TestCase):
-    def test_get_deleted_objects_proxy_permissions(self):
+    def test_get_deleted_objects_proxy_permissions_and_proxy_of_proxy(self):
         """
         Regression test for #20151: get_deleted_objects should check
-        permissions for proxy models even if they aren't in the admin.
+        global permissions for proxy models not registered in the admin.
         """
         site = Site.objects.create(domain="example.com")
         article = Article.objects.create(site=site, title="Test", hist="Test hist")
+
+        # First-level proxy
         article_proxy = ArticleProxy.objects.get(pk=article.pk)
+
+        # Second-level proxy
+        article_proxy2 = ArticleProxy2.objects.get(pk=article.pk)
 
         user = User.objects.create_user(
             username="testuser", password="testpass", is_staff=True
         )
-        article_ct = ContentType.objects.get_for_model(Article)
 
-        # Give permission for Article, but NOT for ArticleProxy
+        # We ONLY give permission to the concrete Article model.
+        # Per modern Django, this DOES NOT grant permission to
+        # ArticleProxy or ArticleProxy2.
+        article_ct = ContentType.objects.get_for_model(Article)
         delete_perm = Permission.objects.get(
             content_type=article_ct, codename="delete_article"
         )
         user.user_permissions.add(delete_perm)
 
-        # Create a request with the user
         request = RequestFactory().get("/")
         request.user = user
 
-        # The function should now identify that the user doesn't have
-        # permission to delete the ArticleProxy instance
-        _, _, perms_needed, _ = get_deleted_objects(
+        # Check first-level proxy (not registered in admin)
+        _, _, perms_needed1, _ = get_deleted_objects(
             [article_proxy], request, AdminSite()
         )
-        # Verify that the permission needed for ArticleProxy is included in
-        # the perms_needed list.
-        self.assertIn("article proxy", perms_needed)
+        # It should be in perms_needed
+        # because the user lacks 'delete_articleproxy'
+        self.assertIn("article proxy", perms_needed1)
+
+        # Check second-level proxy (not registered in admin)
+        _, _, perms_needed2, _ = get_deleted_objects(
+            [article_proxy2], request, AdminSite()
+        )
+        # It should be in perms_needed
+        # because the user lacks 'delete_articleproxy2'
+        self.assertIn("article proxy level 2", perms_needed2)
