@@ -174,8 +174,8 @@ def debug_transaction(connection, sql):
             duration = stop - start
             connection.queries_log.append(
                 {
-                    "sql": "%s" % sql,
-                    "time": "%.3f" % duration,
+                    "sql": f"{sql}",
+                    "time": f"{duration:.3f}",
                 }
             )
             logger.debug(
