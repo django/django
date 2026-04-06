@@ -251,7 +251,7 @@ class Command(BaseCommand):
                         )
                     field_desc += ")"
                     if comment_notes:
-                        field_desc += "  # " + " ".join(comment_notes)
+                        field_desc += f"  # {' '.join(comment_notes)}"
                     yield "    %s" % field_desc
                 comment = None
                 if info := table_info.get(table_name):
@@ -414,8 +414,8 @@ class Command(BaseCommand):
             "        db_table = %r" % table_name,
         ]
         if unique_together:
-            tup = "(" + ", ".join(unique_together) + ",)"
-            meta += ["        unique_together = %s" % tup]
+            tup = f"({', '.join(unique_together)},)"
+            meta += [f"        unique_together = {tup}"]
         if comment:
             meta += [f"        db_table_comment = {comment!r}"]
         return meta
