@@ -348,7 +348,9 @@ Signals
 Tasks
 ~~~~~
 
-* ...
+* The :func:`~django.tasks.task` decorator now accepts ``**kwargs``, which are
+  forwarded to the backend's
+  :attr:`~django.tasks.backends.base.BaseTaskBackend.task_class`.
 
 Templates
 ~~~~~~~~~
