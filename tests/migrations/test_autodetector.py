@@ -5635,6 +5635,48 @@ class AutodetectorTests(BaseAutodetectorTests):
             unique_together={("first_renamed", "second")},
         )
 
+    def test_alter_rename_pk(self):
+        """
+        Altering a model's primary key field and renaming it is detected
+        without recreating the column
+        """
+        changes = self.get_changes(
+            [self.author_empty],
+            [self.author_custom_pk],
+            MigrationQuestioner({"ask_rename": True}),
+        )
+
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertEqual(len(changes["testapp"][0].operations), 2)
+        self.assertOperationTypes(changes, "testapp", 0, ["RenameField", "AlterField"])
+        self.assertOperationAttributes(
+            changes,
+            "testapp",
+            0,
+            0,
+            model_name="author",
+            old_name="id",
+            new_name="pk_field",
+        )
+        self.assertOperationAttributes(
+            changes,
+            "testapp",
+            0,
+            1,
+            model_name="author",
+            name="pk_field",
+        )
+        self.assertEqual(
+            changes["testapp"][0].operations[1].field.deconstruct(),
+            (
+                "pk_field",
+                "django.db.models.IntegerField",
+                [],
+                {"primary_key": True},
+            ),
+        )
+
 
 class MigrationSuggestNameTests(SimpleTestCase):
     def test_no_operations(self):
