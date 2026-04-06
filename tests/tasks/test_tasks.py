@@ -312,3 +312,8 @@ class TaskTestCase(SimpleTestCase):
             "Task takes context but does not have a first argument of 'context'.",
         ):
             task(takes_context=True)(test_tasks.calculate_meaning_of_life.func)
+
+    def test_run_after_in_decorator(self):
+        msg = "run_after cannot be defined statically with the @task decorator."
+        with self.assertRaisesMessage(TypeError, msg):
+            task(run_after=timezone.now())(test_tasks.calculate_meaning_of_life.func)
