@@ -45,6 +45,7 @@ from django.test import (
     skipUnlessDBFeature,
 )
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango71Warning
 
 from ..models import Author, DTModel, Fan
 
@@ -1974,3 +1975,56 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
             .count(),
             1,
         )
+
+    def test_extract_deconstruct_tzinfo_none_deprecation(self):
+        """
+        Deconstructing Extract without an explicit tzinfo raises a deprecation
+        warning when USE_TZ is True.
+        """
+        extract = Extract("start_datetime", "hour")
+        with self.assertWarnsMessage(
+            RemovedInDjango71Warning,
+            "Extract() database function's tzinfo argument is not provided",
+        ):
+            extract.deconstruct()
+
+    def test_trunc_deconstruct_tzinfo_none_deprecation(self):
+        """
+        Deconstructing Trunc without an explicit tzinfo raises a deprecation
+        warning when USE_TZ is True.
+        """
+        trunc = Trunc("start_datetime", "day", output_field=DateTimeField())
+        with self.assertWarnsMessage(
+            RemovedInDjango71Warning,
+            "Trunc() database function's tzinfo argument is not provided",
+        ):
+            trunc.deconstruct()
+
+    @override_settings(USE_TZ=False)
+    def test_extract_deconstruct_tzinfo_none_no_warning_without_tz(self):
+        """
+        Deconstructing Extract without an explicit tzinfo does not warn when
+        USE_TZ is False.
+        """
+        # runtests.py turns the deprecation warning into an error.
+        Extract("start_datetime", "hour").deconstruct()
+
+    @override_settings(USE_TZ=False)
+    def test_trunc_deconstruct_tzinfo_none_no_warning_without_tz(self):
+        """
+        Deconstructing Trunc without an explicit tzinfo does not warn when
+        USE_TZ is False.
+        """
+        Trunc("start_datetime", "day", output_field=DateTimeField()).deconstruct()
+
+    def test_extract_deconstruct_with_tzinfo_no_deprecation(self):
+        """Deconstructing Extract with an explicit tzinfo does not warn."""
+        melb = zoneinfo.ZoneInfo("Australia/Melbourne")
+        Extract("start_datetime", "hour", tzinfo=melb).deconstruct()
+
+    def test_trunc_deconstruct_with_tzinfo_no_deprecation(self):
+        """Deconstructing Trunc with an explicit tzinfo does not warn."""
+        melb = zoneinfo.ZoneInfo("Australia/Melbourne")
+        Trunc(
+            "start_datetime", "day", output_field=DateTimeField(), tzinfo=melb
+        ).deconstruct()

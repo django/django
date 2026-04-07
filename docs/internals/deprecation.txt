@@ -20,6 +20,11 @@ details on these changes.
 * Calling ``QuerySet.aiterator()`` after ``prefetch_related()`` without
   providing a ``chunk_size`` will raise :exc:`ValueError`.
 
+* The :class:`~django.db.models.functions.Extract` and
+  :class:`~django.db.models.functions.Trunc` database functions will capture
+  the current timezone in ``deconstruct()`` when the ``tzinfo`` argument is
+  omitted and :setting:`USE_TZ` is ``True``.
+
 .. _deprecation-removed-in-7.0:
 
 7.0
