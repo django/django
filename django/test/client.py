@@ -865,10 +865,15 @@ class ClientMixin:
 
     def _get_backend(self):
         from django.contrib.auth import load_backend
+        from django.contrib.auth.backends import BaseBackend
+
+        def overrides(backend, name):
+            base = getattr(BaseBackend, name)
+            return getattr(type(backend), name, base) is not base
 
         for backend_path in settings.AUTHENTICATION_BACKENDS:
             backend = load_backend(backend_path)
-            if hasattr(backend, "get_user"):
+            if overrides(backend, "get_user") or overrides(backend, "aget_user"):
                 return backend_path
 
     def _login(self, user, backend=None):
