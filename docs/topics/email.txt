@@ -67,13 +67,22 @@ set, are used to authenticate to the SMTP server, and the
 :setting:`EMAIL_USE_TLS` and :setting:`EMAIL_USE_SSL` settings control whether
 a secure connection is used.
 
+.. _topic-email-sending:
+
+Sending messages
+================
+
+:mod:`!django.core.mail` provides functions for conveniently sending email, as
+well as classes for building and sending more complex email messages with
+attachments and multiple content types.
+
 .. note::
 
     The character set of email sent with ``django.core.mail`` will be set to
     the value of your :setting:`DEFAULT_CHARSET` setting.
 
 ``send_mail()``
-===============
+---------------
 
 .. function:: send_mail(subject, message, from_email, recipient_list, *, fail_silently=False, auth_user=None, auth_password=None, connection=None, html_message=None)
 
@@ -127,7 +136,7 @@ can be ``0`` or ``1`` since it can only send one message).
     This now raises a ``TypeError``.
 
 ``send_mass_mail()``
-====================
+--------------------
 
 .. function:: send_mass_mail(datatuple, *, fail_silently=False, auth_user=None, auth_password=None, connection=None)
 
@@ -178,7 +187,7 @@ The return value will be the number of successfully delivered messages.
     This now raises a ``TypeError``.
 
 ``send_mass_mail()`` vs. ``send_mail()``
-----------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The main difference between :func:`send_mass_mail` and repeatedly calling
 :func:`send_mail` is that :func:`send_mail` opens a connection to the mail
@@ -207,7 +216,7 @@ field::
     send_mass_mail(datatuple)
 
 ``mail_admins()``
-=================
+-----------------
 
 .. function:: mail_admins(subject, message, *, fail_silently=False, connection=None, html_message=None)
 
@@ -238,7 +247,7 @@ If ``html_message`` is provided, the resulting email will be a
     was also provided. This now raises a ``TypeError``.
 
 ``mail_managers()``
-===================
+-------------------
 
 .. function:: mail_managers(subject, message, *, fail_silently=False, connection=None, html_message=None)
 
@@ -257,7 +266,7 @@ setting.
     was also provided. This now raises a ``TypeError``.
 
 Preventing header injection
-===========================
+---------------------------
 
 `Header injection`_ is a security exploit in which an attacker inserts extra
 email headers to control the "To:" and "From:" in email messages that your
@@ -307,7 +316,7 @@ to "/contact/thanks/" when it's done::
 .. _emailmessage-and-smtpconnection:
 
 The ``EmailMessage`` class
-==========================
+--------------------------
 
 Django's :func:`send_mail` and :meth:`send_mass_mail` functions are actually
 thin wrappers that make use of the :class:`EmailMessage` class.
@@ -332,9 +341,6 @@ For convenience, :class:`EmailMessage` provides a :meth:`~EmailMessage.send`
 method for sending a single email. If you need to send multiple messages, the
 email backend API :ref:`provides an alternative
 <topics-sending-multiple-emails>`.
-
-``EmailMessage`` Objects
-------------------------
 
 .. class:: EmailMessage
 
@@ -554,10 +560,10 @@ email backend API :ref:`provides an alternative
     * ``mimetype``
 
 Sending alternative content types
----------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sending multiple content versions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 It can be useful to include multiple versions of the content in an email; the
 classic example is to send both text and HTML versions of a message. With
@@ -628,7 +634,7 @@ Django's email library, you can do this using the
     * ``mimetype``
 
 Updating the default content type
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 By default, the MIME type of the ``body`` parameter in an :class:`EmailMessage`
 is ``"text/plain"``. It is good practice to leave this alone, because it
