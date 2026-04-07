@@ -719,7 +719,7 @@ can :ref:`write your own email backend <topic-custom-email-backend>`.
 .. _topic-email-smtp-backend:
 
 SMTP backend
-~~~~~~~~~~~~
+------------
 
 .. class:: backends.smtp.EmailBackend(host=None, port=None, username=None, password=None, use_tls=None, fail_silently=False, use_ssl=None, timeout=None, ssl_keyfile=None, ssl_certfile=None, **kwargs)
 
@@ -749,7 +749,7 @@ SMTP backend
 .. _topic-email-console-backend:
 
 Console backend
-~~~~~~~~~~~~~~~
+---------------
 
 Instead of sending out real emails the console backend just writes the
 emails that would be sent to the standard output. By default, the console
@@ -766,7 +766,7 @@ convenience that can be used during development.
 .. _topic-email-file-backend:
 
 File backend
-~~~~~~~~~~~~
+------------
 
 The file backend writes emails to a file. A new file is created for each new
 session that is opened on this backend. The directory to which the files are
@@ -784,7 +784,7 @@ convenience that can be used during development.
 .. _topic-email-memory-backend:
 
 In-memory backend
-~~~~~~~~~~~~~~~~~
+-----------------
 
 The ``'locmem'`` backend stores messages in a special attribute of the
 ``django.core.mail`` module. The ``outbox`` attribute is created when the first
@@ -804,7 +804,7 @@ Django's test runner :ref:`automatically uses this backend for testing
 .. _topic-email-dummy-backend:
 
 Dummy backend
-~~~~~~~~~~~~~
+-------------
 
 As the name suggests the dummy backend does nothing with your messages. To
 specify this backend, put the following in your settings::
@@ -813,6 +813,9 @@ specify this backend, put the following in your settings::
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
+
+Third-party backends
+--------------------
 
 .. admonition:: There are community-maintained solutions too!
 
