@@ -222,7 +222,9 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* :meth:`~django.test.Client.force_login` now skips members of
+  :setting:`AUTHENTICATION_BACKENDS` not implementing ``(a)get_user()``, e.g.
+  permission-only backends.
 
 URLs
 ~~~~

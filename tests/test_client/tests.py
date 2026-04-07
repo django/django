@@ -794,6 +794,25 @@ class ClientTest(TestCase):
         self.client.force_login(self.u1)
         self.assertEqual(self.u1.backend, "django.contrib.auth.backends.ModelBackend")
 
+    @override_settings(
+        AUTHENTICATION_BACKENDS=[
+            "test_client.auth_backends.PermissionOnlyBackend",
+            "django.contrib.auth.backends.ModelBackend",
+        ]
+    )
+    def test_force_login_skips_noop_get_user_backend(self):
+        """force_login() skips auth backends without concrete get_user()."""
+        self.client.force_login(self.u1)
+        self.assertEqual(self.u1.backend, "django.contrib.auth.backends.ModelBackend")
+
+    @override_settings(
+        AUTHENTICATION_BACKENDS=[
+            "test_client.auth_backends.PermissionOnlyBackend",
+        ]
+    )
+    def test_force_login_all_backends_noop(self):
+        self.assertIsNone(self.client._get_backend())
+
     @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.signed_cookies")
     def test_logout_cookie_sessions(self):
         self.test_logout()
