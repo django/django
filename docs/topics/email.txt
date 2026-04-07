@@ -3,12 +3,13 @@ Sending email
 =============
 
 .. module:: django.core.mail
-   :synopsis: Helpers to easily send email.
+   :synopsis: Helpers to send email.
 
-Although Python provides a mail sending interface via the :mod:`smtplib`
-module, Django provides a couple of light wrappers over it. These wrappers are
-provided to make sending email extra quick, to help test email sending during
-development, and to provide support for platforms that can't use SMTP.
+Django provides wrappers for Python's :mod:`email` and :mod:`smtplib` modules
+to simplify composing and sending email. Django's email framework also supports
+swapping in different delivery mechanisms: you can direct email to the console
+or a file during development, or use community-maintained solutions for sending
+email directly through commercial email service providers.
 
 The code lives in the ``django.core.mail`` module.
 
@@ -27,10 +28,11 @@ plain text message::
         ["to@example.com"],
     )
 
-When additional email sending functionality is needed, use
-:class:`EmailMessage` or :class:`EmailMultiAlternatives`. For example, to send
-a multipart email that includes both HTML and plain text versions with a
-specific template and custom headers, you can use the following approach::
+When additional email sending functionality is needed, use the
+:ref:`EmailMessage <topic-email-message>` or :class:`EmailMultiAlternatives`
+class. For example, to send a multipart email that includes both HTML and plain
+text versions with a specific template and custom headers, you can use the
+following approach::
 
     from django.core.mail import EmailMultiAlternatives
     from django.template.loader import render_to_string
@@ -111,7 +113,7 @@ attachments and multiple content types.
 
 .. function:: send_mail(subject, message, from_email, recipient_list, *, fail_silently=False, auth_user=None, auth_password=None, connection=None, html_message=None)
 
-In most cases, you can send email using ``django.core.mail.send_mail()``.
+``django.core.mail.send_mail()`` sends a single email message.
 
 The ``subject``, ``message``, ``from_email`` and ``recipient_list`` parameters
 are required.
@@ -290,7 +292,7 @@ setting.
     Older versions ignored ``fail_silently=True`` when a ``connection``
     was also provided. This now raises a ``TypeError``.
 
-.. _emailmessage-and-smtpconnection:
+.. _topic-email-message:
 
 The ``EmailMessage`` class
 --------------------------
@@ -744,10 +746,10 @@ manually open the connection, you can control when it is closed. For example::
 
 When you manually open a backend's connection, you are responsible for ensuring
 it gets closed. The example above actually has a bug: if an exception occurs
-while sending the messages, the connection will not be closed. You could fix
-this with a try-finally statement. Or it's often more convenient to use the
-backend instance as a context manager, which will automatically call ``open()``
-and ``close()`` as needed.
+while sending the messages, the connection will not be closed. This can be
+fixed with a ``try``-``finally`` statement, but using the backend instance as a
+context manager is preferable, as it automatically calls ``open()`` and
+``close()`` as needed.
 
 This is equivalent to the previous example, but uses the backend as a
 :ref:`context manager <context-managers>` to avoid leaving the connection open
@@ -781,6 +783,13 @@ Email backends
 
 The actual sending of an email is handled by the email backend.
 
+Django comes with several email backends. With the exception of the SMTP
+backend, these are mainly useful during testing and development. If the
+built-in backends don't meet your needs there are :ref:`third-party packages
+<topic-third-party-email-backends>` available. You can also subclass one of the
+built-in backends to change its behavior, or even :ref:`write your own email
+backend <topic-custom-email-backend>`.
+
 The email backend class has the following methods:
 
 * ``open()`` instantiates a long-lived email-sending connection.
@@ -795,11 +804,6 @@ The email backend class has the following methods:
 It can also be used as a context manager, which will automatically call
 ``open()`` and ``close()`` as needed. An example is in
 :ref:`topics-sending-multiple-emails`.
-
-Django ships with several email sending backends. With the exception of the
-SMTP backend (which is the default), these backends are only useful during
-testing and development. If you have special email sending requirements, you
-can :ref:`write your own email backend <topic-custom-email-backend>`.
 
 .. _topic-email-smtp-backend:
 
@@ -878,7 +882,7 @@ message that would be sent.
 
 To specify this backend, put the following in your settings::
 
-  EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+    EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development and testing.
@@ -894,23 +898,34 @@ Dummy backend
 As the name suggests the dummy backend does nothing with your messages. To
 specify this backend, put the following in your settings::
 
-   EMAIL_BACKEND = "django.core.mail.backends.dummy.EmailBackend"
+    EMAIL_BACKEND = "django.core.mail.backends.dummy.EmailBackend"
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
 
+.. _topic-third-party-email-backends:
+
 Third-party backends
 --------------------
 
-.. admonition:: There are community-maintained solutions too!
+.. admonition:: There are community-maintained solutions!
 
     Django has a vibrant ecosystem. There are email backends
     highlighted on the `Community Ecosystem`_ page. The Django Packages
     `Email grid`_ has even more options for you!
 
+Third-party email backends are available that:
+
+* Integrate directly with commercial email service providers' APIs (which often
+  have extra functionality not available through SMTP).
+* Offload email sending to asynchronous task queues.
+* Add features to other email backends, such as enforcing do-not-send lists or
+  logging sent messages.
+* Provide development and debugging tools, such as sandbox capture and
+  in-browser email previews.
+
 .. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#email-notifications
 .. _Email grid: https://djangopackages.org/grids/g/email/
-
 
 .. _topic-custom-email-backend:
 
@@ -937,20 +952,20 @@ instance of the email backend that you can use.
 
 .. function:: get_connection(backend=None, *, fail_silently=False, **kwargs)
 
-By default, a call to ``get_connection()`` will return an instance of the
-email backend specified in :setting:`EMAIL_BACKEND`. If you specify the
-``backend`` argument, an instance of that backend will be instantiated.
+    By default, a call to ``get_connection()`` will return an instance of the
+    email backend specified in :setting:`EMAIL_BACKEND`. If you specify the
+    ``backend`` argument, an instance of that backend will be instantiated.
 
-The keyword-only ``fail_silently`` argument controls how the backend should
-handle errors. If ``fail_silently`` is True, exceptions during the email
-sending process will be silently ignored.
+    The keyword-only ``fail_silently`` argument controls how the backend should
+    handle errors. If ``fail_silently`` is True, exceptions during the email
+    sending process will be silently ignored.
 
-All other keyword arguments are passed directly to the constructor of the
-email backend.
+    All other keyword arguments are passed directly to the constructor of the
+    email backend.
 
-.. deprecated:: 6.0
+    .. deprecated:: 6.0
 
-    Passing ``fail_silently`` as positional argument is deprecated.
+        Passing ``fail_silently`` as positional argument is deprecated.
 
 Configuring email for development
 =================================
@@ -969,7 +984,7 @@ The :ref:`file <topic-email-file-backend>` email backend can also be useful
 during development -- this backend dumps the contents of every SMTP connection
 to a file that can be inspected at your leisure.
 
-Another approach is to use a "dumb" SMTP server that receives the emails
+Another approach is to use a mocked SMTP server that receives the emails
 locally and displays them to the terminal, but does not actually send
 anything. The :pypi:`aiosmtpd` package provides a way to accomplish this:
 
