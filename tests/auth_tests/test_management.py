@@ -2,6 +2,7 @@ import builtins
 import getpass
 import os
 import sys
+import unittest
 from datetime import date
 from io import StringIO
 from unittest import mock
@@ -22,6 +23,7 @@ from django.db import migrations
 from django.test import TestCase, override_settings
 from django.test.testcases import TransactionTestCase
 from django.utils.translation import gettext_lazy as _
+from django.utils.version import PY314
 
 from .models import (
     CustomUser,
@@ -57,7 +59,7 @@ def mock_inputs(inputs):
         def wrapper(*args):
             class mock_getpass:
                 @staticmethod
-                def getpass(prompt=b"Password: ", stream=None):
+                def getpass(prompt=b"Password: ", stream=None, **kwargs):
                     if callable(inputs["password"]):
                         return inputs["password"]()
                     return inputs["password"]
@@ -188,6 +190,14 @@ class ChangepasswordManagementCommandTestCase(TestCase):
     def test_get_pass_no_input(self, mock_get_pass):
         with self.assertRaisesMessage(CommandError, "aborted"):
             call_command("changepassword", username="joe", stdout=self.stdout)
+
+    @unittest.skipUnless(PY314, reason="echo_char is 3.14+")
+    @mock.patch.object(getpass, "getpass", return_value="password")
+    def test_password_prompt_uses_echo_char(self, mock_get_pass):
+        """changepassword provides keyboard feedback."""
+        call_command("changepassword", username="joe", stdout=self.stdout)
+        mock_get_pass.assert_any_call(prompt="Password: ", echo_char="*")
+        mock_get_pass.assert_any_call(prompt="Password (again): ", echo_char="*")
 
     @mock.patch.object(changepassword.Command, "_get_pass", return_value="new_password")
     def test_system_username(self, mock_get_pass):
@@ -910,6 +920,21 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             )
 
         test(self)
+
+    @unittest.skipUnless(PY314, reason="echo_char is 3.14+")
+    @mock.patch.object(getpass, "getpass", return_value="password")
+    def test_password_prompt_uses_echo_char(self, mock_get_pass):
+        """createsuperuser provides keyboard feedback."""
+        call_command(
+            "createsuperuser",
+            interactive=True,
+            username="echo_char",
+            email="echo_char@example.com",
+            stdin=MockTTY(),
+            stdout=StringIO(),
+        )
+        mock_get_pass.assert_any_call(echo_char="*")
+        mock_get_pass.assert_any_call("Password (again): ", echo_char="*")
 
     @override_settings(
         AUTH_USER_MODEL="auth_tests.CustomUser",

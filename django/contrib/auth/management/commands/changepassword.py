@@ -5,6 +5,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
+from django.utils.version import PY314
 
 UserModel = get_user_model()
 
@@ -15,7 +16,10 @@ class Command(BaseCommand):
     requires_system_checks = []
 
     def _get_pass(self, prompt="Password: "):
-        p = getpass.getpass(prompt=prompt)
+        if PY314:
+            p = getpass.getpass(prompt=prompt, echo_char="*")
+        else:
+            p = getpass.getpass(prompt=prompt)
         if not p:
             raise CommandError("aborted")
         return p
