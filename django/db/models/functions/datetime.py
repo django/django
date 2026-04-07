@@ -1,3 +1,5 @@
+import warnings
+
 from django.conf import settings
 from django.db.models.expressions import Func
 from django.db.models.fields import (
@@ -17,6 +19,7 @@ from django.db.models.lookups import (
     YearLte,
 )
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 
 
 class TimezoneMixin:
@@ -34,6 +37,32 @@ class TimezoneMixin:
             else:
                 tzname = timezone._get_timezone_name(self.tzinfo)
         return tzname
+
+    def deconstruct(self):
+        path, args, kwargs = super().deconstruct()
+        if self.tzinfo is None and settings.USE_TZ:
+            warnings.warn(
+                f"The {self.__class__.__name__}() database function's tzinfo "
+                "argument is not provided. This is deprecated because the "
+                "timezone information is not captured in migrations, which "
+                "can lead to inconsistent behavior if TIME_ZONE changes. "
+                "Pass the tzinfo argument to suppress this warning.",
+                category=RemovedInDjango70Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
+        # RemovedInDjango70Warning: Remove the warning block above and replace
+        # deconstruct() with the following (tzinfo required when USE_TZ=True):
+        # def deconstruct(self):
+        #     path, args, kwargs = super().deconstruct()
+        #     return path, args, kwargs
+        #
+        # Also update get_tzname() to remove the fallback:
+        # def get_tzname(self):
+        #     tzname = None
+        #     if settings.USE_TZ:
+        #         tzname = timezone._get_timezone_name(self.tzinfo)
+        #     return tzname
+        return path, args, kwargs
 
 
 class Extract(TimezoneMixin, Transform):
