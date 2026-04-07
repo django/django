@@ -180,10 +180,31 @@ The return value will be the number of successfully delivered messages.
 ``send_mass_mail()`` vs. ``send_mail()``
 ----------------------------------------
 
-The main difference between :func:`send_mass_mail` and :func:`send_mail` is
-that :func:`send_mail` opens a connection to the mail server each time it's
-executed, while :func:`send_mass_mail` uses a single connection for all of its
-messages. This makes :func:`send_mass_mail` slightly more efficient.
+The main difference between :func:`send_mass_mail` and repeatedly calling
+:func:`send_mail` is that :func:`send_mail` opens a connection to the mail
+server each time it's executed, while :func:`send_mass_mail` uses a single
+connection for all of its messages. This makes :func:`send_mass_mail` slightly
+more efficient.
+
+:func:`send_mail` with multiple ``to`` addresses sends a single email message,
+with ``john@example.com`` and ``jane@example.com`` both appearing in the "To:"
+field::
+
+    send_mail(
+        "Subject",
+        "Message.",
+        "from@example.com",
+        ["john@example.com", "jane@example.com"],
+    )
+
+:func:`send_mass_mail` sends a separate message per ``datatuple`` element, so
+``john@example.com`` and ``jane@example.com`` each receive their own email::
+
+    datatuple = (
+        ("Subject", "Message.", "from@example.com", ["john@example.com"]),
+        ("Subject", "Message.", "from@example.com", ["jane@example.com"]),
+    )
+    send_mass_mail(datatuple)
 
 ``mail_admins()``
 =================
@@ -234,28 +255,6 @@ setting.
 
     Older versions ignored ``fail_silently=True`` when a ``connection``
     was also provided. This now raises a ``TypeError``.
-
-Examples
-========
-
-This sends a single email to john@example.com and jane@example.com, with them
-both appearing in the "To:"::
-
-    send_mail(
-        "Subject",
-        "Message.",
-        "from@example.com",
-        ["john@example.com", "jane@example.com"],
-    )
-
-This sends a message to ``john@example.com`` and ``jane@example.com``, with
-them both receiving a separate email::
-
-    datatuple = (
-        ("Subject", "Message.", "from@example.com", ["john@example.com"]),
-        ("Subject", "Message.", "from@example.com", ["jane@example.com"]),
-    )
-    send_mass_mail(datatuple)
 
 Preventing header injection
 ===========================
