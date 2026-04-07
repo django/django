@@ -1,4 +1,5 @@
 import json
+import warnings
 
 from django import forms
 from django.contrib.admin.utils import (
@@ -9,6 +10,7 @@ from django.contrib.admin.utils import (
     lookup_field,
     quote,
 )
+from django.contrib.auth.forms import ReadOnlyPasswordHashWidget
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields.related import (
     ForeignObjectRel,
@@ -18,6 +20,7 @@ from django.db.models.fields.related import (
 from django.forms.utils import flatatt
 from django.template.defaultfilters import capfirst, linebreaksbr
 from django.urls import NoReverseMatch, reverse
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
@@ -279,6 +282,25 @@ class AdminReadonlyField:
         except (AttributeError, ValueError, ObjectDoesNotExist):
             result_repr = self.empty_value_display
         else:
+            if field in self.form.fields:
+                widget = self.form[field].field.widget
+                is_read_only = False
+                try:
+                    is_read_only = getattr(widget, "read_only", False)
+                except (NotImplementedError, AttributeError):
+                    pass
+                if is_read_only:
+                    if not isinstance(widget, ReadOnlyPasswordHashWidget):
+                        warnings.warn(
+                            (
+                                "Relying on the undocumented read_only attribute "
+                                "for custom widget rendering in the admin is "
+                                "deprecated and will be removed in Django 7.0."
+                            ),
+                            RemovedInDjango70Warning,
+                            stacklevel=2,
+                        )
+                    return widget.render(field, value)
             if f is None:
                 if getattr(attr, "boolean", False):
                     result_repr = _boolean_icon(value)
