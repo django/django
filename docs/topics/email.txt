@@ -60,12 +60,37 @@ specific template and custom headers, you can use the following approach::
     msg.attach_alternative(html_content, "text/html")
     msg.send()
 
-Mail is sent using the SMTP host and port specified in the
+.. _topic-email-configuration:
+
+Configuring email
+=================
+
+By default, Django tries to send email by connecting to an `SMTP`_ server
+running on localhost, with no authentication. If that doesn't match your
+production environment, trying to send email will raise an error like
+``connection refused`` or ``authentication failed``, or cause a connection
+timeout. You will need to adjust Django's email settings to reflect your
+environment.
+
+Django abstracts the email sending process into an :ref:`email backend
+<topic-email-backends>` class. The :setting:`EMAIL_BACKEND` setting controls
+which backend Django uses.
+
+The default email backend is Django's :ref:`topic-email-smtp-backend`, which
+connects to an SMTP server using the host and port specified in the
 :setting:`EMAIL_HOST` and :setting:`EMAIL_PORT` settings. The
 :setting:`EMAIL_HOST_USER` and :setting:`EMAIL_HOST_PASSWORD` settings, if
 set, are used to authenticate to the SMTP server, and the
 :setting:`EMAIL_USE_TLS` and :setting:`EMAIL_USE_SSL` settings control whether
 a secure connection is used.
+
+SMTP is supported by nearly all email service providers (ESPs) and many hosting
+environments. But there are other options: many commercial ESPs offer HTTP APIs
+with additional sending features, and during development or testing you might
+not want to send email at all. :ref:`topic-email-backends` lists several
+possibilities.
+
+.. _SMTP: https://en.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol
 
 .. _topic-email-sending:
 
