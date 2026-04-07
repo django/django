@@ -112,6 +112,18 @@ class AsyncAuthTest(TestCase):
 
     @override_settings(
         AUTHENTICATION_BACKENDS=[
+            "django.contrib.auth.backends.BaseBackend",
+            "django.contrib.auth.backends.ModelBackend",
+        ]
+    )
+    async def test_client_aforce_login_skips_noop_get_user_backend(self):
+        await self.client.aforce_login(self.test_user)
+        self.assertEqual(
+            self.test_user.backend, "django.contrib.auth.backends.ModelBackend"
+        )
+
+    @override_settings(
+        AUTHENTICATION_BACKENDS=[
             "django.contrib.auth.backends.ModelBackend",
             "django.contrib.auth.backends.AllowAllUsersModelBackend",
         ]

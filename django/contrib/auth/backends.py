@@ -17,8 +17,12 @@ class BaseBackend:
     def get_user(self, user_id):
         return None
 
+    get_user.noop = True
+
     async def aget_user(self, user_id):
         return await sync_to_async(self.get_user)(user_id)
+
+    aget_user.noop = True
 
     def get_user_permissions(self, user_obj, obj=None):
         return set()

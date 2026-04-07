@@ -791,6 +791,32 @@ class ClientTest(TestCase):
         self.client.force_login(self.u1)
         self.assertEqual(self.u1.backend, "django.contrib.auth.backends.ModelBackend")
 
+    @override_settings(
+        AUTHENTICATION_BACKENDS=[
+            "test_client.auth_backends.PermissionOnlyBackend",
+            "django.contrib.auth.backends.ModelBackend",
+        ]
+    )
+    def test_force_login_skips_noop_get_user_backend(self):
+        """
+        force_login() skips auth backends whose get_user() is marked with
+        noop=True (e.g., permission-only backends inheriting from BaseBackend).
+        """
+        self.client.force_login(self.u1)
+        self.assertEqual(self.u1.backend, "django.contrib.auth.backends.ModelBackend")
+
+    @override_settings(
+        AUTHENTICATION_BACKENDS=[
+            "test_client.auth_backends.PermissionOnlyBackend",
+        ]
+    )
+    def test_force_login_all_backends_noop(self):
+        """
+        force_login() without a backend argument returns None when all
+        configured backends have get_user() marked as noop.
+        """
+        self.assertIsNone(self.client._get_backend())
+
     @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.signed_cookies")
     def test_logout_cookie_sessions(self):
         self.test_logout()
