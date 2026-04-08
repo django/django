@@ -363,7 +363,7 @@ class PersonAdmin(admin.ModelAdmin):
         return super().get_queryset(request).order_by("age")
 
 
-class ParentWithUUIDPKAdmin(admin.ModelAdmin):
+class ParentWithUUIDPKNoAddAdmin(admin.ModelAdmin):
     list_display = ("id", "title")
     list_editable = ("title",)
 
@@ -1267,7 +1267,7 @@ site.register(ReferencedByInline)
 site.register(InlineReferer, InlineRefererAdmin)
 site.register(ReferencedByGenRel)
 site.register(GenRelReference)
-site.register(ParentWithUUIDPK, ParentWithUUIDPKAdmin)
+site.register(ParentWithUUIDPK)
 site.register(RelatedPrepopulated, search_fields=["name"])
 site.register(RelatedWithUUIDPKModel)
 site.register(ReadOnlyRelatedField, ReadOnlyRelatedFieldAdmin)
@@ -1345,6 +1345,7 @@ site2.register(Language)
 site7 = admin.AdminSite(name="admin7")
 site7.register(Article, ArticleAdmin2)
 site7.register(Section)
+site7.register(ParentWithUUIDPK, ParentWithUUIDPKNoAddAdmin)
 site7.register(PrePopulatedPost, PrePopulatedPostReadOnlyAdmin)
 site7.register(
     Pizza,
