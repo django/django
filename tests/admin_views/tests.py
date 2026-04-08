@@ -4742,7 +4742,7 @@ class AdminViewListEditable(TestCase):
             "_save": "Save",
         }
         # This model admin allows no add permissions.
-        changelist_url = reverse("admin:admin_views_parentwithuuidpk_changelist")
+        changelist_url = reverse("admin7:admin_views_parentwithuuidpk_changelist")
         response = self.client.post(changelist_url, data)
         self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
         self.assertEqual(ParentWithUUIDPK.objects.count(), before_count)
