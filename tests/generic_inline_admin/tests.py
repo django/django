@@ -432,6 +432,15 @@ class GenericInlineModelAdminTest(SimpleTestCase):
         self.assertEqual(formset.max_num, 100)
         self.assertIs(formset.can_order, True)
 
+    def test_get_formset_edit_only(self):
+        """
+        GenericInlineModelAdmin.get_formset() accepts edit_only parameter.
+        Refs #37026.
+        """
+        ma = MediaInline(Media, self.site)
+        formset = ma.get_formset(request, edit_only=True)
+        self.assertIs(formset.edit_only, True)
+
     def test_custom_form_meta_exclude_with_readonly(self):
         """
         The custom ModelForm's `Meta.exclude` is respected when

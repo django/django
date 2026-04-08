@@ -557,3 +557,12 @@ to remove usage of these features.
 * Support for subclasses of ``RemoteUserMiddleware`` that override
   ``process_request()`` without overriding ``aprocess_request()`` is
   removed.
+
+Bugfixes
+========
+
+* Fixed a bug where the ``edit_only`` parameter was not passed to
+  :func:`~django.contrib.contenttypes.forms.generic_inlineformset_factory`
+  when using
+  :class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin`
+  (:ticket:`37026`).
