@@ -218,6 +218,13 @@ Notice that in addition to the same arguments given to the associated
 :class:`django.contrib.auth.models.User` functions, the backend auth functions
 all take the user object, which may be an anonymous user, as an argument.
 
+If your custom backend is used strictly for authorization and does not support
+authentication, the ``get_user`` method should have a ``noop`` attribute set to
+``True``. This hints to components expecting an authentication backend (such as
+:meth:`~django.test.Client.force_login`) that the backend should be skipped.
+Subclassing :class:`~django.contrib.auth.backends.BaseBackend` handles this
+by default.
+
 A full authorization implementation can be found in the ``ModelBackend`` class
 in :source:`django/contrib/auth/backends.py`, which is the default backend and
 queries the ``auth_permission`` table most of the time.

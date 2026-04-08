@@ -868,7 +868,8 @@ class ClientMixin:
 
         for backend_path in settings.AUTHENTICATION_BACKENDS:
             backend = load_backend(backend_path)
-            if hasattr(backend, "get_user"):
+            get_user = getattr(backend, "get_user", None)
+            if get_user and getattr(get_user, "noop", False) is False:
                 return backend_path
 
     def _login(self, user, backend=None):

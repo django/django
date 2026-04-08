@@ -368,6 +368,10 @@ Tests
   multiple times on the same :class:`~django.http.StreamingHttpResponse`.
   Previously, they would consume the streaming response's content, causing
   subsequent calls to fail.
+* :meth:`~django.test.Client.force_login` and
+  :meth:`~django.test.AsyncClient.aforce_login` now skip authentication
+  backends that don't implement user retrieval (returning ``None`` from
+  ``get_user()``).
 
 URLs
 ~~~~
