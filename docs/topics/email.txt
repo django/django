@@ -815,7 +815,7 @@ convenience that can be used during development.
     highlighted on the `Community Ecosystem`_ page. The Django Packages
     `Email grid`_ has even more options for you!
 
-.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#email-and-notifications
+.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#email-notifications
 .. _Email grid: https://djangopackages.org/grids/g/email/
 
 
