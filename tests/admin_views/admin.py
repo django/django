@@ -377,6 +377,17 @@ class ParentWithUUIDPKNoAddAdmin(admin.ModelAdmin):
         return False
 
 
+class PersonNoChangePermissionsAdmin9(admin.ModelAdmin):
+    list_display = ("name", "gender", "alive")
+    list_editable = ("gender", "alive")
+    ordering = ("id",)
+
+    def has_change_permission(self, request, obj=None):
+        if obj is None:
+            return True
+        return obj.id % 2 == 0
+
+
 class FooAccountAdmin(admin.StackedInline):
     model = FooAccount
     extra = 1
@@ -1491,6 +1502,7 @@ class ActorAdmin9(admin.ModelAdmin):
 site9 = admin.AdminSite(name="admin9")
 site9.register(Article, ArticleAdmin9)
 site9.register(Actor, ActorAdmin9)
+site9.register(Person, PersonNoChangePermissionsAdmin9)
 
 site10 = admin.AdminSite(name="admin10")
 site10.final_catch_all_view = False
