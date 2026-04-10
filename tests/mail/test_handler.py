@@ -2,6 +2,10 @@ from django.core.mail import EmailProviderDoesNotExist, InvalidEmailProvider, pr
 from django.core.mail.backends import locmem, smtp
 from django.test import SimpleTestCase, override_settings
 
+from . import (
+    ignore_no_default_email_provider_warning,
+    override_deprecated_email_settings,
+)
 from .custombackend import InitCheckBackend
 
 
@@ -204,7 +208,7 @@ class EmailProvidersTests(SimpleTestCase):
 class EmailProvidersCompatibilityTests(SimpleTestCase):
     """providers.default is usable even when EMAIL_PROVIDERS is not defined."""
 
-    @override_settings(
+    @override_deprecated_email_settings(
         EMAIL_BACKEND="mail.custombackend.InitCheckBackend"
     )
     def test_default_provider_with_deprecated_settings(self):
@@ -214,6 +218,7 @@ class EmailProvidersCompatibilityTests(SimpleTestCase):
         self.assertIsInstance(backend, InitCheckBackend)
         self.assertNotIn("alias", InitCheckBackend.init_kwargs)
 
+    @ignore_no_default_email_provider_warning()
     def test_default_provider_with_no_settings(self):
         backend = providers.default
         # Django's test runner changes the default EMAIL_BACKEND to locmem.

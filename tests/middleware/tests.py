@@ -7,6 +7,7 @@ from io import BytesIO
 from unittest import mock
 from urllib.parse import quote
 
+from mail import override_deprecated_email_settings
 from mail.custombackend import FailingEmailBackend
 
 from django.conf import settings
@@ -501,7 +502,9 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
         BrokenLinkEmailsMiddleware(self.get_response)(self.req)
         self.assertEqual(len(mail.outbox), 1)
 
-    @override_settings(EMAIL_BACKEND="mail.custombackend.FailingEmailBackend")
+    @override_deprecated_email_settings(
+        EMAIL_BACKEND="mail.custombackend.FailingEmailBackend"
+    )
     def test_sends_using_fail_silently(self):
         FailingEmailBackend.did_fail_silently = False
         self.req.META["HTTP_REFERER"] = "/another/url/"

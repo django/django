@@ -4,6 +4,7 @@ from io import StringIO
 from unittest import TestCase, mock
 
 from admin_scripts.tests import AdminScriptTestCase
+from mail import override_deprecated_email_settings
 from mail.custombackend import FailingEmailBackend
 
 from django.conf import settings
@@ -295,7 +296,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
             record.request = self.request_factory.get(url_path, *args, **kwargs)
         return record
 
-    @override_settings(
+    @override_deprecated_email_settings(
         ADMINS=["admin@example.com"],
         EMAIL_BACKEND="mail.custombackend.FailingEmailBackend",
     )

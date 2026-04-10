@@ -31,6 +31,37 @@ USE_BLANK_CHOICE_DASH_DEPRECATED_MSG = (
     "django.db.models.fields.BLANK_CHOICE_LABEL in your app's ready() method."
 )
 
+# RemovedInDjango70Warning.
+DEPRECATED_EMAIL_SETTINGS = {
+    "EMAIL_BACKEND",
+    "EMAIL_FILE_PATH",
+    "EMAIL_HOST",
+    "EMAIL_HOST_PASSWORD",
+    "EMAIL_HOST_USER",
+    "EMAIL_PORT",
+    "EMAIL_SSL_CERTFILE",
+    "EMAIL_SSL_KEYFILE",
+    "EMAIL_TIMEOUT",
+    "EMAIL_USE_SSL",
+    "EMAIL_USE_TLS",
+}
+EMAIL_SETTING_DEPRECATED_MSG = (
+    "The {name} setting is deprecated. Migrate to EMAIL_PROVIDERS before Django 7.0."
+)
+
+
+# RemovedInDjango70Warning.
+# Must be called with the complete set of user-defined setting names (but no
+# default settings).
+def _check_email_settings_conflicts(explicit_settings):
+    deprecated = DEPRECATED_EMAIL_SETTINGS.intersection(explicit_settings)
+    if deprecated and "EMAIL_PROVIDERS" in explicit_settings:
+        deprecated_str = ", ".join(sorted(deprecated))
+        raise ImproperlyConfigured(
+            "Deprecated email settings are not allowed when EMAIL_PROVIDERS "
+            f"is defined: {deprecated_str}."
+        )
+
 
 class SettingsReference(str):
     """
@@ -85,6 +116,17 @@ class LazySettings(LazyObject):
             _wrapped = self._wrapped
         val = getattr(_wrapped, name)
 
+        # RemovedInDjango70Warning.
+        if name in DEPRECATED_EMAIL_SETTINGS:
+            if hasattr(_wrapped, "EMAIL_PROVIDERS"):
+                raise AttributeError(
+                    f"The {name} setting is not available when "
+                    "EMAIL_PROVIDERS is defined"
+                )
+            _show_settings_deprecation_warning(
+                EMAIL_SETTING_DEPRECATED_MSG.format(name=name), RemovedInDjango70Warning
+            )
+
         # Special case some settings which require further modification.
         # This is done here for performance reasons so the modified value is
         # cached.
@@ -105,12 +147,37 @@ class LazySettings(LazyObject):
             self.__dict__.clear()
         else:
             self.__dict__.pop(name, None)
+
+        # RemovedInDjango70Warning.
+        # Clear cached values of deprecated settings if EMAIL_PROVIDERS added.
+        if name == "EMAIL_PROVIDERS":
+            for setting in DEPRECATED_EMAIL_SETTINGS:
+                self.__dict__.pop(setting, None)
+        if name in DEPRECATED_EMAIL_SETTINGS:
+            _show_settings_deprecation_warning(
+                EMAIL_SETTING_DEPRECATED_MSG.format(name=name), RemovedInDjango70Warning
+            )
+
         super().__setattr__(name, value)
 
     def __delattr__(self, name):
         """Delete a setting and clear it from cache if needed."""
         super().__delattr__(name)
         self.__dict__.pop(name, None)
+
+    # RemovedInDjango70Warning.
+    # When EMAIL_PROVIDERS is defined, filter out deprecated email settings
+    # resulting from default global_settings.
+    def __dir__(self):
+        attrs = super().__dir__()
+        if hasattr(self._wrapped, "EMAIL_PROVIDERS"):
+            attrs = [
+                name
+                for name in attrs
+                if name not in DEPRECATED_EMAIL_SETTINGS
+                or self._wrapped.is_overridden(name)
+            ]
+        return attrs
 
     def configure(self, default_settings=global_settings, **options):
         """
@@ -120,6 +187,10 @@ class LazySettings(LazyObject):
         """
         if self._wrapped is not empty:
             raise RuntimeError("Settings already configured.")
+
+        # RemovedInDjango70Warning.
+        _check_email_settings_conflicts(options.keys())
+
         holder = UserSettingsHolder(default_settings)
         for name, value in options.items():
             if not name.isupper():
@@ -182,6 +253,13 @@ class Settings:
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
+        # RemovedInDjango70Warning.
+        _check_email_settings_conflicts(self._explicit_settings)
+        for name in DEPRECATED_EMAIL_SETTINGS.intersection(self._explicit_settings):
+            _show_settings_deprecation_warning(
+                EMAIL_SETTING_DEPRECATED_MSG.format(name=name), RemovedInDjango70Warning
+            )
+
         if hasattr(time, "tzset") and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
             # this file, no check happens and it's harmless.
@@ -232,6 +310,12 @@ class UserSettingsHolder:
                 RemovedInDjango70Warning,
                 skip_file_prefixes=django_file_prefixes(),
             )
+        # RemovedInDjango70Warning.
+        if name in DEPRECATED_EMAIL_SETTINGS:
+            _show_settings_deprecation_warning(
+                EMAIL_SETTING_DEPRECATED_MSG.format(name=name), RemovedInDjango70Warning
+            )
+
         super().__setattr__(name, value)
 
     def __delattr__(self, name):

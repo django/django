@@ -1,6 +1,18 @@
 # RemovedInDjango70Warning: this entire file.
 # mail.providers-related deprecation warnings and helpers used in multiple
 # places. (In a separate file to avoid circular import problems.)
+import warnings
+
+from django.conf import DEPRECATED_EMAIL_SETTINGS, settings
+from django.utils.deprecation import (
+    RemovedInDjango70Warning,
+    django_file_prefixes,
+)
+
+NO_DEFAULT_EMAIL_PROVIDER_WARNING = (
+    "Django 7.0 will not have a default email provider. Configure "
+    "settings.EMAIL_PROVIDERS to avoid errors sending email."
+)
 
 
 def report_using_incompatibility(
@@ -15,4 +27,20 @@ def report_using_incompatibility(
         raise TypeError(
             "'auth_user' and 'auth_password' are not compatible with 'using'. "
             "Set 'username' and 'password' OPTIONS in EMAIL_PROVIDERS instead."
+        )
+
+
+def warn_about_default_email_providers_if_needed():
+    needs_warning = not (
+        hasattr(settings, "EMAIL_PROVIDERS")
+        or any(
+            hasattr(settings, name) and settings.is_overridden(name)
+            for name in DEPRECATED_EMAIL_SETTINGS
+        )
+    )
+    if needs_warning:
+        warnings.warn(
+            NO_DEFAULT_EMAIL_PROVIDER_WARNING,
+            RemovedInDjango70Warning,
+            skip_file_prefixes=django_file_prefixes(),
         )

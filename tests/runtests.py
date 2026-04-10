@@ -30,6 +30,7 @@ else:
     from django.test.utils import NullTimeKeeper, TimeKeeper, get_runner
     from django.utils.deprecation import (
         RemovedAfterNextVersionWarning,
+        RemovedInDjango70Warning,
         RemovedInNextVersionWarning,
     )
     from django.utils.functional import classproperty
@@ -52,6 +53,14 @@ warnings.simplefilter("error", RemovedAfterNextVersionWarning)
 # patterns.
 warnings.simplefilter("error", ResourceWarning)
 warnings.simplefilter("error", RuntimeWarning)
+
+# Temporarily ignore this warning. A later commit will update tests that send
+# mail and remove this filter.
+warnings.filterwarnings(
+    "ignore",
+    r"Django 7\.0 will not have a default email provider\.",
+    category=RemovedInDjango70Warning,
+)
 
 # Reduce garbage collection frequency to improve performance. Since CPython
 # uses refcounting, garbage collection only collects objects with cyclic

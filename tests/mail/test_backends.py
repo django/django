@@ -15,7 +15,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.mail import EmailMessage, InvalidEmailProvider
 from django.core.mail.backends import console, dummy, filebased, locmem, smtp
 from django.core.mail.backends.base import BaseEmailBackend
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase, ignore_warnings, override_settings
 from django.utils.deprecation import RemovedInDjango70Warning
 
 from .tests import MailTestsMixin, message_from_bytes
@@ -283,6 +283,10 @@ class LocmemBackendTests(SharedEmailBackendTests, SimpleTestCase):
         self.assertIsNone(mail.outbox[1].sent_using)
 
 
+@ignore_warnings(
+    category=RemovedInDjango70Warning,
+    message=r"The EMAIL_FILE_PATH setting is deprecated\.",
+)
 class FileBackendTests(SharedEmailBackendTests, SimpleTestCase):
     backend_class = filebased.EmailBackend
 
@@ -321,12 +325,14 @@ class FileBackendTests(SharedEmailBackendTests, SimpleTestCase):
         # (Overrides SharedEmailBackendTests case.)
         super().test_create_from_providers(required_options={"file_path": self.tmp_dir})
 
+    # RemovedInDjango70Warning.
     def test_email_file_path_use_settings(self):
         file_path_settings = self.mkdtemp()
         with self.settings(EMAIL_FILE_PATH=file_path_settings):
             backend = filebased.EmailBackend()
         self.assertEqual(backend.file_path, str(file_path_settings))
 
+    # RemovedInDjango70Warning.
     def test_email_file_path_override_settings(self):
         file_path_settings = self.mkdtemp()
         file_path_override = self.mkdtemp()
@@ -336,6 +342,7 @@ class FileBackendTests(SharedEmailBackendTests, SimpleTestCase):
             backend = filebased.EmailBackend(file_path=file_path_override)
         self.assertEqual(backend.file_path, str(file_path_override))
 
+    # RemovedInDjango70Warning.
     def test_error_if_email_file_path_setting_not_defined(self):
         msg = (
             "The EMAIL_FILE_PATH setting must be defined to use the file EmailBackend."
@@ -348,6 +355,7 @@ class FileBackendTests(SharedEmailBackendTests, SimpleTestCase):
         with self.assertRaisesMessage(InvalidEmailProvider, msg):
             filebased.EmailBackend(alias="test_alias")
 
+    # RemovedInDjango70Warning.
     @override_settings(EMAIL_FILE_PATH="/this/path/does/not/exist")
     def test_ignores_settings_when_initialized_with_alias(self):
         backend = self.create_backend()
@@ -547,6 +555,9 @@ class SMTPHandler:
 
 
 @skipUnless(HAS_AIOSMTPD, "No aiosmtpd library detected.")
+@ignore_warnings(
+    category=RemovedInDjango70Warning, message=r"The EMAIL_\w+ setting is deprecated\."
+)
 class SMTPBackendTestsBase(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
@@ -596,6 +607,7 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         # (Overrides SharedEmailBackendTests case.)
         super().test_create_from_providers(required_options={"host": "example.com"})
 
+    # RemovedInDjango70Warning.
     @override_settings(
         EMAIL_HOST="mail.example.com",
         EMAIL_PORT=822,
@@ -643,6 +655,7 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
                 backend = self.backend_class(host="mail.example.com", **kwargs)
                 self.assertEqual(backend.port, 25)
 
+    # RemovedInDjango70Warning.
     @override_settings(
         EMAIL_HOST="mail.example.com",
         EMAIL_PORT=822,
@@ -652,6 +665,7 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         self.assertEqual(backend.host, "mail.example.com")
         self.assertEqual(backend.port, 822)
 
+    # RemovedInDjango70Warning.
     @override_settings(
         EMAIL_HOST="mail.example.com",
         EMAIL_PORT=822,
@@ -675,6 +689,7 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
             "mail.example.com", 5322, local_hostname=mock.ANY
         )
 
+    # RemovedInDjango70Warning.
     @override_settings(
         EMAIL_HOST_USER="not empty username",
         EMAIL_HOST_PASSWORD="not empty password",
@@ -684,6 +699,7 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         self.assertEqual(backend.username, "not empty username")
         self.assertEqual(backend.password, "not empty password")
 
+    # RemovedInDjango70Warning.
     @override_settings(
         EMAIL_HOST_USER="not empty username",
         EMAIL_HOST_PASSWORD="not empty password",
@@ -693,6 +709,7 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         self.assertEqual(backend.username, "username")
         self.assertEqual(backend.password, "password")
 
+    # RemovedInDjango70Warning.
     @override_settings(
         EMAIL_HOST_USER="not empty username",
         EMAIL_HOST_PASSWORD="not empty password",
@@ -734,11 +751,13 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         backend.connection = mock.Mock(spec=object())
         self.assertIs(backend.open(), False)
 
+    # RemovedInDjango70Warning.
     @override_settings(EMAIL_USE_TLS=True)
     def test_email_tls_use_settings(self):
         backend = smtp.EmailBackend()
         self.assertIs(backend.use_tls, True)
 
+    # RemovedInDjango70Warning.
     @override_settings(EMAIL_USE_TLS=True)
     def test_email_tls_override_settings(self):
         backend = smtp.EmailBackend(use_tls=False)
@@ -756,6 +775,7 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         with self.assertRaisesMessage(InvalidEmailProvider, msg):
             self.create_backend(use_ssl=True, use_tls=True)
 
+    # RemovedInDjango70Warning.
     def test_ssl_tls_settings_mutually_exclusive(self):
         msg = (
             "EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so only set "
@@ -767,11 +787,13 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         ):
             smtp.EmailBackend()
 
+    # RemovedInDjango70Warning.
     @override_settings(EMAIL_USE_SSL=True)
     def test_email_ssl_use_settings(self):
         backend = smtp.EmailBackend()
         self.assertIs(backend.use_ssl, True)
 
+    # RemovedInDjango70Warning.
     @override_settings(EMAIL_USE_SSL=True)
     def test_email_ssl_override_settings(self):
         backend = smtp.EmailBackend(use_ssl=False)
@@ -781,11 +803,13 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         backend = self.create_backend()
         self.assertIs(backend.use_ssl, False)
 
+    # RemovedInDjango70Warning.
     @override_settings(EMAIL_SSL_CERTFILE="foo")
     def test_email_ssl_certfile_use_settings(self):
         backend = smtp.EmailBackend()
         self.assertEqual(backend.ssl_certfile, "foo")
 
+    # RemovedInDjango70Warning.
     @override_settings(EMAIL_SSL_CERTFILE="foo")
     def test_email_ssl_certfile_override_settings(self):
         backend = smtp.EmailBackend(ssl_certfile="bar")
@@ -795,11 +819,13 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         backend = self.create_backend()
         self.assertIsNone(backend.ssl_certfile)
 
+    # RemovedInDjango70Warning.
     @override_settings(EMAIL_SSL_KEYFILE="foo")
     def test_email_ssl_keyfile_use_settings(self):
         backend = smtp.EmailBackend()
         self.assertEqual(backend.ssl_keyfile, "foo")
 
+    # RemovedInDjango70Warning.
     @override_settings(EMAIL_SSL_KEYFILE="foo")
     def test_email_ssl_keyfile_override_settings(self):
         backend = smtp.EmailBackend(ssl_keyfile="bar")
@@ -855,11 +881,13 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         self.assertEqual(myemailbackend.connection.timeout, 42)
         myemailbackend.close()
 
+    # RemovedInDjango70Warning.
     @override_settings(EMAIL_TIMEOUT=10)
     def test_email_timeout_use_settings(self):
         backend = smtp.EmailBackend()
         self.assertEqual(backend.timeout, 10)
 
+    # RemovedInDjango70Warning.
     @override_settings(EMAIL_TIMEOUT=10)
     def test_email_timeout_override_settings(self):
         backend = smtp.EmailBackend(timeout=15)
