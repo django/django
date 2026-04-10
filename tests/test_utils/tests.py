@@ -37,6 +37,7 @@ from django.test import (
     SimpleTestCase,
     TestCase,
     TransactionTestCase,
+    ignore_warnings,
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
@@ -51,6 +52,7 @@ from django.test.utils import (
     teardown_test_environment,
 )
 from django.urls import NoReverseMatch, path, reverse, reverse_lazy
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.html import VOID_ELEMENTS
 
 from .models import Car, Person, PossessedCar
@@ -1841,6 +1843,7 @@ class SetupTestEnvironmentTests(SimpleTestCase):
                     setup_test_environment()
                     self.assertEqual(settings.ALLOWED_HOSTS, ["*", "testserver"])
 
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_email_backend_override(self):
         with (
             self.mock_test_state(),
