@@ -83,10 +83,14 @@ class Columns(TableColumns):
 
     def __str__(self):
         def col_str(column, idx):
+            col = self.quote_name(column)
             try:
-                return self.quote_name(column) + self.col_suffixes[idx]
+                suffix = self.col_suffixes[idx]
             except IndexError:
-                return self.quote_name(column)
+                return col
+            if suffix:
+                col = '{} {}'.format(col, suffix)
+            return col
 
         return ', '.join(col_str(column, idx) for idx, column in enumerate(self.columns))
 
@@ -112,9 +116,13 @@ class IndexColumns(Columns):
         def col_str(column, idx):
             # Index.__init__() guarantees that self.opclasses is the same
             # length as self.columns.
-            col = '{} {}'.format(self.quote_name(column), self.opclasses[idx])
+            col = self.quote_name(column)
+            if self.opclasses[idx]:
+                col = '{} {}'.format(col, self.opclasses[idx])
             try:
-                col = '{} {}'.format(col, self.col_suffixes[idx])
+                suffix = self.col_suffixes[idx]
+                if suffix:
+                    col = '{} {}'.format(col, suffix)
             except IndexError:
                 pass
             return col
