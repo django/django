@@ -3,6 +3,7 @@ Implementations of SQL functions for SQLite.
 """
 
 import functools
+import operator
 import random
 import statistics
 import zoneinfo
@@ -86,6 +87,9 @@ def register(connection):
     connection.create_aggregate("VAR_POP", 1, VarPop)
     connection.create_aggregate("VAR_SAMP", 1, VarSamp)
     connection.create_aggregate("ANY_VALUE", 1, AnyValue)
+    connection.create_aggregate("BIT_AND", 1, BitAnd)
+    connection.create_aggregate("BIT_OR", 1, BitOr)
+    connection.create_aggregate("BIT_XOR", 1, BitXor)
     connection.create_function("UUIDV4", 0, _sqlite_uuid4)
     if PY314:
         connection.create_function("UUIDV7", 0, _sqlite_uuid7)
@@ -535,3 +539,27 @@ class VarSamp(ListAggregate):
 class AnyValue(ListAggregate):
     def finalize(self):
         return self[0]
+
+
+class BitAggregate(ListAggregate):
+    bit_operator = None
+
+    def finalize(self):
+        items = (item for item in self if item is not None)
+        try:
+            return functools.reduce(self.bit_operator, items)
+        except TypeError:
+            # items may be an empty iterator when all elements are None.
+            return None
+
+
+class BitAnd(BitAggregate):
+    bit_operator = operator.and_
+
+
+class BitOr(BitAggregate):
+    bit_operator = operator.or_
+
+
+class BitXor(BitAggregate):
+    bit_operator = operator.xor

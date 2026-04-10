@@ -274,6 +274,12 @@ class BaseDatabaseFeatures:
     # Does the database support SQL 2023 ANY_VALUE in GROUP BY?
     supports_any_value = False
 
+    # Does the database support bitwise aggregations: BIT_AND, BIT_OR, and
+    # BIT_XOR?
+    supports_bit_aggregations = True
+    # Does the backend support the default parameter in bitwise aggregations?
+    supports_default_in_bit_aggregations = True
+
     # Does the backend support indexing a TextField?
     supports_index_on_text_field = True
 

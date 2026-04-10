@@ -69,6 +69,10 @@ details on these changes.
 
 * The ``SQLCompiler.quote_name_unless_alias()`` method will be removed.
 
+* The ``django.contrib.postgres.aggregates.BitAnd``,
+  ``django.contrib.postgres.aggregates.BitOr``, and
+  ``django.contrib.postgres.aggregates.BitXor`` classes will be removed.
+
 .. _deprecation-removed-in-6.1:
 
 6.1
