@@ -180,6 +180,11 @@ def replace_named_groups(pattern):
             elif val == ')' and prev_char != '\\':
                 unmatched_open_brackets -= 1
             prev_char = val
+        else:
+            # If the loop completes without a break (i.e. the group is at the
+            # end of the pattern), check if brackets are balanced.
+            if unmatched_open_brackets == 0:
+                group_pattern_and_name.append((pattern[start:end + idx + 1], group_name))
 
     # Replace the string for named capture groups with their group names.
     for group_pattern, group_name in group_pattern_and_name:
@@ -212,6 +217,9 @@ def replace_unnamed_groups(pattern):
             elif val == ')' and prev_char != '\\':
                 unmatched_open_brackets -= 1
             prev_char = val
+        else:
+            if unmatched_open_brackets == 0:
+                group_indices.append((start, start + 1 + idx + 1))
 
     # Remove unnamed group matches inside other unnamed capture groups.
     group_start_end_indices = []
