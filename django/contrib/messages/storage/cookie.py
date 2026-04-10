@@ -22,6 +22,8 @@ class MessageEncoder(json.JSONEncoder):
             message = [self.message_key, is_safedata, obj.level, obj.message]
             if obj.extra_tags is not None:
                 message.append(obj.extra_tags)
+            else:
+                message.append(None)
             if obj.extra_kwargs is not None:
                 message.append(obj.extra_kwargs)
             return message

@@ -164,6 +164,7 @@ class AssertMessagesTest(MessagesTestMixin, SimpleTestCase):
             "INFO message.",
             extra_kwargs={"permanent": True},
         )
+        msgs = list(response.wsgi_request._messages)
         self.assertMessages(
             response,
             [
@@ -172,6 +173,7 @@ class AssertMessagesTest(MessagesTestMixin, SimpleTestCase):
                 ),
             ],
         )
+        self.assertEqual(msgs[0].extra_kwargs, {"permanent": True})
 
     @override_settings(MESSAGE_TAGS={42: "CUSTOM"})
     def test_custom_levelname(self):

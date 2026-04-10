@@ -207,6 +207,11 @@ class CookieTests(BaseTests, SimpleTestCase):
                     extra_tags,
                 )
 
+    def test_extra_kwargs_without_extra_tags(self):
+        msg = self.encode_decode("message", extra_kwargs={"permanent": True})
+        self.assertIsNone(msg.extra_tags)
+        self.assertEqual(msg.extra_kwargs, {"permanent": True})
+
 
 class BisectTests(TestCase):
     def test_bisect_keep_left(self):

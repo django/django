@@ -76,16 +76,6 @@ class BaseStorage:
         return len(self._loaded_messages) + len(self._queued_messages)
 
     def __iter__(self):
-        """
-        Iterate over all messages to attempt to display them.
-
-        Any new messages (via _queued_messages) are added to any previously
-        stored messages (via _loaded_messaged). All messages are then returned
-        to be iterated over externally (typically via a template).
-
-        This method can be altered by a subclass to alter the logic of when
-        a message would be cleared from storage.
-        """
         self.used = True
         if self._queued_messages:
             self._loaded_messages.extend(self._queued_messages)
