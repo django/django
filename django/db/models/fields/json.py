@@ -277,6 +277,8 @@ class HasKeys(HasKeyLookup):
     logical_operator = " AND "
 
     def get_prep_lookup(self):
+        if hasattr(self.rhs, "resolve_expression"):
+            return self.rhs
         return [str(item) for item in self.rhs]
 
 
@@ -719,6 +721,29 @@ class KeyTransformGte(KeyTransformNumericLookupMixin, lookups.GreaterThanOrEqual
     pass
 
 
+class KeyTransformRange(KeyTransformNumericLookupMixin, lookups.Range):
+    def process_rhs(self, compiler, connection):
+        if self.rhs_is_direct_value():
+            return super().process_rhs(compiler, connection)
+        rhs_start = KeyTransform(0, self.rhs)
+        rhs_end = KeyTransform(1, self.rhs)
+        start_sql, start_params = compiler.compile(rhs_start)
+        end_sql, end_params = compiler.compile(rhs_end)
+        return [start_sql, end_sql], tuple(start_params) + tuple(end_params)
+
+    def as_mysql(self, compiler, connection):
+        if self.rhs_is_direct_value():
+            return self.as_sql(compiler, connection)
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs_start = KeyTransform(0, self.rhs)
+        rhs_end = KeyTransform(1, self.rhs)
+        start_sql, start_params = compiler.compile(rhs_start)
+        end_sql, end_params = compiler.compile(rhs_end)
+        sql = "(%s >= %s AND %s <= %s)" % (lhs, start_sql, lhs, end_sql)
+        params = (*lhs_params, *start_params, *lhs_params, *end_params)
+        return sql, params
+
+
 KeyTransform.register_lookup(KeyTransformIn)
 KeyTransform.register_lookup(KeyTransformExact)
 KeyTransform.register_lookup(KeyTransformIExact)
@@ -735,6 +760,7 @@ KeyTransform.register_lookup(KeyTransformLt)
 KeyTransform.register_lookup(KeyTransformLte)
 KeyTransform.register_lookup(KeyTransformGt)
 KeyTransform.register_lookup(KeyTransformGte)
+KeyTransform.register_lookup(KeyTransformRange)
 
 
 class KeyTransformFactory:
