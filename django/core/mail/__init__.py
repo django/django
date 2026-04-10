@@ -27,7 +27,10 @@ from django.utils.deprecation import RemovedInDjango70Warning, deprecate_posargs
 from django.utils.functional import Promise
 from django.utils.module_loading import import_string
 
-from .deprecation import report_using_incompatibility
+from .deprecation import (
+    report_using_incompatibility,
+    warn_about_default_mailers_if_needed,
+)
 
 __all__ = [
     "MailerDoesNotExist",
@@ -68,6 +71,8 @@ def get_connection(backend=None, *, fail_silently=False, **kwds):
     Both fail_silently and other keyword arguments are used in the
     constructor of the backend.
     """
+    warn_about_default_mailers_if_needed()
+
     if fail_silently:
         kwds["fail_silently"] = fail_silently
 

@@ -2,6 +2,10 @@ from django.core.mail import MailerDoesNotExist, InvalidMailer, mailers
 from django.core.mail.backends import locmem, smtp
 from django.test import SimpleTestCase, override_settings
 
+from . import (
+    ignore_no_default_mailer_warning,
+    override_deprecated_email_settings,
+)
 from .custombackend import OptionsCapturingBackend
 
 
@@ -208,7 +212,7 @@ class MailersTests(SimpleTestCase):
 class MailersCompatibilityTests(SimpleTestCase):
     """mailers.default is usable even when MAILERS is not defined."""
 
-    @override_settings(
+    @override_deprecated_email_settings(
         EMAIL_BACKEND="mail.custombackend.OptionsCapturingBackend"
     )
     def test_default_mailer_with_deprecated_settings(self):
@@ -218,6 +222,7 @@ class MailersCompatibilityTests(SimpleTestCase):
         self.assertIsInstance(backend, OptionsCapturingBackend)
         self.assertNotIn("alias", OptionsCapturingBackend.init_kwargs[0])
 
+    @ignore_no_default_mailer_warning()
     def test_default_mailer_with_no_settings(self):
         backend = mailers.default
         # Django's test runner changes the default EMAIL_BACKEND to locmem.
