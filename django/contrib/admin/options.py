@@ -2024,10 +2024,27 @@ class ModelAdmin(BaseModelAdmin):
             return queryset
         return queryset.filter(pk__in=object_pks)
 
+    def _get_formset_with_permissions(self, request, queryset):
+        """
+        Construct a changelist formset, and remove list_editable fields
+        for objects the user cannot change.
+        """
+        FormSet = self.get_changelist_formset(request)
+        formset = FormSet(queryset=queryset)
+
+        for form in formset.forms:
+            if not self.has_change_permission(request, form.instance):
+                for field_name in self.list_editable:
+                    form.fields.pop(field_name, None)
+
+        return formset
+
     def _save_formset(self, request, formset):
         changecount = 0
         with transaction.atomic(using=router.db_for_write(self.model)):
             for form in formset.forms:
+                if not self.has_change_permission(request, form.instance):
+                    continue
                 if form.has_changed():
                     obj = self.save_form(request, form, change=True)
                     if obj._state.adding:
@@ -2147,8 +2164,7 @@ class ModelAdmin(BaseModelAdmin):
 
         # Handle GET -- construct a formset for display.
         elif cl.list_editable and self.has_change_permission(request):
-            FormSet = self.get_changelist_formset(request)
-            cl.formset = FormSet(queryset=cl.result_list)
+            cl.formset = self._get_formset_with_permissions(request, cl.result_list)
 
         # Build the list of media to be used by the formset.
         if cl.formset:
