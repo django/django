@@ -91,14 +91,17 @@ To write your own storage class, subclass the ``BaseStorage`` class in
 ``django.contrib.messages.storage.base`` and implement the ``_get`` and
 ``_store`` methods.
 
-.. _custom-storage-class:
+.. _custom-storage-backends:
 
-Custom Storage Classes
-----------------------
+Custom storage backends
+~~~~~~~~~~~~~~~~~~~~~~~
 
-Here is an example of a custom storage class which uses ``extra_kwargs``
-passed to the message to specify whether a message should be permanent and
-therefore never expire after a single request::
+.. versionadded:: 6.1
+
+You can use ``extra_kwargs`` to extend the behavior of existing storage
+backends. In this example, ``SessionStorage`` is extended to allow specifying
+whether a message should be permanent, and therefore never expire after a
+single request::
 
     class PermanentStorage(SessionStorage):
         """
