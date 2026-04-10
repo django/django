@@ -29,6 +29,8 @@ class JSONFieldTest(SimpleTestCase):
         self.assertEqual(field.prepare_value({'a': 'b'}), '{"a": "b"}')
         self.assertEqual(field.prepare_value(None), 'null')
         self.assertEqual(field.prepare_value('foo'), '"foo"')
+        # Unicode characters should be displayed as-is, not escaped to ASCII.
+        self.assertEqual(field.prepare_value({'key': '中国'}), '{"key": "中国"}')
 
     def test_widget(self):
         field = JSONField()
