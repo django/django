@@ -1,0 +1,13 @@
+.. This data file has been placed in the public domain.
+.. Derived from the Unicode character mappings available from
+   <http://www.w3.org/2003/entities/xml/>.
+   Processed by unicode2rstsubs.py, part of Docutils:
+   <https://docutils.sourceforge.io>.
+
+.. |Copf| unicode:: U+02102 .. DOUBLE-STRUCK CAPITAL C
+.. |Hopf| unicode:: U+0210D .. DOUBLE-STRUCK CAPITAL H
+.. |Nopf| unicode:: U+02115 .. DOUBLE-STRUCK CAPITAL N
+.. |Popf| unicode:: U+02119 .. DOUBLE-STRUCK CAPITAL P
+.. |Qopf| unicode:: U+0211A .. DOUBLE-STRUCK CAPITAL Q
+.. |Ropf| unicode:: U+0211D .. DOUBLE-STRUCK CAPITAL R
+.. |Zopf| unicode:: U+02124 .. DOUBLE-STRUCK CAPITAL Z

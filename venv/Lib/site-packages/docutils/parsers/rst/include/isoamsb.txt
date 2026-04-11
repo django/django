@@ -1,0 +1,126 @@
+.. This data file has been placed in the public domain.
+.. Derived from the Unicode character mappings available from
+   <http://www.w3.org/2003/entities/xml/>.
+   Processed by unicode2rstsubs.py, part of Docutils:
+   <https://docutils.sourceforge.io>.
+
+.. |ac|       unicode:: U+0223E .. INVERTED LAZY S
+.. |acE|      unicode:: U+0223E U+00333 .. INVERTED LAZY S with double underline
+.. |amalg|    unicode:: U+02A3F .. AMALGAMATION OR COPRODUCT
+.. |barvee|   unicode:: U+022BD .. NOR
+.. |Barwed|   unicode:: U+02306 .. PERSPECTIVE
+.. |barwed|   unicode:: U+02305 .. PROJECTIVE
+.. |bsolb|    unicode:: U+029C5 .. SQUARED FALLING DIAGONAL SLASH
+.. |Cap|      unicode:: U+022D2 .. DOUBLE INTERSECTION
+.. |capand|   unicode:: U+02A44 .. INTERSECTION WITH LOGICAL AND
+.. |capbrcup| unicode:: U+02A49 .. INTERSECTION ABOVE BAR ABOVE UNION
+.. |capcap|   unicode:: U+02A4B .. INTERSECTION BESIDE AND JOINED WITH INTERSECTION
+.. |capcup|   unicode:: U+02A47 .. INTERSECTION ABOVE UNION
+.. |capdot|   unicode:: U+02A40 .. INTERSECTION WITH DOT
+.. |caps|     unicode:: U+02229 U+0FE00 .. INTERSECTION with serifs
+.. |ccaps|    unicode:: U+02A4D .. CLOSED INTERSECTION WITH SERIFS
+.. |ccups|    unicode:: U+02A4C .. CLOSED UNION WITH SERIFS
+.. |ccupssm|  unicode:: U+02A50 .. CLOSED UNION WITH SERIFS AND SMASH PRODUCT
+.. |coprod|   unicode:: U+02210 .. N-ARY COPRODUCT
+.. |Cup|      unicode:: U+022D3 .. DOUBLE UNION
+.. |cupbrcap| unicode:: U+02A48 .. UNION ABOVE BAR ABOVE INTERSECTION
+.. |cupcap|   unicode:: U+02A46 .. UNION ABOVE INTERSECTION
+.. |cupcup|   unicode:: U+02A4A .. UNION BESIDE AND JOINED WITH UNION
+.. |cupdot|   unicode:: U+0228D .. MULTISET MULTIPLICATION
+.. |cupor|    unicode:: U+02A45 .. UNION WITH LOGICAL OR
+.. |cups|     unicode:: U+0222A U+0FE00 .. UNION with serifs
+.. |cuvee|    unicode:: U+022CE .. CURLY LOGICAL OR
+.. |cuwed|    unicode:: U+022CF .. CURLY LOGICAL AND
+.. |Dagger|   unicode:: U+02021 .. DOUBLE DAGGER
+.. |dagger|   unicode:: U+02020 .. DAGGER
+.. |diam|     unicode:: U+022C4 .. DIAMOND OPERATOR
+.. |divonx|   unicode:: U+022C7 .. DIVISION TIMES
+.. |eplus|    unicode:: U+02A71 .. EQUALS SIGN ABOVE PLUS SIGN
+.. |hercon|   unicode:: U+022B9 .. HERMITIAN CONJUGATE MATRIX
+.. |intcal|   unicode:: U+022BA .. INTERCALATE
+.. |iprod|    unicode:: U+02A3C .. INTERIOR PRODUCT
+.. |loplus|   unicode:: U+02A2D .. PLUS SIGN IN LEFT HALF CIRCLE
+.. |lotimes|  unicode:: U+02A34 .. MULTIPLICATION SIGN IN LEFT HALF CIRCLE
+.. |lthree|   unicode:: U+022CB .. LEFT SEMIDIRECT PRODUCT
+.. |ltimes|   unicode:: U+022C9 .. LEFT NORMAL FACTOR SEMIDIRECT PRODUCT
+.. |midast|   unicode:: U+0002A .. ASTERISK
+.. |minusb|   unicode:: U+0229F .. SQUARED MINUS
+.. |minusd|   unicode:: U+02238 .. DOT MINUS
+.. |minusdu|  unicode:: U+02A2A .. MINUS SIGN WITH DOT BELOW
+.. |ncap|     unicode:: U+02A43 .. INTERSECTION WITH OVERBAR
+.. |ncup|     unicode:: U+02A42 .. UNION WITH OVERBAR
+.. |oast|     unicode:: U+0229B .. CIRCLED ASTERISK OPERATOR
+.. |ocir|     unicode:: U+0229A .. CIRCLED RING OPERATOR
+.. |odash|    unicode:: U+0229D .. CIRCLED DASH
+.. |odiv|     unicode:: U+02A38 .. CIRCLED DIVISION SIGN
+.. |odot|     unicode:: U+02299 .. CIRCLED DOT OPERATOR
+.. |odsold|   unicode:: U+029BC .. CIRCLED ANTICLOCKWISE-ROTATED DIVISION SIGN
+.. |ofcir|    unicode:: U+029BF .. CIRCLED BULLET
+.. |ogt|      unicode:: U+029C1 .. CIRCLED GREATER-THAN
+.. |ohbar|    unicode:: U+029B5 .. CIRCLE WITH HORIZONTAL BAR
+.. |olcir|    unicode:: U+029BE .. CIRCLED WHITE BULLET
+.. |olt|      unicode:: U+029C0 .. CIRCLED LESS-THAN
+.. |omid|     unicode:: U+029B6 .. CIRCLED VERTICAL BAR
+.. |ominus|   unicode:: U+02296 .. CIRCLED MINUS
+.. |opar|     unicode:: U+029B7 .. CIRCLED PARALLEL
+.. |operp|    unicode:: U+029B9 .. CIRCLED PERPENDICULAR
+.. |oplus|    unicode:: U+02295 .. CIRCLED PLUS
+.. |osol|     unicode:: U+02298 .. CIRCLED DIVISION SLASH
+.. |Otimes|   unicode:: U+02A37 .. MULTIPLICATION SIGN IN DOUBLE CIRCLE
+.. |otimes|   unicode:: U+02297 .. CIRCLED TIMES
+.. |otimesas| unicode:: U+02A36 .. CIRCLED MULTIPLICATION SIGN WITH CIRCUMFLEX ACCENT
+.. |ovbar|    unicode:: U+0233D .. APL FUNCTIONAL SYMBOL CIRCLE STILE
+.. |plusacir| unicode:: U+02A23 .. PLUS SIGN WITH CIRCUMFLEX ACCENT ABOVE
+.. |plusb|    unicode:: U+0229E .. SQUARED PLUS
+.. |pluscir|  unicode:: U+02A22 .. PLUS SIGN WITH SMALL CIRCLE ABOVE
+.. |plusdo|   unicode:: U+02214 .. DOT PLUS
+.. |plusdu|   unicode:: U+02A25 .. PLUS SIGN WITH DOT BELOW
+.. |pluse|    unicode:: U+02A72 .. PLUS SIGN ABOVE EQUALS SIGN
+.. |plussim|  unicode:: U+02A26 .. PLUS SIGN WITH TILDE BELOW
+.. |plustwo|  unicode:: U+02A27 .. PLUS SIGN WITH SUBSCRIPT TWO
+.. |prod|     unicode:: U+0220F .. N-ARY PRODUCT
+.. |race|     unicode:: U+029DA .. LEFT DOUBLE WIGGLY FENCE
+.. |roplus|   unicode:: U+02A2E .. PLUS SIGN IN RIGHT HALF CIRCLE
+.. |rotimes|  unicode:: U+02A35 .. MULTIPLICATION SIGN IN RIGHT HALF CIRCLE
+.. |rthree|   unicode:: U+022CC .. RIGHT SEMIDIRECT PRODUCT
+.. |rtimes|   unicode:: U+022CA .. RIGHT NORMAL FACTOR SEMIDIRECT PRODUCT
+.. |sdot|     unicode:: U+022C5 .. DOT OPERATOR
+.. |sdotb|    unicode:: U+022A1 .. SQUARED DOT OPERATOR
+.. |setmn|    unicode:: U+02216 .. SET MINUS
+.. |simplus|  unicode:: U+02A24 .. PLUS SIGN WITH TILDE ABOVE
+.. |smashp|   unicode:: U+02A33 .. SMASH PRODUCT
+.. |solb|     unicode:: U+029C4 .. SQUARED RISING DIAGONAL SLASH
+.. |sqcap|    unicode:: U+02293 .. SQUARE CAP
+.. |sqcaps|   unicode:: U+02293 U+0FE00 .. SQUARE CAP with serifs
+.. |sqcup|    unicode:: U+02294 .. SQUARE CUP
+.. |sqcups|   unicode:: U+02294 U+0FE00 .. SQUARE CUP with serifs
+.. |ssetmn|   unicode:: U+02216 .. SET MINUS
+.. |sstarf|   unicode:: U+022C6 .. STAR OPERATOR
+.. |subdot|   unicode:: U+02ABD .. SUBSET WITH DOT
+.. |sum|      unicode:: U+02211 .. N-ARY SUMMATION
+.. |supdot|   unicode:: U+02ABE .. SUPERSET WITH DOT
+.. |timesb|   unicode:: U+022A0 .. SQUARED TIMES
+.. |timesbar| unicode:: U+02A31 .. MULTIPLICATION SIGN WITH UNDERBAR
+.. |timesd|   unicode:: U+02A30 .. MULTIPLICATION SIGN WITH DOT ABOVE
+.. |top|      unicode:: U+022A4 .. DOWN TACK
+.. |tridot|   unicode:: U+025EC .. WHITE UP-POINTING TRIANGLE WITH DOT
+.. |triminus| unicode:: U+02A3A .. MINUS SIGN IN TRIANGLE
+.. |triplus|  unicode:: U+02A39 .. PLUS SIGN IN TRIANGLE
+.. |trisb|    unicode:: U+029CD .. TRIANGLE WITH SERIFS AT BOTTOM
+.. |tritime|  unicode:: U+02A3B .. MULTIPLICATION SIGN IN TRIANGLE
+.. |uplus|    unicode:: U+0228E .. MULTISET UNION
+.. |veebar|   unicode:: U+022BB .. XOR
+.. |wedbar|   unicode:: U+02A5F .. LOGICAL AND WITH UNDERBAR
+.. |wreath|   unicode:: U+02240 .. WREATH PRODUCT
+.. |xcap|     unicode:: U+022C2 .. N-ARY INTERSECTION
+.. |xcirc|    unicode:: U+025EF .. LARGE CIRCLE
+.. |xcup|     unicode:: U+022C3 .. N-ARY UNION
+.. |xdtri|    unicode:: U+025BD .. WHITE DOWN-POINTING TRIANGLE
+.. |xodot|    unicode:: U+02A00 .. N-ARY CIRCLED DOT OPERATOR
+.. |xoplus|   unicode:: U+02A01 .. N-ARY CIRCLED PLUS OPERATOR
+.. |xotime|   unicode:: U+02A02 .. N-ARY CIRCLED TIMES OPERATOR
+.. |xsqcup|   unicode:: U+02A06 .. N-ARY SQUARE UNION OPERATOR
+.. |xuplus|   unicode:: U+02A04 .. N-ARY UNION OPERATOR WITH PLUS
+.. |xutri|    unicode:: U+025B3 .. WHITE UP-POINTING TRIANGLE
+.. |xvee|     unicode:: U+022C1 .. N-ARY LOGICAL OR
+.. |xwedge|   unicode:: U+022C0 .. N-ARY LOGICAL AND

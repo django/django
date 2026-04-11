@@ -1,0 +1,139 @@
+Metadata-Version: 2.4
+Name: numpy
+Version: 2.4.2
+Summary: Fundamental package for array computing in Python
+Author: Travis E. Oliphant et al.
+Maintainer-Email: NumPy Developers <numpy-discussion@python.org>
+License-Expression: BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0
+License-File: LICENSE.txt
+License-File: numpy/_core/include/numpy/libdivide/LICENSE.txt
+License-File: numpy/_core/src/common/pythoncapi-compat/COPYING
+License-File: numpy/_core/src/highway/LICENSE
+License-File: numpy/_core/src/multiarray/dragon4_LICENSE.txt
+License-File: numpy/_core/src/npysort/x86-simd-sort/LICENSE.md
+License-File: numpy/_core/src/umath/svml/LICENSE
+License-File: numpy/fft/pocketfft/LICENSE.md
+License-File: numpy/linalg/lapack_lite/LICENSE.txt
+License-File: numpy/ma/LICENSE
+License-File: numpy/random/LICENSE.md
+License-File: numpy/random/src/distributions/LICENSE.md
+License-File: numpy/random/src/mt19937/LICENSE.md
+License-File: numpy/random/src/pcg64/LICENSE.md
+License-File: numpy/random/src/philox/LICENSE.md
+License-File: numpy/random/src/sfc64/LICENSE.md
+License-File: numpy/random/src/splitmix64/LICENSE.md
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: C
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Topic :: Software Development
+Classifier: Topic :: Scientific/Engineering
+Classifier: Typing :: Typed
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: Unix
+Classifier: Operating System :: MacOS
+Project-URL: homepage, https://numpy.org
+Project-URL: documentation, https://numpy.org/doc/
+Project-URL: source, https://github.com/numpy/numpy
+Project-URL: download, https://pypi.org/project/numpy/#files
+Project-URL: tracker, https://github.com/numpy/numpy/issues
+Project-URL: release notes, https://numpy.org/doc/stable/release
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+
+<h1 align="center">
+<img src="https://raw.githubusercontent.com/numpy/numpy/main/branding/logo/primary/numpylogo.svg" width="300">
+</h1><br>
+
+
+[![Powered by NumFOCUS](https://img.shields.io/badge/powered%20by-NumFOCUS-orange.svg?style=flat&colorA=E1523D&colorB=007D8A)](
+https://numfocus.org)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/numpy.svg?label=PyPI%20downloads)](
+https://pypi.org/project/numpy/)
+[![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/numpy.svg?label=Conda%20downloads)](
+https://anaconda.org/conda-forge/numpy)
+[![Stack Overflow](https://img.shields.io/badge/stackoverflow-Ask%20questions-blue.svg)](
+https://stackoverflow.com/questions/tagged/numpy)
+[![Nature Paper](https://img.shields.io/badge/DOI-10.1038%2Fs41586--020--2649--2-blue)](
+https://doi.org/10.1038/s41586-020-2649-2)
+[![LFX Health Score](https://insights.linuxfoundation.org/api/badge/health-score?project=numpy)](https://insights.linuxfoundation.org/project/numpy)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/numpy/numpy/badge)](https://securityscorecards.dev/viewer/?uri=github.com/numpy/numpy)
+[![Typing](https://img.shields.io/pypi/types/numpy)](https://pypi.org/project/numpy/)
+
+
+NumPy is the fundamental package for scientific computing with Python.
+
+- **Website:** https://numpy.org
+- **Documentation:** https://numpy.org/doc
+- **Mailing list:** https://mail.python.org/mailman/listinfo/numpy-discussion
+- **Source code:** https://github.com/numpy/numpy
+- **Contributing:** https://numpy.org/devdocs/dev/index.html
+- **Bug reports:** https://github.com/numpy/numpy/issues
+- **Report a security vulnerability:** https://tidelift.com/docs/security
+
+It provides:
+
+- a powerful N-dimensional array object
+- sophisticated (broadcasting) functions
+- tools for integrating C/C++ and Fortran code
+- useful linear algebra, Fourier transform, and random number capabilities
+
+Testing:
+
+NumPy requires `pytest` and `hypothesis`.  Tests can then be run after installation with:
+
+    python -c "import numpy, sys; sys.exit(numpy.test() is False)"
+
+Code of Conduct
+----------------------
+
+NumPy is a community-driven open source project developed by a diverse group of
+[contributors](https://numpy.org/teams/). The NumPy leadership has made a strong
+commitment to creating an open, inclusive, and positive community. Please read the
+[NumPy Code of Conduct](https://numpy.org/code-of-conduct/) for guidance on how to interact
+with others in a way that makes our community thrive.
+
+Call for Contributions
+----------------------
+
+The NumPy project welcomes your expertise and enthusiasm!
+
+Small improvements or fixes are always appreciated. If you are considering larger contributions
+to the source code, please contact us through the [mailing
+list](https://mail.python.org/mailman/listinfo/numpy-discussion) first.
+
+Writing code isn’t the only way to contribute to NumPy. You can also:
+- review pull requests
+- help us stay on top of new and old issues
+- develop tutorials, presentations, and other educational materials
+- maintain and improve [our website](https://github.com/numpy/numpy.org)
+- develop graphic design for our brand assets and promotional materials
+- translate website content
+- help with outreach and onboard new contributors
+- write grant proposals and help with other fundraising efforts
+
+For more information about the ways you can contribute to NumPy, visit [our website](https://numpy.org/contribute/). 
+If you’re unsure where to start or how your skills fit in, reach out! You can
+ask on the mailing list or here, on GitHub, by opening a new issue or leaving a
+comment on a relevant issue that is already open.
+
+Our preferred channels of communication are all public, but if you’d like to
+speak to us in private first, contact our community coordinators at
+numpy-team@googlegroups.com or on Slack (write numpy-team@googlegroups.com for
+an invitation).
+
+We also have a biweekly community call, details of which are announced on the
+mailing list. You are very welcome to join.
+
+If you are new to contributing to open source, [this
+guide](https://opensource.guide/how-to-contribute/) helps explain why, what,
+and how to successfully get involved.

@@ -1,0 +1,10 @@
+PySocks-1.7.1.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
+PySocks-1.7.1.dist-info/LICENSE,sha256=cCfiFOAU63i3rcwc7aWspxOnn8T2oMUsnaWz5wfm_-k,1401
+PySocks-1.7.1.dist-info/METADATA,sha256=zbQMizjPOOP4DhEiEX24XXjNrYuIxF9UGUpN0uFDB6Y,13235
+PySocks-1.7.1.dist-info/RECORD,,
+PySocks-1.7.1.dist-info/WHEEL,sha256=t_MpApv386-8PVts2R6wsTifdIn0vbUDTVv61IbqFC8,92
+PySocks-1.7.1.dist-info/top_level.txt,sha256=TKSOIfCFBoK9EY8FBYbYqC3PWd3--G15ph9n8-QHPDk,19
+__pycache__/socks.cpython-312.pyc,,
+__pycache__/sockshandler.cpython-312.pyc,,
+socks.py,sha256=xOYn27t9IGrbTBzWsUUuPa0YBuplgiUykzkOB5V5iFY,31086
+sockshandler.py,sha256=2SYGj-pwt1kjgLoZAmyeaEXCeZDWRmfVS_QG6kErGtY,3966

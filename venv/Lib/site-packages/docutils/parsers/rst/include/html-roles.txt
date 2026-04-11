@@ -1,0 +1,45 @@
+.. Standard definition file for additional roles matching HTML tags.
+
+  :Copyright: © 2025 Günter Milde.
+  :License: Released under the terms of the
+    `2-Clause BSD license <http://www.spdx.org/licenses/BSD-2-Clause>`__
+
+.. role:: b
+.. role:: bdi
+.. role:: del
+.. role:: dfn
+.. role:: i
+.. role:: ins
+.. role:: kbd(literal)
+.. role:: mark
+.. role:: q
+.. role:: samp(literal)
+.. role:: small
+.. role:: u
+.. role:: s
+.. role:: var
+
+.. raw:: latex
+
+   % Definitions for semantic HTML inline markup and representation of edits
+   % (standard definition file "html-roles.txt").
+   % Add "soul" to the "stylesheet" setting for markup test that wraps
+   % and "xcolor" for yellow highlighting with :mark:`me`.
+   \providecommand{\DUroleb}{\textbf}
+   \providecommand{\DUroledel}{\st}
+   \providecommand{\DUroledfn}{\emph}
+   \providecommand{\DUrolei}{\textit}
+   \providecommand{\DUroleins}{\ul}
+   \providecommand{\DUrolekbd}{\texttt}
+   \providecommand{\DUrolemark}{\hl}
+   \providecommand{\DUroleq}[1]{“#1”}
+   \providecommand{\DUroles}{\st}
+   \providecommand{\DUrolesmall}[1]{{\footnotesize #1}}
+   \providecommand{\DUroleu}{\underline}
+   \providecommand{\DUrolevar}{\textit}
+   % fallback definitions
+   \providecommand{\ul}{\underline}
+   \providecommand{\hl}{\underline}  % highlight/mark
+   \providecommand{\st}[1]{%           strikethrough
+     \raisebox{1ex}{\underline{\smash{\raisebox{-1ex}{#1}}}}%
+   }

@@ -1,0 +1,235 @@
+Metadata-Version: 2.4
+Name: attrs
+Version: 25.4.0
+Summary: Classes Without Boilerplate
+Project-URL: Documentation, https://www.attrs.org/
+Project-URL: Changelog, https://www.attrs.org/en/stable/changelog.html
+Project-URL: GitHub, https://github.com/python-attrs/attrs
+Project-URL: Funding, https://github.com/sponsors/hynek
+Project-URL: Tidelift, https://tidelift.com/subscription/pkg/pypi-attrs?utm_source=pypi-attrs&utm_medium=pypi
+Author-email: Hynek Schlawack <hs@ox.cx>
+License-Expression: MIT
+License-File: LICENSE
+Keywords: attribute,boilerplate,class
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Typing :: Typed
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+
+<p align="center">
+  <a href="https://www.attrs.org/">
+    <img src="https://raw.githubusercontent.com/python-attrs/attrs/main/docs/_static/attrs_logo.svg" width="35%" alt="attrs" />
+  </a>
+</p>
+
+
+*attrs* is the Python package that will bring back the **joy** of **writing classes** by relieving you from the drudgery of implementing object protocols (aka [dunder methods](https://www.attrs.org/en/latest/glossary.html#term-dunder-methods)).
+Trusted by NASA for [Mars missions since 2020](https://github.com/readme/featured/nasa-ingenuity-helicopter)!
+
+Its main goal is to help you to write **concise** and **correct** software without slowing down your code.
+
+
+## Sponsors
+
+*attrs* would not be possible without our [amazing sponsors](https://github.com/sponsors/hynek).
+Especially those generously supporting us at the *The Organization* tier and higher:
+
+<!-- sponsor-break-begin -->
+
+<p align="center">
+
+<!-- [[[cog
+import pathlib, tomllib
+
+for sponsor in tomllib.loads(pathlib.Path("pyproject.toml").read_text())["tool"]["sponcon"]["sponsors"]:
+      print(f'<a href="{sponsor["url"]}"><img title="{sponsor["title"]}" src="https://www.attrs.org/en/25.4.0/_static/sponsors/{sponsor["img"]}" width="190" /></a>')
+]]] -->
+<a href="https://www.variomedia.de/"><img title="Variomedia AG" src="https://www.attrs.org/en/25.4.0/_static/sponsors/Variomedia.svg" width="190" /></a>
+<a href="https://tidelift.com/?utm_source=lifter&utm_medium=referral&utm_campaign=hynek"><img title="Tidelift" src="https://www.attrs.org/en/25.4.0/_static/sponsors/Tidelift.svg" width="190" /></a>
+<a href="https://privacy-solutions.org/"><img title="Privacy Solutions" src="https://www.attrs.org/en/25.4.0/_static/sponsors/Privacy-Solutions.svg" width="190" /></a>
+<a href="https://filepreviews.io/"><img title="FilePreviews" src="https://www.attrs.org/en/25.4.0/_static/sponsors/FilePreviews.svg" width="190" /></a>
+<a href="https://polar.sh/"><img title="Polar" src="https://www.attrs.org/en/25.4.0/_static/sponsors/Polar.svg" width="190" /></a>
+<!-- [[[end]]] -->
+
+</p>
+
+<!-- sponsor-break-end -->
+
+<p align="center">
+   <strong>Please consider <a href="https://github.com/sponsors/hynek">joining them</a> to help make <em>attrs</em>’s maintenance more sustainable!</strong>
+</p>
+
+<!-- teaser-end -->
+
+## Example
+
+*attrs* gives you a class decorator and a way to declaratively define the attributes on that class:
+
+<!-- code-begin -->
+
+```pycon
+>>> from attrs import asdict, define, make_class, Factory
+
+>>> @define
+... class SomeClass:
+...     a_number: int = 42
+...     list_of_numbers: list[int] = Factory(list)
+...
+...     def hard_math(self, another_number):
+...         return self.a_number + sum(self.list_of_numbers) * another_number
+
+
+>>> sc = SomeClass(1, [1, 2, 3])
+>>> sc
+SomeClass(a_number=1, list_of_numbers=[1, 2, 3])
+
+>>> sc.hard_math(3)
+19
+>>> sc == SomeClass(1, [1, 2, 3])
+True
+>>> sc != SomeClass(2, [3, 2, 1])
+True
+
+>>> asdict(sc)
+{'a_number': 1, 'list_of_numbers': [1, 2, 3]}
+
+>>> SomeClass()
+SomeClass(a_number=42, list_of_numbers=[])
+
+>>> C = make_class("C", ["a", "b"])
+>>> C("foo", "bar")
+C(a='foo', b='bar')
+```
+
+After *declaring* your attributes, *attrs* gives you:
+
+- a concise and explicit overview of the class's attributes,
+- a nice human-readable `__repr__`,
+- equality-checking methods,
+- an initializer,
+- and much more,
+
+*without* writing dull boilerplate code again and again and *without* runtime performance penalties.
+
+---
+
+This example uses *attrs*'s modern APIs that have been introduced in version 20.1.0, and the *attrs* package import name that has been added in version 21.3.0.
+The classic APIs (`@attr.s`, `attr.ib`, plus their serious-business aliases) and the `attr` package import name will remain **indefinitely**.
+
+Check out [*On The Core API Names*](https://www.attrs.org/en/latest/names.html) for an in-depth explanation!
+
+
+### Hate Type Annotations!?
+
+No problem!
+Types are entirely **optional** with *attrs*.
+Simply assign `attrs.field()` to the attributes instead of annotating them with types:
+
+```python
+from attrs import define, field
+
+@define
+class SomeClass:
+    a_number = field(default=42)
+    list_of_numbers = field(factory=list)
+```
+
+
+## Data Classes
+
+On the tin, *attrs* might remind you of `dataclasses` (and indeed, `dataclasses` [are a descendant](https://hynek.me/articles/import-attrs/) of *attrs*).
+In practice it does a lot more and is more flexible.
+For instance, it allows you to define [special handling of NumPy arrays for equality checks](https://www.attrs.org/en/stable/comparison.html#customization), allows more ways to [plug into the initialization process](https://www.attrs.org/en/stable/init.html#hooking-yourself-into-initialization), has a replacement for `__init_subclass__`, and allows for stepping through the generated methods using a debugger.
+
+For more details, please refer to our [comparison page](https://www.attrs.org/en/stable/why.html#data-classes), but generally speaking, we are more likely to commit crimes against nature to make things work that one would expect to work, but that are quite complicated in practice.
+
+
+## Project Information
+
+- [**Changelog**](https://www.attrs.org/en/stable/changelog.html)
+- [**Documentation**](https://www.attrs.org/)
+- [**PyPI**](https://pypi.org/project/attrs/)
+- [**Source Code**](https://github.com/python-attrs/attrs)
+- [**Contributing**](https://github.com/python-attrs/attrs/blob/main/.github/CONTRIBUTING.md)
+- [**Third-party Extensions**](https://github.com/python-attrs/attrs/wiki/Extensions-to-attrs)
+- **Get Help**: use the `python-attrs` tag on [Stack Overflow](https://stackoverflow.com/questions/tagged/python-attrs)
+
+
+### *attrs* for Enterprise
+
+Available as part of the [Tidelift Subscription](https://tidelift.com/?utm_source=lifter&utm_medium=referral&utm_campaign=hynek).
+
+The maintainers of *attrs* and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source packages you use to build your applications.
+Save time, reduce risk, and improve code health, while paying the maintainers of the exact packages you use.
+
+## Release Information
+
+### Backwards-incompatible Changes
+
+- Class-level `kw_only=True` behavior is now consistent with `dataclasses`.
+
+  Previously, a class that sets `kw_only=True` makes all attributes keyword-only, including those from base classes.
+  If an attribute sets `kw_only=False`, that setting is ignored, and it is still made keyword-only.
+
+  Now, only the attributes defined in that class that doesn't explicitly set `kw_only=False` are made keyword-only.
+
+  This shouldn't be a problem for most users, unless you have a pattern like this:
+
+  ```python
+  @attrs.define(kw_only=True)
+  class Base:
+      a: int
+      b: int = attrs.field(default=1, kw_only=False)
+
+  @attrs.define
+  class Subclass(Base):
+      c: int
+  ```
+
+  Here, we have a `kw_only=True` *attrs* class (`Base`) with an attribute that sets `kw_only=False` and has a default (`Base.b`), and then create a subclass (`Subclass`) with required arguments (`Subclass.c`).
+  Previously this would work, since it would make `Base.b` keyword-only, but now this fails since `Base.b` is positional, and we have a required positional argument (`Subclass.c`) following another argument with defaults.
+  [#1457](https://github.com/python-attrs/attrs/issues/1457)
+
+
+### Changes
+
+- Values passed to the `__init__()` method of `attrs` classes are now correctly passed to `__attrs_pre_init__()` instead of their default values (in cases where *kw_only* was not specified).
+  [#1427](https://github.com/python-attrs/attrs/issues/1427)
+- Added support for Python 3.14 and [PEP 749](https://peps.python.org/pep-0749/).
+  [#1446](https://github.com/python-attrs/attrs/issues/1446),
+  [#1451](https://github.com/python-attrs/attrs/issues/1451)
+- `attrs.validators.deep_mapping()` now allows to leave out either *key_validator* xor *value_validator*.
+  [#1448](https://github.com/python-attrs/attrs/issues/1448)
+- `attrs.validators.deep_iterator()` and `attrs.validators.deep_mapping()` now accept lists and tuples for all validators and wrap them into a `attrs.validators.and_()`.
+  [#1449](https://github.com/python-attrs/attrs/issues/1449)
+- Added a new **experimental** way to inspect classes:
+
+  `attrs.inspect(cls)` returns the _effective_ class-wide parameters that were used by *attrs* to construct the class.
+
+  The returned class is the same data structure that *attrs* uses internally to decide how to construct the final class.
+  [#1454](https://github.com/python-attrs/attrs/issues/1454)
+- Fixed annotations for `attrs.field(converter=...)`.
+  Previously, a `tuple` of converters was only accepted if it had exactly one element.
+  [#1461](https://github.com/python-attrs/attrs/issues/1461)
+- The performance of `attrs.asdict()` has been improved by 45–260%.
+  [#1463](https://github.com/python-attrs/attrs/issues/1463)
+- The performance of `attrs.astuple()` has been improved by 49–270%.
+  [#1469](https://github.com/python-attrs/attrs/issues/1469)
+- The type annotation for `attrs.validators.or_()` now allows for different types of validators.
+
+  This was only an issue on Pyright.
+  [#1474](https://github.com/python-attrs/attrs/issues/1474)
+
+
+
+---
+
+[Full changelog →](https://www.attrs.org/en/stable/changelog.html)

@@ -1,0 +1,100 @@
+Metadata-Version: 2.4
+Name: platformdirs
+Version: 4.9.2
+Summary: A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`.
+Project-URL: Changelog, https://platformdirs.readthedocs.io/en/latest/changelog.html
+Project-URL: Documentation, https://platformdirs.readthedocs.io
+Project-URL: Homepage, https://github.com/tox-dev/platformdirs
+Project-URL: Source, https://github.com/tox-dev/platformdirs
+Project-URL: Tracker, https://github.com/tox-dev/platformdirs/issues
+Maintainer-email: Bernát Gábor <gaborjbernat@gmail.com>, Julian Berman <Julian@GrayVines.com>, Ofek Lev <oss@ofek.dev>, Ronny Pfannschmidt <opensource@ronnypfannschmidt.de>
+License-Expression: MIT
+License-File: LICENSE
+Keywords: appdirs,application,cache,directory,log,user
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+
+# platformdirs
+
+[![PyPI version](https://badge.fury.io/py/platformdirs.svg)](https://badge.fury.io/py/platformdirs)
+[![Python versions](https://img.shields.io/pypi/pyversions/platformdirs.svg)](https://pypi.python.org/pypi/platformdirs/)
+[![CI](https://github.com/tox-dev/platformdirs/actions/workflows/check.yaml/badge.svg)](https://github.com/platformdirs/platformdirs/actions)
+[![Downloads](https://static.pepy.tech/badge/platformdirs/month)](https://pepy.tech/project/platformdirs)
+
+A Python package for determining platform-specific directories (e.g. user data, config, cache, logs). Handles the
+differences between macOS, Windows, Linux/Unix, and Android so you don't have to.
+
+## Quick start
+
+```python
+from platformdirs import PlatformDirs
+
+dirs = PlatformDirs("MyApp", "MyCompany")
+dirs.user_data_dir  # ~/.local/share/MyApp (Linux)
+dirs.user_config_dir  # ~/.config/MyApp (Linux)
+dirs.user_cache_dir  # ~/.cache/MyApp (Linux)
+dirs.user_state_dir  # ~/.local/state/MyApp (Linux)
+dirs.user_log_dir  # ~/.local/state/MyApp/log (Linux)
+dirs.user_documents_dir  # ~/Documents
+dirs.user_downloads_dir  # ~/Downloads
+dirs.user_runtime_dir  # /run/user/<uid>/MyApp (Linux)
+```
+
+For Path objects instead of strings:
+
+```python
+from platformdirs import PlatformDirs
+
+dirs = PlatformDirs("MyApp", "MyCompany")
+dirs.user_data_path  # pathlib.Path('~/.local/share/MyApp')
+dirs.user_config_path  # pathlib.Path('~/.config/MyApp')
+```
+
+Convenience functions for quick access:
+
+```python
+from platformdirs import user_data_dir, user_config_path
+
+user_data_dir("MyApp", "MyCompany")  # returns str
+user_config_path("MyApp", "MyCompany")  # returns pathlib.Path
+```
+
+## Directory types
+
+- **Data**: Persistent application data (`user_data_dir`, `site_data_dir`)
+- **Config**: Configuration files and settings (`user_config_dir`, `site_config_dir`)
+- **Cache**: Cached data that can be regenerated (`user_cache_dir`, `site_cache_dir`)
+- **State**: Non-essential runtime state like window positions (`user_state_dir`, `site_state_dir`)
+- **Logs**: Log files (`user_log_dir`, `site_log_dir`)
+- **Runtime**: Runtime files like sockets and PIDs (`user_runtime_dir`, `site_runtime_dir`)
+
+Each type has both `user_*` (per-user, writable) and `site_*` (system-wide, read-only for users) variants.
+
+## Documentation
+
+Full documentation is available at [platformdirs.readthedocs.io](https://platformdirs.readthedocs.io):
+
+- **[Getting started tutorial](https://platformdirs.readthedocs.io/en/latest/usage.html)** -- learn core concepts
+  through real-world examples
+- **[How-to guides](https://platformdirs.readthedocs.io/en/latest/howto.html)** -- recipes for common tasks and
+  platform-specific tips
+- **[API reference](https://platformdirs.readthedocs.io/en/latest/api.html)** -- complete list of functions and classes
+- **[Platform details](https://platformdirs.readthedocs.io/en/latest/platforms.html)** -- default paths for each
+  operating system
+
+Contributions are welcome! See [CONTRIBUTING.md](https://github.com/tox-dev/platformdirs/blob/main/CONTRIBUTING.md) for
+details.

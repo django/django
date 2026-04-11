@@ -1,0 +1,565 @@
+/* CSS3_ style sheet for the output of Docutils HTML writers.              */
+/* Rules inspired by Edward Tufte's layout design.                         */
+/*                                                                         */
+/* :Author: Günter Milde                                                   */
+/*          based on tufte.css_ by Dave Liepmann                           */
+/*          and the tufte-latex_ package.                                  */
+/*                                                                         */
+/* :Id: $Id: tuftig.css 10079 2025-04-10 12:01:48Z milde $                                                               */
+/* :Copyright: © 2020 Günter Milde.                                        */
+/* :License: Released under the terms of the `2-Clause BSD license`_,      */
+/*    in short:                                                            */
+/*                                                                         */
+/*    Copying and distribution of this file, with or without modification, */
+/*    are permitted in any medium without royalty provided the copyright   */
+/*    notice and this notice are preserved.                                */
+/*                                                                         */
+/*    This file is offered as-is, without any warranty.                    */
+/*                                                                         */
+/* .. _2-Clause BSD license: http://www.spdx.org/licenses/BSD-2-Clause     */
+/* .. _CSS3: https://www.w3.org/Style/CSS/                                 */
+/* .. _tufte.css: https://edwardtufte.github.io/tufte-css/                 */
+/* .. _tufte-latex_: https://www.ctan.org/pkg/tufte-latex                  */
+
+
+/* General Settings */
+/* ================ */
+
+body {
+  font-family: Georgia, serif;
+  background-color: #fafaf6;
+  font-size: 1.2em;
+  line-height: 1.4;
+  margin: auto;
+}
+main {
+  counter-reset: figure table;
+}
+main, header, footer {
+  padding: 0.5em 5%;
+  background-color: #fefef8;
+  max-width: 100rem;
+}
+
+/* Spacing */
+
+/* vertical space (parskip) */
+p, ol, ul, dl, li,
+h1, h2, h3, h4, h5, h6,
+div.line-block,
+.topic,
+.footnote, .citation,
+table {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+dl > dd {
+  margin-bottom: 0.5em;
+}
+/* exceptions */
+p:first-child {
+  margin-top: 0;
+}
+p:last-child {
+  margin-bottom: 0;
+}
+
+/* Indented Blocks */
+blockquote,
+.topic {
+  /* background-color: Honeydew; */
+  margin: 0.5em 2%;
+  padding-left: 1em;
+}
+div.line-block div.line-block,
+dl.option-list,
+figure > img,
+pre.literal-block, pre.math,
+pre.doctest-block, pre.code {
+  /* background-color: LightCyan; */
+  margin-left: calc(2% + 1em);
+}
+
+/* Object styling */
+/* ============== */
+
+footer, header {
+  font-size: smaller;
+}
+
+/* Titles and Headings */
+
+h2, h3, h4, p.subtitle, p.section-subtitle,
+p.topic-title, p.sidebar-title, p.sidebar-subtitle {
+  font-weight: normal;
+  font-style: italic;
+  text-align: left;
+}
+.sectnum {
+  font-style: normal;
+}
+
+h1.title {
+  text-align: left;
+  margin-top: 2.4em;
+  margin-bottom: 2em;
+  font-size: 2.4em;
+}
+h1 + p.subtitle {
+  margin-top: -2em;
+  margin-bottom: 2em;
+  font-size: 2.0em;
+}
+section {
+  margin-top: 2em;
+}
+h2, .contents > p.topic-title {
+  font-size: 2.2em;
+}
+h2 + p.section-subtitle {
+  font-size: 1.6em;
+}
+h3 {
+  font-size: 1.2em;
+}
+h3 + p.section-subtitle {
+  font-size: 1.1em;
+}
+h4 {
+  font-size: 1em;
+}
+p.section-subtitle {
+  font-size: 1em;
+}
+
+/* Dedication and Abstract */
+div.dedication {
+  padding: 0;
+  margin-left: 0;
+  font-style: italic;
+  font-size: 1.2em;
+}
+/* div.abstract p.topic-title, */
+div.dedication p.topic-title {
+  display: none;
+}
+
+/* Attribution */
+blockquote p.attribution {
+  text-align: right;
+}
+
+/* Table of Contents */
+nav.contents {
+  padding: 0;
+  font-style: italic;
+}
+ul.auto-toc > li > p {
+  padding-left: 1em;
+  text-indent: -1em;
+}
+nav.contents ul {
+  padding-left: 1em;
+}
+
+
+/* Transitions */
+hr {
+  border: 0;
+  border-top: 1px solid #ccc;
+  margin: 1em 10%;
+}
+
+/* Lists */
+/* Less indent per level */
+ul, ol {
+  padding-left: 1.1em;
+}
+dd {
+  margin-left: 1.5em;
+}
+dd > dl:first-child,
+dd > ul:first-child,
+dd > ol:first-child {
+  /* lists nested in definition/description/field lists */
+  clear: left;
+}
+
+dl.field-list > dd,
+dl.docinfo > dd,
+dl.option-list > dd {
+  margin-left: 4em;
+}
+/* example for custom field-name width */
+dl.field-list.narrow > dd {
+  margin-left: 3em;
+}
+/* run-in: start field-body on same line after long field names */
+dl.field-list.run-in > dd p {
+  display: block;
+}
+/* italic field name */
+dl.description > dt,
+dl.field-list > dt,
+dl.docinfo > dt {
+  font-weight: normal;
+  font-style: italic;
+}
+
+/* "description style" like in most dictionaries, encyclopedias etc. */
+dl.description > dt {
+  clear: left;
+  float: left;
+  margin: 0;
+  padding: 0;
+  padding-right: 0.5em;
+}
+dl.description > dd:after {
+  display: block;
+  content: "";
+  clear: both;
+}
+
+/* Citation list (style as description list) */
+.citation-list,
+.footnote-list {
+  display: contents;
+}
+.citation {
+  padding-left: 1.5em;
+}
+.citation .label {
+  margin-left: -1.5em;
+}
+
+/* Images and Figures */
+/* Caption to the left (if there is space) or below: */
+figure {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  margin: 0.5em 2%;
+  padding-left: 1em;
+}
+figure > img,
+figure.fullwidth > img {
+  margin: 0 0.5em 0.5em 0;
+  padding: 0;
+}
+figcaption {
+  font-size: 0.8em;
+}
+.fullwidth > figcaption {
+  font-size: inherit;
+}
+figure.numbered > figcaption > p:before {
+  counter-increment: figure;
+  content: "Figure " counter(figure) ": ";
+}
+
+/* Tables */
+table tr {
+  text-align: left;
+}
+/* th { vertical-align: bottom; } */
+/* "booktabs" style (no vertical lines) */
+table.booktabs {
+  border-top: 2px solid;
+  border-bottom: 2px solid;
+}
+table.booktabs * {
+  border: 0;
+}
+table.booktabs th {
+  border-bottom: thin solid;
+}
+table.numbered > caption:before {
+  counter-increment: table;
+  content: "Table " counter(table) ": ";
+}
+
+/* Admonitions and System Messages */
+.admonition, .system-message {
+  border-style: solid;
+  border-color: silver;
+  border-width: thin;
+  margin: 1em 0;
+  padding: 0.5em;
+}
+.caution p.admonition-title,
+.attention p.admonition-title,
+.danger p.admonition-title,
+.warning p.admonition-title,
+div.error {
+  color: maroon;
+}
+
+/* Literal and Code */
+pre.literal-block, pre.doctest-block,
+pre.math, pre.code {
+  /* font-family: Consolas, "Liberation Mono", Menlo, monospace; */
+  /* font-size: 0.9em; */
+  overflow: auto;
+}
+/* basic highlighting: for a complete scheme, see */
+/* https://docutils.sourceforge.io/sandbox/stylesheets/ */
+pre.code .comment, code .comment { color: #5C6576 }
+pre.code .keyword, code .keyword { color: #3B0D06; font-weight: bold }
+pre.code .literal.string, code .literal.string { color: #0C5404 }
+pre.code .name.builtin, code .name.builtin { color: #352B84 }
+pre.code .deleted, code .deleted { background-color: #DEB0A1}
+pre.code .inserted, code .inserted { background-color: #A3D289}
+
+.sans {
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Lucida Sans", "Noto Sans", sans-serif;
+    letter-spacing: .02em;
+}
+
+/* Hyperlink References */
+/* underline that clears descenders */
+a {
+  color: inherit;
+}
+a:link {
+  text-decoration: underline;
+  /* text-decoration-skip-ink: auto; nonstandard selector */
+}
+/* undecorated links */
+.contents a:link, a.toc-backref:link, a.image-reference:link,
+a[role="doc-noteref"]:link, a[role="doc-backlink"]:link, .backrefs a:link,
+a.citation-reference:link,
+a[href^="#system-message"] {
+  text-decoration: none;
+}
+a:link:hover {
+  text-decoration: underline;
+}
+
+/* Block Alignment */
+/* Let content flow to the side of aligned images and figures */
+/* (does not work if the image/figure is a grid element). */
+
+/* no floats around this elements */
+footer, header,
+hr.docutils,
+h1, h2, h3, .contents > p.topic-title,
+.fullwidth {
+  clear: both;
+}
+
+img.align-left,
+svg.align-left,
+video.align-left,
+figure.align-left,
+div.align-left,
+table.align-left {
+  margin-left: 0;
+  padding-left: 0;
+  padding-right: 0.5em;
+  clear: left;
+  float: left;
+}
+figure.align-left > img {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+img.align-right,
+svg.align-right,
+video.align-right,
+div.align-right {
+  padding-left: 0.5em;
+  clear: right;
+  float: right;
+}
+figure.align-right {
+  clear: right;
+  float: right;
+}
+figure.align-right > img {
+  justify-self: right;
+  padding: 0;
+}
+table.align-right {
+  margin-right: 2.5%;
+}
+
+figure.align-center {
+  align-content: center;
+  justify-content: center;
+}
+figure.align-center > img {
+  padding-left: 0;
+  justify-self: center;
+}
+
+/* Margin Elements */
+/* see below for screen size dependent rules */
+aside.sidebar,
+.marginal,
+.admonition.marginal,
+.topic.marginal {
+  background-color: #efefea;
+  box-sizing: border-box;
+  margin-left: 2%;
+  margin-right: 0;
+  padding: 0.5em;
+  font-size: 0.8em;
+}
+aside.sidebar {
+  background-color: inherit;
+}
+figure.marginal > figcaption {
+  font-size: 1em;
+}
+.footnote {
+  font-size: smaller;
+  overflow: auto;
+}
+
+/* Adaptive page layout */
+
+/* no floating for very small Screens */
+/* (main text up to ca. 40 characters/line) */
+@media (min-width: 35em) {
+  main, header, footer {
+    padding: 0.5em calc(15% - 3rem);
+    line-height: 1.6
+  }
+  aside.sidebar,
+  .marginal,
+  .admonition.marginal,
+  .topic.marginal {
+    max-width: 45%;
+    float: right;
+    clear: right;
+  }
+  dl.field-list > dd,
+  dl.docinfo > dd {
+    margin-left: 6em;
+  }
+  dl.option-list > dd {
+    margin-left: 6em;
+  }
+}
+
+/* 2 column layout with wide margin */
+@media (min-width: 65em) {
+  /* use the same grid for main, all sections, and figures */
+  main, section {
+    display: grid;
+    grid-template-columns: [content] minmax(0, 6fr)
+    			   [margin] 3fr [end];
+    grid-column-gap: calc(3em + 1%);
+  }
+  main > section, section > section {
+    grid-column: 1 / end;
+  }
+  main, header, footer {
+    padding-right: 5%; /* less padding right of margin-column */
+  }
+  section > figure {
+    display: contents; /* to place caption in the margin */
+  }
+  /* Main text elements */
+  main > *, section > *,
+  figure > img,
+  .footnote.align-left, /* override the placement in the margin */
+  .citation.align-left {
+    grid-column: content;
+  }
+  .citation.align-left {
+    font-size: 1em;
+    padding-left: 1.5em;
+  }
+  .citation.align-left .label {
+    margin-left: -1.5em;
+  }
+  figure > img { /* indent */
+    margin: 0.5em 2%;
+    padding-left: 1em;
+  }
+
+  /* Margin Elements */
+  /* Sidebar, Footnotes, Citations, Captions */
+  aside.sidebar,
+  .citation,
+  .footnote,
+  figcaption,
+  /* table > caption,  does not work :(*/
+  .marginal,
+  .admonition.marginal,
+  .topic.marginal {
+    /* color: red; */
+    grid-column: margin;
+    width: auto;
+    max-width: 55em;
+    margin: 0.5em 0;
+    border: none;
+    padding: 0;
+    font-size: 0.8em;
+    text-align: initial; /* overwrite align-* */
+    background-color: inherit;
+  }
+  .admonition.marginal {
+    padding: 0.5em;
+  }
+  figure.marginal {
+    display: block;
+    margin: 0.5em 0;
+  }
+  .citation,
+  .footnote {
+    padding-left: 0;
+  }
+  .citation .label,
+  .footnote .label {
+    margin-left: 0;
+  }
+
+  /* Fullwidth Elements */
+  h1.title, p.subtitle,
+  dl.docinfo,
+  div.abstract,
+  div.dedication,
+  nav.contents,
+  aside.system-message,
+  pre,
+  .fullwidth,
+  .fullwidth img,
+  .fullwidth figcaption {
+    /* background-color: Linen; */
+    grid-column: content / end;
+    margin-right: calc(10% - 3rem);
+    max-width: 55em;
+  }
+}
+
+/* 3 column layout */
+
+@media (min-width: 100em) {
+  main, header, footer {
+    padding-left: 30%;
+  }
+  main > nav.contents {
+    position: fixed;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    width: 25%;
+    height: 100vh;
+    margin: 0;
+    background-color: #fafaf6;
+    padding: 5.5em 2%;
+    overflow: auto;
+  }
+  main > nav.contents > * {
+    padding-left: 0;
+  }
+}
+
+/* wrap URLs */
+/*   a:link {    */
+/*     white-space: normal; */
+/*     hyphens: none;	    */
+/*   }			    */

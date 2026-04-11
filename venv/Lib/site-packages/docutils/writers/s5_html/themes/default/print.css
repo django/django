@@ -1,0 +1,24 @@
+/* This file has been placed in the public domain. */
+/* The following rule is necessary to have all slides appear in print!
+   DO NOT REMOVE IT! */
+.slide, ul {page-break-inside: avoid; visibility: visible !important;}
+h1 {page-break-after: avoid;}
+
+body {font-size: 12pt; background: white;}
+* {color: black;}
+
+#slide0 h1 {font-size: 200%; border: none; margin: 0.5em 0 0.25em;}
+#slide0 h3 {margin: 0; padding: 0;}
+#slide0 h4 {margin: 0 0 0.5em; padding: 0;}
+#slide0 {margin-bottom: 3em;}
+
+#header {display: none;}
+#footer h1 {margin: 0; border-bottom: 1px solid; color: gray;
+  font-style: italic;}
+#footer h2, #controls {display: none;}
+
+.print {display: inline ! important;}
+
+/* The following rule keeps the layout stuff out of print.
+   Remove at your own risk! */
+.layout, .layout * {display: none !important;}
