@@ -484,12 +484,10 @@ class GenericInlineModelAdminTest(SimpleTestCase):
         """
         GenericInlineModelAdmin.get_formset() respects edit_only.
         """
-
         class EditOnlyInline(GenericTabularInline):
             model = Media
-
         ma = EditOnlyInline(Media, self.site)
         formset = ma.get_formset(request, edit_only=True)
-        self.assertTrue(formset.edit_only)
+        self.assertIs(formset.edit_only, True)
         formset = ma.get_formset(request, edit_only=False)
-        self.assertFalse(formset.edit_only)
+        self.assertIs(formset.edit_only, False)
