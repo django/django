@@ -49,7 +49,7 @@ class GDALRasterBase(GDALBase):
             counter = 0
             item = data[counter]
             while item:
-                key, val = item.decode().split("=")
+                key, val = item.decode().split("=", 1)
                 domain_meta[key] = val
                 counter += 1
                 item = data[counter]

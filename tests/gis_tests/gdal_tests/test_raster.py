@@ -374,6 +374,22 @@ class GDALRasterTests(SimpleTestCase):
         source.metadata = metadata
         self.assertNotIn("OWNER", source.metadata["DEFAULT"])
 
+        # Metadata values containing "=" must round-trip correctly.
+        # split("=") without maxsplit raises ValueError when the value
+        # itself contains "="; split("=", 1) preserves them.
+        metadata = {
+            "DEFAULT": {
+                "EQUATION": "x=1",  # single "=" in value
+                "BASE64": "dGVzdA==",  # trailing "==" (base64 padding)
+                "MULTI": "a=b=c",  # multiple "=" in value
+            }
+        }
+        source.metadata = metadata
+        result = source.metadata["DEFAULT"]
+        self.assertEqual(result["EQUATION"], "x=1")
+        self.assertEqual(result["BASE64"], "dGVzdA==")
+        self.assertEqual(result["MULTI"], "a=b=c")
+
     def test_raster_info_accessor(self):
         infos = self.rs.info
         # Data
