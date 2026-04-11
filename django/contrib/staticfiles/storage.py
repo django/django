@@ -297,7 +297,7 @@ class HashedFilesMixin:
                 line = _line_at_position(matchobj.string, matchobj.start())
                 note = f"{name!r} contains this reference {matched!r} on line {line}"
                 exc.add_note(note)
-                raise exc
+                raise
 
             transformed_url = "/".join(
                 url_path.split("/")[:-1] + hashed_url.split("/")[-1:]
