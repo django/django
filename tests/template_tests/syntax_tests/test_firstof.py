@@ -50,6 +50,12 @@ class FirstOfTagTests(SimpleTestCase):
         with self.assertRaises(TemplateSyntaxError):
             self.engine.get_template("firstof09")
 
+    @setup({"firstof09_as": "{% firstof as myvar %}"})
+    def test_firstof09_as(self):
+        msg = "'firstof' statement requires at least one argument before 'as'"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.get_template("firstof09_as")
+
     @setup({"firstof10": "{% firstof a %}"})
     def test_firstof10(self):
         output = self.engine.render_to_string("firstof10", {"a": "<"})
