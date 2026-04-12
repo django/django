@@ -1739,10 +1739,10 @@ class DecimalField(Field):
         self.max_digits, self.decimal_places = max_digits, decimal_places
         if self.max_digits is not None:
             try:
-                max_digits = int(self.max_digits)
-            except (TypeError, ValueError):
+                self.max_digits = int(self.max_digits)
+            except ValueError:
                 raise ValueError("'max_digits' must be a positive integer.")
-            if max_digits <= 0:
+            if self.max_digits <= 0:
                 raise ValueError("'max_digits' must be a positive integer.")
         super().__init__(verbose_name, name, **kwargs)
 
