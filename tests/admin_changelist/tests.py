@@ -820,9 +820,9 @@ class ChangeListTests(TestCase):
         self.assertEqual(cl.queryset.count(), 1)
 
     def test_ordering_null_values(self):
-        c1 = Child.objects.create(name="C1", age=None)
-        c2 = Child.objects.create(name="C2", age=10)
-        c3 = Child.objects.create(name="C3", age=5)
+        Child.objects.create(name="C1", age=None)
+        Child.objects.create(name="C2", age=10)
+        Child.objects.create(name="C3", age=5)
         m = DynamicListDisplayChildAdmin(Child, custom_site)
         request = self.factory.get("/child/", data={ORDER_VAR: "3"})
         request.user = self.superuser
@@ -845,10 +845,10 @@ class ChangeListTests(TestCase):
         g1 = Group.objects.create(name="Group 1")
         g1.members.add(m1)
         g2 = Group.objects.create(name="Empty Group")
-        
+
         m = GroupAdmin(Group, custom_site)
         m.list_filter = ["members"]
-        
+
         request = self.factory.get("/group/", data={"members__isnull": "True"})
         request.user = self.superuser
         cl = m.get_changelist_instance(request)
