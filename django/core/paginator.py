@@ -1,8 +1,8 @@
 import collections.abc
 import inspect
+import traceback
 import warnings
 from math import ceil
-import traceback
 
 from asgiref.sync import sync_to_async
 
