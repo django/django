@@ -800,6 +800,47 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [])
 
+    def test_search_extremely_long_string(self):
+        Group.objects.create(name="The Hype")
+        m = GroupAdmin(Group, custom_site)
+        m.search_fields = ["name"]
+        long_string = "a" * 10000
+        request = self.factory.get("/group/", data={SEARCH_VAR: long_string})
+        request.user = self.superuser
+        cl = m.get_changelist_instance(request)
+        self.assertEqual(cl.queryset.count(), 0)
+
+    def test_search_whitespace_only(self):
+        Group.objects.create(name="The Hype")
+        m = GroupAdmin(Group, custom_site)
+        m.search_fields = ["name"]
+        request = self.factory.get("/group/", data={SEARCH_VAR: "   "})
+        request.user = self.superuser
+        cl = m.get_changelist_instance(request)
+        self.assertEqual(cl.queryset.count(), 1)
+
+    def test_ordering_null_values(self):
+        Child.objects.create(name="C1", age=None)
+        Child.objects.create(name="C2", age=10)
+        Child.objects.create(name="C3", age=5)
+        m = DynamicListDisplayChildAdmin(Child, custom_site)
+        request = self.factory.get("/child/", data={ORDER_VAR: "3"})
+        request.user = self.superuser
+        cl = m.get_changelist_instance(request)
+        cl.get_results(request)
+        results = list(cl.result_list)
+        self.assertEqual(len(results), 3)
+
+    def test_list_filter_empty_m2m(self):
+        Group.objects.create(name="Empty Group")
+        m = GroupAdmin(Group, custom_site)
+        m.list_filter = ["members"]
+        request = self.factory.get("/group/", data={"members": "0"})
+        request.user = self.superuser
+        cl = m.get_changelist_instance(request)
+        cl.get_results(request)
+        self.assertEqual(cl.result_count, 0)
+
     def test_custom_lookup_in_search_fields(self):
         band = Group.objects.create(name="The Hype")
         concert = Concert.objects.create(name="Woodstock", group=band)
