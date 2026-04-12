@@ -2,7 +2,7 @@ import collections.abc
 import inspect
 import warnings
 from math import ceil
-
+import traceback
 from asgiref.sync import sync_to_async
 
 from django.utils.deprecation import RemovedInDjango70Warning
@@ -67,7 +67,7 @@ class BasePaginator:
                 "per_page argument is deprecated. This will raise a ValueError in "
                 "Django 7.0."
             )
-            warnings.warn(msg, category=RemovedInDjango70Warning, stacklevel=2)
+            warnings.warn(msg, category=RemovedInDjango70Warning,stacklevel=2)
 
     def _check_object_list_is_ordered(self):
         """
@@ -83,12 +83,14 @@ class BasePaginator:
                 else "{!r}".format(self.object_list)
             )
             warnings.warn(
-                "Pagination may yield inconsistent results with an unordered "
-                "object_list: {}.".format(obj_list_repr),
-                UnorderedObjectListWarning,
-                stacklevel=3,
-            )
-
+    "Pagination may yield inconsistent results with an unordered "
+    "object_list: {}.\nCalled from:\n{}".format(
+        obj_list_repr,
+        "".join(traceback.format_stack(limit=5)),
+    ),
+    UnorderedObjectListWarning,
+    stacklevel=3
+)
     def _get_elided_page_range(
         self, number, num_pages, page_range, on_each_side=3, on_ends=2
     ):
