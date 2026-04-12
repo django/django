@@ -7889,6 +7889,19 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
             response = self.client.get(url)
         self.assertContains(response, "legacy readonly output from admin view")
 
+    def test_admin_change_view_handles_read_only_attribute_errors(self):
+        post = FieldOverridePost.objects.create(title="Post title", content="content")
+        url = reverse(
+            "namespaced_admin:admin_views_fieldoverridepost_change", args=(post.pk,)
+        )
+        with warnings.catch_warnings(record=True) as warned:
+            warnings.simplefilter("always")
+            response = self.client.get(url)
+        self.assertContains(response, "Post title")
+        self.assertFalse(
+            any(isinstance(w.message, RemovedInDjango70Warning) for w in warned)
+        )
+
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class LimitChoicesToInAdminTest(TestCase):

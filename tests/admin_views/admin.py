@@ -685,6 +685,31 @@ class LegacyReadonlyPostAdmin(admin.ModelAdmin):
     readonly_fields = ("title",)
 
 
+class LegacyReadonlyWidgetError(forms.TextInput):
+    @property
+    def read_only(self):
+        raise NotImplementedError
+
+
+class LegacyReadonlyErrorPostForm(forms.ModelForm):
+    class Meta:
+        model = FieldOverridePost
+        fields = ["title", "content"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["title"] = forms.CharField(
+            required=False,
+            widget=LegacyReadonlyWidgetError,
+            initial=self.instance.title,
+        )
+
+
+class LegacyReadonlyErrorPostAdmin(admin.ModelAdmin):
+    form = LegacyReadonlyErrorPostForm
+    readonly_fields = ("title",)
+
+
 class CustomChangeList(ChangeList):
     def get_queryset(self, request):
         return self.root_queryset.order_by("pk").filter(pk=9999)  # Doesn't exist
@@ -1396,6 +1421,7 @@ site2.register(Person, save_as_continue=False)
 site2.register(ReadOnlyRelatedField, ReadOnlyRelatedFieldAdmin)
 site2.register(Language)
 site2.register(Post, LegacyReadonlyPostAdmin)
+site2.register(FieldOverridePost, LegacyReadonlyErrorPostAdmin)
 
 site7 = admin.AdminSite(name="admin7")
 site7.register(Article, ArticleAdmin2)
