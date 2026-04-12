@@ -1,5 +1,4 @@
 from django import forms
-from django.contrib.gis.gdal import GDALException
 from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -41,10 +40,7 @@ class GeometryField(forms.Field):
 
         if not isinstance(value, GEOSGeometry):
             if hasattr(self.widget, "deserialize"):
-                try:
-                    value = self.widget.deserialize(value)
-                except GDALException:
-                    value = None
+                value = self.widget.deserialize(value)
             else:
                 try:
                     value = GEOSGeometry(value)

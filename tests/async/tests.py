@@ -1,8 +1,9 @@
 import asyncio
 import os
+from inspect import iscoroutinefunction
 from unittest import mock
 
-from asgiref.sync import async_to_sync, iscoroutinefunction
+from asgiref.sync import async_to_sync
 
 from django.core.cache import DEFAULT_CACHE_ALIAS, caches
 from django.core.exceptions import ImproperlyConfigured, SynchronousOnlyOperation

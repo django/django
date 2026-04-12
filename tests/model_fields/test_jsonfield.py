@@ -40,7 +40,7 @@ from django.db.models.fields.json import (
     KeyTransformFactory,
     KeyTransformTextLookupMixin,
 )
-from django.db.models.functions import Cast
+from django.db.models.functions import Cast, Coalesce
 from django.test import (
     SimpleTestCase,
     TestCase,
@@ -364,14 +364,14 @@ class TestQuerying(TestCase):
                 "bax": {"foo": "bar"},
             },
         ]
-        cls.objs = [NullableJSONModel.objects.create(value=value) for value in values]
+        objs = [NullableJSONModel(value=value) for value in values]
         if connection.features.supports_primitives_in_json_field:
-            cls.objs.extend(
-                [
-                    NullableJSONModel.objects.create(value=value)
-                    for value in cls.primitives
-                ]
-            )
+            objs.extend([NullableJSONModel(value=value) for value in cls.primitives])
+        objs = NullableJSONModel.objects.bulk_create(objs)
+        # Some backends don't return primary keys after bulk_create.
+        if any(obj.pk is None for obj in objs):
+            objs = list(NullableJSONModel.objects.order_by("id"))
+        cls.objs = objs
         cls.raw_sql = "%s::jsonb" if connection.vendor == "postgresql" else "%s"
 
     def test_exact(self):
@@ -779,6 +779,12 @@ class TestQuerying(TestCase):
     def test_none_key(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__j=None),
+            [self.objs[4]],
+        )
+
+    def test_key_iexact_none(self):
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value__j__iexact=None),
             [self.objs[4]],
         )
 
@@ -1283,6 +1289,49 @@ class TestQuerying(TestCase):
             data__foo="bar"
         )
         self.assertQuerySetEqual(qs, all_objects)
+
+    @skipUnlessDBFeature("supports_primitives_in_json_field")
+    def test_json_type_casting_with_coalesce(self):
+        RelatedJSONModel.objects.create(
+            summary='"This is valid JSON primitive."',
+            value={"text": "test"},
+            json_model=self.objs[4],
+        )
+        result = RelatedJSONModel.objects.annotate(
+            coalesced_value=Coalesce(
+                Cast("summary", JSONField()), "value", output_field=JSONField()
+            )
+        ).first()
+        self.assertEqual(result.coalesced_value, "This is valid JSON primitive.")
+
+    def test_numeric_lookups_with_expression(self):
+        obj_greater = NullableJSONModel.objects.create(
+            value={"target": 5, "comparison": 2}
+        )
+        obj_lesser = NullableJSONModel.objects.create(
+            value={"target": 2, "comparison": 5}
+        )
+        obj_equal = NullableJSONModel.objects.create(
+            value={"target": 2, "comparison": 2}
+        )
+        objs = [obj_greater.pk, obj_lesser.pk, obj_equal.pk]
+
+        tests = [
+            ("gt", [obj_greater]),
+            ("lt", [obj_lesser]),
+            ("gte", [obj_greater, obj_equal]),
+            ("lte", [obj_lesser, obj_equal]),
+        ]
+
+        for lookup, expected in tests:
+            with self.subTest(lookup=lookup):
+                self.assertCountEqual(
+                    NullableJSONModel.objects.filter(
+                        id__in=objs,
+                        **{f"value__target__{lookup}": F("value__comparison")},
+                    ),
+                    expected,
+                )
 
 
 @skipUnlessDBFeature("supports_primitives_in_json_field")

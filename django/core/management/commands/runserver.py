@@ -184,7 +184,8 @@ class Command(BaseCommand):
         print(
             f"{now}\n"
             f"Django version {version}, using settings {settings.SETTINGS_MODULE!r}\n"
-            f"Starting development server at {self.protocol}://{addr}:{server_port}/\n"
+            f"Starting WSGI development server at {self.protocol}://{addr}"
+            f":{server_port}/\n"
             f"Quit the server with {quit_command}.",
             file=self.stdout,
         )

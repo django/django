@@ -95,6 +95,26 @@ Minor features
 * The admin site login view now redirects authenticated users to the next URL,
   if available, instead of always redirecting to the admin index page.
 
+* The admin's ``FilteredSelectMultiple`` widget now uses ``<optgroup>``\s to
+  preserve :ref:`named groups <field-choices-named-groups>` (e.g.
+  ``choices=[("Group", [("1", "Item")]), ...]``).
+
+* In order to improve accessibility of the admin change forms:
+
+  * Form fields are now shown below their respective labels instead of next to
+    them.
+
+  * Help text is now shown after the field label and before the field input.
+
+  * Validation errors are now shown after the help text and before the field
+    input.
+
+  * Checkboxes are an exception to the above changes and continue to be
+    displayed in their original layout.
+
+* :attr:`~django.contrib.admin.ModelAdmin.list_display` now uses boolean icons
+  for boolean fields on related models.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -105,6 +125,12 @@ Minor features
 
 * The default iteration count for the PBKDF2 password hasher is increased from
   1,200,000 to 1,500,000.
+
+* :attr:`.Permission.name` and :attr:`.Permission.codename` values are now
+  renamed when renaming models via a migration.
+
+* The new :attr:`.Permission.user_perm_str` property returns the string
+  suitable to use with :meth:`.User.has_perm`.
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -135,6 +161,9 @@ Minor features
   :class:`~django.contrib.postgres.fields.HStoreField` when ``psycopg`` 3.2+ is
   installed and ``django.contrib.postgres`` is in :setting:`INSTALLED_APPS`.
 
+* :class:`~django.contrib.postgres.constraints.ExclusionConstraint` now
+  supports the Hash index type.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -143,7 +172,9 @@ Minor features
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :class:`~django.contrib.sessions.backends.base.SessionBase` now supports
+  boolean evaluation via
+  :meth:`~django.contrib.sessions.backends.base.SessionBase.__bool__`.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -235,7 +266,7 @@ Management Commands
 
 * Management commands now set :class:`~argparse.ArgumentParser`\'s
   ``suggest_on_error`` argument to ``True`` by default on Python 3.14, enabling
-  suggestions for mistyped subcommand names and argument choices.
+  suggestions for incorrectly typed subcommand names and argument choices.
 
 * The :djadmin:`loaddata` command now calls
   :data:`~django.db.models.signals.m2m_changed` signals with ``raw=True`` when
@@ -277,6 +308,13 @@ Models
 * The :data:`~django.db.models.signals.m2m_changed` signal now receives a
   ``raw`` argument.
 
+* :class:`~django.db.models.StringAgg` now supports ``distinct=True`` on SQLite
+  when using the default delimiter ``Value(",")`` only.
+
+* The new :attr:`.QuerySet.totally_ordered` property returns ``True`` if the
+  :class:`~django.db.models.query.QuerySet` is ordered and the ordering is
+  deterministic.
+
 Pagination
 ~~~~~~~~~~
 
@@ -285,7 +323,8 @@ Pagination
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :attr:`HttpRequest.multipart_parser_class <django.http.HttpRequest.multipart_parser_class>`
+  can now be customized to use a different multipart parser class.
 
 Security
 ~~~~~~~~
@@ -300,6 +339,10 @@ Serialization
   ``()``. This ensures primary keys are serialized when using
   :option:`dumpdata --natural-primary`.
 
+* The XML deserializer now raises
+  :exc:`~django.core.exceptions.SuspiciousOperation` when it encounters
+  unexpected nested tags.
+
 Signals
 ~~~~~~~
 
@@ -308,7 +351,9 @@ Signals
 Tasks
 ~~~~~
 
-* ...
+* The :func:`~django.tasks.task` decorator now accepts ``**kwargs``, which are
+  forwarded to the backend's
+  :attr:`~django.tasks.backends.base.BaseTaskBackend.task_class`.
 
 Templates
 ~~~~~~~~~
@@ -318,7 +363,11 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* :meth:`~django.test.SimpleTestCase.assertContains` and
+  :meth:`~django.test.SimpleTestCase.assertNotContains` can now be called
+  multiple times on the same :class:`~django.http.StreamingHttpResponse`.
+  Previously, they would consume the streaming response's content, causing
+  subsequent calls to fail.
 
 URLs
 ~~~~
@@ -329,7 +378,7 @@ Utilities
 ~~~~~~~~~
 
 * :func:`~django.utils.dateparse.parse_duration` now supports ISO 8601
-  durations expressed in weeks (``PnW``).
+  time periods expressed in weeks (``PnW``).
 
 Validators
 ~~~~~~~~~~
@@ -356,12 +405,34 @@ backends.
   ``db_on_delete``) as values. ``db_on_delete`` is one of the database-level
   delete options e.g. :attr:`~django.db.models.DB_CASCADE`.
 
+* Set the new ``DatabaseFeatures.supports_inspectdb`` attribute to ``False``
+  if the management command isn't supported.
+
+* The ``DatabaseFeatures.prohibits_dollar_signs_in_column_aliases`` feature
+  flag is removed.
+
+* The ``DatabaseOperations.binary_placeholder_sql()`` method now expects a
+  query compiler as an extra positional argument and should return a
+  two-elements tuple composed of an SQL format string and a tuple of associated
+  parameters.
+
+* The ``BaseSpatialOperations.get_geom_placeholder()`` method is renamed to
+  ``get_geom_placeholder_sql`` and is expected to return a two-elements tuple
+  composed of an SQL format string and a tuple of associated parameters.
+
+:mod:`django.contrib.admin`
+---------------------------
+
+* The ``wide`` class is removed, as it was made obsolete by the new layout.
+
+* The ``object-tools`` block is hoisted out of the ``content`` block in forms.
+
 :mod:`django.contrib.gis`
 -------------------------
 
 * Support for PostGIS 3.1 is removed.
 
-* Support for GEOS 3.8 is removed.
+* Support for GEOS 3.8 and 3.9 is removed.
 
 * Support for GDAL 3.1 and 3.2 is removed.
 
@@ -373,6 +444,16 @@ backends.
   :class:`~django.db.models.JSONField` base field are now saved as SQL ``NULL``
   instead of the JSON ``null`` primitive. This matches the behavior of a
   standalone :class:`~django.db.models.JSONField` when storing ``None`` values.
+
+Models
+------
+
+* SQL ``SELECT`` aliases originating from :meth:`.QuerySet.annotate`
+  calls as well as table and ``JOIN`` aliases are now systematically quoted to
+  prevent special character collisions. Because quoted aliases are
+  case-sensitive, *raw* SQL references to aliases mixing case, such as when
+  using :class:`.RawSQL`, might have to be adjusted to also make use of
+  quoting.
 
 System checks
 -------------
@@ -392,13 +473,32 @@ Dropped support for MySQL < 8.4
 Upstream support for MySQL 8.0 ends in April 2026, and MySQL 8.1-8.3 are
 short-term innovation releases. Django 6.1 supports MySQL 8.4 and higher.
 
+Dropped support for MariaDB < 10.11
+-----------------------------------
+
+Upstream support for MariaDB 10.6 ends in July 2026, and MariaDB 10.7-10.10 are
+short-term maintenance releases. Django 6.1 supports MariaDB 10.11 and higher.
+
 Miscellaneous
 -------------
+
+* Providing ``fail_silently=True``, ``auth_user``, or ``auth_password`` to mail
+  sending functions (such as :func:`~django.core.mail.send_mail`) while also
+  providing a ``connection`` now raises a ``TypeError``.
 
 * :class:`~django.contrib.contenttypes.fields.GenericForeignKey` now uses a
   separate descriptor class: the private ``GenericForeignKeyDescriptor``.
 
 * The minimum supported version of SQLite is increased from 3.31.0 to 3.37.0.
+
+* The :lookup:`iexact=None <iexact>` lookup on
+  :class:`~django.db.models.JSONField` key transforms now matches JSON
+  ``null``, to match the behavior of :lookup:`exact=None <exact>` on key
+  transforms. Previously, it was interpreted as an :lookup:`isnull` lookup.
+
+* :meth:`~.QuerySet.first` and :meth:`~.QuerySet.last` no longer order by the
+  primary key when a ``QuerySet``'s ordering has been forcibly cleared by
+  calling :meth:`~.QuerySet.order_by` with no arguments.
 
 .. _deprecated-features-6.1:
 
@@ -418,6 +518,19 @@ Miscellaneous
   of the deprecation period, ``None`` values compile to SQL ``IS NULL`` when
   used as the top-level value. :lookup:`Key and index lookups <jsonfield.key>`
   are unaffected by this deprecation.
+
+* The undocumented ``get_placeholder`` method of
+  :class:`~django.db.models.Field` is deprecated in favor of the newly
+  introduced ``get_placeholder_sql`` method, which has the same input signature
+  but is expected to return a two-elements tuple composed of an SQL format
+  string and a tuple of associated parameters. This method should now expect
+  to be provided expressions meant to be compiled via the provided ``compiler``
+  argument.
+
+* The ``quote_name_unless_alias()`` method of ``SQLCompiler``, the type of
+  object passed as the ``compiler`` argument to the ``as_sql()`` method of
+  :ref:`expressions <writing-your-own-query-expressions>`, is deprecated in
+  favor of the newly introduced ``quote_name()`` method.
 
 Features removed in 6.1
 =======================

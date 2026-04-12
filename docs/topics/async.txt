@@ -28,9 +28,9 @@ class-based view, this means declaring the HTTP method handlers, such as
 
 .. note::
 
-    Django uses ``asgiref.sync.iscoroutinefunction`` to test if your view is
+    Django uses ``inspect.iscoroutinefunction`` to test if your view is
     asynchronous or not. If you implement your own method of returning a
-    coroutine, ensure you use ``asgiref.sync.markcoroutinefunction`` so this
+    coroutine, ensure you use ``inspect.markcoroutinefunction`` so this
     function returns ``True``.
 
 Under a WSGI server, async views will run in their own, one-off event loop.

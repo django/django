@@ -44,10 +44,10 @@ class Command(BaseCommand):
         )
 
     def handle(self, **options):
-        try:
+        if connections[options["database"]].features.supports_inspectdb:
             for line in self.handle_inspection(options):
                 self.stdout.write(line)
-        except NotImplementedError:
+        else:
             raise CommandError(
                 "Database inspection isn't supported for the currently selected "
                 "database backend."

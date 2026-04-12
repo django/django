@@ -155,6 +155,7 @@ class TestConnectionOnCommit(TransactionTestCase):
             self.assertNotified([])
         self.assertDone([1])
 
+    @skipUnlessDBFeature("uses_savepoints")
     def test_discards_hooks_from_rolled_back_savepoint(self):
         with transaction.atomic():
             # one successful savepoint
@@ -186,6 +187,7 @@ class TestConnectionOnCommit(TransactionTestCase):
 
         self.assertDone([])
 
+    @skipUnlessDBFeature("uses_savepoints")
     def test_inner_savepoint_rolled_back_with_outer(self):
         with transaction.atomic():
             try:
@@ -211,6 +213,7 @@ class TestConnectionOnCommit(TransactionTestCase):
 
         self.assertDone([])
 
+    @skipUnlessDBFeature("uses_savepoints")
     def test_inner_savepoint_does_not_affect_outer(self):
         with transaction.atomic():
             with transaction.atomic():

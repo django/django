@@ -4,8 +4,7 @@ Decorators for views based on HTTP headers.
 
 import datetime
 from functools import wraps
-
-from asgiref.sync import iscoroutinefunction
+from inspect import iscoroutinefunction
 
 from django.http import HttpResponseNotAllowed
 from django.middleware.http import ConditionalGetMiddleware

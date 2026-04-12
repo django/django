@@ -203,4 +203,4 @@ class CSPSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
             (r["csp-report"]["document-uri"], r["csp-report"]["violated-directive"])
             for r in csp_reports
         )
-        self.assertEqual(reports, [(url, "img-src"), (url, "style-src-elem")])
+        self.assertEqual(reports, [(url, "style-src-elem")])

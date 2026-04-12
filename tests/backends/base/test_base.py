@@ -93,6 +93,7 @@ class DatabaseWrapperTests(SimpleTestCase):
         self.assertEqual(gc.garbage, [])
 
 
+@skipUnlessDBFeature("supports_transactions")
 class DatabaseWrapperLoggingTests(TransactionTestCase):
     available_apps = ["backends"]
 

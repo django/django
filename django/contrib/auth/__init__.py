@@ -1,4 +1,3 @@
-import inspect
 import re
 
 from django.apps import apps as django_apps
@@ -6,6 +5,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.middleware.csrf import rotate_token
 from django.utils.crypto import constant_time_compare
+from django.utils.inspect import signature
 from django.utils.module_loading import import_string
 from django.views.decorators.debug import sensitive_variables
 
@@ -40,7 +40,7 @@ def get_backends():
 
 def _get_compatible_backends(request, **credentials):
     for backend, backend_path in _get_backends(return_tuples=True):
-        backend_signature = inspect.signature(backend.authenticate)
+        backend_signature = signature(backend.authenticate)
         try:
             backend_signature.bind(request, **credentials)
         except TypeError:
@@ -205,6 +205,8 @@ async def alogin(request, user, backend=None):
     await request.session.aset(SESSION_KEY, user._meta.pk.value_to_string(user))
     await request.session.aset(BACKEND_SESSION_KEY, backend)
     await request.session.aset(HASH_SESSION_KEY, session_auth_hash)
+    if hasattr(request, "user"):
+        request.user = user
     if hasattr(request, "auser"):
 
         async def auser():
@@ -244,13 +246,21 @@ async def alogout(request):
             user = None
     await user_logged_out.asend(sender=user.__class__, request=request, user=user)
     await request.session.aflush()
-    if hasattr(request, "auser"):
+
+    has_user = hasattr(request, "user")
+    has_auser = hasattr(request, "auser")
+    if has_user or has_auser:
         from django.contrib.auth.models import AnonymousUser
 
-        async def auser():
-            return AnonymousUser()
+        anon = AnonymousUser()
+        if has_user:
+            request.user = anon
+        if has_auser:
 
-        request.auser = auser
+            async def auser():
+                return anon
+
+            request.auser = auser
 
 
 def get_user_model():

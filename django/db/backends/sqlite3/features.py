@@ -157,6 +157,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         32766) or lowered per connection at run-time with
         setlimit(SQLITE_LIMIT_VARIABLE_NUMBER, N).
         """
+        self.connection.ensure_connection()
         return self.connection.connection.getlimit(sqlite3.SQLITE_LIMIT_VARIABLE_NUMBER)
 
     @cached_property

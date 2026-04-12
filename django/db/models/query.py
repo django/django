@@ -26,10 +26,10 @@ from django.db import (
 from django.db.models import AutoField, DateField, DateTimeField, Field, Max, sql
 from django.db.models.constants import LOOKUP_SEP, OnConflict
 from django.db.models.deletion import Collector
-from django.db.models.expressions import Case, DatabaseDefault, F, Value, When
+from django.db.models.expressions import Case, DatabaseDefault, F, OrderBy, Value, When
 from django.db.models.fetch_modes import FETCH_ONE
 from django.db.models.functions import Cast, Trunc
-from django.db.models.query_utils import FilteredRelation, Q
+from django.db.models.query_utils import PROHIBITED_FILTER_KWARGS, FilteredRelation, Q
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, ROW_COUNT
 from django.db.models.utils import (
     AltersData,
@@ -45,8 +45,6 @@ MAX_GET_RESULTS = 21
 
 # The maximum number of items to display in a QuerySet.__repr__
 REPR_OUTPUT_SIZE = 20
-
-PROHIBITED_FILTER_KWARGS = frozenset(["_connector", "_negated"])
 
 
 class BaseIterable:
@@ -114,16 +112,15 @@ class ModelIterable(BaseIterable):
             (
                 field,
                 related_objs,
-                operator.attrgetter(
-                    *[
-                        (
-                            field.attname
-                            if from_field == "self"
-                            else queryset.model._meta.get_field(from_field).attname
-                        )
-                        for from_field in field.from_fields
-                    ]
-                ),
+                attnames := [
+                    (
+                        field.attname
+                        if from_field == "self"
+                        else queryset.model._meta.get_field(from_field).attname
+                    )
+                    for from_field in field.from_fields
+                ],
+                operator.attrgetter(*attnames),
             )
             for field, related_objs in queryset._known_related_objects.items()
         ]
@@ -145,9 +142,13 @@ class ModelIterable(BaseIterable):
                     setattr(obj, attr_name, row[col_pos])
 
             # Add the known related objects to the model.
-            for field, rel_objs, rel_getter in known_related_objects:
+            for field, rel_objs, rel_attnames, rel_getter in known_related_objects:
                 # Avoid overwriting objects loaded by, e.g., select_related().
                 if field.is_cached(obj):
+                    continue
+                # Avoid fetching potentially deferred attributes that would
+                # result in unexpected queries.
+                if any(attname not in obj.__dict__ for attname in rel_attnames):
                     continue
                 rel_obj_id = rel_getter(obj)
                 try:
@@ -297,6 +298,28 @@ class FlatValuesListIterable(BaseIterable):
             yield row[0]
 
 
+class PreventQuerySetCloning:
+    """
+    Temporarily prevent the given QuerySet from creating new QuerySet instances
+    on each mutating operation (e.g: filter(), exclude() etc), instead
+    modifying the QuerySet in-place.
+
+    @contextlib.contextmanager is intentionally not used for performance
+    reasons.
+    """
+
+    __slots__ = ("queryset",)
+
+    def __init__(self, queryset):
+        self.queryset = queryset
+
+    def __enter__(self):
+        return self.queryset._disable_cloning()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.queryset._enable_cloning()
+
+
 class QuerySet(AltersData):
     """Represent a lazy database lookup for a set of objects."""
 
@@ -316,6 +339,7 @@ class QuerySet(AltersData):
         self._fields = None
         self._defer_next_filter = False
         self._deferred_filter = None
+        self._cloning_enabled = True
 
     @property
     def query(self):
@@ -1155,7 +1179,7 @@ class QuerySet(AltersData):
 
     def first(self):
         """Return the first object of a query or None if no match is found."""
-        if self.ordered:
+        if self.ordered or not self.query.default_ordering:
             queryset = self
         else:
             self._check_ordering_first_last_queryset_aggregation(method="first")
@@ -1168,7 +1192,7 @@ class QuerySet(AltersData):
 
     def last(self):
         """Return the last object of a query or None if no match is found."""
-        if self.ordered:
+        if self.ordered or not self.query.default_ordering:
             queryset = self.reverse()
         else:
             self._check_ordering_first_last_queryset_aggregation(method="last")
@@ -1676,6 +1700,7 @@ class QuerySet(AltersData):
         clone = self._chain()
         # Clear limits and ordering so they can be reapplied
         clone.query.clear_ordering(force=True)
+        clone.query.default_ordering = True
         clone.query.clear_limits()
         clone.query.combined_queries = (self.query, *(qs.query for qs in other_qs))
         clone.query.combinator = combinator
@@ -1971,6 +1996,80 @@ class QuerySet(AltersData):
             return False
 
     @property
+    def totally_ordered(self):
+        """
+        Returns True if the QuerySet is ordered and the ordering is
+        deterministic. This requires that the ordering includes a field
+        (or set of fields) that is unique and non-nullable.
+
+        For queries involving a GROUP BY clause, the model's default
+        ordering is ignored. Ordering specified via .extra(order_by=...)
+        is also ignored.
+        """
+        if not self.ordered:
+            return False
+        ordering = self.query.order_by
+        if not ordering and self.query.default_ordering:
+            ordering = self.query.get_meta().ordering
+        if not ordering:
+            return False
+        opts = self.model._meta
+        pk_fields = {f.attname for f in opts.pk_fields}
+        ordering_fields = set()
+        for part in ordering:
+            # Search for single field providing a total ordering.
+            field_name = None
+            if isinstance(part, str):
+                field_name = part.lstrip("-")
+            elif isinstance(part, F):
+                field_name = part.name
+            elif isinstance(part, OrderBy) and isinstance(part.expression, F):
+                field_name = part.expression.name
+            if field_name:
+                if field_name == "pk":
+                    return True
+                # Normalize attname references by using get_field().
+                try:
+                    field = opts.get_field(field_name)
+                except exceptions.FieldDoesNotExist:
+                    # Could be "?" for random ordering or a related field
+                    # lookup. Skip this part of introspection for now.
+                    continue
+                # Ordering by a related field name orders by the referenced
+                # model's ordering. Skip this part of introspection for now.
+                if field.remote_field and field_name == field.name:
+                    continue
+                if field.attname in pk_fields and len(pk_fields) == 1:
+                    return True
+                if field.unique and not field.null:
+                    return True
+                ordering_fields.add(field.attname)
+
+        # Account for members of a CompositePrimaryKey.
+        if ordering_fields.issuperset(pk_fields):
+            return True
+        # No single total ordering field, try unique_together and total
+        # unique constraints.
+        constraint_field_names = (
+            *opts.unique_together,
+            *(constraint.fields for constraint in opts.total_unique_constraints),
+        )
+        for field_names in constraint_field_names:
+            # Normalize attname references by using get_field().
+            try:
+                fields = [opts.get_field(field_name) for field_name in field_names]
+            except exceptions.FieldDoesNotExist:
+                continue
+            # Composite unique constraints containing a nullable column
+            # cannot ensure total ordering.
+            if any(field.null for field in fields):
+                continue
+            if ordering_fields.issuperset(field.attname for field in fields):
+                return True
+
+        return False
+
+    @property
     def db(self):
         """Return the database used if this query is executed now."""
         if self._for_write:
@@ -2056,12 +2155,50 @@ class QuerySet(AltersData):
                 )
         return inserted_rows
 
+    def _disable_cloning(self):
+        """
+        Prevent calls to _chain() from creating a new QuerySet via _clone().
+        All subsequent QuerySet mutations will occur on this instance until
+        _enable_cloning() is used.
+        """
+        self._cloning_enabled = False
+        return self
+
+    def _enable_cloning(self):
+        """
+        Allow calls to _chain() to create a new QuerySet via _clone(). Restores
+        the default behavior where any QuerySet mutation will return a new
+        QuerySet instance. Necessary only when there has been a
+        _disable_cloning() call previously.
+        """
+        self._cloning_enabled = True
+        return self
+
+    def _avoid_cloning(self):
+        """
+        Temporarily prevent QuerySet _clone() operations, restoring the default
+        behavior on exit. For the duration of the context managed statement,
+        all operations (e.g. filter(), exclude(), etc.) will mutate the same
+        QuerySet instance.
+
+        @contextlib.contextmanager is intentionally not used for performance
+        reasons.
+        """
+        return PreventQuerySetCloning(self)
+
     def _chain(self):
         """
         Return a copy of the current QuerySet that's ready for another
         operation.
+
+        If the QuerySet has opted in to in-place mutations via
+        _disable_cloning() temporarily, the copy doesn't occur and instead the
+        same QuerySet instance will be modified.
         """
-        obj = self._clone()
+        if not self._cloning_enabled:
+            obj = self
+        else:
+            obj = self._clone()
         if obj._sticky_filter:
             obj.query.filter_is_sticky = True
             obj._sticky_filter = False
@@ -2767,7 +2904,7 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
             else:
                 manager = getattr(obj, to_attr)
                 if leaf and lookup.queryset is not None:
-                    qs = manager._apply_rel_filters(lookup.queryset)
+                    qs = manager._apply_rel_filters(lookup.queryset._chain())
                 else:
                     qs = manager.get_queryset()
                 qs._result_cache = vals

@@ -29,7 +29,7 @@ from django.forms import (
     ValidationError,
     formset_factory,
 )
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.template import Context, Template
 from django.template.loader import render_to_string
 from django.test import (
@@ -710,20 +710,16 @@ class HTMLEqualTests(SimpleTestCase):
 
     def test_parse_html_in_script(self):
         parse_html('<script>var a = "<p" + ">";</script>')
-        parse_html(
-            """
+        parse_html("""
             <script>
             var js_sha_link='<p>***</p>';
             </script>
-        """
-        )
+        """)
 
         # script content will be parsed to text
-        dom = parse_html(
-            """
+        dom = parse_html("""
             <script><p>foo</p> '</scr'+'ipt>' <span>bar</span></script>
-        """
-        )
+        """)
         self.assertEqual(len(dom.children), 1)
         self.assertEqual(dom.children[0], "<p>foo</p> '</scr'+'ipt>' <span>bar</span>")
 
@@ -1022,12 +1018,10 @@ class HTMLEqualTests(SimpleTestCase):
             self.assertHTMLEqual("<p><foo></p>", "<p>&#60;foo&#62;</p>")
 
     def test_contains_html(self):
-        response = HttpResponse(
-            """<body>
+        response = HttpResponse("""<body>
         This is a form: <form method="get">
             <input type="text" name="Hello" />
-        </form></body>"""
-        )
+        </form></body>""")
 
         self.assertNotContains(response, "<input name='Hello' type='text'>")
         self.assertContains(response, '<form method="get">')
@@ -1052,6 +1046,17 @@ class HTMLEqualTests(SimpleTestCase):
             '<p class="help">Some help text for the title (with Unicode ŠĐĆŽćžšđ)</p>',
             html=True,
         )
+
+    def test_streaming_response_idempotent(self):
+        response = StreamingHttpResponse(["hello world"])
+        self.assertContains(response, "hello")
+        self.assertContains(response, "world")
+
+    def test_streaming_response_not_contains_idempotent(self):
+        response = StreamingHttpResponse(["hello world"])
+        self.assertNotContains(response, "bye")
+        self.assertNotContains(response, "bye")
+        self.assertContains(response, "world")
 
 
 class InHTMLTests(SimpleTestCase):
@@ -1224,9 +1229,7 @@ class XMLEqualTests(SimpleTestCase):
 - <elem attr1='a' />
 + <elem attr2='b' attr1='a' />
 ?      ++++++++++
-""".format(
-            xml1=repr(xml1), xml2=repr(xml2)
-        )
+""".format(xml1=repr(xml1), xml2=repr(xml2))
 
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertXMLEqual(xml1, xml2)
@@ -1961,7 +1964,7 @@ class OverrideSettingsTests(SimpleTestCase):
             self.assertIn(expected_location, finder.locations)
 
 
-@skipUnlessDBFeature("supports_transactions")
+@skipUnlessDBFeature("uses_savepoints")
 class TestBadSetUpTestData(TestCase):
     """
     An exception in setUpTestData() shouldn't leak a transaction which would
@@ -2049,6 +2052,7 @@ class CaptureOnCommitCallbacksTests(TestCase):
         self.assertEqual(len(callbacks), 1)
         self.assertNotEqual(callbacks[0], pre_hook)
 
+    @skipUnlessDBFeature("uses_savepoints")
     def test_with_rolled_back_savepoint(self):
         with self.captureOnCommitCallbacks() as callbacks:
             try:

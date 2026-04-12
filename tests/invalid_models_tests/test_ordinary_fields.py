@@ -584,7 +584,7 @@ class DecimalFieldTests(TestCase):
                     id="fields.E132",
                 ),
             ]
-        self.assertEqual(field.check(), expected)
+        self.assertEqual(field.check(databases=self.databases), expected)
 
     def test_both_attributes_omitted_required_db_features(self):
         class Model(models.Model):
@@ -603,7 +603,7 @@ class DecimalFieldTests(TestCase):
 
         field = Model._meta.get_field("field")
         self.assertEqual(
-            field.check(),
+            field.check(databases=self.databases),
             [
                 Error(
                     "DecimalField’s max_digits and decimal_places must both "
@@ -621,7 +621,7 @@ class DecimalFieldTests(TestCase):
 
         field = Model._meta.get_field("field")
         self.assertEqual(
-            field.check(),
+            field.check(databases=self.databases),
             [
                 Error(
                     "DecimalField’s max_digits and decimal_places must both "
@@ -636,15 +636,43 @@ class DecimalFieldTests(TestCase):
         msg = "'max_digits' must be a positive integer."
         with self.assertRaisesMessage(ValueError, msg):
 
-            class Model(models.Model):
-                field = models.DecimalField(max_digits=-1, decimal_places=-1)
+        field = Model._meta.get_field("field")
+        self.assertEqual(
+            field.check(databases=self.databases),
+            [
+                Error(
+                    "'decimal_places' must be a non-negative integer.",
+                    obj=field,
+                    id="fields.E131",
+                ),
+                Error(
+                    "'max_digits' must be a positive integer.",
+                    obj=field,
+                    id="fields.E133",
+                ),
+            ],
+        )
 
     def test_bad_values_of_max_digits_and_decimal_places(self):
         msg = "'max_digits' must be a positive integer."
         with self.assertRaisesMessage(ValueError, msg):
 
-            class Model(models.Model):
-                field = models.DecimalField(max_digits="bad", decimal_places="bad")
+        field = Model._meta.get_field("field")
+        self.assertEqual(
+            field.check(databases=self.databases),
+            [
+                Error(
+                    "'decimal_places' must be a non-negative integer.",
+                    obj=field,
+                    id="fields.E131",
+                ),
+                Error(
+                    "'max_digits' must be a positive integer.",
+                    obj=field,
+                    id="fields.E133",
+                ),
+            ],
+        )
 
     def test_decimal_places_greater_than_max_digits(self):
         class Model(models.Model):
@@ -667,7 +695,7 @@ class DecimalFieldTests(TestCase):
             field = models.DecimalField(max_digits=10, decimal_places=10)
 
         field = Model._meta.get_field("field")
-        self.assertEqual(field.check(), [])
+        self.assertEqual(field.check(databases=self.databases), [])
 
 
 @isolate_apps("invalid_models_tests")
@@ -1429,6 +1457,29 @@ class GeneratedFieldTests(TestCase):
                 "(fields.W122)",
                 obj=Model._meta.get_field("field"),
                 id="fields.W224",
+            ),
+        ]
+        self.assertEqual(
+            Model._meta.get_field("field").check(databases={"default"}),
+            expected_warnings,
+        )
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_with_null_argument(self):
+        class Model(models.Model):
+            value = models.IntegerField()
+            field = models.GeneratedField(
+                expression=models.F("value") * 2,
+                output_field=models.IntegerField(),
+                db_persist=True,
+                null=True,
+            )
+
+        expected_warnings = [
+            DjangoWarning(
+                "null has no effect on GeneratedField.",
+                obj=Model._meta.get_field("field"),
+                id="fields.W225",
             ),
         ]
         self.assertEqual(

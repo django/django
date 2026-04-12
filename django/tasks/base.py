@@ -1,7 +1,8 @@
+from collections.abc import Callable
 from dataclasses import dataclass, field, replace
 from datetime import datetime
 from inspect import isclass, iscoroutinefunction
-from typing import Any, Callable, Dict, Optional
+from typing import Any
 
 from asgiref.sync import async_to_sync, sync_to_async
 
@@ -42,11 +43,11 @@ class TaskResultStatus(TextChoices):
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Task:
-    priority: int
-    func: Callable  # The Task function.
-    backend: str
-    queue_name: str
-    run_after: Optional[datetime]  # The earliest this Task will run.
+    func: Callable[..., Any]  # The Task function.
+    priority: int = DEFAULT_TASK_PRIORITY
+    backend: str = DEFAULT_TASK_BACKEND_ALIAS
+    queue_name: str = DEFAULT_TASK_QUEUE_NAME
+    run_after: datetime | None = None  # The earliest this Task will run.
 
     # Whether the Task receives the Task context when executed.
     takes_context: bool = False
@@ -137,17 +138,24 @@ def task(
     queue_name=DEFAULT_TASK_QUEUE_NAME,
     backend=DEFAULT_TASK_BACKEND_ALIAS,
     takes_context=False,
+    **kwargs,
 ):
     from . import task_backends
 
+    if "run_after" in kwargs:
+        raise TypeError(
+            "run_after cannot be defined statically with the @task decorator. "
+            "Use .using(run_after=...) to set it dynamically."
+        )
+
     def wrapper(f):
         return task_backends[backend].task_class(
-            priority=priority,
             func=f,
+            priority=priority,
             queue_name=queue_name,
             backend=backend,
             takes_context=takes_context,
-            run_after=None,
+            **kwargs,
         )
 
     if function:
@@ -180,20 +188,20 @@ class TaskResult:
 
     id: str  # Unique identifier for the task result.
     status: TaskResultStatus
-    enqueued_at: Optional[datetime]  # Time the task was enqueued.
-    started_at: Optional[datetime]  # Time the task was started.
-    finished_at: Optional[datetime]  # Time the task was finished.
+    enqueued_at: datetime | None  # Time the task was enqueued.
+    started_at: datetime | None  # Time the task was started.
+    finished_at: datetime | None  # Time the task was finished.
 
     # Time the task was last attempted to be run.
-    last_attempted_at: Optional[datetime]
+    last_attempted_at: datetime | None
 
-    args: list  # Arguments to pass to the task function.
-    kwargs: Dict[str, Any]  # Keyword arguments to pass to the task function.
+    args: list[Any]  # Arguments to pass to the task function.
+    kwargs: dict[str, Any]  # Keyword arguments to pass to the task function.
     backend: str
     errors: list[TaskError]  # Errors raised when running the task.
     worker_ids: list[str]  # Workers which have processed the task.
 
-    _return_value: Optional[Any] = field(init=False, default=None)
+    _return_value: Any | None = field(init=False, default=None)
 
     def __post_init__(self):
         object.__setattr__(self, "args", normalize_json(self.args))

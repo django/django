@@ -1,8 +1,7 @@
 import asyncio
 from functools import update_wrapper, wraps
+from inspect import iscoroutinefunction
 from unittest import TestCase
-
-from asgiref.sync import iscoroutinefunction
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import (

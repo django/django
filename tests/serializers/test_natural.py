@@ -1,13 +1,17 @@
+from unittest import mock
+
 from django.core import serializers
-from django.db import connection
+from django.db import connection, models
 from django.test import TestCase
 
 from .models import (
     Child,
     FKAsPKNoNaturalKey,
     FKDataNaturalKey,
+    FKToNaturalKeyWithNullable,
     NaturalKeyAnchor,
     NaturalKeyThing,
+    NaturalKeyWithNullableField,
     NaturalPKWithDefault,
     PostToOptOutSubclassUser,
     SubclassNaturalKeyOptOutUser,
@@ -42,7 +46,7 @@ def natural_key_serializer_test(self, format):
         self.assertEqual(
             obj.data,
             instance.data,
-            "Objects with PK=%d not equal; expected '%s' (%s), got '%s' (%s)"
+            "Objects with PK=%s not equal; expected '%s' (%s), got '%s' (%s)"
             % (
                 obj.pk,
                 obj.data,
@@ -280,6 +284,74 @@ def natural_key_opt_out_test(self, format):
     )
 
 
+def nullable_natural_key_fk_test(self, format):
+    target_with_none = NaturalKeyWithNullableField.objects.create(
+        name="test_none",
+        optional_id=None,
+    )
+    target_with_value = NaturalKeyWithNullableField.objects.create(
+        name="test_value",
+        optional_id="some_id",
+    )
+    fk_to_none = FKToNaturalKeyWithNullable.objects.create(
+        ref=target_with_none,
+        data="points_to_none",
+    )
+    fk_to_value = FKToNaturalKeyWithNullable.objects.create(
+        ref=target_with_value,
+        data="points_to_value",
+    )
+    objects = [target_with_none, target_with_value, fk_to_none, fk_to_value]
+    serialized = serializers.serialize(
+        format,
+        objects,
+        use_natural_foreign_keys=True,
+        use_natural_primary_keys=True,
+    )
+    objs = list(serializers.deserialize(format, serialized))
+    self.assertEqual(objs[2].object.ref_id, target_with_none.pk)
+    self.assertEqual(objs[3].object.ref_id, target_with_value.pk)
+
+
+def nullable_natural_key_m2m_test(self, format):
+    target_with_none = NaturalKeyWithNullableField.objects.create(
+        name="test_none",
+        optional_id=None,
+    )
+    target_with_value = NaturalKeyWithNullableField.objects.create(
+        name="test_value",
+        optional_id="some_id",
+    )
+    m2m_obj = FKToNaturalKeyWithNullable.objects.create(data="m2m_test")
+    m2m_obj.refs.set([target_with_none, target_with_value])
+    objects = [target_with_none, target_with_value, m2m_obj]
+    serialized = serializers.serialize(
+        format,
+        objects,
+        use_natural_foreign_keys=True,
+        use_natural_primary_keys=True,
+    )
+    objs = list(serializers.deserialize(format, serialized))
+    self.assertCountEqual(
+        objs[2].m2m_data["refs"],
+        [target_with_none.pk, target_with_value.pk],
+    )
+
+
+def natural_key_m2m_totally_ordered_test(self, format):
+    t1 = NaturalKeyThing.objects.create(key="t1")
+    t2 = NaturalKeyThing.objects.create(key="t2")
+    t3 = NaturalKeyThing.objects.create(key="t3")
+    t1.other_things.add(t2, t3)
+
+    with mock.patch.object(models.QuerySet, "order_by") as mock_order_by:
+        serializers.serialize(format, [t1], use_natural_foreign_keys=True)
+        mock_order_by.assert_called_once_with("pk")
+        mock_order_by.reset_mock()
+        serializers.serialize(format, [t1], use_natural_foreign_keys=False)
+        mock_order_by.assert_called_once_with("pk")
+
+
 # Dynamically register tests for each serializer
 register_tests(
     NaturalKeySerializerTests,
@@ -318,4 +390,19 @@ register_tests(
     NaturalKeySerializerTests,
     "test_%s_natural_key_opt_out",
     natural_key_opt_out_test,
+)
+register_tests(
+    NaturalKeySerializerTests,
+    "test_%s_nullable_natural_key_fk",
+    nullable_natural_key_fk_test,
+)
+register_tests(
+    NaturalKeySerializerTests,
+    "test_%s_nullable_natural_key_m2m",
+    nullable_natural_key_m2m_test,
+)
+register_tests(
+    NaturalKeySerializerTests,
+    "test_%s_natural_key_m2m_totally_ordered",
+    natural_key_m2m_totally_ordered_test,
 )

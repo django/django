@@ -13,7 +13,7 @@ import functools
 import sys
 import warnings
 from collections import Counter, namedtuple
-from collections.abc import Iterator, Mapping
+from collections.abc import Iterable, Iterator, Mapping
 from itertools import chain, count, product
 from string import ascii_uppercase
 
@@ -51,12 +51,17 @@ from django.utils.tree import Node
 __all__ = ["Query", "RawQuery"]
 
 # RemovedInDjango70Warning: When the deprecation ends, replace with:
-# Quotation marks ('"`[]), whitespace characters, semicolons, percent signs,
-# hashes, or inline SQL comments are forbidden in column aliases.
-# FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|%|#|--|/\*|\*/")
-# Quotation marks ('"`[]), whitespace characters, semicolons, hashes, or inline
-# SQL comments are forbidden in column aliases.
-FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|#|--|/\*|\*/")
+# Quotation marks ('"`[]), whitespace characters, control characters,
+# semicolons, percent signs, hashes, or inline SQL comments are
+# forbidden in column aliases.
+# FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(
+#   r"['`\"\]\[;\s\x00-\x1F\x7F-\x9F]|%|#|--|/\*|\*/"
+# )
+# Quotation marks ('"`[]), whitespace characters, control characters,
+# semicolons, hashes, or inline SQL comments are forbidden in column aliases.
+FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(
+    r"['`\"\]\[;\s\x00-\x1F\x7F-\x9F]|#|--|/\*|\*/"
+)
 
 # Inspired from
 # https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
@@ -1226,9 +1231,9 @@ class Query(BaseExpression):
                 "Column aliases cannot contain whitespace characters, hashes, "
                 # RemovedInDjango70Warning: When the deprecation ends, replace
                 # with:
-                # "quotation marks, semicolons, percent signs, or SQL "
-                # "comments."
-                "quotation marks, semicolons, or SQL comments."
+                # "control characters, quotation marks, semicolons, percent "
+                # "signs, or SQL comments."
+                "control characters, quotation marks, semicolons, or SQL comments."
             )
 
     def add_annotation(self, annotation, alias, select=True):
@@ -1444,7 +1449,7 @@ class Query(BaseExpression):
         # DEFAULT_DB_ALIAS isn't nice but it's the best that can be done here.
         # A similar thing is done in is_nullable(), too.
         if (
-            lookup_name == "exact"
+            lookup_name in ("exact", "iexact")
             and lookup.rhs == ""
             and connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls
         ):
@@ -1633,7 +1638,17 @@ class Query(BaseExpression):
                 ):
                     lookup_class = targets[0].get_lookup("isnull")
                     col = self._get_col(targets[0], join_info.targets[0], alias)
-                    clause.add(lookup_class(col, False), AND)
+                    # Use OR + IS NULL when RHS `in` values include None.
+                    if (
+                        lookup_type == "in"
+                        # Check containers (not strings or bytes).
+                        and isinstance(condition.rhs, Iterable)
+                        and not isinstance(condition.rhs, (str, bytes))
+                        and any(v is None for v in condition.rhs)
+                    ):
+                        clause.add(lookup_class(col, True), OR)
+                    else:
+                        clause.add(lookup_class(col, False), AND)
                 # If someval is a nullable column, someval IS NOT NULL is
                 # added.
                 if isinstance(value, Col) and self.is_nullable(value.target):
@@ -1715,6 +1730,11 @@ class Query(BaseExpression):
         return target_clause, needed_inner
 
     def add_filtered_relation(self, filtered_relation, alias):
+        if "." in alias:
+            raise ValueError(
+                "FilteredRelation doesn't support aliases with periods "
+                "(got %r)." % alias
+            )
         self.check_alias(alias)
         filtered_relation.alias = alias
         relation_lookup_parts, relation_field_parts, _ = self.solve_lookup_type(
@@ -2585,10 +2605,17 @@ class Query(BaseExpression):
                         annotation_names.append(f)
                         selected[f] = f
                     elif f in self.annotations:
-                        raise FieldError(
-                            f"Cannot select the '{f}' alias. Use annotate() to "
-                            "promote it."
-                        )
+                        if self.annotation_select:
+                            raise FieldError(
+                                f"Cannot select the '{f}' alias. It was excluded "
+                                f"by a previous values() or values_list() call. "
+                                f"Include '{f}' in that call to select it."
+                            )
+                        else:
+                            raise FieldError(
+                                f"Cannot select the '{f}' alias. Use annotate() "
+                                f"to promote it."
+                            )
                     else:
                         # Call `names_to_path` to ensure a FieldError including
                         # annotations about to be masked as valid choices if

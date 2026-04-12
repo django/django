@@ -1,3 +1,5 @@
+import django.contrib.sites.managers
+import django.db.models.manager
 from django.db import migrations, models
 
 
@@ -12,11 +14,11 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
-                        verbose_name="ID",
-                        serialize=False,
+                    models.BigAutoField(
                         auto_created=True,
                         primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("title", models.CharField(max_length=50)),
@@ -28,6 +30,15 @@ class Migration(migrations.Migration):
             options={
                 "abstract": False,
             },
+            managers=[
+                ("objects", django.db.models.manager.Manager()),
+                (
+                    "on_site",
+                    django.contrib.sites.managers.CurrentSiteManager(
+                        "places_this_article_should_appear"
+                    ),
+                ),
+            ],
             bases=(models.Model,),
         ),
         migrations.CreateModel(
@@ -35,11 +46,11 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
-                        verbose_name="ID",
-                        serialize=False,
+                    models.BigAutoField(
                         auto_created=True,
                         primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("title", models.CharField(max_length=50)),
@@ -48,6 +59,10 @@ class Migration(migrations.Migration):
             options={
                 "abstract": False,
             },
+            managers=[
+                ("objects", django.db.models.manager.Manager()),
+                ("on_site", django.contrib.sites.managers.CurrentSiteManager()),
+            ],
             bases=(models.Model,),
         ),
         migrations.CreateModel(
@@ -55,11 +70,11 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
-                        verbose_name="ID",
-                        serialize=False,
+                    models.BigAutoField(
                         auto_created=True,
                         primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("title", models.CharField(max_length=50)),
@@ -68,6 +83,10 @@ class Migration(migrations.Migration):
             options={
                 "abstract": False,
             },
+            managers=[
+                ("objects", django.db.models.manager.Manager()),
+                ("on_site", django.contrib.sites.managers.CurrentSiteManager()),
+            ],
             bases=(models.Model,),
         ),
     ]

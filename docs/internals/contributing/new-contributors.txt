@@ -69,8 +69,8 @@ Sign the Contributor License Agreement
 --------------------------------------
 
 The code that you write belongs to you or your employer. If your contribution
-is more than one or two lines of code, you need to sign the `CLA`_. See the
-`Contributor License Agreement FAQ`_ for a more thorough explanation.
+is more than one or two lines of code, you have the option to sign the `CLA`_.
+See the `Contributor License Agreement FAQ`_ for a more thorough explanation.
 
 .. _CLA: https://www.djangoproject.com/foundation/cla/
 .. _Contributor License Agreement FAQ: https://www.djangoproject.com/foundation/cla/faq/

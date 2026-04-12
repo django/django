@@ -971,7 +971,7 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
           </select>
           <a class="related-widget-wrapper-link add-related" id="add_id_stream"
              data-popup="yes" title="Add another release event"
-             href="/admin_widgets/releaseevent/add/?_to_field=album&amp;_popup=1">
+             href="/admin_widgets/releaseevent/add/?_to_field=album&amp;_popup=1&_source_model=admin_widgets.videostream">
             <img src="/static/admin/img/icon-addlink.svg" alt="" width="24" height="24">
           </a>
         </div>
@@ -1202,6 +1202,41 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
                     self.selenium.find_element(By.ID, "calendarlink0").click()
                     # The right month and year are displayed.
                     self.wait_for_text("#calendarin0 caption", expected_caption)
+
+    @override_settings(TIME_ZONE="Asia/Seoul")
+    def test_timezone_warning_message(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(username="super", password="secret", login_url="/")
+
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_widgets_member_add")
+        )
+
+        datetime = self.selenium.find_element(By.CSS_SELECTOR, "p.datetime")
+        warnings = self.selenium.find_elements(
+            By.CSS_SELECTOR, "div.field-birthdate div.timezonewarning"
+        )
+        self.assertEqual(len(warnings), 1)
+
+        warning = warnings[0]
+        self.assertTrue(warning.is_displayed())
+        next_element = warning.find_element(By.XPATH, "./following-sibling::*[1]")
+        # Warning messages are generally located just above the field block.
+        self.assertEqual(next_element, datetime)
+
+        date = datetime.find_element(By.TAG_NAME, "input")
+        date.send_keys("invalid")
+        with self.wait_page_loaded():
+            self.selenium.find_element(By.NAME, "_save").click()
+
+        errors = self.selenium.find_element(By.ID, "id_birthdate_error")
+        warning = self.selenium.find_element(
+            By.CSS_SELECTOR, "div.help.timezonewarning"
+        )
+        next_element = warning.find_element(By.XPATH, "./following-sibling::*[1]")
+        # warning message appears above the error message.
+        self.assertEqual(next_element, errors)
 
 
 @requires_tz_support

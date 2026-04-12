@@ -341,8 +341,8 @@ class RoutePattern(CheckURLMixin):
             if self._route == path:
                 return "", (), {}
         # If this isn't an endpoint, the path should start with the route.
-        elif path.startswith(self._route):
-            return path.removeprefix(self._route), (), {}
+        elif path.startswith(route := str(self._route)):
+            return path.removeprefix(route), (), {}
         return None
 
     def check(self):

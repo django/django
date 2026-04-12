@@ -1,7 +1,8 @@
 from functools import wraps
+from inspect import iscoroutinefunction
 from urllib.parse import urlsplit
 
-from asgiref.sync import async_to_sync, iscoroutinefunction, sync_to_async
+from asgiref.sync import async_to_sync, sync_to_async
 
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME

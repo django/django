@@ -1,6 +1,7 @@
 import codecs
 import copy
 import operator
+import os
 from io import BytesIO
 from itertools import chain
 from urllib.parse import parse_qsl, quote, urlencode, urljoin, urlsplit
@@ -56,6 +57,7 @@ class HttpRequest:
     # The encoding used in GET/POST dicts. None means use default setting.
     _encoding = None
     _upload_handlers = []
+    _multipart_parser_class = MultiPartParser
 
     def __init__(self):
         # WARNING: The `WSGIRequest` subclass doesn't call `super`.
@@ -364,6 +366,19 @@ class HttpRequest:
             )
         self._upload_handlers = upload_handlers
 
+    @property
+    def multipart_parser_class(self):
+        return self._multipart_parser_class
+
+    @multipart_parser_class.setter
+    def multipart_parser_class(self, multipart_parser_class):
+        if hasattr(self, "_files"):
+            raise RuntimeError(
+                "You cannot set the multipart parser class after the upload has been "
+                "processed."
+            )
+        self._multipart_parser_class = multipart_parser_class
+
     def parse_file_upload(self, META, post_data):
         """Return a tuple of (POST QueryDict, FILES MultiValueDict)."""
         self.upload_handlers = ImmutableList(
@@ -373,7 +388,9 @@ class HttpRequest:
                 "processed."
             ),
         )
-        parser = MultiPartParser(META, post_data, self.upload_handlers, self.encoding)
+        parser = self.multipart_parser_class(
+            META, post_data, self.upload_handlers, self.encoding
+        )
         return parser.parse()
 
     @property
@@ -385,15 +402,18 @@ class HttpRequest:
                 )
 
             # Limit the maximum request data size that will be handled
-            # in-memory.
-            if (
-                settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None
-                and int(self.META.get("CONTENT_LENGTH") or 0)
-                > settings.DATA_UPLOAD_MAX_MEMORY_SIZE
-            ):
-                raise RequestDataTooBig(
-                    "Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE."
-                )
+            # in-memory. Reject early when Content-Length is present and
+            # already exceeds the limit, avoiding reading the body at all.
+            self._check_data_too_big(int(self.META.get("CONTENT_LENGTH") or 0))
+
+            # Content-Length can be absent or understated (e.g.
+            # `Transfer-Encoding: chunked` on ASGI), so for seekable
+            # streams (e.g. SpooledTemporaryFile on ASGI), check the actual
+            # buffered size before reading it all into memory.
+            if self._stream.seekable():
+                stream_size = self._stream.seek(0, os.SEEK_END)
+                self._check_data_too_big(stream_size)
+                self._stream.seek(0)
 
             try:
                 self._body = self.read()
@@ -403,6 +423,14 @@ class HttpRequest:
                 self._stream.close()
             self._stream = BytesIO(self._body)
         return self._body
+
+    def _check_data_too_big(self, length):
+        if (
+            settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None
+            and length > settings.DATA_UPLOAD_MAX_MEMORY_SIZE
+        ):
+            msg = "Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE."
+            raise RequestDataTooBig(msg)
 
     def _mark_post_parse_error(self):
         self._post = QueryDict()

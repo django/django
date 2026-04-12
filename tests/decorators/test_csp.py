@@ -1,6 +1,5 @@
+from inspect import iscoroutinefunction
 from itertools import product
-
-from asgiref.sync import iscoroutinefunction
 
 from django.http import HttpRequest, HttpResponse
 from django.test import SimpleTestCase

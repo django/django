@@ -126,10 +126,11 @@ class TruncateHTMLParser(HTMLParser):
     def handle_endtag(self, tag):
         if tag not in self.void_elements:
             self.output.append(f"</{tag}>")
-            try:
-                self.tags.remove(tag)
-            except ValueError:
-                pass
+            # Remove from the stack only if the tag matches the most recently
+            # opened tag (LIFO). This avoids O(n) linear scans for unmatched
+            # end tags if `deque.remove()` would be called.
+            if self.tags and self.tags[0] == tag:
+                self.tags.popleft()
 
     def handle_data(self, data):
         data, output = self.process(data)
@@ -184,13 +185,7 @@ class TruncateWordsHTMLParser(TruncateHTMLParser):
 class Truncator(SimpleLazyObject):
     """
     An object used to truncate text, either by characters or words.
-
-    When truncating HTML text (either chars or words), input will be limited to
-    at most `MAX_LENGTH_HTML` characters.
     """
-
-    # 5 million characters are approximately 4000 text pages or 3 web pages.
-    MAX_LENGTH_HTML = 5_000_000
 
     def __init__(self, text):
         super().__init__(lambda: str(text))
@@ -387,6 +382,7 @@ def compress_sequence(sequence, *, max_random_bytes=None):
         yield buf.read()
         for item in sequence:
             zfile.write(item)
+            zfile.flush()
             data = buf.read()
             if data:
                 yield data
@@ -403,6 +399,7 @@ async def acompress_sequence(sequence, *, max_random_bytes=None):
         yield buf.read()
         async for item in sequence:
             zfile.write(item)
+            zfile.flush()
             data = buf.read()
             if data:
                 yield data
