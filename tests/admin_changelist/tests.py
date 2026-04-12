@@ -830,7 +830,7 @@ class ChangeListTests(TestCase):
         cl.get_results(request)
         results = list(cl.result_list)
         self.assertEqual(len(results), 3)
-
+        
     def test_list_filter_empty_m2m(self):
         Group.objects.create(name="Empty Group")
         m = GroupAdmin(Group, custom_site)
