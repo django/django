@@ -820,9 +820,9 @@ class ChangeListTests(TestCase):
         self.assertEqual(cl.queryset.count(), 1)
 
     def test_ordering_null_values(self):
-        Child.objects.create(name="C1", age=None)
-        Child.objects.create(name="C2", age=10)
-        Child.objects.create(name="C3", age=5)
+        c1 = Child.objects.create(name="C1", age=None)
+        c2 = Child.objects.create(name="C2", age=10)
+        c3 = Child.objects.create(name="C3", age=5)
         m = DynamicListDisplayChildAdmin(Child, custom_site)
         request = self.factory.get("/child/", data={ORDER_VAR: "3"})
         request.user = self.superuser
@@ -830,16 +830,36 @@ class ChangeListTests(TestCase):
         cl.get_results(request)
         results = list(cl.result_list)
         self.assertEqual(len(results), 3)
-        
-    def test_list_filter_empty_m2m(self):
-        Group.objects.create(name="Empty Group")
-        m = GroupAdmin(Group, custom_site)
-        m.list_filter = ["members"]
-        request = self.factory.get("/group/", data={"members": "0"})
+        self.assertLess(results.index(c3), results.index(c2))
+
+        request = self.factory.get("/child/", data={ORDER_VAR: "-3"})
         request.user = self.superuser
         cl = m.get_changelist_instance(request)
         cl.get_results(request)
-        self.assertEqual(cl.result_count, 0)
+        results = list(cl.result_list)
+        self.assertEqual(len(results), 3)
+        self.assertLess(results.index(c2), results.index(c3))
+
+    def test_list_filter_empty_m2m(self):
+        m1 = Musician.objects.create(name="M1")
+        g1 = Group.objects.create(name="Group 1")
+        g1.members.add(m1)
+        g2 = Group.objects.create(name="Empty Group")
+        
+        m = GroupAdmin(Group, custom_site)
+        m.list_filter = ["members"]
+        
+        request = self.factory.get("/group/", data={"members__isnull": "True"})
+        request.user = self.superuser
+        cl = m.get_changelist_instance(request)
+        cl.get_results(request)
+        self.assertCountEqual(cl.result_list, [g2])
+
+        request = self.factory.get("/group/", data={"members": m1.pk})
+        request.user = self.superuser
+        cl = m.get_changelist_instance(request)
+        cl.get_results(request)
+        self.assertCountEqual(cl.result_list, [g1])
 
     def test_custom_lookup_in_search_fields(self):
         band = Group.objects.create(name="The Hype")
