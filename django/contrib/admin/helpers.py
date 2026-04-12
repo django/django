@@ -1,4 +1,5 @@
 import json
+import warnings
 
 from django import forms
 from django.contrib.admin.utils import (
@@ -18,6 +19,7 @@ from django.db.models.fields.related import (
 from django.forms.utils import flatatt
 from django.template.defaultfilters import capfirst, linebreaksbr
 from django.urls import NoReverseMatch, reverse
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
@@ -279,6 +281,24 @@ class AdminReadonlyField:
         except (AttributeError, ValueError, ObjectDoesNotExist):
             result_repr = self.empty_value_display
         else:
+            if field in self.form.fields:
+                widget = self.form[field].field.widget
+                try:
+                    if getattr(widget, "read_only", False):
+                        warnings.warn(
+                            (
+                                "Relying on the undocumented read_only attribute "
+                                "for custom widget rendering in the admin is "
+                                "deprecated and will be removed in Django 7.0."
+                            ),
+                            RemovedInDjango70Warning,
+                            stacklevel=2,
+                        )
+                        return widget.render(field, value)
+                # Keep readonly rendering resilient after the
+                # read_only workaround removal/regression (#35959).
+                except (NotImplementedError, AttributeError):
+                    pass
             if f is None:
                 if getattr(attr, "boolean", False):
                     result_repr = _boolean_icon(value)
