@@ -1831,19 +1831,6 @@ class DecimalField(Field):
                             id="fields.E135",
                         ),
                     ]
-        else:
-            try:
-                max_digits = int(self.max_digits)
-                if max_digits <= 0:
-                    raise ValueError()
-            except ValueError:
-                return [
-                    checks.Error(
-                        "'max_digits' must be a positive integer.",
-                        obj=self,
-                        id="fields.E133",
-                    )
-                ]
         return []
 
     def _check_decimal_places_and_max_digits(self, **kwargs):
