@@ -1,6 +1,0 @@
-[console_scripts]
-black = black:patched_main
-blackd = blackd:patched_main [d]
-
-[validate_pyproject.tool_schema]
-black = black.schema:get_schema

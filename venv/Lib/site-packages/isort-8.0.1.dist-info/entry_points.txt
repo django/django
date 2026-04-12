@@ -1,3 +1,0 @@
-[console_scripts]
-isort = isort.main:main
-isort-identify-imports = isort.main:identify_imports_main
