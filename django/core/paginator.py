@@ -84,7 +84,8 @@ class BasePaginator:
             )
             warnings.warn(
                 "Pagination may yield inconsistent results with an "
-                "unordered object_list. Consider using an ordered queryset.",
+                "unordered object_list."
+                "Consider using an ordered queryset.",
         
                 UnorderedObjectListWarning,
                 stacklevel=3,
