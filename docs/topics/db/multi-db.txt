@@ -232,6 +232,12 @@ cases, no instance hint will be provided at all. The router checks for
 the existence of an instance hint, and determine if that hint should be
 used to alter routing behavior.
 
+If an ``instance`` hint is present, the database from which it was fetched
+is recorded on its :attr:`instance._state.db <django.db.models.Model._state>`.
+Routers will need to first consult that attribute before falling back to any
+fixed alias to match Django's default behavior of fetching related instances
+from the same database.
+
 Using routers
 -------------
 

@@ -369,6 +369,14 @@ class PersonAdmin(admin.ModelAdmin):
         return super().get_queryset(request).order_by("age")
 
 
+class ParentWithUUIDPKNoAddAdmin(admin.ModelAdmin):
+    list_display = ("id", "title")
+    list_editable = ("title",)
+
+    def has_add_permission(self, request):
+        return False
+
+
 class FooAccountAdmin(admin.StackedInline):
     model = FooAccount
     extra = 1
@@ -1365,6 +1373,7 @@ site2.register(Language)
 site7 = admin.AdminSite(name="admin7")
 site7.register(Article, ArticleAdmin2)
 site7.register(Section)
+site7.register(ParentWithUUIDPK, ParentWithUUIDPKNoAddAdmin)
 
 
 # Admin for testing optgroup in popup response

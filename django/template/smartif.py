@@ -111,10 +111,14 @@ OPERATORS = {
     "<=": infix(10, lambda context, x, y: x.eval(context) <= y.eval(context)),
 }
 
+
 # Assign 'id' to each:
-for key, op in OPERATORS.items():
-    op.id = key
-del key, op
+def _init_operators():
+    for key, op in OPERATORS.items():
+        op.id = key
+
+
+_init_operators()
 
 
 class Literal(TokenBase):

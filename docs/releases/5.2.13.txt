@@ -1,11 +1,11 @@
-==========================
-Django 6.0.4 release notes
-==========================
+===========================
+Django 5.2.13 release notes
+===========================
 
 *April 7, 2026*
 
-Django 6.0.4 fixes one security issue with severity "moderate", four security
-issues with severity "low", and several bugs in 6.0.3.
+Django 5.2.13 fixes one security issue with severity "moderate" and four
+security issues with severity "low" in 5.2.12.
 
 CVE-2026-3902: ASGI header spoofing via underscore/hyphen conflation
 ====================================================================
@@ -67,20 +67,3 @@ memory and causing service degradation.
 
 This issue has severity "low" according to the :ref:`Django security policy
 <security-disclosure>`.
-
-Bugfixes
-========
-
-* Fixed a regression in Django 6.0 where :func:`~django.contrib.auth.alogin`
-  and :func:`~django.contrib.auth.alogout` did not respectively set or clear
-  ``request.user`` if it had already been materialized (e.g., by sync
-  middleware) (:ticket:`37017`).
-
-* Fixed a regression in Django 6.0 in admin forms where
-  ``RelatedFieldWidgetWrapper`` incorrectly wrapped all widgets in a
-  ``<fieldset>`` (:ticket:`36949`).
-
-* Fixed a bug in Django 6.0 where the ``fields.E348`` system check did not
-  detect name clashes between model managers and
-  :attr:`~django.db.models.ForeignKey.related_name`\s for non-self-referential
-  relationships (:ticket:`36973`).

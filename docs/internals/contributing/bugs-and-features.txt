@@ -173,6 +173,74 @@ Roughly translated, these votes mean:
 Although these votes are informal, they'll be taken very seriously. After a
 suitable voting period, if an obvious consensus arises we'll follow the votes.
 
+.. _testing-pre-releases:
+
+How to test pre-release versions of Django
+==========================================
+
+Testing pre-releases is a great way to contribute to Django. Early testers
+help catch bugs before the final release, ensuring a smoother upgrade
+experience for everyone.
+
+Prerequisites
+~~~~~~~~~~~~~
+
+Before testing a pre-release, it is important that your project is running
+smoothly on the latest stable release of Django. That way, any regressions can
+be attributed to the pre-release. See the :doc:`/howto/upgrade-version` guide
+for instructions on getting up to date.
+
+To ensure your project is ready, you should also:
+
+* **Read the release notes:** Review the :doc:`/releases/index` for the
+  upcoming version to learn about upgrade paths for deprecated features or
+  about minor backward-incompatible changes.
+* **Resolve deprecation warnings:** Run your tests with deprecation warnings
+  enabled to become aware of required follow-up actions:
+
+  .. code-block:: console
+
+      $ python -Wa manage.py test
+
+Testing your project
+~~~~~~~~~~~~~~~~~~~~
+
+You can install the latest pre-release using ``pip``:
+
+.. code-block:: console
+
+    $ python -m pip install --pre Django
+
+Once installed, run your project's test suite. Rather than just checking
+if tests pass, try the following:
+
+* **Check dependency support:** Determine whether major dependencies support
+  the new version by checking Django version classifiers on PyPI.
+  Since those projects also value early bug reports, don't let a lack
+  of support prevent you from testing.
+* **Monitor performance:** You can run your tests with the :option:`test
+  --durations` flag to identify potential performance regressions.
+* **Automate tests in CI:** Consider running your Continuous Integration (CI)
+  pipeline with the pre-release version.
+* **Test manually:** While automated tests are great, manually testing your
+  application's main workflows is an important part of verifying compatibility
+  with a new release.
+
+Reporting issues
+~~~~~~~~~~~~~~~~
+
+If you discover a bug, please report it via the `Django issue tracker
+<https://code.djangoproject.com/>`_ so it can be fixed before the final
+release. When creating the ticket, be sure to set the Django version field to
+the exact pre-release version you are testing.
+
+If you suspect a regression, it's helpful to report the specific commit that
+caused it. See :ref:`bisecting-a-regression` for instructions.
+
+You can also discuss any issues or share feedback in the `Pre-releases
+<https://forum.djangoproject.com/c/announcements/prereleases/32>`_ category
+on the `Django Forum`_.
+
 .. _searching: https://code.djangoproject.com/search
 .. _custom queries: https://code.djangoproject.com/query
 .. _Django Forum: https://forum.djangoproject.com/

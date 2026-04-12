@@ -635,3 +635,7 @@ class PermissionTests(TestCase):
         self.assertEqual(
             str(p), "Auth_Tests | custom email field | Can view custom email field"
         )
+
+    def test_user_perm_str(self):
+        p = Permission.objects.get(codename="view_customemailfield")
+        self.assertEqual(p.user_perm_str, "auth_tests.view_customemailfield")

@@ -1,6 +1,7 @@
 import codecs
 import copy
 import operator
+import os
 from io import BytesIO
 from itertools import chain
 from urllib.parse import parse_qsl, quote, urlencode, urljoin, urlsplit
@@ -401,15 +402,18 @@ class HttpRequest:
                 )
 
             # Limit the maximum request data size that will be handled
-            # in-memory.
-            if (
-                settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None
-                and int(self.META.get("CONTENT_LENGTH") or 0)
-                > settings.DATA_UPLOAD_MAX_MEMORY_SIZE
-            ):
-                raise RequestDataTooBig(
-                    "Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE."
-                )
+            # in-memory. Reject early when Content-Length is present and
+            # already exceeds the limit, avoiding reading the body at all.
+            self._check_data_too_big(int(self.META.get("CONTENT_LENGTH") or 0))
+
+            # Content-Length can be absent or understated (e.g.
+            # `Transfer-Encoding: chunked` on ASGI), so for seekable
+            # streams (e.g. SpooledTemporaryFile on ASGI), check the actual
+            # buffered size before reading it all into memory.
+            if self._stream.seekable():
+                stream_size = self._stream.seek(0, os.SEEK_END)
+                self._check_data_too_big(stream_size)
+                self._stream.seek(0)
 
             try:
                 self._body = self.read()
@@ -419,6 +423,14 @@ class HttpRequest:
                 self._stream.close()
             self._stream = BytesIO(self._body)
         return self._body
+
+    def _check_data_too_big(self, length):
+        if (
+            settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None
+            and length > settings.DATA_UPLOAD_MAX_MEMORY_SIZE
+        ):
+            msg = "Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE."
+            raise RequestDataTooBig(msg)
 
     def _mark_post_parse_error(self):
         self._post = QueryDict()

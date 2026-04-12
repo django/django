@@ -43,6 +43,39 @@ the industry-standard 90 days. Confirmed vulnerabilities with a
 
 .. _our public Trac instance: https://code.djangoproject.com/query
 
+.. _respecting-maintainer-time:
+
+Respecting maintainer time
+--------------------------
+
+Django's security team are volunteers. Please be mindful and respectful of
+their time when submitting reports. Your initial report should give the team
+enough to make a triage decision, no more. It should include:
+
+* A brief description of the issue and where in Django it occurs.
+
+* A minimal, working proof of concept (code snippet or reproduction steps).
+
+* The versions of Django and Python you tested against.
+
+* Optionally, a minimal patch with the mitigation for the issue.
+
+Please do not include severity scores (CVSS or otherwise), lengthy background
+sections, multiple headers, or a determination of whether the issue constitutes
+a vulnerability. The security team will make those assessments. Extensive
+upfront analysis makes triage slower, not faster. If the team confirms the
+issue is a valid vulnerability, they will follow up and welcome further detail
+at that stage.
+
+If you have identified multiple potential issues, please wait for a triage
+result on your initial report before submitting further ones. Exceptions can be
+made for issues that are clearly and directly related to an already reported
+finding. Feedback on an initial report is often relevant to subsequent ones,
+and taking the time to read and incorporate it leads to better reports overall.
+
+The security team is not able to process large volumes of reports submitted in
+a short period of time, and reports submitted in bulk may be put on hold.
+
 Reporting guidelines
 --------------------
 
@@ -130,6 +163,12 @@ not been sanitized::
         query = request.GET.get("query", "")
         q = MyModel.objects.extra(select={"id": query})
         return HttpResponse(q.values())
+
+Some HTTP headers must also be sanitized by a web server or fronting proxy
+before they can be used, such as ``Remote-User`` and ``X-Forwarded-*``. For
+instance, under ASGI, it is a deployment misconfiguration (rather than any flaw
+in Django) for Django to be the direct HTTP endpoint when
+:class:`~django.contrib.auth.middleware.RemoteUserMiddleware` is used.
 
 Request headers and URLs must be under 8K bytes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

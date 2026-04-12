@@ -12,7 +12,7 @@ from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import fields
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.query_utils import Q
+from django.db.models.query_utils import PROHIBITED_FILTER_KWARGS, Q
 from django.utils.deconstruct import deconstructible
 from django.utils.functional import cached_property, classproperty
 from django.utils.hashable import make_hashable
@@ -705,10 +705,14 @@ def register_combinable_fields(lhs, connector, rhs, result):
     _connector_combinators[connector].append((lhs, rhs, result))
 
 
-for d in _connector_combinations:
-    for connector, field_types in d.items():
-        for lhs, rhs, result in field_types:
-            register_combinable_fields(lhs, connector, rhs, result)
+def _register_combinable_fields():
+    for d in _connector_combinations:
+        for connector, field_types in d.items():
+            for lhs, rhs, result in field_types:
+                register_combinable_fields(lhs, connector, rhs, result)
+
+
+_register_combinable_fields()
 
 
 @functools.lru_cache(maxsize=128)
@@ -1173,8 +1177,12 @@ class Value(Expression):
                 val = output_field.get_db_prep_save(val, connection=connection)
             else:
                 val = output_field.get_db_prep_value(val, connection=connection)
-            if hasattr(output_field, "get_placeholder"):
-                return output_field.get_placeholder(val, compiler, connection), [val]
+            try:
+                get_placeholder_sql = output_field.get_placeholder_sql
+            except AttributeError:
+                pass
+            else:
+                return get_placeholder_sql(val, compiler, connection)
         if val is None:
             # oracledb does not always convert None to the appropriate
             # NULL type (like in case expressions using numbers), so we
@@ -1358,7 +1366,7 @@ class Col(Expression):
     def as_sql(self, compiler, connection):
         alias, column = self.alias, self.target.column
         identifiers = (alias, column) if alias else (column,)
-        sql = ".".join(map(compiler.quote_name_unless_alias, identifiers))
+        sql = ".".join(map(compiler.quote_name, identifiers))
         return sql, ()
 
     def relabeled_clone(self, relabels):
@@ -1632,6 +1640,9 @@ class When(Expression):
 
     def __init__(self, condition=None, then=None, **lookups):
         if lookups:
+            if invalid_kwargs := PROHIBITED_FILTER_KWARGS.intersection(lookups):
+                invalid_str = ", ".join(f"'{k}'" for k in sorted(invalid_kwargs))
+                raise TypeError(f"The following kwargs are invalid: {invalid_str}")
             if condition is None:
                 condition, lookups = Q(**lookups), None
             elif getattr(condition, "conditional", False):
