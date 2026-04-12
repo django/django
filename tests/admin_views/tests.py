@@ -7877,6 +7877,18 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
 
         self.assertEqual(field.contents(), "Post title")
 
+    def test_admin_change_view_uses_legacy_read_only_widget_fallback(self):
+        post = Post.objects.create(title="Post title", content="content")
+        url = reverse("namespaced_admin:admin_views_post_change", args=(post.pk,))
+        msg = (
+            "Relying on the undocumented read_only attribute for custom "
+            "widget rendering in the admin is deprecated and will be "
+            "removed in Django 7.0."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            response = self.client.get(url)
+        self.assertContains(response, "legacy readonly output from admin view")
+
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class LimitChoicesToInAdminTest(TestCase):
