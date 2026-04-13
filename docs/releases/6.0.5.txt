@@ -9,4 +9,7 @@ Django 6.0.5 fixes several bugs in 6.0.4.
 Bugfixes
 ========
 
-* ...
+* Fixed a misplaced ``</div>`` in the
+  ``django/contrib/admin/templates/admin/change_list.html`` template added in
+  Django 6.0 that could be problematic when overriding the ``pagination`` block
+  (:ticket:`37029`).
