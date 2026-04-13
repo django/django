@@ -773,6 +773,13 @@ class SQLCompiler:
             combinator = self.query.combinator
             features = self.connection.features
             if combinator:
+                if not features.ignores_unnecessary_order_by_in_subqueries and (
+                    self.query.subquery
+                    or (order_by and features.requires_compound_order_by_subquery)
+                ):
+                    self.query = self.query.clone()
+                    self.query.clear_ordering(force=False)
+                    self.query.clear_ordering_in_combined_queries()
                 if not getattr(features, "supports_select_{}".format(combinator)):
                     raise NotSupportedError(
                         "{} is not supported on this database backend.".format(

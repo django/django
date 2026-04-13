@@ -1312,8 +1312,7 @@ class Query(BaseExpression):
             and not connection.features.ignores_unnecessary_order_by_in_subqueries
         ):
             self.clear_ordering(force=False)
-            for query in self.combined_queries:
-                query.clear_ordering(force=False)
+            self.clear_ordering_in_combined_queries()
         sql, params = self.get_compiler(connection=connection).as_sql()
         if self.subquery:
             sql = "(%s)" % sql
@@ -2401,6 +2400,11 @@ class Query(BaseExpression):
         self.extra_order_by = ()
         if clear_default:
             self.default_ordering = False
+
+    def clear_ordering_in_combined_queries(self):
+        for query in self.combined_queries:
+            query.clear_ordering(force=False)
+            query.clear_ordering_in_combined_queries()
 
     def set_group_by(self, allow_aliases=True):
         """
