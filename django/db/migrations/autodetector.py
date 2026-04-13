@@ -1090,7 +1090,7 @@ class MigrationAutodetector:
                         )
                         or is_pk_rename
                     ):
-                        if is_pk_rename or self.questioner.ask_rename(
+                        if self.questioner.ask_rename(
                             model_name, rem_field_name, field_name, field
                         ):
                             self.renamed_operations.append(
