@@ -3440,8 +3440,9 @@ call:
 .. code-block:: pycon
 
     >>> from django.urls import reverse
+    >>> from django.contrib.admin.utils import quote
     >>> c = Choice.objects.get(...)
-    >>> change_url = reverse("admin:polls_choice_change", args=(c.id,))
+    >>> change_url = reverse("admin:polls_choice_change", args=(quote(c.pk),))
 
 This will find the first registered instance of the admin application
 (whatever the instance name), and resolve to the view for changing
@@ -3454,10 +3455,14 @@ if you specifically wanted the admin view from the admin instance named
 
 .. code-block:: pycon
 
-    >>> change_url = reverse("admin:polls_choice_change", args=(c.id,), current_app="custom")
+    >>> change_url = reverse("admin:polls_choice_change", args=(quote(c.pk),), current_app="custom")
 
 For more details, see the documentation on :ref:`reversing namespaced URLs
 <topics-http-reversing-url-namespaces>`.
+
+For URLs that take an ``object_id`` argument, use
+:func:`django.contrib.admin.utils.quote` to escape the primary key before
+passing it to :func:`django.urls.reverse`.
 
 To allow easier reversing of the admin urls in templates, Django provides an
 ``admin_urlname`` filter which takes an action as argument:
@@ -3466,12 +3471,14 @@ To allow easier reversing of the admin urls in templates, Django provides an
 
     {% load admin_urls %}
     <a href="{% url opts|admin_urlname:'add' %}">Add user</a>
-    <a href="{% url opts|admin_urlname:'delete' user.pk %}">Delete this user</a>
+    <a href="{% url opts|admin_urlname:'delete' user.pk|admin_urlquote %}">Delete this user</a>
 
 The action in the examples above match the last part of the URL names for
 :class:`ModelAdmin` instances described above. The ``opts`` variable can be any
 object which has an ``app_label`` and ``model_name`` attributes and is usually
-supplied by the admin views for the current model.
+supplied by the admin views for the current model. For URLs that take an
+``object_id`` argument, use the ``admin_urlquote`` filter to escape primary key
+values before passing them to the :ttag:`url` template tag.
 
 The ``display`` decorator
 =========================
