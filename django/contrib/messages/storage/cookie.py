@@ -19,11 +19,13 @@ class MessageEncoder(json.JSONEncoder):
         if isinstance(obj, Message):
             # Using 0/1 here instead of False/True to produce more compact json
             is_safedata = 1 if isinstance(obj.message, SafeData) else 0
-            message = [self.message_key, is_safedata, obj.level, obj.message]
-            if obj.extra_tags is not None:
-                message.append(obj.extra_tags)
-            else:
-                message.append(None)
+            message = [
+                self.message_key,
+                is_safedata,
+                obj.level,
+                obj.message,
+                obj.extra_tags,
+            ]
             if obj.extra_kwargs is not None:
                 message.append(obj.extra_kwargs)
             return message
