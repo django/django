@@ -3455,7 +3455,9 @@ if you specifically wanted the admin view from the admin instance named
 
 .. code-block:: pycon
 
-    >>> change_url = reverse("admin:polls_choice_change", args=(quote(c.pk),), current_app="custom")
+    >>> change_url = reverse(
+    ...     "admin:polls_choice_change", args=(quote(c.pk),), current_app="custom"
+    ... )
 
 For more details, see the documentation on :ref:`reversing namespaced URLs
 <topics-http-reversing-url-namespaces>`.
