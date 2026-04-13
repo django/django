@@ -1,6 +1,6 @@
 import operator
-from unittest import mock
 from datetime import datetime
+from unittest import mock
 
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import (
@@ -13,8 +13,8 @@ from django.db.models import (
     Transform,
     Value,
 )
-from django.db.models.sql.compiler import SQLAggregateCompiler
 from django.db.models.functions import Cast, Mod
+from django.db.models.sql.compiler import SQLAggregateCompiler
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
