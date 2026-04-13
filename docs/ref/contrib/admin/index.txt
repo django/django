@@ -3463,8 +3463,8 @@ For more details, see the documentation on :ref:`reversing namespaced URLs
 <topics-http-reversing-url-namespaces>`.
 
 For URLs that take an ``object_id`` argument, use
-:func:`django.contrib.admin.utils.quote` to escape the primary key before
-passing it to :func:`django.urls.reverse`.
+``django.contrib.admin.utils.quote()`` to escape the primary key before
+passing it to :func:`~django.urls.reverse`.
 
 To allow easier reversing of the admin urls in templates, Django provides an
 ``admin_urlname`` filter which takes an action as argument:
