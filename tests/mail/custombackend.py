@@ -33,6 +33,7 @@ class FailingEmailBackend(BaseEmailBackend):
         raise ValueError("FailingEmailBackend is doomed to fail.")
 
 
+# RemovedInDjango70Warning.
 class OptionsCapturingBackend(locmem.EmailBackend):
     """Capture the kwargs used to initialize the backend.
 

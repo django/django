@@ -19,11 +19,19 @@ from pathlib import Path
 
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME
-from django.utils.deprecation import RemovedInDjango70Warning, deprecate_posargs
+from django.utils.deprecation import (
+    RemovedInDjango70Warning,
+    deprecate_posargs,
+    warn_about_external_use,
+)
 from django.utils.encoding import force_bytes, force_str, punycode
 from django.utils.timezone import get_current_timezone
 
-from .deprecation import report_using_incompatibility
+from .deprecation import (
+    CONNECTION_ARG_WARNING,
+    FAIL_SILENTLY_ARG_WARNING,
+    report_using_incompatibility,
+)
 
 # RemovedInDjango70Warning.
 # Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
@@ -305,7 +313,28 @@ class EmailMessage:
                 else:
                     self.attach(*attachment)
         self.extra_headers = headers or {}
-        self.connection = connection
+        # RemovedInDjango70Warning.
+        if connection is not None:
+            warn_about_external_use(
+                CONNECTION_ARG_WARNING, RemovedInDjango70Warning, skip_frames=1
+            )
+        self._connection = connection
+
+    # RemovedInDjango70Warning: connection property.
+    @property
+    def connection(self):
+        msg = "The EmailMessage.connection attribute is deprecated."
+        warn_about_external_use(msg, RemovedInDjango70Warning)
+        return self._connection
+
+    @connection.setter
+    def connection(self, value):
+        msg = (
+            "The EmailMessage.connection attribute is deprecated. Switch to "
+            "EmailMessage.send(using=...) with an EMAIL_PROVIDERS alias."
+        )
+        warn_about_external_use(msg, RemovedInDjango70Warning)
+        self._connection = value
 
     def message(self, *, policy=email.policy.default):
         msg = email.message.EmailMessage(policy=policy)
@@ -358,6 +387,8 @@ class EmailMessage:
 
         from django.core import mail
 
+        if fail_silently:
+            warn_about_external_use(FAIL_SILENTLY_ARG_WARNING, RemovedInDjango70Warning)
         if hasattr(self, "get_connection"):
             raise AttributeError(
                 "EmailMessage no longer supports the undocumented "
@@ -365,10 +396,10 @@ class EmailMessage:
             )
 
         if using is not None:
-            report_using_incompatibility(self.connection, fail_silently)
+            report_using_incompatibility(self._connection, fail_silently)
             connection = mail.providers[using]
-        elif self.connection:
-            connection = self.connection
+        elif self._connection:
+            connection = self._connection
             if fail_silently:
                 raise TypeError(
                     "fail_silently cannot be used with a connection. "
