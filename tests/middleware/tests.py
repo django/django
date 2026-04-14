@@ -7,6 +7,8 @@ from io import BytesIO
 from unittest import mock
 from urllib.parse import quote
 
+from mail.custombackend import FailingEmailBackend
+
 from django.conf import settings
 from django.core import mail
 from django.core.exceptions import PermissionDenied
@@ -498,6 +500,13 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
         self.req.META["HTTP_REFERER"] = self.req.path_info[:-1]
         BrokenLinkEmailsMiddleware(self.get_response)(self.req)
         self.assertEqual(len(mail.outbox), 1)
+
+    @override_settings(EMAIL_BACKEND="mail.custombackend.FailingEmailBackend")
+    def test_sends_using_fail_silently(self):
+        self.addCleanup(FailingEmailBackend.reset)
+        self.req.META["HTTP_REFERER"] = "/another/url/"
+        BrokenLinkEmailsMiddleware(self.get_response)(self.req)
+        self.assertIs(FailingEmailBackend.init_kwargs[0]["fail_silently"], True)
 
 
 @override_settings(ROOT_URLCONF="middleware.cond_get_urls")
