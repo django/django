@@ -71,6 +71,8 @@ class BulkCreateTests(TestCase):
         self.assertEqual(Country.objects.count(), 4)
 
     @skipUnlessDBFeature("has_bulk_insert")
+    if not connection.features.has_bulk_insert:
+        self.skipTest("Bulk insert not supported")
     def test_efficiency(self):
         with self.assertNumQueries(1):
             Country.objects.bulk_create(self.data)
