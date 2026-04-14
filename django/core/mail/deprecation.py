@@ -2,6 +2,19 @@
 # mail.providers-related deprecation warnings and helpers used in multiple
 # places. (In a separate file to avoid circular import problems.)
 
+FAIL_SILENTLY_ARG_WARNING = (
+    "The 'fail_silently' argument is deprecated. See 'Migrating to "
+    "EMAIL_PROVIDERS' in Django's documentation for recommended replacements."
+)
+AUTH_ARGS_WARNING = (
+    "The 'auth_user' and 'auth_password' arguments are deprecated. Set "
+    "'username' and 'password' OPTIONS in EMAIL_PROVIDERS instead."
+)
+CONNECTION_ARG_WARNING = (
+    "The 'connection' argument is deprecated. Switch to the 'using' argument "
+    "with an EMAIL_PROVIDERS alias."
+)
+
 
 def report_using_incompatibility(
     connection=None, fail_silently=False, auth_user=None, auth_password=None
