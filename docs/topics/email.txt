@@ -903,7 +903,7 @@ manually open the connection, you can control when it is closed. For example::
         ["to3@example.com"],
     )
 
-    # Send the two emails in a single call -
+    # Send the two emails in a single call.
     connection.send_messages([email2, email3])
     # The connection was already open so send_messages() doesn't close it.
     # We need to manually close the connection.
