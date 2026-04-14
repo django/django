@@ -705,7 +705,10 @@ class QuerySetSetOperationTests(TestCase):
         ):
             sql = qs.query.get_compiler(connection=connection).as_sql()[0]
         self.assertEqual(sql.count("ORDER BY"), 1)
-        self.assertIn('ORDER BY "col2" DESC', sql)
+        self.assertIn(
+            f"ORDER BY {connection.ops.quote_name('col2')} DESC",
+            sql,
+        )
 
     def test_oracle_count_union_with_select_related_in_values_sql(self):
         captured = {}
