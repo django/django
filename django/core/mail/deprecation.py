@@ -9,6 +9,18 @@ from django.utils.deprecation import (
     django_file_prefixes,
 )
 
+FAIL_SILENTLY_ARG_WARNING = (
+    "The 'fail_silently' argument is deprecated. See 'Migrating to "
+    "MAILERS' in Django's documentation for recommended replacements."
+)
+AUTH_ARGS_WARNING = (
+    "The 'auth_user' and 'auth_password' arguments are deprecated. Set "
+    "'username' and 'password' OPTIONS in MAILERS instead."
+)
+CONNECTION_ARG_WARNING = (
+    "The 'connection' argument is deprecated. Switch to the 'using' argument "
+    "with an MAILERS alias."
+)
 NO_DEFAULT_MAILER_WARNING = (
     "Django 7.0 will not have a default mailer. Configure "
     "settings.MAILERS to avoid errors sending email."
