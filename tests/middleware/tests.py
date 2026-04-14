@@ -499,6 +499,12 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
         BrokenLinkEmailsMiddleware(self.get_response)(self.req)
         self.assertEqual(len(mail.outbox), 1)
 
+    @override_settings(EMAIL_BACKEND="mail.custombackend.FailingEmailBackend")
+    def test_uses_email_backend_with_fail_silently_true(self):
+        self.req.META["HTTP_REFERER"] = "/another/url/"
+        BrokenLinkEmailsMiddleware(self.get_response)(self.req)
+        self.assertEqual(len(mail.outbox), 0)
+
 
 @override_settings(ROOT_URLCONF="middleware.cond_get_urls")
 class ConditionalGetMiddlewareTest(SimpleTestCase):
