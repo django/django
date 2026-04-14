@@ -346,7 +346,6 @@ class Command(BaseCommand):
                     % (fixture_name, humanize(fixture_dir))
                 )
             fixture_files.extend(fixture_files_in_dir)
-
         if not fixture_files:
             raise CommandError("No fixture named '%s' found." % fixture_name)
 
