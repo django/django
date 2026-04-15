@@ -310,12 +310,12 @@ Usage example:
 .. warning::
 
     ``Extract`` functions, at the database level are timezone naive. When you
-    use a ``Extract`` function in a filter you will need to remember that it
-    is a timezone naive value. This can lead to unexpected results if you are
-    using timezones other than UTC. Django will store date/time values in the
-    database in the UTC timezone. The following example demonstrates what
-    happens when "Europe/Berlin" is active in Django (in settings
-    :setting:`TIME_ZONE`) and how to adjust for this:
+    use a ``Extract`` function in a filter and :setting:`USE_TZ` is ``True``
+    you will need to remember that it is a timezone naive value. This can lead
+    to unexpected results if you are using timezones other than UTC. Django
+    will store date/time values in the database in the UTC timezone. The
+    following example demonstrates what happens when "Europe/Berlin" is active
+    in Django (in settings :setting:`TIME_ZONE`) and how to adjust for this:
 
     .. code-block:: pycon
 
@@ -668,13 +668,13 @@ Usage example:
 .. warning::
 
     ``Trunc`` functions, at the database level, return a timezone naive value
-    which is converted to a timezone aware value by the ORM. When you use a
-    ``Trunc`` function in a filter you will need to remember that it is a
-    timezone naive value. This can lead to unexpected results if you are using
-    timezones other than UTC. Django will store date/time values in the
-    database in the UTC timezone. The following example demonstrates what
-    happens when "Europe/Berlin" is active in Django (in settings
-    :setting:`TIME_ZONE`) and how to adjust for this:
+    which is converted to a timezone-aware value by the ORM. When you use a
+    ``Trunc`` function in a filter and :setting:`USE_TZ` is ``True`` you will
+    need to remember that it is a timezone naive value. This can lead to
+    unexpected results if you are using timezones other than UTC. Django will
+    store date/time values in the database in the UTC timezone. The following
+    example demonstrates what happens when "Europe/Berlin" is active in Django
+    (in settings :setting:`TIME_ZONE`) and how to adjust for this:
 
     .. code-block:: pycon
 
