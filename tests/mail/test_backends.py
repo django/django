@@ -34,10 +34,14 @@ class BaseEmailBackendTests(SimpleTestCase):
         self.assertEqual(backend.alias, "test_alias")
 
     def test_fail_silently_arg_accepted(self):
+        msg_init = "BaseEmailBackend.__init__() does not support 'fail_silently'."
+        msg_use = "BaseEmailBackend.fail_silently is deprecated."
         for value in [True, False]:
             with self.subTest(fail_silently=value):
-                backend = BaseEmailBackend(fail_silently=value)
-                self.assertIs(backend.fail_silently, value)
+                with self.assertWarnsMessage(RemovedInDjango70Warning, msg_init):
+                    backend = BaseEmailBackend(fail_silently=value)
+                with self.assertWarnsMessage(RemovedInDjango70Warning, msg_use):
+                    self.assertIs(backend.fail_silently, value)
 
     def test_unknown_kwargs_error(self):
         msg = "EMAIL_PROVIDERS['test_alias']: Unknown OPTIONS 'oops_typo', 'unknown'."
@@ -190,11 +194,30 @@ class SharedEmailBackendTests(MailTestsMixin):
 
         backend.close.assert_called_once()
 
+    # RemovedInDjango70Warning. (But keep overrides in subclasses.)
     def test_fail_silently_arg_accepted(self):
-        for value in [True, False]:
-            with self.subTest(fail_silently=value):
-                backend = self.create_backend(fail_silently=value)
-                self.assertIs(backend.fail_silently, value)
+        # In Django 7.0, the fail_silently arg will *not* be accepted by
+        # BaseEmailBackend. Backends that *do* support fail_silently must
+        # handle that argument themselves. Tests for those backends should
+        # override this test case to reflect continuing fail_silently support.
+        with self.subTest("Compatibility configuration"):
+            # Backend initialized in compatibility mode (without alias) warns
+            # but still sets attribute. (alias=None tells create_backend to
+            # _omit_ the `alias` arg.)
+            msg_init = "EmailBackend.__init__() does not support 'fail_silently'."
+            msg_use = "EmailBackend.fail_silently is deprecated."
+            for value in [True, False]:
+                with self.subTest(fail_silently=value):
+                    with self.assertWarnsMessage(RemovedInDjango70Warning, msg_init):
+                        backend = self.create_backend(alias=None, fail_silently=value)
+                    with self.assertWarnsMessage(RemovedInDjango70Warning, msg_use):
+                        self.assertIs(backend.fail_silently, value)
+
+        with self.subTest("Updated configuration"):
+            # Backend initialized with alias raises error.
+            msg_init = "EMAIL_PROVIDERS['test_alias']: Unknown OPTIONS 'fail_silently'."
+            with self.assertRaisesMessage(InvalidEmailProvider, msg_init):
+                self.create_backend(fail_silently=True)
 
     def test_unknown_kwargs_error(self):
         msg = "EMAIL_PROVIDERS['test_alias']: Unknown OPTIONS 'oops_typo', 'unknown'."
@@ -322,6 +345,15 @@ class FileBackendTests(SharedEmailBackendTests, SimpleTestCase):
         for filename in self.get_filenames():
             messages.extend(self.get_messages_from_filename(filename))
         return messages
+
+    def test_fail_silently_arg_accepted(self):
+        # RemovedInDjango70Warning: remove this comment (but keep the test).
+        # The file backend continues to support fail_silently. Override the
+        # SharedEmailBackendTests case that treats it as deprecated.
+        for value in [True, False]:
+            with self.subTest(fail_silently=value):
+                backend = self.create_backend(fail_silently=value)
+                self.assertIs(backend.fail_silently, value)
 
     def test_create_from_providers(self):
         # (Overrides SharedEmailBackendTests case.)
@@ -514,6 +546,15 @@ class ConsoleBackendTests(SharedEmailBackendTests, SimpleTestCase):
         messages = self.stream.getvalue().split("\n" + ("-" * 79) + "\n")
         return [message_from_bytes(m.encode()) for m in messages if m]
 
+    def test_fail_silently_arg_accepted(self):
+        # RemovedInDjango70Warning: remove this comment (but keep the test).
+        # The console backend continues to support fail_silently. Override the
+        # SharedEmailBackendTests case that treats it as deprecated.
+        for value in [True, False]:
+            with self.subTest(fail_silently=value):
+                backend = self.create_backend(fail_silently=value)
+                self.assertIs(backend.fail_silently, value)
+
     def test_console_stream_kwarg(self):
         """
         The console backend can be pointed at an arbitrary stream.
@@ -607,6 +648,15 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
 
     def get_smtp_envelopes(self):
         return self.smtp_handler.smtp_envelopes
+
+    def test_fail_silently_arg_accepted(self):
+        # RemovedInDjango70Warning: remove this comment (but keep the test).
+        # The SMTP backend continues to support fail_silently. Override the
+        # SharedEmailBackendTests case that treats it as deprecated.
+        for value in [True, False]:
+            with self.subTest(fail_silently=value):
+                backend = self.create_backend(fail_silently=value)
+                self.assertIs(backend.fail_silently, value)
 
     def test_create_from_providers(self):
         # (Overrides SharedEmailBackendTests case.)

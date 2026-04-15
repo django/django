@@ -3,6 +3,9 @@
 from django.core.mail import InvalidEmailProvider
 from django.utils.deprecation import RemovedInDjango70Warning, warn_about_external_use
 
+# RemovedInDjango70Warning.
+_NOT_PROVIDED = object()
+
 
 class BaseEmailBackend:
     """
@@ -21,14 +24,24 @@ class BaseEmailBackend:
            pass
     """
 
-    # RemovedInDjango70Warning: _ignore_unknown_kwargs.
+    # RemovedInDjango70Warning: fail_silently, _ignore_unknown_kwargs.
     def __init__(
-        self, fail_silently=False, *, alias=None, _ignore_unknown_kwargs=None, **kwargs
+        self,
+        fail_silently=_NOT_PROVIDED,
+        *,
+        alias=None,
+        _ignore_unknown_kwargs=None,
+        **kwargs,
     ):
         self.alias = alias
-        self.fail_silently = fail_silently
 
         # RemovedInDjango70Warning.
+        if fail_silently is _NOT_PROVIDED:
+            self._fail_silently = False
+        else:
+            self._fail_silently = fail_silently
+            # Force deprecation warning unless in _ignore_unknown_kwargs.
+            kwargs["fail_silently"] = fail_silently
         if _ignore_unknown_kwargs:
             for ignored in _ignore_unknown_kwargs:
                 kwargs.pop(ignored, None)
@@ -61,6 +74,19 @@ class BaseEmailBackend:
                     RemovedInDjango70Warning,
                     skip_name_prefixes="django.core.mail.backends",
                 )
+
+    # RemovedInDjango70Warning.
+    def __getattr__(self, name):
+        if name == "fail_silently":
+            msg = (
+                "BaseEmailBackend.fail_silently is deprecated. A subclass "
+                "that supports fail_silently must set its own attribute."
+            )
+            warn_about_external_use(msg, RemovedInDjango70Warning)
+            return self._fail_silently
+        raise AttributeError(
+            f"{type(self).__name__!r} object has no attribute {name!r}"
+        )
 
     def open(self):
         """
