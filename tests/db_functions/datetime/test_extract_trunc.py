@@ -2019,15 +2019,21 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
                         start_trunc=TruncSecond("start_datetime")
                     ).filter(id=non_utc_model.id, start_trunc__lte=now)
                 elif offset < 0:
-                    # Note: when working in negative timezones, we cannot use the lte
-                    # A fair check is to make the "now" use a trunc second like value
+                    # Note: when working in negative timezones, we cannot use
+                    # the lte A fair check is to make the "now" use a trunc
+                    # second like value
                     models_qs = DTModel.objects.annotate(
                         start_trunc=TruncSecond("start_datetime")
                     ).filter(
-                        id=non_utc_model.id, start_trunc=now.replace(microsecond=0)
+                        id=non_utc_model.id,
+                        start_trunc=now.replace(microsecond=0)
                     )
                 else:
-                    self.assertNotEqual(offset, 0, "Choose a timezone that is not UTC")
+                    self.assertNotEqual(
+                        offset,
+                        0,
+                        "Choose a timezone that is not UTC"
+                    )
                 self.assertNotEqual(
                     models_qs.count(), 1, "time zone: {}".format(test_tz)
                 )
@@ -2037,14 +2043,26 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
                 models_qs = DTModel.objects.annotate(
                     start_trunc=TruncSecond("start_datetime")
                 ).filter(id=non_utc_model.id, start_trunc__lte=adjusted_now)
-                self.assertEqual(models_qs.count(), 1, "time zone: {}".format(test_tz))
+                self.assertEqual(
+                    models_qs.count(),
+                    1,
+                    "time zone: {}".format(test_tz)
+                )
 
 
 class Ticket34699Tests(TestCase):
     def test_docs_example(self):
         self.assertSequenceEqual(DTModel.objects.all(), [])
-
-        dt = datetime.datetime(2015, 6, 15, 14, 30, 50, 321, zoneinfo.ZoneInfo("UTC"))
+        dt = datetime.datetime(
+            2015,
+            6,
+            15,
+            14,
+            30,
+            50,
+            321,
+            zoneinfo.ZoneInfo("UTC")
+        )
         # From the docs: Given the datetime 2015-06-15 14:30:50.000321+00:00...
         docs_dt = "2015-06-15T14:30:50.000321+00:00"
         self.assertEqual(dt.isoformat(), docs_dt)
@@ -2077,7 +2095,10 @@ class Ticket34699Tests(TestCase):
                 ):
                     test_zone = zoneinfo.ZoneInfo(tz)
                     instance = DTModel.objects.create(start_datetime=dt)
-                    self.assertEqual(instance.start_datetime.isoformat(), docs_dt)
+                    self.assertEqual(
+                        instance.start_datetime.isoformat(),
+                        docs_dt
+                    )
 
                     result = DTModel.objects.annotate(
                         truncated=Trunc(
@@ -2097,11 +2118,16 @@ class Ticket34699Tests(TestCase):
                     self.subTest(kind=kind, tz=tz, with_tzinfo=False),
                 ):
                     instance = DTModel.objects.create(start_datetime=dt)
-                    self.assertEqual(instance.start_datetime.isoformat(), docs_dt)
+                    self.assertEqual(
+                        instance.start_datetime.isoformat(),
+                        docs_dt
+                    )
 
                     result = DTModel.objects.annotate(
                         truncated=Trunc(
-                            "start_datetime", kind, output_field=DateTimeField()
+                            "start_datetime",
+                            kind,
+                            output_field=DateTimeField()
                         )
                     ).get()
                     self.assertEqual(result.truncated.isoformat(), expected)
