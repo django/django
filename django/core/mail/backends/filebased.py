@@ -10,12 +10,12 @@ from django.core.mail.backends.console import EmailBackend as ConsoleEmailBacken
 
 
 class EmailBackend(ConsoleEmailBackend):
-    def __init__(self, *args, file_path=None, **kwargs):
+    def __init__(self, fail_silently=False, file_path=None, **kwargs):
         self._fname = None
         # Since we're using the console-based backend as a base, force the
         # stream to be None, so we don't default to stdout.
         kwargs["stream"] = None
-        super().__init__(*args, **kwargs)
+        super().__init__(fail_silently=fail_silently, **kwargs)
 
         # RemovedInDjango70Warning.
         if self.alias is None:

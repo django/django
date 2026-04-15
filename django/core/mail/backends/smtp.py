@@ -33,7 +33,8 @@ class EmailBackend(BaseEmailBackend):
         ssl_certfile=None,
         **kwargs,
     ):
-        super().__init__(fail_silently=fail_silently, **kwargs)
+        super().__init__(**kwargs)
+        self.fail_silently = fail_silently
         self.connection = None
         self._lock = threading.RLock()
 
