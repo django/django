@@ -29,7 +29,7 @@ from django.db.models.deletion import Collector
 from django.db.models.expressions import Case, DatabaseDefault, F, OrderBy, Value, When
 from django.db.models.fetch_modes import FETCH_ONE
 from django.db.models.functions import Cast, Trunc
-from django.db.models.query_utils import FilteredRelation, Q
+from django.db.models.query_utils import PROHIBITED_FILTER_KWARGS, FilteredRelation, Q
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, ROW_COUNT
 from django.db.models.utils import (
     AltersData,
@@ -45,8 +45,6 @@ MAX_GET_RESULTS = 21
 
 # The maximum number of items to display in a QuerySet.__repr__
 REPR_OUTPUT_SIZE = 20
-
-PROHIBITED_FILTER_KWARGS = frozenset(["_connector", "_negated"])
 
 
 class BaseIterable:

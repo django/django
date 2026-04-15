@@ -1037,14 +1037,19 @@ The maximum size in bytes that a request body may be before a
 :exc:`~django.core.exceptions.SuspiciousOperation` (``RequestDataTooBig``) is
 raised. The check is done when accessing ``request.body`` or ``request.POST``
 and is calculated against the total request size excluding any file upload
-data. You can set this to ``None`` to disable the check. Applications that are
-expected to receive unusually large form posts should tune this setting.
+data (``request.FILES``). You can set this to ``None`` to disable the check.
+Applications that are expected to receive unusually large form posts should
+tune this setting.
 
-The amount of request data is correlated to the amount of memory needed to
-process the request and populate the GET and POST dictionaries. Large requests
-could be used as a denial-of-service attack vector if left unchecked. Since web
-servers don't typically perform deep request inspection, it's not possible to
-perform a similar check at that level.
+Under ASGI, the entire request may be spooled to disk before this limit is
+enforced. Therefore, it is strongly recommended to place additional protections
+in front of Django which limit the entire request payload.
+
+The amount of request data is correlated to the amount of memory or storage
+needed to process the request and populate the GET and POST dictionaries.
+Large requests could be used as a denial-of-service attack vector if left
+unchecked. Since web servers don't typically perform deep request inspection,
+it's not possible to perform a similar check at that level.
 
 See also :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`.
 

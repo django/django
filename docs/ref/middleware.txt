@@ -576,13 +576,14 @@ Customize the login URL or field name for authenticated views with the
 .. class:: RemoteUserMiddleware
 
     Middleware for utilizing web server provided authentication. See
-    :doc:`/howto/auth-remote-user` for usage details.
+    :doc:`/howto/auth-remote-user` for usage details, including security
+    considerations.
 
 .. class:: PersistentRemoteUserMiddleware
 
     Middleware for utilizing web server provided authentication when enabled
     only on the login page. See :ref:`persistent-remote-user-middleware-howto`
-    for usage details.
+    for usage details, including security considerations.
 
 CSRF protection middleware
 --------------------------

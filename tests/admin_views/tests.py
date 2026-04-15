@@ -4,6 +4,7 @@ import re
 import sys
 import unittest
 import zoneinfo
+from http import HTTPStatus
 from unittest import mock
 from urllib.parse import parse_qsl, urljoin, urlsplit
 
@@ -4730,6 +4731,22 @@ class AdminViewListEditable(TestCase):
 
         self.assertIs(Person.objects.get(name="John Mauchly").alive, False)
 
+    def test_forged_post_submission_when_no_add_permission(self):
+        before_count = ParentWithUUIDPK.objects.count()
+        data = {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "0",
+            "form-MAX_NUM_FORMS": "0",
+            "form-0-title": "The News",
+            "form-0-id": "",
+            "_save": "Save",
+        }
+        # This model admin allows no add permissions.
+        changelist_url = reverse("admin7:admin_views_parentwithuuidpk_changelist")
+        response = self.client.post(changelist_url, data)
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertEqual(ParentWithUUIDPK.objects.count(), before_count)
+
     def test_non_field_errors(self):
         """
         Non-field errors are displayed for each of the forms in the
@@ -7296,16 +7313,27 @@ class SeleniumTests(AdminSeleniumTestCase):
             "Difficulty:",
             "Materials:",
             "Start datetime:",
-            "Categories:",
         ]
         url = reverse("admin:admin_views_course_change", args=(course.pk,))
         self.selenium.get(self.live_server_url + url)
         fieldsets = self.selenium.find_elements(
             By.CSS_SELECTOR, "fieldset.aligned fieldset"
         )
+        self.assertEqual(len(fieldsets), len(expected_legend_tags_text))
         for index, fieldset in enumerate(fieldsets):
             legend = fieldset.find_element(By.TAG_NAME, "legend")
             self.assertEqual(legend.text, expected_legend_tags_text[index])
+
+        # FilteredSelectMultiple uses <fieldset>.
+        url = reverse("admin:admin_views_camelcaserelatedmodel_add")
+        self.selenium.get(self.live_server_url + url)
+        fieldsets = self.selenium.find_elements(
+            By.CSS_SELECTOR, "fieldset.aligned fieldset"
+        )
+        self.assertEqual(len(fieldsets), 1)
+        for index, fieldset in enumerate(fieldsets):
+            legend = fieldset.find_element(By.TAG_NAME, "legend")
+            self.assertEqual(legend.text, "M2m:")
 
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_use_fieldset_with_grouped_fields(self):
