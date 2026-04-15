@@ -210,10 +210,7 @@ A few days before any release
    for the new release; this will be in ``docs/releases/index.txt``.
 
 #. If this is a :term:`feature release`, ensure translations from Transifex
-   have been integrated. This is typically done by a separate translation's
-   manager rather than the releaser, but here are the steps. This process is a
-   bit lengthy so be sure to set aside 4-10 hours to do this, and ideally plan
-   for this task one or two days ahead of the release day.
+   have been integrated.
 
    In addition to having a configured Transifex account, ensure that the `tx
    CLI <https://developers.transifex.com/docs/cli>`_ is available in your
@@ -239,12 +236,6 @@ A few days before any release
    .. code-block:: shell
 
         $ git diff --name-only stable/5.0.x | grep "\.po"  | xargs sed -ri "s/PO-Revision-Date: [0-9\-]+ /PO-Revision-Date: $(date -I) /g"
-
-   All the new ``.po`` files should be manually and carefully inspected to
-   avoid committing a change in a file without any new translations. Also,
-   there shouldn't be any changes in the "plural forms": if there are any
-   (usually Spanish and French report changes for this) those will need
-   reverting.
 
    Lastly, commit the changed/added files (both ``.po`` and ``.mo``) and create
    a new PR targeting the stable branch of the corresponding release (example
@@ -726,12 +717,10 @@ You're almost done! All that's left to do now is:
       .. code-block:: shell
 
          $ cd django
-         $ django-admin makemessages -l en --domain=djangojs --domain=django
+         $ django-admin makemessages -l en --domain=django
          processing locale en
-
-   #. Review the diff before pushing and avoid committing changes to the
-      ``.po`` files without any new translations (:commit:`example commit
-      <d2b1ec551567c208abfdd21b27ff6d08ae1a6371>`).
+         $ django-admin makemessages -l en --domain=djangojs
+         processing locale en
 
    #. Make a pull request against the corresponding stable branch and merge
       once approved.

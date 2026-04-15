@@ -67,13 +67,22 @@ set, are used to authenticate to the SMTP server, and the
 :setting:`EMAIL_USE_TLS` and :setting:`EMAIL_USE_SSL` settings control whether
 a secure connection is used.
 
+.. _topic-email-sending:
+
+Sending messages
+================
+
+:mod:`!django.core.mail` provides functions for conveniently sending email, as
+well as classes for building and sending more complex email messages with
+attachments and multiple content types.
+
 .. note::
 
     The character set of email sent with ``django.core.mail`` will be set to
     the value of your :setting:`DEFAULT_CHARSET` setting.
 
 ``send_mail()``
-===============
+---------------
 
 .. function:: send_mail(subject, message, from_email, recipient_list, *, fail_silently=False, auth_user=None, auth_password=None, connection=None, html_message=None)
 
@@ -127,7 +136,7 @@ can be ``0`` or ``1`` since it can only send one message).
     This now raises a ``TypeError``.
 
 ``send_mass_mail()``
-====================
+--------------------
 
 .. function:: send_mass_mail(datatuple, *, fail_silently=False, auth_user=None, auth_password=None, connection=None)
 
@@ -178,15 +187,36 @@ The return value will be the number of successfully delivered messages.
     This now raises a ``TypeError``.
 
 ``send_mass_mail()`` vs. ``send_mail()``
-----------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The main difference between :func:`send_mass_mail` and :func:`send_mail` is
-that :func:`send_mail` opens a connection to the mail server each time it's
-executed, while :func:`send_mass_mail` uses a single connection for all of its
-messages. This makes :func:`send_mass_mail` slightly more efficient.
+The main difference between :func:`send_mass_mail` and repeatedly calling
+:func:`send_mail` is that :func:`send_mail` opens a connection to the mail
+server each time it's executed, while :func:`send_mass_mail` uses a single
+connection for all of its messages. This makes :func:`send_mass_mail` slightly
+more efficient.
+
+:func:`send_mail` with multiple ``to`` addresses sends a single email message,
+with ``john@example.com`` and ``jane@example.com`` both appearing in the "To:"
+field::
+
+    send_mail(
+        "Subject",
+        "Message.",
+        "from@example.com",
+        ["john@example.com", "jane@example.com"],
+    )
+
+:func:`send_mass_mail` sends a separate message per ``datatuple`` element, so
+``john@example.com`` and ``jane@example.com`` each receive their own email::
+
+    datatuple = (
+        ("Subject", "Message.", "from@example.com", ["john@example.com"]),
+        ("Subject", "Message.", "from@example.com", ["jane@example.com"]),
+    )
+    send_mass_mail(datatuple)
 
 ``mail_admins()``
-=================
+-----------------
 
 .. function:: mail_admins(subject, message, *, fail_silently=False, connection=None, html_message=None)
 
@@ -217,7 +247,7 @@ If ``html_message`` is provided, the resulting email will be a
     was also provided. This now raises a ``TypeError``.
 
 ``mail_managers()``
-===================
+-------------------
 
 .. function:: mail_managers(subject, message, *, fail_silently=False, connection=None, html_message=None)
 
@@ -235,80 +265,10 @@ setting.
     Older versions ignored ``fail_silently=True`` when a ``connection``
     was also provided. This now raises a ``TypeError``.
 
-Examples
-========
-
-This sends a single email to john@example.com and jane@example.com, with them
-both appearing in the "To:"::
-
-    send_mail(
-        "Subject",
-        "Message.",
-        "from@example.com",
-        ["john@example.com", "jane@example.com"],
-    )
-
-This sends a message to ``john@example.com`` and ``jane@example.com``, with
-them both receiving a separate email::
-
-    datatuple = (
-        ("Subject", "Message.", "from@example.com", ["john@example.com"]),
-        ("Subject", "Message.", "from@example.com", ["jane@example.com"]),
-    )
-    send_mass_mail(datatuple)
-
-Preventing header injection
-===========================
-
-`Header injection`_ is a security exploit in which an attacker inserts extra
-email headers to control the "To:" and "From:" in email messages that your
-scripts generate.
-
-The Django email functions outlined above all protect against header injection
-by forbidding newlines in header values. If any ``subject``, ``from_email`` or
-``recipient_list`` contains a newline (in either Unix, Windows or Mac style),
-the email function (e.g. :func:`send_mail`) will raise :exc:`ValueError` and,
-hence, will not send the email. It's your responsibility to validate all data
-before passing it to the email functions.
-
-If a ``message`` contains headers at the start of the string, the headers will
-be printed as the first bit of the email message.
-
-Here's an example view that takes a ``subject``, ``message`` and ``from_email``
-from the request's POST data, sends that to ``admin@example.com`` and redirects
-to "/contact/thanks/" when it's done::
-
-    from django.core.mail import send_mail
-    from django.http import HttpResponse, HttpResponseRedirect
-
-
-    def send_email(request):
-        subject = request.POST.get("subject", "")
-        message = request.POST.get("message", "")
-        from_email = request.POST.get("from_email", "")
-        if subject and message and from_email:
-            try:
-                send_mail(subject, message, from_email, ["admin@example.com"])
-            except ValueError:
-                return HttpResponse("Invalid header found.")
-            return HttpResponseRedirect("/contact/thanks/")
-        else:
-            # In reality we'd use a form class
-            # to get proper validation errors.
-            return HttpResponse("Make sure all fields are entered and valid.")
-
-
-.. versionchanged:: 6.0
-
-    Older versions raised ``django.core.mail.BadHeaderError`` for some
-    invalid headers. This has been replaced with :exc:`!ValueError`.
-
-.. _Header injection: http://www.nyphp.org/phundamentals/8_Preventing-Email-Header-Injection.html
-
 .. _emailmessage-and-smtpconnection:
 
 The ``EmailMessage`` class
-==========================
+--------------------------
 
 Django's :func:`send_mail` and :meth:`send_mass_mail` functions are actually
 thin wrappers that make use of the :class:`EmailMessage` class.
@@ -333,9 +293,6 @@ For convenience, :class:`EmailMessage` provides a :meth:`~EmailMessage.send`
 method for sending a single email. If you need to send multiple messages, the
 email backend API :ref:`provides an alternative
 <topics-sending-multiple-emails>`.
-
-``EmailMessage`` Objects
-------------------------
 
 .. class:: EmailMessage
 
@@ -555,10 +512,10 @@ email backend API :ref:`provides an alternative
     * ``mimetype``
 
 Sending alternative content types
----------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sending multiple content versions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 It can be useful to include multiple versions of the content in an email; the
 classic example is to send both text and HTML versions of a message. With
@@ -629,7 +586,7 @@ Django's email library, you can do this using the
     * ``mimetype``
 
 Updating the default content type
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 By default, the MIME type of the ``body`` parameter in an :class:`EmailMessage`
 is ``"text/plain"``. It is good practice to leave this alone, because it
@@ -643,6 +600,54 @@ example::
     msg = EmailMessage(subject, html_content, from_email, [to])
     msg.content_subtype = "html"  # Main content is now text/html
     msg.send()
+
+Preventing header injection
+---------------------------
+
+`Header injection`_ is a security exploit in which an attacker inserts extra
+email headers to control the "To:" and "From:" in email messages that your
+scripts generate.
+
+The Django email functions outlined above all protect against header injection
+by forbidding newlines in header values. If any ``subject``, ``from_email`` or
+``recipient_list`` contains a newline (in either Unix, Windows or Mac style),
+the email function (e.g. :func:`send_mail`) will raise :exc:`ValueError` and,
+hence, will not send the email. It's your responsibility to validate all data
+before passing it to the email functions.
+
+If a ``message`` contains headers at the start of the string, the headers will
+be printed as the first bit of the email message.
+
+Here's an example view that takes a ``subject``, ``message`` and ``from_email``
+from the request's POST data, sends that to ``admin@example.com`` and redirects
+to "/contact/thanks/" when it's done::
+
+    from django.core.mail import send_mail
+    from django.http import HttpResponse, HttpResponseRedirect
+
+
+    def send_email(request):
+        subject = request.POST.get("subject", "")
+        message = request.POST.get("message", "")
+        from_email = request.POST.get("from_email", "")
+        if subject and message and from_email:
+            try:
+                send_mail(subject, message, from_email, ["admin@example.com"])
+            except ValueError:
+                return HttpResponse("Invalid header found.")
+            return HttpResponseRedirect("/contact/thanks/")
+        else:
+            # In reality we'd use a form class
+            # to get proper validation errors.
+            return HttpResponse("Make sure all fields are entered and valid.")
+
+
+.. versionchanged:: 6.0
+
+    Older versions raised ``django.core.mail.BadHeaderError`` for some
+    invalid headers. This has been replaced with :exc:`!ValueError`.
+
+.. _Header injection: http://www.nyphp.org/phundamentals/8_Preventing-Email-Header-Injection.html
 
 .. _topic-email-backends:
 
@@ -714,7 +719,7 @@ can :ref:`write your own email backend <topic-custom-email-backend>`.
 .. _topic-email-smtp-backend:
 
 SMTP backend
-~~~~~~~~~~~~
+------------
 
 .. class:: backends.smtp.EmailBackend(host=None, port=None, username=None, password=None, use_tls=None, fail_silently=False, use_ssl=None, timeout=None, ssl_keyfile=None, ssl_certfile=None, **kwargs)
 
@@ -744,7 +749,7 @@ SMTP backend
 .. _topic-email-console-backend:
 
 Console backend
-~~~~~~~~~~~~~~~
+---------------
 
 Instead of sending out real emails the console backend just writes the
 emails that would be sent to the standard output. By default, the console
@@ -761,7 +766,7 @@ convenience that can be used during development.
 .. _topic-email-file-backend:
 
 File backend
-~~~~~~~~~~~~
+------------
 
 The file backend writes emails to a file. A new file is created for each new
 session that is opened on this backend. The directory to which the files are
@@ -779,7 +784,7 @@ convenience that can be used during development.
 .. _topic-email-memory-backend:
 
 In-memory backend
-~~~~~~~~~~~~~~~~~
+-----------------
 
 The ``'locmem'`` backend stores messages in a special attribute of the
 ``django.core.mail`` module. The ``outbox`` attribute is created when the first
@@ -799,7 +804,7 @@ Django's test runner :ref:`automatically uses this backend for testing
 .. _topic-email-dummy-backend:
 
 Dummy backend
-~~~~~~~~~~~~~
+-------------
 
 As the name suggests the dummy backend does nothing with your messages. To
 specify this backend, put the following in your settings::
@@ -809,13 +814,16 @@ specify this backend, put the following in your settings::
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
 
+Third-party backends
+--------------------
+
 .. admonition:: There are community-maintained solutions too!
 
     Django has a vibrant ecosystem. There are email backends
     highlighted on the `Community Ecosystem`_ page. The Django Packages
     `Email grid`_ has even more options for you!
 
-.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#email-and-notifications
+.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#email-notifications
 .. _Email grid: https://djangopackages.org/grids/g/email/
 
 
@@ -903,7 +911,7 @@ manually open the connection, you can control when it is closed. For example::
         ["to3@example.com"],
     )
 
-    # Send the two emails in a single call -
+    # Send the two emails in a single call.
     connection.send_messages([email2, email3])
     # The connection was already open so send_messages() doesn't close it.
     # We need to manually close the connection.

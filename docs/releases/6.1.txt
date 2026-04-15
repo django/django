@@ -129,6 +129,9 @@ Minor features
 * :attr:`.Permission.name` and :attr:`.Permission.codename` values are now
   renamed when renaming models via a migration.
 
+* The new :attr:`.Permission.user_perm_str` property returns the string
+  suitable to use with :meth:`.User.has_perm`.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -348,7 +351,9 @@ Signals
 Tasks
 ~~~~~
 
-* ...
+* The :func:`~django.tasks.task` decorator now accepts ``**kwargs``, which are
+  forwarded to the backend's
+  :attr:`~django.tasks.backends.base.BaseTaskBackend.task_class`.
 
 Templates
 ~~~~~~~~~
@@ -494,6 +499,13 @@ Miscellaneous
 * :meth:`~.QuerySet.first` and :meth:`~.QuerySet.last` no longer order by the
   primary key when a ``QuerySet``'s ordering has been forcibly cleared by
   calling :meth:`~.QuerySet.order_by` with no arguments.
+
+* The :class:`~django.core.files.File` class now always evaluates to ``True``
+  in boolean contexts, rather than relying on the ``name`` attribute. The
+  built-in subclasses ``FieldFile``, ``UploadedFile``,
+  ``TemporaryUploadedFile``, ``InMemoryUploadedFile``, and
+  ``SimpleUploadedFile`` retain the previous behavior of evaluating based on
+  the ``name`` attribute.
 
 .. _deprecated-features-6.1:
 
