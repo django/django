@@ -142,8 +142,17 @@ def setup_test_environment(debug=None):
     saved_data.debug = settings.DEBUG
     settings.DEBUG = debug
 
-    saved_data.email_backend = settings.EMAIL_BACKEND
-    settings.EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+    # RemovedInDjango70Warning: Override EMAIL_PROVIDERS unconditionally;
+    # remove EMAIL_BACKEND override.
+    if hasattr(settings, "EMAIL_PROVIDERS"):
+        saved_data.email_providers = settings.EMAIL_PROVIDERS
+        settings.EMAIL_PROVIDERS = {
+            alias: {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}
+            for alias in settings.EMAIL_PROVIDERS
+        }
+    else:
+        saved_data.email_backend = settings.EMAIL_BACKEND
+        settings.EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
     saved_data.template_render = Template._render
     saved_data.partial_template_render = PartialTemplate._render
@@ -164,7 +173,12 @@ def teardown_test_environment():
 
     settings.ALLOWED_HOSTS = saved_data.allowed_hosts
     settings.DEBUG = saved_data.debug
-    settings.EMAIL_BACKEND = saved_data.email_backend
+    # RemovedInDjango70Warning: Restore EMAIL_PROVIDERS unconditionally;
+    # remove EMAIL_BACKEND support.
+    if hasattr(saved_data, "email_providers"):
+        settings.EMAIL_PROVIDERS = saved_data.email_providers
+    if hasattr(saved_data, "email_backend"):
+        settings.EMAIL_BACKEND = saved_data.email_backend
     Template._render = saved_data.template_render
     PartialTemplate._render = saved_data.partial_template_render
 
