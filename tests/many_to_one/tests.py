@@ -1002,3 +1002,16 @@ class ManyToOneTests(TestCase):
             a2._state.fetch_mode,
             FETCH_PEERS,
         )
+
+    def test_fetch_mode_fetch_peers_reverse_with_deferred_fk(self):
+        Article.objects.create(
+            headline="Another article",
+            pub_date=datetime.date(2005, 7, 27),
+            reporter=self.r,
+        )
+        r = Reporter.objects.fetch_mode(FETCH_PEERS).get(pk=self.r.pk)
+        a1, a2 = r.article_set.defer("reporter")
+        with self.assertNumQueries(2):
+            self.assertEqual(a1.reporter, self.r)
+        with self.assertNumQueries(0):
+            self.assertEqual(a2.reporter, self.r)
