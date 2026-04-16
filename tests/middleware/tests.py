@@ -407,6 +407,9 @@ class CommonMiddlewareTest(SimpleTestCase):
 @override_settings(
     IGNORABLE_404_URLS=[re.compile(r"foo")],
     MANAGERS=["manager@example.com"],
+    EMAIL_PROVIDERS={
+        "default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}
+    },
 )
 class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
     rf = RequestFactory()
@@ -502,14 +505,47 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
         BrokenLinkEmailsMiddleware(self.get_response)(self.req)
         self.assertEqual(len(mail.outbox), 1)
 
+    # RemovedInDjango70Warning.
     @override_deprecated_email_settings(
         EMAIL_BACKEND="mail.custombackend.FailingEmailBackend"
     )
     def test_sends_using_fail_silently(self):
+        del settings.EMAIL_PROVIDERS
         FailingEmailBackend.did_fail_silently = False
         self.req.META["HTTP_REFERER"] = "/another/url/"
         BrokenLinkEmailsMiddleware(self.get_response)(self.req)
         self.assertTrue(FailingEmailBackend.did_fail_silently)
+
+    def test_sends_using_default_provider(self):
+        self.req.META["HTTP_REFERER"] = "/another/url/"
+        BrokenLinkEmailsMiddleware(self.get_response)(self.req)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].sent_using, "default")
+
+    @override_settings(EMAIL_PROVIDERS={})
+    def test_no_error_when_email_not_configured(self):
+        self.req.META["HTTP_REFERER"] = "/another/url/"
+        BrokenLinkEmailsMiddleware(self.get_response)(self.req)
+        self.assertEqual(len(mail.outbox), 0)
+
+    @override_settings(
+        EMAIL_PROVIDERS={
+            "custom": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}
+        },
+    )
+    def test_custom_send_mail(self):
+        class SubclassedMiddleware(BrokenLinkEmailsMiddleware):
+            using = "custom"
+
+            def send_mail(self, subject, message, *args, **kwargs):
+                super().send_mail("custom subject", "custom message", *args, **kwargs)
+
+        self.req.META["HTTP_REFERER"] = "/another/url/"
+        SubclassedMiddleware(self.get_response)(self.req)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].sent_using, "custom")
+        self.assertEqual(mail.outbox[0].subject, "[Django] custom subject")
+        self.assertEqual(mail.outbox[0].body, "custom message")
 
 
 @override_settings(ROOT_URLCONF="middleware.cond_get_urls")
