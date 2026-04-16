@@ -11,6 +11,7 @@ class MyHandler(logging.Handler):
         self.config = settings.LOGGING
 
 
+# RemovedInDjango70Warning.
 class MyEmailBackend(BaseEmailBackend):
     sent_messages = []
 
