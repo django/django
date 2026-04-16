@@ -3,6 +3,8 @@ import shutil
 import tempfile
 
 from django import conf
+from django.core import mail
+from django.core.mail.backends import console
 from django.test import SimpleTestCase
 from django.test.utils import extend_sys_path
 
@@ -46,3 +48,11 @@ class TestStartProjectSettings(SimpleTestCase):
                     b"X-Frame-Options: DENY",
                 ],
             )
+
+    def test_email_providers(self):
+        with extend_sys_path(self.temp_dir.name):
+            from test_settings import EMAIL_PROVIDERS
+
+        with self.settings(EMAIL_PROVIDERS=EMAIL_PROVIDERS):
+            backend = mail.providers.default
+            self.assertIsInstance(backend, console.EmailBackend)
