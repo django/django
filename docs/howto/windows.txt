@@ -83,6 +83,20 @@ The virtual environment will be activated and you'll see "(project-name)" next
 to the command prompt to designate that. Each time you start a new command
 prompt, you'll need to activate the environment again.
 
+Using PowerShell
+================
+
+On Windows, you can also use PowerShell to run Django commands. To activate a
+virtual environment in PowerShell, use:
+
+.. code-block:: powershell
+
+    PS C:\path\to\project-name> .\project-name\Scripts\Activate.ps1
+
+Once activated, the prompt will show "(project-name)" just like in CMD. PowerShell
+provides additional features such as tab completion and scripting support, which
+can make working with Django projects more convenient.
+
 Install Django
 ==============
 
