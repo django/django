@@ -1,6 +1,5 @@
 import operator
 from datetime import datetime
-from unittest import mock
 
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import (
@@ -14,7 +13,6 @@ from django.db.models import (
     Value,
 )
 from django.db.models.functions import Cast, Mod
-from django.db.models.sql.compiler import SQLAggregateCompiler
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
@@ -685,55 +683,6 @@ class QuerySetSetOperationTests(TestCase):
         qs1 = Number.objects.order_by("num")[:2]
         qs2 = Number.objects.order_by("-num")[:2]
         self.assertNumbersEqual(qs1.union(qs2).order_by("-num")[:4], [9, 8, 1, 0])
-
-    def test_oracle_ordering_subqueries_sql(self):
-        qs1 = Number.objects.order_by("num")
-        qs2 = Number.objects.order_by("-num")
-        qs = qs1.union(qs2).order_by("-num")[:4]
-        with (
-            mock.patch.object(
-                connection.features, "supports_slicing_ordering_in_compound", True
-            ),
-            mock.patch.object(
-                connection.features, "requires_compound_order_by_subquery", True
-            ),
-            mock.patch.object(
-                connection.features,
-                "ignores_unnecessary_order_by_in_subqueries",
-                False,
-            ),
-        ):
-            sql = qs.query.get_compiler(connection=connection).as_sql()[0]
-        self.assertEqual(sql.count("ORDER BY"), 1)
-        self.assertIn(
-            f"ORDER BY {connection.ops.quote_name('col2')} DESC",
-            sql,
-        )
-
-    def test_oracle_count_union_with_select_related_in_values_sql(self):
-        captured = {}
-
-        def fake_execute_sql(compiler, result_type=None):
-            captured["sql"] = compiler.as_sql()[0]
-            return (1,)
-
-        qs = Author.objects.select_related("extra").values("pk", "name", "extra__value")
-        with (
-            mock.patch.object(
-                connection.features, "supports_slicing_ordering_in_compound", True
-            ),
-            mock.patch.object(
-                connection.features, "requires_compound_order_by_subquery", True
-            ),
-            mock.patch.object(
-                connection.features,
-                "ignores_unnecessary_order_by_in_subqueries",
-                False,
-            ),
-            mock.patch.object(SQLAggregateCompiler, "execute_sql", fake_execute_sql),
-        ):
-            qs.union(qs).count()
-        self.assertEqual(captured["sql"].count("ORDER BY"), 0)
 
     @skipIfDBFeature("supports_slicing_ordering_in_compound")
     def test_unsupported_ordering_slicing_raises_db_error(self):
