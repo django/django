@@ -431,6 +431,15 @@ class BaseDatabaseFeatures:
     # that should be skipped for this database.
     django_test_skips = {}
 
+    # DatabaseWrapper methods that should raise an error if accessed in
+    # django.test.SimpleTestCase.
+    disallowed_simple_test_case_connection_methods = [
+        ("connect", "connections"),
+        ("temporary_connection", "connections"),
+        ("cursor", "queries"),
+        ("chunked_cursor", "queries"),
+    ]
+
     supports_uuid4_function = False
     supports_uuid7_function = False
     supports_uuid7_function_shift = False

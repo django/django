@@ -189,7 +189,7 @@ class _DatabaseFailure:
         self.wrapped = wrapped
         self.message = message
 
-    def __call__(self):
+    def __call__(self, *args, **kwargs):
         raise DatabaseOperationForbidden(self.message)
 
 
@@ -209,12 +209,6 @@ class SimpleTestCase(unittest.TestCase):
         "proper test isolation or add %(alias)r to %(test)s.databases to silence "
         "this failure."
     )
-    _disallowed_connection_methods = [
-        ("connect", "connections"),
-        ("temporary_connection", "connections"),
-        ("cursor", "queries"),
-        ("chunked_cursor", "queries"),
-    ]
 
     @classmethod
     def setUpClass(cls):
@@ -254,7 +248,10 @@ class SimpleTestCase(unittest.TestCase):
             if alias in cls.databases:
                 continue
             connection = connections[alias]
-            for name, operation in cls._disallowed_connection_methods:
+            disallowed_methods = (
+                connection.features.disallowed_simple_test_case_connection_methods
+            )
+            for name, operation in disallowed_methods:
                 message = cls._disallowed_database_msg % {
                     "test": "%s.%s" % (cls.__module__, cls.__qualname__),
                     "alias": alias,
@@ -276,7 +273,10 @@ class SimpleTestCase(unittest.TestCase):
             if alias in cls.databases:
                 continue
             connection = connections[alias]
-            for name, _ in cls._disallowed_connection_methods:
+            disallowed_methods = (
+                connection.features.disallowed_simple_test_case_connection_methods
+            )
+            for name, _ in disallowed_methods:
                 method = getattr(connection, name)
                 setattr(connection, name, method.wrapped)
 
