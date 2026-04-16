@@ -154,6 +154,9 @@ Minor features
   allow filtering geometries by the number of dimensions on PostGIS and
   SpatiaLite.
 
+* :class:`~django.contrib.gis.forms.widgets.OpenLayersWidget` is now based on
+  OpenLayers 10.9.0 (previously 7.2.2).
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
