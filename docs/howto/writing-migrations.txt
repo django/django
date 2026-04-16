@@ -272,6 +272,141 @@ only use ``run_before`` if it is undesirable or impractical to specify
 ``dependencies`` in the migration which you want to run after the one you are
 writing.
 
+Customizing the SQL generated for a set of operations
+======================================================
+
+By default, each migration operation generates and runs its own SQL when you
+apply it with :djadmin:`migrate`. For operations produced by
+:djadmin:`makemigrations`, the SQL is determined by the database backend and
+is not directly configurable.
+
+However, it is possible to customize what Django does at the database level,
+independently of how it updates its internal migration state, using
+:class:`~django.db.migrations.operations.SeparateDatabaseAndState`.
+
+Suppose you want to rename a model but keep the existing table name, avoiding
+any locking ``ALTER TABLE`` statements. You can rename the model and set
+:attr:`Meta.db_table <django.db.models.Options.db_table>` to pin it to the old
+table name.
+
+Given a rename of ``myapp.Book`` to ``myapp.Article``, the migration produced
+by :djadmin:`makemigrations` would look like this:
+
+.. code-block:: python
+    :caption: ``0002_rename_book_article_alter_article_table.py``
+
+    from django.db import migrations
+
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            ("myapp", "0001_initial"),
+        ]
+
+        operations = [
+            migrations.RenameModel(
+                old_name="Book",
+                new_name="Article",
+            ),
+            migrations.AlterModelTable(
+                name="article",
+                table="myapp_book",
+            ),
+        ]
+
+Running :djadmin:`sqlmigrate` on this migration would show:
+
+.. code-block :: sql
+
+    BEGIN;
+    ALTER TABLE "myapp_book" RENAME TO "myapp_article";
+    ALTER TABLE "myapp_article" RENAME TO "myapp_book";
+    COMMIT;
+
+The two operations logically cancel each other out, but Django still issues
+both ``ALTER TABLE`` statements. To suppress them, wrap the operations in
+:class:`~django.db.migrations.operations.SeparateDatabaseAndState`. Place the
+original operations in ``state_operations`` so Django's migration state is
+updated correctly, and leave ``database_operations`` empty so nothing runs
+against the database:
+
+.. code-block:: python
+    :caption: ``0002_rename_book_article_alter_article_table.py``
+
+    from django.db import migrations
+
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            ("myapp", "0001_initial"),
+        ]
+
+        operations = [
+            migrations.SeparateDatabaseAndState(
+                state_operations=[
+                    migrations.RenameModel(
+                        old_name="Book",
+                        new_name="Article",
+                    ),
+                    migrations.AlterModelTable(
+                        name="article",
+                        table="myapp_book",
+                    ),
+                ],
+                database_operations=[],
+            )
+        ]
+
+Running :djadmin:`sqlmigrate` now confirms the migration is a no-op:
+
+.. code-block:: sql
+
+    BEGIN;
+    -- no-op
+    COMMIT;
+
+``database_operations`` doesn't have to be empty. It can contain any
+operations whose SQL you want to run in place of what Django would normally
+generate. For example, you could use
+:class:`~django.db.migrations.operations.RunSQL` to add a comment to the table
+documenting that it now stores articles despite its legacy name:
+
+.. code-block:: python
+    :caption: ``0002_rename_book_article_alter_article_table.py``
+
+    from django.db import migrations
+
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            ("myapp", "0001_initial"),
+        ]
+
+        operations = [
+            migrations.SeparateDatabaseAndState(
+                state_operations=[
+                    migrations.RenameModel(
+                        old_name="Book",
+                        new_name="Article",
+                    ),
+                    migrations.AlterModelTable(
+                        name="article",
+                        table="myapp_book",
+                    ),
+                ],
+                database_operations=[
+                    migrations.RunSQL(
+                        sql="COMMENT ON TABLE myapp_book IS"
+                        " 'Stores Article records (formerly Book)'",
+                        reverse_sql=migrations.RunSQL.noop,
+                    ),
+                ],
+            )
+        ]
+
 Migrating data between third-party apps
 =======================================
 
