@@ -431,8 +431,8 @@ The script will inspect the database and create a model for each table within
 it.
 
 As you might expect, the created models will have an attribute for every field
-in the table. Note that ``inspectdb`` has a few special cases in its field-name
-output:
+in the table. Note that ``inspectdb`` has a few special cases and limitations
+in its output:
 
 * If ``inspectdb`` cannot map a column's type to a model field type, it'll
   use ``TextField`` and will insert the Python comment
@@ -450,15 +450,21 @@ output:
   ``'Field renamed because it was a Python reserved word.'`` next to the
   field.
 
-This feature is meant as a shortcut, not as definitive model generation. After
-you run it, you'll want to look over the generated models yourself to make
-customizations. In particular, you'll need to rearrange models' order, so that
-models that refer to other models are ordered properly.
+* Database defaults are not introspected and will be absent from the generated
+  output.
 
-Django doesn't create database defaults when a
-:attr:`~django.db.models.Field.default` is specified on a model field.
-Similarly, database defaults aren't translated to model field defaults or
-detected in any fashion by ``inspectdb``.
+* Generated fields are mapped to their output field type.
+
+* Models that reference each other may not be in the correct order.
+
+* If models were managed by Django's migration framework, Python-level field
+  options that have no database-level representation will not be included. In
+  particular, ``Field.default`` will not be included, and Python variants
+  for ``on_delete`` are always emitted as ``DO_NOTHING``.
+
+As such, after you run it, you'll want to look over the generated models
+yourself to make customizations. This feature is meant as a shortcut, not as
+definitive model generation.
 
 By default, ``inspectdb`` creates unmanaged models. That is, ``managed =
 False`` in the model's ``Meta`` class tells Django not to manage each table's
