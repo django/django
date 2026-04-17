@@ -317,7 +317,7 @@ by :djadmin:`makemigrations` would look like this:
 
 Running :djadmin:`sqlmigrate` on this migration would show:
 
-.. code-block :: sql
+.. code-block:: sql
 
     BEGIN;
     ALTER TABLE "myapp_book" RENAME TO "myapp_article";
@@ -466,21 +466,78 @@ data from the new application. Adjust the second argument of the
 Changing a ``ManyToManyField`` to use a ``through`` model
 =========================================================
 
-If you change a :class:`~django.db.models.ManyToManyField` to use a ``through``
-model, the default migration will delete the existing table and create a new
-one, losing the existing relations. To avoid this, you can use
-:class:`.SeparateDatabaseAndState` to rename the existing table to the new
-table name while telling the migration autodetector that the new model has
-been created. You can check the existing table name and constraint name through
-:djadmin:`sqlmigrate` or :djadmin:`dbshell`. You can check the new table name
-with the through model's ``_meta.db_table`` property. Your new ``through``
-model should use the same names for the ``ForeignKey``\s as Django did. Also if
-it needs any extra fields, they should be added in operations after
-:class:`.SeparateDatabaseAndState`.
+By default, Django will not allow you to add a ``through`` argument to an
+existing :class:`~django.db.models.ManyToManyField`. Instead, it raises an
+error to prevent silently dropping the existing table and creating a new one,
+which would result in data loss.
 
-For example, if we had a ``Book`` model with a ``ManyToManyField`` linking to
-``Author``, we could add a through model ``AuthorBook`` with a new field
-``is_primary``, like so::
+It is possible to accomplish this without data loss by using
+:class:`.SeparateDatabaseAndState` to point the new ``through`` model at the
+existing table, while letting the autodetector update the project state as
+normal.
+
+Finding the existing table name
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Before modifying the field, note the table name Django's auto-generated
+``through`` model is using:
+
+.. code-block:: pycon
+
+    >>> MyModel.m2m_field.through._meta.db_table
+
+You will need this to either rename the table or to set ``Meta.db_table``
+on your new ``through`` model to keep the same name.
+
+Creating the ``through`` model
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Create a ``through`` model whose foreign keys match what Django would have
+auto-created. For example, given the following models:
+
+.. code-block:: python
+
+    from django.db import models
+
+
+    class Author(models.Model):
+        pass
+
+
+    class Book(models.Model):
+        authors = models.ManyToManyField(Author)
+
+The ``through`` model would look like:
+
+.. code-block:: python
+
+    class BookAuthors(models.Model):
+        author = models.ForeignKey(Author, models.CASCADE)
+        book = models.ForeignKey(Book, models.CASCADE)
+
+        # Any new fields you want to add.
+        is_primary = models.BooleanField(default=False)
+
+        class Meta:
+            # Match the table name noted earlier.
+            db_table = "core_book_authors"
+            unique_together = (("author", "book"),)
+
+Generating and editing the migration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Change ``authors.through`` to point to the new model and run
+:djadmin:`makemigrations`. This will produce a migration with a
+``CreateModel`` and an ``AlterField`` operation. Wrap both inside a
+:class:`.SeparateDatabaseAndState` call, moving any new/extra fields out
+into separate operations afterwards.
+
+For the ``database_operations`` side: if you chose a new table name, add a
+:class:`~django.db.migrations.operations.RunSQL` to rename the old table.
+If you set ``Meta.db_table`` to match the existing name, leave
+``database_operations`` empty.
+
+The final migration should look like this::
 
     from django.db import migrations, models
     import django.db.models.deletion
@@ -494,20 +551,18 @@ For example, if we had a ``Book`` model with a ``ManyToManyField`` linking to
         operations = [
             migrations.SeparateDatabaseAndState(
                 database_operations=[
-                    # Old table name from checking with sqlmigrate, new table
-                    # name from AuthorBook._meta.db_table.
-                    migrations.RunSQL(
-                        sql="ALTER TABLE core_book_authors RENAME TO core_authorbook",
-                        reverse_sql="ALTER TABLE core_authorbook RENAME TO core_book_authors",
-                    ),
+                    # If renaming the table, add a RunSQL operation here.
+                    # If Meta.db_table matches the old name, leave this empty.
                 ],
+                # Copy CreateModel and AlterField from the generated migration,
+                # omitting any new fields from CreateModel.
                 state_operations=[
                     migrations.CreateModel(
                         name="AuthorBook",
                         fields=[
                             (
                                 "id",
-                                models.AutoField(
+                                models.BigAutoField(
                                     auto_created=True,
                                     primary_key=True,
                                     serialize=False,
@@ -517,25 +572,20 @@ For example, if we had a ``Book`` model with a ``ManyToManyField`` linking to
                             (
                                 "author",
                                 models.ForeignKey(
-                                    on_delete=django.db.models.deletion.DO_NOTHING,
+                                    on_delete=django.db.models.deletion.CASCADE,
                                     to="core.Author",
                                 ),
                             ),
                             (
                                 "book",
                                 models.ForeignKey(
-                                    on_delete=django.db.models.deletion.DO_NOTHING,
+                                    on_delete=django.db.models.deletion.CASCADE,
                                     to="core.Book",
                                 ),
                             ),
                         ],
                         options={
-                            "constraints": [
-                                models.UniqueConstraint(
-                                    fields=["author", "book"],
-                                    name="unique_author_book",
-                                )
-                            ],
+                            "unique_together": {("author", "book")},
                         },
                     ),
                     migrations.AlterField(
@@ -548,6 +598,7 @@ For example, if we had a ``Book`` model with a ``ManyToManyField`` linking to
                     ),
                 ],
             ),
+            # Add new fields here, outside SeparateDatabaseAndState.
             migrations.AddField(
                 model_name="authorbook",
                 name="is_primary",
