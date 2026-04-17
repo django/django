@@ -73,6 +73,28 @@ details on these changes.
 
 * The ``SQLCompiler.quote_name_unless_alias()`` method will be removed.
 
+* The ``EMAIL_BACKEND``, ``EMAIL_FILE_PATH``, ``EMAIL_HOST``,
+  ``EMAIL_HOST_PASSWORD``, ``EMAIL_HOST_USER``, ``EMAIL_PORT``,
+  ``EMAIL_USE_TLS``, ``EMAIL_USE_SSL``, ``EMAIL_SSL_CERTFILE``,
+  ``EMAIL_SSL_KEYFILE``, and ``EMAIL_TIMEOUT`` settings will be removed.
+
+* The ``django.core.mail.get_connection()`` function will be removed.
+
+* The ``connection``, ``fail_silently``, ``auth_user``, and ``auth_password``
+  arguments will be removed from :func:`.send_mail`, :func:`.send_mass_mail`,
+  :func:`.mail_admins`, :func:`.mail_managers`, the :class:`.EmailMessage`
+  constructor, and :meth:`.EmailMessage.send`. Support for the
+  ``EmailMessage.connection`` attribute will also be removed.
+
+* Directly creating instances of the ``smtp.EmailBackend`` class will become
+  unsupported, and the class documentation for that backend will be removed.
+
+* The ``BaseEmailBackend.__init__()`` method will raise errors for unknown
+  keyword arguments and will remove support for ``fail_silently``.
+
+* The ``email_backend`` argument of :class:`.log.AdminEmailHandler` will be
+  removed.
+
 * The ``django.contrib.postgres.aggregates.BitAnd``,
   ``django.contrib.postgres.aggregates.BitOr``, and
   ``django.contrib.postgres.aggregates.BitXor`` classes will be removed.
