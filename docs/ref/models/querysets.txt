@@ -2643,9 +2643,8 @@ iterator` if you call its asynchronous version ``aiterator``.
 
 A ``QuerySet`` typically caches its results internally so that repeated
 evaluations do not result in additional queries. In contrast, ``iterator()``
-will read results directly, without doing any caching at the ``QuerySet`` level
-(internally, the default iterator calls ``iterator()`` and caches the return
-value). For a ``QuerySet`` which returns a large number of objects that you
+will read results directly, without doing any caching at the ``QuerySet``
+level. For a ``QuerySet`` which returns a large number of objects that you
 only need to access once, this can result in better performance and a
 significant reduction in memory.
 
