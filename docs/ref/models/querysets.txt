@@ -2637,9 +2637,9 @@ If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 
 *Asynchronous version*: ``aiterator()``
 
-Evaluates the ``QuerySet`` (by performing the query) and returns an iterator
-(see :pep:`234`) over the results, or an asynchronous iterator (see :pep:`492`)
-if you call its asynchronous version ``aiterator``.
+Evaluates the ``QuerySet`` (by performing the query) and returns an
+:term:`python:iterator` over the results, or an :term:`python:asynchronous
+iterator` if you call its asynchronous version ``aiterator``.
 
 A ``QuerySet`` typically caches its results internally so that repeated
 evaluations do not result in additional queries. In contrast, ``iterator()``
