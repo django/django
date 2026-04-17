@@ -1,4 +1,5 @@
 import datetime
+import warnings
 import zoneinfo
 
 from django.conf import settings
@@ -45,6 +46,7 @@ from django.test import (
     skipUnlessDBFeature,
 )
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from ..models import Author, DTModel, Fan
 
@@ -1948,3 +1950,155 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
             DTModel.objects.annotate(
                 hour_melb=Trunc("start_time", "hour", tzinfo=melb),
             ).get()
+
+    def test_extract_deconstruct_tzinfo_none_deprecation(self):
+        """
+        Deprecation warning is raised when deconstructing Extract without
+        explicit tzinfo when USE_TZ is True.
+        """
+        extract = Extract("start_datetime", "hour")
+        with self.assertWarnsMessage(
+            RemovedInDjango70Warning,
+            "Extract() database function's tzinfo argument is not provided",
+        ):
+            extract.deconstruct()
+
+    def test_trunc_deconstruct_tzinfo_none_deprecation(self):
+        """
+        Deprecation warning is raised when deconstructing Trunc without
+        explicit tzinfo when USE_TZ is True.
+        """
+        trunc = Trunc("start_datetime", "day", output_field=DateTimeField())
+        with self.assertWarnsMessage(
+            RemovedInDjango70Warning,
+            "Trunc() database function's tzinfo argument is not provided",
+        ):
+            trunc.deconstruct()
+
+    @override_settings(USE_TZ=False)
+    def test_extract_deconstruct_tzinfo_none_no_warning_without_tz(self):
+        """
+        No deprecation warning is raised when deconstructing Extract without
+        explicit tzinfo when USE_TZ is False.
+        """
+        extract = Extract("start_datetime", "hour")
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            extract.deconstruct()
+            # No deprecation warning should be raised since USE_TZ is False
+            deprecation_warnings = [
+                warning
+                for warning in w
+                if issubclass(warning.category, DeprecationWarning)
+            ]
+            self.assertEqual(len(deprecation_warnings), 0)
+
+    @override_settings(USE_TZ=False)
+    def test_trunc_deconstruct_tzinfo_none_no_warning_without_tz(self):
+        """
+        No deprecation warning is raised when deconstructing Trunc without
+        explicit tzinfo when USE_TZ is False.
+        """
+        trunc = Trunc("start_datetime", "day", output_field=DateTimeField())
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            trunc.deconstruct()
+            # No deprecation warning should be raised since USE_TZ is False
+            deprecation_warnings = [
+                warning
+                for warning in w
+                if issubclass(warning.category, DeprecationWarning)
+            ]
+            self.assertEqual(len(deprecation_warnings), 0)
+
+    def test_extract_deconstruct_with_tzinfo_no_deprecation(self):
+        """
+        No deprecation warning is raised when deconstructing Extract with
+        explicit tzinfo.
+        """
+        melb = zoneinfo.ZoneInfo("Australia/Melbourne")
+        extract = Extract("start_datetime", "hour", tzinfo=melb)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            extract.deconstruct()
+            # No deprecation warning should be raised
+            deprecation_warnings = [
+                warning
+                for warning in w
+                if issubclass(warning.category, DeprecationWarning)
+            ]
+            self.assertEqual(len(deprecation_warnings), 0)
+
+    def test_trunc_deconstruct_with_tzinfo_no_deprecation(self):
+        """
+        No deprecation warning is raised when deconstructing Trunc with
+        explicit tzinfo.
+        """
+        melb = zoneinfo.ZoneInfo("Australia/Melbourne")
+        trunc = Trunc(
+            "start_datetime", "day", output_field=DateTimeField(), tzinfo=melb
+        )
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            trunc.deconstruct()
+            # No deprecation warning should be raised
+            deprecation_warnings = [
+                warning
+                for warning in w
+                if issubclass(warning.category, DeprecationWarning)
+            ]
+            self.assertEqual(len(deprecation_warnings), 0)
+
+    def test_extract_trunc_migration_serialization_warning(self):
+        """
+        Deprecation warning is raised during migration serialization when
+        Extract/Trunc without explicit tzinfo is used in db_default.
+        """
+        # Test Extract migration serialization
+        extract_func = Extract("start_datetime", "hour")
+        with self.assertWarnsMessage(
+            RemovedInDjango70Warning,
+            "Extract() database function's tzinfo argument is not provided",
+        ):
+            extract_func.deconstruct()
+
+        # Test Trunc migration serialization
+        trunc_func = Trunc("start_datetime", "day", output_field=DateTimeField())
+        with self.assertWarnsMessage(
+            RemovedInDjango70Warning,
+            "Trunc() database function's tzinfo argument is not provided",
+        ):
+            trunc_func.deconstruct()
+
+    def test_extract_trunc_migration_serialization_no_warning_with_tzinfo(self):
+        """
+        No deprecation warning during migration serialization when
+        Extract/Trunc with explicit tzinfo is used in db_default.
+        """
+        melb = zoneinfo.ZoneInfo("Australia/Melbourne")
+
+        # Test Extract with tzinfo - no warning
+        extract_func = Extract("datetime_field", "hour", tzinfo=melb)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            extract_func.deconstruct()
+            deprecation_warnings = [
+                warning
+                for warning in w
+                if issubclass(warning.category, DeprecationWarning)
+            ]
+            self.assertEqual(len(deprecation_warnings), 0)
+
+        # Test Trunc with tzinfo - no warning
+        trunc_func = Trunc(
+            "datetime_field", "day", output_field=DateTimeField(), tzinfo=melb
+        )
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            trunc_func.deconstruct()
+            deprecation_warnings = [
+                warning
+                for warning in w
+                if issubclass(warning.category, DeprecationWarning)
+            ]
+            self.assertEqual(len(deprecation_warnings), 0)

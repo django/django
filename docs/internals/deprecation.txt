@@ -69,6 +69,12 @@ details on these changes.
 
 * The ``SQLCompiler.quote_name_unless_alias()`` method will be removed.
 
+* When :class:`~django.db.models.functions.Extract` and
+  :class:`~django.db.models.functions.Trunc` database functions are used
+  in migrations with :setting:`USE_TZ` is ``True``, omitting the
+  ``tzinfo`` argument will no longer fall back to the current timezone.
+  The ``tzinfo`` argument must be provided explicitly.
+
 .. _deprecation-removed-in-6.1:
 
 6.1

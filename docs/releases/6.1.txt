@@ -539,6 +539,17 @@ Miscellaneous
   :ref:`expressions <writing-your-own-query-expressions>`, is deprecated in
   favor of the newly introduced ``quote_name()`` method.
 
+* Omitting the ``tzinfo`` argument of
+  :class:`~django.db.models.functions.Extract` and
+  :class:`~django.db.models.functions.Trunc` database functions when used
+  in migrations (for example as a
+  :attr:`db_default <django.db.models.Field.db_default>`) and
+  :setting:`USE_TZ` is ``True`` is deprecated. The timezone information is
+  not captured during migration serialization, which can lead to
+  inconsistent behavior if :setting:`TIME_ZONE` changes. At the end of the
+  deprecation period, the current timezone will no longer be used as a
+  fallback, so the ``tzinfo`` argument must be provided explicitly.
+
 Features removed in 6.1
 =======================
 
