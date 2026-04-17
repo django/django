@@ -62,6 +62,7 @@ Other guides
    custom-file-storage
    custom-management-commands
    custom-shell
+   email-providers-migration
 
 .. seealso::
 

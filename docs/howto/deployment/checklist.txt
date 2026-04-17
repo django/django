@@ -144,13 +144,18 @@ your application servers.
 
 If you haven't set up backups for your database, do it right now!
 
-:setting:`EMAIL_BACKEND` and related settings
----------------------------------------------
+:setting:`EMAIL_PROVIDERS` and related settings
+-----------------------------------------------
 
 If your site sends emails, these values need to be set correctly.
 
+In development, email is often configured to be printed to the console or
+stored in a local file. For production, you probably want to send real email
+messages. See :ref:`topic-email-configuration` for more information about
+setting :setting:`EMAIL_PROVIDERS` to use production email services.
+
 By default, Django sends email from ``webmaster@localhost`` and
-``root@localhost``. However, some mail providers reject email from these
+``root@localhost``. However, many email providers reject email from these
 addresses. To use different sender addresses, modify the
 :setting:`DEFAULT_FROM_EMAIL` and :setting:`SERVER_EMAIL` settings.
 
