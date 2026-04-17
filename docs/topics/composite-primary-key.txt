@@ -124,11 +124,6 @@ alternative::
 any columns (e.g. ``item_id``), foreign key constraints or indexes in the
 database, and the ``on_delete`` argument is ignored.
 
-.. warning::
-
-    ``ForeignObject`` is an internal API. This means it is not covered by our
-    :ref:`deprecation policy <internal-release-deprecation-policy>`.
-
 .. _cpk-and-database-functions:
 
 Composite primary keys and database functions
