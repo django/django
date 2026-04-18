@@ -79,6 +79,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_collation_on_textfield = False
     supports_on_delete_db_default = False
     supports_no_precision_decimalfield = True
+    supports_default_in_bit_aggregations = False
     test_now_utc_template = "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
     django_test_expected_failures = {
         # A bug in Django/oracledb with respect to string handling (#23843).
@@ -240,3 +241,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def supports_stored_generated_columns(self):
         return self.connection.oracle_version >= (23, 7)
+
+    @cached_property
+    def supports_bit_aggregations(self):
+        return self.connection.oracle_version >= (21,)
