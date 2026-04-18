@@ -186,6 +186,15 @@ Here's the formal declaration of a ``QuerySet``:
 
         The database that will be used if this query is executed now.
 
+    .. attribute:: executed_queries
+
+        .. versionadded:: 6.2
+
+        A list with the executed SQL queries if the ``QuerySet``
+        has been evaluated.
+        Only if :setting:`DEBUG` is ``True``. ``None`` otherwise
+        or if not evaluated.
+
     .. note::
 
         The ``query`` parameter to :class:`QuerySet` exists so that specialized

@@ -13,7 +13,12 @@ from django.db.models.functions import ExtractYear, Length, LTrim
 from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import AND, OR, NothingNode, WhereNode
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext, ignore_warnings, register_lookup
+from django.test.utils import (
+    CaptureQueriesContext,
+    ignore_warnings,
+    override_settings,
+    register_lookup,
+)
 from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import (
@@ -4687,3 +4692,81 @@ class QuerySetCloningTests(TestCase):
         # QuerySet. qs3 is now all of the filters applied to qs + an additional
         # filter.
         self.assertIsNot(qs3, qs)
+
+
+class ExecutedQueriesTests(TestCase):
+    @override_settings(DEBUG=False)
+    def test_no_debug_executed_queries(self):
+        School.objects.create()
+        queryset = School.objects.all()
+
+        self.assertEqual(
+            queryset.executed_queries,
+            None,
+        )
+
+        list(queryset)
+        self.assertEqual(
+            queryset.executed_queries,
+            [],
+        )
+
+    @override_settings(DEBUG=True)
+    def test_no_executed_queries(self):
+        School.objects.create()
+        queryset = School.objects.filter(pk__in=[])
+
+        self.assertEqual(
+            queryset.executed_queries,
+            None,
+        )
+
+        list(queryset)
+        self.assertEqual(
+            queryset.executed_queries,
+            [],
+        )
+        queryset = queryset.none()
+        list(queryset)
+        self.assertEqual(
+            queryset.executed_queries,
+            [],
+        )
+
+    @override_settings(DEBUG=True)
+    def test_single_executed_query(self):
+        School.objects.create()
+        queryset = School.objects.all()
+        list(queryset)
+
+        self.assertEqual(len(queryset.executed_queries), 1)
+
+    @override_settings(DEBUG=True)
+    def test_multiple_executed_queries(self):
+        instance = School.objects.create()
+        Student.objects.create(school=instance)
+
+        queryset = School.objects.prefetch_related("student_set__classroom")
+        list(queryset)
+
+        self.assertEqual(len(queryset.executed_queries), 3)
+
+    @override_settings(DEBUG=True)
+    def test_raw_queryset_single_executed_query(self):
+        School.objects.create()
+        queryset = School.objects.raw("SELECT * FROM queries_school")
+        list(queryset)
+
+        self.assertEqual(len(queryset.executed_queries), 1)
+
+    @override_settings(DEBUG=True)
+    def test_raw_queryset_multiple_executed_queries(self):
+        instance = School.objects.create()
+        Student.objects.create(school=instance)
+
+        queryset = School.objects.raw("SELECT * FROM queries_school").prefetch_related(
+            "student_set__classroom"
+        )
+        list(queryset)
+
+        self.assertEqual(len(queryset.executed_queries), 3)
