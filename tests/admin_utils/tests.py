@@ -4,7 +4,7 @@ from decimal import Decimal
 from django import forms
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.admin import AdminSite, helpers
+from django.contrib.admin import helpers
 from django.contrib.admin.utils import (
     NestedObjects,
     build_q_object_from_lookup_parameters,
@@ -12,19 +12,16 @@ from django.contrib.admin.utils import (
     display_for_value,
     flatten,
     flatten_fieldsets,
-    get_deleted_objects,
     help_text_for_field,
     label_for_field,
     lookup_field,
     quote,
 )
-from django.contrib.auth.models import Permission, User
+from django.contrib.auth.models import User
 from django.contrib.auth.templatetags.auth import render_password_as_hash
-from django.contrib.contenttypes.models import ContentType
 from django.core.validators import EMPTY_VALUES
 from django.db import DEFAULT_DB_ALIAS, models
 from django.test import (
-    RequestFactory,
     SimpleTestCase,
     TestCase,
     override_settings,
@@ -36,8 +33,6 @@ from django.utils.safestring import mark_safe
 
 from .models import (
     Article,
-    ArticleProxy,
-    ArticleProxy2,
     Car,
     Cascade,
     DBCascade,
@@ -531,51 +526,3 @@ class UtilsTests(SimpleTestCase):
             & models.Q(hist__iexact="history")
             & (models.Q(site__pk=1) | models.Q(site__pk=2)),
         )
-
-
-class ProxyModelTests(TestCase):
-    def test_get_deleted_objects_proxy_permissions_and_proxy_of_proxy(self):
-        """
-        Regression test for #20151: get_deleted_objects should check
-        global permissions for proxy models not registered in the admin.
-        """
-        site = Site.objects.create(domain="example.com")
-        article = Article.objects.create(site=site, title="Test", hist="Test hist")
-
-        # First-level proxy
-        article_proxy = ArticleProxy.objects.get(pk=article.pk)
-
-        # Second-level proxy
-        article_proxy2 = ArticleProxy2.objects.get(pk=article.pk)
-
-        user = User.objects.create_user(
-            username="testuser", password="testpass", is_staff=True
-        )
-
-        # We ONLY give permission to the concrete Article model.
-        # Per modern Django, this DOES NOT grant permission to
-        # ArticleProxy or ArticleProxy2.
-        article_ct = ContentType.objects.get_for_model(Article)
-        delete_perm = Permission.objects.get(
-            content_type=article_ct, codename="delete_article"
-        )
-        user.user_permissions.add(delete_perm)
-
-        request = RequestFactory().get("/")
-        request.user = user
-
-        # Check first-level proxy (not registered in admin)
-        _, _, perms_needed1, _ = get_deleted_objects(
-            [article_proxy], request, AdminSite()
-        )
-        # It should be in perms_needed
-        # because the user lacks 'delete_articleproxy'
-        self.assertIn("article proxy", perms_needed1)
-
-        # Check second-level proxy (not registered in admin)
-        _, _, perms_needed2, _ = get_deleted_objects(
-            [article_proxy2], request, AdminSite()
-        )
-        # It should be in perms_needed
-        # because the user lacks 'delete_articleproxy2'
-        self.assertIn("article proxy level 2", perms_needed2)

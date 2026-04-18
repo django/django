@@ -40,12 +40,6 @@ class ArticleProxy(Article):
         proxy = True
 
 
-class ArticleProxy2(ArticleProxy):
-    class Meta:
-        proxy = True
-        verbose_name = "article proxy level 2"
-
-
 class Cascade(models.Model):
     num = models.PositiveSmallIntegerField()
     parent = models.ForeignKey("self", models.CASCADE, null=True)

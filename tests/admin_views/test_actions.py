@@ -173,6 +173,58 @@ class AdminActionsTest(TestCase):
         )
         self.assertEqual(Question.objects.count(), 2)
 
+    def test_delete_action_unregistered_model_no_permission(self):
+        """
+        The delete action displays models not registered in the admin in the
+        "permissions needed" list if the user lacks the specific permission.
+        """
+        from django.contrib.auth.models import Permission
+
+        from .models import FooAccount, Persona
+
+        # Create a Persona and a related FooAccount
+        p = Persona.objects.create(name="Jerlo")
+        FooAccount.objects.create(persona=p)
+
+        # Create staff user
+        user = User.objects.create_user(
+            username="staff", password="password", is_staff=True
+        )
+
+        # Give permissions for Persona (view/change/delete)
+        # but skip giving 'delete_fooaccount'
+        perms = Permission.objects.filter(
+            codename__in=["view_persona", "change_persona", "delete_persona"]
+        )
+        user.user_permissions.add(*perms)
+
+        self.client.force_login(user)
+
+        # Attempt to trigger the delete action
+        selected = {"action": "delete_selected", "_selected_action": [p.pk]}
+        response = self.client.post(
+            reverse("admin:admin_views_persona_changelist"), selected
+        )
+
+        # 1. Check for the "rendered" error message in the HTML
+        # Using a partial string check is
+        # safer in case of capitalization differences
+        self.assertContains(
+            response, "permission to delete the following types of objects"
+        )
+        self.assertContains(response, "foo account")
+
+        # 2. Try to POST the confirmation (it should fail to delete)
+        confirm_data = {
+            "action": "delete_selected",
+            "_selected_action": [p.pk],
+            "post": "yes",
+        }
+        self.client.post(reverse("admin:admin_views_persona_changelist"), confirm_data)
+
+        # Verify the Persona still exists
+        self.assertTrue(Persona.objects.filter(pk=p.pk).exists())
+
     def test_model_admin_default_delete_action_no_change_url(self):
         """
         The default delete action doesn't break if a ModelAdmin removes the

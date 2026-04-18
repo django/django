@@ -2077,6 +2077,7 @@ default templates used by the :class:`ModelAdmin` views:
     ``perms_needed`` is a set of
     :attr:`~django.db.models.Options.verbose_name`\s of the models that the
     user doesn't have permission to delete.
+
     .. versionchanged:: 6.1
 
         Added a fallback to check the model's global delete permission if it
