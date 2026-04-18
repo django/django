@@ -61,15 +61,17 @@
         background-position: 0 0;
     }
 
-    [dir="rtl"] :enabled.selector-remove:focus, :enabled.selector-remove:hover {
+    [dir="rtl"] :enabled.selector-remove:focus,
+    :enabled.selector-remove:hover {
         background-position: 0 -24px;
     }
 
-    [dir="rtl"] .selector-add  {
+    [dir="rtl"] .selector-add {
         background-position: 0 -48px;
     }
 
-    [dir="rtl"] :enabled.selector-add:focus, :enabled.selector-add:hover {
+    [dir="rtl"] :enabled.selector-add:focus,
+    :enabled.selector-add:hover {
         background-position: 0 -72px;
     }
 

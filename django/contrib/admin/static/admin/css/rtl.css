@@ -4,16 +4,21 @@ th {
     text-align: right;
 }
 
-.module h2, .module caption {
+.module h2,
+.module caption {
     text-align: right;
 }
 
-.module ul, .module ol {
+.module ul,
+.module ol {
     margin-left: 0;
     margin-right: 1.5em;
 }
 
-.viewlink, .addlink, .changelink, .hidelink {
+.viewlink,
+.addlink,
+.changelink,
+.hidelink {
     padding-left: 0;
     padding-right: 16px;
     background-position-x: 100%;
@@ -65,7 +70,7 @@ div.breadcrumbs {
 /* SORTABLE TABLES */
 
 table thead th.sorted .sortoptions {
-   float: left;
+    float: left;
 }
 
 thead th.sorted .text {
@@ -76,7 +81,7 @@ thead th.sorted .text {
 /* dashboard styles */
 
 .dashboard .module table td a {
-    padding-left: .6em;
+    padding-left: 0.6em;
     padding-right: 16px;
 }
 
@@ -103,7 +108,8 @@ thead th.sorted .text {
     margin-right: -15px;
 }
 
-#changelist table tbody td:first-child, #changelist table tbody th:first-child {
+#changelist table tbody td:first-child,
+#changelist table tbody th:first-child {
     border-right: none;
     border-left: none;
 }
@@ -150,7 +156,8 @@ form ul.inline li {
     background: url(../img/calendar-icons.svg) 0 0 no-repeat;
 }
 
-.calendar caption, .calendarbox h2 {
+.calendar caption,
+.calendarbox h2 {
     text-align: center;
 }
 
@@ -167,7 +174,8 @@ form ul.inline li {
     background-size: 24px auto;
 }
 
-:enabled.selector-add:focus, :enabled.selector-add:hover {
+:enabled.selector-add:focus,
+:enabled.selector-add:hover {
     background-position: 0 -120px;
 }
 
@@ -176,15 +184,18 @@ form ul.inline li {
     background-size: 24px auto;
 }
 
-:enabled.selector-remove:focus, :enabled.selector-remove:hover {
+:enabled.selector-remove:focus,
+:enabled.selector-remove:hover {
     background-position: 0 -168px;
 }
 
-:enabled.selector-chooseall:focus, :enabled.selector-chooseall:hover {
+:enabled.selector-chooseall:focus,
+:enabled.selector-chooseall:hover {
     background-position: 100% -144px;
 }
 
-:enabled.selector-clearall:focus, :enabled.selector-clearall:hover {
+:enabled.selector-clearall:focus,
+:enabled.selector-clearall:hover {
     background-position: 0 -176px;
 }
 
@@ -202,8 +213,9 @@ form .form-row p.datetime {
 
 /* MISC */
 
-.inline-related h2, .inline-group h2 {
-    text-align: right
+.inline-related h2,
+.inline-group h2 {
+    text-align: right;
 }
 
 .inline-related h3 span.delete {
@@ -211,7 +223,7 @@ form .form-row p.datetime {
     padding-left: inherit;
     left: 10px;
     right: inherit;
-    float:left;
+    float: left;
 }
 
 .inline-related h3 span.delete label {
