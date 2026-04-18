@@ -18,6 +18,8 @@ from .models import (
     Answer,
     Book,
     ExternalSubscriber,
+    FooAccount,
+    Persona,
     Question,
     Subscriber,
     UnchangeableObject,
@@ -172,6 +174,37 @@ class AdminActionsTest(TestCase):
             response, "would require deleting the following protected related objects"
         )
         self.assertEqual(Question.objects.count(), 2)
+
+    def test_delete_action_unregistered_model_no_permission(self):
+        """
+        The delete action displays models not registered in the admin in the
+        "permissions needed" list if the user lacks the specific permission.
+        """
+        p = Persona.objects.create(name="Jerlo")
+        FooAccount.objects.create(persona=p)
+        user = User.objects.create_user(
+            username="staff", password="password", is_staff=True
+        )
+        perms = Permission.objects.filter(
+            codename__in=["view_persona", "change_persona", "delete_persona"]
+        )
+        user.user_permissions.add(*perms)
+        self.client.force_login(user)
+        selected_data = {"action": "delete_selected", "_selected_action": [p.pk]}
+        response = self.client.post(
+            reverse("admin:admin_views_persona_changelist"), selected_data
+        )
+        self.assertContains(
+            response, "permission to delete the following types of objects"
+        )
+        self.assertContains(response, "foo account")
+        confirm_data = {
+            "action": "delete_selected",
+            "_selected_action": [p.pk],
+            "post": "yes",
+        }
+        self.client.post(reverse("admin:admin_views_persona_changelist"), confirm_data)
+        self.assertEqual(Persona.objects.count(), 1)
 
     def test_model_admin_default_delete_action_no_change_url(self):
         """
