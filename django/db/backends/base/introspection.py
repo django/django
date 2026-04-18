@@ -89,26 +89,36 @@ class BaseDatabaseIntrospection:
             "get_table_description() method."
         )
 
-    def get_migratable_models(self):
+    def get_migratable_models(self, *, use_router=True):
         from django.apps import apps
         from django.db import router
 
-        return (
-            model
-            for app_config in apps.get_app_configs()
-            for model in router.get_migratable_models(app_config, self.connection.alias)
-            if model._meta.can_migrate(self.connection)
-        )
+        if use_router:
+            models = (
+                model
+                for app_config in apps.get_app_configs()
+                for model in router.get_migratable_models(
+                    app_config, self.connection.alias
+                )
+            )
+        else:
+            models = apps.get_models(include_auto_created=True)
 
-    def django_table_names(self, only_existing=False, include_views=True):
+        return (model for model in models if model._meta.can_migrate(self.connection))
+
+    def django_table_names(
+        self, only_existing=False, include_views=True, use_router=True
+    ):
         """
         Return a list of all table names that have associated Django models and
         are in INSTALLED_APPS.
 
         If only_existing is True, include only the tables in the database.
+        If use_router is False, include all managed models regardless of
+        what the database router says (useful for flushing/cleanup operations).
         """
         tables = set()
-        for model in self.get_migratable_models():
+        for model in self.get_migratable_models(use_router=use_router):
             if not model._meta.managed:
                 continue
             tables.add(model._meta.db_table)

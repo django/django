@@ -1,6 +1,6 @@
 from django.db import DatabaseError, connection
 from django.db.models import DB_CASCADE, DB_SET_DEFAULT, DB_SET_NULL, DO_NOTHING, Index
-from django.test import TransactionTestCase, skipUnlessDBFeature
+from django.test import TransactionTestCase, override_settings, skipUnlessDBFeature
 
 from .models import (
     Article,
@@ -81,6 +81,21 @@ class IntrospectionTests(TransactionTestCase):
     def test_unmanaged_through_model(self):
         tables = connection.introspection.django_table_names()
         self.assertNotIn(ArticleReporter._meta.db_table, tables)
+
+    def test_django_table_names_use_router_false_bypasses_router(self):
+        class RejectAllRouter:
+            def allow_migrate(self, db, app_label, **hints):
+                return False
+
+        with override_settings(DATABASE_ROUTERS=[RejectAllRouter()]):
+            self.assertNotIn(
+                Reporter._meta.db_table,
+                connection.introspection.django_table_names(use_router=True),
+            )
+            self.assertIn(
+                Reporter._meta.db_table,
+                connection.introspection.django_table_names(use_router=False),
+            )
 
     def test_installed_models(self):
         tables = [Article._meta.db_table, Reporter._meta.db_table]
