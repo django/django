@@ -16,7 +16,7 @@ th {
 .viewlink, .addlink, .changelink, .hidelink {
     padding-left: 0;
     padding-right: 16px;
-    background-position: 100% 1px;
+    background-position-x: 100%;
 }
 
 .deletelink {
@@ -25,8 +25,9 @@ th {
     background-position: 100% 1px;
 }
 
-.object-tools {
-    float: left;
+.object-tools li + li {
+    margin-right: 15px;
+    margin-left: 0;
 }
 
 thead th:first-child,
@@ -107,7 +108,7 @@ thead th.sorted .text {
     border-left: none;
 }
 
-.paginator .end {
+.paginator ul {
     margin-left: 6px;
     margin-right: 0;
 }
@@ -119,28 +120,8 @@ thead th.sorted .text {
 
 /* FORMS */
 
-.aligned label {
-    padding: 0 0 3px 1em;
-}
-
-.submit-row a.deletelink {
-    margin-left: 0;
-    margin-right: auto;
-}
-
-.vDateField, .vTimeField {
-    margin-left: 2px;
-}
-
-.aligned .form-row input {
-    margin-left: 5px;
-}
-
 form .aligned ul {
-    margin-right: 163px;
-    padding-right: 10px;
-    margin-left: 0;
-    padding-left: 0;
+    margin: 0;
 }
 
 form ul.inline li {
@@ -149,46 +130,8 @@ form ul.inline li {
     padding-left: 7px;
 }
 
-form .aligned p.help,
-form .aligned div.help {
-    margin-left: 0;
-    margin-right: 160px;
-    padding-right: 10px;
-}
-
-form div.help ul,
-form .aligned .checkbox-row + .help,
-form .aligned p.date div.help.timezonewarning,
-form .aligned p.datetime div.help.timezonewarning,
-form .aligned p.time div.help.timezonewarning {
-    margin-right: 0;
-    padding-right: 0;
-}
-
-form .wide p.help,
-form .wide ul.errorlist,
-form .wide div.help {
-    padding-left: 0;
-    padding-right: 50px;
-}
-
 .submit-row {
     text-align: right;
-}
-
-fieldset .fieldBox {
-    margin-left: 20px;
-    margin-right: 0;
-}
-
-.errorlist li {
-    background-position: 100% 12px;
-    padding: 0;
-}
-
-.errornote {
-    background-position: 100% 12px;
-    padding: 10px 12px;
 }
 
 /* WIDGETS */
@@ -220,34 +163,28 @@ fieldset .fieldBox {
 }
 
 .selector-add {
-  background: url(../img/selector-icons.svg) 0 -64px no-repeat;
+    background: url(../img/selector-icons.svg) 0 -96px no-repeat;
+    background-size: 24px auto;
 }
 
-.active.selector-add:focus, .active.selector-add:hover {
-  background-position: 0 -80px;
+:enabled.selector-add:focus, :enabled.selector-add:hover {
+    background-position: 0 -120px;
 }
 
 .selector-remove {
-  background: url(../img/selector-icons.svg) 0 -96px no-repeat;
+    background: url(../img/selector-icons.svg) 0 -144px no-repeat;
+    background-size: 24px auto;
 }
 
-.active.selector-remove:focus, .active.selector-remove:hover {
-  background-position: 0 -112px;
+:enabled.selector-remove:focus, :enabled.selector-remove:hover {
+    background-position: 0 -168px;
 }
 
-a.selector-chooseall {
-    background: url(../img/selector-icons.svg) right -128px no-repeat;
-}
-
-a.active.selector-chooseall:focus, a.active.selector-chooseall:hover {
+:enabled.selector-chooseall:focus, :enabled.selector-chooseall:hover {
     background-position: 100% -144px;
 }
 
-a.selector-clearall {
-    background: url(../img/selector-icons.svg) 0 -160px no-repeat;
-}
-
-a.active.selector-clearall:focus, a.active.selector-clearall:hover {
+:enabled.selector-clearall:focus, :enabled.selector-clearall:hover {
     background-position: 0 -176px;
 }
 
@@ -288,4 +225,9 @@ form .form-row p.datetime {
 
 .selector .selector-chooser {
     margin: 0;
+}
+
+ul.messagelist li {
+    padding: 10px 65px 10px 10px;
+    background-position-x: calc(100% - 40px);
 }

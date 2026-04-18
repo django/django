@@ -1,7 +1,8 @@
-from urllib.parse import unquote, urlsplit, urlunsplit
+from urllib.parse import unquote, urlencode, urlsplit, urlunsplit
 
 from asgiref.local import Local
 
+from django.http import QueryDict
 from django.utils.functional import lazy
 from django.utils.translation import override
 
@@ -24,7 +25,16 @@ def resolve(path, urlconf=None):
     return get_resolver(urlconf).resolve(path)
 
 
-def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
+def reverse(
+    viewname,
+    urlconf=None,
+    args=None,
+    kwargs=None,
+    current_app=None,
+    *,
+    query=None,
+    fragment=None,
+):
     if urlconf is None:
         urlconf = get_urlconf()
     resolver = get_resolver(urlconf)
@@ -85,7 +95,17 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
                 ns_pattern, resolver, tuple(ns_converters.items())
             )
 
-    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+    if query is not None:
+        if isinstance(query, QueryDict):
+            query_string = query.urlencode()
+        else:
+            query_string = urlencode(query, doseq=True)
+        if query_string:
+            resolved_url += "?" + query_string
+    if fragment is not None:
+        resolved_url += "#" + fragment
+    return resolved_url
 
 
 reverse_lazy = lazy(reverse, str)
@@ -127,8 +147,9 @@ def clear_script_prefix():
 
 def set_urlconf(urlconf_name):
     """
-    Set the URLconf for the current thread (overriding the default one in
-    settings). If urlconf_name is None, revert back to the default.
+    Set the URLconf for the current thread or asyncio task (overriding the
+    default one in settings). If urlconf_name is None, revert back to the
+    default.
     """
     if urlconf_name:
         _urlconfs.value = urlconf_name
@@ -139,8 +160,8 @@ def set_urlconf(urlconf_name):
 
 def get_urlconf(default=None):
     """
-    Return the root URLconf to use for the current thread if it has been
-    changed from the default one.
+    Return the root URLconf to use for the current thread or asyncio task if it
+    has been changed from the default one.
     """
     return getattr(_urlconfs, "value", default)
 

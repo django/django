@@ -65,7 +65,7 @@ except ImportError:
 # datetime.datetime(2011, 9, 1, 13, 20, 30), which translates to
 # 10:20:30 in UTC and 17:20:30 in ICT.
 
-UTC = datetime.timezone.utc
+UTC = datetime.UTC
 EAT = timezone.get_fixed_timezone(180)  # Africa/Nairobi
 ICT = timezone.get_fixed_timezone(420)  # Asia/Bangkok
 
@@ -75,7 +75,8 @@ def override_database_connection_timezone(timezone):
     try:
         orig_timezone = connection.settings_dict["TIME_ZONE"]
         connection.settings_dict["TIME_ZONE"] = timezone
-        # Clear cached properties, after first accessing them to ensure they exist.
+        # Clear cached properties, after first accessing them to ensure they
+        # exist.
         connection.timezone
         del connection.timezone
         connection.timezone_name
@@ -83,7 +84,8 @@ def override_database_connection_timezone(timezone):
         yield
     finally:
         connection.settings_dict["TIME_ZONE"] = orig_timezone
-        # Clear cached properties, after first accessing them to ensure they exist.
+        # Clear cached properties, after first accessing them to ensure they
+        # exist.
         connection.timezone
         del connection.timezone
         connection.timezone_name
@@ -450,8 +452,8 @@ class NewDatabaseTests(TestCase):
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=EAT))
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 4, 30, 0, tzinfo=EAT))
         with timezone.override(UTC):
-            # These two dates fall in the same day in EAT, but in different days,
-            # years and months in UTC.
+            # These two dates fall in the same day in EAT, but in different
+            # days, years and months in UTC.
             self.assertEqual(Event.objects.filter(dt__year=2011).count(), 1)
             self.assertEqual(Event.objects.filter(dt__month=1).count(), 1)
             self.assertEqual(Event.objects.filter(dt__day=1).count(), 1)
@@ -618,7 +620,7 @@ class NewDatabaseTests(TestCase):
     @skipIfDBFeature("supports_timezones")
     def test_cursor_execute_accepts_naive_datetime(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
-        utc_naive_dt = timezone.make_naive(dt, datetime.timezone.utc)
+        utc_naive_dt = timezone.make_naive(dt, UTC)
         with connection.cursor() as cursor:
             cursor.execute(
                 "INSERT INTO timezones_event (dt) VALUES (%s)", [utc_naive_dt]
@@ -637,7 +639,7 @@ class NewDatabaseTests(TestCase):
     @skipIfDBFeature("supports_timezones")
     def test_cursor_execute_returns_naive_datetime(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
-        utc_naive_dt = timezone.make_naive(dt, datetime.timezone.utc)
+        utc_naive_dt = timezone.make_naive(dt, UTC)
         Event.objects.create(dt=dt)
         with connection.cursor() as cursor:
             cursor.execute(
@@ -921,9 +923,13 @@ class SerializationTests(SimpleTestCase):
                 self.assertEqual(obj.dt, dt)
 
 
-@translation.override(None)
 @override_settings(DATETIME_FORMAT="c", TIME_ZONE="Africa/Nairobi", USE_TZ=True)
 class TemplateTests(SimpleTestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.enterClassContext(translation.override(None))
+        super().setUpClass()
+
     @requires_tz_support
     def test_localtime_templatetag_and_filters(self):
         """
@@ -1165,7 +1171,8 @@ class TemplateTests(SimpleTestCase):
     @skipIf(sys.platform == "win32", "Windows uses non-standard time zone names")
     def test_tz_template_context_processor(self):
         """
-        Test the django.template.context_processors.tz template context processor.
+        Test the django.template.context_processors.tz template context
+        processor.
         """
         tpl = Template("{{ TIME_ZONE }}")
         context = Context()
@@ -1324,7 +1331,6 @@ class NewFormsTests(TestCase):
             self.assertIn("2011-09-01 17:20:30", str(form))
 
 
-@translation.override(None)
 @override_settings(
     DATETIME_FORMAT="c",
     TIME_ZONE="Africa/Nairobi",
@@ -1334,6 +1340,7 @@ class NewFormsTests(TestCase):
 class AdminTests(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.enterClassContext(translation.override(None))
         cls.u1 = User.objects.create_user(
             password="secret",
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10, tzinfo=UTC),

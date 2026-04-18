@@ -41,7 +41,7 @@ class Feed:
         response = HttpResponse(content_type=feedgen.content_type)
         if hasattr(self, "item_pubdate") or hasattr(self, "item_updateddate"):
             # if item_pubdate or item_updateddate is defined for the feed, set
-            # header so as ConditionalGetMiddleware is able to send 304 NOT MODIFIED
+            # header so as ConditionalGetMiddleware can send 304 NOT MODIFIED.
             response.headers["Last-Modified"] = http_date(
                 feedgen.latest_post_date().timestamp()
             )
@@ -160,6 +160,7 @@ class Feed:
             feed_copyright=self._get_dynamic_attr("feed_copyright", obj),
             feed_guid=self._get_dynamic_attr("feed_guid", obj),
             ttl=self._get_dynamic_attr("ttl", obj),
+            stylesheets=self._get_dynamic_attr("stylesheets", obj),
             **self.feed_extra_kwargs(obj),
         )
 

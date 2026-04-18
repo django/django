@@ -14,7 +14,7 @@ c_uchar_p = POINTER(c_ubyte)
 # We create a simple subclass of c_char_p here because when the response
 # type is set to c_char_p, you get a _Python_ string and there's no way
 # to access the string's address inside the error checking function.
-# In other words, you can't free the memory allocated inside GEOS.  Previously,
+# In other words, you can't free the memory allocated inside GEOS. Previously,
 # the return type would just be omitted and the integer address would be
 # used -- but this allows us to be specific in the function definition and
 # keeps the reference so it may be free'd.
@@ -25,12 +25,14 @@ class geos_char_p(c_char_p):
 # ### ctypes factory classes ###
 class GeomOutput(GEOSFuncFactory):
     "For GEOS routines that return a geometry."
+
     restype = GEOM_PTR
     errcheck = staticmethod(check_geom)
 
 
 class IntFromGeom(GEOSFuncFactory):
     "Argument is a geometry, return type is an integer."
+
     argtypes = [GEOM_PTR]
     restype = c_int
     errcheck = staticmethod(check_minus_one)
@@ -38,6 +40,7 @@ class IntFromGeom(GEOSFuncFactory):
 
 class StringFromGeom(GEOSFuncFactory):
     "Argument is a Geometry, return type is a string."
+
     argtypes = [GEOM_PTR]
     restype = geos_char_p
     errcheck = staticmethod(check_string)

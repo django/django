@@ -36,6 +36,9 @@ class BaseUserManager(models.Manager):
     def get_by_natural_key(self, username):
         return self.get(**{self.model.USERNAME_FIELD: username})
 
+    async def aget_by_natural_key(self, username):
+        return await self.aget(**{self.model.USERNAME_FIELD: username})
+
 
 class AbstractBaseUser(models.Model):
     password = models.CharField(_("password"), max_length=128)
@@ -55,11 +58,8 @@ class AbstractBaseUser(models.Model):
     def __str__(self):
         return self.get_username()
 
-    # RemovedInDjango60Warning: When the deprecation ends, replace with:
-    # def save(self, **kwargs):
-    #   super().save(**kwargs)
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+    def save(self, **kwargs):
+        super().save(**kwargs)
         if self._password is not None:
             password_validation.password_changed(self._password, self)
             self._password = None

@@ -5,7 +5,7 @@ from django.contrib.admin.sites import site
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase
 
-from .models import Location, Person, Place, Traveler
+from .models import Guest, Location, Person, Place, Traveler
 
 
 class NameAdmin(admin.ModelAdmin):
@@ -91,6 +91,14 @@ class TestRegistration(SimpleTestCase):
         msg = "The model Location is abstract, so it cannot be registered with admin."
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.site.register(Location)
+
+    def test_composite_pk_model(self):
+        msg = (
+            "The model Guest has a composite primary key, so it cannot be registered "
+            "with admin."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            self.site.register(Guest)
 
     def test_is_registered_model(self):
         "Checks for registered models should return true."

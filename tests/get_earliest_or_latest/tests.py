@@ -1,9 +1,10 @@
 from datetime import datetime
+from unittest.mock import patch
 
 from django.db.models import Avg
 from django.test import TestCase
 
-from .models import Article, Comment, IndexErrorArticle, Person
+from .models import Article, Comment, IndexErrorArticle, OrderedArticle, Person
 
 
 class EarliestOrLatestTests(TestCase):
@@ -50,8 +51,8 @@ class EarliestOrLatestTests(TestCase):
             Article.objects.filter(pub_date__gt=datetime(2005, 7, 26)).earliest(), a2
         )
 
-        # Pass a custom field name to earliest() to change the field that's used
-        # to determine the earliest object.
+        # Pass a custom field name to earliest() to change the field that's
+        # used to determine the earliest object.
         self.assertEqual(Article.objects.earliest("expire_date"), a2)
         self.assertEqual(
             Article.objects.filter(pub_date__gt=datetime(2005, 7, 26)).earliest(
@@ -143,7 +144,8 @@ class EarliestOrLatestTests(TestCase):
             a3,
         )
 
-        # latest() overrides any other ordering specified on the query (#11283).
+        # latest() overrides any other ordering specified on the query
+        # (#11283).
         self.assertEqual(Article.objects.order_by("id").latest(), a4)
 
         # Error is raised if get_latest_by isn't in Model.Meta.
@@ -264,3 +266,30 @@ class TestFirstLast(TestCase):
             qs.first()
         with self.assertRaisesMessage(TypeError, msg % "last"):
             qs.last()
+
+    def test_first_last_empty_order_by_has_no_pk_ordering(self):
+        Article.objects.create(
+            headline="Article 1",
+            pub_date=datetime(2006, 9, 10),
+            expire_date=datetime(2056, 9, 11),
+        )
+
+        qs = Article.objects.order_by()
+        with patch.object(type(qs), "order_by") as mock_order_by:
+            qs.first()
+            mock_order_by.assert_not_called()
+            qs.last()
+            mock_order_by.assert_not_called()
+
+    def test_first_last_empty_order_by_clears_default_ordering(self):
+        OrderedArticle.objects.create(
+            headline="Article 1",
+            pub_date=datetime(2006, 9, 10),
+        )
+
+        qs = OrderedArticle.objects.order_by()
+        with patch.object(type(qs), "order_by") as mock_order_by:
+            qs.first()
+            mock_order_by.assert_not_called()
+            qs.last()
+            mock_order_by.assert_not_called()

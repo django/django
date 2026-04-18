@@ -6,6 +6,7 @@ All text copyright Python (Monty) Pictures. Thanks to sacred-texts.com for the
 transcript.
 """
 
+from django.db import connection
 from django.db.models import F, Value
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
@@ -13,11 +14,13 @@ from .models import Character, Line, LineSavedSearch, Scene
 
 try:
     from django.contrib.postgres.search import (
+        Lexeme,
         SearchConfig,
         SearchHeadline,
         SearchQuery,
         SearchRank,
         SearchVector,
+        quote_lexeme,
     )
 except ImportError:
     pass
@@ -602,8 +605,8 @@ class TestRankingAndWeights(GrailTestData, PostgreSQLTestCase):
                 rank=SearchRank(
                     SearchVector("dialogue"),
                     SearchQuery("brave sir robin"),
-                    # Divide the rank by the document length and by the number of
-                    # unique words in document.
+                    # Divide the rank by the document length and by the number
+                    # of unique words in document.
                     normalization=Value(2).bitor(Value(8)),
                 ),
             )
@@ -769,3 +772,223 @@ class SearchHeadlineTests(GrailTestData, PostgreSQLTestCase):
             "<b>Brave</b>, <b>brave</b>, <b>brave</b>...<br>"
             "<b>brave</b> <b>Sir</b> <b>Robin</b>",
         )
+
+
+class TestLexemes(GrailTestData, PostgreSQLTestCase):
+    def test_and(self):
+        searched = Line.objects.annotate(
+            search=SearchVector("scene__setting", "dialogue"),
+        ).filter(search=SearchQuery(Lexeme("bedemir") & Lexeme("scales")))
+        self.assertSequenceEqual(searched, [self.bedemir0])
+
+    def test_multiple_and(self):
+        searched = Line.objects.annotate(
+            search=SearchVector("scene__setting", "dialogue"),
+        ).filter(
+            search=SearchQuery(
+                Lexeme("bedemir") & Lexeme("scales") & Lexeme("nostrils")
+            )
+        )
+        self.assertSequenceEqual(searched, [])
+
+        searched = Line.objects.annotate(
+            search=SearchVector("scene__setting", "dialogue"),
+        ).filter(search=SearchQuery(Lexeme("shall") & Lexeme("use") & Lexeme("larger")))
+        self.assertSequenceEqual(searched, [self.bedemir0])
+
+    def test_or(self):
+        searched = Line.objects.annotate(search=SearchVector("dialogue")).filter(
+            search=SearchQuery(Lexeme("kneecaps") | Lexeme("nostrils"))
+        )
+        self.assertCountEqual(searched, [self.verse1, self.verse2])
+
+    def test_multiple_or(self):
+        searched = Line.objects.annotate(search=SearchVector("dialogue")).filter(
+            search=SearchQuery(
+                Lexeme("kneecaps") | Lexeme("nostrils") | Lexeme("Sir Robin")
+            )
+        )
+        self.assertCountEqual(searched, [self.verse1, self.verse2, self.verse0])
+
+    def test_advanced(self):
+        """
+        Combination of & and |
+        This is mainly helpful for checking the test_advanced_invert below
+        """
+        searched = Line.objects.annotate(search=SearchVector("dialogue")).filter(
+            search=SearchQuery(
+                Lexeme("shall") & Lexeme("use") & Lexeme("larger") | Lexeme("nostrils")
+            )
+        )
+        self.assertCountEqual(searched, [self.bedemir0, self.verse2])
+
+    def test_invert(self):
+        searched = Line.objects.annotate(search=SearchVector("dialogue")).filter(
+            character=self.minstrel, search=SearchQuery(~Lexeme("kneecaps"))
+        )
+        self.assertCountEqual(searched, [self.verse0, self.verse2])
+
+    def test_advanced_invert(self):
+        """
+        Inverting a query that uses a combination of & and |
+        should return the opposite of test_advanced.
+        """
+        searched = Line.objects.annotate(search=SearchVector("dialogue")).filter(
+            search=SearchQuery(
+                ~(
+                    Lexeme("shall") & Lexeme("use") & Lexeme("larger")
+                    | Lexeme("nostrils")
+                )
+            )
+        )
+        expected_result = Line.objects.exclude(
+            id__in=[self.bedemir0.id, self.verse2.id]
+        )
+        self.assertCountEqual(searched, expected_result)
+
+    def test_as_sql(self):
+        query = Line.objects.all().query
+        compiler = query.get_compiler(connection.alias)
+
+        tests = (
+            (Lexeme("a"), ("'a'",)),
+            (Lexeme("a", invert=True), ("!'a'",)),
+            (~Lexeme("a"), ("!'a'",)),
+            (Lexeme("a", prefix=True), ("'a':*",)),
+            (Lexeme("a", weight="D"), ("'a':D",)),
+            (Lexeme("a", invert=True, prefix=True, weight="D"), ("!'a':*D",)),
+            (Lexeme("a") | Lexeme("b") & ~Lexeme("c"), ("('a' | ('b' & !'c'))",)),
+            (
+                ~(Lexeme("a") | Lexeme("b") & ~Lexeme("c")),
+                ("(!'a' & (!'b' | 'c'))",),
+            ),
+        )
+
+        for expression, expected_params in tests:
+            with self.subTest(expression=expression, expected_params=expected_params):
+                _, params = expression.as_sql(compiler, connection)
+                self.assertEqual(params, expected_params)
+
+    def test_quote_lexeme(self):
+        tests = (
+            ("L'amour piqué par une abeille", "'L amour piqué par une abeille'"),
+            ("'starting quote", "'starting quote'"),
+            ("ending quote'", "'ending quote'"),
+            ("double quo''te", "'double quo te'"),
+            ("triple quo'''te", "'triple quo te'"),
+            ("backslash\\", "'backslash'"),
+            ("exclamation!", "'exclamation'"),
+            ("ampers&nd", "'ampers nd'"),
+        )
+        for lexeme, quoted in tests:
+            with self.subTest(lexeme=lexeme):
+                self.assertEqual(quote_lexeme(lexeme), quoted)
+
+    def test_prefix_searching(self):
+        searched = Line.objects.annotate(
+            search=SearchVector("scene__setting", "dialogue"),
+        ).filter(search=SearchQuery(Lexeme("hear", prefix=True)))
+
+        self.assertSequenceEqual(searched, [self.verse2])
+
+    def test_inverse_prefix_searching(self):
+        searched = Line.objects.annotate(
+            search=SearchVector("scene__setting", "dialogue"),
+        ).filter(search=SearchQuery(Lexeme("Robi", prefix=True, invert=True)))
+        self.assertEqual(
+            set(searched),
+            {
+                self.verse2,
+                self.bedemir0,
+                self.bedemir1,
+                self.french,
+                self.crowd,
+                self.witch,
+                self.duck,
+            },
+        )
+
+    def test_lexemes_multiple_and(self):
+        searched = Line.objects.annotate(
+            search=SearchVector("scene__setting", "dialogue"),
+        ).filter(
+            search=SearchQuery(
+                Lexeme("Robi", prefix=True) & Lexeme("Camel", prefix=True)
+            )
+        )
+
+        self.assertSequenceEqual(searched, [self.verse0])
+
+    def test_lexemes_multiple_or(self):
+        searched = Line.objects.annotate(
+            search=SearchVector("scene__setting", "dialogue"),
+        ).filter(
+            search=SearchQuery(
+                Lexeme("kneecap", prefix=True) | Lexeme("afrai", prefix=True)
+            )
+        )
+
+        self.assertSequenceEqual(searched, [self.verse0, self.verse1])
+
+    def test_config_query_explicit(self):
+        searched = Line.objects.annotate(
+            search=SearchVector("scene__setting", "dialogue", config="french"),
+        ).filter(search=SearchQuery(Lexeme("cadeaux"), config="french"))
+
+        self.assertSequenceEqual(searched, [self.french])
+
+    def test_config_query_implicit(self):
+        searched = Line.objects.annotate(
+            search=SearchVector("scene__setting", "dialogue", config="french"),
+        ).filter(search=Lexeme("cadeaux"))
+
+        self.assertSequenceEqual(searched, [self.french])
+
+    def test_config_from_field_explicit(self):
+        searched = Line.objects.annotate(
+            search=SearchVector(
+                "scene__setting", "dialogue", config=F("dialogue_config")
+            ),
+        ).filter(search=SearchQuery(Lexeme("cadeaux"), config=F("dialogue_config")))
+        self.assertSequenceEqual(searched, [self.french])
+
+    def test_config_from_field_implicit(self):
+        searched = Line.objects.annotate(
+            search=SearchVector(
+                "scene__setting", "dialogue", config=F("dialogue_config")
+            ),
+        ).filter(search=Lexeme("cadeaux"))
+        self.assertSequenceEqual(searched, [self.french])
+
+    def test_invalid_combinations(self):
+        msg = "A Lexeme can only be combined with another Lexeme, got NoneType."
+        with self.assertRaisesMessage(TypeError, msg):
+            Line.objects.filter(dialogue__search=None | Lexeme("kneecaps"))
+
+        with self.assertRaisesMessage(TypeError, msg):
+            Line.objects.filter(dialogue__search=None & Lexeme("kneecaps"))
+
+    def test_invalid_weights(self):
+        invalid_weights = ["E", "Drandom", "AB", "C ", 0, "", " ", [1, 2, 3]]
+        for weight in invalid_weights:
+            with self.subTest(weight=weight):
+                with self.assertRaisesMessage(
+                    ValueError,
+                    f"Weight must be one of 'A', 'B', 'C', and 'D', got {weight!r}.",
+                ):
+                    Line.objects.filter(
+                        dialogue__search=Lexeme("kneecaps", weight=weight)
+                    )
+
+    def test_empty(self):
+        with self.assertRaisesMessage(ValueError, "Lexeme value cannot be empty."):
+            Line.objects.annotate(
+                search=SearchVector("scene__setting", "dialogue")
+            ).filter(search=SearchQuery(Lexeme("")))
+
+    def test_non_string_values(self):
+        msg = "Lexeme value must be a string, got NoneType."
+        with self.assertRaisesMessage(TypeError, msg):
+            Line.objects.annotate(
+                search=SearchVector("scene__setting", "dialogue")
+            ).filter(search=SearchQuery(Lexeme(None)))

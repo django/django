@@ -29,7 +29,8 @@ class CheckMessage:
             obj = "?"
         elif isinstance(self.obj, models.base.ModelBase):
             # We need to hardcode ModelBase and Field cases because its __str__
-            # method doesn't return "applabel.modellabel" and cannot be changed.
+            # method doesn't return "applabel.modellabel" and cannot be
+            # changed.
             obj = self.obj._meta.label
         else:
             obj = str(self.obj)

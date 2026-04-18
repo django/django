@@ -20,6 +20,7 @@ __all__ = [
     "close_old_connections",
     "connection",
     "connections",
+    "reset_queries",
     "router",
     "DatabaseError",
     "IntegrityError",

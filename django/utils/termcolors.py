@@ -154,9 +154,9 @@ def parse_color_setting(config_string):
         bg is a background color.
         option is a display options.
 
-    Specifying a named palette is the same as manually specifying the individual
-    definitions for each role. Any individual definitions following the palette
-    definition will augment the base palette definition.
+    Specifying a named palette is the same as manually specifying the
+    individual definitions for each role. Any individual definitions following
+    the palette definition will augment the base palette definition.
 
     Valid roles:
         'error', 'success', 'warning', 'notice', 'sql_field', 'sql_coltype',

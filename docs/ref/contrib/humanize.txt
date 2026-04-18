@@ -143,3 +143,4 @@ Examples:
 * ``3`` becomes ``3rd``.
 
 You can pass in either an integer or a string representation of an integer.
+Negative integers are returned unchanged.

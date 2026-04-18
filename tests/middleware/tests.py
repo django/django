@@ -2,6 +2,7 @@ import gzip
 import random
 import re
 import struct
+import zlib
 from io import BytesIO
 from unittest import mock
 from urllib.parse import quote
@@ -350,6 +351,19 @@ class CommonMiddlewareTest(SimpleTestCase):
         response = CommonMiddleware(get_response)(self.rf.get("/"))
         self.assertEqual(int(response.headers["Content-Length"]), bad_content_length)
 
+    @override_settings(APPEND_SLASH=True)
+    def test_content_length_header_added_to_append_slash_redirect(self):
+        """
+        The Content-Length header is set when redirecting with the APPEND_SLASH
+        setting.
+        """
+        request = self.rf.get("/customurlconf/slash")
+        request.urlconf = "middleware.extra_urls"
+        r = CommonMiddleware(get_response_404)(request)
+        self.assertEqual(r.status_code, 301)
+        self.assertEqual(r.url, "/customurlconf/slash/")
+        self.assertTrue(r.has_header("Content-Length"))
+
     # Other tests
 
     @override_settings(DISALLOWED_USER_AGENTS=[re.compile(r"foo")])
@@ -389,7 +403,7 @@ class CommonMiddlewareTest(SimpleTestCase):
 
 @override_settings(
     IGNORABLE_404_URLS=[re.compile(r"foo")],
-    MANAGERS=[("PHD", "PHB@dilbert.com")],
+    MANAGERS=["manager@example.com"],
 )
 class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
     rf = RequestFactory()
@@ -867,8 +881,8 @@ class GZipMiddlewareTest(SimpleTestCase):
 
     @staticmethod
     def decompress(gzipped_string):
-        with gzip.GzipFile(mode="rb", fileobj=BytesIO(gzipped_string)) as f:
-            return f.read()
+        # Use zlib to ensure gzipped_string contains exactly one gzip stream.
+        return zlib.decompress(gzipped_string, zlib.MAX_WBITS | 16)
 
     @staticmethod
     def get_mtime(gzipped_string):

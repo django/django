@@ -3,8 +3,9 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Dimitris Glezos <glezos@transifex.com>, 2012
-# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2023
-# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2013,2015-2020
+# Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2025
+# Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2020-2025
+# Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2013,2015-2020
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # valberg <valberg@orn.li>, 2014-2015
@@ -12,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2023\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2025-12-03 07:05+0000\n"
+"Last-Translator: Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2025\n"
 "Language-Team: Danish (http://app.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,8 +35,8 @@ msgstr "%(count)d %(items)s blev slettet."
 msgid "Cannot delete %(name)s"
 msgstr "Kan ikke slette %(name)s "
 
-msgid "Are you sure?"
-msgstr "Er du sikker?"
+msgid "Delete multiple objects"
+msgstr "Slet flere objekter"
 
 msgid "Administration"
 msgstr "Administration"
@@ -203,10 +204,6 @@ msgid ""
 msgstr "{name} “{obj}” blev ændret. Du kan redigere den/det igen herunder."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "{name} “{obj}” blev tilføjet. Du kan redigere den/det igen herunder."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -266,6 +263,9 @@ msgstr[1] "Alle %(total_count)s valgt"
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 af %(cnt)s valgt"
+
+msgid "Delete"
+msgstr "Slet"
 
 #, python-format
 msgid "Change history: %s"
@@ -327,11 +327,8 @@ msgstr ""
 "Der opstod en fejl. Fejlen er rapporteret til website-administratoren via e-"
 "mail, og vil blive rettet hurtigst muligt. Tak for din tålmodighed."
 
-msgid "Run the selected action"
-msgstr "Udfør den valgte handling"
-
-msgid "Go"
-msgstr "Udfør"
+msgid "Run"
+msgstr "Kør"
 
 msgid "Click here to select the objects across all pages"
 msgstr "Klik her for at vælge objekter på tværs af alle sider"
@@ -350,6 +347,15 @@ msgstr "Sti"
 msgid "Models in the %(name)s application"
 msgstr "Modeller i applikationen %(name)s"
 
+msgid "Model name"
+msgstr "Modelnavn"
+
+msgid "Add link"
+msgstr "Tilføj link"
+
+msgid "Change or view list link"
+msgstr "Ret eller vis liste-link"
+
 msgid "Add"
 msgstr "Tilføj"
 
@@ -359,18 +365,18 @@ msgstr "Vis"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Du har ikke rettigheder til at se eller redigere noget."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Indtast først et brugernavn og en adgangskode. Derefter får du yderligere "
-"redigeringsmuligheder."
+"Efter du har oprettet en bruger får du yderligere redigeringsmuligheder."
 
-msgid "Enter a username and password."
-msgstr "Indtast et brugernavn og en adgangskode."
+msgid "Error:"
+msgstr "Fejl:"
 
 msgid "Change password"
 msgstr "Skift adgangskode"
+
+msgid "Set password"
+msgstr "Sæt adgangskode"
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
@@ -380,6 +386,19 @@ msgstr[1] "Ret venligst fejlene herunder."
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Indtast en ny adgangskode for brugeren <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Denne handling vil <strong>aktivere</strong> adgangskodebaseret "
+"autentificering for denne bruger."
+
+msgid "Disable password-based authentication"
+msgstr "Deaktivér adgangskodebaseret autentificering."
+
+msgid "Enable password-based authentication"
+msgstr "Aktivér adgangskodebaseret autentificering."
 
 msgid "Skip to main content"
 msgstr "Gå til hovedindhold"
@@ -418,6 +437,9 @@ msgstr "Vis antal"
 msgid "Clear all filters"
 msgstr "Nulstil alle filtre"
 
+msgid "Save"
+msgstr "Gem"
+
 msgid "Remove from sorting"
 msgstr "Fjern fra sortering"
 
@@ -437,33 +459,30 @@ msgstr "Skift tema (nuværende tema: lyst)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Skift tema (nuværende tema: mørkt)"
 
-msgid "Delete"
-msgstr "Slet"
-
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Hvis du sletter %(object_name)s '%(escaped_object)s', vil du også slette  "
-"relaterede objekter, men din konto har ikke rettigheder til at slette "
+"Sletning af %(object_name)s “%(escaped_object)s” ville kræve sletning af "
+"relaterede objekter, men din konto har ikke rettigheder til at slette de "
 "følgende objekttyper:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Sletning af %(object_name)s  ' %(escaped_object)s ' vil kræve sletning af "
+"Sletning af %(object_name)s “%(escaped_object)s” ville kræve sletning af de "
 "følgende beskyttede relaterede objekter:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Er du sikker på du vil slette %(object_name)s \"%(escaped_object)s\"? Alle "
+"Er du sikker på at du vil slette %(object_name)s “%(escaped_object)s”? Alle "
 "de følgende relaterede objekter vil blive slettet:"
 
 msgid "Objects"
@@ -474,9 +493,6 @@ msgstr "Ja, jeg er sikker"
 
 msgid "No, take me back"
 msgstr "Nej, tag mig tilbage"
-
-msgid "Delete multiple objects"
-msgstr "Slet flere objekter"
 
 #, python-format
 msgid ""
@@ -552,8 +568,8 @@ msgstr ""
 "Du er logget ind som %(username)s, men du har ikke tilladelse til at tilgå "
 "denne site. Vil du logge ind med en anden brugerkonto?"
 
-msgid "Forgotten your password or username?"
-msgstr "Har du glemt dit password eller brugernavn?"
+msgid "Forgotten your login credentials?"
+msgstr "Har du glemt dine login-brugeroplysninger?"
 
 msgid "Toggle navigation"
 msgstr "Vis/skjul navigation"
@@ -576,6 +592,10 @@ msgstr "Bruger"
 msgid "Action"
 msgstr "Funktion"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr "Paginering %(name)s poster"
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "post"
@@ -588,14 +608,19 @@ msgstr ""
 "Dette objekt har ingen ændringshistorik. Det blev formentlig ikke tilføjet "
 "via dette administrations-site"
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr "Paginering %(name)s"
+
 msgid "Show all"
 msgstr "Vis alle"
 
-msgid "Save"
-msgstr "Gem"
-
 msgid "Popup closing…"
 msgstr "Popup lukker…"
+
+#, python-format
+msgid "Search %(name)s"
+msgstr "Søg %(name)s"
 
 msgid "Search"
 msgstr "Søg"
@@ -719,8 +744,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Gå venligst til denne side og vælg en ny adgangskode:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Hvis du skulle have glemt dit brugernavn er det:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "Hvis du har glemt dem, er du:"
 
 msgid "Thanks for using our site!"
 msgstr "Tak fordi du brugte vores website!"

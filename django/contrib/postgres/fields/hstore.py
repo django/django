@@ -2,6 +2,7 @@ import json
 
 from django.contrib.postgres import forms, lookups
 from django.contrib.postgres.fields.array import ArrayField
+from django.contrib.postgres.utils import CheckPostgresInstalledMixin
 from django.core import exceptions
 from django.db.models import Field, TextField, Transform
 from django.db.models.fields.mixins import CheckFieldDefaultMixin
@@ -10,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 __all__ = ["HStoreField"]
 
 
-class HStoreField(CheckFieldDefaultMixin, Field):
+class HStoreField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
     empty_strings_allowed = False
     description = _("Map of strings to strings/nulls")
     default_error_messages = {
@@ -43,7 +44,7 @@ class HStoreField(CheckFieldDefaultMixin, Field):
         return value
 
     def value_to_string(self, obj):
-        return json.dumps(self.value_from_object(obj))
+        return json.dumps(self.value_from_object(obj), ensure_ascii=False)
 
     def formfield(self, **kwargs):
         return super().formfield(
@@ -87,7 +88,7 @@ class KeyTransform(Transform):
 
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
-        return "(%s -> %%s)" % lhs, tuple(params) + (self.key_name,)
+        return "(%s -> %%s)" % lhs, (*params, self.key_name)
 
 
 class KeyTransformFactory:

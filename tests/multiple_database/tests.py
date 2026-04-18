@@ -30,7 +30,9 @@ class QueryTestCase(TestCase):
         self.assertEqual(Book.objects.db_manager("other").all().db, "other")
 
     def test_default_creation(self):
-        "Objects created on the default database don't leak onto other databases"
+        """
+        Objects created on the default database don't leak onto other databases
+        """
         # Create a book on the default database using create()
         Book.objects.create(title="Pro Django", published=datetime.date(2008, 12, 16))
 
@@ -60,7 +62,10 @@ class QueryTestCase(TestCase):
             Book.objects.using("other").get(title="Dive into Python")
 
     def test_other_creation(self):
-        "Objects created on another database don't leak onto the default database"
+        """
+        Objects created on another database don't leak onto the default
+        database
+        """
         # Create a book on the second database
         Book.objects.using("other").create(
             title="Pro Django", published=datetime.date(2008, 12, 16)
@@ -419,7 +424,10 @@ class QueryTestCase(TestCase):
         )
 
     def test_m2m_cross_database_protection(self):
-        "Operations that involve sharing M2M objects across databases raise an error"
+        """
+        Operations that involve sharing M2M objects across databases raise an
+        error
+        """
         # Create a book and author on the default database
         pro = Book.objects.create(
             title="Pro Django", published=datetime.date(2008, 12, 16)
@@ -471,7 +479,9 @@ class QueryTestCase(TestCase):
                 dive.authors.set([mark, marty])
 
     def test_m2m_deletion(self):
-        "Cascaded deletions of m2m relations issue queries on the right database"
+        """
+        Cascaded deletions of m2m relations issue queries on the right database
+        """
         # Create a book and author on the other database
         dive = Book.objects.using("other").create(
             title="Dive into Python", published=datetime.date(2009, 5, 4)
@@ -714,7 +724,10 @@ class QueryTestCase(TestCase):
         )
 
     def test_foreign_key_cross_database_protection(self):
-        "Operations that involve sharing FK objects across databases raise an error"
+        """
+        Operations that involve sharing FK objects across databases raise an
+        error
+        """
         # Create a book and author on the default database
         pro = Book.objects.create(
             title="Pro Django", published=datetime.date(2008, 12, 16)
@@ -854,7 +867,10 @@ class QueryTestCase(TestCase):
         self.assertEqual(bob_profile.user.username, "bob")
 
     def test_o2o_cross_database_protection(self):
-        "Operations that involve sharing FK objects across databases raise an error"
+        """
+        Operations that involve sharing FK objects across databases raise an
+        error
+        """
         # Create a user and profile on the default database
         alice = User.objects.db_manager("default").create_user(
             "alice", "alice@example.com"
@@ -891,7 +907,8 @@ class QueryTestCase(TestCase):
         self.assertIsNone(new_bob_profile._state.db)
         self.assertIsNone(charlie._state.db)
 
-        # old object comes from 'other', so the new object is set to use 'other'...
+        # old object comes from 'other', so the new object is set to use
+        # 'other'...
         new_bob_profile.user = bob
         charlie.userprofile = bob_profile
         self.assertEqual(new_bob_profile._state.db, "other")
@@ -1263,9 +1280,9 @@ class QueryTestCase(TestCase):
         sub = Person.objects.using("other").filter(name="fff")
         qs = Book.objects.filter(editor__in=sub)
 
-        # When you call __str__ on the query object, it doesn't know about using
-        # so it falls back to the default. If the subquery explicitly uses a
-        # different database, an error should be raised.
+        # When you call __str__ on the query object, it doesn't know about
+        # using so it falls back to the default. If the subquery explicitly
+        # uses a different database, an error should be raised.
         msg = (
             "Subqueries aren't allowed across different databases. Force the "
             "inner query to be evaluated using `list(inner_query)`."
@@ -1517,7 +1534,10 @@ class RouterTestCase(TestCase):
             marty.edited.set([dive])
 
     def test_foreign_key_cross_database_protection(self):
-        "Foreign keys can cross databases if they two databases have a common source"
+        """
+        Foreign keys can cross databases if they two databases have a common
+        source
+        """
         # Create a book and author on the default database
         pro = Book.objects.using("default").create(
             title="Pro Django", published=datetime.date(2008, 12, 16)
@@ -1548,7 +1568,8 @@ class RouterTestCase(TestCase):
         # ...and the source database now has a copy of any object saved
         Book.objects.using("default").get(title="Dive into Python").delete()
 
-        # This isn't a real primary/replica database, so restore the original from other
+        # This isn't a real primary/replica database, so restore the original
+        # from other
         dive = Book.objects.using("other").get(title="Dive into Python")
         self.assertEqual(dive._state.db, "other")
 
@@ -1565,7 +1586,8 @@ class RouterTestCase(TestCase):
         # ...and the source database now has a copy of any object saved
         Book.objects.using("default").get(title="Dive into Python").delete()
 
-        # This isn't a real primary/replica database, so restore the original from other
+        # This isn't a real primary/replica database, so restore the original
+        # from other
         dive = Book.objects.using("other").get(title="Dive into Python")
         self.assertEqual(dive._state.db, "other")
 
@@ -1582,7 +1604,8 @@ class RouterTestCase(TestCase):
         # ...and the source database now has a copy of any object saved
         Book.objects.using("default").get(title="Dive into Python").delete()
 
-        # This isn't a real primary/replica database, so restore the original from other
+        # This isn't a real primary/replica database, so restore the original
+        # from other
         dive = Book.objects.using("other").get(title="Dive into Python")
 
         # If you assign a FK object when the base object hasn't
@@ -1629,7 +1652,8 @@ class RouterTestCase(TestCase):
         )
         self.assertEqual(cheesecake._state.db, "default")
 
-        # Same goes for get_or_create, regardless of whether getting or creating
+        # Same goes for get_or_create, regardless of whether getting or
+        # creating
         cheesecake, created = mark.edited.get_or_create(
             title="Dive into Cheesecake",
             published=datetime.date(2010, 3, 15),
@@ -1740,7 +1764,8 @@ class RouterTestCase(TestCase):
         alice = dive.authors.create(name="Alice", pk=3)
         self.assertEqual(alice._state.db, "default")
 
-        # Same goes for get_or_create, regardless of whether getting or creating
+        # Same goes for get_or_create, regardless of whether getting or
+        # creating
         alice, created = dive.authors.get_or_create(name="Alice")
         self.assertEqual(alice._state.db, "default")
 
@@ -1748,7 +1773,10 @@ class RouterTestCase(TestCase):
         self.assertEqual(bob._state.db, "default")
 
     def test_o2o_cross_database_protection(self):
-        "Operations that involve sharing FK objects across databases raise an error"
+        """
+        Operations that involve sharing FK objects across databases raise an
+        error
+        """
         # Create a user and profile on the default database
         alice = User.objects.db_manager("default").create_user(
             "alice", "alice@example.com"
@@ -1807,11 +1835,13 @@ class RouterTestCase(TestCase):
         # ...and the source database now has a copy of any object saved
         Book.objects.using("default").get(title="Dive into Python").delete()
 
-        # This isn't a real primary/replica database, so restore the original from other
+        # This isn't a real primary/replica database, so restore the original
+        # from other
         dive = Book.objects.using("other").get(title="Dive into Python")
         self.assertEqual(dive._state.db, "other")
 
-        # Add to a generic foreign key set with an object from a different database
+        # Add to a generic foreign key set with an object from a different
+        # database
         dive.reviews.add(review1)
 
         # Database assignments of original objects haven't changed...
@@ -1834,7 +1864,8 @@ class RouterTestCase(TestCase):
         # initially, no db assigned
         self.assertIsNone(review3._state.db)
 
-        # Dive comes from 'other', so review3 is set to use the source of 'other'...
+        # Dive comes from 'other', so review3 is set to use the source of
+        # 'other'...
         review3.content_object = dive
         self.assertEqual(review3._state.db, "default")
 
@@ -1846,7 +1877,10 @@ class RouterTestCase(TestCase):
         self.assertEqual(nyt._state.db, "default")
 
     def test_m2m_managers(self):
-        "M2M relations are represented by managers, and can be controlled like managers"
+        """
+        M2M relations are represented by managers, and can be controlled like
+        managers
+        """
         pro = Book.objects.using("other").create(
             pk=1, title="Pro Django", published=datetime.date(2008, 12, 16)
         )
@@ -1908,8 +1942,8 @@ class RouterTestCase(TestCase):
         sub = Person.objects.filter(name="Mark Pilgrim")
         qs = Book.objects.filter(editor__in=sub)
 
-        # When you call __str__ on the query object, it doesn't know about using
-        # so it falls back to the default. Don't let routing instructions
+        # When you call __str__ on the query object, it doesn't know about
+        # using so it falls back to the default. Don't let routing instructions
         # force the subquery to an incompatible database.
         str(qs.query)
 
@@ -2010,14 +2044,16 @@ class FixtureTestCase(TestCase):
     @override_settings(DATABASE_ROUTERS=[AntiPetRouter()])
     def test_fixture_loading(self):
         "Multi-db fixtures are loaded correctly"
-        # "Pro Django" exists on the default database, but not on other database
+        # "Pro Django" exists on the default database, but not on other
+        # database
         Book.objects.get(title="Pro Django")
         Book.objects.using("default").get(title="Pro Django")
 
         with self.assertRaises(Book.DoesNotExist):
             Book.objects.using("other").get(title="Pro Django")
 
-        # "Dive into Python" exists on the default database, but not on other database
+        # "Dive into Python" exists on the default database, but not on other
+        # database
         Book.objects.using("other").get(title="Dive into Python")
 
         with self.assertRaises(Book.DoesNotExist):

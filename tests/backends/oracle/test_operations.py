@@ -17,20 +17,6 @@ class OperationsTests(TransactionTestCase):
         )
         self.assertEqual(seq_name, "SCHEMA_AUTHORWITHEVENLOB0B8_SQ")
 
-    def test_bulk_batch_size(self):
-        # Oracle restricts the number of parameters in a query.
-        objects = range(2**16)
-        self.assertEqual(connection.ops.bulk_batch_size([], objects), len(objects))
-        # Each field is a parameter for each object.
-        self.assertEqual(
-            connection.ops.bulk_batch_size(["id"], objects),
-            connection.features.max_query_params,
-        )
-        self.assertEqual(
-            connection.ops.bulk_batch_size(["id", "other"], objects),
-            connection.features.max_query_params // 2,
-        )
-
     def test_sql_flush(self):
         statements = connection.ops.sql_flush(
             no_style(),

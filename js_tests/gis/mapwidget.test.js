@@ -1,4 +1,4 @@
-/* global QUnit, MapWidget */
+/* global QUnit, MapWidget, ol */
 'use strict';
 
 QUnit.module('gis.OLMapWidget');
@@ -90,4 +90,85 @@ QUnit.test('MapWidget.IsCollection', function(assert) {
     options.geom_name = 'GeometryCollection';
     widget = new MapWidget(options);
     assert.ok(widget.options.is_collection);
+});
+
+QUnit.test('MapWidget.layerBuilder.osm returns OSM layer', function(assert) {
+    const layer = MapWidget.layerBuilder.osm();
+    assert.ok(layer instanceof ol.layer.Tile, 'Layer is Tile');
+    assert.ok(layer.getSource() instanceof ol.source.OSM, 'Source is OSM');
+});
+
+QUnit.test('MapWidget.layerBuilder.nasaWorldview returns XYZ layer', function(assert) {
+    const layer = MapWidget.layerBuilder.nasaWorldview();
+    assert.ok(layer instanceof ol.layer.Tile, 'Layer is Tile');
+    assert.ok(layer.getSource() instanceof ol.source.XYZ, 'Source is XYZ');
+    assert.ok(layer.getSource().getUrls()[0].includes('earthdata.nasa.gov'), 'URL is NASA-hosted');
+});
+
+QUnit.test('MapWidget uses default OSM base layer when none specified', function(assert) {
+    const widget = new MapWidget({
+        id: 'id_point',
+        map_id: 'id_point_map',
+        geom_name: 'Point'
+    });
+    assert.ok(widget.baseLayer.getSource() instanceof ol.source.OSM, 'Default base layer is OSM');
+});
+
+QUnit.test('MapWidget uses named base layer from layerBuilder', function(assert) {
+    const widget = new MapWidget({
+        id: 'id_point',
+        map_id: 'id_point_map',
+        geom_name: 'Point',
+        base_layer: 'nasaWorldview'
+    });
+    assert.ok(widget.baseLayer.getSource() instanceof ol.source.XYZ, 'Uses named base layer from builder');
+});
+
+QUnit.test('MapWidget uses passed-in base layer object directly', function(assert) {
+    const customLayer = new ol.layer.Tile({source: new ol.source.OSM()});
+    const widget = new MapWidget({
+        id: 'id_point',
+        map_id: 'id_point_map',
+        geom_name: 'Point',
+        base_layer: customLayer
+    });
+    assert.strictEqual(widget.baseLayer, customLayer, 'Uses provided layer object');
+});
+
+QUnit.test('initMapWidgetInSection initializes widgets and skips __prefix__', function(assert) {
+    const wrapper1 = document.createElement('div');
+    wrapper1.className = 'dj_map_wrapper';
+    wrapper1.id = 'id_point_map_wrapper';
+    wrapper1.innerHTML = `
+        <textarea id="id_point"></textarea>
+        <div class="dj_map" id="id_point_map"></div>
+        <script type="application/json" id="id_point_mapwidget_options">
+            { "geom_name": "Point" }
+        </script>
+    `;
+    document.body.appendChild(wrapper1);
+
+    const wrapper2 = document.createElement('div');
+    wrapper2.className = 'dj_map_wrapper';
+    wrapper2.id = 'form-__prefix__-map_wrapper';
+    wrapper2.innerHTML = `
+        <textarea id="id_fake"></textarea>
+        <div class="dj_map" id="id_fake_map"></div>
+        <script type="application/json" id="id_fake_mapwidget_options">
+            { "geom_name": "MultiPoint" }
+        </script>
+    `;
+
+    document.body.appendChild(wrapper2);
+
+    const maps = window.initMapWidgetInSection(document);
+
+    assert.equal(maps.length, 1, 'Only one map widget is initialized');
+    assert.ok(maps[0] instanceof MapWidget, 'Map is instance of MapWidget');
+    assert.equal(maps[0].options.id, 'id_point', 'Correct widget was initialized');
+    assert.equal(maps[0].options.map_id, 'id_point_map', 'Map ID is correct');
+
+    // Clean up
+    wrapper1.remove();
+    wrapper2.remove();
 });

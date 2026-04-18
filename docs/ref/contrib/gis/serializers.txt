@@ -13,8 +13,8 @@ __ https://geojson.org/
 The ``geojson`` serializer is not meant for round-tripping data, as it has no
 deserializer equivalent. For example, you cannot use :djadmin:`loaddata` to
 reload the output produced by this serializer. If you plan to reload the
-outputted data, use the plain :ref:`json serializer <serialization-formats-json>`
-instead.
+outputted data, use the plain :ref:`json serializer
+<serialization-formats-json>` instead.
 
 In addition to the options of the ``json`` serializer, the ``geojson``
 serializer accepts the following additional option when it is called by
@@ -23,7 +23,8 @@ serializer accepts the following additional option when it is called by
 * ``geometry_field``: A string containing the name of a geometry field to use
   for the ``geometry`` key of the GeoJSON feature. This is only needed when you
   have a model with more than one geometry field and you don't want to use the
-  first defined geometry field (by default, the first geometry field is picked).
+  first defined geometry field (by default, the first geometry field is
+  picked).
 
 * ``id_field``: A string containing the name of a field to use for the ``id``
   key of the GeoJSON feature. By default, the primary key of objects is used.
@@ -46,7 +47,6 @@ Would output::
 
     {
         "type": "FeatureCollection",
-        "crs": {"type": "name", "properties": {"name": "EPSG:4326"}},
         "features": [
             {
                 "type": "Feature",

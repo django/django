@@ -45,6 +45,9 @@ class UploadedFile(File):
     def __repr__(self):
         return "<%s: %s (%s)>" % (self.__class__.__name__, self.name, self.content_type)
 
+    def __bool__(self):
+        return bool(self.name)
+
     def _get_name(self):
         return self._name
 
@@ -54,7 +57,8 @@ class UploadedFile(File):
             # Just use the basename of the file -- anything else is dangerous.
             name = os.path.basename(name)
 
-            # File names longer than 255 characters can cause problems on older OSes.
+            # File names longer than 255 characters can cause problems on older
+            # OSes.
             if len(name) > 255:
                 name, ext = os.path.splitext(name)
                 ext = ext[:255]
@@ -126,7 +130,8 @@ class InMemoryUploadedFile(UploadedFile):
 
 class SimpleUploadedFile(InMemoryUploadedFile):
     """
-    A simple representation of a file, which just has content, size, and a name.
+    A simple representation of a file, which just has content, size, and a
+    name.
     """
 
     def __init__(self, name, content, content_type="text/plain"):

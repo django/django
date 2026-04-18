@@ -1,3 +1,4 @@
+from copy import copy
 from unittest import mock
 
 from django.http import HttpRequest
@@ -158,6 +159,17 @@ class ContextTests(SimpleTestCase):
             },
         )
 
+    def test_flatten_context_with_context_copy(self):
+        ctx1 = Context({"a": 2})
+        ctx2 = ctx1.new(Context({"b": 4}))
+        self.assertEqual(
+            ctx2.dicts, [{"True": True, "False": False, "None": None}, {"b": 4}]
+        )
+        self.assertEqual(
+            ctx2.flatten(),
+            {"False": False, "None": None, "True": True, "b": 4},
+        )
+
     def test_context_comparable(self):
         """
         #21765 -- equality comparison should work
@@ -303,3 +315,10 @@ class RequestContextTests(SimpleTestCase):
         with self.assertRaisesMessage(TypeError, msg):
             with request_context.bind_template(Template("")):
                 pass
+
+    def test_context_copyable(self):
+        request_context = RequestContext(HttpRequest())
+        request_context_copy = copy(request_context)
+        self.assertIsInstance(request_context_copy, RequestContext)
+        self.assertEqual(request_context_copy.dicts, request_context.dicts)
+        self.assertIsNot(request_context_copy.dicts, request_context.dicts)

@@ -272,8 +272,9 @@ class I18NViewTests(SimpleTestCase):
                     response.headers["Content-Type"], 'text/javascript; charset="utf-8"'
                 )
                 # response content must include a line like:
-                # "this is to be translated": <value of trans_txt Python variable>
-                # json.dumps() is used to be able to check Unicode strings.
+                # "this is to be translated": <value of trans_txt Python
+                # variable> json.dumps() is used to be able to check Unicode
+                # strings.
                 self.assertContains(response, json.dumps(trans_txt), 1)
                 if lang_code == "fr":
                     # Message with context (msgctxt)
@@ -295,7 +296,7 @@ class I18NViewTests(SimpleTestCase):
         """
         with override("de"):
             response = self.client.get("/jsoni18n/")
-            data = json.loads(response.content.decode())
+            data = json.loads(response.text)
             self.assertIn("catalog", data)
             self.assertIn("formats", data)
             self.assertEqual(
@@ -329,7 +330,7 @@ class I18NViewTests(SimpleTestCase):
         """
         with self.settings(LANGUAGE_CODE="es"), override("en-us"):
             response = self.client.get("/jsoni18n/")
-            data = json.loads(response.content.decode())
+            data = json.loads(response.text)
             self.assertIn("catalog", data)
             self.assertIn("formats", data)
             self.assertIn("plural", data)
@@ -417,8 +418,9 @@ class I18NViewTests(SimpleTestCase):
     def test_non_english_default_english_userpref(self):
         """
         Same as above with the difference that there IS an 'en' translation
-        available. The JavaScript i18n view must return a NON empty language catalog
-        with the proper English translations. See #13726 for more details.
+        available. The JavaScript i18n view must return a NON empty language
+        catalog with the proper English translations. See #13726 for more
+        details.
         """
         with self.settings(LANGUAGE_CODE="fr"), override("en-us"):
             response = self.client.get("/jsi18n_english_translation/")

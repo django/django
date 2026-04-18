@@ -48,6 +48,9 @@ def format(
             if abs(number) < cutoff:
                 number = Decimal("0")
 
+        if not number.is_finite():
+            return str(number)
+
         # Format values with more than 200 digits (an arbitrary cutoff) using
         # scientific notation to avoid high memory usage in {:f}'.format().
         _, digits, exponent = number.as_tuple()
@@ -91,15 +94,15 @@ def format(
             # grouping is a single value
             intervals = [grouping, 0]
         active_interval = intervals.pop(0)
-        int_part_gd = ""
+        int_part_gd = []
         cnt = 0
         for digit in int_part[::-1]:
             if cnt and cnt == active_interval:
                 if intervals:
                     active_interval = intervals.pop(0) or active_interval
-                int_part_gd += thousand_sep[::-1]
+                int_part_gd.append(thousand_sep[::-1])
                 cnt = 0
-            int_part_gd += digit
+            int_part_gd.append(digit)
             cnt += 1
-        int_part = int_part_gd[::-1]
+        int_part = "".join(int_part_gd)[::-1]
     return sign + int_part + dec_part

@@ -13,32 +13,52 @@ from django.db import (
     OperationalError,
     connection,
     models,
+    transaction,
 )
 from django.db.models import (
+    Case,
+    CheckConstraint,
     Count,
     ExpressionWrapper,
     F,
     IntegerField,
     JSONField,
+    JSONNull,
     OuterRef,
     Q,
     Subquery,
     Transform,
     Value,
+    When,
 )
 from django.db.models.expressions import RawSQL
 from django.db.models.fields.json import (
     KT,
+    HasKey,
     KeyTextTransform,
     KeyTransform,
     KeyTransformFactory,
     KeyTransformTextLookupMixin,
 )
-from django.db.models.functions import Cast
-from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.db.models.functions import Cast, Coalesce
+from django.test import (
+    SimpleTestCase,
+    TestCase,
+    ignore_warnings,
+    skipIfDBFeature,
+    skipUnlessDBFeature,
+)
 from django.test.utils import CaptureQueriesContext
+from django.utils.deprecation import RemovedInDjango70Warning
 
-from .models import CustomJSONDecoder, JSONModel, NullableJSONModel, RelatedJSONModel
+from .models import (
+    CustomJSONDecoder,
+    CustomSerializationJSONModel,
+    JSONModel,
+    JSONNullDefaultModel,
+    NullableJSONModel,
+    RelatedJSONModel,
+)
 
 
 @skipUnlessDBFeature("supports_json_field")
@@ -216,6 +236,8 @@ class TestSaveLoad(TestCase):
         self.assertIsNone(obj.value)
 
     @skipUnlessDBFeature("supports_primitives_in_json_field")
+    # RemovedInDjango70Warning.
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_json_null_different_from_sql_null(self):
         json_null = NullableJSONModel.objects.create(value=Value(None, JSONField()))
         NullableJSONModel.objects.update(value=Value(None, JSONField()))
@@ -229,6 +251,9 @@ class TestSaveLoad(TestCase):
         )
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value=None),
+            # RemovedInDjango70Warning: When the deprecation ends, replace
+            # with:
+            # [sql_null],
             [json_null],
         )
         self.assertSequenceEqual(
@@ -296,6 +321,16 @@ class TestSaveLoad(TestCase):
         obj.refresh_from_db()
         self.assertEqual(obj.value, value)
 
+    @skipUnlessDBFeature("supports_primitives_in_json_field")
+    def test_bulk_update_custom_get_prep_value(self):
+        obj = CustomSerializationJSONModel.objects.create(json_field={"version": "1"})
+        obj.json_field["version"] = "1-alpha"
+        CustomSerializationJSONModel.objects.bulk_update([obj], ["json_field"])
+        self.assertSequenceEqual(
+            CustomSerializationJSONModel.objects.values("json_field"),
+            [{"json_field": '{"version": "1-alpha"}'}],
+        )
+
 
 @skipUnlessDBFeature("supports_json_field")
 class TestQuerying(TestCase):
@@ -329,14 +364,14 @@ class TestQuerying(TestCase):
                 "bax": {"foo": "bar"},
             },
         ]
-        cls.objs = [NullableJSONModel.objects.create(value=value) for value in values]
+        objs = [NullableJSONModel(value=value) for value in values]
         if connection.features.supports_primitives_in_json_field:
-            cls.objs.extend(
-                [
-                    NullableJSONModel.objects.create(value=value)
-                    for value in cls.primitives
-                ]
-            )
+            objs.extend([NullableJSONModel(value=value) for value in cls.primitives])
+        objs = NullableJSONModel.objects.bulk_create(objs)
+        # Some backends don't return primary keys after bulk_create.
+        if any(obj.pk is None for obj in objs):
+            objs = list(NullableJSONModel.objects.order_by("id"))
+        cls.objs = objs
         cls.raw_sql = "%s::jsonb" if connection.vendor == "postgresql" else "%s"
 
     def test_exact(self):
@@ -582,6 +617,14 @@ class TestQuerying(TestCase):
                     [expected],
                 )
 
+    def test_has_key_literal_lookup(self):
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(
+                HasKey(Value({"foo": "bar"}, JSONField()), "foo")
+            ).order_by("id"),
+            self.objs,
+        )
+
     def test_has_key_list(self):
         obj = NullableJSONModel.objects.create(value=[{"a": 1}, {"b": "x"}])
         tests = [
@@ -739,6 +782,12 @@ class TestQuerying(TestCase):
             [self.objs[4]],
         )
 
+    def test_key_iexact_none(self):
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value__j__iexact=None),
+            [self.objs[4]],
+        )
+
     def test_none_key_exclude(self):
         obj = NullableJSONModel.objects.create(value={"j": 1})
         if connection.vendor == "oracle":
@@ -757,6 +806,21 @@ class TestQuerying(TestCase):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__0=1),
             [self.objs[5]],
+        )
+
+    @skipIfDBFeature("supports_json_negative_indexing")
+    def test_unsupported_negative_lookup(self):
+        msg = (
+            "Using negative JSON array indices is not supported on this database "
+            "backend."
+        )
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            NullableJSONModel.objects.filter(**{"value__-2": 1}).get()
+
+    @skipUnlessDBFeature("supports_json_negative_indexing")
+    def test_shallow_list_negative_lookup(self):
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(**{"value__-2": 1}), [self.objs[5]]
         )
 
     def test_shallow_obj_lookup(self):
@@ -791,9 +855,23 @@ class TestQuerying(TestCase):
             [self.objs[5]],
         )
 
+    @skipUnlessDBFeature("supports_json_negative_indexing")
+    def test_deep_negative_lookup_array(self):
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(**{"value__-1__0": 2}),
+            [self.objs[5]],
+        )
+
     def test_deep_lookup_mixed(self):
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value__d__1__f="g"),
+            [self.objs[4]],
+        )
+
+    @skipUnlessDBFeature("supports_json_negative_indexing")
+    def test_deep_negative_lookup_mixed(self):
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(**{"value__d__-1__f": "g"}),
             [self.objs[4]],
         )
 
@@ -807,6 +885,59 @@ class TestQuerying(TestCase):
             [self.objs[3], self.objs[4]],
         )
         self.assertIs(NullableJSONModel.objects.filter(value__c__lt=5).exists(), False)
+
+    def test_lookups_special_chars(self):
+        test_keys = [
+            "CONTROL",
+            "single'",
+            "dollar$",
+            "dot.dot",
+            "with space",
+            "back\\slash",
+            "question?mark",
+            "user@name",
+            "emo🤡'ji",
+            "com,ma",
+            "curly{{{brace}}}s",
+            "escape\uffff'seq'\uffffue\uffff'nce",
+        ]
+        json_value = {key: "some value" for key in test_keys}
+        obj = NullableJSONModel.objects.create(value=json_value)
+        obj.refresh_from_db()
+        self.assertEqual(obj.value, json_value)
+
+        for key in test_keys:
+            lookups = {
+                "has_key": Q(value__has_key=key),
+                "has_keys": Q(value__has_keys=[key, "CONTROL"]),
+                "has_any_keys": Q(value__has_any_keys=[key, "does_not_exist"]),
+                "exact": Q(**{f"value__{key}": "some value"}),
+            }
+            for lookup, condition in lookups.items():
+                results = NullableJSONModel.objects.filter(condition)
+                with self.subTest(key=key, lookup=lookup):
+                    self.assertSequenceEqual(results, [obj])
+
+    def test_lookups_special_chars_double_quotes(self):
+        test_keys = [
+            'double"',
+            "m\\i@x. m🤡'a,t{{{ch}}}e?d$\"'es\uffff'ca\uffff'pe",
+        ]
+        json_value = {key: "some value" for key in test_keys}
+        obj = NullableJSONModel.objects.create(value=json_value)
+        obj.refresh_from_db()
+        self.assertEqual(obj.value, json_value)
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value__has_keys=test_keys), [obj]
+        )
+        for key in test_keys:
+            with self.subTest(key=key):
+                results = NullableJSONModel.objects.filter(
+                    Q(value__has_key=key),
+                    Q(value__has_any_keys=[key, "does_not_exist"]),
+                    Q(**{f"value__{key}": "some value"}),
+                )
+                self.assertSequenceEqual(results, [obj])
 
     def test_lookup_exclude(self):
         tests = [
@@ -885,6 +1016,19 @@ class TestQuerying(TestCase):
             NullableJSONModel.objects.filter(value__foo__iexact='"BaR"').exists(), False
         )
 
+    def test_in(self):
+        tests = [
+            ([[]], [self.objs[1]]),
+            ([{}], [self.objs[2]]),
+            ([{"a": "b", "c": 14}], [self.objs[3]]),
+            ([[1, [2]]], [self.objs[5]]),
+        ]
+        for lookup_value, expected in tests:
+            with self.subTest(value__in=lookup_value):
+                self.assertCountEqual(
+                    NullableJSONModel.objects.filter(value__in=lookup_value), expected
+                )
+
     def test_key_in(self):
         tests = [
             ("value__c__in", [14], self.objs[3:5]),
@@ -898,6 +1042,7 @@ class TestQuerying(TestCase):
                 [self.objs[7]],
             ),
             ("value__foo__in", [F("value__bax__foo")], [self.objs[7]]),
+            ("value__foo__in", [F("value__bax__foo"), {}], [self.objs[7]]),
             (
                 "value__foo__in",
                 [KeyTransform("foo", KeyTransform("bax", "value")), "baz"],
@@ -906,13 +1051,24 @@ class TestQuerying(TestCase):
             ("value__foo__in", [F("value__bax__foo"), "baz"], [self.objs[7]]),
             ("value__foo__in", ["bar", "baz"], [self.objs[7]]),
             ("value__bar__in", [["foo", "bar"]], [self.objs[7]]),
+            ("value__bar__in", [Value(["foo", "bar"], JSONField())], [self.objs[7]]),
+            (
+                "value__bar__in",
+                [["foo", "bar"], Value({}, JSONField())],
+                [self.objs[7]],
+            ),
+            (
+                "value__bar__in",
+                [Value(["foo", "bar"], JSONField()), {"a": "b"}],
+                [self.objs[7]],
+            ),
             ("value__bar__in", [["foo", "bar"], ["a"]], [self.objs[7]]),
             ("value__bax__in", [{"foo": "bar"}, {"a": "b"}], [self.objs[7]]),
             ("value__h__in", [True, "foo"], [self.objs[4]]),
             ("value__i__in", [False, "foo"], [self.objs[4]]),
         ]
         for lookup, value, expected in tests:
-            with self.subTest(lookup=lookup, value=value):
+            with self.subTest(lookup=lookup, value=value), transaction.atomic():
                 self.assertCountEqual(
                     NullableJSONModel.objects.filter(**{lookup: value}),
                     expected,
@@ -1052,6 +1208,12 @@ class TestQuerying(TestCase):
                     True,
                 )
 
+    def test_cast_with_key_text_transform(self):
+        obj = NullableJSONModel.objects.annotate(
+            json_data=Cast(Value({"foo": "bar"}, JSONField()), JSONField())
+        ).get(pk=self.objs[0].pk, json_data__foo__icontains="bar")
+        self.assertEqual(obj, self.objs[0])
+
     @skipUnlessDBFeature("supports_json_field_contains")
     def test_contains_contained_by_with_key_transform(self):
         tests = [
@@ -1127,3 +1289,221 @@ class TestQuerying(TestCase):
             data__foo="bar"
         )
         self.assertQuerySetEqual(qs, all_objects)
+
+    @skipUnlessDBFeature("supports_primitives_in_json_field")
+    def test_json_type_casting_with_coalesce(self):
+        RelatedJSONModel.objects.create(
+            summary='"This is valid JSON primitive."',
+            value={"text": "test"},
+            json_model=self.objs[4],
+        )
+        result = RelatedJSONModel.objects.annotate(
+            coalesced_value=Coalesce(
+                Cast("summary", JSONField()), "value", output_field=JSONField()
+            )
+        ).first()
+        self.assertEqual(result.coalesced_value, "This is valid JSON primitive.")
+
+    def test_numeric_lookups_with_expression(self):
+        obj_greater = NullableJSONModel.objects.create(
+            value={"target": 5, "comparison": 2}
+        )
+        obj_lesser = NullableJSONModel.objects.create(
+            value={"target": 2, "comparison": 5}
+        )
+        obj_equal = NullableJSONModel.objects.create(
+            value={"target": 2, "comparison": 2}
+        )
+        objs = [obj_greater.pk, obj_lesser.pk, obj_equal.pk]
+
+        tests = [
+            ("gt", [obj_greater]),
+            ("lt", [obj_lesser]),
+            ("gte", [obj_greater, obj_equal]),
+            ("lte", [obj_lesser, obj_equal]),
+        ]
+
+        for lookup, expected in tests:
+            with self.subTest(lookup=lookup):
+                self.assertCountEqual(
+                    NullableJSONModel.objects.filter(
+                        id__in=objs,
+                        **{f"value__target__{lookup}": F("value__comparison")},
+                    ),
+                    expected,
+                )
+
+
+@skipUnlessDBFeature("supports_primitives_in_json_field")
+class JSONNullTests(TestCase):
+    def test_repr(self):
+        self.assertEqual(repr(JSONNull()), "JSONNull()")
+
+    def test_deconstruct(self):
+        jsonnull = JSONNull()
+        path, args, kwargs = jsonnull.deconstruct()
+        self.assertEqual(path, "django.db.models.JSONNull")
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {})
+
+    def test_save_load(self):
+        obj = JSONModel(value=JSONNull())
+        obj.save()
+        self.assertIsNone(obj.value)
+
+    def test_create(self):
+        obj = JSONModel.objects.create(value=JSONNull())
+        self.assertIsNone(obj.value)
+
+    def test_update(self):
+        obj = JSONModel.objects.create(value={"key": "value"})
+        JSONModel.objects.update(value=JSONNull())
+        obj.refresh_from_db()
+        self.assertIsNone(obj.value)
+
+    def test_filter(self):
+        json_null = NullableJSONModel.objects.create(value=JSONNull())
+        sql_null = NullableJSONModel.objects.create(value=None)
+        self.assertSequenceEqual(
+            [json_null], NullableJSONModel.objects.filter(value=JSONNull())
+        )
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value__isnull=True), [sql_null]
+        )
+
+    def test_filter_in(self):
+        obj = NullableJSONModel.objects.create(value=JSONNull())
+        obj2 = NullableJSONModel.objects.create(value=[1])
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value__in=[JSONNull(), [1], "foo"]),
+            [obj, obj2],
+        )
+
+    def test_key_in(self):
+        obj1 = NullableJSONModel.objects.create(value={"key": None})
+        obj2 = NullableJSONModel.objects.create(value={"key": [1]})
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value__key__in=[JSONNull(), [1], 0]),
+            [obj1, obj2],
+        )
+
+    def test_bulk_update(self):
+        obj1 = NullableJSONModel.objects.create(value={"k": "1st"})
+        obj2 = NullableJSONModel.objects.create(value={"k": "2nd"})
+        obj1.value = JSONNull()
+        obj2.value = JSONNull()
+        NullableJSONModel.objects.bulk_update([obj1, obj2], fields=["value"])
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value=JSONNull()),
+            [obj1, obj2],
+        )
+
+    def test_case_expression_with_jsonnull_then(self):
+        obj = JSONModel.objects.create(value={"key": "value"})
+        JSONModel.objects.filter(pk=obj.pk).update(
+            value=Case(
+                When(value={"key": "value"}, then=JSONNull()),
+            )
+        )
+        obj.refresh_from_db()
+        self.assertIsNone(obj.value)
+
+    def test_case_expr_with_jsonnull_condition(self):
+        obj = NullableJSONModel.objects.create(value=JSONNull())
+        NullableJSONModel.objects.filter(pk=obj.pk).update(
+            value=Case(
+                When(
+                    value=JSONNull(),
+                    then=Value({"key": "replaced"}, output_field=JSONField()),
+                )
+            ),
+        )
+        obj.refresh_from_db()
+        self.assertEqual(obj.value, {"key": "replaced"})
+
+    def test_key_transform_exact_filter(self):
+        obj = NullableJSONModel.objects.create(value={"key": None})
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value__key=JSONNull()),
+            [obj],
+        )
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value__key=None), [obj]
+        )
+
+    def test_index_lookup(self):
+        obj = NullableJSONModel.objects.create(value=["a", "b", None, 3])
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value__2=JSONNull()), [obj]
+        )
+        self.assertSequenceEqual(NullableJSONModel.objects.filter(value__2=None), [obj])
+
+    @skipUnlessDBFeature("supports_table_check_constraints")
+    def test_constraint_validation(self):
+        constraint = CheckConstraint(
+            condition=~Q(value=JSONNull()), name="check_not_json_null"
+        )
+        constraint.validate(NullableJSONModel, NullableJSONModel(value={"key": None}))
+        msg = f"Constraint “{constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(NullableJSONModel, NullableJSONModel(value=JSONNull()))
+
+    @skipUnlessDBFeature("supports_table_check_constraints")
+    def test_constraint_validation_key_transform(self):
+        constraint = CheckConstraint(
+            condition=Q(value__has_key="name") & ~Q(value__name=JSONNull()),
+            name="check_value_name_not_json_null",
+        )
+        constraint.validate(
+            NullableJSONModel, NullableJSONModel(value={"name": "Django"})
+        )
+        msg = f"Constraint “{constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(
+                NullableJSONModel, NullableJSONModel(value={"name": None})
+            )
+
+    def test_default(self):
+        obj = JSONNullDefaultModel.objects.create()
+        self.assertIsNone(obj.value)
+
+    def test_custom_jsonnull_encoder(self):
+        obj = JSONNullDefaultModel.objects.create(
+            value={"name": JSONNull(), "array": [1, JSONNull()]}
+        )
+        obj.refresh_from_db()
+        self.assertIsNone(obj.value["name"])
+        self.assertEqual(obj.value["array"], [1, None])
+
+
+# RemovedInDjango70Warning.
+@skipUnlessDBFeature("supports_primitives_in_json_field")
+class JSONExactNoneDeprecationTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.msg = (
+            "Using None as the right-hand side of an exact lookup on JSONField to mean "
+            "JSON scalar 'null' is deprecated. Use JSONNull() instead (or use the "
+            "__isnull lookup if you meant SQL NULL)."
+        )
+        cls.obj = NullableJSONModel.objects.create(value=JSONNull())
+
+    def test_filter(self):
+        with self.assertWarnsMessage(RemovedInDjango70Warning, self.msg):
+            self.assertSequenceEqual(
+                NullableJSONModel.objects.filter(value=None), [self.obj]
+            )
+
+    def test_annotation_q_filter(self):
+        qs = NullableJSONModel.objects.annotate(
+            has_empty_data=Q(value__isnull=True) | Q(value=None)
+        ).filter(has_empty_data=True)
+        with self.assertWarnsMessage(RemovedInDjango70Warning, self.msg):
+            self.assertSequenceEqual(qs, [self.obj])
+
+    def test_case_when(self):
+        qs = NullableJSONModel.objects.annotate(
+            has_json_null=Case(When(value=None, then=Value(True)), default=Value(False))
+        ).filter(has_json_null=True)
+        with self.assertWarnsMessage(RemovedInDjango70Warning, self.msg):
+            self.assertSequenceEqual(qs, [self.obj])

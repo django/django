@@ -1,5 +1,5 @@
 import re
-from urllib.parse import urlparse
+from urllib.parse import urlsplit
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
@@ -105,7 +105,9 @@ class CommonMiddleware(MiddlewareMixin):
         # If the given URL is "Not Found", then check if we should redirect to
         # a path with a slash appended.
         if response.status_code == 404 and self.should_redirect_with_slash(request):
-            return self.response_redirect_class(self.get_full_path_with_slash(request))
+            response = self.response_redirect_class(
+                self.get_full_path_with_slash(request)
+            )
 
         # Add the Content-Length header to non-streaming responses if not
         # already set.
@@ -171,7 +173,7 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
 
         # The referer is equal to the current URL, ignoring the scheme (assumed
         # to be a poorly implemented bot).
-        parsed_referer = urlparse(referer)
+        parsed_referer = urlsplit(referer)
         if parsed_referer.netloc in ["", domain] and parsed_referer.path == uri:
             return True
 

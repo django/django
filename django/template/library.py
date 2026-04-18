@@ -4,6 +4,7 @@ from importlib import import_module
 from inspect import getfullargspec, unwrap
 
 from django.utils.html import conditional_escape
+from django.utils.inspect import lazy_annotations
 
 from .base import Node, Template, token_kwargs
 from .exceptions import TemplateSyntaxError
@@ -72,7 +73,8 @@ class Library:
                 # @register.filter
                 return self.filter_function(name, **flags)
             else:
-                # @register.filter('somename') or @register.filter(name='somename')
+                # @register.filter('somename') or
+                # @register.filter(name='somename')
                 def dec(func):
                     return self.filter(name, func, **flags)
 
@@ -109,16 +111,26 @@ class Library:
         """
 
         def dec(func):
-            (
-                params,
-                varargs,
-                varkw,
-                defaults,
-                kwonly,
-                kwonly_defaults,
-                _,
-            ) = getfullargspec(unwrap(func))
+            with lazy_annotations():
+                (
+                    params,
+                    varargs,
+                    varkw,
+                    defaults,
+                    kwonly,
+                    kwonly_defaults,
+                    _,
+                ) = getfullargspec(unwrap(func))
             function_name = name or func.__name__
+
+            if takes_context:
+                if params and params[0] == "context":
+                    del params[0]
+                else:
+                    raise TemplateSyntaxError(
+                        f"{function_name!r} is decorated with takes_context=True so it "
+                        "must have a first argument of 'context'"
+                    )
 
             @wraps(func)
             def compile_func(parser, token):
@@ -136,7 +148,6 @@ class Library:
                     defaults,
                     kwonly,
                     kwonly_defaults,
-                    takes_context,
                     function_name,
                 )
                 return SimpleNode(func, takes_context, args, kwargs, target_var)
@@ -153,6 +164,95 @@ class Library:
         else:
             raise ValueError("Invalid arguments provided to simple_tag")
 
+    def simple_block_tag(self, func=None, takes_context=None, name=None, end_name=None):
+        """
+        Register a callable as a compiled block template tag. Example:
+
+        @register.simple_block_tag
+        def hello(content):
+            return 'world'
+        """
+
+        def dec(func):
+            nonlocal end_name
+            with lazy_annotations():
+                (
+                    params,
+                    varargs,
+                    varkw,
+                    defaults,
+                    kwonly,
+                    kwonly_defaults,
+                    _,
+                ) = getfullargspec(unwrap(func))
+            function_name = name or func.__name__
+
+            if end_name is None:
+                end_name = f"end{function_name}"
+
+            if takes_context:
+                if len(params) >= 2 and params[1] == "content":
+                    del params[1]
+                else:
+                    raise TemplateSyntaxError(
+                        f"{function_name!r} is decorated with takes_context=True so"
+                        " it must have a first argument of 'context' and a second "
+                        "argument of 'content'"
+                    )
+
+                if params and params[0] == "context":
+                    del params[0]
+                else:
+                    raise TemplateSyntaxError(
+                        f"{function_name!r} is decorated with takes_context=True so it "
+                        "must have a first argument of 'context'"
+                    )
+            elif params and params[0] == "content":
+                del params[0]
+            else:
+                raise TemplateSyntaxError(
+                    f"{function_name!r} must have a first argument of 'content'"
+                )
+
+            @wraps(func)
+            def compile_func(parser, token):
+                bits = token.split_contents()[1:]
+                target_var = None
+                if len(bits) >= 2 and bits[-2] == "as":
+                    target_var = bits[-1]
+                    bits = bits[:-2]
+
+                nodelist = parser.parse((end_name,))
+                parser.delete_first_token()
+
+                args, kwargs = parse_bits(
+                    parser,
+                    bits,
+                    params,
+                    varargs,
+                    varkw,
+                    defaults,
+                    kwonly,
+                    kwonly_defaults,
+                    function_name,
+                )
+
+                return SimpleBlockNode(
+                    nodelist, func, takes_context, args, kwargs, target_var
+                )
+
+            self.tag(function_name, compile_func)
+            return func
+
+        if func is None:
+            # @register.simple_block_tag(...)
+            return dec
+        elif callable(func):
+            # @register.simple_block_tag
+            return dec(func)
+        else:
+            raise ValueError("Invalid arguments provided to simple_block_tag")
+
     def inclusion_tag(self, filename, func=None, takes_context=None, name=None):
         """
         Register a callable as an inclusion tag:
@@ -164,16 +264,26 @@ class Library:
         """
 
         def dec(func):
-            (
-                params,
-                varargs,
-                varkw,
-                defaults,
-                kwonly,
-                kwonly_defaults,
-                _,
-            ) = getfullargspec(unwrap(func))
+            with lazy_annotations():
+                (
+                    params,
+                    varargs,
+                    varkw,
+                    defaults,
+                    kwonly,
+                    kwonly_defaults,
+                    _,
+                ) = getfullargspec(unwrap(func))
             function_name = name or func.__name__
+
+            if takes_context:
+                if params and params[0] == "context":
+                    params = params[1:]
+                else:
+                    raise TemplateSyntaxError(
+                        f"{function_name!r} is decorated with takes_context=True so it "
+                        "must have a first argument of 'context'"
+                    )
 
             @wraps(func)
             def compile_func(parser, token):
@@ -187,7 +297,6 @@ class Library:
                     defaults,
                     kwonly,
                     kwonly_defaults,
-                    takes_context,
                     function_name,
                 )
                 return InclusionNode(
@@ -220,7 +329,7 @@ class TagHelperNode(Node):
     def get_resolved_arguments(self, context):
         resolved_args = [var.resolve(context) for var in self.args]
         if self.takes_context:
-            resolved_args = [context] + resolved_args
+            resolved_args = [context, *resolved_args]
         resolved_kwargs = {k: v.resolve(context) for k, v in self.kwargs.items()}
         return resolved_args, resolved_kwargs
 
@@ -241,6 +350,23 @@ class SimpleNode(TagHelperNode):
         if context.autoescape:
             output = conditional_escape(output)
         return output
+
+
+class SimpleBlockNode(SimpleNode):
+    def __init__(self, nodelist, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.nodelist = nodelist
+
+    def get_resolved_arguments(self, context):
+        resolved_args, resolved_kwargs = super().get_resolved_arguments(context)
+
+        # Restore the "content" argument.
+        # It will move depending on whether takes_context was passed.
+        resolved_args.insert(
+            1 if self.takes_context else 0, self.nodelist.render(context)
+        )
+
+        return resolved_args, resolved_kwargs
 
 
 class InclusionNode(TagHelperNode):
@@ -289,7 +415,6 @@ def parse_bits(
     defaults,
     kwonly,
     kwonly_defaults,
-    takes_context,
     name,
 ):
     """
@@ -297,14 +422,6 @@ def parse_bits(
     particular by detecting syntax errors and by extracting positional and
     keyword arguments.
     """
-    if takes_context:
-        if params and params[0] == "context":
-            params = params[1:]
-        else:
-            raise TemplateSyntaxError(
-                "'%s' is decorated with takes_context=True so it must "
-                "have a first argument of 'context'" % name
-            )
     args = []
     kwargs = {}
     unhandled_params = list(params)
@@ -383,5 +500,5 @@ def import_library(name):
         return module.register
     except AttributeError:
         raise InvalidTemplateLibrary(
-            "Module  %s does not have a variable named 'register'" % name,
+            "Module %s does not have a variable named 'register'" % name,
         )

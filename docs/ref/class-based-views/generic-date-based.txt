@@ -222,9 +222,9 @@ views for displaying drilldown pages for date-based data.
     context will be:
 
     * ``date_list``: A :meth:`QuerySet <django.db.models.query.QuerySet.dates>`
-      object containing all days that have objects available in the given month,
-      according to ``queryset``, represented as :class:`datetime.datetime`
-      objects, in ascending order.
+      object containing all days that have objects available in the given
+      month, according to ``queryset``, represented as
+      :class:`datetime.datetime` objects, in ascending order.
 
     * ``month``: A :class:`~datetime.date` object
       representing the given month.

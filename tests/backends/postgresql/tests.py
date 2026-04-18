@@ -373,7 +373,8 @@ class Tests(TestCase):
         try:
             # Start a transaction so the isolation level isn't reported as 0.
             new_connection.set_autocommit(False)
-            # Check the level on the psycopg connection, not the Django wrapper.
+            # Check the level on the psycopg connection, not the Django
+            # wrapper.
             self.assertEqual(
                 new_connection.connection.isolation_level,
                 IsolationLevel.SERIALIZABLE,
@@ -516,8 +517,11 @@ class Tests(TestCase):
     def test_correct_extraction_psycopg_version(self):
         from django.db.backends.postgresql.base import Database, psycopg_version
 
+        psycopg_version.cache_clear()
         with mock.patch.object(Database, "__version__", "4.2.1 (dt dec pq3 ext lo64)"):
+            self.addCleanup(psycopg_version.cache_clear)
             self.assertEqual(psycopg_version(), (4, 2, 1))
+        psycopg_version.cache_clear()
         with mock.patch.object(
             Database, "__version__", "4.2b0.dev1 (dt dec pq3 ext lo64)"
         ):
@@ -548,12 +552,12 @@ class Tests(TestCase):
 
     def test_get_database_version(self):
         new_connection = no_pool_connection()
-        new_connection.pg_version = 130009
-        self.assertEqual(new_connection.get_database_version(), (13, 9))
+        new_connection.pg_version = 150009
+        self.assertEqual(new_connection.get_database_version(), (15, 9))
 
-    @mock.patch.object(connection, "get_database_version", return_value=(12,))
+    @mock.patch.object(connection, "get_database_version", return_value=(14,))
     def test_check_database_version_supported(self, mocked_get_database_version):
-        msg = "PostgreSQL 13 or later is required (found 12)."
+        msg = "PostgreSQL 15 or later is required (found 14)."
         with self.assertRaisesMessage(NotSupportedError, msg):
             connection.check_database_version_supported()
         self.assertTrue(mocked_get_database_version.called)
@@ -567,3 +571,49 @@ class Tests(TestCase):
             )
         finally:
             new_connection.close()
+
+    def test_bypass_timezone_configuration(self):
+        from django.db.backends.postgresql.base import DatabaseWrapper
+
+        class CustomDatabaseWrapper(DatabaseWrapper):
+            def _configure_timezone(self, connection):
+                return False
+
+        for Wrapper, commit in [
+            (DatabaseWrapper, True),
+            (CustomDatabaseWrapper, False),
+        ]:
+            with self.subTest(wrapper=Wrapper, commit=commit):
+                new_connection = no_pool_connection()
+                self.addCleanup(new_connection.close)
+
+                # Set the database default time zone to be different from
+                # the time zone in new_connection.settings_dict.
+                with new_connection.cursor() as cursor:
+                    cursor.execute("RESET TIMEZONE")
+                    cursor.execute("SHOW TIMEZONE")
+                    db_default_tz = cursor.fetchone()[0]
+                new_tz = "Europe/Paris" if db_default_tz == "UTC" else "UTC"
+                new_connection.timezone_name = new_tz
+
+                settings = new_connection.settings_dict.copy()
+                conn = new_connection.connection
+                self.assertIs(Wrapper(settings)._configure_connection(conn), commit)
+
+    def test_bypass_role_configuration(self):
+        from django.db.backends.postgresql.base import DatabaseWrapper
+
+        class CustomDatabaseWrapper(DatabaseWrapper):
+            def _configure_role(self, connection):
+                return False
+
+        new_connection = no_pool_connection()
+        self.addCleanup(new_connection.close)
+        new_connection.connect()
+
+        settings = new_connection.settings_dict.copy()
+        settings["OPTIONS"]["assume_role"] = "django_nonexistent_role"
+        conn = new_connection.connection
+        self.assertIs(
+            CustomDatabaseWrapper(settings)._configure_connection(conn), False
+        )

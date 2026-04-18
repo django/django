@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from django.conf import settings
 from django.db.models.expressions import Func
 from django.db.models.fields import (
@@ -96,7 +94,8 @@ class Extract(TimezoneMixin, Transform):
                 "Extract input expression must be DateField, DateTimeField, "
                 "TimeField, or DurationField."
             )
-        # Passing dates to functions expecting datetimes is most likely a mistake.
+        # Passing dates to functions expecting datetimes is most likely a
+        # mistake.
         if type(field) is DateField and copy.lookup_name in (
             "hour",
             "minute",
@@ -343,25 +342,7 @@ class TruncBase(TimezoneMixin, Transform):
         return copy
 
     def convert_value(self, value, expression, connection):
-        if isinstance(self.output_field, DateTimeField):
-            if not settings.USE_TZ:
-                pass
-            elif value is not None:
-                value = value.replace(tzinfo=None)
-                value = timezone.make_aware(value, self.tzinfo)
-            elif not connection.features.has_zoneinfo_database:
-                raise ValueError(
-                    "Database returned an invalid datetime value. Are time "
-                    "zone definitions for your database installed?"
-                )
-        elif isinstance(value, datetime):
-            if value is None:
-                pass
-            elif isinstance(self.output_field, DateField):
-                value = value.date()
-            elif isinstance(self.output_field, TimeField):
-                value = value.time()
-        return value
+        return connection.ops.convert_trunc_expression(value, expression)
 
 
 class Trunc(TruncBase):

@@ -3,24 +3,30 @@
 # Translators:
 # Albin Larsson <albin.post@gmail.com>, 2022
 # Alex Nordlund <deep.alexander@gmail.com>, 2012
+# Anders Hovmöller <boxed@killingar.net>, 2023
 # Cybjit <cybjit@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jonathan Lindén, 2014-2015
 # Jonathan Lindén, 2015
+# Jörgen Olofsson, 2024
+# Jörgen Olofsson, 2024
 # Jonathan Lindén, 2014
 # Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
 # nip3o <n@niclasolofsson.se>, 2014
+# nip3o <n@niclasolofsson.se>, 2014
 # Petter Strandmark <petter.strandmark@gmail.com>, 2019
 # Samuel Linde <samuel@linde.im>, 2011
+# Thomas Lundqvist, 2013,2016
 # Thomas Lundqvist, 2013,2016
 # Tomas Lööw <tomas.loow@mailbox.org>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2022-07-25 08:09+0000\n"
-"Last-Translator: Albin Larsson <albin.post@gmail.com>\n"
-"Language-Team: Swedish (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 08:09+0000\n"
+"Last-Translator: Tomas Lööw <tomas.loow@mailbox.org>, 2021\n"
+"Language-Team: Swedish (http://app.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -41,12 +47,22 @@ msgstr "Viktiga datum"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s-objekt med primärnyckel %(key)r finns inte."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Motstridiga formulärdata skickades. Försök igen."
+
 msgid "Password changed successfully."
 msgstr "Lösenordet ändrades framgångsrikt."
+
+msgid "Password-based authentication was disabled."
+msgstr "Lösenordsbaserad autentisering inaktiverades."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Ändra lösenord: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Sätt lösenord: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Autentisering och auktorisering"
@@ -57,11 +73,17 @@ msgstr "lösenord"
 msgid "last login"
 msgstr "senaste inloggning"
 
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Ogiltigt lösenordsformat eller okänd hashalgoritm."
+
 msgid "No password set."
 msgstr "Inget lösenord angivet."
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Ogiltigt lösenordsformat eller okänd hashalgoritm."
+msgid "Reset password"
+msgstr "Återställ lösenord"
+
+msgid "Set password"
+msgstr "Sätt lösenord"
 
 msgid "The two password fields didn’t match."
 msgstr "De två lösenordsfälten stämmer inte överens."
@@ -76,11 +98,34 @@ msgid "Enter the same password as before, for verification."
 msgstr "Fyll i samma lösenord som tidigare för verifiering."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"Lösenord lagras inte direkt, så det finns inget sätt att se denna användares "
-"lösenord, men du kan ändra lösenorden med <a href=\"{}\">detta formulär</a>."
+"Om användaren kommer att kunna autentisera sig med ett lösenord eller inte. "
+"Om inaktiverat, kan användaren fortfarande ha möjlighet att autentisera sig "
+"via andra backend-lösningar, såsom Single Sign-On eller LDAP."
+
+msgid "Password-based authentication"
+msgstr "Lösenordsbaserad autentisering"
+
+msgid "Enabled"
+msgstr "Aktiverad"
+
+msgid "Disabled"
+msgstr "Avstängd"
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+"Lösenord lagras inte i klartext, det finns inget sätt att se användarens "
+"lösenord."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Aktivera lösenordsbaserad autentisering för denna användare genom att sätta "
+"ett lösenord."
 
 #, python-format
 msgid ""
@@ -103,13 +148,10 @@ msgid "New password confirmation"
 msgstr "Bekräfta nytt lösenord"
 
 msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "Ditt gamla lösenord var felaktigt ifyllt. Var vänlig fyll i det igen."
+msgstr "Ditt gamla lösenord var felaktigt ifyllt. Fyll i det igen."
 
 msgid "Old password"
 msgstr "Gammalt lösenord"
-
-msgid "Password (again)"
-msgstr "Lösenord (igen)"
 
 msgid "algorithm"
 msgstr "algoritm"
@@ -186,7 +228,7 @@ msgstr ""
 "rättigheter som deras grupper har."
 
 msgid "user permissions"
-msgstr "användarättigheter"
+msgstr "användarrättigheter"
 
 msgid "Specific permissions for this user."
 msgstr "Specifika rättigheter för denna användare."
@@ -237,16 +279,13 @@ msgid "users"
 msgstr "användare"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"Detta lösenord är för kort. Det måste innehålla minst %(min_length)d tecken."
+"Det här lösenordet är för kort. Det måste innehålla minst %d tecken."
 msgstr[1] ""
-"Detta lösenord är för kort. Det måste innehålla minst %(min_length)d tecken."
+"Det här lösenordet är för kort. Det måste innehålla minst %d tecken."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -279,11 +318,11 @@ msgid "Password reset on %(site_name)s"
 msgstr "Lösenord nollställt på %(site_name)s"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Fyll i ett giltigt användarnamn. Detta värde får endast innehålla bokstäver "
-"a-z, siffror och @/./+/-/_."
+"Fyll i ett giltigt användarnamn. Det får endast innehålla icke-accentsatta "
+"små och stora bokstäver a-z, A-Z, siffror samt tecknen @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

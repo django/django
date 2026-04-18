@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectNotUpdated
 from django.db import DatabaseError, IntegrityError, models, transaction
 from django.test import TestCase
 
@@ -50,8 +51,14 @@ class ForceTests(TestCase):
         # the data isn't in the database already.
         obj = WithCustomPK(name=1, value=1)
         msg = "Forced update did not affect any rows."
-        with self.assertRaisesMessage(DatabaseError, msg):
-            with transaction.atomic():
+        # Make sure backward compatibility with DatabaseError is preserved.
+        exceptions = [DatabaseError, ObjectNotUpdated, WithCustomPK.NotUpdated]
+        for exception in exceptions:
+            with (
+                self.subTest(exception),
+                self.assertRaisesMessage(DatabaseError, msg),
+                transaction.atomic(),
+            ):
                 obj.save(force_update=True)
 
 

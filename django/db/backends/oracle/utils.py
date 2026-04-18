@@ -4,7 +4,7 @@ import decimal
 from .base import Database
 
 
-class InsertVar:
+class BoundVar:
     """
     A late-binding cursor variable that can be passed to Cursor.execute
     as a parameter, in order to receive the id of the row created by an
@@ -24,7 +24,7 @@ class InsertVar:
         "BooleanField": int,
         "FloatField": Database.DB_TYPE_BINARY_DOUBLE,
         "DateTimeField": Database.DB_TYPE_TIMESTAMP,
-        "DateField": Database.Date,
+        "DateField": datetime.date,
         "DecimalField": decimal.Decimal,
     }
 

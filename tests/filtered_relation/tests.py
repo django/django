@@ -210,11 +210,25 @@ class FilteredRelationTests(TestCase):
             ),
         ).filter(book_alice__isnull=False)
         self.assertIn(
-            "INNER JOIN {} book_alice ON".format(
-                connection.ops.quote_name("filtered_relation_book")
+            "INNER JOIN {} {} ON".format(
+                connection.ops.quote_name("filtered_relation_book"),
+                connection.ops.quote_name("book_alice"),
             ),
             str(queryset.query),
         )
+
+    def test_period_forbidden(self):
+        msg = (
+            "FilteredRelation doesn't support aliases with periods (got 'book.alice')."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Author.objects.annotate(
+                **{
+                    "book.alice": FilteredRelation(
+                        "book", condition=Q(book__title__iexact="poem by alice")
+                    )
+                }
+            )
 
     def test_multiple(self):
         qs = (
@@ -368,7 +382,7 @@ class FilteredRelationTests(TestCase):
                 "book", condition=Q(book__title__iexact="the book by jane a")
             ),
         ).filter(book_jane__isnull=False)
-        self.assertSequenceEqual(qs1.union(qs2), [self.author1, self.author2])
+        self.assertCountEqual(qs1.union(qs2), [self.author1, self.author2])
 
     @skipUnlessDBFeature("supports_select_intersection")
     def test_intersection(self):
@@ -582,6 +596,50 @@ class FilteredRelationTests(TestCase):
             lambda x: (x.author, x.book_title, x.preferred_by_author_pk),
         )
 
+    def test_three_level_nested_chained_relations(self):
+        borrower = Borrower.objects.create(name="Jenny")
+        Reservation.objects.create(
+            borrower=borrower,
+            book=self.book1,
+            state=Reservation.STOPPED,
+        )
+        qs = Author.objects.annotate(
+            my_books=FilteredRelation("book"),
+            my_reserved_books=FilteredRelation(
+                "my_books__reservation",
+                condition=Q(my_books__reservation__state=Reservation.STOPPED),
+            ),
+            my_readers=FilteredRelation(
+                "my_reserved_books__borrower",
+                condition=Q(my_reserved_books__borrower=borrower),
+            ),
+        )
+        self.assertSequenceEqual(
+            qs.filter(my_readers=borrower).values_list("name", flat=True), ["Alice"]
+        )
+
+    def test_reuse_same_filtered_relation(self):
+        borrower = Borrower.objects.create(name="Jenny")
+        Reservation.objects.create(
+            borrower=borrower,
+            book=self.book1,
+            state=Reservation.STOPPED,
+        )
+        condition = Q(book__reservation__state=Reservation.STOPPED)
+        my_reserved_books = FilteredRelation("book__reservation", condition=condition)
+        first_query = list(
+            Author.objects.annotate(
+                my_reserved_books=my_reserved_books,
+            )
+        )
+        self.assertEqual(my_reserved_books.condition, condition)
+        second_query = list(
+            Author.objects.annotate(
+                my_reserved_books=my_reserved_books,
+            )
+        )
+        self.assertEqual(first_query, second_query)
+
     def test_deep_nested_foreign_key(self):
         qs = (
             Book.objects.annotate(
@@ -665,6 +723,19 @@ class FilteredRelationTests(TestCase):
                 book_editor=FilteredRelation(
                     "book",
                     condition=Q(book__editor__name__icontains="b"),
+                ),
+            )
+
+    def test_condition_deeper_relation_name_implicit_exact(self):
+        msg = (
+            "FilteredRelation's condition doesn't support nested relations "
+            "deeper than the relation_name (got 'book__editor__name' for 'book')."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Author.objects.annotate(
+                book_editor=FilteredRelation(
+                    "book",
+                    condition=Q(book__editor__name="b"),
                 ),
             )
 

@@ -170,6 +170,7 @@ input[type="submit"], button {
 
     /* Forms */
 
+    legend,
     label {
         font-size: 1rem;
     }
@@ -204,12 +205,6 @@ input[type="submit"], button {
         min-height: 0;
     }
 
-    fieldset .fieldBox + .fieldBox {
-        margin-top: 10px;
-        padding-top: 10px;
-        border-top: 1px solid var(--hairline-color);
-    }
-
     textarea {
         max-width: 100%;
         max-height: 120px;
@@ -223,7 +218,7 @@ input[type="submit"], button {
     .aligned .datetimeshortcuts,
     .aligned .related-lookup + strong {
         align-self: center;
-        margin-left: 15px;
+        margin-left: 0.5rem;
     }
 
     form .aligned div.radiolist {
@@ -254,10 +249,6 @@ input[type="submit"], button {
         align-items: center;
     }
 
-    .selector .selector-filter label {
-        margin: 0 8px 0 0;
-    }
-
     .selector .selector-filter input {
         width: 100%;
         min-height: 0;
@@ -277,29 +268,7 @@ input[type="submit"], button {
         margin-bottom: 5px;
     }
 
-    .selector ul.selector-chooser {
-        width: 26px;
-        height: 52px;
-        padding: 2px 0;
-        border-radius: 20px;
-        transform: translateY(-10px);
-    }
-
-    .selector-add, .selector-remove {
-        width: 20px;
-        height: 20px;
-        background-size: 20px auto;
-    }
-
-    .selector-add {
-        background-position: 0 -120px;
-    }
-
-    .selector-remove {
-        background-position: 0 -80px;
-    }
-
-    a.selector-chooseall, a.selector-clearall {
+    .selector-chooseall, .selector-clearall {
         align-self: center;
     }
 
@@ -321,50 +290,12 @@ input[type="submit"], button {
     }
 
     .stacked ul.selector-chooser {
-        width: 52px;
-        height: 26px;
         padding: 0 2px;
         transform: none;
     }
 
     .stacked .selector-chooser li {
         padding: 3px;
-    }
-
-    .stacked .selector-add, .stacked .selector-remove {
-        background-size: 20px auto;
-    }
-
-    .stacked .selector-add {
-        background-position: 0 -40px;
-    }
-
-    .stacked .active.selector-add {
-        background-position: 0 -40px;
-    }
-
-    .active.selector-add:focus, .active.selector-add:hover {
-        background-position: 0 -140px;
-    }
-
-    .stacked .active.selector-add:focus, .stacked .active.selector-add:hover {
-        background-position: 0 -60px;
-    }
-
-    .stacked .selector-remove {
-        background-position: 0 0;
-    }
-
-    .stacked .active.selector-remove {
-        background-position: 0 0;
-    }
-
-    .active.selector-remove:focus, .active.selector-remove:hover {
-        background-position: 0 -100px;
-    }
-
-    .stacked .active.selector-remove:focus, .stacked .active.selector-remove:hover {
-        background-position: 0 -20px;
     }
 
     .help-tooltip, .selector .help-icon {
@@ -401,16 +332,8 @@ input[type="submit"], button {
     /* Messages */
 
     ul.messagelist li {
-        padding-left: 55px;
-        background-position: 30px 12px;
-    }
-
-    ul.messagelist li.error {
-        background-position: 30px 12px;
-    }
-
-    ul.messagelist li.warning {
-        background-position: 30px 14px;
+        padding: 10px 10px 10px 55px;
+        background-position-x: 30px;
     }
 
     /* Login */
@@ -481,9 +404,13 @@ input[type="submit"], button {
 
     /* Changelist */
 
-    #changelist {
-        align-items: stretch;
+    #changelist .changelist-form-container {
         flex-direction: column;
+    }
+
+    #changelist .changelist-form-container:has(#changelist-filter) > div {
+        max-width: 100%;
+        width: 100%;
     }
 
     #toolbar {
@@ -508,28 +435,19 @@ input[type="submit"], button {
     }
 
     #changelist-filter {
-        position: static;
-        width: auto;
+        width: 100%;
         margin-top: 30px;
     }
 
-    .object-tools {
-        float: none;
-        margin: 0 0 15px;
-        padding: 0;
-        overflow: hidden;
-    }
-
-    .object-tools li {
-        height: auto;
-        margin-left: 0;
-    }
-
-    .object-tools li + li {
-        margin-left: 15px;
-    }
-
     /* Forms */
+
+    .titles-and-tools {
+        flex-direction: column;
+    }
+
+    .object-tools {
+        margin-bottom: 10px;
+    }
 
     .form-row {
         padding: 15px 0;
@@ -545,11 +463,7 @@ input[type="submit"], button {
     }
 
     .flex-container {
-        flex-flow: column;
-    }
-
-    .flex-container.checkbox-row {
-        flex-flow: row;
+        align-items: stretch;
     }
 
     textarea {
@@ -558,25 +472,6 @@ input[type="submit"], button {
 
     .vURLField {
         width: auto;
-    }
-
-    fieldset .fieldBox + .fieldBox {
-        margin-top: 15px;
-        padding-top: 15px;
-    }
-
-    fieldset.collapsed .form-row {
-        display: none;
-    }
-
-    .aligned label {
-        width: 100%;
-        min-width: auto;
-        padding: 0 0 10px;
-    }
-
-    .aligned label:after {
-        max-height: 0;
     }
 
     .aligned .form-row input,
@@ -596,13 +491,6 @@ input[type="submit"], button {
         padding: 1px 0 0 5px;
     }
 
-    .aligned label + p,
-    .aligned label + div.help,
-    .aligned label + div.readonly {
-        padding: 0;
-        margin-left: 0;
-    }
-
     .aligned p.file-upload {
         font-size: 0.8125rem;
     }
@@ -614,29 +502,6 @@ input[type="submit"], button {
     span.clearable-file-input label {
         font-size: 0.8125rem;
         padding-bottom: 0;
-    }
-
-    .aligned .timezonewarning {
-        flex: 1 0 100%;
-        margin-top: 5px;
-    }
-
-    form .aligned .form-row div.help {
-        width: 100%;
-        margin: 5px 0 0;
-        padding: 0;
-    }
-
-    form .aligned ul,
-    form .aligned ul.errorlist {
-        margin-left: 0;
-        padding-left: 0;
-    }
-
-    form .aligned div.radiolist {
-        margin-top: 5px;
-        margin-right: 15px;
-        margin-bottom: -3px;
     }
 
     form .aligned div.radiolist:not(.inline) div + div {
@@ -653,6 +518,7 @@ input[type="submit"], button {
 
     .related-widget-wrapper .selector {
         order: 1;
+        flex: 1 0 auto;
     }
 
     .related-widget-wrapper > a {
@@ -683,9 +549,9 @@ input[type="submit"], button {
     }
 
     .selector ul.selector-chooser {
-        display: block;
-        width: 52px;
-        height: 26px;
+        display: flex;
+        width: 60px;
+        height: 30px;
         padding: 0 2px;
         transform: none;
     }
@@ -698,16 +564,16 @@ input[type="submit"], button {
         background-position: 0 0;
     }
 
-    .active.selector-remove:focus, .active.selector-remove:hover {
-        background-position: 0 -20px;
+    :enabled.selector-remove:focus, :enabled.selector-remove:hover {
+        background-position: 0 -24px;
     }
 
     .selector-add  {
-        background-position: 0 -40px;
+        background-position: 0 -48px;
     }
 
-    .active.selector-add:focus, .active.selector-add:hover {
-        background-position: 0 -60px;
+    :enabled.selector-add:focus, :enabled.selector-add:hover {
+        background-position: 0 -72px;
     }
 
     /* Inlines */
@@ -806,16 +672,8 @@ input[type="submit"], button {
     /* Messages */
 
     ul.messagelist li {
-        padding-left: 40px;
-        background-position: 15px 12px;
-    }
-
-    ul.messagelist li.error {
-        background-position: 15px 12px;
-    }
-
-    ul.messagelist li.warning {
-        background-position: 15px 14px;
+        padding: 10px 10px 10px 40px;
+        background-position-x: 15px;
     }
 
     /* Paginator */

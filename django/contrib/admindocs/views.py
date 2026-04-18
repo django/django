@@ -13,7 +13,12 @@ from django.contrib.admindocs.utils import (
     replace_named_groups,
     replace_unnamed_groups,
 )
-from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
+from django.contrib.auth import get_permission_codename
+from django.core.exceptions import (
+    ImproperlyConfigured,
+    PermissionDenied,
+    ViewDoesNotExist,
+)
 from django.db import models
 from django.http import Http404
 from django.template.engine import Engine
@@ -30,7 +35,7 @@ from django.utils.inspect import (
 from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 
-from .utils import get_view_name
+from .utils import get_view_name, strip_p_tags
 
 # Exclude methods starting with these strings from documentation
 MODEL_METHODS_EXCLUDE = ("_", "add_", "delete", "save", "set_")
@@ -195,18 +200,31 @@ class ViewDetailView(BaseAdminDocsView):
             **{
                 **kwargs,
                 "name": view,
-                "summary": title,
+                "summary": strip_p_tags(title),
                 "body": body,
                 "meta": metadata,
             }
         )
 
 
+def user_has_model_view_permission(user, opts):
+    """Based off ModelAdmin.has_view_permission."""
+    codename_view = get_permission_codename("view", opts)
+    codename_change = get_permission_codename("change", opts)
+    return user.has_perm("%s.%s" % (opts.app_label, codename_view)) or user.has_perm(
+        "%s.%s" % (opts.app_label, codename_change)
+    )
+
+
 class ModelIndexView(BaseAdminDocsView):
     template_name = "admin_doc/model_index.html"
 
     def get_context_data(self, **kwargs):
-        m_list = [m._meta for m in apps.get_models()]
+        m_list = [
+            m._meta
+            for m in apps.get_models()
+            if user_has_model_view_permission(self.request.user, m._meta)
+        ]
         return super().get_context_data(**{**kwargs, "models": m_list})
 
 
@@ -228,6 +246,8 @@ class ModelDetailView(BaseAdminDocsView):
             )
 
         opts = model._meta
+        if not user_has_model_view_permission(self.request.user, opts):
+            raise PermissionDenied
 
         title, body, metadata = utils.parse_docstring(model.__doc__)
         title = title and utils.parse_rst(title, "model", _("model:") + model_name)
@@ -384,7 +404,7 @@ class ModelDetailView(BaseAdminDocsView):
             **{
                 **kwargs,
                 "name": opts.label,
-                "summary": title,
+                "summary": strip_p_tags(title),
                 "description": body,
                 "fields": fields,
                 "methods": methods,

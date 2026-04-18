@@ -27,8 +27,8 @@ class Layer(GDALBase):
     def __init__(self, layer_ptr, ds):
         """
         Initialize on an OGR C pointer to the Layer and the `DataSource` object
-        that owns this layer.  The `DataSource` object is required so that a
-        reference to it is kept with this Layer.  This prevents garbage
+        that owns this layer. The `DataSource` object is required so that a
+        reference to it is kept with this Layer. This prevents garbage
         collection of the `DataSource` while this Layer is still active.
         """
         if not layer_ptr:
@@ -75,7 +75,7 @@ class Layer(GDALBase):
     def _make_feature(self, feat_id):
         """
         Helper routine for __getitem__ that constructs a Feature from the given
-        Feature ID.  If the OGR Layer does not support random-access reading,
+        Feature ID. If the OGR Layer does not support random-access reading,
         then each feature of the layer will be incremented through until the
         a Feature is found matching the given feature ID.
         """
@@ -150,7 +150,7 @@ class Layer(GDALBase):
     @property
     def field_types(self):
         """
-        Return a list of the types of fields in this Layer.  For example,
+        Return a list of the types of fields in this Layer. For example,
         return the list [OFTInteger, OFTReal, OFTString] for an OGR layer that
         has an integer, a floating-point, and string fields.
         """
@@ -226,7 +226,7 @@ class Layer(GDALBase):
     def test_capability(self, capability):
         """
         Return a bool indicating whether the this Layer supports the given
-        capability (a string).  Valid capability strings include:
+        capability (a string). Valid capability strings include:
           'RandomRead', 'SequentialWrite', 'RandomWrite', 'FastSpatialFilter',
           'FastFeatureCount', 'FastGetExtent', 'CreateField', 'Transactions',
           'DeleteFeature', and 'FastSetNextByIndex'.

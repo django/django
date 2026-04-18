@@ -1,1 +1,1 @@
-{% if errors %}<ul class="{{ error_class }}">{% for error in errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+{% if errors %}<ul class="{{ error_class }}"{% if errors.field_id %} id="{{ errors.field_id }}_error"{% endif %}>{% for error in errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}

@@ -40,6 +40,7 @@ urlpatterns = [
 @override_settings(ROOT_URLCONF=__name__, DATABASE_ROUTERS=["%s.Router" % __name__])
 class MultiDatabaseTests(TestCase):
     databases = {"default", "other"}
+    READ_ONLY_METHODS = {"get", "options", "head", "trace"}
 
     @classmethod
     def setUpTestData(cls):
@@ -56,47 +57,115 @@ class MultiDatabaseTests(TestCase):
             b.save(using=db)
             cls.test_book_ids[db] = b.id
 
+    def tearDown(self):
+        # Reset the routers' state between each test.
+        Router.target_db = None
+
     @mock.patch("django.contrib.admin.options.transaction")
     def test_add_view(self, mock):
         for db in self.databases:
             with self.subTest(db=db):
+                mock.mock_reset()
                 Router.target_db = db
                 self.client.force_login(self.superusers[db])
-                self.client.post(
+                response = self.client.post(
                     reverse("test_adminsite:admin_views_book_add"),
                     {"name": "Foobar: 5th edition"},
                 )
+                self.assertEqual(response.status_code, 302)
+                self.assertEqual(
+                    response.url, reverse("test_adminsite:admin_views_book_changelist")
+                )
                 mock.atomic.assert_called_with(using=db)
+
+    @mock.patch("django.contrib.admin.options.transaction")
+    def test_read_only_methods_add_view(self, mock):
+        for db in self.databases:
+            for method in self.READ_ONLY_METHODS:
+                with self.subTest(db=db, method=method):
+                    mock.mock_reset()
+                    Router.target_db = db
+                    self.client.force_login(self.superusers[db])
+                    response = getattr(self.client, method)(
+                        reverse("test_adminsite:admin_views_book_add"),
+                    )
+                    self.assertEqual(response.status_code, 200)
+                    mock.atomic.assert_not_called()
 
     @mock.patch("django.contrib.admin.options.transaction")
     def test_change_view(self, mock):
         for db in self.databases:
             with self.subTest(db=db):
+                mock.mock_reset()
                 Router.target_db = db
                 self.client.force_login(self.superusers[db])
-                self.client.post(
+                response = self.client.post(
                     reverse(
                         "test_adminsite:admin_views_book_change",
                         args=[self.test_book_ids[db]],
                     ),
                     {"name": "Test Book 2: Test more"},
                 )
+                self.assertEqual(response.status_code, 302)
+                self.assertEqual(
+                    response.url, reverse("test_adminsite:admin_views_book_changelist")
+                )
                 mock.atomic.assert_called_with(using=db)
+
+    @mock.patch("django.contrib.admin.options.transaction")
+    def test_read_only_methods_change_view(self, mock):
+        for db in self.databases:
+            for method in self.READ_ONLY_METHODS:
+                with self.subTest(db=db, method=method):
+                    mock.mock_reset()
+                    Router.target_db = db
+                    self.client.force_login(self.superusers[db])
+                    response = getattr(self.client, method)(
+                        reverse(
+                            "test_adminsite:admin_views_book_change",
+                            args=[self.test_book_ids[db]],
+                        ),
+                        data={"name": "Test Book 2: Test more"},
+                    )
+                    self.assertEqual(response.status_code, 200)
+                    mock.atomic.assert_not_called()
 
     @mock.patch("django.contrib.admin.options.transaction")
     def test_delete_view(self, mock):
         for db in self.databases:
             with self.subTest(db=db):
+                mock.mock_reset()
                 Router.target_db = db
                 self.client.force_login(self.superusers[db])
-                self.client.post(
+                response = self.client.post(
                     reverse(
                         "test_adminsite:admin_views_book_delete",
                         args=[self.test_book_ids[db]],
                     ),
                     {"post": "yes"},
                 )
+                self.assertEqual(response.status_code, 302)
+                self.assertEqual(
+                    response.url, reverse("test_adminsite:admin_views_book_changelist")
+                )
                 mock.atomic.assert_called_with(using=db)
+
+    @mock.patch("django.contrib.admin.options.transaction")
+    def test_read_only_methods_delete_view(self, mock):
+        for db in self.databases:
+            for method in self.READ_ONLY_METHODS:
+                with self.subTest(db=db, method=method):
+                    mock.mock_reset()
+                    Router.target_db = db
+                    self.client.force_login(self.superusers[db])
+                    response = getattr(self.client, method)(
+                        reverse(
+                            "test_adminsite:admin_views_book_delete",
+                            args=[self.test_book_ids[db]],
+                        )
+                    )
+                    self.assertEqual(response.status_code, 200)
+                    mock.atomic.assert_not_called()
 
 
 class ViewOnSiteRouter:

@@ -1,7 +1,6 @@
 import inspect
 from functools import wraps
-
-from asgiref.sync import iscoroutinefunction
+from inspect import iscoroutinefunction
 
 from django.http import HttpRequest
 
@@ -54,8 +53,8 @@ def sensitive_variables(*variables):
                     "Python file (not a builtin or from a native extension)."
                 )
             else:
-                # A source file may not be available (e.g. in .pyc-only builds),
-                # use the first line number instead.
+                # A source file may not be available (e.g. in .pyc-only
+                # builds), use the first line number instead.
                 first_line_number = wrapped_func.__code__.co_firstlineno
                 key = hash(f"{file_path}:{first_line_number}")
 

@@ -4,7 +4,7 @@
 # Ádám Krizsány <krizsany1302@gmail.com>, 2015
 # Akos Zsolt Hochrein <hoch.akos@gmail.com>, 2018
 # András Veres-Szentkirályi, 2016,2018-2020,2023
-# Balázs R, 2023
+# Balázs R, 2023,2025
 # Istvan Farkas <istvan.farkas@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # János R, 2017
@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: András Veres-Szentkirályi, 2016,2018-2020,2023\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2025-12-03 07:05+0000\n"
+"Last-Translator: Balázs R, 2023,2025\n"
 "Language-Team: Hungarian (http://app.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -39,8 +39,8 @@ msgstr "%(count)d %(items)s sikeresen törölve lett."
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s törlése nem sikerült"
 
-msgid "Are you sure?"
-msgstr "Biztos benne?"
+msgid "Delete multiple objects"
+msgstr "Több elem törlése"
 
 msgid "Administration"
 msgstr "Adminisztráció"
@@ -211,10 +211,6 @@ msgid ""
 msgstr "A(z) \"{obj}\" {name} sikeresen módosítva. Alább újra szerkesztheti."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "A(z) \"{obj}\" {name} sikeresen hozzáadva. Alább újra szerkesztheti."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -276,6 +272,9 @@ msgstr[1] "%(total_count)s kiválasztva"
 msgid "0 of %(cnt)s selected"
 msgstr "0 kiválasztva ennyiből: %(cnt)s"
 
+msgid "Delete"
+msgstr "Törlés"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Változások története: %s"
@@ -336,11 +335,8 @@ msgstr ""
 "Hiba történt. Az oldal kezelőjét e-mailben értesítettük, a hiba rövidesen "
 "javítva lesz. Köszönjük a türelmet."
 
-msgid "Run the selected action"
-msgstr "Kiválasztott művelet futtatása"
-
-msgid "Go"
-msgstr "Mehet"
+msgid "Run"
+msgstr ""
 
 msgid "Click here to select the objects across all pages"
 msgstr "Kattintson ide több oldalnyi objektum kiválasztásához"
@@ -359,6 +355,15 @@ msgstr "Breadcrumb navigáció"
 msgid "Models in the %(name)s application"
 msgstr "%(name)s alkalmazásban elérhető modellek."
 
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
+
 msgid "Add"
 msgstr "Új"
 
@@ -368,18 +373,17 @@ msgstr "Megtekintés"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Jelenleg nincs jogosultsága bármit megtekinteni vagy szerkeszteni."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
-msgstr ""
-"Először adjon meg egy felhasználónevet és jelszót. A mentés után a többi "
-"felhasználói adat is szerkeszthető lesz."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
+msgstr "A felhasználó létrehozása után a többi adat is szerkeszthető lesz."
 
-msgid "Enter a username and password."
-msgstr "Írjon be egy felhasználónevet és jelszót."
+msgid "Error:"
+msgstr "Hiba:"
 
 msgid "Change password"
 msgstr "Jelszó megváltoztatása"
+
+msgid "Set password"
+msgstr "Jelszó beállítása"
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
@@ -390,6 +394,17 @@ msgstr[1] "Kérem javítsa a lenti hibákat."
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Adjon meg egy új jelszót <strong>%(username)s</strong> nevű felhasználónak."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr "Jelszavas bejelentkezés letiltása"
+
+msgid "Enable password-based authentication"
+msgstr "Jelszavas bejelentkezés engedélyezése"
 
 msgid "Skip to main content"
 msgstr "Ugrás az oldal fő részéhez"
@@ -428,6 +443,9 @@ msgstr "Számok megjelenítése"
 msgid "Clear all filters"
 msgstr "Összes szűrő törlése"
 
+msgid "Save"
+msgstr "Mentés"
+
 msgid "Remove from sorting"
 msgstr "Eltávolítás a rendezésből"
 
@@ -447,34 +465,24 @@ msgstr "Téma váltás (jelenleg: világos)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Téma váltás (jelenleg: sötét)"
 
-msgid "Delete"
-msgstr "Törlés"
-
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"\"%(escaped_object)s\" %(object_name)s törlése a kapcsolódó objektumok "
-"törlését is eredményezi, de a hozzáférése nem engedi a következő típusú "
-"objektumok törlését:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"\"%(escaped_object)s\" %(object_name)s törlése az alábbi kapcsolódó "
-"objektumok törlését is maga után vonja:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Biztos hogy törli a következőt: \"%(escaped_object)s\" (típus: "
-"%(object_name)s)? A összes további kapcsolódó elem is törlődik:"
 
 msgid "Objects"
 msgstr "Objektumok"
@@ -484,9 +492,6 @@ msgstr "Igen, biztos vagyok benne"
 
 msgid "No, take me back"
 msgstr "Nem, forduljunk vissza"
-
-msgid "Delete multiple objects"
-msgstr "Több elem törlése"
 
 #, python-format
 msgid ""
@@ -562,8 +567,8 @@ msgstr ""
 "Jelenleg be vagy lépve mint %(username)s, de nincs jogod elérni ezt az "
 "oldalt. Szeretnél belépni egy másik fiókkal?"
 
-msgid "Forgotten your password or username?"
-msgstr "Elfelejtette jelszavát vagy felhasználónevét?"
+msgid "Forgotten your login credentials?"
+msgstr "Elfelejtette a bejelentkezési adatait?"
 
 msgid "Toggle navigation"
 msgstr "Navigáció megjelenítése/elrejtése"
@@ -586,6 +591,10 @@ msgstr "Felhasználó"
 msgid "Action"
 msgstr "Művelet"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "bejegyzés"
@@ -598,14 +607,19 @@ msgstr ""
 "Ennek az objektumnak nincs változás naplója. Valószínűleg nem az admin "
 "felületen keresztül lett rögzítve."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "Mutassa mindet"
 
-msgid "Save"
-msgstr "Mentés"
-
 msgid "Popup closing…"
 msgstr "A popup bezáródik…"
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "Keresés"
@@ -728,8 +742,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Kérjük látogassa meg a következő oldalt, és válasszon egy új jelszót:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "A felhasználóneve, amennyiben nem emlékezne rá:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "Ha esetleg elfelejtette volna, a felhasználóneve: "
 
 msgid "Thanks for using our site!"
 msgstr "Köszönjük, hogy használta honlapunkat!"

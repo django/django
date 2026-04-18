@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: schedules
     name: Trigger Full Build
+    timeout-minutes: 60
     # Only trigger on the main Django repository
     if: (github.event_name == 'schedule' && github.repository == 'django/django') || (github.event_name != 'schedule')
     strategy:
@@ -21,7 +22,7 @@ jobs:
         branch:
           - main
     steps:
-      - uses: actions/github-script@v7
+      - uses: actions/github-script@v8
         with:
           github-token: ${{secrets.SCHEDULE_WORKFLOW_TOKEN}}
           script: |

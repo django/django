@@ -1,11 +1,16 @@
 import sys
+import unittest
+from typing import TYPE_CHECKING
 
 from django.template import Context, Engine, TemplateDoesNotExist, TemplateSyntaxError
 from django.template.base import UNKNOWN_SOURCE
 from django.test import SimpleTestCase, override_settings
 from django.urls import NoReverseMatch
 from django.utils import translation
-from django.utils.html import escape
+from django.utils.version import PY314
+
+if TYPE_CHECKING:
+    type AnnotatedKwarg = str
 
 
 class TemplateTestMixin:
@@ -158,9 +163,31 @@ class TemplateTestMixin:
             template.render(context)
         if self.debug_engine:
             self.assertEqual(
-                cm.exception.template_debug["during"],
-                escape('{% include "missing.html" %}'),
+                cm.exception.template_debug["before"],
+                '{% block content %}{% include "index.html" %}',
             )
+            self.assertEqual(
+                cm.exception.template_debug["during"],
+                '{% include "missing.html" %}',
+            )
+            self.assertEqual(
+                cm.exception.template_debug["after"],
+                '{% include "index.html" %}{% endblock %}\n',
+            )
+            self.assertEqual(
+                cm.exception.template_debug["source_lines"][0],
+                (1, '{% extends "test_extends_block_error_parent.html" %}\n'),
+            )
+            self.assertEqual(
+                cm.exception.template_debug["source_lines"][1],
+                (
+                    2,
+                    '{% block content %}{% include "index.html" %}'
+                    '{% include "missing.html" %}'
+                    '{% include "index.html" %}{% endblock %}\n',
+                ),
+            )
+            self.assertEqual(cm.exception.template_debug["source_lines"][2], (3, ""))
 
     def test_super_errors(self):
         """
@@ -199,6 +226,21 @@ class TemplateTestMixin:
         """
         template = self._engine().from_string("{{ description.count }}")
         self.assertEqual(template.render(Context({"description": "test"})), "")
+
+    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
+    def test_callable_uses_deferred_annotations(self):
+        """
+        Missing required arguments are gracefully handled when a signature uses
+        deferred annotations.
+        """
+
+        class MyObject:
+            @staticmethod
+            def uses_deferred_annotations(value: AnnotatedKwarg):
+                return value
+
+        template = self._engine().from_string("{{ obj.uses_deferred_annotations }}")
+        self.assertEqual(template.render(Context({"obj": MyObject()})), "")
 
 
 class TemplateTests(TemplateTestMixin, SimpleTestCase):

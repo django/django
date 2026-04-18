@@ -28,8 +28,8 @@ class BaseSpatialOperations:
 
     geom_func_prefix = ""
 
-    # Mapping between Django function names and backend names, when names do not
-    # match; used in spatial_function_name().
+    # Mapping between Django function names and backend names, when names do
+    # not match; used in spatial_function_name().
     function_names = {}
 
     # Set of known unsupported functions of the backend
@@ -39,17 +39,22 @@ class BaseSpatialOperations:
         "AsGML",
         "AsKML",
         "AsSVG",
+        "AsWKB",
+        "AsWKT",
         "Azimuth",
         "BoundingCircle",
         "Centroid",
         "ClosestPoint",
         "Difference",
         "Distance",
+        "DistanceSpheroid",
         "Envelope",
+        "ForcePolygonCW",
         "FromWKB",
         "FromWKT",
         "GeoHash",
         "GeometryDistance",
+        "GeometryType",
         "Intersection",
         "IsEmpty",
         "IsValid",
@@ -57,11 +62,13 @@ class BaseSpatialOperations:
         "LineLocatePoint",
         "MakeValid",
         "MemSize",
+        "NumDimensions",
         "NumGeometries",
         "NumPoints",
         "Perimeter",
         "PointOnSurface",
         "Reverse",
+        "Rotate",
         "Scale",
         "SnapToGrid",
         "SymDifference",
@@ -73,8 +80,8 @@ class BaseSpatialOperations:
     # Constructors
     from_text = False
 
-    # Default conversion functions for aggregates; will be overridden if implemented
-    # for the spatial backend.
+    # Default conversion functions for aggregates; will be overridden if
+    # implemented for the spatial backend.
     def convert_extent(self, box, srid):
         raise NotImplementedError(
             "Aggregate extent not implemented for this spatial backend."
@@ -108,36 +115,34 @@ class BaseSpatialOperations:
             "Distance operations not available on this spatial backend."
         )
 
-    def get_geom_placeholder(self, f, value, compiler):
+    @staticmethod
+    def _must_transform_value(value, field):
+        return value is not None and value.srid != field.srid
+
+    def get_geom_placeholder_sql(self, f, value, compiler):
         """
         Return the placeholder for the given geometry field with the given
-        value.  Depending on the spatial backend, the placeholder may contain a
+        value. Depending on the spatial backend, the placeholder may contain a
         stored procedure call to the transformation function of the spatial
         backend.
         """
-
-        def transform_value(value, field):
-            return value is not None and value.srid != field.srid
-
         if hasattr(value, "as_sql"):
-            return (
-                "%s(%%s, %s)" % (self.spatial_function_name("Transform"), f.srid)
-                if transform_value(value.output_field, f)
-                else "%s"
-            )
-        if transform_value(value, f):
-            # Add Transform() to the SQL placeholder.
-            return "%s(%s(%%s,%s), %s)" % (
-                self.spatial_function_name("Transform"),
-                self.from_text,
-                value.srid,
-                f.srid,
-            )
+            sql, params = compiler.compile(value)
+            if self._must_transform_value(value.output_field, f):
+                transform_func = self.spatial_function_name("Transform")
+                sql = f"{transform_func}({sql}, %s)"
+                params = (*params, f.srid)
+            return sql, params
+        elif self._must_transform_value(value, f):
+            transform_func = self.spatial_function_name("Transform")
+            sql = f"{transform_func}({self.from_text}(%s, %s), %s)"
+            params = (value, value.srid, f.srid)
+            return sql, params
         elif self.connection.features.has_spatialrefsys_table:
-            return "%s(%%s,%s)" % (self.from_text, f.srid)
+            return f"{self.from_text}(%s, %s)", (value, f.srid)
         else:
             # For backwards compatibility on MySQL (#27464).
-            return "%s(%%s)" % self.from_text
+            return f"{self.from_text}(%s)", (value,)
 
     def check_expression_support(self, expression):
         if isinstance(expression, self.disallowed_aggregates):

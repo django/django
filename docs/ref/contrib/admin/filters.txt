@@ -216,8 +216,6 @@ concrete example.
 Facets
 ======
 
-.. versionadded:: 5.0
-
 By default, counts for each filter, known as facets, can be shown by toggling
 on via the admin UI. These counts will update according to the currently
 applied filters. See :attr:`ModelAdmin.show_facets` for more details.

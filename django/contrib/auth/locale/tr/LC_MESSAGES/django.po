@@ -2,7 +2,7 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# BouRock, 2015-2017,2019-2021,2023
+# BouRock, 2015-2017,2019-2021,2023-2025
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@gmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2014
@@ -15,10 +15,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-04-25 08:09+0000\n"
-"Last-Translator: BouRock, 2015-2017,2019-2021,2023\n"
-"Language-Team: Turkish (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: BouRock, 2015-2017,2019-2021,2023-2025\n"
+"Language-Team: Turkish (http://app.transifex.com/django/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -39,12 +39,22 @@ msgstr "Önemli tarihler"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(key)r birincil anahtarı olan %(name)s nesnesi mevcut değil."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Çakışan form verileri gönderildi. Lütfen tekrar deneyin."
+
 msgid "Password changed successfully."
 msgstr "Parola başarılı olarak değiştirildi."
+
+msgid "Password-based authentication was disabled."
+msgstr "Parola tabanlı kimlik doğrulaması etkisizleştirildi."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Parolayı değiştir: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Parola ayarla: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Kimlik Doğrulama ve Yetkilendirme"
@@ -55,11 +65,17 @@ msgstr "parola"
 msgid "last login"
 msgstr "son oturum açma"
 
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Geçersiz parola biçimi veya bilinmeyen adresleme algoritması."
+
 msgid "No password set."
 msgstr "Ayarlı parola yok."
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Geçersiz parola biçimi veya bilinmeyen adresleme algoritması."
+msgid "Reset password"
+msgstr "Parolayı sıfırla"
+
+msgid "Set password"
+msgstr "Parola ayarla"
 
 msgid "The two password fields didn’t match."
 msgstr "İki parola alanı eşleşmedi."
@@ -74,12 +90,34 @@ msgid "Enter the same password as before, for verification."
 msgstr "Doğrulama için önceki gibi aynı parolayı girin."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"Ham parolalar saklanmaz, bu yüzden bu kullanıcının parolasını görmenin yolu "
-"yoktur, fakat <a href=\"{}\">bu formu</a> kullanarak parolayı "
-"değiştirebilirsiniz."
+"Kullanıcının parola kullanarak ya da kullanmadan kimlik doğrulaması yapıp "
+"yapamayacağı. Eğer etkisizleştirildiyse, Tek Oturum Açma veya LDAP gibi "
+"diğer arka uçları kullanarak kimlik doğrulaması yapmaya devam edebilirler."
+
+msgid "Password-based authentication"
+msgstr "Parola tabanlı kimlik doğrulaması"
+
+msgid "Enabled"
+msgstr "Etkinleştirildi"
+
+msgid "Disabled"
+msgstr "Etkisizleştirildi"
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+"Ham parolalar saklanmaz, dolayısıyla kullanıcının parolasını görmenin bir "
+"yolu yoktur."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Bir parola ayarlayarak bu kullanıcı için parola tabanlı kimlik doğrulamasını "
+"etkinleştirin."
 
 #, python-format
 msgid ""
@@ -106,9 +144,6 @@ msgstr "Eski parolanız yanlış girildi. Lütfen tekrar girin."
 
 msgid "Old password"
 msgstr "Eski parola"
-
-msgid "Password (again)"
-msgstr "Parola (tekrar)"
 
 msgid "algorithm"
 msgstr "algoritma"
@@ -236,14 +271,11 @@ msgid "users"
 msgstr "kullanıcılar"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] "Bu parola çok kısa. En az %(min_length)d karakter içermek zorunda."
-msgstr[1] "Bu parola çok kısa. En az %(min_length)d karakter içermek zorunda."
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "Bu parola çok kısa. En az %d karakter içermek zorunda."
+msgstr[1] "Bu parola çok kısa. En az %d karakter içermek zorunda."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."

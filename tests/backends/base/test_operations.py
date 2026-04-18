@@ -1,23 +1,21 @@
 import decimal
-from unittest import mock
 
 from django.core.management.color import no_style
-from django.db import NotSupportedError, connection, transaction
+from django.db import NotSupportedError, connection, models, transaction
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.models import DurationField
 from django.db.models.expressions import Col
-from django.db.models.lookups import Exact
 from django.test import (
     SimpleTestCase,
     TestCase,
     TransactionTestCase,
     override_settings,
     skipIfDBFeature,
+    skipUnlessDBFeature,
 )
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango60Warning
 
-from ..models import Author, Book
+from ..models import Author, Book, Person
 
 
 class SimpleDatabaseOperationTests(SimpleTestCase):
@@ -174,11 +172,18 @@ class DatabaseOperationTests(TestCase):
     def setUp(self):
         self.ops = BaseDatabaseOperations(connection=connection)
 
-    @skipIfDBFeature("supports_over_clause")
-    def test_window_frame_raise_not_supported_error(self):
-        msg = "This backend does not support window expressions."
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            self.ops.window_frame_rows_start_end()
+    def test_last_executed_query_base_fallback(self):
+        sql = "INVALID SQL"
+        params = []
+        with connection.cursor() as cursor:
+            cursor.close()
+            try:
+                cursor.execute(sql, params)
+            except connection.features.closed_cursor_error_class:
+                pass
+            self.assertIsNotNone(
+                connection.ops.last_executed_query(cursor, sql, params),
+            )
 
     @skipIfDBFeature("can_distinct_on_fields")
     def test_distinct_on_fields(self):
@@ -196,6 +201,55 @@ class DatabaseOperationTests(TestCase):
         )
         with self.assertRaisesMessage(NotSupportedError, msg):
             self.ops.subtract_temporals(duration_field_internal_type, None, None)
+
+    @skipUnlessDBFeature("max_query_params")
+    def test_bulk_batch_size_limited(self):
+        max_query_params = connection.features.max_query_params
+        objects = range(max_query_params + 1)
+        first_name_field = Person._meta.get_field("first_name")
+        last_name_field = Person._meta.get_field("last_name")
+        composite_pk = models.CompositePrimaryKey("first_name", "last_name")
+        composite_pk.fields = [first_name_field, last_name_field]
+
+        self.assertEqual(connection.ops.bulk_batch_size([], objects), len(objects))
+        self.assertEqual(
+            connection.ops.bulk_batch_size([first_name_field], objects),
+            max_query_params,
+        )
+        self.assertEqual(
+            connection.ops.bulk_batch_size(
+                [first_name_field, last_name_field], objects
+            ),
+            max_query_params // 2,
+        )
+        self.assertEqual(
+            connection.ops.bulk_batch_size([composite_pk, first_name_field], objects),
+            max_query_params // 3,
+        )
+
+    @skipIfDBFeature("max_query_params")
+    def test_bulk_batch_size_unlimited(self):
+        objects = range(2**16 + 1)
+        first_name_field = Person._meta.get_field("first_name")
+        last_name_field = Person._meta.get_field("last_name")
+        composite_pk = models.CompositePrimaryKey("first_name", "last_name")
+        composite_pk.fields = [first_name_field, last_name_field]
+
+        self.assertEqual(connection.ops.bulk_batch_size([], objects), len(objects))
+        self.assertEqual(
+            connection.ops.bulk_batch_size([first_name_field], objects),
+            len(objects),
+        )
+        self.assertEqual(
+            connection.ops.bulk_batch_size(
+                [first_name_field, last_name_field], objects
+            ),
+            len(objects),
+        )
+        self.assertEqual(
+            connection.ops.bulk_batch_size([composite_pk, first_name_field], objects),
+            len(objects),
+        )
 
 
 class SqlFlushTests(TransactionTestCase):
@@ -230,24 +284,3 @@ class SqlFlushTests(TransactionTestCase):
                 self.assertEqual(author.pk, 1)
                 book = Book.objects.create(author=author)
                 self.assertEqual(book.pk, 1)
-
-
-class DeprecationTests(TestCase):
-    def test_field_cast_sql_warning(self):
-        base_ops = BaseDatabaseOperations(connection=connection)
-        msg = (
-            "DatabaseOperations.field_cast_sql() is deprecated use "
-            "DatabaseOperations.lookup_cast() instead."
-        )
-        with self.assertRaisesMessage(RemovedInDjango60Warning, msg):
-            base_ops.field_cast_sql("integer", "IntegerField")
-
-    def test_field_cast_sql_usage_warning(self):
-        compiler = Author.objects.all().query.get_compiler(connection.alias)
-        msg = (
-            "The usage of DatabaseOperations.field_cast_sql() is deprecated. Implement "
-            "DatabaseOperations.lookup_cast() instead."
-        )
-        with mock.patch.object(connection.ops.__class__, "field_cast_sql"):
-            with self.assertRaisesMessage(RemovedInDjango60Warning, msg):
-                Exact("name", "book__author__name").as_sql(compiler, connection)

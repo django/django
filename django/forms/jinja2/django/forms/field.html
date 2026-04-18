@@ -1,5 +1,5 @@
 {% if field.use_fieldset %}
-  <fieldset{% if field.help_text and field.auto_id and "aria-describedby" not in field.field.widget.attrs %} aria-describedby="{{ field.auto_id }}_helptext"{% endif %}>
+  <fieldset{% if field.aria_describedby %} aria-describedby="{{ field.aria_describedby }}"{% endif %}>
   {% if field.label %}{{ field.legend_tag() }}{% endif %}
 {% else %}
   {% if field.label %}{{ field.label_tag() }}{% endif %}

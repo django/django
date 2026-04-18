@@ -126,9 +126,9 @@ Minor features
 * Added :class:`~django.contrib.auth.backends.BaseBackend` class to ease
   customization of authentication backends.
 
-* Added :meth:`~django.contrib.auth.models.User.get_user_permissions()` method
+* Added :meth:`~django.contrib.auth.models.User.get_user_permissions` method
   to mirror the existing
-  :meth:`~django.contrib.auth.models.User.get_group_permissions()` method.
+  :meth:`~django.contrib.auth.models.User.get_group_permissions` method.
 
 * Added HTML ``autocomplete`` attribute to widgets of username, email, and
   password fields in :mod:`django.contrib.auth.forms` for better interaction
@@ -182,7 +182,7 @@ Minor features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new
-  :meth:`~django.contrib.sessions.backends.base.SessionBase.get_session_cookie_age()`
+  :meth:`~django.contrib.sessions.backends.base.SessionBase.get_session_cookie_age`
   method allows dynamically specifying the session cookie age.
 
 :mod:`django.contrib.syndication`
@@ -190,7 +190,7 @@ Minor features
 
 * Added the ``language`` class attribute to the
   :class:`django.contrib.syndication.views.Feed` to customize a feed language.
-  The default value is :func:`~django.utils.translation.get_language()` instead
+  The default value is :func:`~django.utils.translation.get_language` instead
   of :setting:`LANGUAGE_CODE`.
 
 Cache
@@ -213,7 +213,7 @@ Forms
 * Formsets may control the widget used when ordering forms via
   :attr:`~django.forms.formsets.BaseFormSet.can_order` by setting the
   :attr:`~django.forms.formsets.BaseFormSet.ordering_widget` attribute or
-  overriding :attr:`~django.forms.formsets.BaseFormSet.get_ordering_widget()`.
+  overriding :attr:`~django.forms.formsets.BaseFormSet.get_ordering_widget`.
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
@@ -285,7 +285,7 @@ Models
 
 * The new :attr:`.Field.descriptor_class` attribute allows model fields to
   customize the get and set behavior by overriding their
-  :py:ref:`descriptors <descriptors>`.
+  :ref:`descriptors <descriptors>`.
 
 * :class:`~django.db.models.Avg` and :class:`~django.db.models.Sum` now support
   the ``distinct`` argument.
@@ -358,9 +358,9 @@ Tests
   new :option:`test -k` option.
 
 * HTML comparison, as used by
-  :meth:`~django.test.SimpleTestCase.assertHTMLEqual`, now treats text, character
-  references, and entity references that refer to the same character as
-  equivalent.
+  :meth:`~django.test.SimpleTestCase.assertHTMLEqual`, now treats text,
+  character references, and entity references that refer to the same character
+  as equivalent.
 
 * :class:`~django.test.runner.DiscoverRunner` can now spawn a debugger at each
   error or failure using the :option:`test --pdb` option.

@@ -2,22 +2,23 @@
 #
 # Translators:
 # Adiyat Mubarak <adiyatmubarak@gmail.com>, 2017
+# Bayu Satiyo <itsyuukunz@gmail.com>, 2024
 # Claude Paroz <claude@2xlibre.net>, 2018
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2023
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
 # oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016,2020
 # rodin <romihardiyanto@gmail.com>, 2011
 # rodin <romihardiyanto@gmail.com>, 2013-2016
-# sag᠎e <laymonage@gmail.com>, 2018-2019
+# sag​e <laymonage@gmail.com>, 2018-2019
 # Sutrisno Efendi <kangfend@gmail.com>, 2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2023\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 06:49+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2025\n"
 "Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -303,7 +304,7 @@ msgid "Udmurt"
 msgstr "Udmurt"
 
 msgid "Uyghur"
-msgstr ""
+msgstr "Uyghur"
 
 msgid "Ukrainian"
 msgstr "Ukrainia"
@@ -352,6 +353,9 @@ msgstr "Tidak ada hasil untuk halaman tersebut"
 msgid "Enter a valid value."
 msgstr "Masukkan nilai yang valid."
 
+msgid "Enter a valid domain name."
+msgstr "Masukkan nama domain yang sah."
+
 msgid "Enter a valid URL."
 msgstr "Masukkan URL yang valid."
 
@@ -375,14 +379,18 @@ msgstr ""
 "Masukkan sebuah “slug” valid yang terdiri dari huruf, angka, garis bawah, "
 "atau penghubung Unicode."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Masukkan alamat IPv4 yang valid."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Masukkan alamat %(protocol)s yang sah."
 
-msgid "Enter a valid IPv6 address."
-msgstr "Masukkan alamat IPv6 yang valid"
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Masukkan alamat IPv4 atau IPv6 yang valid"
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 atau IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Hanya masukkan angka yang dipisahkan dengan koma."
@@ -409,6 +417,9 @@ msgid ""
 "Ensure this value is a multiple of step size %(limit_value)s, starting from "
 "%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
 msgstr ""
+"Pastikan nilai ini merupakan kelipatan ukuran langkah %(limit_value)s, "
+"dimulai dari %(offset)s, misalnya %(offset)s, %(valid_value1)s, "
+"%(valid_value2)s, dan seterusnya."
 
 #, python-format
 msgid ""
@@ -679,8 +690,8 @@ msgid "Value must be valid JSON."
 msgstr "Nilai harus JSON yang valid."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "Salinan %(model)s dengan %(field)s %(value)r tidak ada."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr "%(model)s instance dengan %(field)s %(value)r bukan pilihan sah."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Kunci Asing (tipe tergantung dari bidang yang berkaitan)"

@@ -40,6 +40,8 @@ from .models import (
     OutfitItem,
     ParentModelWithCustomPk,
     Person,
+    Photo,
+    Photographer,
     Poll,
     Profile,
     ProfileCollection,
@@ -55,6 +57,8 @@ from .models import (
     Teacher,
     Title,
     TitleCollection,
+    UUIDChild,
+    UUIDParent,
 )
 
 site = admin.AdminSite(name="admin")
@@ -95,6 +99,60 @@ class AuthorAdmin(admin.ModelAdmin):
         EditablePKBookTabularInline,
         EditablePKBookStackedInline,
         NonAutoPKBookChildTabularInline,
+    ]
+
+
+class PhotoInlineMixin:
+    model = Photo
+    extra = 2
+    fieldsets = [
+        (None, {"fields": ["image", "title"], "description": "First group"}),
+        (
+            "Details",
+            {
+                "fields": ["description", "creation_date"],
+                "classes": ["collapse"],
+                "description": "Second group",
+            },
+        ),
+        (
+            "Details",  # Fieldset name intentionally duplicated
+            {"fields": ["update_date", "updated_by"], "description": "Third group"},
+        ),
+    ]
+
+
+class PhotoTabularInline(PhotoInlineMixin, admin.TabularInline):
+    pass
+
+
+class PhotoStackedExtra2Inline(PhotoInlineMixin, admin.StackedInline):
+    pass
+
+
+class PhotoStackedExtra3Inline(PhotoInlineMixin, admin.StackedInline):
+    extra = 3
+
+
+class PhotoStackedCollapsibleInline(PhotoInlineMixin, admin.StackedInline):
+    fieldsets = []
+    classes = ["collapse"]
+
+
+class PhotographerAdmin(admin.ModelAdmin):
+    fieldsets = [
+        (None, {"fields": ["firstname", "fullname"]}),
+        ("Advanced options", {"fields": ["nationality", "residency"]}),
+        (
+            "Advanced options",  # Fieldset name intentionally duplicated
+            {"fields": ["siblings", "children"], "classes": ["collapse"]},
+        ),
+    ]
+    inlines = [
+        PhotoTabularInline,
+        PhotoStackedExtra2Inline,
+        PhotoStackedExtra3Inline,
+        PhotoStackedCollapsibleInline,
     ]
 
 
@@ -300,6 +358,7 @@ class BinaryTreeAdmin(admin.TabularInline):
 # admin for #19524
 class SightingInline(admin.TabularInline):
     model = Sighting
+    show_change_link = True
 
 
 # admin and form for #18263
@@ -418,6 +477,16 @@ class ShowInlineChildInline(admin.StackedInline):
     model = ShowInlineChild
 
 
+class UUIDChildInline(admin.StackedInline):
+    model = UUIDChild
+    exclude = ("id",)
+
+
+class UUIDParentModelAdmin(admin.ModelAdmin):
+    model = UUIDParent
+    inlines = [UUIDChildInline]
+
+
 class ShowInlineParentAdmin(admin.ModelAdmin):
     def get_inlines(self, request, obj):
         if obj is not None and obj.show_inlines:
@@ -449,16 +518,18 @@ site.register(ParentModelWithCustomPk, inlines=[ChildModel1Inline, ChildModel2In
 site.register(BinaryTree, inlines=[BinaryTreeAdmin])
 site.register(ExtraTerrestrial, inlines=[SightingInline])
 site.register(SomeParentModel, inlines=[SomeChildModelInline])
-site.register([Question, Inner4Stacked, Inner4Tabular])
+site.register([Question, Inner4Stacked, Inner4Tabular, Sighting])
 site.register(Teacher, TeacherAdmin)
 site.register(Chapter, inlines=[FootNoteNonEditableInlineCustomForm])
 site.register(OutfitItem, inlines=[WeaknessInlineCustomForm])
 site.register(Person, inlines=[AuthorTabularInline, FashonistaStackedInline])
+site.register(Photographer, PhotographerAdmin)
 site.register(Course, ClassAdminStackedHorizontal)
 site.register(CourseProxy, ClassAdminStackedVertical)
 site.register(CourseProxy1, ClassAdminTabularVertical)
 site.register(CourseProxy2, ClassAdminTabularHorizontal)
 site.register(ShowInlineParent, ShowInlineParentAdmin)
+site.register(UUIDParent, UUIDParentModelAdmin)
 # Used to test hidden fields in tabular and stacked inlines.
 site2 = admin.AdminSite(name="tabular_inline_hidden_field_admin")
 site2.register(SomeParentModel, inlines=[ChildHiddenFieldTabularInline])

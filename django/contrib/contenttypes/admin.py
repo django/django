@@ -67,8 +67,8 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
                     )
                 ]
 
-            # There's one or more GenericForeignKeys; make sure that one of them
-            # uses the right ct_field and ct_fk_field.
+            # There's one or more GenericForeignKeys; make sure that one of
+            # them uses the right ct_field and ct_fk_field.
             for gfk in gfks:
                 if gfk.ct_field == obj.ct_field and gfk.fk_field == obj.ct_fk_field:
                     return []
@@ -126,6 +126,21 @@ class GenericInlineModelAdmin(InlineModelAdmin):
             "exclude": exclude,
             **kwargs,
         }
+
+        base_model_form = defaults["form"]
+        can_change = self.has_change_permission(request, obj) if request else True
+        can_add = self.has_add_permission(request, obj) if request else True
+
+        class PermissionProtectedModelForm(base_model_form):
+            def has_changed(self):
+                # Protect against unauthorized edits.
+                if not can_change and not self.instance._state.adding:
+                    return False
+                if not can_add and self.instance._state.adding:
+                    return False
+                return super().has_changed()
+
+        defaults["form"] = PermissionProtectedModelForm
 
         if defaults["fields"] is None and not modelform_defines_fields(
             defaults["form"]

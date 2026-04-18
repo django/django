@@ -20,12 +20,13 @@ or Jinja2_, you should feel right at home with Django's templates.
     presentation, not program logic.
 
     The Django template system provides tags which function similarly to some
-    programming constructs -- an :ttag:`if` tag for boolean tests, a :ttag:`for`
-    tag for looping, etc. -- but these are not simply executed as the
-    corresponding Python code, and the template system will not execute
-    arbitrary Python expressions. Only the tags, filters and syntax listed below
-    are supported by default (although you can add :doc:`your own extensions
-    </howto/custom-template-tags>` to the template language as needed).
+    programming constructs -- an :ttag:`if` tag for boolean tests, a
+    :ttag:`for` tag for looping, etc. -- but these are not simply executed as
+    the corresponding Python code, and the template system will not execute
+    arbitrary Python expressions. Only the tags, filters and syntax listed
+    below are supported by default (although you can add :doc:`your own
+    extensions </howto/custom-template-tags>` to the template language as
+    needed).
 
 .. _`The Django template language: For Python programmers`: ../templates_python/
 .. _Smarty: https://www.smarty.net/
@@ -97,8 +98,8 @@ Use a dot (``.``) to access attributes of a variable.
     result of the call becomes the template value.
 
     This lookup order can cause some unexpected behavior with objects that
-    override dictionary lookup. For example, consider the following code snippet
-    that attempts to loop over a ``collections.defaultdict``:
+    override dictionary lookup. For example, consider the following code
+    snippet that attempts to loop over a ``collections.defaultdict``:
 
     .. code-block:: html+django
 
@@ -106,9 +107,9 @@ Use a dot (``.``) to access attributes of a variable.
             Do something with k and v here...
         {% endfor %}
 
-    Because dictionary lookup happens first, that behavior kicks in and provides
-    a default value instead of using the intended ``.items()`` method. In this
-    case, consider converting to a dictionary first.
+    Because dictionary lookup happens first, that behavior kicks in and
+    provides a default value instead of using the intended ``.items()`` method.
+    In this case, consider converting to a dictionary first.
 
 In the above example, ``{{ section.title }}`` will be replaced with the
 ``title`` attribute of the ``section`` object.
@@ -202,13 +203,13 @@ some load external information into the template to be used by later variables.
 Some tags require beginning and ending tags (i.e. ``{% tag %} ... tag contents
 ... {% endtag %}``).
 
-Django ships with about two dozen built-in template tags. You can read all about
-them in the :ref:`built-in tag reference <ref-templates-builtins-tags>`. To give
-you a taste of what's available, here are some of the more commonly used
-tags:
+Django ships with about two dozen built-in template tags. You can read all
+about them in the :ref:`built-in tag reference <ref-templates-builtins-tags>`.
+To give you a taste of what's available, here are some of the more commonly
+used tags:
 
 :ttag:`for`
-    Loop over each item in an array.  For example, to display a list of athletes
+    Loop over each item in an array. For example, to display a list of athletes
     provided in ``athlete_list``:
 
     .. code-block:: html+django
@@ -288,9 +289,9 @@ A comment can contain any template code, invalid or not. For example:
 
     {# {% if foo %}bar{% else %} #}
 
-This syntax can only be used for single-line comments (no newlines are permitted
-between the ``{#`` and ``#}`` delimiters). If you need to comment out a
-multiline portion of the template, see the :ttag:`comment` tag.
+This syntax can only be used for single-line comments (no newlines are
+permitted between the ``{#`` and ``#}`` delimiters). If you need to comment out
+a multiline portion of the template, see the :ttag:`comment` tag.
 
 .. _template-inheritance:
 
@@ -389,8 +390,8 @@ like:
     </html>
 
 Note that since the child template didn't define the ``sidebar`` block, the
-value from the parent template is used instead. Content within a ``{% block %}``
-tag in a parent template is always used as a fallback.
+value from the parent template is used instead. Content within a
+``{% block %}`` tag in a parent template is always used as a fallback.
 
 You can use as many levels of inheritance as needed. One common way of using
 inheritance is the following three-level approach:
@@ -410,12 +411,12 @@ areas, such as section-wide navigation.
 
 Here are some tips for working with inheritance:
 
-* If you use :ttag:`{% extends %}<extends>` in a template, it must be the first template
-  tag in that template. Template inheritance won't work, otherwise.
+* If you use :ttag:`{% extends %}<extends>` in a template, it must be the first
+  template tag in that template. Template inheritance won't work, otherwise.
 
-* More :ttag:`{% block %}<block>` tags in your base templates are better. Remember,
-  child templates don't have to define all parent blocks, so you can fill
-  in reasonable defaults in a number of blocks, then only define the ones
+* More :ttag:`{% block %}<block>` tags in your base templates are better.
+  Remember, child templates don't have to define all parent blocks, so you can
+  fill in reasonable defaults in a number of blocks, then only define the ones
   you need later. It's better to have more hooks than fewer hooks.
 
 * If you find yourself duplicating content in a number of templates, it
@@ -474,6 +475,150 @@ name in the same template. This limitation exists because a block tag works in
 it also defines the content that fills the hole in the *parent*. If there were
 two similarly-named :ttag:`block` tags in a template, that template's parent
 wouldn't know which one of the blocks' content to use.
+
+.. _template-partials:
+
+Template partials
+=================
+
+.. versionadded:: 6.0
+
+Template partials define reusable template fragments within a template file.
+They are self-contained components that can be rendered multiple times within
+the same template, helping to avoid repetition and maintain consistent output.
+
+Basic syntax
+------------
+
+A partial can be defined using the :ttag:`partialdef` tag:
+
+.. code-block:: html+django
+    :caption: ``authors.html``
+
+    {% partialdef user-info %}
+        <div id="user-info-{{ user.username }}">
+            <h3>{{ user.name }}</h3>
+            <p>{{ user.bio }}</p>
+        </div>
+    {% endpartialdef %}
+
+For extra readability, the name can be included in the ``{% endpartialdef %}``
+closing tag:
+
+.. code-block:: html+django
+
+    {% partialdef user-info %}
+        {# ... #}
+    {% endpartialdef user-info %}
+
+The template fragment can be rendered using the :ttag:`partial` tag:
+
+.. code-block:: html+django
+
+    {% partial user-info %}
+
+Fragment reuse
+--------------
+
+A template fragment can be reused multiple times:
+
+.. code-block:: html+django
+    :caption: ``authors.html``
+
+    {% block content %}
+        <h2>Authors</h2>
+        {% for user in authors %}
+            {% partial user-info %}
+        {% endfor %}
+
+        <h2>Editors</h2>
+        {% for user in editors %}
+            {% partial user-info %}
+        {% endfor %}
+    {% endblock %}
+
+The partial content is rendered each time the named partial is used, with the
+current template context.
+
+.. _template-partials-inline:
+
+Inline partials
+---------------
+
+A template fragment can be defined and rendered in-place using the ``inline``
+argument. This defines the partial for later reuse while also rendering it
+immediately at its definition:
+
+.. code-block:: html+django
+
+    {# Define and render immediately. #}
+    {% partialdef user-info inline %}
+        <div id="user-info-{{ user.username }}">
+            <h3>{{ user.name }}</h3>
+            <p>{{ user.bio }}</p>
+        </div>
+    {% endpartialdef %}
+
+    {# Other page content here. #}
+
+    {# Reuse later elsewhere in the template. #}
+    <section class="featured-authors">
+        <h2>Featured Authors</h2>
+        {% for user in featured %}
+            {% partial user-info %}
+        {% endfor %}
+    </section>
+
+.. _template-partials-direct-access:
+
+Accessing partials directly
+---------------------------
+
+Template fragments defined with :ttag:`partialdef` can be accessed directly via
+template loading or inclusion using the ``template.html#partial_name`` syntax.
+
+For example, using the :func:`~django.shortcuts.render` shortcut, the following
+code renders only the partial named ``user-info`` defined in the
+``authors.html`` template::
+
+    from django.contrib.auth.models import User
+    from django.shortcuts import get_object_or_404, render
+
+
+    def user_info_partial(request, user_id):
+        user = get_object_or_404(User, id=user_id)
+        return render(request, "authors.html#user-info", {"user": user})
+
+This approach is particularly useful for AJAX-style requests that update only
+specific portions of a page with the rendered template fragment.
+
+Template partials can also be included using the :ttag:`include` template tag
+with the same ``#`` directive:
+
+.. code-block:: html+django
+
+    {% include "authors.html#user-info" %}
+
+Context handling
+----------------
+
+Template partials are rendered with the current template context. They work as
+expected in loops and with context variables:
+
+.. code-block:: html+django
+
+    {% for user in users %}
+        {% partial user-info %}
+    {% endfor %}
+
+Context variables can be adjusted using the :ttag:`with` tag:
+
+.. code-block:: html+django
+
+    {% with user=featured_author %}
+        <h2>Featured Author of the Month</h2>
+        {% partial user-info %}
+    {% endwith %}
 
 .. _next section: #automatic-html-escaping
 .. _automatic-html-escaping:
@@ -750,8 +895,8 @@ tag in a template:
 
     {{ 45000|intcomma }}
 
-In the above, the :ttag:`load` tag loads the ``humanize`` tag library, which then
-makes the ``intcomma`` filter available for use. If you've enabled
+In the above, the :ttag:`load` tag loads the ``humanize`` tag library, which
+then makes the ``intcomma`` filter available for use. If you've enabled
 :mod:`django.contrib.admindocs`, you can consult the documentation area in your
 admin to find the list of custom libraries in your installation.
 
@@ -762,8 +907,8 @@ Example:
 
     {% load humanize i18n %}
 
-See :doc:`/howto/custom-template-tags` for information on writing your own custom
-template libraries.
+See :doc:`/howto/custom-template-tags` for information on writing your own
+custom template libraries.
 
 Custom libraries and template inheritance
 -----------------------------------------

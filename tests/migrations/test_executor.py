@@ -2,6 +2,7 @@ from unittest import mock
 
 from django.apps.registry import apps as global_apps
 from django.db import DatabaseError, connection, migrations, models
+from django.db.backends.base.introspection import BaseDatabaseIntrospection
 from django.db.migrations.exceptions import InvalidMigrationPlan
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.graph import MigrationGraph
@@ -78,7 +79,8 @@ class ExecutorTests(MigrationTestBase):
     )
     def test_run_with_squashed(self):
         """
-        Tests running a squashed migration from zero (should ignore what it replaces)
+        Tests running a squashed migration from zero (should ignore what it
+        replaces)
         """
         executor = MigrationExecutor(connection)
         # Check our leaf node is the squashed one
@@ -161,6 +163,7 @@ class ExecutorTests(MigrationTestBase):
         self.assertTrue(Publisher.objects.exists())
         self.assertTableNotExists("migrations_book")
 
+    @skipUnlessDBFeature("supports_transactions")
     @override_settings(
         MIGRATION_MODULES={"migrations": "migrations.test_migrations_atomic_operation"}
     )
@@ -351,7 +354,8 @@ class ExecutorTests(MigrationTestBase):
         self.assertTableExists("migrations_tribble")
         # Make sure that was faked
         self.assertIs(state["faked"], True)
-        # Finally, migrate forwards; this should fake-apply our initial migration
+        # Finally, migrate forwards; this should fake-apply our initial
+        # migration
         executor.loader.build_graph()
         self.assertEqual(
             executor.migration_plan([("migrations", "0001_initial")]),
@@ -383,8 +387,8 @@ class ExecutorTests(MigrationTestBase):
     )
     def test_custom_user(self):
         """
-        Regression test for #22325 - references to a custom user model defined in the
-        same app are not resolved correctly.
+        Regression test for #22325 - references to a custom user model defined
+        in the same app are not resolved correctly.
         """
         with isolate_lru_cache(global_apps.get_swappable_settings_name):
             executor = MigrationExecutor(connection)
@@ -398,10 +402,12 @@ class ExecutorTests(MigrationTestBase):
             # Change table_names to not return auth_user during this as it
             # wouldn't be there in a normal run, and ensure migrations.Author
             # exists in the global app registry temporarily.
-            old_table_names = connection.introspection.table_names
-            connection.introspection.table_names = lambda c: [
-                x for x in old_table_names(c) if x != "auth_user"
-            ]
+            with connection.cursor() as cursor:
+                mock_existing_tables = [
+                    x
+                    for x in connection.introspection.table_names(cursor)
+                    if x != "auth_user"
+                ]
             migrations_apps = executor.loader.project_state(
                 ("migrations", "0001_initial"),
             ).apps
@@ -409,10 +415,14 @@ class ExecutorTests(MigrationTestBase):
                 migrations_apps.get_model("migrations", "author")
             )
             try:
-                migration = executor.loader.get_migration("auth", "0001_initial")
+                with mock.patch.object(
+                    BaseDatabaseIntrospection,
+                    "table_names",
+                    return_value=mock_existing_tables,
+                ):
+                    migration = executor.loader.get_migration("auth", "0001_initial")
                 self.assertIs(executor.detect_soft_applied(None, migration)[0], True)
             finally:
-                connection.introspection.table_names = old_table_names
                 del global_apps.get_app_config("migrations").models["author"]
                 # Migrate back to clean up the database.
                 executor.loader.build_graph()

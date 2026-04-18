@@ -215,6 +215,6 @@ class DateFieldTest(SimpleTestCase):
         try:
             f.strptime("31 мая 2011", "%d-%b-%y")
         except Exception as e:
-            # assertIsInstance or assertRaises cannot be used because UnicodeEncodeError
-            # is a subclass of ValueError
+            # assertIsInstance or assertRaises cannot be used because
+            # UnicodeEncodeError is a subclass of ValueError
             self.assertEqual(e.__class__, ValueError)

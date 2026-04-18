@@ -5,7 +5,8 @@ from django.db.backends.postgresql.introspection import DatabaseIntrospection
 class PostGISIntrospection(DatabaseIntrospection):
     postgis_oid_lookup = {}  # Populated when introspection is performed.
 
-    ignored_tables = DatabaseIntrospection.ignored_tables + [
+    ignored_tables = [
+        *DatabaseIntrospection.ignored_tables,
         "geography_columns",
         "geometry_columns",
         "raster_columns",
@@ -36,7 +37,7 @@ class PostGISIntrospection(DatabaseIntrospection):
         """
         The geometry type OID used by PostGIS does not indicate the particular
         type of field that a geometry column is (e.g., whether it's a
-        PointField or a PolygonField).  Thus, this routine queries the PostGIS
+        PointField or a PolygonField). Thus, this routine queries the PostGIS
         metadata tables to determine the geometry type.
         """
         with self.connection.cursor() as cursor:
@@ -60,7 +61,8 @@ class PostGISIntrospection(DatabaseIntrospection):
             # OGRGeomType does not require GDAL and makes it easy to convert
             # from OGC geom type name to Django field.
             field_type = OGRGeomType(field_type).django
-            # Getting any GeometryField keyword arguments that are not the default.
+            # Getting any GeometryField keyword arguments that are not the
+            # default.
             field_params = {}
             if self.postgis_oid_lookup.get(description.type_code) == "geography":
                 field_params["geography"] = True

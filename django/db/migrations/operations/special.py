@@ -31,7 +31,8 @@ class SeparateDatabaseAndState(Operation):
             state_operation.state_forwards(app_label, state)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        # We calculate state separately in here since our state functions aren't useful
+        # We calculate state separately in here since our state functions
+        # aren't useful
         for database_operation in self.database_operations:
             to_state = from_state.clone()
             database_operation.state_forwards(app_label, to_state)
@@ -41,7 +42,8 @@ class SeparateDatabaseAndState(Operation):
             from_state = to_state
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        # We calculate state separately in here since our state functions aren't useful
+        # We calculate state separately in here since our state functions
+        # aren't useful
         to_states = {}
         for dbop in self.database_operations:
             to_states[dbop] = to_state
@@ -91,6 +93,8 @@ class RunSQL(Operation):
             kwargs["state_operations"] = self.state_operations
         if self.hints:
             kwargs["hints"] = self.hints
+        if self.elidable:
+            kwargs["elidable"] = self.elidable
         return (self.__class__.__qualname__, [], kwargs)
 
     @property
@@ -171,6 +175,8 @@ class RunPython(Operation):
             kwargs["atomic"] = self.atomic
         if self.hints:
             kwargs["hints"] = self.hints
+        if self.elidable:
+            kwargs["elidable"] = self.elidable
         return (self.__class__.__qualname__, [], kwargs)
 
     @property
@@ -189,10 +195,11 @@ class RunPython(Operation):
         if router.allow_migrate(
             schema_editor.connection.alias, app_label, **self.hints
         ):
-            # We now execute the Python code in a context that contains a 'models'
-            # object, representing the versioned models as an app registry.
-            # We could try to override the global cache, but then people will still
-            # use direct imports, so we go with a documentation approach instead.
+            # We now execute the Python code in a context that contains a
+            # 'models' object, representing the versioned models as an app
+            # registry. We could try to override the global cache, but then
+            # people will still use direct imports, so we go with a
+            # documentation approach instead.
             self.code(from_state.apps, schema_editor)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):

@@ -18,6 +18,7 @@ from django.db.models.fields.related import (
 from django.forms.utils import flatatt
 from django.template.defaultfilters import capfirst, linebreaksbr
 from django.urls import NoReverseMatch, reverse
+from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext
@@ -116,9 +117,13 @@ class Fieldset:
 
     @property
     def media(self):
-        if "collapse" in self.classes:
-            return forms.Media(js=["admin/js/collapse.js"])
         return forms.Media()
+
+    @cached_property
+    def is_collapsible(self):
+        if any(field in self.fields for field in self.form.errors):
+            return False
+        return "collapse" in self.classes
 
     def __iter__(self):
         for field in self.fields:
@@ -168,6 +173,7 @@ class AdminField:
         self.is_first = is_first  # Whether this field is first on the line
         self.is_checkbox = isinstance(self.field.field.widget, forms.CheckboxInput)
         self.is_readonly = False
+        self.is_fieldset = self.field.field.widget.use_fieldset
 
     def label_tag(self):
         classes = []
@@ -180,12 +186,14 @@ class AdminField:
         if not self.is_first:
             classes.append("inline")
         attrs = {"class": " ".join(classes)} if classes else {}
+        tag = "legend" if self.is_fieldset else None
         # checkboxes should not have a label suffix as the checkbox appears
         # to the left of the label.
         return self.field.label_tag(
             contents=mark_safe(contents),
             attrs=attrs,
             label_suffix="" if self.is_checkbox else None,
+            tag=tag,
         )
 
     def errors(self):
@@ -271,12 +279,6 @@ class AdminReadonlyField:
         except (AttributeError, ValueError, ObjectDoesNotExist):
             result_repr = self.empty_value_display
         else:
-            if field in self.form.fields:
-                widget = self.form[field].field.widget
-                # This isn't elegant but suffices for contrib.auth's
-                # ReadOnlyPasswordHashWidget.
-                if getattr(widget, "read_only", False):
-                    return widget.render(field, value)
             if f is None:
                 if getattr(attr, "boolean", False):
                     result_repr = _boolean_icon(value)
@@ -438,6 +440,12 @@ class InlineAdminFormSet:
     def forms(self):
         return self.formset.forms
 
+    @cached_property
+    def is_collapsible(self):
+        if any(self.formset.errors):
+            return False
+        return "collapse" in self.classes
+
     def non_form_errors(self):
         return self.formset.non_form_errors()
 
@@ -498,6 +506,11 @@ class InlineAdminForm(AdminForm):
             # Auto fields are editable, so check for auto or non-editable pk.
             self.form._meta.model._meta.auto_field
             or not self.form._meta.model._meta.pk.editable
+            # The pk can be editable, but excluded from the inline.
+            or (
+                self.form._meta.exclude
+                and self.form._meta.model._meta.pk.name in self.form._meta.exclude
+            )
             or
             # Also search any parents for an auto field. (The pk info is
             # propagated to child models so that does not need to be checked

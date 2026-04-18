@@ -102,7 +102,11 @@ class SingleObjectMixin(ContextMixin):
 
 
 class BaseDetailView(SingleObjectMixin, View):
-    """A base view for displaying a single object."""
+    """
+    Base view for displaying a single object.
+
+    This requires subclassing to provide a response mixin.
+    """
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -117,9 +121,10 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
     def get_template_names(self):
         """
         Return a list of template names to be used for the request. May not be
-        called if render_to_response() is overridden. Return the following list:
+        called if render_to_response() is overridden. Return a list containing
+        ``template_name``, if set on the value. Otherwise, return a list
+        containing:
 
-        * the value of ``template_name`` on the view (if provided)
         * the contents of the ``template_name_field`` field on the
           object instance that the view is operating upon (if available)
         * ``<app_label>/<model_name><template_name_suffix>.html``
@@ -139,8 +144,9 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
                 if name:
                     names.insert(0, name)
 
-            # The least-specific option is the default <app>/<model>_detail.html;
-            # only use this if the object in question is a model.
+            # The least-specific option is the default
+            # <app>/<model>_detail.html; only use this if the object in
+            # question is a model.
             if isinstance(self.object, models.Model):
                 object_meta = self.object._meta
                 names.append(
@@ -166,7 +172,11 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
             # If we still haven't managed to find any template names, we should
             # re-raise the ImproperlyConfigured to alert the user.
             if not names:
-                raise
+                raise ImproperlyConfigured(
+                    "SingleObjectTemplateResponseMixin requires a definition "
+                    "of 'template_name', 'template_name_field', or 'model'; "
+                    "or an implementation of 'get_template_names()'."
+                )
 
         return names
 
@@ -176,5 +186,6 @@ class DetailView(SingleObjectTemplateResponseMixin, BaseDetailView):
     Render a "detail" view of an object.
 
     By default this is a model instance looked up from `self.queryset`, but the
-    view will support display of *any* object by overriding `self.get_object()`.
+    view will support display of *any* object by overriding
+    `self.get_object()`.
     """

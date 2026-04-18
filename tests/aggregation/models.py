@@ -13,7 +13,7 @@ class Author(models.Model):
 
 class Publisher(models.Model):
     name = models.CharField(max_length=255)
-    num_awards = models.IntegerField()
+    num_awards = models.IntegerField(null=True)
     duration = models.DurationField(blank=True, null=True)
 
     def __str__(self):
@@ -43,3 +43,10 @@ class Store(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Employee(models.Model):
+    work_day_preferences = models.JSONField()
+
+    class Meta:
+        required_db_features = {"supports_json_field"}

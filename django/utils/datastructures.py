@@ -51,7 +51,9 @@ class MultiValueDict(dict):
     A subclass of dictionary customized to handle multiple values for the
     same key.
 
-    >>> d = MultiValueDict({'name': ['Adrian', 'Simon'], 'position': ['Developer']})
+    >>> d = MultiValueDict(
+    ...    {'name': ['Adrian', 'Simon'], 'position': ['Developer']}
+    ... )
     >>> d['name']
     'Simon'
     >>> d.getlist('name')
@@ -343,3 +345,21 @@ class CaseInsensitiveMapping(Mapping):
                     "Element key %r invalid, only strings are allowed" % elem[0]
                 )
             yield elem
+
+
+class DeferredSubDict:
+    """
+    Wrap a dict, allowing deferred access to a sub-dict under a given key.
+
+    The value at ``deferred_key`` must itself be a dict. Accessing
+    ``DeferredSubDict(parent_dict, deferred_key)[key]`` retrieves
+    ``parent_dict[deferred_key][key]`` at access time, so updates to
+    the parent dict are reflected.
+    """
+
+    def __init__(self, parent_dict, deferred_key):
+        self.parent_dict = parent_dict
+        self.deferred_key = deferred_key
+
+    def __getitem__(self, key):
+        return self.parent_dict[self.deferred_key][key]

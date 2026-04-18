@@ -1,5 +1,6 @@
+import oracledb
+
 from django.db.backends.oracle.introspection import DatabaseIntrospection
-from django.db.backends.oracle.oracledb_any import oracledb
 from django.utils.functional import cached_property
 
 
@@ -16,7 +17,8 @@ class OracleIntrospection(DatabaseIntrospection):
 
     def get_geometry_type(self, table_name, description):
         with self.connection.cursor() as cursor:
-            # Querying USER_SDO_GEOM_METADATA to get the SRID and dimension information.
+            # Querying USER_SDO_GEOM_METADATA to get the SRID and dimension
+            # information.
             try:
                 cursor.execute(
                     'SELECT "DIMINFO", "SRID" FROM "USER_SDO_GEOM_METADATA" '
@@ -30,8 +32,8 @@ class OracleIntrospection(DatabaseIntrospection):
                     'corresponding to "%s"."%s"' % (table_name, description.name)
                 ) from exc
 
-            # TODO: Research way to find a more specific geometry field type for
-            # the column's contents.
+            # TODO: Research way to find a more specific geometry field type
+            # for the column's contents.
             field_type = "GeometryField"
 
             # Getting the field parameters.

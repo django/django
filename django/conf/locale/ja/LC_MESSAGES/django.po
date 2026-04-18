@@ -12,8 +12,8 @@
 # Masashi SHIBATA <contact@c-bata.link>, 2017
 # Nikita K <hiyori.amatsuki@gmail.com>, 2019
 # Shinichi Katsumata <shinichi.katsumata@gmail.com>, 2019
-# Shinya Okano <tokibito@gmail.com>, 2012-2019,2021,2023
-# Taichi Taniguchi, 2022
+# Shinya Okano <tokibito@gmail.com>, 2012-2019,2021,2023-2025
+# TANIGUCHI Taichi, 2022
 # Takuro Onoue <kusanaginoturugi@gmail.com>, 2020
 # Takuya N <takninnovationresearch@gmail.com>, 2020
 # Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
@@ -21,9 +21,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>, 2012-2019,2021,2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2025-03-19 11:30-0500\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>, "
+"2012-2019,2021,2023-2025\n"
 "Language-Team: Japanese (http://app.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -358,6 +359,9 @@ msgstr "このページには結果が含まれていません。"
 msgid "Enter a valid value."
 msgstr "値を正しく入力してください。"
 
+msgid "Enter a valid domain name."
+msgstr "有効なドメイン名を入力してください。"
+
 msgid "Enter a valid URL."
 msgstr "URLを正しく入力してください。"
 
@@ -380,14 +384,18 @@ msgstr ""
 "ユニコード文字、数字、アンダースコアまたはハイフンで構成された、有効なスラグ"
 "を入力してください。"
 
-msgid "Enter a valid IPv4 address."
-msgstr "有効なIPアドレス (IPv4) を入力してください。"
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "有効な%(protocol)sアドレスを入力してください。"
 
-msgid "Enter a valid IPv6 address."
-msgstr "IPv6の正しいアドレスを入力してください。"
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "IPv4またはIPv6の正しいアドレスを入力してください。"
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4またはIPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "カンマ区切りの数字だけを入力してください。"
@@ -681,8 +689,10 @@ msgid "Value must be valid JSON."
 msgstr "JSONとして正しい値にしてください。"
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(field)s が %(value)r である %(model)s のインスタンスは存在しません。"
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
+"%(field)s が %(value)r である %(model)s のインスタンスは有効な選択肢ではあり"
+"ません。"
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "外部キー(型は関連フィールドによって決まります)"

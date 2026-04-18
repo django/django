@@ -81,9 +81,32 @@ def DO_NOTHING(collector, field, sub_objs, using):
     pass
 
 
+class DatabaseOnDelete:
+    def __init__(self, operation, name, forced_collector=None):
+        self.operation = operation
+        self.forced_collector = forced_collector
+        self.__name__ = name
+
+    __call__ = DO_NOTHING
+
+    def on_delete_sql(self, schema_editor):
+        return schema_editor.connection.ops.fk_on_delete_sql(self.operation)
+
+    def __str__(self):
+        return self.__name__
+
+
+DB_CASCADE = DatabaseOnDelete("CASCADE", "DB_CASCADE", CASCADE)
+DB_SET_DEFAULT = DatabaseOnDelete("SET DEFAULT", "DB_SET_DEFAULT")
+DB_SET_NULL = DatabaseOnDelete("SET NULL", "DB_SET_NULL")
+
+SKIP_COLLECTION = frozenset([DO_NOTHING, DB_CASCADE, DB_SET_DEFAULT, DB_SET_NULL])
+
+
 def get_candidate_relations_to_delete(opts):
-    # The candidate relations are the ones that come from N-1 and 1-1 relations.
-    # N-N  (i.e., many-to-many) relations aren't candidates for deletion.
+    # The candidate relations are the ones that come from N-1 and 1-1
+    # relations. N-N  (i.e., many-to-many) relations aren't candidates for
+    # deletion.
     return (
         f
         for f in opts.get_fields(include_hidden=True)
@@ -92,10 +115,12 @@ def get_candidate_relations_to_delete(opts):
 
 
 class Collector:
-    def __init__(self, using, origin=None):
+    def __init__(self, using, origin=None, force_collection=False):
         self.using = using
         # A Model or QuerySet object.
         self.origin = origin
+        # Force collecting objects for deletion on the Python-level.
+        self.force_collection = force_collection
         # Initially, {model: {instances}}, later values become lists.
         self.data = defaultdict(set)
         # {(field, value): [instances, …]}
@@ -115,7 +140,7 @@ class Collector:
 
     def add(self, objs, source=None, nullable=False, reverse_dependency=False):
         """
-        Add 'objs' to the collection of objects to be deleted.  If the call is
+        Add 'objs' to the collection of objects to be deleted. If the call is
         the result of a cascade, 'source' should be the model that caused it,
         and 'nullable' should be set to True if the relation can be null.
 
@@ -193,6 +218,8 @@ class Collector:
         skipping parent -> child -> parent chain preventing fast delete of
         the child.
         """
+        if self.force_collection:
+            return False
         if from_field and from_field.remote_field.on_delete is not CASCADE:
             return False
         if hasattr(objs, "_meta"):
@@ -214,7 +241,7 @@ class Collector:
             and
             # Foreign keys pointing to this model.
             all(
-                related.field.remote_field.on_delete is DO_NOTHING
+                related.field.remote_field.on_delete in SKIP_COLLECTION
                 for related in get_candidate_relations_to_delete(opts)
             )
             and (
@@ -230,9 +257,8 @@ class Collector:
         """
         Return the objs in suitably sized batches for the used connection.
         """
-        field_names = [field.name for field in fields]
         conn_batch_size = max(
-            connections[self.using].ops.bulk_batch_size(field_names, objs), 1
+            connections[self.using].ops.bulk_batch_size(fields, objs), 1
         )
         if len(objs) > conn_batch_size:
             return [
@@ -255,8 +281,8 @@ class Collector:
     ):
         """
         Add 'objs' to the collection of objects to be deleted as well as all
-        parent instances.  'objs' must be a homogeneous iterable collection of
-        model instances (e.g. a QuerySet).  If 'collect_related' is True,
+        parent instances. 'objs' must be a homogeneous iterable collection of
+        model instances (e.g. a QuerySet). If 'collect_related' is True,
         related objects will be handled by their respective on_delete handler.
 
         If the call is the result of a cascade, 'source' should be the model
@@ -309,12 +335,20 @@ class Collector:
         protected_objects = defaultdict(list)
         for related in get_candidate_relations_to_delete(model._meta):
             # Preserve parent reverse relationships if keep_parents=True.
-            if keep_parents and related.model in model._meta.all_parents:
+            if (
+                keep_parents
+                and related.model._meta.concrete_model in model._meta.all_parents
+            ):
                 continue
             field = related.field
             on_delete = field.remote_field.on_delete
-            if on_delete == DO_NOTHING:
-                continue
+            if on_delete in SKIP_COLLECTION:
+                if self.force_collection and (
+                    forced_on_delete := getattr(on_delete, "forced_collector", None)
+                ):
+                    on_delete = forced_on_delete
+                else:
+                    continue
             related_model = related.related_model
             if self.can_fast_delete(related_model, from_field=field):
                 model_fast_deletes[related_model].append(field)
@@ -435,8 +469,8 @@ class Collector:
             self.data[model] = sorted(instances, key=attrgetter("pk"))
 
         # if possible, bring the models in an order suitable for databases that
-        # don't support transactions or cannot defer constraint checks until the
-        # end of a transaction.
+        # don't support transactions or cannot defer constraint checks until
+        # the end of a transaction.
         self.sort()
         # number of objects deleted for each model label
         deleted_counter = Counter()

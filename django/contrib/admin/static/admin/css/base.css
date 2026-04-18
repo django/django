@@ -13,6 +13,7 @@ html[data-theme="light"],
     --body-fg: #333;
     --body-bg: #fff;
     --body-quiet-color: #666;
+    --body-medium-color: #444;
     --body-loud-color: #000;
 
     --header-color: #ffc;
@@ -33,9 +34,16 @@ html[data-theme="light"],
 
     --error-fg: #ba2121;
 
+    --message-debug-bg: #efefef;
+    --message-debug-icon: url(../img/icon-debug.svg);
+    --message-info-bg: #ccefff;
+    --message-info-icon: url(../img/icon-info.svg);
     --message-success-bg: #dfd;
+    --message-success-icon: url(../img/icon-yes.svg);
     --message-warning-bg: #ffc;
+    --message-warning-icon: url(../img/icon-alert.svg);
     --message-error-bg: #ffefef;
+    --message-error-icon: url(../img/icon-no.svg);
 
     --darkened-bg: #f8f8f8; /* A bit darker than --body-bg */
     --selected-bg: #e4e4e4; /* E.g. selected table cells */
@@ -117,6 +125,16 @@ a:focus {
     text-decoration: underline;
 }
 
+a:not(
+    [role="button"],
+    #header a,
+    #nav-sidebar a,
+    #content-main.app-list a,
+    .object-tools a
+) {
+    text-decoration: underline;
+}
+
 a img {
     border: none;
 }
@@ -149,7 +167,6 @@ h1 {
     margin: 0 0 20px;
     font-weight: 300;
     font-size: 1.25rem;
-    color: var(--body-quiet-color);
 }
 
 h2 {
@@ -165,7 +182,7 @@ h2.subhead {
 h3 {
     font-size: 0.875rem;
     margin: .8em 0 .3em 0;
-    color: var(--body-quiet-color);
+    color: var(--body-medium-color);
     font-weight: bold;
 }
 
@@ -173,6 +190,7 @@ h4 {
     font-size: 0.75rem;
     margin: 1em 0 .8em 0;
     padding-bottom: 3px;
+    color: var(--body-medium-color);
 }
 
 h5 {
@@ -219,12 +237,16 @@ fieldset {
     border-top: 1px solid var(--hairline-color);
 }
 
+details summary {
+    cursor: pointer;
+}
+
 blockquote {
     font-size: 0.6875rem;
-    color: #777;
+    color: var(--body-quiet-color);
     margin-left: 2px;
     padding-left: 10px;
-    border-left: 5px solid #ddd;
+    border-left: 5px solid currentColor;
 }
 
 code, pre {
@@ -315,7 +337,7 @@ td, th {
 }
 
 th {
-    font-weight: 600;
+    font-weight: 500;
     text-align: left;
 }
 
@@ -336,7 +358,7 @@ tfoot td {
 }
 
 thead th.required {
-    color: var(--body-loud-color);
+    font-weight: bold;
 }
 
 tr.alt {
@@ -475,9 +497,6 @@ input, textarea, select, .form-row p, form .button {
     font-family: var(--font-family-primary);
     font-weight: normal;
     font-size: 0.8125rem;
-}
-.form-row div.help {
-    padding: 2px 3px;
 }
 
 textarea {
@@ -623,20 +642,44 @@ ul.messagelist li {
     font-size: 0.8125rem;
     padding: 10px 10px 10px 65px;
     margin: 0 0 10px 0;
-    background: var(--message-success-bg) url(../img/icon-yes.svg) 40px 12px no-repeat;
-    background-size: 16px auto;
     color: var(--body-fg);
     word-break: break-word;
+    background-color: var(--message-info-bg);
+    background-image: var(--message-info-icon);
+    background-position: 40px 12px;
+    background-repeat: no-repeat;
+    background-size: 16px auto;
+}
+
+ul.messagelist li.debug {
+    background-color: var(--message-debug-bg);
+    background-image: var(--message-debug-icon);
+}
+
+ul.messagelist li.info {
+    background-color: var(--message-info-bg);
+    background-image: var(--message-info-icon);
+}
+
+ul.messagelist li.success {
+    background-color: var(--message-success-bg);
+    background-image: var(--message-success-icon);
 }
 
 ul.messagelist li.warning {
-    background: var(--message-warning-bg) url(../img/icon-alert.svg) 40px 14px no-repeat;
-    background-size: 14px auto;
+    background-color: var(--message-warning-bg);
+    background-image: var(--message-warning-icon);
 }
 
 ul.messagelist li.error {
-    background: var(--message-error-bg) url(../img/icon-no.svg) 40px 12px no-repeat;
-    background-size: 16px auto;
+    background-color: var(--message-error-bg);
+    background-image: var(--message-error-icon);
+}
+
+@media (forced-colors: active) {
+  ul.messagelist li {
+      border: 1px solid;
+  }
 }
 
 .errornote {
@@ -654,7 +697,7 @@ ul.messagelist li.error {
 }
 
 ul.errorlist {
-    margin: 0 0 4px;
+    margin: 0;
     padding: 0;
     color: var(--error-fg);
     background: var(--body-bg);
@@ -663,7 +706,6 @@ ul.errorlist {
 ul.errorlist li {
     font-size: 0.8125rem;
     display: block;
-    margin-bottom: 4px;
     overflow-wrap: break-word;
 }
 
@@ -685,17 +727,6 @@ td ul.errorlist li {
     margin: 0;
 }
 
-.form-row.errors {
-    margin: 0;
-    border: none;
-    border-bottom: 1px solid var(--hairline-color);
-    background: none;
-}
-
-.form-row.errors ul.errorlist li {
-    padding-left: 0;
-}
-
 .errors input, .errors select, .errors textarea,
 td ul.errorlist + input, td ul.errorlist + select, td ul.errorlist + textarea {
     border: 1px solid var(--error-fg);
@@ -708,19 +739,36 @@ td ul.errorlist + input, td ul.errorlist + select, td ul.errorlist + textarea {
 
 /* BREADCRUMBS */
 
-div.breadcrumbs {
+ol.breadcrumbs {
     background: var(--breadcrumbs-bg);
     padding: 10px 40px;
     border: none;
     color: var(--breadcrumbs-fg);
-    text-align: left;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
-div.breadcrumbs a {
+ol.breadcrumbs li {
+    display: inline-block;
+    font-size: 0.875rem;
+    padding: 0;
+}
+
+ol.breadcrumbs li:not([aria-current="page"])::after {
+    content: ' \203A ' / '';
+}
+
+ol.breadcrumbs li a[aria-current="page"] {
+    color: var(--breadcrumbs-fg);
+    text-decoration: none !important;
+    cursor: default;
+}
+
+ol.breadcrumbs a {
     color: var(--breadcrumbs-link-fg);
 }
 
-div.breadcrumbs a:focus, div.breadcrumbs a:hover {
+ol.breadcrumbs a:focus, ol.breadcrumbs a:hover {
     color: var(--breadcrumbs-fg);
 }
 
@@ -728,12 +776,12 @@ div.breadcrumbs a:focus, div.breadcrumbs a:hover {
 
 .viewlink, .inlineviewlink {
     padding-left: 16px;
-    background: url(../img/icon-viewlink.svg) 0 1px no-repeat;
+    background: url(../img/icon-viewlink.svg) 0 center no-repeat;
 }
 
 .hidelink {
     padding-left: 16px;
-    background: url(../img/icon-hidelink.svg) 0 1px no-repeat;
+    background: url(../img/icon-hidelink.svg) 0 center no-repeat;
 }
 
 .addlink {
@@ -743,7 +791,7 @@ div.breadcrumbs a:focus, div.breadcrumbs a:hover {
 
 .changelink, .inlinechangelink {
     padding-left: 16px;
-    background: url(../img/icon-changelink.svg) 0 1px no-repeat;
+    background: url(../img/icon-changelink.svg) 0 2px no-repeat;
 }
 
 .deletelink {
@@ -760,22 +808,29 @@ a.deletelink:focus, a.deletelink:hover {
     text-decoration: none;
 }
 
+/* TITLES */
+
+.titles-and-tools {
+    display: flex;
+}
+
+.titles {
+    flex-grow: 1;
+}
+
 /* OBJECT TOOLS */
 
 .object-tools {
-    font-size: 0.625rem;
-    font-weight: bold;
-    padding-left: 0;
-    float: right;
-    position: relative;
-    margin-top: -48px;
+    padding: 0;
+    margin: 0;
 }
 
 .object-tools li {
-    display: block;
-    float: left;
-    margin-left: 5px;
-    height: 1rem;
+    display: inline-block;
+}
+
+.object-tools li + li {
+    margin-left: 15px;
 }
 
 .object-tools a {
@@ -1115,39 +1170,40 @@ a.deletelink:focus, a.deletelink:hover {
     line-height: 22px;
     margin: 0;
     border-top: 1px solid var(--hairline-color);
-    width: 100%;
+    box-sizing: border-box;
 }
 
-.paginator a:link, .paginator a:visited {
+.paginator ul {
+    margin: 0;
+    margin-right: 6px;
+}
+
+.paginator ul li {
+    display: inline-block;
+    line-height: 22px;
+    padding: 0;
+}
+
+.paginator a {
+    display: inline-block;
     padding: 2px 6px;
+}
+
+.paginator a:not(.showall) {
     background: var(--button-bg);
     text-decoration: none;
     color: var(--button-fg);
 }
 
-.paginator a.showall {
-    border: none;
-    background: none;
-    color: var(--link-fg);
-}
-
-.paginator a.showall:focus, .paginator a.showall:hover {
-    background: none;
-    color: var(--link-hover-color);
-}
-
-.paginator .end {
-    margin-right: 6px;
-}
-
-.paginator .this-page {
-    padding: 2px 6px;
+.paginator a[aria-current="page"] {
+    color: var(--body-quiet-color);
+    background: transparent;
     font-weight: bold;
-    font-size: 0.8125rem;
-    vertical-align: top;
+    cursor: default;
 }
 
-.paginator a:focus, .paginator a:hover {
+.paginator a:not([aria-current="page"], .showall):focus,
+.paginator a:not([aria-current="page"], .showall):hover {
     color: white;
     background: var(--link-hover-color);
 }

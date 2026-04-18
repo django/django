@@ -8,7 +8,7 @@ from functools import partial
 from http import HTTPStatus
 from importlib import import_module
 from io import BytesIO, IOBase
-from urllib.parse import unquote_to_bytes, urljoin, urlparse, urlsplit
+from urllib.parse import unquote_to_bytes, urljoin, urlsplit
 
 from asgiref.sync import sync_to_async
 
@@ -177,7 +177,7 @@ class ClientHandler(BaseHandler):
         request_started.connect(close_old_connections)
         request = WSGIRequest(environ)
         # sneaky little hack so that we can easily get round
-        # CsrfViewMiddleware.  This makes life easier, and is probably
+        # CsrfViewMiddleware. This makes life easier, and is probably
         # required for backwards compatibility with external tests against
         # admin views.
         request._dont_enforce_csrf_checks = not self.enforce_csrf_checks
@@ -458,11 +458,7 @@ class RequestFactory:
         return json.dumps(data, cls=self.json_encoder) if should_encode else data
 
     def _get_path(self, parsed):
-        path = parsed.path
-        # If there are parameters, add them
-        if parsed.params:
-            path += ";" + parsed.params
-        path = unquote_to_bytes(path)
+        path = unquote_to_bytes(parsed.path)
         # Replace the behavior where non-ASCII values in the WSGI environ are
         # arbitrarily decoded with ISO-8859-1.
         # Refs comment in `get_bytes_from_wsgi()`.
@@ -647,7 +643,7 @@ class RequestFactory:
         **extra,
     ):
         """Construct an arbitrary HTTP request."""
-        parsed = urlparse(str(path))  # path can be lazy
+        parsed = urlsplit(str(path))  # path can be lazy
         data = force_bytes(data, settings.DEFAULT_CHARSET)
         r = {
             "PATH_INFO": self._get_path(parsed),
@@ -668,11 +664,10 @@ class RequestFactory:
         if query_params:
             extra["QUERY_STRING"] = urlencode(query_params, doseq=True)
         r.update(extra)
-        # If QUERY_STRING is absent or empty, we want to extract it from the URL.
+        # If QUERY_STRING is absent or empty, extract it from the URL.
         if not r.get("QUERY_STRING"):
             # WSGI requires latin-1 encoded strings. See get_path_info().
-            query_string = parsed[4].encode().decode("iso-8859-1")
-            r["QUERY_STRING"] = query_string
+            r["QUERY_STRING"] = parsed.query.encode().decode("iso-8859-1")
         return self.request(**r)
 
 
@@ -748,7 +743,7 @@ class AsyncRequestFactory(RequestFactory):
         **extra,
     ):
         """Construct an arbitrary HTTP request."""
-        parsed = urlparse(str(path))  # path can be lazy.
+        parsed = urlsplit(str(path))  # path can be lazy.
         data = force_bytes(data, settings.DEFAULT_CHARSET)
         s = {
             "method": method,
@@ -757,6 +752,8 @@ class AsyncRequestFactory(RequestFactory):
             "scheme": "https" if secure else "http",
             "headers": [(b"host", b"testserver")],
         }
+        if self.defaults:
+            extra = {**self.defaults, **extra}
         if data:
             s["headers"].extend(
                 [
@@ -772,11 +769,14 @@ class AsyncRequestFactory(RequestFactory):
         else:
             # If QUERY_STRING is absent or empty, we want to extract it from
             # the URL.
-            s["query_string"] = parsed[4]
+            s["query_string"] = parsed.query
         if headers:
             extra.update(HttpHeaders.to_asgi_names(headers))
         s["headers"] += [
-            (key.lower().encode("ascii"), value.encode("latin1"))
+            # Avoid breaking test clients that just want to supply normalized
+            # ASGI names, regardless of the fact that ASGIRequest drops headers
+            # with underscores (CVE-2026-3902).
+            (key.lower().replace("_", "-").encode("ascii"), value.encode("latin1"))
             for key, value in extra.items()
         ]
         return self.request(**s)
@@ -952,9 +952,7 @@ class ClientMixin:
                     'Content-Type header is "%s", not "application/json"'
                     % response.get("Content-Type")
                 )
-            response._json = json.loads(
-                response.content.decode(response.charset), **extra
-            )
+            response._json = json.loads(response.text, **extra)
         return response._json
 
     def _follow_redirect(
@@ -1003,6 +1001,7 @@ class ClientMixin:
             request_method = self.get
             data = QueryDict(url.query)
             content_type = None
+            query_params = None
 
         return request_method(
             path,

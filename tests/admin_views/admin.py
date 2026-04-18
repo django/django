@@ -18,7 +18,12 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.views.decorators.common import no_append_slash
 
-from .forms import MediaActionForm
+from .forms import (
+    MediaActionForm,
+    SectionFormWithDynamicOptgroups,
+    SectionFormWithObjectOptgroups,
+    SectionFormWithOptgroups,
+)
 from .models import (
     Actor,
     AdminOrderedAdminMethod,
@@ -47,6 +52,7 @@ from .models import (
     Color2,
     ComplexSortedPerson,
     Country,
+    Course,
     CoverLetter,
     CustomArticle,
     CyclicOne,
@@ -237,6 +243,7 @@ class ArticleAdmin(ArticleAdminWithExtraUrl):
             "Some other fields",
             {"classes": ("wide",), "fields": ("date", "section", "sub_section")},
         ),
+        ("이름", {"fields": ("another_section",)}),
     )
 
     # These orderings aren't particularly useful but show that expressions can
@@ -362,6 +369,14 @@ class PersonAdmin(admin.ModelAdmin):
         return super().get_queryset(request).order_by("age")
 
 
+class ParentWithUUIDPKNoAddAdmin(admin.ModelAdmin):
+    list_display = ("id", "title")
+    list_editable = ("title",)
+
+    def has_add_permission(self, request):
+        return False
+
+
 class FooAccountAdmin(admin.StackedInline):
     model = FooAccount
     extra = 1
@@ -430,6 +445,8 @@ class PodcastAdmin(admin.ModelAdmin):
     list_display = ("name", "release_date")
     list_editable = ("release_date",)
     date_hierarchy = "release_date"
+    list_filter = ("name",)
+    search_fields = ("name",)
     ordering = ("name",)
 
 
@@ -489,6 +506,7 @@ class PictureAdmin(admin.ModelAdmin):
 class LanguageAdmin(admin.ModelAdmin):
     list_display = ["iso", "shortlist", "english_name", "name"]
     list_editable = ["shortlist"]
+    fields = [("iso", "english_name"), "name"]
 
 
 class RecommendationAdmin(admin.ModelAdmin):
@@ -608,7 +626,7 @@ class PostAdmin(admin.ModelAdmin):
     @admin.display
     def coolness(self, instance):
         if instance.pk:
-            return "%d amount of cool." % instance.pk
+            return "%s amount of cool." % instance.pk
         else:
             return "Unknown coolness."
 
@@ -699,6 +717,8 @@ class CoverLetterAdmin(admin.ModelAdmin):
     instances. Note that the CoverLetter model defines a __str__ method.
     For testing fix for ticket #14529.
     """
+
+    formfield_overrides = {models.CharField: {"strip": False}}
 
     def get_queryset(self, request):
         return super().get_queryset(request).defer("date_written")
@@ -1187,6 +1207,22 @@ class CamelCaseAdmin(admin.ModelAdmin):
     filter_horizontal = ["m2m"]
 
 
+class CourseAdmin(admin.ModelAdmin):
+    radio_fields = {"difficulty": admin.VERTICAL}
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    ("title", "difficulty"),
+                    ("materials", "start_datetime"),
+                    ("categories"),
+                ),
+            },
+        ),
+    )
+
+
 site = admin.AdminSite(name="admin")
 site.site_url = "/my-site-url/"
 site.register(Article, ArticleAdmin)
@@ -1263,8 +1299,8 @@ site.register(RelatedPrepopulated, search_fields=["name"])
 site.register(RelatedWithUUIDPKModel)
 site.register(ReadOnlyRelatedField, ReadOnlyRelatedFieldAdmin)
 
-# We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
-# That way we cover all four cases:
+# We intentionally register Promo and ChapterXtra1 but not Chapter nor
+# ChapterXtra2. That way we cover all four cases:
 #     related ForeignKey object registered in admin
 #     related ForeignKey object not registered in admin
 #     related OneToOne object registered in admin
@@ -1277,6 +1313,7 @@ site.register(ChapterXtra1, ChapterXtra1Admin)
 site.register(Pizza, PizzaAdmin)
 site.register(ReadOnlyPizza, ReadOnlyPizzaAdmin)
 site.register(ReadablePizza)
+site.register(Course, CourseAdmin)
 site.register(Topping, ToppingAdmin)
 site.register(Album, AlbumAdmin)
 site.register(Song)
@@ -1336,6 +1373,33 @@ site2.register(Language)
 site7 = admin.AdminSite(name="admin7")
 site7.register(Article, ArticleAdmin2)
 site7.register(Section)
+site7.register(ParentWithUUIDPK, ParentWithUUIDPKNoAddAdmin)
+
+
+# Admin for testing optgroup in popup response
+class SectionAdminWithOptgroups(admin.ModelAdmin):
+    form = SectionFormWithOptgroups
+
+
+class SectionAdminWithObjectOptgroups(admin.ModelAdmin):
+    form = SectionFormWithObjectOptgroups
+
+
+class SectionAdminWithDynamicOptgroups(admin.ModelAdmin):
+    form = SectionFormWithDynamicOptgroups
+
+
+site11 = admin.AdminSite(name="admin11")
+site11.register(Article, ArticleAdmin2)
+site11.register(Section, SectionAdminWithOptgroups)
+
+site12 = admin.AdminSite(name="admin12")
+site12.register(Article, ArticleAdmin2)
+site12.register(Section, SectionAdminWithObjectOptgroups)
+
+site13 = admin.AdminSite(name="admin13")
+site13.register(Article, ArticleAdmin2)
+site13.register(Section, SectionAdminWithDynamicOptgroups)
 site7.register(PrePopulatedPost, PrePopulatedPostReadOnlyAdmin)
 site7.register(
     Pizza,

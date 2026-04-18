@@ -1,6 +1,6 @@
 """
- This module contains the 'base' GEOSGeometry object -- all GEOS Geometries
- inherit from this object.
+This module contains the 'base' GEOSGeometry object -- all GEOS Geometries
+inherit from this object.
 """
 
 import re
@@ -76,9 +76,10 @@ class GEOSGeometryBase(GEOSBase):
 
     def __deepcopy__(self, memodict):
         """
-        The `deepcopy` routine is used by the `Node` class of django.utils.tree;
-        thus, the protocol routine needs to be implemented to return correct
-        copies (clones) of these GEOS objects, which use C pointers.
+        The `deepcopy` routine is used by the `Node` class of
+        django.utils.tree; thus, the protocol routine needs to be implemented
+        to return correct copies (clones) of these GEOS objects, which use C
+        pointers.
         """
         return self.clone()
 
@@ -214,7 +215,7 @@ class GEOSGeometryBase(GEOSBase):
 
     @property
     def num_points(self):
-        "Return the number points, or coordinates, in the Geometry."
+        "Return the number of points, or coordinates, in the Geometry."
         return self.num_coords
 
     @property
@@ -252,8 +253,15 @@ class GEOSGeometryBase(GEOSBase):
 
     @property
     def hasz(self):
-        "Return whether the geometry has a 3D dimension."
+        "Return whether the geometry has a Z dimension."
         return capi.geos_hasz(self.ptr)
+
+    @property
+    def hasm(self):
+        "Return whether the geometry has a M dimension."
+        if geos_version_tuple() < (3, 12):
+            raise GEOSException("GEOSGeometry.hasm requires GEOS >= 3.12.0.")
+        return capi.geos_hasm(self.ptr)
 
     @property
     def ring(self):
@@ -336,7 +344,8 @@ class GEOSGeometryBase(GEOSBase):
     def overlaps(self, other):
         """
         Return true if the DE-9IM intersection matrix for the two Geometries
-        is T*T***T** (for two points or two surfaces) 1*T***T** (for two curves).
+        is T*T***T** (for two points or two surfaces) 1*T***T** (for two
+        curves).
         """
         return capi.geos_overlaps(self.ptr, other.ptr)
 
@@ -346,7 +355,7 @@ class GEOSGeometryBase(GEOSBase):
         two Geometries match the elements in pattern.
         """
         if not isinstance(pattern, str) or len(pattern) > 9:
-            raise GEOSException("invalid intersection matrix pattern")
+            raise GEOSException("Invalid intersection matrix pattern.")
         return capi.geos_relatepattern(self.ptr, other.ptr, force_bytes(pattern))
 
     def touches(self, other):
@@ -499,7 +508,9 @@ class GEOSGeometryBase(GEOSBase):
             # source SRS.
             srid = None
         elif srid is None or srid < 0:
-            raise GEOSException("Calling transform() with no SRID set is not supported")
+            raise GEOSException(
+                "Calling transform() with no SRID set is not supported."
+            )
 
         # Creating an OGR Geometry, which is then transformed.
         g = gdal.OGRGeometry(self._ogr_ptr(), srid)
@@ -533,9 +544,9 @@ class GEOSGeometryBase(GEOSBase):
         """
         Return a geometry that represents all points whose distance from this
         Geometry is less than or equal to distance. Calculations are in the
-        Spatial Reference System of this Geometry. The optional third parameter sets
-        the number of segment used to approximate a quarter circle (defaults to 8).
-        (Text from PostGIS documentation at ch. 6.1.3)
+        Spatial Reference System of this Geometry. The optional third parameter
+        sets the number of segment used to approximate a quarter circle
+        (defaults to 8). (Text from PostGIS documentation at ch. 6.1.3)
         """
         return self._topology(capi.geos_buffer(self.ptr, width, quadsegs))
 
@@ -558,9 +569,9 @@ class GEOSGeometryBase(GEOSBase):
     @property
     def centroid(self):
         """
-        The centroid is equal to the centroid of the set of component Geometries
-        of highest dimension (since the lower-dimension geometries contribute zero
-        "weight" to the centroid).
+        The centroid is equal to the centroid of the set of component
+        Geometries of highest dimension (since the lower-dimension geometries
+        contribute zero "weight" to the centroid).
         """
         return self._topology(capi.geos_centroid(self.ptr))
 
@@ -585,7 +596,10 @@ class GEOSGeometryBase(GEOSBase):
         return self._topology(capi.geos_envelope(self.ptr))
 
     def intersection(self, other):
-        "Return a Geometry representing the points shared by this Geometry and other."
+        """
+        Return a Geometry representing the points shared by this Geometry and
+        other.
+        """
         return self._topology(capi.geos_intersection(self.ptr, other.ptr))
 
     @property
@@ -594,13 +608,15 @@ class GEOSGeometryBase(GEOSBase):
         return self._topology(capi.geos_pointonsurface(self.ptr))
 
     def relate(self, other):
-        "Return the DE-9IM intersection matrix for this Geometry and the other."
+        """
+        Return the DE-9IM intersection matrix for this Geometry and the other.
+        """
         return capi.geos_relate(self.ptr, other.ptr).decode()
 
     def simplify(self, tolerance=0.0, preserve_topology=False):
         """
         Return the Geometry, simplified using the Douglas-Peucker algorithm
-        to the specified tolerance (higher tolerance => less points).  If no
+        to the specified tolerance (higher tolerance => less points). If no
         tolerance provided, defaults to 0.
 
         By default, don't preserve topology - e.g. polygons can be split,
@@ -627,7 +643,10 @@ class GEOSGeometryBase(GEOSBase):
         return self._topology(capi.geos_unary_union(self.ptr))
 
     def union(self, other):
-        "Return a Geometry representing all the points in this Geometry and other."
+        """
+        Return a Geometry representing all the points in this Geometry and
+        other.
+        """
         return self._topology(capi.geos_union(self.ptr, other.ptr))
 
     # #### Other Routines ####

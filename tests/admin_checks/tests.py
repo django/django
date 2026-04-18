@@ -479,6 +479,7 @@ class SystemChecksTestCase(SimpleTestCase):
         expected = [
             checks.Error(
                 "The value of 'exclude' contains duplicate field(s).",
+                hint="Remove duplicates of 'name'.",
                 obj=ExcludedFields2,
                 id="admin.E015",
             )
@@ -679,9 +680,9 @@ class SystemChecksTestCase(SimpleTestCase):
 
     def test_fk_exclusion(self):
         """
-        Regression test for #11709 - when testing for fk excluding (when exclude is
-        given) make sure fk_name is honored or things blow up when there is more
-        than one fk to the parent model.
+        Regression test for #11709 - when testing for fk excluding (when
+        exclude is given) make sure fk_name is honored or things blow up when
+        there is more than one fk to the parent model.
         """
 
         class TwoAlbumFKAndAnEInline(admin.TabularInline):
@@ -858,9 +859,9 @@ class SystemChecksTestCase(SimpleTestCase):
 
     def test_graceful_m2m_fail(self):
         """
-        Regression test for #12203/#12237 - Fail more gracefully when a M2M field that
-        specifies the 'through' option is included in the 'fields' or the 'fieldsets'
-        ModelAdmin options.
+        Regression test for #12203/#12237 - Fail more gracefully when a M2M
+        field that specifies the 'through' option is included in the 'fields'
+        or the 'fieldsets' ModelAdmin options.
         """
 
         class BookAdmin(admin.ModelAdmin):
@@ -945,7 +946,8 @@ class SystemChecksTestCase(SimpleTestCase):
     def test_non_model_first_field(self):
         """
         Regression for ensuring ModelAdmin.field can handle first elem being a
-        non-model field (test fix for UnboundLocalError introduced with r16225).
+        non-model field (test fix for UnboundLocalError introduced with
+        r16225).
         """
 
         class SongForm(forms.ModelForm):
@@ -970,6 +972,7 @@ class SystemChecksTestCase(SimpleTestCase):
         expected = [
             checks.Error(
                 "The value of 'fields' contains duplicate field(s).",
+                hint="Remove duplicates of 'state'.",
                 obj=MyModelAdmin,
                 id="admin.E006",
             )
@@ -986,9 +989,35 @@ class SystemChecksTestCase(SimpleTestCase):
         expected = [
             checks.Error(
                 "There are duplicate field(s) in 'fieldsets[0][1]'.",
+                hint="Remove duplicates of 'title', 'album'.",
                 obj=MyModelAdmin,
                 id="admin.E012",
             )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_check_multiple_duplicates_across_fieldsets(self):
+        class MyModelAdmin(admin.ModelAdmin):
+            fieldsets = [
+                ("Header 1", {"fields": ["title", "album"]}),
+                ("Header 2", {"fields": ["album", "name"]}),
+                ("Header 3", {"fields": ["name", "other", "title"]}),
+            ]
+
+        errors = MyModelAdmin(Song, AdminSite()).check()
+        expected = [
+            checks.Error(
+                "There are duplicate field(s) in 'fieldsets[1][1]'.",
+                hint="Remove duplicates of 'album'.",
+                obj=MyModelAdmin,
+                id="admin.E012",
+            ),
+            checks.Error(
+                "There are duplicate field(s) in 'fieldsets[2][1]'.",
+                hint="Remove duplicates of 'title', 'name'.",
+                obj=MyModelAdmin,
+                id="admin.E012",
+            ),
         ]
         self.assertEqual(errors, expected)
 

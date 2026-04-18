@@ -21,7 +21,10 @@ def no_template_view(request):
 
 
 def staff_only_view(request):
-    "A view that can only be visited by staff. Non staff members get an exception"
+    """
+    A view that can only be visited by staff. Non staff members get an
+    exception
+    """
     if request.user.is_staff:
         return HttpResponse()
     else:

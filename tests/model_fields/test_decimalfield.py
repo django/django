@@ -1,9 +1,11 @@
 import math
 from decimal import Decimal
+from unittest import mock
 
 from django.core import validators
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import connection, models
+from django.db.models import Max
 from django.test import TestCase
 
 from .models import BigD, Foo
@@ -47,6 +49,20 @@ class DecimalFieldTests(TestCase):
         f = models.DecimalField(max_digits=5, decimal_places=1)
         self.assertIsNone(f.get_prep_value(None))
         self.assertEqual(f.get_prep_value("2.4"), Decimal("2.4"))
+
+    def test_get_db_prep_value(self):
+        """
+        DecimalField.get_db_prep_value() must call
+        DatabaseOperations.adapt_decimalfield_value().
+        """
+        f = models.DecimalField(max_digits=5, decimal_places=1)
+        # None of the built-in database backends implement
+        # adapt_decimalfield_value(), so this must be confirmed with mocking.
+        with mock.patch.object(
+            connection.ops.__class__, "adapt_decimalfield_value"
+        ) as adapt_decimalfield_value:
+            f.get_db_prep_value("2.4", connection)
+        adapt_decimalfield_value.assert_called_with(Decimal("2.4"), 5, 1)
 
     def test_filter_with_strings(self):
         """
@@ -125,3 +141,20 @@ class DecimalFieldTests(TestCase):
         obj = Foo.objects.create(a="bar", d=Decimal("8.320"))
         obj.refresh_from_db()
         self.assertEqual(obj.d.compare_total(Decimal("8.320")), Decimal("0"))
+
+    def test_large_integer_precision(self):
+        large_int_val = Decimal("9999999999999999")
+        obj = BigD.objects.create(large_int=large_int_val, d=Decimal("0"))
+        obj.refresh_from_db()
+        self.assertEqual(obj.large_int, large_int_val)
+
+    def test_large_integer_precision_aggregation(self):
+        large_int_val = Decimal("9999999999999999")
+        BigD.objects.create(large_int=large_int_val, d=Decimal("0"))
+        result = BigD.objects.aggregate(max_val=Max("large_int"))
+        self.assertEqual(result["max_val"], large_int_val)
+
+    def test_roundtrip_integer_with_trailing_zeros(self):
+        obj = Foo.objects.create(a="bar", d=Decimal("8"))
+        obj.refresh_from_db()
+        self.assertEqual(obj.d.compare_total(Decimal("8.000")), Decimal("0"))

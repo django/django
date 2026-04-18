@@ -1,0 +1,33 @@
+==========================
+Django 5.2.7 release notes
+==========================
+
+*October 1, 2025*
+
+Django 5.2.7 fixes one security issue with severity "high", one security issue
+with severity "low", and one bug in 5.2.6. Also, the latest string translations
+from Transifex are incorporated.
+
+CVE-2025-59681: Potential SQL injection in ``QuerySet.annotate()``, ``alias()``, ``aggregate()``, and ``extra()`` on MySQL and MariaDB
+======================================================================================================================================
+
+:meth:`.QuerySet.annotate`, :meth:`~.QuerySet.alias`,
+:meth:`~.QuerySet.aggregate`, and :meth:`~.QuerySet.extra` methods were subject
+to SQL injection in column aliases, using a suitably crafted dictionary, with
+dictionary expansion, as the ``**kwargs`` passed to these methods (follow up to
+:cve:`2022-28346`).
+
+CVE-2025-59682: Potential partial directory-traversal via ``archive.extract()``
+===============================================================================
+
+The ``django.utils.archive.extract()`` function, used by
+:option:`startapp --template` and :option:`startproject --template`, allowed
+partial directory-traversal via an archive with file paths sharing a common
+prefix with the target directory (follow up to :cve:`2021-3281`).
+
+Bugfixes
+========
+
+* Fixed a regression in Django 5.2 that reduced the color contrast of
+  the chosen label of ``filter_horizontal`` and ``filter_vertical`` widgets
+  within a ``TabularInline`` (:ticket:`36601`).

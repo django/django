@@ -11,6 +11,12 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, storages
 from django.utils.functional import LazyObject
+from django.utils.regex_helper import _lazy_re_compile
+
+comment_re = _lazy_re_compile(r"\/\*[^*]*\*+([^/*][^*]*\*+)*\/", re.DOTALL)
+line_comment_re = _lazy_re_compile(
+    r"\/\*[^*]*\*+([^/*][^*]*\*+)*\/|\/\/[^\n]*", re.DOTALL
+)
 
 
 class StaticFilesStorage(FileSystemStorage):
@@ -53,7 +59,8 @@ class HashedFilesMixin:
         (
             (
                 (
-                    r"""(?P<matched>import(?s:(?P<import>[\s\{].*?))"""
+                    r"""(?P<matched>import"""
+                    r"""(?s:(?P<import>[\s\{].*?|\*\s*as\s*\w+))"""
                     r"""\s*from\s*['"](?P<url>[./].*?)["']\s*;)"""
                 ),
                 """import%(import)s from "%(url)s";""",
@@ -79,7 +86,8 @@ class HashedFilesMixin:
         (
             "*.css",
             (
-                r"""(?P<matched>url\(['"]{0,1}\s*(?P<url>.*?)["']{0,1}\))""",
+                r"""(?P<matched>url\((?P<quote>['"]{0,1})"""
+                r"""\s*(?P<url>.*?)(?P=quote)\))""",
                 (
                     r"""(?P<matched>@import\s*["']\s*(?P<url>.*?)["'])""",
                     """@import url("%(url)s")""",
@@ -202,12 +210,37 @@ class HashedFilesMixin:
         """
         return self._url(self.stored_name, name, force)
 
-    def url_converter(self, name, hashed_files, template=None):
+    def get_comment_blocks(self, content, include_line_comments=False):
+        """
+        Return a list of (start, end) tuples for each comment block.
+        """
+        pattern = line_comment_re if include_line_comments else comment_re
+        return [(match.start(), match.end()) for match in re.finditer(pattern, content)]
+
+    def is_in_comment(self, pos, comments):
+        for start, end in comments:
+            if start < pos and pos < end:
+                return True
+            if pos < start:
+                return False
+        return False
+
+    def url_converter(self, name, hashed_files, template=None, comment_blocks=None):
         """
         Return the custom URL converter for the given file name.
         """
         if template is None:
             template = self.default_template
+
+        def _line_at_position(content, position):
+            start = content.rfind("\n", 0, position) + 1
+            end = content.find("\n", position)
+            end = end if end != -1 else len(content)
+            line_num = content.count("\n", 0, start) + 1
+            msg = f"\n{line_num}: {content[start:end]}"
+            if len(msg) > 79:
+                return f"\n{line_num}"
+            return msg
 
         def converter(matchobj):
             """
@@ -219,6 +252,10 @@ class HashedFilesMixin:
             matches = matchobj.groupdict()
             matched = matches["matched"]
             url = matches["url"]
+
+            # Ignore URLs in comments.
+            if comment_blocks and self.is_in_comment(matchobj.start(), comment_blocks):
+                return matched
 
             # Ignore absolute/protocol-relative and data-uri URLs.
             if re.match(r"^[a-z]+:", url) or url.startswith("//"):
@@ -237,21 +274,30 @@ class HashedFilesMixin:
                 return matched
 
             if url_path.startswith("/"):
-                # Otherwise the condition above would have returned prematurely.
+                # Otherwise the condition above would have returned
+                # prematurely.
                 assert url_path.startswith(settings.STATIC_URL)
                 target_name = url_path.removeprefix(settings.STATIC_URL)
             else:
-                # We're using the posixpath module to mix paths and URLs conveniently.
+                # We're using the posixpath module to mix paths and URLs
+                # conveniently.
                 source_name = name if os.sep == "/" else name.replace(os.sep, "/")
                 target_name = posixpath.join(posixpath.dirname(source_name), url_path)
 
-            # Determine the hashed name of the target file with the storage backend.
-            hashed_url = self._url(
-                self._stored_name,
-                unquote(target_name),
-                force=True,
-                hashed_files=hashed_files,
-            )
+            # Determine the hashed name of the target file with the storage
+            # backend.
+            try:
+                hashed_url = self._url(
+                    self._stored_name,
+                    unquote(target_name),
+                    force=True,
+                    hashed_files=hashed_files,
+                )
+            except ValueError as exc:
+                line = _line_at_position(matchobj.string, matchobj.start())
+                note = f"{name!r} contains this reference {matched!r} on line {line}"
+                exc.add_note(note)
+                raise exc
 
             transformed_url = "/".join(
                 url_path.split("/")[:-1] + hashed_url.split("/")[-1:]
@@ -278,8 +324,8 @@ class HashedFilesMixin:
         2. adjusting files which contain references to other files so they
            refer to the cache-busting filenames.
 
-        If either of these are performed on a file, then that file is considered
-        post-processed.
+        If either of these are performed on a file, then that file is
+        considered post-processed.
         """
         # don't even dare to process the files if we're in dry run mode
         if dry_run:
@@ -307,22 +353,23 @@ class HashedFilesMixin:
                 processed_adjustable_paths[name] = (name, hashed_name, processed)
 
         paths = {path: paths[path] for path in adjustable_paths}
-        substitutions = False
-
+        unresolved_paths = []
         for i in range(self.max_post_process_passes):
-            substitutions = False
+            unresolved_paths = []
             for name, hashed_name, processed, subst in self._post_process(
                 paths, adjustable_paths, hashed_files
             ):
                 # Overwrite since hashed_name may be newer.
                 processed_adjustable_paths[name] = (name, hashed_name, processed)
-                substitutions = substitutions or subst
+                if subst:
+                    unresolved_paths.append(name)
 
-            if not substitutions:
+            if not unresolved_paths:
                 break
 
-        if substitutions:
-            yield "All", None, RuntimeError("Max post-process passes exceeded.")
+        if unresolved_paths:
+            problem_paths = ", ".join(sorted(unresolved_paths))
+            yield problem_paths, None, RuntimeError("Max post-process passes exceeded.")
 
         # Store the processed paths
         self.hashed_files.update(hashed_files)
@@ -369,7 +416,13 @@ class HashedFilesMixin:
                         if matches_patterns(path, (extension,)):
                             for pattern, template in patterns:
                                 converter = self.url_converter(
-                                    name, hashed_files, template
+                                    name,
+                                    hashed_files,
+                                    template,
+                                    self.get_comment_blocks(
+                                        content,
+                                        include_line_comments=path.endswith(".js"),
+                                    ),
                                 )
                                 try:
                                     content = pattern.sub(converter, content)
@@ -445,7 +498,8 @@ class HashedFilesMixin:
                 # Move on to the next intermediate file.
                 intermediate_name = cache_name
         # If the cache name can't be determined after the max number of passes,
-        # the intermediate files on disk may be corrupt; avoid an infinite loop.
+        # the intermediate files on disk may be corrupt; avoid an infinite
+        # loop.
         raise ValueError("The name '%s' could not be hashed with %r." % (name, self))
 
 
@@ -493,11 +547,12 @@ class ManifestFilesMixin(HashedFilesMixin):
             self.save_manifest()
 
     def save_manifest(self):
+        sorted_hashed_files = sorted(self.hashed_files.items())
         self.manifest_hash = self.file_hash(
-            None, ContentFile(json.dumps(sorted(self.hashed_files.items())).encode())
+            None, ContentFile(json.dumps(sorted_hashed_files).encode())
         )
         payload = {
-            "paths": self.hashed_files,
+            "paths": dict(sorted_hashed_files),
             "version": self.manifest_version,
             "hash": self.manifest_hash,
         }

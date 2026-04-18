@@ -1,8 +1,10 @@
 import functools
+import unittest
 
 from django.template import Library
 from django.template.base import Node
 from django.test import SimpleTestCase
+from django.utils.version import PY314
 
 
 class FilterRegistrationTests(SimpleTestCase):
@@ -78,6 +80,14 @@ class InclusionTagRegistrationTests(SimpleTestCase):
         self.assertIs(func_wrapped, func)
         self.assertTrue(hasattr(func_wrapped, "cache_info"))
 
+    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
+    def test_inclusion_tag_deferred_annotation(self):
+        @self.library.inclusion_tag("template.html")
+        def func(arg: SomeType):  # NOQA: F821
+            return ""
+
+        self.assertIn("func", self.library.tags)
+
 
 class SimpleTagRegistrationTests(SimpleTestCase):
     def setUp(self):
@@ -104,6 +114,14 @@ class SimpleTagRegistrationTests(SimpleTestCase):
 
         self.assertIn("name", self.library.tags)
 
+    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
+    def test_tag_deferred_annotation(self):
+        @self.library.simple_tag
+        def func(parser, token: SomeType):  # NOQA: F821
+            return Node()
+
+        self.assertIn("func", self.library.tags)
+
     def test_simple_tag_invalid(self):
         msg = "Invalid arguments provided to simple_tag"
         with self.assertRaisesMessage(ValueError, msg):
@@ -114,6 +132,55 @@ class SimpleTagRegistrationTests(SimpleTestCase):
         @functools.lru_cache(maxsize=32)
         def func():
             return ""
+
+        func_wrapped = self.library.tags["func"].__wrapped__
+        self.assertIs(func_wrapped, func)
+        self.assertTrue(hasattr(func_wrapped, "cache_info"))
+
+
+class SimpleBlockTagRegistrationTests(SimpleTestCase):
+    def setUp(self):
+        self.library = Library()
+
+    def test_simple_block_tag(self):
+        @self.library.simple_block_tag
+        def func(content):
+            return content
+
+        self.assertIn("func", self.library.tags)
+
+    def test_simple_block_tag_parens(self):
+        @self.library.simple_block_tag()
+        def func(content):
+            return content
+
+        self.assertIn("func", self.library.tags)
+
+    def test_simple_block_tag_name_kwarg(self):
+        @self.library.simple_block_tag(name="name")
+        def func(content):
+            return content
+
+        self.assertIn("name", self.library.tags)
+
+    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
+    def test_simple_block_tag_deferred_annotation(self):
+        @self.library.simple_block_tag
+        def func(content: SomeType):  # NOQA: F821
+            return content
+
+        self.assertIn("func", self.library.tags)
+
+    def test_simple_block_tag_invalid(self):
+        msg = "Invalid arguments provided to simple_block_tag"
+        with self.assertRaisesMessage(ValueError, msg):
+            self.library.simple_block_tag("invalid")
+
+    def test_simple_tag_wrapped(self):
+        @self.library.simple_block_tag
+        @functools.lru_cache(maxsize=32)
+        def func(content):
+            return content
 
         func_wrapped = self.library.tags["func"].__wrapped__
         self.assertIs(func_wrapped, func)

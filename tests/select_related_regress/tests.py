@@ -32,12 +32,12 @@ class SelectRelatedRegressTests(TestCase):
         Regression test for bug #7110.
 
         When using select_related(), we must query the
-        Device and Building tables using two different aliases (each) in order to
-        differentiate the start and end Connection fields. The net result is that
-        both the "connections = ..." queries here should give the same results
-        without pulling in more than the absolute minimum number of tables
-        (history has shown that it's easy to make a mistake in the implementation
-        and include some unnecessary bonus joins).
+        Device and Building tables using two different aliases (each) in order
+        to differentiate the start and end Connection fields. The net result is
+        that both the "connections = ..." queries here should give the same
+        results without pulling in more than the absolute minimum number of
+        tables (history has shown that it's easy to make a mistake in the
+        implementation and include some unnecessary bonus joins).
         """
 
         b = Building.objects.create(name="101")
@@ -70,8 +70,9 @@ class SelectRelatedRegressTests(TestCase):
             [(c1.id, "router/4", "switch/7"), (c2.id, "switch/7", "server/1")],
         )
 
-        # This final query should only have seven tables (port, device and building
-        # twice each, plus connection once). Thus, 6 joins plus the FROM table.
+        # This final query should only have seven tables (port, device and
+        # building twice each, plus connection once). Thus, 6 joins plus the
+        # FROM table.
         self.assertEqual(str(connections.query).count(" JOIN "), 6)
 
     def test_regression_8106(self):
@@ -102,8 +103,8 @@ class SelectRelatedRegressTests(TestCase):
 
         the first related model in the tests below
         ("state") is empty and we try to select the more remotely related
-        state__country. The regression here was not skipping the empty column results
-        for country before getting status.
+        state__country. The regression here was not skipping the empty column
+        results for country before getting status.
         """
 
         Country.objects.create(name="Australia")

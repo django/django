@@ -51,7 +51,7 @@ What's new in Django 2.0
 Simplified URL routing syntax
 -----------------------------
 
-The new :func:`django.urls.path()` function allows a simpler, more readable URL
+The new :func:`django.urls.path` function allows a simpler, more readable URL
 routing syntax. For example, this example from previous Django releases::
 
     url(r"^articles/(?P<year>[0-9]{4})/$", views.year_archive),
@@ -266,16 +266,16 @@ Models
   :class:`~django.db.models.functions.Extract` now works with
   :class:`~django.db.models.DurationField`.
 
-* Added the ``of`` argument to :meth:`.QuerySet.select_for_update()`, supported
+* Added the ``of`` argument to :meth:`.QuerySet.select_for_update`, supported
   on PostgreSQL and Oracle, to lock only rows from specific tables rather than
   all selected tables. It may be helpful particularly when
-  :meth:`~.QuerySet.select_for_update()` is used in conjunction with
-  :meth:`~.QuerySet.select_related()`.
+  :meth:`~.QuerySet.select_for_update` is used in conjunction with
+  :meth:`~.QuerySet.select_related`.
 
 * The new ``field_name`` parameter of :meth:`.QuerySet.in_bulk` allows fetching
   results based on any unique model field.
 
-* :meth:`.CursorWrapper.callproc()` now takes an optional dictionary of keyword
+* :meth:`.CursorWrapper.callproc` now takes an optional dictionary of keyword
   parameters, if the backend supports this feature. Of Django's built-in
   backends, only Oracle supports it.
 
@@ -387,8 +387,9 @@ backends.
 
 * To enable support for :class:`~django.db.models.expressions.Window`
   expressions, set ``DatabaseFeatures.supports_over_clause`` to ``True``. You
-  may need to customize the ``DatabaseOperations.window_start_rows_start_end()``
-  and/or ``window_start_range_start_end()`` methods.
+  may need to customize the
+  ``DatabaseOperations.window_start_rows_start_end()`` and/or
+  ``window_start_range_start_end()`` methods.
 
 * Third-party database backends should add a
   ``DatabaseOperations.cast_char_field_without_max_length`` attribute with the
@@ -542,11 +543,11 @@ rebuild tables using a script similar to this::
 This script hasn't received extensive testing and needs adaption for various
 cases such as multiple databases. Feel free to contribute improvements.
 
-In addition, because of a table alteration limitation of SQLite, it's prohibited
-to perform :class:`~django.db.migrations.operations.RenameModel` and
+In addition, because of a table alteration limitation of SQLite, it's
+prohibited to perform :class:`~django.db.migrations.operations.RenameModel` and
 :class:`~django.db.migrations.operations.RenameField` operations on models or
-fields referenced by other models in a transaction. In order to allow migrations
-containing these operations to be applied, you must set the
+fields referenced by other models in a transaction. In order to allow
+migrations containing these operations to be applied, you must set the
 ``Migration.atomic`` attribute to ``False``.
 
 Miscellaneous

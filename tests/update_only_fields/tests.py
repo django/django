@@ -1,3 +1,6 @@
+from django.core.exceptions import ObjectNotUpdated
+from django.db import DatabaseError, connection, transaction
+from django.db.models import F
 from django.db.models.signals import post_save, pre_save
 from django.test import TestCase
 
@@ -6,8 +9,8 @@ from .models import Account, Employee, Person, Profile, ProxyEmployee
 
 class UpdateOnlyFieldsTests(TestCase):
     msg = (
-        "The following fields do not exist in this model, are m2m fields, or "
-        "are non-concrete fields: %s"
+        "The following fields do not exist in this model, are m2m "
+        "fields, primary keys, or are non-concrete fields: %s"
     )
 
     def test_update_fields_basic(self):
@@ -282,3 +285,40 @@ class UpdateOnlyFieldsTests(TestCase):
         profile_boss = Profile.objects.create(name="Boss", salary=3000)
         with self.assertRaisesMessage(ValueError, self.msg % "non_concrete"):
             profile_boss.save(update_fields=["non_concrete"])
+
+    def test_update_pk_field(self):
+        person_boss = Person.objects.create(name="Boss", gender="F")
+        with self.assertRaisesMessage(ValueError, self.msg % "id"):
+            person_boss.save(update_fields=["id"])
+
+    def test_update_inherited_pk_field(self):
+        employee_boss = Employee.objects.create(name="Boss", gender="F")
+        with self.assertRaisesMessage(ValueError, self.msg % "id"):
+            employee_boss.save(update_fields=["id"])
+
+    def test_update_fields_not_updated(self):
+        obj = Person.objects.create(name="Sara", gender="F")
+        Person.objects.filter(pk=obj.pk).delete()
+        msg = "Save with update_fields did not affect any rows."
+        # Make sure backward compatibility with DatabaseError is preserved.
+        exceptions = [DatabaseError, ObjectNotUpdated, Person.NotUpdated]
+        for exception in exceptions:
+            with (
+                self.subTest(exception),
+                self.assertRaisesMessage(DatabaseError, msg),
+                transaction.atomic(),
+            ):
+                obj.save(update_fields=["name"])
+
+    def test_update_fields_expression(self):
+        obj = Person.objects.create(name="Valerie", gender="F", pid=42)
+        updated_pid = F("pid") + 1
+        obj.pid = updated_pid
+        obj.save(update_fields={"gender"})
+        self.assertIs(obj.pid, updated_pid)
+        obj.save(update_fields={"pid"})
+        expected_num_queries = (
+            0 if connection.features.can_return_rows_from_update else 1
+        )
+        with self.assertNumQueries(expected_num_queries):
+            self.assertEqual(obj.pid, 43)

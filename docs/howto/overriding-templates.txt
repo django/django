@@ -63,7 +63,8 @@ in the ``templates`` directory, and add the template files to that folder:
 
 The template loader first looks for templates in the ``DIRS`` directory. When
 the views in the ``blog`` app ask for the ``blog/post.html`` and
-``blog/list.html`` templates, the loader will return the files you just created.
+``blog/list.html`` templates, the loader will return the files you just
+created.
 
 Overriding from an app's template directory
 ===========================================
@@ -111,15 +112,15 @@ reimplement the entire template.
 For example, you can use this technique to add a custom logo to the
 ``admin/base_site.html`` template:
 
-    .. code-block:: html+django
-       :caption: ``templates/admin/base_site.html``
+.. code-block:: html+django
+   :caption: ``templates/admin/base_site.html``
 
-        {% extends "admin/base_site.html" %}
+    {% extends "admin/base_site.html" %}
 
-        {% block branding %}
-            <img src="link/to/logo.png" alt="logo">
-            {{ block.super }}
-        {% endblock %}
+    {% block branding %}
+      <img src="link/to/logo.png" alt="logo">
+      {{ block.super }}
+    {% endblock %}
 
 Key points to note:
 

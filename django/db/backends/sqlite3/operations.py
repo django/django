@@ -1,5 +1,6 @@
 import datetime
 import decimal
+import sqlite3
 import uuid
 from functools import lru_cache
 from itertools import chain
@@ -16,6 +17,14 @@ from django.utils.functional import cached_property
 
 from .base import Database
 
+UNSUPPORTED_DATETIME_AGGREGATES = (
+    models.Sum,
+    models.Avg,
+    models.Variance,
+    models.StdDev,
+)
+DATETIME_FIELDS = (models.DateField, models.DateTimeField, models.TimeField)
+
 
 class DatabaseOperations(BaseDatabaseOperations):
     cast_char_field_without_max_length = "text"
@@ -28,25 +37,8 @@ class DatabaseOperations(BaseDatabaseOperations):
     # SQLite. Use JSON_TYPE() instead.
     jsonfield_datatype_values = frozenset(["null", "false", "true"])
 
-    def bulk_batch_size(self, fields, objs):
-        """
-        SQLite has a compile-time default (SQLITE_LIMIT_VARIABLE_NUMBER) of
-        999 variables per query.
-
-        If there's only a single field to insert, the limit is 500
-        (SQLITE_MAX_COMPOUND_SELECT).
-        """
-        if len(fields) == 1:
-            return 500
-        elif len(fields) > 1:
-            return self.connection.features.max_query_params // len(fields)
-        else:
-            return len(objs)
-
     def check_expression_support(self, expression):
-        bad_fields = (models.DateField, models.DateTimeField, models.TimeField)
-        bad_aggregates = (models.Sum, models.Avg, models.Variance, models.StdDev)
-        if isinstance(expression, bad_aggregates):
+        if isinstance(expression, UNSUPPORTED_DATETIME_AGGREGATES):
             for expr in expression.get_source_expressions():
                 try:
                     output_field = expr.output_field
@@ -55,11 +47,11 @@ class DatabaseOperations(BaseDatabaseOperations):
                     # to ignore.
                     pass
                 else:
-                    if isinstance(output_field, bad_fields):
+                    if isinstance(output_field, DATETIME_FIELDS):
+                        klass = expression.__class__.__name__
                         raise NotSupportedError(
-                            "You cannot use Sum, Avg, StdDev, and Variance "
-                            "aggregations on date/time fields in sqlite3 "
-                            "since date/time is saved as text."
+                            f"SQLite does not support {klass} on date or time "
+                            "fields, because they are stored as text."
                         )
         if (
             isinstance(expression, models.Aggregate)
@@ -78,13 +70,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         string and could otherwise cause a collision with a field name.
         """
         return f"django_date_extract(%s, {sql})", (lookup_type.lower(), *params)
-
-    def fetch_returned_insert_rows(self, cursor):
-        """
-        Given a cursor object that has just performed an INSERT...RETURNING
-        statement into a table, return the list of returned data.
-        """
-        return cursor.fetchall()
 
     def format_for_duration_arithmetic(self, sql):
         """Do nothing since formatting is handled in the custom function."""
@@ -145,16 +130,15 @@ class DatabaseOperations(BaseDatabaseOperations):
         """
         Only for last_executed_query! Don't use this to execute SQL queries!
         """
-        # This function is limited both by SQLITE_LIMIT_VARIABLE_NUMBER (the
-        # number of parameters, default = 999) and SQLITE_MAX_COLUMN (the
-        # number of return values, default = 2000). Since Python's sqlite3
-        # module doesn't expose the get_limit() C API, assume the default
-        # limits are in effect and split the work in batches if needed.
-        BATCH_SIZE = 999
-        if len(params) > BATCH_SIZE:
+        connection = self.connection.connection
+        variable_limit = self.connection.features.max_query_params
+        column_limit = connection.getlimit(sqlite3.SQLITE_LIMIT_COLUMN)
+        batch_size = min(variable_limit, column_limit)
+
+        if len(params) > batch_size:
             results = ()
-            for index in range(0, len(params), BATCH_SIZE):
-                chunk = params[index : index + BATCH_SIZE]
+            for index in range(0, len(params), batch_size):
+                chunk = params[index : index + batch_size]
                 results += self._quote_params_for_last_executed_query(chunk)
             return results
 
@@ -322,10 +306,15 @@ class DatabaseOperations(BaseDatabaseOperations):
                 value = parse_time(value)
         return value
 
+    @staticmethod
+    def _create_decimal(value):
+        if isinstance(value, (int, str)):
+            return decimal.Decimal(value)
+        return decimal.Context(prec=15).create_decimal_from_float(value)
+
     def get_decimalfield_converter(self, expression):
         # SQLite stores only 15 significant digits. Digits coming from
         # float inaccuracy must be removed.
-        create_decimal = decimal.Context(prec=15).create_decimal_from_float
         if isinstance(expression, Col):
             quantize_value = decimal.Decimal(1).scaleb(
                 -expression.output_field.decimal_places
@@ -333,7 +322,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
             def converter(value, expression, connection):
                 if value is not None:
-                    return create_decimal(value).quantize(
+                    return self._create_decimal(value).quantize(
                         quantize_value, context=expression.output_field.context
                     )
 
@@ -341,7 +330,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
             def converter(value, expression, connection):
                 if value is not None:
-                    return create_decimal(value)
+                    return self._create_decimal(value)
 
         return converter
 
@@ -365,7 +354,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def combine_duration_expression(self, connector, sub_expressions):
         if connector not in ["+", "-", "*", "/"]:
             raise DatabaseError("Invalid connector for timedelta: %s." % connector)
-        fn_params = ["'%s'" % connector] + sub_expressions
+        fn_params = ["'%s'" % connector, *sub_expressions]
         if len(fn_params) > 3:
             raise ValueError("Too many params for timedelta operations.")
         return "django_format_dtdelta(%s)" % ", ".join(fn_params)
@@ -394,20 +383,6 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "INSERT OR IGNORE INTO"
         return super().insert_statement(on_conflict=on_conflict)
 
-    def return_insert_columns(self, fields):
-        # SQLite < 3.35 doesn't support an INSERT...RETURNING statement.
-        if not fields:
-            return "", ()
-        columns = [
-            "%s.%s"
-            % (
-                self.quote_name(field.model._meta.db_table),
-                self.quote_name(field.column),
-            )
-            for field in fields
-        ]
-        return "RETURNING %s" % ", ".join(columns), ()
-
     def on_conflict_suffix_sql(self, fields, on_conflict, update_fields, unique_fields):
         if (
             on_conflict == OnConflict.UPDATE
@@ -431,3 +406,6 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def force_group_by(self):
         return ["GROUP BY TRUE"] if Database.sqlite_version_info < (3, 39) else []
+
+    def format_json_path_numeric_index(self, num):
+        return "[#%s]" % num if num < 0 else super().format_json_path_numeric_index(num)

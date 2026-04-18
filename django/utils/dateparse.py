@@ -40,6 +40,7 @@ standard_duration_re = _lazy_re_compile(
 iso8601_duration_re = _lazy_re_compile(
     r"^(?P<sign>[-+]?)"
     r"P"
+    r"(?:(?P<weeks>\d+([.,]\d+)?)W)?"
     r"(?:(?P<days>\d+([.,]\d+)?)D)?"
     r"(?:T"
     r"(?:(?P<hours>\d+([.,]\d+)?)H)?"
@@ -118,7 +119,7 @@ def parse_datetime(value):
             kw["microsecond"] = kw["microsecond"] and kw["microsecond"].ljust(6, "0")
             tzinfo = kw.pop("tzinfo")
             if tzinfo == "Z":
-                tzinfo = datetime.timezone.utc
+                tzinfo = datetime.UTC
             elif tzinfo is not None:
                 offset_mins = int(tzinfo[-2:]) if len(tzinfo) > 3 else 0
                 offset = 60 * int(tzinfo[1:3]) + offset_mins
@@ -134,8 +135,8 @@ def parse_duration(value):
 
     The preferred format for durations in Django is '%d %H:%M:%S.%f'.
 
-    Also supports ISO 8601 representation and PostgreSQL's day-time interval
-    format.
+    Also supports ISO 8601 representation (excluding years and months) and
+    PostgreSQL's day-time interval format.
     """
     match = (
         standard_duration_re.match(value)

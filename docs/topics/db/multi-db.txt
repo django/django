@@ -232,6 +232,12 @@ cases, no instance hint will be provided at all. The router checks for
 the existence of an instance hint, and determine if that hint should be
 used to alter routing behavior.
 
+If an ``instance`` hint is present, the database from which it was fetched
+is recorded on its :attr:`instance._state.db <django.db.models.Model._state>`.
+Routers will need to first consult that attribute before falling back to any
+fixed alias to match Django's default behavior of fetching related instances
+from the same database.
+
 Using routers
 -------------
 
@@ -587,7 +593,8 @@ solution is to use ``db_manager()``, like this::
 
     User.objects.db_manager("new_users").create_user(...)
 
-``db_manager()`` returns a copy of the manager bound to the database you specify.
+``db_manager()`` returns a copy of the manager bound to the database you
+specify.
 
 Using ``get_queryset()`` with multiple databases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -683,6 +690,10 @@ Once you've written your model admin definitions, they can be
 registered with any ``Admin`` instance::
 
     from django.contrib import admin
+    from myapp.models import Author, Book, Publisher
+
+    # Import our custom ModelAdmin and TabularInline from where they're defined.
+    from myproject.admin import MultiDBModelAdmin, MultiDBTabularInline
 
 
     # Specialize the multi-db admin objects for use with specific models.

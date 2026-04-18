@@ -13,6 +13,15 @@ from django.db import models
 
 from .base import BaseModel
 
+try:
+    from PIL import Image  # NOQA
+except ImportError:
+    ImageData = None
+else:
+
+    class ImageData(models.Model):
+        data = models.ImageField(null=True)
+
 
 class BinaryData(models.Model):
     data = models.BinaryField(null=True)
@@ -60,10 +69,6 @@ class IntegerData(models.Model):
 
 class BigIntegerData(models.Model):
     data = models.BigIntegerField(null=True)
-
-
-# class ImageData(models.Model):
-#    data = models.ImageField(null=True)
 
 
 class GenericIPAddressData(models.Model):
@@ -242,11 +247,15 @@ class SmallPKData(models.Model):
     data = models.SmallIntegerField(primary_key=True)
 
 
-# class TextPKData(models.Model):
-#     data = models.TextField(primary_key=True)
+class TextPKData(models.Model):
+    data = models.TextField(primary_key=True)
 
-# class TimePKData(models.Model):
-#    data = models.TimeField(primary_key=True)
+    class Meta:
+        required_db_features = ["supports_index_on_text_field"]
+
+
+class TimePKData(models.Model):
+    data = models.TimeField(primary_key=True)
 
 
 class UUIDData(models.Model):

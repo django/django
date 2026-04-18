@@ -148,13 +148,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         else:
             return f"TIME({sql})", params
 
-    def fetch_returned_insert_rows(self, cursor):
-        """
-        Given a cursor object that has just performed an INSERT...RETURNING
-        statement into a table, return the tuple of returned data.
-        """
-        return cursor.fetchall()
-
     def format_for_duration_arithmetic(self, sql):
         return "INTERVAL %s MICROSECOND" % sql
 
@@ -165,9 +158,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         implicit sorting going on.
         """
         return [(None, ("NULL", [], False))]
-
-    def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
-        return value
 
     def last_executed_query(self, cursor, sql, params):
         # With MySQLdb, cursor objects have an (undocumented) "_executed"
@@ -184,20 +174,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         if name.startswith("`") and name.endswith("`"):
             return name  # Quoting once is enough.
         return "`%s`" % name
-
-    def return_insert_columns(self, fields):
-        # MySQL doesn't support an INSERT...RETURNING statement.
-        if not fields:
-            return "", ()
-        columns = [
-            "%s.%s"
-            % (
-                self.quote_name(field.model._meta.db_table),
-                self.quote_name(field.column),
-            )
-            for field in fields
-        ]
-        return "RETURNING %s" % ", ".join(columns), ()
 
     def sql_flush(self, style, tables, *, reset_sequences=False, allow_cascade=False):
         if not tables:
@@ -330,10 +306,12 @@ class DatabaseOperations(BaseDatabaseOperations):
             value = uuid.UUID(value)
         return value
 
-    def binary_placeholder_sql(self, value):
-        return (
-            "_binary %s" if value is not None and not hasattr(value, "as_sql") else "%s"
-        )
+    def binary_placeholder_sql(self, value, compiler):
+        if value is None:
+            return "%s", (None,)
+        elif hasattr(value, "as_sql"):
+            return compiler.compile(value)
+        return "_binary %s", (value,)
 
     def subtract_temporals(self, internal_type, lhs, rhs):
         lhs_sql, lhs_params = lhs
@@ -362,7 +340,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         return "TIMESTAMPDIFF(MICROSECOND, %s, %s)" % (rhs_sql, lhs_sql), params
 
     def explain_query_prefix(self, format=None, **options):
-        # Alias MySQL's TRADITIONAL to TEXT for consistency with other backends.
+        # Alias MySQL's TRADITIONAL to TEXT for consistency with other
+        # backends.
         if format and format.upper() == "TEXT":
             format = "TRADITIONAL"
         elif (
@@ -372,7 +351,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             format = "TREE"
         analyze = options.pop("analyze", False)
         prefix = super().explain_query_prefix(format, **options)
-        if analyze and self.connection.features.supports_explain_analyze:
+        if analyze:
             # MariaDB uses ANALYZE instead of EXPLAIN ANALYZE.
             prefix = (
                 "ANALYZE" if self.connection.mysql_is_mariadb else prefix + " ANALYZE"
@@ -430,15 +409,11 @@ class DatabaseOperations(BaseDatabaseOperations):
     def on_conflict_suffix_sql(self, fields, on_conflict, update_fields, unique_fields):
         if on_conflict == OnConflict.UPDATE:
             conflict_suffix_sql = "ON DUPLICATE KEY UPDATE %(fields)s"
-            # The use of VALUES() is deprecated in MySQL 8.0.20+. Instead, use
-            # aliases for the new row and its columns available in MySQL
-            # 8.0.19+.
+            # The use of VALUES() is not supported in MySQL. Instead, use
+            # aliases for the new row and its columns.
             if not self.connection.mysql_is_mariadb:
-                if self.connection.mysql_version >= (8, 0, 19):
-                    conflict_suffix_sql = f"AS new {conflict_suffix_sql}"
-                    field_sql = "%(field)s = new.%(field)s"
-                else:
-                    field_sql = "%(field)s = VALUES(%(field)s)"
+                conflict_suffix_sql = f"AS new {conflict_suffix_sql}"
+                field_sql = "%(field)s = new.%(field)s"
             # Use VALUE() on MariaDB.
             else:
                 field_sql = "%(field)s = VALUE(%(field)s)"

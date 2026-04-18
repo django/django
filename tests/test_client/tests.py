@@ -25,7 +25,7 @@ import itertools
 import tempfile
 from unittest import mock
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission, User
 from django.core import mail
 from django.http import HttpResponse, HttpResponseNotAllowed
 from django.test import (
@@ -331,7 +331,9 @@ class ClientTest(TestCase):
         self.assertEqual(response.request["PATH_INFO"], "/accounts/login/")
 
     def test_follow_relative_redirect_no_trailing_slash(self):
-        "A URL with a relative redirect with no trailing slash can be followed."
+        """
+        A URL with a relative redirect with no trailing slash can be followed.
+        """
         response = self.client.get("/accounts/no_trailing_slash", follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.request["PATH_INFO"], "/accounts/login/")
@@ -681,7 +683,9 @@ class ClientTest(TestCase):
         ]
     )
     def test_view_with_inactive_force_login(self):
-        "Request a page that is protected with @login, but use an inactive login"
+        """
+        Request a page that is protected with @login, but use an inactive login
+        """
 
         # Get the page without logging in. Should result in 302.
         response = self.client.get("/login_protected_view/")
@@ -810,7 +814,15 @@ class ClientTest(TestCase):
             response, "/accounts/login/?next=/permission_protected_view/"
         )
 
-        # TODO: Log in with right permissions and request the page again
+        permission = Permission.objects.get(
+            content_type__app_label="auth", codename="add_user"
+        )
+        self.u1.user_permissions.add(permission)
+
+        # Request the page again. Access is granted.
+        response = self.client.get("/permission_protected_view/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["user"].username, "testclient")
 
     def test_view_with_permissions_exception(self):
         """
@@ -849,7 +861,15 @@ class ClientTest(TestCase):
             response, "/accounts/login/?next=/permission_protected_method_view/"
         )
 
-        # TODO: Log in with right permissions and request the page again
+        permission = Permission.objects.get(
+            content_type__app_label="auth", codename="add_user"
+        )
+        self.u1.user_permissions.add(permission)
+
+        # Request the page again. Access is granted.
+        response = self.client.get("/permission_protected_method_view/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["user"].username, "testclient")
 
     def test_external_redirect(self):
         response = self.client.get("/django_project_redirect/")
@@ -1033,6 +1053,13 @@ class ClientTest(TestCase):
                         query_params={"q": "terms"},
                     )
 
+    def test_follow_redirect_with_query_params(self):
+        response = self.client.get(
+            "/redirect_view/", query_params={"next": "x"}, follow=True
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.wsgi_request.get_full_path(), "/get_view/?next=x")
+
 
 @override_settings(
     MIDDLEWARE=["django.middleware.csrf.CsrfViewMiddleware"],
@@ -1172,8 +1199,11 @@ class RequestFactoryTest(SimpleTestCase):
         for method in tests:
             with self.subTest(method=method):
                 factory = getattr(self.request_factory, method)
-                request = factory("/somewhere", query_params={"example": "data"})
+                request = factory(
+                    "/somewhere", query_params={"example": "data", "empty": []}
+                )
                 self.assertEqual(request.GET["example"], "data")
+                self.assertNotIn("empty", request.GET)
 
 
 @override_settings(ROOT_URLCONF="test_client.urls")
@@ -1322,6 +1352,19 @@ class AsyncRequestFactoryTest(SimpleTestCase):
                 "X-Another-Header": "some other value",
             },
         )
+        self.assertEqual(request.headers["authorization"], "Bearer faketoken")
+        self.assertIn("HTTP_AUTHORIZATION", request.META)
+        self.assertEqual(request.headers["x-another-header"], "some other value")
+        self.assertIn("HTTP_X_ANOTHER_HEADER", request.META)
+
+    def test_async_request_factory_default_headers(self):
+        request_factory_with_headers = AsyncRequestFactory(
+            **{
+                "Authorization": "Bearer faketoken",
+                "X-Another-Header": "some other value",
+            }
+        )
+        request = request_factory_with_headers.get("/somewhere/")
         self.assertEqual(request.headers["authorization"], "Bearer faketoken")
         self.assertIn("HTTP_AUTHORIZATION", request.META)
         self.assertEqual(request.headers["x-another-header"], "some other value")

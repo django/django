@@ -18,7 +18,7 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
         klass = apps.get_model(label, model)
     except LookupError:
         raise Http404(
-            'You must supply a valid app label and module name.  Got "%s.%s"'
+            'You must supply a valid app label and module name. Got "%s.%s"'
             % (label, model)
         )
 

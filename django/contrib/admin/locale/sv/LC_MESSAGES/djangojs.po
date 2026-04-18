@@ -2,22 +2,28 @@
 #
 # Translators:
 # Anders Hovmöller <boxed@killingar.net>, 2023
-# Andreas Pelme <andreas@pelme.se>, 2012
+# Andreas Pelme <andreas@pelme.se>, 2012,2024
+# Danijel Grujicic, 2023
 # Danijel Grujicic, 2023
 # Elias Johnstone <eli87as@gmail.com>, 2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonathan Lindén, 2014
+# Jörgen Olofsson, 2024
+# Jörgen Olofsson, 2024
+# Jonathan Lindén, 2014
+# Mattias Benjaminsson <mattias@colourandcode.se>, 2011
 # Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
 # Mattias Benjaminsson <mattias@colourandcode.se>, 2011
 # Samuel Linde <samuel@linde.im>, 2011
+# Thomas Lundqvist, 2016
 # Thomas Lundqvist, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-04 07:59+0000\n"
-"Last-Translator: Danijel Grujicic, 2023\n"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-09-17 07:59+0000\n"
+"Last-Translator: Thomas Lundqvist, 2016\n"
 "Language-Team: Swedish (http://app.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -32,12 +38,8 @@ msgstr "Tillgängliga %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
-msgstr ""
-"Detta är listan med tillgängliga %s. Du kan välja ut vissa genom att markera "
-"dem i rutan nedan och sedan klicka på \"Välj\"-knapparna mellan de två "
-"rutorna."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
+msgstr "Välj %s genom att markera dem och sedan välja pilknappen \"Välj\"."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -46,18 +48,17 @@ msgstr "Skriv i denna ruta för att filtrera listan av tillgängliga %s."
 msgid "Filter"
 msgstr "Filter"
 
-msgid "Choose all"
-msgstr "Välj alla"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "Välj alla %s"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Klicka för att välja alla %s på en gång."
+msgid "Choose selected %s"
+msgstr "Välj vald %s"
 
-msgid "Choose"
-msgstr "Välj"
-
-msgid "Remove"
-msgstr "Ta bort"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "Ta bort markerad %s"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -65,28 +66,26 @@ msgstr "Välj %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Detta är listan med utvalda %s. Du kan ta bort vissa genom att markera dem i "
-"rutan nedan och sedan klicka på \"Ta bort\"-pilen mellan de två rutorna."
+"Ta bort %s genom att markera dem och sedan välja pilknappen \"Ta bort\"."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "Skriv i denna ruta för att filtrera listan av tillgängliga %s."
 
-msgid "Remove all"
-msgstr "Ta bort alla"
+msgid "(click to clear)"
+msgstr "(klicka för att rensa)"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Klicka för att ta bort alla valda %s på en gång."
+msgid "Remove all %s"
+msgstr "Ta bort alla %s"
 
 #, javascript-format
 msgid "%s selected option not visible"
 msgid_plural "%s selected options not visible"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%s valt alternativ inte synligt"
+msgstr[1] "%s valda alternativ inte synliga"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -250,53 +249,53 @@ msgid "Dec"
 msgstr "dec"
 
 msgid "Sunday"
-msgstr ""
+msgstr "Söndag"
 
 msgid "Monday"
-msgstr ""
+msgstr "Måndag"
 
 msgid "Tuesday"
-msgstr ""
+msgstr "Tisdag"
 
 msgid "Wednesday"
-msgstr ""
+msgstr "Onsdag"
 
 msgid "Thursday"
-msgstr ""
+msgstr "Torsdag"
 
 msgid "Friday"
-msgstr ""
+msgstr "Fredag"
 
 msgid "Saturday"
-msgstr ""
+msgstr "Lördag"
 
 msgctxt "abbrev. day Sunday"
 msgid "Sun"
-msgstr ""
+msgstr "sön"
 
 msgctxt "abbrev. day Monday"
 msgid "Mon"
-msgstr ""
+msgstr "mån"
 
 msgctxt "abbrev. day Tuesday"
 msgid "Tue"
-msgstr ""
+msgstr "tis"
 
 msgctxt "abbrev. day Wednesday"
 msgid "Wed"
-msgstr ""
+msgstr "ons"
 
 msgctxt "abbrev. day Thursday"
 msgid "Thur"
-msgstr ""
+msgstr "tors"
 
 msgctxt "abbrev. day Friday"
 msgid "Fri"
-msgstr ""
+msgstr "fre"
 
 msgctxt "abbrev. day Saturday"
 msgid "Sat"
-msgstr ""
+msgstr "lör"
 
 msgctxt "one letter Sunday"
 msgid "S"
@@ -325,9 +324,3 @@ msgstr "F"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "L"
-
-msgid "Show"
-msgstr "Visa"
-
-msgid "Hide"
-msgstr "Göm"

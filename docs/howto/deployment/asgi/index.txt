@@ -17,6 +17,7 @@ Django includes getting-started documentation for the following ASGI servers:
    :maxdepth: 1
 
    daphne
+   granian
    hypercorn
    uvicorn
 

@@ -36,6 +36,424 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+April 7, 2026 - :cve:`2026-3902`
+--------------------------------
+
+ASGI header spoofing via underscore/hyphen conflation.
+`Full description
+<https://www.djangoproject.com/weblog/2026/apr/07/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <a623c3982857e80324448f85c7faf9a6710330ef>`
+* Django 5.2 :commit:`(patch) <1cc2a7612f97c109b92415fc11ba9bd0501852e0>`
+* Django 4.2 :commit:`(patch) <4412731aa64d62a6dd7edae79e0c15b72666d7ca>`
+
+April 7, 2026 - :cve:`2026-4277`
+--------------------------------
+
+Privilege abuse in ``GenericInlineModelAdmin``.
+`Full description
+<https://www.djangoproject.com/weblog/2026/apr/07/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <08a752c1cd8f378b4c64d96c319da23726df6ed3>`
+* Django 5.2 :commit:`(patch) <60ffa957c427e10a2eb0fc80d1674a8a8ccc30b0>`
+* Django 4.2 :commit:`(patch) <051f3909e820360bbe84a21350e82f4961e3d917>`
+
+April 7, 2026 - :cve:`2026-4292`
+--------------------------------
+
+Privilege abuse in ``ModelAdmin.list_editable``.
+`Full description
+<https://www.djangoproject.com/weblog/2026/apr/07/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <428c48f358c5a0ed5ca2834fb721d615eb2b0e11>`
+* Django 5.2 :commit:`(patch) <397c22048244db2cd4bb78f570e6c72a3967bf36>`
+* Django 4.2 :commit:`(patch) <abfe1a1c57a57cfaf6dd4a0571c029401a0fe743>`
+
+April 7, 2026 - :cve:`2026-33033`
+---------------------------------
+
+Potential denial-of-service vulnerability in ``MultiPartParser`` via
+base64-encoded file upload.
+`Full description
+<https://www.djangoproject.com/weblog/2026/apr/07/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <0910af60468216c856dfbcac1177372c225deb76>`
+* Django 5.2 :commit:`(patch) <0b467893bdde69a2d23034338e76021a1e4f4322>`
+* Django 4.2 :commit:`(patch) <f13c20f81b56108ac477213fa5ada2524b5e5c98>`
+
+April 7, 2026 - :cve:`2026-33034`
+---------------------------------
+
+Potential denial-of-service vulnerability in ASGI requests via memory upload
+limit bypass.
+`Full description
+<https://www.djangoproject.com/weblog/2026/apr/07/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <393dbc53e848876fdba92fbf02e10ee6a6eace6b>`
+* Django 5.2 :commit:`(patch) <49e1e2b548999a35a025f9682598946bda9e9921>`
+* Django 4.2 :commit:`(patch) <ed4dfda62718a0bb644b80ac8b1d3099861f2295>`
+
+March 3, 2026 - :cve:`2026-25673`
+---------------------------------
+
+Potential denial-of-service vulnerability in ``URLField`` via Unicode
+normalization on Windows.
+`Full description
+<https://www.djangoproject.com/weblog/2026/mar/03/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <b1444d9acf43db9de96e0da2b4737ad56af0eb76>`
+* Django 5.2 :commit:`(patch) <4d3c184686626d224d9a87451410ecf802b41f7c>`
+* Django 4.2 :commit:`(patch) <b3e8ec8cc310489fe80174b14b11edb970d682ea>`
+
+March 3, 2026 - :cve:`2026-25674`
+---------------------------------
+
+Potential incorrect permissions on newly created file system objects.
+`Full description
+<https://www.djangoproject.com/weblog/2026/mar/03/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <264d5c70ef3281a8869cb2ad45a3a52d5adbe790>`
+* Django 5.2 :commit:`(patch) <b07ed2a1e445efde54fc64cb8c37e0f4f7fe53e5>`
+* Django 4.2 :commit:`(patch) <54b50bf7d6dcbf02d4c01f853627cc9299d4934d>`
+
+February 3, 2026 - :cve:`2025-13473`
+------------------------------------
+
+Username enumeration through timing difference in mod_wsgi authentication
+handler.
+`Full description
+<https://www.djangoproject.com/weblog/2026/feb/03/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <d72cc3be3be0bbebdcaea5a8c8106b4d6f2a32bd>`
+* Django 5.2 :commit:`(patch) <184e38ab0a061c365f5775676a074796d8abd02f>`
+* Django 4.2 :commit:`(patch) <6dc23508f3395e1254c315084c7334ef81c4c09a>`
+
+February 3, 2026 - :cve:`2025-14550`
+------------------------------------
+
+Potential denial-of-service vulnerability via repeated headers when using ASGI.
+`Full description
+<https://www.djangoproject.com/weblog/2026/feb/03/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <972dbdd4f7f69e9c405e6fe12a1b90e4713c1611>`
+* Django 5.2 :commit:`(patch) <1ba90069c12836db46981bdf75b0e661db5849ce>`
+* Django 4.2 :commit:`(patch) <f578acc8c54530fffabd52d2db654c8669b011af>`
+
+February 3, 2026 - :cve:`2026-1207`
+-----------------------------------
+
+Potential SQL injection via raster lookups on PostGIS.
+`Full description
+<https://www.djangoproject.com/weblog/2026/feb/03/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <8f77e7301174834573614ae90e1826fdf27f8a24>`
+* Django 5.2 :commit:`(patch) <17a1d64a58ef24c0c3b78d66d86f5415075f18f0>`
+* Django 4.2 :commit:`(patch) <a14363102d98fa29b8cced578eb3a0fadaa5bcb7>`
+
+February 3, 2026 - :cve:`2026-1285`
+-----------------------------------
+
+Potential denial-of-service vulnerability in ``django.utils.text.Truncator``
+HTML methods.
+`Full description
+<https://www.djangoproject.com/weblog/2026/feb/03/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <4b86ba51e486530db982341a23e53c7a1e1e6e71>`
+* Django 5.2 :commit:`(patch) <9f2ada875bbee62ac46032e38ddb22755d67ae5a>`
+* Django 4.2 :commit:`(patch) <b40cfc6052ced26dcd8166a58ea6f841d0d2cac8>`
+
+February 3, 2026 - :cve:`2026-1287`
+-----------------------------------
+
+Potential SQL injection in column aliases via control characters.
+`Full description
+<https://www.djangoproject.com/weblog/2026/feb/03/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <0c0f5c2178c01ada5410cd53b4b207bf7858b952>`
+* Django 5.2 :commit:`(patch) <3e68ccdc11c127758745ddf0b4954990b14892bc>`
+* Django 4.2 :commit:`(patch) <f75f8f3597e1ce351d5ac08b6ba7ebd9dadd9b5d>`
+
+February 3, 2026 - :cve:`2026-1312`
+-----------------------------------
+
+Potential SQL injection via ``QuerySet.order_by`` and ``FilteredRelation``.
+`Full description
+<https://www.djangoproject.com/weblog/2026/feb/03/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <15e70cb83e6f7a9a2a2f651f30b28b5cb20febeb>`
+* Django 5.2 :commit:`(patch) <e863ee273c6553e9b6fa4960a17acb535851857b>`
+* Django 4.2 :commit:`(patch) <90f5b10784ba5bf369caed87640e2b4394ea3314>`
+
+December 2, 2025 - :cve:`2025-13372`
+------------------------------------
+
+Potential SQL injection in ``FilteredRelation`` column aliases on PostgreSQL.
+`Full description
+<https://www.djangoproject.com/weblog/2025/dec/02/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <56aea00c3c5e1aacf4ed05f8ee06c2e78f02cea0>`
+* Django 5.2 :commit:`(patch) <479415ce5249bcdebeb6570c72df2a87f45a7bbf>`
+* Django 5.1 :commit:`(patch) <9c6a5bde24240382807d13bc3748d08444709355>`
+* Django 4.2 :commit:`(patch) <f997037b235f6b5c9e7c4a501491ec45f3400f3d>`
+
+December 2, 2025 - :cve:`2025-64460`
+------------------------------------
+
+Potential denial-of-service vulnerability in XML serializer text extraction.
+`Full description
+<https://www.djangoproject.com/weblog/2025/dec/02/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <1dbd07a608e495a0c229edaaf84d58d8976313b5>`
+* Django 5.2 :commit:`(patch) <99e7d22f55497278d0bcb2e15e72ef532e62a31d>`
+* Django 5.1 :commit:`(patch) <0db9ea4669312f1f4973e09f4bca06ab9c1ec74b>`
+* Django 4.2 :commit:`(patch) <4d2b8803bebcdefd2b76e9e8fc528d5fddea93f0>`
+
+November 5, 2025 - :cve:`2025-64458`
+------------------------------------
+
+Potential denial-of-service vulnerability in ``HttpResponseRedirect`` and
+``HttpResponsePermanentRedirect`` on Windows. `Full description
+<https://www.djangoproject.com/weblog/2025/nov/05/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <6e13348436fccf8f22982921d6a3a3e65c956a9f>`
+* Django 5.2 :commit:`(patch) <4f5d904b63751dea9ffc3b0e046404a7fa5881ac>`
+* Django 5.1 :commit:`(patch) <3790593781d26168e7306b5b2f8ea0309de16242>`
+* Django 4.2 :commit:`(patch) <770eea38d7a0e9ba9455140b5a9a9e33618226a7>`
+
+November 5, 2025 - :cve:`2025-64459`
+------------------------------------
+
+Potential SQL injection via ``_connector`` keyword argument in ``QuerySet`` and
+``Q`` objects. `Full description
+<https://www.djangoproject.com/weblog/2025/nov/05/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <06dd38324ac3d60d83d9f3adabf0dcdf423d2a85>`
+* Django 5.2 :commit:`(patch) <6703f364d767e949c5b0e4016433ef75063b4f9b>`
+* Django 5.1 :commit:`(patch) <72d2c87431f2ae0431d65d0ec792047f078c8241>`
+* Django 4.2 :commit:`(patch) <59ae82e67053d281ff4562a24bbba21299f0a7d4>`
+
+October 1, 2025 - :cve:`2025-59681`
+-----------------------------------
+
+Potential SQL injection in ``QuerySet.annotate()``, ``alias()``,
+``aggregate()``, and ``extra()`` on MySQL and MariaDB. `Full description
+<https://www.djangoproject.com/weblog/2025/oct/01/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <4ceaaee7e04b416fc465e838a6ef43ca0ccffafe>`
+* Django 5.2 :commit:`(patch) <52fbae0a4dbbe5faa59827f8f05694a0065cc135>`
+* Django 5.1 :commit:`(patch) <01d2d770e22bffe53c7f1e611e2bbca94cb8a2e7>`
+* Django 4.2 :commit:`(patch) <38d9ef8c7b5cb6ef51b933e51a20e0e0063f33d5>`
+
+October 1, 2025 - :cve:`2025-59682`
+-----------------------------------
+
+Potential partial directory-traversal via ``archive.extract()``.
+`Full description
+<https://www.djangoproject.com/weblog/2025/oct/01/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <af067f56c1dd467df4abd0ddd409a700da1f03ba>`
+* Django 5.2 :commit:`(patch) <ed8fc39d77465eddbde1191a054ae965f6a8a584>`
+* Django 5.1 :commit:`(patch) <74fa85c688a87224637155902bcd738bb9e65e11>`
+* Django 4.2 :commit:`(patch) <9504bbaa392c9fe37eee9291f5b4c29eb6037619>`
+
+September 3, 2025 - :cve:`2025-57833`
+-------------------------------------
+
+Potential SQL injection in ``FilteredRelation`` column aliases.
+`Full description
+<https://www.djangoproject.com/weblog/2025/sep/03/security-releases/>`__
+
+* Django 5.2 :commit:`(patch) <4c044fcc866ec226f612c475950b690b0139d243>`
+* Django 5.1 :commit:`(patch) <102965ea93072fe3c39a30be437c683ec1106ef5>`
+* Django 4.2 :commit:`(patch) <31334e6965ad136a5e369993b01721499c5d1a92>`
+
+June 4, 2025 - :cve:`2025-48432`
+--------------------------------
+
+Potential log injection via unescaped request path.
+`Full description
+<https://www.djangoproject.com/weblog/2025/jun/04/security-releases/>`__
+
+* Django 5.2 :commit:`(patch) <7456aa23dafa149e65e62f95a6550cdb241d55ad>`
+* Django 5.1 :commit:`(patch) <596542ddb46cdabe011322917e1655f0d24eece2>`
+* Django 4.2 :commit:`(patch) <ac03c5e7df8680c61cdb0d3bdb8be9095dba841e>`
+
+There was an additional hardening with new patch releases published on June 10,
+2025. `Full description
+<https://www.djangoproject.com/weblog/2025/jun/10/bugfix-releases/>`__
+
+* Django 5.2.3 :commit:`(patch) <8fcc83953c350e158a484bf1da0aa1b79b69bb07>`
+* Django 5.1.11 :commit:`(patch) <31f4bd31fa16f7f5302f65b9b8b7a49b69a7c4a6>`
+* Django 4.2.23 :commit:`(patch) <b597d46bb19c8567615e62029210dab16c70db7d>`
+
+May 7, 2025 - :cve:`2025-32873`
+-------------------------------
+
+Denial-of-service possibility in ``strip_tags()``.
+`Full description
+<https://www.djangoproject.com/weblog/2025/may/07/security-releases/>`__
+
+* Django 5.2 :commit:`(patch) <c9731dc656e533187b021b4d81f8293d6c943a43>`
+* Django 5.1 :commit:`(patch) <0b42f6a528df966729b24ecaaed67f85e5edc3dc>`
+* Django 4.2 :commit:`(patch) <9cd8028f3e38dca8e51c1388f474eecbe7d6ca3c>`
+
+April 2, 2025 - :cve:`2025-27556`
+---------------------------------
+
+Potential denial-of-service vulnerability in ``LoginView``, ``LogoutView``, and
+``set_language()`` on Windows. `Full description
+<https://www.djangoproject.com/weblog/2025/apr/02/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <edc2716d01a6fdd84b173c02031695231bcee1f8>`
+* Django 5.0 :commit:`(patch) <8c6871b097b6c49d2a782c0d80d908bcbe2116f1>`
+
+March 6, 2025 - :cve:`2025-26699`
+---------------------------------
+
+Potential denial-of-service in ``django.utils.text.wrap()``.
+`Full description
+<https://www.djangoproject.com/weblog/2025/mar/06/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <8dbb44d34271637099258391dfc79df33951b841>`
+* Django 5.0 :commit:`(patch) <4f2765232336b8ad0afd8017d9d912ae93470017>`
+* Django 4.2 :commit:`(patch) <e88f7376fe68dbf4ebaf11fad1513ce700b45860>`
+
+January 14, 2025 - :cve:`2024-56374`
+------------------------------------
+
+Potential denial-of-service vulnerability in IPv6 validation.
+`Full description
+<https://www.djangoproject.com/weblog/2025/jan/14/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <4806731e58f3e8700a3c802e77899d54ac6021fe>`
+* Django 5.0 :commit:`(patch) <e8d4a2005955dcf962193600b53bf461b190b455>`
+* Django 4.2 :commit:`(patch) <ad866a1ca3e7d60da888d25d27e46a8adb2ed36e>`
+
+December 4, 2024 - :cve:`2024-53907`
+------------------------------------
+
+Potential denial-of-service in ``django.utils.html.strip_tags()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/dec/04/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <bbc74a7f7eb7335e913bdb4787f22e83a9be947e>`
+* Django 5.0 :commit:`(patch) <a5a89ea28cc550c1b29b03f9e14ef3c128ec1e84>`
+* Django 4.2 :commit:`(patch) <790eb058b0716c536a2f2e8d1c6d5079d776c22b>`
+
+December 4, 2024 - :cve:`2024-53908`
+------------------------------------
+
+Potential SQL injection in ``HasKey(lhs, rhs)`` on Oracle.
+`Full description
+<https://www.djangoproject.com/weblog/2024/dec/04/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <6943d61818e63e77b65d8b1ae65941e8f04bd87b>`
+* Django 5.0 :commit:`(patch) <ff08bb6c70aa45f83a5ef3bd0b601c7c9d1a7642>`
+* Django 4.2 :commit:`(patch) <7376bcbf508883282ffcc0f0fac5cf0ed2d6cbc5>`
+
+September 3, 2024 - :cve:`2024-45231`
+-------------------------------------
+
+Potential user email enumeration via response status on password reset.
+`Full description
+<https://www.djangoproject.com/weblog/2024/sep/03/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <3c733c78d6f8e50296d6e248968b6516c92a53ca>`
+* Django 5.0 :commit:`(patch) <96d84047715ea1715b4bd1594e46122b8a77b9e2>`
+* Django 4.2 :commit:`(patch) <bf4888d317ba4506d091eeac6e8b4f1fcc731199>`
+
+September 3, 2024 - :cve:`2024-45230`
+-------------------------------------
+
+Potential denial-of-service vulnerability in ``django.utils.html.urlize()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/sep/03/security-releases/>`__
+
+* Django 5.1 :commit:`(patch) <022ab0a75c76ab2ea31dfcc5f2cf5501e378d397>`
+* Django 5.0 :commit:`(patch) <813de2672bd7361e9a453ab62cd6e52f96b6525b>`
+* Django 4.2 :commit:`(patch) <d147a8ebbdf28c17cafbbe2884f0bc57e2bf82e2>`
+
+August 6, 2024 - :cve:`2024-42005`
+----------------------------------
+
+Potential SQL injection in ``QuerySet.values()`` and ``values_list()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/aug/06/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <32ebcbf2e1fe3e5ba79a6554a167efce81f7422d>`
+* Django 4.2 :commit:`(patch) <f4af67b9b41e0f4c117a8741da3abbd1c869ab28>`
+
+August 6, 2024 - :cve:`2024-41991`
+----------------------------------
+
+Potential denial-of-service vulnerability in ``django.utils.html.urlize()`` and
+``AdminURLFieldWidget``. `Full description
+<https://www.djangoproject.com/weblog/2024/aug/06/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <523da8771bce321023f490f70d71a9e973ddc927>`
+* Django 4.2 :commit:`(patch) <efea1ef7e2190e3f77ca0651b5458297bc0f6a9f>`
+
+August 6, 2024 - :cve:`2024-41990`
+----------------------------------
+
+Potential denial-of-service vulnerability in ``django.utils.html.urlize()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/aug/06/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <7b7b909579c8311c140c89b8a9431bf537febf93>`
+* Django 4.2 :commit:`(patch) <d0a82e26a74940bf0c78204933c3bdd6a283eb88>`
+
+August 6, 2024 - :cve:`2024-41989`
+----------------------------------
+
+Potential memory exhaustion in ``django.utils.numberformat.floatformat()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/aug/06/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <27900fe56f3d3cabb4aeb6ccb82f92bab29073a8>`
+* Django 4.2 :commit:`(patch) <fc76660f589ac07e45e9cd34ccb8087aeb11904b>`
+
+July 9, 2024 - :cve:`2024-39614`
+--------------------------------
+
+Potential denial-of-service in
+``django.utils.translation.get_supported_language_variant()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/jul/09/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <8e7a44e4bec0f11474699c3111a5e0a45afe7f49>`
+* Django 4.2 :commit:`(patch) <17358fb35fb7217423d4c4877ccb6d1a3a40b1c3>`
+
+July 9, 2024 - :cve:`2024-39330`
+--------------------------------
+
+Potential directory-traversal in ``django.core.files.storage.Storage.save()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/jul/09/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <9f4f63e9ebb7bf6cb9547ee4e2526b9b96703270>`
+* Django 4.2 :commit:`(patch) <2b00edc0151a660d1eb86da4059904a0fc4e095e>`
+
+July 9, 2024 - :cve:`2024-39329`
+--------------------------------
+
+Username enumeration through timing difference for users with unusable
+passwords. `Full description
+<https://www.djangoproject.com/weblog/2024/jul/09/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <07cefdee4a9d1fcd9a3a631cbd07c78defd1923b>`
+* Django 4.2 :commit:`(patch) <156d3186c96e3ec2ca73b8b25dc2ef366e38df14>`
+
+July 9, 2024 - :cve:`2024-38875`
+--------------------------------
+
+Potential denial-of-service in ``django.utils.html.urlize()``.
+`Full description
+<https://www.djangoproject.com/weblog/2024/jul/09/security-releases/>`__
+
+* Django 5.0 :commit:`(patch) <7285644640f085f41d60ab0c8ae4e9153f0485db>`
+* Django 4.2 :commit:`(patch) <79f368764295df109a37192f6182fb6f361d85b5>`
+
 March 4, 2024 - :cve:`2024-27351`
 ---------------------------------
 
@@ -526,8 +944,9 @@ Versions affected
 August 1, 2019 - :cve:`2019-14232`
 ----------------------------------
 
-Denial-of-service possibility in ``django.utils.text.Truncator``. `Full
-description <https://www.djangoproject.com/weblog/2019/aug/01/security-releases/>`__
+Denial-of-service possibility in ``django.utils.text.Truncator``.
+`Full description
+<https://www.djangoproject.com/weblog/2019/aug/01/security-releases/>`__
 
 Versions affected
 ~~~~~~~~~~~~~~~~~
@@ -539,8 +958,9 @@ Versions affected
 July 1, 2019 - :cve:`2019-12781`
 --------------------------------
 
-Incorrect HTTP detection with reverse-proxy connecting via HTTPS. `Full
-description <https://www.djangoproject.com/weblog/2019/jul/01/security-releases/>`__
+Incorrect HTTP detection with reverse-proxy connecting via HTTPS.
+`Full description
+<https://www.djangoproject.com/weblog/2019/jul/01/security-releases/>`__
 
 Versions affected
 ~~~~~~~~~~~~~~~~~
@@ -552,8 +972,9 @@ Versions affected
 June 3, 2019 - :cve:`2019-12308`
 --------------------------------
 
-XSS via "Current URL" link generated by ``AdminURLFieldWidget``. `Full
-description <https://www.djangoproject.com/weblog/2019/jun/03/security-releases/>`__
+XSS via "Current URL" link generated by ``AdminURLFieldWidget``.
+`Full description
+<https://www.djangoproject.com/weblog/2019/jun/03/security-releases/>`__
 
 Versions affected
 ~~~~~~~~~~~~~~~~~
@@ -668,8 +1089,9 @@ Versions affected
 September 5, 2017 - :cve:`2017-12794`
 -------------------------------------
 
-Possible XSS in traceback section of technical 500 debug page. `Full
-description <https://www.djangoproject.com/weblog/2017/sep/05/security-releases/>`__
+Possible XSS in traceback section of technical 500 debug page.
+`Full description
+<https://www.djangoproject.com/weblog/2017/sep/05/security-releases/>`__
 
 Versions affected
 ~~~~~~~~~~~~~~~~~
@@ -680,8 +1102,9 @@ Versions affected
 April 4, 2017 - :cve:`2017-7234`
 --------------------------------
 
-Open redirect vulnerability in ``django.views.static.serve()``. `Full
-description <https://www.djangoproject.com/weblog/2017/apr/04/security-releases/>`__
+Open redirect vulnerability in ``django.views.static.serve()``.
+`Full description
+<https://www.djangoproject.com/weblog/2017/apr/04/security-releases/>`__
 
 Versions affected
 ~~~~~~~~~~~~~~~~~
@@ -694,7 +1117,8 @@ April 4, 2017 - :cve:`2017-7233`
 --------------------------------
 
 Open redirect and possible XSS attack via user-supplied numeric redirect URLs.
-`Full description <https://www.djangoproject.com/weblog/2017/apr/04/security-releases/>`__
+`Full description
+<https://www.djangoproject.com/weblog/2017/apr/04/security-releases/>`__
 
 Versions affected
 ~~~~~~~~~~~~~~~~~
@@ -719,8 +1143,9 @@ Versions affected
 November 1, 2016 - :cve:`2016-9013`
 -----------------------------------
 
-User with hardcoded password created when running tests on Oracle. `Full
-description <https://www.djangoproject.com/weblog/2016/nov/01/security-releases/>`__
+User with hardcoded password created when running tests on Oracle.
+`Full description
+<https://www.djangoproject.com/weblog/2016/nov/01/security-releases/>`__
 
 Versions affected
 ~~~~~~~~~~~~~~~~~
@@ -807,7 +1232,8 @@ August 18, 2015 - :cve:`2015-5963` / :cve:`2015-5964`
 -----------------------------------------------------
 
 Denial-of-service possibility in ``logout()`` view by filling session store.
-`Full description <https://www.djangoproject.com/weblog/2015/aug/18/security-releases/>`__
+`Full description
+<https://www.djangoproject.com/weblog/2015/aug/18/security-releases/>`__
 
 Versions affected
 ~~~~~~~~~~~~~~~~~
@@ -830,8 +1256,9 @@ Versions affected
 July 8, 2015 - :cve:`2015-5144`
 -------------------------------
 
-Header injection possibility since validators accept newlines in input. `Full
-description <https://www.djangoproject.com/weblog/2015/jul/08/security-releases/>`__
+Header injection possibility since validators accept newlines in input.
+`Full description
+<https://www.djangoproject.com/weblog/2015/jul/08/security-releases/>`__
 
 Versions affected
 ~~~~~~~~~~~~~~~~~
@@ -843,8 +1270,9 @@ Versions affected
 July 8, 2015 - :cve:`2015-5143`
 -------------------------------
 
-Denial-of-service possibility by filling session store. `Full
-description <https://www.djangoproject.com/weblog/2015/jul/08/security-releases/>`__
+Denial-of-service possibility by filling session store.
+`Full description
+<https://www.djangoproject.com/weblog/2015/jul/08/security-releases/>`__
 
 Versions affected
 ~~~~~~~~~~~~~~~~~
@@ -867,8 +1295,9 @@ Versions affected
 March 18, 2015 - :cve:`2015-2317`
 ---------------------------------
 
-Mitigated possible XSS attack via user-supplied redirect URLs. `Full
-description <https://www.djangoproject.com/weblog/2015/mar/18/security-releases/>`__
+Mitigated possible XSS attack via user-supplied redirect URLs.
+`Full description
+<https://www.djangoproject.com/weblog/2015/mar/18/security-releases/>`__
 
 Versions affected
 ~~~~~~~~~~~~~~~~~
@@ -958,7 +1387,8 @@ August 20, 2014 - :cve:`2014-0483`
 ----------------------------------
 
 Data leakage via querystring manipulation in admin.
-`Full description <https://www.djangoproject.com/weblog/2014/aug/20/security/>`__
+`Full description
+<https://www.djangoproject.com/weblog/2014/aug/20/security/>`__
 
 Versions affected
 ~~~~~~~~~~~~~~~~~
@@ -1089,7 +1519,8 @@ Denial-of-service via large passwords. `Full description
 Versions affected
 ~~~~~~~~~~~~~~~~~
 
-* Django 1.4 :commit:`(patch <3f3d887a6844ec2db743fee64c9e53e04d39a368>` and :commit:`Python compatibility fix) <6903d1690a92aa040adfb0c8eb37cf62e4206714>`
+* Django 1.4 :commit:`(patch <3f3d887a6844ec2db743fee64c9e53e04d39a368>` and
+  :commit:`Python compatibility fix) <6903d1690a92aa040adfb0c8eb37cf62e4206714>`
 * Django 1.5 :commit:`(patch) <22b74fa09d7ccbc8c52270d648a0da7f3f0fa2bc>`
 
 September 10, 2013 - :cve:`2013-4315`
@@ -1381,7 +1812,7 @@ Versions affected
 
 * Django 1.2 :commit:`(patch) <7f84657b6b2243cc787bdb9f296710c8d13ad0bd>`
 
-October 9, 2009 - :cve:`2009-3965`
+October 9, 2009 - :cve:`2009-3695`
 ----------------------------------
 
 Denial-of-service via pathological regular expression performance. `Full

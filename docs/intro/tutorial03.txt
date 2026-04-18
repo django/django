@@ -2,8 +2,8 @@
 Writing your first Django app, part 3
 =====================================
 
-This tutorial begins where :doc:`Tutorial 2 </intro/tutorial02>` left off. We're
-continuing the web-poll application and will focus on creating the public
+This tutorial begins where :doc:`Tutorial 2 </intro/tutorial02>` left off.
+We're continuing the web-poll application and will focus on creating the public
 interface -- "views."
 
 .. admonition:: Where to get help:
@@ -51,8 +51,8 @@ the part of the URL after the domain name).
 
 Now in your time on the web you may have come across such beauties as
 ``ME2/Sites/dirmod.htm?sid=&type=gen&mod=Core+Pages&gid=A6CD4967199A42D9B65B1B``.
-You will be pleased to know that Django allows us much more elegant
-*URL patterns* than that.
+You will be pleased to know that Django allows us much more elegant *URL
+patterns* than that.
 
 A URL pattern is the general form of a URL - for example:
 ``/newsarchive/<year>/<month>/``.
@@ -135,8 +135,8 @@ Write views that actually do something
 
 Each view is responsible for doing one of two things: returning an
 :class:`~django.http.HttpResponse` object containing the content for the
-requested page, or raising an exception such as :exc:`~django.http.Http404`. The
-rest is up to you.
+requested page, or raising an exception such as :exc:`~django.http.Http404`.
+The rest is up to you.
 
 Your view can read records from a database, or not. It can use a template
 system such as Django's -- or a third-party Python template system -- or not.
@@ -166,10 +166,10 @@ commas, according to publication date:
 
     # Leave the rest of the views (detail, results, vote) unchanged
 
-There's a problem here, though: the page's design is hard-coded in the view. If
-you want to change the way the page looks, you'll have to edit this Python code.
-So let's use Django's template system to separate the design from Python by
-creating a template that the view can use.
+There's a problem here, though: the page's design is hardcoded in the view. If
+you want to change the way the page looks, you'll have to edit this Python
+code. So let's use Django's template system to separate the design from Python
+by creating a template that the view can use.
 
 First, create a directory called ``templates`` in your ``polls`` directory.
 Django will look for templates in there.
@@ -234,9 +234,7 @@ Now let's update our ``index`` view in ``polls/views.py`` to use the template:
     def index(request):
         latest_question_list = Question.objects.order_by("-pub_date")[:5]
         template = loader.get_template("polls/index.html")
-        context = {
-            "latest_question_list": latest_question_list,
-        }
+        context = {"latest_question_list": latest_question_list}
         return HttpResponse(template.render(context, request))
 
 That code loads the template called  ``polls/index.html`` and passes it a
@@ -270,8 +268,8 @@ rewritten:
 
 Note that once we've done this in all these views, we no longer need to import
 :mod:`~django.template.loader` and :class:`~django.http.HttpResponse` (you'll
-want to keep ``HttpResponse`` if you still have the stub methods for ``detail``,
-``results``, and ``vote``).
+want to keep ``HttpResponse`` if you still have the stub methods for
+``detail``, ``results``, and ``vote``).
 
 The :func:`~django.shortcuts.render` function takes the request object as its
 first argument, a template name as its second argument and a dictionary as its
@@ -281,8 +279,8 @@ object of the given template rendered with the given context.
 Raising a 404 error
 ===================
 
-Now, let's tackle the question detail view -- the page that displays the question text
-for a given poll. Here's the view:
+Now, let's tackle the question detail view -- the page that displays the
+question text for a given poll. Here's the view:
 
 .. code-block:: python
     :caption: ``polls/views.py``
@@ -363,8 +361,8 @@ Use the template system
 =======================
 
 Back to the ``detail()`` view for our poll application. Given the context
-variable ``question``, here's what the ``polls/detail.html`` template might look
-like:
+variable ``question``, here's what the ``polls/detail.html`` template might
+look like:
 
 .. code-block:: html+django
     :caption: ``polls/templates/polls/detail.html``
@@ -377,15 +375,15 @@ like:
     </ul>
 
 The template system uses dot-lookup syntax to access variable attributes. In
-the example of ``{{ question.question_text }}``, first Django does a dictionary lookup
-on the object ``question``. Failing that, it tries an attribute lookup -- which
-works, in this case. If attribute lookup had failed, it would've tried a
-list-index lookup.
+the example of ``{{ question.question_text }}``, first Django does a dictionary
+lookup on the object ``question``. Failing that, it tries an attribute lookup
+-- which works, in this case. If attribute lookup had failed, it would've tried
+a list-index lookup.
 
 Method-calling happens in the :ttag:`{% for %}<for>` loop:
 ``question.choice_set.all`` is interpreted as the Python code
-``question.choice_set.all()``, which returns an iterable of ``Choice`` objects and is
-suitable for use in the :ttag:`{% for %}<for>` tag.
+``question.choice_set.all()``, which returns an iterable of ``Choice`` objects
+and is suitable for use in the :ttag:`{% for %}<for>` tag.
 
 See the :doc:`template guide </topics/templates>` for more about templates.
 

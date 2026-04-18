@@ -26,17 +26,6 @@ class BaseFinder:
             "configured correctly."
         )
 
-    def find(self, path, all=False):
-        """
-        Given a relative file path, find an absolute file path.
-
-        If the ``all`` parameter is False (default) return only the first found
-        file path; if True, return a list of all found files paths.
-        """
-        raise NotImplementedError(
-            "subclasses of BaseFinder must provide a find() method"
-        )
-
     def list(self, ignore_patterns):
         """
         Given an optional list of paths to ignore, return a two item iterable
@@ -113,7 +102,7 @@ class FileSystemFinder(BaseFinder):
                 )
         return errors
 
-    def find(self, path, all=False):
+    def find(self, path, find_all=False):
         """
         Look for files in the extra locations as defined in STATICFILES_DIRS.
         """
@@ -123,7 +112,7 @@ class FileSystemFinder(BaseFinder):
                 searched_locations.append(root)
             matched_path = self.find_location(root, path, prefix)
             if matched_path:
-                if not all:
+                if not find_all:
                     return matched_path
                 matches.append(matched_path)
         return matches
@@ -191,7 +180,7 @@ class AppDirectoriesFinder(BaseFinder):
                 for path in utils.get_files(storage, ignore_patterns):
                     yield path, storage
 
-    def find(self, path, all=False):
+    def find(self, path, find_all=False):
         """
         Look for files in the app directories.
         """
@@ -202,7 +191,7 @@ class AppDirectoriesFinder(BaseFinder):
                 searched_locations.append(app_location)
             match = self.find_in_app(app, path)
             if match:
-                if not all:
+                if not find_all:
                     return match
                 matches.append(match)
         return matches
@@ -241,7 +230,7 @@ class BaseStorageFinder(BaseFinder):
             self.storage = self.storage()
         super().__init__(*args, **kwargs)
 
-    def find(self, path, all=False):
+    def find(self, path, find_all=False):
         """
         Look for files in the default file storage, if it's local.
         """
@@ -254,7 +243,7 @@ class BaseStorageFinder(BaseFinder):
                 searched_locations.append(self.storage.location)
             if self.storage.exists(path):
                 match = self.storage.path(path)
-                if all:
+                if find_all:
                     match = [match]
                 return match
         return []
@@ -285,18 +274,18 @@ class DefaultStorageFinder(BaseStorageFinder):
             )
 
 
-def find(path, all=False):
+def find(path, find_all=False):
     """
     Find a static file with the given path using all enabled finders.
 
-    If ``all`` is ``False`` (default), return the first matching
+    If ``find_all`` is ``False`` (default), return the first matching
     absolute path (or ``None`` if no match). Otherwise return a list.
     """
     searched_locations[:] = []
     matches = []
     for finder in get_finders():
-        result = finder.find(path, all=all)
-        if not all and result:
+        result = finder.find(path, find_all=find_all)
+        if not find_all and result:
             return result
         if not isinstance(result, (list, tuple)):
             result = [result]
@@ -304,7 +293,7 @@ def find(path, all=False):
     if matches:
         return matches
     # No match.
-    return [] if all else None
+    return [] if find_all else None
 
 
 def get_finders():

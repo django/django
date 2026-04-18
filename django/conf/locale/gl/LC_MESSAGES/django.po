@@ -8,14 +8,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Leandro Regueiro <leandro.regueiro@gmail.com>, 2013
 # 948a55bc37dd6d642f1875bb84258fff_07a28cc <c1911c41f2600393098639fceba5dab0_5932>, 2012
-# X Bello <xbello@gmail.com>, 2023
+# X Bello <xbello@gmail.com>, 2023-2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
-"Last-Translator: X Bello <xbello@gmail.com>, 2023\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 06:49+0000\n"
+"Last-Translator: X Bello <xbello@gmail.com>, 2023-2025\n"
 "Language-Team: Galician (http://app.transifex.com/django/django/language/"
 "gl/)\n"
 "MIME-Version: 1.0\n"
@@ -350,6 +350,9 @@ msgstr "Esa páxina non contén resultados"
 msgid "Enter a valid value."
 msgstr "Insira un valor válido."
 
+msgid "Enter a valid domain name."
+msgstr "Introduza un nome de dominio válido."
+
 msgid "Enter a valid URL."
 msgstr "Insira un URL válido."
 
@@ -373,14 +376,18 @@ msgstr ""
 "Insira un “slug” valido composto por letras Unicode, números, guións baixos "
 "ou medios."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Insira unha dirección IPv4 válida."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "Introduza unha dirección %(protocol)s válida."
 
-msgid "Enter a valid IPv6 address."
-msgstr "Insira unha dirección IPv6 válida"
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Insira unha dirección IPv4 ou IPv6 válida"
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 ou IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "Insira só díxitos separados por comas."
@@ -692,8 +699,8 @@ msgid "Value must be valid JSON."
 msgstr "O valor ten que ser JSON válido."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "A instancia de %(model)s co %(field)s %(value)r non existe."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr "%(model)s instancia con %(field)s %(value)r non é unha opción válida."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Clave Foránea (tipo determinado por un campo relacionado)"

@@ -107,7 +107,7 @@ class MultiPartParser:
         # For compatibility with low-level network APIs (with 32-bit integers),
         # the chunk size should be < 2^31, but still divisible by 4.
         possible_sizes = [x.chunk_size for x in upload_handlers if x.chunk_size]
-        self._chunk_size = min([2**31 - 4] + possible_sizes)
+        self._chunk_size = min([2**31 - 4, *possible_sizes])
 
         self._meta = META
         self._encoding = encoding or settings.DEFAULT_CHARSET
@@ -168,7 +168,8 @@ class MultiPartParser:
         # Instantiate the parser and stream:
         stream = LazyStream(ChunkIter(self._input_data, self._chunk_size))
 
-        # Whether or not to signal a file-completion at the beginning of the loop.
+        # Whether or not to signal a file-completion at the beginning of the
+        # loop.
         old_field_name = None
         counters = [0] * len(handlers)
 
@@ -304,15 +305,18 @@ class MultiPartParser:
                                 # We should always decode base64 chunks by
                                 # multiple of 4, ignoring whitespace.
 
-                                stripped_chunk = b"".join(chunk.split())
+                                stripped_parts = [b"".join(chunk.split())]
+                                stripped_length = len(stripped_parts[0])
 
-                                remaining = len(stripped_chunk) % 4
-                                while remaining != 0:
-                                    over_chunk = field_stream.read(4 - remaining)
+                                while stripped_length % 4 != 0:
+                                    over_chunk = field_stream.read(self._chunk_size)
                                     if not over_chunk:
                                         break
-                                    stripped_chunk += b"".join(over_chunk.split())
-                                    remaining = len(stripped_chunk) % 4
+                                    over_stripped = b"".join(over_chunk.split())
+                                    stripped_parts.append(over_stripped)
+                                    stripped_length += len(over_stripped)
+
+                                stripped_chunk = b"".join(stripped_parts)
 
                                 try:
                                     chunk = base64.b64decode(stripped_chunk)
@@ -405,8 +409,8 @@ class MultiPartParser:
 
     def _close_files(self):
         # Free up all file handles.
-        # FIXME: this currently assumes that upload handlers store the file as 'file'
-        # We should document that...
+        # FIXME: this currently assumes that upload handlers store the file as
+        # 'file'. We should document that...
         # (Maybe add handler.free_file to complement new_file)
         for handler in self._upload_handlers:
             if hasattr(handler, "file"):
@@ -418,8 +422,8 @@ class LazyStream:
     The LazyStream wrapper allows one to get and "unget" bytes from a stream.
 
     Given a producer object (an iterator that yields bytestrings), the
-    LazyStream object will support iteration, reading, and keeping a "look-back"
-    variable in case you need to "unget" some bytes.
+    LazyStream object will support iteration, reading, and keeping a
+    "look-back" variable in case you need to "unget" some bytes.
     """
 
     def __init__(self, producer, length=None):
@@ -720,13 +724,12 @@ def parse_boundary_stream(stream, max_header_size):
 
     # Eliminate blank lines
     for line in header.split(b"\r\n"):
-        # This terminology ("main value" and "dictionary of
-        # parameters") is from the Python docs.
         try:
-            main_value_pair, params = parse_header_parameters(line.decode())
-            name, value = main_value_pair.split(":", 1)
+            header_name, value_and_params = line.decode().split(":", 1)
+            name = header_name.lower().rstrip(" ")
+            value, params = parse_header_parameters(value_and_params.lstrip(" "))
             params = {k: v.encode() for k, v in params.items()}
-        except ValueError:  # Invalid header.
+        except (ValueError, LookupError):  # Invalid header.
             continue
 
         if name == "content-disposition":

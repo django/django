@@ -48,7 +48,8 @@ class ManyToOneNullTests(TestCase):
         # Accessing an article's 'reporter' attribute returns None
         # if the reporter is set to None.
         self.assertIsNone(a3.reporter)
-        # To retrieve the articles with no reporters set, use "reporter__isnull=True".
+        # To retrieve the articles with no reporters set, use
+        # "reporter__isnull=True".
         self.assertSequenceEqual(
             Article.objects.filter(reporter__isnull=True), [self.a3]
         )
@@ -78,7 +79,8 @@ class ManyToOneNullTests(TestCase):
 
     def test_set(self):
         # Use manager.set() to allocate ForeignKey. Null is legal, so existing
-        # members of the set that are not in the assignment set are set to null.
+        # members of the set that are not in the assignment set are set to
+        # null.
         self.r2.article_set.set([self.a2, self.a3])
         self.assertSequenceEqual(self.r2.article_set.all(), [self.a2, self.a3])
         # Use manager.set(clear=True)

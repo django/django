@@ -24,6 +24,7 @@ from django.http import (
 )
 from django.test import SimpleTestCase
 from django.utils.functional import lazystr
+from django.utils.http import MAX_URL_REDIRECT_LENGTH
 
 
 class QueryDictTests(SimpleTestCase):
@@ -320,8 +321,8 @@ class HttpResponseTests(SimpleTestCase):
         self.assertEqual(r.headers["key"], "=?utf-8?b?4oCg?=")
         self.assertIn(b"=?utf-8?b?4oCg?=", r.serialize_headers())
 
-        # The response also converts string or bytes keys to strings, but requires
-        # them to contain ASCII
+        # The response also converts string or bytes keys to strings, but
+        # requires them to contain ASCII
         r = HttpResponse()
         del r.headers["Content-Type"]
         r.headers["foo"] = "bar"
@@ -350,8 +351,8 @@ class HttpResponseTests(SimpleTestCase):
         f = b"zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz a\xcc\x88"
         f = f.decode("utf-8")
         h.headers["Content-Disposition"] = 'attachment; filename="%s"' % f
-        # This one is triggering https://bugs.python.org/issue20747, that is Python
-        # will itself insert a newline in the header
+        # This one is triggering https://bugs.python.org/issue20747, that is
+        # Python will itself insert a newline in the header
         h.headers["Content-Disposition"] = (
             'attachment; filename="EdelRot_Blu\u0308te (3)-0.JPG"'
         )
@@ -485,11 +486,25 @@ class HttpResponseTests(SimpleTestCase):
         r.writelines(["foo\n", "bar\n", "baz\n"])
         self.assertEqual(r.content, b"foo\nbar\nbaz\n")
 
+    def test_redirect_url_max_length(self):
+        base_url = "https://example.com/"
+        for length in (
+            MAX_URL_REDIRECT_LENGTH - 1,
+            MAX_URL_REDIRECT_LENGTH,
+        ):
+            long_url = base_url + "x" * (length - len(base_url))
+            with self.subTest(length=length):
+                response = HttpResponseRedirect(long_url)
+                self.assertEqual(response.url, long_url)
+                response = HttpResponsePermanentRedirect(long_url)
+                self.assertEqual(response.url, long_url)
+
     def test_unsafe_redirect(self):
         bad_urls = [
             'data:text/html,<script>window.alert("xss")</script>',
             "mailto:test@example.com",
             "file:///etc/passwd",
+            "é" * (MAX_URL_REDIRECT_LENGTH + 1),
         ]
         for url in bad_urls:
             with self.assertRaises(DisallowedRedirect):
@@ -530,6 +545,22 @@ class HttpResponseTests(SimpleTestCase):
                 headers={"Content-Type": "text/csv"},
             )
 
+    def test_text_updates_when_content_updates(self):
+        response = HttpResponse("Hello, world!")
+        self.assertEqual(response.text, "Hello, world!")
+        response.content = "Updated content"
+        self.assertEqual(response.text, "Updated content")
+
+    def test_text_charset(self):
+        for content_type, content in [
+            (None, b"Ol\xc3\xa1 Mundo"),
+            ("text/plain; charset=utf-8", b"Ol\xc3\xa1 Mundo"),
+            ("text/plain; charset=iso-8859-1", b"Ol\xe1 Mundo"),
+        ]:
+            with self.subTest(content_type=content_type):
+                response = HttpResponse(content, content_type=content_type)
+                self.assertEqual(response.text, "Olá Mundo")
+
 
 class HttpResponseSubclassesTests(SimpleTestCase):
     def test_redirect(self):
@@ -549,6 +580,27 @@ class HttpResponseSubclassesTests(SimpleTestCase):
         """Make sure HttpResponseRedirect works with lazy strings."""
         r = HttpResponseRedirect(lazystr("/redirected/"))
         self.assertEqual(r.url, "/redirected/")
+
+    def test_redirect_modifiers(self):
+        cases = [
+            (HttpResponseRedirect, "Moved temporarily", False, 302),
+            (HttpResponseRedirect, "Moved temporarily preserve method", True, 307),
+            (HttpResponsePermanentRedirect, "Moved permanently", False, 301),
+            (
+                HttpResponsePermanentRedirect,
+                "Moved permanently preserve method",
+                True,
+                308,
+            ),
+        ]
+        for response_class, content, preserve_request, expected_status_code in cases:
+            with self.subTest(status_code=expected_status_code):
+                response = response_class(
+                    "/redirected/", content=content, preserve_request=preserve_request
+                )
+                self.assertEqual(response.status_code, expected_status_code)
+                self.assertEqual(response.content.decode(), content)
+                self.assertEqual(response.url, response.headers["Location"])
 
     def test_redirect_repr(self):
         response = HttpResponseRedirect("/redirected/")
@@ -614,7 +666,7 @@ class JsonResponseTests(SimpleTestCase):
     def test_json_response_non_ascii(self):
         data = {"key": "łóżko"}
         response = JsonResponse(data)
-        self.assertEqual(json.loads(response.content.decode()), data)
+        self.assertEqual(json.loads(response.text), data)
 
     def test_json_response_raises_type_error_with_default_setting(self):
         with self.assertRaisesMessage(
@@ -626,16 +678,16 @@ class JsonResponseTests(SimpleTestCase):
 
     def test_json_response_text(self):
         response = JsonResponse("foobar", safe=False)
-        self.assertEqual(json.loads(response.content.decode()), "foobar")
+        self.assertEqual(json.loads(response.text), "foobar")
 
     def test_json_response_list(self):
         response = JsonResponse(["foo", "bar"], safe=False)
-        self.assertEqual(json.loads(response.content.decode()), ["foo", "bar"])
+        self.assertEqual(json.loads(response.text), ["foo", "bar"])
 
     def test_json_response_uuid(self):
         u = uuid.uuid4()
         response = JsonResponse(u, safe=False)
-        self.assertEqual(json.loads(response.content.decode()), str(u))
+        self.assertEqual(json.loads(response.text), str(u))
 
     def test_json_response_custom_encoder(self):
         class CustomDjangoJSONEncoder(DjangoJSONEncoder):
@@ -643,11 +695,11 @@ class JsonResponseTests(SimpleTestCase):
                 return json.dumps({"foo": "bar"})
 
         response = JsonResponse({}, encoder=CustomDjangoJSONEncoder)
-        self.assertEqual(json.loads(response.content.decode()), {"foo": "bar"})
+        self.assertEqual(json.loads(response.text), {"foo": "bar"})
 
     def test_json_response_passing_arguments_to_json_dumps(self):
         response = JsonResponse({"foo": "bar"}, json_dumps_params={"indent": 2})
-        self.assertEqual(response.content.decode(), '{\n  "foo": "bar"\n}')
+        self.assertEqual(response.text, '{\n  "foo": "bar"\n}')
 
 
 class StreamingHttpResponseTests(SimpleTestCase):
@@ -755,6 +807,13 @@ class StreamingHttpResponseTests(SimpleTestCase):
         )
         with self.assertWarnsMessage(Warning, msg):
             self.assertEqual(b"hello", await anext(aiter(r)))
+
+    def test_text_attribute_error(self):
+        r = StreamingHttpResponse(iter(["hello", "world"]))
+        msg = "This %s instance has no `text` attribute." % r.__class__.__name__
+
+        with self.assertRaisesMessage(AttributeError, msg):
+            r.text
 
 
 class FileCloseTests(SimpleTestCase):

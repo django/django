@@ -22,14 +22,14 @@ class ColConstraint:
         self.alias, self.col, self.value = alias, col, value
 
     def as_sql(self, compiler, connection):
-        qn = compiler.quote_name_unless_alias
+        qn = compiler.quote_name
         return "%s.%s = %%s" % (qn(self.alias), qn(self.col)), [self.value]
 
 
 class ActiveTranslationField(models.ForeignObject):
     """
-    This field will allow querying and fetching the currently active translation
-    for Article from ArticleTranslation.
+    This field will allow querying and fetching the currently active
+    translation for Article from ArticleTranslation.
     """
 
     requires_unique_target = False

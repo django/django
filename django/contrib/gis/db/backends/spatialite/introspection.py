@@ -52,7 +52,8 @@ class SpatiaLiteIntrospection(DatabaseIntrospection):
                 ogr_type = ogr_type % 1000 + OGRGeomType.wkb25bit
             field_type = OGRGeomType(ogr_type).django
 
-            # Getting any GeometryField keyword arguments that are not the default.
+            # Getting any GeometryField keyword arguments that are not the
+            # default.
             dim = row[0]
             srid = row[1]
             field_params = {}

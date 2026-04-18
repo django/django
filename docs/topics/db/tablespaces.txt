@@ -21,10 +21,10 @@ the :attr:`~django.db.models.Options.db_tablespace` option inside the model's
 ``class Meta``. This option also affects tables automatically created for
 :class:`~django.db.models.ManyToManyField`\ s in the model.
 
-You can use the :setting:`DEFAULT_TABLESPACE` setting to specify a default value
-for :attr:`~django.db.models.Options.db_tablespace`. This is useful for setting
-a tablespace for the built-in Django apps and other applications whose code you
-cannot control.
+You can use the :setting:`DEFAULT_TABLESPACE` setting to specify a default
+value for :attr:`~django.db.models.Options.db_tablespace`. This is useful for
+setting a tablespace for the built-in Django apps and other applications whose
+code you cannot control.
 
 Declaring tablespaces for indexes
 =================================

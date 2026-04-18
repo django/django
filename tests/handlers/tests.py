@@ -58,7 +58,9 @@ class HandlerTests(SimpleTestCase):
         self.assertEqual(got, ["café", "café", "caf\ufffd", "café"])
 
     def test_non_ascii_cookie(self):
-        """Non-ASCII cookies set in JavaScript are properly decoded (#20557)."""
+        """
+        Non-ASCII cookies set in JavaScript are properly decoded (#20557).
+        """
         environ = self.request_factory.get("/").environ
         raw_cookie = 'want="café"'.encode("utf-8").decode("iso-8859-1")
         environ["HTTP_COOKIE"] = raw_cookie
@@ -258,8 +260,9 @@ class HandlerRequestTests(SimpleTestCase):
             "StreamingHttpResponse must consume asynchronous iterators in order to "
             "serve them synchronously. Use a synchronous iterator instead."
         )
-        with self.assertWarnsMessage(Warning, msg):
+        with self.assertWarnsMessage(Warning, msg) as ctx:
             self.assertEqual(b"".join(list(response)), b"streaming content")
+        self.assertEqual(ctx.filename, __file__)
 
 
 class ScriptNameTests(SimpleTestCase):
@@ -343,6 +346,26 @@ class AsyncHandlerRequestTests(SimpleTestCase):
         self.assertEqual(request.script_name, "/FORCED_PREFIX")
         self.assertEqual(request.path_info, "/somepath/")
 
+    def test_root_path_prefix_boundary(self):
+        async_request_factory = AsyncRequestFactory()
+        # When path shares a textual prefix with root_path but not at a
+        # segment boundary, path_info should be the full path.
+        request = async_request_factory.request(
+            **{"path": "/rootprefix/somepath/", "root_path": "/root"}
+        )
+        self.assertEqual(request.path, "/rootprefix/somepath/")
+        self.assertEqual(request.script_name, "/root")
+        self.assertEqual(request.path_info, "/rootprefix/somepath/")
+
+    def test_root_path_trailing_slash(self):
+        async_request_factory = AsyncRequestFactory()
+        request = async_request_factory.request(
+            **{"path": "/root/somepath/", "root_path": "/root/"}
+        )
+        self.assertEqual(request.path, "/root/somepath/")
+        self.assertEqual(request.script_name, "/root/")
+        self.assertEqual(request.path_info, "/somepath/")
+
     async def test_sync_streaming(self):
         response = await self.async_client.get("/streaming/")
         self.assertEqual(response.status_code, 200)
@@ -350,10 +373,11 @@ class AsyncHandlerRequestTests(SimpleTestCase):
             "StreamingHttpResponse must consume synchronous iterators in order to "
             "serve them asynchronously. Use an asynchronous iterator instead."
         )
-        with self.assertWarnsMessage(Warning, msg):
+        with self.assertWarnsMessage(Warning, msg) as ctx:
             self.assertEqual(
                 b"".join([chunk async for chunk in response]), b"streaming content"
             )
+        self.assertEqual(ctx.filename, __file__)
 
     async def test_async_streaming(self):
         response = await self.async_client.get("/async_streaming/")

@@ -13,6 +13,7 @@ try:
     import docutils.core
     import docutils.nodes
     import docutils.parsers.rst.roles
+    import docutils.writers
 except ImportError:
     docutils_is_available = False
 else:
@@ -30,7 +31,7 @@ def get_view_name(view_func):
 
 def parse_docstring(docstring):
     """
-    Parse out the parts of a docstring.  Return (title, body, metadata).
+    Parse out the parts of a docstring. Return (title, body, metadata).
     """
     if not docstring:
         return "", "", {}
@@ -69,8 +70,8 @@ def parse_rst(text, default_reference_context, thing_being_parsed=None):
         "file_insertion_enabled": False,
     }
     thing_being_parsed = thing_being_parsed and "<%s>" % thing_being_parsed
-    # Wrap ``text`` in some reST that sets the default role to ``cmsreference``,
-    # then restores it.
+    # Wrap ``text`` in some reST that sets the default role to
+    # ``cmsreference``, then restores it.
     source = """
 .. default-role:: cmsreference
 
@@ -78,11 +79,14 @@ def parse_rst(text, default_reference_context, thing_being_parsed=None):
 
 .. default-role::
 """
+    # In docutils < 0.22, the `writer` param must be an instance. Passing a
+    # string writer name like "html" is only supported in 0.22+.
+    writer_instance = docutils.writers.get_writer_class("html")()
     parts = docutils.core.publish_parts(
         source % text,
         source_path=thing_being_parsed,
         destination_path=None,
-        writer_name="html",
+        writer=writer_instance,
         settings_overrides=overrides,
     )
     return mark_safe(parts["fragment"])
@@ -99,6 +103,21 @@ ROLES = {
     "tag": "%s/tags/#%s",
 }
 
+explicit_title_re = re.compile(r"^(.+?)\s*(?<!\x00)<([^<]*?)>$", re.DOTALL)
+
+
+def split_explicit_title(text):
+    """
+    Split role content into title and target, if given.
+
+    From sphinx.util.nodes.split_explicit_title. See:
+    https://github.com/sphinx-doc/sphinx/blob/230ccf2/sphinx/util/nodes.py#L389
+    """
+    match = explicit_title_re.match(text)
+    if match:
+        return True, match.group(1), match.group(2)
+    return False, text, text
+
 
 def create_reference_role(rolename, urlbase):
     # Views and template names are case-sensitive.
@@ -107,14 +126,15 @@ def create_reference_role(rolename, urlbase):
     def _role(name, rawtext, text, lineno, inliner, options=None, content=None):
         if options is None:
             options = {}
+        _, title, target = split_explicit_title(text)
         node = docutils.nodes.reference(
             rawtext,
-            text,
+            title,
             refuri=(
                 urlbase
                 % (
                     inliner.document.settings.link_base,
-                    text if is_case_sensitive else text.lower(),
+                    target if is_case_sensitive else target.lower(),
                 )
             ),
             **options,
@@ -242,3 +262,7 @@ def remove_non_capturing_groups(pattern):
         final_pattern += pattern[prev_end:start]
         prev_end = end
     return final_pattern + pattern[prev_end:]
+
+
+def strip_p_tags(value):
+    return mark_safe(value.replace("<p>", "").replace("</p>", ""))

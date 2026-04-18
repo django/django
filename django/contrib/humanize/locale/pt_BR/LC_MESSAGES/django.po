@@ -3,9 +3,11 @@
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
+# Claude Paroz <claude@2xlibre.net>, 2024
 # Eduardo Cereto Carvalho, 2012
+# Eduardo Felipe Castegnaro <eduardo@onsign.tv>, 2024
 # Erick Mesquita, 2023
-# semente, 2012-2013
+# fa9e10542e458baef0599ae856e43651_13d2225, 2012-2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Rafael Fontenelle <rffontenelle@gmail.com>, 2022
 # Sandro <sandrossv@hotmail.com>, 2011
@@ -14,10 +16,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-07 14:40+0200\n"
-"PO-Revision-Date: 2023-04-24 18:40+0000\n"
-"Last-Translator: Erick Mesquita, 2023\n"
-"Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2024-08-07 18:40+0000\n"
+"Last-Translator: Eduardo Felipe Castegnaro <eduardo@onsign.tv>, 2024\n"
+"Language-Team: Portuguese (Brazil) (http://app.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -48,7 +50,7 @@ msgctxt "ordinal 2"
 msgid "{}nd"
 msgstr "{}º"
 
-#. Translators: Ordinal format when value ends with 3, e.g. 83th, except 13.
+#. Translators: Ordinal format when value ends with 3, e.g. 83rd, except 13.
 msgctxt "ordinal 3"
 msgid "{}rd"
 msgstr "{}º"
@@ -200,7 +202,7 @@ msgstr "ontem"
 #. weeks'
 #, python-format
 msgid "%(delta)s ago"
-msgstr "%(delta)satrás"
+msgstr "%(delta)s atrás"
 
 #. Translators: please keep a non-breaking space (U+00A0) between count
 #. and time unit.
@@ -208,8 +210,8 @@ msgstr "%(delta)satrás"
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
 msgstr[0] "uma hora atrás"
-msgstr[1] "%(count)s horas atrás"
-msgstr[2] "%(count)s horas atrás"
+msgstr[1] "%(count)s horas atrás"
+msgstr[2] "%(count)s horas atrás"
 
 #. Translators: please keep a non-breaking space (U+00A0) between count
 #. and time unit.
@@ -217,8 +219,8 @@ msgstr[2] "%(count)s horas atrás"
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
 msgstr[0] "um minuto atrás"
-msgstr[1] "%(count)s minutos atrás"
-msgstr[2] "%(count)s minutos atrás"
+msgstr[1] "%(count)s minutos atrás"
+msgstr[2] "%(count)s minutos atrás"
 
 #. Translators: please keep a non-breaking space (U+00A0) between count
 #. and time unit.
@@ -226,8 +228,8 @@ msgstr[2] "%(count)s minutos atrás"
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
 msgstr[0] "um segundo atrás"
-msgstr[1] "%(count)s segundos atrás"
-msgstr[2] "%(count)s segundos atrás"
+msgstr[1] "%(count)s segundos atrás"
+msgstr[2] "%(count)s segundos atrás"
 
 msgid "now"
 msgstr "agora"
@@ -238,8 +240,8 @@ msgstr "agora"
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
 msgstr[0] "um segundo a partir de agora"
-msgstr[1] "%(count)s segundos a partir de agora"
-msgstr[2] "%(count)s segundos a partir de agora"
+msgstr[1] "%(count)s segundos a partir de agora"
+msgstr[2] "%(count)s segundos a partir de agora"
 
 #. Translators: please keep a non-breaking space (U+00A0) between count
 #. and time unit.
@@ -247,8 +249,8 @@ msgstr[2] "%(count)s segundos a partir de agora"
 msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
 msgstr[0] "um minuto a partir de agora"
-msgstr[1] "%(count)s minutos a partir de agora"
-msgstr[2] "%(count)s minutos a partir de agora"
+msgstr[1] "%(count)s minutos a partir de agora"
+msgstr[2] "%(count)s minutos a partir de agora"
 
 #. Translators: please keep a non-breaking space (U+00A0) between count
 #. and time unit.
@@ -256,8 +258,8 @@ msgstr[2] "%(count)s minutos a partir de agora"
 msgid "an hour from now"
 msgid_plural "%(count)s hours from now"
 msgstr[0] "uma hora a partir de agora"
-msgstr[1] "%(count)s horas a partir de agora"
-msgstr[2] "%(count)s horas a partir de agora"
+msgstr[1] "%(count)s horas a partir de agora"
+msgstr[2] "%(count)s horas a partir de agora"
 
 #. Translators: delta will contain a string like '2 months' or '1 month, 2
 #. weeks'
@@ -329,7 +331,7 @@ msgctxt "naturaltime-future"
 msgid "%(num)d month"
 msgid_plural "%(num)d months"
 msgstr[0] "%(num)d mês"
-msgstr[1] "%(num)d mses"
+msgstr[1] "%(num)d meses"
 msgstr[2] "%(num)d meses"
 
 #, python-format

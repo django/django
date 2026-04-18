@@ -1,4 +1,5 @@
 "File-based cache backend"
+
 import glob
 import os
 import pickle
@@ -11,6 +12,7 @@ from hashlib import md5
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.core.files import locks
 from django.core.files.move import file_move_safe
+from django.utils._os import safe_makedirs
 
 
 class FileBasedCache(BaseCache):
@@ -114,13 +116,10 @@ class FileBasedCache(BaseCache):
             self._delete(fname)
 
     def _createdir(self):
-        # Set the umask because os.makedirs() doesn't apply the "mode" argument
+        # Workaround because os.makedirs() doesn't apply the "mode" argument
         # to intermediate-level directories.
-        old_umask = os.umask(0o077)
-        try:
-            os.makedirs(self._dir, 0o700, exist_ok=True)
-        finally:
-            os.umask(old_umask)
+        # https://github.com/python/cpython/issues/86533
+        safe_makedirs(self._dir, mode=0o700, exist_ok=True)
 
     def _key_to_file(self, key, version=None):
         """
@@ -166,5 +165,5 @@ class FileBasedCache(BaseCache):
         """
         return [
             os.path.join(self._dir, fname)
-            for fname in glob.glob1(self._dir, "*%s" % self.cache_suffix)
+            for fname in glob.glob(f"*{self.cache_suffix}", root_dir=self._dir)
         ]

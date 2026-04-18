@@ -2,6 +2,10 @@ import json
 
 from django.contrib.postgres import lookups
 from django.contrib.postgres.forms import SimpleArrayField
+from django.contrib.postgres.utils import (
+    CheckPostgresInstalledMixin,
+    prefix_validation_error,
+)
 from django.contrib.postgres.validators import ArrayMaxLengthValidator
 from django.core import checks, exceptions
 from django.db.models import Field, Func, IntegerField, Transform, Value
@@ -9,13 +13,12 @@ from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.db.models.lookups import Exact, In
 from django.utils.translation import gettext_lazy as _
 
-from ..utils import prefix_validation_error
 from .utils import AttributeSetter
 
 __all__ = ["ArrayField"]
 
 
-class ArrayField(CheckFieldDefaultMixin, Field):
+class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
     empty_strings_allowed = False
     default_error_messages = {
         "item_invalid": _("Item %(nth)s in the array did not validate:"),
@@ -67,13 +70,14 @@ class ArrayField(CheckFieldDefaultMixin, Field):
                 )
             )
         else:
-            # Remove the field name checks as they are not needed here.
-            base_checks = self.base_field.check()
+            base_checks = self.base_field.check(**kwargs)
             if base_checks:
                 error_messages = "\n    ".join(
                     "%s (%s)" % (base_check.msg, base_check.id)
                     for base_check in base_checks
                     if isinstance(base_check, checks.Error)
+                    # Prevent duplication of E005 in an E001 check.
+                    and not base_check.id == "postgres.E005"
                 )
                 if error_messages:
                     errors.append(
@@ -120,8 +124,12 @@ class ArrayField(CheckFieldDefaultMixin, Field):
         db_params["collation"] = self.db_collation
         return db_params
 
-    def get_placeholder(self, value, compiler, connection):
-        return "%s::{}".format(self.db_type(connection))
+    def get_placeholder_sql(self, value, compiler, connection):
+        db_type = self.db_type(connection)
+        if hasattr(value, "as_sql"):
+            sql, params = compiler.compile(value)
+            return f"{sql}::{db_type}", params
+        return f"%s::{db_type}", (value,)
 
     def get_db_prep_value(self, value, connection, prepared=False):
         if isinstance(value, (list, tuple)):
@@ -131,16 +139,18 @@ class ArrayField(CheckFieldDefaultMixin, Field):
             ]
         return value
 
+    def get_db_prep_save(self, value, connection):
+        if isinstance(value, (list, tuple)):
+            return [self.base_field.get_db_prep_save(i, connection) for i in value]
+        return value
+
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
         if path == "django.contrib.postgres.fields.array.ArrayField":
             path = "django.contrib.postgres.fields.ArrayField"
-        kwargs.update(
-            {
-                "base_field": self.base_field.clone(),
-                "size": self.size,
-            }
-        )
+        kwargs["base_field"] = self.base_field.clone()
+        if self.size is not None:
+            kwargs["size"] = self.size
         return name, path, args, kwargs
 
     def to_python(self, value):
@@ -169,7 +179,7 @@ class ArrayField(CheckFieldDefaultMixin, Field):
             else:
                 obj = AttributeSetter(base_field.attname, val)
                 values.append(base_field.value_to_string(obj))
-        return json.dumps(values)
+        return json.dumps(values, ensure_ascii=False)
 
     def get_transform(self, name):
         transform = super().get_transform(name)

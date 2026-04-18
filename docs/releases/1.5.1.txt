@@ -4,8 +4,8 @@ Django 1.5.1 release notes
 
 *March 28, 2013*
 
-This is Django 1.5.1, a bugfix release for Django 1.5. It's completely backwards
-compatible with Django 1.5, but includes a handful of fixes.
+This is Django 1.5.1, a bugfix release for Django 1.5. It's completely
+backwards compatible with Django 1.5, but includes a handful of fixes.
 
 The biggest fix is for a memory leak introduced in Django 1.5. Under certain
 circumstances, repeated iteration over querysets could leak memory - sometimes

@@ -30,7 +30,7 @@ General-purpose aggregation functions
 ``ArrayAgg``
 ------------
 
-.. class:: ArrayAgg(expression, distinct=False, filter=None, default=None, ordering=(), **extra)
+.. class:: ArrayAgg(expression, distinct=False, filter=None, default=None, order_by=(), **extra)
 
     Returns a list of values, including nulls, concatenated into an array, or
     ``default`` if there are no values.
@@ -40,7 +40,7 @@ General-purpose aggregation functions
         An optional boolean argument that determines if array values
         will be distinct. Defaults to ``False``.
 
-    .. attribute:: ordering
+    .. attribute:: order_by
 
         An optional string of a field name (with an optional ``"-"`` prefix
         which indicates descending order) or an expression (or a tuple or list
@@ -49,17 +49,10 @@ General-purpose aggregation functions
 
         Examples::
 
-            "some_field"
-            "-some_field"
             from django.db.models import F
 
-            F("some_field").desc()
-
-    .. versionchanged:: 5.0
-
-        In older versions, if there are no rows and ``default`` is not
-        provided, ``ArrayAgg`` returned an empty list instead of ``None``. If
-        you need it, explicitly set ``default`` to ``Value([])``.
+            ArrayAgg("a_field", order_by="-some_field")
+            ArrayAgg("a_field", order_by=F("some_field").desc())
 
 ``BitAnd``
 ----------
@@ -69,6 +62,11 @@ General-purpose aggregation functions
     Returns an ``int`` of the bitwise ``AND`` of all non-null input values, or
     ``default`` if all values are null.
 
+    .. deprecated:: 6.1
+
+        This class is deprecated in favor of the generally available
+        :class:`~django.db.models.BitAnd` class.
+
 ``BitOr``
 ---------
 
@@ -77,13 +75,23 @@ General-purpose aggregation functions
     Returns an ``int`` of the bitwise ``OR`` of all non-null input values, or
     ``default`` if all values are null.
 
+    .. deprecated:: 6.1
+
+        This class is deprecated in favor of the generally available
+        :class:`~django.db.models.BitOr` class.
+
 ``BitXor``
 ----------
 
 .. class:: BitXor(expression, filter=None, default=None, **extra)
 
     Returns an ``int`` of the bitwise ``XOR`` of all non-null input values, or
-    ``default`` if all values are null. It requires PostgreSQL 14+.
+    ``default`` if all values are null.
+
+    .. deprecated:: 6.1
+
+        This class is deprecated in favor of the generally available
+        :class:`~django.db.models.BitXor` class.
 
 ``BoolAnd``
 -----------
@@ -136,7 +144,7 @@ General-purpose aggregation functions
 ``JSONBAgg``
 ------------
 
-.. class:: JSONBAgg(expressions, distinct=False, filter=None, default=None, ordering=(), **extra)
+.. class:: JSONBAgg(expressions, distinct=False, filter=None, default=None, order_by=(), **extra)
 
     Returns the input values as a ``JSON`` array, or ``default`` if there are
     no values. You can query the result using :lookup:`key and index lookups
@@ -147,14 +155,14 @@ General-purpose aggregation functions
         An optional boolean argument that determines if array values will be
         distinct. Defaults to ``False``.
 
-    .. attribute:: ordering
+    .. attribute:: order_by
 
         An optional string of a field name (with an optional ``"-"`` prefix
         which indicates descending order) or an expression (or a tuple or list
         of strings and/or expressions) that specifies the ordering of the
         elements in the result list.
 
-        Examples are the same as for :attr:`ArrayAgg.ordering`.
+        Examples are the same as for :attr:`ArrayAgg.order_by`.
 
     Usage example::
 
@@ -174,7 +182,7 @@ General-purpose aggregation functions
         >>> Room.objects.annotate(
         ...     requirements=JSONBAgg(
         ...         "hotelreservation__requirements",
-        ...         ordering="-hotelreservation__start",
+        ...         order_by="-hotelreservation__start",
         ...     )
         ... ).filter(requirements__0__sea_view=True).values("number", "requirements")
         <QuerySet [{'number': 102, 'requirements': [
@@ -182,37 +190,47 @@ General-purpose aggregation functions
             {'parking': True, 'double_bed': True}
         ]}]>
 
-    .. versionchanged:: 5.0
-
-        In older versions, if there are no rows and ``default`` is not
-        provided, ``JSONBAgg`` returned an empty list instead of ``None``. If
-        you need it, explicitly set ``default`` to ``Value([])``.
-
 ``StringAgg``
 -------------
 
-.. class:: StringAgg(expression, delimiter, distinct=False, filter=None, default=None, ordering=())
+.. class:: StringAgg(expression, delimiter, distinct=False, filter=None, default=None, order_by=())
+
+    .. deprecated:: 6.0
+
+        The PostgreSQL ``StringAgg`` class is deprecated in favor of the
+        generally available :class:`~django.db.models.StringAgg` class.
 
     Returns the input values concatenated into a string, separated by
     the ``delimiter`` string, or ``default`` if there are no values.
 
     .. attribute:: delimiter
 
-        Required argument. Needs to be a string.
+        Required argument. A string, :class:`~django.db.models.Value`, or
+        expression representing the string for separating values. For example,
+        ``Value(",")``.
+
+        .. versionadded:: 6.0
+
+            Support for providing a ``Value`` or expression rather than a
+            string was added.
+
+        .. deprecated:: 6.0
+
+            Support for providing a string is deprecated.
 
     .. attribute:: distinct
 
         An optional boolean argument that determines if concatenated values
         will be distinct. Defaults to ``False``.
 
-    .. attribute:: ordering
+    .. attribute:: order_by
 
         An optional string of a field name (with an optional ``"-"`` prefix
         which indicates descending order) or an expression (or a tuple or list
         of strings and/or expressions) that specifies the ordering of the
         elements in the result string.
 
-        Examples are the same as for :attr:`ArrayAgg.ordering`.
+        Examples are the same as for :attr:`ArrayAgg.order_by`.
 
     Usage example::
 
@@ -236,18 +254,12 @@ General-purpose aggregation functions
         ...     publication_names=StringAgg(
         ...         "publications__title",
         ...         delimiter=", ",
-        ...         ordering="publications__title",
+        ...         order_by="publications__title",
         ...     )
         ... ).values("headline", "publication_names")
         <QuerySet [{
             'headline': 'NASA uses Python', 'publication_names': 'Science News, The Python Journal'
         }]>
-
-    .. versionchanged:: 5.0
-
-        In older versions, if there are no rows and ``default`` is not
-        provided, ``StringAgg`` returned an empty string instead of ``None``.
-        If you need it, explicitly set ``default`` to ``Value("")``.
 
 Aggregate functions for statistics
 ==================================

@@ -25,6 +25,12 @@ def hello_meta(request):
     )
 
 
+def hello_cookie(request):
+    response = HttpResponse("Hello World!")
+    response.set_cookie("key", "value")
+    return response
+
+
 def sync_waiter(request):
     with sync_waiter.lock:
         sync_waiter.active_threads.add(threading.current_thread())
@@ -61,6 +67,7 @@ test_filename = __file__
 
 urlpatterns = [
     path("", hello),
+    path("cookie/", hello_cookie),
     path("file/", lambda x: FileResponse(open(test_filename, "rb"))),
     path("meta/", hello_meta),
     path("post/", post_echo),

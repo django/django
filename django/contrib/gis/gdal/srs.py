@@ -1,30 +1,30 @@
 """
-  The Spatial Reference class, represents OGR Spatial Reference objects.
+The Spatial Reference class, represents OGR Spatial Reference objects.
 
-  Example:
-  >>> from django.contrib.gis.gdal import SpatialReference
-  >>> srs = SpatialReference('WGS84')
-  >>> print(srs)
-  GEOGCS["WGS 84",
-      DATUM["WGS_1984",
-          SPHEROID["WGS 84",6378137,298.257223563,
-              AUTHORITY["EPSG","7030"]],
-          TOWGS84[0,0,0,0,0,0,0],
-          AUTHORITY["EPSG","6326"]],
-      PRIMEM["Greenwich",0,
-          AUTHORITY["EPSG","8901"]],
-      UNIT["degree",0.01745329251994328,
-          AUTHORITY["EPSG","9122"]],
-      AUTHORITY["EPSG","4326"]]
-  >>> print(srs.proj)
-  +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs
-  >>> print(srs.ellipsoid)
-  (6378137.0, 6356752.3142451793, 298.25722356300003)
-  >>> print(srs.projected, srs.geographic)
-  False True
-  >>> srs.import_epsg(32140)
-  >>> print(srs.name)
-  NAD83 / Texas South Central
+Example:
+>>> from django.contrib.gis.gdal import SpatialReference
+>>> srs = SpatialReference('WGS84')
+>>> print(srs)
+GEOGCS["WGS 84",
+    DATUM["WGS_1984",
+        SPHEROID["WGS 84",6378137,298.257223563,
+            AUTHORITY["EPSG","7030"]],
+        TOWGS84[0,0,0,0,0,0,0],
+        AUTHORITY["EPSG","6326"]],
+    PRIMEM["Greenwich",0,
+        AUTHORITY["EPSG","8901"]],
+    UNIT["degree",0.01745329251994328,
+        AUTHORITY["EPSG","9122"]],
+    AUTHORITY["EPSG","4326"]]
+>>> print(srs.proj)
++proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs
+>>> print(srs.ellipsoid)
+(6378137.0, 6356752.3142451793, 298.25722356300003)
+>>> print(srs.projected, srs.geographic)
+False True
+>>> srs.import_epsg(32140)
+>>> print(srs.name)
+NAD83 / Texas South Central
 """
 
 from ctypes import byref, c_char_p, c_int
@@ -44,9 +44,9 @@ class AxisOrder(IntEnum):
 
 class SpatialReference(GDALBase):
     """
-    A wrapper for the OGRSpatialReference object. According to the GDAL web site,
-    the SpatialReference object "provide[s] services to represent coordinate
-    systems (projections and datums) and to transform between them."
+    A wrapper for the OGRSpatialReference object. According to the GDAL web
+    site, the SpatialReference object "provide[s] services to represent
+    coordinate systems (projections and datums) and to transform between them."
     """
 
     destructor = capi.release_srs
@@ -113,10 +113,14 @@ class SpatialReference(GDALBase):
     def __getitem__(self, target):
         """
         Return the value of the given string attribute node, None if the node
-        doesn't exist.  Can also take a tuple as a parameter, (target, child),
-        where child is the index of the attribute in the WKT.  For example:
+        doesn't exist. Can also take a tuple as a parameter, (target, child),
+        where child is the index of the attribute in the WKT. For example:
 
-        >>> wkt = 'GEOGCS["WGS 84", DATUM["WGS_1984, ... AUTHORITY["EPSG","4326"]]'
+        >>> wkt = (
+        ...     'GEOGCS["WGS 84",'
+        ...     '  DATUM["WGS_1984, ... AUTHORITY["EPSG","4326"]'
+        ...     ']'
+        ... )
         >>> srs = SpatialReference(wkt) # could also use 'WGS84', or 4326
         >>> print(srs['GEOGCS'])
         WGS 84
@@ -146,8 +150,8 @@ class SpatialReference(GDALBase):
     # #### SpatialReference Methods ####
     def attr_value(self, target, index=0):
         """
-        The attribute value for the given target node (e.g. 'PROJCS'). The index
-        keyword specifies an index of the child node to return.
+        The attribute value for the given target node (e.g. 'PROJCS'). The
+        index keyword specifies an index of the child node to return.
         """
         if not isinstance(target, str) or not isinstance(index, int):
             raise TypeError
@@ -284,7 +288,9 @@ class SpatialReference(GDALBase):
 
     @property
     def local(self):
-        "Return True if this SpatialReference is local (root node is LOCAL_CS)."
+        """
+        Return True if this SpatialReference is local (root node is LOCAL_CS).
+        """
         return bool(capi.islocal(self.ptr))
 
     @property
@@ -345,6 +351,7 @@ class SpatialReference(GDALBase):
 
 class CoordTransform(GDALBase):
     "The coordinate system transformation object."
+
     destructor = capi.destroy_ct
 
     def __init__(self, source, target):

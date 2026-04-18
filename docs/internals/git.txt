@@ -115,11 +115,11 @@ updates.
     committed until the final release happened.
 
     For example, shortly after the release of Django 1.3 the branch
-    ``stable/1.3.x`` was created. Official support for that release has expired,
-    and so it no longer receives direct maintenance from the Django project.
-    However, that and all other similarly named branches continue to exist, and
-    interested community members have occasionally used them to provide
-    unofficial support for old Django releases.
+    ``stable/1.3.x`` was created. Official support for that release has
+    expired, and so it no longer receives direct maintenance from the Django
+    project. However, that and all other similarly named branches continue to
+    exist, and interested community members have occasionally used them to
+    provide unofficial support for old Django releases.
 
 Tags
 ====

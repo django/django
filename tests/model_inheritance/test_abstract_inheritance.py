@@ -61,7 +61,8 @@ class AbstractInheritanceTests(SimpleTestCase):
     def test_diamond_shaped_multiple_inheritance_is_depth_first(self):
         """
         In contrast to standard Python MRO, resolution of inherited fields is
-        strictly depth-first, rather than breadth-first in diamond-shaped cases.
+        strictly depth-first, rather than breadth-first in diamond-shaped
+        cases.
 
         This is because a copy of the parent field descriptor is placed onto
         the model class in ModelBase.__new__(), rather than the attribute
@@ -183,6 +184,32 @@ class AbstractInheritanceTests(SimpleTestCase):
         self.assertIsInstance(
             ExtendModelAbstract._meta.get_field("field"), GenericRelation
         )
+
+    def test_override_private_field_with_attr(self):
+        class AbstractBase(models.Model):
+            content_type = models.ForeignKey(
+                ContentType, on_delete=models.SET_NULL, null=True, blank=True
+            )
+            object_id = models.PositiveIntegerField(null=True, blank=True)
+            related_object = GenericForeignKey("content_type", "object_id")
+
+            class Meta:
+                abstract = True
+
+        class Descendant(AbstractBase):
+            related_object = None
+
+        class Mixin:
+            related_object = None
+
+        class MultiDescendant(Mixin, AbstractBase):
+            pass
+
+        with self.assertRaises(FieldDoesNotExist):
+            Descendant._meta.get_field("related_object")
+
+        with self.assertRaises(FieldDoesNotExist):
+            MultiDescendant._meta.get_field("related_object")
 
     def test_cannot_override_indirect_abstract_field(self):
         class AbstractBase(models.Model):
@@ -416,30 +443,30 @@ class AbstractInheritanceTests(SimpleTestCase):
         self.assertEqual(
             fields(model1),
             [
-                ("id", models.AutoField),
+                ("id", models.BigAutoField),
                 ("name", models.CharField),
                 ("age", models.IntegerField),
             ],
         )
 
         self.assertEqual(
-            fields(model2), [("id", models.AutoField), ("name", models.CharField)]
+            fields(model2), [("id", models.BigAutoField), ("name", models.CharField)]
         )
         self.assertEqual(getattr(model2, "age"), 2)
 
         self.assertEqual(
-            fields(model3), [("id", models.AutoField), ("name", models.CharField)]
+            fields(model3), [("id", models.BigAutoField), ("name", models.CharField)]
         )
 
         self.assertEqual(
-            fields(model4), [("id", models.AutoField), ("name", models.CharField)]
+            fields(model4), [("id", models.BigAutoField), ("name", models.CharField)]
         )
         self.assertEqual(getattr(model4, "age"), 2)
 
         self.assertEqual(
             fields(model5),
             [
-                ("id", models.AutoField),
+                ("id", models.BigAutoField),
                 ("foo", models.IntegerField),
                 ("concretemodel_ptr", models.OneToOneField),
                 ("age", models.SmallIntegerField),

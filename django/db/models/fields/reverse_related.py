@@ -9,10 +9,7 @@ They also act as reverse fields for the purposes of the Meta API because
 they're the closest concept currently available.
 """
 
-import warnings
-
 from django.core import exceptions
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 
@@ -192,14 +189,6 @@ class ForeignObjectRel(FieldCacheMixin):
             qs = qs.order_by(*ordering)
         return (blank_choice if include_blank else []) + [(x.pk, str(x)) for x in qs]
 
-    def get_joining_columns(self):
-        warnings.warn(
-            "ForeignObjectRel.get_joining_columns() is deprecated. Use "
-            "get_joining_fields() instead.",
-            RemovedInDjango60Warning,
-        )
-        return self.field.get_reverse_joining_columns()
-
     def get_joining_fields(self):
         return self.field.get_reverse_joining_fields()
 
@@ -248,7 +237,8 @@ class ForeignObjectRel(FieldCacheMixin):
     def path_infos(self):
         return self.get_path_info()
 
-    def get_cache_name(self):
+    @cached_property
+    def cache_name(self):
         """
         Return the name of the cache key to use for storing an instance of the
         forward model on the reverse model.
@@ -301,7 +291,7 @@ class ManyToOneRel(ForeignObjectRel):
 
     @property
     def identity(self):
-        return super().identity + (self.field_name,)
+        return (*super().identity, self.field_name)
 
     def get_related_field(self):
         """
@@ -392,7 +382,8 @@ class ManyToManyRel(ForeignObjectRel):
 
     @property
     def identity(self):
-        return super().identity + (
+        return (
+            *super().identity,
             self.through,
             make_hashable(self.through_fields),
             self.db_constraint,

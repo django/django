@@ -24,15 +24,15 @@ place: read this material to quickly get up and running.
 
 .. seealso::
 
-    If you're new to Python_, you might want to start by getting an idea of what
-    the language is like. Django is 100% Python, so if you've got minimal
+    If you're new to Python_, you might want to start by getting an idea of
+    what the language is like. Django is 100% Python, so if you've got minimal
     comfort with Python you'll probably get a lot more out of Django.
 
     If you're new to programming entirely, you might want to start with this
     `list of Python resources for non-programmers`_
 
     If you already know a few other languages and want to get up to speed with
-    Python quickly, we recommend referring the official
+    Python quickly, we recommend referring to the official
     `Python documentation`_, which provides comprehensive and authoritative
     information about the language, as well as links to other resources such as
     a list of `books about Python`_.

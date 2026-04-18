@@ -3,18 +3,18 @@
 # Translators:
 # abdl erkin <84247764@qq.com>, 2018
 # ABDULLA <ijtihat@gmail.com>, 2014
-# Abduqadir Abliz <sahranbay@gmail.com>, 2023
-# Azat, 2023
+# Abduqadir Abliz <sahranbay@gmail.com>, 2023-2024
+# Azat, 2023,2025
 # Murat Orhun <oku.orhun@gmail.com>, 2023
-# Natalia (Django Fellow), 2023
+# Natalia, 2023
 # Serpidin Uyghur, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Natalia (Django Fellow), 2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2025-03-19 11:30-0500\n"
+"Last-Translator: Azat, 2023,2025\n"
 "Language-Team: Uyghur (http://app.transifex.com/django/django/language/ug/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,8 +34,8 @@ msgstr "%(count)d%(items)sمۇۋەپپەقىيەتلىك ئۆچۈرۈلدى"
 msgid "Cannot delete %(name)s"
 msgstr "%(name)sنى ئۆچۈرەلمەيدۇ"
 
-msgid "Are you sure?"
-msgstr "جەزىملەشتۈرەمسىز؟"
+msgid "Delete multiple objects"
+msgstr "كۆپ ئوبىيكتنى ئ‍ۆچۈرۈش"
 
 msgid "Administration"
 msgstr "باشقۇرۇش"
@@ -205,12 +205,6 @@ msgstr ""
 "بولىدۇ."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"{name} “{obj}” مۇۋەپپەقىيەتلىك قوشۇلدى. تۆۋەندە ئۇنى قايتا تەھرىرلىسىڭىز "
-"بولىدۇ."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -270,6 +264,9 @@ msgstr[1] "ھەممە%(total_count)sتاللاندى"
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s تۈردىن 0 نى تاللىدىڭىز."
+
+msgid "Delete"
+msgstr "ئۆچۈر"
 
 #, python-format
 msgid "Change history: %s"
@@ -354,6 +351,15 @@ msgstr "يول كۆرسەتكۈچى"
 msgid "Models in the %(name)s application"
 msgstr "%(name)s پروگراممىسىدىكى مودېللار"
 
+msgid "Model name"
+msgstr "مودىل ئىسمى"
+
+msgid "Add link"
+msgstr "ئۇلىنىش قوشۇڭ"
+
+msgid "Change or view list link"
+msgstr "تىزىملىك ​​ئۇلانمىسىنى ئۆزگەرتىش ياكى كۆرۈش"
+
 msgid "Add"
 msgstr "قوش"
 
@@ -363,18 +369,19 @@ msgstr "كۆرۈنۈش"
 msgid "You don’t have permission to view or edit anything."
 msgstr "سىزنىڭ كۆرۈش ياكى تەھرىرلەش ھوقۇقىڭىز يوق."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"ئالدى بىلەن، ئىشلەتكۈچى ئاتى ۋە ئىم كىرگۈزۈلىدۇ. ئاندىن، تېخىمۇ كۆپ "
-"ئىشلەتكۈچى تاللانمىلىرىنى تەھرىرلىيەلەيسىز."
+"ئىشلەتكۈچى قۇرغاندىن كېيىن ، تېخىمۇ كۆپ ئىشلەتكۈچى تاللانمىلىرىنى "
+"تەھرىرلىيەلەيسىز."
 
-msgid "Enter a username and password."
-msgstr "ئىشلەتكۈچى ئاتى ۋە پارول كىرگۈزۈڭ."
+msgid "Error:"
+msgstr "خاتالىق:"
 
 msgid "Change password"
 msgstr "پارولنى ئۆزگەرتىش"
+
+msgid "Set password"
+msgstr "پارول تەڭشەك"
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
@@ -384,6 +391,19 @@ msgstr[1] "تۆۋەندىكى خاتالىقلارنى توغرىلاڭ."
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "ئىشلەتكۈچى <strong>%(username)s</strong> ئۈچۈن يېڭى پارول كىرگۈزۈڭ."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"بۇ مەشغۇلات مەزكۇر ئىشلەتكۈچىنىڭ ئىم ئاساسىدىكى دەلىللىشىنى "
+"<strong>قوزغىتىدۇ</strong>"
+
+msgid "Disable password-based authentication"
+msgstr "ئىم ئاساسىدىكى دەلىللەشنى چەكلەيدۇ"
+
+msgid "Enable password-based authentication"
+msgstr "ئىم ئاساسىدىكى دەلىللەشنى قوزغىتىدۇ"
 
 msgid "Skip to main content"
 msgstr "ئاساسلىق مەزمۇنغا ئاتلا"
@@ -441,9 +461,6 @@ msgstr "تېمىنى ئالماشتۇرۇش (ھازىرقى تېما: يورۇق
 msgid "Toggle theme (current theme: dark)"
 msgstr "تېمىنى ئالماشتۇرۇش (ھازىرقى تېما: قارا)"
 
-msgid "Delete"
-msgstr "ئۆچۈر"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -478,9 +495,6 @@ msgstr "ھەئە، شۇنداق"
 
 msgid "No, take me back"
 msgstr "ياق، كەينىگە ياندۇر"
-
-msgid "Delete multiple objects"
-msgstr "كۆپ ئوبىيكتنى ئ‍ۆچۈرۈش"
 
 #, python-format
 msgid ""
@@ -555,8 +569,8 @@ msgstr ""
 "سىز %(username)s دېگەن ئىشلەتكۈچى ھېساباتى بىلەن كىرگەنسىز، لېكىن بۇ بەتكە "
 "كىرىش ھوقۇقىڭىز يوق. باشقا ھېساباتقا كىرىشنى خالامسىز؟"
 
-msgid "Forgotten your password or username?"
-msgstr "پارول ياكى ئىشلەتكۈچى ئاتىڭىزنى ئۇنتۇپ قالدىڭىزمۇ؟"
+msgid "Forgotten your login credentials?"
+msgstr "كىرىش كىنىشكىڭىزنى ئۇنتۇپ قالدىڭىزمۇ؟"
 
 msgid "Toggle navigation"
 msgstr "يۆل باشلىغۇچنى ئالماشتۇرۇش"
@@ -723,8 +737,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "كىيىنكى بەتكە كىرىڭ ۋە بىر شىفرە تاللاڭ:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "ئىشلەتكۈچى ئىسمىڭىز، ئۇنتۇپ قالغان ئەھۋال ئاستىدا:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "ئۇنتۇپ قالغان ئەھۋال ئاستىدا ، سىز:"
 
 msgid "Thanks for using our site!"
 msgstr "تور بېكىتىمىزنى ئىشلەتكىنىڭىز ئۈچۈن رەھمەت!"

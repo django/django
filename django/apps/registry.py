@@ -288,9 +288,9 @@ class Apps:
         referred model is not swappable, return None.
 
         This method is decorated with @functools.cache because it's performance
-        critical when it comes to migrations. Since the swappable settings don't
-        change after Django has loaded the settings, there is no reason to get
-        the respective settings attribute over and over again.
+        critical when it comes to migrations. Since the swappable settings
+        don't change after Django has loaded the settings, there is no reason
+        to get the respective settings attribute over and over again.
         """
         to_string = to_string.lower()
         for model in self.get_models(include_swapped=True):
@@ -378,8 +378,9 @@ class Apps:
         # the relation tree and the fields cache.
         self.get_models.cache_clear()
         if self.ready:
-            # Circumvent self.get_models() to prevent that the cache is refilled.
-            # This particularly prevents that an empty value is cached while cloning.
+            # Circumvent self.get_models() to prevent that the cache is
+            # refilled. This particularly prevents that an empty value is
+            # cached while cloning.
             for app_config in self.app_configs.values():
                 for model in app_config.get_models(include_auto_created=True):
                     model._meta._expire_cache()

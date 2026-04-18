@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
@@ -22,7 +22,7 @@ class DummyStorage(storage.Storage):
         pass
 
     def get_modified_time(self, name):
-        return datetime(1970, 1, 1, tzinfo=timezone.utc)
+        return datetime(1970, 1, 1, tzinfo=UTC)
 
 
 class PathNotImplementedStorage(storage.Storage):

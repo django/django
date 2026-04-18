@@ -131,6 +131,8 @@ class MigrationWriter:
         items = {
             "replaces_str": "",
             "initial_str": "",
+            "run_before_str": "",
+            "atomic_str": "",
         }
 
         imports = set()
@@ -158,8 +160,8 @@ class MigrationWriter:
             "\n".join(sorted(dependencies)) + "\n" if dependencies else ""
         )
 
-        # Format imports nicely, swapping imports of functions from migration files
-        # for comments
+        # Format imports nicely, swapping imports of functions from migration
+        # files for comments
         migration_imports = set()
         for line in list(imports):
             if re.match(r"^import (.*)\.\d+[^\s]*$", line):
@@ -189,10 +191,13 @@ class MigrationWriter:
                 "then update the\n# RunPython operations to refer to the local "
                 "versions:\n# %s"
             ) % "\n# ".join(sorted(migration_imports))
-        # If there's a replaces, make a string for it
         if self.migration.replaces:
             items["replaces_str"] = (
                 "\n    replaces = %s\n" % self.serialize(self.migration.replaces)[0]
+            )
+        if self.migration.run_before:
+            items["run_before_str"] = (
+                "\n    run_before = %s\n" % self.serialize(self.migration.run_before)[0]
             )
         # Hinting that goes into comment
         if self.include_header:
@@ -205,6 +210,8 @@ class MigrationWriter:
 
         if self.migration.initial:
             items["initial_str"] = "\n    initial = True\n"
+        if not self.migration.atomic:
+            items["atomic_str"] = "\n    atomic = False\n"
 
         return MIGRATION_TEMPLATE % items
 
@@ -305,7 +312,7 @@ MIGRATION_TEMPLATE = """\
 %(migration_header)s%(imports)s
 
 class Migration(migrations.Migration):
-%(replaces_str)s%(initial_str)s
+%(replaces_str)s%(initial_str)s%(atomic_str)s%(run_before_str)s
     dependencies = [
 %(dependencies)s\
     ]

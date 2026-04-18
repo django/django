@@ -135,7 +135,8 @@ def file_upload_interrupted_temporary_file(request):
 
 def file_upload_getlist_count(request):
     """
-    Check the .getlist() function to ensure we receive the correct number of files.
+    Check the .getlist() function to ensure we receive the correct number of
+    files.
     """
     file_counts = {}
 
@@ -156,7 +157,7 @@ def file_upload_filename_case_view(request):
     file = request.FILES["file_field"]
     obj = FileModel()
     obj.testfile.save(file.name, file)
-    return HttpResponse("%d" % obj.pk)
+    return HttpResponse("%s" % obj.pk)
 
 
 def file_upload_content_type_extra(request):

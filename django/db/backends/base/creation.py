@@ -1,5 +1,6 @@
 import os
 import sys
+import warnings
 from io import StringIO
 
 from django.apps import apps
@@ -7,6 +8,7 @@ from django.conf import settings
 from django.core import serializers
 from django.db import router
 from django.db.transaction import atomic
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.module_loading import import_string
 
 # The prefix to put on the default database name when creating
@@ -20,8 +22,17 @@ class BaseDatabaseCreation:
     destruction of the test database.
     """
 
+    # If this backend's destroy_test_db() closes the database connection, this
+    # attribute must be set to the name of the connection closing method (e.g.
+    # "close" on Oracle, "close_pool" on MongoDB) to avoid failures in some
+    # backends tests.
+    destroy_test_db_connection_close_method = None
+
     def __init__(self, connection):
         self.connection = connection
+
+    def __del__(self):
+        del self.connection
 
     def _nodb_cursor(self):
         return self.connection._nodb_cursor()
@@ -29,8 +40,10 @@ class BaseDatabaseCreation:
     def log(self, msg):
         sys.stderr.write(msg + os.linesep)
 
+    # RemovedInDjango70Warning: When the deprecation ends, replace with:
+    # def create_test_db(self, verbosity=1, autoclobber=False, keepdb=False):
     def create_test_db(
-        self, verbosity=1, autoclobber=False, serialize=True, keepdb=False
+        self, verbosity=1, autoclobber=False, serialize=None, keepdb=False
     ):
         """
         Create a test database, prompting the user for confirmation if the
@@ -87,15 +100,27 @@ class BaseDatabaseCreation:
                 settings.MIGRATION_MODULES = old_migration_modules
 
         # We then serialize the current state of the database into a string
-        # and store it on the connection. This slightly horrific process is so people
-        # who are testing on databases without transactions or who are using
-        # a TransactionTestCase still get a clean database on every test run.
-        if serialize:
-            self.connection._test_serialized_contents = self.serialize_db_to_string()
+        # and store it on the connection. This slightly horrific process is so
+        # people who are testing on databases without transactions or who are
+        # using a TransactionTestCase still get a clean database on every test
+        # run.
+        if serialize is not None:
+            warnings.warn(
+                "DatabaseCreation.create_test_db(serialize) is deprecated. Call "
+                "DatabaseCreation.serialize_test_db() once all test databases are set "
+                "up instead if you need fixtures persistence between tests.",
+                stacklevel=2,
+                category=RemovedInDjango70Warning,
+            )
+            if serialize:
+                self.connection._test_serialized_contents = (
+                    self.serialize_db_to_string()
+                )
 
         call_command("createcachetable", database=self.connection.alias)
 
-        # Ensure a connection for the side effect of initializing the test database.
+        # Ensure a connection for the side effect of initializing the test
+        # database.
         self.connection.ensure_connection()
 
         if os.environ.get("RUNNING_DJANGOS_TEST_SUITE") == "true":
@@ -203,8 +228,8 @@ class BaseDatabaseCreation:
             try:
                 self._execute_create_test_db(cursor, test_db_params, keepdb)
             except Exception as e:
-                # if we want to keep the db, then no need to do any of the below,
-                # just return and skip it all.
+                # if we want to keep the db, then no need to do any of the
+                # below, just return and skip it all.
                 if keepdb:
                     return test_database_name
 
@@ -333,26 +358,39 @@ class BaseDatabaseCreation:
         Mark tests in Django's test suite which are expected failures on this
         database and test which should be skipped on this database.
         """
-        # Only load unittest if we're actually testing.
-        from unittest import expectedFailure, skip
-
         for test_name in self.connection.features.django_test_expected_failures:
-            test_case_name, _, test_method_name = test_name.rpartition(".")
-            test_app = test_name.split(".")[0]
-            # Importing a test app that isn't installed raises RuntimeError.
-            if test_app in settings.INSTALLED_APPS:
-                test_case = import_string(test_case_name)
-                test_method = getattr(test_case, test_method_name)
-                setattr(test_case, test_method_name, expectedFailure(test_method))
+            self._mark_test(test_name)
         for reason, tests in self.connection.features.django_test_skips.items():
             for test_name in tests:
-                test_case_name, _, test_method_name = test_name.rpartition(".")
-                test_app = test_name.split(".")[0]
-                # Importing a test app that isn't installed raises RuntimeError.
-                if test_app in settings.INSTALLED_APPS:
-                    test_case = import_string(test_case_name)
-                    test_method = getattr(test_case, test_method_name)
-                    setattr(test_case, test_method_name, skip(reason)(test_method))
+                self._mark_test(test_name, reason)
+
+    def _mark_test(self, test_name, skip_reason=None):
+        # Only load unittest during testing.
+        from unittest import expectedFailure, skip
+
+        module_or_class_name, _, name_to_mark = test_name.rpartition(".")
+        test_app = test_name.split(".")[0]
+        # Importing a test app that isn't installed raises RuntimeError.
+        if test_app in settings.INSTALLED_APPS:
+            try:
+                test_frame = import_string(module_or_class_name)
+            except ImportError:
+                # import_string() can raise ImportError if a submodule's parent
+                # module hasn't already been imported during test discovery.
+                # This can happen in at least two cases:
+                # 1. When running a subset of tests in a module, the test
+                #    runner won't import tests in that module's other
+                #    submodules.
+                # 2. When the parallel test runner spawns workers with an empty
+                #    import cache.
+                test_to_mark = import_string(test_name)
+                test_frame = sys.modules.get(test_to_mark.__module__)
+            else:
+                test_to_mark = getattr(test_frame, name_to_mark)
+            if skip_reason:
+                setattr(test_frame, name_to_mark, skip(skip_reason)(test_to_mark))
+            else:
+                setattr(test_frame, name_to_mark, expectedFailure(test_to_mark))
 
     def sql_table_creation_suffix(self):
         """

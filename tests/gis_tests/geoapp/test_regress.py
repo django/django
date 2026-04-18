@@ -5,6 +5,7 @@ from django.contrib.gis.shortcuts import render_to_kmz
 from django.db.models import Count, Min
 from django.test import TestCase, skipUnlessDBFeature
 
+from ..utils import skipUnlessGISLookup
 from .models import City, PennsylvaniaCity, State, Truth
 
 
@@ -66,8 +67,12 @@ class GeoRegressionTests(TestCase):
             founded, PennsylvaniaCity.objects.aggregate(Min("founded"))["founded__min"]
         )
 
+    @skipUnlessGISLookup("contains")
     def test_empty_count(self):
-        "Testing that PostGISAdapter.__eq__ does check empty strings. See #13670."
+        """
+        Testing that PostGISAdapter.__eq__ does check empty strings. See
+        #13670.
+        """
         # contrived example, but need a geo lookup paired with an id__in lookup
         pueblo = City.objects.get(name="Pueblo")
         state = State.objects.filter(poly__contains=pueblo.point)
@@ -78,7 +83,10 @@ class GeoRegressionTests(TestCase):
 
     @skipUnlessDBFeature("allows_group_by_lob")
     def test_defer_or_only_with_annotate(self):
-        "Regression for #16409. Make sure defer() and only() work with annotate()"
+        """
+        Regression for #16409. Make sure defer() and only() work with
+        annotate()
+        """
         self.assertIsInstance(
             list(City.objects.annotate(Count("point")).defer("name")), list
         )
@@ -87,7 +95,9 @@ class GeoRegressionTests(TestCase):
         )
 
     def test_boolean_conversion(self):
-        "Testing Boolean value conversion with the spatial backend, see #15169."
+        """
+        Testing Boolean value conversion with the spatial backend, see #15169.
+        """
         t1 = Truth.objects.create(val=True)
         t2 = Truth.objects.create(val=False)
 

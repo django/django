@@ -13,9 +13,9 @@ who visits the malicious site in their browser. A related type of attack,
 'login CSRF', where an attacking site tricks a user's browser into logging into
 a site with someone else's credentials, is also covered.
 
-The first defense against CSRF attacks is to ensure that GET requests (and other
-'safe' methods, as defined by :rfc:`9110#section-9.2.1`) are side effect free.
-Requests via 'unsafe' methods, such as POST, PUT, and DELETE, can then be
+The first defense against CSRF attacks is to ensure that GET requests (and
+other 'safe' methods, as defined by :rfc:`9110#section-9.2.1`) are side effect
+free. Requests via 'unsafe' methods, such as POST, PUT, and DELETE, can then be
 protected by the steps outlined in :ref:`using-csrf`.
 
 .. _Cross Site Request Forgeries: https://owasp.org/www-community/attacks/csrf#overview
@@ -120,13 +120,14 @@ vulnerability allows and much worse).
 Limitations
 ===========
 
-Subdomains within a site will be able to set cookies on the client for the whole
-domain. By setting the cookie and using a corresponding token, subdomains will
-be able to circumvent the CSRF protection. The only way to avoid this is to
-ensure that subdomains are controlled by trusted users (or, are at least unable
-to set cookies). Note that even without CSRF, there are other vulnerabilities,
-such as session fixation, that make giving subdomains to untrusted parties a bad
-idea, and these vulnerabilities cannot easily be fixed with current browsers.
+Subdomains within a site will be able to set cookies on the client for the
+whole domain. By setting the cookie and using a corresponding token, subdomains
+will be able to circumvent the CSRF protection. The only way to avoid this is
+to ensure that subdomains are controlled by trusted users (or, are at least
+unable to set cookies). Note that even without CSRF, there are other
+vulnerabilities, such as session fixation, that make giving subdomains to
+untrusted parties a bad idea, and these vulnerabilities cannot easily be fixed
+with current browsers.
 
 Utilities
 =========
@@ -150,13 +151,10 @@ class-based views<decorating-class-based-views>`.
         def my_view(request):
             return HttpResponse("Hello world")
 
-    .. versionchanged:: 5.0
-
-        Support for wrapping asynchronous view functions was added.
-
 .. function:: csrf_protect(view)
 
-    Decorator that provides the protection of ``CsrfViewMiddleware`` to a view.
+    Decorator that provides the protection of
+    :class:`~django.middleware.csrf.CsrfViewMiddleware` to a view.
 
     Usage::
 
@@ -169,10 +167,6 @@ class-based views<decorating-class-based-views>`.
             c = {}
             # ...
             return render(request, "a_template.html", c)
-
-    .. versionchanged:: 5.0
-
-        Support for wrapping asynchronous view functions was added.
 
 .. function:: requires_csrf_token(view)
 
@@ -194,17 +188,9 @@ class-based views<decorating-class-based-views>`.
             # ...
             return render(request, "a_template.html", c)
 
-    .. versionchanged:: 5.0
-
-        Support for wrapping asynchronous view functions was added.
-
 .. function:: ensure_csrf_cookie(view)
 
     This decorator forces a view to send the CSRF cookie.
-
-    .. versionchanged:: 5.0
-
-        Support for wrapping asynchronous view functions was added.
 
 Settings
 ========

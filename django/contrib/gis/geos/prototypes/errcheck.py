@@ -1,5 +1,5 @@
 """
- Error checking functions for GEOS ctypes prototype functions.
+Error checking functions for GEOS ctypes prototype functions.
 """
 
 from ctypes import c_void_p, string_at
@@ -19,7 +19,9 @@ def last_arg_byref(args):
 
 
 def check_dbl(result, func, cargs):
-    "Check the status code and returns the double value passed in by reference."
+    """
+    Check the status code and returns the double value passed in by reference.
+    """
     # Checking the status code
     if result != 1:
         return None

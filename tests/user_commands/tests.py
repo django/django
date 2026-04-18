@@ -1,6 +1,9 @@
 import os
+import sys
+import unittest
 from argparse import ArgumentDefaultsHelpFormatter
-from io import StringIO
+from io import BytesIO, StringIO, TextIOWrapper
+from pathlib import Path
 from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
@@ -9,19 +12,46 @@ from django.apps import apps
 from django.core import management
 from django.core.checks import Tags
 from django.core.management import BaseCommand, CommandError, find_commands
+from django.core.management.base import OutputWrapper
 from django.core.management.utils import (
     find_command,
     get_random_secret_key,
     is_ignored_path,
     normalize_path_patterns,
     popen_wrapper,
+    run_formatters,
 )
 from django.db import connection
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, extend_sys_path
 from django.utils import translation
+from django.utils.version import PY314, PY315
 
 from .management.commands import dance
+from .utils import AssertFormatterFailureCaughtContext
+
+
+class OutputWrapperTests(SimpleTestCase):
+    def test_unhandled_exceptions(self):
+        cases = [
+            StringIO("Hello world"),
+            TextIOWrapper(BytesIO(b"Hello world")),
+        ]
+        for out in cases:
+            with self.subTest(out=out):
+                wrapper = OutputWrapper(out)
+                out.close()
+
+                unraisable_exceptions = []
+
+                def unraisablehook(unraisable):
+                    unraisable_exceptions.append(unraisable)
+                    sys.__unraisablehook__(unraisable)
+
+                with mock.patch.object(sys, "unraisablehook", unraisablehook):
+                    del wrapper
+
+                self.assertEqual(unraisable_exceptions, [])
 
 
 # A minimal set of apps to avoid system checks running on all apps.
@@ -400,8 +430,8 @@ class CommandTests(SimpleTestCase):
         self.assertIn("bar", out.getvalue())
 
     def test_subparser_invalid_option(self):
-        msg = "invalid choice: 'test' (choose from 'foo')"
-        with self.assertRaisesMessage(CommandError, msg):
+        msg = r"invalid choice: 'test' \(choose from '?foo'?\)"
+        with self.assertRaisesRegex(CommandError, msg):
             management.call_command("subparser", "test", 12)
         msg = "Error: the following arguments are required: subcommand"
         with self.assertRaisesMessage(CommandError, msg):
@@ -425,6 +455,48 @@ class CommandTests(SimpleTestCase):
             management.call_command("outputwrapper", stdout=out)
         self.assertIn("Working...", out.getvalue())
         self.assertIs(mocked_flush.called, True)
+
+    @unittest.skipUnless(PY314 and not PY315, "Only relevant for Python 3.14")
+    def test_suggest_on_error_defaults_true(self):
+        command = BaseCommand()
+        parser = command.create_parser("prog_name", "subcommand")
+        self.assertTrue(parser.suggest_on_error)
+
+    @unittest.skipUnless(PY314 and not PY315, "Only relevant for Python 3.14")
+    def test_suggest_on_error_explicit_false(self):
+        command = BaseCommand()
+        parser = command.create_parser(
+            "prog_name", "subcommand", suggest_on_error=False
+        )
+        self.assertFalse(parser.suggest_on_error)
+
+    @unittest.skipUnless(PY314, "Only relevant for Python 3.14+")
+    def test_color_enabled_by_default(self):
+        with mock.patch.dict(os.environ, {}, clear=True):
+            command = BaseCommand()
+            parser = command.create_parser("prog_name", "subcommand")
+            self.assertTrue(parser.color)
+
+    @unittest.skipUnless(PY314, "Only relevant for Python 3.14+")
+    def test_color_disabled_with_django_colors_nocolor(self):
+        with mock.patch.dict(os.environ, {"DJANGO_COLORS": "nocolor"}):
+            command = BaseCommand()
+            parser = command.create_parser("prog_name", "subcommand")
+            self.assertFalse(parser.color)
+
+    @unittest.skipUnless(PY314, "Only relevant for Python 3.14+")
+    def test_force_color_does_not_affect_argparse_color(self):
+        with mock.patch.dict(os.environ, {}, clear=True):
+            command = BaseCommand(force_color=True)
+            parser = command.create_parser("prog_name", "subcommand")
+            self.assertTrue(parser.color)
+
+    @unittest.skipUnless(PY314, "Only relevant for Python 3.14+")
+    def test_no_color_flag_disables_color(self):
+        with mock.patch.object(sys, "argv", ["manage.py", "mycommand", "--no-color"]):
+            command = BaseCommand()
+            parser = command.create_parser("manage.py", "mycommand")
+            self.assertFalse(parser.color)
 
 
 class CommandRunTests(AdminScriptTestCase):
@@ -460,8 +532,8 @@ class CommandRunTests(AdminScriptTestCase):
             "settings.py",
             apps=["django.contrib.staticfiles", "user_commands"],
             sdict={
-                # (staticfiles.E001) The STATICFILES_DIRS setting is not a tuple or
-                # list.
+                # (staticfiles.E001) The STATICFILES_DIRS setting is not a
+                # tuple or list.
                 "STATICFILES_DIRS": '"foo"',
             },
         )
@@ -535,3 +607,28 @@ class UtilsTests(SimpleTestCase):
     def test_normalize_path_patterns_truncates_wildcard_base(self):
         expected = [os.path.normcase(p) for p in ["foo/bar", "bar/*/"]]
         self.assertEqual(normalize_path_patterns(["foo/bar/*", "bar/*/"]), expected)
+
+    def test_run_formatters_handles_oserror_for_black_path(self):
+        test_files_path = Path(__file__).parent / "test_files"
+        cases = [
+            (
+                FileNotFoundError,
+                str(test_files_path / "nonexistent"),
+            ),
+            (
+                OSError if sys.platform == "win32" else PermissionError,
+                str(test_files_path / "black"),
+            ),
+        ]
+        for exception, location in cases:
+            with (
+                self.subTest(exception.__qualname__),
+                AssertFormatterFailureCaughtContext(
+                    self, shutil_which_result=location
+                ) as ctx,
+            ):
+                run_formatters([], stderr=ctx.stderr)
+                parsed_error = ctx.stderr.getvalue()
+                self.assertIn(exception.__qualname__, parsed_error)
+                if sys.platform != "win32":
+                    self.assertIn(location, parsed_error)

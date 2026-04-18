@@ -45,6 +45,10 @@ class Worker(models.Model):
         return self.name
 
 
+class WorkerProfile(models.Model):
+    worker = models.OneToOneField(Worker, on_delete=models.CASCADE)
+
+
 class NonAutoPK(models.Model):
     name = models.CharField(max_length=10, primary_key=True)
 

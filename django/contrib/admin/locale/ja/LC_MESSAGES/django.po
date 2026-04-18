@@ -8,19 +8,21 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Masaya, 2023
 # Shinichi Katsumata <shinichi.katsumata@gmail.com>, 2019
-# Shinya Okano <tokibito@gmail.com>, 2012-2018,2021,2023
-# Taichi Taniguchi, 2022
+# Shinya Okano <tokibito@gmail.com>, 2012-2018,2021,2023,2025
+# TANIGUCHI Taichi, 2022
 # Takuro Onoue <kusanaginoturugi@gmail.com>, 2020
 # Takuya N <takninnovationresearch@gmail.com>, 2020
 # Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
 # 上田慶祐 <kei.mokusyun@gmail.com>, 2015
+# 余田大輝, 2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>, 2012-2018,2021,2023\n"
+"POT-Creation-Date: 2024-05-22 11:46-0300\n"
+"PO-Revision-Date: 2025-03-19 11:30-0500\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>, "
+"2012-2018,2021,2023,2025\n"
 "Language-Team: Japanese (http://app.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -41,8 +43,8 @@ msgstr "%(count)d 個の %(items)s を削除しました。"
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s が削除できません"
 
-msgid "Are you sure?"
-msgstr "よろしいですか？"
+msgid "Delete multiple objects"
+msgstr "複数のオブジェクトを削除します"
 
 msgid "Administration"
 msgstr "管理"
@@ -211,10 +213,6 @@ msgid ""
 msgstr "{name} “{obj}” を変更しました。以下から再度編集できます。"
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "{name} “{obj}” を追加しました。続けて編集できます。"
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -270,6 +268,9 @@ msgstr[0] "%(total_count)s 個選択されました"
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s個の内ひとつも選択されていません"
+
+msgid "Delete"
+msgstr "削除"
 
 #, python-format
 msgid "Change history: %s"
@@ -354,6 +355,15 @@ msgstr "パンくずリスト"
 msgid "Models in the %(name)s application"
 msgstr "%(name)s アプリケーション内のモデル"
 
+msgid "Model name"
+msgstr "モデル名"
+
+msgid "Add link"
+msgstr "追加のリンク"
+
+msgid "Change or view list link"
+msgstr "変更または表示のリンク"
+
 msgid "Add"
 msgstr "追加"
 
@@ -363,18 +373,17 @@ msgstr "表示"
 msgid "You don’t have permission to view or edit anything."
 msgstr "表示または変更のためのパーミッションがありません。"
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
-msgstr ""
-"まずユーザー名とパスワードを登録してください。その後詳細情報が編集可能になり"
-"ます。"
+msgid "After you’ve created a user, you’ll be able to edit more user options."
+msgstr "ユーザーを作成後に詳細情報が編集可能になります。"
 
-msgid "Enter a username and password."
-msgstr "ユーザー名とパスワードを入力してください。"
+msgid "Error:"
+msgstr "エラー:"
 
 msgid "Change password"
 msgstr "パスワードの変更"
+
+msgid "Set password"
+msgstr "パスワードを設定"
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
@@ -384,6 +393,18 @@ msgstr[0] "下記のエラーを修正してください。"
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "<strong>%(username)s</strong>さんの新しいパスワードを入力してください。"
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"このアクションは、このユーザーに対するパスワードによる認証を有効にします。"
+
+msgid "Disable password-based authentication"
+msgstr "パスワードによる認証の無効化"
+
+msgid "Enable password-based authentication"
+msgstr "パスワードによる認証の有効化"
 
 msgid "Skip to main content"
 msgstr "スキップしてメインコンテンツへ"
@@ -441,9 +462,6 @@ msgstr "テーマを切り替え (現在のテーマ: ライト)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "テーマを切り替え (現在のテーマ: ダーク)"
 
-msgid "Delete"
-msgstr "削除"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -478,9 +496,6 @@ msgstr "はい、大丈夫です"
 
 msgid "No, take me back"
 msgstr "戻る"
-
-msgid "Delete multiple objects"
-msgstr "複数のオブジェクトを削除します"
 
 #, python-format
 msgid ""
@@ -554,8 +569,8 @@ msgstr ""
 "あなたは %(username)s として認証されましたが、このページへのアクセス許可があ"
 "りません。他のアカウントでログインしますか?"
 
-msgid "Forgotten your password or username?"
-msgstr "パスワードまたはユーザー名を忘れましたか？"
+msgid "Forgotten your login credentials?"
+msgstr "ログイン認証情報を忘れましたか？"
 
 msgid "Toggle navigation"
 msgstr "ナビゲーションを切り替えます"
@@ -715,8 +730,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "次のページで新しいパスワードを選んでください:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "あなたのユーザー名 (もし忘れていたら):"
+msgid "In case you’ve forgotten, you are:"
+msgstr "忘れてしまった場合、あなたのユーザー名:"
 
 msgid "Thanks for using our site!"
 msgstr "ご利用ありがとうございました！"

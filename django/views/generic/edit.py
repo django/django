@@ -123,7 +123,7 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
                 url = self.object.get_absolute_url()
             except AttributeError:
                 raise ImproperlyConfigured(
-                    "No URL to redirect to.  Either provide a url or define"
+                    "No URL to redirect to. Either provide a url or define"
                     " a get_absolute_url method on the Model."
                 )
         return url
@@ -170,7 +170,7 @@ class BaseCreateView(ModelFormMixin, ProcessFormView):
     """
     Base view for creating a new object instance.
 
-    Using this base class requires subclassing to provide a response mixin.
+    This requires subclassing to provide a response mixin.
     """
 
     def get(self, request, *args, **kwargs):
@@ -194,7 +194,7 @@ class BaseUpdateView(ModelFormMixin, ProcessFormView):
     """
     Base view for updating an existing object.
 
-    Using this base class requires subclassing to provide a response mixin.
+    This requires subclassing to provide a response mixin.
     """
 
     def get(self, request, *args, **kwargs):
@@ -242,7 +242,7 @@ class BaseDeleteView(DeletionMixin, FormMixin, BaseDetailView):
     """
     Base view for deleting an object.
 
-    Using this base class requires subclassing to provide a response mixin.
+    This requires subclassing to provide a response mixin.
     """
 
     form_class = Form

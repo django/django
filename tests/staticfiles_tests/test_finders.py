@@ -25,7 +25,7 @@ class TestFinders:
 
     def test_find_all(self):
         src, dst = self.find_all
-        found = self.finder.find(src, all=True)
+        found = self.finder.find(src, find_all=True)
         found = [os.path.normcase(f) for f in found]
         dst = [os.path.normcase(d) for d in dst]
         self.assertEqual(found, dst)
@@ -109,6 +109,13 @@ class TestMiscFinder(SimpleTestCase):
 
     def test_searched_locations(self):
         finders.find("spam")
+        self.assertEqual(
+            finders.searched_locations,
+            [os.path.join(TEST_ROOT, "project", "documents")],
+        )
+
+    def test_searched_locations_find_all(self):
+        finders.find("spam", find_all=True)
         self.assertEqual(
             finders.searched_locations,
             [os.path.join(TEST_ROOT, "project", "documents")],

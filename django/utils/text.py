@@ -1,6 +1,7 @@
 import gzip
 import re
 import secrets
+import textwrap
 import unicodedata
 from collections import deque
 from gzip import GzipFile
@@ -49,24 +50,24 @@ def wrap(text, width):
     ``width``.
     """
 
-    def _generator():
-        for line in text.splitlines(True):  # True keeps trailing linebreaks
-            max_width = min((line.endswith("\n") and width + 1 or width), width)
-            while len(line) > max_width:
-                space = line[: max_width + 1].rfind(" ") + 1
-                if space == 0:
-                    space = line.find(" ") + 1
-                    if space == 0:
-                        yield line
-                        line = ""
-                        break
-                yield "%s\n" % line[: space - 1]
-                line = line[space:]
-                max_width = min((line.endswith("\n") and width + 1 or width), width)
-            if line:
-                yield line
-
-    return "".join(_generator())
+    wrapper = textwrap.TextWrapper(
+        width=width,
+        break_long_words=False,
+        break_on_hyphens=False,
+        replace_whitespace=False,
+    )
+    result = []
+    for line in text.splitlines():
+        wrapped = wrapper.wrap(line)
+        if not wrapped:
+            # If `line` contains only whitespaces that are dropped, restore it.
+            result.append(line)
+        else:
+            result.extend(wrapped)
+    if text.endswith("\n"):
+        # If `text` ends with a newline, preserve it.
+        result.append("")
+    return "\n".join(result)
 
 
 def add_truncation_text(text, truncate=None):
@@ -102,7 +103,7 @@ class TruncateHTMLParser(HTMLParser):
     def __init__(self, *, length, replacement, convert_charrefs=True):
         super().__init__(convert_charrefs=convert_charrefs)
         self.tags = deque()
-        self.output = ""
+        self.output = []
         self.remaining = length
         self.replacement = replacement
 
@@ -118,33 +119,34 @@ class TruncateHTMLParser(HTMLParser):
             self.handle_endtag(tag)
 
     def handle_starttag(self, tag, attrs):
-        self.output += self.get_starttag_text()
+        self.output.append(self.get_starttag_text())
         if tag not in self.void_elements:
             self.tags.appendleft(tag)
 
     def handle_endtag(self, tag):
         if tag not in self.void_elements:
-            self.output += f"</{tag}>"
-            try:
-                self.tags.remove(tag)
-            except ValueError:
-                pass
+            self.output.append(f"</{tag}>")
+            # Remove from the stack only if the tag matches the most recently
+            # opened tag (LIFO). This avoids O(n) linear scans for unmatched
+            # end tags if `deque.remove()` would be called.
+            if self.tags and self.tags[0] == tag:
+                self.tags.popleft()
 
     def handle_data(self, data):
         data, output = self.process(data)
         data_len = len(data)
         if self.remaining < data_len:
             self.remaining = 0
-            self.output += add_truncation_text(output, self.replacement)
+            self.output.append(add_truncation_text(output, self.replacement))
             raise self.TruncationCompleted
         self.remaining -= data_len
-        self.output += output
+        self.output.append(output)
 
     def feed(self, data):
         try:
             super().feed(data)
         except self.TruncationCompleted:
-            self.output += "".join([f"</{tag}>" for tag in self.tags])
+            self.output.extend([f"</{tag}>" for tag in self.tags])
             self.tags.clear()
             self.reset()
         else:
@@ -165,9 +167,9 @@ class TruncateCharsHTMLParser(TruncateHTMLParser):
     def process(self, data):
         self.processed_chars += len(data)
         if (self.processed_chars == self.length) and (
-            len(self.output) + len(data) == len(self.rawdata)
+            sum(len(p) for p in self.output) + len(data) == len(self.rawdata)
         ):
-            self.output += data
+            self.output.append(data)
             raise self.TruncationCompleted
         output = escape("".join(data[: self.remaining]))
         return data, output
@@ -183,13 +185,7 @@ class TruncateWordsHTMLParser(TruncateHTMLParser):
 class Truncator(SimpleLazyObject):
     """
     An object used to truncate text, either by characters or words.
-
-    When truncating HTML text (either chars or words), input will be limited to
-    at most `MAX_LENGTH_HTML` characters.
     """
-
-    # 5 million characters are approximately 4000 text pages or 3 web pages.
-    MAX_LENGTH_HTML = 5_000_000
 
     def __init__(self, text):
         super().__init__(lambda: str(text))
@@ -212,7 +208,7 @@ class Truncator(SimpleLazyObject):
             parser = TruncateCharsHTMLParser(length=length, replacement=truncate)
             parser.feed(text)
             parser.close()
-            return parser.output
+            return "".join(parser.output)
         return self._text_chars(length, truncate, text)
 
     def _text_chars(self, length, truncate, text):
@@ -249,7 +245,7 @@ class Truncator(SimpleLazyObject):
             parser = TruncateWordsHTMLParser(length=length, replacement=truncate)
             parser.feed(self._wrapped)
             parser.close()
-            return parser.output
+            return "".join(parser.output)
         return self._text_words(length, truncate)
 
     def _text_words(self, length, truncate):
@@ -386,6 +382,24 @@ def compress_sequence(sequence, *, max_random_bytes=None):
         yield buf.read()
         for item in sequence:
             zfile.write(item)
+            zfile.flush()
+            data = buf.read()
+            if data:
+                yield data
+    yield buf.read()
+
+
+async def acompress_sequence(sequence, *, max_random_bytes=None):
+    buf = StreamingBuffer()
+    filename = _get_random_filename(max_random_bytes) if max_random_bytes else None
+    with GzipFile(
+        filename=filename, mode="wb", compresslevel=6, fileobj=buf, mtime=0
+    ) as zfile:
+        # Output headers...
+        yield buf.read()
+        async for item in sequence:
+            zfile.write(item)
+            zfile.flush()
             data = buf.read()
             if data:
                 yield data

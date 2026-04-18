@@ -4,12 +4,14 @@
 # BJ Jang <qgis.tr.kr@gmail.com>, 2014
 # JunGu Kang <chr0m3.kr@gmail.com>, 2017
 # Jiyoon, Ha <cryptography@konkuk.ac.kr>, 2016
+# KwonHan <darjeeling@gmail.com>, 2024
 # DONGHO JEONG <nearermg@gmail.com>, 2020
 # Park Hyunwoo <ez.amiryo@gmail.com>, 2017
 # Geonho Kim / Leo Kim <gh.leokim@gmail.com>, 2019
 # hoseung2 <ghyutjik123@gmail.com>, 2017
 # Ian Y. Choi <ianyrchoi@gmail.com>, 2015
 # Jaehong Kim <mixe@korea.com>, 2011
+# Jamie Seol, 2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jay Oh <theanswer.jay@gmail.com>, 2020
 # Le Tartuffe <magno79@gmail.com>, 2014,2016
@@ -22,16 +24,18 @@
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
 # Seho Noh <iam@sehonoh.kr>, 2018
 # Seoeun(Sun☀️) Hong, 2023
+# 최소영, 2024
 # Subin Choi <os1742@gmail.com>, 2016
 # Taesik Yoon <xotlr43@gmail.com>, 2015
 # 정훈 이, 2021
+# 김영빈, 2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
-"Last-Translator: Seoeun(Sun☀️) Hong, 2023\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 06:49+0000\n"
+"Last-Translator: Jamie Seol, 2025\n"
 "Language-Team: Korean (http://app.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -235,7 +239,7 @@ msgid "Malay"
 msgstr "말레이시아어"
 
 msgid "Burmese"
-msgstr "룩셈부르크어"
+msgstr "미얀마어"
 
 msgid "Norwegian Bokmål"
 msgstr "노르웨이어(보크몰)"
@@ -316,7 +320,7 @@ msgid "Udmurt"
 msgstr "이제프스크"
 
 msgid "Uyghur"
-msgstr ""
+msgstr "위구르"
 
 msgid "Ukrainian"
 msgstr "우크라이나어"
@@ -365,6 +369,9 @@ msgstr "해당 페이지에 결과가 없습니다."
 msgid "Enter a valid value."
 msgstr "올바른 값을 입력하세요."
 
+msgid "Enter a valid domain name."
+msgstr "유효한 도메인 이름을 입력하세요."
+
 msgid "Enter a valid URL."
 msgstr "올바른 URL을 입력하세요."
 
@@ -386,14 +393,18 @@ msgstr ""
 "유니코드 문자, 숫자, 언더스코어 또는 하이픈으로 구성된 올바른 내용을 입력하세"
 "요."
 
-msgid "Enter a valid IPv4 address."
-msgstr "올바른 IPv4 주소를 입력하세요."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr "유효한 %(protocol)s의 주소를 입력하세요."
 
-msgid "Enter a valid IPv6 address."
-msgstr "올바른 IPv6 주소를 입력하세요."
+msgid "IPv4"
+msgstr "IPv4"
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "올바른 IPv4 혹은 IPv6 주소를 입력하세요."
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "IPv4 or IPv6"
+msgstr "IPv4 혹은 IPv6"
 
 msgid "Enter only digits separated by commas."
 msgstr "콤마로 구분된 숫자만 입력하세요."
@@ -414,13 +425,15 @@ msgstr "%(limit_value)s 이상의 값을 입력해 주세요."
 
 #, python-format
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
-msgstr ""
+msgstr "단계 크기 %(limit_value)s의 배수를 입력해 주세요."
 
 #, python-format
 msgid ""
 "Ensure this value is a multiple of step size %(limit_value)s, starting from "
 "%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
 msgstr ""
+"예를 들어 %(offset)s, %(valid_value1)s, %(valid_value2)s 등, %(offset)s에서 "
+"시작하는 %(limit_value)s의 배수를 입력해 주세요."
 
 #, python-format
 msgid ""
@@ -529,7 +542,7 @@ msgid "String (up to %(max_length)s)"
 msgstr "문자열(%(max_length)s 글자까지)"
 
 msgid "String (unlimited)"
-msgstr ""
+msgstr "문자열 (무제한의)"
 
 msgid "Comma-separated integers"
 msgstr "정수(콤마로 구분)"
@@ -687,8 +700,10 @@ msgid "Value must be valid JSON."
 msgstr "올바른 JSON 형식이여야 합니다."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(field)s %(value)r 를 가지는 %(model)s 인스턴스가 존재하지 않습니다."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
+"%(field)s 필드의 값이 %(value)r인 %(model)s 인스턴스는 유효한 선택이 아닙니"
+"다."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "외래 키 (연관 필드에 의해 형식 결정)"
@@ -752,7 +767,7 @@ msgstr[0] "파일이름의 길이가 최대 %(max)d 자인지 확인하세요(%(
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
-"파일 업로드 또는 삭제 체크박스를 선택하세요. 동시에 둘 다 할 수는 없습니다."
+"파일 업로드 또는 비우기 체크박스를 선택하세요. 동시에 둘 다 할 수는 없습니다."
 
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
@@ -847,7 +862,7 @@ msgstr ""
 "가 모호하거나 존재하지 않을 수 있습니다."
 
 msgid "Clear"
-msgstr "취소"
+msgstr "비우기"
 
 msgid "Currently"
 msgstr "현재"
@@ -1198,11 +1213,11 @@ msgid ""
 "If you’re concerned about privacy, use alternatives like <a "
 "rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
-"<meta name=\"referrer\" content=\"no-referrer\">태그나  'Referrer-Policy: no-"
-"referrer' 헤더를 포함하고 있다면, 제거해주시기 바랍니다. CSRF 방지를 위한 리"
-"퍼러 검사를 위해 'Referer' 헤더가 필요합니다. 개인 정보에 대해 우려가 있는 경"
-"우, 서드 파티 사이트에 대한 링크에 <a rel=\"noreferrer\" …>와 같은 대안을 사"
-"용할 수 있습니다."
+"<meta name=\"referrer\" content=\"no-referrer\"> 태그나 \"Referrer-Policy: "
+"no-referrer\" 헤더를 포함하고 있다면, 삭제해주시기 바랍니다. CSRF 방지를 위"
+"한 리퍼러 검사를 위해 \"Referer\" 헤더가 필요합니다. 개인 정보에 대해 우려가 "
+"있는 경우, 서드 파티 사이트에 대한 링크에 <a rel=\"noreferrer\" …>와 같은 대"
+"안을 사용할 수 있습니다."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "

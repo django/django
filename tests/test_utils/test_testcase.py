@@ -65,14 +65,12 @@ class TestTestCase(TestCase):
 
     @skipUnlessDBFeature("supports_transactions")
     def test_reset_sequences(self):
-        old_reset_sequences = self.reset_sequences
-        self.reset_sequences = True
+        old_reset_sequences = self.__class__.reset_sequences
+        self.__class__.reset_sequences = True
+        self.addCleanup(setattr, self.__class__, "reset_sequences", old_reset_sequences)
         msg = "reset_sequences cannot be used on TestCase instances"
-        try:
-            with self.assertRaisesMessage(TypeError, msg):
-                self._fixture_setup()
-        finally:
-            self.reset_sequences = old_reset_sequences
+        with self.assertRaisesMessage(TypeError, msg):
+            self._fixture_setup()
 
 
 def assert_no_queries(test):
@@ -84,10 +82,9 @@ def assert_no_queries(test):
     return inner
 
 
-# On databases with no transaction support (for instance, MySQL with the MyISAM
-# engine), setUpTestData() is called before each test, so there is no need to
-# clone class level test data.
-@skipUnlessDBFeature("supports_transactions")
+# On databases without savepoint support, setUpTestData() is called before each
+# test, so there's no need to clone class-level test data.
+@skipUnlessDBFeature("uses_savepoints")
 class TestDataTests(TestCase):
     # setUpTestData re-assignment are also wrapped in TestData.
     jim_douglas = None

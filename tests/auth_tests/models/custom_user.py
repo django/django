@@ -29,6 +29,19 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+    async def acreate_user(self, email, date_of_birth, password=None, **fields):
+        """See create_user()"""
+        if not email:
+            raise ValueError("Users must have an email address")
+
+        user = self.model(
+            email=self.normalize_email(email), date_of_birth=date_of_birth, **fields
+        )
+
+        user.set_password(password)
+        await user.asave(using=self._db)
+        return user
+
     def create_superuser(self, email, password, date_of_birth, **fields):
         u = self.create_user(
             email, password=password, date_of_birth=date_of_birth, **fields
@@ -104,6 +117,19 @@ class CustomUserWithoutIsActiveField(AbstractBaseUser):
     objects = UserManager()
 
     USERNAME_FIELD = "username"
+
+
+class CustomUserCompositePrimaryKey(AbstractBaseUser):
+    pk = models.CompositePrimaryKey("email", "date_of_birth")
+    email = models.EmailField(verbose_name="email address", max_length=255, unique=True)
+    is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
+    date_of_birth = models.DateField()
+
+    custom_objects = CustomUserManager()
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["date_of_birth"]
 
 
 # The extension user is a simple extension of the built-in user class,

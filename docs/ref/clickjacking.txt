@@ -6,7 +6,7 @@ Clickjacking Protection
    :synopsis: Protects against Clickjacking
 
 The clickjacking middleware and decorators provide easy-to-use protection
-against `clickjacking`_.  This type of attack occurs when a malicious site
+against `clickjacking`_. This type of attack occurs when a malicious site
 tricks a user into clicking on a concealed element of another site which they
 have loaded in a hidden frame or iframe.
 
@@ -15,13 +15,14 @@ have loaded in a hidden frame or iframe.
 An example of clickjacking
 ==========================
 
-Suppose an online store has a page where a logged in user can click "Buy Now" to
-purchase an item. A user has chosen to stay logged into the store all the time
-for convenience. An attacker site might create an "I Like Ponies" button on one
-of their own pages, and load the store's page in a transparent iframe such that
-the "Buy Now" button is invisibly overlaid on the "I Like Ponies" button. If the
-user visits the attacker's site, clicking "I Like Ponies" will cause an
-inadvertent click on the "Buy Now" button and an unknowing purchase of the item.
+Suppose an online store has a page where a logged-in user can click "Buy Now"
+to purchase an item. A user has chosen to stay logged into the store all the
+time for convenience. An attacker site might create an "I Like Ponies" button
+on one of their own pages, and load the store's page in a transparent iframe
+such that the "Buy Now" button is invisibly overlaid on the "I Like Ponies"
+button. If the user visits the attacker's site, clicking "I Like Ponies" will
+cause an inadvertent click on the "Buy Now" button and an unknowing purchase of
+the item.
 
 .. _clickjacking-prevention:
 
@@ -90,16 +91,11 @@ that tells the middleware not to set the header::
     iframe, you may need to modify the :setting:`CSRF_COOKIE_SAMESITE` or
     :setting:`SESSION_COOKIE_SAMESITE` settings.
 
-.. versionchanged:: 5.0
-
-    Support for wrapping asynchronous view functions was added to the
-    ``@xframe_options_exempt`` decorator.
-
 Setting ``X-Frame-Options`` per view
 ------------------------------------
 
-To set the ``X-Frame-Options`` header on a per view basis, Django provides these
-decorators::
+To set the ``X-Frame-Options`` header on a per view basis, Django provides
+these decorators::
 
     from django.http import HttpResponse
     from django.views.decorators.clickjacking import xframe_options_deny
@@ -118,32 +114,10 @@ decorators::
 Note that you can use the decorators in conjunction with the middleware. Use of
 a decorator overrides the middleware.
 
-.. versionchanged:: 5.0
-
-    Support for wrapping asynchronous view functions was added to the
-    ``@xframe_options_deny`` and ``@xframe_options_sameorigin`` decorators.
-
 Limitations
 ===========
 
-The ``X-Frame-Options`` header will only protect against clickjacking in a
-modern browser. Older browsers will quietly ignore the header and need `other
-clickjacking prevention techniques`_.
+The ``X-Frame-Options`` header will only protect against clickjacking in
+`modern browsers`_.
 
-Browsers that support ``X-Frame-Options``
------------------------------------------
-
-* Internet Explorer 8+
-* Edge
-* Firefox 3.6.9+
-* Opera 10.5+
-* Safari 4+
-* Chrome 4.1+
-
-See also
---------
-
-A `complete list`_ of browsers supporting ``X-Frame-Options``.
-
-.. _complete list: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options#browser_compatibility
-.. _other clickjacking prevention techniques: https://en.wikipedia.org/wiki/Clickjacking#Prevention
+.. _modern browsers: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options#browser_compatibility

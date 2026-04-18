@@ -10,6 +10,7 @@ API Reference
    class-based-views/index
    clickjacking
    contrib/index
+   csp
    csrf
    databases
    django-admin
@@ -25,6 +26,7 @@ API Reference
    schema-editor
    settings
    signals
+   tasks
    templates/index
    template-response
    unicode

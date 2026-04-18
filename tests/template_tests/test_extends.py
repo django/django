@@ -1,9 +1,9 @@
 import os
 
-from django.template import Context, Engine, TemplateDoesNotExist
+from django.template import Context, Engine, TemplateDoesNotExist, TemplateSyntaxError
 from django.test import SimpleTestCase
 
-from .utils import ROOT
+from .utils import ROOT, setup
 
 RECURSIVE = os.path.join(ROOT, "recursive_templates")
 
@@ -181,3 +181,17 @@ class ExtendsBehaviorTests(SimpleTestCase):
         )
         template = engine.get_template("base.html")
         self.assertEqual(template.render(Context({})), "12AB")
+
+    @setup(
+        {"index.html": "{% block content %}B{% endblock %}{% extends 'base.html' %}"}
+    )
+    def test_extends_not_first_tag_in_extended_template(self):
+        msg = "{% extends 'base.html' %} must be the first tag in 'index.html'."
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.get_template("index.html")
+
+    def test_extends_not_first_tag_in_extended_template_from_string(self):
+        template_string = "{% block content %}B{% endblock %}{% extends 'base.html' %}"
+        msg = "{% extends 'base.html' %} must be the first tag in the template."
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            Engine().from_string(template_string)

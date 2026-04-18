@@ -2,7 +2,7 @@ from django.apps import apps
 from django.contrib.contenttypes.models import ContentType, ContentTypeManager
 from django.contrib.contenttypes.prefetch import GenericPrefetch
 from django.db import models
-from django.db.migrations.state import ProjectState
+from django.db.migrations.state import ModelState, ProjectState
 from django.test import TestCase, override_settings
 from django.test.utils import isolate_apps
 
@@ -99,6 +99,25 @@ class ContentTypesTests(TestCase):
             cts, {ContentType: ContentType.objects.get_for_model(ContentType)}
         )
 
+    @isolate_apps("contenttypes_tests")
+    def test_get_for_models_migrations_create_model(self):
+        state = ProjectState.from_apps(apps.get_app_config("contenttypes"))
+
+        class Foo(models.Model):
+            class Meta:
+                app_label = "contenttypes_tests"
+
+        state.add_model(ModelState.from_model(Foo))
+        ContentType = state.apps.get_model("contenttypes", "ContentType")
+        cts = ContentType.objects.get_for_models(FooWithUrl, Foo)
+        self.assertEqual(
+            cts,
+            {
+                Foo: ContentType.objects.get_for_model(Foo),
+                FooWithUrl: ContentType.objects.get_for_model(FooWithUrl),
+            },
+        )
+
     def test_get_for_models_full_cache(self):
         # Full cache
         ContentType.objects.get_for_model(ContentType)
@@ -126,7 +145,7 @@ class ContentTypesTests(TestCase):
         ct = ContentType.objects.get_for_model(ModelCreatedOnTheFly)
         self.assertEqual(ct.app_label, "contenttypes_tests")
         self.assertEqual(ct.model, "modelcreatedonthefly")
-        self.assertEqual(str(ct), "modelcreatedonthefly")
+        self.assertEqual(str(ct), "contenttypes_tests | modelcreatedonthefly")
 
     def test_get_for_concrete_model(self):
         """
@@ -250,7 +269,7 @@ class ContentTypesTests(TestCase):
             app_label="contenttypes",
             model="OldModel",
         )
-        self.assertEqual(str(ct), "OldModel")
+        self.assertEqual(str(ct), "contenttypes | OldModel")
         self.assertIsNone(ct.model_class())
 
         # Stale ContentTypes can be fetched like any other object.
@@ -299,7 +318,7 @@ class ContentTypesTests(TestCase):
 
     def test_app_labeled_name_unknown_model(self):
         ct = ContentType(app_label="contenttypes_tests", model="unknown")
-        self.assertEqual(ct.app_labeled_name, "unknown")
+        self.assertEqual(ct.app_labeled_name, "contenttypes_tests | unknown")
 
 
 class TestRouter:

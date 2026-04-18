@@ -66,6 +66,9 @@ class SessionBase:
         del self._session[key]
         self.modified = True
 
+    def __bool__(self):
+        return not self.is_empty()
+
     @property
     def key_salt(self):
         return "django.contrib.sessions." + self.__class__.__qualname__
@@ -120,7 +123,9 @@ class SessionBase:
         del (await self._aget_session())[self.TEST_COOKIE_NAME]
 
     def encode(self, session_dict):
-        "Return the given session dictionary serialized and encoded as a string."
+        """
+        Return the given session dictionary serialized and encoded as a string.
+        """
         return signing.dumps(
             session_dict,
             salt=self.key_salt,

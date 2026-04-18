@@ -22,7 +22,7 @@ from django.db.models import (
 )
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from ..utils import FuncTestMixin
+from ..utils import FuncTestMixin, skipUnlessGISLookup
 from .models import (
     AustraliaCity,
     CensusZipcode,
@@ -65,7 +65,8 @@ class DistanceTest(TestCase):
         self.assertEqual(1, Interstate.objects.count())
         self.assertEqual(1, SouthTexasInterstate.objects.count())
 
-    @skipUnlessDBFeature("supports_dwithin_lookup")
+    @skipUnlessGISLookup("dwithin")
+    @skipUnlessDBFeature("has_Transform_function")
     def test_dwithin(self):
         """
         Test the `dwithin` lookup type.
@@ -158,8 +159,8 @@ class DistanceTest(TestCase):
         """
         Test distance lookups on geodetic coordinate systems.
         """
-        # Line is from Canberra to Sydney.  Query is for all other cities within
-        # a 100km of that line (which should exclude only Hobart & Adelaide).
+        # Line is from Canberra to Sydney. Query is for all other cities within
+        # a 100km of that line (which should exclude only Hobart & # Adelaide).
         line = GEOSGeometry("LINESTRING(144.9630 -37.8143,151.2607 -33.8870)", 4326)
         dist_qs = AustraliaCity.objects.filter(point__distance_lte=(line, D(km=100)))
         expected_cities = [
@@ -221,9 +222,9 @@ class DistanceTest(TestCase):
         gq2 = Q(point__distance_gte=(wollongong.point, d2))
         qs1 = AustraliaCity.objects.exclude(name="Wollongong").filter(gq1 | gq2)
 
-        # Geodetic distance lookup but telling GeoDjango to use `distance_spheroid`
-        # instead (we should get the same results b/c accuracy variance won't matter
-        # in this test case).
+        # Geodetic distance lookup but telling GeoDjango to use
+        # `distance_spheroid` instead (we should get the same results b/c
+        # accuracy variance won't matter in this test case).
         querysets = [qs1]
         if connection.features.has_DistanceSpheroid_function:
             gq3 = Q(point__distance_lte=(wollongong.point, d1, "spheroid"))
@@ -322,7 +323,8 @@ class DistanceTest(TestCase):
                 point__distance_lte=(Point(0, 0), D(m=100))
             ).exists()
 
-    @skipUnlessDBFeature("supports_dwithin_lookup")
+    @skipUnlessGISLookup("dwithin")
+    @skipUnlessDBFeature("has_Transform_function")
     def test_dwithin_subquery(self):
         """dwithin lookup in a subquery using OuterRef as a parameter."""
         qs = CensusZipcode.objects.annotate(
@@ -334,7 +336,8 @@ class DistanceTest(TestCase):
         ).filter(annotated_value=True)
         self.assertEqual(self.get_names(qs), ["77002", "77025", "77401"])
 
-    @skipUnlessDBFeature("supports_dwithin_lookup", "supports_dwithin_distance_expr")
+    @skipUnlessGISLookup("dwithin")
+    @skipUnlessDBFeature("supports_dwithin_distance_expr")
     def test_dwithin_with_expression_rhs(self):
         # LineString of Wollongong and Adelaide coords.
         ls = LineString(((150.902, -34.4245), (138.6, -34.9258)), srid=4326)
@@ -442,7 +445,10 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         # using the provided raw SQL statements.
         #  SELECT ST_Distance(
         #      point,
-        #      ST_Transform(ST_GeomFromText('POINT(-96.876369 29.905320)', 4326), 32140)
+        #      ST_Transform(
+        #          ST_GeomFromText('POINT(-96.876369 29.905320)', 4326),
+        #          32140
+        #      )
         #  )
         #  FROM distapp_southtexascity;
         m_distances = [
@@ -458,7 +464,10 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         ]
         #  SELECT ST_Distance(
         #      point,
-        #      ST_Transform(ST_GeomFromText('POINT(-96.876369 29.905320)', 4326), 2278)
+        #      ST_Transform(
+        #          ST_GeomFromText('POINT(-96.876369 29.905320)', 4326),
+        #          2278
+        #      )
         #  )
         #  FROM distapp_southtexascityft;
         ft_distances = [
@@ -502,7 +511,10 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         # Reference query:
         #  SELECT ST_distance_sphere(
         #      point,
-        #      ST_GeomFromText('LINESTRING(150.9020 -34.4245,150.8700 -34.5789)', 4326)
+        #      ST_GeomFromText(
+        #          'LINESTRING(150.9020 -34.4245,150.8700 -34.5789)',
+        #          4326
+        #      )
         #  )
         #  FROM distapp_australiacity ORDER BY name;
         distances = [
@@ -523,7 +535,8 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         )
         for city, distance in zip(qs, distances):
             with self.subTest(city=city, distance=distance):
-                # Testing equivalence to within a meter (kilometer on SpatiaLite).
+                # Testing equivalence to within a meter (kilometer on
+                # SpatiaLite).
                 tol = -3 if connection.ops.spatialite else 0
                 self.assertAlmostEqual(distance, city.distance.m, tol)
 
@@ -542,7 +555,8 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         #      point,
         #      ST_GeomFromText('POINT(151.231341 -33.952685)', 4326)
         #  )
-        #  FROM distapp_australiacity WHERE (NOT (id = 11));  st_distance_sphere
+        #  FROM distapp_australiacity
+        #  WHERE (NOT (id = 11));  st_distance_sphere
         spheroid_distances = [
             60504.0628957201,
             77023.9489850262,
@@ -578,7 +592,8 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
             with self.subTest(c=c):
                 self.assertAlmostEqual(spheroid_distances[i], c.distance.m, tol)
         if connection.ops.postgis or connection.ops.spatialite:
-            # PostGIS uses sphere-only distances by default, testing these as well.
+            # PostGIS uses sphere-only distances by default, testing these as
+            # well.
             qs = (
                 AustraliaCity.objects.exclude(id=hillsdale.id)
                 .annotate(distance=Distance("point", hillsdale.point))
@@ -653,7 +668,8 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
     @skipUnlessDBFeature("has_Distance_function", "has_Transform_function")
     def test_distance_transform(self):
         """
-        Test the `Distance` function used with `Transform` on a geographic field.
+        Test the `Distance` function used with `Transform` on a geographic
+        field.
         """
         # We'll be using a Polygon (created by buffering the centroid
         # of 77005 to 100m) -- which aren't allowed in geographic distance
@@ -662,7 +678,8 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         z = SouthTexasZipcode.objects.get(name="77005")
 
         # Reference query:
-        # SELECT ST_Distance(ST_Transform("distapp_censuszipcode"."poly", 32140),
+        # SELECT ST_Distance(
+        #   ST_Transform("distapp_censuszipcode"."poly", 32140),
         #   ST_GeomFromText('<buffer_wkt>', 32140))
         # FROM "distapp_censuszipcode";
         dists_m = [3553.30384972258, 1243.18391525602, 2186.15439472242]
@@ -670,7 +687,7 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         # Having our buffer in the SRID of the transformation and of the field
         # -- should get the same results. The first buffer has no need for
         # transformation SQL because it is the same SRID as what was given
-        # to `transform()`.  The second buffer will need to be transformed,
+        # to `transform()`. The second buffer will need to be transformed,
         # however.
         buf1 = z.poly.centroid.buffer(100)
         buf2 = buf1.transform(4269, clone=True)
@@ -706,7 +723,8 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         # Reference query (should use `length_spheroid`).
         #  SELECT ST_length_spheroid(
         #      ST_GeomFromText('<wkt>', 4326)
-        #      'SPHEROID["WGS 84",6378137,298.257223563, AUTHORITY["EPSG","7030"]]'
+        #      'SPHEROID["WGS 84",6378137,298.257223563,
+        #        AUTHORITY["EPSG","7030"]]'
         #  );
         len_m1 = 473504.769553813
         len_m2 = 4617.668

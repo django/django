@@ -69,8 +69,8 @@ class Polygon(GEOSGeometry):
     # ### These routines are needed for list-like operation w/ListMixin ###
     def _create_polygon(self, length, items):
         # Instantiate LinearRing objects if necessary, but don't clone them yet
-        # _construct_ring will throw a TypeError if a parameter isn't a valid ring
-        # If we cloned the pointers here, we wouldn't be able to clean up
+        # _construct_ring will throw a TypeError if a parameter isn't a valid
+        # ring If we cloned the pointers here, we wouldn't be able to clean up
         # in case of error.
         if not length:
             return capi.create_empty_polygon()
@@ -103,7 +103,7 @@ class Polygon(GEOSGeometry):
         param,
         msg=(
             "Parameter must be a sequence of LinearRings or objects that can "
-            "initialize to LinearRings"
+            "initialize to LinearRings."
         ),
     ):
         "Try to construct a ring from the given parameter."
@@ -127,7 +127,7 @@ class Polygon(GEOSGeometry):
     def _get_single_internal(self, index):
         """
         Return the ring at the specified index. The first index, 0, will
-        always return the exterior ring.  Indices > 0 will return the
+        always return the exterior ring. Indices > 0 will return the
         interior ring at the given index (e.g., poly[1] and poly[2] would
         return the first and second interior ring, respectively).
 

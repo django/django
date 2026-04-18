@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2023
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016-2023\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016-2025\n"
 "Language-Team: Upper Sorbian (http://app.transifex.com/django/django/"
 "language/hsb/)\n"
 "MIME-Version: 1.0\n"
@@ -28,10 +28,10 @@ msgstr "%(count)d %(items)s je so wuspěšnje zhašało."
 
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr "%(name)s njeda so zhašeć."
+msgstr "%(name)s njeda so zhašeć"
 
-msgid "Are you sure?"
-msgstr "Sće wěsty?"
+msgid "Delete multiple objects"
+msgstr "Wjacore objekty zhašeć"
 
 msgid "Administration"
 msgstr "Administracija"
@@ -200,10 +200,6 @@ msgid ""
 msgstr "{name} „{obj}“ je so wuspěšnje změnił. Móžeće jón deleka wobdźěłować."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "{name} „{obj}“ je so wuspěšnje přidał. Móžeće jón deleka wobdźěłować."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -266,6 +262,9 @@ msgstr[3] "%(total_count)s wubranych"
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 z %(cnt)s wubranych"
+
+msgid "Delete"
+msgstr "Zhašeć"
 
 #, python-format
 msgid "Change history: %s"
@@ -350,6 +349,15 @@ msgstr "Chlěbowe srjódki"
 msgid "Models in the %(name)s application"
 msgstr "Modele w nałoženju %(name)s"
 
+msgid "Model name"
+msgstr "Modelowe mjeno"
+
+msgid "Add link"
+msgstr "Wotkaz přidać"
+
+msgid "Change or view list link"
+msgstr "Lisćinowy wotkaz změnić abo pokazać"
+
 msgid "Add"
 msgstr "Přidać"
 
@@ -359,18 +367,18 @@ msgstr "Pokazać"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Nimaće prawo něšto pokazać abo wobdźěłać."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Zapodajće najprjedy wužiwarske mjeno a hesło. Potom móžeće dalše wužiwarske "
-"nastajenja wobdźěłować."
+"Hdyž sće wužiwarja wutworił, móžeće dalše wužiwarske nastajenja wobdźěłać."
 
-msgid "Enter a username and password."
-msgstr "Zapodajće wužiwarske mjeno a hesło."
+msgid "Error:"
+msgstr "Zmylk:"
 
 msgid "Change password"
 msgstr "Hesło změnić"
+
+msgid "Set password"
+msgstr "Hesło postajić"
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
@@ -382,6 +390,19 @@ msgstr[3] "Prošu porjedźće slědowace zmylki."
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Zapodajće nowe hesło za <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Tuta akcija awtentifikacija na zakładźe hesła za tutoho wužiwarja <strong> "
+"zmóžni </strong>."
+
+msgid "Disable password-based authentication"
+msgstr "Awtentifikaciju na zakładźe hesła znjemóžnić"
+
+msgid "Enable password-based authentication"
+msgstr "Awtentifikaciju na zakładźe hesła zmóžnić"
 
 msgid "Skip to main content"
 msgstr "Dale k hłownemu wobsahej"
@@ -439,9 +460,6 @@ msgstr "Drastu změnić (aktualna drasta: swětła)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Drastu změnić (aktualna drasta: ćmowa)"
 
-msgid "Delete"
-msgstr "Zhašeć"
-
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -475,9 +493,6 @@ msgstr "Haj, sym sej wěsty"
 
 msgid "No, take me back"
 msgstr "Ně, prošu wróćo"
-
-msgid "Delete multiple objects"
-msgstr "Wjacore objekty zhašeć"
 
 #, python-format
 msgid ""
@@ -552,8 +567,8 @@ msgstr ""
 "Sće jako %(username)s awtentifikowany, ale nimaće přistup na tutu stronu. "
 "Chceće so pola druheho konta přizjewić?"
 
-msgid "Forgotten your password or username?"
-msgstr "Sće swoje hesło abo wužiwarske mjeno zabył?"
+msgid "Forgotten your login credentials?"
+msgstr "Sće swoje přizjewjenske daty zabył?"
 
 msgid "Toggle navigation"
 msgstr "Nawigaciju přepinać"
@@ -723,8 +738,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Prošu dźiće k slědowacej stronje a wubjerće nowe hesło:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Waše wužiwarske mjeno, jeli sće jo zabył:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "Jeli sće je zabył, sće:"
 
 msgid "Thanks for using our site!"
 msgstr "Wulki dźak za wužiwanje našeho sydła!"

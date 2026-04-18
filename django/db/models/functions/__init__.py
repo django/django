@@ -1,4 +1,4 @@
-from .comparison import Cast, Coalesce, Collate, Greatest, JSONObject, Least, NullIf
+from .comparison import Cast, Coalesce, Collate, Greatest, Least, NullIf
 from .datetime import (
     Extract,
     ExtractDay,
@@ -25,6 +25,7 @@ from .datetime import (
     TruncWeek,
     TruncYear,
 )
+from .json import JSONArray, JSONObject
 from .math import (
     Abs,
     ACos,
@@ -77,6 +78,7 @@ from .text import (
     Trim,
     Upper,
 )
+from .uuid import UUID4, UUID7
 from .window import (
     CumeDist,
     DenseRank,
@@ -97,7 +99,6 @@ __all__ = [
     "Coalesce",
     "Collate",
     "Greatest",
-    "JSONObject",
     "Least",
     "NullIf",
     # datetime
@@ -125,6 +126,9 @@ __all__ = [
     "TruncTime",
     "TruncWeek",
     "TruncYear",
+    # json
+    "JSONArray",
+    "JSONObject",
     # math
     "Abs",
     "ACos",
@@ -175,6 +179,9 @@ __all__ = [
     "Substr",
     "Trim",
     "Upper",
+    # uuid
+    "UUID4",
+    "UUID7",
     # window
     "CumeDist",
     "DenseRank",

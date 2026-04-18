@@ -15,6 +15,7 @@ from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
 from django.db import DEFAULT_DB_ALIAS, connections
+from django.utils.version import PY314, PY315
 
 ALL_CHECKS = "__all__"
 
@@ -57,6 +58,11 @@ class CommandParser(ArgumentParser):
     ):
         self.missing_args_message = missing_args_message
         self.called_from_command_line = called_from_command_line
+        if PY314:
+            if not PY315:
+                kwargs.setdefault("suggest_on_error", True)
+            if os.environ.get("DJANGO_COLORS") == "nocolor" or "--no-color" in sys.argv:
+                kwargs.setdefault("color", False)
         super().__init__(**kwargs)
 
     def parse_args(self, args=None, namespace=None):
@@ -142,7 +148,7 @@ class DjangoHelpFormatter(HelpFormatter):
         super().add_arguments(self._reordered_actions(actions))
 
 
-class OutputWrapper(TextIOBase):
+class OutputWrapper:
     """
     Wrapper around stdout/stderr
     """
@@ -181,6 +187,9 @@ class OutputWrapper(TextIOBase):
         self._out.write(style_func(msg))
 
 
+TextIOBase.register(OutputWrapper)
+
+
 class BaseCommand:
     """
     The base class from which all management commands ultimately
@@ -211,7 +220,7 @@ class BaseCommand:
        SQL statements, will be wrapped in ``BEGIN`` and ``COMMIT``.
 
     4. If ``handle()`` or ``execute()`` raised any exception (e.g.
-       ``CommandError``), ``run_from_argv()`` will  instead print an error
+       ``CommandError``), ``run_from_argv()`` will instead print an error
        message to ``stderr``.
 
     Thus, the ``handle()`` method is typically the starting point for
@@ -345,7 +354,7 @@ class BaseCommand:
             parser,
             "--traceback",
             action="store_true",
-            help="Raise on CommandError exceptions.",
+            help="Display a full stack trace on CommandError exceptions.",
         )
         self.add_base_argument(
             parser,
@@ -450,10 +459,8 @@ class BaseCommand:
             self.stderr = OutputWrapper(options["stderr"])
 
         if self.requires_system_checks and not options["skip_checks"]:
-            if self.requires_system_checks == ALL_CHECKS:
-                self.check()
-            else:
-                self.check(tags=self.requires_system_checks)
+            check_kwargs = self.get_check_kwargs(options)
+            self.check(**check_kwargs)
         if self.requires_migrations_checks:
             self.check_migrations()
         output = self.handle(*args, **options)
@@ -467,6 +474,11 @@ class BaseCommand:
                 )
             self.stdout.write(output)
         return output
+
+    def get_check_kwargs(self, options):
+        if self.requires_system_checks == ALL_CHECKS:
+            return {}
+        return {"tags": self.requires_system_checks}
 
     def check(
         self,
@@ -672,7 +684,13 @@ class LabelCommand(BaseCommand):
     """
 
     label = "label"
-    missing_args_message = "Enter at least one %s." % label
+    missing_args_message = "Enter at least one %s."
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.missing_args_message == LabelCommand.missing_args_message:
+            self.missing_args_message = self.missing_args_message % self.label
 
     def add_arguments(self, parser):
         parser.add_argument("args", metavar=self.label, nargs="+")

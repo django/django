@@ -7,23 +7,33 @@
 # Andreas Pelme <andreas@pelme.se>, 2014
 # d7bcbd5f5cbecdc2b959899620582440, 2011
 # Cybjit <cybjit@gmail.com>, 2012
+# d7bcbd5f5cbecdc2b959899620582440, 2011
+# Daniel Nylander <po@danielnylander.se>, 2025
 # Elias Johnstone <eli87as@gmail.com>, 2022
 # Henrik Palmlund Wahlgren <henrik@pwit.se>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Johan Rohdin, 2021
+# Johan Rohdin, 2021
+# Jonathan Lindén, 2014-2015
 # Jonathan Lindén, 2015
+# Jörgen Olofsson, 2024
+# Jörgen Olofsson, 2024
 # Jonathan Lindén, 2014
 # metteludwig <luudde@gmail.com>, 2019
 # Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
+# metteludwig <luudde@gmail.com>, 2019
+# Mikko Hellsing <mikko@aino.se>, 2011
+# nip3o <n@niclasolofsson.se>, 2024
+# nip3o <n@niclasolofsson.se>, 2024
 # Mikko Hellsing <mikko@aino.se>, 2011
 # Thomas Lundqvist, 2013,2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: Albin Larsson <albin.post@gmail.com>, 2022-2023\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2025-12-03 07:05+0000\n"
+"Last-Translator: Daniel Nylander <po@danielnylander.se>, 2025\n"
 "Language-Team: Swedish (http://app.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -38,14 +48,14 @@ msgstr "Ta bort markerade %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr "Tog bort %(count)d %(items)s"
+msgstr "Tog bort %(count)d %(items)s."
 
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Kan inte ta bort %(name)s"
 
-msgid "Are you sure?"
-msgstr "Är du säker?"
+msgid "Delete multiple objects"
+msgstr "Ta bort flera objekt"
 
 msgid "Administration"
 msgstr "Administration"
@@ -193,14 +203,14 @@ msgstr ""
 "Håll inne “Control”, eller “Command” på en Mac, för att välja fler än en."
 
 msgid "Select this object for an action - {}"
-msgstr ""
+msgstr "Välj detta objekt för en åtgärd - {}"
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "Lade till {name} “{obj}”."
 
 msgid "You may edit it again below."
-msgstr "Du kan redigera det igen nedan"
+msgstr "Du kan redigera det igen nedan."
 
 #, python-brace-format
 msgid ""
@@ -211,10 +221,6 @@ msgstr "Lade till {name} “{obj}”. Du kan lägga till ytterligare {name} neda
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr "Ändrade {name} “{obj}”. Du kan göra ytterligare förändringar nedan."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "Lade till {name} “{obj}”. Du kan göra ytterligare förändringar nedan."
 
 #, python-brace-format
 msgid ""
@@ -273,6 +279,9 @@ msgstr[1] "Alla %(total_count)s valda"
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 av %(cnt)s valda"
+
+msgid "Delete"
+msgstr "Radera"
 
 #, python-format
 msgid "Change history: %s"
@@ -334,11 +343,8 @@ msgstr ""
 "Ett fel har inträffat. Felet är rapporterat till sidans administratörer via "
 "e-post och bör vara åtgärdat inom kort. Tack för ditt tålamod."
 
-msgid "Run the selected action"
-msgstr "Kör markerade operationer"
-
-msgid "Go"
-msgstr "Utför"
+msgid "Run"
+msgstr "Kör"
 
 msgid "Click here to select the objects across all pages"
 msgstr "Klicka här för att välja alla objekt från alla sidor"
@@ -357,6 +363,15 @@ msgstr "Brödsmulor"
 msgid "Models in the %(name)s application"
 msgstr "Modeller i applikationen %(name)s"
 
+msgid "Model name"
+msgstr "Modellens namn"
+
+msgid "Add link"
+msgstr "Lägg till länk"
+
+msgid "Change or view list link"
+msgstr "Ändra eller visa listlänk"
+
 msgid "Add"
 msgstr "Lägg till"
 
@@ -366,27 +381,40 @@ msgstr "Visa"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Du har inte tillåtelse att se eller ändra någonting."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Ange först ett användarnamn och ett lösenord. Därefter kan du ändra fler "
-"egenskaper för användaren."
+"När du har skapat en användare kan du redigera fler användaralternativ."
 
-msgid "Enter a username and password."
-msgstr "Mata in användarnamn och lösenord."
+msgid "Error:"
+msgstr "Fel:"
 
 msgid "Change password"
 msgstr "Ändra lösenord"
 
+msgid "Set password"
+msgstr "Sätt lösenord"
+
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Var god rätta felet nedan."
-msgstr[1] "Vad god rätta felen nedan."
+msgstr[1] "Var god rätta felen nedan."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Ange nytt lösenord för användare <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Denna åtgärd <strong>aktiverar</strong>  lösenordsbaserad autentisering för "
+"denna användare."
+
+msgid "Disable password-based authentication"
+msgstr "Inaktivera lösenordsbaserad autentisering"
+
+msgid "Enable password-based authentication"
+msgstr "Aktivera lösenordsbaserad autentisering"
 
 msgid "Skip to main content"
 msgstr "Hoppa till huvudinnehållet"
@@ -417,13 +445,16 @@ msgid "Filter"
 msgstr "Filtrera"
 
 msgid "Hide counts"
-msgstr ""
+msgstr "Dölj antal"
 
 msgid "Show counts"
-msgstr ""
+msgstr "Visa antal"
 
 msgid "Clear all filters"
 msgstr "Rensa alla filter"
+
+msgid "Save"
+msgstr "Spara"
 
 msgid "Remove from sorting"
 msgstr "Ta bort från sortering"
@@ -444,34 +475,31 @@ msgstr "Växla tema (aktuellt tema: ljust)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Växla tema (aktuellt tema: mörkt)"
 
-msgid "Delete"
-msgstr "Radera"
-
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Att ta bort %(object_name)s '%(escaped_object)s' skulle innebära att "
-"relaterade objekt togs bort, men ditt konto har inte rättigheter att ta bort "
-"följande objekttyper:"
+"Om du tar bort %(object_name)s “%(escaped_object)s” kommer relaterade objekt "
+"att tas bort, men ditt konto har inte behörighet att ta bort följande typer "
+"av objekt:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Borttagning av %(object_name)s '%(escaped_object)s'  kräver borttagning av "
-"följande skyddade relaterade objekt:"
+"För att ta bort %(object_name)s “%(escaped_object)s” måste följande skyddade "
+"relaterade objekt tas bort:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Är du säker på att du vill ta bort %(object_name)s \"%(escaped_object)s\"? "
-"Följande relaterade objekt kommer att tas bort:"
+"Är du säker på att du vill ta bort %(object_name)s “%(escaped_object)s”? "
+"Alla följande relaterade objekt kommer att tas bort:"
 
 msgid "Objects"
 msgstr "Objekt"
@@ -481,9 +509,6 @@ msgstr "Ja, jag är säker"
 
 msgid "No, take me back"
 msgstr "Nej, ta mig tillbaka"
-
-msgid "Delete multiple objects"
-msgstr "Ta bort flera objekt"
 
 #, python-format
 msgid ""
@@ -509,7 +534,7 @@ msgid ""
 "following objects and their related items will be deleted:"
 msgstr ""
 "Är du säker på att du vill ta bort valda %(objects_name)s? Alla följande "
-"objekt samt relaterade objekt kommer att tas bort: "
+"objekt samt relaterade objekt kommer att tas bort:"
 
 msgid "Delete?"
 msgstr "Radera?"
@@ -531,13 +556,13 @@ msgid "None available"
 msgstr "Inga tillgängliga"
 
 msgid "Added:"
-msgstr ""
+msgstr "Lagt till:"
 
 msgid "Changed:"
-msgstr ""
+msgstr "Ändrade:"
 
 msgid "Deleted:"
-msgstr ""
+msgstr "Raderade:"
 
 msgid "Unknown content"
 msgstr "Okänt innehåll"
@@ -559,8 +584,8 @@ msgstr ""
 "Du är autentiserad som %(username)s men är inte behörig att komma åt denna "
 "sida. Vill du logga in med ett annat konto?"
 
-msgid "Forgotten your password or username?"
-msgstr "Har du glömt lösenordet eller användarnamnet?"
+msgid "Forgotten your login credentials?"
+msgstr "Har du glömt dina inloggningsuppgifter?"
 
 msgid "Toggle navigation"
 msgstr "Växla navigering"
@@ -569,7 +594,7 @@ msgid "Sidebar"
 msgstr "Sidopanel"
 
 msgid "Start typing to filter…"
-msgstr "Börja skriv för att filtrera..."
+msgstr "Börja skriv för att filtrera…"
 
 msgid "Filter navigation items"
 msgstr "Filtrera navigeringsobjekt"
@@ -583,6 +608,10 @@ msgstr "Användare"
 msgid "Action"
 msgstr "Händelse"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr "Sidnumrering %(name)s-poster"
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "post"
@@ -595,14 +624,19 @@ msgstr ""
 "Det här objektet har ingen förändringshistorik. Det var antagligen inte "
 "tillagt via den här admin-sidan."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr "Sidnumrering %(name)s"
+
 msgid "Show all"
 msgstr "Visa alla"
 
-msgid "Save"
-msgstr "Spara"
-
 msgid "Popup closing…"
-msgstr "Popup stängs..."
+msgstr "Popup stängs…"
+
+#, python-format
+msgid "Search %(name)s"
+msgstr "Sök efter %(name)s"
 
 msgid "Search"
 msgstr "Sök"
@@ -725,8 +759,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Var god gå till följande sida och välj ett nytt lösenord:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Ditt användarnamn, utifall du glömt det:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "Om du har glömt det, du är:"
 
 msgid "Thanks for using our site!"
 msgstr "Tack för att du använder vår webbplats!"
@@ -749,7 +783,7 @@ msgid "Reset my password"
 msgstr "Nollställ mitt lösenord"
 
 msgid "Select all objects on this page for an action"
-msgstr ""
+msgstr "Välj alla objekt på denna sida för en åtgärd"
 
 msgid "All dates"
 msgstr "Alla datum"

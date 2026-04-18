@@ -10,6 +10,8 @@ TEST_DATABASE_PREFIX = "test_"
 
 
 class DatabaseCreation(BaseDatabaseCreation):
+    destroy_test_db_connection_close_method = "close"
+
     @cached_property
     def _maindb_connection(self):
         """
@@ -36,7 +38,8 @@ class DatabaseCreation(BaseDatabaseCreation):
                     )
                 except Exception as e:
                     if "ORA-01543" not in str(e):
-                        # All errors except "tablespace already exists" cancel tests
+                        # All errors except "tablespace already exists" cancel
+                        # tests
                         self.log("Got an error creating the test database: %s" % e)
                         sys.exit(2)
                     if not autoclobber:
@@ -205,13 +208,15 @@ class DatabaseCreation(BaseDatabaseCreation):
         Destroy a test database, prompting the user for confirmation if the
         database already exists. Return the name of the test database created.
         """
-        self.connection.settings_dict["USER"] = self.connection.settings_dict[
-            "SAVED_USER"
-        ]
-        self.connection.settings_dict["PASSWORD"] = self.connection.settings_dict[
-            "SAVED_PASSWORD"
-        ]
+        if not self.connection.is_pool:
+            self.connection.settings_dict["USER"] = self.connection.settings_dict[
+                "SAVED_USER"
+            ]
+            self.connection.settings_dict["PASSWORD"] = self.connection.settings_dict[
+                "SAVED_PASSWORD"
+            ]
         self.connection.close()
+        self.connection.close_pool()
         parameters = self._get_test_db_params()
         with self._maindb_connection.cursor() as cursor:
             if self._test_user_create():
@@ -223,6 +228,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                     self.log("Destroying test database tables...")
                 self._execute_test_db_destruction(cursor, parameters, verbosity)
         self._maindb_connection.close()
+        self._maindb_connection.close_pool()
 
     def _execute_test_db_creation(self, cursor, parameters, verbosity, keepdb=False):
         if verbosity >= 2:
@@ -403,7 +409,8 @@ class DatabaseCreation(BaseDatabaseCreation):
     def _test_database_passwd(self):
         password = self._test_settings_get("PASSWORD")
         if password is None and self._test_user_create():
-            # Oracle passwords are limited to 30 chars and can't contain symbols.
+            # Oracle passwords are limited to 30 chars and can't contain
+            # symbols.
             password = get_random_string(30)
         return password
 

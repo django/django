@@ -18,7 +18,8 @@ class TestDjangoTestCase(DjangoTestCase):
 
 
 class TestZimpleTestCase(SimpleTestCase):
-    # Z is used to trick this test case to appear after Vanilla in default suite
+    # Z is used to trick this test case to appear after Vanilla in default
+    # suite
 
     def test_sample(self):
         self.assertEqual(1, 1)

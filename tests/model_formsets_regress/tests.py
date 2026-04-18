@@ -407,7 +407,8 @@ class BaseCustomDeleteFormSet(BaseFormSet):
     A formset mix-in that lets a form decide if it's to be deleted.
     Works for BaseFormSets. Also works for ModelFormSets with #14099 fixed.
 
-    form.should_delete() is called. The formset delete field is also suppressed.
+    form.should_delete() is called. The formset delete field is also
+    suppressed.
     """
 
     def add_fields(self, form, index):

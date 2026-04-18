@@ -1,8 +1,11 @@
 import asyncio
 import sys
+import tempfile
 import threading
 import time
+from io import BytesIO
 from pathlib import Path
+from unittest.mock import patch
 
 from asgiref.sync import sync_to_async
 from asgiref.testing import ApplicationCommunicator
@@ -21,6 +24,7 @@ from django.test import (
     modify_settings,
     override_settings,
 )
+from django.test.utils import captured_stderr
 from django.urls import path
 from django.utils.http import http_date
 from django.views.decorators.csrf import csrf_exempt
@@ -28,6 +32,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .urls import sync_waiter, test_filename
 
 TEST_STATIC_ROOT = Path(__file__).parent / "project" / "static"
+TOO_MUCH_DATA_MSG = "Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE."
 
 
 class SignalHandler:
@@ -75,13 +80,23 @@ class ASGITest(SimpleTestCase):
         # Allow response.close() to finish.
         await communicator.wait()
 
+    async def test_asgi_cookies(self):
+        application = get_asgi_application()
+        scope = self.async_request_factory._base_scope(path="/cookie/")
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request"})
+        response_start = await communicator.receive_output()
+        self.assertIn((b"Set-Cookie", b"key=value; Path=/"), response_start["headers"])
+        # Allow response.close() to finish.
+        await communicator.wait()
+
     # Python's file API is not async compatible. A third-party library such
     # as https://github.com/Tinche/aiofiles allows passing the file to
     # FileResponse as an async iterator. With a sync iterator
     # StreamingHTTPResponse triggers a warning when iterating the file.
     # assertWarnsMessage is not async compatible, so ignore_warnings for the
     # test.
-    @ignore_warnings(module="django.http.response")
+    @ignore_warnings(module="django.core.handlers.asgi")
     async def test_file_response(self):
         """
         Makes sure that FileResponse works over ASGI.
@@ -95,7 +110,8 @@ class ASGITest(SimpleTestCase):
         with open(test_filename, "rb") as test_file:
             test_file_contents = test_file.read()
         # Read the response.
-        response_start = await communicator.receive_output()
+        with captured_stderr():
+            response_start = await communicator.receive_output()
         self.assertEqual(response_start["type"], "http.response.start")
         self.assertEqual(response_start["status"], 200)
         headers = response_start["headers"]
@@ -209,7 +225,7 @@ class ASGITest(SimpleTestCase):
         self.assertEqual(response_body["type"], "http.response.body")
         self.assertEqual(response_body["body"], b"Echo!")
 
-    async def test_create_request_error(self):
+    async def test_request_too_big_request_error(self):
         # Track request_finished signal.
         signal_handler = SignalHandler()
         request_finished.connect(signal_handler)
@@ -239,6 +255,43 @@ class ASGITest(SimpleTestCase):
         self.assertNotEqual(
             signal_handler.calls[0]["thread"], threading.current_thread()
         )
+
+    async def test_meta_not_modified_with_repeat_headers(self):
+        scope = self.async_request_factory._base_scope(path="/", http_version="2.0")
+        scope["headers"] = [(b"foo", b"bar")] * 200_000
+
+        setitem_count = 0
+
+        class InstrumentedDict(dict):
+            def __setitem__(self, *args, **kwargs):
+                nonlocal setitem_count
+                setitem_count += 1
+                super().__setitem__(*args, **kwargs)
+
+        class InstrumentedASGIRequest(ASGIRequest):
+            @property
+            def META(self):
+                return self._meta
+
+            @META.setter
+            def META(self, value):
+                self._meta = InstrumentedDict(**value)
+
+        request = InstrumentedASGIRequest(scope, None)
+
+        self.assertEqual(len(request.headers["foo"].split(",")), 200_000)
+        self.assertLessEqual(setitem_count, 100)
+
+    async def test_underscores_in_headers_ignored(self):
+        scope = self.async_request_factory._base_scope(path="/", http_version="2.0")
+        scope["headers"] = [(b"some_header", b"1")]
+        request = ASGIRequest(scope, None)
+        # No form of the header exists anywhere.
+        self.assertNotIn("Some_Header", request.headers)
+        self.assertNotIn("Some-Header", request.headers)
+        self.assertNotIn("SOME_HEADER", request.META)
+        self.assertNotIn("SOME-HEADER", request.META)
+        self.assertNotIn("HTTP_SOME_HEADER", request.META)
 
     async def test_cancel_post_request_with_sync_processing(self):
         """
@@ -475,6 +528,7 @@ class ASGITest(SimpleTestCase):
         sync_waiter.active_threads.clear()
 
     async def test_asyncio_cancel_error(self):
+        view_started = asyncio.Event()
         # Flag to check if the view was cancelled.
         view_did_cancel = False
         # Track request_finished signal.
@@ -485,8 +539,9 @@ class ASGITest(SimpleTestCase):
         # A view that will listen for the cancelled error.
         async def view(request):
             nonlocal view_did_cancel
+            view_started.set()
             try:
-                await asyncio.sleep(0.2)
+                await asyncio.sleep(0.1)
                 return HttpResponse("Hello World!")
             except asyncio.CancelledError:
                 # Set the flag.
@@ -522,6 +577,7 @@ class ASGITest(SimpleTestCase):
         self.assertNotEqual(handler_call["thread"], threading.current_thread())
         # The signal sender is the handler class.
         self.assertEqual(handler_call["kwargs"], {"sender": TestASGIHandler})
+        view_started.clear()
 
         # Request cycle with a disconnect before the view can respond.
         application = TestASGIHandler()
@@ -529,7 +585,7 @@ class ASGITest(SimpleTestCase):
         communicator = ApplicationCommunicator(application, scope)
         await communicator.send_input({"type": "http.request"})
         # Let the view actually start.
-        await asyncio.sleep(0.1)
+        await view_started.wait()
         # Disconnect the client.
         await communicator.send_input({"type": "http.disconnect"})
         # The handler should not send a response.
@@ -654,3 +710,258 @@ class ASGITest(SimpleTestCase):
         # 'last\n' isn't sent.
         with self.assertRaises(asyncio.TimeoutError):
             await communicator.receive_output(timeout=0.2)
+
+    async def test_read_body_thread(self):
+        """Write runs on correct thread depending on rollover."""
+        handler = ASGIHandler()
+        loop_thread = threading.current_thread()
+
+        called_threads = []
+
+        def write_wrapper(data):
+            called_threads.append(threading.current_thread())
+            return original_write(data)
+
+        # In-memory write (no rollover expected).
+        in_memory_chunks = [
+            {"type": "http.request", "body": b"small", "more_body": False}
+        ]
+
+        async def receive():
+            return in_memory_chunks.pop(0)
+
+        with tempfile.SpooledTemporaryFile(max_size=1024, mode="w+b") as temp_file:
+            original_write = temp_file.write
+            with (
+                patch(
+                    "django.core.handlers.asgi.tempfile.SpooledTemporaryFile",
+                    return_value=temp_file,
+                ),
+                patch.object(temp_file, "write", side_effect=write_wrapper),
+            ):
+                await handler.read_body(receive)
+        # Write was called in the event loop thread.
+        self.assertIn(loop_thread, called_threads)
+
+        # Clear thread log before next test.
+        called_threads.clear()
+
+        # Rollover to disk (write should occur in a threadpool thread).
+        rolled_chunks = [
+            {"type": "http.request", "body": b"A" * 16, "more_body": True},
+            {"type": "http.request", "body": b"B" * 16, "more_body": False},
+        ]
+
+        async def receive_rolled():
+            return rolled_chunks.pop(0)
+
+        with (
+            override_settings(FILE_UPLOAD_MAX_MEMORY_SIZE=10),
+            tempfile.SpooledTemporaryFile(max_size=10, mode="w+b") as temp_file,
+        ):
+            original_write = temp_file.write
+            # roll_over force in handlers.
+            with (
+                patch(
+                    "django.core.handlers.asgi.tempfile.SpooledTemporaryFile",
+                    return_value=temp_file,
+                ),
+                patch.object(temp_file, "write", side_effect=write_wrapper),
+            ):
+                await handler.read_body(receive_rolled)
+        # The second write should have rolled over to disk.
+        self.assertTrue(any(t != loop_thread for t in called_threads))
+
+    def test_multiple_cookie_headers_http2(self):
+        test_cases = [
+            {
+                "label": "RFC-compliant headers (no semicolon)",
+                "headers": [
+                    (b"cookie", b"a=abc"),
+                    (b"cookie", b"b=def"),
+                    (b"cookie", b"c=ghi"),
+                ],
+            },
+            {
+                # Some clients may send cookies with trailing semicolons.
+                "label": "Headers with trailing semicolons",
+                "headers": [
+                    (b"cookie", b"a=abc;"),
+                    (b"cookie", b"b=def;"),
+                    (b"cookie", b"c=ghi;"),
+                ],
+            },
+        ]
+
+        for case in test_cases:
+            with self.subTest(case["label"]):
+                scope = self.async_request_factory._base_scope(
+                    path="/", http_version="2.0"
+                )
+                scope["headers"] = case["headers"]
+                request = ASGIRequest(scope, None)
+                self.assertEqual(request.META["HTTP_COOKIE"], "a=abc; b=def; c=ghi")
+                self.assertEqual(request.COOKIES, {"a": "abc", "b": "def", "c": "ghi"})
+
+
+class DataUploadMaxMemorySizeASGITests(SimpleTestCase):
+
+    def make_request(
+        self,
+        body,
+        content_type=b"application/octet-stream",
+        content_length=None,
+        stream=None,
+    ):
+        scope = AsyncRequestFactory()._base_scope(method="POST", path="/")
+        scope["headers"] = [(b"content-type", content_type)]
+        if content_length is not None:
+            scope["headers"].append((b"content-length", str(content_length).encode()))
+        return ASGIRequest(scope, stream if stream is not None else BytesIO(body))
+
+    def test_body_size_not_exceeded_without_content_length(self):
+        body = b"x" * 5
+        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=5):
+            self.assertEqual(self.make_request(body).body, body)
+
+    def test_body_size_exceeded_without_content_length(self):
+        request = self.make_request(b"x" * 10)
+        with (
+            self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=5),
+            self.assertRaisesMessage(RequestDataTooBig, TOO_MUCH_DATA_MSG),
+        ):
+            request.body
+
+    def test_body_size_check_fires_before_read(self):
+        # The seekable size check rejects oversized bodies before reading
+        # them into memory (i.e. before calling self.read()).
+        class TrackingBytesIO(BytesIO):
+            calls = []
+
+            def read(self, *args, **kwargs):
+                self.calls.append((args, kwargs))
+                return super().read(*args, **kwargs)
+
+        stream = TrackingBytesIO(b"x" * 10)
+        request = self.make_request(b"x" * 10, stream=stream)
+        with (
+            self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=5),
+            self.assertRaisesMessage(RequestDataTooBig, TOO_MUCH_DATA_MSG),
+        ):
+            request.body
+
+        self.assertEqual(stream.calls, [])
+
+    def test_post_size_exceeded_without_content_length(self):
+        request = self.make_request(
+            b"a=" + b"x" * 10,
+            content_type=b"application/x-www-form-urlencoded",
+        )
+        with (
+            self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=5),
+            self.assertRaisesMessage(RequestDataTooBig, TOO_MUCH_DATA_MSG),
+        ):
+            request.POST
+
+    def test_no_limit(self):
+        body = b"x" * 100
+        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=None):
+            self.assertEqual(self.make_request(body).body, body)
+
+    async def test_read_body_no_limit(self):
+        chunks = [
+            {"type": "http.request", "body": b"x" * 100, "more_body": True},
+            {"type": "http.request", "body": b"x" * 100, "more_body": False},
+        ]
+
+        async def receive():
+            return chunks.pop(0)
+
+        handler = ASGIHandler()
+        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=None):
+            body_file = await handler.read_body(receive)
+            self.addCleanup(body_file.close)
+
+        body_file.seek(0)
+        self.assertEqual(body_file.read(), b"x" * 200)
+
+    def test_non_multipart_body_size_enforced(self):
+        # DATA_UPLOAD_MAX_MEMORY_SIZE is enforced on non-multipart bodies.
+        request = self.make_request(b"x" * 100)
+        with (
+            self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=10),
+            self.assertRaisesMessage(RequestDataTooBig, TOO_MUCH_DATA_MSG),
+        ):
+            request.body
+
+    def test_multipart_file_upload_not_limited_by_data_upload_max(self):
+        # DATA_UPLOAD_MAX_MEMORY_SIZE applies to non-file fields only; a file
+        # upload whose total body exceeds the limit must still succeed.
+        boundary = "testboundary"
+        file_content = b"x" * 100
+        body = (
+            (
+                f"--{boundary}\r\n"
+                f'Content-Disposition: form-data; name="file"; filename="test.txt"\r\n'
+                f"Content-Type: application/octet-stream\r\n"
+                f"\r\n"
+            ).encode()
+            + file_content
+            + f"\r\n--{boundary}--\r\n".encode()
+        )
+        request = self.make_request(
+            body,
+            content_type=f"multipart/form-data; boundary={boundary}".encode(),
+            content_length=len(body),
+        )
+        with self.settings(
+            DATA_UPLOAD_MAX_MEMORY_SIZE=10, FILE_UPLOAD_MAX_MEMORY_SIZE=10
+        ):
+            files = request.FILES
+        self.assertEqual(len(files), 1)
+        uploaded = files["file"]
+        self.addCleanup(uploaded.close)
+        self.assertEqual(uploaded.read(), file_content)
+
+    async def test_read_body_buffers_all_chunks(self):
+        # read_body() consumes all chunks regardless of
+        # DATA_UPLOAD_MAX_MEMORY_SIZE; the limit is enforced later when
+        # HttpRequest.body is accessed.
+        chunks = [
+            {"type": "http.request", "body": b"x" * 10, "more_body": True},
+            {"type": "http.request", "body": b"y" * 10, "more_body": True},
+            {"type": "http.request", "body": b"z" * 10, "more_body": False},
+        ]
+
+        async def receive():
+            return chunks.pop(0)
+
+        handler = ASGIHandler()
+        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=15):
+            body_file = await handler.read_body(receive)
+            self.addCleanup(body_file.close)
+
+        self.assertEqual(len(chunks), 0)  # All chunks were consumed.
+        body_file.seek(0)
+        self.assertEqual(body_file.read(), b"x" * 10 + b"y" * 10 + b"z" * 10)
+
+    async def test_read_body_multipart_not_limited(self):
+        # All chunks are consumed regardless of DATA_UPLOAD_MAX_MEMORY_SIZE;
+        # multipart size enforcement happens inside MultiPartParser, not here.
+        chunks = [
+            {"type": "http.request", "body": b"x" * 10, "more_body": True},
+            {"type": "http.request", "body": b"y" * 10, "more_body": True},
+            {"type": "http.request", "body": b"z" * 10, "more_body": False},
+        ]
+
+        async def receive():
+            return chunks.pop(0)
+
+        handler = ASGIHandler()
+        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=15):
+            body_file = await handler.read_body(receive)
+            self.addCleanup(body_file.close)
+
+        self.assertEqual(len(chunks), 0)  # All chunks were consumed.
+        body_file.seek(0)
+        self.assertEqual(body_file.read(), b"x" * 10 + b"y" * 10 + b"z" * 10)

@@ -41,6 +41,9 @@ class Foo(models.Model):
 
 class Bar(models.Model):
     foo = models.ForeignKey(Foo, models.CASCADE, to_field="target")
+    o2o_foo = models.OneToOneField(
+        Foo, models.CASCADE, related_name="o2o_bar", null=True
+    )
     m2m_foo = models.ManyToManyField(Foo, related_name="m2m_foo")
     x = models.IntegerField(default=0)
 

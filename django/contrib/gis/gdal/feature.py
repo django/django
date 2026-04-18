@@ -8,7 +8,7 @@ from django.utils.encoding import force_bytes, force_str
 
 
 # For more information, see the OGR C API source code:
-#  https://gdal.org/api/vector_c_api.html
+# https://gdal.org/api/vector_c_api.html
 #
 # The OGR_F_* routines are relevant here.
 class Feature(GDALBase):
@@ -31,7 +31,7 @@ class Feature(GDALBase):
     def __getitem__(self, index):
         """
         Get the Field object at the specified index, which may be either
-        an integer or the Field's string label.  Note that the Field object
+        an integer or the Field's string label. Note that the Field object
         is not the field's _value_ -- use the `get` method instead to
         retrieve the value (e.g. an integer) instead of a Field instance.
         """
@@ -106,7 +106,7 @@ class Feature(GDALBase):
     def get(self, field):
         """
         Return the value of the field, instead of an instance of the Field
-        object.  May take a string of the field name or a Field object as
+        object. May take a string of the field name or a Field object as
         parameters.
         """
         field_name = getattr(field, "name", field)

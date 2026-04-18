@@ -1,4 +1,3 @@
-import warnings
 from datetime import datetime, timedelta
 
 from django import forms
@@ -12,6 +11,7 @@ from django.contrib.admin.exceptions import (
 from django.contrib.admin.options import (
     IS_FACETS_VAR,
     IS_POPUP_VAR,
+    SOURCE_MODEL_VAR,
     TO_FIELD_VAR,
     IncorrectLookupParameters,
     ShowFacets,
@@ -33,9 +33,7 @@ from django.db.models import F, Field, ManyToOneRel, OrderBy
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Combinable
 from django.urls import reverse
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.http import urlencode
-from django.utils.inspect import func_supports_parameter
 from django.utils.timezone import make_aware
 from django.utils.translation import gettext
 
@@ -52,6 +50,7 @@ IGNORED_PARAMS = (
     SEARCH_VAR,
     IS_FACETS_VAR,
     IS_POPUP_VAR,
+    SOURCE_MODEL_VAR,
     TO_FIELD_VAR,
 )
 
@@ -104,7 +103,7 @@ class ChangeList:
         self.preserved_filters = model_admin.get_preserved_filters(request)
         self.sortable_by = sortable_by
         self.search_help_text = search_help_text
-
+        self.formset = None
         # Get search parameters from the query string.
         _search_form = self.search_form_class(request.GET)
         if not _search_form.is_valid():
@@ -178,19 +177,9 @@ class ChangeList:
         may_have_duplicates = False
         has_active_filters = False
 
-        supports_request = func_supports_parameter(
-            self.model_admin.lookup_allowed, "request"
-        )
-        if not supports_request:
-            warnings.warn(
-                f"`request` must be added to the signature of "
-                f"{self.model_admin.__class__.__qualname__}.lookup_allowed().",
-                RemovedInDjango60Warning,
-            )
         for key, value_list in lookup_params.items():
             for value in value_list:
-                params = (key, value, request) if supports_request else (key, value)
-                if not self.model_admin.lookup_allowed(*params):
+                if not self.model_admin.lookup_allowed(key, value, request):
                     raise DisallowedModelAdminLookup(f"Filtering by {key} not allowed")
 
         filter_specs = []
@@ -335,7 +324,8 @@ class ChangeList:
         self.result_count = result_count
         self.show_full_result_count = self.model_admin.show_full_result_count
         # Admin actions are shown if there is at least one entry
-        # or if entries are not counted because show_full_result_count is disabled
+        # or if entries are not counted because show_full_result_count is
+        # disabled
         self.show_admin_actions = not self.show_full_result_count or bool(
             full_result_count
         )
@@ -395,7 +385,7 @@ class ChangeList:
         ordering = list(
             self.model_admin.get_ordering(request) or self._get_default_ordering()
         )
-        if ORDER_VAR in params:
+        if params.get(ORDER_VAR):
             # Clear ordering and used params
             ordering = []
             order_params = params[ORDER_VAR].split(".")
@@ -427,79 +417,16 @@ class ChangeList:
         # Add the given query's ordering fields, if any.
         ordering.extend(queryset.query.order_by)
 
-        return self._get_deterministic_ordering(ordering)
-
-    def _get_deterministic_ordering(self, ordering):
-        """
-        Ensure a deterministic order across all database backends. Search for a
-        single field or unique together set of fields providing a total
-        ordering. If these are missing, augment the ordering with a descendant
-        primary key.
-        """
-        ordering = list(ordering)
-        ordering_fields = set()
-        total_ordering_fields = {"pk"} | {
-            field.attname
-            for field in self.lookup_opts.fields
-            if field.unique and not field.null
-        }
-        for part in ordering:
-            # Search for single field providing a total ordering.
-            field_name = None
-            if isinstance(part, str):
-                field_name = part.lstrip("-")
-            elif isinstance(part, F):
-                field_name = part.name
-            elif isinstance(part, OrderBy) and isinstance(part.expression, F):
-                field_name = part.expression.name
-            if field_name:
-                # Normalize attname references by using get_field().
-                try:
-                    field = self.lookup_opts.get_field(field_name)
-                except FieldDoesNotExist:
-                    # Could be "?" for random ordering or a related field
-                    # lookup. Skip this part of introspection for now.
-                    continue
-                # Ordering by a related field name orders by the referenced
-                # model's ordering. Skip this part of introspection for now.
-                if field.remote_field and field_name == field.name:
-                    continue
-                if field.attname in total_ordering_fields:
-                    break
-                ordering_fields.add(field.attname)
-        else:
-            # No single total ordering field, try unique_together and total
-            # unique constraints.
-            constraint_field_names = (
-                *self.lookup_opts.unique_together,
-                *(
-                    constraint.fields
-                    for constraint in self.lookup_opts.total_unique_constraints
-                ),
-            )
-            for field_names in constraint_field_names:
-                # Normalize attname references by using get_field().
-                fields = [
-                    self.lookup_opts.get_field(field_name) for field_name in field_names
-                ]
-                # Composite unique constraints containing a nullable column
-                # cannot ensure total ordering.
-                if any(field.null for field in fields):
-                    continue
-                if ordering_fields.issuperset(field.attname for field in fields):
-                    break
-            else:
-                # If no set of unique fields is present in the ordering, rely
-                # on the primary key to provide total ordering.
-                ordering.append("-pk")
-        return ordering
+        if queryset.order_by(*ordering).totally_ordered:
+            return ordering
+        return ordering + ["-pk"]
 
     def get_ordering_field_columns(self):
         """
         Return a dictionary of ordering field column numbers and asc/desc.
         """
-        # We must cope with more than one column having the same underlying sort
-        # field, so we base things on column numbers.
+        # We must cope with more than one column having the same underlying
+        # sort field, so we base things on column numbers.
         ordering = self._get_default_ordering()
         ordering_fields = {}
         if ORDER_VAR not in self.params:

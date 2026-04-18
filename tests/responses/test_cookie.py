@@ -1,5 +1,5 @@
 import time
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from email.utils import format_datetime as format_datetime_rfc5322
 from http import cookies
 
@@ -18,9 +18,7 @@ class SetCookieTests(SimpleTestCase):
         # evaluated expiration time and the time evaluated in set_cookie(). If
         # this difference doesn't exist, the cookie time will be 1 second
         # larger. The sleep guarantees that there will be a time difference.
-        expires = datetime.now(tz=timezone.utc).replace(tzinfo=None) + timedelta(
-            seconds=10
-        )
+        expires = datetime.now(tz=UTC).replace(tzinfo=None) + timedelta(seconds=10)
         time.sleep(0.001)
         response.set_cookie("datetime", expires=expires)
         datetime_cookie = response.cookies["datetime"]
@@ -29,7 +27,7 @@ class SetCookieTests(SimpleTestCase):
     def test_aware_expiration(self):
         """set_cookie() accepts an aware datetime as expiration time."""
         response = HttpResponse()
-        expires = datetime.now(tz=timezone.utc) + timedelta(seconds=10)
+        expires = datetime.now(tz=UTC) + timedelta(seconds=10)
         time.sleep(0.001)
         response.set_cookie("datetime", expires=expires)
         datetime_cookie = response.cookies["datetime"]
@@ -50,9 +48,7 @@ class SetCookieTests(SimpleTestCase):
     def test_far_expiration(self):
         """Cookie will expire when a distant expiration time is provided."""
         response = HttpResponse()
-        future_datetime = datetime(
-            date.today().year + 2, 1, 1, 4, 5, 6, tzinfo=timezone.utc
-        )
+        future_datetime = datetime(date.today().year + 2, 1, 1, 4, 5, 6, tzinfo=UTC)
         response.set_cookie("datetime", expires=future_datetime)
         datetime_cookie = response.cookies["datetime"]
         self.assertIn(

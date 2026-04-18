@@ -24,6 +24,7 @@ from django.db.migrations.writer import MigrationWriter
 
 
 class Command(BaseCommand):
+    autodetector = MigrationAutodetector
     help = "Creates new migration(s) for apps."
 
     def add_arguments(self, parser):
@@ -138,7 +139,8 @@ class Command(BaseCommand):
         # the loader doesn't try to resolve replaced migrations from DB.
         loader = MigrationLoader(None, ignore_no_migrations=True)
 
-        # Raise an error if any migrations are applied before their dependencies.
+        # Raise an error if any migrations are applied before their
+        # dependencies.
         consistency_check_labels = {config.label for config in apps.get_app_configs()}
         # Non-default databases are only checked if database routers used.
         aliases_to_check = (
@@ -185,7 +187,8 @@ class Command(BaseCommand):
                 "'python manage.py makemigrations --merge'" % name_str
             )
 
-        # If they want to merge and there's nothing to merge, then politely exit
+        # If they want to merge and there's nothing to merge, then politely
+        # exit
         if self.merge and not conflicts:
             self.log("No conflicts detected to merge.")
             return
@@ -209,7 +212,7 @@ class Command(BaseCommand):
                 log=self.log,
             )
         # Set up autodetector
-        autodetector = MigrationAutodetector(
+        autodetector = self.autodetector(
             loader.project_state(),
             ProjectState.from_apps(apps),
             questioner,
@@ -391,7 +394,7 @@ class Command(BaseCommand):
                         )
                     )
                     self.log(writer.as_string())
-        run_formatters(self.written_files)
+        run_formatters(self.written_files, stderr=self.stderr)
 
     @staticmethod
     def get_relative_path(path):
@@ -461,7 +464,7 @@ class Command(BaseCommand):
                 # If they still want to merge it, then write out an empty
                 # file depending on the migrations needing merging.
                 numbers = [
-                    MigrationAutodetector.parse_number(migration.name)
+                    self.autodetector.parse_number(migration.name)
                     for migration in merge_migrations
                 ]
                 try:
@@ -498,15 +501,15 @@ class Command(BaseCommand):
                     # Write the merge migrations file to the disk
                     with open(writer.path, "w", encoding="utf-8") as fh:
                         fh.write(writer.as_string())
-                    run_formatters([writer.path])
+                    run_formatters([writer.path], stderr=self.stderr)
                     if self.verbosity > 0:
                         self.log("\nCreated new merge migration %s" % writer.path)
                         if self.scriptable:
                             self.stdout.write(writer.path)
                 elif self.verbosity == 3:
-                    # Alternatively, makemigrations --merge --dry-run --verbosity 3
-                    # will log the merge migrations rather than saving the file
-                    # to the disk.
+                    # Alternatively, makemigrations --merge --dry-run
+                    # --verbosity 3 will log the merge migrations rather than
+                    # saving the file to the disk.
                     self.log(
                         self.style.MIGRATE_HEADING(
                             "Full merge migrations file '%s':" % writer.filename

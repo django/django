@@ -1,9 +1,14 @@
 """
-Query subclasses which provide extra functionality beyond simple data retrieval.
+Query subclasses which provide extra functionality beyond simple data
+retrieval.
 """
 
 from django.core.exceptions import FieldError
-from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE, NO_RESULTS
+from django.db.models.sql.constants import (
+    GET_ITERATOR_CHUNK_SIZE,
+    NO_RESULTS,
+    ROW_COUNT,
+)
 from django.db.models.sql.query import Query
 
 __all__ = ["DeleteQuery", "UpdateQuery", "InsertQuery", "AggregateQuery"]
@@ -17,11 +22,7 @@ class DeleteQuery(Query):
     def do_query(self, table, where, using):
         self.alias_map = {table: self.alias_map[table]}
         self.where = where
-        cursor = self.get_compiler(using).execute_sql(CURSOR)
-        if cursor:
-            with cursor:
-                return cursor.rowcount
-        return 0
+        return self.get_compiler(using).execute_sql(ROW_COUNT)
 
     def delete_batch(self, pk_list, using):
         """
@@ -86,14 +87,15 @@ class UpdateQuery(Query):
         values_seq = []
         for name, val in values.items():
             field = self.get_meta().get_field(name)
-            direct = (
-                not (field.auto_created and not field.concrete) or not field.concrete
-            )
             model = field.model._meta.concrete_model
-            if not direct or (field.is_relation and field.many_to_many):
+            if field.name == "pk" and model._meta.is_composite_pk:
                 raise FieldError(
-                    "Cannot update model field %r (only non-relations and "
-                    "foreign keys permitted)." % field
+                    "Composite primary key fields must be updated individually."
+                )
+            if not field.concrete:
+                raise FieldError(
+                    "Cannot update model field %r (only concrete fields are permitted)."
+                    % field
                 )
             if model is not self.get_meta().concrete_model:
                 self.add_related_update(model, field, val)
@@ -112,7 +114,8 @@ class UpdateQuery(Query):
             if field.generated:
                 continue
             if hasattr(val, "resolve_expression"):
-                # Resolve expressions here so that annotations are no longer needed
+                # Resolve expressions here so that annotations are no longer
+                # needed
                 val = val.resolve_expression(self, allow_joins=False, for_save=True)
             self.values.append((field, model, val))
 

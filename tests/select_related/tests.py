@@ -1,5 +1,9 @@
+import gc
+
 from django.core.exceptions import FieldError
+from django.db.models import FETCH_PEERS
 from django.test import SimpleTestCase, TestCase
+from django.test.utils import garbage_collect
 
 from .models import (
     Bookmark,
@@ -55,6 +59,17 @@ class SelectRelatedTests(TestCase):
             "Eukaryota Fungi Basidiomycota Homobasidiomycatae Agaricales Amanitacae "
             "Amanita muscaria"
         )
+
+    def setup_gc_debug(self):
+        self.addCleanup(gc.set_debug, 0)
+        self.addCleanup(gc.enable)
+        gc.disable()
+        garbage_collect()
+        gc.set_debug(gc.DEBUG_SAVEALL)
+
+    def assert_no_memory_leaks(self):
+        garbage_collect()
+        self.assertEqual(gc.garbage, [])
 
     def test_access_fks_without_select_related(self):
         """
@@ -126,6 +141,11 @@ class SelectRelatedTests(TestCase):
             .extra(select={"a": "select_related_species.id + 10"})[0]
         )
         self.assertEqual(s.id + 10, s.a)
+
+    def test_select_related_memory_leak(self):
+        self.setup_gc_debug()
+        list(Species.objects.select_related("genus"))
+        self.assert_no_memory_leaks()
 
     def test_certain_fields(self):
         """
@@ -209,6 +229,37 @@ class SelectRelatedTests(TestCase):
         message = "Cannot call select_related() after .values() or .values_list()"
         with self.assertRaisesMessage(TypeError, message):
             list(Species.objects.values_list("name").select_related("genus"))
+
+    def test_fetch_mode_copied_fetching_one(self):
+        fly = (
+            Species.objects.fetch_mode(FETCH_PEERS)
+            .select_related("genus__family")
+            .get(name="melanogaster")
+        )
+        self.assertEqual(fly._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            fly.genus._state.fetch_mode,
+            FETCH_PEERS,
+        )
+        self.assertEqual(
+            fly.genus.family._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_fetching_many(self):
+        specieses = list(
+            Species.objects.fetch_mode(FETCH_PEERS).select_related("genus__family")
+        )
+        species = specieses[0]
+        self.assertEqual(species._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            species.genus._state.fetch_mode,
+            FETCH_PEERS,
+        )
+        self.assertEqual(
+            species.genus.family._state.fetch_mode,
+            FETCH_PEERS,
+        )
 
 
 class SelectRelatedValidationTests(SimpleTestCase):

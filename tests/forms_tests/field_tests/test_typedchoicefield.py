@@ -19,13 +19,15 @@ class TypedChoiceFieldTest(SimpleTestCase):
         self.assertEqual(1.0, f.clean("1"))
 
     def test_typedchoicefield_3(self):
-        # This can also cause weirdness: be careful (bool(-1) == True, remember)
+        # This can also cause weirdness: be careful (bool(-1) == True,
+        # remember)
         f = TypedChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=bool)
         self.assertTrue(f.clean("-1"))
 
     def test_typedchoicefield_4(self):
-        # Even more weirdness: if you have a valid choice but your coercion function
-        # can't coerce, you'll still get a validation error. Don't do this!
+        # Even more weirdness: if you have a valid choice but your coercion
+        # function can't coerce, you'll still get a validation error. Don't do
+        # this!
         f = TypedChoiceField(choices=[("A", "A"), ("B", "B")], coerce=int)
         msg = "'Select a valid choice. B is not one of the available choices.'"
         with self.assertRaisesMessage(ValidationError, msg):
@@ -40,7 +42,8 @@ class TypedChoiceFieldTest(SimpleTestCase):
             choices=[(1, "+1"), (-1, "-1")], coerce=int, required=False
         )
         self.assertEqual("", f.clean(""))
-        # If you want cleaning an empty value to return a different type, tell the field
+        # If you want cleaning an empty value to return a different type, tell
+        # the field
 
     def test_typedchoicefield_6(self):
         f = TypedChoiceField(

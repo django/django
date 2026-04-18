@@ -1,21 +1,26 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# EnCo_de, 2024-2025
 # Սմբատ Պետրոսյան <smbatpetrosyan@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-11-01 20:23+0000\n"
-"Last-Translator: Ruben Harutyunov <rharutyunov@mail.ru>\n"
-"Language-Team: Armenian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2025-12-03 07:05+0000\n"
+"Last-Translator: EnCo_de, 2024-2025\n"
+"Language-Team: Armenian (http://app.transifex.com/django/django/language/"
 "hy/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: hy\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Հեռացնել նշված %(verbose_name_plural)sը"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -25,12 +30,8 @@ msgstr "Հաջողությամբ հեռացվել է %(count)d %(items)s։"
 msgid "Cannot delete %(name)s"
 msgstr "Հնարավոր չէ հեռացնել %(name)s"
 
-msgid "Are you sure?"
-msgstr "Համոզված ե՞ք"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Հեռացնել նշված %(verbose_name_plural)sը"
+msgid "Delete multiple objects"
+msgstr "Հեռացնել մի քանի օբյեկտ"
 
 msgid "Administration"
 msgstr "Ադմինիստրավորում"
@@ -68,6 +69,12 @@ msgstr ""
 msgid "Has date"
 msgstr ""
 
+msgid "Empty"
+msgstr "Դատարկ"
+
+msgid "Not empty"
+msgstr "Դատարկ չէ"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -85,7 +92,7 @@ msgid "Remove"
 msgstr "Հեռացնել"
 
 msgid "Addition"
-msgstr ""
+msgstr "Ավելացում"
 
 msgid "Change"
 msgstr "Փոփոխել"
@@ -106,7 +113,7 @@ msgid "object id"
 msgstr "օբյեկտի id"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "օբյեկտի repr"
 
@@ -123,23 +130,23 @@ msgid "log entries"
 msgstr "log գրառումներ"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "%(object)s֊ը ավելացվեց "
+msgid "Added “%(object)s”."
+msgstr "%(object)sն ավելացվել է։"
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "%(object)s֊ը փոփոխվեց ֊ %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "Փոխվել է %(changes)s «%(object)s»"
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "%(object)s-ը հեռացվեց"
+msgid "Deleted “%(object)s.”"
+msgstr ""
 
 msgid "LogEntry Object"
 msgstr "LogEntry օբյեկտ"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr ""
+msgid "Added {name} “{object}”."
+msgstr "Ավելացվել է {name} «{object}»-ը։"
 
 msgid "Added."
 msgstr "Ավելացվեց։"
@@ -148,7 +155,7 @@ msgid "and"
 msgstr "և"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
 msgstr ""
 
 #, python-brace-format
@@ -156,7 +163,7 @@ msgid "Changed {fields}."
 msgstr ""
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
 msgstr ""
 
 msgid "No fields changed."
@@ -165,42 +172,37 @@ msgstr "Ոչ մի դաշտ չփոփոխվեց։"
 msgid "None"
 msgstr "Ոչինչ"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
-"Սեղմեք \"Control\", կամ \"Command\" Mac֊ի մրա, մեկից ավելին ընտրելու համար։"
+
+msgid "Select this object for an action - {}"
+msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid "The {name} “{obj}” was added successfully."
 msgstr ""
 
 msgid "You may edit it again below."
+msgstr "Դուք կարող եք կրկին փոփոխել այն ստորև:"
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
+msgid "The {name} “{obj}” was changed successfully."
 msgstr ""
 
 msgid ""
@@ -214,11 +216,11 @@ msgid "No action selected."
 msgstr "Գործողությունը ընտրված չէ։"
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s  %(obj)s֊ը հաջողությամբ հեռացվեց։"
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr ""
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr ""
 
 #, python-format
@@ -252,12 +254,16 @@ msgstr[1] "Բոլոր %(total_count)s֊ը ընտրված են "
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s֊ից 0֊ն ընտրված է"
 
+msgid "Delete"
+msgstr "Հեռացնել"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Փոփոխությունների պատմություն %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(instance)s %(class_name)s"
@@ -289,8 +295,8 @@ msgstr "%(app)s ադմինիստրավորում"
 msgid "Page not found"
 msgstr "Էջը գտնված չէ"
 
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Ներողություն ենք հայցում, բայց հարցվող Էջը գտնված չէ"
+msgid "We’re sorry, but the requested page could not be found."
+msgstr ""
 
 msgid "Home"
 msgstr "Գլխավոր"
@@ -305,18 +311,12 @@ msgid "Server Error <em>(500)</em>"
 msgstr "Սերվերի սխալ <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Առաջացել է սխալ։ Ադմինիստրատորները տեղեկացվել են դրա մասին էլեկտրոնային "
-"փոստի միջոցով և այն կուղղվի կարճ ժամանակահատվածի ընդացքում․ Շնորհակալ ենք "
-"ձեր համբերության համար։"
 
-msgid "Run the selected action"
-msgstr "Կատարել ընտրված գործողությունը"
-
-msgid "Go"
-msgstr "Կատարել"
+msgid "Run"
+msgstr ""
 
 msgid "Click here to select the objects across all pages"
 msgstr "Սեղմեք այստեղ բոլոր էջերից օբյեկտներ ընտրելու համար"
@@ -328,29 +328,66 @@ msgstr "Ընտրել բոլոր %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Չեղարկել ընտրությունը"
 
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
+msgid "Breadcrumbs"
 msgstr ""
-"Սկզբում մուտքագրեք օգտագործողի անունը և գաղտնաբառը․ Հետո դուք "
-"հնարավորություն կունենաք խմբագրել ավելին։"
 
-msgid "Enter a username and password."
-msgstr "Մուտքագրեք օգտագործողի անունը և գաղտնաբառը։"
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr " %(name)s հավելվածի մոդել"
+
+msgid "Model name"
+msgstr "Մոդելի անվանում"
+
+msgid "Add link"
+msgstr "Ավելացնել հղում"
+
+msgid "Change or view list link"
+msgstr ""
+
+msgid "Add"
+msgstr "Ավելացնել"
+
+msgid "View"
+msgstr ""
+
+msgid "You don’t have permission to view or edit anything."
+msgstr ""
+
+msgid "After you’ve created a user, you’ll be able to edit more user options."
+msgstr ""
+
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "Փոխել գաղտնաբառը"
 
-msgid "Please correct the error below."
-msgstr "Ուղղեք ստորև նշված սխալը։"
+msgid "Set password"
+msgstr ""
 
-msgid "Please correct the errors below."
-msgstr "Ուղղեք ստորև նշված սխալները․"
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Մուտքագրեք նոր գաղտնաբառ <strong>%(username)s</strong> օգտագործողի համար։"
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
+msgstr "Անցնել գլխավոր բովանդակությանը"
 
 msgid "Welcome,"
 msgstr "Բարի գալուստ, "
@@ -377,6 +414,18 @@ msgstr "Դիտել կայքում"
 msgid "Filter"
 msgstr "Ֆիլտրել"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
+msgid "Clear all filters"
+msgstr ""
+
+msgid "Save"
+msgstr "Պահպանել"
+
 msgid "Remove from sorting"
 msgstr "Հեռացնել դասակարգումից"
 
@@ -387,46 +436,42 @@ msgstr "Դասակարգման առաջնություն՝  %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "Toggle sorting"
 
-msgid "Delete"
-msgstr "Հեռացնել"
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"%(object_name)s '%(escaped_object)s'֊ի հեռացումը կարող է հանգեցնել նրա հետ "
-"կապված օբյեկտների հեռացմանը, բայց դուք չունեք իրավունք հեռացնել այդ տիպի "
-"օբյեկտներ․"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"%(object_name)s '%(escaped_object)s'֊ը հեռացնելու համար կարող է անհրաժեշտ "
-"լինել հեռացնել նրա հետ կապված պաշտպանված օբյեկտները։"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Համոզված ե՞ք, որ ուզում եք հեռացնել %(object_name)s \"%(escaped_object)s\"֊"
-"ը։ նրա հետ կապված այս բոլոր օբյեկտները կհեռացվեն․"
 
 msgid "Objects"
 msgstr "Օբյեկտներ"
 
-msgid "Yes, I'm sure"
-msgstr "Այո, ես համոզված եմ"
+msgid "Yes, I’m sure"
+msgstr "Այո, վստահ եմ"
 
 msgid "No, take me back"
 msgstr "Ոչ, տարեք ենձ ետ"
-
-msgid "Delete multiple objects"
-msgstr "Հեռացնել մի քանի օբյեկտ"
 
 #, python-format
 msgid ""
@@ -453,9 +498,6 @@ msgstr ""
 "Համոզված ե՞ք, որ ուզում եք հեռացնել նշված %(objects_name)s֊ները։ Այս բոլոր "
 "օբյեկտները, ինչպես նաև նրանց հետ կապված օբյեկտները կհեռացվեն․"
 
-msgid "View"
-msgstr ""
-
 msgid "Delete?"
 msgstr "Հեռացնե՞լ"
 
@@ -466,16 +508,6 @@ msgstr "%(filter_title)s "
 msgid "Summary"
 msgstr "Ամփոփում"
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr " %(name)s հավելվածի մոդել"
-
-msgid "Add"
-msgstr "Ավելացնել"
-
-msgid "You don't have permission to view or edit anything."
-msgstr ""
-
 msgid "Recent actions"
 msgstr ""
 
@@ -483,19 +515,25 @@ msgid "My actions"
 msgstr ""
 
 msgid "None available"
-msgstr "Ոչինք չկա"
+msgstr "Ոչինչ չկա"
+
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
 
 msgid "Unknown content"
 msgstr "Անհայտ կոնտենտ"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"Ինչ֊որ բան այն չէ ձեր տվյալների բազայի հետ։ Համոզվեք, որ համապատասխան "
-"աղյուսակները ստեղծվել են և համոզվեք, որ համապատասխան օգտագործողը կարող է "
-"կարդալ բազան։"
 
 #, python-format
 msgid ""
@@ -505,8 +543,20 @@ msgstr ""
 "Դուք մուտք եք գործել որպես %(username)s, բայց իրավունք չունեք դիտելու այս "
 "էջը։ Ցանկանում ե՞ք մուտք գործել որպես այլ օգտագործող"
 
-msgid "Forgotten your password or username?"
-msgstr "Մոռացել ե՞ք օգտագործողի անունը կամ գաղտնաբառը"
+msgid "Forgotten your login credentials?"
+msgstr ""
+
+msgid "Toggle navigation"
+msgstr ""
+
+msgid "Sidebar"
+msgstr ""
+
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr ""
 
 msgid "Date/time"
 msgstr "Ամսաթիվ/Ժամանակ"
@@ -517,37 +567,33 @@ msgstr "Օգտագործող"
 msgid "Action"
 msgstr "Գործողություն"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
-"Այս օբյեկտը չունի փոփոխման պատմություն։ Այն հավանաբար ավելացված չէ "
-"ադմինիստրավորման էջից։"
+
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
 
 msgid "Show all"
 msgstr "Ցույց տալ բոլորը"
 
-msgid "Save"
-msgstr "Պահպանել"
-
-msgid "Popup closing..."
-msgstr "Ելնող պատուհանը փակվում է"
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Փոփոխել ընտրված %(model)s տիպի օբյեկտը"
-
-#, python-format
-msgid "View selected %(model)s"
+msgid "Popup closing…"
 msgstr ""
 
 #, python-format
-msgid "Add another %(model)s"
-msgstr "Ավելացնել այլ %(model)s տիպի օբյեկտ"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Հեռացնել ընտրված %(model)s տիպի օբյեկտը"
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "Փնտրել"
@@ -577,8 +623,25 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Շնորհակալություն մեր կայքում ինչ֊որ ժամանակ ծախսելու համար։"
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Փոփոխել ընտրված %(model)s տիպի օբյեկտը"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Ավելացնել այլ %(model)s տիպի օբյեկտ"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Հեռացնել ընտրված %(model)s տիպի օբյեկտը"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
+"Շնորհակալություն այսօր կայքի հետ բովանդակալից ժամանակ անցկացնելու համար։"
 
 msgid "Log in again"
 msgstr "Մուտք գործել նորից"
@@ -590,12 +653,9 @@ msgid "Your password was changed."
 msgstr "Ձեր գաղտնաբառը փոխվել է"
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Մուտքագրեք ձեր հին գաղտնաբառը։ Անվտանգության նկատառումներով մուտքագրեք ձեր "
-"նոր գաղտնաբառը երկու անգամ, որպեսզի մենք համոզված լինենք, որ այն ճիշտ է "
-"հավաքված։"
 
 msgid "Change my password"
 msgstr "Փոխել իմ գաղտնաբառը"
@@ -630,18 +690,14 @@ msgstr ""
 "կարող եք ստանալ նոր հղում։"
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Մենք ուղարկեցինք ձեր էլեկտրոնային փոստի հասցեին գաղտնաբառը փոփոխելու "
-"հրահանգներ․ Դուք շուտով կստանաք դրանք։"
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"Եթե դուք չեք ստացել էլեկտրոնային նամակ, համոզվեք, որ հավաքել եք այն հասցեն, "
-"որով գրանցվել եք և ստուգեք ձեր սպամի թղթապանակը։"
 
 #, python-format
 msgid ""
@@ -654,8 +710,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Բացեք հետևյալ էջը և ընտրեք նոր գաղտնաբառ։"
 
-msgid "Your username, in case you've forgotten:"
-msgstr "Եթե դուք մոռացել եք ձեր օգտագործողի անունը․"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "Շնորհակալություն մեր կայքից օգտվելու համար։"
@@ -665,17 +721,18 @@ msgid "The %(site_name)s team"
 msgstr "%(site_name)s կայքի թիմ"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
-"Մոռացել ե՞ք ձեր գաղտնաբառը Մուտքագրեք ձեր էլեկտրոնային փոստի հասցեն և մենք "
-"կուղարկենք ձեզ հրահանգներ նորը ստանալու համար։"
 
 msgid "Email address:"
 msgstr "Email հասցե․"
 
 msgid "Reset my password"
 msgstr "Փոխել գաղտնաբառը"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "Բոլոր ամսաթվերը"
