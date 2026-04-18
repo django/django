@@ -19,13 +19,13 @@ max_line_length = 88
 indent_size = 2
 
 [**/admin/js/vendor/**]
-indent_style = ignore
-indent_size = ignore
+indent_style = unset
+indent_size = unset
 
 # Minified JavaScript files shouldn't be changed
 [**.min.js]
-indent_style = ignore
-insert_final_newline = ignore
+indent_style = unset
+insert_final_newline = unset
 
 # Makefiles always use tabs for indentation
 [Makefile]
