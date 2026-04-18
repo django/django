@@ -3,12 +3,14 @@
   "private": true,
   "scripts": {
     "pretest": "eslint .",
-    "test": "grunt test --verbose"
+    "test": "grunt test --verbose",
+    "biome": "biome check"
   },
   "engines": {
     "npm": ">=1.3.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.12",
     "eslint": "^9.39.1",
     "puppeteer": "^24.22.0",
     "grunt": "^1.6.1",

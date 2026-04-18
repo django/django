@@ -1,0 +1,37 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.4.12/schema.json",
+    "files": {
+        "includes": [
+            "django/contrib/admin/static/admin/css/**/*.css",
+            "!django/contrib/admin/static/admin/css/vendor/**",
+            "django/contrib/gis/static/gis/css/**/*.css",
+            "docs/_theme/**/*.css",
+            "!docs/_theme/djangodocs/static/fontawesome/**",
+            "!docs/_theme/djangodocs/static/reset-fonts-grids.css",
+            "!**/*.min.css"
+        ]
+    },
+    "formatter": {
+        "enabled": true,
+        "useEditorconfig": true
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "complexity": {
+                "noImportantStyles": "off"
+            },
+            "style": {
+                "noDescendingSpecificity": "off"
+            }
+        }
+    },
+    "javascript": {
+        "linter": { "enabled": false },
+        "formatter": { "enabled": false }
+    },
+    "json": {
+        "linter": { "enabled": false },
+        "formatter": { "enabled": false }
+    }
+}
