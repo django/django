@@ -791,6 +791,9 @@ Miscellaneous
 * Overriding ``ModelAdmin.get_action_choices()`` without the new
   ``action_location`` parameter is deprecated.
 
+* ``django.db.transaction.savepoint()`` is deprecated in favor of
+  ``django.db.transaction.savepoint_create()``.
+
 Features removed in 6.1
 =======================
 
