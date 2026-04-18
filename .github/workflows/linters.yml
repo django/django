@@ -92,11 +92,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - name: Set up Node.js
-        uses: actions/setup-node@v5
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: '**/package.json'
-      - run: npm install
-      - run: npx biome ci
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+      - name: Run biome
+        run: biome ci
