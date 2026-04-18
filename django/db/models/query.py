@@ -1031,7 +1031,12 @@ class QuerySet(AltersData):
             params = self._extract_model_params(defaults, **kwargs)
             # Try to create an object using passed params.
             try:
-                with transaction.atomic(using=self.db):
+                context_manager = (
+                    transaction.atomic(using=self.db, savepoint=True)
+                    if connections[self.db].in_atomic_block
+                    else nullcontext()
+                )
+                with context_manager:
                     params = dict(resolve_callables(params))
                     return self.create(**params), True
             except IntegrityError:
