@@ -126,6 +126,9 @@ details on these changes.
 * Support for overriding ``ModelAdmin.get_action_choices()`` without the new
   ``action_location`` parameter will be removed.
 
+* The ``django.db.transaction.savepoint()`` alias to
+  ``django.db.transaction.savepoint_create()`` will be removed.
+
 .. _deprecation-removed-in-6.1:
 
 6.1
