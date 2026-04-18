@@ -653,8 +653,11 @@ class CustomManagerTests(TestCase):
         self.assertSequenceEqual(Book.published_title_t_objects.all(), [b3])
 
     def test_queryset_initial_filter_invalid_argument(self):
-        msg = "The following kwargs are invalid: '_connector', '_negated'"
-        with self.assertRaisesMessage(TypeError, msg):
+        msg = (
+            f"_connector must be one of {models.Q.AND!r}, {models.Q.OR!r}, "
+            f"{models.Q.XOR!r}, or None."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             models.QuerySet.filter(pk=1, _negated=True, _connector="evil")
 
     def test_queryset_initial_filter_chained(self):

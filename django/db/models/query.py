@@ -347,6 +347,9 @@ class QuerySet(AltersData):
         self._defer_next_filter = False
         self._deferred_filter = None
         self._cloning_enabled = True
+        if self._initial_filter is not None:
+            with self._avoid_cloning():
+                self.filter(self._initial_filter)
 
     @property
     def query(self):
@@ -354,8 +357,6 @@ class QuerySet(AltersData):
             negate, args, kwargs = self._deferred_filter
             self._filter_or_exclude_inplace(negate, args, kwargs)
             self._deferred_filter = None
-        if self._initial_filter is not None:
-            self._query.add_q(self._initial_filter)
         return self._query
 
     @query.setter
@@ -1652,9 +1653,6 @@ class QuerySet(AltersData):
         return self._chain()
 
     def _class_filter(cls, *args, **kwargs):
-        if invalid_kwargs := PROHIBITED_FILTER_KWARGS.intersection(kwargs):
-            invalid_kwargs_str = ", ".join(f"'{k}'" for k in sorted(invalid_kwargs))
-            raise TypeError(f"The following kwargs are invalid: {invalid_kwargs_str}")
         initial_filter = Q(*args, **kwargs)
         # Chain initial filters.
         base_class = cls
