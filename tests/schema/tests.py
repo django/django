@@ -2699,6 +2699,61 @@ class SchemaTests(TransactionTestCase):
             with self.assertRaisesMessage(ValueError, msg):
                 editor.alter_field(LocalNoteWithM2MThrough, old_field, new_field)
 
+    def test_changing_custom_m2m_through(self):
+        """
+        Changing through model to use a different custom model should raise.
+        """
+
+        class LocalAuthorTag(Model):
+            author = ForeignKey("schema.LocalAuthorM2MThrough", CASCADE)
+            tag = ForeignKey("schema.TagM2MTest", CASCADE)
+
+            class Meta:
+                app_label = "schema"
+                apps = new_apps
+
+        class LocalAuthorTagOther(Model):
+            author = ForeignKey("schema.LocalAuthorM2MThrough", CASCADE)
+            tag = ForeignKey("schema.TagM2MTest", CASCADE)
+
+            class Meta:
+                app_label = "schema"
+                apps = new_apps
+
+        class LocalAuthorM2MThrough(Model):
+            name = CharField(max_length=255)
+            tags = ManyToManyField(
+                "schema.TagM2MTest", related_name="authors", through=LocalAuthorTag
+            )
+
+            class Meta:
+                app_label = "schema"
+                apps = new_apps
+
+        self.local_models = [LocalAuthorTag, LocalAuthorTagOther, LocalAuthorM2MThrough]
+
+        with connection.schema_editor() as editor:
+            editor.create_model(LocalAuthorTag)
+            editor.create_model(LocalAuthorM2MThrough)
+            editor.create_model(TagM2MTest)
+        # Ensure the m2m table is there
+        self.assertEqual(len(self.column_classes(LocalAuthorTag)), 3)
+        old_field = LocalAuthorM2MThrough._meta.get_field("tags")
+        new_field = ManyToManyField(
+            "schema.TagM2MTest", related_name="authors", through=LocalAuthorTagOther
+        )
+        new_field.contribute_to_class(LocalAuthorM2MThrough, "tags")
+        msg = (
+            f"Cannot alter field {old_field} into {new_field} - they are not "
+            f"compatible types (you cannot alter to or from M2M fields, or add or "
+            f"remove through= on M2M fields)"
+        )
+        with connection.schema_editor() as editor:
+            with self.assertRaisesMessage(ValueError, msg):
+                editor.alter_field(
+                    LocalAuthorM2MThrough, old_field, new_field, strict=True
+                )
+
     def _test_m2m(self, M2MFieldClass):
         """
         Tests adding/removing M2M fields on models
@@ -2782,7 +2837,7 @@ class SchemaTests(TransactionTestCase):
 
     def _test_m2m_through_alter(self, M2MFieldClass):
         """
-        Tests altering M2Ms with explicit through models (should no-op)
+        Altering M2Ms with the same custom through model should no-op.
         """
 
         class LocalAuthorTag(Model):
