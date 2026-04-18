@@ -57,6 +57,8 @@ URLOPEN_TIMEOUT_SECONDS = 15
 PR_TEMPLATE_DATE = date(2024, 3, 4)  # 3fcef50 -- PR template introduced
 AI_DISCLOSURE_DATE = date(2026, 1, 8)  # 4f580c4 -- AI disclosure added
 
+ALLOWED_STAGES = ("Accepted", "Ready for checkin")
+
 logger = logging.getLogger(__name__)
 
 
@@ -215,7 +217,8 @@ def check_trac_ticket(pr_body, total_changes, threshold=LARGE_PR_THRESHOLD):
 
 
 def check_trac_status(ticket_id, ticket_data):
-    """The referenced Trac ticket must be Accepted, unresolved, and assigned.
+    """The referenced Trac ticket must be Accepted or Ready for checkin,
+    unresolved, and assigned.
 
     ticket_data is the dict returned by fetch_trac_ticket(). Passing None
     skips the check (non-fatal fetch error). Passing TICKET_NOT_FOUND fails
@@ -232,10 +235,10 @@ def check_trac_status(ticket_id, ticket_data):
     stage = ticket_data.get("custom", {}).get("stage", "").strip()
     resolution = (ticket_data.get("resolution") or "").strip()
     status = ticket_data.get("status", "").strip()
-    if stage == "Accepted" and not resolution and status == "assigned":
+    if stage in ALLOWED_STAGES and not resolution and status == "assigned":
         return None
     current_state = [
-        f"{stage=}" if stage != "Accepted" else "",
+        f"{stage=}" if stage not in ALLOWED_STAGES else "",
         f"{resolution=}" if resolution else "",
         f"{status=}" if status != "assigned" else "",
     ]
@@ -480,7 +483,7 @@ def main(
 
     results = [
         ("Trac ticket referenced", ticket_result, LEVEL_ERROR),
-        ("Trac ticket status is Accepted", ticket_status_result, LEVEL_ERROR),
+        ("Trac ticket is ready for work", ticket_status_result, LEVEL_ERROR),
         ("Trac ticket has_patch flag set", ticket_has_patch_result, LEVEL_WARNING),
         ("PR title includes ticket number", pr_title_result, LEVEL_WARNING),
         ("Branch description provided", check_branch_description(pr_body), LEVEL_ERROR),
