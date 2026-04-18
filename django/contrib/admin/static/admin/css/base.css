@@ -64,15 +64,8 @@ html[data-theme="light"],
     --object-tools-hover-bg: var(--close-button-hover-bg);
 
     --font-family-primary:
-        "Segoe UI",
-        system-ui,
-        Roboto,
-        "Helvetica Neue",
-        Arial,
-        sans-serif,
-        "Apple Color Emoji",
-        "Segoe UI Emoji",
-        "Segoe UI Symbol",
+        "Segoe UI", system-ui, Roboto, "Helvetica Neue", Arial, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
         "Noto Color Emoji";
     --font-family-monospace:
         ui-monospace,
@@ -96,7 +89,8 @@ html[data-theme="light"],
     color-scheme: light;
 }
 
-html, body {
+html,
+body {
     height: 100%;
 }
 
@@ -111,13 +105,17 @@ body {
 
 /* LINKS */
 
-a:link, a:visited {
+a:link,
+a:visited {
     color: var(--link-fg);
     text-decoration: none;
-    transition: color 0.15s, background 0.15s;
+    transition:
+        color 0.15s,
+        background 0.15s;
 }
 
-a:focus, a:hover {
+a:focus,
+a:hover {
     color: var(--link-hover-color);
 }
 
@@ -126,12 +124,12 @@ a:focus {
 }
 
 a:not(
-    [role="button"],
-    #header a,
-    #nav-sidebar a,
-    #content-main.app-list a,
-    .object-tools a
-) {
+        [role="button"],
+        #header a,
+        #nav-sidebar a,
+        #content-main.app-list a,
+        .object-tools a
+    ) {
     text-decoration: underline;
 }
 
@@ -139,19 +137,24 @@ a img {
     border: none;
 }
 
-a.section:link, a.section:visited {
+a.section:link,
+a.section:visited {
     color: var(--header-link-color);
     text-decoration: none;
 }
 
-a.section:focus, a.section:hover {
+a.section:focus,
+a.section:hover {
     text-decoration: underline;
 }
 
 /* GLOBAL DEFAULTS */
 
-p, ol, ul, dl {
-    margin: .2em 0 .8em 0;
+p,
+ol,
+ul,
+dl {
+    margin: 0.2em 0 0.8em 0;
 }
 
 p {
@@ -159,7 +162,11 @@ p {
     line-height: 140%;
 }
 
-h1,h2,h3,h4,h5 {
+h1,
+h2,
+h3,
+h4,
+h5 {
     font-weight: bold;
 }
 
@@ -171,7 +178,7 @@ h1 {
 
 h2 {
     font-size: 1rem;
-    margin: 1em 0 .5em 0;
+    margin: 1em 0 0.5em 0;
 }
 
 h2.subhead {
@@ -181,21 +188,21 @@ h2.subhead {
 
 h3 {
     font-size: 0.875rem;
-    margin: .8em 0 .3em 0;
+    margin: 0.8em 0 0.3em 0;
     color: var(--body-medium-color);
     font-weight: bold;
 }
 
 h4 {
     font-size: 0.75rem;
-    margin: 1em 0 .8em 0;
+    margin: 1em 0 0.8em 0;
     padding-bottom: 3px;
     color: var(--body-medium-color);
 }
 
 h5 {
     font-size: 0.625rem;
-    margin: 1.5em 0 .5em 0;
+    margin: 1.5em 0 0.5em 0;
     color: var(--body-quiet-color);
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -210,7 +217,9 @@ li ul {
     margin-bottom: 0;
 }
 
-li, dt, dd {
+li,
+dt,
+dd {
     font-size: 0.8125rem;
     line-height: 1.25rem;
 }
@@ -249,7 +258,8 @@ blockquote {
     border-left: 5px solid currentColor;
 }
 
-code, pre {
+code,
+pre {
     font-family: var(--font-family-monospace);
     color: var(--body-quiet-color);
     font-size: 0.75rem;
@@ -287,24 +297,36 @@ hr {
     font-size: 0.625rem;
 }
 
-.help, p.help, form p.help, div.help, form div.help, div.help li {
+.help,
+p.help,
+form p.help,
+div.help,
+form div.help,
+div.help li {
     font-size: 0.6875rem;
     color: var(--body-quiet-color);
 }
 
 div.help ul {
-     margin-bottom: 0;
+    margin-bottom: 0;
 }
 
 .help-tooltip {
     cursor: help;
 }
 
-p img, h1 img, h2 img, h3 img, h4 img, td img {
+p img,
+h1 img,
+h2 img,
+h3 img,
+h4 img,
+td img {
     vertical-align: middle;
 }
 
-.quiet, a.quiet:link, a.quiet:visited {
+.quiet,
+a.quiet:link,
+a.quiet:visited {
     color: var(--body-quiet-color);
     font-weight: normal;
 }
@@ -328,7 +350,8 @@ table {
     border-color: var(--border-color);
 }
 
-td, th {
+td,
+th {
     font-size: 0.8125rem;
     line-height: 1rem;
     border-bottom: 1px solid var(--hairline-color);
@@ -365,7 +388,8 @@ tr.alt {
     background: var(--darkened-bg);
 }
 
-tr:nth-child(odd), .row-form-errors {
+tr:nth-child(odd),
+.row-form-errors {
     background: var(--body-bg);
 }
 
@@ -385,7 +409,8 @@ thead th {
     background: var(--darkened-bg);
 }
 
-thead th a:link, thead th a:visited {
+thead th a:link,
+thead th a:visited {
     color: var(--body-quiet-color);
 }
 
@@ -408,7 +433,8 @@ table thead th .text a {
     padding: 8px 10px;
 }
 
-table thead th .text a:focus, table thead th .text a:hover {
+table thead th .text a:focus,
+table thead th .text a:hover {
     background: var(--selected-bg);
 }
 
@@ -428,7 +454,7 @@ table thead th.sorted .sortoptions {
 }
 
 table thead th.sorted .sortpriority {
-    font-size: .8em;
+    font-size: 0.8em;
     min-width: 12px;
     text-align: center;
     vertical-align: 3px;
@@ -450,7 +476,7 @@ table thead th.sorted .sortoptions a.sortremove {
 }
 
 table thead th.sorted .sortoptions a.sortremove:after {
-    content: '\\';
+    content: "\\";
     position: absolute;
     top: -6px;
     left: 3px;
@@ -490,7 +516,11 @@ table thead th.sorted .sortoptions a.descending:hover {
 
 /* FORM DEFAULTS */
 
-input, textarea, select, .form-row p, form .button {
+input,
+textarea,
+select,
+.form-row p,
+form .button {
     margin: 2px 0;
     padding: 2px 3px;
     vertical-align: middle;
@@ -507,8 +537,15 @@ textarea {
 Minifiers remove the default (text) "type" attribute from "input" HTML tags.
 Add input:not([type]) to make the CSS stylesheet work the same.
 */
-input:not([type]), input[type=text], input[type=password], input[type=email],
-input[type=url], input[type=number], input[type=tel], textarea, select,
+input:not([type]),
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="url"],
+input[type="number"],
+input[type="tel"],
+textarea,
+select,
 .vTextField {
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -522,9 +559,16 @@ input[type=url], input[type=number], input[type=tel], textarea, select,
 Minifiers remove the default (text) "type" attribute from "input" HTML tags.
 Add input:not([type]) to make the CSS stylesheet work the same.
 */
-input:not([type]):focus, input[type=text]:focus, input[type=password]:focus,
-input[type=email]:focus, input[type=url]:focus, input[type=number]:focus,
-input[type=tel]:focus, textarea:focus, select:focus, .vTextField:focus {
+input:not([type]):focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="number"]:focus,
+input[type="tel"]:focus,
+textarea:focus,
+select:focus,
+.vTextField:focus {
     border-color: var(--body-quiet-color);
 }
 
@@ -540,7 +584,11 @@ select[multiple] {
 
 /* FORM BUTTONS */
 
-.button, input[type=submit], input[type=button], .submit-row input, a.button {
+.button,
+input[type="submit"],
+input[type="button"],
+.submit-row input,
+a.button {
     background: var(--button-bg);
     padding: 10px 15px;
     border: none;
@@ -554,34 +602,46 @@ a.button {
     padding: 4px 5px;
 }
 
-.button:active, input[type=submit]:active, input[type=button]:active,
-.button:focus, input[type=submit]:focus, input[type=button]:focus,
-.button:hover, input[type=submit]:hover, input[type=button]:hover {
+.button:active,
+input[type="submit"]:active,
+input[type="button"]:active,
+.button:focus,
+input[type="submit"]:focus,
+input[type="button"]:focus,
+.button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover {
     background: var(--button-hover-bg);
 }
 
-.button[disabled], input[type=submit][disabled], input[type=button][disabled] {
+.button[disabled],
+input[type="submit"][disabled],
+input[type="button"][disabled] {
     opacity: 0.4;
 }
 
-.button.default, input[type=submit].default, .submit-row input.default {
+.button.default,
+input[type="submit"].default,
+.submit-row input.default {
     border: none;
     font-weight: 400;
     background: var(--default-button-bg);
 }
 
-.button.default:active, input[type=submit].default:active,
-.button.default:focus, input[type=submit].default:focus,
-.button.default:hover, input[type=submit].default:hover {
+.button.default:active,
+input[type="submit"].default:active,
+.button.default:focus,
+input[type="submit"].default:focus,
+.button.default:hover,
+input[type="submit"].default:hover {
     background: var(--default-button-hover-bg);
 }
 
 .button[disabled].default,
-input[type=submit][disabled].default,
-input[type=button][disabled].default {
+input[type="submit"][disabled].default,
+input[type="button"][disabled].default {
     opacity: 0.4;
 }
-
 
 /* MODULES */
 
@@ -591,7 +651,12 @@ input[type=button][disabled].default {
     background: var(--body-bg);
 }
 
-.module p, .module ul, .module h3, .module h4, .module dl, .module pre {
+.module p,
+.module ul,
+.module h3,
+.module h4,
+.module dl,
+.module pre {
     padding-left: 10px;
     padding-right: 10px;
 }
@@ -600,15 +665,18 @@ input[type=button][disabled].default {
     margin-left: 12px;
 }
 
-.module ul, .module ol {
+.module ul,
+.module ol {
     margin-left: 1.5em;
 }
 
 .module h3 {
-    margin-top: .6em;
+    margin-top: 0.6em;
 }
 
-.module h2, .module caption, .inline-group h2 {
+.module h2,
+.module caption,
+.inline-group h2 {
     margin: 0;
     padding: 8px;
     font-weight: 400;
@@ -677,9 +745,9 @@ ul.messagelist li.error {
 }
 
 @media (forced-colors: active) {
-  ul.messagelist li {
-      border: 1px solid;
-  }
+    ul.messagelist li {
+        border: 1px solid;
+    }
 }
 
 .errornote {
@@ -727,8 +795,12 @@ td ul.errorlist li {
     margin: 0;
 }
 
-.errors input, .errors select, .errors textarea,
-td ul.errorlist + input, td ul.errorlist + select, td ul.errorlist + textarea {
+.errors input,
+.errors select,
+.errors textarea,
+td ul.errorlist + input,
+td ul.errorlist + select,
+td ul.errorlist + textarea {
     border: 1px solid var(--error-fg);
 }
 
@@ -755,7 +827,7 @@ ol.breadcrumbs li {
 }
 
 ol.breadcrumbs li:not([aria-current="page"])::after {
-    content: ' \203A ' / '';
+    content: " \203A " / "";
 }
 
 ol.breadcrumbs li a[aria-current="page"] {
@@ -768,13 +840,15 @@ ol.breadcrumbs a {
     color: var(--breadcrumbs-link-fg);
 }
 
-ol.breadcrumbs a:focus, ol.breadcrumbs a:hover {
+ol.breadcrumbs a:focus,
+ol.breadcrumbs a:hover {
     color: var(--breadcrumbs-fg);
 }
 
 /* ACTION ICONS */
 
-.viewlink, .inlineviewlink {
+.viewlink,
+.inlineviewlink {
     padding-left: 16px;
     background: url(../img/icon-viewlink.svg) 0 center no-repeat;
 }
@@ -789,7 +863,8 @@ ol.breadcrumbs a:focus, ol.breadcrumbs a:hover {
     background: url(../img/icon-addlink.svg) 0 1px no-repeat;
 }
 
-.changelink, .inlinechangelink {
+.changelink,
+.inlinechangelink {
     padding-left: 16px;
     background: url(../img/icon-changelink.svg) 0 2px no-repeat;
 }
@@ -799,11 +874,13 @@ ol.breadcrumbs a:focus, ol.breadcrumbs a:hover {
     background: url(../img/icon-deletelink.svg) 0 1px no-repeat;
 }
 
-a.deletelink:link, a.deletelink:visited {
-    color: #CC3434; /* XXX Probably unused? */
+a.deletelink:link,
+a.deletelink:visited {
+    color: #cc3434; /* XXX Probably unused? */
 }
 
-a.deletelink:focus, a.deletelink:hover {
+a.deletelink:focus,
+a.deletelink:hover {
     color: #993333; /* XXX Probably unused? */
     text-decoration: none;
 }
@@ -837,7 +914,8 @@ a.deletelink:focus, a.deletelink:hover {
     border-radius: 15px;
 }
 
-.object-tools a:link, .object-tools a:visited {
+.object-tools a:link,
+.object-tools a:visited {
     display: block;
     float: left;
     padding: 3px 12px;
@@ -849,15 +927,17 @@ a.deletelink:focus, a.deletelink:hover {
     letter-spacing: 0.5px;
 }
 
-.object-tools a:focus, .object-tools a:hover {
+.object-tools a:focus,
+.object-tools a:hover {
     background-color: var(--object-tools-hover-bg);
 }
 
-.object-tools a:focus{
+.object-tools a:focus {
     text-decoration: none;
 }
 
-.object-tools a.viewsitelink, .object-tools a.addlink {
+.object-tools a.viewsitelink,
+.object-tools a.addlink {
     background-repeat: no-repeat;
     background-position: right 7px center;
     padding-right: 26px;
@@ -906,7 +986,7 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 .main > .content {
-    flex:  1 0;
+    flex: 1 0;
     max-width: 100%;
 }
 
@@ -945,9 +1025,9 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 @media (forced-colors: active) {
-  #content-related {
-      border: 1px solid;
-  }
+    #content-related {
+        border: 1px solid;
+    }
 }
 
 /* COLUMN TYPES */
@@ -987,18 +1067,21 @@ a.deletelink:focus, a.deletelink:hover {
     color: var(--header-color);
 }
 
-#header a:link, #header a:visited, #logout-form button {
+#header a:link,
+#header a:visited,
+#logout-form button {
     color: var(--header-link-color);
 }
 
-#header a:focus , #header a:hover {
+#header a:focus,
+#header a:hover {
     text-decoration: underline;
 }
 
 @media (forced-colors: active) {
-  #header {
-      border-bottom: 1px solid;
-  }
+    #header {
+        border-bottom: 1px solid;
+    }
 }
 
 #branding {
@@ -1014,7 +1097,8 @@ a.deletelink:focus, a.deletelink:hover {
     color: var(--header-branding-color);
 }
 
-#site-name a:link, #site-name a:visited {
+#site-name a:link,
+#site-name a:visited {
     color: var(--accent);
 }
 
@@ -1047,7 +1131,8 @@ a.deletelink:focus, a.deletelink:hover {
     text-align: right;
 }
 
-#user-tools, #logout-form button{
+#user-tools,
+#logout-form button {
     padding: 0;
     font-weight: 300;
     font-size: 0.6875rem;
@@ -1055,17 +1140,21 @@ a.deletelink:focus, a.deletelink:hover {
     text-transform: uppercase;
 }
 
-#user-tools a, #logout-form button {
+#user-tools a,
+#logout-form button {
     border-bottom: 1px solid rgba(255, 255, 255, 0.25);
 }
 
-#user-tools a:focus, #user-tools a:hover,
-#logout-form button:active, #logout-form button:hover {
+#user-tools a:focus,
+#user-tools a:hover,
+#logout-form button:active,
+#logout-form button:hover {
     text-decoration: none;
     border-bottom: 0;
 }
 
-#logout-form button:active, #logout-form button:hover {
+#logout-form button:active,
+#logout-form button:hover {
     margin-bottom: 1px;
 }
 
@@ -1222,7 +1311,7 @@ a.deletelink:focus, a.deletelink:hover {
     height: 1px;
     padding: 0;
     overflow: hidden;
-    clip: rect(0,0,0,0);
+    clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
     color: var(--body-fg);
