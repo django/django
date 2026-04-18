@@ -318,27 +318,34 @@ class TestCheckTracStatus(BaseTestCase):
         data = make_trac_json(stage="Accepted", status="assigned", resolution=None)
         self.assertIsNone(check_pr.check_trac_status("36991", data))
 
+    def test_ready_for_checkin_assigned_unresolved_passes(self):
+        data = make_trac_json(
+            stage="Ready for checkin", status="assigned", resolution=None
+        )
+        self.assertIsNone(check_pr.check_trac_status("36991", data))
+
     def test_non_accepted_stage_fails(self):
-        for stage in ["Unreviewed", "Ready for Checkin", "Someday/Maybe"]:
+        for stage in ["Unreviewed", "Someday/Maybe"]:
             with self.subTest(stage=stage):
                 data = make_trac_json(stage=stage)
                 self.assertIsNotNone(check_pr.check_trac_status("36991", data))
 
     def test_resolved_ticket_fails(self):
-        for resolution in [
-            "fixed",
-            "wontfix",
-            "duplicate",
-            "invalid",
-            "worksforme",
-            "needsinfo",
-            "needsnewfeatureprocess",
-        ]:
-            with self.subTest(resolution=resolution):
-                data = make_trac_json(
-                    stage="Accepted", status="assigned", resolution=resolution
-                )
-                self.assertIsNotNone(check_pr.check_trac_status("36991", data))
+        for stage in ("Accepted", "Ready for checkin"):
+            for resolution in [
+                "fixed",
+                "wontfix",
+                "duplicate",
+                "invalid",
+                "worksforme",
+                "needsinfo",
+                "needsnewfeatureprocess",
+            ]:
+                with self.subTest(stage=stage, resolution=resolution):
+                    data = make_trac_json(
+                        stage=stage, status="assigned", resolution=resolution
+                    )
+                    self.assertIsNotNone(check_pr.check_trac_status("36991", data))
 
     def test_unassigned_ticket_fails(self):
         for status in ["new", "closed", ""]:
@@ -743,7 +750,7 @@ class TestIntegration(BaseTestCase):
         _, mock_summary, _ = self.call_main(pr_body=body)
         _, results, _ = mock_summary.call_args.args
         result_map = {name: result for name, result, _ in results}
-        self.assertIs(result_map["Trac ticket status is Accepted"], check_pr.SKIPPED)
+        self.assertIs(result_map["Trac ticket is ready for work"], check_pr.SKIPPED)
         self.assertIs(result_map["Trac ticket has_patch flag set"], check_pr.SKIPPED)
         self.assertIs(result_map["PR title includes ticket number"], check_pr.SKIPPED)
 
@@ -754,7 +761,7 @@ class TestIntegration(BaseTestCase):
         )
         _, results, _ = mock_summary.call_args.args
         result_map = {name: result for name, result, _ in results}
-        self.assertIsNotNone(result_map["Trac ticket status is Accepted"])
+        self.assertIsNotNone(result_map["Trac ticket is ready for work"])
         self.assertIs(result_map["Trac ticket has_patch flag set"], check_pr.SKIPPED)
 
     def test_established_author_skips_all_checks(self):
