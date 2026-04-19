@@ -418,6 +418,36 @@ class TestUtilsText(SimpleTestCase):
         self.assertLess(len(out), len(original))
         self.assertGreater(len(compressed_chunks), 2)
 
+    def test_camel_case_to_spaces(self):
+        items = [
+            # Basic PascalCase / CamelCase splitting.
+            ("CamelCase", "camel case"),
+            ("camelCase", "camel case"),
+            ("CamelCaseWord", "camel case word"),
+            # Single word – no transformation needed beyond lowercasing.
+            ("Word", "word"),
+            ("word", "word"),
+            # Empty string.
+            ("", ""),
+            # Already all lowercase – nothing to split.
+            ("lowercase", "lowercase"),
+            # All uppercase – consecutive caps are kept together (no spaces).
+            ("UPPERCASE", "uppercase"),
+            # Acronym at the start followed by a capitalized word.
+            ("HTTPSConnection", "https connection"),
+            # Lowercase prefix followed by an acronym.
+            ("myHTTPS", "my https"),
+            # Lowercase prefix, acronym in the middle, then a capitalized word.
+            ("myHTTPSConnection", "my https connection"),
+            # Surrounding whitespace is stripped.
+            ("  CamelCase  ", "camel case"),
+            # Digits pass through unchanged; adjacent uppercase treated normally.
+            ("CamelCase2Go", "camel case2 go"),
+        ]
+        for value, output in items:
+            with self.subTest(value=value):
+                self.assertEqual(text.camel_case_to_spaces(value), output)
+
     def test_format_lazy(self):
         self.assertEqual("django/test", format_lazy("{}/{}", "django", lazystr("test")))
         self.assertEqual("django/test", format_lazy("{0}/{1}", *("django", "test")))
