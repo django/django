@@ -515,6 +515,10 @@ Miscellaneous
   ``SimpleUploadedFile`` retain the previous behavior of evaluating based on
   the ``name`` attribute.
 
+* The undocumented ``URLResolver._is_callback()``,
+  ``URLResolver._callback_strs``, and ``URLPattern.lookup_str()`` are
+  moved to ``django.contrib.admindocs.utils``.
+
 .. _deprecated-features-6.1:
 
 Features deprecated in 6.1

@@ -1,11 +1,14 @@
 import unittest
 
 from django.contrib.admindocs.utils import (
+    _is_callback,
     docutils_is_available,
     parse_docstring,
     parse_rst,
 )
+from django.test import SimpleTestCase
 from django.test.utils import captured_stderr
+from django.urls import get_resolver
 
 from .tests import AdminDocsSimpleTestCase
 
@@ -135,3 +138,38 @@ class TestUtils(AdminDocsSimpleTestCase):
         markup = "<p>reST, <cite>interpreted text</cite>, default role.</p>\n"
         parts = docutils.core.publish_parts(source=source, writer="html4css1")
         self.assertEqual(parts["fragment"], markup)
+
+
+class TestResolver(SimpleTestCase):
+    def test_namespaced_view_detail(self):
+        resolver = get_resolver("urlpatterns_reverse.nested_urls")
+        self.assertTrue(_is_callback("urlpatterns_reverse.nested_urls.view1", resolver))
+        self.assertTrue(_is_callback("urlpatterns_reverse.nested_urls.view2", resolver))
+        self.assertTrue(_is_callback("urlpatterns_reverse.nested_urls.View3", resolver))
+        self.assertTrue(_is_callback("urlpatterns_reverse.nested_urls.view4", resolver))
+        self.assertFalse(_is_callback("urlpatterns_reverse.nested_urls.blub", resolver))
+
+    def test_view_detail_as_method(self):
+        # Views that have a class name as part of their path.
+        resolver = get_resolver("urlpatterns_reverse.method_view_urls")
+        self.assertTrue(
+            _is_callback(
+                "urlpatterns_reverse.method_view_urls.ViewContainer.method_view",
+                resolver,
+            )
+        )
+        self.assertTrue(
+            _is_callback(
+                "urlpatterns_reverse.method_view_urls.ViewContainer.classmethod_view",
+                resolver,
+            )
+        )
+
+    def test_partial_view(self):
+        # Views wrapped in functools.partial.
+        resolver = get_resolver("urlpatterns_reverse.partial_view_urls")
+        self.assertTrue(
+            _is_callback(
+                "urlpatterns_reverse.partial_view_urls.view_with_args", resolver
+            )
+        )
