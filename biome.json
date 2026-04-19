@@ -8,7 +8,12 @@
             "docs/_theme/**/*.css",
             "!docs/_theme/djangodocs/static/fontawesome/**",
             "!docs/_theme/djangodocs/static/reset-fonts-grids.css",
-            "!**/*.min.css"
+            "!**/*.min.css",
+            "django/contrib/admin/static/admin/js/**/*.js",
+            "!django/contrib/admin/static/admin/js/vendor/**",
+            "django/contrib/gis/static/gis/js/**/*.js",
+            "js_tests/**/*.js",
+            "!**/*.min.js"
         ]
     },
     "formatter": {
@@ -19,16 +24,26 @@
         "enabled": true,
         "rules": {
             "complexity": {
-                "noImportantStyles": "off"
+                "noArguments": "off",
+                "noImportantStyles": "off",
+                "noUselessLoneBlockStatements": "off",
+                "useArrowFunction": "off",
+                "useIndexOf": "off",
+                "useOptionalChain": "off"
+            },
+            "correctness": {
+                "noUnusedFunctionParameters": "off",
+                "noUnusedVariables": "off",
+                "useParseIntRadix": "off"
             },
             "style": {
-                "noDescendingSpecificity": "off"
+                "noDescendingSpecificity": "off",
+                "useTemplate": "off"
+            },
+            "suspicious": {
+                "noRedundantUseStrict": "off"
             }
         }
-    },
-    "javascript": {
-        "linter": { "enabled": false },
-        "formatter": { "enabled": false }
     },
     "json": {
         "linter": { "enabled": false },
