@@ -291,6 +291,9 @@
             cal_box.style.position = 'absolute';
             cal_box.className = 'calendarbox module';
             cal_box.id = DateTimeShortcuts.calendarDivName1 + num;
+            if (inp.dataset.firstDayOfWeek) {
+                cal_box.dataset.firstDayOfWeek = inp.dataset.firstDayOfWeek;
+            }
             document.body.appendChild(cal_box);
             cal_box.addEventListener('click', function(e) { e.stopPropagation(); });
 
