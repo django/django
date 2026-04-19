@@ -435,6 +435,9 @@ backends.
 
 * The ``object-tools`` block is hoisted out of the ``content`` block in forms.
 
+* The undocumented ``InclusionAdminNode.__init__()`` now takes the template tag
+  ``name`` as the first positional argument.
+
 :mod:`django.contrib.gis`
 -------------------------
 
@@ -496,6 +499,9 @@ Miscellaneous
 
 * :class:`~django.contrib.contenttypes.fields.GenericForeignKey` now uses a
   separate descriptor class: the private ``GenericForeignKeyDescriptor``.
+
+* The undocumented ``django.template.library.parse_bits()`` function no longer
+  accepts the ``takes_context`` argument.
 
 * The minimum supported version of SQLite is increased from 3.31.0 to 3.37.0.
 
