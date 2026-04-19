@@ -2,7 +2,6 @@
   "name": "Django",
   "private": true,
   "scripts": {
-    "pretest": "eslint .",
     "test": "grunt test --verbose",
     "biome": "biome check"
   },
@@ -11,7 +10,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.12",
-    "eslint": "^9.39.1",
     "puppeteer": "^24.22.0",
     "grunt": "^1.6.1",
     "grunt-cli": "^1.5.0",
