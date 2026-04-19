@@ -46,6 +46,8 @@ MAX_GET_RESULTS = 21
 # The maximum number of items to display in a QuerySet.__repr__
 REPR_OUTPUT_SIZE = 20
 
+DEFAULT_FETCH_MODE = FETCH_ONE
+
 
 class BaseIterable:
     def __init__(
@@ -335,7 +337,7 @@ class QuerySet(AltersData):
         self._prefetch_done = False
         self._known_related_objects = {}  # {rel_field: {pk: rel_obj}}
         self._iterable_class = ModelIterable
-        self._fetch_mode = FETCH_ONE
+        self._fetch_mode = DEFAULT_FETCH_MODE
         self._fields = None
         self._defer_next_filter = False
         self._deferred_filter = None
@@ -2356,7 +2358,7 @@ class RawQuerySet:
         translations=None,
         using=None,
         hints=None,
-        fetch_mode=FETCH_ONE,
+        fetch_mode=DEFAULT_FETCH_MODE,
     ):
         self.raw_query = raw_query
         self.model = model
