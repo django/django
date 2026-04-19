@@ -173,6 +173,14 @@ class SimpleTagTests(TagTestCase):
                 "{% simple_unlimited_args_kwargs 37 "
                 'eggs="scrambled" eggs="scrambled" %}',
             ),
+            (
+                "'no_params' tag requires a variable name after 'as'",
+                "{% load custom %}{% no_params as %}",
+            ),
+            (
+                "'one_param' tag requires a variable name after 'as'",
+                "{% load custom %}{% one_param 37 as %}",
+            ),
         ]
 
         for entry in errors:
@@ -420,6 +428,14 @@ class SimpleBlockTagTests(TagTestCase):
                 "Unclosed tag on line 1: 'simple_one_default_block'. Looking for one "
                 "of: endsimple_one_default_block.",
                 "{% load custom %}{% simple_one_default_block %}Some content",
+            ),
+            (
+                "'div' tag requires a variable name after 'as'",
+                "{% load custom %}{% div as %}content{% enddiv %}",
+            ),
+            (
+                "'one_param_block' tag requires a variable name after 'as'",
+                "{% load custom %}{% one_param_block 37 as %}content{% endone_param_block %}",
             ),
         ]
 

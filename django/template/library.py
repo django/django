@@ -139,6 +139,10 @@ class Library:
                 if len(bits) >= 2 and bits[-2] == "as":
                     target_var = bits[-1]
                     bits = bits[:-2]
+                if bits and bits[-1] == "as":
+                    raise TemplateSyntaxError(
+                        f"'{function_name}' tag requires a variable name after 'as'"
+                    )
                 args, kwargs = parse_bits(
                     parser,
                     bits,
@@ -221,6 +225,10 @@ class Library:
                 if len(bits) >= 2 and bits[-2] == "as":
                     target_var = bits[-1]
                     bits = bits[:-2]
+                if bits and bits[-1] == "as":
+                    raise TemplateSyntaxError(
+                        f"'{function_name}' tag requires a variable name after 'as'"
+                    )
 
                 nodelist = parser.parse((end_name,))
                 parser.delete_first_token()
