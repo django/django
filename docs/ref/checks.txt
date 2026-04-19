@@ -967,7 +967,8 @@ The following checks are performed on any model using a
 The following checks verify that :mod:`django.contrib.sites` is correctly
 configured:
 
-* **sites.E101**: The :setting:`SITE_ID` setting must be an integer.
+* **sites.E101**: The :setting:`SITE_ID` setting must be of type ``<type>``.
+  *or* The :setting:`SITE_ID` setting failed to validate: ``<error>``.
 
 ``staticfiles``
 ---------------
