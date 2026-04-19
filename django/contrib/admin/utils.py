@@ -5,7 +5,7 @@ from collections import defaultdict
 from functools import reduce
 from operator import or_
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.templatetags.auth import render_password_as_hash
 from django.core.exceptions import FieldDoesNotExist
 from django.core.validators import EMPTY_VALUES
@@ -177,7 +177,7 @@ def get_deleted_objects(objs, request, admin_site):
         else:
             # If the model is not registered,
             # check if the user has delete permissions for the model.
-            p = "%s.delete_%s" % (opts.app_label, opts.model_name)
+            p = get_permission_codename("delete", opts)
             if not request.user.has_perm(p):
                 perms_needed.add(opts.verbose_name)
 
