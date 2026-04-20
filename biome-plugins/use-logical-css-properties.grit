@@ -1,0 +1,147 @@
+// Flag non-logical CSS properties and values, enforcing logical equivalents.
+// Mappings taken from MDN's "Logical properties and values" guide:
+// https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Logical_properties_and_values
+//
+// Implementation notes:
+// - Each check uses `maybe { ... }` so branches run independently and every
+//   matching branch fires its diagnostic; `or` short-circuits on first match.
+// - Each branch binds its matched declaration to a unique variable (`$r1`..)
+//   because GritQL variables are pattern-scoped — reusing a name across
+//   branches makes later branches fail to bind.
+// - For `margin`/`padding`/`border*`/`inset` shorthands, the 1-value form is
+//   direction-neutral (`margin: 10px` = all sides equal) and is left alone;
+//   only the 2/3/4-value forms, whose order is physical (top/right/bottom/
+//   left), are flagged.
+language css;
+
+`$selector { $props }` where {
+    // Sizing
+    maybe { $props <: contains `width: $_` as $r1,      register_diagnostic(span=$r1, message="Prefer logical `inline-size` over `width`.", severity="error") },
+    maybe { $props <: contains `height: $_` as $r2,     register_diagnostic(span=$r2, message="Prefer logical `block-size` over `height`.", severity="error") },
+    maybe { $props <: contains `min-width: $_` as $r3,  register_diagnostic(span=$r3, message="Prefer logical `min-inline-size` over `min-width`.", severity="error") },
+    maybe { $props <: contains `min-height: $_` as $r4, register_diagnostic(span=$r4, message="Prefer logical `min-block-size` over `min-height`.", severity="error") },
+    maybe { $props <: contains `max-width: $_` as $r5,  register_diagnostic(span=$r5, message="Prefer logical `max-inline-size` over `max-width`.", severity="error") },
+    maybe { $props <: contains `max-height: $_` as $r6, register_diagnostic(span=$r6, message="Prefer logical `max-block-size` over `max-height`.", severity="error") },
+
+    // Multi-value directional shorthands. The 2/3/4-value forms order values
+    // top/right/bottom/left, so they encode physical direction.
+    maybe { $props <: contains `margin: $_ $_` as $r7,             register_diagnostic(span=$r7,  message="Avoid the multi-value `margin` shorthand; use logical `margin-block` / `margin-inline` (or `margin-{block,inline}-{start,end}`).", severity="error") },
+    maybe { $props <: contains `margin: $_ $_ $_` as $r8,          register_diagnostic(span=$r8,  message="Avoid the multi-value `margin` shorthand; use logical `margin-block` / `margin-inline` (or `margin-{block,inline}-{start,end}`).", severity="error") },
+    maybe { $props <: contains `margin: $_ $_ $_ $_` as $r9,       register_diagnostic(span=$r9,  message="Avoid the multi-value `margin` shorthand; use logical `margin-block` / `margin-inline` (or `margin-{block,inline}-{start,end}`).", severity="error") },
+    maybe { $props <: contains `padding: $_ $_` as $r10,           register_diagnostic(span=$r10, message="Avoid the multi-value `padding` shorthand; use logical `padding-block` / `padding-inline` (or `padding-{block,inline}-{start,end}`).", severity="error") },
+    maybe { $props <: contains `padding: $_ $_ $_` as $r11,        register_diagnostic(span=$r11, message="Avoid the multi-value `padding` shorthand; use logical `padding-block` / `padding-inline` (or `padding-{block,inline}-{start,end}`).", severity="error") },
+    maybe { $props <: contains `padding: $_ $_ $_ $_` as $r12,     register_diagnostic(span=$r12, message="Avoid the multi-value `padding` shorthand; use logical `padding-block` / `padding-inline` (or `padding-{block,inline}-{start,end}`).", severity="error") },
+    maybe { $props <: contains `border-width: $_ $_` as $r13,      register_diagnostic(span=$r13, message="Avoid the multi-value `border-width` shorthand; use logical `border-block-width` / `border-inline-width`.", severity="error") },
+    maybe { $props <: contains `border-width: $_ $_ $_` as $r14,   register_diagnostic(span=$r14, message="Avoid the multi-value `border-width` shorthand; use logical `border-block-width` / `border-inline-width`.", severity="error") },
+    maybe { $props <: contains `border-width: $_ $_ $_ $_` as $r15, register_diagnostic(span=$r15, message="Avoid the multi-value `border-width` shorthand; use logical `border-block-width` / `border-inline-width`.", severity="error") },
+    maybe { $props <: contains `border-style: $_ $_` as $r16,      register_diagnostic(span=$r16, message="Avoid the multi-value `border-style` shorthand; use logical `border-block-style` / `border-inline-style`.", severity="error") },
+    maybe { $props <: contains `border-style: $_ $_ $_` as $r17,   register_diagnostic(span=$r17, message="Avoid the multi-value `border-style` shorthand; use logical `border-block-style` / `border-inline-style`.", severity="error") },
+    maybe { $props <: contains `border-style: $_ $_ $_ $_` as $r18, register_diagnostic(span=$r18, message="Avoid the multi-value `border-style` shorthand; use logical `border-block-style` / `border-inline-style`.", severity="error") },
+    maybe { $props <: contains `border-color: $_ $_` as $r19,      register_diagnostic(span=$r19, message="Avoid the multi-value `border-color` shorthand; use logical `border-block-color` / `border-inline-color`.", severity="error") },
+    maybe { $props <: contains `border-color: $_ $_ $_` as $r20,   register_diagnostic(span=$r20, message="Avoid the multi-value `border-color` shorthand; use logical `border-block-color` / `border-inline-color`.", severity="error") },
+    maybe { $props <: contains `border-color: $_ $_ $_ $_` as $r21, register_diagnostic(span=$r21, message="Avoid the multi-value `border-color` shorthand; use logical `border-block-color` / `border-inline-color`.", severity="error") },
+    maybe { $props <: contains `border-radius: $_ $_` as $r22,      register_diagnostic(span=$r22, message="Avoid the multi-value `border-radius` shorthand; use logical `border-start-start-radius`, `border-start-end-radius`, `border-end-start-radius`, `border-end-end-radius`.", severity="error") },
+    maybe { $props <: contains `border-radius: $_ $_ $_` as $r23,   register_diagnostic(span=$r23, message="Avoid the multi-value `border-radius` shorthand; use logical `border-start-start-radius`, `border-start-end-radius`, `border-end-start-radius`, `border-end-end-radius`.", severity="error") },
+    maybe { $props <: contains `border-radius: $_ $_ $_ $_` as $r24, register_diagnostic(span=$r24, message="Avoid the multi-value `border-radius` shorthand; use logical `border-start-start-radius`, `border-start-end-radius`, `border-end-start-radius`, `border-end-end-radius`.", severity="error") },
+    maybe { $props <: contains `inset: $_ $_` as $r25,             register_diagnostic(span=$r25, message="Avoid the multi-value `inset` shorthand; use logical `inset-block` / `inset-inline` (or `inset-{block,inline}-{start,end}`).", severity="error") },
+    maybe { $props <: contains `inset: $_ $_ $_` as $r26,          register_diagnostic(span=$r26, message="Avoid the multi-value `inset` shorthand; use logical `inset-block` / `inset-inline` (or `inset-{block,inline}-{start,end}`).", severity="error") },
+    maybe { $props <: contains `inset: $_ $_ $_ $_` as $r27,       register_diagnostic(span=$r27, message="Avoid the multi-value `inset` shorthand; use logical `inset-block` / `inset-inline` (or `inset-{block,inline}-{start,end}`).", severity="error") },
+
+    // Margin per-side
+    maybe { $props <: contains `margin-top: $_` as $r28,    register_diagnostic(span=$r28, message="Prefer logical `margin-block-start` over `margin-top`.", severity="error") },
+    maybe { $props <: contains `margin-bottom: $_` as $r29, register_diagnostic(span=$r29, message="Prefer logical `margin-block-end` over `margin-bottom`.", severity="error") },
+    maybe { $props <: contains `margin-left: $_` as $r30,   register_diagnostic(span=$r30, message="Prefer logical `margin-inline-start` over `margin-left`.", severity="error") },
+    maybe { $props <: contains `margin-right: $_` as $r31,  register_diagnostic(span=$r31, message="Prefer logical `margin-inline-end` over `margin-right`.", severity="error") },
+
+    // Padding per-side
+    maybe { $props <: contains `padding-top: $_` as $r32,    register_diagnostic(span=$r32, message="Prefer logical `padding-block-start` over `padding-top`.", severity="error") },
+    maybe { $props <: contains `padding-bottom: $_` as $r33, register_diagnostic(span=$r33, message="Prefer logical `padding-block-end` over `padding-bottom`.", severity="error") },
+    maybe { $props <: contains `padding-left: $_` as $r34,   register_diagnostic(span=$r34, message="Prefer logical `padding-inline-start` over `padding-left`.", severity="error") },
+    maybe { $props <: contains `padding-right: $_` as $r35,  register_diagnostic(span=$r35, message="Prefer logical `padding-inline-end` over `padding-right`.", severity="error") },
+
+    // Border shorthand per-side
+    maybe { $props <: contains `border-top: $_` as $r36,    register_diagnostic(span=$r36, message="Prefer logical `border-block-start` over `border-top`.", severity="error") },
+    maybe { $props <: contains `border-bottom: $_` as $r37, register_diagnostic(span=$r37, message="Prefer logical `border-block-end` over `border-bottom`.", severity="error") },
+    maybe { $props <: contains `border-left: $_` as $r38,   register_diagnostic(span=$r38, message="Prefer logical `border-inline-start` over `border-left`.", severity="error") },
+    maybe { $props <: contains `border-right: $_` as $r39,  register_diagnostic(span=$r39, message="Prefer logical `border-inline-end` over `border-right`.", severity="error") },
+
+    // Border color per-side
+    maybe { $props <: contains `border-top-color: $_` as $r40,    register_diagnostic(span=$r40, message="Prefer logical `border-block-start-color` over `border-top-color`.", severity="error") },
+    maybe { $props <: contains `border-bottom-color: $_` as $r41, register_diagnostic(span=$r41, message="Prefer logical `border-block-end-color` over `border-bottom-color`.", severity="error") },
+    maybe { $props <: contains `border-left-color: $_` as $r42,   register_diagnostic(span=$r42, message="Prefer logical `border-inline-start-color` over `border-left-color`.", severity="error") },
+    maybe { $props <: contains `border-right-color: $_` as $r43,  register_diagnostic(span=$r43, message="Prefer logical `border-inline-end-color` over `border-right-color`.", severity="error") },
+
+    // Border style per-side
+    maybe { $props <: contains `border-top-style: $_` as $r44,    register_diagnostic(span=$r44, message="Prefer logical `border-block-start-style` over `border-top-style`.", severity="error") },
+    maybe { $props <: contains `border-bottom-style: $_` as $r45, register_diagnostic(span=$r45, message="Prefer logical `border-block-end-style` over `border-bottom-style`.", severity="error") },
+    maybe { $props <: contains `border-left-style: $_` as $r46,   register_diagnostic(span=$r46, message="Prefer logical `border-inline-start-style` over `border-left-style`.", severity="error") },
+    maybe { $props <: contains `border-right-style: $_` as $r47,  register_diagnostic(span=$r47, message="Prefer logical `border-inline-end-style` over `border-right-style`.", severity="error") },
+
+    // Border width per-side
+    maybe { $props <: contains `border-top-width: $_` as $r48,    register_diagnostic(span=$r48, message="Prefer logical `border-block-start-width` over `border-top-width`.", severity="error") },
+    maybe { $props <: contains `border-bottom-width: $_` as $r49, register_diagnostic(span=$r49, message="Prefer logical `border-block-end-width` over `border-bottom-width`.", severity="error") },
+    maybe { $props <: contains `border-left-width: $_` as $r50,   register_diagnostic(span=$r50, message="Prefer logical `border-inline-start-width` over `border-left-width`.", severity="error") },
+    maybe { $props <: contains `border-right-width: $_` as $r51,  register_diagnostic(span=$r51, message="Prefer logical `border-inline-end-width` over `border-right-width`.", severity="error") },
+
+    // Border radius per-corner
+    maybe { $props <: contains `border-top-left-radius: $_` as $r52,     register_diagnostic(span=$r52, message="Prefer logical `border-start-start-radius` over `border-top-left-radius`.", severity="error") },
+    maybe { $props <: contains `border-top-right-radius: $_` as $r53,    register_diagnostic(span=$r53, message="Prefer logical `border-start-end-radius` over `border-top-right-radius`.", severity="error") },
+    maybe { $props <: contains `border-bottom-left-radius: $_` as $r54,  register_diagnostic(span=$r54, message="Prefer logical `border-end-start-radius` over `border-bottom-left-radius`.", severity="error") },
+    maybe { $props <: contains `border-bottom-right-radius: $_` as $r55, register_diagnostic(span=$r55, message="Prefer logical `border-end-end-radius` over `border-bottom-right-radius`.", severity="error") },
+
+    // Positioning / inset offsets
+    maybe { $props <: contains `top: $_` as $r56,    register_diagnostic(span=$r56, message="Prefer logical `inset-block-start` over `top`.", severity="error") },
+    maybe { $props <: contains `bottom: $_` as $r57, register_diagnostic(span=$r57, message="Prefer logical `inset-block-end` over `bottom`.", severity="error") },
+    maybe { $props <: contains `left: $_` as $r58,   register_diagnostic(span=$r58, message="Prefer logical `inset-inline-start` over `left`.", severity="error") },
+    maybe { $props <: contains `right: $_` as $r59,  register_diagnostic(span=$r59, message="Prefer logical `inset-inline-end` over `right`.", severity="error") },
+
+    // Flow-relative values on otherwise-logical properties
+    maybe { $props <: contains `float: left` as $r60,       register_diagnostic(span=$r60, message="Prefer logical `float: inline-start` over `float: left`.", severity="error") },
+    maybe { $props <: contains `float: right` as $r61,      register_diagnostic(span=$r61, message="Prefer logical `float: inline-end` over `float: right`.", severity="error") },
+    maybe { $props <: contains `clear: left` as $r62,       register_diagnostic(span=$r62, message="Prefer logical `clear: inline-start` over `clear: left`.", severity="error") },
+    maybe { $props <: contains `clear: right` as $r63,      register_diagnostic(span=$r63, message="Prefer logical `clear: inline-end` over `clear: right`.", severity="error") },
+    maybe { $props <: contains `text-align: left` as $r64,  register_diagnostic(span=$r64, message="Prefer logical `text-align: start` over `text-align: left`.", severity="error") },
+    maybe { $props <: contains `text-align: right` as $r65, register_diagnostic(span=$r65, message="Prefer logical `text-align: end` over `text-align: right`.", severity="error") },
+
+    // Overflow axes
+    maybe { $props <: contains `overflow-x: $_` as $r66, register_diagnostic(span=$r66, message="Prefer logical `overflow-inline` over `overflow-x`.", severity="error") },
+    maybe { $props <: contains `overflow-y: $_` as $r67, register_diagnostic(span=$r67, message="Prefer logical `overflow-block` over `overflow-y`.", severity="error") },
+
+    // Overscroll-behavior axes
+    maybe { $props <: contains `overscroll-behavior-x: $_` as $r68, register_diagnostic(span=$r68, message="Prefer logical `overscroll-behavior-inline` over `overscroll-behavior-x`.", severity="error") },
+    maybe { $props <: contains `overscroll-behavior-y: $_` as $r69, register_diagnostic(span=$r69, message="Prefer logical `overscroll-behavior-block` over `overscroll-behavior-y`.", severity="error") },
+
+    // Scroll margin per-side
+    maybe { $props <: contains `scroll-margin-top: $_` as $r70,    register_diagnostic(span=$r70, message="Prefer logical `scroll-margin-block-start` over `scroll-margin-top`.", severity="error") },
+    maybe { $props <: contains `scroll-margin-bottom: $_` as $r71, register_diagnostic(span=$r71, message="Prefer logical `scroll-margin-block-end` over `scroll-margin-bottom`.", severity="error") },
+    maybe { $props <: contains `scroll-margin-left: $_` as $r72,   register_diagnostic(span=$r72, message="Prefer logical `scroll-margin-inline-start` over `scroll-margin-left`.", severity="error") },
+    maybe { $props <: contains `scroll-margin-right: $_` as $r73,  register_diagnostic(span=$r73, message="Prefer logical `scroll-margin-inline-end` over `scroll-margin-right`.", severity="error") },
+
+    // Scroll margin multi-value shorthand
+    maybe { $props <: contains `scroll-margin: $_ $_` as $r74,       register_diagnostic(span=$r74, message="Avoid the multi-value `scroll-margin` shorthand; use logical `scroll-margin-block` / `scroll-margin-inline`.", severity="error") },
+    maybe { $props <: contains `scroll-margin: $_ $_ $_` as $r75,    register_diagnostic(span=$r75, message="Avoid the multi-value `scroll-margin` shorthand; use logical `scroll-margin-block` / `scroll-margin-inline`.", severity="error") },
+    maybe { $props <: contains `scroll-margin: $_ $_ $_ $_` as $r76, register_diagnostic(span=$r76, message="Avoid the multi-value `scroll-margin` shorthand; use logical `scroll-margin-block` / `scroll-margin-inline`.", severity="error") },
+
+    // Scroll padding per-side
+    maybe { $props <: contains `scroll-padding-top: $_` as $r77,    register_diagnostic(span=$r77, message="Prefer logical `scroll-padding-block-start` over `scroll-padding-top`.", severity="error") },
+    maybe { $props <: contains `scroll-padding-bottom: $_` as $r78, register_diagnostic(span=$r78, message="Prefer logical `scroll-padding-block-end` over `scroll-padding-bottom`.", severity="error") },
+    maybe { $props <: contains `scroll-padding-left: $_` as $r79,   register_diagnostic(span=$r79, message="Prefer logical `scroll-padding-inline-start` over `scroll-padding-left`.", severity="error") },
+    maybe { $props <: contains `scroll-padding-right: $_` as $r80,  register_diagnostic(span=$r80, message="Prefer logical `scroll-padding-inline-end` over `scroll-padding-right`.", severity="error") },
+
+    // Scroll padding multi-value shorthand
+    maybe { $props <: contains `scroll-padding: $_ $_` as $r81,       register_diagnostic(span=$r81, message="Avoid the multi-value `scroll-padding` shorthand; use logical `scroll-padding-block` / `scroll-padding-inline`.", severity="error") },
+    maybe { $props <: contains `scroll-padding: $_ $_ $_` as $r82,    register_diagnostic(span=$r82, message="Avoid the multi-value `scroll-padding` shorthand; use logical `scroll-padding-block` / `scroll-padding-inline`.", severity="error") },
+    maybe { $props <: contains `scroll-padding: $_ $_ $_ $_` as $r83, register_diagnostic(span=$r83, message="Avoid the multi-value `scroll-padding` shorthand; use logical `scroll-padding-block` / `scroll-padding-inline`.", severity="error") },
+
+    // Contain-intrinsic sizing
+    maybe { $props <: contains `contain-intrinsic-width: $_` as $r84,  register_diagnostic(span=$r84, message="Prefer logical `contain-intrinsic-inline-size` over `contain-intrinsic-width`.", severity="error") },
+    maybe { $props <: contains `contain-intrinsic-height: $_` as $r85, register_diagnostic(span=$r85, message="Prefer logical `contain-intrinsic-block-size` over `contain-intrinsic-height`.", severity="error") },
+
+    // Resize axis values
+    maybe { $props <: contains `resize: horizontal` as $r86, register_diagnostic(span=$r86, message="Prefer logical `resize: inline` over `resize: horizontal`.", severity="error") },
+    maybe { $props <: contains `resize: vertical` as $r87,   register_diagnostic(span=$r87, message="Prefer logical `resize: block` over `resize: vertical`.", severity="error") },
+
+    // Caption-side values
+    maybe { $props <: contains `caption-side: top` as $r88,    register_diagnostic(span=$r88, message="Prefer logical `caption-side: block-start` over `caption-side: top`.", severity="error") },
+    maybe { $props <: contains `caption-side: bottom` as $r89, register_diagnostic(span=$r89, message="Prefer logical `caption-side: block-end` over `caption-side: bottom`.", severity="error") }
+}
