@@ -75,8 +75,10 @@ from django.test.utils import (
     Approximate,
     CaptureQueriesContext,
     isolate_apps,
+    override_settings,
     register_lookup,
 )
+from django.utils import timezone
 from django.utils.functional import SimpleLazyObject
 from django.utils.version import PY314
 
@@ -92,6 +94,7 @@ from .models import (
     RemoteEmployee,
     Result,
     SimulationRun,
+    SQLiteTimezoneEmulationModel,
     Text,
     Time,
 )
@@ -3052,3 +3055,38 @@ class OrderByTests(SimpleTestCase):
             F("field").asc(nulls_first=False)
         with self.assertRaisesMessage(ValueError, msg):
             F("field").desc(nulls_last=False)
+
+
+class SQLiteTimezoneEmulationTests(TestCase):
+    @override_settings(USE_TZ=True, TIME_ZONE="UTC")
+    def test_db_default_emulation_ignores_override(self):
+        expected_hour = timezone.now().hour
+
+        with self.settings(TIME_ZONE="Asia/Kathmandu"):
+            obj = SQLiteTimezoneEmulationModel.objects.create()
+            obj.refresh_from_db()
+            self.assertEqual(obj.created_hour, expected_hour)
+
+    @override_settings(USE_TZ=True, TIME_ZONE="UTC")
+    def test_db_default_bulk_create_mix(self):
+        expected_hour = timezone.now().hour
+
+        with self.settings(TIME_ZONE="Asia/Kathmandu"):
+            SQLiteTimezoneEmulationModel.objects.bulk_create(
+                [
+                    SQLiteTimezoneEmulationModel(
+                        other_field="provided", created_hour=99
+                    ),
+                    SQLiteTimezoneEmulationModel(other_field="defaulted"),
+                ]
+            )
+
+            obj_provided = SQLiteTimezoneEmulationModel.objects.get(
+                other_field="provided"
+            )
+            obj_defaulted = SQLiteTimezoneEmulationModel.objects.get(
+                other_field="defaulted"
+            )
+
+            self.assertEqual(obj_provided.created_hour, 99)
+            self.assertEqual(obj_defaulted.created_hour, expected_hour)
