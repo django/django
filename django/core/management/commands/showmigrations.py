@@ -1,10 +1,33 @@
 import sys
+from enum import StrEnum
 
 from django.apps import apps
 from django.core.management.base import BaseCommand
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
+
+
+class MigrationStatus(StrEnum):
+    """
+    ``status`` field on each row returned by :meth:`Command.get_migration_data`.
+
+    Members subclass :class:`str`, so they compare equal to their string values
+    and serialize like plain strings.
+
+    * :attr:`APPLIED` — Recorded in ``django_migrations`` for this migration name
+      and reflected in the loader's applied set (``[X]`` in the default list
+      output).
+    * :attr:`UNRECORDED` — The loader treats this migration as applied (e.g. all
+      replaced migrations of a squash are recorded), but there is no row yet for
+      this migration name in ``django_migrations`` (``[-]`` and the "finish
+      recording" hint).
+    * :attr:`UNAPPLIED` — Not applied (``[ ]`` in the default list output).
+    """
+
+    APPLIED = "applied"
+    UNRECORDED = "unrecorded"
+    UNAPPLIED = "unapplied"
 
 
 class Command(BaseCommand):
@@ -61,10 +84,11 @@ class Command(BaseCommand):
         db = options["database"]
         connection = connections[db]
 
-        if options["format"] == "plan":
-            return self.show_plan(connection, options["app_label"])
-        else:
-            return self.show_list(connection, options["app_label"])
+        plan = options["format"] == "plan"
+        rows = self.get_migration_data(
+            connection, app_names=options["app_label"], plan=plan
+        )
+        return self.show_plan(rows) if plan else self.show_list(rows)
 
     def _validate_app_names(self, loader, app_names):
         has_bad_names = False
@@ -77,67 +101,44 @@ class Command(BaseCommand):
         if has_bad_names:
             sys.exit(2)
 
-    def show_list(self, connection, app_names=None):
-        """
-        Show a list of all migrations on the system, or only those of
-        some named apps.
-        """
-        # Load migrations from disk/DB
-        loader = MigrationLoader(connection, ignore_no_migrations=True)
-        recorder = MigrationRecorder(connection)
-        recorded_migrations = recorder.applied_migrations()
-        graph = loader.graph
-        # If we were passed a list of apps, validate it
-        if app_names:
-            self._validate_app_names(loader, app_names)
-        # Otherwise, show all apps in alphabetic order
-        else:
-            app_names = sorted(loader.migrated_apps)
-        # For each app, print its migrations in order from oldest (roots) to
-        # newest (leaves).
-        for app_name in app_names:
-            self.stdout.write(app_name, self.style.MIGRATE_LABEL)
-            shown = set()
-            for node in graph.leaf_nodes(app_name):
-                for plan_node in graph.forwards_plan(node):
-                    if plan_node not in shown and plan_node[0] == app_name:
-                        # Give it a nice title if it's a squashed one
-                        title = plan_node[1]
-                        if graph.nodes[plan_node].replaces:
-                            title += " (%s squashed migrations)" % len(
-                                graph.nodes[plan_node].replaces
-                            )
-                        applied_migration = loader.applied_migrations.get(plan_node)
-                        # Mark it as applied/unapplied
-                        if applied_migration:
-                            if plan_node in recorded_migrations:
-                                output = " [X] %s" % title
-                            else:
-                                title += " Run 'manage.py migrate' to finish recording."
-                                output = " [-] %s" % title
-                            if self.verbosity >= 2 and hasattr(
-                                applied_migration, "applied"
-                            ):
-                                output += (
-                                    " (applied at %s)"
-                                    % applied_migration.applied.strftime(
-                                        "%Y-%m-%d %H:%M:%S"
-                                    )
-                                )
-                            self.stdout.write(output)
-                        else:
-                            self.stdout.write(" [ ] %s" % title)
-                        shown.add(plan_node)
-            # If we didn't print anything, then a small message
-            if not shown:
-                self.stdout.write(" (no migrations)", self.style.ERROR)
+    def _migration_row(
+        self,
+        *,
+        app,
+        name,
+        title,
+        status,
+        applied_at,
+    ):
+        return {
+            "app": app,
+            "name": name,
+            "title": title,
+            "status": status,
+            "applied_at": applied_at,
+        }
 
-    def show_plan(self, connection, app_names=None):
+    def get_migration_data(self, connection, *, app_names=None, plan=False):
         """
-        Show all known migrations (or only those of the specified app_names)
-        in the order they will be applied.
+        Return a list of dicts describing migrations for list or plan output.
+
+        Each row includes ``app``, ``name``, ``title``, ``status``, and
+        ``applied_at``. Use ``plan=False`` (the default) for per-app list ordering;
+        use ``plan=True`` for global apply order as in ``showmigrations --plan``,
+        in which case each row also has ``dependency_labels`` (list of
+        ``app.name`` dependency strings). List mode may include a placeholder row
+        per app with ``name`` and ``title`` set to ``None`` when the app has no
+        migrations.
+
+        Subclasses overriding this method should keep the same keyword-only
+        parameters and preserve the row structure (including
+        ``dependency_labels`` when ``plan`` is true).
         """
-        # Load migrations from disk/DB
+        if plan:
+            return self._plan_migration_rows(connection, app_names)
+        return self._list_migration_rows(connection, app_names)
+
+    def _plan_migration_rows(self, connection, app_names):
         loader = MigrationLoader(connection)
         graph = loader.graph
         if app_names:
@@ -145,33 +146,157 @@ class Command(BaseCommand):
             targets = [key for key in graph.leaf_nodes() if key[0] in app_names]
         else:
             targets = graph.leaf_nodes()
-        plan = []
+        rows = []
         seen = set()
-
-        # Generate the plan
         for target in targets:
             for migration in graph.forwards_plan(target):
                 if migration not in seen:
                     node = graph.node_map[migration]
-                    plan.append(node)
+                    name = node.key[1]
+                    applied = node.key in loader.applied_migrations
+                    status = (
+                        MigrationStatus.APPLIED
+                        if applied
+                        else MigrationStatus.UNAPPLIED
+                    )
+                    dependency_labels = [
+                        "%s.%s" % parent.key for parent in sorted(node.parents)
+                    ]
+                    rows.append(
+                        {
+                            **self._migration_row(
+                                app=node.key[0],
+                                name=name,
+                                title=name,
+                                status=status,
+                                applied_at=None,
+                            ),
+                            "dependency_labels": dependency_labels,
+                        }
+                    )
                     seen.add(migration)
+        return rows
 
-        # Output
-        def print_deps(node):
-            out = []
-            for parent in sorted(node.parents):
-                out.append("%s.%s" % parent.key)
-            if out:
-                return " ... (%s)" % ", ".join(out)
-            return ""
+    def _list_migration_rows(self, connection, app_names):
+        loader = MigrationLoader(connection, ignore_no_migrations=True)
+        recorder = MigrationRecorder(connection)
+        recorded_migrations = recorder.applied_migrations()
+        graph = loader.graph
+        if app_names:
+            self._validate_app_names(loader, app_names)
+        else:
+            app_names = sorted(loader.migrated_apps)
 
-        for node in plan:
-            deps = ""
-            if self.verbosity >= 2:
-                deps = print_deps(node)
-            if node.key in loader.applied_migrations:
-                self.stdout.write("[X]  %s.%s%s" % (node.key[0], node.key[1], deps))
+        rows = []
+        for app_name in app_names:
+            shown = set()
+            for node in graph.leaf_nodes(app_name):
+                for plan_node in graph.forwards_plan(node):
+                    if plan_node not in shown and plan_node[0] == app_name:
+                        title = plan_node[1]
+                        if graph.nodes[plan_node].replaces:
+                            title += " (%s squashed migrations)" % len(
+                                graph.nodes[plan_node].replaces
+                            )
+                        applied_migration = loader.applied_migrations.get(plan_node)
+                        if applied_migration:
+                            if plan_node in recorded_migrations:
+                                status = MigrationStatus.APPLIED
+                            else:
+                                status = MigrationStatus.UNRECORDED
+                            applied_at = (
+                                applied_migration.applied
+                                if hasattr(applied_migration, "applied")
+                                else None
+                            )
+                        else:
+                            status = MigrationStatus.UNAPPLIED
+                            applied_at = None
+                        rows.append(
+                            self._migration_row(
+                                app=app_name,
+                                name=plan_node[1],
+                                title=title,
+                                status=status,
+                                applied_at=applied_at,
+                            )
+                        )
+                        shown.add(plan_node)
+            if not shown:
+                rows.append(
+                    self._migration_row(
+                        app=app_name,
+                        name=None,
+                        title=None,
+                        status=None,
+                        applied_at=None,
+                    )
+                )
+        return rows
+
+    def show_list(self, migration_rows):
+        """
+        Print default ``showmigrations`` list output for structured list rows.
+
+        Writes an app label before that app's migrations. Each migration line
+        uses ``[X]``, ``[-]``, or ``[ ]`` for applied, unrecorded, and unapplied
+        states (see :class:`.MigrationStatus`). Unrecorded rows include the
+        hint to run ``migrate`` to finish recording. Placeholder rows (empty
+        ``name`` and ``title``) print only the app label and ``(no migrations)``.
+
+        When verbosity is 2 or higher, applied and unrecorded lines may append
+        ``(applied at ...)`` when the row provides ``applied_at``. Expects rows
+        from :meth:`get_migration_data` with ``plan=False``.
+        """
+        current_app = None
+        for migration in migration_rows:
+            app_name = migration["app"]
+            if migration["name"] is None and migration["title"] is None:
+                self.stdout.write(app_name, self.style.MIGRATE_LABEL)
+                self.stdout.write(" (no migrations)", self.style.ERROR)
+                current_app = app_name
+                continue
+            if app_name != current_app:
+                self.stdout.write(app_name, self.style.MIGRATE_LABEL)
+                current_app = app_name
+            title = migration["title"]
+            status = migration["status"]
+            applied_at = migration["applied_at"]
+            if status == MigrationStatus.APPLIED:
+                output = " [X] %s" % title
+                if self.verbosity >= 2 and applied_at is not None:
+                    output += " (applied at %s)" % applied_at.strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    )
+                self.stdout.write(output)
+            elif status == MigrationStatus.UNRECORDED:
+                display_title = title + " Run 'manage.py migrate' to finish recording."
+                output = " [-] %s" % display_title
+                if self.verbosity >= 2 and applied_at is not None:
+                    output += " (applied at %s)" % applied_at.strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    )
+                self.stdout.write(output)
             else:
-                self.stdout.write("[ ]  %s.%s%s" % (node.key[0], node.key[1], deps))
-        if not plan:
+                self.stdout.write(" [ ] %s" % title)
+
+    def show_plan(self, migration_rows):
+        """
+        Print ``showmigrations --plan`` output for rows from
+        :meth:`get_migration_data` with ``plan=True``.
+
+        One line per migration: ``[X]`` or ``[ ]`` followed by ``app.name``. At
+        verbosity 2 and above, append direct dependencies from each row's
+        ``dependency_labels``. If ``migration_rows`` is empty, print
+        ``(no migrations)``.
+        """
+        for entry in migration_rows:
+            deps = ""
+            if self.verbosity >= 2 and entry["dependency_labels"]:
+                deps = " ... (%s)" % ", ".join(entry["dependency_labels"])
+            if entry["status"] == MigrationStatus.APPLIED:
+                self.stdout.write("[X]  %s.%s%s" % (entry["app"], entry["name"], deps))
+            else:
+                self.stdout.write("[ ]  %s.%s%s" % (entry["app"], entry["name"], deps))
+        if not migration_rows:
             self.stdout.write("(no migrations)", self.style.ERROR)

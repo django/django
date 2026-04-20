@@ -493,6 +493,15 @@ short-term maintenance releases. Django 6.1 supports MariaDB 10.11 and higher.
 Miscellaneous
 -------------
 
+* Subclasses of ``django.core.management.commands.showmigrations.Command`` that
+  override ``show_list()`` or ``show_plan()`` must update those methods to
+  accept structured data (``show_list(self, migration_data)`` and
+  ``show_plan(self, plan_data)``) instead of a database connection. Use
+  ``get_migration_data()`` (which returns a list of uniform row dicts for both
+  list and plan modes) to customize collected data before display. Pass
+  ``plan=True`` or ``plan=False`` to match ``--plan`` or list output when calling
+  it outside :meth:`~django.core.management.commands.showmigrations.Command.handle`.
+
 * Providing ``fail_silently=True``, ``auth_user``, or ``auth_password`` to mail
   sending functions (such as :func:`~django.core.mail.send_mail`) while also
   providing a ``connection`` now raises a ``TypeError``.
