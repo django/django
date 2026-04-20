@@ -5,7 +5,7 @@ class Base64Converter:
     regex = r"[a-zA-Z0-9+/]*={0,2}"
 
     def to_python(self, value):
-        return base64.b64decode(value)
+        return base64.b64decode(value, validate=True)
 
     def to_url(self, value):
         return base64.b64encode(value).decode("ascii")
