@@ -18,6 +18,14 @@ class SecurityMiddleware(MiddlewareMixin):
         self.referrer_policy = settings.SECURE_REFERRER_POLICY
         self.cross_origin_opener_policy = settings.SECURE_CROSS_ORIGIN_OPENER_POLICY
 
+        # Pre-compute referrer policy value to avoid string operations on every request
+        if self.referrer_policy:
+            self._referrer_policy_value = (
+                ",".join([v.strip() for v in self.referrer_policy.split(",")])
+                if isinstance(self.referrer_policy, str)
+                else ",".join(self.referrer_policy)
+            )
+
     def process_request(self, request):
         path = request.path.lstrip("/")
         if (
@@ -51,11 +59,7 @@ class SecurityMiddleware(MiddlewareMixin):
             # fallback.
             response.headers.setdefault(
                 "Referrer-Policy",
-                ",".join(
-                    [v.strip() for v in self.referrer_policy.split(",")]
-                    if isinstance(self.referrer_policy, str)
-                    else self.referrer_policy
-                ),
+                self._referrer_policy_value,
             )
 
         if self.cross_origin_opener_policy:
