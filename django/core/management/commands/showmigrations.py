@@ -10,18 +10,18 @@ from django.db.migrations.recorder import MigrationRecorder
 
 class MigrationStatus(StrEnum):
     """
-    ``status`` field on each row returned by :meth:`Command.get_migration_data`.
+    ``status`` field on each row from :meth:`Command.get_migration_data`.
 
-    Members subclass :class:`str`, so they compare equal to their string values
-    and serialize like plain strings.
+    Members subclass :class:`str`, so they compare equal to their string
+    values and serialize like plain strings.
 
-    * :attr:`APPLIED` — Recorded in ``django_migrations`` for this migration name
-      and reflected in the loader's applied set (``[X]`` in the default list
-      output).
-    * :attr:`UNRECORDED` — The loader treats this migration as applied (e.g. all
-      replaced migrations of a squash are recorded), but there is no row yet for
-      this migration name in ``django_migrations`` (``[-]`` and the "finish
-      recording" hint).
+    * :attr:`APPLIED` — Recorded in ``django_migrations`` for this migration
+      name and reflected in the loader's applied set (``[X]`` in the default
+      list output).
+    * :attr:`UNRECORDED` — The loader treats this migration as applied (e.g.
+      all replaced migrations of a squash are recorded), but there is no row
+      yet for this migration name in ``django_migrations`` (``[-]`` and the
+      "finish recording" hint).
     * :attr:`UNAPPLIED` — Not applied (``[ ]`` in the default list output).
     """
 
@@ -123,12 +123,12 @@ class Command(BaseCommand):
         Return a list of dicts describing migrations for list or plan output.
 
         Each row includes ``app``, ``name``, ``title``, ``status``, and
-        ``applied_at``. Use ``plan=False`` (the default) for per-app list ordering;
-        use ``plan=True`` for global apply order as in ``showmigrations --plan``,
-        in which case each row also has ``dependency_labels`` (list of
-        ``app.name`` dependency strings). List mode may include a placeholder row
-        per app with ``name`` and ``title`` set to ``None`` when the app has no
-        migrations.
+        ``applied_at``. Use ``plan=False`` (the default) for per-app list
+        ordering; use ``plan=True`` for global apply order as in
+        ``showmigrations --plan``, in which case each row also has
+        ``dependency_labels`` (list of ``app.name`` dependency strings). List
+        mode may include a placeholder row per app with ``name`` and ``title``
+        set to ``None`` when the app has no migrations.
 
         Subclasses overriding this method should keep the same keyword-only
         parameters and preserve the row structure (including
@@ -239,14 +239,15 @@ class Command(BaseCommand):
         Print default ``showmigrations`` list output for structured list rows.
 
         Writes an app label before that app's migrations. Each migration line
-        uses ``[X]``, ``[-]``, or ``[ ]`` for applied, unrecorded, and unapplied
-        states (see :class:`.MigrationStatus`). Unrecorded rows include the
-        hint to run ``migrate`` to finish recording. Placeholder rows (empty
-        ``name`` and ``title``) print only the app label and ``(no migrations)``.
+        uses ``[X]``, ``[-]``, or ``[ ]`` for applied, unrecorded, and
+        unapplied states (see :class:`.MigrationStatus`). Unrecorded rows
+        include the hint to run ``migrate`` to finish recording. Placeholder
+        rows (empty ``name`` and ``title``) print only the app label and
+        ``(no migrations)``.
 
         When verbosity is 2 or higher, applied and unrecorded lines may append
-        ``(applied at ...)`` when the row provides ``applied_at``. Expects rows
-        from :meth:`get_migration_data` with ``plan=False``.
+        ``(applied at ...)`` when the row provides ``applied_at``. Expects
+        rows from :meth:`get_migration_data` with ``plan=False``.
         """
         current_app = None
         for migration in migration_rows:
@@ -270,7 +271,9 @@ class Command(BaseCommand):
                     )
                 self.stdout.write(output)
             elif status == MigrationStatus.UNRECORDED:
-                display_title = title + " Run 'manage.py migrate' to finish recording."
+                display_title = title + (
+                    " Run 'manage.py migrate' to finish recording."
+                )
                 output = " [-] %s" % display_title
                 if self.verbosity >= 2 and applied_at is not None:
                     output += " (applied at %s)" % applied_at.strftime(
