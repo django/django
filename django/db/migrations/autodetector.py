@@ -1340,14 +1340,18 @@ class MigrationAutodetector:
                     new_field.remote_field.through = old_field.remote_field.through
             old_field_dec = self.deep_deconstruct(old_field)
             new_field_dec = self.deep_deconstruct(new_field)
-            # If the field was confirmed to be renamed it means that only
-            # db_column was allowed to change which generate_renamed_fields()
-            # already accounts for by adding an AlterField operation.
-            is_pk_rename = old_field_dec[2].get("primary_key") and new_field_dec[2].get(
-                "primary_key"
-            )
+            is_pk_renamed = old_field_dec[2].get("primary_key") and new_field_dec[
+                2
+            ].get("primary_key")
+            # If the field was confirmed to be renamed and it was not the PK it
+            # means that only db_column was allowed to change which
+            # generate_renamed_fields() already accounts for by adding
+            # an AlterField operation.
+            #
+            # However, if the renamed column was the primary key,
+            # the AlterField operation needs to be considered here.
             if old_field_dec != new_field_dec and (
-                old_field_name == field_name or is_pk_rename
+                old_field_name == field_name or is_pk_renamed
             ):
                 both_m2m = old_field.many_to_many and new_field.many_to_many
                 neither_m2m = not old_field.many_to_many and not new_field.many_to_many
