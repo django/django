@@ -83,8 +83,9 @@ The :class:`.DummyBackend` doesn't execute enqueued Tasks at all, instead
 storing results for later use. Task results will forever remain in the
 :attr:`~django.tasks.TaskResultStatus.READY` state.
 
-This backend is not intended for use in production - it is provided as a
-convenience that can be used during development and testing.
+This backend is not intended for use in production. It is provided as a
+convenience for development and testing.
+
 
 To use it, set :setting:`BACKEND <TASKS-BACKEND>` to
 ``"django.tasks.backends.dummy.DummyBackend"``::
