@@ -1,5 +1,5 @@
 {% extends "admin/base_site.html" %}
-{% load i18n admin_urls static admin_modify admin_filters %}
+{% load i18n l10n admin_urls static admin_modify admin_filters %}
 
 {% block title %}{% if errors %}{% translate "Error:" %} {% endif %}{{ block.super }}{% endblock %}
 {% block extrahead %}{{ block.super }}
@@ -37,6 +37,10 @@
 {% block content %}<div id="content-main">
 <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}{% if form_url %}action="{{ form_url }}" {% endif %}method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
 <div>
+{% if action_form and not is_popup %}
+  {% change_form_admin_actions %}
+  <input type="hidden" name="{{ action_checkbox_name }}" value="{{ object_id|unlocalize }}">
+{% endif %}
 {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
 {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
 {% if source_model %}<input type="hidden" name="{{ source_model_var }}" value="{{ source_model }}">{% endif %}

@@ -1,4 +1,16 @@
-def action(function=None, *, permissions=None, description=None):
+from collections.abc import Iterable
+
+from django.contrib.admin.options import ActionType
+
+
+def action(
+    function=None,
+    *,
+    permissions=None,
+    description=None,
+    description_plural=None,
+    action_type=ActionType.BULK_ACTION,
+):
     """
     Conveniently add attributes to an action function::
 
@@ -23,6 +35,13 @@ def action(function=None, *, permissions=None, description=None):
             func.allowed_permissions = permissions
         if description is not None:
             func.short_description = description
+        if description_plural is not None:
+            func.plural_description = description_plural
+        elif description is not None:
+            func.plural_description = description
+        func.action_types = (
+            action_type if isinstance(action_type, Iterable) else [action_type]
+        )
         return func
 
     if function is None:

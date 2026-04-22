@@ -120,6 +120,18 @@ Minor features
 * :attr:`~django.contrib.admin.ModelAdmin.list_display` now uses boolean icons
   for boolean fields on related models.
 
+* The new ``action_type`` keyword argument of the
+  :func:`~django.contrib.admin.action` decorator specifies which admin views
+  the action is available on. The action is available on the admin change list
+  page by default. It can also be available on the admin change form. See
+  :ref:`admin-action-availability` for details.
+
+* The new ``description_plural`` keyword argument of the
+  :func:`~django.contrib.admin.action` decorator specifies a human-readable
+  description for actions on the admin change list page. Defaults to the
+  ``description`` value. This is useful when the action is available on both
+  the admin change list and admin change form.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -579,6 +591,12 @@ Miscellaneous
 * Support for a double-dot variable lookup like ``{{ book..title }}`` which
   maps to a lookup of the empty string before the next lookup of the named
   attribute is deprecated.
+
+* Overriding ``ModelAdmin.get_actions()`` without the new ``action_type``
+  parameter is deprecated.
+
+* Overriding ``ModelAdmin.get_action_choices()`` without the new
+  ``action_type`` parameter is deprecated.
 
 Features removed in 6.1
 =======================

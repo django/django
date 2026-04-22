@@ -14,6 +14,7 @@ from django.contrib.admin.filters import (
 from django.contrib.admin.options import (
     HORIZONTAL,
     VERTICAL,
+    ActionType,
     ModelAdmin,
     ShowFacets,
     StackedInline,
@@ -24,6 +25,7 @@ from django.utils.module_loading import autodiscover_modules
 
 __all__ = [
     "action",
+    "ActionType",
     "display",
     "register",
     "ModelAdmin",

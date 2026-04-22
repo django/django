@@ -2818,6 +2818,7 @@ app or per model. The following can:
 * ``actions.html``
 * ``app_index.html``
 * ``change_form.html``
+* ``change_form_actions.html``
 * ``change_form_object_tools.html``
 * ``change_list.html``
 * ``change_list_object_tools.html``

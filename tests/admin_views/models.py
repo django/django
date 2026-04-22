@@ -327,7 +327,7 @@ class Subscriber(models.Model):
 
 
 class ExternalSubscriber(Subscriber):
-    pass
+    action = models.CharField(default="subscribe", max_length=80, blank=True)
 
 
 class OldSubscriber(Subscriber):
@@ -1200,3 +1200,8 @@ class CamelCaseRelatedModel(models.Model):
     fk2 = models.ForeignKey(
         CamelCaseModel, on_delete=models.CASCADE, related_name="fk2"
     )
+
+
+# RemovedInDjango70Warning: When the deprecation ends, remove.
+class ModelAction(models.Model):
+    pass
