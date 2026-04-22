@@ -467,7 +467,21 @@ The ``action`` decorator
 
     In this case it will add no attributes to the function.
 
-    Action descriptions are %-formatted and may contain ``'%(verbose_name)s'``
-    and ``'%(verbose_name_plural)s'`` placeholders, which are replaced,
-    respectively, by the model's :attr:`~django.db.models.Options.verbose_name`
-    and :attr:`~django.db.models.Options.verbose_name_plural`.
+    :param permissions: A list of permission codenames that restrict the action
+        to users who have at least one of the defined permissions. This sets
+        the ``allowed_permissions`` attribute on the function. See
+        :ref:`admin-action-permissions` for details.
+
+    :param description: A human-readable description of the action to be
+        rendered in the admin. If ``description`` is not provided, Django
+        renders the function's name, converting underscores to spaces and
+        capitalizing the first letter of the first word. This sets the
+        ``short_description`` attribute on the function.
+
+    .. admonition:: Action description ``%``-formatting support
+
+        Action descriptions support ``%``-formatting and may include
+        ``'%(verbose_name)s'`` and ``'%(verbose_name_plural)s'`` placeholders.
+        These are replaced with the model’s
+        :attr:`~django.db.models.Options.verbose_name` and
+        :attr:`~django.db.models.Options.verbose_name_plural`.
