@@ -4198,6 +4198,26 @@ class AdminViewDeletedObjectsTest(TestCase):
         # BookAdmin.get_deleted_objects() returns custom text.
         self.assertContains(response, "a deletable object")
 
+    def test_delete_view_uses_delete_confirmation_max_display(self):
+        book = Book.objects.create(name="Test Book")
+        response = self.client.get(
+            reverse("admin2:admin_views_book_delete", args=(book.pk,))
+        )
+        self.assertContains(response, "a deletable object")
+        self.assertContains(response, "…and 2 more objects.")
+        self.assertNotContains(response, "another object")
+        self.assertNotContains(response, "last object")
+
+    def test_delete_view_hides_objects_when_delete_confirmation_max_display_is_zero(
+        self,
+    ):
+        book = Book.objects.create(name="Test Book")
+        response = self.client.get(
+            reverse("admin_zero_display:admin_views_book_delete", args=(book.pk,))
+        )
+        self.assertNotContains(response, "<h2>Objects</h2>")
+        self.assertNotContains(response, 'id="deleted-objects"')
+
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class TestGenericRelations(TestCase):
