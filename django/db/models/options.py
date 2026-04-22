@@ -221,10 +221,11 @@ class Options:
                 self.constraints = self._format_names(self.constraints)
                 self.indexes = self._format_names(self.indexes)
 
-            # verbose_name_plural is a special case because it uses a 's'
-            # by default.
+            # verbose_name_plural use standard pluralization by default.
             if self.verbose_name_plural is None:
-                self.verbose_name_plural = format_lazy("{}s", self.verbose_name)
+                import inflect
+                inflect_engine = inflect.engine()
+                self.verbose_name_plural = format_lazy("{}", inflect_engine.plural(self.verbose_name))
 
             # order_with_respect_and ordering are mutually exclusive.
             self._ordering_clash = bool(self.ordering and self.order_with_respect_to)
@@ -235,7 +236,9 @@ class Options:
                     "'class Meta' got invalid attribute(s): %s" % ",".join(meta_attrs)
                 )
         else:
-            self.verbose_name_plural = format_lazy("{}s", self.verbose_name)
+            import inflect
+            inflect_engine = inflect.engine()
+            self.verbose_name_plural = format_lazy("{}", inflect_engine.plural(self.verbose_name))
         del self.meta
 
         # If the db_table wasn't provided, use the app_label + model_name.

@@ -501,8 +501,7 @@ not be looking at your Django code. For example::
 
         verbose_name_plural = "stories"
 
-    If this isn't given, Django will use :attr:`~Options.verbose_name` +
-    ``"s"``.
+    If this isn't given, Django will use standard pluralization by default like ``Category`` to ``Categories``.
 
 Read-only ``Meta`` attributes
 =============================
