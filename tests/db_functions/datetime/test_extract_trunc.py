@@ -1990,7 +1990,7 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         """
         When TruncSecond is used in a filter, it can behave unexpectedly
         because the function at the database level returns a timezone-naive
-        value. The documentation at docs/ref/models/database-functions.txt
+        value. The documentation is at docs/ref/models/database-functions.txt
         describes the problem and provides a work-around in specific cases.
         """
         # UTC: No adjustment required to filtering for TruncSecond
