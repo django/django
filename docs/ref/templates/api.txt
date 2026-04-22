@@ -804,6 +804,9 @@ This processor adds a token that is needed by the :ttag:`csrf_token` template
 tag for protection against :doc:`Cross Site Request Forgeries
 </ref/csrf>`.
 
+This is always enabled by :class:`~django.template.RequestContext` and cannot
+be disabled. You do not need to include it within ``context_processors``.
+
 ``django.template.context_processors.csp``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
