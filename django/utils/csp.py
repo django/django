@@ -48,6 +48,9 @@ class CSP(StrEnum):
     # nonce.
     NONCE = "<CSP_NONCE_SENTINEL>"
 
+    # Template context key for the CSP nonce.
+    CONTEXT_KEY = "csp_nonce"
+
 
 class LazyNonce(SimpleLazyObject):
     """
@@ -63,10 +66,8 @@ class LazyNonce(SimpleLazyObject):
 
     Example Django template usage with context processors enabled:
 
-        <script{% if csp_nonce %} nonce="{{ csp_nonce }}"...{% endif %}>
-
-    The `{% if %}` block will only render if the nonce has been evaluated
-    elsewhere.
+        {% load csp %}
+        <script {% csp_nonce %}></script>
 
     """
 

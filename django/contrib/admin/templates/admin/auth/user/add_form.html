@@ -1,5 +1,5 @@
 {% extends "admin/change_form.html" %}
-{% load i18n static %}
+{% load i18n static csp %}
 
 {% block form_top %}
   {% if not is_popup %}
@@ -8,5 +8,5 @@
 {% endblock %}
 {% block extrahead %}
   {{ block.super }}
-  <link rel="stylesheet" href="{% static 'admin/css/unusable_password_field.css' %}">
+  <link rel="stylesheet" href="{% static 'admin/css/unusable_password_field.css' %}" {% csp_nonce %}>
 {% endblock %}
