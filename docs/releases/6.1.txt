@@ -315,6 +315,11 @@ Models
   :class:`~django.db.models.query.QuerySet` is ordered and the ordering is
   deterministic.
 
+* The new :class:`~django.db.models.BitAnd`, :class:`~django.db.models.BitOr`,
+  and :class:`~django.db.models.BitXor` aggregates return the bitwise ``AND``,
+  ``OR``, ``XOR``, respectively. These aggregates were previously included only
+  in ``contrib.postgres``.
+
 Pagination
 ~~~~~~~~~~
 
@@ -420,12 +425,18 @@ backends.
   ``get_geom_placeholder_sql`` and is expected to return a two-elements tuple
   composed of an SQL format string and a tuple of associated parameters.
 
+* Set the new ``DatabaseFeatures.supports_bit_aggregations`` attribute to
+  ``False`` if the database doesn't support bitwise aggregations.
+
 :mod:`django.contrib.admin`
 ---------------------------
 
 * The ``wide`` class is removed, as it was made obsolete by the new layout.
 
 * The ``object-tools`` block is hoisted out of the ``content`` block in forms.
+
+* The undocumented ``InclusionAdminNode.__init__()`` now takes the template tag
+  ``name`` as the first positional argument.
 
 :mod:`django.contrib.gis`
 -------------------------
@@ -489,6 +500,9 @@ Miscellaneous
 * :class:`~django.contrib.contenttypes.fields.GenericForeignKey` now uses a
   separate descriptor class: the private ``GenericForeignKeyDescriptor``.
 
+* The undocumented ``django.template.library.parse_bits()`` function no longer
+  accepts the ``takes_context`` argument.
+
 * The minimum supported version of SQLite is increased from 3.31.0 to 3.37.0.
 
 * The :lookup:`iexact=None <iexact>` lookup on
@@ -538,6 +552,12 @@ Miscellaneous
   object passed as the ``compiler`` argument to the ``as_sql()`` method of
   :ref:`expressions <writing-your-own-query-expressions>`, is deprecated in
   favor of the newly introduced ``quote_name()`` method.
+
+* The ``BitAnd``, ``BitOr``, and ``BitXor`` classes in
+  ``django.contrib.postgres.aggregates`` are deprecated in favor of the
+  generally available :class:`~django.db.models.BitAnd`,
+  :class:`~django.db.models.BitOr`, and :class:`~django.db.models.BitXor`
+  classes.
 
 Features removed in 6.1
 =======================

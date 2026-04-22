@@ -1,6 +1,7 @@
 /* Tablets */
 
-input[type="submit"], button {
+input[type="submit"],
+button {
     -webkit-appearance: none;
     appearance: none;
 }
@@ -12,7 +13,8 @@ input[type="submit"], button {
         -webkit-text-size-adjust: 100%;
     }
 
-    td, th {
+    td,
+    th {
         padding: 10px;
         font-size: 0.875rem;
     }
@@ -86,7 +88,8 @@ input[type="submit"], button {
         padding-right: 0;
     }
 
-    td .changelink, td .addlink {
+    td .changelink,
+    td .addlink {
         font-size: 0.8125rem;
     }
 
@@ -114,7 +117,7 @@ input[type="submit"], button {
         margin: 0 10px 0 6px;
     }
 
-    #toolbar form input[type=submit] {
+    #toolbar form input[type="submit"] {
         flex: 0 1 auto;
     }
 
@@ -159,7 +162,6 @@ input[type="submit"], button {
     .change-list .filtered .paginator,
     .filtered #toolbar,
     .filtered .actions,
-
     #changelist .paginator {
         border-top-color: var(--hairline-color); /* XXX Is this used at all? */
     }
@@ -180,12 +182,12 @@ input[type="submit"], button {
     tags. Add input:not([type]) to make the CSS stylesheet work the same.
     */
     .form-row input:not([type]),
-    .form-row input[type=text],
-    .form-row input[type=password],
-    .form-row input[type=email],
-    .form-row input[type=url],
-    .form-row input[type=tel],
-    .form-row input[type=number],
+    .form-row input[type="text"],
+    .form-row input[type="password"],
+    .form-row input[type="email"],
+    .form-row input[type="url"],
+    .form-row input[type="tel"],
+    .form-row input[type="number"],
     .form-row textarea,
     .form-row select,
     .form-row .vTextField {
@@ -233,7 +235,11 @@ input[type="submit"], button {
         padding: 10px 7px;
     }
 
-    .button, input[type=submit], input[type=button], .submit-row input, a.button {
+    .button,
+    input[type="submit"],
+    input[type="button"],
+    .submit-row input,
+    a.button {
         padding: 7px;
     }
 
@@ -255,7 +261,8 @@ input[type="submit"], button {
         flex: 1 1;
     }
 
-    .selector-available, .selector-chosen {
+    .selector-available,
+    .selector-chosen {
         width: auto;
         flex: 1 1;
         display: flex;
@@ -268,7 +275,8 @@ input[type="submit"], button {
         margin-bottom: 5px;
     }
 
-    .selector-chooseall, .selector-clearall {
+    .selector-chooseall,
+    .selector-clearall {
         align-self: center;
     }
 
@@ -285,7 +293,8 @@ input[type="submit"], button {
         margin-bottom: 0;
     }
 
-    .stacked .selector-available, .stacked .selector-chosen {
+    .stacked .selector-available,
+    .stacked .selector-chosen {
         width: auto;
     }
 
@@ -298,7 +307,8 @@ input[type="submit"], button {
         padding: 3px;
     }
 
-    .help-tooltip, .selector .help-icon {
+    .help-tooltip,
+    .selector .help-icon {
         display: none;
     }
 
@@ -318,10 +328,13 @@ input[type="submit"], button {
     }
 
     .datetimeshortcuts {
-        color: var(--border-color); /* XXX Redundant, .datetime span also sets #ccc */
+        color: var(
+            --border-color
+        ); /* XXX Redundant, .datetime span also sets #ccc */
     }
 
-    .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
+    .form-row .datetime input.vDateField,
+    .form-row .datetime input.vTimeField {
         width: 75%;
     }
 
@@ -374,7 +387,8 @@ input[type="submit"], button {
 @media (max-width: 767px) {
     /* Layout */
 
-    #header, #content {
+    #header,
+    #content {
         padding: 15px;
     }
 
@@ -384,11 +398,13 @@ input[type="submit"], button {
 
     /* Dashboard */
 
-    .colMS, .colSM {
+    .colMS,
+    .colSM {
         margin: 0;
     }
 
-    #content-related, .colSM #content-related {
+    #content-related,
+    .colSM #content-related {
         width: 100%;
         margin: 0;
     }
@@ -540,7 +556,8 @@ input[type="submit"], button {
         gap: 10px 0;
     }
 
-    .selector-available, .selector-chosen {
+    .selector-available,
+    .selector-chosen {
         flex: 1 1 auto;
     }
 
@@ -564,15 +581,17 @@ input[type="submit"], button {
         background-position: 0 0;
     }
 
-    :enabled.selector-remove:focus, :enabled.selector-remove:hover {
+    :enabled.selector-remove:focus,
+    :enabled.selector-remove:hover {
         background-position: 0 -24px;
     }
 
-    .selector-add  {
+    .selector-add {
         background-position: 0 -48px;
     }
 
-    :enabled.selector-add:focus, :enabled.selector-add:hover {
+    :enabled.selector-add:focus,
+    :enabled.selector-add:hover {
         background-position: 0 -72px;
     }
 
@@ -593,12 +612,18 @@ input[type="submit"], button {
         padding: 0 10px;
     }
 
-    .inline-group[data-inline-type="stacked"] .inline-related .module .form-row {
+    .inline-group[data-inline-type="stacked"]
+        .inline-related
+        .module
+        .form-row {
         border-top: 1px solid var(--hairline-color);
         border-bottom: none;
     }
 
-    .inline-group[data-inline-type="stacked"] .inline-related .module .form-row:first-child {
+    .inline-group[data-inline-type="stacked"]
+        .inline-related
+        .module
+        .form-row:first-child {
         border-top: none;
     }
 
@@ -621,7 +646,10 @@ input[type="submit"], button {
         margin-top: 5px;
     }
 
-    .inline-group[data-inline-type="stacked"] .aligned .form-row > div:not([class]) {
+    .inline-group[data-inline-type="stacked"]
+        .aligned
+        .form-row
+        > div:not([class]) {
         width: 100%;
     }
 
@@ -656,7 +684,9 @@ input[type="submit"], button {
         gap: 8px;
     }
 
-    .submit-row input, .submit-row input.default, .submit-row a {
+    .submit-row input,
+    .submit-row input.default,
+    .submit-row a {
         text-align: center;
     }
 
@@ -678,7 +708,9 @@ input[type="submit"], button {
 
     /* Paginator */
 
-    .paginator .this-page, .paginator a:link, .paginator a:visited {
+    .paginator .this-page,
+    .paginator a:link,
+    .paginator a:visited {
         padding: 4px 10px;
     }
 
@@ -737,7 +769,8 @@ input[type="submit"], button {
 
     /* Calendar and clock */
 
-    .calendarbox, .clockbox {
+    .calendarbox,
+    .clockbox {
         position: fixed !important;
         top: 50% !important;
         left: 50% !important;
@@ -747,8 +780,9 @@ input[type="submit"], button {
         overflow: visible;
     }
 
-    .calendarbox:before, .clockbox:before {
-        content: '';
+    .calendarbox:before,
+    .clockbox:before {
+        content: "";
         position: fixed;
         top: 50%;
         left: 50%;
@@ -758,7 +792,8 @@ input[type="submit"], button {
         transform: translate(-50%, -50%);
     }
 
-    .calendarbox > *, .clockbox > * {
+    .calendarbox > *,
+    .clockbox > * {
         position: relative;
         z-index: 1;
     }
@@ -767,12 +802,14 @@ input[type="submit"], button {
         z-index: 2;
     }
 
-    .calendarbox .calendar, .clockbox h2 {
+    .calendarbox .calendar,
+    .clockbox h2 {
         border-radius: 4px 4px 0 0;
         overflow: hidden;
     }
 
-    .calendarbox .calendar-cancel, .clockbox .calendar-cancel {
+    .calendarbox .calendar-cancel,
+    .clockbox .calendar-cancel {
         border-radius: 0 0 4px 4px;
         overflow: hidden;
     }
@@ -804,14 +841,16 @@ input[type="submit"], button {
         padding: 10px;
     }
 
-    .calendarbox .calendarnav-previous, .calendarbox .calendarnav-next {
+    .calendarbox .calendarnav-previous,
+    .calendarbox .calendarnav-next {
         z-index: 1;
         top: 10px;
     }
 
     /* History */
 
-    table#change-history tbody th, table#change-history tbody td {
+    table#change-history tbody th,
+    table#change-history tbody td {
         font-size: 0.8125rem;
         word-break: break-word;
     }
@@ -822,7 +861,8 @@ input[type="submit"], button {
 
     /* Docs */
 
-    table.model tbody th, table.model tbody td {
+    table.model tbody th,
+    table.model tbody td {
         font-size: 0.8125rem;
         word-break: break-word;
     }

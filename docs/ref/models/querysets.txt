@@ -4085,6 +4085,42 @@ by the aggregate.
         unique values. This is the SQL equivalent of ``AVG(DISTINCT <field>)``.
         The default value is ``False``.
 
+``BitAnd``
+~~~~~~~~~~
+
+.. class:: BitAnd(expression, filter=None, default=None, **extra)
+
+    .. versionadded:: 6.1
+
+    Returns an ``int`` of the bitwise ``AND`` of all non-null input values, or
+    ``default`` if all values are null.
+
+    The ``default`` parameter is not supported on MariaDB, MySQL, and Oracle.
+
+``BitOr``
+~~~~~~~~~
+
+.. class:: BitOr(expression, filter=None, default=None, **extra)
+
+    .. versionadded:: 6.1
+
+    Returns an ``int`` of the bitwise ``OR`` of all non-null input values, or
+    ``default`` if all values are null.
+
+    The ``default`` parameter is not supported on MariaDB, MySQL, and Oracle.
+
+``BitXor``
+~~~~~~~~~~
+
+.. class:: BitXor(expression, filter=None, default=None, **extra)
+
+    .. versionadded:: 6.1
+
+    Returns an ``int`` of the bitwise ``XOR`` of all non-null input values, or
+    ``default`` if all values are null.
+
+    The ``default`` parameter is not supported on MariaDB, MySQL, and Oracle.
+
 ``Count``
 ~~~~~~~~~
 

@@ -292,7 +292,7 @@ class Deserializer(base.Deserializer):
 
         field_names = {f.name for f in Model._meta.get_fields()}
         # Deserialize each field.
-        for field_node in node.getElementsByTagName("field"):
+        for field_node in getChildrenByTagName(node, "field"):
             # If the field is missing the name attribute, bail (are you
             # sensing a pattern here?)
             field_name = field_node.getAttribute("name")
@@ -319,12 +319,12 @@ class Deserializer(base.Deserializer):
                         [
                             (
                                 None
-                                if nat_node.getElementsByTagName("None")
+                                if getChildrenByTagName(nat_node, "None")
                                 else getInnerText(nat_node).strip()
                             )
-                            for nat_node in obj_node.getElementsByTagName("natural")
+                            for nat_node in getChildrenByTagName(obj_node, "natural")
                         ]
-                        for obj_node in field_node.getElementsByTagName("object")
+                        for obj_node in getChildrenByTagName(field_node, "object")
                     ]
                 else:
                     m2m_data[field.name] = value
@@ -336,15 +336,15 @@ class Deserializer(base.Deserializer):
                     deferred_fields[field] = [
                         (
                             None
-                            if k.getElementsByTagName("None")
+                            if getChildrenByTagName(k, "None")
                             else getInnerText(k).strip()
                         )
-                        for k in field_node.getElementsByTagName("natural")
+                        for k in getChildrenByTagName(field_node, "natural")
                     ]
                 else:
                     data[field.attname] = value
             else:
-                if field_node.getElementsByTagName("None"):
+                if getChildrenByTagName(field_node, "None"):
                     value = None
                 else:
                     value = field.to_python(getInnerText(field_node).strip())
@@ -363,8 +363,8 @@ class Deserializer(base.Deserializer):
         Handle a <field> node for a ForeignKey
         """
         # Check if there is a child node named 'None', returning None if so.
-        natural_keys = node.getElementsByTagName("natural")
-        if node.getElementsByTagName("None") and not natural_keys:
+        natural_keys = getChildrenByTagName(node, "natural")
+        if getChildrenByTagName(node, "None") and not natural_keys:
             return None
         else:
             model = field.remote_field.model
@@ -374,7 +374,7 @@ class Deserializer(base.Deserializer):
                     # key
                     field_value = []
                     for k in natural_keys:
-                        if k.getElementsByTagName("None"):
+                        if getChildrenByTagName(k, "None"):
                             field_value.append(None)
                         else:
                             field_value.append(getInnerText(k).strip())
@@ -414,13 +414,13 @@ class Deserializer(base.Deserializer):
         if hasattr(default_manager, "get_by_natural_key"):
 
             def m2m_convert(n):
-                keys = n.getElementsByTagName("natural")
+                keys = getChildrenByTagName(n, "natural")
                 if keys:
                     # If there are 'natural' subelements, it must be a natural
                     # key
                     field_value = []
                     for k in keys:
-                        if k.getElementsByTagName("None"):
+                        if getChildrenByTagName(k, "None"):
                             field_value.append(None)
                         else:
                             field_value.append(getInnerText(k).strip())
@@ -441,7 +441,7 @@ class Deserializer(base.Deserializer):
 
         values = []
         try:
-            for c in node.getElementsByTagName("object"):
+            for c in getChildrenByTagName(node, "object"):
                 values.append(m2m_convert(c))
         except SuspiciousOperation:
             raise
@@ -477,6 +477,25 @@ def check_element_type(element):
     if element.childNodes:
         raise SuspiciousOperation(f"Unexpected element: {element.tagName!r}")
     return element.nodeType in (element.TEXT_NODE, element.CDATA_SECTION_NODE)
+
+
+def getChildrenByTagName(node, tag_name):
+    """
+    Like Element.getElementsByTagName() but return only direct children.
+
+    Element.getElementsByTagName() searches all descendants (direct children,
+    children's children, etc.). This prevents correct deserialization of
+    third-party nested fields. For example:
+
+      <field name="author" type="EmbeddedModelField">
+        <object model="app.Model">
+          <field name="id" type="..."><None></None></field>
+    """
+    return [
+        n
+        for n in node.childNodes
+        if n.nodeType == node.ELEMENT_NODE and n.tagName == tag_name
+    ]
 
 
 def getInnerText(node):

@@ -20,9 +20,9 @@ Code style
   Different JavaScript files sometimes use a different code style. Please try
   to conform to the code style of each file.
 
-* Use the `ESLint`_ code linter to check your code for bugs and style errors.
-  ESLint will be run when you run the JavaScript tests. We also recommended
-  installing a ESLint plugin in your text editor.
+* Use the `Biome`_ code linter to check your code for bugs and style errors.
+  Biome will be run by the pre-commit hooks. We also recommended installing
+  a Biome plugin in your text editor.
 
 * Where possible, write code that will work even if the page structure is later
   changed with JavaScript. For instance, when binding a click handler, use
@@ -117,8 +117,8 @@ Then run the tests with:
 
     $ npm test
 
+.. _Biome: https://biomejs.dev/
 .. _EditorConfig: https://editorconfig.org/
 .. _Java: https://www.java.com
-.. _eslint: https://eslint.org/
 .. _node.js: https://nodejs.org/
 .. _qunit: https://qunitjs.com/

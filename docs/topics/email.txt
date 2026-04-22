@@ -3,12 +3,13 @@ Sending email
 =============
 
 .. module:: django.core.mail
-   :synopsis: Helpers to easily send email.
+   :synopsis: Helpers to send email.
 
-Although Python provides a mail sending interface via the :mod:`smtplib`
-module, Django provides a couple of light wrappers over it. These wrappers are
-provided to make sending email extra quick, to help test email sending during
-development, and to provide support for platforms that can't use SMTP.
+Django provides wrappers for Python's :mod:`email` and :mod:`smtplib` modules
+to simplify composing and sending email. Django's email framework also supports
+swapping in different delivery mechanisms: you can direct email to the console
+or a file during development, or use community-maintained solutions for sending
+email directly through commercial email service providers.
 
 The code lives in the ``django.core.mail`` module.
 
@@ -27,10 +28,11 @@ plain text message::
         ["to@example.com"],
     )
 
-When additional email sending functionality is needed, use
-:class:`EmailMessage` or :class:`EmailMultiAlternatives`. For example, to send
-a multipart email that includes both HTML and plain text versions with a
-specific template and custom headers, you can use the following approach::
+When additional email sending functionality is needed, use the
+:ref:`EmailMessage <topic-email-message>` or :class:`EmailMultiAlternatives`
+class. For example, to send a multipart email that includes both HTML and plain
+text versions with a specific template and custom headers, you can use the
+following approach::
 
     from django.core.mail import EmailMultiAlternatives
     from django.template.loader import render_to_string
@@ -60,12 +62,37 @@ specific template and custom headers, you can use the following approach::
     msg.attach_alternative(html_content, "text/html")
     msg.send()
 
-Mail is sent using the SMTP host and port specified in the
+.. _topic-email-configuration:
+
+Configuring email
+=================
+
+By default, Django tries to send email by connecting to an `SMTP`_ server
+running on localhost, with no authentication. If that doesn't match your
+production environment, trying to send email will raise an error like
+``connection refused`` or ``authentication failed``, or cause a connection
+timeout. You will need to adjust Django's email settings to reflect your
+environment.
+
+Django abstracts the email sending process into an :ref:`email backend
+<topic-email-backends>` class. The :setting:`EMAIL_BACKEND` setting controls
+which backend Django uses.
+
+The default email backend is Django's :ref:`topic-email-smtp-backend`, which
+connects to an SMTP server using the host and port specified in the
 :setting:`EMAIL_HOST` and :setting:`EMAIL_PORT` settings. The
 :setting:`EMAIL_HOST_USER` and :setting:`EMAIL_HOST_PASSWORD` settings, if
 set, are used to authenticate to the SMTP server, and the
 :setting:`EMAIL_USE_TLS` and :setting:`EMAIL_USE_SSL` settings control whether
 a secure connection is used.
+
+SMTP is supported by nearly all email service providers (ESPs) and many hosting
+environments. But there are other options: many commercial ESPs offer HTTP APIs
+with additional sending features, and during development or testing you might
+not want to send email at all. :ref:`topic-email-backends` lists several
+possibilities.
+
+.. _SMTP: https://en.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol
 
 .. _topic-email-sending:
 
@@ -86,7 +113,7 @@ attachments and multiple content types.
 
 .. function:: send_mail(subject, message, from_email, recipient_list, *, fail_silently=False, auth_user=None, auth_password=None, connection=None, html_message=None)
 
-In most cases, you can send email using ``django.core.mail.send_mail()``.
+``django.core.mail.send_mail()`` sends a single email message.
 
 The ``subject``, ``message``, ``from_email`` and ``recipient_list`` parameters
 are required.
@@ -265,7 +292,7 @@ setting.
     Older versions ignored ``fail_silently=True`` when a ``connection``
     was also provided. This now raises a ``TypeError``.
 
-.. _emailmessage-and-smtpconnection:
+.. _topic-email-message:
 
 The ``EmailMessage`` class
 --------------------------
@@ -649,12 +676,119 @@ to "/contact/thanks/" when it's done::
 
 .. _Header injection: http://www.nyphp.org/phundamentals/8_Preventing-Email-Header-Injection.html
 
+.. _topics-sending-multiple-emails:
+
+Sending many messages efficiently
+---------------------------------
+
+Establishing and closing an SMTP connection (or any other network connection,
+for that matter) is an expensive process. If you have a lot of emails to send,
+it makes sense to reuse an SMTP connection, rather than creating and
+destroying a connection every time you want to send an email.
+
+There are two ways to tell an email backend to reuse a connection. Both
+require an email backend instance obtained via :func:`get_connection`, which is
+documented in :ref:`topic-email-backends`.
+
+The first approach is to obtain an email backend instance from
+:func:`get_connection` and use its ``send_messages()`` method. This takes a
+list of :class:`EmailMessage` (or subclass) instances, and sends them all using
+that single connection. As a consequence, any :class:`connection
+<EmailMessage>` set on an individual message is ignored.
+
+For example, if you have a function called ``get_notification_emails()`` that
+returns a list of :class:`EmailMessage` objects representing some periodic
+email you wish to send out, you could send these emails using a single call to
+``send_messages()``::
+
+    from django.core import mail
+
+    connection = mail.get_connection()  # Use default email connection
+    messages = get_notification_emails()
+    connection.send_messages(messages)
+
+In this example, the call to ``send_messages()`` opens a connection on the
+backend, sends the list of messages, and then closes the connection again.
+
+The second approach is to use the ``open()`` and ``close()`` methods on the
+email backend to manually control the connection. ``send_messages()`` will not
+open or close the connection if it is already open, so if you
+manually open the connection, you can control when it is closed. For example::
+
+    from django.core import mail
+
+    connection = mail.get_connection()
+
+    # Manually open the connection.
+    connection.open()
+
+    # Construct an email message that will use the connection.
+    email1 = mail.EmailMessage(
+        "Hello",
+        "Body goes here",
+        "from@example.com",
+        ["to1@example.com"],
+        connection=connection,
+    )
+    # Send the email through its connection. The connection was already open,
+    # so send() leaves it open after sending.
+    email1.send()
+
+    # Construct two more email messages. (Passing None as the third argument
+    # uses settings.DEFAULT_FROM_EMAIL as the "From:" address.)
+    email2 = mail.EmailMessage("Hi", "Message", None, ["to2@example.com"])
+    email3 = mail.EmailMessage("Hi", "Message", None, ["to3@example.com"])
+    # Send the two messages. The connection is still open.
+    connection.send_messages([email2, email3])
+
+    # Because we opened it, we need to manually close the connection.
+    connection.close()
+
+When you manually open a backend's connection, you are responsible for ensuring
+it gets closed. The example above actually has a bug: if an exception occurs
+while sending the messages, the connection will not be closed. This can be
+fixed with a ``try``-``finally`` statement, but using the backend instance as a
+context manager is preferable, as it automatically calls ``open()`` and
+``close()`` as needed.
+
+This is equivalent to the previous example, but uses the backend as a
+:ref:`context manager <context-managers>` to avoid leaving the connection open
+on errors::
+
+    from django.core import mail
+
+    with mail.get_connection() as connection:
+        # The backend connection is automatically opened inside the context.
+        email1 = mail.EmailMessage(
+            "Hello",
+            "Body goes here",
+            "from@example.com",
+            ["to1@example.com"],
+            connection=connection,
+        )
+        email1.send()
+
+        # The connection is still open, and is reused for the second send.
+        email2 = mail.EmailMessage("Hi", "Message", None, ["to2@example.com"])
+        email3 = mail.EmailMessage("Hi", "Message", None, ["to3@example.com"])
+        connection.send_messages([email2, email3])
+
+    # After exiting the context (either normally or because of an error),
+    # the backend connection is automatically closed.
+
 .. _topic-email-backends:
 
 Email backends
 ==============
 
 The actual sending of an email is handled by the email backend.
+
+Django comes with several email backends. With the exception of the SMTP
+backend, these are mainly useful during testing and development. If the
+built-in backends don't meet your needs there are :ref:`third-party packages
+<topic-third-party-email-backends>` available. You can also subclass one of the
+built-in backends to change its behavior, or even :ref:`write your own email
+backend <topic-custom-email-backend>`.
 
 The email backend class has the following methods:
 
@@ -668,53 +802,8 @@ The email backend class has the following methods:
   open, it will be left open after mail has been sent.
 
 It can also be used as a context manager, which will automatically call
-``open()`` and ``close()`` as needed::
-
-    from django.core import mail
-
-    with mail.get_connection() as connection:
-        mail.EmailMessage(
-            subject1,
-            body1,
-            from1,
-            [to1],
-            connection=connection,
-        ).send()
-        mail.EmailMessage(
-            subject2,
-            body2,
-            from2,
-            [to2],
-            connection=connection,
-        ).send()
-
-Obtaining an instance of an email backend
------------------------------------------
-
-The :func:`get_connection` function in ``django.core.mail`` returns an
-instance of the email backend that you can use.
-
-.. function:: get_connection(backend=None, *, fail_silently=False, **kwargs)
-
-By default, a call to ``get_connection()`` will return an instance of the
-email backend specified in :setting:`EMAIL_BACKEND`. If you specify the
-``backend`` argument, an instance of that backend will be instantiated.
-
-The keyword-only ``fail_silently`` argument controls how the backend should
-handle errors. If ``fail_silently`` is True, exceptions during the email
-sending process will be silently ignored.
-
-All other keyword arguments are passed directly to the constructor of the
-email backend.
-
-Django ships with several email sending backends. With the exception of the
-SMTP backend (which is the default), these backends are only useful during
-testing and development. If you have special email sending requirements, you
-can :ref:`write your own email backend <topic-custom-email-backend>`.
-
-.. deprecated:: 6.0
-
-    Passing ``fail_silently`` as positional argument is deprecated.
+``open()`` and ``close()`` as needed. An example is in
+:ref:`topics-sending-multiple-emails`.
 
 .. _topic-email-smtp-backend:
 
@@ -793,7 +882,7 @@ message that would be sent.
 
 To specify this backend, put the following in your settings::
 
-  EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+    EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development and testing.
@@ -809,23 +898,34 @@ Dummy backend
 As the name suggests the dummy backend does nothing with your messages. To
 specify this backend, put the following in your settings::
 
-   EMAIL_BACKEND = "django.core.mail.backends.dummy.EmailBackend"
+    EMAIL_BACKEND = "django.core.mail.backends.dummy.EmailBackend"
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
 
+.. _topic-third-party-email-backends:
+
 Third-party backends
 --------------------
 
-.. admonition:: There are community-maintained solutions too!
+.. admonition:: There are community-maintained solutions!
 
     Django has a vibrant ecosystem. There are email backends
     highlighted on the `Community Ecosystem`_ page. The Django Packages
     `Email grid`_ has even more options for you!
 
+Third-party email backends are available that:
+
+* Integrate directly with commercial email service providers' APIs (which often
+  have extra functionality not available through SMTP).
+* Offload email sending to asynchronous task queues.
+* Add features to other email backends, such as enforcing do-not-send lists or
+  logging sent messages.
+* Provide development and debugging tools, such as sandbox capture and
+  in-browser email previews.
+
 .. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#email-notifications
 .. _Email grid: https://djangopackages.org/grids/g/email/
-
 
 .. _topic-custom-email-backend:
 
@@ -844,79 +944,28 @@ delivered messages. If your backend has any concept of a persistent session or
 connection, you should also implement the ``open()`` and ``close()`` methods.
 Refer to ``smtp.EmailBackend`` for a reference implementation.
 
-.. _topics-sending-multiple-emails:
+Obtaining an instance of an email backend
+-----------------------------------------
 
-Sending multiple emails
------------------------
+The :func:`get_connection` function in ``django.core.mail`` returns an
+instance of the email backend that you can use.
 
-Establishing and closing an SMTP connection (or any other network connection,
-for that matter) is an expensive process. If you have a lot of emails to send,
-it makes sense to reuse an SMTP connection, rather than creating and
-destroying a connection every time you want to send an email.
+.. function:: get_connection(backend=None, *, fail_silently=False, **kwargs)
 
-There are two ways you tell an email backend to reuse a connection.
+    By default, a call to ``get_connection()`` will return an instance of the
+    email backend specified in :setting:`EMAIL_BACKEND`. If you specify the
+    ``backend`` argument, an instance of that backend will be instantiated.
 
-Firstly, you can use the ``send_messages()`` method on a connection. This takes
-a list of :class:`EmailMessage` (or subclass) instances, and sends them all
-using that single connection. As a consequence, any :class:`connection
-<EmailMessage>` set on an individual message is ignored.
+    The keyword-only ``fail_silently`` argument controls how the backend should
+    handle errors. If ``fail_silently`` is True, exceptions during the email
+    sending process will be silently ignored.
 
-For example, if you have a function called ``get_notification_email()`` that
-returns a list of :class:`EmailMessage` objects representing some periodic
-email you wish to send out, you could send these emails using a single call to
-``send_messages()``::
+    All other keyword arguments are passed directly to the constructor of the
+    email backend.
 
-    from django.core import mail
+    .. deprecated:: 6.0
 
-    connection = mail.get_connection()  # Use default email connection
-    messages = get_notification_email()
-    connection.send_messages(messages)
-
-In this example, the call to ``send_messages()`` opens a connection on the
-backend, sends the list of messages, and then closes the connection again.
-
-The second approach is to use the ``open()`` and ``close()`` methods on the
-email backend to manually control the connection. ``send_messages()`` will not
-manually open or close the connection if it is already open, so if you
-manually open the connection, you can control when it is closed. For example::
-
-    from django.core import mail
-
-    connection = mail.get_connection()
-
-    # Manually open the connection
-    connection.open()
-
-    # Construct an email message that uses the connection
-    email1 = mail.EmailMessage(
-        "Hello",
-        "Body goes here",
-        "from@example.com",
-        ["to1@example.com"],
-        connection=connection,
-    )
-    email1.send()  # Send the email
-
-    # Construct two more messages
-    email2 = mail.EmailMessage(
-        "Hello",
-        "Body goes here",
-        "from@example.com",
-        ["to2@example.com"],
-    )
-    email3 = mail.EmailMessage(
-        "Hello",
-        "Body goes here",
-        "from@example.com",
-        ["to3@example.com"],
-    )
-
-    # Send the two emails in a single call.
-    connection.send_messages([email2, email3])
-    # The connection was already open so send_messages() doesn't close it.
-    # We need to manually close the connection.
-    connection.close()
-
+        Passing ``fail_silently`` as positional argument is deprecated.
 
 Configuring email for development
 =================================
@@ -935,7 +984,7 @@ The :ref:`file <topic-email-file-backend>` email backend can also be useful
 during development -- this backend dumps the contents of every SMTP connection
 to a file that can be inspected at your leisure.
 
-Another approach is to use a "dumb" SMTP server that receives the emails
+Another approach is to use a mocked SMTP server that receives the emails
 locally and displays them to the terminal, but does not actually send
 anything. The :pypi:`aiosmtpd` package provides a way to accomplish this:
 

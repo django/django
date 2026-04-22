@@ -2022,6 +2022,47 @@ class ModelAdmin(BaseModelAdmin):
             return queryset
         return queryset.filter(pk__in=object_pks)
 
+    def _get_formset_with_permissions(self, request, queryset):
+        """
+        Construct a changelist formset, and remove list_editable fields
+        for objects the user cannot change.
+        """
+        FormSet = self.get_changelist_formset(request)
+        formset = FormSet(queryset=queryset)
+
+        for form in formset.forms:
+            if not self.has_change_permission(request, form.instance):
+                for field_name in self.list_editable:
+                    form.fields.pop(field_name, None)
+
+        return formset
+
+    def _save_formset(self, request, formset):
+        changecount = 0
+        with transaction.atomic(using=router.db_for_write(self.model)):
+            for form in formset.forms:
+                if not self.has_change_permission(request, form.instance):
+                    continue
+                if form.has_changed():
+                    obj = self.save_form(request, form, change=True)
+                    if obj._state.adding:
+                        raise BadRequest("list_editable does not allow adding.")
+                    self.save_model(request, obj, form, change=True)
+                    self.save_related(request, form, formsets=[], change=True)
+                    change_msg = self.construct_change_message(request, form, None)
+                    self.log_change(request, obj, change_msg)
+                    changecount += 1
+        if changecount:
+            msg = ngettext(
+                "%(count)s %(name)s was changed successfully.",
+                "%(count)s %(name)s were changed successfully.",
+                changecount,
+            ) % {
+                "count": changecount,
+                "name": model_ngettext(self.opts, changecount),
+            }
+            self.message_user(request, msg, messages.SUCCESS)
+
     @csrf_protect_m
     def changelist_view(self, request, extra_context=None):
         """
@@ -2115,37 +2156,13 @@ class ModelAdmin(BaseModelAdmin):
             )
             cl.formset = FormSet(request.POST, request.FILES, queryset=modified_objects)
             if cl.formset.is_valid():
-                changecount = 0
-                with transaction.atomic(using=router.db_for_write(self.model)):
-                    for form in cl.formset.forms:
-                        if form.has_changed():
-                            obj = self.save_form(request, form, change=True)
-                            if obj._state.adding:
-                                raise BadRequest("list_editable does not allow adding.")
-                            self.save_model(request, obj, form, change=True)
-                            self.save_related(request, form, formsets=[], change=True)
-                            change_msg = self.construct_change_message(
-                                request, form, None
-                            )
-                            self.log_change(request, obj, change_msg)
-                            changecount += 1
-                if changecount:
-                    msg = ngettext(
-                        "%(count)s %(name)s was changed successfully.",
-                        "%(count)s %(name)s were changed successfully.",
-                        changecount,
-                    ) % {
-                        "count": changecount,
-                        "name": model_ngettext(self.opts, changecount),
-                    }
-                    self.message_user(request, msg, messages.SUCCESS)
+                self._save_formset(request, cl.formset)
 
                 return HttpResponseRedirect(request.get_full_path())
 
         # Handle GET -- construct a formset for display.
         elif cl.list_editable and self.has_change_permission(request):
-            FormSet = self.get_changelist_formset(request)
-            cl.formset = FormSet(queryset=cl.result_list)
+            cl.formset = self._get_formset_with_permissions(request, cl.result_list)
 
         # Build the list of media to be used by the formset.
         if cl.formset:

@@ -20,10 +20,11 @@ repos:
     rev: 7.3.0
     hooks:
       - id: flake8
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.39.1
+  - repo: https://github.com/biomejs/pre-commit
+    rev: v2.4.12
     hooks:
-      - id: eslint
+      - id: biome-check
+        additional_dependencies: ["@biomejs/biome@2.4.12"]
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
     rev: v1.19.0
     hooks:

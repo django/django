@@ -456,6 +456,20 @@ class RequestsTests(SimpleTestCase):
         with self.assertRaises(RawPostDataException):
             request.body
 
+    def test_malformed_header(self):
+        tests = [
+            # Invalid encoding name with percent-encoded value
+            "text/plain; charset*=BOGUS''%20",
+            # Another invalid encoding with different value
+            "text/plain; filename*=INVALID''%s%s%s",
+            # Invalid encoding with multi-line encoded content
+            "text/plain; title*=NOTACODEC''%E2%80%A6",
+        ]
+        msg = "Invalid Content-Type header."
+        for header in tests:
+            with self.subTest(header=header), self.assertRaisesMessage(BadRequest, msg):
+                WSGIRequest({"REQUEST_METHOD": "GET", "CONTENT_TYPE": header})
+
     def test_malformed_multipart_header(self):
         tests = [
             ('Content-Disposition : form-data; name="name"', {"name": ["value"]}),

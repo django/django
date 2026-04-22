@@ -24,6 +24,9 @@ __all__ = [
     "Aggregate",
     "AnyValue",
     "Avg",
+    "BitAnd",
+    "BitOr",
+    "BitXor",
     "Count",
     "Max",
     "Min",
@@ -239,6 +242,54 @@ class Avg(FixDurationInputMixin, NumericOutputFieldMixin, Aggregate):
     name = "Avg"
     allow_distinct = True
     arity = 1
+
+
+class BitAggregate(Aggregate):
+    arity = 1
+
+    def __init__(self, expression, **extra):
+        super().__init__(expression, **extra)
+        # self.default is reset in Aggregate.resolve_expression(). Store the
+        # information for the later check in as_sql().
+        self._has_default = self.default is not None
+
+    def as_sql(self, compiler, connection, **extra_context):
+        if not connection.features.supports_bit_aggregations:
+            raise NotSupportedError(
+                f"{self.name} is not supported on {connection.vendor}."
+            )
+        if (
+            self._has_default
+            and not connection.features.supports_default_in_bit_aggregations
+        ):
+            raise NotSupportedError(
+                f"{self.name} does not support the default parameter on "
+                f"{connection.vendor}."
+            )
+        return super().as_sql(compiler, connection, **extra_context)
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        return self.as_sql(
+            compiler,
+            connection,
+            function=f"{self.function}_AGG",
+            **extra_context,
+        )
+
+
+class BitAnd(BitAggregate):
+    function = "BIT_AND"
+    name = "BitAnd"
+
+
+class BitOr(BitAggregate):
+    function = "BIT_OR"
+    name = "BitOr"
+
+
+class BitXor(BitAggregate):
+    function = "BIT_XOR"
+    name = "BitXor"
 
 
 class Count(Aggregate):

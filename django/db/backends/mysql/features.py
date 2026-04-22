@@ -28,6 +28,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_over_clause = True
     supports_frame_range_fixed_distance = True
     supports_update_conflicts = True
+    supports_default_in_bit_aggregations = False
     can_rename_index = True
     delete_can_self_reference_subquery = False
     create_test_procedure_without_params_sql = """

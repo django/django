@@ -296,7 +296,7 @@ class DeferredAttribute:
         db = instances[0]._state.db
         value_by_pk = (
             self.field.model._base_manager.using(db)
-            .values_list(attname)
+            .values_list(attname, flat=True)
             .in_bulk({i.pk for i in instances})
         )
         for instance in instances:
