@@ -2829,6 +2829,19 @@ Default: ``{}``
 Extra parameters to pass to the Task backend. Available parameters vary
 depending on the Task backend.
 
+.. setting:: TEMPLATE_TAGS_MULTILINE
+
+``TEMPLATE_TAGS_MULTILINE``
+---------------------------
+.. versionadded:: 6.1
+.. deprecated:: 6.1
+
+Default: ``True``
+
+Turns on multi-line parsing of templates. If this setting is ``False`` it will
+produce a warning the first time a template is rendered. This option will be
+removed in Django 7.0.
+
 .. setting:: TEMPLATES
 
 ``TEMPLATES``
