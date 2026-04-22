@@ -130,7 +130,8 @@ def get_deleted_objects(objs, request, admin_site):
     must be a homogeneous iterable of objects (e.g. a QuerySet).
 
     Return a nested list of strings suitable for display in the
-    template with the ``unordered_list`` filter.
+    template with the ``unordered_list``
+    and ``truncated_unordered_list`` filters.
     """
     from django.contrib.admin.options import EMPTY_VALUE_STRING
 
