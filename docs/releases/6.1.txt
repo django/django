@@ -499,8 +499,9 @@ Miscellaneous
   ``show_plan(self, plan_data)``) instead of a database connection. Use
   ``get_migration_data()`` (which returns a list of uniform row dicts for both
   list and plan modes) to customize collected data before display. Pass
-  ``plan=True`` or ``plan=False`` to match ``--plan`` or list output when calling
-  it outside :meth:`~django.core.management.commands.showmigrations.Command.handle`.
+  ``plan=True`` or ``plan=False`` to match ``--plan`` or list output
+  when calling it outside
+  :meth:`~django.core.management.commands.showmigrations.Command.handle`.
 
 * Providing ``fail_silently=True``, ``auth_user``, or ``auth_password`` to mail
   sending functions (such as :func:`~django.core.mail.send_mail`) while also
