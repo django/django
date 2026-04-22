@@ -1,8 +1,10 @@
 import json
+import warnings
 
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.views.main import IS_POPUP_VAR
 from django.contrib.auth.models import Permission, User
+from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.db import connection
 from django.template.loader import render_to_string
@@ -10,6 +12,7 @@ from django.template.response import TemplateResponse
 from django.test import TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .admin import SubscriberAdmin
 from .forms import MediaActionForm
@@ -18,6 +21,7 @@ from .models import (
     Answer,
     Book,
     ExternalSubscriber,
+    ModelAction,
     Question,
     Subscriber,
     UnchangeableObject,
@@ -283,7 +287,9 @@ class AdminActionsTest(TestCase):
             reverse("admin:admin_views_externalsubscriber_changelist"), action_data
         )
         content = b"".join(list(response))
-        self.assertEqual(content, b"This is the content of the file")
+        self.assertEqual(
+            content, b"This is the content of the file written by John Doe"
+        )
         self.assertEqual(response.status_code, 200)
 
     def test_custom_function_action_no_perm_response(self):
@@ -308,13 +314,13 @@ class AdminActionsTest(TestCase):
             response,
             """<label>Action: <select name="action" required>
 <option value="" selected>- Select an option -</option>
-<option value="delete_selected">Delete selected external
-subscribers</option>
+<option value="delete_selected">Delete selected external subscribers</option>
 <option value="redirect_to">Redirect to (Awesome action)</option>
-<option value="external_mail">External mail (Another awesome
-action)</option>
-<option value="download">Download subscription</option>
+<option value="external_mail">External mail (Another awesome action)</option>
+<option value="download">Download selected subscriptions</option>
 <option value="no_perm">No permission to run</option>
+<option value="custom_action">Custom action</option>
+<option value="no_decorator_action">No decorator action</option>
 </select>""",
             html=True,
         )
@@ -558,3 +564,302 @@ class AdminActionsPermissionTests(TestCase):
             reverse("admin:admin_views_subscriber_changelist"), delete_confirmation_data
         )
         self.assertEqual(response.status_code, 403)
+
+
+@override_settings(ROOT_URLCONF="admin_views.urls")
+class AdminDetailActionsTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.superuser = User.objects.create_superuser(
+            username="super", password="secret", email="super@example.com"
+        )
+        cls.user = User.objects.create_user(
+            username="user",
+            password="secret",
+            email="user@example.com",
+            is_staff=True,
+        )
+        cls.s1 = ExternalSubscriber.objects.create(
+            name="John Doe", email="john@example.org"
+        )
+        content_type = ContentType.objects.get_for_model(ExternalSubscriber)
+        for permission_type in ("view", "add", "change", "delete"):
+            permission = Permission.objects.get(
+                codename=f"{permission_type}_externalsubscriber",
+                content_type=content_type,
+            )
+            cls.user.user_permissions.add(permission)
+
+    def setUp(self):
+        self.client.force_login(self.user)
+
+    def test_delete_action_not_available_by_default(self):
+        response = self.client.get(
+            reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk])
+        )
+        self.assertNotContains(response, '<option value="delete_selected">', html=True)
+
+    def test_singular_description_used_for_action_on_changeform(self):
+        response = self.client.get(
+            reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk])
+        )
+        self.assertContains(
+            response,
+            '<option value="download">Download subscription</option>',
+            html=True,
+        )
+        self.assertNotContains(response, "Download selected subscriptions")
+        response = self.client.get(
+            reverse("admin:admin_views_externalsubscriber_changelist")
+        )
+        self.assertNotContains(response, "Download subscription")
+        self.assertContains(
+            response,
+            '<option value="download">Download selected subscriptions</option>',
+            html=True,
+        )
+
+    def test_actions_filtered_by_permissions(self):
+        response = self.client.get(
+            reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk])
+        )
+        self.assertNotContains(
+            response, '<option value="custom_action">Custom action</option>', html=True
+        )
+        self.client.force_login(self.superuser)
+        response = self.client.get(
+            reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk])
+        )
+        self.assertContains(
+            response, '<option value="custom_action">Custom action</option>', html=True
+        )
+
+    def test_run_action_permissions(self):
+        change_url = reverse(
+            "admin:admin_views_externalsubscriber_change", args=[self.s1.pk]
+        )
+        # User doesn't have the permission to run the custom action.
+        response = self.client.get(change_url)
+        self.assertNotContains(
+            response, '<option value="custom_action">Custom action</option>', html=True
+        )
+        post_data = {
+            "CHANGE_FORM-action": "custom_action",
+            ACTION_CHECKBOX_NAME: [self.s1.pk],
+            "index": 0,
+        }
+        response = self.client.post(change_url, post_data)
+        self.assertNotEqual(response.content, b"OK")
+
+        # Add permission for user to run the custom action.
+        content_type = ContentType.objects.get_for_model(ExternalSubscriber)
+        permission = Permission.objects.create(
+            name="custom",
+            codename="custom_externalsubscriber",
+            content_type=content_type,
+        )
+        self.user.user_permissions.add(permission)
+        response = self.client.get(change_url)
+        self.assertContains(
+            response, '<option value="custom_action">Custom action</option>', html=True
+        )
+        response = self.client.post(change_url, post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b"OK")
+
+    def test_select_across_ignored(self):
+        ExternalSubscriber.objects.create(name="Bob Bobson", email="bob@example.org")
+        change_url = reverse(
+            "admin:admin_views_externalsubscriber_change", args=[self.s1.pk]
+        )
+        post_data = {
+            "CHANGE_FORM-action": "download",
+            ACTION_CHECKBOX_NAME: [self.s1.pk],
+            "index": 0,
+            "CHANGE_FORM-select-across": True,
+        }
+        response = self.client.post(change_url, post_data)
+        content = b"".join(list(response))
+        self.assertEqual(
+            content, b"This is the content of the file written by John Doe"
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_detail_action_ordering_and_template(self):
+        response = self.client.get(
+            reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk])
+        )
+        self.assertContains(
+            response,
+            """<label>Action: <select name="CHANGE_FORM-action" required>
+            <option value="" selected>- Select an option -</option>
+            <option value="external_mail">External mail (Another awesome action)
+            </option>
+            <option value="download">Download subscription</option>
+            <option value="change_view_only_action">Change view</option>
+            </select>""",
+            html=True,
+        )
+        self.assertTemplateUsed(response, "admin/change_form_actions.html")
+
+    def test_detail_actions_are_not_present_in_add_view(self):
+        response = self.client.get(reverse("admin:admin_views_externalsubscriber_add"))
+        self.assertNotContains(
+            response,
+            "<div class='actions'>",
+            html=True,
+        )
+
+    def test_dropdown_not_displayed_when_change_form_actions(self):
+        self.client.force_login(self.superuser)
+        instance = Actor.objects.create(name="David Tennant", age=45)
+        response = self.client.get(
+            reverse("admin:admin_views_actor_change", args=(instance.pk,))
+        )
+        self.assertNotContains(
+            response,
+            "<div class='actions'>",
+            html=True,
+        )
+
+    def test_update_object_without_action_selected(self):
+        buttons = ["_save", "_continue", "_addanother"]
+        for button in buttons:
+            with self.subTest(button=button):
+                self.client.post(
+                    reverse(
+                        "admin:admin_views_externalsubscriber_change", args=[self.s1.pk]
+                    ),
+                    {
+                        "name": button,
+                        "email": "foo@bar.com",
+                        "action": "test",
+                        button: "Save",
+                        "CHANGE_FORM-action": "",
+                        ACTION_CHECKBOX_NAME: [self.s1.pk],
+                    },
+                )
+                external_subscriber = ExternalSubscriber.objects.get()
+                self.assertEqual(external_subscriber.name, button)
+                self.assertEqual(external_subscriber.email, "foo@bar.com")
+                self.assertEqual(external_subscriber.action, "test")
+
+    def test_object_is_not_updated_when_action_selected(self):
+        self.client.post(
+            reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
+            {
+                "name": "Foo Bar",
+                "email": "foo@bar.com",
+                "action": "test",
+                "CHANGE_FORM-action": "external_mail",
+                ACTION_CHECKBOX_NAME: [self.s1.pk],
+                "index": 0,
+            },
+        )
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, "Greetings from a function action")
+        external_subscriber = ExternalSubscriber.objects.get()
+        self.assertEqual(external_subscriber.name, "John Doe")
+        self.assertEqual(external_subscriber.email, "john@example.org")
+        self.assertEqual(external_subscriber.action, "subscribe")
+
+    def test_redirect_after_an_action(self):
+        response = self.client.post(
+            reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
+            {
+                "CHANGE_FORM-action": "external_mail",
+                ACTION_CHECKBOX_NAME: [self.s1.pk],
+                "index": 0,
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.url,
+            reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
+        )
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_popup_change_form_has_no_actions(self):
+        change_url = reverse(
+            "admin:admin_views_externalsubscriber_change", args=[self.s1.pk]
+        )
+        response = self.client.get(change_url)
+        self.assertIsNotNone(response.context["action_form"])
+        checkbox = f'<input type="hidden" name="_selected_action" value="{self.s1.pk}">'
+        self.assertContains(response, checkbox, html=True)
+        response = self.client.get(change_url + "?%s" % IS_POPUP_VAR)
+        self.assertIsNone(response.context["action_form"])
+        self.assertNotContains(response, checkbox, html=True)
+
+    def test_user_message_on_no_action(self):
+        change_url = reverse(
+            "admin:admin_views_externalsubscriber_change", args=[self.s1.pk]
+        )
+        response = self.client.post(
+            change_url,
+            {
+                "CHANGE_FORM-action": "",
+                ACTION_CHECKBOX_NAME: [self.s1.pk],
+                "index": 0,
+            },
+        )
+        self.assertRedirects(response, change_url, fetch_redirect_response=False)
+        response = self.client.get(response.url)
+        self.assertContains(response, "No action selected.")
+
+    # RemovedInDjango70Warning.
+    def test_overridden_admin_action_methods(self):
+        self.client.force_login(self.superuser)
+        obj = ModelAction.objects.create()
+        change_url = reverse("admin:admin_views_modelaction_change", args=[obj.pk])
+        get_actions_overridden_msg = (
+            "Overriding get_actions() without the 'action_location' parameter is "
+            "deprecated. Update the signature to get_actions(self, request, "
+            "action_location=ActionLocation.CHANGE_LIST)."
+        )
+        with self.assertWarnsMessage(
+            RemovedInDjango70Warning, get_actions_overridden_msg
+        ):
+            response = self.client.get(change_url)
+        self.assertNotContains(response, "<div class='actions'>", html=True)
+
+        changelist_url = reverse("admin:admin_views_modelaction_changelist")
+        with warnings.catch_warnings(record=True) as warning_list:
+            warnings.simplefilter("always", RemovedInDjango70Warning)
+            warnings.filterwarnings("always", category=RemovedInDjango70Warning)
+            response = self.client.get(changelist_url)
+
+            message_warnings = [str(warning.message) for warning in warning_list]
+            expected_warnings = {
+                get_actions_overridden_msg,
+                "Overriding get_action_choices() without the 'action_location' "
+                "parameter is deprecated. Update the signature to "
+                "get_action_choices(self, request, default_choices=None, "
+                "action_location=ActionLocation.CHANGE_LIST).",
+                "Unpacking an action tuple is deprecated. "
+                "Use Action attributes instead.",
+                "Using indexes on an action tuple is deprecated. "
+                "Use Action attributes instead.",
+            }
+            self.assertEqual(set(message_warnings), expected_warnings)
+        self.assertContains(response, "Delete selected model actions (extra)")
+
+        action_data = {
+            ACTION_CHECKBOX_NAME: [obj.pk],
+            "action": "delete_selected",
+            "index": 0,
+        }
+        get_actions_overridden_msg = (
+            "Overriding get_actions() without the 'action_location' parameter is "
+            "deprecated. Update the signature to get_actions(self, request, "
+            "action_location=ActionLocation.CHANGE_LIST)."
+        )
+        with self.assertWarnsMessage(
+            RemovedInDjango70Warning, get_actions_overridden_msg
+        ):
+            response = self.client.post(
+                reverse("admin:admin_views_modelaction_changelist"), action_data
+            )
+        self.assertContains(
+            response, "Are you sure you want to delete the selected model action?"
+        )

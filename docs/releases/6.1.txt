@@ -125,6 +125,18 @@ Minor features
 * :attr:`~django.contrib.admin.ModelAdmin.list_display` now uses boolean icons
   for boolean fields on related models.
 
+* The new ``location`` keyword argument of the
+  :func:`~django.contrib.admin.action` decorator specifies which admin views
+  the action is available on. The action is available on the admin change list
+  page by default. It can also be available on the admin change form. See
+  :ref:`admin-action-availability` for details.
+
+* The new ``description_plural`` keyword argument of the
+  :func:`~django.contrib.admin.action` decorator specifies a human-readable
+  description for actions on the admin change list page. Defaults to the
+  ``description`` value. This is useful when the action is available on both
+  the admin change list and admin change form.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -652,6 +664,16 @@ Miscellaneous
   ``django.core.signing.base64_hmac()`` is deprecated and will change from
   ``"sha1"`` to ``"sha256"`` in Django 7.0. Pass an explicit ``algorithm``
   to silence the deprecation warning.
+
+* Overriding ``ModelAdmin.get_actions()`` without the new ``action_location``
+  parameter is deprecated.
+
+* Unpacking or indexing the dictionary values of the
+  ``ModelAdmin.get_actions()`` return value is deprecated. Use
+  :class:`~django.contrib.admin.Action` attributes instead.
+
+* Overriding ``ModelAdmin.get_action_choices()`` without the new
+  ``action_location`` parameter is deprecated.
 
 Features removed in 6.1
 =======================

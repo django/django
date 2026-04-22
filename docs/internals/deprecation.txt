@@ -94,6 +94,16 @@ details on these changes.
 * :class:`.ModelAdmin` will raise :exc:`ValueError` if its
   :meth:`.get_list_select_related` method returns ``True``.
 
+* Support for overriding ``ModelAdmin.get_actions()`` without the new
+  ``action_location`` parameter will be removed.
+
+* Support for unpacking or indexing the dictionary values of the
+  ``ModelAdmin.get_actions()`` return value will be removed. Use
+  :class:`~django.contrib.admin.Action` attributes instead.
+
+* Support for overriding ``ModelAdmin.get_action_choices()`` without the new
+  ``action_location`` parameter will be removed.
+
 .. _deprecation-removed-in-6.1:
 
 6.1
