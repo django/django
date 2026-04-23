@@ -1,5 +1,3 @@
-from selenium.common.exceptions import TimeoutException
-
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.auth.models import User
 from django.test import override_settings
@@ -183,6 +181,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
     def test_child_popup_not_closed_when_parent_minimized(self):
+        from selenium.common.exceptions import TimeoutException
         from selenium.webdriver.common.by import By
 
         album_add_url = reverse("admin:admin_views_album_add")
