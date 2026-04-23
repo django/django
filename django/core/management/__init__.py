@@ -15,7 +15,7 @@ from importlib import import_module
 import django
 from django.apps import apps
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import SettingsException
 from django.core.management.base import (
     BaseCommand,
     CommandError,
@@ -380,7 +380,7 @@ class ManagementUtility:
 
         try:
             settings.INSTALLED_APPS
-        except ImproperlyConfigured as exc:
+        except SettingsException as exc:
             self.settings_exception = exc
 
         if settings.configured:

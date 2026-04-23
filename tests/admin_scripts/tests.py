@@ -1453,8 +1453,8 @@ class ManageSettingsWithSettingsErrors(AdminScriptTestCase):
         """
         self.write_settings(
             "settings.py",
-            extra="from django.core.exceptions import ImproperlyConfigured\n"
-            "raise ImproperlyConfigured('Improper configuration')",
+            extra="from django.core.exceptions import SettingsException\n"
+            "raise SettingsException('Improper configuration')",
         )
         args = ["help"]
         out, err = self.run_manage(args)

@@ -126,6 +126,12 @@ class ImproperlyConfigured(Exception):
     pass
 
 
+class SettingsException(ImproperlyConfigured):
+    """An error was encountered while importing settings."""
+
+    pass
+
+
 class FieldError(Exception):
     """Some kind of problem with a model field."""
 

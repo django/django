@@ -15,7 +15,7 @@ from pathlib import Path
 
 import django
 from django.conf import global_settings
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, SettingsException
 from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.functional import LazyObject, empty
 
@@ -59,7 +59,7 @@ class LazySettings(LazyObject):
         settings_module = os.environ.get(ENVIRONMENT_VARIABLE)
         if not settings_module:
             desc = ("setting %s" % name) if name else "settings"
-            raise ImproperlyConfigured(
+            raise SettingsException(
                 "Requested %s, but settings are not configured. "
                 "You must either define the environment variable %s "
                 "or call settings.configure() before accessing settings."
@@ -172,7 +172,7 @@ class Settings:
             # If settings cannot be imported, treat as a configuration error.
             if exc.name == self.SETTINGS_MODULE:
                 msg = f"Settings module '{self.SETTINGS_MODULE}' could not be imported."
-                raise ImproperlyConfigured(msg) from exc
+                raise SettingsException(msg) from exc
             raise
 
         tuple_settings = (
