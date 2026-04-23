@@ -261,7 +261,9 @@ class DjangoAdminNoSettings(AdminScriptTestCase):
             if owner != "django.core":
                 continue
             with self.subTest(command=cmd):
-                out, err = self.run_django_admin([cmd], settings_file="bad_settings")
+                out, err = self.run_django_admin(
+                    [cmd, "--help"], settings_file="bad_settings"
+                )
                 klass = load_command_class(owner, cmd)
                 if klass.requires_settings:
                     msg = "Settings module 'bad_settings' could not be imported."
