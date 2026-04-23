@@ -3093,6 +3093,90 @@ class OperationTests(OperationTestBase):
         )
         self.apply_operations(app_label, project_state, operations=[operation])
 
+    @skipUnlessDBFeature("supports_foreign_keys")
+    def test_alter_field_reloads_state_on_transitive_attname_to_field_type_change(
+        self,
+    ):
+        app_label = "test_alflrstfattnamettc"
+        project_state = self.apply_operations(
+            app_label,
+            ProjectState(),
+            operations=[
+                migrations.CreateModel(
+                    "Primary",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                        ("code", models.CharField(max_length=5, unique=True)),
+                    ],
+                ),
+                migrations.CreateModel(
+                    "Related",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                        (
+                            "primary",
+                            models.OneToOneField(
+                                f"{app_label}.Primary",
+                                models.CASCADE,
+                                to_field="code",
+                            ),
+                        ),
+                    ],
+                ),
+                migrations.CreateModel(
+                    "Dependent",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                        (
+                            "related",
+                            models.ForeignKey(
+                                f"{app_label}.Related",
+                                models.CASCADE,
+                                to_field="primary_id",
+                            ),
+                        ),
+                    ],
+                ),
+            ],
+        )
+        self.assertColumnLength(f"{app_label}_primary", "code", 5)
+        self.assertColumnLength(f"{app_label}_related", "primary_id", 5)
+        self.assertColumnLength(f"{app_label}_dependent", "related_id", 5)
+        self.assertFKExists(
+            f"{app_label}_related",
+            ["primary_id"],
+            (f"{app_label}_primary", "code"),
+        )
+        self.assertFKExists(
+            f"{app_label}_dependent",
+            ["related_id"],
+            (f"{app_label}_related", "primary_id"),
+        )
+
+        operation = migrations.AlterField(
+            "Primary",
+            "code",
+            models.CharField(max_length=11, unique=True),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+
+        self.assertColumnLength(f"{app_label}_primary", "code", 11)
+        self.assertColumnLength(f"{app_label}_related", "primary_id", 11)
+        self.assertColumnLength(f"{app_label}_dependent", "related_id", 11)
+        self.assertFKExists(
+            f"{app_label}_related",
+            ["primary_id"],
+            (f"{app_label}_primary", "code"),
+        )
+        self.assertFKExists(
+            f"{app_label}_dependent",
+            ["related_id"],
+            (f"{app_label}_related", "primary_id"),
+        )
+
     def test_alter_field_reloads_state_on_fk_target_changes(self):
         """
         If AlterField doesn't reload state appropriately, the second AlterField

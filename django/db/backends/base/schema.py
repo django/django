@@ -36,7 +36,10 @@ def _is_relevant_relation(relation, altered_field):
         # Foreign key constraint on the primary key, which is being altered.
         return True
     # Is the constraint targeting the field being altered?
-    return altered_field.name in field.to_fields
+    return (
+        altered_field.name in field.to_fields
+        or altered_field.attname in field.to_fields
+    )
 
 
 def _all_related_fields(model):

@@ -65,11 +65,22 @@ class MigrationTestBase(TransactionTestCase):
             if c.name == column
         ][0]
 
+    def _get_column_length(self, table, column, using):
+        field = next(
+            c
+            for c in self.get_table_description(table, using=using)
+            if c.name == column
+        )
+        return field.display_size or field.internal_size
+
     def assertColumnNull(self, table, column, using="default"):
         self.assertTrue(self._get_column_allows_null(table, column, using))
 
     def assertColumnNotNull(self, table, column, using="default"):
         self.assertFalse(self._get_column_allows_null(table, column, using))
+
+    def assertColumnLength(self, table, column, length, using="default"):
+        self.assertEqual(self._get_column_length(table, column, using), length)
 
     def _get_column_collation(self, table, column, using):
         return next(
