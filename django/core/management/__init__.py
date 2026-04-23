@@ -257,10 +257,8 @@ class ManagementUtility:
         except KeyError:
             if os.environ.get("DJANGO_SETTINGS_MODULE") and self.settings_exception:
                 sys.stderr.write(self.style.NOTICE(str(self.settings_exception) + "\n"))
-                sys.exit(1)
             elif not settings.configured:
                 sys.stderr.write(self.style.NOTICE("No Django settings specified.\n"))
-                sys.exit(1)
             possible_matches = get_close_matches(subcommand, commands)
             sys.stderr.write("Unknown command: %r" % subcommand)
             if possible_matches:

@@ -169,11 +169,10 @@ class Settings:
         try:
             mod = importlib.import_module(self.SETTINGS_MODULE)
         except ImportError as exc:
-            # If settings module cannot be imported, treat it as a configuration error.
+            # If settings cannot be imported, treat as a configuration error.
             if exc.name == self.SETTINGS_MODULE:
-                raise ImproperlyConfigured(
-                    f"Settings module '{self.SETTINGS_MODULE}' could not be imported."
-                ) from exc
+                msg = f"Settings module '{self.SETTINGS_MODULE}' could not be imported."
+                raise ImproperlyConfigured(msg) from exc
             raise
 
         tuple_settings = (

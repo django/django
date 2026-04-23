@@ -28,6 +28,8 @@ from django.core.management import (
     call_command,
     color,
     execute_from_command_line,
+    get_commands,
+    load_command_class,
 )
 from django.core.management.base import LabelCommand, SystemCheckError
 from django.core.management.commands.loaddata import Command as LoaddataCommand
@@ -255,10 +257,17 @@ class DjangoAdminNoSettings(AdminScriptTestCase):
         Commands that don't require settings succeed if the settings file
         doesn't exist.
         """
-        args = ["startproject"]
-        out, err = self.run_django_admin(args, settings_file="bad_settings")
-        self.assertNoOutput(out)
-        self.assertOutput(err, "You must provide a project name", regex=True)
+        for cmd, owner in get_commands().items():
+            if owner != "django.core":
+                continue
+            with self.subTest(command=cmd):
+                out, err = self.run_django_admin([cmd], settings_file="bad_settings")
+                klass = load_command_class(owner, cmd)
+                if klass.requires_settings:
+                    msg = "Settings module 'bad_settings' could not be imported."
+                    self.assertOutput(err, msg)
+                else:
+                    self.assertNotIn(err, "bad_settings")
 
 
 class DjangoAdminDefaultSettings(AdminScriptTestCase):

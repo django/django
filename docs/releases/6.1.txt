@@ -273,6 +273,10 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
+* Whether to suppress an :exc:`ImportError` escaping from a settings module is
+  configurable by the new :attr:`.BaseCommand.requires_settings` attribute
+  (default ``True``). In previous versions, such errors were always suppressed.
+
 * Management commands now set :class:`~argparse.ArgumentParser`\'s
   ``suggest_on_error`` argument to ``True`` by default on Python 3.14, enabling
   suggestions for incorrectly typed subcommand names and argument choices.

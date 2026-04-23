@@ -245,6 +245,10 @@ class BaseCommand:
         A boolean; if ``True``, the command prints a warning if the set of
         migrations on disk don't match the migrations in the database.
 
+    ``requires_settings``
+        A boolean; if ``False``, any ``ImportError`` encountered while loading
+        settings is suppressed.
+
     ``requires_system_checks``
         A list or tuple of tags, e.g. [Tags.staticfiles, Tags.models]. System
         checks registered in the chosen tags will be checked for errors prior
