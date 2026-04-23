@@ -267,7 +267,7 @@ class DjangoAdminNoSettings(AdminScriptTestCase):
                     msg = "Settings module 'bad_settings' could not be imported."
                     self.assertOutput(err, msg)
                 else:
-                    self.assertNotIn(err, "bad_settings")
+                    self.assertNotIn("bad_settings", err)
 
 
 class DjangoAdminDefaultSettings(AdminScriptTestCase):
