@@ -1937,6 +1937,29 @@ class SendMassMailTests(SimpleTestCase):
     Tests for django.core.mail.send_mass_mail().
     """
 
+    def test_send_mass_mail(self):
+        count = send_mass_mail(
+            [
+                ("Subject1", "Content1", "from1@example.com", ["to1@example.com"]),
+                (
+                    "Subject2",
+                    "Content2",
+                    "from2@example.com",
+                    ["to2a@example.com", "to2b@example.com"],
+                ),
+            ],
+        )
+        self.assertEqual(count, 2)
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(mail.outbox[0].subject, "Subject1")
+        self.assertEqual(mail.outbox[0].body, "Content1")
+        self.assertEqual(mail.outbox[0].from_email, "from1@example.com")
+        self.assertEqual(mail.outbox[0].to, ["to1@example.com"])
+        self.assertEqual(mail.outbox[1].subject, "Subject2")
+        self.assertEqual(mail.outbox[1].body, "Content2")
+        self.assertEqual(mail.outbox[1].from_email, "from2@example.com")
+        self.assertEqual(mail.outbox[1].to, ["to2a@example.com", "to2b@example.com"])
+
     def test_connection_arg(self):
         # Send using non-default connection.
         connection = mail.get_connection("mail.custombackend.EmailBackend")
