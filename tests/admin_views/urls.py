@@ -41,4 +41,5 @@ urlpatterns = [
     # Shares the admin URL prefix.
     path("test_admin/admin/non_admin_view/", non_admin_view, name="non_admin"),
     path("test_admin/admin10/non_admin_view/", non_admin_view, name="non_admin10"),
+    path("test_admin/admin14/", admin.site14.urls),
 ]

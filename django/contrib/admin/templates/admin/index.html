@@ -29,12 +29,21 @@
             {% else %}
             <ul class="actionlist">
             {% for entry in admin_log %}
+            {% can_change_log_entry user entry as can_edit %}
             <li class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
                 <span class="visually-hidden">{% if entry.is_addition %}{% translate 'Added:' %}{% elif entry.is_change %}{% translate 'Changed:' %}{% elif entry.is_deletion %}{% translate 'Deleted:' %}{% endif %}</span>
                 {% if entry.is_deletion or not entry.get_admin_url %}
                     {{ entry.object_repr|to_object_display_value }}
-                {% else %}
+                {% elif can_edit  %}
                     <a href="{{ entry.get_admin_url }}">{{ entry.object_repr|to_object_display_value }}</a>
+                {% else %}
+                    <span class="no-edit-perm-action tooltip">
+                        {{ entry.object_repr|to_object_display_value }}
+
+                        <span class="tooltip-text">
+                            No edit access.
+                        </span>
+                    </span>
                 {% endif %}
                 <br>
                 {% if entry.content_type %}

@@ -1,4 +1,6 @@
 from django import template
+from django.contrib import admin
+from django.core.exceptions import ObjectDoesNotExist
 
 register = template.Library()
 
@@ -65,3 +67,46 @@ def get_admin_log(parser, token):
         varname=tokens[3],
         user=(tokens[5] if len(tokens) > 5 else None),
     )
+
+
+def get_admin_site_from_request(request):
+    namespace = request.resolver_match.namespace
+
+    for site in admin.sites.all_sites:
+        if site.name == namespace:
+            return site
+
+    return admin.site
+
+
+@register.simple_tag(takes_context=True)
+def can_change_log_entry(context, user, entry):
+    """
+    Determines if user has change permissions to determine
+    whether to show <a> link or <span> in recent actions section.
+    """
+
+    # Some of the tests in admin_utils require to show link
+    # when content type is not available so we have to return
+    # True so link shows instead of span
+
+    if entry.content_type is None:
+        return True  # can't get object or determine perms - show link
+
+    try:
+        obj = entry.get_edited_object()
+    except (AttributeError, ObjectDoesNotExist):
+        # contenttype deleted or unavailable - show link
+        return True
+
+    if obj is None or not hasattr(obj, "_meta"):
+        return True
+
+    perm = f"{obj._meta.app_label}.change_{obj._meta.model_name}"
+
+    request = context["request"]
+    site = get_admin_site_from_request(request)
+    model_admin = site._registry.get(obj.__class__)
+    if model_admin:
+        return model_admin.has_change_permission(request, obj)
+    return user.has_perm(perm)
