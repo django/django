@@ -303,26 +303,28 @@ produce a version "suitable for a pull request (smooth and professional)":
 
   How Django knows to UPDATE vs. INSERT
 
-  You may have noticed Django database objects use the same save() method for
-  creating and changing objects. Django abstracts the need to use INSERT or
-  UPDATE SQL statements. Specifically, when you call save() and the object’s
-  primary key attribute does not define a default or db_default, Django follows
-  this algorithm: ...
+  You may have noticed Django database objects use the same ``save()`` method
+  for creating and changing objects. Django abstracts the need to use
+  ``INSERT`` or ``UPDATE`` SQL statements. Specifically, when you call
+  ``save()`` and the object's primary key attribute does **not** define a
+  :attr:`~django.db.models.Field.default` or
+  :attr:`~django.db.models.Field.db_default`, Django follows this algorithm:
+  ...
 
   The one gotcha here is that you should be careful not to specify a
   primary-key value explicitly when saving new objects, if you cannot guarantee
   the primary-key value is unused.
 
 .. admonition:: Frictionless version
-  
+
   How Django determines UPDATE vs. INSERT
 
-  Django model instances use a single method, save(), for both creating and
-  updating records. Internally, Django determines whether to issue an INSERT or
-  UPDATE SQL statement based on the state of the model instance and its primary
-  key.
+  Django model instances use a single method, ``save()``, for both creating and
+  updating records. Internally, Django determines whether to issue an
+  ``INSERT`` or ``UPDATE`` SQL statement based on the state of the model
+  instance and its primary key.
 
-  When calling save(), Django follows this general logic: ...
+  When calling ``save()``, Django follows this general logic: ...
 
   One important caveat is to avoid explicitly assigning a primary key value
   when creating new objects unless you can guarantee that the value is unique.
