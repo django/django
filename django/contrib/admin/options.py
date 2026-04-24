@@ -2033,6 +2033,19 @@ class ModelAdmin(BaseModelAdmin):
         url = reverse("admin:index", current_app=self.admin_site.name)
         return HttpResponseRedirect(url)
 
+    def _get_user_has_no_change_perms_redirect(self, request, opts, object_id):
+        """
+        Create a message informing the user that the he doesn't not have
+        change permissions and return a redirect to the admin index page.
+        """
+        msg = _("No permissions to change %(name)s with ID “%(key)s”.") % {
+            "name": opts.verbose_name,
+            "key": unquote(object_id),
+        }
+        self.message_user(request, msg, messages.WARNING)
+        url = reverse("admin:index", current_app=self.admin_site.name)
+        return HttpResponseRedirect(url)
+
     @csrf_protect_m
     def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
         if request.method in ("GET", "HEAD", "OPTIONS", "TRACE"):
@@ -2061,7 +2074,9 @@ class ModelAdmin(BaseModelAdmin):
         else:
             obj = self.get_object(request, unquote(object_id), to_field)
             if not self.has_view_or_change_permission(request, obj):
-                raise PermissionDenied
+                return self._get_user_has_no_change_perms_redirect(
+                    request, self.opts, object_id
+                )
 
             if obj is None:
                 return self._get_obj_does_not_exist_redirect(
