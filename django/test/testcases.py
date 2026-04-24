@@ -278,7 +278,8 @@ class SimpleTestCase(unittest.TestCase):
             )
             for name, _ in disallowed_methods:
                 method = getattr(connection, name)
-                setattr(connection, name, method.wrapped)
+                if isinstance(method, _DatabaseFailure):
+                    setattr(connection, name, method.wrapped)
 
     @classmethod
     def ensure_connection_patch_method(cls):

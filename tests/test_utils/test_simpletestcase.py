@@ -4,7 +4,9 @@ from io import StringIO
 from unittest import mock
 from unittest.suite import _DebugResult
 
+from django.db import connections
 from django.test import SimpleTestCase
+from django.test.testcases import _DatabaseFailure
 
 
 class ErrorTestCase(SimpleTestCase):
@@ -147,3 +149,95 @@ class DebugInvocationTests(SimpleTestCase):
         self.assertFalse(_post_teardown.called)
         self.assertFalse(_pre_setup.called)
         self.isolate_debug_test(test_suite, result)
+
+
+class RemoveDatabasesFailuresTests(SimpleTestCase):
+    """Regression tests for SimpleTestCase._remove_databases_failures."""
+
+    databases = {"default"}
+
+    def _pick_other_alias(self):
+        for alias in connections:
+            if alias != "default":
+                return alias
+        self.skipTest("Test requires a second database alias.")
+
+    def setUp(self):
+        """Snapshot every disallowed method on the non-default alias.
+
+        ``_remove_databases_failures`` has side effects across all
+        disallowed methods of all non-allowed aliases, so each test
+        must restore the full state for the next test to start from
+        a known-good (wrapped) baseline.
+        """
+        super().setUp()
+        alias = self._pick_other_alias()
+        connection = connections[alias]
+        self._method_snapshot = {
+            name: getattr(connection, name)
+            for name, _ in connection.features.disallowed_simple_test_case_connection_methods
+        }
+
+    def tearDown(self):
+        alias = self._pick_other_alias()
+        connection = connections[alias]
+        for name, original in self._method_snapshot.items():
+            setattr(connection, name, original)
+        super().tearDown()
+
+    def test_teardown_noops_when_method_is_not_wrapped(self):
+        """
+        If a connection method is replaced between setUpClass and
+        tearDownClass (e.g. the connection was recycled), teardown must
+        not crash with AttributeError on ``method.wrapped``.
+        """
+        alias = self._pick_other_alias()
+        connection = connections[alias]
+        name, _ = next(
+            iter(connection.features.disallowed_simple_test_case_connection_methods)
+        )
+        setattr(connection, name, lambda *a, **kw: None)
+        # Should not raise even though the lambda has no ``.wrapped``.
+        self.__class__._remove_databases_failures()
+
+    def test_teardown_still_unwraps_database_failures(self):
+        """The happy path must continue to restore wrapped methods."""
+        alias = self._pick_other_alias()
+        connection = connections[alias]
+        name, _ = next(
+            iter(connection.features.disallowed_simple_test_case_connection_methods)
+        )
+        # ``setUpClass`` wrapped this alias's methods, so the snapshot
+        # holds a ``_DatabaseFailure``; the real method is one layer down.
+        snapshot = self._method_snapshot[name]
+        real_method = snapshot.wrapped if isinstance(snapshot, _DatabaseFailure) else snapshot
+        setattr(connection, name, _DatabaseFailure(real_method, "msg"))
+        self.__class__._remove_databases_failures()
+        self.assertIs(getattr(connection, name), real_method)
+
+    def test_teardown_noops_against_third_party_cursor_wrapping(self):
+        """
+        Regression test for the ``wrap_cursor`` pattern used by
+        django-debug-toolbar, graphene-django, and similar tools.
+
+        Such libraries replace ``connection.cursor`` with a closure that
+        holds the previous cursor in an instance attribute and never
+        sets a ``.wrapped`` attribute on the closure itself.  Teardown
+        must not crash when one of these closures is still installed
+        at class-cleanup time.
+        """
+        alias = self._pick_other_alias()
+        connection = connections[alias]
+        # Mimic the wrap_cursor-style replacement.
+        connection._third_party_cursor = connection.cursor
+
+        def cursor():
+            return connection._third_party_cursor()
+
+        connection.cursor = cursor
+        try:
+            # Should not raise even though ``cursor.wrapped`` doesn't
+            # exist on the closure.
+            self.__class__._remove_databases_failures()
+        finally:
+            del connection._third_party_cursor
