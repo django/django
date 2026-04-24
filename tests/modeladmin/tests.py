@@ -662,7 +662,7 @@ class ModelAdminTests(TestCase):
             '<select data-context="available-source" '
             'name="main_band" id="id_main_band" required>'
             '<option value="" selected>- Select an option -</option>'
-            '<option value="%d">The Doors</option>'
+            '<option value="%s">The Doors</option>'
             "</select></div>" % self.band.id,
         )
 
