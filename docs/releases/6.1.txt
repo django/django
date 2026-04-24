@@ -258,7 +258,9 @@ Forms
 Generic Views
 ~~~~~~~~~~~~~
 
-* ...
+* The new :attr:`.RedirectView.preserve_request` attribute allows preserving
+  the HTTP method and body during redirects, using 307/308 status codes instead
+  of 302/301.
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
