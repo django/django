@@ -4,7 +4,9 @@ from io import StringIO
 from unittest import mock
 from unittest.suite import _DebugResult
 
+from django.db import connections
 from django.test import SimpleTestCase
+from django.test.testcases import _DatabaseFailure
 
 
 class ErrorTestCase(SimpleTestCase):
@@ -147,3 +149,48 @@ class DebugInvocationTests(SimpleTestCase):
         self.assertFalse(_post_teardown.called)
         self.assertFalse(_pre_setup.called)
         self.isolate_debug_test(test_suite, result)
+
+
+class RemoveDatabasesFailuresTests(SimpleTestCase):
+    """Regression tests for SimpleTestCase._remove_databases_failures."""
+
+    databases = {"default"}
+
+    def _pick_other_alias(self):
+        for alias in connections:
+            if alias != "default":
+                return alias
+        self.skipTest("Test requires a second database alias.")
+
+    def test_teardown_noops_when_method_is_not_wrapped(self):
+        """
+        If a connection method is replaced between setUpClass and
+        tearDownClass (e.g. the connection was recycled), teardown must
+        not crash with AttributeError on ``method.wrapped``.
+        """
+        alias = self._pick_other_alias()
+        connection = connections[alias]
+        name, _ = next(
+            iter(connection.features.disallowed_simple_test_case_connection_methods)
+        )
+        original = getattr(connection, name)
+        try:
+            setattr(connection, name, lambda *a, **kw: None)
+            self.__class__._remove_databases_failures()
+        finally:
+            setattr(connection, name, original)
+
+    def test_teardown_still_unwraps_database_failures(self):
+        """The happy path must continue to restore wrapped methods."""
+        alias = self._pick_other_alias()
+        connection = connections[alias]
+        name, _ = next(
+            iter(connection.features.disallowed_simple_test_case_connection_methods)
+        )
+        original = getattr(connection, name)
+        setattr(connection, name, _DatabaseFailure(original, "msg"))
+        try:
+            self.__class__._remove_databases_failures()
+            self.assertIs(getattr(connection, name), original)
+        finally:
+            setattr(connection, name, original)

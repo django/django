@@ -13,3 +13,9 @@ Bugfixes
   ``django/contrib/admin/templates/admin/change_list.html`` template added in
   Django 6.0 that could be problematic when overriding the ``pagination`` block
   (:ticket:`37029`).
+
+* Fixed a crash in ``SimpleTestCase._remove_databases_failures()`` when a
+  disallowed connection method was replaced between ``setUpClass()`` and
+  ``tearDownClass()`` (e.g. due to connection recycling), which raised
+  ``AttributeError: 'function' object has no attribute 'wrapped'`` during
+  teardown.
