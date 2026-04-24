@@ -277,6 +277,70 @@ cases, we do not want to update a "redirected" link, e.g. a rewrite to always
 point to the latest or stable version of the documentation, e.g.
 ``/en/stable/`` → ``/en/3.2/``.
 
+.. _documentation-voice:
+
+Voice
+=====
+
+We value the human voice in Django's documentation, in which the reader can
+have the experience of one person addressing another.
+
+The Django documentation is successful because it contains human rhythms and
+patterns. It speaks in the way an expert would speak to help a fellow
+developer. It expresses things in lively and imaginative ways.
+
+The documentation doesn't efface the personality of its authors, or smooth
+everything into a slippery, frictionless surface. The documentation should not
+reach for high-sounding but empty descriptions: for example, overusing
+superlatives such as *clear*, *robust*, or *structured*. We find ways to write
+systematically without being mechanical.
+
+To make this more concrete, we present the same information in two versions:
+once in a "human" voice, and a second version from prompting an AI tool to
+produce a version "suitable for a pull request (smooth and professional)":
+
+.. admonition:: Human version (excerpted from Django's documentation)
+
+  How Django knows to UPDATE vs. INSERT
+
+  You may have noticed Django database objects use the same save() method for
+  creating and changing objects. Django abstracts the need to use INSERT or
+  UPDATE SQL statements. Specifically, when you call save() and the object’s
+  primary key attribute does not define a default or db_default, Django follows
+  this algorithm: ...
+
+  The one gotcha here is that you should be careful not to specify a
+  primary-key value explicitly when saving new objects, if you cannot guarantee
+  the primary-key value is unused.
+
+.. admonition:: Frictionless version
+  
+  How Django determines UPDATE vs. INSERT
+
+  Django model instances use a single method, save(), for both creating and
+  updating records. Internally, Django determines whether to issue an INSERT or
+  UPDATE SQL statement based on the state of the model instance and its primary
+  key.
+
+  When calling save(), Django follows this general logic: ...
+
+  One important caveat is to avoid explicitly assigning a primary key value
+  when creating new objects unless you can guarantee that the value is unique.
+  Providing a conflicting primary key may lead to unexpected behavior or
+  database errors.
+
+Notice how the revision does not address the reader (originally: "you may have
+noticed"), removed the figurative language (originally: "Django knows"),
+impaired the sense that the design was intentional (originally: "Django
+abstracts"), avoided a technical term appropriate for the context (originally:
+"algorithm"), added an unnecessary preamble (revised: "based on the state of
+..."), and belabored a self-evident point (revised: "may lead to unexpected
+behavior or database errors").
+
+Without a doubt, a different prompt would produce a different, perhaps improved
+result. Still, we include this example to illustrate how easily the
+documentation can be polluted when attention is not given to voice.
+
 Writing style
 =============
 
@@ -295,29 +359,6 @@ operation, such as "easily", "simply", "just", "merely", "straightforward", and
 so on. People's experience may not match your expectations, and they may become
 frustrated when they do not find a step as "straightforward" or "simple" as it
 is implied to be.
-
-.. _documentation-voice:
-
-Voice
-=====
-
-Django's documentation is written in the voice of an experienced user of the
-framework addressing a peer developer, even if that developer is new to Django
-or new to web development.
-
-Avoid:
-
-* Platitudes: Remember you are speaking to another developer.
-
-* Overly digested, zippy advice: Although concision is important, artificially
-  concise text expressed in predictable rhythms of bullet points sound more
-  like advertising than technical documentation.
-
-* Architectural superlatives: Overusing words like *robust*, *clear*, and
-  *structured* can ring false by making too much out of very little, or
-  glossing over the fact that opinions differ about what makes software
-  well-designed. The author should not appear unaware of alternative viewpoints
-  or inherent design trade-offs.
 
 Commonly used terms
 ===================
