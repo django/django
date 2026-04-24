@@ -9,7 +9,7 @@
     "npm": ">=1.3.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.12",
+    "@biomejs/biome": "2.4.12",
     "puppeteer": "^24.22.0",
     "grunt": "^1.6.1",
     "grunt-cli": "^1.5.0",
