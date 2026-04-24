@@ -2852,10 +2852,11 @@ class AdminViewPermissionsTest(TestCase):
         self.client.force_login(self.adduser)
         response = self.client.get(article_changelist_url)
         self.assertEqual(response.status_code, 403)
+
         response = self.client.get(article_change_url)
-        self.assertEqual(response.status_code, 403)
+        self.assertRedirects(response, reverse("admin:index"))
         post = self.client.post(article_change_url, change_dict)
-        self.assertEqual(post.status_code, 403)
+        self.assertRedirects(response, reverse("admin:index"))
         self.client.post(reverse("admin:logout"))
 
         # view user can view articles but not make changes.
@@ -2880,6 +2881,7 @@ class AdminViewPermissionsTest(TestCase):
         )
         self.assertEqual(response.context["title"], "View article")
         post = self.client.post(article_change_url, change_dict)
+        # No redirect because user has view perms.
         self.assertEqual(post.status_code, 403)
         self.assertEqual(
             Article.objects.get(pk=self.a1.pk).content, "<p>Middle content</p>"
