@@ -352,6 +352,28 @@ class ManagementUtility:
         sys.exit(0)
 
     def execute(self):
+        try:
+            self._execute()
+        finally:
+            # Surface settings-loading errors on every exit path. Only fires
+            # when the user asked for a settings module (via
+            # DJANGO_SETTINGS_MODULE or --settings); commands like startproject
+            # legitimately run without any settings configured. Skip during
+            # bash completion, whose stdout is consumed by the shell (#32915).
+            if (
+                self.settings_exception is not None
+                and os.environ.get("DJANGO_SETTINGS_MODULE")
+                and "DJANGO_AUTO_COMPLETE" not in os.environ
+            ):
+                style = color_style()
+                sys.stderr.write(
+                    style.NOTICE(
+                        "Note that settings are not properly configured "
+                        "(error: %s).\n" % self.settings_exception
+                    )
+                )
+
+    def _execute(self):
         """
         Given the command-line arguments, figure out which subcommand is being
         run, create a parser appropriate to that command, and run it.

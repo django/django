@@ -112,7 +112,7 @@ class AdminScriptTestCase(SimpleTestCase):
                 paths.append(os.path.dirname(backend_dir))
         return paths
 
-    def run_test(self, args, settings_file=None, apps=None, umask=-1):
+    def run_test(self, args, settings_file=None, apps=None, umask=-1, extra_env=None):
         base_dir = os.path.dirname(self.test_dir)
         # The base dir for Django's tests is one level up.
         tests_dir = os.path.dirname(os.path.dirname(__file__))
@@ -135,6 +135,8 @@ class AdminScriptTestCase(SimpleTestCase):
         test_environ["PYTHONPATH"] = os.pathsep.join(python_path)
         test_environ["PYTHONWARNINGS"] = ""
         test_environ["PYTHON_COLORS"] = "0"
+        if extra_env:
+            test_environ.update(extra_env)
 
         p = subprocess.run(
             [sys.executable, *args],
@@ -149,7 +151,7 @@ class AdminScriptTestCase(SimpleTestCase):
     def run_django_admin(self, args, settings_file=None, umask=-1):
         return self.run_test(["-m", "django", *args], settings_file, umask=umask)
 
-    def run_manage(self, args, settings_file=None, manage_py=None):
+    def run_manage(self, args, settings_file=None, manage_py=None, extra_env=None):
         template_manage_py = (
             os.path.join(os.path.dirname(__file__), manage_py)
             if manage_py
@@ -168,7 +170,7 @@ class AdminScriptTestCase(SimpleTestCase):
         with open(test_manage_py, "w") as fp:
             fp.write(manage_py_contents)
 
-        return self.run_test(["./manage.py", *args], settings_file)
+        return self.run_test(["./manage.py", *args], settings_file, extra_env=extra_env)
 
     def assertInAfterFormatting(self, member, container, msg=None):
         if HAS_BLACK:
@@ -897,6 +899,15 @@ class ManageNoSettings(AdminScriptTestCase):
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
+    def test_runserver_with_bad_settings(self):
+        """
+        runserver surfaces the settings error when the settings module fails
+        to import (refs #32915).
+        """
+        args = ["runserver", "--settings=bad_settings", "--nostatic"]
+        out, err = self.run_manage(args)
+        self.assertOutput(err, "settings are not properly configured")
+
 
 class ManageDefaultSettings(AdminScriptTestCase):
     """A series of tests for manage.py when using a settings.py file that
@@ -1431,8 +1442,8 @@ class ManageSettingsWithSettingsErrors(AdminScriptTestCase):
 
     def test_help(self):
         """
-        Test listing available commands output note when only core commands are
-        available.
+        manage.py help lists only core commands and surfaces the settings
+        error on stderr when settings fail to import.
         """
         self.write_settings(
             "settings.py",
@@ -1442,6 +1453,58 @@ class ManageSettingsWithSettingsErrors(AdminScriptTestCase):
         args = ["help"]
         out, err = self.run_manage(args)
         self.assertOutput(out, "only Django core commands are listed")
+        self.assertOutput(err, "settings are not properly configured")
+
+    def test_version_surfaces_settings_error(self):
+        """
+        manage.py version surfaces a settings import error on stderr instead
+        of exiting silently (refs #32915).
+        """
+        self.write_settings(
+            "settings.py",
+            extra="from django.core.exceptions import ImproperlyConfigured\n"
+            "raise ImproperlyConfigured('broken setting')",
+        )
+        out, err = self.run_manage(["version"])
+        self.assertOutput(out, get_version())
+        self.assertOutput(err, "settings are not properly configured")
+        self.assertOutput(err, "broken setting")
+
+    def test_app_command_surfaces_settings_error(self):
+        """
+        When settings fail to import, app commands are absent from
+        get_commands() and fetch_command re-raises ImproperlyConfigured.
+        The settings notice must still be surfaced on stderr (refs #32915).
+        """
+        self.write_settings(
+            "settings.py",
+            extra="from django.core.exceptions import ImproperlyConfigured\n"
+            "raise ImproperlyConfigured('broken setting')",
+        )
+        out, err = self.run_manage(["noargs_command"])
+        self.assertNoOutput(out)
+        self.assertOutput(err, "settings are not properly configured")
+        self.assertOutput(err, "broken setting")
+
+    def test_autocomplete_does_not_emit_settings_error(self):
+        """
+        bash completion's stdout is consumed by the shell, so the settings
+        notice must not be emitted during autocomplete even if settings
+        failed to import (refs #32915).
+        """
+        self.write_settings(
+            "settings.py",
+            extra="from django.core.exceptions import ImproperlyConfigured\n"
+            "raise ImproperlyConfigured('broken setting')",
+        )
+        out, err = self.run_manage(
+            [],
+            extra_env={
+                "DJANGO_AUTO_COMPLETE": "1",
+                "COMP_WORDS": "manage.py ",
+                "COMP_CWORD": "1",
+            },
+        )
         self.assertNoOutput(err)
 
 
