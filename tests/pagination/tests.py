@@ -3,9 +3,11 @@ import inspect
 import pathlib
 import unittest.mock
 import warnings
+from contextlib import aclosing
 from datetime import datetime
 
 from django.core.paginator import (
+    AsyncPage,
     AsyncPaginator,
     BasePaginator,
     EmptyPage,
@@ -990,3 +992,20 @@ class ModelPaginationTests(TestCase):
         # It returns the same list that was converted on the first call.
         second_called_objs = await p.aget_object_list()
         self.assertEqual(id(first_called_objs), id(second_called_objs))
+
+    async def test_async_page_aiteration_closes_object_list_promptly(self):
+        finally_ran = False
+
+        async def object_list():
+            nonlocal finally_ran
+            try:
+                yield 1
+                yield 2
+            finally:
+                finally_ran = True
+
+        page = AsyncPage(object_list(), number=1, paginator=None)
+        async with aclosing(aiter(page)) as it:
+            async for _ in it:
+                break
+        self.assertTrue(finally_ran)

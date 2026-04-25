@@ -1,12 +1,13 @@
 import gzip
 import json
 import sys
+from contextlib import aclosing
 
 from django.core.exceptions import SuspiciousFileOperation
 from django.test import SimpleTestCase
 from django.utils import text
 from django.utils.functional import lazystr
-from django.utils.text import format_lazy
+from django.utils.text import acompress_sequence, format_lazy
 from django.utils.translation import gettext_lazy, override
 
 IS_WIDE_BUILD = len("\U0001f4a9") == 1
@@ -417,6 +418,22 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual(gzip.decompress(out), original)
         self.assertLess(len(out), len(original))
         self.assertGreater(len(compressed_chunks), 2)
+
+    async def test_acompress_sequence_closes_inner_sequence_promptly(self):
+        finally_ran = False
+
+        async def sequence():
+            nonlocal finally_ran
+            try:
+                yield b"chunk1" * 1024
+                yield b"chunk2" * 1024
+            finally:
+                finally_ran = True
+
+        async with aclosing(acompress_sequence(sequence())) as compressed:
+            await anext(compressed)  # gzip header
+            await anext(compressed)  # first sequence-derived chunk
+        self.assertTrue(finally_ran)
 
     def test_format_lazy(self):
         self.assertEqual("django/test", format_lazy("{}/{}", "django", lazystr("test")))
