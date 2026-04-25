@@ -897,14 +897,19 @@ class Queries1Tests(TestCase):
             self.assertSequenceEqual(q.annotate(Count("food")), [])
             self.assertSequenceEqual(q.order_by("meal", "food"), [])
             self.assertSequenceEqual(q.distinct(), [])
-            self.assertSequenceEqual(q.extra(select={"foo": "1"}), [])
             self.assertSequenceEqual(q.reverse(), [])
+            self.assertSequenceEqual(q.defer("meal"), [])
+            self.assertSequenceEqual(q.only("meal"), [])
+
+    def test_ticket7235_extra(self):
+        Eaten.objects.create(meal="m")
+        q = Eaten.objects.none()
+        with self.assertNumQueries(0):
+            self.assertSequenceEqual(q.extra(select={"foo": "1"}), [])
             q.query.low_mark = 1
             msg = "Cannot change a query once a slice has been taken."
             with self.assertRaisesMessage(TypeError, msg):
                 q.extra(select={"foo": "1"})
-            self.assertSequenceEqual(q.defer("meal"), [])
-            self.assertSequenceEqual(q.only("meal"), [])
 
     def test_ticket7791(self):
         # There were "issues" when ordering and distinct-ing on fields related
