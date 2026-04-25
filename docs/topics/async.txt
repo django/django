@@ -399,3 +399,26 @@ trigger the thread safety checks:
 Rather, you should encapsulate all database access within a helper function
 that can be called with ``sync_to_async()`` without relying on the connection
 object in the calling code.
+
+``maybe_aclosing()``
+====================
+
+.. function:: maybe_aclosing(iterator)
+
+.. versionadded:: 6.1
+
+Return a context manager that calls ``aclose()`` on *iterator* on exit if it
+has one, otherwise a no-op context manager that yields *iterator* unchanged.
+Use it to consume a caller-supplied async iterable that may not be a real
+async generator::
+
+    from django.utils.asyncio import maybe_aclosing
+
+
+    async def consume(iterable):
+        async with maybe_aclosing(aiter(iterable)) as it:
+            async for item in it:
+                ...
+
+Wrapping with :func:`contextlib.aclosing` unconditionally would raise
+``AttributeError`` at ``__aexit__`` for any iterator without ``aclose()``.

@@ -4,6 +4,7 @@ import os
 import pickle
 import unittest
 import uuid
+from contextlib import aclosing
 
 from django.core.exceptions import DisallowedRedirect
 from django.core.serializers.json import DjangoJSONEncoder
@@ -814,6 +815,22 @@ class StreamingHttpResponseTests(SimpleTestCase):
 
         with self.assertRaisesMessage(AttributeError, msg):
             r.text
+
+    async def test_streaming_response_closes_user_generator_promptly(self):
+        finally_ran = False
+
+        async def body():
+            nonlocal finally_ran
+            try:
+                yield b"chunk"
+            finally:
+                finally_ran = True
+
+        response = StreamingHttpResponse(body())
+        async with aclosing(aiter(response)) as content:
+            async for _ in content:
+                break
+        self.assertTrue(finally_ran)
 
 
 class FileCloseTests(SimpleTestCase):

@@ -4,6 +4,8 @@ of MVC. In other words, these functions/classes introduce controlled coupling
 for convenience's sake.
 """
 
+from contextlib import aclosing
+
 from django.http import (
     Http404,
     HttpResponse,
@@ -153,7 +155,8 @@ async def aget_list_or_404(klass, *args, **kwargs):
             "First argument to aget_list_or_404() must be a Model, Manager, or "
             f"QuerySet, not '{klass__name}'."
         )
-    obj_list = [obj async for obj in queryset.filter(*args, **kwargs)]
+    async with aclosing(aiter(queryset.filter(*args, **kwargs))) as it:
+        obj_list = [obj async for obj in it]
     if not obj_list:
         raise Http404(
             _("No %s matches the given query.") % queryset.model._meta.object_name
