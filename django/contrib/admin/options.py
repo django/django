@@ -2026,13 +2026,16 @@ class ModelAdmin(BaseModelAdmin):
             return queryset
         return queryset.filter(pk__in=object_pks)
 
-    def _get_formset_with_permissions(self, request, queryset):
+    def _get_formset_with_permissions(self, request, queryset, for_save=False):
         """
         Construct a changelist formset, and remove list_editable fields
         for objects the user cannot change.
         """
         FormSet = self.get_changelist_formset(request)
-        formset = FormSet(queryset=queryset)
+        if for_save:
+            formset = FormSet(data=request.POST, files=request.FILES, queryset=queryset)
+        else:
+            formset = FormSet(queryset=queryset)
 
         for form in formset.forms:
             if not self.has_change_permission(request, form.instance):
@@ -2158,7 +2161,11 @@ class ModelAdmin(BaseModelAdmin):
             modified_objects = self._get_list_editable_queryset(
                 request, FormSet.get_default_prefix()
             )
-            cl.formset = FormSet(request.POST, request.FILES, queryset=modified_objects)
+            cl.formset = self._get_formset_with_permissions(
+                request,
+                queryset=modified_objects,
+                for_save=True,
+            )
             if cl.formset.is_valid():
                 self._save_formset(request, cl.formset)
 
