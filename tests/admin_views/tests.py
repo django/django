@@ -5076,14 +5076,14 @@ class AdminViewListEditable(TestCase):
         self.client.force_login(self.superuser)
 
         response = self.client.get(reverse("admin9:admin_views_person_changelist"))
-        # Editable fields present
-        self.assertContains(response, 'name="form-1-gender"')
-        self.assertContains(response, 'name="form-1-alive"')
-        # Non-editable fields should NOT have inputs
-        self.assertNotContains(response, 'name="form-0-gender"')
-        self.assertNotContains(response, 'name="form-0-alive"')
-        self.assertNotContains(response, 'name="form-2-gender"')
-        self.assertNotContains(response, 'name="form-2-alive"')
+        # Non-editable fields should NOT have inputs.
+        self.assertNotContains(response, 'name="form-1-gender"')
+        self.assertNotContains(response, 'name="form-1-alive"')
+        # Editable fields are present.
+        self.assertContains(response, 'name="form-0-gender"')
+        self.assertContains(response, 'name="form-0-alive"')
+        self.assertContains(response, 'name="form-2-gender"')
+        self.assertContains(response, 'name="form-2-alive"')
 
     def test_list_editable_per_object_permissions_submission(self):
         """
@@ -5092,26 +5092,28 @@ class AdminViewListEditable(TestCase):
         """
         self.client.logout()
         self.client.force_login(self.superuser)
-
+        # Skip the instance lacking edit permission (include only its id).
         data = {
             "form-TOTAL_FORMS": "3",
             "form-INITIAL_FORMS": "3",
             "form-MAX_NUM_FORMS": "0",
-            "form-0-gender": "2",  # Change per1 (not allowed)
+            "form-0-gender": "2",
+            "form-0-alive": "checked",
             "form-0-id": str(self.per1.pk),
-            "form-1-gender": "2",  # Change per2 (allowed)
-            "form-1-id": str(self.per2.pk),
-            "form-2-gender": "2",  # Change per3 (not allowed)
+            "form-1-id": str(self.per2.pk),  # not editable
+            "form-2-gender": "2",
+            "form-2-alive": "checked",
             "form-2-id": str(self.per3.pk),
             "_save": "Save",
         }
         response = self.client.post(
             reverse("admin9:admin_views_person_changelist"), data, follow=True
         )
-        # per2 and per3 were updated, but per1 was not
-        self.assertEqual(Person.objects.get(pk=self.per1.pk).gender, 1)  # Unchanged
-        self.assertEqual(Person.objects.get(pk=self.per2.pk).gender, 2)
-        self.assertEqual(Person.objects.get(pk=self.per3.pk).gender, 1)  # Unchanged
+        # per1 and per3 were updated, but per2 was not.
+        self.assertEqual(Person.objects.get(pk=self.per1.pk).gender, 2)
+        self.assertEqual(Person.objects.get(pk=self.per2.pk).gender, 1)  # Unchanged
+        self.assertEqual(Person.objects.get(pk=self.per3.pk).gender, 2)
+
         # Check for success message
         self.assertEqual(len(response.context["messages"]), 1)
 

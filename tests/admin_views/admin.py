@@ -385,7 +385,7 @@ class PersonNoChangePermissionsAdmin9(admin.ModelAdmin):
     def has_change_permission(self, request, obj=None):
         if obj is None:
             return True
-        return obj.id % 2 == 0
+        return obj.alive
 
 
 class FooAccountAdmin(admin.StackedInline):
