@@ -2033,6 +2033,98 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
     If in doubt, leave it to its default of ``True``.
 
+.. _foreign-object:
+
+``ForeignObject``
+-----------------
+
+.. class:: ForeignObject(to, on_delete, from_fields, to_fields, **options)
+
+A generalization of :class:`ForeignKey` that supports relationships spanning
+multiple columns. Unlike :class:`ForeignKey`, ``ForeignObject`` does not
+create database columns, foreign key constraints, or indexes -- it reuses
+existing fields on the source model and defines the relationship in Python
+only.
+
+In most cases, you should prefer :class:`ForeignKey`. ``ForeignObject`` is
+intended for relating to a model that uses a :class:`CompositePrimaryKey`,
+or for custom multi-column joins where the underlying columns are managed
+separately. See :doc:`/topics/composite-primary-key` for a worked example::
+
+    from django.db import models
+
+
+    class Foo(models.Model):
+        item_order_id = models.CharField(max_length=20)
+        item_product_id = models.IntegerField()
+        item = models.ForeignObject(
+            OrderLineItem,
+            on_delete=models.CASCADE,
+            from_fields=("item_order_id", "item_product_id"),
+            to_fields=("order_id", "product_id"),
+        )
+
+The relationship supports the usual ORM features such as
+:meth:`~django.db.models.query.QuerySet.select_related` and reverse
+accessors.
+
+.. versionchanged:: 6.1
+
+    ``ForeignObject`` is now a documented public API.
+
+Database Representation
+~~~~~~~~~~~~~~~~~~~~~~~
+
+``ForeignObject`` does not add columns, constraints, or indexes to the
+database schema. The columns referenced by :attr:`~ForeignObject.from_fields`
+must already exist on the model; Django uses them as-is when constructing
+the ``JOIN`` clause and never appends an ``_id`` suffix.
+
+.. _foreign-object-arguments:
+
+Arguments
+~~~~~~~~~
+
+``ForeignObject`` requires :attr:`~ForeignObject.from_fields` and
+:attr:`~ForeignObject.to_fields` in addition to ``to`` and ``on_delete``.
+Other arguments common to :class:`ForeignKey` (such as
+:attr:`~ForeignKey.related_name`, :attr:`~ForeignKey.related_query_name`,
+and :attr:`~ForeignKey.limit_choices_to`) behave the same way.
+
+.. attribute:: ForeignObject.from_fields
+
+    A tuple of field names on the source model used in the join. Each
+    name must correspond to an existing field on the model.
+
+    When ``from_fields`` contains more than one entry, it cannot appear
+    in :attr:`~django.db.models.Options.indexes`,
+    :attr:`~django.db.models.Options.constraints`, or
+    :attr:`~django.db.models.Options.unique_together`. Doing so raises
+    ``models.E049``.
+
+.. attribute:: ForeignObject.to_fields
+
+    A tuple of field names on the target model used in the join. The
+    order must match :attr:`~ForeignObject.from_fields`. The target
+    columns must satisfy a uniqueness constraint -- through
+    ``unique=True``,
+    :attr:`Meta.unique_together <django.db.models.Options.unique_together>`,
+    a :class:`~django.db.models.UniqueConstraint`, or by matching the
+    target's :class:`CompositePrimaryKey` columns. Otherwise the
+    :ref:`system check framework <field-checking>` raises ``fields.E310``,
+    ``fields.E311``, or ``fields.E312``. ``to_fields`` cannot reference a
+    :class:`CompositePrimaryKey` field directly; doing so raises
+    ``fields.E347``.
+
+.. attribute:: ForeignObject.on_delete
+
+    Behaves the same as :attr:`ForeignKey.on_delete`. Because
+    ``ForeignObject`` does not create a database-level foreign-key
+    constraint, cascading happens only through Django's ORM (during
+    :meth:`~django.db.models.Model.delete` and
+    :meth:`~django.db.models.query.QuerySet.delete`); raw SQL ``DELETE``
+    statements bypass it.
+
 ``ManyToManyField``
 -------------------
 

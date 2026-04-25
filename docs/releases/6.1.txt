@@ -329,6 +329,9 @@ Models
   ``OR``, ``XOR``, respectively. These aggregates were previously included only
   in ``contrib.postgres``.
 
+* :class:`~django.db.models.ForeignObject` is now documented as a public API.
+  See :ref:`foreign-object` for details.
+
 Pagination
 ~~~~~~~~~~
 
