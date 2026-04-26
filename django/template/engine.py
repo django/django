@@ -25,6 +25,7 @@ class Engine:
         debug=False,
         loaders=None,
         string_if_invalid="",
+        invalid_variable_handler=None,
         file_charset="utf-8",
         libraries=None,
         builtins=None,
@@ -61,6 +62,16 @@ class Engine:
         self.template_libraries = self.get_template_libraries(libraries)
         self.builtins = self.default_builtins + builtins
         self.template_builtins = self.get_template_builtins(self.builtins)
+        if invalid_variable_handler is None:
+            from .invalid_variables import default_invalid_variable_handler
+            self.invalid_variable_handler = default_invalid_variable_handler
+        else:
+            try:
+                self.invalid_variable_handler = import_string(invalid_variable_handler)
+            except ImportError:
+                raise ImproperlyConfigured(
+                    "Invalid value in handle_invalid_var configuration: %r" % invalid_variable_handler
+                )
 
     def __repr__(self):
         return (

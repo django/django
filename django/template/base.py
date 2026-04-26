@@ -790,14 +790,16 @@ class FilterExpression:
                 if ignore_failures:
                     obj = None
                 else:
-                    string_if_invalid = context.template.engine.string_if_invalid
-                    if string_if_invalid:
-                        if "%s" in string_if_invalid:
-                            return string_if_invalid % self.var
-                        else:
-                            return string_if_invalid
+                    invalid_variable_handler = context.template.engine.invalid_variable_handler
+                    invalid_variable_instance = invalid_variable_handler(
+                        variable=self.var,
+                        context=context,
+                        reason="missing_variable",
+                    )
+                    if invalid_variable_instance:
+                        return invalid_variable_instance
                     else:
-                        obj = string_if_invalid
+                        obj = invalid_variable_instance
         else:
             obj = self.var
         for func, args in self.filters:
@@ -991,10 +993,15 @@ class Variable:
                                 (bit, current),
                             )  # missing attribute
                 if callable(current):
+                    invalid_variable_handler = context.template.engine.invalid_variable_handler
                     if getattr(current, "do_not_call_in_templates", False):
                         pass
                     elif getattr(current, "alters_data", False):
-                        current = context.template.engine.string_if_invalid
+                        current = invalid_variable_handler(
+                            variable=current,
+                            context=context,
+                            reason="callable_alters_data",
+                        )
                     else:
                         try:  # method call (assuming no args required)
                             current = current()
@@ -1002,26 +1009,33 @@ class Variable:
                             try:
                                 current_signature = signature(current)
                             except ValueError:  # No signature found.
-                                current = context.template.engine.string_if_invalid
+                                current = invalid_variable_handler(
+                                    variable=current,
+                                    context=context,
+                                    reason="callable_missing_signature",
+                                )
                             else:
                                 try:
                                     current_signature.bind()
                                 except TypeError:  # Arguments *were* required.
                                     # Invalid method call.
-                                    current = context.template.engine.string_if_invalid
+                                    current = invalid_variable_handler(
+                                        variable=current,
+                                        context=context,
+                                        reason="callable_requires_arguments",
+                                    )
                                 else:
                                     raise
         except Exception as e:
-            template_name = getattr(context, "template_name", None) or "unknown"
-            logger.debug(
-                "Exception while resolving variable '%s' in template '%s'.",
-                bit,
-                template_name,
-                exc_info=True,
-            )
-
+            # NB: By moving the logging from here, to inside `handle_valid_var`, there is a very
+            # minor change in behaviour: an exception that does not have silent_variable_failure
+            # set will not necessarily get logged. Most of these will be VariableDoesNotExist
+            # exceptions which will get caught, and handled by `handle_valid_var` later on. Other
+            # exceptions will propogate upwards and cause a noise, so the lack of a debug log is
+            # not super significant. 
             if getattr(e, "silent_variable_failure", False):
-                current = context.template.engine.string_if_invalid
+                invalid_variable_handler = context.template.engine.invalid_variable_handler
+                current = invalid_variable_handler(context=context, reason="silent_variable_failure")
             else:
                 raise
 
