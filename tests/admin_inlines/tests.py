@@ -12,7 +12,6 @@ from .admin import InnerInline
 from .admin import site as admin_site
 from .models import (
     Author,
-    BankAccount,
     BinaryTree,
     Book,
     BothVerboseNameProfile,
@@ -42,11 +41,11 @@ from .models import (
     Profile,
     ProfileCollection,
     Question,
+    ShowInlineChild,
     ShowInlineParent,
     Sighting,
     SomeChildModel,
     SomeParentModel,
-    Subject,
     Teacher,
     UUIDChild,
     UUIDParent,
@@ -836,27 +835,24 @@ class TestInline(TestDataMixin, TestCase):
     def test_delete_protected_message_limits_number_of_objects_displayed(self):
         # admin limits the amount of displayed objects to 100, so we create
         # 102 invoices
-        subject = Subject.objects.create(name="Subject")
-        bank_account = BankAccount.objects.create(
-            subject=subject, account_number="000000000"
-        )
+        parent = ShowInlineParent.objects.create(show_inlines=True)
+        child = ShowInlineChild.objects.create(parent=parent)
         invoices = [
-            Invoice(subject=subject, account=bank_account, number=str(i))
-            for i in range(102)
+            Invoice(parent=parent, child=child, number=str(i)) for i in range(102)
         ]
         Invoice.objects.bulk_create(invoices)
 
         response = self.client.post(
-            reverse("admin:admin_inlines_subject_change", args=(subject.pk,)),
+            reverse("admin:admin_inlines_showinlineparent_change", args=(parent.pk,)),
             data={
-                "name": "Subject",
-                "bankaccount_set-TOTAL_FORMS": "1",
-                "bankaccount_set-INITIAL_FORMS": "1",
-                "bankaccount_set-MAX_NUM_FORMS": "1000",
-                "bankaccount_set-MIN_NUM_FORMS": "0",
-                "bankaccount_set-0-account_number": "000000000",
-                "bankaccount_set-0-id": bank_account.pk,
-                "bankaccount_set-0-DELETE": "on",
+                "show_inlines": "on",
+                "showinlinechild_set-TOTAL_FORMS": "1",
+                "showinlinechild_set-INITIAL_FORMS": "1",
+                "showinlinechild_set-MAX_NUM_FORMS": "1000",
+                "showinlinechild_set-MIN_NUM_FORMS": "0",
+                "showinlinechild_set-0-account_number": "000000000",
+                "showinlinechild_set-0-id": child.pk,
+                "showinlinechild_set-0-DELETE": "on",
             },
         )
         self.assertEqual(response.status_code, 200)
@@ -865,7 +861,7 @@ class TestInline(TestDataMixin, TestCase):
         error_message = inline_formset.non_form_errors()[0]
         self.assertTrue(
             error_message.startswith(
-                "Deleting bank account 000000000 would require deleting the "
+                "Deleting show inline child Child True would require deleting the "
                 "following protected related objects:"
             ),
             error_message,
@@ -874,27 +870,24 @@ class TestInline(TestDataMixin, TestCase):
         self.assertTrue(error_message.endswith(" and 2 more"), error_message)
 
     def test_delete_protected_message_does_not_limits_small_amount_of_objects(self):
-        subject = Subject.objects.create(name="Subject")
-        bank_account = BankAccount.objects.create(
-            subject=subject, account_number="000000000"
-        )
+        parent = ShowInlineParent.objects.create(show_inlines=True)
+        child = ShowInlineChild.objects.create(parent=parent)
         invoices = [
-            Invoice(subject=subject, account=bank_account, number=str(i))
-            for i in range(3)
+            Invoice(parent=parent, child=child, number=str(i)) for i in range(3)
         ]
         Invoice.objects.bulk_create(invoices)
 
         response = self.client.post(
-            reverse("admin:admin_inlines_subject_change", args=(subject.pk,)),
+            reverse("admin:admin_inlines_showinlineparent_change", args=(parent.pk,)),
             data={
-                "name": "Subject",
-                "bankaccount_set-TOTAL_FORMS": "1",
-                "bankaccount_set-INITIAL_FORMS": "1",
-                "bankaccount_set-MAX_NUM_FORMS": "1000",
-                "bankaccount_set-MIN_NUM_FORMS": "0",
-                "bankaccount_set-0-account_number": "000000000",
-                "bankaccount_set-0-id": bank_account.pk,
-                "bankaccount_set-0-DELETE": "on",
+                "show_inlines": "True",
+                "showinlinechild_set-TOTAL_FORMS": "1",
+                "showinlinechild_set-INITIAL_FORMS": "1",
+                "showinlinechild_set-MAX_NUM_FORMS": "1000",
+                "showinlinechild_set-MIN_NUM_FORMS": "0",
+                "showinlinechild_set-0-account_number": "000000000",
+                "showinlinechild_set-0-id": child.pk,
+                "showinlinechild_set-0-DELETE": "on",
             },
         )
         self.assertEqual(response.status_code, 200)
@@ -903,7 +896,7 @@ class TestInline(TestDataMixin, TestCase):
         error_message = inline_formset.non_form_errors()[0]
         self.assertTrue(
             error_message.startswith(
-                "Deleting bank account 000000000 "
+                "Deleting show inline child Child False "
                 "would require deleting the "
                 "following protected related "
                 "objects:"
