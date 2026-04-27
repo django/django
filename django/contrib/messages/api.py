@@ -4,6 +4,7 @@ from django.contrib.messages.storage import default_storage
 __all__ = (
     "add_message",
     "get_messages",
+    "clear_messages",
     "get_level",
     "set_level",
     "debug",
@@ -46,6 +47,14 @@ def get_messages(request):
     an empty list.
     """
     return getattr(request, "_messages", [])
+
+
+def clear_messages(request):
+    """
+    Clear all messages on the request.
+    """
+    if hasattr(request, "_messages"):
+        request._messages.clear()
 
 
 def get_level(request):

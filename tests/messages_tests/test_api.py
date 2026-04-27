@@ -18,6 +18,17 @@ class ApiTests(SimpleTestCase):
         [message] = self.storage.store
         self.assertEqual(msg, message.message)
 
+    def test_clear_messages(self):
+        self.request._messages = self.storage
+        messages.add_message(self.request, messages.DEBUG, "some message")
+        self.assertEqual(len(self.storage.store), 1)
+        messages.clear_messages(self.request)
+        self.assertEqual(len(self.storage.store), 0)
+
+    def test_clear_messages_middleware_missing(self):
+        # Should fail silently if middleware is missing.
+        messages.clear_messages(self.request)
+
     def test_request_is_none(self):
         msg = "add_message() argument must be an HttpRequest object, not 'NoneType'."
         self.request._messages = self.storage

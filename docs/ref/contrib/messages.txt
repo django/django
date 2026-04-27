@@ -91,6 +91,10 @@ To write your own storage class, subclass the ``BaseStorage`` class in
 ``django.contrib.messages.storage.base`` and implement the ``_get`` and
 ``_store`` methods.
 
+.. method:: storage.base.BaseStorage.clear()
+
+    Clear all messages.
+
 .. _message-level:
 
 Message levels
@@ -181,6 +185,10 @@ used tags (which are usually represented as HTML classes for the message)::
 Displaying messages
 -------------------
 .. function:: get_messages(request)
+
+.. function:: clear_messages(request)
+
+    Clear all messages on the request.
 
 **In your template**, use something like:
 

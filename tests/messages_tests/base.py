@@ -93,6 +93,15 @@ class BaseTests:
         storage.add(constants.INFO, "Test message 2", extra_tags="tag")
         self.assertEqual(len(storage), 2)
 
+    def test_clear(self):
+        storage = self.get_storage()
+        storage.add(constants.INFO, "Test message 1")
+        storage.add(constants.INFO, "Test message 2", extra_tags="tag")
+        self.assertEqual(len(storage), 2)
+        storage.clear()
+        self.assertEqual(len(storage), 0)
+        self.assertTrue(storage.used)
+
     def test_add_lazy_translation(self):
         storage = self.get_storage()
         response = self.get_response()

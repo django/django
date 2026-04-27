@@ -157,6 +157,15 @@ class BaseStorage:
         message = Message(level, message, extra_tags=extra_tags)
         self._queued_messages.append(message)
 
+    def clear(self):
+        """
+        Clear all messages.
+        """
+        self.used = True
+        self._queued_messages = []
+        if hasattr(self, "_loaded_data"):
+            self._loaded_data = []
+
     def _get_level(self):
         """
         Return the minimum recorded level.
