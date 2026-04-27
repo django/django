@@ -208,6 +208,7 @@ class Command(BaseCommand):
     translatable_file_class = TranslatableFile
     build_file_class = BuildFile
 
+    requires_settings = False
     requires_system_checks = []
 
     msgmerge_options = ["-q", "--backup=none", "--previous", "--update"]

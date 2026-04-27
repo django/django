@@ -245,6 +245,10 @@ class BaseCommand:
         A boolean; if ``True``, the command prints a warning if the set of
         migrations on disk don't match the migrations in the database.
 
+    ``requires_settings``
+        A boolean; if ``False``, any ``ImportError`` encountered while loading
+        settings is suppressed.
+
     ``requires_system_checks``
         A list or tuple of tags, e.g. [Tags.staticfiles, Tags.models]. System
         checks registered in the chosen tags will be checked for errors prior
@@ -269,6 +273,7 @@ class BaseCommand:
     _called_from_command_line = False
     output_transaction = False  # Whether to wrap the output in a "BEGIN; COMMIT;"
     requires_migrations_checks = False
+    requires_settings = True
     requires_system_checks = "__all__"
     # Arguments, common to all commands, which aren't defined by the argument
     # parser.

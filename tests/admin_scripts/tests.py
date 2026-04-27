@@ -28,6 +28,8 @@ from django.core.management import (
     call_command,
     color,
     execute_from_command_line,
+    get_commands,
+    load_command_class,
 )
 from django.core.management.base import LabelCommand, SystemCheckError
 from django.core.management.commands.loaddata import Command as LoaddataCommand
@@ -238,7 +240,7 @@ class DjangoAdminNoSettings(AdminScriptTestCase):
         args = ["check", "--settings=bad_settings", "admin_scripts"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_builtin_with_bad_environment(self):
         """
@@ -248,17 +250,26 @@ class DjangoAdminNoSettings(AdminScriptTestCase):
         args = ["check", "admin_scripts"]
         out, err = self.run_django_admin(args, "bad_settings")
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_commands_with_invalid_settings(self):
         """
         Commands that don't require settings succeed if the settings file
         doesn't exist.
         """
-        args = ["startproject"]
-        out, err = self.run_django_admin(args, settings_file="bad_settings")
-        self.assertNoOutput(out)
-        self.assertOutput(err, "You must provide a project name", regex=True)
+        for cmd, owner in get_commands().items():
+            if owner != "django.core":
+                continue
+            with self.subTest(command=cmd):
+                out, err = self.run_django_admin(
+                    [cmd, "--help"], settings_file="bad_settings"
+                )
+                klass = load_command_class(owner, cmd)
+                if klass.requires_settings:
+                    msg = "Settings module 'bad_settings' could not be imported."
+                    self.assertOutput(err, msg)
+                else:
+                    self.assertNotIn("bad_settings", err)
 
 
 class DjangoAdminDefaultSettings(AdminScriptTestCase):
@@ -309,7 +320,7 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
         args = ["check", "--settings=bad_settings", "admin_scripts"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_builtin_with_bad_environment(self):
         """
@@ -319,7 +330,7 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
         args = ["check", "admin_scripts"]
         out, err = self.run_django_admin(args, "bad_settings")
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_custom_command(self):
         """
@@ -330,7 +341,6 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No Django settings specified")
-        self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
         """
@@ -409,7 +419,7 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
         args = ["check", "--settings=bad_settings", "admin_scripts"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_builtin_with_bad_environment(self):
         """
@@ -419,7 +429,7 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
         args = ["check", "admin_scripts"]
         out, err = self.run_django_admin(args, "bad_settings")
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_custom_command(self):
         """
@@ -430,7 +440,6 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No Django settings specified")
-        self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
         """
@@ -503,7 +512,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
         args = ["check", "--settings=bad_settings", "admin_scripts"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_builtin_with_bad_environment(self):
         """
@@ -513,7 +522,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
         args = ["check", "admin_scripts"]
         out, err = self.run_django_admin(args, "bad_settings")
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_custom_command(self):
         """
@@ -524,7 +533,6 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No Django settings specified")
-        self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
         """
@@ -595,7 +603,7 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
         args = ["check", "--settings=bad_settings", "admin_scripts"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_builtin_with_bad_environment(self):
         """
@@ -605,7 +613,7 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
         args = ["check", "admin_scripts"]
         out, err = self.run_django_admin(args, "bad_settings")
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_custom_command(self):
         """
@@ -616,7 +624,6 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No Django settings specified")
-        self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
         """
@@ -691,7 +698,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
         """
         args = ["check", "--settings=bad_settings", "admin_scripts"]
         out, err = self.run_django_admin(args)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_builtin_with_bad_environment(self):
         """
@@ -701,7 +708,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
         args = ["check", "admin_scripts"]
         out, err = self.run_django_admin(args, "bad_settings")
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_custom_command(self):
         """
@@ -712,7 +719,6 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No Django settings specified")
-        self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
         """
@@ -799,7 +805,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         """
         args = ["check", "--settings=bad_settings", "admin_scripts"]
         out, err = self.run_django_admin(args)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_builtin_with_bad_environment(self):
         """
@@ -809,7 +815,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         args = ["check", "admin_scripts"]
         out, err = self.run_django_admin(args, "bad_settings")
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_custom_command(self):
         """
@@ -820,7 +826,6 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No Django settings specified")
-        self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_builtin_with_settings(self):
         """
@@ -873,8 +878,8 @@ class ManageNoSettings(AdminScriptTestCase):
         args = ["check", "admin_scripts"]
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(
-            err, r"No module named '?(test_project\.)?settings'?", regex=True
+        self.assertEqual(
+            err, "Settings module 'test_project.settings' could not be imported.\n"
         )
 
     def test_builtin_with_bad_settings(self):
@@ -885,7 +890,19 @@ class ManageNoSettings(AdminScriptTestCase):
         args = ["check", "--settings=bad_settings", "admin_scripts"]
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
+
+    def test_runserver_with_bad_settings(self):
+        args = ["runserver", "--settings=bad_settings", "--nostatic"]
+        out, err = self.run_manage(args)
+        self.assertNoOutput(out)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
+
+    def test_startapp_with_bad_settings(self):
+        args = ["startapp", "--settings=bad_settings", "app1"]
+        out, err = self.run_manage(args)
+        self.assertNoOutput(out)
+        self.assertNoOutput(err)
 
     def test_builtin_with_bad_environment(self):
         """
@@ -895,7 +912,7 @@ class ManageNoSettings(AdminScriptTestCase):
         args = ["check", "admin_scripts"]
         out, err = self.run_manage(args, "bad_settings")
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
 
 class ManageDefaultSettings(AdminScriptTestCase):
@@ -945,7 +962,7 @@ class ManageDefaultSettings(AdminScriptTestCase):
         args = ["check", "--settings=bad_settings", "admin_scripts"]
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_builtin_with_bad_environment(self):
         """
@@ -955,7 +972,7 @@ class ManageDefaultSettings(AdminScriptTestCase):
         args = ["check", "admin_scripts"]
         out, err = self.run_manage(args, "bad_settings")
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_custom_command(self):
         """
@@ -1038,7 +1055,7 @@ class ManageFullPathDefaultSettings(AdminScriptTestCase):
         args = ["check", "--settings=bad_settings", "admin_scripts"]
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_builtin_with_bad_environment(self):
         """
@@ -1048,7 +1065,7 @@ class ManageFullPathDefaultSettings(AdminScriptTestCase):
         args = ["check", "admin_scripts"]
         out, err = self.run_manage(args, "bad_settings")
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_custom_command(self):
         """
@@ -1130,7 +1147,7 @@ class ManageMinimalSettings(AdminScriptTestCase):
         args = ["check", "--settings=bad_settings", "admin_scripts"]
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_builtin_with_bad_environment(self):
         """
@@ -1140,7 +1157,7 @@ class ManageMinimalSettings(AdminScriptTestCase):
         args = ["check", "admin_scripts"]
         out, err = self.run_manage(args, "bad_settings")
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_custom_command(self):
         """
@@ -1190,8 +1207,8 @@ class ManageAlternateSettings(AdminScriptTestCase):
         args = ["check", "admin_scripts"]
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(
-            err, r"No module named '?(test_project\.)?settings'?", regex=True
+        self.assertEqual(
+            err, "Settings module 'test_project.settings' could not be imported.\n"
         )
 
     def test_builtin_with_settings(self):
@@ -1222,7 +1239,7 @@ class ManageAlternateSettings(AdminScriptTestCase):
         args = ["check", "--settings=bad_settings", "admin_scripts"]
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_builtin_with_bad_environment(self):
         """
@@ -1232,7 +1249,7 @@ class ManageAlternateSettings(AdminScriptTestCase):
         args = ["check", "admin_scripts"]
         out, err = self.run_manage(args, "bad_settings")
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_custom_command(self):
         "alternate: manage.py can't execute user commands without settings"
@@ -1240,7 +1257,9 @@ class ManageAlternateSettings(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(
-            err, r"No module named '?(test_project\.)?settings'?", regex=True
+            err,
+            r"Settings module '?(test_project\.)?settings'? could not be imported.",
+            regex=True,
         )
 
     def test_custom_command_with_settings(self):
@@ -1341,7 +1360,7 @@ class ManageMultipleSettings(AdminScriptTestCase):
         args = ["check", "--settings=bad_settings", "admin_scripts"]
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_builtin_with_bad_environment(self):
         """
@@ -1351,7 +1370,7 @@ class ManageMultipleSettings(AdminScriptTestCase):
         args = ["check", "admin_scripts"]
         out, err = self.run_manage(args, "bad_settings")
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+        self.assertEqual(err, "Settings module 'bad_settings' could not be imported.\n")
 
     def test_custom_command(self):
         """
@@ -1436,8 +1455,8 @@ class ManageSettingsWithSettingsErrors(AdminScriptTestCase):
         """
         self.write_settings(
             "settings.py",
-            extra="from django.core.exceptions import ImproperlyConfigured\n"
-            "raise ImproperlyConfigured()",
+            extra="from django.core.exceptions import SettingsException\n"
+            "raise SettingsException('Improper configuration')",
         )
         args = ["help"]
         out, err = self.run_manage(args)
@@ -1865,6 +1884,7 @@ class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
 class ManageRunserverHelpOutput(AdminScriptTestCase):
     def test_suppressed_options(self):
         """runserver doesn't support --verbosity and --trackback options."""
+        self.write_settings("settings.py")
         out, err = self.run_manage(["runserver", "--help"])
         self.assertNotInOutput(out, "--verbosity")
         self.assertNotInOutput(out, "--trackback")

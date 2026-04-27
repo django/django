@@ -222,6 +222,13 @@ All attributes can be set in your derived class and can be used in
     migrations on disk don't match the migrations in the database. A warning
     doesn't prevent the command from executing. Default value is ``False``.
 
+.. attribute:: BaseCommand.requires_settings
+
+    .. versionadded:: 6.1
+
+    A boolean; if ``False``, any :exc:`ImportError` encountered while loading
+    settings is suppressed. Default value is ``True``.
+
 .. attribute:: BaseCommand.requires_system_checks
 
     A list or tuple of tags, e.g. ``[Tags.staticfiles, Tags.models]``. System

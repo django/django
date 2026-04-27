@@ -15,7 +15,7 @@ from importlib import import_module
 import django
 from django.apps import apps
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import SettingsException
 from django.core.management.base import (
     BaseCommand,
     CommandError,
@@ -206,6 +206,7 @@ class ManagementUtility:
         if self.prog_name == "__main__.py":
             self.prog_name = "python -m django"
         self.settings_exception = None
+        self.style = color_style()
 
     def main_help_text(self, commands_only=False):
         """Return the script's main help text, as a string."""
@@ -226,16 +227,15 @@ class ManagementUtility:
                 else:
                     app = app.rpartition(".")[-1]
                 commands_dict[app].append(name)
-            style = color_style()
             for app in sorted(commands_dict):
                 usage.append("")
-                usage.append(style.NOTICE("[%s]" % app))
+                usage.append(self.style.NOTICE("[%s]" % app))
                 for name in sorted(commands_dict[app]):
                     usage.append("    %s" % name)
             # Output an extra note if settings are not properly configured
             if self.settings_exception is not None:
                 usage.append(
-                    style.NOTICE(
+                    self.style.NOTICE(
                         "Note that only Django core commands are listed "
                         "as settings are not properly configured (error: %s)."
                         % self.settings_exception
@@ -255,14 +255,10 @@ class ManagementUtility:
         try:
             app_name = commands[subcommand]
         except KeyError:
-            if os.environ.get("DJANGO_SETTINGS_MODULE"):
-                # If `subcommand` is missing due to misconfigured settings, the
-                # following line will retrigger an ImproperlyConfigured
-                # exception (get_commands() swallows the original one) so the
-                # user is informed about it.
-                settings.INSTALLED_APPS
+            if os.environ.get("DJANGO_SETTINGS_MODULE") and self.settings_exception:
+                sys.stderr.write(self.style.NOTICE(str(self.settings_exception) + "\n"))
             elif not settings.configured:
-                sys.stderr.write("No Django settings specified.\n")
+                sys.stderr.write(self.style.NOTICE("No Django settings specified.\n"))
             possible_matches = get_close_matches(subcommand, commands)
             sys.stderr.write("Unknown command: %r" % subcommand)
             if possible_matches:
@@ -274,6 +270,9 @@ class ManagementUtility:
             klass = app_name
         else:
             klass = load_command_class(app_name, subcommand)
+        if self.settings_exception and klass.requires_settings:
+            sys.stderr.write(self.style.NOTICE(str(self.settings_exception) + "\n"))
+            sys.exit(1)
         return klass
 
     def autocomplete(self):
@@ -381,9 +380,7 @@ class ManagementUtility:
 
         try:
             settings.INSTALLED_APPS
-        except ImproperlyConfigured as exc:
-            self.settings_exception = exc
-        except ImportError as exc:
+        except SettingsException as exc:
             self.settings_exception = exc
 
         if settings.configured:
