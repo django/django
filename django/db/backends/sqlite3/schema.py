@@ -6,7 +6,7 @@ from django.db import NotSupportedError
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.ddl_references import Statement
 from django.db.backends.utils import strip_quotes
-from django.db.models import CompositePrimaryKey, UniqueConstraint
+from django.db.models import CheckConstraint, CompositePrimaryKey, UniqueConstraint
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -485,6 +485,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             or constraint.deferrable
         ):
             super().add_constraint(model, constraint)
+        # On SQLite 3.53.0+, use newly supported "ALTER TABLE ... ALTER COLUMN
+        # ... ADD CONSTRAINT ... CHECK ...".
+        elif isinstance(
+            constraint, CheckConstraint
+        ) and self.connection.Database.sqlite_version_info >= (3, 53):
+            super().add_constraint(model, constraint)
         else:
             self._remake_table(model)
 
@@ -495,6 +501,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             or constraint.include
             or constraint.deferrable
         ):
+            super().remove_constraint(model, constraint)
+        # On SQLite 3.53.0+, use newly supported "ALTER TABLE ... ALTER COLUMN
+        # ... DROP CONSTRAINT ...".
+        elif isinstance(
+            constraint, CheckConstraint
+        ) and self.connection.Database.sqlite_version_info >= (3, 53):
             super().remove_constraint(model, constraint)
         else:
             self._remake_table(model)

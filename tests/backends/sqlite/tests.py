@@ -16,7 +16,17 @@ from django.db import (
     connections,
     transaction,
 )
-from django.db.models import Aggregate, Avg, StdDev, Sum, Variance
+from django.db.models import (
+    Aggregate,
+    Avg,
+    CheckConstraint,
+    IntegerField,
+    Model,
+    Q,
+    StdDev,
+    Sum,
+    Variance,
+)
 from django.db.utils import ConnectionHandler
 from django.test import SimpleTestCase, TestCase, TransactionTestCase, override_settings
 from django.test.utils import CaptureQueriesContext, isolate_apps
@@ -181,6 +191,26 @@ class SchemaTests(TransactionTestCase):
         with self.assertRaisesMessage(NotSupportedError, msg):
             with transaction.atomic(), connection.schema_editor(atomic=True):
                 pass
+
+    @isolate_apps("backends")
+    def test_add_remove_check_constraint_without_remake(self):
+        if connection.Database.sqlite_version_info < (3, 53, 0):
+            raise unittest.SkipTest("SQLite >= 3.53.0 required")
+
+        class Puppy(Model):
+            age = IntegerField()
+
+        constraint = CheckConstraint(condition=Q(age__gte=0), name="age_gte_0")
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Puppy)
+
+            with mock.patch.object(editor, "_remake_table") as remake:
+                editor.add_constraint(Puppy, constraint)
+                remake.assert_not_called()
+
+                editor.remove_constraint(Puppy, constraint)
+                remake.assert_not_called()
 
     def test_constraint_checks_disabled_atomic_allowed(self):
         """
