@@ -368,24 +368,12 @@ class CourseProxy2(Course):
         proxy = True
 
 
-# models for #36984
-
-
-class Subject(models.Model):
-    name = models.CharField(max_length=100)
-
-
-class BankAccount(models.Model):
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    account_number = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.account_number
+# model for #36984
 
 
 class Invoice(models.Model):
-    subject = models.ForeignKey(Subject, on_delete=models.PROTECT)
-    account = models.ForeignKey(BankAccount, on_delete=models.PROTECT)
+    parent = models.ForeignKey("ShowInlineParent", on_delete=models.PROTECT)
+    child = models.ForeignKey("ShowInlineChild", on_delete=models.PROTECT)
     number = models.CharField(max_length=100)
 
     class Meta:
@@ -402,6 +390,9 @@ class ShowInlineParent(models.Model):
 
 class ShowInlineChild(models.Model):
     parent = models.ForeignKey(ShowInlineParent, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Child {self.parent.show_inlines}"
 
 
 class ProfileCollection(models.Model):
