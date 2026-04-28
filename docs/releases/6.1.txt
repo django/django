@@ -394,8 +394,8 @@ Utilities
 * :func:`~django.utils.dateparse.parse_duration` now supports ISO 8601
   time periods expressed in weeks (``PnW``).
 
-* :func:`~django.utils.timesince.timesince` and
-  :func:`~django.utils.timesince.timeuntil` now correctly calculate elapsed
+* ``django.utils.timesince.timesince()`` and
+  ``django.utils.timesince.timeuntil()`` now correctly calculate elapsed
   time across DST (Daylight Saving Time) transitions when using timezone-aware
   datetimes, by converting to UTC before computing the difference.
 

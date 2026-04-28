@@ -282,9 +282,7 @@ class TimesinceTests(TestCase):
         berlin = zoneinfo.ZoneInfo("Europe/Berlin")
         t = datetime.datetime(2024, 10, 27, 2, 55, tzinfo=berlin)
         ten_minutes_later = datetime.datetime(2024, 10, 27, 2, 5, fold=1, tzinfo=berlin)
-        seventy_minutes_later = datetime.datetime(
-            2024, 10, 27, 3, 5, tzinfo=berlin
-        )
+        seventy_minutes_later = datetime.datetime(2024, 10, 27, 3, 5, tzinfo=berlin)
 
         self.assertEqual(timesince(t, ten_minutes_later), "10\xa0minutes")
         self.assertEqual(
