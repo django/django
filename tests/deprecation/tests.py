@@ -31,7 +31,14 @@ class DjangoFilePrefixesTests(SimpleTestCase):
         prefixes = django_file_prefixes()
         self.assertIsInstance(prefixes, tuple)
         self.assertEqual(len(prefixes), 1)
-        self.assertTrue(prefixes[0].endswith(f"{os.path.sep}django"))
+        self.assertTrue(prefixes[0].endswith(f"{os.path.sep}django{os.path.sep}"))
+
+    def test_does_not_match_packages_prefixed_with_django(self):
+        (django_prefix,) = django_file_prefixes()
+        django_dir = django_prefix.removesuffix(os.path.sep)
+        site_packages_dir = os.path.dirname(django_dir)
+        package_file = os.path.join(site_packages_dir, "django_goodies", "__init__.py")
+        self.assertFalse(package_file.startswith(django_prefix))
 
 
 class RenameManagerMethods(RenameMethodsBase):
