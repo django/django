@@ -278,6 +278,36 @@ class TimesinceTests(TestCase):
             with self.subTest(value):
                 self.assertEqual(timesince(value, now_utc), expected)
 
+    def test_across_dst_fallback_with_zoneinfo(self):
+        berlin = zoneinfo.ZoneInfo("Europe/Berlin")
+        t = datetime.datetime(2024, 10, 27, 2, 55, tzinfo=berlin)
+        ten_minutes_later = datetime.datetime(2024, 10, 27, 2, 5, fold=1, tzinfo=berlin)
+        seventy_minutes_later = datetime.datetime(
+            2024, 10, 27, 3, 5, tzinfo=berlin
+        )
+
+        self.assertEqual(timesince(t, ten_minutes_later), "10\xa0minutes")
+        self.assertEqual(
+            timesince(t, seventy_minutes_later),
+            "1\xa0hour, 10\xa0minutes",
+        )
+
+    def test_across_dst_fallback_same_wall_time_with_different_fold(self):
+        berlin = zoneinfo.ZoneInfo("Europe/Berlin")
+        earlier = datetime.datetime(2024, 10, 27, 2, 5, fold=0, tzinfo=berlin)
+        later = datetime.datetime(2024, 10, 27, 2, 5, fold=1, tzinfo=berlin)
+
+        self.assertEqual(timesince(earlier, later), "1\xa0hour")
+        self.assertEqual(timeuntil(later, earlier), "1\xa0hour")
+
+    def test_across_dst_spring_forward_with_zoneinfo(self):
+        berlin = zoneinfo.ZoneInfo("Europe/Berlin")
+        start = datetime.datetime(2025, 3, 30, 1, 55, tzinfo=berlin)
+        ten_minutes_later = datetime.datetime(2025, 3, 30, 3, 5, tzinfo=berlin)
+
+        self.assertEqual(timesince(start, ten_minutes_later), "10\xa0minutes")
+        self.assertEqual(timeuntil(ten_minutes_later, start), "10\xa0minutes")
+
 
 @requires_tz_support
 @override_settings(USE_TZ=True)

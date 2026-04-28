@@ -71,7 +71,31 @@ def timesince(d, now=None, reversed=False, time_strings=None, depth=2):
 
     if reversed:
         d, now = now, d
-    delta = now - d
+    both_aware = is_aware(now) and is_aware(d)
+
+    def build_pivot(total_months):
+        if not total_months:
+            return d
+        years, months = divmod(total_months, 12)
+        pivot_year = d.year + years
+        pivot_month = d.month + months
+        if pivot_month > 12:
+            pivot_month -= 12
+            pivot_year += 1
+        return datetime.datetime(
+            pivot_year,
+            pivot_month,
+            min(MONTHS_DAYS[pivot_month - 1], d.day),
+            d.hour,
+            d.minute,
+            d.second,
+            tzinfo=d.tzinfo,
+        )
+
+    if both_aware:
+        delta = now.astimezone(datetime.UTC) - d.astimezone(datetime.UTC)
+    else:
+        delta = now - d
 
     # Ignore microseconds.
     since = delta.days * 24 * 60 * 60 + delta.seconds
@@ -81,31 +105,32 @@ def timesince(d, now=None, reversed=False, time_strings=None, depth=2):
 
     # Get years and months.
     total_months = (now.year - d.year) * 12 + (now.month - d.month)
-    if d.day > now.day or (d.day == now.day and d.time() > now.time()):
-        total_months -= 1
+    total_months = max(total_months, 0)
     years, months = divmod(total_months, 12)
 
     # Calculate the remaining time.
     # Create a "pivot" datetime shifted from d by years and months, then use
     # that to determine the other parts.
-    if years or months:
-        pivot_year = d.year + years
-        pivot_month = d.month + months
-        if pivot_month > 12:
-            pivot_month -= 12
-            pivot_year += 1
-        pivot = datetime.datetime(
-            pivot_year,
-            pivot_month,
-            min(MONTHS_DAYS[pivot_month - 1], d.day),
-            d.hour,
-            d.minute,
-            d.second,
-            tzinfo=d.tzinfo,
-        )
+    pivot = build_pivot(total_months)
+    if total_months:
+        if both_aware:
+            pivot_is_later = pivot.astimezone(datetime.UTC) > now.astimezone(
+                datetime.UTC
+            )
+        else:
+            pivot_is_later = pivot > now
     else:
-        pivot = d
-    remaining_time = (now - pivot).total_seconds()
+        pivot_is_later = False
+    if pivot_is_later:
+        total_months -= 1
+        years, months = divmod(total_months, 12)
+        pivot = build_pivot(total_months)
+    if both_aware:
+        remaining_time = (
+            now.astimezone(datetime.UTC) - pivot.astimezone(datetime.UTC)
+        ).total_seconds()
+    else:
+        remaining_time = (now - pivot).total_seconds()
     partials = [years, months]
     for chunk in TIME_CHUNKS:
         count = int(remaining_time // chunk)
