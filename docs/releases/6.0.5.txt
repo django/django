@@ -14,3 +14,6 @@ Bugfixes
   ``django/contrib/admin/templates/admin/change_list.html`` template added in
   Django 6.0 that could be problematic when overriding the ``pagination`` block
   (:ticket:`37029`).
+
+* Fixed a bug in Django 6.0 where deprecation warnings incorrectly skipped
+  lines from third-party packages prefixed with "django" (:ticket:`37067`).
