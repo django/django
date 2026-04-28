@@ -1,3 +1,4 @@
+import warnings
 from contextlib import ContextDecorator, contextmanager
 
 from django.db import (
@@ -7,6 +8,7 @@ from django.db import (
     ProgrammingError,
     connections,
 )
+from django.utils.deprecation import RemovedInDjango70Warning
 
 
 class TransactionManagementError(ProgrammingError):
@@ -46,6 +48,20 @@ def rollback(using=None):
 
 
 def savepoint(using=None):
+    """
+    Create a savepoint (if supported and required by the backend) inside the
+    current transaction. Return an identifier for the savepoint that will be
+    used for the subsequent rollback or commit.
+    """
+    warnings.warn(
+        "savepoint() is deprecated. Use savepoint_create() instead.",
+        stacklevel=2,
+        category=RemovedInDjango70Warning,
+    )
+    return savepoint_create(using=using)
+
+
+def savepoint_create(using=None):
     """
     Create a savepoint (if supported and required by the backend) inside the
     current transaction. Return an identifier for the savepoint that will be

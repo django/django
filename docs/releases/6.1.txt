@@ -573,6 +573,9 @@ Miscellaneous
   :class:`~django.db.models.BitOr`, and :class:`~django.db.models.BitXor`
   classes.
 
+* ``django.db.transaction.savepoint`` has been deprecated in favor of
+  ``django.db.transaction.savepoint_create``.
+
 Features removed in 6.1
 =======================
 

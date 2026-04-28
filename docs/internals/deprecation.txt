@@ -77,6 +77,9 @@ details on these changes.
   ``django.contrib.postgres.aggregates.BitOr``, and
   ``django.contrib.postgres.aggregates.BitXor`` classes will be removed.
 
+* ``django.db.transaction.savepoint`` alias to
+  ``django.db.transaction.savepoint_create`` will be removed.
+
 .. _deprecation-removed-in-6.1:
 
 6.1

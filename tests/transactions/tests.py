@@ -17,6 +17,7 @@ from django.test import (
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import Reporter
 
@@ -214,7 +215,7 @@ class AtomicTests(TransactionTestCase):
     def test_prevent_rollback(self):
         with transaction.atomic():
             reporter = Reporter.objects.create(first_name="Tintin")
-            sid = transaction.savepoint()
+            sid = transaction.savepoint_create()
             # trigger a database error inside an inner atomic without savepoint
             with self.assertRaises(DatabaseError):
                 with transaction.atomic(savepoint=False):
@@ -589,3 +590,10 @@ class DurableTransactionTests(DurableTestsBase, TransactionTestCase):
 
 class DurableTests(DurableTestsBase, TestCase):
     pass
+
+
+class SavepointTests(TestCase):
+    def test_deprecation_warning(self):
+        msg = "savepoint() is deprecated. Use savepoint_create() instead."
+        with self.assertRaisesMessage(RemovedInDjango70Warning, msg):
+            transaction.savepoint()
