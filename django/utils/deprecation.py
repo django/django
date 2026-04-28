@@ -16,7 +16,9 @@ def django_file_prefixes():
     file = getattr(django, "__file__", None)
     if file is None:
         return ()
-    return (os.path.dirname(file),)
+
+    base = os.path.dirname(os.path.dirname(__file__))
+    return (os.path.join(base, ""),)
 
 
 class RemovedInNextVersionWarning(DeprecationWarning):

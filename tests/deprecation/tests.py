@@ -31,7 +31,40 @@ class DjangoFilePrefixesTests(SimpleTestCase):
         prefixes = django_file_prefixes()
         self.assertIsInstance(prefixes, tuple)
         self.assertEqual(len(prefixes), 1)
-        self.assertTrue(prefixes[0].endswith(f"{os.path.sep}django"))
+        # /django must be in the prefix
+        self.assertTrue(os.path.normpath(prefixes[0]).endswith(f"{os.path.sep}django"))
+
+    def test_prefix_has_trailing_separator(self):
+        """django_file_prefixes() should end with a separator to avoid
+        matching packages like django_something."""
+        for prefix in django_file_prefixes():
+            self.assertTrue(
+                prefix.endswith(os.sep),
+            )
+
+    def test_sibling_package_not_skipped(self):
+        """Warnings from packages like django_something should
+        not be in django_file_prefixes and should not be skipped."""
+
+        something_file = os.path.dirname(django.__file__) + "_something/__init__.py"
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            exec(
+                compile("warn()", something_file, "exec"),
+                {
+                    "warn": lambda: warnings.warn(
+                        "deprecated.",
+                        DeprecationWarning,
+                        skip_file_prefixes=django_file_prefixes(),
+                    )
+                },
+            )
+
+        self.assertEqual(len(caught), 1)
+        self.assertEqual(
+            os.path.normcase(caught[0].filename), os.path.normcase(something_file)
+        )
 
 
 class RenameManagerMethods(RenameMethodsBase):
@@ -207,4 +240,42 @@ class RenameMethodsTests(SimpleTestCase):
     def test_removedafternextversionwarning_pending(self):
         self.assertTrue(
             issubclass(RemovedAfterNextVersionWarning, PendingDeprecationWarning)
+        )
+
+
+class DjangoSkipsSiblingPackagesTests(SimpleTestCase):
+    def setUp(self):
+        django_file_prefixes.cache_clear()
+        self.addCleanup(django_file_prefixes.cache_clear)
+
+    def test_prefix_has_trailing_separator(self):
+        """django_file_prefixes() should end with a separator to avoid
+        matching packages like django_something."""
+        for prefix in django_file_prefixes():
+            self.assertTrue(
+                prefix.endswith(os.sep),
+            )
+
+    def test_warnings_skip_past_packages_start_with_django(self):
+        """Warnings from packages like django_something should
+        not be in django_file_prefixes and should not be skipped."""
+
+        something_file = os.path.dirname(django.__file__) + "_something/__init__.py"
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            exec(
+                compile("warn()", something_file, "exec"),
+                {
+                    "warn": lambda: warnings.warn(
+                        "deprecated.",
+                        DeprecationWarning,
+                        skip_file_prefixes=django_file_prefixes(),
+                    )
+                },
+            )
+
+        self.assertEqual(len(caught), 1)
+        self.assertEqual(
+            os.path.normcase(caught[0].filename), os.path.normcase(something_file)
         )
