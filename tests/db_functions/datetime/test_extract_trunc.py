@@ -2039,6 +2039,12 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
                     start_trunc=TruncSecond("start_datetime")
                 ).filter(id=non_utc_model.id, start_trunc__lte=adjusted_now)
                 self.assertEqual(models_qs.count(), 1, "time zone: {}".format(test_tz))
+                models_qs = DTModel.objects.annotate(
+                    start_trunc=TruncSecond(
+                        "start_datetime", tzinfo=zoneinfo.ZoneInfo("UTC")
+                    )
+                ).filter(id=non_utc_model.id, start_trunc__lte=now)
+                self.assertEqual(models_qs.count(), 1, "time zone: {}".format(test_tz))
 
 
 class Ticket34699Tests(TestCase):

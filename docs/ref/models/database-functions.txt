@@ -690,10 +690,9 @@ Usage example:
         ... ).filter(trunc_start__lte=start)
         >>> find_this_exp.count()
         0  # We expect to find one result but 0 are found
-        >>> start_adjusted = timezone.localtime(start).replace(tzinfo=zoneinfo.ZoneInfo(key="UTC"))
         >>> find_this_exp_adjusted = Experiment.objects.annotate(
-        ...     trunc_start=TruncSecond("start_datetime")
-        ... ).filter(trunc_start__lte=start_adjusted)
+        ...     trunc_start=TruncSecond("start_datetime", tzinfo=zoneinfo.ZoneInfo("UTC"))
+        ... ).filter(trunc_start__lte=start)
         >>> find_this_exp_adjusted.count()
         1
 
