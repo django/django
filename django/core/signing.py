@@ -96,7 +96,7 @@ def b64_decode(s):
     return base64.urlsafe_b64decode(s + pad)
 
 
-def base64_hmac(salt, value, key, algorithm="sha1"):
+def base64_hmac(salt, value, key, algorithm="sha256"):
     return b64_encode(
         salted_hmac(salt, value, key, algorithm=algorithm).digest()
     ).decode()

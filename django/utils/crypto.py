@@ -16,7 +16,7 @@ class InvalidAlgorithm(ValueError):
     pass
 
 
-def salted_hmac(key_salt, value, secret=None, *, algorithm="sha1"):
+def salted_hmac(key_salt, value, secret=None, *, algorithm="sha256"):
     """
     Return the HMAC of 'value', using a key generated from key_salt and a
     secret (which defaults to settings.SECRET_KEY). Default algorithm is SHA1,
