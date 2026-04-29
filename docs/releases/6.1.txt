@@ -582,9 +582,9 @@ Miscellaneous
   :class:`~django.db.models.BitOr`, and :class:`~django.db.models.BitXor`
   classes.
 
-* Support for a double-dot variable lookup like ``{{ book..title }}`` which
-  maps to a lookup of the empty string before the next lookup of the named
-  attribute is deprecated.
+* Support for double-dot variable lookups, like ``{{ book..title }}``, is
+  deprecated. This syntax maps to a lookup of the empty string, which is
+  normally a mistake.
 
 Features removed in 6.1
 =======================
