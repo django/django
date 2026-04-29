@@ -1,4 +1,4 @@
-{% load i18n static %}<!DOCTYPE html>
+{% load i18n static tz %}<!DOCTYPE html>
 {% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}">
 <head>
@@ -25,7 +25,8 @@
 </head>
 
 <body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}"
-  data-admin-utc-offset="{% now "Z" %}">
+  data-admin-utc-offset="{% now "Z" %}"
+  data-admin-server-timezone="{% get_current_timezone as time_zone %}{{ time_zone }}">
 <a href="#content-start" class="skip-to-content-link">{% translate 'Skip to main content' %}</a>
 <!-- Container -->
 <div id="container">

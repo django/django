@@ -1337,7 +1337,7 @@ Overriding settings
 
 For testing purposes it's often useful to change a setting temporarily and
 revert to the original value after running the testing code. For this use case
-Django provides a standard Python context manager (see :pep:`343`) called
+Django provides a standard :ref:`context manager <context-managers>` called
 :meth:`~django.test.SimpleTestCase.settings`, which can be used like this::
 
     from django.test import TestCase
@@ -1390,8 +1390,7 @@ neither does ``remove`` when the value doesn't exist.
 .. function:: override_settings(**kwargs)
 
 In case you want to override a setting for a test method, Django provides the
-:func:`~django.test.override_settings` decorator (see :pep:`318`). It's used
-like this::
+:func:`~django.test.override_settings` :term:`python:decorator`::
 
     from django.test import TestCase, override_settings
 

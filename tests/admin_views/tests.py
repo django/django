@@ -26,6 +26,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.checks import Error
 from django.core.files import temp as tempfile
+from django.db.models.utils import get_blank_choice_label
 from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
 from django.test import (
@@ -4197,6 +4198,26 @@ class AdminViewDeletedObjectsTest(TestCase):
         # BookAdmin.get_deleted_objects() returns custom text.
         self.assertContains(response, "a deletable object")
 
+    def test_delete_view_uses_delete_confirmation_max_display(self):
+        book = Book.objects.create(name="Test Book")
+        response = self.client.get(
+            reverse("admin2:admin_views_book_delete", args=(book.pk,))
+        )
+        self.assertContains(response, "a deletable object")
+        self.assertContains(response, "…and 2 more objects.")
+        self.assertNotContains(response, "another object")
+        self.assertNotContains(response, "last object")
+
+    def test_delete_view_hides_objects_when_delete_confirmation_max_display_is_zero(
+        self,
+    ):
+        book = Book.objects.create(name="Test Book")
+        response = self.client.get(
+            reverse("admin_zero_display:admin_views_book_delete", args=(book.pk,))
+        )
+        self.assertNotContains(response, "<h2>Objects</h2>")
+        self.assertNotContains(response, 'id="deleted-objects"')
+
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class TestGenericRelations(TestCase):
@@ -5055,14 +5076,14 @@ class AdminViewListEditable(TestCase):
         self.client.force_login(self.superuser)
 
         response = self.client.get(reverse("admin9:admin_views_person_changelist"))
-        # Editable fields present
-        self.assertContains(response, 'name="form-1-gender"')
-        self.assertContains(response, 'name="form-1-alive"')
-        # Non-editable fields should NOT have inputs
-        self.assertNotContains(response, 'name="form-0-gender"')
-        self.assertNotContains(response, 'name="form-0-alive"')
-        self.assertNotContains(response, 'name="form-2-gender"')
-        self.assertNotContains(response, 'name="form-2-alive"')
+        # Non-editable fields should NOT have inputs.
+        self.assertNotContains(response, 'name="form-1-gender"')
+        self.assertNotContains(response, 'name="form-1-alive"')
+        # Editable fields are present.
+        self.assertContains(response, 'name="form-0-gender"')
+        self.assertContains(response, 'name="form-0-alive"')
+        self.assertContains(response, 'name="form-2-gender"')
+        self.assertContains(response, 'name="form-2-alive"')
 
     def test_list_editable_per_object_permissions_submission(self):
         """
@@ -5071,26 +5092,28 @@ class AdminViewListEditable(TestCase):
         """
         self.client.logout()
         self.client.force_login(self.superuser)
-
+        # Skip the instance lacking edit permission (include only its id).
         data = {
             "form-TOTAL_FORMS": "3",
             "form-INITIAL_FORMS": "3",
             "form-MAX_NUM_FORMS": "0",
-            "form-0-gender": "2",  # Change per1 (not allowed)
+            "form-0-gender": "2",
+            "form-0-alive": "checked",
             "form-0-id": str(self.per1.pk),
-            "form-1-gender": "2",  # Change per2 (allowed)
-            "form-1-id": str(self.per2.pk),
-            "form-2-gender": "2",  # Change per3 (not allowed)
+            "form-1-id": str(self.per2.pk),  # not editable
+            "form-2-gender": "2",
+            "form-2-alive": "checked",
             "form-2-id": str(self.per3.pk),
             "_save": "Save",
         }
         response = self.client.post(
             reverse("admin9:admin_views_person_changelist"), data, follow=True
         )
-        # per2 and per3 were updated, but per1 was not
-        self.assertEqual(Person.objects.get(pk=self.per1.pk).gender, 1)  # Unchanged
-        self.assertEqual(Person.objects.get(pk=self.per2.pk).gender, 2)
-        self.assertEqual(Person.objects.get(pk=self.per3.pk).gender, 1)  # Unchanged
+        # per1 and per3 were updated, but per2 was not.
+        self.assertEqual(Person.objects.get(pk=self.per1.pk).gender, 2)
+        self.assertEqual(Person.objects.get(pk=self.per2.pk).gender, 1)  # Unchanged
+        self.assertEqual(Person.objects.get(pk=self.per3.pk).gender, 2)
+
         # Check for success message
         self.assertEqual(len(response.context["messages"]), 1)
 
@@ -6929,7 +6952,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         select = Select(self.selenium.find_element(By.ID, "id_parent"))
         self.assertEqual(ParentWithUUIDPK.objects.count(), 0)
-        self.assertEqual(select.first_selected_option.text, "---------")
+        self.assertEqual(select.first_selected_option.text, get_blank_choice_label())
         self.assertEqual(select.first_selected_option.get_attribute("value"), "")
 
     def test_inline_with_popup_cancel_delete(self):
@@ -7179,7 +7202,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(born_country_select_id),
             f"""
-            <option value="" selected="">---------</option>
+            <option value="" selected="">- Select an option -</option>
             <option value="{argentina.pk}" selected="">Argentina</option>
             """,
         )
@@ -7198,7 +7221,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         # limit_choices_to.
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(favorite_country_to_vacation_select_id),
-            '<option value="" selected="">---------</option>',
+            '<option value="" selected="">- Select an option -</option>',
         )
 
         # Add new Country from the living_country select.
@@ -7218,7 +7241,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(born_country_select_id),
             f"""
-            <option value="" selected="">---------</option>
+            <option value="" selected="">- Select an option -</option>
             <option value="{argentina.pk}" selected="">Argentina</option>
             <option value="{spain.pk}">Spain</option>
             """,
@@ -7240,7 +7263,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         # limit_choices_to.
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(favorite_country_to_vacation_select_id),
-            '<option value="" selected="">---------</option>',
+            '<option value="" selected="">- Select an option -</option>',
         )
 
         # Edit second Country created from living_country select.
@@ -7261,7 +7284,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(born_country_select_id),
             f"""
-            <option value="" selected="">---------</option>
+            <option value="" selected="">- Select an option -</option>
             <option value="{argentina.pk}" selected="">Argentina</option>
             <option value="{italy.pk}">Italy</option>
             """,
@@ -7281,7 +7304,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         # favorite_country_to_vacation field has no options.
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(favorite_country_to_vacation_select_id),
-            '<option value="" selected="">---------</option>',
+            '<option value="" selected="">- Select an option -</option>',
         )
 
         # Add a new Asian country.

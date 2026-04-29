@@ -2,9 +2,10 @@
 Django 6.0.5 release notes
 ==========================
 
-*Expected May 5, 2026*
+*May 5, 2026*
 
-Django 6.0.5 fixes several bugs in 6.0.4.
+Django 6.0.5 fixes three security issues with severity "low" and several bugs
+in 6.0.4.
 
 Bugfixes
 ========
@@ -13,3 +14,6 @@ Bugfixes
   ``django/contrib/admin/templates/admin/change_list.html`` template added in
   Django 6.0 that could be problematic when overriding the ``pagination`` block
   (:ticket:`37029`).
+
+* Fixed a bug in Django 6.0 where deprecation warnings incorrectly skipped
+  lines from third-party packages prefixed with "django" (:ticket:`37067`).

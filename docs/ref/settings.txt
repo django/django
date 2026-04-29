@@ -1636,6 +1636,12 @@ when using the :djadmin:`collectstatic` management command. See
     modes must be specified. If you try to use ``644``, you'll get totally
     incorrect behavior.
 
+.. admonition:: A numeric value trumps umask
+
+    When this setting has a numeric value (one you've set yourself, or the
+    default ``0o644``), this value will be used as is, and a umask will not
+    be applied to it. The umask will apply only if this setting is ``None``.
+
 .. setting:: FILE_UPLOAD_TEMP_DIR
 
 ``FILE_UPLOAD_TEMP_DIR``
@@ -3044,6 +3050,19 @@ the correct environment.
 
 .. _list of time zones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
+.. setting:: USE_BLANK_CHOICE_DASH
+
+``USE_BLANK_CHOICE_DASH``
+------------------------------------
+
+.. versionadded:: 6.1
+.. deprecated:: 6.1
+
+Default: ``False``
+
+Set this transitional setting to ``True`` to revert back to the old default
+blank choice label in forms.
+
 .. setting:: USE_I18N
 
 ``USE_I18N``
@@ -3851,6 +3870,7 @@ File uploads
 Forms
 -----
 * :setting:`FORM_RENDERER`
+* :setting:`USE_BLANK_CHOICE_DASH`
 
 Globalization (``i18n``/``l10n``)
 ---------------------------------

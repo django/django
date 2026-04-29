@@ -57,7 +57,7 @@ import warnings
 from enum import Enum
 
 from django.template.context import BaseContext
-from django.utils.deprecation import django_file_prefixes
+from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.formats import localize
 from django.utils.html import conditional_escape
 from django.utils.inspect import lazy_annotations, signature
@@ -555,6 +555,23 @@ class Parser:
                 except TemplateSyntaxError as e:
                     raise self.error(token, e)
                 var_node = VariableNode(filter_expression)
+                if ".." in str(filter_expression.var):
+                    warnings.warn(
+                        "Support for double-dot lookups '..' which maps to a "
+                        "lookup of the empty string is deprecated.\n"
+                        f"  Template: {self.origin.name}\n"
+                        f"  Line: {token.lineno}",
+                        RemovedInDjango70Warning,
+                        skip_file_prefixes=django_file_prefixes(),
+                    )
+
+                    # RemovedInDjango70Warning
+                    # When deprecation ends elevate the warning to an error.
+                    # raise self.error(
+                    #     token,
+                    #     ("Variable contains '..' on line %d" % token.lineno),
+                    # )
+
                 self.extend_nodelist(nodelist, var_node, token)
             elif token_type == 2:  # TokenType.BLOCK
                 try:

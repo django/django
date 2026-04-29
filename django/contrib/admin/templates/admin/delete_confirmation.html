@@ -23,19 +23,21 @@
 {% if perms_lacking %}
   {% block delete_forbidden %}
     <p>{% blocktranslate %}Deleting the {{ object_name }} “{{ escaped_object }}” would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:{% endblocktranslate %}</p>
-    <ul id="deleted-objects">{{ perms_lacking|unordered_list }}</ul>
+    <ul id="deleted-objects">{{ perms_lacking|truncated_unordered_list:delete_confirmation_max_display }}</ul>
   {% endblock %}
 {% elif protected %}
   {% block delete_protected %}
     <p>{% blocktranslate %}Deleting the {{ object_name }} “{{ escaped_object }}” would require deleting the following protected related objects:{% endblocktranslate %}</p>
-    <ul id="deleted-objects">{{ protected|unordered_list }}</ul>
+    <ul id="deleted-objects">{{ protected|truncated_unordered_list:delete_confirmation_max_display }}</ul>
   {% endblock %}
 {% else %}
   {% block delete_confirm %}
     <p>{% blocktranslate %}Are you sure you want to delete the {{ object_name }} “{{ escaped_object }}”? All of the following related items will be deleted:{% endblocktranslate %}</p>
     {% include "admin/includes/object_delete_summary.html" %}
+    {% if delete_confirmation_max_display is None or delete_confirmation_max_display > 0 %}
     <h2>{% translate "Objects" %}</h2>
-    <ul id="deleted-objects">{{ deleted_objects|unordered_list }}</ul>
+    <ul id="deleted-objects">{{ deleted_objects|truncated_unordered_list:delete_confirmation_max_display }}</ul>
+    {% endif %}
     <form method="post">{% csrf_token %}
     <div>
     <input type="hidden" name="post" value="yes">
