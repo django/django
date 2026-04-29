@@ -1,9 +1,9 @@
 import os
+import runpy
 import select
 import sys
 import traceback
 from collections import defaultdict
-from importlib import import_module
 
 from django.apps import apps
 from django.core.exceptions import AppRegistryNotReady
@@ -80,12 +80,12 @@ class Command(BaseCommand):
                     continue
                 if not os.path.isfile(pythonrc):
                     continue
-                with open(pythonrc) as handle:
-                    pythonrc_code = handle.read()
                 # Match the behavior of the cpython shell where an error in
                 # PYTHONSTARTUP prints an exception and continues.
                 try:
-                    exec(compile(pythonrc_code, pythonrc, "exec"), imported_objects)
+                    imported_objects.update(
+                        runpy.run_path(pythonrc, init_globals=imported_objects)
+                    )
                 except Exception:
                     traceback.print_exc()
 
@@ -189,16 +189,12 @@ class Command(BaseCommand):
         import_errors = []
         for path in path_imports:
             try:
-                obj = import_dotted_path(path) if "." in path else import_module(path)
+                obj = import_dotted_path(path)
             except ImportError:
                 import_errors.append(path)
                 continue
 
-            if "." in path:
-                module, name = path.rsplit(".", 1)
-            else:
-                module = None
-                name = path
+            module, name = path.rsplit(".", 1)
             if (name, obj) not in auto_imports[module]:
                 auto_imports[module].append((name, obj))
 
@@ -256,9 +252,12 @@ class Command(BaseCommand):
         return namespace
 
     def handle(self, **options):
+        import code
+
         # Execute the command and exit.
         if options["command"]:
-            exec(options["command"], {**globals(), **self.get_namespace(**options)})
+            console = code.InteractiveConsole(self.get_namespace(**options))
+            console.runcode(compile(options["command"], "<string>", "exec"))
             return
 
         # Execute stdin if it has anything to read and exit.
@@ -268,7 +267,8 @@ class Command(BaseCommand):
             and not sys.stdin.isatty()
             and select.select([sys.stdin], [], [], 0)[0]
         ):
-            exec(sys.stdin.read(), {**globals(), **self.get_namespace(**options)})
+            console = code.InteractiveConsole(self.get_namespace(**options))
+            console.runcode(compile(sys.stdin.read(), "<stdin>", "exec"))
             return
 
         available_shells = (
