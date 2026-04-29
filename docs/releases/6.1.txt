@@ -137,6 +137,12 @@ Minor features
 * The new :attr:`.Permission.user_perm_str` property returns the string
   suitable to use with :meth:`.User.has_perm`.
 
+* The new async only middleware classes
+  :class:`django.contrib.auth.middleware.AsyncRemoteUserMiddleware` and
+  :class:`django.contrib.auth.middleware.AsyncPersistentRemoteUserMiddleware`
+  were added. Async support for ``RemoteUserMiddleware`` and
+  ``PersistentRemoteUserMiddleware`` has been deprecated.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -537,6 +543,15 @@ Miscellaneous
 
 Features deprecated in 6.1
 ==========================
+
+Async support of ``RemoteUserMiddleware`` and ``PersistentRemoteUserMiddleware``
+--------------------------------------------------------------------------------
+
+Async support of ``RemoteUserMiddleware`` and
+``PersistentRemoteUserMiddleware`` is deprecated. Please use
+:class:`django.contrib.auth.middleware.AsyncRemoteUserMiddleware` and
+:class:`django.contrib.auth.middleware.AsyncPersistentRemoteUserMiddleware`
+instead.
 
 Miscellaneous
 -------------

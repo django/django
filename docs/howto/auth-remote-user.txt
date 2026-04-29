@@ -14,14 +14,30 @@ Windows Authentication or Apache and `mod_authnz_ldap`_, `CAS`_, `WebAuth`_,
 .. _WebAuth: https://uit.stanford.edu/service/authentication
 .. _mod_auth_sspi: https://sourceforge.net/projects/mod-auth-sspi
 
-When the web server takes care of authentication it typically sets the
-``REMOTE_USER`` environment variable for use in the underlying application. In
-Django, ``REMOTE_USER`` is made available in the :attr:`request.META
+Under WSGI, when the web server takes care of authentication it typically sets
+the ``REMOTE_USER`` environment variable for use in the underlying application.
+In Django, ``REMOTE_USER`` is made available in the :attr:`request.META
 <django.http.HttpRequest.META>` attribute. Django can be configured to make
 use of the ``REMOTE_USER`` value using the ``RemoteUserMiddleware``
 or ``PersistentRemoteUserMiddleware``, and
 :class:`~django.contrib.auth.backends.RemoteUserBackend` classes found in
 :mod:`django.contrib.auth`.
+
+Under ASGI, the web server or reverse proxy does not provide a ``REMOTE_USER``
+environment variable. Instead, the authenticated user is conveyed via an HTTP
+header. ``AsyncRemoteUserMiddleware`` reads this value from
+``request.headers``, where header names are treated case-insensitively. By
+default, it looks for a ``REMOTE_USER`` header, though this can be customized.
+In this case, Django can be configured to make use of the ``REMOTE_USER``
+value using the ``AsyncRemoteUserMiddleware`` or
+``AsyncPersistentRemoteUserMiddleware``, and
+:class:`~django.contrib.auth.backends.RemoteUserBackend` classes.
+
+.. versionchanged:: 6.1
+
+    :class:`django.contrib.auth.middleware.AsyncRemoteUserMiddleware` and
+    :class:`django.contrib.auth.middleware.AsyncPersistentRemoteUserMiddleware`
+    were added.
 
 Configuration
 =============
@@ -38,6 +54,16 @@ First, you must add the
         "...",
     ]
 
+When using ASGI, you must use the
+:class:`django.contrib.auth.middleware.AsyncRemoteUserMiddleware`::
+
+    MIDDLEWARE = [
+        "...",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+        "django.contrib.auth.middleware.AsyncRemoteUserMiddleware",
+        "...",
+    ]
+
 Next, you must replace the :class:`~django.contrib.auth.backends.ModelBackend`
 with :class:`~django.contrib.auth.backends.RemoteUserBackend` in the
 :setting:`AUTHENTICATION_BACKENDS` setting::
@@ -46,9 +72,12 @@ with :class:`~django.contrib.auth.backends.RemoteUserBackend` in the
         "django.contrib.auth.backends.RemoteUserBackend",
     ]
 
-With this setup, ``RemoteUserMiddleware`` will detect the username in
-``request.META['REMOTE_USER']`` and will authenticate and auto-login that user
-using the :class:`~django.contrib.auth.backends.RemoteUserBackend`.
+Under WSGI, with this setup, ``RemoteUserMiddleware`` will detect the username
+in ``request.META['REMOTE_USER']`` and will authenticate and auto-login that
+user using the :class:`~django.contrib.auth.backends.RemoteUserBackend`.
+
+Under ASGI, ``AsyncRemoteUserMiddleware`` will detect the username in
+``request.headers['REMOTE_USER']``.
 
 Be aware that this particular setup disables authentication with the default
 ``ModelBackend``. This means that if the ``REMOTE_USER`` value is not set
@@ -74,7 +103,7 @@ regardless of ``AUTHENTICATION_BACKENDS``.
     :class:`~django.contrib.auth.backends.AllowAllUsersRemoteUserBackend` if
     you want to allow them to.
 
-If your authentication mechanism uses a custom HTTP header and not
+Under WSGI, if your authentication mechanism uses a custom HTTP header and not
 ``REMOTE_USER``, you can subclass ``RemoteUserMiddleware`` and set the
 ``header`` attribute to the desired ``request.META`` key. For example:
 
@@ -97,28 +126,35 @@ instead of :class:`django.contrib.auth.middleware.RemoteUserMiddleware`::
         "...",
     ]
 
+``AsyncRemoteUserMiddleware`` obtains the username from ``request.headers``
+rather than ``request.META``. Therefore, header names should be specified in
+their standard HTTP form (e.g. ``X-Remote-User``), rather than the ``HTTP_*``
+format used in ``request.META``. To use a different header, subclass
+:class:`~django.contrib.auth.middleware.AsyncRemoteUserMiddleware` and set the
+``header`` attribute to the desired header name:
+
+.. code-block:: python
+   :caption: ``mysite/middleware.py``
+
+    from django.contrib.auth.middleware import AsyncRemoteUserMiddleware
+
+
+    class CustomHeaderRemoteUserMiddleware(AsyncRemoteUserMiddleware):
+        header = "X-Remote-User"
+
+As before, this middleware should then be added to the :setting:`MIDDLEWARE`
+setting in place of
+:class:`django.contrib.auth.middleware.AsyncRemoteUserMiddleware`.
+
 .. warning::
 
-    ``RemoteUserMiddleware`` must not be deployed in configurations where a
-    client can supply the header. You must be sure that your web server or
+    ``AsyncRemoteUserMiddleware`` must not be deployed in configurations where
+    a client can supply the header. You must be sure that your web server or
     reverse proxy always sets or strips that header based on the appropriate
     authentication checks, never permitting an end user to submit a fake (or
     "spoofed") header value. In particular, ASGI deployments cannot be exposed
     directly to the internet (that is, without a reverse proxy) when using this
     middleware.
-
-    Since the HTTP headers ``X-Auth-User`` and ``X-Auth_User`` (for example)
-    both normalize to the ``HTTP_X_AUTH_USER`` key in ``request.META``, you
-    must also check that your web server doesn't allow a spoofed header using
-    underscores in place of dashes.
-
-    Under WSGI, this warning doesn't apply to ``RemoteUserMiddleware`` in its
-    default configuration with ``header = "REMOTE_USER"``, since a key that
-    doesn't start with ``HTTP_`` in ``request.META`` can only be set by your
-    WSGI server, not directly from an HTTP request header. This warning *does*
-    apply by default on ASGI, because in the async path, the middleware
-    prepends ``HTTP_`` to the defined header name before looking it up in
-    ``request.META``.
 
 If you need more control, you can create your own authentication backend
 that inherits from :class:`~django.contrib.auth.backends.RemoteUserBackend` and
@@ -129,16 +165,17 @@ override one or more of its attributes and methods.
 Using ``REMOTE_USER`` on login pages only
 =========================================
 
-The ``RemoteUserMiddleware`` authentication middleware assumes that the HTTP
-request header ``REMOTE_USER`` is present with all authenticated requests. That
-might be expected and practical when Basic HTTP Auth with ``htpasswd`` or
-similar mechanisms are used, but with Negotiate (GSSAPI/Kerberos) or other
-resource intensive authentication methods, the authentication in the front-end
-HTTP server is usually only set up for one or a few login URLs, and after
-successful authentication, the application is supposed to maintain the
-authenticated session itself.
+The ``RemoteUserMiddleware`` and ``AsyncRemoteUserMiddleware`` authentication
+middleware assumes that the HTTP request header ``REMOTE_USER`` is present with
+all authenticated requests. That might be expected and practical when Basic
+HTTP Auth with ``htpasswd`` or similar mechanisms are used, but with Negotiate
+(GSSAPI/Kerberos) or other resource intensive authentication methods, the
+authentication in the front-end HTTP server is usually only set up for one or a
+few login URLs, and after successful authentication, the application is
+supposed to maintain the authenticated session itself.
 
-:class:`~django.contrib.auth.middleware.PersistentRemoteUserMiddleware`
+:class:`~django.contrib.auth.middleware.PersistentRemoteUserMiddleware` and
+:class:`~django.contrib.auth.middleware.AsyncPersistentRemoteUserMiddleware`
 provides support for this use case. It will maintain the authenticated session
 until explicit logout by the user. The class can be used as a drop-in
 replacement of :class:`~django.contrib.auth.middleware.RemoteUserMiddleware`

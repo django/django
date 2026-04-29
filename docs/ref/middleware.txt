@@ -579,11 +579,36 @@ Customize the login URL or field name for authenticated views with the
     :doc:`/howto/auth-remote-user` for usage details, including security
     considerations.
 
+    .. deprecated:: 6.1
+
+        Async support of this middleware is deprecated.
+
+.. class:: AsyncRemoteUserMiddleware
+
+    .. versionadded:: 6.1
+
+    Middleware for utilizing web server provided authentication under ASGI
+    deployments. See :doc:`/howto/auth-remote-user` for usage details,
+    including security considerations.
+
 .. class:: PersistentRemoteUserMiddleware
 
     Middleware for utilizing web server provided authentication when enabled
     only on the login page. See :ref:`persistent-remote-user-middleware-howto`
     for usage details, including security considerations.
+
+    .. deprecated:: 6.1
+
+        Async support of this middleware is deprecated.
+
+.. class:: AsyncPersistentRemoteUserMiddleware
+
+    .. versionadded:: 6.1
+
+    Middleware for utilizing web server provided authentication when enabled
+    only on the login page under ASGI deployments. See
+    :ref:`persistent-remote-user-middleware-howto` for usage details, including
+    security considerations.
 
 CSRF protection middleware
 --------------------------

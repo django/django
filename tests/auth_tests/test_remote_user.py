@@ -3,7 +3,10 @@ from datetime import UTC, datetime
 from django.conf import settings
 from django.contrib.auth import aauthenticate, authenticate
 from django.contrib.auth.backends import RemoteUserBackend
-from django.contrib.auth.middleware import RemoteUserMiddleware
+from django.contrib.auth.middleware import (
+    AsyncRemoteUserMiddleware,
+    RemoteUserMiddleware,
+)
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
 from django.middleware.csrf import _get_new_csrf_string, _mask_cipher_secret
@@ -11,9 +14,11 @@ from django.test import (
     AsyncClient,
     Client,
     TestCase,
+    ignore_warnings,
     modify_settings,
     override_settings,
 )
+from django.utils.deprecation import RemovedInDjango70Warning
 
 
 @override_settings(ROOT_URLCONF="auth_tests.urls")
@@ -58,6 +63,8 @@ class RemoteUserTest(TestCase):
         self.assertTrue(response.context["user"].is_anonymous)
         self.assertEqual(User.objects.count(), num_users)
 
+    # RemovedInDjango70Warning.
+    @ignore_warnings(category=RemovedInDjango70Warning)
     async def test_no_remote_user_async(self):
         """See test_no_remote_user."""
         num_users = await User.objects.acount()
@@ -99,6 +106,8 @@ class RemoteUserTest(TestCase):
         response = csrf_client.post("/remote_user/", data, **headers)
         self.assertEqual(response.status_code, 200)
 
+    # RemovedInDjango70Warning.
+    @ignore_warnings(category=RemovedInDjango70Warning)
     async def test_csrf_validation_passes_after_process_request_login_async(self):
         """See test_csrf_validation_passes_after_process_request_login."""
         csrf_client = AsyncClient(enforce_csrf_checks=True)
@@ -139,6 +148,8 @@ class RemoteUserTest(TestCase):
         response = self.client.get("/remote_user/", **{self.header: "newuser"})
         self.assertEqual(User.objects.count(), num_users + 1)
 
+    # RemovedInDjango70Warning.
+    @ignore_warnings(category=RemovedInDjango70Warning)
     async def test_unknown_user_async(self):
         """See test_unknown_user."""
         num_users = await User.objects.acount()
@@ -171,6 +182,8 @@ class RemoteUserTest(TestCase):
         self.assertEqual(response.context["user"].username, "knownuser2")
         self.assertEqual(User.objects.count(), num_users)
 
+    # RemovedInDjango70Warning.
+    @ignore_warnings(category=RemovedInDjango70Warning)
     async def test_known_user_async(self):
         """See test_known_user."""
         await User.objects.acreate(username="knownuser")
@@ -211,6 +224,8 @@ class RemoteUserTest(TestCase):
         response = self.client.get("/remote_user/", **{self.header: self.known_user})
         self.assertEqual(default_login, response.context["user"].last_login)
 
+    # RemovedInDjango70Warning.
+    @ignore_warnings(category=RemovedInDjango70Warning)
     async def test_last_login_async(self):
         """See test_last_login."""
         user = await User.objects.acreate(username="knownuser")
@@ -255,6 +270,8 @@ class RemoteUserTest(TestCase):
         response = self.client.get("/remote_user/")
         self.assertEqual(response.context["user"].username, "modeluser")
 
+    # RemovedInDjango70Warning.
+    @ignore_warnings(category=RemovedInDjango70Warning)
     async def test_header_disappears_async(self):
         """See test_header_disappears."""
         await User.objects.acreate(username="knownuser")
@@ -291,6 +308,8 @@ class RemoteUserTest(TestCase):
         # In backends that do not create new users, it is '' (anonymous user)
         self.assertNotEqual(response.context["user"].username, "knownuser")
 
+    # RemovedInDjango70Warning.
+    @ignore_warnings(category=RemovedInDjango70Warning)
     async def test_user_switch_forces_new_login_async(self):
         """See test_user_switch_forces_new_login."""
         await User.objects.acreate(username="knownuser")
@@ -313,7 +332,171 @@ class RemoteUserTest(TestCase):
         response = self.client.get("/remote_user/", **{self.header: "knownuser"})
         self.assertTrue(response.context["user"].is_anonymous)
 
+    # RemovedInDjango70Warning.
+    @ignore_warnings(category=RemovedInDjango70Warning)
     async def test_inactive_user_async(self):
+        await User.objects.acreate(username="knownuser", is_active=False)
+        response = await self.async_client.get(
+            "/remote_user/", **{self.header: "knownuser"}
+        )
+        self.assertTrue(response.context["user"].is_anonymous)
+
+    # RemovedInDjango70Warning.
+    async def test_deprecation_msg(self):
+        msg = (
+            "Async support of RemoteUserMiddleware is deprecated. Use "
+            "AsyncRemoteUserMiddleware instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            await self.async_client.get("/remote_user/")
+
+
+@override_settings(ROOT_URLCONF="auth_tests.urls")
+class AsyncRemoteUserTest(TestCase):
+    middleware = "django.contrib.auth.middleware.AsyncRemoteUserMiddleware"
+    backend = "django.contrib.auth.backends.RemoteUserBackend"
+    header = "REMOTE_USER"
+    email_header = "REMOTE_EMAIL"
+
+    # Usernames to be passed in REMOTE_USER for the test_known_user test case.
+    known_user = "knownuser"
+    known_user2 = "knownuser2"
+
+    @classmethod
+    def setUpClass(cls):
+        cls.enterClassContext(
+            modify_settings(
+                AUTHENTICATION_BACKENDS={"append": cls.backend},
+                MIDDLEWARE={"append": cls.middleware},
+            )
+        )
+        super().setUpClass()
+
+    async def test_no_remote_user(self):
+        num_users = await User.objects.acount()
+
+        response = await self.async_client.get("/remote_user/")
+        self.assertTrue(response.context["user"].is_anonymous)
+        self.assertEqual(await User.objects.acount(), num_users)
+
+        response = await self.async_client.get("/remote_user/", **{self.header: ""})
+        self.assertTrue(response.context["user"].is_anonymous)
+        self.assertEqual(await User.objects.acount(), num_users)
+
+    async def test_csrf_validation_passes_after_process_request_login(self):
+        csrf_client = AsyncClient(enforce_csrf_checks=True)
+        csrf_secret = _get_new_csrf_string()
+        csrf_token = _mask_cipher_secret(csrf_secret)
+        csrf_token_form = _mask_cipher_secret(csrf_secret)
+        headers = {self.header: "fakeuser"}
+        data = {"csrfmiddlewaretoken": csrf_token_form}
+
+        # Verify that CSRF is configured for the view
+        csrf_client.cookies.load({settings.CSRF_COOKIE_NAME: csrf_token})
+        response = await csrf_client.post("/remote_user/", **headers)
+        self.assertEqual(response.status_code, 403)
+        self.assertIn(b"CSRF verification failed.", response.content)
+
+        # This request will call django.contrib.auth.alogin() which will call
+        # django.middleware.csrf.rotate_token() thus changing the value of
+        # request.META['CSRF_COOKIE'] from the user submitted value set by
+        # CsrfViewMiddleware.process_request() to the new csrftoken value set
+        # by rotate_token(). Csrf validation should still pass when the view is
+        # later processed by CsrfViewMiddleware.process_view()
+        csrf_client.cookies.load({settings.CSRF_COOKIE_NAME: csrf_token})
+        response = await csrf_client.post("/remote_user/", data, **headers)
+        self.assertEqual(response.status_code, 200)
+
+    async def test_unknown_user(self):
+        num_users = await User.objects.acount()
+        response = await self.async_client.get(
+            "/remote_user/", **{self.header: "newuser"}
+        )
+        self.assertEqual(response.context["user"].username, "newuser")
+        self.assertEqual(await User.objects.acount(), num_users + 1)
+        await User.objects.aget(username="newuser")
+
+        # Another request with same user should not create any new users.
+        response = await self.async_client.get(
+            "/remote_user/", **{self.header: "newuser"}
+        )
+        self.assertEqual(await User.objects.acount(), num_users + 1)
+
+    async def test_known_user(self):
+        await User.objects.acreate(username="knownuser")
+        await User.objects.acreate(username="knownuser2")
+        num_users = await User.objects.acount()
+        response = await self.async_client.get(
+            "/remote_user/", **{self.header: self.known_user}
+        )
+        self.assertEqual(response.context["user"].username, "knownuser")
+        self.assertEqual(await User.objects.acount(), num_users)
+        # A different user passed in the headers causes the new user
+        # to be logged in.
+        response = await self.async_client.get(
+            "/remote_user/", **{self.header: self.known_user2}
+        )
+        self.assertEqual(response.context["user"].username, "knownuser2")
+        self.assertEqual(await User.objects.acount(), num_users)
+
+    async def test_last_login(self):
+        user = await User.objects.acreate(username="knownuser")
+        # Set last_login to something so we can determine if it changes.
+        default_login = datetime(2000, 1, 1)
+        if settings.USE_TZ:
+            default_login = default_login.replace(tzinfo=UTC)
+        user.last_login = default_login
+        await user.asave()
+
+        response = await self.async_client.get(
+            "/remote_user/", **{self.header: self.known_user}
+        )
+        self.assertNotEqual(default_login, response.context["user"].last_login)
+
+        user = await User.objects.aget(username="knownuser")
+        user.last_login = default_login
+        await user.asave()
+        response = await self.async_client.get(
+            "/remote_user/", **{self.header: self.known_user}
+        )
+        self.assertEqual(default_login, response.context["user"].last_login)
+
+    async def test_header_disappears(self):
+        await User.objects.acreate(username="knownuser")
+        # Known user authenticates
+        response = await self.async_client.get(
+            "/remote_user/", **{self.header: self.known_user}
+        )
+        self.assertEqual(response.context["user"].username, "knownuser")
+        # During the session, the REMOTE_USER header disappears. Should trigger
+        # logout.
+        response = await self.async_client.get("/remote_user/")
+        self.assertTrue(response.context["user"].is_anonymous)
+        # verify the remoteuser middleware will not remove a user
+        # authenticated via another backend
+        await User.objects.acreate_user(username="modeluser", password="foo")
+        await self.async_client.alogin(username="modeluser", password="foo")
+        await aauthenticate(username="modeluser", password="foo")
+        response = await self.async_client.get("/remote_user/")
+        self.assertEqual(response.context["user"].username, "modeluser")
+
+    async def test_user_switch_forces_new_login(self):
+        await User.objects.acreate(username="knownuser")
+        # Known user authenticates
+        response = await self.async_client.get(
+            "/remote_user/", **{self.header: self.known_user}
+        )
+        self.assertEqual(response.context["user"].username, "knownuser")
+        # During the session, the REMOTE_USER changes to a different user.
+        response = await self.async_client.get(
+            "/remote_user/", **{self.header: "newnewuser"}
+        )
+        # The current user is not the prior remote_user.
+        # In backends that create a new user, username is "newnewuser"
+        # In backends that do not create new users, it is '' (anonymous user)
+        self.assertNotEqual(response.context["user"].username, "knownuser")
+
+    async def test_inactive_user(self):
         await User.objects.acreate(username="knownuser", is_active=False)
         response = await self.async_client.get(
             "/remote_user/", **{self.header: "knownuser"}
@@ -341,7 +524,20 @@ class RemoteUserNoCreateTest(RemoteUserTest):
         self.assertTrue(response.context["user"].is_anonymous)
         self.assertEqual(User.objects.count(), num_users)
 
+    @ignore_warnings(category=RemovedInDjango70Warning)
     async def test_unknown_user_async(self):
+        num_users = await User.objects.acount()
+        response = await self.async_client.get(
+            "/remote_user/", **{self.header: "newuser"}
+        )
+        self.assertTrue(response.context["user"].is_anonymous)
+        self.assertEqual(await User.objects.acount(), num_users)
+
+
+class AsyncRemoteUserNoCreateTest(AsyncRemoteUserTest):
+    backend = "auth_tests.test_remote_user.RemoteUserNoCreateBackend"
+
+    async def test_unknown_user(self):
         num_users = await User.objects.acount()
         response = await self.async_client.get(
             "/remote_user/", **{self.header: "newuser"}
@@ -360,7 +556,19 @@ class AllowAllUsersRemoteUserBackendTest(RemoteUserTest):
         response = self.client.get("/remote_user/", **{self.header: self.known_user})
         self.assertEqual(response.context["user"].username, user.username)
 
+    @ignore_warnings(category=RemovedInDjango70Warning)
     async def test_inactive_user_async(self):
+        user = await User.objects.acreate(username="knownuser", is_active=False)
+        response = await self.async_client.get(
+            "/remote_user/", **{self.header: self.known_user}
+        )
+        self.assertEqual(response.context["user"].username, user.username)
+
+
+class AsyncAllowAllUsersRemoteUserBackendTest(AsyncRemoteUserTest):
+    backend = "django.contrib.auth.backends.AllowAllUsersRemoteUserBackend"
+
+    async def test_inactive_user(self):
         user = await User.objects.acreate(username="knownuser", is_active=False)
         response = await self.async_client.get(
             "/remote_user/", **{self.header: self.known_user}
@@ -388,6 +596,13 @@ class CustomRemoteUserBackend(RemoteUserBackend):
         if not created:
             user.last_name = user.username
         user.save()
+        return user
+
+    async def aconfigure_user(self, request, user, created=True):
+        user.email = request.headers.get(AsyncRemoteUserTest.email_header, "")
+        if not created:
+            user.last_name = user.username
+        await user.asave()
         return user
 
 
@@ -437,6 +652,41 @@ class RemoteUserCustomTest(RemoteUserTest):
         self.assertEqual(newuser.email, "user@example.com")
 
 
+class AsyncRemoteUserCustomTest(AsyncRemoteUserTest):
+    backend = "auth_tests.test_remote_user.CustomRemoteUserBackend"
+    known_user = "knownuser@example.com"
+    known_user2 = "knownuser2@example.com"
+
+    async def test_known_user(self):
+        """
+        The strings passed in REMOTE_USER should be cleaned and the known users
+        should not have been configured with an email address.
+        """
+        await super().test_known_user()
+        knownuser = await User.objects.aget(username="knownuser")
+        knownuser2 = await User.objects.aget(username="knownuser2")
+        self.assertEqual(knownuser.email, "")
+        self.assertEqual(knownuser2.email, "")
+        self.assertEqual(knownuser.last_name, "knownuser")
+        self.assertEqual(knownuser2.last_name, "knownuser2")
+
+    async def test_unknown_user(self):
+        num_users = await User.objects.acount()
+        response = await self.async_client.get(
+            "/remote_user/",
+            **{
+                self.header: "newuser",
+                self.email_header: "user@example.com",
+            },
+        )
+        self.assertEqual(response.context["user"].username, "newuser")
+        self.assertEqual(response.context["user"].email, "user@example.com")
+        self.assertEqual(response.context["user"].last_name, "")
+        self.assertEqual(await User.objects.acount(), num_users + 1)
+        newuser = await User.objects.aget(username="newuser")
+        self.assertEqual(newuser.email, "user@example.com")
+
+
 class CustomHeaderMiddleware(RemoteUserMiddleware):
     """
     Middleware that overrides custom HTTP auth user header.
@@ -452,6 +702,15 @@ class CustomHeaderRemoteUserTest(RemoteUserTest):
     """
 
     middleware = "auth_tests.test_remote_user.CustomHeaderMiddleware"
+    header = "HTTP_AUTHUSER"
+
+
+class AsyncCustomHeaderMiddleware(AsyncRemoteUserMiddleware):
+    header = "HTTP_AUTHUSER"
+
+
+class AsyncCustomHeaderRemoteUserTest(AsyncRemoteUserTest):
+    middleware = "auth_tests.test_remote_user.AsyncCustomHeaderMiddleware"
     header = "HTTP_AUTHUSER"
 
 
@@ -478,8 +737,36 @@ class PersistentRemoteUserTest(RemoteUserTest):
         self.assertFalse(response.context["user"].is_anonymous)
         self.assertEqual(response.context["user"].username, "knownuser")
 
+    # RemovedInDjango70Warning.
+    @ignore_warnings(category=RemovedInDjango70Warning)
     async def test_header_disappears_async(self):
         """See test_header_disappears."""
+        await User.objects.acreate(username="knownuser")
+        # Known user authenticates
+        response = await self.async_client.get(
+            "/remote_user/", **{self.header: self.known_user}
+        )
+        self.assertEqual(response.context["user"].username, "knownuser")
+        # Should stay logged in if the REMOTE_USER header disappears.
+        response = await self.async_client.get("/remote_user/")
+        self.assertFalse(response.context["user"].is_anonymous)
+        self.assertEqual(response.context["user"].username, "knownuser")
+
+    # RemovedInDjango70Warning.
+    async def test_deprecation_msg(self):
+        msg = (
+            "Async support of PersistentRemoteUserMiddleware is deprecated. Use "
+            "AsyncPersistentRemoteUserMiddleware instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            await self.async_client.get("/remote_user/")
+
+
+class AsyncPersistentRemoteUserTest(AsyncRemoteUserTest):
+    middleware = "django.contrib.auth.middleware.AsyncPersistentRemoteUserMiddleware"
+    require_header = False
+
+    async def test_header_disappears(self):
         await User.objects.acreate(username="knownuser")
         # Known user authenticates
         response = await self.async_client.get(
@@ -518,6 +805,8 @@ class RemoteUserImproperlyConfigured(TestCase):
         ):
             self.client.get("/remote_user/")
 
+    # RemovedInDjango70Warning.
+    @ignore_warnings(category=RemovedInDjango70Warning)
     @override_settings(
         MIDDLEWARE=["django.contrib.auth.middleware.RemoteUserMiddleware"]
     )
@@ -527,11 +816,33 @@ class RemoteUserImproperlyConfigured(TestCase):
         ):
             await self.async_client.get("/remote_user/")
 
+    # RemovedInDjango70Warning.
+    @ignore_warnings(category=RemovedInDjango70Warning)
     @override_settings(
         MIDDLEWARE=["django.contrib.auth.middleware.PersistentRemoteUserMiddleware"]
     )
     async def test_improperly_configured_message_persistent_remote_user_async(self):
         with self.assertRaisesMessage(
             ImproperlyConfigured, self.msg % "PersistentRemoteUserMiddleware"
+        ):
+            await self.async_client.get("/remote_user/")
+
+    @override_settings(
+        MIDDLEWARE=["django.contrib.auth.middleware.AsyncRemoteUserMiddleware"]
+    )
+    async def test_improperly_configured_message_async_remote_user(self):
+        with self.assertRaisesMessage(
+            ImproperlyConfigured, self.msg % "AsyncRemoteUserMiddleware"
+        ):
+            await self.async_client.get("/remote_user/")
+
+    @override_settings(
+        MIDDLEWARE=[
+            "django.contrib.auth.middleware.AsyncPersistentRemoteUserMiddleware"
+        ]
+    )
+    async def test_improperly_configured_message_async_persistent_remote_user(self):
+        with self.assertRaisesMessage(
+            ImproperlyConfigured, self.msg % "AsyncPersistentRemoteUserMiddleware"
         ):
             await self.async_client.get("/remote_user/")

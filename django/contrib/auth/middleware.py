@@ -1,3 +1,4 @@
+import warnings
 from functools import partial
 from inspect import iscoroutinefunction, markcoroutinefunction
 from urllib.parse import urlsplit
@@ -9,7 +10,8 @@ from django.contrib.auth.backends import RemoteUserBackend
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import resolve_url
-from django.utils.deprecation import MiddlewareMixin
+from django.utils.decorators import async_only_middleware
+from django.utils.deprecation import MiddlewareMixin, RemovedInDjango70Warning
 from django.utils.functional import SimpleLazyObject
 
 
@@ -107,13 +109,17 @@ class RemoteUserMiddleware:
     """
 
     sync_capable = True
+    # RemovedInDjango70Warning: When the deprecation ends, decorate this
+    # middleware with @sync_only_middleware.
     async_capable = True
 
     def __init__(self, get_response):
         if get_response is None:
             raise ValueError("get_response must be provided.")
         self.get_response = get_response
+        # RemovedInDjango70Warning.
         self.is_async = iscoroutinefunction(get_response)
+        # RemovedInDjango70Warning.
         if self.is_async:
             markcoroutinefunction(self)
         super().__init__()
@@ -168,10 +174,17 @@ class RemoteUserMiddleware:
             # user in.
             auth.login(request, user)
 
+    # RemovedInDjango70Warning.
     async def __acall__(self, request):
+        msg = (
+            "Async support of RemoteUserMiddleware is deprecated. Use "
+            "AsyncRemoteUserMiddleware instead."
+        )
+        warnings.warn(msg, category=RemovedInDjango70Warning, stacklevel=2)
         await self.aprocess_request(request)
         return await self.get_response(request)
 
+    # RemovedInDjango70Warning.
     async def aprocess_request(self, request):
         # AuthenticationMiddleware is required so that request.user exists.
         if not hasattr(request, "user"):
@@ -242,7 +255,92 @@ class RemoteUserMiddleware:
             if isinstance(stored_backend, RemoteUserBackend):
                 auth.logout(request)
 
+    # RemovedInDjango70Warning.
     async def _aremove_invalid_user(self, request):
+        """
+        Remove the current authenticated user in the request which is invalid
+        but only if the user is authenticated via the RemoteUserBackend.
+        """
+        try:
+            stored_backend = load_backend(
+                await request.session.aget(auth.BACKEND_SESSION_KEY, "")
+            )
+        except ImportError:
+            # Backend failed to load.
+            await auth.alogout(request)
+        else:
+            if isinstance(stored_backend, RemoteUserBackend):
+                await auth.alogout(request)
+
+
+@async_only_middleware
+class AsyncRemoteUserMiddleware:
+    header = "REMOTE_USER"
+    force_logout_if_no_header = True
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+        markcoroutinefunction(self)
+
+    async def __call__(self, request):
+        await self.process_request(request)
+        return await self.get_response(request)
+
+    async def process_request(self, request):
+        # AuthenticationMiddleware is required so that request.auser exists.
+        if not hasattr(request, "auser"):
+            raise ImproperlyConfigured(
+                "The Django remote user auth middleware requires the"
+                " authentication middleware to be installed. Edit your"
+                " MIDDLEWARE setting to insert"
+                " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
+                f" before the {self.__class__.__name__} class."
+            )
+        try:
+            username = request.headers[self.header]
+        except KeyError:
+            # If specified header doesn't exist then remove any existing
+            # authenticated remote-user, or return (leaving request.user set to
+            # AnonymousUser by the AuthenticationMiddleware).
+            if self.force_logout_if_no_header:
+                user = await request.auser()
+                if user.is_authenticated:
+                    await self._remove_invalid_user(request)
+            return
+        user = await request.auser()
+        # If the user is already authenticated and that user is the user we are
+        # getting passed in the headers, then the correct user is already
+        # persisted in the session and we don't need to continue.
+        if user.is_authenticated:
+            if user.get_username() == await self.clean_username(username, request):
+                return
+            else:
+                # An authenticated user is associated with the request, but
+                # it does not match the authorized user in the header.
+                await self._remove_invalid_user(request)
+
+        # We are seeing this user for the first time in this session, attempt
+        # to authenticate the user.
+        user = await auth.aauthenticate(request, remote_user=username)
+        if user:
+            # User is valid. Persist the user in the session by logging the
+            # user in.
+            await auth.alogin(request, user)
+
+    async def clean_username(self, username, request):
+        """
+        Allow the backend to clean the username, if the backend defines a
+        clean_username method.
+        """
+        backend_str = await request.session.aget(auth.BACKEND_SESSION_KEY)
+        backend = auth.load_backend(backend_str)
+        try:
+            username = backend.clean_username(username)
+        except AttributeError:  # Backend has no clean_username method.
+            pass
+        return username
+
+    async def _remove_invalid_user(self, request):
         """
         Remove the current authenticated user in the request which is invalid
         but only if the user is authenticated via the RemoteUserBackend.
@@ -270,4 +368,17 @@ class PersistentRemoteUserMiddleware(RemoteUserMiddleware):
     Django's authentication mechanism.
     """
 
+    force_logout_if_no_header = False
+
+    # RemovedInDjango70Warning.
+    async def __acall__(self, request):
+        msg = (
+            "Async support of PersistentRemoteUserMiddleware is deprecated. Use "
+            "AsyncPersistentRemoteUserMiddleware instead."
+        )
+        warnings.warn(msg, category=RemovedInDjango70Warning, stacklevel=2)
+        return await super().__acall__(request)
+
+
+class AsyncPersistentRemoteUserMiddleware(AsyncRemoteUserMiddleware):
     force_logout_if_no_header = False
