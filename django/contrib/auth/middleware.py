@@ -164,9 +164,8 @@ class RemoteUserMiddleware:
         # to authenticate the user.
         user = auth.authenticate(request, remote_user=username)
         if user:
-            # User is valid. Set request.user and persist user in the session
-            # by logging the user in.
-            request.user = user
+            # User is valid. Persist the user in the session by logging the
+            # user in.
             auth.login(request, user)
 
     async def __acall__(self, request):
@@ -210,9 +209,8 @@ class RemoteUserMiddleware:
         # to authenticate the user.
         user = await auth.aauthenticate(request, remote_user=username)
         if user:
-            # User is valid. Set request.user and persist user in the session
-            # by logging the user in.
-            request.user = user
+            # User is valid. Persist the user in the session by logging the
+            # user in.
             await auth.alogin(request, user)
 
     def clean_username(self, username, request):
