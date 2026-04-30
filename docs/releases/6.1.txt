@@ -224,6 +224,14 @@ CSRF
 
 * ...
 
+Database backends
+~~~~~~~~~~~~~~~~~
+
+* A ``"check"`` callable provided in ``OPTIONS["pool"]`` now takes precedence
+  over Django's default for the PostgreSQL backend. This enables custom pool
+  liveness probes, such as a ``pg_is_in_recovery()`` check to discard
+  connections silently rerouted to a reader after an Aurora writer flip.
+
 Decorators
 ~~~~~~~~~~
 
