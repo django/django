@@ -540,7 +540,7 @@ removing the old ones, you should be able to remove the field completely.
 Moving a model between apps
 ===========================
 
-.. versionadded:: 5.2
+.. versionadded:: 6.1
 
 Django handles the process of transferring models from one app to another. This
 involves recognizing the moved model and automatically generating the necessary
@@ -552,13 +552,14 @@ To move a model ``MyModel`` from ``app1`` to ``app2``:
 #. Ensure all ``MyModel`` references point to the new model location.
 #. Run :djadmin:`makemigrations`.
 
-This generates the multiple migration files which do the following:
+If the model has been moved without changes to field definitions,
+Django will detect it as a model move. It will ask for your confirmation,
+and if confirmed, generate the following migrations:
 
-#. In ``app1``, a migration to rename ``MyModel``'s database table to
-   ``app2_mymodel``. This is only if ``MyModel`` does not define a
-   ``Meta.db_table`` in ``app2`` that matches the old table name of ``app1``.
-   In other words, this is only if the table name is implicit.
-
+#. In ``app1``, a migration to rename ``MyModel``'s database table, if
+   necessary. By default, the table needs to be renamed from ``app1_mymodel``
+   to ``app2_mymodel``.
+   
 #. In ``app2``, a migration to create ``MyModel`` in ``app2`` with the option
    ``managed=False``. At this point, the project has two models pointing to the
    same table.
