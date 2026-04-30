@@ -138,7 +138,7 @@ class RemoteUserMiddleware:
                 " authentication middleware to be installed. Edit your"
                 " MIDDLEWARE setting to insert"
                 " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
-                " before the RemoteUserMiddleware class."
+                f" before the {self.__class__.__name__} class."
             )
         try:
             username = request.META[self.header]
@@ -181,7 +181,7 @@ class RemoteUserMiddleware:
                 " authentication middleware to be installed. Edit your"
                 " MIDDLEWARE setting to insert"
                 " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
-                " before the RemoteUserMiddleware class."
+                f" before the {self.__class__.__name__} class."
             )
         try:
             username = request.META["HTTP_" + self.header]
