@@ -247,6 +247,10 @@ class MoveContentTypeOperationsTests(TransactionTestCase):
                         next_operation.old_app_label, operation.options["old_app_label"]
                     )
                     self.assertEqual(next_operation.model_name, operation.name_lower)
+                    self.assertEqual(
+                        next_operation.old_model_name,
+                        operation.options.get("old_model_name", operation.name_lower),
+                    )
 
     def test_move_model_content_type_change(self):
         ContentType.objects.create(app_label="source_app", model="simplebar")
@@ -384,5 +388,57 @@ class MoveContentTypeOperationsTests(TransactionTestCase):
         self.assertTrue(
             ContentType.objects.filter(
                 app_label="target_app", model="simplebar"
+            ).exists()
+        )
+
+
+@override_settings(
+    INSTALLED_APPS=[
+        "contenttypes_tests.target_rename_app",
+        "contenttypes_tests.source_rename_app",
+        "django.contrib.contenttypes",
+    ],
+)
+class MoveRenameContentTypeOperationsTests(TransactionTestCase):
+    available_apps = [
+        "contenttypes_tests.source_rename_app",
+        "contenttypes_tests.target_rename_app",
+        "django.contrib.contenttypes",
+    ]
+
+    def test_move_rename_model_content_type_change(self):
+        ContentType.objects.create(app_label="source_rename_app", model="simplebar")
+        call_command(
+            "migrate",
+            database="default",
+            interactive=False,
+            verbosity=0,
+        )
+        self.assertFalse(
+            ContentType.objects.filter(
+                app_label="source_rename_app", model="simplebar"
+            ).exists()
+        )
+        self.assertTrue(
+            ContentType.objects.filter(
+                app_label="target_rename_app", model="renamedsimplebar"
+            ).exists()
+        )
+        call_command(
+            "migrate",
+            "source_rename_app",
+            "zero",
+            database="default",
+            interactive=False,
+            verbosity=0,
+        )
+        self.assertTrue(
+            ContentType.objects.filter(
+                app_label="source_rename_app", model="simplebar"
+            ).exists()
+        )
+        self.assertFalse(
+            ContentType.objects.filter(
+                app_label="target_rename_app", model="renamedsimplebar"
             ).exists()
         )

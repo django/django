@@ -721,6 +721,8 @@ class MigrationAutodetector:
                     )
                 model_state.options["managed"] = False
                 model_state.options["old_app_label"] = rem_app_label
+                if rem_model_name != model_name:
+                    model_state.options["old_model_name"] = rem_model_name
                 self.add_operation(
                     app_label,
                     operations.CreateModel(
@@ -771,7 +773,9 @@ class MigrationAutodetector:
         # Make a model unmanaged before deleting it.
         self.add_operation(
             rem_app_label,
-            operations.AlterModelOptions(name=rem_model_name, options={"managed": False}),
+            operations.AlterModelOptions(
+                name=rem_model_name, options={"managed": False}
+            ),
             dependencies=dependencies,
         )
         dependencies = list(dependencies) + [
