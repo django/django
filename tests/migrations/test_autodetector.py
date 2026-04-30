@@ -2681,6 +2681,98 @@ class AutodetectorTests(BaseAutodetectorTests):
         self.assertOperationTypes(changes, "otherapp", 0, ["CreateModel", "AlterField"])
         self.assertOperationTypes(changes, "testapp", 0, ["DeleteModel"])
 
+    def test_move_model_ignores_different_model_defs(self):
+        before = [
+            ModelState(
+                "testapp",
+                "Author",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("name", models.CharField(max_length=200)),
+                ],
+            ),
+        ]
+        after = [
+            ModelState(
+                "otherapp",
+                "Person",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("age", models.IntegerField(default=0)),
+                ],
+            ),
+        ]
+        changes = self.get_changes(
+            before, after, MigrationQuestioner({"ask_move_model": True})
+        )
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "otherapp", 0, ["CreateModel"])
+        self.assertOperationTypes(changes, "testapp", 0, ["DeleteModel"])
+
+    def test_move_model_with_new_name(self):
+        before = [self.author_name]
+        after = [
+            ModelState(
+                "otherapp",
+                "RenamedAuthor",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("name", models.CharField(max_length=200)),
+                ],
+            ),
+        ]
+        changes = self.get_changes(
+            before, after, MigrationQuestioner({"ask_move_model": True})
+        )
+        self.assertNumberMigrations(changes, "otherapp", 2)
+
+        self.assertMigrationDependencies(
+            changes, "otherapp", 0, [("testapp", "auto_1")]
+        )
+        self.assertOperationTypes(changes, "otherapp", 0, ["CreateModel"])
+        self.assertOperationAttributes(
+            changes,
+            "otherapp",
+            0,
+            0,
+            name="renamedauthor",
+            options={
+                "indexes": [],
+                "constraints": [],
+                "managed": False,
+                "old_app_label": "testapp",
+            },
+        )
+        self.assertMigrationDependencies(
+            changes, "otherapp", 1, [("otherapp", "auto_1"), ("testapp", "auto_2")]
+        )
+        self.assertOperationTypes(changes, "otherapp", 1, ["AlterModelOptions"])
+        self.assertOperationAttributes(changes, "otherapp", 1, 0, name="renamedauthor")
+
+        self.assertNumberMigrations(changes, "testapp", 3)
+
+        self.assertMigrationDependencies(changes, "testapp", 0, [])
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterModelTable"])
+        self.assertOperationAttributes(
+            changes,
+            "testapp",
+            0,
+            0,
+            name="author",
+            table="otherapp_renamedauthor",
+        )
+        self.assertMigrationDependencies(
+            changes, "testapp", 1, [("otherapp", "auto_1"), ("testapp", "auto_1")]
+        )
+        self.assertOperationTypes(changes, "testapp", 1, ["AlterModelOptions"])
+        self.assertOperationAttributes(changes, "testapp", 1, 0, name="author")
+        self.assertMigrationDependencies(
+            changes, "testapp", 2, [("otherapp", "auto_2"), ("testapp", "auto_2")]
+        )
+        self.assertOperationTypes(changes, "testapp", 2, ["DeleteModel"])
+        self.assertOperationAttributes(changes, "testapp", 2, 0, name="author")
+
     def test_move_model_with_db_table_changed(self):
         before = [self.author_with_db_table_options, self.book]
         after = [
@@ -2689,7 +2781,6 @@ class AutodetectorTests(BaseAutodetectorTests):
                 "Author",
                 [
                     ("id", models.AutoField(primary_key=True)),
-                    ("name", models.CharField(max_length=200)),
                 ],
                 {"db_table": "changed_db_table"},
             ),

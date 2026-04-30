@@ -14,6 +14,9 @@ class RenameContentType(migrations.RunPython):
     def _rename(self, apps, schema_editor, old_model, new_model):
         ContentType = apps.get_model("contenttypes", "ContentType")
         db = schema_editor.connection.alias
+        if not router.allow_migrate_model(db, ContentType):
+            return
+
         try:
             content_type = ContentType.objects.db_manager(db).get_by_natural_key(
                 self.app_label, old_model

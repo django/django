@@ -686,8 +686,8 @@ class MigrationAutodetector:
                     rem_model_state.fields
                 )
                 if (
-                    model_fields_def == rem_model_fields_def
-                    and not self.questioner.ask_move_model(
+                    model_fields_def != rem_model_fields_def
+                    or not self.questioner.ask_move_model(
                         rem_model_state,
                         model_state,
                     )
@@ -706,7 +706,7 @@ class MigrationAutodetector:
                     self.add_operation(
                         rem_app_label,
                         operations.AlterModelTable(
-                            name=model_name,
+                            name=rem_model_name,
                             table=new_table_name,
                         ),
                         beginning=True,
@@ -714,7 +714,7 @@ class MigrationAutodetector:
                     dependencies.append(
                         OperationDependency(
                             rem_app_label,
-                            model_name,
+                            rem_model_name,
                             None,
                             OperationDependency.Type.ALTER_MODEL_TABLE,
                         )
@@ -733,7 +733,7 @@ class MigrationAutodetector:
                     dependencies=dependencies,
                 )
                 dependencies = list(dependencies) + self._alter_options_for_moved_model(
-                    rem_app_label, app_label, model_name, dependencies
+                    rem_app_label, app_label, rem_model_name, model_name, dependencies
                 )
                 # If there are any base models, then add dependencies for them
                 # so that they are created before the model(s) inheriting it.
@@ -752,7 +752,7 @@ class MigrationAutodetector:
                                 )
                 self.add_operation(
                     rem_app_label,
-                    operations.DeleteModel(name=model_name),
+                    operations.DeleteModel(name=rem_model_name),
                     dependencies=dependencies,
                 )
                 self.old_model_keys.remove((rem_app_label, rem_model_name))
@@ -761,7 +761,7 @@ class MigrationAutodetector:
                 break
 
     def _alter_options_for_moved_model(
-        self, rem_app_label, app_label, model_name, dependencies
+        self, rem_app_label, app_label, rem_model_name, model_name, dependencies
     ):
         dependencies = list(dependencies) + [
             OperationDependency(
@@ -771,13 +771,13 @@ class MigrationAutodetector:
         # Make a model unmanaged before deleting it.
         self.add_operation(
             rem_app_label,
-            operations.AlterModelOptions(name=model_name, options={"managed": False}),
+            operations.AlterModelOptions(name=rem_model_name, options={"managed": False}),
             dependencies=dependencies,
         )
         dependencies = list(dependencies) + [
             OperationDependency(
                 rem_app_label,
-                model_name,
+                rem_model_name,
                 None,
                 OperationDependency.Type.ALTER_MODEL_OPTIONS,
             )
