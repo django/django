@@ -1,13 +1,14 @@
 import hashlib
 import unittest
 
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
 from django.utils.crypto import (
     InvalidAlgorithm,
     constant_time_compare,
     pbkdf2,
     salted_hmac,
 )
+from django.utils.deprecation import RemovedInDjango70Warning
 
 
 class TestUtilsCryptoMisc(SimpleTestCase):
@@ -22,6 +23,7 @@ class TestUtilsCryptoMisc(SimpleTestCase):
         self.assertTrue(constant_time_compare("ありがとう", "ありがとう"))
         self.assertFalse(constant_time_compare("ありがとう", "おはよう"))
 
+    @ignore_warnings(category=RemovedInDjango70Warning)
     def test_salted_hmac(self):
         tests = [
             ((b"salt", b"value"), {}, "b51a2e619c43b1ca4f91d15c57455521d71d61eb"),
@@ -55,6 +57,16 @@ class TestUtilsCryptoMisc(SimpleTestCase):
         for args, kwargs, digest in tests:
             with self.subTest(args=args, kwargs=kwargs):
                 self.assertEqual(salted_hmac(*args, **kwargs).hexdigest(), digest)
+
+    def test_salted_hmac_default_algorithm_deprecation(self):
+        msg = (
+            "The default argument for algorithm in salted_hmac() will change "
+            "from 'sha1' to 'sha256' in Django 7.0. Pass an explicit "
+            "algorithm to silence this warning."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg) as ctx:
+            salted_hmac("salt", "value")
+        self.assertEqual(ctx.filename, __file__)
 
     def test_invalid_algorithm(self):
         msg = "'whatever' is not an algorithm accepted by the hashlib module."

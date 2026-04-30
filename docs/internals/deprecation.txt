@@ -56,6 +56,11 @@ details on these changes.
 See the :ref:`Django 6.1 release notes <deprecated-features-6.1>` for more
 details on these changes.
 
+* The default value of the ``algorithm`` argument for
+  ``django.utils.crypto.salted_hmac()`` and
+  ``django.core.signing.base64_hmac()`` will change from ``"sha1"`` to
+  ``"sha256"``.
+
 * Calling :meth:`.QuerySet.values_list` with ``flat=True`` and no field name
   will raise ``TypeError``.
 
