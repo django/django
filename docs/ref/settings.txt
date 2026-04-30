@@ -1636,6 +1636,12 @@ when using the :djadmin:`collectstatic` management command. See
     modes must be specified. If you try to use ``644``, you'll get totally
     incorrect behavior.
 
+.. admonition:: A numeric value trumps umask
+
+    When this setting has a numeric value (one you've set yourself, or the
+    default ``0o644``), this value will be used as is, and a umask will not
+    be applied to it. The umask will apply only if this setting is ``None``.
+
 .. setting:: FILE_UPLOAD_TEMP_DIR
 
 ``FILE_UPLOAD_TEMP_DIR``

@@ -1,0 +1,7 @@
+===========================
+Django 5.2.14 release notes
+===========================
+
+*May 5, 2026*
+
+Django 5.2.14 fixes three security issue with severity "low" in 5.2.13.

@@ -9,14 +9,16 @@ for a list of all possible variables.
 import importlib
 import os
 import time
-import traceback
 import warnings
 from pathlib import Path
 
-import django
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
+from django.utils.deprecation import (
+    RemovedInDjango70Warning,
+    django_file_prefixes,
+    warn_about_external_use,
+)
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
@@ -146,13 +148,19 @@ class LazySettings(LazyObject):
         return self._wrapped is not empty
 
     def _show_deprecation_warning(self, message, category):
-        stack = traceback.extract_stack()
-        # Show a warning if the setting is used outside of Django.
-        # Stack index: -1 this line, -2 the property, -3 the
-        # LazyObject __getattribute__(), -4 the caller.
-        filename, _, _, _ = stack[-4]
-        if not filename.startswith(os.path.dirname(django.__file__)):
-            warnings.warn(message, category, stacklevel=2)
+        """Issue a warning when external code uses a deprecated setting.
+
+        Allow Django's own code to use it without emitting the warning. This
+        function should only be called from within LazySettings methods.
+        """
+        warn_about_external_use(
+            message,
+            category,
+            skip_name_prefixes=(
+                "django.conf.LazySettings",
+                "django.utils.functional.LazyObject",
+            ),
+        )
 
 
 class Settings:

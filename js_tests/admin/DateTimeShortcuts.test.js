@@ -1,7 +1,15 @@
 /* global QUnit, DateTimeShortcuts */
 "use strict";
 
-QUnit.module("admin.DateTimeShortcuts");
+QUnit.module("admin.DateTimeShortcuts", {
+    afterEach: function () {
+        const $ = django.jQuery;
+        $("body")
+            .removeAttr("data-admin-server-timezone")
+            .removeAttr("data-admin-utc-offset");
+        $(".timezonewarning").remove();
+    },
+});
 
 QUnit.test("init", function (assert) {
     const $ = django.jQuery;
@@ -46,11 +54,13 @@ QUnit.test("time zone offset warning - single field", function (assert) {
         "data-admin-utc-offset",
         new Date().getTimezoneOffset() * -60 + 3600,
     );
+    $("body").attr("data-admin-server-timezone", "America/Chicago");
     DateTimeShortcuts.init();
     $("body").attr("data-admin-utc-offset", savedOffset);
     assert.equal(
         $(".timezonewarning").text(),
-        "Note: You are 1 hour behind server time.",
+        "Note: Enter times in the America/Chicago timezone. " +
+            "(You are 1 hour behind.)",
     );
     assert.equal(
         $(".timezonewarning").attr("id"),
@@ -74,6 +84,10 @@ QUnit.test("time zone offset warning - date and time field", function (assert) {
     );
     DateTimeShortcuts.init();
     $("body").attr("data-admin-utc-offset", savedOffset);
+    assert.equal(
+        $(".timezonewarning").text(),
+        "Note: Enter times in the server timezone. (You are 1 hour behind.)",
+    );
     assert.equal(
         $(".timezonewarning").attr("id"),
         "id_updated_at_timezone_warning_helptext",
