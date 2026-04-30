@@ -8,6 +8,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME, load_backend
 from django.contrib.auth.backends import RemoteUserBackend
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import ImproperlyConfigured
+from django.core.handlers.asgi import ASGIRequest
 from django.shortcuts import resolve_url
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
@@ -141,7 +142,7 @@ class RemoteUserMiddleware:
                 f" before the {self.__class__.__name__} class."
             )
         try:
-            username = request.META[self.header]
+            username = self._get_username(request)
         except KeyError:
             # If specified header doesn't exist then remove any existing
             # authenticated remote-user, or return (leaving request.user set to
@@ -183,7 +184,7 @@ class RemoteUserMiddleware:
                 f" before the {self.__class__.__name__} class."
             )
         try:
-            username = request.META["HTTP_" + self.header]
+            username = self._get_username(request)
         except KeyError:
             # If specified header doesn't exist then remove any existing
             # authenticated remote-user, or return (leaving request.user set to
@@ -235,6 +236,11 @@ class RemoteUserMiddleware:
         except AttributeError:  # Backend has no clean_username method.
             pass
         return username
+
+    def _get_username(self, request):
+        if isinstance(request, ASGIRequest):
+            return request.META["HTTP_" + self.header]
+        return request.META[self.header]
 
     def _remove_invalid_user(self, request):
         """

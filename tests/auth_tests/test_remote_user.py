@@ -1,5 +1,7 @@
 from datetime import UTC, datetime
 
+import asgiref.sync
+
 from django.conf import settings
 from django.contrib.auth import aauthenticate, authenticate
 from django.contrib.auth.backends import RemoteUserBackend
@@ -14,6 +16,15 @@ from django.test import (
     modify_settings,
     override_settings,
 )
+from django.utils.decorators import sync_only_middleware
+
+
+@sync_only_middleware
+def sync_middleware(get_response):
+    def middleware(request):
+        return get_response(request)
+
+    return middleware
 
 
 @override_settings(ROOT_URLCONF="auth_tests.urls")
@@ -470,6 +481,20 @@ class RemoteUserCustomTest(RemoteUserTest):
         self.assertEqual(newuser.email, "user@example.com")
 
 
+class ASGISyncPathRemoteUserTest(RemoteUserTest):
+    """Later sync-only middleware forces sync execution even under ASGI."""
+
+    middleware = [
+        RemoteUserTest.middleware,
+        "auth_tests.test_remote_user.sync_middleware",
+    ]
+
+    def setUp(self):
+        method = getattr(self, self._testMethodName)
+        if not isinstance(method, asgiref.sync.AsyncToSync):
+            self.skipTest("This test covers async-only functionality")
+
+
 class CustomHeaderMiddleware(RemoteUserMiddleware):
     """
     Middleware that overrides custom HTTP auth user header.
@@ -484,6 +509,11 @@ class CustomHeaderRemoteUserTest(RemoteUserTest):
     header.
     """
 
+    middleware = "auth_tests.test_remote_user.CustomHeaderMiddleware"
+    header = "HTTP_AUTHUSER"
+
+
+class CustomHeaderASGISyncPathRemoteUserTest(ASGISyncPathRemoteUserTest):
     middleware = "auth_tests.test_remote_user.CustomHeaderMiddleware"
     header = "HTTP_AUTHUSER"
 
