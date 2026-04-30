@@ -1826,6 +1826,12 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
                     start_extract_hour=ExtractHour("start_datetime")
                 ).filter(id=non_utc_model.id, start_extract_hour=now.hour)
                 self.assertNotEqual(models_qs.count(), 1)
+                models_qs = DTModel.objects.annotate(
+                    start_extract_hour=ExtractHour(
+                        "start_datetime", tzinfo=zoneinfo.ZoneInfo("UTC")
+                    )
+                ).filter(id=non_utc_model.id, start_extract_hour=now.hour)
+                self.assertEqual(models_qs.count(), 1)
                 adjusted_now = timezone.localtime(now).replace(
                     tzinfo=zoneinfo.ZoneInfo(key="UTC")
                 )
