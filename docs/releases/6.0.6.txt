@@ -24,6 +24,19 @@ cookies immediately.
 This issue has severity "low" according to the :ref:`Django security policy
 <severity-levels>`.
 
+CVE-2026-7666: Potential unencrypted email transmission via ``STARTTLS`` in the SMTP backend
+============================================================================================
+
+When using :setting:`EMAIL_USE_TLS`, a failed ``STARTTLS`` handshake could
+leave a partially-initialized connection that would subsequently be reused for
+sending email without encryption. This can occur with ``fail_silently=True``,
+as used by :func:`~django.core.mail.send_mail` and
+:class:`~django.middleware.common.BrokenLinkEmailsMiddleware`, among others.
+Connections configured with :setting:`EMAIL_USE_SSL` are not affected.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
 Bugfixes
 ========
 
