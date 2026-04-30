@@ -723,6 +723,20 @@ class MigrationAutodetector:
                 model_state.options["old_app_label"] = rem_app_label
                 if rem_model_name != model_name:
                     model_state.options["old_model_name"] = rem_model_name
+                for field in model_state.fields.values():
+                    if field.remote_field:
+                        for dependency in self._get_dependencies_for_foreign_key(
+                            app_label,
+                            model_name,
+                            field,
+                            self.to_state,
+                        ):
+                            if (
+                                dependency.app_label == app_label
+                                and dependency.model_name_lower == model_name
+                            ):
+                                continue
+                            dependencies.append(dependency)
                 self.add_operation(
                     app_label,
                     operations.CreateModel(
@@ -733,6 +747,7 @@ class MigrationAutodetector:
                         managers=model_state.managers,
                     ),
                     dependencies=dependencies,
+                    beginning=True,
                 )
                 dependencies = list(dependencies) + self._alter_options_for_moved_model(
                     rem_app_label, app_label, rem_model_name, model_name, dependencies

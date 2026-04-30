@@ -8,7 +8,10 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser
 from django.core.validators import RegexValidator, validate_slug
 from django.db import connection, migrations, models
-from django.db.migrations.autodetector import MigrationAutodetector
+from django.db.migrations.autodetector import (
+    MigrationAutodetector,
+    OperationDependency,
+)
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.questioner import MigrationQuestioner
@@ -2648,6 +2651,111 @@ class AutodetectorTests(BaseAutodetectorTests):
             changes, "testapp", 2, [("otherapp", "auto_2"), ("testapp", "auto_2")]
         )
         self.assertOperationTypes(changes, "testapp", 2, ["DeleteModel"])
+
+    def test_move_related_models(self):
+        testapp_book = ModelState(
+            "testapp",
+            "Book",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
+                ("title", models.CharField(max_length=200)),
+            ],
+        )
+        before = [self.author_name, testapp_book]
+        after = [
+            ModelState(
+                "otherapp",
+                "Author",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("name", models.CharField(max_length=200)),
+                ],
+            ),
+            ModelState(
+                "otherapp",
+                "Book",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("author", models.ForeignKey("otherapp.Author", models.CASCADE)),
+                    ("title", models.CharField(max_length=200)),
+                ],
+            ),
+        ]
+        changes = self.get_changes(
+            before, after, MigrationQuestioner({"ask_move_model": True})
+        )
+        self.assertNumberMigrations(changes, "otherapp", 2)
+
+        self.assertMigrationDependencies(
+            changes, "otherapp", 0, [("testapp", "auto_1")]
+        )
+        # Moved target models must be grouped before AlterModelOptions.
+        # Otherwise contenttypes operations injected after CreateModel can
+        # render an invalid intermediate state.
+        self.assertOperationTypes(
+            changes, "otherapp", 0, ["CreateModel", "CreateModel"]
+        )
+        create_operations = changes["otherapp"][0].operations
+        self.assertEqual(create_operations[0].name_lower, "author")
+        self.assertEqual(create_operations[1].name_lower, "book")
+        for operation in create_operations:
+            self.assertEqual(
+                operation.options,
+                {
+                    "indexes": [],
+                    "constraints": [],
+                    "managed": False,
+                    "old_app_label": "testapp",
+                },
+            )
+        book_operation = next(
+            operation
+            for operation in create_operations
+            if operation.name_lower == "book"
+        )
+        self.assertEqual(
+            dict(book_operation.fields)["author"].remote_field.model,
+            "otherapp.Author",
+        )
+        # Grouping creates is not enough; Book must explicitly depend on
+        # Author so ordering doesn't rely on insertion order.
+        self.assertIn(
+            OperationDependency(
+                "otherapp", "author", None, OperationDependency.Type.CREATE
+            ),
+            book_operation._auto_deps,
+        )
+        self.assertMigrationDependencies(
+            changes, "otherapp", 1, [("otherapp", "auto_1"), ("testapp", "auto_2")]
+        )
+        self.assertOperationTypes(
+            changes, "otherapp", 1, ["AlterModelOptions", "AlterModelOptions"]
+        )
+
+        self.assertNumberMigrations(changes, "testapp", 3)
+
+        self.assertMigrationDependencies(changes, "testapp", 0, [])
+        self.assertOperationTypes(
+            changes, "testapp", 0, ["AlterModelTable", "AlterModelTable"]
+        )
+        self.assertCountEqual(
+            [
+                (operation.name, operation.table)
+                for operation in changes["testapp"][0].operations
+            ],
+            [("author", "otherapp_author"), ("book", "otherapp_book")],
+        )
+        self.assertMigrationDependencies(
+            changes, "testapp", 1, [("otherapp", "auto_1"), ("testapp", "auto_1")]
+        )
+        self.assertOperationTypes(
+            changes, "testapp", 1, ["AlterModelOptions", "AlterModelOptions"]
+        )
+        self.assertMigrationDependencies(
+            changes, "testapp", 2, [("otherapp", "auto_2"), ("testapp", "auto_2")]
+        )
+        self.assertOperationTypes(changes, "testapp", 2, ["DeleteModel", "DeleteModel"])
 
     def test_ask_move_model(self):
         before = [self.author_name, self.book]
