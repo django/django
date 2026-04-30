@@ -559,7 +559,7 @@ and if confirmed, generate the following migrations:
 #. In ``app1``, a migration to rename ``MyModel``'s database table, if
    necessary. By default, the table needs to be renamed from ``app1_mymodel``
    to ``app2_mymodel``.
-   
+
 #. In ``app2``, a migration to create ``MyModel`` in ``app2`` with the option
    ``managed=False``. At this point, the project has two models pointing to the
    same table.
