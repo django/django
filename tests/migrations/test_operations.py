@@ -1536,6 +1536,107 @@ class OperationTests(OperationTestBase):
         self.assertEqual(temp_rider.objects.count(), 2)
         self.assertEqual(pony.objects.count(), 2)
 
+    def test_move_rename_model_with_fk(self):
+        app_label_1 = "test_mrmw_fk_1"
+        app_label_2 = "test_mrmw_fk_2"
+        project_state = self.apply_operations(
+            app_label_1,
+            ProjectState(),
+            operations=[
+                migrations.CreateModel(
+                    "TempRider",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                    ],
+                ),
+            ],
+        )
+        project_state = self.apply_operations(
+            app_label_2,
+            project_state,
+            operations=[
+                migrations.CreateModel(
+                    "Pony",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                        (
+                            "riders",
+                            models.ForeignKey(
+                                f"{app_label_1}.TempRider", on_delete=models.CASCADE
+                            ),
+                        ),
+                    ],
+                ),
+            ],
+        )
+
+        self.assertTableExists(f"{app_label_1}_temprider")
+        self.assertTableExists(f"{app_label_2}_pony")
+        temp_rider = project_state.apps.get_model(app_label_1, "TempRider")
+        pony = project_state.apps.get_model(app_label_2, "Pony")
+        pony.objects.create(riders=temp_rider.objects.create())
+
+        project_state = self.apply_operations(
+            app_label_1,
+            project_state,
+            operations=[
+                migrations.AlterModelTable(
+                    "TempRider",
+                    f"{app_label_2}_renamedrider",
+                ),
+            ],
+        )
+        project_state = self.apply_operations(
+            app_label_2,
+            project_state,
+            operations=[
+                migrations.CreateModel(
+                    "RenamedRider",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                    ],
+                    options={
+                        "managed": False,
+                    },
+                ),
+            ],
+        )
+        project_state = self.apply_operations(
+            app_label_1,
+            project_state,
+            operations=[
+                migrations.AlterModelOptions("TempRider", {"managed": False}),
+            ],
+        )
+        project_state = self.apply_operations(
+            app_label_2,
+            project_state,
+            operations=[
+                migrations.AlterModelOptions("RenamedRider", {}),
+                migrations.AlterField(
+                    "pony",
+                    name="riders",
+                    field=models.ForeignKey(
+                        on_delete=models.CASCADE, to=f"{app_label_2}.RenamedRider"
+                    ),
+                ),
+            ],
+        )
+        project_state = self.apply_operations(
+            app_label_1,
+            project_state,
+            operations=[
+                migrations.DeleteModel("TempRider"),
+            ],
+        )
+        self.assertTableExists(f"{app_label_2}_renamedrider")
+        self.assertTableExists(f"{app_label_2}_pony")
+        renamed_rider = project_state.apps.get_model(app_label_2, "RenamedRider")
+        pony = project_state.apps.get_model(app_label_2, "Pony")
+        pony.objects.create(riders=renamed_rider.objects.create())
+        self.assertEqual(renamed_rider.objects.count(), 2)
+        self.assertEqual(pony.objects.count(), 2)
+
     def test_move_model_with_inheritance_and_m2m_field(self):
         app_label_1 = "test_mmw_i_m2m_1"
         app_label_2 = "test_mmw_i_m2m_2"
