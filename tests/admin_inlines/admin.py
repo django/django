@@ -486,6 +486,7 @@ class ChildHiddenFieldOnSingleLineStackedInline(admin.StackedInline):
 
 class ShowInlineChildInline(admin.StackedInline):
     model = ShowInlineChild
+    delete_confirmation_max_display = 3
 
 
 class UUIDChildInline(admin.StackedInline):

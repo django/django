@@ -99,10 +99,11 @@ Minor features
   preserve :ref:`named groups <field-choices-named-groups>` (e.g.
   ``choices=[("Group", [("1", "Item")]), ...]``).
 
-* The :attr:`~django.contrib.admin.ModelAdmin.delete_confirmation_max_display`
+* The
+  :attr:`~django.contrib.admin.BaseModelAdmin.delete_confirmation_max_display`
   option allows customizing how many objects are displayed on admin delete
-  confirmation pages before the remainder is truncated. The default is
-  ``None`` (no truncation).
+  confirmation pages and inline protected deletion errors before the remainder
+  is truncated. The default is ``None`` (no truncation).
 
 * In order to improve accessibility of the admin change forms:
 
@@ -117,14 +118,8 @@ Minor features
   * Checkboxes are an exception to the above changes and continue to be
     displayed in their original layout.
 
-<<<<<<< HEAD
 * :attr:`~django.contrib.admin.ModelAdmin.list_display` now uses boolean icons
   for boolean fields on related models.
-
-=======
->>>>>>> 0091eb0818 (Updated release notes for 6.1)
-* Inline admin formsets will now limit the number of delete-protected objects
-  displayed in the validation message to 100.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

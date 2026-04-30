@@ -833,12 +833,12 @@ class TestInline(TestDataMixin, TestCase):
         self.assertIs(parent.show_inlines, True)
 
     def test_delete_protected_message_limits_number_of_objects_displayed(self):
-        # admin limits the amount of displayed objects to 100, so we create
-        # 102 invoices
+        # admin limits the number of displayed objects to 2, so we create
+        # 5 invoices
         parent = ShowInlineParent.objects.create(show_inlines=True)
         child = ShowInlineChild.objects.create(parent=parent)
         invoices = [
-            Invoice(parent=parent, child=child, number=str(i)) for i in range(102)
+            Invoice(parent=parent, child=child, number=str(i)) for i in range(5)
         ]
         Invoice.objects.bulk_create(invoices)
 
@@ -866,7 +866,7 @@ class TestInline(TestDataMixin, TestCase):
             ),
             error_message,
         )
-        self.assertEqual(error_message.count("invoice"), 100, error_message)
+        self.assertEqual(error_message.count("invoice"), 3, error_message)
         self.assertTrue(error_message.endswith(" and 2 more"), error_message)
 
     def test_delete_protected_message_does_not_limits_small_amount_of_objects(self):
@@ -896,7 +896,7 @@ class TestInline(TestDataMixin, TestCase):
         error_message = inline_formset.non_form_errors()[0]
         self.assertTrue(
             error_message.startswith(
-                "Deleting show inline child Child False "
+                "Deleting show inline child Child True "
                 "would require deleting the "
                 "following protected related "
                 "objects:"
