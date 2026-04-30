@@ -26,6 +26,7 @@ from django.core.cache import (
     caches,
 )
 from django.core.cache.backends.base import BaseCache, InvalidCacheBackendError
+from django.core.cache.backends.db import CullHandler
 from django.core.cache.backends.redis import RedisCacheClient
 from django.core.cache.utils import make_template_fragment_key
 from django.db import close_old_connections, connection, connections
@@ -1307,6 +1308,45 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
                 self.assertIn(connection.ops.quote_name("expires"), sql)
             if "cache_key" in sql:
                 self.assertIn(connection.ops.quote_name("cache_key"), sql)
+
+    def test_db_cull_optimized_off(self):
+        # Check for expired entries every request.
+        old_max_entries = cache._max_entries
+        cache._max_entries = -1
+        with mock.patch.object(cache, "_cull") as mocked:
+            try:
+                cache.set("key_foo", "foo")
+            finally:
+                cache._max_entries = old_max_entries
+            mocked.assert_called_once()
+
+    def test_db_cull_optimized_on(self):
+        # Only check for expired entries every n requests.
+        old_cull_handler = cache._cull_handler
+        old_max_entries = cache._max_entries
+        cache._max_entries = -1
+        cache._cull_handler = CullHandler(2)
+        cache._cull_handler.elements = [2]
+        with mock.patch.object(cache, "_cull") as mocked:
+            try:
+                cache.set("key_foo", "foo")
+            finally:
+                cache._max_entries = old_max_entries
+                cache._cull_handler = old_cull_handler
+            mocked.assert_called_once()
+
+    def test_no_query_without_check(self):
+        # No COUNT query should occur if the cull check is False.
+        old_cull_handler = cache._cull_handler
+        cache._cull_handler = CullHandler(2)
+        cache._cull_handler.elements = [9, 9]
+        with CaptureQueriesContext(connection) as captured_queries:
+            try:
+                cache.set("shouldnt_cull", "value", 1000)
+            finally:
+                cache._cull_handler = old_cull_handler
+        num_count_queries = sum("COUNT" in query["sql"] for query in captured_queries)
+        self.assertEqual(num_count_queries, 0)
 
     def test_delete_cursor_rowcount(self):
         """

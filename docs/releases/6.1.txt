@@ -180,7 +180,9 @@ Asynchronous views
 Cache
 ~~~~~
 
-* ...
+* Subclasses of ``BaseDatabaseCache`` now support culling entries every N
+  cache operations as an optimization. To use this feature, pass the
+  ``CULL_EVERY_N`` argument.
 
 CSP
 ~~~

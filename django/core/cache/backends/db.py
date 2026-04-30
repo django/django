@@ -2,6 +2,7 @@
 
 import base64
 import pickle
+import random
 from datetime import UTC, datetime
 
 from django.conf import settings
@@ -29,10 +30,37 @@ class Options:
         self.swapped = False
 
 
+class CullHandler:
+    def __init__(self, n):
+        self.n = n
+        self.elements = []
+        self.set()
+
+    def set(self):
+        elements = list(range(1, self.n + 1))
+        random.shuffle(elements)
+        self.elements = elements
+
+    def check(self):
+        if self.n == 1:
+            return True
+        n = self.elements.pop()
+        if len(self.elements) < 1:
+            self.set()
+        return n == self.n
+
+
 class BaseDatabaseCache(BaseCache):
     def __init__(self, table, params):
         super().__init__(params)
         self._table = table
+        options = params.get("OPTIONS", {})
+        try:
+            cull_n = int(options.get("CULL_EVERY_N", 1))
+        except (ValueError, TypeError):
+            cull_n = 1
+
+        self._cull_handler = CullHandler(n=cull_n)
 
         class CacheEntry:
             _meta = Options(table)
@@ -118,8 +146,6 @@ class DatabaseCache(BaseDatabaseCache):
         table = quote_name(self._table)
 
         with connection.cursor() as cursor:
-            cursor.execute("SELECT COUNT(*) FROM %s" % table)
-            num = cursor.fetchone()[0]
             now = tz_now()
             now = now.replace(microsecond=0)
             if timeout is None:
@@ -128,8 +154,11 @@ class DatabaseCache(BaseDatabaseCache):
                 tz = UTC if settings.USE_TZ else None
                 exp = datetime.fromtimestamp(timeout, tz=tz)
             exp = exp.replace(microsecond=0)
-            if num > self._max_entries:
-                self._cull(db, cursor, now, num)
+            if self._cull_handler.check():
+                cursor.execute("SELECT COUNT(*) FROM %s" % table)
+                num = cursor.fetchone()[0]
+                if num > self._max_entries:
+                    self._cull(db, cursor, now, num)
             pickled = pickle.dumps(value, self.pickle_protocol)
             # The DB column is expecting a string, so make sure the value is a
             # string, not bytes. Refs #19274.
