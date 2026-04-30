@@ -589,6 +589,12 @@ Miscellaneous
   deprecated. This syntax maps to a lookup of the empty string, which is
   normally a mistake.
 
+* The default value of the ``algorithm`` argument for
+  ``django.utils.crypto.salted_hmac()`` and
+  ``django.core.signing.base64_hmac()`` is deprecated and will change from
+  ``"sha1"`` to ``"sha256"`` in Django 7.0. Pass an explicit ``algorithm``
+  to silence the deprecation warning.
+
 Features removed in 6.1
 =======================
 
