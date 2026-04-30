@@ -1,0 +1,9 @@
+[
+    {
+        "pk": "100",
+        "model": "fixtures_regress.absolute",
+        "fields": {
+            "name": "Mixed format JSON"
+        }
+    }
+]
