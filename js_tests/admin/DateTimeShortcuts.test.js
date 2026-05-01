@@ -137,3 +137,34 @@ QUnit.test("today link has aria-label with current date", function (assert) {
     const expectedAriaLabel = `Today (${formattedDate})`;
     assert.equal(todayLink.attr("aria-label"), expectedAriaLabel);
 });
+
+QUnit.test("calendar today highlight with server offset", function (assert) {
+    const $ = django.jQuery;
+    const calDiv = $('<div id="test-calendar"></div>');
+    $("#qunit-fixture").append(calDiv);
+
+    // Simulate a server timezone that is 24 hours ahead of the browser.
+    const localOffset = new Date().getTimezoneOffset() * -60;
+    const serverOffset = localOffset + 86400;
+    $("body").attr("data-admin-utc-offset", serverOffset);
+
+    const expectedDate = new Date();
+    expectedDate.setTime(
+        expectedDate.getTime() + 1000 * (serverOffset - localOffset),
+    );
+
+    CalendarNamespace.draw(
+        expectedDate.getMonth() + 1,
+        expectedDate.getFullYear(),
+        "test-calendar",
+        function () {},
+    );
+
+    const todayCells = calDiv.find("td.today");
+    assert.equal(todayCells.length, 1, "Exactly one cell marked as today");
+    assert.equal(
+        todayCells.find("a").text(),
+        String(expectedDate.getDate()),
+        "Today cell matches server-adjusted date",
+    );
+});
