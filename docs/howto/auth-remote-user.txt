@@ -47,7 +47,8 @@ with :class:`~django.contrib.auth.backends.RemoteUserBackend` in the
     ]
 
 With this setup, ``RemoteUserMiddleware`` will detect the username in
-``request.META['REMOTE_USER']`` and will authenticate and auto-login that user
+``request.META['REMOTE_USER']`` (or ``request.META['HTTP_REMOTE_USER']`` under
+ASGI) and will authenticate and auto-login that user
 using the :class:`~django.contrib.auth.backends.RemoteUserBackend`.
 
 Be aware that this particular setup disables authentication with the default
@@ -103,9 +104,7 @@ instead of :class:`django.contrib.auth.middleware.RemoteUserMiddleware`::
     client can supply the header. You must be sure that your web server or
     reverse proxy always sets or strips that header based on the appropriate
     authentication checks, never permitting an end user to submit a fake (or
-    "spoofed") header value. In particular, ASGI deployments cannot be exposed
-    directly to the internet (that is, without a reverse proxy) when using this
-    middleware.
+    "spoofed") header value.
 
     Since the HTTP headers ``X-Auth-User`` and ``X-Auth_User`` (for example)
     both normalize to the ``HTTP_X_AUTH_USER`` key in ``request.META``, you
@@ -115,10 +114,12 @@ instead of :class:`django.contrib.auth.middleware.RemoteUserMiddleware`::
     Under WSGI, this warning doesn't apply to ``RemoteUserMiddleware`` in its
     default configuration with ``header = "REMOTE_USER"``, since a key that
     doesn't start with ``HTTP_`` in ``request.META`` can only be set by your
-    WSGI server, not directly from an HTTP request header. This warning *does*
-    apply by default on ASGI, because in the async path, the middleware
-    prepends ``HTTP_`` to the defined header name before looking it up in
-    ``request.META``.
+    WSGI server, not directly from an HTTP request header.
+
+    This warning applies under ASGI in all configurations, because there is
+    no equivalent for a WSGI server's ability to place a trusted value in the
+    environ. ASGI deployments *must* use a reverse proxy as described above
+    when using this middleware.
 
 If you need more control, you can create your own authentication backend
 that inherits from :class:`~django.contrib.auth.backends.RemoteUserBackend` and

@@ -1,10 +1,14 @@
+import unittest
 from datetime import UTC, datetime
+
+import asgiref.sync
 
 from django.conf import settings
 from django.contrib.auth import aauthenticate, authenticate
 from django.contrib.auth.backends import RemoteUserBackend
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User
+from django.middleware.common import CommonMiddleware
 from django.middleware.csrf import _get_new_csrf_string, _mask_cipher_secret
 from django.test import (
     AsyncClient,
@@ -19,6 +23,13 @@ from django.test import (
 class RemoteUserTest(TestCase):
     middleware = "django.contrib.auth.middleware.RemoteUserMiddleware"
     backend = "django.contrib.auth.backends.RemoteUserBackend"
+
+    # ASGI tests provide this value via `headers`.
+    # WSGI tests provide this value directly into the environ via `**extra`.
+    # When subclassing to provide a custom header, implement a property to
+    # strip the prefix, and always pass via `headers`, since the only case
+    # where it should be passed via the environ is under WSGI, and only when
+    # the value is exactly "REMOTE_USER".
     header = "REMOTE_USER"
     email_header = "REMOTE_EMAIL"
 
@@ -65,7 +76,9 @@ class RemoteUserTest(TestCase):
         self.assertTrue(response.context["user"].is_anonymous)
         self.assertEqual(await User.objects.acount(), num_users)
 
-        response = await self.async_client.get("/remote_user/", **{self.header: ""})
+        response = await self.async_client.get(
+            "/remote_user/", headers={self.header: ""}
+        )
         self.assertTrue(response.context["user"].is_anonymous)
         self.assertEqual(await User.objects.acount(), num_users)
 
@@ -142,7 +155,7 @@ class RemoteUserTest(TestCase):
         """See test_unknown_user."""
         num_users = await User.objects.acount()
         response = await self.async_client.get(
-            "/remote_user/", **{self.header: "newuser"}
+            "/remote_user/", headers={self.header: "newuser"}
         )
         self.assertEqual(response.context["user"].username, "newuser")
         self.assertEqual(await User.objects.acount(), num_users + 1)
@@ -150,7 +163,7 @@ class RemoteUserTest(TestCase):
 
         # Another request with same user should not create any new users.
         response = await self.async_client.get(
-            "/remote_user/", **{self.header: "newuser"}
+            "/remote_user/", headers={self.header: "newuser"}
         )
         self.assertEqual(await User.objects.acount(), num_users + 1)
 
@@ -176,14 +189,14 @@ class RemoteUserTest(TestCase):
         await User.objects.acreate(username="knownuser2")
         num_users = await User.objects.acount()
         response = await self.async_client.get(
-            "/remote_user/", **{self.header: self.known_user}
+            "/remote_user/", headers={self.header: self.known_user}
         )
         self.assertEqual(response.context["user"].username, "knownuser")
         self.assertEqual(await User.objects.acount(), num_users)
         # A different user passed in the headers causes the new user
         # to be logged in.
         response = await self.async_client.get(
-            "/remote_user/", **{self.header: self.known_user2}
+            "/remote_user/", headers={self.header: self.known_user2}
         )
         self.assertEqual(response.context["user"].username, "knownuser2")
         self.assertEqual(await User.objects.acount(), num_users)
@@ -221,7 +234,7 @@ class RemoteUserTest(TestCase):
         await user.asave()
 
         response = await self.async_client.get(
-            "/remote_user/", **{self.header: self.known_user}
+            "/remote_user/", headers={self.header: self.known_user}
         )
         self.assertNotEqual(default_login, response.context["user"].last_login)
 
@@ -229,7 +242,7 @@ class RemoteUserTest(TestCase):
         user.last_login = default_login
         await user.asave()
         response = await self.async_client.get(
-            "/remote_user/", **{self.header: self.known_user}
+            "/remote_user/", headers={self.header: self.known_user}
         )
         self.assertEqual(default_login, response.context["user"].last_login)
 
@@ -259,7 +272,7 @@ class RemoteUserTest(TestCase):
         await User.objects.acreate(username="knownuser")
         # Known user authenticates
         response = await self.async_client.get(
-            "/remote_user/", **{self.header: self.known_user}
+            "/remote_user/", headers={self.header: self.known_user}
         )
         self.assertEqual(response.context["user"].username, "knownuser")
         # During the session, the REMOTE_USER header disappears. Should trigger
@@ -295,12 +308,12 @@ class RemoteUserTest(TestCase):
         await User.objects.acreate(username="knownuser")
         # Known user authenticates
         response = await self.async_client.get(
-            "/remote_user/", **{self.header: self.known_user}
+            "/remote_user/", headers={self.header: self.known_user}
         )
         self.assertEqual(response.context["user"].username, "knownuser")
         # During the session, the REMOTE_USER changes to a different user.
         response = await self.async_client.get(
-            "/remote_user/", **{self.header: "newnewuser"}
+            "/remote_user/", headers={self.header: "newnewuser"}
         )
         # The current user is not the prior remote_user.
         # In backends that create a new user, username is "newnewuser"
@@ -315,7 +328,7 @@ class RemoteUserTest(TestCase):
     async def test_inactive_user_async(self):
         await User.objects.acreate(username="knownuser", is_active=False)
         response = await self.async_client.get(
-            "/remote_user/", **{self.header: "knownuser"}
+            "/remote_user/", headers={self.header: "knownuser"}
         )
         self.assertTrue(response.context["user"].is_anonymous)
 
@@ -343,7 +356,7 @@ class RemoteUserNoCreateTest(RemoteUserTest):
     async def test_unknown_user_async(self):
         num_users = await User.objects.acount()
         response = await self.async_client.get(
-            "/remote_user/", **{self.header: "newuser"}
+            "/remote_user/", headers={self.header: "newuser"}
         )
         self.assertTrue(response.context["user"].is_anonymous)
         self.assertEqual(await User.objects.acount(), num_users)
@@ -362,7 +375,7 @@ class AllowAllUsersRemoteUserBackendTest(RemoteUserTest):
     async def test_inactive_user_async(self):
         user = await User.objects.acreate(username="knownuser", is_active=False)
         response = await self.async_client.get(
-            "/remote_user/", **{self.header: self.known_user}
+            "/remote_user/", headers={self.header: self.known_user}
         )
         self.assertEqual(response.context["user"].username, user.username)
 
@@ -436,6 +449,29 @@ class RemoteUserCustomTest(RemoteUserTest):
         self.assertEqual(newuser.email, "user@example.com")
 
 
+class ASGISyncPathRemoteUserTest(RemoteUserTest):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        # Patch CommonMiddleware to be sync-only, and order it last. This will
+        # force process_request() to run even on an async request.
+        common = settings.MIDDLEWARE[:].pop(1)
+        # If this mock is removed, then methods in this class will fail without
+        # making cls.header begin with HTTP_, like CustomHeaderRemoteUserTest.
+        cls.enterClassContext(
+            unittest.mock.patch.object(CommonMiddleware, "async_capable", False)
+        )
+        cls.enterClassContext(
+            override_settings(MIDDLEWARE=[*settings.MIDDLEWARE, cls.middleware, common])
+        )
+
+    def setUp(self):
+        method = getattr(self, self._testMethodName)
+        if not isinstance(method, asgiref.sync.AsyncToSync):
+            self.skipTest("This test covers async-only functionality")
+
+
 class CustomHeaderMiddleware(RemoteUserMiddleware):
     """
     Middleware that overrides custom HTTP auth user header.
@@ -444,14 +480,49 @@ class CustomHeaderMiddleware(RemoteUserMiddleware):
     header = "HTTP_AUTHUSER"
 
 
-class CustomHeaderRemoteUserTest(RemoteUserTest):
+class CustomHeaderMixin:
+    @property
+    def header(self):
+        """Return the unprefixed header the client should provide."""
+        return self.auth_header.removeprefix("HTTP_")
+
+    def setUp(self):
+        """Force any **kwargs to be passed via `headers`."""
+        super().setUp()
+        original_get = self.client.get
+        original_async_get = self.async_client.get
+
+        def get(self, *args, headers={}, **kwargs):
+            headers = {**headers}
+            headers.update(kwargs)
+            return original_get(self, *args, headers=headers)
+
+        async def aget(self, *args, headers={}, **kwargs):
+            headers = {**headers}
+            headers.update(kwargs)
+            return await original_async_get(self, *args, headers=headers)
+
+        self.client.get = get
+        self.async_client.get = aget
+        self.addCleanup(setattr, self.client, "get", original_get)
+        self.addCleanup(setattr, self.async_client, "get", original_async_get)
+
+
+class CustomHeaderRemoteUserTest(CustomHeaderMixin, RemoteUserTest):
     """
     Tests a custom RemoteUserMiddleware subclass with custom HTTP auth user
     header.
     """
 
     middleware = "auth_tests.test_remote_user.CustomHeaderMiddleware"
-    header = "HTTP_AUTHUSER"
+    auth_header = "HTTP_AUTHUSER"
+
+
+class CustomHeaderASGISyncPathRemoteUserTest(
+    CustomHeaderMixin, ASGISyncPathRemoteUserTest
+):
+    middleware = "auth_tests.test_remote_user.CustomHeaderMiddleware"
+    auth_header = "HTTP_AUTHUSER"
 
 
 class PersistentRemoteUserTest(RemoteUserTest):
@@ -482,7 +553,7 @@ class PersistentRemoteUserTest(RemoteUserTest):
         await User.objects.acreate(username="knownuser")
         # Known user authenticates
         response = await self.async_client.get(
-            "/remote_user/", **{self.header: self.known_user}
+            "/remote_user/", headers={self.header: self.known_user}
         )
         self.assertEqual(response.context["user"].username, "knownuser")
         # Should stay logged in if the REMOTE_USER header disappears.
