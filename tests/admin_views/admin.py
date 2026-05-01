@@ -263,6 +263,18 @@ class ArticleAdmin(ArticleAdminWithExtraUrl):
     def changelist_view(self, request):
         return super().changelist_view(request, extra_context={"extra_var": "Hello!"})
 
+    def get_change_form_object_tools(self, request, obj):
+        from django.contrib.admin import ObjectTool
+
+        return [
+            ObjectTool(
+                label="Publish",
+                url="/some/publish/action/url",
+                classes="publishlink",
+            ),
+            *super().get_change_form_object_tools(request, obj),
+        ]
+
     @admin.display(ordering="date", description=None)
     def modeladmin_year(self, obj):
         return obj.date.year
