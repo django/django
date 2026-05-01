@@ -1,10 +1,14 @@
+import unittest
 from datetime import UTC, datetime
+
+import asgiref.sync
 
 from django.conf import settings
 from django.contrib.auth import aauthenticate, authenticate
 from django.contrib.auth.backends import RemoteUserBackend
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User
+from django.middleware.common import CommonMiddleware
 from django.middleware.csrf import _get_new_csrf_string, _mask_cipher_secret
 from django.test import (
     AsyncClient,
@@ -436,6 +440,29 @@ class RemoteUserCustomTest(RemoteUserTest):
         self.assertEqual(newuser.email, "user@example.com")
 
 
+class ASGISyncPathRemoteUserTest(RemoteUserTest):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        # Patch CommonMiddleware to be sync-only, and order it last. This will
+        # force process_request() to run even on an async request.
+        common = settings.MIDDLEWARE[:].pop(1)
+        # If this mock is removed, then methods in this class will fail without
+        # making cls.header begin with HTTP_, like CustomHeaderRemoteUserTest.
+        cls.enterClassContext(
+            unittest.mock.patch.object(CommonMiddleware, "async_capable", False)
+        )
+        cls.enterClassContext(
+            override_settings(MIDDLEWARE=[*settings.MIDDLEWARE, cls.middleware, common])
+        )
+
+    def setUp(self):
+        method = getattr(self, self._testMethodName)
+        if not isinstance(method, asgiref.sync.AsyncToSync):
+            self.skipTest("This test covers async-only functionality")
+
+
 class CustomHeaderMiddleware(RemoteUserMiddleware):
     """
     Middleware that overrides custom HTTP auth user header.
@@ -450,6 +477,11 @@ class CustomHeaderRemoteUserTest(RemoteUserTest):
     header.
     """
 
+    middleware = "auth_tests.test_remote_user.CustomHeaderMiddleware"
+    header = "HTTP_AUTHUSER"
+
+
+class CustomHeaderASGISyncPathRemoteUserTest(ASGISyncPathRemoteUserTest):
     middleware = "auth_tests.test_remote_user.CustomHeaderMiddleware"
     header = "HTTP_AUTHUSER"
 
