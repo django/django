@@ -8,9 +8,11 @@ from io import StringIO
 from pathlib import Path
 from smtplib import SMTPException
 from ssl import SSLError
-from unittest import mock, skipUnless
+from unittest import mock, skipIf, skipUnless
 
+from django.conf import settings
 from django.core import mail
+from django.core.exceptions import ImproperlyConfigured
 from django.core.mail import EmailMessage
 from django.core.mail.backends import dummy, filebased, locmem, smtp
 from django.core.mail.backends.base import BaseEmailBackend
@@ -256,11 +258,50 @@ class FileBackendTests(SharedEmailBackendTests, SimpleTestCase):
             backend = filebased.EmailBackend(file_path=file_path_override)
         self.assertEqual(backend.file_path, str(file_path_override))
 
+    def test_error_if_email_file_path_setting_not_defined(self):
+        msg = (
+            "The EMAIL_FILE_PATH setting must be defined to use the file EmailBackend."
+        )
+        with self.settings():
+            del settings.EMAIL_FILE_PATH
+            with self.assertRaisesMessage(ImproperlyConfigured, msg):
+                filebased.EmailBackend()
+
+    def test_error_if_file_path_is_not_directory(self):
+        tmp_file = Path(self.tmp_dir) / "ordinary-file"
+        tmp_file.touch()
+        if isinstance(self.tmp_dir, str):
+            # Running the non-"PathLib" version of FileBackendTests.
+            tmp_file = str(tmp_file)
+        msg = (
+            f"Path for saving email messages exists, but is not a directory: {tmp_file}"
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            filebased.EmailBackend(file_path=tmp_file)
+
+    @skipIf(
+        sys.platform == "win32",
+        "No cross-platform means to force an OSError from os.makedirs().",
+    )
+    def test_error_if_file_path_cannot_be_created(self):
+        msg = "Could not create directory for saving email messages: /dev/null/foo"
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            filebased.EmailBackend(file_path="/dev/null/foo")
+
+    @skipIf(
+        sys.platform == "win32",
+        "chmod does not reliably make directories read-only on Windows.",
+    )
+    def test_error_if_file_path_is_not_writeable(self):
+        os.chmod(self.tmp_dir, 0o444)
+        self.addCleanup(os.chmod, self.tmp_dir, 0o777)
+        msg = f"Could not write to directory: {self.tmp_dir}"
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            filebased.EmailBackend(file_path=self.tmp_dir)
+
     def test_new_file_per_instance(self):
-        """
-        Documented behavior: "A new file is created for each new session that
-        is opened on this backend."
-        """
+        # Documented behavior: "A new file is created for each new session that
+        # is opened on this backend."
         email = EmailMessage(to=["to@example.com"])
         self.assertEqual(len(self.get_filenames()), 0)
 
