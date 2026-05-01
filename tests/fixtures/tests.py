@@ -1166,6 +1166,17 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
                 ],
             )
 
+    def test_loading_dotted_path_without_format(self):
+        """
+        loaddata works when a directory in the fixture path contains a dot.
+        Refs #37081
+        """
+        management.call_command("loaddata", "dotted.folder/fixture", verbosity=0)
+        self.assertEqual(
+            Article.objects.get().headline,
+            "Fixture is loaded correctly when the path contains a dot",
+        )
+
 
 class NonexistentFixtureTests(TestCase):
     """

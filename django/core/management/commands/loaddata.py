@@ -6,6 +6,7 @@ import sys
 import warnings
 import zipfile
 from itertools import product
+from pathlib import PurePath
 
 from django.apps import apps
 from django.conf import settings
@@ -394,7 +395,8 @@ class Command(BaseCommand):
                 )
             return READ_STDIN, self.format, "stdin"
 
-        parts = fixture_name.rsplit(".", 2)
+        fixture_path = PurePath(fixture_name)
+        parts = fixture_path.name.rsplit(".", 2)
 
         if len(parts) > 1 and parts[-1] in self.compression_formats:
             cmp_fmt = parts[-1]
@@ -414,8 +416,7 @@ class Command(BaseCommand):
         else:
             ser_fmt = None
 
-        name = ".".join(parts)
-
+        name = str(fixture_path.parent.joinpath(".".join(parts)))
         return name, ser_fmt, cmp_fmt
 
 
