@@ -130,6 +130,13 @@ using a *virtual environment*, which is a feature built into Python that allows
 you to keep a separate directory of installed packages for each of your
 projects so that they don't interfere with each other.
 
+You can also optionally use `uv <https://github.com/astral-sh/uv>`_ to set up the
+environment and install dependencies:
+
+.. console::
+
+    $ uv sync
+
 It's a good idea to keep all your virtual environments in one place, for
 example in ``.virtualenvs/`` in your home directory.
 
