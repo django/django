@@ -478,12 +478,43 @@ class CustomHeaderRemoteUserTest(RemoteUserTest):
     """
 
     middleware = "auth_tests.test_remote_user.CustomHeaderMiddleware"
+    # Note: under WSGI, your request should send the "AUTHUSER" header, but
+    # under ASGI, your request should send "HTTP_AUTHUSER". The test client
+    # hides this difference, because it does not pass this value via the
+    # `headers` kwarg. By passing it via `**extra`, it gets passed to the
+    # underlying request, which, for ASGI, will apply prefixing, turning
+    # HTTP_AUTHUSER -> HTTP_HTTP_AUTHUSER. A more sensible header for ASGI
+    # is tested separately, see CustomHeaderASGISyncPathRemoteUserTest.
     header = "HTTP_AUTHUSER"
 
 
 class CustomHeaderASGISyncPathRemoteUserTest(ASGISyncPathRemoteUserTest):
-    middleware = "auth_tests.test_remote_user.CustomHeaderMiddleware"
-    header = "HTTP_AUTHUSER"
+    """
+    Tests a custom RemoteUserMiddleware subclass with custom HTTP auth user
+    header, with other sync middleware forcing sync execution under ASGI.
+
+    These tests are only run under ASGI, see super().setUpClass().
+    """
+
+    # Use a header that's more sensible for ASGI. (On the superclass,
+    # the header value HTTP_AUTHUSER will become, after prefixing,
+    # HTTP_HTTP_AUTHUSER under ASGI.)
+    header = "AUTHUSER"
+
+    async def test_header_value(self):
+        """
+        Header values do not correspond to request.META under ASGI. Thus,
+        a single subclass with a custom header cannot be reused on both WSGI
+        and ASGI deployments.
+        """
+        response = await self.async_client.get("/remote_user/", **{self.header: ""})
+        request = response.asgi_request
+        # The prefixed form is in request.META.
+        self.assertIn("HTTP_" + self.header, request.META)
+        self.assertNotIn(self.header, request.META)
+        # The unprefixed form is in request.headers.
+        self.assertIn(self.header, request.headers)
+        self.assertNotIn("HTTP_" + self.header, request.headers)
 
 
 class PersistentRemoteUserTest(RemoteUserTest):
@@ -514,7 +545,7 @@ class PersistentRemoteUserTest(RemoteUserTest):
         await User.objects.acreate(username="knownuser")
         # Known user authenticates
         response = await self.async_client.get(
-            "/remote_user/", **{self.header: self.known_user}
+            "/remote_user/", headers={self.header: self.known_user}
         )
         self.assertEqual(response.context["user"].username, "knownuser")
         # Should stay logged in if the REMOTE_USER header disappears.
