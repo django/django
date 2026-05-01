@@ -142,7 +142,7 @@ class RemoteUserMiddleware:
                 f" before the {self.__class__.__name__} class."
             )
         try:
-            username = self._get_username(request)
+            username = self.get_username(request)
         except KeyError:
             # If specified header doesn't exist then remove any existing
             # authenticated remote-user, or return (leaving request.user set to
@@ -184,7 +184,7 @@ class RemoteUserMiddleware:
                 f" before the {self.__class__.__name__} class."
             )
         try:
-            username = self._get_username(request)
+            username = self.get_username(request)
         except KeyError:
             # If specified header doesn't exist then remove any existing
             # authenticated remote-user, or return (leaving request.user set to
@@ -237,7 +237,7 @@ class RemoteUserMiddleware:
             pass
         return username
 
-    def _get_username(self, request):
+    def get_username(self, request):
         if isinstance(request, ASGIRequest):
             return request.META["HTTP_" + self.header]
         return request.META[self.header]
