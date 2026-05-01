@@ -9781,3 +9781,114 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
         response = self.client.get(unknown_url)
         # Does not redirect to the admin login.
         self.assertEqual(response.status_code, 404)
+
+
+@override_settings(ROOT_URLCONF="admin_views.urls")
+class RecentActionsRespectPermissionsTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
+            username="user",
+            password="secret",
+            email="user@example.com",
+        )
+        cls.user.is_staff = True
+        cls.user.save()
+
+        cls.s1 = Section.objects.create(name="Test section")
+        cls.a1 = Article.objects.create(
+            title="Middle article",
+            content="<p>Middle content</p>",
+            date=datetime.datetime(2008, 3, 18, 11, 54, 58),
+            section=cls.s1,
+        )
+        cls.a2 = Article.objects.create(
+            title="Oldest article",
+            content="<p>Oldest content</p>",
+            date=datetime.datetime(2000, 3, 18, 11, 54, 58),
+            section=cls.s1,
+        )
+
+        user_pk = cls.user.pk
+
+        LogEntry.objects.log_actions(
+            user_pk,
+            [cls.a1, cls.a2],
+            1,
+            change_message="Added something",
+        )
+
+    def setUp(self):
+        self.client.force_login(self.user)
+
+    def test_recentactions_no_link_with_no_global_perms(self):
+        """
+        The recent actions message should not have link when
+        user has no global perms to view/edit the instance.
+        (No links for both of the articles)
+        """
+        response = self.client.get(reverse("admin:index"))
+        # Span message instead of the link
+        should_contain = f"""
+                        <span class="no-edit-perm-action tooltip">
+                            {escape(self.a2.title)}
+                            <span class="tooltip-text">
+                                No edit access.
+                            </span>
+                        </span>
+                        """
+
+        self.assertContains(response, should_contain, html=True)
+        # reverse link to default site because
+        # thats what entry.get_admin_url returns
+        link = reverse("admin:admin_views_article_change", args=(quote(self.a2.pk),))
+        should_not_contain = """<a href="%s">%s</a>""" % (
+            escape(link),
+            escape(self.a2.title),
+        )
+        self.assertNotContains(response, should_not_contain, html=True)
+
+        should_contain = f"""
+                        <span class="no-edit-perm-action tooltip">
+                            {escape(self.a1.title)}
+                            <span class="tooltip-text">
+                                No edit access.
+                            </span>
+                        </span>
+                        """
+        self.assertContains(response, should_contain, html=True)
+
+        link = reverse("admin:admin_views_article_change", args=(quote(self.a1.pk),))
+        should_not_contain = """<a href="%s">%s</a>""" % (
+            escape(link),
+            escape(self.a1.title),
+        )
+        self.assertNotContains(response, should_not_contain, html=True)
+
+    def test_recentactions_no_link_with_no_per_obj_perm(self):
+        """
+        The recent actions message should not have link when
+        user has no per obj perms to view/edit the instance.
+        But the other ones should have a link.
+        (Link only for one article)
+        """
+        # Admin 14 for per object permissions
+        response = self.client.get(reverse("admin14:index"))
+        should_contain = """
+                        <span class="no-edit-perm-action tooltip">
+                            %s
+                            <span class="tooltip-text">
+                                No edit access.
+                            </span>
+                        </span>
+                        """
+        self.assertContains(response, should_contain % escape(self.a2.title), html=True)
+
+        # reverse link to default site because
+        # thats what entry.get_admin_url returns
+        link1 = reverse("admin:admin_views_article_change", args=(quote(self.a1.pk),))
+        should_contain = """<a href="%s">%s</a>""" % (
+            escape(link1),
+            escape(self.a1.title),
+        )
+        self.assertContains(response, should_contain, html=True)

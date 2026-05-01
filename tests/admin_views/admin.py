@@ -1507,3 +1507,15 @@ site9.register(Person, PersonNoChangePermissionsAdmin9)
 site10 = admin.AdminSite(name="admin10")
 site10.final_catch_all_view = False
 site10.register(Article, ArticleAdminWithExtraUrl)
+
+
+class ArticleAdmin14(admin.ModelAdmin):
+    def has_change_permission(self, request, obj=None):
+        """No permissions for specific article"""
+        if obj is None:
+            return True
+        return not (obj.title == "Oldest article")
+
+
+site14 = admin.AdminSite(name="admin14")
+site14.register(Article, ArticleAdmin14)

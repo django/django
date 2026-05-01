@@ -1192,6 +1192,34 @@ a.deletelink:hover {
     line-height: 1.2;
     margin-bottom: 10px;
     padding-left: 18px;
+    overflow: visible;
+}
+
+#content-related .actionlist .no-edit-perm-action {
+    color: var(--link-fg);
+    text-decoration: underline;
+}
+
+#content-related .actionlist .tooltip {
+    position: relative;
+    cursor: pointer;
+}
+
+#content-related .actionlist .tooltip .tooltip-text {
+    visibility: hidden;
+    background-color: #555;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    position: absolute;
+    bottom: 125%;
+    left: 0;
+    transform: none;
+    white-space: nowrap;
+}
+
+#content-related .actionlist .tooltip:hover .tooltip-text {
+    visibility: visible;
 }
 
 #content-related .module h2 {
