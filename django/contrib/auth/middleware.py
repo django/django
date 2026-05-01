@@ -184,6 +184,9 @@ class RemoteUserMiddleware:
                 " before the RemoteUserMiddleware class."
             )
         try:
+            # BUG: on ASGI, as of Django 5.2, the value of the .header
+            # attribute is what must be sent by the client.
+            # https://code.djangoproject.com/ticket/36300
             username = request.META["HTTP_" + self.header]
         except KeyError:
             # If specified header doesn't exist then remove any existing
