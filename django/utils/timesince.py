@@ -93,7 +93,9 @@ def timesince(d, now=None, reversed=False, time_strings=None, depth=2):
         )
 
     if both_aware:
-        delta = now.astimezone(datetime.UTC) - d.astimezone(datetime.UTC)
+        d_utc = d.astimezone(datetime.UTC)
+        now_utc = now.astimezone(datetime.UTC)
+        delta = now_utc - d_utc
     else:
         delta = now - d
 
@@ -105,6 +107,7 @@ def timesince(d, now=None, reversed=False, time_strings=None, depth=2):
 
     # Get years and months.
     total_months = (now.year - d.year) * 12 + (now.month - d.month)
+    # Guard against DST rollback crossing a local month boundary backward.
     total_months = max(total_months, 0)
     years, months = divmod(total_months, 12)
 
@@ -114,9 +117,7 @@ def timesince(d, now=None, reversed=False, time_strings=None, depth=2):
     pivot = build_pivot(total_months)
     if total_months:
         if both_aware:
-            pivot_is_later = pivot.astimezone(datetime.UTC) > now.astimezone(
-                datetime.UTC
-            )
+            pivot_is_later = pivot.astimezone(datetime.UTC) > now_utc
         else:
             pivot_is_later = pivot > now
     else:
@@ -127,7 +128,7 @@ def timesince(d, now=None, reversed=False, time_strings=None, depth=2):
         pivot = build_pivot(total_months)
     if both_aware:
         remaining_time = (
-            now.astimezone(datetime.UTC) - pivot.astimezone(datetime.UTC)
+            now_utc - pivot.astimezone(datetime.UTC)
         ).total_seconds()
     else:
         remaining_time = (now - pivot).total_seconds()

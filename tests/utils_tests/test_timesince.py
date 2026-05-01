@@ -289,6 +289,11 @@ class TimesinceTests(TestCase):
             timesince(t, seventy_minutes_later),
             "1\xa0hour, 10\xa0minutes",
         )
+        self.assertEqual(timeuntil(ten_minutes_later, t), "10\xa0minutes")
+        self.assertEqual(
+            timeuntil(seventy_minutes_later, t),
+            "1\xa0hour, 10\xa0minutes",
+        )
 
     def test_across_dst_fallback_same_wall_time_with_different_fold(self):
         berlin = zoneinfo.ZoneInfo("Europe/Berlin")
