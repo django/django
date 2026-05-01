@@ -290,6 +290,10 @@ Management Commands
   :data:`~django.db.models.signals.m2m_changed` signals with ``raw=True`` when
   loading fixtures.
 
+* The :djadmin:`loaddata` command now reports the unrecognized
+  serialization format when a fixture file is loaded by name without
+  the file extension.
+
 Migrations
 ~~~~~~~~~~
 

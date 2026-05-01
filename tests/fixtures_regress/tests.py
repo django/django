@@ -265,6 +265,48 @@ class TestFixtures(TestCase):
                 verbosity=0,
             )
 
+    def test_unknown_format_no_ext(self):
+        """
+        Loading a fixture in an unknown format without its file extension
+        raises the same error as when the extension is specified
+        explicitly (#13680).
+        """
+        msg = (
+            "Problem installing fixture 'unknown_format': invalid is not a "
+            "known serialization format."
+        )
+        with self.assertRaisesMessage(management.CommandError, msg):
+            management.call_command(
+                "loaddata",
+                "unknown_format",
+                verbosity=0,
+            )
+
+    def test_unknown_format_no_ext_with_known_format(self):
+        """
+        A fixture in a known format is loaded normally even when a sibling
+        file with the same basename uses an unknown extension (#13680).
+        """
+        management.call_command("loaddata", "mixed_format", verbosity=0)
+        self.assertEqual(Absolute.objects.filter(name="Mixed format JSON").count(), 1)
+
+    def test_unknown_format_no_ext_compressed(self):
+        """
+        Loading a fixture by name when only a compressed file with an
+        unknown serialization format extension exists raises a helpful
+        error identifying the unknown format (#13680).
+        """
+        msg = (
+            "Problem installing fixture 'compressed_unknown': invalid is "
+            "not a known serialization format."
+        )
+        with self.assertRaisesMessage(management.CommandError, msg):
+            management.call_command(
+                "loaddata",
+                "compressed_unknown",
+                verbosity=0,
+            )
+
     @override_settings(SERIALIZATION_MODULES={"unkn": "unexistent.path"})
     def test_unimportable_serializer(self):
         """
