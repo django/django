@@ -173,8 +173,8 @@ class RemoteUserMiddleware:
         return await self.get_response(request)
 
     async def aprocess_request(self, request):
-        # AuthenticationMiddleware is required so that request.user exists.
-        if not hasattr(request, "user"):
+        # AuthenticationMiddleware is required so that request.auser exists.
+        if not hasattr(request, "auser"):
             raise ImproperlyConfigured(
                 "The Django remote user auth middleware requires the"
                 " authentication middleware to be installed. Edit your"
@@ -198,7 +198,7 @@ class RemoteUserMiddleware:
         # getting passed in the headers, then the correct user is already
         # persisted in the session and we don't need to continue.
         if user.is_authenticated:
-            if user.get_username() == self.clean_username(username, request):
+            if user.get_username() == await self.aclean_username(username, request):
                 return
             else:
                 # An authenticated user is associated with the request, but
@@ -219,6 +219,16 @@ class RemoteUserMiddleware:
         clean_username method.
         """
         backend_str = request.session[auth.BACKEND_SESSION_KEY]
+        backend = auth.load_backend(backend_str)
+        try:
+            username = backend.clean_username(username)
+        except AttributeError:  # Backend has no clean_username method.
+            pass
+        return username
+
+    async def aclean_username(self, username, request):
+        """See clean_username."""
+        backend_str = await request.session.aget(auth.BACKEND_SESSION_KEY)
         backend = auth.load_backend(backend_str)
         try:
             username = backend.clean_username(username)
