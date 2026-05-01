@@ -390,6 +390,13 @@ class CustomRemoteUserBackend(RemoteUserBackend):
         user.save()
         return user
 
+    async def aconfigure_user(self, request, user, created=True):
+        user.email = request.META.get("HTTP_" + RemoteUserTest.email_header, "")
+        if not created:
+            user.last_name = user.username
+        await user.asave()
+        return user
+
 
 class RemoteUserCustomTest(RemoteUserTest):
     """
@@ -434,6 +441,32 @@ class RemoteUserCustomTest(RemoteUserTest):
         self.assertEqual(response.context["user"].last_name, "")
         self.assertEqual(User.objects.count(), num_users + 1)
         newuser = User.objects.get(username="newuser")
+        self.assertEqual(newuser.email, "user@example.com")
+
+    async def test_known_user_async(self):
+        """See test_known_user."""
+        await super().test_known_user_async()
+        knownuser = await User.objects.aget(username="knownuser")
+        knownuser2 = await User.objects.aget(username="knownuser2")
+        self.assertEqual(knownuser.email, "")
+        self.assertEqual(knownuser2.email, "")
+        self.assertEqual(knownuser.last_name, "knownuser")
+        self.assertEqual(knownuser2.last_name, "knownuser2")
+
+    async def test_unknown_user_async(self):
+        num_users = await User.objects.acount()
+        response = await self.async_client.get(
+            "/remote_user/",
+            **{
+                self.header: "newuser",
+                self.email_header: "user@example.com",
+            },
+        )
+        self.assertEqual(response.context["user"].username, "newuser")
+        self.assertEqual(response.context["user"].email, "user@example.com")
+        self.assertEqual(response.context["user"].last_name, "")
+        self.assertEqual(await User.objects.acount(), num_users + 1)
+        newuser = await User.objects.aget(username="newuser")
         self.assertEqual(newuser.email, "user@example.com")
 
 
