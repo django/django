@@ -459,6 +459,15 @@ backends.
 * The undocumented ``InclusionAdminNode.__init__()`` now takes the template tag
   ``name`` as the first positional argument.
 
+:mod:`django.contrib.auth`
+--------------------------
+
+* Under ASGI, :class:`~django.contrib.auth.middleware.RemoteUserMiddleware` no
+  longer prefixes ``HTTP_`` when looking up custom values in ``request.META``.
+  For example, to send ``-H "AuthUser": ...``, the ``header`` attribute should
+  be ``HTTP_AUTHUSER``. This restores the behavior prior to Django 5.2. (The
+  default value of ``REMOTE_USER`` is not affected.)
+
 :mod:`django.contrib.gis`
 -------------------------
 

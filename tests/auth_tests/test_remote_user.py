@@ -480,24 +480,10 @@ class CustomHeaderMiddleware(RemoteUserMiddleware):
     header = "HTTP_AUTHUSER"
 
 
-class CustomHeaderRemoteUserTest(RemoteUserTest):
-    """
-    Tests a custom RemoteUserMiddleware subclass with custom HTTP auth user
-    header.
-    """
-
-    middleware = "auth_tests.test_remote_user.CustomHeaderMiddleware"
-    auth_header = "HTTP_AUTHUSER"
-
+class CustomHeaderMixin:
     @property
     def header(self):
         """Return the unprefixed header the client should provide."""
-        method = getattr(self, self._testMethodName)
-        if isinstance(method, asgiref.sync.AsyncToSync):
-            # BUG: on ASGI, as of Django 5.2, the value of the .header
-            # attribute is what must be sent by the client.
-            # https://code.djangoproject.com/ticket/36300
-            return self.auth_header
         return self.auth_header.removeprefix("HTTP_")
 
     def setUp(self):
@@ -522,9 +508,21 @@ class CustomHeaderRemoteUserTest(RemoteUserTest):
         self.addCleanup(setattr, self.async_client, "get", original_async_get)
 
 
-class CustomHeaderASGISyncPathRemoteUserTest(ASGISyncPathRemoteUserTest):
+class CustomHeaderRemoteUserTest(CustomHeaderMixin, RemoteUserTest):
+    """
+    Tests a custom RemoteUserMiddleware subclass with custom HTTP auth user
+    header.
+    """
+
     middleware = "auth_tests.test_remote_user.CustomHeaderMiddleware"
-    header = "HTTP_AUTHUSER"
+    auth_header = "HTTP_AUTHUSER"
+
+
+class CustomHeaderASGISyncPathRemoteUserTest(
+    CustomHeaderMixin, ASGISyncPathRemoteUserTest
+):
+    middleware = "auth_tests.test_remote_user.CustomHeaderMiddleware"
+    auth_header = "HTTP_AUTHUSER"
 
 
 class PersistentRemoteUserTest(RemoteUserTest):
