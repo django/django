@@ -127,9 +127,7 @@ def timesince(d, now=None, reversed=False, time_strings=None, depth=2):
         years, months = divmod(total_months, 12)
         pivot = build_pivot(total_months)
     if both_aware:
-        remaining_time = (
-            now_utc - pivot.astimezone(datetime.UTC)
-        ).total_seconds()
+        remaining_time = (now_utc - pivot.astimezone(datetime.UTC)).total_seconds()
     else:
         remaining_time = (now - pivot).total_seconds()
     partials = [years, months]
