@@ -231,6 +231,9 @@ class RemoteUserMiddleware:
 
     def get_username(self, request):
         if isinstance(request, ASGIRequest):
+            # BUG: on ASGI, as of Django 5.2, the value of the .header
+            # attribute is what must be sent by the client.
+            # https://code.djangoproject.com/ticket/36300
             return request.META["HTTP_" + self.header]
         return request.META[self.header]
 
