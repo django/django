@@ -120,6 +120,39 @@ class BaseBackendTest(TestCase):
             await self.user.ahas_perms(object())
 
 
+class GetUserNoopTests(SimpleTestCase):
+    def test_base_backend_get_user_is_noop(self):
+        backend = BaseBackend()
+        self.assertIs(backend.get_user.noop, True)
+
+    def test_base_backend_aget_user_is_noop(self):
+        backend = BaseBackend()
+        self.assertIs(backend.aget_user.noop, True)
+
+    def test_model_backend_get_user_is_not_noop(self):
+        backend = ModelBackend()
+        self.assertIs(getattr(backend.get_user, "noop", False), False)
+
+    def test_model_backend_aget_user_is_not_noop(self):
+        backend = ModelBackend()
+        self.assertIs(getattr(backend.aget_user, "noop", False), False)
+
+    def test_subclass_overriding_get_user_is_not_noop(self):
+        class CustomBackend(BaseBackend):
+            def get_user(self, user_id):
+                return None
+
+        backend = CustomBackend()
+        self.assertIs(getattr(backend.get_user, "noop", False), False)
+
+    def test_subclass_not_overriding_get_user_is_noop(self):
+        class PermissionOnlyBackend(BaseBackend):
+            pass
+
+        backend = PermissionOnlyBackend()
+        self.assertIs(backend.get_user.noop, True)
+
+
 class CountingMD5PasswordHasher(MD5PasswordHasher):
     """Hasher that counts how many times it computes a hash."""
 
