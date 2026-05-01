@@ -119,7 +119,9 @@ def timesince(d, now=None, reversed=False, time_strings=None, depth=2):
         if both_aware:
             pivot_is_later = pivot.astimezone(datetime.UTC) > now_utc
         else:
-            pivot_is_later = pivot > now
+            pivot_is_later = d.day > now.day or (
+                d.day == now.day and d.time() > now.time()
+            )
     else:
         pivot_is_later = False
     if pivot_is_later:
