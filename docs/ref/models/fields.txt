@@ -2645,6 +2645,47 @@ Field API reference
 
         See :ref:`converting-model-field-to-serialization` for usage.
 
+    Some additional hooks for serialization and deserialization should only be
+    used if :meth:`value_to_string` and :meth:`to_python` aren't sufficient.
+    For example, :class:`CompositePrimaryKey` overrides
+    ``serialize_to_python()`` to call it for each of its fields. To allow this
+    sort of use case, each serialize method provides the ``serializer`` as an
+    argument.
+
+    Hooks for serializers that inherit the Python serializer (``json``,
+    ``jsonl``, and ``yaml``):
+
+    .. method:: serialize_to_python(obj, serializer)
+
+        .. versionadded:: 6.1
+
+        The base implementation passes through JSON-serializable types
+        (``None``, ``int``, ``float``, :class:`~decimal.Decimal`,
+        :class:`~datetime.datetime`, :class:`~datetime.date`, and
+        :class:`~datetime.time`) unchanged. Other values are passed to
+        :meth:`value_to_string`.
+
+    .. method:: deserialize_from_python(value)
+
+        .. versionadded:: 6.1
+
+        The base implementation calls :meth:`to_python`.
+
+    Hooks for the ``xml`` serializer:
+
+    .. method:: serialize_to_xml(obj, serializer)
+
+        .. versionadded:: 6.1
+
+        The base implementation calls :meth:`value_to_string`.
+
+    .. method:: deserialize_from_xml(field_node)
+
+        .. versionadded:: 6.1
+
+        The base implementation extracts the text from ``field_node``, strips
+        whitespace, and passes the value to :meth:`to_python`.
+
     When using :doc:`model forms </topics/forms/modelforms>`, the ``Field``
     needs to know which form field it should be represented by:
 
