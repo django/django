@@ -169,6 +169,17 @@ class ModelChoiceFieldTests(TestCase):
         Category.objects.all().delete()
         self.assertIs(bool(f.choices), False)
 
+    def test_empty_label_one_query(self):
+        class MyForm(forms.Form):
+            f = forms.ModelChoiceField(Category.objects.all(), empty_label=None)
+
+        form = MyForm()
+        with self.assertNumQueries(1):
+            form.as_ul()
+        # Make sure the query re-runs when re-rendering the form.
+        with self.assertNumQueries(1):
+            form.as_ul()
+
     def test_choices_bool_empty_label(self):
         f = forms.ModelChoiceField(Category.objects.all(), empty_label="--------")
         Category.objects.all().delete()

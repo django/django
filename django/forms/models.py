@@ -3,6 +3,7 @@ Helper functions for creating Form classes from Django models
 and database field objects.
 """
 
+from collections import deque
 from itertools import chain
 
 from django.core.exceptions import (
@@ -1438,16 +1439,30 @@ class ModelChoiceIterator(BaseChoiceIterator):
     def __init__(self, field):
         self.field = field
         self.queryset = field.queryset
+        self._deque = deque()
+
+        def generator():
+            if self.field.empty_label is not None:
+                yield ("", self.field.empty_label)
+            queryset = self.queryset
+            # Can't use iterator() when queryset uses prefetch_related()
+            if not queryset._prefetch_related_lookups:
+                queryset = queryset.iterator()
+            for obj in iter(queryset):
+                yield self.choice(obj)
+            # Reset the generator after it's exhausted so that it can
+            # be used again.
+            self.generator = generator()
+
+        self.generator = generator()
 
     def __iter__(self):
-        if self.field.empty_label is not None:
-            yield ("", self.field.empty_label)
-        queryset = self.queryset
-        # Can't use iterator() when queryset uses prefetch_related()
-        if not queryset._prefetch_related_lookups:
-            queryset = queryset.iterator()
-        for obj in queryset:
-            yield self.choice(obj)
+        return self
+
+    def __next__(self):
+        if self._deque:
+            return self._deque.popleft()
+        return next(self.generator)
 
     def __len__(self):
         # count() adds a query but uses less memory since the QuerySet results
@@ -1456,13 +1471,21 @@ class ModelChoiceIterator(BaseChoiceIterator):
         return self.queryset.count() + (1 if self.field.empty_label is not None else 0)
 
     def __bool__(self):
-        return self.field.empty_label is not None or self.queryset.exists()
+        return (
+            self.field.empty_label is not None or self._deque or self.queryset.exists()
+        )
 
     def choice(self, obj):
         return (
             ModelChoiceIteratorValue(self.field.prepare_value(obj), obj),
             self.field.label_from_instance(obj),
         )
+
+    def peek(self):
+        value = next(self.generator, None)
+        if value is not None:
+            self._deque.append(value)
+        return value
 
 
 class ModelChoiceField(ChoiceField):
