@@ -997,6 +997,32 @@ It also provides an additional method:
                 self.assertEqual(mail.outbox[0].subject, "Contact Form")
                 self.assertEqual(mail.outbox[0].body, "I like your site")
 
+Cache isolation
+---------------
+
+To ensure test isolation, :class:`TestCase` clears the default cache
+before each test method. This prevents cached data from one test from
+affecting subsequent tests.
+
+If your tests require the cache to persist across test methods, set
+the :attr:`clears_caches` attribute to ``False``::
+
+    class MyPersistentCacheTests(TestCase):
+        clears_caches = False
+
+        def test_build_cache(self):
+            cache.set("expensive_data", compute_data())
+
+        def test_use_cache(self):
+            data = cache.get("expensive_data")
+            self.assertIsNotNone(data)
+
+.. note::
+
+    Only the default cache is cleared. Other configured caches are
+    unaffected. Only :class:`TestCase` clears caches automatically;
+    :class:`SimpleTestCase` does not.
+
 .. _live-test-server:
 
 ``LiveServerTestCase``
@@ -2021,6 +2047,7 @@ creates.
     methods with :func:`~asgiref.sync.async_to_sync` *inside* of them instead::
 
         from asgiref.sync import async_to_sync
+
         from django.test import TestCase
 
 
