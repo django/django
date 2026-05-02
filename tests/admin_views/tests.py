@@ -3109,6 +3109,205 @@ class AdminViewPermissionsTest(TestCase):
         formset = response.context["inline_admin_formsets"][0]
         self.assertEqual(len(formset.forms), 3)
 
+    def test_save_as_new_with_parent_validation_error_and_view_only_inlines(self):
+        self.viewuser.user_permissions.add(
+            get_perm(Section, get_permission_codename("add", Section._meta))
+        )
+        self.viewuser.user_permissions.add(
+            get_perm(Section, get_permission_codename("change", Section._meta))
+        )
+        self.client.force_login(self.viewuser)
+        section = Section.objects.create(name="Ticket29969 section")
+        article = Article.objects.create(
+            title="Ticket29969 article",
+            content="<p>Inline content</p>",
+            date=datetime.datetime(2008, 3, 18, 11, 54, 58),
+            section=section,
+        )
+        response = self.client.post(
+            reverse("admin:admin_views_section_change", args=(section.pk,)),
+            {
+                "_saveasnew": "Save as new",
+                "name": "",
+                "article_set-TOTAL_FORMS": 1,
+                "article_set-INITIAL_FORMS": 1,
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Please correct the error below.")
+        self.assertFalse(response.context["show_save_and_add_another"])
+        self.assertFalse(response.context["show_save_and_continue"])
+        self.assertTrue(response.context["show_save_as_new"])
+        self.assertEqual(len(response.context["inline_admin_formsets"]), 1)
+        inline_formset = response.context["inline_admin_formsets"][0]
+        self.assertFalse(inline_formset.has_change_permission)
+        self.assertEqual(len(inline_formset.forms), 1)
+        self.assertEqual(inline_formset.formset.forms[0].instance, article)
+        self.assertContains(response, "Ticket29969 article")
+
+    def test_save_as_new_with_view_only_inlines(self):
+        self.viewuser.user_permissions.add(
+            get_perm(Section, get_permission_codename("add", Section._meta))
+        )
+        self.viewuser.user_permissions.add(
+            get_perm(Section, get_permission_codename("change", Section._meta))
+        )
+        self.client.force_login(self.viewuser)
+        section = Section.objects.create(name="Ticket29969 section")
+        Article.objects.create(
+            title="Ticket29969 article",
+            content="<p>Inline content</p>",
+            date=datetime.datetime(2008, 3, 18, 11, 54, 58),
+            section=section,
+        )
+        section_count = Section.objects.count()
+        article_count = Article.objects.count()
+        response = self.client.post(
+            reverse("admin:admin_views_section_change", args=(section.pk,)),
+            {
+                "_saveasnew": "Save as new",
+                "name": "Ticket29969 section copy",
+                "article_set-TOTAL_FORMS": 1,
+                "article_set-INITIAL_FORMS": 1,
+            },
+        )
+        self.assertEqual(Section.objects.count(), section_count + 1)
+        self.assertEqual(Article.objects.count(), article_count)
+        new_section = Section.objects.latest("id")
+        self.assertEqual(new_section.name, "Ticket29969 section copy")
+        self.assertFalse(new_section.article_set.exists())
+        self.assertRedirects(
+            response,
+            reverse("admin:admin_views_section_change", args=(new_section.pk,)),
+        )
+
+    def test_save_as_new_with_view_only_inlines_deleted_source_object(self):
+        self.viewuser.user_permissions.add(
+            get_perm(Section, get_permission_codename("add", Section._meta))
+        )
+        self.viewuser.user_permissions.add(
+            get_perm(Section, get_permission_codename("change", Section._meta))
+        )
+        self.client.force_login(self.viewuser)
+        section = Section.objects.create(name="Ticket29969 section")
+        change_url = reverse("admin:admin_views_section_change", args=(section.pk,))
+        section_pk = section.pk
+        section.delete()
+        response = self.client.post(
+            change_url,
+            {"_saveasnew": "Save as new", "name": "Ticket29969 section copy"},
+            follow=True,
+        )
+        self.assertRedirects(response, reverse("admin:index"))
+        self.assertEqual(
+            [m.message for m in response.context["messages"]],
+            [f"section with ID “{section_pk}” doesn’t exist. Perhaps it was deleted?"],
+        )
+
+    def test_save_as_new_without_object_id(self):
+        self.viewuser.user_permissions.add(
+            get_perm(Section, get_permission_codename("add", Section._meta))
+        )
+        self.client.force_login(self.viewuser)
+        section_count = Section.objects.count()
+        response = self.client.post(
+            reverse("admin:admin_views_section_add"),
+            {
+                "_saveasnew": "Save as new",
+                "name": "Ticket29969 section from add view",
+                "article_set-TOTAL_FORMS": 0,
+                "article_set-INITIAL_FORMS": 0,
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Section.objects.count(), section_count + 1)
+
+    def test_save_as_new_with_add_only_inline_permissions(self):
+        self.viewuser.user_permissions.add(
+            get_perm(Section, get_permission_codename("add", Section._meta))
+        )
+        self.viewuser.user_permissions.add(
+            get_perm(Section, get_permission_codename("change", Section._meta))
+        )
+        self.viewuser.user_permissions.add(
+            get_perm(Article, get_permission_codename("add", Article._meta))
+        )
+        self.client.force_login(self.viewuser)
+        section = Section.objects.create(name="Ticket29969 source section")
+        Article.objects.create(
+            title="Ticket29969 source article",
+            content="<p>Inline content</p>",
+            date=datetime.datetime(2008, 3, 18, 11, 54, 58),
+            section=section,
+        )
+        section_count = Section.objects.count()
+        article_count = Article.objects.count()
+        response = self.client.post(
+            reverse("admin:admin_views_section_change", args=(section.pk,)),
+            {
+                "_saveasnew": "Save as new",
+                "name": "Ticket29969 section copy",
+                "article_set-TOTAL_FORMS": 1,
+                "article_set-INITIAL_FORMS": 0,
+                "article_set-0-id": "",
+                "article_set-0-title": "Ticket29969 added inline",
+                "article_set-0-content": "<p>New inline content</p>",
+                "article_set-0-date_0": "2008-03-18",
+                "article_set-0-date_1": "11:54:58",
+                "article_set-0-section": str(section.pk),
+            },
+        )
+        self.assertEqual(Section.objects.count(), section_count + 1)
+        self.assertEqual(Article.objects.count(), article_count + 1)
+        new_section = Section.objects.latest("id")
+        new_article = Article.objects.get(title="Ticket29969 added inline")
+        self.assertEqual(new_article.section, new_section)
+        self.assertEqual(section.article_set.count(), 1)
+        self.assertRedirects(
+            response,
+            reverse("admin:admin_views_section_change", args=(new_section.pk,)),
+        )
+
+    def test_save_as_new_with_add_only_inline_validation_error(self):
+        self.viewuser.user_permissions.add(
+            get_perm(Section, get_permission_codename("add", Section._meta))
+        )
+        self.viewuser.user_permissions.add(
+            get_perm(Section, get_permission_codename("change", Section._meta))
+        )
+        self.viewuser.user_permissions.add(
+            get_perm(Article, get_permission_codename("add", Article._meta))
+        )
+        self.client.force_login(self.viewuser)
+        section = Section.objects.create(name="Ticket29969 source section")
+        Article.objects.create(
+            title="Ticket29969 source article",
+            content="<p>Inline content</p>",
+            date=datetime.datetime(2008, 3, 18, 11, 54, 58),
+            section=section,
+        )
+        response = self.client.post(
+            reverse("admin:admin_views_section_change", args=(section.pk,)),
+            {
+                "_saveasnew": "Save as new",
+                "name": "",
+                "article_set-TOTAL_FORMS": 1,
+                "article_set-INITIAL_FORMS": 0,
+                "article_set-0-id": "",
+                "article_set-0-title": "Ticket29969 new inline",
+                "article_set-0-content": "<p>New content</p>",
+                "article_set-0-date_0": "2008-03-18",
+                "article_set-0-date_1": "11:54:58",
+                "article_set-0-section": "",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Please correct the error below.")
+        inline_formset = response.context["inline_admin_formsets"][0]
+        self.assertTrue(inline_formset.has_add_permission)
+        self.assertFalse(inline_formset.has_change_permission)
+        self.assertContains(response, "Ticket29969 new inline")
+
     def test_change_view_with_view_only_last_inline(self):
         self.viewuser.user_permissions.add(
             get_perm(Section, get_permission_codename("view", Section._meta))

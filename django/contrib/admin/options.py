@@ -1863,7 +1863,17 @@ class ModelAdmin(BaseModelAdmin):
                 "The field %s cannot be referenced." % to_field
             )
 
-        if request.method == "POST" and "_saveasnew" in request.POST:
+        if (
+            request.method == "POST"
+            and "_saveasnew" in request.POST
+            and object_id is not None
+        ):
+            source_obj = self.get_object(request, unquote(object_id), to_field)
+            if source_obj is None:
+                return self._get_obj_does_not_exist_redirect(
+                    request, self.opts, object_id
+                )
+            request._saveasnew_source_obj = source_obj
             object_id = None
 
         add = object_id is None
@@ -2391,6 +2401,7 @@ class ModelAdmin(BaseModelAdmin):
         formsets = []
         inline_instances = []
         prefixes = {}
+        source_obj = getattr(request, "_saveasnew_source_obj", None)
         get_formsets_args = [request]
         if change:
             get_formsets_args.append(obj)
@@ -2399,7 +2410,28 @@ class ModelAdmin(BaseModelAdmin):
             prefixes[prefix] = prefixes.get(prefix, 0) + 1
             if prefixes[prefix] != 1 or not prefix:
                 prefix = "%s-%s" % (prefix, prefixes[prefix])
-            formset_params = self.get_formset_kwargs(request, obj, inline, prefix)
+            permission_obj = obj if change else None
+            has_add_permission = inline.has_add_permission(request, permission_obj)
+            has_change_permission = inline.has_change_permission(
+                request, permission_obj
+            )
+            has_delete_permission = inline.has_delete_permission(
+                request, permission_obj
+            )
+            is_view_only_inline = (
+                not has_add_permission
+                and not has_change_permission
+                and not has_delete_permission
+            )
+            use_source_obj = source_obj is not None and is_view_only_inline
+            formset_obj = source_obj if use_source_obj else obj
+            formset_params = self.get_formset_kwargs(
+                request, formset_obj, inline, prefix
+            )
+            if use_source_obj:
+                # Re-render truly view-only inlines against the original object
+                # during save-as-new, so existing objects remain initial forms.
+                formset_params["save_as_new"] = False
             formset = FormSet(**formset_params)
 
             def user_deleted_form(request, obj, formset, index, inline):
@@ -2411,12 +2443,18 @@ class ModelAdmin(BaseModelAdmin):
 
             # Bypass validation of each view-only inline form (since the form's
             # data won't be in request.POST), unless the form was deleted.
-            if not inline.has_change_permission(request, obj if change else None):
-                for index, form in enumerate(formset.initial_forms):
-                    if user_deleted_form(request, obj, formset, index, inline):
+            # This intentionally checks has_change_permission alone (not
+            # is_view_only_inline) because users with only add permission
+            # still can't edit existing inline rows.
+            if not has_change_permission:
+                for index, (form, instance) in enumerate(
+                    zip(formset.initial_forms, formset.get_queryset())
+                ):
+                    if user_deleted_form(request, formset_obj, formset, index, inline):
                         continue
                     form._errors = {}
                     form.cleaned_data = form.initial
+                    form.instance = instance
             formsets.append(formset)
             inline_instances.append(inline)
         return formsets, inline_instances
