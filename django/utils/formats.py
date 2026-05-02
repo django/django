@@ -265,16 +265,15 @@ def sanitize_strftime_format(fmt):
     """
     if datetime.date(1, 1, 1).strftime("%Y") == "0001":
         return fmt
-    
     mapping = {"C": 2, "F": 10, "G": 4, "Y": 4}
-    
+
     def _replace_specifier(match):
         """Return the specifier with explicit zero-padding."""
-        prefix = match.group(1)          # everything before the significant %
-        letter = match.group("letter")   # C, F, G, or Y
+        prefix = match.group(1)  # everything before the significant %
+        letter = match.group("letter")  # C, F, G, or Y
         width = mapping[letter]
         return f"{prefix}%0{width}{letter}"
-    
+
     return re.sub(
         r"((?:^|[^%])(?:%%)*)%  (?P<letter>[CFGY])",
         _replace_specifier,
