@@ -1372,6 +1372,7 @@ class TestData:
     def __repr__(self):
         return "<TestData: name=%r, data=%r>" % (self.name, self.data)
 
+
 class TestCase(TransactionTestCase):
     """
     Similar to TransactionTestCase, but use ``transaction.atomic()`` to achieve
