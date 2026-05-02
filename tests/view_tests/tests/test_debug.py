@@ -11,6 +11,7 @@ from unittest import mock, skipIf
 
 from asgiref.sync import async_to_sync, iscoroutinefunction
 
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import DatabaseError, connection
@@ -18,6 +19,7 @@ from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.template import TemplateDoesNotExist
 from django.test import RequestFactory, SimpleTestCase, override_settings
+from django.test.selenium import SeleniumTestCase, screenshot_cases
 from django.test.utils import LoggingCaptureMixin
 from django.urls import path, reverse
 from django.urls.converters import IntConverter
@@ -495,6 +497,22 @@ class DebugViewTests(SimpleTestCase):
         with self.assertLogs("django.request", "ERROR"):
             response = self.client.get("/raises500/", headers={"accept": "text/plain"})
         self.assertContains(response, "Oh dear, an error occurred!", status_code=500)
+
+
+@override_settings(ROOT_URLCONF="view_tests.default_urls", DEBUG=True)
+class DebugViewVisualTests(SeleniumTestCase, StaticLiveServerTestCase):
+    available_apps = ["django.contrib.admin"]
+
+    @screenshot_cases(["desktop_size", "mobile_size", "dark", "high_contrast"])
+    def test_congratulations_page(self):
+        from selenium.webdriver.common.by import By
+
+        self.selenium.get(self.live_server_url)
+        h1 = self.selenium.find_element(By.TAG_NAME, "h1")
+        self.assertEqual(h1.text, "The install worked successfully! Congratulations!")
+        self.take_screenshot("top")
+        self.selenium.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        self.take_screenshot("bottom")
 
 
 class DebugViewQueriesAllowedTests(SimpleTestCase):
