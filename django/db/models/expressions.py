@@ -343,6 +343,23 @@ class BaseExpression:
         except OutputFieldIsNoneError:
             return
 
+    @cached_property
+    def constrains_nulls(self):
+        return any(
+            expr and expr.constrains_nulls for expr in self.get_source_expressions()
+        )
+
+    def is_nullable(self, nullable_aliases):
+        return any(
+            expr and expr.is_nullable(nullable_aliases)
+            for expr in self.get_source_expressions()
+        )
+
+    def exclude_nulls(self, nullable_aliases):
+        if self.is_nullable(nullable_aliases):
+            return [self.output_field.get_lookup("isnull")(self, False)]
+        return []
+
     def _resolve_output_field(self):
         """
         Attempt to infer the output type of the expression.
@@ -953,6 +970,7 @@ class ResolvedOuterRef(F):
 
     contains_aggregate = False
     contains_over_clause = False
+    constrains_nulls = False
 
     def as_sql(self, *args, **kwargs):
         raise ValueError(
@@ -983,6 +1001,7 @@ class ResolvedOuterRef(F):
 class OuterRef(F):
     contains_aggregate = False
     contains_over_clause = False
+    constrains_nulls = False
 
     def resolve_expression(self, *args, **kwargs):
         if isinstance(self.name, self.__class__):
@@ -1240,6 +1259,9 @@ class Value(Expression):
     def empty_result_set_value(self):
         return self.value
 
+    def is_nullable(self, nullable_aliases):
+        return self.output_field.nullable
+
 
 @deconstructible(path="django.db.models.JSONNull")
 class JSONNull(Value):
@@ -1386,8 +1408,13 @@ class Col(Expression):
             connection
         ) + self.target.get_db_converters(connection)
 
+    def is_nullable(self, nullable_aliases):
+        return self.alias in nullable_aliases or self.target.nullable
+
 
 class ColPairs(Expression):
+    constrains_nulls = False
+
     def __init__(self, alias, targets, sources, output_field):
         super().__init__(output_field=output_field)
         self.alias = alias
@@ -1442,6 +1469,14 @@ class ColPairs(Expression):
 
     def select_format(self, compiler, sql, params):
         return sql, params
+
+    def exclude_nulls(self, nullable_aliases):
+        return list(
+            chain.from_iterable(
+                target.get_col(self.alias).exclude_nulls(nullable_aliases)
+                for target in self.targets
+            )
+        )
 
 
 class Ref(Expression):
