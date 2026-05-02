@@ -1251,7 +1251,13 @@ class ModelAdmin(BaseModelAdmin):
         return construct_change_message(form, formsets, add)
 
     def message_user(
-        self, request, message, level=messages.INFO, extra_tags="", fail_silently=False
+        self,
+        request,
+        message,
+        level=messages.INFO,
+        extra_tags="",
+        fail_silently=False,
+        extra_kwargs=None,
     ):
         """
         Send a message to the user. The default implementation
@@ -1275,7 +1281,12 @@ class ModelAdmin(BaseModelAdmin):
                 )
 
         messages.add_message(
-            request, level, message, extra_tags=extra_tags, fail_silently=fail_silently
+            request,
+            level,
+            message,
+            extra_tags=extra_tags,
+            fail_silently=fail_silently,
+            extra_kwargs=extra_kwargs,
         )
 
     def save_form(self, request, form, change):
