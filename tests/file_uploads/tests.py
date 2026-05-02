@@ -800,8 +800,7 @@ class FileUploadTests(TestCase):
             "multipart/form-data; boundary=%(boundary)s" % vars,
         )
         self.assertEqual(response.status_code, 200)
-        id = int(response.content)
-        obj = FileModel.objects.get(pk=id)
+        obj = FileModel.objects.get(pk=response.content.decode())
         # The name of the file uploaded and the file stored in the server-side
         # shouldn't differ.
         self.assertEqual(os.path.basename(obj.testfile.path), "MiXeD_cAsE.txt")
