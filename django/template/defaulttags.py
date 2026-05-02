@@ -1323,7 +1323,9 @@ def querystring(context, *args, **kwargs):
         {% querystring my_query_dict my_dict foo=3 bar=None %}
     """
     if not args:
-        args = [context.request.GET]
+        if not context.get("request"):
+            raise TemplateSyntaxError("'Context' object has no key 'request'")
+        args = [context["request"].GET]
     params = QueryDict(mutable=True)
     for d in [*args, kwargs]:
         if not isinstance(d, Mapping):
