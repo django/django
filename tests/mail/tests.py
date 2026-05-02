@@ -234,9 +234,7 @@ class MailTestsMixin:
 
 
 class EmailMessageTests(MailTestsMixin, SimpleTestCase):
-    """
-    Tests for django.core.mail.EmailMessage and EmailMultiAlternative.
-    """
+    """Tests for django.core.mail.EmailMessage and EmailMultiAlternative."""
 
     def test_ascii(self):
         email = EmailMessage(
@@ -1809,7 +1807,7 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
         )
 
     def test_send_fail_silently_conflict(self):
-        email = mail.EmailMessage(
+        email = EmailMessage(
             "Subject",
             "Body",
             "from@example.com",
@@ -1825,9 +1823,7 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
 
 
 class SendMailTests(SimpleTestCase, MailTestsMixin):
-    """
-    Tests for django.core.mail.send_mail().
-    """
+    """Tests for django.core.mail.send_mail()."""
 
     def test_plaintext_send_mail(self):
         """
@@ -1903,7 +1899,7 @@ class SendMailTests(SimpleTestCase, MailTestsMixin):
             "Pass fail_silently to get_connection() instead."
         )
         with self.assertRaisesMessage(TypeError, msg):
-            mail.send_mail(
+            send_mail(
                 "Subject",
                 "Body",
                 "from@example.com",
@@ -1922,7 +1918,7 @@ class SendMailTests(SimpleTestCase, MailTestsMixin):
                 self.subTest(param=param),
                 self.assertRaisesMessage(TypeError, msg),
             ):
-                mail.send_mail(
+                send_mail(
                     "subject",
                     "body",
                     "from@example.com",
@@ -1933,9 +1929,7 @@ class SendMailTests(SimpleTestCase, MailTestsMixin):
 
 
 class SendMassMailTests(SimpleTestCase):
-    """
-    Tests for django.core.mail.send_mass_mail().
-    """
+    """Tests for django.core.mail.send_mass_mail()."""
 
     def test_connection_arg(self):
         # Send using non-default connection.
@@ -1959,7 +1953,7 @@ class SendMassMailTests(SimpleTestCase):
             "Pass fail_silently to get_connection() instead."
         )
         with self.assertRaisesMessage(TypeError, msg):
-            mail.send_mass_mail(
+            send_mass_mail(
                 datatuple, fail_silently=True, connection=mail.get_connection()
             )
 
@@ -1974,15 +1968,13 @@ class SendMassMailTests(SimpleTestCase):
                 self.subTest(param=param),
                 self.assertRaisesMessage(TypeError, msg),
             ):
-                mail.send_mass_mail(
+                send_mass_mail(
                     datatuple, **{param: "value"}, connection=mail.get_connection()
                 )
 
 
 class MailAdminsAndManagersTests(SimpleTestCase, MailTestsMixin):
-    """
-    Tests for django.core.mail.mail_admins() and mail_managers().
-    """
+    """Tests for django.core.mail.mail_admins() and mail_managers()."""
 
     def test_mail_admins_and_managers(self):
         tests = (
@@ -2149,7 +2141,7 @@ class MailAdminsAndManagersTests(SimpleTestCase, MailTestsMixin):
             "Pass fail_silently to get_connection() instead."
         )
         with self.assertRaisesMessage(TypeError, msg):
-            mail.mail_admins(
+            mail_admins(
                 "Subject",
                 "Message",
                 fail_silently=True,
@@ -2162,7 +2154,7 @@ class MailAdminsAndManagersTests(SimpleTestCase, MailTestsMixin):
             "Pass fail_silently to get_connection() instead."
         )
         with self.assertRaisesMessage(TypeError, msg):
-            mail.mail_managers(
+            mail_managers(
                 "Subject",
                 "Message",
                 fail_silently=True,
@@ -2171,9 +2163,7 @@ class MailAdminsAndManagersTests(SimpleTestCase, MailTestsMixin):
 
 
 class GetConnectionTests(SimpleTestCase):
-    """
-    Tests for django.core.mail.get_connection().
-    """
+    """Tests for django.core.mail.get_connection()."""
 
     def test_backend_arg(self):
         """Test backend argument of mail.get_connection()"""
