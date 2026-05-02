@@ -885,11 +885,18 @@ class BaseDatabaseSchemaEditor:
             and (
                 old_field.remote_field.through
                 and new_field.remote_field.through
-                and not old_field.remote_field.through._meta.auto_created
-                and not new_field.remote_field.through._meta.auto_created
+                # Use meta label comparison instead of identity check to cover
+                # for cases when the same through model exists as two distinct
+                # class objects across different app registry states (e.g.
+                # during migrations, fake model classes are reconstructed per
+                # state).
+                and (
+                    old_field.remote_field.through._meta.label
+                    == new_field.remote_field.through._meta.label
+                )
             )
         ):
-            # Both sides have through models; this is a no-op.
+            # Both sides have the same through model; this is a no-op.
             return
         elif old_type is None or new_type is None:
             raise ValueError(
