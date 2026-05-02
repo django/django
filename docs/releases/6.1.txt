@@ -120,6 +120,9 @@ Minor features
 * :attr:`~django.contrib.admin.ModelAdmin.list_display` now uses boolean icons
   for boolean fields on related models.
 
+* ``ModelAdmin.get_deleted_objects()`` now falls back to checking the user's
+  model delete permission for models not registered in the admin.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
