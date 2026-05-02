@@ -23,6 +23,7 @@ rather than the HTML rendered to the end-user.
 import copy
 import itertools
 import tempfile
+from contextlib import aclosing
 from unittest import mock
 
 from django.contrib.auth.models import Permission, User
@@ -37,6 +38,7 @@ from django.test import (
     modify_settings,
     override_settings,
 )
+from django.test.client import aclosing_iterator_wrapper
 from django.urls import reverse_lazy
 from django.utils.decorators import async_only_middleware
 from django.views.generic import RedirectView
@@ -1212,6 +1214,23 @@ class AsyncClientTest(TestCase):
         response = await self.async_client.get("/async_get_view/")
         self.assertTrue(hasattr(response, "resolver_match"))
         self.assertEqual(response.resolver_match.url_name, "async_get_view")
+
+    async def test_aclosing_iterator_wrapper_closes_inner_iterable_promptly(self):
+        finally_ran = False
+
+        async def iterable():
+            nonlocal finally_ran
+            try:
+                yield b"chunk"
+            finally:
+                finally_ran = True
+
+        async with aclosing(
+            aclosing_iterator_wrapper(iterable(), close=lambda: None)
+        ) as wrapped:
+            async for _ in wrapped:
+                break
+        self.assertTrue(finally_ran)
 
     @modify_settings(
         MIDDLEWARE={"prepend": "test_client.tests.async_middleware_urlconf"},

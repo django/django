@@ -7,6 +7,7 @@ import re
 import sys
 import time
 import warnings
+from contextlib import aclosing
 from email.header import Header
 from http.client import responses
 from urllib.parse import urlsplit
@@ -19,6 +20,7 @@ from django.core.exceptions import DisallowedRedirect
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import timezone
+from django.utils.asyncio import maybe_aclosing
 from django.utils.datastructures import CaseInsensitiveMapping
 from django.utils.encoding import iri_to_uri
 from django.utils.functional import cached_property
@@ -485,8 +487,9 @@ class StreamingHttpResponse(HttpResponseBase):
             _iterator = self._iterator
 
             async def awrapper():
-                async for part in _iterator:
-                    yield self.make_bytes(part)
+                async with maybe_aclosing(_iterator) as it:
+                    async for part in it:
+                        yield self.make_bytes(part)
 
             return awrapper()
         else:
@@ -521,16 +524,18 @@ class StreamingHttpResponse(HttpResponseBase):
             # async iterator. Consume in async_to_sync and map back.
             async def to_list(_iterator):
                 as_list = []
-                async for chunk in _iterator:
-                    as_list.append(chunk)
+                async with maybe_aclosing(_iterator) as it:
+                    async for chunk in it:
+                        as_list.append(chunk)
                 return as_list
 
             return map(self.make_bytes, iter(async_to_sync(to_list)(self._iterator)))
 
     async def __aiter__(self):
         try:
-            async for part in self.streaming_content:
-                yield part
+            async with aclosing(aiter(self.streaming_content)) as content:
+                async for part in content:
+                    yield part
         except TypeError:
             warnings.warn(
                 "StreamingHttpResponse must consume synchronous iterators in order to "

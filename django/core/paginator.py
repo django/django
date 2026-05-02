@@ -5,6 +5,7 @@ from math import ceil
 
 from asgiref.sync import sync_to_async
 
+from django.utils.asyncio import maybe_aclosing
 from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import cached_property
 from django.utils.inspect import method_has_no_args
@@ -370,8 +371,9 @@ class AsyncPage:
 
     async def __aiter__(self):
         if hasattr(self.object_list, "__aiter__"):
-            async for obj in self.object_list:
-                yield obj
+            async with maybe_aclosing(aiter(self.object_list)) as it:
+                async for obj in it:
+                    yield obj
         else:
             for obj in self.object_list:
                 yield obj
@@ -414,7 +416,8 @@ class AsyncPage:
         """
         if not isinstance(self.object_list, list):
             if hasattr(self.object_list, "__aiter__"):
-                self.object_list = [obj async for obj in self.object_list]
+                async with maybe_aclosing(aiter(self.object_list)) as it:
+                    self.object_list = [obj async for obj in it]
             else:
                 self.object_list = await sync_to_async(list)(self.object_list)
         return self.object_list

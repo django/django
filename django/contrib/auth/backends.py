@@ -1,3 +1,5 @@
+from contextlib import aclosing
+
 from asgiref.sync import sync_to_async
 
 from django.contrib.auth import (
@@ -139,11 +141,12 @@ class ModelBackend(BaseBackend):
             else:
                 perms = getattr(self, "_get_%s_permissions" % from_name)(user_obj)
             perms = perms.values_list("content_type__app_label", "codename").order_by()
-            setattr(
-                user_obj,
-                perm_cache_name,
-                {"%s.%s" % (ct, name) async for ct, name in perms},
-            )
+            async with aclosing(aiter(perms)) as it:
+                setattr(
+                    user_obj,
+                    perm_cache_name,
+                    {"%s.%s" % (ct, name) async for ct, name in it},
+                )
         return getattr(user_obj, perm_cache_name)
 
     def get_user_permissions(self, user_obj, obj=None):
