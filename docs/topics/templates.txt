@@ -567,6 +567,20 @@ applications. This generic name was kept for backwards-compatibility.
 
   See :ref:`invalid-template-variables` for details.
 
+* ``'raise_on_missing_variable'``: a Boolean that controls whether to raise an
+  exception when a variable cannot be resolved against the context.
+
+  It defaults to ``False``.
+
+  When ``True``, raises ``django.template.VariableDoesNotExist`` if a
+  variable cannot be resolved. When ``False``, invalid variables are replaced
+  with the value of ``string_if_invalid``. This is particularly useful during
+  development and testing to catch template variable errors early, though the
+  default ``False`` value is recommended in production to avoid exposing error
+  details to users.
+
+  .. versionadded:: 6.0
+
 * ``'file_charset'``: the charset used to read template files on disk.
 
   It defaults to ``'utf-8'``.
