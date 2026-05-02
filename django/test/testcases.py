@@ -30,6 +30,7 @@ from asgiref.sync import async_to_sync, iscoroutinefunction
 from django.apps import apps
 from django.conf import settings
 from django.core import mail
+from django.core.cache import caches
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.files import locks
 from django.core.handlers.wsgi import WSGIHandler, get_path_info
@@ -1371,10 +1372,9 @@ class TestData:
     def __repr__(self):
         return "<TestData: name=%r, data=%r>" % (self.name, self.data)
 
-
 class TestCase(TransactionTestCase):
     """
-    Similar to TransactionTestCase, but use `transaction.atomic()` to achieve
+    Similar to TransactionTestCase, but use ``transaction.atomic()`` to achieve
     test isolation.
 
     In most situations, TestCase should be preferred to TransactionTestCase as
@@ -1384,7 +1384,26 @@ class TestCase(TransactionTestCase):
 
     On database backends with no transaction support, TestCase behaves as
     TransactionTestCase.
+
+    Cache Isolation
+    ---------------
+    By default, TestCase clears all configured caches before and after each
+    test method to prevent cached data from leaking between tests. This
+    ensures that ``cache.set()`` in one test does not affect subsequent tests.
+
+    To disable this behavior for specific test classes, set
+    ``clears_caches = False``::
     """
+
+    # Opt-out mechanism for cache clearing between test methods.
+    # Set to ``False`` to persist cache data across test methods.
+    clears_caches = True
+
+    @classmethod
+    def _clear_caches(cls):
+        """Clear all configured cache backends."""
+        for cache in caches.all():
+            cache.clear()
 
     @classmethod
     def _enter_atomics(cls):
@@ -1471,30 +1490,47 @@ class TestCase(TransactionTestCase):
             # If the backend does not support transactions, we should reload
             # class data before each test
             cls.setUpTestData()
-            return super()._fixture_setup()
+            result = super()._fixture_setup()
+        else:
+            if cls.reset_sequences:
+                raise TypeError("reset_sequences cannot be used on TestCase instances")
+            cls.atomics = cls._enter_atomics()
+            if not cls._databases_support_savepoints():
+                if cls.fixtures:
+                    for db_name in cls._databases_names(include_mirrors=False):
+                        call_command(
+                            "loaddata",
+                            *cls.fixtures,
+                            **{"verbosity": 0, "database": db_name},
+                        )
+                cls.setUpTestData()
+            result = None
 
-        if cls.reset_sequences:
-            raise TypeError("reset_sequences cannot be used on TestCase instances")
-        cls.atomics = cls._enter_atomics()
-        if not cls._databases_support_savepoints():
-            if cls.fixtures:
-                for db_name in cls._databases_names(include_mirrors=False):
-                    call_command(
-                        "loaddata",
-                        *cls.fixtures,
-                        **{"verbosity": 0, "database": db_name},
-                    )
-            cls.setUpTestData()
+        # Clear all caches before each test method
+        if cls.clears_caches:
+            cls._clear_caches()
+
+        return result
 
     def _fixture_teardown(self):
         if not self._databases_support_transactions():
-            return super()._fixture_teardown()
+            result = super()._fixture_teardown()
+        else:
+            try:
+                for db_name in reversed(self._databases_names()):
+                    if self._should_check_constraints(connections[db_name]):
+                        connections[db_name].check_constraints()
+            finally:
+                self._rollback_atomics(self.atomics)
+                result = None
+
+        # Clear all caches after each test method
+        # Use try/finally to ensure cleanup even if teardown fails
         try:
-            for db_name in reversed(self._databases_names()):
-                if self._should_check_constraints(connections[db_name]):
-                    connections[db_name].check_constraints()
+            if self.clears_caches:
+                self._clear_caches()
         finally:
-            self._rollback_atomics(self.atomics)
+            return result
 
     def _should_check_constraints(self, connection):
         return (

@@ -997,6 +997,61 @@ It also provides an additional method:
                 self.assertEqual(mail.outbox[0].subject, "Contact Form")
                 self.assertEqual(mail.outbox[0].body, "I like your site")
 
+``Cache Isolation``
+---------------
+To ensure strict test isolation, :class:`TestCase` flushes all configured
+caches during the setup and teardown phases of every test method. This
+prevents data from one test case from affecting the results of subsequent
+tests---a common source of non-deterministic "flaky" test failures.
+
+Consider these two tests::
+
+    from django.core.cache import cache
+    from django.test import TestCase
+
+    class UserCacheTests(TestCase):
+        def test_cache_user(self):
+            cache.set('active_user', 'alice')
+            self.assertEqual(cache.get('active_user'), 'alice')
+
+        def test_cache_is_empty(self):
+            # This passes because TestCase cleared the cache
+            self.assertIsNone(cache.get('active_user'))
+
+Without cache isolation, ``test_cache_is_empty`` would fail because
+``test_cache_user`` left data in the cache.
+
+If your tests specifically require the cache to persist across test
+methods, you can opt out by setting the :attr:`clears_caches` attribute
+to ``False``::
+
+    class MyPersistentCacheTests(TestCase):
+        clears_caches = False
+
+        def test_build_expensive_cache(self):
+            expensive_data = compute_something()
+            cache.set('expensive_key', expensive_data)
+
+        def test_use_expensive_cache(self):
+            # This works because clears_caches=False
+            data = cache.get('expensive_key')
+            self.assertIsNotNone(data)
+
+.. warning::
+
+    Disabling cache clearing can lead to flaky tests that depend on
+    execution order. Use ``clears_caches = False`` sparingly and ensure
+    your tests properly clean up after themselves.
+
+.. note::
+
+    Only :class:`TestCase` (and its subclasses like
+    :class:`TransactionTestCase`) clear caches automatically.
+    :class:`SimpleTestCase` does not clear caches, as it does not
+    provide database isolation either. If you need cache isolation
+    without database access, call ``cache.clear()`` manually in your
+    ``setUp`` method.
+
 .. _live-test-server:
 
 ``LiveServerTestCase``
