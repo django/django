@@ -1521,23 +1521,14 @@ class TestCase(TransactionTestCase):
 
     def _fixture_teardown(self):
         if not self._databases_support_transactions():
-            result = super()._fixture_teardown()
-        else:
-            try:
-                for db_name in reversed(self._databases_names()):
-                    if self._should_check_constraints(connections[db_name]):
-                        connections[db_name].check_constraints()
-            finally:
-                self._rollback_atomics(self.atomics)
-                result = None
+            return super()._fixture_teardown()
 
-        # Clear all caches after each test method
-        # Use try/finally to ensure cleanup even if teardown fails
         try:
-            if self.clears_caches:
-                self._clear_caches()
+            for db_name in reversed(self._databases_names()):
+                if self._should_check_constraints(connections[db_name]):
+                    connections[db_name].check_constraints()
         finally:
-            return result
+            self._rollback_atomics(self.atomics)
 
     def _should_check_constraints(self, connection):
         return (
