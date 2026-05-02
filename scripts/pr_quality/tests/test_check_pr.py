@@ -781,8 +781,16 @@ class TestIntegration(BaseTestCase):
         body = make_pr_body(ticket="", checked_items=0)
         result, _, mock_gh = self.call_main(pr_body=body, commit_count=1)
         self.assertEqual(result, 1)
-        mock_gh.assert_called_once_with(
-            "POST", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+        self.assertEqual(
+            mock_gh.call_args_list,
+            [
+                mock.call(
+                    "GET", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+                ),
+                mock.call(
+                    "POST", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+                ),
+            ],
         )
 
     def test_untrusted_author_failures_posts_comment_and_closes(self):
@@ -790,8 +798,11 @@ class TestIntegration(BaseTestCase):
         result, _, mock_gh = self.call_main(pr_body=body)
         self.assertEqual(result, 1)
         self.assertEqual(
-            mock_gh.mock_calls,
+            mock_gh.call_args_list,
             [
+                mock.call(
+                    "GET", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+                ),
                 mock.call(
                     "POST", "/issues/10/comments", "test-token", "test/repo", mock.ANY
                 ),
@@ -806,8 +817,11 @@ class TestIntegration(BaseTestCase):
         result, _, mock_gh = self.call_main(pr_body=body, pr_author="")
         self.assertEqual(result, 1)
         self.assertEqual(
-            mock_gh.mock_calls,
+            mock_gh.call_args_list,
             [
+                mock.call(
+                    "GET", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+                ),
                 mock.call(
                     "POST", "/issues/10/comments", "test-token", "test/repo", mock.ANY
                 ),
@@ -821,8 +835,16 @@ class TestIntegration(BaseTestCase):
         body = make_pr_body(ticket="", checked_items=0)
         result, _, mock_gh = self.call_main(pr_body=body, autoclose=False)
         self.assertEqual(result, 1)
-        mock_gh.assert_called_once_with(
-            "POST", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+        self.assertEqual(
+            mock_gh.call_args_list,
+            [
+                mock.call(
+                    "GET", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+                ),
+                mock.call(
+                    "POST", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+                ),
+            ],
         )
 
     def test_warnings_only_posts_comment_does_not_close(self):
@@ -833,8 +855,16 @@ class TestIntegration(BaseTestCase):
             pr_body=VALID_PR_BODY, pr_title="", trac_data=trac_data
         )
         self.assertIsNone(result)
-        mock_gh.assert_called_once_with(
-            "POST", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+        self.assertEqual(
+            mock_gh.call_args_list,
+            [
+                mock.call(
+                    "GET", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+                ),
+                mock.call(
+                    "POST", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+                ),
+            ],
         )
 
     def test_warnings_alongside_failures_still_closes(self):
@@ -844,8 +874,11 @@ class TestIntegration(BaseTestCase):
         result, _, mock_gh = self.call_main(pr_body=body, trac_data=trac_data)
         self.assertEqual(result, 1)
         self.assertEqual(
-            mock_gh.mock_calls,
+            mock_gh.call_args_list,
             [
+                mock.call(
+                    "GET", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+                ),
                 mock.call(
                     "POST", "/issues/10/comments", "test-token", "test/repo", mock.ANY
                 ),

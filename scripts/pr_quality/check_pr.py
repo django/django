@@ -30,6 +30,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import date, datetime, timedelta, timezone
+from http import HTTPStatus
 
 from pr_quality.errors import (
     CHECKS_FOOTER,
@@ -102,7 +103,8 @@ def github_request(method, path, token, repo, data=None, params=None):
         headers["Content-Type"] = "application/json"
     req = urllib.request.Request(url, data=body, headers=headers, method=method)
     with urllib.request.urlopen(req, timeout=URLOPEN_TIMEOUT_SECONDS) as response:
-        return json.loads(response.read())
+        if response.status != HTTPStatus.NO_CONTENT:
+            return json.loads(response.read())
 
 
 def get_recent_commit_count(pr_author, repo, token, since_days, max_count):
@@ -142,6 +144,26 @@ def get_pr_total_changes(pr_number, repo, token):
             break
         page += 1
     return total_changes
+
+
+def get_comment_ids_to_delete(pr_number, repo, token):
+    ids = []
+    page = 1
+    while True:
+        comments = github_request(
+            "GET",
+            f"/issues/{pr_number}/comments",
+            token,
+            repo,
+            {"per_page": GITHUB_PER_PAGE, "page": page},
+        )
+        for comment in comments:
+            if CHECKS_HEADER in comment["body"]:
+                ids.append(comment["id"])
+        if len(comments) < GITHUB_PER_PAGE:
+            break
+        page += 1
+    return ids
 
 
 def strip_html_comments(text):
@@ -505,6 +527,14 @@ def main(
     if not failures and not warning_msgs:
         logger.info("PR #%s passed all quality checks.", pr_number)
         return
+
+    for id_to_delete in get_comment_ids_to_delete(pr_number, repo, token):
+        github_request(
+            "DELETE",
+            f"/issues/comments/{id_to_delete}",
+            token,
+            repo,
+        )
 
     github_request(
         "POST",
