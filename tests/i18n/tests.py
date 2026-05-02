@@ -1948,7 +1948,7 @@ class TestLanguageInfo(SimpleTestCase):
 
     def test_unknown_only_country_code(self):
         li = get_language_info("de-xx")
-        self.assertEqual(li["code"], "de")
+        self.assertEqual(li["code"], "de-xx")
         self.assertEqual(li["name_local"], "Deutsch")
         self.assertEqual(li["name"], "German")
         self.assertIs(li["bidi"], False)
@@ -1960,10 +1960,11 @@ class TestLanguageInfo(SimpleTestCase):
     def test_fallback_language_code(self):
         """
         get_language_info return the first fallback language info if the
-        lang_info struct does not contain the 'name' key.
+        lang_info struct does not contain the 'name' key. The code in the
+        returned dict should match the originally requested language code.
         """
         li = get_language_info("zh-my")
-        self.assertEqual(li["code"], "zh-hans")
+        self.assertEqual(li["code"], "zh-my")
         li = get_language_info("zh-hans")
         self.assertEqual(li["code"], "zh-hans")
 
