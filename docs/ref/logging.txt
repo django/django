@@ -315,7 +315,7 @@ Handlers
 Django provides one log handler in addition to :mod:`those provided by the
 Python logging module <python:logging.handlers>`.
 
-.. class:: AdminEmailHandler(include_html=False, email_backend=None, reporter_class=None)
+.. class:: AdminEmailHandler(include_html=False, email_backend=None, reporter_class=None, using=None)
 
     This handler sends an email to the site :setting:`ADMINS` for each log
     message it receives.
@@ -346,20 +346,27 @@ Python logging module <python:logging.handlers>`.
     Be aware of the :ref:`security implications of logging
     <logging-security-implications>` when using the ``AdminEmailHandler``.
 
-    By setting the ``email_backend`` argument of ``AdminEmailHandler``, the
-    :ref:`email backend <topic-email-backends>` that is being used by the
-    handler can be overridden, like this::
+    Email is sent using the default :ref:`email provider
+    <topic-email-configuration>`. This can be overridden by setting the
+    ``using`` argument of ``AdminEmailHandler``, like this::
 
         "handlers": {
             "mail_admins": {
                 "level": "ERROR",
                 "class": "django.utils.log.AdminEmailHandler",
-                "email_backend": "django.core.mail.backends.filebased.EmailBackend",
+                "using": "internal",
             },
         }
 
-    By default, an instance of the email backend specified in
-    :setting:`EMAIL_BACKEND` will be used.
+    If the specified provider is not configured in the
+    :setting:`EMAIL_PROVIDERS` setting, no email will be sent and no additional
+    error will be raised.
+
+    By setting the deprecated ``email_backend`` argument of
+    ``AdminEmailHandler``, the :ref:`email backend <topic-email-backends>` that
+    is being used by the handler can be overridden. ``email_backend`` is not
+    supported when :setting:`EMAIL_PROVIDERS` is defined or when the ``using``
+    argument is provided.
 
     The ``reporter_class`` argument of ``AdminEmailHandler`` allows providing
     an ``django.views.debug.ExceptionReporter`` subclass to customize the
@@ -374,6 +381,14 @@ Python logging module <python:logging.handlers>`.
                 "reporter_class": "somepackage.error_reporter.CustomErrorReporter",
             },
         }
+
+    .. versionchanged:: 6.1
+
+        The ``using`` argument was added.
+
+    .. deprecated:: 6.1
+
+        ``email_backend``.
 
     .. method:: send_mail(subject, message, *args, **kwargs)
 

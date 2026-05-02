@@ -304,7 +304,7 @@ Email
   authentication with the :setting:`EMAIL_SSL_CERTFILE` and
   :setting:`EMAIL_SSL_KEYFILE` settings.
 
-* The SMTP :class:`~django.core.mail.backends.smtp.EmailBackend` now supports
+* The :ref:`SMTP EmailBackend <topic-email-smtp-backend>` now supports
   setting the ``timeout`` parameter with the :setting:`EMAIL_TIMEOUT` setting.
 
 * :class:`~django.core.mail.EmailMessage` and ``EmailMultiAlternatives`` now

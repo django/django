@@ -381,7 +381,7 @@ def mass_mail_sending_view(request):
         ["second@example.com", "third@example.com"],
     )
 
-    c = mail.get_connection()
+    c = mail.providers.default
     c.send_messages([m1, m2])
 
     return HttpResponse("Mail sent")

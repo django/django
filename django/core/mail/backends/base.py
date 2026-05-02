@@ -1,11 +1,20 @@
 """Base email backend class."""
 
+from django.core.mail import InvalidEmailProvider
+from django.utils.deprecation import RemovedInDjango70Warning, warn_about_external_use
+
+# RemovedInDjango70Warning.
+_NOT_PROVIDED = object()
+
 
 class BaseEmailBackend:
     """
     Base class for email backend implementations.
 
-    Subclasses must at least overwrite send_messages().
+    Subclasses must implement at least send_messages().
+
+    Subclass __init__() should pass alias and unknown **kwargs to
+    super().__init__() for proper error reporting.
 
     open() and close() can be called indirectly by using a backend object as a
     context manager:
@@ -15,8 +24,69 @@ class BaseEmailBackend:
            pass
     """
 
-    def __init__(self, fail_silently=False, **kwargs):
-        self.fail_silently = fail_silently
+    # RemovedInDjango70Warning: fail_silently, _ignore_unknown_kwargs.
+    def __init__(
+        self,
+        fail_silently=_NOT_PROVIDED,
+        *,
+        alias=None,
+        _ignore_unknown_kwargs=None,
+        **kwargs,
+    ):
+        self.alias = alias
+
+        # RemovedInDjango70Warning.
+        if fail_silently is _NOT_PROVIDED:
+            self._fail_silently = False
+        else:
+            self._fail_silently = fail_silently
+            # Force deprecation warning unless in _ignore_unknown_kwargs.
+            kwargs["fail_silently"] = fail_silently
+        if _ignore_unknown_kwargs:
+            for ignored in _ignore_unknown_kwargs:
+                kwargs.pop(ignored, None)
+
+        if kwargs:
+            kwarg_names = ", ".join(repr(key) for key in kwargs.keys())
+            if alias is not None:
+                # Being initialized from mail.providers.
+                raise InvalidEmailProvider(
+                    f"Unknown OPTIONS {kwarg_names}.", alias=alias
+                )
+            else:
+                # Not being initialized from mail.providers.
+                # RemovedInDjango70Warning: replace everything below with:
+                #   raise TypeError(
+                #       f"Unexpected keyword argument(s) {kwarg_names}."
+                #   )
+
+                # Use something more precise than type(self).__name__, which
+                # is often just "EmailBackend".
+                class_name = f"{type(self).__module__}.{type(self).__qualname__}"
+
+                # Warn when initialized from outside Django, either direct
+                # construction of a built-in backend or a super.__init__() call
+                # from a non-Django subclass.
+                warn_about_external_use(
+                    f"{class_name}.__init__() does not support {kwarg_names}. "
+                    "In Django 7.0, BaseEmailBackend will raise a TypeError "
+                    "for unknown keyword arguments.",
+                    RemovedInDjango70Warning,
+                    skip_name_prefixes="django.core.mail.backends",
+                )
+
+    # RemovedInDjango70Warning.
+    def __getattr__(self, name):
+        if name == "fail_silently":
+            msg = (
+                "BaseEmailBackend.fail_silently is deprecated. A subclass "
+                "that supports fail_silently must set its own attribute."
+            )
+            warn_about_external_use(msg, RemovedInDjango70Warning)
+            return self._fail_silently
+        raise AttributeError(
+            f"{type(self).__name__!r} object has no attribute {name!r}"
+        )
 
     def open(self):
         """

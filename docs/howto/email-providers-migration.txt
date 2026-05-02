@@ -1,0 +1,33 @@
+.. _migrating-to-email-providers:
+
+============================
+Migrating to email providers
+============================
+
+**TODO:** Migration guide. Rough outline follows:
+
+Most users:
+
+*   Verify readiness of any third-party email packages (some deprecation
+    warnings become hard errors when ``EMAIL_PROVIDERS`` is defined)
+*   Replace :setting:`EMAIL_BACKEND` and other deprecated ``EMAIL_*`` settings
+    with :setting:`EMAIL_PROVIDERS`
+
+Less common situations:
+
+*   Replace :func:`~django.core.mail.get_connection` and ``connection`` args
+    (options from DEP)
+*   Replace ``fail_silently`` (options from DEP)
+
+Even less common:
+
+*   Replace ``auth_user`` and ``auth_password`` args
+*   Change ``email_backend`` to ``using`` in ``AdminEmailHandler`` config
+*   Change custom ``BrokenLinksEmailMiddleware`` that overrides connection (?)
+
+If you have a custom email backend:
+
+*   Use keyword args for configuration; consume all ``**kwargs`` you use and
+    pass the remainder to superclass init (including ``alias``)
+*   Decide how to handle custom settings
+*   Decide how to handle ``fail_silently``

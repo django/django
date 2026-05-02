@@ -26,8 +26,10 @@ class EmailBackend(BaseEmailBackend):
     def send_messages(self, messages):
         """Redirect messages to the dummy outbox"""
         msg_count = 0
-        for message in messages:  # .message() triggers header validation
-            message.message()
-            mail.outbox.append(copy.deepcopy(message))
+        for message in messages:
+            message.message()  # Trigger header validation.
+            msg_copy = copy.deepcopy(message)
+            msg_copy.sent_using = self.alias
+            mail.outbox.append(msg_copy)
             msg_count += 1
         return msg_count

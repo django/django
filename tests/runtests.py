@@ -48,6 +48,12 @@ warnings.simplefilter("error", RemovedInDjango70Warning)
 # patterns.
 warnings.simplefilter("error", ResourceWarning)
 warnings.simplefilter("error", RuntimeWarning)
+# RemovedInDjango70Warning: Ignore undefined EMAIL_PROVIDERS warning.
+warnings.filterwarnings(
+    "ignore",
+    "Django 7.0 will not have a default email provider.",
+    category=RemovedInDjango70Warning,
+)
 
 # Reduce garbage collection frequency to improve performance. Since CPython
 # uses refcounting, garbage collection only collects objects with cyclic
