@@ -95,6 +95,13 @@ depends on core.js for utility functions like removeChildren or quickElement
         draw: function (month, year, div_id, callback, selected) {
             // month = 1-12, year = 1-9999
             const today = new Date();
+            const serverOffset = document.body.dataset.adminUtcOffset;
+            if (serverOffset) {
+                const localOffset = today.getTimezoneOffset() * -60;
+                today.setTime(
+                    today.getTime() + 1000 * (serverOffset - localOffset),
+                );
+            }
             const todayDay = today.getDate();
             const todayMonth = today.getMonth() + 1;
             const todayYear = today.getFullYear();
@@ -230,6 +237,13 @@ depends on core.js for utility functions like removeChildren or quickElement
         this.div_id = div_id;
         this.callback = callback;
         this.today = new Date();
+        const serverOffset = document.body.dataset.adminUtcOffset;
+        if (serverOffset) {
+            const localOffset = this.today.getTimezoneOffset() * -60;
+            this.today.setTime(
+                this.today.getTime() + 1000 * (serverOffset - localOffset),
+            );
+        }
         this.currentMonth = this.today.getMonth() + 1;
         this.currentYear = this.today.getFullYear();
         if (typeof selected !== "undefined") {

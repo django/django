@@ -93,3 +93,84 @@ QUnit.test("time zone offset warning - date and time field", function (assert) {
         "id_updated_at_timezone_warning_helptext",
     );
 });
+
+QUnit.test("calendar today highlight without server offset", function (assert) {
+    const $ = django.jQuery;
+    const calDiv = $('<div id="test-calendar"></div>');
+    $("#qunit-fixture").append(calDiv);
+
+    const today = new Date();
+    CalendarNamespace.draw(
+        today.getMonth() + 1,
+        today.getFullYear(),
+        "test-calendar",
+        function () {},
+    );
+
+    const todayCells = calDiv.find("td.today");
+    assert.equal(todayCells.length, 1, "Exactly one cell marked as today");
+    assert.equal(
+        todayCells.find("a").text(),
+        String(today.getDate()),
+        "Today cell matches local date",
+    );
+});
+
+QUnit.test("calendar today highlight with server offset", function (assert) {
+    const $ = django.jQuery;
+    const calDiv = $('<div id="test-calendar"></div>');
+    $("#qunit-fixture").append(calDiv);
+
+    // Simulate a server timezone that is 24 hours ahead of the browser.
+    const localOffset = new Date().getTimezoneOffset() * -60;
+    const serverOffset = localOffset + 86400;
+    $("body").attr("data-admin-utc-offset", serverOffset);
+
+    const expectedDate = new Date();
+    expectedDate.setTime(
+        expectedDate.getTime() + 1000 * (serverOffset - localOffset),
+    );
+
+    CalendarNamespace.draw(
+        expectedDate.getMonth() + 1,
+        expectedDate.getFullYear(),
+        "test-calendar",
+        function () {},
+    );
+
+    const todayCells = calDiv.find("td.today");
+    assert.equal(todayCells.length, 1, "Exactly one cell marked as today");
+    assert.equal(
+        todayCells.find("a").text(),
+        String(expectedDate.getDate()),
+        "Today cell matches server-adjusted date",
+    );
+});
+
+QUnit.test("Calendar constructor uses server offset", function (assert) {
+    const $ = django.jQuery;
+    const calDiv = $('<div id="test-calendar"></div>');
+    $("#qunit-fixture").append(calDiv);
+
+    // Simulate a server timezone that is 24 hours ahead of the browser.
+    const localOffset = new Date().getTimezoneOffset() * -60;
+    const serverOffset = localOffset + 86400;
+    $("body").attr("data-admin-utc-offset", serverOffset);
+
+    const expectedDate = new Date();
+    expectedDate.setTime(
+        expectedDate.getTime() + 1000 * (serverOffset - localOffset),
+    );
+
+    const cal = new Calendar("test-calendar", function () {});
+    assert.equal(
+        cal.currentMonth,
+        expectedDate.getMonth() + 1,
+        "Calendar month matches server-adjusted date",
+    );
+    assert.equal(
+        cal.currentYear,
+        expectedDate.getFullYear(),
+        "Calendar year matches server-adjusted date",
+    );
+});
