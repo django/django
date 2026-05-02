@@ -1,4 +1,5 @@
 import re
+import unittest
 
 from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
 from django.db import connection
@@ -67,6 +68,11 @@ test_srs = (
 )
 
 
+# Skip all SpatialRefSys tests on MariaDB
+@unittest.skipIf(
+    connection.vendor == "mysql" and connection.mysql_is_mariadb,
+    "MariaDB doesn't support spatial reference system tables",
+)
 @skipUnlessDBFeature("has_spatialrefsys_table")
 class SpatialRefSysTest(TestCase):
     @cached_property

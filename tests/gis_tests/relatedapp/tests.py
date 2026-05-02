@@ -10,6 +10,7 @@ from ..utils import skipUnlessGISLookup
 from .models import Article, Author, Book, City, DirectoryEntry, Event, Location, Parcel
 
 
+@skipUnlessDBFeature("supports_srid_constraints")
 class RelatedGeoModelTest(TestCase):
     fixtures = ["initial"]
 
