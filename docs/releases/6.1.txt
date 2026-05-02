@@ -290,6 +290,12 @@ Management Commands
   :data:`~django.db.models.signals.m2m_changed` signals with ``raw=True`` when
   loading fixtures.
 
+* ``django-admin`` and ``manage.py`` now display a notice on standard error
+  when the configured settings module fails to import, regardless of the
+  subcommand invoked. Previously this notice was shown only when running
+  ``manage.py`` with no arguments, so other commands could complete silently
+  despite broken settings.
+
 Migrations
 ~~~~~~~~~~
 
