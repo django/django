@@ -13,7 +13,7 @@ from django.db.models.functions import ExtractYear, Length, LTrim
 from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import AND, OR, NothingNode, WhereNode
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext, register_lookup
+from django.test.utils import CaptureQueriesContext, override_settings, register_lookup
 
 from .models import (
     FK1,
@@ -41,6 +41,8 @@ from .models import (
     DumbCategory,
     Eaten,
     Employment,
+    ExecutedQueriesModel,
+    ExecutedQueriesRelatedModel,
     ExtraInfo,
     Fan,
     Food,
@@ -4676,3 +4678,83 @@ class QuerySetCloningTests(TestCase):
         # QuerySet. qs3 is now all of the filters applied to qs + an additional
         # filter.
         self.assertIsNot(qs3, qs)
+
+
+class ExecutedQueriesTests(TestCase):
+    def test_no_debug_executed_queries(self):
+        ExecutedQueriesModel.objects.create()
+        queryset = ExecutedQueriesModel.objects.all()
+
+        self.assertEqual(
+            queryset.executed_queries,
+            None,
+        )
+
+        list(queryset)
+        self.assertEqual(
+            queryset.executed_queries,
+            [],
+        )
+
+    @override_settings(DEBUG=True)
+    def test_no_executed_queries(self):
+        ExecutedQueriesModel.objects.create()
+        queryset = ExecutedQueriesModel.objects.filter(pk__in=[])
+
+        self.assertEqual(
+            queryset.executed_queries,
+            None,
+        )
+
+        list(queryset)
+        self.assertEqual(
+            queryset.executed_queries,
+            [],
+        )
+        queryset = queryset.none()
+        list(queryset)
+        self.assertEqual(
+            queryset.executed_queries,
+            [],
+        )
+
+    @override_settings(DEBUG=True)
+    def test_single_executed_query(self):
+        ExecutedQueriesModel.objects.create()
+        queryset = ExecutedQueriesModel.objects.all()
+        list(queryset)
+
+        self.assertEqual(
+            queryset.executed_queries,
+            [
+                'SELECT "queries_executedqueriesmodel"."id" '
+                'FROM "queries_executedqueriesmodel"'
+            ],
+        )
+
+    @override_settings(DEBUG=True)
+    def test_multiple_executed_queries(self):
+        instance = ExecutedQueriesModel.objects.create()
+        ExecutedQueriesRelatedModel.objects.create(original_model=instance)
+
+        queryset = ExecutedQueriesModel.objects.prefetch_related(
+            "executedqueriesrelatedmodel_set__executedqueriesextrarelatedmodel_set"
+        )
+        list(queryset)
+
+        self.assertEqual(
+            queryset.executed_queries,
+            [
+                'SELECT "queries_executedqueriesmodel"."id" '
+                'FROM "queries_executedqueriesmodel"',
+                'SELECT "queries_executedqueriesrelatedmodel"."id", '
+                '"queries_executedqueriesrelatedmodel"."original_model_id" FROM '
+                '"queries_executedqueriesrelatedmodel" WHERE '
+                '"queries_executedqueriesrelatedmodel"."original_model_id" IN (1)',
+                'SELECT "queries_executedqueriesextrarelatedmodel"."id", '
+                '"queries_executedqueriesextrarelatedmodel"."extra_original_model_id" '
+                'FROM "queries_executedqueriesextrarelatedmodel" WHERE '
+                '"queries_executedqueriesextrarelatedmodel"."extra_original_model_id"'
+                ' IN (1)',
+            ],
+        )

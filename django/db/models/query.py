@@ -342,6 +342,7 @@ class QuerySet(AltersData):
         self._defer_next_filter = False
         self._deferred_filter = None
         self._cloning_enabled = True
+        self.executed_queries = None
 
     @property
     def query(self):
@@ -1631,6 +1632,7 @@ class QuerySet(AltersData):
         """Return an empty QuerySet."""
         clone = self._chain()
         clone.query.set_empty()
+        clone.executed_queries = []
         return clone
 
     ##################################################################
@@ -2227,10 +2229,23 @@ class QuerySet(AltersData):
         return c
 
     def _fetch_all(self):
+        connection = connections[self.db]
+        executed_queries_length = len(connection.queries)
+        queries_executed = False
+
         if self._result_cache is None:
+            queries_executed = True
             self._result_cache = list(self._iterable_class(self))
+
         if self._prefetch_related_lookups and not self._prefetch_done:
+            queries_executed = True
             self._prefetch_related_objects()
+
+        if queries_executed:
+            self.executed_queries = []
+            if len(connection.queries) > executed_queries_length:
+                for query in connection.queries[executed_queries_length:]:
+                    self.executed_queries.append(query["sql"])
 
     def _next_is_sticky(self):
         """
