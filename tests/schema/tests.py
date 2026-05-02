@@ -5056,8 +5056,16 @@ class SchemaTests(TransactionTestCase):
         old_field = Author._meta.get_field("name")
         new_field = CharField(max_length=255, db_comment="Custom comment")
         new_field.set_attributes_from_name("name")
-        with connection.schema_editor() as editor:
+        with (
+            connection.schema_editor() as editor,
+            CaptureQueriesContext(connection) as ctx,
+        ):
             editor.alter_field(Author, old_field, new_field, strict=True)
+        self.assertEqual(len(ctx), 1)
+        if connection.features.supports_independent_comment_alteration:
+            self.assertIn("COMMENT ON COLUMN", ctx.captured_queries[0]["sql"])
+        else:
+            self.assertIn("ALTER TABLE", ctx.captured_queries[0]["sql"])
         self.assertEqual(
             self.get_column_comment(Author._meta.db_table, "name"),
             "Custom comment",
