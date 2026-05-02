@@ -23,6 +23,7 @@ rather than the HTML rendered to the end-user.
 import copy
 import itertools
 import tempfile
+from io import BytesIO
 from unittest import mock
 
 from django.contrib.auth.models import Permission, User
@@ -1022,6 +1023,23 @@ class ClientTest(TestCase):
                 data={"named_temp_file": test_file},
             )
         self.assertEqual(response.content, b"named_temp_file")
+
+    def test_encode_multipart_with_field_and_file_same_name(self):
+        """
+        encode_multipart() should include both a form field and a file upload
+        when they share the same name in a MultiValueDict.
+        """
+        from django.test.client import BOUNDARY, encode_multipart
+        from django.utils.datastructures import MultiValueDict
+
+        file = BytesIO(b"file content")
+        file.name = "test.txt"
+        data = MultiValueDict({"shared": ["field_value", file]})
+        result = encode_multipart(BOUNDARY, data)
+        # Both the form field value and the file content must be present.
+        self.assertIn(b"field_value", result)
+        self.assertIn(b"file content", result)
+        self.assertIn(b"test.txt", result)
 
     def test_query_params(self):
         tests = (
