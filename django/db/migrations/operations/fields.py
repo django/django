@@ -160,11 +160,17 @@ class RemoveField(FieldOperation):
 
     category = OperationCategory.REMOVAL
 
+    def __init__(self, model_name, name, default=NOT_PROVIDED):
+        self.default = default
+        super().__init__(model_name, name)
+
     def deconstruct(self):
         kwargs = {
             "model_name": self.model_name,
             "name": self.name,
         }
+        if self.default is not NOT_PROVIDED:
+            kwargs["default"] = self.default
         return (self.__class__.__name__, [], kwargs)
 
     def state_forwards(self, app_label, state):
@@ -181,7 +187,12 @@ class RemoveField(FieldOperation):
         to_model = to_state.apps.get_model(app_label, self.model_name)
         if self.allow_migrate_model(schema_editor.connection.alias, to_model):
             from_model = from_state.apps.get_model(app_label, self.model_name)
-            schema_editor.add_field(from_model, to_model._meta.get_field(self.name))
+            field = to_model._meta.get_field(self.name)
+            old_default = field.default
+            if self.default is not NOT_PROVIDED:
+                field.default = self.default
+            schema_editor.add_field(from_model, field)
+            field.default = old_default
 
     def describe(self):
         return "Remove field %s from %s" % (self.name, self.model_name)
