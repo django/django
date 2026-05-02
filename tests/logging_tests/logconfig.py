@@ -12,8 +12,15 @@ class MyHandler(logging.Handler):
 
 
 class MyEmailBackend(BaseEmailBackend):
+    sent_messages = []
+
+    def __init__(self, fail_silently=False, **kwargs):
+        super().__init__(**kwargs)
+        self.fail_silently = fail_silently
+        self.__class__.sent_messages[:] = []
+
     def send_messages(self, email_messages):
-        pass
+        self.__class__.sent_messages.extend(email_messages)
 
 
 class CustomExceptionReporter(ExceptionReporter):
