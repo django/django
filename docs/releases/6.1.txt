@@ -217,7 +217,10 @@ Cache
 CSP
 ~~~
 
-* ...
+* The new :ttag:`csp_nonce` template tag generates a CSP nonce. For standalone
+  use or in combination with :class:`~django.forms.Script` and
+  :doc:`Media </topics/forms/media>` objects. See :ref:`csp-form-media-nonce`
+  for details.
 
 CSRF
 ~~~~
