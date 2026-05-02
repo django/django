@@ -8,7 +8,7 @@ Verifies that:
 4. SimpleTestCase does not clear caches
 """
 
-from django.core.cache import cache, caches, DEFAULT_CACHE_ALIAS
+from django.core.cache import DEFAULT_CACHE_ALIAS, cache, caches
 from django.test import SimpleTestCase, TestCase, override_settings
 
 
@@ -104,9 +104,7 @@ class DefaultCacheOnlyClearedTests(TestCase):
 
         # Verify both are set
         self.assertEqual(caches["default"].get("default_key"), "default_value")
-        self.assertEqual(
-            caches["secondary"].get("secondary_key"), "secondary_value"
-        )
+        self.assertEqual(caches["secondary"].get("secondary_key"), "secondary_value")
 
         # Simulate what TestCase._clear_caches() does
         caches[DEFAULT_CACHE_ALIAS].clear()

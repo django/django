@@ -30,7 +30,7 @@ from asgiref.sync import async_to_sync, iscoroutinefunction
 from django.apps import apps
 from django.conf import settings
 from django.core import mail
-from django.core.cache import caches, DEFAULT_CACHE_ALIAS
+from django.core.cache import DEFAULT_CACHE_ALIAS, caches
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.files import locks
 from django.core.handlers.wsgi import WSGIHandler, get_path_info
