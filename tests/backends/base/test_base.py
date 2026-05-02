@@ -1,4 +1,5 @@
 import gc
+from unittest import SkipTest
 from unittest.mock import MagicMock, patch
 
 from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
@@ -415,6 +416,21 @@ class ConnectionHealthChecksTests(SimpleTestCase):
         connection.commit()
         connection.set_autocommit(True)
         self.assertIs(new_connection, connection.connection)
+
+    def test_no_close_usable_in_atomic(self):
+        with transaction.atomic():
+            connection.close_if_unusable_or_obsolete()
+            self.run_query()
+
+    def test_close_unusable_in_atomic(self):
+        if connection.vendor == "sqlite" and connection.is_in_memory_db():
+            raise SkipTest("In-memory databases are never closed.")
+        with (
+            transaction.atomic(),
+            patch.object(connection, "is_usable", return_value=False),
+        ):
+            connection.close_if_unusable_or_obsolete()
+            self.assertIs(True, connection.closed_in_transaction)
 
 
 class MultiDatabaseTests(TestCase):
