@@ -307,6 +307,36 @@ Usage example:
     >>> Experiment.objects.filter(start_datetime__year=Extract("end_datetime", "year")).count()
     1
 
+.. warning::
+
+    ``Extract`` functions, at the database level are timezone naive. When you
+    use a ``Extract`` function in a filter and :setting:`USE_TZ` is ``True``
+    you will need to remember that it is a timezone naive value. This can lead
+    to unexpected results if you are using timezones other than UTC. Django
+    will store date/time values in the database in the UTC timezone. The
+    following example demonstrates what happens when "Europe/Berlin" is active
+    in Django (in settings :setting:`TIME_ZONE`) and how to adjust for this:
+
+    .. code-block:: pycon
+
+        >>> from django.utils import timezone
+        >>> from datetime import datetime
+        >>> from django.db.models.functions import ExtractHour
+        >>> import zoneinfo
+        >>> start = datetime(2015, 6, 15, 14, 30, 50, 321)
+        >>> start = timezone.make_aware(start)
+        >>> exp = Experiment.objects.create(start_datetime=start)
+        >>> find_this_exp = Experiment.objects.annotate(
+        ...     extract_hour_start=ExtractHour("start_datetime")
+        ... ).filter(extract_hour_start=start.hour)
+        >>> find_this_exp.count()
+        0  # We expect to find one result but 0 are found
+        >>> find_this_exp_adjusted = Experiment.objects.annotate(
+        ...     extract_hour_start=ExtractHour("start_datetime", tzinfo=zoneinfo.ZoneInfo("UTC"))
+        ... ).filter(extract_hour_start=start.hour)
+        >>> find_this_exp_adjusted.count()
+        1
+
 ``DateField`` extracts
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -584,9 +614,9 @@ The timezone offset for Melbourne in the example date above is +10:00. The
 values returned when this timezone is active will be:
 
 * "year": 2015-01-01 00:00:00+11:00
-* "quarter": 2015-04-01 00:00:00+10:00
+* "quarter": 2015-04-01 00:00:00+11:00
 * "month": 2015-06-01 00:00:00+10:00
-* "week": 2015-06-16 00:00:00+10:00
+* "week": 2015-06-15 00:00:00+10:00
 * "day": 2015-06-16 00:00:00+10:00
 * "hour": 2015-06-16 00:00:00+10:00
 * "minute": 2015-06-16 00:30:00+10:00
@@ -633,6 +663,37 @@ Usage example:
     ...
     2015-06-15 14:30:50.000321
     2015-06-15 14:40:02.000123
+
+.. warning::
+
+    ``Trunc`` functions, at the database level, return a timezone naive value
+    which is converted to a timezone-aware value by the ORM. When you use a
+    ``Trunc`` function in a filter and :setting:`USE_TZ` is ``True`` you will
+    need to remember that it is a timezone naive value. This can lead to
+    unexpected results if you are using timezones other than UTC. Django will
+    store date/time values in the database in the UTC timezone. The following
+    example demonstrates what happens when "Europe/Berlin" is active in Django
+    (in settings :setting:`TIME_ZONE`) and how to adjust for this:
+
+    .. code-block:: pycon
+
+        >>> from django.utils import timezone
+        >>> from datetime import datetime
+        >>> from django.db.models.functions import TruncSecond
+        >>> import zoneinfo
+        >>> start = datetime(2015, 6, 15, 14, 30, 50, 321)
+        >>> start = timezone.make_aware(start)
+        >>> exp = Experiment.objects.create(start_datetime=start)
+        >>> find_this_exp = Experiment.objects.annotate(
+        ...     trunc_start=TruncSecond("start_datetime")
+        ... ).filter(trunc_start__lte=start)
+        >>> find_this_exp.count()
+        0  # We expect to find one result but 0 are found
+        >>> find_this_exp_adjusted = Experiment.objects.annotate(
+        ...     trunc_start=TruncSecond("start_datetime", tzinfo=zoneinfo.ZoneInfo("UTC"))
+        ... ).filter(trunc_start__lte=start)
+        >>> find_this_exp_adjusted.count()
+        1
 
 ``DateField`` truncation
 ~~~~~~~~~~~~~~~~~~~~~~~~
