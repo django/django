@@ -267,7 +267,9 @@ Forms
 Generic Views
 ~~~~~~~~~~~~~
 
-* ...
+* :class:`~django.views.generic.base.RedirectView` now supports the
+  ``preserve_request`` attribute to preserve the HTTP method and body
+  during redirects, using 307/308 status codes instead of 302/301.
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~

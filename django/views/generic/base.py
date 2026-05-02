@@ -235,6 +235,7 @@ class RedirectView(View):
     url = None
     pattern_name = None
     query_string = False
+    preserve_request = False
 
     def get_redirect_url(self, *args, **kwargs):
         """
@@ -261,9 +262,11 @@ class RedirectView(View):
         url = self.get_redirect_url(*args, **kwargs)
         if url:
             if self.permanent:
-                return HttpResponsePermanentRedirect(url)
+                return HttpResponsePermanentRedirect(
+                    url, preserve_request=self.preserve_request
+                )
             else:
-                return HttpResponseRedirect(url)
+                return HttpResponseRedirect(url, preserve_request=self.preserve_request)
         else:
             response = HttpResponseGone()
             log_response("Gone: %s", request.path, response=response, request=request)
