@@ -36,6 +36,7 @@ from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.translation import gettext_lazy
 
 from . import custombackend
+from .custombackend import OptionsCapturingBackend
 
 # Check whether python/cpython#128110 has been fixed by seeing if space between
 # encoded-words is ignored (as required by RFC 2047 section 6.2).
@@ -1862,6 +1863,19 @@ class SendMailTests(SimpleTestCase, MailTestsMixin):
         self.assertEqual(message.get_payload(1).get_content(), "HTML Content\n")
         self.assertEqual(message.get_payload(1).get_content_type(), "text/html")
 
+    def test_returns_count_of_messages_sent(self):
+        cases = [
+            (["to@example.com"], 1),
+            (["one@example.com", "two@example.com"], 1),
+            ([], 0),
+        ]
+        for recipient_list, expected_count in cases:
+            with self.subTest(recipient_list=recipient_list):
+                count = send_mail(
+                    "Subject", "Content", "from@example.com", recipient_list
+                )
+                self.assertEqual(count, expected_count)
+
     def test_idn_addresses(self):
         """
         IDNA encoding is applied to non-ASCII domains in address headers
@@ -1895,6 +1909,35 @@ class SendMailTests(SimpleTestCase, MailTestsMixin):
         self.assertEqual(mail.outbox, [])
         self.assertEqual(len(connection.test_outbox), 1)
         self.assertEqual(connection.test_outbox[0].subject, "Subject")
+
+    def test_auth_passed_to_backend_init(self):
+        self.addCleanup(OptionsCapturingBackend.reset)
+        with self.settings(EMAIL_BACKEND="mail.custombackend.OptionsCapturingBackend"):
+            send_mail(
+                "Subject",
+                "Content",
+                "from@example.com",
+                ["to@example.com"],
+                auth_user="user",
+                auth_password="password",
+            )
+        # "auth_user" and "auth_password" become "username" and "password".
+        init_kwargs = OptionsCapturingBackend.init_kwargs[0]
+        self.assertEqual(init_kwargs["username"], "user")
+        self.assertEqual(init_kwargs["password"], "password")
+
+    def test_fail_silently_passed_to_backend_init(self):
+        self.addCleanup(OptionsCapturingBackend.reset)
+        with self.settings(EMAIL_BACKEND="mail.custombackend.OptionsCapturingBackend"):
+            send_mail(
+                "Subject",
+                "Content",
+                "from@example.com",
+                ["to@example.com"],
+                fail_silently=True,
+            )
+        init_kwargs = OptionsCapturingBackend.init_kwargs[0]
+        self.assertIs(init_kwargs["fail_silently"], True)
 
     def test_fail_silently_conflict(self):
         msg = (
@@ -1934,6 +1977,29 @@ class SendMailTests(SimpleTestCase, MailTestsMixin):
 class SendMassMailTests(SimpleTestCase):
     """Tests for django.core.mail.send_mass_mail()."""
 
+    def test_send_mass_mail(self):
+        count = send_mass_mail(
+            [
+                ("Subject1", "Content1", "from1@example.com", ["to1@example.com"]),
+                (
+                    "Subject2",
+                    "Content2",
+                    "from2@example.com",
+                    ["to2a@example.com", "to2b@example.com"],
+                ),
+            ],
+        )
+        self.assertEqual(count, 2)
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(mail.outbox[0].subject, "Subject1")
+        self.assertEqual(mail.outbox[0].body, "Content1")
+        self.assertEqual(mail.outbox[0].from_email, "from1@example.com")
+        self.assertEqual(mail.outbox[0].to, ["to1@example.com"])
+        self.assertEqual(mail.outbox[1].subject, "Subject2")
+        self.assertEqual(mail.outbox[1].body, "Content2")
+        self.assertEqual(mail.outbox[1].from_email, "from2@example.com")
+        self.assertEqual(mail.outbox[1].to, ["to2a@example.com", "to2b@example.com"])
+
     def test_connection_arg(self):
         # Send using non-default connection.
         connection = custombackend.EmailBackend()
@@ -1948,6 +2014,32 @@ class SendMassMailTests(SimpleTestCase):
         self.assertEqual(len(connection.test_outbox), 2)
         self.assertEqual(connection.test_outbox[0].subject, "Subject1")
         self.assertEqual(connection.test_outbox[1].subject, "Subject2")
+        # Connection is provided to EmailMessage objects (#17811).
+        self.assertIs(connection.test_outbox[0].connection, connection)
+        self.assertIs(connection.test_outbox[1].connection, connection)
+
+    def test_auth_passed_to_backend_init(self):
+        self.addCleanup(OptionsCapturingBackend.reset)
+        with self.settings(EMAIL_BACKEND="mail.custombackend.OptionsCapturingBackend"):
+            send_mass_mail(
+                [("Subject1", "Content1", "from1@example.com", ["to1@example.com"])],
+                auth_user="user",
+                auth_password="password",
+            )
+        # "auth_user" and "auth_password" become "username" and "password".
+        init_kwargs = OptionsCapturingBackend.init_kwargs[0]
+        self.assertEqual(init_kwargs["username"], "user")
+        self.assertEqual(init_kwargs["password"], "password")
+
+    def test_fail_silently_passed_to_backend_init(self):
+        self.addCleanup(OptionsCapturingBackend.reset)
+        with self.settings(EMAIL_BACKEND="mail.custombackend.OptionsCapturingBackend"):
+            send_mass_mail(
+                [("Subject1", "Content1", "from1@example.com", ["to1@example.com"])],
+                fail_silently=True,
+            )
+        init_kwargs = OptionsCapturingBackend.init_kwargs[0]
+        self.assertIs(init_kwargs["fail_silently"], True)
 
     def test_send_fail_silently_conflict(self):
         datatuple = (("Subject", "Message", "from@example.com", ["to@example.com"]),)
@@ -2167,6 +2259,17 @@ class MailAdminsAndManagersTests(SimpleTestCase, MailTestsMixin):
 
 class GetConnectionTests(SimpleTestCase):
     """Tests for django.core.mail.get_connection()."""
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.console.EmailBackend")
+    def test_uses_email_backend_setting(self):
+        connection = mail.get_connection()
+        self.assertIsInstance(connection, console.EmailBackend)
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend")
+    def test_backend_specific_kwargs(self):
+        connection = mail.get_connection(host="mail.example.com")
+        self.assertIsInstance(connection, smtp.EmailBackend)
+        self.assertEqual(connection.host, "mail.example.com")
 
     def test_backend_arg(self):
         """Test backend argument of mail.get_connection()"""

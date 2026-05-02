@@ -1,18 +1,22 @@
 import os
 import shutil
 import socket
+import ssl
 import sys
 import tempfile
 from io import StringIO
 from pathlib import Path
 from smtplib import SMTPException
 from ssl import SSLError
-from unittest import mock, skipUnless
+from unittest import mock, skipIf, skipUnless
 
 from django.core import mail
+from django.core.exceptions import ImproperlyConfigured
 from django.core.mail import EmailMessage
-from django.core.mail.backends import dummy, locmem, smtp
+from django.core.mail.backends import dummy, filebased, locmem, smtp
+from django.core.mail.backends.base import BaseEmailBackend
 from django.test import SimpleTestCase, override_settings
+from django.utils.module_loading import import_string
 
 from .tests import MailTestsMixin, message_from_bytes
 
@@ -22,6 +26,19 @@ try:
     HAS_AIOSMTPD = True
 except ImportError:
     HAS_AIOSMTPD = False
+
+
+class BaseEmailBackendTests(SimpleTestCase):
+    def test_fail_silently_arg_accepted(self):
+        for value in [True, False]:
+            with self.subTest(fail_silently=value):
+                backend = BaseEmailBackend(fail_silently=value)
+                self.assertIs(backend.fail_silently, value)
+
+    def test_unknown_kwargs_ignored(self):
+        backend = BaseEmailBackend(unknown_kwarg="foo")
+        self.assertIsInstance(backend, BaseEmailBackend)
+        self.assertFalse(hasattr(backend, "unknown_kwarg"))
 
 
 class SharedEmailBackendTests(MailTestsMixin):
@@ -111,6 +128,18 @@ class SharedEmailBackendTests(MailTestsMixin):
             backend.close.assert_not_called()
 
         backend.close.assert_called_once()
+
+    def test_fail_silently_arg_accepted(self):
+        backend_class = import_string(self.email_backend)
+        for value in [True, False]:
+            with self.subTest(fail_silently=value):
+                backend = backend_class(fail_silently=value)
+                self.assertIs(backend.fail_silently, value)
+
+    def test_unknown_kwargs_ignored(self):
+        backend_class = import_string(self.email_backend)
+        backend = backend_class(unknown_kwarg="foo")
+        self.assertFalse(hasattr(backend, "unknown_kwarg"))
 
 
 class DummyBackendTests(SharedEmailBackendTests, SimpleTestCase):
@@ -208,6 +237,53 @@ class FileBackendTests(SharedEmailBackendTests, SimpleTestCase):
         for filename in self.get_filenames():
             messages.extend(self.get_messages_from_filename(filename))
         return messages
+
+    def test_email_file_path_use_settings(self):
+        file_path_settings = self.mkdtemp()
+        with self.settings(EMAIL_FILE_PATH=file_path_settings):
+            backend = filebased.EmailBackend()
+        self.assertEqual(backend.file_path, str(file_path_settings))
+
+    def test_email_file_path_override_settings(self):
+        file_path_settings = self.mkdtemp()
+        file_path_override = self.mkdtemp()
+        self.assertNotEqual(file_path_settings, file_path_override)
+
+        with self.settings(EMAIL_FILE_PATH=file_path_settings):
+            backend = filebased.EmailBackend(file_path=file_path_override)
+        self.assertEqual(backend.file_path, str(file_path_override))
+
+    def test_error_if_file_path_is_not_directory(self):
+        tmp_file = Path(self.tmp_dir) / "ordinary-file"
+        tmp_file.touch()
+        if isinstance(self.tmp_dir, str):
+            # Running the non-"PathLib" version of FileBackendTests.
+            tmp_file = str(tmp_file)
+        msg = (
+            f"Path for saving email messages exists, but is not a directory: {tmp_file}"
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            filebased.EmailBackend(file_path=tmp_file)
+
+    @skipIf(
+        sys.platform == "win32",
+        "No cross-platform means to force an OSError from os.makedirs().",
+    )
+    def test_error_if_file_path_cannot_be_created(self):
+        msg = "Could not create directory for saving email messages: /dev/null/foo"
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            filebased.EmailBackend(file_path="/dev/null/foo")
+
+    @skipIf(
+        sys.platform == "win32",
+        "chmod does not reliably make directories read-only on Windows.",
+    )
+    def test_error_if_file_path_is_not_writeable(self):
+        os.chmod(self.tmp_dir, 0o444)
+        self.addCleanup(os.chmod, self.tmp_dir, 0o777)
+        msg = f"Could not write to directory: {self.tmp_dir}"
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            filebased.EmailBackend(file_path=self.tmp_dir)
 
     def test_new_file_per_instance(self):
         # Documented behavior: "A new file is created for each new session that
@@ -391,6 +467,38 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         return self.smtp_handler.smtp_envelopes
 
     @override_settings(
+        EMAIL_HOST="mail.example.com",
+        EMAIL_PORT=822,
+    )
+    def test_email_host_use_settings(self):
+        backend = smtp.EmailBackend()
+        self.assertEqual(backend.host, "mail.example.com")
+        self.assertEqual(backend.port, 822)
+
+    @override_settings(
+        EMAIL_HOST="mail.example.com",
+        EMAIL_PORT=822,
+    )
+    def test_email_host_override_settings(self):
+        backend = smtp.EmailBackend(host="other.example.net", port=5322)
+        self.assertEqual(backend.host, "other.example.net")
+        self.assertEqual(backend.port, 5322)
+
+    def test_smtp_connection_uses_host_and_port(self):
+        backend = smtp.EmailBackend(host="mail.example.com", port=5322)
+        self.assertEqual(backend.host, "mail.example.com")
+        self.assertEqual(backend.port, 5322)
+        with (
+            mock.patch("django.core.mail.backends.smtp.smtplib.SMTP") as mock_smtp,
+            backend,
+        ):
+            # Using backend as context manager opens the connection.
+            pass
+        mock_smtp.assert_called_once_with(
+            "mail.example.com", 5322, local_hostname=mock.ANY
+        )
+
+    @override_settings(
         EMAIL_HOST_USER="not empty username",
         EMAIL_HOST_PASSWORD="not empty password",
     )
@@ -513,6 +621,16 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         backend = smtp.EmailBackend()
         self.assertIsNone(backend.ssl_keyfile)
 
+    def test_ssl_context_uses_ssl_certfile_and_keyfile(self):
+        backend = smtp.EmailBackend(ssl_certfile="certfile", ssl_keyfile="keyfile")
+        with mock.patch(
+            "django.core.mail.backends.smtp.ssl.SSLContext"
+        ) as mock_ssl_context:
+            ssl_context = backend.ssl_context
+        self.assertIs(ssl_context, mock_ssl_context.return_value)
+        mock_ssl_context.assert_called_once_with(protocol=ssl.PROTOCOL_TLS_CLIENT)
+        ssl_context.load_cert_chain.assert_called_once_with("certfile", "keyfile")
+
     @override_settings(EMAIL_USE_TLS=True)
     def test_email_tls_attempts_starttls(self):
         backend = smtp.EmailBackend()
@@ -553,6 +671,16 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
     def test_email_timeout_use_settings(self):
         backend = smtp.EmailBackend()
         self.assertEqual(backend.timeout, 10)
+
+    @override_settings(EMAIL_TIMEOUT=10)
+    def test_email_timeout_override_settings(self):
+        backend = smtp.EmailBackend(timeout=15)
+        self.assertEqual(backend.timeout, 15)
+
+    def test_smtp_connection_uses_timeout(self):
+        backend = smtp.EmailBackend(timeout=10)
+        with backend:
+            self.assertEqual(backend.connection.timeout, 10)
 
     def test_serialized_message_uses_crlf_line_ending(self):
         backend = mail.get_connection()
