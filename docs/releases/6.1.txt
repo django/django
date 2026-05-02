@@ -338,6 +338,10 @@ Models
   ``OR``, ``XOR``, respectively. These aggregates were previously included only
   in ``contrib.postgres``.
 
+* The new :attr:`DecimalField.context <django.db.models.DecimalField.context>`
+  attribute allows customizing the creation of  ``Decimal`` instances from
+  floats.
+
 Pagination
 ~~~~~~~~~~
 
