@@ -93,3 +93,47 @@ QUnit.test("time zone offset warning - date and time field", function (assert) {
         "id_updated_at_timezone_warning_helptext",
     );
 });
+
+QUnit.test("update aria labels - previous and next months", function (assert) {
+    const $ = django.jQuery;
+    const dateField = $('<input type="text" class="vDateField">');
+    $("#qunit-fixture").append(dateField);
+    DateTimeShortcuts.init();
+    const num = DateTimeShortcuts.calendars.length - 1;
+    const cal = DateTimeShortcuts.calendars[num];
+    // Set to January 2026
+    cal.currentMonth = 1;
+    cal.currentYear = 2026;
+    DateTimeShortcuts.updateNavAriaLabels(num);
+    const cal_box = document.getElementById(
+        DateTimeShortcuts.calendarDivName1 + num,
+    );
+    const prevLabel = cal_box
+        .querySelector(".calendarnav-previous")
+        .getAttribute("aria-label");
+    const nextLabel = cal_box
+        .querySelector(".calendarnav-next")
+        .getAttribute("aria-label");
+    assert.equal(prevLabel, "Previous (December 2025)");
+    assert.equal(nextLabel, "Next (February 2026)");
+});
+
+QUnit.test("today link has aria-label with current date", function (assert) {
+    const $ = django.jQuery;
+    const dateField = $(
+        '<input type="text" class="vDateField" value="2026-04-12"><br>',
+    );
+    $("#qunit-fixture").append(dateField);
+    DateTimeShortcuts.init();
+    const todayLink = $(".datetimeshortcuts a:first");
+    assert.equal(todayLink.text(), "Today");
+    // "Today (April 12, 2026)"
+    const today = new Date();
+    const formattedDate = today.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+    });
+    const expectedAriaLabel = `Today (${formattedDate})`;
+    assert.equal(todayLink.attr("aria-label"), expectedAriaLabel);
+});
