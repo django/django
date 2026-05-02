@@ -1247,6 +1247,12 @@ class CharField(Field):
         super().__init__(*args, **kwargs)
         self.db_collation = db_collation
         if self.max_length is not None:
+            if (
+                not isinstance(self.max_length, int)
+                or isinstance(self.max_length, bool)
+                or self.max_length <= 0
+            ):
+                raise ValueError("'max_length' must be a positive integer.")
             self.validators.append(validators.MaxLengthValidator(self.max_length))
 
     @property
@@ -1277,18 +1283,6 @@ class CharField(Field):
                     "CharFields must define a 'max_length' attribute.",
                     obj=self,
                     id="fields.E120",
-                )
-            ]
-        elif (
-            not isinstance(self.max_length, int)
-            or isinstance(self.max_length, bool)
-            or self.max_length <= 0
-        ):
-            return [
-                checks.Error(
-                    "'max_length' must be a positive integer.",
-                    obj=self,
-                    id="fields.E121",
                 )
             ]
         else:
@@ -1752,6 +1746,13 @@ class DecimalField(Field):
         **kwargs,
     ):
         self.max_digits, self.decimal_places = max_digits, decimal_places
+        if self.max_digits is not None:
+            try:
+                self.max_digits = int(self.max_digits)
+            except ValueError:
+                raise ValueError("'max_digits' must be a positive integer.")
+            if self.max_digits <= 0:
+                raise ValueError("'max_digits' must be a positive integer.")
         super().__init__(verbose_name, name, **kwargs)
 
     def check(self, **kwargs):
@@ -1839,19 +1840,6 @@ class DecimalField(Field):
                             id="fields.E135",
                         ),
                     ]
-        else:
-            try:
-                max_digits = int(self.max_digits)
-                if max_digits <= 0:
-                    raise ValueError()
-            except ValueError:
-                return [
-                    checks.Error(
-                        "'max_digits' must be a positive integer.",
-                        obj=self,
-                        id="fields.E133",
-                    )
-                ]
         return []
 
     def _check_decimal_places_and_max_digits(self, **kwargs):
