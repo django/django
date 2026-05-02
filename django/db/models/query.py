@@ -1086,10 +1086,24 @@ class QuerySet(AltersData):
                 # This is to maintain backward compatibility as these fields
                 # are not updated unless explicitly specified in the
                 # update_fields list.
+                # Only include pre_save fields from models that already have
+                # at least one field being updated, to avoid unnecessary
+                # updates to parent tables in MTI (see #32095).
                 pk_fields = self.model._meta.pk_fields
-                for field in self.model._meta.local_concrete_fields:
-                    if not (
-                        field in pk_fields or field.__class__.pre_save is Field.pre_save
+                updated_models = set()
+                for field in self.model._meta.concrete_fields:
+                    if field not in pk_fields and (
+                        field.name in update_defaults
+                        or field.attname in update_defaults
+                    ):
+                        updated_models.add(field.model)
+                for field in self.model._meta.concrete_fields:
+                    if (
+                        not (
+                            field in pk_fields
+                            or field.__class__.pre_save is Field.pre_save
+                        )
+                        and field.model in updated_models
                     ):
                         update_fields.add(field.name)
                         if field.name != field.attname:
