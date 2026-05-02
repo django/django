@@ -175,10 +175,7 @@ be done by adding an ``output_field`` attribute to the transform::
     class AbsoluteValue(Transform):
         lookup_name = "abs"
         function = "ABS"
-
-        @property
-        def output_field(self):
-            return FloatField()
+        output_field = FloatField()
 
 This ensures that further lookups like ``abs__lte`` behave as they would for
 a ``FloatField``.

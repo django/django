@@ -329,7 +329,7 @@ class Query(BaseExpression):
 
         self._filtered_relations = {}
 
-    @property
+    @cached_property
     def output_field(self):
         if len(self.select) == 1:
             select = self.select[0]
