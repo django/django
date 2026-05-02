@@ -655,6 +655,21 @@ class BaseDatabaseSchemaEditor:
         }
         meta_index_names = {constraint.name for constraint in model._meta.indexes}
         columns = [model._meta.get_field(field).column for field in fields]
+
+        # Check if the constraint is still in deferred_sql. This happens when
+        # CreateModel with unique_together or index_together is followed by
+        # AlterUniqueTogether/AlterIndexTogether in the same migration.
+        table = model._meta.db_table
+        for deferred in list(self.deferred_sql):
+            if (
+                isinstance(deferred, Statement)
+                and deferred.references_table(table)
+                and all(deferred.references_column(table, column) for column in columns)
+                and deferred.parts["columns"].columns == columns
+            ):
+                self.deferred_sql.remove(deferred)
+                return
+
         constraint_names = self._constraint_names(
             model,
             columns,
