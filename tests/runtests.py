@@ -28,7 +28,10 @@ else:
     from django.test.runner import get_max_test_processes, parallel_type
     from django.test.selenium import SeleniumTestCase, SeleniumTestCaseBase
     from django.test.utils import NullTimeKeeper, TimeKeeper, get_runner
-    from django.utils.deprecation import (RemovedInNextVersionWarning, RemovedAfterNextVersionWarning)
+    from django.utils.deprecation import (
+        RemovedInNextVersionWarning,
+        RemovedAfterNextVersionWarning,
+    )
     from django.utils.functional import classproperty
     from django.utils.log import DEFAULT_LOGGING
     from django.utils.version import PYPY
