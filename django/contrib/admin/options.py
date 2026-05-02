@@ -1,7 +1,9 @@
 import copy
 import enum
+import inspect
 import json
 import re
+import warnings
 from functools import partial, update_wrapper
 from urllib.parse import parse_qsl
 from urllib.parse import quote as urlquote
@@ -58,6 +60,7 @@ from django.http.response import HttpResponseBase
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.html import format_html
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
@@ -84,6 +87,11 @@ class ShowFacets(enum.Enum):
     NEVER = "NEVER"
     ALLOW = "ALLOW"
     ALWAYS = "ALWAYS"
+
+
+class ActionType(enum.Enum):
+    BULK_ACTION = 0
+    SINGLE_ACTION = 1
 
 
 HORIZONTAL, VERTICAL = 1, 2
@@ -856,7 +864,11 @@ class ModelAdmin(BaseModelAdmin):
         list_display = self.get_list_display(request)
         list_display_links = self.get_list_display_links(request, list_display)
         # Add the action checkboxes if any actions are available.
-        if self.get_actions(request):
+        # RemovedInDjango70Warning: When the deprecation ends, replace with:
+        # if self.get_actions(request, action_type=ActionType.BULK_ACTION):
+        if self._get_actions_with_action_type(
+            request, action_type=ActionType.BULK_ACTION
+        ):
             list_display = ["action_checkbox", *list_display]
         sortable_by = self.get_sortable_by(request)
         ChangeList = self.get_changelist(request)
@@ -999,16 +1011,22 @@ class ModelAdmin(BaseModelAdmin):
         return checkbox.render(helpers.ACTION_CHECKBOX_NAME, str(obj.pk))
 
     @staticmethod
-    def _get_action_description(func, name):
+    def _get_action_description(func, name, action_type=ActionType.BULK_ACTION):
+        attribute_mapping = {
+            ActionType.BULK_ACTION: "plural_description",
+            ActionType.SINGLE_ACTION: "short_description",
+        }
         try:
-            return func.short_description
+            return getattr(func, attribute_mapping[action_type])
         except AttributeError:
             return capfirst(name.replace("_", " "))
 
-    def _get_base_actions(self):
+    def _get_base_actions(self, action_type=ActionType.BULK_ACTION):
         """Return the list of actions, prior to any request-based filtering."""
         actions = []
-        base_actions = (self.get_action(action) for action in self.actions or [])
+        base_actions = (
+            self.get_action(action, action_type) for action in self.actions or []
+        )
         # get_action might have returned None, so filter any of those out.
         base_actions = [action for action in base_actions if action]
         base_action_names = {name for _, name, _ in base_actions}
@@ -1017,7 +1035,11 @@ class ModelAdmin(BaseModelAdmin):
         for name, func in self.admin_site.actions:
             if name in base_action_names:
                 continue
-            description = self._get_action_description(func, name)
+            if action_type not in getattr(
+                func, "action_types", [ActionType.BULK_ACTION]
+            ):
+                continue
+            description = self._get_action_description(func, name, action_type)
             actions.append((func, name, description))
         # Add actions from this ModelAdmin.
         actions.extend(base_actions)
@@ -1039,7 +1061,28 @@ class ModelAdmin(BaseModelAdmin):
                 filtered_actions.append(action)
         return filtered_actions
 
-    def get_actions(self, request):
+    # RemovedInDjango70Warning: When the deprecation ends, remove.
+    def _get_actions_with_action_type(
+        self, request, action_type=ActionType.BULK_ACTION
+    ):
+        sig = inspect.signature(self.get_actions)
+        if "action_type" in sig.parameters:
+            return self.get_actions(request, action_type=action_type)
+        else:
+            warnings.warn(
+                "Overriding get_actions() without the 'action_type' parameter "
+                "is deprecated. Update the signature to "
+                "get_actions(self, request, action_type=ActionType.BULK_ACTION).",
+                RemovedInDjango70Warning,
+                stacklevel=2,
+            )
+            if action_type == ActionType.SINGLE_ACTION:
+                # Disable adding actions on change form when get_actions is
+                # overridden with old signature.
+                return {}
+            return self.get_actions(request)
+
+    def get_actions(self, request, action_type=ActionType.BULK_ACTION):
         """
         Return a dictionary mapping the names of all actions for this
         ModelAdmin to a tuple of (callable, name, description) for each action.
@@ -1048,10 +1091,39 @@ class ModelAdmin(BaseModelAdmin):
         # this page.
         if self.actions is None or IS_POPUP_VAR in request.GET:
             return {}
-        actions = self._filter_actions_by_permissions(request, self._get_base_actions())
+        base_actions = self._get_base_actions(action_type=action_type)
+        actions = self._filter_actions_by_permissions(request, base_actions)
         return {name: (func, name, desc) for func, name, desc in actions}
 
-    def get_action_choices(self, request, default_choices=None):
+    # RemovedInDjango70Warning: When the deprecation ends, remove.
+    def _get_action_choices_with_action_type(
+        self,
+        request,
+        default_choices=None,
+        action_type=ActionType.BULK_ACTION,
+    ):
+        sig = inspect.signature(self.get_action_choices)
+        if "action_type" in sig.parameters:
+            return self.get_action_choices(
+                request, default_choices=default_choices, action_type=action_type
+            )
+        else:
+            warnings.warn(
+                "Overriding get_action_choices() without the 'action_type' "
+                "parameter is deprecated. Update the signature to "
+                "get_action_choices(self, request, default_choices=None, "
+                "action_type=ActionType.BULK_ACTION).",
+                RemovedInDjango70Warning,
+                stacklevel=2,
+            )
+            return self.get_action_choices(request, default_choices=default_choices)
+
+    def get_action_choices(
+        self,
+        request,
+        default_choices=None,
+        action_type=ActionType.BULK_ACTION,
+    ):
         """
         Return a list of choices for use in a form object. Each choice is a
         tuple (name, description).
@@ -1059,12 +1131,15 @@ class ModelAdmin(BaseModelAdmin):
         if default_choices is None:
             default_choices = [("", get_blank_choice_label())]
         choices = [*default_choices]
-        for func, name, description in self.get_actions(request).values():
+        # RemovedInDjango70Warning: When the deprecation ends, replace with:
+        # actions = self.get_actions(request, action_type=action_type)
+        actions = self._get_actions_with_action_type(request, action_type=action_type)
+        for func, name, description in actions.values():
             choice = (name, description % model_format_dict(self.opts))
             choices.append(choice)
         return choices
 
-    def get_action(self, action):
+    def get_action(self, action, action_type=ActionType.BULK_ACTION):
         """
         Return a given action from a parameter, which can either be a callable,
         or the name of a method on the ModelAdmin. Return is a tuple of
@@ -1087,8 +1162,11 @@ class ModelAdmin(BaseModelAdmin):
                 func = self.admin_site.get_action(action)
             except KeyError:
                 return None
+        # Filter out actions based on the action type.
+        if action_type not in getattr(func, "action_types", [ActionType.BULK_ACTION]):
+            return None
 
-        description = self._get_action_description(func, action)
+        description = self._get_action_description(func, action, action_type)
         return func, action, description
 
     def get_list_display(self, request):
@@ -1642,11 +1720,10 @@ class ModelAdmin(BaseModelAdmin):
         """
         return self._response_post_save(request, obj)
 
-    def response_action(self, request, queryset):
+    def response_action(self, request, queryset, action_type=ActionType.BULK_ACTION):
         """
-        Handle an admin action. This is called if a request is POSTed to the
-        changelist; it returns an HttpResponse if the action was handled, and
-        None otherwise.
+        Handle an admin action. Returns an HttpResponse if the action was
+        handled, and None otherwise.
         """
 
         # There can be multiple action forms on the page (at the top
@@ -1671,14 +1748,26 @@ class ModelAdmin(BaseModelAdmin):
             # below. So no need to do anything here
             pass
 
-        action_form = self.action_form(data, auto_id=None)
-        action_form.fields["action"].choices = self.get_action_choices(request)
+        prefix = action_type.value if action_type != ActionType.BULK_ACTION else ""
+        action_form = self.action_form(data, auto_id=None, prefix=prefix)
+        # RemovedInDjango70Warning: When the deprecation ends, replace with:
+        # action_form.fields["action"].choices = self.get_action_choices(
+        #     request, action_type=action_type
+        # )
+        action_form.fields["action"].choices = (
+            self._get_action_choices_with_action_type(request, action_type=action_type)
+        )
 
         # If the form's valid we can handle the action.
         if action_form.is_valid():
             action = action_form.cleaned_data["action"]
             select_across = action_form.cleaned_data["select_across"]
-            func = self.get_actions(request)[action][0]
+            # RemovedInDjango70Warning: When the deprecation ends, replace:
+            # actions = self.get_actions(request, action_type=action_type)
+            actions = self._get_actions_with_action_type(
+                request, action_type=action_type
+            )
+            func = actions[action][0]
 
             # Get the list of selected PKs. If nothing's selected, we can't
             # perform an action on it, so bail. Except we want to perform
@@ -1888,11 +1977,39 @@ class ModelAdmin(BaseModelAdmin):
                     request, self.opts, object_id
                 )
 
+        action_form = None
+        # RemovedInDjango70Warning: When the deprecation ends, replace with:
+        # actions = self.get_actions(
+        #     request, action_type=ActionType.SINGLE_ACTION
+        # )
+        actions = self._get_actions_with_action_type(
+            request, action_type=ActionType.SINGLE_ACTION
+        )
+        if actions and not add:
+            action_type = ActionType.SINGLE_ACTION
+            action_form = self.action_form(auto_id=None, prefix=action_type.value)
+            # RemovedInDjango70Warning: When the deprecation ends, replace:
+            # action_form.fields["action"].choices = self.get_action_choices(
+            #     request, action_type=action_type
+            # )
+            action_form.fields["action"].choices = (
+                self._get_action_choices_with_action_type(
+                    request, action_type=action_type
+                )
+            )
         fieldsets = self.get_fieldsets(request, obj)
         ModelForm = self.get_form(
             request, obj, change=not add, fields=flatten_fieldsets(fieldsets)
         )
         if request.method == "POST":
+            if action_form and request.POST.get(action_form["action"].html_name, ""):
+                queryset = self.model._default_manager.get_queryset()
+                if response := self.response_action(
+                    request, queryset, action_type=ActionType.SINGLE_ACTION
+                ):
+                    return response
+                return HttpResponseRedirect(request.get_full_path())
+
             form = ModelForm(request.POST, request.FILES, instance=obj)
             formsets, inline_instances = self._create_formsets(
                 request,
@@ -1954,6 +2071,8 @@ class ModelAdmin(BaseModelAdmin):
         )
         for inline_formset in inline_formsets:
             media += inline_formset.media
+        if action_form:
+            media += action_form.media
 
         if add:
             title = _("Add %s")
@@ -1974,6 +2093,8 @@ class ModelAdmin(BaseModelAdmin):
             "source_model": request.GET.get(SOURCE_MODEL_VAR),
             "to_field": to_field,
             "media": media,
+            "action_form": action_form,
+            "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
             "inline_admin_formsets": inline_formsets,
             "errors": helpers.AdminErrorList(form, formsets),
             "preserved_filters": self.get_preserved_filters(request),
@@ -2106,7 +2227,11 @@ class ModelAdmin(BaseModelAdmin):
         action_failed = False
         selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
 
-        actions = self.get_actions(request)
+        # RemovedInDjango70Warning: When the deprecation ends, replace with:
+        # actions = self.get_actions(request, action_type=action_type)
+        actions = self._get_actions_with_action_type(
+            request, action_type=ActionType.BULK_ACTION
+        )
         # Actions with no confirmation
         if (
             actions
@@ -2116,7 +2241,9 @@ class ModelAdmin(BaseModelAdmin):
         ):
             if selected:
                 response = self.response_action(
-                    request, queryset=cl.get_queryset(request)
+                    request,
+                    queryset=cl.get_queryset(request),
+                    action_type=ActionType.BULK_ACTION,
                 )
                 if response:
                     return response
@@ -2140,7 +2267,9 @@ class ModelAdmin(BaseModelAdmin):
         ):
             if selected:
                 response = self.response_action(
-                    request, queryset=cl.get_queryset(request)
+                    request,
+                    queryset=cl.get_queryset(request),
+                    action_type=ActionType.BULK_ACTION,
                 )
                 if response:
                     return response
@@ -2184,7 +2313,15 @@ class ModelAdmin(BaseModelAdmin):
         # Build the action form and populate it with available actions.
         if actions:
             action_form = self.action_form(auto_id=None)
-            action_form.fields["action"].choices = self.get_action_choices(request)
+            # RemovedInDjango70Warning: When the deprecation ends, replace:
+            # action_form.fields["action"].choices = self.get_action_choices(
+            #     request, action_type=ActionType.BULK_ACTION
+            # )
+            action_form.fields["action"].choices = (
+                self._get_action_choices_with_action_type(
+                    request, action_type=ActionType.BULK_ACTION
+                )
+            )
             media += action_form.media
         else:
             action_form = None

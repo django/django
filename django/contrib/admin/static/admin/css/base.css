@@ -1317,3 +1317,69 @@ a.deletelink:hover {
     color: var(--body-fg);
     background-color: var(--body-bg);
 }
+
+/* ACTIONS */
+
+.actions {
+    padding: 10px;
+    background: var(--body-bg);
+    border-top: none;
+    border-bottom: none;
+    line-height: 1.5rem;
+    color: var(--body-quiet-color);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.actions span.all,
+.actions span.action-counter,
+.actions span.clear,
+.actions span.question {
+    font-size: 0.8125rem;
+    margin: 0 0.5em;
+}
+
+.actions:last-child {
+    border-bottom: none;
+}
+
+.actions select {
+    vertical-align: top;
+    height: 1.5rem;
+    color: var(--body-fg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 0.875rem;
+    padding: 0 0 0 4px;
+    margin: 0;
+    margin-left: 10px;
+}
+
+.actions select:focus {
+    border-color: var(--body-quiet-color);
+}
+
+.actions label {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 0.8125rem;
+}
+
+.actions .button {
+    font-size: 0.8125rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--body-bg);
+    box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;
+    cursor: pointer;
+    height: 1.5rem;
+    line-height: 1;
+    padding: 4px 8px;
+    margin: 0;
+    color: var(--body-fg);
+}
+
+.actions .button:focus,
+.actions .button:hover {
+    border-color: var(--body-quiet-color);
+}

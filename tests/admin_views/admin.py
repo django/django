@@ -5,7 +5,9 @@ from wsgiref.util import FileWrapper
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import BooleanFieldListFilter
+from django.contrib.admin.options import ActionType
 from django.contrib.admin.views.main import ChangeList
+from django.contrib.auth import get_permission_codename
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
@@ -84,6 +86,7 @@ from .models import (
     Language,
     Link,
     MainPrepopulated,
+    ModelAction,
     ModelWithStringPrimaryKey,
     NotReferenced,
     OldSubscriber,
@@ -420,7 +423,10 @@ class SubscriberAdmin(admin.ModelAdmin):
         ).send()
 
 
-@admin.action(description="External mail (Another awesome action)")
+@admin.action(
+    description="External mail (Another awesome action)",
+    action_type=(ActionType.BULK_ACTION, ActionType.SINGLE_ACTION),
+)
 def external_mail(modeladmin, request, selected):
     EmailMessage(
         "Greetings from a function action",
@@ -437,9 +443,18 @@ def redirect_to(modeladmin, request, selected):
     return HttpResponseRedirect("/some-where-else/")
 
 
-@admin.action(description="Download subscription")
+@admin.action(
+    description="Download subscription",
+    description_plural="Download selected subscriptions",
+    action_type=(ActionType.BULK_ACTION, ActionType.SINGLE_ACTION),
+)
 def download(modeladmin, request, selected):
-    buf = StringIO("This is the content of the file")
+    if selected.count() > 1:
+        buf = StringIO("This is the content of the file")
+    else:
+        selected = selected.get()
+        buf = StringIO(f"This is the content of the file written by {selected.name}")
+
     return StreamingHttpResponse(FileWrapper(buf))
 
 
@@ -448,8 +463,39 @@ def no_perm(modeladmin, request, selected):
     return HttpResponse(content="No permission to perform this action", status=403)
 
 
+@admin.action(
+    permissions=["custom"],
+    action_type=[ActionType.SINGLE_ACTION, ActionType.BULK_ACTION],
+)
+def custom_action(modeladmin, request, selected):
+    return HttpResponse(content="OK", status=200)
+
+
+@admin.action(description="Change view", action_type=ActionType.SINGLE_ACTION)
+def change_view_only_action(modeladmin, request, selected):
+    return HttpResponse(content="OK", status=200)
+
+
+def no_decorator_action(modeladmin, request, selected):
+    return HttpResponse(content="OK", status=200)
+
+
 class ExternalSubscriberAdmin(admin.ModelAdmin):
-    actions = [redirect_to, external_mail, download, no_perm]
+    actions = [
+        redirect_to,
+        external_mail,
+        download,
+        no_perm,
+        custom_action,
+        change_view_only_action,
+        no_decorator_action,
+    ]
+
+    def has_custom_permission(self, request):
+        """Does the user have the custom permission?"""
+        opts = self.opts
+        codename = get_permission_codename("custom", opts)
+        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
 
 
 class PodcastAdmin(admin.ModelAdmin):
@@ -1234,6 +1280,19 @@ class CourseAdmin(admin.ModelAdmin):
     )
 
 
+# RemovedInDjango70Warning: When the deprecation ends, remove.
+class OverriddenActionAdmin(admin.ModelAdmin):
+    def get_actions(self, request):
+        return super().get_actions(request)
+
+    def get_action_choices(self, request, default_choices=models.BLANK_CHOICE_DASH):
+        return super().get_action_choices(request, default_choices)
+
+    @admin.action(action_type=[ActionType.BULK_ACTION, ActionType.SINGLE_ACTION])
+    def test_action(self, request, selected):
+        pass
+
+
 site = admin.AdminSite(name="admin")
 site.site_url = "/my-site-url/"
 site.register(Article, ArticleAdmin)
@@ -1309,6 +1368,8 @@ site.register(ParentWithUUIDPK)
 site.register(RelatedPrepopulated, search_fields=["name"])
 site.register(RelatedWithUUIDPKModel)
 site.register(ReadOnlyRelatedField, ReadOnlyRelatedFieldAdmin)
+# RemovedInDjango70Warning: When the deprecation ends, remove.
+site.register(ModelAction, OverriddenActionAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor
 # ChapterXtra2. That way we cover all four cases:
