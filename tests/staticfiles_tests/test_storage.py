@@ -65,7 +65,7 @@ class TestHashedFiles:
 
     def test_path_ignored_completely(self):
         relpath = self.hashed_file_path("cached/css/ignored.css")
-        self.assertEqual(relpath, "cached/css/ignored.0e15ac4a4fb4.css")
+        self.assertEqual(relpath, "cached/css/ignored.2068445f4b21.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertIn(b"#foobar", content)
@@ -91,6 +91,9 @@ class TestHashedFiles:
                 b'/*url("does.not.exist.either.png")*/',
                 content,
             )
+            # Ignore string literals.
+            self.assertIn(b'content: "url(non_exist.png)";', content)
+            self.assertIn(b"content: 'url(non_exist.png)';", content)
         self.assertPostCondition()
 
     def test_path_with_querystring(self):
@@ -722,7 +725,7 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
 
     def test_module_import(self):
         relpath = self.hashed_file_path("cached/module.js")
-        self.assertEqual(relpath, "cached/module.eaa407b94311.js")
+        self.assertEqual(relpath, "cached/module.d3ad2487aea3.js")
         tests = [
             # Relative imports.
             b'import testConst from "./module_test.477bbebe77f0.js";',
@@ -754,6 +757,17 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
             # Ignore line comments
             b'// import testConst from "./module_test_missing.js";',
             b'// const dynamicModule = import("./module_test_missing.js");',
+            # Ignore string literals
+            b"""const msg = 'import { foo } from "./module_test_missing.js";';""",
+            b"""const help = "import { bar } from './module_test_missing.js';";""",
+            b"""const tmpl = `import { baz } from "./module_test_missing.js";`;""",
+            b"""const dyn = 'const x = import("./module_test_missing.js");';""",
+            # export without from must not consume a subsequent import's from
+            b"export { testConst };",
+            b'import { firstConst } from "./module_test.477bbebe77f0.js";',
+            # Ignore imports in JSDoc block comments that follow a real import.
+            b'import"../nested/js/nested.866475c46bb4.js";',
+            b'import { something } from "./module_test_missing.js";',
         ]
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
@@ -763,7 +777,7 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
 
     def test_aggregating_modules(self):
         relpath = self.hashed_file_path("cached/module.js")
-        self.assertEqual(relpath, "cached/module.eaa407b94311.js")
+        self.assertEqual(relpath, "cached/module.d3ad2487aea3.js")
         tests = [
             b'export * from "./module_test.477bbebe77f0.js";',
             b'export { testConst } from "./module_test.477bbebe77f0.js";',
