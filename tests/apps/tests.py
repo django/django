@@ -184,6 +184,18 @@ class AppsTests(SimpleTestCase):
         self.assertIs(apps.is_installed("django.contrib.staticfiles"), True)
         self.assertIs(apps.is_installed("django.contrib.admindocs"), False)
 
+    @override_settings(
+        INSTALLED_APPS=["django.contrib.admindocs", *SOME_INSTALLED_APPS]
+    )
+    def test_valid_order_between_admin_docs_and_admin(self):
+        """
+        Regression test for #33955: Having "django.contrib.admindocs" before
+        "django.contrib.admin" in INSTALLED_APPS shouldn't break app loading
+        (regression test for #33955).
+        """
+        self.assertIs(apps.is_installed("django.contrib.admin"), True)
+        self.assertIs(apps.is_installed("django.contrib.admindocs"), True)
+
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_get_model(self):
         """

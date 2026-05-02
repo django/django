@@ -1,11 +1,13 @@
 "Misc. utility functions/classes for admin documentation generator."
 
+import functools
 import re
 from email.errors import HeaderParseError
 from email.parser import HeaderParser
 from inspect import cleandoc
 
 from django.urls import reverse
+from django.urls.resolvers import URLPattern
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import mark_safe
 
@@ -266,3 +268,37 @@ def remove_non_capturing_groups(pattern):
 
 def strip_p_tags(value):
     return mark_safe(value.replace("<p>", "").replace("</p>", ""))
+
+
+def _is_callback(name, url_resolver):
+    return name in _get_callback_strs(url_resolver)
+
+
+@functools.lru_cache(maxsize=None)
+def _get_callback_strs(url_resolver):
+    callback_strs = set()
+    return _collect_callback_strs(url_resolver, callback_strs)
+
+
+def _collect_callback_strs(url_resolver, callback_strs):
+    for url_pattern in url_resolver.url_patterns:
+        if isinstance(url_pattern, URLPattern):
+            callback_strs.add(_lookup_str(url_pattern))
+        else:
+            _collect_callback_strs(url_pattern, callback_strs)
+    return callback_strs
+
+
+def _lookup_str(url_pattern):
+    """
+    A string that identifies the view (e.g. 'path.to.view_function' or
+    'path.to.ClassBasedView').
+    """
+    callback = url_pattern.callback
+    if isinstance(callback, functools.partial):
+        callback = callback.func
+    if hasattr(callback, "view_class"):
+        callback = callback.view_class
+    elif not hasattr(callback, "__name__"):
+        return callback.__module__ + "." + callback.__class__.__name__
+    return callback.__module__ + "." + callback.__qualname__
