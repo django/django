@@ -95,7 +95,7 @@ class GenericInlineModelAdmin(InlineModelAdmin):
 
     checks_class = GenericInlineModelAdminChecks
 
-    def get_formset(self, request, obj=None, **kwargs):
+    def get_formset(self, request, obj=None, edit_only=False, **kwargs):
         if "fields" in kwargs:
             fields = kwargs.pop("fields")
         else:
@@ -124,6 +124,7 @@ class GenericInlineModelAdmin(InlineModelAdmin):
             "min_num": self.get_min_num(request, obj),
             "max_num": self.get_max_num(request, obj),
             "exclude": exclude,
+            "edit_only": edit_only,
             **kwargs,
         }
 
