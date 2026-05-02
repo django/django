@@ -68,6 +68,8 @@ from .models import (
     Fabric,
     FancyDoodad,
     FieldOverridePost,
+    FilePathChild,
+    FilePathParent,
     FilteredManager,
     FooAccount,
     FoodDelivery,
@@ -490,6 +492,14 @@ class ParentAdmin(admin.ModelAdmin):
             if len(child.name.split()) < 2:
                 child.name = child.name + " " + last_name
                 child.save()
+
+
+class FilePathChildInline(admin.StackedInline):
+    model = FilePathChild
+
+
+class FilePathParentAdmin(admin.ModelAdmin):
+    inlines = [FilePathChildInline]
 
 
 class EmptyModelAdmin(admin.ModelAdmin):
@@ -1259,6 +1269,7 @@ site.register(OldSubscriber, OldSubscriberAdmin)
 site.register(Podcast, PodcastAdmin)
 site.register(Vodcast, VodcastAdmin)
 site.register(Parent, ParentAdmin)
+site.register(FilePathParent, FilePathParentAdmin)
 site.register(EmptyModel, EmptyModelAdmin)
 site.register(Fabric, FabricAdmin)
 site.register(Gallery, GalleryAdmin)
