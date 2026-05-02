@@ -1494,8 +1494,6 @@ class TestCase(TransactionTestCase):
     @classmethod
     def _fixture_setup(cls):
         if not cls._databases_support_transactions():
-            # If the backend does not support transactions, we should reload
-            # class data before each test
             cls.setUpTestData()
             result = super()._fixture_setup()
         else:
@@ -1513,8 +1511,9 @@ class TestCase(TransactionTestCase):
                 cls.setUpTestData()
             result = None
 
-        # Clear all caches before each test method
-        if cls.clears_caches:
+        # Clear default cache before each test, but only when
+        # database transactions are enabled (normal TestCase behavior).
+        if cls.clears_caches and cls._databases_support_transactions():
             cls._clear_caches()
 
         return result
