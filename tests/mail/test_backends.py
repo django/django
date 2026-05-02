@@ -253,6 +253,14 @@ class FileBackendTests(SharedEmailBackendTests, SimpleTestCase):
             backend = filebased.EmailBackend(file_path=file_path_override)
         self.assertEqual(backend.file_path, str(file_path_override))
 
+    def test_error_if_email_file_path_setting_not_defined(self):
+        msg = "The EMAIL_FILE_PATH setting must be set to use the file EmailBackend."
+        with (
+            self.settings(EMAIL_FILE_PATH=None),
+            self.assertRaisesMessage(ImproperlyConfigured, msg),
+        ):
+            filebased.EmailBackend()
+
     def test_error_if_file_path_is_not_directory(self):
         tmp_file = Path(self.tmp_dir) / "ordinary-file"
         tmp_file.touch()
