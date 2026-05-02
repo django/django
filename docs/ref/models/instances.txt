@@ -68,6 +68,19 @@ need to :meth:`~Model.save`.
 
         book = Book.objects.create_book("Pride and Prejudice")
 
+.. note::
+
+    Instantiating a model or assigning to its attributes does not convert
+    values to the field's Python type. That conversion only happens when
+    values are loaded from the database. A field assigned a value of a
+    different type, for example a string passed to a
+    :class:`~django.db.models.UUIDField`, will round-trip correctly to and
+    from the database, but the in-memory instance keeps the original value
+    until reloaded. This can cause surprising results in equality checks
+    and ``obj in queryset`` tests. Pass values of the correct type, or
+    call :meth:`~Model.refresh_from_db` after saving to refresh the
+    in-memory representation.
+
 Customizing model loading
 -------------------------
 
