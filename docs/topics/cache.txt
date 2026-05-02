@@ -252,9 +252,16 @@ In this example, the cache table's name is ``my_cache_table``::
         }
     }
 
+
 Unlike other cache backends, the database cache does not support automatic
 culling of expired entries at the database level. Instead, expired cache
-entries are culled each time ``add()``, ``set()``, or ``touch()`` is called.
+entries are culled when an ``add()``, ``set()``, or ``touch()`` is called.
+
+.. versionadded:: 6.1
+
+Since the cull operation can be expensive for a large cache, you may control
+how often this check occurs by setting ``CULL_EVERY_N`` to an integer
+value. The cull will occur every ``N`` requests, ``1`` is the default.
 
 .. _database-caching-creating-the-table:
 
@@ -498,6 +505,12 @@ behavior. These arguments are provided as additional keys in the
     entire cache will be dumped when ``MAX_ENTRIES`` is reached.
     On some backends (``database`` in particular) this makes culling *much*
     faster at the expense of more cache misses.
+
+  .. versionadded:: 6.1
+
+  The database backend supports an option ``CULL_EVERY_N`` that determines
+  how often expired entries are culled. The cull operation will occur every
+  N requests, this argument should be an integer and defaults to ``1``.
 
   The Memcached and Redis backends pass the contents of :setting:`OPTIONS
   <CACHES-OPTIONS>` as keyword arguments to the client constructors, allowing
