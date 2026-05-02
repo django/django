@@ -410,6 +410,17 @@ class ClassStackedHorizontal(admin.StackedInline):
     filter_horizontal = ["person"]
 
 
+# Admin for #36984
+
+
+class CourseInline(admin.TabularInline):
+    model = Course
+
+
+class SubjectAdmin(admin.ModelAdmin):
+    inlines = [CourseInline]
+
+
 class ClassAdminStackedHorizontal(admin.ModelAdmin):
     inlines = [ClassStackedHorizontal]
 
@@ -475,6 +486,7 @@ class ChildHiddenFieldOnSingleLineStackedInline(admin.StackedInline):
 
 class ShowInlineChildInline(admin.StackedInline):
     model = ShowInlineChild
+    delete_confirmation_max_display = 3
 
 
 class UUIDChildInline(admin.StackedInline):

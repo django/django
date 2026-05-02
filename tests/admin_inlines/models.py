@@ -368,6 +368,21 @@ class CourseProxy2(Course):
         proxy = True
 
 
+# model for #36984
+
+
+class Invoice(models.Model):
+    parent = models.ForeignKey("ShowInlineParent", on_delete=models.PROTECT)
+    child = models.ForeignKey("ShowInlineChild", on_delete=models.PROTECT)
+    number = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ("number",)
+
+    def __str__(self):
+        return self.number
+
+
 # Other models
 class ShowInlineParent(models.Model):
     show_inlines = models.BooleanField(default=False)
@@ -375,6 +390,9 @@ class ShowInlineParent(models.Model):
 
 class ShowInlineChild(models.Model):
     parent = models.ForeignKey(ShowInlineParent, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Child {self.parent.show_inlines}"
 
 
 class ProfileCollection(models.Model):

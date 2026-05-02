@@ -1,5 +1,6 @@
 import copy
 import enum
+import itertools
 import json
 import re
 from functools import partial, update_wrapper
@@ -149,6 +150,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
     view_on_site = True
     show_full_result_count = True
     checks_class = BaseModelAdminChecks
+    delete_confirmation_max_display = None
 
     def check(self, **kwargs):
         return self.checks_class().check(self, **kwargs)
@@ -662,7 +664,6 @@ class ModelAdmin(BaseModelAdmin):
     add_form_template = None
     change_form_template = None
     change_list_template = None
-    delete_confirmation_max_display = None
     delete_confirmation_template = None
     delete_selected_confirmation_template = None
     object_history_template = None
@@ -2514,6 +2515,17 @@ class InlineModelAdmin(BaseModelAdmin):
         can_change = self.has_change_permission(request, obj) if request else True
         can_add = self.has_add_permission(request, obj) if request else True
 
+        # handling the value of None means adding if-else everywhere. The
+        # largest integer-based field in Django is BigIntegerField, let's
+        # assume that the number of objects will not go beyond this limit. If
+        # it does, the message is probably not getting displayed anyway due to
+        # hardware limitations.
+        delete_confirmation_max_display = (
+            self.delete_confirmation_max_display
+            if self.delete_confirmation_max_display
+            else models.BigIntegerField.MAX_BIGINT
+        )
+
         class DeleteProtectedModelForm(base_model_form):
             def hand_clean_DELETE(self):
                 """
@@ -2529,7 +2541,10 @@ class InlineModelAdmin(BaseModelAdmin):
                     collector.collect([self.instance])
                     if collector.protected:
                         objs = []
-                        for p in collector.protected:
+                        protected = itertools.islice(
+                            collector.protected, delete_confirmation_max_display
+                        )
+                        for p in protected:
                             objs.append(
                                 # Translators: Model verbose name and instance
                                 # representation, suitable to be an item in a
@@ -2540,8 +2555,20 @@ class InlineModelAdmin(BaseModelAdmin):
                         params = {
                             "class_name": self._meta.model._meta.verbose_name,
                             "instance": self.instance,
-                            "related_objects": get_text_list(objs, _("and")),
                         }
+                        deleted_diff = (
+                            len(collector.protected) - delete_confirmation_max_display
+                        )
+                        if deleted_diff > 0:
+                            # Translators: This string is used as a separator
+                            # between list elements
+                            related = (
+                                _(", ").join(str(i) for i in objs)
+                                + _(" and %d more") % deleted_diff
+                            )
+                        else:
+                            related = get_text_list(objs, _("and"))
+                        params["related_objects"] = related
                         msg = _(
                             "Deleting %(class_name)s %(instance)s would require "
                             "deleting the following protected related objects: "
