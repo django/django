@@ -242,6 +242,22 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
         )
         self.assertIsInstance(f1.widget, forms.TextInput)
 
+    def test_formfield_overrides_for_field_with_choices(self):
+        """
+        formfield_overrides is respected for fields with choices (#19303).
+        """
+
+        class MemberAdmin(admin.ModelAdmin):
+            formfield_overrides = {
+                CharField: {"widget": forms.TextInput(attrs={"class": "custom"})}
+            }
+
+        ma = MemberAdmin(Member, admin.site)
+        # Field with choices should still respect formfield_overrides
+        f1 = ma.formfield_for_dbfield(Member._meta.get_field("gender"), request=None)
+        self.assertIsInstance(f1.widget, forms.TextInput)
+        self.assertEqual(f1.widget.attrs["class"], "custom")
+
     def test_field_with_choices(self):
         self.assertFormfield(Member, "gender", forms.Select)
 
