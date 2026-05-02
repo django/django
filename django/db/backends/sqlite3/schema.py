@@ -383,6 +383,30 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                     model._meta.db_table, old_field, new_field, new_type
                 )
             )
+        # On SQLite 3.53.0+, use newly supported "ALTER TABLE ... ALTER COLUMN
+        # ... {SET|DROP} NOT NULL" if only nullability has changed.
+        if (
+            self.connection.Database.sqlite_version_info >= (3, 53)
+            and old_field.column == new_field.column
+            and old_type == new_type
+            and old_field.null != new_field.null
+            and old_db_params.get("check") == new_db_params.get("check")
+            and old_db_params.get("collation") == new_db_params.get("collation")
+            and old_field.unique == new_field.unique
+            and old_field.db_index == new_field.db_index
+            and not (old_field.remote_field and old_field.db_constraint)
+            and not (new_field.remote_field and new_field.db_constraint)
+        ):
+            return super()._alter_field(
+                model,
+                old_field,
+                new_field,
+                old_type,
+                new_type,
+                old_db_params,
+                new_db_params,
+                strict,
+            )
         # Alter by remaking table
         self._remake_table(model, alter_fields=[(old_field, new_field)])
         # Rebuild tables with FKs pointing to this field.
