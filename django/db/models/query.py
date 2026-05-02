@@ -29,7 +29,12 @@ from django.db.models.deletion import Collector
 from django.db.models.expressions import Case, DatabaseDefault, F, OrderBy, Value, When
 from django.db.models.fetch_modes import FETCH_ONE
 from django.db.models.functions import Cast, Trunc
-from django.db.models.query_utils import PROHIBITED_FILTER_KWARGS, FilteredRelation, Q
+from django.db.models.query_utils import (
+    PROHIBITED_FILTER_KWARGS,
+    FilteredRelation,
+    Q,
+    class_or_instance_method,
+)
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, ROW_COUNT
 from django.db.models.utils import (
     AltersData,
@@ -325,6 +330,8 @@ class PreventQuerySetCloning:
 class QuerySet(AltersData):
     """Represent a lazy database lookup for a set of objects."""
 
+    _initial_filter = None
+
     def __init__(self, model=None, query=None, using=None, hints=None):
         self.model = model
         self._db = using
@@ -342,6 +349,9 @@ class QuerySet(AltersData):
         self._defer_next_filter = False
         self._deferred_filter = None
         self._cloning_enabled = True
+        if self._initial_filter is not None:
+            with self._avoid_cloning():
+                self.filter(self._initial_filter)
 
     @property
     def query(self):
@@ -1644,13 +1654,42 @@ class QuerySet(AltersData):
         """
         return self._chain()
 
-    def filter(self, *args, **kwargs):
+    def _class_filter(cls, *args, **kwargs):
+        initial_filter = Q(*args, **kwargs)
+        # Chain initial filters.
+        base_class = cls
+        if cls._initial_filter is not None:
+            initial_filter = cls._initial_filter & initial_filter
+            for base in cls.__bases__:
+                if issubclass(base, QuerySet):
+                    base_class = base
+                    break
+
+        initial_filter_id = id(initial_filter)
+        name = f"{base_class.__name__}WithFilter{initial_filter_id}"
+        new_filter_class = type(
+            name,
+            (base_class,),
+            {
+                "_initial_filter": initial_filter,
+                "__module__": base_class.__module__,
+                "__qualname__": f"{base_class.__qualname__}.{name}",
+            },
+        )
+        # Add new class to the QuerySet class to make it pickleable.
+        setattr(base_class, name, new_filter_class)
+        return new_filter_class
+
+    def _instance_filter(self, *args, **kwargs):
         """
         Return a new QuerySet instance with the args ANDed to the existing
         set.
         """
         self._not_support_combined_queries("filter")
         return self._filter_or_exclude(False, args, kwargs)
+
+    filter = class_or_instance_method(_class_filter, _instance_filter)
+    _class_filter = classmethod(_class_filter)
 
     def exclude(self, *args, **kwargs):
         """
