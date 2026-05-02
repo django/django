@@ -1076,12 +1076,19 @@ class MigrationAutodetector:
                             old_field_dec[2]["to"] = self.renamed_models_rel[old_rel_to]
                     old_field.set_attributes_from_name(rem_field_name)
                     old_db_column = old_field.get_attname_column()[1]
-                    if old_field_dec == field_dec or (
-                        # Was the field renamed and db_column equal to the
-                        # old field's column added?
-                        old_field_dec[0:2] == field_dec[0:2]
-                        and dict(old_field_dec[2], db_column=old_db_column)
-                        == field_dec[2]
+                    is_pk_rename = old_field_dec[2].get("primary_key") and field_dec[
+                        2
+                    ].get("primary_key")
+                    if (
+                        old_field_dec == field_dec
+                        or (
+                            # Was the field renamed and db_column equal to the
+                            # old field's column added?
+                            old_field_dec[0:2] == field_dec[0:2]
+                            and dict(old_field_dec[2], db_column=old_db_column)
+                            == field_dec[2]
+                        )
+                        or is_pk_rename
                     ):
                         if self.questioner.ask_rename(
                             model_name, rem_field_name, field_name, field
@@ -1333,10 +1340,19 @@ class MigrationAutodetector:
                     new_field.remote_field.through = old_field.remote_field.through
             old_field_dec = self.deep_deconstruct(old_field)
             new_field_dec = self.deep_deconstruct(new_field)
-            # If the field was confirmed to be renamed it means that only
-            # db_column was allowed to change which generate_renamed_fields()
-            # already accounts for by adding an AlterField operation.
-            if old_field_dec != new_field_dec and old_field_name == field_name:
+            is_pk_renamed = old_field_dec[2].get("primary_key") and new_field_dec[
+                2
+            ].get("primary_key")
+            # If the field was confirmed to be renamed and it was not the PK it
+            # means that only db_column was allowed to change which
+            # generate_renamed_fields() already accounts for by adding
+            # an AlterField operation.
+            #
+            # However, if the renamed column was the primary key,
+            # the AlterField operation needs to be considered here.
+            if old_field_dec != new_field_dec and (
+                old_field_name == field_name or is_pk_renamed
+            ):
                 both_m2m = old_field.many_to_many and new_field.many_to_many
                 neither_m2m = not old_field.many_to_many and not new_field.many_to_many
                 target_changed = (
