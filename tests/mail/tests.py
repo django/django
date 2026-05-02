@@ -35,6 +35,8 @@ from django.test.utils import ignore_warnings, requires_tz_support
 from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.translation import gettext_lazy
 
+from . import custombackend
+
 # Check whether python/cpython#128110 has been fixed by seeing if space between
 # encoded-words is ignored (as required by RFC 2047 section 6.2).
 NEEDS_CPYTHON_128110_WORKAROUND = (
@@ -800,12 +802,13 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
         # even an empty body.
         self.assertEqual(msg.message().get_payload(), "\n")
 
-    @mock.patch("socket.getfqdn", return_value="漢字")
-    def test_non_ascii_dns_non_unicode_email(self, mocked_getfqdn):
+    def test_non_ascii_dns_non_unicode_email(self):
         delattr(DNS_NAME, "_fqdn")
         email = EmailMessage()
         email.encoding = "iso-8859-1"
-        self.assertIn("@xn--p8s937b>", email.message()["Message-ID"])
+        with mock.patch("socket.getfqdn", return_value="漢字"):
+            message = email.message()
+        self.assertIn("@xn--p8s937b>", message["Message-ID"])
 
     def test_encoding(self):
         """
@@ -1683,8 +1686,8 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
         """
         # This is meant to verify EmailMessage.__init__() doesn't apply any
         # special processing that would be missing for properties set later.
-        original_connection = mail.get_connection(username="original")
-        new_connection = mail.get_connection(username="new")
+        original_connection = mail.get_connection()
+        new_connection = mail.get_connection()
         email = EmailMessage(
             "original subject",
             "original body\n",
@@ -1864,7 +1867,7 @@ class SendMailTests(SimpleTestCase, MailTestsMixin):
         IDNA encoding is applied to non-ASCII domains in address headers
         (#14301).
         """
-        self.assertTrue(send_mail("Subject", "Content", "from@öäü.com", ["to@öäü.com"]))
+        send_mail("Subject", "Content", "from@öäü.com", ["to@öäü.com"])
         message = self.get_outbox_message()
         self.assertEqual(message.get("from"), "from@xn--4ca9at.com")
         self.assertEqual(message.get("to"), "to@xn--4ca9at.com")
@@ -1874,14 +1877,14 @@ class SendMailTests(SimpleTestCase, MailTestsMixin):
         Email sending should support lazy email addresses (#24416).
         """
         _ = gettext_lazy
-        self.assertTrue(send_mail("Subject", "Content", _("tester"), [_("django")]))
+        send_mail("Subject", "Content", _("tester"), [_("django")])
         message = self.get_outbox_message()
         self.assertEqual(message.get("from"), "tester")
         self.assertEqual(message.get("to"), "django")
 
     def test_connection_arg(self):
         # Send using non-default connection.
-        connection = mail.get_connection("mail.custombackend.EmailBackend")
+        connection = custombackend.EmailBackend()
         send_mail(
             "Subject",
             "Content",
@@ -1933,7 +1936,7 @@ class SendMassMailTests(SimpleTestCase):
 
     def test_connection_arg(self):
         # Send using non-default connection.
-        connection = mail.get_connection("mail.custombackend.EmailBackend")
+        connection = custombackend.EmailBackend()
         send_mass_mail(
             [
                 ("Subject1", "Content1", "from1@example.com", ["to1@example.com"]),
@@ -2120,7 +2123,7 @@ class MailAdminsAndManagersTests(SimpleTestCase, MailTestsMixin):
     @override_settings(ADMINS=["nobody@example.com"])
     def test_connection_arg_mail_admins(self):
         # Send using non-default connection.
-        connection = mail.get_connection("mail.custombackend.EmailBackend")
+        connection = custombackend.EmailBackend()
         mail_admins("Admin message", "Content", connection=connection)
         self.assertEqual(mail.outbox, [])
         self.assertEqual(len(connection.test_outbox), 1)
@@ -2129,7 +2132,7 @@ class MailAdminsAndManagersTests(SimpleTestCase, MailTestsMixin):
     @override_settings(MANAGERS=["nobody@example.com"])
     def test_connection_arg_mail_managers(self):
         # Send using non-default connection.
-        connection = mail.get_connection("mail.custombackend.EmailBackend")
+        connection = custombackend.EmailBackend()
         mail_managers("Manager message", "Content", connection=connection)
         self.assertEqual(mail.outbox, [])
         self.assertEqual(len(connection.test_outbox), 1)
@@ -2216,7 +2219,7 @@ class GetConnectionTests(SimpleTestCase):
         used with custom backends.
         """
         c = mail.get_connection(fail_silently=True, foo="bar")
-        self.assertTrue(c.fail_silently)
+        self.assertIs(c.fail_silently, True)
 
 
 # RemovedInDjango70Warning.
