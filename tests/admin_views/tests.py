@@ -1789,6 +1789,21 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse("admin:login"))
         self.assertContains(response, '<footer id="footer">')
 
+    def test_custom_change_form_object_tool(self):
+        """
+        Custom object tool link should work and contain the pk value quoted.
+        """
+        url = reverse(
+            "admin:%s_article_change" % Article._meta.app_label,
+            args=(quote(self.a1.pk),),
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            '<a href="/some/publish/action/url" class="publishlink"',
+        )
+
     def test_aria_describedby_for_add_and_change_links(self):
         response = self.client.get(reverse("admin:index"))
         tests = [

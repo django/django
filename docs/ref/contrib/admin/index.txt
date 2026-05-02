@@ -1861,6 +1861,93 @@ default templates used by the :class:`ModelAdmin` views:
     ``django.contrib.admin.views.main.ChangeList`` is used. By inheriting this
     class you can change the behavior of the listing.
 
+.. class:: ObjectTool
+
+    .. versionadded:: 6.1
+
+    A data class representing a single entry in the object-tools bar rendered
+    in the top-right area of the changelist and change form pages.
+
+    .. attribute:: label
+
+        The visible text of the link.
+
+    .. attribute:: url
+
+        The URL the link points to.
+
+    .. attribute:: classes
+
+        A string of CSS classes to apply to the ``<a>`` element. Common values
+        used by the built-in tools are ``"addlink"``, ``"historylink"``, and
+        ``"viewsitelink"``.
+
+    .. attribute:: preserve_filters
+
+        If ``True``, the current changelist filters are appended to the URL
+        so the user returns to the same filtered view after following the link.
+        Defaults to ``False``.
+
+.. method:: ModelAdmin.get_change_list_object_tools(request)
+
+    .. versionadded:: 6.1
+
+    Returns a list of :class:`~django.contrib.admin.ObjectTool` instances to
+    be rendered in the object-tools area of the changelist page. By default,
+    this returns an "Add <verbose_name>" button if the user has add permission.
+
+    Override this method to add, remove, or replace object tools on the
+    changelist page::
+
+        from django.contrib.admin import ObjectTool
+        from django.urls import reverse
+
+
+        class MyModelAdmin(admin.ModelAdmin):
+            def get_change_list_object_tools(self, request):
+                tools = super().get_change_list_object_tools(request)
+                tools.append(
+                    ObjectTool(
+                        label="Import",
+                        url=reverse("admin:myapp_mymodel_import"),
+                        classes="import-link",
+                    )
+                )
+                return tools
+
+    ``None`` entries in the returned list are ignored.
+
+.. method:: ModelAdmin.get_change_form_object_tools(request, obj)
+
+    .. versionadded:: 6.1
+
+    Returns a list of :class:`~django.contrib.admin.ObjectTool` instances to
+    be rendered in the object-tools area of the change form page. By default,
+    this returns a "History" button and, if :attr:`~ModelAdmin.view_on_site` is
+    enabled, a "View on site" button.
+
+    Override this method to add, remove, or replace object tools on the change
+    form page::
+
+        from django.contrib.admin import ObjectTool
+        from django.urls import reverse
+
+
+        class MyModelAdmin(admin.ModelAdmin):
+            def get_change_form_object_tools(self, request, obj):
+                tools = super().get_change_form_object_tools(request, obj)
+                if obj and obj.pk:
+                    tools.append(
+                        ObjectTool(
+                            label="Preview",
+                            url=reverse("myapp:preview", args=[obj.pk]),
+                            classes="preview-link",
+                        )
+                    )
+                return tools
+
+    ``None`` entries in the returned list are ignored.
+
 .. method:: ModelAdmin.get_changelist_form(request, **kwargs)
 
     Returns a :class:`~django.forms.ModelForm` class for use in the ``Formset``
