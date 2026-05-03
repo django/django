@@ -53,7 +53,11 @@ from django.test.utils import (
     teardown_test_environment,
 )
 from django.urls import NoReverseMatch, path, reverse, reverse_lazy
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import (
+    RemovedAfterNextVersionWarning,
+    RemovedInDjango70Warning,
+    RemovedInNextVersionWarning,
+)
 from django.utils.html import VOID_ELEMENTS
 
 from .models import Car, Person, PossessedCar
@@ -1337,16 +1341,29 @@ class AssertWarnsMessageTests(SimpleTestCase):
             warnings.warn("Expected message", UserWarning)
 
     def test_context_manager_failure(self):
-        msg = "Expected message' not found in 'Unexpected message'"
-        with self.assertRaisesMessage(AssertionError, msg):
-            with self.assertWarnsMessage(UserWarning, "Expected message"):
-                warnings.warn("Unexpected message", UserWarning)
+        msg = (
+            "No 'UserWarning' warning was triggered with a message "
+            "containing 'Expected message'."
+        )
+        with (
+            self.assertRaisesMessage(AssertionError, msg),
+            self.assertWarnsMessage(UserWarning, "Expected message"),
+        ):
+            warnings.warn("Unexpected message", UserWarning)
+            warnings.warn("Expected message", RuntimeWarning)
 
     def test_callable(self):
         def func():
-            warnings.warn("Expected message", UserWarning)
+            # Wrong message and wrong category warnings.
+            warnings.warn("Unexpected message", UserWarning)
+            warnings.warn("Expected message", RuntimeWarning)
 
-        self.assertWarnsMessage(UserWarning, "Expected message", func)
+        msg = (
+            "No 'UserWarning' warning was triggered with a message "
+            "containing 'Expected message'."
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertWarnsMessage(UserWarning, "Expected message", func)
 
     def test_special_re_chars(self):
         def func1():
@@ -1354,6 +1371,60 @@ class AssertWarnsMessageTests(SimpleTestCase):
 
         with self.assertWarnsMessage(UserWarning, "[.*x+]y?"):
             func1()
+
+    def test_matches_regardless_the_order(self):
+        # RemovedInNextVersionWarning is always converted to error.
+        with (
+            self.assertRaisesMessage(RemovedInNextVersionWarning, "Unexpected"),
+            self.assertWarnsMessage(RemovedInNextVersionWarning, "Expected"),
+        ):
+
+            warnings.warn("Unexpected", RemovedInNextVersionWarning)
+            warnings.warn("Expected", RemovedInNextVersionWarning)
+
+        # With warning that does not trigger an error.
+        with self.assertWarnsMessage(DeprecationWarning, "Expected"):
+            warnings.warn("Unexpected", DeprecationWarning)
+            warnings.warn("Expected", DeprecationWarning)
+
+    def test_does_not_ignore_entire_category(self):
+        with (
+            self.assertRaisesMessage(RemovedAfterNextVersionWarning, "Unexpected"),
+            self.assertWarnsMessage(RemovedAfterNextVersionWarning, "Expected"),
+        ):
+            warnings.warn("Expected", RemovedAfterNextVersionWarning)
+            warnings.warn("Unexpected", RemovedAfterNextVersionWarning)
+
+    def test_does_not_ignore_entire_category_regardless_the_order(self):
+        with (
+            self.assertRaisesMessage(RemovedAfterNextVersionWarning, "Unexpected"),
+            self.assertWarnsMessage(RemovedAfterNextVersionWarning, "Expected"),
+        ):
+            warnings.warn("Unexpected", RemovedAfterNextVersionWarning)
+            warnings.warn("Expected", RemovedAfterNextVersionWarning)
+
+    def test_non_matching_warnings_are_reemitted(self):
+        # Same category, wrong message.
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            with self.assertWarnsMessage(RemovedInNextVersionWarning, "Expected"):
+                warnings.warn("Unexpected", RemovedInNextVersionWarning)
+                warnings.warn("Expected", RemovedInNextVersionWarning)
+
+        self.assertEqual(len(caught), 1)
+        self.assertEqual(str(caught[0].message), "Unexpected")
+        self.assertIs(caught[0].category, RemovedInNextVersionWarning)
+
+        # Different category warnings.
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            with self.assertWarnsMessage(RemovedInNextVersionWarning, "Expected"):
+                warnings.warn("Unexpected", DeprecationWarning)
+                warnings.warn("Expected", RemovedInNextVersionWarning)
+
+        self.assertEqual(len(caught), 1)
+        self.assertEqual(str(caught[0].message), "Unexpected")
+        self.assertIs(caught[0].category, DeprecationWarning)
 
 
 class AssertFieldOutputTests(SimpleTestCase):
