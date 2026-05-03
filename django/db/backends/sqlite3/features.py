@@ -172,3 +172,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     can_introspect_json_field = property(operator.attrgetter("supports_json_field"))
     has_json_object_function = property(operator.attrgetter("supports_json_field"))
+
+    supports_alter_column_nullability = Database.sqlite_version_info >= (
+        3,
+        53,
+        1,
+    )
