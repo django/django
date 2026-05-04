@@ -1935,28 +1935,28 @@ For example:
 .. method:: comment(message)
 
 Returns a new ``QuerySet`` that injects ``message`` into the resulting SQL as
-an ``/* … */`` comment, after ``SELECT`` (and ``DISTINCT`` if present) or
+an ``/* ... */`` comment, after ``SELECT`` (and ``DISTINCT`` if present) or
 after ``UPDATE``.
 
 For example::
 
     Entry.objects.comment("hello").all()
 
-… roughly produces:
+roughly produces:
 
 .. code-block:: sql
 
-    SELECT /* hello */ "blog_entry"."id", … FROM "blog_entry"
+    SELECT /* hello */ "blog_entry"."id" FROM "blog_entry"
 
 Calls can be chained; each call appends a separate block::
 
     Entry.objects.comment("first").comment("second").update(headline="x")
 
-… produces:
+produces:
 
 .. code-block:: sql
 
-    UPDATE /* first */ /* second */ "blog_entry" SET "headline" = …
+    UPDATE /* first */ /* second */ "blog_entry" SET "headline" = 'x'
 
 ``comment()`` raises :exc:`ValueError` if ``message`` contains ``/*`` or
 ``*/`` to prevent SQL comment injection, and :exc:`TypeError` if ``message``
@@ -1966,7 +1966,7 @@ is not a string.
 ``INSERT``, and statements issued by migrations are not annotated. When
 called on a combined ``QuerySet`` (produced by :meth:`union`,
 :meth:`intersection`, or :meth:`difference`), the comment is emitted as a
-leading ``/* … */`` block before the combined SQL.
+leading ``/* ... */`` block before the combined SQL.
 
 ``select_for_update()``
 ~~~~~~~~~~~~~~~~~~~~~~~

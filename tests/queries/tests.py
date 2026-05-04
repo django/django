@@ -4677,8 +4677,8 @@ class QuerySetCommentTests(TestCase):
 
     def test_select_with_filter_preserves_comment(self):
         with CaptureQueriesContext(connection) as ctx:
-            list(NamedCategory.objects.comment("traceparent=00-x").filter(name="x"))
-        self.assertIn("/* traceparent=00-x */", ctx.captured_queries[0]["sql"])
+            list(NamedCategory.objects.comment("request-id=123").filter(name="x"))
+        self.assertIn("/* request-id=123 */", ctx.captured_queries[0]["sql"])
 
     def test_select_subquery(self):
         with CaptureQueriesContext(connection) as ctx:
