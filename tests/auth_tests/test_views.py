@@ -61,6 +61,9 @@ class RedirectURLMixinTests(TestCase):
     LANGUAGE_CODE="en",
     TEMPLATES=AUTH_TEMPLATES,
     ROOT_URLCONF="auth_tests.urls",
+    EMAIL_PROVIDERS={
+        "default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}
+    },
 )
 class AuthViewsTestCase(TestCase):
     """

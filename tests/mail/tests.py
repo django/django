@@ -254,6 +254,7 @@ class MailTestsMixin:
             return override_deprecated_email_settings(EMAIL_BACKEND=backend)
 
 
+@ignore_no_default_email_provider_warning()
 class EmailMessageTests(MailTestsMixin, SimpleTestCase):
     """Tests for django.core.mail.EmailMessage and EmailMultiAlternative."""
 
@@ -1936,6 +1937,7 @@ class EmailMessageTestsWithEmailProviders(EmailMessageTests):
             email.send(using="test", fail_silently=True)
 
 
+@ignore_no_default_email_provider_warning()
 class SendMailTests(SimpleTestCase, MailTestsMixin):
     """Tests for django.core.mail.send_mail()."""
 
@@ -2179,6 +2181,7 @@ class SendMailTestsWithEmailProviders(SendMailTests):
         self.assertEqual(mail.outbox[0].sent_using, "custom")
 
 
+@ignore_no_default_email_provider_warning()
 class SendMassMailTests(MailTestsMixin, SimpleTestCase):
     """Tests for django.core.mail.send_mass_mail()."""
 
@@ -2343,6 +2346,7 @@ class SendMassMailTestsWithEmailProviders(SendMassMailTests):
         self.assertEqual(mail.outbox[0].sent_using, "custom")
 
 
+@ignore_no_default_email_provider_warning()
 class MailAdminsAndManagersTests(SimpleTestCase, MailTestsMixin):
     """Tests for django.core.mail.mail_admins() and mail_managers()."""
 

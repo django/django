@@ -1157,7 +1157,12 @@ class UserChangeFormTest(TestDataMixin, TestCase):
         )
 
 
-@override_settings(TEMPLATES=AUTH_TEMPLATES)
+@override_settings(
+    TEMPLATES=AUTH_TEMPLATES,
+    EMAIL_PROVIDERS={
+        "default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}
+    },
+)
 class PasswordResetFormTest(TestDataMixin, TestCase):
     @classmethod
     def setUpClass(cls):

@@ -24,7 +24,12 @@ from .models import (
 )
 
 
-@override_settings(ROOT_URLCONF="admin_views.urls")
+@override_settings(
+    ROOT_URLCONF="admin_views.urls",
+    EMAIL_PROVIDERS={
+        "default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}
+    },
+)
 class AdminActionsTest(TestCase):
     @classmethod
     def setUpTestData(cls):

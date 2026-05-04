@@ -305,6 +305,11 @@ class AdminViewBasicTestCase(TestCase):
         )
 
 
+@override_settings(
+    EMAIL_PROVIDERS={
+        "default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}
+    }
+)
 class AdminViewBasicTest(AdminViewBasicTestCase):
     def test_trailing_slash_required(self):
         """
@@ -2346,6 +2351,9 @@ def get_perm(Model, codename):
             },
         }
     ],
+    EMAIL_PROVIDERS={
+        "default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}
+    },
 )
 class AdminViewPermissionsTest(TestCase):
     """Tests for Admin Views Permissions."""
