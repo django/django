@@ -303,6 +303,8 @@ class Query(BaseExpression):
 
     explain_info = None
 
+    comments = ()
+
     def __init__(self, model, alias_cols=True):
         self.model = model
         self.alias_refcount = {}

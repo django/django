@@ -1706,6 +1706,9 @@ class QuerySet(AltersData):
         clone.query.default_ordering = True
         self._clear_ordering_in_combined_queries(clone.query, other_qs)
         clone.query.clear_limits()
+        # Comments belong to the combined leg (`self.query`). Clear them on
+        # the outer combinator wrapper so they aren't emitted twice.
+        clone.query.comments = ()
         clone.query.combinator = combinator
         clone.query.combinator_all = all
         return clone
@@ -1979,6 +1982,19 @@ class QuerySet(AltersData):
         """Set the fetch mode for the QuerySet."""
         clone = self._chain()
         clone._fetch_mode = fetch_mode
+        return clone
+
+    def comment(self, message):
+        """Add an SQL comment to the query."""
+        if not isinstance(message, str):
+            raise TypeError("QuerySet.comment() argument must be a string.")
+        if "/*" in message or "*/" in message:
+            raise ValueError(
+                "QuerySet.comment() cannot include '/*' or '*/'; strip or "
+                "escape these delimiters before calling comment()."
+            )
+        clone = self._chain()
+        clone.query.comments = (*clone.query.comments, message)
         return clone
 
     ###################################

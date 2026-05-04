@@ -626,7 +626,10 @@ class SQLCompiler:
         sql_parts, args_parts = zip(
             *((braces.format(sql), args) for sql, args in parts)
         )
-        result = [" {} ".format(combinator_sql).join(sql_parts)]
+        combined_sql = " {} ".format(combinator_sql).join(sql_parts)
+        if self.query.comments:
+            combined_sql = "%s %s" % (self.comments_sql(), combined_sql)
+        result = [combined_sql]
         params = []
         for part in args_parts:
             params.extend(part)
@@ -820,6 +823,9 @@ class SQLCompiler:
                     )
                     result += distinct_result
                     params += distinct_params
+
+                if self.query.comments:
+                    result.append(self.comments_sql())
 
                 out_cols = []
                 for _, (s_sql, s_params), alias in self.select + extra_select:
@@ -1679,6 +1685,16 @@ class SQLCompiler:
                 else:
                     yield value
 
+    def comments_sql(self):
+        """
+        Return SQL comments for ``Query.comments`` as a single space-separated
+        string of ``/* ... */`` blocks.
+
+        Validation in ``QuerySet.comment()`` already rejects strings containing
+        ``/*`` or ``*/``, so the values here cannot break out of the comment.
+        """
+        return " ".join("/* %s */" % comment for comment in self.query.comments)
+
 
 class SQLInsertCompiler(SQLCompiler):
     returning_fields = None
@@ -2090,10 +2106,10 @@ class SQLUpdateCompiler(SQLCompiler):
                 values.append(f"{quoted_name} = %s")
                 update_params.append(val)
         table = self.query.base_table
-        result = [
-            "UPDATE %s SET" % qn(table),
-            ", ".join(values),
-        ]
+        result = ["UPDATE"]
+        if self.query.comments:
+            result.append(self.comments_sql())
+        result += [qn(table), "SET", ", ".join(values)]
         try:
             where, params = self.compile(self.query.where)
         except FullResultSet:
