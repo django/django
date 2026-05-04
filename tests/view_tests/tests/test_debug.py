@@ -1594,7 +1594,12 @@ class ExceptionReportTestMixin:
                 self.assertNotIn(v, body)
 
 
-@override_settings(ROOT_URLCONF="view_tests.urls")
+@override_settings(
+    ROOT_URLCONF="view_tests.urls",
+    MAILERS={
+        "default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}
+    },
+)
 class ExceptionReporterFilterTests(
     ExceptionReportTestMixin, LoggingCaptureMixin, SimpleTestCase
 ):
