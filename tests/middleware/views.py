@@ -31,6 +31,18 @@ def csp_nonce(request):
     return HttpResponse(get_nonce(request))
 
 
+def csp_nonce_used(request):
+    nonce = get_nonce(request)
+    return HttpResponse(f'<script nonce="{nonce}"></script>')
+
+
+def csp_nonce_used_with_cache_control(request):
+    nonce = get_nonce(request)
+    response = HttpResponse(f'<script nonce="{nonce}"></script>')
+    response["Cache-Control"] = "max-age=3600"
+    return response
+
+
 @csp_override({})
 def csp_disabled_enforced(request):
     return HttpResponse()

@@ -55,6 +55,28 @@ class CSPMiddlewareTest(SimpleTestCase):
         self.assertIsNotNone(nonce)
         self.assertEqual(response[CSP.HEADER_ENFORCE], basic_policy)
 
+    @override_settings(SECURE_CSP={"default-src": [CSP.SELF, CSP.NONCE]})
+    def test_nonce_in_policy_sets_cache_control(self):
+        response = self.client.get("/csp-nonce-used/")
+        self.assertIn("private", response.get("Cache-Control", ""))
+
+    @override_settings(SECURE_CSP={"default-src": [CSP.SELF, CSP.NONCE]})
+    def test_nonce_in_policy_merges_with_existing_cache_control(self):
+        response = self.client.get("/csp-nonce-used-with-cache-control/")
+        cache_control = response.get("Cache-Control", "")
+        self.assertIn("private", cache_control)
+        self.assertIn("max-age=3600", cache_control)
+
+    @override_settings(SECURE_CSP={"default-src": [CSP.SELF, CSP.NONCE]})
+    def test_nonce_unused_does_not_set_cache_control(self):
+        response = self.client.get("/csp-base/")
+        self.assertIsNone(response.get("Cache-Control"))
+
+    @override_settings(SECURE_CSP=basic_config)
+    def test_nonce_used_but_absent_from_policy_does_not_set_cache_control(self):
+        response = self.client.get("/csp-nonce-used/")
+        self.assertIsNone(response.get("Cache-Control"))
+
     @override_settings(SECURE_CSP=None, SECURE_CSP_REPORT_ONLY=basic_config)
     def test_csp_report_only_basic(self):
         """

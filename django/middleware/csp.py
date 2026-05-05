@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils.cache import patch_cache_control
 from django.utils.csp import CSP, LazyNonce, build_policy
 from django.utils.deprecation import MiddlewareMixin
 
@@ -29,5 +30,15 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
             # An empty config means CSP headers are not added to the response.
             if config and header not in response:
                 response.headers[str(header)] = build_policy(config, nonce)
+
+        # If the nonce is included in a CSP header, prevent shared/public
+        # caching. A nonce discoverable by multiple users defeats its security
+        # guarantee. Browser caching (private) is still allowed since the nonce
+        # is only reused by the same user on the same device.
+        if nonce and any(
+            f"'nonce-{nonce}'" in response.get(str(header), "")
+            for header in (CSP.HEADER_ENFORCE, CSP.HEADER_REPORT_ONLY)
+        ):
+            patch_cache_control(response, private=True)
 
         return response
