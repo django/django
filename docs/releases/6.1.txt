@@ -256,6 +256,10 @@ File Uploads
 Forms
 ~~~~~
 
+* The new asset object :class:`~django.forms.Stylesheet` is available for
+  adding custom HTML-attributes to stylesheet links in form media. See
+  :ref:`paths as objects <form-media-asset-objects>` for more details.
+
 * The new constant ``django.db.models.fields.BLANK_CHOICE_LABEL`` defines a
   more accessible and translatable default label for the blank choice in
   forms, which is appended to most ``choices`` lists. The transitional setting

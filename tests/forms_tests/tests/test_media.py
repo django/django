@@ -1,16 +1,8 @@
 from django.forms import CharField, Form, Media, MultiWidget, TextInput
-from django.forms.widgets import MediaAsset, Script
+from django.forms.widgets import MediaAsset, Script, Stylesheet
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
 from django.utils.html import html_safe
-
-
-class CSS(MediaAsset):
-    element_template = '<link href="{path}"{attributes}>'
-
-    def __init__(self, href, **attributes):
-        super().__init__(href, **attributes)
-        self.attributes["rel"] = "stylesheet"
 
 
 @override_settings(STATIC_URL="http://media.example.com/static/")
@@ -31,7 +23,9 @@ class MediaAssetTestCase(SimpleTestCase):
 
         self.assertNotEqual(MediaAsset("path/to/css"), MediaAsset("path/to/other.css"))
         self.assertNotEqual(MediaAsset("path/to/css"), "path/to/other.css")
-        self.assertNotEqual(MediaAsset("path/to/css", media="all"), CSS("path/to/css"))
+        self.assertNotEqual(
+            MediaAsset("path/to/css", media="all"), Stylesheet("path/to/css")
+        )
 
     def test_hash(self):
         self.assertEqual(hash(MediaAsset("path/to/css")), hash("path/to/css"))
@@ -117,17 +111,35 @@ class ScriptTestCase(SimpleTestCase):
 
 
 @override_settings(STATIC_URL="http://media.example.com/static/")
-class CSSTestCase(SimpleTestCase):
+class StylesheetTestCase(SimpleTestCase):
+    def test_init_with_href_kwarg(self):
+        self.assertEqual(
+            Stylesheet(href="path/to/css").path,
+            "http://media.example.com/static/path/to/css",
+        )
+
+    def test_str(self):
+        self.assertHTMLEqual(
+            str(Stylesheet("path/to/css")),
+            '<link href="http://media.example.com/static/path/to/css"'
+            ' rel="stylesheet">',
+        )
+        self.assertHTMLEqual(
+            str(Stylesheet("path/to/css", media="all")),
+            '<link href="http://media.example.com/static/path/to/css"'
+            ' media="all" rel="stylesheet">',
+        )
+
     def test_render_with_attrs(self):
-        asset = CSS("/path/to/css")
+        asset = Stylesheet("/path/to/css")
         self.assertHTMLEqual(
             asset.render(attrs={"nonce": "abc123"}),
             '<link href="/path/to/css" nonce="abc123" rel="stylesheet">',
         )
 
     def test_render_attrs_conflict(self):
-        asset = CSS("/path/to/css", nonce="static")
-        msg = "CSS has conflicting attributes: nonce"
+        asset = Stylesheet("/path/to/css", nonce="static")
+        msg = "Stylesheet has conflicting attributes: nonce"
         with self.assertRaisesMessage(ValueError, msg):
             asset.render(attrs={"nonce": "dynamic"})
 
@@ -848,7 +860,7 @@ class FormsMediaTestCase(SimpleTestCase):
         )
 
     def test_render_css_with_attrs(self):
-        media = Media(css={"all": [CSS("/path/to/css", media="print")]})
+        media = Media(css={"all": [Stylesheet("/path/to/css", media="print")]})
         self.assertHTMLEqual(
             media.render(attrs={"nonce": "abc123"}),
             '<link href="/path/to/css" media="print" nonce="abc123" rel="stylesheet">',
@@ -868,8 +880,8 @@ class FormsMediaTestCase(SimpleTestCase):
                 "Script has conflicting attributes: nonce",
             ),
             (
-                Media(css={"all": [CSS("/path/to/css", nonce="static")]}),
-                "CSS has conflicting attributes: nonce",
+                Media(css={"all": [Stylesheet("/path/to/css", nonce="static")]}),
+                "Stylesheet has conflicting attributes: nonce",
             ),
         ]
         for media, msg in cases:
@@ -888,8 +900,8 @@ class FormsMediaObjectTestCase(SimpleTestCase):
         m = Media(
             css={
                 "all": (
-                    CSS("path/to/css1", media="all"),
-                    CSS("/path/to/css2", media="all"),
+                    Stylesheet("path/to/css1", media="all"),
+                    Stylesheet("/path/to/css2", media="all"),
                 )
             },
             js=(
@@ -913,7 +925,8 @@ class FormsMediaObjectTestCase(SimpleTestCase):
         )
         self.assertEqual(
             repr(m),
-            "Media(css={'all': [CSS('path/to/css1'), CSS('/path/to/css2')]}, "
+            "Media(css={'all': [Stylesheet('path/to/css1'), "
+            "Stylesheet('/path/to/css2')]}, "
             "js=[Script('/path/to/js1'), Script('http://media.other.com/path/to/js2'), "
             "Script('https://secure.other.com/path/to/js3')])",
         )
@@ -935,7 +948,9 @@ class FormsMediaObjectTestCase(SimpleTestCase):
     def test_combine_media(self):
         class MyWidget1(TextInput):
             class Media:
-                css = {"all": (CSS("path/to/css1", media="all"), "/path/to/css2")}
+                css = {
+                    "all": (Stylesheet("path/to/css1", media="all"), "/path/to/css2")
+                }
                 js = (
                     "/path/to/js1",
                     "http://media.other.com/path/to/js2",
@@ -947,7 +962,9 @@ class FormsMediaObjectTestCase(SimpleTestCase):
 
         class MyWidget2(TextInput):
             class Media:
-                css = {"all": (CSS("/path/to/css2", media="all"), "/path/to/css3")}
+                css = {
+                    "all": (Stylesheet("/path/to/css2", media="all"), "/path/to/css3")
+                }
                 js = (Script("/path/to/js1"), "/path/to/js4")
 
         w1 = MyWidget1()
@@ -971,8 +988,8 @@ class FormsMediaObjectTestCase(SimpleTestCase):
         media = Media(
             css={
                 "all": (
-                    CSS("/path/to/css1", media="all"),
-                    CSS("/path/to/css1", media="all"),
+                    Stylesheet("/path/to/css1", media="all"),
+                    Stylesheet("/path/to/css1", media="all"),
                     "/path/to/css1",
                 )
             },

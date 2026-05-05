@@ -24,6 +24,7 @@ from .renderers import get_default_renderer
 
 __all__ = (
     "Script",
+    "Stylesheet",
     "Media",
     "MediaDefiningClass",
     "Widget",
@@ -123,6 +124,13 @@ class Script(MediaAsset):
         super().__init__(src, **attributes)
 
 
+class Stylesheet(MediaAsset):
+    element_template = '<link href="{path}"{attributes}>'
+
+    def __init__(self, href, **attributes):
+        super().__init__(path=href, rel="stylesheet", **attributes)
+
+
 @html_safe
 class Media:
     def __init__(self, media=None, css=None, js=None):
@@ -190,12 +198,7 @@ class Media:
                     else (
                         path.__html__()
                         if hasattr(path, "__html__")
-                        else format_html(
-                            '<link href="{}" media="{}"{} rel="stylesheet">',
-                            self.absolute_path(path),
-                            medium,
-                            flatatt(attrs) if attrs else "",
-                        )
+                        else Stylesheet(path, media=medium).render(attrs=attrs)
                     )
                 )
                 for path in self._css[medium]
