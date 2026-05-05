@@ -11,7 +11,7 @@
   {% if cl.formset or action_form %}
     <script src="{% url 'admin:jsi18n' %}" {% csp_nonce_attr %}></script>
   {% endif %}
-  {{ media.css }}
+  {% csp_nonce_attr media.css %}
   {% if not actions_on_top and not actions_on_bottom %}
     <style>
       #changelist table thead th:first-child {width: inherit}
@@ -21,7 +21,7 @@
 
 {% block extrahead %}
 {{ block.super }}
-{{ media.js }}
+{% csp_nonce_attr media.js %}
 <script src="{% static 'admin/js/filters.js' %}" defer {% csp_nonce_attr %}></script>
 {% endblock %}
 

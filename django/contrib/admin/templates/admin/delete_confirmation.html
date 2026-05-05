@@ -3,7 +3,7 @@
 
 {% block extrahead %}
     {{ block.super }}
-    {{ media }}
+    {% csp_nonce_attr media %}
     <script src="{% static 'admin/js/cancel.js' %}" async {% csp_nonce_attr %}></script>
 {% endblock %}
 
