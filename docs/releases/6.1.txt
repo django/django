@@ -223,6 +223,11 @@ CSP
   :func:`~django.template.context_processors.csp` context processor is
   configured. See :ref:`csp-nonce` for details.
 
+* A new ``security.W027`` system check warns when
+  :class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` is enabled
+  with ``CSP.NONCE`` in a CSP policy but
+  ``django.template.context_processors.csp`` is not configured.
+
 CSRF
 ~~~~
 

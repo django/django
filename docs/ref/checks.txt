@@ -604,6 +604,9 @@ configured:
   imported.
 * **security.E026**: The CSP setting ``<SETTING_NAME>`` must be a dictionary
   (got ``<value>`` instead).
+* **security.W027**: Your Content Security Policy includes ``CSP.NONCE`` and
+  :class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` is enabled,
+  but ``django.template.context_processors.csp`` is not configured.
 
 Signals
 -------
