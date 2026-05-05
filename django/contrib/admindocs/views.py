@@ -8,6 +8,7 @@ from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admindocs import utils
 from django.contrib.admindocs.utils import (
+    _is_callback,
     remove_non_capturing_groups,
     replace_metacharacters,
     replace_named_groups,
@@ -172,7 +173,7 @@ class ViewDetailView(BaseAdminDocsView):
     @staticmethod
     def _get_view_func(view):
         urlconf = get_urlconf()
-        if get_resolver(urlconf)._is_callback(view):
+        if _is_callback(view, get_resolver(urlconf)):
             mod, func = get_mod_func(view)
             try:
                 # Separate the module and function, e.g.

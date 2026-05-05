@@ -131,6 +131,24 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
+    def test_view_detail_does_not_recollect_callbacks(self):
+        """
+        Unsure that multiple requests to ViewDetailView
+        don't recollect on each request.
+        """
+        url = reverse(
+            "django-admindocs-views-detail",
+            args=["django.contrib.admindocs.views.BaseAdminDocsView"],
+        )
+        utils._get_callback_strs.cache_clear()
+        for _ in range(3):
+            self.client.get(url)
+        cache_info = utils._get_callback_strs.cache_info()
+        # First call need to collect callbacks
+        self.assertEqual(cache_info.misses, 1)
+        # Following calls hit the cache.
+        self.assertEqual(cache_info.hits, 2)
+
     def test_model_index(self):
         response = self.client.get(reverse("django-admindocs-models-index"))
         self.assertContains(
