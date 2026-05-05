@@ -851,7 +851,11 @@ class Select(ChoiceWidget):
         if self.allow_multiple_selected:
             return use_required_attribute
 
-        first_choice = next(iter(self.choices), None)
+        first_choice = (
+            self.choices.peek()
+            if hasattr(self.choices, "peek")
+            else next(iter(self.choices), None)
+        )
         return (
             use_required_attribute
             and first_choice is not None

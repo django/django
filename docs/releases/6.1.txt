@@ -264,6 +264,12 @@ Forms
   field's choices. This allows per-request refreshing when called in a form's
   ``__init__()``.
 
+* :class:`~django.forms.ModelChoiceIterator` now yields choices via
+  its :meth:`~django.forms.ModelChoiceIterator.generator` method.
+  Users who have previously overridden the ``__iter__()`` method of
+  :class:`~django.forms.ModelChoiceIterator` should override
+  :meth:`~django.forms.ModelChoiceIterator.generator` instead.
+
 Generic Views
 ~~~~~~~~~~~~~
 
