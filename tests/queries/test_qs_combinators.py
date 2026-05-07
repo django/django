@@ -580,6 +580,20 @@ class QuerySetSetOperationTests(TestCase):
             ordered=False,
         )
 
+    @skipUnlessDBFeature("supports_slicing_ordering_in_compound")
+    def test_union_in_with_ordering_union(self):
+        qs1 = Number.objects.filter(num__gt=7).order_by("id")
+        qs2 = Number.objects.filter(num__lt=2).order_by("-id")
+        qs3 = Number.objects.filter(num=5).order_by("id")
+        union = qs1.union(qs2).order_by("id")
+        self.assertNumbersEqual(
+            Number.objects.exclude(
+                id__in=union.union(qs3).order_by("-id").values("id")
+            ),
+            [2, 3, 4, 6, 7],
+            ordered=False,
+        )
+
     @skipUnlessDBFeature(
         "supports_slicing_ordering_in_compound", "allow_sliced_subqueries_with_in"
     )
