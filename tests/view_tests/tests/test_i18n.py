@@ -13,7 +13,7 @@ from django.test import (
 )
 from django.test.selenium import SeleniumTestCase
 from django.urls import reverse
-from django.utils.translation import get_language, override
+from django.utils.translation import deactivate_all, get_language, override
 from django.views.i18n import JavaScriptCatalog, get_formats
 
 from ..urls import locale_dir
@@ -245,6 +245,25 @@ class SetLanguageTests(TestCase):
             headers={"referer": "/nl/vertaald/"},
         )
         self.assertRedirects(response, "/en/translated/")
+
+    @modify_settings(
+        MIDDLEWARE={
+            "append": "django.middleware.locale.LocaleMiddleware",
+        }
+    )
+    def test_setlang_with_mismatched_cookie_and_next_url_prefix(self):
+        self.client.cookies[settings.LANGUAGE_COOKIE_NAME] = "de"
+        response = self.client.post(
+            "/i18n/setlang/",
+            data={"language": "nl", "next": "/en/translated/"},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/nl/vertaald/")
+        self.assertEqual(
+            self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value,
+            "nl",
+        )
+        deactivate_all()
 
 
 @override_settings(ROOT_URLCONF="view_tests.urls")
