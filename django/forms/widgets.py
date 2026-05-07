@@ -72,14 +72,19 @@ class MediaAsset:
         self.attributes = attributes
 
     def __eq__(self, other):
-        # Compare the path only, to ensure performant comparison in
-        # Media.merge.
-        return (self.__class__ is other.__class__ and self.path == other.path) or (
-            isinstance(other, str) and self._path == other
-        )
+        # Compare path and attrs to ensure performant comparison
+        # in Media.merge.
+        return (
+            self.__class__ is other.__class__
+            and self._path == other._path
+            and self.attributes == other.attributes
+        ) or (isinstance(other, str) and self._path == other)
 
     def __hash__(self):
-        # Hash the path only, to ensure performant comparison in Media.merge.
+        # Compare path and attrs to ensure performant comparison
+        # in Media.merge.
+        if self.attributes:
+            return hash(self._path) ^ hash(frozenset(self.attributes.items()))
         return hash(self._path)
 
     def __str__(self):
@@ -142,8 +147,22 @@ class Media:
                 css = {}
             if js is None:
                 js = []
-        self._css_lists = [css]
-        self._js_lists = [js]
+        self._css_lists = [self._normalize_css(css)]
+        self._js_lists = [self._normalize_js(js)]
+
+    @staticmethod
+    def _normalize_js(js):
+        return [Script(path) if isinstance(path, str) else path for path in js]
+
+    @staticmethod
+    def _normalize_css(css):
+        return {
+            medium: [
+                Stylesheet(path, media=medium) if isinstance(path, str) else path
+                for path in paths
+            ]
+            for medium, paths in css.items()
+        }
 
     def __repr__(self):
         return "Media(css=%r, js=%r)" % (self._css, self._js)
@@ -177,11 +196,7 @@ class Media:
             (
                 path.render(attrs=attrs)
                 if isinstance(path, MediaAsset)
-                else (
-                    path.__html__()
-                    if hasattr(path, "__html__")
-                    else Script(path).render(attrs=attrs)
-                )
+                else path.__html__()
             )
             for path in self._js
         ]
@@ -195,11 +210,7 @@ class Media:
                 (
                     path.render(attrs=attrs)
                     if isinstance(path, MediaAsset)
-                    else (
-                        path.__html__()
-                        if hasattr(path, "__html__")
-                        else Stylesheet(path, media=medium).render(attrs=attrs)
-                    )
+                    else path.__html__()
                 )
                 for path in self._css[medium]
             ]
