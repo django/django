@@ -4756,8 +4756,8 @@ class QuerySetCommentTests(TestCase):
 
     def test_rejects_comment_delimiters(self):
         msg = (
-            "QuerySet.comment() cannot include '/*' or '*/'; strip or "
-            "escape these delimiters before calling comment()."
+            "QuerySet.comment() cannot include '/*', '*/', or null bytes; "
+            "remove them before calling comment()."
         )
         for bad in [
             "foo /* bar",
@@ -4767,6 +4767,14 @@ class QuerySetCommentTests(TestCase):
         ]:
             with self.subTest(bad=bad), self.assertRaisesMessage(ValueError, msg):
                 NamedCategory.objects.comment(bad)
+
+    def test_rejects_null_byte(self):
+        msg = (
+            "QuerySet.comment() cannot include '/*', '*/', or null bytes; "
+            "remove them before calling comment()."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            NamedCategory.objects.comment("\x00")
 
 
 class QuerySetCloningTests(TestCase):

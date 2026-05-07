@@ -1958,9 +1958,9 @@ produces:
 
     UPDATE /* first */ /* second */ "blog_entry" SET "headline" = 'x'
 
-``comment()`` raises :exc:`ValueError` if ``message`` contains ``/*`` or
-``*/`` to prevent SQL comment injection, and :exc:`TypeError` if ``message``
-is not a string.
+``comment()`` raises :exc:`ValueError` if ``message`` contains ``/*``,
+``*/``, or null bytes to prevent SQL comment injection and avoid database
+adapter parsing issues, and :exc:`TypeError` if ``message`` is not a string.
 
 ``comment()`` only affects ``SELECT`` and ``UPDATE`` statements; ``DELETE``,
 ``INSERT``, and statements issued by migrations are not annotated. When

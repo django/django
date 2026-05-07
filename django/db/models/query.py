@@ -1988,10 +1988,10 @@ class QuerySet(AltersData):
         """Add an SQL comment to the query."""
         if not isinstance(message, str):
             raise TypeError("QuerySet.comment() argument must be a string.")
-        if "/*" in message or "*/" in message:
+        if "/*" in message or "*/" in message or "\x00" in message:
             raise ValueError(
-                "QuerySet.comment() cannot include '/*' or '*/'; strip or "
-                "escape these delimiters before calling comment()."
+                "QuerySet.comment() cannot include '/*', '*/', or null bytes; "
+                "remove them before calling comment()."
             )
         clone = self._chain()
         clone.query.comments = (*clone.query.comments, message)

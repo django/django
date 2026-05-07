@@ -1691,7 +1691,8 @@ class SQLCompiler:
         string of ``/* ... */`` blocks.
 
         Validation in ``QuerySet.comment()`` already rejects strings containing
-        ``/*`` or ``*/``, so the values here cannot break out of the comment.
+        ``/*``, ``*/``, or null bytes, so the values here cannot break out of
+        the comment or be truncated by database adapters.
         """
         return " ".join("/* %s */" % comment for comment in self.query.comments)
 
