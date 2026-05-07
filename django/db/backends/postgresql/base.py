@@ -273,7 +273,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             }
         elif settings_dict["NAME"] is None:
             # Connect to the default 'postgres' db.
-            settings_dict["OPTIONS"].pop("service", None)
             conn_params = {"dbname": "postgres", **settings_dict["OPTIONS"]}
         else:
             conn_params = {**settings_dict["OPTIONS"]}

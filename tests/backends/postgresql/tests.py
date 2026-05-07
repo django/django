@@ -180,7 +180,17 @@ class Tests(TestCase):
         settings["OPTIONS"] = {"service": "django_test"}
         params = DatabaseWrapper(settings).get_connection_params()
         self.assertEqual(params["dbname"], "postgres")
-        self.assertNotIn("service", params)
+        self.assertEqual(params["service"], "django_test")
+
+    def test_service_name_test_db(self):
+        from django.db.backends.postgresql.base import DatabaseWrapper
+
+        settings = connection.settings_dict.copy()
+        settings["NAME"] = ""
+        settings["OPTIONS"] = {"service": "my_service"}
+        settings["TEST"] = {**settings["TEST"], "NAME": None}
+        wrapper = DatabaseWrapper(settings)
+        self.assertEqual(wrapper.creation._get_test_db_name(), "test_my_service")
 
     def test_connect_and_rollback(self):
         """

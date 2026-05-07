@@ -174,11 +174,6 @@ PostgreSQL documentation.
 .. _password file: https://www.postgresql.org/docs/current/libpq-pgpass.html
 .. _parameters: https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS
 
-.. warning::
-
-    Using a service name for testing purposes is not supported. This
-    :ticket:`may be implemented later <33685>`.
-
 Optimizing PostgreSQL's configuration
 -------------------------------------
 

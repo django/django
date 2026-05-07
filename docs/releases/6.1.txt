@@ -416,6 +416,8 @@ Tests
   Previously, they would consume the streaming response's content, causing
   subsequent calls to fail.
 
+* PostgreSQL service names are now supported by the test runner.
+
 URLs
 ~~~~
 
