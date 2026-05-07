@@ -14,21 +14,21 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout Benchmark Repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           repository: django/django-asv
           path: "."
           persist-credentials: false
       - name: Setup Miniforge
         # Pinned to v3.2.0.
-        uses: conda-incubator/setup-miniconda@835234971496cad1653abb28a638a281cf32541f
+        uses: conda-incubator/setup-miniconda@8ee1f361103df19b6f8c8655fd3967a8ecb162d5 # v4.0.1
         with:
           miniforge-version: "24.1.2-0"
           activate-environment: asv-bench
       - name: Install Requirements
         run: pip install -r requirements.txt
       - name: Cache Django
-        uses: actions/cache@v4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: Django/*
           key: Django
