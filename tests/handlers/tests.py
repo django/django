@@ -1,7 +1,8 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler, WSGIRequest, get_script_name
 from django.core.signals import request_finished, request_started
-from django.db import close_old_connections, connection
+from django.db import close_old_connections, connection, transaction
+from django.http import HttpResponse
 from django.test import (
     AsyncRequestFactory,
     RequestFactory,
@@ -142,6 +143,17 @@ class TransactionsPerRequestTests(TransactionTestCase):
             connection.settings_dict["ATOMIC_REQUESTS"] = old_atomic_requests
         # The non_atomic_requests decorator is used for an incorrect table.
         self.assertContains(response, "True")
+
+    def test_non_atomic_requests_does_not_mutate_original(self):
+        def my_view(request):
+            return HttpResponse("Ok")
+
+        wrapped_once = transaction.non_atomic_requests(using="default")(my_view)
+        wrapped_twice = transaction.non_atomic_requests(using="other")(wrapped_once)
+
+        self.assertIsNot(wrapped_twice, wrapped_once)
+        self.assertEqual(wrapped_once._non_atomic_requests, {"default"})
+        self.assertEqual(wrapped_twice._non_atomic_requests, {"default", "other"})
 
 
 @override_settings(ROOT_URLCONF="handlers.urls")
