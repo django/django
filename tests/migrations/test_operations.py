@@ -3097,7 +3097,7 @@ class OperationTests(OperationTestBase):
     def test_alter_field_reloads_state_on_transitive_attname_to_field_type_change(
         self,
     ):
-        app_label = "test_alflrstfattnamettc"
+        app_label = "test_alflrstatftc"
         project_state = self.apply_operations(
             app_label,
             ProjectState(),
