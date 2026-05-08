@@ -1,5 +1,6 @@
 import warnings
 from contextlib import ContextDecorator, contextmanager
+from functools import wraps
 
 from django.db import (
     DEFAULT_DB_ALIAS,
@@ -337,10 +338,16 @@ def atomic(using=None, savepoint=True, durable=False):
 
 def _non_atomic_requests(view, using):
     try:
-        view._non_atomic_requests.add(using)
+        databases = view._non_atomic_requests | {using}
     except AttributeError:
-        view._non_atomic_requests = {using}
-    return view
+        databases = {using}
+
+    @wraps(view)
+    def wrapper(*args, **kwargs):
+        return view(*args, **kwargs)
+
+    wrapper._non_atomic_requests = databases
+    return wrapper
 
 
 def non_atomic_requests(using=None):
