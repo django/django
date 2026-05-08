@@ -1,3 +1,4 @@
+import contextlib
 import os
 from asyncio import get_running_loop
 from functools import wraps
@@ -37,3 +38,21 @@ def async_unsafe(message):
         return decorator(func)
     else:
         return decorator
+
+
+def maybe_aclosing(iterator):
+    """
+    Wrap an async iterator in contextlib.aclosing() if it has an aclose()
+    method, otherwise return it wrapped in contextlib.nullcontext().
+
+    This ensures that async generators are properly closed when iteration
+    exits (via break, return, exception, or cancellation), rather than
+    deferring cleanup to asyncio's asyncgen finalizer hook.
+
+    See PEP 533 and https://code.djangoproject.com/ticket/35190.
+    """
+    return (
+        contextlib.aclosing(iterator)
+        if hasattr(iterator, "aclose")
+        else contextlib.nullcontext(iterator)
+    )
