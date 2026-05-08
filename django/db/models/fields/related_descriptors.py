@@ -686,8 +686,16 @@ class ReverseManyToOneDescriptor:
         return self.rel.cache_name
 
     def related_manager_binding(self, instance):
+        get_related_value = getattr(self.field, "get_foreign_related_value", None)
+        if get_related_value is None:
+            get_related_value = self.rel.get_instance_value_for_fields
+            related_value = get_related_value(
+                instance, self.field.foreign_related_fields
+            )
+        else:
+            related_value = get_related_value(instance)
         return (
-            self.field.get_foreign_related_value(instance),
+            related_value,
             instance._get_pk_val(),
             instance._state.db,
         )
