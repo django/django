@@ -106,6 +106,30 @@ def _cookie_signer_key(key):
     return b"django.http.cookies" + force_bytes(key)
 
 
+def _cookie_signer_salt(cookie_name, salt=""):
+    # Prefix the salt length so (cookie_name, salt) pairs can't collide.
+    return f"django.http.cookies.v2:{len(salt)}:{salt}{cookie_name}"
+
+
+def _cookie_signer_legacy_salt(cookie_name, salt=""):
+    return cookie_name + salt
+
+
+def _unsign_cookie(signed_value, *, cookie_name, salt="", max_age=None):
+    try:
+        return get_cookie_signer(salt=_cookie_signer_salt(cookie_name, salt)).unsign(
+            signed_value, max_age=max_age
+        )
+    except BadSignature as exc:
+        if settings.SIGNED_COOKIE_LEGACY_SALT_FALLBACK and not isinstance(
+            exc, SignatureExpired
+        ):
+            return get_cookie_signer(
+                salt=_cookie_signer_legacy_salt(cookie_name, salt)
+            ).unsign(signed_value, max_age=max_age)
+        raise
+
+
 def get_cookie_signer(salt="django.core.signing.get_cookie_signer"):
     Signer = import_string(settings.SIGNING_BACKEND)
     return Signer(
