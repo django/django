@@ -459,12 +459,27 @@ class ModelBase(type):
         return cls._meta.default_manager
 
 
-class ModelStateFieldsCacheDescriptor:
+class ModelStateCacheDescriptor:
+    """
+    Upon first access, replace itself with an empty dictionary on the instance.
+    """
+
+    def __set_name__(self, owner, name):
+        self.attribute_name = name
+
     def __get__(self, instance, cls=None):
         if instance is None:
             return self
-        res = instance.fields_cache = {}
+        res = instance.__dict__[self.attribute_name] = {}
         return res
+
+
+class ModelStateFieldsCacheDescriptor(ModelStateCacheDescriptor):
+    pass
+
+
+class ModelStateRelatedManagersCacheDescriptor(ModelStateCacheDescriptor):
+    pass
 
 
 class ModelStateFetchModeDescriptor:
@@ -485,6 +500,7 @@ class ModelState:
     # on the actual save.
     adding = True
     fields_cache = ModelStateFieldsCacheDescriptor()
+    related_managers_cache = ModelStateRelatedManagersCacheDescriptor()
     fetch_mode = ModelStateFetchModeDescriptor()
     peers = ()
 
@@ -492,10 +508,18 @@ class ModelState:
         state = self.__dict__.copy()
         # Weak references can't be pickled.
         state.pop("peers", None)
+        if "fields_cache" in state:
+            state["fields_cache"] = self.fields_cache.copy()
+        # Manager instances stored in related_managers_cache won't necessarily
+        # be deserializable if they were dynamically created via inner scopes,
+        # e.g. create_forward_many_to_many_manager().
+        if "related_managers_cache" in state:
+            state["related_managers_cache"] = {}
         return state
 
     def __del__(self):
         self.fields_cache.clear()
+        self.related_managers_cache.clear()
 
 
 class Model(AltersData, metaclass=ModelBase):
@@ -661,6 +685,8 @@ class Model(AltersData, metaclass=ModelBase):
         state = self.__dict__.copy()
         state["_state"] = copy.copy(state["_state"])
         state["_state"].fields_cache = state["_state"].fields_cache.copy()
+        if "related_managers_cache" in self._state.__dict__:
+            state["_state"].related_managers_cache = {}
         # memoryview cannot be pickled, so cast it to bytes and store
         # separately.
         _memoryview_attrs = []

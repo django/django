@@ -606,6 +606,21 @@ class ReverseGenericManyToOneDescriptor(ReverseManyToOneDescriptor):
             self.rel,
         )
 
+    @cached_property
+    def related_manager_cache_key(self):
+        # GenericRel defaults to related_name="+" unless related_query_name is
+        # provided, so use the field name to avoid collisions between multiple
+        # GenericRelations on the same model.
+        return self.field.cache_name
+
+    def related_manager_binding(self, instance):
+        model = (
+            instance._meta.concrete_model
+            if self.field.for_concrete_model
+            else instance.__class__
+        )
+        return model, instance.pk, instance._state.db
+
 
 def create_generic_related_manager(superclass, rel):
     """

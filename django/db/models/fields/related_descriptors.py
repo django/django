@@ -681,6 +681,17 @@ class ReverseManyToOneDescriptor:
             self.rel,
         )
 
+    @cached_property
+    def related_manager_cache_key(self):
+        return self.rel.cache_name
+
+    def related_manager_binding(self, instance):
+        return (
+            self.field.get_foreign_related_value(instance),
+            instance._get_pk_val(),
+            instance._state.db,
+        )
+
     def __get__(self, instance, cls=None):
         """
         Get the related objects through the reverse relation.
@@ -694,7 +705,18 @@ class ReverseManyToOneDescriptor:
         if instance is None:
             return self
 
-        return self.related_manager_cls(instance)
+        cache = instance._state.related_managers_cache
+        cache_key = self.related_manager_cache_key
+        binding = self.related_manager_binding(instance)
+        manager = cache.get(cache_key)
+        if (
+            manager is None
+            or getattr(manager, "_related_manager_binding", None) != binding
+        ):
+            manager = self.related_manager_cls(instance)
+            manager._related_manager_binding = binding
+            cache[cache_key] = manager
+        return manager
 
     def _get_set_deprecation_msg_params(self):
         return (
@@ -1060,6 +1082,23 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor):
             related_model._default_manager.__class__,
             self.rel,
             reverse=self.reverse,
+        )
+
+    @cached_property
+    def related_manager_cache_key(self):
+        return self.rel.cache_name if self.reverse else self.field.cache_name
+
+    def related_manager_binding(self, instance):
+        source_field_name = (
+            self.field.m2m_reverse_field_name()
+            if self.reverse
+            else self.field.m2m_field_name()
+        )
+        source_field = self.through._meta.get_field(source_field_name)
+        return (
+            source_field.get_foreign_related_value(instance),
+            instance._get_pk_val(),
+            instance._state.db,
         )
 
     def _get_set_deprecation_msg_params(self):

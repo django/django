@@ -106,6 +106,8 @@ class ManyToManyTests(TestCase):
         user_1 = User.objects.create(username="Jean")
         user_2 = User.objects.create(username="Joe")
         self.a3.authors.add(user_1.username)
+        user_1_articles = user_1.article_set
+        self.assertIs(user_1_articles, user_1.article_set)
         self.assertSequenceEqual(user_1.article_set.all(), [self.a3])
         # Change the username on a different instance of the same user.
         user_1_from_db = User.objects.get(pk=user_1.pk)
@@ -119,6 +121,7 @@ class ManyToManyTests(TestCase):
         # Refresh the instance with an evaluated related manager.
         user_1.refresh_from_db()
         self.assertEqual(user_1.username, "Paul")
+        self.assertIsNot(user_1.article_set, user_1_articles)
         self.assertSequenceEqual(user_1.article_set.all(), [self.a4])
 
     def test_add_remove_invalid_type(self):

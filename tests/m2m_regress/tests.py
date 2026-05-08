@@ -39,6 +39,14 @@ class M2MRegressionTests(TestCase):
         self.assertSequenceEqual(e1.topics.all(), [t1])
         self.assertSequenceEqual(e1.related.all(), [t2])
 
+    def test_m2m_managers_reused(self):
+        s1 = SelfRefer.objects.create(name="s1")
+        e1 = Entry.objects.create(name="e1")
+        self.assertIs(s1.references, s1.references)
+        self.assertIs(s1.related, s1.related)
+        self.assertIs(e1.topics, e1.topics)
+        self.assertIs(e1.related, e1.related)
+
     def test_internal_related_name_not_in_error_msg(self):
         # The secret internal related names for self-referential many-to-many
         # fields shouldn't appear in the list when an error is made.
@@ -76,10 +84,12 @@ class M2MRegressionTests(TestCase):
         Entry.objects.create(name="e1")
         entry = Entry.objects.first()
         entry.topics.set([t1])
+        old_manager = entry.topics
         old_topics = entry.topics.all()
         entry.pk = None
         entry._state.adding = True
         entry.save()
+        self.assertIsNot(entry.topics, old_manager)
         entry.topics.set(old_topics)
         entry = Entry.objects.get(pk=entry.pk)
         self.assertCountEqual(entry.topics.all(), old_topics)
