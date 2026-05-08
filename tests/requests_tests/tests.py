@@ -456,6 +456,20 @@ class RequestsTests(SimpleTestCase):
         with self.assertRaises(RawPostDataException):
             request.body
 
+    def test_malformed_header(self):
+        tests = [
+            # Invalid encoding name with percent-encoded value
+            "text/plain; charset*=BOGUS''%20",
+            # Another invalid encoding with different value
+            "text/plain; filename*=INVALID''%s%s%s",
+            # Invalid encoding with multi-line encoded content
+            "text/plain; title*=NOTACODEC''%E2%80%A6",
+        ]
+        msg = "Invalid Content-Type header."
+        for header in tests:
+            with self.subTest(header=header), self.assertRaisesMessage(BadRequest, msg):
+                WSGIRequest({"REQUEST_METHOD": "GET", "CONTENT_TYPE": header})
+
     def test_malformed_multipart_header(self):
         tests = [
             ('Content-Disposition : form-data; name="name"', {"name": ["value"]}),
@@ -1249,6 +1263,44 @@ class RequestsTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(RuntimeError, msg):
             request.multipart_parser_class = MultiPartParser
+
+
+class MemoryFileUploadHandlerTests(SimpleTestCase):
+    def test_handle_raw_input_wsgi_request_within_limit_activated(self):
+
+        class WSGIRequest:
+            def __init__(self, body):
+                self._stream = LimitedStream(BytesIO(body), len(body))
+
+        handler = MemoryFileUploadHandler()
+        with self.settings(FILE_UPLOAD_MAX_MEMORY_SIZE=10):
+            handler.handle_raw_input(WSGIRequest(b"x" * 5), {}, 5, None)
+        self.assertIs(handler.activated, True)
+
+    def test_handle_raw_input_wsgi_request_exceeds_limit_deactivated(self):
+
+        class WSGIRequest:
+            def __init__(self, body):
+                self._stream = LimitedStream(BytesIO(body), len(body))
+
+        handler = MemoryFileUploadHandler()
+        with self.settings(FILE_UPLOAD_MAX_MEMORY_SIZE=10):
+            handler.handle_raw_input(WSGIRequest(b"x" * 15), {}, 15, None)
+        self.assertIs(handler.activated, False)
+
+    def test_handle_raw_input_seekable_within_limit_activated(self):
+        handler = MemoryFileUploadHandler()
+        with self.settings(FILE_UPLOAD_MAX_MEMORY_SIZE=10):
+            # content_length param is understated (0) but actual size is 10.
+            handler.handle_raw_input(BytesIO(b"x" * 10), {}, 0, None)
+        self.assertIs(handler.activated, True)
+
+    def test_handle_raw_input_seekable_exceeds_limit_deactivated(self):
+        handler = MemoryFileUploadHandler()
+        with self.settings(FILE_UPLOAD_MAX_MEMORY_SIZE=10):
+            # content_length param is understated (0) but actual size is 15.
+            handler.handle_raw_input(BytesIO(b"x" * 15), {}, 0, None)
+        self.assertIs(handler.activated, False)
 
 
 class HostValidationTests(SimpleTestCase):

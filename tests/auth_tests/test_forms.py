@@ -4,6 +4,8 @@ import sys
 import urllib.parse
 from unittest import mock
 
+from mail.custombackend import FailingEmailBackend
+
 from django import forms
 from django.contrib.auth.forms import (
     AdminPasswordChangeForm,
@@ -1382,6 +1384,7 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
 
     @override_settings(EMAIL_BACKEND="mail.custombackend.FailingEmailBackend")
     def test_save_send_email_exceptions_are_catched_and_logged(self):
+        self.addCleanup(FailingEmailBackend.reset)
         user, username, email = self.create_dummy_user()
         form = PasswordResetForm({"email": email})
         self.assertTrue(form.is_valid())

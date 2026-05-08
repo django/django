@@ -2637,15 +2637,14 @@ If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 
 *Asynchronous version*: ``aiterator()``
 
-Evaluates the ``QuerySet`` (by performing the query) and returns an iterator
-(see :pep:`234`) over the results, or an asynchronous iterator (see :pep:`492`)
-if you call its asynchronous version ``aiterator``.
+Evaluates the ``QuerySet`` (by performing the query) and returns an
+:term:`python:iterator` over the results, or an :term:`python:asynchronous
+iterator` if you call its asynchronous version ``aiterator``.
 
 A ``QuerySet`` typically caches its results internally so that repeated
 evaluations do not result in additional queries. In contrast, ``iterator()``
-will read results directly, without doing any caching at the ``QuerySet`` level
-(internally, the default iterator calls ``iterator()`` and caches the return
-value). For a ``QuerySet`` which returns a large number of objects that you
+will read results directly, without doing any caching at the ``QuerySet``
+level. For a ``QuerySet`` which returns a large number of objects that you
 only need to access once, this can result in better performance and a
 significant reduction in memory.
 
@@ -4084,6 +4083,42 @@ by the aggregate.
         Optional. If ``distinct=True``, ``Avg`` returns the mean value of
         unique values. This is the SQL equivalent of ``AVG(DISTINCT <field>)``.
         The default value is ``False``.
+
+``BitAnd``
+~~~~~~~~~~
+
+.. class:: BitAnd(expression, filter=None, default=None, **extra)
+
+    .. versionadded:: 6.1
+
+    Returns an ``int`` of the bitwise ``AND`` of all non-null input values, or
+    ``default`` if all values are null.
+
+    The ``default`` parameter is not supported on MariaDB, MySQL, and Oracle.
+
+``BitOr``
+~~~~~~~~~
+
+.. class:: BitOr(expression, filter=None, default=None, **extra)
+
+    .. versionadded:: 6.1
+
+    Returns an ``int`` of the bitwise ``OR`` of all non-null input values, or
+    ``default`` if all values are null.
+
+    The ``default`` parameter is not supported on MariaDB, MySQL, and Oracle.
+
+``BitXor``
+~~~~~~~~~~
+
+.. class:: BitXor(expression, filter=None, default=None, **extra)
+
+    .. versionadded:: 6.1
+
+    Returns an ``int`` of the bitwise ``XOR`` of all non-null input values, or
+    ``default`` if all values are null.
+
+    The ``default`` parameter is not supported on MariaDB, MySQL, and Oracle.
 
 ``Count``
 ~~~~~~~~~

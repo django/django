@@ -93,7 +93,7 @@ class DatabaseCache(BaseDatabaseCache):
                 expired_keys.append(key)
             else:
                 value = connection.ops.process_clob(value)
-                value = pickle.loads(base64.b64decode(value.encode()))
+                value = pickle.loads(base64.b64decode(value.encode(), validate=True))
                 result[key_map.get(key)] = value
         self._base_delete_many(expired_keys)
         return result

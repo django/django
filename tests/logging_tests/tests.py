@@ -4,6 +4,7 @@ from io import StringIO
 from unittest import TestCase, mock
 
 from admin_scripts.tests import AdminScriptTestCase
+from mail.custombackend import FailingEmailBackend, OptionsCapturingBackend
 
 from django.conf import settings
 from django.core import mail
@@ -26,7 +27,6 @@ from django.utils.log import (
 from django.views.debug import ExceptionReporter
 
 from . import views
-from .logconfig import MyEmailBackend
 
 
 class LoggingFiltersTest(SimpleTestCase):
@@ -286,9 +286,22 @@ class AdminEmailHandlerTest(SimpleTestCase):
             h for h in logger.handlers if h.__class__.__name__ == "AdminEmailHandler"
         ][0]
 
-    def test_fail_silently(self):
-        admin_email_handler = self.get_admin_email_handler(self.logger)
-        self.assertTrue(admin_email_handler.connection().fail_silently)
+    def make_log_record(self, url_path=None, *args, **kwargs):
+        record = self.logger.makeRecord(
+            "name", logging.ERROR, "function", "lno", "message", None, None
+        )
+        if url_path is not None:
+            record.request = self.request_factory.get(url_path, *args, **kwargs)
+        return record
+
+    @override_settings(
+        ADMINS=["admin@example.com"],
+        EMAIL_BACKEND="mail.custombackend.FailingEmailBackend",
+    )
+    def test_sends_using_fail_silently(self):
+        self.addCleanup(FailingEmailBackend.reset)
+        self.logger.error("All work and no play makes Jack a dull boy")
+        self.assertIs(FailingEmailBackend.init_kwargs[0]["fail_silently"], True)
 
     @override_settings(
         ADMINS=["admin@example.com"],
@@ -383,36 +396,16 @@ class AdminEmailHandlerTest(SimpleTestCase):
         self.assertNotIn("\r", mail.outbox[0].subject)
         self.assertEqual(mail.outbox[0].subject, expected_subject)
 
-    @override_settings(
-        ADMINS=["admin@example.com"],
-        DEBUG=False,
-    )
+    @override_settings(ADMINS=["admin@example.com"])
     def test_uses_custom_email_backend(self):
-        """
-        Refs #19325
-        """
-        message = "All work and no play makes Jack a dull boy"
-        admin_email_handler = self.get_admin_email_handler(self.logger)
-        mail_admins_called = {"called": False}
-
-        def my_mail_admins(*args, **kwargs):
-            connection = kwargs["connection"]
-            self.assertIsInstance(connection, MyEmailBackend)
-            mail_admins_called["called"] = True
-
-        # Monkeypatches
-        orig_mail_admins = mail.mail_admins
-        orig_email_backend = admin_email_handler.email_backend
-        mail.mail_admins = my_mail_admins
-        admin_email_handler.email_backend = "logging_tests.logconfig.MyEmailBackend"
-
-        try:
-            self.logger.error(message)
-            self.assertTrue(mail_admins_called["called"])
-        finally:
-            # Revert Monkeypatches
-            mail.mail_admins = orig_mail_admins
-            admin_email_handler.email_backend = orig_email_backend
+        self.addCleanup(OptionsCapturingBackend.reset)
+        handler = AdminEmailHandler(
+            email_backend="mail.custombackend.OptionsCapturingBackend"
+        )
+        handler.emit(self.make_log_record("/"))
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertIs(OptionsCapturingBackend.init_kwargs[0]["fail_silently"], True)
+        self.assertEqual(len(OptionsCapturingBackend.sent_messages), 1)
 
     @override_settings(
         ADMINS=["admin@example.com"],
@@ -423,12 +416,8 @@ class AdminEmailHandlerTest(SimpleTestCase):
         request.
         """
         handler = self.get_admin_email_handler(self.logger)
-        record = self.logger.makeRecord(
-            "name", logging.ERROR, "function", "lno", "message", None, None
-        )
         url_path = "/º"
-        record.request = self.request_factory.get(url_path)
-        handler.emit(record)
+        handler.emit(self.make_log_record(url_path))
         self.assertEqual(len(mail.outbox), 1)
         msg = mail.outbox[0]
         self.assertEqual(msg.to, ["admin@example.com"])
@@ -442,16 +431,10 @@ class AdminEmailHandlerTest(SimpleTestCase):
     def test_customize_send_mail_method(self):
         class ManagerEmailHandler(AdminEmailHandler):
             def send_mail(self, subject, message, *args, **kwargs):
-                mail.mail_managers(
-                    subject, message, *args, connection=self.connection(), **kwargs
-                )
+                mail.mail_managers(subject, message, *args, **kwargs)
 
         handler = ManagerEmailHandler()
-        record = self.logger.makeRecord(
-            "name", logging.ERROR, "function", "lno", "message", None, None
-        )
-        self.assertEqual(len(mail.outbox), 0)
-        handler.emit(record)
+        handler.emit(self.make_log_record())
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, ["manager@example.com"])
 
@@ -480,14 +463,10 @@ class AdminEmailHandlerTest(SimpleTestCase):
 
     @override_settings(ADMINS=["admin@example.com"])
     def test_custom_exception_reporter_is_used(self):
-        record = self.logger.makeRecord(
-            "name", logging.ERROR, "function", "lno", "message", None, None
-        )
-        record.request = self.request_factory.get("/")
         handler = AdminEmailHandler(
             reporter_class="logging_tests.logconfig.CustomExceptionReporter"
         )
-        handler.emit(record)
+        handler.emit(self.make_log_record("/"))
         self.assertEqual(len(mail.outbox), 1)
         msg = mail.outbox[0]
         self.assertEqual(msg.body, "message\n\ncustom traceback text")
@@ -496,16 +475,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
     def test_emit_no_form_tag(self):
         """HTML email doesn't contain forms."""
         handler = AdminEmailHandler(include_html=True)
-        record = self.logger.makeRecord(
-            "name",
-            logging.ERROR,
-            "function",
-            "lno",
-            "message",
-            None,
-            None,
-        )
-        handler.emit(record)
+        handler.emit(self.make_log_record())
         self.assertEqual(len(mail.outbox), 1)
         msg = mail.outbox[0]
         self.assertEqual(msg.subject, "[Django] ERROR: message")
@@ -517,15 +487,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
     @override_settings(ADMINS=[])
     def test_emit_no_admins(self):
         handler = AdminEmailHandler()
-        record = self.logger.makeRecord(
-            "name",
-            logging.ERROR,
-            "function",
-            "lno",
-            "message",
-            None,
-            None,
-        )
+        record = self.make_log_record()
         with mock.patch.object(
             handler,
             "format_subject",

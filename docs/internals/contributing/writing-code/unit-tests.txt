@@ -419,14 +419,14 @@ the lines that were changed or added in the PR. It shows:
 When reviewing coverage reports on pull requests, keep these limitations in
 mind:
 
-* **Database-specific code:** The CI coverage job runs tests using SQLite on
-  Windows. Code paths specific to other databases (PostgreSQL, MySQL, Oracle)
+* **Database-specific code:** The CI coverage job runs tests using PostgreSQL
+  on Ubuntu. Code paths specific to other databases (SQLite, MySQL, Oracle)
   will appear as "not covered" even if database-specific tests exist. This is
   expected and acceptable.
 
 * **Platform-specific code:** Similarly, code that only runs on certain
-  operating systems (Linux, macOS) will appear as not covered when run on
-  Windows.
+  operating systems (Windows, macOS) will appear as not covered when run on
+  Ubuntu.
 
 * **Coverage doesn't equal quality:** A line being "covered" only means it was
   executed during tests. It doesn't guarantee the line is well-tested or that

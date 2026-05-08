@@ -56,18 +56,17 @@ INCOMPLETE_CHECKLIST = (
 INVALID_TRAC_STATUS = (
     "Trac Ticket Not Ready for a Pull Request",
     "The referenced ticket **ticket-{ticket_id}** is not ready for a pull request. "
-    "A ticket must be in the *Accepted* stage, *assigned* status, and have no "
-    "resolution.\n\n"
+    "A ticket must be in the *Accepted* or *Ready for checkin* stage, "
+    "*assigned* status, and have no resolution.\n\n"
     "**Current state:** {current_state}\n\n"
     "**What to do:**\n\n"
     f"1. Check the ticket at {TRAC_URL}/ticket/{{ticket_id}}.\n"
     "2. If *Unreviewed*, wait for a community member to accept it. "
     "A ticket cannot be accepted by its reporter.\n"
-    "3. If *Ready for Checkin*, there is already a solution for it.\n"
-    "4. If *Someday/Maybe*, discuss on the "
+    "3. If *Someday/Maybe*, discuss on the "
     f"[Django Forum]({FORUM_URL}/c/internals/5) before proceeding.\n"
-    "5. If resolved or closed, it is not eligible for a PR.\n"
-    "6. If not *assigned*, claim it by setting yourself as the owner.\n\n"
+    "4. If resolved or closed, it is not eligible for a PR.\n"
+    "5. If not *assigned*, claim it by setting yourself as the owner.\n\n"
     f"For more information on the Django triage process see {TRIAGING_URL}.",
 )
 

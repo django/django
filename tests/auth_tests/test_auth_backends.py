@@ -498,6 +498,22 @@ class BaseModelBackendTest:
         await aauthenticate(username="no_such_user", password="test")
         self.assertEqual(CountingMD5PasswordHasher.calls, 1)
 
+    async def test_aauthentication_timing_async_bridge(self):
+        with patch(
+            "django.contrib.auth.hashers.sync_to_async",
+            return_value=mock.AsyncMock(return_value=(True, False)),
+        ) as mocked_adapter:
+            username = getattr(self.user, self.UserModel.USERNAME_FIELD)
+            await aauthenticate(username=username, password="test")
+            mocked_adapter.assert_called_once()
+
+        with patch(
+            "django.contrib.auth.sync_to_async", return_value=mock.AsyncMock()
+        ) as mocked_adapter:
+            username = getattr(self.user, self.UserModel.USERNAME_FIELD)
+            await aauthenticate(username="no_such_user", password="test")
+            mocked_adapter.assert_called_once()
+
     @override_settings(
         PASSWORD_HASHERS=["auth_tests.test_auth_backends.CountingMD5PasswordHasher"]
     )
@@ -1141,6 +1157,42 @@ class AuthenticateTests(TestCase):
         self.assertContains(
             response,
             '<tr><td>credentials</td><td class="code">'
+            "<pre>&#39;********************&#39;</pre></td></tr>",
+            html=True,
+            status_code=500,
+        )
+
+    @override_settings(AUTH_USER_MODEL="auth_tests.ErrorAdminUser")
+    def test_model_backend_authenticate_sensitive_variables(self):
+        try:
+            authenticate(username="testusername", password=self.sensitive_password)
+        except TypeError:
+            exc_info = sys.exc_info()
+        rf = RequestFactory()
+        response = technical_500_response(rf.get("/"), *exc_info)
+        self.assertNotContains(response, self.sensitive_password, status_code=500)
+        self.assertContains(
+            response,
+            '<tr><td>password</td><td class="code">'
+            "<pre>&#39;********************&#39;</pre></td></tr>",
+            html=True,
+            status_code=500,
+        )
+
+    @override_settings(AUTH_USER_MODEL="auth_tests.ErrorAdminUser")
+    async def test_model_backend_async_authenticate_sensitive_variables(self):
+        try:
+            await aauthenticate(
+                username="testusername", password=self.sensitive_password
+            )
+        except TypeError:
+            exc_info = sys.exc_info()
+        rf = RequestFactory()
+        response = technical_500_response(rf.get("/"), *exc_info)
+        self.assertNotContains(response, self.sensitive_password, status_code=500)
+        self.assertContains(
+            response,
+            '<tr><td>password</td><td class="code">'
             "<pre>&#39;********************&#39;</pre></td></tr>",
             html=True,
             status_code=500,

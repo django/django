@@ -632,13 +632,20 @@ class FileResponse(StreamingHttpResponse):
 class HttpResponseRedirectBase(HttpResponse):
     allowed_schemes = ["http", "https", "ftp"]
 
-    def __init__(self, redirect_to, preserve_request=False, *args, **kwargs):
+    def __init__(
+        self,
+        redirect_to,
+        preserve_request=False,
+        *args,
+        max_length=MAX_URL_REDIRECT_LENGTH,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self["Location"] = iri_to_uri(redirect_to)
         redirect_to_str = str(redirect_to)
-        if len(redirect_to_str) > MAX_URL_REDIRECT_LENGTH:
+        if max_length is not None and len(redirect_to_str) > max_length:
             raise DisallowedRedirect(
-                f"Unsafe redirect exceeding {MAX_URL_REDIRECT_LENGTH} characters"
+                f"Unsafe redirect exceeding {max_length} characters"
             )
         parsed = urlsplit(redirect_to_str)
         if preserve_request:

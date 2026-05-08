@@ -53,6 +53,19 @@ The short version of the steps involved is:
 
 There are a lot of details, so please read on.
 
+.. _checklist-generator:
+
+.. admonition:: Use the checklists app
+
+   To generate a checklist compiling the tasks described below as relevant to
+   the specific release(s) you are issuing, use the checklists app in the
+   `project admin <https://www.djangoproject.com/admin/checklists/>`_. This
+   populates a lot of boilerplate you will need for announcements, CVE
+   publication, and hashes for commit messages. By using this app for preparing
+   security issue metadata, your peer releasers can check your entries and
+   consult them again in the future.
+   (`Example <https://www.djangoproject.com/checklists/release/5.2.4/>`_)
+
 Prerequisites
 =============
 
@@ -150,9 +163,23 @@ any time leading up to the actual release.
 10 (or more) days before a security release
 -------------------------------------------
 
-#. Request the `CVE IDs <https://cveform.mitre.org/>`_  for the security
-   issue(s) being released. One CVE ID per issue, requested with
-   ``Vendor: djangoproject`` and ``Product: django``.
+#. Reserve one `CVE ID <https://www.cve.org/About/Overview/>`_ per security
+   issue as follows. (Or, if you lack CNA credentials, email
+   ``cna@djangoproject.com`` with a request.)
+
+   * Enable virtual environment with :pypi:`cvelib` installed.
+
+   * Export user information:
+
+      .. code-block:: shell
+
+         $ export CVE_USER=<user-email>@djangoproject.com CVE_ORG=DSF
+
+   * Reserve:
+
+      .. code-block:: shell
+
+         $ cve --interactive reserve <quantity>
 
 #. Generate the relevant (private) patch(es) using ``git format-patch``, one
    for the ``main`` branch and one for each stable branch being patched.
@@ -162,9 +189,9 @@ A week before a security release
 
 #. Send out pre-notification exactly **one week** before the security release.
    The template for that email and a list of the recipients are in the private
-   ``django-security`` GitHub wiki. BCC the pre-notification recipients and be
+   ``django-security`` GitHub wiki. BCC the pre-notification recipients, and be
    sure to include the relevant CVE IDs. Attach all the relevant patches
-   (targeting ``main`` and the stable branches) and sign the email text with
+   (targeting ``main`` and the stable branches), and sign the email text with
    the key you'll use for the release, with a command like:
 
    .. code-block:: shell
@@ -184,6 +211,17 @@ A week before a security release
 
     For details of severity levels, see:
     https://docs.djangoproject.com/en/dev/internals/security/#how-django-discloses-security-issues
+
+#. Prepare issue metadata:
+   * Severity
+   * Short description
+   * Reporter
+   * Remediator
+   * Reported at
+   * Confirmed at (usually date CVE reserved)
+   * CWE Problem Type
+   * CAPEC Impact Type
+   * CVSS (4.0) Score & Vector
 
 A few days before any release
 -----------------------------
@@ -644,12 +682,18 @@ Now you're ready to actually put the release out there. To do this:
 #. Post the release announcement to the |django-announce| mailing list and the
    Django Forum. This should include a link to the announcement blog post.
 
+#. If this is a security release, publish the CVE metadata. (The
+   :ref:`checklist app<checklist-generator>` generates JSON for this.):
+
+   .. code-block:: shell
+
+        $ cve publish <cve-number> --cve-json-file <path-to-file>
+
 #. If this is a security release, send a separate email to
-   ``oss-security@lists.openwall.com``. Provide a descriptive subject, for
-   example, "Django" plus the issue title from the release notes (including CVE
-   ID). The message body should include the vulnerability details, for example,
-   the announcement blog post text. Include a link to the announcement blog
-   post.
+   ``oss-security@lists.openwall.com``. Provide "Django" plus the CVE IDs in
+   the subject line. The message body should include the vulnerability details,
+   for example, the announcement blog post text. Include a link to the
+   announcement blog post.
 
 Post-release
 ============
@@ -708,8 +752,8 @@ You're almost done! All that's left to do now is:
 
       .. code-block:: shell
 
-         git checkout stable/A.B.x
-         git checkout -b update-translations-catalog-A.B.x
+         $ git checkout stable/A.B.x
+         $ git checkout -b update-translations-catalog-A.B.x
 
    #. Ensure that the release's dedicated virtual environment is enabled and
       run the following:

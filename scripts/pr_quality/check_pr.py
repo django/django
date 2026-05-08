@@ -30,6 +30,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import date, datetime, timedelta, timezone
+from http import HTTPStatus
 
 from pr_quality.errors import (
     CHECKS_FOOTER,
@@ -56,6 +57,8 @@ URLOPEN_TIMEOUT_SECONDS = 15
 # PRs opened before these dates predate PR template additions.
 PR_TEMPLATE_DATE = date(2024, 3, 4)  # 3fcef50 -- PR template introduced
 AI_DISCLOSURE_DATE = date(2026, 1, 8)  # 4f580c4 -- AI disclosure added
+
+ALLOWED_STAGES = ("Accepted", "Ready for checkin")
 
 logger = logging.getLogger(__name__)
 
@@ -100,7 +103,8 @@ def github_request(method, path, token, repo, data=None, params=None):
         headers["Content-Type"] = "application/json"
     req = urllib.request.Request(url, data=body, headers=headers, method=method)
     with urllib.request.urlopen(req, timeout=URLOPEN_TIMEOUT_SECONDS) as response:
-        return json.loads(response.read())
+        if response.status != HTTPStatus.NO_CONTENT:
+            return json.loads(response.read())
 
 
 def get_recent_commit_count(pr_author, repo, token, since_days, max_count):
@@ -140,6 +144,26 @@ def get_pr_total_changes(pr_number, repo, token):
             break
         page += 1
     return total_changes
+
+
+def get_comment_ids_to_delete(pr_number, repo, token):
+    ids = []
+    page = 1
+    while True:
+        comments = github_request(
+            "GET",
+            f"/issues/{pr_number}/comments",
+            token,
+            repo,
+            {"per_page": GITHUB_PER_PAGE, "page": page},
+        )
+        for comment in comments:
+            if CHECKS_HEADER in comment["body"]:
+                ids.append(comment["id"])
+        if len(comments) < GITHUB_PER_PAGE:
+            break
+        page += 1
+    return ids
 
 
 def strip_html_comments(text):
@@ -215,7 +239,8 @@ def check_trac_ticket(pr_body, total_changes, threshold=LARGE_PR_THRESHOLD):
 
 
 def check_trac_status(ticket_id, ticket_data):
-    """The referenced Trac ticket must be Accepted, unresolved, and assigned.
+    """The referenced Trac ticket must be Accepted or Ready for checkin,
+    unresolved, and assigned.
 
     ticket_data is the dict returned by fetch_trac_ticket(). Passing None
     skips the check (non-fatal fetch error). Passing TICKET_NOT_FOUND fails
@@ -232,10 +257,10 @@ def check_trac_status(ticket_id, ticket_data):
     stage = ticket_data.get("custom", {}).get("stage", "").strip()
     resolution = (ticket_data.get("resolution") or "").strip()
     status = ticket_data.get("status", "").strip()
-    if stage == "Accepted" and not resolution and status == "assigned":
+    if stage in ALLOWED_STAGES and not resolution and status == "assigned":
         return None
     current_state = [
-        f"{stage=}" if stage != "Accepted" else "",
+        f"{stage=}" if stage not in ALLOWED_STAGES else "",
         f"{resolution=}" if resolution else "",
         f"{status=}" if status != "assigned" else "",
     ]
@@ -480,7 +505,7 @@ def main(
 
     results = [
         ("Trac ticket referenced", ticket_result, LEVEL_ERROR),
-        ("Trac ticket status is Accepted", ticket_status_result, LEVEL_ERROR),
+        ("Trac ticket is ready for work", ticket_status_result, LEVEL_ERROR),
         ("Trac ticket has_patch flag set", ticket_has_patch_result, LEVEL_WARNING),
         ("PR title includes ticket number", pr_title_result, LEVEL_WARNING),
         ("Branch description provided", check_branch_description(pr_body), LEVEL_ERROR),
@@ -502,6 +527,14 @@ def main(
     if not failures and not warning_msgs:
         logger.info("PR #%s passed all quality checks.", pr_number)
         return
+
+    for id_to_delete in get_comment_ids_to_delete(pr_number, repo, token):
+        github_request(
+            "DELETE",
+            f"/issues/comments/{id_to_delete}",
+            token,
+            repo,
+        )
 
     github_request(
         "POST",

@@ -43,6 +43,7 @@ from django.core.exceptions import (
 from django.core.paginator import Paginator
 from django.db import models, router, transaction
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.utils import get_blank_choice_label
 from django.forms.formsets import DELETION_FIELD_NAME, all_valid
 from django.forms.models import (
     BaseInlineFormSet,
@@ -661,6 +662,7 @@ class ModelAdmin(BaseModelAdmin):
     add_form_template = None
     change_form_template = None
     change_list_template = None
+    delete_confirmation_max_display = None
     delete_confirmation_template = None
     delete_selected_confirmation_template = None
     object_history_template = None
@@ -1049,11 +1051,13 @@ class ModelAdmin(BaseModelAdmin):
         actions = self._filter_actions_by_permissions(request, self._get_base_actions())
         return {name: (func, name, desc) for func, name, desc in actions}
 
-    def get_action_choices(self, request, default_choices=models.BLANK_CHOICE_DASH):
+    def get_action_choices(self, request, default_choices=None):
         """
         Return a list of choices for use in a form object. Each choice is a
         tuple (name, description).
         """
+        if default_choices is None:
+            default_choices = [("", get_blank_choice_label())]
         choices = [*default_choices]
         for func, name, description in self.get_actions(request).values():
             choice = (name, description % model_format_dict(self.opts))
@@ -2022,6 +2026,50 @@ class ModelAdmin(BaseModelAdmin):
             return queryset
         return queryset.filter(pk__in=object_pks)
 
+    def _get_formset_with_permissions(self, request, queryset, for_save=False):
+        """
+        Construct a changelist formset, and remove list_editable fields
+        for objects the user cannot change.
+        """
+        FormSet = self.get_changelist_formset(request)
+        if for_save:
+            formset = FormSet(data=request.POST, files=request.FILES, queryset=queryset)
+        else:
+            formset = FormSet(queryset=queryset)
+
+        for form in formset.forms:
+            if not self.has_change_permission(request, form.instance):
+                for field_name in self.list_editable:
+                    form.fields.pop(field_name, None)
+
+        return formset
+
+    def _save_formset(self, request, formset):
+        changecount = 0
+        with transaction.atomic(using=router.db_for_write(self.model)):
+            for form in formset.forms:
+                if not self.has_change_permission(request, form.instance):
+                    continue
+                if form.has_changed():
+                    obj = self.save_form(request, form, change=True)
+                    if obj._state.adding:
+                        raise BadRequest("list_editable does not allow adding.")
+                    self.save_model(request, obj, form, change=True)
+                    self.save_related(request, form, formsets=[], change=True)
+                    change_msg = self.construct_change_message(request, form, None)
+                    self.log_change(request, obj, change_msg)
+                    changecount += 1
+        if changecount:
+            msg = ngettext(
+                "%(count)s %(name)s was changed successfully.",
+                "%(count)s %(name)s were changed successfully.",
+                changecount,
+            ) % {
+                "count": changecount,
+                "name": model_ngettext(self.opts, changecount),
+            }
+            self.message_user(request, msg, messages.SUCCESS)
+
     @csrf_protect_m
     def changelist_view(self, request, extra_context=None):
         """
@@ -2113,39 +2161,19 @@ class ModelAdmin(BaseModelAdmin):
             modified_objects = self._get_list_editable_queryset(
                 request, FormSet.get_default_prefix()
             )
-            cl.formset = FormSet(request.POST, request.FILES, queryset=modified_objects)
+            cl.formset = self._get_formset_with_permissions(
+                request,
+                queryset=modified_objects,
+                for_save=True,
+            )
             if cl.formset.is_valid():
-                changecount = 0
-                with transaction.atomic(using=router.db_for_write(self.model)):
-                    for form in cl.formset.forms:
-                        if form.has_changed():
-                            obj = self.save_form(request, form, change=True)
-                            if obj._state.adding:
-                                raise BadRequest("list_editable does not allow adding.")
-                            self.save_model(request, obj, form, change=True)
-                            self.save_related(request, form, formsets=[], change=True)
-                            change_msg = self.construct_change_message(
-                                request, form, None
-                            )
-                            self.log_change(request, obj, change_msg)
-                            changecount += 1
-                if changecount:
-                    msg = ngettext(
-                        "%(count)s %(name)s was changed successfully.",
-                        "%(count)s %(name)s were changed successfully.",
-                        changecount,
-                    ) % {
-                        "count": changecount,
-                        "name": model_ngettext(self.opts, changecount),
-                    }
-                    self.message_user(request, msg, messages.SUCCESS)
+                self._save_formset(request, cl.formset)
 
                 return HttpResponseRedirect(request.get_full_path())
 
         # Handle GET -- construct a formset for display.
         elif cl.list_editable and self.has_change_permission(request):
-            FormSet = self.get_changelist_formset(request)
-            cl.formset = FormSet(queryset=cl.result_list)
+            cl.formset = self._get_formset_with_permissions(request, cl.result_list)
 
         # Build the list of media to be used by the formset.
         if cl.formset:
@@ -2267,6 +2295,7 @@ class ModelAdmin(BaseModelAdmin):
             "object": obj,
             "escaped_object": display_for_value(str(obj), EMPTY_VALUE_STRING),
             "deleted_objects": deleted_objects,
+            "delete_confirmation_max_display": self.delete_confirmation_max_display,
             "model_count": dict(model_count).items(),
             "perms_lacking": perms_needed,
             "protected": protected,

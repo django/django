@@ -188,6 +188,14 @@ class AggregationTests(TestCase):
         )
         self.assertEqual(qs.order_by("id").count(), len(qs.order_by("id")))
         self.assertEqual(qs.extra(order_by=["id"]).count(), len(qs.order_by("id")))
+        self.assertEqual(qs.order_by("-id").count(), len(qs.order_by("-id")))
+        self.assertEqual(
+            qs.order_by("-publications").count(), len(qs.order_by("-publications"))
+        )
+        self.assertEqual(
+            qs.order_by("-contact__name").count(), len(qs.order_by("-contact__name"))
+        )
+        self.assertEqual(qs.order_by("?").count(), len(qs.order_by("?")))
 
     def test_annotation_with_value(self):
         values = (

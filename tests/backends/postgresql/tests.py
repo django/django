@@ -326,6 +326,33 @@ class Tests(TestCase):
             new_connection.close_pool()
 
     @unittest.skipUnless(is_psycopg3, "psycopg3 specific test")
+    def test_pool_check_can_be_overridden(self):
+        def custom_check(conn):
+            pass
+
+        new_connection = no_pool_connection(alias="default_pool")
+        new_connection.settings_dict["OPTIONS"]["pool"] = {"check": custom_check}
+
+        for enable_checks in (True, False):
+            with self.subTest(CONN_HEALTH_CHECKS=enable_checks):
+                new_connection.settings_dict["CONN_HEALTH_CHECKS"] = enable_checks
+                try:
+                    self.assertIs(new_connection.pool._check, custom_check)
+                finally:
+                    new_connection.close_pool()
+
+    @unittest.skipUnless(is_psycopg3, "psycopg3 specific test")
+    def test_pool_options_not_mutated(self):
+        pool_options = {"min_size": 0, "max_size": 2}
+        new_connection = no_pool_connection(alias="default_pool")
+        new_connection.settings_dict["OPTIONS"]["pool"] = pool_options
+        try:
+            self.assertIsNotNone(new_connection.pool)
+        finally:
+            new_connection.close_pool()
+        self.assertEqual(pool_options, {"min_size": 0, "max_size": 2})
+
+    @unittest.skipUnless(is_psycopg3, "psycopg3 specific test")
     def test_cannot_open_new_connection_in_atomic_block(self):
         new_connection = no_pool_connection(alias="default_pool")
         new_connection.settings_dict["OPTIONS"]["pool"] = True

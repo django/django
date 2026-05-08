@@ -1,4 +1,4 @@
-@import url('widgets.css');
+@import url("widgets.css");
 
 /* FORM ROWS */
 
@@ -9,7 +9,8 @@
     border-bottom: 1px solid var(--hairline-color);
 }
 
-.form-row img, .form-row input {
+.form-row img,
+.form-row input {
     vertical-align: middle;
 }
 
@@ -45,15 +46,18 @@ form .form-row p {
 
 /* FORM LABELS */
 
-legend, label {
+legend,
+label {
     font-weight: normal;
     color: var(--body-quiet-color);
     font-size: 0.8125rem;
     padding: 0;
 }
 
-.required legend, legend.required,
-.required label, label.required {
+.required legend,
+legend.required,
+.required label,
+label.required {
     font-weight: bold;
 }
 
@@ -116,7 +120,9 @@ fieldset .inline-heading,
     padding: 0.5rem 0;
 }
 
-.aligned label + p, .aligned .checkbox-row + div.help, .aligned label + div.readonly {
+.aligned label + p,
+.aligned .checkbox-row + div.help,
+.aligned label + div.readonly {
     padding: 6px 0;
     margin-top: 0;
     margin-bottom: 0;
@@ -134,7 +140,8 @@ fieldset .inline-heading,
     margin-bottom: 0;
 }
 
-.colMS .aligned .vLargeTextField, .colMS .aligned .vXMLLargeTextField {
+.colMS .aligned .vLargeTextField,
+.colMS .aligned .vXMLLargeTextField {
     width: 350px;
 }
 
@@ -177,7 +184,8 @@ form .aligned table p {
     margin-top: -4px;
 }
 
-.colM .aligned .vLargeTextField, .colM .aligned .vXMLLargeTextField {
+.colM .aligned .vLargeTextField,
+.colM .aligned .vXMLLargeTextField {
     width: 610px;
 }
 
@@ -222,7 +230,8 @@ body.popup .submit-row {
     line-height: 0.9375rem;
 }
 
-.submit-row input, .submit-row a {
+.submit-row input,
+.submit-row a {
     margin: 0;
 }
 
@@ -278,7 +287,8 @@ body.popup .submit-row {
     border: none;
 }
 
-.vDateField, .vTimeField {
+.vDateField,
+.vTimeField {
     margin-right: 2px;
     margin-bottom: 4px;
 }
@@ -295,7 +305,8 @@ body.popup .submit-row {
     width: 30em;
 }
 
-.vLargeTextField, .vXMLLargeTextField {
+.vLargeTextField,
+.vXMLLargeTextField {
     width: 48em;
 }
 
@@ -319,7 +330,8 @@ body.popup .submit-row {
     width: 5em;
 }
 
-.vTextField, .vUUIDField {
+.vTextField,
+.vUUIDField {
     width: 20em;
 }
 

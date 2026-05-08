@@ -260,16 +260,43 @@ expression into the CSP header.
 
 To use this nonce in templates, the
 :func:`~django.template.context_processors.csp` context processor needs to be
-enabled. It adds a ``csp_nonce`` variable to the template context, allowing
-inline elements to include a matching ``nonce="{{ csp_nonce }}"`` attribute in
-inline scripts or styles.
+enabled. It adds a ``csp_nonce`` variable to the template context.
+
+.. versionchanged:: 6.1
+
+    The :ttag:`csp_nonce_attr` template tag was added, including support for
+    rendering :class:`~django.forms.Media` objects.
+
+For inline ``<script>`` and ``<style>`` elements, include the nonce directly
+using the context variable:
+
+.. code-block:: html+django
+
+    <script nonce="{{ csp_nonce }}">
+      // This inline JavaScript will be allowed.
+    </script>
+
+For external ``<script src="...">`` and ``<link rel="stylesheet">`` elements,
+use the :ttag:`csp_nonce_attr` template tag:
+
+.. code-block:: html+django
+
+    <script src="/path/to/script.js" {% csp_nonce_attr %}></script>
+    <link rel="stylesheet" href="/path/to/style.css" {% csp_nonce_attr %}>
+
+To render a :class:`~django.forms.Media` object's assets with the nonce
+applied, pass the object to the :ttag:`csp_nonce_attr` template tag:
+
+.. code-block:: html+django
+
+    {% csp_nonce_attr form.media %}
 
 The browser will only execute inline elements that include a ``nonce=<value>``
 attribute matching the one specified in the ``Content-Security-Policy`` (or
 ``Content-Security-Policy-Report-Only``) header. This mechanism provides
 fine-grained control over which inline code is allowed to run.
 
-If a template includes ``{{ csp_nonce }}`` but the policy does not include
+If a template includes the CSP nonce but the policy does not include
 :attr:`~django.utils.csp.CSP.NONCE`, the HTML will include a nonce attribute,
 but the header will lack the required source expression. In this case, the
 browser will block the inline script or style (or report it for report-only
@@ -291,7 +318,8 @@ the nonce and weakens security.
 
 To ensure nonce-based policies remain effective:
 
-* Avoid caching full responses that include ``{{ csp_nonce }}``.
+* Avoid caching full responses that include ``{{ csp_nonce }}`` or
+  :ttag:`csp_nonce_attr`.
 * If caching is necessary, use a strategy that injects a fresh nonce on each
   request, or consider refactoring your application to avoid inline scripts and
   styles altogether.
