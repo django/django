@@ -118,7 +118,9 @@ CSRF
 Decorators
 ~~~~~~~~~~
 
-* ...
+* :func:`~django.db.transaction.non_atomic_requests` no longer mutates the
+  original view function's ``_non_atomic_requests`` attribute when applied
+  multiple times (:ticket:`29303`).
 
 Email
 ~~~~~

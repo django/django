@@ -1,4 +1,5 @@
 from django.db import connection, transaction
+from django.http import HttpResponse
 from django.test import TransactionTestCase, skipUnlessDBFeature
 
 from .models import Thing
@@ -281,3 +282,18 @@ class TestConnectionOnCommit(TransactionTestCase):
         msg = "on_commit()'s callback must be a callable."
         with self.assertRaisesMessage(TypeError, msg):
             transaction.on_commit(None)
+
+    def test_non_atomic_requests_does_not_mutate_original(self):
+        """non_atomic_requests should return a new wrapper, not mutate the original."""
+
+        def my_view(request):
+            return HttpResponse("")
+
+        wrapped_once = transaction.non_atomic_requests(using="default")(my_view)
+        wrapped_twice = transaction.non_atomic_requests(using="other")(wrapped_once)
+
+        # wrapped_twice باید object جدید باشه
+        self.assertIsNot(wrapped_twice, wrapped_once)
+        # wrapped_once نباید دست خورده باشه
+        self.assertEqual(wrapped_once._non_atomic_requests, {"default"})
+        self.assertEqual(wrapped_twice._non_atomic_requests, {"default", "other"})
