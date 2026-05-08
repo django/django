@@ -246,8 +246,8 @@ class HttpRequest:
             else:
                 raise
         try:
-            value = signing.get_cookie_signer(salt=key + salt).unsign(
-                cookie_value, max_age=max_age
+            value = signing._unsign_cookie(
+                cookie_value, cookie_name=key, salt=salt, max_age=max_age
             )
         except signing.BadSignature:
             if default is not RAISE_ERROR:

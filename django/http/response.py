@@ -284,7 +284,9 @@ class HttpResponseBase:
         self.headers.setdefault(key, value)
 
     def set_signed_cookie(self, key, value, salt="", **kwargs):
-        value = signing.get_cookie_signer(salt=key + salt).sign(value)
+        value = signing.get_cookie_signer(
+            salt=signing._cookie_signer_salt(key, salt)
+        ).sign(value)
         return self.set_cookie(key, value, **kwargs)
 
     def delete_cookie(self, key, path="/", domain=None, samesite=None):
