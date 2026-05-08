@@ -3,8 +3,7 @@ XML serializer.
 """
 
 import json
-from contextlib import contextmanager
-from xml.dom import minidom, pulldom
+from xml.dom import pulldom
 from xml.sax import handler
 from xml.sax.expatreader import ExpatParser as _ExpatParser
 
@@ -14,25 +13,6 @@ from django.core.exceptions import ObjectDoesNotExist, SuspiciousOperation
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
 from django.utils.xmlutils import SimplerXMLGenerator, UnserializableContentError
-
-
-@contextmanager
-def fast_cache_clearing():
-    """Workaround for performance issues in minidom document checks.
-
-    Speeds up repeated DOM operations by skipping unnecessary full traversal
-    of the DOM tree.
-    """
-    module_helper_was_lambda = False
-    if original_fn := getattr(minidom, "_in_document", None):
-        module_helper_was_lambda = original_fn.__name__ == "<lambda>"
-        if not module_helper_was_lambda:
-            minidom._in_document = lambda node: bool(node.ownerDocument)
-    try:
-        yield
-    finally:
-        if original_fn and not module_helper_was_lambda:
-            minidom._in_document = original_fn
 
 
 class Serializer(base.Serializer):
@@ -267,8 +247,7 @@ class Deserializer(base.Deserializer):
     def __next__(self):
         for event, node in self.event_stream:
             if event == "START_ELEMENT" and node.nodeName == "object":
-                with fast_cache_clearing():
-                    self.event_stream.expandNode(node)
+                self.event_stream.expandNode(node)
                 return self._handle_object(node)
         raise StopIteration
 
