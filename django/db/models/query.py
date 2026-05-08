@@ -28,6 +28,7 @@ from django.db.models.constants import LOOKUP_SEP, OnConflict
 from django.db.models.deletion import Collector
 from django.db.models.expressions import Case, DatabaseDefault, F, OrderBy, Value, When
 from django.db.models.fetch_modes import FETCH_ONE
+from django.utils.asyncio import maybe_aclosing
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import PROHIBITED_FILTER_KWARGS, FilteredRelation, Q
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, ROW_COUNT
@@ -589,28 +590,29 @@ class QuerySet(AltersData):
         iterable = self._iterable_class(
             self, chunked_fetch=use_chunked_fetch, chunk_size=chunk_size
         )
-        if self._prefetch_related_lookups:
-            results = []
+        async with maybe_aclosing(aiter(iterable)) as iterator:
+            if self._prefetch_related_lookups:
+                results = []
 
-            async for item in iterable:
-                results.append(item)
-                if len(results) >= chunk_size:
+                async for item in iterator:
+                    results.append(item)
+                    if len(results) >= chunk_size:
+                        await aprefetch_related_objects(
+                            results, *self._prefetch_related_lookups
+                        )
+                        for result in results:
+                            yield result
+                        results.clear()
+
+                if results:
                     await aprefetch_related_objects(
                         results, *self._prefetch_related_lookups
                     )
                     for result in results:
                         yield result
-                    results.clear()
-
-            if results:
-                await aprefetch_related_objects(
-                    results, *self._prefetch_related_lookups
-                )
-                for result in results:
-                    yield result
-        else:
-            async for item in iterable:
-                yield item
+            else:
+                async for item in iterator:
+                    yield item
 
     def aggregate(self, *args, **kwargs):
         """

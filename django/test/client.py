@@ -18,6 +18,7 @@ from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.signals import got_request_exception, request_finished, request_started
+from django.utils.asyncio import maybe_aclosing
 from django.db import close_old_connections
 from django.http import HttpHeaders, HttpRequest, QueryDict, SimpleCookie
 from django.test import signals
@@ -128,8 +129,9 @@ def closing_iterator_wrapper(iterable, close):
 
 async def aclosing_iterator_wrapper(iterable, close):
     try:
-        async for chunk in iterable:
-            yield chunk
+        async with maybe_aclosing(aiter(iterable)) as it:
+            async for chunk in it:
+                yield chunk
     finally:
         request_finished.disconnect(close_old_connections)
         close()  # will fire request_finished

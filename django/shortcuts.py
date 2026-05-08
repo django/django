@@ -12,6 +12,7 @@ from django.http import (
 )
 from django.template import loader
 from django.urls import NoReverseMatch, reverse
+from django.utils.asyncio import maybe_aclosing
 from django.utils.functional import Promise
 from django.utils.translation import gettext as _
 
@@ -153,7 +154,8 @@ async def aget_list_or_404(klass, *args, **kwargs):
             "First argument to aget_list_or_404() must be a Model, Manager, or "
             f"QuerySet, not '{klass__name}'."
         )
-    obj_list = [obj async for obj in queryset.filter(*args, **kwargs)]
+    async with maybe_aclosing(aiter(queryset.filter(*args, **kwargs))) as it:
+        obj_list = [obj async for obj in it]
     if not obj_list:
         raise Http404(
             _("No %s matches the given query.") % queryset.model._meta.object_name

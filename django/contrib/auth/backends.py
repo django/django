@@ -7,6 +7,7 @@ from django.contrib.auth import (
 )
 from django.contrib.auth.models import Permission
 from django.db.models import Exists, OuterRef, Q
+from django.utils.asyncio import maybe_aclosing
 from django.views.decorators.debug import sensitive_variables
 
 UserModel = get_user_model()
@@ -139,11 +140,9 @@ class ModelBackend(BaseBackend):
             else:
                 perms = getattr(self, "_get_%s_permissions" % from_name)(user_obj)
             perms = perms.values_list("content_type__app_label", "codename").order_by()
-            setattr(
-                user_obj,
-                perm_cache_name,
-                {"%s.%s" % (ct, name) async for ct, name in perms},
-            )
+            async with maybe_aclosing(aiter(perms)) as it:
+                perm_set = {"%s.%s" % (ct, name) async for ct, name in it}
+            setattr(user_obj, perm_cache_name, perm_set)
         return getattr(user_obj, perm_cache_name)
 
     def get_user_permissions(self, user_obj, obj=None):
