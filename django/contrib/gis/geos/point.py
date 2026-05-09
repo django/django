@@ -72,7 +72,7 @@ class Point(GEOSGeometry):
             coords_buffer,
             1,
             int(ndim == 3),
-            0,  # hazM not yet supported.
+            0,  # hasM not yet supported.
         )
 
         return capi.create_point(cs)

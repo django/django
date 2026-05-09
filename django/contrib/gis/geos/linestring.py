@@ -1,7 +1,6 @@
 from ctypes import c_double
 
 from django.contrib.gis.geos import prototypes as capi
-from django.contrib.gis.geos.coordseq import GEOSCoordSeq
 from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.geometry import GEOSGeometry, LinearGeometryMixin
 from django.contrib.gis.geos.point import Point
@@ -110,16 +109,20 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
     _get_single_internal = _get_single_external
 
     def _set_list(self, length, items):
-        ndim = self._cs.dims
         hasz = self._cs.hasz  # I don't understand why these are different
         srid = self.srid
 
         # create a new coordinate sequence and populate accordingly
-        cs = GEOSCoordSeq(capi.create_cs(length, ndim), z=hasz)
-        for i, c in enumerate(items):
-            cs[i] = c
+        flat_items = tuple(item for t in items for item in t)
+        coords_buffer = (c_double * len(flat_items))(*flat_items)
+        cs_ptr = capi.coordseq_from_buffer(
+            coords_buffer,
+            length,
+            int(hasz),
+            0,  # hasM not yet supported.
+        )
 
-        ptr = self._init_func(cs.ptr)
+        ptr = self._init_func(cs_ptr)
         if ptr:
             capi.destroy_geom(self.ptr)
             self.ptr = ptr
