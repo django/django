@@ -2589,9 +2589,9 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         "Make sure the startproject management command creates a project"
         args = ["startproject", "testproject"]
         testproject_dir = os.path.join(self.test_dir, "testproject")
-
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
+        self.assertIn("Success! Created project", out)
         self.assertTrue(os.path.isdir(testproject_dir))
 
         # running again..
@@ -2912,7 +2912,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         ]
         testproject_dir = os.path.join(self.test_dir, "project_dir2")
         out, err = self.run_django_admin(args)
-        self.assertNoOutput(out)
+        self.assertIn("Success! Created project", out)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(testproject_dir))
 
@@ -3151,7 +3151,7 @@ class StartApp(AdminScriptTestCase):
         ]
         testapp_dir = os.path.join(self.test_dir, "my_app")
         out, err = self.run_django_admin(args)
-        self.assertNoOutput(out)
+        self.assertIn("Success! Created app", out)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(testapp_dir))
 
@@ -3163,7 +3163,7 @@ class StartApp(AdminScriptTestCase):
         ]
         testapp_dir = os.path.join(self.test_dir, "apps", "my_app")
         out, err = self.run_django_admin(args)
-        self.assertNoOutput(out)
+        self.assertIn("Success! Created app", out)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(testapp_dir))
 
@@ -3175,7 +3175,7 @@ class StartApp(AdminScriptTestCase):
         nested_args = ["startapp", "child", "parent/child"]
         child_app_dir = os.path.join(self.test_dir, "parent", "child")
         out, err = self.run_django_admin(nested_args)
-        self.assertNoOutput(out)
+        self.assertIn("Success! Created app", out)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(child_app_dir))
 
