@@ -23,19 +23,20 @@ GDAL_PIXEL_TYPES = {
     3: "GDT_Int16",  # Sixteen bit signed integer
     4: "GDT_UInt32",  # Thirty-two bit unsigned integer
     5: "GDT_Int32",  # Thirty-two bit signed integer
-    6: "GDT_Float32",  # Thirty-two bit floating point
-    7: "GDT_Float64",  # Sixty-four bit floating point
-    8: "GDT_CInt16",  # Complex Int16
-    9: "GDT_CInt32",  # Complex Int32
-    10: "GDT_CFloat32",  # Complex Float32
-    11: "GDT_CFloat64",  # Complex Float64
-    12: "GDT_UInt64",  # 64 bit unsigned integer (GDAL 3.5+).
-    13: "GDT_Int64",  # 64 bit signed integer (GDAL 3.5+).
-    14: "GDT_Int8",  # 8 bit signed integer (GDAL 3.7+).
+    6: "GDT_Float16",  # Sixteen bit floating point
+    7: "GDT_Float32",  # Thirty-two bit floating point
+    8: "GDT_Float64",  # Sixty-four bit floating point
+    9: "GDT_CInt16",  # Complex Int16
+    10: "GDT_CInt32",  # Complex Int32
+    11: "GDT_CFloat32",  # Complex Float32
+    12: "GDT_CFloat64",  # Complex Float64
+    13: "GDT_UInt64",  # 64 bit unsigned integer (GDAL 3.5+).
+    14: "GDT_Int64",  # 64 bit signed integer (GDAL 3.5+).
+    15: "GDT_Int8",  # 8 bit signed integer (GDAL 3.7+).
 }
 
 # A list of gdal datatypes that are integers.
-GDAL_INTEGER_TYPES = [1, 2, 3, 4, 5, 12, 13, 14]
+GDAL_INTEGER_TYPES = [1, 2, 3, 4, 5, 13, 14, 15]
 
 # Lookup values to convert GDAL pixel type indices into ctypes objects.
 # The GDAL band-io works with ctypes arrays to hold data to be written
