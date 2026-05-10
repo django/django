@@ -1373,16 +1373,26 @@ class GeneratedFieldTests(TestCase):
 
     @skipUnlessDBFeature("supports_stored_generated_columns")
     def test_output_field_check_error(self):
-        msg = "'max_digits' must be a positive integer."
-        with self.assertRaisesMessage(ValueError, msg):
+        class Model(models.Model):
+            value = models.DecimalField(max_digits=5, decimal_places=2)
+            field = models.GeneratedField(
+                expression=models.F("value") * 2,
+                output_field=models.DecimalField(max_digits=2, decimal_places=3),
+                db_persist=True,
+            )
 
-            class Model(models.Model):
-                value = models.DecimalField(max_digits=5, decimal_places=2)
-                field = models.GeneratedField(
-                    expression=models.F("value") * 2,
-                    output_field=models.DecimalField(max_digits=-1, decimal_places=-1),
-                    db_persist=True,
-                )
+        self.assertEqual(
+            Model._meta.get_field("field").check(databases={"default"}),
+            [
+                Error(
+                    "GeneratedField.output_field has errors:"
+                    "\n    'max_digits' must be greater or equal to "
+                    "'decimal_places'. (fields.E134)",
+                    obj=Model._meta.get_field("field"),
+                    id="fields.E223",
+                ),
+            ],
+        )
 
     @skipUnlessDBFeature("supports_stored_generated_columns")
     def test_output_field_charfield_unlimited_error(self):
