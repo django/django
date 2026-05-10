@@ -1754,6 +1754,17 @@ class DecimalField(Field):
                 raise ValueError("'max_digits' must be a positive integer.")
             if self.max_digits <= 0:
                 raise ValueError("'max_digits' must be a positive integer.")
+        if self.decimal_places is not None:
+            try:
+                self.decimal_places = int(self.decimal_places)
+            except (TypeError, ValueError):
+                raise ValueError(
+                    "'decimal_places' must be a non-negative integer."
+                )
+            if self.decimal_places < 0:
+                raise ValueError(
+                    "'decimal_places' must be a non-negative integer."
+                )
         super().__init__(verbose_name, name, **kwargs)
 
     def check(self, **kwargs):
@@ -1798,19 +1809,6 @@ class DecimalField(Field):
                             id="fields.E135",
                         ),
                     ]
-        else:
-            try:
-                decimal_places = int(self.decimal_places)
-                if decimal_places < 0:
-                    raise ValueError()
-            except ValueError:
-                return [
-                    checks.Error(
-                        "'decimal_places' must be a non-negative integer.",
-                        obj=self,
-                        id="fields.E131",
-                    )
-                ]
         return []
 
     def _check_max_digits(self, databases):
