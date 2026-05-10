@@ -1,9 +1,12 @@
 rules:
   dangerous-triggers:
+    # Before ignoring a file, assume all inputs are malicious, assign explicit
+    # minimal permissions, and do not use actions/checkout.
     ignore:
       - coverage_comment.yml
       - labels.yml
       - new_contributor_pr.yml
+      - check_pr_quality.yml
   unpinned-uses:
     config:
       policies:

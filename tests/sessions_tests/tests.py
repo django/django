@@ -1022,6 +1022,7 @@ class SessionMiddlewareTests(TestCase):
         # Handle the response through the middleware
         response = middleware(request)
         self.assertIs(response.cookies[settings.SESSION_COOKIE_NAME]["secure"], True)
+        self.assertEqual(response.headers["Vary"], "Cookie")
 
     @override_settings(SESSION_COOKIE_HTTPONLY=True)
     def test_httponly_session_cookie(self):
@@ -1162,6 +1163,7 @@ class SessionMiddlewareTests(TestCase):
             ),
             str(response.cookies[settings.SESSION_COOKIE_NAME]),
         )
+        self.assertEqual(response.headers["Vary"], "Cookie")
 
     def test_flush_empty_without_session_cookie_doesnt_set_cookie(self):
         def response_ending_session(request):
@@ -1177,6 +1179,32 @@ class SessionMiddlewareTests(TestCase):
         # A cookie should not be set.
         self.assertEqual(response.cookies, {})
         # The session is accessed so "Vary: Cookie" should be set.
+        self.assertEqual(response.headers["Vary"], "Cookie")
+
+    @override_settings(SESSION_SAVE_EVERY_REQUEST=True)
+    def test_save_every_request_with_non_empty_session_renews_session_cookie(self):
+        request = self.request_factory.get("/")
+        middleware = SessionMiddleware(self.get_response_touching_session)
+
+        # Make sure the request has a session.
+        middleware(request)
+
+        # A cookie should be set.
+        self.assertIs(request.session.is_empty(), False)
+        self.assertEqual(request.session["hello"], "world")
+
+        request.COOKIES[settings.SESSION_COOKIE_NAME] = request.session.session_key
+
+        def simple_view(request):
+            return HttpResponse("Session test")
+
+        middleware = SessionMiddleware(simple_view)
+        response = middleware(request)
+
+        # A cookie should be set because SESSION_SAVE_EVERY_REQUEST=True,
+        # even though the session wasn't touched.
+        self.assertIn(settings.SESSION_COOKIE_NAME, response.cookies)
+        # There's a session, so also Vary on it.
         self.assertEqual(response.headers["Vary"], "Cookie")
 
     def test_empty_session_saved(self):

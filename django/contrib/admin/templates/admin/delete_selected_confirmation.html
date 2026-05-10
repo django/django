@@ -1,5 +1,5 @@
 {% extends "admin/base_site.html" %}
-{% load i18n l10n admin_urls static %}
+{% load i18n l10n admin_urls static admin_filters %}
 
 {% block extrahead %}
     {{ block.super }}
@@ -21,16 +21,16 @@
 {% block content %}
 {% if perms_lacking %}
     <p>{% blocktranslate %}Deleting the selected {{ objects_name }} would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:{% endblocktranslate %}</p>
-    <ul>{{ perms_lacking|unordered_list }}</ul>
+    <ul>{{ perms_lacking|truncated_unordered_list:delete_confirmation_max_display }}</ul>
 {% elif protected %}
     <p>{% blocktranslate %}Deleting the selected {{ objects_name }} would require deleting the following protected related objects:{% endblocktranslate %}</p>
-    <ul>{{ protected|unordered_list }}</ul>
+    <ul>{{ protected|truncated_unordered_list:delete_confirmation_max_display }}</ul>
 {% else %}
     <p>{% blocktranslate %}Are you sure you want to delete the selected {{ objects_name }}? All of the following objects and their related items will be deleted:{% endblocktranslate %}</p>
     {% include "admin/includes/object_delete_summary.html" %}
     <h2>{% translate "Objects" %}</h2>
     {% for deletable_object in deletable_objects %}
-        <ul>{{ deletable_object|unordered_list }}</ul>
+        <ul>{{ deletable_object|truncated_unordered_list:delete_confirmation_max_display }}</ul>
     {% endfor %}
     <form method="post">{% csrf_token %}
     <div>

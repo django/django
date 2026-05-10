@@ -842,6 +842,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             *self._check_search_fields(admin_obj),
             *self._check_date_hierarchy(admin_obj),
             *self._check_actions(admin_obj),
+            *self._check_delete_confirmation_max_display(admin_obj),
         ]
 
     def _check_save_as(self, obj):
@@ -1085,6 +1086,25 @@ class ModelAdminChecks(BaseModelAdminChecks):
                 option="list_select_related",
                 obj=obj,
                 id="admin.E117",
+            )
+        else:
+            return []
+
+    def _check_delete_confirmation_max_display(self, obj):
+        """Check that delete_confirmation_max_display is
+        a non-negative integer or None."""
+
+        if obj.delete_confirmation_max_display is None:
+            return []
+        if (
+            not isinstance(obj.delete_confirmation_max_display, int)
+            or obj.delete_confirmation_max_display < 0
+        ):
+            return must_be(
+                "a non-negative integer or None",
+                option="delete_confirmation_max_display",
+                obj=obj,
+                id="admin.E131",
             )
         else:
             return []

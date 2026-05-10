@@ -15,6 +15,10 @@ class EmailBackend(ConsoleEmailBackend):
             self.file_path = file_path
         else:
             self.file_path = getattr(settings, "EMAIL_FILE_PATH", None)
+        if self.file_path is None:
+            raise ImproperlyConfigured(
+                "The EMAIL_FILE_PATH setting must be set to use the file EmailBackend."
+            )
         self.file_path = os.path.abspath(self.file_path)
         try:
             os.makedirs(self.file_path, exist_ok=True)

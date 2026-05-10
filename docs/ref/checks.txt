@@ -592,8 +592,6 @@ The following checks are run if you use the :option:`check --deploy` option:
   ``'django-insecure-'`` indicating that it was generated automatically by
   Django. Please generate a long and random value, otherwise many of Django's
   security-critical features will be vulnerable to attack.
-* **security.E026**: The CSP setting ``<SETTING_NAME>`` must be a dictionary
-  (got ``<value>`` instead).
 
 The following checks verify that your security-related settings are correctly
 configured:
@@ -604,6 +602,11 @@ configured:
   correct number of arguments.
 * **security.E102**: The CSRF failure view ``'path.to.view'`` could not be
   imported.
+* **security.E026**: The CSP setting ``<SETTING_NAME>`` must be a dictionary
+  (got ``<value>`` instead).
+* **security.W027**: Your Content Security Policy includes ``CSP.NONCE`` and
+  :class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` is enabled,
+  but ``django.template.context_processors.csp`` is not configured.
 
 Signals
 -------
@@ -816,6 +819,8 @@ with the admin site:
   method for the ``<action>`` action.
 * **admin.E130**: ``__name__`` attributes of actions defined in
   ``<modeladmin>`` must be unique. Name ``<name>`` is not unique.
+* **admin.E131**: The value of ``delete_confirmation_max_display`` must be a
+  non-negative integer or ``None``.
 
 ``InlineModelAdmin``
 ~~~~~~~~~~~~~~~~~~~~
@@ -967,7 +972,8 @@ The following checks are performed on any model using a
 The following checks verify that :mod:`django.contrib.sites` is correctly
 configured:
 
-* **sites.E101**: The :setting:`SITE_ID` setting must be an integer.
+* **sites.E101**: The :setting:`SITE_ID` setting must be of type ``<type>``.
+  *or* The :setting:`SITE_ID` setting failed to validate: ``<error>``.
 
 ``staticfiles``
 ---------------

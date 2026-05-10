@@ -99,6 +99,11 @@ Minor features
   preserve :ref:`named groups <field-choices-named-groups>` (e.g.
   ``choices=[("Group", [("1", "Item")]), ...]``).
 
+* The :attr:`~django.contrib.admin.ModelAdmin.delete_confirmation_max_display`
+  option allows customizing how many objects are displayed on admin delete
+  confirmation pages before the remainder is truncated. The default is
+  ``None`` (no truncation).
+
 * In order to improve accessibility of the admin change forms:
 
   * Form fields are now shown below their respective labels instead of next to
@@ -148,6 +153,9 @@ Minor features
   <django.contrib.gis.db.models.functions.NumDimensions>` database function
   allow filtering geometries by the number of dimensions on PostGIS and
   SpatiaLite.
+
+* :class:`~django.contrib.gis.forms.widgets.OpenLayersWidget` is now based on
+  OpenLayers 10.9.0 (previously 7.2.2).
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -209,7 +217,16 @@ Cache
 CSP
 ~~~
 
-* ...
+* The new :ttag:`csp_nonce_attr` template tag renders the CSP nonce attribute
+  on ``<script>`` and ``<link>`` elements, or renders a
+  :class:`~django.forms.Media` object's assets with the nonce applied, when the
+  :func:`~django.template.context_processors.csp` context processor is
+  configured. See :ref:`csp-nonce` for details.
+
+* A new ``security.W027`` system check warns when
+  :class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` is enabled
+  with ``CSP.NONCE`` in a CSP policy but
+  ``django.template.context_processors.csp`` is not configured.
 
 CSRF
 ~~~~
@@ -244,7 +261,21 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* The new asset object :class:`~django.forms.Stylesheet` is available for
+  adding custom HTML-attributes to stylesheet links in form media. See
+  :ref:`paths as objects <form-media-asset-objects>` for more details.
+
+* The new constant ``django.db.models.fields.BLANK_CHOICE_LABEL`` defines a
+  more accessible and translatable default label for the blank choice in
+  forms, which is appended to most ``choices`` lists. The transitional setting
+  :setting:`USE_BLANK_CHOICE_DASH` allows you to revert back to the old
+  default label.
+
+* :class:`~django.forms.FilePathField` now provides a
+  :meth:`~django.forms.FilePathField.set_choices` method to scan the
+  directory at :attr:`~django.forms.FilePathField.path` and refresh the
+  field's choices. This allows per-request refreshing when called in a form's
+  ``__init__()``.
 
 Generic Views
 ~~~~~~~~~~~~~
@@ -315,6 +346,15 @@ Models
   :class:`~django.db.models.query.QuerySet` is ordered and the ordering is
   deterministic.
 
+* The new :class:`~django.db.models.BitAnd`, :class:`~django.db.models.BitOr`,
+  and :class:`~django.db.models.BitXor` aggregates return the bitwise ``AND``,
+  ``OR``, ``XOR``, respectively. These aggregates were previously included only
+  in ``contrib.postgres``.
+
+* :class:`django.db.models.BinaryField` now validates Base64 input strictly.
+  Invalid Base64 strings now raise ``ValidationError`` instead of being
+  silently accepted.
+
 Pagination
 ~~~~~~~~~~
 
@@ -325,6 +365,10 @@ Requests and Responses
 
 * :attr:`HttpRequest.multipart_parser_class <django.http.HttpRequest.multipart_parser_class>`
   can now be customized to use a different multipart parser class.
+
+* :class:`~django.http.HttpResponseRedirect` (and its subclasses), as well as
+  the :func:`~django.shortcuts.redirect` shortcut, now accept a ``max_length``
+  parameter to override the default maximum URL length limit.
 
 Security
 ~~~~~~~~
@@ -354,6 +398,9 @@ Tasks
 * The :func:`~django.tasks.task` decorator now accepts ``**kwargs``, which are
   forwarded to the backend's
   :attr:`~django.tasks.backends.base.BaseTaskBackend.task_class`.
+
+* :class:`~django.tasks.Task` and :class:`~django.tasks.TaskResult` instances
+  can now be pickled and unpickled.
 
 Templates
 ~~~~~~~~~
@@ -420,12 +467,27 @@ backends.
   ``get_geom_placeholder_sql`` and is expected to return a two-elements tuple
   composed of an SQL format string and a tuple of associated parameters.
 
+* Set the new ``DatabaseFeatures.supports_bit_aggregations`` attribute to
+  ``False`` if the database doesn't support bitwise aggregations.
+
 :mod:`django.contrib.admin`
 ---------------------------
 
 * The ``wide`` class is removed, as it was made obsolete by the new layout.
 
 * The ``object-tools`` block is hoisted out of the ``content`` block in forms.
+
+* The undocumented ``InclusionAdminNode.__init__()`` now takes the template tag
+  ``name`` as the first positional argument.
+
+:mod:`django.contrib.auth`
+--------------------------
+
+* Under ASGI, :class:`~django.contrib.auth.middleware.RemoteUserMiddleware` no
+  longer prefixes ``HTTP_`` when looking up custom values in ``request.META``.
+  For example, to send ``-H "AuthUser": ...``, the ``header`` attribute should
+  be ``HTTP_AUTHUSER``. This restores the behavior prior to Django 5.2. (The
+  default value of ``REMOTE_USER`` is not affected.)
 
 :mod:`django.contrib.gis`
 -------------------------
@@ -489,6 +551,9 @@ Miscellaneous
 * :class:`~django.contrib.contenttypes.fields.GenericForeignKey` now uses a
   separate descriptor class: the private ``GenericForeignKeyDescriptor``.
 
+* The undocumented ``django.template.library.parse_bits()`` function no longer
+  accepts the ``takes_context`` argument.
+
 * The minimum supported version of SQLite is increased from 3.31.0 to 3.37.0.
 
 * The :lookup:`iexact=None <iexact>` lookup on
@@ -499,6 +564,25 @@ Miscellaneous
 * :meth:`~.QuerySet.first` and :meth:`~.QuerySet.last` no longer order by the
   primary key when a ``QuerySet``'s ordering has been forcibly cleared by
   calling :meth:`~.QuerySet.order_by` with no arguments.
+
+* The :class:`~django.core.files.File` class now always evaluates to ``True``
+  in boolean contexts, rather than relying on the ``name`` attribute. The
+  built-in subclasses ``FieldFile``, ``UploadedFile``,
+  ``TemporaryUploadedFile``, ``InMemoryUploadedFile``, and
+  ``SimpleUploadedFile`` retain the previous behavior of evaluating based on
+  the ``name`` attribute.
+
+* ``django.http.multipartparser.MultiPartParser`` now uses strict Base64
+  validation when decoding encoded request data. Previously, invalid data could
+  be silently ignored or result in empty values. Invalid data now raises
+  ``MultiPartParserError``.
+
+* ``django.core.cache.backends.db.DatabaseCache`` now uses strict Base64
+  validation when decoding cached values. Invalid Base64 data will raise an
+  exception instead of being silently ignored. Cache values generated by Django
+  are unaffected, as they are always valid Base64. However, existing cache
+  entries containing non-standard or corrupted Base64 data may no longer be
+  readable.
 
 .. _deprecated-features-6.1:
 
@@ -519,6 +603,11 @@ Miscellaneous
   used as the top-level value. :lookup:`Key and index lookups <jsonfield.key>`
   are unaffected by this deprecation.
 
+* The ``django.db.models.fields.BLANK_CHOICE_DASH`` constant is deprecated
+  in favor of the new constant ``django.db.models.fields.BLANK_CHOICE_LABEL``.
+
+* The :setting:`USE_BLANK_CHOICE_DASH` transitional setting is deprecated.
+
 * The undocumented ``get_placeholder`` method of
   :class:`~django.db.models.Field` is deprecated in favor of the newly
   introduced ``get_placeholder_sql`` method, which has the same input signature
@@ -531,6 +620,22 @@ Miscellaneous
   object passed as the ``compiler`` argument to the ``as_sql()`` method of
   :ref:`expressions <writing-your-own-query-expressions>`, is deprecated in
   favor of the newly introduced ``quote_name()`` method.
+
+* The ``BitAnd``, ``BitOr``, and ``BitXor`` classes in
+  ``django.contrib.postgres.aggregates`` are deprecated in favor of the
+  generally available :class:`~django.db.models.BitAnd`,
+  :class:`~django.db.models.BitOr`, and :class:`~django.db.models.BitXor`
+  classes.
+
+* Support for double-dot variable lookups, like ``{{ book..title }}``, is
+  deprecated. This syntax maps to a lookup of the empty string, which is
+  normally a mistake.
+
+* The default value of the ``algorithm`` argument for
+  ``django.utils.crypto.salted_hmac()`` and
+  ``django.core.signing.base64_hmac()`` is deprecated and will change from
+  ``"sha1"`` to ``"sha256"`` in Django 7.0. Pass an explicit ``algorithm``
+  to silence the deprecation warning.
 
 Features removed in 6.1
 =======================

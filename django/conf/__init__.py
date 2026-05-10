@@ -9,18 +9,27 @@ for a list of all possible variables.
 import importlib
 import os
 import time
-import traceback
 import warnings
 from pathlib import Path
 
-import django
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import (
+    RemovedInDjango70Warning,
+    django_file_prefixes,
+    warn_about_external_use,
+)
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 DEFAULT_STORAGE_ALIAS = "default"
 STATICFILES_STORAGE_ALIAS = "staticfiles"
+
+USE_BLANK_CHOICE_DASH_DEPRECATED_MSG = (
+    "The USE_BLANK_CHOICE_DASH setting is deprecated. If you wish to define "
+    "your own default blank choice label, override "
+    "django.db.models.fields.BLANK_CHOICE_LABEL in your app's ready() method."
+)
 
 
 class SettingsReference(str):
@@ -138,15 +147,6 @@ class LazySettings(LazyObject):
         """Return True if the settings have already been configured."""
         return self._wrapped is not empty
 
-    def _show_deprecation_warning(self, message, category):
-        stack = traceback.extract_stack()
-        # Show a warning if the setting is used outside of Django.
-        # Stack index: -1 this line, -2 the property, -3 the
-        # LazyObject __getattribute__(), -4 the caller.
-        filename, _, _, _ = stack[-4]
-        if not filename.startswith(os.path.dirname(django.__file__)):
-            warnings.warn(message, category, stacklevel=2)
-
 
 class Settings:
     def __init__(self, settings_module):
@@ -226,6 +226,12 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
+        if name == "USE_BLANK_CHOICE_DASH":
+            warnings.warn(
+                USE_BLANK_CHOICE_DASH_DEPRECATED_MSG,
+                RemovedInDjango70Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
         super().__setattr__(name, value)
 
     def __delattr__(self, name):
@@ -252,6 +258,35 @@ class UserSettingsHolder:
         return "<%(cls)s>" % {
             "cls": self.__class__.__name__,
         }
+
+
+def _show_settings_deprecation_warning(message, category):
+    """Issue a warning when external code uses a deprecated setting.
+
+    Allow Django's own code to use the setting without emitting the warning.
+    This function should only be called from within settings-related code.
+    """
+    warn_about_external_use(
+        message,
+        category,
+        skip_name_prefixes=(
+            # Include all settings-related code here. (Do not include all of
+            # "django.conf", which would incorrectly identify any deprecated
+            # settings usage inside django.conf.urls as external.)
+            "django.conf.LazySettings",
+            "django.conf.Settings",
+            "django.conf.UserSettingsHolder",
+            "django.utils.functional.LazyObject",  # LazySettings superclass.
+            # override_settings() and similar test utils must be treated as
+            # settings-related code, else deprecated settings usage in tests
+            # would be incorrectly identified as internal.
+            "django.test.utils.override_settings",
+            "django.test.utils.modify_settings",
+            "django.test.utils.TestContextDecorator",
+            "django.test.testcases.SimpleTestCase.settings",
+            "django.test.testcases.SimpleTestCase.modify_settings",
+        ),
+    )
 
 
 settings = LazySettings()

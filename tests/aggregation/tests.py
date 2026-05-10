@@ -10,6 +10,9 @@ from django.db import NotSupportedError, connection
 from django.db.models import (
     AnyValue,
     Avg,
+    BitAnd,
+    BitOr,
+    BitXor,
     Case,
     CharField,
     Count,
@@ -1957,7 +1960,20 @@ class AggregateTestCase(TestCase):
             Count("age", default=0)
 
     def test_aggregation_default_unset(self):
-        for Aggregate in [Avg, Max, Min, StdDev, Sum, Variance]:
+        test_aggregates = [Avg, Max, Min, StdDev, Sum, Variance]
+        if (
+            connection.features.supports_bit_aggregations
+            and connection.features.supports_default_in_bit_aggregations
+        ):
+            # Some databases (e.g. Oracle, MySQL, MariaDB) don't return NULL on
+            # empty sets:
+            # - BitAnd on MySQL and MariaDB returns 18446744073709551615 (all
+            #   bits set to 1),
+            # - BitAnd on Oracle returns 0
+            # - BitOr and BitXor on Oracle, MySQL, and MariaDB return 0
+            # As a consequence, they don't support the default parameter.
+            test_aggregates.extend([BitAnd, BitOr, BitXor])
+        for Aggregate in test_aggregates:
             with self.subTest(Aggregate):
                 result = Author.objects.filter(age__gt=100).aggregate(
                     value=Aggregate("age"),
@@ -1965,7 +1981,13 @@ class AggregateTestCase(TestCase):
                 self.assertIsNone(result["value"])
 
     def test_aggregation_default_zero(self):
-        for Aggregate in [Avg, Max, Min, StdDev, Sum, Variance]:
+        test_aggregates = [Avg, Max, Min, StdDev, Sum, Variance]
+        if (
+            connection.features.supports_bit_aggregations
+            and connection.features.supports_default_in_bit_aggregations
+        ):
+            test_aggregates.extend([BitAnd, BitOr, BitXor])
+        for Aggregate in test_aggregates:
             with self.subTest(Aggregate):
                 result = Author.objects.filter(age__gt=100).aggregate(
                     value=Aggregate("age", default=0),
@@ -1973,7 +1995,13 @@ class AggregateTestCase(TestCase):
                 self.assertEqual(result["value"], 0)
 
     def test_aggregation_default_integer(self):
-        for Aggregate in [Avg, Max, Min, StdDev, Sum, Variance]:
+        test_aggregates = [Avg, Max, Min, StdDev, Sum, Variance]
+        if (
+            connection.features.supports_bit_aggregations
+            and connection.features.supports_default_in_bit_aggregations
+        ):
+            test_aggregates.extend([BitAnd, BitOr, BitXor])
+        for Aggregate in test_aggregates:
             with self.subTest(Aggregate):
                 result = Author.objects.filter(age__gt=100).aggregate(
                     value=Aggregate("age", default=21),
@@ -2353,6 +2381,101 @@ class AggregateTestCase(TestCase):
                 func_instance = function(Value(1), True)
                 with self.assertRaisesMessage(TypeError, msg):
                     super(function, func_instance).__init__(Value(1), Value(2))
+
+    @skipIfDBFeature("supports_bit_aggregations")
+    def test_bit_aggregations_not_supported(self):
+        for BitAggregate in [BitAnd, BitOr, BitXor]:
+            msg = f"{BitAggregate.name} is not supported on {connection.vendor}."
+            with (
+                self.subTest(BitAggregate.name),
+                self.assertRaisesMessage(NotSupportedError, msg),
+            ):
+                Publisher.objects.aggregate(BitAggregate("num_awards"))
+
+    @skipUnlessDBFeature("supports_bit_aggregations")
+    @skipIfDBFeature("supports_default_in_bit_aggregations")
+    def test_bit_aggregations_default_not_supported(self):
+        for BitAggregate in [BitAnd, BitOr, BitXor]:
+            msg = (
+                f"{BitAggregate.name} does not support the default parameter on "
+                f"{connection.vendor}."
+            )
+            with (
+                self.subTest(BitAggregate.name),
+                self.assertRaisesMessage(NotSupportedError, msg),
+            ):
+                Publisher.objects.aggregate(BitAggregate("num_awards", default=21))
+
+    @skipUnlessDBFeature("supports_bit_aggregations")
+    def test_bit_and(self):
+        Publisher.objects.create(name="Albatros", num_awards=0)
+        Publisher.objects.create(name="Newish")
+        values = Publisher.objects.filter(
+            Q(num_awards__in=[0, 1]) | Q(num_awards__isnull=True)
+        ).aggregate(bitand=BitAnd("num_awards"))
+        self.assertEqual(values, {"bitand": 0})
+
+    @skipUnlessDBFeature("supports_bit_aggregations")
+    def test_bit_and_on_only_true_values(self):
+        values = Publisher.objects.filter(num_awards=1).aggregate(
+            bitand=BitAnd("num_awards")
+        )
+        self.assertEqual(values, {"bitand": 1})
+
+    @skipUnlessDBFeature("supports_bit_aggregations")
+    def test_bit_and_on_only_false_values(self):
+        Publisher.objects.create(name="Albatros", num_awards=0)
+        values = Publisher.objects.filter(num_awards=0).aggregate(
+            bitand=BitAnd("num_awards")
+        )
+        self.assertEqual(values, {"bitand": 0})
+
+    @skipUnlessDBFeature("supports_bit_aggregations")
+    def test_bit_or(self):
+        Publisher.objects.create(name="Albatros", num_awards=0)
+        Publisher.objects.create(name="Newish")
+        values = Publisher.objects.filter(
+            Q(num_awards__in=[0, 1]) | Q(num_awards__isnull=True)
+        ).aggregate(bitor=BitOr("num_awards"))
+        self.assertEqual(values, {"bitor": 1})
+
+    @skipUnlessDBFeature("supports_bit_aggregations")
+    def test_bit_or_on_only_true_values(self):
+        values = Publisher.objects.filter(num_awards=1).aggregate(
+            bitor=BitOr("num_awards")
+        )
+        self.assertEqual(values, {"bitor": 1})
+
+    @skipUnlessDBFeature("supports_bit_aggregations")
+    def test_bit_or_on_only_false_values(self):
+        Publisher.objects.create(name="Albatros", num_awards=0)
+        values = Publisher.objects.filter(num_awards=0).aggregate(
+            bitor=BitOr("num_awards")
+        )
+        self.assertEqual(values, {"bitor": 0})
+
+    @skipUnlessDBFeature("supports_bit_aggregations")
+    def test_bit_xor(self):
+        Publisher.objects.create(name="Newish")
+        values = Publisher.objects.filter(
+            Q(num_awards__in=[1, 3]) | Q(num_awards__isnull=True)
+        ).aggregate(bitxor=BitXor("num_awards"))
+        self.assertEqual(values, {"bitxor": 2})
+
+    @skipUnlessDBFeature("supports_bit_aggregations")
+    def test_bit_xor_on_only_true_values(self):
+        values = Publisher.objects.filter(
+            num_awards=1,
+        ).aggregate(bitxor=BitXor("num_awards"))
+        self.assertEqual(values, {"bitxor": 1})
+
+    @skipUnlessDBFeature("supports_bit_aggregations")
+    def test_bit_xor_on_only_false_values(self):
+        Publisher.objects.create(name="Albatros", num_awards=0)
+        values = Publisher.objects.filter(
+            num_awards=0,
+        ).aggregate(bitxor=BitXor("num_awards"))
+        self.assertEqual(values, {"bitxor": 0})
 
     def test_string_agg_requires_delimiter(self):
         with self.assertRaises(TypeError):

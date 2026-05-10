@@ -285,9 +285,9 @@ The Django wrappers for database exceptions behave exactly the same as
 the underlying database exceptions. See :pep:`249`, the Python Database API
 Specification v2.0, for further information.
 
-As per :pep:`3134`, a ``__cause__`` attribute is set with the original
-(underlying) database exception, allowing access to any additional
-information provided.
+A :attr:`~BaseException.__cause__` attribute is set with the original
+(underlying) database exception, allowing access to any additional information
+provided.
 
 .. exception:: models.ProtectedError
 

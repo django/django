@@ -83,3 +83,20 @@ jobs:
         with:
           advanced-security: false
           annotations: true
+
+  biome:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: '**/package.json'
+      - run: npm install
+      - run: npx biome ci

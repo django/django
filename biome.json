@@ -1,0 +1,52 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.4.12/schema.json",
+    "files": {
+        "includes": [
+            "django/contrib/admin/static/admin/css/**/*.css",
+            "!django/contrib/admin/static/admin/css/vendor/**",
+            "django/contrib/gis/static/gis/css/**/*.css",
+            "docs/_theme/**/*.css",
+            "!docs/_theme/djangodocs/static/fontawesome/**",
+            "!docs/_theme/djangodocs/static/reset-fonts-grids.css",
+            "!**/*.min.css",
+            "django/contrib/admin/static/admin/js/**/*.js",
+            "!django/contrib/admin/static/admin/js/vendor/**",
+            "django/contrib/gis/static/gis/js/**/*.js",
+            "js_tests/**/*.js",
+            "!**/*.min.js"
+        ]
+    },
+    "formatter": {
+        "enabled": true,
+        "useEditorconfig": true
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "complexity": {
+                "noArguments": "off",
+                "noImportantStyles": "off",
+                "noUselessLoneBlockStatements": "off",
+                "useArrowFunction": "off",
+                "useIndexOf": "off",
+                "useOptionalChain": "off"
+            },
+            "correctness": {
+                "noUnusedFunctionParameters": "off",
+                "noUnusedVariables": "off",
+                "useParseIntRadix": "off"
+            },
+            "style": {
+                "noDescendingSpecificity": "off",
+                "useTemplate": "off"
+            },
+            "suspicious": {
+                "noRedundantUseStrict": "off"
+            }
+        }
+    },
+    "json": {
+        "linter": { "enabled": false },
+        "formatter": { "enabled": false }
+    }
+}

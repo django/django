@@ -11,7 +11,7 @@ from itertools import groupby
 
 from django.conf import settings
 from django.http import QueryDict
-from django.utils import timezone
+from django.utils import csp, timezone
 from django.utils.datastructures import DeferredSubDict
 from django.utils.html import conditional_escape, escape, format_html
 from django.utils.lorem_ipsum import paragraphs, words
@@ -1685,3 +1685,8 @@ def do_with(parser, token):
     nodelist = parser.parse(("endwith",))
     parser.delete_first_token()
     return WithNode(None, None, nodelist, extra_context=extra_context)
+
+
+@register.simple_tag(takes_context=True)
+def csp_nonce_attr(context, media=None):
+    return csp.nonce_attr(context, media)

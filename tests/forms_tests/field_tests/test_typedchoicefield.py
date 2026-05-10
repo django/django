@@ -1,6 +1,7 @@
 import decimal
 
 from django.core.exceptions import ValidationError
+from django.db.models.utils import get_blank_choice_label
 from django.forms import TypedChoiceField
 from django.test import SimpleTestCase
 
@@ -62,7 +63,11 @@ class TypedChoiceFieldTest(SimpleTestCase):
         self.assertFalse(f.has_changed("1", "1"))
 
         f = TypedChoiceField(
-            choices=[("", "---------"), ("a", "a"), ("b", "b")],
+            choices=[
+                ("", get_blank_choice_label()),
+                ("a", "a"),
+                ("b", "b"),
+            ],
             coerce=str,
             required=False,
             initial=None,

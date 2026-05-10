@@ -219,6 +219,20 @@ class DeferTests(AssertionMixin, TestCase):
         with self.assertNumQueries(1):
             p1.value
 
+    def test_defer_fk_fetch_mode_fetch_peers(self):
+        p1, p2 = Primary.objects.fetch_mode(FETCH_PEERS).defer("related")
+        with self.assertNumQueries(2):
+            self.assertEqual(p1.related, self.s1)
+        with self.assertNumQueries(0):
+            self.assertEqual(p2.related, self.s1)
+
+    def test_only_fk_fetch_mode_fetch_peers(self):
+        p1, p2 = Primary.objects.fetch_mode(FETCH_PEERS).only("name")
+        with self.assertNumQueries(2):
+            self.assertEqual(p1.related, self.s1)
+        with self.assertNumQueries(0):
+            self.assertEqual(p2.related, self.s1)
+
     def test_only_fetch_mode_raise(self):
         p1 = Primary.objects.fetch_mode(RAISE).only("name").get(name="p1")
         msg = "Fetching of Primary.value blocked."

@@ -646,6 +646,29 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
     :doc:`/topics/i18n/formatting`. ``%U``, ``%W``, and ``%j`` formats are not
     supported by this widget.
 
+    .. admonition:: Using the HTML5 "date" input type
+
+        If you are targeting browsers that support the
+        `HTML5 "date" input type`_, you can override the ``input_type``
+        attribute to enable the browser’s native date picker::
+
+            class MyDateInput(forms.DateInput):
+                input_type = "date"
+                format = "%Y-%m-%d"
+
+        Alternatively::
+
+            DateInput(attrs={"type": "date"}, format="%Y-%m-%d")
+
+        HTML5 date inputs expect values in the ISO format ``YYYY-MM-DD``. If a
+        different format is provided, the field may appear empty even when a
+        value exists. Setting the ``format`` attribute controls how Django
+        provides the value, but the browser controls how it is displayed.
+        Hence, the ``format`` attribute and the :setting:`DATE_INPUT_FORMATS`
+        setting will have no effect on the displayed value.
+
+        .. _HTML5 "date" input type: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/date
+
 ``DateTimeInput``
 ~~~~~~~~~~~~~~~~~
 
