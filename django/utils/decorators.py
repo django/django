@@ -1,6 +1,6 @@
 "Functions that help with dynamically creating decorators for views."
 
-from functools import partial, update_wrapper, wraps
+from functools import update_wrapper, wraps
 from inspect import iscoroutinefunction, markcoroutinefunction
 
 
@@ -41,7 +41,12 @@ def _multi_decorate(decorators, method):
         # 'self' argument, but it's a closure over self so it can call
         # 'func'. Also, wrap method.__get__() in a function because new
         # attributes can't be set on bound method objects, only on functions.
-        bound_method = wraps(method)(partial(method.__get__(self, type(self))))
+        @wraps(method)
+        def bound_method(*args2, **kwargs2):
+            return method.__get__(self, type(self))(*args2, **kwargs2)
+
+        if getattr(self, "view_is_async", False):
+            markcoroutinefunction(bound_method)
         for dec in decorators:
             bound_method = dec(bound_method)
         return bound_method(*args, **kwargs)

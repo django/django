@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import (
     user_passes_test,
 )
 from django.http import HttpResponse
-from django.test import SimpleTestCase
+from django.test import RequestFactory, SimpleTestCase
 from django.utils.decorators import method_decorator
 from django.utils.functional import keep_lazy, keep_lazy_text, lazy
 from django.utils.safestring import mark_safe
@@ -23,6 +23,7 @@ from django.views.decorators.http import (
     require_safe,
 )
 from django.views.decorators.vary import vary_on_cookie, vary_on_headers
+from django.views.generic import View
 
 
 def fully_decorated(request):
@@ -696,3 +697,48 @@ class AsyncMethodDecoratorTests(SimpleTestCase):
         method = Test().method
         self.assertIs(iscoroutinefunction(method), True)
         self.assertEqual(await method(), "returned: tests")
+
+    async def test_async_view_never_cache_applied(self):
+        """
+        @method_decorator applied to View class synchronous dispatch should
+        function correctly for async view i.e. with async def get().
+        """
+        factory = RequestFactory()
+        request = factory.get("/dummy-url/")
+
+        @method_decorator(never_cache, name="dispatch")
+        class AsyncView(View):
+            async def get(self, request, *args, **kwargs):
+                return HttpResponse("Async GET response")
+
+        async_view = AsyncView.as_view()
+        response = await async_view(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Cache-Control", response)
+        self.assertIn("no-cache", response["Cache-Control"])
+        self.assertEqual(response.content, b"Async GET response")
+
+    async def test_sync_view_never_cache_applied(self):
+        """
+        @method_decorator applied to View class synchronous dispatch should
+        function correctly for sync view i.e. with def get().
+        """
+        factory = RequestFactory()
+        request = factory.get("/dummy-url/")
+
+        @method_decorator(never_cache, name="dispatch")
+        class SyncView(View):
+            def get(self, request, *args, **kwargs):
+                return HttpResponse("Sync GET response")
+
+        sync_view = SyncView.as_view()
+        response = sync_view(request)
+
+        self.assertEqual(iscoroutinefunction(sync_view), False)
+        self.assertEqual(iscoroutinefunction(View.dispatch), False)
+        self.assertEqual(iscoroutinefunction(SyncView.as_view()), False)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Cache-Control", response)
+        self.assertIn("no-cache", response["Cache-Control"])
+        self.assertEqual(response.content, b"Sync GET response")
