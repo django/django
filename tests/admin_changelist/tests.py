@@ -2102,7 +2102,7 @@ class SeleniumTests(AdminSeleniumTestCase):
                 alert.text,
                 "You have selected an action, and you haven’t made any "
                 "changes on individual fields. You’re probably looking for "
-                "the Go button rather than the Save button.",
+                "the Run button rather than the Save button.",
             )
         finally:
             alert.dismiss()
