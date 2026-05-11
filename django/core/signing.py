@@ -38,10 +38,12 @@ import base64
 import datetime
 import json
 import time
+import warnings
 import zlib
 
 from django.conf import settings
 from django.utils.crypto import constant_time_compare, salted_hmac
+from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.encoding import force_bytes
 from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
@@ -96,7 +98,17 @@ def b64_decode(s):
     return base64.urlsafe_b64decode(s + pad)
 
 
-def base64_hmac(salt, value, key, algorithm="sha1"):
+# RemovedInDjango70Warning: algorithm="sha256"
+def base64_hmac(salt, value, key, algorithm=None):
+    if algorithm is None:
+        warnings.warn(
+            "The default argument for algorithm in base64_hmac() will change "
+            "from 'sha1' to 'sha256' in Django 7.0. Pass an explicit "
+            "algorithm to silence this warning.",
+            category=RemovedInDjango70Warning,
+            skip_file_prefixes=django_file_prefixes(),
+        )
+        algorithm = "sha1"
     return b64_encode(
         salted_hmac(salt, value, key, algorithm=algorithm).digest()
     ).decode()

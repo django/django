@@ -2616,6 +2616,18 @@ def hello_world_view(request, value):
     return HttpResponse("Hello World %s" % value)
 
 
+def hello_world_view_patch_vary_headers_asterisk(request, value):
+    response = HttpResponse("Hello World %s" % value)
+    patch_vary_headers(response, ("*",))
+    return response
+
+
+def hello_world_view_vary_headers_includes_asterisk(request, value):
+    response = HttpResponse("Hello World %s" % value)
+    response["Vary"] = "Cookie, *, Pony"
+    return response
+
+
 def csrf_view(request):
     return HttpResponse(csrf(request)["csrf_token"])
 
@@ -2848,6 +2860,19 @@ class CacheMiddlewareTest(SimpleTestCase):
                 response = view_with_cache(request, "1")
                 self.assertEqual(response.content, b"Hello World 1")
                 response = view_with_cache(request, "2")
+                self.assertEqual(response.content, b"Hello World 2")
+
+    def test_vary_asterisk_not_cached(self):
+        views_with_cache = (
+            cache_page(3)(hello_world_view_patch_vary_headers_asterisk),
+            cache_page(3)(hello_world_view_vary_headers_includes_asterisk),
+        )
+        for view in views_with_cache:
+            with self.subTest(view=view):
+                request = self.factory.get("/view/")
+                response = view(request, "1")
+                self.assertEqual(response.content, b"Hello World 1")
+                response = view(request, "2")
                 self.assertEqual(response.content, b"Hello World 2")
 
     def test_sensitive_cookie_not_cached(self):

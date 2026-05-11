@@ -1,4 +1,4 @@
-/*global gettext, pgettext, get_format, quickElement, removeChildren*/
+/*global gettext, pgettext, get_format, interpolate, quickElement, removeChildren*/
 /*
 calendar.js - Calendar functions by Adrian Holovaty
 depends on core.js for utility functions like removeChildren or quickElement
@@ -92,9 +92,32 @@ depends on core.js for utility functions like removeChildren or quickElement
             }
             return days;
         },
+        formatDate: function (day, month, year) {
+            return interpolate(
+                gettext("%(month)s %(day)s, %(year)s"),
+                {
+                    month: CalendarNamespace.monthsOfYear[month - 1],
+                    day: day,
+                    year: year,
+                },
+                true,
+            );
+        },
+        // Return the current date adjusted for the server timezone.
+        serverToday: function () {
+            const today = new Date();
+            const serverOffset = document.body.dataset.adminUtcOffset;
+            if (serverOffset) {
+                const localOffset = today.getTimezoneOffset() * -60;
+                today.setTime(
+                    today.getTime() + 1000 * (serverOffset - localOffset),
+                );
+            }
+            return today;
+        },
         draw: function (month, year, div_id, callback, selected) {
             // month = 1-12, year = 1-9999
-            const today = new Date();
+            const today = CalendarNamespace.serverToday();
             const todayDay = today.getDate();
             const todayMonth = today.getMonth() + 1;
             const todayYear = today.getFullYear();
@@ -133,13 +156,16 @@ depends on core.js for utility functions like removeChildren or quickElement
             // Draw days-of-week header
             let tableRow = quickElement("tr", tableBody);
             for (let i = 0; i < 7; i++) {
-                quickElement(
-                    "th",
-                    tableRow,
+                const dayAbbrev =
+                    CalendarNamespace.daysOfWeekAbbrev[
+                        (i + CalendarNamespace.firstDayOfWeek) % 7
+                    ];
+                const dayInitial =
                     CalendarNamespace.daysOfWeekInitial[
                         (i + CalendarNamespace.firstDayOfWeek) % 7
-                    ],
-                );
+                    ];
+                const th = quickElement("th", tableRow, dayInitial);
+                th.setAttribute("aria-label", dayAbbrev);
             }
 
             const startingPos = new Date(
@@ -206,6 +232,30 @@ depends on core.js for utility functions like removeChildren or quickElement
                     "href",
                     "#",
                 );
+                let ariaLabel = CalendarNamespace.formatDate(
+                    currentDay,
+                    month,
+                    year,
+                );
+                const isToday =
+                    currentDay === todayDay &&
+                    month === todayMonth &&
+                    year === todayYear;
+                const isSelected =
+                    isSelectedMonth && currentDay === selected.getUTCDate();
+                if (isToday && isSelected) {
+                    ariaLabel = interpolate(
+                        gettext("%s (today, current selection)"),
+                        [ariaLabel],
+                    );
+                } else if (isToday) {
+                    ariaLabel = interpolate(gettext("%s (today)"), [ariaLabel]);
+                } else if (isSelected) {
+                    ariaLabel = interpolate(gettext("%s (current selection)"), [
+                        ariaLabel,
+                    ]);
+                }
+                link.setAttribute("aria-label", ariaLabel);
                 link.addEventListener("click", calendarMonth(year, month));
                 currentDay++;
             }
@@ -229,7 +279,7 @@ depends on core.js for utility functions like removeChildren or quickElement
         //     calendar is clicked
         this.div_id = div_id;
         this.callback = callback;
-        this.today = new Date();
+        this.today = CalendarNamespace.serverToday();
         this.currentMonth = this.today.getMonth() + 1;
         this.currentYear = this.today.getFullYear();
         if (typeof selected !== "undefined") {

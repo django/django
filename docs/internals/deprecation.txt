@@ -80,6 +80,11 @@ details on these changes.
 * Support for double-dot variable lookup, like ``{{ book..title }}``,
   is removed.
 
+* The default value of the ``algorithm`` argument for
+  ``django.utils.crypto.salted_hmac()`` and
+  ``django.core.signing.base64_hmac()`` will change from ``"sha1"`` to
+  ``"sha256"``.
+
 .. _deprecation-removed-in-6.1:
 
 6.1

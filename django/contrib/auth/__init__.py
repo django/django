@@ -1,5 +1,7 @@
 import re
 
+from asgiref.sync import sync_to_async
+
 from django.apps import apps as django_apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
@@ -407,6 +409,6 @@ def check_password_with_timing_attack_mitigation(user, password):
 async def acheck_password_with_timing_attack_mitigation(user, password):
     """See check_user_with_timing_attack_mitigation."""
     if user is None:
-        get_user_model()().set_password(password)
+        await sync_to_async(get_user_model()().set_password)(password)
     else:
         return await user.acheck_password(password)
