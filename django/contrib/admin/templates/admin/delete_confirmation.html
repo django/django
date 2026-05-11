@@ -3,8 +3,8 @@
 
 {% block extrahead %}
     {{ block.super }}
-    {{ media }}
-    <script src="{% static 'admin/js/cancel.js' %}" async></script>
+    {% csp_nonce_attr media %}
+    <script src="{% static 'admin/js/cancel.js' %}" async {% csp_nonce_attr %}></script>
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation{% endblock %}

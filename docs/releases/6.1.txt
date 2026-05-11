@@ -282,6 +282,11 @@ CSP
   with ``CSP.NONCE`` in a CSP policy but
   ``django.template.context_processors.csp`` is not configured.
 
+* CSP nonce attributes are now added on ``<script>``, ``<style>``, and
+  ``<link>`` elements in admin templates and all built-in templates when the
+  :func:`~django.template.context_processors.csp` context processor is
+  configured. See :ref:`csp-nonce-config` for setup instructions.
+
 CSRF
 ~~~~
 
