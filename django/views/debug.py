@@ -673,6 +673,8 @@ def technical_404_response(request, exception):
     return HttpResponseNotFound(t.render(c))
 
 
+@csp_override({})
+@csp_report_only_override({})
 def default_urlconf(request):
     """Create an empty URLconf 404 error response."""
     with builtin_template_path("default_urlconf.html").open(encoding="utf-8") as fh:

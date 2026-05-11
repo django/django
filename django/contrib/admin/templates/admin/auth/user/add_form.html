@@ -8,5 +8,5 @@
 {% endblock %}
 {% block extrahead %}
   {{ block.super }}
-  <link rel="stylesheet" href="{% static 'admin/css/unusable_password_field.css' %}">
+  <link rel="stylesheet" href="{% static 'admin/css/unusable_password_field.css' %}" {% csp_nonce_attr %}>
 {% endblock %}
