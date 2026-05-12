@@ -68,6 +68,16 @@ need to :meth:`~Model.save`.
 
         book = Book.objects.create_book("Pride and Prejudice")
 
+.. admonition:: Setting attributes does not convert types
+
+    Setting a model attribute does not convert the value to the field's Python
+    type. That conversion happens when the model is :ref:`validated
+    <validating-objects>`. Although a field assigned a value of a different
+    type (for example, a string assigned to a
+    :class:`~django.db.models.UUIDField`) may be converted when
+    :meth:`~Model.save` executes a query, the in-memory instance will keep the
+    original value until it is :ref:`reloaded <refreshing-objects>`.
+
 Customizing model loading
 -------------------------
 
@@ -130,6 +140,8 @@ are loaded from the database::
 The example above shows a full ``from_db()`` implementation to clarify how that
 is done. In this case it would be possible to use a ``super()`` call in the
 ``from_db()`` method.
+
+.. _refreshing-objects:
 
 Refreshing objects from database
 ================================

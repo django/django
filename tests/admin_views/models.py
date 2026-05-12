@@ -128,6 +128,8 @@ class ChapterXtra2(models.Model):
 
 class RowLevelChangePermissionModel(models.Model):
     name = models.CharField(max_length=100, blank=True)
+    can_change = models.BooleanField(default=False)
+    can_view = models.BooleanField(default=False)
 
 
 class CustomArticle(models.Model):

@@ -36,6 +36,38 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+May 5, 2026 - :cve:`2026-5766`
+------------------------------
+
+Potential denial-of-service vulnerability in ASGI requests via file upload
+limit bypass.
+`Full description
+<https://www.djangoproject.com/weblog/2026/may/05/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <ad8f9e19e0897ea45ded7c046ff28daf6f773e92>`
+* Django 5.2 :commit:`(patch) <2ec27eda3ba6c14f0856e6e3eb1df07c41fd95e6>`
+
+May 5, 2026 - :cve:`2026-35192`
+-------------------------------
+
+Session fixation via public cached pages and ``SESSION_SAVE_EVERY_REQUEST``.
+`Full description
+<https://www.djangoproject.com/weblog/2026/may/05/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <1b0184aa657bc3f5859aeb0206e7c1e94e48b103>`
+* Django 5.2 :commit:`(patch) <47cf968c125e3fab317e10fe150ec479e745f995>`
+
+May 5, 2026 - :cve:`2026-6907`
+------------------------------
+
+Potential exposure of private data due to incorrect handling of ``Vary: *`` in
+``UpdateCacheMiddleware``.
+`Full description
+<https://www.djangoproject.com/weblog/2026/may/05/security-releases/>`__
+
+* Django 6.0 :commit:`(patch) <44ad76efcbe3c4ca0f08bb9dabe916f6374596c9>`
+* Django 5.2 :commit:`(patch) <2115d4eaee15107f5cd290d7cfcc5ffe3ad43661>`
+
 April 7, 2026 - :cve:`2026-3902`
 --------------------------------
 

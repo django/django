@@ -498,6 +498,22 @@ class BaseModelBackendTest:
         await aauthenticate(username="no_such_user", password="test")
         self.assertEqual(CountingMD5PasswordHasher.calls, 1)
 
+    async def test_aauthentication_timing_async_bridge(self):
+        with patch(
+            "django.contrib.auth.hashers.sync_to_async",
+            return_value=mock.AsyncMock(return_value=(True, False)),
+        ) as mocked_adapter:
+            username = getattr(self.user, self.UserModel.USERNAME_FIELD)
+            await aauthenticate(username=username, password="test")
+            mocked_adapter.assert_called_once()
+
+        with patch(
+            "django.contrib.auth.sync_to_async", return_value=mock.AsyncMock()
+        ) as mocked_adapter:
+            username = getattr(self.user, self.UserModel.USERNAME_FIELD)
+            await aauthenticate(username="no_such_user", password="test")
+            mocked_adapter.assert_called_once()
+
     @override_settings(
         PASSWORD_HASHERS=["auth_tests.test_auth_backends.CountingMD5PasswordHasher"]
     )

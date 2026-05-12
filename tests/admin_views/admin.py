@@ -292,13 +292,17 @@ class ArticleAdmin2(admin.ModelAdmin):
 
 
 class RowLevelChangePermissionModelAdmin(admin.ModelAdmin):
+    # These fields aren't intended to be modified by the change form. By
+    # making them read-only, they don't need to be included in post data.
+    readonly_fields = ("can_change", "can_view")
+
     def has_change_permission(self, request, obj=None):
-        """Only allow changing objects with even id number"""
-        return request.user.is_staff and (obj is not None) and (obj.id % 2 == 0)
+        """Only allow changing objects with can_change=True."""
+        return request.user.is_staff and obj is not None and obj.can_change
 
     def has_view_permission(self, request, obj=None):
-        """Only allow viewing objects if id is a multiple of 3."""
-        return request.user.is_staff and obj is not None and obj.id % 3 == 0
+        """Only allow viewing objects with can_view=True."""
+        return request.user.is_staff and obj is not None and obj.can_view
 
 
 class CustomArticleAdmin(admin.ModelAdmin):

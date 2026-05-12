@@ -1,3 +1,4 @@
+import binascii
 import copy
 import datetime
 import decimal
@@ -2743,6 +2744,9 @@ class URLField(CharField):
 class BinaryField(Field):
     description = _("Raw binary data")
     empty_values = [None, b""]
+    default_error_messages = {
+        "invalid": _("“%(value)s” is not a valid binary value."),
+    }
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("editable", False)
@@ -2800,7 +2804,15 @@ class BinaryField(Field):
     def to_python(self, value):
         # If it's a string, it should be base64-encoded data
         if isinstance(value, str):
-            return memoryview(b64decode(value.encode("ascii")))
+            try:
+                return memoryview(b64decode(value.encode("ascii"), validate=True))
+            except (UnicodeEncodeError, binascii.Error):
+                raise exceptions.ValidationError(
+                    self.error_messages["invalid"],
+                    code="invalid",
+                    params={"value": value},
+                )
+
         return value
 
 

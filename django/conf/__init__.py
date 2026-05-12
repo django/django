@@ -147,21 +147,6 @@ class LazySettings(LazyObject):
         """Return True if the settings have already been configured."""
         return self._wrapped is not empty
 
-    def _show_deprecation_warning(self, message, category):
-        """Issue a warning when external code uses a deprecated setting.
-
-        Allow Django's own code to use it without emitting the warning. This
-        function should only be called from within LazySettings methods.
-        """
-        warn_about_external_use(
-            message,
-            category,
-            skip_name_prefixes=(
-                "django.conf.LazySettings",
-                "django.utils.functional.LazyObject",
-            ),
-        )
-
 
 class Settings:
     def __init__(self, settings_module):
@@ -273,6 +258,35 @@ class UserSettingsHolder:
         return "<%(cls)s>" % {
             "cls": self.__class__.__name__,
         }
+
+
+def _show_settings_deprecation_warning(message, category):
+    """Issue a warning when external code uses a deprecated setting.
+
+    Allow Django's own code to use the setting without emitting the warning.
+    This function should only be called from within settings-related code.
+    """
+    warn_about_external_use(
+        message,
+        category,
+        skip_name_prefixes=(
+            # Include all settings-related code here. (Do not include all of
+            # "django.conf", which would incorrectly identify any deprecated
+            # settings usage inside django.conf.urls as external.)
+            "django.conf.LazySettings",
+            "django.conf.Settings",
+            "django.conf.UserSettingsHolder",
+            "django.utils.functional.LazyObject",  # LazySettings superclass.
+            # override_settings() and similar test utils must be treated as
+            # settings-related code, else deprecated settings usage in tests
+            # would be incorrectly identified as internal.
+            "django.test.utils.override_settings",
+            "django.test.utils.modify_settings",
+            "django.test.utils.TestContextDecorator",
+            "django.test.testcases.SimpleTestCase.settings",
+            "django.test.testcases.SimpleTestCase.modify_settings",
+        ),
+    )
 
 
 settings = LazySettings()

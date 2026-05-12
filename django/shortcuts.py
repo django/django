@@ -14,6 +14,7 @@ from django.template import loader
 from django.urls import NoReverseMatch, reverse
 from django.utils.asyncio import maybe_aclosing
 from django.utils.functional import Promise
+from django.utils.http import MAX_URL_REDIRECT_LENGTH
 from django.utils.translation import gettext as _
 
 
@@ -28,7 +29,14 @@ def render(
     return HttpResponse(content, content_type, status)
 
 
-def redirect(to, *args, permanent=False, preserve_request=False, **kwargs):
+def redirect(
+    to,
+    *args,
+    permanent=False,
+    preserve_request=False,
+    max_length=MAX_URL_REDIRECT_LENGTH,
+    **kwargs,
+):
     """
     Return an HttpResponseRedirect to the appropriate URL for the arguments
     passed.
@@ -52,6 +60,7 @@ def redirect(to, *args, permanent=False, preserve_request=False, **kwargs):
     return redirect_class(
         resolve_url(to, *args, **kwargs),
         preserve_request=preserve_request,
+        max_length=max_length,
     )
 
 

@@ -103,9 +103,21 @@ depends on core.js for utility functions like removeChildren or quickElement
                 true,
             );
         },
+        // Return the current date adjusted for the server timezone.
+        serverToday: function () {
+            const today = new Date();
+            const serverOffset = document.body.dataset.adminUtcOffset;
+            if (serverOffset) {
+                const localOffset = today.getTimezoneOffset() * -60;
+                today.setTime(
+                    today.getTime() + 1000 * (serverOffset - localOffset),
+                );
+            }
+            return today;
+        },
         draw: function (month, year, div_id, callback, selected) {
             // month = 1-12, year = 1-9999
-            const today = new Date();
+            const today = CalendarNamespace.serverToday();
             const todayDay = today.getDate();
             const todayMonth = today.getMonth() + 1;
             const todayYear = today.getFullYear();
@@ -267,7 +279,7 @@ depends on core.js for utility functions like removeChildren or quickElement
         //     calendar is clicked
         this.div_id = div_id;
         this.callback = callback;
-        this.today = new Date();
+        this.today = CalendarNamespace.serverToday();
         this.currentMonth = this.today.getMonth() + 1;
         this.currentYear = this.today.getFullYear();
         if (typeof selected !== "undefined") {
