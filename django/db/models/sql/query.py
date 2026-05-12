@@ -2402,6 +2402,8 @@ class Query(BaseExpression):
         self.extra_order_by = ()
         if clear_default:
             self.default_ordering = False
+        for query in self.combined_queries:
+            query.clear_ordering(force=False, clear_default=clear_default)
 
     def set_group_by(self, allow_aliases=True):
         """

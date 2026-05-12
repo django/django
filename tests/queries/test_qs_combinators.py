@@ -578,6 +578,23 @@ class QuerySetSetOperationTests(TestCase):
             ordered=False,
         )
 
+    def test_double_union_in_with_default_ordering(self):
+        e1 = ExtraInfo.objects.create(value=7, info="e1")
+        Author.objects.bulk_create(
+            [Author(num=i, name=f"a{i}", extra=e1) for i in range(1, 8)]
+        )
+        qs1 = Author.objects.filter(num__lt=2)
+        qs2 = Author.objects.filter(num__gt=6)
+        qs3 = Author.objects.filter(num=4)
+        double_union = qs1.union(qs2).union(qs3)
+        # Target a column (num) other than the ordering column (name). Before,
+        # on Postgres: "each UNION query must have the same number of columns".
+        self.assertQuerySetEqual(
+            Author.objects.filter(num__in=double_union.values("num")).order_by("-name"),
+            ["a7", "a4", "a1"],
+            transform=lambda au: au.name,
+        )
+
     @skipUnlessDBFeature(
         "supports_slicing_ordering_in_compound", "allow_sliced_subqueries_with_in"
     )
