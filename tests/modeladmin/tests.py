@@ -21,7 +21,8 @@ from django.db import models
 from django.db.models.utils import get_blank_choice_label
 from django.forms.widgets import Select
 from django.test import RequestFactory, SimpleTestCase, TestCase
-from django.test.utils import isolate_apps
+from django.test.utils import ignore_warnings, isolate_apps
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import Band, Concert, Song
 
@@ -1026,6 +1027,54 @@ class ModelAdminTests(TestCase):
             repr(ma),
             "<ModelAdmin: model=Band site=AdminSite(name='admin')>",
         )
+
+    def test_list_select_related_true_deprecated(self):
+        msg = (
+            r"Setting ModelAdmin.list_select_related to True is deprecated. "
+            r"Use False or a list or tuple of fields to fetch instead."
+        )
+        # RemovedInDjango70Warning:
+        # with self.assertRaisesMessage(ValueError, msg)
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+
+            class TestModelAdmin(ModelAdmin):
+                list_select_related = True
+
+    # RemovedInDjango70Warning: when the deprecation ends, remove.
+    def test_list_select_related_true_deprecated_subclass(self):
+        with ignore_warnings(
+            category=RemovedInDjango70Warning,
+            message=r"Setting ModelAdmin.list_select_related to True is deprecated\.",
+        ):
+
+            class BaseTestModelAdmin(ModelAdmin):
+                list_select_related = True
+
+        # Does not warn
+        class TestModelAdmin(BaseTestModelAdmin):
+            pass
+
+    # RemovedInDjango70Warning: when the deprecation ends, rename.
+    def test_get_list_select_related_returns_true_deprecated(self):
+        msg = (
+            "Returning True from ModelAdmin.get_list_select_related() is "
+            "deprecated. Return False or a list or tuple of fields to fetch "
+            "instead."
+        )
+
+        class TestModelAdmin(ModelAdmin):
+            def get_list_select_related(self, request):
+                return True
+
+        request = RequestFactory().get("/")
+        request.user = User.objects.create_superuser(
+            username="bob", email="bob@test.com", password="test"
+        )
+
+        # RemovedInDjango70Warning:
+        # with self.assertRaisesMessage(ValueError, msg)
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            TestModelAdmin(Band, self.site).get_changelist_instance(request)
 
 
 class ModelAdminPermissionTests(SimpleTestCase):

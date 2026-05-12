@@ -1299,15 +1299,15 @@ class UniqueConstraintTests(TestCase):
 
     @skipUnlessDBFeature("supports_comparing_boolean_expr")
     def test_validate_nullable_condition(self):
-        GeneratedFieldStoredProduct.objects.create(name="Product", price=42)
+        UniqueConstraintProduct.objects.create(name="Product", age=42)
         constraint = models.UniqueConstraint(
             fields=["name"],
-            name="uniq_name_for_positive_price",
-            condition=models.Q(price__gt=0),
+            name="uniq_name_for_positive_age",
+            condition=models.Q(age__gt=0),
         )
         constraint.validate(
-            GeneratedFieldStoredProduct,
-            GeneratedFieldStoredProduct(name="Product", price=None),
+            UniqueConstraintProduct,
+            UniqueConstraintProduct(name="Product", age=None),
         )
 
     def test_name(self):

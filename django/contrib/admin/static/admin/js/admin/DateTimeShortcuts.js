@@ -52,17 +52,7 @@
         },
         // Return the current time while accounting for the server timezone.
         now: function () {
-            const serverOffset = document.body.dataset.adminUtcOffset;
-            if (serverOffset) {
-                const localNow = new Date();
-                const localOffset = localNow.getTimezoneOffset() * -60;
-                localNow.setTime(
-                    localNow.getTime() + 1000 * (serverOffset - localOffset),
-                );
-                return localNow;
-            } else {
-                return new Date();
-            }
+            return CalendarNamespace.serverToday();
         },
         // Add a warning when the time zone in the browser and backend do not match.
         addTimezoneWarning: function (inp) {

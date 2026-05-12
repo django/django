@@ -113,6 +113,10 @@ class UpdateCacheMiddleware(MiddlewareMixin):
         ):
             return response
 
+        # Don't cache responses when the Vary header contains '*'.
+        if has_vary_header(response, "*"):
+            return response
+
         # Page timeout takes precedence over the "max-age" and the default
         # cache timeout.
         timeout = self.page_timeout

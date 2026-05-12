@@ -422,7 +422,7 @@ class Argon2PasswordHasher(BasePasswordHasher):
         variety, *_, b64salt, hash = rest.split("$")
         # Add padding.
         b64salt += "=" * (-len(b64salt) % 4)
-        salt = base64.b64decode(b64salt).decode("latin1")
+        salt = base64.b64decode(b64salt, validate=True).decode("latin1")
         return {
             "algorithm": algorithm,
             "hash": hash,
