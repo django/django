@@ -102,8 +102,8 @@ class UpdateCacheMiddleware(MiddlewareMixin):
 
         # Don't cache responses when the Cache-Control header is set to
         # private, no-cache, or no-store.
-        cache_control = response.get("Cache-Control", ())
-        if any(
+        cache_control = response.get("Cache-Control", "").lower()
+        if cache_control and any(
             directive in cache_control
             for directive in (
                 "private",

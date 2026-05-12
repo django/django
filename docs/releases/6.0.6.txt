@@ -37,6 +37,22 @@ Connections configured with :setting:`EMAIL_USE_SSL` are not affected.
 This issue has severity "low" according to the :ref:`Django security policy
 <severity-levels>`.
 
+CVE-2026-8404: Potential exposure of private data via case-sensitive ``Cache-Control`` directives
+=================================================================================================
+
+:class:`~django.middleware.cache.UpdateCacheMiddleware` and
+:func:`~django.views.decorators.cache.cache_page` incorrectly cached responses
+marked with private ``Cache-Control`` directives when using mixed or uppercase
+values (e.g. ``Private``).
+
+The :func:`~django.views.decorators.cache.cache_control` decorator and
+:func:`~django.utils.cache.patch_cache_control` function were not affected,
+since they normalize directives to lowercase. This issue only affects responses
+where ``Cache-Control`` is set manually.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
 Bugfixes
 ========
 
