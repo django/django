@@ -4646,8 +4646,8 @@ class QuerySetCommentTests(TestCase):
 
     def test_select_single_comment(self):
         with CaptureQueriesContext(connection) as ctx:
-            list(NamedCategory.objects.comment("blog/views.py:50"))
-        self.assertIn("SELECT /* blog/views.py:50 */ ", ctx.captured_queries[0]["sql"])
+            list(NamedCategory.objects.comment("blog.views.py 50"))
+        self.assertIn("SELECT /* blog.views.py 50 */ ", ctx.captured_queries[0]["sql"])
 
     def test_select_multiple_comments_preserve_order(self):
         with CaptureQueriesContext(connection) as ctx:
@@ -4661,11 +4661,6 @@ class QuerySetCommentTests(TestCase):
             ctx.captured_queries[0]["sql"],
         )
 
-    def test_select_empty_comment_allowed(self):
-        with CaptureQueriesContext(connection) as ctx:
-            list(NamedCategory.objects.comment("").comment("non-empty"))
-        self.assertIn("SELECT /*  */ /* non-empty */ ", ctx.captured_queries[0]["sql"])
-
     def test_select_with_distinct(self):
         with CaptureQueriesContext(connection) as ctx:
             list(NamedCategory.objects.distinct().comment("after distinct"))
@@ -4677,8 +4672,8 @@ class QuerySetCommentTests(TestCase):
 
     def test_select_with_filter_preserves_comment(self):
         with CaptureQueriesContext(connection) as ctx:
-            list(NamedCategory.objects.comment("request-id=123").filter(name="x"))
-        self.assertIn("/* request-id=123 */", ctx.captured_queries[0]["sql"])
+            list(NamedCategory.objects.comment("request-id 123").filter(name="x"))
+        self.assertIn("/* request-id 123 */", ctx.captured_queries[0]["sql"])
 
     def test_select_subquery(self):
         with CaptureQueriesContext(connection) as ctx:
@@ -4726,8 +4721,8 @@ class QuerySetCommentTests(TestCase):
 
     def test_unicode_comment(self):
         with CaptureQueriesContext(connection) as ctx:
-            list(NamedCategory.objects.comment("источник=cron"))
-        self.assertIn("/* источник=cron */", ctx.captured_queries[0]["sql"])
+            list(NamedCategory.objects.comment("источник cron"))
+        self.assertIn("/* источник cron */", ctx.captured_queries[0]["sql"])
 
     def test_comment_inside_union_leg(self):
         qs = NamedCategory.objects.comment("first leg").union(
@@ -4754,27 +4749,28 @@ class QuerySetCommentTests(TestCase):
             with self.subTest(bad=bad), self.assertRaisesMessage(TypeError, msg):
                 NamedCategory.objects.comment(bad)
 
-    def test_rejects_comment_delimiters(self):
+    def test_rejects_disallowed_comment_characters(self):
         msg = (
-            "QuerySet.comment() cannot include '/*', '*/', or null bytes; "
-            "remove them before calling comment()."
+            "QuerySet.comment() argument must contain only letters, numbers, "
+            "spaces, periods, underscores, and hyphens."
         )
         for bad in [
+            "",
+            "blog/views.py:50",
+            "request-id=123",
             "foo /* bar",
             "foo */ bar",
             "*/-- DROP TABLE x;--/*",
             "/* nested */",
+            "quote '",
+            'quote "',
+            "semi;colon",
+            "hash#tag",
+            "comma,value",
+            *(f"name{chr(c)}" for c in chain(range(32), range(0x7F, 0xA0))),
         ]:
             with self.subTest(bad=bad), self.assertRaisesMessage(ValueError, msg):
                 NamedCategory.objects.comment(bad)
-
-    def test_rejects_null_byte(self):
-        msg = (
-            "QuerySet.comment() cannot include '/*', '*/', or null bytes; "
-            "remove them before calling comment()."
-        )
-        with self.assertRaisesMessage(ValueError, msg):
-            NamedCategory.objects.comment("\x00")
 
 
 class QuerySetCloningTests(TestCase):

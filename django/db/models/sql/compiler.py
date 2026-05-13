@@ -1690,9 +1690,9 @@ class SQLCompiler:
         Return SQL comments for ``Query.comments`` as a single space-separated
         string of ``/* ... */`` blocks.
 
-        Validation in ``QuerySet.comment()`` already rejects strings containing
-        ``/*``, ``*/``, or null bytes, so the values here cannot break out of
-        the comment or be truncated by database adapters.
+        Validation in ``QuerySet.comment()`` restricts comments to word
+        characters, spaces, periods, underscores, and hyphens, so the values
+        here cannot contain SQL comment delimiters or control characters.
         """
         return " ".join("/* %s */" % comment for comment in self.query.comments)
 

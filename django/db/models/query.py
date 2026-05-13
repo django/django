@@ -39,6 +39,7 @@ from django.db.models.utils import (
 from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import cached_property
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.warnings import django_file_prefixes
 
 # The maximum number of results to fetch in a get() query.
@@ -48,6 +49,7 @@ MAX_GET_RESULTS = 21
 REPR_OUTPUT_SIZE = 20
 
 DEFAULT_FETCH_MODE = FETCH_ONE
+SQL_COMMENT_RE = _lazy_re_compile(r"^[\w ._-]+$")
 
 
 class BaseIterable:
@@ -1988,10 +1990,10 @@ class QuerySet(AltersData):
         """Add an SQL comment to the query."""
         if not isinstance(message, str):
             raise TypeError("QuerySet.comment() argument must be a string.")
-        if "/*" in message or "*/" in message or "\x00" in message:
+        if not SQL_COMMENT_RE.fullmatch(message):
             raise ValueError(
-                "QuerySet.comment() cannot include '/*', '*/', or null bytes; "
-                "remove them before calling comment()."
+                "QuerySet.comment() argument must contain only letters, numbers, "
+                "spaces, periods, underscores, and hyphens."
             )
         clone = self._chain()
         clone.query.comments = (*clone.query.comments, message)
