@@ -50,6 +50,10 @@
     width: 100%;
 }
 
+#changelist-form .results table {
+    overflow-wrap: break-word;
+}
+
 #changelist .toplinks {
     border-bottom: 1px solid var(--hairline-color);
 }
@@ -85,7 +89,6 @@
 
 #changelist table thead th {
     padding: 0;
-    white-space: nowrap;
     vertical-align: middle;
 }
 

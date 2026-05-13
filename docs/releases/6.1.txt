@@ -125,6 +125,10 @@ Minor features
 * :attr:`~django.contrib.admin.ModelAdmin.list_display` now uses boolean icons
   for boolean fields on related models.
 
+* The admin change list page now handles wide tables more gracefully. Table
+  column headers can now wrap instead of forcing horizontal overflow, and long
+  cell content is broken to prevent overflow.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
