@@ -2,8 +2,6 @@
 Tasks
 =====
 
-.. versionadded:: 6.0
-
 .. module:: django.tasks
    :synopsis: Django's built-in background Task system.
 

@@ -323,8 +323,6 @@ reversed coordinates.
 ``Rotate``
 ----------
 
-.. versionadded:: 6.0
-
 .. class:: Rotate(expression, angle, origin=None, **extra)
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Rotate.html>`__
@@ -609,10 +607,6 @@ result.
 
 __ https://en.wikipedia.org/wiki/Geohash
 
-.. versionchanged:: 6.0
-
-    MariaDB 12.0.1+ support was added.
-
 Miscellaneous
 =============
 
@@ -643,14 +637,8 @@ geometry. Returns ``True`` if its value is empty and ``False`` otherwise.
 Accepts a geographic field or expression and tests if the value is well formed.
 Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
 
-.. versionchanged:: 6.0
-
-    MariaDB 12.0.1+ support was added.
-
 ``GeometryType``
 ----------------
-
-.. versionadded:: 6.0
 
 .. class:: GeometryType(expr)
 
