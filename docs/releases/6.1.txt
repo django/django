@@ -86,6 +86,12 @@ Python-level options, as Django does not need to load objects before deleting
 them. As a consequence, the :attr:`~django.db.models.DB_CASCADE` option does
 not trigger the ``pre_delete`` or ``post_delete`` signals.
 
+Moving model between apps
+-------------------------
+
+The migration framework now detects and supports moving models moving between
+apps. See :ref:`moving-model-between-apps` for details.
+
 Minor features
 --------------
 

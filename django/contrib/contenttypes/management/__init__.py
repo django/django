@@ -51,7 +51,65 @@ class RenameContentType(migrations.RunPython):
         self._rename(apps, schema_editor, self.new_model, self.old_model)
 
 
-def inject_rename_contenttypes_operations(
+class MoveContentType(migrations.RunPython):
+    def __init__(self, new_app_label, old_app_label, model_name, old_model_name=None):
+        self.new_app_label = new_app_label
+        self.old_app_label = old_app_label
+        self.model_name = model_name
+        self.old_model_name = old_model_name or model_name
+        super().__init__(self.move_model_forward, self.move_model_backward)
+
+    def _move_model(
+        self,
+        apps,
+        schema_editor,
+        old_app_label,
+        old_model_name,
+        new_app_label,
+        model_name,
+    ):
+        ContentType = apps.get_model("contenttypes", "ContentType")
+        db = schema_editor.connection.alias
+        try:
+            content_type = ContentType.objects.db_manager(db).get_by_natural_key(
+                old_app_label, old_model_name
+            )
+        except ContentType.DoesNotExist:
+            pass
+        else:
+            content_type.app_label = new_app_label
+            content_type.model = model_name
+            try:
+                with transaction.atomic(using=db):
+                    content_type.save(using=db, update_fields={"app_label", "model"})
+            except IntegrityError:
+                content_type.app_label = new_app_label
+                content_type.model = model_name
+            else:
+                ContentType.objects.clear_cache()
+
+    def move_model_forward(self, apps, schema_editor):
+        self._move_model(
+            apps,
+            schema_editor,
+            self.old_app_label,
+            self.old_model_name,
+            self.new_app_label,
+            self.model_name,
+        )
+
+    def move_model_backward(self, apps, schema_editor):
+        self._move_model(
+            apps,
+            schema_editor,
+            self.new_app_label,
+            self.model_name,
+            self.old_app_label,
+            self.old_model_name,
+        )
+
+
+def inject_modify_contenttypes_operations(
     plan=None, apps=global_apps, using=DEFAULT_DB_ALIAS, **kwargs
 ):
     """
@@ -91,6 +149,20 @@ def inject_rename_contenttypes_operations(
                     migration.app_label,
                     operation.old_name_lower,
                     operation.new_name_lower,
+                )
+                inserts.append((index + 1, operation))
+            if isinstance(
+                operation, migrations.CreateModel
+            ) and not operation.options.get(
+                "old_app_label", None
+            ) == operation.options.get(
+                "app_label", None
+            ):
+                operation = MoveContentType(
+                    migration.app_label,
+                    operation.options["old_app_label"],
+                    operation.name_lower,
+                    operation.options.get("old_model_name"),
                 )
                 inserts.append((index + 1, operation))
         for inserted, (index, operation) in enumerate(inserts):

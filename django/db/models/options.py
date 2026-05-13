@@ -42,6 +42,8 @@ DEFAULT_NAMES = (
     "get_latest_by",
     "order_with_respect_to",
     "app_label",
+    "old_app_label",
+    "old_model_name",
     "db_tablespace",
     "abstract",
     "managed",
@@ -135,6 +137,8 @@ class Options:
         self.permissions = []
         self.object_name = None
         self.app_label = app_label
+        self.old_app_label = None
+        self.old_model_name = None
         self.get_latest_by = None
         self.order_with_respect_to = None
         self.db_tablespace = settings.DEFAULT_TABLESPACE
