@@ -14,7 +14,7 @@ pymemcache >= 3.4.0
 pywatchman; sys_platform != 'win32'
 PyYAML >= 6.0.2
 redis >= 5.1.0
-selenium >= 4.23.0
+selenium >= 4.23.0,<4.44.0
 sqlparse >= 0.5.0
 tblib >= 3.0.0
 tzdata
