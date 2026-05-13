@@ -19,15 +19,16 @@ def django_file_prefixes():
     return (os.path.join(os.path.dirname(file), ""),)
 
 
-class RemovedInNextVersionWarning(DeprecationWarning):
+class RemovedInDjango70Warning(DeprecationWarning):
     pass
 
 
-class RemovedInDjango70Warning(PendingDeprecationWarning):
+class RemovedInDjango71Warning(PendingDeprecationWarning):
     pass
 
 
-RemovedAfterNextVersionWarning = RemovedInDjango70Warning
+RemovedInNextVersionWarning = RemovedInDjango70Warning
+RemovedAfterNextVersionWarning = RemovedInDjango71Warning
 
 
 def warn_about_external_use(
