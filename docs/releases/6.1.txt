@@ -122,6 +122,10 @@ Minor features
   * Checkboxes are an exception to the above changes and continue to be
     displayed in their original layout.
 
+  * The admin ``Yes`` icon is now a square instead of a circle, making it
+    easier to distinguish from the ``No`` icon for people with color vision
+    deficiency.
+
 * :attr:`~django.contrib.admin.ModelAdmin.list_display` now uses boolean icons
   for boolean fields on related models.
 
