@@ -5,6 +5,8 @@ import socket
 import ssl
 import sys
 import tempfile
+from email.errors import HeaderWriteError
+from email.message import EmailMessage as PyEmailMessage
 from io import StringIO
 from pathlib import Path
 from smtplib import SMTPException
@@ -1093,17 +1095,26 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         )
 
     def test_rejects_non_ascii_local_part(self):
-        """
-        The SMTP EmailBackend does not currently support non-ASCII local-parts.
-        (That would require using the RFC 6532 SMTPUTF8 extension.) #35713.
-        """
+        # The SMTP EmailBackend must work around invalid email encoding caused
+        # by https://github.com/python/cpython/issues/122476 (#35713).
+        try:
+            # Detect fix for CPython issue gh-122476.
+            message = PyEmailMessage()
+            message["To"] = "nø@example.dk"
+            message.as_bytes()
+        except HeaderWriteError:
+            # PY315: Error from Python email generator.
+            msg = "Non-ASCII local-part 'nø' is invalid"
+        else:
+            # Python <=3.14: Error from smtp.EmailBackend.prep_address().
+            msg = (
+                "Invalid address 'nø@example.dk': local-part contains "
+                "non-ASCII characters"
+            )
+
         backend = self.create_backend()
-        backend.connection = mock.Mock(spec=object())
         email = EmailMessage(to=["nø@example.dk"])
-        with self.assertRaisesMessage(
-            ValueError,
-            "Invalid address 'nø@example.dk': local-part contains non-ASCII characters",
-        ):
+        with self.assertRaisesMessage((ValueError, HeaderWriteError), msg):
             backend.send_messages([email])
 
     def test_prep_address_without_force_ascii(self):

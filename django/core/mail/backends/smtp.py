@@ -217,8 +217,10 @@ class EmailBackend(BaseEmailBackend):
         # Django allows local mailboxes like "From: webmaster" (#15042).
         defects.discard("addr-spec local part with no domain")
         if not force_ascii:
-            # Non-ASCII local-part is valid with SMTPUTF8. Remove once
-            # https://github.com/python/cpython/issues/81074 is fixed.
+            # PY315: Non-ASCII local-part is valid with SMTPUTF8. This check
+            # can be removed once the minimum supported Python version is 3.15
+            # (so the fix for https://github.com/python/cpython/issues/81074
+            # is in all supported versions).
             defects.discard("local-part contains non-ASCII characters)")
         if defects:
             raise ValueError(f"Invalid address {address!r}: {'; '.join(defects)}")
