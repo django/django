@@ -355,7 +355,7 @@ Exception Value: {{ exception_value|force_escape }}{% if exception_notes %}{{ ex
   {% endif %}
 
   <h3 id="get-info">GET</h3>
-  {% if request.GET %}
+  {% if request_GET_items %}
     <table class="req">
       <thead>
         <tr>
@@ -372,6 +372,8 @@ Exception Value: {{ exception_value|force_escape }}{% if exception_notes %}{{ ex
         {% endfor %}
       </tbody>
     </table>
+  {% elif request_GET_error %}
+    <p>{{ request_GET_error }}</p>
   {% else %}
     <p>No GET data</p>
   {% endif %}
@@ -399,7 +401,7 @@ Exception Value: {{ exception_value|force_escape }}{% if exception_notes %}{{ ex
   {% endif %}
 
   <h3 id="files-info">FILES</h3>
-  {% if request.FILES %}
+  {% if request_FILES_items %}
     <table class="req">
       <thead>
         <tr>
@@ -416,6 +418,8 @@ Exception Value: {{ exception_value|force_escape }}{% if exception_notes %}{{ ex
         {% endfor %}
       </tbody>
     </table>
+  {% elif request_FILES_error %}
+    <p>{{ request_FILES_error }}</p>
   {% else %}
     <p>No FILES data</p>
   {% endif %}

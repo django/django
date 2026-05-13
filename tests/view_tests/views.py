@@ -22,6 +22,7 @@ TEMPLATES_PATH = Path(__file__).resolve().parent / "templates"
 
 def index_page(request):
     """Dummy index page"""
+    request.GET.getlist("a")
     return HttpResponse("<html><body>Dummy page</body></html>")
 
 
