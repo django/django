@@ -2402,6 +2402,9 @@ class Query(BaseExpression):
         self.extra_order_by = ()
         if clear_default:
             self.default_ordering = False
+        # Ordering is cleared on combined queries with clear_default=False
+        # when union() and analogues are called, so percolate any possible
+        # clear_default=True.
         for query in self.combined_queries:
             query.clear_ordering(force=False, clear_default=clear_default)
 
