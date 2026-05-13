@@ -25,6 +25,7 @@ ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 DEFAULT_STORAGE_ALIAS = "default"
 STATICFILES_STORAGE_ALIAS = "staticfiles"
 
+# RemovedInDjango70Warning.
 USE_BLANK_CHOICE_DASH_DEPRECATED_MSG = (
     "The USE_BLANK_CHOICE_DASH setting is deprecated. If you wish to define "
     "your own default blank choice label, override "
@@ -148,6 +149,11 @@ class LazySettings(LazyObject):
             self.__dict__.pop(name, None)
 
         # RemovedInDjango70Warning.
+        if name == "USE_BLANK_CHOICE_DASH":
+            _show_settings_deprecation_warning(
+                USE_BLANK_CHOICE_DASH_DEPRECATED_MSG, RemovedInDjango70Warning
+            )
+        # RemovedInDjango70Warning.
         if name == "MAILERS":
             # When MAILERS is set, clear any cached values of
             # deprecated settings so that __getattr__() runs again for them.
@@ -254,6 +260,13 @@ class Settings:
                 self._explicit_settings.add(setting)
 
         # RemovedInDjango70Warning.
+        if "USE_BLANK_CHOICE_DASH" in self._explicit_settings:
+            warnings.warn(
+                USE_BLANK_CHOICE_DASH_DEPRECATED_MSG,
+                RemovedInDjango70Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
+        # RemovedInDjango70Warning.
         _check_email_settings_conflicts(self._explicit_settings)
         for name in DEPRECATED_EMAIL_SETTINGS.intersection(self._explicit_settings):
             warnings.warn(
@@ -307,10 +320,8 @@ class UserSettingsHolder:
     def __setattr__(self, name, value):
         self._deleted.discard(name)
         if name == "USE_BLANK_CHOICE_DASH":
-            warnings.warn(
-                USE_BLANK_CHOICE_DASH_DEPRECATED_MSG,
-                RemovedInDjango70Warning,
-                skip_file_prefixes=django_file_prefixes(),
+            _show_settings_deprecation_warning(
+                USE_BLANK_CHOICE_DASH_DEPRECATED_MSG, RemovedInDjango70Warning
             )
         # RemovedInDjango70Warning.
         if name in DEPRECATED_EMAIL_SETTINGS:
