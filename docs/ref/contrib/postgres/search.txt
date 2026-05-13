@@ -119,10 +119,6 @@ Examples:
 See :ref:`postgresql-fts-search-configuration` for an explanation of the
 ``config`` parameter.
 
-.. versionchanged:: 6.0
-
-    :class:`Lexeme` objects were added.
-
 ``SearchRank``
 ==============
 
@@ -283,8 +279,6 @@ floats to :class:`SearchRank` as ``weights`` in the same order above:
 
 ``Lexeme``
 ==========
-
-.. versionadded:: 6.0
 
 .. class:: Lexeme(value, output_field=None, *, invert=False, prefix=False, weight=None)
 

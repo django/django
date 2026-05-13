@@ -1188,10 +1188,6 @@ directly, but you can still use dictionary unpacking to use it in a query:
 
     Negative JSON array indices are not supported.
 
-.. versionchanged:: 6.0
-
-    SQLite support for negative JSON array indices was added.
-
 .. versionchanged:: 6.1
 
     Oracle 21c+ support for negative JSON array indices was added.

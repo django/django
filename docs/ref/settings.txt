@@ -56,10 +56,6 @@ Each item in the list should be an email address string. Example::
 
     ADMINS = ["john@example.com", '"Ng, Mary" <mary@example.com>']
 
-.. versionchanged:: 6.0
-
-    In older versions, required a list of (name, address) tuples.
-
 .. setting:: ALLOWED_HOSTS
 
 ``ALLOWED_HOSTS``
@@ -1284,11 +1280,6 @@ Default: ``'``:class:`django.db.models.BigAutoField`\ ``'``
 Default primary key field type to use for models that don't have a field with
 :attr:`primary_key=True <django.db.models.Field.primary_key>`.
 
-.. versionchanged:: 6.0
-
-    In older versions, the default value is
-    :class:`django.db.models.AutoField`.
-
 .. admonition:: Migrating auto-created through tables
 
     The value of ``DEFAULT_AUTO_FIELD`` will be respected when creating new
@@ -2242,10 +2233,6 @@ A list in the same format as :setting:`ADMINS` that specifies who should get
 broken link notifications when
 :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` is enabled.
 
-.. versionchanged:: 6.0
-
-    In older versions, required a list of (name, address) tuples.
-
 .. setting:: MEDIA_ROOT
 
 ``MEDIA_ROOT``
@@ -2532,8 +2519,6 @@ have it to the value provided.
 ``SECURE_CSP``
 --------------
 
-.. versionadded:: 6.0
-
 Default: ``{}``
 
 This setting defines the directives used by the
@@ -2582,8 +2567,6 @@ This example illustrates the expected structure, using the constants defined in
 
 ``SECURE_CSP_REPORT_ONLY``
 --------------------------
-
-.. versionadded:: 6.0
 
 Default: ``{}``
 
@@ -2926,8 +2909,6 @@ backend definition in :setting:`STORAGES`.
 
 ``TASKS``
 ---------
-
-.. versionadded:: 6.0
 
 Default::
 
@@ -3296,7 +3277,6 @@ enabled if a proxy which sets this header is in use.
 ``URLIZE_ASSUME_HTTPS``
 -----------------------
 
-.. versionadded:: 6.0
 .. deprecated:: 6.0
 
 Default: ``False``

@@ -42,8 +42,6 @@ Attributes
 ``NotUpdated``
 --------------
 
-.. versionadded:: 6.0
-
 .. exception:: Model.NotUpdated
 
     This exception is raised when :ref:`a forced update

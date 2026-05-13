@@ -1079,11 +1079,6 @@ flag.
 See the guide on :ref:`customizing this behavior
 <customizing-shell-auto-imports>` to add or remove automatic imports.
 
-.. versionchanged:: 6.0
-
-    Automatic imports of common utilities, such as ``django.conf.settings``,
-    were added.
-
 .. django-admin-option:: --interface {ipython,bpython,python}, -i {ipython,bpython,python}
 
 Specifies the shell to use. By default, Django will use IPython_ or bpython_ if
@@ -1274,10 +1269,6 @@ If the optional destination is provided, Django will use that name instead. If
 the directory with the given name doesn't exist, it will be created. You can
 use '.' to denote the current working directory.
 
-.. versionchanged:: 6.0
-
-    Automatic creation of the destination directory was added.
-
 For example:
 
 .. console::
@@ -1399,10 +1390,6 @@ If the optional destination is provided, Django will use that name as the
 project directory, and create ``manage.py`` and the project package within it.
 If the directory with the given name doesn't exist, it will be created. Use '.'
 to denote the current working directory.
-
-.. versionchanged:: 6.0
-
-    Automatic creation of the destination directory was added.
 
 For example:
 

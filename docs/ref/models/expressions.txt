@@ -236,12 +236,6 @@ MariaDB). For example:
     >>> reporter.stories_filed  # This triggers a refresh query on MySQL/MariaDB.
     14  # Assuming the database value was 13 when the object was saved.
 
-.. versionchanged:: 6.0
-
-    In previous versions of Django, ``F()`` objects were not refreshed from the
-    database on :meth:`~Model.save` which resulted in them being evaluated and
-    persisted every time the instance was saved.
-
 Using ``F()`` in filters
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -490,8 +484,6 @@ The ``Aggregate`` API is as follows:
 
     .. attribute:: allow_order_by
 
-        .. versionadded:: 6.0
-
         A class attribute determining whether or not this aggregate function
         allows passing a ``order_by`` keyword argument. If set to ``False``
         (default), ``TypeError`` is raised if ``order_by`` is passed as a value
@@ -528,10 +520,6 @@ grouping) contains no entries.
 
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
 into the ``template`` attribute.
-
-.. versionchanged:: 6.0
-
-    The ``order_by`` argument was added.
 
 Creating your own Aggregate Functions
 -------------------------------------

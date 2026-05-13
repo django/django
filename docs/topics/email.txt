@@ -516,11 +516,6 @@ email backend API :ref:`provides an alternative
       :class:`EmailAttachment`, or a tuple with attributes
       ``(filename, content, mimetype)``.
 
-      .. versionchanged:: 6.0
-
-          Support for :class:`~email.message.MIMEPart` objects in the
-          ``attachments`` list was added.
-
       .. deprecated:: 6.0
 
           Support for Python's legacy :class:`~email.mime.base.MIMEBase`
@@ -613,11 +608,6 @@ email backend API :ref:`provides an alternative
         you'll probably want to override this method to put the content you
         want into the Python EmailMessage object.
 
-        .. versionchanged:: 6.0
-
-            The ``policy`` keyword argument was added and the return type was
-            updated to an instance of :class:`~email.message.EmailMessage`.
-
     .. method:: recipients()
 
         Returns a list of all the recipients of the message, whether they're
@@ -684,11 +674,6 @@ email backend API :ref:`provides an alternative
 
           Python's :meth:`email.contentmanager.set_content` documentation
           describes the supported arguments for ``MIMEPart.set_content()``.
-
-          .. versionchanged:: 6.0
-
-              Support for :class:`~email.message.MIMEPart` attachments was
-              added.
 
           .. deprecated:: 6.0
 
@@ -846,12 +831,6 @@ to "/contact/thanks/" when it's done::
             # In reality we'd use a form class
             # to get proper validation errors.
             return HttpResponse("Make sure all fields are entered and valid.")
-
-
-.. versionchanged:: 6.0
-
-    Older versions raised ``django.core.mail.BadHeaderError`` for some
-    invalid headers. This has been replaced with :exc:`!ValueError`.
 
 .. _Header injection: http://www.nyphp.org/phundamentals/8_Preventing-Email-Header-Injection.html
 
