@@ -625,7 +625,11 @@ class QuerySetSetOperationTests(TestCase):
     def test_count_union_with_select_related_in_values(self):
         e1 = ExtraInfo.objects.create(value=1, info="e1")
         a1 = Author.objects.create(name="a1", num=1, extra=e1)
-        qs = Author.objects.select_related("extra").values("pk", "name", "extra__value")
+        qs = (
+            Author.objects.select_related("extra")
+            .order_by()
+            .values("pk", "name", "extra__value")
+        )
         self.assertCountEqual(
             qs.union(qs), [{"pk": a1.id, "name": "a1", "extra__value": 1}]
         )
@@ -706,9 +710,11 @@ class QuerySetSetOperationTests(TestCase):
         msg = "LIMIT/OFFSET not allowed in subqueries of compound statements"
         with self.assertRaisesMessage(DatabaseError, msg):
             list(qs1.union(qs2[:10]))
-        # Unioning ordered queries is permitted.
-        list(qs1.order_by("id").union(qs2))
-        list(qs1.union(qs2).order_by("id").union(qs3))
+        msg = "ORDER BY not allowed in subqueries of compound statements."
+        with self.assertRaisesMessage(DatabaseError, msg):
+            list(qs1.order_by("id").union(qs2))
+        with self.assertRaisesMessage(DatabaseError, msg):
+            list(qs1.union(qs2).order_by("id").union(qs3))
 
     @skipIfDBFeature("supports_select_intersection")
     def test_unsupported_intersection_raises_db_error(self):
