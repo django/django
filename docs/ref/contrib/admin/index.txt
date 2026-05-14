@@ -2723,8 +2723,8 @@ You can override many of the templates which the admin module uses to generate
 the various pages of an admin site. You can even override a few of these
 templates for a specific app, or a specific model.
 
-Set up your projects admin template directories
------------------------------------------------
+Set up your project's admin template directories
+------------------------------------------------
 
 The admin template files are located in the
 :source:`django/contrib/admin/templates/admin` directory.

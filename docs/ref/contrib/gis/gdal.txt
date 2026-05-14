@@ -1272,7 +1272,7 @@ Raster Data Objects
 ===================
 
 ``GDALRaster``
-----------------
+--------------
 
 :class:`GDALRaster` is a wrapper for the GDAL raster source object that
 supports reading data from a variety of GDAL-supported geospatial file formats
@@ -1783,7 +1783,7 @@ bands: one for red, one for green, and one for blue.
 
     .. method:: color_interp(as_string=False)
 
-        The color interpretation for the band, as an integer between 0and 16.
+        The color interpretation for the band, as an integer between 0 and 16.
         If ``as_string`` is ``True``, the data type is returned as a string
         with the following possible values: ``GCI_Undefined``,
         ``GCI_GrayIndex``, ``GCI_PaletteIndex``, ``GCI_RedBand``,
@@ -2105,8 +2105,8 @@ documentation`_ for more details.
 Compressed rasters
 ^^^^^^^^^^^^^^^^^^
 
-Instead decompressing the file and instantiating the resulting raster, GDAL can
-directly access compressed files using the ``/vsizip/``, ``/vsigzip/``, or
+Instead of decompressing the file and instantiating the resulting raster, GDAL
+can directly access compressed files using the ``/vsizip/``, ``/vsigzip/``, or
 ``/vsitar/`` virtual filesystems:
 
 .. code-block:: pycon

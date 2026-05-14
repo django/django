@@ -22,7 +22,7 @@ def delete_selected(modeladmin, request, queryset):
 
     This action first displays a confirmation page which shows all the
     deletable objects, or, if the user has no permission one of the related
-    childs (foreignkeys), a "permission denied" message.
+    children (foreignkeys), a "permission denied" message.
 
     Next, it deletes all selected objects and redirects back to the change
     list.

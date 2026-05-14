@@ -1562,7 +1562,7 @@ class Model(AltersData, metaclass=ModelBase):
         for model_class, lookup_type, field, unique_for in date_checks:
             lookup_kwargs = {}
             # there's a ticket to add a date lookup, we can remove this special
-            # case if that makes it's way in
+            # case if that makes its way in
             date = getattr(self, unique_for)
             if date is None:
                 continue

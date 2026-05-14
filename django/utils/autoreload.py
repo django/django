@@ -459,7 +459,7 @@ class WatchmanReloader(BaseReloader):
         # changes, however, as this is currently an internal API,  no files
         # will be being watched outside of sys.path. Fixing this by checking
         # inside watch_glob() and watch_dir() is expensive, instead this could
-        # could fall back to the StatReloader if this case is detected? For
+        # fall back to the StatReloader if this case is detected? For
         # now, watching its parent, if possible, is sufficient.
         if not root.exists():
             if not root.parent.exists():
@@ -526,8 +526,8 @@ class WatchmanReloader(BaseReloader):
         """
         Watch a directory with a specific glob. If the directory doesn't yet
         exist, attempt to watch the parent directory and amend the patterns to
-        include this. It's important this method isn't called more than one per
-        directory when updating all subscriptions. Subsequent calls will
+        include this. It's important this method isn't called more than once
+        per directory when updating all subscriptions. Subsequent calls will
         overwrite the named subscription, so it must include all possible glob
         expressions.
         """

@@ -3110,7 +3110,7 @@ The output differs significantly between databases.
 ``explain()`` is supported by all built-in database backends except Oracle
 because an implementation there isn't straightforward.
 
-The ``format`` parameter changes the output format from the databases's
+The ``format`` parameter changes the output format from the database's
 default, which is usually text-based. PostgreSQL supports ``'TEXT'``,
 ``'JSON'``, ``'YAML'``, and ``'XML'`` formats. MariaDB and MySQL support
 ``'TEXT'`` (also called ``'TRADITIONAL'``) and ``'JSON'`` formats. MySQL

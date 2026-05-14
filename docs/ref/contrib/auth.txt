@@ -625,7 +625,7 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     permissions if ``obj is not None``.
 
     :meth:`with_perm` also allows an object to be passed as a parameter, but
-    unlike others methods it returns an empty queryset if ``obj is not None``.
+    unlike other methods it returns an empty queryset if ``obj is not None``.
 
     .. method:: authenticate(request, username=None, password=None, **kwargs)
     .. method:: aauthenticate(request, username=None, password=None, **kwargs)

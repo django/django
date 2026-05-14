@@ -79,6 +79,6 @@ class SpatialProxy(DeferredAttribute):
                 % (instance.__class__.__name__, gtype, type(value))
             )
 
-        # Setting the objects dictionary with the value, and returning.
+        # Setting the object's dictionary with the value, and returning.
         instance.__dict__[self.field.attname] = value
         return value

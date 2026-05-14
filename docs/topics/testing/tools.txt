@@ -444,7 +444,7 @@ Use the ``django.test.Client`` class to make requests.
         require different credentials. It requires whichever credentials are
         required by your backend's ``authenticate()`` method.
 
-        ``login()`` returns ``True`` if it the credentials were accepted and
+        ``login()`` returns ``True`` if the credentials were accepted and
         login was successful.
 
         Finally, you'll need to remember to create user accounts before you can
