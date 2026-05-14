@@ -2097,7 +2097,7 @@ The answer lies in the :data:`app registry <django.apps.apps>`. When Django
 starts, it imports each application listed in :setting:`INSTALLED_APPS`, and
 then the ``models`` module inside each application. Whenever a new model class
 is created, Django adds backward-relationships to any related models. If the
-related models haven't been imported yet, Django keeps tracks of the
+related models haven't been imported yet, Django keeps track of the
 relationships and adds them when the related models eventually are imported.
 
 For this reason, it's particularly important that all the models you're using

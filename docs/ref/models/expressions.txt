@@ -878,7 +878,7 @@ expression is applied. For example, if you sum over the rows in a partition,
 the first result is the value of the first row, the second is the sum of first
 and second row.
 
-The ``frame`` parameter specifies which other rows that should be used in the
+The ``frame`` parameter specifies which other rows should be used in the
 computation. See :ref:`window-frames` for details.
 
 For example, to annotate each movie with the average rating for the movies by
@@ -1202,7 +1202,7 @@ calling the appropriate methods on the wrapped expression.
 
     .. method:: get_group_by_cols()
 
-        Responsible for returning the list of columns references by
+        Responsible for returning the list of columns referenced by
         this expression. ``get_group_by_cols()`` should be called on any
         nested expressions. ``F()`` objects, in particular, hold a reference
         to a column.

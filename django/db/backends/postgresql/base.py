@@ -228,7 +228,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 **pool_options,
             )
             # setdefault() ensures that multiple threads don't set this in
-            # parallel. Since we do not open the pool during it's init above,
+            # parallel. Since we do not open the pool during its init above,
             # this means that at worst during startup multiple threads generate
             # pool objects and the first to set it wins.
             self._connection_pools.setdefault(self.alias, pool)

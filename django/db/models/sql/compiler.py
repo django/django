@@ -465,7 +465,7 @@ class SQLCompiler:
             else:
                 if self.query.combinator and self.select:
                     # Don't use the first model's field because other
-                    # combinated queries might define it differently.
+                    # combined queries might define it differently.
                     yield OrderBy(F(col), descending=descending), False
                 else:
                     # 'col' is of the form 'field' or 'field1__field2' or

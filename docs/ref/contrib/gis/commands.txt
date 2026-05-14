@@ -80,4 +80,4 @@ of using ``ogrinspect`` :ref:`in the tutorial <ogrinspect-intro>`.
 .. django-admin-option:: --srid SRID
 
     The SRID to use for the geometry field. If not set, ``ogrinspect`` attempts
-    to automatically determine of the SRID of the data source.
+    to automatically determine the SRID of the data source.

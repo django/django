@@ -843,7 +843,7 @@ For example::
     def get_absolute_url(self):
         return "/people/%i/" % self.id
 
-While this code is correct and simple, it may not be the most portable way to
+While this code is correct and simple, it may not be the most portable way
 to write this kind of method. The :func:`~django.urls.reverse` function is
 usually the best approach.
 

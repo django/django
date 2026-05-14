@@ -358,7 +358,7 @@ Put another way, these two statements are equivalent::
 How did :class:`~django.contrib.sites.managers.CurrentSiteManager`
 know which field of ``Photo`` was the
 :class:`~django.contrib.sites.models.Site`? By default,
-:class:`~django.contrib.sites.managers.CurrentSiteManager` looks for a
+:class:`~django.contrib.sites.managers.CurrentSiteManager` looks for
 either a :class:`~django.db.models.ForeignKey` called
 ``site`` or a
 :class:`~django.db.models.ManyToManyField` called
