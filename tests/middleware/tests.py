@@ -461,7 +461,7 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
     def test_referer_equal_to_requested_url(self):
         """
         Some bots set the referer to the current URL to avoid being blocked by
-        an referer check (#25302).
+        a referer check (#25302).
         """
         self.req.META["HTTP_REFERER"] = self.req.path
         BrokenLinkEmailsMiddleware(self.get_response)(self.req)

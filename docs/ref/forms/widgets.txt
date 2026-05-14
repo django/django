@@ -358,7 +358,7 @@ foundation for custom widgets.
         all checkboxes to be checked instead of at least one.
 
         Override this method in custom widgets that aren't compatible with
-        browser validation. For example, a WSYSIWG text editor widget backed by
+        browser validation. For example, a WYSIWYG text editor widget backed by
         a hidden ``textarea`` element may want to always return ``False`` to
         avoid browser validation on the hidden field.
 

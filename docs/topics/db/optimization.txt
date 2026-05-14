@@ -207,7 +207,7 @@ Use the ``FETCH_PEERS`` fetch mode
 ----------------------------------
 
 Use the :attr:`~django.db.models.FETCH_PEERS` fetch mode to make on-demand
-field access more efficient with bulk-fetching. Enable all it for all usage of
+field access more efficient with bulk-fetching. Enable it for all usage of
 your models :ref:`with a custom manager <fetch-modes-custom-manager>`.
 
 Using this fetch mode is easier than declaring fields to fetch with

@@ -27,7 +27,7 @@ try:
     # Adapters.
     class BaseTzLoader(adapt.Loader):
         """
-        Load a PostgreSQL timestamptz using the a specific timezone.
+        Load a PostgreSQL timestamptz using a specific timezone.
         The timezone can be None too, in which case it will be chopped.
         """
 

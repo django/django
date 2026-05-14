@@ -546,7 +546,7 @@ class FormatStylePlaceholderCursor:
                 arraysize=cursor.arraysize,
                 outconverter=outconverter,
             )
-        # oracledb 2.0.0+ returns NLOB columns with IS JSON constraints as
+        # oracledb 2.0.0+ returns NCLOB columns with IS JSON constraints as
         # dicts. Use a no-op converter to avoid this.
         elif defaultType == Database.DB_TYPE_NCLOB:
             return cursor.var(Database.DB_TYPE_NCLOB, arraysize=cursor.arraysize)

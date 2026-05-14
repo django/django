@@ -449,7 +449,7 @@ def npgettext(context, singular, plural, number):
 
 def all_locale_paths():
     """
-    Return a list of paths to user-provides languages files.
+    Return a list of paths to user-provided language files.
     """
     globalpath = os.path.join(
         os.path.dirname(sys.modules[settings.__module__].__file__), "locale"

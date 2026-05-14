@@ -229,7 +229,7 @@ object instance that is related to the read or write operation that is
 underway. This might be the instance that is being saved, or it might
 be an instance that is being added in a many-to-many relation. In some
 cases, no instance hint will be provided at all. The router checks for
-the existence of an instance hint, and determine if that hint should be
+the existence of an instance hint, and determines if that hint should be
 used to alter routing behavior.
 
 If an ``instance`` hint is present, the database from which it was fetched
@@ -417,7 +417,7 @@ catch-all nature of the PrimaryReplicaRouter implementation would mean
 that all models would be available on all databases.
 
 With this setup installed, and all databases migrated as per
-:ref:`synchronizing_multiple_databases`, lets run some Django code:
+:ref:`synchronizing_multiple_databases`, let's run some Django code:
 
 .. code-block:: pycon
 
