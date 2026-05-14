@@ -49,7 +49,7 @@ MAX_GET_RESULTS = 21
 REPR_OUTPUT_SIZE = 20
 
 DEFAULT_FETCH_MODE = FETCH_ONE
-SQL_COMMENT_RE = _lazy_re_compile(r"^[\w ._-]+$")
+sql_comment_re = _lazy_re_compile(r"^[\w ._-]+$")
 
 
 class BaseIterable:
@@ -1990,7 +1990,7 @@ class QuerySet(AltersData):
         """Add an SQL comment to the query."""
         if not isinstance(message, str):
             raise TypeError("QuerySet.comment() argument must be a string.")
-        if not SQL_COMMENT_RE.fullmatch(message):
+        if not sql_comment_re.fullmatch(message):
             raise ValueError(
                 "QuerySet.comment() argument must contain only letters, numbers, "
                 "spaces, periods, underscores, and hyphens."
