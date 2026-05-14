@@ -97,7 +97,7 @@ END;
         else:
             lookup_type = lookup_type.upper()
             if not self._extract_format_re.fullmatch(lookup_type):
-                raise ValueError(f"Invalid loookup type: {lookup_type!r}")
+                raise ValueError(f"Invalid lookup type: {lookup_type!r}")
             # https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/EXTRACT-datetime.html
             return f"EXTRACT({lookup_type} FROM {sql})", params
         return extract_sql, (*params, extract_param)
@@ -198,7 +198,7 @@ END;
     def time_trunc_sql(self, lookup_type, sql, params, tzname=None):
         # The implementation is similar to `datetime_trunc_sql` as both
         # `DateTimeField` and `TimeField` are stored as TIMESTAMP where
-        # the date part of the later is ignored.
+        # the date part of the latter is ignored.
         sql, params = self._convert_sql_to_tz(sql, params, tzname)
         trunc_param = None
         if lookup_type == "hour":

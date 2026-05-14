@@ -362,7 +362,7 @@ keep this checked, as it is necessary to install :ref:`postgisasb`.
 .. note::
 
     If installed successfully, the PostgreSQL server will run in the background
-    each time the system as started as a Windows service. A
+    each time the system is started as a Windows service. A
     :menuselection:`PostgreSQL 15` start menu group will created and contains
     shortcuts for the Application Stack Builder (ASB) as well as the
     'SQL Shell', which will launch a ``psql`` command window.

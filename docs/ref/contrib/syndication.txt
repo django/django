@@ -188,7 +188,7 @@ put into those elements.
   in ``items()``, Django first tries calling the
   ``item_link()`` method on the
   :class:`~django.contrib.syndication.views.Feed` class. In a similar way to
-  the title and description, it is passed it a single parameter,
+  the title and description, it is passed a single parameter,
   ``item``. If that method doesn't exist, Django tries executing a
   ``get_absolute_url()`` method on that object. Both
   ``get_absolute_url()`` and ``item_link()`` should return the

@@ -120,7 +120,7 @@ raster models:
     >>> dem = Elevation(name="Canyon", rast=rast)
     >>> dem.save()
 
-Note that this equivalent to:
+Note that this is equivalent to:
 
 .. code-block:: pycon
 

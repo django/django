@@ -109,7 +109,7 @@ memory leaks where some peer instances are discarded.
 Raises a :exc:`~django.core.exceptions.FieldFetchBlocked` exception.
 
 Using ``RAISE`` for the above example would raise an exception at the access of
-``book.author`` access, like:
+``book.author``, like:
 
 .. code-block:: python
 
