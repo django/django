@@ -11,7 +11,6 @@ import inspect
 import re
 import string
 from importlib import import_module
-from pickle import PicklingError
 from urllib.parse import quote
 
 from asgiref.local import Local
@@ -101,8 +100,14 @@ class ResolverMatch:
             )
         )
 
-    def __reduce_ex__(self, protocol):
-        raise PicklingError(f"Cannot pickle {self.__class__.__qualname__}.")
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state["func"]
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.func = get_callable(state["_func_path"])
 
 
 def get_resolver(urlconf=None):
@@ -498,6 +503,16 @@ class URLPattern:
         elif not hasattr(callback, "__name__"):
             return callback.__module__ + "." + callback.__class__.__name__
         return callback.__module__ + "." + callback.__qualname__
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state["lookup_str"] = self.lookup_str
+        del state["callback"]
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.callback = get_callable(state["lookup_str"])
 
 
 class URLResolver:

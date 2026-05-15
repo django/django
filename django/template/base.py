@@ -290,6 +290,24 @@ class Template:
             "end": end,
         }
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state["engine"] = str(self.engine)
+        state["origin"] = self.origin.name
+        state["loader"] = str(self.origin.loader)
+        del state["nodelist"]
+        return state
+
+    def __setstate(self, state):
+        from .engine import _engine_list
+
+        self.__dict__.update(state)
+        self.engine = _engine_list(using=state["engine"])
+        self.origin = Origin(
+            state["origin"], template_name=state["name"], loader=state["loader"]
+        )
+        self.nodelist = self.compile_nodelist()
+
 
 class PartialTemplate:
     """
