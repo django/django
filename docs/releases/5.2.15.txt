@@ -64,3 +64,16 @@ cache keys, responses to these requests will now :ref:`vary on
 
 This issue has severity "low" according to the :ref:`Django security policy
 <severity-levels>`.
+
+CVE-2026-48587: Potential exposure of private data via whitespace padding in ``Vary`` header
+============================================================================================
+
+:class:`~django.middleware.cache.UpdateCacheMiddleware` incorrectly cached
+responses whose ``Vary`` header values contained leading or trailing
+whitespace. Because ``has_vary_header()`` failed to strip that, a ``Vary: *``
+header value with surrounding whitespace was not recognized as containing the
+wildcard, causing it to be stored and potentially served from the cache when it
+should not have been.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.

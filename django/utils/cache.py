@@ -331,8 +331,8 @@ def has_vary_header(response, header_query):
     if not response.has_header("Vary"):
         return False
     vary_headers = cc_delim_re.split(response.headers["Vary"])
-    existing_headers = {header.lower() for header in vary_headers}
-    return header_query.lower() in existing_headers
+    existing_headers = {header.lower().strip() for header in vary_headers}
+    return header_query.lower().strip() in existing_headers
 
 
 def _i18n_cache_key_suffix(request, cache_key):
