@@ -151,8 +151,8 @@ If your site sends emails, these values need to be set correctly.
 
 In development, email is often configured to be printed to the console or
 stored in a local file. For production, you probably want to send real email
-messages. See :ref:`topic-email-configuration` for more information about
-setting :setting:`MAILERS` to use production email services.
+messages. :ref:`topic-email-configuration` has more information about setting
+:setting:`MAILERS` to use production email servers.
 
 By default, Django sends email from ``webmaster@localhost`` and
 ``root@localhost``. However, many mail providers reject email from these

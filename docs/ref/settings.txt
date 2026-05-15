@@ -1392,77 +1392,6 @@ that are not allowed to visit any page, systemwide. Use this for bots/crawlers.
 This is only used if ``CommonMiddleware`` is installed (see
 :doc:`/topics/http/middleware`).
 
-.. setting:: MAILERS
-
-``MAILERS``
------------
-
-.. versionadded:: 6.1
-
-Default: no default until Django 7.0, then ``{}``. (See deprecation note
-below.)
-
-A dictionary containing the settings for all email backends to be used with
-Django. It is a nested dictionary that maps backend aliases to dictionaries
-containing each mailer's backend import path and configuration options.
-Example::
-
-    MAILERS = {
-        "default": {
-            "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
-            "OPTIONS": {
-                "host": "smtp.example.net",
-            },
-        },
-        "newsletters": {
-            "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
-            "OPTIONS": {
-                "host": "smtp.bulk-email-service.example.com",
-                "username": os.environ["BULK_EMAIL_SERVICE_ACCOUNT_ID"],
-                "password": os.environ["BULK_EMAIL_SERVICE_API_KEY"],
-                "use_tls": True,
-            },
-        },
-    }
-
-If you plan to send email through Django, configuring at least a ``"default"``
-mailer is recommended. Any number of additional mailers may also be specified.
-Depending on which backend is used, other options may be required.
-
-See :ref:`topic-email-configuration` for more information.
-
-.. deprecated:: 6.1
-
-    In Django 7.0, the default value will change to ``{}`` (no defined email
-    mailers). Until then, if ``MAILERS`` is not defined in the
-    settings, Django will create a ``"default"`` mailer from the
-    deprecated :setting:`EMAIL_BACKEND` setting. Projects can opt into the
-    Django 7.0 behavior early by adding ``MAILERS`` and removing
-    ``EMAIL_BACKEND`` from their settings.
-
-.. setting:: MAILERS-BACKEND
-
-``BACKEND``
-~~~~~~~~~~~
-
-Default: ``"django.core.mail.backends.smtp.EmailBackend"``
-
-The Python import path to the email backend class. If ``"BACKEND"`` is omitted,
-Django's :ref:`topic-email-smtp-backend` is used.
-
-See :ref:`topic-email-backends` for a list of Django's built-in backends and
-pointers to community-maintained options.
-
-.. setting:: MAILERS-OPTIONS
-
-``OPTIONS``
-~~~~~~~~~~~
-
-Default: ``{}``
-
-Configuration parameters to pass to the email backend. The available and
-required options vary depending on the backend.
-
 .. setting:: EMAIL_BACKEND
 
 ``EMAIL_BACKEND``
@@ -2230,6 +2159,77 @@ Django project. Points at an instance of Python's :ref:`dictConfig
 
 If you set :setting:`LOGGING_CONFIG` to ``None``, the logging
 configuration process will be skipped.
+
+.. setting:: MAILERS
+
+``MAILERS``
+-----------
+
+.. versionadded:: 6.1
+
+Default: no default until Django 7.0, then ``{}``. (See deprecation note
+below.)
+
+A dictionary containing the settings for all email backends to be used with
+Django. It is a nested dictionary that maps backend aliases to dictionaries
+containing each mailer's backend import path and configuration options.
+Example::
+
+    MAILERS = {
+        "default": {
+            "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+            "OPTIONS": {
+                "host": "smtp.example.net",
+            },
+        },
+        "newsletters": {
+            "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+            "OPTIONS": {
+                "host": "smtp.bulk-email-service.example.com",
+                "username": os.environ["BULK_EMAIL_SERVICE_ACCOUNT_ID"],
+                "password": os.environ["BULK_EMAIL_SERVICE_API_KEY"],
+                "use_tls": True,
+            },
+        },
+    }
+
+If you plan to send email through Django, configuring at least a ``"default"``
+mailer is recommended. Any number of additional mailers may also be specified.
+Depending on which backend is used, other options may be required.
+
+See :ref:`topic-email-configuration` for more information.
+
+.. deprecated:: 6.1
+
+    In Django 7.0, the default value will change to ``{}`` (no defined email
+    mailers). Until then, if ``MAILERS`` is not defined in the
+    settings, Django will create a ``"default"`` mailer from the
+    deprecated :setting:`EMAIL_BACKEND` setting. Projects can opt into the
+    Django 7.0 behavior early by adding ``MAILERS`` and removing
+    ``EMAIL_BACKEND`` from their settings.
+
+.. setting:: MAILERS-BACKEND
+
+``BACKEND``
+~~~~~~~~~~~
+
+Default: ``"django.core.mail.backends.smtp.EmailBackend"``
+
+The Python import path to the email backend class. If ``"BACKEND"`` is omitted,
+Django's :ref:`topic-email-smtp-backend` is used.
+
+See :ref:`topic-email-backends` for a list of Django's built-in backends and
+pointers to community-maintained options.
+
+.. setting:: MAILERS-OPTIONS
+
+``OPTIONS``
+~~~~~~~~~~~
+
+Default: ``{}``
+
+Configuration parameters to pass to the email backend. The available and
+required options vary depending on the backend.
 
 .. setting:: MANAGERS
 

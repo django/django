@@ -2075,7 +2075,6 @@ and contents::
                 "Here is the message.",
                 "from@example.com",
                 ["to@example.com"],
-                fail_silently=False,
             )
 
             # Test that one message has been sent.

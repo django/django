@@ -99,8 +99,8 @@ with different options, similar to existing mechanisms for :setting:`CACHES`,
             "OPTIONS": {"host": "smtp.example.com", "use_tls": True},
         },
         "marketing": {
-            "BACKEND": "example_ses.EmailBackend",
-            "OPTIONS": {"region": "us-east-1"},
+            "BACKEND": "example.third.party.EmailBackend",
+            "OPTIONS": {"region": "africa-1"},
         },
     }
 
