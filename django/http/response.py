@@ -32,6 +32,7 @@ from django.utils.regex_helper import _lazy_re_compile
 _charset_from_content_type_re = _lazy_re_compile(
     r";\s*charset=(?P<charset>[^\s;]+)", re.I
 )
+_control_chars_re = _lazy_re_compile(r"[\x00-\x1f\x7f-\x9f]")
 
 
 class ResponseHeaders(CaseInsensitiveMapping):
@@ -142,7 +143,7 @@ class HttpResponseBase:
 
             if not 100 <= self.status_code <= 599:
                 raise ValueError("HTTP status code must be an integer from 100 to 599.")
-        self._reason_phrase = reason
+        self.reason_phrase = reason
 
     @property
     def reason_phrase(self):
@@ -154,6 +155,8 @@ class HttpResponseBase:
 
     @reason_phrase.setter
     def reason_phrase(self, value):
+        if value and _control_chars_re.search(value):
+            raise BadHeaderError("reason_phrase can't contain control characters.")
         self._reason_phrase = value
 
     @property
