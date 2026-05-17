@@ -804,6 +804,27 @@ class ASGITest(SimpleTestCase):
                 self.assertEqual(request.META["HTTP_COOKIE"], "a=abc; b=def; c=ghi")
                 self.assertEqual(request.COOKIES, {"a": "abc", "b": "def", "c": "ghi"})
 
+    def test_body_access_handles_malformed_content_length(self):
+        """
+        A non-numeric ``CONTENT_LENGTH`` in META (e.g. the value produced
+        when ``ASGIRequest`` comma-joins duplicate ``Content-Length``
+        headers) must not surface as an unhandled ``ValueError`` from
+        ``request.body``; it should fall back to the same defined behavior
+        as ``request.POST``, which already handles it via
+        ``MultiPartParser``.
+        """
+        body = b"hello world body"
+        scope = self.async_request_factory._base_scope(
+            method="POST", path="/"
+        )
+        scope["headers"] = [
+            (b"content-type", b"text/plain"),
+            (b"content-length", b"10,20"),
+        ]
+        request = ASGIRequest(scope, BytesIO(body))
+        self.assertEqual(dict(request.POST), {})
+        self.assertEqual(request.body, body)
+
 
 class MaxMemorySizeASGITests(SimpleTestCase):
     def make_request(

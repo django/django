@@ -407,7 +407,14 @@ class HttpRequest:
             # Limit the maximum request data size that will be handled
             # in-memory. Reject early when Content-Length is present and
             # already exceeds the limit, avoiding reading the body at all.
-            self._check_data_too_big(int(self.META.get("CONTENT_LENGTH") or 0))
+            # CONTENT_LENGTH may be malformed (e.g. ASGIRequest comma-joins
+            # duplicate Content-Length headers into a non-numeric value);
+            # fall back to 0 like WSGIRequest and MultiPartParser do.
+            try:
+                content_length = int(self.META.get("CONTENT_LENGTH") or 0)
+            except (ValueError, TypeError):
+                content_length = 0
+            self._check_data_too_big(content_length)
 
             # Content-Length can be absent or understated (e.g.
             # `Transfer-Encoding: chunked` on ASGI), so for seekable
