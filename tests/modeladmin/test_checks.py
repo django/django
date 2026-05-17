@@ -1020,6 +1020,50 @@ class ListMaxShowAllCheckTests(CheckTestCase):
         self.assertIsValid(TestModelAdmin, ValidationTestModel)
 
 
+class DeleteConfirmationMaxObjectsCheckTests(CheckTestCase):
+    def test_not_integer(self):
+        class TestModelAdmin(ModelAdmin):
+            delete_confirmation_max_display = "hello"
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            ValidationTestModel,
+            (
+                "The value of "
+                "'delete_confirmation_max_display'"
+                " must be a non-negative integer or None."
+            ),
+            "admin.E131",
+        )
+
+    def test_negative_integer(self):
+        class TestModelAdmin(ModelAdmin):
+            delete_confirmation_max_display = -1
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            ValidationTestModel,
+            (
+                "The value of "
+                "'delete_confirmation_max_display'"
+                " must be a non-negative integer or None."
+            ),
+            "admin.E131",
+        )
+
+    def test_valid_case(self):
+        class TestModelAdmin(ModelAdmin):
+            delete_confirmation_max_display = 100
+
+        self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
+    def test_valid_none(self):
+        class TestModelAdmin(ModelAdmin):
+            delete_confirmation_max_display = None
+
+        self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
+
 class SearchFieldsCheckTests(CheckTestCase):
     def test_not_iterable(self):
         class TestModelAdmin(ModelAdmin):
@@ -1189,6 +1233,8 @@ class ListSelectRelatedCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin,
             ValidationTestModel,
+            # RemovedInDjango70Warning: when the deprecation ends, replace:
+            # ... must be a tuple, list, or False.",
             "The value of 'list_select_related' must be a boolean, tuple or list.",
             "admin.E117",
         )

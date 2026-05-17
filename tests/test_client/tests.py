@@ -61,7 +61,10 @@ def async_middleware_urlconf(get_response):
     return middleware
 
 
-@override_settings(ROOT_URLCONF="test_client.urls")
+@override_settings(
+    ROOT_URLCONF="test_client.urls",
+    MAILERS={"default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}},
+)
 class ClientTest(TestCase):
     @classmethod
     def setUpTestData(cls):

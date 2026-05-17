@@ -13,13 +13,15 @@
     width: 100%;
 }
 
-.selector-available, .selector-chosen {
+.selector-available,
+.selector-chosen {
     display: flex;
     flex-direction: column;
     flex: 1 1;
 }
 
-.selector-available-title, .selector-chosen-title {
+.selector-available-title,
+.selector-chosen-title {
     border: 1px solid var(--border-color);
     border-radius: 4px 4px 0 0;
 }
@@ -119,11 +121,14 @@
     height: 14em;
 }
 
-.selector .selector-chosen:not(.selector-chosen--with-filtered) .list-footer-display {
+.selector
+    .selector-chosen:not(.selector-chosen--with-filtered)
+    .list-footer-display {
     display: none;
 }
 
-.selector-add, .selector-remove {
+.selector-add,
+.selector-remove {
     width: 24px;
     height: 24px;
     display: block;
@@ -134,11 +139,13 @@
     border: none;
 }
 
-:enabled.selector-add, :enabled.selector-remove {
+:enabled.selector-add,
+:enabled.selector-remove {
     opacity: 1;
 }
 
-:enabled.selector-add:hover, :enabled.selector-remove:hover {
+:enabled.selector-add:hover,
+:enabled.selector-remove:hover {
     cursor: pointer;
 }
 
@@ -147,7 +154,8 @@
     background-size: 24px auto;
 }
 
-:enabled.selector-add:focus, :enabled.selector-add:hover {
+:enabled.selector-add:focus,
+:enabled.selector-add:hover {
     background-position: 0 -168px;
 }
 
@@ -156,11 +164,13 @@
     background-size: 24px auto;
 }
 
-:enabled.selector-remove:focus, :enabled.selector-remove:hover {
+:enabled.selector-remove:focus,
+:enabled.selector-remove:hover {
     background-position: 0 -120px;
 }
 
-.selector-chooseall, .selector-clearall {
+.selector-chooseall,
+.selector-clearall {
     display: inline-block;
     text-align: left;
     padding: 4px 5px;
@@ -174,24 +184,30 @@
     border-radius: 4px;
 }
 
-:enabled.selector-chooseall:focus, :enabled.selector-clearall:focus,
-:enabled.selector-chooseall:hover, :enabled.selector-clearall:hover {
+:enabled.selector-chooseall:focus,
+:enabled.selector-clearall:focus,
+:enabled.selector-chooseall:hover,
+:enabled.selector-clearall:hover {
     background-color: var(--button-hover-bg);
 }
 
-:enabled.selector-chooseall, :enabled.selector-clearall {
+:enabled.selector-chooseall,
+:enabled.selector-clearall {
     opacity: 1;
 }
 
-:enabled.selector-chooseall:hover, :enabled.selector-clearall:hover {
+:enabled.selector-chooseall:hover,
+:enabled.selector-clearall:hover {
     cursor: pointer;
 }
 
-:enabled.selector-chooseall:focus, :enabled.selector-chooseall:hover {
+:enabled.selector-chooseall:focus,
+:enabled.selector-chooseall:hover {
     background-position: 100% -176px;
 }
 
-:enabled.selector-clearall:focus, :enabled.selector-clearall:hover {
+:enabled.selector-clearall:focus,
+:enabled.selector-clearall:hover {
     background-position: 0 -144px;
 }
 
@@ -208,7 +224,8 @@
     height: 10.1em;
 }
 
-.stacked .selector-available, .stacked .selector-chosen {
+.stacked .selector-available,
+.stacked .selector-chosen {
     width: 480px;
 }
 
@@ -235,7 +252,8 @@
     padding: 3px 3px 3px 5px;
 }
 
-.stacked .selector-chooseall, .stacked .selector-clearall {
+.stacked .selector-chooseall,
+.stacked .selector-clearall {
     display: none;
 }
 
@@ -250,7 +268,8 @@
     cursor: pointer;
 }
 
-.stacked :enabled.selector-add:focus, .stacked :enabled.selector-add:hover {
+.stacked :enabled.selector-add:focus,
+.stacked :enabled.selector-add:hover {
     background-position: 0 -72px;
     cursor: pointer;
 }
@@ -266,7 +285,8 @@
     cursor: pointer;
 }
 
-.stacked :enabled.selector-remove:focus, .stacked :enabled.selector-remove:hover {
+.stacked :enabled.selector-remove:focus,
+.stacked :enabled.selector-remove:hover {
     background-position: 0 -24px;
     cursor: pointer;
 }
@@ -313,7 +333,9 @@ p.datetime label {
     color: var(--body-quiet-color);
 }
 
-.datetime input, .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
+.datetime input,
+.form-row .datetime input.vDateField,
+.form-row .datetime input.vTimeField {
     margin-bottom: 4px;
 }
 
@@ -323,7 +345,8 @@ table p.datetime {
     padding-left: 0;
 }
 
-.datetimeshortcuts .clock-icon, .datetimeshortcuts .date-icon {
+.datetimeshortcuts .clock-icon,
+.datetimeshortcuts .date-icon {
     position: relative;
     display: inline-block;
     vertical-align: middle;
@@ -401,7 +424,8 @@ span.clearable-file-input label {
 
 /* CALENDARS & CLOCKS */
 
-.calendarbox, .clockbox {
+.calendarbox,
+.clockbox {
     margin: 5px auto;
     font-size: 0.75rem;
     width: 19em;
@@ -432,7 +456,8 @@ span.clearable-file-input label {
     width: 100%;
 }
 
-.calendar caption, .calendarbox h2 {
+.calendar caption,
+.calendarbox h2 {
     margin: 0;
     text-align: center;
     border-top: none;
@@ -474,7 +499,8 @@ span.clearable-file-input label {
     font-weight: 700;
 }
 
-.calendar td a, .timelist a {
+.calendar td a,
+.timelist a {
     display: block;
     font-weight: 400;
     padding: 6px;
@@ -482,13 +508,16 @@ span.clearable-file-input label {
     color: var(--body-quiet-color);
 }
 
-.calendar td a:focus, .timelist a:focus,
-.calendar td a:hover, .timelist a:hover {
+.calendar td a:focus,
+.timelist a:focus,
+.calendar td a:hover,
+.timelist a:hover {
     background: var(--primary);
     color: white;
 }
 
-.calendar td a:active, .timelist a:active {
+.calendar td a:active,
+.timelist a:active {
     background: var(--header-bg);
     color: white;
 }
@@ -501,8 +530,10 @@ span.clearable-file-input label {
     padding: 1px 3px;
 }
 
-.calendarnav a:link, #calendarnav a:visited,
-#calendarnav a:focus, #calendarnav a:hover {
+.calendarnav a:link,
+#calendarnav a:visited,
+#calendarnav a:focus,
+#calendarnav a:hover {
     color: var(--body-quiet-color);
 }
 
@@ -515,7 +546,8 @@ span.clearable-file-input label {
     padding: 8px 0;
 }
 
-.calendarbox .calendarnav-previous, .calendarbox .calendarnav-next {
+.calendarbox .calendarnav-previous,
+.calendarbox .calendarnav-next {
     display: block;
     position: absolute;
     top: 8px;
@@ -544,7 +576,8 @@ span.clearable-file-input label {
     color: var(--button-fg);
 }
 
-.calendar-cancel:focus, .calendar-cancel:hover {
+.calendar-cancel:focus,
+.calendar-cancel:hover {
     background: var(--close-button-hover-bg);
 }
 
@@ -553,7 +586,8 @@ span.clearable-file-input label {
     display: block;
 }
 
-ul.timelist, .timelist li {
+ul.timelist,
+.timelist li {
     list-style-type: none;
     margin: 0;
     padding: 0;
@@ -573,10 +607,11 @@ ul.timelist, .timelist li {
     width: 1.5rem;
     height: 1.5rem;
     border: 0px none;
-    margin-bottom: .25rem;
+    margin-bottom: 0.25rem;
 }
 
-.inline-deletelink:focus, .inline-deletelink:hover {
+.inline-deletelink:focus,
+.inline-deletelink:hover {
     cursor: pointer;
 }
 
@@ -594,7 +629,7 @@ ul.timelist, .timelist li {
 }
 
 .related-widget-wrapper-link {
-    opacity: .6;
+    opacity: 0.6;
     filter: grayscale(1);
 }
 

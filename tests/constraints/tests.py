@@ -1297,6 +1297,19 @@ class UniqueConstraintTests(TestCase):
         with self.assertRaisesMessage(ValidationError, msg):
             constraint.validate(Product, Product(price=None))
 
+    @skipUnlessDBFeature("supports_comparing_boolean_expr")
+    def test_validate_nullable_condition(self):
+        UniqueConstraintProduct.objects.create(name="Product", age=42)
+        constraint = models.UniqueConstraint(
+            fields=["name"],
+            name="uniq_name_for_positive_age",
+            condition=models.Q(age__gt=0),
+        )
+        constraint.validate(
+            UniqueConstraintProduct,
+            UniqueConstraintProduct(name="Product", age=None),
+        )
+
     def test_name(self):
         constraints = get_constraints(UniqueConstraintProduct._meta.db_table)
         expected_name = "name_color_uniq"

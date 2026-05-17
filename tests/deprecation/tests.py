@@ -1,5 +1,6 @@
 import os
 import warnings
+from pathlib import Path
 
 import django
 from django.test import SimpleTestCase
@@ -31,7 +32,11 @@ class DjangoFilePrefixesTests(SimpleTestCase):
         prefixes = django_file_prefixes()
         self.assertIsInstance(prefixes, tuple)
         self.assertEqual(len(prefixes), 1)
-        self.assertTrue(prefixes[0].endswith(f"{os.path.sep}django"))
+        self.assertTrue(prefixes[0].endswith(f"{os.path.sep}django{os.path.sep}"))
+
+    def test_does_not_match_packages_prefixed_with_django(self):
+        other_file = Path(django.__file__).parent.parent / "djangoextra" / "__init__.py"
+        self.assertFalse(str(other_file).startswith(django_file_prefixes()))
 
 
 class RenameManagerMethods(RenameMethodsBase):

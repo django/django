@@ -4,6 +4,7 @@ import re
 import sys
 import unittest
 import zoneinfo
+from http import HTTPStatus
 from unittest import mock
 from urllib.parse import parse_qsl, urljoin, urlsplit
 
@@ -25,6 +26,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.checks import Error
 from django.core.files import temp as tempfile
+from django.db.models.utils import get_blank_choice_label
 from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
 from django.test import (
@@ -303,6 +305,9 @@ class AdminViewBasicTestCase(TestCase):
         )
 
 
+@override_settings(
+    MAILERS={"default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}}
+)
 class AdminViewBasicTest(AdminViewBasicTestCase):
     def test_trailing_slash_required(self):
         """
@@ -993,29 +998,29 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             self.assertContentBefore(response, "The First Item", "The Middle Item")
             self.assertContentBefore(response, "The Middle Item", "The Last Item")
 
-    def test_has_related_field_in_list_display_fk(self):
+    def test_get_select_related_fields_in_list_display_fk(self):
         """Joins shouldn't be performed for <FK>_id fields in list display."""
         state = State.objects.create(name="Karnataka")
         City.objects.create(state=state, name="Bangalore")
         response = self.client.get(reverse("admin:admin_views_city_changelist"), {})
 
         response.context["cl"].list_display = ["id", "name", "state"]
-        self.assertIs(response.context["cl"].has_related_field_in_list_display(), True)
+        self.assertEqual(response.context["cl"].get_select_related_fields(), ["state"])
 
         response.context["cl"].list_display = ["id", "name", "state_id"]
-        self.assertIs(response.context["cl"].has_related_field_in_list_display(), False)
+        self.assertEqual(response.context["cl"].get_select_related_fields(), [])
 
-    def test_has_related_field_in_list_display_o2o(self):
+    def test_get_select_related_fields_in_list_display_o2o(self):
         """Joins shouldn't be performed for <O2O>_id fields in list display."""
         media = Media.objects.create(name="Foo")
         Vodcast.objects.create(media=media)
         response = self.client.get(reverse("admin:admin_views_vodcast_changelist"), {})
 
         response.context["cl"].list_display = ["media"]
-        self.assertIs(response.context["cl"].has_related_field_in_list_display(), True)
+        self.assertEqual(response.context["cl"].get_select_related_fields(), ["media"])
 
         response.context["cl"].list_display = ["media_id"]
-        self.assertIs(response.context["cl"].has_related_field_in_list_display(), False)
+        self.assertEqual(response.context["cl"].get_select_related_fields(), [])
 
     def test_limited_filter(self):
         """
@@ -2344,6 +2349,7 @@ def get_perm(Model, codename):
             },
         }
     ],
+    MAILERS={"default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}},
 )
 class AdminViewPermissionsTest(TestCase):
     """Tests for Admin Views Permissions."""
@@ -2928,10 +2934,18 @@ class AdminViewPermissionsTest(TestCase):
 
         # Test redirection when using row-level change permissions. Refs
         # #11513.
-        r1 = RowLevelChangePermissionModel.objects.create(id=1, name="odd id")
-        r2 = RowLevelChangePermissionModel.objects.create(id=2, name="even id")
-        r3 = RowLevelChangePermissionModel.objects.create(id=3, name="odd id mult 3")
-        r6 = RowLevelChangePermissionModel.objects.create(id=6, name="even id mult 3")
+        r1 = RowLevelChangePermissionModel.objects.create(
+            name="A", can_change=False, can_view=False
+        )
+        r2 = RowLevelChangePermissionModel.objects.create(
+            name="B", can_change=True, can_view=False
+        )
+        r3 = RowLevelChangePermissionModel.objects.create(
+            name="C", can_change=False, can_view=True
+        )
+        r4 = RowLevelChangePermissionModel.objects.create(
+            name="D", can_change=True, can_view=True
+        )
         change_url_1 = reverse(
             "admin:admin_views_rowlevelchangepermissionmodel_change", args=(r1.pk,)
         )
@@ -2941,8 +2955,8 @@ class AdminViewPermissionsTest(TestCase):
         change_url_3 = reverse(
             "admin:admin_views_rowlevelchangepermissionmodel_change", args=(r3.pk,)
         )
-        change_url_6 = reverse(
-            "admin:admin_views_rowlevelchangepermissionmodel_change", args=(r6.pk,)
+        change_url_4 = reverse(
+            "admin:admin_views_rowlevelchangepermissionmodel_change", args=(r4.pk,)
         )
         logins = [
             self.superuser,
@@ -2958,14 +2972,16 @@ class AdminViewPermissionsTest(TestCase):
                 self.assertEqual(response.status_code, 403)
                 response = self.client.post(change_url_1, {"name": "changed"})
                 self.assertEqual(
-                    RowLevelChangePermissionModel.objects.get(id=1).name, "odd id"
+                    RowLevelChangePermissionModel.objects.get(pk=r1.pk).name,
+                    r1.name,
                 )
                 self.assertEqual(response.status_code, 403)
                 response = self.client.get(change_url_2)
                 self.assertEqual(response.status_code, 200)
                 response = self.client.post(change_url_2, {"name": "changed"})
                 self.assertEqual(
-                    RowLevelChangePermissionModel.objects.get(id=2).name, "changed"
+                    RowLevelChangePermissionModel.objects.get(pk=r2.pk).name,
+                    "changed",
                 )
                 self.assertRedirects(response, self.index_url)
                 response = self.client.get(change_url_3)
@@ -2973,14 +2989,15 @@ class AdminViewPermissionsTest(TestCase):
                 response = self.client.post(change_url_3, {"name": "changed"})
                 self.assertEqual(response.status_code, 403)
                 self.assertEqual(
-                    RowLevelChangePermissionModel.objects.get(id=3).name,
-                    "odd id mult 3",
+                    RowLevelChangePermissionModel.objects.get(pk=r3.pk).name,
+                    r3.name,
                 )
-                response = self.client.get(change_url_6)
+                response = self.client.get(change_url_4)
                 self.assertEqual(response.status_code, 200)
-                response = self.client.post(change_url_6, {"name": "changed"})
+                response = self.client.post(change_url_4, {"name": "changed"})
                 self.assertEqual(
-                    RowLevelChangePermissionModel.objects.get(id=6).name, "changed"
+                    RowLevelChangePermissionModel.objects.get(pk=r4.pk).name,
+                    "changed",
                 )
                 self.assertRedirects(response, self.index_url)
 
@@ -2995,7 +3012,8 @@ class AdminViewPermissionsTest(TestCase):
                     change_url_1, {"name": "changed"}, follow=True
                 )
                 self.assertEqual(
-                    RowLevelChangePermissionModel.objects.get(id=1).name, "odd id"
+                    RowLevelChangePermissionModel.objects.get(pk=r1.pk).name,
+                    r1.name,
                 )
                 self.assertContains(response, "login-form")
                 response = self.client.get(change_url_2, follow=True)
@@ -3004,7 +3022,8 @@ class AdminViewPermissionsTest(TestCase):
                     change_url_2, {"name": "changed again"}, follow=True
                 )
                 self.assertEqual(
-                    RowLevelChangePermissionModel.objects.get(id=2).name, "changed"
+                    RowLevelChangePermissionModel.objects.get(pk=r2.pk).name,
+                    "changed",
                 )
                 self.assertContains(response, "login-form")
                 self.client.post(reverse("admin:logout"))
@@ -3304,8 +3323,8 @@ class AdminViewPermissionsTest(TestCase):
 
         # Test redirection when using row-level change permissions. Refs
         # #11513.
-        rl1 = RowLevelChangePermissionModel.objects.create(id=1, name="odd id")
-        rl2 = RowLevelChangePermissionModel.objects.create(id=2, name="even id")
+        rl1 = RowLevelChangePermissionModel.objects.create(name="A", can_change=False)
+        rl2 = RowLevelChangePermissionModel.objects.create(name="B", can_change=True)
         logins = [
             self.superuser,
             self.viewuser,
@@ -4196,6 +4215,26 @@ class AdminViewDeletedObjectsTest(TestCase):
         # BookAdmin.get_deleted_objects() returns custom text.
         self.assertContains(response, "a deletable object")
 
+    def test_delete_view_uses_delete_confirmation_max_display(self):
+        book = Book.objects.create(name="Test Book")
+        response = self.client.get(
+            reverse("admin2:admin_views_book_delete", args=(book.pk,))
+        )
+        self.assertContains(response, "a deletable object")
+        self.assertContains(response, "…and 2 more objects.")
+        self.assertNotContains(response, "another object")
+        self.assertNotContains(response, "last object")
+
+    def test_delete_view_hides_objects_when_delete_confirmation_max_display_is_zero(
+        self,
+    ):
+        book = Book.objects.create(name="Test Book")
+        response = self.client.get(
+            reverse("admin_zero_display:admin_views_book_delete", args=(book.pk,))
+        )
+        self.assertNotContains(response, "<h2>Objects</h2>")
+        self.assertNotContains(response, 'id="deleted-objects"')
+
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class TestGenericRelations(TestCase):
@@ -4730,6 +4769,22 @@ class AdminViewListEditable(TestCase):
 
         self.assertIs(Person.objects.get(name="John Mauchly").alive, False)
 
+    def test_forged_post_submission_when_no_add_permission(self):
+        before_count = ParentWithUUIDPK.objects.count()
+        data = {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "0",
+            "form-MAX_NUM_FORMS": "0",
+            "form-0-title": "The News",
+            "form-0-id": "",
+            "_save": "Save",
+        }
+        # This model admin allows no add permissions.
+        changelist_url = reverse("admin7:admin_views_parentwithuuidpk_changelist")
+        response = self.client.post(changelist_url, data)
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertEqual(ParentWithUUIDPK.objects.count(), before_count)
+
     def test_non_field_errors(self):
         """
         Non-field errors are displayed for each of the forms in the
@@ -4816,7 +4871,7 @@ class AdminViewListEditable(TestCase):
             "form-0-alive": "1",
             "form-0-gender": "2",
             # The form processing understands this as a list_editable "Save"
-            # and not an action "Go".
+            # and not an action "Run".
             "_save": "Save",
         }
         response = self.client.post(
@@ -4871,7 +4926,7 @@ class AdminViewListEditable(TestCase):
             "form-3-id": "4",
             "form-3-collector": "1",
             # The form processing understands this as a list_editable "Save"
-            # and not an action "Go".
+            # and not an action "Run".
             "_save": "Save",
         }
         response = self.client.post(
@@ -4907,7 +4962,7 @@ class AdminViewListEditable(TestCase):
         self.assertContains(response, "Unordered object #1")
 
     def test_list_editable_action_submit(self):
-        # List editable changes should not be executed if the action "Go"
+        # List editable changes should not be executed if the action "Run"
         # button is used to submit the form.
         data = {
             "form-TOTAL_FORMS": "3",
@@ -5027,6 +5082,57 @@ class AdminViewListEditable(TestCase):
             '<th class="field-id"><a href="%s">%s</a></th>' % (link2, story2.id),
             1,
         )
+
+    def test_list_editable_per_object_permissions(self):
+        """
+        List_editable fields are stripped for objects where the user
+        lacks change permissions, and retained for objects where the user has
+        permissions.
+        """
+        self.client.logout()
+        self.client.force_login(self.superuser)
+
+        response = self.client.get(reverse("admin9:admin_views_person_changelist"))
+        # Non-editable fields should NOT have inputs.
+        self.assertNotContains(response, 'name="form-1-gender"')
+        self.assertNotContains(response, 'name="form-1-alive"')
+        # Editable fields are present.
+        self.assertContains(response, 'name="form-0-gender"')
+        self.assertContains(response, 'name="form-0-alive"')
+        self.assertContains(response, 'name="form-2-gender"')
+        self.assertContains(response, 'name="form-2-alive"')
+
+    def test_list_editable_per_object_permissions_submission(self):
+        """
+        Form submission updates only objects where the user has
+        change permissions, ignoring changes to unauthorized objects.
+        """
+        self.client.logout()
+        self.client.force_login(self.superuser)
+        # Skip the instance lacking edit permission (include only its id).
+        data = {
+            "form-TOTAL_FORMS": "3",
+            "form-INITIAL_FORMS": "3",
+            "form-MAX_NUM_FORMS": "0",
+            "form-0-gender": "2",
+            "form-0-alive": "checked",
+            "form-0-id": str(self.per1.pk),
+            "form-1-id": str(self.per2.pk),  # not editable
+            "form-2-gender": "2",
+            "form-2-alive": "checked",
+            "form-2-id": str(self.per3.pk),
+            "_save": "Save",
+        }
+        response = self.client.post(
+            reverse("admin9:admin_views_person_changelist"), data, follow=True
+        )
+        # per1 and per3 were updated, but per2 was not.
+        self.assertEqual(Person.objects.get(pk=self.per1.pk).gender, 2)
+        self.assertEqual(Person.objects.get(pk=self.per2.pk).gender, 1)  # Unchanged
+        self.assertEqual(Person.objects.get(pk=self.per3.pk).gender, 2)
+
+        # Check for success message
+        self.assertEqual(len(response.context["messages"]), 1)
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
@@ -6863,7 +6969,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         select = Select(self.selenium.find_element(By.ID, "id_parent"))
         self.assertEqual(ParentWithUUIDPK.objects.count(), 0)
-        self.assertEqual(select.first_selected_option.text, "---------")
+        self.assertEqual(select.first_selected_option.text, get_blank_choice_label())
         self.assertEqual(select.first_selected_option.get_attribute("value"), "")
 
     def test_inline_with_popup_cancel_delete(self):
@@ -7113,7 +7219,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(born_country_select_id),
             f"""
-            <option value="" selected="">---------</option>
+            <option value="" selected="">- Select an option -</option>
             <option value="{argentina.pk}" selected="">Argentina</option>
             """,
         )
@@ -7132,7 +7238,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         # limit_choices_to.
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(favorite_country_to_vacation_select_id),
-            '<option value="" selected="">---------</option>',
+            '<option value="" selected="">- Select an option -</option>',
         )
 
         # Add new Country from the living_country select.
@@ -7152,7 +7258,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(born_country_select_id),
             f"""
-            <option value="" selected="">---------</option>
+            <option value="" selected="">- Select an option -</option>
             <option value="{argentina.pk}" selected="">Argentina</option>
             <option value="{spain.pk}">Spain</option>
             """,
@@ -7174,7 +7280,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         # limit_choices_to.
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(favorite_country_to_vacation_select_id),
-            '<option value="" selected="">---------</option>',
+            '<option value="" selected="">- Select an option -</option>',
         )
 
         # Edit second Country created from living_country select.
@@ -7195,7 +7301,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(born_country_select_id),
             f"""
-            <option value="" selected="">---------</option>
+            <option value="" selected="">- Select an option -</option>
             <option value="{argentina.pk}" selected="">Argentina</option>
             <option value="{italy.pk}">Italy</option>
             """,
@@ -7215,7 +7321,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         # favorite_country_to_vacation field has no options.
         self.assertHTMLEqual(
             _get_HTML_inside_element_by_id(favorite_country_to_vacation_select_id),
-            '<option value="" selected="">---------</option>',
+            '<option value="" selected="">- Select an option -</option>',
         )
 
         # Add a new Asian country.

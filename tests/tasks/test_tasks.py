@@ -1,4 +1,5 @@
 import dataclasses
+import pickle
 from datetime import datetime
 
 from django.tasks import (
@@ -269,6 +270,31 @@ class TaskTestCase(SimpleTestCase):
             test_tasks.noop_task_async,
         )
 
+    def test_pickle_task(self):
+        pickled_task = pickle.dumps(test_tasks.noop_task)
+        unpickled_task = pickle.loads(pickled_task)
+
+        self.assertEqual(unpickled_task, test_tasks.noop_task)
+
+    def test_unpickle_arbitrary_string(self):
+        kwargs = {"func": "does.not.exist.fake_task"}
+        msg = "Expected 'does.not.exist.fake_task' to point to a Task instance."
+        with self.assertRaisesMessage(ValueError, msg):
+            Task._reconstruct(kwargs)
+
+    def test_unpickle_non_task_object(self):
+        kwargs = {"func": "builtins.any"}
+        msg = "Expected 'builtins.any' to point to a Task instance."
+        with self.assertRaisesMessage(ValueError, msg):
+            Task._reconstruct(kwargs)
+
+    def test_pickle_task_result(self):
+        result = test_tasks.noop_task.enqueue()
+        pickled_result = pickle.dumps(result)
+        unpickled_result = pickle.loads(pickled_result)
+
+        self.assertEqual(unpickled_result, result)
+
     @override_settings(TASKS={})
     def test_no_backends(self):
         with self.assertRaises(InvalidTaskBackend):
@@ -312,3 +338,8 @@ class TaskTestCase(SimpleTestCase):
             "Task takes context but does not have a first argument of 'context'.",
         ):
             task(takes_context=True)(test_tasks.calculate_meaning_of_life.func)
+
+    def test_run_after_in_decorator(self):
+        msg = "run_after cannot be defined statically with the @task decorator."
+        with self.assertRaisesMessage(TypeError, msg):
+            task(run_after=timezone.now())(test_tasks.calculate_meaning_of_life.func)

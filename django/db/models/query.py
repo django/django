@@ -37,7 +37,7 @@ from django.db.models.utils import (
     resolve_callables,
 )
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.functional import cached_property
 
 # The maximum number of results to fetch in a get() query.
@@ -45,6 +45,8 @@ MAX_GET_RESULTS = 21
 
 # The maximum number of items to display in a QuerySet.__repr__
 REPR_OUTPUT_SIZE = 20
+
+DEFAULT_FETCH_MODE = FETCH_ONE
 
 
 class BaseIterable:
@@ -335,7 +337,7 @@ class QuerySet(AltersData):
         self._prefetch_done = False
         self._known_related_objects = {}  # {rel_field: {pk: rel_obj}}
         self._iterable_class = ModelIterable
-        self._fetch_mode = FETCH_ONE
+        self._fetch_mode = DEFAULT_FETCH_MODE
         self._fields = None
         self._defer_next_filter = False
         self._deferred_filter = None
@@ -1772,6 +1774,14 @@ class QuerySet(AltersData):
         elif fields:
             obj.query.add_select_related(fields)
         else:
+            # RemovedInDjango70Warning: when the deprecation ends, raise a
+            # TypeError instead.
+            warnings.warn(
+                "Calling select_related() with no arguments is deprecated. "
+                "Specify the fields to fetch instead.",
+                category=RemovedInDjango70Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
             obj.query.select_related = True
         return obj
 
@@ -2356,7 +2366,7 @@ class RawQuerySet:
         translations=None,
         using=None,
         hints=None,
-        fetch_mode=FETCH_ONE,
+        fetch_mode=DEFAULT_FETCH_MODE,
     ):
         self.raw_query = raw_query
         self.model = model

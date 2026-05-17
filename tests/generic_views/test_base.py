@@ -479,6 +479,20 @@ class RedirectViewTest(LoggingAssertionMixin, SimpleTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, "/bar/")
 
+    def test_preserve_request_temporary_redirect(self):
+        response = RedirectView.as_view(url="/bar/", preserve_request=True)(
+            self.rf.get("/foo/")
+        )
+        self.assertEqual(response.status_code, 307)
+        self.assertEqual(response.url, "/bar/")
+
+    def test_preserve_request_permanent_redirect(self):
+        response = RedirectView.as_view(
+            url="/bar/", preserve_request=True, permanent=True
+        )(self.rf.get("/foo/"))
+        self.assertEqual(response.status_code, 308)
+        self.assertEqual(response.url, "/bar/")
+
     def test_include_args(self):
         "GET arguments can be included in the redirected URL"
         response = RedirectView.as_view(url="/bar/")(self.rf.get("/foo/"))

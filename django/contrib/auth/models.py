@@ -79,6 +79,11 @@ class Permission(models.Model):
     def __str__(self):
         return "%s | %s" % (self.content_type, self.name)
 
+    @property
+    def user_perm_str(self):
+        """String representation for the user permission check."""
+        return f"{self.content_type.app_label}.{self.codename}"
+
     def natural_key(self):
         return (self.codename, *self.content_type.natural_key())
 

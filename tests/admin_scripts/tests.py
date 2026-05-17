@@ -2450,7 +2450,8 @@ class CommandDBOptionChoiceTests(SimpleTestCase):
         if PY314:
             expected_error = (
                 r"Error: argument --database: invalid choice: 'deflaut', "
-                r"maybe you meant 'default'\? \(choose from default, other\)"
+                r"maybe you meant 'default'\? "
+                r"\(choose from '?default'?, '?other'?\)"
             )
         else:
             expected_error = (

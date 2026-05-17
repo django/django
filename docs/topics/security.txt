@@ -253,7 +253,9 @@ User-uploaded content
 * If your site accepts file uploads, it is strongly advised that you limit
   these uploads in your web server configuration to a reasonable
   size in order to prevent denial of service (DOS) attacks. In Apache, this
-  can be easily set using the LimitRequestBody_ directive.
+  can be easily set using the LimitRequestBody_ directive. You should not rely
+  solely on :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE`
+  nor :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`.
 
 * If you are serving your own static files, be sure that handlers like Apache's
   ``mod_php``, which would execute static files as code, are disabled. You
@@ -286,6 +288,15 @@ User-uploaded content
      to only serve such files.
 
 .. _same-origin policy: https://en.wikipedia.org/wiki/Same-origin_policy
+
+Form Submissions
+================
+
+* Form submissions containing files are not limited by
+  :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE`. Under ASGI, the entire request may be
+  spooled to disk before any file size validation is performed. It is strongly
+  advised that you limit the maximum request body size in your web server
+  configuration to prevent denial of service (DOS) attacks.
 
 .. _security-csp:
 

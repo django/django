@@ -1,0 +1,54 @@
+==========================
+Django 6.0.5 release notes
+==========================
+
+*May 5, 2026*
+
+Django 6.0.5 fixes three security issues with severity "low" and several bugs
+in 6.0.4.
+
+CVE-2026-5766: Potential denial-of-service vulnerability in ASGI requests via file upload limit bypass
+======================================================================================================
+
+ASGI requests with a missing or understated ``Content-Length`` header could
+bypass the :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE` limit, potentially loading
+large files into memory and causing service degradation.
+
+As a reminder, Django :ref:`expects a limit to be configured
+<user-uploaded-content-security>` at the web server level rather than solely
+relying on :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<security-disclosure>`.
+
+CVE-2026-35192: Session fixation via public cached pages and ``SESSION_SAVE_EVERY_REQUEST``
+===========================================================================================
+
+Response headers did not :ref:`vary on <using-vary-headers>` cookies if a
+session was not modified, but :setting:`SESSION_SAVE_EVERY_REQUEST` was
+``True``. A remote attacker could steal a user's session after that user visits
+a cached public page.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<security-disclosure>`.
+
+CVE-2026-6907: Potential exposure of private data due to incorrect handling of ``Vary: *`` in ``UpdateCacheMiddleware``
+=======================================================================================================================
+
+Previously, :class:`~django.middleware.cache.UpdateCacheMiddleware` would
+erroneously cache requests where the ``Vary`` header contained an asterisk
+(``'*'``). This could lead to private data being stored and served.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<security-disclosure>`.
+
+Bugfixes
+========
+
+* Fixed a misplaced ``</div>`` in the
+  ``django/contrib/admin/templates/admin/change_list.html`` template added in
+  Django 6.0 that could be problematic when overriding the ``pagination`` block
+  (:ticket:`37029`).
+
+* Fixed a bug in Django 6.0 where deprecation warnings incorrectly skipped
+  lines from third-party packages prefixed with "django" (:ticket:`37067`).

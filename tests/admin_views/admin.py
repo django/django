@@ -5,7 +5,9 @@ from wsgiref.util import FileWrapper
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import BooleanFieldListFilter
+from django.contrib.admin.options import ActionLocation
 from django.contrib.admin.views.main import ChangeList
+from django.contrib.auth import get_permission_codename
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
@@ -84,6 +86,7 @@ from .models import (
     Language,
     Link,
     MainPrepopulated,
+    ModelAction,
     ModelWithStringPrimaryKey,
     NotReferenced,
     OldSubscriber,
@@ -292,13 +295,17 @@ class ArticleAdmin2(admin.ModelAdmin):
 
 
 class RowLevelChangePermissionModelAdmin(admin.ModelAdmin):
+    # These fields aren't intended to be modified by the change form. By
+    # making them read-only, they don't need to be included in post data.
+    readonly_fields = ("can_change", "can_view")
+
     def has_change_permission(self, request, obj=None):
-        """Only allow changing objects with even id number"""
-        return request.user.is_staff and (obj is not None) and (obj.id % 2 == 0)
+        """Only allow changing objects with can_change=True."""
+        return request.user.is_staff and obj is not None and obj.can_change
 
     def has_view_permission(self, request, obj=None):
-        """Only allow viewing objects if id is a multiple of 3."""
-        return request.user.is_staff and obj is not None and obj.id % 3 == 0
+        """Only allow viewing objects with can_view=True."""
+        return request.user.is_staff and obj is not None and obj.can_view
 
 
 class CustomArticleAdmin(admin.ModelAdmin):
@@ -369,6 +376,25 @@ class PersonAdmin(admin.ModelAdmin):
         return super().get_queryset(request).order_by("age")
 
 
+class ParentWithUUIDPKNoAddAdmin(admin.ModelAdmin):
+    list_display = ("id", "title")
+    list_editable = ("title",)
+
+    def has_add_permission(self, request):
+        return False
+
+
+class PersonNoChangePermissionsAdmin9(admin.ModelAdmin):
+    list_display = ("name", "gender", "alive")
+    list_editable = ("gender", "alive")
+    ordering = ("id",)
+
+    def has_change_permission(self, request, obj=None):
+        if obj is None:
+            return True
+        return obj.alive
+
+
 class FooAccountAdmin(admin.StackedInline):
     model = FooAccount
     extra = 1
@@ -401,7 +427,10 @@ class SubscriberAdmin(admin.ModelAdmin):
         ).send()
 
 
-@admin.action(description="External mail (Another awesome action)")
+@admin.action(
+    description="External mail (Another awesome action)",
+    location=(ActionLocation.CHANGE_LIST, ActionLocation.CHANGE_FORM),
+)
 def external_mail(modeladmin, request, selected):
     EmailMessage(
         "Greetings from a function action",
@@ -418,9 +447,18 @@ def redirect_to(modeladmin, request, selected):
     return HttpResponseRedirect("/some-where-else/")
 
 
-@admin.action(description="Download subscription")
+@admin.action(
+    description="Download subscription",
+    description_plural="Download selected subscriptions",
+    location=(ActionLocation.CHANGE_LIST, ActionLocation.CHANGE_FORM),
+)
 def download(modeladmin, request, selected):
-    buf = StringIO("This is the content of the file")
+    if selected.count() > 1:
+        buf = StringIO("This is the content of the file")
+    else:
+        selected = selected.get()
+        buf = StringIO(f"This is the content of the file written by {selected.name}")
+
     return StreamingHttpResponse(FileWrapper(buf))
 
 
@@ -429,8 +467,39 @@ def no_perm(modeladmin, request, selected):
     return HttpResponse(content="No permission to perform this action", status=403)
 
 
+@admin.action(
+    permissions=["custom"],
+    location=[ActionLocation.CHANGE_LIST, ActionLocation.CHANGE_FORM],
+)
+def custom_action(modeladmin, request, selected):
+    return HttpResponse(content="OK", status=200)
+
+
+@admin.action(description="Change view", location=ActionLocation.CHANGE_FORM)
+def change_view_only_action(modeladmin, request, selected):
+    return HttpResponse(content="OK", status=200)
+
+
+def no_decorator_action(modeladmin, request, selected):
+    return HttpResponse(content="OK", status=200)
+
+
 class ExternalSubscriberAdmin(admin.ModelAdmin):
-    actions = [redirect_to, external_mail, download, no_perm]
+    actions = [
+        redirect_to,
+        external_mail,
+        download,
+        no_perm,
+        custom_action,
+        change_view_only_action,
+        no_decorator_action,
+    ]
+
+    def has_custom_permission(self, request):
+        """Does the user have the custom permission?"""
+        opts = self.opts
+        codename = get_permission_codename("custom", opts)
+        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
 
 
 class PodcastAdmin(admin.ModelAdmin):
@@ -1215,6 +1284,23 @@ class CourseAdmin(admin.ModelAdmin):
     )
 
 
+# RemovedInDjango70Warning: When the deprecation ends, remove.
+class OverriddenActionAdmin(admin.ModelAdmin):
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        func, name, _ = actions["delete_selected"]
+        description = actions["delete_selected"][2]
+        actions["delete_selected"] = (func, name, description + " (extra)")
+        return actions
+
+    def get_action_choices(self, request, default_choices=models.BLANK_CHOICE_DASH):
+        return super().get_action_choices(request, default_choices)
+
+    @admin.action(location=[ActionLocation.CHANGE_LIST, ActionLocation.CHANGE_FORM])
+    def test_action(self, request, selected):
+        pass
+
+
 site = admin.AdminSite(name="admin")
 site.site_url = "/my-site-url/"
 site.register(Article, ArticleAdmin)
@@ -1290,6 +1376,8 @@ site.register(ParentWithUUIDPK)
 site.register(RelatedPrepopulated, search_fields=["name"])
 site.register(RelatedWithUUIDPKModel)
 site.register(ReadOnlyRelatedField, ReadOnlyRelatedFieldAdmin)
+# RemovedInDjango70Warning: When the deprecation ends, remove.
+site.register(ModelAction, OverriddenActionAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor
 # ChapterXtra2. That way we cover all four cases:
@@ -1365,6 +1453,7 @@ site2.register(Language)
 site7 = admin.AdminSite(name="admin7")
 site7.register(Article, ArticleAdmin2)
 site7.register(Section)
+site7.register(ParentWithUUIDPK, ParentWithUUIDPKNoAddAdmin)
 
 
 # Admin for testing optgroup in popup response
@@ -1482,6 +1571,7 @@ class ActorAdmin9(admin.ModelAdmin):
 site9 = admin.AdminSite(name="admin9")
 site9.register(Article, ArticleAdmin9)
 site9.register(Actor, ActorAdmin9)
+site9.register(Person, PersonNoChangePermissionsAdmin9)
 
 site10 = admin.AdminSite(name="admin10")
 site10.final_catch_all_view = False

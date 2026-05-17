@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field, fields, replace
 from datetime import datetime
 from inspect import isclass, iscoroutinefunction
 from typing import Any
@@ -43,17 +43,34 @@ class TaskResultStatus(TextChoices):
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Task:
-    priority: int
     func: Callable[..., Any]  # The Task function.
-    backend: str
-    queue_name: str
-    run_after: datetime | None  # The earliest this Task will run.
+    priority: int = DEFAULT_TASK_PRIORITY
+    backend: str = DEFAULT_TASK_BACKEND_ALIAS
+    queue_name: str = DEFAULT_TASK_QUEUE_NAME
+    run_after: datetime | None = None  # The earliest this Task will run.
 
     # Whether the Task receives the Task context when executed.
     takes_context: bool = False
 
     def __post_init__(self):
         self.get_backend().validate_task(self)
+
+    @classmethod
+    def _reconstruct(cls, kwargs):
+        func_path = kwargs["func"]
+        try:
+            func = import_string(func_path)
+            kwargs["func"] = func.func
+        except (ImportError, AttributeError) as e:
+            msg = f"Expected {func_path!r} to point to a Task instance."
+            raise ValueError(msg) from e
+        return cls(**kwargs)
+
+    def __reduce__(self):
+        kwargs = {f.name: getattr(self, f.name) for f in fields(self)}
+        kwargs["func"] = self.module_path
+
+        return (self.__class__._reconstruct, (kwargs,))
 
     @property
     def name(self):
@@ -138,17 +155,24 @@ def task(
     queue_name=DEFAULT_TASK_QUEUE_NAME,
     backend=DEFAULT_TASK_BACKEND_ALIAS,
     takes_context=False,
+    **kwargs,
 ):
     from . import task_backends
 
+    if "run_after" in kwargs:
+        raise TypeError(
+            "run_after cannot be defined statically with the @task decorator. "
+            "Use .using(run_after=...) to set it dynamically."
+        )
+
     def wrapper(f):
         return task_backends[backend].task_class(
-            priority=priority,
             func=f,
+            priority=priority,
             queue_name=queue_name,
             backend=backend,
             takes_context=takes_context,
-            run_after=None,
+            **kwargs,
         )
 
     if function:

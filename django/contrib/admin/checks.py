@@ -842,6 +842,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             *self._check_search_fields(admin_obj),
             *self._check_date_hierarchy(admin_obj),
             *self._check_actions(admin_obj),
+            *self._check_delete_confirmation_max_display(admin_obj),
         ]
 
     def _check_save_as(self, obj):
@@ -1081,10 +1082,32 @@ class ModelAdminChecks(BaseModelAdminChecks):
 
         if not isinstance(obj.list_select_related, (bool, list, tuple)):
             return must_be(
+                # RemovedInDjango70Warning: when the deprecation ends, replace:
+                # "a tuple, list, or False",
+                # and also update docs/ref/checks.txt.
                 "a boolean, tuple or list",
                 option="list_select_related",
                 obj=obj,
                 id="admin.E117",
+            )
+        else:
+            return []
+
+    def _check_delete_confirmation_max_display(self, obj):
+        """Check that delete_confirmation_max_display is
+        a non-negative integer or None."""
+
+        if obj.delete_confirmation_max_display is None:
+            return []
+        if (
+            not isinstance(obj.delete_confirmation_max_display, int)
+            or obj.delete_confirmation_max_display < 0
+        ):
+            return must_be(
+                "a non-negative integer or None",
+                option="delete_confirmation_max_display",
+                obj=obj,
+                id="admin.E131",
             )
         else:
             return []
@@ -1225,10 +1248,10 @@ class ModelAdminChecks(BaseModelAdminChecks):
 
         # Actions with an allowed_permission attribute require the ModelAdmin
         # to implement a has_<perm>_permission() method for each permission.
-        for func, name, _ in actions:
-            if not hasattr(func, "allowed_permissions"):
+        for action in actions:
+            if not hasattr(action.func, "allowed_permissions"):
                 continue
-            for permission in func.allowed_permissions:
+            for permission in action.func.allowed_permissions:
                 method_name = "has_%s_permission" % permission
                 if not hasattr(obj, method_name):
                     errors.append(
@@ -1237,14 +1260,14 @@ class ModelAdminChecks(BaseModelAdminChecks):
                             % (
                                 obj.__class__.__name__,
                                 method_name,
-                                func.__name__,
+                                action.func.__name__,
                             ),
                             obj=obj.__class__,
                             id="admin.E129",
                         )
                     )
         # Names need to be unique.
-        names = collections.Counter(name for _, name, _ in actions)
+        names = collections.Counter(action.name for action in actions)
         for name, count in names.items():
             if count > 1:
                 errors.append(

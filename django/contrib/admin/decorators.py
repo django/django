@@ -1,4 +1,14 @@
-def action(function=None, *, permissions=None, description=None):
+from django.contrib.admin.options import ActionLocation
+
+
+def action(
+    function=None,
+    *,
+    permissions=None,
+    description=None,
+    description_plural=None,
+    location=ActionLocation.CHANGE_LIST,
+):
     """
     Conveniently add attributes to an action function::
 
@@ -23,6 +33,13 @@ def action(function=None, *, permissions=None, description=None):
             func.allowed_permissions = permissions
         if description is not None:
             func.short_description = description
+        if description_plural is not None:
+            func.plural_description = description_plural
+        elif description is not None:
+            func.plural_description = description
+        func.locations = (
+            [location] if isinstance(location, ActionLocation) else location
+        )
         return func
 
     if function is None:

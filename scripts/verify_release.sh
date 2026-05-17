@@ -67,15 +67,15 @@ sha1sum --check "${CHECKSUM_FILE}" 2>/dev/null
 echo "- SHA256 checksums"
 sha256sum --check "${CHECKSUM_FILE}" 2>/dev/null
 
-PKG_TAR=$(ls Django-*.tar.gz)
-PKG_WHL=$(ls Django-*.whl)
+PKG_TAR=$(ls django-*.tar.gz)
+PKG_WHL=$(ls django-*.whl)
 
 echo "Testing tarball install ..."
 python3 -m venv django-pip
 . django-pip/bin/activate
 python -m pip install --no-cache-dir "${WORKDIR}/${PKG_TAR}"
-django-admin startproject test_one
-cd test_one
+django-admin startproject test_tarball
+cd test_tarball
 ./manage.py --help  # Ensure executable bits
 python manage.py migrate
 python manage.py runserver 0
@@ -86,8 +86,8 @@ echo "Testing wheel install ..."
 python3 -m venv django-pip-wheel
 . django-pip-wheel/bin/activate
 python -m pip install --no-cache-dir "${WORKDIR}/${PKG_WHL}"
-django-admin startproject test_one
-cd test_one
+django-admin startproject test_wheel
+cd test_wheel
 ./manage.py --help  # Ensure executable bits
 python manage.py migrate
 python manage.py runserver 0

@@ -3,7 +3,7 @@ from urllib.parse import urlsplit
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.core.mail import mail_managers
+from django.core.mail import MailerDoesNotExist, mail_managers, mailers
 from django.http import HttpResponsePermanentRedirect
 from django.urls import is_valid_path
 from django.utils.deprecation import MiddlewareMixin
@@ -118,6 +118,9 @@ class CommonMiddleware(MiddlewareMixin):
 
 
 class BrokenLinkEmailsMiddleware(MiddlewareMixin):
+    # Set to override the mail.mailers alias used for sending the email.
+    using = None
+
     def process_response(self, request, response):
         """Send broken link emails for relevant 404 NOT FOUND responses."""
         if response.status_code == 404 and not settings.DEBUG:
@@ -128,7 +131,7 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
             if not self.is_ignorable_request(request, path, domain, referer):
                 ua = request.META.get("HTTP_USER_AGENT", "<none>")
                 ip = request.META.get("REMOTE_ADDR", "<none>")
-                mail_managers(
+                self.send_mail(
                     "Broken %slink on %s"
                     % (
                         (
@@ -140,9 +143,19 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
                     ),
                     "Referrer: %s\nRequested URL: %s\nUser agent: %s\n"
                     "IP address: %s\n" % (referer, path, ua, ip),
-                    fail_silently=True,
                 )
         return response
+
+    def send_mail(self, subject, message, *args, **kwargs):
+        # RemovedInDjango70Warning.
+        if not mailers._is_configured:
+            mail_managers(subject, message, *args, fail_silently=True, **kwargs)
+            return
+
+        try:
+            mail_managers(subject, message, *args, using=self.using, **kwargs)
+        except MailerDoesNotExist:
+            pass
 
     def is_internal_request(self, domain, referer):
         """

@@ -5,7 +5,7 @@ How to authenticate against Django's user database from Apache
 Since keeping multiple authentication databases in sync is a common problem
 when dealing with Apache, you can configure Apache to authenticate against
 Django's :doc:`authentication system </topics/auth/index>` directly. This
-requires Apache version >= 2.2 and mod_wsgi >= 2.0. For example, you could:
+requires Apache version >= 2.2 and ``mod_wsgi`` >= 2.0. For example, you could:
 
 * Serve static/media files directly from Apache only to authenticated users.
 
@@ -23,7 +23,7 @@ requires Apache version >= 2.2 and mod_wsgi >= 2.0. For example, you could:
     auth handler if your custom cannot conform to these requirements.
 
 .. _Subversion: https://subversion.apache.org/
-.. _mod_dav: https://httpd.apache.org/docs/2.2/mod/mod_dav.html
+.. _mod_dav: https://httpd.apache.org/docs/current/mod/mod_dav.html
 
 Authentication with ``mod_wsgi``
 ================================
@@ -66,7 +66,7 @@ password that it receives from the prompt. In this example, the
 application :doc:`that is created by django-admin startproject
 </howto/deployment/wsgi/index>`.
 
-.. admonition:: Using Apache 2.2 with authentication
+.. admonition:: Using Apache 2.2+ with authentication
 
     Make sure that ``mod_auth_basic`` and ``mod_authz_user`` are loaded.
 

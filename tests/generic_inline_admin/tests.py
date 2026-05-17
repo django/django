@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.admin.sites import AdminSite
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.admin import GenericTabularInline
 from django.contrib.contenttypes.models import ContentType
 from django.forms.formsets import DEFAULT_MAX_NUM
@@ -8,9 +8,9 @@ from django.forms.models import ModelForm
 from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 
-from .admin import MediaInline, MediaPermanentInline
+from .admin import MediaInline, MediaPermanentInline, PhoneNumberInline
 from .admin import site as admin_site
-from .models import Category, Episode, EpisodePermanent, Media, PhoneNumber
+from .models import Category, Contact, Episode, EpisodePermanent, Media, PhoneNumber
 
 
 class TestDataMixin:
@@ -295,12 +295,102 @@ class GenericInlineAdminWithUniqueTogetherTest(TestDataMixin, TestCase):
 
 
 @override_settings(ROOT_URLCONF="generic_inline_admin.urls")
-class NoInlineDeletionTest(SimpleTestCase):
-    def test_no_deletion(self):
-        inline = MediaPermanentInline(EpisodePermanent, admin_site)
-        fake_request = object()
-        formset = inline.get_formset(fake_request)
-        self.assertFalse(formset.can_delete)
+class GenericInlineAdminPermissionsTest(TestCase):
+    factory = RequestFactory()
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User(username="admin", is_staff=True, is_active=True)
+        cls.user.set_password("secret")
+        cls.user.save()
+
+        # User always has all permissions on Contact (parent) model.
+        # Permissions on the inlines vary per test.
+        cls.contact_type = ContentType.objects.get_for_model(Contact)
+        cls.user.user_permissions.add(
+            *Permission.objects.filter(content_type=cls.contact_type)
+        )
+
+    def test_add_inline_without_add_permission(self):
+        self.client.force_login(self.user)
+        inline_view_perm = Permission.objects.get(codename="view_phonenumber")
+        self.user.user_permissions.add(inline_view_perm)
+
+        category_id = Category.objects.create(name="test").pk
+        prefix = "generic_inline_admin-phonenumber-content_type-object_id"
+        post_data = {
+            "name": "Barbara",
+            # inline data
+            f"{prefix}-TOTAL_FORMS": "1",
+            f"{prefix}-INITIAL_FORMS": "0",
+            f"{prefix}-MIN_NUM_FORMS": "0",
+            f"{prefix}-MAX_NUM_FORMS": "0",
+            f"{prefix}-0-id": "",
+            f"{prefix}-0-phone_number": "555-555-5555",
+            f"{prefix}-0-category": str(category_id),
+        }
+        request = self.factory.get(reverse("admin:generic_inline_admin_contact_add"))
+        request.user = self.user
+        inline = PhoneNumberInline(Contact, AdminSite())
+        FormSet = inline.get_formset(request)
+        formset = FormSet(
+            data=post_data, prefix=prefix, instance=Contact(name="Barbara")
+        )
+
+        self.assertIs(formset.is_valid(), True)
+        self.assertIs(formset.has_changed(), False)
+        self.assertEqual(formset.save(commit=False), [])
+
+    def test_add_inline_with_change_permission_only(self):
+        """
+        Forged new inline instances are ignored without add permissions, but
+        but edits still work with edit permissions.
+        """
+        self.client.force_login(self.user)
+        inline_perms = Permission.objects.filter(
+            codename__in=("view_phonenumber", "change_phonenumber")
+        )
+        self.user.user_permissions.add(*inline_perms)
+
+        category_id = Category.objects.create(name="test").pk
+        contact = Contact.objects.create(name="Barbara")
+        existing_number = PhoneNumber.objects.create(
+            category_id=category_id,
+            content_type=self.contact_type,
+            object_id=contact.pk,
+            phone_number="555-555-5555",
+        )
+        prefix = "generic_inline_admin-phonenumber-content_type-object_id"
+        post_data = {
+            "id": str(contact.pk),
+            "name": "Barbara",
+            # inline data
+            f"{prefix}-TOTAL_FORMS": "2",
+            f"{prefix}-INITIAL_FORMS": "1",
+            f"{prefix}-MIN_NUM_FORMS": "0",
+            f"{prefix}-MAX_NUM_FORMS": "0",
+            # Attempt to edit the existing phone number value.
+            f"{prefix}-0-id": str(existing_number.id),
+            f"{prefix}-0-phone_number": "111-111-1111",
+            f"{prefix}-0-category": str(category_id),
+            # Attempt to forge a new phone number.
+            f"{prefix}-1-id": "",
+            f"{prefix}-1-phone_number": "666-666-6666",
+            f"{prefix}-1-category": str(category_id),
+            "_save": "Save",
+        }
+        request = self.factory.get(
+            reverse("admin:generic_inline_admin_contact_change", args=[contact.pk])
+        )
+        request.user = self.user
+        inline = PhoneNumberInline(Contact, AdminSite())
+        FormSet = inline.get_formset(request)
+        formset = FormSet(data=post_data, prefix=prefix, instance=contact)
+
+        self.assertIs(formset.is_valid(), True)
+        self.assertIs(formset.has_changed(), True)
+        # The edit succeeds; the add is ignored.
+        self.assertEqual(formset.save(commit=False), [existing_number])
 
 
 class MockRequest:
@@ -314,6 +404,14 @@ class MockSuperUser:
 
 request = MockRequest()
 request.user = MockSuperUser()
+
+
+@override_settings(ROOT_URLCONF="generic_inline_admin.urls")
+class NoInlineDeletionTest(SimpleTestCase):
+    def test_no_deletion(self):
+        inline = MediaPermanentInline(EpisodePermanent, admin_site)
+        formset = inline.get_formset(request)
+        self.assertFalse(formset.can_delete)
 
 
 @override_settings(ROOT_URLCONF="generic_inline_admin.urls")

@@ -1,7 +1,8 @@
 import logging
+from dataclasses import dataclass
 from unittest import mock
 
-from django.tasks import default_task_backend, task_backends
+from django.tasks import Task, default_task_backend, task, task_backends
 from django.tasks.backends.base import BaseTaskBackend
 from django.tasks.exceptions import InvalidTask
 from django.test import SimpleTestCase, override_settings
@@ -21,6 +22,20 @@ class CustomBackend(BaseTaskBackend):
 
 class CustomBackendNoEnqueue(BaseTaskBackend):
     pass
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class CustomTask(Task):
+    foo: int = 3
+    bar: int = 300
+
+
+class CustomTaskBackend(BaseTaskBackend):
+    task_class = CustomTask
+    supports_priority = True
+
+    def enqueue(self, task, args, kwargs):
+        pass
 
 
 @override_settings(
@@ -68,3 +83,45 @@ class CustomBackendTestCase(SimpleTestCase):
             "without an implementation for abstract method 'enqueue'",
         ):
             test_tasks.noop_task.using(backend="no_enqueue")
+
+
+@override_settings(
+    TASKS={
+        "default": {
+            "BACKEND": f"{CustomTaskBackend.__module__}."
+            f"{CustomTaskBackend.__qualname__}",
+            "QUEUES": ["default", "high"],
+        },
+    }
+)
+class CustomTaskTestCase(SimpleTestCase):
+    def test_custom_task_default_values(self):
+        my_task = task()(test_tasks.noop_task.func)
+
+        self.assertIsInstance(my_task, CustomTask)
+        self.assertEqual(my_task.foo, 3)
+        self.assertEqual(my_task.bar, 300)
+
+    def test_custom_task_with_custom_values(self):
+        my_task = task(foo=5, bar=600)(test_tasks.noop_task.func)
+
+        self.assertIsInstance(my_task, CustomTask)
+        self.assertEqual(my_task.foo, 5)
+        self.assertEqual(my_task.bar, 600)
+
+    def test_custom_task_with_standard_and_custom_values(self):
+        my_task = task(priority=10, queue_name="high", foo=10, bar=1000)(
+            test_tasks.noop_task.func
+        )
+
+        self.assertIsInstance(my_task, CustomTask)
+        self.assertEqual(my_task.priority, 10)
+        self.assertEqual(my_task.queue_name, "high")
+        self.assertEqual(my_task.foo, 10)
+        self.assertEqual(my_task.bar, 1000)
+        self.assertFalse(my_task.takes_context)
+        self.assertIsNone(my_task.run_after)
+
+    def test_custom_task_invalid_kwarg(self):
+        with self.assertRaises(TypeError):
+            task(unknown_param=123)(test_tasks.noop_task.func)

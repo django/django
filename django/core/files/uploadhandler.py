@@ -3,7 +3,7 @@ Base file upload handler classes, and the built-in concrete subclasses
 """
 
 import os
-from io import BytesIO
+from io import BytesIO, UnsupportedOperation
 
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
@@ -203,9 +203,24 @@ class MemoryFileUploadHandler(FileUploadHandler):
         Use the content_length to signal whether or not this handler should be
         used.
         """
-        # Check the content-length header to see if we should
         # If the post is too large, we cannot use the Memory handler.
-        self.activated = content_length <= settings.FILE_UPLOAD_MAX_MEMORY_SIZE
+        # Content-Length can be absent or understated (for example
+        # `Transfer-Encoding: chunked` on ASGI), so for seekable streams (such
+        # as SpooledTemporaryFile on ASGI), check the actual size.
+
+        stream = getattr(input_data, "_stream", input_data)
+        try:
+            content_length = stream.seek(0, os.SEEK_END)
+        except (UnsupportedOperation, AttributeError):
+            # Cannot seek; fall back to the Content-Length parameter.
+            # On WSGI the stream enforces this value so it is trustworthy.
+            pass
+        else:
+            stream.seek(0)
+        self.activated = (
+            content_length is not None
+            and content_length <= settings.FILE_UPLOAD_MAX_MEMORY_SIZE
+        )
 
     def new_file(self, *args, **kwargs):
         super().new_file(*args, **kwargs)

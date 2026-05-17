@@ -79,15 +79,13 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_collation_on_textfield = False
     supports_on_delete_db_default = False
     supports_no_precision_decimalfield = True
+    supports_default_in_bit_aggregations = False
     test_now_utc_template = "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
     django_test_expected_failures = {
         # A bug in Django/oracledb with respect to string handling (#23843).
         "annotations.tests.NonAggregateAnnotationTestCase.test_custom_functions",
         "annotations.tests.NonAggregateAnnotationTestCase."
         "test_custom_functions_can_ref_other_functions",
-        # A bug in Django with respect to unioning ordered querysets (#36938).
-        "queries.test_qs_combinators.QuerySetSetOperationTests."
-        "test_count_union_with_select_related_in_values",
     }
     insert_test_table_with_defaults = (
         "INSERT INTO {} VALUES (DEFAULT, DEFAULT, DEFAULT)"
@@ -240,3 +238,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def supports_stored_generated_columns(self):
         return self.connection.oracle_version >= (23, 7)
+
+    @cached_property
+    def supports_bit_aggregations(self):
+        return self.connection.oracle_version >= (21,)

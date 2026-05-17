@@ -64,10 +64,67 @@ details on these changes.
   :class:`~django.db.models.JSONNull` to query for a JSON ``null`` value
   instead.
 
+* The ``django.db.models.fields.BLANK_CHOICE_DASH`` constant will be removed.
+
+* The ``USE_BLANK_CHOICE_DASH`` transitional setting will be removed.
+
 * The ``Field.get_placeholder_sql`` shim over the deprecated
   ``get_placeholder`` method will be removed.
 
 * The ``SQLCompiler.quote_name_unless_alias()`` method will be removed.
+
+* The ``EMAIL_BACKEND``, ``EMAIL_FILE_PATH``, ``EMAIL_HOST``,
+  ``EMAIL_HOST_PASSWORD``, ``EMAIL_HOST_USER``, ``EMAIL_PORT``,
+  ``EMAIL_USE_TLS``, ``EMAIL_USE_SSL``, ``EMAIL_SSL_CERTFILE``,
+  ``EMAIL_SSL_KEYFILE``, and ``EMAIL_TIMEOUT`` settings will be removed.
+
+* The ``django.core.mail.get_connection()`` function will be removed.
+
+* The ``connection``, ``fail_silently``, ``auth_user``, and ``auth_password``
+  arguments will be removed from :func:`.send_mail`, :func:`.send_mass_mail`,
+  :func:`.mail_admins`, :func:`.mail_managers`, the :class:`.EmailMessage`
+  constructor, and :meth:`.EmailMessage.send`. Support for the
+  ``EmailMessage.connection`` attribute will also be removed.
+
+* Directly creating instances of the ``smtp.EmailBackend`` class will become
+  unsupported, and the class documentation for that backend will be removed.
+
+* The ``BaseEmailBackend.__init__()`` method will raise errors for unknown
+  keyword arguments and will remove support for ``fail_silently``.
+
+* The ``email_backend`` argument of :class:`.log.AdminEmailHandler` will be
+  removed.
+
+* The ``django.contrib.postgres.aggregates.BitAnd``,
+  ``django.contrib.postgres.aggregates.BitOr``, and
+  ``django.contrib.postgres.aggregates.BitXor`` classes will be removed.
+
+* Support for double-dot variable lookup, like ``{{ book..title }}``,
+  is removed.
+
+* The default value of the ``algorithm`` argument for
+  ``django.utils.crypto.salted_hmac()`` and
+  ``django.core.signing.base64_hmac()`` will change from ``"sha1"`` to
+  ``"sha256"``.
+
+* :meth:`.QuerySet.select_related` will raise :exc:`TypeError` if passed
+  ``True`` rather than :exc:`AttributeError`.
+
+* :class:`.ModelAdmin` will raise :exc:`ValueError` if subclassed with its
+  :attr:`.list_select_related` attribute set to ``True``.
+
+* :class:`.ModelAdmin` will raise :exc:`ValueError` if its
+  :meth:`.get_list_select_related` method returns ``True``.
+
+* Support for overriding ``ModelAdmin.get_actions()`` without the new
+  ``action_location`` parameter will be removed.
+
+* Support for unpacking or indexing the dictionary values of the
+  ``ModelAdmin.get_actions()`` return value will be removed. Use
+  :class:`~django.contrib.admin.Action` attributes instead.
+
+* Support for overriding ``ModelAdmin.get_action_choices()`` without the new
+  ``action_location`` parameter will be removed.
 
 .. _deprecation-removed-in-6.1:
 

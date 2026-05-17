@@ -35,6 +35,7 @@ urlpatterns = [
     path("test_admin/admin11/", admin.site11.urls),
     path("test_admin/admin12/", admin.site12.urls),
     path("test_admin/admin13/", admin.site13.urls),
+    path("test_admin/admin_zero_display/", customadmin.zero_display_site.urls),
     path("test_admin/has_permission_admin/", custom_has_permission_admin.site.urls),
     path("test_admin/autocomplete_admin/", autocomplete_site.urls),
     # Shares the admin URL prefix.

@@ -9,18 +9,59 @@ for a list of all possible variables.
 import importlib
 import os
 import time
-import traceback
 import warnings
 from pathlib import Path
 
-import django
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import (
+    RemovedInDjango70Warning,
+    django_file_prefixes,
+    warn_about_external_use,
+)
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 DEFAULT_STORAGE_ALIAS = "default"
 STATICFILES_STORAGE_ALIAS = "staticfiles"
+
+# RemovedInDjango70Warning.
+USE_BLANK_CHOICE_DASH_DEPRECATED_MSG = (
+    "The USE_BLANK_CHOICE_DASH setting is deprecated. If you wish to define "
+    "your own default blank choice label, override "
+    "django.db.models.fields.BLANK_CHOICE_LABEL in your app's ready() method."
+)
+
+# RemovedInDjango70Warning.
+DEPRECATED_EMAIL_SETTINGS = {
+    "EMAIL_BACKEND",
+    "EMAIL_FILE_PATH",
+    "EMAIL_HOST",
+    "EMAIL_HOST_PASSWORD",
+    "EMAIL_HOST_USER",
+    "EMAIL_PORT",
+    "EMAIL_SSL_CERTFILE",
+    "EMAIL_SSL_KEYFILE",
+    "EMAIL_TIMEOUT",
+    "EMAIL_USE_SSL",
+    "EMAIL_USE_TLS",
+}
+EMAIL_SETTING_DEPRECATED_MSG = (
+    "The {name} setting is deprecated. Migrate to MAILERS before Django 7.0."
+)
+
+
+# RemovedInDjango70Warning.
+# Must be called with the complete set of user-defined setting names (but no
+# default settings).
+def _check_email_settings_conflicts(explicit_settings):
+    deprecated = DEPRECATED_EMAIL_SETTINGS.intersection(explicit_settings)
+    if deprecated and "MAILERS" in explicit_settings:
+        deprecated_str = ", ".join(sorted(deprecated))
+        raise ImproperlyConfigured(
+            "Deprecated email settings are not allowed when MAILERS is "
+            f"defined: {deprecated_str}."
+        )
 
 
 class SettingsReference(str):
@@ -76,6 +117,16 @@ class LazySettings(LazyObject):
             _wrapped = self._wrapped
         val = getattr(_wrapped, name)
 
+        # RemovedInDjango70Warning.
+        if name in DEPRECATED_EMAIL_SETTINGS:
+            if hasattr(_wrapped, "MAILERS"):
+                raise AttributeError(
+                    f"The {name} setting is not available when MAILERS is defined."
+                )
+            _show_settings_deprecation_warning(
+                EMAIL_SETTING_DEPRECATED_MSG.format(name=name), RemovedInDjango70Warning
+            )
+
         # Special case some settings which require further modification.
         # This is done here for performance reasons so the modified value is
         # cached.
@@ -96,12 +147,43 @@ class LazySettings(LazyObject):
             self.__dict__.clear()
         else:
             self.__dict__.pop(name, None)
+
+        # RemovedInDjango70Warning.
+        if name == "USE_BLANK_CHOICE_DASH":
+            _show_settings_deprecation_warning(
+                USE_BLANK_CHOICE_DASH_DEPRECATED_MSG, RemovedInDjango70Warning
+            )
+        # RemovedInDjango70Warning.
+        if name == "MAILERS":
+            # When MAILERS is set, clear any cached values of
+            # deprecated settings so that __getattr__() runs again for them.
+            for setting in DEPRECATED_EMAIL_SETTINGS:
+                self.__dict__.pop(setting, None)
+        if name in DEPRECATED_EMAIL_SETTINGS:
+            _show_settings_deprecation_warning(
+                EMAIL_SETTING_DEPRECATED_MSG.format(name=name), RemovedInDjango70Warning
+            )
+
         super().__setattr__(name, value)
 
     def __delattr__(self, name):
         """Delete a setting and clear it from cache if needed."""
         super().__delattr__(name)
         self.__dict__.pop(name, None)
+
+    # RemovedInDjango70Warning.
+    def __dir__(self):
+        attrs = super().__dir__()
+        if hasattr(self._wrapped, "MAILERS"):
+            # When MAILERS is defined, filter out deprecated email
+            # settings that are from the global_settings defaults.
+            attrs = [
+                name
+                for name in attrs
+                if name not in DEPRECATED_EMAIL_SETTINGS
+                or self._wrapped.is_overridden(name)
+            ]
+        return attrs
 
     def configure(self, default_settings=global_settings, **options):
         """
@@ -111,6 +193,10 @@ class LazySettings(LazyObject):
         """
         if self._wrapped is not empty:
             raise RuntimeError("Settings already configured.")
+
+        # RemovedInDjango70Warning.
+        _check_email_settings_conflicts(options.keys())
+
         holder = UserSettingsHolder(default_settings)
         for name, value in options.items():
             if not name.isupper():
@@ -137,15 +223,6 @@ class LazySettings(LazyObject):
     def configured(self):
         """Return True if the settings have already been configured."""
         return self._wrapped is not empty
-
-    def _show_deprecation_warning(self, message, category):
-        stack = traceback.extract_stack()
-        # Show a warning if the setting is used outside of Django.
-        # Stack index: -1 this line, -2 the property, -3 the
-        # LazyObject __getattribute__(), -4 the caller.
-        filename, _, _, _ = stack[-4]
-        if not filename.startswith(os.path.dirname(django.__file__)):
-            warnings.warn(message, category, stacklevel=2)
 
 
 class Settings:
@@ -181,6 +258,22 @@ class Settings:
                     )
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
+
+        # RemovedInDjango70Warning.
+        if "USE_BLANK_CHOICE_DASH" in self._explicit_settings:
+            warnings.warn(
+                USE_BLANK_CHOICE_DASH_DEPRECATED_MSG,
+                RemovedInDjango70Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
+        # RemovedInDjango70Warning.
+        _check_email_settings_conflicts(self._explicit_settings)
+        for name in DEPRECATED_EMAIL_SETTINGS.intersection(self._explicit_settings):
+            warnings.warn(
+                EMAIL_SETTING_DEPRECATED_MSG.format(name=name),
+                RemovedInDjango70Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
 
         if hasattr(time, "tzset") and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
@@ -226,6 +319,16 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
+        if name == "USE_BLANK_CHOICE_DASH":
+            _show_settings_deprecation_warning(
+                USE_BLANK_CHOICE_DASH_DEPRECATED_MSG, RemovedInDjango70Warning
+            )
+        # RemovedInDjango70Warning.
+        if name in DEPRECATED_EMAIL_SETTINGS:
+            _show_settings_deprecation_warning(
+                EMAIL_SETTING_DEPRECATED_MSG.format(name=name), RemovedInDjango70Warning
+            )
+
         super().__setattr__(name, value)
 
     def __delattr__(self, name):
@@ -252,6 +355,35 @@ class UserSettingsHolder:
         return "<%(cls)s>" % {
             "cls": self.__class__.__name__,
         }
+
+
+def _show_settings_deprecation_warning(message, category):
+    """Issue a warning when external code uses a deprecated setting.
+
+    Allow Django's own code to use the setting without emitting the warning.
+    This function should only be called from within settings-related code.
+    """
+    warn_about_external_use(
+        message,
+        category,
+        skip_name_prefixes=(
+            # Include all settings-related code here. (Do not include all of
+            # "django.conf", which would incorrectly identify any deprecated
+            # settings usage inside django.conf.urls as external.)
+            "django.conf.LazySettings",
+            "django.conf.Settings",
+            "django.conf.UserSettingsHolder",
+            "django.utils.functional.LazyObject",  # LazySettings superclass.
+            # override_settings() and similar test utils must be treated as
+            # settings-related code, else deprecated settings usage in tests
+            # would be incorrectly identified as internal.
+            "django.test.utils.override_settings",
+            "django.test.utils.modify_settings",
+            "django.test.utils.TestContextDecorator",
+            "django.test.testcases.SimpleTestCase.settings",
+            "django.test.testcases.SimpleTestCase.modify_settings",
+        ),
+    )
 
 
 settings = LazySettings()

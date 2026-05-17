@@ -243,6 +243,15 @@ to test for basic permissions you should use:
 The :class:`~django.contrib.auth.models.Permission` model is rarely accessed
 directly.
 
+The :class:`~django.contrib.auth.models.Permission` model provides a helper
+property, :attr:`~django.contrib.auth.models.Permission.user_perm_str`,
+that returns the string representation that can be used to check permission
+using the :meth:`~django.contrib.auth.models.User.has_perm` method.
+
+.. versionchanged:: 6.1
+
+    The ``user_perm_str`` property was added.
+
 Groups
 ------
 

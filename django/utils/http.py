@@ -342,6 +342,10 @@ def parse_header_parameters(line, max_length=MAX_HEADER_LENGTH):
     if max_length is not None and len(line) > max_length:
         raise ValueError("Unable to parse header parameters (value too long).")
 
+    # Fast path for no params.
+    if ";" not in line:
+        return line.strip().lower(), {}
+
     parts = _parseparam(";" + line)
     key = parts.__next__().lower()
     pdict = {}
@@ -362,7 +366,11 @@ def parse_header_parameters(line, max_length=MAX_HEADER_LENGTH):
                 value = value.replace("\\\\", "\\").replace('\\"', '"')
             if has_encoding:
                 encoding, lang, value = value.split("'")
-                value = unquote(value, encoding=encoding)
+                try:
+                    value = unquote(value, encoding=encoding)
+                except (LookupError, UnicodeDecodeError):
+                    msg = f"Invalid encoding {encoding!r} for RFC 2231 param."
+                    raise ValueError(msg)
             pdict[name] = value
     return key, pdict
 

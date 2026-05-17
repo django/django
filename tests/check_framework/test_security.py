@@ -8,6 +8,7 @@ from django.core.checks.security import base, csrf, sessions
 from django.core.management.utils import get_random_secret_key
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
+from django.utils.csp import CSP
 from django.utils.version import PY314
 from django.views.generic import View
 
@@ -706,6 +707,23 @@ class CheckCrossOriginOpenerPolicyTest(SimpleTestCase):
 class CheckSecureCSPTests(SimpleTestCase):
     """Tests for the CSP settings check function."""
 
+    django_templates_with_csp = [
+        {
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "OPTIONS": {
+                "context_processors": ["django.template.context_processors.csp"],
+            },
+        },
+    ]
+    jinja2_templates_with_csp = [
+        {
+            "BACKEND": "django.template.backends.jinja2.Jinja2",
+            "OPTIONS": {
+                "context_processors": ["django.template.context_processors.csp"],
+            },
+        },
+    ]
+
     def test_secure_csp_allowed_values(self):
         """Check should pass when both CSP settings are None or dicts."""
         allowed_values = (None, {}, {"key": "value"})
@@ -752,3 +770,80 @@ class CheckSecureCSPTests(SimpleTestCase):
                 with self.settings(SECURE_CSP=value, SECURE_CSP_REPORT_ONLY=value):
                     errors = base.check_csp_settings(None)
                     self.assertEqual(errors, [csp_error, csp_report_only_error])
+
+    @override_settings(
+        MIDDLEWARE=["django.middleware.csp.ContentSecurityPolicyMiddleware"],
+        SECURE_CSP={"script-src": [CSP.SELF, CSP.NONCE]},
+        SECURE_CSP_REPORT_ONLY={},
+        TEMPLATES=[],
+    )
+    def test_secure_csp_nonce_without_context_processor(self):
+        self.assertEqual(base.check_csp_nonce_context_processor(None), [base.W027])
+
+    @override_settings(
+        MIDDLEWARE=["django.middleware.csp.ContentSecurityPolicyMiddleware"],
+        SECURE_CSP={},
+        SECURE_CSP_REPORT_ONLY={"script-src": [CSP.SELF, CSP.NONCE]},
+        TEMPLATES=[],
+    )
+    def test_secure_csp_report_only_nonce_without_context_processor(self):
+        self.assertEqual(base.check_csp_nonce_context_processor(None), [base.W027])
+
+    def test_secure_csp_nonce_iterable_values_without_context_processor(self):
+        tests = (
+            frozenset([CSP.SELF, CSP.NONCE]),
+            (value for value in [CSP.SELF, CSP.NONCE]),
+        )
+        for values in tests:
+            with (
+                self.subTest(values=values),
+                self.settings(
+                    MIDDLEWARE=[
+                        "django.middleware.csp.ContentSecurityPolicyMiddleware"
+                    ],
+                    SECURE_CSP={"script-src": values},
+                    TEMPLATES=[],
+                ),
+            ):
+                self.assertEqual(
+                    base.check_csp_nonce_context_processor(None), [base.W027]
+                )
+
+    def test_secure_csp_nonce_context_processor_allowed_values(self):
+        tests = [
+            {
+                "MIDDLEWARE": ["django.middleware.csp.ContentSecurityPolicyMiddleware"],
+                "SECURE_CSP": None,
+                "SECURE_CSP_REPORT_ONLY": None,
+                "TEMPLATES": [],
+            },
+            {
+                "MIDDLEWARE": [],
+                "SECURE_CSP": {"script-src": [CSP.SELF, CSP.NONCE]},
+                "TEMPLATES": [],
+            },
+            {
+                "MIDDLEWARE": ["django.middleware.csp.ContentSecurityPolicyMiddleware"],
+                "SECURE_CSP": {"script-src": [CSP.SELF]},
+                "TEMPLATES": [],
+            },
+            {
+                "MIDDLEWARE": ["django.middleware.csp.ContentSecurityPolicyMiddleware"],
+                "SECURE_CSP": {"upgrade-insecure-requests": True},
+                "TEMPLATES": [],
+            },
+            {
+                "MIDDLEWARE": ["django.middleware.csp.ContentSecurityPolicyMiddleware"],
+                "SECURE_CSP": {"script-src": [CSP.SELF, CSP.NONCE]},
+                "TEMPLATES": self.django_templates_with_csp,
+            },
+            {
+                "MIDDLEWARE": ["django.middleware.csp.ContentSecurityPolicyMiddleware"],
+                "SECURE_CSP": {"script-src": [CSP.SELF, CSP.NONCE]},
+                "TEMPLATES": self.jinja2_templates_with_csp,
+            },
+        ]
+        for settings_overrides in tests:
+            with self.subTest(settings_overrides=settings_overrides):
+                with self.settings(**settings_overrides):
+                    self.assertEqual(base.check_csp_nonce_context_processor(None), [])

@@ -742,8 +742,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         4. model_related_fields
         """
         store = Store.objects.first()
-        Employee.objects.create(
-            id=1,
+        e1 = Employee.objects.create(
             first_name="Max",
             manager=True,
             last_name="Paine",
@@ -751,8 +750,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             age=23,
             salary=Decimal(50000.00),
         )
-        Employee.objects.create(
-            id=2,
+        e2 = Employee.objects.create(
             first_name="Buffy",
             manager=False,
             last_name="Summers",
@@ -770,8 +768,18 @@ class NonAggregateAnnotationTestCase(TestCase):
         )
 
         rows = [
-            (1, "Max", True, 42, "Paine", 23, Decimal(50000.00), store.name, 17),
-            (2, "Buffy", False, 42, "Summers", 18, Decimal(40000.00), store.name, 17),
+            (e1.pk, "Max", True, 42, "Paine", 23, Decimal(50000.00), store.name, 17),
+            (
+                e2.pk,
+                "Buffy",
+                False,
+                42,
+                "Summers",
+                18,
+                Decimal(40000.00),
+                store.name,
+                17,
+            ),
         ]
 
         self.assertQuerySetEqual(
@@ -792,8 +800,7 @@ class NonAggregateAnnotationTestCase(TestCase):
 
     def test_column_field_ordering_with_deferred(self):
         store = Store.objects.first()
-        Employee.objects.create(
-            id=1,
+        e1 = Employee.objects.create(
             first_name="Max",
             manager=True,
             last_name="Paine",
@@ -801,8 +808,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             age=23,
             salary=Decimal(50000.00),
         )
-        Employee.objects.create(
-            id=2,
+        e2 = Employee.objects.create(
             first_name="Buffy",
             manager=False,
             last_name="Summers",
@@ -820,8 +826,18 @@ class NonAggregateAnnotationTestCase(TestCase):
         )
 
         rows = [
-            (1, "Max", True, 42, "Paine", 23, Decimal(50000.00), store.name, 17),
-            (2, "Buffy", False, 42, "Summers", 18, Decimal(40000.00), store.name, 17),
+            (e1.pk, "Max", True, 42, "Paine", 23, Decimal(50000.00), store.name, 17),
+            (
+                e2.pk,
+                "Buffy",
+                False,
+                42,
+                "Summers",
+                18,
+                Decimal(40000.00),
+                store.name,
+                17,
+            ),
         ]
 
         # and we respect deferred columns!

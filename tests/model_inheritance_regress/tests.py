@@ -9,6 +9,8 @@ from unittest import expectedFailure
 from django import forms
 from django.db.models import FETCH_PEERS
 from django.test import TestCase
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import (
     ArticleWithAuthor,
@@ -252,7 +254,13 @@ class ModelInheritanceTest(TestCase):
         """
         Regression test for #11764
         """
-        wholesalers = list(Wholesaler.objects.select_related())
+        # RemovedInDjango70Warning: when the deprecation ends, this test can
+        # be removed.
+        with ignore_warnings(
+            category=RemovedInDjango70Warning,
+            message=r"Calling select_related\(\) with no arguments is deprecated\.",
+        ):
+            wholesalers = list(Wholesaler.objects.select_related())
         self.assertEqual(wholesalers, [])
 
     def test_issue_7853(self):
@@ -528,7 +536,7 @@ class ModelInheritanceTest(TestCase):
         Supplier.objects.create(name="Jane", restaurant=r2)
 
         self.assertQuerySetEqual(
-            Supplier.objects.order_by("name").select_related(),
+            Supplier.objects.order_by("name").select_related("restaurant"),
             [
                 "Jane",
                 "John",

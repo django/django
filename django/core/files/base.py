@@ -20,10 +20,10 @@ class File(FileProxyMixin):
         return self.name or ""
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, self or "None")
+        return "<%s: %s>" % (self.__class__.__name__, self.name or "None")
 
     def __bool__(self):
-        return bool(self.name)
+        return True
 
     def __len__(self):
         return self.size
@@ -133,9 +133,6 @@ class ContentFile(File):
 
     def __str__(self):
         return "Raw content"
-
-    def __bool__(self):
-        return True
 
     def open(self, mode=None):
         self.seek(0)

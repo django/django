@@ -7,6 +7,67 @@ Django 6.0.4 release notes
 Django 6.0.4 fixes one security issue with severity "moderate", four security
 issues with severity "low", and several bugs in 6.0.3.
 
+CVE-2026-3902: ASGI header spoofing via underscore/hyphen conflation
+====================================================================
+
+``ASGIRequest`` normalizes header names following WSGI conventions, mapping
+hyphens to underscores. As a result, even in configurations where reverse
+proxies carefully strip security-sensitive headers named with hyphens, such a
+header could be spoofed by supplying a header named with underscores.
+
+Under WSGI, it is the responsibility of the server or proxy to avoid ambiguous
+mappings. (Django's :djadmin:`runserver` was patched in :cve:`2015-0219`.) But
+under ASGI, there is not the same uniform expectation, even if many proxies
+protect against this under default configuration (including ``nginx`` via
+``underscores_in_headers off;``).
+
+Headers containing underscores are now ignored by ``ASGIRequest``, matching the
+behavior of :pypi:`Daphne <daphne>`, the reference server for ASGI.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<security-disclosure>`.
+
+CVE-2026-4277: Privilege abuse in ``GenericInlineModelAdmin``
+=============================================================
+
+Add permissions on inline model instances were not validated on submission of
+forged ``POST`` data in
+:class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin`.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<security-disclosure>`.
+
+CVE-2026-4292: Privilege abuse in ``ModelAdmin.list_editable``
+==============================================================
+
+Admin changelist forms using
+:attr:`~django.contrib.admin.ModelAdmin.list_editable` incorrectly allowed new
+instances to be created via forged ``POST`` data.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<security-disclosure>`.
+
+CVE-2026-33033: Potential denial-of-service vulnerability in ``MultiPartParser`` via base64-encoded file upload
+===============================================================================================================
+
+When using ``django.http.multipartparser.MultiPartParser``, multipart uploads
+with ``Content-Transfer-Encoding: base64`` that include excessive whitespace
+may trigger repeated memory copying, potentially degrading performance.
+
+This issue has severity "moderate" according to the :ref:`Django security
+policy <security-disclosure>`.
+
+CVE-2026-33034: Potential denial-of-service vulnerability in ASGI requests via memory upload limit bypass
+=========================================================================================================
+
+ASGI requests with a missing or understated ``Content-Length`` header could
+bypass the :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE` limit when reading
+``HttpRequest.body``, potentially loading an unbounded request body into
+memory and causing service degradation.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<security-disclosure>`.
+
 Bugfixes
 ========
 

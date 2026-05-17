@@ -13,8 +13,6 @@ PYPY = sys.implementation.name == "pypy"
 # or later". So that third-party apps can use these values, each constant
 # should remain as long as the oldest supported Django version supports that
 # Python version.
-PY38 = sys.version_info >= (3, 8)
-PY39 = sys.version_info >= (3, 9)
 PY310 = sys.version_info >= (3, 10)
 PY311 = sys.version_info >= (3, 11)
 PY312 = sys.version_info >= (3, 12)

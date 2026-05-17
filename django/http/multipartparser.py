@@ -231,7 +231,7 @@ class MultiPartParser:
                         raw_data = field_stream.read(size=read_size)
                         num_bytes_read += len(raw_data)
                         try:
-                            data = base64.b64decode(raw_data)
+                            data = base64.b64decode(raw_data, validate=True)
                         except binascii.Error:
                             data = raw_data
                     else:
@@ -305,18 +305,23 @@ class MultiPartParser:
                                 # We should always decode base64 chunks by
                                 # multiple of 4, ignoring whitespace.
 
-                                stripped_chunk = b"".join(chunk.split())
+                                stripped_parts = [b"".join(chunk.split())]
+                                stripped_length = len(stripped_parts[0])
 
-                                remaining = len(stripped_chunk) % 4
-                                while remaining != 0:
-                                    over_chunk = field_stream.read(4 - remaining)
+                                while stripped_length % 4 != 0:
+                                    over_chunk = field_stream.read(self._chunk_size)
                                     if not over_chunk:
                                         break
-                                    stripped_chunk += b"".join(over_chunk.split())
-                                    remaining = len(stripped_chunk) % 4
+                                    over_stripped = b"".join(over_chunk.split())
+                                    stripped_parts.append(over_stripped)
+                                    stripped_length += len(over_stripped)
+
+                                stripped_chunk = b"".join(stripped_parts)
 
                                 try:
-                                    chunk = base64.b64decode(stripped_chunk)
+                                    chunk = base64.b64decode(
+                                        stripped_chunk, validate=True
+                                    )
                                 except Exception as exc:
                                     # Since this is only a chunk, any error is
                                     # an unfixable error.

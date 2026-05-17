@@ -1,4 +1,5 @@
 import copy
+import itertools
 import json
 import os
 import pickle
@@ -23,6 +24,7 @@ from django.http import (
     parse_cookie,
 )
 from django.test import SimpleTestCase
+from django.utils.encoding import iri_to_uri
 from django.utils.functional import lazystr
 from django.utils.http import MAX_URL_REDIRECT_LENGTH
 
@@ -488,15 +490,36 @@ class HttpResponseTests(SimpleTestCase):
 
     def test_redirect_url_max_length(self):
         base_url = "https://example.com/"
-        for length in (
-            MAX_URL_REDIRECT_LENGTH - 1,
-            MAX_URL_REDIRECT_LENGTH,
+        for length, response_class in itertools.product(
+            (MAX_URL_REDIRECT_LENGTH - 1, MAX_URL_REDIRECT_LENGTH),
+            (HttpResponseRedirect, HttpResponsePermanentRedirect),
         ):
             long_url = base_url + "x" * (length - len(base_url))
-            with self.subTest(length=length):
-                response = HttpResponseRedirect(long_url)
+            with self.subTest(length=length, response_class=response_class):
+                response = response_class(long_url)
                 self.assertEqual(response.url, long_url)
-                response = HttpResponsePermanentRedirect(long_url)
+
+    def test_redirect_url_max_length_checks_encoded_location(self):
+        long_url = "/" + "é" * (MAX_URL_REDIRECT_LENGTH - 1)
+        self.assertLessEqual(len(long_url), MAX_URL_REDIRECT_LENGTH)
+        self.assertGreater(len(iri_to_uri(long_url)), MAX_URL_REDIRECT_LENGTH)
+        for response_class in (HttpResponseRedirect, HttpResponsePermanentRedirect):
+            msg = f"Unsafe redirect exceeding {MAX_URL_REDIRECT_LENGTH} characters"
+            with (
+                self.subTest(response_class=response_class),
+                self.assertRaisesMessage(DisallowedRedirect, msg),
+            ):
+                response_class(long_url)
+
+    def test_redirect_url_max_length_override_via_param(self):
+        base_url = "https://example.com/"
+        for (max_length, length), response_class in itertools.product(
+            ((None, MAX_URL_REDIRECT_LENGTH + 1), (100, 99), (100, 100)),
+            (HttpResponseRedirect, HttpResponsePermanentRedirect),
+        ):
+            long_url = base_url + "x" * (length - len(base_url))
+            with self.subTest(length=length, response_class=response_class):
+                response = response_class(long_url, max_length=max_length)
                 self.assertEqual(response.url, long_url)
 
     def test_unsafe_redirect(self):
@@ -506,11 +529,23 @@ class HttpResponseTests(SimpleTestCase):
             "file:///etc/passwd",
             "é" * (MAX_URL_REDIRECT_LENGTH + 1),
         ]
-        for url in bad_urls:
-            with self.assertRaises(DisallowedRedirect):
-                HttpResponseRedirect(url)
-            with self.assertRaises(DisallowedRedirect):
-                HttpResponsePermanentRedirect(url)
+        for url, response_class in itertools.product(
+            bad_urls, (HttpResponseRedirect, HttpResponsePermanentRedirect)
+        ):
+            with (
+                self.subTest(url=url, response_class=response_class),
+                self.assertRaises(DisallowedRedirect),
+            ):
+                response_class(url)
+
+    def test_unsafe_redirect_via_max_length(self):
+        url = "https://example.com/"
+        for response_class in (HttpResponseRedirect, HttpResponsePermanentRedirect):
+            with (
+                self.subTest(response_class=response_class),
+                self.assertRaises(DisallowedRedirect),
+            ):
+                response_class(url, max_length=len(url) - 1)
 
     def test_header_deletion(self):
         r = HttpResponse("hello")

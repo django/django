@@ -274,6 +274,12 @@ class BaseDatabaseFeatures:
     # Does the database support SQL 2023 ANY_VALUE in GROUP BY?
     supports_any_value = False
 
+    # Does the database support bitwise aggregations: BIT_AND, BIT_OR, and
+    # BIT_XOR?
+    supports_bit_aggregations = True
+    # Does the backend support the default parameter in bitwise aggregations?
+    supports_default_in_bit_aggregations = True
+
     # Does the backend support indexing a TextField?
     supports_index_on_text_field = True
 
@@ -430,6 +436,15 @@ class BaseDatabaseFeatures:
     # A map of reasons to sets of dotted paths to tests in Django's test suite
     # that should be skipped for this database.
     django_test_skips = {}
+
+    # DatabaseWrapper methods that should raise an error if accessed in
+    # django.test.SimpleTestCase.
+    disallowed_simple_test_case_connection_methods = [
+        ("connect", "connections"),
+        ("temporary_connection", "connections"),
+        ("cursor", "queries"),
+        ("chunked_cursor", "queries"),
+    ]
 
     supports_uuid4_function = False
     supports_uuid7_function = False

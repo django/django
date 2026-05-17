@@ -34,6 +34,9 @@ class FieldFile(File, AltersData):
     def __hash__(self):
         return hash(self.name)
 
+    def __bool__(self):
+        return bool(self.name)
+
     # The standard File contains most of the necessary properties, but
     # FieldFiles can be instantiated without a name, so that needs to
     # be checked for here.

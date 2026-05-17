@@ -1,10 +1,10 @@
-import enum
+from enum import StrEnum
 
 from django.db import router
 from django.utils.inspect import get_func_args
 
 
-class OperationCategory(str, enum.Enum):
+class OperationCategory(StrEnum):
     ADDITION = "+"
     REMOVAL = "-"
     ALTERATION = "~"
@@ -113,8 +113,8 @@ class Operation:
         """Output a description prefixed by a category symbol."""
         description = self.describe()
         if self.category is None:
-            return f"{OperationCategory.MIXED.value} {description}"
-        return f"{self.category.value} {description}"
+            return f"{OperationCategory.MIXED} {description}"
+        return f"{self.category} {description}"
 
     @property
     def migration_name_fragment(self):

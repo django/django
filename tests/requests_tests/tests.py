@@ -1,6 +1,7 @@
 import copy
 from io import BytesIO
 from itertools import chain
+from unittest import mock
 from urllib.parse import urlencode
 
 from django.core.exceptions import BadRequest, DisallowedHost
@@ -15,6 +16,7 @@ from django.http import (
 )
 from django.http.multipartparser import (
     MAX_TOTAL_HEADER_SIZE,
+    LazyStream,
     MultiPartParser,
     MultiPartParserError,
 )
@@ -453,6 +455,20 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(request.POST, {"name": ["value"]})
         with self.assertRaises(RawPostDataException):
             request.body
+
+    def test_malformed_header(self):
+        tests = [
+            # Invalid encoding name with percent-encoded value
+            "text/plain; charset*=BOGUS''%20",
+            # Another invalid encoding with different value
+            "text/plain; filename*=INVALID''%s%s%s",
+            # Invalid encoding with multi-line encoded content
+            "text/plain; title*=NOTACODEC''%E2%80%A6",
+        ]
+        msg = "Invalid Content-Type header."
+        for header in tests:
+            with self.subTest(header=header), self.assertRaisesMessage(BadRequest, msg):
+                WSGIRequest({"REQUEST_METHOD": "GET", "CONTENT_TYPE": header})
 
     def test_malformed_multipart_header(self):
         tests = [
@@ -917,6 +933,65 @@ class RequestsTests(SimpleTestCase):
         request.body  # evaluate
         self.assertEqual(request.POST, {"name": ["123"]})
 
+    def test_multipart_file_upload_base64_whitespace_heavy(self):
+        # Fake a file upload with base64-encoded content including mostly
+        # whitespaces across chunk boundaries.
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="file"; filename="test.txt"',
+                    "Content-Type: application/octet-stream",
+                    "Content-Transfer-Encoding: base64",
+                    "",
+                ]
+            )
+        )
+        # "AAAA" decodes to b"\x00\x00\x00". Whitespace (70000 bytes) spans the
+        # default 64KB chunk boundary, hence the alignment loop is exercised.
+        payload.write(b"\r\n" + b"AAA" + b" " * 70000 + b"A" + b"\r\n")
+        payload.write("--" + BOUNDARY + "--\r\n")
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": MULTIPART_CONTENT,
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        reads = []
+        original_read = LazyStream.read
+
+        def counting_read(self_stream, size=None):
+            reads.append(size)
+            return original_read(self_stream, size)
+
+        with mock.patch.object(LazyStream, "read", counting_read):
+            files = request.FILES
+
+        self.assertEqual(len(files), 1)
+        self.assertEqual(files["file"].read(), b"\x00\x00\x00")
+
+        # The alignment loop must read in `chunk-sized` units rather than one
+        # byte at a time, otherwise each whitespace byte triggers a separate
+        # read() call with a costly internal unget() cycle.
+        # Parsing this payload should issue exactly 8 LazyStream.read() calls:
+        # 1. main_stream.read(1)     -- BoundaryIter.__init__ probe, preamble
+        # 2. sub_stream.read(1024)   -- parse_boundary_stream, preamble headers
+        # 3. main_stream.read(1)     -- BoundaryIter.__init__ probe, file field
+        # 4. field_stream.read(1024) -- parse_boundary_stream, file headers
+        # 5. field_stream.read(65536)-- base64 alignment loop: one chunk-sized
+        #                               read to find the non-whitespace bytes
+        #                               needed to complete the 4-byte base64
+        #                               group that spans the chunk boundary
+        # 6. main_stream.read(1)     -- BoundaryIter.__init__ probe, epilogue
+        # 7. sub_stream.read(1024)   -- parse_boundary_stream, epilogue headers
+        # 8. main_stream.read(1)     -- BoundaryIter.__init__ probe, exhausted
+        #                               stream; returns b"" and stops iteration
+        # A byte-at-a-time implementation of read() in step 5 would do instead
+        # one read(1) per whitespace byte past the chunk boundary (4488 calls).
+        self.assertEqual(reads, [1, 1024, 1, 1024, 65536, 1, 1024, 1])
+
     def test_POST_after_body_read_and_stream_read_multipart(self):
         """
         POST should be populated even if body is read first, and then
@@ -1188,6 +1263,44 @@ class RequestsTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(RuntimeError, msg):
             request.multipart_parser_class = MultiPartParser
+
+
+class MemoryFileUploadHandlerTests(SimpleTestCase):
+    def test_handle_raw_input_wsgi_request_within_limit_activated(self):
+
+        class WSGIRequest:
+            def __init__(self, body):
+                self._stream = LimitedStream(BytesIO(body), len(body))
+
+        handler = MemoryFileUploadHandler()
+        with self.settings(FILE_UPLOAD_MAX_MEMORY_SIZE=10):
+            handler.handle_raw_input(WSGIRequest(b"x" * 5), {}, 5, None)
+        self.assertIs(handler.activated, True)
+
+    def test_handle_raw_input_wsgi_request_exceeds_limit_deactivated(self):
+
+        class WSGIRequest:
+            def __init__(self, body):
+                self._stream = LimitedStream(BytesIO(body), len(body))
+
+        handler = MemoryFileUploadHandler()
+        with self.settings(FILE_UPLOAD_MAX_MEMORY_SIZE=10):
+            handler.handle_raw_input(WSGIRequest(b"x" * 15), {}, 15, None)
+        self.assertIs(handler.activated, False)
+
+    def test_handle_raw_input_seekable_within_limit_activated(self):
+        handler = MemoryFileUploadHandler()
+        with self.settings(FILE_UPLOAD_MAX_MEMORY_SIZE=10):
+            # content_length param is understated (0) but actual size is 10.
+            handler.handle_raw_input(BytesIO(b"x" * 10), {}, 0, None)
+        self.assertIs(handler.activated, True)
+
+    def test_handle_raw_input_seekable_exceeds_limit_deactivated(self):
+        handler = MemoryFileUploadHandler()
+        with self.settings(FILE_UPLOAD_MAX_MEMORY_SIZE=10):
+            # content_length param is understated (0) but actual size is 15.
+            handler.handle_raw_input(BytesIO(b"x" * 15), {}, 0, None)
+        self.assertIs(handler.activated, False)
 
 
 class HostValidationTests(SimpleTestCase):
