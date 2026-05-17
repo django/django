@@ -96,7 +96,7 @@ def server_error(request, template_name=ERROR_500_TEMPLATE_NAME):
         return HttpResponseServerError(
             ERROR_PAGE_TEMPLATE % {"title": "Server Error (500)", "details": ""},
         )
-    return HttpResponseServerError(template.render())
+    return HttpResponseServerError(template.render(request=request))
 
 
 @requires_csrf_token

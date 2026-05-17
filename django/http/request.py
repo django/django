@@ -45,7 +45,7 @@ class RawPostDataException(Exception):
     """
     You cannot access raw_post_data from a request that has
     multipart/* POST data if it has been accessed via POST,
-    FILES, etc..
+    FILES, etc.
     """
 
     pass
