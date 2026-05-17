@@ -10,6 +10,7 @@ from django.test.utils import override_settings
 from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import lazystr
 from django.utils.html import (
+    CountsDict,
     conditional_escape,
     escape,
     escapejs,
@@ -525,3 +526,31 @@ class TestUtilsHtml(SimpleTestCase):
         for value in tests:
             with self.subTest(value=value):
                 self.assertEqual(urlize(value), value)
+
+
+class TestCountsDict(SimpleTestCase):
+    def test_init_with_kwargs(self):
+        """CountsDict correctly passes kwargs to dict.__init__."""
+        d = CountsDict(word="hello", a=1, b=2)
+        self.assertEqual(d["a"], 1)
+        self.assertEqual(d["b"], 2)
+        self.assertEqual(d.word, "hello")
+
+    def test_init_with_no_kwargs(self):
+        """CountsDict works when only word is provided."""
+        d = CountsDict(word="test")
+        self.assertEqual(d.word, "test")
+
+    def test_missing_key_counts_in_word(self):
+        """__missing__ returns the count of key characters in word."""
+        d = CountsDict(word="hello")
+        self.assertEqual(d["l"], 2)
+        self.assertEqual(d["h"], 1)
+        self.assertEqual(d["z"], 0)
+
+    def test_missing_key_caches_result(self):
+        """__missing__ caches the computed count in the dict."""
+        d = CountsDict(word="banana")
+        self.assertNotIn("a", d)
+        self.assertEqual(d["a"], 3)
+        self.assertIn("a", d)
