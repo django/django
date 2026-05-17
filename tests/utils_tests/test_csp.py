@@ -135,6 +135,20 @@ class CSPBuildPolicyTest(SimpleTestCase):
         policy = {"default-src": []}
         self.assertPolicyEqual(build_policy(policy), "")
 
+    def test_config_rejects_directive_policy_delimiters(self):
+        for directive in ["default-src; script-src", "default-src\r", "default-src\n"]:
+            with self.subTest(directive=directive):
+                msg = "CSP directive names must be strings without policy delimiters."
+                with self.assertRaisesMessage(ValueError, msg):
+                    build_policy({directive: [CSP.SELF]})
+
+    def test_config_rejects_directive_value_policy_delimiters(self):
+        for value in ["'self'; script-src 'none'", "'self'\r", "'self'\n"]:
+            with self.subTest(value=value):
+                msg = "CSP directive values must be strings without policy delimiters."
+                with self.assertRaisesMessage(ValueError, msg):
+                    build_policy({"default-src": [value]})
+
 
 class LazyNonceTests(SimpleTestCase):
     def test_generates_on_usage(self):

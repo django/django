@@ -6,6 +6,11 @@ from django.utils.html import format_html
 
 # Template context key for the CSP nonce.
 CONTEXT_KEY = "csp_nonce"
+POLICY_DELIMITERS = frozenset(";\r\n")
+
+
+def _contains_policy_delimiter(value):
+    return any(char in value for char in POLICY_DELIMITERS)
 
 
 class CSP(StrEnum):
@@ -98,6 +103,11 @@ def build_policy(config, nonce=None):
     policy = []
 
     for directive, values in config.items():
+        if not isinstance(directive, str) or _contains_policy_delimiter(directive):
+            raise ValueError(
+                "CSP directive names must be strings without policy delimiters."
+            )
+
         if values in (None, False):
             continue
 
@@ -120,6 +130,14 @@ def build_policy(config, nonce=None):
 
             if not values:
                 continue
+
+            if any(
+                not isinstance(value, str) or _contains_policy_delimiter(value)
+                for value in values
+            ):
+                raise ValueError(
+                    "CSP directive values must be strings without policy delimiters."
+                )
 
             rendered_value = " ".join(values)
 
