@@ -667,7 +667,7 @@ def cycle(parser, token):
                 "No named cycles in template. '%s' is not defined" % name
             )
         if name not in parser._named_cycle_nodes:
-            raise TemplateSyntaxError("Named cycle '%s' does not exist" % name)
+            raise TemplateSyntaxError("Named cycle '%s' does not exist." % name)
         return parser._named_cycle_nodes[name]
 
     as_form = False

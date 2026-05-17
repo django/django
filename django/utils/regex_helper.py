@@ -84,7 +84,7 @@ def normalize(pattern):
                 # Replace "any character" with an arbitrary representative.
                 result.append(".")
             elif ch == "|":
-                # FIXME: One day we'll should do this, but not in 1.0.
+                # FIXME: One day we should do this, but not in 1.0.
                 raise NotImplementedError("Awaiting Implementation")
             elif ch == "^":
                 pass
@@ -135,7 +135,7 @@ def normalize(pattern):
                             raise ValueError(
                                 "Non-reversible reg-exp portion: '(?P%s'" % ch
                             )
-                        # We are in a named capturing group. Extra the name and
+                        # We are in a named capturing group. Extract the name and
                         # then skip to the end.
                         if ch == "<":
                             terminal_char = ">"

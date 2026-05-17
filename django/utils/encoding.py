@@ -154,8 +154,8 @@ _hextobyte.update(
 
 def uri_to_iri(uri):
     """
-    Convert a Uniform Resource Identifier(URI) into an Internationalized
-    Resource Identifier(IRI).
+    Convert a Uniform Resource Identifier (URI) into an Internationalized
+    Resource Identifier (IRI).
 
     This is the algorithm from RFC 3987 Section 3.2, excluding step 4.
 
@@ -248,8 +248,8 @@ def filepath_to_uri(path):
 def get_system_encoding():
     """
     The encoding for the character type functions. Fallback to 'ascii' if the
-    #encoding is unsupported by Python or could not be determined. See tickets
-    #10335 and #5846.
+    encoding is unsupported by Python or could not be determined. See tickets
+    10335 and 5846.
     """
     try:
         encoding = locale.getlocale()[1] or "ascii"
