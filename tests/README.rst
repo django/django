@@ -1,9 +1,8 @@
 To run the test suite, first, create and activate a virtual environment. Then
-install some requirements and run the tests::
+install the dependencies and run the tests::
 
     $ cd tests
-    $ python -m pip install -e ..
-    $ python -m pip install -r requirements/py3.txt
+    $ python -m pip install --group=test -e ..
     $ ./runtests.py
 
 For more information about the test suite, see
