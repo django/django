@@ -42,6 +42,22 @@ classifiers = [
 [project.optional-dependencies]
 argon2 = ["argon2-cffi>=23.1.0"]
 bcrypt = ["bcrypt>=4.1.1"]
+admindocs = ["docutils>=0.22"]
+colorama = ["colorama>=0.4.6; sys_platform == 'win32'"]
+geoip = ["geoip2>=4.8.0"]
+gis = ["geoip2>=4.8.0", "numpy>=1.26.0"]
+images = ["Pillow>=10.1.0"]
+jinja2 = ["jinja2>=2.11.0"]
+mysql = ["mysqlclient>=2.2.1"]
+oracle = ["oracledb>=4.0.2"]
+postgresql = ["psycopg>=3.1.12"]
+postgresql-pool = ["psycopg>=3.1.12", "psycopg-pool>=3.2.0"]
+pylibmc = ["pylibmc; sys_platform != 'win32'"]
+pymemcache = ["pymemcache>=3.4.0"]
+pywatchman = ["pywatchman>=1.2.0; sys_platform != 'win32'"]
+redis = ["redis>=5.1.0"]
+test-parallel = ["tblib>=3.0.0"]
+yaml = ["pyyaml>=6.0.2"]
 
 [project.scripts]
 django = "django.core.management:execute_from_command_line"
@@ -54,6 +70,33 @@ Documentation = "https://docs.djangoproject.com/"
 Funding = "https://www.djangoproject.com/fundraising/"
 Source = "https://github.com/django/django"
 Tracker = "https://code.djangoproject.com/"
+
+[dependency-groups]
+# Groups reference Django's own extras so each version bound lives in one
+# place. Database adapters: use the extras, e.g. -e ".[mysql]".
+test = [
+    "django[admindocs,argon2,bcrypt,colorama,gis,images,jinja2,pylibmc,pymemcache,pywatchman,redis,test-parallel,yaml]",
+    "aiosmtpd>=1.4.5",
+    "black>=26.5.1",
+    "playwright>=1.65.0",
+    "tzdata",
+]
+# Packages that are pure Python or publish free-threaded (cp3XXt) wheels.
+# pylibmc and pywatchman re-enable the GIL on import. argon2-cffi-bindings,
+# numpy, Pillow, and PyYAML publish free-threaded wheels for 3.14+ only.
+test-free-threading = [
+    "django[admindocs,geoip,jinja2,pymemcache,redis,test-parallel]",
+    "django[argon2,gis,images,yaml]; python_version >= '3.14'",
+    "django[bcrypt]; python_version < '3.15'",
+    "aiosmtpd>=1.4.5",
+    "black>=26.5.1",
+    "playwright>=1.65.0",
+    "tzdata",
+]
+# CI only: the postgresql extra installs plain psycopg (see the docs).
+postgres = ["django[postgresql-pool]", "psycopg[binary]"]
+# psycopg-binary doesn't publish free-threaded wheels.
+postgres-free-threading = ["django[postgresql-pool]"]
 
 [tool.black]
 target-version = ["py312"]
