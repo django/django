@@ -173,7 +173,8 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :djadmin:`listurls` command lists the URLs from the project's root
+  URLconf, including the view class or function (and name, if present).
 
 Migrations
 ~~~~~~~~~~

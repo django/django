@@ -97,6 +97,9 @@ PALETTES = {
         "HTTP_SERVER_ERROR": {},
         "MIGRATE_HEADING": {},
         "MIGRATE_LABEL": {},
+        "COMMAND_HEADER": {},
+        "COMMAND_DATA": {},
+        "COMMAND_HIGHLIGHT": {},
     },
     DARK_PALETTE: {
         "ERROR": {"fg": "red", "opts": ("bold",)},
@@ -116,6 +119,9 @@ PALETTES = {
         "HTTP_SERVER_ERROR": {"fg": "magenta", "opts": ("bold",)},
         "MIGRATE_HEADING": {"fg": "cyan", "opts": ("bold",)},
         "MIGRATE_LABEL": {"opts": ("bold",)},
+        "COMMAND_HEADER": {"fg": "cyan", "opts": ("bold",)},
+        "COMMAND_DATA": {"opts": ("bold",)},
+        "COMMAND_HIGHLIGHT": {"fg": "yellow", "opts": ("bold",)},
     },
     LIGHT_PALETTE: {
         "ERROR": {"fg": "red", "opts": ("bold",)},
@@ -135,6 +141,9 @@ PALETTES = {
         "HTTP_SERVER_ERROR": {"fg": "magenta", "opts": ("bold",)},
         "MIGRATE_HEADING": {"fg": "cyan", "opts": ("bold",)},
         "MIGRATE_LABEL": {"opts": ("bold",)},
+        "COMMAND_HEADER": {"fg": "cyan", "opts": ("bold",)},
+        "COMMAND_DATA": {"opts": ("bold",)},
+        "COMMAND_HIGHLIGHT": {"fg": "yellow", "opts": ("bold",)},
     },
 }
 DEFAULT_PALETTE = DARK_PALETTE
