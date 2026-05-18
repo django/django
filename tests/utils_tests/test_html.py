@@ -10,6 +10,7 @@ from django.test.utils import override_settings
 from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import lazystr
 from django.utils.html import (
+    CountsDict,
     conditional_escape,
     escape,
     escapejs,
@@ -525,3 +526,20 @@ class TestUtilsHtml(SimpleTestCase):
         for value in tests:
             with self.subTest(value=value):
                 self.assertEqual(urlize(value), value)
+
+
+class CountsDictTests(SimpleTestCase):
+    def test_init_no_kwargs(self):
+        d = CountsDict(word="hello")
+        self.assertEqual(d.word, "hello")
+
+    def test_init_with_args_and_kwargs(self):
+        d = CountsDict({"a": 1}, word="hello")
+        self.assertEqual(d["a"], 1)
+        self.assertEqual(d.word, "hello")
+
+    def test_missing_counts_chars(self):
+        d = CountsDict(word="hello")
+        self.assertEqual(d["l"], 2)
+        self.assertEqual(d["h"], 1)
+        self.assertEqual(d["z"], 0)
