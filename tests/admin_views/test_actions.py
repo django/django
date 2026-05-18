@@ -673,6 +673,30 @@ class AdminDetailActionsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b"OK")
 
+    def test_action_changeform_cannot_target_different_objects(self):
+        changeform_url = reverse(
+            "admin:admin_views_externalsubscriber_change", args=[self.s1.pk]
+        )
+        external_subscriber = ExternalSubscriber.objects.create(
+            name="Jane Austen", email="jane@example.org"
+        )
+        for invalid_checkbox_value in [
+            [external_subscriber.pk],
+            [self.s1.pk, external_subscriber.pk],
+            [],
+        ]:
+            with self.subTest(invalid_checkbox_value=invalid_checkbox_value):
+                response = self.client.post(
+                    changeform_url,
+                    {
+                        "CHANGE_FORM-action": "external_mail",
+                        ACTION_CHECKBOX_NAME: invalid_checkbox_value,
+                        "index": 0,
+                    },
+                )
+                self.assertEqual(len(mail.outbox), 0)
+                self.assertEqual(response.status_code, 400)
+
     def test_select_across_ignored(self):
         ExternalSubscriber.objects.create(name="Bob Bobson", email="bob@example.org")
         change_url = reverse(
