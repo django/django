@@ -1,1 +1,3 @@
-mysqlclient >= 2.2.1
+# Deprecated: use pyproject.toml. Kept for Jenkins and the conda env files.
+# Install Django first, or in the same pip command.
+django[mysql]
