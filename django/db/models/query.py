@@ -2847,16 +2847,34 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
 
     # The 'values to be matched' must be hashable as they will be used
     # in a dictionary.
-    (
-        rel_qs,
-        rel_obj_attr,
-        instance_attr,
-        single,
-        cache_name,
-        is_descriptor,
-    ) = prefetcher.get_prefetch_querysets(
-        instances, lookup.get_current_querysets(level)
+
+    # Some databases (e.g. SQLite) limit the number of query parameters. If
+    # there are more instances than the database can handle in a single query,
+    # split them into batches.
+    connection = connections[instances[0]._state.db]
+    batch_size = connection.ops.bulk_batch_size([instances[0]._meta.pk], instances)
+    batches = (
+        instances[i : i + batch_size] for i in range(0, len(instances), batch_size)
     )
+
+    # Call get_prefetch_querysets() once per batch, collecting the querysets.
+    # We assume it returns the same rel_obj_attr, instance_attr, single,
+    # cache_name, and is_descriptor for all batches (homogeneous instances),
+    # so we keep the values from the last batch.
+    all_related_querysets = []
+    for batch in batches:
+        (
+            rel_qs,
+            rel_obj_attr,
+            instance_attr,
+            single,
+            cache_name,
+            is_descriptor,
+        ) = prefetcher.get_prefetch_querysets(
+            batch, lookup.get_current_querysets(level)
+        )
+        all_related_querysets.append(rel_qs)
+
     # We have to handle the possibility that the QuerySet we just got back
     # contains some prefetch_related lookups. We don't want to trigger the
     # prefetch_related functionality by evaluating the query. Rather, we need
@@ -2865,19 +2883,34 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
     # later (happens in nested prefetch_related).
     additional_lookups = [
         copy.copy(additional_lookup)
-        for additional_lookup in getattr(rel_qs, "_prefetch_related_lookups", ())
+        for additional_lookup in getattr(
+            all_related_querysets[0], "_prefetch_related_lookups", ()
+        )
     ]
     if additional_lookups:
         # Don't need to clone because the manager should have given us a fresh
         # instance, so we access an internal instead of using public interface
         # for performance reasons.
-        rel_qs._prefetch_related_lookups = ()
+        for rel_qs in all_related_querysets:
+            rel_qs._prefetch_related_lookups = ()
 
-    all_related_objects = list(rel_qs)
-
+    # Stream objects from all batch querysets into rel_obj_cache in a single
+    # pass, deduplicating as we go. The same related object may appear in
+    # results from multiple batches (e.g. a shared FK target), so we track
+    # seen (rel_attr_val, pk) pairs to avoid duplicates in the final lists.
+    # all_related_objects is built here (deduplicated) for use as the next
+    # level's instance list in nested prefetches.
     rel_obj_cache = {}
-    for rel_obj in all_related_objects:
+    seen_related_pks = set()
+    all_related_objects = []
+    for rel_obj in chain.from_iterable(all_related_querysets):
         rel_attr_val = rel_obj_attr(rel_obj)
+        obj_pk = rel_obj.pk
+        key = (rel_attr_val, obj_pk)
+        if key in seen_related_pks:
+            continue
+        seen_related_pks.add(key)
+        all_related_objects.append(rel_obj)
         rel_obj_cache.setdefault(rel_attr_val, []).append(rel_obj)
 
     to_attr, as_attr = lookup.get_current_to_attr(level)
