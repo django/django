@@ -1,4 +1,4 @@
-from ctypes import byref, c_int
+from ctypes import byref, c_float, c_int
 from datetime import date, datetime, time
 
 from django.contrib.gis.gdal.base import GDALBase
@@ -74,7 +74,8 @@ class Field(GDALBase):
         if not self.is_set:
             return None
         yy, mm, dd, hh, mn, ss, tz = [c_int() for i in range(7)]
-        status = capi.get_field_as_datetime(
+        ms = c_float()
+        status = capi.get_field_as_datetime_x(
             self._feat.ptr,
             self._index,
             byref(yy),
@@ -82,11 +83,11 @@ class Field(GDALBase):
             byref(dd),
             byref(hh),
             byref(mn),
-            byref(ss),
+            byref(ms),
             byref(tz),
         )
         if status:
-            return (yy, mm, dd, hh, mn, ss, tz)
+            return (yy, mm, dd, hh, mn, ss, tz, ms)
         else:
             raise GDALException(
                 "Unable to retrieve date & time information from the field."
@@ -191,8 +192,19 @@ class OFTDateTime(Field):
         #  The `tz` variable has values of: 0=unknown, 1=localtime (ambiguous),
         #  100=GMT, 104=GMT+1, 80=GMT-5, etc.
         try:
-            yy, mm, dd, hh, mn, ss, tz = self.as_datetime()
-            return datetime(yy.value, mm.value, dd.value, hh.value, mn.value, ss.value)
+            yy, mm, dd, hh, mn, ss, tz, ms = self.as_datetime()
+            ms_value = ms.value if ms else 0.0
+            seconds = int(ms_value)
+            milliseconds = int(round((ms_value - seconds) * 1000))
+            return datetime(
+                yy.value,
+                mm.value,
+                dd.value,
+                hh.value,
+                mn.value,
+                int(seconds),
+                milliseconds * 1000,
+            )
         except (TypeError, ValueError, GDALException):
             return None
 
@@ -202,8 +214,11 @@ class OFTTime(Field):
     def value(self):
         "Return a Python `time` object for this OFTTime field."
         try:
-            yy, mm, dd, hh, mn, ss, tz = self.as_datetime()
-            return time(hh.value, mn.value, ss.value)
+            yy, mm, dd, hh, mn, ss, tz, ms = self.as_datetime()
+            ms_value = ms.value if ms else 0.0
+            seconds = int(ms_value)
+            milliseconds = int(round((ms_value - seconds) * 1000))
+            return time(hh.value, mm.value, seconds, milliseconds * 1000)
         except (ValueError, GDALException):
             return None
 
