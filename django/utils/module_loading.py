@@ -5,7 +5,7 @@ from importlib import import_module
 from importlib.util import find_spec as importlib_find
 
 
-def cached_import(module_path, class_name):
+def cached_import(module_path):
     # Check whether module is loaded and fully initialized.
     if not (
         (module := sys.modules.get(module_path))
@@ -13,26 +13,37 @@ def cached_import(module_path, class_name):
         and getattr(spec, "_initializing", False) is False
     ):
         module = import_module(module_path)
-    return getattr(module, class_name)
+    return module
 
 
 def import_string(dotted_path):
     """
-    Import a dotted module path and return the attribute/class designated by
-    the last name in the path. Raise ImportError if the import failed.
+    Import a dotted module path and return the module or attribute/class
+    designated by the path. Raise ImportError if the import failed.
     """
     try:
-        module_path, class_name = dotted_path.rsplit(".", 1)
-    except ValueError as err:
-        raise ImportError("%s doesn't look like a module path" % dotted_path) from err
+        module = cached_import(dotted_path)
+    except ImportError as err:
+        # Attempt to load an attribute from a module
+        try:
+            module_path, class_name = dotted_path.rsplit(".", 1)
+        except ValueError:
+            # The supplied path contained no dots, so must be a module,
+            # and we've already failed to load.
+            raise err
 
-    try:
-        return cached_import(module_path, class_name)
-    except AttributeError as err:
-        raise ImportError(
-            'Module "%s" does not define a "%s" attribute/class'
-            % (module_path, class_name)
-        ) from err
+        module = cached_import(module_path)
+
+        try:
+            class_or_attr = getattr(module, class_name)
+        except AttributeError as err:
+            raise ImportError(
+                'Module "%s" does not define a "%s" attribute/class'
+                % (module_path, class_name)
+            ) from err
+
+        return class_or_attr
+    return module
 
 
 def autodiscover_modules(*args, **kwargs):

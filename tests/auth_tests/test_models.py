@@ -464,7 +464,7 @@ class UserWithPermTestCase(TestCase):
             )
 
     def test_invalid_backend_submodule(self):
-        with self.assertRaises(ImportError):
+        with self.assertRaises(TypeError):
             User.objects.with_perm(
                 "auth.test",
                 backend="json.tool",

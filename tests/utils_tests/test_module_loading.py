@@ -134,11 +134,24 @@ class ModuleImportTests(SimpleTestCase):
         self.assertEqual(cls, import_string)
 
         # Test exceptions raised
-        with self.assertRaises(ImportError):
-            import_string("no_dots_in_path")
         msg = 'Module "utils_tests" does not define a "unexistent" attribute'
         with self.assertRaisesMessage(ImportError, msg):
             import_string("utils_tests.unexistent")
+
+    def test_import_string_unloaded_modules(self):
+        """Regression test for issue #36864"""
+        module_dotpath = "utils_tests"
+        submodule_dotpath = "utils_tests.test_module.good_module"
+        attr_dotpath = "utils_tests.test_module.good_module.content"
+
+        import_string(module_dotpath)
+        import_string(submodule_dotpath)
+
+        with self.assertRaisesMessage(ValueError, "Empty module name"):
+            import_string("")
+
+        self.addCleanup(sys.modules.pop, submodule_dotpath, None)
+        self.addCleanup(sys.modules.pop, module_dotpath, None)
 
 
 @modify_settings(INSTALLED_APPS={"append": "utils_tests.test_module"})
