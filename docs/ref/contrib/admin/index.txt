@@ -204,9 +204,9 @@ subclass::
 .. attribute:: ModelAdmin.actions_on_top
 .. attribute:: ModelAdmin.actions_on_bottom
 
-    Controls where on the page the actions bar appears. By default, the admin
-    changelist displays actions at the top of the page (``actions_on_top =
-    True; actions_on_bottom = False``).
+    Controls where on the admin changelist page the actions bar appears. By
+    default, the admin changelist displays actions at the top of the page
+    (``actions_on_top = True; actions_on_bottom = False``).
 
 .. attribute:: ModelAdmin.actions_selection_counter
 
@@ -961,6 +961,11 @@ subclass::
     If you need to specify a dynamic value based on the request, you can
     implement a :meth:`~ModelAdmin.get_list_select_related` method.
 
+    .. deprecated:: 6.1
+
+        Using ``True`` for ``list_select_related`` is deprecated. Use a list or
+        tuple of field names instead.
+
     .. note::
 
         ``ModelAdmin`` ignores this attribute when
@@ -1629,6 +1634,11 @@ default templates used by the :class:`ModelAdmin` views:
     The ``get_list_select_related`` method is given the ``HttpRequest`` and
     should return a boolean or list as :attr:`ModelAdmin.list_select_related`
     does.
+
+    .. deprecated:: 6.1
+
+        Returning ``True`` is deprecated. Return a list or tuple of field names
+        instead.
 
 .. method:: ModelAdmin.get_search_fields(request)
 
@@ -2818,6 +2828,7 @@ app or per model. The following can:
 * ``actions.html``
 * ``app_index.html``
 * ``change_form.html``
+* ``change_form_actions.html``
 * ``change_form_object_tools.html``
 * ``change_list.html``
 * ``change_list_object_tools.html``

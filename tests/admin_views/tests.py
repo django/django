@@ -305,6 +305,9 @@ class AdminViewBasicTestCase(TestCase):
         )
 
 
+@override_settings(
+    MAILERS={"default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}}
+)
 class AdminViewBasicTest(AdminViewBasicTestCase):
     def test_trailing_slash_required(self):
         """
@@ -995,29 +998,29 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             self.assertContentBefore(response, "The First Item", "The Middle Item")
             self.assertContentBefore(response, "The Middle Item", "The Last Item")
 
-    def test_has_related_field_in_list_display_fk(self):
+    def test_get_select_related_fields_in_list_display_fk(self):
         """Joins shouldn't be performed for <FK>_id fields in list display."""
         state = State.objects.create(name="Karnataka")
         City.objects.create(state=state, name="Bangalore")
         response = self.client.get(reverse("admin:admin_views_city_changelist"), {})
 
         response.context["cl"].list_display = ["id", "name", "state"]
-        self.assertIs(response.context["cl"].has_related_field_in_list_display(), True)
+        self.assertEqual(response.context["cl"].get_select_related_fields(), ["state"])
 
         response.context["cl"].list_display = ["id", "name", "state_id"]
-        self.assertIs(response.context["cl"].has_related_field_in_list_display(), False)
+        self.assertEqual(response.context["cl"].get_select_related_fields(), [])
 
-    def test_has_related_field_in_list_display_o2o(self):
+    def test_get_select_related_fields_in_list_display_o2o(self):
         """Joins shouldn't be performed for <O2O>_id fields in list display."""
         media = Media.objects.create(name="Foo")
         Vodcast.objects.create(media=media)
         response = self.client.get(reverse("admin:admin_views_vodcast_changelist"), {})
 
         response.context["cl"].list_display = ["media"]
-        self.assertIs(response.context["cl"].has_related_field_in_list_display(), True)
+        self.assertEqual(response.context["cl"].get_select_related_fields(), ["media"])
 
         response.context["cl"].list_display = ["media_id"]
-        self.assertIs(response.context["cl"].has_related_field_in_list_display(), False)
+        self.assertEqual(response.context["cl"].get_select_related_fields(), [])
 
     def test_limited_filter(self):
         """
@@ -2346,6 +2349,7 @@ def get_perm(Model, codename):
             },
         }
     ],
+    MAILERS={"default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}},
 )
 class AdminViewPermissionsTest(TestCase):
     """Tests for Admin Views Permissions."""
@@ -2930,10 +2934,18 @@ class AdminViewPermissionsTest(TestCase):
 
         # Test redirection when using row-level change permissions. Refs
         # #11513.
-        r1 = RowLevelChangePermissionModel.objects.create(id=1, name="odd id")
-        r2 = RowLevelChangePermissionModel.objects.create(id=2, name="even id")
-        r3 = RowLevelChangePermissionModel.objects.create(id=3, name="odd id mult 3")
-        r6 = RowLevelChangePermissionModel.objects.create(id=6, name="even id mult 3")
+        r1 = RowLevelChangePermissionModel.objects.create(
+            name="A", can_change=False, can_view=False
+        )
+        r2 = RowLevelChangePermissionModel.objects.create(
+            name="B", can_change=True, can_view=False
+        )
+        r3 = RowLevelChangePermissionModel.objects.create(
+            name="C", can_change=False, can_view=True
+        )
+        r4 = RowLevelChangePermissionModel.objects.create(
+            name="D", can_change=True, can_view=True
+        )
         change_url_1 = reverse(
             "admin:admin_views_rowlevelchangepermissionmodel_change", args=(r1.pk,)
         )
@@ -2943,8 +2955,8 @@ class AdminViewPermissionsTest(TestCase):
         change_url_3 = reverse(
             "admin:admin_views_rowlevelchangepermissionmodel_change", args=(r3.pk,)
         )
-        change_url_6 = reverse(
-            "admin:admin_views_rowlevelchangepermissionmodel_change", args=(r6.pk,)
+        change_url_4 = reverse(
+            "admin:admin_views_rowlevelchangepermissionmodel_change", args=(r4.pk,)
         )
         logins = [
             self.superuser,
@@ -2960,14 +2972,16 @@ class AdminViewPermissionsTest(TestCase):
                 self.assertEqual(response.status_code, 403)
                 response = self.client.post(change_url_1, {"name": "changed"})
                 self.assertEqual(
-                    RowLevelChangePermissionModel.objects.get(id=1).name, "odd id"
+                    RowLevelChangePermissionModel.objects.get(pk=r1.pk).name,
+                    r1.name,
                 )
                 self.assertEqual(response.status_code, 403)
                 response = self.client.get(change_url_2)
                 self.assertEqual(response.status_code, 200)
                 response = self.client.post(change_url_2, {"name": "changed"})
                 self.assertEqual(
-                    RowLevelChangePermissionModel.objects.get(id=2).name, "changed"
+                    RowLevelChangePermissionModel.objects.get(pk=r2.pk).name,
+                    "changed",
                 )
                 self.assertRedirects(response, self.index_url)
                 response = self.client.get(change_url_3)
@@ -2975,14 +2989,15 @@ class AdminViewPermissionsTest(TestCase):
                 response = self.client.post(change_url_3, {"name": "changed"})
                 self.assertEqual(response.status_code, 403)
                 self.assertEqual(
-                    RowLevelChangePermissionModel.objects.get(id=3).name,
-                    "odd id mult 3",
+                    RowLevelChangePermissionModel.objects.get(pk=r3.pk).name,
+                    r3.name,
                 )
-                response = self.client.get(change_url_6)
+                response = self.client.get(change_url_4)
                 self.assertEqual(response.status_code, 200)
-                response = self.client.post(change_url_6, {"name": "changed"})
+                response = self.client.post(change_url_4, {"name": "changed"})
                 self.assertEqual(
-                    RowLevelChangePermissionModel.objects.get(id=6).name, "changed"
+                    RowLevelChangePermissionModel.objects.get(pk=r4.pk).name,
+                    "changed",
                 )
                 self.assertRedirects(response, self.index_url)
 
@@ -2997,7 +3012,8 @@ class AdminViewPermissionsTest(TestCase):
                     change_url_1, {"name": "changed"}, follow=True
                 )
                 self.assertEqual(
-                    RowLevelChangePermissionModel.objects.get(id=1).name, "odd id"
+                    RowLevelChangePermissionModel.objects.get(pk=r1.pk).name,
+                    r1.name,
                 )
                 self.assertContains(response, "login-form")
                 response = self.client.get(change_url_2, follow=True)
@@ -3006,7 +3022,8 @@ class AdminViewPermissionsTest(TestCase):
                     change_url_2, {"name": "changed again"}, follow=True
                 )
                 self.assertEqual(
-                    RowLevelChangePermissionModel.objects.get(id=2).name, "changed"
+                    RowLevelChangePermissionModel.objects.get(pk=r2.pk).name,
+                    "changed",
                 )
                 self.assertContains(response, "login-form")
                 self.client.post(reverse("admin:logout"))
@@ -3306,8 +3323,8 @@ class AdminViewPermissionsTest(TestCase):
 
         # Test redirection when using row-level change permissions. Refs
         # #11513.
-        rl1 = RowLevelChangePermissionModel.objects.create(id=1, name="odd id")
-        rl2 = RowLevelChangePermissionModel.objects.create(id=2, name="even id")
+        rl1 = RowLevelChangePermissionModel.objects.create(name="A", can_change=False)
+        rl2 = RowLevelChangePermissionModel.objects.create(name="B", can_change=True)
         logins = [
             self.superuser,
             self.viewuser,
@@ -4854,7 +4871,7 @@ class AdminViewListEditable(TestCase):
             "form-0-alive": "1",
             "form-0-gender": "2",
             # The form processing understands this as a list_editable "Save"
-            # and not an action "Go".
+            # and not an action "Run".
             "_save": "Save",
         }
         response = self.client.post(
@@ -4909,7 +4926,7 @@ class AdminViewListEditable(TestCase):
             "form-3-id": "4",
             "form-3-collector": "1",
             # The form processing understands this as a list_editable "Save"
-            # and not an action "Go".
+            # and not an action "Run".
             "_save": "Save",
         }
         response = self.client.post(
@@ -4945,7 +4962,7 @@ class AdminViewListEditable(TestCase):
         self.assertContains(response, "Unordered object #1")
 
     def test_list_editable_action_submit(self):
-        # List editable changes should not be executed if the action "Go"
+        # List editable changes should not be executed if the action "Run"
         # button is used to submit the form.
         data = {
             "form-TOTAL_FORMS": "3",

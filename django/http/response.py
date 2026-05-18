@@ -642,12 +642,11 @@ class HttpResponseRedirectBase(HttpResponse):
     ):
         super().__init__(*args, **kwargs)
         self["Location"] = iri_to_uri(redirect_to)
-        redirect_to_str = str(redirect_to)
-        if max_length is not None and len(redirect_to_str) > max_length:
+        if max_length is not None and len(self["Location"]) > max_length:
             raise DisallowedRedirect(
                 f"Unsafe redirect exceeding {max_length} characters"
             )
-        parsed = urlsplit(redirect_to_str)
+        parsed = urlsplit(str(redirect_to))
         if preserve_request:
             self.status_code = self.status_code_preserve_request
         if parsed.scheme and parsed.scheme not in self.allowed_schemes:

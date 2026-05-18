@@ -127,29 +127,29 @@ button {
         margin: 5px 0 0 25px;
     }
 
-    #changelist .actions {
+    .actions {
         display: flex;
         flex-wrap: wrap;
         padding: 15px 0;
     }
 
-    #changelist .actions label {
+    .actions label {
         display: flex;
     }
 
-    #changelist .actions select {
+    .actions select {
         background: var(--body-bg);
     }
 
-    #changelist .actions .button {
+    .actions .button {
         min-width: 48px;
         margin: 0 10px;
     }
 
-    #changelist .actions span.all,
-    #changelist .actions span.clear,
-    #changelist .actions span.question,
-    #changelist .actions span.action-counter {
+    .actions span.all,
+    .actions span.clear,
+    .actions span.question,
+    .actions span.action-counter {
         font-size: 0.6875rem;
         margin: 0 10px 0 0;
     }
@@ -437,16 +437,16 @@ button {
         margin-left: 0;
     }
 
-    #changelist .actions label {
+    .actions label {
         flex: 1 1;
     }
 
-    #changelist .actions select {
+    .actions select {
         flex: 1 0;
         width: 100%;
     }
 
-    #changelist .actions span {
+    .actions span {
         flex: 1 0 100%;
     }
 

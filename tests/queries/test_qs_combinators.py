@@ -419,7 +419,6 @@ class QuerySetSetOperationTests(TestCase):
         qs2 = base_qs.filter(name="a2")
         self.assertSequenceEqual(qs1.union(qs2).order_by("pk"), [a1, a2])
 
-    @skipUnlessDBFeature("supports_slicing_ordering_in_compound")
     def test_union_with_select_related_and_first(self):
         e1 = ExtraInfo.objects.create(value=7, info="e1")
         a1 = Author.objects.create(name="a1", num=1, extra=e1)
@@ -570,7 +569,6 @@ class QuerySetSetOperationTests(TestCase):
         # Combined queries don't mutate.
         self.assertCountEqual(qs, ["a1", "a2"])
 
-    @skipUnlessDBFeature("supports_slicing_ordering_in_compound")
     def test_union_in_with_ordering(self):
         qs1 = Number.objects.filter(num__gt=7).order_by("num")
         qs2 = Number.objects.filter(num__lt=2).order_by("num")
@@ -607,7 +605,6 @@ class QuerySetSetOperationTests(TestCase):
         qs = Author.objects.select_related("extra").order_by()
         self.assertEqual(qs.union(qs).count(), 1)
 
-    @skipUnlessDBFeature("supports_slicing_ordering_in_compound")
     def test_count_union_with_select_related_in_values(self):
         e1 = ExtraInfo.objects.create(value=1, info="e1")
         a1 = Author.objects.create(name="a1", num=1, extra=e1)
@@ -692,11 +689,9 @@ class QuerySetSetOperationTests(TestCase):
         msg = "LIMIT/OFFSET not allowed in subqueries of compound statements"
         with self.assertRaisesMessage(DatabaseError, msg):
             list(qs1.union(qs2[:10]))
-        msg = "ORDER BY not allowed in subqueries of compound statements"
-        with self.assertRaisesMessage(DatabaseError, msg):
-            list(qs1.order_by("id").union(qs2))
-        with self.assertRaisesMessage(DatabaseError, msg):
-            list(qs1.union(qs2).order_by("id").union(qs3))
+        # Unioning ordered queries is permitted.
+        list(qs1.order_by("id").union(qs2))
+        list(qs1.union(qs2).order_by("id").union(qs3))
 
     @skipIfDBFeature("supports_select_intersection")
     def test_unsupported_intersection_raises_db_error(self):

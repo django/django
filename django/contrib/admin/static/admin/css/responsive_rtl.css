@@ -9,12 +9,12 @@
         text-align: right;
     }
 
-    [dir="rtl"] #changelist .actions label {
+    [dir="rtl"] .actions label {
         padding-left: 10px;
         padding-right: 0;
     }
 
-    [dir="rtl"] #changelist .actions select {
+    [dir="rtl"] .actions select {
         margin-left: 0;
         margin-right: 15px;
     }

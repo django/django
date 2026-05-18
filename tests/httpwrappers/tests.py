@@ -24,6 +24,7 @@ from django.http import (
     parse_cookie,
 )
 from django.test import SimpleTestCase
+from django.utils.encoding import iri_to_uri
 from django.utils.functional import lazystr
 from django.utils.http import MAX_URL_REDIRECT_LENGTH
 
@@ -497,6 +498,18 @@ class HttpResponseTests(SimpleTestCase):
             with self.subTest(length=length, response_class=response_class):
                 response = response_class(long_url)
                 self.assertEqual(response.url, long_url)
+
+    def test_redirect_url_max_length_checks_encoded_location(self):
+        long_url = "/" + "é" * (MAX_URL_REDIRECT_LENGTH - 1)
+        self.assertLessEqual(len(long_url), MAX_URL_REDIRECT_LENGTH)
+        self.assertGreater(len(iri_to_uri(long_url)), MAX_URL_REDIRECT_LENGTH)
+        for response_class in (HttpResponseRedirect, HttpResponsePermanentRedirect):
+            msg = f"Unsafe redirect exceeding {MAX_URL_REDIRECT_LENGTH} characters"
+            with (
+                self.subTest(response_class=response_class),
+                self.assertRaisesMessage(DisallowedRedirect, msg),
+            ):
+                response_class(long_url)
 
     def test_redirect_url_max_length_override_via_param(self):
         base_url = "https://example.com/"

@@ -9,4 +9,6 @@ Django 6.0.6 fixes several bugs in 6.0.5.
 Bugfixes
 ========
 
-* ...
+* Fixed a bug in Django 6.0 where an alert message on an admin changelist with
+  ``ModelAdmin.list_editable`` referred to the "Run" button by its previous
+  name (:ticket:`37094`).

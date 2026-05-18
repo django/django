@@ -6,6 +6,7 @@ from django.test import SimpleTestCase, override_settings
 @override_settings(
     ADMINS=["admin@example.com", "admin_and_manager@example.com"],
     MANAGERS=["manager@example.com", "admin_and_manager@example.com"],
+    MAILERS={"default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}},
 )
 class SendTestEmailManagementCommand(SimpleTestCase):
     """

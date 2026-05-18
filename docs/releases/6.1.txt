@@ -86,6 +86,43 @@ Python-level options, as Django does not need to load objects before deleting
 them. As a consequence, the :attr:`~django.db.models.DB_CASCADE` option does
 not trigger the ``pre_delete`` or ``post_delete`` signals.
 
+Mailers
+-------
+
+The new :setting:`MAILERS` setting supports configuring multiple email backends
+with different options, similar to existing mechanisms for :setting:`CACHES`,
+:setting:`DATABASES`, :setting:`STORAGES`, and :setting:`TASKS`::
+
+    MAILERS = {
+        "default": {
+            "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+            "OPTIONS": {"host": "smtp.example.com", "use_tls": True},
+        },
+        "marketing": {
+            "BACKEND": "example_ses.EmailBackend",
+            "OPTIONS": {"region": "us-east-1"},
+        },
+    }
+
+You can select a mailer with the new ``using`` argument to :ref:`email sending
+<topic-email-sending>` functions, or obtain an email backend instance with
+:data:`mail.mailers[alias] <django.core.mail.mailers>`. See
+:doc:`/topics/email` for more details.
+
+:setting:`MAILERS` is not yet enabled by default in existing projects. It will
+replace :setting:`EMAIL_BACKEND` and related ``EMAIL_*`` settings in Django
+7.0. Until then, the older settings will continue to work but will issue
+deprecation warnings: see the list of :ref:`email deprecations
+<mailers-deprecations>` below.
+
+You can opt into the new feature at any time before Django 7.0; see
+:ref:`migrating-to-mailers`. To ease the transition,
+:data:`mail.mailers["default"] <django.core.mail.mailers.default>` works with
+either :setting:`MAILERS` or the deprecated :setting:`EMAIL_BACKEND` setting
+defined. The deprecated :func:`~django.core.mail.get_connection` function will
+also return an instance of the default mailer when :setting:`MAILERS` is
+defined.
+
 Minor features
 --------------
 
@@ -98,6 +135,11 @@ Minor features
 * The admin's ``FilteredSelectMultiple`` widget now uses ``<optgroup>``\s to
   preserve :ref:`named groups <field-choices-named-groups>` (e.g.
   ``choices=[("Group", [("1", "Item")]), ...]``).
+
+* When :attr:`.ModelAdmin.list_select_related` is ``False`` (the default),
+  the change list now selects only the foreign key fields specified in
+  :attr:`.ModelAdmin.list_display`, rather than all foreign key fields. This
+  should improve performance for models with many foreign key fields.
 
 * The :attr:`~django.contrib.admin.ModelAdmin.delete_confirmation_max_display`
   option allows customizing how many objects are displayed on admin delete
@@ -119,6 +161,18 @@ Minor features
 
 * :attr:`~django.contrib.admin.ModelAdmin.list_display` now uses boolean icons
   for boolean fields on related models.
+
+* The new ``location`` keyword argument of the
+  :func:`~django.contrib.admin.action` decorator specifies which admin views
+  the action is available on. The action is available on the admin change list
+  page by default. It can also be available on the admin change form. See
+  :ref:`admin-action-availability` for details.
+
+* The new ``description_plural`` keyword argument of the
+  :func:`~django.contrib.admin.action` decorator specifies a human-readable
+  description for actions on the admin change list page. Defaults to the
+  ``description`` value. This is useful when the action is available on both
+  the admin change list and admin change form.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -280,7 +334,9 @@ Forms
 Generic Views
 ~~~~~~~~~~~~~
 
-* ...
+* The new :attr:`.RedirectView.preserve_request` attribute allows preserving
+  the HTTP method and body during redirects, using 307/308 status codes instead
+  of 302/301.
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
@@ -480,6 +536,9 @@ backends.
 * The undocumented ``InclusionAdminNode.__init__()`` now takes the template tag
   ``name`` as the first positional argument.
 
+* The undocumented ``ChangeList.has_related_field_in_list_display()`` method
+  has been replaced with ``ChangeList.get_select_related_fields()``.
+
 :mod:`django.contrib.auth`
 --------------------------
 
@@ -541,12 +600,22 @@ Dropped support for MariaDB < 10.11
 Upstream support for MariaDB 10.6 ends in July 2026, and MariaDB 10.7-10.10 are
 short-term maintenance releases. Django 6.1 supports MariaDB 10.11 and higher.
 
-Miscellaneous
--------------
+Email
+-----
 
 * Providing ``fail_silently=True``, ``auth_user``, or ``auth_password`` to mail
   sending functions (such as :func:`~django.core.mail.send_mail`) while also
   providing a ``connection`` now raises a ``TypeError``.
+
+* The undocumented ``EmailMessage.get_connection()`` method is no longer used.
+  Defining it in a subclass or trying to call it now causes an error.
+
+* :meth:`.EmailMessage.send` no longer sets the ``connection`` property on the
+  ``EmailMessage``. (This behavior was never documented. The ``send()`` method
+  will still *use* a ``connection`` that is set on the message before sending.)
+
+Miscellaneous
+-------------
 
 * :class:`~django.contrib.contenttypes.fields.GenericForeignKey` now uses a
   separate descriptor class: the private ``GenericForeignKeyDescriptor``.
@@ -572,6 +641,17 @@ Miscellaneous
   ``SimpleUploadedFile`` retain the previous behavior of evaluating based on
   the ``name`` attribute.
 
+* The undocumented ``connection()`` method of :class:`.log.AdminEmailHandler`
+  has been removed and is no longer called. Subclasses overriding
+  :meth:`.AdminEmailHandler.send_mail` should avoid calling ``connection()``.
+  See :ref:`migrating-to-mailers-get-connection` if specific connection
+  configuration is needed.
+
+* The internal implementation of :class:`.BrokenLinkEmailsMiddleware` has been
+  updated for mailers. If you have subclassed it to customize email sending
+  behavior (as suggested in :doc:`/howto/error-reporting`), you may want to
+  review the updates in the base :class:`.BrokenLinkEmailsMiddleware` class.
+
 * ``django.http.multipartparser.MultiPartParser`` now uses strict Base64
   validation when decoding encoded request data. Previously, invalid data could
   be silently ignored or result in empty values. Invalid data now raises
@@ -589,8 +669,64 @@ Miscellaneous
 Features deprecated in 6.1
 ==========================
 
+.. _mailers-deprecations:
+
+Email
+-----
+
+* The :setting:`EMAIL_BACKEND`, :setting:`EMAIL_FILE_PATH`,
+  :setting:`EMAIL_HOST`, :setting:`EMAIL_HOST_PASSWORD`,
+  :setting:`EMAIL_HOST_USER`, :setting:`EMAIL_PORT`,
+  :setting:`EMAIL_USE_TLS`, :setting:`EMAIL_USE_SSL`,
+  :setting:`EMAIL_SSL_CERTFILE`, :setting:`EMAIL_SSL_KEYFILE`, and
+  :setting:`EMAIL_TIMEOUT` settings are deprecated. Replace them with an
+  :setting:`MAILERS` configuration dictionary as described in
+  :ref:`migrating-to-mailers`.
+
+* :func:`.mail.get_connection` is deprecated. See
+  :ref:`migrating-to-mailers-get-connection` for replacement options.
+
+* The ``connection`` argument to :func:`.send_mail`, :func:`.send_mass_mail`,
+  :func:`.mail_admins`, :func:`.mail_managers`, and :class:`.EmailMessage` is
+  deprecated. The ``EmailMessage.connection`` attribute is also deprecated.
+  Switch to the ``using`` argument with a :setting:`MAILERS` alias.
+
+* The ``fail_silently`` argument to :func:`.send_mail`,
+  :func:`.send_mass_mail`, :func:`.mail_admins`, :func:`.mail_managers`, and
+  :meth:`.EmailMessage.send` is deprecated. See
+  :ref:`migrating-to-mailers-fail-silently` for alternatives.
+
+* The ``auth_user`` and ``auth_password`` arguments to :func:`.send_mail` and
+  :func:`.send_mass_mail` are deprecated. Replace them with ``"username"`` and
+  ``"password"`` :setting:`OPTIONS <MAILERS-OPTIONS>` in :setting:`MAILERS`.
+  See :ref:`migrating-to-mailers-auth`.
+
+* Directly constructing and using instances of the
+  :ref:`smtp.EmailBackend <topic-email-smtp-backend>` class is deprecated. Use
+  :data:`.mail.mailers` to obtain email backend instances.
+
+* The ``BaseEmailBackend.__init__()`` constructor no longer silently ignores
+  unknown keyword arguments. Custom email backend subclasses should ensure they
+  have consumed all supported ``**kwargs`` before forwarding the remainder to
+  superclass init. The base class now issues a deprecation warning for unknown
+  arguments, and it will treat them as errors starting in Django 7.0. See
+  :ref:`migrating-to-mailers-email-backends`.
+
+* Support for ``fail_silently`` in the ``BaseEmailBackend`` is deprecated.
+  A custom email backend that wants to support ``fail_silently`` should manage
+  its own local attribute, not pass it to the base backend constructor. See
+  :ref:`migrating-to-mailers-email-backends`.
+
 Miscellaneous
 -------------
+
+* Calling :meth:`~django.db.models.query.QuerySet.select_related` with no
+  arguments to select all related fields, is deprecated. Specify the related
+  fields to fetch instead.
+
+* Setting :attr:`.ModelAdmin.list_select_related` to ``True`` and returning
+  ``True`` from :attr:`.ModelAdmin.get_list_select_related()` are deprecated.
+  Specify the related fields to fetch instead.
 
 * Calling :meth:`.QuerySet.values_list` with ``flat=True`` and no field name
   is deprecated. Pass an explicit field name, like
@@ -621,6 +757,9 @@ Miscellaneous
   :ref:`expressions <writing-your-own-query-expressions>`, is deprecated in
   favor of the newly introduced ``quote_name()`` method.
 
+* The ``email_backend`` argument of :class:`.log.AdminEmailHandler` is
+  deprecated in favor of the newly introduced ``using`` argument.
+
 * The ``BitAnd``, ``BitOr``, and ``BitXor`` classes in
   ``django.contrib.postgres.aggregates`` are deprecated in favor of the
   generally available :class:`~django.db.models.BitAnd`,
@@ -636,6 +775,16 @@ Miscellaneous
   ``django.core.signing.base64_hmac()`` is deprecated and will change from
   ``"sha1"`` to ``"sha256"`` in Django 7.0. Pass an explicit ``algorithm``
   to silence the deprecation warning.
+
+* Overriding ``ModelAdmin.get_actions()`` without the new ``action_location``
+  parameter is deprecated.
+
+* Unpacking or indexing the dictionary values of the
+  ``ModelAdmin.get_actions()`` return value is deprecated. Use
+  :class:`~django.contrib.admin.Action` attributes instead.
+
+* Overriding ``ModelAdmin.get_action_choices()`` without the new
+  ``action_location`` parameter is deprecated.
 
 Features removed in 6.1
 =======================

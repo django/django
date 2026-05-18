@@ -68,6 +68,8 @@ admin one article at a time, but if we wanted to bulk-publish a group of
 articles, it'd be tedious. So, let's write an action that lets us change an
 article's status to "published."
 
+.. _action-function:
+
 Writing action functions
 ------------------------
 
@@ -362,13 +364,14 @@ including any :ref:`site-wide actions <adminsite-actions>`.
 Conditionally enabling or disabling actions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: ModelAdmin.get_actions(request)
+.. method:: ModelAdmin.get_actions(request, action_location=ActionLocation.CHANGE_LIST)
 
     Finally, you can conditionally enable or disable actions on a per-request
     (and hence per-user basis) by overriding :meth:`ModelAdmin.get_actions`.
 
-    This returns a dictionary of actions allowed. The keys are action names,
-    and the values are ``(function, name, short_description)`` tuples.
+    This returns a dictionary of actions allowed for the specific
+    ``action_location``. The keys are action names, and the values are
+    :class:`Action` objects.
 
     For example, if you only want users whose names begin with 'J' to be able
     to delete objects in bulk::
@@ -376,12 +379,19 @@ Conditionally enabling or disabling actions
         class MyModelAdmin(admin.ModelAdmin):
             ...
 
-            def get_actions(self, request):
-                actions = super().get_actions(request)
+            def get_actions(self, request, action_location=ActionLocation.CHANGE_LIST):
+                actions = super().get_actions(request, action_location=action_location)
                 if request.user.username[0].upper() != "J":
                     if "delete_selected" in actions:
                         del actions["delete_selected"]
                 return actions
+
+    .. versionchanged:: 6.1
+
+        The keyword argument ``action_location`` was added. The return type was
+        changed to a dictionary where the keys are action names and the values
+        are :class:`Action` objects, previously the values were
+        ``(function, name, description)`` tuples.
 
 .. _admin-action-permissions:
 
@@ -431,10 +441,49 @@ For example::
             codename = get_permission_codename("publish", opts)
             return request.user.has_perm("%s.%s" % (opts.app_label, codename))
 
+.. _admin-action-availability:
+
+Controlling where actions are available
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 6.1
+
+By default, admin actions are available on the change list page only. You can
+control where an action appears using the ``location`` argument of the
+``@admin.action`` decorator.
+
+For example, to make an action available only on the change form, set
+``location`` to :attr:`ActionLocation.CHANGE_FORM`::
+
+    from django.contrib import admin
+    from django.contrib.admin import ActionLocation
+
+
+    @admin.action(location=ActionLocation.CHANGE_FORM)
+    def make_published(modeladmin, request, queryset): ...
+
+To make an action available on both the change list and the change form::
+
+    @admin.action(
+        location=[ActionLocation.CHANGE_FORM, ActionLocation.CHANGE_LIST],
+        description="Publish",
+        description_plural="Mark selected stories as published",
+    )
+    def make_published(modeladmin, request, queryset): ...
+
+Notice that ``description`` and ``description_plural`` were provided. These are
+optional but the admin action will be labeled by ``description`` in the admin
+change form and ``description_plural`` in the admin change list.
+
+You can customize how actions are rendered by overriding admin templates.
+The change list page uses ``admin/actions.html`` and the change form page uses
+``admin/change_form_actions.html``. Note that the change form template inherits
+from the change list actions template.
+
 The ``action`` decorator
 ========================
 
-.. function:: action(*, permissions=None, description=None)
+.. function:: action(*, permissions=None, description=None, description_plural=None, location=ActionLocation.CHANGE_LIST)
 
     This decorator can be used for setting specific attributes on custom action
     functions that can be used with
@@ -478,6 +527,17 @@ The ``action`` decorator
         capitalizing the first letter of the first word. This sets the
         ``short_description`` attribute on the function.
 
+    :param description_plural: A human-readable description of the action used
+        in contexts where plural wording is required, such as on the admin
+        change list. If ``description_plural`` is not provided, falls back to
+        ``description``. This sets the ``plural_description`` attribute on the
+        function.
+
+    :param location: Specifies where the action is available. Accepts either a
+        single :class:`ActionLocation` value or an iterable of values. If
+        omitted, the action is only available on the admin change list. See
+        :ref:`admin-action-availability` for details.
+
     .. admonition:: Action description ``%``-formatting support
 
         Action descriptions support ``%``-formatting and may include
@@ -485,3 +545,59 @@ The ``action`` decorator
         These are replaced with the model’s
         :attr:`~django.db.models.Options.verbose_name` and
         :attr:`~django.db.models.Options.verbose_name_plural`.
+
+    .. versionchanged:: 6.1
+
+        The keyword arguments ``description_plural`` and ``location`` were
+        added.
+
+``ActionLocation``
+==================
+
+.. versionadded:: 6.1
+
+.. class:: ActionLocation
+
+  Enum of allowed values for the ``location`` parameter of the
+  :func:`~django.contrib.admin.action` decorator.
+
+  .. attribute:: CHANGE_FORM
+
+      The action is available on the admin change form. When an action is run,
+      any unsaved changes on the admin change form will be lost.
+
+  .. attribute:: CHANGE_LIST
+
+      The action is available on the admin change list.
+
+``Action``
+==========
+
+.. versionadded:: 6.1
+
+.. class:: Action
+
+    Represents an action. Actions should be defined using the :func:`action`
+    decorator.
+
+    .. attribute:: func
+
+        The action function. See :ref:`action-function` for details.
+
+    .. attribute:: name
+
+        The action function name.
+
+    .. attribute:: description
+
+        A human-readable description of the action to be rendered in the admin.
+
+    .. attribute:: plural_description
+
+        A human-readable description of the action used in contexts where
+        plural wording is required.
+
+    .. attribute:: locations
+
+        A list of :class:`ActionLocation` values the admin action can be
+        rendered.
