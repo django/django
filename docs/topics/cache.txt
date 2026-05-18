@@ -272,13 +272,13 @@ This creates a table in your database that is in the proper format that
 Django's database-cache system expects. The name of the table is taken from
 :setting:`LOCATION <CACHES-LOCATION>`.
 
-If you are using multiple database caches, :djadmin:`createcachetable` creates
+If you are using multiple database caches, :djcli:`createcachetable` creates
 one table for each cache.
 
-If you are using multiple databases, :djadmin:`createcachetable` observes the
+If you are using multiple databases, :djcli:`createcachetable` observes the
 ``allow_migrate()`` method of your database routers (see below).
 
-Like :djadmin:`migrate`, :djadmin:`createcachetable` won't touch an existing
+Like :djcli:`migrate`, :djcli:`createcachetable` won't touch an existing
 table. It will only create missing tables.
 
 To print the SQL that would be run, rather than run it, use the

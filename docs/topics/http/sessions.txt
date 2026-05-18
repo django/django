@@ -20,7 +20,7 @@ To enable session functionality, do the following:
 
 * Edit the :setting:`MIDDLEWARE` setting and make sure it contains
   ``'django.contrib.sessions.middleware.SessionMiddleware'``. The default
-  ``settings.py`` created by ``django-admin startproject`` has
+  ``settings.py`` created by ``django startproject`` has
   ``SessionMiddleware`` activated.
 
 If you don't want to use sessions, you might as well remove the
@@ -387,7 +387,7 @@ You can edit it multiple times.
       *Asynchronous version*: ``aclear_expired()``
 
       Removes expired sessions from the session store. This class method is
-      called by :djadmin:`clearsessions`.
+      called by :djcli:`clearsessions`.
 
     .. method:: cycle_key()
     .. method:: acycle_key()
@@ -705,7 +705,7 @@ the row never gets deleted. A similar process happens with the file backend.
 
 Django does *not* provide automatic purging of expired sessions. Therefore,
 it's your job to purge expired sessions on a regular basis. Django provides a
-clean-up management command for this purpose: :djadmin:`clearsessions`. It's
+clean-up management command for this purpose: :djcli:`clearsessions`. It's
 recommended to call this command on a regular basis, for example as a daily
 cron job.
 
@@ -835,7 +835,7 @@ including ``django.contrib.sessions`` in :setting:`INSTALLED_APPS`.
         A datetime designating when the session expires.
 
         Expired sessions are not available to a user, however, they may still
-        be stored in the database until the :djadmin:`clearsessions` management
+        be stored in the database until the :djcli:`clearsessions` management
         command is run.
 
     .. classmethod:: get_session_store_class()

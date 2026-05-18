@@ -68,7 +68,7 @@ your ``models.py``.
 
 For example, if the models for your application live in the module
 ``myapp.models`` (the package structure that is created for an
-application by the :djadmin:`manage.py startapp <startapp>` script),
+application by the :djcli:`manage.py startapp <startapp>` script),
 :setting:`INSTALLED_APPS` should read, in part::
 
     INSTALLED_APPS = [
@@ -78,8 +78,8 @@ application by the :djadmin:`manage.py startapp <startapp>` script),
     ]
 
 When you add new apps to :setting:`INSTALLED_APPS`, be sure to run
-:djadmin:`manage.py migrate <migrate>`, optionally making migrations
-for them first with :djadmin:`manage.py makemigrations <makemigrations>`.
+:djcli:`manage.py migrate <migrate>`, optionally making migrations
+for them first with :djcli:`manage.py makemigrations <makemigrations>`.
 
 Fields
 ======
@@ -1193,7 +1193,7 @@ will be ``rare_childb_related`` and the reverse query name will be
 ``rare_childbs``. It's up to you how you use the ``'%(class)s'`` and
 ``'%(app_label)s'`` portion to construct your related name or related query
 name but if you forget to use it, Django will raise errors when you perform
-system checks (or run :djadmin:`migrate`).
+system checks (or run :djcli:`migrate`).
 
 If you don't specify a :attr:`~django.db.models.ForeignKey.related_name`
 attribute for a field in an abstract base class, the default reverse name will
@@ -1621,7 +1621,7 @@ try to avoid.
 Organizing models in a package
 ==============================
 
-The :djadmin:`manage.py startapp <startapp>` command creates an application
+The :djcli:`manage.py startapp <startapp>` command creates an application
 structure that includes a ``models.py`` file. If you have many models,
 organizing them in separate files may be useful.
 

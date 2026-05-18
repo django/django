@@ -37,7 +37,7 @@ same directory as your ``manage.py`` file.
 Integration with ``runserver``
 ==============================
 
-Daphne provides a :djadmin:`runserver` command to serve your site under ASGI
+Daphne provides a :djcli:`runserver` command to serve your site under ASGI
 during development.
 
 This can be enabled by adding ``daphne`` to the start of your

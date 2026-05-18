@@ -39,7 +39,7 @@ described in the option's documentation.
 Switch away from ``manage.py runserver``
 ========================================
 
-The :djadmin:`runserver` command is not designed for a production setting. Be
+The :djcli:`runserver` command is not designed for a production setting. Be
 sure to switch to a production-ready WSGI or ASGI server. For a few common
 options, see :doc:`WSGI servers </howto/deployment/wsgi/index>` or
 :doc:`ASGI servers </howto/deployment/asgi/index>`.
@@ -164,7 +164,7 @@ addresses. To use different sender addresses, modify the
 
 Static files are automatically served by the development server. In
 production, you must define a :setting:`STATIC_ROOT` directory where
-:djadmin:`collectstatic` will copy them.
+:djcli:`collectstatic` will copy them.
 
 See :doc:`/howto/static-files/index` for more information.
 

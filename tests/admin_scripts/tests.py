@@ -213,16 +213,16 @@ class AdminScriptTestCase(SimpleTestCase):
 ##########################################################################
 # DJANGO ADMIN TESTS
 # This first series of test classes checks the environment processing
-# of the django-admin.
+# of the django CLI.
 ##########################################################################
 
 
 class DjangoAdminNoSettings(AdminScriptTestCase):
-    "A series of tests for django-admin when there is no settings.py file."
+    "A series of tests for the django CLI when there is no settings.py file."
 
     def test_builtin_command(self):
         """
-        no settings: django-admin builtin commands fail with an error when no
+        no settings: builtin commands fail with an error when no
         settings provided.
         """
         args = ["check", "admin_scripts"]
@@ -232,7 +232,7 @@ class DjangoAdminNoSettings(AdminScriptTestCase):
 
     def test_builtin_with_bad_settings(self):
         """
-        no settings: django-admin builtin commands fail if settings file (from
+        no settings: builtin commands fail if settings file (from
         argument) doesn't exist.
         """
         args = ["check", "--settings=bad_settings", "admin_scripts"]
@@ -242,7 +242,7 @@ class DjangoAdminNoSettings(AdminScriptTestCase):
 
     def test_builtin_with_bad_environment(self):
         """
-        no settings: django-admin builtin commands fail if settings file (from
+        no settings: builtin commands fail if settings file (from
         environment) doesn't exist.
         """
         args = ["check", "admin_scripts"]
@@ -263,7 +263,7 @@ class DjangoAdminNoSettings(AdminScriptTestCase):
 
 class DjangoAdminDefaultSettings(AdminScriptTestCase):
     """
-    A series of tests for django-admin when using a settings.py file that
+    A series of tests for django when using a settings.py file that
     contains the test application.
     """
 
@@ -273,7 +273,7 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
 
     def test_builtin_command(self):
         """
-        default: django-admin builtin commands fail with an error when no
+        default: builtin commands fail with an error when no
         settings provided.
         """
         args = ["check", "admin_scripts"]
@@ -283,7 +283,7 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
 
     def test_builtin_with_settings(self):
         """
-        default: django-admin builtin commands succeed if settings are provided
+        default: builtin commands succeed if settings are provided
         as argument.
         """
         args = ["check", "--settings=test_project.settings", "admin_scripts"]
@@ -293,7 +293,7 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
 
     def test_builtin_with_environment(self):
         """
-        default: django-admin builtin commands succeed if settings are provided
+        default: builtin commands succeed if settings are provided
         in the environment.
         """
         args = ["check", "admin_scripts"]
@@ -303,7 +303,7 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
 
     def test_builtin_with_bad_settings(self):
         """
-        default: django-admin builtin commands fail if settings file (from
+        default: builtin commands fail if settings file (from
         argument) doesn't exist.
         """
         args = ["check", "--settings=bad_settings", "admin_scripts"]
@@ -313,7 +313,7 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
 
     def test_builtin_with_bad_environment(self):
         """
-        default: django-admin builtin commands fail if settings file (from
+        default: builtin commands fail if settings file (from
         environment) doesn't exist.
         """
         args = ["check", "admin_scripts"]
@@ -323,7 +323,7 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
 
     def test_custom_command(self):
         """
-        default: django-admin can't execute user commands if it isn't provided
+        default: django can't execute user commands if it isn't provided
         settings.
         """
         args = ["noargs_command"]
@@ -334,7 +334,7 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
 
     def test_custom_command_with_settings(self):
         """
-        default: django-admin can execute user commands if settings are
+        default: django can execute user commands if settings are
         provided as argument.
         """
         args = ["noargs_command", "--settings=test_project.settings"]
@@ -344,7 +344,7 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
 
     def test_custom_command_with_environment(self):
         """
-        default: django-admin can execute user commands if settings are
+        default: django can execute user commands if settings are
         provided in environment.
         """
         args = ["noargs_command"]
@@ -355,7 +355,7 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
 
 class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
     """
-    A series of tests for django-admin when using a settings.py file that
+    A series of tests for django when using a settings.py file that
     contains the test application specified using a full path.
     """
 
@@ -373,7 +373,7 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
 
     def test_builtin_command(self):
         """
-        fulldefault: django-admin builtin commands fail with an error when no
+        fulldefault: builtin commands fail with an error when no
         settings provided.
         """
         args = ["check", "admin_scripts"]
@@ -383,7 +383,7 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
 
     def test_builtin_with_settings(self):
         """
-        fulldefault: django-admin builtin commands succeed if a settings file
+        fulldefault: builtin commands succeed if a settings file
         is provided.
         """
         args = ["check", "--settings=test_project.settings", "admin_scripts"]
@@ -393,7 +393,7 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
 
     def test_builtin_with_environment(self):
         """
-        fulldefault: django-admin builtin commands succeed if the environment
+        fulldefault: builtin commands succeed if the environment
         contains settings.
         """
         args = ["check", "admin_scripts"]
@@ -403,7 +403,7 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
 
     def test_builtin_with_bad_settings(self):
         """
-        fulldefault: django-admin builtin commands fail if settings file (from
+        fulldefault: builtin commands fail if settings file (from
         argument) doesn't exist.
         """
         args = ["check", "--settings=bad_settings", "admin_scripts"]
@@ -413,7 +413,7 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
 
     def test_builtin_with_bad_environment(self):
         """
-        fulldefault: django-admin builtin commands fail if settings file (from
+        fulldefault: builtin commands fail if settings file (from
         environment) doesn't exist.
         """
         args = ["check", "admin_scripts"]
@@ -423,7 +423,7 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
 
     def test_custom_command(self):
         """
-        fulldefault: django-admin can't execute user commands unless settings
+        fulldefault: django can't execute user commands unless settings
         are provided.
         """
         args = ["noargs_command"]
@@ -434,7 +434,7 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
 
     def test_custom_command_with_settings(self):
         """
-        fulldefault: django-admin can execute user commands if settings are
+        fulldefault: django can execute user commands if settings are
         provided as argument.
         """
         args = ["noargs_command", "--settings=test_project.settings"]
@@ -444,7 +444,7 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
 
     def test_custom_command_with_environment(self):
         """
-        fulldefault: django-admin can execute user commands if settings are
+        fulldefault: django can execute user commands if settings are
         provided in environment.
         """
         args = ["noargs_command"]
@@ -455,7 +455,7 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
 
 class DjangoAdminMinimalSettings(AdminScriptTestCase):
     """
-    A series of tests for django-admin when using a settings.py file that
+    A series of tests for django when using a settings.py file that
     doesn't contain the test application.
     """
 
@@ -467,7 +467,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
 
     def test_builtin_command(self):
         """
-        minimal: django-admin builtin commands fail with an error when no
+        minimal: builtin commands fail with an error when no
         settings provided.
         """
         args = ["check", "admin_scripts"]
@@ -477,7 +477,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
 
     def test_builtin_with_settings(self):
         """
-        minimal: django-admin builtin commands fail if settings are provided as
+        minimal: builtin commands fail if settings are provided as
         argument.
         """
         args = ["check", "--settings=test_project.settings", "admin_scripts"]
@@ -487,7 +487,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
 
     def test_builtin_with_environment(self):
         """
-        minimal: django-admin builtin commands fail if settings are provided in
+        minimal: builtin commands fail if settings are provided in
         the environment.
         """
         args = ["check", "admin_scripts"]
@@ -497,7 +497,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
 
     def test_builtin_with_bad_settings(self):
         """
-        minimal: django-admin builtin commands fail if settings file (from
+        minimal: builtin commands fail if settings file (from
         argument) doesn't exist.
         """
         args = ["check", "--settings=bad_settings", "admin_scripts"]
@@ -507,7 +507,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
 
     def test_builtin_with_bad_environment(self):
         """
-        minimal: django-admin builtin commands fail if settings file (from
+        minimal: builtin commands fail if settings file (from
         environment) doesn't exist.
         """
         args = ["check", "admin_scripts"]
@@ -517,7 +517,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
 
     def test_custom_command(self):
         """
-        minimal: django-admin can't execute user commands unless settings are
+        minimal: django can't execute user commands unless settings are
         provided
         """
         args = ["noargs_command"]
@@ -528,7 +528,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
 
     def test_custom_command_with_settings(self):
         """
-        minimal: django-admin can't execute user commands, even if settings are
+        minimal: django can't execute user commands, even if settings are
         provided as argument.
         """
         args = ["noargs_command", "--settings=test_project.settings"]
@@ -538,7 +538,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
 
     def test_custom_command_with_environment(self):
         """
-        minimal: django-admin can't execute user commands, even if settings are
+        minimal: django can't execute user commands, even if settings are
         provided in environment.
         """
         args = ["noargs_command"]
@@ -549,7 +549,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
 
 class DjangoAdminAlternateSettings(AdminScriptTestCase):
     """
-    A series of tests for django-admin when using a settings file with a name
+    A series of tests for django when using a settings file with a name
     other than 'settings.py'.
     """
 
@@ -559,7 +559,7 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
 
     def test_builtin_command(self):
         """
-        alternate: django-admin builtin commands fail with an error when no
+        alternate: builtin commands fail with an error when no
         settings provided.
         """
         args = ["check", "admin_scripts"]
@@ -569,7 +569,7 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
 
     def test_builtin_with_settings(self):
         """
-        alternate: django-admin builtin commands succeed if settings are
+        alternate: builtin commands succeed if settings are
         provided as argument.
         """
         args = ["check", "--settings=test_project.alternate_settings", "admin_scripts"]
@@ -579,7 +579,7 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
 
     def test_builtin_with_environment(self):
         """
-        alternate: django-admin builtin commands succeed if settings are
+        alternate: builtin commands succeed if settings are
         provided in the environment.
         """
         args = ["check", "admin_scripts"]
@@ -589,7 +589,7 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
 
     def test_builtin_with_bad_settings(self):
         """
-        alternate: django-admin builtin commands fail if settings file (from
+        alternate: builtin commands fail if settings file (from
         argument) doesn't exist.
         """
         args = ["check", "--settings=bad_settings", "admin_scripts"]
@@ -599,7 +599,7 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
 
     def test_builtin_with_bad_environment(self):
         """
-        alternate: django-admin builtin commands fail if settings file (from
+        alternate: builtin commands fail if settings file (from
         environment) doesn't exist.
         """
         args = ["check", "admin_scripts"]
@@ -609,7 +609,7 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
 
     def test_custom_command(self):
         """
-        alternate: django-admin can't execute user commands unless settings
+        alternate: django can't execute user commands unless settings
         are provided.
         """
         args = ["noargs_command"]
@@ -620,7 +620,7 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
 
     def test_custom_command_with_settings(self):
         """
-        alternate: django-admin can execute user commands if settings are
+        alternate: django can execute user commands if settings are
         provided as argument.
         """
         args = ["noargs_command", "--settings=test_project.alternate_settings"]
@@ -630,7 +630,7 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
 
     def test_custom_command_with_environment(self):
         """
-        alternate: django-admin can execute user commands if settings are
+        alternate: django can execute user commands if settings are
         provided in environment.
         """
         args = ["noargs_command"]
@@ -641,7 +641,7 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
 
 class DjangoAdminMultipleSettings(AdminScriptTestCase):
     """
-    A series of tests for django-admin when multiple settings files
+    A series of tests for django when multiple settings files
     (including the default 'settings.py') are available. The default settings
     file is insufficient for performing the operations described, so the
     alternate settings must be used by the running script.
@@ -656,7 +656,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
 
     def test_builtin_command(self):
         """
-        alternate: django-admin builtin commands fail with an error when no
+        alternate: builtin commands fail with an error when no
         settings provided.
         """
         args = ["check", "admin_scripts"]
@@ -666,7 +666,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
 
     def test_builtin_with_settings(self):
         """
-        alternate: django-admin builtin commands succeed if settings are
+        alternate: builtin commands succeed if settings are
         provided as argument.
         """
         args = ["check", "--settings=test_project.alternate_settings", "admin_scripts"]
@@ -676,7 +676,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
 
     def test_builtin_with_environment(self):
         """
-        alternate: django-admin builtin commands succeed if settings are
+        alternate: builtin commands succeed if settings are
         provided in the environment.
         """
         args = ["check", "admin_scripts"]
@@ -686,7 +686,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
 
     def test_builtin_with_bad_settings(self):
         """
-        alternate: django-admin builtin commands fail if settings file (from
+        alternate: builtin commands fail if settings file (from
         argument) doesn't exist.
         """
         args = ["check", "--settings=bad_settings", "admin_scripts"]
@@ -695,7 +695,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
 
     def test_builtin_with_bad_environment(self):
         """
-        alternate: django-admin builtin commands fail if settings file (from
+        alternate: builtin commands fail if settings file (from
         environment) doesn't exist.
         """
         args = ["check", "admin_scripts"]
@@ -705,7 +705,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
 
     def test_custom_command(self):
         """
-        alternate: django-admin can't execute user commands unless settings are
+        alternate: django can't execute user commands unless settings are
         provided.
         """
         args = ["noargs_command"]
@@ -716,7 +716,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
 
     def test_custom_command_with_settings(self):
         """
-        alternate: django-admin can execute user commands if settings are
+        alternate: django can execute user commands if settings are
         provided as argument.
         """
         args = ["noargs_command", "--settings=test_project.alternate_settings"]
@@ -726,7 +726,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
 
     def test_custom_command_with_environment(self):
         """
-        alternate: django-admin can execute user commands if settings are
+        alternate: django can execute user commands if settings are
         provided in environment.
         """
         args = ["noargs_command"]
@@ -737,7 +737,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
 
 class DjangoAdminSettingsDirectory(AdminScriptTestCase):
     """
-    A series of tests for django-admin when the settings file is in a
+    A series of tests for django when the settings file is in a
     directory. (see #9751).
     """
 
@@ -784,7 +784,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
 
     def test_builtin_command(self):
         """
-        directory: django-admin builtin commands fail with an error when no
+        directory: builtin commands fail with an error when no
         settings provided.
         """
         args = ["check", "admin_scripts"]
@@ -794,7 +794,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
 
     def test_builtin_with_bad_settings(self):
         """
-        directory: django-admin builtin commands fail if settings file (from
+        directory: builtin commands fail if settings file (from
         argument) doesn't exist.
         """
         args = ["check", "--settings=bad_settings", "admin_scripts"]
@@ -803,7 +803,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
 
     def test_builtin_with_bad_environment(self):
         """
-        directory: django-admin builtin commands fail if settings file (from
+        directory: builtin commands fail if settings file (from
         environment) doesn't exist.
         """
         args = ["check", "admin_scripts"]
@@ -813,7 +813,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
 
     def test_custom_command(self):
         """
-        directory: django-admin can't execute user commands unless settings are
+        directory: django can't execute user commands unless settings are
         provided.
         """
         args = ["noargs_command"]
@@ -824,7 +824,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
 
     def test_builtin_with_settings(self):
         """
-        directory: django-admin builtin commands succeed if settings are
+        directory: builtin commands succeed if settings are
         provided as argument.
         """
         args = ["check", "--settings=test_project.settings", "admin_scripts"]
@@ -834,7 +834,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
 
     def test_builtin_with_environment(self):
         """
-        directory: django-admin builtin commands succeed if settings are
+        directory: builtin commands succeed if settings are
         provided in the environment.
         """
         args = ["check", "admin_scripts"]
@@ -2484,7 +2484,7 @@ class CommandDBOptionChoiceTests(SimpleTestCase):
 class ArgumentOrder(AdminScriptTestCase):
     """Tests for 2-stage argument parsing scheme.
 
-    django-admin command arguments are parsed in 2 parts; the core arguments
+    django CLI arguments are parsed in 2 parts; the core arguments
     (--settings, --traceback and --pythonpath) are parsed using a basic parser,
     ignoring any unknown options. Then the full settings are
     passed to the command parser, which extracts commands of interest to the
@@ -2565,6 +2565,15 @@ class ExecuteFromCommandLine(SimpleTestCase):
             with mock.patch("sys.argv", [None] + args):
                 execute_from_command_line(["django-admin"] + args)
         self.assertIn("usage: django-admin shell", out.getvalue())
+        self.assertIn(
+            "The django-admin command is being renamed to django.",
+            err.getvalue(),
+        )
+
+        with captured_stdout() as out, captured_stderr() as err:
+            with mock.patch("sys.argv", [None] + args):
+                execute_from_command_line(["django"] + args)
+        self.assertIn("usage: django shell", out.getvalue())
         self.assertEqual(err.getvalue(), "")
 
 
@@ -3314,7 +3323,7 @@ class Dumpdata(AdminScriptTestCase):
 
 
 class MainModule(AdminScriptTestCase):
-    """python -m django works like django-admin."""
+    """python -m django works like the django CLI."""
 
     def test_program_name_in_help(self):
         out, err = self.run_test(["-m", "django", "help"])

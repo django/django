@@ -46,12 +46,18 @@ def setup(app):
         indextemplate="pair: %s; field lookup type",
     )
     app.add_object_type(
+        directivename="django-cli",
+        rolename="djcli",
+        indextemplate="pair: %s; django command",
+        parse_node=parse_django_cli_node,
+    )
+    app.add_object_type(
         directivename="django-admin",
         rolename="djadmin",
         indextemplate="pair: %s; django-admin command",
         parse_node=parse_django_admin_node,
     )
-    app.add_directive("django-admin-option", Cmdoption)
+    app.add_directive("django-cli-option", Cmdoption)
     app.add_config_value("django_next_version", "0.0", True)
     app.add_directive("versionadded", VersionDirective)
     app.add_directive("versionchanged", VersionDirective)
@@ -67,6 +73,7 @@ def setup(app):
         texinfo=(visit_console_dummy, depart_console_dummy),
     )
     app.add_directive("console", ConsoleDirective)
+    app.connect("env-updated", add_django_admin_object_aliases)
     app.connect("html-page-context", html_page_context_hook)
     app.add_role("default-role-error", default_role_error)
     return {"parallel_read_safe": True}
@@ -181,12 +188,32 @@ class DjangoHTMLTranslator(HTMLTranslator):
         node["ids"] = old_ids
 
 
+def parse_django_cli_node(env, sig, signode):
+    command = sig.split(" ")[0]
+    env.ref_context["std:program"] = command
+    title = "django %s" % sig
+    signode += addnodes.desc_name(title, title)
+    return command
+
+
 def parse_django_admin_node(env, sig, signode):
     command = sig.split(" ")[0]
     env.ref_context["std:program"] = command
     title = "django-admin %s" % sig
     signode += addnodes.desc_name(title, title)
     return command
+
+
+def add_django_admin_object_aliases(app, env):
+    # The canonical docs now use :djcli:, so :djadmin: won't resolve.
+    # We still want the old :djadmin:, so that historical references,
+    # particularly in release notes, read exactly as they did.
+    # We need to copy the `django-cli` objects to `django-admin` so
+    # that Sphinx will be able to resolve the :djadmin: references.
+    objects = env.domaindata["std"]["objects"]
+    for (objtype, name), value in list(objects.items()):
+        if objtype == "django-cli":
+            objects.setdefault(("django-admin", name), value)
 
 
 class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):

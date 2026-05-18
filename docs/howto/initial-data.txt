@@ -25,7 +25,7 @@ however, this data isn't loaded automatically, except if you use
 
 A fixture is a collection of data that Django knows how to import into a
 database. The most straightforward way of creating a fixture if you've already
-got some data is to use the :djadmin:`manage.py dumpdata <dumpdata>` command.
+got some data is to use the :djcli:`manage.py dumpdata <dumpdata>` command.
 Or, you can write fixtures by hand; fixtures can be written as JSON, XML or
 YAML (with PyYAML_ installed) documents. The :doc:`serialization documentation
 </topics/serialization>` has more details about each of these supported
@@ -74,11 +74,11 @@ And here's that same fixture as YAML:
 
 You'll store this data in a ``fixtures`` directory inside your app.
 
-You can load data by calling :djadmin:`manage.py loaddata <loaddata>`
+You can load data by calling :djcli:`manage.py loaddata <loaddata>`
 ``<fixturename>``, where ``<fixturename>`` is the name of the fixture file
-you've created. Each time you run :djadmin:`loaddata`, the data will be read
+you've created. Each time you run :djcli:`loaddata`, the data will be read
 from the fixture and reloaded into the database. Note this means that if you
-change one of the rows created by a fixture and then run :djadmin:`loaddata`
+change one of the rows created by a fixture and then run :djcli:`loaddata`
 again, you'll wipe out any changes you've made.
 
 Tell Django where to look for fixture files

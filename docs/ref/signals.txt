@@ -426,7 +426,7 @@ Arguments that are sent with this signal:
 Management signals
 ==================
 
-Signals sent by :doc:`django-admin </ref/django-admin>`.
+Signals sent by :doc:`django </ref/django-cli>`.
 
 ``pre_migrate``
 ---------------
@@ -434,7 +434,7 @@ Signals sent by :doc:`django-admin </ref/django-admin>`.
 .. data:: django.db.models.signals.pre_migrate
    :module:
 
-Sent by the :djadmin:`migrate` command before it starts to install an
+Sent by the :djcli:`migrate` command before it starts to install an
 application. It's not emitted for applications that lack a ``models`` module.
 
 Arguments sent with this signal:
@@ -486,13 +486,13 @@ Arguments sent with this signal:
 .. data:: django.db.models.signals.post_migrate
    :module:
 
-Sent at the end of the :djadmin:`migrate` (even if no migrations are run) and
-:djadmin:`flush` commands. It's not emitted for applications that lack a
+Sent at the end of the :djcli:`migrate` (even if no migrations are run) and
+:djcli:`flush` commands. It's not emitted for applications that lack a
 ``models`` module.
 
 Handlers of this signal must not perform database schema alterations as doing
-so may cause the :djadmin:`flush` command to fail if it runs during the
-:djadmin:`migrate` command.
+so may cause the :djcli:`flush` command to fail if it runs during the
+:djcli:`migrate` command.
 
 Arguments sent with this signal:
 

@@ -274,7 +274,7 @@ To enable the sites framework, follow these steps:
 
     SITE_ID = 1
 
-#. Run :djadmin:`migrate`.
+#. Run :djcli:`migrate`.
 
 ``django.contrib.sites`` registers a
 :data:`~django.db.models.signals.post_migrate` signal handler which creates a

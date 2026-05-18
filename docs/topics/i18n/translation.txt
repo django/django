@@ -63,7 +63,7 @@ as a shorter alias, ``_``, to save typing.
 
 .. admonition:: What functions may be aliased as ``_``?
 
-    Because of how ``xgettext`` (used by :djadmin:`makemessages`) works, only
+    Because of how ``xgettext`` (used by :djcli:`makemessages`) works, only
     functions that take a single string argument can be imported as ``_``:
 
     * :func:`~django.utils.translation.gettext`
@@ -108,8 +108,8 @@ Translation works on variables. Again, here's an identical example::
 
 (The caveat with using variables or computed values, as in the previous two
 examples, is that Django's translation-string-detecting utility,
-:djadmin:`django-admin makemessages <makemessages>`, won't be able to find
-these strings. More on :djadmin:`makemessages` later.)
+:djcli:`django makemessages <makemessages>`, won't be able to find
+these strings. More on :djcli:`makemessages` later.)
 
 The strings you pass to ``_()`` or ``gettext()`` can take placeholders,
 specified with Python's standard named-string interpolation syntax. Example::
@@ -275,7 +275,7 @@ In a case like this, consider something like the following::
             "plural_name": Report._meta.verbose_name_plural,
         }
 
-    You would get an error when running :djadmin:`django-admin
+    You would get an error when running :djcli:`django
     compilemessages <compilemessages>`:
 
     .. code-block:: pytb
@@ -1558,7 +1558,7 @@ message file is a plain-text file, representing a single language, that
 contains all available translation strings and how they should be represented
 in the given language. Message files have a ``.po`` file extension.
 
-Django comes with a tool, :djadmin:`django-admin makemessages
+Django comes with a tool, :djcli:`django makemessages
 <makemessages>`, that automates the creation and upkeep of these files.
 
 .. admonition:: Gettext utilities
@@ -1573,7 +1573,7 @@ To create or update a message file, run this command:
 
 .. code-block:: shell
 
-    django-admin makemessages -l de
+    django makemessages -l de
 
 ...where ``de`` is the :term:`locale name` for the message file you want to
 create. For example, ``pt_BR`` for Brazilian Portuguese, ``de_AT`` for Austrian
@@ -1600,21 +1600,21 @@ extracted from a file of an app without any ``locale`` directory will either go
 in a message file under the directory listed first in :setting:`LOCALE_PATHS`
 or will generate an error if :setting:`LOCALE_PATHS` is empty.
 
-By default :djadmin:`django-admin makemessages <makemessages>` examines every
+By default :djcli:`django makemessages <makemessages>` examines every
 file that has the ``.html``, ``.txt`` or ``.py`` file extension. If you want to
 override that default, use the :option:`--extension <makemessages --extension>`
 or ``-e`` option to specify the file extensions to examine:
 
 .. code-block:: shell
 
-    django-admin makemessages -l de -e txt
+    django makemessages -l de -e txt
 
 Separate multiple extensions with commas and/or use ``-e`` or ``--extension``
 multiple times:
 
 .. code-block:: shell
 
-    django-admin makemessages -l de -e html,txt -e xml
+    django makemessages -l de -e html,txt -e xml
 
 .. warning::
 
@@ -1624,7 +1624,7 @@ multiple times:
 
 .. admonition:: Using Jinja2 templates?
 
-    :djadmin:`makemessages` doesn't understand the syntax of Jinja2 templates.
+    :djcli:`makemessages` doesn't understand the syntax of Jinja2 templates.
     To extract strings from a project containing Jinja2 templates, use `Message
     Extracting`_ from Babel_ instead.
 
@@ -1643,7 +1643,7 @@ multiple times:
     recognize the tags defined by these extensions and will ignore Jinja2
     templates containing them entirely.
 
-    Babel provides similar features to :djadmin:`makemessages`, can replace it
+    Babel provides similar features to :djcli:`makemessages`, can replace it
     in general, and doesn't depend on ``gettext``. For more information, read
     its documentation about `working with message catalogs`_.
 
@@ -1654,7 +1654,7 @@ multiple times:
 .. admonition:: No gettext?
 
     If you don't have the ``gettext`` utilities installed,
-    :djadmin:`makemessages` will create empty files. If that's the case, either
+    :djcli:`makemessages` will create empty files. If that's the case, either
     install the ``gettext`` utilities or copy the English message file
     (``locale/en/LC_MESSAGES/django.po``) if available and use it as a starting
     point, which is an empty translation file.
@@ -1662,7 +1662,7 @@ multiple times:
 .. admonition:: Working on Windows?
 
    If you're using Windows and need to install the GNU gettext utilities so
-   :djadmin:`makemessages` works, see :ref:`gettext_on_windows` for more
+   :djcli:`makemessages` works, see :ref:`gettext_on_windows` for more
    information.
 
 Each ``.po`` file contains a small bit of metadata, such as the translation
@@ -1675,7 +1675,7 @@ For example, if your Django app contained a translation string for the text
 
     _("Welcome to my site.")
 
-...then :djadmin:`django-admin makemessages <makemessages>` will have created
+...then :djcli:`django makemessages <makemessages>` will have created
 a ``.po`` file containing the following snippet -- a message:
 
 .. code-block:: po
@@ -1711,41 +1711,41 @@ otherwise, they'll be tacked together without whitespace!
 
 .. admonition:: Fuzzy entries
 
-    :djadmin:`makemessages` sometimes generates translation entries marked as
+    :djcli:`makemessages` sometimes generates translation entries marked as
     fuzzy, e.g. when translations are inferred from previously translated
     strings. By default, fuzzy entries are **not** processed by
-    :djadmin:`compilemessages`.
+    :djcli:`compilemessages`.
 
 To reexamine all source code and templates for new translation strings and
 update all message files for **all** languages, run this:
 
 .. code-block:: shell
 
-    django-admin makemessages -a
+    django makemessages -a
 
 Compiling message files
 -----------------------
 
 After you create your message file -- and each time you make changes to it --
 you'll need to compile it into a more efficient form, for use by ``gettext``.
-Do this with the :djadmin:`django-admin compilemessages <compilemessages>`
+Do this with the :djcli:`django compilemessages <compilemessages>`
 utility.
 
 This tool runs over all available ``.po`` files and creates ``.mo`` files,
 which are binary files optimized for use by ``gettext``. In the same directory
-from which you ran :djadmin:`django-admin makemessages <makemessages>`, run
-:djadmin:`django-admin compilemessages <compilemessages>` like this:
+from which you ran :djcli:`django makemessages <makemessages>`, run
+:djcli:`django compilemessages <compilemessages>` like this:
 
 .. code-block:: shell
 
-   django-admin compilemessages
+   django compilemessages
 
 That's it. Your translations are ready for use.
 
 .. admonition:: Working on Windows?
 
    If you're using Windows and need to install the GNU gettext utilities so
-   :djadmin:`django-admin compilemessages <compilemessages>` works see
+   :djcli:`django compilemessages <compilemessages>` works see
    :ref:`gettext_on_windows` for more information.
 
 .. admonition:: ``.po`` files: Encoding and BOM usage.
@@ -1786,17 +1786,17 @@ Creating message files from JavaScript source code
 --------------------------------------------------
 
 You create and update the message files the same way as the other Django
-message files -- with the :djadmin:`django-admin makemessages <makemessages>`
+message files -- with the :djcli:`django makemessages <makemessages>`
 tool. The only difference is you need to explicitly specify what in gettext
 parlance is known as a domain in this case the ``djangojs`` domain, by
 providing a ``-d djangojs`` parameter, like this:
 
 .. code-block:: shell
 
-    django-admin makemessages -d djangojs -l de
+    django makemessages -d djangojs -l de
 
 This would create or update the message file for JavaScript for German. After
-updating message files, run :djadmin:`django-admin compilemessages
+updating message files, run :djcli:`django compilemessages
 <compilemessages>` the same way as you do with normal Django message files.
 
 .. _gettext_on_windows:
@@ -1823,7 +1823,7 @@ Customizing the ``makemessages`` command
 ----------------------------------------
 
 If you want to pass additional parameters to ``xgettext``, you need to create a
-custom :djadmin:`makemessages` command and override its ``xgettext_options``
+custom :djcli:`makemessages` command and override its ``xgettext_options``
 attribute::
 
     from django.core.management.commands import makemessages
@@ -1833,7 +1833,7 @@ attribute::
         xgettext_options = makemessages.Command.xgettext_options + ["--keyword=mytrans"]
 
 If you need more flexibility, you could also add a new argument to your custom
-:djadmin:`makemessages` command::
+:djcli:`makemessages` command::
 
     from django.core.management.commands import makemessages
 
@@ -2214,11 +2214,11 @@ All message file repositories are structured the same way. They are:
 * ``$PYTHONPATH/django/conf/locale/<language>/LC_MESSAGES/django.(po|mo)``
 
 To create message files, you use the
-:djadmin:`django-admin makemessages <makemessages>` tool. And you use
-:djadmin:`django-admin compilemessages <compilemessages>` to produce the binary
+:djcli:`django makemessages <makemessages>` tool. And you use
+:djcli:`django compilemessages <compilemessages>` to produce the binary
 ``.mo`` files that are used by ``gettext``.
 
-You can also run :djadmin:`django-admin compilemessages
+You can also run :djcli:`django compilemessages
 --settings=path.to.settings <compilemessages>` to make the compiler process all
 the directories in your :setting:`LOCALE_PATHS` setting.
 

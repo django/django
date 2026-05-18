@@ -187,7 +187,7 @@ Consequently, the Django security team will not consider reports that rely on
 request headers or URLs exceeding 8K bytes, as such inputs are already
 mitigated at the server level in production environments.
 
-.. admonition:: :djadmin:`runserver` should never be used in production
+.. admonition:: :djcli:`runserver` should never be used in production
 
     Django's built-in development server does not enforce these limits because
     it is not designed to be a production server.
@@ -329,7 +329,7 @@ requires a security release:
   means the following scenarios do not require a security release:
 
   * Exploits that only affect local development, for example when using
-    :djadmin:`runserver`.
+    :djcli:`runserver`.
   * Exploits which fail to follow security best practices, such as failure to
     sanitize user input. For other examples, see our :ref:`security
     documentation <cross-site-scripting>`.

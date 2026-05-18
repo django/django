@@ -498,19 +498,19 @@ define some extra description units:
 
   To link, use ``:lookup:`exact```.
 
-* ``django-admin`` commands:
+* ``django`` commands:
 
   .. code-block:: rst
 
-        .. django-admin:: migrate
+        .. django-cli:: migrate
 
-  To link, use ``:djadmin:`migrate```.
+  To link, use ``:djcli:`migrate```.
 
-* ``django-admin`` command-line options:
+* ``django`` command-line options:
 
   .. code-block:: rst
 
-        .. django-admin-option:: --traceback
+        .. django-cli-option:: --traceback
 
   To link, use ``:option:`command_name --traceback``` (or omit ``command_name``
   for the options shared by all commands like ``--verbosity``).
@@ -522,7 +522,7 @@ define some extra description units:
         :ticket:`12345`
 
 Django's documentation uses a custom ``console`` directive for documenting
-command-line examples involving ``django-admin``, ``manage.py``, ``python``,
+command-line examples involving ``django``, ``manage.py``, ``python``,
 etc. In the HTML documentation, it renders a two-tab UI, with one tab showing
 a Unix-style command prompt and a second tab showing a Windows prompt.
 
@@ -720,15 +720,15 @@ Translating documentation
 See :ref:`Localizing the Django documentation <translating-documentation>` if
 you'd like to help translate the documentation into another language.
 
-.. _django-admin-manpage:
+.. _django-manpage:
 
-``django-admin`` man page
-=========================
+``django`` man page
+===================
 
-Sphinx can generate a manual page for the :doc:`django-admin
-</ref/django-admin>` command. This is configured in ``docs/conf.py``. Unlike
+Sphinx can generate a manual page for the :doc:`django
+</ref/django-cli>` CLI. This is configured in ``docs/conf.py``. Unlike
 other documentation output, this man page should be included in the Django
-repository and the releases as ``docs/man/django-admin.1``. There isn't a need
+repository and the releases as ``docs/man/django.1``. There isn't a need
 to update this file when updating the documentation, as it's updated once as
 part of the release process.
 
@@ -738,4 +738,4 @@ To generate an updated version of the man page, in the ``docs`` directory, run:
 
      $ make man
 
-The new man page will be written in ``docs/_build/man/django-admin.1``.
+The new man page will be written in ``docs/_build/man/django.1``.

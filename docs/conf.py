@@ -353,9 +353,9 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     (
-        "ref/django-admin",
-        "django-admin",
-        "Utility script for the Django web framework",
+        "ref/django-cli",
+        "django",
+        "Command line interface for the Django web framework",
         ["Django Software Foundation"],
         1,
     )

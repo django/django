@@ -1032,7 +1032,7 @@ details on these changes.
   ``BaseMemcachedCache._get_memcache_timeout()`` method to
   ``get_backend_timeout()`` will be removed.
 
-* The ``--natural`` and ``-n`` options for :djadmin:`dumpdata` will be removed.
+* The ``--natural`` and ``-n`` options for :djcli:`dumpdata` will be removed.
 
 * The ``use_natural_keys`` argument for ``serializers.serialize()`` will be
   removed.

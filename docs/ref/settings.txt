@@ -1239,7 +1239,7 @@ requests being returned as "Bad Request (400)".
 
 .. note::
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin
+    The default :file:`settings.py` file created by :djcli:`django
     startproject <startproject>` sets ``DEBUG = True`` for convenience.
 
 .. setting:: DEBUG_PROPAGATE_EXCEPTIONS
@@ -1748,8 +1748,8 @@ The numeric mode to apply to directories created in the process of uploading
 files.
 
 This setting also determines the default permissions for collected static
-directories when using the :djadmin:`collectstatic` management command. See
-:djadmin:`collectstatic` for details on overriding it.
+directories when using the :djcli:`collectstatic` management command. See
+:djcli:`collectstatic` for details on overriding it.
 
 This value mirrors the functionality and caveats of the
 :setting:`FILE_UPLOAD_PERMISSIONS` setting.
@@ -1773,8 +1773,8 @@ For security reasons, these permissions aren't applied to the temporary files
 that are stored in :setting:`FILE_UPLOAD_TEMP_DIR`.
 
 This setting also determines the default permissions for collected static files
-when using the :djadmin:`collectstatic` management command. See
-:djadmin:`collectstatic` for details on overriding it.
+when using the :djcli:`collectstatic` management command. See
+:djcli:`collectstatic` for details on overriding it.
 
 .. warning::
 
@@ -2332,7 +2332,7 @@ Example::
 In this case, migrations pertaining to the ``blog`` app will be contained in
 the ``blog.db_migrations`` package.
 
-If you provide the ``app_label`` argument, :djadmin:`makemigrations` will
+If you provide the ``app_label`` argument, :djcli:`makemigrations` will
 automatically create the package if it doesn't already exist.
 
 When you supply ``None`` as a value for an app, Django will consider the app as
@@ -2434,7 +2434,7 @@ A secret key for a particular Django installation. This is used to provide
 :doc:`cryptographic signing </topics/signing>`, and should be set to a unique,
 unpredictable value.
 
-:djadmin:`django-admin startproject <startproject>` automatically adds a
+:djcli:`django startproject <startproject>` automatically adds a
 randomly-generated ``SECRET_KEY`` to each new project.
 
 Uses of the key shouldn't assume that it's text or bytes. Every use should go
@@ -2472,7 +2472,7 @@ passwords of users and key rotation will not affect them.
 
 .. note::
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin
+    The default :file:`settings.py` file created by :djcli:`django
     startproject <startproject>` creates a unique ``SECRET_KEY`` for
     convenience.
 
@@ -3060,7 +3060,7 @@ applications.
 
 .. note::
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin
+    The default :file:`settings.py` file created by :djcli:`django
     startproject <startproject>` sets ``'APP_DIRS': True``.
 
 .. setting:: TEMPLATES-OPTIONS
@@ -3228,7 +3228,7 @@ See also :setting:`LANGUAGE_CODE` and :setting:`USE_TZ`.
 
 .. note::
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin
+    The default :file:`settings.py` file created by :djcli:`django
     startproject <startproject>` includes ``USE_I18N = True`` for convenience.
 
 .. setting:: USE_THOUSAND_SEPARATOR
@@ -3314,13 +3314,13 @@ default protocol when none is provided in URLs processed by the
 Default: ``None``
 
 The full Python path of the WSGI application object that Django's built-in
-servers (e.g. :djadmin:`runserver`) will use. The :djadmin:`django-admin
+servers (e.g. :djcli:`runserver`) will use. The :djcli:`django
 startproject <startproject>` management command will create a standard
 ``wsgi.py`` file with an ``application`` callable in it, and point this setting
 to that ``application``.
 
 If not set, the return value of ``django.core.wsgi.get_wsgi_application()``
-will be used. In this case, the behavior of :djadmin:`runserver` will be
+will be used. In this case, the behavior of :djcli:`runserver` will be
 identical to previous Django versions.
 
 .. setting:: YEAR_MONTH_FORMAT
@@ -3816,13 +3816,13 @@ Settings for :mod:`django.contrib.staticfiles`.
 
 Default: ``None``
 
-The absolute path to the directory where :djadmin:`collectstatic` will collect
+The absolute path to the directory where :djcli:`collectstatic` will collect
 static files for deployment.
 
 Example: ``"/var/www/example.com/static/"``
 
 If the :doc:`staticfiles</ref/contrib/staticfiles>` contrib app is enabled
-(as in the default project template), the :djadmin:`collectstatic` management
+(as in the default project template), the :djcli:`collectstatic` management
 command will collect static files into this directory. See the how-to on
 :doc:`managing static files</howto/static-files/index>` for more details about
 usage.
@@ -3875,7 +3875,7 @@ Default: ``[]`` (Empty list)
 
 This setting defines the additional locations the staticfiles app will traverse
 if the ``FileSystemFinder`` finder is enabled, e.g. if you use the
-:djadmin:`collectstatic` or :djadmin:`findstatic` management command or use the
+:djcli:`collectstatic` or :djcli:`findstatic` management command or use the
 static file serving view.
 
 This should be set to a list of strings that contain full paths to
@@ -3905,7 +3905,7 @@ tuples, e.g.::
     ]
 
 For example, assuming you have :setting:`STATIC_URL` set to ``'static/'``, the
-:djadmin:`collectstatic` management command would collect the "stats" files
+:djcli:`collectstatic` management command would collect the "stats" files
 in a ``'downloads'`` subdirectory of :setting:`STATIC_ROOT`.
 
 This would allow you to refer to the local file

@@ -283,14 +283,14 @@ A few days before any release
    Once merged, forward port the changes into ``main`` (:commit:`example commit
    <cb27e5b9c0703fb0edd70b2138e3e53a78c9551d>`).
 
-#. :ref:`Update the django-admin manual page <django-admin-manpage>`:
+#. :ref:`Update the django manual page <django-manpage>`:
 
    .. code-block:: shell
 
         $ cd docs
         $ make man
-        $ man _build/man/django-admin.1  # do a quick sanity check
-        $ cp _build/man/django-admin.1 man/django-admin.1
+        $ man _build/man/django.1  # do a quick sanity check
+        $ cp _build/man/django.1 man/django.1 man/django-admin.1
 
    and then commit the changed man page.
 
@@ -761,9 +761,9 @@ You're almost done! All that's left to do now is:
       .. code-block:: shell
 
          $ cd django
-         $ django-admin makemessages -l en --domain=django
+         $ django makemessages -l en --domain=django
          processing locale en
-         $ django-admin makemessages -l en --domain=djangojs
+         $ django makemessages -l en --domain=djangojs
          processing locale en
 
    #. Make a pull request against the corresponding stable branch and merge

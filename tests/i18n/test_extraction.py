@@ -1043,7 +1043,7 @@ class ExcludedLocaleExtractionTests(ExtractorTests):
             # `call_command` bypasses the parser; by calling
             # `execute_from_command_line` with the help subcommand we
             # ensure that there are no issues with the parser itself.
-            execute_from_command_line(["django-admin", "help", "makemessages"])
+            execute_from_command_line(["django", "help", "makemessages"])
 
     def test_one_locale_excluded(self):
         management.call_command("makemessages", exclude=["it"], verbosity=0)

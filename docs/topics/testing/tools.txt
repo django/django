@@ -1028,7 +1028,7 @@ Then, add a ``LiveServerTestCase``-based test to your app's tests module
 the :mod:`~django.contrib.staticfiles` app and want to have static files served
 during the execution of your tests similar to what we get at development time
 with ``DEBUG=True``, i.e. without having to collect them using
-:djadmin:`collectstatic`. We'll use
+:djcli:`collectstatic`. We'll use
 the  :class:`~django.contrib.staticfiles.testing.StaticLiveServerTestCase`
 subclass which provides that functionality. Replace it with
 ``django.test.LiveServerTestCase`` if you don't need that.
@@ -1199,8 +1199,8 @@ database. For example, if your site has user accounts, you might set up a
 fixture of fake user accounts in order to populate your database during tests.
 
 The most straightforward way of creating a fixture is to use the
-:djadmin:`manage.py dumpdata <dumpdata>` command. This assumes you
-already have some data in your database. See the :djadmin:`dumpdata
+:djcli:`manage.py dumpdata <dumpdata>` command. This assumes you
+already have some data in your database. See the :djcli:`dumpdata
 documentation<dumpdata>` for more details.
 
 Once you've created a fixture and placed it in a ``fixtures`` directory in one
@@ -1236,7 +1236,7 @@ test for performance reasons. But for :class:`TransactionTestCase`, the
 following actions will take place:
 
 * At the end of each test Django will flush the database, returning the
-  database to the state it was in directly after :djadmin:`migrate` was
+  database to the state it was in directly after :djcli:`migrate` was
   called.
 
 * For each subsequent test, the fixtures will be reloaded before ``setUp()``

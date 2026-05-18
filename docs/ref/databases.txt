@@ -387,7 +387,7 @@ cause a conflict. For example:
     "auth_user_pkey" DETAIL:  Key (id)=(1) already exists.
 
 If you need to specify such values, reset the sequence afterward to avoid
-reusing a value that's already in the table. The :djadmin:`sqlsequencereset`
+reusing a value that's already in the table. The :djcli:`sqlsequencereset`
 management command generates the SQL statements to do that.
 
 .. _sequence: https://www.postgresql.org/docs/current/sql-createsequence.html
@@ -764,7 +764,7 @@ or using a :class:`~django.db.migrations.operations.RunSQL` operation in a
 
 If you are using a legacy database that contains ``TIMESTAMP`` columns, you
 must set :setting:`USE_TZ = False <USE_TZ>` to avoid data corruption.
-:djadmin:`inspectdb` maps these columns to
+:djcli:`inspectdb` maps these columns to
 :class:`~django.db.models.DateTimeField` and if you enable timezone support,
 both MySQL and Django will attempt to convert the values from UTC to local
 time.

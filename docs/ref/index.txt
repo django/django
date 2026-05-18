@@ -13,7 +13,7 @@ API Reference
    csp
    csrf
    databases
-   django-admin
+   django-cli
    exceptions
    files/index
    forms/index

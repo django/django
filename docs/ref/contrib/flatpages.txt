@@ -51,7 +51,7 @@ or:
 3. Add ``'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'``
    to your :setting:`MIDDLEWARE` setting.
 
-4. Run the command :djadmin:`manage.py migrate <migrate>`.
+4. Run the command :djcli:`manage.py migrate <migrate>`.
 
 .. currentmodule:: django.contrib.flatpages.middleware
 

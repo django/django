@@ -50,7 +50,7 @@ For more details about :mod:`unittest`, see the Python documentation.
 
 .. admonition:: Where should the tests live?
 
-    The default :djadmin:`startapp` template creates a ``tests.py`` file in the
+    The default :djcli:`startapp` template creates a ``tests.py`` file in the
     new application. This might be fine if you only have a few tests, but as
     your test suite grows you'll likely want to restructure it into a tests
     package so you can split your tests into different submodules such as
@@ -76,7 +76,7 @@ For more details about :mod:`unittest`, see the Python documentation.
 Running tests
 =============
 
-Once you've written tests, run them using the :djadmin:`test` command of
+Once you've written tests, run them using the :djcli:`test` command of
 your project's ``manage.py`` utility:
 
 .. code-block:: shell

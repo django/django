@@ -16,15 +16,15 @@ The Commands
 There are several commands which you will use to interact with migrations
 and Django's handling of database schema:
 
-* :djadmin:`migrate`, which is responsible for applying and unapplying
+* :djcli:`migrate`, which is responsible for applying and unapplying
   migrations.
 
-* :djadmin:`makemigrations`, which is responsible for creating new migrations
+* :djcli:`makemigrations`, which is responsible for creating new migrations
   based on the changes you have made to your models.
 
-* :djadmin:`sqlmigrate`, which displays the SQL statements for a migration.
+* :djcli:`sqlmigrate`, which displays the SQL statements for a migration.
 
-* :djadmin:`showmigrations`, which lists a project's migrations and their
+* :djcli:`showmigrations`, which lists a project's migrations and their
   status.
 
 You should think of migrations as a version control system for your database
@@ -111,7 +111,7 @@ Workflow
 ========
 
 Django can create migrations for you. Make changes to your models - say, add a
-field and remove a model - and then run :djadmin:`makemigrations`:
+field and remove a model - and then run :djcli:`makemigrations`:
 
 .. code-block:: shell
 
@@ -361,13 +361,13 @@ the dependencies are incorrect, so Django will refuse to run migrations or make
 new migrations until it's fixed. When using multiple databases, you can use the
 :meth:`allow_migrate` method of :ref:`database routers
 <topics-db-multi-db-routing>` to control which databases
-:djadmin:`makemigrations` checks for consistent history.
+:djcli:`makemigrations` checks for consistent history.
 
 Adding migrations to apps
 =========================
 
 New apps come preconfigured to accept migrations, and so you can add migrations
-by running :djadmin:`makemigrations` once you've made some changes.
+by running :djcli:`makemigrations` once you've made some changes.
 
 If your app already has models and database tables, and doesn't have migrations
 yet (for example, you created it against a previous Django version), you'll
@@ -399,7 +399,7 @@ Note that this only works given two things:
 Reversing migrations
 ====================
 
-Migrations can be reversed with :djadmin:`migrate` by passing the number of the
+Migrations can be reversed with :djcli:`migrate` by passing the number of the
 previous migration. For example, to reverse migration ``books.0003``:
 
 .. console::
@@ -692,7 +692,7 @@ the new release (or if you're a third-party project, ensure your users upgrade
 releases in order without skipping any), and then remove the old files, commit
 and do a second release.
 
-The command that backs all this is :djadmin:`squashmigrations` - pass it the
+The command that backs all this is :djcli:`squashmigrations` - pass it the
 app label and migration name you want to squash up to, and it'll get to work:
 
 .. code-block:: shell
@@ -724,9 +724,9 @@ resolve it.
 To manually resolve a ``CircularDependencyError``, break out one of
 the ForeignKeys in the circular dependency loop into a separate
 migration, and move the dependency on the other app with it. If you're unsure,
-see how :djadmin:`makemigrations` deals with the problem when asked to create
+see how :djcli:`makemigrations` deals with the problem when asked to create
 brand new migrations from your models. In a future release of Django,
-:djadmin:`squashmigrations` will be updated to attempt to resolve these errors
+:djcli:`squashmigrations` will be updated to attempt to resolve these errors
 itself.
 
 Once you've squashed your migration, you should then commit it alongside the
@@ -875,7 +875,7 @@ Django will write out the value as an instantiation of your class with the
 given arguments, similar to the way it writes out references to Django fields.
 
 To prevent a new migration from being created each time
-:djadmin:`makemigrations` is run, you should also add a ``__eq__()`` method to
+:djcli:`makemigrations` is run, you should also add a ``__eq__()`` method to
 the decorated class. This function will be called by Django's migration
 framework to detect changes between states.
 
@@ -905,7 +905,7 @@ Supporting multiple Django versions
 
 If you are the maintainer of a third-party app with models, you may need to
 ship migrations that support multiple Django versions. In this case, you should
-always run :djadmin:`makemigrations` **with the lowest Django version you wish
+always run :djcli:`makemigrations` **with the lowest Django version you wish
 to support**.
 
 The migrations system will maintain backwards-compatibility according to the
