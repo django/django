@@ -166,7 +166,8 @@ Identifier  Information
 ``jsonl``   Serializes to and from JSONL_.
 
 ``yaml``    Serializes to YAML (YAML Ain't a Markup Language). This
-            serializer is only available if PyYAML_ is installed.
+            serializer is only available if PyYAML_ is installed (see
+            :optional-dependency:`yaml`).
 ==========  ==============================================================
 
 .. _json: https://json.org/

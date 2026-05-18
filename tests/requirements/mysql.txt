@@ -1,0 +1,2 @@
+# Deprecated: use pyproject.toml. Kept for Jenkins and the conda env files.
+mysqlclient >= 2.2.1

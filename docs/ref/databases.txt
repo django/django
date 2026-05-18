@@ -120,7 +120,8 @@ PostgreSQL notes
 ================
 
 Django supports PostgreSQL 16 and higher. `psycopg`_ 3.1.12+ or `psycopg2`_
-2.9.9+ is required, though the latest `psycopg`_ 3.1.12+ is recommended.
+2.9.9+ is required, though the latest `psycopg`_ 3.1.12+ is recommended. The
+:optional-dependency:`postgresql` extra installs ``psycopg``.
 
 .. note::
 
@@ -260,7 +261,8 @@ each database alias in each process. Closing a Django database connection
 returns it to the pool for reuse.
 
 Connection pooling is supported only with `psycopg`_ and requires
-``psycopg[pool]`` (which installs :pypi:`psycopg-pool`).
+:pypi:`psycopg-pool`. The :optional-dependency:`postgresql-pool` extra installs
+both.
 
 To enable connection pooling, set ``"pool"`` in the :setting:`OPTIONS` part of
 your database configuration in :setting:`DATABASES` to a dictionary of options
@@ -503,7 +505,8 @@ Connector/Python includes `its own`_.
 mysqlclient
 ~~~~~~~~~~~
 
-Django requires `mysqlclient`_ 2.2.1 or later.
+Django requires `mysqlclient`_ 2.2.1 or later. The
+:optional-dependency:`mysql` extra installs it.
 
 MySQL Connector/Python
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -1006,7 +1009,8 @@ Oracle notes
 ============
 
 Django supports `Oracle Database Server`_ versions 19c and higher. Version
-4.0.2 or higher of the `oracledb`_ Python driver is required.
+4.0.2 or higher of the `oracledb`_ Python driver is required. The
+:optional-dependency:`oracle` extra installs it.
 
 .. _`Oracle Database Server`: https://www.oracle.com/
 .. _`oracledb`: https://oracle.github.io/python-oracledb/

@@ -187,11 +187,14 @@ before, it's a good idea to run it once beforehand to get familiar with its
 output.
 
 Before running the test suite, enter the Django ``tests/`` directory using the
-``cd tests`` command, and install test dependencies by running:
+``cd tests`` command, and install test dependencies by running the commands
+below. Installing dependency groups requires pip 25.1 or later, so the first
+command upgrades pip:
 
 .. console::
 
-    $ python -m pip install -r requirements/py3.txt
+    $ python -m pip install -U pip
+    $ python -m pip install --group=../pyproject.toml:test -e ..
 
 If you encounter an error during the installation, your system might be missing
 a dependency for one or more of the Python packages. Consult the failing

@@ -445,12 +445,12 @@ psycopg
 ~~~~~~~
 
 The ``psycopg`` Python module provides the interface between Python and the
-PostgreSQL database. ``psycopg`` can be installed via pip within your Python
-virtual environment:
+PostgreSQL database. Install it with the :optional-dependency:`postgresql`
+extra within your Python virtual environment:
 
 .. code-block:: doscon
 
-    ...\> py -m pip install psycopg
+    ...\> py -m pip install "django[postgresql]"
 
 .. rubric:: Footnotes
 .. [#] GeoDjango uses the :func:`~ctypes.util.find_library` routine from

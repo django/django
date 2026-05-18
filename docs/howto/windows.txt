@@ -112,11 +112,12 @@ for some reason this needs to be disabled, set the environmental variable
 :envvar:`DJANGO_COLORS` to ``nocolor``.
 
 On older Windows versions, or legacy terminals, :pypi:`colorama` 0.4.6+ must be
-installed to enable syntax coloring:
+installed to enable syntax coloring. The :optional-dependency:`colorama` extra
+installs it:
 
 .. code-block:: doscon
 
-    ...\> py -m pip install "colorama >= 0.4.6"
+    ...\> py -m pip install "django[colorama]"
 
 See :ref:`syntax-coloring` for more information on color settings.
 
