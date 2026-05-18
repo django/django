@@ -13,7 +13,8 @@
       "properties": {
         "uuid": "1378c26f-cbe6-44b0-929f-eb330d4991f5",
         "boolean": true,
-        "datetime": "1994-08-14T11:32:14+0000",
+        "datetime": "1994-08-14T11:32:14.123+0000",
+        "time": "11:32:14.123",
         "name": "Philadelphia",
         "integer": 5,
         "num": 1.001
@@ -58,6 +59,7 @@
       "type": "Feature",
       "properties": {
         "uuid": "fa2ba67c-a135-4338-b924-a9622b5d869f",
+        "time": "00:00:00",
         "integer": null,
         "num": null
       },
@@ -98,6 +100,7 @@
       "properties": {
         "uuid": "4494c1f3-55ab-4256-b365-12115cb388d5",
         "datetime": "2018-11-29T03:02:52+0000",
+        "time": "03:02:52",
         "name": "north",
         "integer": 8,
         "num": 0.0,

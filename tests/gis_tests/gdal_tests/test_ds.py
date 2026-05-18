@@ -1,10 +1,16 @@
 import os
 import re
-from datetime import datetime
+from datetime import datetime, time
 from pathlib import Path
 
 from django.contrib.gis.gdal import DataSource, Envelope, GDALException, OGRGeometry
-from django.contrib.gis.gdal.field import OFTDateTime, OFTInteger, OFTReal, OFTString
+from django.contrib.gis.gdal.field import (
+    OFTDateTime,
+    OFTInteger,
+    OFTReal,
+    OFTString,
+    OFTTime,
+)
 from django.contrib.gis.geos import GEOSGeometry
 from django.test import SimpleTestCase
 
@@ -74,7 +80,7 @@ ds_list = (
     TestDS(
         "has_nulls",
         nfeat=3,
-        nfld=6,
+        nfld=7,
         geom="POLYGON",
         gtype=3,
         driver="GeoJSON",
@@ -85,6 +91,7 @@ ds_list = (
             "num": OFTReal,
             "integer": OFTInteger,
             "datetime": OFTDateTime,
+            "time": OFTTime,
             "boolean": OFTInteger,
         },
         extent=(-75.274200, 39.846504, -74.959717, 40.119040),  # Got extent from QGIS
@@ -99,10 +106,11 @@ ds_list = (
             "integer": [5, None, 8],
             "boolean": [True, None, False],
             "datetime": [
-                datetime.strptime("1994-08-14T11:32:14", datetime_format),
+                datetime(1994, 8, 14, 11, 32, 14, 123000),
                 None,
                 datetime.strptime("2018-11-29T03:02:52", datetime_format),
             ],
+            "time": [time(11, 32, 14, 123000), time(0), time(3, 2, 52)],
         },
         fids=range(3),
     ),
@@ -353,3 +361,8 @@ class DataSourceTest(SimpleTestCase):
         msg = "invalid field name: nonexistent"
         with self.assertRaisesMessage(GDALException, msg):
             ds[0].get_fields("nonexistent")
+
+    def test_datetime_with_milliseconds(self):
+        feature = DataSource(get_ds_file("has_nulls", "geojson"))[0][0]
+        for field_name in "datetime", "time":
+            self.assertEqual(feature.get(field_name).microsecond, 123000)

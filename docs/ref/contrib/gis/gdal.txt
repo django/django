@@ -470,12 +470,18 @@ __ https://gdal.org/drivers/vector/
 
     .. method:: as_datetime()
 
-    Returns the value of the field as a tuple of date and time components:
+    Returns the value of the field as a tuple of date and time components with
+    millisecond precision:
 
     .. code-block:: pycon
 
         >>> city["Created"].as_datetime()
-        (c_long(1999), c_long(5), c_long(23), c_long(0), c_long(0), c_long(0), c_long(0))
+        (c_long(1999), c_long(5), c_long(23), c_long(0), c_long(0), c_float(0.0), c_long(0))
+
+    .. versionchanged:: 6.2
+
+        The seconds component is now returned as a ``c_float`` with millisecond
+        precision instead of a ``c_int``.
 
 ``Driver``
 ----------
