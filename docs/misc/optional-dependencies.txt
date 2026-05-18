@@ -1,0 +1,252 @@
+=====================
+Optional dependencies
+=====================
+
+Django supports a number of optional features that require additional Python
+packages to be installed. These can be installed alongside Django using pip
+extras, e.g.:
+
+.. code-block:: console
+
+    $ python -m pip install "django[gis,postgresql]"
+
+A full list of available extras is below.
+
+.. contents::
+    :local:
+    :depth: 1
+
+Caches
+======
+
+``pylibmc``
+-----------
+
+Provides support for the :ref:`pylibmc-based memcached cache backend
+<memcached>`.
+
+Requires: :pypi:`pylibmc` 1.4.0+ (Linux/macOS only)
+
+.. code-block:: console
+
+    $ python -m pip install "django[pylibmc]"
+
+``pymemcache``
+--------------
+
+Provides support for the :ref:`pymemcache-based memcached cache backend
+<memcached>`.
+
+Requires: :pypi:`pymemcache` 3.4.0+
+
+.. code-block:: console
+
+    $ python -m pip install "django[pymemcache]"
+
+``redis``
+---------
+
+Provides support for the :ref:`Redis cache backend <redis>`.
+
+Requires: :pypi:`redis` 5.1.0+
+
+.. code-block:: console
+
+    $ python -m pip install "django[redis]"
+
+Databases
+=========
+
+``mysql``
+---------
+
+Provides support for the :doc:`MySQL database backend
+</ref/databases>`.
+
+Requires: :pypi:`mysqlclient` 2.2.1+
+
+.. code-block:: console
+
+    $ python -m pip install "django[mysql]"
+
+``oracle``
+----------
+
+Provides support for the :doc:`Oracle database backend
+</ref/databases>`.
+
+Requires: :pypi:`oracledb` 2.3.0+
+
+.. code-block:: console
+
+    $ python -m pip install "django[oracle]"
+
+``postgresql``
+--------------
+
+Provides support for the :doc:`PostgreSQL database backend
+</ref/databases>`.
+
+Requires: :pypi:`psycopg` 3.1.12+
+
+.. code-block:: console
+
+    $ python -m pip install "django[postgresql]"
+
+``postgresql-pool``
+-------------------
+
+Provides support for the :doc:`PostgreSQL database backend </ref/databases>`
+with :ref:`server-side connection pooling <postgresql-pool>`.
+
+Requires: :pypi:`psycopg` 3.1.12+ and :pypi:`psycopg-pool` 3.2.0+
+
+.. code-block:: console
+
+    $ python -m pip install "django[postgresql-pool]"
+
+GIS
+===
+
+``geoip``
+---------
+
+Provides support for :doc:`GeoIP2-based geolocation </ref/contrib/gis/geoip2>`.
+
+Requires: :pypi:`geoip2` 4.8.0+
+
+.. code-block:: console
+
+    $ python -m pip install "django[geoip]"
+
+``gis``
+-------
+
+Provides support for all :doc:`GeoDjango </ref/contrib/gis/index>` features,
+including GeoIP2-based geolocation and spatial query support.
+
+Requires: :pypi:`geoip2` 4.8.0+ and :pypi:`numpy` 1.26.0+
+
+.. code-block:: console
+
+    $ python -m pip install "django[gis]"
+
+Security
+========
+
+``argon2``
+----------
+
+Enables the :ref:`Argon2 password hasher <argon2_usage>`.
+
+Requires: :pypi:`argon2-cffi` 23.1.0+
+
+.. code-block:: console
+
+    $ python -m pip install "django[argon2]"
+
+``bcrypt``
+----------
+
+Enables the :ref:`bcrypt password hasher <bcrypt_usage>`.
+
+Requires: :pypi:`bcrypt` 4.1.1+
+
+.. code-block:: console
+
+    $ python -m pip install "django[bcrypt]"
+
+Other
+=====
+
+``admindocs``
+-------------
+
+Enables the :doc:`django.contrib.admindocs </ref/contrib/admin/admindocs>`
+application.
+
+Requires: :pypi:`docutils` 0.22+
+
+.. code-block:: console
+
+    $ python -m pip install "django[admindocs]"
+
+``colorama``
+------------
+
+Provides colored terminal output on Windows.
+
+Requires: :pypi:`colorama` 0.4.6+
+
+.. code-block:: console
+
+    $ python -m pip install "django[colorama]"
+
+``images``
+----------
+
+Enables image-related features such as :class:`~django.db.models.ImageField`.
+
+Requires: :pypi:`Pillow` 10.1.0+
+
+.. code-block:: console
+
+    $ python -m pip install "django[images]"
+
+``jinja2``
+----------
+
+Enables the :doc:`Jinja2 template backend </topics/templates>`.
+
+Requires: :pypi:`Jinja2` 2.11.0+
+
+.. code-block:: console
+
+    $ python -m pip install "django[jinja2]"
+
+``pywatchman``
+--------------
+
+Enables Watchman_ support for faster auto-reloading during development.
+
+Requires: :pypi:`pywatchman` (Linux/macOS only)
+
+.. code-block:: console
+
+    $ python -m pip install "django[pywatchman]"
+
+.. _Watchman: https://facebook.github.io/watchman/
+
+``selenium``
+------------
+
+Required for running the :ref:`Selenium test suite <running-selenium-tests>`.
+
+Requires: :pypi:`selenium` 4.23.0+
+
+.. code-block:: console
+
+    $ python -m pip install "django[selenium]"
+
+``test-parallel``
+-----------------
+
+Enables :option:`parallel test execution <test --parallel>` across multiple
+processes.
+
+Requires: :pypi:`tblib` 3.0.0+
+
+.. code-block:: console
+
+    $ python -m pip install "django[test-parallel]"
+
+``yaml``
+--------
+
+Enables the :doc:`YAML serializer </topics/serialization>`.
+
+Requires: :pypi:`PyYAML` 6.0.2+
+
+.. code-block:: console
+
+    $ python -m pip install "django[yaml]"

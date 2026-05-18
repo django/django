@@ -197,7 +197,7 @@ Before running the test suite, enter the Django ``tests/`` directory using the
 
 .. console::
 
-    $ python -m pip install -r requirements/py3.txt
+    $ python -m pip install --group=test -e ..
 
 If you encounter an error during the installation, your system might be missing
 a dependency for one or more of the Python packages. Consult the failing

@@ -1,0 +1,2 @@
+# Deprecated: this file is kept for CI compatibility and will be removed in a future cleanup.
+oracledb >= 2.3.0

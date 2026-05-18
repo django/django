@@ -178,6 +178,14 @@ This is the recommended way to install Django.
 
         $ python -m pip install Django
 
+   If you require any
+   :doc:`optional dependencies </misc/optional-dependencies>`,
+   these can be installed at the same time:
+
+   .. code-block:: console
+
+        $ python -m pip install "django[gis,postgresql]"
+
 .. _pip: https://pip.pypa.io/
 .. _standalone pip installer: https://pip.pypa.io/en/latest/installation/
 
