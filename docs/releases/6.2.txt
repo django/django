@@ -238,6 +238,10 @@ URLs
 Utilities
 ~~~~~~~~~
 
+* :func:`.utils.module_loading.import_string` now supports modules. Previously,
+  top-level modules did not work, and submodules only worked if already
+  imported.
+
 * ...
 
 Validators
@@ -271,6 +275,10 @@ Miscellaneous
   ``datetime.time`` objects if they have zero milliseconds. For example,
   ``datetime.datetime(2000, 1, 1, 0, 0, 0, 1)`` now serializes to
   ``"2000-01-01T00:00:00"`` rather than ``"2000-01-01T00:00:00.000"``.
+
+* :func:`.utils.module_loading.import_string` now deterministically favors
+  submodules in ambiguous cases where depending on prior import state, a
+  same-named attribute of the parent module might have been returned instead.
 
 .. _deprecated-features-6.2:
 
