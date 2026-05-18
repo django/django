@@ -33,6 +33,13 @@ def get_password_validators(validator_config):
                 "AUTH_PASSWORD_VALIDATORS setting."
             )
             raise ImproperlyConfigured(msg % validator["NAME"])
+        else:
+            if not callable(klass):
+                msg = (
+                    "The configured validator in NAME is not callable: %s. "
+                    "Check your AUTH_PASSWORD_VALIDATORS setting."
+                )
+                raise ImproperlyConfigured(msg % validator["NAME"])
         validators.append(klass(**validator.get("OPTIONS", {})))
 
     return validators
