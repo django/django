@@ -46,7 +46,7 @@ Set up
    .. console::
 
        $ python -m pip install -U pip
-       $ python -m pip install -e . -r tests/requirements/py3.txt -r docs/requirements.txt
+       $ python -m pip install --group=test -e . -r docs/requirements.txt
 
 #. Install pre-commit hooks so that formatting and linting run automatically
    before each commit:

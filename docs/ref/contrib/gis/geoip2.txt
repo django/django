@@ -14,11 +14,11 @@ The :class:`GeoIP2` object is a wrapper for the :pypi:`MaxMind geoip2 Python
 library <geoip2>`. [#]_
 
 In order to perform IP-based geolocation, the :class:`GeoIP2` object requires
-the :pypi:`geoip2` Python package and the GeoIP ``Country`` and/or ``City``
-datasets in binary format (the CSV files will not work!), downloaded from e.g.
-`MaxMind`__ or `DB-IP`__ websites. Grab the ``GeoLite2-Country.mmdb.gz`` and
-``GeoLite2-City.mmdb.gz`` files and unzip them in a directory corresponding to
-the :setting:`GEOIP_PATH` setting.
+the :pypi:`geoip2` Python package (see :optional-dependency:`geoip`) and the
+GeoIP ``Country`` and/or ``City`` datasets in binary format (the CSV files will
+not work!), downloaded from e.g. `MaxMind`__ or `DB-IP`__ websites. Grab the
+``GeoLite2-Country.mmdb.gz`` and ``GeoLite2-City.mmdb.gz`` files and unzip them
+in a directory corresponding to the :setting:`GEOIP_PATH` setting.
 
 Additionally, it is recommended to install the `libmaxminddb C library`__, so
 that ``geoip2`` can leverage the C library's faster speed.
