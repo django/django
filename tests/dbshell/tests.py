@@ -15,3 +15,25 @@ class DbshellCommandTestCase(SimpleTestCase):
         with self.assertRaisesMessage(CommandError, msg):
             with mock.patch("subprocess.run", side_effect=FileNotFoundError):
                 call_command("dbshell")
+
+    @mock.patch("django.db.backends.base.client.subprocess.run")
+    def test_sigint_ignored_during_runshell(self, mock_run):
+        import signal
+
+        from django.db.backends.base.client import BaseDatabaseClient
+
+        original_handler = signal.getsignal(signal.SIGINT)
+
+        def mock_run_side_effect(*args, **kwargs):
+            self.assertEqual(signal.getsignal(signal.SIGINT), signal.SIG_IGN)
+
+        mock_run.side_effect = mock_run_side_effect
+
+        client = BaseDatabaseClient(connection)
+        # Mock settings_to_cmd_args_env to return dummy args
+        with mock.patch.object(
+            client, "settings_to_cmd_args_env", return_value=(["mock_db_client"], None)
+        ):
+            client.runshell([])
+
+        self.assertEqual(signal.getsignal(signal.SIGINT), original_handler)
