@@ -12,7 +12,7 @@ from django.db.models import Field, Func, IntegerField, Transform, Value
 from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.db.models.lookups import Exact, In
 from django.utils.translation import gettext_lazy as _
-
+from django.db.models.expressions import CombinedExpression
 from .utils import AttributeSetter
 
 __all__ = ["ArrayField"]
@@ -381,3 +381,10 @@ class SliceTransformFactory:
 
     def __call__(self, *args, **kwargs):
         return SliceTransform(self.start, self.end, *args, **kwargs)
+
+@CombinedExpression.dispatch(CombinedExpression.ADD, ArrayField, ArrayField)
+class ArrayCatPair(Func):
+    function = 'ARRAY_CAT'
+
+    def __init__(self, lhs, connector, rhs, output_field):
+        super().__init__(lhs, rhs, output_field=output_field)

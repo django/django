@@ -10,7 +10,7 @@ from django.core import checks, exceptions, serializers, validators
 from django.core.exceptions import FieldError
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
-from django.db.models import JSONNull
+from django.db.models import JSONNull, F, IntegerField, Value
 from django.db.models.expressions import Exists, F, OuterRef, RawSQL, Value
 from django.db.models.functions import Cast, JSONObject, Upper
 from django.test import TransactionTestCase, override_settings, skipUnlessDBFeature
@@ -205,6 +205,17 @@ class TestSaveLoad(PostgreSQLTestCase):
         )
         self.assertEqual(instance.field_nested, [[None, None], [None, None]])
 
+    def test_add(self):
+        def IntegerArrayValue(v):
+            return Value(v, output_field=ArrayField(IntegerField()))
+
+        instance = IntegerArrayModel.objects.create(field=[2])
+        IntegerArrayModel.objects.update(field=F('field') + IntegerArrayValue([3]))
+        IntegerArrayModel.objects.update(field=IntegerArrayValue([1]) + F('field'))
+        IntegerArrayModel.objects.update(
+            field=IntegerArrayValue([0]) + F('field') + F('field') + IntegerArrayValue([4]))
+        instance.refresh_from_db()
+        self.assertEqual(instance.field, [0, 1, 2, 3, 1, 2, 3, 4])
 
 class TestQuerying(PostgreSQLTestCase):
     @classmethod

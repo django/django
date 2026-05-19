@@ -2951,7 +2951,18 @@ class CombinedExpressionTests(SimpleTestCase):
         with self.assertRaisesMessage(FieldError, msg):
             list(queryset)
 
+class OperatorTests(TestCase):
 
+    def test_add(self):
+        instance = Employee.objects.create(firstname='John', lastname='Doe')
+        Employee.objects.update(
+            firstname=F('firstname') + Value('_firstname', output_field=CharField()),
+            lastname=F('lastname') + Value('_lastname', output_field=CharField())
+        )
+        instance.refresh_from_db()
+        self.assertEqual(instance.firstname, 'John_firstname')
+        self.assertEqual(instance.lastname, 'Doe_lastname')
+        
 class ExpressionWrapperTests(SimpleTestCase):
     def test_empty_group_by(self):
         expr = ExpressionWrapper(Value(3), output_field=IntegerField())

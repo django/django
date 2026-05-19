@@ -59,6 +59,8 @@ from django.db.models.query import (
     prefetch_related_objects,
 )
 from django.db.models.query_utils import FilteredRelation, Q
+from django.db.models.operators import *  # NOQA isort:skip
+from django.db.models.operators import __all__ as operators_all
 
 # Imports that would create circular imports if sorted
 from django.db.models.base import DEFERRED, Model  # isort:skip
@@ -73,7 +75,7 @@ from django.db.models.fields.related import (  # isort:skip
     OneToOneRel,
 )
 
-__all__ = aggregates_all + constraints_all + enums_all + fields_all + indexes_all
+__all__ = aggregates_all + constraints_all + enums_all + fields_all + indexes_all + operators_all
 __all__ += [
     "ObjectDoesNotExist",
     "signals",
