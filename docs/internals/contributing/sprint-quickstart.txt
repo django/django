@@ -1,0 +1,130 @@
+=======================
+Sprint Quickstart Guide
+=======================
+
+This document outlines the concise guidelines for preparing to contribute to
+Django. This should be used during sprints or by people who are more familiar
+with contributing to Python open source projects.
+
+This guide assumes you're familiar with:
+
+* Git
+
+* Managing multiple versions of Python
+
+* Python dependency management, including virtual environments
+
+* The concept of running tests and building documentation
+
+
+Set up
+======
+
+Fork the repository, clone your fork to your machine and configure a remote
+reference to Django's repository.
+
+.. code-block:: shell
+
+    $ git clone https://github.com/YourGitHubName/django.git django-repo
+    $ cd django-repo
+    $ git remote add upstream https://github.com/django/django.git
+
+Install the dependencies to run the tests and build the documentation.
+
+.. code-block:: shell
+
+    $ python -m venv .venv
+    $ source .venv/bin/activate
+    $ python -m pip install -e .
+    $ python -m pip install -r tests/requirements/py3.txt
+    $ python -m pip install -r docs/requirements.txt
+    $ # This needs to be >= 3.12
+    $ python -V
+
+Confirm that the version of Python you're using is Python 3.12 or greater.
+
+Run the tests:
+
+.. code-block:: shell
+
+    $ ./tests/runtests.py
+
+If ten or fewer tests fail, you're likely okay to move on. However, keep in
+mind if the code you're changing requires changing those tests, you'll need
+to fix the underlying issues on your machine first. There are 10,000+ tests
+though, so it's unlikely.
+
+Build the documentation:
+
+.. code-block:: shell
+
+    $ (cd docs && make html)
+
+
+Finding an issue to work on
+===========================
+
+Finding a workable ticket is a challenging issue. The ways to get started
+are the following:
+
+* Look at the `easy pickings`_.
+
+* Use the `vulture method`_.
+
+The vulture method
+------------------
+
+This approach to finding tickets is to look for accepted tickets that
+haven't been touched in six months or longer. The ideal ticket has a PR
+attached to it that has a code review with explicit requests and the author
+has not responded in at least six months.
+
+When you find a stale ticket, make yourself the owner on the ticket with
+the "Modify Ticket" button near the bottom of the page. Claim the ticket
+by clicking the "assign to" radio button in the "Action" section. Your
+username will be filled in the text box by default.
+
+Assessing issues
+----------------
+
+When looking over tickets, it's a good idea to keep your search to
+tickets that were created in the last five years. An easy way to tell is
+by the ticket number. Avoid tickets with an ID of less than 20,000. These
+are old for a reason. You're welcome to try, but they will require a high
+degree of perseverance.
+
+Consider using the component filter option in Trac to limit your search
+to areas you have used before. If you've used forms in a few Django apps,
+consider filtering down to the forms components. Similarly, if you've
+never worked with geospatial projects, it's probably wise to avoid
+``django.contrib.gis``.
+
+
+Resuming work from someone else's branch
+========================================
+
+If you're continuing the work from someone else's pull request on GitHub,
+things can be tricky. You need to pull their branch, but then push it to
+your GitHub repository fork.
+
+Run the following, but switch ``ThePRNumber`` with the **pull request ID**
+and ``TheTicketNumber`` with the **Trac ticket number**.
+
+.. code-block:: shell
+
+    $ git fetch upstream pull/ThePRNumber/head:ticket_TheTicketNumber
+    $ git checkout ticket_TheTicketNumber
+    $ git push origin ticket_TheTicketNumber
+
+For example, if you're working on PR 8000 which references ticket 123, the
+command to run would be:
+
+.. code-block:: shell
+
+    $ git fetch upstream pull/8000/head:ticket_123
+    $ git checkout ticket_123
+    $ git push origin ticket_123
+
+
+.. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1
+.. _vulture method: https://youtube.com/shorts/D6QHet5U82U?si=j5M6sy0ufpeGy_iZ
