@@ -143,6 +143,8 @@ necessary for the majority of patches. To run the JavaScript tests using
 This command runs ``npm install`` to ensure test requirements are up to
 date and then runs ``npm test``.
 
+.. _running-tests-docker-box:
+
 Running tests using ``django-docker-box``
 -----------------------------------------
 
