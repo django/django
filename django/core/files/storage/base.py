@@ -84,7 +84,7 @@ class Storage:
                 "Detected path traversal attempt in '%s'" % dir_name
             )
         validate_file_name(file_name)
-        file_ext = "".join(pathlib.PurePath(file_name).suffixes)
+        file_ext = pathlib.PurePath(file_name).suffix
         file_root = file_name.removesuffix(file_ext)
         # If the filename is not available, generate an alternative
         # filename until one is available.

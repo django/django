@@ -708,6 +708,18 @@ class OverwritingStorageTests(FileStorageTests):
         ):
             self.storage.save(name, file, max_length=5)
 
+    def test_file_name_truncation_with_dots_in_name(self):
+        # Saving a file whose name contains multiple dots should not raise
+        # SuspiciousFileOperation when a max_length forces truncation. The
+        # dots that are part of the stem (not a file extension) should not
+        # prevent truncation. Regression test for #35818.
+        name = "this.is.a.very." + "o" * 50 + ".txt"
+        file = ContentFile(b"content")
+        max_length = 30
+        stored_name = self.storage.save(name, file, max_length=max_length)
+        self.addCleanup(self.storage.delete, stored_name)
+        self.assertLessEqual(len(stored_name), max_length)
+
 
 class DiscardingFalseContentStorage(FileSystemStorage):
     def _save(self, name, content):
@@ -830,12 +842,21 @@ class FileFieldStorageTests(TestCase):
 
     def test_duplicate_filename(self):
         # Multiple files with the same name get _(7 random chars) appended to
-        # them.
+        # them. Only the last extension is preserved; dots in the stem are part
+        # of the file root and remain when an alternative name is generated.
         tests = [
-            ("multiple_files", "txt"),
-            ("multiple_files_many_extensions", "tar.gz"),
+            (
+                "multiple_files",
+                "txt",
+                f"tests/multiple_files_{FILE_SUFFIX_REGEX}.txt",
+            ),
+            (
+                "multiple_files_many_extensions",
+                "tar.gz",
+                f"tests/multiple_files_many_extensions.tar_{FILE_SUFFIX_REGEX}.gz",
+            ),
         ]
-        for filename, extension in tests:
+        for filename, extension, expected_pattern in tests:
             with self.subTest(filename=filename):
                 objs = [Storage() for i in range(2)]
                 for o in objs:
@@ -843,9 +864,7 @@ class FileFieldStorageTests(TestCase):
                 try:
                     names = [o.normal.name for o in objs]
                     self.assertEqual(names[0], f"tests/{filename}.{extension}")
-                    self.assertRegex(
-                        names[1], f"tests/{filename}_{FILE_SUFFIX_REGEX}.{extension}"
-                    )
+                    self.assertRegex(names[1], expected_pattern)
                 finally:
                     for o in objs:
                         o.delete()
