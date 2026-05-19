@@ -348,6 +348,15 @@ class Command(BaseCommand):
             fixture_files.extend(fixture_files_in_dir)
 
         if not fixture_files:
+            if ser_fmt is None:
+                # If a file matches the basename but uses an unrecognized
+                # extension, parse_name() raises a clearer error than the
+                # generic "No fixture named ..." below. Refs #13680.
+                for fixture_dir in fixture_dirs:
+                    for candidate in glob.iglob(
+                        glob.escape(os.path.join(fixture_dir, fixture_name)) + ".*"
+                    ):
+                        self.parse_name(os.path.basename(candidate))
             raise CommandError("No fixture named '%s' found." % fixture_name)
 
         return fixture_files
