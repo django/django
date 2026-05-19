@@ -55,6 +55,7 @@ Our documentation contains guidance for first-time contributors, including:
    :maxdepth: 1
 
    An overview of the contributing process and what's involved. <new-contributors>
+   If you're at a contribution sprint, start here. <sprint-quickstart>
 
 Work on the Django framework
 ============================
