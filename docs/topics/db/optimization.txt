@@ -189,12 +189,10 @@ Doing the following is potentially quite slow:
 First of all, ``headline`` is not indexed, which will make the underlying
 database fetch slower.
 
-Second, the lookup doesn't guarantee that only one object will be returned.
-If the query matches more than one object, it will retrieve and transfer all of
-them from the database. This penalty could be substantial if hundreds or
-thousands of records are returned. The penalty will be compounded if the
-database lives on a separate server, where network overhead and latency also
-play a factor.
+Second, the lookup may return multiple results. Even though Django applies a
+limit of 21 objects when using :meth:`~django.db.models.query.QuerySet.get`,
+the database may still need to scan everything to evaluate a non-unique
+condition. Narrowing your query up-front is more efficient.
 
 Retrieve related objects efficiently
 ====================================
