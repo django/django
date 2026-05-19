@@ -24,6 +24,7 @@ from django.http import (
     parse_cookie,
 )
 from django.test import SimpleTestCase
+from django.utils.deprecation import RemovedInDjango71Warning
 from django.utils.encoding import iri_to_uri
 from django.utils.functional import lazystr
 from django.utils.http import MAX_URL_REDIRECT_LENGTH
@@ -703,25 +704,31 @@ class JsonResponseTests(SimpleTestCase):
         response = JsonResponse(data)
         self.assertEqual(json.loads(response.text), data)
 
-    def test_json_response_raises_type_error_with_default_setting(self):
-        with self.assertRaisesMessage(
-            TypeError,
-            "In order to allow non-dict objects to be serialized set the "
-            "safe parameter to False",
+    # RemovedInDjango71Warning: When the deprecation ends, remove this test.
+    def test_json_response_raises_type_error_with_safe_arg(self):
+        with (
+            self.assertRaisesMessage(
+                TypeError,
+                "In order to allow non-dict objects to be serialized set the "
+                "safe parameter to False",
+            ),
+            self.assertWarnsMessage(
+                RemovedInDjango71Warning, "The safe parameter is deprecated."
+            ),
         ):
-            JsonResponse([1, 2, 3])
+            JsonResponse([1, 2, 3], safe=True)
 
     def test_json_response_text(self):
-        response = JsonResponse("foobar", safe=False)
+        response = JsonResponse("foobar")
         self.assertEqual(json.loads(response.text), "foobar")
 
     def test_json_response_list(self):
-        response = JsonResponse(["foo", "bar"], safe=False)
+        response = JsonResponse(["foo", "bar"])
         self.assertEqual(json.loads(response.text), ["foo", "bar"])
 
     def test_json_response_uuid(self):
         u = uuid.uuid4()
-        response = JsonResponse(u, safe=False)
+        response = JsonResponse(u)
         self.assertEqual(json.loads(response.text), str(u))
 
     def test_json_response_custom_encoder(self):

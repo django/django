@@ -251,7 +251,10 @@ backends.
 Miscellaneous
 -------------
 
-* ...
+* To facilitate the deprecation of the ``safe`` parameter of
+  :class:`~django.http.JsonResponse`, it now defaults to ``False``, because the
+  pollution vulnerability in the ``Array`` prototype was fixed in
+  `ES5 <https://262.ecma-international.org/5.1/#sec-11.1.4>`_.
 
 .. _deprecated-features-6.2:
 
@@ -261,4 +264,5 @@ Features deprecated in 6.2
 Miscellaneous
 -------------
 
-* ...
+* The ``safe`` parameter is deprecated from :class:`~django.http.JsonResponse`.
+  Omitting the argument is equivalent to the prior ``safe=False`` usage.

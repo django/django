@@ -1281,6 +1281,14 @@ using non-dict objects in JSON-encoded response.
     modern browsers implement ECMAScript 5 which removes this attack vector.
     Therefore it is possible to disable this security precaution.
 
+.. versionchanged:: 6.2
+
+    In earlier versions, the ``safe`` parameter defaulted to ``True``.
+
+.. deprecated:: 6.2
+
+    The ``safe`` parameter is deprecated.
+
 Changing the default JSON encoder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
