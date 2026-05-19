@@ -3212,6 +3212,24 @@ Default: ``False``
 Set this transitional setting to ``True`` to revert back to the old default
 blank choice label in forms.
 
+.. setting:: TRANSLATION_BACKEND
+
+``TRANSLATION_BACKEND``
+-----------------------
+
+.. versionadded:: 6.1
+
+Default: ``"django.utils.translation.backends.gettext.GettextBackend"``
+
+The dotted Python path to the translation backend class that powers
+:func:`~django.utils.translation.gettext` and the rest of the public
+:mod:`django.utils.translation` API. See :doc:`/topics/i18n/backends` for the
+backend contract and how to write your own.
+
+When :setting:`USE_I18N` is ``False``, the null backend is used regardless of
+this setting so the existing ``USE_I18N = False`` performance optimization is
+preserved.
+
 .. setting:: USE_I18N
 
 ``USE_I18N``
@@ -3224,7 +3242,8 @@ This provides a way to turn it off, for performance. If this is set to
 ``False``, Django will make some optimizations so as not to load the
 translation machinery.
 
-See also :setting:`LANGUAGE_CODE` and :setting:`USE_TZ`.
+See also :setting:`LANGUAGE_CODE`, :setting:`TRANSLATION_BACKEND`, and
+:setting:`USE_TZ`.
 
 .. note::
 
@@ -4042,6 +4061,7 @@ Internationalization (``i18n``)
 * :setting:`LANGUAGES_BIDI`
 * :setting:`LOCALE_PATHS`
 * :setting:`TIME_ZONE`
+* :setting:`TRANSLATION_BACKEND`
 * :setting:`USE_I18N`
 * :setting:`USE_TZ`
 

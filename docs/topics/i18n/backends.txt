@@ -1,0 +1,162 @@
+====================
+Translation backends
+====================
+
+.. versionadded:: 6.1
+
+The :mod:`django.utils.translation` API — :func:`~django.utils.translation.gettext`,
+:func:`~django.utils.translation.gettext_lazy`,
+:func:`~django.utils.translation.activate`,
+:func:`~django.utils.translation.get_language`, … — is a thin dispatcher in
+front of a **translation backend**. The default backend is gettext, mirroring
+Django's historical behavior, but the backend is pluggable: a project can ship
+translations from a database row, a JSON file, a remote service, or any other
+store by providing its own backend class.
+
+This is the extension point requested by :ticket:`14974`. It is **not** a
+replacement for :doc:`per-model translations </topics/i18n/index>` — those are
+tracked separately in :ticket:`6460`.
+
+Selecting a backend
+===================
+
+The :setting:`TRANSLATION_BACKEND` setting holds the dotted Python path to the
+active backend class::
+
+    # settings.py
+    TRANSLATION_BACKEND = "myproject.i18n.PontoonBackend"
+
+The default is::
+
+    TRANSLATION_BACKEND = "django.utils.translation.backends.gettext.GettextBackend"
+
+When :setting:`USE_I18N` is ``False``, Django forces the null backend
+(``django.utils.translation.backends.null.NullBackend``) regardless of
+``TRANSLATION_BACKEND``, preserving the performance optimization that
+``USE_I18N = False`` has always given.
+
+Writing a custom backend
+========================
+
+Subclass ``django.utils.translation.backends.BaseTranslationBackend`` and
+override the methods you need. The base class provides usable defaults for the
+optional hooks; the mandatory methods raise :class:`NotImplementedError`.
+
+Mandatory methods
+-----------------
+
+These are the surface that the public translation API delegates to, so a
+backend that omits one of them will raise :class:`NotImplementedError` the
+first time a project calls into the corresponding feature.
+
+* ``gettext(message)``
+* ``ngettext(singular, plural, number)``
+* ``pgettext(context, message)``
+* ``npgettext(context, singular, plural, number)``
+* ``activate(language)``
+* ``deactivate()``
+* ``deactivate_all()``
+* ``get_language()``
+* ``get_language_bidi()``
+* ``get_language_from_request(request, check_path=False)``
+* ``get_language_from_path(path)``
+* ``get_supported_language_variant(lang_code, strict=False)``
+* ``check_for_language(lang_code)``
+
+Optional hooks (with sensible defaults)
+---------------------------------------
+
+* ``gettext_noop(message)`` — defaults to returning ``message`` unchanged.
+* ``clear_translations_cache()`` — invoked when :setting:`INSTALLED_APPS`
+  changes during tests; drop any per-process catalog cache.
+* ``clear_active_language()`` — invoked when :setting:`LANGUAGE_CODE`,
+  :setting:`LANGUAGES`, or :setting:`LOCALE_PATHS` changes; forget the
+  per-thread active language.
+* ``reset_state()`` — full reset. Default implementation calls both ``clear_*``
+  hooks above.
+* ``on_translation_files_changed(sender, file_path, **kwargs)`` — called by
+  the autoreloader when a translation source file changes on disk. Default
+  calls ``reset_state``; backends that do not read from disk can override
+  with ``pass``.
+* ``get_catalog(locale, domain="djangojs", localedirs=None)`` — used by
+  :class:`django.views.i18n.JavaScriptCatalog`. The returned object must
+  expose ``_catalog`` and ``_fallback`` attributes compatible with gettext's
+  ``GNUTranslations``. Backends that do not ship a JS catalog should leave
+  this raising :class:`NotImplementedError`.
+* ``is_valid_language_code(code)`` — used by the system checks for
+  :setting:`LANGUAGE_CODE` / :setting:`LANGUAGES` / :setting:`LANGUAGES_BIDI`.
+  Defaults to ``True`` (accept anything that's a non-empty string).
+
+Example
+-------
+
+A minimal backend that prefixes every message with ``[xx]`` — useful as a
+pseudo-localization for QA::
+
+    from django.utils.translation.backends import BaseTranslationBackend
+
+
+    class PseudoBackend(BaseTranslationBackend):
+        def gettext(self, message):
+            return "[xx] %s" % message
+
+        def ngettext(self, singular, plural, number):
+            return self.gettext(singular if number == 1 else plural)
+
+        def pgettext(self, context, message):
+            return self.gettext(message)
+
+        def npgettext(self, context, singular, plural, number):
+            return self.ngettext(singular, plural, number)
+
+        def activate(self, language):
+            pass
+
+        def deactivate(self):
+            pass
+
+        def deactivate_all(self):
+            pass
+
+        def get_language(self):
+            from django.conf import settings
+
+            return settings.LANGUAGE_CODE
+
+        def get_language_bidi(self):
+            return False
+
+        def get_language_from_request(self, request, check_path=False):
+            from django.conf import settings
+
+            return settings.LANGUAGE_CODE
+
+        def get_language_from_path(self, path):
+            return None
+
+        def get_supported_language_variant(self, lang_code, strict=False):
+            return lang_code
+
+        def check_for_language(self, lang_code):
+            return True
+
+Wire it in::
+
+    TRANSLATION_BACKEND = "myproject.i18n.PseudoBackend"
+
+Caveats
+=======
+
+* ``templatize()`` is gettext-specific: it produces a ``.py`` source that
+  ``xgettext`` can parse, which is meaningless for non-gettext backends.
+  Custom backends therefore do not benefit from :djadmin:`makemessages` or
+  :djadmin:`compilemessages` — they need to populate their own message store.
+
+* The dispatcher caches resolved methods on first call. If you change
+  :setting:`TRANSLATION_BACKEND` at runtime via
+  :class:`~django.test.override_settings`, also clear the dispatcher cache::
+
+      from django.utils.translation import _trans
+
+      for name in list(_trans.__dict__):
+          delattr(_trans, name)

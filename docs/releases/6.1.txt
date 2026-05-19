@@ -346,7 +346,11 @@ Generic Views
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :setting:`TRANSLATION_BACKEND` setting lets projects swap the
+  gettext-based translation machinery for a custom backend (for example one
+  that reads translations from a database row or a remote service). The
+  default value preserves the existing gettext behavior, and ``USE_I18N =
+  False`` keeps forcing the null backend. See :doc:`/topics/i18n/backends`.
 
 Logging
 ~~~~~~~

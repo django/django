@@ -10,8 +10,7 @@ from django.template import Context, Engine
 from django.urls import translate_url
 from django.utils.formats import get_format
 from django.utils.http import url_has_allowed_host_and_scheme
-from django.utils.translation import check_for_language, get_language
-from django.utils.translation.trans_real import DjangoTranslation
+from django.utils.translation import _trans, check_for_language, get_language
 from django.views.generic import View
 
 LANGUAGE_QUERY_PARAMETER = "language"
@@ -120,7 +119,7 @@ class JavaScriptCatalog(View):
         packages = kwargs.get("packages", "")
         packages = packages.split("+") if packages else self.packages
         paths = self.get_paths(packages) if packages else None
-        self.translation = DjangoTranslation(locale, domain=domain, localedirs=paths)
+        self.translation = _trans.get_catalog(locale, domain=domain, localedirs=paths)
         context = self.get_context_data(**kwargs)
         return self.render_to_response(context)
 

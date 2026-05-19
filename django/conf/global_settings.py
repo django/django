@@ -161,6 +161,10 @@ LANGUAGES_BIDI = ["he", "ar", "ar-dz", "ckb", "fa", "ug", "ur"]
 USE_I18N = True
 LOCALE_PATHS = []
 
+# Dotted path to the translation backend used to serve gettext()/activate()/...
+# When USE_I18N is False, the null backend is used regardless of this setting.
+TRANSLATION_BACKEND = "django.utils.translation.backends.gettext.GettextBackend"
+
 # Settings for language cookie
 LANGUAGE_COOKIE_NAME = "django_language"
 LANGUAGE_COOKIE_AGE = None

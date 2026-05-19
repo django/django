@@ -49,22 +49,26 @@ class TranslatorCommentWarning(SyntaxWarning):
 
 class Trans:
     """
-    The purpose of this class is to store the actual translation function upon
-    receiving the first call to that function. After this is done, changes to
-    USE_I18N will have no effect to which function is served upon request. If
-    your tests rely on changing USE_I18N, you can delete all the functions
-    from _trans.__dict__.
+    Dispatcher that lazily resolves translation calls to the active backend.
 
-    Note that storing the function with setattr will have a noticeable
-    performance effect, as access to the function goes the normal path,
-    instead of using __getattr__.
+    The active backend is selected by :setting:`TRANSLATION_BACKEND`, unless
+    :setting:`USE_I18N` is ``False`` — in which case the null backend is forced
+    so projects that disable i18n keep paying zero cost.
+
+    The first attribute access loads the backend, binds the resolved bound
+    method on the instance, and returns it; subsequent calls hit the bound
+    method directly with no per-call dispatch overhead (same trick the
+    pre-backends implementation used).
     """
+
+    NULL_BACKEND = "django.utils.translation.backends.null.NullBackend"
 
     def __getattr__(self, real_name):
         from django.conf import settings
+        from django.utils.translation.backends import load_backend
 
         if settings.USE_I18N:
-            from django.utils.translation import trans_real as trans
+            backend = load_backend(settings.TRANSLATION_BACKEND)
             from django.utils.translation.reloader import (
                 translation_file_changed,
                 watch_for_translation_changes,
@@ -77,9 +81,10 @@ class Trans:
                 translation_file_changed, dispatch_uid="translation_file_changed"
             )
         else:
-            from django.utils.translation import trans_null as trans
-        setattr(self, real_name, getattr(trans, real_name))
-        return getattr(trans, real_name)
+            backend = load_backend(self.NULL_BACKEND)
+        attr = getattr(backend, real_name)
+        setattr(self, real_name, attr)
+        return attr
 
 
 _trans = Trans()
