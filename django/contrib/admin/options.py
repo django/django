@@ -745,6 +745,22 @@ class ModelAdmin(BaseModelAdmin):
             f"site={self.admin_site!r}>"
         )
 
+    def get_readonly_fields(self, request, obj=None):
+        # When editing an existing object, make manually-defined pk fields
+        # readonly to prevent accidentally creating duplicate objects.
+        # (refs #2259)
+        readonly_fields = list(self.readonly_fields)
+        if obj is not None:
+            for pk in self.model._meta.pk_fields:
+                if (
+                    pk.editable
+                    and not pk.auto_created
+                    and not isinstance(pk, models.AutoField)
+                    and pk.name not in readonly_fields
+                ):
+                    readonly_fields.append(pk.name)
+        return readonly_fields
+
     def get_inline_instances(self, request, obj=None):
         inline_instances = []
         for inline_class in self.get_inlines(request, obj):
