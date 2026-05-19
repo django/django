@@ -362,7 +362,9 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* Generated migration filenames now include a timestamp that respects the
+  :setting:`TIME_ZONE` setting when :setting:`USE_TZ` is enabled, instead of
+  using the local system timezone.
 
 Models
 ~~~~~~

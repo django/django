@@ -1995,9 +1995,9 @@ class MakeMigrationsTests(MigrationTestBase):
             self.assertIn(target_str, content)
         self.assertIn("Created new merge migration %s" % merge_file, out.getvalue())
 
-    @mock.patch("django.db.migrations.utils.datetime")
-    def test_makemigrations_auto_merge_name(self, mock_datetime):
-        mock_datetime.datetime.now.return_value = datetime.datetime(2016, 1, 2, 3, 4)
+    @mock.patch("django.db.migrations.utils.now")
+    def test_makemigrations_auto_merge_name(self, mock_now):
+        mock_now.return_value = datetime.datetime(2016, 1, 2, 3, 4)
         with mock.patch("builtins.input", mock.Mock(return_value="y")):
             out = io.StringIO()
             with self.temporary_migration_module(
