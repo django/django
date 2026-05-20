@@ -521,6 +521,65 @@ class ParseHeaderParameterTests(unittest.TestCase):
             parsed = parse_header_parameters(raw_line)
             self.assertEqual(parsed[1]["title"], expected_title)
 
+    def test_rfc2231_continuation(self):
+        """RFC 2231 §4.1 parameter continuation (#24213)."""
+        tests = [
+            (
+                "Content-Type: application/x-stuff;"
+                " title*0*=us-ascii'en'This%20is%20even%20more%20;"
+                " title*1*=%2A%2A%2Afun%2A%2A%2A%20;"
+                ' title*2="isn\'t it!"',
+                "This is even more ***fun*** isn't it!",
+            ),
+            # Quoted segment values.
+            (
+                "Content-Type: application/x-stuff;"
+                " title*0*=\"us-ascii'en'This%20is%20even%20more%20\";"
+                ' title*1*="%2A%2A%2Afun%2A%2A%2A%20";'
+                ' title*2="isn\'t it!"',
+                "This is even more ***fun*** isn't it!",
+            ),
+            # Unencoded segments.
+            (
+                "Content-Type: application/x-stuff; title*0=Hello; title*1=World",
+                "HelloWorld",
+            ),
+            # Single segment.
+            (
+                "Content-Type: application/x-stuff; filename*0*=UTF-8''test.txt",
+                "test.txt",
+            ),
+            # Out-of-order segments.
+            (
+                "Content-Type: application/x-stuff; title*1=World; title*0=Hello",
+                "HelloWorld",
+            ),
+        ]
+        for raw_line, expected in tests:
+            with self.subTest(raw_line=raw_line):
+                parsed = parse_header_parameters(raw_line)
+                self.assertEqual(
+                    parsed[1]["title" if "title" in raw_line else "filename"], expected
+                )
+
+    def test_rfc2231_continuation_mixed_with_regular_params(self):
+        """Continuation params coexist with regular params."""
+        raw_line = "attachment; filename*0*=UTF-8''foo; filename*1=.txt; size=123"
+        _, params = parse_header_parameters(raw_line)
+        self.assertEqual(params["filename"], "foo.txt")
+        self.assertEqual(params["size"], "123")
+
+    def test_rfc2231_continuation_invalid_encoding(self):
+        """Invalid encoding in a continuation segment raises ValueError."""
+        test_data = [
+            "attachment; filename*0*=BOGUS''%E2%80%A6; filename*1=.txt",
+            "attachment; filename*0*=INVALID''%E2%80%A6; filename*1=.txt",
+        ]
+        msg = "Invalid encoding"
+        for header in test_data:
+            with self.subTest(raw_line=header), self.assertRaisesRegex(ValueError, msg):
+                parse_header_parameters(header)
+
     def test_rfc2231_invalid_encoding(self):
         test_data = [
             # Invalid encoding name with percent-encoded value

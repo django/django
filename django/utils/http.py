@@ -34,6 +34,7 @@ __Y2 = r"(?P<year>[0-9]{2})"
 __T = r"(?P<hour>[0-9]{2}):(?P<min>[0-9]{2}):(?P<sec>[0-9]{2})"
 RFC1123_DATE = _lazy_re_compile(r"^\w{3}, %s %s %s %s GMT$" % (__D, __M, __Y, __T))
 RFC850_DATE = _lazy_re_compile(r"^\w{6,9}, %s-%s-%s %s GMT$" % (__D, __M, __Y2, __T))
+_RFC2231_CONTINUATION_RE = _lazy_re_compile(r"\*(\d{1,4})$", re.ASCII)
 ASCTIME_DATE = _lazy_re_compile(r"^\w{3} %s %s %s %s$" % (__M, __D2, __T, __Y))
 
 RFC3986_GENDELIMS = ":/?#[]@"
@@ -349,13 +350,14 @@ def parse_header_parameters(line, max_length=MAX_HEADER_LENGTH):
     parts = _parseparam(";" + line)
     key = parts.__next__().lower()
     pdict = {}
+    continuations = {}  # RFC 2231 §4.1: {base: {seg_num: (starred, value)}}
     for p in parts:
         i = p.find("=")
         if i >= 0:
             has_encoding = False
             name = p[:i].strip().lower()
-            if name.endswith("*"):
-                # Embedded lang/encoding, like "filename*=UTF-8''file.ext".
+            starred = name.endswith("*")
+            if starred:
                 # https://tools.ietf.org/html/rfc2231#section-4
                 name = name[:-1]
                 if p.count("'") == 2:
@@ -364,6 +366,14 @@ def parse_header_parameters(line, max_length=MAX_HEADER_LENGTH):
             if len(value) >= 2 and value[0] == value[-1] == '"':
                 value = value[1:-1]
                 value = value.replace("\\\\", "\\").replace('\\"', '"')
+            # RFC 2231 §4.1: continuation params end with *N after stripping.
+            if m := _RFC2231_CONTINUATION_RE.search(name):
+                if base := name[: m.start()]:
+                    continuations.setdefault(base, {})[int(m.group(1))] = (
+                        starred,
+                        value,
+                    )
+                    continue
             if has_encoding:
                 encoding, lang, value = value.split("'")
                 try:
@@ -372,6 +382,25 @@ def parse_header_parameters(line, max_length=MAX_HEADER_LENGTH):
                     msg = f"Invalid encoding {encoding!r} for RFC 2231 param."
                     raise ValueError(msg)
             pdict[name] = value
+    for base, segments in continuations.items():
+        charset = None
+        combined = []
+        for seg_num in sorted(segments):
+            is_starred, value = segments[seg_num]
+            if is_starred:
+                if seg_num == 0 and value.count("'") >= 2:
+                    charset, _, value = value.split("'", 2)
+                    charset = charset or None
+                if charset:
+                    try:
+                        value = unquote(value, encoding=charset)
+                    except (LookupError, UnicodeDecodeError):
+                        msg = f"Invalid encoding {charset!r} for RFC 2231 param."
+                        raise ValueError(msg)
+            combined.append(value)
+        pdict[base] = "".join(
+            combined
+        )  # continuation overrides any direct param with same name
     return key, pdict
 
 
