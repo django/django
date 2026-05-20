@@ -31,6 +31,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_deferrable_unique_constraints = True
     truncates_names = True
     supports_comments = True
+    supports_alter_column_comment_standalone = True
     supports_tablespaces = True
     supports_sequence_reset = False
     can_introspect_materialized_views = True

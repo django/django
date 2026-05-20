@@ -1113,20 +1113,34 @@ class BaseDatabaseSchemaEditor:
         old_type_suffix = old_field.db_type_suffix(connection=self.connection)
         new_type_suffix = new_field.db_type_suffix(connection=self.connection)
         # Type, collation, or comment change?
-        if (
+        type_or_collation_changed = (
             old_type != new_type
             or old_type_suffix != new_type_suffix
             or old_collation != new_collation
-            or (
-                self.connection.features.supports_comments
-                and old_field.db_comment != new_field.db_comment
-            )
-        ):
-            fragment, other_actions = self._alter_column_type_sql(
-                model, old_field, new_field, new_type, old_collation, new_collation
-            )
-            actions.append(fragment)
-            post_actions.extend(other_actions)
+        )
+        comment_changed = (
+            self.connection.features.supports_comments
+            and old_field.db_comment != new_field.db_comment
+        )
+        if type_or_collation_changed or comment_changed:
+            if (
+                not type_or_collation_changed
+                and comment_changed
+                and self.connection.features.supports_alter_column_comment_standalone
+            ):
+                # Only the column comment changed; avoid an unnecessary
+                # ALTER COLUMN by emitting a standalone COMMENT ON COLUMN.
+                comment_sql, comment_params = self._alter_column_comment_sql(
+                    model, new_field, new_type, new_field.db_comment
+                )
+                if comment_sql:
+                    post_actions.append((comment_sql, comment_params))
+            else:
+                fragment, other_actions = self._alter_column_type_sql(
+                    model, old_field, new_field, new_type, old_collation, new_collation
+                )
+                actions.append(fragment)
+                post_actions.extend(other_actions)
 
         if new_field.has_db_default():
             if (

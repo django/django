@@ -374,6 +374,8 @@ class BaseDatabaseFeatures:
     supports_comments = False
     # Does the backend support column comments in ADD COLUMN statements?
     supports_comments_inline = False
+    # Does the backend support standalone COMMENT ON COLUMN statements?
+    supports_alter_column_comment_standalone = False
 
     # Does the backend support stored generated columns?
     supports_stored_generated_columns = False

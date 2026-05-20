@@ -5083,6 +5083,51 @@ class SchemaTests(TransactionTestCase):
             [None, ""],
         )
 
+    @skipUnlessDBFeature("supports_alter_column_comment_standalone")
+    def test_alter_db_comment_only_does_not_alter_column(self):
+        old_field = Author._meta.get_field("name")
+        new_field = CharField(max_length=255, db_comment="Custom comment")
+        new_field.set_attributes_from_name("name")
+        new_field.model = Author
+        with connection.schema_editor(collect_sql=True) as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+
+        self.assertEqual(len(editor.collected_sql), 1)
+        sql = editor.collected_sql[0].upper()
+        self.assertIn("COMMENT ON COLUMN", sql)
+        self.assertNotIn("ALTER COLUMN", sql)
+
+    @skipUnlessDBFeature("supports_comments")
+    def test_alter_db_comment_only_unsupported_standalone_alters_column(self):
+        old_field = Author._meta.get_field("name")
+        new_field = CharField(max_length=255, db_comment="Custom comment")
+        new_field.set_attributes_from_name("name")
+        new_field.model = Author
+        with mock.patch.object(
+            connection.features,
+            "supports_alter_column_comment_standalone",
+            False,
+        ):
+            with connection.schema_editor(collect_sql=True) as editor:
+                editor.alter_field(Author, old_field, new_field, strict=True)
+
+        self.assertIn("ALTER TABLE", editor.collected_sql[0].upper())
+        sql = "\n".join(editor.collected_sql).upper()
+        self.assertIn("COMMENT", sql)
+
+    @skipUnlessDBFeature("supports_alter_column_comment_standalone")
+    def test_alter_db_comment_with_type_change_alters_column(self):
+        old_field = Author._meta.get_field("name")
+        new_field = CharField(max_length=511, db_comment="Custom comment")
+        new_field.set_attributes_from_name("name")
+        new_field.model = Author
+        with connection.schema_editor(collect_sql=True) as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+
+        self.assertIn("ALTER TABLE", editor.collected_sql[0].upper())
+        sql = "\n".join(editor.collected_sql).upper()
+        self.assertIn("COMMENT ON COLUMN", sql)
+
     @skipUnlessDBFeature("supports_comments", "supports_foreign_keys")
     def test_alter_db_comment_foreign_key(self):
         with connection.schema_editor() as editor:
