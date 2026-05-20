@@ -177,13 +177,6 @@ class CSPMiddlewareWithDecoratedViewsTest(SimpleTestCase):
 
 @override_settings(
     ROOT_URLCONF="middleware.urls",
-    SECURE_CSP_REPORT_ONLY={
-        "default-src": [CSP.NONE],
-        "img-src": [CSP.SELF],
-        "script-src": [CSP.SELF],
-        "style-src": [CSP.SELF],
-        "report-uri": "/csp-report/",
-    },
 )
 @modify_settings(
     MIDDLEWARE={"append": "django.middleware.csp.ContentSecurityPolicyMiddleware"}
