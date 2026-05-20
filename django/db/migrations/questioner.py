@@ -64,6 +64,11 @@ class MigrationQuestioner:
         # None means quit
         return None
 
+    def ask_not_null_removal(self, field_name, model_name):
+        "Removing a NOT NULL field from a model"
+        # None means quit
+        return None
+
     def ask_rename(self, model_name, old_name, new_name, field_instance):
         """Was this field really renamed?"""
         return self.defaults.get("ask_rename", False)
@@ -209,6 +214,30 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                     "Ignore for now. Existing rows that contain NULL values "
                     "will have to be handled manually, for example with a "
                     "RunPython or RunSQL operation.",
+                    "Quit and manually define a default value in models.py.",
+                ],
+            )
+            if choice == 2:
+                return NOT_PROVIDED
+            elif choice == 3:
+                sys.exit(3)
+            else:
+                return self._ask_default()
+        return None
+
+    def ask_not_null_removal(self, field_name, model_name):
+        """Removing a NOT NULL field from a model"""
+        if not self.dry_run:
+            choice = self._choice_input(
+                f"It is not recommended to remove a non-nullable field '{field_name}' "
+                f"from '{model_name}' without providing a default. "
+                f"This is because the database needs something to populate existing "
+                f"rows. When migrating backwards, the column/field will be re-added "
+                f"to the table.\nPlease select a fix:",
+                [
+                    "Provide a one-off default now (will be set on all existing rows).",
+                    "Ignore for now, and make this migration potentially "
+                    "non-reversible.",
                     "Quit and manually define a default value in models.py.",
                 ],
             )

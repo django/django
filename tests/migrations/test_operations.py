@@ -2074,6 +2074,41 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[1], [])
         self.assertEqual(definition[2], {"model_name": "Pony", "name": "pink"})
 
+    def test_remove_field_non_nullable(self):
+        """
+        Tests the RemoveField operation with explicit default
+        """
+        project_state = self.set_up_test_model("test_rmflnn")
+        operation = migrations.RemoveField("Pony", "weight")
+        new_state = project_state.clone()
+        Pony = project_state.apps.get_model("test_rmflnn.Pony")
+        Pony.objects.create(pink=1, weight=1337)
+        operation.state_forwards("test_rmflnn", new_state)
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_rmflnn", editor, project_state, new_state)
+
+        # MySQL populates NOT NULL cols with implicit defaults instead of
+        # raising an error.
+        if connection.vendor != "mysql":
+            with self.assertRaises(IntegrityError):
+                with connection.schema_editor() as editor:
+                    operation.database_backwards(
+                        "test_rmflnn", editor, new_state, project_state
+                    )
+
+        operation.default = 42
+        with connection.schema_editor() as editor:
+            operation.database_backwards(
+                "test_rmflnn", editor, new_state, project_state
+            )
+        self.assertEqual(Pony.objects.get().weight, 42)
+
+        definition = operation.deconstruct()
+        self.assertEqual(
+            definition[2], {"model_name": "Pony", "name": "weight", "default": 42}
+        )
+
     def test_remove_fk(self):
         """
         Tests the RemoveField operation on a foreign key.
