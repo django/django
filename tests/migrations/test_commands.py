@@ -17,6 +17,12 @@ from django.core.management.commands.makemigrations import (
     Command as MakeMigrationsCommand,
 )
 from django.core.management.commands.migrate import Command as MigrateCommand
+from django.core.management.commands.showmigrations import (
+    Command as ShowMigrationsCommand,
+)
+from django.core.management.commands.showmigrations import (
+    MigrationStatus,
+)
 from django.db import (
     ConnectionHandler,
     DatabaseError,
@@ -554,6 +560,124 @@ class MigrateTests(MigrationTestBase):
         finally:
             # Unmigrate everything.
             call_command("migrate", "migrations", "zero", verbosity=0)
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    def test_get_migration_data_list(self):
+        cmd = ShowMigrationsCommand(
+            stdout=io.StringIO(), stderr=io.StringIO(), no_color=True
+        )
+        rows = cmd.get_migration_data(connection)
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(
+            rows[0],
+            {
+                "app": "migrations",
+                "name": "0001_initial",
+                "title": "0001_initial",
+                "status": MigrationStatus.UNAPPLIED,
+                "applied_at": None,
+            },
+        )
+        self.assertEqual(
+            rows[1],
+            {
+                "app": "migrations",
+                "name": "0002_second",
+                "title": "0002_second",
+                "status": MigrationStatus.UNAPPLIED,
+                "applied_at": None,
+            },
+        )
+
+        call_command("migrate", "migrations", "0001", verbosity=0)
+        try:
+            rows = cmd.get_migration_data(connection, app_names=["migrations"])
+            self.assertEqual(rows[0]["status"], MigrationStatus.APPLIED)
+            self.assertEqual(rows[1]["status"], MigrationStatus.UNAPPLIED)
+            self.assertIsNotNone(rows[0]["applied_at"])
+            self.assertIsNone(rows[1]["applied_at"])
+        finally:
+            call_command("migrate", "migrations", "zero", verbosity=0)
+
+    @override_settings(
+        MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"}
+    )
+    def test_get_migration_data_list_squashed(self):
+        cmd = ShowMigrationsCommand(
+            stdout=io.StringIO(), stderr=io.StringIO(), no_color=True
+        )
+        rows = cmd.get_migration_data(connection)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["app"], "migrations")
+        self.assertEqual(rows[0]["name"], "0001_squashed_0002")
+        self.assertEqual(rows[0]["title"], "0001_squashed_0002 (2 squashed migrations)")
+        self.assertEqual(rows[0]["status"], MigrationStatus.UNAPPLIED)
+        self.assertIsNone(rows[0]["applied_at"])
+
+    @override_settings(
+        MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"}
+    )
+    def test_get_migration_data_squashed_unrecorded(self):
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied("migrations", "0001_initial")
+        recorder.record_applied("migrations", "0002_second")
+        try:
+            cmd = ShowMigrationsCommand(
+                stdout=io.StringIO(), stderr=io.StringIO(), no_color=True
+            )
+            rows = cmd.get_migration_data(connection)
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows[0]["name"], "0001_squashed_0002")
+            self.assertEqual(rows[0]["status"], MigrationStatus.UNRECORDED)
+        finally:
+            recorder.record_unapplied("migrations", "0001_initial")
+            recorder.record_unapplied("migrations", "0002_second")
+
+    @override_settings(
+        MIGRATION_MODULES={"migrations": "migrations.test_migrations_run_before"}
+    )
+    def test_get_migration_data_plan(self):
+        cmd = ShowMigrationsCommand(
+            stdout=io.StringIO(), stderr=io.StringIO(), no_color=True
+        )
+        plan = cmd.get_migration_data(connection, plan=True)
+        self.assertEqual(len(plan), 3)
+        self.assertEqual(
+            plan[0],
+            {
+                "app": "migrations",
+                "name": "0001_initial",
+                "title": "0001_initial",
+                "status": MigrationStatus.UNAPPLIED,
+                "applied_at": None,
+                "dependency_labels": [],
+            },
+        )
+        self.assertEqual(
+            plan[1],
+            {
+                "app": "migrations",
+                "name": "0003_third",
+                "title": "0003_third",
+                "status": MigrationStatus.UNAPPLIED,
+                "applied_at": None,
+                "dependency_labels": ["migrations.0001_initial"],
+            },
+        )
+        self.assertEqual(
+            plan[2],
+            {
+                "app": "migrations",
+                "name": "0002_second",
+                "title": "0002_second",
+                "status": MigrationStatus.UNAPPLIED,
+                "applied_at": None,
+                "dependency_labels": [
+                    "migrations.0001_initial",
+                    "migrations.0003_third",
+                ],
+            },
+        )
 
     @override_settings(
         MIGRATION_MODULES={"migrations": "migrations.test_migrations_run_before"}
