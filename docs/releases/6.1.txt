@@ -54,7 +54,7 @@ Django provides three fetch modes:
 Use the new method :meth:`.QuerySet.fetch_mode` to set the fetch mode for model
 instances fetched by the ``QuerySet``:
 
-.. code-block:: python
+.. code-block::
 
     from django.db import models
 
@@ -424,7 +424,7 @@ backends.
 
 * Under ASGI, :class:`~django.contrib.auth.middleware.RemoteUserMiddleware` no
   longer prefixes ``HTTP_`` when looking up custom values in ``request.META``.
-  For example, to send ``-H "AuthUser": ...``, the ``header`` attribute should
+  For example, to send ``-H "AuthUser: ..."``, the ``header`` attribute should
   be ``HTTP_AUTHUSER``. This restores the behavior prior to Django 5.2. (The
   default value of ``REMOTE_USER`` is not affected.)
 
@@ -446,8 +446,31 @@ backends.
   instead of the JSON ``null`` primitive. This matches the behavior of a
   standalone :class:`~django.db.models.JSONField` when storing ``None`` values.
 
+Email
+-----
+
+* Providing ``fail_silently=True``, ``auth_user``, or ``auth_password`` to mail
+  sending functions (such as :func:`~django.core.mail.send_mail`) while also
+  providing a ``connection`` now raises a ``TypeError``.
+
+* The undocumented ``EmailMessage.get_connection()`` method is no longer used.
+  Defining it in a subclass or trying to call it now causes an error.
+
+* :meth:`.EmailMessage.send` no longer sets the ``connection`` property on the
+  ``EmailMessage``. (This behavior was never documented. The ``send()`` method
+  will still *use* a ``connection`` that is set on the message before sending.)
+
 Models
 ------
+
+* The :lookup:`iexact=None <iexact>` lookup on
+  :class:`~django.db.models.JSONField` key transforms now matches JSON
+  ``null``, to match the behavior of :lookup:`exact=None <exact>` on key
+  transforms. Previously, it was interpreted as an :lookup:`isnull` lookup.
+
+* :meth:`~.QuerySet.first` and :meth:`~.QuerySet.last` no longer order by the
+  primary key when a ``QuerySet``'s ordering has been forcibly cleared by
+  calling :meth:`~.QuerySet.order_by` with no arguments.
 
 * SQL ``SELECT`` aliases originating from :meth:`.QuerySet.annotate`
   calls as well as table and ``JOIN`` aliases are now systematically quoted to
@@ -480,39 +503,16 @@ Dropped support for MariaDB < 10.11
 Upstream support for MariaDB 10.6 ends in July 2026, and MariaDB 10.7-10.10 are
 short-term maintenance releases. Django 6.1 supports MariaDB 10.11 and higher.
 
-Email
------
-
-* Providing ``fail_silently=True``, ``auth_user``, or ``auth_password`` to mail
-  sending functions (such as :func:`~django.core.mail.send_mail`) while also
-  providing a ``connection`` now raises a ``TypeError``.
-
-* The undocumented ``EmailMessage.get_connection()`` method is no longer used.
-  Defining it in a subclass or trying to call it now causes an error.
-
-* :meth:`.EmailMessage.send` no longer sets the ``connection`` property on the
-  ``EmailMessage``. (This behavior was never documented. The ``send()`` method
-  will still *use* a ``connection`` that is set on the message before sending.)
-
 Miscellaneous
 -------------
+
+* The minimum supported version of SQLite is increased from 3.31.0 to 3.37.0.
 
 * :class:`~django.contrib.contenttypes.fields.GenericForeignKey` now uses a
   separate descriptor class: the private ``GenericForeignKeyDescriptor``.
 
 * The undocumented ``django.template.library.parse_bits()`` function no longer
   accepts the ``takes_context`` argument.
-
-* The minimum supported version of SQLite is increased from 3.31.0 to 3.37.0.
-
-* The :lookup:`iexact=None <iexact>` lookup on
-  :class:`~django.db.models.JSONField` key transforms now matches JSON
-  ``null``, to match the behavior of :lookup:`exact=None <exact>` on key
-  transforms. Previously, it was interpreted as an :lookup:`isnull` lookup.
-
-* :meth:`~.QuerySet.first` and :meth:`~.QuerySet.last` no longer order by the
-  primary key when a ``QuerySet``'s ordering has been forcibly cleared by
-  calling :meth:`~.QuerySet.order_by` with no arguments.
 
 * The :class:`~django.core.files.File` class now always evaluates to ``True``
   in boolean contexts, rather than relying on the ``name`` attribute. The
@@ -559,7 +559,7 @@ Email
   :setting:`EMAIL_HOST_USER`, :setting:`EMAIL_PORT`,
   :setting:`EMAIL_USE_TLS`, :setting:`EMAIL_USE_SSL`,
   :setting:`EMAIL_SSL_CERTFILE`, :setting:`EMAIL_SSL_KEYFILE`, and
-  :setting:`EMAIL_TIMEOUT` settings are deprecated. Replace them with an
+  :setting:`EMAIL_TIMEOUT` settings are deprecated. Replace them with a
   :setting:`MAILERS` configuration dictionary as described in
   :ref:`migrating-to-mailers`.
 
@@ -601,8 +601,9 @@ Miscellaneous
 -------------
 
 * Calling :meth:`~django.db.models.query.QuerySet.select_related` with no
-  arguments to select all related fields, is deprecated. Specify the related
-  fields to fetch instead.
+  arguments to select all non-nullable related fields is deprecated. Specify
+  the related fields to fetch instead, or use the
+  :attr:`~django.db.models.FETCH_PEERS` fetch mode.
 
 * Setting :attr:`.ModelAdmin.list_select_related` to ``True`` and returning
   ``True`` from :attr:`.ModelAdmin.get_list_select_related()` are deprecated.
@@ -614,10 +615,10 @@ Miscellaneous
 
 * The use of ``None`` to represent a top-level JSON scalar ``null`` when
   querying :class:`~django.db.models.JSONField` is now deprecated in favor of
-  the new :class:`~django.db.models.JSONNull` expression. At the end
-  of the deprecation period, ``None`` values compile to SQL ``IS NULL`` when
-  used as the top-level value. :lookup:`Key and index lookups <jsonfield.key>`
-  are unaffected by this deprecation.
+  the new :class:`~django.db.models.JSONNull` expression. At the end of the
+  deprecation period, ``None`` values compile to SQL ``IS NULL`` when used as
+  the top-level value. :lookup:`Key and index lookups <jsonfield.key>` are
+  unaffected by this deprecation.
 
 * The ``django.db.models.fields.BLANK_CHOICE_DASH`` constant is deprecated
   in favor of the new constant ``django.db.models.fields.BLANK_CHOICE_LABEL``.
@@ -666,8 +667,8 @@ Miscellaneous
 * Overriding ``ModelAdmin.get_action_choices()`` without the new
   ``action_location`` parameter is deprecated.
 
-* ``django.db.transaction.savepoint()`` is deprecated in favor of
-  ``django.db.transaction.savepoint_create()``.
+* :func:`django.db.transaction.savepoint` is deprecated in favor of
+  :func:`~django.db.transaction.savepoint_create`.
 
 Features removed in 6.1
 =======================
