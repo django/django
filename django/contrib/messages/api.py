@@ -19,7 +19,9 @@ class MessageFailure(Exception):
     pass
 
 
-def add_message(request, level, message, extra_tags="", fail_silently=False):
+def add_message(
+    request, level, message, extra_tags="", fail_silently=False, extra_kwargs=None
+):
     """
     Attempt to add a message to the request using the 'messages' app.
     """
@@ -37,7 +39,7 @@ def add_message(request, level, message, extra_tags="", fail_silently=False):
                 "django.contrib.messages.middleware.MessageMiddleware"
             )
     else:
-        return messages.add(level, message, extra_tags)
+        return messages.add(level, message, extra_tags, extra_kwargs=extra_kwargs)
 
 
 def get_messages(request):
@@ -72,7 +74,7 @@ def set_level(request, level):
     return True
 
 
-def debug(request, message, extra_tags="", fail_silently=False):
+def debug(request, message, extra_tags="", fail_silently=False, extra_kwargs=None):
     """Add a message with the ``DEBUG`` level."""
     add_message(
         request,
@@ -80,10 +82,11 @@ def debug(request, message, extra_tags="", fail_silently=False):
         message,
         extra_tags=extra_tags,
         fail_silently=fail_silently,
+        extra_kwargs=extra_kwargs,
     )
 
 
-def info(request, message, extra_tags="", fail_silently=False):
+def info(request, message, extra_tags="", fail_silently=False, extra_kwargs=None):
     """Add a message with the ``INFO`` level."""
     add_message(
         request,
@@ -91,10 +94,11 @@ def info(request, message, extra_tags="", fail_silently=False):
         message,
         extra_tags=extra_tags,
         fail_silently=fail_silently,
+        extra_kwargs=extra_kwargs,
     )
 
 
-def success(request, message, extra_tags="", fail_silently=False):
+def success(request, message, extra_tags="", fail_silently=False, extra_kwargs=None):
     """Add a message with the ``SUCCESS`` level."""
     add_message(
         request,
@@ -102,10 +106,11 @@ def success(request, message, extra_tags="", fail_silently=False):
         message,
         extra_tags=extra_tags,
         fail_silently=fail_silently,
+        extra_kwargs=extra_kwargs,
     )
 
 
-def warning(request, message, extra_tags="", fail_silently=False):
+def warning(request, message, extra_tags="", fail_silently=False, extra_kwargs=None):
     """Add a message with the ``WARNING`` level."""
     add_message(
         request,
@@ -113,10 +118,11 @@ def warning(request, message, extra_tags="", fail_silently=False):
         message,
         extra_tags=extra_tags,
         fail_silently=fail_silently,
+        extra_kwargs=extra_kwargs,
     )
 
 
-def error(request, message, extra_tags="", fail_silently=False):
+def error(request, message, extra_tags="", fail_silently=False, extra_kwargs=None):
     """Add a message with the ``ERROR`` level."""
     add_message(
         request,
@@ -124,4 +130,5 @@ def error(request, message, extra_tags="", fail_silently=False):
         message,
         extra_tags=extra_tags,
         fail_silently=fail_silently,
+        extra_kwargs=extra_kwargs,
     )
