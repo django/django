@@ -2,6 +2,7 @@ import functools
 import inspect
 import itertools
 import re
+import reprlib
 import sys
 import types
 import warnings
@@ -10,7 +11,6 @@ from pathlib import Path
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
-from django.template.defaultfilters import pprint
 from django.urls import URLResolver, resolve
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
@@ -353,14 +353,27 @@ class ExceptionReporter:
             self.postmortem = self.exc_value.chain or [self.exc_value]
 
         frames = self.get_traceback_frames()
+        # Use reprlib to limit output size during generation, avoiding
+        # high memory consumption for large variables (see ticket #34746).
+        r = reprlib.Repr()
+        r.maxstring = 200
+        r.maxother = 200
+        r.maxlevel = 3
+        r.maxtuple = 10
+        r.maxlist = 10
+        r.maxarray = 10
+        r.maxdict = 10
+        r.maxset = 10
+        r.maxfrozenset = 10
+        r.maxdeque = 10
         for i, frame in enumerate(frames):
             if "vars" in frame:
                 frame_vars = []
                 for k, v in frame["vars"]:
-                    v = pprint(v)
-                    # Trim large blobs of data
-                    if len(v) > 4096:
-                        v = "%s… <trimmed %d bytes string>" % (v[0:4096], len(v))
+                    try:
+                        v = r.repr(v)
+                    except Exception as e:
+                        v = "Error in formatting: %s: %s" % (e.__class__.__name__, e)
                     frame_vars.append((k, v))
                 frame["vars"] = frame_vars
             frames[i] = frame
