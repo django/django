@@ -174,11 +174,6 @@ Minor features
   ``description`` value. This is useful when the action is available on both
   the admin change list and admin change form.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -190,11 +185,6 @@ Minor features
 
 * The new :attr:`.Permission.user_perm_str` property returns the string
   suitable to use with :meth:`.User.has_perm`.
-
-:mod:`django.contrib.contenttypes`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -211,11 +201,6 @@ Minor features
 * :class:`~django.contrib.gis.forms.widgets.OpenLayersWidget` is now based on
   OpenLayers 10.9.0 (previously 7.2.2).
 
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -226,47 +211,12 @@ Minor features
 * :class:`~django.contrib.postgres.constraints.ExclusionConstraint` now
   supports the Hash index type.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * :class:`~django.contrib.sessions.backends.base.SessionBase` now supports
   boolean evaluation via
   :meth:`~django.contrib.sessions.backends.base.SessionBase.__bool__`.
-
-:mod:`django.contrib.sitemaps`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.staticfiles`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Asynchronous views
-~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Cache
-~~~~~
-
-* ...
 
 CSP
 ~~~
@@ -286,36 +236,6 @@ CSP
   ``<link>`` elements in admin templates and all built-in templates when the
   :func:`~django.template.context_processors.csp` context processor is
   configured. See :ref:`csp-nonce-config` for setup instructions.
-
-CSRF
-~~~~
-
-* ...
-
-Decorators
-~~~~~~~~~~
-
-* ...
-
-Email
-~~~~~
-
-* ...
-
-Error Reporting
-~~~~~~~~~~~~~~~
-
-* ...
-
-File Storage
-~~~~~~~~~~~~
-
-* ...
-
-File Uploads
-~~~~~~~~~~~~
-
-* ...
 
 Forms
 ~~~~~
@@ -343,16 +263,6 @@ Generic Views
   the HTTP method and body during redirects, using 307/308 status codes instead
   of 302/301.
 
-Internationalization
-~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Logging
-~~~~~~~
-
-* ...
-
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
@@ -363,11 +273,6 @@ Management Commands
 * The :djadmin:`loaddata` command now calls
   :data:`~django.db.models.signals.m2m_changed` signals with ``raw=True`` when
   loading fixtures.
-
-Migrations
-~~~~~~~~~~
-
-* ...
 
 Models
 ~~~~~~
@@ -416,11 +321,6 @@ Models
   Invalid Base64 strings now raise ``ValidationError`` instead of being
   silently accepted.
 
-Pagination
-~~~~~~~~~~
-
-* ...
-
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -430,11 +330,6 @@ Requests and Responses
 * :class:`~django.http.HttpResponseRedirect` (and its subclasses), as well as
   the :func:`~django.shortcuts.redirect` shortcut, now accept a ``max_length``
   parameter to override the default maximum URL length limit.
-
-Security
-~~~~~~~~
-
-* ...
 
 Serialization
 ~~~~~~~~~~~~~
@@ -448,11 +343,6 @@ Serialization
   :exc:`~django.core.exceptions.SuspiciousOperation` when it encounters
   unexpected nested tags.
 
-Signals
-~~~~~~~
-
-* ...
-
 Tasks
 ~~~~~
 
@@ -463,11 +353,6 @@ Tasks
 * :class:`~django.tasks.Task` and :class:`~django.tasks.TaskResult` instances
   can now be pickled and unpickled.
 
-Templates
-~~~~~~~~~
-
-* ...
-
 Tests
 ~~~~~
 
@@ -477,21 +362,11 @@ Tests
   Previously, they would consume the streaming response's content, causing
   subsequent calls to fail.
 
-URLs
-~~~~
-
-* ...
-
 Utilities
 ~~~~~~~~~
 
 * :func:`~django.utils.dateparse.parse_duration` now supports ISO 8601
   time periods expressed in weeks (``PnW``).
-
-Validators
-~~~~~~~~~~
-
-* ...
 
 .. _backwards-incompatible-6.1:
 
