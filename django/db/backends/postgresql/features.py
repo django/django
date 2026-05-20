@@ -54,6 +54,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         END;
     $$ LANGUAGE plpgsql;"""
     requires_casted_case_in_updates = True
+    supports_async = is_psycopg3
     supports_over_clause = True
     supports_frame_exclusion = True
     only_supports_unbounded_with_preceding_and_following = True
