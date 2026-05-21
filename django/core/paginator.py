@@ -35,6 +35,7 @@ class BasePaginator:
         "invalid_page": _("That page number is not an integer"),
         "min_page": _("That page number is less than 1"),
         "no_results": _("That page contains no results"),
+        "max_page": _("That page number is too high"),
     }
 
     def __init__(
@@ -140,7 +141,10 @@ class BasePaginator:
         if number < 1:
             raise EmptyPage(self.error_messages["min_page"])
         if number > num_pages:
-            raise EmptyPage(self.error_messages["no_results"])
+            if num_pages == 0:
+                raise EmptyPage(self.error_messages["no_results"])
+            else:
+                raise EmptyPage(self.error_messages["max_page"])
         return number
 
 
