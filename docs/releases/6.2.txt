@@ -256,6 +256,12 @@ Miscellaneous
   pollution vulnerability in the ``Array`` prototype was fixed in
   `ES5 <https://262.ecma-international.org/5.1/#sec-11.1.4>`_.
 
+* :class:`~django.core.serializers.json.DjangoJSONEncoder` now omits the
+  millisecond component of serialized ``datetime.datetime`` and
+  ``datetime.time`` objects if they have zero milliseconds. For example,
+  ``datetime.datetime(2000, 1, 1, 0, 0, 0, 1)`` now serializes to
+  ``"2000-01-01T00:00:00"`` rather than ``"2000-01-01T00:00:00.000"``.
+
 .. _deprecated-features-6.2:
 
 Features deprecated in 6.2
