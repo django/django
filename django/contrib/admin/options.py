@@ -2103,7 +2103,7 @@ class ModelAdmin(BaseModelAdmin):
                 selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
                 if len(selected) != 1 or selected[0] != str(obj.pk):
                     raise BadRequest
-                queryset = self.model._default_manager.get_queryset()
+                queryset = self.get_queryset(request)
                 if response := self.response_action(
                     request, queryset, action_location=ActionLocation.CHANGE_FORM
                 ):
