@@ -562,6 +562,28 @@ class ParseHeaderParameterTests(unittest.TestCase):
                     parsed[1]["title" if "title" in raw_line else "filename"], expected
                 )
 
+    def test_rfc2231_malformed_continuation_preserves_direct_param(self):
+        """Invalid continuation groups leave the direct param intact."""
+        tests = [
+            # No segment 0.
+            "attachment; filename=safe; filename*1=evil",
+            # Gap between segments.
+            "attachment; filename=safe; filename*0=bad; filename*2=evil",
+            # Leading zero in segment number.
+            "attachment; filename=safe; filename*0=bad; filename*01=evil",
+        ]
+        for raw_line in tests:
+            with self.subTest(raw_line=raw_line):
+                _, params = parse_header_parameters(raw_line)
+                self.assertEqual(params["filename"], "safe")
+
+    def test_rfc2231_continuation_splits_utf8_sequence(self):
+        """Multi-byte UTF-8 sequences split across continuation segments
+        decode correctly."""
+        raw_line = "attachment; filename*0*=UTF-8''%E2%82; filename*1*=%AC"
+        _, params = parse_header_parameters(raw_line)
+        self.assertEqual(params["filename"], "\u20ac")  # €
+
     def test_rfc2231_continuation_mixed_with_regular_params(self):
         """Continuation params coexist with regular params."""
         raw_line = "attachment; filename*0*=UTF-8''foo; filename*1=.txt; size=123"
