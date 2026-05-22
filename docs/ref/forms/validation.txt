@@ -125,6 +125,10 @@ following guidelines:
       # Bad
       ValidationError(_("Invalid value"))
 
+  Having a ``code`` associated to your ``ValidationError`` allows to
+  programatically do something with the error, for instance in a try/except or
+  to check that the correct ``ValidationError`` is raised in your tests.
+
 * Don't coerce variables into the message; use placeholders and the ``params``
   argument of the constructor::
 
