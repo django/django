@@ -5728,25 +5728,40 @@ class AdminCustomQuerysetTest(TestCase):
         Custom querysets are considered for the admin history view.
         """
         self.client.post(reverse("admin:login"), self.super_login)
-        FilteredManager.objects.create(pk=1)
-        FilteredManager.objects.create(pk=2)
+        active_pk = FilteredManager.all_objects.create(deleted=False).pk
+        deleted_pk = FilteredManager.all_objects.create(deleted=True).pk
         response = self.client.get(
             reverse("admin:admin_views_filteredmanager_changelist")
         )
-        self.assertContains(response, "PK=1")
-        self.assertContains(response, "PK=2")
+        self.assertContains(response, f"PK={active_pk}")
+        self.assertContains(response, f"PK={deleted_pk}")
+        url_name = "admin:admin_views_filteredmanager_history"
         self.assertEqual(
-            self.client.get(
-                reverse("admin:admin_views_filteredmanager_history", args=(1,))
-            ).status_code,
-            200,
+            self.client.get(reverse(url_name, args=(active_pk,))).status_code, 200
         )
         self.assertEqual(
-            self.client.get(
-                reverse("admin:admin_views_filteredmanager_history", args=(2,))
-            ).status_code,
+            self.client.get(reverse(url_name, args=(deleted_pk,))).status_code,
             200,
         )
+
+    def test_action_changeform_uses_modeladmin_queryset(self):
+        # Change form actions must receive the queryset from
+        # ModelAdmin.get_queryset(), not the model's default manager. Here,
+        # FilteredManager.objects excludes deleted rows while
+        # CustomManagerAdmin.get_queryset() uses all_objects. A restore action
+        # on a soft-deleted object must receive a non-empty queryset.
+        obj = FilteredManager.all_objects.create(deleted=True)
+        response = self.client.post(
+            reverse("admin:admin_views_filteredmanager_change", args=[obj.pk]),
+            {
+                "CHANGE_FORM-action": "restore_filtered_manager",
+                ACTION_CHECKBOX_NAME: [obj.pk],
+                "index": 0,
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        obj.refresh_from_db()
+        self.assertIs(obj.deleted, False)
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")

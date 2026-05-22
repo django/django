@@ -1036,9 +1036,16 @@ class AttributeErrorRaisingAdmin(admin.ModelAdmin):
     list_display = [callable_on_unknown]
 
 
+@admin.action(description="Restore", location=ActionLocation.CHANGE_FORM)
+def restore_filtered_manager(modeladmin, request, queryset):
+    queryset.update(deleted=False)
+
+
 class CustomManagerAdmin(admin.ModelAdmin):
+    actions = [restore_filtered_manager]
+
     def get_queryset(self, request):
-        return FilteredManager.objects
+        return FilteredManager.all_objects.all()
 
 
 class MessageTestingAdmin(admin.ModelAdmin):
