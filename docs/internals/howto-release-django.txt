@@ -347,6 +347,9 @@ cut. The following items should be addressed in this branch:
    features section in the release notes (:commit:`example commit
    <f2d9c76aa7096ef3eed675b9eb824858f9dd81e5>`).
 
+#. Advance the deprecation warnings (:commit:`example commit
+   <0c0bda7f79a2de89a55cfcc8e60467d6588f406f>`).
+
 #. Increase the default PBKDF2 iterations in
    ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` by about 20%
    (pick a round number). Run the tests, and update the 3 failing
