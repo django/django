@@ -81,11 +81,11 @@ default environments can be seen as follows:
     py3
     black
     blacken-docs
-    flake8>=3.7.0
+    flake8
     docs
-    isort>=7.0.0
+    isort
     lint-docs
-    zizmor>=1.19.0
+    zizmor
 
 Testing other Python versions and database backends
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
