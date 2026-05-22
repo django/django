@@ -2932,32 +2932,11 @@ class AdminViewPermissionsTest(TestCase):
         )
         self.client.post(reverse("admin:logout"))
 
-        # Test redirection when using row-level change permissions. Refs
-        # #11513.
-        r1 = RowLevelChangePermissionModel.objects.create(
-            name="A", can_change=False, can_view=False
-        )
-        r2 = RowLevelChangePermissionModel.objects.create(
-            name="B", can_change=True, can_view=False
-        )
-        r3 = RowLevelChangePermissionModel.objects.create(
-            name="C", can_change=False, can_view=True
-        )
-        r4 = RowLevelChangePermissionModel.objects.create(
-            name="D", can_change=True, can_view=True
-        )
-        change_url_1 = reverse(
-            "admin:admin_views_rowlevelchangepermissionmodel_change", args=(r1.pk,)
-        )
-        change_url_2 = reverse(
-            "admin:admin_views_rowlevelchangepermissionmodel_change", args=(r2.pk,)
-        )
-        change_url_3 = reverse(
-            "admin:admin_views_rowlevelchangepermissionmodel_change", args=(r3.pk,)
-        )
-        change_url_4 = reverse(
-            "admin:admin_views_rowlevelchangepermissionmodel_change", args=(r4.pk,)
-        )
+    def test_redirection_with_per_object_change_permissions(self):
+        """
+        User must be redirected to admin index if lacks per object (row level)
+        change permissions for the obj. Refs #11513.
+        """
         logins = [
             self.superuser,
             self.viewuser,
@@ -2965,68 +2944,69 @@ class AdminViewPermissionsTest(TestCase):
             self.changeuser,
             self.deleteuser,
         ]
-        for login_user in logins:
-            with self.subTest(login_user.username):
-                self.client.force_login(login_user)
-                response = self.client.get(change_url_1)
-                self.assertEqual(response.status_code, 403)
-                response = self.client.post(change_url_1, {"name": "changed"})
-                self.assertEqual(
-                    RowLevelChangePermissionModel.objects.get(pk=r1.pk).name,
-                    r1.name,
-                )
-                self.assertEqual(response.status_code, 403)
-                response = self.client.get(change_url_2)
-                self.assertEqual(response.status_code, 200)
-                response = self.client.post(change_url_2, {"name": "changed"})
-                self.assertEqual(
-                    RowLevelChangePermissionModel.objects.get(pk=r2.pk).name,
-                    "changed",
-                )
-                self.assertRedirects(response, self.index_url)
-                response = self.client.get(change_url_3)
-                self.assertEqual(response.status_code, 200)
-                response = self.client.post(change_url_3, {"name": "changed"})
-                self.assertEqual(response.status_code, 403)
-                self.assertEqual(
-                    RowLevelChangePermissionModel.objects.get(pk=r3.pk).name,
-                    r3.name,
-                )
-                response = self.client.get(change_url_4)
-                self.assertEqual(response.status_code, 200)
-                response = self.client.post(change_url_4, {"name": "changed"})
-                self.assertEqual(
-                    RowLevelChangePermissionModel.objects.get(pk=r4.pk).name,
-                    "changed",
-                )
-                self.assertRedirects(response, self.index_url)
 
-                self.client.post(reverse("admin:logout"))
+        test_cases = [
+            # (can_change, can_view, initial_name, expect_changed)
+            (False, False, "A", False),
+            (True, False, "B", True),
+            (False, True, "C", False),
+            (True, True, "D", True),
+        ]
+        for login_user in logins:
+            for can_change, can_view, name, expect_changed in test_cases:
+                with self.subTest(user=login_user.username, name=name):
+                    obj = RowLevelChangePermissionModel.objects.create(
+                        name=name, can_change=can_change, can_view=can_view
+                    )
+                    change_url = reverse(
+                        "admin:admin_views_rowlevelchangepermissionmodel_change",
+                        args=(obj.pk,),
+                    )
+                    self.client.force_login(login_user)
+
+                    get_response = self.client.get(change_url)
+                    self.assertEqual(
+                        get_response.status_code, 200 if can_change or can_view else 302
+                    )
+
+                    self.client.post(change_url, {"name": "changed"})
+                    obj.refresh_from_db()
+
+                    if expect_changed:
+                        self.assertEqual(obj.name, "changed")
+                    else:
+                        self.assertEqual(obj.name, name)
+
+                    self.client.post(reverse("admin:logout"))
+                    obj.delete()
 
         for login_user in [self.joepublicuser, self.nostaffuser]:
-            with self.subTest(login_user.username):
-                self.client.force_login(login_user)
-                response = self.client.get(change_url_1, follow=True)
-                self.assertContains(response, "login-form")
-                response = self.client.post(
-                    change_url_1, {"name": "changed"}, follow=True
-                )
-                self.assertEqual(
-                    RowLevelChangePermissionModel.objects.get(pk=r1.pk).name,
-                    r1.name,
-                )
-                self.assertContains(response, "login-form")
-                response = self.client.get(change_url_2, follow=True)
-                self.assertContains(response, "login-form")
-                response = self.client.post(
-                    change_url_2, {"name": "changed again"}, follow=True
-                )
-                self.assertEqual(
-                    RowLevelChangePermissionModel.objects.get(pk=r2.pk).name,
-                    "changed",
-                )
-                self.assertContains(response, "login-form")
-                self.client.post(reverse("admin:logout"))
+            # Reuse test_cases from before, minus expect_changed.
+            for can_change, can_view, name, _ in test_cases:
+                with self.subTest(user=login_user.username, name=name):
+                    obj = RowLevelChangePermissionModel.objects.create(
+                        name=name, can_change=can_change, can_view=can_view
+                    )
+                    change_url = reverse(
+                        "admin:admin_views_rowlevelchangepermissionmodel_change",
+                        args=(obj.pk,),
+                    )
+                    self.client.force_login(login_user)
+
+                    response = self.client.get(change_url, follow=True)
+                    self.assertContains(response, "login-form")
+
+                    response = self.client.post(
+                        change_url, {"name": "changed"}, follow=True
+                    )
+                    self.assertContains(response, "login-form")
+                    obj.refresh_from_db()
+
+                    # Never changed since both of the users are not staff.
+                    self.assertEqual(obj.name, name)
+
+                    self.client.post(reverse("admin:logout"))
+                    obj.delete()
 
     def test_change_view_without_object_change_permission(self):
         """
