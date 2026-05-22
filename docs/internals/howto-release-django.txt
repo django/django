@@ -171,15 +171,15 @@ any time leading up to the actual release.
 
    * Export user information:
 
-      .. code-block:: shell
+     .. code-block:: shell
 
-         $ export CVE_USER=<user-email>@djangoproject.com CVE_ORG=DSF
+       $ export CVE_USER=<user-email>@djangoproject.com CVE_ORG=DSF
 
    * Reserve:
 
-      .. code-block:: shell
+     .. code-block:: shell
 
-         $ cve --interactive reserve <quantity>
+       $ cve --interactive reserve <quantity>
 
 #. Generate the relevant (private) patch(es) using ``git format-patch``, one
    for the ``main`` branch and one for each stable branch being patched.
