@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.core import checks
@@ -12,31 +11,27 @@ from .models import CustomArticle, ExclusiveArticle, SyndicatedArticle
 class SitesFrameworkTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        Site.objects.get_or_create(
-            id=settings.SITE_ID, domain="example.com", name="example.com"
-        )
-        Site.objects.create(
-            id=settings.SITE_ID + 1, domain="example2.com", name="example2.com"
-        )
+        cls.site1 = Site.objects.get(domain="example.com", name="example.com")
+        cls.site2 = Site.objects.create(domain="example2.com", name="example2.com")
 
     def test_site_fk(self):
         article = ExclusiveArticle.objects.create(
-            title="Breaking News!", site_id=settings.SITE_ID
+            title="Breaking News!", site=self.site1
         )
         self.assertEqual(ExclusiveArticle.on_site.get(), article)
 
     def test_sites_m2m(self):
         article = SyndicatedArticle.objects.create(title="Fresh News!")
-        article.sites.add(Site.objects.get(id=settings.SITE_ID))
-        article.sites.add(Site.objects.get(id=settings.SITE_ID + 1))
+        article.sites.add(self.site1)
+        article.sites.add(self.site2)
         article2 = SyndicatedArticle.objects.create(title="More News!")
-        article2.sites.add(Site.objects.get(id=settings.SITE_ID + 1))
+        article2.sites.add(self.site2)
         self.assertEqual(SyndicatedArticle.on_site.get(), article)
 
     def test_custom_named_field(self):
         article = CustomArticle.objects.create(
             title="Tantalizing News!",
-            places_this_article_should_appear_id=settings.SITE_ID,
+            places_this_article_should_appear_id=self.site1.id,
         )
         self.assertEqual(CustomArticle.on_site.get(), article)
 
