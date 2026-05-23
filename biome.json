@@ -1,5 +1,6 @@
 {
     "$schema": "https://biomejs.dev/schemas/2.4.12/schema.json",
+    "plugins": ["./biome-plugins/use-logical-css-properties.grit"],
     "files": {
         "includes": [
             "django/contrib/admin/static/admin/css/**/*.css",
