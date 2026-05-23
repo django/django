@@ -1030,7 +1030,7 @@ class TestInlinePermissions(TestCase):
         )
         cls.user.user_permissions.add(permission)
 
-        author = Author.objects.create(pk=1, name="The Author")
+        author = Author.objects.create(name="The Author")
         cls.book = author.books.create(name="The inline Book")
         cls.author_change_url = reverse(
             "admin:admin_inlines_author_change", args=(author.id,)

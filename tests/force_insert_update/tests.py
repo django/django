@@ -125,7 +125,7 @@ class ForceInsertInheritanceTests(TestCase):
         self.assertEqual(obj.value, 3)
 
     def test_force_insert_false_with_existing_parent(self):
-        parent = Counter.objects.create(pk=1, value=1)
+        parent = Counter.objects.create(value=1)
         with self.assertNumQueries(2):
             SubCounter.objects.create(pk=parent.pk, value=2)
 
@@ -152,15 +152,15 @@ class ForceInsertInheritanceTests(TestCase):
 
     def test_force_insert_with_existing_grandparent(self):
         # Force insert only the last child.
-        grandparent = Counter.objects.create(pk=1, value=1)
+        grandparent = Counter.objects.create(value=1)
         with self.assertNumQueries(4):
             SubSubCounter(pk=grandparent.pk, value=1).save(force_insert=True)
         # Force insert a parent, and don't force insert a grandparent.
-        grandparent = Counter.objects.create(pk=2, value=1)
+        grandparent = Counter.objects.create(value=1)
         with self.assertNumQueries(3):
             SubSubCounter(pk=grandparent.pk, value=1).save(force_insert=(SubCounter,))
         # Force insert parents on all levels, grandparent conflicts.
-        grandparent = Counter.objects.create(pk=3, value=1)
+        grandparent = Counter.objects.create(value=1)
         with self.assertRaises(IntegrityError), transaction.atomic():
             SubSubCounter(pk=grandparent.pk, value=1).save(force_insert=(Counter,))
 

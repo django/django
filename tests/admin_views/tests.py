@@ -1893,7 +1893,7 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
             data={
                 "index": 0,
                 "action": ["delete_selected"],
-                "_selected_action": ["1"],
+                "_selected_action": [str(article_pk)],
             },
         )
         self.assertTemplateUsed(
@@ -4901,30 +4901,28 @@ class AdminViewListEditable(TestCase):
         )
 
     def test_list_editable_ordering(self):
-        collector = Collector.objects.create(id=1, name="Frederick Clegg")
-
-        Category.objects.create(id=1, order=1, collector=collector)
-        Category.objects.create(id=2, order=2, collector=collector)
-        Category.objects.create(id=3, order=0, collector=collector)
-        Category.objects.create(id=4, order=0, collector=collector)
-
+        collector = Collector.objects.create(name="Frederick Clegg")
+        category1 = Category.objects.create(order=1, collector=collector)
+        category2 = Category.objects.create(order=2, collector=collector)
+        category3 = Category.objects.create(order=0, collector=collector)
+        category4 = Category.objects.create(order=0, collector=collector)
         # NB: The order values must be changed so that the items are reordered.
         data = {
             "form-TOTAL_FORMS": "4",
             "form-INITIAL_FORMS": "4",
             "form-MAX_NUM_FORMS": "0",
             "form-0-order": "14",
-            "form-0-id": "1",
-            "form-0-collector": "1",
+            "form-0-id": str(category1.id),
+            "form-0-collector": str(collector.id),
             "form-1-order": "13",
-            "form-1-id": "2",
-            "form-1-collector": "1",
+            "form-1-id": str(category2.id),
+            "form-1-collector": str(collector.id),
             "form-2-order": "1",
-            "form-2-id": "3",
-            "form-2-collector": "1",
+            "form-2-id": str(category3.id),
+            "form-2-collector": str(collector.id),
             "form-3-order": "0",
-            "form-3-id": "4",
-            "form-3-collector": "1",
+            "form-3-id": str(category4.id),
+            "form-3-collector": str(collector.id),
             # The form processing understands this as a list_editable "Save"
             # and not an action "Run".
             "_save": "Save",
@@ -4936,18 +4934,18 @@ class AdminViewListEditable(TestCase):
         self.assertEqual(response.status_code, 302)
 
         # The order values have been applied to the right objects
-        self.assertEqual(Category.objects.get(id=1).order, 14)
-        self.assertEqual(Category.objects.get(id=2).order, 13)
-        self.assertEqual(Category.objects.get(id=3).order, 1)
-        self.assertEqual(Category.objects.get(id=4).order, 0)
+        self.assertEqual(Category.objects.get(id=category1.id).order, 14)
+        self.assertEqual(Category.objects.get(id=category2.id).order, 13)
+        self.assertEqual(Category.objects.get(id=category3.id).order, 1)
+        self.assertEqual(Category.objects.get(id=category4.id).order, 0)
 
     def test_list_editable_pagination(self):
         """
         Pagination works for list_editable items.
         """
-        UnorderedObject.objects.create(id=1, name="Unordered object #1")
-        UnorderedObject.objects.create(id=2, name="Unordered object #2")
-        UnorderedObject.objects.create(id=3, name="Unordered object #3")
+        UnorderedObject.objects.create(name="Unordered object #1")
+        UnorderedObject.objects.create(name="Unordered object #2")
+        UnorderedObject.objects.create(name="Unordered object #3")
         response = self.client.get(
             reverse("admin:admin_views_unorderedobject_changelist")
         )
@@ -4969,14 +4967,14 @@ class AdminViewListEditable(TestCase):
             "form-INITIAL_FORMS": "3",
             "form-MAX_NUM_FORMS": "0",
             "form-0-gender": "1",
-            "form-0-id": "1",
+            "form-0-id": str(self.per1.id),
             "form-1-gender": "2",
-            "form-1-id": "2",
+            "form-1-id": str(self.per2.id),
             "form-2-alive": "checked",
             "form-2-gender": "1",
-            "form-2-id": "3",
+            "form-2-id": str(self.per3.id),
             "index": "0",
-            "_selected_action": ["3"],
+            "_selected_action": [str(self.per3.id)],
             "action": ["", "delete_selected"],
         }
         self.client.post(reverse("admin:admin_views_person_changelist"), data)
@@ -4999,7 +4997,7 @@ class AdminViewListEditable(TestCase):
             "form-2-gender": "1",
             "form-2-id": str(self.per3.pk),
             "_save": "Save",
-            "_selected_action": ["1"],
+            "_selected_action": [str(self.per1.pk)],
             "action": ["", "delete_selected"],
         }
         self.client.post(reverse("admin:admin_views_person_changelist"), data)
@@ -5830,7 +5828,7 @@ class AdminInlineTests(TestCase):
         cls.superuser = User.objects.create_superuser(
             username="super", password="secret", email="super@example.com"
         )
-        cls.collector = Collector.objects.create(pk=1, name="John Fowles")
+        cls.collector = Collector.objects.create(name="John Fowles")
 
     def setUp(self):
         self.post_data = {
@@ -5839,63 +5837,63 @@ class AdminInlineTests(TestCase):
             "widget_set-INITIAL_FORMS": "0",
             "widget_set-MAX_NUM_FORMS": "0",
             "widget_set-0-id": "",
-            "widget_set-0-owner": "1",
+            "widget_set-0-owner": str(self.collector.pk),
             "widget_set-0-name": "",
             "widget_set-1-id": "",
-            "widget_set-1-owner": "1",
+            "widget_set-1-owner": str(self.collector.pk),
             "widget_set-1-name": "",
             "widget_set-2-id": "",
-            "widget_set-2-owner": "1",
+            "widget_set-2-owner": str(self.collector.pk),
             "widget_set-2-name": "",
             "doohickey_set-TOTAL_FORMS": "3",
             "doohickey_set-INITIAL_FORMS": "0",
             "doohickey_set-MAX_NUM_FORMS": "0",
-            "doohickey_set-0-owner": "1",
+            "doohickey_set-0-owner": str(self.collector.pk),
             "doohickey_set-0-code": "",
             "doohickey_set-0-name": "",
-            "doohickey_set-1-owner": "1",
+            "doohickey_set-1-owner": str(self.collector.pk),
             "doohickey_set-1-code": "",
             "doohickey_set-1-name": "",
-            "doohickey_set-2-owner": "1",
+            "doohickey_set-2-owner": str(self.collector.pk),
             "doohickey_set-2-code": "",
             "doohickey_set-2-name": "",
             "grommet_set-TOTAL_FORMS": "3",
             "grommet_set-INITIAL_FORMS": "0",
             "grommet_set-MAX_NUM_FORMS": "0",
             "grommet_set-0-code": "",
-            "grommet_set-0-owner": "1",
+            "grommet_set-0-owner": str(self.collector.pk),
             "grommet_set-0-name": "",
             "grommet_set-1-code": "",
-            "grommet_set-1-owner": "1",
+            "grommet_set-1-owner": str(self.collector.pk),
             "grommet_set-1-name": "",
             "grommet_set-2-code": "",
-            "grommet_set-2-owner": "1",
+            "grommet_set-2-owner": str(self.collector.pk),
             "grommet_set-2-name": "",
             "whatsit_set-TOTAL_FORMS": "3",
             "whatsit_set-INITIAL_FORMS": "0",
             "whatsit_set-MAX_NUM_FORMS": "0",
-            "whatsit_set-0-owner": "1",
+            "whatsit_set-0-owner": str(self.collector.pk),
             "whatsit_set-0-index": "",
             "whatsit_set-0-name": "",
-            "whatsit_set-1-owner": "1",
+            "whatsit_set-1-owner": str(self.collector.pk),
             "whatsit_set-1-index": "",
             "whatsit_set-1-name": "",
-            "whatsit_set-2-owner": "1",
+            "whatsit_set-2-owner": str(self.collector.pk),
             "whatsit_set-2-index": "",
             "whatsit_set-2-name": "",
             "fancydoodad_set-TOTAL_FORMS": "3",
             "fancydoodad_set-INITIAL_FORMS": "0",
             "fancydoodad_set-MAX_NUM_FORMS": "0",
             "fancydoodad_set-0-doodad_ptr": "",
-            "fancydoodad_set-0-owner": "1",
+            "fancydoodad_set-0-owner": str(self.collector.pk),
             "fancydoodad_set-0-name": "",
             "fancydoodad_set-0-expensive": "on",
             "fancydoodad_set-1-doodad_ptr": "",
-            "fancydoodad_set-1-owner": "1",
+            "fancydoodad_set-1-owner": str(self.collector.pk),
             "fancydoodad_set-1-name": "",
             "fancydoodad_set-1-expensive": "on",
             "fancydoodad_set-2-doodad_ptr": "",
-            "fancydoodad_set-2-owner": "1",
+            "fancydoodad_set-2-owner": str(self.collector.pk),
             "fancydoodad_set-2-name": "",
             "fancydoodad_set-2-expensive": "on",
             "category_set-TOTAL_FORMS": "3",
@@ -5903,13 +5901,13 @@ class AdminInlineTests(TestCase):
             "category_set-MAX_NUM_FORMS": "0",
             "category_set-0-order": "",
             "category_set-0-id": "",
-            "category_set-0-collector": "1",
+            "category_set-0-collector": str(self.collector.pk),
             "category_set-1-order": "",
             "category_set-1-id": "",
-            "category_set-1-collector": "1",
+            "category_set-1-collector": str(self.collector.pk),
             "category_set-2-order": "",
             "category_set-2-id": "",
-            "category_set-2-collector": "1",
+            "category_set-2-collector": str(self.collector.pk),
         }
 
         self.client.force_login(self.superuser)
@@ -6105,11 +6103,10 @@ class AdminInlineTests(TestCase):
         An inline with an editable ordering fields is updated correctly.
         """
         # Create some objects with an initial ordering
-        Category.objects.create(id=1, order=1, collector=self.collector)
-        Category.objects.create(id=2, order=2, collector=self.collector)
-        Category.objects.create(id=3, order=0, collector=self.collector)
-        Category.objects.create(id=4, order=0, collector=self.collector)
-
+        category1 = Category.objects.create(order=1, collector=self.collector)
+        category2 = Category.objects.create(order=2, collector=self.collector)
+        category3 = Category.objects.create(order=0, collector=self.collector)
+        category4 = Category.objects.create(order=0, collector=self.collector)
         # NB: The order values must be changed so that the items are reordered.
         self.post_data.update(
             {
@@ -6118,26 +6115,26 @@ class AdminInlineTests(TestCase):
                 "category_set-INITIAL_FORMS": "4",
                 "category_set-MAX_NUM_FORMS": "0",
                 "category_set-0-order": "14",
-                "category_set-0-id": "1",
-                "category_set-0-collector": "1",
+                "category_set-0-id": str(category1.id),
+                "category_set-0-collector": str(self.collector.id),
                 "category_set-1-order": "13",
-                "category_set-1-id": "2",
-                "category_set-1-collector": "1",
+                "category_set-1-id": str(category2.id),
+                "category_set-1-collector": str(self.collector.pk),
                 "category_set-2-order": "1",
-                "category_set-2-id": "3",
-                "category_set-2-collector": "1",
+                "category_set-2-id": str(category3.id),
+                "category_set-2-collector": str(self.collector.pk),
                 "category_set-3-order": "0",
-                "category_set-3-id": "4",
-                "category_set-3-collector": "1",
+                "category_set-3-id": str(category4.id),
+                "category_set-3-collector": str(self.collector.pk),
                 "category_set-4-order": "",
                 "category_set-4-id": "",
-                "category_set-4-collector": "1",
+                "category_set-4-collector": str(self.collector.pk),
                 "category_set-5-order": "",
                 "category_set-5-id": "",
-                "category_set-5-collector": "1",
+                "category_set-5-collector": str(self.collector.pk),
                 "category_set-6-order": "",
                 "category_set-6-id": "",
-                "category_set-6-collector": "1",
+                "category_set-6-collector": str(self.collector.pk),
             }
         )
         collector_url = reverse(
@@ -6149,10 +6146,10 @@ class AdminInlineTests(TestCase):
 
         # The order values have been applied to the right objects
         self.assertEqual(self.collector.category_set.count(), 4)
-        self.assertEqual(Category.objects.get(id=1).order, 14)
-        self.assertEqual(Category.objects.get(id=2).order, 13)
-        self.assertEqual(Category.objects.get(id=3).order, 1)
-        self.assertEqual(Category.objects.get(id=4).order, 0)
+        self.assertEqual(Category.objects.get(id=category1.id).order, 14)
+        self.assertEqual(Category.objects.get(id=category2.id).order, 13)
+        self.assertEqual(Category.objects.get(id=category3.id).order, 1)
+        self.assertEqual(Category.objects.get(id=category4.id).order, 0)
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
