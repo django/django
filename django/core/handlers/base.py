@@ -88,7 +88,7 @@ class BaseHandler:
                     ),
                 )
             if hasattr(mw_instance, "process_exception"):
-                # The exception-handling stack is still always synchronous for
+                # The exception-handling stack is still always synchronous for.
                 # now, so adapt that way.
                 self._exception_middleware.append(
                     self.adapt_method_mode(False, mw_instance.process_exception),
