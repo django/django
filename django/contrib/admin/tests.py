@@ -1,8 +1,6 @@
-from contextlib import contextmanager
-
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import modify_settings, override_settings
-from django.test.selenium import SeleniumTestCase
+from django.test.playwright import PlaywrightTestCase
 from django.utils.csp import CSP
 from django.utils.translation import gettext as _
 
@@ -22,7 +20,7 @@ __unittest = True
         "style-src": [CSP.SELF],
     },
 )
-class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
+class AdminPlaywrightTestCase(PlaywrightTestCase, StaticLiveServerTestCase):
     available_apps = [
         "django.contrib.admin",
         "django.contrib.auth",
@@ -31,202 +29,77 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         "django.contrib.sites",
     ]
 
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        # Track CSP violations via SecurityPolicyViolationEvent.
+        cls._csp_violations = []
+        cls._browser_context.expose_function(
+            "cspviolation",
+            lambda violation: cls._csp_violations.append(violation),
+        )
+        cls._browser_context.add_init_script("""
+            document.addEventListener('securitypolicyviolation', (e) => {
+                window.cspviolation({
+                    blockedURI: e.blockedURI,
+                    violatedDirective: e.violatedDirective,
+                    effectiveDirective: e.effectiveDirective,
+                    originalPolicy: e.originalPolicy,
+                    documentURI: e.documentURI,
+                });
+            });
+        """)
+
     def tearDown(self):
-        # Ensure that no CSP violations were logged in the browser.
-        self.assertEqual(self.get_browser_logs(source="security"), [])
-        super().tearDown()
-
-    def wait_until(self, callback, timeout=10):
-        """
-        Block the execution of the tests until the specified callback returns a
-        value that is not falsy. This method can be called, for example, after
-        clicking a link or submitting a form. See the other public methods that
-        call this function for more details.
-        """
-        from selenium.webdriver.support.wait import WebDriverWait
-
-        WebDriverWait(self.selenium, timeout).until(callback)
-
-    def wait_for_and_switch_to_popup(self, num_windows=2, timeout=10):
-        """
-        Block until `num_windows` are present and are ready (usually 2, but can
-        be overridden in the case of pop-ups opening other pop-ups). Switch the
-        current window to the new pop-up.
-        """
-        self.wait_until(lambda d: len(d.window_handles) == num_windows, timeout)
-        self.selenium.switch_to.window(self.selenium.window_handles[-1])
-        self.wait_page_ready()
-
-    def wait_for(self, css_selector, timeout=10):
-        """
-        Block until a CSS selector is found on the page.
-        """
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.support import expected_conditions as ec
-
-        self.wait_until(
-            ec.presence_of_element_located((By.CSS_SELECTOR, css_selector)), timeout
-        )
-
-    def wait_for_text(self, css_selector, text, timeout=10):
-        """
-        Block until the text is found in the CSS selector.
-        """
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.support import expected_conditions as ec
-
-        self.wait_until(
-            ec.text_to_be_present_in_element((By.CSS_SELECTOR, css_selector), text),
-            timeout,
-        )
-
-    def wait_for_value(self, css_selector, text, timeout=10):
-        """
-        Block until the value is found in the CSS selector.
-        """
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.support import expected_conditions as ec
-
-        self.wait_until(
-            ec.text_to_be_present_in_element_value(
-                (By.CSS_SELECTOR, css_selector), text
-            ),
-            timeout,
-        )
-
-    def wait_until_visible(self, css_selector, timeout=10):
-        """
-        Block until the element described by the CSS selector is visible.
-        """
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.support import expected_conditions as ec
-
-        self.wait_until(
-            ec.visibility_of_element_located((By.CSS_SELECTOR, css_selector)), timeout
-        )
-
-    def wait_until_invisible(self, css_selector, timeout=10):
-        """
-        Block until the element described by the CSS selector is invisible.
-        """
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.support import expected_conditions as ec
-
-        self.wait_until(
-            ec.invisibility_of_element_located((By.CSS_SELECTOR, css_selector)), timeout
-        )
-
-    def wait_page_ready(self, timeout=10):
-        """
-        Block until the page is ready.
-        """
-        self.wait_until(
-            lambda driver: driver.execute_script("return document.readyState;")
-            == "complete",
-            timeout,
-        )
-
-    @contextmanager
-    def wait_page_loaded(self, timeout=10):
-        """
-        Block until a new page has loaded and is ready.
-        """
-        from selenium.common.exceptions import WebDriverException
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.support import expected_conditions as ec
-
-        old_page = self.selenium.find_element(By.TAG_NAME, "html")
-        yield
-        # Wait for the next page to be loaded
         try:
-            self.wait_until(ec.staleness_of(old_page), timeout=timeout)
-        except WebDriverException:
-            # Issue in version 113+ of Chrome driver where a WebDriverException
-            # error is raised rather than a StaleElementReferenceException.
-            # See: https://issues.chromium.org/issues/42323468
-            pass
-
-        self.wait_page_ready(timeout=timeout)
-
-    def trigger_resize(self):
-        width = self.selenium.get_window_size()["width"]
-        height = self.selenium.get_window_size()["height"]
-        self.selenium.set_window_size(width + 1, height)
-        self.wait_page_ready()
-        self.selenium.set_window_size(width, height)
-        self.wait_page_ready()
+            # WebKit injects style during screenshot(), which triggers
+            # style-src-elem CSP violation.
+            if not (self.browser == "webkit" and self.screenshots):
+                # Ensure that no CSP violations were logged in the browser.
+                self.assertEqual(self._csp_violations, [])
+        finally:
+            self._csp_violations.clear()
+            super().tearDown()
 
     def admin_login(self, username, password, login_url="/admin/"):
         """
         Log in to the admin.
         """
-        from selenium.webdriver.common.by import By
-
-        self.selenium.get("%s%s" % (self.live_server_url, login_url))
-        username_input = self.selenium.find_element(By.NAME, "username")
-        username_input.send_keys(username)
-        password_input = self.selenium.find_element(By.NAME, "password")
-        password_input.send_keys(password)
+        self.page.goto(f"{self.live_server_url}{login_url}")
+        self.page.locator('[name="username"]').fill(username)
+        self.page.locator('[name="password"]').fill(password)
         login_text = _("Log in")
-        with self.wait_page_loaded():
-            self.selenium.find_element(
-                By.XPATH, '//input[@value="%s"]' % login_text
-            ).click()
+        self.page.get_by_role("button", name=login_text).click()
+        self.page.wait_for_url(f"{self.live_server_url}{login_url}")
 
-    def select_option(self, selector, value):
+    def click_and_expect_popup_to_close(self, locator):
         """
-        Select the <OPTION> with the value `value` inside the <SELECT> widget
-        identified by the CSS selector `selector`.
+        Click a button that closes the popup and wait until the popup is
+        closed.
         """
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.support.ui import Select
+        from playwright.sync_api import Error
 
-        select = Select(self.selenium.find_element(By.CSS_SELECTOR, selector))
-        select.select_by_value(value)
-
-    def deselect_option(self, selector, value):
-        """
-        Deselect the <OPTION> with the value `value` inside the <SELECT> widget
-        identified by the CSS selector `selector`.
-        """
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.support.ui import Select
-
-        select = Select(self.selenium.find_element(By.CSS_SELECTOR, selector))
-        select.deselect_by_value(value)
-
-    def assertCountSeleniumElements(self, selector, count, root_element=None):
-        """
-        Assert number of matches for a CSS selector.
-
-        `root_element` allow restriction to a pre-selected node.
-        """
-        from selenium.webdriver.common.by import By
-
-        root_element = root_element or self.selenium
-        self.assertEqual(
-            len(root_element.find_elements(By.CSS_SELECTOR, selector)), count
-        )
+        popup = locator.page
+        with popup.expect_event("close"):
+            try:
+                locator.click(no_wait_after=True)
+            except Error:
+                # The popup may close before Playwright finishes the click.
+                # See https://github.com/microsoft/playwright/issues/26900
+                if not popup.is_closed():
+                    raise
 
     def _assertOptionsValues(self, options_selector, values):
-        from selenium.webdriver.common.by import By
-
+        options = self.page.locator(options_selector)
         if values:
-            options = self.selenium.find_elements(By.CSS_SELECTOR, options_selector)
             actual_values = []
-            for option in options:
+            for option in options.all():
                 actual_values.append(option.get_attribute("value"))
             self.assertEqual(values, actual_values)
         else:
-            # Prevent the `find_elements(By.CSS_SELECTOR, …)` call from
-            # blocking if the selector doesn't match any options as we expect
-            # it to be the case.
-            with self.disable_implicit_wait():
-                self.wait_until(
-                    lambda driver: not driver.find_elements(
-                        By.CSS_SELECTOR, options_selector
-                    )
-                )
+            # Wait until no options match the selector, as expected after a
+            # DOM update that clears the <select>.
+            self.expect(options).to_have_count(0)
 
     def assertSelectOptions(self, selector, values):
         """
@@ -241,17 +114,3 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         selected options with the given `values`.
         """
         self._assertOptionsValues("%s > option:checked" % selector, values)
-
-    def is_disabled(self, selector):
-        """
-        Return True if the element identified by `selector` has the `disabled`
-        attribute.
-        """
-        from selenium.webdriver.common.by import By
-
-        return (
-            self.selenium.find_element(By.CSS_SELECTOR, selector).get_attribute(
-                "disabled"
-            )
-            == "true"
-        )
