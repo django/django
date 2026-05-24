@@ -12,7 +12,7 @@ class CustomStorage(Storage):
     def exists(self, name):
         return False
 
-    def _save(self, name):
+    def _save(self, name, content):
         return name
 
 
