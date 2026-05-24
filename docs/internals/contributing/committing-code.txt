@@ -25,7 +25,7 @@ standard themselves.
 
 You may want to have Jenkins or GitHub actions test the pull request with one
 of the pull request builders that doesn't run automatically, such as Oracle or
-Selenium. See the `CI wiki page`_ for instructions.
+Playwright. See the `CI wiki page`_ for instructions.
 
 .. _CI wiki page: https://code.djangoproject.com/wiki/CI
 
