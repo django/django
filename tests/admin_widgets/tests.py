@@ -1213,9 +1213,9 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         self.selenium.get(
             self.live_server_url + reverse("admin:admin_widgets_member_add")
         )
-        icon = self.selenium.find_element(By.ID, "calendarlink0")
+        icon = self.selenium.find_element(By.ID, "calendarbutton0")
         expected_focus_element = self.selenium.find_element(
-            By.CSS_SELECTOR, "div#calendarin0 table td.today a"
+            By.CSS_SELECTOR, "div#calendarin0 table td.today button"
         )
         icon.send_keys(Keys.ENTER)
         focused_element = self.selenium.switch_to.active_element

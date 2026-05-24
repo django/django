@@ -389,9 +389,9 @@
             });
             // Handle arrow key navigation within the calendar
             cal_box.addEventListener("keydown", function (event) {
-                const focused = cal_box.querySelector("a:focus");
+                const focused = cal_box.querySelector("button:focus");
                 if (!focused) return;
-                const cells = Array.from(cal_box.querySelectorAll("td a"));
+                const cells = Array.from(cal_box.querySelectorAll("td button"));
                 const currentIndex = cells.indexOf(focused);
                 if (currentIndex === -1) return;
 
@@ -635,9 +635,9 @@
             if (calendarDiv) {
                 // Focus on selected date, today, or first available date
                 const focusElement =
-                    cal_box.querySelector("td.selected a") ||
-                    cal_box.querySelector("td.today a") ||
-                    cal_box.querySelector("td a");
+                    cal_box.querySelector("td.selected button") ||
+                    cal_box.querySelector("td.today button") ||
+                    cal_box.querySelector("td button");
                 focusElement?.focus();
             }
         },
