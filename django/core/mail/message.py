@@ -217,7 +217,7 @@ class SafeMIMEText(MIMEMixin, MIMEText):
             # Quoted-Printable encoding has the side effect of shortening long
             # lines, if any (#22561).
             charset = utf8_charset_qp if has_long_lines else utf8_charset
-        MIMEText.set_payload(self, payload, charset=charset)
+        super().set_payload(payload, charset=charset)
 
 
 # RemovedInDjango70Warning.
