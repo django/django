@@ -2765,8 +2765,10 @@ class DeprecatedInternalsTests(SimpleTestCase):
         # (Using surrogateescape for non-utf8 is covered in test_encoding().)
         from django.core.mail import SafeMIMEText
 
-        def simplified_set_payload(instance, payload, charset):
-            instance._payload = payload
+        captured = []
+
+        def simplified_set_payload(payload, charset):
+            captured.append(payload)
 
         mock_set_payload.side_effect = simplified_set_payload
 
@@ -2775,6 +2777,7 @@ class DeprecatedInternalsTests(SimpleTestCase):
         ).encode("iso-8859-1")
         body = text.decode("ascii", errors="surrogateescape")
         message = SafeMIMEText(body, "plain", "ascii")
+        message._payload = captured[0]
         mock_set_payload.assert_called_once()
         self.assertEqual(message.get_payload(decode=True), text)
 
