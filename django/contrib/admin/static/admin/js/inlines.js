@@ -67,11 +67,11 @@
                             options.addCssClass +
                             '"><td colspan="' +
                             numCols +
-                            '"><a role="button" class="addlink" href="#">' +
+                            '"><button type="button" class="addlink">' +
                             options.addText +
-                            "</a></tr>",
+                            "</button></tr>",
                     );
-                    addButton = $parent.find("tr:last a");
+                    addButton = $parent.find("tr:last button");
                 } else {
                     // Otherwise, insert it immediately after the last form:
                     $this
@@ -79,11 +79,11 @@
                         .after(
                             '<div class="' +
                                 options.addCssClass +
-                                '"><a role="button" class="addlink" href="#">' +
+                                '"><button type="button" class="addlink">' +
                                 options.addText +
-                                "</a></div>",
+                                "</button></div>",
                         );
-                    addButton = $this.filter(":last").next().find("a");
+                    addButton = $this.filter(":last").next().find("button");
                 }
             }
             addButton.on("click", addInlineClickHandler);
@@ -138,35 +138,35 @@
                 // If the forms are laid out in table rows, insert
                 // the remove button into the last table cell:
                 row.children(":last").append(
-                    '<div><a role="button" class="' +
+                    '<div><button type="button" class="' +
                         options.deleteCssClass +
-                        '" href="#">' +
+                        '">' +
                         options.deleteText +
-                        "</a></div>",
+                        "</button></div>",
                 );
             } else if (row.is("ul") || row.is("ol")) {
                 // If they're laid out as an ordered/unordered list,
                 // insert an <li> after the last list item:
                 row.append(
-                    '<li><a role="button" class="' +
+                    '<li><button type="button" class="' +
                         options.deleteCssClass +
-                        '" href="#">' +
+                        '">' +
                         options.deleteText +
-                        "</a></li>",
+                        "</button></li>",
                 );
             } else {
                 // Otherwise, just insert the remove button as the
                 // last child element of the form's container:
                 row.children(":first").append(
-                    '<span><a role="button" class="' +
+                    '<span><button type="button" class="' +
                         options.deleteCssClass +
-                        '" href="#">' +
+                        '">' +
                         options.deleteText +
-                        "</a></span>",
+                        "</button></span>",
                 );
             }
             // Add delete handler for each row.
-            row.find("a." + options.deleteCssClass).on(
+            row.find("button." + options.deleteCssClass).on(
                 "click",
                 inlineDeleteHandler.bind(this),
             );

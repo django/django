@@ -223,14 +223,12 @@ depends on core.js for utility functions like removeChildren or quickElement
                     "class",
                     todayClass,
                 );
-                const link = quickElement(
-                    "a",
+                const button = quickElement(
+                    "button",
                     cell,
                     currentDay,
-                    "role",
+                    "type",
                     "button",
-                    "href",
-                    "#",
                 );
                 let ariaLabel = CalendarNamespace.formatDate(
                     currentDay,
@@ -255,8 +253,8 @@ depends on core.js for utility functions like removeChildren or quickElement
                         ariaLabel,
                     ]);
                 }
-                link.setAttribute("aria-label", ariaLabel);
-                link.addEventListener("click", calendarMonth(year, month));
+                button.setAttribute("aria-label", ariaLabel);
+                button.addEventListener("click", calendarMonth(year, month));
                 currentDay++;
             }
 

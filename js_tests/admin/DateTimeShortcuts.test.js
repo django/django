@@ -23,7 +23,7 @@ QUnit.test("init", function (assert) {
 
     const shortcuts = $(".datetimeshortcuts");
     assert.equal(shortcuts.length, 1);
-    assert.equal(shortcuts.find("a:first").text(), "Today");
+    assert.equal(shortcuts.find("button:first").text(), "Today");
     assert.equal(shortcuts.find("button:last .date-icon").length, 1);
 
     // To prevent incorrect timezone warnings on date/time widgets, timezoneOffset
@@ -39,7 +39,7 @@ QUnit.test("custom time shortcuts", function (assert) {
     $("#qunit-fixture").append(timeField);
     DateTimeShortcuts.clockHours.time_test = [["3 a.m.", 3]];
     DateTimeShortcuts.init();
-    assert.equal($(".clockbox").find("a").first().text(), "3 a.m.");
+    assert.equal($(".clockbox").find("button").first().text(), "3 a.m.");
 });
 
 QUnit.test("time zone offset warning - single field", function (assert) {
@@ -125,7 +125,7 @@ QUnit.test("today link has aria-label with current date", function (assert) {
     );
     $("#qunit-fixture").append(dateField);
     DateTimeShortcuts.init();
-    const todayLink = $(".datetimeshortcuts a:first");
+    const todayLink = $(".datetimeshortcuts button:first");
     assert.equal(todayLink.text(), "Today");
     // "Today (April 12, 2026)"
     const today = new Date();
@@ -163,7 +163,7 @@ QUnit.test("calendar today highlight with server offset", function (assert) {
     const todayCells = calDiv.find("td.today");
     assert.equal(todayCells.length, 1, "Exactly one cell marked as today");
     assert.equal(
-        todayCells.find("a").text(),
+        todayCells.find("button").text(),
         String(expectedDate.getDate()),
         "Today cell matches server-adjusted date",
     );

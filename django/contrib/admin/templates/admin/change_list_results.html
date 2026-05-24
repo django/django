@@ -18,7 +18,7 @@
          <a href="{{ header.url_toggle }}" class="toggle {{ header.ascending|yesno:'ascending,descending' }}" title="{% translate "Toggle sorting" %}"></a>
        </div>
    {% endif %}
-   <div class="text">{% if header.sortable %}<a role="button" href="{{ header.url_primary }}">{{ header.text|capfirst }}</a>{% else %}<span>{{ header.text|capfirst }}</span>{% endif %}</div>
+   <div class="text">{% if header.sortable %}<a href="{{ header.url_primary }}">{{ header.text|capfirst }}</a>{% else %}<span>{{ header.text|capfirst }}</span>{% endif %}</div>
    <div class="clear"></div>
 </th>{% endfor %}
 </tr>
