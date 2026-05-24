@@ -395,13 +395,15 @@ class LoadNode(Node):
 
 
 class NowNode(Node):
-    def __init__(self, format_string, asvar=None):
-        self.format_string = format_string
+    def __init__(self, format_obj, asvar=None):
+        self.format_obj = format_obj
         self.asvar = asvar
 
     def render(self, context):
         tzinfo = timezone.get_current_timezone() if settings.USE_TZ else None
-        formatted = date(datetime.now(tz=tzinfo), self.format_string)
+        format_string = self.format_obj.resolve(context)
+
+        formatted = date(datetime.now(tz=tzinfo), format_string)
 
         if self.asvar:
             context[self.asvar] = formatted
@@ -1181,7 +1183,7 @@ def lorem(parser, token):
 @register.tag
 def now(parser, token):
     """
-    Display the date, formatted according to the given string.
+    Display the date, formatted according to the given string or variable.
 
     Use the same format as PHP's ``date()`` function; see https://php.net/date
     for all the possible values.
@@ -1189,6 +1191,10 @@ def now(parser, token):
     Sample usage::
 
         It is {% now "jS F Y H:i" %}
+
+    You can also pass a template variable as the format string:
+
+        It is {% now my_date_format %}
     """
     bits = token.split_contents()
     asvar = None
@@ -1197,8 +1203,8 @@ def now(parser, token):
         bits = bits[:-2]
     if len(bits) != 2:
         raise TemplateSyntaxError("'now' statement takes one argument")
-    format_string = bits[1][1:-1]
-    return NowNode(format_string, asvar)
+    format_obj = parser.compile_filter(bits[1])
+    return NowNode(format_obj, asvar)
 
 
 @register.tag(name="partialdef")

@@ -96,3 +96,29 @@ class NowTagTests(SimpleTestCase):
             TemplateSyntaxError, "'now' statement takes one argument"
         ):
             self.engine.render_to_string("no_args")
+
+    @setup({"now_var": "{% now my_format %}"})
+    def test_now_variable(self):
+        output = self.engine.render_to_string("now_var", {"my_format": "j n Y"})
+        self.assertEqual(
+            output,
+            "%d %d %d"
+            % (
+                datetime.now().day,
+                datetime.now().month,
+                datetime.now().year,
+            ),
+        )
+
+    @setup({"now_var_as": "{% now my_format as N %}-{{ N }}-"})
+    def test_now_variable_as(self):
+        output = self.engine.render_to_string("now_var_as", {"my_format": "j n Y"})
+        self.assertEqual(
+            output,
+            "-%d %d %d-"
+            % (
+                datetime.now().day,
+                datetime.now().month,
+                datetime.now().year,
+            ),
+        )
