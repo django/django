@@ -1,4 +1,4 @@
-name: Selenium Tests
+name: Playwright Tests
 
 on:
   pull_request:
@@ -14,8 +14,8 @@ permissions:
    contents: read
 
 jobs:
-  selenium-sqlite:
-    if: contains(github.event.pull_request.labels.*.name, 'selenium')
+  playwright-sqlite:
+    if: contains(github.event.pull_request.labels.*.name, 'playwright')
     runs-on: ubuntu-latest
     name: SQLite
     timeout-minutes: 60
@@ -37,13 +37,15 @@ jobs:
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip wheel
       - run: python -m pip install -r tests/requirements/py3.txt -e .
-      - name: Run Selenium tests
+      - name: Install Playwright browsers
+        run: python -m playwright install --with-deps chromium
+      - name: Run Playwright tests
         working-directory: ./tests/
         run: |
-          python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_sqlite --parallel 1
+          python -Wall runtests.py --verbosity 2 --noinput --playwright=chromium --headless --settings=test_sqlite --parallel 1
 
-  selenium-postgresql:
-    if: contains(github.event.pull_request.labels.*.name, 'selenium')
+  playwright-postgresql:
+    if: contains(github.event.pull_request.labels.*.name, 'playwright')
     runs-on: ubuntu-latest
     name: PostgreSQL
     timeout-minutes: 60
@@ -79,9 +81,11 @@ jobs:
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip wheel
       - run: python -m pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .
+      - name: Install Playwright browsers
+        run: python -m playwright install --with-deps chromium
       - name: Create PostgreSQL settings file
         run: mv ./.github/workflows/data/test_postgres.py.tpl ./tests/test_postgres.py
-      - name: Run Selenium tests
+      - name: Run Playwright tests
         working-directory: ./tests/
         run: |
-          python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_postgres --parallel 1
+          python -Wall runtests.py --verbosity 2 --noinput --playwright=chromium --headless --settings=test_postgres --parallel 1

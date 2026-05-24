@@ -1,4 +1,4 @@
-from django.contrib.admin.tests import AdminSeleniumTestCase
+from django.contrib.admin.tests import AdminPlaywrightTestCase
 from django.contrib.auth.models import User
 from django.test import override_settings
 from django.urls import reverse
@@ -7,10 +7,12 @@ from .models import Podcast
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
-class SeleniumTests(AdminSeleniumTestCase):
-    available_apps = ["admin_views"] + AdminSeleniumTestCase.available_apps
+class PlaywrightTests(AdminPlaywrightTestCase):
+    available_apps = ["admin_views"] + AdminPlaywrightTestCase.available_apps
 
     def setUp(self):
+        if self.browser == "webkit":
+            self.skipTest("WebKit Tab key only focuses form controls, not links.")
         self.superuser = User.objects.create_superuser(
             username="super",
             password="secret",
@@ -18,10 +20,6 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
     def test_use_skip_link_to_content(self):
-        from selenium.webdriver.common.action_chains import ActionChains
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.common.keys import Keys
-
         self.admin_login(
             username="super",
             password="secret",
@@ -29,53 +27,43 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
         # `Skip link` is not present.
-        skip_link = self.selenium.find_element(By.CLASS_NAME, "skip-to-content-link")
-        self.assertFalse(skip_link.is_displayed())
+        skip_link = self.page.locator(".skip-to-content-link")
+        self.expect(skip_link).not_to_be_in_viewport()
 
         # 1st TAB is pressed, `skip link` is shown.
-        body = self.selenium.find_element(By.TAG_NAME, "body")
-        body.send_keys(Keys.TAB)
-        self.assertTrue(skip_link.is_displayed())
+        self.page.keyboard.press("Tab")
+        self.expect(skip_link).to_be_in_viewport()
 
         # Press RETURN to skip the navbar links (view site / documentation /
         # change password / log out) and focus first model in the admin_views
         # list.
-        skip_link.send_keys(Keys.RETURN)
-        self.assertFalse(skip_link.is_displayed())  # `skip link` disappear.
-        keys = [Keys.TAB, Keys.TAB]  # The 1st TAB is the section title.
-        if self.browser == "firefox":
-            # For some reason Firefox doesn't focus the section title
-            # ('ADMIN_VIEWS').
-            keys.remove(Keys.TAB)
-        body.send_keys(keys)
-        actors_a_tag = self.selenium.find_element(By.LINK_TEXT, "Actors")
-        self.assertEqual(self.selenium.switch_to.active_element, actors_a_tag)
+        self.page.keyboard.press("Enter")
+        self.expect(skip_link).not_to_be_in_viewport()  # `skip link` disappear.
+        tab_count = 1 if self.browser == "firefox" else 2
+        for _ in range(tab_count):
+            self.page.keyboard.press("Tab")
+        actors_link = self.page.get_by_role("link", name="Actors")
+        self.expect(actors_link).to_be_focused()
 
         # Go to Actors changelist, skip sidebar and focus "Add actor +".
-        with self.wait_page_loaded():
-            actors_a_tag.send_keys(Keys.RETURN)
-        body = self.selenium.find_element(By.TAG_NAME, "body")
-        body.send_keys(Keys.TAB)
-        skip_link = self.selenium.find_element(By.CLASS_NAME, "skip-to-content-link")
-        self.assertTrue(skip_link.is_displayed())
-        ActionChains(self.selenium).send_keys(Keys.RETURN, Keys.TAB).perform()
+        actors_link.press("Enter")
+        self.page.wait_for_load_state("load")
+        self.page.keyboard.press("Tab")
+        skip_link = self.page.locator(".skip-to-content-link")
+        self.expect(skip_link).to_be_in_viewport()
+        self.page.keyboard.press("Enter")
+        self.page.keyboard.press("Tab")
         actors_add_url = reverse("admin:admin_views_actor_add")
-        actors_a_tag = self.selenium.find_element(
-            By.CSS_SELECTOR, f"#content [href='{actors_add_url}']"
-        )
-        self.assertEqual(self.selenium.switch_to.active_element, actors_a_tag)
+        actors_add_link = self.page.locator(f"#content [href='{actors_add_url}']")
+        self.expect(actors_add_link).to_be_focused()
 
         # Go to the Actor form and the first input will be focused
         # automatically.
-        with self.wait_page_loaded():
-            actors_a_tag.send_keys(Keys.RETURN)
-        first_input = self.selenium.find_element(By.ID, "id_name")
-        self.assertEqual(self.selenium.switch_to.active_element, first_input)
+        actors_add_link.press("Enter")
+        first_input = self.page.locator("#id_name")
+        self.expect(first_input).to_be_focused()
 
     def test_dont_use_skip_link_to_content(self):
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.common.keys import Keys
-
         self.admin_login(
             username="super",
             password="secret",
@@ -83,28 +71,22 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
         # `Skip link` is not present.
-        skip_link = self.selenium.find_element(By.CLASS_NAME, "skip-to-content-link")
-        self.assertFalse(skip_link.is_displayed())
+        skip_link = self.page.locator(".skip-to-content-link")
+        self.expect(skip_link).not_to_be_in_viewport()
 
         # 1st TAB is pressed, `skip link` is shown.
-        body = self.selenium.find_element(By.TAG_NAME, "body")
-        body.send_keys(Keys.TAB)
-        self.assertTrue(skip_link.is_displayed())
+        self.page.keyboard.press("Tab")
+        self.expect(skip_link).to_be_in_viewport()
 
         # The 2nd TAB will focus the page title.
-        body.send_keys(Keys.TAB)
-        django_administration_title = self.selenium.find_element(
-            By.LINK_TEXT, "Django administration"
+        self.page.keyboard.press("Tab")
+        django_administration_title = self.page.get_by_role(
+            "link", name="Django administration"
         )
-        self.assertFalse(skip_link.is_displayed())  # `skip link` disappear.
-        self.assertEqual(
-            self.selenium.switch_to.active_element, django_administration_title
-        )
+        self.expect(skip_link).not_to_be_in_viewport()  # `skip link` disappear.
+        self.expect(django_administration_title).to_be_focused()
 
     def test_skip_link_with_RTL_language_doesnt_create_horizontal_scrolling(self):
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.common.keys import Keys
-
         with override_settings(LANGUAGE_CODE="ar"):
             self.admin_login(
                 username="super",
@@ -112,31 +94,30 @@ class SeleniumTests(AdminSeleniumTestCase):
                 login_url=reverse("admin:index"),
             )
 
-            skip_link = self.selenium.find_element(
-                By.CLASS_NAME, "skip-to-content-link"
-            )
-            body = self.selenium.find_element(By.TAG_NAME, "body")
-            body.send_keys(Keys.TAB)
-            self.assertTrue(skip_link.is_displayed())
+            self.page.goto(f"{self.live_server_url}{reverse('admin:index')}")
 
-            is_vertical_scrolleable = self.selenium.execute_script(
-                "return arguments[0].scrollHeight > arguments[0].offsetHeight;", body
+            skip_link = self.page.locator(".skip-to-content-link")
+            body = self.page.locator("body")
+            self.page.keyboard.press("Tab")
+            self.expect(skip_link).to_be_in_viewport()
+
+            is_vertical_scrolleable = body.evaluate(
+                "el => el.scrollHeight > el.offsetHeight"
             )
-            is_horizontal_scrolleable = self.selenium.execute_script(
-                "return arguments[0].scrollWidth > arguments[0].offsetWidth;", body
+            is_horizontal_scrolleable = body.evaluate(
+                "el => el.scrollWidth > el.offsetWidth"
             )
             self.assertTrue(is_vertical_scrolleable)
             self.assertFalse(is_horizontal_scrolleable)
 
     def test_skip_link_keyboard_navigation_in_changelist(self):
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.common.keys import Keys
-
         Podcast.objects.create(name="apple", release_date="2000-09-19")
         self.admin_login(
-            username="super", password="secret", login_url=reverse("admin:index")
+            username="super",
+            password="secret",
+            login_url=reverse("admin:index"),
         )
-        self.selenium.get(
+        self.page.goto(
             self.live_server_url + reverse("admin:admin_views_podcast_changelist")
         )
         selectors = [
@@ -148,24 +129,21 @@ class SeleniumTests(AdminSeleniumTestCase):
             "table#result_list",  # table.
             "div.changelist-footer",  # footer.
         ]
-        content = self.selenium.find_element(By.ID, "content-start")
-        content.send_keys(Keys.TAB)
+        self.page.locator("#content-start").press("Tab")
 
         for selector in selectors:
             with self.subTest(selector=selector):
                 # Currently focused element.
-                focused_element = self.selenium.switch_to.active_element
-                expected_element = self.selenium.find_element(By.CSS_SELECTOR, selector)
-                element_points = self.selenium.find_elements(
-                    By.CSS_SELECTOR,
-                    f"{selector} a, {selector} input, {selector} button",
+                focused_outer_html = self.page.evaluate(
+                    "document.activeElement.outerHTML"
                 )
-                self.assertIn(
-                    focused_element.get_attribute("outerHTML"),
-                    expected_element.get_attribute("innerHTML"),
-                )
+                expected_inner_html = self.page.locator(selector).inner_html()
+                element_points = self.page.locator(
+                    f"{selector} a, {selector} input, {selector} button"
+                ).all()
+                self.assertIn(focused_outer_html, expected_inner_html)
                 # Move to the next container element via TAB.
                 for point in element_points[::-1]:
-                    if point.is_displayed():
-                        point.send_keys(Keys.TAB)
+                    if point.is_visible():
+                        point.press("Tab")
                         break

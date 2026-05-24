@@ -11,7 +11,7 @@ from django.test import (
     modify_settings,
     override_settings,
 )
-from django.test.selenium import SeleniumTestCase
+from django.test.playwright import PlaywrightTestCase
 from django.urls import reverse
 from django.utils.translation import get_language, override
 from django.views.i18n import JavaScriptCatalog, get_formats
@@ -526,7 +526,7 @@ class I18NViewTests(SimpleTestCase):
 
 
 @override_settings(ROOT_URLCONF="view_tests.urls")
-class I18nSeleniumTests(SeleniumTestCase):
+class I18nPlaywrightTests(PlaywrightTestCase):
     # The test cases use fixtures & translations from these apps.
     available_apps = [
         "django.contrib.admin",
@@ -537,26 +537,15 @@ class I18nSeleniumTests(SeleniumTestCase):
 
     @override_settings(LANGUAGE_CODE="de")
     def test_javascript_gettext(self):
-        from selenium.webdriver.common.by import By
-
-        self.selenium.get(self.live_server_url + "/jsi18n_template/")
-        elem = self.selenium.find_element(By.ID, "gettext")
-        self.assertEqual(elem.text, "Entfernen")
-        elem = self.selenium.find_element(By.ID, "ngettext_sing")
-        self.assertEqual(elem.text, "1 Element")
-        elem = self.selenium.find_element(By.ID, "ngettext_plur")
-        self.assertEqual(elem.text, "455 Elemente")
-        elem = self.selenium.find_element(By.ID, "ngettext_onnonplural")
-        self.assertEqual(elem.text, "Bild")
-        elem = self.selenium.find_element(By.ID, "pgettext")
-        self.assertEqual(elem.text, "Kann")
-        elem = self.selenium.find_element(By.ID, "npgettext_sing")
-        self.assertEqual(elem.text, "1 Resultat")
-        elem = self.selenium.find_element(By.ID, "npgettext_plur")
-        self.assertEqual(elem.text, "455 Resultate")
-        elem = self.selenium.find_element(By.ID, "formats")
-        self.assertEqual(
-            elem.text,
+        self.page.goto(self.live_server_url + "/jsi18n_template/")
+        self.expect(self.page.locator("#gettext")).to_have_text("Entfernen")
+        self.expect(self.page.locator("#ngettext_sing")).to_have_text("1 Element")
+        self.expect(self.page.locator("#ngettext_plur")).to_have_text("455 Elemente")
+        self.expect(self.page.locator("#ngettext_onnonplural")).to_have_text("Bild")
+        self.expect(self.page.locator("#pgettext")).to_have_text("Kann")
+        self.expect(self.page.locator("#npgettext_sing")).to_have_text("1 Resultat")
+        self.expect(self.page.locator("#npgettext_plur")).to_have_text("455 Resultate")
+        self.expect(self.page.locator("#formats")).to_have_text(
             "DATE_INPUT_FORMATS is an object; DECIMAL_SEPARATOR is a string; "
             "FIRST_DAY_OF_WEEK is a number;",
         )
@@ -564,14 +553,10 @@ class I18nSeleniumTests(SeleniumTestCase):
     @modify_settings(INSTALLED_APPS={"append": ["view_tests.app1", "view_tests.app2"]})
     @override_settings(LANGUAGE_CODE="fr")
     def test_multiple_catalogs(self):
-        from selenium.webdriver.common.by import By
-
-        self.selenium.get(self.live_server_url + "/jsi18n_multi_catalogs/")
-        elem = self.selenium.find_element(By.ID, "app1string")
-        self.assertEqual(
-            elem.text, "il faut traduire cette chaîne de caractères de app1"
+        self.page.goto(self.live_server_url + "/jsi18n_multi_catalogs/")
+        self.expect(self.page.locator("#app1string")).to_have_text(
+            "il faut traduire cette chaîne de caractères de app1",
         )
-        elem = self.selenium.find_element(By.ID, "app2string")
-        self.assertEqual(
-            elem.text, "il faut traduire cette chaîne de caractères de app2"
+        self.expect(self.page.locator("#app2string")).to_have_text(
+            "il faut traduire cette chaîne de caractères de app2",
         )

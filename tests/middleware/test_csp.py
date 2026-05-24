@@ -1,10 +1,8 @@
-import time
-
 from utils_tests.test_csp import basic_config, basic_policy
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import SimpleTestCase
-from django.test.selenium import SeleniumTestCase
+from django.test.playwright import PlaywrightTestCase
 from django.test.utils import modify_settings, override_settings
 from django.utils.csp import CSP
 
@@ -181,7 +179,7 @@ class CSPMiddlewareWithDecoratedViewsTest(SimpleTestCase):
 @modify_settings(
     MIDDLEWARE={"append": "django.middleware.csp.ContentSecurityPolicyMiddleware"}
 )
-class CSPSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
+class CSPPlaywrightTestCase(PlaywrightTestCase, StaticLiveServerTestCase):
     available_apps = ["middleware"]
 
     def setUp(self):
@@ -190,8 +188,8 @@ class CSPSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
 
     def test_reports_are_generated(self):
         url = self.live_server_url + "/csp-failure/"
-        self.selenium.get(url)
-        time.sleep(1)  # Allow time for the CSP report to be sent.
+        self.page.goto(url)
+        self.page.wait_for_load_state("networkidle")
         reports = sorted(
             (r["csp-report"]["document-uri"], r["csp-report"]["violated-directive"])
             for r in csp_reports

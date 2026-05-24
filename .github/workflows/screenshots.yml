@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 jobs:
-  selenium-screenshots:
+  playwright-screenshots:
     if: contains(join(github.event.pull_request.labels.*.name, '|'), 'screenshots')
     runs-on: ubuntu-latest
     name: Screenshots
@@ -37,10 +37,12 @@ jobs:
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip wheel
       - run: python -m pip install -r tests/requirements/py3.txt -e .
+      - name: Install Playwright browsers
+        run: python -m playwright install --with-deps chromium
 
-      - name: Run Selenium tests with screenshots
+      - name: Run Playwright tests with screenshots
         working-directory: ./tests/
-        run: python -Wall runtests.py --verbosity=2 --noinput --selenium=chrome --headless --screenshots --settings=test_sqlite --parallel=1
+        run: python -Wall runtests.py --verbosity=2 --noinput --playwright=chromium --headless --screenshots --settings=test_sqlite --parallel=1
 
       - name: Cache oxipng
         uses: actions/cache@v6

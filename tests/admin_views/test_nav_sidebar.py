@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.contrib.admin.tests import AdminSeleniumTestCase
+from django.contrib.admin.tests import AdminPlaywrightTestCase
 from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
 from django.urls import path, reverse
@@ -118,8 +118,8 @@ class AdminSidebarTests(TestCase):
 
 
 @override_settings(ROOT_URLCONF="admin_views.test_nav_sidebar")
-class SeleniumTests(AdminSeleniumTestCase):
-    available_apps = ["admin_views"] + AdminSeleniumTestCase.available_apps
+class PlaywrightTests(AdminPlaywrightTestCase):
+    available_apps = ["admin_views"] + AdminPlaywrightTestCase.available_apps
 
     def setUp(self):
         self.superuser = User.objects.create_superuser(
@@ -132,102 +132,78 @@ class SeleniumTests(AdminSeleniumTestCase):
             password="secret",
             login_url=reverse("test_with_sidebar:index"),
         )
-        self.selenium.execute_script(
-            "localStorage.removeItem('django.admin.navSidebarIsOpen')"
-        )
+        self.page.evaluate("localStorage.removeItem('django.admin.navSidebarIsOpen')")
 
     def test_sidebar_starts_open(self):
-        from selenium.webdriver.common.by import By
-
-        self.selenium.get(
+        self.page.goto(
             self.live_server_url + reverse("test_with_sidebar:auth_user_changelist")
         )
-        main_element = self.selenium.find_element(By.CSS_SELECTOR, "#main")
-        self.assertIn("shifted", main_element.get_attribute("class").split())
+        main_element = self.page.locator("#main")
+        self.expect(main_element).to_contain_class("shifted")
 
     def test_sidebar_can_be_closed(self):
-        from selenium.webdriver.common.by import By
-
-        self.selenium.get(
+        self.page.goto(
             self.live_server_url + reverse("test_with_sidebar:auth_user_changelist")
         )
-        toggle_button = self.selenium.find_element(
-            By.CSS_SELECTOR, "#toggle-nav-sidebar"
-        )
-        self.assertEqual(toggle_button.tag_name, "button")
-        self.assertEqual(toggle_button.get_attribute("aria-label"), "Toggle navigation")
-        nav_sidebar = self.selenium.find_element(By.ID, "nav-sidebar")
-        self.assertEqual(nav_sidebar.get_attribute("aria-expanded"), "true")
-        self.assertTrue(nav_sidebar.is_displayed())
+        toggle_button = self.page.locator("#toggle-nav-sidebar")
+        self.expect(toggle_button).to_have_role("button")
+        self.expect(toggle_button).to_have_accessible_name("Toggle navigation")
+        nav_sidebar = self.page.locator("#nav-sidebar")
+        self.expect(nav_sidebar).to_have_attribute("aria-expanded", "true")
+        self.expect(nav_sidebar).to_be_visible()
         toggle_button.click()
 
         # Hidden sidebar is not visible.
-        nav_sidebar = self.selenium.find_element(By.ID, "nav-sidebar")
-        self.assertEqual(nav_sidebar.get_attribute("aria-expanded"), "false")
-        self.assertFalse(nav_sidebar.is_displayed())
-        main_element = self.selenium.find_element(By.CSS_SELECTOR, "#main")
-        self.assertNotIn("shifted", main_element.get_attribute("class").split())
+        self.expect(nav_sidebar).to_have_attribute("aria-expanded", "false")
+        self.expect(nav_sidebar).to_be_hidden()
+        main_element = self.page.locator("#main")
+        self.expect(main_element).not_to_contain_class("shifted")
 
     def test_sidebar_state_persists(self):
-        from selenium.webdriver.common.by import By
-
-        self.selenium.get(
+        self.page.goto(
             self.live_server_url + reverse("test_with_sidebar:auth_user_changelist")
         )
         self.assertIsNone(
-            self.selenium.execute_script(
-                "return localStorage.getItem('django.admin.navSidebarIsOpen')"
-            )
+            self.page.evaluate("localStorage.getItem('django.admin.navSidebarIsOpen')")
         )
-        toggle_button = self.selenium.find_element(
-            By.CSS_SELECTOR, "#toggle-nav-sidebar"
-        )
+        toggle_button = self.page.locator("#toggle-nav-sidebar")
         toggle_button.click()
         self.assertEqual(
-            self.selenium.execute_script(
-                "return localStorage.getItem('django.admin.navSidebarIsOpen')"
-            ),
+            self.page.evaluate("localStorage.getItem('django.admin.navSidebarIsOpen')"),
             "false",
         )
-        self.selenium.get(
+        self.page.goto(
             self.live_server_url + reverse("test_with_sidebar:auth_user_changelist")
         )
-        main_element = self.selenium.find_element(By.CSS_SELECTOR, "#main")
-        self.assertNotIn("shifted", main_element.get_attribute("class").split())
+        main_element = self.page.locator("#main")
+        self.expect(main_element).not_to_contain_class("shifted")
 
-        toggle_button = self.selenium.find_element(
-            By.CSS_SELECTOR, "#toggle-nav-sidebar"
-        )
+        toggle_button = self.page.locator("#toggle-nav-sidebar")
         # Hidden sidebar is not visible.
-        nav_sidebar = self.selenium.find_element(By.ID, "nav-sidebar")
-        self.assertEqual(nav_sidebar.get_attribute("aria-expanded"), "false")
-        self.assertFalse(nav_sidebar.is_displayed())
+        nav_sidebar = self.page.locator("#nav-sidebar")
+        self.expect(nav_sidebar).to_have_attribute("aria-expanded", "false")
+        self.expect(nav_sidebar).to_be_hidden()
         toggle_button.click()
-        nav_sidebar = self.selenium.find_element(By.ID, "nav-sidebar")
-        self.assertEqual(nav_sidebar.get_attribute("aria-expanded"), "true")
-        self.assertTrue(nav_sidebar.is_displayed())
+        self.expect(nav_sidebar).to_have_attribute("aria-expanded", "true")
+        self.expect(nav_sidebar).to_be_visible()
         self.assertEqual(
-            self.selenium.execute_script(
-                "return localStorage.getItem('django.admin.navSidebarIsOpen')"
-            ),
+            self.page.evaluate("localStorage.getItem('django.admin.navSidebarIsOpen')"),
             "true",
         )
-        self.selenium.get(
+        self.page.goto(
             self.live_server_url + reverse("test_with_sidebar:auth_user_changelist")
         )
-        main_element = self.selenium.find_element(By.CSS_SELECTOR, "#main")
-        self.assertIn("shifted", main_element.get_attribute("class").split())
+        main_element = self.page.locator("#main")
+        self.expect(main_element).to_contain_class("shifted")
 
     def test_sidebar_filter_persists(self):
-        from selenium.webdriver.common.by import By
-
-        self.selenium.get(
+        self.page.goto(
             self.live_server_url + reverse("test_with_sidebar:auth_user_changelist")
         )
         filter_value_script = (
-            "return sessionStorage.getItem('django.admin.navSidebarFilterValue')"
+            "sessionStorage.getItem('django.admin.navSidebarFilterValue')"
         )
-        self.assertIsNone(self.selenium.execute_script(filter_value_script))
-        filter_input = self.selenium.find_element(By.CSS_SELECTOR, "#nav-filter")
-        filter_input.send_keys("users")
-        self.assertEqual(self.selenium.execute_script(filter_value_script), "users")
+        self.assertIsNone(self.page.evaluate(filter_value_script))
+        filter_input = self.page.locator("#nav-filter")
+        filter_input.fill("users")
+        self.assertEqual(self.page.evaluate(filter_value_script), "users")
