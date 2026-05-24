@@ -80,7 +80,6 @@ from .models import (
     CyclicTwo,
     DooHickey,
     Employee,
-    EmptyModel,
     Fabric,
     FancyDoodad,
     FieldOverridePost,
@@ -89,6 +88,7 @@ from .models import (
     FoodDelivery,
     FunkyTag,
     Gallery,
+    GetQuerySetModel,
     Grommet,
     Inquisition,
     Language,
@@ -5454,7 +5454,8 @@ class AdminCustomQuerysetTest(TestCase):
         cls.superuser = User.objects.create_superuser(
             username="super", password="secret", email="super@example.com"
         )
-        cls.pks = [EmptyModel.objects.create().id for i in range(3)]
+        cls.obj = GetQuerySetModel.objects.create()
+        cls.deleted_obj = GetQuerySetModel.objects.create(deleted=True)
 
     def setUp(self):
         self.client.force_login(self.superuser)
@@ -5465,12 +5466,11 @@ class AdminCustomQuerysetTest(TestCase):
         }
 
     def test_changelist_view(self):
-        response = self.client.get(reverse("admin:admin_views_emptymodel_changelist"))
-        for i in self.pks:
-            if i > 1:
-                self.assertContains(response, "Primary key = %s" % i)
-            else:
-                self.assertNotContains(response, "Primary key = %s" % i)
+        # The changelist filters objects using ModelAdmin.get_queryset().
+        url = reverse("admin:admin_views_getquerysetmodel_changelist")
+        response = self.client.get(url)
+        self.assertContains(response, str(self.obj))
+        self.assertNotContains(response, str(self.deleted_obj))
 
     def test_changelist_view_count_queries(self):
         # create 2 Person objects
@@ -5501,17 +5501,23 @@ class AdminCustomQuerysetTest(TestCase):
             self.assertEqual(resp.context["selection_note_all"], "1 selected")
 
     def test_change_view(self):
-        for i in self.pks:
-            url = reverse("admin:admin_views_emptymodel_change", args=(i,))
-            response = self.client.get(url, follow=True)
-            if i > 1:
-                self.assertEqual(response.status_code, 200)
-            else:
-                self.assertRedirects(response, reverse("admin:index"))
-                self.assertEqual(
-                    [m.message for m in response.context["messages"]],
-                    ["empty model with ID “1” doesn’t exist. Perhaps it was deleted?"],
-                )
+        # The change view filters objects using ModelAdmin.get_queryset().
+        url = reverse("admin:admin_views_getquerysetmodel_change", args=(self.obj.pk,))
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # The deleted object isn't accessible.
+        url = reverse(
+            "admin:admin_views_getquerysetmodel_change", args=(self.deleted_obj.pk,)
+        )
+        response = self.client.get(url, follow=True)
+        self.assertRedirects(response, reverse("admin:index"))
+        self.assertEqual(
+            [m.message for m in response.context["messages"]],
+            [
+                f"get query set model with ID “{self.deleted_obj.pk}” doesn’t "
+                "exist. Perhaps it was deleted?"
+            ],
+        )
 
     def test_add_model_modeladmin_defer_qs(self):
         # Test for #14529. defer() is used in ModelAdmin.get_queryset()

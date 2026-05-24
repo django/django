@@ -390,7 +390,9 @@ class Toy(models.Model):
     child = models.ForeignKey(PKChild, models.CASCADE)
 
 
-class EmptyModel(models.Model):
+class GetQuerySetModel(models.Model):
+    deleted = models.BooleanField(default=False)
+
     def __str__(self):
         return "Primary key = %s" % self.id
 
