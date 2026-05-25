@@ -50,7 +50,7 @@ Run the tests:
     $ ./tests/runtests.py
 
 If ten or fewer tests fail, you're likely okay to move on. However, keep in
-mind if the code you're changing requires changing those tests, you'll need
+mind if the code you're changing requires changing those failing tests, you'll need
 to fix the underlying issues on your machine first. There are 10,000+ tests
 though, so it's unlikely.
 
@@ -64,7 +64,7 @@ Build the documentation:
 Finding an issue to work on
 ===========================
 
-Finding a workable ticket is a challenging issue. The ways to get started
+Finding a workable ticket is a challenging issue. Some ways to get started
 are the following:
 
 * Look at the `easy pickings`_.
