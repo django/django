@@ -241,6 +241,15 @@ Django raises an error with next steps.
 
     Updating permissions when models are renamed was added.
 
+Similarly, when a model's :attr:`~django.db.models.Options.verbose_name`
+changes, Django updates the names of its existing default permissions to match
+the next time you run :cli:`manage.py migrate <migrate>`.
+
+.. versionchanged:: 6.2
+
+    Updating permission names when a model's ``verbose_name`` changes was
+    added.
+
 Assuming you have an application with an
 :attr:`~django.db.models.Options.app_label` ``foo`` and a model named ``Bar``,
 to test for basic permissions you should use:
