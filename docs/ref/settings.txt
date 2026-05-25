@@ -3205,12 +3205,18 @@ the correct environment.
 ------------------------------------
 
 .. versionadded:: 6.1
-.. deprecated:: 6.1
 
 Default: ``False``
 
-Set this transitional setting to ``True`` to revert back to the old default
-blank choice label in forms.
+The default blank choice label in ``Select`` widgets was changed from
+``"---------"`` to ``django.db.models.fields.BLANK_CHOICE_LABEL``. Set this
+transitional setting to ``True`` to revert to the previous label.
+
+.. deprecated:: 6.1
+
+    This setting will be removed in Django 7.0. To use a custom default blank
+    choice label, override ``django.db.models.fields.BLANK_CHOICE_LABEL`` in
+    the app's ``ready()`` method.
 
 .. setting:: USE_I18N
 
