@@ -13,11 +13,11 @@ First steps
   :doc:`Overview </intro/overview>` |
   :doc:`Installation </intro/install>`
 
-Django's tutorial is a hands-on learning experience, that takes you through key
-operations and concepts to build a working application.
+The tutorial takes you by the hand through a series of steps to create a
+web application.
 
 * **Tutorial**:
-  :doc:`Part 1: Requests and responses </intro/tutorial01>` |
+  :doc:`Part 1: Setting things up </intro/tutorial01>` |
   :doc:`Part 2: Models and the admin site </intro/tutorial02>` |
   :doc:`Part 3: Views and templates </intro/tutorial03>` |
   :doc:`Part 4: Forms and generic views </intro/tutorial04>` |
@@ -115,7 +115,8 @@ The template layer
 ==================
 
 The template layer provides a designer-friendly syntax for rendering the
-information to be presented to the user. Template functionality can also be customized.
+information to be presented to the user. Template functionality can also be
+customized.
 
 * **The basics**:
   :doc:`Overview </topics/templates>` |
@@ -141,7 +142,7 @@ Other core functionality
 * **Exceptions**:
   :doc:`Overview </ref/exceptions>`
 
-* **django-admin and manage.py**:
+* **Command line tools**:
   :doc:`Overview </ref/django-admin>` |
   :doc:`Adding custom commands </howto/custom-management-commands>`
 
@@ -215,7 +216,7 @@ Developer-facing features
 Resources and interfaces
 ========================
 
-* **Supported databases**:
+* **Databases**:
   :doc:`Supported databases </ref/databases>` |
   :doc:`Legacy databases </howto/legacy-databases>`
 
