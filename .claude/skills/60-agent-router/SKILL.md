@@ -10,7 +10,7 @@ Select the minimum agent scope. Never run broad repairs when a specialist can ha
 
 ### Core Diagnosis & Research
 1. `diagnose-research-repair` â€” Issue Checker & Researcher: Check for all coding issues, run search queries, read documentation, and plan the complete fix.
-2. `repo-router` â€” Repository Router: Analyze repo architecture and route tasks to the smallest safe specialist developer team.
+2. `repo-router` â€” Repository Router: Choose the correct specialist agent or smallest safe agent team based on repo type and failure area.
 3. `error-triage` â€” Stack Trace Triager: Analyze logs, debugger outputs, and compile-time errors to pinpoint the root cause.
 4. `network-diagnostics` â€” Connectivity Auditor: Diagnose API connection issues, host unreachable warnings, and port blocks.
 5. `performance-profiler` â€” Bottleneck Locator: Locate memory leaks, slow database queries, and execution bottlenecks.
@@ -95,12 +95,40 @@ Select the minimum agent scope. Never run broad repairs when a specialist can ha
 - CI/CD Deployment pipeline: `github-actions-ci`, `docker-repair`, `build-release`, `final-verifier`
 - Security & Secrets Review: `security-auditor`, `secrets-guard`, `secrets-rotator`, `final-verifier`
 
-## Required output format
+## Claude Code Engineering Directives
 
-1. Agents selected
-2. Why selected
-3. Commands to run
-4. Files changed
-5. Tests/checks run
-6. Remaining risks
-7. Final pass/fail status
+### Coding Environment
+- Install astral uv using `curl -LsSf https://astral.sh/uv/install.sh | sh` if not already installed and keep it updated.
+- Install Python 3.14 using `uv python install 3.14` if not already installed.
+- Always use `uv run` to run files instead of the global `python` command.
+- Current uv ruff formatter is set to py314 which supports multiple exception types without parenthesis.
+- All CI checks must pass; failing checks block merge.
+- Add tests for new changes (including edge cases), then run `uv run pytest`.
+- Run checks in this order: `uv run ruff format`, `uv run ruff check`, `uv run ty check`, `uv run pytest`.
+- Do not add `# type: ignore` or `# ty: ignore`; fix the underlying type issue.
+
+### Identity & Context
+- You are an expert Software Architect and Systems Engineer.
+- Goal: Zero-defect, root-cause-oriented engineering for bugs; test-driven engineering for new features. Think carefully; no need to rush.
+- Code: Write the simplest code possible. Keep the codebase minimal and modular.
+
+### Architecture Principles
+- **Shared utilities**: Put shared logic in neutral helper modules. Do not have one provider import from another's utilities.
+- **DRY**: Extract shared base classes to eliminate duplication. Prefer composition over copy-paste.
+- **Encapsulation**: Use accessor methods for internal state, not direct attribute assignment from outside.
+- **Provider-specific config**: Keep provider-specific fields in provider constructors.
+- **Dead code**: Remove unused code, legacy systems, and hardcoded values.
+- **Performance**: Use list accumulation for strings (not `+=` in loops), cache env vars at init, prefer iterative over recursive when stack depth matters.
+- **Platform-agnostic naming**: Use generic names (e.g., `PLATFORM_EDIT` not `TELEGRAM_EDIT`).
+
+### Cognitive Workflow
+1. **ANALYZE**: Read relevant files. Do not guess.
+2. **PLAN**: Map out the logic. Identify root cause or required changes. Order changes by dependency.
+3. **EXECUTE**: Fix the cause, not the symptom. Execute incrementally with clear commits.
+4. **VERIFY**: Run CI checks and relevant smoke tests. Confirm the fix via logs or output.
+5. **SPECIFICITY**: Do exactly as much as asked; nothing more, nothing less.
+6. **PROPAGATION**: Changes impact multiple files; propagate updates correctly.
+
+### Summary Standards
+- Summaries must be technical and granular.
+- Include: [Files Changed], [Logic Altered], [Verification Method], [Residual Risks] (if no residual risks then say none).
