@@ -3,7 +3,7 @@ import unittest
 
 from django.apps.registry import Apps
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import connection, models
 from django.test import TestCase
 
 from .models import (
@@ -135,8 +135,9 @@ class PerformUniqueChecksTest(TestCase):
 
     def test_primary_key_unique_check_performed_when_adding_and_pk_specified(self):
         # Regression test for #12560
+        id_ = connection.ops.get_hardcoded_pk(123)
         with self.assertNumQueries(1):
-            mtv = ModelToValidate(number=10, name="Some Name", id=123)
+            mtv = ModelToValidate(number=10, name="Some Name", id=id_)
             setattr(mtv, "_adding", True)
             mtv.full_clean()
 

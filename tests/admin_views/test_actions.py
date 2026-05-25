@@ -123,7 +123,7 @@ class AdminActionsTest(TestCase):
         If USE_THOUSAND_SEPARATOR is set, the ids for the objects selected for
         deletion are rendered without separators.
         """
-        s = ExternalSubscriber.objects.create(id=9999)
+        s = ExternalSubscriber.objects.create(id=connection.ops.get_hardcoded_pk(9999))
         action_data = {
             ACTION_CHECKBOX_NAME: [s.pk, self.s2.pk],
             "action": "delete_selected",
@@ -133,7 +133,7 @@ class AdminActionsTest(TestCase):
             reverse("admin:admin_views_subscriber_changelist"), action_data
         )
         self.assertTemplateUsed(response, "admin/delete_selected_confirmation.html")
-        self.assertContains(response, 'value="9999"')  # Instead of 9,999
+        self.assertContains(response, f'value="{s.pk}"')  # Instead of 9,999
         self.assertContains(response, 'value="%s"' % self.s2.pk)
 
     def test_model_admin_default_delete_action_protected(self):

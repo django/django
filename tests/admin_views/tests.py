@@ -26,6 +26,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.checks import Error
 from django.core.files import temp as tempfile
+from django.db import connection
 from django.db.models.utils import get_blank_choice_label
 from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
@@ -3985,8 +3986,9 @@ class AdminViewDeletedObjectsTest(TestCase):
         cls.ssh1 = SuperSecretHideout.objects.create(
             location="super floating castle!", supervillain=cls.sv1
         )
-        cls.cy1 = CyclicOne.objects.create(pk=1, name="I am recursive", two_id=1)
-        cls.cy2 = CyclicTwo.objects.create(pk=1, name="I am recursive too", one_id=1)
+        pk = connection.ops.get_hardcoded_pk(1)
+        cls.cy1 = CyclicOne.objects.create(pk=pk, name="I am recursive", two_id=pk)
+        cls.cy2 = CyclicTwo.objects.create(pk=pk, name="I am recursive too", one_id=pk)
 
     def setUp(self):
         self.client.force_login(self.superuser)
@@ -8832,7 +8834,7 @@ class AdminUserMessageTest(TestCase):
         message with the level has appeared in the response.
         """
         action_data = {
-            ACTION_CHECKBOX_NAME: [1],
+            ACTION_CHECKBOX_NAME: [connection.ops.get_hardcoded_pk(1)],
             "action": "message_%s" % level,
             "index": 0,
         }
@@ -8864,7 +8866,7 @@ class AdminUserMessageTest(TestCase):
 
     def test_message_extra_tags(self):
         action_data = {
-            ACTION_CHECKBOX_NAME: [1],
+            ACTION_CHECKBOX_NAME: [connection.ops.get_hardcoded_pk(1)],
             "action": "message_extra_tags",
             "index": 0,
         }

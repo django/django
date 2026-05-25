@@ -903,3 +903,14 @@ class BaseDatabaseOperations:
                     )
                 path.append(self.format_json_path_numeric_index(num))
         return "".join(path)
+
+    def get_hardcoded_pk(self, value):
+        """
+        Given an integer suggestion (which works for built-in backends because
+        they don't override DEFAULT_AUTO_FIELD), return a hardcoded primary key
+        value for use in tests.
+
+        Example use case: MongoDB uses DEFAULT_AUTO_FIELD=ObjectIdAutoField and
+        an integer pk can be converted to bson.ObjectId().
+        """
+        return value

@@ -1749,15 +1749,16 @@ class MultiDbTests(TestCase):
 class Ticket19607Tests(TestCase):
     @classmethod
     def setUpTestData(cls):
+        pk = connection.ops.get_hardcoded_pk
         LessonEntry.objects.bulk_create(
-            LessonEntry(id=id_, name1=name1, name2=name2)
+            LessonEntry(id=pk(id_), name1=name1, name2=name2)
             for id_, name1, name2 in [
                 (1, "einfach", "simple"),
                 (2, "schwierig", "difficult"),
             ]
         )
         WordEntry.objects.bulk_create(
-            WordEntry(id=id_, lesson_entry_id=lesson_entry_id, name=name)
+            WordEntry(id=pk(id_), lesson_entry_id=pk(lesson_entry_id), name=name)
             for id_, lesson_entry_id, name in [
                 (1, 1, "einfach"),
                 (2, 1, "simple"),

@@ -10,6 +10,7 @@ from django.contrib.sites.requests import RequestSite
 from django.contrib.sites.shortcuts import get_current_site
 from django.core import checks
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.db import connection
 from django.db.models.signals import post_migrate
 from django.http import HttpRequest, HttpResponse
 from django.test import SimpleTestCase, TestCase, modify_settings, override_settings
@@ -203,7 +204,7 @@ class SitesFrameworkTests(TestCase):
         self.assertEqual(Site.objects.get_by_natural_key(self.site.domain), self.site)
         self.assertEqual(self.site.natural_key(), (self.site.domain,))
 
-    @override_settings(SITE_ID="1")
+    @override_settings(SITE_ID=str(connection.ops.get_hardcoded_pk(1)))
     def test_check_site_id_incorrect_type(self):
         self.assertEqual(
             check_site_id(None),
@@ -229,7 +230,7 @@ class SitesFrameworkTests(TestCase):
         )
 
     def test_valid_site_id(self):
-        for site_id in [1, None]:
+        for site_id in [connection.ops.get_hardcoded_pk(1), None]:
             with self.subTest(site_id=site_id), self.settings(SITE_ID=site_id):
                 self.assertEqual(check_site_id(None), [])
 
@@ -330,13 +331,14 @@ class CreateDefaultSiteTests(TestCase):
         )
         self.assertTrue(Site.objects.exists())
 
-    @override_settings(SITE_ID=35696)
     def test_custom_site_id(self):
         """
         #23945 - The configured ``SITE_ID`` should be respected.
         """
-        create_default_site(self.app_config, verbosity=0)
-        self.assertEqual(Site.objects.get().pk, 35696)
+        custom_site_id = connection.ops.get_hardcoded_pk(35696)
+        with self.settings(SITE_ID=custom_site_id):
+            create_default_site(self.app_config, verbosity=0)
+        self.assertEqual(Site.objects.get().pk, custom_site_id)
 
     @override_settings()  # Restore original ``SITE_ID`` afterward.
     def test_no_site_id(self):

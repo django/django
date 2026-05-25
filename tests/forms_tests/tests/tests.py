@@ -1,7 +1,7 @@
 import datetime
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db import models
+from django.db import connection, models
 from django.forms import CharField, FileField, Form, ModelForm
 from django.forms.models import ModelFormMetaclass
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
@@ -101,9 +101,10 @@ class ModelFormCallableModelDefault(TestCase):
         The initial value for a callable default returning a queryset is the
         pk.
         """
-        obj1 = ChoiceOptionModel.objects.create(id=1, name="default")
-        obj2 = ChoiceOptionModel.objects.create(id=2, name="option 2")
-        obj3 = ChoiceOptionModel.objects.create(id=3, name="option 3")
+        pk = connection.ops.get_hardcoded_pk
+        obj1 = ChoiceOptionModel.objects.create(id=pk(1), name="default")
+        obj2 = ChoiceOptionModel.objects.create(id=pk(2), name="option 2")
+        obj3 = ChoiceOptionModel.objects.create(id=pk(3), name="option 3")
         self.assertHTMLEqual(
             ChoiceFieldForm().as_p(),
             f"""

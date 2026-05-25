@@ -630,6 +630,7 @@ class FkConstraintsTests(TransactionTestCase):
     def setUp(self):
         # Create a Reporter.
         self.r = Reporter.objects.create(first_name="John", last_name="Smith")
+        self.invalid_reporter_id = connection.ops.get_hardcoded_pk(30)
 
     def test_integrity_checks_on_creation(self):
         """
@@ -639,7 +640,7 @@ class FkConstraintsTests(TransactionTestCase):
         a1 = Article(
             headline="This is a test",
             pub_date=datetime.datetime(2005, 7, 27),
-            reporter_id=30,
+            reporter_id=self.invalid_reporter_id,
         )
         try:
             a1.save()
@@ -653,7 +654,7 @@ class FkConstraintsTests(TransactionTestCase):
             headline="This is another test",
             reporter=self.r,
             pub_date=datetime.datetime(2012, 8, 3),
-            reporter_proxy_id=30,
+            reporter_proxy_id=self.invalid_reporter_id,
         )
         with self.assertRaises(IntegrityError):
             a2.save()
@@ -671,7 +672,7 @@ class FkConstraintsTests(TransactionTestCase):
         )
         # Retrieve it from the DB
         a1 = Article.objects.get(headline="Test article")
-        a1.reporter_id = 30
+        a1.reporter_id = self.invalid_reporter_id
         try:
             a1.save()
         except IntegrityError:
@@ -690,7 +691,7 @@ class FkConstraintsTests(TransactionTestCase):
         )
         # Retrieve the second article from the DB
         a2 = Article.objects.get(headline="Another article")
-        a2.reporter_proxy_id = 30
+        a2.reporter_proxy_id = self.invalid_reporter_id
         with self.assertRaises(IntegrityError):
             a2.save()
 
@@ -708,7 +709,7 @@ class FkConstraintsTests(TransactionTestCase):
             )
             # Retrieve it from the DB
             a = Article.objects.get(headline="Test article")
-            a.reporter_id = 30
+            a.reporter_id = self.invalid_reporter_id
             try:
                 connection.disable_constraint_checking()
                 a.save()
@@ -731,7 +732,7 @@ class FkConstraintsTests(TransactionTestCase):
             )
             # Retrieve it from the DB
             a = Article.objects.get(headline="Test article")
-            a.reporter_id = 30
+            a.reporter_id = self.invalid_reporter_id
             try:
                 with connection.constraint_checks_disabled():
                     a.save()
@@ -753,7 +754,7 @@ class FkConstraintsTests(TransactionTestCase):
             )
             # Retrieve it from the DB
             a = Article.objects.get(headline="Test article")
-            a.reporter_id = 30
+            a.reporter_id = self.invalid_reporter_id
             with connection.constraint_checks_disabled():
                 a.save()
                 try:
@@ -768,7 +769,7 @@ class FkConstraintsTests(TransactionTestCase):
         with transaction.atomic():
             obj = SQLKeywordsModel.objects.create(reporter=self.r)
             obj.refresh_from_db()
-            obj.reporter_id = 30
+            obj.reporter_id = self.invalid_reporter_id
             with connection.constraint_checks_disabled():
                 obj.save()
                 try:

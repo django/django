@@ -2862,9 +2862,10 @@ class AggregateAnnotationPruningTests(TestCase):
         self.assertEqual(aggregates, {"count": 1})
 
     def test_aggregate_reference_lookup_rhs_iter(self):
+        zero = connection.ops.get_hardcoded_pk(0)
         aggregates = Author.objects.annotate(
             max_book_author=Max("book__authors"),
-        ).aggregate(count=Count("id", filter=Q(id__in=[F("max_book_author"), 0])))
+        ).aggregate(count=Count("id", filter=Q(id__in=[F("max_book_author"), zero])))
         self.assertEqual(aggregates, {"count": 1})
 
     @skipUnlessDBFeature("supports_select_union")
