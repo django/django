@@ -186,7 +186,7 @@ Developer-facing features
 * **Core features**:
   :doc:`The sites framework </ref/contrib/sites>` |
   :doc:`Sessions </topics/http/sessions>` |
-  :doc:`Static files management </ref/contrib/staticfiles>` |
+  :doc:`Static files management </ref/contrib/staticfiles>`
 
 * **Project-level features**:
   :doc:`Caching </topics/cache>` |
