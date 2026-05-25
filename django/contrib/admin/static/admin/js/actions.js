@@ -121,7 +121,7 @@
             });
 
         document
-            .querySelectorAll(options.acrossQuestions + " a")
+            .querySelectorAll(options.acrossQuestions + " button")
             .forEach(function (el) {
                 el.addEventListener("click", function (event) {
                     event.preventDefault();
@@ -136,7 +136,7 @@
             });
 
         document
-            .querySelectorAll(options.acrossClears + " a")
+            .querySelectorAll(options.acrossClears + " button")
             .forEach(function (el) {
                 el.addEventListener("click", function (event) {
                     event.preventDefault();
