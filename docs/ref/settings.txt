@@ -2167,8 +2167,7 @@ configuration process will be skipped.
 
 .. versionadded:: 6.1
 
-Default: no default until Django 7.0, then ``{}``. (See deprecation note
-below.)
+Default: no default until the deprecation ends, then ``{}``.
 
 A dictionary containing the settings for all email backends to be used with
 Django. It is a nested dictionary that maps backend aliases to dictionaries
