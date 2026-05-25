@@ -587,8 +587,9 @@ class BaseCommand:
         """
         from django.db.migrations.executor import MigrationExecutor
 
+        executor_class = getattr(self, "executor_class", MigrationExecutor)
         try:
-            executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
+            executor = executor_class(connections[DEFAULT_DB_ALIAS])
         except ImproperlyConfigured:
             # No databases are configured (or the dummy one)
             return

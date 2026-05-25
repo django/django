@@ -28,6 +28,7 @@ from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.utils import truncate_name
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.exceptions import InconsistentMigrationHistory
+from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import TestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import captured_stdout, extend_sys_path, isolate_apps
@@ -3436,3 +3437,22 @@ class CustomMigrationCommandTests(MigrationTestBase):
             )
         finally:
             call_command(command, "migrated_app", "zero", verbosity=0)
+
+    @override_settings(INSTALLED_APPS=["migrations.migrations_test_apps.migrated_app"])
+    def test_migrate_custom_executor(self):
+        executor_calls = []
+
+        class CustomExecutor(MigrationExecutor):
+            def __init__(self, *args, **kwargs):
+                executor_calls.append((args, kwargs))
+                super().__init__(*args, **kwargs)
+
+        class CustomMigrateCommand(MigrateCommand):
+            executor_class = CustomExecutor
+
+        command = CustomMigrateCommand(stdout=io.StringIO())
+        try:
+            call_command(command, verbosity=0)
+        finally:
+            call_command(command, "migrated_app", "zero", verbosity=0)
+        self.assertGreater(len(executor_calls), 0)

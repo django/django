@@ -16,6 +16,7 @@ from django.utils.text import Truncator
 
 class Command(BaseCommand):
     autodetector = MigrationAutodetector
+    executor_class = MigrationExecutor
     help = (
         "Updates database schema. Manages both apps with migrations and those without."
     )
@@ -111,7 +112,7 @@ class Command(BaseCommand):
         # Hook for backends needing any database preparation
         connection.prepare_database()
         # Work out which apps have migrations and which do not
-        executor = MigrationExecutor(connection, self.migration_progress_callback)
+        executor = self.executor_class(connection, self.migration_progress_callback)
 
         # Raise an error if any migrations are applied before their dependencies.
         executor.loader.check_consistent_history(connection)

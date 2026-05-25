@@ -34,6 +34,7 @@ from django.core.management.commands.loaddata import Command as LoaddataCommand
 from django.core.management.commands.runserver import Command as RunserverCommand
 from django.core.management.commands.testserver import Command as TestserverCommand
 from django.db import ConnectionHandler, connection
+from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
@@ -1811,6 +1812,22 @@ class ManageRunserverMigrationWarning(TestCase):
             "app_waiting_migration.",
             output,
         )
+
+    @override_settings(INSTALLED_APPS=["admin_scripts.app_waiting_migration"])
+    def test_check_migrations_custom_executor(self):
+        executor_calls = []
+
+        class CustomExecutor(MigrationExecutor):
+            def __init__(self, *args, **kwargs):
+                executor_calls.append((args, kwargs))
+                super().__init__(*args, **kwargs)
+
+        self.runserver_command.executor_class = CustomExecutor
+        try:
+            self.runserver_command.check_migrations()
+        finally:
+            del self.runserver_command.executor_class
+        self.assertGreater(len(executor_calls), 0)
 
 
 class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
