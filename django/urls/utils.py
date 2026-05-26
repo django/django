@@ -73,6 +73,7 @@ def get_mod_func(callback):
 _NAMED_GROUP_MATCHER = _lazy_re_compile(r"\(\?P(<\w+>)")
 _UNNAMED_GROUP_MATCHER = _lazy_re_compile(r"\(")
 _NON_CAPTURING_GROUP_MATCHER = _lazy_re_compile(r"\(\?\:")
+_LITERAL_ESCAPE_RE = _lazy_re_compile(r"\\([./()_-])")
 
 
 def replace_metacharacters(pattern):
@@ -160,6 +161,10 @@ def remove_non_capturing_groups(pattern):
     return final_pattern + pattern[prev_end:]
 
 
+def unescape_literals(pattern):
+    return _LITERAL_ESCAPE_RE.sub(r"\1", pattern)
+
+
 def extract_views_from_urlpatterns(urlpatterns, base="", namespace=None):
     """
     Return a list of views from a list of urlpatterns.
@@ -201,6 +206,7 @@ def simplify_regex(pattern):
     pattern = replace_named_groups(pattern)
     pattern = replace_unnamed_groups(pattern)
     pattern = replace_metacharacters(pattern)
+    pattern = unescape_literals(pattern)
     if not pattern.startswith("/"):
         pattern = "/" + pattern
     return pattern
