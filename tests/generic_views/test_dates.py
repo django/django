@@ -885,8 +885,9 @@ class DateDetailViewTests(TestDataMixin, TestCase):
         self.assertEqual(res.context["book"], self.book2)
         self.assertTemplateUsed(res, "generic_views/book_detail.html")
 
+        nonexistent_pk = connection.ops.get_nonexistent_pk(9999998)
         res = self.client.get(
-            "/dates/books/get_object_custom_queryset/2008/oct/01/9999999/"
+            f"/dates/books/get_object_custom_queryset/2008/oct/01/{nonexistent_pk}/"
         )
         self.assertEqual(res.status_code, 404)
 

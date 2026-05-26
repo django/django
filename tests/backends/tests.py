@@ -998,15 +998,17 @@ class DBConstraintTestCase(TestCase):
         self.assertEqual(ref.obj, obj)
 
     def test_can_reference_non_existent(self):
-        self.assertFalse(Object.objects.filter(id=12345).exists())
-        ref = ObjectReference.objects.create(obj_id=12345)
-        ref_new = ObjectReference.objects.get(obj_id=12345)
+        nonexistent_id = connection.ops.get_nonexistent_pk(12345)
+        self.assertFalse(Object.objects.filter(id=nonexistent_id).exists())
+        ref = ObjectReference.objects.create(obj_id=nonexistent_id)
+        ref_new = ObjectReference.objects.get(obj_id=nonexistent_id)
         self.assertEqual(ref, ref_new)
 
         with self.assertRaises(Object.DoesNotExist):
             ref.obj
 
     def test_many_to_many(self):
+        nonexistent_id = connection.ops.get_nonexistent_pk(12345)
         obj = Object.objects.create()
         obj.related_objects.create()
         self.assertEqual(Object.objects.count(), 2)
@@ -1015,6 +1017,8 @@ class DBConstraintTestCase(TestCase):
         intermediary_model = Object._meta.get_field(
             "related_objects"
         ).remote_field.through
-        intermediary_model.objects.create(from_object_id=obj.id, to_object_id=12345)
+        intermediary_model.objects.create(
+            from_object_id=obj.id, to_object_id=nonexistent_id
+        )
         self.assertEqual(obj.related_objects.count(), 1)
         self.assertEqual(intermediary_model.objects.count(), 2)
