@@ -914,3 +914,13 @@ class BaseDatabaseOperations:
         an integer pk can be converted to bson.ObjectId().
         """
         return value
+
+    def get_nonexistent_pk(self, value):
+        """
+        Given the last created pk or a large integer value unlikely to exist,
+        return a nonexistent primary key value for use in tests.
+
+        Example use case: MongoDB uses DEFAULT_AUTO_FIELD=ObjectIdAutoField and
+        can use ObjectId() to generate a nonexistent ID.
+        """
+        return value + 1

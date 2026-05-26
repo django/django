@@ -177,11 +177,12 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
                 self.assertEqual(author.name, author.bio.author.name)
 
     def test_survives_clone(self):
+        nonexistent_pk = connection.ops.get_nonexistent_pk(1000)
         with self.assertNumQueries(2):
             [
                 list(b.first_time_authors.all())
                 for b in Book.objects.prefetch_related("first_time_authors").exclude(
-                    id=1000
+                    id=nonexistent_pk
                 )
             ]
 

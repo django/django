@@ -778,7 +778,8 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertEqual(cl.queryset.count(), 1)
 
-        request = self.factory.get("/concert/", data={SEARCH_VAR: band.pk + 5})
+        nonexistent_pk = connection.ops.get_nonexistent_pk(band.pk)
+        request = self.factory.get("/concert/", data={SEARCH_VAR: nonexistent_pk})
         request.user = self.superuser
         cl = m.get_changelist_instance(request)
         self.assertEqual(cl.queryset.count(), 0)

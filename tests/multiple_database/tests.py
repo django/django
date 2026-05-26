@@ -7,7 +7,7 @@ from unittest.mock import Mock
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
-from django.db import DEFAULT_DB_ALIAS, router, transaction
+from django.db import DEFAULT_DB_ALIAS, connection, router, transaction
 from django.db.models import signals
 from django.db.utils import ConnectionRouter
 from django.test import SimpleTestCase, TestCase, override_settings
@@ -1668,16 +1668,21 @@ class RouterTestCase(TestCase):
         "M2M relations can cross databases if the database share a source"
         # Create books and authors on the inverse to the usual database
         pro = Book.objects.using("other").create(
-            pk=1, title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Django", published=datetime.date(2008, 12, 16)
         )
 
-        marty = Person.objects.using("other").create(pk=1, name="Marty Alchin")
+        marty = Person.objects.using("other").create(name="Marty Alchin")
 
         dive = Book.objects.using("default").create(
-            pk=2, title="Dive into Python", published=datetime.date(2009, 5, 4)
+            pk=connection.ops.get_nonexistent_pk(pro.pk),
+            title="Dive into Python",
+            published=datetime.date(2009, 5, 4),
         )
 
-        mark = Person.objects.using("default").create(pk=2, name="Mark Pilgrim")
+        mark = Person.objects.using("default").create(
+            pk=connection.ops.get_nonexistent_pk(marty.pk),
+            name="Mark Pilgrim",
+        )
 
         # Now save back onto the usual database.
         # This simulates primary/replica - the objects exist on both database,
@@ -1760,7 +1765,9 @@ class RouterTestCase(TestCase):
         # If you create an object through a M2M relation, it will be
         # written to the write database, even if the original object
         # was on the read database
-        alice = dive.authors.create(name="Alice", pk=3)
+        alice = dive.authors.create(
+            name="Alice", pk=connection.ops.get_nonexistent_pk(mark.pk)
+        )
         self.assertEqual(alice._state.db, "default")
 
         # Same goes for get_or_create, regardless of whether getting or
@@ -1768,7 +1775,9 @@ class RouterTestCase(TestCase):
         alice, created = dive.authors.get_or_create(name="Alice")
         self.assertEqual(alice._state.db, "default")
 
-        bob, created = dive.authors.get_or_create(name="Bob", defaults={"pk": 4})
+        bob, created = dive.authors.get_or_create(
+            name="Bob", defaults={"pk": connection.ops.get_nonexistent_pk(alice.pk)}
+        )
         self.assertEqual(bob._state.db, "default")
 
     def test_o2o_cross_database_protection(self):

@@ -103,9 +103,10 @@ class AdminActionsTest(TestCase):
         self.assertEqual(Subscriber.objects.count(), 0)
 
     def test_default_delete_action_nonexistent_pk(self):
-        self.assertFalse(Subscriber.objects.filter(id=9998).exists())
+        nonexistent_pk = connection.ops.get_nonexistent_pk(9998)
+        self.assertFalse(Subscriber.objects.filter(id=nonexistent_pk).exists())
         action_data = {
-            ACTION_CHECKBOX_NAME: ["9998"],
+            ACTION_CHECKBOX_NAME: [str(nonexistent_pk)],
             "action": "delete_selected",
             "index": 0,
         }

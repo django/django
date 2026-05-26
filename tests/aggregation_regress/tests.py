@@ -1475,7 +1475,8 @@ class AggregationTests(TestCase):
         qs = Book.objects.annotate(n=Count("pk"))
         self.assertIs(qs.query.alias_map["aggregation_regress_book"].join_type, None)
         # The query executes without problems.
-        self.assertEqual(len(qs.exclude(publisher=-1)), 6)
+        id_ = connection.ops.get_nonexistent_pk(-1)
+        self.assertEqual(len(qs.exclude(publisher=id_)), 6)
 
     @skipUnlessDBFeature("allows_group_by_selected_pks")
     def test_aggregate_duplicate_columns(self):

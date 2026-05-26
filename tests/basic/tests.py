@@ -671,7 +671,7 @@ class ModelLookupTest(TestCase):
             ObjectDoesNotExist, "Article matching query does not exist."
         ):
             Article.objects.get(
-                id__exact=2000,
+                id__exact=connection.ops.get_nonexistent_pk(2000),
             )
         # To avoid dict-ordering related errors check only one lookup
         # in single assert.
