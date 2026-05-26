@@ -544,6 +544,12 @@ class SimplifyRegexTests(SimpleTestCase):
             # Complex examples with metacharacters and (un)named groups.
             (r"^\b(?P<slug>\w+)\B/(\w+)?", "/<slug>/<var>"),
             (r"^\A(?P<slug>\w+)\Z", "/<slug>"),
+            # Single escaped literals.
+            (r"\/well-known", "/well-known"),
+            (r"\.well-known", "/.well-known"),
+            (r"\-well-known", "/-well-known"),
+            (r"\_well-known", "/_well-known"),
+            (r"\(well-known\)", "/(well-known)"),
         )
         for pattern, output in tests:
             with self.subTest(pattern=pattern):
