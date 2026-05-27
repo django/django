@@ -2368,9 +2368,9 @@ The ``InlineModelAdmin`` class adds or customizes:
     :doc:`formsets documentation </topics/forms/formsets>` for more
     information.
 
-    For users with JavaScript-enabled browsers, an "Add another" link is
-    provided to enable any number of additional inlines to be added in addition
-    to those provided as a result of the ``extra`` argument.
+    For users with JavaScript-enabled browsers, an "Add" link is provided to
+    enable any number of additional inlines to be added in addition to those
+    provided as a result of the ``extra`` argument.
 
     The dynamic link will not appear if the number of currently displayed forms
     exceeds ``max_num``, or if the user does not have JavaScript enabled.
