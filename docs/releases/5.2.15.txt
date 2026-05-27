@@ -1,0 +1,7 @@
+===========================
+Django 5.2.15 release notes
+===========================
+
+*June 3, 2026*
+
+Django 5.2.15 fixes five security issues with severity "low" in 5.2.14.
