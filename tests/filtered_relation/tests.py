@@ -18,8 +18,10 @@ from django.db.models import (
 )
 from django.db.models.functions import Concat
 from django.db.models.lookups import Exact, IStartsWith
+from django.db.models.sql.compiler import DISTINCT_VALUES_ORDERING_DEPRECATION_MSG
 from django.test import TestCase
 from django.test.testcases import skipUnlessDBFeature
+from django.utils.deprecation import RemovedInDjango71Warning
 
 from .models import (
     Author,
@@ -533,13 +535,17 @@ class FilteredRelationTests(TestCase):
             .order_by("name", "alice_editors__name")
             .distinct()
         )
-        self.assertSequenceEqual(
-            qs,
-            [
-                {"name": self.author1.name, "alice_editors__pk": self.editor_a.pk},
-                {"name": self.author2.name, "alice_editors__pk": None},
-            ],
-        )
+        with self.assertWarnsMessage(
+            RemovedInDjango71Warning,
+            DISTINCT_VALUES_ORDERING_DEPRECATION_MSG,
+        ):
+            self.assertSequenceEqual(
+                qs,
+                [
+                    {"name": self.author1.name, "alice_editors__pk": self.editor_a.pk},
+                    {"name": self.author2.name, "alice_editors__pk": None},
+                ],
+            )
 
     def test_nested_m2m_filtered(self):
         qs = (

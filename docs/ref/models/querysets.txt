@@ -540,6 +540,14 @@ query spans multiple tables, it's possible to get duplicate results when a
     :meth:`values` together, be careful when ordering by fields not in the
     :meth:`values` call.
 
+    .. deprecated:: 6.2
+
+        Using ``distinct()`` with :meth:`values` or :meth:`values_list` while
+        ordering by fields not included in the selected values is deprecated.
+        In Django 7.1, this will raise ``DatabaseError``. Include the ordering
+        fields in :meth:`values` or :meth:`values_list`, or clear ordering with
+        ``order_by()``.
+
 On PostgreSQL only, you can pass positional arguments (``*fields``) in order to
 specify the names of fields to which the ``DISTINCT`` should apply. This
 translates to a ``SELECT DISTINCT ON`` SQL query. Here's the difference. For a

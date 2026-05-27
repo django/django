@@ -278,3 +278,8 @@ Miscellaneous
 
 * The ``safe`` parameter is deprecated from :class:`~django.http.JsonResponse`.
   Omitting the argument is equivalent to the prior ``safe=False`` usage.
+
+* Using ``QuerySet.distinct()`` with ``values()`` or ``values_list()`` while
+  ordering by fields not included in the selected values is deprecated. In
+  Django 7.1, this will raise ``DatabaseError``. Include the ordering fields in
+  ``values()`` or ``values_list()``, or clear ordering with ``order_by()``.
