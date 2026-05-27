@@ -19,7 +19,7 @@ class SecurityMiddleware(MiddlewareMixin):
         self.cross_origin_opener_policy = settings.SECURE_CROSS_ORIGIN_OPENER_POLICY
 
     def process_request(self, request):
-        path = request.path.lstrip("/")
+        path = request.path_info.lstrip("/")
         if (
             self.redirect
             and not request.is_secure()
