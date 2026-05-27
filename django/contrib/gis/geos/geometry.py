@@ -153,11 +153,25 @@ class GEOSGeometryBase(GEOSBase):
                 other = GEOSGeometry.from_ewkt(other)
             except (ValueError, GEOSException):
                 return False
-        return (
-            isinstance(other, GEOSGeometry)
-            and self.srid == other.srid
-            and self.equals_exact(other)
-        )
+
+        try:
+            # If both the geometries have Z values,
+            # then use equals_identical, since equals_exact ignores the Z values.
+            # Ref: https://libgeos.org/doxygen/geos__c_8h.html#a45499a7d87851015d36e57d285da9d8e
+            return (
+                self.equals_identical(other)
+                if isinstance(other, GEOSGeometry)
+                and self.hasz
+                and other.hasz
+                and self.srid == other.srid
+                else self.equals_exact(other)
+            )
+        except GEOSException:
+            return (
+                isinstance(other, GEOSGeometry)
+                and self.srid == other.srid
+                and self.equals_exact(other)
+            )
 
     def __hash__(self):
         return hash((self.srid, self.wkt))
