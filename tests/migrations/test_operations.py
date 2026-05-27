@@ -938,6 +938,44 @@ class OperationTests(OperationTestBase):
                 "test_rmwsrf_rider", ["friend_id"], ("test_rmwsrf_horserider", "id")
             )
 
+    def test_rename_model_with_self_referential_fk_collect_sql(self):
+        """
+        Collecting SQL (e.g. sqlmigrate) for a RenameModel operation on a model
+        with a self-referential foreign key doesn't introspect the renamed
+        table, which doesn't exist yet (#33185).
+        """
+        project_state = self.set_up_test_model("test_rmwsrfcs", related_model=True)
+        operation = migrations.RenameModel("Rider", "HorseRider")
+        new_state = project_state.clone()
+        operation.state_forwards("test_rmwsrfcs", new_state)
+        # Forwards: only the old table exists, so the renamed table can't be
+        # introspected. The rename is collected and the self-referential FK is
+        # handled (rather than silently skipped) using the constraint
+        # introspected from the still-existing old table.
+        with connection.schema_editor(collect_sql=True) as editor:
+            operation.database_forwards(
+                "test_rmwsrfcs", editor, project_state, new_state
+            )
+            collected_sql = "\n".join(editor.collected_sql)
+        self.assertIn(
+            connection.ops.quote_name("test_rmwsrfcs_horserider"), collected_sql
+        )
+        self.assertIn(connection.ops.quote_name("friend_id"), collected_sql)
+        # Backwards: apply the rename for real so the renamed table exists,
+        # then collect the reverse SQL. The same redirection must happen, this
+        # time back to the "horserider" table.
+        with connection.schema_editor() as editor:
+            operation.database_forwards(
+                "test_rmwsrfcs", editor, project_state, new_state
+            )
+        with connection.schema_editor(collect_sql=True) as editor:
+            operation.database_backwards(
+                "test_rmwsrfcs", editor, new_state, project_state
+            )
+            collected_sql = "\n".join(editor.collected_sql)
+        self.assertIn(connection.ops.quote_name("test_rmwsrfcs_rider"), collected_sql)
+        self.assertIn(connection.ops.quote_name("friend_id"), collected_sql)
+
     def test_rename_model_with_superclass_fk(self):
         """
         Tests the RenameModel operation on a model which has a superclass that
