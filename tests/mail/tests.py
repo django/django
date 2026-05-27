@@ -2264,14 +2264,38 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         backend = smtp.EmailBackend(username="", password="")
         self.assertIsNone(backend.connection)
         opened = backend.open()
+        self.assertIsNotNone(backend.connection)
+        self.assertIsNone(backend._partial_connection)
         backend.close()
         self.assertIs(opened, True)
+        self.assertIsNone(backend.connection)
+        self.assertIsNone(backend._partial_connection)
 
     def test_reopen_connection(self):
         backend = smtp.EmailBackend()
         # Simulate an already open connection.
         backend.connection = mock.Mock(spec=object())
         self.assertIs(backend.open(), False)
+
+    def test_reopen_replaces_partial_connection(self):
+        backend = smtp.EmailBackend(username="not empty", password="not empty")
+        self.addCleanup(backend.close)
+
+        error = "SMTP AUTH extension not supported by server."
+        with self.assertRaisesMessage(SMTPException, error):
+            backend.open()
+        self.assertIsNone(backend.connection)
+        self.assertIsNotNone(backend._partial_connection)
+        partial_conn = backend._partial_connection
+
+        with self.assertRaisesMessage(SMTPException, error):
+            backend.open()
+        self.assertIsNone(backend.connection)
+        self.assertIsNotNone(backend._partial_connection)
+        self.assertNotEqual(backend._partial_connection, partial_conn)
+
+        self.assertIsNone(partial_conn.sock)
+        self.assertIsNotNone(backend._partial_connection.sock)
 
     @override_settings(EMAIL_USE_TLS=True)
     def test_email_tls_use_settings(self):
@@ -2340,20 +2364,21 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     @override_settings(EMAIL_USE_TLS=True)
     def test_email_tls_attempts_starttls(self):
         backend = smtp.EmailBackend()
-        self.assertTrue(backend.use_tls)
+        self.addCleanup(backend.close)
+        self.assertIs(backend.use_tls, True)
         with self.assertRaisesMessage(
             SMTPException, "STARTTLS extension not supported by server."
         ):
-            with backend:
-                pass
+            backend.open()
+        self.assertIsNone(backend.connection)
 
     @override_settings(EMAIL_USE_SSL=True)
     def test_email_ssl_attempts_ssl_connection(self):
         backend = smtp.EmailBackend()
-        self.assertTrue(backend.use_ssl)
+        self.assertIs(backend.use_ssl, True)
         with self.assertRaises(SSLError):
-            with backend:
-                pass
+            backend.open()
+        self.assertIsNone(backend.connection)
 
     def test_connection_timeout_default(self):
         """The connection's timeout value is None by default."""
@@ -2369,10 +2394,10 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
                 super().__init__(*args, **kwargs)
 
         myemailbackend = MyEmailBackend()
+        self.addCleanup(myemailbackend.close)
         myemailbackend.open()
         self.assertEqual(myemailbackend.timeout, 42)
         self.assertEqual(myemailbackend.connection.timeout, 42)
-        myemailbackend.close()
 
     @override_settings(EMAIL_TIMEOUT=10)
     def test_email_timeout_override_settings(self):
@@ -2546,5 +2571,7 @@ class SMTPBackendStoppedServerTests(SMTPBackendTestsBase):
         """
         with self.assertRaises(ConnectionError):
             self.backend.open()
+        self.assertIsNone(self.backend.connection)
         self.backend.fail_silently = True
         self.backend.open()
+        self.assertIsNone(self.backend.connection)
