@@ -2158,11 +2158,14 @@ configuration process will be skipped.
 
 .. versionadded:: 6.1
 
-Default: no default until the deprecation ends, then ``{}``.
+.. RemovedInDjango70Warning: Update the default value to be ``{}``.
+
+Default: Not defined
 
 A dictionary containing the settings for all email backends to be used with
 Django. It is a nested dictionary that maps backend aliases to dictionaries
 containing each mailer's backend import path and configuration options.
+
 Example::
 
     MAILERS = {
@@ -2187,16 +2190,19 @@ If you plan to send email through Django, configuring at least a ``"default"``
 mailer is recommended. Any number of additional mailers may also be specified.
 Depending on which backend is used, other options may be required.
 
+Setting ``MAILERS`` to an empty dictionary (``{}``) disables email sending and
+any attempt to send mail will raise ``MailerDoesNotExist``.
+
 See :ref:`topic-email-configuration` for more information.
 
 .. deprecated:: 6.1
 
-    In Django 7.0, the default value will change to ``{}`` (no defined email
-    mailers). Until then, if ``MAILERS`` is not defined in the
-    settings, Django will create a ``"default"`` mailer from the
-    deprecated :setting:`EMAIL_BACKEND` setting. Projects can opt into the
-    Django 7.0 behavior early by adding ``MAILERS`` and removing
-    ``EMAIL_BACKEND`` from their settings.
+    In Django 7.0, the default value will change from "Not defined" to ``{}``.
+    Until then, if ``MAILERS`` is not defined in the project's settings, Django
+    will create a ``"default"`` mailer using the :setting:`EMAIL_BACKEND`
+    setting. Projects can opt into the Django 7.0 behavior at any time by
+    adding ``MAILERS`` and removing ``EMAIL_BACKEND`` from their settings. See
+    :ref:`migrating-to-mailers-settings`.
 
 .. setting:: MAILERS-BACKEND
 

@@ -1,10 +1,12 @@
+.. RemovedInDjango70Warning: Remove this file and references to it.
+
 .. _migrating-to-mailers:
 
 ==========================
 Migrating email to mailers
 ==========================
 
-Django has introduced the :setting:`MAILERS` setting, replacing
+Django 6.1 introduced the :setting:`MAILERS` setting, replacing
 :setting:`EMAIL_BACKEND` and several other ``EMAIL_*`` settings. It also
 introduced :data:`.mail.mailers` for obtaining configured email backend
 instances, replacing :func:`.mail.get_connection`. A new ``using`` argument
@@ -45,6 +47,29 @@ use these specific features:
 * :ref:`migrating-to-mailers-email-backends`
 * :ref:`migrating-to-mailers-auth`
 * :ref:`migrating-to-mailers-adminemailhandler`
+
+.. deprecated:: 6.1
+
+    The following settings and functions will be removed in Django 7.0:
+
+    * :setting:`EMAIL_BACKEND`, :setting:`EMAIL_FILE_PATH`,
+      :setting:`EMAIL_HOST`, :setting:`EMAIL_HOST_PASSWORD`,
+      :setting:`EMAIL_HOST_USER`, :setting:`EMAIL_PORT`,
+      :setting:`EMAIL_SSL_CERTFILE`, :setting:`EMAIL_SSL_KEYFILE`,
+      :setting:`EMAIL_TIMEOUT`, :setting:`EMAIL_USE_SSL`,
+      :setting:`EMAIL_USE_TLS`
+
+    * :func:`.mail.get_connection` and the ``connection`` arguments to mail
+      functions
+
+    * The ``fail_silently`` argument to :func:`.send_mail`,
+      :func:`.send_mass_mail`, :func:`.mail_admins`, :func:`.mail_managers`,
+      and :meth:`.EmailMessage.send`
+
+    * The ``auth_user`` and ``auth_password`` arguments to :func:`.send_mail`
+      and :func:`.send_mass_mail`
+
+    * The ``email_backend`` argument to :class:`.AdminEmailHandler`
 
 .. _migrating-to-mailers-settings:
 
@@ -92,11 +117,6 @@ use::
 
 
 .. _deprecated-email-settings:
-
-.. deprecated:: 6.1
-
-    The :setting:`EMAIL_BACKEND` and related ``EMAIL_*`` settings are
-    deprecated.
 
 The complete list of deprecated ``EMAIL_*`` settings and where they should be
 moved in a :setting:`MAILERS` configuration is:
@@ -181,12 +201,9 @@ migration guide for recommended updates.
 Replacing ``get_connection()`` and ``connection`` arguments
 -----------------------------------------------------------
 
-.. deprecated:: 6.1
-
-    :func:`.mail.get_connection` and the ``connection`` argument for passing
-    backend instances directly to mail functions are deprecated.
-
-The replacement for ``get_connection()`` depends on how it is being called:
+The replacements for the deprecated :func:`.mail.get_connection` function
+and ``connection`` arguments to other mail functions depend on how and why
+the connections are being created:
 
 *   ``get_connection()`` called with no arguments
 
@@ -251,16 +268,12 @@ The replacement for ``get_connection()`` depends on how it is being called:
 Replacing ``fail_silently``
 ---------------------------
 
-.. deprecated:: 6.1
-
-    The ``fail_silently`` argument to :func:`.send_mail`,
-    :func:`.send_mass_mail`, :func:`.mail_admins`, :func:`.mail_managers`, and
-    :meth:`.EmailMessage.send` are deprecated.
-
-Existing code using ``fail_silently`` seems to have several different
-expectations for its behavior, many of which don't match the actual (and email
-backend-dependent) implementation. Consider removing ``fail_silently`` entirely
-if there is not a specific need for it.
+The deprecated ``fail_silently`` arguments to :func:`.send_mail`,
+:func:`.send_mass_mail`, :func:`.mail_admins`, :func:`.mail_managers`, and
+:meth:`.EmailMessage.send` can be replaced in several ways. Existing usage
+seems to have several different expectations for the behavior, many of which
+don't match the actual (and email backend-dependent) implementation. Consider
+removing ``fail_silently`` entirely if there is not a specific need for it.
 
 Calls with ``fail_silently=True`` should be updated with one of these options,
 depending on the caller's intent:
@@ -354,12 +367,9 @@ functions and settings, or that support older Django versions:
 Replacing ``auth_user`` and ``auth_password``
 ---------------------------------------------
 
-.. deprecated:: 6.1
-
-    The ``auth_user`` and ``auth_password`` arguments to :func:`.send_mail`
-    and :func:`.send_mass_mail` are deprecated.
-
-To replace them, define a custom :setting:`MAILERS` configuration with
+The deprecated ``auth_user`` and ``auth_password`` arguments to
+:func:`.send_mail` and :func:`.send_mass_mail` can be replaced by defining a
+custom :setting:`MAILERS` configuration with
 ``"username"`` and ``"password"`` :setting:`"OPTIONS" <MAILERS-OPTIONS>`, and
 refer to that configuration with the ``using`` argument when sending mail.
 
@@ -397,13 +407,10 @@ And then refer to it when sending::
 Updating AdminEmailHandler ``email_backend``
 --------------------------------------------
 
-.. deprecated:: 6.1
-
-    The ``email_backend`` argument to the logging :class:`.AdminEmailHandler`
-    is deprecated.
-
-Replace it with a custom :setting:`MAILERS` configuration and refer to that
-configuration with the ``using`` argument.
+The deprecated ``email_backend`` argument to the logging
+:class:`.AdminEmailHandler` can be replaced with a custom
+:setting:`MAILERS` configuration, referring to it with the ``using``
+argument.
 
 For example, if your settings include::
 
