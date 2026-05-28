@@ -10,7 +10,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.15",
-    "puppeteer": "^25.0.4",
     "grunt": "^1.6.2",
     "grunt-cli": "^1.5.0",
     "grunt-contrib-qunit": "^10.2.0",
