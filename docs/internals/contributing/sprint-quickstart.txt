@@ -8,7 +8,7 @@ with contributing to Python open source projects.
 
 This guide assumes you're familiar with:
 
-* Git
+* Git (see :doc:`how-to use Git </internals/contributing/writing-code/working-with-git>`)
 
 * Managing multiple versions of Python
 
@@ -35,9 +35,7 @@ Install the dependencies to run the tests and build the documentation.
 
     $ python -m venv .venv
     $ source .venv/bin/activate
-    $ python -m pip install -e .
-    $ python -m pip install -r tests/requirements/py3.txt
-    $ python -m pip install -r docs/requirements.txt
+    $ pip install -e . -U pip -r tests/requirements/py3.txt -r docs/requirements.txt
     $ # This needs to be >= 3.12
     $ python -V
 
@@ -58,7 +56,7 @@ Build the documentation:
 
 .. code-block:: shell
 
-    $ (cd docs && make html)
+    $ cd docs && make html && cd ..
 
 
 Finding a ticket to work on
@@ -108,7 +106,7 @@ If you're continuing the work from someone else's pull request on GitHub,
 things can be tricky. You need to pull their branch, but then push it to
 your GitHub repository fork.
 
-Run the following, but switch ``ThePRNumber`` with the **pull request ID**
+Run the following, but replace ``ThePRNumber`` with the **pull request number**
 and ``TheTicketNumber`` with the **Trac ticket number**.
 
 .. code-block:: shell
