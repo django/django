@@ -58,7 +58,7 @@ def get_key_func(key_func):
 class BaseCache:
     _missing_key = object()
 
-    def __init__(self, params, alias):
+    def __init__(self, params, alias=None):
         self.alias = alias
 
         timeout = params.get("timeout", params.get("TIMEOUT", 300))
