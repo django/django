@@ -23,7 +23,7 @@ Set up
 Fork the repository, clone your fork to your machine and configure a remote
 reference to Django's repository.
 
-.. code-block:: shell
+.. console::
 
     $ git clone https://github.com/YourGitHubName/django.git django-repo
     $ cd django-repo
@@ -31,7 +31,7 @@ reference to Django's repository.
 
 Install the dependencies to run the tests and build the documentation.
 
-.. code-block:: shell
+.. console::
 
     $ python -m venv .venv
     $ source .venv/bin/activate
@@ -43,7 +43,7 @@ Confirm that the version of Python you're using is Python 3.12 or greater.
 
 Run the tests:
 
-.. code-block:: shell
+.. console::
 
     $ ./tests/runtests.py
 
@@ -54,7 +54,7 @@ though, so it's unlikely.
 
 Build the documentation:
 
-.. code-block:: shell
+.. console::
 
     $ cd docs && make html && cd ..
 
@@ -109,7 +109,7 @@ your GitHub repository fork.
 Run the following, but replace ``ThePRNumber`` with the **pull request number**
 and ``TheTicketNumber`` with the **Trac ticket number**.
 
-.. code-block:: shell
+.. console::
 
     $ git fetch upstream pull/ThePRNumber/head:ticket_TheTicketNumber
     $ git checkout ticket_TheTicketNumber
@@ -118,7 +118,7 @@ and ``TheTicketNumber`` with the **Trac ticket number**.
 For example, if you're working on PR 8000 which references ticket 123, the
 command to run would be:
 
-.. code-block:: shell
+.. console::
 
     $ git fetch upstream pull/8000/head:ticket_123
     $ git checkout ticket_123
