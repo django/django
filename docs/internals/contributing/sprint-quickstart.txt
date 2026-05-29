@@ -29,17 +29,17 @@ reference to Django's repository.
     $ cd django-repo
     $ git remote add upstream https://github.com/django/django.git
 
-Install the dependencies to run the tests and build the documentation.
+Confirm you're using a
+:ref:`compatible version of Python <faq-python-version-support>`, install
+the dependencies to run the tests and build the documentation.
 
 .. console::
 
+    $ # This needs to be >= 3.12
+    $ python -V
     $ python -m venv .venv
     $ source .venv/bin/activate
     $ pip install -e . -U pip -r tests/requirements/py3.txt -r docs/requirements.txt
-    $ # This needs to be >= 3.12
-    $ python -V
-
-Confirm that the version of Python you're using is Python 3.12 or greater.
 
 Run the tests:
 
