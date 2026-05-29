@@ -139,7 +139,8 @@ submitted by a contributor via a pull request or landed directly by a merger:
   reasoning that the code cannot.
 
   Credit the contributors in the commit message: "Thanks A for the report and B
-  for review." Use git's `Co-Authored-By`_ as appropriate.
+  for review." Use git's `Co-Authored-By`_ as appropriate. If this change is
+  one that someone else started, please include them as a co-author.
 
   For example:
 

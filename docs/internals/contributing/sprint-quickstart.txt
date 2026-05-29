@@ -130,6 +130,9 @@ command to run would be:
     $ git checkout ticket_123
     $ git push origin ticket_123
 
+When preparing your commit, please review our
+:ref:`committing guidelines <committing-guidelines>`, specifically how to
+credit co-authors.
 
 .. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1
 .. _vulture method: https://youtube.com/shorts/D6QHet5U82U?si=j5M6sy0ufpeGy_iZ
