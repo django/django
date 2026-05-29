@@ -47,10 +47,15 @@ Run the tests:
 
     $ ./tests/runtests.py
 
-If ten or fewer tests fail, you're likely okay to move on. However, keep in
-mind if the code you're changing requires changing those failing tests, you'll need
-to fix the underlying issues on your machine first. There are 10,000+ tests
-though, so it's unlikely.
+See :ref:`running-unit-tests` for more information. Whil tests will all pass
+in CI, they may not on every person's local environment. For example, only the
+latest point release of Python is supported. It's possible you may encounter
+errors using an earlier version of Python.
+
+If you have a small number of failures, it may be worth investigating whether
+they are known issues, or using the `django-docker-box`_ project to run the
+tests. Since this is a sprint, it may be more valuable for you to work on the
+issue at hand rather than investigating a weird machine configuration problem.
 
 Build the documentation:
 
@@ -58,6 +63,7 @@ Build the documentation:
 
     $ cd docs && make html && cd ..
 
+.. _django-docker-box: https://github.com/django/django-docker-box/
 
 Finding a ticket to work on
 ===========================
