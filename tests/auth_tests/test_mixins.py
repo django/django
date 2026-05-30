@@ -28,11 +28,20 @@ class EmptyResponseView(View):
         return HttpResponse()
 
 
+class AsyncEmptyResponseView(View):
+    async def get(self, request, *args, **kwargs):
+        return HttpResponse()
+
+
 class AlwaysTrueView(AlwaysTrueMixin, EmptyResponseView):
     pass
 
 
 class AlwaysFalseView(AlwaysFalseMixin, EmptyResponseView):
+    pass
+
+
+class AsyncAlwaysFalseView(AlwaysFalseMixin, AsyncEmptyResponseView):
     pass
 
 
@@ -130,6 +139,26 @@ class AccessMixinTests(TestCase):
         view = StackedMixinsView2.as_view()
         with self.assertRaises(PermissionDenied):
             view(request)
+
+    async def test_access_mixin_async_permission_denied_response(self):
+        user = await models.User.objects.acreate(username="asyncjoe", password="qwerty")
+        request = self.factory.get("/rand")
+        request.user = user
+
+        async def get_auser():
+            return request.user
+
+        request.auser = get_auser
+
+        view = AsyncAlwaysFalseView.as_view()
+
+        with self.assertRaises(PermissionDenied):
+            await view(request)
+
+        request.user = AnonymousUser()
+        response = await view(request)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/accounts/login/?next=/rand")
 
 
 class UserPassesTestTests(SimpleTestCase):
@@ -236,6 +265,33 @@ class LoginRequiredMixinTests(TestCase):
         request = self.factory.get("/rand")
         request.user = self.user
         response = view(request)
+        self.assertEqual(response.status_code, 200)
+
+    async def test_login_required_async(self):
+        """
+        login_required works on an async view wrapped in a login_required
+        mixin.
+        """
+
+        class AView(LoginRequiredMixin, AsyncEmptyResponseView):
+            pass
+
+        view = AView.as_view()
+        request = self.factory.get("/rand")
+        request.user = AnonymousUser()
+
+        async def get_auser():
+            return request.user
+
+        request.auser = get_auser
+
+        response = await view(request)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual("/accounts/login/?next=/rand", response.url)
+        request = self.factory.get("/rand")
+        request.user = self.user
+        request.auser = get_auser
+        response = await view(request)
         self.assertEqual(response.status_code, 200)
 
 
