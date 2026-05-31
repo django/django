@@ -1,6 +1,7 @@
 import dataclasses
 import pickle
-from datetime import datetime
+import queue
+from datetime import datetime, timedelta
 
 from django.tasks import (
     DEFAULT_TASK_QUEUE_NAME,
@@ -343,3 +344,42 @@ class TaskTestCase(SimpleTestCase):
         msg = "run_after cannot be defined statically with the @task decorator."
         with self.assertRaisesMessage(TypeError, msg):
             task(run_after=timezone.now())(test_tasks.calculate_meaning_of_life.func)
+
+    def test_task_comparability_in_priority_queue(self):
+        now = timezone.now()
+        later = now + timedelta(hours=1)
+
+        task_high_immediate = test_tasks.noop_task.using(priority=1, run_after=None)
+        task_high_early = test_tasks.noop_task.using(priority=1, run_after=now)
+        task_high_late = test_tasks.noop_task.using(priority=1, run_after=later)
+        task_low = test_tasks.noop_task.using(priority=5, run_after=now)
+
+        pq = queue.PriorityQueue()
+        pq.put(task_low)
+        pq.put(task_high_late)
+        pq.put(task_high_immediate)
+        pq.put(task_high_early)
+
+        self.assertEqual(pq.get(), task_high_immediate)
+        self.assertEqual(pq.get(), task_high_early)
+        self.assertEqual(pq.get(), task_high_late)
+        self.assertEqual(pq.get(), task_low)
+
+        task_eq_1 = test_tasks.noop_task.using(priority=2, run_after=now)
+        task_eq_2 = test_tasks.noop_task.using(priority=2, run_after=now)
+        task_eq_3 = test_tasks.noop_task.using(priority=3, run_after=now)
+
+        self.assertEqual(task_eq_1, task_eq_2)
+        self.assertNotEqual(task_eq_1, task_eq_3)
+
+    def test_task_result_equality_by_id_only(self):
+        result_1 = test_tasks.noop_task.enqueue()
+
+        result_2 = dataclasses.replace(
+            result_1, status=TaskResultStatus.SUCCESSFUL, backend="different_backend"
+        )
+
+        result_3 = dataclasses.replace(result_1, id="completely-different-id")
+
+        self.assertEqual(result_1, result_2)
+        self.assertNotEqual(result_1, result_3)
