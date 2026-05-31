@@ -590,8 +590,10 @@ required layout. For example:
       {{ form.cc_myself.as_field_group }}
     </div>
 
-By default Django uses the ``"django/forms/field.html"`` template which is
-designed for use with the default ``"django/forms/div.html"`` form style.
+By default Django uses the ``"django/forms/field.html"`` template
+(:source:`source <django/forms/templates/django/forms/field.html>`) which is
+designed for use with the default ``"django/forms/div.html"`` form style
+(:source:`source <django/forms/templates/django/forms/div.html>`).
 
 The default template can be customized by setting
 :attr:`~django.forms.renderers.BaseRenderer.field_template_name` in your

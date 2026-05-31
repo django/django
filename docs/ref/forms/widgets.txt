@@ -527,7 +527,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 .. class:: TextInput
 
     * ``input_type``: ``'text'``
-    * ``template_name``: ``'django/forms/widgets/text.html'``
+    * ``template_name``: ``'django/forms/widgets/text.html'`` (:source:`source <django/forms/templates/django/forms/widgets/text.html>`)
     * Renders as: ``<input type="text" ...>``
 
 ``NumberInput``
@@ -536,7 +536,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 .. class:: NumberInput
 
     * ``input_type``: ``'number'``
-    * ``template_name``: ``'django/forms/widgets/number.html'``
+    * ``template_name``: ``'django/forms/widgets/number.html'`` (:source:`source <django/forms/templates/django/forms/widgets/number.html>`)
     * Renders as: ``<input type="number" ...>``
 
     Beware that not all browsers support entering localized numbers in
@@ -549,7 +549,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 .. class:: EmailInput
 
     * ``input_type``: ``'email'``
-    * ``template_name``: ``'django/forms/widgets/email.html'``
+    * ``template_name``: ``'django/forms/widgets/email.html'`` (:source:`source <django/forms/templates/django/forms/widgets/email.html>`)
     * Renders as: ``<input type="email" ...>``
 
 ``URLInput``
@@ -558,7 +558,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 .. class:: URLInput
 
     * ``input_type``: ``'url'``
-    * ``template_name``: ``'django/forms/widgets/url.html'``
+    * ``template_name``: ``'django/forms/widgets/url.html'`` (:source:`source <django/forms/templates/django/forms/widgets/url.html>`)
     * Renders as: ``<input type="url" ...>``
 
 ``ColorInput``
@@ -567,7 +567,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 .. class:: ColorInput
 
     * ``input_type``: ``'color'``
-    * ``template_name``:``'django/forms/widgets/color.html'``
+    * ``template_name``:``'django/forms/widgets/color.html'`` (:source:`source <django/forms/templates/django/forms/widgets/color.html>`)
     * Renders as: ``<input type="color" ...>``
 
 ``SearchInput``
@@ -576,7 +576,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 .. class:: SearchInput
 
     * ``input_type``: ``'search'``
-    * ``template_name``: ``'django/forms/widgets/search.html'``
+    * ``template_name``: ``'django/forms/widgets/search.html'`` (:source:`source <django/forms/templates/django/forms/widgets/search.html>`)
     * Renders as: ``<input type="search" ...>``
 
 ``TelInput``
@@ -585,7 +585,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 .. class:: TelInput
 
     * ``input_type``: ``'tel'``
-    * ``template_name``: ``'django/forms/widgets/tel.html'``
+    * ``template_name``: ``'django/forms/widgets/tel.html'`` (:source:`source <django/forms/templates/django/forms/widgets/tel.html>`)
     * Renders as: ``<input type="tel" ...>``
 
     Browsers perform no client-side validation by default because telephone
@@ -603,7 +603,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 .. class:: PasswordInput
 
     * ``input_type``: ``'password'``
-    * ``template_name``: ``'django/forms/widgets/password.html'``
+    * ``template_name``: ``'django/forms/widgets/password.html'`` (:source:`source <django/forms/templates/django/forms/widgets/password.html>`)
     * Renders as: ``<input type="password" ...>``
 
     Takes one optional argument:
@@ -619,7 +619,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 .. class:: HiddenInput
 
     * ``input_type``: ``'hidden'``
-    * ``template_name``: ``'django/forms/widgets/hidden.html'``
+    * ``template_name``: ``'django/forms/widgets/hidden.html'`` (:source:`source <django/forms/templates/django/forms/widgets/hidden.html>`)
     * Renders as: ``<input type="hidden" ...>``
 
     Note that there also is a :class:`MultipleHiddenInput` widget that
@@ -631,7 +631,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 .. class:: DateInput
 
     * ``input_type``: ``'text'``
-    * ``template_name``: ``'django/forms/widgets/date.html'``
+    * ``template_name``: ``'django/forms/widgets/date.html'`` (:source:`source <django/forms/templates/django/forms/widgets/date.html>`)
     * Renders as: ``<input type="text" ...>``
 
     Takes same arguments as :class:`TextInput`, with one more optional
@@ -675,7 +675,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 .. class:: DateTimeInput
 
     * ``input_type``: ``'text'``
-    * ``template_name``: ``'django/forms/widgets/datetime.html'``
+    * ``template_name``: ``'django/forms/widgets/datetime.html'`` (:source:`source <django/forms/templates/django/forms/widgets/datetime.html>`)
     * Renders as: ``<input type="text" ...>``
 
     Takes same arguments as :class:`TextInput`, with one more optional
@@ -700,7 +700,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 .. class:: TimeInput
 
     * ``input_type``: ``'text'``
-    * ``template_name``: ``'django/forms/widgets/time.html'``
+    * ``template_name``: ``'django/forms/widgets/time.html'`` (:source:`source <django/forms/templates/django/forms/widgets/time.html>`)
     * Renders as: ``<input type="text" ...>``
 
     Takes same arguments as :class:`TextInput`, with one more optional
@@ -721,7 +721,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
 .. class:: Textarea
 
-    * ``template_name``: ``'django/forms/widgets/textarea.html'``
+    * ``template_name``: ``'django/forms/widgets/textarea.html'`` (:source:`source <django/forms/templates/django/forms/widgets/textarea.html>`)
     * Renders as: ``<textarea>...</textarea>``
 
 .. _selector-widgets:
@@ -743,7 +743,7 @@ that specifies the template used to render each choice. For example, for the
 .. class:: CheckboxInput
 
     * ``input_type``: ``'checkbox'``
-    * ``template_name``: ``'django/forms/widgets/checkbox.html'``
+    * ``template_name``: ``'django/forms/widgets/checkbox.html'`` (:source:`source <django/forms/templates/django/forms/widgets/checkbox.html>`)
     * Renders as: ``<input type="checkbox" ...>``
 
     Takes one optional argument:
@@ -758,8 +758,8 @@ that specifies the template used to render each choice. For example, for the
 
 .. class:: Select
 
-    * ``template_name``: ``'django/forms/widgets/select.html'``
-    * ``option_template_name``: ``'django/forms/widgets/select_option.html'``
+    * ``template_name``: ``'django/forms/widgets/select.html'`` (:source:`source <django/forms/templates/django/forms/widgets/select.html>`)
+    * ``option_template_name``: ``'django/forms/widgets/select_option.html'`` (:source:`source <django/forms/templates/django/forms/widgets/select_option.html>`)
     * Renders as: ``<select><option ...>...</select>``
 
     .. attribute:: Select.choices
@@ -773,8 +773,8 @@ that specifies the template used to render each choice. For example, for the
 
 .. class:: NullBooleanSelect
 
-    * ``template_name``: ``'django/forms/widgets/select.html'``
-    * ``option_template_name``: ``'django/forms/widgets/select_option.html'``
+    * ``template_name``: ``'django/forms/widgets/select.html'`` (:source:`source <django/forms/templates/django/forms/widgets/select.html>`)
+    * ``option_template_name``: ``'django/forms/widgets/select_option.html'`` (:source:`source <django/forms/templates/django/forms/widgets/select_option.html>`)
 
     Select widget with options 'Unknown', 'Yes' and 'No'
 
@@ -783,8 +783,8 @@ that specifies the template used to render each choice. For example, for the
 
 .. class:: SelectMultiple
 
-    * ``template_name``: ``'django/forms/widgets/select.html'``
-    * ``option_template_name``: ``'django/forms/widgets/select_option.html'``
+    * ``template_name``: ``'django/forms/widgets/select.html'`` (:source:`source <django/forms/templates/django/forms/widgets/select.html>`)
+    * ``option_template_name``: ``'django/forms/widgets/select_option.html'`` (:source:`source <django/forms/templates/django/forms/widgets/select_option.html>`)
 
     Similar to :class:`Select`, but allows multiple selection:
     ``<select multiple>...</select>``
@@ -794,8 +794,8 @@ that specifies the template used to render each choice. For example, for the
 
 .. class:: RadioSelect
 
-    * ``template_name``: ``'django/forms/widgets/radio.html'``
-    * ``option_template_name``: ``'django/forms/widgets/radio_option.html'``
+    * ``template_name``: ``'django/forms/widgets/radio.html'`` (:source:`source <django/forms/templates/django/forms/widgets/radio.html>`)
+    * ``option_template_name``: ``'django/forms/widgets/radio_option.html'`` (:source:`source <django/forms/templates/django/forms/widgets/radio_option.html>`)
 
     Similar to :class:`Select`, but rendered as a list of radio buttons within
     ``<div>`` tags:
@@ -898,8 +898,8 @@ that specifies the template used to render each choice. For example, for the
 
 .. class:: CheckboxSelectMultiple
 
-    * ``template_name``: ``'django/forms/widgets/checkbox_select.html'``
-    * ``option_template_name``: ``'django/forms/widgets/checkbox_option.html'``
+    * ``template_name``: ``'django/forms/widgets/checkbox_select.html'`` (:source:`source <django/forms/templates/django/forms/widgets/checkbox_select.html>`)
+    * ``option_template_name``: ``'django/forms/widgets/checkbox_option.html'`` (:source:`source <django/forms/templates/django/forms/widgets/checkbox_option.html>`)
 
     Similar to :class:`SelectMultiple`, but rendered as a list of checkboxes:
 
@@ -932,7 +932,7 @@ File upload widgets
 
 .. class:: FileInput
 
-    * ``template_name``: ``'django/forms/widgets/file.html'``
+    * ``template_name``: ``'django/forms/widgets/file.html'`` (:source:`source <django/forms/templates/django/forms/widgets/file.html>`)
     * Renders as: ``<input type="file" ...>``
 
 ``ClearableFileInput``
@@ -940,7 +940,7 @@ File upload widgets
 
 .. class:: ClearableFileInput
 
-    * ``template_name``: ``'django/forms/widgets/clearable_file_input.html'``
+    * ``template_name``: ``'django/forms/widgets/clearable_file_input.html'`` (:source:`source <django/forms/templates/django/forms/widgets/clearable_file_input.html>`)
     * Renders as: ``<input type="file" ...>`` with an additional checkbox
       input to clear the field's value, if the field is not required and has
       initial data.
@@ -955,7 +955,7 @@ Composite widgets
 
 .. class:: MultipleHiddenInput
 
-    * ``template_name``: ``'django/forms/widgets/multiple_hidden.html'``
+    * ``template_name``: ``'django/forms/widgets/multiple_hidden.html'`` (:source:`source <django/forms/templates/django/forms/widgets/multiple_hidden.html>`)
     * Renders as: multiple ``<input type="hidden" ...>`` tags
 
     A widget that handles multiple hidden widgets for fields that have a list
@@ -966,7 +966,7 @@ Composite widgets
 
 .. class:: SplitDateTimeWidget
 
-    * ``template_name``: ``'django/forms/widgets/splitdatetime.html'``
+    * ``template_name``: ``'django/forms/widgets/splitdatetime.html'`` (:source:`source <django/forms/templates/django/forms/widgets/splitdatetime.html>`)
 
     Wrapper (using :class:`MultiWidget`) around two widgets: :class:`DateInput`
     for the date, and :class:`TimeInput` for the time. Must be used with
@@ -995,7 +995,7 @@ Composite widgets
 
 .. class:: SplitHiddenDateTimeWidget
 
-    * ``template_name``: ``'django/forms/widgets/splithiddendatetime.html'``
+    * ``template_name``: ``'django/forms/widgets/splithiddendatetime.html'`` (:source:`source <django/forms/templates/django/forms/widgets/splithiddendatetime.html>`)
 
     Similar to :class:`SplitDateTimeWidget`, but uses :class:`HiddenInput` for
     both date and time.
@@ -1005,7 +1005,7 @@ Composite widgets
 
 .. class:: SelectDateWidget
 
-    * ``template_name``: ``'django/forms/widgets/select_date.html'``
+    * ``template_name``: ``'django/forms/widgets/select_date.html'`` (:source:`source <django/forms/templates/django/forms/widgets/select_date.html>`)
 
     Wrapper around three :class:`~django.forms.Select` widgets: one each for
     month, day, and year.
