@@ -1351,6 +1351,43 @@ any format valid in the chosen email sending protocol.
 This doesn't affect error messages sent to :setting:`ADMINS` and
 :setting:`MANAGERS`. See :setting:`SERVER_EMAIL` for that.
 
+
+.. setting:: DEFAULT_PK_FIELD
+
+``DEFAULT_PK_FIELD``
+--------------------
+
+.. versionadded:: 6.2
+
+Default: ``None``
+
+The default primary key field type to use for models that don't define a
+primary key field explicitly.
+
+When set to ``None``, Django uses :setting:`DEFAULT_AUTO_FIELD`.
+
+Unlike :setting:`DEFAULT_AUTO_FIELD`, this setting may refer to any
+:class:`~django.db.models.Field` subclass. The field is created with
+``primary_key=True`` and ``auto_created=True``.
+
+For example, to use UUID primary keys by default::
+
+    import uuid
+
+    from django.db import models
+
+
+    class UUIDPrimaryKeyField(models.UUIDField):
+        def __init__(self, *args, **kwargs):
+            kwargs.setdefault("default", uuid.uuid4)
+            kwargs.setdefault("editable", False)
+            super().__init__(*args, **kwargs)
+
+
+Then configure::
+
+    DEFAULT_PK_FIELD = "app.fields.UUIDPrimaryKeyField"
+
 .. setting:: DEFAULT_INDEX_TABLESPACE
 
 ``DEFAULT_INDEX_TABLESPACE``

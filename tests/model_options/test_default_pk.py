@@ -1,3 +1,5 @@
+import uuid
+
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.test import SimpleTestCase, override_settings
@@ -6,6 +8,13 @@ from django.test.utils import isolate_apps
 
 class MyBigAutoField(models.BigAutoField):
     pass
+
+
+class UUIDPrimaryKeyField(models.UUIDField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("default", uuid.uuid4)
+        kwargs.setdefault("editable", False)
+        super().__init__(*args, **kwargs)
 
 
 @isolate_apps("model_options")
@@ -26,6 +35,40 @@ class TestDefaultPK(SimpleTestCase):
             "imported."
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
+
+            class Model(models.Model):
+                pass
+
+    @override_settings(DEFAULT_PK_FIELD="django.db.models.NonexistentField")
+    def test_default_pk_field_setting_nonexistent(self):
+        msg = (
+            "DEFAULT_PK_FIELD refers to the module "
+            "'django.db.models.NonexistentField' that could not be imported."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+
+            class Model(models.Model):
+                pass
+
+    @override_settings(
+        DEFAULT_PK_FIELD="model_options.test_default_pk.UUIDPrimaryKeyField"
+    )
+    def test_default_pk_field_can_use_uuid_field(self):
+        class Model(models.Model):
+            pass
+
+        self.assertIsInstance(Model._meta.pk, UUIDPrimaryKeyField)
+        self.assertEqual(Model._meta.pk.name, "id")
+        self.assertTrue(Model._meta.pk.primary_key)
+        self.assertFalse(Model._meta.pk.editable)
+
+    @override_settings(DEFAULT_PK_FIELD="django.db.models.Model")
+    def test_default_pk_field_setting_non_field(self):
+        msg = (
+            "Primary key 'django.db.models.Model' referred by "
+            "DEFAULT_PK_FIELD must subclass Field."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
 
             class Model(models.Model):
                 pass

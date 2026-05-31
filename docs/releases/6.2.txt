@@ -183,6 +183,11 @@ Migrations
 Models
 ~~~~~~
 
+* The new :setting:`DEFAULT_PK_FIELD` setting allows projects to configure the
+  default primary key field type for models that don't define a primary key
+  explicitly, without requiring the field to subclass
+  :class:`~django.db.models.AutoField`.
+
 * ...
 
 Requests and Responses
