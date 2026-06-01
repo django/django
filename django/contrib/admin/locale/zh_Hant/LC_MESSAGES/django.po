@@ -2,7 +2,7 @@
 #
 # Translators:
 # Chen Chun-Chia <ccc.larc@gmail.com>, 2015
-# yubike, 2025
+# coby2023t, 2025-2026
 # ilay <ilay@ilay.tw>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # mail6543210 <mail6543210@yahoo.com.tw>, 2013-2014
@@ -12,15 +12,15 @@
 # W. H. Wang <mattwang44@gmail.com>, 2025
 # YAO WEN LIANG, 2024
 # Yeh-Yung <yyc1217@gmail.com>, 2013
-# yubike, 2024
+# coby2023t, 2024
 # Yeh-Yung <yyc1217@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 07:05+0000\n"
-"Last-Translator: W. H. Wang <mattwang44@gmail.com>, 2025\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2026-06-01 07:05+0000\n"
+"Last-Translator: coby2023t, 2025-2026\n"
 "Language-Team: Chinese (Taiwan) (http://app.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -324,10 +324,7 @@ msgstr ""
 "存在一個錯誤。已透過電子郵件回報給網站管理員，並且應該很快就會被修正。謝謝您"
 "的耐心等待。"
 
-msgid "Run the selected action"
-msgstr "執行選取的動作"
-
-msgid "Go"
+msgid "Run"
 msgstr "執行"
 
 msgid "Click here to select the objects across all pages"
@@ -433,6 +430,9 @@ msgstr "顯示計數"
 msgid "Clear all filters"
 msgstr "清除所有篩選"
 
+msgid "Save"
+msgstr "儲存"
+
 msgid "Remove from sorting"
 msgstr "從排序中移除"
 
@@ -454,27 +454,27 @@ msgstr "切換主題（當前主題:深色）"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"刪除 %(object_name)s '%(escaped_object)s' 會把相關的物件也刪除，不過你的帳號"
-"並沒有刪除以下型態物件的權限:"
+"刪除 %(object_name)s '%(escaped_object)s' 將一併刪除相關的物件，只是貴帳號並"
+"沒有刪除下列物件的權限:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"要刪除 %(object_name)s '%(escaped_object)s', 將要求刪除下面受保護的相關物件:"
+"刪除 %(object_name)s '%(escaped_object)s' 需一併刪除下列受保護的相關物件:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"你確定想要刪除 %(object_name)s \"%(escaped_object)s\"？以下所有的相關項目都會"
-"被刪除:"
+"確定想要刪除 %(object_name)s \"%(escaped_object)s\"嗎？下列相關資料會一併被刪"
+"除:"
 
 msgid "Objects"
 msgstr "物件"
@@ -578,6 +578,10 @@ msgstr "使用者"
 msgid "Action"
 msgstr "動作"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr "分頁 %(name)s 內容"
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "紀錄項目"
@@ -587,14 +591,19 @@ msgid ""
 "admin site."
 msgstr "該物件沒有修改的歷史紀錄。它可能不是透過此管理網站新增的。"
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr "分頁 %(name)s"
+
 msgid "Show all"
 msgstr "顯示全部"
 
-msgid "Save"
-msgstr "儲存"
-
 msgid "Popup closing…"
 msgstr "關閉彈跳視窗中..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr "搜尋 %(name)s"
 
 msgid "Search"
 msgstr "搜尋"
