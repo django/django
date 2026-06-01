@@ -34,6 +34,7 @@
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
 # mpachas <miguel.pachas.garcia@gmail.com>, 2022
 # monobotsoft <monobot.soft@gmail.com>, 2012
+# Nahuel Villegas, 2026
 # Natalia, 2024
 # ntrrgc <ntrrgc@gmail.com>, 2013
 # ntrrgc <ntrrgc@gmail.com>, 2013
@@ -41,16 +42,16 @@
 # Pablo, 2015
 # Sebastián Magrí, 2013
 # Sebastián Magrí, 2013
-# Uriel Medina <urimeba511@gmail.com>, 2020-2021,2023
+# Uriel Medina <urimeba511@gmail.com>, 2020-2021,2023,2026
 # Veronicabh <vero.blazher@gmail.com>, 2015
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 06:49+0000\n"
-"Last-Translator: Gustavo Adolfo Huarcaya Delgado <diavolo@gahd.net>, 2025\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2026-06-01 06:49+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020-2021,2023,2026\n"
 "Language-Team: Spanish (http://app.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -182,6 +183,9 @@ msgstr "Croata"
 
 msgid "Upper Sorbian"
 msgstr "Alto sorbio"
+
+msgid "Haitian Creole"
+msgstr "Criollo Haitiano"
 
 msgid "Hungarian"
 msgstr "Húngaro"
@@ -608,8 +612,8 @@ msgstr "Fecha (sin hora)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "“%(value)s”: el valor tiene un formato inválido. Debería estar en el formato "
 "YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
@@ -619,8 +623,8 @@ msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"“%(value)s”: el valor tiene el formato correcto (YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ]) pero es una fecha inválida."
+"“%(value)s”: el valor tiene el formato correcto (YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ]) pero es una fecha inválida."
 
 msgid "Date (with time)"
 msgstr "Fecha (con hora)"
@@ -634,8 +638,8 @@ msgstr "Número decimal"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "“%(value)s”: el valor tiene un formato inválido. Debería estar en el formato "
 "[DD] [[HH:]MM:]ss[.uuuuuu]"
@@ -765,8 +769,8 @@ msgid "Many-to-many relationship"
 msgstr "Relación muchos-a-muchos"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -937,6 +941,22 @@ msgstr "Sí"
 
 msgid "No"
 msgstr "No"
+
+msgctxt "Task"
+msgid "Ready"
+msgstr "Listo"
+
+msgctxt "Task"
+msgid "Running"
+msgstr "Ejecutando"
+
+msgctxt "Task"
+msgid "Failed"
+msgstr "Fallo"
+
+msgctxt "Task"
+msgid "Successful"
+msgstr "Exitoso"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1335,8 +1355,8 @@ msgstr "No %(verbose_name_plural)s disponibles"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
 "Los futuros %(verbose_name_plural)s no están disponibles porque "
 "%(class_name)s.allow_future es Falso."

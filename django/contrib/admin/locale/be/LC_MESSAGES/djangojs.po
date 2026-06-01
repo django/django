@@ -2,14 +2,15 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016,2020-2021,2023,2025
+# znotdead <zhirafchik@gmail.com>, 2016,2020-2021,2023,2025-2026
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-25 15:04-0500\n"
-"PO-Revision-Date: 2025-09-17 07:59+0000\n"
-"Last-Translator: znotdead <zhirafchik@gmail.com>, 2016,2020-2021,2023,2025\n"
+"PO-Revision-Date: 2026-06-01 07:59+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>, "
+"2016,2020-2021,2023,2025-2026\n"
 "Language-Team: Belarusian (http://app.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -102,7 +103,7 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
 "Абралі дзеяньне, а ў палях нічога не зьмянялі. Мажліва, вы хацелі націснуць "
