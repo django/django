@@ -5,15 +5,16 @@
 # Carles Barrobés <carles@barrobes.com>, 2011-2012,2014
 # Carlton Gibson <carlton.gibson@gmail.com>, 2023
 # Emilio Carrion, 2022
+# Isaac Torres, 2026
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Roger Pons <rogerpons@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-04 07:59+0000\n"
-"Last-Translator: Carlton Gibson <carlton.gibson@gmail.com>, 2023\n"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2026-06-01 07:59+0000\n"
+"Last-Translator: Isaac Torres, 2026\n"
 "Language-Team: Catalan (http://app.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -28,12 +29,10 @@ msgstr "%s Disponibles"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Aquesta és la llista de %s disponibles. En podeu escollir alguns "
-"seleccionant-los a la caixa de sota i fent clic a la fletxa \"Escollir\" "
-"entre les dues caixes."
+"Escollir %s seleccionat-los i a continuació, seleccioneu el botó de fleta "
+"\"Seleccionar\""
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -42,18 +41,17 @@ msgstr "Escriviu en aquesta caixa per a filtrar la llista de %s disponibles."
 msgid "Filter"
 msgstr "Filtre"
 
-msgid "Choose all"
-msgstr "Escollir-los tots"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "Escollir tots %s"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Feu clic per escollir tots els %s d'un cop."
+msgid "Choose selected %s"
+msgstr "Escollir seleccionats %s"
 
-msgid "Choose"
-msgstr "Escollir"
-
-msgid "Remove"
-msgstr "Eliminar"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "Eliminar seleccionats %s"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -61,23 +59,21 @@ msgstr "Escollit %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Aquesta és la llista de %s escollits. En podeu eliminar alguns seleccionant-"
-"los a la caixa de sota i fent clic a la fletxa \"Eliminar\" entre les dues "
-"caixes."
+"Eliminar %s seleccionat-los i a continuació, seleccioneu el botó de fleta "
+"\"Seleccionar\""
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "Escriviu en aquesta caixa per a filtrar la llista de %s seleccionats."
 
-msgid "Remove all"
-msgstr "Esborrar-los tots"
+msgid "(click to clear)"
+msgstr "(fer clic per netejar)"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Feu clic per eliminar tots els %s escollits d'un cop."
+msgid "Remove all %s"
+msgstr "Eliminar tots %s"
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -108,11 +104,9 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"Has seleccionat una acció i no has fet cap canvi als camps individuals. "
-"Probablement estàs cercant el botó Anar enlloc del botó de Desar."
 
 msgid "Now"
 msgstr "Ara"
@@ -322,9 +316,3 @@ msgstr "V"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
-
-msgid "Show"
-msgstr "Mostrar"
-
-msgid "Hide"
-msgstr "Ocultar"
