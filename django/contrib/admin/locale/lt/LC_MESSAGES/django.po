@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-03-09 07:05+0000\n"
+"PO-Revision-Date: 2026-06-01 07:05+0000\n"
 "Last-Translator: Karolis Ryselis <karolis@esperonus.com>, 2025-2026\n"
 "Language-Team: Lithuanian (http://app.transifex.com/django/django/language/"
 "lt/)\n"
@@ -585,10 +585,10 @@ msgid "Sidebar"
 msgstr "Šoninė juosta"
 
 msgid "Start typing to filter…"
-msgstr ""
+msgstr "Pradėkite rašyti, jei norite filtruoti..."
 
 msgid "Filter navigation items"
-msgstr ""
+msgstr "Filtruoti navigacijos įrašus"
 
 msgid "Date/time"
 msgstr "Data/laikas"
@@ -601,23 +601,25 @@ msgstr "Veiksmas"
 
 #, python-format
 msgid "Pagination %(name)s entries"
-msgstr ""
+msgstr "%(name)s puslapiavimo įrašai"
 
 msgid "entry"
 msgid_plural "entries"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "įrašas"
+msgstr[1] "įrašai"
+msgstr[2] "įrašų"
+msgstr[3] "įrašų"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
+"Šis objektas neturi pakeitimų istorijos. Tikriausiai jis buvo pridėtas ne "
+"per šį administravimo puslapį."
 
 #, python-format
 msgid "Pagination %(name)s"
-msgstr ""
+msgstr "Puslapiavimas %(name)s"
 
 msgid "Show all"
 msgstr "Rodyti visus"
@@ -627,7 +629,7 @@ msgstr "Iškylantysis langas užsidaro..."
 
 #, python-format
 msgid "Search %(name)s"
-msgstr ""
+msgstr "Ieškoti %(name)s"
 
 msgid "Search"
 msgstr "Ieškoti"
@@ -673,10 +675,10 @@ msgstr "Pašalinti pasirinktus %(model)s"
 
 #, python-format
 msgid "View selected %(model)s"
-msgstr ""
+msgstr "Peržiūrėti pasirinktus %(model)s"
 
 msgid "Thanks for spending some quality time with the web site today."
-msgstr ""
+msgstr "Ačiū, kad šiandien skyrėte laiko apsilankyti mūsų svetainėje."
 
 msgid "Log in again"
 msgstr "Prisijungti dar kartą"
@@ -691,6 +693,8 @@ msgid ""
 "Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
+"Saugumo sumetimais įveskite seną slaptažodį ir tada du kartus naują, kad "
+"įsitikintume, jog jis įvestas teisingai"
 
 msgid "Change my password"
 msgstr "Keisti mano slaptažodį"
@@ -728,11 +732,16 @@ msgid ""
 "We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"Jei egzistuoja vartotojas su jūsų įvestu elektroninio pašto adresu, "
+"išsiuntėme jums slaptažodžio atstatymo instrukcijas. Jas turėtumėte gauti "
+"netrukus."
 
 msgid ""
 "If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
+"Jei el. laiško negavote, prašome įsitikinti, ar įvedėte tą el. pašto adresą, "
+"kuriuo registravotės, ir patikrinkite savo šlamšto aplanką."
 
 #, python-format
 msgid ""
@@ -746,7 +755,7 @@ msgid "Please go to the following page and choose a new password:"
 msgstr "Prašome eiti į šį puslapį ir pasirinkti naują slaptažodį:"
 
 msgid "In case you’ve forgotten, you are:"
-msgstr ""
+msgstr "Jeigu pamiršote, jūs esate:"
 
 msgid "Thanks for using our site!"
 msgstr "Dėkui, kad naudojatės mūsų tinklalapiu!"
@@ -759,6 +768,8 @@ msgid ""
 "Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
+"Pamiršote slaptažodį? Įveskite savo el. pašto adresą ir mes išsiųsime laišką "
+"su instrukcijomis kaip susikurti naują slaptažodį."
 
 msgid "Email address:"
 msgstr "El. pašto adresas:"
@@ -767,7 +778,7 @@ msgid "Reset my password"
 msgstr "Atstatyti slaptažodį"
 
 msgid "Select all objects on this page for an action"
-msgstr ""
+msgstr "Pasirinkti visus objektus šiame puslapyje veiksmui atlikti"
 
 msgid "All dates"
 msgstr "Visos datos"

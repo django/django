@@ -5,7 +5,7 @@
 # Boryslav Larin <brabadu@gmail.com>, 2011,2022
 # Denys Pidlisnyi <haos616@gmail.com>, 2016
 # Igor Melnyk, 2014-2015,2017
-# Illia Volochii <illia.volochii@gmail.com>, 2019,2021-2023,2025
+# Illia Volochii <illia.volochii@gmail.com>, 2019,2021-2023,2025-2026
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2014
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
@@ -22,10 +22,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2026-06-01 06:49+0000\n"
 "Last-Translator: Illia Volochii <illia.volochii@gmail.com>, "
-"2019,2021-2023,2025\n"
+"2019,2021-2023,2025-2026\n"
 "Language-Team: Ukrainian (http://app.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -159,6 +159,9 @@ msgstr "Хорватська"
 
 msgid "Upper Sorbian"
 msgstr "Верхньолужицька"
+
+msgid "Haitian Creole"
+msgstr "Гаїтянська креольська"
 
 msgid "Hungarian"
 msgstr "Угорська"
@@ -594,8 +597,8 @@ msgstr "Дата (без часу)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "Значення \"%(value)s\" має невірний формат. Воно повинне бути у форматі YYYY-"
 "MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
@@ -618,8 +621,8 @@ msgstr "Десяткове число"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 
 msgid "Duration"
@@ -685,8 +688,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"Значення \"%(value)s\" має невірний формат. Воно повинне бути у форматі HH:"
-"MM[:ss[.uuuuuu]]."
+"Значення \"%(value)s\" має невірний формат. Воно повинне бути у форматі "
+"HH:MM[:ss[.uuuuuu]]."
 
 #, python-format
 msgid ""
@@ -744,8 +747,8 @@ msgid "Many-to-many relationship"
 msgstr "Багато-до-багатьох"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -915,6 +918,22 @@ msgstr "Так"
 
 msgid "No"
 msgstr "Ні"
+
+msgctxt "Task"
+msgid "Ready"
+msgstr ""
+
+msgctxt "Task"
+msgid "Running"
+msgstr ""
+
+msgctxt "Task"
+msgid "Failed"
+msgstr ""
+
+msgctxt "Task"
+msgid "Successful"
+msgstr ""
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1308,11 +1327,11 @@ msgstr "%(verbose_name_plural)s недоступні"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"Майбутні %(verbose_name_plural)s недоступні, тому що %(class_name)s."
-"allow_future має нульове значення."
+"Майбутні %(verbose_name_plural)s недоступні, тому що "
+"%(class_name)s.allow_future має нульове значення."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
@@ -1362,10 +1381,10 @@ msgid ""
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"Ви бачите цю сторінку тому що змінна <a href=\"https://docs.djangoproject."
-"com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
-"rel=\"noopener\">DEBUG</a> встановлена на <i>True</i> у вашому файлі "
-"конфігурації і ви не налаштували жодного URL."
+"Ви бачите цю сторінку тому що змінна <a href=\"https://"
+"docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" "
+"target=\"_blank\" rel=\"noopener\">DEBUG</a> встановлена на <i>True</i> у "
+"вашому файлі конфігурації і ви не налаштували жодного URL."
 
 msgid "Django Documentation"
 msgstr "Документація Django"
