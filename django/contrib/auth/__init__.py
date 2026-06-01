@@ -402,6 +402,7 @@ def check_password_with_timing_attack_mitigation(user, password):
 async def acheck_password_with_timing_attack_mitigation(user, password):
     """See check_user_with_timing_attack_mitigation."""
     if user is None:
-        await sync_to_async(get_user_model()().set_password)(password)
+        set_password = get_user_model()().set_password
+        await sync_to_async(set_password, thread_sensitive=False)(password)
     else:
         return await user.acheck_password(password)
