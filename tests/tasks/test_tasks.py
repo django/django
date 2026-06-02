@@ -372,14 +372,20 @@ class TaskTestCase(SimpleTestCase):
         self.assertEqual(task_eq_1, task_eq_2)
         self.assertNotEqual(task_eq_1, task_eq_3)
 
-    def test_task_result_equality_by_id_only(self):
+    def test_task_result_equality(self):
         result_1 = test_tasks.noop_task.enqueue()
 
-        result_2 = dataclasses.replace(
-            result_1, status=TaskResultStatus.SUCCESSFUL, backend="different_backend"
+        result_same = dataclasses.replace(result_1, backend="different_backend")
+        self.assertEqual(result_1, result_same)
+
+        result_diff_status = dataclasses.replace(
+            result_1, status=TaskResultStatus.SUCCESSFUL
         )
+        self.assertNotEqual(result_1, result_diff_status)
 
-        result_3 = dataclasses.replace(result_1, id="completely-different-id")
+        later = timezone.now() + timedelta(minutes=5)
+        result_diff_time = dataclasses.replace(result_1, last_attempted_at=later)
+        self.assertNotEqual(result_1, result_diff_time)
 
-        self.assertEqual(result_1, result_2)
-        self.assertNotEqual(result_1, result_3)
+        result_diff_id = dataclasses.replace(result_1, id="completely-different-id")
+        self.assertNotEqual(result_1, result_diff_id)

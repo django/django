@@ -56,19 +56,20 @@ class Task:
         self.get_backend().validate_task(self)
 
     def __lt__(self, other):
-        if not isinstance(other, Task):
+        try:
+            return (self.priority, self.run_after is not None, self.run_after) < (
+                other.priority,
+                other.run_after is not None,
+                other.run_after,
+            )
+        except AttributeError:
             return NotImplemented
-
-        self_time = (self.run_after is not None, self.run_after)
-        other_time = (other.run_after is not None, other.run_after)
-
-        return (self.priority, self_time) < (other.priority, other_time)
 
     def __eq__(self, other):
-        if not isinstance(other, Task):
+        try:
+            return (self.priority, self.run_after) == (other.priority, other.run_after)
+        except AttributeError:
             return NotImplemented
-
-        return (self.priority, self.run_after) == (other.priority, other.run_after)
 
     @classmethod
     def _reconstruct(cls, kwargs):
@@ -219,31 +220,35 @@ class TaskResult:
     task: Task
 
     id: str  # Unique identifier for the task result.
-    status: TaskResultStatus = field(compare=False)
-    enqueued_at: datetime | None = field(compare=False)  # Time the task was enqueued.
-    started_at: datetime | None = field(compare=False)  # Time the task was started.
-    finished_at: datetime | None = field(compare=False)  # Time the task was finished.
+    status: TaskResultStatus
+    enqueued_at: datetime | None  # Time the task was enqueued.
+    started_at: datetime | None  # Time the task was started.
+    finished_at: datetime | None  # Time the task was finished.
 
     # Time the task was last attempted to be run.
-    last_attempted_at: datetime | None = field(compare=False)
+    last_attempted_at: datetime | None
 
-    args: list[Any] = field(compare=False)  # Arguments to pass to the task function.
-    kwargs: dict[str, Any] = field(
-        compare=False
-    )  # Keyword arguments to pass to the task function.
-    backend: str = field(compare=False)
-    errors: list[TaskError] = field(
-        compare=False
-    )  # Errors raised when running the task.
-    worker_ids: list[str] = field(
-        compare=False
-    )  # Workers which have processed the task.
+    args: list[Any]  # Arguments to pass to the task function.
+    kwargs: dict[str, Any]  # Keyword arguments to pass to the task function.
+    backend: str
+    errors: list[TaskError]  # Errors raised when running the task.
+    worker_ids: list[str]  # Workers which have processed the task.
 
-    _return_value: Any | None = field(init=False, default=None, compare=False)
+    _return_value: Any | None = field(init=False, default=None)
 
     def __post_init__(self):
         object.__setattr__(self, "args", normalize_json(self.args))
         object.__setattr__(self, "kwargs", normalize_json(self.kwargs))
+
+    def __eq__(self, other):
+        try:
+            return (self.id, self.status, self.last_attempted_at) == (
+                other.id,
+                other.status,
+                other.last_attempted_at,
+            )
+        except AttributeError:
+            return NotImplemented
 
     @property
     def return_value(self):
