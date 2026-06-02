@@ -154,6 +154,7 @@ MISSING_TRAC_TICKET = (
     "Patches submitted against unreviewed tickets are unlikely to be merged.\n"
     "3. Edit the **Trac ticket number** section of your PR description to include "
     "the ticket in the format `ticket-NNNNN` (e.g. `ticket-36991`).\n\n"
-    "For PRs with fewer than {threshold} lines changed (additions + deletions), you "
-    "may write `N/A` in the ticket field instead (e.g. `N/A - typo fix`).",
+    "Unless this is your first contribution, for PRs with fewer than {threshold} lines "
+    "changed (additions + deletions), you may write `N/A` in the ticket field instead "
+    "(e.g. `N/A - typo fix`).",
 )
