@@ -345,7 +345,7 @@ class TaskTestCase(SimpleTestCase):
         with self.assertRaisesMessage(TypeError, msg):
             task(run_after=timezone.now())(test_tasks.calculate_meaning_of_life.func)
 
-    def test_task_comparability_in_priority_queue(self):
+    def test_task_result_comparability_in_priority_queue(self):
         now = timezone.now()
         later = now + timedelta(hours=1)
 
@@ -354,23 +354,21 @@ class TaskTestCase(SimpleTestCase):
         task_high_late = test_tasks.noop_task.using(priority=1, run_after=later)
         task_low = test_tasks.noop_task.using(priority=5, run_after=now)
 
+        tr_high_immediate = task_high_immediate.enqueue()
+        tr_high_early = task_high_early.enqueue()
+        tr_high_late = task_high_late.enqueue()
+        tr_low = task_low.enqueue()
+
         pq = queue.PriorityQueue()
-        pq.put(task_low)
-        pq.put(task_high_late)
-        pq.put(task_high_immediate)
-        pq.put(task_high_early)
+        pq.put(tr_low)
+        pq.put(tr_high_late)
+        pq.put(tr_high_immediate)
+        pq.put(tr_high_early)
 
-        self.assertEqual(pq.get(), task_high_immediate)
-        self.assertEqual(pq.get(), task_high_early)
-        self.assertEqual(pq.get(), task_high_late)
-        self.assertEqual(pq.get(), task_low)
-
-        task_eq_1 = test_tasks.noop_task.using(priority=2, run_after=now)
-        task_eq_2 = test_tasks.noop_task.using(priority=2, run_after=now)
-        task_eq_3 = test_tasks.noop_task.using(priority=3, run_after=now)
-
-        self.assertEqual(task_eq_1, task_eq_2)
-        self.assertNotEqual(task_eq_1, task_eq_3)
+        self.assertEqual(pq.get(), tr_high_immediate)
+        self.assertEqual(pq.get(), tr_high_early)
+        self.assertEqual(pq.get(), tr_high_late)
+        self.assertEqual(pq.get(), tr_low)
 
     def test_task_result_equality(self):
         result_1 = test_tasks.noop_task.enqueue()

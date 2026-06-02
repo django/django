@@ -208,7 +208,9 @@ Signals
 Tasks
 ~~~~~
 
-* ...
+* The ``Task`` and ``TaskResult`` objects now support comparability,
+  allowing them to be evaluated and sorted natively within priority
+  queues.
 
 Templates
 ~~~~~~~~~

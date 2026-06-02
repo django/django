@@ -250,6 +250,17 @@ class TaskResult:
         except AttributeError:
             return NotImplemented
 
+    def __lt__(self, other):
+        try:
+            if self.task == other.task:
+                return (self.enqueued_at is not None, self.enqueued_at) < (
+                    other.enqueued_at is not None,
+                    other.enqueued_at,
+                )
+            return self.task < other.task
+        except AttributeError:
+            return NotImplemented
+
     @property
     def return_value(self):
         """
