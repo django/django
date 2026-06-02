@@ -349,7 +349,6 @@ or an unexpected success). If all the tests pass, the return code is 0. This
 feature is useful if you're using the test-runner script in a shell script and
 need to test for success or failure at that level.
 
-.. _speeding-up-tests-auth-hashers:
 
 Speeding up the tests
 ---------------------
@@ -359,6 +358,8 @@ Running tests in parallel
 
 As long as your tests are properly isolated, you can run them in parallel to
 gain a speed up on multi-core hardware. See :option:`test --parallel`.
+
+.. _speeding-up-tests-auth-hashers:
 
 Password hashing
 ~~~~~~~~~~~~~~~~
