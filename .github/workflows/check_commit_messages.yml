@@ -22,7 +22,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Calculate commit prefix
+      - name: Set base and calculate commit prefix
         id: vars
         env:
           BASE: ${{ github.event.pull_request.base.ref }}
@@ -79,6 +79,11 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
+
+      - name: Set base
+        env:
+          BASE: ${{ github.event.pull_request.base.ref }}
+        run: echo "BASE=$BASE" >> $GITHUB_ENV
 
       - name: Fetch relevant branches
         run: |
