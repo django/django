@@ -8,7 +8,7 @@ with contributing to Python open source projects.
 
 This guide assumes you're familiar with:
 
-* Git (see :doc:`how-to use Git </internals/contributing/writing-code/working-with-git>`)
+* Git (see :doc:`/internals/contributing/writing-code/working-with-git`)
 
 * Managing multiple versions of Python
 
@@ -47,7 +47,7 @@ Run the tests:
 
     $ ./tests/runtests.py
 
-See :ref:`running-unit-tests` for more information. Whil tests will all pass
+See :ref:`running-unit-tests` for more information. While tests will all pass
 in CI, they may not on every person's local environment. For example, only the
 latest point release of Python is supported. It's possible you may encounter
 errors using an earlier version of Python.
@@ -87,6 +87,8 @@ consider filtering down to the forms components. Similarly, if you've
 never worked with geospatial projects, it's probably wise to avoid
 ``django.contrib.gis``.
 
+.. _looking over tickets: https://code.djangoproject.com/query?stage=Accepted&status=assigned&status=new&order=id&desc=1&col=id&col=summary&col=owner&col=type&col=component&col=time&col=changetime
+
 Methods to find tickets
 -----------------------
 
@@ -105,6 +107,9 @@ When you find a stale ticket, make yourself the owner on the ticket with
 the "Modify Ticket" button near the bottom of the page. Claim the ticket
 by clicking the "assign to" radio button in the "Action" section. Your
 username will be filled in the text box by default.
+
+.. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1
+.. _vulture method: https://youtube.com/shorts/D6QHet5U82U?si=j5M6sy0ufpeGy_iZ
 
 Resuming work from someone else's branch
 ========================================
@@ -134,7 +139,3 @@ command to run would be:
 When preparing your commit, please review our
 :ref:`committing guidelines <committing-guidelines>`, specifically how to
 credit co-authors.
-
-.. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1
-.. _vulture method: https://youtube.com/shorts/D6QHet5U82U?si=j5M6sy0ufpeGy_iZ
-.. _looking over tickets: https://code.djangoproject.com/query?stage=Accepted&status=assigned&status=new&order=id&desc=1&col=id&col=summary&col=owner&col=type&col=component&col=time&col=changetime
