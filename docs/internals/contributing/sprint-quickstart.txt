@@ -76,9 +76,10 @@ Assessing tickets
 
 When `looking over tickets`_, it's a good idea to keep your search to
 tickets that were created in the last five years. An easy way to tell is
-by the ticket number. Avoid tickets with an ID of less than 20,000. These
-are old for a reason. You're welcome to try, but they will require a high
-degree of perseverance.
+by the ticket number. Avoid tickets older than 10 years old. These are old
+for a reason. You're welcome to try, but they will require a high
+degree of perseverance. We recommend you start with tickets created in the
+last five years when getting started.
 
 Consider using the component filter option in Trac to limit your search
 to areas you have used before. If you've used forms in a few Django apps,
