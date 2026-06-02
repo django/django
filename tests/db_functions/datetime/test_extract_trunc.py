@@ -1948,3 +1948,29 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
             DTModel.objects.annotate(
                 hour_melb=Trunc("start_time", "hour", tzinfo=melb),
             ).get()
+
+    @override_settings(TIME_ZONE="Australia/Melbourne")
+    def test_trunc_filter_non_utc_active(self):
+        melb = zoneinfo.ZoneInfo("Australia/Melbourne")
+        start_datetime = datetime.datetime(2015, 6, 15, 1, 30, 1, 321, tzinfo=melb)
+        end_datetime = datetime.datetime(2015, 6, 16, 2, 30, 1, 123, tzinfo=melb)
+        self.create_model(start_datetime, end_datetime)
+
+        # Trunc() yields a naive datetime (June 15), but the RHS is aware.
+        self.assertEqual(
+            DTModel.objects.annotate(
+                day_melb=Trunc("start_datetime", "day"),
+            )
+            .filter(day_melb__lt=start_datetime)
+            .count(),
+            0,
+        )
+        # When TIME_ZONE != "UTC", supply tzinfo explicitly.
+        self.assertEqual(
+            DTModel.objects.annotate(
+                day_melb=Trunc("start_datetime", "day", tzinfo=datetime.UTC),
+            )
+            .filter(day_melb__lt=start_datetime)
+            .count(),
+            1,
+        )
