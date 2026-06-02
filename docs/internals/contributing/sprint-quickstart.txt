@@ -98,7 +98,7 @@ Some ways to find a ticket to work on are the following:
 The vulture method is the process where you look for accepted tickets that
 haven't been touched in six months or longer. The ideal ticket has a PR
 attached to it that has a code review with explicit requests and the author
-has not responded in at least six months.
+has not responded in at least six months on the PR and on the ticket.
 
 When you find a stale ticket, make yourself the owner on the ticket with
 the "Modify Ticket" button near the bottom of the page. Claim the ticket
