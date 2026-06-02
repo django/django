@@ -1,4 +1,4 @@
-@import url("{{ pathto('_static/fontawesome/css/fa-brands.min.css', 1) }}");
+@import url("fontawesome/css/fa-brands.min.css");
 
 .console-block {
     text-align: right;
