@@ -74,7 +74,7 @@ to read this whole section before attempting to find a ticket to work on.
 Assessing tickets
 -----------------
 
-When looking over tickets, it's a good idea to keep your search to
+When `looking over tickets`_, it's a good idea to keep your search to
 tickets that were created in the last five years. An easy way to tell is
 by the ticket number. Avoid tickets with an ID of less than 20,000. These
 are old for a reason. You're welcome to try, but they will require a high
@@ -136,3 +136,4 @@ credit co-authors.
 
 .. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1
 .. _vulture method: https://youtube.com/shorts/D6QHet5U82U?si=j5M6sy0ufpeGy_iZ
+.. _looking over tickets: https://code.djangoproject.com/query?stage=Accepted&status=assigned&status=new&order=id&desc=1&col=id&col=summary&col=owner&col=type&col=component&col=time&col=changetime
