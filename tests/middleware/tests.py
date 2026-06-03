@@ -595,6 +595,19 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
             ConditionalGetMiddleware(self.get_response)(self.req).has_header("ETag")
         )
 
+    def test_no_etag_no_store_cache_whitespace(self):
+        # A no-store directive with surrounding whitespace (e.g. from a
+        # multi-value header where split(",") leaves leading space) must still
+        # prevent ETag generation.
+        for cc in (" no-store", "\tno-store", "no-cache, no-store"):
+            with self.subTest(cache_control=cc):
+                self.resp_headers["Cache-Control"] = cc
+                self.assertFalse(
+                    ConditionalGetMiddleware(self.get_response)(self.req).has_header(
+                        "ETag"
+                    )
+                )
+
     def test_etag_extended_cache_control(self):
         self.resp_headers["Cache-Control"] = 'my-directive="my-no-store"'
         self.assertTrue(

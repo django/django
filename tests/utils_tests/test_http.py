@@ -18,6 +18,7 @@ from django.utils.http import (
     parse_header_parameters,
     parse_http_date,
     quote_etag,
+    split_header_value,
     url_has_allowed_host_and_scheme,
     urlencode,
     urlsafe_base64_decode,
@@ -319,6 +320,41 @@ class IsSameDomainTests(unittest.TestCase):
             ("foo.example.com:8888", ""),
         ):
             self.assertIs(is_same_domain(*pair), False)
+
+
+class SplitHeaderValueTests(unittest.TestCase):
+    def test_basic(self):
+        tests = [
+            ("", []),
+            ("no-store", ["no-store"]),
+            ("no-store, max-age=0", ["no-store", "max-age=0"]),
+            # Trailing/leading commas from header concatenation.
+            ("no-store,", ["no-store"]),
+            (",no-store", ["no-store"]),
+            # Whitespace around tokens.
+            (" no-store , max-age=0 ", ["no-store", "max-age=0"]),
+            # Semicolons are not separators with the default sep.
+            ("text/html; charset=utf-8", ["text/html; charset=utf-8"]),
+            ("a; b, c; d", ["a; b", "c; d"]),
+        ]
+        for value, expected in tests:
+            with self.subTest(value=value):
+                self.assertEqual(list(split_header_value(value)), expected)
+
+    def test_custom_sep(self):
+        tests = [
+            ("", []),
+            ("text/html", ["text/html"]),
+            ("text/html; charset=utf-8", ["text/html", "charset=utf-8"]),
+            # Trailing/leading separators.
+            ("text/html;", ["text/html"]),
+            (";text/html", ["text/html"]),
+            # Whitespace around tokens.
+            (" text/html ; charset=utf-8 ", ["text/html", "charset=utf-8"]),
+        ]
+        for value, expected in tests:
+            with self.subTest(value=value):
+                self.assertEqual(list(split_header_value(value, sep=";")), expected)
 
 
 class ETagProcessingTests(unittest.TestCase):
