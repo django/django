@@ -2838,16 +2838,23 @@ See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATE_FORMAT`.
 
 .. versionadded:: 5.2.15
 
-Default: ``True``
+Default: ``False``
 
 Controls whether :meth:`~django.http.HttpRequest.get_signed_cookie` accepts
 cookies signed with Django's historical signed-cookie salt derivation based on
 ``key + salt``.
 
-Set this to ``False`` to reject those legacy signed cookies and only accept
+Set this to ``True`` to accept those legacy signed cookies in addition to
 cookies signed with Django's current unambiguous signed-cookie salt derivation.
-This transitional setting will be removed in Django 7.0, when the legacy signed
-cookies will no longer be accepted.
+
+.. versionchanged:: 6.1
+
+    In older versions, the default was ``True``.
+
+.. deprecated:: 6.1
+
+    This transitional setting will be removed in Django 7.0, when legacy signed
+    cookies will no longer be accepted.
 
 .. setting:: SIGNING_BACKEND
 
