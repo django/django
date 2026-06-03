@@ -7,6 +7,7 @@ from django.test.utils import garbage_collect, ignore_warnings
 from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import (
+    Biome,
     Bookmark,
     Domain,
     Family,
@@ -14,11 +15,13 @@ from .models import (
     HybridSpecies,
     Kingdom,
     Klass,
+    Moss,
     Order,
     Phylum,
     Pizza,
     Species,
     TaggedItem,
+    Tree,
 )
 
 
@@ -348,3 +351,26 @@ class SelectRelatedValidationTests(SimpleTestCase):
             FieldError, self.invalid_error % ("content_object", "content_type")
         ):
             list(TaggedItem.objects.select_related("content_object"))
+
+
+class SelectRelatedForeignObjectTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        biome = Biome.objects.create(name="Tundra")
+        Tree.objects.create(code=999)
+        Moss.objects.create(biome=biome, tree_code=999)
+
+    def test_select_related_foreign_object_with_defer(self):
+        """
+        select_related() including a ForeignObject should not raise a
+        FieldError when unrelated fields are deferred.
+
+        ForeignObject has no physical column, so it's not present in
+        select_mask. This test ensures the ORM doesn't treat that as
+        explicit deferral.
+        """
+        qs = Moss.objects.select_related("tree", "biome").defer("biome__name")
+        results = list(qs)
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].tree.code, 999)
