@@ -177,7 +177,7 @@ class TranslationTests(SimpleTestCase):
         self.assertEqual(len(french._catalog._catalogs), 6)
         # Translations from this last one are supposed to win.
         self.assertEqual(french.gettext("I win"), "Je gagne")
-        # Merge a third translation file with the same plural forms as the second one.
+        # Merge a third translation file with the same plural forms.
         catalog3 = _create_translation_from_string(
             'msgid ""\n'
             'msgstr ""\n'
