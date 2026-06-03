@@ -2346,7 +2346,7 @@ supervisor designated by ``MySpecialUser``::
 .. _onetoone-arguments:
 
 Additionally, ``OneToOneField`` accepts all of the extra arguments
-accepted by :class:`ForeignKey`, plus one extra argument:
+accepted by :class:`ForeignKey`, plus two extra arguments:
 
 .. attribute:: OneToOneField.parent_link
 
@@ -2355,6 +2355,17 @@ accepted by :class:`ForeignKey`, plus one extra argument:
     link back to the parent class, rather than the extra
     ``OneToOneField`` which would normally be implicitly created by
     subclassing.
+
+.. attribute:: OneToOneField.related_default
+
+    Determines the behavior of a reverse lookup in the event that the
+    related instance does not exist.
+
+    Defaults to ``RelatedDefaultRaiseException``
+    which will raise a RelatedObjectDoesNotExist exception.
+    If a value is provided, such as ``None``, that value will be returned.
+    The value can also be a callable in which case the result of
+    that callable will be returned.
 
 See :doc:`One-to-one relationships </topics/db/examples/one_to_one>` for usage
 examples of ``OneToOneField``.
