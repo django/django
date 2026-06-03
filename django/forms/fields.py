@@ -1390,6 +1390,8 @@ class JSONField(CharField):
         return json.dumps(value, ensure_ascii=False, cls=self.encoder)
 
     def has_changed(self, initial, data):
+        if self.disabled:
+            return False
         if super().has_changed(initial, data):
             return True
         # For purposes of seeing whether something has changed, True isn't the
