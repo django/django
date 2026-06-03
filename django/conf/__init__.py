@@ -26,6 +26,12 @@ DEFAULT_STORAGE_ALIAS = "default"
 STATICFILES_STORAGE_ALIAS = "staticfiles"
 
 # RemovedInDjango70Warning.
+SIGNED_COOKIE_LEGACY_SALT_DEPRECATED_MSG = (
+    "The SIGNED_COOKIE_LEGACY_SALT_FALLBACK transitional setting is "
+    "deprecated. Remove it from your settings once legacy signed cookies "
+    "have expired. They will not be accepted in Django 7.0."
+)
+# RemovedInDjango70Warning.
 USE_BLANK_CHOICE_DASH_DEPRECATED_MSG = (
     "The USE_BLANK_CHOICE_DASH setting is deprecated. If you wish to define "
     "your own default blank choice label, override "
@@ -149,6 +155,12 @@ class LazySettings(LazyObject):
             self.__dict__.pop(name, None)
 
         # RemovedInDjango70Warning.
+        if name == "SIGNED_COOKIE_LEGACY_SALT_FALLBACK":
+            _show_settings_deprecation_warning(
+                SIGNED_COOKIE_LEGACY_SALT_DEPRECATED_MSG,
+                RemovedInDjango70Warning,
+            )
+        # RemovedInDjango70Warning.
         if name == "USE_BLANK_CHOICE_DASH":
             _show_settings_deprecation_warning(
                 USE_BLANK_CHOICE_DASH_DEPRECATED_MSG, RemovedInDjango70Warning
@@ -260,6 +272,13 @@ class Settings:
                 self._explicit_settings.add(setting)
 
         # RemovedInDjango70Warning.
+        if "SIGNED_COOKIE_LEGACY_SALT_FALLBACK" in self._explicit_settings:
+            warnings.warn(
+                SIGNED_COOKIE_LEGACY_SALT_DEPRECATED_MSG,
+                RemovedInDjango70Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
+        # RemovedInDjango70Warning.
         if "USE_BLANK_CHOICE_DASH" in self._explicit_settings:
             warnings.warn(
                 USE_BLANK_CHOICE_DASH_DEPRECATED_MSG,
@@ -319,6 +338,13 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
+        # RemovedInDjango70Warning.
+        if name == "SIGNED_COOKIE_LEGACY_SALT_FALLBACK":
+            _show_settings_deprecation_warning(
+                SIGNED_COOKIE_LEGACY_SALT_DEPRECATED_MSG,
+                RemovedInDjango70Warning,
+            )
+        # RemovedInDjango70Warning.
         if name == "USE_BLANK_CHOICE_DASH":
             _show_settings_deprecation_warning(
                 USE_BLANK_CHOICE_DASH_DEPRECATED_MSG, RemovedInDjango70Warning

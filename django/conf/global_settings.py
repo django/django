@@ -561,7 +561,7 @@ AUTH_PASSWORD_VALIDATORS = []
 # SIGNING #
 ###########
 
-SIGNED_COOKIE_LEGACY_SALT_FALLBACK = True
+SIGNED_COOKIE_LEGACY_SALT_FALLBACK = False
 SIGNING_BACKEND = "django.core.signing.TimestampSigner"
 
 ########

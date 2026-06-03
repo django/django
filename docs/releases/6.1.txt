@@ -331,6 +331,13 @@ Requests and Responses
   the :func:`~django.shortcuts.redirect` shortcut, now accept a ``max_length``
   parameter to override the default maximum URL length limit.
 
+Security
+~~~~~~~~
+
+* Signed cookies now use an unambiguous salt derivation by default. Set
+  :setting:`SIGNED_COOKIE_LEGACY_SALT_FALLBACK` to ``True`` to continue
+  accepting legacy signed cookies.
+
 Serialization
 ~~~~~~~~~~~~~
 
@@ -508,6 +515,9 @@ Miscellaneous
 
 * The minimum supported version of SQLite is increased from 3.31.0 to 3.37.0.
 
+* The default value of the transitional setting
+  :setting:`SIGNED_COOKIE_LEGACY_SALT_FALLBACK` is now ``False``.
+
 * :class:`~django.contrib.contenttypes.fields.GenericForeignKey` now uses a
   separate descriptor class: the private ``GenericForeignKeyDescriptor``.
 
@@ -624,6 +634,9 @@ Miscellaneous
   in favor of the new constant ``django.db.models.fields.BLANK_CHOICE_LABEL``.
 
 * The :setting:`USE_BLANK_CHOICE_DASH` transitional setting is deprecated.
+
+* The :setting:`SIGNED_COOKIE_LEGACY_SALT_FALLBACK` transitional setting is
+  deprecated.
 
 * The undocumented ``get_placeholder`` method of
   :class:`~django.db.models.Field` is deprecated in favor of the newly
