@@ -265,6 +265,9 @@ Note the second example is more restrictive.
 If you need to execute more complex queries (for example, queries with ``OR``
 statements), you can use :class:`Q objects <django.db.models.Q>` (``*args``).
 
+For the behavior of ``exclude(field__in=...)`` when the right-hand side is
+a queryset whose column can be ``NULL``, see the :lookup:`in` field lookup.
+
 ``annotate()``
 ~~~~~~~~~~~~~~
 
@@ -3361,6 +3364,27 @@ extract two field values, where only one is expected::
     # Bad code! Will raise a TypeError.
     inner_qs = Blog.objects.filter(name__contains="Ch").values("name", "id")
     entries = Entry.objects.filter(blog__name__in=inner_qs)
+
+.. warning::
+
+    When the right-hand side of ``__in`` is a
+    :class:`~django.db.models.Subquery` or a ``values()`` /
+    ``values_list()`` queryset whose returned column is nullable,
+    ``exclude(field__in=...)`` compiles to SQL ``NOT IN (subquery)``. If
+    the subquery returns a ``NULL`` value, the whole condition evaluates
+    to UNKNOWN under SQL's three-valued logic and the queryset returns
+    no rows.
+
+    Use :class:`~django.db.models.Exists` with
+    :class:`~django.db.models.OuterRef` instead. It compiles to
+    ``NOT EXISTS`` and handles ``NULL`` correctly::
+
+        Entry.objects.exclude(
+            Exists(Blog.objects.filter(name__contains="Cheddar", pk=OuterRef("blog")))
+        )
+
+    See :ticket:`20024` for the related case of literal ``None`` values
+    in ``__in`` lists.
 
 .. _nested-queries-performance:
 
