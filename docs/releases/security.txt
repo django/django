@@ -36,6 +36,64 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+June 3, 2026 - :cve:`2026-6873`
+-------------------------------
+
+Signed cookie salt namespace collision in
+``django.http.HttpRequest.get_signed_cookie``.
+`Full description
+<https://www.djangoproject.com/weblog/2026/jun/03/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <42bdfd74ff85eb9ddf8fd444e2359afd9add59c8>`
+* Django 6.0 :commit:`(patch) <c807d9c398022d23cb27518fa6ecaf343efb30cf>`
+* Django 5.2 :commit:`(patch) <594360cbf58be7f56eb6da96d58644297c99ef85>`
+
+June 3, 2026 - :cve:`2026-7666`
+-------------------------------
+
+Potential unencrypted email transmission via ``STARTTLS`` in the SMTP backend.
+`Full description
+<https://www.djangoproject.com/weblog/2026/jun/03/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <afd82a544910dc79941a44af078bbc59e3e18f1c>`
+* Django 6.0 :commit:`(patch) <625a670c467aa3118c0f8ae1e0df14dbebb3bf68>`
+* Django 5.2 :commit:`(patch) <4e47d2b800435bcbfd1301ef3250b9c7fb8fa670>`
+
+June 3, 2026 - :cve:`2026-8404`
+-------------------------------
+
+Potential exposure of private data via case-sensitive ``Cache-Control``
+directives in ``UpdateCacheMiddleware``.
+`Full description
+<https://www.djangoproject.com/weblog/2026/jun/03/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <130467c8b4d05a69b885363aa7d47386e4f5d6a9>`
+* Django 6.0 :commit:`(patch) <b4330259ffbe1a031ed14daab1f35697460f10f2>`
+* Django 5.2 :commit:`(patch) <366d9ae6e8d1469c04e9ebdc1bcd098fc14a3b1e>`
+
+June 3, 2026 - :cve:`2026-35193`
+--------------------------------
+
+Potential exposure of private data via missing ``Vary: Authorization`` in
+``UpdateCacheMiddleware``.
+`Full description
+<https://www.djangoproject.com/weblog/2026/jun/03/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <b7b23f4697850e232486d787df3459f19bd16dba>`
+* Django 6.0 :commit:`(patch) <664652f1a2dd80d8a4cd491b4313cad915ae6669>`
+* Django 5.2 :commit:`(patch) <050a3dc276f9142067260e990e4d8d42d5e32863>`
+
+June 3, 2026 - :cve:`2026-48587`
+--------------------------------
+
+Potential exposure of private data via whitespace padding in ``Vary`` header.
+`Full description
+<https://www.djangoproject.com/weblog/2026/jun/03/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <e06958dbfff789d6a72efb1d38c65b4b22b6690e>`
+* Django 6.0 :commit:`(patch) <1721035a72624aad7b38dd19b14013efd94b24b8>`
+* Django 5.2 :commit:`(patch) <9b62b0af71a14c657d19d95371630ba839e83d9a>`
+
 May 5, 2026 - :cve:`2026-5766`
 ------------------------------
 
