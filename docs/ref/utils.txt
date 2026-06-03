@@ -103,6 +103,19 @@ need to distinguish caches by the ``Accept-language`` header.
     cache, this means that we have to build the response once to get at the
     Vary header and so at the list of headers to use for the cache key.
 
+.. function:: invalidate_view_cache(request, key_prefix=None, cache=None):
+    Delete a cached page based on either a relative URL (type: ``any``)
+    or a request object (type: ``django.http.HttpRequest``).
+
+    The cache key is reconstructed in two steps:
+        1. A headers cache key is built using the absolute URL,
+            key prefix, and locale code.
+        2. A response cache key is then built using the absolute URL,
+            key prefix, HTTP method, and recovered headers.
+
+    The ``key_prefix`` must match the value used in the ``cache_page``
+    decorator for the corresponding view.
+
 ``django.utils.dateparse``
 ==========================
 
