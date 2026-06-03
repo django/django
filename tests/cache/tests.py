@@ -56,8 +56,8 @@ from django.test.signals import setting_changed
 from django.test.utils import CaptureQueriesContext
 from django.utils import timezone, translation
 from django.utils.cache import (
-    cc_delim_re,
     get_cache_key,
+    get_max_age,
     has_vary_header,
     learn_cache_key,
     patch_cache_control,
@@ -2207,6 +2207,61 @@ class CacheUtils(SimpleTestCase):
                 patch_vary_headers(response, newheaders)
                 self.assertEqual(response.headers["Vary"], resulting_vary)
 
+    def test_patch_vary_headers_strips_whitespace(self):
+        headers = (
+            # Whitespace-padded tokens in existing Vary must be stripped before
+            # deduplication so that adding a header already present (with
+            # surrounding whitespace) does not produce a duplicate entry.
+            (" Cookie", ("Accept-Encoding",), "Cookie, Accept-Encoding"),
+            ("Cookie ", ("Cookie",), "Cookie"),
+            (" Cookie ", ("Cookie",), "Cookie"),
+            # Tab-padded tokens must also be normalized.
+            (
+                "Cookie, Accept-Encoding",
+                ("Accept-Encoding\t", "\tcookie"),
+                "Cookie, Accept-Encoding",
+            ),
+            # Whitespace-padded wildcard in existing Vary must be recognized so
+            # that patch_vary_headers() still outputs a single "*" rather than
+            # appending new headers alongside the (unrecognized) padded "*".
+            ("* ", ("Accept-Language",), "*"),
+            (" *", ("Cookie",), "*"),
+            (" * ", ("Cookie", "Accept-Language"), "*"),
+            # Whitespace-padded wildcard supplied as a new header must also be
+            # recognized and collapsed to a single "*".
+            (None, (" * ",), "*"),
+            ("Cookie", (" * ",), "*"),
+            ("Cookie, Accept-Encoding", (" * ",), "*"),
+        )
+        for initial_vary, newheaders, resulting_vary in headers:
+            with self.subTest(initial_vary=initial_vary, newheaders=newheaders):
+                response = HttpResponse()
+                if initial_vary is not None:
+                    response.headers["Vary"] = initial_vary
+                patch_vary_headers(response, newheaders)
+                self.assertEqual(response.headers["Vary"], resulting_vary)
+
+    def test_get_max_age_strips_whitespace(self):
+        # A max-age directive with surrounding whitespace must be parsed
+        # correctly; a leading space (e.g. from manual header construction)
+        # previously caused the directive key to be " max-age" which never
+        # matched, returning None instead of the integer value.
+        tests = [
+            # Whitespace before directive (no preceding comma).
+            (" max-age=300", 300),
+            ("\tmax-age=300", 300),
+            # Whitespace around a non-first directive after split(",").
+            ("no-cache, max-age=600", 600),
+            ("no-cache,\tmax-age=600", 600),
+            # Whitespace after the value is handled by int() transparently.
+            ("max-age=300 ", 300),
+        ]
+        for header_value, expected in tests:
+            with self.subTest(header_value=header_value):
+                response = HttpResponse()
+                response.headers["Cache-Control"] = header_value
+                self.assertEqual(get_max_age(response), expected)
+
     def test_get_cache_key(self):
         request = self.factory.get(self.path)
         response = HttpResponse()
@@ -2266,6 +2321,30 @@ class CacheUtils(SimpleTestCase):
             "18a03f9c9649f7d684af5db3524f5c99.d41d8cd98f00b204e9800998ecf8427e",
         )
 
+    def test_learn_cache_key_strips_whitespace(self):
+        # Vary header tokens with leading or trailing whitespace must be
+        # stripped before being used as request.META lookup keys, so that the
+        # generated cache key correctly incorporates the header value rather
+        # than silently ignoring it.
+        request_a = self.factory.get(
+            self.path, headers={"cookie": "a=1", "x-pony": "gold"}
+        )
+        request_b = self.factory.get(
+            self.path, headers={"cookie": "a=2", "x-pony": "gold"}
+        )
+
+        response = HttpResponse()
+        # Whitespace-padded token: should be treated identically to "Cookie".
+        response.headers["Vary"] = " Cookie "
+        learn_cache_key(request_a, response)
+
+        # Requests with different Cookie values must get different cache keys.
+        key_a = get_cache_key(request_a)
+        key_b = get_cache_key(request_b)
+        self.assertIsNotNone(key_a)
+        self.assertIsNotNone(key_b)
+        self.assertNotEqual(key_a, key_b)
+
     def test_patch_cache_control(self):
         tests = (
             # Initial Cache-Control, kwargs to patch_cache_control, expected
@@ -2315,7 +2394,7 @@ class CacheUtils(SimpleTestCase):
                 if initial_cc is not None:
                     response.headers["Cache-Control"] = initial_cc
                 patch_cache_control(response, **newheaders)
-                parts = set(cc_delim_re.split(response.headers["Cache-Control"]))
+                parts = {cc for cc in response.headers["Cache-Control"].split(", ")}
                 self.assertEqual(parts, expected_cc)
 
     def test_has_vary_header(self):
