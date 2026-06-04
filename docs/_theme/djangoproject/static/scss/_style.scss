@@ -1,0 +1,3806 @@
+/*
+CSS Written by Jes Gundy
+Threespot, Washington DC
+---
+Ammended and appended by Andrew McCarthy
+http://andrevv.com/
+---
+Ported to Libsass by Michael Trythall
+https://lincolnloop.com/team/michael-trythall/
+---
+CSS rendered with Libsass 0.7.0
+*/
+
+//------------------- Globals
+body {
+    @include sans-serif;
+    @include font-size(18);
+    background: var(--sidebar-bg);
+    color: var(--body-fg);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    .layout-secondary,
+    [role="complementary"] {
+        @include sans-serif; // reverse font style on sidebar and secondary areas
+    }
+
+    // don't activate mobile styles for larger screens
+    @include respond-min(768px) {
+        min-width: 768px;
+    }
+}
+
+a {
+    color: var(--link-color);
+    text-decoration: underline;
+    -webkit-tap-highlight-color: transparent;
+
+    &:visited {
+        color: var(--text-l10);
+    }
+
+    &:focus {
+        outline: 2px solid currentColor;
+    }
+
+    &:active,
+    &:focus,
+    &:hover {
+        color: var(--text-l20);
+    }
+}
+
+button:focus {
+    outline: 2px solid currentColor;
+}
+
+::selection {
+    // Text Selection Colors
+    background-color: var(--selection);
+}
+
+ol li,
+ul li {
+    //list style
+    margin-top: 10px;
+}
+
+dl {
+    margin: 20px 0 10px;
+
+    dt {
+        @include sans-serif;
+        font-weight: 400;
+    }
+
+    dd {
+        margin: 0.2em 0 1.2em;
+        padding: 0;
+
+        &:last-of-type {
+            margin-bottom: 0;
+        }
+    }
+
+    &.glossary {
+        dt {
+            font-weight: 700;
+        }
+    }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    @include sans-serif;
+    font-weight: 400;
+
+    a {
+        text-decoration: none;
+        @include link-green;
+    }
+
+
+}
+
+h1 {
+    @include font-size(28);
+    color: var(--white-color);
+    letter-spacing: -1px;
+    line-height: 1.1;
+
+    @include respond-min(768px) {
+        @include font-size(32);
+    }
+
+    .layout-secondary & {
+        color: var(--body-fg);
+    }
+
+    main & {
+        @include font-size(32);
+        margin: 40px 0px 30px;
+        color: var(--body-fg);
+    }
+
+    [role="complementary"] & {
+        @include font-size(28);
+    }
+}
+
+h2 {
+    @include font-size(24);
+
+    [role="complementary"] &,
+    .layout-secondary & {
+        @include font-size(20);
+        border-bottom: 1px solid var(--hairline-color);
+        font-weight: 400;
+        padding-bottom: 15px;
+        margin-top: 30px;
+
+        &:first-of-type {
+            margin-top: inherit;
+        }
+
+        &:first-child {
+            @include respond-min(768px) {
+                margin-top: 20px;
+            }
+        }
+
+        .full-width & {
+            @include font-size(24);
+        }
+    }
+
+    main & {
+        margin-top: 40px;
+        margin-bottom: 15px;
+    }
+}
+
+h3 {
+    @include font-size(20);
+    font-weight: 700;
+    color: var(--body-fg);
+    line-height: 1.2;
+    margin: 35px 0 20px;
+
+    [role="complementary"] &,
+    .layout-secondary & {
+        @include font-size(20);
+        border-bottom: 1px solid var(--hairline-color);
+        font-weight: 400;
+        padding-bottom: 15px;
+        margin-top: 30px;
+
+        &:first-of-type {
+            margin-top: inherit;
+        }
+
+        &:first-child {
+            @include respond-min(768px) {
+                margin-top: 20px;
+            }
+        }
+        .full-width & {
+            @include font-size(24);
+        }
+    }
+}
+
+h4 {
+    @include font-size(16);
+    color: var(--body-fg);
+    line-height: 1.2;
+    margin: 35px 0 20px;
+    font-weight: 700;
+}
+
+h5 {
+    @include font-size(14);
+    color: var(--body-fg);
+    line-height: 1.2;
+    margin: 35px 0 20px;
+    font-weight: 700;
+}
+
+tt,
+code,
+kbd,
+pre,
+samp {
+    @include monospace;
+    color: var(--code-fg);
+    font-size: 1em;
+}
+
+tt {
+    font-weight: 700;
+}
+
+span.pre {
+    @include monospace;
+}
+
+a:hover,
+a:active,
+a:focus {
+    tt {
+        color: var(--text-l20);
+    }
+}
+
+p {
+
+    //increase top margin if first item in container
+    main>&:first-child {
+        margin-top: 30px;
+    }
+}
+
+ul {
+    padding-left: 20px;
+}
+
+// TODO: most of this is copy/pasted from .admonition. We should factor out the common bits
+blockquote {
+    background: var(--body-bg);
+    padding: 15px 20px 15px 70px;
+    border: 1px solid var(--secondary-accent);
+    border-radius: 4px;
+    margin: 25px 0;
+    position: relative;
+
+    p:first-child {
+        margin-top: 0;
+    }
+
+    &::before {
+        @include fa-icon();
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        font-size: 30px;
+        width: 34px;
+        text-align: center;
+        content: $fa-var-quote-left; // default icon
+        opacity: 0.5;
+    }
+}
+
+//------------------- Layout
+
+
+main {
+    //Main column. Left aligned by default. See /styleguide for explanation.
+    background: var(--white-color);
+    padding: 1px 10px 40px;
+
+    @include respond-min(768px) {
+        min-height: 800px;
+        border: none;
+        box-shadow: 0px 0px 0 0 var(--white-color), 0px 0px 0 0 var(--white-color), 460px 0 0 0 var(--white-color), 1000px 0 0 0 var(--white-color), 0px 600px 0 0px var(--white-color), 460px 600px 0 0px var(--white-color);
+        float: right;
+        margin: 0;
+        padding-bottom: 80px;
+        padding-left: 4%;
+        padding-right: 0;
+        width: 63%;
+
+        .sidebar-right & {
+            border: none;
+            box-shadow: 0px 0px 0 0 var(--white-color), 0px 0px 0 0 var(--white-color), -460px 0 0 0 var(--white-color), -1000px 0 0 0 var(--white-color), 0px 600px 0 0px var(--white-color), -460px 600px 0 0px var(--white-color);
+            float: left;
+            padding-left: 0;
+            width: 62%;
+            padding-right: 4%;
+        }
+    }
+
+    .full-width & {
+        border: none;
+        box-shadow: none;
+        float: none;
+        margin: 0 auto;
+        padding: 0 10px 40px;
+        width: auto;
+
+        @include respond-min(768px) {
+            max-width: 740px;
+            padding: 20px 0 40px;
+            width: (704/768) * 100%;
+        }
+    }
+
+    .section {
+        padding-bottom: 40px;
+        border-bottom: 1px solid var(--hairline-color);
+
+        &:last-of-type {
+            padding-bottom: 0;
+            border-bottom: 0;
+        }
+
+        dd {
+            &.last-child {
+                padding-bottom: 0;
+            }
+        }
+    }
+}
+
+.full-width {
+    border: none;
+    box-shadow: 0 4px 8px rgba(12, 60, 38, 0.07);
+
+    // Single column, full width layout. See /styleguide for explanation.
+    &.container {
+        width: 100%;
+        padding: 0;
+        max-width: none;
+        background: var(--white-color);
+    }
+
+    // High-level class denoting full-width layout
+    @include clearfix;
+}
+
+[role="complementary"] {
+    //Sidebar in column layouts, gray section in fullwidth layout
+    padding: 0 10px 20px;
+    @include font-size(14);
+
+    @include respond-min(768px) {
+        float: right;
+        margin: 20px 0;
+        margin-right: 3%;
+        padding: 0 0 40px 0;
+        width: 30%;
+
+        .sidebar-right & {
+            margin-left: 3%;
+            margin-right: 0;
+        }
+    }
+
+    span.form-controls {
+        display: none;
+    }
+
+    .list-collapsing {
+        margin-top: 0;
+        border-bottom: 0;
+
+        &.active {
+            li {
+                border-top: 0;
+            }
+
+            h2 {
+                padding: 10px 40px 10px 0;
+                font-size: 18px;
+                border-bottom: 0;
+                color: var(--primary);
+
+                .collapsing-icon {
+                    font-size: 10px;
+                }
+            }
+        }
+    }
+}
+
+[role="secondary"] {
+    margin: 0 10px;
+    padding: 40px 0 60px;
+
+    @include respond-min(768px) {
+        .full-width & {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+    }
+}
+
+.layout-secondary {
+    // Secondary (gray) content area on full-width pages
+    padding: 20px 10px 50px;
+}
+
+.layout-tertiary {
+    // Tertiary (white) content area on full-width pages
+    background: var(--white-color);
+    border: none;
+    box-shadow: 0 -4px 8px rgba(12, 60, 38, 0.07);
+    padding: 20px 10px 50px;
+}
+
+.container {
+    @include respond-min(768px) {
+        margin: 0 auto;
+        padding: 0 (32/768) * 100%;
+    }
+
+    &.sidebar-right {
+        box-shadow: -1200px 0 0 0px var(--white-color);
+    }
+}
+
+.container--flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.container--flex--wrap--mobile {
+    flex-wrap: wrap;
+
+    @include respond-min(768px) {
+        flex-wrap: no-wrap;
+    }
+}
+
+
+//-------------------  Site Chrome (Header/Footer)
+
+header {
+    // Includes global navigation, logo, and tagline at top of document
+    @include clearfix;
+    background: $green-dark;
+    overflow: hidden;
+    margin: 0;
+    padding: 10px 0 6px;
+    position: relative;
+    z-index: 0;
+
+    .container {
+        display: flex;
+        align-items: center;
+    }
+
+    .meta {
+        @include font-size(13);
+        color: var(--primary);
+        font-weight: 700;
+        width: auto;
+        margin: 8px 0 0 10px;
+        display: none;
+
+        @include respond-min(1500px) {
+            width: 200px;
+            display: block;
+        }
+
+
+    }
+
+    .logo {
+        @include font-size(40);
+        @include sans-serif;
+        // Small screens less than 500px use the dj logo. This gives more
+        // horizontal space for a searchbar in the header.
+        background: url(../img/logo-dj.svg) center center no-repeat;
+        color: var(--white-color);
+        display: block;
+        font-weight: 700;
+        margin: 10px 4px;
+        overflow: hidden;
+        text-decoration: none;
+        text-indent: 100%;
+        width: 45px;
+        height: 36px;
+
+        @include respond-min(500px) {
+            background: url(../img/logo-django.svg) center center no-repeat;
+            width: 104px;
+        }
+
+        @include respond-min(1080px) {
+            margin-left: 10px;
+        }
+
+        &:focus {
+            outline: 2px solid var(--menu);
+        }
+
+    }
+
+    .header-tools {
+        display: flex;
+        align-items: center;
+        order: 1;
+        margin-left: auto;
+
+        .search {
+            flex: 0 1 240px;
+        }
+
+        @include respond-min(1280px) {
+            order: 3;
+            margin-left: 0;
+        }
+    }
+
+    .menu-button {
+        @include font-size(20);
+        background: $green-dark;
+        border: 0;
+        color: var(--menu);
+        cursor: pointer;
+        display: block;
+        height: 45px;
+        text-align: center;
+        text-decoration: none;
+        width: 45px;
+        order: 2;
+
+        @include respond-min(1280px) {
+            display: none;
+        }
+
+        &:active {
+            color: var(--primary);
+        }
+
+        &.active {
+            opacity: 0.5;
+        }
+    }
+
+    nav {
+        order: 4;
+        width: 100%;
+        background: $green-dark;
+        transition: max-height 0.3s ease-out;
+        max-height: 0;
+        display: none; // hide mobile menu by default
+        overflow: hidden;
+        padding: 0 2px;
+        flex-basis: 100%;
+
+        &.active {
+            max-height: 580px;
+            display: block;
+
+            @starting-style {
+                max-height: 0;
+            }
+        }
+
+        @include respond-min(1280px) {
+            width: auto;
+            order: 2;
+            margin-left: auto;
+            flex-basis: auto;
+            display: block; // always show menu on a desktop width
+            max-height: none;
+        }
+
+        ul {
+            margin: 10px 0 0;
+            padding: 0;
+
+            @include respond-min(1280px) {
+                display: flex;
+                align-items: center;
+                margin: 2px 0;
+            }
+        }
+
+        li {
+            @include sans-serif;
+            @include font-size(13);
+            display: block;
+            font-weight: 700;
+            line-height: 16px;
+            text-align: left;
+            text-transform: uppercase;
+            margin: 0 10px;
+            border-top: 1px solid lighten($green-dark, 5%);
+            > :not(.search){
+              padding: 20px 0px;
+            }
+
+            @include respond-min(1280px) {
+                margin: 0;
+                border: 0;
+                float: left;
+                text-align: left;
+                > :not(.search) {
+                  padding: 10px;
+                }
+            }
+
+            &.active a {
+                color: var(--primary);
+            }
+        }
+
+        a {
+            color: var(--menu);
+            display: block;
+            text-decoration: none;
+
+            &:visited {
+              color: var(--menu);
+            }
+
+            &:active,
+            &:hover {
+                color: var(--secondary-accent);
+            }
+        }
+
+        span {
+            display: inline-block;
+            padding: 20px 10px;
+            color: var(--white-color);
+
+            &:active,
+            &:hover {
+                color: var(--secondary-accent);
+            }
+
+            @include respond-min(1280px) {
+                padding: 20px 10px;
+            }
+        }
+
+    }
+}
+
+.header {
+    // dark green bar containing the page title
+    @include sans-serif;
+    background: $green-dark;
+    margin: 0;
+    padding: 11px 0px 8px;
+    position: relative;
+
+    h1 {
+        margin: 0.4em 0;
+    }
+
+    p {
+        @include font-size(18);
+        color: var(--white-color);
+        left: -9999px;
+        line-height: 1.5;
+        padding: 0 0 10px;
+        position: absolute;
+        top: 0;
+        max-width: 660px;
+
+        @include respond-min(1080px) {
+            position: static;
+        }
+    }
+}
+
+/* banner for billboard */
+#billboard {
+    background-color: $green-light;
+    border-top: 1px solid $black;
+
+    * {
+        color: $black;
+    }
+
+    .banner {
+        text-align: center;
+        padding: 1em 3em;
+        max-width: 60em;
+        margin: 0 auto;
+        p {
+            @include sans-serif;
+            @include font-size(32);
+            font-weight: 300;
+            margin: 0.35em 0 0.35em;
+            line-height: 1.3;
+            padding: 1px 0 6px;
+        }
+        .underlined {
+          text-decoration: underline;
+        }
+    }
+
+    .banner-preview-notice {
+        background-color: $warning-bg;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+    }
+
+    a, h1 a {
+        color: $black;
+        font-weight: bold;
+        text-decoration: none;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+.copy-banner {
+    // Large green callout at the top of the page
+    background: var(--primary);
+    padding: 1px 10px;
+
+    @include respond-min(768px) {
+        padding: 1px 0;
+    }
+
+    p,
+    h1 {
+        @include sans-serif;
+        @include font-size(24);
+        color: var(--secondary-accent);
+        font-weight: 300;
+        line-height: 1.3;
+        padding: 1px 0 6px;
+        margin: .45em 0 .35em;
+        letter-spacing: -1px;
+
+        em {
+            font-style: normal;
+            color: var(--menu);
+        }
+
+        @include respond-min(768px) {
+            @include font-size(32);
+
+            margin: .35em 0 .35em;
+            color: var(--secondary-accent);
+            padding: 1px 0 6px;
+
+        }
+
+        a {
+            font-weight: 300;
+            color: var(--secondary-accent);
+            text-decoration: none;
+        }
+
+        a.cta,
+        .cta {
+            margin: 0;
+            @include font-size(18);
+        }
+    }
+
+    a.cta,
+    .cta {
+        margin: 15px 0;
+        padding: 0.4em 1.5em 0.5em;
+        background: var(--primary-light);
+
+        &:hover {
+            background: lighten($green-medium-dark, 4%);
+        }
+
+        background: none;
+        border: 1px solid var(--secondary-accent);
+        color: var(--cta-color-accent);
+        font-weight: 400;
+
+        em {
+            color: var(--white-color);
+        }
+
+        &:hover {
+            background: var(--body-bg);
+            color: var(--secondary);
+            border-color: var(--body-bg);
+
+            em {
+                color: var(--secondary);
+            }
+        }
+
+        &.white {
+            background: var(--body-bg);
+            color: var(--secondary);
+            font-weight: 700;
+            border: 0;
+
+            &:hover {
+                background: var(--white-color);
+            }
+        }
+    }
+
+    .homepage & {
+        padding: 50px 0;
+        background: var(--white-color);
+        text-align: center;
+        border-bottom: 1px solid var(--hairline-color);
+
+        p {
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            margin: 1em auto .5em;
+            color: var(--body-fg);
+            @include font-size(36);
+
+            &.small {
+                color: var(--text-light);
+                margin: 2em auto 1em;
+                @include font-size(14);
+            }
+
+            em {
+                color: var(--body-fg);
+            }
+        }
+
+        a.cta,
+        .cta {
+            display: inline-block;
+            padding: 1em 50px 1.1em;
+            margin-bottom: 40px;
+            background: var(--primary);
+            color: var(--white-color);
+            border: 0;
+            font-weight: 700;
+
+            &:hover {
+                background: lighten($green-medium, 4%);
+            }
+
+            &:active {
+                background: darken($green-medium, 2%);
+            }
+        }
+    }
+}
+
+[role="alert"] {
+    //Announcement banner above the footer.
+    clear: both;
+    background: var(--body-bg);
+    position: relative;
+    box-shadow: 0 -2px 8px 0 rgba(0, 0, 0, 0.05);
+
+    a {
+        @include link-green;
+
+        &.link-readmore {
+            margin: 0;
+        }
+    }
+
+    dl {
+        margin: 0 10px;
+        padding: 25px 0;
+        @include clearfix;
+
+        dt {
+            i.icon {
+                color: var(--secondary);
+                margin-right: 8px;
+            }
+        }
+
+        dd {
+            float: left;
+            width: 60%;
+            margin-top: 0;
+            @include sans-serif;
+        }
+
+        .link-readmore {
+            margin-left: 10px;
+        }
+    }
+
+    @include respond-min(768px) {
+        dt {
+            float: left;
+            width: 31%;
+            padding-right: 2%;
+        }
+
+        dl {
+            margin: 0;
+        }
+    }
+
+}
+
+footer {
+    // Global Footer at bottom of page
+    @include clearfix;
+    @include sans-serif;
+    position: relative;
+    background: var(--primary);
+    clear: both;
+    margin-top: 0px;
+
+    .container {
+        overflow: hidden;
+    }
+
+    .subfooter {
+        @include clearfix;
+        padding: 0 10px;
+
+        @include respond-min(768px) {
+            padding: 0;
+        }
+
+        .col {
+            &:first-child {
+                h2 {
+                    border-top: 0;
+                }
+            }
+
+            @include respond-min(768px) {
+                float: left;
+                margin-bottom: -999px;
+                padding: 0 3% 999px 0;
+                width: 23%;
+            }
+
+            &:first-child {
+                margin-left: 0;
+                padding-left: 0;
+            }
+
+            &.last-child {
+                margin-right: 0;
+                padding-right: 0;
+            }
+        }
+
+    }
+
+    h3 {
+        @include font-size(16);
+        border-top: 1px solid var(--hairline-color);
+        color: var(--menu);
+        font-weight: 700;
+        margin-top: 20px;
+        padding: 30px 0 10px;
+
+        @include respond-min(768px) {
+            border: none;
+            margin-top: 0;
+        }
+    }
+
+    ul {
+        @include font-size(14);
+        font-weight: 400;
+        list-style: none;
+        margin: 15px 0 0 0;
+        padding: 0 0 30px;
+
+        li {
+            margin: 10px 0 0;
+            padding: 0;
+        }
+
+        a {
+            color: var(--menu);
+            text-decoration: none;
+
+            &:visited {
+              color: var(--menu);
+            }
+
+            &:hover,
+            &:active,
+            &:focus {
+                text-decoration: underline;
+                color: var(--menu);
+            }
+        }
+    }
+
+    .footer {
+        background: $green-dark;
+        margin-top: 20px;
+        padding: 10px 0 30px;
+        color: var(--primary-accent);
+
+        .footer-logo {
+            float: left;
+            width: 33%;
+        }
+
+        .logo {
+            background-position: left center;
+            margin-right: 0;
+            margin-top: 20px;
+
+            &:focus {
+                outline: 2px solid var(--menu);
+            }
+        }
+    }
+
+    .logo {
+        @include font-size(40);
+        @include sans-serif;
+        background: url(../img/logo-django.svg) center center no-repeat;
+        color: $green-dark;
+        display: block;
+        font-weight: 700;
+        height: 39px;
+        margin: 10px;
+        overflow: hidden;
+        text-decoration: none;
+        text-indent: 100%;
+        width: 109px;
+
+        @include respond-min(768px) {
+            float: left;
+            margin: 20px 90px 0 0;
+        }
+    }
+
+    .thanks {
+        @include font-size(12);
+        color: var(--primary-accent);
+        margin: 0;
+        padding: 0;
+
+        @include respond-min(768px) {
+            border: none;
+        }
+
+        li {
+            @include clearfix;
+            margin: 0;
+            padding: 17px 10px 11px;
+            display: block;
+            clear: both;
+
+            @include respond-min(768px) {
+                background: none;
+                float: left;
+                clear: none;
+                padding: 0 3% 0 0;
+                width: 30%;
+
+                &.design {
+
+                    span.ampersand,
+                    a {
+                        display: inline-block;
+                        vertical-align: top;
+
+                        &.threespot {
+                            clear: both;
+                        }
+
+                        &.ampersand {
+                            position: relative;
+                            top: 6px;
+                            margin: 0 6px;
+                            line-height: 36px;
+                        }
+                    }
+                }
+            }
+
+            span.ampersand {
+                line-height: 24px;
+            }
+        }
+
+        span {
+            display: block;
+            height: 24px;
+            line-height: 36px;
+            padding-right: 12px;
+            white-space: nowrap;
+        }
+
+        a.in-kind-donors {
+            @include font-size(20);
+            color: var(--primary-accent);
+
+            &:focus {
+                outline: 2px solid var(--menu);
+            }
+        }
+
+        a.threespot,
+        a.andrevv {
+            display: block;
+            height: 33px;
+            overflow: hidden;
+            text-indent: -200px;
+            width: 94px;
+
+            @include respond-min(768px) {
+                clear: both;
+                margin-top: 5px;
+            }
+
+            &.threespot {
+                background: url(../img/logo-threespot.svg) no-repeat left center;
+            }
+
+            &.andrevv {
+                background: url(../img/logo-andrevv.svg) no-repeat left center;
+            }
+        }
+    }
+
+    .copyright {
+
+        @include font-size(12);
+        clear: both;
+        margin: 20px 0 0 10px;
+
+        @include respond-min(768px) {
+            max-width: 80%;
+            padding-top: 30px;
+            margin: 0;
+        }
+
+        a {
+            color: var(--primary-accent);
+        }
+    }
+}
+
+
+//------------------- Recycleable Style Classes
+.backtotop {
+    // Back to top link (in base.html after block body)
+    @include link-green;
+    @include sans-serif;
+    @include font-size(14);
+    display: block;
+    font-weight: 700;
+    margin: 10px 0;
+    padding: 10px 0;
+    text-align: center;
+    text-transform: uppercase;
+
+    @include respond-min(768px) {
+        display: none;
+    }
+}
+
+.cta,
+a.cta {
+    // Call To Action buttons
+    @include sans-serif;
+    font-weight: 700;
+    appearance: none;
+    background: var(--primary);
+    border: none;
+    border-radius: 5px;
+    color: var(--white-color);
+    display: block;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+    margin: 30px auto 0;
+    padding: 1em 1.5em;
+    text-align: center;
+    text-decoration: none;
+
+    @include respond-min(768px) {
+        margin: 20px auto;
+        max-width: 400px;
+    }
+
+    em {
+        color: var(--cta-color-accent);
+        font-style: normal;
+    }
+
+    &:hover {
+        background: lighten($green-medium, 4%);
+    }
+
+    &:focus {
+        outline-offset: 2px;
+        outline-color: var(--primary);
+    }
+
+    &:active {
+        background: darken($green-medium, 2%);
+    }
+
+    [role="complementary"] & {
+        @include font-size(16);
+
+        +.link-readmore {
+            display: block;
+            text-align: center;
+
+            @include respond-min(768px) {
+                margin-top: -10px;
+            }
+        }
+    }
+
+
+    &.outline {
+        // Outline button for less-dominant CTA
+        background: none;
+        border: 1px solid var(--hairline-color);
+        color: var(--dark-hairline-color);
+        font-weight: 400;
+
+        &.inline {
+            display: inline;
+            margin-right: 1em;
+        }
+
+        em {
+            color: $green-dark;
+        }
+
+        &:hover {
+            border-color: var(--secondary);
+            color: var(--secondary);
+
+            em {
+                color: var(--secondary);
+            }
+        }
+
+        &:active {
+            border-color: var(--primary);
+            color: var(--primary);
+
+            em {
+                color: var(--primary);
+            }
+        }
+    }
+}
+
+.link-green {
+    // class render of the link-green mixin
+    @include link-green;
+}
+
+.link-readmore {
+    // Read More links. Should exist outside of <p> tag, and include the '&rsaquo;' arrow after the text.
+    @include link-green;
+    @include sans-serif;
+    @include font-size(14);
+    display: inline-block;
+    margin: 10px 0;
+
+    &:after {
+        content: " ›";
+        font-size: 1.2em;
+    }
+
+    &.back-link {
+        &:after {
+            content: "";
+        }
+
+        &:before {
+            content: "‹ ";
+            font-size: 1.2em;
+        }
+    }
+
+    font-weight: 700;
+    text-transform: uppercase;
+
+    [role="complementary"] & {
+        @include font-size(12);
+    }
+}
+
+.meta {
+    // Re-usable meta class for alternate-style content.
+    @include sans-serif;
+    @include font-size(14);
+    display: block;
+    line-height: 1.3;
+    margin: 25px 0 20px;
+
+    a {
+        @include link-green;
+    }
+}
+
+.layout-2col {
+    //two column layout module
+    margin: 20px 0;
+
+    @include respond-min(768px) {
+        @include clearfix;
+        margin: 0;
+
+        .col {
+            float: left;
+            width: 46%;
+            margin: 0 4%;
+
+            &:first-child {
+                margin-left: 0;
+            }
+
+            &.last-child {
+                margin-right: 0;
+            }
+        }
+
+        .one-third {
+            width: 29%;
+        }
+
+        .two-third {
+            width: 62%;
+        }
+    }
+}
+
+.blue {
+    // overide blue color class
+    color: var(--secondary);
+}
+
+.label {
+    // Label style associated with forms and other global elements.
+    @include sans-serif;
+    @include font-size(16);
+    color: lighten($text-light, 30%);
+    display: block;
+    font-weight: 700;
+    margin: 20px 0 10px;
+    text-transform: uppercase;
+
+
+    &.form-controls {
+        @include font-size(14);
+        display: block;
+        margin: 0;
+        position: relative;
+        text-align: left;
+
+        span {
+            cursor: pointer;
+
+            &:hover,
+            &:active,
+            &:focus {
+                color: lighten($text-light, 20%);
+            }
+        }
+    }
+}
+
+label[for] {
+  font-weight: bold;
+}
+
+.errorlist {
+  color: var(--error-fg);
+  background-color: var(--error-light-l10);
+  border-radius: .3em;
+  margin: 10px 0;
+}
+
+.cta.arrow {
+  height: auto;
+  &::after {
+    content: " →" / "";
+  }
+  &:dir(rtl) {
+    &::after {
+      content: " ←" / "";
+    }
+  }
+}
+
+.callout-right {
+    @include respond-min(768px) {
+        float: right;
+        margin: 26px 0 0 35px;
+        width: 33%;
+
+        &.two-thirds {
+            width: 60%;
+        }
+    }
+
+    img {
+        display: block;
+        max-width: 100%;
+    }
+}
+
+.callout-left {
+    @include respond-min(768px) {
+        float: left;
+        margin: 26px 35px 0 0;
+        width: 33%;
+
+        &.two-thirds {
+            width: 60%;
+        }
+    }
+
+    img {
+        display: block;
+        max-width: 100%;
+    }
+}
+
+.codedump {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    border: 1px solid var(--hairline-color);
+    padding: 10px;
+    border-radius: 4px;
+    @include sans-serif;
+    @include font-size(14);
+    line-height: 1.6em;
+}
+
+//------------------- List Modules
+.list-events {
+    // reusable event list style class, for use in the sidebar. (See sidebar-news.html include.)
+    @include sans-serif;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+        @include font-size(18);
+        border-top: 1px solid var(--hairline-color);
+        display: block;
+        line-height: 1.3;
+        margin: 0;
+        padding: 20px 0 0 30px;
+        position: relative;
+
+        i {
+            @include font-size(16);
+            color: $green-light;
+            display: block;
+            left: 0;
+            line-height: 20px;
+            height: 30px;
+            position: absolute;
+            text-align: center;
+            top: 20px;
+            width: 24px;
+        }
+
+        &:first-child {
+            border-top: 0;
+            padding-top: 0;
+
+            i {
+                top: 0px;
+            }
+        }
+    }
+
+    .meta {
+        @include sans-serif;
+        @include font-size(14);
+        display: block;
+        margin-top: 10px;
+    }
+
+    a {
+        @include link-green;
+    }
+}
+
+.list-tags {
+    // Tag list style with blue block links. (See sidebar-news.html include.)
+    @include sans-serif;
+    @include font-size(12);
+    font-weight: 700;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-transform: uppercase;
+
+    li {
+        margin-top: 10px;
+    }
+
+    a {
+        background: $green-light;
+        color: var(--body-bg);
+        display: inline-block;
+        line-height: 1.2;
+        margin: 0;
+        padding: 8px 10px 5px;
+        text-decoration: none;
+
+        &:hover,
+        &:active,
+        &:focus {
+            background-color: var(--primary);
+            color: var(--white-color);
+        }
+    }
+}
+
+.list-news {
+    // News article listing style. (See News & Events Page.)
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    h2 {
+        font-weight: 400;
+        margin-bottom: 5px;
+    }
+
+    > li {
+        border-top: 1px solid var(--hairline-color);
+        margin-top: 35px;
+        padding-top: 10px;
+
+        &:first-child {
+            border: none;
+            margin-top: 0;
+            padding-top: 0;
+        }
+
+        &.unpublished,
+        &.unpublished * {
+            color: var(--dark-hairline-color);
+        }
+    }
+
+    .meta {
+        margin-top: 10px;
+        color: var(--dark-hairline-color);
+
+        a:link {
+            color: var(--text-light);
+            text-decoration: underline;
+        }
+    }
+}
+
+.list-case-study {
+    // Three column list for Case Studies that switches to one column on mobile. (See Overview page.)
+    @include clearfix;
+    list-style: none;
+    margin: 0;
+    padding: 0 0 10px;
+
+    p {
+        @include font-size(14);
+        margin: 10px 0 5px;
+    }
+
+    li {
+        border-top: 1px solid var(--hairline-color);
+        margin-top: 20px;
+        padding-top: 20px;
+
+        @include respond-min(1024px) {
+            border: none;
+            float: left;
+            padding-right: 5%;
+            padding-top: 0;
+            width: 28%;
+
+            &:nth-child(3) {
+                &:after {
+                    clear: both;
+                    content: "";
+                    display: block;
+                    margin-bottom: 30px;
+                }
+            }
+        }
+    }
+
+    li>a {
+        @include sans-serif;
+        @include link-green;
+        @include font-size(12);
+        font-weight: 700;
+        margin-top: 10px;
+        text-transform: uppercase;
+
+        &:after {
+            content: " ›";
+            font-size: 1.2em;
+        }
+    }
+
+    h3 {
+        margin: 10px 0 20px;
+        padding: 0;
+
+        &.logo {
+            text-indent: -1000%;
+            overflow: hidden;
+        }
+    }
+
+    // Logo List
+    [title="Knight Foundation"] {
+        background: url(../img/logo-knight.svg) no-repeat bottom left;
+        height: 25px;
+        padding-top: 7px;
+        width: 190px;
+    }
+
+    [title="Mozilla"] {
+        background: url(../img/logo-mozilla.svg) no-repeat bottom left;
+        height: 32px;
+        width: 120px;
+    }
+
+    [title="Disqus"] {
+        background: url(../img/logo-disqus.svg) no-repeat bottom left;
+        height: 28px;
+        padding-top: 4px;
+        width: 140px;
+    }
+
+    &.single-col {
+        li {
+            margin-top: 0;
+            margin-bottom: 30px;
+            width: auto;
+
+            p {
+                @include font-size(18);
+                margin-right: 40px;
+            }
+
+            h3 {
+                margin-top: 20px;
+            }
+        }
+    }
+}
+
+.case-study-logo {
+    max-width: 50%;
+    max-height: 70px;
+    height: auto;
+    margin: 40px 0 0;
+}
+
+.list-link-soup {
+    // Basic link-soup list style. Three Column on Desktop, two column on mobile. (See Why Django Page.)
+    @include sans-serif;
+    @include clearfix;
+    @include font-size(16);
+    border-top: 1px solid var(--hairline-color);
+    list-style: none;
+    margin: 20px 0 0;
+    padding: 20px 0 10px;
+
+    li {
+        float: left;
+        margin: 10px 5% 0 0;
+        width: 45%;
+
+        @include respond-min(768px) {
+            margin-right: 3%;
+            width: 30%;
+        }
+    }
+
+    a {
+        @include link-green;
+    }
+
+    [role="complementary"] & {
+        li {
+            float: none;
+        }
+    }
+}
+
+
+h2+.list-link-soup {
+    border-top: 0;
+}
+
+
+.list-features {
+    // Animated Feature List from the Why Django Page. Require looks for the 'list-features' class to load the appropriate scripts to animate the icons. Degrades gracefully into mobile.
+
+    margin: 50px 0 40px;
+
+    dt {
+        @include font-size(24);
+        border-top: 1px solid var(--hairline-color);
+        padding-top: 25px;
+    }
+
+    i {
+        color: var(--body-bg);
+        margin-right: 10px;
+        width: 40px;
+        height: 40px;
+        border-radius: 25px;
+        background: var(--secondary);
+        line-height: 1.68em;
+        display: inline-block;
+        text-align: center;
+
+        &.icon-briefcase {
+            line-height: 1.7em;
+        }
+
+        &.icon-dashboard {
+            line-height: 1.5em;
+        }
+    }
+
+    @include respond-min(768px) {
+        padding-bottom: 40px;
+
+        dt {
+            margin-top: 60px;
+            padding: 60px 0 0 245px;
+            position: relative;
+
+            &:first-child {
+                margin-top: 20px;
+            }
+
+            &.even {
+                padding-left: 0;
+                padding-right: 245px;
+
+                i {
+                    left: auto !important;
+                    right: 0;
+                }
+            }
+        }
+
+        dd {
+            padding-left: 245px;
+            min-height: 140px;
+
+            &.even {
+                padding-left: 0;
+                padding-right: 245px;
+            }
+        }
+
+        i {
+            @include font-size(120);
+            background: url(../img/bg-features.svg) no-repeat center center;
+            border-radius: 100px;
+            color: var(--white-color);
+            display: block;
+            height: 200px;
+            left: 0;
+            position: absolute;
+            text-align: center;
+            top: 60px;
+            width: 200px;
+            margin-right: 0;
+
+            &.icon-bolt {
+                background-position: -150px -269px;
+            }
+
+            &.icon-briefcase {
+                background-position: -354px -7px;
+            }
+
+            &.icon-lock {
+                background-position: -36px -96px;
+            }
+
+            &.icon-dashboard {
+                background-position: -270px -9px;
+            }
+
+            &.icon-cogs {
+                background-position: -334px -12px;
+            }
+
+            transform: rotate(0.5turn);
+            transition: all 0.3s ease-out;
+
+            &.inview {
+                transform: rotate(0turn);
+            }
+
+            &.icon-bolt {
+                background-position: 40px -369px;
+
+                &.inview {
+                    background-position: -150px -269px;
+                }
+            }
+
+            &.icon-briefcase {
+                background-position: -494px 207px;
+
+                &.inview {
+                    background-position: -354px -7px;
+                }
+            }
+
+            &.icon-lock {
+                background-position: 148px -206px;
+
+                &.inview {
+                    background-position: -36px -96px;
+                }
+            }
+
+            &.icon-dashboard {
+                background-position: -367px 201px;
+
+                &.inview {
+                    background-position: -270px -9px;
+                }
+            }
+
+            &.icon-cogs {
+                background-position: -500px -180px;
+
+                &.inview {
+                    background-position: -334px -12px;
+                }
+            }
+
+            // Fixing opera svg-border-radius bug
+            // http://stackoverflow.com/questions/11114636/opera-border-radius-svg-background-bug
+            :-o-prefocus,
+            & {
+                background: $green-medium !important;
+
+                -webkit-transition: none !important;
+                transition: none !important;
+
+                -webkit-transform: none !important;
+                transform: none !important;
+            }
+        }
+    }
+
+    .homepage & {
+
+        padding-bottom: 0;
+
+        dl {
+            padding-top: 0;
+        }
+
+        i {
+            color: var(--body-bg);
+            margin-right: 10px;
+            width: 40px;
+            height: 40px;
+            top: 10px;
+            border-radius: 20px;
+            background: var(--secondary);
+            display: inline-block;
+            text-align: center;
+            transform: rotate(0.5turn);
+            transition: all 0.3s ease-out;
+            @include font-size(24);
+
+            &.inview {
+                transform: rotate(0turn);
+            }
+        }
+
+        @include respond-min(768px) {
+
+            dt {
+                padding: 20px 0 0px 110px;
+                @include font-size(18);
+                border-top: 0;
+                margin-top: 0;
+            }
+
+            dd {
+                padding: 0 60px 20px 110px;
+                min-height: 0;
+
+                p {
+                    margin-top: 0;
+                    @include font-size(18);
+                }
+            }
+
+            i {
+                margin-right: 10px;
+                width: 80px;
+                height: 80px;
+                top: 20px;
+                border-radius: 40px;
+                @include font-size(46);
+            }
+        }
+    }
+}
+
+@include respond-min(768px) {
+
+    .list-collapsing-header {
+        float: left;
+
+        .section & h2 {
+            margin: 40px 0 20px;
+        }
+
+        +.form-controls.label {
+            margin: 50px 0 0;
+            text-align: right;
+        }
+    }
+
+    .form-controls.label {
+        float: right;
+    }
+}
+
+
+.list-collapsing {
+    // reusable accordion style collapsing list, as seen on the Get Started Page. 'Expand/Collapse All' toggle is generated by the javascript. H2 is used for label, and 'collapsing-content' class is used to identify all content that should expand and collapse onclick.
+    border-bottom: 1px solid var(--hairline-color);
+    list-style: none;
+    margin: 30px 0;
+    padding: 0;
+    clear: both;
+
+    &.active {
+
+        >li {
+            border-top: 1px solid var(--hairline-color);
+            margin: 0;
+            padding: 0;
+
+            &.active {
+                h2 {
+                    .collapsing-icon {
+                        &:before {
+                            content: "\f068";
+                        }
+                    }
+                }
+            }
+        }
+
+        h2 {
+            @include font-size(18);
+            cursor: pointer;
+            margin: 0;
+            padding: 18px 40px 18px 0;
+            position: relative;
+
+            &:hover,
+            &:focus,
+            &:active {
+                color: var(--text-l20);
+                outline: none;
+            }
+
+            .collapsing-icon {
+                position: absolute;
+                right: 0;
+                top: 24px;
+
+                &:before {
+                    content: "\f067";
+                }
+            }
+
+            &.bullet-icon {
+                // H2 class for using icons as 'bullets' much like the layout of a list. When the line breaks, the text won't fold under the icon. See the community page for an example.
+                padding-left: 1.5em;
+
+                >i:first-child {
+                    position: absolute;
+                    top: 24px;
+                    left: 0;
+                }
+            }
+        }
+
+        .collapsing-content {
+            overflow: hidden;
+            max-height: 0px;
+
+            -webkit-transition: all 0.5s ease-out;
+            transition: all 0.5s ease-out;
+        }
+
+        li.active .collapsing-content {
+            max-height: 1000px;
+            overflow: auto;
+        }
+    }
+}
+
+.list-image {
+    // list style for large, clickable images accompanied by text. (See Get Started Page.)
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+        border-top: 1px solid var(--hairline-color);
+        margin-top: 20px;
+        padding-top: 40px;
+
+        @include respond-min(768px) {
+            @include clearfix;
+            margin-top: 20px;
+            padding-top: 40px;
+        }
+
+        &:first-child {
+            border: none;
+            padding-top: 0;
+        }
+    }
+
+    a {
+        text-decoration: none;
+
+        &:hover,
+        &:active,
+        &:focus {
+            color: var(--text-light);
+        }
+
+        &.link-readmore {
+            margin: 0;
+        }
+    }
+
+    img {
+        display: block;
+        margin: 0 auto 25px;
+        max-width: 100%;
+    }
+
+    @include respond-min(768px) {
+        img {
+            float: left;
+            margin: 0 40px 0 0;
+            max-width: 200px;
+            max-height: 200px;
+        }
+
+        h2,
+        h3,
+        h4,
+        p {
+            padding-left: 240px;
+        }
+
+        h3 {
+            margin-top: 10px;
+        }
+
+    }
+
+    .layout-secondary &,
+    [role="complementary"] & {
+        img {
+            float: left;
+            max-width: 40%;
+            max-height: 120px;
+            margin: 0 20px 10px 0;
+        }
+
+        h2,
+        h3,
+        h4,
+        p {
+            padding-left: 0px;
+            border: 0;
+        }
+
+        h3 {
+            @include font-size(14);
+            margin-top: 0;
+            margin-bottom: 1em;
+            padding-bottom: 0;
+            @include sans-serif;
+            font-weight: 700;
+        }
+    }
+
+}
+
+//-------------------Documentation styles
+
+#s-django-documentation,
+#s-feed {
+    @include sans-serif;
+}
+
+.list-outline {
+    // Nested lists to house documentation outline. Meant for use in sidebar. (See Documentation Page.)
+    @include font-size(16);
+    line-height: 1.3;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    a {
+        text-decoration: none;
+    }
+
+    >li>ul>li {
+        margin-top: 12px;
+
+        &:first-child {
+            margin-top: 6px;
+        }
+    }
+
+    >li>a {
+        //top level
+        text-transform: uppercase;
+        font-weight: 700;
+        @include link-green;
+    }
+
+    >li>ul {
+        //second level
+        list-style: none;
+        @include font-size(12);
+        padding: 5px 0 0 10px;
+
+        >li>a {
+            font-weight: 700;
+            text-transform: uppercase;
+            @include link-green;
+        }
+    }
+
+    >li>ul>li ul {
+        //third level & down
+        @include font-size(14);
+        padding: 0 0 0 20px;
+
+    }
+}
+
+.section h2 {
+    margin: 50px 0 30px;
+}
+
+.section h3 {
+    margin: 40px 0 20px;
+}
+
+.headerlink {
+    // Permalink styles for sections in docs
+    margin-left: 10px;
+    font-size: 0.8em;
+    position: relative;
+    top: -0.17em;
+    font-weight: 700;
+    text-decoration: none;
+    -webkit-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+
+    &:focus {
+        opacity: 1;
+    }
+}
+
+//Notes, help blocks, and annotation sections
+.note,
+.admonition,
+.help-block {
+    background: var(--body-bg);
+    padding: 15px 20px 15px 70px;
+    border: 1px solid var(--secondary-accent);
+    border-radius: 4px;
+    margin: 25px 0;
+    position: relative;
+
+    h1,
+    h2,
+    h3,
+    h4 {
+        margin-top: 20px;
+    }
+
+    p {
+        margin: 0.8em 0;
+    }
+
+    .first {
+        margin-top: 0;
+    }
+
+    // Add an icon on the left of the box
+    .admonition-title {
+        font-weight: bold;
+
+        &::before {
+            @include fa-icon();
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 30px;
+            width: 34px;
+            text-align: center;
+            content: $fa-var-file-text-o; // default icon
+            opacity: 0.5;
+        }
+    }
+
+    &.warning {
+        background-color: var(--warning-admonition-bg);
+        border-color: var(--warning-dark);
+        color: var(--warning-text);
+
+        .admonition-title::before {
+            // color: #E9BD46;
+            color: var(--warning-admonition-icon);
+            content: $fa-var-exclamation-triangle;
+        }
+
+        code {
+            color: var(--primary);
+        }
+    }
+
+    &.admonition-philosophy {
+        .admonition-title::before {
+            content: $fa-var-lightbulb-o;
+        }
+    }
+
+    &.admonition-behind-the-scenes {
+        .admonition-title::before {
+            content: $fa-var-cogs;
+        }
+    }
+
+    .last,
+    .highlight {
+        margin-bottom: 0px;
+    }
+}
+
+
+// Horizontal navigation links for documentation
+.browse-horizontal {
+
+    @include sans-serif;
+    @include font-size(14);
+    @include clearfix;
+    font-weight: 700;
+
+    border-top: 1px solid var(--hairline-color);
+    border-bottom: 1px solid var(--hairline-color);
+    padding: 20px 0;
+    margin-top: 2em;
+
+    .left {
+        float: left;
+
+        .icon {
+            margin-right: 4px;
+            @include font-size(12);
+        }
+    }
+
+    .right {
+        float: right;
+
+        .icon {
+            margin-left: 4px;
+            @include font-size(12);
+        }
+    }
+
+    a {
+        text-decoration: none;
+    }
+
+}
+
+// Switcher for docs version and language
+
+#version-switcher {
+
+    position: fixed;
+    right: 15px;
+    bottom: 15px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+    pointer-events: none;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.6em;
+
+    ul {
+        text-align: right;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 3px;
+    }
+}
+
+#doc-versions li,
+#doc-languages li,
+#faq-link li,
+#backtotop-link li {
+    margin: 0 3px;
+    background: var(--body-bg);
+    border: 1px solid var(--hairline-color);
+    border-radius: 4px;
+    cursor: pointer;
+    pointer-events: auto;
+
+    a,
+    button {
+        display: inline-block;
+        background: var(--body-bg);
+        padding: 8px 15px;
+        border-radius: 4px;
+        border: none;
+        @include sans-serif;
+        font-size: 12px;
+        line-height: inherit;
+        color: var(--body-fg);
+    }
+
+    a {
+        text-decoration: none;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    &:hover,
+    &:focus-within {
+        border-color: $green-light;
+        a {
+            color: var(--secondary);
+        }
+    }
+}
+
+#doc-languages,
+#doc-versions {
+    position: relative;
+    flex-direction: row-reverse;
+    pointer-events: auto;
+
+    @include respond-max(768px) {
+        flex-wrap: wrap;
+        max-width: calc(100vw - 33px);
+    }
+
+    li {
+        display: inline-block;
+        padding: 0;
+        position: relative;
+
+        &.current {
+            &::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: -8px;
+                width: 8px;
+                height: 100%;
+            }
+        }
+
+        &.other {
+            display: none;
+            margin-right: 2px;
+            white-space: nowrap;
+            z-index: 2;
+        }
+    }
+
+    &:hover li.other,
+    &.open li.other {
+        display: inline-block;
+    }
+}
+
+@include respond-max(767px) {
+    body:has(.doc-floating-warning) [id] {
+        scroll-margin-top: 0;
+    }
+}
+
+@include respond-min(768px) {
+    body:has(.doc-floating-warning) [id] {
+        scroll-margin-top: 63px;
+    }
+}
+
+@include respond-min(1300px) {
+    body:has(.doc-floating-warning) [id] {
+        scroll-margin-top: 42px;
+    }
+}
+
+.doc-floating-warning {
+    top: 0;
+    width: 100%;
+    padding: 8px 20px 8px;
+    box-sizing: border-box;
+    background-image: linear-gradient(135deg, rgba(0, 0, 0, .04) 25%, transparent 25%, transparent 50%, rgba(0, 0, 0, .04) 50%, rgba(0, 0, 0, .04) 75%, transparent 75%, transparent);
+    @include sans-serif;
+    font-size: 14px;
+    text-align: center;
+    z-index: 1;
+
+    @include respond-min(768px) {
+        position: sticky;
+        min-width: 768px;
+    }
+}
+
+#dev-warning {
+    background-color: $warning-bg;
+    color: $text;
+}
+
+#outdated-warning {
+    background-color: var(--error-light);
+    color: $black-light-5;
+}
+
+#docs-content {
+
+    // Decrease vertical spacing in docs for less scrolling
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin: 0.6em 0;
+        line-height: 1.1em;
+    }
+
+    .section {
+        padding: 10px 0 20px;
+    }
+
+    img {
+        display: block;
+        max-width: 100%;
+    }
+
+    @include sans-serif;
+    @include font-size(14);
+    line-height: 1.5em;
+
+    .warning {
+        a.reference {
+            color: var(--warning-link-block);
+        }
+    }
+
+    a.reference {
+        // for docs links. if we keep text-decoration, then underscores in function names become invisible.
+        color: var(--error-dark);
+        text-decoration: none;
+        overflow-wrap: break-word;
+        border-bottom: 1px dotted var(--text-light);
+
+        &:visited {
+            border-color: var(--error-dark-l10);
+        }
+
+        &:active,
+        &:focus,
+        &:hover {
+            background: var(--body-bg);
+            color: var(--error-dark-l10);
+        }
+
+        em {
+            font-style: normal;
+        }
+    }
+
+    code.literal {
+        font-weight: 700;
+    }
+
+    .code-block-caption {
+        code.literal {
+            font-weight: 400;
+        }
+    }
+}
+
+.versionadded,
+.versionchanged,
+.versionmodified {
+    @include sans-serif;
+    font-weight: bold;
+    margin-bottom: 20px;
+
+    padding: 10px 13px;
+    border: 1px solid var(--secondary-accent);
+    border-radius: 4px;
+
+    p {
+        font-weight: normal;
+        margin-top: 0.3em;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.deprecated {
+    @extend .versionchanged;
+
+    .versionadded,
+    .versionchanged,
+    .versionmodified {
+        border: none;
+        padding: 0;
+        margin-bottom: 0;
+        display: block;
+    }
+
+    p {
+        font-weight: normal;
+        margin-top: 0;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+
+}
+
+dl.function,
+dl.class,
+dl.method,
+dl.classmethod,
+dl.staticmethod,
+dl.attribute,
+dl.exception,
+dl.data {
+    dt {
+        font-weight: 700;
+    }
+
+    dd {
+        padding-left: 1.4em;
+    }
+}
+
+.table-wrapper {
+    // This class is used to avoid the table exceeds the size of the content
+    // and add a scrollbar to see the rest of the content in mobile
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    overflow: auto;
+    white-space: normal;
+}
+
+table {
+    th {
+        background: var(--sidebar-bg);
+        font-weight: bold;
+        text-align: left;
+    }
+
+    td {
+        border-bottom: 1px solid var(--hairline-color);
+    }
+
+    td,
+    th {
+        padding: 0.5em 1em;
+    }
+}
+
+table.foundation td {
+    padding: 0 5px;
+}
+
+table.django-supported-versions,
+table.django-unsupported-versions {
+    border: 1px solid var(--hairline-color);
+    color: var(--table-color);
+
+    th,
+    td {
+        border-bottom: none;
+        padding: 5px;
+        text-align: center;
+    }
+}
+
+table.django-supported-versions th,
+table.django-supported-versions tr {
+    background-color: var(--secondary-accent);
+}
+
+table.django-unsupported-versions th,
+table.django-unsupported-versions tr {
+    background-color: var(--error-light);
+}
+
+.list-links {
+    //Can be used globally to stack list items either with a <ul>, or with a <dl> using the <dd> to add meta information.  (See Community Page - sidebar and block body.)
+    @include sans-serif;
+    list-style: none;
+    margin: 0;
+    padding: 10px 0 0;
+
+    a {
+        @include link-green;
+    }
+
+    dt,
+    li {
+        @include font-size(16);
+        margin-top: 15px;
+
+        &:first-child {
+            margin-top: 0;
+        }
+
+        font-weight: 400;
+    }
+
+    dd {
+        @extend .meta;
+        margin-top: 0;
+        margin-bottom: 30px;
+    }
+
+    [role="complementary"] & {
+
+        padding: 0;
+
+        dt,
+        li {
+            @include font-size(16);
+            border-top: 1px solid var(--hairline-color);
+            margin-top: 0;
+            padding-top: 20px;
+
+            &:first-child {
+                border: none;
+                padding-top: 0;
+            }
+        }
+
+        li {
+            padding: 14px 0 10px;
+        }
+
+        dd {
+            @include font-size(14);
+            margin-bottom: 16px;
+        }
+    }
+
+    +h3 {
+        margin-top: 34px;
+    }
+}
+
+search.filters {
+    @include sans-serif;
+
+    display: flex;
+    gap: 10px;
+    border-bottom: 2px solid var(--hairline-color);
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 0;
+    position: relative;
+
+    a {
+      padding: 10px 15px;
+      text-decoration: none;
+      border-bottom: 3px solid transparent;
+      transition: color 0.3s ease, border-bottom 0.3s ease;
+      color: var(--text-light);
+      flex-shrink: 0;
+
+      &:not([href]) {
+        color: var(--body-fg);
+        font-weight: bold;
+        border-bottom: 3px solid var(--primary);
+      }
+
+      &[href]:focus,
+      &[href]:active,
+      &[href]:hover {
+        outline: none;
+        border-bottom: 3px solid var(--hairline-color);
+      }
+    }
+}
+
+#search-results {
+    // Sphinx searchtools.js generated content.
+
+    > h2:not(a) {
+        // Reset top h2 to appear like in main, not #docs-content.
+        // (On djangoproject.com, the top h2 is outside #docs-content.)
+        margin-top: 40px;
+        margin-bottom: 15px;
+        line-height: 1.6;
+    }
+
+    .search-summary {
+        @extend .meta;
+    }
+}
+
+#search-results ul.search,
+.search-links {
+    @extend .list-links;
+
+    a {
+        span.highlighted,
+        mark {
+            color: var(--search-mark-text);
+            text-decoration: none;
+
+            &:visited {
+                color: var(--link-color);
+            }
+
+            &:hover,
+            &:active,
+            &:focus {
+                color: var(--search-link-hover);
+                text-decoration: none;
+            }
+
+            &:hover,
+            &:active,
+            &:focus {
+                color: var(--search-link-hover);
+                text-decoration: none;
+            }
+
+            background-color: var(--secondary-accent);
+        }
+    }
+
+    em {
+        font-weight: 700;
+        color: var(--body-fg);
+    }
+
+    > li > span,
+    span.meta {
+        margin-top: 0;
+        margin-bottom: 10px;
+        color: var(--dark-hairline-color);
+
+        a {
+            color: var(--text-light);
+
+            &:visited {
+                color: darken($text-light, 10%);
+            }
+
+            &:active,
+            &:focus,
+            &:hover {
+                color: darken($text-light, 20%);
+            }
+        }
+    }
+
+    h2.result-title {
+        margin: 0.3em 0 !important;
+    }
+
+    span.arrow {
+        color: var(--body-fg);
+        font-weight: 700;
+    }
+
+    dd {
+        margin-bottom: 30px;
+
+        mark {
+            background-color: var(--secondary-accent);
+            color: var(--search-mark-text);
+        }
+    }
+
+    .code-links {
+        margin-top: 15px;
+        margin-left: 10px;
+        list-style-type: none;
+        padding-left: 0;
+
+        a {
+            &:active,
+            &:focus,
+            &:hover {
+                code {
+                    color: var(--primary);
+                }
+                .meta {
+                    color: var(--text-light);
+                }
+            }
+        }
+
+        code {
+            color: var(--primary-accent);
+            font-weight: 700;
+        }
+
+        div {
+            margin: 0;
+            .meta {
+                margin: 5px 0 0;
+                color: var(--body-fg);
+            }
+        }
+    }
+
+    > li {
+        > a {
+            // searchtools.js equivalent to djangoproject.com's h2.result-title.
+            @extend h2, .result-title;
+            display: block;
+        }
+
+        > span {
+            // searchtools.js's location (e.g., "(setting, in Settings)").
+            // (See also span.meta earlier.)
+            @extend dd;
+            display: block;
+        }
+
+        > p.context {
+            // searchtools.js equivalent to djangoproject.com's .list-links dd.
+            @extend dd;
+        }
+
+        margin-bottom: 30px; // from dd above.
+    }
+}
+
+#search-results {
+    p.search-summary {
+        @extend .meta;
+    }
+}
+
+span.highlighted {
+    // sphinx_highlight.js is used on both search results and document pages.
+    // From .search-links dd mark.
+    background-color: var(--secondary-accent);
+    color: var(--search-mark-text);
+}
+
+.list-links-small {
+    //List style used to display links, with optional icons. See Homepage sidebar
+    padding-left: 0;
+    list-style: none;
+
+    a {
+        @include link-green;
+        text-decoration: none;
+    }
+
+    li>a,
+    dt>a {
+        &:before {
+            font-family: FontAwesome;
+            font-weight: normal;
+            font-style: normal;
+            float: left;
+            width: 23px;
+            height: 20px;
+        }
+    }
+
+    dt {
+        font-weight: 400;
+    }
+
+    dd {
+        color: var(--text-light);
+        padding-top: 2px;
+    }
+
+    // Add document icon before list item link
+    &.docs-list {
+        list-style: none;
+
+        li>a,
+        dt>a {
+            &:before {
+                content: "\f0f6";
+            }
+        }
+
+        dd {
+            padding-left: 24px;
+        }
+    }
+
+    // Add news icon before list item link
+    &.news-list {
+        list-style: none;
+
+        li>a,
+        dt>a {
+            &:before {
+                content: "\f0a1";
+            }
+        }
+
+        dt.event>a {
+            &:before {
+                content: "\f133";
+            }
+        }
+
+        dd {
+            padding-left: 24px;
+        }
+    }
+
+    // Add link icon before list item link
+    &.resource-list {
+        list-style: none;
+
+        li>a,
+        dt>a {
+            &:before {
+                content: "\f0c1";
+            }
+        }
+
+        dd {
+            padding-left: 24px;
+        }
+    }
+
+    // Add rss icon before list item link
+    &.rss-list {
+        list-style: none;
+
+        li>a,
+        dt>a {
+            &:before {
+                content: "\f09e";
+            }
+        }
+
+        dd {
+            padding-left: 24px;
+        }
+    }
+}
+
+//------------------- Forms
+form {
+    @include sans-serif;
+    @include font-size(16);
+
+    // Global input styles
+    input[type="search"],
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="url"],
+    textarea {
+        @include sans-serif;
+        @include font-size(16);
+        appearance: none;
+        background: var(--white-color);
+        border: 1px solid var(--hairline-color);
+        color: var(--body-fg);
+        border-radius: 4px;
+        cursor: auto;
+        display: block;
+        font-weight: 400;
+        height: 30px;
+        margin: 10px 0px;
+        padding: 6px 14% 8px 10px;
+        text-indent: 0;
+        vertical-align: middle;
+        width: 83%;
+
+        @include respond-min(768px) {
+            padding: 6px 18% 8px 10px;
+            width: 80%;
+        }
+
+        &::-ms-clear {
+            display: none;
+        }
+
+        &:active,
+        &:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+
+        &::placeholder {
+            color: var(--body-fg);
+        }
+    }
+
+    textarea {
+        height: auto;
+    }
+
+    input[type=checkbox],
+    input[type=radio] {
+        margin-right: 6px;
+    }
+
+    select {
+        border: 1px solid var(--hairline-color);
+        background: var(--white-color);
+        color: var(--body-fg);
+        height: 46px;
+        padding: 0 10px;
+        border-radius: 4px;
+        @include font-size(16);
+
+        [role="complementary"] & {
+            height: 36px;
+            @include font-size(14);
+        }
+    }
+
+    button {
+        appearance: none;
+
+        background: var(--secondary);
+        border-radius: 4px;
+        color: var(--white-color);
+        border: 0;
+        height: 46px;
+        padding: 0 15px;
+        @include sans-serif;
+        @include font-size(16);
+
+        &:hover {
+            background: var(--primary);
+        }
+    }
+}
+
+.form-general {
+
+    // Multi-input forms with seperate submit button. For use in Login and Register forms, or other general form uses.
+    fieldset {
+        max-width: 700px;
+        border: 0;
+        padding: 0;
+        margin: 15px 0;
+
+        input[type="search"],
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="url"] {
+            margin: 10px 0;
+        }
+    }
+}
+
+.form-input {
+    // Specific class for single-entry form with <button> submit element utilizing a font-awesome icon. See examples on Community and News & Events pages.
+    min-height: 40px;
+    margin: 30px 0 20px;
+    position: relative;
+
+    &:focus {
+        background: #000;
+    }
+
+    button {
+        background: none;
+        border: none;
+        color: var(--primary);
+        height: 40px;
+        padding: 0;
+        position: absolute;
+        right: 0;
+        top: 6%;
+        width: 40px;
+
+        i {
+            @include font-size(20);
+            line-height: 1;
+        }
+
+        &:hover,
+        &:focus,
+        &:active {
+            background: none;
+            color: $green-dark;
+            outline: none;
+        }
+    }
+
+    [role="complementary"] & {
+        min-height: 30px;
+        margin: 20px 0 30px;
+
+        input[type="search"],
+        input[type="text"],
+        input[type="email"] {
+            height: 20px;
+            @include font-size(14);
+        }
+
+        button {
+            height: 30px;
+            width: 30px;
+            top: 3px;
+
+            @include respond-min(768px) {
+                right: 0;
+            }
+
+            i {
+                @include font-size(20);
+            }
+        }
+    }
+
+    &.search {
+        width: 20%;
+        min-width: 200px;
+        margin: 10px 8px 10px 0;
+        @include respond-min(768px) {
+            margin-left: 10px;
+        }
+
+        input {
+          margin: 0;
+        }
+    }
+}
+
+
+
+.form-email {
+
+    // Email submission forms on Community page.
+    h3 {
+        @include font-size(18);
+        margin: 10px 0;
+    }
+
+    .meta {
+        margin: 0;
+    }
+
+    form {
+        margin: 10px 0 30px;
+    }
+}
+
+//------------------- Pagination
+.nav-pagination {
+    // Pagination style for use with the News & Events pages.
+    @include sans-serif;
+    @include font-size(14);
+    border-top: 1px solid var(--hairline-color);
+    font-weight: 700;
+    line-height: 31px;
+    list-style: none;
+    margin: 30px 0;
+    padding: 30px 0 0;
+    text-align: center;
+
+    li {
+        display: inline-block;
+    }
+
+    a {
+        border: none;
+        color: var(--text-light);
+        height: auto;
+        width: auto;
+        margin: 0 5px;
+        border-radius: 15px;
+        display: block;
+        text-decoration: none;
+
+        @include device-min(320px) {
+            background: var(--text-light);
+            color: var(--white-color);
+            height: 30px;
+            margin: 0 2px;
+            width: 30px;
+        }
+
+        &.previous,
+        &.next {
+            @include font-size(16);
+
+            @include device-min(320px) {
+                border-radius: 20px;
+                height: 40px;
+                line-height: 43px;
+                width: 40px;
+            }
+        }
+
+        &.previous {
+            margin-right: 10px;
+
+            @include respond-min(768px) {
+                margin-right: 70px;
+            }
+        }
+
+        &.next {
+            margin-left: 10px;
+            text-indent: 1px;
+
+            @include respond-min(768px) {
+                margin-left: 70px;
+            }
+        }
+
+        &:hover,
+        &:focus,
+        &:active,
+        &.active {
+            background: none;
+            color: var(--secondary);
+
+            @include device-min(320px) {
+                background: var(--secondary);
+                color: var(--white-color);
+            }
+        }
+    }
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid var(--hairline-color);
+}
+
+// em {
+//     // this is because our main font does not support this style:
+//     font-style: normal;
+// }
+
+.badge {
+    border-radius: 4px;
+    font-size: 12px;
+    padding: 2px 6px;
+    margin: 0 5px;
+    letter-spacing: 0px;
+    position: relative;
+    bottom: 0.3em;
+    color: var(--body-bg);
+    background-color: var(--secondary);
+}
+
+.user-info {
+    .avatar {
+        @include framed-image();
+        float: right;
+    }
+}
+
+// Boilerplate Helper mixins (rendered as classes)
+.visuallyhidden {
+    @include visuallyhidden;
+}
+
+.clearfix,
+.group-container {
+    @include clearfix;
+}
+
+/// Fundraising page
+@keyframes pixel-pulse {
+
+    0%,
+    100% {
+        opacity: 0.10;
+    }
+
+    50% {
+        opacity: 0.25;
+    }
+}
+
+.fundraising-index {
+    margin-top: 50px;
+
+    .fundraising-heart {
+        width: 100%;
+        float: none;
+
+        img,
+        svg {
+            width: 100%;
+            height: auto;
+        }
+
+        rect {
+            -webkit-transition: opacity 250ms ease-out;
+            transition: opacity 250ms ease-out;
+
+            &.faded {
+                opacity: 0.05;
+                animation: pixel-pulse 3s infinite;
+            }
+        }
+
+        text {
+            @include font-size(120);
+            fill: rgba(50, 50, 50, 0.3);
+            stroke: #aaaaaa;
+            stroke-width: 2px;
+            -webkit-user-select: none;
+            user-select: none;
+            cursor: default;
+        }
+
+        @include respond-min(768px) {
+            width: 55%;
+            float: left;
+        }
+    }
+
+    .description {
+        margin-left: 5%;
+        width: 100%;
+        float: none;
+        margin-top: 30px;
+
+        @include respond-min(768px) {
+            width: 40%;
+            float: left;
+            margin-top: 0px;
+        }
+
+        h2 {
+            margin-top: 0;
+            @include font-size(28);
+        }
+    }
+}
+
+.fundraising-index {
+    .donate {
+        select {
+            width: 80%;
+
+            @include respond-min(768px) {
+                width: 100%;
+            }
+        }
+
+        .cta {
+            margin: 10px 0;
+
+            & .disabled {
+                opacity: 0.5;
+            }
+        }
+
+        .custom-donation {
+            display: none;
+        }
+
+        .prefix {
+            float: left;
+            @include font-size(19);
+            margin: 8px 9px 0 3px;
+        }
+
+        input[type="text"] {
+            width: 70%;
+        }
+    }
+
+    .cls {
+        clear: both;
+    }
+}
+
+.fundraising-sidebar {
+    .small-heart {
+        margin-top: 20px;
+        width: 20%;
+        float: left;
+        margin-bottom: 20px;
+
+        img {
+            width: 100%;
+            max-width: 64px;
+        }
+    }
+
+    .small-cta {
+        width: 70%;
+        float: left;
+        vertical-align: top;
+        margin-left: 5%;
+        margin-right: 5%;
+        margin-bottom: 20px;
+    }
+
+    clear: both;
+}
+
+.footnote {
+    color: var(--dark-hairline-color);
+    @include font-size(14);
+    margin-top: 20px;
+    text-align: center;
+
+    /* The IDs in documentation footnotes should stay as table cells */
+    .label {
+        display: table-cell;
+        padding-right: 1em;
+    }
+}
+
+form .footnote {
+    margin-top: 10px;
+    text-align: left;
+}
+
+.footnote.docutils {
+    text-align: left;
+}
+
+.heroes-section {
+    overflow: hidden;
+
+    .heroes {
+        clear: both;
+
+        h3 {
+            clear: both;
+            text-align: center;
+        }
+
+        .hero {
+            width: 30%;
+            background-color: var(--logo-bg);
+            border-radius: 10px;
+            margin: 5px;
+            position: relative;
+            height: auto;
+
+            div {
+                width: 100%;
+            }
+        }
+
+        .hero-logo {
+            height: 170px;
+            line-height: 170px;
+
+            img {
+                vertical-align: middle;
+            }
+        }
+
+        .hero-name {
+            min-height: 87px;
+            vertical-align: top;
+            margin-bottom: 5px;
+        }
+
+        div {
+            float: left;
+            text-align: center;
+            width: 100%;
+
+            img {
+                max-width: 90%;
+                max-height: 170px;
+            }
+        }
+
+        .no-logo-hero {
+            min-height: 60px;
+            margin-right: 24px;
+            width: auto;
+        }
+    }
+
+    .pagination {
+        clear: both;
+    }
+}
+
+.manage-donations-form {
+
+    select,
+    input[type="number"] {
+        width: 300px;
+    }
+
+    input[type="number"] {
+        padding: 7px 10px;
+        width: 278px;
+    }
+}
+
+.django-hero-form {
+    .form-control {
+        margin: 1em 0;
+    }
+
+    ul {
+        list-style: none;
+        display: inline-block;
+        margin: 0;
+        padding: 0;
+    }
+
+    li {
+        display: inline-block;
+        margin-left: 1em;
+    }
+}
+
+/* Corporate membership list page */
+
+ul.corporate-members li {
+    min-height: 160px;
+}
+
+.corporate-member-logo {
+    float: right;
+    max-height: 150px;
+    max-width: 150px;
+    padding: 0 0 10px 10px;
+}
+
+/* Corporate membership download page, this mimics .fundraising-sidebar */
+
+.corporate-members {
+    .member-logo {
+        margin-top: 20px;
+        width: 20%;
+        float: left;
+        margin-bottom: 20px;
+
+        img {
+            width: 100%;
+            max-width: 75px;
+        }
+    }
+
+    .small-cta {
+        width: 70%;
+        float: left;
+        vertical-align: top;
+        margin-left: 5%;
+        margin-right: 5%;
+        margin-bottom: 20px;
+    }
+
+    clear: both;
+}
+
+/* Messages */
+
+.messages {
+    list-style-type: none;
+    width: 100%;
+    padding-left: 0;
+
+    li {
+        padding: 15px;
+        background-color: var(--secondary-accent-l10);
+        color: $green-dark;
+        border: 1px solid $green-dark;
+        border-radius: 4px;
+
+        &::before {
+            @include fa-icon();
+            font-size: 30px;
+            width: 34px;
+            text-align: center;
+            float: left;
+            margin-left: -5px;
+            margin-right: 10px;
+        }
+
+        &.fade-out {
+            opacity: 0;
+            transition: opacity 400ms;
+        }
+
+        &.info {
+            &::before {
+                content: $fa-var-info-circle;
+            }
+        }
+
+        &.success {
+            background-color: var(--secondary-accent-l5);
+            content: $fa-var-check-circle;
+
+            &::before {
+                content: $fa-var-check-circle;
+            }
+        }
+
+        &.warning {
+            background-color: var(--warning);
+            border-color: var(--warning-dark-d50);
+
+            &::before {
+                color: var(--warning-dark-d50);
+                content: $fa-var-exclamation-triangle;
+            }
+        }
+
+        &.error {
+            background-color: var(--error-light-l10);
+            color: var(--error-dark);
+            border-color: var(--error-dark);
+
+            &::before {
+                content: $fa-var-times-circle;
+            }
+        }
+
+        i.close {
+            float: right;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: -10px;
+            margin-right: -10px;
+        }
+    }
+}
+
+.code-block-caption,
+.snippet {
+    .btn-clipboard {
+        float: right;
+        cursor: pointer;
+        margin-top: 2px;
+        margin-right: -10px;
+
+        i:hover {
+            color: lighten($green-dark, 20);
+        }
+
+        .clipboard-success {
+            font-size: 80%;
+            margin-right: 10px;
+
+            &.fade-out {
+                opacity: 0;
+                transition: opacity 400ms;
+            }
+        }
+    }
+
+    .caption-text::selection {
+        background: $green-light;
+    }
+}
+
+.column-container {
+    @include respond-min(768px) {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    @include respond-max(1080px) {
+        .community-title {
+            text-align: center;
+        }
+
+        .community-cta-wrapper {
+            justify-content: space-evenly;
+            align-items: center;
+        }
+
+    }
+
+    .community-cta-wrapper {
+        display: flex;
+        gap: 60px;
+        flex-wrap: wrap;
+        align-content: center;
+    }
+
+    .community-cta-a {
+        display: inline-block;
+        width: 300px;
+        height: 300px;
+    }
+
+    .community-cta {
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background: var(--community-img-bg);
+        border-radius: 20px;
+    }
+
+    .community-cta {
+        svg, h3 {
+            color: var(--community-img-fg);
+        }
+    }
+}
+
+.blog {
+    .blog-entry-body {
+        img {
+            max-width: 100%;
+            display: block;
+            margin: auto;
+        }
+    }
+}
+
+// added for skip to main functionality
+.skip-link {
+    position: absolute;
+    top: -5em;
+    z-index: 1;
+    background: var(--body-bg);
+    color: var(--link-color);
+    border: 0.5em solid var(--primary);
+    padding: 0.5em 2em;
+    transition: top 0.5s ease-out;
+
+    &:focus {
+        top: 0;
+    }
+}

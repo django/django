@@ -1,0 +1,352 @@
+// default theme: light
+html[data-theme="light"],
+:root {
+    --body-fg: #{$text};
+    --body-bg: #{$white};
+    --logo-bg: #{$white};
+
+    --menu: #{$white};
+
+    --text-l10: #{$text-l10};
+    --text-l20: #{$text-l20};
+    --text-light: #{$text-light};
+
+    --primary: #{$green-medium};
+    --primary-accent: #{$green-medium-dark};
+
+    --secondary: #{$green};
+    --secondary-accent: #{$green-very-light};
+    --secondary-accent-l5: #{$green-very-light-l5};
+    --secondary-accent-l10: #{$green-very-light-l10};
+
+    --link-color: #{$green};
+    --sidebar-bg: #{$white-dark};
+
+    --code-bg: #{$white-dark};
+    --code-fg: #{$green-dark};
+    --code-block-title: #{$green-dark};
+    --code-border: #EAEAEA;
+
+
+    --console-tabs-color: #555;
+    --console-tabs-border: #{$orange};
+
+    --warning: #{$warning-yellow};
+    --warning-admonition-icon: #{$warning-icon};
+    --warning-admonition-bg: #{$warning-yellow};
+    --warning-text: #{$text};
+    --warning-link-block: #{$red-medium};
+    --warning-dark: #{$warning-dark-yellow};
+    --warning-dark-d50: #{$warning-dark-yellow-d50};
+
+    --hairline-color: #{$gray-line};
+    --dark-hairline-color: #{$gray-medium};
+
+    --error-fg: #{$red};
+    --error-light: #{$red-light};
+    --error-light-l10: #{$red-light-l10};
+    --error-dark: #{$red-dark};
+    --error-dark-l10: #{$red-dark-l10};
+
+    --cta-color-accent: #{$green-very-light};
+    --table-color: var(--body-fg);
+    --white-color: #fff;
+
+    --search-link: #{$green};
+    --search-link-hover: #{$green-light};
+    --search-mark-text: #{$green-dark};
+
+    --selection: #{$green-very-light};
+
+    --community-img-bg: #{$green-very-light};
+    --community-img-fg: #{$green-dark};
+}
+
+@media (prefers-color-scheme: dark) {
+    html:not([data-theme="light"]) {
+        color-scheme: dark;
+        --body-fg: #C1CAD2;
+        --body-bg: #{$black};
+        --logo-bg: #{$logo-bg-dark};
+
+        --text-l10: #{$green-light};
+        --text-l20: #{$green-very-light};
+        --text-light: #{$text-light-l20};
+
+        --primary: #{$green-medium};
+        --primary-accent: #{$green-light};
+
+        --secondary-accent: #{$green-medium};
+
+        --link-color: #{$green-light};
+        --sidebar-bg: #{$black-light-5};
+
+        --code-bg: #{$black-light-5};
+        --code-fg: #{$white-dark};
+        --code-border: #{$black-light-5};
+        --code-block-title: #{$black-light-5};
+
+        --console-tabs-color: #{$dark-orange};
+        --console-tabs-border: #{$dark-orange};
+
+        --warning-admonition-icon: #{$warning-icon};
+        --warning-admonition-bg: transparent;
+        --warning-text: #{$white};
+        --warning-link-block: #{$red};
+
+        --hairline-color: #{$gray-line};
+        --dark-hairline-color: #{gray-medium-l10};
+
+        --error-light: #{$red-medium};
+        --error-dark: #{$red-medium};
+
+        --table-color: var(--body-bg);
+        --cta-color-accent: #{$black};
+        --white-color: #{$black};
+
+        --search-link: #{$green-dark};
+        --search-link-hover: #{$green-light};
+        --search-mark-text: #{$black-light-5};
+
+        --selection: #{$green-dark};
+
+        --community-img-bg: #{$green-dark};
+        --community-img-fg: #{$white};
+    }
+
+    body .homepage {
+        .copy-banner {
+            background: var(--white-color);
+        }
+    }
+
+    body .copy-banner {
+        background: darken($green, 10%);
+
+        p,
+        h1 {
+            color: $green-very-light;
+
+            @include respond-min(768px) {
+                color: $green-very-light;
+            }
+
+            a {
+                color: $green-very-light;
+            }
+        }
+    }
+
+    body table.django-supported-versions,
+    body table.django-unsupported-versions {
+        a {
+            color: var(--table-color);
+
+            &:active,
+            &:focus,
+            &:hover {
+                color: var(--table-link-hover);
+            }
+        }
+    }
+
+    body footer {
+        background: darken($green, 10%);
+    }
+
+    body .admonition.warning {
+        .admonition-title::before {
+            opacity: 1;
+        }
+    }
+
+}
+
+html[data-theme="dark"] {
+    color-scheme: dark;
+    --body-fg: #C1CAD2;
+    --body-bg: #{$black};
+    --logo-bg: #{$logo-bg-dark};
+
+    --text-l10: #{$green-light};
+    --text-l20: #{$green-very-light};
+    --text-light: #{$text-light-l20};
+
+    --primary: #{$green-medium};
+    --primary-accent: #{$green-light};
+
+    --secondary-accent: #{$green-medium};
+
+    --link-color: #{$green-light};
+    --sidebar-bg: #{$black-light-5};
+
+    --code-bg: #{$black-light-5};
+    --code-fg: #{$white-dark};
+    --code-border: #{$black-light-5};
+    --code-block-title: #{$black-light-5};
+
+    --console-tabs-color: #{$dark-orange};
+    --console-tabs-border: #{$dark-orange};
+
+    --warning-admonition-icon: #{$warning-icon};
+    --warning-admonition-bg: transparent;
+    --warning-text: #{$white};
+    --warning-link-block: #{$red};
+
+    --hairline-color: #{$gray-line};
+    --dark-hairline-color: #{gray-medium-l10};
+
+    --error-light: #{$red-medium};
+    --error-dark: #{$red-medium};
+
+    --table-color: var(--body-bg);
+    --table-link-hover: #09422C;
+    --cta-color-accent: #{$black};
+    --white-color: #{$black};
+
+    --search-link: #{$green-dark};
+    --search-link-hover: #{$green-light};
+    --search-mark-text: #{$black-light-5};
+
+    --selection: #{$green-dark};
+
+    --community-img-bg: #{$green-dark};
+    --community-img-fg: #{$white};
+
+    .homepage {
+        .copy-banner {
+            background: var(--white-color);
+        }
+    }
+
+    .copy-banner {
+        background: darken($green, 10%);
+
+        p,
+        h1 {
+            color: $green-very-light;
+
+            @include respond-min(768px) {
+                color: $green-very-light;
+            }
+
+            a {
+                color: $green-very-light;
+            }
+        }
+    }
+
+    table.django-supported-versions,
+    table.django-unsupported-versions {
+        a {
+            color: var(--table-color);
+
+            &:active,
+            &:focus,
+            &:hover {
+                color: var(--table-link-hover);
+            }
+        }
+    }
+
+    .admonition.warning {
+        .admonition-title::before {
+            opacity: 1;
+        }
+    }
+
+    footer {
+        background: darken($green, 10%);
+    }
+}
+
+html[data-theme="light"] .img-release {
+  filter: invert(0);
+}
+
+@media (prefers-color-scheme: light) {
+    html[data-theme="auto"] .img-release {
+        filter: invert(0);
+    }
+}
+
+html[data-theme="dark"] .img-release {
+  filter: invert(1);
+}
+
+@media (prefers-color-scheme: dark) {
+    html[data-theme="auto"] .img-release {
+        filter: invert(1);
+    }
+}
+
+
+/* THEME SWITCH */
+.theme-toggle {
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    margin: 0 2px;
+    padding: 0;
+    color: var(--menu);
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ICONS */
+.theme-toggle .icon {
+    display: none;
+    color: var(--menu);
+}
+
+html[data-theme="auto"] .theme-toggle .theme-icon-when-auto {
+    display: block;
+}
+
+html[data-theme="dark"] .theme-toggle .theme-icon-when-dark {
+    display: block;
+}
+
+html[data-theme="light"] .theme-toggle .theme-icon-when-light {
+    display: block;
+}
+
+/* Fully hide screen reader text so we only show the one matching the current theme */
+.theme-toggle .visually-hidden {
+    display: none;
+}
+
+html[data-theme="auto"] .theme-toggle .theme-label-when-auto {
+    display: block;
+}
+
+html[data-theme="dark"] .theme-toggle .theme-label-when-dark {
+    display: block;
+}
+
+html[data-theme="light"] .theme-toggle .theme-label-when-light {
+    display: block;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+    color: var(--body-fg);
+    background-color: var(--body-bg);
+}
+
+html[data-theme="light"] .admonition {
+    .admonition-title::before {
+        opacity: 0.5;
+    }
+}

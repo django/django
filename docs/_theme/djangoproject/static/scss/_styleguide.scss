@@ -1,0 +1,132 @@
+// Styleguide helper classes. Not intended for production use.
+
+.styleguide {
+
+    .example {
+        padding: 0 20px 20px;
+        border: 1px solid var(--hairline-color);
+        border-radius: 4px;
+        margin-top: 20px;
+        margin-bottom: 64px;
+
+        &:before {
+            content: "Example";
+            font-size: 16px;
+            font-weight: 700;
+            display: block;
+            color: var(--hairline-color);
+            @include sans-serif;
+            text-align: left;
+            padding: 10px 0;
+        }
+
+        [role="complementary"] {
+            float: none;
+            width: auto;
+            padding: 0;
+            margin: 0;
+        }
+    }
+
+    .iframe {
+        display: block;
+        height: 400px;
+        cursor: zoom-in;
+        border: 1px solid var(--hairline-color);
+        overflow: hidden;
+
+        iframe {
+            pointer-events: none;
+            position: relative;
+            width: 200%;
+            border: 0;
+            height: 800px;
+            -webkit-transform: scale(0.5) translate(-50%, -50%);
+            transform: scale(0.5) translate(-50%, -50%);
+            top: 0;
+            left: 0;
+            overflow: hidden;
+        }
+    }
+
+    .swatches {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        @include clearfix;
+        margin: 30px 0;
+
+        li {
+            width: 30%;
+            height: 30px;
+            margin-right: 2%;
+            box-sizing: border-box;
+
+            float: left;
+
+            // Primary
+            &.text {
+                background: var(--body-fg);
+            }
+
+            &.green-dark {
+                background: $green-dark;
+            }
+
+            &.green {
+                background: var(--secondary);
+            }
+
+            &.green-light {
+                background: $green-light;
+            }
+
+            &.white {
+                background: var(--body-bg);
+                border: 1px solid var(--hairline-color);
+            }
+
+            &.red-dark {
+                background: var(--error-dark);
+            }
+
+            // Secondary
+            &.text-light {
+                background: var(--text-light);
+            }
+
+            &.green-medium-dark {
+                background: var(--primary-accent);
+            }
+
+            &.green-medium {
+                background: var(--primary);
+            }
+
+            &.green-very-light {
+                background: var(--secondary-accent);
+            }
+
+            &.gray-line {
+                background: var(--hairline-color);
+            }
+
+            &.red {
+                background: $red;
+            }
+
+        }
+    }
+
+    #layout {
+        overflow: hidden;
+    }
+
+    #icons .icon {
+        @include font-size(32);
+        color: var(--secondary);
+        padding: 0 .2em;
+    }
+
+
+}

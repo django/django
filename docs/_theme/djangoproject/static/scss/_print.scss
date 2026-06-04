@@ -1,0 +1,97 @@
+@media print {
+
+    // H5BP Print styles (https://github.com/h5bp/html5-boilerplate/blob/master/css/main.css)
+    * {
+        background: transparent !important;
+        color: #000 !important; /* Black prints faster: h5bp.com/s */
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    a,
+    a:visited {
+        text-decoration: underline;
+    }
+
+    /*
+    * Don't show links for images, or javascript/internal links
+    */
+
+    pre,
+    blockquote {
+        border: 1px solid #999;
+        page-break-inside: avoid;
+    }
+
+    thead {
+        display: table-header-group; /* h5bp.com/t */
+    }
+
+    tr,
+    img {
+        page-break-inside: avoid;
+    }
+
+    img {
+        max-width: 100% !important;
+    }
+
+    @page {
+        margin: 0.5cm;
+    }
+
+    p,
+    h2,
+    h3 {
+        orphans: 3;
+        widows: 3;
+    }
+
+    h2,
+    h3 {
+        page-break-after: avoid;
+    }
+
+    // Custom Print Styles
+
+    html { // adjust page font size
+        font-size: 40%;
+    }
+
+.menu-button, //display none list
+    .news-search,
+    .backtotop,
+    .nav-pagination,
+    footer>.container,
+    footer .logo,
+    .thanks,
+    [role="complementary"],
+    nav,
+    .form-input {
+        display: none !important;
+    }
+
+    .logo {
+        text-indent: 0 !important;
+    }
+
+    footer,
+    footer .copyright {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .internal-container {
+        float: none;
+        width: auto;
+    }
+
+    .list-news li {
+        margin-top: 0;
+    }
+#homepage,
+    [role="complementary"],
+    .form-input {
+        display: block !important;
+    }
+}

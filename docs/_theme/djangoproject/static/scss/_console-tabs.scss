@@ -1,0 +1,85 @@
+.console-block {
+    text-align: right;
+
+    *:before,
+    *:after {
+        box-sizing: border-box;
+    }
+
+    >input {
+
+        &.c-tab-unix,
+        &.c-tab-win {
+            display: none;
+        }
+
+        &:checked+label {
+            color: var(--console-tabs-color);
+            border: 1px solid #ddd;
+            border-top: 2px solid var(--console-tabs-border);
+            border-bottom: 1px solid var(--white-color);
+        }
+    }
+
+    >label {
+        display: inline-block;
+        padding: 4px 8px;
+        font-weight: normal;
+        text-align: center;
+        color: #bbb;
+        border: 1px solid transparent;
+        font-family: fontawesome;
+    }
+
+    >section {
+        display: none;
+        text-align: left;
+
+        .highlight {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+
+            pre {
+                flex: 1;
+                margin: 0;
+            }
+        }
+
+        .btn-clipboard {
+            cursor: pointer;
+            padding: 8px 12px;
+            flex-shrink: 0;
+
+            i {
+                color: var(--code-fg);
+                opacity: 0.6;
+                transition: opacity 200ms ease;
+
+                &:hover {
+                    opacity: 1;
+                    color: var(--link-color);
+                }
+            }
+
+            .clipboard-success {
+                @include monospace;
+                font-size: 80%;
+                color: var(--link-color);
+                margin-right: 6px;
+                white-space: nowrap;
+                line-height: 1;
+
+                &.fade-out {
+                    opacity: 0;
+                    transition: opacity 400ms;
+                }
+            }
+        }
+    }
+
+    >.c-tab-unix:checked~.c-content-unix,
+    >.c-tab-win:checked~.c-content-win {
+        display: block;
+    }
+}

@@ -1,0 +1,179 @@
+// Colors
+
+$gray-medium: #859D94;
+$gray-medium-l10: lighten($gray-medium, 10);
+$gray-dark: #343940;
+$text: #0C3C26;
+$text-l10: lighten($text, 10);
+$text-l20: lighten($text, 20);
+$text-light: #798780;
+$text-light-l20: lighten($text-light, 20);
+$text-light-l30: lighten($text-light, 30);
+$text-light-d10: darken($text-light, 10);
+$text-light-d20: darken($text-light, 20);
+$gray-line: #CFE3DC;
+$green-very-light: #C9F0DD;
+$green-very-light-l5: lighten($green-very-light, 5);
+$green-very-light-l10: lighten($green-very-light, 10);
+$green-light: #93D7B7;
+$green-medium: #44B78B;
+$green-medium-dark: #2B8C67;
+$green: #20AA76;
+$green-l6: lighten($green, 6);
+$green-dark: #0C4B33;
+$green-dark-text: #3C8866;
+$white: #F1FFF7;
+$white-dark: #F8F8F8;
+$warning-bg: #ffe761;
+$warning-icon: #E9BD46;
+$warning-yellow: #FFFDF1;
+$warning-dark-yellow: #F5F1C7;
+$warning-dark-yellow-d50: darken($warning-dark-yellow, 50);
+$orange: #ab5603;
+$dark-orange: #f87c04;
+$red: #BA2121;
+$red-light: #FFBABA;
+$red-light-l10: lighten($red-light, 10);
+$red-medium: #E46767;
+$red-dark: #6A0E0E;
+$red-dark-l10: lighten($red-dark, 10);
+$black: #0e1117;
+$black-light-5: lighten($black, 5);
+$font-path: "../font";
+$logo-bg-dark: #272c27;
+
+
+// @font-face declarations
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('#{$font-path}/Roboto-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('#{$font-path}/Roboto-Italic.woff2') format('woff2');
+    font-weight: 400;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('#{$font-path}/Roboto-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('#{$font-path}/Roboto-BoldItalic.woff2') format('woff2');
+    font-weight: 700;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('#{$font-path}/Roboto-Light.woff2') format('woff2');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Fira Mono';
+    src: url('#{$font-path}/FiraMono-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Fira Mono';
+    src: url('#{$font-path}/FiraMono-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+}
+
+// Media Queries Mixin (http://jakearchibald.github.com/sass-ie/)
+@mixin respond-min($width) {
+    @media screen and (min-width: $width) {
+        @content;
+    }
+}
+
+@mixin respond-max($width) {
+    @media screen and (max-width: $width) {
+        @content;
+    }
+}
+
+@mixin device-min($width) {
+    @media screen and (min-device-width: $width) {
+        @content;
+    }
+}
+
+// Font Family Mixins
+@mixin sans-serif {
+    font-family: "Roboto", Corbel, Avenir, "Lucida Grande", "Lucida Sans", sans-serif;
+}
+
+@mixin monospace {
+    font-family: "Fira Mono", Consolas, Menlo, Monaco, "Courier New", Courier, monospace;
+    font-variant-ligatures: no-common-ligatures; // disables the common ligatures only
+    text-rendering: optimizeSpeed; // for Safari 7.x
+    overflow-wrap: break-word;
+}
+
+@mixin font-size ($size: 16) {
+    font-size: $size/16 + rem;
+}
+
+// Boilerplate Helper mixins (https://github.com/h5bp/html5-boilerplate/blob/v4.1.0/doc/css.md)
+@mixin visuallyhidden {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+@mixin clearfix {
+
+    &:before,
+    &:after {
+        content: "";
+        display: table;
+    }
+
+    &:after {
+        clear: both;
+    }
+}
+
+// Green Link Mixin
+@mixin link-green {
+    color: var(--link-color);
+    text-decoration: none;
+
+    &:visited {
+        color: var(--link-color);
+    }
+
+    &:hover,
+    &:active,
+    &:focus {
+        color: lighten($green, 6%);
+        text-decoration: none;
+    }
+
+}
+
+@mixin framed-image {
+    padding: 20px;
+    border: 1px solid var(--hairline-color);
+    border-radius: 4px;
+}
