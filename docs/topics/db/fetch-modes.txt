@@ -118,6 +118,33 @@ Using ``RAISE`` for the above example would raise an exception at the access of
 This mode can prevent unintentional queries in performance-critical
 sections of code.
 
+.. _writing-your-own-fetch-mode:
+
+Writing your own
+================
+
+Emitting a warning for unintentional queries rather than an exception is
+possible by implementing your own fetch mode and choosing a fallback strategy:
+
+.. code-block::
+
+    from django.utils.warnings import django_file_prefixes
+
+    class LazyFetchWarning(RuntimeWarning):
+        pass
+
+    class Warn(FetchOne):
+        def fetch(self, fetcher, instance):
+            """Emit a warning before delegating to FetchOne."""
+            klass = instance.__class__.__qualname__
+            field_name = fetcher.field.name
+            warnings.warn(
+                f"Lazy fetch of {klass}.{field_name}",
+                LazyFetchWarning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
+            return super().fetch(fetcher, instance)
+
 .. _fetch-modes-custom-manager:
 
 Make a fetch mode the default for a model class
