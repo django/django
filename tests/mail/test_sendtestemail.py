@@ -1,4 +1,5 @@
 from django.core import mail
+from django.core.mail import MailerDoesNotExist
 from django.core.management import CommandError, call_command
 from django.test import SimpleTestCase, override_settings
 
@@ -6,7 +7,10 @@ from django.test import SimpleTestCase, override_settings
 @override_settings(
     ADMINS=["admin@example.com", "admin_and_manager@example.com"],
     MANAGERS=["manager@example.com", "admin_and_manager@example.com"],
-    MAILERS={"default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}},
+    MAILERS={
+        "default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"},
+        "notifications": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"},
+    },
 )
 class SendTestEmailManagementCommand(SimpleTestCase):
     """
@@ -108,3 +112,32 @@ class SendTestEmailManagementCommand(SimpleTestCase):
                 "admin_and_manager@example.com",
             ],
         )
+
+    def test_using_option(self):
+        recipient = "joe@example.com"
+        call_command("sendtestemail", "--using", "notifications", recipient)
+        self.assertEqual(len(mail.outbox), 1)
+        mail_message = mail.outbox[0]
+        self.assertEqual(mail_message.sent_using, "notifications")
+
+    def test_using_default(self):
+        recipient = "joe@example.com"
+        call_command("sendtestemail", recipient)
+        self.assertEqual(len(mail.outbox), 1)
+        mail_message = mail.outbox[0]
+        self.assertEqual(mail_message.sent_using, "default")
+
+    def test_using_option_with_managers(self):
+        call_command("sendtestemail", "--using", "notifications", "--managers")
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].sent_using, "notifications")
+
+    def test_using_option_with_admins(self):
+        call_command("sendtestemail", "--using", "notifications", "--admins")
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].sent_using, "notifications")
+
+    def test_using_nonexistent_mailer(self):
+        msg = "The mailer 'nonexistent' is not configured."
+        with self.assertRaisesMessage(MailerDoesNotExist, msg):
+            call_command("sendtestemail", "--using", "nonexistent", "joe@example.com")
