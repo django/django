@@ -2,6 +2,7 @@
 
 import base64
 import pickle
+import random
 from datetime import UTC, datetime
 
 from django.conf import settings
@@ -33,6 +34,11 @@ class BaseDatabaseCache(BaseCache):
     def __init__(self, table, params):
         super().__init__(params)
         self._table = table
+        options = params.get("OPTIONS", {})
+        try:
+            self._cull_probability = float(options.get("CULL_PROBABILITY", 0.1))
+        except (ValueError, TypeError):
+            self._cull_probability = 0.1
 
         class CacheEntry:
             _meta = Options(table)
@@ -118,8 +124,6 @@ class DatabaseCache(BaseDatabaseCache):
         table = quote_name(self._table)
 
         with connection.cursor() as cursor:
-            cursor.execute("SELECT COUNT(*) FROM %s" % table)
-            num = cursor.fetchone()[0]
             now = tz_now()
             now = now.replace(microsecond=0)
             if timeout is None:
@@ -128,8 +132,11 @@ class DatabaseCache(BaseDatabaseCache):
                 tz = UTC if settings.USE_TZ else None
                 exp = datetime.fromtimestamp(timeout, tz=tz)
             exp = exp.replace(microsecond=0)
-            if num > self._max_entries:
-                self._cull(db, cursor, now, num)
+            if self._cull_probability and random.random() <= self._cull_probability:
+                cursor.execute("SELECT COUNT(*) FROM %s" % table)
+                num = cursor.fetchone()[0]
+                if num > self._max_entries:
+                    self._cull(db, cursor, now, num)
             pickled = pickle.dumps(value, self.pickle_protocol)
             # The DB column is expecting a string, so make sure the value is a
             # string, not bytes. Refs #19274.
