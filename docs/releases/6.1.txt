@@ -274,6 +274,9 @@ Management Commands
   :data:`~django.db.models.signals.m2m_changed` signals with ``raw=True`` when
   loading fixtures.
 
+* The :djadmin:`sendtestemail` command now supports a :option:`--using
+  <sendtestemail --using>` option to specify the :setting:`MAILERS` alias.
+
 Models
 ~~~~~~
 
