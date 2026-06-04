@@ -307,8 +307,8 @@ class Query(BaseExpression):
         self.alias_refcount = {}
         # alias_map is the most important data structure regarding joins.
         # It's used for recording which joins exist in the query and what
-        # types they are. The key is the alias of the joined table (possibly
-        # the table name) and the value is a Join-like object (see
+        # types they are. The key is the alias of the joined table or table
+        # expression and the value is a Join-like object (see
         # sql.datastructures.Join for more information).
         self.alias_map = {}
         # Whether to provide alias to columns during reference resolving.
