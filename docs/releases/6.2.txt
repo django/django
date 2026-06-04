@@ -108,7 +108,10 @@ Asynchronous views
 Cache
 ~~~~~
 
-* ...
+* Subclasses of ``BaseDatabaseCache`` now support :ref:`
+  culling <_database-caching>` on a percentage of writes as an optimization.
+  The default is 10%, and may be configured using the ``CULL_PROBABILITY``
+  option.
 
 CSP
 ~~~

@@ -300,8 +300,10 @@ _caches_setting_base = {
     "v2": {"VERSION": 2},
     "custom_key": {"KEY_FUNCTION": custom_key_func},
     "custom_key2": {"KEY_FUNCTION": "cache.tests.custom_key_func"},
-    "cull": {"OPTIONS": {"MAX_ENTRIES": 30}},
-    "zero_cull": {"OPTIONS": {"CULL_FREQUENCY": 0, "MAX_ENTRIES": 30}},
+    "cull": {"OPTIONS": {"MAX_ENTRIES": 30, "CULL_PROBABILITY": 1.0}},
+    "zero_cull": {
+        "OPTIONS": {"CULL_FREQUENCY": 0, "MAX_ENTRIES": 30, "CULL_PROBABILITY": 1.0}
+    },
 }
 
 
@@ -1293,13 +1295,16 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
 
     def test_cull_queries(self):
         old_max_entries = cache._max_entries
+        old_cull_probability = cache._cull_probability
         # Force _cull to delete on first cached record.
         cache._max_entries = -1
+        cache._cull_probability = 1.0
         with CaptureQueriesContext(connection) as captured_queries:
             try:
                 cache.set("force_cull", "value", 1000)
             finally:
                 cache._max_entries = old_max_entries
+                cache._cull_probability = old_cull_probability
         num_count_queries = sum("COUNT" in query["sql"] for query in captured_queries)
         self.assertEqual(num_count_queries, 1)
         # Column names are quoted.
@@ -1309,6 +1314,52 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
                 self.assertIn(connection.ops.quote_name("expires"), sql)
             if "cache_key" in sql:
                 self.assertIn(connection.ops.quote_name("cache_key"), sql)
+
+    def test_db_cull_optimized_off(self):
+        # Check for expired entries every request if probability is 1.0.
+        old_max_entries = cache._max_entries
+        old_cull_probability = cache._cull_probability
+        cache._max_entries = -1
+        cache._cull_probability = 1.0
+        with mock.patch.object(cache, "_cull") as mocked:
+            try:
+                cache.set("key_foo", "foo")
+            finally:
+                cache._max_entries = old_max_entries
+                cache._cull_probability = old_cull_probability
+            mocked.assert_called_once()
+
+    def test_db_cull_optimized_on(self):
+        # Do not check for expired entries unless the cull check passes.
+        old_cull_probability = cache._cull_probability
+        old_max_entries = cache._max_entries
+        cache._max_entries = -1
+        cache._cull_probability = 0.1
+        with mock.patch("random.random") as mock_random:
+            mock_random.return_value = 0.01
+            with mock.patch.object(cache, "_cull") as mocked:
+                try:
+                    cache.set("key_foo", "foo")
+                finally:
+                    cache._max_entries = old_max_entries
+                    cache._cull_probability = old_cull_probability
+            mocked.assert_called_once()
+
+    def test_no_query_without_check(self):
+        # No COUNT query should occur if the cull check is False.
+        old_cull_probability = cache._cull_probability
+        cache._cull_probability = 0.1
+        with mock.patch("random.random") as mock_random:
+            mock_random.return_value = 0.9
+            with CaptureQueriesContext(connection) as captured_queries:
+                try:
+                    cache.set("shouldnt_cull", "value")
+                finally:
+                    cache._cull_probability = old_cull_probability
+                num_count_queries = sum(
+                    "COUNT" in query["sql"] for query in captured_queries
+                )
+                self.assertEqual(num_count_queries, 0)
 
     def test_delete_cursor_rowcount(self):
         """
