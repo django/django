@@ -1,0 +1,63 @@
+Don't set html font-size to 62.5%.
+
+Remove "1rem = 10px" font-size logic, which makes external content (such as
+ReadTheDocs widgets) unexpectedly small.
+
+See https://github.com/django/djangoproject.com/issues/2651.
+
+diff --git a/static/scss/_utils.scss b/static/scss/_utils.scss
+--- a/static/scss/_utils.scss
++++ b/static/scss/_utils.scss
+@@ -125,14 +125,8 @@
+     overflow-wrap: break-word;
+ }
+
+-// Font Sizing Mixin (http://css-tricks.com/snippets/css/less-mixin-for-rem-font-sizing/)
+-html {
+-    font-size: 62.5%;
+-}
+-
+ @mixin font-size ($size: 16) {
+-    font-size: $size + px;
+-    font-size: $size/10 + rem;
++    font-size: $size/16 + rem;
+ }
+
+ // Boilerplate Helper mixins (https://github.com/h5bp/html5-boilerplate/blob/v4.1.0/doc/css.md)
+diff --git a/static/scss/_style.scss b/static/scss/_style.scss
+--- a/static/scss/_style.scss
++++ b/static/scss/_style.scss
+@@ -700,7 +700,7 @@
+         margin: 0 auto;
+         p {
+             @include sans-serif;
+-            font-size: 3.2rem;
++            @include font-size(32);
+             font-weight: 300;
+             margin: 0.35em 0 0.35em;
+             line-height: 1.3;
+@@ -2437,13 +2437,13 @@
+
+ @include respond-min(768px) {
+     body:has(.doc-floating-warning) [id] {
+-        scroll-margin-top: 6.3rem;
++        scroll-margin-top: 63px;
+     }
+ }
+
+ @include respond-min(1300px) {
+     body:has(.doc-floating-warning) [id] {
+-        scroll-margin-top: 4.2rem;
++        scroll-margin-top: 42px;
+     }
+ }
+
+@@ -3748,7 +3848,7 @@
+
+     .community-cta-wrapper {
+         display: flex;
+-        gap: 6rem;
++        gap: 60px;
+         flex-wrap: wrap;
+         align-content: center;
+     }

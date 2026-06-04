@@ -1,0 +1,128 @@
+{# Adapted from:
+   - djangoproject.com/docs/templates/base_docs.html
+   - djangoproject.com/docs/templates/docs/doc.html
+   - sphinx/themes/basic/layout.html
+#}
+{% extends "base.html" %}
+
+{% block before_header %}
+  <div id="dev-warning" class="doc-floating-warning">
+    {{ _("This document is for a local build or a pull-request preview build of Django.") }}
+  </div>
+{% endblock before_header %}
+
+{% block header_title %}
+  {# "block header" on djangoproject.com #}
+  <p><a href="{{ pathto("index")|e }}">
+    {%- block header_title_content -%}
+      {%- trans release=release|e %}Django {{ release }} documentation{% endtrans -%}
+    {%- endblock header_title_content -%}
+  </a></p>
+{% endblock header_title %}
+
+{% block layout_class %}sidebar-right{% endblock %}
+
+{% block content %}
+  <div id="version-switcher">
+    <ul id="backtotop-link">
+      <li class="current-link">
+        <a href="#top" aria-label="Back to top" class="icon-chevron-up-align"><i class="icon icon-chevron-up"></i></a>
+      </li>
+    </ul>
+  </div>
+
+  {%- block body_wrap %}
+  {# role=main is required for Sphinx searchtools.js #}
+  <article id="docs-content" role="main">
+    {% block body %}{#
+      Sphinx inserts body content here.
+      This is not the same as djangoproject.com "block body".
+    #}{% endblock %}
+  </article>
+  {%- endblock body_wrap %}
+
+  {%- if prev or next %}
+    <nav class="browse-horizontal" aria-labelledby="browse-horizontal-header">
+      <span id="browse-horizontal-header" class="visuallyhidden">{{ _("Previous page and next page") }}</span>
+      {% if prev %}
+        <div class="left"><a rel="prev" href="{{ prev.link|e }}"><i class="icon icon-chevron-left"></i> {{ prev.title|striptags|e }}</a></div>
+      {% endif %}
+      {% if next %}
+        <div class="right"><a rel="next" href="{{ next.link|e }}">{{ next.title|striptags|e }} <i class="icon icon-chevron-right"></i></a></div>
+      {% endif %}
+    </nav>
+  {%- endif %}
+{% endblock content %}
+
+{% block content_related %}
+  <div role="complementary">
+    <h2 class="visuallyhidden" id="aside-header">{{ _("Additional Information") }}</h2>
+
+    {%- if display_toc %}
+      {%- block toc_wrapper %}
+        <h3>{{ _("Contents") }}</h3>
+        {% block toc %}{{ toc }}{% endblock toc %}
+      {%- endblock toc_wrapper %}
+    {%- endif %}
+
+    {%- block browse_wrapper %}
+      <nav aria-labelledby="browse-header">
+        <h3 id="browse-header">{{ _("Browse") }}</h3>
+        <ul>
+          {%- block browse %}
+            {% if prev %}
+              <li>{{ _("Prev:") }} <a rel="prev" href="{{ prev.link|e }}">{{ prev.title|striptags|e }}</a></li>
+            {% endif %}
+            {% if next %}
+              <li>{{ _("Next:") }} <a rel="next" href="{{ next.link|e }}">{{ next.title|striptags|e }}</a></li>
+            {% endif %}
+            <li><a href="{{ pathto(root_doc)|e }}">{{ _("Table of contents") }}</a></li>
+            {%- for doc, title, accesskey, shorttitle in rellinks %}
+              {# Skip prev and next links rendered above.
+                 (djangoproject.com does this in preprocessing.)
+              #}
+              {%- if accesskey not in ('P', 'N') %}
+                <li><a href="{{ pathto(doc)|e }}">{{ title }}</a></li>
+              {%- endif %}
+            {%- endfor %}
+          {%- endblock browse %}
+        </ul>
+      </nav>
+    {%- endblock browse_wrapper %}
+
+    {%- block breadcrumbs_wrapper %}
+      <nav aria-labelledby="breadcrumbs-header">
+        <h3 id="breadcrumbs-header">{{ _("You are here:") }}</h3>
+        <ul>
+          <li>
+            <a href="{{ pathto(root_doc)|e }}">{% trans version=version|e %}Django {{ version }} documentation{% endtrans %}</a>
+            {% for p in parents %}
+              <ul><li><a href="{{ p.link|e }}">{{ p.title }}</a>
+            {% endfor %}
+            <ul><li>{% block current_page_title %}{{ title }}{% endblock %}</li></ul>
+            {% for p in parents %}</li></ul>{% endfor %}
+          </li>
+        </ul>
+      </nav>
+    {%- endblock breadcrumbs_wrapper %}
+
+    {% block help_wrapper %}
+      <section aria-labelledby="getting-help-sidebar">
+        <h3 id="getting-help-sidebar">{{ _("Getting help") }}</h3>
+        <dl class="list-links">
+          <dt><a href="{{ pathto("faq")|e }}">{{ _("FAQ") }}</a></dt>
+          <dd>{% trans %}Try the FAQ — it's got answers to many common questions.{% endtrans %}</dd>
+
+          <dt><a href="{{ pathto("genindex")|e }}">{{ _("Index") }}</a>,
+            <a href="{{ pathto("py-modindex")|e }}">{{ _("Module Index") }}</a>,
+            or <a href="{{ pathto("contents")|e }}">{{ _("Table of Contents") }}</a></dt>
+          <dd>{% trans %}Handy when looking for specific information.{% endtrans %}</dd>
+        </dl>
+      </section>
+    {% endblock help_wrapper %}
+
+    {# Encourage ReadTheDocs to place any ads here in the sidebar,
+       rather than inserted at the end of article#docs-content. #}
+    <div id="ethical-ad-placement"></div>
+  </div>
+{% endblock content_related %}

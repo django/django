@@ -1,0 +1,88 @@
+Adapt djangoproject.com styles for Sphinx search results.
+
+Sphinx's searchtools.js generates hard-coded DOM that can't be modified via
+templates. Instead, patch _style.scss `.search-links` rules to also cover
+Sphinx's DOM.
+
+diff --git a/static/scss/_style.scss b/static/scss/_style.scss
+--- a/static/scss/_style.scss
++++ b/static/scss/_style.scss
+@@ -2751,10 +2751,28 @@
+     }
+ }
+
++#search-results {
++    // Sphinx searchtools.js generated content.
++
++    > h2:not(a) {
++        // Reset top h2 to appear like in main, not #docs-content.
++        // (On djangoproject.com, the top h2 is outside #docs-content.)
++        margin-top: 40px;
++        margin-bottom: 15px;
++        line-height: 1.6;
++    }
++
++    .search-summary {
++        @extend .meta;
++    }
++}
++
++#search-results ul.search,
+ .search-links {
+     @extend .list-links;
+
+     a {
++        span.highlighted,
+         mark {
+             color: var(--search-mark-text);
+             text-decoration: none;
+@@ -2786,6 +2804,7 @@
+         color: var(--body-fg);
+     }
+
++    > li > span,
+     span.meta {
+         margin-top: 0;
+         margin-bottom: 10px;
+@@ -2856,6 +2875,41 @@
+             }
+         }
+     }
++
++    > li {
++        > a {
++            // searchtools.js equivalent to djangoproject.com's h2.result-title.
++            @extend h2, .result-title;
++            display: block;
++        }
++
++        > span {
++            // searchtools.js's location (e.g., "(setting, in Settings)").
++            // (See also span.meta earlier.)
++            @extend dd;
++            display: block;
++        }
++
++        > p.context {
++            // searchtools.js equivalent to djangoproject.com's .list-links dd.
++            @extend dd;
++        }
++
++        margin-bottom: 30px; // from dd above.
++    }
++}
++
++#search-results {
++    p.search-summary {
++        @extend .meta;
++    }
++}
++
++span.highlighted {
++    // sphinx_highlight.js is used on both search results and document pages.
++    // From .search-links dd mark.
++    background-color: var(--secondary-accent);
++    color: var(--search-mark-text);
+ }
+
+ .list-links-small {

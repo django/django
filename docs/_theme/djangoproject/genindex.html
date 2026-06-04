@@ -1,0 +1,51 @@
+{# Adapted from:
+    - djangoproject.com/docs/templates/docs/genindex.html
+    - sphinx/themes/basic/genindex.html
+#}
+{% extends "layout.html" %}
+{% set title = _("General Index | Django Documentation") %}
+{% set page_title = _("General Index") %}
+
+{% block toc_wrapper %}{% endblock %}
+
+{% block current_page_title %}{{ page_title }}{% endblock %}
+
+{% block body_wrap %}
+  <h1>{{ page_title }}</h1>
+
+  <p class="indexletters">
+    {%- for letter, _ in genindexentries %}
+      <a href="#{{ letter }}">{{ letter }}</a> {% if not loop.last %} |{% endif %}
+    {%- endfor %}
+  </p>
+
+
+  {%- for letter, entries in genindexentries %}
+    <br><hr>
+
+    <h2 id="{{ letter }}">{{ letter }}</h2>
+
+    <dl class="index">
+      {%- for name, contents in entries %}
+        <dt>
+          {# contents.0 is a list of links for the item #}
+          {%- if contents.0 %}
+            <a href="{{ contents.0.0.1 }}">{{ name }}</a>
+          {%- else %}
+            {{ name }}
+          {%- endif %}
+        </dt>
+
+        {# contents.1 is a list of subitems #}
+        {%- if contents.1 %}
+          {%- for subname, sublinks in contents.1 %}
+            <dd>
+              <a href="{{ sublinks.0.1 }}">{{ subname }}</a>
+              {% for link in sublinks[1:] %}, <a href="{{ link.1 }}">{{ _("[Link]") }}</a>{% endfor %}
+            </dd>
+          {%- endfor %}
+        {%- endif %}
+      {%- endfor %}
+    </dl>
+  {%- endfor %}
+{% endblock body_wrap %}

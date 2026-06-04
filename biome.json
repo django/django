@@ -8,6 +8,7 @@
             "docs/_theme/**/*.css",
             "!docs/_theme/djangodocs/static/fontawesome/**",
             "!docs/_theme/djangodocs/static/reset-fonts-grids.css",
+            "!docs/_theme/djangoproject/static/**",
             "!**/*.min.css",
             "django/contrib/admin/static/admin/js/**/*.js",
             "!django/contrib/admin/static/admin/js/vendor/**",

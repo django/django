@@ -25,8 +25,10 @@ PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -n -d $(BUILDDIR)/doctrees -D language=$(LANGUAGEOPT) --jobs $(JOBS) $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 # the i18n builder cannot share the environment and doctrees with the others
 I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
+THEMEDIR        = _theme/djangoproject
+STATICDIR       = $(THEMEDIR)/static
 
-.PHONY: help clean html htmlview dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest gettext
+.PHONY: help clean html htmlview dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest gettext update-theme build-theme
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -52,6 +54,8 @@ help:
 	@echo "  spelling   to check for typos in documentation"
 	@echo "  black      to apply the black formatting to code blocks in documentation"
 	@echo "  lint       to check for linting errors in documentation"
+	@echo "  update-theme to fetch assets from GitHub django/djangoproject.com"
+	@echo "  build-theme  to compile SCSS to CSS"
 
 
 clean:
@@ -201,3 +205,42 @@ check:
 		exit 1; \
 	fi; \
 	echo "All style and spelling checks passed."
+
+update-theme:
+	@echo "=== Cloning django/djangoproject.com repo ==="; \
+		tmp_dir=$$(mktemp -d); \
+		trap 'rm -rf "$$tmp_dir"' EXIT; \
+		set -x; \
+		git clone --depth 1 --filter=blob:none --sparse \
+			https://github.com/django/djangoproject.com.git "$$tmp_dir"; \
+		(cd "$$tmp_dir" && git sparse-checkout set djangoproject docs); \
+		set +x; \
+		echo ""; \
+		echo "=== Copying theme files ==="; \
+		rm -rf "$(STATICDIR)"; \
+		mkdir -p "$(STATICDIR)/img" "$(STATICDIR)/js"; \
+		set -x; \
+		cp "$${tmp_dir}"/LICENSE "$(STATICDIR)/"; \
+		cp -R "$${tmp_dir}"/djangoproject/scss "$(STATICDIR)/"; \
+		cp -R "$${tmp_dir}"/djangoproject/static/font "$(STATICDIR)/"; \
+		cp "$${tmp_dir}"/djangoproject/static/img/logo-dj*.svg "$(STATICDIR)/img/"; \
+		cp "$${tmp_dir}"/djangoproject/static/js/mod/switch-dark-mode.js "$(STATICDIR)/js/"; \
+		set +x
+	@echo ""
+	@echo "Theme fetched from GitHub django/djangoproject.com into $(STATICDIR)."
+	@echo ""
+	@echo "=== Applying local theme overrides ==="
+	(cd "$(THEMEDIR)" && \
+		set -e; \
+		for p in patches/*.patch; do \
+			patch -p1 -i "$$p"; \
+		done)
+	@echo ""
+	@echo "=== Building CSS from SCSS ==="
+	@$(MAKE) --no-print-directory build-theme
+
+build-theme:
+	@mkdir -p "$(STATICDIR)/css"
+	$(PYTHON) -m pysassc "$(STATICDIR)/scss/output.scss" "$(STATICDIR)/css/output.css" --sourcemap
+	@echo
+	@echo "SCSS built into $(STATICDIR)/css/output.css."

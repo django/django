@@ -1,0 +1,19 @@
+{# Adapted from:
+    - djangoproject.com/docs/templates/docs/search_results.html
+    - sphinx/themes/basic/search.html
+#}
+{% extends "basic/search.html" %}
+
+{% block header_title_content %}{{ title }}{% endblock %}
+
+{% block toc_wrapper %}{% endblock %}
+
+{% block breadcrumbs_wrapper %}{% endblock %}
+{% block browse_wrapper %}{% endblock %}
+
+{% block body %}
+  {% block scriptwarning %}{{ super() }}{% endblock %}
+  {% block searchtext %}{# empty -- skip note about search behavior #}{% endblock %}
+  {% block searchbox %}{# empty -- search box is in header #}{% endblock %}
+  {% block searchresults %}{{ super() }}{% endblock %}
+{% endblock body %}

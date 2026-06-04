@@ -1,0 +1,5 @@
+[theme]
+inherit = "basic"
+stylesheets = [
+    "css/output.css",
+]

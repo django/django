@@ -1,0 +1,48 @@
+{# Adapted from
+    - djangoproject.com/docs/templates/docs/py-modindex.html
+    - sphinx/themes/basic/domainindex.html
+#}
+{% extends "layout.html" %}
+
+{% if pagename == "py-modindex" %}
+  {% set title = _("Module Index | Django Documentation") %}
+  {% set page_title = _("Module Index") %}
+{% else %}
+  {# Some other domain index. (Probably unused in Django.) #}
+  {% set title -%}
+    {% trans indextitle=indextitle %}{{ indextitle }} | Django Documentation{% endtrans %}
+  {%- endset %}
+  {% set page_title = indextitle %}
+{% endif %}
+
+{% block toc_wrapper %}{% endblock %}
+
+{% block current_page_title %}{{ page_title }}{% endblock %}
+
+{% block body_wrap %}
+    <h1>{{ page_title }}</h1>
+
+    <ul class="jump_links">
+        {% for letter, _ in content %}
+            <a href="#{{ letter }}"><strong>{{ letter }}</strong></a>{% if not loop.last %} | {% endif %}
+        {% endfor %}
+    </ul>
+
+    {% for letter, objects in content %}
+        <h3><a id="{{ letter }}">{{ letter|upper }}</a></h3>
+        <ul>
+            {%- for module_name, subtype, docname, path, platforms, qualifier, synopsis in objects %}
+                {%- if docname %}
+                    <li>
+                        <a href="{{ pathto(docname)|e }}"><tt class="literal xref">{{ module_name }}</tt></a>
+                        {%- if synopsis %}
+                            <span class="synopsis"><br>{{ synopsis }}</span>
+                        {%- endif %}
+                    </li>
+                {%- endif %}
+
+            {%- endfor %}
+        </ul>
+    {%- endfor %}
+
+{% endblock body_wrap %}

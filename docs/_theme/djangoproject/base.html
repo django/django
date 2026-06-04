@@ -1,0 +1,113 @@
+{# Adapted from:
+   - djangoproject.com/djangoproject/templates/base.html
+   - sphinx/themes/basic/layout.html
+#}
+{%- block doctype -%}
+<!DOCTYPE html>
+{%- endblock doctype %}
+
+{%- macro script() %}
+  {%- for js in script_files %}
+    {{ js_tag(js) }}
+  {%- endfor %}
+{%- endmacro %}
+
+{%- macro css() %}
+  {# Strip Sphinx's copy of pygments.css.
+     It conflicts with our own copy (which is bundled in output.css). #}
+  {%- for css in css_files if "pygments.css" not in css.filename %}
+    {{ css_tag(css) }}
+  {%- endfor %}
+{%- endmacro %}
+
+{%- if html_tag %}
+{{ html_tag }}
+{%- else %}
+<html lang="{{ language|default("en") }}" data-content_root="{{ content_root }}">
+{%- endif %}
+  <head>
+    <meta charset="{{ encoding }}">
+    {{- metatags }}
+    {%- block htmltitle %}
+    <title>{{ title|striptags|e }}{{ titlesuffix }}</title>
+    {%- endblock htmltitle %}
+    {%- block css %}
+    {{- css() }}
+    {%- endblock css %}
+    {%- block scripts %}
+    {{- script() }}
+    <script src="{{ pathto('_static/js/switch-dark-mode.js', 1) }}"></script>
+    {%- endblock scripts %}
+    {%- if favicon_url %}
+    <link rel="icon" href="{{ favicon_url|e }}">
+    {%- endif %}
+    {%- block extrahead %}{% endblock %}
+  </head>
+
+  {%- block body_tag %}<body id="generic">{% endblock %}
+    {% block before_header %}{% endblock %}
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    {%- block header %}
+      {# Adapted from djangoproject.com/djangoproject/templates/includes/header.html #}
+      <header id="top">
+        <div class="container container--flex--wrap--mobile">
+          <span class="logo">Django</span>
+          <div class="header-tools">
+            {%- include "searchbox.html" %}
+            {%- include "toggle_theme.html" %}
+          </div>
+        </div>
+      </header>
+      {# End of djangoproject.com header.html #}
+
+      <section class="copy-banner">
+        <div class="container container--flex container--flex--wrap--mobile">
+          {% block header_title %}{# "block header" on djangoproject.com #}{% endblock %}
+        </div>
+      </section>
+    {%- endblock header %}
+
+    <div class="container {% block layout_class %}{% endblock %}">
+      <main id="main-content">
+        {% block content %}{% endblock %}
+        <a href="#top" class="backtotop"><i class="icon icon-chevron-up"></i> Back to Top</a>
+      </main>
+
+      {% block content_related %}{% endblock %}
+      {% block content_extra %}{% endblock %}
+    </div>
+
+    {%- block footer %}
+      {# Adapted from djangoproject.com/djangoproject/templates/includes/footer.html #}
+      <footer>
+        <div class="footer">
+          <div class="container" role="contentinfo">
+            <div class="copyright">
+              {%- if last_updated %}
+                <div>{% trans last_updated=last_updated|e %}Last updated on
+                  {{ last_updated }}.{% endtrans %}</div>
+              {%- endif %}
+
+              {%- if show_sphinx %}
+                <div>{% trans sphinx_version=sphinx_version|e %}Created using
+                  <a href="https://www.sphinx-doc.org/">Sphinx</a>
+                  {{ sphinx_version }}.{% endtrans %}</div>
+              {%- endif %}
+
+              <div>Django theme designed by
+                <a href="https://www.threespot.com">Threespot</a> &amp;
+                <a href="https://andrevv.com/">andrevv</a>.</div>
+
+              {%- if show_copyright %}<div>&copy; {{ copyright }}.</div>{% endif %}
+
+              <div>Django is a <a href="https://www.djangoproject.com/trademarks/">registered trademark</a>
+                of the <a href="https://www.djangoproject.com/foundation/">Django Software Foundation</a>.</div>
+          </div>
+        </div>
+      </footer>
+      {# End of djangoproject.com footer.html #}
+    {%- endblock footer %}
+  </body>
+</html>

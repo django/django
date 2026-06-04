@@ -1,0 +1,18 @@
+{# Adapted from:
+   - djangoproject.com/djangoproject/templates/search_form.html
+   - sphinx/themes/basic/searchbox.html
+#}
+{%- if builder != "singlehtml" %}
+  {# Sphinx's JS uses '/' as search hotkey -- not '⌘K' or 'Ctrl+K' #}
+  {% set placeholder = _("Search (/)") %}
+  <search class="search form-input" aria-labelledby="docs-search-label">
+    <form action="{{ pathto('search') }}" method="get">
+      <label id="docs-search-label" class="visuallyhidden" for="id_q">{{ placeholder }}</label>
+      <input type="search" name="q" placeholder="{{ placeholder }}" id="id_q">
+      <button type="submit">
+        <i class="icon icon-search" aria-hidden="true"></i>
+        <span class="visuallyhidden">{{ _("Submit") }}</span>
+      </button>
+    </form>
+  </search>
+{%- endif %}

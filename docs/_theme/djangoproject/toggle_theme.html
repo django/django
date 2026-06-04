@@ -1,0 +1,11 @@
+{# Adapted from djangoproject.com/djangoproject/templates/includes/toggle_theme.html #}
+<button class="theme-toggle">
+  <div class="visually-hidden theme-label-when-auto">{{ _('Toggle theme (current theme: auto)') }}</div>
+  <div class="visually-hidden theme-label-when-light">{{ _('Toggle theme (current theme: light)') }}</div>
+  <div class="visually-hidden theme-label-when-dark">{{ _('Toggle theme (current theme: dark)') }}</div>
+
+  <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+  <i aria-hidden="true" class="theme-icon-when-auto icon icon-adjust"></i>
+  <i aria-hidden="true" class="theme-icon-when-dark icon icon-moon-o"></i>
+  <i aria-hidden="true" class="theme-icon-when-light icon icon-sun-o"></i>
+</button>
