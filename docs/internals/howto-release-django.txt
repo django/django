@@ -85,9 +85,8 @@ permissions.
     Linux, or ``md5`` and ``shasum`` on macOS)
   * python
 
-* A GPG key pair. Ensure that the private part of this key is securely stored.
-  The public part needs to be uploaded to your GitHub account, and also to the
-  Jenkins server running the "confirm release" job.
+* A GPG key pair. Securely store the private part, and protect it with a
+  passphrase. The public part needs to be uploaded to your GitHub account.
 
   .. admonition:: More than one GPG key
 
@@ -96,18 +95,16 @@ permissions.
     ``you@example.com`` is the email address associated with the key you want
     to use.
 
-* A clean Python virtual environment (Python 3.9+) to build artifacts, with
-  these required Python packages installed:
-
-  .. code-block:: shell
-
-      $ python -m pip install build twine
+* A clean Python virtual environment (Python 3.10+, pip 26.1+) to build
+  artifacts.
 
 * Access to `Django's project on PyPI <https://pypi.org/project/Django/>`_ to
   upload binaries, ideally with extra permissions to `yank a release
-  <https://pypi.org/help/#yanked>`_ if necessary. Create a project-scoped token
-  following the `official documentation <https://pypi.org/help/#apitoken>`_
-  and set up your ``$HOME/.pypirc`` file like this:
+  <https://pypi.org/help/#yanked>`_ if necessary. Ensure your PyPI account
+  only uses WebAuthn-based authentication factors, not TOTP (one-time codes).
+  Create an API token following the `official documentation
+  <https://pypi.org/help/#apitoken>`_, and set up your ``$HOME/.pypirc`` file
+  like this:
 
   .. code-block:: ini
      :caption: ``~/.pypirc``
@@ -451,10 +448,15 @@ issuing **multiple releases**, repeat these steps for each release.
       release date for all releases, if necessary (:commit:`example commit
       <34a503162fe222033a1cd3249bccad014fcd1d20>`).
 
+#. Regenerate a fresh, dedicated virtual environment for the release tools
+   using a cooldown:
+
+   .. code-block:: shell
+
+        $ python -m pip install build twine --uploaded-prior-to=P7D
+
 #. A release always begins from a release branch, so you should make sure
-   you're on an up-to-date stable branch. Also, you should have available a
-   clean and dedicated virtual environment per version being released. For
-   example:
+   you're on an up-to-date stable branch. For example:
 
    .. code-block:: shell
 
@@ -642,11 +644,16 @@ Now you're ready to actually put the release out there. To do this:
 
    __ https://djangoci.com/job/confirm-release/
 
+#. Generate a new token for this release on PyPI, and store it in ``.pypirc``
+   as shown above.
+
 #. Upload the release packages to PyPI:
 
    .. code-block:: shell
 
        $ twine upload --repository django dist/*
+
+#. On PyPI, revoke the token you just created.
 
 #. Update the newly created ``Release`` in the admin in ``djangoproject.com``
    and enable the ``is_active`` flag.

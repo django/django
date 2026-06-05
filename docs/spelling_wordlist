@@ -95,6 +95,7 @@ conf
 config
 contenttypes
 contrib
+cooldown
 coroutine
 coroutines
 counterintuitive
