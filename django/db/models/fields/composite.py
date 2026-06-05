@@ -1,6 +1,10 @@
 import json
 
+from functools import partial
+
 from django.core import checks
+from django.core.exceptions import FieldError
+from django.db.models.lookups import Transform
 from django.db.models import NOT_PROVIDED, Field
 from django.db.models.expressions import ColPairs
 from django.db.models.fields.tuple_lookups import (
@@ -175,3 +179,68 @@ def unnest(fields):
             result.append(field)
 
     return result
+
+
+class CompositeSubfieldTransform(Transform):
+    def __init__(self, expression, lookup_name, output_field, **kwargs):
+        super().__init__(expression, **kwargs)
+        self.lookup_name = lookup_name
+        self._output_field = output_field
+
+    @property
+    def output_field(self):
+        return self._output_field
+
+    def as_sql(self, compiler, connection):
+        """
+        Render a reference to a sub-column of a composite table expression.
+        """
+        if hasattr(self.lhs, "alias") and self.lhs.alias:
+            table_alias = self.lhs.alias
+        elif hasattr(self.lhs, "refs"):
+            table_alias = self.lhs.refs
+        else:
+            raise FieldError(
+                "some error"
+            )
+
+        quoted_table = compiler.quote_name(table_alias)
+        quoted_column = compiler.quote_name(self.lookup_name)
+        return f"{quoted_table}.{quoted_column}", []
+
+
+class CompositeField(Field):
+    is_composite = True
+
+    def __init__(self, **kwargs):
+        self.sub_fields = {}
+        if len(kwargs) <= 1:
+            raise ValueError("At least two fields should be there")
+        for name, field in kwargs.items():
+            if not isinstance(field, Field):
+                raise TypeError(f"{name!r} should field instance") # this message could enhance later
+
+            self.sub_fields[name] = field
+        super().__init__()
+
+    def deconstruct(self):
+        """This method taken from base Field class"""
+        name, path, _, kwargs = super().deconstruct()
+        return name, path, self.sub_fields, kwargs
+
+    def get_field(self, name):
+        if name not in self.sub_fields:
+            raise FieldError(f"{name!r} not found")
+        return self.sub_fields[name]
+
+    def get_transform(self, name):
+        """This for to work lookups"""
+        try:
+            subfield = self.get_field(name)
+        except FieldError:
+            return super().get_transform(name)
+        return partial(
+            CompositeSubfieldTransform,
+            lookup_name=name,
+            output_field=subfield
+        )

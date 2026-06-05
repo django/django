@@ -29,6 +29,33 @@ class TableExpression(Expression):
     is_composite = False
 
 
+class SubqueryTable(TableExpression):
+    """
+    This is just for experiment pupose.
+    Even if subquery registered in the alias_map.
+    subquery misses some parts. so this is just for make it workable.
+    and put subquery in the FROM clause
+    """
+    join_type = None
+    parent_alias = None
+    filtered_relation = None
+    is_composite = True
+
+    def __init__(self, query, alias=None, output_field=None):
+        self.query = query
+        self.table_name = alias
+        self.alias = alias
+        self.output_field = output_field
+
+    def as_sql(self, compiler, connection):
+        sql, params = self.query.as_sql(compiler, connection)
+        return f", {sql} {compiler.quote_name(self.alias)}", params
+
+    def relabeled_clone(self, change_map):
+        alias = change_map.get(self.alias, self.alias)
+        return self.__class__(self.query.clone(), alias, self.output_field)
+
+
 class Join(TableExpression):
     """
     Used by sql.Query and sql.SQLCompiler to generate JOIN clauses into the

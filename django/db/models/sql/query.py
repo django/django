@@ -41,7 +41,13 @@ from django.db.models.query_utils import (
     refs_expression,
 )
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
-from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
+from django.db.models.sql.datastructures import (
+    BaseTable,
+    Empty,
+    Join,
+    MultiJoin,
+    SubqueryTable
+)
 from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
 from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.functional import cached_property
@@ -1239,6 +1245,29 @@ class Query(BaseExpression):
     def add_annotation(self, annotation, alias, select=True):
         """Add a single annotation expression to the Query."""
         self.check_alias(alias)
+        if getattr(getattr(annotation, "output_field", None), "is_composite", False):
+            self.get_initial_alias()
+            annotation.alias = alias
+            self.alias_map[alias] = SubqueryTable(
+                annotation.query.clone(),
+                alias,
+                annotation.output_field,
+            )
+            self.alias_refcount[alias] = 1
+            self.table_map[alias] = [alias]
+            """
+            This part was taken from AI.
+            if select:
+                self.append_annotation_mask([alias])
+            else:
+                self.set_annotation_mask(set(self.annotation_select).difference({alias}))
+            """
+            if select:
+                self.append_annotation_mask([alias])
+            else:
+                self.set_annotation_mask(set(self.annotation_select).difference({alias}))
+            self.annotations[alias] = annotation
+            return
         annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None)
         if select:
             self.append_annotation_mask([alias])
@@ -2622,6 +2651,8 @@ class Query(BaseExpression):
                                 f"Cannot select the '{f}' alias. Use annotate() "
                                 f"to promote it."
                             )
+                    elif f.split(LOOKUP_SEP, 1)[0] in self.annotations:
+                        selected[f] = self.resolve_ref(f)
                     else:
                         # Call `names_to_path` to ensure a FieldError including
                         # annotations about to be masked as valid choices if

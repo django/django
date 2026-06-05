@@ -312,8 +312,7 @@ class BaseExpression:
         ):
             raise ValueError(
                 f"{self.__class__.__name__} expression does not support "
-                "composite primary keys."
-                # "composite expressions."
+                "composite expressions."
             )
         c.set_source_expressions(source_expressions)
         return c
@@ -1857,6 +1856,8 @@ class Subquery(BaseExpression, Combinable):
                 self.output_field
             except AttributeError:
                 return resolved.query
+            if getattr(self.output_field, "is_composite", False):
+                return resolved
             if self.output_field and type(self.output_field) is not type(
                 resolved.query.output_field
             ):

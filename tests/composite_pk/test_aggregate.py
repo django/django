@@ -138,7 +138,7 @@ class CompositePKAggregateTests(TestCase):
         )
 
     def test_max_pk(self):
-        msg = "Max expression does not support composite primary keys."
+        msg = "Max expression does not support composite expressions."
         with self.assertRaisesMessage(ValueError, msg):
             Comment.objects.aggregate(Max("pk"))
 
