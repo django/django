@@ -55,6 +55,12 @@ class Post(models.Model):
     id = models.UUIDField(default=uuid.uuid4)
 
 
+class PostDbDefault(models.Model):
+    pk = models.CompositePrimaryKey("tenant_id", "id")
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, default=1)
+    id = models.IntegerField(db_default=1)
+
+
 class TimeStamped(models.Model):
     pk = models.CompositePrimaryKey("id", "created")
     id = models.SmallIntegerField(unique=True)
