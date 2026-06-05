@@ -65,12 +65,6 @@ class Task:
         except AttributeError:
             return NotImplemented
 
-    def __eq__(self, other):
-        try:
-            return (self.priority, self.run_after) == (other.priority, other.run_after)
-        except AttributeError:
-            return NotImplemented
-
     @classmethod
     def _reconstruct(cls, kwargs):
         func_path = kwargs["func"]
@@ -250,14 +244,20 @@ class TaskResult:
         except AttributeError:
             return NotImplemented
 
+    def __hash__(self):
+        return hash((self.id, self.status, self.last_attempted_at))
+
     def __lt__(self, other):
         try:
-            if self.task == other.task:
-                return (self.enqueued_at is not None, self.enqueued_at) < (
-                    other.enqueued_at is not None,
-                    other.enqueued_at,
-                )
-            return self.task < other.task
+            if self.task < other.task:
+                return True
+            if other.task < self.task:
+                return False
+
+            return (self.enqueued_at is not None, self.enqueued_at) < (
+                other.enqueued_at is not None,
+                other.enqueued_at,
+            )
         except AttributeError:
             return NotImplemented
 
