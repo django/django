@@ -1187,3 +1187,31 @@ For a complete discussion on the usage of the following see the
     Turns a Django template into something that is understood by ``xgettext``.
     It does so by translating the Django translation tags into standard
     ``gettext`` function invocations.
+
+``django.utils.warnings``
+=========================
+
+.. module:: django.utils.warnings
+   :synopsis: Helpers for issuing warnings.
+
+.. function:: django_file_prefixes()
+
+    .. versionadded:: 6.2
+
+    Returns a tuple of file path prefixes for the Django package directory.
+    This is used as the ``skip_file_prefixes`` argument to
+    :func:`warnings.warn` so that warnings are attributed to the *caller*
+    (your project or third-party library) rather than to Django internals.
+
+    The result is cached after the first call.
+
+    Usage example::
+
+        import warnings
+        from django.utils.warnings import django_file_prefixes
+
+        warnings.warn(
+            "Your custom warning message.",
+            category=RuntimeWarning,
+            skip_file_prefixes=django_file_prefixes(),
+        )

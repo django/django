@@ -4,10 +4,8 @@
 import warnings
 
 from django.conf import DEPRECATED_EMAIL_SETTINGS, settings
-from django.utils.deprecation import (
-    RemovedInDjango70Warning,
-    django_file_prefixes,
-)
+from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.warnings import django_file_prefixes
 
 FAIL_SILENTLY_ARG_WARNING = (
     "The 'fail_silently' argument is deprecated. See 'Migrating email to "

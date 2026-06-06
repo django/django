@@ -12,8 +12,9 @@ from django.db.models.lookups import (
     PostgresOperatorLookup,
     Transform,
 )
-from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.translation import gettext_lazy as _
+from django.utils.warnings import django_file_prefixes
 
 from . import Field
 from .mixins import CheckFieldDefaultMixin

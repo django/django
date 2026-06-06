@@ -20,10 +20,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import timezone
 from django.utils.datastructures import CaseInsensitiveMapping
-from django.utils.deprecation import (
-    RemovedInDjango71Warning,
-    django_file_prefixes,
-)
+from django.utils.deprecation import RemovedInDjango71Warning
 from django.utils.encoding import iri_to_uri
 from django.utils.functional import cached_property
 from django.utils.http import (
@@ -32,6 +29,7 @@ from django.utils.http import (
     http_date,
 )
 from django.utils.regex_helper import _lazy_re_compile
+from django.utils.warnings import django_file_prefixes
 
 _charset_from_content_type_re = _lazy_re_compile(
     r";\s*charset=(?P<charset>[^\s;]+)", re.I
