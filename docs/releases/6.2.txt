@@ -278,3 +278,8 @@ Miscellaneous
 
 * The ``safe`` parameter is deprecated from :class:`~django.http.JsonResponse`.
   Omitting the argument is equivalent to the prior ``safe=False`` usage.
+
+* Calling :meth:`.QuerySet.aiterator` after ``prefetch_related()`` without
+  providing a ``chunk_size`` is deprecated. It currently falls back to a
+  ``chunk_size`` of 2000, but a ``ValueError`` will be raised in
+  Django 7.1.

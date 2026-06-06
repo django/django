@@ -7,6 +7,7 @@ from asgiref.sync import async_to_sync, sync_to_async
 from django.db import NotSupportedError, connection
 from django.db.models import Prefetch, Sum
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.utils.deprecation import RemovedInDjango71Warning
 
 from .models import RelatedModel, SimpleModel
 
@@ -54,9 +55,30 @@ class AsyncQuerySetTest(TestCase):
         results = []
         async for s in SimpleModel.objects.prefetch_related(
             Prefetch("relatedmodel_set", to_attr="prefetched_relatedmodel")
-        ).aiterator():
+        ).aiterator(chunk_size=2000):
             results.append(s.prefetched_relatedmodel)
         self.assertCountEqual(results, [[self.r1], [self.r2], [self.r3]])
+
+    async def test_aiterator_prefetch_related_chunk_size_none(self):
+        msg = (
+            "Using QuerySet.aiterator() after prefetch_related() without "
+            "providing a chunk_size is deprecated"
+        )
+        qs = SimpleModel.objects.prefetch_related("relatedmodel_set").aiterator()
+
+        # RemovedInDjango71Warning: When the deprecation ends, replace with:
+        # with self.assertRaisesMessage(
+        #     ValueError,
+        #     "chunk_size must be provided when using QuerySet.aiterator() "
+        #     "after prefetch_related().",
+        # ):
+        #     async for _ in qs:
+        #         pass
+        results = []
+        with self.assertWarnsMessage(RemovedInDjango71Warning, msg):
+            async for s in qs:
+                results.append(s)
+        self.assertCountEqual(results, [self.s1, self.s2, self.s3])
 
     async def test_aiterator_invalid_chunk_size(self):
         msg = "Chunk size must be strictly positive."

@@ -37,7 +37,7 @@ from django.db.models.utils import (
     resolve_callables,
 )
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango70Warning, RemovedInDjango71Warning
 from django.utils.functional import cached_property
 from django.utils.warnings import django_file_prefixes
 
@@ -577,18 +577,36 @@ class QuerySet(AltersData):
         )
         return self._iterator(use_chunked_fetch, chunk_size)
 
-    async def aiterator(self, chunk_size=2000):
+    async def aiterator(self, chunk_size=None):
         """
         An asynchronous iterator over the results from applying this QuerySet
         to the database.
         """
-        if chunk_size <= 0:
+        if chunk_size is None:
+            if self._prefetch_related_lookups:
+                # RemovedInDjango71Warning: Replace the warning with:
+                # raise ValueError(
+                #     "chunk_size must be provided when using "
+                #     "QuerySet.aiterator() after prefetch_related()."
+                # )
+                warnings.warn(
+                    "Using QuerySet.aiterator() after prefetch_related() without "
+                    "providing a chunk_size is deprecated and will raise a "
+                    "ValueError in Django 7.1.",
+                    category=RemovedInDjango71Warning,
+                    skip_file_prefixes=django_file_prefixes(),
+                )
+                # RemovedInDjango71Warning: When the deprecation ends, remove.
+                chunk_size = 2000
+        elif chunk_size <= 0:
             raise ValueError("Chunk size must be strictly positive.")
         use_chunked_fetch = not connections[self.db].settings_dict.get(
             "DISABLE_SERVER_SIDE_CURSORS"
         )
         iterable = self._iterable_class(
-            self, chunked_fetch=use_chunked_fetch, chunk_size=chunk_size
+            self,
+            chunked_fetch=use_chunked_fetch,
+            chunk_size=chunk_size or 2000,
         )
         if self._prefetch_related_lookups:
             results = []
