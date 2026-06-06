@@ -17,6 +17,9 @@ details on these changes.
 
 * The ``safe`` parameter of :class:`~django.http.JsonResponse` will be removed.
 
+* Calling ``QuerySet.aiterator()`` after ``prefetch_related()`` without
+  providing a ``chunk_size`` will raise :exc:`ValueError`.
+
 .. _deprecation-removed-in-7.0:
 
 7.0
