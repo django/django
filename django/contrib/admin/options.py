@@ -63,7 +63,7 @@ from django.http.response import HttpResponseBase
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.html import format_html
 from django.utils.http import urlencode
 from django.utils.inspect import get_func_args
@@ -77,6 +77,7 @@ from django.utils.text import (
 )
 from django.utils.translation import gettext as _
 from django.utils.translation import ngettext
+from django.utils.warnings import django_file_prefixes
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import RedirectView
 

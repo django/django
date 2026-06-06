@@ -1,22 +1,13 @@
 import functools
 import inspect
-import os
 import warnings
 from collections import Counter
 from inspect import iscoroutinefunction, markcoroutinefunction
 
 from asgiref.sync import sync_to_async
 
-import django
 from django.utils.inspect import signature
-
-
-@functools.cache
-def django_file_prefixes():
-    file = getattr(django, "__file__", None)
-    if file is None:
-        return ()
-    return (os.path.join(os.path.dirname(file), ""),)
+from django.utils.warnings import django_file_prefixes
 
 
 class RemovedInDjango70Warning(DeprecationWarning):
