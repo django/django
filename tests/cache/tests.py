@@ -1361,6 +1361,24 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
                 )
                 self.assertEqual(num_count_queries, 0)
 
+    def test_delete_query_skipped_on_high_cull_frequency(self):
+        cull_delete_cache = caches["cull"]
+        old_cull_freq = cull_delete_cache._cull_frequency
+
+        # CULL_FREQUENCY > MAX_ENTRIES forces
+        # (remaining_num // CULL_FREQUENCY) to evaluate to zero (cull_num)
+        cull_delete_cache._cull_frequency = cull_delete_cache._max_entries * 2
+        self.addCleanup(setattr, cull_delete_cache, "_cull_frequency", old_cull_freq)
+
+        self._perform_cull_test("cull", 50, 49)
+
+        with CaptureQueriesContext(connection) as captured_queries:
+            cull_delete_cache.set("force_cull", "value")
+
+        # Only the expiration DELETE query runs; culling is skipped.
+        num_delete_queries = sum("DELETE" in query["sql"] for query in captured_queries)
+        self.assertEqual(num_delete_queries, 1)
+
     def test_delete_cursor_rowcount(self):
         """
         The rowcount attribute should not be checked on a closed cursor.
