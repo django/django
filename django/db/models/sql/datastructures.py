@@ -36,6 +36,7 @@ class SubqueryTable(TableExpression):
     subquery misses some parts. so this is just for make it workable.
     and put subquery in the FROM clause
     """
+
     join_type = None
     parent_alias = None
     filtered_relation = None

@@ -1,10 +1,8 @@
 import json
-
 from functools import partial
 
 from django.core import checks
 from django.core.exceptions import FieldError
-from django.db.models.lookups import Transform
 from django.db.models import NOT_PROVIDED, Field
 from django.db.models.expressions import ColPairs
 from django.db.models.fields.tuple_lookups import (
@@ -16,6 +14,7 @@ from django.db.models.fields.tuple_lookups import (
     TupleLessThan,
     TupleLessThanOrEqual,
 )
+from django.db.models.lookups import Transform
 from django.utils.functional import cached_property
 
 
@@ -195,17 +194,26 @@ class CompositeSubfieldTransform(Transform):
         """
         Render a reference to a sub-column of a composite table expression.
         """
-        if hasattr(self.lhs, "alias") and self.lhs.alias:
-            table_alias = self.lhs.alias
-        elif hasattr(self.lhs, "refs"):
-            table_alias = self.lhs.refs
+        current_lhs = self.lhs
+        parts = [self.lookup_name]
+
+        while isinstance(current_lhs, CompositeSubfieldTransform):
+            parts.insert(0, current_lhs.lookup_name)
+            current_lhs = current_lhs.lhs
+        print(parts)
+        full_lookup_name = "__".join(parts)
+        print(full_lookup_name)
+
+        if hasattr(current_lhs, "alias") and current_lhs.alias:
+            table_alias = current_lhs.alias
+        elif hasattr(current_lhs, "refs"):
+            table_alias = current_lhs.refs
         else:
-            raise FieldError(
-                "some error"
-            )
+            raise FieldError("Cannot resolve table alias for composite field. ")
 
         quoted_table = compiler.quote_name(table_alias)
-        quoted_column = compiler.quote_name(self.lookup_name)
+        quoted_column = compiler.quote_name(full_lookup_name)
+        print(f"{quoted_table}.{quoted_column}")
         return f"{quoted_table}.{quoted_column}", []
 
 
@@ -214,11 +222,13 @@ class CompositeField(Field):
 
     def __init__(self, **kwargs):
         self.sub_fields = {}
-        if len(kwargs) <= 1:
-            raise ValueError("At least two fields should be there")
+        # if len(kwargs) <= 1:
+        #     raise ValueError("At least two fields should be there")
         for name, field in kwargs.items():
             if not isinstance(field, Field):
-                raise TypeError(f"{name!r} should field instance") # this message could enhance later
+                raise TypeError(
+                    f"{name!r} should field instance"
+                )  # this message could enhance later
 
             self.sub_fields[name] = field
         super().__init__()
@@ -240,7 +250,5 @@ class CompositeField(Field):
         except FieldError:
             return super().get_transform(name)
         return partial(
-            CompositeSubfieldTransform,
-            lookup_name=name,
-            output_field=subfield
+            CompositeSubfieldTransform, lookup_name=name, output_field=subfield
         )

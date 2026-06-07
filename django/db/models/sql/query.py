@@ -46,7 +46,7 @@ from django.db.models.sql.datastructures import (
     Empty,
     Join,
     MultiJoin,
-    SubqueryTable
+    SubqueryTable,
 )
 from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
 from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
@@ -1265,7 +1265,9 @@ class Query(BaseExpression):
             if select:
                 self.append_annotation_mask([alias])
             else:
-                self.set_annotation_mask(set(self.annotation_select).difference({alias}))
+                self.set_annotation_mask(
+                    set(self.annotation_select).difference({alias})
+                )
             self.annotations[alias] = annotation
             return
         annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None)
