@@ -1,3 +1,5 @@
+from django.db.models import Value
+from django.db.models.expressions import DatabaseDefault
 from django.forms import Widget
 from django.forms.widgets import Input
 
@@ -9,6 +11,7 @@ class WidgetTests(WidgetTest):
         widget = Widget()
         self.assertIsNone(widget.format_value(None))
         self.assertIsNone(widget.format_value(""))
+        self.assertIsNone(widget.format_value(DatabaseDefault(Value("1"))))
         self.assertEqual(widget.format_value("español"), "español")
         self.assertEqual(widget.format_value(42.5), "42.5")
 

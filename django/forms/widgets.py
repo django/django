@@ -343,7 +343,14 @@ class Widget(metaclass=MediaDefiningClass):
         """
         Return a value as it should appear when rendered in a template.
         """
-        if value == "" or value is None:
+        from django.db.models.expressions import DatabaseDefault
+
+        if (
+            value == ""
+            or value is None
+            # Empty value when db_default is used.
+            or isinstance(value, DatabaseDefault)
+        ):
             return None
         if self.is_localized:
             return formats.localize_input(value)
