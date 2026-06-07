@@ -5,6 +5,7 @@
 # Resul <resulsaparov@gmail.com>, 2020
 # Resul <resulsaparov@gmail.com>, 2022-2024
 # Welbeck Garli <welbeckgrlyw@gmail.com>, 2020
+# Toýly SAZAKOW <Sazakow@gmail.com>, 2026
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
@@ -424,7 +425,7 @@ msgstr[0] ""
 "Bu maglumatda iň az %(limit_value)d harp bardygyna göz ýetiriň (munda "
 "%(show_value)d bar)."
 msgstr[1] ""
-"Bu maglumatda azyndan %(limit_value)d nyşanyň bolmagyny üpjün ediň (şuwagt "
+"Bu maglumatda azyndan %(limit_value)d nyşanyň bolmagyny üpjün ediň (şu wagt "
 "%(show_value)d sany bar)."
 
 #, python-format
@@ -435,10 +436,10 @@ msgid_plural ""
 "Ensure this value has at most %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
-"Bu maglumatda köpünden %(limit_value)d harp bardygyna göz ýetiriň (bunda "
+"Bu maglumatda köpünden %(limit_value)d harp bardygyna göz ýetiriň (munda "
 "%(show_value)d bar)"
 msgstr[1] ""
-"Bu maglumatda iň köp %(limit_value)d nyşanyň bolmagyny üpjün ediň (şuwagt "
+"Bu maglumatda iň köp %(limit_value)d nyşanyň bolmagyny üpjün ediň (şu wagt "
 "%(show_value)d sany bar)"
 
 msgid "Enter a number."
@@ -491,7 +492,7 @@ msgid "Value %(value)r is not a valid choice."
 msgstr "%(value)r dogry saýlaw däl."
 
 msgid "This field cannot be null."
-msgstr "Bu meýdan null bilmez."
+msgstr "Bu meýdan null bolup bilmez."
 
 msgid "This field cannot be blank."
 msgstr "Bu meýdan boş bolup bilmez."
@@ -751,10 +752,10 @@ msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
-"Bu faýl adynyň iň köp %(max)d nyşanynyň bolmagyny üpjin ediň (şuwagt "
+"Bu faýl adynyň iň köp %(max)d nyşanynyň bolmagyny üpjün ediň (şu wagt "
 "%(length)d sany bar)."
 msgstr[1] ""
-"Bu faýl adynyň iň köp %(max)d nyşanynyň bolmagyny üpjin ediň (şuwagt "
+"Bu faýl adynyň iň köp %(max)d nyşanynyň bolmagyny üpjün ediň (şu wagt "
 "%(length)d sany bar)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
@@ -764,7 +765,7 @@ msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
-"Dogry surat ýükläň. Ýüklän faýlyňyz ýa surat däldi ýa-da zaýalanan suratdy."
+"Dogry surat ýükläň. Ýüklän faýlyňyz ýa surat däldi, ýa-da zaýalanan suratdy."
 
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
@@ -1194,7 +1195,7 @@ msgid ""
 msgstr ""
 "Bu haty görýärsiňiz, sebäbi bu HTTPS sahypasy web brauzeriňiz tarapyndan "
 "iberilmeli \"Referer header\" talap edýär, ýöne hiç biri iberilmedi. Bu "
-"sözbaşy, brauzeriňiziň üçünji şahyslar tarapyndan ogurlanmazlygy üçin "
+"sözbaşy, brauzeriňiziň üçünji şahslar tarapyndan ogurlanmazlygy üçin "
 "howpsuzlyk sebäpli talap edilýär."
 
 msgid ""
@@ -1334,4 +1335,4 @@ msgid "Django Community"
 msgstr "Django jemgyýeti"
 
 msgid "Connect, get help, or contribute"
-msgstr "Birikiň, kömek alyň ýa-da goşant goşuň"
+msgstr "Birigiň, kömek alyň ýa-da goşant goşuň"
