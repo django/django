@@ -278,8 +278,8 @@ class DatabaseCache(BaseDatabaseCache):
             )
             deleted_count = cursor.rowcount
             remaining_num = num - deleted_count
-            if remaining_num > self._max_entries:
-                cull_num = remaining_num // self._cull_frequency
+            cull_num = remaining_num // self._cull_frequency
+            if cull_num > 0 and remaining_num > self._max_entries:
                 cursor.execute(
                     connection.ops.cache_key_culling_sql() % table, [cull_num]
                 )
