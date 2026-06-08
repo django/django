@@ -45,7 +45,7 @@ jobs:
         with:
           python-version: '3.14'
           cache: 'pip'
-          cache-dependency-path: 'tests/requirements/py3.txt'
+          cache-dependency-path: 'pyproject.toml'
 
       - name: Update apt repo
         run: sudo apt update
@@ -54,7 +54,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip wheel
-          python -m pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .
+          python -m pip install --group=test-postgres -e .
           python -m pip install 'coverage[toml]' diff-cover
 
       - name: Create PostgreSQL settings file

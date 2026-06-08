@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-   contents: read
+  contents: read
 
 jobs:
   define-matrix:
@@ -48,11 +48,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
-          cache-dependency-path: 'tests/requirements/py3.txt'
+          cache-dependency-path: 'pyproject.toml'
       - name: Install libmemcached-dev for pylibmc
         run: sudo apt-get install libmemcached-dev
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip wheel
-      - run: python -m pip install -r tests/requirements/py3.txt -e .
+      - run: python -m pip install --group=test -e .
       - name: Run tests
         run: python -Wall tests/runtests.py -v2

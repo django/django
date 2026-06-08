@@ -40,6 +40,23 @@ classifiers = [
 [project.optional-dependencies]
 argon2 = ["argon2-cffi>=23.1.0"]
 bcrypt = ["bcrypt>=4.1.1"]
+admindocs = ["docutils>=0.22"]
+colorama = ["colorama>=0.4.6; sys_platform == 'win32'"]
+geoip = ["geoip2>=4.8.0"]
+gis = ["geoip2>=4.8.0", "numpy>=1.26.0"]
+images = ["Pillow>=10.1.0"]
+jinja2 = ["jinja2>=2.11.0"]
+mysql = ["mysqlclient>=2.2.1"]
+oracle = ["oracledb>=2.3.0"]
+postgresql = ["psycopg>=3.1.12"]
+postgresql-pool = ["psycopg>=3.1.12", "psycopg-pool>=3.2.0"]
+pylibmc = ["pylibmc; sys_platform != 'win32'"]
+pymemcache = ["pymemcache>=3.4.0"]
+pywatchman = ["pywatchman; sys_platform != 'win32'"]
+redis = ["redis>=5.1.0"]
+selenium = ["selenium>=4.23.0,<4.44.0"]
+test-parallel = ["tblib>=3.0.0"]
+yaml = ["pyyaml>=6.0.2"]
 
 [project.scripts]
 django-admin = "django.core.management:execute_from_command_line"
@@ -51,6 +68,34 @@ Documentation = "https://docs.djangoproject.com/"
 Funding = "https://www.djangoproject.com/fundraising/"
 Source = "https://github.com/django/django"
 Tracker = "https://code.djangoproject.com/"
+
+[dependency-groups]
+test = [
+    "aiosmtpd>=1.4.5",
+    "argon2-cffi>=23.1.0",
+    "bcrypt>=4.1.1",
+    "black>=26.1.0",
+    "colorama>=0.4.6; sys_platform == 'win32'",
+    "docutils>=0.22",
+    "geoip2>=4.8.0",
+    "jinja2>=2.11.0",
+    "numpy>=1.26.0; sys_platform != 'win32' or python_version < '3.15'",
+    "Pillow>=10.1.0; sys_platform != 'win32' or python_version < '3.15'",
+    "pylibmc; sys_platform != 'win32'",
+    "pymemcache>=3.4.0",
+    "pywatchman; sys_platform != 'win32'",
+    "pyyaml>=6.0.2",
+    "redis>=5.1.0",
+    "selenium>=4.23.0,<4.44.0",
+    "tblib>=3.0.0",
+    "tzdata",
+]
+postgres = ["psycopg[binary]>=3.1.12", "psycopg-pool>=3.2.0"]
+mysql = ["mysqlclient>=2.2.1"]
+oracle = ["oracledb>=2.3.0"]
+test-postgres = [{include-group = "test"}, {include-group = "postgres"}]
+test-mysql = [{include-group = "test"}, {include-group = "mysql"}]
+test-oracle = [{include-group = "test"}, {include-group = "oracle"}]
 
 [tool.black]
 target-version = ["py312"]

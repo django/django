@@ -30,16 +30,15 @@ Next, clone your fork, install some requirements, and run the tests:
 
    $ git clone https://github.com/YourGitHubName/django.git django-repo
    $ cd django-repo/tests
-   $ python -m pip install -e ..
-   $ python -m pip install -r requirements/py3.txt
+   $ python -m pip install --group=test -e ..
    $ ./runtests.py
 
-Installing the requirements will likely require some operating system packages
+Installing the dependencies will likely require some operating system packages
 that your computer doesn't have installed. You can usually figure out which
 package to install by doing a web search for the last line or so of the error
 message. Try adding your operating system to the search query if needed.
 
-If you have trouble installing the requirements, you can skip that step. See
+If you have trouble installing the dependencies, you can skip that step. See
 :ref:`running-unit-tests-dependencies` for details on installing the optional
 test dependencies. If you don't have an optional dependency installed, the
 tests that require it will be skipped.
@@ -334,22 +333,25 @@ dependencies:
 * :pypi:`sqlparse` 0.5.0+ (required)
 * :pypi:`tblib` 3.0.0+
 
-You can find these dependencies in `pip requirements files
-<https://pip.pypa.io/en/latest/user_guide/#requirements-files>`_ inside the
-``tests/requirements`` directory of the Django source tree and install them
-like so:
+These dependencies are declared as a ``test`` :pep:`735` dependency group in
+``pyproject.toml``. Installing dependency groups requires pip 25.1+. They can
+be installed like so:
 
 .. console::
 
-   $ python -m pip install -r tests/requirements/py3.txt
+   $ python -m pip install --group=test -e .
 
 If you encounter an error during the installation, your system might be missing
 a dependency for one or more of the Python packages. Consult the failing
 package's documentation or search the web with the error message that you
 encounter.
 
-You can also install the database adapter(s) of your choice using
-``oracle.txt``, ``mysql.txt``, or ``postgres.txt``.
+You can also install the database adapter(s) of your choice using the
+``postgres``, ``mysql``, or ``oracle`` dependency groups, e.g.:
+
+.. code-block:: console
+
+   $ python -m pip install --group=test-postgres -e .
 
 If you want to test the memcached or Redis cache backends, you'll also need to
 define a :setting:`CACHES` setting that points at your memcached or Redis

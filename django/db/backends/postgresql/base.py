@@ -209,7 +209,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 from psycopg_pool import ConnectionPool
             except ImportError as err:
                 raise ImproperlyConfigured(
-                    "Error loading psycopg_pool module.\nDid you install psycopg[pool]?"
+                    "Error loading psycopg_pool module.\n"
+                    "Did you install django[postgresql-pool]?"
                 ) from err
 
             connect_kwargs = self.get_connection_params()

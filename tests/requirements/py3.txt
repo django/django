@@ -1,3 +1,4 @@
+# Deprecated: this file is kept for CI compatibility and will be removed in a future cleanup.
 aiosmtpd >= 1.4.5
 asgiref >= 3.9.1
 argon2-cffi >= 23.1.0
