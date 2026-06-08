@@ -548,7 +548,7 @@ msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"\"%(value)s\" dogry yazylyş usuluna (ÝÝÝÝ-AA-GG) eýe, ýöne, sene nädogry."
+"\"%(value)s\" dogry yazylyş usulyna (ÝÝÝÝ-AA-GG) eýe, ýöne, sene nädogry."
 
 msgid "Date (without time)"
 msgstr "Sene (wagtsyz)"
@@ -591,7 +591,7 @@ msgid "Duration"
 msgstr "Dowamlylyk"
 
 msgid "Email address"
-msgstr "Email adres"
+msgstr "Email salgy"
 
 msgid "File path"
 msgstr "Faýl ýoly"
@@ -675,7 +675,7 @@ msgid "“%(value)s” is not a valid UUID."
 msgstr "\"%(value)s\" dogry UUID däl."
 
 msgid "Universally unique identifier"
-msgstr "Ähliumumy özboluşly kesgitleýji"
+msgstr "Ählumumy özboluşly kesgitleýji"
 
 msgid "File"
 msgstr "Faýl"
