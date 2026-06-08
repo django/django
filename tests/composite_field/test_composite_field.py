@@ -1,15 +1,20 @@
 from django.core.exceptions import FieldError
 from django.db.models import (
+    Case,
     CharField,
     CompositeField,
     Count,
     EmailField,
     F,
     IntegerField,
+    Value,
+    When,
 )
 from django.db.models.expressions import Subquery
+from django.db.models.functions import Cast, Concat, Length, Lower
 from django.test import TestCase
 
+from .expressions import JsonEachFunc
 from .models import (
     BugReport,
     Post,
@@ -187,7 +192,6 @@ class CompositeFieldTests(TestCase):
         qs_agg = User.objects.annotate(some=subquery).aggregate(
             total=Count("some__user__email")
         )
-
         self.assertEqual(qs_agg["total"], 9)
 
     def test_composite_rhs_with_f_expression(self):
@@ -236,6 +240,226 @@ class CompositeFieldTests(TestCase):
             "ticket__task__project__workspace__owner__first_name",
         )
 
-        print(qs)
+        # print(qs)
 
         self.assertEqual(qs.count(), 3)
+
+    def test_composite_subfields_in_db_functions(self):
+        composite_field = CompositeField(
+            email=EmailField(),
+            first_name=CharField(),
+        )
+        subquery = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
+            output_field=composite_field,
+        )
+
+        qs = (
+            User.objects.alias(info=subquery)
+            .annotate(
+                lower_email=Lower("info__email"), name_length=Length("info__first_name")
+            )
+            .values("lower_email", "name_length")
+        )
+
+        result = qs.first()
+        self.assertEqual(result["lower_email"], self.user1.email.lower())
+        self.assertEqual(result["name_length"], len(self.user1.first_name))
+
+    def test_composite_in_conditional_expression(self):
+        composite_field = CompositeField(
+            email=EmailField(),
+            first_name=CharField(),
+        )
+        subquery = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
+            output_field=composite_field,
+        )
+
+        qs = (
+            User.objects.alias(info=subquery)
+            .annotate(
+                is_john=Case(
+                    When(info__first_name="John", then=Value("Yes")),
+                    default=Value("No"),
+                    output_field=CharField(),
+                )
+            )
+            .filter(pk=self.user1.pk)
+        )
+
+        self.assertEqual(qs.first().is_john, "Yes")
+
+    def test_composite_subfield_in_lookup(self):
+        composite_field = CompositeField(
+            user=CompositeField(id=IntegerField(), email=EmailField()),
+            title=CharField(),
+        )
+        subquery = Subquery(
+            Post.objects.filter(user__pk=self.user1.pk).values("user__id", "title"),
+            output_field=composite_field,
+        )
+
+        allowed_ids = [self.user3.pk, self.user2.pk]
+        qs = (
+            User.objects.alias(post_info=subquery)
+            .filter(post_info__user__id__in=allowed_ids)
+            .values("id")
+        )
+
+        self.assertEqual(len(qs), 0)
+
+    def test_composite_subquery_returning_empty_resolves_to_none(self):
+        composite_field = CompositeField(email=EmailField())
+
+        empty_subquery = Subquery(
+            User.objects.filter(pk=999999).values("email"),
+            output_field=composite_field,
+        )
+
+        qs = (
+            User.objects.alias(info=empty_subquery)
+            .annotate(extracted_email=F("info__email"))
+            .values("extracted_email")
+        )
+
+        self.assertIsNone(qs.first())
+
+    def test_composite_subfield_explicit_cast(self):
+        composite_field = CompositeField(severity_level=IntegerField())
+        subquery = Subquery(
+            BugReport.objects.filter(pk=self.bug_report.pk).values("severity_level"),
+            output_field=composite_field,
+        )
+
+        qs = (
+            User.objects.alias(report=subquery)
+            .annotate(
+                severity_str=Cast("report__severity_level", output_field=CharField())
+            )
+            .values("severity_str")
+        )
+
+        self.assertEqual(
+            qs.first()["severity_str"], str(self.bug_report.severity_level)
+        )
+
+    def test_composite_field_alongside_json_function(self):
+        composite_field = CompositeField(title=CharField())
+        subquery = Subquery(
+            Post.objects.filter(pk=self.posts[0].pk).values("title"),
+            output_field=composite_field,
+        )
+
+        qs = User.objects.alias(
+            post_info=subquery, json_data=JsonEachFunc(Value('{"meta": "data"}'))
+        ).filter(post_info__title=self.posts[0].title)
+
+        self.assertTrue(qs.exists())
+
+    def test_composite_subfield_string_lookups(self):
+        composite_field = CompositeField(
+            title=CharField(),
+            body=CharField(),
+        )
+        subquery = Subquery(
+            Post.objects.filter(pk=self.posts[0].pk).values("title", "body"),
+            output_field=composite_field,
+        )
+
+        qs = (
+            User.objects.filter(pk=self.user1.pk)
+            .alias(post_info=subquery)
+            .filter(
+                post_info__title__contains="first", post_info__body__startswith="body"
+            )
+        )
+
+        self.assertEqual(qs.count(), 1)
+
+    def test_composite_subfield_range_and_comparison(self):
+        composite_field = CompositeField(
+            description=CharField(),
+            severity_level=IntegerField(),
+        )
+        subquery = Subquery(
+            BugReport.objects.filter(pk=self.bug_report.pk).values(
+                "description", "severity_level"
+            ),
+            output_field=composite_field,
+        )
+
+        qs_gt = (
+            User.objects.filter(pk=self.user1.pk)
+            .alias(report=subquery)
+            .filter(report__severity_level__gt=3)
+        )
+        qs_range = (
+            User.objects.filter(pk=self.user1.pk)
+            .alias(report=subquery)
+            .filter(report__severity_level__range=(1, 10))
+        )
+
+        self.assertEqual(qs_gt.count(), 1)
+        self.assertEqual(qs_range.count(), 1)
+
+    def test_composite_subfield_isnull(self):
+        composite_field = CompositeField(
+            email=EmailField(),
+            first_name=CharField(),
+        )
+        subquery = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
+            output_field=composite_field,
+        )
+
+        qs = (
+            User.objects.filter(pk=self.user1.pk)
+            .alias(info=subquery)
+            .filter(
+                info__email__isnull=False,
+                info__first_name__isnull=False,
+            )
+        )
+
+        self.assertEqual(qs.count(), 1)
+
+    def test_composite_subfield_concatenation(self):
+        composite_field = CompositeField(
+            email=EmailField(),
+            first_name=CharField(),
+        )
+        subquery = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
+            output_field=composite_field,
+        )
+
+        qs = (
+            User.objects.filter(pk=self.user1.pk)
+            .alias(info=subquery)
+            .annotate(greeting=Concat(Value("Hello, "), "info__first_name"))
+            .values("greeting")
+        )
+
+        self.assertEqual(qs.first()["greeting"], f"Hello, {self.user1.first_name}")
+
+    def test_composite_subfield_arithmetic(self):
+        composite_field = CompositeField(
+            description=CharField(),
+            severity_level=IntegerField(),
+        )
+        subquery = Subquery(
+            BugReport.objects.filter(pk=self.bug_report.pk).values(
+                "description", "severity_level"
+            ),
+            output_field=composite_field,
+        )
+
+        qs = (
+            User.objects.filter(pk=self.user1.pk)
+            .alias(report=subquery)
+            .annotate(adjusted_severity=F("report__severity_level") + 2)
+            .values("adjusted_severity")
+        )
+
+        self.assertEqual(qs.first()["adjusted_severity"], 7)

@@ -335,13 +335,13 @@ class Query(BaseExpression):
 
         self._filtered_relations = {}
 
-    @property
-    def output_field(self):
-        if len(self.select) == 1:
-            select = self.select[0]
-            return getattr(select, "target", None) or select.field
-        elif len(self.annotation_select) == 1:
-            return next(iter(self.annotation_select.values())).output_field
+    # @property
+    # def output_field(self):
+    #     if len(self.select) == 1:
+    #         select = self.select[0]
+    #         return getattr(select, "target", None) or select.field
+    #     elif len(self.annotation_select) == 1:
+    #         return next(iter(self.annotation_select.values())).output_field
 
     @cached_property
     def base_table(self):
@@ -2654,6 +2654,16 @@ class Query(BaseExpression):
                                 f"to promote it."
                             )
                     elif f.split(LOOKUP_SEP, 1)[0] in self.annotations:
+                        """
+                        for example:
+                        f ='ticket__task__project__workspace__owner__email`
+                        selected[f]:
+                        CompositeSubfieldTransform(
+                            CompositeSubfieldTransform(
+                                ...so on
+                            )
+                        )
+                        """
                         selected[f] = self.resolve_ref(f)
                     else:
                         # Call `names_to_path` to ensure a FieldError including
