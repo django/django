@@ -17,60 +17,6 @@
 {%- endmacro %}
 
 {% block extrahead %}
-{# When building htmlhelp (CHM format) disable jQuery inclusion, #}
-{# as it causes problems in compiled CHM files.                  #}
-{% if builder != "htmlhelp" %}
-{{ super() }}
-<script src="{{ pathto('templatebuiltins.js', 1) }}"></script>
-<script>
-(function($) {
-    if (!django_template_builtins) {
-       // templatebuiltins.js missing, do nothing.
-       return;
-    }
-    $(document).ready(function() {
-        // Hyperlink Django template tags and filters
-        var base = "{{ pathto('ref/templates/builtins') }}";
-        if (base == "#") {
-            // Special case for builtins.html itself
-            base = "";
-        }
-        // Tags are keywords, class '.k'
-        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
-             var tagname = $(elem).text();
-             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
-                 var fragment = tagname.replace(/_/, '-');
-                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
-             }
-        });
-        // Filters are functions, class '.nf'
-        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
-             var filtername = $(elem).text();
-             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
-                 var fragment = filtername.replace(/_/, '-');
-                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
-             }
-        });
-    });
-})(jQuery);
-{%- if include_console_assets -%}
-(function($) {
-    $(document).ready(function() {
-        $(".c-tab-unix").on("click", function() {
-            $("section.c-content-unix").show();
-            $("section.c-content-win").hide();
-            $(".c-tab-unix").prop("checked", true);
-        });
-        $(".c-tab-win").on("click", function() {
-            $("section.c-content-win").show();
-            $("section.c-content-unix").hide();
-            $(".c-tab-win").prop("checked", true);
-        });
-    });
-})(jQuery);
-{%- endif -%}
-</script>
-{% endif %}
 {%- if include_console_assets -%}
 <link rel="stylesheet" href="{{ pathto('_static/console-tabs.css', 1) }}">
 {%- endif -%}
