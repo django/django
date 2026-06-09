@@ -249,12 +249,8 @@ class TaskResult:
 
     def __lt__(self, other):
         try:
-            if self.task < other.task:
-                return True
-            if other.task < self.task:
-                return False
-
-            return (self.enqueued_at is not None, self.enqueued_at) < (
+            return (self.task, self.enqueued_at is not None, self.enqueued_at) < (
+                other.task,
                 other.enqueued_at is not None,
                 other.enqueued_at,
             )
