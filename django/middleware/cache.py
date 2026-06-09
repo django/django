@@ -56,6 +56,7 @@ from django.utils.cache import (
     learn_cache_key,
     patch_response_headers,
     patch_vary_headers,
+    split_header_value,
 )
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import parse_http_date_safe
@@ -106,8 +107,9 @@ class UpdateCacheMiddleware(MiddlewareMixin):
         # Don't cache responses when the Cache-Control header is set to
         # private, no-cache, or no-store.
         cache_control = response.get("Cache-Control", "").lower()
+        cache_control_parts = list(split_header_value(cache_control))
         if cache_control and any(
-            directive in cache_control
+            directive in cache_control_parts
             for directive in (
                 "private",
                 "no-cache",
@@ -137,7 +139,7 @@ class UpdateCacheMiddleware(MiddlewareMixin):
         # header, unless allowed by "public" per RFC 9111, Section 3.5. No
         # exceptions are made for "s-maxage" and "must-revalidate" since these
         # are not currently implemented by Django.
-        if request.headers.get("Authorization") and "public" not in cache_control:
+        if request.headers.get("Authorization") and "public" not in cache_control_parts:
             patch_vary_headers(response, ("Authorization",))
         if timeout and response.status_code == 200:
             cache_key = learn_cache_key(

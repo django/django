@@ -2975,6 +2975,23 @@ class CacheMiddlewareTest(SimpleTestCase):
                 response = view(request, "2")
                 self.assertEqual(response.content, b"Hello World 2")
 
+    def test_cache_control_not_cached_superstring(self):
+        """
+        "myprivate", a hypothetical extension directive, is not confused for
+        "private".
+        """
+
+        @cache_page(3)
+        @cache_control(myprivate=True)
+        def view(request, value):
+            return HttpResponse(f"Hello World {value}")
+
+        request = self.factory.get("/view/")
+        response = view(request, "1")
+        self.assertEqual(response.content, b"Hello World 1")
+        response = view(request, "2")
+        self.assertEqual(response.content, b"Hello World 1")
+
     def test_vary_asterisk_not_cached(self):
         views_with_cache = (
             cache_page(3)(hello_world_view_patch_vary_headers_asterisk),
@@ -3012,6 +3029,16 @@ class CacheMiddlewareTest(SimpleTestCase):
         request = self.factory.get("/view/", headers={"Authorization": "token"})
         response = view_with_cache(request, "1")
         self.assertIs(has_vary_header(response, "Authorization"), False)
+
+    def test_authorization_header_exception_superstring(self):
+        """
+        "nopublic", a hypothetical extension directive, is not confused for
+        "public".
+        """
+        view_with_cache = cache_page(3)(cache_control(no_public=True)(hello_world_view))
+        request = self.factory.get("/view/", headers={"Authorization": "token"})
+        response = view_with_cache(request, "1")
+        self.assertIs(has_vary_header(response, "Authorization"), True)
 
     def test_sensitive_cookie_not_cached(self):
         """
