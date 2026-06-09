@@ -1208,19 +1208,25 @@ class AddConstraint(IndexOperation):
         return "%s_%s" % (self.model_name_lower, self.constraint.name.lower())
 
     def references_field(self, model_name, name, app_label):
-        return self.constraint.expressions or name in {f.lower() for f in self.constraint.fields}
+        return isinstance(self.constraint, models.UniqueConstraint) and (
+            self.constraint.expressions
+            or name in {f.lower() for f in self.constraint.fields}
+        )
 
     def can_reduce_through(self, operation, app_label):
         if not super().can_reduce_through(operation, app_label):
             return False
-        if self.constraint.expressions:
-            return False
-        if isinstance(operation, FieldOperation):
-            if self.references_field(
-                self.model_name_lower, operation.name_lower, app_label
-            ):
+        if isinstance(self.constraint, models.UniqueConstraint):
+            if self.constraint.expressions:
                 return False
-        return True
+            if isinstance(operation, FieldOperation):
+                if self.references_field(
+                    self.model_name_lower, operation.name_lower, app_label
+                ):
+                    return False
+            return True
+        else:
+            return False
 
     def reduce(self, operation, app_label):
         if (
@@ -1320,19 +1326,24 @@ class AlterConstraint(IndexOperation):
         return "alter_%s_%s" % (self.model_name_lower, self.constraint.name.lower())
 
     def references_field(self, model_name, name, app_label):
-        return self.constraint.expressions or name in {f.lower() for f in self.constraint.fields}
+        return isinstance(self.constraint, models.UniqueConstraint) and (
+            self.constraint.expressions
+            or name in {f.lower() for f in self.constraint.fields}
+        )
 
     def can_reduce_through(self, operation, app_label):
         if not super().can_reduce_through(operation, app_label):
             return False
-        if self.constraint.expressions:
-            return False
-        if isinstance(operation, FieldOperation):
-            if self.references_field(
-                self.model_name_lower, operation.name_lower, app_label
-            ):
+        if isinstance(self.constraint, models.UniqueConstraint):
+            if self.constraint.expressions:
                 return False
-        return True
+            if isinstance(operation, FieldOperation):
+                if self.references_field(
+                    self.model_name_lower, operation.name_lower, app_label
+                ):
+                    return False
+            return True
+        return False
 
     def reduce(self, operation, app_label):
         if (
