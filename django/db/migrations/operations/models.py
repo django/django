@@ -882,6 +882,17 @@ class IndexOperation(Operation):
     def model_name_lower(self):
         return self.model_name.lower()
 
+    def references_model(self, name, app_label):
+        return name.lower() == self.model_name_lower
+
+    def reduce(self, operation, app_label):
+        return super().reduce(operation, app_label) or self.can_reduce_through(
+            operation, app_label
+        )
+
+    def can_reduce_through(self, operation, app_label):
+        return not operation.references_model(self.model_name, app_label)
+
 
 class AddIndex(IndexOperation):
     """Add an index on a model."""
@@ -937,6 +948,21 @@ class AddIndex(IndexOperation):
     @property
     def migration_name_fragment(self):
         return "%s_%s" % (self.model_name_lower, self.index.name.lower())
+
+    def references_field(self, model_name, name, app_label):
+        return self.index.expressions or name in {f.lower() for f in self.index.fields}
+
+    def can_reduce_through(self, operation, app_label):
+        if not super().can_reduce_through(operation, app_label):
+            return False
+        if self.index.expressions:
+            return False
+        if isinstance(operation, FieldOperation):
+            if self.references_field(
+                self.model_name_lower, operation.name_lower, app_label
+            ):
+                return False
+        return True
 
     def reduce(self, operation, app_label):
         if isinstance(operation, RemoveIndex) and self.index.name == operation.name:
@@ -1181,6 +1207,21 @@ class AddConstraint(IndexOperation):
     def migration_name_fragment(self):
         return "%s_%s" % (self.model_name_lower, self.constraint.name.lower())
 
+    def references_field(self, model_name, name, app_label):
+        return self.constraint.expressions or name in {f.lower() for f in self.constraint.fields}
+
+    def can_reduce_through(self, operation, app_label):
+        if not super().can_reduce_through(operation, app_label):
+            return False
+        if self.constraint.expressions:
+            return False
+        if isinstance(operation, FieldOperation):
+            if self.references_field(
+                self.model_name_lower, operation.name_lower, app_label
+            ):
+                return False
+        return True
+
     def reduce(self, operation, app_label):
         if (
             isinstance(operation, RemoveConstraint)
@@ -1277,6 +1318,21 @@ class AlterConstraint(IndexOperation):
     @property
     def migration_name_fragment(self):
         return "alter_%s_%s" % (self.model_name_lower, self.constraint.name.lower())
+
+    def references_field(self, model_name, name, app_label):
+        return self.constraint.expressions or name in {f.lower() for f in self.constraint.fields}
+
+    def can_reduce_through(self, operation, app_label):
+        if not super().can_reduce_through(operation, app_label):
+            return False
+        if self.constraint.expressions:
+            return False
+        if isinstance(operation, FieldOperation):
+            if self.references_field(
+                self.model_name_lower, operation.name_lower, app_label
+            ):
+                return False
+        return True
 
     def reduce(self, operation, app_label):
         if (
