@@ -11,7 +11,6 @@ from sphinx import addnodes
 from sphinx import version_info as sphinx_version
 from sphinx.directives.code import CodeBlock
 from sphinx.domains.std import Cmdoption
-from sphinx.errors import ExtensionError
 from sphinx.util import logging
 from sphinx.writers.html import HTMLTranslator
 
@@ -98,11 +97,7 @@ class VersionDirective(Directive):
         node["type"] = self.name
         if self.content:
             self.state.nested_parse(self.content, self.content_offset, node)
-        try:
-            env.get_domain("changeset").note_changeset(node)
-        except ExtensionError:
-            # Sphinx < 1.8: Domain 'changeset' is not registered
-            env.note_versionchange(node["type"], node["version"], node, self.lineno)
+        env.get_domain("changeset").note_changeset(node)
         return ret
 
 
