@@ -1,5 +1,6 @@
 from django.core.exceptions import FieldError
 from django.db.models import (
+    Avg,
     Case,
     CharField,
     CompositeField,
@@ -7,6 +8,9 @@ from django.db.models import (
     EmailField,
     F,
     IntegerField,
+    OuterRef,
+    Q,
+    Sum,
     Value,
     When,
 )
@@ -189,7 +193,7 @@ class CompositeFieldTests(TestCase):
 
         self.assertEqual(qs_ordered.count(), 9)
 
-        qs_agg = User.objects.annotate(some=subquery).aggregate(
+        qs_agg = User.objects.alias(some=subquery).aggregate(
             total=Count("some__user__email")
         )
         self.assertEqual(qs_agg["total"], 9)
@@ -463,3 +467,225 @@ class CompositeFieldTests(TestCase):
         )
 
         self.assertEqual(qs.first()["adjusted_severity"], 7)
+
+    def test_composite_annotate_before_values(self):
+        composite_field = CompositeField(
+            email=EmailField(),
+            first_name=CharField(),
+        )
+
+        subquery = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
+            output_field=composite_field,
+        )
+
+        qs = (
+            User.objects.filter(pk=self.user1.pk)
+            .annotate(author_info=subquery)
+            .values("author_info__email", "author_info__first_name")
+        )
+
+        result = qs.first()
+        self.assertEqual(result["author_info__email"], self.user1.email)
+        self.assertEqual(result["author_info__first_name"], self.user1.first_name)
+
+    def test_composite_annotate_then_transform(self):
+        composite_field = CompositeField(
+            title=CharField(),
+            body=CharField(),
+        )
+
+        subquery = Subquery(
+            Post.objects.filter(pk=self.posts[0].pk).values("title", "body"),
+            output_field=composite_field,
+        )
+
+        qs = (
+            User.objects.filter(pk=self.user1.pk)
+            .annotate(post_data=subquery)
+            .annotate(lowercased_title=Lower("post_data__title"))
+            .values("lowercased_title", "post_data__body")
+        )
+
+        result = qs.first()
+        self.assertEqual(result["lowercased_title"], self.posts[0].title.lower())
+        self.assertEqual(result["post_data__body"], self.posts[0].body)
+
+    def test_composite_subquery_with_outerref(self):
+        composite_field = CompositeField(
+            title=CharField(),
+            body=CharField(),
+        )
+
+        subquery = Subquery(
+            Post.objects.filter(
+                user=OuterRef("pk"),
+            ).values(
+                "title",
+                "body",
+            )[:1],
+            output_field=composite_field,
+        )
+        qs = User.objects.annotate(post_info=subquery).values(
+            "post_info__title",
+            "post_info__body",
+        )
+
+        self.assertEqual(qs[0]["post_info__title"], "user1 first post title")
+
+    def test_multiple_composite_aliases(self):
+        composite_field1 = CompositeField(email=EmailField(), first_name=CharField())
+        composite_field2 = CompositeField(title=CharField(), body=CharField())
+        sub1 = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
+            output_field=composite_field1,
+        )
+        sub2 = Subquery(
+            Post.objects.filter(pk=self.posts[0].pk).values("title", "body"),
+            output_field=composite_field2,
+        )
+        qs = User.objects.alias(info1=sub1, info2=sub2).values(
+            "info1__email", "info2__title"
+        )
+        result = qs.first()
+        self.assertEqual(result["info1__email"], self.user1.email)
+        self.assertEqual(result["info2__title"], self.posts[0].title)
+
+    def test_composite_alias_exclude(self):
+        composite_field = CompositeField(email=EmailField(), first_name=CharField())
+        sub = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
+            output_field=composite_field,
+        )
+        qs = User.objects.alias(info=sub).exclude(info__email=self.user1.email)
+        self.assertEqual(qs.count(), 0)
+
+        qs2 = User.objects.alias(info=sub).exclude(info__email="nonexistent@mail.com")
+        self.assertEqual(qs2.count(), 3)
+        self.assertEqual(
+            list(qs2.order_by("pk").values_list("email", flat=True)),
+            ["user001@mail.com", "user002@mail.com", "user003@mail.com"],
+        )
+
+    def test_composite_values_list(self):
+        composite_field = CompositeField(email=EmailField(), first_name=CharField())
+        sub = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
+            output_field=composite_field,
+        )
+        qs_flat = User.objects.alias(info=sub).values_list("info__email", flat=True)
+        self.assertEqual(list(qs_flat), [self.user1.email] * 3)
+
+        qs_normal = User.objects.alias(info=sub).values_list(
+            "info__email", "info__first_name"
+        )
+        self.assertEqual(
+            list(qs_normal), [(self.user1.email, self.user1.first_name)] * 3
+        )
+
+    def test_composite_aggregation_math(self):
+        composite_field = CompositeField(severity_level=IntegerField())
+        sub = Subquery(
+            BugReport.objects.filter(pk=self.bug_report.pk).values("severity_level"),
+            output_field=composite_field,
+        )
+        res = User.objects.alias(report=sub).aggregate(
+            total_severity=Sum("report__severity_level"),
+            avg_severity=Avg("report__severity_level"),
+        )
+        self.assertEqual(res["total_severity"], self.bug_report.severity_level * 3)
+        self.assertEqual(res["avg_severity"], self.bug_report.severity_level)
+
+    def test_composite_q_or(self):
+        composite_field = CompositeField(email=EmailField(), first_name=CharField())
+        sub = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
+            output_field=composite_field,
+        )
+        qs = User.objects.alias(info=sub).filter(
+            Q(info__email=self.user1.email) | Q(first_name="Bob")
+        )
+        self.assertEqual(qs.count(), 3)
+        self.assertCountEqual(
+            qs.values_list("email", flat=True),
+            ["user001@mail.com", "user002@mail.com", "user003@mail.com"],
+        )
+
+    def test_composite_referenced_in_nested_subquery(self):
+        composite_field = CompositeField(email=EmailField(), first_name=CharField())
+        sub_outer = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
+            output_field=composite_field,
+        )
+        sub_inner = Subquery(
+            User.objects.filter(email=OuterRef("info__email")).values("pk")[:1]
+        )
+        qs = (
+            User.objects.alias(info=sub_outer)
+            .annotate(inner_user_id=sub_inner)
+            .filter(pk=self.user1.pk)
+        )
+        self.assertEqual(qs.first().inner_user_id, self.user1.pk)
+
+    def test_correlated_composite_alias(self):
+        composite_field = CompositeField(title=CharField(), body=CharField())
+        subquery = Subquery(
+            Post.objects.filter(user=OuterRef("pk")).values("title", "body")[:1],
+            output_field=composite_field,
+        )
+        qs = (
+            User.objects.alias(post_info=subquery)
+            .annotate(post_title=F("post_info__title"))
+            .filter(post_title__isnull=False)
+            .order_by("pk")
+        )
+        self.assertEqual(qs.count(), 3)
+        self.assertEqual(qs[0].post_title, "user1 first post title")
+        self.assertEqual(qs[1].post_title, "user2 first post title")
+        self.assertEqual(qs[2].post_title, "user3 first post title")
+
+    def test_composite_distinct(self):
+        composite_field = CompositeField(email=EmailField(), first_name=CharField())
+        sub = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
+            output_field=composite_field,
+        )
+        qs = (
+            User.objects.alias(info=sub)
+            .values(
+                "info__email",
+                "info__first_name",
+            )
+            .distinct()
+        )
+        self.assertEqual(
+            list(qs),
+            [
+                {
+                    "info__email": self.user1.email,
+                    "info__first_name": self.user1.first_name,
+                }
+            ],
+        )
+
+    def test_composite_order_by_string(self):
+        composite_field = CompositeField(
+            user=CompositeField(email=EmailField()),
+            title=CharField(),
+        )
+        subquery = Subquery(
+            Post.objects.filter(
+                user__pk=OuterRef("pk"),
+            ).values(
+                "user__email", "title"
+            )[:1],
+            output_field=composite_field,
+        )
+        qs = (
+            User.objects.alias(some=subquery)
+            .order_by("-some__user__email")
+            .values_list("email", flat=True)
+        )
+        self.assertEqual(
+            list(qs), ["user003@mail.com", "user002@mail.com", "user001@mail.com"]
+        )

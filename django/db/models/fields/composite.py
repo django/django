@@ -200,21 +200,28 @@ class CompositeSubfieldTransform(Transform):
         while isinstance(current_lhs, CompositeSubfieldTransform):
             parts.insert(0, current_lhs.lookup_name)
             current_lhs = current_lhs.lhs
-        print(parts)
         full_lookup_name = "__".join(parts)
-        print(full_lookup_name)
 
-        if hasattr(current_lhs, "alias") and current_lhs.alias:
+        if (
+            hasattr(current_lhs, "alias")
+            and current_lhs.alias
+            and current_lhs.alias in compiler.query.alias_map
+        ):
             table_alias = current_lhs.alias
+            quoted_table = compiler.quote_name(table_alias)
+            quoted_column = compiler.quote_name(full_lookup_name)
+            return f"{quoted_table}.{quoted_column}", []
         elif hasattr(current_lhs, "refs"):
             table_alias = current_lhs.refs
+            quoted_table = compiler.quote_name(table_alias)
+            quoted_column = compiler.quote_name(full_lookup_name)
+            return f"{quoted_table}.{quoted_column}", []
+        elif getattr(current_lhs, "subquery", False) and hasattr(current_lhs, "query"):
+            query = current_lhs.query.clone()
+            query.set_values([full_lookup_name])
+            return query.as_sql(compiler, connection)
         else:
             raise FieldError("Cannot resolve table alias for composite field. ")
-
-        quoted_table = compiler.quote_name(table_alias)
-        quoted_column = compiler.quote_name(full_lookup_name)
-        print(f"{quoted_table}.{quoted_column}")
-        return f"{quoted_table}.{quoted_column}", []
 
 
 class CompositeField(Field):
@@ -252,3 +259,12 @@ class CompositeField(Field):
         return partial(
             CompositeSubfieldTransform, lookup_name=name, output_field=subfield
         )
+
+
+CompositeField.register_lookup(TupleExact)
+CompositeField.register_lookup(TupleGreaterThan)
+CompositeField.register_lookup(TupleGreaterThanOrEqual)
+CompositeField.register_lookup(TupleLessThan)
+CompositeField.register_lookup(TupleLessThanOrEqual)
+CompositeField.register_lookup(TupleIn)
+CompositeField.register_lookup(TupleIsNull)

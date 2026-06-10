@@ -335,13 +335,13 @@ class Query(BaseExpression):
 
         self._filtered_relations = {}
 
-    # @property
-    # def output_field(self):
-    #     if len(self.select) == 1:
-    #         select = self.select[0]
-    #         return getattr(select, "target", None) or select.field
-    #     elif len(self.annotation_select) == 1:
-    #         return next(iter(self.annotation_select.values())).output_field
+    @property
+    def output_field(self):
+        if len(self.select) == 1:
+            select = self.select[0]
+            return getattr(select, "target", None) or select.field
+        elif len(self.annotation_select) == 1:
+            return next(iter(self.annotation_select.values())).output_field
 
     @cached_property
     def base_table(self):
@@ -1245,30 +1245,10 @@ class Query(BaseExpression):
     def add_annotation(self, annotation, alias, select=True):
         """Add a single annotation expression to the Query."""
         self.check_alias(alias)
-        if getattr(getattr(annotation, "output_field", None), "is_composite", False):
-            self.get_initial_alias()
-            annotation.alias = alias
-            self.alias_map[alias] = SubqueryTable(
-                annotation.query.clone(),
-                alias,
-                annotation.output_field,
-            )
-            self.alias_refcount[alias] = 1
-            self.table_map[alias] = [alias]
-            """
-            This part was taken from AI.
-            if select:
-                self.append_annotation_mask([alias])
-            else:
-                self.set_annotation_mask(set(self.annotation_select).difference({alias}))
-            """
-            if select:
-                self.append_annotation_mask([alias])
-            else:
-                self.set_annotation_mask(
-                    set(self.annotation_select).difference({alias})
-                )
-            self.annotations[alias] = annotation
+        if getattr(
+            getattr(annotation, "_output_field_or_none", None), "is_composite", False
+        ):
+            self.add_composite_annotation(annotation, alias, select=select)
             return
         annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None)
         if select:
@@ -1278,6 +1258,34 @@ class Query(BaseExpression):
         self.annotations[alias] = annotation
         if select and self.selected:
             self.selected[alias] = alias
+
+    def add_composite_annotation(self, annotation, alias, select=True):
+        annotation = annotation.resolve_expression(
+            self,
+            allow_joins=True,
+            reuse=None,
+        )
+        self.get_initial_alias()
+        annotation.alias = alias
+        self.annotations[alias] = annotation
+        if self.is_relation_source(annotation, select):
+            self.add_relation(
+                SubqueryTable(annotation.query.clone(), alias, annotation.output_field),
+                alias,
+            )
+        self.set_annotation_mask(set(self.annotation_select).difference({alias}))
+
+    def is_relation_source(self, annotation, select):
+        return (
+            not select
+            and hasattr(annotation, "query")
+            and not getattr(annotation.query, "external_aliases", None)
+        )
+
+    def add_relation(self, relation, alias):
+        self.alias_map[alias] = relation
+        self.alias_refcount[alias] = 1
+        self.table_map[alias] = [alias]
 
     @property
     def _subquery_fields_len(self):
@@ -2369,7 +2377,10 @@ class Query(BaseExpression):
                 if item == "?":
                     continue
                 item = item.removeprefix("-")
-                if item in self.annotations:
+                if (
+                    item in self.annotations
+                    or item.split(LOOKUP_SEP)[0] in self.annotations
+                ):
                     continue
                 if self.extra and item in self.extra:
                     continue

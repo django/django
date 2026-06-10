@@ -1852,16 +1852,25 @@ class Subquery(BaseExpression, Combinable):
             resolved.query.contains_subquery = True
             # Subquery is an unnecessary shim for a resolved query as it
             # complexifies the lookup's right-hand-side introspection.
-            try:
-                self.output_field
-            except AttributeError:
+            """
+            _output_field_or_none catches OutputFieldIsNoneError but not
+            AttributeError.
+            When the subquery has an OuterRef, self.query still contains
+            ResolvedOuterRef (an unresolved placeholder).
+            Trying to get its output field raises AttributeError because
+            ResolvedOuterRef inherits from F/Combinable, not BaseExpression,
+            and lacks _output_field_or_none.
+            So in resolved.query, all ResolvedOuterRef placeholders have been
+            replaced with actual Col objects
+            (which DO have _output_field_or_none).
+            """
+            output_field = resolved._output_field_or_none
+            if output_field is None:
                 return resolved.query
-            if getattr(self.output_field, "is_composite", False):
+            if getattr(output_field, "is_composite", False):
                 return resolved
-            if self.output_field and type(self.output_field) is not type(
-                resolved.query.output_field
-            ):
-                return ExpressionWrapper(resolved.query, output_field=self.output_field)
+            if type(output_field) is not type(resolved.query.output_field):
+                return ExpressionWrapper(resolved.query, output_field=output_field)
             return resolved.query
         return resolved
 
