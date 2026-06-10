@@ -58,6 +58,13 @@
     #traceback { background:#eee; }
     #requestinfo { background:#f6f6f6; padding-left:120px; }
     #summary table { border:none; background:transparent; }
+    #exception_group li { list-style: none; }
+    #exception_group ul ul li { padding-left: 40px; }
+    #exception_group ul li { position: relative; line-height: 1.25em;}
+    #exception_group ul li::before { position: absolute; left: 30px; top: 0px; border-left: 1.5px dashed; border-bottom: 1.5px dashed; content: ""; width: 9px; height: 0.5em; }
+    #exception_group ul li::after { position: absolute; left: 30px; bottom: 0px; border-left: 1.5px dashed; content: ""; width: 6px; height: 100%; }
+    #exception_group ul li:last-child::after { display: none }
+    #exception_group > ul > li::before { display: none }
     #requestinfo h2, #requestinfo h3 { position:relative; margin-left:-100px; }
     #requestinfo h3 { margin-bottom:-1em; }
     .error { background: #ffc; }
@@ -128,7 +135,10 @@
 {% if exception_type and exception_value %}
     <tr>
       <th scope="row">Exception Value:</th>
-      <td><pre>{{ exception_value|force_escape }}</pre></td>
+{% partialdef exception %}<li><pre>{{ exception.type }}: {{ exception.message }}</pre></li>{% endpartialdef %}
+{% partialdef exception_group %}<li><pre>{{ exception.type }}: {{ exception.message }}</pre><ul>{% for child in exception.children %}{% with exception=child %}{% partial exception_router %}{% endwith %}{% endfor %}</ul></li>{% endpartialdef %}
+{% partialdef exception_router %}{% if exception.is_group %}{% partial exception_group %}{% else %}{% partial exception %}{% endif %}{% endpartialdef %}
+      <td id=exception_group>{% if exception_group %}<ul>{% with exception=exception_group %}{% partial exception_router %}{% endwith %}</ul>{% else%}<pre>{{ exception_value|force_escape }}</pre>{% endif %}</td>
     </tr>
 {% endif %}
 {% if lastframe %}

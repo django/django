@@ -765,6 +765,66 @@ class ExceptionReporterTests(SimpleTestCase):
             text,
         )
 
+    def test_exception_group(self):
+        request = self.rf.get("/test_view")
+        try:
+            raise ExceptionGroup(
+                "Oops group",
+                [RuntimeError("Oops 1"), ValueError("Oops 2"), ValueError("Oops 3")],
+            )
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertInHTML("<h1>ExceptionGroup at /test_view</h1>", html)
+        self.assertIn(
+            '<pre class="exception_value">Oops group (3 sub-exceptions)</pre>', html
+        )
+        self.assertIn('<th scope="row">Exception Type:</th>', html)
+        self.assertIn('<th scope="row">Exception Value:</th>', html)
+        self.assertIn("<pre>RuntimeError: Oops 1</pre>", html)
+        self.assertIn("<pre>ValueError: Oops 2</pre>", html)
+        self.assertIn("<pre>ValueError: Oops 3</pre>", html)
+
+    def test_nested_exception_group(self):
+        request = self.rf.get("/test_view")
+        try:
+            raise ExceptionGroup(
+                "Outer Oops group",
+                [
+                    RuntimeError("Outer Oops"),
+                    ExceptionGroup(
+                        "Inner Oops group",
+                        [
+                            ValueError("Inner Oops 1"),
+                            ValueError("Inner Oops 2"),
+                            ValueError("Inner Oops 3"),
+                        ],
+                    ),
+                ],
+            )
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertInHTML("<h1>ExceptionGroup at /test_view</h1>", html)
+        self.assertIn(
+            '<pre class="exception_value">Outer Oops group (2 sub-exceptions)</pre>',
+            html,
+        )
+        self.assertIn('<th scope="row">Exception Type:</th>', html)
+        self.assertIn('<th scope="row">Exception Value:</th>', html)
+        self.assertIn(
+            "<pre>ExceptionGroup: Outer Oops group (2 sub-exceptions)</pre>", html
+        )
+        self.assertIn("<pre>RuntimeError: Outer Oops</pre>", html)
+        self.assertIn(
+            "<pre>ExceptionGroup: Inner Oops group (3 sub-exceptions)</pre>", html
+        )
+        self.assertIn("<pre>ValueError: Inner Oops 1</pre>", html)
+        self.assertIn("<pre>ValueError: Inner Oops 2</pre>", html)
+        self.assertIn("<pre>ValueError: Inner Oops 3</pre>", html)
+
     def test_mid_stack_exception_without_traceback(self):
         try:
             try:
