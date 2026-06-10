@@ -2563,13 +2563,13 @@ class ModelAdmin(BaseModelAdmin):
         # First check if the user can see this history.
         model = self.model
         obj = self.get_object(request, unquote(object_id))
+        if not self.has_view_or_change_permission(request, obj):
+            raise PermissionDenied
+
         if obj is None:
             return self._get_obj_does_not_exist_redirect(
                 request, model._meta, object_id
             )
-
-        if not self.has_view_or_change_permission(request, obj):
-            raise PermissionDenied
 
         # Then get the history for this object.
         app_label = self.opts.app_label

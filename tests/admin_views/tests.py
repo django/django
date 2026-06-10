@@ -3380,6 +3380,24 @@ class AdminViewPermissionsTest(TestCase):
             ["article with ID “foo” doesn’t exist. Perhaps it was deleted?"],
         )
 
+    def test_history_view_without_permission_returns_403(self):
+        self.client.force_login(self.adduser)
+        for label, pk in [("existing", self.a1.pk), ("missing", 999999)]:
+            with self.subTest(pk=label):
+                response = self.client.get(
+                    reverse("admin:admin_views_article_history", args=(pk,))
+                )
+                self.assertEqual(response.status_code, 403)
+
+    def test_history_view_with_view_or_change_permission_success(self):
+        for permission, user in [("view", self.viewuser), ("change", self.changeuser)]:
+            with self.subTest(permission=permission):
+                self.client.force_login(user)
+                response = self.client.get(
+                    reverse("admin:admin_views_article_history", args=(self.a1.pk,))
+                )
+                self.assertEqual(response.status_code, 200)
+
     def test_conditionally_show_add_section_link(self):
         """
         The foreign key widget should only show the "add related" button if the
@@ -3526,6 +3544,56 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(response.status_code, 302)
         # Domain may depend on contrib.sites tests also run
         self.assertRegex(response.url, "http://(testserver|example.com)/dummy/foo/")
+
+    def test_shortcut_view_without_permission_returns_403(self):
+        obj = ModelWithStringPrimaryKey.objects.create(string_pk="bar")
+        model_ctype = ContentType.objects.get_for_model(ModelWithStringPrimaryKey)
+        shortcut_url = reverse("admin:view_on_site", args=(model_ctype.pk, obj.pk))
+        # deleteuser has no view permission on ModelWithStringPrimaryKey.
+        self.client.force_login(self.deleteuser)
+        response = self.client.get(shortcut_url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_shortcut_view_with_view_or_change_permission_success(self):
+        obj = ModelWithStringPrimaryKey.objects.create(string_pk="bar")
+        model_ctype = ContentType.objects.get_for_model(ModelWithStringPrimaryKey)
+        shortcut_url = reverse("admin:view_on_site", args=(model_ctype.pk, obj.pk))
+        opts = ModelWithStringPrimaryKey._meta
+        for permission in ["view", "change"]:
+            codename = get_permission_codename(permission, opts)
+            perm = get_perm(ModelWithStringPrimaryKey, codename)
+            with self.subTest(permission=permission):
+                self.viewuser.user_permissions.set([perm])
+                self.client.force_login(self.viewuser)
+                response = self.client.get(shortcut_url)
+                self.assertEqual(response.status_code, 302)
+
+    def test_shortcut_view_for_invalid_content_type_returns_404(self):
+        # An unknown or non-int content type id skips the permission check and
+        # falls back to the contenttypes shortcut view, which raises Http404.
+        self.client.force_login(self.deleteuser)
+        for content_type_id in [9999, "not-an-int", None]:
+            with self.subTest(content_type_id=content_type_id):
+                response = self.client.get(
+                    reverse("admin:view_on_site", args=(content_type_id, 1))
+                )
+                self.assertEqual(response.status_code, 404)
+
+    def test_shortcut_view_does_not_repeat_content_type_query(self):
+        obj = ModelWithStringPrimaryKey.objects.create(string_pk="bar")
+        model_ctype = ContentType.objects.get_for_model(ModelWithStringPrimaryKey)
+        shortcut_url = reverse("admin:view_on_site", args=(model_ctype.pk, obj.pk))
+        self.client.force_login(self.superuser)
+        # A warmup request populates the ContentType and Site caches, so only
+        # relevant queries are measured. The 4 expected queries are:
+        # 1. Load the session.
+        # 2. Load the user.
+        # 3. Look up the content type.
+        # 4. Fetch the target instance.
+        self.client.get(shortcut_url)
+        with self.assertNumQueries(4):
+            response = self.client.get(shortcut_url)
+        self.assertEqual(response.status_code, 302)
 
     def test_has_module_permission(self):
         """
