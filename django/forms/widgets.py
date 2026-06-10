@@ -262,6 +262,8 @@ class Media:
             return list(dict.fromkeys(chain.from_iterable(filter(None, lists))))
 
     def __add__(self, other):
+        if not isinstance(other, Media):
+            return NotImplemented
         combined = Media()
         combined._css_lists = self._css_lists[:]
         combined._js_lists = self._js_lists[:]
