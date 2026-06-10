@@ -266,6 +266,16 @@ backends.
 
 * ...
 
+:mod:`django.contrib.admin`
+---------------------------
+
+* The admin ``view_on_site`` URL now consistently returns an HTTP 403 response
+  when a staff user lacks view or change permission for the target model.
+
+* The admin history view now checks permissions before object existence,
+  consistently returning an HTTP 403 response for staff users without the view
+  or change permission regardless of whether the object exists.
+
 Miscellaneous
 -------------
 
