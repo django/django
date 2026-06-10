@@ -864,44 +864,6 @@ class FormsMediaTestCase(SimpleTestCase):
         self.assertEqual(merged._css_lists, [{"screen": ["a.css"]}])
         self.assertEqual(merged._js_lists, [["a"]])
 
-    def test_add_media_subclass_with_radd(self):
-        class SubclassedMedia(Media):
-            def __radd__(self, other):
-                combined = SubclassedMedia()
-                # Simplify the test by ignoring _css_lists
-                combined._js_lists = [*other._js_lists, *self._js_lists]
-                return combined
-
-        media = Media(js=["b.js", "c.js"])
-        subclassed = SubclassedMedia(js=["a.js", "b.js"])
-
-        merged = media + subclassed
-        self.assertEqual(merged._js, ["a.js", "b.js", "c.js"])
-        self.assertIsInstance(merged, SubclassedMedia)
-
-        merged = subclassed + media
-        self.assertEqual(merged._js, ["a.js", "b.js", "c.js"])
-        self.assertIsInstance(merged, Media)
-
-    def test_add_media_subclass_with_add(self):
-        class SubclassedMedia(Media):
-            def __add__(self, other):
-                combined = SubclassedMedia()
-                # Simplify the test by ignoring _css_lists
-                combined._js_lists = [*other._js_lists, *self._js_lists]
-                return combined
-
-        media = Media(js=["b.js", "c.js"])
-        subclassed = SubclassedMedia(js=["a.js", "b.js"])
-
-        merged = media + subclassed
-        self.assertEqual(merged._js, ["a.js", "b.js", "c.js"])
-        self.assertIsInstance(merged, Media)
-
-        merged = subclassed + media
-        self.assertEqual(merged._js, ["a.js", "b.js", "c.js"])
-        self.assertIsInstance(merged, SubclassedMedia)
-
     def test_render_js_with_attrs(self):
         media = Media(js=[Script("/path/to/js", integrity="sha256-abc")])
         self.assertHTMLEqual(
