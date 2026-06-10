@@ -387,3 +387,41 @@ class TaskTestCase(SimpleTestCase):
 
         result_diff_id = dataclasses.replace(result_1, id="completely-different-id")
         self.assertNotEqual(result_1, result_diff_id)
+
+    def test_task_result_equality_not_implemented(self):
+        result = test_tasks.noop_task.enqueue()
+        self.assertNotEqual(result, "not a task result")
+        self.assertNotEqual(result, 6.2)
+        self.assertNotEqual(result, None)
+
+    def test_task_result_hash_equal_objects(self):
+        result_1 = test_tasks.noop_task.enqueue()
+        result_2 = dataclasses.replace(result_1, backend="different_backend")
+
+        self.assertEqual(result_1, result_2)
+        self.assertEqual(hash(result_1), hash(result_2))
+
+    def test_task_result_hash_usable_in_set(self):
+        result = test_tasks.noop_task.enqueue()
+        result_dup = dataclasses.replace(result, args=[1, 2, 3])
+
+        self.assertEqual(len({result, result_dup}), 1)
+
+    def test_task_result_hash_usable_as_dict_key(self):
+        result = test_tasks.noop_task.enqueue()
+        mapping = {result: "value"}
+
+        result_lookup = dataclasses.replace(result, kwargs={"a": 1})
+        self.assertEqual(mapping[result_lookup], "value")
+
+    def test_task_result_lt_not_implemented(self):
+        result = test_tasks.noop_task.enqueue()
+        with self.assertRaises(TypeError):
+            result < "not a task result"
+
+    def test_task_result_lt_stability(self):
+        result_1 = test_tasks.noop_task.enqueue()
+        result_2 = dataclasses.replace(result_1)
+
+        self.assertFalse(result_1 < result_2)
+        self.assertFalse(result_2 < result_1)
