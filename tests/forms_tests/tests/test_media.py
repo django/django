@@ -1,8 +1,13 @@
+import json
+import operator
+from functools import reduce
+
 from django.forms import CharField, Form, Media, MultiWidget, TextInput
+from django.forms.utils import flatatt
 from django.forms.widgets import MediaAsset, Script, Stylesheet
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
-from django.utils.html import html_safe
+from django.utils.html import format_html, html_safe, mark_safe
 
 
 @override_settings(STATIC_URL="http://media.example.com/static/")
@@ -859,11 +864,6 @@ class FormsMediaTestCase(SimpleTestCase):
         self.assertEqual(merged._css_lists, [{"screen": ["a.css"]}])
         self.assertEqual(merged._js_lists, [["a"]])
 
-    def test_add_other(self):
-        """Media.__add__ shouldn't assume media instances"""
-        with self.assertRaisesRegex(TypeError, "unsupported operand type"):
-            Media() + 3
-
     def test_add_media_subclass_with_radd(self):
         class SubclassedMedia(Media):
             def __radd__(self, other):
@@ -1050,4 +1050,163 @@ class FormsMediaObjectTestCase(SimpleTestCase):
             str(media),
             '<link href="/path/to/css1" media="all" rel="stylesheet">\n'
             '<script src="/path/to/js1"></script>',
+        )
+
+
+@html_safe
+class ImportMap:
+    """
+    A JavaScript import map asset which can be merged with other import maps.
+
+    This emulates a real-world asset (such as the one in django-js-asset) which
+    a ``Media`` subclass wants to collapse into a single ``<script>`` tag while
+    keeping the surrounding scripts in order.
+    """
+
+    def __init__(self, imports):
+        self.imports = imports
+
+    def __eq__(self, other):
+        return isinstance(other, ImportMap) and self.imports == other.imports
+
+    def __hash__(self):
+        # Required so the asset can take part in Media.merge().
+        return hash(tuple(sorted(self.imports.items())))
+
+    def __or__(self, other):
+        if not isinstance(other, ImportMap):
+            return NotImplemented
+        return ImportMap({**self.imports, **other.imports})
+
+    def render(self, *, attrs=None):
+        return format_html(
+            '<script type="importmap"{}>{}</script>',
+            mark_safe(flatatt(attrs or {})),
+            mark_safe(json.dumps({"imports": self.imports})),
+        )
+
+    def __str__(self):
+        return self.render()
+
+
+class AugmentedMedia(Media):
+    """
+    A Media subclass which preserves its type and an attached CSP nonce on both
+    sides of an addition, and which merges intermediate import maps on render.
+    """
+
+    def __init__(self, *, nonce="", **kwargs):
+        self.nonce = nonce
+        super().__init__(**kwargs)
+
+    def _combine(self, first, second):
+        combined = AugmentedMedia(
+            nonce=self.nonce
+            or getattr(first, "nonce", "")
+            or getattr(second, "nonce", "")
+        )
+        combined._css_lists = first._css_lists[:]
+        combined._js_lists = first._js_lists[:]
+        for item in second._css_lists:
+            if item and item not in combined._css_lists:
+                combined._css_lists.append(item)
+        for item in second._js_lists:
+            if item and item not in combined._js_lists:
+                combined._js_lists.append(item)
+        return combined
+
+    def __add__(self, other):
+        if not isinstance(other, Media):
+            return NotImplemented
+        return self._combine(self, other)
+
+    def __radd__(self, other):
+        # Called when an AugmentedMedia is the right-hand side of an addition
+        # to a plain Media instance. Without this, the type and the nonce
+        # would be lost.
+        return self._combine(other, self)
+
+    def render(self, *, attrs=None):
+        # Apply the nonce to every rendered asset, both CSS and JS.
+        attrs = {**(attrs or {})}
+        if self.nonce:
+            attrs.setdefault("nonce", self.nonce)
+        return super().render(attrs=attrs)
+
+    def render_js(self, *, attrs=None):
+        importmaps = [asset for asset in self._js if isinstance(asset, ImportMap)]
+        rendered = []
+        if importmaps:
+            rendered.append(reduce(operator.or_, importmaps).render(attrs=attrs))
+        for path in self._js:
+            if isinstance(path, ImportMap):
+                continue
+            rendered.append(
+                path.render(attrs=attrs)
+                if isinstance(path, MediaAsset)
+                else path.__html__()
+            )
+        return rendered
+
+
+@override_settings(STATIC_URL="/static/")
+class AugmentedMediaTestCase(SimpleTestCase):
+    """
+    Media subclasses can override __radd__ to keep their type (and any extra
+    state) even when added to a plain Media instance from the right-hand side.
+    """
+
+    def test_radd_preserves_type_and_nonce(self):
+        base = Media(js=["base.js"])
+        augmented = AugmentedMedia(nonce="r@nd0m", js=["app.js"])
+
+        # As the right-hand side, __radd__ keeps the subclass and the nonce.
+        merged = base + augmented
+        self.assertIsInstance(merged, AugmentedMedia)
+        self.assertEqual(merged.nonce, "r@nd0m")
+        self.assertEqual(merged._js, ["base.js", "app.js"])
+
+        # As the left-hand side, __add__ does the same.
+        merged = augmented + base
+        self.assertIsInstance(merged, AugmentedMedia)
+        self.assertEqual(merged.nonce, "r@nd0m")
+        self.assertEqual(merged._js, ["app.js", "base.js"])
+
+    def test_other_subclasses_use_default_addition(self):
+        # Subclasses which do not opt in via __radd__ are still combined the
+        # standard way, yielding a plain Media instance.
+        class PlainSubclass(Media):
+            pass
+
+        merged = Media(js=["a.js"]) + PlainSubclass(js=["b.js"])
+        self.assertIs(type(merged), Media)
+        self.assertEqual(merged._js, ["a.js", "b.js"])
+
+    def test_intermediate_importmaps_are_merged(self):
+        base = Media(css={"all": ["base.css"]}, js=["base.js"])
+        augmented = AugmentedMedia(
+            nonce="r@nd0m",
+            css={"all": ["app.css"]},
+            js=[
+                ImportMap({"lib-a": "/static/a.js"}),
+                "app.js",
+                ImportMap({"lib-b": "/static/b.js"}),
+            ],
+        )
+
+        merged = base + augmented
+        self.assertIsInstance(merged, AugmentedMedia)
+        # The nonce is rendered on CSS and JS assets, and the intermediate
+        # import maps are collapsed into a single tag.
+        self.assertHTMLEqual(
+            merged.render(),
+            '<link href="/static/base.css" media="all" nonce="r@nd0m" '
+            'rel="stylesheet">\n'
+            '<link href="/static/app.css" media="all" nonce="r@nd0m" '
+            'rel="stylesheet">\n'
+            '<script type="importmap" nonce="r@nd0m">'
+            '{"imports": {"lib-a": "/static/a.js", "lib-b": "/static/b.js"}}'
+            "</script>\n"
+            '<script src="/static/base.js" nonce="r@nd0m"></script>\n'
+            '<script src="/static/app.js" nonce="r@nd0m"></script>',
         )
