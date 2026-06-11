@@ -25,7 +25,7 @@ here's how we recommend you read the docs:
 
 Docs are updated rigorously. If you find any problems in the docs, or think
 they should be clarified in any way, please take 30 seconds to fill out a
-ticket here: https://code.djangoproject.com/newticket
+ticket here: https://code.djangoproject.com
 
 To get more help:
 
