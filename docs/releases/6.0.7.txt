@@ -35,6 +35,20 @@ affected.
 This issue has severity "low" according to the :ref:`Django security policy
 <severity-levels>`.
 
+CVE-2026-53878: Header injection possibility since ``DomainNameValidator`` accepted newlines in input
+=====================================================================================================
+
+:class:`~django.core.validators.DomainNameValidator` accepted newlines in
+domain names. If such values were included in HTTP responses, header injection
+attacks were possible. Django itself wasn't vulnerable because
+:class:`~django.http.HttpResponse` prohibits newlines in HTTP headers.
+
+The vulnerability only affected uses of ``DomainNameValidator`` outside Django
+form fields, as ``CharField`` strips newlines by default.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
 Bugfixes
 ========
 
