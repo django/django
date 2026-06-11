@@ -11,10 +11,12 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      TARGET_BRANCH: ${{ inputs.branch }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.branch }}
+          ref: ${{ env.TARGET_BRANCH }}
 
       - uses: actions/setup-python@v5
         with:
