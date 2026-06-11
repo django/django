@@ -47,7 +47,7 @@ class Deserializer(PythonDeserializer):
             stream_or_string = stream_or_string.decode()
         if isinstance(stream_or_string, str):
             stream_or_string = stream_or_string.splitlines()
-        super().__init__(Deserializer._get_lines(stream_or_string), **options)
+        super().__init__(self._get_lines(stream_or_string), **options)
 
     def _handle_object(self, obj):
         try:
