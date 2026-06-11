@@ -505,7 +505,7 @@ email backend API :ref:`provides an alternative
     * ``cc``: A list or tuple of recipient addresses used in the "Cc" header
       when sending the email.
 
-    * ``bcc``: A list or tuple of addresses used in the "Bcc" header when
+    * ``bcc``: A list or tuple of addresses used for blind carbon copies when
       sending the email.
 
     * ``reply_to``: A list or tuple of recipient addresses used in the
