@@ -92,11 +92,11 @@ msgid ""
 "as Single Sign-On or LDAP."
 msgstr ""
 "Apakah pengguna dapat mengautentifikasi menggunakan sandi atau tidak. Jika "
-"ditiadakan, mereka mungkin masih dapat autentidikasi menggunakan backend "
+"ditiadakan, mereka mungkin masih dapat melakukan autentikasi menggunakan backend "
 "lain, seperti Single Sign-On atau LDAP."
 
 msgid "Password-based authentication"
-msgstr "Autentidikasi berdasarkan-sandi"
+msgstr "Autentikasi berdasarkan-sandi"
 
 msgid "Enabled"
 msgstr "Diadakan"
