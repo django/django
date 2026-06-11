@@ -3106,18 +3106,42 @@ class CacheMiddlewareTest(SimpleTestCase):
 
     def test_sensitive_cookie_not_cached(self):
         """
-        Django must prevent caching of responses that set a user-specific (and
-        maybe security sensitive) cookie in response to a cookie-less request.
+        Responses that set a new cookie not present in the request are not
+        cached, regardless of whether the request already had other cookies.
         """
-        request = self.factory.get("/view/")
-        csrf_middleware = CsrfViewMiddleware(csrf_view)
-        csrf_middleware.process_view(request, csrf_view, (), {})
-        cache_middleware = CacheMiddleware(csrf_middleware)
+        for headers in ({}, {"HTTP_COOKIE": "unrelated=value"}):
+            with self.subTest(headers=headers):
+                request = self.factory.get("/view/", **headers)
+                csrf_middleware = CsrfViewMiddleware(csrf_view)
+                csrf_middleware.process_view(request, csrf_view, (), {})
+                cache_middleware = CacheMiddleware(csrf_middleware)
+
+                self.assertIsNone(cache_middleware.process_request(request))
+                cache_middleware(request)
+
+                # Inserting a CSRF cookie prevented caching.
+                self.assertIsNone(cache_middleware.process_request(request))
+
+    def test_refreshed_cookie_not_cached(self):
+        """
+        A response that updates the value of a cookie already present in the
+        request is not cached. Caching it would allow a stale cookie value to
+        be served to a different client via a Vary: Cookie cache hit.
+        """
+
+        def refreshing_cookie_view(request):
+            response = HttpResponse("content")
+            response.set_cookie("session", "new_value")
+            patch_vary_headers(response, ("Cookie",))
+            return response
+
+        request = self.factory.get("/view/", HTTP_COOKIE="session=old_value")
+        cache_middleware = CacheMiddleware(refreshing_cookie_view)
 
         self.assertIsNone(cache_middleware.process_request(request))
         cache_middleware(request)
 
-        # Inserting a CSRF cookie in a cookie-less request prevented caching.
+        # The response refreshed an existing cookie so it must not be cached.
         self.assertIsNone(cache_middleware.process_request(request))
 
     def test_304_response_has_http_caching_headers_but_not_cached(self):
