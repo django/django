@@ -665,6 +665,8 @@ TEST_DATA = [
     (validate_domain_name, "dashinpunytld.xn---c", None),
     (validate_domain_name, "python..org", ValidationError),
     (validate_domain_name, "python-.org", ValidationError),
+    (validate_domain_name, "example.com\n", ValidationError),
+    (validate_domain_name, "example.com\r\n", ValidationError),
     (validate_domain_name, "too-long-name." * 20 + "com", ValidationError),
     (validate_domain_name, "stupid-name试", ValidationError),
     (validate_domain_name, "255.0.0.0", ValidationError),
@@ -677,6 +679,8 @@ TEST_DATA = [
         ValidationError,
     ),
     (DomainNameValidator(accept_idna=False), "ıçğü.com", ValidationError),
+    (DomainNameValidator(accept_idna=False), "example.com\n", ValidationError),
+    (DomainNameValidator(accept_idna=False), "example.com\r\n", ValidationError),
     (DomainNameValidator(accept_idna=False), "not-domain-name", ValidationError),
     (
         DomainNameValidator(accept_idna=False),
