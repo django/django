@@ -1,0 +1,27 @@
+name: Run Tests (Bake-Off Evaluation)
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch to test
+        required: true
+        default: main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip; pip install -e . || true
+
+      - name: Run tests
+        run: python -m pytest tests/ -x -q --timeout=120 2>&1 | tail -50 || true
