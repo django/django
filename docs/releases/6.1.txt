@@ -470,6 +470,10 @@ Email
   ``EmailMessage``. (This behavior was never documented. The ``send()`` method
   will still *use* a ``connection`` that is set on the message before sending.)
 
+* :meth:`.EmailMessage.message` now raises a ``ValueError`` if ``Bcc`` is
+  included in the ``headers`` argument or ``extra_headers`` attribute. Use the
+  ``bcc`` argument instead.
+
 Models
 ------
 

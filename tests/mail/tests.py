@@ -397,6 +397,18 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
         self.assertNotIn("bcc@example.com", message.as_string())
         self.assertEqual(email.recipients(), ["to@example.com", "bcc@example.com"])
 
+    def test_bcc_in_headers_raises_error(self):
+        email = EmailMessage(
+            to=["to@example.com"],
+            headers={"Bcc": "bcc@example.com"},
+        )
+        msg = (
+            'Bcc is not a valid email header. Use the "bcc" argument to '
+            "specify blind carbon copy recipients."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            email.message()
+
     def test_reply_to(self):
         with self.subTest("Single Reply-To"):
             email = EmailMessage(
