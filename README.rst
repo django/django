@@ -27,7 +27,7 @@ Docs are updated rigorously. If you find any problems in the docs, or think
 they should be clarified in any way, please take 30 seconds to fill out a
 new ticket here: https://code.djangoproject.com You can log in with your 
 GitHub account, or with a Django Project account if you have one. Once you log in, 
-a New Ticket button is available.
+a New Ticket button is available next to View Tickets.
 
 To get more help:
 
