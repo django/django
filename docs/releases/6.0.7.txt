@@ -7,6 +7,20 @@ Django 6.0.7 release notes
 Django 6.0.7 fixes three security issues with severity "low" and one bug in
 6.0.6.
 
+CVE-2026-48588: Potential exposure of private data via cached ``Set-Cookie`` response
+=====================================================================================
+
+:class:`~django.middleware.cache.UpdateCacheMiddleware` and
+:func:`~django.views.decorators.cache.cache_page` avoided caching responses
+that set a cookie while varying on ``Cookie`` only when the incoming request
+contained no cookies at all. When the request already carried an unrelated
+cookie (such as a language or theme preference cookie), the protection did not
+apply, allowing a response that sets a session or other sensitive cookie to be
+stored in Django's shared cache.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
 Bugfixes
 ========
 
