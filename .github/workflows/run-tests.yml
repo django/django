@@ -8,6 +8,9 @@ on:
         required: true
         default: main
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -17,6 +20,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ env.TARGET_BRANCH }}
+          persist-credentials: false
 
       - uses: actions/setup-python@v5
         with:
