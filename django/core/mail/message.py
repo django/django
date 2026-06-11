@@ -360,8 +360,14 @@ class EmailMessage:
             # Use cached DNS_NAME for performance
             msg["Message-ID"] = make_msgid(domain=DNS_NAME)
         for name, value in self.extra_headers.items():
+            header = name.lower()
+            if header == "bcc":
+                raise ValueError(
+                    'Bcc is not a valid email header. Use the "bcc" '
+                    "argument to specify blind carbon copy recipients."
+                )
             # Avoid headers handled above.
-            if name.lower() not in {"from", "to", "cc", "reply-to"}:
+            if header not in {"from", "to", "cc", "reply-to"}:
                 msg[name] = force_str(value, strings_only=True)
         self._idna_encode_address_header_domains(msg)
         return msg
