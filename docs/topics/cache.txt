@@ -253,8 +253,10 @@ In this example, the cache table's name is ``my_cache_table``::
     }
 
 Unlike other cache backends, the database cache does not support automatic
-culling of expired entries at the database level. Instead, expired cache
-entries are culled when an ``add()``, ``set()``, or ``touch()`` is called.
+culling of expired entries at the database level. Instead, an expired cache
+entry is deleted when evaluated by a ``get()`` request. Furthermore,
+expired cache entries are culled when ``add()``, ``set()``, or ``touch()``
+is called and the number of entries exceeds ``MAX_ENTRIES``.
 
 Since the cull operation can be expensive for a large cache, you may control
 how often this check occurs by setting ``CULL_PROBABILITY`` to a value between
