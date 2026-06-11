@@ -2316,6 +2316,7 @@ adds some of its own (the shared features are actually defined in the
 - :attr:`~ModelAdmin.filter_vertical`
 - :attr:`~ModelAdmin.ordering`
 - :attr:`~ModelAdmin.prepopulated_fields`
+- :meth:`~ModelAdmin.get_exclude`
 - :meth:`~ModelAdmin.get_fieldsets`
 - :meth:`~ModelAdmin.get_queryset`
 - :attr:`~ModelAdmin.radio_fields`
