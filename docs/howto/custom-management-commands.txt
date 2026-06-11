@@ -91,6 +91,22 @@ to ``False`` for each one. If the user referenced any nonexistent polls, a
 the :doc:`tutorial</intro/tutorial02>` and was added to
 ``polls.models.Question`` for this example.
 
+Database connections and multiprocessing
+========================================
+
+If a custom management command uses :mod:`multiprocessing`, avoid sharing
+database connections created in the parent process with child processes. Close
+all database connections before starting worker processes so each child process
+opens its own connection on first database access::
+
+    from django.db import connections
+
+    connections.close_all()
+
+This is especially important when using the ``fork`` start method and the
+management command has already performed ORM queries before starting child
+processes.
+
 .. _custom-commands-options:
 
 Accepting optional arguments
