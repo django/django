@@ -56,6 +56,11 @@ Each item in the list should be an email address string. Example::
 
     ADMINS = ["john@example.com", '"Ng, Mary" <mary@example.com>']
 
+To safely build an address with a display name from variable content, see
+:ref:`formatting-addresses`, which recommends using
+:class:`~email.headerregistry.Address` over string formatting, but since this
+setting requires a list of strings, wrap each ``Address`` in ``str(...)``.
+
 .. setting:: ALLOWED_HOSTS
 
 ``ALLOWED_HOSTS``
@@ -1350,6 +1355,9 @@ any format valid in the chosen email sending protocol.
 
 This doesn't affect error messages sent to :setting:`ADMINS` and
 :setting:`MANAGERS`. See :setting:`SERVER_EMAIL` for that.
+
+To build an address with a display name from variable content, see
+:ref:`formatting-addresses`.
 
 .. setting:: DEFAULT_INDEX_TABLESPACE
 
@@ -2796,6 +2804,9 @@ The email address that error messages come from, such as those sent to
 :setting:`ADMINS` and :setting:`MANAGERS`. This address is used in the
 ``From:`` header and can take any format valid in the chosen email sending
 protocol.
+
+To build an address with a display name from variable content, see
+:ref:`formatting-addresses`.
 
 .. admonition:: Why are my emails sent from a different address?
 
