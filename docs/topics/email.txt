@@ -495,7 +495,8 @@ email backend API :ref:`provides an alternative
     * ``body``: The body text. This should be a plain text message.
 
     * ``from_email``: The sender's address. Both ``fred@example.com`` and
-      ``"Fred" <fred@example.com>`` forms are legal. If omitted, the
+      ``"Fred" <fred@example.com>`` forms are supported (see
+      :ref:`formatting-addresses`). If omitted, the
       :setting:`DEFAULT_FROM_EMAIL` setting is used.
 
     * ``to``: A list or tuple of recipient addresses.
@@ -792,47 +793,112 @@ example::
     msg.content_subtype = "html"  # Main content is now text/html
     msg.send()
 
-Preventing header injection
----------------------------
+Safely sending email
+--------------------
 
-`Header injection`_ is a security exploit in which an attacker inserts extra
-email headers to control the "To:" and "From:" in email messages that your
-scripts generate.
+Any public website that can send email will eventually be targeted by attempts
+to abuse it for spam, phishing, or other malicious content. While a complete
+discussion of vulnerabilities in sending email is beyond the scope of Django's
+documentation, there are many references available on the web. Two good
+starting points are:
 
-The Django email functions outlined above all protect against header injection
-by forbidding newlines in header values. If any ``subject``, ``from_email`` or
-``recipient_list`` contains a newline (in either Unix, Windows or Mac style),
-the email function (e.g. :func:`send_mail`) will raise :exc:`ValueError` and,
-hence, will not send the email. It's your responsibility to validate all data
-before passing it to the email functions.
+* Princeton University's guidance on `preventing email abuse in web forms`_.
+  Although this is an internal reference for users of Princeton's Drupal Site
+  Builder, nearly all of its advice applies equally to sites built with Django
+  (or any web framework).
 
-If a ``message`` contains headers at the start of the string, the headers will
-be printed as the first bit of the email message.
+* OWASP's `Email Validation and Verification in Identity Systems Cheat Sheet`_.
+  This primarily covers using email in authentication contexts. While many of
+  its recommendations are handled by :mod:`django.contrib.auth` and other
+  Django features, items like rate limiting and securing email change workflows
+  are the developer's responsibility.
 
-Here's an example view that takes a ``subject``, ``message`` and ``from_email``
-from the request's POST data, sends that to ``admin@example.com`` and redirects
-to "/contact/thanks/" when it's done::
+Thinking through how email might be abused (and taking steps to mitigate it) is
+especially important if your site can send to unverified addresses. Features
+like newsletter sign-up, contact forms that cc or auto-reply to the sender, and
+"share this page" can be attractive targets.
+
+.. _preventing email abuse in web forms:
+    https://sitebuilder.princeton.edu/site-administration/spam
+.. _Email Validation and Verification in Identity Systems Cheat Sheet:
+    https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html
+
+.. _formatting-addresses:
+
+Formatting email addresses
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Email addresses allow a "friendly" display name alongside the ``user@domain``
+address. For example, you could include your company name in the
+:setting:`DEFAULT_FROM_EMAIL` setting::
+
+    DEFAULT_FROM_EMAIL = '"Example, Inc." <contact@example.com>'
+
+The double quotes around ``"Example, Inc."`` are needed so the comma isn't read
+as separating two different addresses. A fixed address, written out by hand as
+in the example above, is safe, but composing one from variable parts
+(especially untrusted input) needs more care.
+
+.. warning::
+
+    Never use string formatting to build an email address from variable parts.
+    For example, ``f'"{name}" <{email}>'`` is **unsafe**.
+
+Email address headers have complex syntax rules (much like HTML or SQL), so
+constructing them by combining strings creates an injection vulnerability. Even
+if you've :class:`validated <.EmailValidator>` the format of ``email``, an
+attacker could exploit the ``name`` portion to inject additional addresses.
+
+To avoid this, always use a well-tested library specifically meant to format
+email addresses, like Python's :class:`email.headerregistry.Address` class (the
+replacement for the legacy :func:`~email.utils.formataddr` function, which does
+not support internationalized domain names).
+
+For example, to include a user's full name when sending them email (where
+``user`` is an instance of the default :class:`.User` model)::
 
     from django.core.mail import send_mail
-    from django.http import HttpResponse, HttpResponseRedirect
+    from email.headerregistry import Address
 
 
-    def send_email(request):
-        subject = request.POST.get("subject", "")
-        message = request.POST.get("message", "")
-        from_email = request.POST.get("from_email", "")
-        if subject and message and from_email:
-            try:
-                send_mail(subject, message, from_email, ["admin@example.com"])
-            except ValueError:
-                return HttpResponse("Invalid header found.")
-            return HttpResponseRedirect("/contact/thanks/")
-        else:
-            # In reality we'd use a form class
-            # to get proper validation errors.
-            return HttpResponse("Make sure all fields are entered and valid.")
+    def send_mail_to_user(user, subject, body, from_email=None):
+        # Safely create an email address with the user's name.
+        # (addr_spec is the technical term for the user@domain address.)
+        address = Address(
+            display_name=user.get_full_name(),
+            addr_spec=user.email,
+        )
+        send_mail(subject, body, from_email, [address])
 
-.. _Header injection: http://www.nyphp.org/phundamentals/8_Preventing-Email-Header-Injection.html
+Django's built-in email backends support using
+:class:`~email.headerregistry.Address` objects directly in any address field,
+as shown here. So do many custom and third-party email backends. But if this
+causes a ``TypeError`` or other problem with a particular backend, use
+``str(address)`` to convert the object to a safe, properly formatted string.
+
+Preventing header injection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`Email header injection`_ is a security exploit in which an attacker
+manipulates email headers to change the intended sender or recipients, subject,
+or potentially even the entire visible message body.
+
+One type of header injection exploits address header syntax. You are
+responsible for preventing this when constructing email addresses from
+user-supplied input, as described in :ref:`formatting-addresses` above.
+
+Another (perhaps better understood) attack, CRLF injection, uses carriage
+return and line feed characters to insert additional headers into the email.
+Django prevents this by raising a :exc:`ValueError` if those characters appear
+in any header field when trying to send the message.
+
+Django's CRLF protection relies on using Python's modern
+:class:`~email.policy.EmailPolicy` in Django's :meth:`EmailMessage.message`.
+Custom email backends that don't call that function, or that call it with the
+legacy :data:`~email.policy.compat32` policy, are responsible for implementing
+their own CRLF injection prevention.
+
+.. _Email header injection: https://en.wikipedia.org/wiki/Email_injection
 
 .. _topics-sending-multiple-emails:
 
