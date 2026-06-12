@@ -56,6 +56,18 @@ Each item in the list should be an email address string. Example::
 
     ADMINS = ["john@example.com", '"Ng, Mary" <mary@example.com>']
 
+To construct email addresses from variable content, use Python's
+:class:`email.headerregistry.Address` object (see
+:ref:`formatting-email-addresses`). The address must be converted to a
+``str``::
+
+    from email.headerregistry import Address
+    from os import environ
+
+    ADMINS = [
+        str(Address(display_name=environ["ADMIN_NAME"], addr_spec=environ["ADMIN_EMAIL"]))
+    ]
+
 .. setting:: ALLOWED_HOSTS
 
 ``ALLOWED_HOSTS``
@@ -1346,7 +1358,8 @@ Default: ``'webmaster@localhost'``
 
 Default email address for automated correspondence from the site manager(s).
 This address is used in the ``From:`` header of outgoing emails and can take
-any format valid in the chosen email sending protocol.
+any format valid in the chosen email sending protocol (see
+:ref:`formatting-email-addresses`).
 
 This doesn't affect error messages sent to :setting:`ADMINS` and
 :setting:`MANAGERS`. See :setting:`SERVER_EMAIL` for that.
@@ -2795,7 +2808,7 @@ Default: ``'root@localhost'``
 The email address that error messages come from, such as those sent to
 :setting:`ADMINS` and :setting:`MANAGERS`. This address is used in the
 ``From:`` header and can take any format valid in the chosen email sending
-protocol.
+protocol (see :ref:`formatting-email-addresses`).
 
 .. admonition:: Why are my emails sent from a different address?
 
