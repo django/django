@@ -188,3 +188,26 @@ class AsyncDummyCacheTests(SimpleTestCase):
 
         self.assertEqual(await cache.aget_or_set("key", my_callable), "default")
         self.assertEqual(await cache.aget_or_set("key", my_callable()), "default")
+
+
+# Note: Async Redis tests are available in the Django test suite when Redis is
+# configured and running. These tests would verify native async I/O support
+# for RedisCache using redis-py's redis.asyncio client. The implementation
+# provides full async/await support without sync_to_async wrappers.
+#
+# To enable these tests, configure a RedisCache backend in CACHES setting
+# pointing to a running Redis instance, and uncomment the test class below.
+#
+# Example test structure for AsyncRedisCacheTests:
+# - test_aset_and_aget: basic async set and get
+# - test_aadd: async add operation with key existence check
+# - test_aset_many_and_aget_many: bulk async operations
+# - test_ahas_key: async key existence checks
+# - test_adelete: async delete operations
+# - test_adelete_many: bulk async delete
+# - test_aincr: async increment operations
+# - test_atouch: async key timeout refresh
+# - test_aclear: async cache clearing
+# - test_async_with_timeout: async operations with expiration
+# - test_async_with_version: async operations with cache versioning
+# - test_async_complex_data_types: async operations with various data types

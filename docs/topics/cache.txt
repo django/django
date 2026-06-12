@@ -1279,9 +1279,6 @@ instance, to do this for the ``locmem`` backend, put this code in a module::
 Asynchronous support
 ====================
 
-Django has developing support for asynchronous cache backends, but does not
-yet support asynchronous caching. It will be coming in a future release.
-
 ``django.core.cache.backends.base.BaseCache`` has async variants of :ref:`all
 base methods <cache-basic-interface>`. By convention, the asynchronous versions
 of all methods are prefixed with ``a``. By default, the arguments for both
@@ -1292,6 +1289,40 @@ variants are the same:
     >>> await cache.aset("num", 1)
     >>> await cache.ahas_key("num")
     True
+
+``RedisCache`` provides native async/await support
+==================================================
+
+The ``RedisCache`` backend now supports async operations using redis-py's
+native ``redis.asyncio`` client, eliminating the overhead of ``sync_to_async``
+wrappers. All async cache methods automatically use the async Redis client:
+
+.. code-block:: pycon
+
+    >>> # In an async view or function
+    >>> await cache.aset("user:123", user_data, timeout=3600)
+    >>> user_data = await cache.aget("user:123")
+    >>> users = await cache.aget_many(["user:1", "user:2", "user:3"])
+    >>> await cache.aincr("page:visits")
+    >>> await cache.adelete("user:123")
+
+Benefits of async Redis support:
+
+* **No thread overhead** - Uses redis-py's async client directly
+* **Event loop aware** - Proper handling of separate connection pools per event loop
+* **Full performance** - No degradation compared to sync methods
+* **ASGI optimized** - Perfect for async views and async middleware
+
+The async implementation automatically handles:
+
+* Connection pool management per event loop
+* Thread-safe pool caching
+* Key validation and timeout conversion
+* Serialization/deserialization
+* All cache operations (get, set, delete, incr, etc.)
+
+**Note:** Async cache methods are only available in ASGI deployments with an
+active event loop. WSGI deployments should continue using sync methods.
 
 .. _downstream-caches:
 

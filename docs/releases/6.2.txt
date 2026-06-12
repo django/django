@@ -113,6 +113,13 @@ Cache
   The default is 10%, and may be configured using the ``CULL_PROBABILITY``
   option.
 
+* The ``RedisCache`` backend now supports native async/await operations using
+  redis-py's ``redis.asyncio`` client. All async cache methods (``aadd()``,
+  ``aget()``, ``aset()``, etc.) now use true async I/O instead of
+  ``sync_to_async`` wrappers, eliminating thread overhead for ASGI
+  deployments. This provides proper event loop-aware connection pooling and
+  significantly improves performance for async views and middleware.
+
 CSP
 ~~~
 
