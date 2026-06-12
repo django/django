@@ -74,6 +74,10 @@ the resulting output; it never appears in the ``fields`` part.
 Inherited models
 ----------------
 
+Approaches to serializing models that inherit from other classes will vary
+depending on the type of inheritance, and how you intend to use the serialized
+data.
+
 If you have a model that is defined using an :ref:`abstract base class
 <abstract-base-classes>`, you don't have to do anything special to serialize
 that model. Call the serializer on the object (or objects) that you want to
@@ -81,9 +85,9 @@ serialize, and the output will be a complete representation of the serialized
 object.
 
 However, if you have a model that uses :ref:`multi-table inheritance
-<multi-table-inheritance>`, you also need to serialize all of the base classes
-for the model. This is because only the fields that are locally defined on the
-model will be serialized. For example, consider the following models::
+<multi-table-inheritance>`, you need to intentionally serialize the base models
+as well. This is because only the fields that are locally defined on each model
+will be serialized. For example, consider the following models::
 
     class Place(models.Model):
         name = models.CharField(max_length=50)
@@ -99,11 +103,47 @@ If you only serialize the Restaurant model::
 the fields on the serialized output will only contain the ``serves_hot_dogs``
 attribute. The ``name`` attribute of the base class will be ignored.
 
-In order to fully serialize your ``Restaurant`` instances, you will need to
-serialize the ``Place`` models as well::
+If your eventual goal is to deserialize the data into ``Restaurant`` model
+objects, you will need to serialize the ``Place`` model objects as well::
 
-    all_objects = [*Restaurant.objects.all(), *Place.objects.all()]
+    all_objects = [*Place.objects.all(), *Restaurant.objects.all()]
     data = serializers.serialize("json", all_objects)
+
+This will output all the ``Place`` objects with their ``name`` values, and
+then the ``Restaurant`` objects with their ``serves_hot_dogs`` values::
+
+    [
+        {"model": "myapp.place", "pk": 1, "fields": {"name": "Burger Joint"}},
+        {"model": "myapp.place", "pk": 2, "fields": {"name": "Hot Dog Palace"}},
+        {"model": "myapp.restaurant", "pk": 1, "fields": {"serves_hot_dogs": false}},
+        {"model": "myapp.restaurant", "pk": 2, "fields": {"serves_hot_dogs": true}},
+    ]
+
+This format is suitable for deserializing into a database using
+``serializers.deserialize()`` or the :djadmin:`loaddata` management command.
+
+On the other hand, if you only need to serialize the ``Restaurant`` object for
+consumption by an API client, it might be more appropriate to use the Python
+JSON library directly::
+
+    data = json.dumps(
+        [
+            {
+                "id": r.id,
+                "name": r.name,
+                "serves_hot_dogs": r.serves_hot_dogs,
+            }
+            for r in Restaurant.objects.select_related()
+        ]
+    )
+
+This produces simpler output, though is no longer suitable for deserializing
+into Django model objects::
+
+    [
+        {"id": 1, "name": "Burger Joint", "serves_hot_dogs": false},
+        {"id": 2, "name": "Hot Dog Palace", "serves_hot_dogs": true},
+    ]
 
 Deserializing data
 ==================
