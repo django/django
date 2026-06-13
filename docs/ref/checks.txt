@@ -84,6 +84,7 @@ Django's system checks are organized using the following tags:
   or if you specify configured database aliases using the ``--database`` option
   when calling the :djadmin:`check` command.
 * ``files``: Checks files related configuration.
+* ``mail``: Checks email related configuration.
 * ``models``: Checks of model, field, and manager definitions.
 * ``security``: Checks security related configuration.
 * ``signals``: Checks on signal declarations and handler registrations.
@@ -150,6 +151,15 @@ If you're using MySQL or MariaDB, the following checks will be performed:
   ``<alias>``. See also :ref:`mysql-sql-mode`.
 * **mysql.W003**: MySQL/MariaDB may not allow unique ``CharField``\s to have a
   ``max_length`` > 255.
+
+Mail
+----
+
+The following checks verify that your :setting:`MAILERS` setting is correctly
+configured:
+
+* **mail.W001**: Your :setting:`MAILERS` setting has no ``'default'`` entry.
+  Sending email without a valid mailer will fail.
 
 Managing files
 --------------
