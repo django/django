@@ -237,6 +237,12 @@ CSP
   :func:`~django.template.context_processors.csp` context processor is
   configured. See :ref:`csp-nonce-config` for setup instructions.
 
+Email
+~~~~~
+
+* A new ``mail.W001`` system check warns when :setting:`MAILERS` is
+  defined without a ``"default"`` configuration.
+
 Forms
 ~~~~~
 
