@@ -49,7 +49,7 @@ MAX_GET_RESULTS = 21
 REPR_OUTPUT_SIZE = 20
 
 DEFAULT_FETCH_MODE = FETCH_ONE
-sql_comment_re = _lazy_re_compile(r"^[\w ._-]+$")
+sql_comment_re = _lazy_re_compile(r"[\w ._-]+")
 
 
 class BaseIterable:

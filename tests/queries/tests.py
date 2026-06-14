@@ -4740,8 +4740,98 @@ class QuerySetCommentTests(TestCase):
         with CaptureQueriesContext(connection) as ctx:
             list(qs)
         sql = ctx.captured_queries[0]["sql"]
-        self.assertIn("/* outer combinator */", sql)
+        self.assertEqual(sql.count("/* outer combinator */"), 1)
         self.assertLess(sql.index("/* outer combinator */"), sql.index("UNION"))
+
+    @skipUnlessDBFeature("supports_select_intersection")
+    def test_comment_inside_intersection_leg(self):
+        qs = NamedCategory.objects.comment("first leg").intersection(
+            NamedCategory.objects.all()
+        )
+        with CaptureQueriesContext(connection) as ctx:
+            list(qs)
+        sql = ctx.captured_queries[0]["sql"]
+        self.assertEqual(sql.count("/* first leg */"), 1)
+
+    @skipUnlessDBFeature("supports_select_intersection")
+    def test_comment_around_intersection(self):
+        qs = NamedCategory.objects.intersection(NamedCategory.objects.all()).comment(
+            "outer combinator"
+        )
+        with CaptureQueriesContext(connection) as ctx:
+            list(qs)
+        sql = ctx.captured_queries[0]["sql"]
+        self.assertEqual(sql.count("/* outer combinator */"), 1)
+        self.assertLess(sql.index("/* outer combinator */"), sql.index("INTERSECT"))
+
+    @skipUnlessDBFeature("supports_select_difference")
+    def test_comment_inside_difference_leg(self):
+        qs = NamedCategory.objects.comment("first leg").difference(
+            NamedCategory.objects.all()
+        )
+        with CaptureQueriesContext(connection) as ctx:
+            list(qs)
+        sql = ctx.captured_queries[0]["sql"]
+        self.assertEqual(sql.count("/* first leg */"), 1)
+
+    @skipUnlessDBFeature("supports_select_difference")
+    def test_comment_around_difference(self):
+        qs = NamedCategory.objects.difference(NamedCategory.objects.all()).comment(
+            "outer combinator"
+        )
+        with CaptureQueriesContext(connection) as ctx:
+            list(qs)
+        sql = ctx.captured_queries[0]["sql"]
+        self.assertEqual(sql.count("/* outer combinator */"), 1)
+        self.assertLess(sql.index("/* outer combinator */"), sql.index("EXCEPT"))
+
+    def test_comment_leg_and_wrapper_combined(self):
+        qs = (
+            NamedCategory.objects.comment("leg")
+            .union(NamedCategory.objects.all())
+            .comment("outer")
+        )
+        with CaptureQueriesContext(connection) as ctx:
+            list(qs)
+        sql = ctx.captured_queries[0]["sql"]
+        self.assertEqual(sql.count("/* leg */"), 1)
+        self.assertEqual(sql.count("/* outer */"), 1)
+        # The outer comment leads the statement; the leg comment follows it.
+        self.assertLess(sql.index("/* outer */"), sql.index("/* leg */"))
+
+    def test_update_multiple_comments(self):
+        NamedCategory.objects.create(name="initial")
+        with CaptureQueriesContext(connection) as ctx:
+            NamedCategory.objects.comment("first").comment("second").update(
+                name="renamed"
+            )
+        update_sql = next(
+            q["sql"] for q in ctx.captured_queries if q["sql"].startswith("UPDATE")
+        )
+        self.assertIn("UPDATE /* first */ /* second */ ", update_sql)
+
+    def test_delete_statements_not_annotated(self):
+        NamedCategory.objects.create(name="doomed")
+        with CaptureQueriesContext(connection) as ctx:
+            NamedCategory.objects.comment("cleanup").filter(name="doomed").delete()
+        delete_sqls = [
+            q["sql"] for q in ctx.captured_queries if q["sql"].startswith("DELETE")
+        ]
+        self.assertTrue(delete_sqls)
+        for sql in delete_sqls:
+            self.assertNotIn("/* cleanup */", sql)
+
+    def test_insert_statements_not_annotated(self):
+        with CaptureQueriesContext(connection) as ctx:
+            DumbCategory.objects.comment("seed").bulk_create(
+                [DumbCategory(), DumbCategory()]
+            )
+        insert_sqls = [
+            q["sql"] for q in ctx.captured_queries if q["sql"].startswith("INSERT")
+        ]
+        self.assertTrue(insert_sqls)
+        for sql in insert_sqls:
+            self.assertNotIn("/* seed */", sql)
 
     def test_rejects_non_string(self):
         msg = "QuerySet.comment() argument must be a string."
