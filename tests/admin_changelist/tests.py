@@ -24,8 +24,8 @@ from django.db.models.lookups import Contains, Exact
 from django.template import Context, Template, TemplateSyntaxError
 from django.test import TestCase, override_settings, skipUnlessDBFeature
 from django.test.client import RequestFactory
-from django.test.utils import CaptureQueriesContext, register_lookup
 from django.test.selenium import screenshot_cases
+from django.test.utils import CaptureQueriesContext, register_lookup
 from django.urls import reverse
 from django.utils import formats
 

@@ -441,11 +441,19 @@ table thead th.sortable div {
     align-items: center;
 }
 
-table thead th.sortable[aria-sort="ascending"] div span:nth-last-child(2):after {
+table
+    thead
+    th.sortable[aria-sort="ascending"]
+    div
+    span:nth-last-child(2):after {
     content: "▲";
 }
 
-table thead th.sortable[aria-sort="descending"] div span:nth-last-child(2):after {
+table
+    thead
+    th.sortable[aria-sort="descending"]
+    div
+    span:nth-last-child(2):after {
     content: "▼";
 }
 
