@@ -207,7 +207,9 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* :meth:`.QuerySet.count` now avoids a redundant ``DISTINCT`` subquery for
+  base-table :meth:`.QuerySet.distinct` queries where row uniqueness is already
+  guaranteed by the model primary key.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
