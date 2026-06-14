@@ -323,6 +323,7 @@ div.datetime {
 div.datetime label {
     padding: 6px 0;
     display: block;
+    font-weight: normal;
 }
 
 div.datetime span {
