@@ -736,7 +736,9 @@ class BaseModelFormSet(BaseFormSet, AltersData):
         pk_required = i < self.initial_form_count()
         if pk_required:
             if self.is_bound:
-                pk_key = "%s-%s" % (self.add_prefix(i), self.model._meta.pk.name)
+                form_kwargs = {"prefix": self.add_prefix(i), **kwargs}
+                pk_form = self.form(**form_kwargs)
+                pk_key = pk_form.add_prefix(self.model._meta.pk.name)
                 try:
                     pk = self.data[pk_key]
                 except KeyError:
