@@ -267,6 +267,28 @@ class FormsFormsetTestCase(SimpleTestCase):
             '<li>Votes: <input type="number" name="choices-1-votes"></li>',
         )
 
+    def test_formset_with_overridden_add_prefix(self):
+        class CustomAddPrefixChoice(Choice):
+            def add_prefix(self, field_name):
+                return (
+                    "%s.%s" % (self.prefix, field_name) if self.prefix else field_name
+                )
+
+        FormSet = formset_factory(CustomAddPrefixChoice)
+        data = {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "0",
+            "form-MIN_NUM_FORMS": "0",
+            "form-MAX_NUM_FORMS": "0",
+            "form-0.choice": "Calexico",
+            "form-0.votes": "100",
+        }
+        formset = FormSet(data)
+        self.assertTrue(formset.is_valid())
+        self.assertEqual(
+            formset.forms[0].cleaned_data, {"choice": "Calexico", "votes": 100}
+        )
+
     def test_blank_form_unfilled(self):
         """A form that's displayed as blank may be submitted as blank."""
         formset = self.make_choiceformset(
