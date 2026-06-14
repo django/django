@@ -324,6 +324,10 @@ Models
   Invalid Base64 strings now raise ``ValidationError`` instead of being
   silently accepted.
 
+* :meth:`.QuerySet.count` now avoids a redundant ``DISTINCT`` subquery for
+  base-table :meth:`.QuerySet.distinct` queries where row uniqueness is already
+  guaranteed by the model primary key.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
