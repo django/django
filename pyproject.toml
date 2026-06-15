@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=77.0.3"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling==1.30.1"]
+build-backend = "hatchling.build"
 
 [project]
 name = "Django"
@@ -56,13 +56,29 @@ Tracker = "https://code.djangoproject.com/"
 target-version = ["py312"]
 force-exclude = "tests/test_runner_apps/tagged/tests_syntax_error.py"
 
+[tool.hatch.build.targets.sdist]
+include = [
+  "CONTRIBUTING.rst",
+  "Gruntfile.js",
+  "INSTALL",
+  "package.json",
+  "tox.ini",
+  "django",
+  "docs",
+  "extras",
+  "js_tests",
+  "tests",
+]
+exclude = [
+  "scripts",
+]
+
+[tool.hatch.version]
+source = "code"
+path = "django/__init__.py"
+search-paths = ["."]
+
 [tool.isort]
 profile = "black"
 default_section = "THIRDPARTY"
 known_first_party = "django"
-
-[tool.setuptools.dynamic]
-version = {attr = "django.__version__"}
-
-[tool.setuptools.packages.find]
-include = ["django*"]
