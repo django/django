@@ -265,6 +265,13 @@ Note the second example is more restrictive.
 If you need to execute more complex queries (for example, queries with ``OR``
 statements), you can use :class:`Q objects <django.db.models.Q>` (``*args``).
 
+.. note::
+
+    Using :meth:`exclude` with an ``__in`` lookup whose subquery can contain
+    ``NULL`` values may *silently* return no results due to SQL's three-valued
+    logic. See the :lookup:`in` lookup for details and a recommended
+    workaround.
+
 ``annotate()``
 ~~~~~~~~~~~~~~
 
@@ -3361,6 +3368,34 @@ extract two field values, where only one is expected::
     # Bad code! Will raise a TypeError.
     inner_qs = Blog.objects.filter(name__contains="Ch").values("name", "id")
     entries = Entry.objects.filter(blog__name__in=inner_qs)
+
+.. warning::
+
+    If the ``QuerySet`` used as the subquery can return ``NULL`` values, take
+    extra care when using it with :meth:`exclude`. Unlike a literal list, where
+    Django removes ``None`` automatically, the values produced by a subquery
+    are used as-is, so a ``NULL`` can reach the generated SQL. Because of the
+    way SQL handles ``NULL`` in three-valued logic, a ``NULL`` in the list of
+    values makes the ``NOT IN`` condition evaluate to unknown (instead of true)
+    for any row that doesn't match a non-``NULL`` value, so no rows qualify and
+    the query may *silently* return no results.
+
+    For example, since an ``Entry`` may have no authors, the ``authors`` values
+    can contain ``NULL``, and this query to find authors who aren't credited on
+    any entry unexpectedly returns nothing::
+
+        credited = Entry.objects.values("authors")
+        Author.objects.exclude(pk__in=credited)
+
+    To avoid this, exclude ``NULL`` values inside the subquery so that the
+    generated list of values never contains ``NULL``::
+
+        credited = Entry.objects.filter(authors__isnull=False).values("authors")
+        Author.objects.exclude(pk__in=credited)
+
+    A :meth:`filter` using ``__in`` is not affected in the same way (it still
+    returns the matching rows), but excluding ``NULL`` values from the subquery
+    is recommended.
 
 .. _nested-queries-performance:
 
