@@ -705,8 +705,38 @@ When :setting:`USE_TZ` is ``False``, it is an error to set this option.
   datetime arithmetic more tricky — you must account for possible offset
   changes over DST transitions.
 
-  Consider converting to local time explicitly with ``AT TIME ZONE`` in raw SQL
-  queries instead of setting the ``TIME_ZONE`` option.
+  Consider converting to local time explicitly in queries instead of setting
+  the ``TIME_ZONE`` option. For example, use PostgreSQL's ``timezone``
+  function to annotate a person's last contact time in Paris time:
+
+  .. code-block:: python
+
+      from django.db import models
+      from django.db.models import DateTimeField, Func, Value
+
+
+      class Person(models.Model):
+          name = models.CharField(max_length=100)
+          last_contacted = models.DateTimeField(null=True, blank=True)
+
+
+      class PostgresTimeZone(Func):
+          function = "timezone"
+          output_field = DateTimeField()
+
+
+      Person.objects.annotate(
+          local_time=PostgresTimeZone(
+              Value("Europe/Paris"),  # Timezone value
+              "last_contacted",  # Column name
+          )
+      )
+
+  This PostgreSQL-specific function returns a naive datetime, even when
+  :setting:`USE_TZ` is ``True``. Other database backends may require their own
+  functions for time zone conversions. Saving this value to a
+  :class:`~django.db.models.DateTimeField` interprets it in Django's default
+  time zone, which may differ from the time zone used in the conversion.
 
 .. setting:: DATABASE-DISABLE_SERVER_SIDE_CURSORS
 
