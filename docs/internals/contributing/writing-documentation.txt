@@ -287,18 +287,20 @@ have the experience of one person addressing another.
 
 The Django documentation is successful because it contains human rhythms and
 patterns. It speaks in the way an expert would speak to help a fellow
-developer. It expresses things in lively and imaginative ways.
+developer. It expresses things in lively and imaginative ways. It's systematic
+but not mechanical.
 
-The documentation doesn't efface the personality of its authors or smooth
-everything into a slippery, dull surface. The documentation should not
-reach for high-sounding but empty descriptions: for example, overusing
-superlatives such as *clear*, *robust*, or *structured*. We find ways to write
-systematically without being mechanical.
+The documentation doesn't erase the personality of its authors or smooth
+everything into a slippery, dull surface. Some friction is necessary for a
+reader to grasp a concept.
+
+The documentation should not reach for grandiose but empty descriptions: for
+example, by overusing superlatives such as *clear*, *robust*, or *structured*.
 
 To make this more concrete, we present the same information in two versions:
-human and indistinct. The "human" example is excerpted from this documentation.
-The "indistinct" version was produced by prompting an AI tool for a version
-"suitable for a pull request (smooth and professional)":
+human and frictionless. The "human" example is excerpted from this
+documentation. The "frictionless" version was produced by prompting an AI tool
+for a version "suitable for a pull request (smooth and professional)":
 
 .. admonition:: Human version (excerpted from Django's documentation)
 
@@ -316,7 +318,7 @@ The "indistinct" version was produced by prompting an AI tool for a version
   primary-key value explicitly when saving new objects, if you cannot guarantee
   the primary-key value is unused.
 
-.. admonition:: Indistinct version
+.. admonition:: Frictionless version
 
   How Django determines UPDATE vs. INSERT
 
@@ -333,18 +335,17 @@ The "indistinct" version was produced by prompting an AI tool for a version
   database errors.
 
 Notice how the revision does not address the reader (originally: "you may have
-noticed"), removes the figurative language (originally: "Django knows"),
-impairs the sense that the design was intentional (originally: "Django
-abstracts"), avoids a technical term appropriate for the context (originally:
-"algorithm"), and belabors a self-evident point (revised: "may lead to
-unexpected behavior or database errors"). Also notice how the original version
-poses a problem (an abstraction is accomplished: how?), whereas the revised
-version begins with a dry summary ("Django determines ... based on the state of
-...").
+noticed"). Notice the deleted figurative language (originally: "Django knows")
+and a deleted technical term appropriate for the context (originally:
+"algorithm"). Notice how a self-evident point is belabored (revised: "may lead
+to unexpected behavior or database errors"). Finally, notice how the original
+version poses a problem (an abstraction is provided: how?), whereas the revised
+version merely summarizes ("Django determines ... based on the state of ..."),
+impairing the sense that the design was intentional.
 
 Without a doubt, a different prompt would produce a different, perhaps improved
 result. Still, we include this example to illustrate how easily the
-documentation can be polluted when attention is not given to voice.
+documentation can be undermined when attention is not given to voice.
 
 Writing style
 =============
