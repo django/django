@@ -1,10 +1,10 @@
 The documentation in this tree is in plain text files and can be viewed using
 any text file viewer.
 
-It uses `ReST`_ (reStructuredText), and the `Sphinx`_ documentation system.
+It uses `reStructuredText (ReST)`_ and the `Sphinx`_ documentation system.
 This allows it to be built into other forms for easier viewing and browsing.
 
-To create an HTML version of the docs:
+To build an HTML version of the documentation:
 
 * Install Sphinx (using ``python -m pip install Sphinx`` or some other method).
 
