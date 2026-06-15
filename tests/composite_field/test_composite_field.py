@@ -8,14 +8,16 @@ from django.db.models import (
     EmailField,
     F,
     IntegerField,
+    Max,
+    Min,
     OuterRef,
     Q,
     Sum,
     Value,
     When,
 )
-from django.db.models.expressions import Subquery
-from django.db.models.functions import Cast, Concat, Length, Lower
+from django.db.models.expressions import Exists, Subquery
+from django.db.models.functions import Cast, Coalesce, Concat, Length, Lower
 from django.test import TestCase
 
 from .expressions import JsonEachFunc
@@ -689,3 +691,278 @@ class CompositeFieldTests(TestCase):
         self.assertEqual(
             list(qs), ["user003@mail.com", "user002@mail.com", "user001@mail.com"]
         )
+
+    def test_composite_subquery_email_lookup_values(self):
+        composite_field = CompositeField(
+            email=EmailField(),
+            first_name=CharField(),
+        )
+        subquery = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
+            output_field=composite_field,
+        )
+        qs = (
+            User.objects.alias(info=subquery)
+            .filter(info__email=self.user1.email)
+            .order_by("pk")
+            .values("email", "first_name")
+        )
+        result = list(qs)
+        self.assertEqual(len(result), 3)
+        self.assertEqual(result[0]["email"], self.user1.email)
+        self.assertEqual(result[0]["first_name"], self.user1.first_name)
+        self.assertEqual(result[1]["email"], self.user2.email)
+        self.assertEqual(result[2]["email"], self.user3.email)
+
+    def test_composite_exists_filter(self):
+        composite_field = CompositeField(email=EmailField(), first_name=CharField())
+        subquery = Subquery(
+            User.objects.filter(pk=OuterRef("pk")).values("email", "first_name")[:1],
+            output_field=composite_field,
+        )
+        inner_qs = User.objects.alias(info=subquery).filter(
+            info__email=OuterRef("email")
+        )
+        qs = User.objects.filter(Exists(inner_qs)).order_by("pk")
+        self.assertEqual(qs.count(), 3)
+        self.assertEqual(qs.first().email, self.user1.email)
+
+    def test_two_composites_cross_reference(self):
+        composite_field1 = CompositeField(email=EmailField(), first_name=CharField())
+        composite_field2 = CompositeField(email=EmailField(), first_name=CharField())
+        sub1 = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
+            output_field=composite_field1,
+        )
+        sub2 = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
+            output_field=composite_field2,
+        )
+        qs = User.objects.alias(a=sub1, b=sub2).filter(a__email=F("b__email"))
+        self.assertEqual(qs.count(), 3)
+
+        qs_mismatch = User.objects.alias(a=sub1, b=sub2).filter(
+            a__email=F("b__first_name")
+        )
+        self.assertEqual(qs_mismatch.count(), 0)
+
+    def test_composite_subfield_coalesce(self):
+        composite_field = CompositeField(email=EmailField(), first_name=CharField())
+        subquery = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
+            output_field=composite_field,
+        )
+        qs = (
+            User.objects.filter(pk=self.user1.pk)
+            .alias(info=subquery)
+            .annotate(safe_email=Coalesce("info__email", Value("fallback@example.com")))
+            .values("safe_email")
+        )
+        self.assertEqual(qs.first()["safe_email"], self.user1.email)
+
+        empty_composite = CompositeField(email=EmailField())
+        empty_sub = Subquery(
+            User.objects.filter(pk=999999).values("email"),
+            output_field=empty_composite,
+        )
+        qs_empty = (
+            User.objects.filter(pk=self.user1.pk)
+            .alias(info=empty_sub)
+            .annotate(safe_email=Coalesce("info__email", Value("fallback@example.com")))
+            .values("safe_email")
+        )
+        self.assertEqual(qs_empty.first()["safe_email"], "fallback@example.com")
+
+    def test_composite_aggregation_max_min(self):
+        composite_field = CompositeField(
+            severity_level=IntegerField(),
+            description=CharField(),
+        )
+        sub = Subquery(
+            BugReport.objects.filter(pk=self.bug_report.pk).values(
+                "severity_level", "description"
+            ),
+            output_field=composite_field,
+        )
+        res = User.objects.alias(report=sub).aggregate(
+            max_sev=Max("report__severity_level"),
+            min_sev=Min("report__severity_level"),
+        )
+        self.assertEqual(res["max_sev"], self.bug_report.severity_level)
+        self.assertEqual(res["min_sev"], self.bug_report.severity_level)
+
+    def test_composite_negated_q(self):
+        composite_field = CompositeField(email=EmailField(), first_name=CharField())
+        sub = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
+            output_field=composite_field,
+        )
+        qs = User.objects.alias(info=sub).filter(~Q(info__email=self.user1.email))
+        self.assertEqual(qs.count(), 0)
+
+        qs2 = User.objects.alias(info=sub).filter(
+            ~Q(info__email="nonexistent@mail.com")
+        )
+        self.assertEqual(qs2.count(), 3)
+
+    def test_composite_annotation_filter_combined(self):
+        composite_field = CompositeField(
+            email=EmailField(),
+            age=IntegerField(),
+        )
+        subquery = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "age"),
+            output_field=composite_field,
+        )
+        qs = (
+            User.objects.alias(info=subquery)
+            .annotate(
+                user_age=F("info__age"),
+                user_email=F("info__email"),
+            )
+            .filter(user_age=self.user1.age)
+            .order_by("pk")
+        )
+        self.assertEqual(qs.count(), 3)
+        first = qs.first()
+        self.assertEqual(first.user_email, self.user1.email)
+        self.assertEqual(first.user_age, self.user1.age)
+
+    def test_composite_subfield_as_subquery_filter_rhs(self):
+        composite_field = CompositeField(email=EmailField(), first_name=CharField())
+        sub = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
+            output_field=composite_field,
+        )
+        qs = User.objects.alias(info=sub).filter(email=F("info__email")).order_by("pk")
+        self.assertEqual(qs.count(), 1)
+        self.assertEqual(qs.first().pk, self.user1.pk)
+
+    def test_composite_union(self):
+        composite_field = CompositeField(email=EmailField(), first_name=CharField())
+        sub1 = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
+            output_field=composite_field,
+        )
+        sub2 = Subquery(
+            User.objects.filter(pk=self.user2.pk).values("email", "first_name"),
+            output_field=composite_field,
+        )
+        qs1 = (
+            User.objects.filter(pk=self.user1.pk)
+            .alias(info=sub1)
+            .annotate(resolved_email=F("info__email"))
+            .values("resolved_email")
+        )
+        qs2 = (
+            User.objects.filter(pk=self.user2.pk)
+            .alias(info=sub2)
+            .annotate(resolved_email=F("info__email"))
+            .values("resolved_email")
+        )
+        combined = qs1.union(qs2)
+        result_emails = sorted(r["resolved_email"] for r in combined)
+        self.assertEqual(result_emails, sorted([self.user1.email, self.user2.email]))
+
+    def test_composite_intersection(self):
+        composite_field = CompositeField(email=EmailField(), first_name=CharField())
+        sub = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
+            output_field=composite_field,
+        )
+        qs1 = (
+            User.objects.filter(pk=self.user1.pk)
+            .alias(info=sub)
+            .annotate(resolved_email=F("info__email"))
+            .values("resolved_email")
+        )
+        qs2 = (
+            User.objects.filter(pk=self.user1.pk)
+            .alias(info=sub)
+            .annotate(resolved_email=F("info__email"))
+            .values("resolved_email")
+        )
+        combined = qs1.intersection(qs2)
+        result = list(combined)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["resolved_email"], self.user1.email)
+
+    def test_composite_deconstruct_round_trip(self):
+        original = CompositeField(
+            email=EmailField(),
+            first_name=CharField(),
+            severity_level=IntegerField(),
+        )
+        name, path, args, kwargs = original.deconstruct()
+        self.assertEqual(path, "django.db.models.CompositeField")
+        self.assertIn("email", args)
+        self.assertIn("first_name", args)
+        self.assertIn("severity_level", args)
+        self.assertIsInstance(args["email"], EmailField)
+        self.assertIsInstance(args["first_name"], CharField)
+        self.assertIsInstance(args["severity_level"], IntegerField)
+
+    def test_composite_deconstruct_nested(self):
+        inner = CompositeField(email=EmailField(), age=IntegerField())
+        outer = CompositeField(user=inner, title=CharField())
+        name, path, args, kwargs = outer.deconstruct()
+        self.assertIn("user", args)
+        self.assertIn("title", args)
+        self.assertIsInstance(args["user"], CompositeField)
+        _, _, inner_args, _ = args["user"].deconstruct()
+        self.assertIn("email", inner_args)
+        self.assertIn("age", inner_args)
+
+    def test_composite_only_and_defer_are_safe(self):
+        composite_field = CompositeField(email=EmailField(), first_name=CharField())
+        sub = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
+            output_field=composite_field,
+        )
+        qs_only = (
+            User.objects.alias(info=sub)
+            .filter(info__email=self.user1.email)
+            .only("email")
+        )
+        self.assertEqual(qs_only.count(), 3)
+        first = qs_only.first()
+        self.assertEqual(first.email, self.user1.email)
+
+        qs_defer = (
+            User.objects.alias(info=sub)
+            .filter(info__email=self.user1.email)
+            .defer("first_name")
+        )
+        self.assertEqual(qs_defer.count(), 3)
+        first = qs_defer.first()
+        self.assertEqual(first.email, self.user1.email)
+
+    def test_composite_select_related_noop(self):
+        composite_field = CompositeField(title=CharField(), body=CharField())
+        sub = Subquery(
+            Post.objects.filter(pk=self.posts[0].pk).values("title", "body"),
+            output_field=composite_field,
+        )
+        qs = (
+            Post.objects.alias(post_info=sub)
+            .filter(post_info__title=self.posts[0].title)
+            .select_related("user")
+        )
+        self.assertTrue(qs.exists())
+        post = qs.first()
+        self.assertEqual(post.user.email, self.user1.email)
+
+    def test_composite_prefetch_related_noop(self):
+        composite_field = CompositeField(email=EmailField(), first_name=CharField())
+        sub = Subquery(
+            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
+            output_field=composite_field,
+        )
+        qs = (
+            User.objects.alias(info=sub)
+            .filter(info__email=self.user1.email)
+            .prefetch_related("posts")
+        )
+        self.assertEqual(qs.count(), 3)
+        user = qs.get(pk=self.user1.pk)
+        self.assertEqual(user.posts.count(), 3)
