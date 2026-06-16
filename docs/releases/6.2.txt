@@ -30,6 +30,7 @@ only officially support the latest release of each series.
 
 What's new in Django 6.2
 ========================
+* Added support CompositeField.
 
 Minor features
 --------------

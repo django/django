@@ -925,11 +925,7 @@ class CompositeFieldTests(TestCase):
         self.assertEqual(first.email, self.user1.email)
 
     def test_composite_select_related_noop(self):
-        composite_field = CompositeField(title=CharField(), body=CharField())
-        sub = Subquery(
-            Post.objects.filter(pk=self.posts[0].pk).values("title", "body"),
-            output_field=composite_field,
-        )
+        sub = Post.objects.filter(pk=self.posts[0].pk).values("title", "body")
         qs = (
             Post.objects.alias(post_info=sub)
             .filter(post_info__title=self.posts[0].title)
@@ -940,11 +936,7 @@ class CompositeFieldTests(TestCase):
         self.assertEqual(post.user.email, self.user1.email)
 
     def test_composite_prefetch_related_noop(self):
-        composite_field = CompositeField(email=EmailField(), first_name=CharField())
-        sub = Subquery(
-            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
-            output_field=composite_field,
-        )
+        sub = User.objects.filter(pk=self.user1.pk).values("email", "first_name")
         qs = (
             User.objects.alias(info=sub)
             .filter(info__email=self.user1.email)

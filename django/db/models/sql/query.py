@@ -2687,16 +2687,6 @@ class Query(BaseExpression):
                                 f"to promote it."
                             )
                     elif f.split(LOOKUP_SEP, 1)[0] in self.annotations:
-                        """
-                        for example:
-                        f ='ticket__task__project__workspace__owner__email`
-                        selected[f]:
-                        CompositeSubfieldTransform(
-                            CompositeSubfieldTransform(
-                                ...so on
-                            )
-                        )
-                        """
                         selected[f] = self.resolve_ref(f)
                     else:
                         # Call `names_to_path` to ensure a FieldError including
