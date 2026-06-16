@@ -342,6 +342,14 @@ class Query(BaseExpression):
             return getattr(select, "target", None) or select.field
         elif len(self.annotation_select) == 1:
             return next(iter(self.annotation_select.values())).output_field
+        elif len(self.select) > 1:
+            from django.db.models import CompositeField
+
+            fields = (
+                getattr(select, "target", None) or select.field
+                for select in self.select
+            )
+            return CompositeField(**{field.name: field for field in fields})
 
     @cached_property
     def base_table(self):
@@ -1245,9 +1253,15 @@ class Query(BaseExpression):
     def add_annotation(self, annotation, alias, select=True):
         """Add a single annotation expression to the Query."""
         self.check_alias(alias)
-        if getattr(
+        is_composite = getattr(
             getattr(annotation, "_output_field_or_none", None), "is_composite", False
-        ):
+        )
+        if not is_composite and hasattr(annotation, "query"):
+            is_composite = getattr(
+                getattr(annotation.query, "output_field", None), "is_composite", False
+            )
+
+        if is_composite:
             self.add_composite_annotation(annotation, alias, select=select)
             return
         annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None)
@@ -1269,18 +1283,26 @@ class Query(BaseExpression):
         annotation.alias = alias
         self.annotations[alias] = annotation
         if self.is_relation_source(annotation, select):
+            subquery = self._get_subquery(annotation)
             self.add_relation(
-                SubqueryTable(annotation.query.clone(), alias, annotation.output_field),
+                SubqueryTable(subquery.clone(), alias, annotation.output_field),
                 alias,
             )
         self.set_annotation_mask(set(self.annotation_select).difference({alias}))
 
+    def _get_subquery(self, annotation):
+        if hasattr(annotation, "query"):
+            return annotation.query
+        return annotation
+
     def is_relation_source(self, annotation, select):
-        return (
-            not select
-            and hasattr(annotation, "query")
-            and not getattr(annotation.query, "external_aliases", None)
-        )
+        if select:
+            return False
+        if hasattr(annotation, "query"):
+            return not getattr(annotation.query, "external_aliases", None)
+        if isinstance(annotation, Query):
+            return not getattr(annotation, "external_aliases", None)
+        return False
 
     def add_relation(self, relation, alias):
         self.alias_map[alias] = relation

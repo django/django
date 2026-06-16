@@ -693,14 +693,7 @@ class CompositeFieldTests(TestCase):
         )
 
     def test_composite_subquery_email_lookup_values(self):
-        composite_field = CompositeField(
-            email=EmailField(),
-            first_name=CharField(),
-        )
-        subquery = Subquery(
-            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
-            output_field=composite_field,
-        )
+        subquery = User.objects.filter(pk=self.user1.pk).values("email", "first_name")
         qs = (
             User.objects.alias(info=subquery)
             .filter(info__email=self.user1.email)
@@ -715,11 +708,9 @@ class CompositeFieldTests(TestCase):
         self.assertEqual(result[2]["email"], self.user3.email)
 
     def test_composite_exists_filter(self):
-        composite_field = CompositeField(email=EmailField(), first_name=CharField())
-        subquery = Subquery(
-            User.objects.filter(pk=OuterRef("pk")).values("email", "first_name")[:1],
-            output_field=composite_field,
-        )
+        subquery = User.objects.filter(pk=OuterRef("pk")).values("email", "first_name")[
+            :1
+        ]
         inner_qs = User.objects.alias(info=subquery).filter(
             info__email=OuterRef("email")
         )
@@ -747,11 +738,7 @@ class CompositeFieldTests(TestCase):
         self.assertEqual(qs_mismatch.count(), 0)
 
     def test_composite_subfield_coalesce(self):
-        composite_field = CompositeField(email=EmailField(), first_name=CharField())
-        subquery = Subquery(
-            User.objects.filter(pk=self.user1.pk).values("email", "first_name"),
-            output_field=composite_field,
-        )
+        subquery = User.objects.filter(pk=self.user1.pk).values("email", "first_name")
         qs = (
             User.objects.filter(pk=self.user1.pk)
             .alias(info=subquery)

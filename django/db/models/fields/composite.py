@@ -220,6 +220,10 @@ class CompositeSubfieldTransform(Transform):
             query = current_lhs.query.clone()
             query.set_values([full_lookup_name])
             return query.as_sql(compiler, connection)
+        elif isinstance(current_lhs, type(compiler.query)):
+            query = current_lhs.clone()
+            query.set_values([full_lookup_name])
+            return query.as_sql(compiler, connection)
         else:
             raise FieldError("Cannot resolve table alias for composite field. ")
 
@@ -229,8 +233,8 @@ class CompositeField(Field):
 
     def __init__(self, **kwargs):
         self.sub_fields = {}
-        # if len(kwargs) <= 1:
-        #     raise ValueError("At least two fields should be there")
+        if len(kwargs) == 0:
+            raise ValueError("At least one fields should be there")
         for name, field in kwargs.items():
             if not isinstance(field, Field):
                 raise TypeError(
@@ -259,12 +263,3 @@ class CompositeField(Field):
         return partial(
             CompositeSubfieldTransform, lookup_name=name, output_field=subfield
         )
-
-
-CompositeField.register_lookup(TupleExact)
-CompositeField.register_lookup(TupleGreaterThan)
-CompositeField.register_lookup(TupleGreaterThanOrEqual)
-CompositeField.register_lookup(TupleLessThan)
-CompositeField.register_lookup(TupleLessThanOrEqual)
-CompositeField.register_lookup(TupleIn)
-CompositeField.register_lookup(TupleIsNull)
