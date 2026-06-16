@@ -80,7 +80,6 @@ from .models import (
     CyclicTwo,
     DooHickey,
     Employee,
-    EmptyModel,
     Fabric,
     FancyDoodad,
     FieldOverridePost,
@@ -89,6 +88,7 @@ from .models import (
     FoodDelivery,
     FunkyTag,
     Gallery,
+    GetQuerySetModel,
     Grommet,
     Inquisition,
     Language,
@@ -5454,7 +5454,8 @@ class AdminCustomQuerysetTest(TestCase):
         cls.superuser = User.objects.create_superuser(
             username="super", password="secret", email="super@example.com"
         )
-        cls.pks = [EmptyModel.objects.create().id for i in range(3)]
+        cls.obj = GetQuerySetModel.objects.create()
+        cls.deleted_obj = GetQuerySetModel.objects.create(deleted=True)
 
     def setUp(self):
         self.client.force_login(self.superuser)
@@ -5465,12 +5466,11 @@ class AdminCustomQuerysetTest(TestCase):
         }
 
     def test_changelist_view(self):
-        response = self.client.get(reverse("admin:admin_views_emptymodel_changelist"))
-        for i in self.pks:
-            if i > 1:
-                self.assertContains(response, "Primary key = %s" % i)
-            else:
-                self.assertNotContains(response, "Primary key = %s" % i)
+        # The changelist filters objects using ModelAdmin.get_queryset().
+        url = reverse("admin:admin_views_getquerysetmodel_changelist")
+        response = self.client.get(url)
+        self.assertContains(response, str(self.obj))
+        self.assertNotContains(response, str(self.deleted_obj))
 
     def test_changelist_view_count_queries(self):
         # create 2 Person objects
@@ -5501,17 +5501,23 @@ class AdminCustomQuerysetTest(TestCase):
             self.assertEqual(resp.context["selection_note_all"], "1 selected")
 
     def test_change_view(self):
-        for i in self.pks:
-            url = reverse("admin:admin_views_emptymodel_change", args=(i,))
-            response = self.client.get(url, follow=True)
-            if i > 1:
-                self.assertEqual(response.status_code, 200)
-            else:
-                self.assertRedirects(response, reverse("admin:index"))
-                self.assertEqual(
-                    [m.message for m in response.context["messages"]],
-                    ["empty model with ID “1” doesn’t exist. Perhaps it was deleted?"],
-                )
+        # The change view filters objects using ModelAdmin.get_queryset().
+        url = reverse("admin:admin_views_getquerysetmodel_change", args=(self.obj.pk,))
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # The deleted object isn't accessible.
+        url = reverse(
+            "admin:admin_views_getquerysetmodel_change", args=(self.deleted_obj.pk,)
+        )
+        response = self.client.get(url, follow=True)
+        self.assertRedirects(response, reverse("admin:index"))
+        self.assertEqual(
+            [m.message for m in response.context["messages"]],
+            [
+                f"get query set model with ID “{self.deleted_obj.pk}” doesn’t "
+                "exist. Perhaps it was deleted?"
+            ],
+        )
 
     def test_add_model_modeladmin_defer_qs(self):
         # Test for #14529. defer() is used in ModelAdmin.get_queryset()
@@ -5728,25 +5734,40 @@ class AdminCustomQuerysetTest(TestCase):
         Custom querysets are considered for the admin history view.
         """
         self.client.post(reverse("admin:login"), self.super_login)
-        FilteredManager.objects.create(pk=1)
-        FilteredManager.objects.create(pk=2)
+        active_pk = FilteredManager.all_objects.create(deleted=False).pk
+        deleted_pk = FilteredManager.all_objects.create(deleted=True).pk
         response = self.client.get(
             reverse("admin:admin_views_filteredmanager_changelist")
         )
-        self.assertContains(response, "PK=1")
-        self.assertContains(response, "PK=2")
+        self.assertContains(response, f"PK={active_pk}")
+        self.assertContains(response, f"PK={deleted_pk}")
+        url_name = "admin:admin_views_filteredmanager_history"
         self.assertEqual(
-            self.client.get(
-                reverse("admin:admin_views_filteredmanager_history", args=(1,))
-            ).status_code,
-            200,
+            self.client.get(reverse(url_name, args=(active_pk,))).status_code, 200
         )
         self.assertEqual(
-            self.client.get(
-                reverse("admin:admin_views_filteredmanager_history", args=(2,))
-            ).status_code,
+            self.client.get(reverse(url_name, args=(deleted_pk,))).status_code,
             200,
         )
+
+    def test_action_changeform_uses_modeladmin_queryset(self):
+        # Change form actions must receive the queryset from
+        # ModelAdmin.get_queryset(), not the model's default manager. Here,
+        # FilteredManager.objects excludes deleted rows while
+        # CustomManagerAdmin.get_queryset() uses all_objects. A restore action
+        # on a soft-deleted object must receive a non-empty queryset.
+        obj = FilteredManager.all_objects.create(deleted=True)
+        response = self.client.post(
+            reverse("admin:admin_views_filteredmanager_change", args=[obj.pk]),
+            {
+                "CHANGE_FORM-action": "restore_filtered_manager",
+                ACTION_CHECKBOX_NAME: [obj.pk],
+                "index": 0,
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        obj.refresh_from_db()
+        self.assertIs(obj.deleted, False)
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
@@ -7468,7 +7489,9 @@ class SeleniumTests(AdminSeleniumTestCase):
                 Select(self.selenium.find_element(By.NAME, "action")).select_by_value(
                     f"message_{level}"
                 )
-                self.selenium.find_element(By.XPATH, '//button[text()="Run"]').click()
+                self.selenium.find_element(
+                    By.CSS_SELECTOR, 'button[name="index"]'
+                ).click()
                 message = self.selenium.find_element(
                     By.CSS_SELECTOR, "ul.messagelist li"
                 )

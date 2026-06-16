@@ -33,8 +33,8 @@ jobs:
           python-version: '3.14'
       - run: python -m pip install flake8
       - name: flake8
-        # Pinned to v3.0.0.
-        uses: liskin/gh-problem-matcher-wrap@e7b7beaaafa52524748b31a381160759d68d61fb
+        # Pinned to v4.0.0.
+        uses: liskin/gh-problem-matcher-wrap@d31bb388d13cf879e93f878cb2550299f0afb460
         with:
           linters: flake8
           run: flake8
@@ -53,8 +53,8 @@ jobs:
           python-version: '3.14'
       - run: python -m pip install isort
       - name: isort
-        # Pinned to v3.0.0.
-        uses: liskin/gh-problem-matcher-wrap@e7b7beaaafa52524748b31a381160759d68d61fb
+        # Pinned to v4.0.0.
+        uses: liskin/gh-problem-matcher-wrap@d31bb388d13cf879e93f878cb2550299f0afb460
         with:
           linters: isort
           run: isort --check --diff django tests scripts
@@ -93,9 +93,9 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: '**/package.json'
       - run: npm install

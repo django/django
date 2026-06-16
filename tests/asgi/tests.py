@@ -804,6 +804,24 @@ class ASGITest(SimpleTestCase):
                 self.assertEqual(request.META["HTTP_COOKIE"], "a=abc; b=def; c=ghi")
                 self.assertEqual(request.COOKIES, {"a": "abc", "b": "def", "c": "ghi"})
 
+    def test_malformed_content_length(self):
+        body = b"hello world body"
+        cases = [
+            {"content_length_headers": [b"10", b"20"], "CONTENT_LENGTH": "10,20"},
+            {"content_length_headers": [b"abc"], "CONTENT_LENGTH": "abc"},
+        ]
+        for case in cases:
+            with self.subTest(CONTENT_LENGTH=case["CONTENT_LENGTH"]):
+                scope = self.async_request_factory._base_scope(method="POST", path="/")
+                headers = [(b"content-type", b"text/plain")]
+                for content_length in case["content_length_headers"]:
+                    headers.append((b"content-length", content_length))
+                scope["headers"] = headers
+                request = ASGIRequest(scope, BytesIO(body))
+                self.assertEqual(dict(request.POST), {})
+                self.assertEqual(request.body, body)
+                self.assertEqual(request.META["CONTENT_LENGTH"], case["CONTENT_LENGTH"])
+
 
 class MaxMemorySizeASGITests(SimpleTestCase):
     def make_request(
@@ -826,6 +844,22 @@ class MaxMemorySizeASGITests(SimpleTestCase):
 
     def test_body_size_exceeded_without_content_length(self):
         request = self.make_request(b"x" * 10)
+        with (
+            self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=5),
+            self.assertRaisesMessage(RequestDataTooBig, TOO_MUCH_DATA_MSG),
+        ):
+            request.body
+
+    def test_body_size_exceeded_with_malformed_content_length(self):
+        body = b"x" * 10
+        scope = AsyncRequestFactory()._base_scope(method="POST", path="/")
+        scope["headers"] = [
+            (b"content-type", b"application/octet-stream"),
+            (b"content-length", b"10"),
+            (b"content-length", b"20"),
+        ]
+        request = ASGIRequest(scope, BytesIO(body))
+        self.assertEqual(request.META["CONTENT_LENGTH"], "10,20")
         with (
             self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=5),
             self.assertRaisesMessage(RequestDataTooBig, TOO_MUCH_DATA_MSG),

@@ -499,6 +499,31 @@ Only support for PostgreSQL is implemented.
 
 If this option is provided, models are also created for database views.
 
+``listurls``
+------------
+
+.. django-admin:: listurls
+
+.. versionadded:: 6.2
+
+List URL patterns from the project's root :doc:`URLconf </topics/http/urls>`
+with optional filtering by prefixes, inspired by ``show_urls`` from
+``django-extensions``.
+
+.. django-admin-option:: --unsorted, -u
+
+Lists URLs in the original ordering from ``urlpatterns``. The default ordering
+is alphabetical by route.
+
+.. django-admin-option:: --prefix, -p [prefix ...]
+
+Filters URLs by given prefixes.
+
+.. django-admin-option:: --format, -f {tabular,stacked,json}
+
+Specifies the output format. Available values are ``tabular``, ``stacked``, and
+``json``. Default is ``tabular``.
+
 ``loaddata``
 ------------
 
@@ -1044,8 +1069,15 @@ recipient(s) specified. For example:
 
     django-admin sendtestemail foo@example.com bar@example.com
 
-There are a couple of options, and you may use any combination of them
-together:
+The following options may be used in any combination with each other and with
+recipient email arguments.
+
+.. django-admin-option:: --using ALIAS
+
+.. versionadded:: 6.1
+
+Specifies the :setting:`MAILERS` alias to use for sending the test email to
+the recipients given as arguments. Defaults to the ``"default"`` mailer.
 
 .. django-admin-option:: --managers
 
@@ -1078,11 +1110,6 @@ flag.
 
 See the guide on :ref:`customizing this behavior
 <customizing-shell-auto-imports>` to add or remove automatic imports.
-
-.. versionchanged:: 6.0
-
-    Automatic imports of common utilities, such as ``django.conf.settings``,
-    were added.
 
 .. django-admin-option:: --interface {ipython,bpython,python}, -i {ipython,bpython,python}
 
@@ -1274,10 +1301,6 @@ If the optional destination is provided, Django will use that name instead. If
 the directory with the given name doesn't exist, it will be created. You can
 use '.' to denote the current working directory.
 
-.. versionchanged:: 6.0
-
-    Automatic creation of the destination directory was added.
-
 For example:
 
 .. console::
@@ -1399,10 +1422,6 @@ If the optional destination is provided, Django will use that name as the
 project directory, and create ``manage.py`` and the project package within it.
 If the directory with the given name doesn't exist, it will be created. Use '.'
 to denote the current working directory.
-
-.. versionchanged:: 6.0
-
-    Automatic creation of the destination directory was added.
 
 For example:
 

@@ -22,13 +22,16 @@ from hashlib import md5
 from django.conf import settings
 from django.core.cache import caches
 from django.http import HttpResponse, HttpResponseNotModified
-from django.utils.http import http_date, parse_etags, parse_http_date_safe, quote_etag
+from django.utils.http import (
+    http_date,
+    parse_etags,
+    parse_http_date_safe,
+    quote_etag,
+    split_header_value,
+)
 from django.utils.log import log_response
-from django.utils.regex_helper import _lazy_re_compile
 from django.utils.timezone import get_current_timezone_name
 from django.utils.translation import get_language
-
-cc_delim_re = _lazy_re_compile(r"\s*,\s*")
 
 
 def patch_cache_control(response, **kwargs):
@@ -59,7 +62,7 @@ def patch_cache_control(response, **kwargs):
 
     cc = defaultdict(set)
     if response.get("Cache-Control"):
-        for field in cc_delim_re.split(response.headers["Cache-Control"]):
+        for field in split_header_value(response.headers["Cache-Control"]):
             directive, value = dictitem(field)
             if directive == "no-cache":
                 # no-cache supports multiple field names.
@@ -108,7 +111,7 @@ def get_max_age(response):
     if not response.has_header("Cache-Control"):
         return
     cc = dict(
-        _to_tuple(el) for el in cc_delim_re.split(response.headers["Cache-Control"])
+        _to_tuple(el) for el in split_header_value(response.headers["Cache-Control"])
     )
     try:
         return int(cc["max-age"])
@@ -308,11 +311,12 @@ def patch_vary_headers(response, newheaders):
     # implementations may rely on the order of the Vary contents in, say,
     # computing an MD5 hash.
     if response.has_header("Vary"):
-        vary_headers = cc_delim_re.split(response.headers["Vary"])
+        vary_headers = list(split_header_value(response.headers["Vary"]))
     else:
         vary_headers = []
     # Use .lower() here so we treat headers as case-insensitive.
     existing_headers = {header.lower() for header in vary_headers}
+    newheaders = [newheader.strip() for newheader in newheaders]
     additional_headers = [
         newheader
         for newheader in newheaders
@@ -331,9 +335,8 @@ def has_vary_header(response, header_query):
     """
     if not response.has_header("Vary"):
         return False
-    vary_headers = cc_delim_re.split(response.headers["Vary"])
-    existing_headers = {header.lower() for header in vary_headers}
-    return header_query.lower() in existing_headers
+    existing_headers = {h.lower() for h in split_header_value(response.headers["Vary"])}
+    return header_query.lower().strip() in existing_headers
 
 
 def _i18n_cache_key_suffix(request, cache_key):
@@ -424,7 +427,7 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cach
         # in that case and would result in storing the same content under
         # multiple keys in the cache. See #18191 for details.
         headerlist = []
-        for header in cc_delim_re.split(response.headers["Vary"]):
+        for header in split_header_value(response.headers["Vary"]):
             header = header.upper().replace("-", "_")
             if header != "ACCEPT_LANGUAGE" or not is_accept_language_redundant:
                 headerlist.append("HTTP_" + header)

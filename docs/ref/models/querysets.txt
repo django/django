@@ -4019,8 +4019,6 @@ by the aggregate.
 ``AnyValue``
 ~~~~~~~~~~~~
 
-.. versionadded:: 6.0
-
 .. class:: AnyValue(expression, output_field=None, filter=None, default=None, **extra)
 
     Returns an arbitrary value from the non-null input values.
@@ -4224,8 +4222,6 @@ by the aggregate.
 
 ``StringAgg``
 ~~~~~~~~~~~~~
-
-.. versionadded:: 6.0
 
 .. class:: StringAgg(expression, delimiter, output_field=None, distinct=False, filter=None, order_by=None, default=None, **extra)
 

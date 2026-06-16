@@ -124,12 +124,12 @@ a:focus {
 }
 
 a:not(
-        [role="button"],
-        #header a,
-        #nav-sidebar a,
-        #content-main.app-list a,
-        .object-tools a
-    ) {
+    [role="button"],
+    #header a,
+    #nav-sidebar a,
+    #content-main.app-list a,
+    .object-tools a
+) {
     text-decoration: underline;
 }
 

@@ -6,15 +6,16 @@
 # Jiří Podhorecký <jirka.p@volny.cz>, 2024
 # Jiří Podhorecký <jirka.p@volny.cz>, 2022
 # Jirka Vejrazka <Jirka.Vejrazka@gmail.com>, 2011
+# J Nezbeda, 2026
 # Vláďa Macek <macek@sandbox.cz>, 2012,2014
 # Vláďa Macek <macek@sandbox.cz>, 2015-2016,2020-2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-10-07 07:59+0000\n"
-"Last-Translator: Jan Papež <honyczek@centrum.cz>, 2024\n"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2026-06-01 07:59+0000\n"
+"Last-Translator: J Nezbeda, 2026\n"
 "Language-Team: Czech (http://app.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -29,11 +30,8 @@ msgstr "Dostupné položky: %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Seznam dostupných položek %s. Jednotlivě je lze vybrat tak, že na ně v "
-"rámečku klepnete a pak klepnete na šipku \"Vybrat\" mezi rámečky."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -44,18 +42,17 @@ msgstr ""
 msgid "Filter"
 msgstr "Filtr"
 
-msgid "Choose all"
-msgstr "Vybrat vše"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "Vybrat vše %s"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Chcete-li najednou vybrat všechny položky %s, klepněte sem."
+msgid "Choose selected %s"
+msgstr ""
 
-msgid "Choose"
-msgstr "Vybrat"
-
-msgid "Remove"
-msgstr "Odebrat"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "Odebrat vybrané %s"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -63,22 +60,19 @@ msgstr "Vybrané položky %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Seznam vybraných položek %s. Jednotlivě je lze odebrat tak, že na ně v "
-"rámečku klepnete a pak klepnete na šipku \"Odebrat mezi rámečky."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "Zadáním do tohoto pole vyfiltrujete seznam vybraných %s."
 
-msgid "Remove all"
-msgstr "Odebrat vše"
+msgid "(click to clear)"
+msgstr "(kliknout pro vyčištění)"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Chcete-li najednou odebrat všechny vybrané položky %s, klepněte sem."
+msgid "Remove all %s"
+msgstr "Odebrat vše %s"
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -112,11 +106,9 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"Byla vybrána operace, ale dosud nedošlo k uložení změn jednotlivých polí. "
-"Patrně využijete tlačítko Provést spíše než tlačítko Uložit."
 
 msgid "Now"
 msgstr "Nyní"

@@ -9,11 +9,10 @@
     "npm": ">=1.3.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.12",
-    "puppeteer": "^24.22.0",
-    "grunt": "^1.6.1",
+    "@biomejs/biome": "2.4.15",
+    "grunt": "^1.6.2",
     "grunt-cli": "^1.5.0",
-    "grunt-contrib-qunit": "^10.1.1",
-    "qunit": "^2.24.1"
+    "grunt-contrib-qunit": "^10.2.0",
+    "qunit": "^2.25.0"
   }
 }

@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015-2016,2019-2023,2025
+# BouRock, 2015-2016,2019-2023,2025-2026
 # BouRock, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Metin Amiroff <amiroff@gmail.com>, 2011
@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-25 15:04-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: BouRock, 2015-2016,2019-2023,2025\n"
+"PO-Revision-Date: 2026-06-01 07:59+0000\n"
+"Last-Translator: BouRock, 2015-2016,2019-2023,2025-2026\n"
 "Language-Team: Turkish (http://app.transifex.com/django/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -99,11 +99,11 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"Bir eylem seçtiniz, ancak tek tek alanlarda herhangi bir değişiklik "
-"yapmadınız. Muhtemelen Kaydet düğmesi yerine Git düğmesini arıyorsunuz."
+"Bir eylem seçtiniz, ancak tek alanlarda herhangi bir değişiklik yapmadınız. "
+"Muhtemelen Kaydet düğmesi yerine Çalıştır düğmesini arıyorsunuz."
 
 msgid "Now"
 msgstr "Şimdi"

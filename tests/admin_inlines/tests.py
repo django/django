@@ -830,6 +830,76 @@ class TestInline(TestDataMixin, TestCase):
         parent.refresh_from_db()
         self.assertIs(parent.show_inlines, True)
 
+    def test_delete_protected_message_limits_number_of_objects_displayed(self):
+        # admin limits the number of displayed objects to 2, so we create
+        # 5 footnotes.
+        novel = Novel.objects.create()
+        chapter = Chapter.objects.create(novel=novel)
+        footnotes = [FootNote(chapter=chapter) for i in range(5)]
+        FootNote.objects.bulk_create(footnotes)
+
+        response = self.client.post(
+            reverse("admin:admin_inlines_novel_change", args=(novel.pk,)),
+            data={
+                "show_inlines": "on",
+                "chapter_set-TOTAL_FORMS": "1",
+                "chapter_set-INITIAL_FORMS": "1",
+                "chapter_set-MAX_NUM_FORMS": "1000",
+                "chapter_set-MIN_NUM_FORMS": "0",
+                "chapter_set-0-id": chapter.id,
+                "chapter_set-0-name": chapter.name,
+                "chapter_set-0-novel": novel.id,
+                "chapter_set-0-DELETE": "on",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        inline_formset = response.context_data["inline_admin_formsets"][0]
+        self.assertEqual(1, len(inline_formset.non_form_errors()))
+        error_message = inline_formset.non_form_errors()[0]
+        self.assertTrue(
+            error_message.startswith(
+                f"Deleting chapter Chapter object ({chapter.pk}) would "
+                "require deleting the following protected related objects:"
+            ),
+            error_message,
+        )
+        self.assertEqual(error_message.count("FootNote"), 3, error_message)
+        self.assertTrue(error_message.endswith("…and 2 more objects."), error_message)
+
+    def test_delete_protected_message_does_not_limit_small_amount_of_objects(self):
+        novel = Novel.objects.create()
+        chapter = Chapter.objects.create(novel=novel)
+        footnotes = [FootNote(chapter=chapter) for i in range(3)]
+        FootNote.objects.bulk_create(footnotes)
+
+        response = self.client.post(
+            reverse("admin:admin_inlines_novel_change", args=(novel.pk,)),
+            data={
+                "show_inlines": "on",
+                "chapter_set-TOTAL_FORMS": "1",
+                "chapter_set-INITIAL_FORMS": "1",
+                "chapter_set-MAX_NUM_FORMS": "1000",
+                "chapter_set-MIN_NUM_FORMS": "0",
+                "chapter_set-0-id": chapter.id,
+                "chapter_set-0-name": chapter.name,
+                "chapter_set-0-novel": novel.id,
+                "chapter_set-0-DELETE": "on",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        inline_formset = response.context_data["inline_admin_formsets"][0]
+        self.assertEqual(1, len(inline_formset.non_form_errors()))
+        error_message = inline_formset.non_form_errors()[0]
+        self.assertTrue(
+            error_message.startswith(
+                f"Deleting chapter Chapter object ({chapter.pk}) would require "
+                "deleting the following protected related objects:"
+            ),
+            error_message,
+        )
+        self.assertEqual(error_message.count("FootNote object"), 3)
+        self.assertNotIn("more", error_message)
+
 
 @override_settings(ROOT_URLCONF="admin_inlines.urls")
 class TestInlineMedia(TestDataMixin, TestCase):

@@ -303,8 +303,6 @@ Form Submissions
 Content Security Policy
 =======================
 
-.. versionadded:: 6.0
-
 Content Security Policy (CSP) is a browser security mechanism that helps
 protect web applications against attacks such as cross-site scripting (XSS) and
 other content injection attacks.

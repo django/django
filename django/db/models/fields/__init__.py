@@ -32,12 +32,13 @@ from django.utils.dateparse import (
     parse_duration,
     parse_time,
 )
-from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.duration import duration_string
 from django.utils.functional import Promise, cached_property
 from django.utils.ipv6 import MAX_IPV6_ADDRESS_LENGTH, clean_ipv6_address
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
+from django.utils.warnings import django_file_prefixes
 
 __all__ = [
     "AutoField",

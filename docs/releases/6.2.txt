@@ -1,0 +1,280 @@
+============================================
+Django 6.2 release notes - UNDER DEVELOPMENT
+============================================
+
+*Expected April 2027*
+
+Welcome to Django 6.2!
+
+These release notes cover the :ref:`new features <whats-new-6.2>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-6.2>` you
+should be aware of when upgrading from Django 6.1 or earlier. We've
+:ref:`begun the deprecation process for some features
+<deprecated-features-6.2>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Django 6.2 is designated as a :term:`long-term support release
+<Long-term support release>`. It will receive security updates for at least
+three years after its release. Support for the previous LTS, Django 5.2, will
+end in April 2028.
+
+Python compatibility
+====================
+
+Django 6.2 supports Python 3.12, 3.13 and 3.14. We **highly recommend** and
+only officially support the latest release of each series.
+
+.. _whats-new-6.2:
+
+What's new in Django 6.2
+========================
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The default iteration count for the PBKDF2 password hasher is increased from
+  1,500,000 to 1,800,000.
+
+:mod:`django.contrib.contenttypes`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.messages`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.redirects`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sitemaps`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sites`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Asynchronous views
+~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Cache
+~~~~~
+
+* Subclasses of ``BaseDatabaseCache`` now support :ref:`
+  culling <_database-caching>` on a percentage of writes as an optimization.
+  The default is 10%, and may be configured using the ``CULL_PROBABILITY``
+  option.
+
+CSP
+~~~
+
+* ...
+
+CSRF
+~~~~
+
+* ...
+
+Database backends
+~~~~~~~~~~~~~~~~~
+
+* ...
+
+Decorators
+~~~~~~~~~~
+
+* ...
+
+Email
+~~~~~
+
+* ...
+
+Error Reporting
+~~~~~~~~~~~~~~~
+
+* ...
+
+File Storage
+~~~~~~~~~~~~
+
+* ...
+
+File Uploads
+~~~~~~~~~~~~
+
+* ...
+
+Forms
+~~~~~
+
+* ...
+
+Generic Views
+~~~~~~~~~~~~~
+
+* ...
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Logging
+~~~~~~~
+
+* ...
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* The new :djadmin:`listurls` command lists the URLs from the project's root
+  URLconf, including the view class or function (and name, if present).
+
+Migrations
+~~~~~~~~~~
+
+* ...
+
+Models
+~~~~~~
+
+* ...
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Security
+~~~~~~~~
+
+* ...
+
+Serialization
+~~~~~~~~~~~~~
+
+* ...
+
+Signals
+~~~~~~~
+
+* ...
+
+Tasks
+~~~~~
+
+* ...
+
+Templates
+~~~~~~~~~
+
+* ...
+
+Tests
+~~~~~
+
+* :meth:`~django.test.Client.force_login` now skips members of
+  :setting:`AUTHENTICATION_BACKENDS` not implementing ``(a)get_user()``, e.g.
+  permission-only backends.
+
+URLs
+~~~~
+
+* ...
+
+Utilities
+~~~~~~~~~
+
+* ...
+
+Validators
+~~~~~~~~~~
+
+* ...
+
+.. _backwards-incompatible-6.2:
+
+Backwards incompatible changes in 6.2
+=====================================
+
+Database backend API
+--------------------
+
+This section describes changes that may be needed in third-party database
+backends.
+
+* ...
+
+Miscellaneous
+-------------
+
+* To facilitate the deprecation of the ``safe`` parameter of
+  :class:`~django.http.JsonResponse`, it now defaults to ``False``, because the
+  pollution vulnerability in the ``Array`` prototype was fixed in
+  `ES5 <https://262.ecma-international.org/5.1/#sec-11.1.4>`_.
+
+* :class:`~django.core.serializers.json.DjangoJSONEncoder` now omits the
+  millisecond component of serialized ``datetime.datetime`` and
+  ``datetime.time`` objects if they have zero milliseconds. For example,
+  ``datetime.datetime(2000, 1, 1, 0, 0, 0, 1)`` now serializes to
+  ``"2000-01-01T00:00:00"`` rather than ``"2000-01-01T00:00:00.000"``.
+
+.. _deprecated-features-6.2:
+
+Features deprecated in 6.2
+==========================
+
+Miscellaneous
+-------------
+
+* The ``safe`` parameter is deprecated from :class:`~django.http.JsonResponse`.
+  Omitting the argument is equivalent to the prior ``safe=False`` usage.

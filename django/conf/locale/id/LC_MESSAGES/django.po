@@ -4,21 +4,21 @@
 # Adiyat Mubarak <adiyatmubarak@gmail.com>, 2017
 # Bayu Satiyo <itsyuukunz@gmail.com>, 2024
 # Claude Paroz <claude@2xlibre.net>, 2018
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2025
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2026
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
 # oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016,2020
 # rodin <romihardiyanto@gmail.com>, 2011
 # rodin <romihardiyanto@gmail.com>, 2013-2016
-# sag​e <laymonage@gmail.com>, 2018-2019
+# S​age Abdullah <laymonage@gmail.com>, 2018-2019
 # Sutrisno Efendi <kangfend@gmail.com>, 2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 06:49+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2025\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2026-03-09 06:49+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2026\n"
 "Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -149,6 +149,9 @@ msgstr "Kroasia"
 
 msgid "Upper Sorbian"
 msgstr "Sorbian Atas"
+
+msgid "Haitian Creole"
+msgstr "Kreol Haiti"
 
 msgid "Hungarian"
 msgstr "Hungaria"
@@ -555,8 +558,8 @@ msgstr "Tanggal (tanpa waktu)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "Nilai “%(value)s” memiliki format yang tidak valid. Tanggal dan waktu harus "
 "dalam format YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
@@ -581,8 +584,8 @@ msgstr "Bilangan desimal"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "Nilai “%(value)s” mempunyai format yang tidak valid. Waktu harus dalam "
 "format [DD] [[HH:]MM:]ss[.uuuuuu]."
@@ -711,8 +714,8 @@ msgid "Many-to-many relationship"
 msgstr "Hubungan banyak-ke-banyak"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -874,6 +877,22 @@ msgstr "Ya"
 
 msgid "No"
 msgstr "Tidak"
+
+msgctxt "Task"
+msgid "Ready"
+msgstr "Siap"
+
+msgctxt "Task"
+msgid "Running"
+msgstr "Berjalan"
+
+msgctxt "Task"
+msgid "Failed"
+msgstr "Gagal"
+
+msgctxt "Task"
+msgid "Successful"
+msgstr "Berhasil"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1258,11 +1277,11 @@ msgstr "Tidak ada %(verbose_name_plural)s tersedia"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"%(verbose_name_plural)s di masa depan tidak tersedia karena %(class_name)s."
-"allow_future bernilai False."
+"%(verbose_name_plural)s di masa depan tidak tersedia karena "
+"%(class_name)s.allow_future bernilai False."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
@@ -1314,10 +1333,10 @@ msgid ""
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"Anda sedang melihat halaman ini karena <a href=\"https://docs.djangoproject."
-"com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
-"rel=\"noopener\">DEBUG=True</a> berada di berkas pengaturan Anda dan Anda "
-"belum mengonfigurasi URL apa pun."
+"Anda sedang melihat halaman ini karena <a href=\"https://"
+"docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" "
+"target=\"_blank\" rel=\"noopener\">DEBUG=True</a> berada di berkas "
+"pengaturan Anda dan Anda belum mengonfigurasi URL apa pun."
 
 msgid "Django Documentation"
 msgstr "Dokumentasi Django"

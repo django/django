@@ -197,17 +197,32 @@ def urlsafe_base64_decode(s):
         raise ValueError(e)
 
 
+def split_header_value(value, sep=","):
+    """Yield stripped parts of an HTTP header value split by sep.
+
+    Use only with headers whose values are token lists (e.g. Vary,
+    Cache-Control). Do not use with headers that allow quoted strings in values
+    (e.g. Set-Cookie), as commas inside values will be used as separators.
+    """
+    for part in value.split(sep):
+        if stripped := part.strip():
+            yield stripped
+
+
 def parse_etags(etag_str):
     """
     Parse a string of ETags given in an If-None-Match or If-Match header as
     defined by RFC 9110. Return a list of quoted ETags, or ['*'] if all ETags
     should be matched.
+
+    ETags values containing a comma are not supported, as the comma is used as
+    list separator.
     """
     if etag_str.strip() == "*":
         return ["*"]
     else:
         # Parse each ETag individually, and return any that are valid.
-        etag_matches = (ETAG_MATCH.match(etag.strip()) for etag in etag_str.split(","))
+        etag_matches = (ETAG_MATCH.match(etag) for etag in split_header_value(etag_str))
         return [match[1] for match in etag_matches if match]
 
 

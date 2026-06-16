@@ -129,9 +129,9 @@ This example is equivalent to::
    the maximum allowed length for the redirect URL. Set it to ``None`` to
    disable the length check.
 
-    .. versionchanged:: 6.1
+   .. versionchanged:: 6.1
 
-       ``max_length`` was added.
+        ``max_length`` was added.
 
 Examples
 --------

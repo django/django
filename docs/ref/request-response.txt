@@ -418,11 +418,14 @@ Methods
     no longer valid. If you provide the ``default`` argument the exception
     will be suppressed and that default value will be returned instead.
 
-    The optional ``salt`` argument can be used to provide extra protection
-    against brute force attacks on your secret key. If supplied, the
-    ``max_age`` argument will be checked against the signed timestamp
-    attached to the cookie value to ensure the cookie is not older than
-    ``max_age`` seconds.
+    The optional ``salt`` argument can be used to put the cookie into a
+    separate signature namespace. If supplied, the ``max_age`` argument will
+    be checked against the signed timestamp attached to the cookie value to
+    ensure the cookie is not older than ``max_age`` seconds.
+
+    Cookies signed by older Django versions are accepted by default for
+    backwards compatibility. Set :setting:`SIGNED_COOKIE_LEGACY_SALT_FALLBACK`
+    to ``False`` to reject them.
 
     For example:
 
@@ -444,6 +447,11 @@ Methods
         False
 
     See :doc:`cryptographic signing </topics/signing>` for more information.
+
+    .. versionchanged:: 5.2.15
+
+        In older versions, cookies signed with distinct ``(key, salt)`` pairs
+        that concatenate to the same string could be used interchangeably.
 
 .. method:: HttpRequest.is_secure()
 
@@ -1065,8 +1073,9 @@ Methods
     Like :meth:`~HttpResponse.set_cookie`, but
     :doc:`cryptographic signing </topics/signing>` the cookie before setting
     it. Use in conjunction with :meth:`HttpRequest.get_signed_cookie`.
-    You can use the optional ``salt`` argument for added key strength, but
-    you will need to remember to pass it to the corresponding
+    You can use the optional ``salt`` argument to put the cookie into a
+    separate signature namespace, but you will need to remember to pass it to
+    the corresponding
     :meth:`HttpRequest.get_signed_cookie` call.
 
 .. method:: HttpResponse.delete_cookie(key, path='/', domain=None, samesite=None)
@@ -1258,28 +1267,25 @@ Typical usage could look like:
 Serializing non-dictionary objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In order to serialize objects other than ``dict`` you must set the ``safe``
-parameter to ``False``:
+Objects other than ``dict`` can be serialized:
 
 .. code-block:: pycon
 
-    >>> response = JsonResponse([1, 2, 3], safe=False)
-
-Without passing ``safe=False``, a :exc:`TypeError` will be raised.
+    >>> response = JsonResponse([1, 2, 3])
 
 Note that an API based on ``dict`` objects is more extensible, flexible, and
 makes it easier to maintain forwards compatibility. Therefore, you should avoid
-using non-dict objects in JSON-encoded response.
+using non-dict objects in JSON-encoded responses.
 
-.. warning::
+.. versionchanged:: 6.2
 
-    Before the `5th edition of ECMAScript
-    <https://262.ecma-international.org/5.1/#sec-11.1.4>`_ it was possible to
-    poison the JavaScript ``Array`` constructor. For this reason, Django does
-    not allow passing non-dict objects to the
-    :class:`~django.http.JsonResponse` constructor by default. However, most
-    modern browsers implement ECMAScript 5 which removes this attack vector.
-    Therefore it is possible to disable this security precaution.
+    In earlier versions, it was necessary to pass ``safe=False`` to serialize
+    other objects besides dictionaries, as the (now deprecated) ``safe``
+    parameter defaulted to ``True``, raising :exc:`TypeError`.
+
+.. deprecated:: 6.2
+
+    The ``safe`` parameter is deprecated.
 
 Changing the default JSON encoder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

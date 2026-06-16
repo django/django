@@ -12,9 +12,108 @@ Or from the repo root with:
 $ PYTHONPATH=scripts/ python -m unittest scripts/tests.py
 """
 
+import hashlib
+import os
+import tempfile
 import unittest
 
+from do_django_release import (
+    create_checksum_file,
+    find_release_artifacts,
+    parse_major_version,
+)
 from prepare_commit_msg import process_commit_message
+
+
+class ParseMajorVersionTests(unittest.TestCase):
+    def test_final_patch_release(self):
+        self.assertEqual(parse_major_version("5.2.4"), "5.2")
+
+    def test_final_dot_zero_release(self):
+        self.assertEqual(parse_major_version("6.0"), "6.0")
+
+    def test_alpha(self):
+        self.assertEqual(parse_major_version("6.0a1"), "6.0")
+
+    def test_beta(self):
+        self.assertEqual(parse_major_version("6.0b1"), "6.0")
+
+    def test_release_candidate(self):
+        self.assertEqual(parse_major_version("6.0rc1"), "6.0")
+
+    def test_two_digit_minor(self):
+        self.assertEqual(parse_major_version("5.10a1"), "5.10")
+
+
+class CreateChecksumFileTests(unittest.TestCase):
+    WHEEL_CONTENT = b"fake wheel content"
+    TARBALL_CONTENT = b"fake tarball content"
+
+    def generate_checksum_file(self, **overrides):
+        with tempfile.TemporaryDirectory() as tmp:
+            dist_path = os.path.join(tmp, "dist")
+            os.mkdir(dist_path)
+            with open(
+                os.path.join(dist_path, "Django-5.2.4-py3-none-any.whl"), "wb"
+            ) as f:
+                f.write(self.WHEEL_CONTENT)
+            with open(os.path.join(dist_path, "django-5.2.4.tar.gz"), "wb") as f:
+                f.write(self.TARBALL_CONTENT)
+            artifacts_path = os.path.join(tmp, "artifacts")
+            os.mkdir(artifacts_path)
+            checksum_file_path = os.path.join(
+                artifacts_path, "Django-5.2.4.checksum.txt"
+            )
+            kwargs = dict(
+                django_version="5.2.4",
+                release_date="May 7, 2025",
+                checksum_file_path=checksum_file_path,
+                wheel_name="Django-5.2.4-py3-none-any.whl",
+                tarball_name="django-5.2.4.tar.gz",
+                commit_hash="abc123def456abc123def456abc123def456abc1",
+                dist_path=dist_path,
+                pgp_key_id="ABCD1234ABCD1234",
+                pgp_key_url="https://github.com/releaser.gpg",
+            )
+            kwargs.update(overrides)
+            create_checksum_file(**kwargs)
+            with open(checksum_file_path) as f:
+                return f.read()
+
+    def test_release_metadata(self):
+        result = self.generate_checksum_file()
+        self.assertIn("Django 5.2.4", result)
+        self.assertIn("May 7, 2025", result)
+        self.assertIn("ABCD1234ABCD1234", result)
+        self.assertIn("https://github.com/releaser.gpg", result)
+        self.assertIn("Django-5.2.4.checksum.txt", result)
+        self.assertIn("abc123def456abc123def456abc123def456abc1  5.2.4", result)
+
+    def test_artifact_checksums(self):
+        result = self.generate_checksum_file()
+        for algo in (hashlib.md5, hashlib.sha1, hashlib.sha256):
+            expected_tarball = algo(self.TARBALL_CONTENT).hexdigest()
+            expected_wheel = algo(self.WHEEL_CONTENT).hexdigest()
+            self.assertIn(f"{expected_tarball}  django-5.2.4.tar.gz", result)
+            self.assertIn(f"{expected_wheel}  Django-5.2.4-py3-none-any.whl", result)
+
+
+class FindReleaseArtifactsTests(unittest.TestCase):
+    def test_finds_wheel_and_tarball(self):
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, "Django-5.2.4-py3-none-any.whl"), "w"):
+                pass
+            with open(os.path.join(d, "django-5.2.4.tar.gz"), "w"):
+                pass
+            wheel, tarball = find_release_artifacts(d)
+        self.assertEqual(wheel, "Django-5.2.4-py3-none-any.whl")
+        self.assertEqual(tarball, "django-5.2.4.tar.gz")
+
+    def test_empty_directory_returns_none(self):
+        with tempfile.TemporaryDirectory() as d:
+            wheel, tarball = find_release_artifacts(d)
+        self.assertIsNone(wheel)
+        self.assertIsNone(tarball)
 
 
 class ProcessCommitMessageTests(unittest.TestCase):

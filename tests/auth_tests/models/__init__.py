@@ -8,6 +8,7 @@ from .custom_user import (
 from .invalid_models import CustomUserNonUniqueUsername
 from .is_active import IsActiveTestUser1
 from .minimal import MinimalUser
+from .no_natural_key import CustomUserNoNaturalKey
 from .no_password import NoPasswordUser
 from .proxy import Proxy, UserProxy
 from .uuid_pk import UUIDUser
@@ -23,6 +24,7 @@ __all__ = (
     "CustomPermissionsUser",
     "CustomUser",
     "CustomUserCompositePrimaryKey",
+    "CustomUserNoNaturalKey",
     "CustomUserNonUniqueUsername",
     "CustomUserWithFK",
     "CustomUserWithM2M",

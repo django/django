@@ -36,7 +36,7 @@ jobs:
       - name: Post/update PR comment
         env:
           PR_NUMBER: ${{ steps.pr.outputs.number }}
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');

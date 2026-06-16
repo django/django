@@ -253,8 +253,19 @@ In this example, the cache table's name is ``my_cache_table``::
     }
 
 Unlike other cache backends, the database cache does not support automatic
-culling of expired entries at the database level. Instead, expired cache
-entries are culled each time ``add()``, ``set()``, or ``touch()`` is called.
+culling of expired entries at the database level. Instead, an expired cache
+entry is deleted when evaluated by a ``get()`` request. Furthermore,
+expired cache entries are culled when ``add()``, ``set()``, or ``touch()``
+is called and the number of entries exceeds ``MAX_ENTRIES``.
+
+Since the cull operation can be expensive for a large cache, you may control
+how often this check occurs by setting ``CULL_PROBABILITY`` to a value between
+0 and 1. This makes the cull probabilistic, occurring on that percentage of
+writes. The default is ``0.1`` (10%).
+
+.. versionadded:: 6.2
+
+    The ``CULL_PROBABILITY`` option was added.
 
 .. _database-caching-creating-the-table:
 
@@ -498,6 +509,14 @@ behavior. These arguments are provided as additional keys in the
     entire cache will be dumped when ``MAX_ENTRIES`` is reached.
     On some backends (``database`` in particular) this makes culling *much*
     faster at the expense of more cache misses.
+
+  * ``CULL_PROBABILITY``: The percentage of writes that will trigger a cull on
+    the database backend. This value should be between 0 and 1: the default is
+    ``0.1``.
+
+  .. versionadded:: 6.2
+
+    The ``CULL_PROBABILITY`` option was added.
 
   The Memcached and Redis backends pass the contents of :setting:`OPTIONS
   <CACHES-OPTIONS>` as keyword arguments to the client constructors, allowing
@@ -1402,6 +1421,18 @@ second argument.
 
 For more on Vary headers, see the :rfc:`official Vary spec
 <9110#section-12.5.5>`.
+
+.. admonition:: ``CacheMiddleware`` varies on ``Authorization`` automatically
+
+    Although varying on ``Authorization`` is not strictly necessary given that
+    :rfc:`9111#section-3.5` allows caches to avoid reusing authenticated
+    responses, Django's ``CacheMiddleware`` adds ``Authorization`` to the
+    ``Vary`` header to simplify construction of cache keys.
+
+.. versionchanged:: 6.0.6
+
+    Previously, ``UpdateCacheMiddleware`` did not vary on ``Authorization`` for
+    requests bearing that header.
 
 Controlling cache: Using other headers
 ======================================

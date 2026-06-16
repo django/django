@@ -30,15 +30,16 @@ transaction to provide isolation::
 
     class AnimalTestCase(TestCase):
         def setUp(self):
-            Animal.objects.create(name="lion", sound="roar")
             Animal.objects.create(name="cat", sound="meow")
 
         def test_animals_can_speak(self):
             """Animals that can speak are correctly identified"""
-            lion = Animal.objects.get(name="lion")
             cat = Animal.objects.get(name="cat")
-            self.assertEqual(lion.speak(), 'The lion says "roar"')
             self.assertEqual(cat.speak(), 'The cat says "meow"')
+
+            cat.sound = "hiss"
+            cat.save(update_fields=["sound"])
+            self.assertEqual(cat.speak(), 'The cat says "hiss"')
 
 When you :ref:`run your tests <running-tests>`, the default behavior of the
 test utility is to find all the test case classes (that is, subclasses of
@@ -348,7 +349,6 @@ or an unexpected success). If all the tests pass, the return code is 0. This
 feature is useful if you're using the test-runner script in a shell script and
 need to test for success or failure at that level.
 
-.. _speeding-up-tests-auth-hashers:
 
 Speeding up the tests
 ---------------------
@@ -358,6 +358,8 @@ Running tests in parallel
 
 As long as your tests are properly isolated, you can run them in parallel to
 gain a speed up on multi-core hardware. See :option:`test --parallel`.
+
+.. _speeding-up-tests-auth-hashers:
 
 Password hashing
 ~~~~~~~~~~~~~~~~
@@ -386,3 +388,12 @@ Avoiding disk access for media files
 The :class:`~django.core.files.storage.InMemoryStorage` is a convenient way to
 prevent disk access for media files. All data is kept in memory, then it gets
 discarded after tests run.
+
+Using ``setUpTestData`` to create test data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Moving common test data to :meth:`TestCase.setUpTestData` will reduce the
+number of times your tests need to create the data. Using
+:meth:`TestCase.setUpTestData` to will create test data
+once per class. While :meth:`TestCase.setUp() <unittest.TestCase.setUp>` will
+create the test data once per test.

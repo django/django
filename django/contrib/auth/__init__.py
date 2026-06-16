@@ -89,6 +89,22 @@ def _clean_credentials(credentials):
     return credentials
 
 
+def _set_auth_user(request, user=None):
+    from django.contrib.auth.models import AnonymousUser
+
+    if user is None:
+        user = AnonymousUser()
+
+    if hasattr(request, "user"):
+        request.user = user
+    if hasattr(request, "auser"):
+
+        async def auser():
+            return user
+
+        request.auser = auser
+
+
 def _get_user_session_key(request):
     # This value in the session is always serialized to a string, so we need
     # to convert it back to Python whenever we access it.
@@ -177,8 +193,7 @@ def login(request, user, backend=None):
     request.session[SESSION_KEY] = user._meta.pk.value_to_string(user)
     request.session[BACKEND_SESSION_KEY] = backend
     request.session[HASH_SESSION_KEY] = session_auth_hash
-    if hasattr(request, "user"):
-        request.user = user
+    _set_auth_user(request, user)
     rotate_token(request)
     user_logged_in.send(sender=user.__class__, request=request, user=user)
 
@@ -207,14 +222,7 @@ async def alogin(request, user, backend=None):
     await request.session.aset(SESSION_KEY, user._meta.pk.value_to_string(user))
     await request.session.aset(BACKEND_SESSION_KEY, backend)
     await request.session.aset(HASH_SESSION_KEY, session_auth_hash)
-    if hasattr(request, "user"):
-        request.user = user
-    if hasattr(request, "auser"):
-
-        async def auser():
-            return user
-
-        request.auser = auser
+    _set_auth_user(request, user)
     rotate_token(request)
     await user_logged_in.asend(sender=user.__class__, request=request, user=user)
 
@@ -231,10 +239,8 @@ def logout(request):
         user = None
     user_logged_out.send(sender=user.__class__, request=request, user=user)
     request.session.flush()
-    if hasattr(request, "user"):
-        from django.contrib.auth.models import AnonymousUser
 
-        request.user = AnonymousUser()
+    _set_auth_user(request)
 
 
 async def alogout(request):
@@ -249,20 +255,7 @@ async def alogout(request):
     await user_logged_out.asend(sender=user.__class__, request=request, user=user)
     await request.session.aflush()
 
-    has_user = hasattr(request, "user")
-    has_auser = hasattr(request, "auser")
-    if has_user or has_auser:
-        from django.contrib.auth.models import AnonymousUser
-
-        anon = AnonymousUser()
-        if has_user:
-            request.user = anon
-        if has_auser:
-
-            async def auser():
-                return anon
-
-            request.auser = auser
+    _set_auth_user(request)
 
 
 def get_user_model():
@@ -409,6 +402,7 @@ def check_password_with_timing_attack_mitigation(user, password):
 async def acheck_password_with_timing_attack_mitigation(user, password):
     """See check_user_with_timing_attack_mitigation."""
     if user is None:
-        await sync_to_async(get_user_model()().set_password)(password)
+        set_password = get_user_model()().set_password
+        await sync_to_async(set_password, thread_sensitive=False)(password)
     else:
         return await user.acheck_password(password)

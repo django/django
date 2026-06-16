@@ -117,7 +117,8 @@ Raising ``ValidationError``
 In order to make error messages flexible and easy to override, consider the
 following guidelines:
 
-* Provide a descriptive error ``code`` to the constructor::
+* Provide a descriptive error ``code`` to the constructor, to allow
+  programmatic use (e.g. in tests) that will not vary with translations::
 
       # Good
       ValidationError(_("Invalid value"), code="invalid")

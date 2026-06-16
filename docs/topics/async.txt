@@ -117,6 +117,26 @@ For example::
     @never_cache
     async def my_async_view(request): ...
 
+:func:`~django.utils.decorators.method_decorator` can be used with asynchronous
+methods, including ``async def`` view handlers. Note, though, that if
+decorating :meth:`~django.views.generic.base.View.dispatch` on a ``View`` with
+asynchronous handlers, you will need to override ``dispatch`` to make it
+``async def`` as well::
+
+    class MyClass(View):
+        @method_decorator(never_cache)
+        async def dispatch(self, *args, **kwargs):
+            return super().dispatch(*args, **kwargs)
+
+        async def get(self, request): ...
+
+        async def post(self, request): ...
+
+Here, because we are decorating ``dispatch``, rather than the individual
+handler methods, we need to make ``dispatch`` asynchronous so that
+``method_decorator`` can correctly mark the resulting method as a coroutine
+function.
+
 Queries & the ORM
 -----------------
 

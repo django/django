@@ -7,8 +7,9 @@ from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style
-from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.module_loading import import_string
+from django.utils.warnings import django_file_prefixes
 
 request_logger = logging.getLogger("django.request")
 

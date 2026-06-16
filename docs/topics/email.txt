@@ -8,8 +8,8 @@ Sending email
 Django provides wrappers for Python's :mod:`email` and :mod:`smtplib` modules
 to simplify composing and sending email. Django's email framework also supports
 swapping in different delivery mechanisms: you can direct email to the console
-or a file during development, or use community-maintained solutions for sending
-email directly through commercial email service providers.
+or a file during development and an SMTP server or email service provider in
+production.
 
 The code lives in the ``django.core.mail`` module.
 
@@ -68,13 +68,12 @@ Configuring email
 =================
 
 New Django projects are not configured to send email by default. Instead, email
-is printed to ``stdout`` as a development aid (for projects created with
+is printed to the console as a development aid (for projects created with
 :djadmin:`startproject`) or results in a ``MailerDoesNotExist`` error (when the
 :setting:`MAILERS` setting isn't defined).
 
-To enable sending real email, you will need to tell Django how to send it by
-creating or editing the :setting:`MAILERS` setting. For example, to send
-through an SMTP server running on the local machine::
+Use the :setting:`MAILERS` setting to tell Django how to send email. For
+example, to send through an SMTP server running on the local machine::
 
     MAILERS = {
         "default": {
@@ -85,29 +84,30 @@ through an SMTP server running on the local machine::
         },
     }
 
-`SMTP`_ is supported by nearly all email service mailers and many hosting
-environments. But there are other options: many commercial services offer APIs
-with additional sending features, and during development or testing you might
-not want to send email at all.
-
 Django abstracts the email sending process into an "email backend" class.
-:ref:`topic-email-backends` lists the email backends that come with Django: the
-:ref:`SMTP backend <topic-email-smtp-backend>` for production use and several
-others meant for development and testing. It also covers :ref:`third-party
-packages <topic-third-party-email-backends>` and :ref:`custom backends
-<topic-custom-email-backend>` if Django's built-in backends don't meet your
-needs.
+:ref:`topic-email-backends` lists the email backends that come with Django.
 
-Django's test runner automatically :ref:`overrides the email configuration
-<topics-testing-email>` during testing. It substitutes the :ref:`memory backend
-<topic-email-memory-backend>` for each defined mailer, preventing email from
-being sent and giving test cases access to the messages.
+The example above uses Django's :ref:`SMTP email backend
+<topic-email-smtp-backend>`, which sends using the standard `SMTP`_ protocol.
+This backend is useful for many production configurations, including SMTP
+servers in your own infrastructure and most commercial email service providers
+(ESPs). There are also :ref:`third-party email backends
+<topic-third-party-email-backends>` available that integrate directly with ESP
+APIs or add other sending features.
+
+During development or testing you often don't want to send email at all.
+Django's test runner :ref:`automatically overrides <topics-testing-email>` the
+:setting:`MAILERS` configuration to substitute Django's :ref:`memory email
+backend <topic-email-memory-backend>`. This prevents test cases from sending
+real email and gives them access to the messages that would have been sent.
+:ref:`topics/email:Configuring email for development` discusses some other
+approaches.
 
 .. versionchanged:: 6.1
 
     In earlier releases, Django defaulted to sending email through an SMTP
-    server running on localhost (using the now-deprecated
-    :setting:`EMAIL_BACKEND` and related settings).
+    server running on localhost, using the now-deprecated
+    :setting:`EMAIL_BACKEND` and related settings.
 
 .. deprecated:: 6.1
 
@@ -123,9 +123,10 @@ being sent and giving test cases access to the messages.
 Multiple mailers
 ----------------
 
-Sometimes different types of email need to be sent in different ways: internal
-vs. external email, different servers for users in different regions, different
-services for transactional notifications and bulk marketing email, etc.
+Sometimes different types of email need to be sent in different ways: e.g.,
+internal vs. external email, different SMTP servers for users in different
+regions, using different services for transactional notifications and bulk
+marketing email, etc.
 
 The :setting:`MAILERS` setting can define multiple mail configurations. For
 example::
@@ -162,8 +163,7 @@ This defines three mailer configurations:
 * ``"default"`` sends through an SMTP server at ``smtp.example.net`` with a TLS
   secured connection. It reads an account id and API key from environment
   variables and uses them as the SMTP authentication username and password.
-  (Many SMTP relay services use some variation of this authentication scheme.
-  Check your provider's documentation for specific options to use.)
+  (Many SMTP services use some variation of this authentication scheme.)
 
 * ``"notifications"`` sends through a hypothetical commercial email service,
   using a third-party EmailBackend that connects directly to their API.
@@ -188,10 +188,10 @@ mailer configuration::
     )
 
 If ``using`` is not specified, Django uses the mailer defined for the
-``"default"`` mailer configuration.
+``"default"`` configuration.
 
 With reusable apps or Django features that send email for you, there may be an
-option to use a specific mailer. For example, Django's logging
+option to use a specific mailer configuration. For example, Django's logging
 :class:`~django.utils.log.AdminEmailHandler` allows specifying the mailer
 configuration in its ``using`` option.
 
@@ -232,10 +232,9 @@ are required.
 The following parameters are optional, and must be given as keyword arguments
 if used.
 
-* ``fail_silently``: A boolean. When it's ``False``, ``send_mail()`` will raise
-  an :exc:`smtplib.SMTPException` if an error occurs. See the :mod:`smtplib`
-  docs for a list of possible exceptions, all of which are subclasses of
-  :exc:`~smtplib.SMTPException`.
+* ``fail_silently``: A boolean, default ``False``. If set ``True``,
+  ``send_mail()`` will suppress some errors during sending. (The exact
+  exceptions ignored depend on the email backend in use.)
 * ``auth_user``: The optional username to use to authenticate to the SMTP
   server. If this isn't provided, Django will use the value of the
   :setting:`EMAIL_HOST_USER` setting.
@@ -269,7 +268,9 @@ can be ``0`` or ``1`` since it can only send one message).
     The ``fail_silently``, ``auth_user``, ``auth_password``, and ``connection``
     arguments are deprecated. In most cases they can be replaced by ``using``
     with an appropriate :setting:`MAILERS` configuration. See
-    :ref:`migrating-to-mailers`.
+    :ref:`migrating-to-mailers-fail-silently`,
+    :ref:`migrating-to-mailers-auth`, and
+    :ref:`migrating-to-mailers-get-connection`.
 
 .. versionchanged:: 6.1
 
@@ -318,7 +319,7 @@ mail server would be opened::
         "from@example.com",
         ["second@test.com"],
     )
-    send_mass_mail((message1, message2), fail_silently=False)
+    send_mass_mail((message1, message2))
 
 The return value will be the number of successfully delivered messages.
 
@@ -332,7 +333,9 @@ The return value will be the number of successfully delivered messages.
     The ``fail_silently``, ``auth_user``, ``auth_password``, and ``connection``
     arguments are deprecated. In most cases they can be replaced by ``using``
     with an appropriate :setting:`MAILERS` configuration. See
-    :ref:`migrating-to-mailers`.
+    :ref:`migrating-to-mailers-fail-silently`,
+    :ref:`migrating-to-mailers-auth`, and
+    :ref:`migrating-to-mailers-get-connection`.
 
 .. versionchanged:: 6.1
 
@@ -405,7 +408,9 @@ used.
 
     The ``fail_silently`` and ``connection`` arguments are deprecated. In most
     cases they can be replaced by ``using`` with an appropriate
-    :setting:`MAILERS` configuration. See :ref:`migrating-to-mailers`.
+    :setting:`MAILERS` configuration. See
+    :ref:`migrating-to-mailers-fail-silently` and
+    :ref:`migrating-to-mailers-get-connection`.
 
 .. versionchanged:: 6.1
 
@@ -436,7 +441,9 @@ used.
 
     The ``fail_silently`` and ``connection`` arguments are deprecated. In most
     cases they can be replaced by ``using`` with an appropriate
-    :setting:`MAILERS` configuration. See :ref:`migrating-to-mailers`.
+    :setting:`MAILERS` configuration. See
+    :ref:`migrating-to-mailers-fail-silently` and
+    :ref:`migrating-to-mailers-get-connection`.
 
 .. versionchanged:: 6.1
 
@@ -498,7 +505,7 @@ email backend API :ref:`provides an alternative
     * ``cc``: A list or tuple of recipient addresses used in the "Cc" header
       when sending the email.
 
-    * ``bcc``: A list or tuple of addresses used in the "Bcc" header when
+    * ``bcc``: A list or tuple of addresses used for blind carbon copies when
       sending the email.
 
     * ``reply_to``: A list or tuple of recipient addresses used in the
@@ -508,11 +515,6 @@ email backend API :ref:`provides an alternative
       be an instance of :class:`~email.message.MIMEPart` or
       :class:`EmailAttachment`, or a tuple with attributes
       ``(filename, content, mimetype)``.
-
-      .. versionchanged:: 6.0
-
-          Support for :class:`~email.message.MIMEPart` objects in the
-          ``attachments`` list was added.
 
       .. deprecated:: 6.0
 
@@ -606,11 +608,6 @@ email backend API :ref:`provides an alternative
         you'll probably want to override this method to put the content you
         want into the Python EmailMessage object.
 
-        .. versionchanged:: 6.0
-
-            The ``policy`` keyword argument was added and the return type was
-            updated to an instance of :class:`~email.message.EmailMessage`.
-
     .. method:: recipients()
 
         Returns a list of all the recipients of the message, whether they're
@@ -677,11 +674,6 @@ email backend API :ref:`provides an alternative
 
           Python's :meth:`email.contentmanager.set_content` documentation
           describes the supported arguments for ``MIMEPart.set_content()``.
-
-          .. versionchanged:: 6.0
-
-              Support for :class:`~email.message.MIMEPart` attachments was
-              added.
 
           .. deprecated:: 6.0
 
@@ -840,12 +832,6 @@ to "/contact/thanks/" when it's done::
             # to get proper validation errors.
             return HttpResponse("Make sure all fields are entered and valid.")
 
-
-.. versionchanged:: 6.0
-
-    Older versions raised ``django.core.mail.BadHeaderError`` for some
-    invalid headers. This has been replaced with :exc:`!ValueError`.
-
 .. _Header injection: http://www.nyphp.org/phundamentals/8_Preventing-Email-Header-Injection.html
 
 .. _topics-sending-multiple-emails:
@@ -858,14 +844,13 @@ for that matter) is an expensive process. If you have a lot of emails to send,
 it makes sense to reuse an SMTP connection, rather than creating and
 destroying a connection every time you want to send an email.
 
-There are two ways to tell an email backend to reuse a connection. Both
-require an email backend instance obtained via :func:`get_connection`, which is
-documented in :ref:`topic-email-backends`.
+There are two ways to tell an email backend to reuse a connection. Both involve
+obtaining an email backend instance from :data:`.mail.mailers` and using the
+:ref:`backend's API <topic-email-backend-api>`.
 
-The first approach is to obtain an email backend instance from :data:`mailers`
-and use its ``send_messages()`` method. This takes a list of
-:class:`EmailMessage` (or subclass) instances, and sends them all using that
-single connection.
+The first approach is to use the backend's ``send_messages()`` method. This
+takes a list of :class:`EmailMessage` (or subclass) instances, and sends them
+all using that single connection.
 
 For example, if you have a function called ``get_notification_emails()`` that
 returns a list of :class:`EmailMessage` objects representing some periodic
@@ -953,21 +938,6 @@ built-in backends don't meet your needs there are :ref:`third-party packages
 built-in backends to change its behavior, or even :ref:`write your own email
 backend <topic-custom-email-backend>`.
 
-The email backend class has the following methods:
-
-* ``open()`` instantiates a long-lived email-sending connection.
-
-* ``close()`` closes the current email-sending connection.
-
-* ``send_messages(email_messages)`` sends a list of :class:`EmailMessage`
-  objects. If the connection is not open, this call will implicitly open the
-  connection, and close the connection afterward. If the connection is already
-  open, it will be left open after mail has been sent.
-
-It can also be used as a context manager, which will automatically call
-``open()`` and ``close()`` as needed. An example is in
-:ref:`topics-sending-multiple-emails`.
-
 .. _topic-email-smtp-backend:
 
 SMTP backend
@@ -1046,7 +1016,7 @@ Example::
     When the :setting:`MAILERS` setting is not defined, Django uses the SMTP
     backend as the default mailer (the default :setting:`EMAIL_BACKEND`),
     connecting to localhost on port 25. This behavior will be removed in Django
-    7.0, which will not have a default email mailer.
+    7.0, which will not have a default mailer configuration.
 
     When the SMTP backend is used without :setting:`MAILERS` defined,
     the options listed above are obtained from the deprecated
@@ -1064,11 +1034,12 @@ Example::
     Directly instantiating an ``EmailBackend`` class is not recommended. Use
     :data:`mailers` to obtain a backend instance.
 
-    When constructed directly, the SMTP ``EmailBackend`` class accepts the
-    options listed above as keyword arguments. Default values come from the
-    corresponding, deprecated ``EMAIL_*`` settings. ``host`` is not required
-    and defaults to ``"localhost"``, and ``port`` defaults to ``25`` even if
-    ``use_tls`` or ``use_ssl`` is True.
+    When constructed directly (without going through :data:`mailers`), the SMTP
+    ``EmailBackend`` class accepts the options listed above as keyword
+    arguments. Default values come from the corresponding, deprecated
+    ``EMAIL_*`` settings. ``host`` is not required and defaults to
+    ``"localhost"``, and ``port`` defaults to ``25`` even if ``use_tls`` or
+    ``use_ssl`` is True.
 
     When the :setting:`MAILERS` setting is defined, attempting to directly
     create an SMTP ``EmailBackend`` will raise an ``AttributeError``.
@@ -1122,8 +1093,8 @@ convenience that can be used during development.
 
 .. versionchanged:: 6.1
 
-    The settings file created by :djadmin:`startproject` now sets up
-    :setting:`MAILERS` with the console backend as the default mailer.
+    The settings file created by :djadmin:`startproject` now defines
+    :setting:`MAILERS` with the console backend as the default configuration.
 
 .. _topic-email-file-backend:
 
@@ -1318,6 +1289,26 @@ backends.
         :func:`!get_connection` is deprecated and will be removed in Django
         7.0. Switch to :data:`mailers[alias] <mailers>`. See
         :ref:`migrating-to-mailers-get-connection` for migration suggestions.
+
+.. _topic-email-backend-api:
+
+Email backend API
+-----------------
+
+Instances of an email backend class have the following methods:
+
+* ``open()`` instantiates a long-lived email-sending connection.
+
+* ``close()`` closes the current email-sending connection.
+
+* ``send_messages(email_messages)`` sends a list of :class:`EmailMessage`
+  objects. If the connection is not open, this call will implicitly open the
+  connection, and close the connection afterward. If the connection is already
+  open, it will be left open after mail has been sent.
+
+A backend instance can also be used as a context manager, which will
+automatically call ``open()`` and ``close()`` as needed. An example is in
+:ref:`topics-sending-multiple-emails`.
 
 
 Configuring email for development

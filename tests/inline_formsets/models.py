@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.functions import UUID4
 
 
 class School(models.Model):
@@ -19,6 +20,27 @@ class Child(models.Model):
         constraints = [
             models.UniqueConstraint("mother", "father", name="unique_parents"),
         ]
+
+
+class ParentUUIDPk(models.Model):
+    uuid = models.UUIDField(primary_key=True, db_default=UUID4(), editable=False)
+
+    class Meta:
+        required_db_features = {
+            "supports_uuid4_function",
+            "supports_expression_defaults",
+        }
+
+
+class ChildUUIDPk(models.Model):
+    parent = models.ForeignKey(ParentUUIDPk, models.CASCADE)
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        required_db_features = {
+            "supports_uuid4_function",
+            "supports_expression_defaults",
+        }
 
 
 class Poet(models.Model):

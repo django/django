@@ -7,6 +7,14 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
+.. _deprecation-removed-in-7.1:
+
+7.1
+---
+
+See the :ref:`Django 6.2 release notes <deprecated-features-6.2>` for more
+details on these changes.
+
 .. _deprecation-removed-in-7.0:
 
 7.0
@@ -27,6 +35,9 @@ details on these changes.
   change from HTTP to HTTPS.
 
 * The ``URLIZE_ASSUME_HTTPS`` transitional setting will be removed.
+
+* The ``SIGNED_COOKIE_LEGACY_SALT_FALLBACK`` transitional setting will be
+  removed.
 
 * Using a percent sign in a column alias or annotation will raise
   ``ValueError``.
@@ -125,6 +136,9 @@ details on these changes.
 
 * Support for overriding ``ModelAdmin.get_action_choices()`` without the new
   ``action_location`` parameter will be removed.
+
+* The ``django.db.transaction.savepoint()`` alias to
+  ``django.db.transaction.savepoint_create()`` will be removed.
 
 .. _deprecation-removed-in-6.1:
 

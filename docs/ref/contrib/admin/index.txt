@@ -1244,8 +1244,11 @@ subclass::
     This should be set to a list of field names that will be searched whenever
     somebody submits a search query in that text box.
 
-    These fields should be some kind of text field, such as ``CharField`` or
-    ``TextField``. You can also perform a related lookup on a ``ForeignKey`` or
+    These fields are typically text fields such as ``CharField`` or
+    ``TextField``, but non-text fields like ``IntegerField`` can also be
+    searched. Adding an explicit lookup, such as ``age__exact``, lets the
+    search use that lookup directly instead of casting the value to text. You
+    can also perform a related lookup on a ``ForeignKey`` or
     ``ManyToManyField`` with the lookup API "follow" notation::
 
         search_fields = ["foreign_key__related_fieldname"]
@@ -1257,17 +1260,23 @@ subclass::
         search_fields = ["user__email"]
 
     When somebody does a search in the admin search box, Django splits the
-    search query into words and returns all objects that contain each of the
-    words, case-insensitive (using the :lookup:`icontains` lookup), where each
-    word must be in at least one of ``search_fields``. For example, if
-    ``search_fields`` is set to ``['first_name', 'last_name']`` and a user
-    searches for ``john lennon``, Django will do the equivalent of this SQL
-    ``WHERE`` clause:
+    search query into search terms and returns all objects that contain each
+    of them in at least one of ``search_fields``. By default, the
+    :lookup:`icontains` lookup is used for text fields. For non-text fields
+    with an explicit lookup (e.g., ``age__exact``), the specified lookup is
+    used, and search terms that are invalid for that field type are skipped.
+
+    For example, if ``search_fields`` is set to
+    ``['first_name', 'last_name', 'age__exact']`` and a user searches for
+    ``john 25``, Django will do the equivalent of this SQL ``WHERE`` clause:
 
     .. code-block:: sql
 
         WHERE (first_name ILIKE '%john%' OR last_name ILIKE '%john%')
-        AND (first_name ILIKE '%lennon%' OR last_name ILIKE '%lennon%')
+        AND (first_name ILIKE '%25%' OR last_name ILIKE '%25%' OR age = 25)
+
+    Note that ``john`` is not searched on ``age`` because it's not a valid
+    integer, while ``25`` is searched on all three fields.
 
     The search query can contain quoted phrases with spaces. For example, if a
     user searches for ``"john winston"`` or ``'john winston'``, Django will do
@@ -1297,6 +1306,11 @@ subclass::
     If you need to customize search you can use
     :meth:`ModelAdmin.get_search_results` to provide additional or alternate
     search behavior.
+
+    .. versionchanged:: 6.1
+
+        On earlier versions, search terms invalid for a given field type were
+        not skipped.
 
 .. attribute:: ModelAdmin.search_help_text
 
@@ -1403,8 +1417,10 @@ default templates used by the :class:`ModelAdmin` views:
     relationship hierarchy. This is purely a display setting and does not
     affect the total number of objects retrieved from the database.
 
-    This applies to both :meth:`delete_view` and the ``delete_selected``
-    action. By default, this is ``None`` (no truncation).
+    This applies to :meth:`delete_view` and the ``delete_selected``
+    action if specified for ``ModelAdmin``, and to protected deletion
+    validation messages if specified for ``InlineModelAdmin``. By default,
+    this is ``None`` (no truncation).
 
 .. attribute:: ModelAdmin.object_history_template
 
@@ -2314,6 +2330,7 @@ adds some of its own (the shared features are actually defined in the
 - :attr:`~ModelAdmin.filter_vertical`
 - :attr:`~ModelAdmin.ordering`
 - :attr:`~ModelAdmin.prepopulated_fields`
+- :meth:`~ModelAdmin.get_exclude`
 - :meth:`~ModelAdmin.get_fieldsets`
 - :meth:`~ModelAdmin.get_queryset`
 - :attr:`~ModelAdmin.radio_fields`
@@ -3024,8 +3041,6 @@ Templates can override or extend base admin templates as described in
     Path to a custom template that will be used by the admin site logout view.
 
 .. attribute:: AdminSite.password_change_form
-
-    .. versionadded:: 6.0
 
     Subclass of :class:`~django.contrib.auth.forms.PasswordChangeForm` that
     will be used by the admin site password change view.
