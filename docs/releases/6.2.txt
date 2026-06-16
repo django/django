@@ -234,10 +234,7 @@ URLs
 Utilities
 ~~~~~~~~~
 
-* The new ``django.utils.warnings`` module provides
-  :func:`~django.utils.warnings.django_file_prefixes`, which returns the file
-  path prefix of the Django package for use as the ``skip_file_prefixes``
-  argument of :func:`warnings.warn`.
+* ...
 
 Validators
 ~~~~~~~~~~
