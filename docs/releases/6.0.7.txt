@@ -21,6 +21,20 @@ stored in Django's shared cache.
 This issue has severity "low" according to the :ref:`Django security policy
 <severity-levels>`.
 
+CVE-2026-53877: Heap buffer over-read in ``GDALRaster``
+=======================================================
+
+When :class:`~django.contrib.gis.gdal.GDALRaster` was instantiated with a bytes
+object representing a raster file, the
+:attr:`~django.contrib.gis.gdal.GDALRaster.vsi_buffer` property could over-read
+the allocated buffer by approximately 32 bytes. This could result in
+information disclosure of adjacent heap memory or, in rare cases, a
+segmentation fault. Only rasters stored in GDAL's virtual filesystem were
+affected.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
 Bugfixes
 ========
 
