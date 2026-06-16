@@ -7007,7 +7007,9 @@ class SeleniumTests(AdminSeleniumTestCase):
                 Select(self.selenium.find_element(By.NAME, "action")).select_by_value(
                     f"message_{level}"
                 )
-                self.selenium.find_element(By.XPATH, '//button[text()="Run"]').click()
+                self.selenium.find_element(
+                    By.CSS_SELECTOR, 'button[name="index"]'
+                ).click()
                 message = self.selenium.find_element(
                     By.CSS_SELECTOR, "ul.messagelist li"
                 )
