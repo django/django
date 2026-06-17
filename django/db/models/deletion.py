@@ -11,6 +11,42 @@ class ProtectedError(IntegrityError):
         super().__init__(msg, protected_objects)
 
 
+class RestrictedError(IntegrityError):
+    def __init__(self, msg, restricted_objects):
+        self.restricted_objects = restricted_objects
+        super().__init__(msg, restricted_objects)
+
+
+class DatabaseOnDelete:
+    """Base class for database-level deletion handlers."""
+    with_db = True
+    
+    def __init__(self, name, operation):
+        self.name = name
+        self.operation = operation
+    
+    def __call__(self, collector, field, sub_objs, using):
+        # Database-level handlers don't need to do anything at the ORM level
+        pass
+
+
+def RESTRICT(collector, field, sub_objs, using):
+    """Restrict deletion if related objects exist."""
+    raise RestrictedError(
+        "Cannot delete some instances of model '%s' because they are "
+        "referenced through a RESTRICT foreign key: '%s.%s'" % (
+            field.remote_field.model.__name__, sub_objs[0].__class__.__name__, field.name
+        ),
+        sub_objs
+    )
+
+
+# Database-level deletion handlers - these delegate to the database
+DB_CASCADE = DatabaseOnDelete('DB_CASCADE', 'CASCADE')
+DB_SET_NULL = DatabaseOnDelete('DB_SET_NULL', 'SET NULL')
+DB_SET_DEFAULT = DatabaseOnDelete('DB_SET_DEFAULT', 'SET DEFAULT')
+
+
 def CASCADE(collector, field, sub_objs, using):
     collector.collect(sub_objs, source=field.remote_field.model,
                       source_attr=field.name, nullable=field.null)
