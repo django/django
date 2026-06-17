@@ -209,6 +209,20 @@ def split_header_value(value, sep=","):
             yield stripped
 
 
+def split_directive_names(value):
+    """Yield the lowercased directive names from an HTTP header value.
+
+    Any qualified value is discarded, so that qualified forms permitted by
+    RFC 9111 (e.g. `private="Set-Cookie"`) reduce to their directive name
+    ("private").
+
+    Use to check for the presence of a directive when its value is not needed;
+    use `split_header_value()` when the value matters (e.g. `max-age`).
+    """
+    for part in split_header_value(value):
+        yield part.split("=", 1)[0].strip().lower()
+
+
 def parse_etags(etag_str):
     """
     Parse a string of ETags given in an If-None-Match or If-Match header as

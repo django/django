@@ -18,6 +18,7 @@ from django.utils.http import (
     parse_header_parameters,
     parse_http_date,
     quote_etag,
+    split_directive_names,
     split_header_value,
     url_has_allowed_host_and_scheme,
     urlencode,
@@ -355,6 +356,29 @@ class SplitHeaderValueTests(unittest.TestCase):
         for value, expected in tests:
             with self.subTest(value=value):
                 self.assertEqual(list(split_header_value(value, sep=";")), expected)
+
+
+class SplitDirectiveNamesTests(unittest.TestCase):
+    def test_basic(self):
+        tests = [
+            ("", []),
+            ("no-store", ["no-store"]),
+            # Names are lowercased.
+            ("No-Store, PRIVATE", ["no-store", "private"]),
+            # Qualified values are dropped, leaving the directive name.
+            ('private="Set-Cookie"', ["private"]),
+            ('no-cache="Set-Cookie", max-age=0', ["no-cache", "max-age"]),
+            # Whitespace around the "=" is stripped from the name.
+            ('private ="Set-Cookie"', ["private"]),
+            ("no-cache = foo", ["no-cache"]),
+            # Superstrings are preserved (not confused for shorter names).
+            ("myprivate", ["myprivate"]),
+            # A nameless directive yields an empty name.
+            ('="Set-Cookie"', [""]),
+        ]
+        for value, expected in tests:
+            with self.subTest(value=value):
+                self.assertEqual(list(split_directive_names(value)), expected)
 
 
 class ETagProcessingTests(unittest.TestCase):
