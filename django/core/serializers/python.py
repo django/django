@@ -9,8 +9,6 @@ from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
 from django.utils.encoding import is_protected_type
 
-from .utils import ClassLookupDict
-
 
 class FieldSerializer:
     @classmethod
@@ -139,6 +137,8 @@ class Deserializer(base.Deserializer):
     stream or a string) to the constructor
     """
 
+    serializer = Serializer
+
     def __init__(
         self, object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False, **options
     ):
@@ -148,7 +148,6 @@ class Deserializer(base.Deserializer):
         self.ignorenonexistent = ignorenonexistent
         self.field_names_cache = {}  # Model: <list of field_names>
         self._iterator = None
-        self.field_deserializers = ClassLookupDict(Serializer.field_mapping)
 
     def __iter__(self):
         for obj in self.stream:

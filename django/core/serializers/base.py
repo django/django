@@ -253,6 +253,8 @@ class Deserializer:
     Abstract base deserializer class.
     """
 
+    serializer = Serializer
+
     def __init__(self, stream_or_string, **options):
         """
         Init this serializer given a stream or a string
@@ -262,6 +264,7 @@ class Deserializer:
             self.stream = StringIO(stream_or_string)
         else:
             self.stream = stream_or_string
+        self.field_deserializers = ClassLookupDict(self.serializer.field_mapping)
 
     def __iter__(self):
         return self

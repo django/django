@@ -14,8 +14,6 @@ from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
 from django.utils.xmlutils import SimplerXMLGenerator, UnserializableContentError
 
-from .utils import ClassLookupDict
-
 
 class FieldSerializer:
     @classmethod
@@ -255,6 +253,8 @@ class Serializer(base.Serializer):
 class Deserializer(base.Deserializer):
     """Deserialize XML."""
 
+    serializer = Serializer
+
     def __init__(
         self,
         stream_or_string,
@@ -268,7 +268,6 @@ class Deserializer(base.Deserializer):
         self.event_stream = pulldom.parse(self.stream, self._make_parser())
         self.db = using
         self.ignore = ignorenonexistent
-        self.field_deserializers = ClassLookupDict(Serializer.field_mapping)
 
     def _make_parser(self):
         """Create a hardened XML parser (no custom/external entities)."""
