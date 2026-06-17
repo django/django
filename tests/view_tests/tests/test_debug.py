@@ -50,6 +50,7 @@ from ..views import (
     multivalue_dict_key_error,
     non_sensitive_view,
     paranoid_view,
+    partially_sensitive_view,
     sensitive_args_function_caller,
     sensitive_kwargs_function_caller,
     sensitive_method_view,
@@ -1672,6 +1673,20 @@ class ExceptionReporterFilterTests(
         with self.settings(DEBUG=False):
             self.verify_paranoid_response(paranoid_view)
             self.verify_paranoid_email(paranoid_view)
+
+    def test_partially_sensitive_request(self):
+        """
+        No POST parameters can be seen in the default error reports for views
+        decorated with the no-argument form of sensitive_post_parameters()
+        alongside a with-arguments form of sensitive_variables().
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(partially_sensitive_view)
+            self.verify_unsafe_email(partially_sensitive_view)
+
+        with self.settings(DEBUG=False):
+            self.verify_paranoid_response(partially_sensitive_view)
+            self.verify_paranoid_email(partially_sensitive_view)
 
     def test_multivalue_dict_key_error(self):
         """
