@@ -38,9 +38,6 @@ details on these changes.
 
 * The ``URLIZE_ASSUME_HTTPS`` transitional setting will be removed.
 
-* The ``SIGNED_COOKIE_LEGACY_SALT_FALLBACK`` transitional setting will be
-  removed.
-
 * Using a percent sign in a column alias or annotation will raise
   ``ValueError``.
 
@@ -80,6 +77,9 @@ details on these changes.
 * The ``django.db.models.fields.BLANK_CHOICE_DASH`` constant will be removed.
 
 * The ``USE_BLANK_CHOICE_DASH`` transitional setting will be removed.
+
+* The ``SIGNED_COOKIE_LEGACY_SALT_FALLBACK`` transitional setting will be
+  removed.
 
 * The ``Field.get_placeholder_sql`` shim over the deprecated
   ``get_placeholder`` method will be removed.
