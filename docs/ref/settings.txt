@@ -1282,6 +1282,10 @@ See also :setting:`NUMBER_GROUPING`, :setting:`THOUSAND_SEPARATOR` and
 
 Default: ``'``:class:`django.db.models.BigAutoField`\ ``'``
 
+.. deprecated:: 6.2
+
+    This setting is deprecated. Use :setting:`DEFAULT_PK_FIELD` instead.
+
 Default primary key field type to use for models that don't have a field with
 :attr:`primary_key=True <django.db.models.Field.primary_key>`.
 
@@ -1356,10 +1360,8 @@ any format valid in the chosen email sending protocol.
 This doesn't affect error messages sent to :setting:`ADMINS` and
 :setting:`MANAGERS`. See :setting:`SERVER_EMAIL` for that.
 
-<<<<<<< HEAD
 To build an address with a display name from variable content, see
 :ref:`formatting-addresses`.
-=======
 
 .. setting:: DEFAULT_PK_FIELD
 
@@ -1374,6 +1376,9 @@ The default primary key field type to use for models that don't define a
 primary key field explicitly.
 
 When set to ``None``, Django uses :setting:`DEFAULT_AUTO_FIELD`.
+
+This setting is the recommended replacement for
+:setting:`DEFAULT_AUTO_FIELD`, which is deprecated.
 
 Unlike :setting:`DEFAULT_AUTO_FIELD`, this setting may refer to any
 :class:`~django.db.models.Field` subclass. The field is created with
@@ -1396,7 +1401,6 @@ For example, to use UUID primary keys by default::
 Then configure::
 
     DEFAULT_PK_FIELD = "app.fields.UUIDPrimaryKeyField"
->>>>>>> b9f5fb9055 (Refs #32577 -- Added DEFAULT_PK_FIELD for implicit primary keys.)
 
 .. setting:: DEFAULT_INDEX_TABLESPACE
 
