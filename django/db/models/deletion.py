@@ -11,6 +11,12 @@ class ProtectedError(IntegrityError):
         super().__init__(msg, protected_objects)
 
 
+class RestrictedError(IntegrityError):
+    def __init__(self, msg, restricted_objects):
+        self.restricted_objects = restricted_objects
+        super().__init__(msg, restricted_objects)
+
+
 def CASCADE(collector, field, sub_objs, using):
     collector.collect(sub_objs, source=field.remote_field.model,
                       source_attr=field.name, nullable=field.null)
@@ -26,6 +32,11 @@ def PROTECT(collector, field, sub_objs, using):
         ),
         sub_objs
     )
+
+
+def RESTRICT(collector, field, sub_objs, using):
+    collector.add_restricted_objects(field, sub_objs)
+    collector.add_dependency(field.remote_field.model, field.model)
 
 
 def SET(value):
@@ -49,6 +60,26 @@ def SET_DEFAULT(collector, field, sub_objs, using):
 
 def DO_NOTHING(collector, field, sub_objs, using):
     pass
+
+
+class DatabaseOnDelete:
+    def __init__(self, operation, name, forced_collector=None):
+        self.operation = operation
+        self.forced_collector = forced_collector
+        self.__name__ = name
+
+    __call__ = DO_NOTHING
+
+    def on_delete_sql(self, schema_editor):
+        return schema_editor.connection.ops.fk_on_delete_sql(self.operation)
+
+    def __str__(self):
+        return self.__name__
+
+
+DB_CASCADE = DatabaseOnDelete("CASCADE", "DB_CASCADE", CASCADE)
+DB_SET_DEFAULT = DatabaseOnDelete("SET DEFAULT", "DB_SET_DEFAULT")
+DB_SET_NULL = DatabaseOnDelete("SET NULL", "DB_SET_NULL")
 
 
 def get_candidate_relations_to_delete(opts):
