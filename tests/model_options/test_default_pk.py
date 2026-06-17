@@ -3,8 +3,8 @@ import uuid
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.test import SimpleTestCase, override_settings
-from django.test.utils import isolate_apps
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.test.utils import ignore_warnings, isolate_apps
+from django.utils.deprecation import RemovedInDjango71Warning
 
 
 class MyBigAutoField(models.BigAutoField):
@@ -28,6 +28,7 @@ class TestDefaultPK(SimpleTestCase):
 
         self.assertIsInstance(MyModel._meta.pk, models.BigAutoField)
 
+    @ignore_warnings(category=RemovedInDjango71Warning)
     @override_settings(DEFAULT_AUTO_FIELD="django.db.models.NonexistentAutoField")
     def test_default_auto_field_setting_nonexistent(self):
         msg = (
@@ -50,23 +51,6 @@ class TestDefaultPK(SimpleTestCase):
 
             class Model(models.Model):
                 pass
-
-    @isolate_apps("model_options.apps.ModelDefaultPKConfig")
-    @override_settings(
-        DEFAULT_PK_FIELD=None,
-        DEFAULT_AUTO_FIELD="django.db.models.BigAutoField",
-    )
-    def test_default_auto_field_deprecation_warning(self):
-        msg = (
-            "The DEFAULT_AUTO_FIELD setting is deprecated. Use DEFAULT_PK_FIELD "
-            "instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
-
-            class Model(models.Model):
-                pass
-
-        self.assertIsInstance(Model._meta.pk, models.BigAutoField)
 
     @override_settings(
         DEFAULT_PK_FIELD="model_options.test_default_pk.UUIDPrimaryKeyField"
@@ -103,6 +87,7 @@ class TestDefaultPK(SimpleTestCase):
             class Model(models.Model):
                 pass
 
+    @ignore_warnings(category=RemovedInDjango71Warning)
     @override_settings(DEFAULT_AUTO_FIELD="django.db.models.TextField")
     def test_default_auto_field_setting_non_auto(self):
         msg = (
@@ -126,6 +111,7 @@ class TestDefaultPK(SimpleTestCase):
             class Model(models.Model):
                 pass
 
+    @ignore_warnings(category=RemovedInDjango71Warning)
     @override_settings(DEFAULT_AUTO_FIELD=None)
     def test_default_auto_field_setting_none(self):
         msg = "DEFAULT_AUTO_FIELD must not be empty."
@@ -145,35 +131,26 @@ class TestDefaultPK(SimpleTestCase):
             class Model(models.Model):
                 pass
 
+    @ignore_warnings(category=RemovedInDjango71Warning)
     @isolate_apps("model_options.apps.ModelDefaultPKConfig")
     @override_settings(DEFAULT_AUTO_FIELD="django.db.models.SmallAutoField")
     def test_default_auto_field_setting(self):
-        msg = (
-            "The DEFAULT_AUTO_FIELD setting is deprecated. Use DEFAULT_PK_FIELD "
-            "instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
-
-            class Model(models.Model):
-                pass
+        class Model(models.Model):
+            pass
 
         self.assertIsInstance(Model._meta.pk, models.SmallAutoField)
 
+    @ignore_warnings(category=RemovedInDjango71Warning)
     @override_settings(
         DEFAULT_AUTO_FIELD="model_options.test_default_pk.MyBigAutoField"
     )
     def test_default_auto_field_setting_bigautofield_subclass(self):
-        msg = (
-            "The DEFAULT_AUTO_FIELD setting is deprecated. Use DEFAULT_PK_FIELD "
-            "instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
-
-            class Model(models.Model):
-                pass
+        class Model(models.Model):
+            pass
 
         self.assertIsInstance(Model._meta.pk, MyBigAutoField)
 
+    @ignore_warnings(category=RemovedInDjango71Warning)
     @isolate_apps("model_options.apps.ModelPKConfig")
     @override_settings(DEFAULT_AUTO_FIELD="django.db.models.AutoField")
     def test_app_default_auto_field(self):
@@ -182,21 +159,17 @@ class TestDefaultPK(SimpleTestCase):
 
         self.assertIsInstance(Model._meta.pk, models.SmallAutoField)
 
+    @ignore_warnings(category=RemovedInDjango71Warning)
     @isolate_apps("model_options.apps.ModelDefaultPKConfig")
     @override_settings(DEFAULT_AUTO_FIELD="django.db.models.SmallAutoField")
     def test_m2m_default_auto_field_setting(self):
-        msg = (
-            "The DEFAULT_AUTO_FIELD setting is deprecated. Use DEFAULT_PK_FIELD "
-            "instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
-
-            class M2MModel(models.Model):
-                m2m = models.ManyToManyField("self")
+        class M2MModel(models.Model):
+            m2m = models.ManyToManyField("self")
 
         m2m_pk = M2MModel._meta.get_field("m2m").remote_field.through._meta.pk
         self.assertIsInstance(m2m_pk, models.SmallAutoField)
 
+    @ignore_warnings(category=RemovedInDjango71Warning)
     @isolate_apps("model_options.apps.ModelPKConfig")
     @override_settings(DEFAULT_AUTO_FIELD="django.db.models.AutoField")
     def test_m2m_app_default_auto_field(self):

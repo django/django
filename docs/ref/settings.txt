@@ -1277,6 +1277,10 @@ See also :setting:`NUMBER_GROUPING`, :setting:`THOUSAND_SEPARATOR` and
 
 Default: ``'``:class:`django.db.models.BigAutoField`\ ``'``
 
+.. deprecated:: 6.2
+
+    This setting is deprecated. Use :setting:`DEFAULT_PK_FIELD` instead.
+
 Default primary key field type to use for models that don't have a field with
 :attr:`primary_key=True <django.db.models.Field.primary_key>`.
 
@@ -1365,6 +1369,9 @@ The default primary key field type to use for models that don't define a
 primary key field explicitly.
 
 When set to ``None``, Django uses :setting:`DEFAULT_AUTO_FIELD`.
+
+This setting is the recommended replacement for
+:setting:`DEFAULT_AUTO_FIELD`, which is deprecated.
 
 Unlike :setting:`DEFAULT_AUTO_FIELD`, this setting may refer to any
 :class:`~django.db.models.Field` subclass. The field is created with

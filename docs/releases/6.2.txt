@@ -271,3 +271,6 @@ Miscellaneous
 
 * The ``safe`` parameter is deprecated from :class:`~django.http.JsonResponse`.
   Omitting the argument is equivalent to the prior ``safe=False`` usage.
+
+* The ``DEFAULT_AUTO_FIELD`` setting is deprecated in favor of
+  :setting:`DEFAULT_PK_FIELD`.
