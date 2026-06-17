@@ -5,11 +5,12 @@ import re
 import sys
 import tempfile
 import threading
+from inspect import iscoroutinefunction
 from io import StringIO
 from pathlib import Path
 from unittest import mock, skipIf
 
-from asgiref.sync import async_to_sync, iscoroutinefunction
+from asgiref.sync import async_to_sync
 
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
