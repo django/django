@@ -30,7 +30,6 @@ only officially support the latest release of each series.
 
 What's new in Django 6.2
 ========================
-* Added support CompositeField.
 
 Minor features
 --------------
@@ -184,6 +183,10 @@ Migrations
 
 Models
 ~~~~~~
+* Added support for CompositeField. CompositeField allow subqueries to
+  return multiple columns. Subfields of a composite field can be referenced
+  and traversed in filters and lookups using the double-underscore syntax
+  for example, ``info__email``.
 
 * ...
 
