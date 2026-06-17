@@ -710,7 +710,7 @@ class Model(AltersData, metaclass=ModelBase):
     def _is_pk_set(self, meta=None):
         pk_val = self._get_pk_val(meta)
 
-        def _is_set(value):
+        def _is_unset(value):
             return (
                 value is None
                 # Empty value when db_default is used.
@@ -718,8 +718,8 @@ class Model(AltersData, metaclass=ModelBase):
             )
 
         return not (
-            _is_set(pk_val)
-            or (isinstance(pk_val, tuple) and any(_is_set(f) for f in pk_val))
+            _is_unset(pk_val)
+            or (isinstance(pk_val, tuple) and any(_is_unset(f) for f in pk_val))
         )
 
     def get_deferred_fields(self):
