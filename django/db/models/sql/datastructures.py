@@ -34,7 +34,7 @@ class Relation(TableExpression):
     parent_alias = None
     filtered_relation = None
     is_composite = True
-    relation_join_sql = ","  # this will render `, (SELECT ...) alias`
+    relation_join_sql = "CROSS JOIN"  # this will render `CROSS JOIN (SELECT ...) alias`
 
     def __init__(self, expression, alias=None, output_field=None):
         self.expression = expression
