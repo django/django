@@ -35,74 +35,70 @@ class CompositeFieldTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        users = User.objects.bulk_create(
-            [
-                User(
-                    email="user001@mail.com",
-                    first_name="John",
-                ),
-                User(
-                    email="user002@mail.com",
-                    first_name="Bob",
-                ),
-                User(
-                    email="user003@mail.com",
-                    first_name="Mike",
-                ),
-            ]
+
+        cls.user1 = User.objects.create(
+            email="user001@mail.com",
+            first_name="John",
         )
 
-        cls.user1, cls.user2, cls.user3 = users
-
-        cls.posts = Post.objects.bulk_create(
-            [
-                Post(
-                    user=cls.user1,
-                    title="user1 first post title",
-                    body="body of first post",
-                ),
-                Post(
-                    user=cls.user1,
-                    title="user1 second post title",
-                    body="body of second post",
-                ),
-                Post(
-                    user=cls.user1,
-                    title="user1 third post title",
-                    body="body of third post",
-                ),
-                Post(
-                    user=cls.user2,
-                    title="user2 first post title",
-                    body="body of first post",
-                ),
-                Post(
-                    user=cls.user2,
-                    title="user2 second post title",
-                    body="body of second post",
-                ),
-                Post(
-                    user=cls.user2,
-                    title="user2 third post title",
-                    body="body of third post",
-                ),
-                Post(
-                    user=cls.user3,
-                    title="user3 first post title",
-                    body="body of first post",
-                ),
-                Post(
-                    user=cls.user3,
-                    title="user3 second post title",
-                    body="body of second post",
-                ),
-                Post(
-                    user=cls.user3,
-                    title="user3 third post title",
-                    body="body of third post",
-                ),
-            ]
+        cls.user2 = User.objects.create(
+            email="user002@mail.com",
+            first_name="Bob",
         )
+
+        cls.user3 = User.objects.create(
+            email="user003@mail.com",
+            first_name="Mike",
+        )
+
+        cls.posts = [
+            Post.objects.create(
+                user=cls.user1,
+                title="user1 first post title",
+                body="body of first post",
+            ),
+            Post.objects.create(
+                user=cls.user1,
+                title="user1 second post title",
+                body="body of second post",
+            ),
+            Post.objects.create(
+                user=cls.user1,
+                title="user1 third post title",
+                body="body of third post",
+            ),
+            Post.objects.create(
+                user=cls.user2,
+                title="user2 first post title",
+                body="body of first post",
+            ),
+            Post.objects.create(
+                user=cls.user2,
+                title="user2 second post title",
+                body="body of second post",
+            ),
+            Post.objects.create(
+                user=cls.user2,
+                title="user2 third post title",
+                body="body of third post",
+            ),
+            Post.objects.create(
+                user=cls.user3,
+                title="user3 first post title",
+                body="body of first post",
+            ),
+            Post.objects.create(
+                user=cls.user3,
+                title="user3 second post title",
+                body="body of second post",
+            ),
+            Post.objects.create(
+                user=cls.user3,
+                title="user3 third post title",
+                body="body of third post",
+            ),
+        ]
+
         cls.workspace = Workspace.objects.create(
             owner=cls.user1,
             name="Core Platform Engine",
