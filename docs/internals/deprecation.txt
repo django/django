@@ -15,6 +15,10 @@ about each item can often be found in the release notes of two versions prior.
 See the :ref:`Django 6.2 release notes <deprecated-features-6.2>` for more
 details on these changes.
 
+* Using ``QuerySet.distinct()`` with ``values()`` or ``values_list()`` while
+  ordering by fields not included in the selected values will raise
+  ``DatabaseError``.
+
 .. _deprecation-removed-in-7.0:
 
 7.0

@@ -10,11 +10,12 @@ from django.db import DEFAULT_DB_ALIAS, connection
 from django.db.models import CharField, Count, Exists, F, Max, OuterRef, Q
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import ExtractYear, Length, LTrim
+from django.db.models.sql.compiler import DISTINCT_VALUES_ORDERING_DEPRECATION_MSG
 from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import AND, OR, NothingNode, WhereNode
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext, ignore_warnings, register_lookup
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango70Warning, RemovedInDjango71Warning
 
 from .models import (
     FK1,
@@ -693,9 +694,41 @@ class Queries1Tests(TestCase):
         # are multiple values in the ordering cols), as in this example. This
         # isn't a bug; it's a warning to be careful with the selection of
         # ordering columns.
+        with self.assertWarnsMessage(
+            RemovedInDjango71Warning,
+            DISTINCT_VALUES_ORDERING_DEPRECATION_MSG,
+        ):
+            self.assertSequenceEqual(
+                Note.objects.values("misc").distinct().order_by("note", "-misc"),
+                [{"misc": "foo"}, {"misc": "bar"}, {"misc": "foo"}],
+            )
+
+    def test_distinct_values_default_ordering_deprecation(self):
+        with self.assertWarnsMessage(
+            RemovedInDjango71Warning,
+            DISTINCT_VALUES_ORDERING_DEPRECATION_MSG,
+        ):
+            self.assertSequenceEqual(
+                Tag.objects.filter(parent=self.t1).values("parent").distinct(),
+                [{"parent": self.t1.pk}, {"parent": self.t1.pk}],
+            )
+
+    def test_distinct_values_list_default_ordering_deprecation(self):
+        with self.assertWarnsMessage(
+            RemovedInDjango71Warning,
+            DISTINCT_VALUES_ORDERING_DEPRECATION_MSG,
+        ):
+            self.assertSequenceEqual(
+                Tag.objects.filter(parent=self.t1)
+                .values_list("parent", flat=True)
+                .distinct(),
+                [self.t1.pk, self.t1.pk],
+            )
+
+    def test_distinct_values_cleared_ordering(self):
         self.assertSequenceEqual(
-            Note.objects.values("misc").distinct().order_by("note", "-misc"),
-            [{"misc": "foo"}, {"misc": "bar"}, {"misc": "foo"}],
+            Tag.objects.filter(parent=self.t1).order_by().values("parent").distinct(),
+            [{"parent": self.t1.pk}],
         )
 
     def test_ticket4358(self):
@@ -2482,28 +2515,37 @@ class SubqueryTests(TestCase):
             ["first", "fourth"],
         )
         # Explicit values('id').
-        self.assertSequenceEqual(
-            NamedCategory.objects.filter(
-                id__in=NamedCategory.objects.distinct()
-                .order_by("-name")
-                .values("id")[0:2],
+        with self.assertWarnsMessage(
+            RemovedInDjango71Warning,
+            DISTINCT_VALUES_ORDERING_DEPRECATION_MSG,
+        ):
+            self.assertSequenceEqual(
+                NamedCategory.objects.filter(
+                    id__in=NamedCategory.objects.distinct()
+                    .order_by("-name")
+                    .values("id")[0:2],
+                )
+                .order_by("name")
+                .values_list("name", flat=True),
+                ["second", "third"],
             )
-            .order_by("name")
-            .values_list("name", flat=True),
-            ["second", "third"],
-        )
-        # Annotated value.
-        self.assertSequenceEqual(
-            DumbCategory.objects.filter(
-                id__in=DumbCategory.objects.annotate(double_id=F("id") * 2)
+        # RemovedInDjango71Warning: When the deprecation ends, this query will
+        # need to select "id" as well.
+        with self.assertWarnsMessage(
+            RemovedInDjango71Warning,
+            DISTINCT_VALUES_ORDERING_DEPRECATION_MSG,
+        ):
+            self.assertSequenceEqual(
+                DumbCategory.objects.filter(
+                    id__in=DumbCategory.objects.annotate(double_id=F("id") * 2)
+                    .order_by("id")
+                    .distinct()
+                    .values("double_id")[0:2],
+                )
                 .order_by("id")
-                .distinct()
-                .values("double_id")[0:2],
+                .values_list("id", flat=True),
+                [2, 4],
             )
-            .order_by("id")
-            .values_list("id", flat=True),
-            [2, 4],
-        )
 
 
 class QuerySetBitwiseOperationTests(TestCase):

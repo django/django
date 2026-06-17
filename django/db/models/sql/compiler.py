@@ -24,11 +24,21 @@ from django.db.models.sql.constants import (
 )
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import (
+    RemovedInDjango70Warning,
+    RemovedInDjango71Warning,
+)
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.warnings import django_file_prefixes
+
+DISTINCT_VALUES_ORDERING_DEPRECATION_MSG = (
+    "Using QuerySet.distinct() with values() or values_list() and ordering by "
+    "fields not selected in the restricted column list is deprecated. In "
+    "Django 7.1, this will raise a DatabaseError. Add the ordering fields to "
+    "values() or values_list(), or clear the ordering with order_by()."
+)
 
 
 class PositionRef(Ref):
@@ -546,6 +556,14 @@ class SQLCompiler:
                 without_ordering = self.ordering_parts.search(sql)[1]
                 if not is_ref and (without_ordering, params) not in select_sql:
                     extra_select.append((expr, (without_ordering, params), None))
+            if extra_select and self.query.has_select_fields:
+                # RemovedInDjango71Warning: When the deprecation ends, raise
+                # DatabaseError instead.
+                warnings.warn(
+                    DISTINCT_VALUES_ORDERING_DEPRECATION_MSG,
+                    category=RemovedInDjango71Warning,
+                    skip_file_prefixes=django_file_prefixes(),
+                )
         return extra_select
 
     def quote_name(self, name):
