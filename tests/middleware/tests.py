@@ -614,6 +614,15 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
             ConditionalGetMiddleware(self.get_response)(self.req).has_header("ETag")
         )
 
+    def test_no_etag_no_store_qualified(self):
+        # A qualified no-store directive (including whitespace around "=")
+        # reduces to its name and must still prevent ETag generation.
+        for cc in ('no-store="x"', 'no-store ="x"', "no-store = x"):
+            with self.subTest(cache_control=cc):
+                self.resp_headers["Cache-Control"] = cc
+                response = ConditionalGetMiddleware(self.get_response)(self.req)
+                self.assertIs(response.has_header("ETag"), False)
+
     def test_if_none_match_and_no_etag(self):
         self.req.META["HTTP_IF_NONE_MATCH"] = "spam"
         resp = ConditionalGetMiddleware(self.get_response)(self.req)

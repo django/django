@@ -2397,6 +2397,17 @@ class CacheUtils(SimpleTestCase):
                 parts = {cc for cc in response.headers["Cache-Control"].split(", ")}
                 self.assertEqual(parts, expected_cc)
 
+    def test_patch_cache_control_whitespace_around_equals(self):
+        # Whitespace around "=" must not be retained in the directive name;
+        # otherwise no_cache=True fails to collapse the qualified field-list
+        # form (i.e. dictitem() lacks a strip()).
+        for initial_cc in ('no-cache ="Set-Cookie"', 'no-cache = "Set-Cookie"'):
+            with self.subTest(initial_cc=initial_cc):
+                response = HttpResponse(headers={"Cache-Control": initial_cc})
+                patch_cache_control(response, no_cache=True)
+                parts = {cc for cc in response.headers["Cache-Control"].split(", ")}
+                self.assertEqual(parts, {"no-cache"})
+
     def test_has_vary_header(self):
         tests = [
             ("*", "*", True),
@@ -2991,6 +3002,40 @@ class CacheMiddlewareTest(SimpleTestCase):
         self.assertEqual(response.content, b"Hello World 1")
         response = view(request, "2")
         self.assertEqual(response.content, b"Hello World 1")
+
+    def test_qualified_cache_control_value_not_cached(self):
+        for cc in (
+            'private="Set-Cookie"',
+            'no-cache="Set-Cookie"',
+            'no-store="Set-Cookie"',
+            # Malformed whitespace around "=" still fails safe.
+            'private ="Set-Cookie"',
+            'no-cache = "Set-Cookie"',
+        ):
+            with self.subTest(cache_control=cc):
+
+                @cache_page(3)
+                def view(request, value):
+                    return HttpResponse(
+                        f"Hello World {value}", headers={"Cache-Control": cc}
+                    )
+
+                request = self.factory.get("/view/")
+                response = view(request, "1")
+                self.assertEqual(response.content, b"Hello World 1")
+                response = view(request, "2")
+                self.assertEqual(response.content, b"Hello World 2")
+
+    def test_authorization_header_exception_qualified_public_directive(self):
+        @cache_page(3)
+        def view(request, value):
+            return HttpResponse(
+                f"Hello World {value}", headers={"Cache-Control": 'public="abc"'}
+            )
+
+        request = self.factory.get("/view/", headers={"Authorization": "token"})
+        response = view(request, "1")
+        self.assertIs(has_vary_header(response, "Authorization"), False)
 
     def test_vary_asterisk_not_cached(self):
         views_with_cache = (
