@@ -44,3 +44,9 @@ class BugReport(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="bug_reports")
     description = models.CharField(max_length=255)
     severity_level = models.IntegerField(default=1)
+
+
+class Version(models.Model):
+    major = models.IntegerField()
+    minor = models.IntegerField()
+    patch = models.IntegerField()

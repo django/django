@@ -49,6 +49,24 @@ class Tuple(Func):
 class TupleLookupMixin:
     allows_composite_expressions = True
 
+    def get_lhs_expressions(self):
+        if hasattr(self.lhs, "output_field") and getattr(
+            self.lhs.output_field, "is_composite", False
+        ):
+            cols = []
+            for name in self.lhs.output_field.sub_fields:
+                transform_class = self.lhs.output_field.get_transform(name)
+                cols.append(transform_class(self.lhs))
+            return cols
+        return self.lhs
+
+    def get_lhs_len(self):
+        if hasattr(self.lhs, "output_field") and getattr(
+            self.lhs.output_field, "is_composite", False
+        ):
+            return len(self.lhs.output_field.sub_fields)
+        return len(self.lhs)
+
     def get_prep_lookup(self):
         if self.rhs_is_direct_value():
             self.check_rhs_is_tuple_or_list()
@@ -66,7 +84,7 @@ class TupleLookupMixin:
             )
 
     def check_rhs_length_equals_lhs_length(self):
-        len_lhs = len(self.lhs)
+        len_lhs = self.get_lhs_len()
         if len_lhs != len(self.rhs):
             lhs_str = self.get_lhs_str()
             raise ValueError(
@@ -85,6 +103,11 @@ class TupleLookupMixin:
     def get_lhs_str(self):
         if isinstance(self.lhs, ColPairs):
             return repr(self.lhs.field.name)
+        elif hasattr(self.lhs, "output_field") and getattr(
+            self.lhs.output_field, "is_composite", False
+        ):
+            names = ", ".join(repr(name) for name in self.lhs.output_field.sub_fields)
+            return f"({names})"
         else:
             names = ", ".join(repr(f.name) for f in self.lhs)
             return f"({names})"
@@ -95,8 +118,17 @@ class TupleLookupMixin:
         return super().get_prep_lhs()
 
     def process_lhs(self, compiler, connection, lhs=None):
+        if lhs is None:
+            if (
+                hasattr(self.lhs, "output_field")
+                and getattr(self.lhs.output_field, "is_composite", False)
+                and not isinstance(self.lhs, (ColPairs, tuple))
+            ):
+                lhs = Tuple(*self.get_lhs_expressions())
+            else:
+                lhs = self.lhs
         sql, params = super().process_lhs(compiler, connection, lhs)
-        if not isinstance(self.lhs, Tuple):
+        if not isinstance(lhs, Tuple) and not isinstance(self.lhs, Tuple):
             sql = f"({sql})"
         return sql, params
 
@@ -108,7 +140,7 @@ class TupleLookupMixin:
                     if hasattr(val, "as_sql")
                     else Value(val, output_field=col.output_field)
                 )
-                for col, val in zip(self.lhs, self.rhs)
+                for col, val in zip(self.get_lhs_expressions(), self.rhs)
             ]
             return compiler.compile(Tuple(*args))
         else:
@@ -156,7 +188,9 @@ class TupleExact(TupleLookupMixin, Exact):
         self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) == (x, y, z) as SQL:
         # WHERE a = x AND b = y AND c = z
-        lookups = [Exact(col, val) for col, val in zip(self.lhs, self.rhs)]
+        lookups = [
+            Exact(col, val) for col, val in zip(self.get_lhs_expressions(), self.rhs)
+        ]
         root = WhereNode(lookups, connector=AND)
 
         return root.as_sql(compiler, connection)
@@ -179,7 +213,7 @@ class TupleIsNull(TupleLookupMixin, IsNull):
         # e.g.: (a, b, c) is not None as SQL:
         # WHERE a IS NOT NULL AND b IS NOT NULL AND c IS NOT NULL
         rhs = self.rhs
-        lookups = [IsNull(col, rhs) for col in self.lhs]
+        lookups = [IsNull(col, rhs) for col in self.get_lhs_expressions()]
         root = WhereNode(lookups, connector=OR if rhs else AND)
         return root.as_sql(compiler, connection)
 
@@ -192,7 +226,7 @@ class TupleGreaterThan(TupleLookupMixin, GreaterThan):
         # WHERE a > x OR (a = x AND (b > y OR (b = y AND c > z)))
         lookups = itertools.cycle([GreaterThan, Exact])
         connectors = itertools.cycle([OR, AND])
-        cols_list = [col for col in self.lhs for _ in range(2)]
+        cols_list = [col for col in self.get_lhs_expressions() for _ in range(2)]
         vals_list = [val for val in self.rhs for _ in range(2)]
         cols_iter = iter(cols_list[:-1])
         vals_iter = iter(vals_list[:-1])
@@ -220,7 +254,7 @@ class TupleGreaterThanOrEqual(TupleLookupMixin, GreaterThanOrEqual):
         # WHERE a > x OR (a = x AND (b > y OR (b = y AND (c > z OR c = z))))
         lookups = itertools.cycle([GreaterThan, Exact])
         connectors = itertools.cycle([OR, AND])
-        cols_list = [col for col in self.lhs for _ in range(2)]
+        cols_list = [col for col in self.get_lhs_expressions() for _ in range(2)]
         vals_list = [val for val in self.rhs for _ in range(2)]
         cols_iter = iter(cols_list)
         vals_iter = iter(vals_list)
@@ -245,10 +279,10 @@ class TupleLessThan(TupleLookupMixin, LessThan):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) < (x, y, z) as SQL:
-        # WHERE a < x OR (a = x AND (b < y OR (b = y AND c < z)))
+        # WHERE a < x OR (a = x AND (b < y OR (b = y AND c > z)))
         lookups = itertools.cycle([LessThan, Exact])
         connectors = itertools.cycle([OR, AND])
-        cols_list = [col for col in self.lhs for _ in range(2)]
+        cols_list = [col for col in self.get_lhs_expressions() for _ in range(2)]
         vals_list = [val for val in self.rhs for _ in range(2)]
         cols_iter = iter(cols_list[:-1])
         vals_iter = iter(vals_list[:-1])
@@ -276,7 +310,7 @@ class TupleLessThanOrEqual(TupleLookupMixin, LessThanOrEqual):
         # WHERE a < x OR (a = x AND (b < y OR (b = y AND (c < z OR c = z))))
         lookups = itertools.cycle([LessThan, Exact])
         connectors = itertools.cycle([OR, AND])
-        cols_list = [col for col in self.lhs for _ in range(2)]
+        cols_list = [col for col in self.get_lhs_expressions() for _ in range(2)]
         vals_list = [val for val in self.rhs for _ in range(2)]
         cols_iter = iter(cols_list)
         vals_iter = iter(vals_list)
@@ -317,7 +351,7 @@ class TupleIn(TupleLookupMixin, In):
             )
 
     def check_rhs_elements_length_equals_lhs_length(self):
-        len_lhs = len(self.lhs)
+        len_lhs = self.get_lhs_len()
         if not all(len_lhs == len(vals) for vals in self.rhs):
             lhs_str = self.get_lhs_str()
             raise ValueError(
@@ -345,7 +379,7 @@ class TupleIn(TupleLookupMixin, In):
         # e.g.: (a, b, c) in [(x1, y1, z1), (x2, y2, z2)] as SQL:
         # WHERE (a, b, c) IN ((x1, y1, z1), (x2, y2, z2))
         result = []
-        lhs = self.lhs
+        lhs = self.get_lhs_expressions()
 
         for vals in rhs:
             # Remove any tuple containing None from the list as NULL is never
@@ -385,7 +419,12 @@ class TupleIn(TupleLookupMixin, In):
             )
             rhs = rhs.clone()
             rhs.add_q(
-                models.Q(*[Exact(col, val) for col, val in zip(self.lhs, rhs_exprs)])
+                models.Q(
+                    *[
+                        Exact(col, val)
+                        for col, val in zip(self.get_lhs_expressions(), rhs_exprs)
+                    ]
+                )
             )
             return compiler.compile(Exists(rhs))
         elif not self.rhs_is_direct_value():
@@ -395,7 +434,7 @@ class TupleIn(TupleLookupMixin, In):
         # WHERE (a = x1 AND b = y1 AND c = z1)
         #    OR (a = x2 AND b = y2 AND c = z2)
         root = WhereNode([], connector=OR)
-        lhs = self.lhs
+        lhs = self.get_lhs_expressions()
 
         for vals in rhs:
             # Remove any tuple containing None from the list as NULL is never

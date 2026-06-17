@@ -21,36 +21,24 @@ from django.db.models.functions import Cast, Coalesce, Concat, Length, Lower
 from django.test import TestCase
 
 from .expressions import JsonEachFunc
-from .models import (
-    BugReport,
-    Post,
-    Project,
-    Task,
-    User,
-    Workspace,
-)
+from .models import BugReport, Post, Project, Task, User, Version, Workspace
 
 
-class CompositeFieldTests(TestCase):
-
+class TestCaseSetup(TestCase):
     @classmethod
     def setUpTestData(cls):
-
         cls.user1 = User.objects.create(
             email="user001@mail.com",
             first_name="John",
         )
-
         cls.user2 = User.objects.create(
             email="user002@mail.com",
             first_name="Bob",
         )
-
         cls.user3 = User.objects.create(
             email="user003@mail.com",
             first_name="Mike",
         )
-
         cls.posts = [
             Post.objects.create(
                 user=cls.user1,
@@ -98,27 +86,33 @@ class CompositeFieldTests(TestCase):
                 body="body of third post",
             ),
         ]
-
         cls.workspace = Workspace.objects.create(
             owner=cls.user1,
             name="Core Platform Engine",
         )
-
         cls.project = Project.objects.create(
             workspace=cls.workspace,
             title="ORM Infrastructure Modernization",
         )
-
         cls.task = Task.objects.create(
             project=cls.project,
             name="Fix custom composite field compiler unrolling loop",
         )
-
         cls.bug_report = BugReport.objects.create(
             task=cls.task,
             description="AST traversal fails when looking up fields past 3 levels deep",
             severity_level=5,
         )
+        cls.v1 = Version.objects.create(major=1, minor=2, patch=3)
+        cls.v2 = Version.objects.create(major=1, minor=5, patch=0)
+        cls.v3 = Version.objects.create(major=2, minor=0, patch=1)
+
+
+class CompositeFieldTests(TestCaseSetup):
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
 
     def test_composite_subquery_email_lookup(self):
         composite_field = CompositeField(
@@ -941,3 +935,156 @@ class CompositeFieldTests(TestCase):
         self.assertEqual(qs.count(), 3)
         user = qs.get(pk=self.user1.pk)
         self.assertEqual(user.posts.count(), 3)
+
+
+class TupleLookupTests(TestCaseSetup):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+
+    def test_tuple_exact(self):
+        subquery = Version.objects.filter(pk=OuterRef("pk")).values(
+            "major", "minor", "patch"
+        )
+        qs = Version.objects.alias(val=subquery).filter(val=(1, 2, 3))
+        self.assertSequenceEqual(qs, [self.v1])
+
+    def test_tuple_isnull(self):
+        subquery = Version.objects.filter(pk=OuterRef("pk")).values(
+            "major", "minor", "patch"
+        )
+        qs = (
+            Version.objects.alias(val=subquery).filter(val__isnull=False).order_by("pk")
+        )
+        self.assertSequenceEqual(qs, [self.v1, self.v2, self.v3])
+
+    def test_tuple_gt(self):
+        subquery = Version.objects.filter(pk=OuterRef("pk")).values(
+            "major", "minor", "patch"
+        )
+        qs = (
+            Version.objects.alias(val=subquery).filter(val__gt=(1, 2, 3)).order_by("pk")
+        )
+        self.assertSequenceEqual(qs, [self.v2, self.v3])
+
+    def test_tuple_gte(self):
+        subquery = Version.objects.filter(pk=OuterRef("pk")).values(
+            "major", "minor", "patch"
+        )
+        qs = (
+            Version.objects.alias(val=subquery)
+            .filter(val__gte=(1, 5, 0))
+            .order_by("pk")
+        )
+        self.assertSequenceEqual(qs, [self.v2, self.v3])
+
+    def test_tuple_lt(self):
+        subquery = Version.objects.filter(pk=OuterRef("pk")).values(
+            "major", "minor", "patch"
+        )
+        qs = (
+            Version.objects.alias(val=subquery).filter(val__lt=(1, 5, 0)).order_by("pk")
+        )
+        self.assertSequenceEqual(qs, [self.v1])
+
+    def test_tuple_lte(self):
+        subquery = Version.objects.filter(pk=OuterRef("pk")).values(
+            "major", "minor", "patch"
+        )
+        qs = (
+            Version.objects.alias(val=subquery)
+            .filter(val__lte=(1, 5, 0))
+            .order_by("pk")
+        )
+        self.assertSequenceEqual(qs, [self.v1, self.v2])
+
+    def test_tuple_in(self):
+        subquery = Version.objects.filter(pk=OuterRef("pk")).values(
+            "major", "minor", "patch"
+        )
+        qs = (
+            Version.objects.alias(val=subquery)
+            .filter(val__in=[(1, 2, 3), (2, 0, 1)])
+            .order_by("pk")
+        )
+        self.assertSequenceEqual(qs, [self.v1, self.v3])
+
+    def test_tuple_explicit_subquery_lookups(self):
+        composite_field = CompositeField(
+            major=IntegerField(),
+            minor=IntegerField(),
+            patch=IntegerField(),
+        )
+        subquery = Subquery(
+            Version.objects.filter(pk=OuterRef("pk")).values("major", "minor", "patch"),
+            output_field=composite_field,
+        )
+
+        qs_gt = (
+            Version.objects.alias(val=subquery).filter(val__gt=(1, 2, 3)).order_by("pk")
+        )
+        self.assertSequenceEqual(qs_gt, [self.v2, self.v3])
+
+        qs_gte = (
+            Version.objects.alias(val=subquery)
+            .filter(val__gte=(1, 5, 0))
+            .order_by("pk")
+        )
+        self.assertSequenceEqual(qs_gte, [self.v2, self.v3])
+
+        qs_lt = (
+            Version.objects.alias(val=subquery).filter(val__lt=(1, 5, 0)).order_by("pk")
+        )
+        self.assertSequenceEqual(qs_lt, [self.v1])
+
+        qs_lte = (
+            Version.objects.alias(val=subquery)
+            .filter(val__lte=(1, 5, 0))
+            .order_by("pk")
+        )
+        self.assertSequenceEqual(qs_lte, [self.v1, self.v2])
+
+    def test_composite_field_exact_lookup_bare_queryset(self):
+        subquery = User.objects.filter(pk=OuterRef("pk")).values("email", "first_name")
+        rhs_qs = User.objects.filter(pk=self.user1.pk).values("email", "first_name")[:1]
+        qs = User.objects.alias(info=subquery).filter(info=rhs_qs)
+        self.assertSequenceEqual(qs, [self.user1])
+
+    def test_composite_field_in_lookup_bare_queryset(self):
+        subquery = User.objects.filter(pk=OuterRef("pk")).values("email", "first_name")
+        rhs_qs = User.objects.filter(pk__in=[self.user1.pk, self.user2.pk]).values(
+            "email", "first_name"
+        )
+        qs = User.objects.alias(info=subquery).filter(info__in=rhs_qs).order_by("pk")
+        self.assertSequenceEqual(qs, [self.user1, self.user2])
+
+    def test_composite_field_exact_lookup_tuple(self):
+        subquery = User.objects.filter(pk=OuterRef("pk")).values("email", "first_name")
+        qs = User.objects.alias(info=subquery).filter(
+            info=(self.user1.email, self.user1.first_name)
+        )
+        self.assertSequenceEqual(qs, [self.user1])
+
+        qs_none = User.objects.alias(info=subquery).filter(
+            info=(self.user2.email, self.user1.first_name)
+        )
+        self.assertSequenceEqual(qs_none, [])
+
+    def test_composite_field_in_lookup_tuple_list(self):
+        subquery = User.objects.filter(pk=OuterRef("pk")).values("email", "first_name")
+        qs = (
+            User.objects.alias(info=subquery)
+            .filter(
+                info__in=[
+                    (self.user1.email, self.user1.first_name),
+                    (self.user2.email, self.user2.first_name),
+                ]
+            )
+            .order_by("pk")
+        )
+        self.assertSequenceEqual(qs, [self.user1, self.user2])
+
+    def test_composite_field_isnull_lookup(self):
+        subquery = User.objects.filter(pk=OuterRef("pk")).values("email", "first_name")
+        qs = User.objects.alias(info=subquery).filter(info__isnull=False).order_by("pk")
+        self.assertSequenceEqual(qs, [self.user1, self.user2, self.user3])

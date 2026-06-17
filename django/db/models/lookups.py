@@ -379,7 +379,14 @@ class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
                     "The QuerySet value for an exact lookup must be limited to "
                     "one result using slicing."
                 )
-            lhs_len = len(self.lhs) if isinstance(self.lhs, (ColPairs, tuple)) else 1
+            if isinstance(self.lhs, (ColPairs, tuple)):
+                lhs_len = len(self.lhs)
+            elif getattr(
+                getattr(self.lhs, "output_field", None), "is_composite", False
+            ):
+                lhs_len = len(self.lhs.output_field.sub_fields)
+            else:
+                lhs_len = 1
             if (rhs_len := query._subquery_fields_len) != lhs_len:
                 raise ValueError(
                     f"The QuerySet value for the exact lookup must have {lhs_len} "
@@ -504,7 +511,14 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
         from django.db.models.sql.query import Query  # avoid circular import
 
         if isinstance(self.rhs, Query):
-            lhs_len = len(self.lhs) if isinstance(self.lhs, (ColPairs, tuple)) else 1
+            if isinstance(self.lhs, (ColPairs, tuple)):
+                lhs_len = len(self.lhs)
+            elif getattr(
+                getattr(self.lhs, "output_field", None), "is_composite", False
+            ):
+                lhs_len = len(self.lhs.output_field.sub_fields)
+            else:
+                lhs_len = 1
             if (rhs_len := self.rhs._subquery_fields_len) != lhs_len:
                 raise ValueError(
                     f"The QuerySet value for the 'in' lookup must have {lhs_len} "

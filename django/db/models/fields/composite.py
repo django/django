@@ -263,3 +263,12 @@ class CompositeField(Field):
         return partial(
             CompositeSubfieldTransform, lookup_name=name, output_field=subfield
         )
+
+
+CompositeField.register_lookup(TupleExact)
+CompositeField.register_lookup(TupleGreaterThan)
+CompositeField.register_lookup(TupleGreaterThanOrEqual)
+CompositeField.register_lookup(TupleLessThan)
+CompositeField.register_lookup(TupleLessThanOrEqual)
+CompositeField.register_lookup(TupleIn)
+CompositeField.register_lookup(TupleIsNull)
