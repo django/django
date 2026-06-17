@@ -15,6 +15,8 @@ from django.db.models import (
     OrderWrt,
     UniqueConstraint,
 )
+import warnings
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.db.models.fields import composite
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, OrderedSet
@@ -265,6 +267,7 @@ class Options:
             source = "DEFAULT_PK_FIELD"
             pk_class_required_base = Field
             pk_class_required_base_name = "Field"
+            warn_default_auto_field_deprecation = False
         else:
             pk_class_path = getattr(
                 self.app_config,
@@ -272,16 +275,18 @@ class Options:
                 settings.DEFAULT_AUTO_FIELD,
             )
             if self.app_config and self.app_config._is_default_auto_field_overridden:
-                app_config_class = type(self.app_config)
                 source = (
-                    f"{app_config_class.__module__}."
-                    f"{app_config_class.__qualname__}.default_auto_field"
+                    f"{self.app_config.__class__.__module__}."
+                    f"{self.app_config.__class__.__qualname__}.default_auto_field"
                 )
+                warn_default_auto_field_deprecation = False
             else:
                 source = "DEFAULT_AUTO_FIELD"
+                warn_default_auto_field_deprecation = settings.is_overridden(
+                    "DEFAULT_AUTO_FIELD"
+                )
             pk_class_required_base = AutoField
             pk_class_required_base_name = "AutoField"
-
         if not pk_class_path:
             raise ImproperlyConfigured(f"{source} must not be empty.")
         try:
@@ -296,6 +301,13 @@ class Options:
             raise ValueError(
                 f"Primary key '{pk_class_path}' referred by {source} must "
                 f"subclass {pk_class_required_base_name}."
+            )
+        if warn_default_auto_field_deprecation:
+            warnings.warn(
+                "The DEFAULT_AUTO_FIELD setting is deprecated. Use DEFAULT_PK_FIELD "
+                "instead.",
+                RemovedInDjango70Warning,
+                stacklevel=3,
             )
         return pk_class
 
