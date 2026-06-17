@@ -185,6 +185,17 @@ class SafeExceptionReporterFilter:
         """
         return settings.DEBUG is False
 
+    def _cleanse_multivaluedict(self, multivaluedict, sensitive_post_parameters):
+        # The no-argument form of sensitive_post_parameters() marks every
+        # parameter as sensitive.
+        cleansed = multivaluedict.copy()
+        if sensitive_post_parameters == "__ALL__":
+            sensitive_post_parameters = list(multivaluedict)
+        for param in sensitive_post_parameters:
+            if param in multivaluedict:
+                cleansed[param] = self.cleansed_substitute
+        return cleansed
+
     def get_cleansed_multivaluedict(self, request, multivaluedict):
         """
         Replace the keys in a MultiValueDict marked as sensitive with stars.
@@ -193,10 +204,9 @@ class SafeExceptionReporterFilter:
         """
         sensitive_post_parameters = getattr(request, "sensitive_post_parameters", [])
         if self.is_active(request) and sensitive_post_parameters:
-            multivaluedict = multivaluedict.copy()
-            for param in sensitive_post_parameters:
-                if param in multivaluedict:
-                    multivaluedict[param] = self.cleansed_substitute
+            return self._cleanse_multivaluedict(
+                multivaluedict, sensitive_post_parameters
+            )
         return multivaluedict
 
     def get_post_parameters(self, request):
@@ -206,25 +216,10 @@ class SafeExceptionReporterFilter:
         """
         if request is None:
             return {}
-        else:
-            sensitive_post_parameters = getattr(
-                request, "sensitive_post_parameters", []
-            )
-            if self.is_active(request) and sensitive_post_parameters:
-                cleansed = request.POST.copy()
-                if sensitive_post_parameters == "__ALL__":
-                    # Cleanse all parameters.
-                    for k in cleansed:
-                        cleansed[k] = self.cleansed_substitute
-                    return cleansed
-                else:
-                    # Cleanse only the specified parameters.
-                    for param in sensitive_post_parameters:
-                        if param in cleansed:
-                            cleansed[param] = self.cleansed_substitute
-                    return cleansed
-            else:
-                return request.POST
+        sensitive_post_parameters = getattr(request, "sensitive_post_parameters", [])
+        if self.is_active(request) and sensitive_post_parameters:
+            return self._cleanse_multivaluedict(request.POST, sensitive_post_parameters)
+        return request.POST
 
     def cleanse_special_types(self, request, value):
         try:
