@@ -925,13 +925,27 @@ def filesizeformat(bytes_):
     if bytes_ < KB:
         value = ngettext("%(size)d byte", "%(size)d bytes", bytes_) % {"size": bytes_}
     elif bytes_ < MB:
-        value = gettext("%s KB") % filesize_number_format(bytes_ / KB)
+        # round() can push the mantissa to 1024 (e.g. 1,048,575 B is
+        # 1023.999 KB, which rounds to "1024.0 KB"). Carry up one unit.
+        if round(bytes_ / KB, 1) >= 1024:
+            value = gettext("%s MB") % filesize_number_format(bytes_ / MB)
+        else:
+            value = gettext("%s KB") % filesize_number_format(bytes_ / KB)
     elif bytes_ < GB:
-        value = gettext("%s MB") % filesize_number_format(bytes_ / MB)
+        if round(bytes_ / MB, 1) >= 1024:
+            value = gettext("%s GB") % filesize_number_format(bytes_ / GB)
+        else:
+            value = gettext("%s MB") % filesize_number_format(bytes_ / MB)
     elif bytes_ < TB:
-        value = gettext("%s GB") % filesize_number_format(bytes_ / GB)
+        if round(bytes_ / GB, 1) >= 1024:
+            value = gettext("%s TB") % filesize_number_format(bytes_ / TB)
+        else:
+            value = gettext("%s GB") % filesize_number_format(bytes_ / GB)
     elif bytes_ < PB:
-        value = gettext("%s TB") % filesize_number_format(bytes_ / TB)
+        if round(bytes_ / TB, 1) >= 1024:
+            value = gettext("%s PB") % filesize_number_format(bytes_ / PB)
+        else:
+            value = gettext("%s TB") % filesize_number_format(bytes_ / TB)
     else:
         value = gettext("%s PB") % filesize_number_format(bytes_ / PB)
 
