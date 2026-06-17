@@ -110,6 +110,9 @@ details on these changes.
   ``django.core.signing.base64_hmac()`` will change from ``"sha1"`` to
   ``"sha256"``.
 
+* Calling :meth:`.QuerySet.select_related` without arguments will raise
+  :exc:`TypeError`.
+
 * :meth:`.QuerySet.select_related` will raise :exc:`TypeError` if passed
   ``True`` rather than :exc:`AttributeError`.
 
