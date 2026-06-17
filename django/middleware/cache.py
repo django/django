@@ -56,10 +56,9 @@ from django.utils.cache import (
     learn_cache_key,
     patch_response_headers,
     patch_vary_headers,
-    split_header_value,
 )
 from django.utils.deprecation import MiddlewareMixin
-from django.utils.http import parse_http_date_safe
+from django.utils.http import parse_http_date_safe, split_directive_names
 
 
 class UpdateCacheMiddleware(MiddlewareMixin):
@@ -105,17 +104,12 @@ class UpdateCacheMiddleware(MiddlewareMixin):
             return response
 
         # Don't cache responses when the Cache-Control header is set to
-        # private, no-cache, or no-store.
-        cache_control = response.get("Cache-Control", "").lower()
-        cache_control_parts = list(split_header_value(cache_control))
-        if cache_control and any(
-            directive in cache_control_parts
-            for directive in (
-                "private",
-                "no-cache",
-                "no-store",
-            )
-        ):
+        # private, no-cache, or no-store. Qualified forms like
+        # `private="Set-Cookie"` reduce to their directive name and match too.
+        cache_control_parts = set(
+            split_directive_names(response.get("Cache-Control", ""))
+        )
+        if cache_control_parts.intersection({"private", "no-cache", "no-store"}):
             return response
 
         # Don't cache responses when the Vary header contains '*'.
