@@ -265,6 +265,12 @@ Note the second example is more restrictive.
 If you need to execute more complex queries (for example, queries with ``OR``
 statements), you can use :class:`Q objects <django.db.models.Q>` (``*args``).
 
+.. note::
+
+    See the warning under the :lookup:`in` lookup for unexpected behavior
+    when using ``exclude()`` with subqueries that may return ``NULL``
+    values.
+
 ``annotate()``
 ~~~~~~~~~~~~~~
 
@@ -3379,6 +3385,34 @@ extract two field values, where only one is expected::
     Note the ``list()`` call around the Blog ``QuerySet`` to force execution of
     the first query. Without it, a nested query would be executed, because
     :ref:`querysets-are-lazy`.
+
+.. warning::
+
+    **NULL values and three-valued logic**
+
+    If the right-hand side of an ``__in`` lookup (either a subquery or a list
+    of values) contains or evaluates to ``NULL`` (or ``None``), it can produce
+    unexpected or empty query results due to SQL's three-valued logic.
+
+    For example, when using ``exclude(field__in=...)``, if the right-hand side
+    contains even a single ``NULL`` value, the SQL ``NOT IN`` comparison
+    evaluates to ``UNKNOWN`` for all rows, resulting in an empty queryset.
+
+    To avoid this, filter out ``NULL`` values from the right-hand side:
+
+    .. code-block:: python
+
+        # For a subquery
+        inner_qs = Blog.objects.filter(name__isnull=False).values("pk")
+        entries = Entry.objects.exclude(blog__in=inner_qs)
+
+        # For a list of values
+        values = [1, 2, None]
+        non_null_values = [v for v in values if v is not None]
+        entries = Entry.objects.exclude(blog__in=non_null_values)
+
+    Alternatively, rewrite the query to use a NULL-safe
+    :class:`~django.db.models.Exists` subquery.
 
 .. fieldlookup:: gt
 
