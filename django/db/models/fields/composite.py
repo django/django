@@ -190,6 +190,17 @@ class CompositeSubfieldTransform(Transform):
     def output_field(self):
         return self._output_field
 
+    def get_transform(self, name):
+        if (
+            getattr(self.output_field, "is_relation", False)
+            and self.output_field.related_model
+        ):
+            target_field = self.output_field.related_model._meta.get_field(name)
+            return partial(
+                CompositeSubfieldTransform, lookup_name=name, output_field=target_field
+            )
+        return super().get_transform(name)
+
     def as_sql(self, compiler, connection):
         """
         Render a reference to a sub-column of a composite table expression.
