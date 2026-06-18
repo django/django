@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib.messages.storage import default_storage
-from django.utils.deprecation import MiddlewareMixin
+from django.middleware import MiddlewareMixin
 
 
 class MessageMiddleware(MiddlewareMixin):

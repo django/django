@@ -288,6 +288,10 @@ Features deprecated in 6.2
 Miscellaneous
 -------------
 
+* The :class:`~django.middleware.MiddlewareMixin` class moved from
+  ``django.utils.deprecation`` to ``django.middleware``. The old import path
+  is deprecated.
+
 * The ``safe`` parameter is deprecated from :class:`~django.http.JsonResponse`.
   Omitting the argument is equivalent to the prior ``safe=False`` usage.
 

@@ -49,6 +49,7 @@ import time
 
 from django.conf import settings
 from django.core.cache import DEFAULT_CACHE_ALIAS, caches
+from django.middleware import MiddlewareMixin
 from django.utils.cache import (
     get_cache_key,
     get_max_age,
@@ -57,7 +58,6 @@ from django.utils.cache import (
     patch_response_headers,
     patch_vary_headers,
 )
-from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import parse_http_date_safe, split_directive_names
 
 

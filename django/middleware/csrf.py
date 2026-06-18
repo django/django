@@ -13,10 +13,10 @@ from urllib.parse import urlsplit
 from django.conf import settings
 from django.core.exceptions import DisallowedHost, ImproperlyConfigured
 from django.http import HttpHeaders, UnreadablePostError
+from django.middleware import MiddlewareMixin
 from django.urls import get_callable
 from django.utils.cache import patch_vary_headers
 from django.utils.crypto import constant_time_compare, get_random_string
-from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import cached_property
 from django.utils.http import is_same_domain
 from django.utils.log import log_response

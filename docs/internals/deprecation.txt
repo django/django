@@ -15,6 +15,9 @@ about each item can often be found in the release notes of two versions prior.
 See the :ref:`Django 6.2 release notes <deprecated-features-6.2>` for more
 details on these changes.
 
+* The ``django.utils.deprecation.MiddlewareMixin`` import path will be removed.
+  Use ``django.middleware.MiddlewareMixin`` instead.
+
 * The ``safe`` parameter of :class:`~django.http.JsonResponse` will be removed.
 
 * Calling ``QuerySet.aiterator()`` after ``prefetch_related()`` without

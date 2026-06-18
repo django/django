@@ -9,8 +9,8 @@ from django.contrib.auth.backends import RemoteUserBackend
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.asgi import ASGIRequest
+from django.middleware import MiddlewareMixin
 from django.shortcuts import resolve_url
-from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
 
 
