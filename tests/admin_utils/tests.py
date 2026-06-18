@@ -21,6 +21,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.templatetags.auth import render_password_as_hash
 from django.core.validators import EMPTY_VALUES
 from django.db import DEFAULT_DB_ALIAS, models
+from django.db.models.expressions import DatabaseDefault
 from django.test import SimpleTestCase, TestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils.formats import localize
@@ -194,6 +195,12 @@ class UtilsTests(SimpleTestCase):
                     )
                     self.assertEqual(display_value, self.empty_value)
 
+    def test_empty_value_database_default_display_for_field(self):
+        display_value = display_for_field(
+            DatabaseDefault(models.Value(1)), models.IntegerField(), self.empty_value
+        )
+        self.assertEqual(display_value, self.empty_value)
+
     def test_empty_value_display_choices(self):
         model_field = models.CharField(choices=((None, "test_none"),))
         display_value = display_for_field(None, model_field, self.empty_value)
@@ -201,11 +208,13 @@ class UtilsTests(SimpleTestCase):
 
     def test_empty_value_display_booleanfield(self):
         model_field = models.BooleanField(null=True)
-        display_value = display_for_field(None, model_field, self.empty_value)
         expected = (
             f'<img src="{settings.STATIC_URL}admin/img/icon-unknown.svg" alt="None" />'
         )
-        self.assertHTMLEqual(display_value, expected)
+        for value in [None, DatabaseDefault(models.Value(True))]:
+            with self.subTest(empty_value=value):
+                display_value = display_for_field(value, model_field, self.empty_value)
+                self.assertHTMLEqual(display_value, expected)
 
     def test_json_display_for_field(self):
         tests = [
@@ -307,11 +316,25 @@ class UtilsTests(SimpleTestCase):
         self.assertEqual(display_for_value(True, ""), "True")
         self.assertEqual(display_for_value(False, ""), "False")
 
+    def test_list_display_for_value_boolean_database_default(self):
+        # DatabaseDefault expression is interpreted as unknown.
+        self.assertEqual(
+            display_for_value(DatabaseDefault(models.Value(True)), "", boolean=True),
+            '<img src="/static/admin/img/icon-unknown.svg" alt="None">',
+        )
+        self.assertEqual(display_for_value(DatabaseDefault(models.Value(True)), ""), "")
+
     def test_list_display_for_value_empty(self):
         for value in EMPTY_VALUES:
             with self.subTest(empty_value=value):
                 display_value = display_for_value(value, self.empty_value)
                 self.assertEqual(display_value, self.empty_value)
+
+    def test_list_display_for_database_default(self):
+        display_value = display_for_value(
+            DatabaseDefault(models.Value("1")), self.empty_value
+        )
+        self.assertEqual(display_value, self.empty_value)
 
     def test_list_display_for_value_consecutive_whitespace(self):
         cases = [
