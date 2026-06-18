@@ -319,7 +319,10 @@ class BaseExpression:
 
     @property
     def conditional(self):
-        return isinstance(self.output_field, fields.BooleanField)
+        condition = hasattr(self.output_field, "conditional") and isinstance(
+            self.output_field.conditional, fields.BooleanField
+        )
+        return condition or isinstance(self.output_field, fields.BooleanField)
 
     @property
     def field(self):
@@ -470,7 +473,13 @@ class BaseExpression:
 
     def get_source_fields(self):
         """Return the underlying field types used by this aggregate."""
-        return [e._output_field_or_none for e in self.get_source_expressions()]
+        fields = []
+        for e in self.get_source_expressions():
+            field = e._output_field_or_none
+            if getattr(field, "is_composite", False) and len(field.sub_fields) == 1:
+                field = list(field.sub_fields.values())[0]
+            fields.append(field)
+        return fields
 
     def asc(self, **kwargs):
         return OrderBy(self, **kwargs)
@@ -750,10 +759,16 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
     def _resolve_output_field(self):
         # We avoid using super() here for reasons given in
         # Expression._resolve_output_field()
+        lhs_field = self.lhs._output_field_or_none
+        rhs_field = self.rhs._output_field_or_none
+        if getattr(lhs_field, "is_composite", False) and len(lhs_field.sub_fields) == 1:
+            lhs_field = list(lhs_field.sub_fields.values())[0]
+        if getattr(rhs_field, "is_composite", False) and len(rhs_field.sub_fields) == 1:
+            rhs_field = list(rhs_field.sub_fields.values())[0]
         combined_type = _resolve_combined_type(
             self.connector,
-            type(self.lhs._output_field_or_none),
-            type(self.rhs._output_field_or_none),
+            type(lhs_field),
+            type(rhs_field),
         )
         if combined_type is None:
             raise FieldError(
@@ -1855,7 +1870,10 @@ class Subquery(BaseExpression, Combinable):
             output_field = resolved._output_field_or_none
             if output_field is None:
                 return resolved.query
-            if getattr(output_field, "is_composite", False):
+            if (
+                getattr(output_field, "is_composite", False)
+                and len(output_field.sub_fields) > 1
+            ):
                 return resolved
             if type(output_field) is not type(resolved.query.output_field):
                 return ExpressionWrapper(resolved.query, output_field=output_field)

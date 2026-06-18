@@ -265,15 +265,44 @@ class CompositeField(Field):
             raise FieldError(f"{name!r} not found")
         return self.sub_fields[name]
 
+    def get_lookup(self, lookup_name):
+        if len(self.sub_fields) == 1:
+            subfield = list(self.sub_fields.values())[0]
+            lookup = subfield.get_lookup(lookup_name)
+            if lookup is not None:
+                return lookup
+        return super().get_lookup(lookup_name)
+
     def get_transform(self, name):
         """This for to work lookups"""
         try:
             subfield = self.get_field(name)
         except FieldError:
+            if len(self.sub_fields) == 1:
+                subfield = list(self.sub_fields.values())[0]
+                transform = subfield.get_transform(name)
+                if transform is not None:
+                    return transform
             return super().get_transform(name)
         return partial(
             CompositeSubfieldTransform, lookup_name=name, output_field=subfield
         )
+
+    @property
+    def path_infos(self):
+        if len(self.sub_fields) == 1:
+            return list(self.sub_fields.values())[0].path_infos
+
+    @property
+    def conditional(self):
+        if len(self.sub_fields) == 1:
+            return list(self.sub_fields.values())[0]
+        return super().conditional
+
+    def get_internal_type(self):
+        if len(self.sub_fields) == 1:
+            return list(self.sub_fields.values())[0].get_internal_type()
+        return super().get_internal_type()
 
 
 CompositeField.register_lookup(TupleExact)
