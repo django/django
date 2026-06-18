@@ -5,8 +5,8 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.mail import MailerDoesNotExist, mail_managers, mailers
 from django.http import HttpResponsePermanentRedirect
+from django.middleware import MiddlewareMixin
 from django.urls import is_valid_path
-from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import escape_leading_slashes
 
 

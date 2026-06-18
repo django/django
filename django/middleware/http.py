@@ -1,5 +1,5 @@
+from django.middleware import MiddlewareMixin
 from django.utils.cache import get_conditional_response, set_response_etag
-from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import parse_http_date_safe, split_directive_names
 
 

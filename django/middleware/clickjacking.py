@@ -6,7 +6,7 @@ malicious site loading resources from your site in a hidden frame.
 """
 
 from django.conf import settings
-from django.utils.deprecation import MiddlewareMixin
+from django.middleware import MiddlewareMixin
 
 
 class XFrameOptionsMiddleware(MiddlewareMixin):
