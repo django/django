@@ -2318,7 +2318,7 @@ class CacheUtils(SimpleTestCase):
         self.assertEqual(
             get_cache_key(request),
             "views.decorators.cache.cache_page.settingsprefix.GET."
-            "18a03f9c9649f7d684af5db3524f5c99.d41d8cd98f00b204e9800998ecf8427e",
+            "18a03f9c9649f7d684af5db3524f5c99.3b59035bd3b34e30981dc990dd93acbb",
         )
 
     def test_learn_cache_key_strips_whitespace(self):
@@ -2344,6 +2344,25 @@ class CacheUtils(SimpleTestCase):
         self.assertIsNotNone(key_a)
         self.assertIsNotNone(key_b)
         self.assertNotEqual(key_a, key_b)
+
+    def test_learn_cache_key_no_header_collision(self):
+        tests = [
+            ({"X-Region": "EU", "X-Tenant": ""}, {"X-Region": "", "X-Tenant": "EU"}),
+            ({"X-Region": "EU"}, {"X-Tenant": "EU"}),
+        ]
+        for headers_a, headers_b in tests:
+            with self.subTest(headers=(headers_a, headers_b)):
+                request_a = self.factory.get(self.path, headers=headers_a)
+                request_b = self.factory.get(self.path, headers=headers_b)
+                response = HttpResponse()
+                response.headers["Vary"] = "X-Region, X-Tenant"
+                learn_cache_key(request_a, response)
+                # Potentially colliding values result in different cache keys.
+                key_a = get_cache_key(request_a)
+                key_b = get_cache_key(request_b)
+                self.assertIsNotNone(key_a)
+                self.assertIsNotNone(key_b)
+                self.assertNotEqual(key_a, key_b)
 
     def test_patch_cache_control(self):
         tests = (
@@ -2546,7 +2565,7 @@ class CacheI18nTest(SimpleTestCase):
         request = self.factory.get(self.path)
         request.META["HTTP_ACCEPT_ENCODING"] = "gzip;q=1.0, identity; q=0.5, *;q=0"
         response = HttpResponse()
-        response.headers["Vary"] = "accept-encoding"
+        response.headers["Vary"] = "cookie, accept-encoding"
         key = learn_cache_key(request, response)
         self.assertIn(
             lang,
