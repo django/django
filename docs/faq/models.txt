@@ -60,14 +60,7 @@ immediately after :djadmin:`migrate` was executed.
 Do Django models support multiple-column primary keys?
 ======================================================
 
-No. Only single-column primary keys are supported.
-
-But this isn't an issue in practice, because there's nothing stopping you from
-adding other constraints (using the ``unique_together`` model option or
-creating the constraint directly in your database), and enforcing the
-uniqueness at that level. Single-column primary keys are needed for things such
-as the admin interface to work; e.g., you need a single value to specify
-an object to edit or delete.
+Partially. See :doc:`/topics/composite-primary-key`.
 
 Does Django support NoSQL databases?
 ====================================
