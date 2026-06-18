@@ -98,6 +98,17 @@ class DefaultTests(TestCase):
         obj2 = DBDefaults.objects.create()
         self.assertEqual(obj2.both, 1)
 
+    def test_db_default_blind_overwrite(self):
+        """
+        Perform a blind overwrite: instantiate an object with a known pk
+        without fetching it, and overwrite some values. The db_default is used.
+        """
+        obj1 = DBDefaults.objects.create(null=1.2)
+        unfetched_instance = DBDefaults(pk=obj1.pk)
+        unfetched_instance.save()
+        obj1.refresh_from_db()
+        self.assertEqual(obj1.null, 1.1)
+
     def test_pk_db_default(self):
         obj1 = DBDefaultsPK.objects.create()
         if not connection.features.can_return_columns_from_insert:
