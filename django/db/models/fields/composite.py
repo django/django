@@ -255,6 +255,44 @@ class CompositeField(Field):
             self.sub_fields[name] = field
         super().__init__()
 
+    @classmethod
+    def from_select(cls, select, values_select=None):
+        """
+        Builds a CompositeField (possibly nested) from query select exprs.
+        """
+        if values_select:
+            select_map = {}
+            for path, sel in zip(values_select, select):
+                field = getattr(sel, "target", None) or getattr(sel, "field", None)
+                select_map[path] = field
+        else:
+            fields = [
+                getattr(sel, "target", None) or getattr(sel, "field", None) or sel
+                for sel in select
+            ]
+            select_map = {field.name: field for field in fields}
+
+        nested = {}
+        for path, field in select_map.items():
+            if field is None:
+                continue
+            parts = path.split("__")
+            current = nested
+            for part in parts[:-1]:
+                if part not in current:
+                    current[part] = {}
+                current = current[part]
+            current[parts[-1]] = field
+        sub_fields = {k: cls._make_composite(k, v) for k, v in nested.items()}
+        return cls(**sub_fields)
+
+    @classmethod
+    def _make_composite(cls, name, value):
+        if isinstance(value, dict):
+            sub_fields = {k: cls._make_composite(k, v) for k, v in value.items()}
+            return cls(**sub_fields)
+        return value
+
     def deconstruct(self):
         """This method taken from base Field class"""
         name, path, _, kwargs = super().deconstruct()

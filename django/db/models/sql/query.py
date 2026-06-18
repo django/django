@@ -337,19 +337,23 @@ class Query(BaseExpression):
 
     @property
     def output_field(self):
-        if len(self.select) == 1:
-            select = self.select[0]
-            return getattr(select, "target", None) or select.field
-        elif len(self.annotation_select) == 1:
-            return next(iter(self.annotation_select.values())).output_field
-        elif len(self.select) > 1:
-            from django.db.models import CompositeField
+        is_composite = False
+        if len(self.select) > 1:
+            is_composite = True
+        elif self.values_select and len(self.select) > 0:
+            is_composite = True
 
-            fields = (
-                getattr(select, "target", None) or select.field
-                for select in self.select
-            )
-            return CompositeField(**{field.name: field for field in fields})
+        if not is_composite:
+            if len(self.select) == 1:
+                select = self.select[0]
+                return getattr(select, "target", None) or select.field
+            elif len(self.annotation_select) == 1:
+                return next(iter(self.annotation_select.values())).output_field
+            return None
+
+        from django.db.models import CompositeField
+
+        return CompositeField.from_select(self.select, self.values_select)
 
     @cached_property
     def base_table(self):
@@ -1535,24 +1539,24 @@ class Query(BaseExpression):
         transform_class = lhs.get_transform(name)
         if transform_class:
             return transform_class(lhs)
+
+        output_field = lhs.output_field.__class__
+        suggested_lookups = difflib.get_close_matches(
+            name, lhs.output_field.get_lookups()
+        )
+        if suggested_lookups:
+            suggestion = ", perhaps you meant %s?" % " or ".join(suggested_lookups)
         else:
-            output_field = lhs.output_field.__class__
-            suggested_lookups = difflib.get_close_matches(
-                name, lhs.output_field.get_lookups()
-            )
-            if suggested_lookups:
-                suggestion = ", perhaps you meant %s?" % " or ".join(suggested_lookups)
-            else:
-                suggestion = "."
-            if lookups is not None:
-                name_index = lookups.index(name)
-                unsupported_lookup = LOOKUP_SEP.join(lookups[name_index:])
-            else:
-                unsupported_lookup = name
-            raise FieldError(
-                "Unsupported lookup '%s' for %s or join on the field not "
-                "permitted%s" % (unsupported_lookup, output_field.__name__, suggestion)
-            )
+            suggestion = "."
+        if lookups is not None:
+            name_index = lookups.index(name)
+            unsupported_lookup = LOOKUP_SEP.join(lookups[name_index:])
+        else:
+            unsupported_lookup = name
+        raise FieldError(
+            "Unsupported lookup '%s' for %s or join on the field not "
+            "permitted%s" % (unsupported_lookup, output_field.__name__, suggestion)
+        )
 
     def build_filter(
         self,
