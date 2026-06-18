@@ -16,6 +16,7 @@ from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.deprecation import (
     RemovedInDjango70Warning,
+    RemovedInDjango71Warning,
     warn_about_external_use,
 )
 from django.utils.functional import LazyObject, empty
@@ -24,6 +25,11 @@ from django.utils.warnings import django_file_prefixes
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 DEFAULT_STORAGE_ALIAS = "default"
 STATICFILES_STORAGE_ALIAS = "staticfiles"
+
+# RemovedInDjango71Warning.
+DEFAULT_AUTO_FIELD_DEPRECATED_MSG = (
+    "The DEFAULT_AUTO_FIELD setting is deprecated. Use DEFAULT_PK_FIELD instead."
+)
 
 # RemovedInDjango70Warning.
 SIGNED_COOKIE_LEGACY_SALT_DEPRECATED_MSG = (
@@ -133,6 +139,14 @@ class LazySettings(LazyObject):
                 EMAIL_SETTING_DEPRECATED_MSG.format(name=name), RemovedInDjango70Warning
             )
 
+        # RemovedInDjango71Warning.
+        if name == "DEFAULT_AUTO_FIELD" and _wrapped.is_overridden(
+            "DEFAULT_AUTO_FIELD"
+        ):
+            _show_settings_deprecation_warning(
+                DEFAULT_AUTO_FIELD_DEPRECATED_MSG, RemovedInDjango71Warning
+            )
+
         # Special case some settings which require further modification.
         # This is done here for performance reasons so the modified value is
         # cached.
@@ -174,6 +188,12 @@ class LazySettings(LazyObject):
         if name in DEPRECATED_EMAIL_SETTINGS:
             _show_settings_deprecation_warning(
                 EMAIL_SETTING_DEPRECATED_MSG.format(name=name), RemovedInDjango70Warning
+            )
+
+        # RemovedInDjango71Warning.
+        if name == "DEFAULT_AUTO_FIELD":
+            _show_settings_deprecation_warning(
+                DEFAULT_AUTO_FIELD_DEPRECATED_MSG, RemovedInDjango71Warning
             )
 
         super().__setattr__(name, value)
@@ -285,6 +305,13 @@ class Settings:
                 RemovedInDjango70Warning,
                 skip_file_prefixes=django_file_prefixes(),
             )
+        # RemovedInDjango71Warning.
+        if "DEFAULT_AUTO_FIELD" in self._explicit_settings:
+            warnings.warn(
+                DEFAULT_AUTO_FIELD_DEPRECATED_MSG,
+                RemovedInDjango71Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
         # RemovedInDjango70Warning.
         _check_email_settings_conflicts(self._explicit_settings)
         for name in DEPRECATED_EMAIL_SETTINGS.intersection(self._explicit_settings):
@@ -351,6 +378,11 @@ class UserSettingsHolder:
         if name in DEPRECATED_EMAIL_SETTINGS:
             _show_settings_deprecation_warning(
                 EMAIL_SETTING_DEPRECATED_MSG.format(name=name), RemovedInDjango70Warning
+            )
+        # RemovedInDjango71Warning.
+        if name == "DEFAULT_AUTO_FIELD":
+            _show_settings_deprecation_warning(
+                DEFAULT_AUTO_FIELD_DEPRECATED_MSG, RemovedInDjango71Warning
             )
 
         super().__setattr__(name, value)
