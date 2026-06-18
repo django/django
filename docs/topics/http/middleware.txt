@@ -395,10 +395,10 @@ instances are correctly marked as coroutine functions::
 Upgrading pre-Django 1.10-style middleware
 ==========================================
 
-.. class:: django.utils.deprecation.MiddlewareMixin
+.. class:: django.middleware.MiddlewareMixin
     :module:
 
-Django provides ``django.utils.deprecation.MiddlewareMixin`` to ease creating
+Django provides ``django.middleware.MiddlewareMixin`` to ease creating
 middleware classes that are compatible with both :setting:`MIDDLEWARE` and the
 old ``MIDDLEWARE_CLASSES``, and support synchronous and asynchronous requests.
 All middleware classes included with Django are compatible with both settings.

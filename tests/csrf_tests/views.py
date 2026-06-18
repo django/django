@@ -3,7 +3,7 @@ from django.middleware.csrf import get_token, rotate_token
 from django.template import Context, RequestContext, Template
 from django.template.context_processors import csrf
 from django.utils.decorators import decorator_from_middleware
-from django.utils.deprecation import MiddlewareMixin
+from django.middleware import MiddlewareMixin
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 
 

@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.utils.csp import CSP, LazyNonce, build_policy
-from django.utils.deprecation import MiddlewareMixin
+from django.middleware import MiddlewareMixin
 
 
 def get_nonce(request):

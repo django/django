@@ -29,7 +29,8 @@ from django.middleware.http import ConditionalGetMiddleware
 from django.middleware.locale import LocaleMiddleware
 from django.middleware.security import SecurityMiddleware
 from django.test import SimpleTestCase
-from django.utils.deprecation import MiddlewareMixin
+from django.middleware import MiddlewareMixin
+from django.utils.deprecation import MiddlewareMixin as DeprecationMiddlewareMixin
 
 
 class MiddlewareMixinTests(SimpleTestCase):
@@ -54,6 +55,9 @@ class MiddlewareMixinTests(SimpleTestCase):
         XFrameOptionsMiddleware,
         XViewMiddleware,
     ]
+
+    def test_deprecation_import_compatibility(self):
+        self.assertIs(DeprecationMiddlewareMixin, MiddlewareMixin)
 
     def test_repr(self):
         class GetResponse:

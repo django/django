@@ -58,7 +58,7 @@ from django.utils.cache import (
     patch_vary_headers,
     split_header_value,
 )
-from django.utils.deprecation import MiddlewareMixin
+from django.middleware import MiddlewareMixin
 from django.utils.http import parse_http_date_safe
 
 
