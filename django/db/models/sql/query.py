@@ -1288,7 +1288,16 @@ class Query(BaseExpression):
                 SubqueryTable(subquery.clone(), alias, annotation.output_field),
                 alias,
             )
-        self.set_annotation_mask(set(self.annotation_select).difference({alias}))
+            self.set_annotation_mask(set(self.annotation_select).difference({alias}))
+        else:
+            if select:
+                self.append_annotation_mask([alias])
+                if self.selected:
+                    self.selected[alias] = alias
+            else:
+                self.set_annotation_mask(
+                    set(self.annotation_select).difference({alias})
+                )
 
     def _get_subquery(self, annotation):
         if hasattr(annotation, "query"):
