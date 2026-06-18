@@ -3292,27 +3292,32 @@ class TestMakeTemplateFragmentKey(SimpleTestCase):
 
     def test_with_one_vary_on(self):
         key = make_template_fragment_key("foo", ["abc"])
-        self.assertEqual(key, "template.cache.foo.493e283d571a73056196f1a68efd0f66")
+        self.assertEqual(key, "template.cache.foo.a6360ec2c58ecc4b23fd5bd00216fccd")
 
     def test_with_many_vary_on(self):
         key = make_template_fragment_key("bar", ["abc", "def"])
-        self.assertEqual(key, "template.cache.bar.17c1a507a0cb58384f4c639067a93520")
+        self.assertEqual(key, "template.cache.bar.250310c146db454966b64f5fc265a540")
 
     def test_proper_escaping(self):
         key = make_template_fragment_key("spam", ["abc:def%"])
-        self.assertEqual(key, "template.cache.spam.06c8ae8e8c430b69fb0a6443504153dc")
+        self.assertEqual(key, "template.cache.spam.bf6c24ef2576004284e0522c15314d8c")
 
     def test_with_ints_vary_on(self):
         key = make_template_fragment_key("foo", [1, 2, 3, 4, 5])
-        self.assertEqual(key, "template.cache.foo.7ae8fd2e0d25d651c683bdeebdb29461")
+        self.assertEqual(key, "template.cache.foo.087c006c1b99e0d147f624b4921f8a13")
 
     def test_with_unicode_vary_on(self):
         key = make_template_fragment_key("foo", ["42º", "😀"])
-        self.assertEqual(key, "template.cache.foo.7ced1c94e543668590ba39b3c08b0237")
+        self.assertEqual(key, "template.cache.foo.ab66482052ab2084b9d25bdd04bc9b10")
 
     def test_long_vary_on(self):
         key = make_template_fragment_key("foo", ["x" * 10000])
-        self.assertEqual(key, "template.cache.foo.3670b349b5124aa56bdb50678b02b23a")
+        self.assertEqual(key, "template.cache.foo.abff8a6702abde497feae7f61de2ef1e")
+
+    def test_collision_vary_on(self):
+        key1 = make_template_fragment_key("foo", ["a:b", "c"])
+        key2 = make_template_fragment_key("foo", ["a", "b:c"])
+        self.assertNotEqual(key1, key2)
 
 
 class CacheHandlerTest(SimpleTestCase):
