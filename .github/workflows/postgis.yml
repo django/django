@@ -17,54 +17,48 @@ jobs:
   postgis:
     if: contains(github.event.pull_request.labels.*.name, 'geodjango')
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        # Use Conda shell in all steps. See https://github.com/marketplace/actions/setup-miniconda#use-a-default-shell
+        shell: bash -el {0}
     strategy:
       fail-fast: false
       matrix:
-        postgis-version: ["latest", "18-3.6-alpine", "17-master"]
-    name: PostGIS ${{ matrix.postgis-version }}
-    services:
-      postgres:
-        image: postgis/postgis:${{ matrix.postgis-version }}
-        env:
-          POSTGRES_DB: geodjango
-          POSTGRES_USER: user
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    timeout-minutes: 60
+        include:
+          - conda-environment-file: ".github/workflows/data/conda/geolibs-pg17.yml"
+            pg_major: "17"
+          - conda-environment-file: ".github/workflows/data/conda/geolibs-pg18.yml"
+            pg_major: "18"
+    name: PostgreSQL ${{ matrix.pg_major }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - name: Set up Python
-        uses: actions/setup-python@v6
+      - name: Setup Miniforge
+        # Pinned to v4.0.1
+        uses: conda-incubator/setup-miniconda@8ee1f361103df19b6f8c8655fd3967a8ecb162d5
         with:
-          python-version: '3.14'
-          cache: 'pip'
-          cache-dependency-path: 'tests/requirements/py3.txt'
-      - name: Update apt repo
-        run: sudo apt update
+          activate-environment: geodjango
+          environment-file: ${{ matrix.conda-environment-file }}
+          channel-priority: strict
       - name: Install libmemcached-dev for pylibmc
         run: sudo apt install -y libmemcached-dev
-      - name: Install geospatial dependencies
-        run: sudo apt install -y binutils libproj-dev gdal-bin
-      - name: Print PostGIS versions
-        env:
-          POSTGRES_DB: geodjango
-          POSTGRES_USER: user
-          POSTGRES_PASSWORD: postgres
-        run: |
-          PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USER -d $POSTGRES_DB -h localhost -c "SELECT PostGIS_full_version();"
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip wheel
       - run: python -m pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .
       - name: Create PostgreSQL settings file
         run: mv ./.github/workflows/data/test_postgis.py.tpl ./tests/test_postgis.py
+      - name: Initialize and start local PostgreSQL
+        env:
+          PGPASSWORD: postgres
+        run: |
+          initdb -D "$GITHUB_WORKSPACE/.tmp/pgdata" --username="user" --auth=scram-sha-256 --pwfile=<(echo "$PGPASSWORD")
+          pg_ctl -D "$GITHUB_WORKSPACE/.tmp/pgdata" -w start
+          psql -U user -d postgres -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+          psql -U user -d postgres -c "SELECT PostGIS_full_version();"
+      - name: Print geospatial versions
+        run: |
+          python -c "from django.contrib.gis import gdal, geos; print(f'GDAL: {gdal.gdal_version()}'); print(f'GEOS: {geos.geos_version()}')"
       - name: Run PostGIS tests
         run: python -Wall tests/runtests.py -v2 --settings=test_postgis
