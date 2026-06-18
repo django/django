@@ -72,8 +72,8 @@ is printed to the console as a development aid (for projects created with
 :djadmin:`startproject`) or results in a ``MailerDoesNotExist`` error (when the
 :setting:`MAILERS` setting isn't defined).
 
-Define edit the :setting:`MAILERS` setting to tell Django how to send email.
-For example, to send through an SMTP server running on the local machine::
+Use the :setting:`MAILERS` setting to tell Django how to send email. For
+example, to send through an SMTP server running on the local machine::
 
     MAILERS = {
         "default": {
@@ -505,7 +505,7 @@ email backend API :ref:`provides an alternative
     * ``cc``: A list or tuple of recipient addresses used in the "Cc" header
       when sending the email.
 
-    * ``bcc``: A list or tuple of addresses used in the "Bcc" header when
+    * ``bcc``: A list or tuple of addresses used for blind carbon copies when
       sending the email.
 
     * ``reply_to``: A list or tuple of recipient addresses used in the

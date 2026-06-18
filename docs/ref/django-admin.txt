@@ -499,6 +499,31 @@ Only support for PostgreSQL is implemented.
 
 If this option is provided, models are also created for database views.
 
+``listurls``
+------------
+
+.. django-admin:: listurls
+
+.. versionadded:: 6.2
+
+List URL patterns from the project's root :doc:`URLconf </topics/http/urls>`
+with optional filtering by prefixes, inspired by ``show_urls`` from
+``django-extensions``.
+
+.. django-admin-option:: --unsorted, -u
+
+Lists URLs in the original ordering from ``urlpatterns``. The default ordering
+is alphabetical by route.
+
+.. django-admin-option:: --prefix, -p [prefix ...]
+
+Filters URLs by given prefixes.
+
+.. django-admin-option:: --format, -f {tabular,stacked,json}
+
+Specifies the output format. Available values are ``tabular``, ``stacked``, and
+``json``. Default is ``tabular``.
+
 ``loaddata``
 ------------
 
@@ -1044,8 +1069,15 @@ recipient(s) specified. For example:
 
     django-admin sendtestemail foo@example.com bar@example.com
 
-There are a couple of options, and you may use any combination of them
-together:
+The following options may be used in any combination with each other and with
+recipient email arguments.
+
+.. django-admin-option:: --using ALIAS
+
+.. versionadded:: 6.1
+
+Specifies the :setting:`MAILERS` alias to use for sending the test email to
+the recipients given as arguments. Defaults to the ``"default"`` mailer.
 
 .. django-admin-option:: --managers
 

@@ -714,9 +714,9 @@ Here are some hints about the ordering of various Django middleware classes:
 
 #. :class:`~django.middleware.csp.ContentSecurityPolicyMiddleware`
 
-   Can be placed near the bottom, but ensure any middleware that accesses
-   :ref:`csp_nonce <csp-nonce>` is positioned after it, so the nonce is
-   properly included in the response header.
+   Can be placed near the bottom, but since the :ref:`csp_nonce <csp-nonce>` is
+   lazy, ensure any middleware that accesses it is positioned after, so the
+   nonce is generated before this middleware builds the response header.
 
 #. :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
 

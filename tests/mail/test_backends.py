@@ -795,10 +795,9 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         backend = self.create_backend(
             username="not empty username", password="not empty password"
         )
-        with mock.patch("smtplib.SMTP.login") as mock_smtp_login, backend:
-            # Using backend as context manager opens the connection and
-            # attempts login.
-            pass
+        self.addCleanup(backend.close)
+        with mock.patch("smtplib.SMTP.login") as mock_smtp_login:
+            backend.open()
         mock_smtp_login.assert_called_once_with(
             "not empty username", "not empty password"
         )
@@ -810,14 +809,38 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         backend = self.create_backend()
         self.assertIsNone(backend.connection)
         opened = backend.open()
+        self.assertIsNotNone(backend.connection)
+        self.assertIsNone(backend._partial_connection)
         backend.close()
         self.assertIs(opened, True)
+        self.assertIsNone(backend.connection)
+        self.assertIsNone(backend._partial_connection)
 
     def test_reopen_connection(self):
         backend = self.create_backend()
         # Simulate an already open connection.
         backend.connection = mock.Mock(spec=object())
         self.assertIs(backend.open(), False)
+
+    def test_reopen_replaces_partial_connection(self):
+        backend = self.create_backend(username="not empty", password="not empty")
+        self.addCleanup(backend.close)
+
+        error = "SMTP AUTH extension not supported by server."
+        with self.assertRaisesMessage(SMTPException, error):
+            backend.open()
+        self.assertIsNone(backend.connection)
+        self.assertIsNotNone(backend._partial_connection)
+        partial_conn = backend._partial_connection
+
+        with self.assertRaisesMessage(SMTPException, error):
+            backend.open()
+        self.assertIsNone(backend.connection)
+        self.assertIsNotNone(backend._partial_connection)
+        self.assertNotEqual(backend._partial_connection, partial_conn)
+
+        self.assertIsNone(partial_conn.sock)
+        self.assertIsNotNone(backend._partial_connection.sock)
 
     # RemovedInDjango70Warning.
     @override_settings(EMAIL_USE_TLS=True)
@@ -915,19 +938,20 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
 
     def test_email_tls_attempts_starttls(self):
         backend = self.create_backend(use_tls=True)
+        self.addCleanup(backend.close)
         self.assertIs(backend.use_tls, True)
         with self.assertRaisesMessage(
             SMTPException, "STARTTLS extension not supported by server."
         ):
-            with backend:
-                pass
+            backend.open()
+        self.assertIsNone(backend.connection)
 
     def test_email_ssl_attempts_ssl_connection(self):
         backend = self.create_backend(use_ssl=True)
         self.assertIs(backend.use_ssl, True)
         with self.assertRaises(SSLError):
-            with backend:
-                pass
+            backend.open()
+        self.assertIsNone(backend.connection)
 
     def test_connection_timeout_default(self):
         backend = self.create_backend()
@@ -944,10 +968,10 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         myemailbackend = MyEmailBackend(
             host=self.smtp_controller.hostname, port=self.smtp_controller.port
         )
+        self.addCleanup(myemailbackend.close)
         myemailbackend.open()
         self.assertEqual(myemailbackend.timeout, 42)
         self.assertEqual(myemailbackend.connection.timeout, 42)
-        myemailbackend.close()
 
     # RemovedInDjango70Warning.
     @override_settings(EMAIL_TIMEOUT=10)
@@ -1158,5 +1182,7 @@ class SMTPBackendStoppedServerTests(SMTPBackendTestsBase):
         """
         with self.assertRaises(ConnectionError):
             self.backend.open()
+        self.assertIsNone(self.backend.connection)
         self.backend.fail_silently = True
         self.backend.open()
+        self.assertIsNone(self.backend.connection)

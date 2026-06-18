@@ -108,7 +108,10 @@ Asynchronous views
 Cache
 ~~~~~
 
-* ...
+* Subclasses of ``BaseDatabaseCache`` now support :ref:`
+  culling <_database-caching>` on a percentage of writes as an optimization.
+  The default is 10%, and may be configured using the ``CULL_PROBABILITY``
+  option.
 
 CSP
 ~~~
@@ -173,7 +176,8 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :djadmin:`listurls` command lists the URLs from the project's root
+  URLconf, including the view class or function (and name, if present).
 
 Migrations
 ~~~~~~~~~~
@@ -223,7 +227,9 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* :meth:`~django.test.Client.force_login` now skips members of
+  :setting:`AUTHENTICATION_BACKENDS` not implementing ``(a)get_user()``, e.g.
+  permission-only backends.
 
 URLs
 ~~~~
@@ -260,6 +266,12 @@ Miscellaneous
   :class:`~django.http.JsonResponse`, it now defaults to ``False``, because the
   pollution vulnerability in the ``Array`` prototype was fixed in
   `ES5 <https://262.ecma-international.org/5.1/#sec-11.1.4>`_.
+
+* :class:`~django.core.serializers.json.DjangoJSONEncoder` now omits the
+  millisecond component of serialized ``datetime.datetime`` and
+  ``datetime.time`` objects if they have zero milliseconds. For example,
+  ``datetime.datetime(2000, 1, 1, 0, 0, 0, 1)`` now serializes to
+  ``"2000-01-01T00:00:00"`` rather than ``"2000-01-01T00:00:00.000"``.
 
 .. _deprecated-features-6.2:
 

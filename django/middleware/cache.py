@@ -41,6 +41,8 @@ More details about how the caching works:
 * This middleware also sets ETag, Last-Modified, Expires and Cache-Control
   headers on the response object.
 
+* If the request had an Authorization header and the response was not marked
+  "Cache-Control: public", the response will vary on Authorization.
 """
 
 import time
@@ -53,6 +55,8 @@ from django.utils.cache import (
     has_vary_header,
     learn_cache_key,
     patch_response_headers,
+    patch_vary_headers,
+    split_header_value,
 )
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import parse_http_date_safe
@@ -102,9 +106,10 @@ class UpdateCacheMiddleware(MiddlewareMixin):
 
         # Don't cache responses when the Cache-Control header is set to
         # private, no-cache, or no-store.
-        cache_control = response.get("Cache-Control", ())
-        if any(
-            directive in cache_control
+        cache_control = response.get("Cache-Control", "").lower()
+        cache_control_parts = list(split_header_value(cache_control))
+        if cache_control and any(
+            directive in cache_control_parts
             for directive in (
                 "private",
                 "no-cache",
@@ -130,6 +135,12 @@ class UpdateCacheMiddleware(MiddlewareMixin):
                 # max-age was set to 0, don't cache.
                 return response
         patch_response_headers(response, timeout)
+        # Make the response vary on Authorization if the request bears that
+        # header, unless allowed by "public" per RFC 9111, Section 3.5. No
+        # exceptions are made for "s-maxage" and "must-revalidate" since these
+        # are not currently implemented by Django.
+        if request.headers.get("Authorization") and "public" not in cache_control_parts:
+            patch_vary_headers(response, ("Authorization",))
         if timeout and response.status_code == 200:
             cache_key = learn_cache_key(
                 request, response, timeout, self.key_prefix, cache=self.cache

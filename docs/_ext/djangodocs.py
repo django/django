@@ -2,8 +2,6 @@
 Sphinx plugins for Django documentation.
 """
 
-import json
-import os
 import re
 
 from docutils import nodes
@@ -11,12 +9,9 @@ from docutils.parsers.rst import Directive
 from docutils.statemachine import ViewList
 from sphinx import addnodes
 from sphinx import version_info as sphinx_version
-from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.directives.code import CodeBlock
 from sphinx.domains.std import Cmdoption
-from sphinx.errors import ExtensionError
 from sphinx.util import logging
-from sphinx.util.console import bold
 from sphinx.writers.html import HTMLTranslator
 
 logger = logging.getLogger(__name__)
@@ -55,9 +50,7 @@ def setup(app):
     app.add_config_value("django_next_version", "0.0", True)
     app.add_directive("versionadded", VersionDirective)
     app.add_directive("versionchanged", VersionDirective)
-    app.add_builder(DjangoStandaloneHTMLBuilder)
-    app.set_translator("djangohtml", DjangoHTMLTranslator)
-    app.set_translator("json", DjangoHTMLTranslator)
+    app.connect("builder-inited", set_django_html_translator)
     app.add_node(
         ConsoleNode,
         html=(visit_console_html, None),
@@ -70,6 +63,11 @@ def setup(app):
     app.connect("html-page-context", html_page_context_hook)
     app.add_role("default-role-error", default_role_error)
     return {"parallel_read_safe": True}
+
+
+def set_django_html_translator(app):
+    if app.builder.format == "html":
+        app.set_translator(app.builder.name, DjangoHTMLTranslator, override=True)
 
 
 class VersionDirective(Directive):
@@ -99,11 +97,7 @@ class VersionDirective(Directive):
         node["type"] = self.name
         if self.content:
             self.state.nested_parse(self.content, self.content_offset, node)
-        try:
-            env.get_domain("changeset").note_changeset(node)
-        except ExtensionError:
-            # Sphinx < 1.8: Domain 'changeset' is not registered
-            env.note_versionchange(node["type"], node["version"], node, self.lineno)
+        env.get_domain("changeset").note_changeset(node)
         return ret
 
 
@@ -189,36 +183,6 @@ def parse_django_admin_node(env, sig, signode):
     return command
 
 
-class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
-    """
-    Subclass to add some extra things we need.
-    """
-
-    name = "djangohtml"
-
-    def finish(self):
-        super().finish()
-        logger.info(bold("writing templatebuiltins.js..."))
-        xrefs = self.env.domaindata["std"]["objects"]
-        templatebuiltins = {
-            "ttags": [
-                n
-                for ((t, n), (k, a)) in xrefs.items()
-                if t == "templatetag" and k == "ref/templates/builtins"
-            ],
-            "tfilters": [
-                n
-                for ((t, n), (k, a)) in xrefs.items()
-                if t == "templatefilter" and k == "ref/templates/builtins"
-            ],
-        }
-        outfilename = os.path.join(self.outdir, "templatebuiltins.js")
-        with open(outfilename, "w") as fp:
-            fp.write("var django_template_builtins = ")
-            json.dump(templatebuiltins, fp)
-            fp.write(";\n")
-
-
 class ConsoleNode(nodes.literal_block):
     """
     Custom node to override the visit/depart event handlers at registration
@@ -248,7 +212,7 @@ def depart_console_dummy(self, node):
 
 def visit_console_html(self, node):
     """Generate HTML for the console directive."""
-    if self.builder.name in ("djangohtml", "json") and node["win_console_text"]:
+    if self.builder.format == "html" and node["win_console_text"]:
         # Put a mark on the document object signaling the fact the directive
         # has been used on it.
         self.document._console_directive_used_flag = True
@@ -363,9 +327,9 @@ class ConsoleDirective(CodeBlock):
         self.arguments = ["console"]
         lit_blk_obj = super().run()[0]
 
-        # Only do work when the djangohtml HTML Sphinx builder is being used,
+        # Only do work when an HTML-format Sphinx builder is being used,
         # invoke the default behavior for the rest.
-        if env.app.builder.name not in ("djangohtml", "json"):
+        if env.app.builder.format != "html":
             return [lit_blk_obj]
 
         lit_blk_obj["uid"] = str(env.new_serialno("console"))
@@ -385,9 +349,8 @@ class ConsoleDirective(CodeBlock):
 
 def html_page_context_hook(app, pagename, templatename, context, doctree):
     # Put a bool on the context used to render the template. It's used to
-    # control inclusion of console-tabs.css and activation of the JavaScript.
-    # This way it's include only from HTML files rendered from reST files where
-    # the ConsoleDirective is used.
+    # control inclusion of console-tabs.css. This way it's included only from
+    # HTML files rendered from reST files where the ConsoleDirective is used.
     context["include_console_assets"] = getattr(
         doctree, "_console_directive_used_flag", False
     )

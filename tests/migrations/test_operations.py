@@ -938,6 +938,44 @@ class OperationTests(OperationTestBase):
                 "test_rmwsrf_rider", ["friend_id"], ("test_rmwsrf_horserider", "id")
             )
 
+    def test_rename_model_with_self_referential_fk_collect_sql(self):
+        """
+        Collecting SQL (e.g. sqlmigrate) for a RenameModel operation on a model
+        with a self-referential foreign key doesn't introspect the renamed
+        table, which doesn't exist yet (#33185).
+        """
+        project_state = self.set_up_test_model("test_rmwsrfcs", related_model=True)
+        operation = migrations.RenameModel("Rider", "HorseRider")
+        new_state = project_state.clone()
+        operation.state_forwards("test_rmwsrfcs", new_state)
+        # Forwards: only the old table exists, so the renamed table can't be
+        # introspected. The rename is collected and the self-referential FK is
+        # handled (rather than silently skipped) using the constraint
+        # introspected from the still-existing old table.
+        with connection.schema_editor(collect_sql=True) as editor:
+            operation.database_forwards(
+                "test_rmwsrfcs", editor, project_state, new_state
+            )
+            collected_sql = "\n".join(editor.collected_sql)
+        self.assertIn(
+            connection.ops.quote_name("test_rmwsrfcs_horserider"), collected_sql
+        )
+        self.assertIn(connection.ops.quote_name("friend_id"), collected_sql)
+        # Backwards: apply the rename for real so the renamed table exists,
+        # then collect the reverse SQL. The same redirection must happen, this
+        # time back to the "horserider" table.
+        with connection.schema_editor() as editor:
+            operation.database_forwards(
+                "test_rmwsrfcs", editor, project_state, new_state
+            )
+        with connection.schema_editor(collect_sql=True) as editor:
+            operation.database_backwards(
+                "test_rmwsrfcs", editor, new_state, project_state
+            )
+            collected_sql = "\n".join(editor.collected_sql)
+        self.assertIn(connection.ops.quote_name("test_rmwsrfcs_rider"), collected_sql)
+        self.assertIn(connection.ops.quote_name("friend_id"), collected_sql)
+
     def test_rename_model_with_superclass_fk(self):
         """
         Tests the RenameModel operation on a model which has a superclass that
@@ -3823,6 +3861,62 @@ class OperationTests(OperationTestBase):
             operation.describe(), "Alter unique_together for Pony (0 constraint(s))"
         )
 
+    def test_alter_unique_together_deferred(self):
+        """
+        AlterUniqueTogether handles deferred SQL constraints from previous
+        operations. Regression test for #31317.
+        """
+        app_label = "test_aluntod"
+        self.apply_operations(
+            app_label,
+            ProjectState(),
+            operations=[
+                migrations.CreateModel(
+                    "Pony",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                        ("pink", models.IntegerField(default=3)),
+                        ("weight", models.FloatField()),
+                    ],
+                    options={"unique_together": {("pink",)}},
+                ),
+                migrations.AlterUniqueTogether(
+                    name="Pony",
+                    unique_together={("pink", "weight")},
+                ),
+            ],
+        )
+
+        table_name = f"{app_label}_pony"
+        self.assertUniqueConstraintExists(table_name, ("pink", "weight"), value=True)
+        self.assertUniqueConstraintExists(table_name, ("pink",), value=False)
+
+    def test_alter_unique_together_deferred_overlapping_columns(self):
+        app_label = "test_aluntodoc"
+        self.apply_operations(
+            app_label,
+            ProjectState(),
+            operations=[
+                migrations.CreateModel(
+                    "Pony",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                        ("pink", models.IntegerField(default=3)),
+                        ("weight", models.FloatField()),
+                    ],
+                    options={"unique_together": [("pink", "weight"), ("pink",)]},
+                ),
+                migrations.AlterUniqueTogether(
+                    name="Pony",
+                    unique_together={("pink", "weight")},
+                ),
+            ],
+        )
+
+        table_name = f"{app_label}_pony"
+        self.assertUniqueConstraintExists(table_name, ("pink", "weight"), value=True)
+        self.assertUniqueConstraintExists(table_name, ("pink",), value=False)
+
     @skipUnlessDBFeature("allows_multiple_constraints_on_same_fields")
     def test_remove_unique_together_on_pk_field(self):
         app_label = "test_rutopkf"
@@ -4413,6 +4507,35 @@ class OperationTests(OperationTestBase):
             operation.database_forwards(app_label, editor, project_state, new_state)
         self.assertIndexNotExists(table_name, ["pink", "weight"])
         self.assertUniqueConstraintExists(table_name, ["pink", "weight"])
+
+    def test_alter_index_together_deferred_overlapping_columns(self):
+        app_label = "test_alintodoc"
+        self.apply_operations(
+            app_label,
+            ProjectState(),
+            operations=[
+                migrations.CreateModel(
+                    "Pony",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                        ("pink", models.IntegerField(default=3)),
+                        ("weight", models.FloatField()),
+                    ],
+                    options={
+                        "unique_together": [("pink",)],
+                        "index_together": [("pink",)],
+                    },
+                ),
+                migrations.AlterIndexTogether(
+                    name="Pony",
+                    index_together=set(),
+                ),
+            ],
+        )
+
+        table_name = f"{app_label}_pony"
+        self.assertIndexNotExists(table_name, ["pink"])
+        self.assertUniqueConstraintExists(table_name, ("pink",), value=True)
 
     def test_add_constraint(self):
         project_state = self.set_up_test_model("test_addconstraint")

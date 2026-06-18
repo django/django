@@ -20,10 +20,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import timezone
 from django.utils.datastructures import CaseInsensitiveMapping
-from django.utils.deprecation import (
-    RemovedInDjango71Warning,
-    django_file_prefixes,
-)
+from django.utils.deprecation import RemovedInDjango71Warning
 from django.utils.encoding import iri_to_uri
 from django.utils.functional import cached_property
 from django.utils.http import (
@@ -32,6 +29,7 @@ from django.utils.http import (
     http_date,
 )
 from django.utils.regex_helper import _lazy_re_compile
+from django.utils.warnings import django_file_prefixes
 
 _charset_from_content_type_re = _lazy_re_compile(
     r";\s*charset=(?P<charset>[^\s;]+)", re.I
@@ -291,7 +289,9 @@ class HttpResponseBase:
         self.headers.setdefault(key, value)
 
     def set_signed_cookie(self, key, value, salt="", **kwargs):
-        value = signing.get_cookie_signer(salt=key + salt).sign(value)
+        value = signing.get_cookie_signer(
+            salt=signing._cookie_signer_salt(key, salt)
+        ).sign(value)
         return self.set_cookie(key, value, **kwargs)
 
     def delete_cookie(self, key, path="/", domain=None, samesite=None):
@@ -745,9 +745,7 @@ class JsonResponse(HttpResponse):
     """
     An HTTP response class that consumes data to be serialized to JSON.
 
-    :param data: Data to be dumped into json. By default only ``dict`` objects
-      are allowed to be passed due to a security flaw before ECMAScript 5. See
-      the ``safe`` parameter for more information.
+    :param data: Data to be dumped into json.
     :param encoder: Should be a json encoder class. Defaults to
       ``django.core.serializers.json.DjangoJSONEncoder``.
     :param safe: Controls if only ``dict`` objects may be serialized. Defaults

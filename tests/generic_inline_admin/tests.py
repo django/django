@@ -577,3 +577,14 @@ class GenericInlineModelAdminTest(SimpleTestCase):
             request.name = name
             self.assertEqual(ma.get_inlines(request, None), (inline_class,))
             self.assertEqual(type(ma.get_inline_instances(request)[0]), inline_class)
+
+    def test_get_exclude_is_respected(self):
+        class GetExcludeInline(GenericTabularInline):
+            model = Media
+
+            def get_exclude(self, request, obj=None):
+                return ["url"]
+
+        ma = GetExcludeInline(Media, self.site)
+        formset = ma.get_formset(request)
+        self.assertNotIn("url", formset.form.base_fields)

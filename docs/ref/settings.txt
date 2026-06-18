@@ -2875,6 +2875,31 @@ precedence and will be applied instead. See
 
 See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATE_FORMAT`.
 
+.. setting:: SIGNED_COOKIE_LEGACY_SALT_FALLBACK
+
+``SIGNED_COOKIE_LEGACY_SALT_FALLBACK``
+---------------------------------------
+
+.. versionadded:: 5.2.15
+
+Default: ``False``
+
+Controls whether :meth:`~django.http.HttpRequest.get_signed_cookie` accepts
+cookies signed with Django's historical signed-cookie salt derivation based on
+``key + salt``.
+
+Set this to ``True`` to accept those legacy signed cookies in addition to
+cookies signed with Django's current unambiguous signed-cookie salt derivation.
+
+.. versionchanged:: 6.1
+
+    In older versions, the default was ``True``.
+
+.. deprecated:: 6.1
+
+    This transitional setting will be removed in Django 7.0, when legacy signed
+    cookies will no longer be accepted.
+
 .. setting:: SIGNING_BACKEND
 
 ``SIGNING_BACKEND``
@@ -4125,6 +4150,7 @@ HTTP
   * :setting:`SECURE_REFERRER_POLICY`
   * :setting:`SECURE_SSL_HOST`
   * :setting:`SECURE_SSL_REDIRECT`
+* :setting:`SIGNED_COOKIE_LEGACY_SALT_FALLBACK`
 * :setting:`SIGNING_BACKEND`
 * :setting:`USE_X_FORWARDED_HOST`
 * :setting:`USE_X_FORWARDED_PORT`

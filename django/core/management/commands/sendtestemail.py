@@ -28,8 +28,16 @@ class Command(BaseCommand):
             action="store_true",
             help="Send a test email to the addresses specified in settings.ADMINS.",
         )
+        parser.add_argument(
+            "--using",
+            default=None,
+            help=(
+                "Specify the MAILERS alias to use for sending the test email. "
+                "Defaults to 'default'."
+            ),
+        )
 
-    def handle(self, *args, **kwargs):
+    def handle(self, *args, using=None, **kwargs):
         subject = "Test email from %s on %s" % (socket.gethostname(), timezone.now())
 
         send_mail(
@@ -37,10 +45,13 @@ class Command(BaseCommand):
             message="If you're reading this, it was successful.",
             from_email=None,
             recipient_list=kwargs["email"],
+            using=using,
         )
 
         if kwargs["managers"]:
-            mail_managers(subject, "This email was sent to the site managers.")
+            mail_managers(
+                subject, "This email was sent to the site managers.", using=using
+            )
 
         if kwargs["admins"]:
-            mail_admins(subject, "This email was sent to the site admins.")
+            mail_admins(subject, "This email was sent to the site admins.", using=using)

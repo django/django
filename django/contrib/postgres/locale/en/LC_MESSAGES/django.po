@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
 "PO-Revision-Date: 2015-01-18 20:56+0100\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -18,21 +18,21 @@ msgstr ""
 msgid "PostgreSQL extensions"
 msgstr ""
 
-#: contrib/postgres/fields/array.py:21 contrib/postgres/forms/array.py:17
-#: contrib/postgres/forms/array.py:185
+#: contrib/postgres/fields/array.py:24 contrib/postgres/forms/array.py:16
+#: contrib/postgres/forms/array.py:184
 #, python-format
 msgid "Item %(nth)s in the array did not validate:"
 msgstr ""
 
-#: contrib/postgres/fields/array.py:22
+#: contrib/postgres/fields/array.py:25
 msgid "Nested arrays must have the same length."
 msgstr ""
 
-#: contrib/postgres/fields/hstore.py:15
+#: contrib/postgres/fields/hstore.py:16
 msgid "Map of strings to strings/nulls"
 msgstr ""
 
-#: contrib/postgres/fields/hstore.py:17
+#: contrib/postgres/fields/hstore.py:18
 #, python-format
 msgid "The value of “%(key)s” is not a string or null."
 msgstr ""

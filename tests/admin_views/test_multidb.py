@@ -3,6 +3,7 @@ from unittest import mock
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
 from django.http import HttpResponse
 from django.test import TestCase, override_settings
 from django.urls import path, reverse
@@ -192,6 +193,11 @@ class ViewOnSiteRouter:
 @override_settings(ROOT_URLCONF=__name__, DATABASE_ROUTERS=[ViewOnSiteRouter()])
 class ViewOnSiteTests(TestCase):
     databases = {"default", "other"}
+
+    def tearDown(self):
+        # Reads via ViewOnSiteRouter may prime the global SITE_CACHE using the
+        # "other" db, which is problematic for other tests that do not use it.
+        Site.objects.clear_cache()
 
     def test_contenttype_in_separate_db(self):
         ContentType.objects.using("other").all().delete()

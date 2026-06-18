@@ -859,6 +859,13 @@ class FormsMediaTestCase(SimpleTestCase):
         self.assertEqual(merged._css_lists, [{"screen": ["a.css"]}])
         self.assertEqual(merged._js_lists, [["a"]])
 
+    def test_add_invalid_type(self):
+        class InvalidType:
+            pass
+
+        with self.assertRaises(TypeError):
+            Media() + InvalidType()
+
     def test_render_js_with_attrs(self):
         media = Media(js=[Script("/path/to/js", integrity="sha256-abc")])
         self.assertHTMLEqual(

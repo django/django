@@ -8,7 +8,8 @@ from django.db import (
     ProgrammingError,
     connections,
 )
-from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
+from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.warnings import django_file_prefixes
 
 
 class TransactionManagementError(ProgrammingError):

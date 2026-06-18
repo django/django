@@ -143,8 +143,8 @@ Minor features
 
 * The :attr:`~django.contrib.admin.ModelAdmin.delete_confirmation_max_display`
   option allows customizing how many objects are displayed on admin delete
-  confirmation pages before the remainder is truncated. The default is
-  ``None`` (no truncation).
+  confirmation pages and inline protected deletion errors before the remainder
+  is truncated. The default is ``None`` (no truncation).
 
 * In order to improve accessibility of the admin change forms:
 
@@ -274,6 +274,9 @@ Management Commands
   :data:`~django.db.models.signals.m2m_changed` signals with ``raw=True`` when
   loading fixtures.
 
+* The :djadmin:`sendtestemail` command now supports a :option:`--using
+  <sendtestemail --using>` option to specify the :setting:`MAILERS` alias.
+
 Models
 ~~~~~~
 
@@ -330,6 +333,13 @@ Requests and Responses
 * :class:`~django.http.HttpResponseRedirect` (and its subclasses), as well as
   the :func:`~django.shortcuts.redirect` shortcut, now accept a ``max_length``
   parameter to override the default maximum URL length limit.
+
+Security
+~~~~~~~~
+
+* Signed cookies now use an unambiguous salt derivation by default. Set
+  :setting:`SIGNED_COOKIE_LEGACY_SALT_FALLBACK` to ``True`` to continue
+  accepting legacy signed cookies.
 
 Serialization
 ~~~~~~~~~~~~~
@@ -460,6 +470,10 @@ Email
   ``EmailMessage``. (This behavior was never documented. The ``send()`` method
   will still *use* a ``connection`` that is set on the message before sending.)
 
+* :meth:`.EmailMessage.message` now raises a ``ValueError`` if ``Bcc`` is
+  included in the ``headers`` argument or ``extra_headers`` attribute. Use the
+  ``bcc`` argument instead.
+
 Models
 ------
 
@@ -507,6 +521,9 @@ Miscellaneous
 -------------
 
 * The minimum supported version of SQLite is increased from 3.31.0 to 3.37.0.
+
+* The default value of the transitional setting
+  :setting:`SIGNED_COOKIE_LEGACY_SALT_FALLBACK` is now ``False``.
 
 * :class:`~django.contrib.contenttypes.fields.GenericForeignKey` now uses a
   separate descriptor class: the private ``GenericForeignKeyDescriptor``.
@@ -624,6 +641,9 @@ Miscellaneous
   in favor of the new constant ``django.db.models.fields.BLANK_CHOICE_LABEL``.
 
 * The :setting:`USE_BLANK_CHOICE_DASH` transitional setting is deprecated.
+
+* The :setting:`SIGNED_COOKIE_LEGACY_SALT_FALLBACK` transitional setting is
+  deprecated.
 
 * The undocumented ``get_placeholder`` method of
   :class:`~django.db.models.Field` is deprecated in favor of the newly
