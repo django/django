@@ -65,9 +65,10 @@ class GISLookup(Lookup):
             rhs = self.rhs.resolve_expression(compiler.query)
         else:
             rhs = connection.ops.Adapter(self.rhs)
-        return connection.ops.get_geom_placeholder_sql(
-            self.lhs.output_field, rhs, compiler
-        )
+        field = self.lhs.output_field
+        if hasattr(field, "is_composite") and len(field.sub_fields) == 1:
+            field = list(field.sub_fields.values())[0]
+        return connection.ops.get_geom_placeholder_sql(field, rhs, compiler)
 
     def get_rhs_op(self, connection, rhs):
         # Unlike BuiltinLookup, the GIS get_rhs_op() implementation should

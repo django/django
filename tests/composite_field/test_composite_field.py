@@ -237,7 +237,7 @@ class CompositeFieldTests(TestCaseSetup):
         self.assertEqual(len(qs), 0)
 
     def test_composite_subquery_returning_empty_resolves_to_none(self):
-        empty_subquery = User.objects.filter(pk=999999).values("email")
+        empty_subquery = User.objects.filter(first_name="no_name").values("email")
 
         qs = (
             User.objects.alias(info=empty_subquery)
