@@ -5,6 +5,8 @@ from django.utils.deprecation import MiddlewareMixin
 
 
 class FlatpageFallbackMiddleware(MiddlewareMixin):
+    async_capable = False
+
     def process_response(self, request, response):
         if response.status_code != 404:
             return response  # No need to check for a flatpage for non-404 responses.

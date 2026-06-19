@@ -71,6 +71,8 @@ class UpdateCacheMiddleware(MiddlewareMixin):
     so that it'll get called last during the response phase.
     """
 
+    async_capable = False
+
     def __init__(self, get_response):
         super().__init__(get_response)
         self.cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
@@ -156,6 +158,8 @@ class FetchFromCacheMiddleware(MiddlewareMixin):
     FetchFromCacheMiddleware must be the last piece of middleware in MIDDLEWARE
     so that it'll get called last during the request phase.
     """
+
+    async_capable = False
 
     def __init__(self, get_response):
         super().__init__(get_response)

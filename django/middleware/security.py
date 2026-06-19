@@ -6,6 +6,8 @@ from django.utils.deprecation import MiddlewareMixin
 
 
 class SecurityMiddleware(MiddlewareMixin):
+    async_capable = False
+
     def __init__(self, get_response):
         super().__init__(get_response)
         self.sts_seconds = settings.SECURE_HSTS_SECONDS
