@@ -67,7 +67,7 @@ class GISLookup(Lookup):
             rhs = connection.ops.Adapter(self.rhs)
         field = self.lhs.output_field
         if hasattr(field, "is_composite") and len(field.sub_fields) == 1:
-            field = list(field.sub_fields.values())[0]
+            field = next(iter(field.sub_fields.values()))
         return connection.ops.get_geom_placeholder_sql(field, rhs, compiler)
 
     def get_rhs_op(self, connection, rhs):

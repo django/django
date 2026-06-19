@@ -477,7 +477,7 @@ class BaseExpression:
         for e in self.get_source_expressions():
             field = e._output_field_or_none
             if getattr(field, "is_composite", False) and len(field.sub_fields) == 1:
-                field = list(field.sub_fields.values())[0]
+                field = next(iter(field.sub_fields.values()))
             fields.append(field)
         return fields
 
