@@ -46,7 +46,10 @@ class PostGISOperator(SpatialOperator):
         spheroid = lookup.rhs_params and lookup.rhs_params[-1] == "spheroid"
 
         # Check which input is a raster.
-        lhs_is_raster = lookup.lhs.field.geom_type == "RASTER"
+        field = lookup.lhs.output_field
+        if hasattr(field, "is_composite") and len(field.sub_fields) == 1:
+            field = next(iter(field.sub_fields.values()))
+        lhs_is_raster = field.geom_type == "RASTER"
         rhs_is_raster = isinstance(lookup.rhs, GDALRaster)
 
         # Look for band indices and inject them if provided.
@@ -97,7 +100,10 @@ class PostGISOperator(SpatialOperator):
 
     def check_geography(self, lookup, template_params):
         """Convert geography fields to geometry types, if necessary."""
-        if lookup.lhs.output_field.geography and not self.geography:
+        field = lookup.lhs.output_field
+        if hasattr(field, "is_composite") and len(field.sub_fields) == 1:
+            field = next(iter(field.sub_fields.values()))
+        if field.geography and not self.geography:
             template_params["lhs"] += "::geometry"
         return template_params
 
