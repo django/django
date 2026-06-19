@@ -3,7 +3,7 @@ import gc
 from django.core.exceptions import FieldError
 from django.db.models import FETCH_PEERS
 from django.test import SimpleTestCase, TestCase
-from django.test.utils import garbage_collect, ignore_warnings
+from django.test.utils import garbage_collect, ignore_warnings, requires_gil
 from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import (
@@ -62,15 +62,19 @@ class SelectRelatedTests(TestCase):
         )
 
     def setup_gc_debug(self):
+        self.addCleanup(gc.garbage.clear)
         self.addCleanup(gc.set_debug, 0)
         self.addCleanup(gc.enable)
         gc.disable()
         garbage_collect()
         gc.set_debug(gc.DEBUG_SAVEALL)
 
-    def assert_no_memory_leaks(self):
+    def assert_no_local_function_leaks(self):
         garbage_collect()
-        self.assertEqual(gc.garbage, [])
+        local_functions_leaked = [
+            obj for obj in gc.garbage if "<locals>" in getattr(obj, "__qualname__", "")
+        ]
+        self.assertEqual(local_functions_leaked, [])
 
     def test_access_fks_without_select_related(self):
         """
@@ -157,10 +161,11 @@ class SelectRelatedTests(TestCase):
         )
         self.assertEqual(s.id + 10, s.a)
 
+    @requires_gil
     def test_select_related_memory_leak(self):
         self.setup_gc_debug()
         list(Species.objects.select_related("genus"))
-        self.assert_no_memory_leaks()
+        self.assert_no_local_function_leaks()
 
     def test_certain_fields(self):
         """

@@ -10,7 +10,7 @@ from django.test import (
     skipUnlessDBFeature,
 )
 from django.test.runner import DebugSQLTextTestResult
-from django.test.utils import CaptureQueriesContext, override_settings
+from django.test.utils import CaptureQueriesContext, override_settings, requires_gil
 
 from ..models import Person, Square
 
@@ -62,6 +62,7 @@ class DatabaseWrapperTests(SimpleTestCase):
         with patch.object(connection.features, "minimum_database_version", None):
             connection.check_database_version_supported()
 
+    @requires_gil
     def test_release_memory_without_garbage_collection(self):
         # Schedule the restore of the garbage collection settings.
         self.addCleanup(gc.set_debug, 0)

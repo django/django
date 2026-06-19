@@ -787,6 +787,17 @@ requires_tz_support = skipUnless(
 )
 
 
+requires_gil = skipUnless(
+    # sys._is_gil_enabled() is available on Python 3.13+, and only returns
+    # False on a free-threaded build with the GIL disabled. Assume the GIL is
+    # enabled otherwise.
+    getattr(sys, "_is_gil_enabled", lambda: True)(),
+    "This test relies on CPython's reference counting to free objects as soon "
+    "as they become unreachable, which isn't guaranteed on a free-threaded "
+    "build where the cyclic garbage collector may reclaim them instead.",
+)
+
+
 @contextmanager
 def extend_sys_path(*paths):
     """Context manager to temporarily add paths to sys.path."""
