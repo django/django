@@ -415,12 +415,12 @@ to implement "contact me" functionality on a personal website:
     class ContactForm(forms.Form):
         subject = forms.CharField(max_length=100)
         message = forms.CharField(widget=forms.Textarea)
-        sender = forms.EmailField()
-        cc_myself = forms.BooleanField(required=False)
+        contact_email = forms.EmailField()
+        urgent = forms.BooleanField(required=False)
 
 Our earlier form used a single field, ``your_name``, a :class:`CharField`. In
-this case, our form has four fields: ``subject``, ``message``, ``sender`` and
-``cc_myself``. :class:`CharField`, :class:`EmailField` and
+this case, our form has four fields: ``subject``, ``message``,
+``contact_email`` and ``urgent``. :class:`CharField`, :class:`EmailField` and
 :class:`BooleanField` are just three of the available field types; a full list
 can be found in :doc:`/ref/forms/fields`.
 
@@ -450,7 +450,7 @@ data will have been nicely converted into Python types for you.
     You can still access the unvalidated data directly from ``request.POST`` at
     this point, but the validated data is better.
 
-In the contact form example above, ``cc_myself`` will be a boolean value.
+In the contact form example above, ``urgent`` will be a boolean value.
 Likewise, fields such as :class:`IntegerField` and :class:`FloatField` convert
 values to a Python ``int`` and ``float`` respectively.
 
@@ -459,19 +459,31 @@ Here's how the form data could be processed in the view that handles this form:
 .. code-block:: python
     :caption: ``views.py``
 
-    from django.core.mail import send_mail
+    from django.core.mail import EmailMessage
 
     if form.is_valid():
         subject = form.cleaned_data["subject"]
         message = form.cleaned_data["message"]
-        sender = form.cleaned_data["sender"]
-        cc_myself = form.cleaned_data["cc_myself"]
+        contact_email = form.cleaned_data["contact_email"]
+        urgent = form.cleaned_data["urgent"]
 
-        recipients = ["info@example.com"]
-        if cc_myself:
-            recipients.append(sender)
+        body = (
+            "Submitted through the contact form.\n"
+            f"Contact email (unverified): {contact_email}\n"
+            f"Marked urgent: {'yes' if urgent else 'no'}\n"
+            f"Message:\n{message}"
+        )
 
-        send_mail(subject, message, sender, recipients)
+        # Send the message, directing replies to the contact_email.
+        EmailMessage(
+            subject=f"[contact form] {subject}",
+            body=body,
+            from_email="contact-form@example.com",
+            to=["info@example.com"],
+            headers={"Importance": "high"} if urgent else None,
+            reply_to=[contact_email],
+        ).send()
+
         return HttpResponseRedirect("/thanks/")
 
 .. tip::
@@ -584,10 +596,10 @@ required layout. For example:
       {{ form.message.as_field_group }}
     </div>
     <div class="fieldWrapper">
-      {{ form.sender.as_field_group }}
+      {{ form.contact_email.as_field_group }}
     </div>
     <div class="fieldWrapper">
-      {{ form.cc_myself.as_field_group }}
+      {{ form.urgent.as_field_group }}
     </div>
 
 By default Django uses the ``"django/forms/field.html"`` template which is
@@ -640,14 +652,14 @@ field attribute on the form. For example:
         {{ form.message }}
     </div>
     <div class="fieldWrapper">
-        {{ form.sender.errors }}
-        <label for="{{ form.sender.id_for_label }}">Your email address:</label>
-        {{ form.sender }}
+        {{ form.contact_email.errors }}
+        <label for="{{ form.contact_email.id_for_label }}">Your email address:</label>
+        {{ form.contact_email }}
     </div>
     <div class="fieldWrapper">
-        {{ form.cc_myself.errors }}
-        <label for="{{ form.cc_myself.id_for_label }}">CC yourself?</label>
-        {{ form.cc_myself }}
+        {{ form.urgent.errors }}
+        <label for="{{ form.urgent.id_for_label }}">Urgent reply needed?</label>
+        {{ form.urgent }}
     </div>
 
 Complete ``<label>`` elements can also be generated using the
@@ -677,7 +689,7 @@ rendered as an unordered list. This might look like:
 .. code-block:: html+django
 
     <ul class="errorlist">
-        <li>Sender is required.</li>
+        <li>Contact email is required.</li>
     </ul>
 
 The list has a CSS class of ``errorlist`` to allow you to style its appearance.
@@ -751,10 +763,10 @@ Useful attributes on ``{{ field }}`` include:
     field. This takes the form prefix into account, if it has been set.
 
 ``{{ field.id_for_label }}``
-    The ID that will be used for this field (``id_email`` in the example
-    above). If you are constructing the label manually, you may want to use
-    this in lieu of ``label_tag``. It's also useful, for example, if you have
-    some inline JavaScript and want to avoid hardcoding the field's ID.
+    The ID that will be used for this field (``id_contact_email`` in the
+    example above). If you are constructing the label manually, you may want to
+    use this in lieu of ``label_tag``. It's also useful, for example, if you
+    have some inline JavaScript and want to avoid hardcoding the field's ID.
 
 ``{{ field.is_hidden }}``
     This attribute is ``True`` if the form field is a hidden field and
@@ -768,7 +780,7 @@ Useful attributes on ``{{ field }}`` include:
     {% endif %}
 
 ``{{ field.label }}``
-    The label of the field, e.g. ``Email address``.
+    The label of the field, e.g. ``Contact email``.
 
 ``{{ field.label_tag }}``
     The field's label wrapped in the appropriate HTML ``<label>`` tag. This
@@ -777,7 +789,7 @@ Useful attributes on ``{{ field }}`` include:
 
     .. code-block:: html+django
 
-        <label for="id_email">Email address:</label>
+        <label for="id_contact_email">Contact email:</label>
 
 ``{{ field.legend_tag }}``
     Similar to ``field.label_tag`` but uses a ``<legend>`` tag in place of
