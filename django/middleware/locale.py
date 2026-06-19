@@ -14,6 +14,7 @@ class LocaleMiddleware(MiddlewareMixin):
     the language the user desires (if the language is available).
     """
 
+    async_capable = False
     response_redirect_class = HttpResponseRedirect
 
     def process_request(self, request):
