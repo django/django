@@ -6,7 +6,8 @@ from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
 from django.http import HttpResponse
-from django.test import RequestFactory, SimpleTestCase, override_settings
+from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.module_loading import import_string
 
 from . import middleware as mw
@@ -351,27 +352,49 @@ class MiddlewareSyncAsyncTests(SimpleTestCase):
         self.assertEqual(response.content, b"OK")
         self.assertEqual(response.status_code, 200)
 
+
+@override_settings(
+    DEBUG=True,
+    ROOT_URLCONF="middleware_exceptions.urls",
+)
+class MiddlewareSyncAsyncTransitionTests(TestCase):
     async def test_sync_middleware_adaptation_grouping(self):
+        real_acall = MiddlewareMixin.__acall__
+
+        async def spy_acall(self, request):
+            return await real_acall(self, request)
+
         with (
-            mock.patch(
-                "django.utils.deprecation.sync_to_async", side_effect=sync_to_async
-            ) as mixin_adapter,
-            mock.patch(
-                "django.core.handlers.base.sync_to_async", side_effect=sync_to_async
-            ) as base_adapter,
             # This middleware requires a second adaptation for process_view(),
             # making it a little harder to see what's happening.
             self.modify_settings(
                 MIDDLEWARE={"remove": "django.middleware.csrf.CsrfViewMiddleware"}
             ),
+            mock.patch.object(
+                MiddlewareMixin,
+                "__acall__",
+                autospec=True,
+                side_effect=spy_acall,
+            ) as acall,
         ):
+            with mock.patch(
+                "django.core.handlers.base.sync_to_async", wraps=sync_to_async
+            ) as base_adapter:
+                self.async_client.handler.load_middleware(is_async=True)
+            # Exit the mock of sync_to_async before issuing a request.
             await self.async_client.get("/middleware_exceptions/async_view/")
-        # No sync-to-async adaptation via MiddlewareMixin.
-        self.assertEqual(mixin_adapter.call_count, 0)
+
+        # No sync-to-async adaptation via MiddlewareMixin.__acall__().
+        acall.assert_not_called()
         # O(1) sync-to-async adaptation via BaseHandler.
         self.assertEqual(base_adapter.call_count, 1)
 
     async def test_sync_middleware_adaptation_grouping_isolation(self):
+        real_acall = MiddlewareMixin.__acall__
+
+        async def spy_acall(self, request):
+            return await real_acall(self, request)
+
         for middleware in [
             # From startproject template.
             "django.middleware.security.SecurityMiddleware",
@@ -404,9 +427,6 @@ class MiddlewareSyncAsyncTests(SimpleTestCase):
                     if middleware.startswith("django.contrib.")
                     else nullcontext()
                 ),
-                mock.patch(
-                    "django.utils.deprecation.sync_to_async", side_effect=sync_to_async
-                ) as mocked_adapter,
                 # Patch out any ImproperlyConfigured from testing in isolation.
                 (
                     mock.patch(
@@ -416,11 +436,13 @@ class MiddlewareSyncAsyncTests(SimpleTestCase):
                     if hasattr(import_string(middleware), "process_request")
                     else nullcontext()
                 ),
+                mock.patch.object(
+                    MiddlewareMixin, "__acall__", autospec=True, side_effect=spy_acall
+                ) as acall,
             ):
                 self.async_client.handler.load_middleware(is_async=True)
                 await self.async_client.get("/middleware_exceptions/async_view/")
-                # No sync-to-async adaptation via MiddlewareMixin.
-                self.assertEqual(mocked_adapter.call_count, 0)
+                self.assertEqual(acall.call_count, 0)
 
 
 @override_settings(ROOT_URLCONF="middleware_exceptions.urls")
