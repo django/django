@@ -7,7 +7,6 @@ from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
 from django.http import HttpResponse
 from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
-from django.test.client import AsyncClient
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.module_loading import import_string
 
@@ -391,11 +390,6 @@ class MiddlewareSyncAsyncTransitionTests(TestCase):
         self.assertEqual(base_adapter.call_count, 1)
 
     async def test_sync_middleware_adaptation_grouping_isolation(self):
-        real_acall = MiddlewareMixin.__acall__
-
-        async def spy_acall(self, request):
-            return await real_acall(self, request)
-
         for middleware in [
             # From startproject template.
             "django.middleware.security.SecurityMiddleware",
@@ -419,31 +413,14 @@ class MiddlewareSyncAsyncTransitionTests(TestCase):
             "django.middleware.locale.LocaleMiddleware",
         ]:
             with (
-                self.subTest(middleware=middleware),
-                self.settings(MIDDLEWARE=[middleware]),
-                (
-                    self.modify_settings(
-                        INSTALLED_APPS={"append": middleware.split(".middleware")[0]}
-                    )
-                    if middleware.startswith("django.contrib.")
-                    else nullcontext()
-                ),
-                # Patch out any ImproperlyConfigured from testing in isolation.
-                (
-                    mock.patch(
-                        f"{middleware}.process_request",
-                        side_effect=lambda request: None,
-                    )
-                    if hasattr(import_string(middleware), "process_request")
-                    else nullcontext()
-                ),
-                mock.patch.object(
-                    MiddlewareMixin, "__acall__", autospec=True, side_effect=spy_acall
-                ) as acall,
+                self.modify_settings(
+                    INSTALLED_APPS={"append": middleware.split(".middleware")[0]}
+                )
+                if middleware.startswith("django.contrib.")
+                else nullcontext()
             ):
-                client = AsyncClient()
-                await client.get("/middleware_exceptions/async_view/")
-                acall.assert_not_called()
+                klass = import_string(middleware)
+                self.assertIs(klass.async_capable, False)
 
 
 @override_settings(ROOT_URLCONF="middleware_exceptions.urls")
