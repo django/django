@@ -273,6 +273,13 @@ Miscellaneous
 Features deprecated in 6.2
 ==========================
 
+Templates
+---------
+
+* Using a numeric literal as the first component of a template variable, such
+  as ``{{ 1.2.3 }}``, is deprecated. Such variables currently resolve as a
+  lookup, but will raise a ``TemplateSyntaxError`` in Django 7.1.
+
 Miscellaneous
 -------------
 

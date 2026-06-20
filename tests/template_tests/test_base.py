@@ -1,6 +1,7 @@
 from django.template import Context, Template, Variable, VariableDoesNotExist
 from django.template.base import DebugLexer, Lexer, TokenType
 from django.test import SimpleTestCase
+from django.utils.deprecation import RemovedInDjango71Warning
 from django.utils.translation import gettext_lazy
 
 
@@ -81,3 +82,24 @@ class VariableTests(SimpleTestCase):
         for var in ["inf", "infinity", "iNFiniTy", "nan"]:
             with self.subTest(var=var):
                 self.assertIsNone(Variable(var).literal)
+
+    def test_numeric_literal_lookup_deprecated(self):
+        msg = (
+            "Support for using a numeric literal as the first component of a "
+            "template variable is deprecated. This will raise a "
+            "TemplateSyntaxError in Django 7.1."
+        )
+        for name in ["1.2.3", "1e2.", "1e2.0"]:
+            with self.subTest(name=name):
+                with self.assertWarnsMessage(RemovedInDjango71Warning, msg):
+                    Variable(name)
+
+    # RemovedInDjango71Warning: When the deprecation ends, replace the above
+    # test with the following.
+    # def test_numeric_literal_lookup_error(self):
+    #     for name in ["1.2.3", "1e2.", "1e2.0"]:
+    #         with self.subTest(name=name):
+    #             with self.assertRaisesMessage(
+    #                 TemplateSyntaxError, f"Invalid numeric literal: '{name}'"
+    #             ):
+    #                 Variable(name)
