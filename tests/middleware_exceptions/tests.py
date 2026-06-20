@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
 from django.http import HttpResponse
 from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
+from django.test.client import AsyncClient
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.module_loading import import_string
 
@@ -440,9 +441,9 @@ class MiddlewareSyncAsyncTransitionTests(TestCase):
                     MiddlewareMixin, "__acall__", autospec=True, side_effect=spy_acall
                 ) as acall,
             ):
-                self.async_client.handler.load_middleware(is_async=True)
-                await self.async_client.get("/middleware_exceptions/async_view/")
-                self.assertEqual(acall.call_count, 0)
+                client = AsyncClient()
+                await client.get("/middleware_exceptions/async_view/")
+                acall.assert_not_called()
 
 
 @override_settings(ROOT_URLCONF="middleware_exceptions.urls")
