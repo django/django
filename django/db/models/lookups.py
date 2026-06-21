@@ -519,13 +519,26 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
                 lhs_len = len(self.lhs.output_field.sub_fields)
             else:
                 lhs_len = 1
-            if (rhs_len := self.rhs._subquery_fields_len) != lhs_len:
+            has_explicit_values = self.rhs.has_select_fields or bool(
+                getattr(self.rhs, "values_select", None)
+            )
+            if has_explicit_values and lhs_len > 1:
+                rhs_len = len(self.rhs.select) + sum(
+                    len(expr.targets) - 1
+                    for expr in self.rhs.select
+                    if isinstance(expr, ColPairs)
+                )
+            else:
+                rhs_len = self.rhs._subquery_fields_len
+            if rhs_len != lhs_len:
                 raise ValueError(
                     f"The QuerySet value for the 'in' lookup must have {lhs_len} "
                     f"selected fields (received {rhs_len})"
                 )
             self.rhs.clear_ordering(clear_default=True)
-            if not self.rhs.has_select_fields:
+            if not has_explicit_values or (
+                not self.rhs.has_select_fields and lhs_len == 1
+            ):
                 self.rhs.clear_select_clause()
                 self.rhs.add_fields(["pk"])
         return super().get_prep_lookup()

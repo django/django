@@ -848,3 +848,16 @@ class TupleLookupTests(TestCaseSetup):
         subquery = User.objects.filter(pk=OuterRef("pk")).values("email", "first_name")
         qs = User.objects.alias(info=subquery).filter(info__isnull=False).order_by("pk")
         self.assertSequenceEqual(qs, [self.user1, self.user2, self.user3])
+
+    def test_composite_field_in_lookup_values_without_args_lhs_gt_1(self):
+        subquery = User.objects.filter(pk=OuterRef("pk")).values(
+            "id", "email", "first_name", "age"
+        )
+        rhs_qs = User.objects.filter(pk=self.user1.pk).values()
+        qs = User.objects.alias(info=subquery).filter(info__in=rhs_qs)
+        self.assertSequenceEqual(qs, [self.user1])
+
+    def test_composite_field_in_lookup_values_without_args_lhs_eq_1(self):
+        rhs_qs = User.objects.filter(pk=self.user1.pk).values()
+        qs = User.objects.filter(id__in=rhs_qs)
+        self.assertSequenceEqual(qs, [self.user1])
