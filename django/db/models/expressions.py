@@ -476,8 +476,10 @@ class BaseExpression:
         fields = []
         for e in self.get_source_expressions():
             field = e._output_field_or_none
-            if getattr(field, "is_composite", False) and len(field.sub_fields) == 1:
-                field = next(iter(field.sub_fields.values()))
+            if getattr(field, "is_composite", False) and getattr(
+                field, "has_one_field", False
+            ):
+                field = field.output_field_when_only_one_subfield
             fields.append(field)
         return fields
 
@@ -761,10 +763,14 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         # Expression._resolve_output_field()
         lhs_field = self.lhs._output_field_or_none
         rhs_field = self.rhs._output_field_or_none
-        if getattr(lhs_field, "is_composite", False) and len(lhs_field.sub_fields) == 1:
-            lhs_field = list(lhs_field.sub_fields.values())[0]
-        if getattr(rhs_field, "is_composite", False) and len(rhs_field.sub_fields) == 1:
-            rhs_field = list(rhs_field.sub_fields.values())[0]
+        if getattr(lhs_field, "is_composite", False) and getattr(
+            lhs_field, "has_one_field", False
+        ):
+            lhs_field = lhs_field.output_field_when_only_one_subfield
+        if getattr(rhs_field, "is_composite", False) and getattr(
+            rhs_field, "has_one_field", False
+        ):
+            rhs_field = rhs_field.output_field_when_only_one_subfield
         combined_type = _resolve_combined_type(
             self.connector,
             type(lhs_field),

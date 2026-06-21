@@ -304,8 +304,8 @@ class CompositeField(Field):
         return self.sub_fields[name]
 
     def get_lookup(self, lookup_name):
-        if len(self.sub_fields) == 1:
-            subfield = list(self.sub_fields.values())[0]
+        if self.has_one_field:
+            subfield = self.output_field_when_only_one_subfield
             lookup = subfield.get_lookup(lookup_name)
             if lookup is not None:
                 return lookup
@@ -328,19 +328,33 @@ class CompositeField(Field):
 
     @property
     def path_infos(self):
-        if len(self.sub_fields) == 1:
-            return list(self.sub_fields.values())[0].path_infos
+        if self.has_one_field:
+            return self.output_field_when_only_one_subfield.path_infos
 
     @property
     def conditional(self):
-        if len(self.sub_fields) == 1:
-            return list(self.sub_fields.values())[0]
+        if self.has_one_field:
+            return self.output_field_when_only_one_subfield
         return super().conditional
 
     def get_internal_type(self):
-        if len(self.sub_fields) == 1:
-            return list(self.sub_fields.values())[0].get_internal_type()
+        if self.has_one_field:
+            return self.output_field_when_only_one_subfield.get_internal_type()
         return super().get_internal_type()
+
+    @property
+    def __len__(self):
+        return len(self.sub_fields)
+
+    @property
+    def has_one_field(self):
+        return self.__len__ == 1
+
+    @property
+    def output_field_when_only_one_subfield(self):
+        if not self.has_one_field:
+            raise TypeError("No single subfield")
+        return next(iter(self.sub_fields.values()))
 
 
 CompositeField.register_lookup(TupleExact)

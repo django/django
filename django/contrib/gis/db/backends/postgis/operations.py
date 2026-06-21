@@ -47,8 +47,8 @@ class PostGISOperator(SpatialOperator):
 
         # Check which input is a raster.
         field = lookup.lhs.output_field
-        if hasattr(field, "is_composite") and len(field.sub_fields) == 1:
-            field = next(iter(field.sub_fields.values()))
+        if hasattr(field, "is_composite") and getattr(field, "has_one_field", False):
+            field = field.output_field_when_only_one_subfield
         lhs_is_raster = field.geom_type == "RASTER"
         rhs_is_raster = isinstance(lookup.rhs, GDALRaster)
 
@@ -101,8 +101,8 @@ class PostGISOperator(SpatialOperator):
     def check_geography(self, lookup, template_params):
         """Convert geography fields to geometry types, if necessary."""
         field = lookup.lhs.output_field
-        if hasattr(field, "is_composite") and len(field.sub_fields) == 1:
-            field = next(iter(field.sub_fields.values()))
+        if hasattr(field, "is_composite") and getattr(field, "has_one_field", False):
+            field = field.output_field_when_only_one_subfield
         if field.geography and not self.geography:
             template_params["lhs"] += "::geometry"
         return template_params
