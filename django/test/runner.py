@@ -426,6 +426,7 @@ def _init_worker(
     process_setup_args=None,
     debug_mode=None,
     used_aliases=None,
+    processes=None,
 ):
     """
     Switch to databases dedicated to this worker and run system checks.
@@ -438,7 +439,10 @@ def _init_worker(
 
     with counter.get_lock():
         counter.value += 1
-        _worker_id = counter.value
+        if processes:
+            _worker_id = ((counter.value - 1) % processes) + 1
+        else:
+            _worker_id = counter.value
 
     is_spawn_or_forkserver = multiprocessing.get_start_method() in {
         "forkserver",
@@ -573,6 +577,7 @@ class ParallelTestSuite(unittest.TestSuite):
                 self.process_setup_args,
                 self.debug_mode,
                 self.used_aliases,
+                self.processes,
             ],
         ) as pool:
             test_results = pool.imap_unordered(self.run_subsuite.__func__, args)

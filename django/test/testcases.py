@@ -1819,6 +1819,8 @@ class LiveServerTestCase(TransactionTestCase):
     @classmethod
     def _make_connections_override(cls):
         connections_override = {}
+        for alias in cls.databases:
+            connections[alias].ensure_connection()
         for conn in connections.all():
             # If using in-memory sqlite databases, pass the connections to
             # the server thread.
