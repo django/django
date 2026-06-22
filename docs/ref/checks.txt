@@ -158,6 +158,9 @@ Mail
 The following checks verify that your :setting:`MAILERS` setting is correctly
 configured:
 
+* **mail.E001**: Your :setting:`MAILERS` setting uses a development-only email
+  backend in the ``'default'`` entry (``<backend>``). (Only checked when the
+  :option:`check --deploy` option is used.)
 * **mail.W001**: Your :setting:`MAILERS` setting has no ``'default'`` entry.
   Sending email without a valid mailer will fail.
 
