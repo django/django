@@ -240,6 +240,10 @@ CSP
 Email
 ~~~~~
 
+* A new ``mail.E001`` deployment-only system check prevents using one of
+  Django's email backends that is not intended for production use in the
+  ``'default'`` :setting:`MAILERS` entry.
+
 * A new ``mail.W001`` system check warns when :setting:`MAILERS` is defined but
   does not include a ``'default'`` entry.
 
