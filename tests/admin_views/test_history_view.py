@@ -99,7 +99,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(current_page_link.text, "1")
         # The last page.
         last_page_link = self.selenium.find_element(By.XPATH, "//ul/li[last()]/a")
-        self.assertTrue(last_page_link.text, "20")
+        self.assertEqual(last_page_link.text, "11")
         # Select the second page.
         pages = paginator.find_elements(By.TAG_NAME, "a")
         second_page_link = pages[1]
