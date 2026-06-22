@@ -1654,6 +1654,19 @@ class ChangeListTests(TestCase):
         # The "Add" button inside the object-tools shouldn't appear.
         self.assertNotIn("Add event", response.rendered_content)
 
+    def test_object_tools_extended_in_change_list(self):
+        """
+        When ModelAdmin.get_change_list_object_tools() extends the
+        objects-tools they show in the changelist_view.
+        """
+        superuser = self._create_superuser("superuser")
+        self.client.force_login(superuser)
+        changelist_url = reverse("admin:admin_changelist_event_changelist")
+        response = self.client.get(changelist_url).content.decode("utf-8")
+        self.assertIn('<ul class="object-tools">', response)
+        # The "View latest" button inside the object-tools shouldn appear.
+        self.assertIn("View latest", response)
+
     def test_search_help_text(self):
         superuser = self._create_superuser("superuser")
         m = BandAdmin(Band, custom_site)
