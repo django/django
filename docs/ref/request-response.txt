@@ -448,11 +448,6 @@ Methods
 
     See :doc:`cryptographic signing </topics/signing>` for more information.
 
-    .. versionchanged:: 5.2.15
-
-        In older versions, cookies signed with distinct ``(key, salt)`` pairs
-        that concatenate to the same string could be used interchangeably.
-
 .. method:: HttpRequest.is_secure()
 
     Returns ``True`` if the request is secure; that is, if it was made with

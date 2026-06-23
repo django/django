@@ -1429,11 +1429,6 @@ For more on Vary headers, see the :rfc:`official Vary spec
     responses, Django's ``CacheMiddleware`` adds ``Authorization`` to the
     ``Vary`` header to simplify construction of cache keys.
 
-.. versionchanged:: 6.0.6
-
-    Previously, ``UpdateCacheMiddleware`` did not vary on ``Authorization`` for
-    requests bearing that header.
-
 Controlling cache: Using other headers
 ======================================
 
