@@ -681,6 +681,7 @@ Miscellaneous
 
 * The ``email_backend`` argument of :class:`.log.AdminEmailHandler` is
   deprecated in favor of the newly introduced ``using`` argument.
+  See :ref:`migrating-to-mailers-adminemailhandler` for details.
 
 * The ``BitAnd``, ``BitOr``, and ``BitXor`` classes in
   ``django.contrib.postgres.aggregates`` are deprecated in favor of the
