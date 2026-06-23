@@ -63,7 +63,13 @@ class Serializer(base.Serializer):
             if obj_pk is not None:
                 attrs["pk"] = obj._meta.pk.value_to_string(obj)
 
-        self.xml.startElement("object", attrs)
+        try:
+            self.xml.startElement("object", attrs)
+        except UnserializableContentError:
+            raise ValueError(
+                "%s (pk:%s) contains unserializable characters"
+                % (obj.__class__.__name__, obj.pk)
+            )
 
     def end_object(self, obj):
         """
