@@ -342,6 +342,8 @@ class Query(BaseExpression):
             is_composite = True
         elif self.values_select and len(self.select) > 0:
             is_composite = True
+        elif len(self.annotation_select) > 1:
+            is_composite = True
 
         if not is_composite:
             if len(self.select) == 1:
@@ -353,7 +355,9 @@ class Query(BaseExpression):
 
         from django.db.models import CompositeField
 
-        return CompositeField.from_select(self.select, self.values_select)
+        return CompositeField.from_select(
+            self.select, self.values_select, self.annotation_select
+        )
 
     @cached_property
     def base_table(self):

@@ -256,20 +256,26 @@ class CompositeField(Field):
         super().__init__()
 
     @classmethod
-    def from_select(cls, select, values_select=None):
+    def from_select(cls, select, values_select=None, annotation_select=None):
         """
         Builds a CompositeField (possibly nested) from query select exprs.
         """
+
+        def extract_field(value):
+            return getattr(value, "target", None) or getattr(value, "field", None)
+
+        if annotation_select:
+            select_map = {}
+            for key, value in annotation_select.items():
+                select_map[key] = extract_field(value)
+
         if values_select:
             select_map = {}
             for path, sel in zip(values_select, select):
-                field = getattr(sel, "target", None) or getattr(sel, "field", None)
+                field = extract_field(sel)
                 select_map[path] = field
-        else:
-            fields = [
-                getattr(sel, "target", None) or getattr(sel, "field", None) or sel
-                for sel in select
-            ]
+        elif annotation_select is None:
+            fields = [extract_field(sel) for sel in select]
             select_map = {field.name: field for field in fields}
 
         nested = {}

@@ -150,6 +150,20 @@ class CompositeFieldTests(TestCaseSetup):
         with self.assertRaises(FieldError):
             list(User.objects.alias(info=subquery).values("info__typo"))
 
+    def test_composite_with_f_expressions_in_values(self):
+        subquery = User.objects.filter(pk=self.user1.pk).values(
+            one=F("email"), two=F("first_name")
+        )
+        qs = (
+            User.objects.filter(pk=self.user1.pk)
+            .alias(info=subquery)
+            .filter(
+                info__one__isnull=False,
+                info__two__isnull=False,
+            )
+        )
+        self.assertEqual(qs.count(), 1)
+
     def test_composite_aggregation_and_ordering(self):
         subquery = Post.objects.filter(user__pk=self.user1.pk).values("user__email")
 
