@@ -219,7 +219,8 @@ connecting the same receiver more than once has no effect::
     def my_handler(sender, **kwargs): ...
 
 
-    my_signal.connect(my_handler)  # Running this code again is a no-op.
+    my_signal.connect(my_handler)
+    my_signal.connect(my_handler)  # This line is a no-op.
 
 Bound methods, which take a ``self`` argument, are different. Their identity
 is tied to the specific instance, so connecting the same method from a new
@@ -230,7 +231,8 @@ instance registers it as an additional receiver::
         my_signal.connect(backend.my_handler)  # A distinct receiver.
 
 
-    connect_signals()  # Running this code again registers another receiver.
+    connect_signals()
+    connect_signals()  # Registers two receivers, handler fires twice
 
 When using a bound method as a receiver, multiple registrations can be
 prevented by supplying a unique ``dispatch_uid``. This identifier will usually
