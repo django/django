@@ -796,7 +796,8 @@ some dynamic data that appears inside the fragment. For example, you might want
 a separate cached copy of the sidebar used in the previous example for every
 user of your site. Do this by passing one or more additional arguments, which
 may be variables with or without filters, to the ``{% cache %}`` template tag
-to uniquely identify the cache fragment:
+that will uniquely identify the cache fragment when those values are converted
+to strings:
 
 .. code-block:: html+django
 
@@ -804,6 +805,15 @@ to uniquely identify the cache fragment:
     {% cache 500 sidebar request.user.username %}
         .. sidebar for logged-in user ..
     {% endcache %}
+
+.. admonition:: Argument values converted to strings
+
+    Because argument values are converted to strings when creating the cache
+    key, consider uniqueness carefully to avoid serving one fragment for two
+    distinct values that share a string representation, such as ``None`` and
+    ``"None"``. Avoid supplying a model instance, since its ``__str__()`` is
+    not guaranteed to be unique. Conveniently, in the example above,
+    ``request.user.username`` is unique for the default ``User`` model.
 
 If :setting:`USE_I18N` is set to ``True`` the per-site middleware cache will
 :ref:`respect the active language<i18n-cache-key>`. For the ``cache`` template
