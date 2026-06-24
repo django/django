@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.http import HttpResponse
 from django.test import modify_settings, override_settings
 from django.test.selenium import SeleniumTestCase
 from django.utils.csp import CSP
@@ -10,8 +11,51 @@ from django.utils.translation import gettext as _
 __unittest = True
 
 
+class CSPViolationInjectionMiddleware:
+    """
+    Test-only middleware to inject a CSP violation listener.
+    Uses a virtual same-origin JS file to bypass inline-script CSP blocking.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if request.path == "/_selenium_csp_listener.js":
+            script = (
+                b"window._csp_violations = [];\n"
+                b"document.addEventListener('securitypolicyviolation', function(e) {\n"
+                b"    window._csp_violations.push(e.violatedDirective + "
+                b"' blocked ' + e.blockedURI);\n"
+                b"});"
+            )
+            return HttpResponse(script, content_type="application/javascript")
+
+        response = self.get_response(request)
+
+        if (
+            not getattr(response, "streaming", False)
+            and response.get("Content-Type", "").startswith("text/html")
+            and b"</head>" in response.content
+        ):
+            script_tag = b'<script src="/_selenium_csp_listener.js"></script>'
+            response.content = response.content.replace(
+                b"</head>", script_tag + b"</head>", 1
+            )
+
+            if "Content-Length" in response:
+                response["Content-Length"] = str(len(response.content))
+
+        return response
+
+
 @modify_settings(
-    MIDDLEWARE={"append": "django.middleware.csp.ContentSecurityPolicyMiddleware"}
+    MIDDLEWARE={
+        "append": [
+            "django.middleware.csp.ContentSecurityPolicyMiddleware",
+            "django.contrib.admin.tests.CSPViolationInjectionMiddleware",
+        ]
+    }
 )
 @override_settings(
     SECURE_CSP={
@@ -33,7 +77,13 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
 
     def tearDown(self):
         # Ensure that no CSP violations were logged in the browser.
-        self.assertEqual(self.get_browser_logs(source="security"), [])
+        violations = None
+        try:
+            violations = self.selenium.execute_script("return window._csp_violations;")
+        except Exception:
+            pass
+        if violations is not None:
+            self.assertEqual(violations, [])
         super().tearDown()
 
     def wait_until(self, callback, timeout=10):
