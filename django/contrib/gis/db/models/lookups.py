@@ -66,7 +66,7 @@ class GISLookup(Lookup):
         else:
             rhs = connection.ops.Adapter(self.rhs)
         field = self.lhs.output_field
-        if hasattr(field, "is_composite") and getattr(field, "has_one_field", False):
+        if field.is_composite and field.has_one_field:
             field = field.output_field_when_only_one_subfield
         return connection.ops.get_geom_placeholder_sql(field, rhs, compiler)
 

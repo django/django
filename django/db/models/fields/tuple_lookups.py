@@ -50,9 +50,7 @@ class TupleLookupMixin:
     allows_composite_expressions = True
 
     def get_lhs_expressions(self):
-        if hasattr(self.lhs, "output_field") and getattr(
-            self.lhs.output_field, "is_composite", False
-        ):
+        if hasattr(self.lhs, "output_field") and self.lhs.output_field.is_composite:
             cols = []
             for name in self.lhs.output_field.sub_fields:
                 transform_class = self.lhs.output_field.get_transform(name)
@@ -61,10 +59,8 @@ class TupleLookupMixin:
         return self.lhs
 
     def get_lhs_len(self):
-        if hasattr(self.lhs, "output_field") and getattr(
-            self.lhs.output_field, "is_composite", False
-        ):
-            return len(self.lhs.output_field.sub_fields)
+        if hasattr(self.lhs, "output_field") and self.lhs.output_field.is_composite:
+            return len(self.lhs.output_field)
         return len(self.lhs)
 
     def get_prep_lookup(self):
@@ -103,9 +99,7 @@ class TupleLookupMixin:
     def get_lhs_str(self):
         if isinstance(self.lhs, ColPairs):
             return repr(self.lhs.field.name)
-        elif hasattr(self.lhs, "output_field") and getattr(
-            self.lhs.output_field, "is_composite", False
-        ):
+        elif hasattr(self.lhs, "output_field") and self.lhs.output_field.is_composite:
             names = ", ".join(repr(name) for name in self.lhs.output_field.sub_fields)
             return f"({names})"
         else:
@@ -121,7 +115,7 @@ class TupleLookupMixin:
         if lhs is None:
             if (
                 hasattr(self.lhs, "output_field")
-                and getattr(self.lhs.output_field, "is_composite", False)
+                and self.lhs.output_field.is_composite
                 and not isinstance(self.lhs, (ColPairs, tuple))
             ):
                 lhs = Tuple(*self.get_lhs_expressions())

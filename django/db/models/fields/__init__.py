@@ -179,6 +179,7 @@ class Field(RegisterLookupMixin):
     one_to_one = None
     related_model = None
     generated = False
+    is_composite = False
 
     descriptor_class = DeferredAttribute
 

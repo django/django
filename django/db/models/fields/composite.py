@@ -341,20 +341,18 @@ class CompositeField(Field):
     def conditional(self):
         if self.has_one_field:
             return self.output_field_when_only_one_subfield
-        return super().conditional
 
     def get_internal_type(self):
         if self.has_one_field:
             return self.output_field_when_only_one_subfield.get_internal_type()
         return super().get_internal_type()
 
-    @property
     def __len__(self):
         return len(self.sub_fields)
 
     @property
     def has_one_field(self):
-        return self.__len__ == 1
+        return self.__len__() == 1
 
     @property
     def output_field_when_only_one_subfield(self):

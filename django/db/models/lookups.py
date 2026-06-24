@@ -384,7 +384,7 @@ class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
             elif getattr(
                 getattr(self.lhs, "output_field", None), "is_composite", False
             ):
-                lhs_len = len(self.lhs.output_field.sub_fields)
+                lhs_len = len(self.lhs.output_field)
             else:
                 lhs_len = 1
             if (rhs_len := query._subquery_fields_len) != lhs_len:
@@ -516,7 +516,7 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             elif getattr(
                 getattr(self.lhs, "output_field", None), "is_composite", False
             ):
-                lhs_len = len(self.lhs.output_field.sub_fields)
+                lhs_len = len(self.lhs.output_field)
             else:
                 lhs_len = 1
             has_explicit_values = self.rhs.has_select_fields or bool(
