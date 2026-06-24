@@ -9,4 +9,6 @@ Django 6.0.7 fixes several bugs in 6.0.6.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 6.0 by removing the forced string conversion in
+  ``PBKDF2PasswordHasher`` added for consistency, as it caused failures when
+  passwords were provided as non-UTF-8 bytes (:ticket:`37184`).

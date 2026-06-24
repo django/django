@@ -104,6 +104,13 @@ class TestUtilsHashPass(SimpleTestCase):
         encoded_strong_salt = make_password("lètmein", hasher.salt(), "pbkdf2_sha256")
         self.assertIs(hasher.must_update(encoded_weak_salt), True)
         self.assertIs(hasher.must_update(encoded_strong_salt), False)
+        # Bytes password check.
+        non_utf8_bytes_password = b"\xc0\xc1\xfe\xff"
+        encoded_bytes = make_password(
+            non_utf8_bytes_password, "seasalt", "pbkdf2_sha256"
+        )
+        self.assertTrue(check_password(non_utf8_bytes_password, encoded_bytes))
+        self.assertFalse(check_password(b"wrong", encoded_bytes))
 
     @override_settings(
         PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"]
@@ -169,6 +176,11 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password("", blank_encoded))
         self.assertFalse(check_password(" ", blank_encoded))
+        # Bytes password check.
+        non_utf8_bytes_password = b"\xc0\xc1\xfe\xff"
+        encoded_bytes = make_password(non_utf8_bytes_password, hasher="bcrypt")
+        self.assertTrue(check_password(non_utf8_bytes_password, encoded_bytes))
+        self.assertFalse(check_password(b"wrong", encoded_bytes))
 
     @skipUnless(bcrypt, "bcrypt not installed")
     @override_settings(
@@ -674,6 +686,11 @@ class TestUtilsHashPassArgon2(SimpleTestCase):
         encoded_strong_salt = make_password("lètmein", hasher.salt(), "argon2")
         self.assertIs(hasher.must_update(encoded_weak_salt), True)
         self.assertIs(hasher.must_update(encoded_strong_salt), False)
+        # Bytes password check.
+        non_utf8_bytes_password = b"\xc0\xc1\xfe\xff"
+        encoded_bytes = make_password(non_utf8_bytes_password, "iodizedsalt", "argon2")
+        self.assertTrue(check_password(non_utf8_bytes_password, encoded_bytes))
+        self.assertFalse(check_password(b"wrong", encoded_bytes))
 
     def test_argon2_decode(self):
         salt = "abcdefghijk"
@@ -767,6 +784,11 @@ class TestUtilsHashPassScrypt(SimpleTestCase):
         self.assertIs(is_password_usable(blank_encoded), True)
         self.assertIs(check_password("", blank_encoded), True)
         self.assertIs(check_password(" ", blank_encoded), False)
+        # Bytes password check.
+        non_utf8_bytes_password = b"\xc0\xc1\xfe\xff"
+        encoded_bytes = make_password(non_utf8_bytes_password, "seasalt", "scrypt")
+        self.assertTrue(check_password(non_utf8_bytes_password, encoded_bytes))
+        self.assertFalse(check_password(b"wrong", encoded_bytes))
 
     def test_scrypt_decode(self):
         encoded = make_password("lètmein", "seasalt", "scrypt")
