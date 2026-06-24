@@ -136,6 +136,7 @@ class Field:
         #             that is its widget is shown in the form but not editable.
         # label_suffix -- Suffix to be added to the label. Overrides
         #                 form's label_suffix.
+        # template_name -- Template name to use when rendering the field.
         # bound_field_class -- BoundField class to use in
         #                      Field.get_bound_field.
         self.required, self.label, self.initial = required, label, initial
