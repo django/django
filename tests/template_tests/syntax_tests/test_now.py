@@ -122,3 +122,25 @@ class NowTagTests(SimpleTestCase):
                 datetime.now().year,
             ),
         )
+
+    @setup({"now_var_escape": "{% now my_format %}"})
+    def test_now_var_escape(self):
+        """
+        Test that dynamic variables are properly escaped to prevent XSS.
+        """
+        evil_format = r"\<\i\m\g \s\r\c=\x\o\n\e\r\r\o\r=\a\l\e\r\t\(1\)\>"
+        output = self.engine.render_to_string(
+            "now_var_escape", {"my_format": evil_format}
+        )
+        self.assertEqual(output, "&lt;img src=xonerror=alert(1)&gt;")
+
+    @setup({"now_filter_escape": '{% now ""|add:my_format %}'})
+    def test_now_filter_escape(self):
+        """
+        Test that formats constructed via filter chains are properly escaped.
+        """
+        evil_format = r"\<\i\m\g \s\r\c=\x\o\n\e\r\r\o\r=\a\l\e\r\t\(1\)\>"
+        output = self.engine.render_to_string(
+            "now_filter_escape", {"my_format": evil_format}
+        )
+        self.assertEqual(output, "&lt;img src=xonerror=alert(1)&gt;")

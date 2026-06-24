@@ -404,14 +404,12 @@ class NowNode(Node):
         format_string = self.format_expr.resolve(context)
         formatted = date(datetime.now(tz=tzinfo), format_string)
 
-        if not self.asvar and self.format_expr.is_var:
-            return render_value_in_context(formatted, context)
-
         if self.asvar:
             context[self.asvar] = formatted
             return ""
-        else:
-            return formatted
+        if context.autoescape and (self.format_expr.is_var or self.format_expr.filters):
+            return conditional_escape(formatted)
+        return formatted
 
 
 class PartialDefNode(Node):
