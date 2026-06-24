@@ -25,6 +25,7 @@ class InvalidCacheKey(ValueError):
 # Stub class to ensure not passing in a `timeout` argument results in
 # the default timeout
 DEFAULT_TIMEOUT = object()
+NO_TIMEOUT = "no_timeout"
 
 # Memcached does not accept keys longer than this.
 MEMCACHE_MAX_KEY_LENGTH = 250
