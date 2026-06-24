@@ -1,9 +1,11 @@
 from django.conf import settings
+from django.contrib.sites.context_processors import site
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.core import checks
 from django.db import models
 from django.test import SimpleTestCase, TestCase
+from django.test.client import RequestFactory
 from django.test.utils import isolate_apps
 
 from .models import CustomArticle, ExclusiveArticle, SyndicatedArticle
@@ -73,3 +75,16 @@ class CurrentSiteManagerChecksTests(SimpleTestCase):
             )
         ]
         self.assertEqual(errors, expected)
+
+
+class ContextProcessorTest(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def test_context_processor(self):
+        site_obj = Site.objects.get_current()
+        request = self.factory.get("/")
+        context = site(request)
+        self.assertIn("site", context)
+        self.assertEqual(context["site"].name, site_obj.name)
+        self.assertEqual(context["site"].domain, site_obj.domain)
