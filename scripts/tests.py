@@ -87,7 +87,11 @@ class CreateChecksumFileTests(unittest.TestCase):
         self.assertIn("ABCD1234ABCD1234", result)
         self.assertIn("https://github.com/releaser.gpg", result)
         self.assertIn("Django-5.2.4.checksum.txt", result)
-        self.assertIn("abc123def456abc123def456abc123def456abc1  5.2.4", result)
+        self.assertIn(
+            "The 5.2.4 tag points to commit "
+            "abc123def456abc123def456abc123def456abc1.",
+            result,
+        )
 
     def test_artifact_checksums(self):
         result = self.generate_checksum_file()

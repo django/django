@@ -62,7 +62,7 @@ SHA256 checksums
 Git tag
 =======
 
-{commit_hash}  {django_version}
+The {django_version} tag points to commit {commit_hash}.
 """
 
 
