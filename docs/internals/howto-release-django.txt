@@ -778,6 +778,13 @@ You're almost done! All that's left to do now is:
    #. Forward port the updated source translations to the ``main`` branch
       (:commit:`example commit <aed303aff57ac990894b6354af001b0e8ea55f71>`).
 
+#. If this was an ``alpha`` pre-release, coordinate with the maintainer of
+   :pypi:`asgiref` to determine when to raise the minimum version before the
+   final release. For the backport, add an upper bound on the next major
+   version (example commits:
+   :commit:`main <df35cf578f99522dd1ba864d513be95d47bab7a5>`,
+   :commit:`backport <e5d2664908164d51d2daa46e375da8b6a93def03>`).
+
 #. If this was an ``rc`` pre-release, call for translations for the upcoming
    release in the `Django Forum - Internationalization category
    <https://forum.djangoproject.com/c/internals/i18n/14>`_.
