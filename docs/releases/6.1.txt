@@ -657,8 +657,9 @@ Miscellaneous
   the top-level value. :lookup:`Key and index lookups <jsonfield.key>` are
   unaffected by this deprecation.
 
-* The ``django.db.models.fields.BLANK_CHOICE_DASH`` constant is deprecated
-  in favor of the new constant ``django.db.models.fields.BLANK_CHOICE_LABEL``.
+* The undocumented ``django.db.models.fields.BLANK_CHOICE_DASH`` constant is
+  deprecated. See the :setting:`USE_BLANK_CHOICE_DASH` transitional setting for
+  migration advice.
 
 * The :setting:`USE_BLANK_CHOICE_DASH` transitional setting is deprecated.
 
