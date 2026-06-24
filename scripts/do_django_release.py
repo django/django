@@ -38,13 +38,8 @@ source revision the artifacts were built from.
 To use this file, you will need a working install of PGP or other
 compatible public-key encryption software. You will also need to have
 the Django release manager's public key in your keyring. This key has
-the ID ``{pgp_key_id}`` and can be imported from the MIT
-keyserver, for example, if using the open-source GNU Privacy Guard
-implementation of PGP:
-
-    gpg --keyserver pgp.mit.edu --recv-key {pgp_key_id}
-
-or via the GitHub API:
+the ID ``{pgp_key_id}`` and can be imported from GitHub, for example, if
+using the open-source GNU Privacy Guard implementation of PGP:
 
     curl {pgp_key_url} | gpg --import -
 
