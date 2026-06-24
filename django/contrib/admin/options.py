@@ -2798,9 +2798,9 @@ class InlineModelAdmin(BaseModelAdmin):
                             len(collector.protected) - delete_confirmation_max_display
                         )
                         if remaining_object_count > 0:
-                            # Translators: This string is used as a separator
-                            # between list elements
                             related = (
+                                # Translators: This string is used as a
+                                # separator between list elements.
                                 _(", ").join(str(i) for i in objs)
                                 + _(", ")
                                 + ngettext(
