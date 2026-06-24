@@ -2,9 +2,11 @@ import os
 import re
 from datetime import datetime
 from pathlib import Path
+from unittest import mock
 
 from django.contrib.gis.gdal import DataSource, Envelope, GDALException, OGRGeometry
 from django.contrib.gis.gdal.field import OFTDateTime, OFTInteger, OFTReal, OFTString
+from django.contrib.gis.gdal.prototypes import ds as capi
 from django.contrib.gis.geos import GEOSGeometry
 from django.test import SimpleTestCase
 
@@ -225,6 +227,31 @@ class DataSourceTest(SimpleTestCase):
             test_vals = [feat.get(fld_name) for feat in feats]
             control_vals = source.field_values[fld_name][sl]
             self.assertEqual(control_vals, test_vals)
+
+    def test03b_layer_slice_no_random_read(self):
+        """
+        Slicing a Layer that doesn't support random reads must scan the
+        Layer once, regardless of the size of the slice.
+        """
+        source = ds_list[0]
+        ds = DataSource(source.ds)
+        layer = ds[0]
+        # Force the code path taken by layers without random-read support
+        # (e.g. CSV, GeoJSON in older GDAL versions), independent of what
+        # the driver used in this test actually supports.
+        layer._random_read = False
+
+        with mock.patch(
+            "django.contrib.gis.gdal.prototypes.ds.get_next_feature",
+            wraps=capi.get_next_feature,
+        ) as mock_get_next_feature:
+            feats = layer[0 : source.nfeat]
+
+        # A single scan of the layer reads each feature once. Without the
+        # fix, re-scanning from the start for every requested id reads
+        # nfeat * (nfeat + 1) / 2 features instead.
+        self.assertEqual(mock_get_next_feature.call_count, source.nfeat)
+        self.assertEqual([feat.fid for feat in feats], list(source.fids))
 
     def test03c_layer_references(self):
         """

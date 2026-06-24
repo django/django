@@ -51,7 +51,13 @@ class Layer(GDALBase):
         elif isinstance(index, slice):
             # A slice was given
             start, stop, stride = index.indices(self.num_feat)
-            return [self._make_feature(fid) for fid in range(start, stop, stride)]
+            feature_ids = range(start, stop, stride)
+            if self._random_read:
+                return [self._make_feature(fid) for fid in feature_ids]
+            # Without random-read support, _make_feature() rescans the
+            # Layer from the beginning for every requested id. Make a
+            # single pass over the Layer instead of one pass per id.
+            return self._make_features(feature_ids)
         else:
             raise TypeError(
                 "Integers and slices may only be used when indexing OGR Layers."
@@ -93,6 +99,26 @@ class Layer(GDALBase):
                     return feat
         # Should have returned a Feature, raise an IndexError.
         raise IndexError("Invalid feature id: %s." % feat_id)
+
+    def _make_features(self, feature_ids):
+        """
+        Helper routine for __getitem__ slicing on Layers that do not
+        support random-access reading. Collects the requested Features in
+        a single pass over the Layer, rather than rescanning it from the
+        beginning for each feature id.
+        """
+        remaining = set(feature_ids)
+        found = {}
+        for feature in self:
+            if feature.fid in remaining:
+                found[feature.fid] = feature
+                remaining.discard(feature.fid)
+                if not remaining:
+                    break
+        try:
+            return [found[feature_id] for feature_id in feature_ids]
+        except KeyError as e:
+            raise IndexError("Invalid feature id: %s." % e.args[0]) from e
 
     # #### Layer properties ####
     @property
