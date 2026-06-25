@@ -37,7 +37,11 @@ from django.db.models.utils import (
     resolve_callables,
 )
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango70Warning, RemovedInDjango71Warning
+from django.utils.deprecation import (
+    RemovedInDjango70Warning,
+    RemovedInDjango71Warning,
+    warn_about_external_use,
+)
 from django.utils.functional import cached_property
 from django.utils.warnings import django_file_prefixes
 
@@ -1795,11 +1799,11 @@ class QuerySet(AltersData):
         else:
             # RemovedInDjango70Warning: when the deprecation ends, raise a
             # TypeError instead.
-            warnings.warn(
+            warn_about_external_use(
                 "Calling select_related() with no arguments is deprecated. "
                 "Specify the fields to fetch instead.",
                 category=RemovedInDjango70Warning,
-                skip_file_prefixes=django_file_prefixes(),
+                skip_name_prefixes=("django.db.models",),
             )
             obj.query.select_related = True
         return obj
