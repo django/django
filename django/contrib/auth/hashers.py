@@ -330,7 +330,6 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     def encode(self, password, salt, iterations=None):
         self._check_encode_args(password, salt)
         iterations = iterations or self.iterations
-        password = force_str(password)
         salt = force_str(salt)
         hash = pbkdf2(password, salt, iterations, digest=self.digest)
         hash = base64.b64encode(hash).decode("ascii").strip()
@@ -664,10 +663,8 @@ class MD5PasswordHasher(BasePasswordHasher):
 
     def encode(self, password, salt):
         self._check_encode_args(password, salt)
-        password = force_str(password)
-        salt = force_str(salt)
-        hash = hashlib.md5((salt + password).encode()).hexdigest()
-        return "%s$%s$%s" % (self.algorithm, salt, hash)
+        hash = hashlib.md5(force_bytes(salt) + force_bytes(password)).hexdigest()
+        return "%s$%s$%s" % (self.algorithm, force_str(salt), hash)
 
     def decode(self, encoded):
         algorithm, salt, hash = encoded.split("$", 2)

@@ -522,6 +522,30 @@ class TestUtilsHashPass(SimpleTestCase):
                     with self.assertRaisesMessage(ValueError, msg):
                         hasher.encode("password", salt)
 
+    def assertHasherVerifiesStrAndBytes(self, hasher, salts):
+        """
+        If a string representation exists for a bytes password, then both
+        representations will verify against whichever form was stored.
+        Otherwise, only the bytes representation will verify.
+        """
+        for pass_str, pass_bytes in [
+            ("password", b"password"),
+            # Valid UTF-8, but not ASCII.
+            ("Lösenord", "Lösenord".encode()),
+            # Not UTF-8.
+            ("", b"non-utf-8-\xc0"),
+        ]:
+            with self.subTest(hasher=hasher.__class__.__name__, password=pass_bytes):
+                for password in (pass_str, pass_bytes):
+                    if not password:
+                        continue
+                    for salt in salts:
+                        encoded = hasher.encode(password, salt)
+                        self.assertIs(hasher.verify(pass_bytes, encoded), True)
+                        if not pass_str:
+                            continue
+                        self.assertIs(hasher.verify(pass_str, encoded), True)
+
     def test_password_and_salt_in_str_and_bytes(self):
         hasher_classes = [
             MD5PasswordHasher,
@@ -531,25 +555,16 @@ class TestUtilsHashPass(SimpleTestCase):
         ]
         for hasher_class in hasher_classes:
             hasher = hasher_class()
-            with self.subTest(hasher_class.__name__):
-                passwords = ["password", b"password"]
-                for password in passwords:
-                    for salt in [hasher.salt(), hasher.salt().encode()]:
-                        encoded = hasher.encode(password, salt)
-                        for password_to_verify in passwords:
-                            self.assertIs(
-                                hasher.verify(password_to_verify, encoded), True
-                            )
+            self.assertHasherVerifiesStrAndBytes(
+                hasher, [hasher.salt(), hasher.salt().encode()]
+            )
 
     @skipUnless(argon2, "argon2-cffi not installed")
     def test_password_and_salt_in_str_and_bytes_argon2(self):
         hasher = Argon2PasswordHasher()
-        passwords = ["password", b"password"]
-        for password in passwords:
-            for salt in [hasher.salt(), hasher.salt().encode()]:
-                encoded = hasher.encode(password, salt)
-                for password_to_verify in passwords:
-                    self.assertIs(hasher.verify(password_to_verify, encoded), True)
+        self.assertHasherVerifiesStrAndBytes(
+            hasher, [hasher.salt(), hasher.salt().encode()]
+        )
 
     @skipUnless(bcrypt, "bcrypt not installed")
     def test_password_and_salt_in_str_and_bytes_bcrypt(self):
@@ -559,16 +574,9 @@ class TestUtilsHashPass(SimpleTestCase):
         ]
         for hasher_class in hasher_classes:
             hasher = hasher_class()
-            with self.subTest(hasher_class.__name__):
-                passwords = ["password", b"password"]
-                for password in passwords:
-                    salts = [hasher.salt().decode(), hasher.salt()]
-                    for salt in salts:
-                        encoded = hasher.encode(password, salt)
-                        for password_to_verify in passwords:
-                            self.assertIs(
-                                hasher.verify(password_to_verify, encoded), True
-                            )
+            self.assertHasherVerifiesStrAndBytes(
+                hasher, [hasher.salt().decode(), hasher.salt()]
+            )
 
     def test_encode_password_required(self):
         hasher_classes = [

@@ -9,4 +9,7 @@ Django 6.0.7 fixes several bugs in 6.0.6.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 6.0 where the PBKDF2 and MD5 password hashers
+  raised :exc:`UnicodeDecodeError` for :class:`bytes` passwords that were not
+  valid UTF-8. Passwords supplied as :class:`str` or as UTF-8 :class:`bytes`
+  are unaffected (:ticket:`37184`).
