@@ -3,20 +3,20 @@
 {% if app_list %}
   {% for app in app_list %}
     <div class="app-{{ app.app_label }} module{% if app.app_url in request.path|urlencode %} current-app{% endif %}">
-      <table>
-        <caption>
+      <ul>
+        <h2>
           <a href="{{ app.app_url }}" class="section">{{ app.name }}</a>
-        </caption>
+        </h2>
         <thead class="visually-hidden">
-          <tr>
+          <li>
             <th scope="col">{% translate 'Model name' %}</th>
             <th scope="col">{% translate 'Add link' %}</th>
             <th scope="col">{% translate 'Change or view list link' %}</th>
-          </tr>
+          </li>
         </thead>
         {% for model in app.models %}
           {% with model_name=model.object_name|lower %}
-            <tr class="model-{{ model_name }}{% if model.admin_url in request.path|urlencode %} current-model{% endif %}">
+            <li class="model-{{ model_name }}{% if model.admin_url in request.path|urlencode %} current-model{% endif %}">
               <th scope="row" id="{{ app.app_label }}-{{ model_name }}">
                 {% if model.admin_url %}
                   <a href="{{ model.admin_url }}"{% if model.admin_url in request.path|urlencode %} aria-current="page"{% endif %}>{{ model.name }}</a>
@@ -40,10 +40,10 @@
               {% elif show_changelinks %}
                 <td></td>
               {% endif %}
-            </tr>
+            </li>
           {% endwith %}
         {% endfor %}
-      </table>
+      </ul>
     </div>
   {% endfor %}
 {% else %}
