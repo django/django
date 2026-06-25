@@ -63,7 +63,11 @@ from django.http.response import HttpResponseBase
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
+from django.utils.deprecation import (
+    RemovedInDjango70Warning,
+    django_file_prefixes,
+    warn_about_implementation,
+)
 from django.utils.html import format_html
 from django.utils.http import urlencode
 from django.utils.inspect import get_func_args
@@ -927,11 +931,12 @@ class ModelAdmin(BaseModelAdmin):
             # RemovedInDjango70Warning: when the deprecation ends, remove the
             # below 'if' clause and raise a ValueError here.
             if self.list_select_related is not True:
-                warnings.warn(
+                warn_about_implementation(
                     "Returning True from ModelAdmin.get_list_select_related() is "
                     "deprecated. Return False or a list or tuple of fields to "
                     "fetch instead.",
                     RemovedInDjango70Warning,
+                    self.get_list_select_related,
                 )
         return ChangeList(
             request,
@@ -1131,12 +1136,12 @@ class ModelAdmin(BaseModelAdmin):
         if "action_location" in get_func_args(self.get_actions):
             return self.get_actions(request, action_location=action_location)
         else:
-            warnings.warn(
+            warn_about_implementation(
                 "Overriding get_actions() without the 'action_location' parameter is "
                 "deprecated. Update the signature to get_actions(self, request, "
                 "action_location=ActionLocation.CHANGE_LIST).",
                 RemovedInDjango70Warning,
-                skip_file_prefixes=django_file_prefixes(),
+                self.get_actions,
             )
             if action_location == ActionLocation.CHANGE_FORM:
                 # Disable adding actions on change form when get_actions is
@@ -1171,13 +1176,13 @@ class ModelAdmin(BaseModelAdmin):
                 action_location=action_location,
             )
         else:
-            warnings.warn(
+            warn_about_implementation(
                 "Overriding get_action_choices() without the 'action_location' "
                 "parameter is deprecated. Update the signature to "
                 "get_action_choices(self, request, default_choices=None, "
                 "action_location=ActionLocation.CHANGE_LIST).",
                 RemovedInDjango70Warning,
-                skip_file_prefixes=django_file_prefixes(),
+                self.get_action_choices,
             )
             return self.get_action_choices(request, default_choices=default_choices)
 
