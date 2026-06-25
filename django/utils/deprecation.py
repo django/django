@@ -1,5 +1,6 @@
 import functools
 import inspect
+import sys
 import warnings
 from collections import Counter
 from inspect import iscoroutinefunction, markcoroutinefunction
@@ -99,6 +100,58 @@ def warn_about_external_use(
 
     if not is_internal:
         warnings.warn(message, category=category, stacklevel=level + 1)
+
+
+def warn_about_implementation(message, category, target):
+    """Issue a warning about a specific function, class, or method definition.
+
+    The warning will point to the source filename and line number where
+    'target' is _defined_ (not where it is being _called_ as with other warning
+    helpers). Use this to warn about code that isn't currently on the call
+    stack, e.g., deprecation based on the return value of a called method or
+    inspecting a function's signature to see if it supports an updated API.
+
+    Supported usage:
+    warn_about_implementation(message, category, some_function)
+    warn_about_implementation(message, category, SomeClass)
+    warn_about_implementation(message, category, SomeClass.method)
+    warn_about_implementation(message, category, self.method) [a bound method]
+
+    To warn about a property without invoking its descriptor, call with
+    'target' set to inspect.getattr_static(class_or_instance, "property_name").
+    """
+    if inspect.ismethod(target) or isinstance(target, (classmethod, staticmethod)):
+        function = target.__func__
+    elif inspect.isfunction(target) or inspect.isclass(target):
+        function = target
+    elif isinstance(target, property):
+        function = target.fget
+    else:
+        raise TypeError(
+            "target must be a function, class, bound method, or unbound descriptor "
+            "(classmethod, staticmethod, or property)."
+        )
+
+    function = inspect.unwrap(function)
+
+    try:
+        filename = inspect.getsourcefile(function)
+        _, lineno = inspect.getsourcelines(function)
+    except (AttributeError, OSError, TypeError):
+        # Can't identify the source. Issue the warning generically.
+        warnings.warn(message, category, skip_file_prefixes=django_file_prefixes())
+        return
+
+    # Find or create the module's warning registry so warning filters work.
+    module = function.__module__
+    try:
+        registry = sys.modules[module].__dict__.setdefault("__warningregistry__", {})
+    except (AttributeError, KeyError):
+        registry = None
+
+    warnings.warn_explicit(
+        message, category, filename, lineno, module=module, registry=registry
+    )
 
 
 class warn_about_renamed_method:
