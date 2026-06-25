@@ -1035,10 +1035,12 @@ class ModelAdminTests(TestCase):
         )
         # RemovedInDjango70Warning:
         # with self.assertRaisesMessage(ValueError, msg)
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg) as warning:
 
             class TestModelAdmin(ModelAdmin):
                 list_select_related = True
+
+        self.assertEqual(warning.filename, __file__)
 
     # RemovedInDjango70Warning: when the deprecation ends, remove.
     def test_list_select_related_true_deprecated_subclass(self):
@@ -1073,8 +1075,9 @@ class ModelAdminTests(TestCase):
 
         # RemovedInDjango70Warning:
         # with self.assertRaisesMessage(ValueError, msg)
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg) as warning:
             TestModelAdmin(Band, self.site).get_changelist_instance(request)
+        self.assertEqual(warning.filename, __file__)
 
 
 class ModelAdminPermissionTests(SimpleTestCase):
