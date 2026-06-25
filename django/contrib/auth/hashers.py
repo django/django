@@ -98,8 +98,7 @@ async def acheck_password(password, encoded, setter=None, preferred="default"):
 
 
 def make_password(password, salt=None, hasher="default"):
-    """
-    Turn a plain-text password into a hash for database storage
+    """Turn a plaintext password into a hash for database storage.
 
     Same as encode() but generate a new random salt. If password is None then
     return a concatenation of UNUSABLE_PASSWORD_PREFIX and a random string,
