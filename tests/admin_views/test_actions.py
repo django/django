@@ -15,6 +15,7 @@ from django.urls import reverse
 from django.utils.deprecation import RemovedInDjango70Warning
 
 from .admin import SubscriberAdmin
+from .admin import __file__ as admin_filename
 from .forms import MediaActionForm
 from .models import (
     Actor,
@@ -878,14 +879,14 @@ class AdminDetailActionsTest(TestCase):
         )
         with self.assertWarnsMessage(
             RemovedInDjango70Warning, get_actions_overridden_msg
-        ):
+        ) as warning:
             response = self.client.get(change_url)
+        self.assertEqual(warning.filename, admin_filename)
         self.assertNotContains(response, "<div class='actions'>", html=True)
 
         changelist_url = reverse("admin:admin_views_modelaction_changelist")
         with warnings.catch_warnings(record=True) as warning_list:
             warnings.simplefilter("always", RemovedInDjango70Warning)
-            warnings.filterwarnings("always", category=RemovedInDjango70Warning)
             response = self.client.get(changelist_url)
 
             message_warnings = [str(warning.message) for warning in warning_list]
@@ -901,6 +902,9 @@ class AdminDetailActionsTest(TestCase):
                 "Use Action attributes instead.",
             }
             self.assertEqual(set(message_warnings), expected_warnings)
+            self.assertEqual(
+                {warning.filename for warning in warning_list}, {admin_filename}
+            )
         self.assertContains(response, "Delete selected model actions (extra)")
 
         action_data = {
@@ -915,10 +919,11 @@ class AdminDetailActionsTest(TestCase):
         )
         with self.assertWarnsMessage(
             RemovedInDjango70Warning, get_actions_overridden_msg
-        ):
+        ) as warning:
             response = self.client.post(
                 reverse("admin:admin_views_modelaction_changelist"), action_data
             )
+        self.assertEqual(warning.filename, admin_filename)
         self.assertContains(
             response, "Are you sure you want to delete the selected model action?"
         )
