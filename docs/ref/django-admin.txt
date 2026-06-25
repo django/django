@@ -193,7 +193,7 @@ Example usage:
 
 .. console::
 
-    django-admin compilemessages --ignore=cache --ignore=outdated/*/locale
+    django-admin compilemessages --ignore=node_modules --ignore=outdated/*/locale
 
 ``createcachetable``
 --------------------
