@@ -73,7 +73,9 @@ class FileBasedCache(BaseCache):
                         self._write_content(f, timeout, previous_value)
                         return True
                 finally:
-                    locks.unlock(f)
+                    # Expired files are closed & unlocked by _is_expired().
+                    if not f.closed:
+                        locks.unlock(f)
         except FileNotFoundError:
             return False
 

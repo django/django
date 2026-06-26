@@ -1971,6 +1971,12 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
         ):
             super().test_touch()
 
+    def test_touch_expired_key_does_not_crash(self):
+        cache.set("expired_touch_key", "value", timeout=0.01)
+        time.sleep(0.05)
+        result = cache.touch("expired_touch_key", 60)
+        self.assertIs(result, False)
+
 
 @unittest.skipUnless(RedisCache_params, "Redis backend not configured")
 @override_settings(
