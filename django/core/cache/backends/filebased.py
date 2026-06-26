@@ -73,7 +73,8 @@ class FileBasedCache(BaseCache):
                         self._write_content(f, timeout, previous_value)
                         return True
                 finally:
-                    locks.unlock(f)
+                    if not f.closed:
+                        locks.unlock(f)
         except FileNotFoundError:
             return False
 
