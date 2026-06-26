@@ -2,9 +2,10 @@
 Django 6.0.7 release notes
 ==========================
 
-*Expected July 1, 2026*
+*July 7, 2026*
 
-Django 6.0.7 fixes several bugs in 6.0.6.
+Django 6.0.7 fixes three security issues with severity "low" and one bug in
+6.0.6.
 
 Bugfixes
 ========

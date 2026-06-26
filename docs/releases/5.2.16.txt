@@ -1,0 +1,7 @@
+===========================
+Django 5.2.16 release notes
+===========================
+
+*July 7, 2026*
+
+Django 5.2.16 fixes three security issues with severity "low" in 5.2.15.
