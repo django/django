@@ -1057,6 +1057,8 @@ class ModelAdminTests(TestCase):
     # RemovedInDjango70Warning: when the deprecation ends, rename.
     def test_get_list_select_related_returns_true_deprecated(self):
         msg = (
+            "modeladmin.tests.ModelAdminTests.test_get_list_select_related_returns"
+            "_true_deprecated.<locals>.TestModelAdmin.get_list_select_related: "
             "Returning True from ModelAdmin.get_list_select_related() is "
             "deprecated. Return False or a list or tuple of fields to fetch "
             "instead."

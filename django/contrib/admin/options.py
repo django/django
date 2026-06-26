@@ -88,6 +88,11 @@ IS_FACETS_VAR = "_facets"
 EMPTY_VALUE_STRING = "-"
 
 
+# RemovedInDjango70Warning.
+def _fqname(bound_method):
+    return f"{bound_method.__module__}.{bound_method.__func__.__qualname__}"
+
+
 class ShowFacets(enum.Enum):
     NEVER = "NEVER"
     ALLOW = "ALLOW"
@@ -929,6 +934,7 @@ class ModelAdmin(BaseModelAdmin):
             # below 'if' clause and raise a ValueError here.
             if self.list_select_related is not True:
                 warnings.warn(
+                    f"{_fqname(self.get_list_select_related)}: "
                     "Returning True from ModelAdmin.get_list_select_related() is "
                     "deprecated. Return False or a list or tuple of fields to "
                     "fetch instead.",
@@ -1133,11 +1139,11 @@ class ModelAdmin(BaseModelAdmin):
             return self.get_actions(request, action_location=action_location)
         else:
             warnings.warn(
+                f"{_fqname(self.get_actions)}: "
                 "Overriding get_actions() without the 'action_location' parameter is "
                 "deprecated. Update the signature to get_actions(self, request, "
                 "action_location=ActionLocation.CHANGE_LIST).",
                 RemovedInDjango70Warning,
-                skip_file_prefixes=django_file_prefixes(),
             )
             if action_location == ActionLocation.CHANGE_FORM:
                 # Disable adding actions on change form when get_actions is
@@ -1173,12 +1179,12 @@ class ModelAdmin(BaseModelAdmin):
             )
         else:
             warnings.warn(
+                f"{_fqname(self.get_action_choices)}: "
                 "Overriding get_action_choices() without the 'action_location' "
                 "parameter is deprecated. Update the signature to "
                 "get_action_choices(self, request, default_choices=None, "
                 "action_location=ActionLocation.CHANGE_LIST).",
                 RemovedInDjango70Warning,
-                skip_file_prefixes=django_file_prefixes(),
             )
             return self.get_action_choices(request, default_choices=default_choices)
 

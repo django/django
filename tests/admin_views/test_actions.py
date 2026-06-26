@@ -872,6 +872,7 @@ class AdminDetailActionsTest(TestCase):
         obj = ModelAction.objects.create()
         change_url = reverse("admin:admin_views_modelaction_change", args=[obj.pk])
         get_actions_overridden_msg = (
+            "admin_views.admin.OverriddenActionAdmin.get_actions: "
             "Overriding get_actions() without the 'action_location' parameter is "
             "deprecated. Update the signature to get_actions(self, request, "
             "action_location=ActionLocation.CHANGE_LIST)."
@@ -891,6 +892,7 @@ class AdminDetailActionsTest(TestCase):
             message_warnings = [str(warning.message) for warning in warning_list]
             expected_warnings = {
                 get_actions_overridden_msg,
+                "admin_views.admin.OverriddenActionAdmin.get_action_choices: "
                 "Overriding get_action_choices() without the 'action_location' "
                 "parameter is deprecated. Update the signature to "
                 "get_action_choices(self, request, default_choices=None, "
@@ -909,6 +911,7 @@ class AdminDetailActionsTest(TestCase):
             "index": 0,
         }
         get_actions_overridden_msg = (
+            "admin_views.admin.OverriddenActionAdmin.get_actions: "
             "Overriding get_actions() without the 'action_location' parameter is "
             "deprecated. Update the signature to get_actions(self, request, "
             "action_location=ActionLocation.CHANGE_LIST)."
