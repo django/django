@@ -1970,6 +1970,20 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
             mock.patch("cache.tests.time", new=mocked_time),
         ):
             super().test_touch()
+        
+    def test_touch_expired_key_does_not_crash(self):
+        """
+        Touching an expired key in FileBasedCache should safely return False
+        instead of raising a ValueError due to an unlocked closed file.
+        """
+        import time
+        # Set a cache key with a very short timeout
+        cache.set("expired_touch_key", "value", timeout=0.01)
+        # Wait a moment to ensure it is natively expired
+        time.sleep(0.05)
+        # Attempt to touch the key (this will crash without the fix)
+        result = cache.touch("expired_touch_key", 60)
+        self.assertIs(result, False)
 
 
 @unittest.skipUnless(RedisCache_params, "Redis backend not configured")
