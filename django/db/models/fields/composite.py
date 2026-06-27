@@ -4,6 +4,7 @@ from functools import partial
 from django.core import checks
 from django.core.exceptions import FieldError
 from django.db.models import NOT_PROVIDED, Field
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import ColPairs
 from django.db.models.fields.tuple_lookups import (
     TupleExact,
@@ -228,11 +229,11 @@ class CompositeSubfieldTransform(Transform):
             quoted_column = compiler.quote_name(full_lookup_name)
             return f"{quoted_table}.{quoted_column}", []
         elif getattr(current_lhs, "subquery", False) and hasattr(current_lhs, "query"):
-            query = current_lhs.query.clone()
+            query = current_lhs.query
             query.set_values([full_lookup_name])
             return query.as_sql(compiler, connection)
         elif isinstance(current_lhs, type(compiler.query)):
-            query = current_lhs.clone()
+            query = current_lhs
             query.set_values([full_lookup_name])
             return query.as_sql(compiler, connection)
         else:
@@ -282,7 +283,7 @@ class CompositeField(Field):
         for path, field in select_map.items():
             if field is None:
                 continue
-            parts = path.split("__")
+            parts = path.split(LOOKUP_SEP)
             current = nested
             for part in parts[:-1]:
                 if part not in current:
@@ -322,8 +323,8 @@ class CompositeField(Field):
         try:
             subfield = self.get_field(name)
         except FieldError:
-            if len(self.sub_fields) == 1:
-                subfield = list(self.sub_fields.values())[0]
+            if self.has_one_field:
+                subfield = self.output_field_when_only_one_subfield
                 transform = subfield.get_transform(name)
                 if transform is not None:
                     return transform

@@ -30,6 +30,7 @@ class ForeignObjectRel(FieldCacheMixin):
     concrete = False
     editable = False
     is_relation = True
+    is_composite = False
 
     # Reverse relations are always nullable (Django can't enforce that a
     # foreign key on the related model points to this model).

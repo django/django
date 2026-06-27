@@ -476,7 +476,7 @@ class BaseExpression:
         fields = []
         for e in self.get_source_expressions():
             field = e._output_field_or_none
-            if field.is_composite and field.has_one_field:
+            if field and field.is_composite and field.has_one_field:
                 field = field.output_field_when_only_one_subfield
             fields.append(field)
         return fields
@@ -761,9 +761,9 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         # Expression._resolve_output_field()
         lhs_field = self.lhs._output_field_or_none
         rhs_field = self.rhs._output_field_or_none
-        if lhs_field.is_composite and lhs_field.has_one_field:
+        if lhs_field and lhs_field.is_composite and lhs_field.has_one_field:
             lhs_field = lhs_field.output_field_when_only_one_subfield
-        if rhs_field.is_composite and rhs_field.has_one_field:
+        if rhs_field and rhs_field.is_composite and rhs_field.has_one_field:
             rhs_field = rhs_field.output_field_when_only_one_subfield
         combined_type = _resolve_combined_type(
             self.connector,

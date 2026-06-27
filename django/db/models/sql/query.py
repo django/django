@@ -340,7 +340,7 @@ class Query(BaseExpression):
         is_composite = False
         if len(self.select) > 1:
             is_composite = True
-        elif self.values_select and len(self.select) > 0:
+        elif self.values_select and self.select:
             is_composite = True
         elif len(self.annotation_select) > 1:
             is_composite = True

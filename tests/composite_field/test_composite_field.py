@@ -710,6 +710,14 @@ class CompositeFieldTests(TestCaseSetup):
         user = qs.get(pk=self.user1.pk)
         self.assertEqual(user.posts.count(), 3)
 
+    def test_composite_for_value_select_case(self):
+        inner = Post.objects.filter(user=OuterRef("pk")).values("pk")
+        qs1 = User.objects.filter(Exists(inner))
+        qs2 = User.objects.annotate(found=Exists(inner)).filter(found=True)
+        self.assertCountEqual(qs1, qs2)
+        self.assertFalse(User.objects.exclude(Exists(inner)).exists())
+        self.assertCountEqual(qs2, User.objects.exclude(~Exists(inner)))
+
 
 class TupleLookupTests(TestCaseSetup):
     @classmethod
