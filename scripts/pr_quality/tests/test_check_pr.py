@@ -43,12 +43,13 @@ def make_pr_body(
         "This PR targets the `main` branch."
         " <!-- Backports will be evaluated and done by mergers, when necessary. -->",
         "The commit message is written in past tense, mentions the ticket"
-        " number, and ends with a period (see [guidelines]"
+        " number (if applicable), and ends with a period (see [guidelines]"
         "(https://docs.djangoproject.com/en/dev/internals/contributing/"
         "committing-code/#committing-guidelines)).",
         "I have not requested, and will not request, an automated AI review"
         " for this PR."
-        " <!-- You are welcome to do so in your own fork. -->",
+        " <!-- You are welcome to do so in your own fork. -->\n\n"
+        "<!-- Leave the following items unchecked if not applicable. -->",
         'I have checked the "Has patch" ticket flag in the Trac system.',
         "I have added or updated relevant tests.",
         "I have added or updated relevant docs, including release notes if"
@@ -73,10 +74,11 @@ def make_pr_body(
         f"{description}\n"
         f"\n"
         f"#### AI Assistance Disclosure (REQUIRED)\n"
-        f"<!-- Please select exactly ONE of the following: -->\n"
+        f"<!-- Select exactly ONE of the following: -->\n"
         f"- {no_ai_box} **No AI tools were used** in preparing this PR.\n"
         f"- {ai_used_box} **If AI tools were used**, I have disclosed which"
         f" ones, and fully reviewed and verified their output.{ai_extra}\n"
+        f"<!-- If AI tools were used, provide which tools were used here. -->\n"
         f"\n"
         f"#### Checklist\n"
         f"{checklist_lines}\n"
@@ -465,24 +467,6 @@ class TestCheckBranchDescription(BaseTestCase):
     def test_valid_passes(self):
         self.assertIsNone(check_pr.check_branch_description(VALID_PR_BODY))
 
-    def test_placeholder_fails(self):
-        body = make_pr_body(
-            description=(
-                "Provide a concise overview of the issue or rationale behind"
-                " the proposed changes."
-            )
-        )
-        self.assertIsNotNone(check_pr.check_branch_description(body))
-
-    def test_placeholder_with_appended_text_fails(self):
-        body = make_pr_body(
-            description=(
-                "Provide a concise overview of the issue or rationale behind"
-                " the proposed changes. Yes."
-            )
-        )
-        self.assertIsNotNone(check_pr.check_branch_description(body))
-
     def test_empty_fails(self):
         body = make_pr_body(description="")
         self.assertIsNotNone(check_pr.check_branch_description(body))
@@ -688,8 +672,8 @@ class TestIntegration(BaseTestCase):
         blank_body = make_pr_body(
             ticket="ticket-XXXXX",
             description=(
-                "Provide a concise overview of the issue or rationale behind"
-                " the proposed changes."
+                "<!-- Provide a concise overview of the issue or rationale behind"
+                " the proposed changes. 5 word minimum. -->"
             ),
             no_ai_checked=False,
             ai_used_checked=False,

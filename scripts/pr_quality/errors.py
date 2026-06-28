@@ -5,7 +5,7 @@ str.format() placeholders; kwargs are supplied at Message() construction time.
 
 """
 
-LEVEL_ERROR = ("🛑", "Error")
+LEVEL_ERROR = ("❗", "Error")
 LEVEL_WARNING = ("⚠️", "Warning")
 
 
@@ -112,9 +112,7 @@ MISSING_AI_DISCLOSURE = (
 
 MISSING_DESCRIPTION = (
     "Missing PR Description",
-    "Your PR description must be substantive and meaningful. The placeholder text "
-    '"*Provide a concise overview of the issue or rationale behind the proposed '
-    'changes.*" is not acceptable.\n\n'
+    "Your PR description must be substantive and meaningful.\n\n"
     "**What to do:**\n\n"
     "Write a description that contains at least 5 words and addresses:\n\n"
     "- What problem does this PR solve?\n"
