@@ -18,11 +18,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           persist-credentials: false
 
-      - name: Calculate commit prefix
+      - name: Set base and calculate commit prefix
         id: vars
         env:
           BASE: ${{ github.event.pull_request.base.ref }}
@@ -76,9 +76,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           persist-credentials: false
+
+      - name: Set base
+        env:
+          BASE: ${{ github.event.pull_request.base.ref }}
+        run: echo "BASE=$BASE" >> $GITHUB_ENV
 
       - name: Fetch relevant branches
         run: |
