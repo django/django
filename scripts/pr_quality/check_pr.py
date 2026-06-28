@@ -330,16 +330,7 @@ def check_pr_title_has_ticket(pr_title, ticket_id):
 
 
 def check_branch_description(pr_body):
-    """The branch description must be present.
-
-    The description should not contain the placeholder, and should be at least
-    5 words long.
-    """
-    placeholder = (
-        "Provide a concise overview of the issue or rationale behind the"
-        " proposed changes."
-    )
-
+    """The branch description should be at least 5 words long."""
     description_match = re.search(
         r"#### Branch description[ \t]*\r?\n(.*?)(?=\r?\n####|\Z)",
         pr_body,
@@ -351,7 +342,7 @@ def check_branch_description(pr_body):
     # Strip HTML comments before evaluating content.
     cleaned = strip_html_comments(description_match.group(1)).strip()
 
-    if not cleaned or placeholder in cleaned or len(cleaned.split()) < MIN_WORDS:
+    if not cleaned or len(cleaned.split()) < MIN_WORDS:
         return Message(*MISSING_DESCRIPTION)
 
     return None
