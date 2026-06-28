@@ -18,7 +18,7 @@ jobs:
     timeout-minutes: 60
     steps:
       # Pin to v1: https://github.com/actions/first-interaction/issues/369
-      - uses: actions/first-interaction@v1
+      - uses: actions/first-interaction@2ec0f0fd78838633cd1c1342e4536d49ef72be54 # v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           issue-message: |
