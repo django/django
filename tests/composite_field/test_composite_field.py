@@ -125,18 +125,22 @@ class CompositeFieldTests(TestCaseSetup):
         self.assertEqual(result["first_name"], "John")
 
     def test_composite_with_nested_fields(self):
-        subquery = Post.objects.filter(user__pk=self.user1.pk).values(
+        subquery = Post.objects.filter(user=OuterRef("pk")).values(
             "user__email",
             "title",
             "body",
             "user__id",
-        )
+        )[:1]
 
-        qs = User.objects.alias(some=subquery).values(
-            "some__title",
-            "some__body",
-            "some__user__email",
-            "some__user__id",
+        qs = (
+            User.objects.alias(some=subquery)
+            .values(
+                "some__title",
+                "some__body",
+                "some__user__email",
+                "some__user__id",
+            )
+            .filter(pk=self.user1.pk)
         )
 
         self.assertEqual(qs[0]["some__title"], "user1 first post title")
@@ -165,16 +169,16 @@ class CompositeFieldTests(TestCaseSetup):
         self.assertEqual(qs.count(), 1)
 
     def test_composite_aggregation_and_ordering(self):
-        subquery = Post.objects.filter(user__pk=self.user1.pk).values("user__email")
+        subquery = Post.objects.filter(user=OuterRef("pk")).values("user__email")[:1]
 
         qs_ordered = User.objects.alias(some=subquery).order_by("some__user__email")
 
-        self.assertEqual(qs_ordered.count(), 9)
+        self.assertEqual(qs_ordered.count(), 3)
 
         qs_agg = User.objects.alias(some=subquery).aggregate(
             total=Count("some__user__email")
         )
-        self.assertEqual(qs_agg["total"], 9)
+        self.assertEqual(qs_agg["total"], 3)
 
     def test_composite_rhs_with_f_expression(self):
         subquery = User.objects.filter(pk=self.user1.pk).values("email")
@@ -237,9 +241,9 @@ class CompositeFieldTests(TestCaseSetup):
         self.assertEqual(qs.first().is_john, "Yes")
 
     def test_composite_subfield_in_lookup(self):
-        subquery = Post.objects.filter(user__pk=self.user1.pk).values(
-            "user__id", "title"
-        )
+        subquery = Post.objects.filter(user=OuterRef("pk")).values("user__id", "title")[
+            :1
+        ]
 
         allowed_ids = [self.user3.pk, self.user2.pk]
         qs = (
@@ -248,7 +252,7 @@ class CompositeFieldTests(TestCaseSetup):
             .values("id")
         )
 
-        self.assertEqual(len(qs), 0)
+        self.assertEqual(len(qs), 2)
 
     def test_composite_subquery_returning_empty_resolves_to_none(self):
         empty_subquery = User.objects.filter(first_name="no_name").values("email")
@@ -259,7 +263,9 @@ class CompositeFieldTests(TestCaseSetup):
             .values("extracted_email")
         )
 
-        self.assertIsNone(qs.first())
+        result = qs.first()
+        self.assertIsNotNone(result)
+        self.assertIsNone(result["extracted_email"])
 
     def test_composite_subfield_explicit_cast(self):
         subquery = BugReport.objects.filter(pk=self.bug_report.pk).values(
@@ -883,3 +889,17 @@ class TupleLookupTests(TestCaseSetup):
         rhs_qs = User.objects.filter(pk=self.user1.pk).values()
         qs = User.objects.filter(id__in=rhs_qs)
         self.assertSequenceEqual(qs, [self.user1])
+
+
+class SingleColumnValuesSubqueryTests(TestCaseSetup):
+    def test_single_column_values_subquery_zero_rows(self):
+        # subquery result is zero
+        subquery = User.objects.filter(email="nonexistent@mail.com").values("email")
+        qs = (
+            User.objects.alias(info=subquery)
+            .annotate(the_email=F("info"))
+            .values("the_email")
+        )
+        self.assertEqual(len(list(qs)), 3)
+        for row in qs:
+            self.assertIsNone(row["the_email"])

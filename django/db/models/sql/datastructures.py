@@ -29,47 +29,6 @@ class TableExpression(Expression):
     is_composite = False
 
 
-class Relation(TableExpression):
-    join_type = None
-    parent_alias = None
-    filtered_relation = None
-    is_composite = True
-    relation_join_sql = "CROSS JOIN"  # this will render `CROSS JOIN (SELECT ...) alias`
-
-    def __init__(self, expression, alias=None, output_field=None):
-        self.expression = expression
-        self.table_name = alias
-        self.alias = alias
-        self.table_alias = alias
-        self.output_field = output_field
-
-    def as_sql(self, compiler, connection):
-        sql, params = self.expression.as_sql(compiler, connection)
-        return (
-            f"{self.relation_join_sql} {sql} {compiler.quote_name(self.alias)}",
-            params,
-        )
-
-    def relabeled_clone(self, change_map):
-        alias = change_map.get(self.alias, self.alias)
-        expression = (
-            self.expression.clone()
-            if hasattr(self.expression, "clone")
-            else self.expression.copy()
-        )
-        return self.__class__(expression, alias, self.output_field)
-
-
-class SubqueryTable(Relation):
-    """
-    Temporary table-expression adapter for using a subquery in the FROM clause.
-    """
-
-    def __init__(self, query, alias=None, output_field=None):
-        super().__init__(query, alias, output_field)
-        self.query = self.expression
-
-
 class Join(TableExpression):
     """
     Used by sql.Query and sql.SQLCompiler to generate JOIN clauses into the

@@ -41,13 +41,7 @@ from django.db.models.query_utils import (
     refs_expression,
 )
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
-from django.db.models.sql.datastructures import (
-    BaseTable,
-    Empty,
-    Join,
-    MultiJoin,
-    SubqueryTable,
-)
+from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
 from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
 from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
 from django.utils.functional import cached_property
@@ -1261,17 +1255,6 @@ class Query(BaseExpression):
     def add_annotation(self, annotation, alias, select=True):
         """Add a single annotation expression to the Query."""
         self.check_alias(alias)
-        is_composite = getattr(
-            getattr(annotation, "_output_field_or_none", None), "is_composite", False
-        )
-        if not is_composite and hasattr(annotation, "query"):
-            is_composite = getattr(
-                getattr(annotation.query, "output_field", None), "is_composite", False
-            )
-
-        if is_composite:
-            self.add_composite_annotation(annotation, alias, select=select)
-            return
         annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None)
         if select:
             self.append_annotation_mask([alias])
@@ -1280,51 +1263,6 @@ class Query(BaseExpression):
         self.annotations[alias] = annotation
         if select and self.selected:
             self.selected[alias] = alias
-
-    def add_composite_annotation(self, annotation, alias, select=True):
-        annotation = annotation.resolve_expression(
-            self,
-            allow_joins=True,
-            reuse=None,
-        )
-        self.get_initial_alias()
-        annotation.alias = alias
-        self.annotations[alias] = annotation
-        if self.is_relation_source(annotation, select):
-            subquery = self._get_subquery(annotation)
-            self.add_relation(
-                SubqueryTable(subquery.clone(), alias, annotation.output_field),
-                alias,
-            )
-            self.set_annotation_mask(set(self.annotation_select).difference({alias}))
-        else:
-            if select:
-                self.append_annotation_mask([alias])
-                if self.selected:
-                    self.selected[alias] = alias
-            else:
-                self.set_annotation_mask(
-                    set(self.annotation_select).difference({alias})
-                )
-
-    def _get_subquery(self, annotation):
-        if hasattr(annotation, "query"):
-            return annotation.query
-        return annotation
-
-    def is_relation_source(self, annotation, select):
-        if select:
-            return False
-        if hasattr(annotation, "query"):
-            return not getattr(annotation.query, "external_aliases", None)
-        if isinstance(annotation, Query):
-            return not getattr(annotation, "external_aliases", None)
-        return False
-
-    def add_relation(self, relation, alias):
-        self.alias_map[alias] = relation
-        self.alias_refcount[alias] = 1
-        self.table_map[alias] = [alias]
 
     @property
     def _subquery_fields_len(self):
@@ -1543,24 +1481,24 @@ class Query(BaseExpression):
         transform_class = lhs.get_transform(name)
         if transform_class:
             return transform_class(lhs)
-
-        output_field = lhs.output_field.__class__
-        suggested_lookups = difflib.get_close_matches(
-            name, lhs.output_field.get_lookups()
-        )
-        if suggested_lookups:
-            suggestion = ", perhaps you meant %s?" % " or ".join(suggested_lookups)
         else:
-            suggestion = "."
-        if lookups is not None:
-            name_index = lookups.index(name)
-            unsupported_lookup = LOOKUP_SEP.join(lookups[name_index:])
-        else:
-            unsupported_lookup = name
-        raise FieldError(
-            "Unsupported lookup '%s' for %s or join on the field not "
-            "permitted%s" % (unsupported_lookup, output_field.__name__, suggestion)
-        )
+            output_field = lhs.output_field.__class__
+            suggested_lookups = difflib.get_close_matches(
+                name, lhs.output_field.get_lookups()
+            )
+            if suggested_lookups:
+                suggestion = ", perhaps you meant %s?" % " or ".join(suggested_lookups)
+            else:
+                suggestion = "."
+            if lookups is not None:
+                name_index = lookups.index(name)
+                unsupported_lookup = LOOKUP_SEP.join(lookups[name_index:])
+            else:
+                unsupported_lookup = name
+            raise FieldError(
+                "Unsupported lookup '%s' for %s or join on the field not "
+                "permitted%s" % (unsupported_lookup, output_field.__name__, suggestion)
+            )
 
     def build_filter(
         self,

@@ -1867,13 +1867,14 @@ class Subquery(BaseExpression, Combinable):
             resolved.query.contains_subquery = True
             # Subquery is an unnecessary shim for a resolved query as it
             # complexifies the lookup's right-hand-side introspection.
-            output_field = resolved._output_field_or_none
-            if output_field is None:
+            try:
+                self.output_field
+            except AttributeError:
                 return resolved.query
-            if output_field.is_composite and output_field.has_one_field:
+            if self.output_field.is_composite and self.output_field.has_one_field:
                 return resolved
-            if type(output_field) is not type(resolved.query.output_field):
-                return ExpressionWrapper(resolved.query, output_field=output_field)
+            if type(self.output_field) is not type(resolved.query.output_field):
+                return ExpressionWrapper(resolved.query, output_field=self.output_field)
             return resolved.query
         return resolved
 

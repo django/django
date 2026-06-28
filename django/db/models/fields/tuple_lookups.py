@@ -88,7 +88,7 @@ class TupleLookupMixin:
             )
 
     def check_rhs_is_supported_expression(self):
-        if not isinstance(self.rhs, (ResolvedOuterRef, Query)):
+        if not isinstance(self.rhs, (ResolvedOuterRef, Query, Subquery)):
             lhs_str = self.get_lhs_str()
             rhs_cls = self.rhs.__class__.__name__
             raise ValueError(
@@ -141,7 +141,7 @@ class TupleLookupMixin:
             sql, params = compiler.compile(self.rhs)
             if isinstance(self.rhs, ColPairs):
                 return "(%s)" % sql, params
-            elif isinstance(self.rhs, Query):
+            elif isinstance(self.rhs, (Query, Subquery)):
                 return super().process_rhs(compiler, connection)
             else:
                 raise ValueError(
@@ -157,8 +157,10 @@ class TupleLookupMixin:
     def as_sql(self, compiler, connection):
         if (
             not connection.features.supports_tuple_comparison_against_subquery
-            and isinstance(self.rhs, Query)
-            and self.rhs.subquery
+            and (
+                (isinstance(self.rhs, Query) and self.rhs.subquery)
+                or isinstance(self.rhs, Subquery)
+            )
             and isinstance(
                 self, (GreaterThan, GreaterThanOrEqual, LessThan, LessThanOrEqual)
             )
@@ -176,7 +178,7 @@ class TupleLookupMixin:
 
 class TupleExact(TupleLookupMixin, Exact):
     def get_fallback_sql(self, compiler, connection):
-        if isinstance(self.rhs, Query):
+        if isinstance(self.rhs, (Query, Subquery)):
             return super(TupleLookupMixin, self).as_sql(compiler, connection)
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
@@ -402,7 +404,8 @@ class TupleIn(TupleLookupMixin, In):
         rhs = self.rhs
         if not rhs:
             raise EmptyResultSet
-        if isinstance(rhs, Query):
+        if isinstance(rhs, (Query, Subquery)):
+            rhs = rhs.query if isinstance(rhs, Subquery) else rhs
             rhs_exprs = itertools.chain.from_iterable(
                 (
                     select_expr
