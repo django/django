@@ -38,9 +38,9 @@ from django.test.utils import captured_stdout, extend_sys_path, isolate_apps
 from django.utils import timezone
 from django.utils.version import get_docs_version
 
+from .base import MigrationTestBase
 from .models import UnicodeModel, UnserializableModel
 from .routers import TestRouter
-from .test_base import MigrationTestBase
 
 HAS_BLACK = shutil.which("black")
 

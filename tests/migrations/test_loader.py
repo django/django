@@ -17,7 +17,7 @@ from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import TestCase, modify_settings, override_settings
 
-from .test_base import MigrationTestBase
+from .base import MigrationTestBase
 
 
 class RecorderTests(TestCase):
