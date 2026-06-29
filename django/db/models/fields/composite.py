@@ -214,25 +214,7 @@ class CompositeSubfieldTransform(Transform):
             current_lhs = current_lhs.lhs
         full_lookup_name = "__".join(parts)
 
-        if (
-            hasattr(current_lhs, "alias")
-            and current_lhs.alias
-            and current_lhs.alias in compiler.query.alias_map
-        ):
-            table_alias = current_lhs.alias
-            quoted_table = compiler.quote_name(table_alias)
-            quoted_column = compiler.quote_name(full_lookup_name)
-            return f"{quoted_table}.{quoted_column}", []
-        elif hasattr(current_lhs, "refs"):
-            table_alias = current_lhs.refs
-            quoted_table = compiler.quote_name(table_alias)
-            quoted_column = compiler.quote_name(full_lookup_name)
-            return f"{quoted_table}.{quoted_column}", []
-        elif getattr(current_lhs, "subquery", False) and hasattr(current_lhs, "query"):
-            query = current_lhs.query
-            query.set_values([full_lookup_name])
-            return query.as_sql(compiler, connection)
-        elif isinstance(current_lhs, type(compiler.query)):
+        if isinstance(current_lhs, type(compiler.query)):
             query = current_lhs
             query.set_values([full_lookup_name])
             return query.as_sql(compiler, connection)

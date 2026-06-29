@@ -16,8 +16,9 @@ from django.db.models import (
     Value,
     When,
 )
-from django.db.models.expressions import Exists, Subquery
+from django.db.models.expressions import Col, Exists, Subquery
 from django.db.models.functions import Cast, Coalesce, Concat, Length, Lower
+from django.db.models.sql.query import Query
 from django.test import TestCase
 
 from .models import BugReport, Post, Project, Task, User, Version, Workspace
@@ -724,6 +725,87 @@ class CompositeFieldTests(TestCaseSetup):
         self.assertFalse(User.objects.exclude(Exists(inner)).exists())
         self.assertCountEqual(qs2, User.objects.exclude(~Exists(inner)))
 
+    def test_composite_query_output_field_single_select(self):
+        subquery = User.objects.filter(pk=OuterRef("pk")).values("email")
+        qs = User.objects.alias(subq=subquery).filter(subq="test@example.com")
+        self.assertEqual(qs.count(), 0)
+
+        query = Query(User)
+        self.assertIsNone(query.output_field)
+
+    def test_composite_composite_subfield_transform_relation(self):
+        subquery = Post.objects.filter(pk=OuterRef("pk")).values("id", "user")
+
+        qs = (
+            Post.objects.alias(info=subquery)
+            .annotate(user_first_name=F("info__user__first_name"))
+            .filter(user_first_name="John")
+        )
+
+        self.assertEqual(qs.count(), 3)
+        self.assertCountEqual(
+            [p.pk for p in qs], [self.posts[0].pk, self.posts[1].pk, self.posts[2].pk]
+        )
+
+    def test_composite_composite_subfield_transform_as_sql_refs(self):
+        subquery = User.objects.filter(pk=OuterRef("pk")).values("id", "email")
+        qs = (
+            User.objects.alias(info=subquery)
+            .annotate(email_alias=F("info__email"))
+            .filter(email_alias="user001@mail.com")
+        )
+        self.assertEqual(qs.count(), 1)
+
+    def test_composite_composite_subfield_transform_as_sql_subquery(self):
+        comp = CompositeField(id=IntegerField(), email=CharField())
+        subquery = Subquery(
+            User.objects.filter(pk=OuterRef("pk")).values("id", "email")[:1],
+            output_field=comp,
+        )
+
+        qs = User.objects.annotate(info=subquery).filter(info__email="user001@mail.com")
+        self.assertEqual(qs.count(), 1)
+
+    def test_composite_composite_field_from_select_no_annotations(self):
+        fields = [
+            Col("test_composite_table", User._meta.get_field("email")),
+            Col("test_composite_table", User._meta.get_field("first_name")),
+        ]
+        comp = CompositeField.from_select(fields)
+
+        self.assertIsInstance(comp, CompositeField)
+        self.assertIn("email", comp.sub_fields)
+        self.assertIn("first_name", comp.sub_fields)
+
+    def test_composite_composite_field_single_subfield_error(self):
+        comp = CompositeField(id=CharField(), email=CharField())
+        with self.assertRaisesMessage(TypeError, "No single subfield"):
+            _ = comp.output_field_when_only_one_subfield
+
+    def test_composite_composite_field_init_errors(self):
+        with self.assertRaisesMessage(
+            ValueError, "At least one fields should be there"
+        ):
+            CompositeField()
+        with self.assertRaisesMessage(TypeError, "'email' should field instance"):
+            CompositeField(email="not a field")
+
+    def test_composite_composite_subfield_transform_as_sql_query(self):
+        q = User.objects.filter(pk=OuterRef("pk")).values("id", "email")[:1].query
+
+        qs = User.objects.annotate(info=q).filter(info__email="user001@mail.com")
+
+        self.assertEqual(qs.count(), 1)
+
+    def test_composite_combined_expression_single_subfield_composite(self):
+        comp = CompositeField(id=IntegerField())
+
+        expr = Value(1, output_field=comp) + 2
+        self.assertIsInstance(expr.output_field, IntegerField)
+
+        expr2 = 1 + Value(2, output_field=comp)
+        self.assertIsInstance(expr2.output_field, IntegerField)
+
 
 class TupleLookupTests(TestCaseSetup):
     @classmethod
@@ -889,6 +971,13 @@ class TupleLookupTests(TestCaseSetup):
         rhs_qs = User.objects.filter(pk=self.user1.pk).values()
         qs = User.objects.filter(id__in=rhs_qs)
         self.assertSequenceEqual(qs, [self.user1])
+
+    def test_composite_tuple_lookup_composite_lhs(self):
+        subquery = User.objects.filter(pk=OuterRef("pk")).values("id", "email")
+        with self.assertRaisesMessage(
+            ValueError, "'gt' lookup of ('id', 'email') must be a tuple or a list"
+        ):
+            list(User.objects.alias(info=subquery).filter(info__gt=5))
 
 
 class SingleColumnValuesSubqueryTests(TestCaseSetup):
