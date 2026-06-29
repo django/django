@@ -19,8 +19,8 @@ from django.test import (
 )
 from django.test.utils import CaptureQueriesContext
 
+from .base import OperationTestBase
 from .models import FoodManager, FoodQuerySet, UnicodeModel
-from .test_base import OperationTestBase
 
 
 class Mixin:
