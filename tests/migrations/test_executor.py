@@ -16,7 +16,7 @@ from django.test import (
 )
 from django.test.utils import isolate_lru_cache
 
-from .test_base import MigrationTestBase
+from .base import MigrationTestBase
 
 
 @modify_settings(INSTALLED_APPS={"append": "migrations2"})
