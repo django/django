@@ -1036,6 +1036,39 @@ class TestQuerying(TestCase):
             self.objs[3:5],
         )
 
+    def test_exclude_full_result_set(self):
+        self.assertCountEqual(
+            NullableJSONModel.objects.exclude(value__k="x", num__in=[]), self.objs
+        )
+
+    def test_exclude_empty_result_set(self):
+        self.assertCountEqual(
+            NullableJSONModel.objects.exclude(Q(value__k="x") | ~Q(num__in=[])),
+            [],
+        )
+
+    def test_exclude_full_result_set_leaf(self):
+        self.assertCountEqual(
+            NullableJSONModel.objects.exclude(
+                Q(value__k="x") & Q(num__range=(None, None))
+            ),
+            self.objs,
+        )
+
+    def test_exclude_empty_result_set_leaf(self):
+        self.assertCountEqual(
+            NullableJSONModel.objects.exclude(Q(value__k="x") | Q(num__in=[])),
+            [self.objs[0], self.objs[4], self.objs[6]],
+        )
+
+    def test_exclude_never_true_or_branches(self):
+        self.assertCountEqual(
+            NullableJSONModel.objects.exclude(
+                Q(value__k="x") & Q(num__in=[]) | Q(num__in=[])
+            ),
+            self.objs,
+        )
+
     @skipUnlessDBFeature("supports_json_field_contains")
     def test_array_key_contains(self):
         tests = [
