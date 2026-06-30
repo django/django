@@ -74,7 +74,7 @@ to read this whole section before attempting to find a ticket to work on.
 Assessing tickets
 -----------------
 
-When `looking over tickets`_, it's a good idea to keep your search to
+When looking over tickets, it's a good idea to keep your search to
 tickets that were created in the last five years. An easy way to tell is
 by the ticket number. Avoid tickets older than 10 years old. These are old
 for a reason. You're welcome to try, but they will require a high
@@ -87,7 +87,12 @@ consider filtering down to the forms components. Similarly, if you've
 never worked with geospatial projects, it's probably wise to avoid
 ``django.contrib.gis``.
 
-.. _looking over tickets: https://code.djangoproject.com/query?stage=Accepted&status=assigned&status=new&order=id&desc=1&col=id&col=summary&col=owner&col=type&col=component&col=time&col=changetime
+* View `tickets with created and modified columns`_.
+
+* View `tickets for the documentation component`_.
+
+.. _tickets with created and modified columns: https://code.djangoproject.com/query?stage=Accepted&status=assigned&status=new&order=id&desc=1&col=id&col=summary&col=owner&col=type&col=component&col=time&col=changetime
+.. _tickets for the documentation component: https://code.djangoproject.com/query?component=Documentation&stage=Accepted&status=assigned&status=new&order=id&desc=1&col=id&col=summary&col=owner&col=type&col=component&col=time&col=changetime
 
 Methods to find tickets
 -----------------------
@@ -103,13 +108,24 @@ haven't been touched in six months or longer. The ideal ticket has a PR
 attached to it that has a code review with explicit requests and the author
 has not responded in at least six months on the PR and on the ticket.
 
-When you find a stale ticket, make yourself the owner on the ticket with
-the "Modify Ticket" button near the bottom of the page. Claim the ticket
-by clicking the "assign to" radio button in the "Action" section. Your
-username will be filled in the text box by default.
+To view a list of possibly vulture-able tickets, you can run the following
+command to generate a link to the page.
+
+.. console::
+
+    $ python -c "from datetime import date,timedelta;from urllib.parse import urlencode;t=date.today();f=lambda d:(lambda x:f'{x:%b} {x.day}, {x:%Y}')(t+timedelta(d));print('https://code.djangoproject.com/query?'+urlencode([('changetime', f(-1610)+'..'+f(-151)),('description','~'),('needs_better_patch','1'),('status','assigned'),('status','new'),('time' ,f(-1610)+'..'+f(0)),('order','id'),('desc','1'),('col','id'),('col','summary'),('col','time'),('col','changetime'), ('col','needs_better_patch'),('col','owner'),('col','type'),('col','component')]))"
 
 .. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1
 .. _vulture method: https://youtube.com/shorts/D6QHet5U82U?si=j5M6sy0ufpeGy_iZ
+
+Claiming a ticket
+-----------------
+
+When you find a ticket, make yourself the owner on the ticket with
+the "Modify Ticket" button near the bottom of the page. Claim the ticket
+by clicking the "assign to" radio button in the "Action" section. Your
+username will be filled in the text box by default. The :ref:`full
+documentation on claiming tickets can be found here.<claiming-tickets>`
 
 Resuming work from someone else's branch
 ========================================
