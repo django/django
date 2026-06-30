@@ -251,7 +251,14 @@ Utilities
 Validators
 ~~~~~~~~~~
 
-* ...
+* :class:`~django.core.validators.EmailValidator` now includes the invalid
+  ``username`` or ``domain`` in the ``params`` dict of the
+  :exc:`~django.core.exceptions.ValidationError` it raises. The new
+  :meth:`~django.core.validators.EmailValidator.parse_address`,
+  :meth:`~django.core.validators.EmailValidator.validate`,
+  :meth:`~django.core.validators.EmailValidator.validate_domain`, and
+  :meth:`~django.core.validators.EmailValidator.validate_username` methods can
+  be overridden to customize how the address is parsed and validated.
 
 .. _backwards-incompatible-6.2:
 
@@ -291,6 +298,13 @@ Miscellaneous
 
 Features deprecated in 6.2
 ==========================
+
+Validators
+----------
+
+* The undocumented ``EmailValidator.validate_domain_part()`` method is
+  deprecated in favor of the new
+  :meth:`~django.core.validators.EmailValidator.validate_domain` method.
 
 Miscellaneous
 -------------

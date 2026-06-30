@@ -23,6 +23,9 @@ details on these changes.
 * Calling ``QuerySet.aiterator()`` after ``prefetch_related()`` without
   providing a ``chunk_size`` will raise :exc:`ValueError`.
 
+* The undocumented ``EmailValidator.validate_domain_part()`` method will be
+  removed.
+
 .. _deprecation-removed-in-7.0:
 
 7.0
