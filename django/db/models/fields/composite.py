@@ -5,7 +5,7 @@ from django.core import checks
 from django.core.exceptions import FieldError
 from django.db.models import NOT_PROVIDED, Field
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import ColPairs
+from django.db.models.expressions import ColPairs, CompositeCol
 from django.db.models.fields.tuple_lookups import (
     TupleExact,
     TupleGreaterThan,
@@ -15,7 +15,6 @@ from django.db.models.fields.tuple_lookups import (
     TupleLessThan,
     TupleLessThanOrEqual,
 )
-from django.db.models.lookups import Transform
 from django.utils.functional import cached_property
 
 
@@ -181,47 +180,6 @@ def unnest(fields):
     return result
 
 
-class CompositeSubfieldTransform(Transform):
-    def __init__(self, expression, lookup_name, output_field, **kwargs):
-        super().__init__(expression, **kwargs)
-        self.lookup_name = lookup_name
-        self._output_field = output_field
-
-    @property
-    def output_field(self):
-        return self._output_field
-
-    def get_transform(self, name):
-        if (
-            getattr(self.output_field, "is_relation", False)
-            and self.output_field.related_model
-        ):
-            target_field = self.output_field.related_model._meta.get_field(name)
-            return partial(
-                CompositeSubfieldTransform, lookup_name=name, output_field=target_field
-            )
-        return super().get_transform(name)
-
-    def as_sql(self, compiler, connection):
-        """
-        Render a reference to a sub-column of a composite table expression.
-        """
-        current_lhs = self.lhs
-        parts = [self.lookup_name]
-
-        while isinstance(current_lhs, CompositeSubfieldTransform):
-            parts.insert(0, current_lhs.lookup_name)
-            current_lhs = current_lhs.lhs
-        full_lookup_name = "__".join(parts)
-
-        if isinstance(current_lhs, type(compiler.query)):
-            query = current_lhs
-            query.set_values([full_lookup_name])
-            return query.as_sql(compiler, connection)
-        else:
-            raise FieldError("Cannot resolve table alias for composite field. ")
-
-
 class CompositeField(Field):
     is_composite = True
 
@@ -311,9 +269,7 @@ class CompositeField(Field):
                 if transform is not None:
                     return transform
             return super().get_transform(name)
-        return partial(
-            CompositeSubfieldTransform, lookup_name=name, output_field=subfield
-        )
+        return partial(CompositeCol, lookup_name=name, output_field=subfield)
 
     @property
     def path_infos(self):

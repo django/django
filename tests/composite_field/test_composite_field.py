@@ -806,6 +806,81 @@ class CompositeFieldTests(TestCaseSetup):
         expr2 = 1 + Value(2, output_field=comp)
         self.assertIsInstance(expr2.output_field, IntegerField)
 
+    def test_composite_alias_reused_consecutively(self):
+        subquery = User.objects.filter(pk=OuterRef("pk")).values("email", "first_name")
+        qs = User.objects.annotate(info=subquery).filter(pk=self.user1.pk)
+
+        email = list(qs.values_list("info__email", flat=True))[0]
+        name = list(qs.values_list("info__first_name", flat=True))[0]
+
+        self.assertEqual(email, "user001@mail.com")
+        self.assertEqual(name, "John")
+
+    def test_composite_same_annotation_in_filter_and_values(self):
+        subquery = User.objects.filter(pk=OuterRef("pk")).values("email", "first_name")
+        qs = (
+            User.objects.annotate(info=subquery)
+            .filter(info__email="user001@mail.com")
+            .values_list("info__first_name", flat=True)
+        )
+        self.assertEqual(list(qs), ["John"])
+
+    def test_composite_multiple_references_in_expression(self):
+        subquery = User.objects.filter(pk=OuterRef("pk")).values("email")
+        qs = (
+            User.objects.annotate(info=subquery)
+            .annotate(
+                doubled=Concat(
+                    "info__email", Value("-"), "info__email", output_field=CharField()
+                )
+            )
+            .values_list("doubled", flat=True)
+            .filter(pk=self.user1.pk)
+        )
+        self.assertEqual(list(qs), ["user001@mail.com-user001@mail.com"])
+
+    def test_composite_alias_reused_in_filter_and_order_by(self):
+        subquery = User.objects.filter(pk=OuterRef("pk")).values("email")
+        qs = (
+            User.objects.alias(info=subquery)
+            .filter(info__email__startswith="user")
+            .order_by("-info__email")
+            .values_list("info__email", flat=True)
+        )
+        self.assertEqual(
+            list(qs), ["user003@mail.com", "user002@mail.com", "user001@mail.com"]
+        )
+
+    def test_composite_nested_used_twice(self):
+        subquery = Post.objects.filter(user=OuterRef("pk")).values(
+            "user__email",
+            "user__first_name",
+        )[:1]
+
+        qs = (
+            User.objects.alias(info=subquery)
+            .values(
+                "info__user__email",
+                "info__user__first_name",
+            )
+            .filter(pk=self.user1.pk)
+        )
+
+        self.assertEqual(qs[0]["info__user__email"], "user001@mail.com")
+        self.assertEqual(qs[0]["info__user__first_name"], "John")
+
+    def test_composite_sql_generation_stability(self):
+        subquery = User.objects.filter(pk=OuterRef("pk")).values("email")
+        qs = (
+            User.objects.alias(info=subquery)
+            .annotate(doubled_email=F("info__email"))
+            .filter(info__email__startswith="user")
+        )
+        sql = str(qs.query)
+        self.assertIn("email", sql)
+        self.assertNotIn('"info"', sql)
+        self.assertNotIn("`info`", sql)
+
 
 class TupleLookupTests(TestCaseSetup):
     @classmethod

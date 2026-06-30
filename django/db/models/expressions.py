@@ -1505,6 +1505,82 @@ class Ref(Expression):
         return [self]
 
 
+class CompositeCol(Expression):
+    """
+    This represents a subfield of a CompositeField.
+
+    `info__email` creates a `CompositeCol` for `email`. Nested lookups
+    such as `info__user__email` create nested `CompositeCol`
+    expressions.
+
+    Since each `CompositeCol` stores only one lookup name, the nested
+    expressions are walked during SQL compilation to recover the complete
+    lookup path. If the source is a subquery, it is cloned and its SELECT
+    clause is rewritten to return only the requested subfield.
+    """
+
+    def __init__(self, lhs, lookup_name, output_field):
+        super().__init__(output_field=output_field)
+        self.lhs = lhs
+        self.lookup_name = lookup_name
+
+    def get_transform(self, name):
+        output_field = self.output_field
+        # traversal: info__user__email
+        if getattr(output_field, "is_relation", False) and output_field.related_model:
+            target_field = output_field.related_model._meta.get_field(name)
+            return functools.partial(
+                CompositeCol, lookup_name=name, output_field=target_field
+            )
+        return output_field.get_transform(name)
+
+    def _resolve_lookup_path(self):
+        """
+        Walk up through nested CompositeCol objects to
+        rebuild the original lookup.
+
+        For example:
+            info__user__email
+
+        becomes:
+            CompositeCol(
+                CompositeCol(query, "user", ...),
+                "email",
+                ...,
+            )
+
+        This method returns:
+        - ["user", "email"]
+        - the original left-hand side expression (usually the Query)
+        """
+        parts = []
+        current = self
+        while isinstance(current, CompositeCol):
+            parts.append(current.lookup_name)
+            current = current.lhs
+        parts.reverse()
+        return parts, current
+
+    def as_sql(self, compiler, connection):
+        """
+        Generate the SQL.
+        for example, if a subquery returns,
+        `values("user__email", "title")`
+
+        and the lookup is `info__user__email`
+
+        the subquery is cloned and its SELECT clause is rewrote to
+        `values("user__email")`
+
+        so only the requested subfield is returned.
+        """
+        parts, root_lhs = self._resolve_lookup_path()
+        full_lookup = LOOKUP_SEP.join(parts)
+        query = root_lhs.clone()
+        query.set_values([full_lookup])
+        return query.as_sql(compiler, connection)
+
+
 class ExpressionList(Func):
     """
     An expression containing multiple expressions. Can be used to provide a
