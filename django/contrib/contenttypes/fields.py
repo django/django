@@ -10,7 +10,7 @@ from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import DEFAULT_DB_ALIAS, models, router, transaction
 from django.db.models import DO_NOTHING, ForeignObject, ForeignObjectRel
 from django.db.models.base import ModelBase, make_foreign_order_accessors
-from django.db.models.deletion import DatabaseOnDelete
+from django.db.models.deletion import GENERIC_ON_DELETE, DatabaseOnDelete
 from django.db.models.fields import Field
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related import (
@@ -317,6 +317,7 @@ class GenericRel(ForeignObjectRel):
         related_name=None,
         related_query_name=None,
         limit_choices_to=None,
+        on_delete=models.CASCADE
     ):
         super().__init__(
             field,
@@ -324,7 +325,7 @@ class GenericRel(ForeignObjectRel):
             related_name=related_query_name or "+",
             related_query_name=related_query_name,
             limit_choices_to=limit_choices_to,
-            on_delete=DO_NOTHING,
+            on_delete=on_delete,
         )
 
 
@@ -356,20 +357,25 @@ class GenericRelation(ForeignObject):
         limit_choices_to=None,
         **kwargs,
     ):
+        on_delete = kwargs.get("on_delete", models.CASCADE)
+        if on_delete not in GENERIC_ON_DELETE:
+            raise NotImplementedError(f"{on_delete} is not supported")
+
         kwargs["rel"] = self.rel_class(
             self,
             to,
             related_query_name=related_query_name,
             limit_choices_to=limit_choices_to,
+            on_delete=on_delete
         )
 
         # Reverse relations are always nullable (Django can't enforce that a
         # foreign key on the related model points to this model).
         kwargs["null"] = True
         kwargs["blank"] = True
-        kwargs["on_delete"] = models.CASCADE
         kwargs["editable"] = False
         kwargs["serialize"] = False
+        kwargs["on_delete"] = on_delete
 
         # This construct is somewhat of an abuse of ForeignObject. This field
         # represents a relation from pk to object_id field. But, this relation

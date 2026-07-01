@@ -101,7 +101,7 @@ DB_SET_DEFAULT = DatabaseOnDelete("SET DEFAULT", "DB_SET_DEFAULT")
 DB_SET_NULL = DatabaseOnDelete("SET NULL", "DB_SET_NULL")
 
 SKIP_COLLECTION = frozenset([DO_NOTHING, DB_CASCADE, DB_SET_DEFAULT, DB_SET_NULL])
-
+GENERIC_ON_DELETE = frozenset([CASCADE, DO_NOTHING])
 
 def get_candidate_relations_to_delete(opts):
     # The candidate relations are the ones that come from N-1 and 1-1
@@ -399,10 +399,11 @@ class Collector:
         for field in model._meta.private_fields:
             if hasattr(field, "bulk_related_objects"):
                 # It's something like generic foreign key.
-                sub_objs = field.bulk_related_objects(new_objs, self.using)
-                self.collect(
-                    sub_objs, source=model, nullable=True, fail_on_restricted=False
-                )
+                if field.remote_field.on_delete == CASCADE:
+                    sub_objs = field.bulk_related_objects(new_objs, self.using)
+                    self.collect(
+                        sub_objs, source=model, nullable=True, fail_on_restricted=False
+                    )
 
         if fail_on_restricted:
             # Raise an error if collected restricted objects (RESTRICT) aren't
