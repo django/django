@@ -63,8 +63,8 @@ There are a lot of details, so please read on.
    populates a lot of boilerplate you will need for announcements, CVE
    publication, and hashes for commit messages. By using this app for preparing
    security issue metadata, your peer releasers can check your entries and
-   consult them again in the future.
-   (`Example <https://www.djangoproject.com/checklists/release/5.2.4/>`_)
+   consult them again in the future. See `example checklist
+   <https://www.djangoproject.com/checklists/release/5.2.4/>`_.
 
 Prerequisites
 =============
@@ -742,7 +742,8 @@ You're almost done! All that's left to do now is:
    #. Process the older versions that will reach End-Of-Mainstream and/or
       End-Of-Life support when this final release is published:
 
-      #. Ensure that the EOL versions are mentioned in the blog post. `Example
+      #. Ensure that the EOL versions are mentioned in the blog post. See
+         `example announcement
          <https://www.djangoproject.com/weblog/2025/apr/02/django-52-released/>`_.
 
       #. Create a tag for the EOL stable branch and delete the stable branch.
