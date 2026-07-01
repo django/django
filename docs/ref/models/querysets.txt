@@ -2542,7 +2542,7 @@ them, but it has a few caveats:
     batch_size = 100
     ids_iter = iter(range(1000))
     while ids := list(islice(ids_iter, batch_size)):
-        batch = Entry.objects.filter(ids__in=ids)
+        batch = Entry.objects.filter(id__in=ids)
         for entry in batch:
             entry.headline = f"Updated headline {entry.pk}"
         Entry.objects.bulk_update(batch, ["headline"], batch_size=batch_size)
