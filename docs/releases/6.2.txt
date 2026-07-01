@@ -267,6 +267,9 @@ Miscellaneous
   ``datetime.datetime(2000, 1, 1, 0, 0, 0, 1)`` now serializes to
   ``"2000-01-01T00:00:00"`` rather than ``"2000-01-01T00:00:00.000"``.
 
+* The minimum supported version of ``oracledb`` is increased from 2.3.0 to
+  4.0.2.
+
 .. _deprecated-features-6.2:
 
 Features deprecated in 6.2

@@ -201,3 +201,59 @@ jobs:
       - name: Run tests
         working-directory: ./tests/
         run: python -Wall runtests.py --settings=test_postgres --verbosity=2
+
+  oracle_test_pilot:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          #- rdbms: base-database-service-26ai
+          #- rdbms: autonomous-transaction-processing-serverless-19c
+          - rdbms: autonomous-transaction-processing-serverless-26ai
+    runs-on: [ self-hosted, Linux, X64, OracleTestPilot ]
+    name: Oracle ${{matrix.rdbms}}
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+          cache: 'pip'
+          cache-dependency-path: |
+            'tests/requirements/py3.txt'
+            'tests/requirements/oracle.txt'
+      - name: Install and upgrade packaging tools
+        run: python -m pip install --upgrade pip wheel
+      - run: python -m pip install -r tests/requirements/py3.txt -r tests/requirements/oracle.txt -e .
+      - name: Create Oracle Test Pilot settings file
+        run: mv ./.github/workflows/data/test_oracle_test_pilot.py.tpl ./tests/test_oracle_test_pilot.py
+      - id: create_database
+        uses: oracle-actions/setup-testpilot@0e9d9b877bb35f65e3f1f1c54c6a425329dd7ece # v1.0.27
+        with:
+          oci-service: ${{ matrix.rdbms }}
+          action: create
+          user: django_tests_default,django_tests_other
+          connection-string-format: easy-connect
+
+      - name: Run tests
+        env:
+          TESTPILOT_USERNAME: django_tests_default_${{ github.run_number }}
+          TESTPILOT_PASSWORD: ${{ steps.create_database.outputs.database_password }}
+          TESTPILOT_CONNECTION_STRING_SUFFIX: ${{ steps.create_database.outputs.connection_string_suffix }}
+          RUNID: ${{ github.run_number }}
+          API_HOST: ""
+          TESTPILOT_CLIENT_ID: ""
+          TESTPILOT_TOKEN: ""
+        working-directory: ./tests/
+        run: python -Wall runtests.py --settings=test_oracle_test_pilot --keepdb --noinput --verbosity=2 --timing --parallel 1
+
+      - uses: oracle-actions/setup-testpilot@0e9d9b877bb35f65e3f1f1c54c6a425329dd7ece # v1.0.27
+        if: always()
+        with:
+          oci-service: ${{ matrix.rdbms }}
+          action: delete
+          user: django_tests_default,django_tests_other
