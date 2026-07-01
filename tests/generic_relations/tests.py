@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.prefetch import GenericPrefetch
 from django.core.exceptions import FieldError, FieldFetchBlocked
+from django.db import models
 from django.db.models import Q, prefetch_related_objects
 from django.db.models.fetch_modes import FETCH_PEERS, RAISE
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
@@ -11,6 +12,7 @@ from .models import (
     Carrot,
     Comparison,
     ConcreteRelatedModel,
+    DoNothingVegetable,
     ForConcreteModelModel,
     ForProxyModelModel,
     Gecko,
@@ -23,6 +25,45 @@ from .models import (
     ValuableTaggedItem,
     Vegetable,
 )
+
+
+class GenericRelationsOnDeleteTests(TestCase):
+    """
+    Tests related to on_delete, where on_delete issomething else
+    other than CASCADE
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.vegetable = DoNothingVegetable.objects.create(name="Eggplant")
+        cls.vegetable.tags.create(tag="yellow")
+        cls.vegetable.tags.create(tag="yummy")
+
+    def comp_func(self, obj):
+        # Original list of tags:
+        return obj.tag, obj.content_type.model_class(), obj.object_id
+
+    def test_deleting_vegetable_does_not_delete_tags(self):
+        pk = self.vegetable.pk
+        self.assertQuerySetEqual(
+            TaggedItem.objects.all(),
+            [
+                ("yellow", DoNothingVegetable, pk),
+                ("yummy", DoNothingVegetable, pk),
+            ],
+            self.comp_func,
+        )
+
+        self.vegetable.delete()
+
+        self.assertQuerySetEqual(
+            TaggedItem.objects.all(),
+            [
+                ("yellow", DoNothingVegetable, pk),
+                ("yummy", DoNothingVegetable, pk),
+            ],
+            self.comp_func,
+        )
 
 
 class GenericRelationsTests(TestCase):
@@ -289,6 +330,17 @@ class GenericRelationsTests(TestCase):
             ],
             self.comp_func,
         )
+
+    def test_generic_relation_has_correct_remote_field(self):
+        """
+        GenericRelation field should correctly tell you that it's using cascade
+        """
+
+        fields = self.lion._meta.get_fields()
+        tag_field = fields[-2]
+
+        self.assertEqual(tag_field.verbose_name, "tags")
+        self.assertEqual(tag_field.remote_field.on_delete, models.CASCADE)
 
     def test_object_deletion_without_generic_relation(self):
         """
