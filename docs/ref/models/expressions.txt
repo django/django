@@ -694,6 +694,27 @@ row: the email address of the most recently created comment.
 ``OuterRef`` cannot be resolved until the queryset is used within a
 ``Subquery``.)
 
+Using multi-column subqueries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A ``Subquery`` can also return multiple columns by calling ``values()`` with
+multiple field names. In this case, the subquery has a ``CompositeField``
+output.
+
+The individual subfields can be referenced using the normal
+double-underscore lookup syntax:
+
+.. code-block:: pycon
+
+    >>> newest = Comment.objects.filter(post=OuterRef("pk")).values("email", "author__name")[:1]
+    >>> Post.objects.annotate(info=newest).values("info__email", "info__author__name")
+
+The subfields can also be used in filters, annotations, ordering, and other
+expressions in the same way as model fields.
+
+A multi-column ``Subquery`` can also be compared as a whole using tuple
+lookups, for example ``__lt``, ``__in``, and ``__gt``.
+
 ``Exists()`` subqueries
 ~~~~~~~~~~~~~~~~~~~~~~~
 
