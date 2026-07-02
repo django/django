@@ -167,8 +167,10 @@ of the page.
 .. code-block:: html+django
     :caption: ``polls/templates/polls/detail.html``
 
-    {{ results_data|json_script:"results-data" }}
-    <div id="results-widget"></div>
+    <h1>{{ question.question_text }}</h1>
+    <results-widget>
+        {{ results_data|json_script }}
+    </results-widget>
     <script src="{% static 'polls/js/results-widget.js' %}" defer></script>
 
 The :tfilter:`json_script` filter safely outputs the data for the JavaScript
@@ -177,45 +179,58 @@ to read.
 .. code-block:: javascript
     :caption: ``polls/static/polls/js/results-widget.js``
 
-    const data = JSON.parse(document.getElementById("results-data").textContent);
-    const root = document.getElementById("results-widget");
+    class ResultsWidget extends HTMLElement {
+        connectedCallback() {
+            const source = this.querySelector("script[type='application/json']");
+            this.data = JSON.parse(source.textContent);
 
-    function render({question, choices}) {
-        root.innerHTML = `<h1>${question}</h1><ul>` +
-            choices.map((c) =>
-                `<li><button data-choice="${c.id}">${c.text}</button> -- ${c.votes}</li>`
-            ).join("") +
-            `</ul>`;
-    }
+            // Delegate on the element itself, which survives each render()
+            // replacing its contents.
+            this.addEventListener("click", (event) => {
+                const button = event.target.closest("button[data-choice]");
+                if (button) {
+                    this.vote(button.dataset.choice);
+                }
+            });
 
-    async function vote(choiceId) {
-        const response = await fetch(data.voteUrl, {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": getCookie("csrftoken"),
-                "Content-Type": "application/json",
-            },
-            mode: "same-origin",
-            body: JSON.stringify({choice: choiceId}),
-        });
-        render(await response.json());
-    }
-
-    // Delegate on root, which survives each render() replacing its contents.
-    root.addEventListener("click", (event) => {
-        const button = event.target.closest("button[data-choice]");
-        if (button) {
-            vote(button.dataset.choice);
+            this.render(this.data);
         }
-    });
 
-    render(data);
+        render({choices}) {
+            const list = document.createElement("ul");
+            for (const choice of choices) {
+                const item = document.createElement("li");
+                const button = document.createElement("button");
+                button.dataset.choice = choice.id;
+                button.textContent = choice.text;
+                item.append(button, ` -- ${choice.votes}`);
+                list.append(item);
+            }
+            this.replaceChildren(list);
+        }
+
+        async vote(choiceId) {
+            const response = await fetch(this.data.voteUrl, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json",
+                },
+                mode: "same-origin",
+                body: JSON.stringify({choice: choiceId}),
+            });
+            this.render(await response.json());
+        }
+    }
+
+    customElements.define("results-widget", ResultsWidget);
 
 The details page continues to be served by a Django view. The view is reworked
-to pass the ``results_data`` object into the context for the JavaScript widget
-to render instead of the question. The vote view is changed to a JSON endpoint
-using :class:`~django.http.JsonResponse`, which updates the vote and returns
-the new state.
+to also pass a ``results_data`` object into the context for the `web component
+<https://developer.mozilla.org/en-US/docs/Web/API/Web_components>`_ to render.
+The vote view is changed to a JSON endpoint using
+:class:`~django.http.JsonResponse`, which updates the vote and returns the new
+state.
 
 .. code-block:: python
     :caption: ``polls/views.py``
@@ -229,7 +244,6 @@ the new state.
 
     def results_data(question):
         return {
-            "question": question.question_text,
             "voteUrl": reverse("polls:vote_json", args=(question.id,)),
             "choices": [
                 {"id": c.id, "text": c.choice_text, "votes": c.votes}
@@ -241,7 +255,9 @@ the new state.
     def detail(request, question_id):
         question = get_object_or_404(Question, pk=question_id)
         return render(
-            request, "polls/detail.html", {"results_data": results_data(question)}
+            request,
+            "polls/detail.html",
+            {"question": question, "results_data": results_data(question)},
         )
 
 
