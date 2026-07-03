@@ -58,7 +58,8 @@ you will need to link the installed libraries to your static files:
 
 * To deliver the library files unchanged, let static files read from where
   they're installed (usually ``node_modules``); the Django ecosystem provides
-  packages that help with this.
+  `packages that help with this
+  <https://djangopackages.org/grids/g/javascript-tooling/>`_.
 * Or, more commonly, to combine, convert, or tree-shake your libraries (and
   your own code), use a build tool whose output goes to a folder in the static
   files tree.
@@ -73,10 +74,9 @@ file.
 .. note::
 
     Many build tools also provide a development server with features like
-    Hot Module Reload (HMR), allowing your front-end to update as you change
-    your development files. To integrate this with Django, search for
-    ``django <build tool>`` to find a community package that supports your
-    setup.
+    Hot Module Replacement (HMR), allowing your front-end to update as you
+    change your development files. To integrate this with Django, look for a
+    package that supports your build tool in the comparison linked above.
 
 How to communicate between Django and JavaScript
 ================================================
