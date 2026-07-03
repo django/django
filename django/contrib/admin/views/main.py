@@ -17,6 +17,8 @@ from django.contrib.admin.options import (
     ShowFacets,
 )
 from django.contrib.admin.utils import (
+    FieldIsAForeignKeyColumnName,
+    _get_non_gfk_field,
     build_q_object_from_lookup_parameters,
     get_fields_from_path,
     lookup_spawns_duplicates,
@@ -352,9 +354,13 @@ class ChangeList:
         attribute. Return None if no proper model field name can be matched.
         """
         try:
-            field = self.lookup_opts.get_field(field_name)
+            # Use the same field resolution as lookup_field() does for
+            # rendering, so that e.g. a method shadowing a reverse relation
+            # sorts by its admin_order_field rather than by the relation
+            # (#26372).
+            field = _get_non_gfk_field(self.lookup_opts, field_name)
             return field.name
-        except FieldDoesNotExist:
+        except (FieldDoesNotExist, FieldIsAForeignKeyColumnName):
             # See whether field_name is a name of a non-field
             # that allows sorting.
             if callable(field_name):

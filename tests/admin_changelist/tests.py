@@ -18,7 +18,7 @@ from django.contrib.admin.views.main import (
 from django.contrib.auth.models import User
 from django.contrib.messages.storage.cookie import CookieStorage
 from django.db import DatabaseError, connection
-from django.db.models import F, Field, IntegerField
+from django.db.models import Count, F, Field, IntegerField
 from django.db.models.functions import Upper
 from django.db.models.lookups import Contains, Exact
 from django.template import Context, Template, TemplateSyntaxError
@@ -140,6 +140,41 @@ class ChangeListTests(TestCase):
         request.user = self.superuser
         cl = m.get_changelist_instance(request)
         self.assertEqual(cl.get_ordering_field_columns(), {3: "asc", 2: "asc"})
+
+    def test_admin_order_field_on_method_shadowing_reverse_relation(self):
+        """
+        A list_display method whose name shadows a reverse relation is
+        ordered by its admin_order_field, matching how the column is
+        rendered (#26372).
+        """
+
+        class ShadowingChildAdmin(admin.ModelAdmin):
+            list_display = ["name", "child"]
+
+            @admin.display(ordering="child_count")
+            def child(self, obj):
+                return obj.child_count
+
+            def get_queryset(self, request):
+                return (
+                    super().get_queryset(request).annotate(child_count=Count("child"))
+                )
+
+        parent_two = Parent.objects.create(name="two children")
+        Child.objects.create(parent=parent_two)
+        Child.objects.create(parent=parent_two)
+        parent_zero = Parent.objects.create(name="no children")
+
+        m = ShadowingChildAdmin(Parent, custom_site)
+        request = self._mocked_authenticated_request("/parent/", self.superuser)
+        cl = m.get_changelist_instance(request)
+        self.assertEqual(cl.get_ordering_field("child"), "child_count")
+
+        # Sorting on the column orders by the annotation without duplicating
+        # rows for each related object.
+        request = self._mocked_authenticated_request("/parent/?o=2", self.superuser)
+        cl = m.get_changelist_instance(request)
+        self.assertEqual(list(cl.queryset), [parent_zero, parent_two])
 
     def test_select_related_preserved(self):
         """
