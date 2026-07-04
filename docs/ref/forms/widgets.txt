@@ -82,12 +82,11 @@ are available and which arguments they accept.
 Widgets with choices
 ====================
 
-There are a group of widgets which deal with choices and present the
-user with a list of options to choose from. These widgets inherit from
-:class:`ChoiceWidget`. The different widgets present this choice
-differently; the :class:`Select` widget itself uses a ``<select>``
-HTML list representation, while :class:`RadioSelect` uses radio
-buttons.
+There are a group of widgets which deal with choices and present the user with
+a list of options to choose from. These widgets inherit from ``ChoiceWidget``.
+The different widgets present this choice differently; the :class:`Select`
+widget itself uses a ``<select>`` HTML list representation, while
+:class:`RadioSelect` uses radio buttons.
 
 :class:`Select` widgets are used by default on :class:`ChoiceField` fields. The
 choices displayed on the widget are inherited from the :class:`ChoiceField` and
