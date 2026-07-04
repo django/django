@@ -18,6 +18,15 @@ class SignedCookieTest(SimpleTestCase):
         value = request.get_signed_cookie("c")
         self.assertEqual(value, "hello")
 
+    @override_settings(SIGNING_BACKEND="django.core.signing.Signer")
+    def test_get_signed_cookie_works_with_plain_signer_backend(self):
+        response = HttpResponse()
+        response.set_signed_cookie("c", "hello")
+        request = HttpRequest()
+        request.COOKIES["c"] = response.cookies["c"].value
+        self.assertEqual(request.get_signed_cookie("c"), "hello")
+        self.assertEqual(request.get_signed_cookie("c", default=None), "hello")
+
     def test_can_use_salt(self):
         response = HttpResponse()
         response.set_signed_cookie("a", "hello", salt="one")

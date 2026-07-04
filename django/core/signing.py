@@ -131,11 +131,14 @@ def _cookie_signer_legacy_salt(cookie_name, salt=""):
 
 
 def _unsign_cookie(signed_value, *, cookie_name, salt="", max_age=None):
+    kwargs = {}
+    if max_age is not None:
+        kwargs["max_age"] = max_age
     try:
         # RemovedInDjango70Warning: When the deprecation ends, replace the
         # whole function body with this single return statement.
         return get_cookie_signer(salt=_cookie_signer_salt(cookie_name, salt)).unsign(
-            signed_value, max_age=max_age
+            signed_value, **kwargs
         )
     except BadSignature as exc:
         if settings.SIGNED_COOKIE_LEGACY_SALT_FALLBACK and not isinstance(
@@ -143,7 +146,7 @@ def _unsign_cookie(signed_value, *, cookie_name, salt="", max_age=None):
         ):
             return get_cookie_signer(
                 salt=_cookie_signer_legacy_salt(cookie_name, salt)
-            ).unsign(signed_value, max_age=max_age)
+            ).unsign(signed_value, **kwargs)
         raise
 
 
