@@ -1,3 +1,4 @@
+import ast
 import re
 from io import StringIO
 from unittest import mock, skipUnless
@@ -5,7 +6,7 @@ from unittest import mock, skipUnless
 from django.core.management import CommandError, call_command
 from django.core.management.commands import inspectdb
 from django.db import connection
-from django.db.backends.base.introspection import TableInfo
+from django.db.backends.base.introspection import FieldInfo, TableInfo
 from django.test import (
     TestCase,
     TransactionTestCase,
@@ -515,6 +516,26 @@ class InspectDBTestCase(TestCase):
         # The error message depends on the backend
         self.assertIn("# The error was:", output)
 
+    def test_introspection_errors_escape_table_name_and_message(self):
+        table_name = "table_name\n__import__('os').system('echo unsafe')"
+        error_message = "error\n__import__('os').system('echo unsafe')"
+        out = StringIO()
+        with (
+            mock.patch(
+                "django.db.connection.introspection.get_table_list",
+                return_value=[TableInfo(name=table_name, type="t")],
+            ),
+            mock.patch(
+                "django.db.connection.introspection.get_relations",
+                side_effect=RuntimeError(error_message),
+            ),
+        ):
+            call_command("inspectdb", stdout=out)
+        output = out.getvalue()
+        self.assertIn(f"# Unable to inspect table {table_name!r}", output)
+        self.assertIn(f"# The error was: {error_message!r}", output)
+        self.assertNotIn("\n__import__('os').system", output)
+
     def test_same_relations(self):
         out = StringIO()
         call_command("inspectdb", "inspectdb_message", stdout=out)
@@ -673,6 +694,63 @@ class InspectDBTransactionalTests(TransactionTestCase):
         )
         self.assertIn(f"column_1 = models.{field_type}()", output)
         self.assertIn(f"column_2 = models.{field_type}()", output)
+
+    def test_composite_primary_key_escapes_column_names(self):
+        column_name = "x', 'safe');__import__('os').system('echo unsafe')#"
+        table_name = "inspectdb_compositepk_unsafe_column"
+        out = StringIO()
+        field_info = FieldInfo(
+            name=column_name,
+            type_code=None,
+            display_size=None,
+            internal_size=None,
+            precision=None,
+            scale=None,
+            null_ok=False,
+            default=None,
+            collation=None,
+        )
+        safe_field_info = field_info._replace(name="safe")
+        with (
+            mock.patch.object(
+                connection.introspection,
+                "get_table_list",
+                return_value=[TableInfo(name=table_name, type="t")],
+            ),
+            mock.patch.object(connection.introspection, "get_relations", return_value={}),
+            mock.patch.object(
+                connection.introspection, "get_constraints", return_value={}
+            ),
+            mock.patch.object(
+                connection.introspection,
+                "get_primary_key_columns",
+                return_value=[column_name, "safe"],
+            ),
+            mock.patch.object(
+                connection.introspection,
+                "get_table_description",
+                return_value=[field_info, safe_field_info],
+            ),
+            mock.patch.object(
+                connection.introspection, "get_field_type", return_value="IntegerField"
+            ),
+            mock.patch.object(connection.features, "supports_comments", False),
+        ):
+            call_command("inspectdb", table_name, stdout=out)
+        output = out.getvalue()
+        self.assertIn(
+            f"pk = models.CompositePrimaryKey({column_name!r}, 'safe')",
+            output,
+        )
+        pk_assignment = [
+            node
+            for node in ast.parse(output).body
+            if isinstance(node, ast.ClassDef)
+        ][0].body[0]
+        self.assertEqual(
+            [arg.value for arg in pk_assignment.value.args],
+            [column_name, "safe"],
+        )
 
     def test_composite_primary_key_not_unique_together(self):
         out = StringIO()
