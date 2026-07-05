@@ -58,6 +58,7 @@ from django.db.models.signals import (
     pre_init,
     pre_save,
 )
+from django.db.models.table_references import SchemaQualifiedTable
 from django.db.models.utils import AltersData, make_model_tuple
 from django.utils.encoding import force_str
 from django.utils.hashable import make_hashable
@@ -1939,6 +1940,16 @@ class Model(AltersData, metaclass=ModelBase):
                         id="models.E017",
                     )
                 )
+        elif isinstance(cls._meta.db_table, SchemaQualifiedTable) and cls._meta.managed:
+            errors.append(
+                checks.Error(
+                    "'managed' must be False when 'db_table' is a "
+                    "SchemaQualifiedTable.",
+                    hint="Set 'managed = False' in the model's Meta class.",
+                    obj=cls,
+                    id="models.E051",
+                )
+            )
         return errors
 
     @classmethod

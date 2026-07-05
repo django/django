@@ -22,6 +22,7 @@ from django.db.models.sql.constants import (
     ROW_COUNT,
     SINGLE,
 )
+from django.db.models.sql.datastructures import table_as_sql
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
 from django.utils.deprecation import RemovedInDjango70Warning
@@ -1804,7 +1805,12 @@ class SQLInsertCompiler(SQLCompiler):
         insert_statement = self.connection.ops.insert_statement(
             on_conflict=self.query.on_conflict,
         )
-        result = ["%s %s" % (insert_statement, qn(opts.db_table))]
+        table_sql, table_params = table_as_sql(opts.db_table, self, self.connection)
+        if table_params:
+            raise ValueError(
+                "Table references used in INSERT queries cannot contain parameters."
+            )
+        result = ["%s %s" % (insert_statement, table_sql)]
 
         if fields := list(self.query.fields):
             from django.db.models.expressions import DatabaseDefault
@@ -1998,7 +2004,12 @@ class SQLDeleteCompiler(SQLCompiler):
         )
 
     def _as_sql(self, query):
-        delete = "DELETE FROM %s" % self.quote_name(query.base_table)
+        table_sql, table_params = self.compile(query.alias_map[query.base_table])
+        if table_params:
+            raise ValueError(
+                "Table references used in DELETE queries cannot contain parameters."
+            )
+        delete = "DELETE FROM %s" % table_sql
         try:
             where, params = self.compile(query.where)
         except FullResultSet:
@@ -2090,8 +2101,13 @@ class SQLUpdateCompiler(SQLCompiler):
                 values.append(f"{quoted_name} = %s")
                 update_params.append(val)
         table = self.query.base_table
+        table_sql, table_params = self.compile(self.query.alias_map[table])
+        if table_params:
+            raise ValueError(
+                "Table references used in UPDATE queries cannot contain parameters."
+            )
         result = [
-            "UPDATE %s SET" % qn(table),
+            "UPDATE %s SET" % table_sql,
             ", ".join(values),
         ]
         try:
