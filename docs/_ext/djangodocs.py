@@ -212,7 +212,14 @@ def depart_console_dummy(self, node):
 
 def visit_console_html(self, node):
     """Generate HTML for the console directive."""
-    if self.builder.format == "html" and node["win_console_text"]:
+    # The epub builder uses the HTML format but produces XHTML for e-readers,
+    # where the CSS-driven tabs neither work nor validate as XML, so fall back
+    # to a plain literal block there (as the non-HTML formats already do).
+    if (
+        self.builder.format == "html"
+        and self.builder.name != "epub"
+        and node["win_console_text"]
+    ):
         # Put a mark on the document object signaling the fact the directive
         # has been used on it.
         self.document._console_directive_used_flag = True
