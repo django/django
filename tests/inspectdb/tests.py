@@ -5,7 +5,7 @@ from unittest import mock, skipUnless
 from django.core.management import CommandError, call_command
 from django.core.management.commands import inspectdb
 from django.db import connection
-from django.db.backends.base.introspection import TableInfo
+from django.db.backends.base.introspection import FieldInfo, TableInfo
 from django.test import (
     TestCase,
     TransactionTestCase,
@@ -515,6 +515,26 @@ class InspectDBTestCase(TestCase):
         # The error message depends on the backend
         self.assertIn("# The error was:", output)
 
+    def test_introspection_errors_escape_table_name_and_message(self):
+        table_name = "table_name\ncontinued"
+        error_message = "error\ncontinued"
+        out = StringIO()
+        with (
+            mock.patch(
+                "django.db.connection.introspection.get_table_list",
+                return_value=[TableInfo(name=table_name, type="t")],
+            ),
+            mock.patch(
+                "django.db.connection.introspection.get_relations",
+                side_effect=RuntimeError(error_message),
+            ),
+        ):
+            call_command("inspectdb", stdout=out)
+        output = out.getvalue()
+        self.assertIn(f"# Unable to inspect table {table_name!r}", output)
+        self.assertIn(f"# The error was: {error_message!r}", output)
+        self.assertNotIn("\ncontinued", output)
+
     def test_same_relations(self):
         out = StringIO()
         call_command("inspectdb", "inspectdb_message", stdout=out)
@@ -673,6 +693,62 @@ class InspectDBTransactionalTests(TransactionTestCase):
         )
         self.assertIn(f"column_1 = models.{field_type}()", output)
         self.assertIn(f"column_2 = models.{field_type}()", output)
+
+    def test_composite_primary_key_uses_normalized_column_names(self):
+        class_column = "class"
+        order_column = "order-line"
+        table_name = "inspectdb_compositepk_normalized_columns"
+        out = StringIO()
+        field_info = FieldInfo(
+            name=class_column,
+            type_code=None,
+            display_size=None,
+            internal_size=None,
+            precision=None,
+            scale=None,
+            null_ok=False,
+            default=None,
+            collation=None,
+        )
+        order_field_info = field_info._replace(name=order_column)
+        with (
+            mock.patch.object(
+                connection.introspection,
+                "get_table_list",
+                return_value=[TableInfo(name=table_name, type="t")],
+            ),
+            mock.patch.object(
+                connection.introspection, "get_relations", return_value={}
+            ),
+            mock.patch.object(
+                connection.introspection, "get_constraints", return_value={}
+            ),
+            mock.patch.object(
+                connection.introspection,
+                "get_primary_key_columns",
+                return_value=[class_column, order_column],
+            ),
+            mock.patch.object(
+                connection.introspection,
+                "get_table_description",
+                return_value=[field_info, order_field_info],
+            ),
+            mock.patch.object(
+                connection.introspection, "get_field_type", return_value="IntegerField"
+            ),
+            mock.patch.object(connection.features, "supports_comments", False),
+        ):
+            call_command("inspectdb", table_name, stdout=out)
+        output = out.getvalue()
+        self.assertIn(
+            "pk = models.CompositePrimaryKey('class_field', 'order_line')",
+            output,
+        )
+        self.assertIn("class_field = models.IntegerField(db_column='class')", output)
+        self.assertIn(
+            "order_line = models.IntegerField(db_column='order-line')",
+            output,
+        )
 
     def test_composite_primary_key_not_unique_together(self):
         out = StringIO()
