@@ -1660,7 +1660,7 @@ Default::
 A list of handlers to use for uploading. Changing this setting allows complete
 customization -- even replacement -- of Django's upload process.
 
-See :doc:`/topics/files` for details.
+See :ref:`file-upload-handlers` for details.
 
 .. setting:: FILE_UPLOAD_MAX_MEMORY_SIZE
 
@@ -1670,7 +1670,7 @@ See :doc:`/topics/files` for details.
 Default: ``2621440`` (i.e. 2.5 MB).
 
 The maximum size (in bytes) that an upload will be before it gets streamed to
-the file system. See :doc:`/topics/files` for details.
+the file system. See :ref:`file-upload-handlers` for details.
 
 See also :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE`.
 
@@ -1741,7 +1741,7 @@ If ``None``, Django will use the standard temporary directory for the operating
 system. For example, this will default to ``/tmp`` on \*nix-style operating
 systems.
 
-See :doc:`/topics/files` for details.
+See :ref:`file-upload-handlers` for details.
 
 .. setting:: FIRST_DAY_OF_WEEK
 
