@@ -209,12 +209,20 @@ suppress_warnings = ["app.add_directive", "epub.duplicated_toc_entry"]
 
 # The theme to use for HTML and HTML Help pages. See the documentation for
 # a list of builtin themes.
-html_theme = "djangodocs"
+html_theme = "sphinx_book_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further. For a list of options available for each theme, see the
 # documentation.
-# html_theme_options = {}
+html_theme_options = {
+    # https://github.com/executablebooks/sphinx-book-theme/issues/999
+    "navbar_persistent": [],
+    # GitHub link:
+    "repository_url": "https://github.com/django/django",
+    "use_repository_button": True,
+    # Right (page) nav:
+    "show_toc_level": 4,
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 html_theme_path = ["_theme"]
@@ -244,6 +252,7 @@ html_static_path = ["_static"]
 
 html_css_files = [
     "console-tabs.css",
+    "custom.css",
 ]
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
@@ -437,7 +446,10 @@ epub_cover = ("", "epub-cover.html")
 # epub_post_files = []
 
 # A list of files that should not be packed into the epub file.
-epub_exclude_files = ["_static/console-tabs.css"]
+epub_exclude_files = [
+    join("_static", "console-tabs.css"),
+    join("_static", "custom.css"),
+]
 
 # Empty, rather than defaulting to html_css_files, because its only entry is
 # the console-tabs.css excluded above. Any epub compatible addition to
