@@ -1,5 +1,6 @@
 pyenchant
 Sphinx>=7.3.0
+pydata-sphinx-theme
 sphinxcontrib-spelling
 blacken-docs
 sphinx-lint
