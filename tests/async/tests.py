@@ -118,7 +118,7 @@ class ViewTests(SimpleTestCase):
                 if is_coroutine:
                     response = asyncio.run(response)
 
-                self.assertIsInstance(response, HttpResponse)
+                self.assertEqual(response.status_code, HttpResponse.status_code)
 
     def test_http_method_not_allowed_responds_correctly(self):
         request_factory = RequestFactory()
@@ -137,7 +137,9 @@ class ViewTests(SimpleTestCase):
                 if is_coroutine:
                     response = asyncio.run(response)
 
-                self.assertIsInstance(response, HttpResponseNotAllowed)
+                self.assertEqual(
+                    response.status_code, HttpResponseNotAllowed.status_code
+                )
 
     def test_base_view_class_is_sync(self):
         """

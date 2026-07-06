@@ -1,11 +1,12 @@
 from inspect import iscoroutinefunction
 
 from django.http import HttpRequest, HttpResponse
-from django.test import SimpleTestCase
 from django.views.decorators.common import no_append_slash
 
+from .testcases import HttpResponseTestCase
 
-class NoAppendSlashTests(SimpleTestCase):
+
+class NoAppendSlashTests(HttpResponseTestCase):
     def test_wrapped_sync_function_is_not_coroutine_function(self):
         def sync_view(request):
             return HttpResponse()
@@ -26,7 +27,7 @@ class NoAppendSlashTests(SimpleTestCase):
             return HttpResponse()
 
         self.assertIs(sync_view.should_append_slash, False)
-        self.assertIsInstance(sync_view(HttpRequest()), HttpResponse)
+        self._assert_response(sync_view(HttpRequest()), HttpResponse)
 
     async def test_no_append_slash_decorator_async_view(self):
         @no_append_slash
@@ -34,4 +35,4 @@ class NoAppendSlashTests(SimpleTestCase):
             return HttpResponse()
 
         self.assertIs(async_view.should_append_slash, False)
-        self.assertIsInstance(await async_view(HttpRequest()), HttpResponse)
+        self._assert_response(await async_view(HttpRequest()), HttpResponse)
