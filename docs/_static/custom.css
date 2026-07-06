@@ -1,0 +1,43 @@
+/* Style djangodocs console tabs using Furo theme variables. */
+.console-block {
+    --tab-padding-inline: 0.5em;
+    --tab-padding-block: 0.25em;
+    --tab-row-end-margin: 0.2rem;
+    --tab-label-size: var(--font-size--small);
+    --tab-label-color: var(--color-foreground-muted);
+    --tab-active-label-color: var(--color-foreground-primary);
+    --tab-border-radius: 0.3rem;
+    --tab-border-color: var(--color-background-border);
+    --tab-active-border-color: var(--color-background-border);
+    --tab-active-highlight-color: var(--color-brand-content);
+
+    /* Adapt Furo's code blocks for console tabs. */
+    section {
+        div.highlight-console,
+        div.highlight-doscon {
+            margin-block-start: 0;
+        }
+    }
+}
+
+/* Keep Read the Docs' floating panels from covering important content. */
+body:has(readthedocs-filetreediff:not([hidden])) {
+    header {
+        padding-block-start: 2rem;
+    }
+    .content-icon-container {
+        /* Icon buttons at top right on wide displays.
+         * Increase Furo's existing margin-top: 1rem. */
+        margin-top: 2.5rem;
+    }
+    .toc-drawer {
+        /* Right-side panel on wide displays. */
+        padding-block-start: 1rem;
+    }
+}
+body:has(readthedocs-flyout:not([hidden])) {
+    footer,
+    .toc-drawer .toc-tree {
+        padding-block-end: 6rem;
+    }
+}
