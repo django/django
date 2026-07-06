@@ -420,7 +420,7 @@ def content_disposition_header(as_attachment, filename):
         # characters from 0x21 to 0x7e, except 0x22 (`"`) and 0x5C (`\`) which
         # can still be expressed but must be escaped with their own `\`.
         # https://datatracker.ietf.org/doc/html/rfc9110#name-quoted-strings
-        quotable_characters = r"^[\t \x21-\x7e]*$"
+        quotable_characters = r"^[\t \x21-\x7e]*\Z"
         if is_ascii and re.match(quotable_characters, filename):
             file_expr = 'filename="{}"'.format(
                 filename.replace("\\", "\\\\").replace('"', r"\"")
