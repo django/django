@@ -1,0 +1,21 @@
+[theme]
+inherit = "pydata_sphinx_theme"
+stylesheets = ["default.css"]
+
+# Show full site nav in primary sidebar. (Replaces inherited "Section
+# Navigation" in sidebar-nav-bs.)
+sidebars = ["sidebar-collapse", "sidebar-nav-full"]
+
+[options]
+# Remove navbar-nav top level nav from top navbar (replaced in sidebars above).
+# Remove navbar-logo from navbar_start; replace with custom navbar-title in
+# center. (Avoids wrapping long docstitle version number in start column.)
+navbar_start = []
+navbar_center = ["navbar-title"]
+
+# Add last-updated to footer.
+footer_start = ["copyright", "last-updated"]
+footer_end = ["sphinx-version", "theme-version"]
+
+# In the right sidebar ("on this page"), initially expand 3 levels (default 2).
+show_toc_level = 3
