@@ -644,6 +644,10 @@ class ContentDispositionHeaderTests(unittest.TestCase):
                 "attachment; filename*=utf-8''%22esp%C3%A9cimen%22%20filename",
             ),
             ((True, "some\nfile"), "attachment; filename*=utf-8''some%0Afile"),
+            # Trailing newline must not slip through the quoted-string branch
+            # ($ matches before trailing \n in Python regex). Refs #37198.
+            ((True, "report.pdf\n"), "attachment; filename*=utf-8''report.pdf%0A"),
+            ((True, "\n"), "attachment; filename*=utf-8''%0A"),
         )
 
         for (is_attachment, filename), expected in tests:
