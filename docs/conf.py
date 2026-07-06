@@ -95,7 +95,7 @@ spelling_word_list_filename = "spelling_wordlist"
 spelling_warning = True
 
 # Add any paths that contain templates here, relative to this directory.
-# templates_path = []
+templates_path = ["_templates"]
 
 # The suffix of source filenames.
 source_suffix = {".txt": "restructuredtext"}
@@ -170,7 +170,14 @@ today_fmt = "%B %d, %Y"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ["_build", "_ext", "_static", "_theme", "requirements.txt"]
+exclude_patterns = [
+    "_build",
+    "_ext",
+    "_static",
+    "_templates",
+    "_theme",
+    "requirements.txt",
+]
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -208,12 +215,18 @@ suppress_warnings = ["app.add_directive", "epub.duplicated_toc_entry"]
 
 # The theme to use for HTML and HTML Help pages. See the documentation for
 # a list of builtin themes.
-html_theme = "djangodocs"
+html_theme = "pydata_sphinx_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further. For a list of options available for each theme, see the
 # documentation.
-# html_theme_options = {}
+html_theme_options = {
+    "show_toc_level": 3,  # Right nav levels ("on this page"; default 2).
+    "navbar_start": [],  # Skip the "logo".
+    "navbar_center": ["docstitle"],
+    "footer_start": ["copyright", "last-updated"],
+    "footer_end": ["sphinx-version", "theme-version"],
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 html_theme_path = ["_theme"]
@@ -243,6 +256,7 @@ html_static_path = ["_static"]
 
 html_css_files = [
     "console-tabs.css",
+    "custom.css",
 ]
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
@@ -436,7 +450,10 @@ epub_cover = ("", "epub-cover.html")
 # epub_post_files = []
 
 # A list of files that should not be packed into the epub file.
-epub_exclude_files = [join("_static", "console-tabs.css")]
+epub_exclude_files = [
+    join("_static", "console-tabs.css"),
+    join("_static", "custom.css"),
+]
 
 # Empty, rather than defaulting to html_css_files, because its only entry is
 # the console-tabs.css excluded above. Any epub compatible addition to
