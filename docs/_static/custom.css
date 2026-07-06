@@ -1,0 +1,21 @@
+.console-block {
+    /* Use Furo theme variables for console tabs. */
+    --tab-padding-inline: 0.5em;
+    --tab-padding-block: 0.25em;
+    --tab-row-end-margin: 0.2rem;
+    --tab-label-size: var(--font-size--small);
+    --tab-label-color: var(--color-foreground-muted);
+    --tab-active-label-color: var(--color-foreground-primary);
+    --tab-border-radius: 0.3rem;
+    --tab-border-color: var(--color-background-border);
+    --tab-active-border-color: var(--color-background-border);
+    --tab-active-highlight-color: var(--color-brand-content);
+
+    /* Remove Furo's margin above code blocks in console tabs. */
+    section {
+        div.highlight-console,
+        div.highlight-doscon {
+            margin-block-start: 0;
+        }
+    }
+}
