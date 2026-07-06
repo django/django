@@ -223,6 +223,8 @@ uploads:
    instance (in a single field), for example, even if the custom widget is used
    with a form field related to a model ``FileField``.
 
+.. _file-upload-handlers:
+
 Upload Handlers
 ===============
 
