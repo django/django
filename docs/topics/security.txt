@@ -5,6 +5,19 @@ Security in Django
 This document is an overview of Django's security features. It includes advice
 on securing a Django-powered site.
 
+.. admonition:: Real-world security
+
+    Django's web security implementations have been designed with security for
+    real-world applications in mind. Django is a general-purpose web
+    application framework, and its defaults reflect this - they will not be the
+    best solution for every particular case. Special cases deserve special
+    attention to their needs.
+
+    Web security requires a multi-layered approach. Securing only a single
+    vector does not make a site secure overall, nor does a single apparent
+    weakness necessarily compromise the entire site. This should be borne in
+    mind particularly when assessing individual points in security audits.
+
 .. _sanitize-user-input:
 
 Always sanitize user input
@@ -17,25 +30,35 @@ details on validating user inputs in Django.
 
 .. _cross-site-scripting:
 
-Cross site scripting (XSS) protection
+Cross-site scripting (XSS) protection
 =====================================
 
-XSS attacks allow a user to inject client side scripts into the browsers of
-other users. This is usually achieved by storing the malicious scripts in the
-database where it will be retrieved and displayed to other users, or by getting
-users to click a link which will cause the attacker's JavaScript to be executed
-by the user's browser. However, XSS attacks can originate from any untrusted
-source of data, such as cookies or web services, whenever the data is not
-sufficiently sanitized before including in a page.
+In a cross-site scripting attack, malicious code in the form of a client-side
+script is injected into another user's web browser, where it will be executed.
 
-Using Django templates protects you against the majority of XSS attacks.
-However, it is important to understand what protections it provides
-and its limitations.
+This is typically done by:
 
-Django templates :ref:`escape specific characters <automatic-html-escaping>`
-which are particularly dangerous to HTML. While this protects users from most
-malicious input, it is not entirely foolproof. For example, it will not
-protect the following:
+* storing the malicious script in the database where it will be retrieved and
+  presented to other users in their browsers, or
+* getting users to click a link which will cause the attacker's JavaScript to
+  be executed by the user's browser.
+
+Cross-site scripting attacks can originate from any untrusted source of data,
+including cookies or web services, if the data are not adequately sanitized
+before being published in a page.
+
+Django templates provide protection against the majority of cross-site
+scripting attacks by :ref:`automatically escaping characters that represent a
+risk <automatic-html-escaping>` (that is, HTML characters that could be
+*interpreted* by the browser to malicious effect are instead safely
+*displayed*).
+
+However, the extent of this protection and its limitations should be
+understood.
+
+Ambiguity between the developer's intention and how the browser interprets
+HTML can expose the client to unintended code execution. Suppose that a
+developer creates:
 
 .. code-block:: text
 
@@ -43,23 +66,34 @@ protect the following:
 
 .. highlighting as html+django fails due to intentionally missing quotes.
 
-If ``var`` is set to ``'class1 onmouseover=javascript:func()'``, this can
-result in unauthorized JavaScript execution, depending on how the browser
-renders imperfect HTML. (Quoting the attribute value would fix this case.)
+where ``var`` is expected to contain something like ``'class1'``. If ``var``
+were set to ``'class1 onmouseover=javascript:func()'`` though, this could
+result in unauthorized JavaScript execution due to differences in how browsers
+will interpret this imperfect HTML.
 
-It is also important to be particularly careful when using ``is_safe`` with
-custom template tags, the :tfilter:`safe` template tag, :mod:`mark_safe
-<django.utils.safestring>`, and when autoescape is turned off.
+Explicit template design, in which the quotes are not left to the variable to
+provide:
 
-In addition, if you are using the template system to output something other
-than HTML, there may be entirely separate characters and words which require
-escaping.
+.. code-block:: html+django
 
-You should also be very careful when storing HTML in the database, especially
-when that HTML is retrieved and displayed.
+    <style class="{{ var }}">...</style>
 
+would eliminate this possibility.
 
-Cross site request forgery (CSRF) protection
+It is also important to be particularly careful when using the ``is_safe``
+attribute with custom template tags, the :tfilter:`safe` template tag,
+:mod:`mark_safe <django.utils.safestring>`, and when autoescape is turned off.
+
+Django's built-in escaping is intended to protect HTML output. If you are using
+the template system to output something other than HTML, the characters and
+strings that require escaping might be entirely different.
+
+Additionally, be very careful when storing HTML in the database, especially
+when that HTML is retrieved and displayed. Unless the HTML is guaranteed to
+come from a trusted source - user input is *not* a trusted source - stored HTML
+should be checked and sanitized, preferably on input as well as output.
+
+Cross-site request forgery (CSRF) protection
 ============================================
 
 CSRF attacks allow a malicious user to execute actions using the credentials
@@ -182,8 +216,8 @@ Host header validation
 ======================
 
 Django uses the ``Host`` header provided by the client to construct URLs in
-certain cases. While these values are sanitized to prevent Cross Site Scripting
-attacks, a fake ``Host`` value can be used for Cross-Site Request Forgery,
+certain cases. While these values are sanitized to prevent cross-site scripting
+attacks, a fake ``Host`` value can be used for cross-site request forgery,
 cache poisoning attacks, and poisoning links in emails.
 
 Because even seemingly-secure web server configurations are susceptible to fake
