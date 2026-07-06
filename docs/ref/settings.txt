@@ -3870,6 +3870,7 @@ File uploads
 ------------
 * :setting:`FILE_UPLOAD_HANDLERS`
 * :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`
+* :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS`
 * :setting:`FILE_UPLOAD_PERMISSIONS`
 * :setting:`FILE_UPLOAD_TEMP_DIR`
 * :setting:`MEDIA_ROOT`
