@@ -1282,6 +1282,8 @@ backends.
 
 .. data:: mailers
 
+    .. versionadded:: 6.1
+
     You can access the mailers configured in the :setting:`MAILERS` setting
     through a dict-like object: ``django.core.mail.mailers``:
 
@@ -1293,9 +1295,9 @@ backends.
     If the named key is not defined, a ``MailerDoesNotExist`` error will be
     raised. Other configuration problems will raise an ``InvalidMailer`` error.
 
-    .. versionadded:: 6.1
-
 .. data:: mailers.default
+
+    .. versionadded:: 6.1
 
     As a shortcut, the default mailer can be accessed through
     ``django.core.mail.mailers.default``:
@@ -1348,7 +1350,7 @@ backends.
 
     .. deprecated:: 6.0
 
-        Passing ``fail_silently`` as positional argument is deprecated.
+        Passing ``fail_silently`` as a positional argument is deprecated.
 
     .. deprecated:: 6.1
 
