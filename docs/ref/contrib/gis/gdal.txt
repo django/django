@@ -2099,8 +2099,8 @@ documentation`_ for more details.
 Compressed rasters
 ^^^^^^^^^^^^^^^^^^
 
-Instead decompressing the file and instantiating the resulting raster, GDAL can
-directly access compressed files using the ``/vsizip/``, ``/vsigzip/``, or
+Instead of decompressing the file and instantiating the resulting raster, GDAL
+can directly access compressed files using the ``/vsizip/``, ``/vsigzip/``, or
 ``/vsitar/`` virtual filesystems:
 
 .. code-block:: pycon
