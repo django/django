@@ -184,7 +184,7 @@ class CsrfExemptTests(HttpResponseTestCase):
             return HttpResponse()
 
         self.assertIs(sync_view.csrf_exempt, True)
-        self._assert_response(sync_view(HttpRequest()), HttpResponse)
+        self.assertIsClass(sync_view(HttpRequest()), HttpResponse)
 
     async def test_csrf_exempt_decorator_async_view(self):
         @csrf_exempt
@@ -192,4 +192,4 @@ class CsrfExemptTests(HttpResponseTestCase):
             return HttpResponse()
 
         self.assertIs(async_view.csrf_exempt, True)
-        self._assert_response(await async_view(HttpRequest()), HttpResponse)
+        self.assertIsClass(await async_view(HttpRequest()), HttpResponse)

@@ -27,7 +27,7 @@ class NoAppendSlashTests(HttpResponseTestCase):
             return HttpResponse()
 
         self.assertIs(sync_view.should_append_slash, False)
-        self._assert_response(sync_view(HttpRequest()), HttpResponse)
+        self.assertIsClass(sync_view(HttpRequest()), HttpResponse)
 
     async def test_no_append_slash_decorator_async_view(self):
         @no_append_slash
@@ -35,4 +35,4 @@ class NoAppendSlashTests(HttpResponseTestCase):
             return HttpResponse()
 
         self.assertIs(async_view.should_append_slash, False)
-        self._assert_response(await async_view(HttpRequest()), HttpResponse)
+        self.assertIsClass(await async_view(HttpRequest()), HttpResponse)
