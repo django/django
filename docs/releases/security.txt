@@ -36,6 +36,40 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+July 7, 2026 - :cve:`2026-48588`
+--------------------------------
+
+Potential exposure of private data via cached ``Set-Cookie`` response.
+`Full description
+<https://www.djangoproject.com/weblog/2026/jul/07/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <c2a936ab7d6048acfc341dd61e6094c2dc84782f>`
+* Django 6.0 :commit:`(patch) <64f9a2b2283fde3ec69fb0dfe441cf0f6f411ba3>`
+* Django 5.2 :commit:`(patch) <721685aa7799cc9327bd202cd1f70bd012ca95a7>`
+
+July 7, 2026 - :cve:`2026-53877`
+--------------------------------
+
+Heap buffer over-read in ``GDALRaster``.
+`Full description
+<https://www.djangoproject.com/weblog/2026/jul/07/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <a46b417d9e441379e7f86933ec1b2fb05f63d492>`
+* Django 6.0 :commit:`(patch) <38dfbd27d7d4f4e6eaa087d7a90f2613fbf55b3a>`
+* Django 5.2 :commit:`(patch) <6c66eb8cec52b303af85c2c6e4dd00aa37654dbc>`
+
+July 7, 2026 - :cve:`2026-53878`
+--------------------------------
+
+Header injection possibility since ``DomainNameValidator`` accepted newlines in
+input.
+`Full description
+<https://www.djangoproject.com/weblog/2026/jul/07/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <fe3e8a0de7fad7897fa4917013d8abd507e4d756>`
+* Django 6.0 :commit:`(patch) <a5de13f1491f1dbf2bb0ad9b91570524ebbc8acd>`
+* Django 5.2 :commit:`(patch) <d5d60ed0323cddaa0ce0237a26a3d49ac21ee05e>`
+
 June 3, 2026 - :cve:`2026-6873`
 -------------------------------
 
