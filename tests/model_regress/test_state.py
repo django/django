@@ -1,6 +1,10 @@
 import gc
 
-from django.db.models.base import ModelState, ModelStateFieldsCacheDescriptor
+from django.db.models.base import (
+    ModelState,
+    ModelStateFieldsCacheDescriptor,
+    ModelStateRelatedManagersCacheDescriptor,
+)
 from django.test import SimpleTestCase
 from django.test.utils import garbage_collect
 
@@ -10,6 +14,12 @@ from .models import Worker, WorkerProfile
 class ModelStateTests(SimpleTestCase):
     def test_fields_cache_descriptor(self):
         self.assertIsInstance(ModelState.fields_cache, ModelStateFieldsCacheDescriptor)
+
+    def test_related_managers_cache_descriptor(self):
+        self.assertIsInstance(
+            ModelState.related_managers_cache,
+            ModelStateRelatedManagersCacheDescriptor,
+        )
 
     def test_one_to_one_field_cycle_collection(self):
         self.addCleanup(gc.set_debug, gc.get_debug())

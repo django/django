@@ -1,3 +1,5 @@
+import pickle
+
 from django.db import models
 from django.test import TestCase
 
@@ -128,6 +130,14 @@ class CustomManagerTests(TestCase):
         self.assertIsInstance(self.droopy.books, PublishedBookManager)
         self.assertIsInstance(self.b2.authors, PersonManager)
 
+    def test_fk_related_manager_reused(self):
+        self.assertIs(self.b1.favorite_books, self.b1.favorite_books)
+        self.assertIn("favorite_books", self.b1._state.related_managers_cache)
+        self.assertIsNot(
+            self.b1.favorite_books(manager="fun_people"),
+            self.b1.favorite_books(manager="fun_people"),
+        )
+
     def test_no_objects(self):
         """
         The default manager, "objects", doesn't exist, because a custom one
@@ -245,6 +255,28 @@ class CustomManagerTests(TestCase):
             ordered=False,
         )
 
+    def test_gfk_related_manager_reused(self):
+        self.assertIs(
+            self.b1.fun_people_favorite_things,
+            self.b1.fun_people_favorite_things,
+        )
+        self.assertIn(
+            "fun_people_favorite_things",
+            self.b1._state.related_managers_cache,
+        )
+        self.assertIsNot(
+            self.b1.favorite_things(manager="fun_people"),
+            self.b1.favorite_things(manager="fun_people"),
+        )
+
+    def test_gfk_related_manager_rebuilt_after_pk_change(self):
+        book = Book.published_objects.create(
+            title="How to program", author="Rodney Dangerfield", is_published=True
+        )
+        manager = book.favorite_things
+        book.pk = None
+        self.assertIsNot(book.favorite_things, manager)
+
     def test_m2m_related_manager(self):
         bugs = Person.objects.create(first_name="Bugs", last_name="Bunny", fun=True)
         self.b1.authors.add(bugs)
@@ -290,6 +322,26 @@ class CustomManagerTests(TestCase):
             lambda c: c.first_name,
             ordered=False,
         )
+
+    def test_m2m_related_forward_manager_reused(self):
+        self.assertIs(self.b1.authors, self.b1.authors)
+        self.assertIn("authors", self.b1._state.related_managers_cache)
+        self.assertIsNot(
+            self.b1.authors(manager="fun_people"),
+            self.b1.authors(manager="fun_people"),
+        )
+
+    def test_m2m_related_reverse_manager_reused(self):
+        bugs = Person.objects.create(first_name="Bugs", last_name="Bunny")
+        self.b1.authors.add(bugs)
+        self.assertIs(bugs.books, bugs.books)
+        self.assertIn("books", bugs._state.related_managers_cache)
+
+    def test_related_managers_cache_not_pickled(self):
+        self.b1.authors
+        self.assertIn("authors", self.b1._state.related_managers_cache)
+        reloaded = pickle.loads(pickle.dumps(self.b1))
+        self.assertEqual(reloaded._state.related_managers_cache, {})
 
     def test_removal_through_default_fk_related_manager(self, bulk=True):
         bugs = FunPerson.objects.create(

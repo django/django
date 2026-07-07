@@ -330,6 +330,10 @@ Models
   ``OR``, ``XOR``, respectively. These aggregates were previously included only
   in ``contrib.postgres``.
 
+* Related managers for ``ForeignKey``, ``ManyToManyField``, and
+  ``GenericRelation`` are now cached on model instances, with caches refreshed
+  when the instance values that bind the manager change.
+
 * :class:`django.db.models.BinaryField` now validates Base64 input strictly.
   Invalid Base64 strings now raise ``ValidationError`` instead of being
   silently accepted.
