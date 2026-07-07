@@ -2091,9 +2091,9 @@ supported. You can use them by prepending the provided path with the
 appropriate ``/vsi*/`` prefix. See the `GDAL Virtual Filesystems
 documentation`_ for more details.
 
-.. warning:
+.. warning::
 
-    Rasters with names starting with `/vsi*/` will be treated as rasters from
+    Rasters with names starting with ``/vsi*/`` will be treated as rasters from
     the GDAL virtual filesystems. Django doesn't perform any extra validation.
 
 Compressed rasters
