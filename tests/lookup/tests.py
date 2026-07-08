@@ -1101,7 +1101,15 @@ class LookupTests(TestCase):
             .values("pk")
             .query
         )
-        self.assertIn(" IN (a1, a2, a3, a4, a5, a6, a7) ", str(query))
+        sql = str(query)
+        # PostgreSQL compiles In to `= ANY(...)` with a single list parameter;
+        # other backends emit the traditional `IN (a1, a2, ...)` form. Both
+        # preserve the caller's value ordering.
+        self.assertTrue(
+            " IN (a1, a2, a3, a4, a5, a6, a7) " in sql
+            or "= ANY(['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7']" in sql,
+            sql,
+        )
 
     def test_in_ignore_none(self):
         with self.assertNumQueries(1) as ctx:
@@ -1110,7 +1118,13 @@ class LookupTests(TestCase):
                 [self.a1],
             )
         sql = ctx.captured_queries[0]["sql"]
-        self.assertIn("IN (%s)" % self.a1.pk, sql)
+        # PostgreSQL compiles In to `= ANY(...)` with a single bound array
+        # parameter; other backends emit `IN (<value>)`. Either shape must
+        # exclude the None value that was passed alongside the real pk.
+        self.assertTrue(
+            "IN (%s)" % self.a1.pk in sql or "'{%s}'" % self.a1.pk in sql,
+            sql,
+        )
 
     def test_in_ignore_solo_none(self):
         with self.assertNumQueries(0):
@@ -1126,7 +1140,11 @@ class LookupTests(TestCase):
                 [self.a1],
             )
         sql = ctx.captured_queries[0]["sql"]
-        self.assertIn("IN (%s)" % self.a1.pk, sql)
+        # See test_in_ignore_none for the shape rationale.
+        self.assertTrue(
+            "IN (%s)" % self.a1.pk in sql or "'{%s}'" % self.a1.pk in sql,
+            sql,
+        )
 
     def test_in_select_mismatch(self):
         msg = (

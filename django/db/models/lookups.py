@@ -555,6 +555,45 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             return self.split_parameter_list_as_sql(compiler, connection)
         return super().as_sql(compiler, connection)
 
+    def as_postgresql(self, compiler, connection):
+        # Compile `col IN (%s, %s, ..., %s)` as `col = ANY(%s::type[])` when
+        # the right-hand side is a literal iterable of values. Postgres's
+        # parser normalizes both forms to the same ScalarArrayOpExpr during
+        # parse analysis, so query plans are unchanged. Emitting a single
+        # array-bound parameter instead of N per-element placeholders avoids
+        # O(N) client-side placeholder rewriting inside psycopg (see
+        # https://github.com/psycopg/psycopg/discussions/628) for large lists.
+        #
+        # The rewrite is skipped for composite-column left-hand sides
+        # (ColPairs / tuple), whose values are tuples that PostgreSQL can't
+        # bind as a scalar array, and for lookups with bilateral transforms
+        # that need per-value SQL wrapping.
+        if (
+            self.rhs_is_direct_value()
+            and not self.bilateral_transforms
+            and not isinstance(self.lhs, (ColPairs, tuple))
+        ):
+            field = getattr(self.lhs, "output_field", None)
+            if field is not None:
+                array_type = connection.ops.in_lookup_array_type(field)
+                if array_type is not None:
+                    lhs_sql, lhs_params = self.process_lhs(compiler, connection)
+                    # Filter out NULLs (matching process_rhs semantics) and
+                    # let get_db_prep_lookup prepare each value uniformly.
+                    try:
+                        rhs = OrderedSet(self.rhs)
+                        rhs.discard(None)
+                    except TypeError:
+                        rhs = [r for r in self.rhs if r is not None]
+                    if not rhs:
+                        raise EmptyResultSet
+                    _, prepared = self.get_db_prep_lookup(list(rhs), connection)
+                    return (
+                        "%s = ANY(%%s::%s)" % (lhs_sql, array_type),
+                        list(lhs_params) + [prepared],
+                    )
+        return self.as_sql(compiler, connection)
+
     def split_parameter_list_as_sql(self, compiler, connection):
         # This is a special case for databases which limit the number of
         # elements which can appear in an 'IN' clause.

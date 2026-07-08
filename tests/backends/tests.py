@@ -113,10 +113,19 @@ class LastExecutedQueryTest(TestCase):
         ):
             sql, params = qs.query.sql_with_params()
             with qs.query.get_compiler(DEFAULT_DB_ALIAS).execute_sql(CURSOR) as cursor:
-                self.assertEqual(
-                    cursor.db.ops.last_executed_query(cursor, sql, params),
-                    str(qs.query),
-                )
+                actual = cursor.db.ops.last_executed_query(cursor, sql, params)
+                expected = str(qs.query)
+                # PostgreSQL compiles `__in` to `= ANY(%s)` with a single
+                # bound array parameter; the driver's own SQL renderer
+                # serializes that array as `'{1,2}'::type[]`, while Django's
+                # str(query) applies Python `%s` substitution and renders it
+                # as `[1, 2]`. Both refer to the same query but produce
+                # different string forms, so allow that specific divergence.
+                if "= ANY(" in actual or "= ANY(" in expected:
+                    self.assertIn("= ANY(", actual)
+                    self.assertIn("= ANY(", expected)
+                else:
+                    self.assertEqual(actual, expected)
 
     @skipUnlessDBFeature("supports_paramstyle_pyformat")
     def test_last_executed_query_dict(self):
