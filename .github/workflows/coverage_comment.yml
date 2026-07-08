@@ -1,7 +1,10 @@
 name: Coverage Comment
 
 on:
-  workflow_run:
+  # The so-called dangerous workflow_run trigger is necessary for letting forks
+  # gain workflow-scoped pull-requests: write permission. The only
+  # user-controlled content is the content of diff-cover-report.md.
+  workflow_run:  # zizmor: ignore[dangerous-triggers]
     workflows: ["Coverage Tests"]
     types:
       - completed
@@ -27,15 +30,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
 
-      - name: Read PR number
-        id: pr
-        run: |
-          pr_number=$(cat pr_number.txt)
-          echo "number=$pr_number" >> $GITHUB_OUTPUT
-
       - name: Post/update PR comment
-        env:
-          PR_NUMBER: ${{ steps.pr.outputs.number }}
         uses: actions/github-script@v9
         with:
           script: |
@@ -54,16 +49,23 @@ jobs:
               '**Note:** Missing lines are warnings only. Some database-specific lines may not be measured. [More information](https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#code-coverage-on-pull-requests)'
             );
 
-            const prNumber = parseInt(process.env.PR_NUMBER);
-            if (isNaN(prNumber)) {
-              core.setFailed('PR number is not available or invalid.');
+            const headSha = context.payload.workflow_run.head_sha;
+            const { data: prs } =
+              await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                commit_sha: headSha,
+              });
+            const pr = prs.find((p) => p.head.sha === headSha);
+            if (!pr) {
+              core.setFailed(`No PR found for commit ${headSha}.`);
               return;
             }
             
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: prNumber,
+              issue_number: pr.number,
             });
             
             for (const c of comments) {
@@ -79,6 +81,6 @@ jobs:
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: prNumber,
+              issue_number: pr.number,
               body: commentBody,
             });
