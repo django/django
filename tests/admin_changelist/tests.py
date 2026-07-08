@@ -1443,7 +1443,9 @@ class ChangeListTests(TestCase):
             response = self.client.post(changelist_url, data=data)
             self.assertEqual(response.status_code, 200)
             self.assertIn("WHERE", context.captured_queries[4]["sql"])
-            self.assertIn("IN", context.captured_queries[4]["sql"])
+            # PostgreSQL compiles In to `= ANY(...)`; other backends emit IN.
+            edit_sql = context.captured_queries[4]["sql"]
+            self.assertTrue("IN" in edit_sql or "= ANY" in edit_sql, edit_sql)
             # Check only the first few characters since the UUID may have
             # dashes.
             self.assertIn(str(a.pk)[:8], context.captured_queries[4]["sql"])
