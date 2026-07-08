@@ -186,7 +186,18 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* On PostgreSQL, the ``__in`` lookup now compiles to ``col = ANY(%s::type[])``
+  with a single bound array parameter for literal value iterables, instead of
+  ``col IN (%s, %s, ..., %s)`` with one placeholder per value. Both forms are
+  normalized to the same ``ScalarArrayOpExpr`` during PostgreSQL's parse
+  analysis, so query plans are unchanged. The rewrite eliminates the
+  ``O(N)`` client-side placeholder rewriting cost paid inside psycopg for
+  large lists.
+
+  This changes the raw SQL emitted for ``__in`` on PostgreSQL. Application
+  code that asserts on the SQL string of ``__in`` queries (for example via
+  ``str(queryset.query)`` or ``connection.queries``) may need to be updated
+  to accept either shape. Query semantics are unchanged.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
