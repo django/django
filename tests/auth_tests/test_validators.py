@@ -231,6 +231,13 @@ class UserAttributeSimilarityValidatorTest(TestCase):
             )
         )
 
+        user.anagram = "mountaineers"
+        self.assertIsNone(
+            UserAttributeSimilarityValidator(user_attributes=["anagram"]).validate(
+                "enumerations", user=user
+            )
+        )
+
     @isolate_apps("auth_tests")
     def test_validate_property(self):
         class TestUser(models.Model):

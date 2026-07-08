@@ -197,9 +197,9 @@ class UserAttributeSimilarityValidator:
                 ):
                     continue
                 if (
-                    SequenceMatcher(a=password, b=value_part).quick_ratio()
+                    (matcher := SequenceMatcher(a=password, b=value_part)).quick_ratio()
                     >= self.max_similarity
-                ):
+                ) and matcher.ratio() >= self.max_similarity:
                     try:
                         verbose_name = str(
                             user._meta.get_field(attribute_name).verbose_name
