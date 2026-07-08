@@ -515,6 +515,26 @@ class InspectDBTestCase(TestCase):
         # The error message depends on the backend
         self.assertIn("# The error was:", output)
 
+    def test_introspection_errors_escape_table_name_and_message(self):
+        table_name = "table_name\ncontinued"
+        error_message = "error\ncontinued"
+        out = StringIO()
+        with (
+            mock.patch(
+                "django.db.connection.introspection.get_table_list",
+                return_value=[TableInfo(name=table_name, type="t")],
+            ),
+            mock.patch(
+                "django.db.connection.introspection.get_relations",
+                side_effect=RuntimeError(error_message),
+            ),
+        ):
+            call_command("inspectdb", stdout=out)
+        output = out.getvalue()
+        self.assertIn(f"# Unable to inspect table {table_name!r}", output)
+        self.assertIn(f"# The error was: {error_message!r}", output)
+        self.assertNotIn("\ncontinued", output)
+
     def test_same_relations(self):
         out = StringIO()
         call_command("inspectdb", "inspectdb_message", stdout=out)

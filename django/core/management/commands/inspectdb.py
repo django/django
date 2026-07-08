@@ -123,8 +123,8 @@ class Command(BaseCommand):
                         cursor, table_name
                     )
                 except Exception as e:
-                    yield "# Unable to inspect table '%s'" % table_name
-                    yield "# The error was: %s" % e
+                    yield "# Unable to inspect table %r" % table_name
+                    yield "# The error was: %r" % str(e)
                     continue
 
                 model_name = self.normalize_table_name(table_name)
