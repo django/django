@@ -4,7 +4,6 @@ import copy
 import io
 import os
 import pickle
-import re
 import shutil
 import sys
 import tempfile
@@ -58,6 +57,8 @@ from django.test.utils import CaptureQueriesContext
 from django.utils import timezone, translation
 from django.utils.cache import (
     get_cache_key,
+    get_max_age,
+    has_vary_header,
     learn_cache_key,
     patch_cache_control,
     patch_vary_headers,
@@ -299,8 +300,10 @@ _caches_setting_base = {
     "v2": {"VERSION": 2},
     "custom_key": {"KEY_FUNCTION": custom_key_func},
     "custom_key2": {"KEY_FUNCTION": "cache.tests.custom_key_func"},
-    "cull": {"OPTIONS": {"MAX_ENTRIES": 30}},
-    "zero_cull": {"OPTIONS": {"CULL_FREQUENCY": 0, "MAX_ENTRIES": 30}},
+    "cull": {"OPTIONS": {"MAX_ENTRIES": 30, "CULL_PROBABILITY": 1.0}},
+    "zero_cull": {
+        "OPTIONS": {"CULL_FREQUENCY": 0, "MAX_ENTRIES": 30, "CULL_PROBABILITY": 1.0}
+    },
 }
 
 
@@ -1292,13 +1295,16 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
 
     def test_cull_queries(self):
         old_max_entries = cache._max_entries
+        old_cull_probability = cache._cull_probability
         # Force _cull to delete on first cached record.
         cache._max_entries = -1
+        cache._cull_probability = 1.0
         with CaptureQueriesContext(connection) as captured_queries:
             try:
                 cache.set("force_cull", "value", 1000)
             finally:
                 cache._max_entries = old_max_entries
+                cache._cull_probability = old_cull_probability
         num_count_queries = sum("COUNT" in query["sql"] for query in captured_queries)
         self.assertEqual(num_count_queries, 1)
         # Column names are quoted.
@@ -1308,6 +1314,70 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
                 self.assertIn(connection.ops.quote_name("expires"), sql)
             if "cache_key" in sql:
                 self.assertIn(connection.ops.quote_name("cache_key"), sql)
+
+    def test_db_cull_optimized_off(self):
+        # Check for expired entries every request if probability is 1.0.
+        old_max_entries = cache._max_entries
+        old_cull_probability = cache._cull_probability
+        cache._max_entries = -1
+        cache._cull_probability = 1.0
+        with mock.patch.object(cache, "_cull") as mocked:
+            try:
+                cache.set("key_foo", "foo")
+            finally:
+                cache._max_entries = old_max_entries
+                cache._cull_probability = old_cull_probability
+            mocked.assert_called_once()
+
+    def test_db_cull_optimized_on(self):
+        # Do not check for expired entries unless the cull check passes.
+        old_cull_probability = cache._cull_probability
+        old_max_entries = cache._max_entries
+        cache._max_entries = -1
+        cache._cull_probability = 0.1
+        with mock.patch("random.random") as mock_random:
+            mock_random.return_value = 0.01
+            with mock.patch.object(cache, "_cull") as mocked:
+                try:
+                    cache.set("key_foo", "foo")
+                finally:
+                    cache._max_entries = old_max_entries
+                    cache._cull_probability = old_cull_probability
+            mocked.assert_called_once()
+
+    def test_no_query_without_check(self):
+        # No COUNT query should occur if the cull check is False.
+        old_cull_probability = cache._cull_probability
+        cache._cull_probability = 0.1
+        with mock.patch("random.random") as mock_random:
+            mock_random.return_value = 0.9
+            with CaptureQueriesContext(connection) as captured_queries:
+                try:
+                    cache.set("shouldnt_cull", "value")
+                finally:
+                    cache._cull_probability = old_cull_probability
+                num_count_queries = sum(
+                    "COUNT" in query["sql"] for query in captured_queries
+                )
+                self.assertEqual(num_count_queries, 0)
+
+    def test_delete_query_skipped_on_high_cull_frequency(self):
+        cull_delete_cache = caches["cull"]
+        old_cull_freq = cull_delete_cache._cull_frequency
+
+        # CULL_FREQUENCY > MAX_ENTRIES forces
+        # (remaining_num // CULL_FREQUENCY) to evaluate to zero (cull_num)
+        cull_delete_cache._cull_frequency = cull_delete_cache._max_entries * 2
+        self.addCleanup(setattr, cull_delete_cache, "_cull_frequency", old_cull_freq)
+
+        self._perform_cull_test("cull", 50, 49)
+
+        with CaptureQueriesContext(connection) as captured_queries:
+            cull_delete_cache.set("force_cull", "value")
+
+        # Only the expiration DELETE query runs; culling is skipped.
+        num_delete_queries = sum("DELETE" in query["sql"] for query in captured_queries)
+        self.assertEqual(num_delete_queries, 1)
 
     def test_delete_cursor_rowcount(self):
         """
@@ -1901,6 +1971,12 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
         ):
             super().test_touch()
 
+    def test_touch_expired_key_does_not_crash(self):
+        cache.set("expired_touch_key", "value", timeout=0.01)
+        time.sleep(0.05)
+        result = cache.touch("expired_touch_key", 60)
+        self.assertIs(result, False)
+
 
 @unittest.skipUnless(RedisCache_params, "Redis backend not configured")
 @override_settings(
@@ -2206,6 +2282,61 @@ class CacheUtils(SimpleTestCase):
                 patch_vary_headers(response, newheaders)
                 self.assertEqual(response.headers["Vary"], resulting_vary)
 
+    def test_patch_vary_headers_strips_whitespace(self):
+        headers = (
+            # Whitespace-padded tokens in existing Vary must be stripped before
+            # deduplication so that adding a header already present (with
+            # surrounding whitespace) does not produce a duplicate entry.
+            (" Cookie", ("Accept-Encoding",), "Cookie, Accept-Encoding"),
+            ("Cookie ", ("Cookie",), "Cookie"),
+            (" Cookie ", ("Cookie",), "Cookie"),
+            # Tab-padded tokens must also be normalized.
+            (
+                "Cookie, Accept-Encoding",
+                ("Accept-Encoding\t", "\tcookie"),
+                "Cookie, Accept-Encoding",
+            ),
+            # Whitespace-padded wildcard in existing Vary must be recognized so
+            # that patch_vary_headers() still outputs a single "*" rather than
+            # appending new headers alongside the (unrecognized) padded "*".
+            ("* ", ("Accept-Language",), "*"),
+            (" *", ("Cookie",), "*"),
+            (" * ", ("Cookie", "Accept-Language"), "*"),
+            # Whitespace-padded wildcard supplied as a new header must also be
+            # recognized and collapsed to a single "*".
+            (None, (" * ",), "*"),
+            ("Cookie", (" * ",), "*"),
+            ("Cookie, Accept-Encoding", (" * ",), "*"),
+        )
+        for initial_vary, newheaders, resulting_vary in headers:
+            with self.subTest(initial_vary=initial_vary, newheaders=newheaders):
+                response = HttpResponse()
+                if initial_vary is not None:
+                    response.headers["Vary"] = initial_vary
+                patch_vary_headers(response, newheaders)
+                self.assertEqual(response.headers["Vary"], resulting_vary)
+
+    def test_get_max_age_strips_whitespace(self):
+        # A max-age directive with surrounding whitespace must be parsed
+        # correctly; a leading space (e.g. from manual header construction)
+        # previously caused the directive key to be " max-age" which never
+        # matched, returning None instead of the integer value.
+        tests = [
+            # Whitespace before directive (no preceding comma).
+            (" max-age=300", 300),
+            ("\tmax-age=300", 300),
+            # Whitespace around a non-first directive after split(",").
+            ("no-cache, max-age=600", 600),
+            ("no-cache,\tmax-age=600", 600),
+            # Whitespace after the value is handled by int() transparently.
+            ("max-age=300 ", 300),
+        ]
+        for header_value, expected in tests:
+            with self.subTest(header_value=header_value):
+                response = HttpResponse()
+                response.headers["Cache-Control"] = header_value
+                self.assertEqual(get_max_age(response), expected)
+
     def test_get_cache_key(self):
         request = self.factory.get(self.path)
         response = HttpResponse()
@@ -2262,8 +2393,51 @@ class CacheUtils(SimpleTestCase):
         self.assertEqual(
             get_cache_key(request),
             "views.decorators.cache.cache_page.settingsprefix.GET."
-            "18a03f9c9649f7d684af5db3524f5c99.d41d8cd98f00b204e9800998ecf8427e",
+            "18a03f9c9649f7d684af5db3524f5c99.3b59035bd3b34e30981dc990dd93acbb",
         )
+
+    def test_learn_cache_key_strips_whitespace(self):
+        # Vary header tokens with leading or trailing whitespace must be
+        # stripped before being used as request.META lookup keys, so that the
+        # generated cache key correctly incorporates the header value rather
+        # than silently ignoring it.
+        request_a = self.factory.get(
+            self.path, headers={"cookie": "a=1", "x-pony": "gold"}
+        )
+        request_b = self.factory.get(
+            self.path, headers={"cookie": "a=2", "x-pony": "gold"}
+        )
+
+        response = HttpResponse()
+        # Whitespace-padded token: should be treated identically to "Cookie".
+        response.headers["Vary"] = " Cookie "
+        learn_cache_key(request_a, response)
+
+        # Requests with different Cookie values must get different cache keys.
+        key_a = get_cache_key(request_a)
+        key_b = get_cache_key(request_b)
+        self.assertIsNotNone(key_a)
+        self.assertIsNotNone(key_b)
+        self.assertNotEqual(key_a, key_b)
+
+    def test_learn_cache_key_no_header_collision(self):
+        tests = [
+            ({"X-Region": "EU", "X-Tenant": ""}, {"X-Region": "", "X-Tenant": "EU"}),
+            ({"X-Region": "EU"}, {"X-Tenant": "EU"}),
+        ]
+        for headers_a, headers_b in tests:
+            with self.subTest(headers=(headers_a, headers_b)):
+                request_a = self.factory.get(self.path, headers=headers_a)
+                request_b = self.factory.get(self.path, headers=headers_b)
+                response = HttpResponse()
+                response.headers["Vary"] = "X-Region, X-Tenant"
+                learn_cache_key(request_a, response)
+                # Potentially colliding values result in different cache keys.
+                key_a = get_cache_key(request_a)
+                key_b = get_cache_key(request_b)
+                self.assertIsNotNone(key_a)
+                self.assertIsNotNone(key_b)
+                self.assertNotEqual(key_a, key_b)
 
     def test_patch_cache_control(self):
         tests = (
@@ -2308,16 +2482,50 @@ class CacheUtils(SimpleTestCase):
             ),
         )
 
-        cc_delim_re = re.compile(r"\s*,\s*")
-
         for initial_cc, newheaders, expected_cc in tests:
             with self.subTest(initial_cc=initial_cc, newheaders=newheaders):
                 response = HttpResponse()
                 if initial_cc is not None:
                     response.headers["Cache-Control"] = initial_cc
                 patch_cache_control(response, **newheaders)
-                parts = set(cc_delim_re.split(response.headers["Cache-Control"]))
+                parts = {cc for cc in response.headers["Cache-Control"].split(", ")}
                 self.assertEqual(parts, expected_cc)
+
+    def test_patch_cache_control_whitespace_around_equals(self):
+        # Whitespace around "=" must not be retained in the directive name;
+        # otherwise no_cache=True fails to collapse the qualified field-list
+        # form (i.e. dictitem() lacks a strip()).
+        for initial_cc in ('no-cache ="Set-Cookie"', 'no-cache = "Set-Cookie"'):
+            with self.subTest(initial_cc=initial_cc):
+                response = HttpResponse(headers={"Cache-Control": initial_cc})
+                patch_cache_control(response, no_cache=True)
+                parts = {cc for cc in response.headers["Cache-Control"].split(", ")}
+                self.assertEqual(parts, {"no-cache"})
+
+    def test_has_vary_header(self):
+        tests = [
+            ("*", "*", True),
+            ("Cookie, *", "*", True),
+            ("Cookie,*", "*", True),
+            ("Cookie , *", "*", True),
+            # Surronding whitespace on values must be stripped independently of
+            # the comma delimiter.
+            ("* ", "*", True),
+            (" *", "*", True),
+            ("Cookie, * ", "*", True),
+            (" Cookie", "Cookie", True),
+            ("Cookie", "*", False),
+            ("*", "Cookie", False),
+            ("cookie", "Cookie", True),
+            ("Cookie", "cookie", True),
+        ]
+
+        for header_value, header_query, has_match in tests:
+            with self.subTest(header_value=header_value, header_query=header_query):
+                response = HttpResponse()
+                response.headers["Vary"] = header_value
+
+                self.assertIs(has_vary_header(response, header_query), has_match)
 
 
 @override_settings(
@@ -2432,7 +2640,7 @@ class CacheI18nTest(SimpleTestCase):
         request = self.factory.get(self.path)
         request.META["HTTP_ACCEPT_ENCODING"] = "gzip;q=1.0, identity; q=0.5, *;q=0"
         response = HttpResponse()
-        response.headers["Vary"] = "accept-encoding"
+        response.headers["Vary"] = "cookie, accept-encoding"
         key = learn_cache_key(request, response)
         self.assertIn(
             lang,
@@ -2622,9 +2830,15 @@ def hello_world_view_patch_vary_headers_asterisk(request, value):
     return response
 
 
+def hello_world_view_patch_vary_headers_asterisk_space(request, value):
+    response = HttpResponse("Hello World %s" % value)
+    patch_vary_headers(response, (" * ",))
+    return response
+
+
 def hello_world_view_vary_headers_includes_asterisk(request, value):
     response = HttpResponse("Hello World %s" % value)
-    response["Vary"] = "Cookie, *, Pony"
+    response["Vary"] = "Cookie, * , Pony"
     return response
 
 
@@ -2851,20 +3065,76 @@ class CacheMiddlewareTest(SimpleTestCase):
         Responses with 'Cache-Control: private/no-cache/no-store' are
         not cached.
         """
-        for cc in ("private", "no-cache", "no-store"):
+        for cc in ("private", "no-cache", "no-store", "PRIVATE", "NO-store"):
             with self.subTest(cache_control=cc):
-                view_with_cache = cache_page(3)(
-                    cache_control(**{cc: True})(hello_world_view)
-                )
+                # Cannot use @cache_control() as it lowercases directives.
+                @cache_page(3)
+                def view(request, value):
+                    return HttpResponse(
+                        f"Hello World {value}", headers={"Cache-Control": cc}
+                    )
+
                 request = self.factory.get("/view/")
-                response = view_with_cache(request, "1")
+                response = view(request, "1")
                 self.assertEqual(response.content, b"Hello World 1")
-                response = view_with_cache(request, "2")
+                response = view(request, "2")
                 self.assertEqual(response.content, b"Hello World 2")
+
+    def test_cache_control_not_cached_superstring(self):
+        """
+        "myprivate", a hypothetical extension directive, is not confused for
+        "private".
+        """
+
+        @cache_page(3)
+        @cache_control(myprivate=True)
+        def view(request, value):
+            return HttpResponse(f"Hello World {value}")
+
+        request = self.factory.get("/view/")
+        response = view(request, "1")
+        self.assertEqual(response.content, b"Hello World 1")
+        response = view(request, "2")
+        self.assertEqual(response.content, b"Hello World 1")
+
+    def test_qualified_cache_control_value_not_cached(self):
+        for cc in (
+            'private="Set-Cookie"',
+            'no-cache="Set-Cookie"',
+            'no-store="Set-Cookie"',
+            # Malformed whitespace around "=" still fails safe.
+            'private ="Set-Cookie"',
+            'no-cache = "Set-Cookie"',
+        ):
+            with self.subTest(cache_control=cc):
+
+                @cache_page(3)
+                def view(request, value):
+                    return HttpResponse(
+                        f"Hello World {value}", headers={"Cache-Control": cc}
+                    )
+
+                request = self.factory.get("/view/")
+                response = view(request, "1")
+                self.assertEqual(response.content, b"Hello World 1")
+                response = view(request, "2")
+                self.assertEqual(response.content, b"Hello World 2")
+
+    def test_authorization_header_exception_qualified_public_directive(self):
+        @cache_page(3)
+        def view(request, value):
+            return HttpResponse(
+                f"Hello World {value}", headers={"Cache-Control": 'public="abc"'}
+            )
+
+        request = self.factory.get("/view/", headers={"Authorization": "token"})
+        response = view(request, "1")
+        self.assertIs(has_vary_header(response, "Authorization"), False)
 
     def test_vary_asterisk_not_cached(self):
         views_with_cache = (
             cache_page(3)(hello_world_view_patch_vary_headers_asterisk),
+            cache_page(3)(hello_world_view_patch_vary_headers_asterisk_space),
             cache_page(3)(hello_world_view_vary_headers_includes_asterisk),
         )
         for view in views_with_cache:
@@ -2875,20 +3145,78 @@ class CacheMiddlewareTest(SimpleTestCase):
                 response = view(request, "2")
                 self.assertEqual(response.content, b"Hello World 2")
 
+    def test_vary_on_authorization_for_authorization_header(self):
+        view_with_cache = cache_page(3)(hello_world_view)
+        request = self.factory.get("/view/", headers={"Authorization": "token"})
+        response = view_with_cache(request, "1")
+        self.assertIs(has_vary_header(response, "Authorization"), True)
+
+    def test_no_vary_on_authorization_for_empty_authorization_header(self):
+        view_with_cache = cache_page(3)(hello_world_view)
+        request = self.factory.get("/view/", headers={"Authorization": ""})
+        response = view_with_cache(request, "1")
+        self.assertIs(has_vary_header(response, "Authorization"), False)
+
+    def test_authorization_header_exceptions(self):
+        """
+        Responses to requests with an ``Authorization`` header are not made to
+        vary on ``Authorization`` when ``Cache-Control: public`` is present.
+        ``s-maxage`` and ``must-revalidate`` are also exceptions per RFC 9111,
+        Section 3.5, but Django does not implement them.
+        """
+        view_with_cache = cache_page(3)(cache_control(public=True)(hello_world_view))
+        request = self.factory.get("/view/", headers={"Authorization": "token"})
+        response = view_with_cache(request, "1")
+        self.assertIs(has_vary_header(response, "Authorization"), False)
+
+    def test_authorization_header_exception_superstring(self):
+        """
+        "nopublic", a hypothetical extension directive, is not confused for
+        "public".
+        """
+        view_with_cache = cache_page(3)(cache_control(no_public=True)(hello_world_view))
+        request = self.factory.get("/view/", headers={"Authorization": "token"})
+        response = view_with_cache(request, "1")
+        self.assertIs(has_vary_header(response, "Authorization"), True)
+
     def test_sensitive_cookie_not_cached(self):
         """
-        Django must prevent caching of responses that set a user-specific (and
-        maybe security sensitive) cookie in response to a cookie-less request.
+        Responses that set a new cookie not present in the request are not
+        cached, regardless of whether the request already had other cookies.
         """
-        request = self.factory.get("/view/")
-        csrf_middleware = CsrfViewMiddleware(csrf_view)
-        csrf_middleware.process_view(request, csrf_view, (), {})
-        cache_middleware = CacheMiddleware(csrf_middleware)
+        for headers in ({}, {"HTTP_COOKIE": "unrelated=value"}):
+            with self.subTest(headers=headers):
+                request = self.factory.get("/view/", **headers)
+                csrf_middleware = CsrfViewMiddleware(csrf_view)
+                csrf_middleware.process_view(request, csrf_view, (), {})
+                cache_middleware = CacheMiddleware(csrf_middleware)
+
+                self.assertIsNone(cache_middleware.process_request(request))
+                cache_middleware(request)
+
+                # Inserting a CSRF cookie prevented caching.
+                self.assertIsNone(cache_middleware.process_request(request))
+
+    def test_refreshed_cookie_not_cached(self):
+        """
+        A response that updates the value of a cookie already present in the
+        request is not cached. Caching it would allow a stale cookie value to
+        be served to a different client via a Vary: Cookie cache hit.
+        """
+
+        def refreshing_cookie_view(request):
+            response = HttpResponse("content")
+            response.set_cookie("session", "new_value")
+            patch_vary_headers(response, ("Cookie",))
+            return response
+
+        request = self.factory.get("/view/", HTTP_COOKIE="session=old_value")
+        cache_middleware = CacheMiddleware(refreshing_cookie_view)
 
         self.assertIsNone(cache_middleware.process_request(request))
         cache_middleware(request)
 
-        # Inserting a CSRF cookie in a cookie-less request prevented caching.
+        # The response refreshed an existing cookie so it must not be cached.
         self.assertIsNone(cache_middleware.process_request(request))
 
     def test_304_response_has_http_caching_headers_but_not_cached(self):
@@ -3063,27 +3391,32 @@ class TestMakeTemplateFragmentKey(SimpleTestCase):
 
     def test_with_one_vary_on(self):
         key = make_template_fragment_key("foo", ["abc"])
-        self.assertEqual(key, "template.cache.foo.493e283d571a73056196f1a68efd0f66")
+        self.assertEqual(key, "template.cache.foo.a6360ec2c58ecc4b23fd5bd00216fccd")
 
     def test_with_many_vary_on(self):
         key = make_template_fragment_key("bar", ["abc", "def"])
-        self.assertEqual(key, "template.cache.bar.17c1a507a0cb58384f4c639067a93520")
+        self.assertEqual(key, "template.cache.bar.250310c146db454966b64f5fc265a540")
 
     def test_proper_escaping(self):
         key = make_template_fragment_key("spam", ["abc:def%"])
-        self.assertEqual(key, "template.cache.spam.06c8ae8e8c430b69fb0a6443504153dc")
+        self.assertEqual(key, "template.cache.spam.bf6c24ef2576004284e0522c15314d8c")
 
     def test_with_ints_vary_on(self):
         key = make_template_fragment_key("foo", [1, 2, 3, 4, 5])
-        self.assertEqual(key, "template.cache.foo.7ae8fd2e0d25d651c683bdeebdb29461")
+        self.assertEqual(key, "template.cache.foo.087c006c1b99e0d147f624b4921f8a13")
 
     def test_with_unicode_vary_on(self):
         key = make_template_fragment_key("foo", ["42º", "😀"])
-        self.assertEqual(key, "template.cache.foo.7ced1c94e543668590ba39b3c08b0237")
+        self.assertEqual(key, "template.cache.foo.ab66482052ab2084b9d25bdd04bc9b10")
 
     def test_long_vary_on(self):
         key = make_template_fragment_key("foo", ["x" * 10000])
-        self.assertEqual(key, "template.cache.foo.3670b349b5124aa56bdb50678b02b23a")
+        self.assertEqual(key, "template.cache.foo.abff8a6702abde497feae7f61de2ef1e")
+
+    def test_collision_vary_on(self):
+        key1 = make_template_fragment_key("foo", ["a:b", "c"])
+        key2 = make_template_fragment_key("foo", ["a", "b:c"])
+        self.assertNotEqual(key1, key2)
 
 
 class CacheHandlerTest(SimpleTestCase):

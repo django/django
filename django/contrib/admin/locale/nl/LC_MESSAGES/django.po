@@ -12,14 +12,14 @@
 # Meteor0id, 2019-2020
 # 8de006b1b0894aab6aef71979dcd8bd6_5c6b207 <ff2658a8d8dbebbd9cc240b8c133a515_234097>, 2014-2015
 # Tino de Bruijn <tinodb@gmail.com>, 2011
-# Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020,2022-2025
+# Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020,2022-2026
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 07:05+0000\n"
-"Last-Translator: Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020,2022-2025\n"
+"PO-Revision-Date: 2026-06-01 07:05+0000\n"
+"Last-Translator: Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020,2022-2026\n"
 "Language-Team: Dutch (http://app.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -338,7 +338,7 @@ msgstr ""
 "geduld."
 
 msgid "Run"
-msgstr ""
+msgstr "Uitvoeren"
 
 msgid "Click here to select the objects across all pages"
 msgstr "Klik hier om alle objecten op alle pagina's te selecteren"
@@ -361,10 +361,10 @@ msgid "Model name"
 msgstr "Modelnaam"
 
 msgid "Add link"
-msgstr ""
+msgstr "Koppeling toevoegen"
 
 msgid "Change or view list link"
-msgstr ""
+msgstr "Lijstkoppeling wijzigen of weergeven"
 
 msgid "Add"
 msgstr "Toevoegen"

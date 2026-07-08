@@ -36,8 +36,6 @@ Django core exception classes are defined in ``django.core.exceptions``.
 ``ObjectNotUpdated``
 --------------------
 
-.. versionadded:: 6.0
-
 .. exception:: ObjectNotUpdated
 
     The base class for :exc:`Model.NotUpdated

@@ -1,3 +1,4 @@
+import warnings
 from contextlib import ContextDecorator, contextmanager
 
 from django.db import (
@@ -7,6 +8,8 @@ from django.db import (
     ProgrammingError,
     connections,
 )
+from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.warnings import django_file_prefixes
 
 
 class TransactionManagementError(ProgrammingError):
@@ -46,6 +49,15 @@ def rollback(using=None):
 
 
 def savepoint(using=None):
+    warnings.warn(
+        "savepoint() is deprecated. Use savepoint_create() instead.",
+        category=RemovedInDjango70Warning,
+        skip_file_prefixes=django_file_prefixes(),
+    )
+    return savepoint_create(using=using)
+
+
+def savepoint_create(using=None):
     """
     Create a savepoint (if supported and required by the backend) inside the
     current transaction. Return an identifier for the savepoint that will be

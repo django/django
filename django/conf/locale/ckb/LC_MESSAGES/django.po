@@ -4,16 +4,17 @@
 # Bawar Jalal, 2021
 # Bawar Jalal, 2020-2021
 # Bawar Jalal, 2020
+# Jacob Walls, 2026
 # Kosar Tofiq Saeed <kosar.belana@gmail.com>, 2020-2021
 # Natalia, 2025
-# Swara <swara09@gmail.com>, 2022-2024
+# Swara <swara09@gmail.com>, 2022-2026
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 06:49+0000\n"
-"Last-Translator: Natalia, 2025\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2026-03-09 06:49+0000\n"
+"Last-Translator: Jacob Walls, 2026\n"
 "Language-Team: Central Kurdish (http://app.transifex.com/django/django/"
 "language/ckb/)\n"
 "MIME-Version: 1.0\n"
@@ -144,6 +145,9 @@ msgstr "کڕواتی"
 
 msgid "Upper Sorbian"
 msgstr "سڕبی سەروو"
+
+msgid "Haitian Creole"
+msgstr "کریۆلی ھایتی"
 
 msgid "Hungarian"
 msgstr "هەنگاری"
@@ -549,11 +553,11 @@ msgstr "بەروار (بەبێ کات)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
-"بەهای “%(value)s” شێوازێکی نادروستی هەیە. دەبێت بەشێوەی  YYYY-MM-DD HH:MM[:"
-"ss[.uuuuuu]][TZ] بێت."
+"بەهای “%(value)s” شێوازێکی نادروستی هەیە. دەبێت بەشێوەی  YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] بێت."
 
 #, python-format
 msgid ""
@@ -575,11 +579,11 @@ msgstr "ژمارەی دەیی"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
-"بەهای “%(value)s” شێوازێکی هەڵەی هەیە. دەبێت بەشێوەی [DD] [[HH:]MM:]ss[."
-"uuuuuu] format بێت."
+"بەهای “%(value)s” شێوازێکی هەڵەی هەیە. دەبێت بەشێوەی [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format بێت."
 
 msgid "Duration"
 msgstr "ماوە"
@@ -684,7 +688,7 @@ msgstr "بەها پێویستە JSONی دروست بێت."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
-msgstr ""
+msgstr "نمونەی%(model)s لەگەڵ %(field)s %(value)r هەڵبژاردەیەکی دروست نیە."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "کلیلی دەرەکی(جۆر بەپێی خانەی پەیوەندیدار دیاری دەکرێت)"
@@ -704,8 +708,8 @@ msgid "Many-to-many relationship"
 msgstr "پەیوەندیی گشت-بۆ-گشت"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":؟.!"
 
@@ -865,6 +869,22 @@ msgstr "بەڵێ"
 
 msgid "No"
 msgstr "نەخێر"
+
+msgctxt "Task"
+msgid "Ready"
+msgstr "ئامادەیە"
+
+msgctxt "Task"
+msgid "Running"
+msgstr "جێبەجێدەکرێت"
+
+msgctxt "Task"
+msgid "Failed"
+msgstr "سەرنەکەوتوو"
+
+msgctxt "Task"
+msgid "Successful"
+msgstr "سەرکەوتوو"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1254,11 +1274,11 @@ msgstr "هیچ %(verbose_name_plural)s بەردەست نییە"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"لەداهاتوودا %(verbose_name_plural)s بەردەست نیە چونکە %(class_name)s."
-"allow_future چەوتە."
+"لەداهاتوودا %(verbose_name_plural)s بەردەست نیە چونکە "
+"%(class_name)s.allow_future چەوتە."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"

@@ -278,7 +278,7 @@ def smart_urlquote(url):
 
 class CountsDict(dict):
     def __init__(self, *args, word, **kwargs):
-        super().__init__(*args, *kwargs)
+        super().__init__(*args, **kwargs)
         self.word = word
 
     def __missing__(self, key):

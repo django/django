@@ -458,10 +458,6 @@ Variable                    Description
                             the current one
 ==========================  ===============================================
 
-.. versionchanged:: 6.0
-
-    The variable ``forloop.length`` was added.
-
 ``for`` ... ``empty``
 ---------------------
 
@@ -992,8 +988,6 @@ output (as a string) inside a variable. This is useful if you want to use
 ``partial``
 -----------
 
-.. versionadded:: 6.0
-
 Renders a template fragment that was defined with :ttag:`partialdef`, inserting
 the matching partial at this location.
 
@@ -1022,8 +1016,6 @@ rendered three times:
 
 ``partialdef``
 --------------
-
-.. versionadded:: 6.0
 
 Defines a reusable template fragment that can be rendered multiple times within
 the same template or accessed directly via :ref:`template loading or inclusion
@@ -1087,10 +1079,6 @@ links, and an empty result could prevent the page from reloading as expected.
     enabled. If it's not enabled, you must either explicitly pass the
     ``request`` object into the template context, or provide a ``QueryDict``
     instance to this tag.
-
-.. versionchanged:: 6.0
-
-    A ``?`` was prepended to the query string for empty results.
 
 Basic usage
 ~~~~~~~~~~~
@@ -1166,10 +1154,6 @@ If all keys are removed by setting them to ``None``, this outputs ``?``:
 
 Similarly, if all positional arguments are empty and keyword arguments do not
 contribute any new params, the output will also be ``?``.
-
-.. versionchanged:: 6.0
-
-    Support for multiple positional mapping arguments was added.
 
 Dynamic usage
 ~~~~~~~~~~~~~

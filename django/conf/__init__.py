@@ -10,21 +10,27 @@ import importlib
 import os
 import time
 import warnings
-from pathlib import Path
+import zoneinfo
 
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.deprecation import (
     RemovedInDjango70Warning,
-    django_file_prefixes,
     warn_about_external_use,
 )
 from django.utils.functional import LazyObject, empty
+from django.utils.warnings import django_file_prefixes
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 DEFAULT_STORAGE_ALIAS = "default"
 STATICFILES_STORAGE_ALIAS = "staticfiles"
 
+# RemovedInDjango70Warning.
+SIGNED_COOKIE_LEGACY_SALT_DEPRECATED_MSG = (
+    "The SIGNED_COOKIE_LEGACY_SALT_FALLBACK transitional setting is "
+    "deprecated. Remove it from your settings once legacy signed cookies "
+    "have expired. They will not be accepted in Django 7.0."
+)
 # RemovedInDjango70Warning.
 USE_BLANK_CHOICE_DASH_DEPRECATED_MSG = (
     "The USE_BLANK_CHOICE_DASH setting is deprecated. If you wish to define "
@@ -149,6 +155,12 @@ class LazySettings(LazyObject):
             self.__dict__.pop(name, None)
 
         # RemovedInDjango70Warning.
+        if name == "SIGNED_COOKIE_LEGACY_SALT_FALLBACK":
+            _show_settings_deprecation_warning(
+                SIGNED_COOKIE_LEGACY_SALT_DEPRECATED_MSG,
+                RemovedInDjango70Warning,
+            )
+        # RemovedInDjango70Warning.
         if name == "USE_BLANK_CHOICE_DASH":
             _show_settings_deprecation_warning(
                 USE_BLANK_CHOICE_DASH_DEPRECATED_MSG, RemovedInDjango70Warning
@@ -260,6 +272,13 @@ class Settings:
                 self._explicit_settings.add(setting)
 
         # RemovedInDjango70Warning.
+        if "SIGNED_COOKIE_LEGACY_SALT_FALLBACK" in self._explicit_settings:
+            warnings.warn(
+                SIGNED_COOKIE_LEGACY_SALT_DEPRECATED_MSG,
+                RemovedInDjango70Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
+        # RemovedInDjango70Warning.
         if "USE_BLANK_CHOICE_DASH" in self._explicit_settings:
             warnings.warn(
                 USE_BLANK_CHOICE_DASH_DEPRECATED_MSG,
@@ -276,11 +295,9 @@ class Settings:
             )
 
         if hasattr(time, "tzset") and self.TIME_ZONE:
-            # When we can, attempt to validate the timezone. If we can't find
-            # this file, no check happens and it's harmless.
-            zoneinfo_root = Path("/usr/share/zoneinfo")
-            zone_info_file = zoneinfo_root.joinpath(*self.TIME_ZONE.split("/"))
-            if zoneinfo_root.exists() and not zone_info_file.exists():
+            try:
+                zoneinfo.ZoneInfo(self.TIME_ZONE)
+            except zoneinfo.ZoneInfoNotFoundError:
                 raise ValueError("Incorrect timezone setting: %s" % self.TIME_ZONE)
             # Move the time zone info into os.environ. See ticket #2315 for why
             # we don't do this unconditionally (breaks Windows).
@@ -319,6 +336,13 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
+        # RemovedInDjango70Warning.
+        if name == "SIGNED_COOKIE_LEGACY_SALT_FALLBACK":
+            _show_settings_deprecation_warning(
+                SIGNED_COOKIE_LEGACY_SALT_DEPRECATED_MSG,
+                RemovedInDjango70Warning,
+            )
+        # RemovedInDjango70Warning.
         if name == "USE_BLANK_CHOICE_DASH":
             _show_settings_deprecation_warning(
                 USE_BLANK_CHOICE_DASH_DEPRECATED_MSG, RemovedInDjango70Warning

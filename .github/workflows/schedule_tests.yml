@@ -79,9 +79,11 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          # Transitive dependency of puppeteer (extract-zip) broken on 24.16
+          # https://github.com/puppeteer/puppeteer/issues/15071
+          node-version: '24.15.0'
           cache: 'npm'
           cache-dependency-path: '**/package.json'
       - run: npm install

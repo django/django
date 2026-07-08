@@ -479,14 +479,20 @@ Use the ``django.test.Client`` class to make requests.
 
         The user will have its ``backend`` attribute set to the value of the
         ``backend`` argument (which should be a dotted Python path string), or
-        to ``settings.AUTHENTICATION_BACKENDS[0]`` if a value isn't provided.
-        The :func:`~django.contrib.auth.authenticate` function called by
-        :meth:`login` normally annotates the user like this.
+        if a value isn't provided, the first backend from
+        :setting:`AUTHENTICATION_BACKENDS` implementing ``get_user()`` or
+        ``aget_user()``. The :func:`~django.contrib.auth.authenticate` function
+        called by :meth:`login` normally annotates the user like this.
 
         This method is faster than ``login()`` since the expensive
         password hashing algorithms are bypassed. Also, you can speed up
         ``login()`` by :ref:`using a weaker hasher while testing
         <speeding-up-tests-auth-hashers>`.
+
+        .. versionchanged:: 6.2
+
+            On older versions, backends not implementing ``(a)get_user()`` were
+            eligible to be selected.
 
     .. method:: Client.logout()
     .. method:: Client.alogout()
@@ -2075,7 +2081,6 @@ and contents::
                 "Here is the message.",
                 "from@example.com",
                 ["to@example.com"],
-                fail_silently=False,
             )
 
             # Test that one message has been sent.

@@ -129,9 +129,9 @@ class Queries1Tests(TestCase):
         cls.t4 = Tag.objects.create(name="t4", parent=cls.t3)
         cls.t5 = Tag.objects.create(name="t5", parent=cls.t3)
 
-        cls.n1 = Note.objects.create(note="n1", misc="foo", id=1)
-        cls.n2 = Note.objects.create(note="n2", misc="bar", id=2)
-        cls.n3 = Note.objects.create(note="n3", misc="foo", id=3, negate=False)
+        cls.n1 = Note.objects.create(note="n1", misc="foo")
+        cls.n2 = Note.objects.create(note="n2", misc="bar")
+        cls.n3 = Note.objects.create(note="n3", misc="foo", negate=False)
 
         cls.ann1 = Annotation.objects.create(name="a1", tag=cls.t1)
         cls.ann1.notes.add(cls.n1)
@@ -707,11 +707,13 @@ class Queries1Tests(TestCase):
         self.assertIn("note_id", ExtraInfo.objects.values()[0])
         # You can also pass it in explicitly.
         self.assertSequenceEqual(
-            ExtraInfo.objects.values("note_id"), [{"note_id": 1}, {"note_id": 2}]
+            ExtraInfo.objects.values("note_id"),
+            [{"note_id": self.n1.pk}, {"note_id": self.n2.pk}],
         )
         # ...or use the field name.
         self.assertSequenceEqual(
-            ExtraInfo.objects.values("note"), [{"note": 1}, {"note": 2}]
+            ExtraInfo.objects.values("note"),
+            [{"note": self.n1.pk}, {"note": self.n2.pk}],
         )
 
     def test_ticket6154(self):
@@ -938,7 +940,7 @@ class Queries1Tests(TestCase):
         # qs.values_list(...).values(...) combinations should work.
         self.assertSequenceEqual(
             Note.objects.values_list("note", flat=True).values("id").order_by("id"),
-            [{"id": 1}, {"id": 2}, {"id": 3}],
+            [{"id": self.n1.pk}, {"id": self.n2.pk}, {"id": self.n3.pk}],
         )
         self.assertSequenceEqual(
             Annotation.objects.filter(
@@ -1846,8 +1848,8 @@ class Queries5Tests(TestCase):
     def setUpTestData(cls):
         # Ordering by 'rank' gives us rank2, rank1, rank3. Ordering by the
         # Meta.ordering will be rank3, rank2, rank1.
-        cls.n1 = Note.objects.create(note="n1", misc="foo", id=1)
-        cls.n2 = Note.objects.create(note="n2", misc="bar", id=2)
+        cls.n1 = Note.objects.create(note="n1", misc="foo")
+        cls.n2 = Note.objects.create(note="n2", misc="bar")
         e1 = ExtraInfo.objects.create(info="e1", note=cls.n1)
         e2 = ExtraInfo.objects.create(info="e2", note=cls.n2)
         a1 = Author.objects.create(name="a1", num=1001, extra=e1)
@@ -2073,7 +2075,7 @@ class NullableRelOrderingTests(TestCase):
 class DisjunctiveFilterTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.n1 = Note.objects.create(note="n1", misc="foo", id=1)
+        cls.n1 = Note.objects.create(note="n1", misc="foo")
         cls.e1 = ExtraInfo.objects.create(info="e1", note=cls.n1)
 
     def test_ticket7872(self):
@@ -2115,7 +2117,7 @@ class Queries6Tests(TestCase):
         cls.t3 = Tag.objects.create(name="t3", parent=cls.t1)
         cls.t4 = Tag.objects.create(name="t4", parent=cls.t3)
         cls.t5 = Tag.objects.create(name="t5", parent=cls.t3)
-        n1 = Note.objects.create(note="n1", misc="foo", id=1)
+        n1 = Note.objects.create(note="n1", misc="foo")
         cls.ann1 = Annotation.objects.create(name="a1", tag=cls.t1)
         cls.ann1.notes.add(n1)
         cls.ann2 = Annotation.objects.create(name="a2", tag=cls.t4)
@@ -2242,7 +2244,7 @@ class Queries6Tests(TestCase):
 class RawQueriesTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        Note.objects.create(note="n1", misc="foo", id=1)
+        Note.objects.create(note="n1", misc="foo")
 
     def test_ticket14729(self):
         # Test representation of raw query with one or few parameters passed as
@@ -2273,7 +2275,7 @@ class GeneratorExpressionTests(SimpleTestCase):
 class ComparisonTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.n1 = Note.objects.create(note="n1", misc="foo", id=1)
+        cls.n1 = Note.objects.create(note="n1", misc="foo")
         e1 = ExtraInfo.objects.create(info="e1", note=cls.n1)
         cls.a2 = Author.objects.create(name="a2", num=2002, extra=e1)
 
@@ -2916,7 +2918,7 @@ class QuerySetSupportsPythonIdioms(TestCase):
     def test_slicing_cannot_filter_queryset_once_sliced(self):
         msg = "Cannot filter a query once a slice has been taken."
         with self.assertRaisesMessage(TypeError, msg):
-            Article.objects.all()[0:5].filter(id=1)
+            Article.objects.all()[0:5].filter(name="foo")
 
     def test_slicing_cannot_reorder_queryset_once_sliced(self):
         msg = "Cannot reorder a query once a slice has been taken."
@@ -3408,7 +3410,7 @@ class ExcludeTest17600(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        # Create a few Orders.
+        # Create a few Orders. Explicit pks needed for IntegerField pk.
         cls.o1 = Order.objects.create(pk=1)
         cls.o2 = Order.objects.create(pk=2)
         cls.o3 = Order.objects.create(pk=3)

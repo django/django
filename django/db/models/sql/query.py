@@ -43,10 +43,11 @@ from django.db.models.query_utils import (
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
 from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
 from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
-from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.tree import Node
+from django.utils.warnings import django_file_prefixes
 
 __all__ = ["Query", "RawQuery"]
 
@@ -2402,6 +2403,11 @@ class Query(BaseExpression):
         self.extra_order_by = ()
         if clear_default:
             self.default_ordering = False
+        # Ordering is cleared on combined queries with clear_default=False
+        # when union() and analogues are called, so percolate any possible
+        # clear_default=True.
+        for query in self.combined_queries:
+            query.clear_ordering(force=False, clear_default=clear_default)
 
     def set_group_by(self, allow_aliases=True):
         """

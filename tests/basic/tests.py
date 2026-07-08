@@ -554,6 +554,7 @@ class ModelTest(TestCase):
         cases = [
             Article(),
             Article(id=None),
+            PrimaryKeyWithDbDefault(),
         ]
         for case in cases:
             with self.subTest(case=case):

@@ -1203,6 +1203,22 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
                     # The right month and year are displayed.
                     self.wait_for_text("#calendarin0 caption", expected_caption)
 
+    def test_calendar_press_enter_focus_element(self):
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.common.keys import Keys
+
+        self.admin_login(username="super", password="secret", login_url="/")
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_widgets_member_add")
+        )
+        icon = self.selenium.find_element(By.ID, "calendarlink0")
+        expected_focus_element = self.selenium.find_element(
+            By.CSS_SELECTOR, "div#calendarin0 table td.today a"
+        )
+        icon.send_keys(Keys.ENTER)
+        focused_element = self.selenium.switch_to.active_element
+        self.assertEqual(expected_focus_element, focused_element)
+
     @override_settings(TIME_ZONE="Asia/Seoul")
     def test_timezone_warning_message(self):
         from selenium.webdriver.common.by import By
@@ -1844,6 +1860,23 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertSequenceEqual(
             school.alumni.all().order_by("name"), [self.lisa, self.peter]
         )
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_vertical_arrow_buttons_layout(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(username="super", password="secret", login_url="/")
+        self.selenium.get(
+            self.live_server_url
+            + reverse("admin:admin_widgets_school_change", args=(self.school.id,))
+        )
+        students = self.selenium.find_element(By.CSS_SELECTOR, ".field-students")
+        self.selenium.execute_script("window.scrollTo(0, %s);" % students.location["y"])
+        buttons = self.selenium.find_element(
+            By.CSS_SELECTOR, "div.selector.stacked ul.selector-chooser"
+        )
+        self.assertTrue(buttons.is_displayed())
+        self.take_screenshot("arrow_buttons")
 
 
 class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):

@@ -84,6 +84,7 @@ Django's system checks are organized using the following tags:
   or if you specify configured database aliases using the ``--database`` option
   when calling the :djadmin:`check` command.
 * ``files``: Checks files related configuration.
+* ``mail``: Checks email related configuration.
 * ``models``: Checks of model, field, and manager definitions.
 * ``security``: Checks security related configuration.
 * ``signals``: Checks on signal declarations and handler registrations.
@@ -150,6 +151,18 @@ If you're using MySQL or MariaDB, the following checks will be performed:
   ``<alias>``. See also :ref:`mysql-sql-mode`.
 * **mysql.W003**: MySQL/MariaDB may not allow unique ``CharField``\s to have a
   ``max_length`` > 255.
+
+Mail
+----
+
+The following checks verify that your :setting:`MAILERS` setting is correctly
+configured:
+
+* **mail.E001**: Your :setting:`MAILERS` setting uses a development-only email
+  backend in the ``'default'`` entry (``<backend>``). (Only checked when the
+  :option:`check --deploy` option is used.)
+* **mail.W001**: Your :setting:`MAILERS` setting has no ``'default'`` entry.
+  Sending email without a valid mailer will fail.
 
 Managing files
 --------------
@@ -759,6 +772,8 @@ with the admin site:
   referenced by ``<modeladmin>.autocomplete_fields``.
 * **admin.E040**: ``<modeladmin>`` must define ``search_fields``, because
   it's referenced by ``<other_modeladmin>.autocomplete_fields``.
+* **admin.E041**: The value of ``delete_confirmation_max_display`` must be a
+  non-negative integer or ``None``.
 
 ``ModelAdmin``
 ~~~~~~~~~~~~~~
@@ -819,8 +834,6 @@ with the admin site:
   method for the ``<action>`` action.
 * **admin.E130**: ``__name__`` attributes of actions defined in
   ``<modeladmin>`` must be unique. Name ``<name>`` is not unique.
-* **admin.E131**: The value of ``delete_confirmation_max_display`` must be a
-  non-negative integer or ``None``.
 
 ``InlineModelAdmin``
 ~~~~~~~~~~~~~~~~~~~~

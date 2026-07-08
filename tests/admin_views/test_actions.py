@@ -514,7 +514,10 @@ class AdminActionsTest(TestCase):
         self.assertIn(r"&quot;obj\\&quot;", output)
 
 
-@override_settings(ROOT_URLCONF="admin_views.urls")
+@override_settings(
+    ROOT_URLCONF="admin_views.urls",
+    MAILERS={"default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}},
+)
 class AdminActionsPermissionTests(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -567,6 +570,32 @@ class AdminActionsPermissionTests(TestCase):
             reverse("admin:admin_views_subscriber_changelist"), delete_confirmation_data
         )
         self.assertEqual(response.status_code, 403)
+
+    def test_minimum_permission(self):
+        permission = Permission.objects.get(codename="view_externalsubscriber")
+        self.user.user_permissions.add(permission)
+        es = ExternalSubscriber.objects.create(
+            name="John Doe", email="john@example.org"
+        )
+
+        cl_url = reverse("admin:admin_views_externalsubscriber_changelist")
+        cl_post = {ACTION_CHECKBOX_NAME: [es.pk], "action": "external_mail"}
+        cf_url = reverse("admin:admin_views_externalsubscriber_change", args=[es.pk])
+        cf_post = {ACTION_CHECKBOX_NAME: [es.pk], "CHANGE_FORM-action": "external_mail"}
+
+        for url, post_data in [(cl_url, cl_post), (cf_url, cf_post)]:
+            mail.outbox = []
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertContains(
+                    response,
+                    '<option value="external_mail">'
+                    "External mail (Another awesome action)</option>",
+                    html=True,
+                )
+                response = self.client.post(url, post_data)
+                self.assertEqual(len(mail.outbox), 1)
+                self.assertEqual(response.status_code, 302)
 
 
 @override_settings(
@@ -672,6 +701,30 @@ class AdminDetailActionsTest(TestCase):
         response = self.client.post(change_url, post_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b"OK")
+
+    def test_action_changeform_cannot_target_different_objects(self):
+        changeform_url = reverse(
+            "admin:admin_views_externalsubscriber_change", args=[self.s1.pk]
+        )
+        external_subscriber = ExternalSubscriber.objects.create(
+            name="Jane Austen", email="jane@example.org"
+        )
+        for invalid_checkbox_value in [
+            [external_subscriber.pk],
+            [self.s1.pk, external_subscriber.pk],
+            [],
+        ]:
+            with self.subTest(invalid_checkbox_value=invalid_checkbox_value):
+                response = self.client.post(
+                    changeform_url,
+                    {
+                        "CHANGE_FORM-action": "external_mail",
+                        ACTION_CHECKBOX_NAME: invalid_checkbox_value,
+                        "index": 0,
+                    },
+                )
+                self.assertEqual(len(mail.outbox), 0)
+                self.assertEqual(response.status_code, 400)
 
     def test_select_across_ignored(self):
         ExternalSubscriber.objects.create(name="Bob Bobson", email="bob@example.org")

@@ -1148,16 +1148,20 @@ class ChangeListTests(TestCase):
         Regression tests for #16257: dynamic list_display_links support.
         """
         parent = Parent.objects.create(name="parent")
+        children = []
         for i in range(1, 10):
-            Child.objects.create(id=i, name="child %s" % i, parent=parent, age=i)
+            children.append(
+                Child.objects.create(name="child %s" % i, parent=parent, age=i + 1)
+            )
 
         m = DynamicListDisplayLinksChildAdmin(Child, custom_site)
         superuser = self._create_superuser("superuser")
         request = self._mocked_authenticated_request("/child/", superuser)
         response = m.changelist_view(request)
-        for i in range(1, 10):
-            link = reverse("admin:admin_changelist_child_change", args=(i,))
-            self.assertContains(response, '<a href="%s">%s</a>' % (link, i))
+        for child in children:
+            link = reverse("admin:admin_changelist_child_change", args=(child.pk,))
+            # "age" is in list_display_links.
+            self.assertContains(response, '<a href="%s">%s</a>' % (link, child.age))
 
         list_display = m.get_list_display(request)
         list_display_links = m.get_list_display_links(request, list_display)

@@ -1,4 +1,5 @@
 import contextvars
+import gc
 from inspect import markcoroutinefunction
 from unittest import mock
 
@@ -14,26 +15,34 @@ from .models import Author, Book, Car, Page, Person
 
 
 class BaseSignalSetup:
+    def _signal_counts(self):
+        # Clear dead receivers before counting.
+        counts = []
+        for signal in (
+            signals.pre_save,
+            signals.post_save,
+            signals.pre_delete,
+            signals.post_delete,
+        ):
+            with signal.lock:
+                signal._clear_dead_receivers()
+            counts.append(len(signal.receivers))
+        return tuple(counts)
+
     def setUp(self):
-        # Save up the number of connected signals so that we can check at the
-        # end that all the signals we register get properly unregistered
-        # (#9989)
-        self.pre_signals = (
-            len(signals.pre_save.receivers),
-            len(signals.post_save.receivers),
-            len(signals.pre_delete.receivers),
-            len(signals.post_delete.receivers),
-        )
+        # The count comparison in tearDown() is a regression check for
+        # Signal.disconnect() failing to remove entries (#9989). Collect first
+        # so the baseline contains only reachable receivers; a receiver
+        # connected elsewhere in the suite and then garbage-collected could
+        # linger as a dead weakref, inflating the count (#29187). No collection
+        # in tearDown(): a weak receiver kept alive by a cycle should be
+        # counted, to catch a forgotten disconnect.
+        gc.collect()
+        self.pre_signals = self._signal_counts()
 
     def tearDown(self):
         # All our signals got disconnected properly.
-        post_signals = (
-            len(signals.pre_save.receivers),
-            len(signals.post_save.receivers),
-            len(signals.pre_delete.receivers),
-            len(signals.post_delete.receivers),
-        )
-        self.assertEqual(self.pre_signals, post_signals)
+        self.assertEqual(self.pre_signals, self._signal_counts())
 
 
 class SignalTests(BaseSignalSetup, TestCase):

@@ -24,10 +24,11 @@ from django.db.models.sql.constants import (
 )
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
-from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 from django.utils.regex_helper import _lazy_re_compile
+from django.utils.warnings import django_file_prefixes
 
 
 class PositionRef(Ref):
@@ -590,6 +591,10 @@ class SQLCompiler:
                     raise DatabaseError(
                         "LIMIT/OFFSET not allowed in subqueries of compound statements."
                     )
+                if compiler.get_order_by():
+                    raise DatabaseError(
+                        "ORDER BY not allowed in subqueries of compound statements."
+                    )
         parts = []
         empty_compiler = None
         for compiler in compilers:
@@ -636,15 +641,6 @@ class SQLCompiler:
         if selected is not None and compiler.query.selected is None:
             compiler.query = compiler.query.clone()
             compiler.query.set_values(selected)
-        if (
-            (
-                features.requires_compound_order_by_subquery
-                and not features.ignores_unnecessary_order_by_in_subqueries
-            )
-            or not features.supports_parentheses_in_compound
-        ) and compiler.get_order_by():
-            compiler.query = compiler.query.clone()
-            compiler.query.clear_ordering(force=False)
         part_sql, part_args = compiler.as_sql(with_col_aliases=True)
         if compiler.query.combinator:
             # Wrap in a subquery if wrapping in parentheses isn't

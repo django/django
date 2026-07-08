@@ -2,6 +2,7 @@ from unittest import mock
 
 from django.template import TemplateDoesNotExist
 from django.test import Client, RequestFactory, SimpleTestCase, override_settings
+from django.utils.csp import CSP
 from django.utils.translation import override
 from django.views.csrf import CSRF_FAILURE_TEMPLATE_NAME, csrf_failure
 
@@ -112,6 +113,37 @@ class CsrfViewTests(SimpleTestCase):
         """A custom CSRF_FAILURE_TEMPLATE_NAME is used."""
         response = self.client.post("/")
         self.assertContains(response, "Test template for CSRF failure", status_code=403)
+        self.assertIs(response.wsgi_request, response.context.request)
+
+    @override_settings(
+        TEMPLATES=[
+            {
+                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "OPTIONS": {
+                    "loaders": [
+                        (
+                            "django.template.loaders.locmem.Loader",
+                            {CSRF_FAILURE_TEMPLATE_NAME: ("{% csp_nonce_attr %}")},
+                        ),
+                    ],
+                    "context_processors": [
+                        "django.template.context_processors.csp",
+                    ],
+                },
+            }
+        ],
+        MIDDLEWARE=[
+            "django.middleware.csrf.CsrfViewMiddleware",
+            "django.middleware.csp.ContentSecurityPolicyMiddleware",
+        ],
+        SECURE_CSP={
+            "default-src": [CSP.NONCE],
+        },
+    )
+    def test_custom_template_with_csp_nonce(self):
+        """A custom CSRF_FAILURE_TEMPLATE_NAME with a CSP nonce is used."""
+        response = self.client.post("/")
+        self.assertContains(response, "nonce=", status_code=403)
         self.assertIs(response.wsgi_request, response.context.request)
 
     def test_custom_template_does_not_exist(self):

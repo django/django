@@ -197,17 +197,46 @@ def urlsafe_base64_decode(s):
         raise ValueError(e)
 
 
+def split_header_value(value, sep=","):
+    """Yield stripped parts of an HTTP header value split by sep.
+
+    Use only with headers whose values are token lists (e.g. Vary,
+    Cache-Control). Do not use with headers that allow quoted strings in values
+    (e.g. Set-Cookie), as commas inside values will be used as separators.
+    """
+    for part in value.split(sep):
+        if stripped := part.strip():
+            yield stripped
+
+
+def split_directive_names(value):
+    """Yield the lowercased directive names from an HTTP header value.
+
+    Any qualified value is discarded, so that qualified forms permitted by
+    RFC 9111 (e.g. `private="Set-Cookie"`) reduce to their directive name
+    ("private").
+
+    Use to check for the presence of a directive when its value is not needed;
+    use `split_header_value()` when the value matters (e.g. `max-age`).
+    """
+    for part in split_header_value(value):
+        yield part.split("=", 1)[0].strip().lower()
+
+
 def parse_etags(etag_str):
     """
     Parse a string of ETags given in an If-None-Match or If-Match header as
     defined by RFC 9110. Return a list of quoted ETags, or ['*'] if all ETags
     should be matched.
+
+    ETags values containing a comma are not supported, as the comma is used as
+    list separator.
     """
     if etag_str.strip() == "*":
         return ["*"]
     else:
         # Parse each ETag individually, and return any that are valid.
-        etag_matches = (ETAG_MATCH.match(etag.strip()) for etag in etag_str.split(","))
+        etag_matches = (ETAG_MATCH.match(etag) for etag in split_header_value(etag_str))
         return [match[1] for match in etag_matches if match]
 
 

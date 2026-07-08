@@ -39,10 +39,12 @@ that your computer doesn't have installed. You can usually figure out which
 package to install by doing a web search for the last line or so of the error
 message. Try adding your operating system to the search query if needed.
 
-If you have trouble installing the requirements, you can skip that step. See
+If you have trouble installing an optional test dependency, you can skip that
+dependency locally. For example, if installing ``pylibmc`` fails, comment out
+its line in ``requirements/py3.txt`` and continue with ``./runtests.py``.
+Tests that require ``pylibmc`` will be skipped automatically. See
 :ref:`running-unit-tests-dependencies` for details on installing the optional
-test dependencies. If you don't have an optional dependency installed, the
-tests that require it will be skipped.
+test dependencies.
 
 Running the tests requires a Django settings module that defines the databases
 to use. To help you get started, Django provides and uses a sample settings
@@ -81,11 +83,11 @@ default environments can be seen as follows:
     py3
     black
     blacken-docs
-    flake8>=3.7.0
+    flake8
     docs
-    isort>=7.0.0
+    isort
     lint-docs
-    zizmor>=1.19.0
+    zizmor
 
 Testing other Python versions and database backends
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

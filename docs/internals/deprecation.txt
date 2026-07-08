@@ -7,6 +7,19 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
+.. _deprecation-removed-in-7.1:
+
+7.1
+---
+
+See the :ref:`Django 6.2 release notes <deprecated-features-6.2>` for more
+details on these changes.
+
+* The ``safe`` parameter of :class:`~django.http.JsonResponse` will be removed.
+
+* Calling ``QuerySet.aiterator()`` after ``prefetch_related()`` without
+  providing a ``chunk_size`` will raise :exc:`ValueError`.
+
 .. _deprecation-removed-in-7.0:
 
 7.0
@@ -68,6 +81,9 @@ details on these changes.
 
 * The ``USE_BLANK_CHOICE_DASH`` transitional setting will be removed.
 
+* The ``SIGNED_COOKIE_LEGACY_SALT_FALLBACK`` transitional setting will be
+  removed.
+
 * The ``Field.get_placeholder_sql`` shim over the deprecated
   ``get_placeholder`` method will be removed.
 
@@ -107,6 +123,9 @@ details on these changes.
   ``django.core.signing.base64_hmac()`` will change from ``"sha1"`` to
   ``"sha256"``.
 
+* Calling :meth:`.QuerySet.select_related` without arguments will raise
+  :exc:`TypeError`.
+
 * :meth:`.QuerySet.select_related` will raise :exc:`TypeError` if passed
   ``True`` rather than :exc:`AttributeError`.
 
@@ -125,6 +144,9 @@ details on these changes.
 
 * Support for overriding ``ModelAdmin.get_action_choices()`` without the new
   ``action_location`` parameter will be removed.
+
+* The ``django.db.transaction.savepoint()`` alias to
+  ``django.db.transaction.savepoint_create()`` will be removed.
 
 .. _deprecation-removed-in-6.1:
 

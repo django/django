@@ -301,6 +301,7 @@ button {
     .stacked ul.selector-chooser {
         padding: 0 2px;
         transform: none;
+        margin: 10px auto;
     }
 
     .stacked .selector-chooser li {
@@ -571,6 +572,7 @@ button {
         height: 30px;
         padding: 0 2px;
         transform: none;
+        margin: auto;
     }
 
     .selector ul.selector-chooser li {
@@ -778,18 +780,6 @@ button {
         margin: 0;
         border: none;
         overflow: visible;
-    }
-
-    .calendarbox:before,
-    .clockbox:before {
-        content: "";
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.75);
-        transform: translate(-50%, -50%);
     }
 
     .calendarbox > *,

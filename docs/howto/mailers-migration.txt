@@ -1,18 +1,19 @@
+.. RemovedInDjango70Warning: Remove this file and references to it.
+
 .. _migrating-to-mailers:
 
 ==========================
 Migrating email to mailers
 ==========================
 
-Django 6.1 introduces the :setting:`MAILERS` setting, replacing
+Django 6.1 introduced the :setting:`MAILERS` setting, replacing
 :setting:`EMAIL_BACKEND` and several other ``EMAIL_*`` settings. It also
-introduces :data:`.mail.mailers` for obtaining configured email backend
+introduced :data:`.mail.mailers` for obtaining configured email backend
 instances, replacing :func:`.mail.get_connection`. A new ``using`` argument
 replaces the earlier ``connection`` in Django functions that send email.
 
-The older functionality and settings are still available, but are deprecated
-and will be removed in Django 7.0. This guide provides details on migrating
-existing projects to the new mailers functionality.
+This guide provides details on migrating existing projects to the new mailers
+functionality.
 
 All Django projects that send email should:
 
@@ -28,15 +29,15 @@ All Django projects that send email should:
 
   .. note::
 
-      Test suites often use a non-functional email backend, such as the memory
-      backend that Django automatically :ref:`substitutes during tests
-      <topics-testing-email>`. As a result, running tests won't uncover
-      deprecations that only appear when sending email in production.
+      Running tests may not identify all relevant deprecations. Test suites
+      often use a non-functional email backend (such as the memory backend that
+      Django :ref:`substitutes during tests <topics-testing-email>`), so can
+      miss deprecation warnings that are only issued from the production email
+      configuration.
 
       Consider running with deprecation warnings enabled in production to catch
       those deprecations. Or carefully review your code (including third-party
-      packages) for use of any deprecated email features that will change in
-      Django 7.0.
+      packages) for use of any deprecated email features.
 
 Other updates are needed only for projects or reusable Django libraries that
 use these specific features:
@@ -46,6 +47,29 @@ use these specific features:
 * :ref:`migrating-to-mailers-email-backends`
 * :ref:`migrating-to-mailers-auth`
 * :ref:`migrating-to-mailers-adminemailhandler`
+
+.. deprecated:: 6.1
+
+    The following settings and functions will be removed in Django 7.0:
+
+    * :setting:`EMAIL_BACKEND`, :setting:`EMAIL_FILE_PATH`,
+      :setting:`EMAIL_HOST`, :setting:`EMAIL_HOST_PASSWORD`,
+      :setting:`EMAIL_HOST_USER`, :setting:`EMAIL_PORT`,
+      :setting:`EMAIL_SSL_CERTFILE`, :setting:`EMAIL_SSL_KEYFILE`,
+      :setting:`EMAIL_TIMEOUT`, :setting:`EMAIL_USE_SSL`,
+      :setting:`EMAIL_USE_TLS`
+
+    * :func:`.mail.get_connection` and the ``connection`` arguments to mail
+      functions
+
+    * The ``fail_silently`` argument to :func:`.send_mail`,
+      :func:`.send_mass_mail`, :func:`.mail_admins`, :func:`.mail_managers`,
+      and :meth:`.EmailMessage.send`
+
+    * The ``auth_user`` and ``auth_password`` arguments to :func:`.send_mail`
+      and :func:`.send_mass_mail`
+
+    * The ``email_backend`` argument to :class:`.AdminEmailHandler`
 
 .. _migrating-to-mailers-settings:
 
@@ -60,7 +84,8 @@ settings. In your project's settings, define a :setting:`MAILERS` dict with a
         "default": {
             "BACKEND": ...,  # value of EMAIL_BACKEND setting
             "OPTIONS": {
-                ...,  # values from other deprecated EMAIL_* settings
+                # values from other deprecated EMAIL_* settings
+                ...,
             },
         },
     }
@@ -102,12 +127,14 @@ moved in a :setting:`MAILERS` configuration is:
   if a :setting:`MAILERS` configuration doesn't specify the ``"BACKEND"``).
 * :setting:`EMAIL_FILE_PATH` becomes ``"file_path"`` in ``"OPTIONS"`` (with
   ``"BACKEND"`` set to ``"django.core.mail.backends.filebased.EmailBackend"``).
-* :setting:`EMAIL_HOST` becomes ``"host"`` in ``"OPTIONS"``. If your settings
-  didn't define :setting:`!EMAIL_HOST`, the default value was ``"localhost"``
-  and you must add ``"host": "localhost"`` to the ``"OPTIONS"`` for an SMTP
-  mailer configuration.
+* :setting:`EMAIL_HOST` becomes ``"host"`` in ``"OPTIONS"``. A ``"host"`` is
+  required for the SMTP email backend. If your settings didn't define
+  ``EMAIL_HOST``, set ``"host"`` to ``"localhost"`` (the default value for the
+  deprecated setting).
 * :setting:`EMAIL_HOST_PASSWORD` becomes ``"password"`` in ``"OPTIONS"``.
-* :setting:`EMAIL_HOST_USER` becomes ``"username"`` in ``"OPTIONS"``.
+* :setting:`EMAIL_HOST_USER` becomes ``"username"`` in ``"OPTIONS"``. (Note
+  ``"username"`` doesn't quite follow the naming pattern for the other
+  deprecated settings.)
 * :setting:`EMAIL_PORT` becomes ``"port"`` in ``"OPTIONS"``. It can be omitted
   if the connection uses the default port for its security (465 for SSL, 587
   for TLS, or 25 for an unsecured SMTP connection).
@@ -141,11 +168,13 @@ There are two deprecated features that are *not* supported when
   ``django.conf.settings`` (e.g., checking ``settings.EMAIL_BACKEND`` or using
   ``settings.EMAIL_HOST_USER``).
 * Calling :func:`mail.get_connection("path.to.EmailBackend")
-  <.mail.get_connection>` with a specific backend path. (Other uses of
-  ``get_connection()`` are still allowed, and will issue deprecation warnings.)
+  <.mail.get_connection>` with a specific backend path. (Other arguments to
+  ``get_connection()`` are still supported, and will simply issue deprecation
+  warnings when :setting:`MAILERS` is defined.)
 
-If a third-party package does either of those, projects that use it cannot
-upgrade to the :setting:`MAILERS` setting until the package has been updated.
+If a third-party package does either of those, projects that use it will not be
+able to change to the :setting:`MAILERS` setting until the package has been
+updated.
 
 Solving "not available when MAILERS is defined" errors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -164,16 +193,17 @@ need to remove :setting:`MAILERS` from your settings and replace it with the
 equivalent :ref:`deprecated email settings <deprecated-email-settings>` until
 the package has been updated.
 
+If those errors are coming from your own code, see the other sections in this
+migration guide for recommended updates.
+
 .. _migrating-to-mailers-get-connection:
 
 Replacing ``get_connection()`` and ``connection`` arguments
 -----------------------------------------------------------
 
-:func:`.mail.get_connection` is deprecated in Django 6.1, as is the
-``connection`` argument for passing backend instances directly to mail
-functions.
-
-The replacement for ``get_connection()`` depends on how it is being called:
+The replacements for the deprecated :func:`.mail.get_connection` function
+and ``connection`` arguments to other mail functions depend on how and why
+the connections are being created:
 
 *   ``get_connection()`` called with no arguments
 
@@ -238,13 +268,12 @@ The replacement for ``get_connection()`` depends on how it is being called:
 Replacing ``fail_silently``
 ---------------------------
 
-The ``fail_silently`` arguments to :func:`.send_mail`, :func:`.send_mass_mail`,
-:func:`.mail_admins`, :func:`.mail_managers`, and :meth:`.EmailMessage.send`
-are deprecated.
-
-Handling of ``fail_silently`` varies depending on the email backend. A survey
-of its use suggested that callers have several different expectations for its
-behavior, many of which don't match the actual backend implementations.
+The deprecated ``fail_silently`` arguments to :func:`.send_mail`,
+:func:`.send_mass_mail`, :func:`.mail_admins`, :func:`.mail_managers`, and
+:meth:`.EmailMessage.send` can be replaced in several ways. Existing usage
+seems to have several different expectations for the behavior, many of which
+don't match the actual (and email backend-dependent) implementation. Consider
+removing ``fail_silently`` entirely if there is not a specific need for it.
 
 Calls with ``fail_silently=True`` should be updated with one of these options,
 depending on the caller's intent:
@@ -254,23 +283,25 @@ depending on the caller's intent:
   ``except mail.MailerDoesNotExist: pass``.
 
 * To ignore *all* exceptions (e.g., to avoid cascading failures in an error
-  handler), wrap the send call in ``try:`` / ``except Exception: pass``.
+  handler that sends mail), wrap the send call in ``try:`` / ``except
+  Exception: pass``.
 
 * To ignore only SMTP-related errors, wrap the send call in ``try`` /
   ``except OSError: pass``. Note that this ignores both transient network
   glitches *and* SMTP configuration problems (just like the existing SMTP
-  backend ``fail_silently`` handling).
+  email backend ``fail_silently`` implementation).
 
 * To ignore end user typos in ``to`` addresses and other delivery problems,
   remove the ``fail_silently`` argument. Recipient errors are not generally
   detected at send time, so using ``fail_silently`` for this purpose doesn't
   accomplish anything and could mask other problems like configuration errors.
 
-  (In certain local delivery configurations, SMTP servers *may* report some
-  recipient errors at send time. Intercept
+  (In *local delivery* configurations, SMTP servers may report some recipient
+  errors at send time. If you are using ``fail_silently`` specifically to
+  ignore those errors, consider instead intercepting
   :exc:`~.smtplib.SMTPRecipientsRefused` and/or
   :exc:`~.smtplib.SMTPResponseException`\ s with particular ``smtp_code``
-  values to detect those cases.)
+  values as a more precise filter.)
 
 * To create an email configuration that ignores certain backend-dependent
   errors and reuse it for multiple sending operations, create a custom
@@ -308,14 +339,14 @@ compatibility with mailers.
 
 * Do not accept variable positional ``*args`` or pass them to superclass init.
 
-The ``BaseEmailBackend`` superclass now defines a ``self.alias`` attribute.
+The ``BaseEmailBackend`` superclass now initializes an ``alias`` attribute.
 This is useful for error messages (e.g., ``raise InvalidMailer(f"Bad host
 {host}", alias=self.alias)``), but should not be used for accessing
 ``settings.MAILERS`` directly. All OPTIONS for a mailer configuration are
 passed to backend init as keyword arguments.
 
 For reusable libraries that want to support compatibility with deprecated mail
-functions and settings (similar to Django's built-in email backends):
+functions and settings, or that support older Django versions:
 
 * A backend can detect it is being initialized without :setting:`MAILERS` by
   checking if ``self.alias is None``. (Django's built-in backends check this to
@@ -336,11 +367,11 @@ functions and settings (similar to Django's built-in email backends):
 Replacing ``auth_user`` and ``auth_password``
 ---------------------------------------------
 
-The ``auth_user`` and ``auth_password`` arguments to :func:`.mail.send_mail`
-and :func:`.mail.send_mass_mail` are deprecated. To replace them, define a
-custom :setting:`MAILERS` configuration with ``"username"`` and ``"password"``
-:setting:`"OPTIONS" <MAILERS-OPTIONS>`, and refer to that configuration with
-the ``using`` argument when sending mail.
+The deprecated ``auth_user`` and ``auth_password`` arguments to
+:func:`.send_mail` and :func:`.send_mass_mail` can be replaced by defining a
+custom :setting:`MAILERS` configuration with
+``"username"`` and ``"password"`` :setting:`"OPTIONS" <MAILERS-OPTIONS>`, and
+refer to that configuration with the ``using`` argument when sending mail.
 
 For example, to upgrade::
 
@@ -349,6 +380,7 @@ For example, to upgrade::
 Add a custom :setting:`MAILERS` configuration in your settings::
 
     MAILERS = {
+        # Existing default configuration.
         "default": {
             "OPTIONS": {
                 "host": "smtp.example.com",
@@ -356,6 +388,7 @@ Add a custom :setting:`MAILERS` configuration in your settings::
                 "password": "default-password",
             },
         },
+        # Duplicate the default configuration, changing the auth.
         "admin-config": {
             "OPTIONS": {
                 "host": "smtp.example.com",
@@ -374,9 +407,10 @@ And then refer to it when sending::
 Updating AdminEmailHandler ``email_backend``
 --------------------------------------------
 
-The ``email_backend`` argument to the logging :class:`.AdminEmailHandler` is
-deprecated. Replace it with a custom :setting:`MAILERS` configuration and refer
-to that configuration with the ``using`` argument.
+The deprecated ``email_backend`` argument to the logging
+:class:`.AdminEmailHandler` can be replaced with a custom
+:setting:`MAILERS` configuration, referring to it with the ``using``
+argument.
 
 For example, if your settings include::
 

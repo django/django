@@ -770,6 +770,15 @@ class TestIntegration(BaseTestCase):
         self.assertIsNone(result)
         mock_gh.assert_not_called()
 
+    def test_new_contributor_cannot_omit_ticket(self):
+        body = make_pr_body(ticket="", checked_items=0)
+        _, mock_summary, _ = self.call_main(pr_body=body, commit_count=0)
+        _, results, _ = mock_summary.call_args.args
+        result_map = {name: result for name, result, _ in results}
+        self.assertEqual(
+            result_map["Trac ticket referenced"].title, check_pr.MISSING_TRAC_TICKET[0]
+        )
+
     def test_fully_valid_pr_no_comment_posted(self):
         result, _, mock_gh = self.call_main(
             pr_body=VALID_PR_BODY, pr_title=VALID_PR_TITLE

@@ -4,7 +4,8 @@
   <body>
     <script id="django-admin-popup-response-constants"
             src="{% static "admin/js/popup_response.js" %}"
-            data-popup-response="{{ popup_response_data }}">
+            data-popup-response="{{ popup_response_data }}"
+            {% csp_nonce_attr %}>
     </script>
   </body>
 </html>

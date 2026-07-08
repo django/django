@@ -6,7 +6,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jorgecarleitao <jorgecarleitao@gmail.com>, 2015
 # Manuela Silva <mmsrs@sky.com>, 2025
-# Nuno Mariz <nmariz@gmail.com>, 2013,2015,2017-2018,2023
+# Nuno Mariz <nmariz@gmail.com>, 2013,2015,2017-2018,2023,2025
 # 12574c6d66324e145c1d19e02acecb73_84badd8 <4e8d94859927eab3b50486d21249c068_5346>, 2011
 # Raúl Pedro Fernandes Santos, 2014
 # Rui Dinis Silva, 2017
@@ -15,9 +15,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 07:05+0000\n"
-"Last-Translator: Manuela Silva <mmsrs@sky.com>, 2025\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"Last-Translator: Nuno Mariz <nmariz@gmail.com>, "
+"2013,2015,2017-2018,2023,2025\n"
 "Language-Team: Portuguese (http://app.transifex.com/django/django/language/"
 "pt/)\n"
 "MIME-Version: 1.0\n"
@@ -336,11 +337,8 @@ msgstr ""
 "Ocorreu um erro. Foi comunicado por email aos administradores da página e "
 "deverá ser corrigido em breve. Obrigado pela sua compreensão. "
 
-msgid "Run the selected action"
-msgstr "Executar a acção selecionada"
-
-msgid "Go"
-msgstr "Ir"
+msgid "Run"
+msgstr "Executar"
 
 msgid "Click here to select the objects across all pages"
 msgstr "Clique aqui para selecionar os objetos em todas as páginas"
@@ -366,7 +364,7 @@ msgid "Add link"
 msgstr "Adicionar hiperligação"
 
 msgid "Change or view list link"
-msgstr "Alterar ou ver a hiperligação da lista"
+msgstr "Alterar ou visualizar a lista hiperligações"
 
 msgid "Add"
 msgstr "Adicionar"
@@ -379,10 +377,10 @@ msgstr "Não tem permissões para visualizar ou editar nada. "
 
 msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Depois de criar um utilizador, poderá editar mais opções de utilizador."
+"Depois de criar um utilizador, poderá editar mais opções do utilizador."
 
 msgid "Error:"
-msgstr ""
+msgstr "Erro:"
 
 msgid "Change password"
 msgstr "Modificar palavra-passe"
@@ -394,7 +392,7 @@ msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Por favor, corrija o erro abaixo."
 msgstr[1] "Por favor, corrija os erros abaixo."
-msgstr[2] "Por favor, corrija os erros abaixo."
+msgstr[2] "Por favor corrija os erros abaixo."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
@@ -452,6 +450,9 @@ msgstr "Mostrar contagem"
 msgid "Clear all filters"
 msgstr "Limpar todos os filtros"
 
+msgid "Save"
+msgstr "Gravar"
+
 msgid "Remove from sorting"
 msgstr "Remover da ordenação"
 
@@ -473,29 +474,29 @@ msgstr "Mudar tema (tema corrente: escuro)"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"A remoção de %(object_name)s '%(escaped_object)s' resultará na remoção dos "
-"objetos relacionados, mas a sua conta não tem permissão de remoção dos "
+"A remoção de %(object_name)s “%(escaped_object)s” pode resultar na remoção "
+"de objetos relacionados, mas sua conta não tem a permissão para remoção dos "
 "seguintes tipos de objetos:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Remover o %(object_name)s  ' %(escaped_object)s ' exigiria a remoção dos "
+"Remover o %(object_name)s  “%(escaped_object)s” exigiria remover os "
 "seguintes objetos protegidos relacionados:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Tem a certeza que deseja remover %(object_name)s \"%(escaped_object)s\"? "
-"Todos os items relacionados seguintes irão ser removidos:"
+"Tem certeza que deseja remover %(object_name)s “%(escaped_object)s”? Todos "
+"os seguintes itens relacionados serão removidos:"
 
 msgid "Objects"
 msgstr "Objectos"
@@ -581,7 +582,7 @@ msgstr ""
 "página. Deseja autenticar-se com uma conta diferente?"
 
 msgid "Forgotten your login credentials?"
-msgstr ""
+msgstr "Esqueceu-se das suas credenciais de login?"
 
 msgid "Toggle navigation"
 msgstr "Alternar navegação"
@@ -604,6 +605,10 @@ msgstr "Utilizador"
 msgid "Action"
 msgstr "Ação"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr "Paginação de %(name)s itens"
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "entrada"
@@ -617,14 +622,19 @@ msgstr ""
 "Este objeto não tem um histórico de alterações. Provavelmente não foi "
 "adicionado através da página de administração."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr "Paginação %(name)s"
+
 msgid "Show all"
 msgstr "Mostrar todos"
 
-msgid "Save"
-msgstr "Gravar"
-
 msgid "Popup closing…"
 msgstr "Encerramento de popup…"
+
+#, python-format
+msgid "Search %(name)s"
+msgstr "Pesquisar %(name)s"
 
 msgid "Search"
 msgstr "Pesquisar"
@@ -750,7 +760,7 @@ msgid "Please go to the following page and choose a new password:"
 msgstr "Por favor siga a seguinte página e escolha a sua nova palavra-passe:"
 
 msgid "In case you’ve forgotten, you are:"
-msgstr ""
+msgstr "Caso se tenha esquecido, você é:"
 
 msgid "Thanks for using our site!"
 msgstr "Obrigado pela sua visita ao nosso site!"

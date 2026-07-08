@@ -3,7 +3,7 @@
 
 {% block extrahead %}
 {{ block.super }}
-<style>
+<style {% csp_nonce_attr %}>
 .module table { width:100%; }
 .module table p { padding: 0; margin: 0; }
 </style>

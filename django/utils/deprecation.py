@@ -1,33 +1,25 @@
 import functools
 import inspect
-import os
 import warnings
 from collections import Counter
 from inspect import iscoroutinefunction, markcoroutinefunction
 
 from asgiref.sync import sync_to_async
 
-import django
 from django.utils.inspect import signature
+from django.utils.warnings import django_file_prefixes
 
 
-@functools.cache
-def django_file_prefixes():
-    file = getattr(django, "__file__", None)
-    if file is None:
-        return ()
-    return (os.path.join(os.path.dirname(file), ""),)
-
-
-class RemovedInNextVersionWarning(DeprecationWarning):
+class RemovedInDjango70Warning(DeprecationWarning):
     pass
 
 
-class RemovedInDjango70Warning(PendingDeprecationWarning):
+class RemovedInDjango71Warning(PendingDeprecationWarning):
     pass
 
 
-RemovedAfterNextVersionWarning = RemovedInDjango70Warning
+RemovedInNextVersionWarning = RemovedInDjango70Warning
+RemovedAfterNextVersionWarning = RemovedInDjango71Warning
 
 
 def warn_about_external_use(

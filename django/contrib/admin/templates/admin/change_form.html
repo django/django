@@ -3,11 +3,15 @@
 
 {% block title %}{% if errors %}{% translate "Error:" %} {% endif %}{{ block.super }}{% endblock %}
 {% block extrahead %}{{ block.super }}
-<script src="{% url 'admin:jsi18n' %}"></script>
-{{ media }}
+<script src="{% url 'admin:jsi18n' %}" {% csp_nonce_attr %}></script>
+{% csp_nonce_attr media %}
 {% endblock %}
 
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/forms.css" %}">{% endblock %}
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static "admin/css/widgets.css" %}" {% csp_nonce_attr %}>
+  <link rel="stylesheet" href="{% static "admin/css/forms.css" %}" {% csp_nonce_attr %}>
+{% endblock %}
 
 {% block coltype %}colM{% endblock %}
 
@@ -39,7 +43,7 @@
 <div>
 {% if action_form and not is_popup %}
   {% change_form_admin_actions %}
-  <input type="hidden" name="{{ action_checkbox_name }}" value="{{ object_id|unlocalize }}">
+  <input type="hidden" name="{{ action_checkbox_name }}" value="{{ original.pk|unlocalize }}">
 {% endif %}
 {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
 {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
@@ -76,6 +80,7 @@
             {% if adminform and add %}
                 data-model-name="{{ opts.model_name }}"
             {% endif %}
+            {% csp_nonce_attr %}
             async>
     </script>
 {% endblock %}

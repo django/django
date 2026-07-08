@@ -1,6 +1,7 @@
 import threading
+from inspect import iscoroutinefunction
 
-from asgiref.sync import async_to_sync, iscoroutinefunction
+from asgiref.sync import async_to_sync
 
 from django.contrib.admindocs.middleware import XViewMiddleware
 from django.contrib.auth.middleware import (

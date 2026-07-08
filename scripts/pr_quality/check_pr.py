@@ -470,10 +470,18 @@ def main(
             pr_number,
         )
         return
+    if commit_count == 0:
+        logger.info(
+            "PR #%s author has no commits -- setting size threshold to 0.",
+            pr_number,
+        )
+        threshold = 0
+    else:
+        threshold = LARGE_PR_THRESHOLD
 
     pr_title_result = SKIPPED
     total_changes = get_pr_total_changes(pr_number, repo, token)
-    ticket_result = check_trac_ticket(pr_body, total_changes)
+    ticket_result = check_trac_ticket(pr_body, total_changes, threshold)
     ticket_status_result = SKIPPED
     ticket_has_patch_result = SKIPPED
     ticket_id = extract_ticket_id(pr_body) if ticket_result is None else None

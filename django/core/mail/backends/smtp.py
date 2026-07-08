@@ -45,6 +45,7 @@ class EmailBackend(BaseEmailBackend):
         super().__init__(**kwargs)
         self.fail_silently = fail_silently
         self.connection = None
+        self._partial_connection = None
         self._lock = threading.RLock()
 
         # RemovedInDjango70Warning.
@@ -120,6 +121,11 @@ class EmailBackend(BaseEmailBackend):
             # Nothing to do if the connection is already open.
             return False
 
+        # If a connection was partially opened before, close it.
+        if self._partial_connection is not None:
+            self._close_connection(self._partial_connection)
+            self._partial_connection = None
+
         # If local_hostname is not specified, socket.getfqdn() gets used.
         # For performance, we use the cached FQDN for local_hostname.
         connection_params = {"local_hostname": DNS_NAME.get_fqdn()}
@@ -128,39 +134,51 @@ class EmailBackend(BaseEmailBackend):
         if self.use_ssl:
             connection_params["context"] = self.ssl_context
         try:
-            self.connection = self.connection_class(
+            self._partial_connection = self.connection_class(
                 self.host, self.port, **connection_params
             )
 
             # TLS/SSL are mutually exclusive, so only attempt TLS over
             # non-secure connections.
             if not self.use_ssl and self.use_tls:
-                self.connection.starttls(context=self.ssl_context)
+                self._partial_connection.starttls(context=self.ssl_context)
             if self.username and self.password:
-                self.connection.login(self.username, self.password)
+                self._partial_connection.login(self.username, self.password)
+
+            # Don't set connection until it's fully configured.
+            self.connection = self._partial_connection
+            self._partial_connection = None
+
             return True
         except OSError:
             if not self.fail_silently:
                 raise
 
+    def _close_connection(self, connection):
+        try:
+            connection.quit()
+        except (ssl.SSLError, smtplib.SMTPServerDisconnected):
+            # This happens when calling quit() on a TLS connection
+            # sometimes, or when the connection was already disconnected
+            # by the server.
+            connection.close()
+        except smtplib.SMTPException:
+            if self.fail_silently:
+                return
+            raise
+
     def close(self):
         """Close the connection to the email server."""
-        if self.connection is None:
-            return
-        try:
+        if self._partial_connection is not None:
             try:
-                self.connection.quit()
-            except (ssl.SSLError, smtplib.SMTPServerDisconnected):
-                # This happens when calling quit() on a TLS connection
-                # sometimes, or when the connection was already disconnected
-                # by the server.
-                self.connection.close()
-            except smtplib.SMTPException:
-                if self.fail_silently:
-                    return
-                raise
-        finally:
-            self.connection = None
+                self._close_connection(self._partial_connection)
+            finally:
+                self._partial_connection = None
+        if self.connection is not None:
+            try:
+                self._close_connection(self.connection)
+            finally:
+                self.connection = None
 
     def send_messages(self, email_messages):
         """

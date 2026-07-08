@@ -273,15 +273,13 @@ fields. We've specified ``auto_id=False`` to simplify the output:
     >>> class HelpTextContactForm(forms.Form):
     ...     subject = forms.CharField(max_length=100, help_text="100 characters max.")
     ...     message = forms.CharField()
-    ...     sender = forms.EmailField(help_text="A valid email address, please.")
-    ...     cc_myself = forms.BooleanField(required=False)
+    ...     contact_email = forms.EmailField(help_text="Your email (so we can reply).")
     ...
     >>> f = HelpTextContactForm(auto_id=False)
     >>> print(f)
     <div>Subject:<div class="helptext">100 characters max.</div><input type="text" name="subject" maxlength="100" required></div>
     <div>Message:<input type="text" name="message" required></div>
-    <div>Sender:<div class="helptext">A valid email address, please.</div><input type="email" name="sender" required></div>
-    <div>Cc myself:<input type="checkbox" name="cc_myself"></div>
+    <div>Contact email:<div class="helptext">Your email (so we can reply).</div><input type="email" name="contact_email" maxlength="320" required></div>
 
 When a field has help text it is associated with its input using the
 ``aria-describedby`` HTML attribute. If the widget is rendered in a

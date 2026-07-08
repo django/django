@@ -2,8 +2,8 @@
 {% load i18n static %}
 
 {% block title %}{% if form.errors %}{% translate "Error:" %} {% endif %}{{ block.super }}{% endblock %}
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/login.css" %}">
-{{ form.media }}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/login.css" %}" {% csp_nonce_attr %}>
+{% csp_nonce_attr form.media %}
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} login{% endblock %}

@@ -8,6 +8,7 @@
 # Felipe Silveira (Felipebros) <felipeiturama@gmail.com>, 2025
 # Gabriel da Mota <gabrielmotaa@hotmail.com>, 2023
 # fa9e10542e458baef0599ae856e43651_13d2225, 2012
+# Heron Fonsaca, 2026
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonas Rodrigues, 2023
 # Lucas Infante <maccinza@gmail.com>, 2015
@@ -20,8 +21,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-25 15:04-0500\n"
-"PO-Revision-Date: 2025-12-03 07:59+0000\n"
-"Last-Translator: Eduardo Felipe Castegnaro <eduardo@onsign.tv>, 2024-2025\n"
+"PO-Revision-Date: 2026-06-01 07:59+0000\n"
+"Last-Translator: Heron Fonsaca, 2026\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -109,11 +110,11 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"Você selecionou uma ação sem fazer mudanças nos campos individuais. Você "
-"provavelmente está procurando pelo botão Ir ao invés do botão Salvar."
+"Você selecionou uma ação e não fez nenhuma alteração nos campos individuais. "
+"Você provavelmente está procurando o botão Executar em vez do botão Salvar."
 
 msgid "Now"
 msgstr "Agora"

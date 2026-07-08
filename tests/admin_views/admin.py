@@ -61,7 +61,6 @@ from .models import (
     CyclicTwo,
     DependentChild,
     DooHickey,
-    EmptyModel,
     EmptyModelHidden,
     EmptyModelMixin,
     EmptyModelVisible,
@@ -77,6 +76,7 @@ from .models import (
     Gadget,
     Gallery,
     GenRelReference,
+    GetQuerySetModel,
     Grommet,
     ImplicitlyGeneratedPK,
     Ingredient,
@@ -542,9 +542,9 @@ class ParentAdmin(admin.ModelAdmin):
                 child.save()
 
 
-class EmptyModelAdmin(admin.ModelAdmin):
+class GetQuerySetModelAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
-        return super().get_queryset(request).filter(pk__gt=1)
+        return super().get_queryset(request).filter(deleted=False)
 
 
 class OldSubscriberAdmin(admin.ModelAdmin):
@@ -1036,9 +1036,16 @@ class AttributeErrorRaisingAdmin(admin.ModelAdmin):
     list_display = [callable_on_unknown]
 
 
+@admin.action(description="Restore", location=ActionLocation.CHANGE_FORM)
+def restore_filtered_manager(modeladmin, request, queryset):
+    queryset.update(deleted=False)
+
+
 class CustomManagerAdmin(admin.ModelAdmin):
+    actions = [restore_filtered_manager]
+
     def get_queryset(self, request):
-        return FilteredManager.objects
+        return FilteredManager.all_objects.all()
 
 
 class MessageTestingAdmin(admin.ModelAdmin):
@@ -1326,7 +1333,7 @@ site.register(OldSubscriber, OldSubscriberAdmin)
 site.register(Podcast, PodcastAdmin)
 site.register(Vodcast, VodcastAdmin)
 site.register(Parent, ParentAdmin)
-site.register(EmptyModel, EmptyModelAdmin)
+site.register(GetQuerySetModel, GetQuerySetModelAdmin)
 site.register(Fabric, FabricAdmin)
 site.register(Gallery, GalleryAdmin)
 site.register(Picture, PictureAdmin)

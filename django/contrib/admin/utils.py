@@ -435,6 +435,7 @@ def help_text_for_field(name, model):
 
 def display_for_field(value, field, empty_value_display, avoid_link=False):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
+    from django.db.models.expressions import DatabaseDefault
 
     if field.name == "password" and field.model == get_user_model():
         return render_password_as_hash(value)
@@ -450,8 +451,10 @@ def display_for_field(value, field, empty_value_display, avoid_link=False):
     # BooleanField needs special-case null-handling, so it comes before the
     # general null test.
     elif isinstance(field, models.BooleanField):
+        if isinstance(value, DatabaseDefault):
+            return _boolean_icon(None)
         return _boolean_icon(value)
-    elif value in field.empty_values:
+    elif value in field.empty_values or isinstance(value, DatabaseDefault):
         return empty_value_display
     elif isinstance(field, models.DateTimeField):
         return formats.localize(timezone.template_localtime(value))
@@ -476,12 +479,15 @@ def display_for_field(value, field, empty_value_display, avoid_link=False):
 
 def display_for_value(value, empty_value_display, boolean=False):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
+    from django.db.models.expressions import DatabaseDefault
 
     if boolean:
+        if value in EMPTY_VALUES or isinstance(value, DatabaseDefault):
+            return _boolean_icon(None)
         return _boolean_icon(value)
     if isinstance(value, str) and not isinstance(value, SafeString):
         value = value.strip()
-    if value in EMPTY_VALUES:
+    if value in EMPTY_VALUES or isinstance(value, DatabaseDefault):
         return empty_value_display
     elif isinstance(value, bool):
         return str(value)

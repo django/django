@@ -4,6 +4,7 @@ from django.core import serializers
 from django.core.serializers.xml_serializer import DTDForbidden
 from django.test import TestCase, TransactionTestCase
 
+from .models import Actor
 from .tests import SerializersTestBase, SerializersTransactionTestBase
 
 
@@ -78,6 +79,12 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
             "HT \t, LF \n, and CR \r are allowed",
             serializers.serialize(self.serializer_name, [self.a1]),
         )
+
+    def test_control_char_failure_attribute(self):
+        actor = Actor.objects.create(pk="\u0001")
+        msg = "Actor (pk:%s) contains unserializable characters" % actor.pk
+        with self.assertRaisesMessage(ValueError, msg):
+            serializers.serialize(self.serializer_name, [actor])
 
     def test_no_dtd(self):
         """

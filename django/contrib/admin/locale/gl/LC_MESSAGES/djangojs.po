@@ -5,14 +5,14 @@
 # fonso <fonzzo@gmail.com>, 2011,2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Leandro Regueiro <leandro.regueiro@gmail.com>, 2013
-# X Bello <xbello@gmail.com>, 2023,2025
+# X Bello <xbello@gmail.com>, 2023,2025-2026
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-25 15:04-0500\n"
-"PO-Revision-Date: 2025-09-17 07:59+0000\n"
-"Last-Translator: X Bello <xbello@gmail.com>, 2023,2025\n"
+"PO-Revision-Date: 2026-06-01 07:59+0000\n"
+"Last-Translator: X Bello <xbello@gmail.com>, 2023,2025-2026\n"
 "Language-Team: Galician (http://app.transifex.com/django/django/language/"
 "gl/)\n"
 "MIME-Version: 1.0\n"
@@ -28,9 +28,7 @@ msgstr "%s dispoñíbeis"
 #, javascript-format
 msgid ""
 "Choose %s by selecting them and then select the \"Choose\" arrow button."
-msgstr ""
-"Elixa %s seleccionándoos e despóis seleccionando o botón \"Escoller\" ca "
-"flecha."
+msgstr "Elixa %s seleccionándoos e despóis pulsar a flecha de \"Escoller\"."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -53,14 +51,12 @@ msgstr "Eliminar os %s seleccionados"
 
 #, javascript-format
 msgid "Chosen %s"
-msgstr "%s escollido/a(s)"
+msgstr "%s escollido(s)"
 
 #, javascript-format
 msgid ""
 "Remove %s by selecting them and then select the \"Remove\" arrow button."
-msgstr ""
-"Eliminar %s seleccionándoos e despóis seleccionando o botón \"Eliminar\" ca "
-"flecha."
+msgstr "Eliminar %s seleccionándoos e despóis pulsar a flecha de \"Eliminar\"."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
@@ -101,12 +97,12 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"Escolleu unha acción, pero aínda non gardou os cambios nos campos "
-"individuais. Probablemente estea buscando o botón Ir no canto do botón "
-"Gardar."
+"Seleccionaches unha acción e non fixeches ningún cambio nos campos "
+"individuais. Probablemente esteas a buscar o botón Executar no canto do "
+"botón Gardar."
 
 msgid "Now"
 msgstr "Agora"

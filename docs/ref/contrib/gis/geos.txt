@@ -318,8 +318,6 @@ Properties
 
 .. attribute:: GEOSGeometry.hasm
 
-    .. versionadded:: 6.0
-
     Returns a boolean indicating whether the geometry has the M dimension.
     Requires GEOS 3.12.
 

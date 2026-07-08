@@ -17,7 +17,7 @@ from django.db.models import CompositePrimaryKey
 from django.forms import modelform_factory
 from django.test import TestCase
 
-from .models import Comment, Post, Tenant, TimeStamped, Token, User
+from .models import Comment, Post, PostDbDefault, Tenant, TimeStamped, Token, User
 
 
 class CommentForm(forms.ModelForm):
@@ -63,6 +63,12 @@ class CompositePKTests(TestCase):
         self.assertEqual(user.tenant_id, 9132)
         self.assertIsNone(user.id)
         self.assertIs(user._is_pk_set(), False)
+
+    def test_pk_not_set_db_default(self):
+        post = PostDbDefault(tenant=self.tenant)
+        self.assertEqual(post.tenant_id, self.tenant.pk)
+        self.assertIsNotNone(post.id)
+        self.assertIs(post._is_pk_set(), False)
 
     def test_hash(self):
         self.assertEqual(hash(User(pk=(1, 2))), hash((1, 2)))

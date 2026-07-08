@@ -1366,12 +1366,6 @@ materialized view.
 .. _PostgreSQL: https://www.postgresql.org/docs/current/ddl-generated-columns.html
 .. _SQLite: https://www.sqlite.org/gencol.html#limitations
 
-.. versionchanged:: 6.0
-
-    ``GeneratedField``\s are now automatically refreshed from the database on
-    backends that support it (SQLite, PostgreSQL, and Oracle) and marked as
-    deferred otherwise.
-
 :attr:`~Field.null` has no effect on ``GeneratedField`` since whether the
 column is nullable depends on the database and expression used.
 

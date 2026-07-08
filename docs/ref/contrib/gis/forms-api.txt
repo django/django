@@ -98,8 +98,6 @@ from other Django widget attributes.
 
 .. attribute:: BaseGeometryWidget.base_layer
 
-    .. versionadded:: 6.0
-
     A string that specifies the identifier for the default base map layer to be
     used by the corresponding JavaScript map widget. It is passed as part of
     the widget options when rendering, allowing the ``MapWidget`` to determine
@@ -157,8 +155,6 @@ Widget classes
 
     .. attribute:: base_layer
 
-        .. versionadded:: 6.0
-
         ``nasaWorldview``
 
     .. attribute:: template_name
@@ -205,8 +201,6 @@ Widget classes
 
     .. attribute:: base_layer
 
-        .. versionadded:: 6.0
-
         ``osm``
 
     .. attribute:: default_lat
@@ -238,17 +232,10 @@ Widget classes
 
     .. _FAQ answer: https://help.openstreetmap.org/questions/10920/how-to-embed-a-map-in-my-https-site
 
-    .. versionchanged:: 6.0
-
-        The ``OSMWidget`` no longer uses a custom template. Consequently, the
-        ``gis/openlayers-osm.html`` template was removed.
-
 .. _geometry-widgets-customization:
 
 Customizing the base layer used in OpenLayers-based widgets
 -----------------------------------------------------------
-
-.. versionadded:: 6.0
 
 To customize the base layer displayed in OpenLayers-based geometry widgets,
 define a new layer builder in a custom JavaScript file. For example:

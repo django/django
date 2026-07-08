@@ -9,14 +9,14 @@
 # Leandro Regueiro <leandro.regueiro@gmail.com>, 2013
 # 948a55bc37dd6d642f1875bb84258fff_07a28cc <c1911c41f2600393098639fceba5dab0_5932>, 2011-2012
 # Pablo, 2015
-# X Bello <xbello@gmail.com>, 2023-2025
+# X Bello <xbello@gmail.com>, 2023-2026
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 07:05+0000\n"
-"Last-Translator: X Bello <xbello@gmail.com>, 2023-2025\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2026-06-01 07:05+0000\n"
+"Last-Translator: X Bello <xbello@gmail.com>, 2023-2026\n"
 "Language-Team: Galician (http://app.transifex.com/django/django/language/"
 "gl/)\n"
 "MIME-Version: 1.0\n"
@@ -330,11 +330,8 @@ msgstr ""
 "Ocorreu un erro. Os administradores do sitio foron informados por email e "
 "debería ser arranxado pronto. Grazas pola súa paciencia."
 
-msgid "Run the selected action"
-msgstr "Executar a acción seleccionada"
-
-msgid "Go"
-msgstr "Ir"
+msgid "Run"
+msgstr "Executar"
 
 msgid "Click here to select the objects across all pages"
 msgstr "Fai clic aquí para seleccionar os obxectos en tódalas páxinas"
@@ -443,6 +440,9 @@ msgstr "Amosar contas"
 msgid "Clear all filters"
 msgstr "Borrar tódolos filtros"
 
+msgid "Save"
+msgstr "Gardar"
+
 msgid "Remove from sorting"
 msgstr "Eliminar da clasificación"
 
@@ -464,25 +464,25 @@ msgstr "Escoller tema (tema actual: escuro)"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Borrar o %(object_name)s '%(escaped_object)s' resultaría na eliminación de "
+"Borrar o %(object_name)s “%(escaped_object)s” resultaría na eliminación de "
 "elementos relacionados, pero a súa conta non ten permiso para borrar os "
 "seguintes tipos de elementos:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Para borrar o obxecto %(object_name)s '%(escaped_object)s' requiriríase "
+"Para borrar o obxecto %(object_name)s “%(escaped_object)s” requiriríase "
 "borrar os seguintes obxectos protexidos relacionados:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
 "Seguro que quere borrar o %(object_name)s \"%(escaped_object)s\"? "
@@ -596,6 +596,10 @@ msgstr "Usuario"
 msgid "Action"
 msgstr "Acción"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr "Paxinación de entradas de %(name)s"
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "entrada"
@@ -608,14 +612,19 @@ msgstr ""
 "Este obxecto non ten histórico de cambios. Posibelmente non se creou usando "
 "este sitio de administración."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr "Paxinación %(name)s"
+
 msgid "Show all"
 msgstr "Amosar todo"
 
-msgid "Save"
-msgstr "Gardar"
-
 msgid "Popup closing…"
 msgstr "Pechando popup…"
+
+#, python-format
+msgid "Search %(name)s"
+msgstr "Busca %(name)s"
 
 msgid "Search"
 msgstr "Busca"

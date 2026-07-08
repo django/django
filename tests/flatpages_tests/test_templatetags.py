@@ -8,10 +8,7 @@ from django.test import TestCase
 class FlatpageTemplateTagTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        # don't use the manager because we want to ensure the site exists
-        # with pk=1, regardless of whether or not it already exists.
-        cls.site1 = Site(pk=1, domain="example.com", name="example.com")
-        cls.site1.save()
+        cls.site1 = Site.objects.get()
         cls.fp1 = FlatPage.objects.create(
             url="/flatpage/",
             title="A Flatpage",

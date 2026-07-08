@@ -1,7 +1,7 @@
 from django.forms.models import ModelForm, inlineformset_factory
 from django.test import TestCase, skipUnlessDBFeature
 
-from .models import Child, Parent, Poem, Poet, School
+from .models import Child, ChildUUIDPk, Parent, ParentUUIDPk, Poem, Poet, School
 
 
 class DeletionTests(TestCase):
@@ -112,6 +112,18 @@ class DeletionTests(TestCase):
             obj.father = father
             obj.save()
         self.assertEqual(school.child_set.count(), 1)
+
+    @skipUnlessDBFeature("supports_uuid4_function", "supports_expression_defaults")
+    def test_add_form_uuid_pk(self):
+        ChildFormSet = inlineformset_factory(ParentUUIDPk, ChildUUIDPk, fields=["name"])
+        data = {
+            "child_set-TOTAL_FORMS": "1",
+            "child_set-INITIAL_FORMS": "1",
+            "child_set-MAX_NUM_FORMS": "0",
+            "child_set-0-name": "child",
+        }
+        formset = ChildFormSet(data)
+        self.assertIs(formset.is_valid(), False)
 
 
 class InlineFormsetFactoryTest(TestCase):
