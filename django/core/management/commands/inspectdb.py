@@ -133,12 +133,9 @@ class Command(BaseCommand):
                 yield "class %s(models.Model):" % model_name
                 known_models.append(model_name)
 
-                if len(primary_key_columns) > 1:
-                    fields = ", ".join([f"'{col}'" for col in primary_key_columns])
-                    yield f"    pk = models.CompositePrimaryKey({fields})"
-
                 used_column_names = []  # Holds column names used in the table so far
                 column_to_field_name = {}  # Maps column names to names of model fields
+                field_lines = []
                 used_relations = set()  # Holds foreign relations used in the table.
                 for row in table_description:
                     comment_notes = (
@@ -252,7 +249,16 @@ class Command(BaseCommand):
                     field_desc += ")"
                     if comment_notes:
                         field_desc += "  # " + " ".join(comment_notes)
-                    yield "    %s" % field_desc
+                    field_lines.append("    %s" % field_desc)
+                if len(primary_key_columns) > 1:
+                    fields = ", ".join(
+                        [
+                            f"{column_to_field_name[col]!r}"
+                            for col in primary_key_columns
+                        ]
+                    )
+                    yield f"    pk = models.CompositePrimaryKey({fields})"
+                yield from field_lines
                 comment = None
                 if info := table_info.get(table_name):
                     is_view = info.type == "v"

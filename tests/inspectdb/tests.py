@@ -722,6 +722,24 @@ class InspectDBTransactionalTests(TransactionTestCase):
         self.assertIn(f"column_1 = models.{field_type}()", output)
         self.assertIn(f"column_2 = models.{field_type}()", output)
 
+    def test_composite_primary_key_uses_normalized_column_names(self):
+        out = StringIO()
+        field_type = connection.features.introspected_field_types["IntegerField"]
+        call_command("inspectdb", "inspectdb_compositepkmodel2", stdout=out)
+        output = out.getvalue()
+        self.assertIn(
+            "pk = models.CompositePrimaryKey('column_1', 'column_2')",
+            output,
+        )
+        self.assertIn(
+            f"column_1 = models.{field_type}(db_column='column-1')",
+            output,
+        )
+        self.assertIn(
+            f"column_2 = models.{field_type}(db_column='column-2')",
+            output,
+        )
+
     def test_composite_primary_key_not_unique_together(self):
         out = StringIO()
         call_command("inspectdb", "inspectdb_compositepkmodel", stdout=out)
