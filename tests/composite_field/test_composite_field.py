@@ -496,6 +496,34 @@ class CompositeFieldTests(TestCaseSetup):
             ],
         )
 
+    def test_composite_distinct_in_subquery(self):
+        Post.objects.create(
+            user=self.user1,
+            title="user1 first post title",
+            body="body of first post",
+        )
+        subquery = (
+            Post.objects.filter(user=OuterRef("pk"))
+            .values("title", "body")
+            .distinct()
+            .order_by("title")[:1]
+        )
+
+        qs = (
+            User.objects.alias(info=subquery)
+            .annotate(
+                post_title=F("info__title"),
+                post_body=F("info__body"),
+            )
+            .order_by("pk")
+        )
+
+        self.assertEqual(qs.count(), 3)
+        self.assertEqual(qs[0].post_title, "user1 first post title")
+        self.assertEqual(qs[0].post_body, "body of first post")
+        self.assertEqual(qs[1].post_title, "user2 first post title")
+        self.assertEqual(qs[2].post_title, "user3 first post title")
+
     def test_composite_order_by_string(self):
         subquery = Post.objects.filter(
             user__pk=OuterRef("pk"),
