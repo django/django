@@ -1346,8 +1346,8 @@ materialized view.
 
     .. versionchanged:: 6.1
 
-        Support for stored ``GeneratedField``\s was added on Oracle 23ai/26ai
-        (23.7+).
+        Support for virtual ``GeneratedField``\s was added on Postgres 18+ and
+        for stored ones on Oracle 23ai/26ai (23.7+).
 
 .. admonition:: Database limitations
 
