@@ -3,6 +3,9 @@ from collections import defaultdict, namedtuple
 from django.contrib.gis import forms, gdal
 from django.contrib.gis.db.models.proxy import SpatialProxy
 from django.contrib.gis.gdal.error import GDALException
+from django.contrib.gis.gdal.raster.const import VSI_FILESYSTEM_PREFIX
+from django.contrib.gis.gdal.raster.source import DisallowedRasterLookup
+from django.contrib.gis.geometry import json_regex
 from django.contrib.gis.geos import (
     GeometryCollection,
     GEOSException,
@@ -170,21 +173,19 @@ class BaseSpatialField(Field):
     def get_raster_prep_value(self, value, is_candidate):
         """
         Return a GDALRaster if conversion is successful, otherwise return None.
+
+        Unless the user opts in by wrapping values in a GDALRaster, raise
+        DisallowedRasterLookup for values that fetch or write to disk.
         """
         if isinstance(value, gdal.GDALRaster):
             return value
-        elif is_candidate:
+        gdal.GDALRaster.check_raster_lookup_value(value)
+        if is_candidate:
             try:
                 return gdal.GDALRaster(value)
             except GDALException:
                 pass
-        elif isinstance(value, dict):
-            try:
-                return gdal.GDALRaster(value)
-            except GDALException:
-                raise ValueError(
-                    "Couldn't create spatial object from lookup value '%s'." % value
-                )
+        return None
 
     def get_prep_value(self, value):
         obj = super().get_prep_value(value)
@@ -200,22 +201,36 @@ class BaseSpatialField(Field):
                 obj, "__geo_interface__"
             )
             # Try to convert the input to raster.
-            raster = self.get_raster_prep_value(obj, is_candidate)
-
+            raster = None
+            blocked_err = None
+            try:
+                raster = self.get_raster_prep_value(obj, is_candidate)
+            except DisallowedRasterLookup as err:
+                if isinstance(obj, dict):
+                    raise err
+                # Don't immediately raise in case this is a valid GEOSGeometry.
+                blocked_err = err
             if raster:
                 obj = raster
             elif is_candidate:
                 try:
                     obj = GEOSGeometry(obj)
+                except (TypeError, ValueError) as err:
+                    if isinstance(obj, str) and obj.startswith(VSI_FILESYSTEM_PREFIX):
+                        raise blocked_err
+                    raise err
                 except (GEOSException, GDALException):
+                    if isinstance(obj, str) and json_regex.match(obj):
+                        raise blocked_err
                     raise ValueError(
                         "Couldn't create spatial object from lookup value '%s'." % obj
                     )
             else:
-                raise ValueError(
+                msg = (
                     "Cannot use object with type %s for a spatial lookup parameter."
                     % type(obj).__name__
                 )
+                raise blocked_err or ValueError(msg)
 
         # Assigning the SRID value.
         obj.srid = self.get_srid(obj)
