@@ -109,7 +109,10 @@ class SessionStore(DBStore):
             if self.session_key is None:
                 return
             session_key = self.session_key
-        self._cache.delete(self.cache_key_prefix + session_key)
+        try:
+            self._cache.delete(self.cache_key_prefix + session_key)
+        except Exception:
+            logger.exception("Error deleting from cache (%s)", self._cache)
 
     async def adelete(self, session_key=None):
         await super().adelete(session_key)
@@ -117,7 +120,10 @@ class SessionStore(DBStore):
             if self.session_key is None:
                 return
             session_key = self.session_key
-        await self._cache.adelete(self.cache_key_prefix + session_key)
+        try:
+            await self._cache.adelete(self.cache_key_prefix + session_key)
+        except Exception:
+            logger.exception("Error deleting from cache (%s)", self._cache)
 
     def flush(self):
         """
