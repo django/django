@@ -1,8 +1,11 @@
+import json
 from io import StringIO
+from pathlib import Path
 from unittest import skipIf
 
 from django.contrib.gis import gdal
 from django.contrib.gis.db.models import Extent, MakeLine, Union, functions
+from django.contrib.gis.gdal.raster.source import DisallowedRasterLookup
 from django.contrib.gis.geos import (
     GeometryCollection,
     GEOSGeometry,
@@ -22,6 +25,7 @@ from django.db.models import F, OuterRef, Subquery
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
+from ..data.rasters.textrasters import JSON_RASTER
 from ..utils import cannot_save_multipoint, skipUnlessGISLookup
 from .models import (
     City,
@@ -693,6 +697,93 @@ class GeoLookupTest(TestCase):
             city_point__within=F("poly"),
         )
         self.assertEqual(qs.get(), multifields)
+
+    def test_lookup_rejects_writing_or_fetching_rasters(self):
+        """
+        GDALRaster enables write mode in the following cases even when the
+        value of the `write` parameter is False (default):
+        - dicts
+        - strings matching a json regex
+        - bytes
+
+        Since this could be unexpected in a lookup context, disallow dicts
+        and strings: instead, explicitly wrap with GDALRaster() to signal that
+        a write or fetch is expected. Bytes only write to the in-memory virtual
+        filesystem, so allow them.
+
+        Disallowing strings also disallows paths to local or network rasters,
+        but those didn't work in the lookup context anyway, since they were
+        never opened for writing, and lookups failed on setting the SRID with:
+
+        GDALException: Raster needs to be opened in write mode to change values
+
+        Still, a network fetch might have occurred before that failure point,
+        so disallow strings altogether.
+        """
+        # Create a vsi-based raster from scratch.
+        vsimem_path = "/vsimem/raster.tif"
+        # Keep a reference to this raster while it is being re-parsed below.
+        # Otherwise, GDALRaster.__del__() will delete the in-memory raster.
+        _rast = gdal.GDALRaster(  # NOQA: F841
+            {
+                "name": vsimem_path,
+                "driver": "tif",
+                "width": 4,
+                "height": 4,
+                "srid": 4326,
+                "bands": [
+                    {
+                        "data": range(16),
+                    }
+                ],
+            }
+        )
+        existing_path = Path(__file__).parent.parent / "data" / "rasters" / "raster.tif"
+        disallowed_cases = [
+            JSON_RASTER,
+            json.loads(JSON_RASTER),
+            "/vsicurl/someurl",
+            "/vsicurl_streaming/someurl",
+            "/vsis3/someurl",
+            vsimem_path,
+            existing_path,
+        ]
+        for obj in disallowed_cases:
+            try:
+                msg_obj = json.loads(obj)
+            except Exception:
+                if isinstance(obj, Path):
+                    msg_obj = str(obj)
+                else:
+                    msg_obj = obj
+            msg = (
+                f"Cannot use object {msg_obj!r} for a spatial lookup parameter. "
+                "If this is a raster, wrap it with GDALRaster() before using "
+                "it in a lookup to enable writing or fetching."
+            )
+            with (
+                self.subTest(obj=obj),
+                self.assertRaisesMessage(DisallowedRasterLookup, msg),
+            ):
+                City.objects.filter(point__contained=obj)
+
+        # Strings having nothing to do with rasters raise a more generic error.
+        for obj in str(existing_path), "invalid":
+            msg = "String input unrecognized as WKT EWKT, and HEXEWKB."
+            with self.subTest(obj=obj), self.assertRaisesMessage(ValueError, msg):
+                City.objects.filter(point__contained=obj)
+
+    def test_lookup_allows_writing_raster_from_bytes(self):
+        raster_path = Path(__file__).parent.parent / "data" / "rasters" / "raster.tif"
+        with open(raster_path, "rb") as raster_file:
+            raster_bytes = raster_file.read()
+        # Just get SQL to avoid gating on connection.supports_raster.
+        City.objects.filter(point__contained=raster_bytes).query
+
+    def test_lookup_allows_geos_geometry_string(self):
+        geojson = json.dumps({"type": "Point", "coordinates": [2, 49]})
+        # Just get SQL to avoid gating on connection.supports_raster.
+        City.objects.filter(point__contained=geojson).query
 
 
 class GeoQuerySetTest(TestCase):
