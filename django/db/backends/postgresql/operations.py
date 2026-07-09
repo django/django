@@ -404,17 +404,22 @@ class DatabaseOperations(BaseDatabaseOperations):
 
         return lhs_expr, rhs_expr
 
-    def in_lookup_array_type(self, field):
+    def get_field_literal_array_type(self, field):
         """
         Return the PostgreSQL array type string (e.g. "uuid[]", "bigint[]")
-        for compiling `In` as `col = ANY(%s::type[])`, or None if the field
-        cannot be safely arrayified and the caller should fall back to
-        `IN (%s, %s, ...)`.
+        used to bind a Python list of scalar values for `field` as a single
+        parameter, or None if the field cannot be safely arrayified.
 
-        Rewriting `IN` to `= ANY(array_literal)` avoids the O(N) client-side
-        placeholder rewriting cost paid inside psycopg for large value lists.
-        PostgreSQL's parse analysis normalizes both forms to the same
-        ScalarArrayOpExpr, so query plans are unchanged.
+        Currently used by:
+        - `SQLInsertCompiler.assemble_as_sql` for UNNEST-based bulk inserts.
+        - `In.as_postgresql` for compiling `col __in [values]` as
+          `col = ANY(%s::type[])`.
+
+        In both cases the goal is to replace N placeholders with one bound
+        array parameter, sparing psycopg the O(N) client-side placeholder
+        rewriting cost for large value lists. PostgreSQL's parse analysis
+        normalizes `IN (literal, ...)` to `ScalarArrayOpExpr` anyway, so
+        query plans are unchanged.
         """
         # Fields with a custom placeholder (e.g. contrib.postgres.RangeField,
         # GIS geometry fields) may depend on per-value SQL and can't share

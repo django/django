@@ -582,7 +582,7 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
         ):
             field = getattr(self.lhs, "output_field", None)
             if field is not None:
-                array_type = connection.ops.in_lookup_array_type(field)
+                array_type = connection.ops.get_field_literal_array_type(field)
                 if array_type is not None:
                     lhs_sql, lhs_params = self.process_lhs(compiler, connection)
                     # Filter out NULLs (matching process_rhs semantics) and
