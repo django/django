@@ -2138,6 +2138,40 @@ previously configured for authentication and possibly other settings (see the
 
 .. _`GDAL Virtual Filesystems documentation`: https://gdal.org/user/virtual_file_systems.html
 
+.. _raster-security:
+
+Security considerations
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Since :class:`GDALRaster` always opens new rasters in write mode, it is
+essential to prevent instantiating one from untrusted input. Otherwise, an
+attacker might gain the ability to write a file or make a network request.
+
+To mitigate this, :ref:`spatial lookups <spatial-lookups-intro>` prevent
+``str``, :class:`pathlib.Path`, and ``dict`` values from reaching
+:class:`GDALRaster` altogether. To use these types with lookups, wrap them
+explicitly with :class:`GDALRaster`, indicating that the value is trusted.
+Bytes are accepted without being wrapped in :class:`GDALRaster` because they
+are opened through GDAL's memory-based :ref:`virtual filesystem
+<gdal-raster-vsimem>`.
+
+This protection applies only to spatial lookups. Assigning a ``dict`` value to
+a :class:`~django.contrib.gis.db.models.RasterField` will still open a new
+raster, and assigning a ``str`` or ``Path`` will still fetch and open the
+referenced raster.
+
+When validating geometry inputs, the
+:class:`~django.contrib.gis.forms.GeometryField` form field will reject raster
+values. When validating raster inputs, you should write custom validation.
+
+For defense-in-depth strategies for limiting the available raster drivers, see
+`GDAL security considerations <https://gdal.org/user/security.html>`_.
+
+.. versionchanged:: 5.2.17
+
+    In earlier versions, spatial lookups accepted ``str`` and ``dict`` types
+    for new rasters, allowing file writes and network fetches.
+
 Settings
 ========
 

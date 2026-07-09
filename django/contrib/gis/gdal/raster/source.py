@@ -27,8 +27,17 @@ from django.contrib.gis.gdal.raster.const import (
 )
 from django.contrib.gis.gdal.srs import SpatialReference, SRSException
 from django.contrib.gis.geometry import json_regex
+from django.core.exceptions import SuspiciousOperation
 from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
+
+
+class DisallowedRasterLookup(SuspiciousOperation):
+    """
+    Types that force GDALRaster to open in write mode (dict) or values that
+    could be virtual filesystem paths (str) are not allowed in lookup contexts.
+    Instead, wrap values in GDALRaster explicitly.
+    """
 
 
 class TransformPoint(list):
@@ -77,14 +86,10 @@ class GDALRaster(GDALRasterBase):
         self._write = 1 if write else 0
         Driver.ensure_registered()
 
-        # Preprocess json inputs. This converts json strings to dictionaries,
-        # which are parsed below the same way as direct dictionary inputs.
-        if isinstance(ds_input, str) and json_regex.match(ds_input):
-            ds_input = json.loads(ds_input)
+        ds_input = self._preprocess_input(ds_input)
 
         # If input is a valid file path, try setting file as source.
-        if isinstance(ds_input, (str, Path)):
-            ds_input = str(ds_input)
+        if isinstance(ds_input, str):
             if not ds_input.startswith(VSI_FILESYSTEM_PREFIX) and not os.path.exists(
                 ds_input
             ):
@@ -225,6 +230,35 @@ class GDALRaster(GDALRasterBase):
         Short-hand representation because WKB may be very large.
         """
         return "<Raster object at %s>" % hex(addressof(self._ptr))
+
+    @classmethod
+    def _preprocess_input(cls, ds_input):
+        """
+        Preprocess json and Path inputs. This converts json strings to
+        dictionaries, which are then parsed just like direct dictionary inputs.
+        This also stringifies Path objects.
+        """
+        if isinstance(ds_input, str) and json_regex.match(ds_input):
+            ds_input = json.loads(ds_input)
+        if isinstance(ds_input, Path):
+            ds_input = str(ds_input)
+        return ds_input
+
+    @classmethod
+    def check_raster_lookup_value(cls, ds_input):
+        """
+        Raise DisallowedRasterLookup for values inappropriate in lookups:
+        - No dicts, which GDALRaster(write=False) might still write to.
+        - No strings or Paths, which might fetch over the virtual filesystem.
+        """
+        normalized = cls._preprocess_input(ds_input)
+        if isinstance(normalized, (dict, str)):
+            msg = (
+                f"Cannot use object {normalized!r} for a spatial lookup "
+                "parameter. If this is a raster, wrap it with GDALRaster() "
+                "before using it in a lookup to enable writing or fetching."
+            )
+            raise DisallowedRasterLookup(msg)
 
     def _flush(self):
         """
