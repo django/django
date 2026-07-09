@@ -7,3 +7,32 @@ Django 5.2.17 release notes
 Django 5.2.17 fixes one security issue with severity "high", two security
 issues with severity "moderate", and one security issue with severity "low" in
 5.2.16.
+
+CVE-2026-15307: Server-side file-write and request forgery via spatial lookups
+==============================================================================
+
+Spatial lookups allowed ``str`` and ``dict`` lookup values to be passed to
+:class:`~django.contrib.gis.gdal.GDALRaster` when they represented rasters.
+Depending on the raster driver, this could write a file to disk (in some cases
+enabling remote code execution) or issue a network request as the Django
+process user. Because the admin changelist permits filtering via
+:meth:`~django.contrib.admin.ModelAdmin.lookup_allowed`, the flaw was reachable
+by staff users with view permission on any registered model containing a
+spatial field.
+
+The following types are now disallowed by spatial lookups:
+
+- ``dict``
+- A ``str`` that is not a valid
+  :class:`~django.contrib.gis.geos.GEOSGeometry`, e.g. a serialized dictionary
+
+This is a backward incompatible change. As a reminder, all untrusted user input
+should be validated before use. For that reason, assignments to model fields
+are unaffected and still accept these input types.
+
+For guidance on how to keep using these types in spatial lookups, on validating
+untrusted input, and on further security considerations, see
+:ref:`raster security considerations <raster-security>`.
+
+This issue has severity "high" according to the :ref:`Django security policy
+<severity-levels>`.
