@@ -77,9 +77,9 @@ cache or a non-persistent cache.
 
 The cached database backend (``cached_db``) uses a write-through cache --
 session writes are applied to both the database and cache, in that order. If
-writing to the cache fails, the exception is handled and logged via the
-:ref:`sessions logger <django-contrib-sessions-logger>`, to avoid failing an
-otherwise successful write operation.
+writing to the cache (or deleting from it) fails, the exception is handled and
+logged via the :ref:`sessions logger <django-contrib-sessions-logger>`, to
+avoid failing an otherwise successful write or delete operation.
 
 Session reads use the cache, or the database if the data has been evicted from
 the cache. To use this backend, set :setting:`SESSION_ENGINE` to
@@ -97,6 +97,11 @@ The cache backend can be made persistent by using a persistent cache, such as
 Redis with appropriate configuration. But unless your cache is definitely
 configured for sufficient persistence, opt for the cached database backend.
 This avoids edge cases caused by unreliable data storage in production.
+
+.. versionchanged:: 6.2
+
+  In earlier versions, only failed writes were caught and logged rather than
+  failed deletes.
 
 Using file-based sessions
 -------------------------
