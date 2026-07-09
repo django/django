@@ -6,7 +6,7 @@ from django.core.exceptions import FieldError
 from django.db import connection, models
 from django.db.models.fields.related_lookups import RelatedGreaterThan
 from django.db.models.functions import Lower
-from django.db.models.lookups import EndsWith, StartsWith
+from django.db.models.lookups import EndsWith, GreaterThanOrEqual, StartsWith
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import register_lookup
 from django.utils import timezone
@@ -494,8 +494,7 @@ class YearLteTests(TestCase):
         cls.a4 = Author.objects.create(name="a4", birthdate=date(2012, 3, 1))
 
     def setUp(self):
-        models.DateField.register_lookup(YearTransform)
-        self.addCleanup(models.DateField._unregister_lookup, YearTransform)
+        self.enterContext(register_lookup(models.DateField, YearTransform))
 
     @unittest.skipUnless(
         connection.vendor == "postgresql", "PostgreSQL specific SQL used"
@@ -608,7 +607,7 @@ class YearLteTests(TestCase):
                 "CONCAT(", str(Author.objects.filter(birthdate__testyear=2012).query)
             )
         finally:
-            YearTransform._unregister_lookup(CustomYearExact)
+            YearTransform.unregister_lookup(CustomYearExact)
             YearTransform.register_lookup(YearExact)
 
 
@@ -774,3 +773,96 @@ class RegisterLookupTests(SimpleTestCase):
         with register_lookup(article_author, RelatedMoreThan):
             self.assertEqual(article_author.get_lookup("rmt"), RelatedMoreThan)
         self.assertIsNone(article_author.get_lookup("rmt"))
+
+    def test_unregister_class_lookup(self):
+        class CustomTextField(models.TextField):
+            pass
+
+        CustomTextField.register_lookup(CustomStartsWith)
+        self.assertIs(CustomTextField().get_lookup("sw"), CustomStartsWith)
+        CustomTextField.unregister_lookup(CustomStartsWith)
+        self.assertIsNone(CustomTextField().get_lookup("sw"))
+        self.assertNotIn("sw", CustomTextField.get_lookups())
+
+    def test_unregister_class_lookup_on_subclass(self):
+        class ParentField(models.TextField):
+            pass
+
+        class ChildField(ParentField):
+            pass
+
+        ChildField.unregister_lookup(GreaterThanOrEqual)
+        self.assertIsNone(ChildField().get_lookup("gte"))
+        self.assertNotIn("gte", ChildField.get_lookups())
+        # The parent class is unaffected.
+        self.assertIs(ParentField().get_lookup("gte"), GreaterThanOrEqual)
+        self.assertIn("gte", ParentField.get_lookups())
+        # Unregistering twice raises as the lookup is no longer visible.
+        with self.assertRaisesMessage(KeyError, "'gte'"):
+            ChildField.unregister_lookup(GreaterThanOrEqual)
+
+    def test_register_class_lookup_after_unregister(self):
+        class CustomTextField(models.TextField):
+            pass
+
+        CustomTextField.unregister_lookup(GreaterThanOrEqual)
+        self.assertIsNone(CustomTextField().get_lookup("gte"))
+        CustomTextField.register_lookup(GreaterThanOrEqual)
+        self.assertIs(CustomTextField().get_lookup("gte"), GreaterThanOrEqual)
+        self.assertIn("gte", CustomTextField.get_lookups())
+
+    def test_register_parent_class_lookup_after_unregister_on_subclass(self):
+        class ParentField(models.TextField):
+            pass
+
+        class ChildField(ParentField):
+            pass
+
+        ParentField.register_lookup(CustomStartsWith)
+        ChildField.unregister_lookup(CustomStartsWith)
+        ParentField.register_lookup(CustomEndsWith, lookup_name="sw")
+        self.assertIs(ParentField().get_lookup("sw"), CustomEndsWith)
+        self.assertIsNone(ChildField().get_lookup("sw"))
+        self.assertNotIn("sw", ChildField.get_lookups())
+
+    def test_unregister_missing_class_lookup(self):
+        class CustomTextField(models.TextField):
+            pass
+
+        with self.assertRaisesMessage(KeyError, "'sw'"):
+            CustomTextField.unregister_lookup(CustomStartsWith)
+
+    def test_unregister_instance_lookup(self):
+        field = models.TextField()
+        field.register_lookup(CustomStartsWith)
+        self.assertIs(field.get_lookup("sw"), CustomStartsWith)
+        field.unregister_lookup(CustomStartsWith)
+        self.assertIsNone(field.get_lookup("sw"))
+        self.assertNotIn("sw", field.get_lookups())
+
+    def test_unregister_class_registered_lookup_on_instance(self):
+        field = models.TextField()
+        field.unregister_lookup(GreaterThanOrEqual)
+        self.assertIsNone(field.get_lookup("gte"))
+        self.assertNotIn("gte", field.get_lookups())
+        # The class and other instances are unaffected.
+        self.assertIn("gte", models.TextField.get_lookups())
+        self.assertIs(models.TextField().get_lookup("gte"), GreaterThanOrEqual)
+        # Re-registering on the instance overrides the unregistration.
+        field.register_lookup(GreaterThanOrEqual)
+        self.assertIs(field.get_lookup("gte"), GreaterThanOrEqual)
+
+    def test_unregister_missing_instance_lookup(self):
+        field = models.TextField()
+        with self.assertRaisesMessage(KeyError, "'sw'"):
+            field.unregister_lookup(CustomStartsWith)
+
+    def test_register_lookup_context_manager_leaves_no_residue(self):
+        class CustomTextField(models.TextField):
+            pass
+
+        with register_lookup(CustomTextField, CustomStartsWith):
+            self.assertIs(CustomTextField().get_lookup("sw"), CustomStartsWith)
+        # The lookup name is removed entirely, not left as a None tombstone.
+        self.assertNotIn("sw", CustomTextField.class_lookups)
+        self.assertIsNone(CustomTextField().get_lookup("sw"))
