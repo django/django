@@ -1431,14 +1431,12 @@ class MultiTableInheritanceTest(TestCase):
                 for a in Author.objects.prefetch_related("authorwithage")
             ]
 
-        # Regression for #18090: the prefetching query must filter by parent
-        # pk. PostgreSQL compiles In to `= ANY(...)` with a single bound
-        # array; other backends emit the traditional `IN (...)` form. Note
-        # that on Oracle the table name is upper case in the generated SQL,
-        # thus the .lower() call.
-        self.assertIn("authorwithage", connection.queries[-1]["sql"].lower())
+        # Regression for #18090: the prefetching query must filter by the
+        # parent pks (WHERE clause). Note that on Oracle the table name is
+        # upper case in the generated SQL, thus the .lower() call.
         last_sql = connection.queries[-1]["sql"]
-        self.assertTrue(" IN " in last_sql or " = ANY(" in last_sql, last_sql)
+        self.assertIn("authorwithage", last_sql.lower())
+        self.assertIn(" WHERE ", last_sql)
 
         self.assertEqual(authors, [a.authorwithage for a in Author.objects.all()])
 

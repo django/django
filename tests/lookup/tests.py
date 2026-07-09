@@ -1102,33 +1102,26 @@ class LookupTests(TestCase):
             .query
         )
         sql = str(query)
-        # PostgreSQL compiles In to `= ANY(...)` with a single list parameter;
-        # other backends emit the traditional `IN (a1, a2, ...)` form. Both
-        # preserve the caller's value ordering.
-        self.assertTrue(
-            " IN (a1, a2, a3, a4, a5, a6, a7) " in sql
-            or "= ANY(['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7']" in sql,
-            sql,
-        )
+        # Value ordering is preserved regardless of whether the backend
+        # compiles __in to `IN (a1, a2, ...)` or `= ANY([a1, a2, ...])`.
+        prev = -1
+        for i in range(1, 8):
+            idx = sql.find("a%d" % i)
+            self.assertGreater(idx, prev, sql)
+            prev = idx
 
     def test_in_ignore_none(self):
-        with self.assertNumQueries(1) as ctx:
-            self.assertSequenceEqual(
-                Article.objects.filter(id__in=[None, self.a1.id]),
-                [self.a1],
-            )
-        sql = ctx.captured_queries[0]["sql"]
-        # PostgreSQL compiles In to `= ANY(...)` with a single bound array
-        # parameter; other backends emit `IN (<value>)`. Either shape must
-        # exclude the None value that was passed alongside the real pk.
-        pk = self.a1.pk
-        # PostgreSQL compiles In to `= ANY(...)`. psycopg3 serializes the
-        # bound array as `'{pk}'::type[]`; psycopg2 serializes it as
-        # `ARRAY[pk]::type[]`. Other backends emit `IN (pk)`.
-        self.assertTrue(
-            "IN (%s)" % pk in sql or "'{%s}'" % pk in sql or "ARRAY[%s]" % pk in sql,
-            sql,
-        )
+        articles = Article.objects.filter(id__in=[None, self.a1.id])
+        with self.assertNumQueries(1):
+            self.assertSequenceEqual(articles, [self.a1])
+        # None values passed to __in are dropped before parameters are
+        # bound; assert they don't appear in the compiled parameter list
+        # regardless of whether the backend emits `IN (...)` or `= ANY(...)`.
+        _, params = articles.query.sql_with_params()
+        for param in params:
+            self.assertIsNotNone(param)
+            if isinstance(param, (list, tuple)):
+                self.assertNotIn(None, param)
 
     def test_in_ignore_solo_none(self):
         with self.assertNumQueries(0):
@@ -1138,21 +1131,17 @@ class LookupTests(TestCase):
         class UnhashableInt(int):
             __hash__ = None
 
-        with self.assertNumQueries(1) as ctx:
-            self.assertSequenceEqual(
-                Article.objects.filter(id__in=[None, UnhashableInt(self.a1.id)]),
-                [self.a1],
-            )
-        sql = ctx.captured_queries[0]["sql"]
-        # See test_in_ignore_none for the shape rationale.
-        pk = self.a1.pk
-        # PostgreSQL compiles In to `= ANY(...)`. psycopg3 serializes the
-        # bound array as `'{pk}'::type[]`; psycopg2 serializes it as
-        # `ARRAY[pk]::type[]`. Other backends emit `IN (pk)`.
-        self.assertTrue(
-            "IN (%s)" % pk in sql or "'{%s}'" % pk in sql or "ARRAY[%s]" % pk in sql,
-            sql,
+        articles = Article.objects.filter(
+            id__in=[None, UnhashableInt(self.a1.id)],
         )
+        with self.assertNumQueries(1):
+            self.assertSequenceEqual(articles, [self.a1])
+        # See test_in_ignore_none: None values are stripped before binding.
+        _, params = articles.query.sql_with_params()
+        for param in params:
+            self.assertIsNotNone(param)
+            if isinstance(param, (list, tuple)):
+                self.assertNotIn(None, param)
 
     def test_in_select_mismatch(self):
         msg = (

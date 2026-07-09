@@ -73,8 +73,7 @@ class NestedObjectsTests(TestCase):
         self._connect(2, 0)
         self._collect(0)
         # Sibling order within a nested group is not guaranteed across
-        # database backends (PostgreSQL does not guarantee row order for
-        # scans without an ORDER BY clause).
+        # database backends (row order is unspecified without ORDER BY).
         nested = self.n.nested(lambda obj: obj.num)
         self.assertEqual(nested[0], 0)
         self.assertEqual(sorted(nested[1]), [1, 2])
