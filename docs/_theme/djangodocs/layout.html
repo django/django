@@ -16,12 +16,6 @@
   {%- endif %}
 {%- endmacro %}
 
-{% block extrahead %}
-{%- if include_console_assets -%}
-<link rel="stylesheet" href="{{ pathto('_static/console-tabs.css', 1) }}">
-{%- endif -%}
-{% endblock %}
-
 {% block document %}
   <div id="custom-doc" class="{% block bodyclass %}{{ 'yui-t6' if pagename != 'index' else '' }}{% endblock %}">
     <div id="hd">
