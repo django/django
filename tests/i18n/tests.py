@@ -59,7 +59,10 @@ from django.utils.translation.reloader import (
     translation_file_changed,
     watch_for_translation_changes,
 )
-from django.utils.translation.trans_real import LANGUAGE_CODE_MAX_LENGTH
+from django.utils.translation.trans_real import (
+    LANGUAGE_CODE_MAX_LENGTH,
+    translation_catalog_exists,
+)
 
 from .forms import CompanyForm, I18nForm, SelectDateForm
 from .models import Company, TestModel
@@ -2080,6 +2083,25 @@ class CountrySpecificLanguageTests(SimpleTestCase):
         self.assertFalse(check_for_language("tr-TR.UTF-8"))
         self.assertFalse(check_for_language("tr-TR.UTF8"))
         self.assertFalse(check_for_language("de-DE.utf-8"))
+
+    def test_check_for_language_lang_code_max_length(self):
+        self.addCleanup(translation_catalog_exists.cache_clear)
+
+        # Overly long codes are rejected before the cached lookup, so they are
+        # not retained as cache keys, potentially consuming too much memory.
+        # Codes at the maximum length can reach the cached lookup.
+        for length, cache_size in [
+            (LANGUAGE_CODE_MAX_LENGTH - 1, 1),
+            (LANGUAGE_CODE_MAX_LENGTH, 1),
+            (LANGUAGE_CODE_MAX_LENGTH + 1, 0),
+        ]:
+            translation_catalog_exists.cache_clear()
+            with self.subTest(length=length):
+                self.assertIs(check_for_language("a" * length), False)
+                self.assertEqual(
+                    translation_catalog_exists.cache_info().currsize,
+                    cache_size,
+                )
 
     def test_check_for_language_null(self):
         self.assertIs(trans_null.check_for_language("en"), True)

@@ -1140,6 +1140,9 @@ For a complete discussion on the usage of the following see the
     code (e.g. 'fr', 'pt_BR'). This is used to decide whether a user-provided
     language is available.
 
+    ``lang_code`` has a maximum accepted length of 500 characters. ``False``
+    is returned if it exceeds this limit, before any language-file lookup.
+
 .. function:: get_language()
 
     Returns the currently selected language code. Returns ``None`` if
