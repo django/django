@@ -6674,19 +6674,11 @@ class SeleniumTests(AdminSeleniumTestCase):
         url = self.live_server_url + reverse("admin7:admin_views_pizza_add")
         self.selenium.get(url)
         self.selenium.find_elements(By.TAG_NAME, "summary")[0].click()
-        from_filter_box = self.selenium.find_element(By.ID, "id_toppings_filter")
-        from_box = self.selenium.find_element(By.ID, "id_toppings_from")
-        to_filter_box = self.selenium.find_element(By.ID, "id_toppings_filter_selected")
-        to_box = self.selenium.find_element(By.ID, "id_toppings_to")
+        available_box = self.selenium.find_element(By.CLASS_NAME, "selector-available")
+        chosen_box = self.selenium.find_element(By.CLASS_NAME, "selector-chosen")
         self.assertEqual(
-            (
-                to_filter_box.get_property("offsetHeight")
-                + to_box.get_property("offsetHeight")
-            ),
-            (
-                from_filter_box.get_property("offsetHeight")
-                + from_box.get_property("offsetHeight")
-            ),
+            available_box.get_property("offsetHeight"),
+            chosen_box.get_property("offsetHeight"),
         )
         self.take_screenshot("selectbox-collapsible")
 
@@ -6701,23 +6693,11 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         url = self.live_server_url + reverse("admin7:admin_views_question_add")
         self.selenium.get(url)
-        from_filter_box = self.selenium.find_element(
-            By.ID, "id_related_questions_filter"
-        )
-        from_box = self.selenium.find_element(By.ID, "id_related_questions_from")
-        to_filter_box = self.selenium.find_element(
-            By.ID, "id_related_questions_filter_selected"
-        )
-        to_box = self.selenium.find_element(By.ID, "id_related_questions_to")
+        available_box = self.selenium.find_element(By.CLASS_NAME, "selector-available")
+        chosen_box = self.selenium.find_element(By.CLASS_NAME, "selector-chosen")
         self.assertEqual(
-            (
-                to_filter_box.get_property("offsetHeight")
-                + to_box.get_property("offsetHeight")
-            ),
-            (
-                from_filter_box.get_property("offsetHeight")
-                + from_box.get_property("offsetHeight")
-            ),
+            available_box.get_property("offsetHeight"),
+            chosen_box.get_property("offsetHeight"),
         )
         self.take_screenshot("selectbox-non-collapsible")
 
