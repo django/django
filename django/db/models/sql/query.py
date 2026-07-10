@@ -2649,6 +2649,7 @@ class Query(BaseExpression):
                                             annotation, field
                                         )
                                 selected[f] = annotation
+                                annotation_names.append(key)
                                 break
                         else:
                             # Call `names_to_path` to ensure a
