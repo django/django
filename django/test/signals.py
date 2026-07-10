@@ -151,7 +151,7 @@ def language_changed(*, setting, **kwargs):
         from django.utils.translation import trans_real
 
         trans_real._translations = {}
-        trans_real.check_for_language.cache_clear()
+        trans_real.translation_catalog_exists.cache_clear()
 
 
 @receiver(setting_changed)
