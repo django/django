@@ -342,7 +342,12 @@ class EmailMessage:
         self._add_attachments(msg)
 
         msg["Subject"] = str(self.subject)
-        msg["From"] = str(self.extra_headers.get("From", self.from_email))
+
+        from_header = self.extra_headers.get("From", self.from_email)
+        msg["From"] = (
+            from_header if isinstance(from_header, Address) else str(from_header)
+        )
+
         self._set_list_header_if_not_empty(msg, "To", self.to)
         self._set_list_header_if_not_empty(msg, "Cc", self.cc)
         self._set_list_header_if_not_empty(msg, "Reply-To", self.reply_to)
@@ -563,7 +568,11 @@ class EmailMessage:
             msg[header] = self.extra_headers[header]
         except KeyError:
             if values:
-                msg[header] = ", ".join(str(v) for v in values)
+                msg[header] = (
+                    tuple(values)
+                    if all(isinstance(v, Address) for v in values)
+                    else ", ".join(str(v) for v in values)
+                )
 
     def _idna_encode_address_header_domains(self, msg):
         """

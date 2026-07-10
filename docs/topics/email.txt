@@ -499,6 +499,11 @@ email backend API :ref:`provides an alternative
       :ref:`formatting-addresses`). If omitted, the
       :setting:`DEFAULT_FROM_EMAIL` setting is used.
 
+      .. versionchanged:: 6.0
+
+          The ``from_email`` parameter now officially supports
+          :class:`email.headerregistry.Address` objects.
+
     * ``to``: A list or tuple of recipient addresses.
 
     The following parameters must be given as keyword arguments if used:
@@ -511,6 +516,12 @@ email backend API :ref:`provides an alternative
 
     * ``reply_to``: A list or tuple of recipient addresses used in the
       "Reply-To" header when sending the email.
+
+      .. versionchanged:: 6.0
+
+          The recipient lists (``to``, ``cc``, ``bcc``, and ``reply_to``) now
+          officially support :class:`email.headerregistry.Address` objects
+          mixed with standard email strings.
 
     * ``attachments``: A list of attachments to put on the message. Each can
       be an instance of :class:`~email.message.MIMEPart` or
