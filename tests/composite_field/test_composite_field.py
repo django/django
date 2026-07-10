@@ -909,6 +909,70 @@ class CompositeFieldTests(TestCaseSetup):
         self.assertNotIn('"info"', sql)
         self.assertNotIn("`info`", sql)
 
+    def test_composite_test_annotations(self):
+        subquery = Post.objects.filter(user=OuterRef("pk")).values(
+            "user__email",
+            "user__first_name",
+        )[:1]
+
+        qs = (
+            User.objects.alias(info=subquery)
+            .values(
+                "info__user__email",
+                "info__user__first_name",
+            )
+            .filter(pk=self.user1.pk)
+        )
+
+        self.assertEqual(qs[0]["info__user__email"], "user001@mail.com")
+        self.assertEqual(qs[0]["info__user__first_name"], "John")
+
+    def test_composite_test_terrible_alias(self):
+        subquery = Post.objects.filter(user=OuterRef("pk")).values(
+            "user__email",
+            "user__first_name",
+        )[:1]
+
+        qs = (
+            User.objects.alias(
+                ____a_____b______c____d____________e____=subquery,
+            )
+            .annotate(
+                _________0=F("____a_____b______c____d____________e______user__email"),
+                _________1=F(
+                    "____a_____b______c____d____________e______user__first_name"
+                ),
+            )
+            .filter(
+                ____a_____b______c____d____________e______user__email__icontains="user"
+            )
+            .values(
+                "_________0",
+                "_________1",
+                "____a_____b______c____d____________e______user__email",
+                "____a_____b______c____d____________e______user__first_name",
+            )
+            .order_by("_________0")
+        )
+
+        self.assertEqual(qs[0]["_________0"], self.user1.email)
+        self.assertEqual(qs[0]["_________1"], self.user1.first_name)
+        self.assertEqual(
+            qs[0]["____a_____b______c____d____________e______user__email"],
+            self.user1.email,
+        )
+        self.assertEqual(
+            qs[0]["____a_____b______c____d____________e______user__first_name"],
+            self.user1.first_name,
+        )
+
+    def test_composite_outer_order_by(self):
+        subquery = User.objects.filter(pk=OuterRef("pk")).values("email", "first_name")
+        qs = User.objects.alias(
+            ____a_____b______c____d____________e____=subquery
+        ).order_by("-____a_____b______c____d____________e______first_name")
+        self.assertSequenceEqual(list(qs), [self.user3, self.user1, self.user2])
+
 
 class TupleLookupTests(TestCaseSetup):
     @classmethod
