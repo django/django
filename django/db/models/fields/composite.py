@@ -197,46 +197,73 @@ class CompositeField(Field):
         super().__init__()
 
     @classmethod
-    def from_select(cls, select, values_select=None, annotation_select=None):
+    def from_select(
+        cls, select, values_select=None, annotation_select=None, selected=None
+    ):
         """
         Builds a CompositeField (possibly nested) from query select exprs.
         """
 
         def extract_field(value):
-            return getattr(value, "target", None) or getattr(value, "field", None)
+            return (
+                getattr(value, "target", None)
+                or getattr(value, "field", None)
+                or getattr(value, "output_field", None)
+            )
 
+        select_map = {}
+        if selected:
+            for path, val in selected.items():
+                if isinstance(val, int):
+                    field = extract_field(select[val])
+                else:
+                    field = extract_field(val)
+                if field:
+                    select_map[path] = field
+        else:
+            if values_select:
+                select_idx = 0
+                for path in values_select:
+                    if annotation_select and path in annotation_select:
+                        field = extract_field(annotation_select[path])
+                    elif select_idx < len(select):
+                        field = extract_field(select[select_idx])
+                        select_idx += 1
+                    else:
+                        field = None
+                    if field:
+                        select_map[path] = field
+            else:
+                for sel in select:
+                    field = extract_field(sel)
+                    if field:
+                        select_map[field.name] = field
+            
         if annotation_select:
-            select_map = {}
-            for key, value in annotation_select.items():
-                select_map[key] = extract_field(value)
+            select_map.update(
+                {
+                    key: extract_field(value)
+                    for key, value in annotation_select.items()
+                    if key not in select_map
+                }
+            )
 
-        if values_select:
-            select_map = {}
-            for path, sel in zip(values_select, select):
-                field = extract_field(sel)
-                select_map[path] = field
-        elif annotation_select is None:
-            fields = [extract_field(sel) for sel in select]
-            select_map = {field.name: field for field in fields}
+        if len(select_map) == 1:
+            return next(iter(select_map.values()))
 
         nested = {}
         for path, field in select_map.items():
-            if field is None:
-                continue
             parts = path.split(LOOKUP_SEP)
             current = nested
             for part in parts[:-1]:
-                if part not in current:
-                    current[part] = {}
-                current = current[part]
+                current = current.setdefault(part, {})
             current[parts[-1]] = field
-        sub_fields = {k: cls._make_composite(k, v) for k, v in nested.items()}
-        return cls(**sub_fields)
+        return cls._make_composite(nested)
 
     @classmethod
-    def _make_composite(cls, name, value):
+    def _make_composite(cls, value):
         if isinstance(value, dict):
-            sub_fields = {k: cls._make_composite(k, v) for k, v in value.items()}
+            sub_fields = {k: cls._make_composite(v) for k, v in value.items()}
             return cls(**sub_fields)
         return value
 
@@ -246,16 +273,12 @@ class CompositeField(Field):
         return name, path, self.sub_fields, kwargs
 
     def get_field(self, name):
-        if name not in self.sub_fields:
+        try:
+            return self.sub_fields[name]
+        except KeyError:
             raise FieldError(f"{name!r} not found")
-        return self.sub_fields[name]
 
     def get_lookup(self, lookup_name):
-        if self.has_one_field:
-            subfield = self.output_field_when_only_one_subfield
-            lookup = subfield.get_lookup(lookup_name)
-            if lookup is not None:
-                return lookup
         return super().get_lookup(lookup_name)
 
     def get_transform(self, name):
@@ -263,41 +286,11 @@ class CompositeField(Field):
         try:
             subfield = self.get_field(name)
         except FieldError:
-            if self.has_one_field:
-                subfield = self.output_field_when_only_one_subfield
-                transform = subfield.get_transform(name)
-                if transform is not None:
-                    return transform
             return super().get_transform(name)
         return partial(CompositeCol, lookup_name=name, output_field=subfield)
 
-    @property
-    def path_infos(self):
-        if self.has_one_field:
-            return self.output_field_when_only_one_subfield.path_infos
-
-    @property
-    def conditional(self):
-        if self.has_one_field:
-            return self.output_field_when_only_one_subfield
-
-    def get_internal_type(self):
-        if self.has_one_field:
-            return self.output_field_when_only_one_subfield.get_internal_type()
-        return super().get_internal_type()
-
     def __len__(self):
         return len(self.sub_fields)
-
-    @property
-    def has_one_field(self):
-        return self.__len__() == 1
-
-    @property
-    def output_field_when_only_one_subfield(self):
-        if not self.has_one_field:
-            raise TypeError("No single subfield")
-        return next(iter(self.sub_fields.values()))
 
 
 CompositeField.register_lookup(TupleExact)

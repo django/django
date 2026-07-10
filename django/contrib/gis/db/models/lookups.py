@@ -66,8 +66,6 @@ class GISLookup(Lookup):
         else:
             rhs = connection.ops.Adapter(self.rhs)
         field = self.lhs.output_field
-        if field and field.is_composite and field.has_one_field:
-            field = field.output_field_when_only_one_subfield
         return connection.ops.get_geom_placeholder_sql(field, rhs, compiler)
 
     def get_rhs_op(self, connection, rhs):

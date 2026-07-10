@@ -331,23 +331,16 @@ class Query(BaseExpression):
 
     @property
     def output_field(self):
-        is_composite = False
-        if len(self.select) > 1:
-            is_composite = True
-        elif self.values_select and self.select:
-            is_composite = True
-        elif len(self.annotation_select) > 1:
-            is_composite = True
-
-        if not is_composite:
-            if len(self.annotation_select) == 1:
-                return next(iter(self.annotation_select.values())).output_field
+        if not self.select and not self.annotation_select:
             return None
 
         from django.db.models import CompositeField
 
         return CompositeField.from_select(
-            self.select, self.values_select, self.annotation_select
+            self.select,
+            self.values_select,
+            self.annotation_select,
+            getattr(self, "selected", None),
         )
 
     @cached_property

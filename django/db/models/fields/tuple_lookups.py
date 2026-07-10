@@ -275,7 +275,7 @@ class TupleLessThan(TupleLookupMixin, LessThan):
         # Process right-hand-side to trigger sanitization.
         self.process_rhs(compiler, connection)
         # e.g.: (a, b, c) < (x, y, z) as SQL:
-        # WHERE a < x OR (a = x AND (b < y OR (b = y AND c > z)))
+        # WHERE a < x OR (a = x AND (b < y OR (b = y AND c < z)))
         lookups = itertools.cycle([LessThan, Exact])
         connectors = itertools.cycle([OR, AND])
         cols_list = [col for col in self.get_lhs_expressions() for _ in range(2)]

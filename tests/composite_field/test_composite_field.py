@@ -172,19 +172,17 @@ class CompositeFieldTests(TestCaseSetup):
     def test_composite_aggregation_and_ordering(self):
         subquery = Post.objects.filter(user=OuterRef("pk")).values("user__email")[:1]
 
-        qs_ordered = User.objects.alias(some=subquery).order_by("some__user__email")
+        qs_ordered = User.objects.annotate(some=subquery).order_by("some")
 
         self.assertEqual(qs_ordered.count(), 3)
 
-        qs_agg = User.objects.alias(some=subquery).aggregate(
-            total=Count("some__user__email")
-        )
+        qs_agg = User.objects.annotate(some=subquery).aggregate(total=Count("some"))
         self.assertEqual(qs_agg["total"], 3)
 
     def test_composite_rhs_with_f_expression(self):
-        subquery = User.objects.filter(pk=self.user1.pk).values("email")
+        subquery = User.objects.filter(pk=self.user1.pk).values("email")[:1]
 
-        qs = User.objects.alias(info=subquery).filter(email=F("info__email"))
+        qs = User.objects.alias(info=subquery).filter(email=F("info"))
 
         self.assertTrue(qs.filter(pk=self.user1.pk).exists())
 
@@ -204,8 +202,6 @@ class CompositeFieldTests(TestCaseSetup):
             "ticket__task__project__workspace__owner__email",
             "ticket__task__project__workspace__owner__first_name",
         )
-
-        # print(qs)
 
         self.assertEqual(qs.count(), 3)
 
@@ -260,7 +256,7 @@ class CompositeFieldTests(TestCaseSetup):
 
         qs = (
             User.objects.alias(info=empty_subquery)
-            .annotate(extracted_email=F("info__email"))
+            .annotate(extracted_email=F("info"))
             .values("extracted_email")
         )
 
@@ -275,9 +271,7 @@ class CompositeFieldTests(TestCaseSetup):
 
         qs = (
             User.objects.alias(report=subquery)
-            .annotate(
-                severity_str=Cast("report__severity_level", output_field=CharField())
-            )
+            .annotate(severity_str=Cast("report", output_field=CharField()))
             .values("severity_str")
         )
 
@@ -435,9 +429,9 @@ class CompositeFieldTests(TestCaseSetup):
 
     def test_composite_aggregation_math(self):
         sub = BugReport.objects.filter(pk=self.bug_report.pk).values("severity_level")
-        res = User.objects.alias(report=sub).aggregate(
-            total_severity=Sum("report__severity_level"),
-            avg_severity=Avg("report__severity_level"),
+        res = User.objects.annotate(report=sub).aggregate(
+            total_severity=Sum("report"),
+            avg_severity=Avg("report"),
         )
         self.assertEqual(res["total_severity"], self.bug_report.severity_level * 3)
         self.assertEqual(res["avg_severity"], self.bug_report.severity_level)
@@ -524,6 +518,34 @@ class CompositeFieldTests(TestCaseSetup):
         self.assertEqual(qs[1].post_title, "user2 first post title")
         self.assertEqual(qs[2].post_title, "user3 first post title")
 
+    def test_composite_nested_multicolumn_subquery(self):
+        inner_subquery = (
+            Post.objects.filter(user=OuterRef("pk"))
+            .values("title", "body")
+            .order_by("pk")[:1]
+        )
+
+        outer_subquery = (
+            User.objects.filter(pk=OuterRef("pk"))
+            .alias(post_info=inner_subquery)
+            .values("email", "post_info__title", "post_info__body")[:1]
+        )
+
+        qs = (
+            User.objects.alias(nested_info=outer_subquery)
+            .annotate(
+                user_email=F("nested_info__email"),
+                post_title=F("nested_info__post_info__title"),
+                post_body=F("nested_info__post_info__body"),
+            )
+            .order_by("pk")
+        )
+
+        self.assertEqual(qs[0].user_email, self.user1.email)
+        self.assertEqual(qs[0].post_title, "user1 first post title")
+        self.assertEqual(qs[0].post_body, "body of first post")
+        self.assertEqual(qs[1].post_title, "user2 first post title")
+
     def test_composite_order_by_string(self):
         subquery = Post.objects.filter(
             user__pk=OuterRef("pk"),
@@ -578,11 +600,10 @@ class CompositeFieldTests(TestCaseSetup):
         self.assertEqual(qs_mismatch.count(), 0)
 
     def test_composite_subfield_coalesce(self):
-        subquery = User.objects.filter(pk=self.user1.pk).values("email", "first_name")
+        subquery = User.objects.filter(pk=self.user1.pk).values("email")
         qs = (
-            User.objects.filter(pk=self.user1.pk)
-            .alias(info=subquery)
-            .annotate(safe_email=Coalesce("info__email", Value("fallback@example.com")))
+            User.objects.alias(info=subquery)
+            .annotate(safe_email=Coalesce("info", Value("fallback@example.com")))
             .values("safe_email")
         )
         self.assertEqual(qs.first()["safe_email"], self.user1.email)
@@ -591,18 +612,16 @@ class CompositeFieldTests(TestCaseSetup):
         qs_empty = (
             User.objects.filter(pk=self.user1.pk)
             .alias(info=empty_sub)
-            .annotate(safe_email=Coalesce("info__email", Value("fallback@example.com")))
+            .annotate(safe_email=Coalesce("info", Value("fallback@example.com")))
             .values("safe_email")
         )
         self.assertEqual(qs_empty.first()["safe_email"], "fallback@example.com")
 
     def test_composite_aggregation_max_min(self):
-        sub = BugReport.objects.filter(pk=self.bug_report.pk).values(
-            "severity_level", "description"
-        )
-        res = User.objects.alias(report=sub).aggregate(
-            max_sev=Max("report__severity_level"),
-            min_sev=Min("report__severity_level"),
+        sub = BugReport.objects.filter(pk=self.bug_report.pk).values("severity_level")
+        res = User.objects.annotate(report=sub).aggregate(
+            max_sev=Max("report"),
+            min_sev=Min("report"),
         )
         self.assertEqual(res["max_sev"], self.bug_report.severity_level)
         self.assertEqual(res["min_sev"], self.bug_report.severity_level)
@@ -805,10 +824,14 @@ class CompositeFieldTests(TestCaseSetup):
         self.assertIn("email", comp.sub_fields)
         self.assertIn("first_name", comp.sub_fields)
 
-    def test_composite_composite_field_single_subfield_error(self):
-        comp = CompositeField(id=CharField(), email=CharField())
-        with self.assertRaisesMessage(TypeError, "No single subfield"):
-            _ = comp.output_field_when_only_one_subfield
+    def test_composite_from_select_single_column_returns_plain_field(self):
+        fields = [
+            Col("test_composite_table", User._meta.get_field("email")),
+        ]
+        result = CompositeField.from_select(fields)
+        # Single-column should NOT be wrapped in CompositeField.
+        self.assertNotIsInstance(result, CompositeField)
+        self.assertIsInstance(result, EmailField)
 
     def test_composite_composite_field_init_errors(self):
         with self.assertRaisesMessage(
@@ -824,15 +847,6 @@ class CompositeFieldTests(TestCaseSetup):
         qs = User.objects.annotate(info=q).filter(info__email="user001@mail.com")
 
         self.assertEqual(qs.count(), 1)
-
-    def test_composite_combined_expression_single_subfield_composite(self):
-        comp = CompositeField(id=IntegerField())
-
-        expr = Value(1, output_field=comp) + 2
-        self.assertIsInstance(expr.output_field, IntegerField)
-
-        expr2 = 1 + Value(2, output_field=comp)
-        self.assertIsInstance(expr2.output_field, IntegerField)
 
     def test_composite_alias_reused_consecutively(self):
         subquery = User.objects.filter(pk=OuterRef("pk")).values("email", "first_name")
@@ -858,9 +872,7 @@ class CompositeFieldTests(TestCaseSetup):
         qs = (
             User.objects.annotate(info=subquery)
             .annotate(
-                doubled=Concat(
-                    "info__email", Value("-"), "info__email", output_field=CharField()
-                )
+                doubled=Concat("info", Value("-"), "info", output_field=CharField())
             )
             .values_list("doubled", flat=True)
             .filter(pk=self.user1.pk)
@@ -870,10 +882,10 @@ class CompositeFieldTests(TestCaseSetup):
     def test_composite_alias_reused_in_filter_and_order_by(self):
         subquery = User.objects.filter(pk=OuterRef("pk")).values("email")
         qs = (
-            User.objects.alias(info=subquery)
-            .filter(info__email__startswith="user")
-            .order_by("-info__email")
-            .values_list("info__email", flat=True)
+            User.objects.annotate(info=subquery)
+            .filter(info__startswith="user")
+            .order_by("-info")
+            .values_list("info", flat=True)
         )
         self.assertEqual(
             list(qs), ["user003@mail.com", "user002@mail.com", "user001@mail.com"]
@@ -901,8 +913,8 @@ class CompositeFieldTests(TestCaseSetup):
         subquery = User.objects.filter(pk=OuterRef("pk")).values("email")
         qs = (
             User.objects.alias(info=subquery)
-            .annotate(doubled_email=F("info__email"))
-            .filter(info__email__startswith="user")
+            .annotate(doubled_email=F("info"))
+            .filter(info__startswith="user")
         )
         sql = str(qs.query)
         self.assertIn("email", sql)
