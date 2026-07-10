@@ -984,6 +984,33 @@ class CompositeFieldTests(TestCaseSetup):
             ____a_____b______c____d____________e____=subquery
         ).order_by("-____a_____b______c____d____________e______first_name")
         self.assertSequenceEqual(list(qs), [self.user3, self.user1, self.user2])
+    
+    def test_composite_values_select_fallback(self):
+        subquery = User.objects.filter(pk=OuterRef("pk")).values()
+        qs = (
+            User.objects.alias(info=subquery)
+            .annotate(first_name_alias=F("info__first_name"))
+            .filter(pk=self.user1.pk)
+            .values("first_name_alias", "info__email")
+        )
+        self.assertEqual(list(qs)[0]["first_name_alias"], self.user1.first_name)
+        self.assertEqual(list(qs)[0]["info__email"], self.user1.email)
+
+    def test_composite_from_select_routing_deep(self):
+        sub1 = User.objects.filter(pk=OuterRef("pk")).annotate(
+            my_alias=Value(1)
+        ).values("my_alias")
+        
+        inner = User.objects.filter(pk=OuterRef("pk")).values("email", "first_name")
+        sub2 = User.objects.filter(pk=OuterRef("pk")).annotate(inner_info=inner).values("inner_info__email")
+        
+        qs = User.objects.annotate(
+            sub1_val=Subquery(sub1),
+            sub2_val=Subquery(sub2)
+        )
+        res = list(qs)[0]
+        self.assertEqual(res.sub1_val, 1)
+        self.assertEqual(res.sub2_val, self.user1.email)
 
 
 class TupleLookupTests(TestCaseSetup):
