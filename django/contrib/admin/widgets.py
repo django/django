@@ -10,6 +10,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db.models import CASCADE, UUIDField
+from django.forms.models import ModelChoiceIterator
 from django.forms.widgets import Select
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
@@ -210,8 +211,18 @@ class ForeignKeyRawIdWidget(forms.TextInput):
 
     def label_and_url_for_value(self, value):
         key = self.rel.get_related_field().name
+        # Resolve the value through the form field's queryset, which may be
+        # narrowed (e.g. via ModelAdmin.formfield_for_foreignkey()), so that
+        # labels and change links aren't exposed for objects outside it. Fall
+        # back to the default manager when the widget isn't bound to a
+        # ModelChoiceField (and therefore has no queryset to consult).
+        choices = getattr(self, "choices", None)
+        if isinstance(choices, ModelChoiceIterator) and choices.queryset is not None:
+            manager = choices.queryset
+        else:
+            manager = self.rel.model._default_manager
         try:
-            obj = self.rel.model._default_manager.using(self.db).get(**{key: value})
+            obj = manager.using(self.db).get(**{key: value})
         except (ValueError, self.rel.model.DoesNotExist, ValidationError):
             return "", ""
 
