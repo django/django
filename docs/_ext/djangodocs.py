@@ -8,7 +8,6 @@ from docutils import nodes
 from docutils.parsers.rst import Directive
 from docutils.statemachine import ViewList
 from sphinx import addnodes
-from sphinx import version_info as sphinx_version
 from sphinx.directives.code import CodeBlock
 from sphinx.domains.std import Cmdoption
 from sphinx.util import logging
@@ -60,7 +59,6 @@ def setup(app):
         texinfo=(visit_console_dummy, depart_console_dummy),
     )
     app.add_directive("console", ConsoleDirective)
-    app.connect("html-page-context", html_page_context_hook)
     app.add_role("default-role-error", default_role_error)
     return {"parallel_read_safe": True}
 
@@ -106,43 +104,6 @@ class DjangoHTMLTranslator(HTMLTranslator):
     Django-specific reST to HTML tweaks.
     """
 
-    # Don't use border=1, which docutils does by default.
-    def visit_table(self, node):
-        self.context.append(self.compact_p)
-        self.compact_p = True
-        # Needed by Sphinx.
-        self._table_row_indices.append(0)
-        self.body.append(self.starttag(node, "table", CLASS="docutils"))
-
-    def depart_table(self, node):
-        self.compact_p = self.context.pop()
-        self._table_row_indices.pop()
-        self.body.append("</table>\n")
-
-    def visit_desc_parameterlist(self, node):
-        self.body.append("(")  # by default sphinx puts <big> around the "("
-        self.optional_param_level = 0
-        self.param_separator = node.child_text_separator
-        # Counts 'parameter groups' being either a required parameter, or a set
-        # of contiguous optional ones.
-        required_params = [
-            isinstance(c, addnodes.desc_parameter) for c in node.children
-        ]
-        # How many required parameters are left.
-        self.required_params_left = sum(required_params)
-        if sphinx_version < (7, 1):
-            self.first_param = 1
-        else:
-            self.is_first_param = True
-            self.params_left_at_level = 0
-            self.param_group_index = 0
-            self.list_is_required_param = required_params
-            self.multi_line_parameter_list = False
-
-    def depart_desc_parameterlist(self, node):
-        self.body.append(")")
-
-    #
     # Turn the "new in version" stuff (versionadded/versionchanged) into a
     # better callout -- the Sphinx default is just a little span,
     # which is a bit less obvious that I'd like.
@@ -220,18 +181,15 @@ def visit_console_html(self, node):
         and self.builder.name != "epub"
         and node["win_console_text"]
     ):
-        # Put a mark on the document object signaling the fact the directive
-        # has been used on it.
-        self.document._console_directive_used_flag = True
         uid = node["uid"]
-        self.body.append("""\
-<div class="console-block" id="console-block-%(id)s">
-<input class="c-tab-unix" id="c-tab-%(id)s-unix" type="radio" name="console-%(id)s" \
+        self.body.append(f"""\
+<div class="console-block" id="console-block-{uid}">
+<input class="c-tab-unix" id="c-tab-{uid}-unix" type="radio" name="console-{uid}" \
 checked>
-<label for="c-tab-%(id)s-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
-<input class="c-tab-win" id="c-tab-%(id)s-win" type="radio" name="console-%(id)s">
-<label for="c-tab-%(id)s-win" title="Windows">&#xf17a</label>
-<section class="c-content-unix" id="c-content-%(id)s-unix">\n""" % {"id": uid})
+<label for="c-tab-{uid}-unix">Unix/macOS</label>
+<input class="c-tab-win" id="c-tab-{uid}-win" type="radio" name="console-{uid}">
+<label for="c-tab-{uid}-win">Windows</label>
+<section class="c-content-unix" id="c-content-{uid}-unix">\n""")
         try:
             self.visit_literal_block(node)
         except nodes.SkipNode:
@@ -242,16 +200,13 @@ checked>
             '<section class="c-content-win" id="c-content-%(id)s-win">\n' % {"id": uid}
         )
         win_text = node["win_console_text"]
-        highlight_args = {"force": True}
-        linenos = node.get("linenos", False)
-
-        def warner(msg):
-            self.builder.warn(msg, (self.builder.current_docname, node.line))
-
-        highlighted = self.highlighter.highlight_block(
-            win_text, "doscon", warn=warner, linenos=linenos, **highlight_args
-        )
-        self.body.append(highlighted)
+        win_node = nodes.literal_block(win_text, win_text)
+        win_node.update_all_atts(node)
+        win_node["language"] = "doscon"
+        try:
+            self.visit_literal_block(win_node)
+        except nodes.SkipNode:
+            pass
         self.body.append("</section>\n")
         self.body.append("</div>\n")
         raise nodes.SkipNode
@@ -352,15 +307,6 @@ class ConsoleDirective(CodeBlock):
         # Replace the literal_node object returned by Sphinx's CodeBlock with
         # the ConsoleNode wrapper.
         return [ConsoleNode(lit_blk_obj)]
-
-
-def html_page_context_hook(app, pagename, templatename, context, doctree):
-    # Put a bool on the context used to render the template. It's used to
-    # control inclusion of console-tabs.css. This way it's included only from
-    # HTML files rendered from reST files where the ConsoleDirective is used.
-    context["include_console_assets"] = getattr(
-        doctree, "_console_directive_used_flag", False
-    )
 
 
 def default_role_error(
