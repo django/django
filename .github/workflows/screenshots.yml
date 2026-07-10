@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Set up Python
@@ -43,7 +43,7 @@ jobs:
         run: python -Wall runtests.py --verbosity=2 --noinput --selenium=chrome --headless --screenshots --settings=test_sqlite --parallel=1
 
       - name: Cache oxipng
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ~/.cargo/
           key: ${{ runner.os }}-cargo
@@ -60,7 +60,7 @@ jobs:
           mv tests/screenshots/* "/tmp/screenshots/${{ github.event.pull_request.head.sha }}/"
 
       - name: Upload screenshots
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: screenshots-${{ github.event.pull_request.head.sha }}
           path: /tmp/screenshots/

@@ -32,7 +32,7 @@ jobs:
     name: PostgreSQL ${{ matrix.pg_major }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Setup Miniforge

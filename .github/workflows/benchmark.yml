@@ -14,7 +14,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout Benchmark Repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: django/django-asv
           path: "."
@@ -28,7 +28,7 @@ jobs:
       - name: Install Requirements
         run: pip install -r requirements.txt
       - name: Cache Django
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: Django/*
           key: Django
