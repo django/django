@@ -212,9 +212,9 @@ We follow this policy:
 * As we add features to Django's development version, we update the
   documentation in the same Git commit transaction.
 
-* To distinguish feature changes/additions in the docs, we use the phrase:
-  "New in Django Development version" for the version of Django that hasn't
-  been released yet, or "New in version X.Y" for released versions.
+* The `documentation site`_ displays a prominent warning that "This document is
+  for Django's development version" when you are viewing the documentation for
+  an unreleased version.
 
 * Documentation fixes and improvements may be backported to the last release
   branch, at the discretion of the merger, however, once a version of Django is
@@ -225,4 +225,5 @@ We follow this policy:
   previous versions. Be sure you are using the version of the docs
   corresponding to the version of Django you are using!
 
+.. _documentation site: https://docs.djangoproject.com
 .. _main documentation web page: https://docs.djangoproject.com/en/dev/

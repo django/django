@@ -627,8 +627,8 @@ Our policy for new features is:
     release, not the development version.
 
 Our preferred way for marking new features is by prefacing the features'
-documentation with: "``.. versionadded:: X.Y``", followed by a mandatory
-blank line and an optional description (indented).
+documentation with: "``.. versionadded:: X.Y``", followed by a blank line and
+an optional description (indented).
 
 General improvements or other changes to the APIs that should be emphasized
 should use the "``.. versionchanged:: X.Y``" directive (with the same format
@@ -649,7 +649,7 @@ in a block, do something like this:
 
         ``first_name`` is ...
 
-        ...
+        .​..
 
         ``middle_name`` is ...
 
@@ -661,8 +661,8 @@ Put the changed annotation notes at the bottom of a section, not the top.
 
 Also, avoid referring to a specific version of Django outside a
 ``versionadded`` or ``versionchanged`` block. Even inside a block, it's often
-redundant to do so as these annotations render as "New in Django A.B:" and
-"Changed in Django A.B", respectively.
+redundant to do so as these annotations render as "Added in version A.B:" and
+"Changed in version A.B", respectively.
 
 If a function, attribute, etc. is added, it's also okay to use a
 ``versionadded`` annotation like this:
