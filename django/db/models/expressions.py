@@ -1566,7 +1566,7 @@ class CompositeCol(Expression):
         """
         parts, root_lhs = self._resolve_lookup_path()
         full_lookup = LOOKUP_SEP.join(parts)
-        query = root_lhs.clone()
+        query = getattr(root_lhs, "query", root_lhs).clone()
         query.set_values([full_lookup])
         return query.as_sql(compiler, connection)
 
