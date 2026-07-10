@@ -1,5 +1,3 @@
-@import url("{{ pathto('_static/fontawesome/css/fa-brands.min.css', 1) }}");
-
 .console-block {
     text-align: right;
 }
@@ -26,7 +24,6 @@
     text-align: center;
     color: #bbb;
     border: 1px solid transparent;
-    font-family: fontawesome, sans-serif;
 }
 
 .console-block > input:checked + label {
