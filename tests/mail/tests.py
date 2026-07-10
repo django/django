@@ -464,6 +464,40 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
                 with self.assertRaisesMessage(TypeError, message):
                     EmailMessage(**params)
 
+    def test_email_message_with_address_objects(self):
+        email = EmailMessage(
+            "Subject",
+            "Content",
+            from_email=Address("From Name", "from", "example.com"),
+            to=[Address("To Name", "to", "example.com")],
+            cc=[Address("Cc Name", "cc", "example.com")],
+            bcc=[Address("Bcc Name", "bcc", "example.com")],
+            reply_to=[Address("Reply Name", "reply", "example.com")],
+        )
+        message = email.message()
+
+        self.assertEqual(message["From"], "From Name <from@example.com>")
+        self.assertEqual(message["To"], "To Name <to@example.com>")
+        self.assertEqual(message["Cc"], "Cc Name <cc@example.com>")
+        self.assertEqual(message["Reply-To"], "Reply Name <reply@example.com>")
+        self.assertEqual(
+            email.recipients(),
+            [
+                Address("To Name", "to", "example.com"),
+                Address("Cc Name", "cc", "example.com"),
+                Address("Bcc Name", "bcc", "example.com"),
+            ],
+        )
+
+    def test_email_message_mixed_address_and_str(self):
+        email = EmailMessage(
+            "Subject",
+            "Content",
+            to=[Address("Jane", "jane", "example.com"), "john@example.com"],
+        )
+        message = email.message()
+        self.assertEqual(message["To"], "Jane <jane@example.com>, john@example.com")
+
     def test_header_injection(self):
         msg = "Header values may not contain linefeed or carriage return characters"
         cases = [
@@ -557,6 +591,15 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
         )
         message = email.message()
         self.assertEqual(message.get_all("From"), ["from@example.com"])
+
+    def test_default_from_email_with_address_object(self):
+        address = Address("Default Sender", "default", "example.com")
+        with self.settings(DEFAULT_FROM_EMAIL=address):
+            email = EmailMessage("Subject", "Content", to=["to@example.com"])
+            message = email.message()
+            self.assertEqual(
+                message.get_all("From"), ["Default Sender <default@example.com>"]
+            )
 
     def test_to_header(self):
         """
@@ -2394,6 +2437,28 @@ class MailAdminsAndManagersTests(SimpleTestCase, MailTestsMixin):
                     expected_to = ", ".join([str(address) for address in value])
                     self.assertEqual(message.get_all("to"), [expected_to])
 
+    def test_mail_admins_and_managers_with_address_objects(self):
+        address = Address("Admin Name", "admin", "example.com")
+        for setting, mail_func in (
+            ("ADMINS", mail_admins),
+            ("MANAGERS", mail_managers),
+        ):
+            mail.outbox = []
+            with self.subTest(setting=setting), self.settings(**{setting: [address]}):
+                mail_func("subject", "content")
+                message = self.get_outbox_message()
+                self.assertEqual(
+                    message.get_all("To"), ["Admin Name <admin@example.com>"]
+                )
+
+    def test_server_email_with_address_object(self):
+        address = Address("Server", "server", "example.com")
+        with self.settings(SERVER_EMAIL=address, ADMINS=["admin@example.com"]):
+            mail.outbox = []
+            mail_admins("subject", "content")
+            message = self.get_outbox_message()
+            self.assertEqual(message.get_all("From"), ["Server <server@example.com>"])
+
     @override_settings(MANAGERS=["nobody@example.com"])
     def test_html_mail_managers(self):
         """Test html_message argument to mail_managers"""
@@ -2513,7 +2578,10 @@ class MailAdminsAndManagersTests(SimpleTestCase, MailTestsMixin):
             ("ADMINS", mail_admins),
             ("MANAGERS", mail_managers),
         ):
-            msg = f"The {setting} setting must be a list of email address strings."
+            msg = (
+                f"The {setting} setting must be a list of email address "
+                "strings or Address objects."
+            )
             for value in tests:
                 mail.outbox = []
                 with (

@@ -135,7 +135,9 @@ Decorators
 Email
 ~~~~~
 
-* ...
+* The :setting:`ADMINS`, :setting:`DEFAULT_FROM_EMAIL`, :setting:`MANAGERS`,
+  and :setting:`SERVER_EMAIL` settings now support
+  :class:`~email.headerregistry.Address` objects.
 
 Error Reporting
 ~~~~~~~~~~~~~~~
