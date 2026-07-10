@@ -15,7 +15,6 @@ from django.db.models.query import get_prefetcher
 from django.db.models.sql import Query
 from django.test import (
     TestCase,
-    override_settings,
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
@@ -1423,21 +1422,21 @@ class MultiTableInheritanceTest(TestCase):
         with self.assertNumQueries(2):
             [a.author for a in AuthorWithAge.objects.prefetch_related("author")]
 
-    @override_settings(DEBUG=True)
     def test_child_link_prefetch(self):
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(2) as ctx:
             authors = [
                 a.authorwithage
                 for a in Author.objects.prefetch_related("authorwithage")
             ]
 
-        # Regression for #18090: the prefetching query must filter by the
-        # parent pks (WHERE clause). Note that on Oracle the table name is
-        # upper case in the generated SQL, thus the .lower() call.
-        last_sql = connection.queries[-1]["sql"]
-        self.assertIn("authorwithage", last_sql.lower())
-        self.assertIn(" WHERE ", last_sql)
-
+        # Regression for #18090: the prefetching query must be filtered by
+        # the associated author IDs.
+        prefetch_sql = ctx[-1]["sql"]
+        self.assertIn(AuthorWithAge._meta.db_table, prefetch_sql)
+        where_index = prefetch_sql.index(" WHERE ")
+        for author in authors:
+            with self.subTest(author_id=author.pk):
+                self.assertIn(str(author.pk), prefetch_sql[where_index:])
         self.assertEqual(authors, [a.authorwithage for a in Author.objects.all()])
 
 
