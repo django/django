@@ -123,7 +123,7 @@ class SeleniumTests(AdminSeleniumTestCase):
                 "return arguments[0].scrollHeight > arguments[0].offsetHeight;", body
             )
             is_horizontal_scrolleable = self.selenium.execute_script(
-                "return arguments[0].scrollWeight > arguments[0].offsetWeight;", body
+                "return arguments[0].scrollWidth > arguments[0].offsetWidth;", body
             )
             self.assertTrue(is_vertical_scrolleable)
             self.assertFalse(is_horizontal_scrolleable)
