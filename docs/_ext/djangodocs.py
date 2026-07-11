@@ -124,13 +124,16 @@ def visit_console_html(self, node):
         and node["win_console_text"]
     ):
         uid = node["uid"]
+        # The <input> radio buttons are visually hidden. Each <label> is
+        # rendered as a tab, and the <span> allows a focus outline _inside_
+        # the tab border. The <section> for the checked radio (only) is shown.
         self.body.append(f"""\
 <div class="console-block" id="console-block-{uid}">
 <input class="c-tab-unix" id="c-tab-{uid}-unix" type="radio" name="console-{uid}" \
 checked>
-<label for="c-tab-{uid}-unix">Unix/macOS</label>
+<label for="c-tab-{uid}-unix"><span>Unix/macOS</span></label>
 <input class="c-tab-win" id="c-tab-{uid}-win" type="radio" name="console-{uid}">
-<label for="c-tab-{uid}-win">Windows</label>
+<label for="c-tab-{uid}-win"><span>Windows</span></label>
 <section class="c-content-unix" id="c-content-{uid}-unix">\n""")
         try:
             self.visit_literal_block(node)
