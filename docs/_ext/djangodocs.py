@@ -124,6 +124,8 @@ def visit_console_html(self, node):
         and node["win_console_text"]
     ):
         uid = node["uid"]
+        # The <input> radio buttons are visually hidden. Each <label> is
+        # rendered as a tab, and only the checked radio's <section> is shown.
         self.body.append(f"""\
 <div class="console-block" id="console-block-{uid}">
 <input class="c-tab-unix" id="c-tab-{uid}-unix" type="radio" name="console-{uid}" \
