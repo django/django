@@ -414,15 +414,8 @@ class SQLCompiler:
                 ref = col
                 transforms = []
             else:
-                for key, annotation in self.query.annotations.items():
-                    if col.startswith(key + LOOKUP_SEP):
-                        ref = key
-                        transforms = col[len(key) + len(LOOKUP_SEP) :].split(LOOKUP_SEP)
-                        expr = annotation
-                        break
-                else:
-                    ref, *transforms = col.split(LOOKUP_SEP)
-                    expr = self.query.annotations.get(ref)
+                ref, *transforms = col.split(LOOKUP_SEP)
+                expr = self.query.annotations.get(ref)
             if expr:
                 if self.query.combinator and self.select:
                     if transforms:

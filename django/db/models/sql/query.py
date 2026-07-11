@@ -2088,14 +2088,12 @@ class Query(BaseExpression):
             else:
                 return annotation
         else:
-            for key, annotation in self.annotations.items():
-                if name.startswith(key + LOOKUP_SEP):
-                    remaining = name[len(key) + len(LOOKUP_SEP) :]
-                    if remaining:
-                        for transform in remaining.split(LOOKUP_SEP):
-                            annotation = self.try_transform(annotation, transform)
-                    return annotation
             field_list = name.split(LOOKUP_SEP)
+            annotation = self.annotations.get(field_list[0])
+            if annotation is not None:
+                for transform in field_list[1:]:
+                    annotation = self.try_transform(annotation, transform)
+                return annotation
             join_info = self.setup_joins(
                 field_list, self.get_meta(), self.get_initial_alias(), can_reuse=reuse
             )
@@ -2346,8 +2344,9 @@ class Query(BaseExpression):
                 if item == "?":
                     continue
                 item = item.removeprefix("-")
-                if item in self.annotations or any(
-                    item.startswith(key + LOOKUP_SEP) for key in self.annotations
+                if (
+                    item in self.annotations
+                    or item.split(LOOKUP_SEP)[0] in self.annotations
                 ):
                     continue
                 if self.extra and item in self.extra:
@@ -2632,29 +2631,16 @@ class Query(BaseExpression):
                                 f"Cannot select the '{f}' alias. Use annotate() "
                                 f"to promote it."
                             )
+                    elif f.split(LOOKUP_SEP, 1)[0] in self.annotations:
+                        selected[f] = self.resolve_ref(f)
                     else:
-                        for key, annotation in self.annotations.items():
-                            if f.startswith(key + LOOKUP_SEP):
-                                remaining = f[len(key) + len(LOOKUP_SEP) :]
-                                if remaining:
-                                    for field in remaining.split(LOOKUP_SEP):
-                                        annotation = self.try_transform(
-                                            annotation, field
-                                        )
-                                selected[f] = annotation
-                                annotation_names.append(key)
-                                break
-                        else:
-                            # Call `names_to_path` to ensure a
-                            # FieldError including annotations
-                            # about to be masked as valid choices if
-                            # `f` is not resolvable.
-                            if self.annotation_select:
-                                self.names_to_path(
-                                    f.split(LOOKUP_SEP), self.model._meta
-                                )
-                            selected[f] = len(field_names)
-                            field_names.append(f)
+                        # Call `names_to_path` to ensure a FieldError including
+                        # annotations about to be masked as valid choices if
+                        # `f` is not resolvable.
+                        if self.annotation_select:
+                            self.names_to_path(f.split(LOOKUP_SEP), self.model._meta)
+                        selected[f] = len(field_names)
+                        field_names.append(f)
             self.set_extra_mask(extra_names)
             self.set_annotation_mask(annotation_names)
         else:
