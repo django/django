@@ -79,3 +79,18 @@ affected.
 
 This issue has severity "moderate" according to the :ref:`Django security
 policy <severity-levels>`.
+
+CVE-2026-15920: Potential cross-site scripting via ``URLField`` values in the admin
+===================================================================================
+
+The admin renders :class:`~django.db.models.URLField` values as clickable links
+on changelist views and read-only fields. The link was generated without
+validating the value as a safe URL, so a stored value using a potentially
+dangerous scheme was rendered as a link.
+
+``URLField`` values shown via ``display_for_field`` are now validated using
+:class:`~django.core.validators.URLValidator` before a link is rendered, and
+displayed as plain text if validation is failed.
+
+This issue has severity "moderate" according to the :ref:`Django security
+policy <severity-levels>`.
