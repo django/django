@@ -95,7 +95,7 @@ spelling_word_list_filename = "spelling_wordlist"
 spelling_warning = True
 
 # Add any paths that contain templates here, relative to this directory.
-# templates_path = []
+templates_path = ["_templates"]
 
 # The suffix of source filenames.
 source_suffix = {".txt": "restructuredtext"}
@@ -166,7 +166,7 @@ today_fmt = "%B %d, %Y"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ["_build", "_ext", "_static", "_theme", "requirements.txt"]
+exclude_patterns = ["_*", "requirements.txt"]
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -212,15 +212,10 @@ html_theme = "pydata_sphinx_theme"
 html_theme_options = {
     "show_nav_level": 2,  # Left nav initially expanded (default 1).
     "show_toc_level": 3,  # Right nav ("on this page"; default 2).
-    # Add genindex and py-modindex links below global toc in left nav.
-    # (And keep ad-placement hint for RTD preview builds.)
-    "primary_sidebar_end": ["indices.html", "sidebar-ethical-ads.html"],
     "navbar_start": [],  # Skip the "logo".
+    "navbar_center": ["navbar-nav", "navbar-extra-links"],
     "header_links_before_dropdown": 6,
-    "external_links": [
-        {"name": "Project homepage", "url": "https://www.djangoproject.com"},
-    ],
-    "footer_start": ["copyright", "last-updated"],
+    "footer_start": ["docstitle", "copyright", "last-updated"],
     "footer_end": ["sphinx-version", "theme-version"],
 }
 

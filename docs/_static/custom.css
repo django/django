@@ -15,6 +15,13 @@ div.admonition.admonition-philosophy > .admonition-title::after {
     content: var(--pst-icon-lightbulb);
 }
 
+/* Add a separator in the navbar "More" menu before the end-matter content. */
+#pst-nav-more-links li:has(a[href*="glossary"]) {
+    border-top: 1px solid var(--pst-color-border-muted);
+    margin-block-start: 0.5rem;
+    padding-block-start: 0.5rem;
+}
+
 .console-block {
     /* Use pydata-sphinx-theme and Bootstrap design tokens for console tabs. */
     --tab-gap: 0.375rem;
