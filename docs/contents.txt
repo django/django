@@ -8,13 +8,14 @@ Django documentation contents
     index
 
 .. toctree::
-    :maxdepth: 3
+    :maxdepth: 2
 
-    intro/index
-    topics/index
-    howto/index
-    faq/index
-    ref/index
+    Tutorials <intro/index>
+    Using <topics/index>
+    How-to <howto/index>
+    Reference <ref/index>
+    FAQ <faq/index>
+
     misc/index
     glossary
     releases/index
