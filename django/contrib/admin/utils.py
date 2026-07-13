@@ -5,8 +5,8 @@ from collections import defaultdict
 from functools import reduce
 from operator import or_
 
-from django.core.exceptions import FieldDoesNotExist
-from django.core.validators import EMPTY_VALUES
+from django.core.exceptions import FieldDoesNotExist, ValidationError
+from django.core.validators import EMPTY_VALUES, URLValidator
 from django.db import models, router
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
@@ -455,6 +455,14 @@ def display_for_field(value, field, empty_value_display, avoid_link=False):
     elif isinstance(field, models.FileField) and value and not avoid_link:
         return format_html('<a href="{}">{}</a>', value.url, value)
     elif isinstance(field, models.URLField) and value and not avoid_link:
+        # Only render a clickable link for URLs with a safe scheme, so that a
+        # potentially dangerous stored value is shown as plain text rather than
+        # an executable link. The check is deliberately independent of the
+        # field's own validators, which may permit such schemes.
+        try:
+            URLValidator()(value)
+        except ValidationError:
+            return display_for_value(value, empty_value_display)
         return format_html('<a href="{}">{}</a>', value, value)
     elif isinstance(field, models.JSONField) and value:
         try:
