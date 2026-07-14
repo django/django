@@ -666,16 +666,14 @@ class InspectDBTransactionalTests(TransactionTestCase):
     @skipUnlessDBFeature("can_introspect_foreign_keys")
     def test_foreign_key_to_sqlite_master(self):
         with connection.constraint_checks_disabled():
-            cursor_execute(
-                """
+            cursor_execute("""
                 CREATE TABLE inspectdb_sqlite_master_fk (
                     id INTEGER PRIMARY KEY,
                     table_name VARCHAR(64)
                         REFERENCES sqlite_master (tbl_name),
                     content TEXT NOT NULL
                 )
-                """
-            )
+                """)
 
         def cleanup():
             with connection.constraint_checks_disabled():
