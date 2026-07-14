@@ -1188,6 +1188,27 @@ attribute::
             # Here self.client is an instance of MyTestClient...
             call_some_test_code()
 
+.. attribute:: SimpleTestCase.async_client_class
+
+If you want to use a different ``AsyncClient`` class (for example, a subclass
+with customized behavior), use the
+:attr:`~SimpleTestCase.async_client_class` class attribute::
+
+    from django.test import AsyncClient, TestCase
+
+
+    class MyAsyncTestClient(AsyncClient):
+        # Specialized methods for your environment
+        ...
+
+
+    class MyAsyncTest(TestCase):
+        async_client_class = MyAsyncTestClient
+
+        async def test_my_stuff(self):
+            # Here self.async_client is an instance of MyAsyncTestClient...
+            response = await self.async_client.get("/some-url/")
+
 .. _topics-testing-fixtures:
 
 Fixture loading
