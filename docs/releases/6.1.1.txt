@@ -4,10 +4,14 @@ Django 6.1.1 release notes
 
 *Expected September 2, 2026*
 
-Django 6.1.1 fixes several bugs in 6.1.
+Django 6.1.1 fixes one crash in Django 5.2 and several bugs in 6.1.
 
 Bugfixes
 ========
+
+* Fixed a crash in Django 5.2 when combining :meth:`distinct(*fields)
+  <.QuerySet.distinct>` with ``order_by()`` and ``values()`` and using two
+  lookup paths resolving to the same column (:ticket:`37222`).
 
 * Fixed a regression in Django 6.1 where the deprecation of double-dot variable
   lookups incorrectly applied to string and translated template literals
