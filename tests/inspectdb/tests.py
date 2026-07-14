@@ -662,6 +662,34 @@ class InspectDBTransactionalTests(TransactionTestCase):
         self.assertIn(foreign_table_model, output)
         self.assertIn(foreign_table_managed, output)
 
+    @skipUnless(connection.vendor == "sqlite", "SQLite specific SQL")
+    @skipUnlessDBFeature("can_introspect_foreign_keys")
+    def test_foreign_key_to_sqlite_schema(self):
+        with connection.constraint_checks_disabled():
+            cursor_execute("""
+                CREATE TABLE inspectdb_sqlite_schema_fk (
+                    id INTEGER PRIMARY KEY,
+                    table_name VARCHAR(64)
+                        REFERENCES sqlite_schema (tbl_name),
+                    content TEXT NOT NULL
+                )
+                """)
+
+        def cleanup():
+            with connection.constraint_checks_disabled():
+                cursor_execute("DROP TABLE IF EXISTS inspectdb_sqlite_schema_fk")
+
+        self.addCleanup(cleanup)
+        out = StringIO()
+        call_command("inspectdb", "inspectdb_sqlite_schema_fk", stdout=out)
+        output = out.getvalue()
+        self.assertIn("class InspectdbSqliteSchemaFk(models.Model):", output)
+        self.assertIn(
+            "table_name = models.ForeignKey('SqliteSchema', models.DO_NOTHING, "
+            "db_column='table_name', blank=True, null=True)",
+            output,
+        )
+
     def test_composite_primary_key(self):
         out = StringIO()
         field_type = connection.features.introspected_field_types["IntegerField"]
