@@ -2690,10 +2690,18 @@ def prefetch_related_objects(model_instances, *related_lookups):
             # premise of prefetch_related), so what applies to first object
             # applies to all.
             first_obj = next(iter(obj_list))
-            to_attr = lookup.get_current_to_attr(level)[0]
+            to_attr, as_attr = lookup.get_current_to_attr(level)
             prefetcher, descriptor, attr_found, is_fetched = get_prefetcher(
                 first_obj, through_attr, to_attr
             )
+
+            if as_attr:
+                to_attr_obj = getattr(first_obj.__class__, to_attr, None)
+                if isinstance(to_attr_obj, property) and to_attr_obj.fset is None:
+                    raise ValueError(
+                        "to_attr=%s cannot be used because %s defines a property "
+                        "without a setter." % (to_attr, first_obj.__class__.__name__)
+                    )
 
             if not attr_found:
                 raise AttributeError(
@@ -2794,14 +2802,22 @@ def get_prefetcher(instance, through_attr, to_attr):
     """
 
     def is_to_attr_fetched(model, to_attr):
+        to_attr_obj = getattr(model, to_attr, None)
         # Special case cached_property instances because hasattr() triggers
         # attribute computation and assignment.
-        if isinstance(getattr(model, to_attr, None), cached_property):
+        if isinstance(to_attr_obj, cached_property):
 
             def has_cached_property(instance):
                 return to_attr in instance.__dict__
 
             return has_cached_property
+
+        if isinstance(to_attr_obj, property) and to_attr_obj.fset is not None:
+
+            def has_property_value(instance):
+                return to_attr in instance.__dict__
+
+            return has_property_value
 
         def has_to_attr_attribute(instance):
             return hasattr(instance, to_attr)

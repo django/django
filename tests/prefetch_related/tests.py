@@ -1127,6 +1127,18 @@ class CustomPrefetchTests(TestCase):
             with self.assertNumQueries(0):
                 self.assertEqual(person.cached_all_houses, all_houses)
 
+    def test_to_attr_property_without_setter(self):
+        msg = (
+            "to_attr=all_houses cannot be used because Person defines a property "
+            "without a setter."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            list(
+                Person.objects.prefetch_related(
+                    Prefetch("houses", House.objects.all(), to_attr="all_houses"),
+                )
+            )
+
     def test_filter_deferred(self):
         """
         Related filtering of prefetched querysets is deferred until necessary.
