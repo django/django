@@ -1013,7 +1013,10 @@ class ExceptionReporterTests(SimpleTestCase):
         )
         with self.assertWarnsMessage(ExceptionCycleWarning, msg):
             tb_generator.start()
-        tb_generator.join(timeout=5)
+            # The warning is emitted in the background thread, so wait for it
+            # to finish before the assertion is checked on exiting the context
+            # manager.
+            tb_generator.join(timeout=5)
         if tb_generator.is_alive():
             # tb_generator is a daemon that runs until the main thread/process
             # exits. This is resource heavy when running the full test suite.
