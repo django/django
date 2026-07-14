@@ -1,5 +1,6 @@
 import uuid
 
+from django.db import connection, models
 from django.db.models import Subquery
 
 from . import PostgreSQLTestCase
@@ -84,3 +85,12 @@ class InLookupSQLTests(PostgreSQLTestCase):
         self.assertRegex(sql, r"= ANY\(%s::(integer|bigint)\[\]\)")
         (bound,) = params
         self.assertNotIn(None, bound)
+
+    def test_field_without_db_type_falls_back(self):
+        # If a field's db_type() returns None (e.g. a virtual field), the
+        # operation returns None so the caller falls back to `IN (%s, ...)`.
+        class NoDBTypeField(models.IntegerField):
+            def db_type(self, connection):
+                return None
+
+        self.assertIsNone(connection.ops.get_field_literal_array_type(NoDBTypeField()))
