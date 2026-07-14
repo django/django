@@ -224,3 +224,24 @@ class CompositePKValuesTests(TestCase):
                     values[0]["user"], (self.user_1.tenant_id, self.user_1.id)
                 )
                 self.assertEqual(values[0]["integer"], 42)
+
+    def test_values_distinct_ordered_by_unselected_field(self):
+        # Ordering by an unselected field adds it to the select clause, and the
+        # extra column must be stripped from the rows without truncating the
+        # composite primary key, which is selected as several columns.
+        self.assertSequenceEqual(
+            User.objects.values("pk").distinct().order_by("email"),
+            (
+                {"pk": self.user_1.pk},
+                {"pk": self.user_2.pk},
+                {"pk": self.user_3.pk},
+            ),
+        )
+        self.assertSequenceEqual(
+            User.objects.values("pk", "id").distinct().order_by("email"),
+            (
+                {"pk": self.user_1.pk, "id": self.user_1.id},
+                {"pk": self.user_2.pk, "id": self.user_2.id},
+                {"pk": self.user_3.pk, "id": self.user_3.id},
+            ),
+        )
