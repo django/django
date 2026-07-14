@@ -4040,6 +4040,7 @@ Email
 * :setting:`EMAIL_USE_LOCALTIME`
 * :setting:`EMAIL_USE_SSL`
 * :setting:`EMAIL_USE_TLS`
+* :setting:`MAILERS`
 * :setting:`MANAGERS`
 * :setting:`SERVER_EMAIL`
 
