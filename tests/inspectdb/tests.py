@@ -664,28 +664,28 @@ class InspectDBTransactionalTests(TransactionTestCase):
 
     @skipUnless(connection.vendor == "sqlite", "SQLite specific SQL")
     @skipUnlessDBFeature("can_introspect_foreign_keys")
-    def test_foreign_key_to_sqlite_master(self):
+    def test_foreign_key_to_sqlite_schema(self):
         with connection.constraint_checks_disabled():
             cursor_execute("""
-                CREATE TABLE inspectdb_sqlite_master_fk (
+                CREATE TABLE inspectdb_sqlite_schema_fk (
                     id INTEGER PRIMARY KEY,
                     table_name VARCHAR(64)
-                        REFERENCES sqlite_master (tbl_name),
+                        REFERENCES sqlite_schema (tbl_name),
                     content TEXT NOT NULL
                 )
                 """)
 
         def cleanup():
             with connection.constraint_checks_disabled():
-                cursor_execute("DROP TABLE IF EXISTS inspectdb_sqlite_master_fk")
+                cursor_execute("DROP TABLE IF EXISTS inspectdb_sqlite_schema_fk")
 
         self.addCleanup(cleanup)
         out = StringIO()
-        call_command("inspectdb", "inspectdb_sqlite_master_fk", stdout=out)
+        call_command("inspectdb", "inspectdb_sqlite_schema_fk", stdout=out)
         output = out.getvalue()
-        self.assertIn("class InspectdbSqliteMasterFk(models.Model):", output)
+        self.assertIn("class InspectdbSqliteSchemaFk(models.Model):", output)
         self.assertIn(
-            "table_name = models.ForeignKey('SqliteMaster', models.DO_NOTHING, "
+            "table_name = models.ForeignKey('SqliteSchema', models.DO_NOTHING, "
             "db_column='table_name', blank=True, null=True)",
             output,
         )
