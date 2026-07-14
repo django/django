@@ -1,0 +1,23 @@
+# Subset of py3.txt for the free-threaded CI jobs, limited to packages that
+# are pure Python or publish free-threaded (cp3XXt) wheels. pylibmc and
+# pywatchman are omitted: they don't support free-threading and re-enable the
+# GIL on import.
+aiosmtpd >= 1.4.5
+asgiref >= 3.12.0
+# argon2-cffi-bindings, numpy, Pillow, and PyYAML publish free-threaded wheels
+# for Python 3.14+ only.
+argon2-cffi >= 23.1.0; python_version >= '3.14'
+bcrypt >= 4.1.1
+black >= 26.5.1
+docutils >= 0.22
+geoip2 >= 4.8.0
+jinja2 >= 2.11.0
+numpy >= 1.26.0; python_version >= '3.14'
+Pillow >= 10.1.0; python_version >= '3.14'
+pymemcache >= 3.4.0
+PyYAML >= 6.0.2; python_version >= '3.14'
+redis >= 5.1.0
+selenium >= 4.23.0
+sqlparse >= 0.5.0
+tblib >= 3.0.0
+tzdata
