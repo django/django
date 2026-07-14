@@ -280,6 +280,9 @@ Miscellaneous
   submodules in ambiguous cases where depending on prior import state, a
   same-named attribute of the parent module might have been returned instead.
 
+* The minimum supported version of ``asgiref`` is increased from 3.9.1 to
+  3.12.1.
+
 .. _deprecated-features-6.2:
 
 Features deprecated in 6.2
