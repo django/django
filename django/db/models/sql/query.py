@@ -1408,6 +1408,12 @@ class Query(BaseExpression):
                 lookup_splitted, self.annotations
             )
             if annotation:
+                for idx in range(len(lookup_splitted), 0, -1):
+                    inner_query_field = LOOKUP_SEP.join(lookup_splitted[:idx])
+                    expression = self._promote_inner_subquery_join(inner_query_field)
+                    if expression is not None:
+                        expression_lookups.remove(expression.field.name)
+                        return expression_lookups, (), expression
                 expression = self.annotations[annotation]
                 if summarize:
                     expression = Ref(annotation, expression)
