@@ -41,7 +41,13 @@ from django.db.models.query_utils import (
     refs_expression,
 )
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
-from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
+from django.db.models.sql.datastructures import (
+    BaseTable,
+    Empty,
+    Join,
+    MultiJoin,
+    SubqueryJoin,
+)
 from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
 from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import cached_property
@@ -332,11 +338,16 @@ class Query(BaseExpression):
 
     @property
     def output_field(self):
-        if len(self.select) == 1:
-            select = self.select[0]
-            return getattr(select, "target", None) or select.field
-        elif len(self.annotation_select) == 1:
-            return next(iter(self.annotation_select.values())).output_field
+        if not self.select and not self.annotation_select:
+            return None
+        from django.db.models import CompositeField
+
+        return CompositeField.from_select(
+            self.select,
+            self.values_select,
+            self.annotation_select,
+            getattr(self, "selected", None),
+        )
 
     @cached_property
     def base_table(self):
@@ -1237,6 +1248,52 @@ class Query(BaseExpression):
                 "control characters, quotation marks, semicolons, or SQL comments."
             )
 
+    @staticmethod
+    def _iter_composite_field_paths(field, prefix=()):
+        if getattr(field, "is_composite", False):
+            for name, subfield in field.sub_fields.items():
+                yield from Query._iter_composite_field_paths(subfield, prefix + (name,))
+        else:
+            yield prefix, field
+
+    @classmethod
+    def _is_multi_column_query(cls, query):
+        output_field = query.output_field
+        return (
+            output_field is not None
+            and sum(1 for _ in cls._iter_composite_field_paths(output_field)) > 1
+        )
+
+    def _resolve_inner_subquery_field(self, join, field_path):
+        for path, field in self._iter_composite_field_paths(
+            join.table_subquery.output_field
+        ):
+            if (field_path,) == path:
+                return Col(join.table_alias, field)
+        return None
+
+    def _promote_inner_subquery_join(self, name):
+        if len(name.split(LOOKUP_SEP, 1)) == 1:
+            return None
+        alias, rest_path = name.split(LOOKUP_SEP, 1)
+        annotation = self.annotations.get(alias)
+        if not self._is_multi_column_query(annotation):
+            return None
+        existing = self.alias_map.get(alias)
+        if isinstance(existing, SubqueryJoin):
+            return self._resolve_inner_subquery_field(existing, rest_path)
+        if isinstance(annotation, SubqueryJoin):
+            return self._resolve_inner_subquery_field(annotation, rest_path)
+        self.get_initial_alias()
+        table_alias, _ = self.table_alias(alias, create=True)
+        join = SubqueryJoin(
+            annotation,
+            alias,
+            table_alias,
+        )
+        self.alias_map[table_alias] = join
+        return self._resolve_inner_subquery_field(join, rest_path)
+
     def add_annotation(self, annotation, alias, select=True):
         """Add a single annotation expression to the Query."""
         self.check_alias(alias)
@@ -2085,6 +2142,10 @@ class Query(BaseExpression):
         else:
             field_list = name.split(LOOKUP_SEP)
             annotation = self.annotations.get(field_list[0])
+            join_result = self._promote_inner_subquery_join(name)
+            if join_result is not None:
+                return join_result
+
             if annotation is not None:
                 for transform in field_list[1:]:
                     annotation = self.try_transform(annotation, transform)
@@ -2623,6 +2684,8 @@ class Query(BaseExpression):
                                 f"Cannot select the '{f}' alias. Use annotate() "
                                 f"to promote it."
                             )
+                    elif f.split(LOOKUP_SEP, 1)[0] in self.annotations:
+                        selected[f] = self.resolve_ref(f)
                     else:
                         # Call `names_to_path` to ensure a FieldError including
                         # annotations about to be masked as valid choices if

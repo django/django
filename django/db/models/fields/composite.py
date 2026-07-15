@@ -1,7 +1,9 @@
 import json
 
 from django.core import checks
+from django.core.exceptions import FieldError
 from django.db.models import NOT_PROVIDED, Field
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import ColPairs
 from django.db.models.fields.tuple_lookups import (
     TupleExact,
@@ -175,3 +177,112 @@ def unnest(fields):
             result.append(field)
 
     return result
+
+
+class CompositeField(Field):
+    is_composite = True
+
+    def __init__(self, **kwargs):
+        self.sub_fields = {}
+        for name, field in kwargs.items():
+            if not isinstance(field, Field):
+                raise TypeError(
+                    f"{name!r} should field instance"
+                )  # this message could enhance later
+
+            self.sub_fields[name] = field
+        if len(self.sub_fields) < 2:
+            raise ValueError("At least two fields should be there")
+        super().__init__()
+
+    @classmethod
+    def from_select(
+        cls, select, values_select=None, annotation_select=None, selected=None
+    ):
+        """
+        Builds a CompositeField (possibly nested) from query select exprs.
+        """
+
+        def extract_field(value):
+            return (
+                getattr(value, "target", None)
+                or getattr(value, "field", None)
+                or getattr(value, "output_field", None)
+            )
+
+        select_map = {}
+        if selected:
+            for path, val in selected.items():
+                if isinstance(val, int):
+                    field = extract_field(select[val])
+                else:
+                    field = extract_field(val)
+                if field:
+                    select_map[path] = field
+        else:
+            if values_select:
+                select_idx = 0
+                for path in values_select:
+                    if annotation_select and path in annotation_select:
+                        field = extract_field(annotation_select[path])
+                    elif select_idx < len(select):
+                        field = extract_field(select[select_idx])
+                        select_idx += 1
+                    else:
+                        field = None
+                    if field:
+                        select_map[path] = field
+            else:
+                for sel in select:
+                    field = extract_field(sel)
+                    if field:
+                        select_map[field.name] = field
+
+        if annotation_select:
+            select_map.update(
+                {
+                    key: extract_field(value)
+                    for key, value in annotation_select.items()
+                    if key not in select_map
+                }
+            )
+
+        if len(select_map) == 1:
+            return next(iter(select_map.values()))
+
+        nested = {}
+        for path, field in select_map.items():
+            parts = path.split(LOOKUP_SEP)
+            current = nested
+            for part in parts[:-1]:
+                current = current.setdefault(part, {})
+            current[parts[-1]] = field
+        return cls._make_composite(nested)
+
+    @classmethod
+    def _make_composite(cls, value):
+        if isinstance(value, dict):
+            sub_fields = {k: cls._make_composite(v) for k, v in value.items()}
+            composite = cls.__new__(cls)
+            composite.sub_fields = sub_fields
+            Field.__init__(composite)
+            return composite
+        return value
+
+    def get_field(self, name):
+        try:
+            return self.sub_fields[name]
+        except KeyError:
+            raise FieldError(f"{name!r} not found")
+
+    def __len__(self):
+        return len(self.sub_fields)
+
+
+CompositeField.register_lookup(TupleExact)
+CompositeField.register_lookup(TupleGreaterThan)
+CompositeField.register_lookup(TupleGreaterThanOrEqual)
+CompositeField.register_lookup(TupleLessThan)
+CompositeField.register_lookup(TupleLessThanOrEqual)
+CompositeField.register_lookup(TupleIn)
+CompositeField.register_lookup(TupleIsNull)
