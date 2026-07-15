@@ -113,4 +113,4 @@ class Lines(models.Model):
 
 
 class GeometryCollectionModel(models.Model):
-    geom = models.GeometryCollectionField()
+    geom = models.GeometryCollectionField(max_geom_collections=5)

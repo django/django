@@ -23,6 +23,10 @@ class DatabaseFeatures(BaseSpatialFeatures, OracleDatabaseFeatures):
                     "gis_tests.gis_migrations.test_operations.OperationTests."
                     "test_add_check_constraint",
                 },
+                "Oracle doesn't support nested geometry collections.": {
+                    "gis_tests.geoapp.tests.SaveLoadTests."
+                    "test_geometrycollectionfield_default_max_ignored_on_read",
+                },
             }
         )
         return skips

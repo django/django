@@ -17,6 +17,7 @@ from django.contrib.gis.geos import (
     Point,
     Polygon,
 )
+from django.contrib.gis.geos.prototypes.io import MAX_GEOM_COLLECTIONS
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Field
 from django.utils.translation import gettext_lazy as _
@@ -214,8 +215,11 @@ class BaseSpatialField(Field):
             if raster:
                 obj = raster
             elif is_candidate:
+                max_geom_collections = getattr(
+                    self, "max_geom_collections", MAX_GEOM_COLLECTIONS
+                )
                 try:
-                    obj = GEOSGeometry(obj)
+                    obj = GEOSGeometry(obj, max_geom_collections=max_geom_collections)
                 except (TypeError, ValueError) as err:
                     if isinstance(obj, str) and obj.startswith(VSI_FILESYSTEM_PREFIX):
                         raise blocked_err
@@ -259,6 +263,7 @@ class GeometryField(BaseSpatialField):
         *,
         extent=(-180.0, -90.0, 180.0, 90.0),
         tolerance=0.05,
+        max_geom_collections=MAX_GEOM_COLLECTIONS,
         **kwargs,
     ):
         """
@@ -277,6 +282,10 @@ class GeometryField(BaseSpatialField):
         tolerance:
          Define the tolerance, in meters, to use for the geometry field
          entry in the `USER_SDO_GEOM_METADATA` table. Defaults to 0.05.
+
+        max_geom_collections:
+         The maximum number of geometry collections accepted before parsing is
+         refused, forwarded to the form field.
         """
         # Setting the dimension of the geometry field.
         self.dim = dim
@@ -288,6 +297,10 @@ class GeometryField(BaseSpatialField):
         # `USER_SDO_GEOM_METADATA`
         self._extent = extent
         self._tolerance = tolerance
+
+        # Limit on nested/total geometry collections, forwarded to the form
+        # field to guard against crashes in GEOS from deeply nested input.
+        self.max_geom_collections = max_geom_collections
 
         super().__init__(verbose_name=verbose_name, **kwargs)
 
@@ -302,6 +315,8 @@ class GeometryField(BaseSpatialField):
             kwargs["extent"] = self._extent
         if self._tolerance != 0.05:
             kwargs["tolerance"] = self._tolerance
+        if self.max_geom_collections != MAX_GEOM_COLLECTIONS:
+            kwargs["max_geom_collections"] = self.max_geom_collections
         return name, path, args, kwargs
 
     def contribute_to_class(self, cls, name, **kwargs):
@@ -319,6 +334,7 @@ class GeometryField(BaseSpatialField):
             "form_class": self.form_class,
             "geom_type": self.geom_type,
             "srid": self.srid,
+            "max_geom_collections": self.max_geom_collections,
             **kwargs,
         }
         if self.dim > 2 and not getattr(

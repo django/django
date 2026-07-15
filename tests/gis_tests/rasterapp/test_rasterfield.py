@@ -1,4 +1,5 @@
 import json
+from unittest import mock
 
 from django.contrib.gis.db.models.fields import BaseSpatialField
 from django.contrib.gis.db.models.functions import Distance
@@ -276,6 +277,21 @@ class RasterFieldTest(TransactionTestCase):
             # Evaluate on conditional Q expressions.
             qs = RasterModel.objects.filter(Q(**combos[0]) & Q(**combos[1]))
             self.assertIn(qs.count(), [0, 1])
+
+    def test_geometry_lookup_falls_back_to_default_max_geom_collections(self):
+        def make_geom(depth):
+            geom = "POINT(0 0)"
+            for _ in range(depth):
+                geom = f"GEOMETRYCOLLECTION({geom})"
+            return geom
+
+        msg = "WKT contains too many possible GeometryCollections."
+        # RasterField has no max_geom_collections, so the module default
+        # (patched here) applies. Under the limit parses; over it is rejected.
+        with mock.patch("django.contrib.gis.db.models.fields.MAX_GEOM_COLLECTIONS", 5):
+            self.assertEqual(RasterModel.objects.filter(rast=make_geom(4)).count(), 0)
+            with self.assertRaisesMessage(ValueError, msg):
+                RasterModel.objects.filter(rast=make_geom(6))
 
     def test_dwithin_gis_lookup_output_with_rasters(self):
         """
