@@ -56,6 +56,30 @@ now rejected before the cached lookup.
 This issue has severity "low" according to the :ref:`Django security policy
 <severity-levels>`.
 
+CVE-2026-15830: Potential denial-of-service vulnerability via nested geometry collections
+=========================================================================================
+
+:class:`~django.contrib.gis.geos.GEOSGeometry` was subject to a potential
+denial-of-service attack when provided deeply nested ``GEOMETRYCOLLECTION``
+objects, leading to a segmentation fault in GEOS. A maximum depth of 198
+``GEOMETRYCOLLECTION``\s is now enforced for the well-known text (WKT) format,
+and a maximum number of 198 ``GEOMETRYCOLLECTION``\s in total (breadth and
+depth) is enforced for well-known binary (WKB).
+
+:ref:`Lookups against spatial fields <spatial-lookups-intro>` and the
+:class:`~django.contrib.gis.forms.GeometryField` form field were also affected.
+
+The limit can be customized through the new ``max_geom_collections`` argument,
+available on :class:`~django.contrib.gis.geos.GEOSGeometry`, the
+:attr:`form field <django.contrib.gis.forms.Field.max_geom_collections>`,
+and the :attr:`model field
+<django.contrib.gis.db.models.GeometryField.max_geom_collections>`. The limit
+is not applied to GeoJSON inputs, as they were parsed by GDAL and are not
+affected.
+
+This issue has severity "moderate" according to the :ref:`Django security
+policy <severity-levels>`.
+
 Bugfixes
 ========
 

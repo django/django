@@ -1,7 +1,7 @@
 import json
 from io import StringIO
 from pathlib import Path
-from unittest import skipIf
+from unittest import mock, skipIf
 
 from django.contrib.gis import gdal
 from django.contrib.gis.db.models import Extent, MakeLine, Union, functions
@@ -22,7 +22,7 @@ from django.core.files.temp import NamedTemporaryFile
 from django.core.management import call_command
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import F, OuterRef, Subquery
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
 from ..data.rasters.textrasters import JSON_RASTER
@@ -317,6 +317,49 @@ class SaveLoadTests(TestCase):
         obj = GeometryCollectionModel.objects.create(geom=geom)
         obj.refresh_from_db()
         self.assertIs(obj.geom.equals(geom), True)
+
+    def test_geometrycollectionfield_max(self):
+        geom = "POINT(0 0)"
+        for _ in range(6):
+            geom = f"GEOMETRYCOLLECTION({geom})"
+        msg = "WKT contains too many possible GeometryCollections."
+        with self.assertRaisesMessage(ValueError, msg):
+            GeometryCollectionModel.objects.create(geom=geom)
+        with self.assertRaisesMessage(ValueError, msg):
+            GeometryCollectionModel.objects.bulk_create(
+                [GeometryCollectionModel(geom=geom), GeometryCollectionModel(geom=geom)]
+            )
+
+    def test_geometrycollectionfield_default_max_ignored_on_read(self):
+        geom = "POINT(0 0)"
+        for _ in range(5):
+            geom = f"GEOMETRYCOLLECTION({geom})"
+        obj = GeometryCollectionModel.objects.create(geom=geom)
+        with (
+            mock.patch(
+                "django.contrib.gis.geos.prototypes.io._WKBReader.limit_hex"
+            ) as hex_limit_mock,
+            mock.patch(
+                "django.contrib.gis.geos.prototypes.io._WKBReader.limit_wkb"
+            ) as wkb_limit_mock,
+        ):
+            obj.refresh_from_db()
+        limit_mock = hex_limit_mock if hex_limit_mock.call_count else wkb_limit_mock
+        limit_mock.assert_called_once()
+        max_geom_collections = limit_mock.call_args.args[1]
+        self.assertIsNone(max_geom_collections)
+
+
+class ValidationTests(SimpleTestCase):
+    def test_geometrycollectionfield_max(self):
+        geom = "POINT(0 0)"
+        for _ in range(6):
+            geom = f"GEOMETRYCOLLECTION({geom})"
+        obj = GeometryCollectionModel(geom=geom)
+        msg = "WKT contains too many possible GeometryCollections."
+        # Spatial fields do not re-raise ValueError as ValidationError.
+        with self.assertRaisesMessage(ValueError, msg):
+            obj.full_clean()
 
 
 class GeoLookupTest(TestCase):
@@ -784,6 +827,15 @@ class GeoLookupTest(TestCase):
         geojson = json.dumps({"type": "Point", "coordinates": [2, 49]})
         # Just get SQL to avoid gating on connection.supports_raster.
         City.objects.filter(point__contained=geojson).query
+
+    @skipUnlessGISLookup("exact")
+    def test_lookup_against_nested_geometry_collection(self):
+        geom = "POINT(0 0)"
+        for _ in range(6):
+            geom = f"GEOMETRYCOLLECTION({geom})"
+        msg = "WKT contains too many possible GeometryCollections."
+        with self.assertRaisesMessage(ValueError, msg):
+            GeometryCollectionModel.objects.filter(geom=geom)
 
 
 class GeoQuerySetTest(TestCase):

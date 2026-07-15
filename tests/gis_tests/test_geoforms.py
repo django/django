@@ -3,6 +3,7 @@ import re
 from django.contrib.gis import forms
 from django.contrib.gis.forms import BaseGeometryWidget, OpenLayersWidget
 from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos.prototypes.io import MAX_GEOM_COLLECTIONS
 from django.core.exceptions import ValidationError
 from django.template.defaultfilters import json_script
 from django.test import SimpleTestCase, override_settings
@@ -43,6 +44,55 @@ class GeometryFieldTest(SimpleTestCase):
         )
         self.assertEqual(cleaned_geom.srid, 32140)
         self.assertTrue(xform_geom.equals_exact(cleaned_geom, tol))
+
+    def test_max_geom_collections_default(self):
+        """The limit has a default and reaches the widget."""
+        fld = forms.GeometryField()
+        self.assertEqual(fld.max_geom_collections, MAX_GEOM_COLLECTIONS)
+        self.assertEqual(fld.widget.max_geom_collections, MAX_GEOM_COLLECTIONS)
+
+    def test_max_geom_collections_override(self):
+        """A per-field limit is enforced when cleaning nested collections."""
+        fld = forms.GeometryField(max_geom_collections=5)
+        # The override is propagated to the widget that does the parsing.
+        self.assertEqual(fld.widget.max_geom_collections, 5)
+
+        def make_geom(depth):
+            return "GEOMETRYCOLLECTION(" * depth + "POINT(0 0)" + ")" * depth
+
+        with self.assertRaisesMessage(ValidationError, "Invalid geometry value."):
+            fld.clean(make_geom(6))
+        self.assertIsNotNone(fld.clean(make_geom(5)))
+
+    def test_max_geom_collections_widget_without_deserialize(self):
+        # A widget without deserialize() (e.g. TextInput) uses to_python's
+        # fallback, which still applies the field's limit.
+        fld = forms.GeometryField(max_geom_collections=5, widget=forms.TextInput)
+
+        def make_geom(depth):
+            return "GEOMETRYCOLLECTION(" * depth + "POINT(0 0)" + ")" * depth
+
+        with self.assertRaisesMessage(ValidationError, "Invalid geometry value."):
+            fld.clean(make_geom(6))
+        self.assertIsNotNone(fld.clean(make_geom(5)))
+
+    def test_max_geom_collections_custom_widget_uses_default(self):
+        # A custom widget overriding deserialize() and ignoring the field's
+        # max_geom_collections still gets the default limit via GEOSGeometry.
+        class IgnoringWidget(BaseGeometryWidget):
+            def deserialize(self, value):
+                return GEOSGeometry(value)  # no limit -> default applies
+
+        fld = forms.GeometryField(max_geom_collections=5, widget=IgnoringWidget)
+
+        def make_geom(depth):
+            return "GEOMETRYCOLLECTION(" * depth + "POINT(0 0)" + ")" * depth
+
+        # The field's low limit (5) is ignored by the widget...
+        self.assertIsNotNone(fld.clean(make_geom(6)))
+        # ...but the default (198) still guards against deeper input.
+        with self.assertRaises(ValueError):
+            fld.clean(make_geom(MAX_GEOM_COLLECTIONS + 1))
 
     def test_null(self):
         "Testing GeometryField's handling of null (None) geometries."
