@@ -40,6 +40,10 @@ class BaseDatabaseFeatures:
     can_return_rows_from_bulk_insert = False
     can_return_rows_from_update = False
     has_bulk_insert = True
+    # SQL operator emitted for `col __in [literal, ...]` lookups. Backends
+    # that rewrite it into an array-comparison form (e.g. PostgreSQL uses
+    # `= ANY(%s::type[])`) should override this.
+    in_lookup_operator = "IN"
     uses_savepoints = True
     can_release_savepoints = False
 

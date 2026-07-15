@@ -1,4 +1,5 @@
 import collections.abc
+import unittest
 from datetime import datetime
 from math import ceil
 from operator import attrgetter
@@ -1150,6 +1151,29 @@ class LookupTests(TestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             Article.objects.filter(id__in=Article.objects.values("id", "headline"))
+
+    @unittest.skipUnless(
+        connection.features.in_lookup_operator == "ANY",
+        "Backend does not compile __in to `= ANY(%s::type[])`.",
+    )
+    def test_in_reverse_relation_uses_target_field_type(self):
+        # Regression: for a reverse relation the LHS's output_field is a
+        # ManyToOneRel whose db_type reflects the FK target column, not the
+        # local pk of the joined table. The array cast must resolve to the
+        # scalar column actually being compared.
+        sql, _ = Article.objects.filter(tag__in=[1, 2]).query.sql_with_params()
+        self.assertRegex(sql, r"= ANY\(%s::(integer|bigint)\[\]\)")
+
+    @unittest.skipUnless(
+        connection.features.in_lookup_operator == "ANY",
+        "Backend does not compile __in to `= ANY(%s::type[])`.",
+    )
+    def test_in_varchar_field_strips_column_size(self):
+        # Regression: `varchar(N)` must have its size stripped before being
+        # turned into an array cast, otherwise PostgreSQL rejects the
+        # `::varchar(N)[]` syntax.
+        sql, _ = Article.objects.filter(headline__in=["a", "b"]).query.sql_with_params()
+        self.assertRegex(sql, r"= ANY\(%s::(varchar|text)\[\]\)")
 
     def test_error_messages(self):
         # Programming errors are pointed out with nice error messages

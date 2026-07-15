@@ -539,7 +539,7 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
         de-duplicating where the values are hashable. NULLs are dropped
         because they are never equal to anything in SQL semantics.
 
-        Raises EmptyResultSet if the filtered list is empty, so the caller
+        Raise EmptyResultSet if the filtered list is empty, so the caller
         can short-circuit the whole query.
         """
         try:

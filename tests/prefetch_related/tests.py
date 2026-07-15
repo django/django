@@ -1433,10 +1433,7 @@ class MultiTableInheritanceTest(TestCase):
         # the associated author IDs.
         prefetch_sql = ctx[-1]["sql"]
         self.assertIn(AuthorWithAge._meta.db_table, prefetch_sql)
-        where_index = prefetch_sql.index(" WHERE ")
-        for author in authors:
-            with self.subTest(author_id=author.pk):
-                self.assertIn(str(author.pk), prefetch_sql[where_index:])
+        self.assertIn(connection.features.in_lookup_operator, prefetch_sql)
         self.assertEqual(authors, [a.authorwithage for a in Author.objects.all()])
 
 

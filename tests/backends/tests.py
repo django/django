@@ -102,6 +102,12 @@ class LastExecutedQueryTest(TestCase):
     def test_last_executed_query(self):
         # last_executed_query() interpolate all parameters, in most cases it is
         # not equal to QuerySet.query.
+        # Backends that rewrite __in to an array-comparison form (e.g.
+        # PostgreSQL uses `= ANY(%s)`) bind the values as a single list
+        # parameter; the driver's SQL renderer and Django's str(query)
+        # then disagree on how to serialize that list, so only assert the
+        # operator itself is preserved on both sides.
+        in_operator = connection.features.in_lookup_operator
         for qs in (
             Article.objects.filter(pk=1),
             Article.objects.filter(pk__in=(1, 2), reporter__pk=3),
@@ -115,15 +121,9 @@ class LastExecutedQueryTest(TestCase):
             with qs.query.get_compiler(DEFAULT_DB_ALIAS).execute_sql(CURSOR) as cursor:
                 actual = cursor.db.ops.last_executed_query(cursor, sql, params)
                 expected = str(qs.query)
-                # PostgreSQL compiles `__in` to `= ANY(%s)` with a single
-                # bound array parameter; the driver's own SQL renderer
-                # serializes that array as `'{1,2}'::type[]`, while Django's
-                # str(query) applies Python `%s` substitution and renders it
-                # as `[1, 2]`. Both refer to the same query but produce
-                # different string forms, so allow that specific divergence.
-                if "= ANY(" in actual or "= ANY(" in expected:
-                    self.assertIn("= ANY(", actual)
-                    self.assertIn("= ANY(", expected)
+                if in_operator == "ANY" and ("ANY(" in actual or "ANY(" in expected):
+                    self.assertIn("ANY(", actual)
+                    self.assertIn("ANY(", expected)
                 else:
                     self.assertEqual(actual, expected)
 
