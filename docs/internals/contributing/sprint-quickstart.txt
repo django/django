@@ -75,8 +75,8 @@ Assessing tickets
 -----------------
 
 When looking over tickets, it's a good idea to keep your search to
-tickets that were created in the last five years. An easy way to tell is
-by the ticket number. Avoid tickets older than 10 years old. These are old
+accepted tickets that were created in the last five years. An easy way to tell
+is by the ticket number. Avoid tickets older than 10 years old. These are old
 for a reason. You're welcome to try, but they will require a high
 degree of perseverance. We recommend you start with tickets created in the
 last five years when getting started.
@@ -108,15 +108,17 @@ haven't been touched in six months or longer. The ideal ticket has a PR
 attached to it that has a code review with explicit requests and the author
 has not responded in at least six months on the PR and on the ticket.
 
-To view a list of possibly vulture-able tickets, you can run the following
-command to generate a link to the page.
+You can view the list of `possibly vulture-able tickets here`_. The filters
+that are applied are:
 
-.. console::
-
-    $ python -c "from datetime import date,timedelta;from urllib.parse import urlencode;t=date.today();f=lambda d:(lambda x:f'{x:%b} {x.day}, {x:%Y}')(t+timedelta(d));print('https://code.djangoproject.com/query?'+urlencode([('changetime', f(-1610)+'..'+f(-151)),('description','~'),('needs_better_patch','1'),('status','assigned'),('status','new'),('time' ,f(-1610)+'..'+f(0)),('order','id'),('desc','1'),('col','id'),('col','summary'),('col','time'),('col','changetime'), ('col','needs_better_patch'),('col','owner'),('col','type'),('col','component')]))"
+- Triage stage = Accepted
+- Patch needs improvement = Yes
+- Created = between `5 years ago` and `today`
+- Modified = between `5 years ago` and `6 months ago`
 
 .. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1
 .. _vulture method: https://youtube.com/shorts/D6QHet5U82U?si=j5M6sy0ufpeGy_iZ
+.. _possibly vulture-able tickets here: https://code.djangoproject.com/query?changetime=5+years+ago..6+months+ago&description=~&needs_better_patch=1&status=assigned&status=new&time=5+years+ago..today&order=id&desc=1&col=id&col=summary&col=time&col=changetime&col=needs_better_patch&col=owner&col=type&col=component
 
 Claiming a ticket
 -----------------
