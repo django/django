@@ -236,7 +236,10 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
         def converter(value, expression, connection):
             if value is not None:
-                geom = GEOSGeometryBase(read(memoryview(value.read())), geom_class)
+                geom = GEOSGeometryBase(
+                    read(memoryview(value.read()), max_geom_collections=None),
+                    geom_class,
+                )
                 if srid:
                     geom.srid = srid
                 return geom

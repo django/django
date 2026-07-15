@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.gis import gdal
 from django.contrib.gis.geometry import json_regex
 from django.contrib.gis.geos import GEOSException, GEOSGeometry
+from django.contrib.gis.geos.prototypes.io import MAX_GEOM_COLLECTIONS
 from django.forms.widgets import Widget
 from django.utils import translation
 
@@ -19,6 +20,7 @@ class BaseGeometryWidget(Widget):
     geom_type = "GEOMETRY"
     map_srid = 4326
     display_raw = False
+    max_geom_collections = MAX_GEOM_COLLECTIONS
 
     supports_3d = False
     template_name = ""  # set on subclasses
@@ -35,7 +37,7 @@ class BaseGeometryWidget(Widget):
 
     def deserialize(self, value):
         try:
-            return GEOSGeometry(value)
+            return GEOSGeometry(value, max_geom_collections=self.max_geom_collections)
         except (GEOSException, ValueError, TypeError) as err:
             logger.error("Error creating geometry from value '%s' (%s)", value, err)
         return None

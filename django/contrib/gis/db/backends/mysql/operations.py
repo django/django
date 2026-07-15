@@ -135,7 +135,9 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
         def converter(value, expression, connection):
             if value is not None:
-                geom = GEOSGeometryBase(read(memoryview(value)), geom_class)
+                geom = GEOSGeometryBase(
+                    read(memoryview(value), max_geom_collections=None), geom_class
+                )
                 if srid:
                     geom.srid = srid
                 return geom

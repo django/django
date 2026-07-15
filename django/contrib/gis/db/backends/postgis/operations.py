@@ -419,9 +419,12 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         geom_class = expression.output_field.geom_class
 
         def converter(value, expression, connection):
-            if isinstance(value, str):  # Coming from hex strings.
-                value = value.encode("ascii")
-            return None if value is None else GEOSGeometryBase(read(value), geom_class)
+            if value is not None:
+                if isinstance(value, str):  # Coming from hex strings.
+                    value = value.encode("ascii")
+                return GEOSGeometryBase(
+                    read(value, max_geom_collections=None), geom_class
+                )
 
         return converter
 
