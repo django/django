@@ -20,3 +20,17 @@ class DatabaseFeatures(BaseSpatialFeatures, MySQLDatabaseFeatures):
         # Not supported in MySQL since
         # https://dev.mysql.com/worklog/task/?id=11808
         return self.connection.mysql_is_mariadb
+
+    @cached_property
+    def django_test_skips(self):
+        skips = super().django_test_skips
+        if self.connection.mysql_is_mariadb:
+            skips.update(
+                {
+                    "MariaDB doesn't support nested geometry collections.": {
+                        "gis_tests.geoapp.tests.SaveLoadTests."
+                        "test_geometrycollectionfield_default_max_ignored_on_read",
+                    },
+                }
+            )
+        return skips
