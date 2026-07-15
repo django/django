@@ -5,17 +5,26 @@ Sphinx plugins for Django documentation.
 import re
 
 from docutils import nodes
-from docutils.parsers.rst import Directive
 from docutils.statemachine import ViewList
 from sphinx import addnodes
 from sphinx.directives.code import CodeBlock
+from sphinx.domains import changeset
 from sphinx.domains.std import Cmdoption
+from sphinx.locale import _
 from sphinx.util import logging
 from sphinx.writers.html import HTMLTranslator
 
 logger = logging.getLogger(__name__)
 # RE for option descriptions without a '--' prefix
 simple_option_desc_re = re.compile(r"([-_a-zA-Z0-9]+)(\s*.*?)(?=,\s+(?:/|-|--)|$)")
+
+# Refer to "Django N.M" rather than "version N.M".
+django_changeset_versionlabels = {
+    "deprecated": _("Deprecated since Django %s"),
+    "versionadded": _("New in Django %s"),
+    "versionchanged": _("Changed in Django %s"),
+    "versionremoved": _("Removed in Django %s"),
+}
 
 
 def setup(app):
@@ -46,10 +55,24 @@ def setup(app):
         parse_node=parse_django_admin_node,
     )
     app.add_directive("django-admin-option", Cmdoption)
+
     app.add_config_value("django_next_version", "0.0", True)
-    app.add_directive("versionadded", VersionDirective)
-    app.add_directive("versionchanged", VersionDirective)
+    changeset_directives = set(changeset.versionlabels)
+    if hasattr(changeset, "name_aliases"):
+        # Sphinx 9.0+ also allows "version-added", "version-changed", etc.
+        changeset_directives.update(changeset.name_aliases)
+    for directive in changeset_directives:
+        app.add_directive(directive, DjangoVersionChange, override=True)
+    # Patch Sphinx versionlabels to refer to "Django".
+    if set(changeset.versionlabels) != set(django_changeset_versionlabels):
+        raise RuntimeError(
+            "djangodocs extension needs to be updated: "
+            "sphinx.domains.changeset.versionlabels has changed."
+        )
+    changeset.versionlabels.update(django_changeset_versionlabels)
+
     app.connect("builder-inited", set_django_html_translator)
+
     app.add_node(
         ConsoleNode,
         html=(visit_console_html, None),
@@ -68,64 +91,17 @@ def set_django_html_translator(app):
         app.set_translator(app.builder.name, DjangoHTMLTranslator, override=True)
 
 
-class VersionDirective(Directive):
-    has_content = True
-    required_arguments = 1
-    optional_arguments = 1
-    final_argument_whitespace = True
-    option_spec = {}
-
+class DjangoVersionChange(changeset.VersionChange):
     def run(self):
-        if len(self.arguments) > 1:
-            msg = """Only one argument accepted for directive '{directive_name}::'.
-            Comments should be provided as content,
-            not as an extra argument.""".format(directive_name=self.name)
-            raise self.error(msg)
-
-        env = self.state.document.settings.env
-        ret = []
-        node = addnodes.versionmodified()
-        ret.append(node)
-
-        if self.arguments[0] == env.config.django_next_version:
-            node["version"] = "Development version"
-        else:
-            node["version"] = self.arguments[0]
-
-        node["type"] = self.name
-        if self.content:
-            self.state.nested_parse(self.content, self.content_offset, node)
-        env.get_domain("changeset").note_changeset(node)
-        return ret
+        if self.arguments[0] == self.env.config.django_next_version:
+            self.arguments[0] = _("development version")
+        return super().run()
 
 
 class DjangoHTMLTranslator(HTMLTranslator):
     """
     Django-specific reST to HTML tweaks.
     """
-
-    # Turn the "new in version" stuff (versionadded/versionchanged) into a
-    # better callout -- the Sphinx default is just a little span,
-    # which is a bit less obvious that I'd like.
-    #
-    # FIXME: these messages are all hardcoded in English. We need to change
-    # that to accommodate other language docs, but I can't work out how to make
-    # that work.
-    #
-    version_text = {
-        "versionchanged": "Changed in Django %s",
-        "versionadded": "New in Django %s",
-    }
-
-    def visit_versionmodified(self, node):
-        self.body.append(self.starttag(node, "div", CLASS=node["type"]))
-        version_text = self.version_text.get(node["type"])
-        if version_text:
-            title = "%s%s" % (version_text % node["version"], ":" if len(node) else ".")
-            self.body.append('<span class="title">%s</span> ' % title)
-
-    def depart_versionmodified(self, node):
-        self.body.append("</div>\n")
 
     # Give each section a unique ID -- nice for custom CSS hooks
     def visit_section(self, node):
