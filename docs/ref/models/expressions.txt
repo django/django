@@ -662,8 +662,11 @@ Limiting a subquery to a single column
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There are times when a single column must be returned from a ``Subquery``, for
-instance, to use a ``Subquery`` as the target of an ``__in`` lookup. To return
-all comments for posts published within the last day:
+instance, to use a ``Subquery`` as the target of an :lookup:`in` lookup whose
+left-hand side doesn't have a ``CompositeField``
+:ref:`output_field <output-field>`. See
+:ref:`using-multi-column-subqueries` for lookups that expect multiple columns.
+To return all comments for posts published within the last day:
 
 .. code-block:: pycon
 
@@ -693,6 +696,47 @@ row: the email address of the most recently created comment.
 (Using :meth:`~.QuerySet.get` instead of a slice would fail because the
 ``OuterRef`` cannot be resolved until the queryset is used within a
 ``Subquery``.)
+
+.. _using-multi-column-subqueries:
+
+Using multi-column subqueries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 6.2
+
+A ``Subquery`` can return multiple columns by calling
+:meth:`~.QuerySet.values` with multiple field names. In this case, the
+subquery has a ``CompositeField`` :ref:`output_field <output-field>`.
+
+The individual subfields can be referenced using the normal
+double-underscore lookup syntax:
+
+.. code-block:: pycon
+
+    >>> newest = Comment.objects.order_by("-created_at").values("email", "author__name")[:1]
+    >>> Post.objects.alias(info=newest).values("info__email", "info__author__name")
+
+.. note::
+
+    Selecting an entire multi-column ``Subquery`` as a single annotation value
+    isn't supported. Assign it using :meth:`~.QuerySet.alias` and select or
+    annotate its individual subfields instead.
+
+An uncorrelated multi-column subquery is combined with every row of the outer
+query, forming a Cartesian product. If the outer query has ``M`` rows and the
+subquery has ``N`` rows, where ``N`` is greater than zero, the result can
+contain ``M * N`` rows. Use a ``[:1]`` slice to limit the subquery to at most
+one row. If the subquery is empty, the outer rows are preserved and the
+subfields have SQL ``NULL`` values.
+
+Correlated multi-column subqueries that use ``OuterRef`` aren't supported.
+
+The subfields can also be used in filters, annotations, ordering, and other
+expressions in the same way as model fields.
+
+A multi-column ``Subquery`` can also be compared as a whole using tuple
+lookups, including :lookup:`exact`, :lookup:`lt`, :lookup:`in`, and
+:lookup:`gt`.
 
 ``Exists()`` subqueries
 ~~~~~~~~~~~~~~~~~~~~~~~
