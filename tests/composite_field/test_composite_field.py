@@ -1,7 +1,7 @@
 from django.core.exceptions import FieldError
-from django.db import NotSupportedError
-from django.db.models import Count, F, OuterRef
-from django.test import TestCase
+from django.db import NotSupportedError, connection
+from django.db.models import Count, F, OuterRef, Q
+from django.test import TestCase, skipUnlessDBFeature
 
 from .models import BugReport, Organization, Post, Project, Task, User
 from .utils import create_composite_test_data
@@ -510,3 +510,357 @@ class CompositeFieldTests(TestCase):
                 "code", "priority_bug__description"
             )
             list(projects)
+
+
+class CompositeSubqueryTupleLookupTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.data = create_composite_test_data()
+        cls.higher_priority_bug = BugReport.objects.create(
+            task=cls.data.tasks.login,
+            reporter=cls.data.users.cy,
+            description="Account takeover",
+            severity_level=4,
+        )
+
+    def bug_tuple_subquery(self, bug_report):
+        return BugReport.objects.filter(pk=bug_report.pk).values(
+            "severity_level", "description"
+        )[:1]
+
+    def projects_with_priority_bug(self, *, empty=False):
+        bug_reports = BugReport.objects.filter(pk=self.data.bug_reports.crash.pk)
+        if empty:
+            bug_reports = bug_reports.filter(description="Does not exist")
+        priority_bug = bug_reports.values("severity_level", "description")[:1]
+        return Project.objects.filter(pk=self.data.projects.auth.pk).alias(
+            priority_bug=priority_bug
+        )
+
+    def test_exact(self):
+        projects = self.projects_with_priority_bug()
+
+        self.assertEqual(
+            list(
+                projects.filter(priority_bug=(3, "Login crash")).values_list(
+                    "code", flat=True
+                )
+            ),
+            ["AUTH"],
+        )
+        self.assertEqual(
+            list(
+                projects.filter(priority_bug=(3, "Export missing rows")).values_list(
+                    "code", flat=True
+                )
+            ),
+            [],
+        )
+
+    def test_exact_subquery(self):
+        projects = self.projects_with_priority_bug()
+        matching_bug = self.bug_tuple_subquery(self.data.bug_reports.crash)
+        nonmatching_bug = self.bug_tuple_subquery(self.data.bug_reports.missing_export)
+
+        self.assertEqual(
+            list(
+                projects.filter(priority_bug=matching_bug).values_list(
+                    "code", flat=True
+                )
+            ),
+            ["AUTH"],
+        )
+        self.assertEqual(
+            list(
+                projects.filter(priority_bug=nonmatching_bug).values_list(
+                    "code", flat=True
+                )
+            ),
+            [],
+        )
+
+    def test_in(self):
+        projects = self.projects_with_priority_bug()
+
+        self.assertEqual(
+            list(
+                projects.filter(
+                    priority_bug__in=[
+                        (2, "Export missing rows"),
+                        (3, "Login crash"),
+                    ]
+                ).values_list("code", flat=True)
+            ),
+            ["AUTH"],
+        )
+        self.assertEqual(
+            list(
+                projects.filter(
+                    priority_bug__in=[
+                        (2, "Login crash"),
+                        (3, "Export missing rows"),
+                    ]
+                ).values_list("code", flat=True)
+            ),
+            [],
+        )
+
+    def test_isnull(self):
+        projects = self.projects_with_priority_bug()
+        projects_without_bug = self.projects_with_priority_bug(empty=True)
+
+        self.assertEqual(
+            list(
+                projects.filter(priority_bug__isnull=False).values_list(
+                    "code", flat=True
+                )
+            ),
+            ["AUTH"],
+        )
+        self.assertEqual(
+            list(
+                projects.filter(priority_bug__isnull=True).values_list(
+                    "code", flat=True
+                )
+            ),
+            [],
+        )
+        self.assertEqual(
+            list(
+                projects_without_bug.filter(priority_bug__isnull=True).values_list(
+                    "code", flat=True
+                )
+            ),
+            ["AUTH"],
+        )
+        self.assertEqual(
+            list(
+                projects_without_bug.filter(priority_bug__isnull=False).values_list(
+                    "code", flat=True
+                )
+            ),
+            [],
+        )
+
+    def test_greater_than(self):
+        projects = self.projects_with_priority_bug()
+
+        self.assertEqual(
+            list(
+                projects.filter(priority_bug__gt=(2, "Anything")).values_list(
+                    "code", flat=True
+                )
+            ),
+            ["AUTH"],
+        )
+        self.assertEqual(
+            list(
+                projects.filter(priority_bug__gt=(4, "Anything")).values_list(
+                    "code", flat=True
+                )
+            ),
+            [],
+        )
+
+    def test_greater_than_or_equal(self):
+        projects = self.projects_with_priority_bug()
+
+        self.assertEqual(
+            list(
+                projects.filter(priority_bug__gte=(3, "Login crash")).values_list(
+                    "code", flat=True
+                )
+            ),
+            ["AUTH"],
+        )
+        self.assertEqual(
+            list(
+                projects.filter(priority_bug__gte=(4, "Anything")).values_list(
+                    "code", flat=True
+                )
+            ),
+            [],
+        )
+
+    def test_less_than(self):
+        projects = self.projects_with_priority_bug()
+
+        self.assertEqual(
+            list(
+                projects.filter(priority_bug__lt=(4, "Anything")).values_list(
+                    "code", flat=True
+                )
+            ),
+            ["AUTH"],
+        )
+        self.assertEqual(
+            list(
+                projects.filter(priority_bug__lt=(2, "Anything")).values_list(
+                    "code", flat=True
+                )
+            ),
+            [],
+        )
+
+    def test_less_than_or_equal(self):
+        projects = self.projects_with_priority_bug()
+
+        self.assertEqual(
+            list(
+                projects.filter(priority_bug__lte=(3, "Login crash")).values_list(
+                    "code", flat=True
+                )
+            ),
+            ["AUTH"],
+        )
+        self.assertEqual(
+            list(
+                projects.filter(priority_bug__lte=(2, "Anything")).values_list(
+                    "code", flat=True
+                )
+            ),
+            [],
+        )
+
+    @skipUnlessDBFeature("supports_tuple_comparison_against_subquery")
+    def test_comparison_subqueries(self):
+        lower_bug = self.data.bug_reports.missing_export
+        equal_bug = self.data.bug_reports.crash
+        higher_bug = self.higher_priority_bug
+        test_cases = (
+            ("gt", lower_bug, equal_bug),
+            ("gte", equal_bug, higher_bug),
+            ("lt", higher_bug, equal_bug),
+            ("lte", equal_bug, lower_bug),
+        )
+
+        for lookup, matching_bug, nonmatching_bug in test_cases:
+            with self.subTest(lookup=lookup):
+                projects = self.projects_with_priority_bug()
+                self.assertEqual(
+                    list(
+                        projects.filter(
+                            **{
+                                f"priority_bug__{lookup}": self.bug_tuple_subquery(
+                                    matching_bug
+                                )
+                            }
+                        ).values_list("code", flat=True)
+                    ),
+                    ["AUTH"],
+                )
+                self.assertEqual(
+                    list(
+                        projects.filter(
+                            **{
+                                f"priority_bug__{lookup}": self.bug_tuple_subquery(
+                                    nonmatching_bug
+                                )
+                            }
+                        ).values_list("code", flat=True)
+                    ),
+                    [],
+                )
+
+    def test_in_empty_list(self):
+        projects = self.projects_with_priority_bug()
+
+        self.assertEqual(
+            list(projects.filter(priority_bug__in=[]).values_list("code", flat=True)),
+            [],
+        )
+
+    def test_exact_rejects_incorrect_number_of_values(self):
+        projects = self.projects_with_priority_bug()
+
+        with self.assertRaisesMessage(
+            ValueError,
+            "'exact' lookup of ('severity_level', 'description') must have "
+            "2 elements",
+        ):
+            projects.filter(priority_bug=(3,))
+
+    def test_in_rejects_incorrect_number_of_values(self):
+        projects = self.projects_with_priority_bug()
+
+        with self.assertRaisesMessage(
+            ValueError,
+            "'in' lookup of ('severity_level', 'description') must have "
+            "2 elements each",
+        ):
+            projects.filter(priority_bug__in=[(3,)])
+
+    def test_in_subquery(self):
+        projects = self.projects_with_priority_bug()
+        matching_bugs = BugReport.objects.filter(
+            pk=self.data.bug_reports.crash.pk
+        ).values("severity_level", "description")
+        nonmatching_bugs = BugReport.objects.filter(
+            pk=self.data.bug_reports.missing_export.pk
+        ).values("severity_level", "description")
+
+        self.assertEqual(
+            list(
+                projects.filter(priority_bug__in=matching_bugs).values_list(
+                    "code", flat=True
+                )
+            ),
+            ["AUTH"],
+        )
+        self.assertEqual(
+            list(
+                projects.filter(priority_bug__in=nonmatching_bugs).values_list(
+                    "code", flat=True
+                )
+            ),
+            [],
+        )
+
+    def test_or_condition(self):
+        projects = self.projects_with_priority_bug()
+
+        self.assertEqual(
+            list(
+                projects.filter(
+                    Q(priority_bug=(3, "Export missing rows"))
+                    | Q(priority_bug=(3, "Login crash"))
+                ).values_list("code", flat=True)
+            ),
+            ["AUTH"],
+        )
+        self.assertEqual(
+            list(
+                projects.filter(
+                    Q(priority_bug=(2, "Login crash"))
+                    | Q(priority_bug=(3, "Export missing rows"))
+                ).values_list("code", flat=True)
+            ),
+            [],
+        )
+
+    def test_and_condition(self):
+        projects = self.projects_with_priority_bug()
+
+        self.assertEqual(
+            list(
+                projects.filter(
+                    Q(priority_bug=(3, "Login crash"))
+                    & Q(
+                        priority_bug__in=[
+                            (2, "Export missing rows"),
+                            (3, "Login crash"),
+                        ]
+                    )
+                ).values_list("code", flat=True)
+            ),
+            ["AUTH"],
+        )
+        self.assertEqual(
+            list(
+                projects.filter(
+                    Q(priority_bug=(3, "Login crash"))
+                    & Q(priority_bug__in=[(2, "Export missing rows")])
+                ).values_list("code", flat=True)
+            ),
+            [],
+        )

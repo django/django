@@ -1248,6 +1248,12 @@ class Query(BaseExpression):
                 "control characters, quotation marks, semicolons, or SQL comments."
             )
 
+    def has_external_references(self):
+        """Return whether this query references a column from an outer query"""
+        return bool(self.get_external_cols()) or any(
+            query.has_external_references() for query in self.combined_queries
+        )
+
     @staticmethod
     def _iter_composite_field_paths(field, prefix=()):
         if getattr(field, "is_composite", False):
@@ -1269,20 +1275,53 @@ class Query(BaseExpression):
             join.table_subquery.output_field
         ):
             if (field_path,) == path:
+            if tuple(field_path.split(LOOKUP_SEP)) == path:
+                column_name = LOOKUP_SEP.join(path)
+                field = join.get_field(column_name)
                 return Col(join.table_alias, field)
         return None
 
+    def _resolve_inner_subquery_tuple(self, join):
+        from django.db.models.fields.tuple_lookups import Tuple
+
+        cols = []
+        output_field = join.table_subquery.output_field
+        for path, field in self._iter_composite_field_paths(output_field):
+            column_name = LOOKUP_SEP.join(path)
+            field = join.get_field(column_name)
+            cols.append(Col(join.table_alias, field))
+        return Tuple(*cols, output_field=output_field)
+
+    def _find_inner_subquery_join(self, annotation_alias):
+        for join in self.alias_map.values():
+            if isinstance(join, SubqueryJoin) and join.table_name == annotation_alias:
+                return join
+        return None
+
     def _promote_inner_subquery_join(self, name):
-        if len(name.split(LOOKUP_SEP, 1)) == 1:
-            return None
-        alias, rest_path = name.split(LOOKUP_SEP, 1)
+        rest_path = None
+        alias = None
+        if len(name.split(LOOKUP_SEP, 1)) > 1:
+            alias, rest_path = name.split(LOOKUP_SEP, 1)
+        else:
+            alias = name.split(LOOKUP_SEP, 1)[0]
         annotation = self.annotations.get(alias)
+        if annotation is None:
+            return None
         if not self._is_multi_column_query(annotation):
             return None
-        existing = self.alias_map.get(alias)
-        if isinstance(existing, SubqueryJoin):
+        if annotation.has_external_references():
+            raise NotSupportedError(
+                "Correlated multi-column subquery aliases are not supported."
+            )
+        existing = self._find_inner_subquery_join(alias)
+        if existing is not None:
+            if rest_path is None:
+                return self._resolve_inner_subquery_tuple(existing)
             return self._resolve_inner_subquery_field(existing, rest_path)
         if isinstance(annotation, SubqueryJoin):
+            if rest_path is None:
+                return self._resolve_inner_subquery_tuple(annotation)
             return self._resolve_inner_subquery_field(annotation, rest_path)
         self.get_initial_alias()
         table_alias, _ = self.table_alias(alias, create=True)
@@ -1292,6 +1331,8 @@ class Query(BaseExpression):
             table_alias,
         )
         self.alias_map[table_alias] = join
+        if rest_path is None:
+            return self._resolve_inner_subquery_tuple(join)
         return self._resolve_inner_subquery_field(join, rest_path)
 
     def add_annotation(self, annotation, alias, select=True):
@@ -1412,8 +1453,7 @@ class Query(BaseExpression):
                     inner_query_field = LOOKUP_SEP.join(lookup_splitted[:idx])
                     expression = self._promote_inner_subquery_join(inner_query_field)
                     if expression is not None:
-                        expression_lookups.remove(expression.field.name)
-                        return expression_lookups, (), expression
+                        return lookup_splitted[idx:], (), expression
                 expression = self.annotations[annotation]
                 if summarize:
                     expression = Ref(annotation, expression)
