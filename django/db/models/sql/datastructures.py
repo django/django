@@ -231,6 +231,18 @@ class SubqueryJoin:
         new.join_type = LOUTER
         return new
 
+    def get_field(self, name):
+        field = self.table_subquery.output_field.get_field(name)
+
+        if field.is_relation:
+            field = field.target_field
+
+        field = field.clone()
+        field.model = None
+        field.name = name
+        field.column = name
+        return field
+
 
 class BaseTable:
     """
