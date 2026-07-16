@@ -15,6 +15,22 @@ class CompositeFieldTests(TestCase):
     def setUp(self):
         self.user1 = self.data.users.ada
 
+    def test_single_column_subquery_keeps_scalar_behavior(self):
+        first_title = (
+            Post.objects.filter(user=self.user1).order_by("pk").values("title")[:1]
+        )
+        profile = (
+            User.objects.filter(pk=self.user1.pk)
+            .annotate(first_title=first_title)
+            .values("name", "first_title")
+        )
+
+        self.assertEqual(
+            list(profile),
+            [{"name": "Ada", "first_title": "Welcome"}],
+        )
+        self.assertNotIn("JOIN (", str(profile.query))
+
     def test_composite_subquery_alias_direct_fields(self):
         first_post = (
             Post.objects.filter(user=self.user1)
