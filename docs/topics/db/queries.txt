@@ -996,8 +996,10 @@ In there, you'll find the methods on QuerySets grouped into two sections:
 
 * *Methods that return new querysets*: These are the non-blocking ones,
   and don't have asynchronous versions. You're free to use these in any
-  situation, though read the notes on ``defer()`` and ``only()`` before you use
-  them.
+  situation, but understand the constraint of `no deferred queries`_ before
+  using :meth:`~django.db.models.query.QuerySet.defer`,
+  :meth:`~django.db.models.query.QuerySet.only`, or
+  :meth:`~django.db.models.query.QuerySet.fetch_mode`.
 
 * *Methods that do not return querysets*: These are the blocking ones, and
   have asynchronous versions - the asynchronous name for each is noted in its
@@ -1019,6 +1021,15 @@ the whole expression in order to call it in an asynchronous-friendly way.
     *"coroutine object has no attribute x"* or *"<coroutine …>"* strings in
     place of your model instances. If you ever see these, you are missing an
     ``await`` somewhere to turn that coroutine into a real value.
+
+No deferred queries
+-------------------
+
+Relations are deferred by default. If the ``blog`` relation is not prefetched,
+accessing ``entry.blog`` during asynchronous evaluation of a queryset attempts
+a blocking database query, raising ``SynchronousOnlyOperation``. (A similar
+limitation applies to fields deferred via ``defer()`` or ``only()``.) To avoid
+this, see the advice on prefetching in :ref:`topics-db-queries-related`.
 
 Transactions
 ------------
