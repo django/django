@@ -368,6 +368,31 @@ if it were an annotated ``SearchVector``:
 
 .. _PostgreSQL documentation: https://www.postgresql.org/docs/current/textsearch-features.html#TEXTSEARCH-UPDATE-TRIGGERS
 
+Using ``GeneratedField``
+------------------------
+
+An alternative method is to use a :class:`~django.db.models.GeneratedField`,
+which has PostgreSQL maintain the column rather than a trigger::
+
+    from django.contrib.postgres.indexes import GinIndex
+    from django.contrib.postgres.search import SearchVector, SearchVectorField
+    from django.db import models
+
+
+    class Entry(models.Model):
+        headline = models.CharField(max_length=255)
+        body_text = models.TextField()
+
+        search_vector = models.GeneratedField(
+            expression=SearchVector("headline", weight="A", config="english")
+            + SearchVector("body_text", weight="B", config="english"),
+            output_field=SearchVectorField(),
+            db_persist=True,
+        )
+
+        class Meta:
+            indexes = [GinIndex(fields=["search_vector"])]
+
 Trigram similarity
 ==================
 
