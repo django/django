@@ -468,6 +468,26 @@ class CompositeFieldTests(TestCase):
             [{"name": "Ada", "post_info__user__email": "ada@example.com"}],
         )
 
+    def test_composite_subquery_alias_direct_and_nested_projected_fields(self):
+        post_info = Post.objects.filter(pk=self.data.posts.welcome.pk).values(
+            "user", "user__email", "title"
+        )[:1]
+        profile = (
+            User.objects.filter(pk=self.user1.pk)
+            .alias(post_info=post_info)
+            .values("post_info__user", "post_info__user__email")
+        )
+
+        self.assertEqual(
+            list(profile),
+            [
+                {
+                    "post_info__user": self.user1.pk,
+                    "post_info__user__email": "ada@example.com",
+                }
+            ],
+        )
+
     def test_composite_subquery_alias_rejects_unprojected_relation_traversal(self):
         post_info = Post.objects.filter(pk=self.data.posts.welcome.pk).values(
             "user", "title"
