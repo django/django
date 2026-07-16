@@ -31,6 +31,34 @@ class CompositeFieldTests(TestCase):
         )
         self.assertNotIn("JOIN (", str(profile.query))
 
+    def test_composite_subquery_annotation_not_supported(self):
+        first_post = (
+            Post.objects.filter(user=self.user1)
+            .order_by("pk")
+            .values("title", "body")[:1]
+        )
+        profile = User.objects.filter(pk=self.user1.pk).annotate(info=first_post)
+
+        msg = "Selecting a multi-column subquery as an annotation is not supported."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            list(profile)
+
+    def test_composite_subquery_alias_whole_annotation_not_supported(self):
+        first_post = (
+            Post.objects.filter(user=self.user1)
+            .order_by("pk")
+            .values("title", "body")[:1]
+        )
+        profile = (
+            User.objects.filter(pk=self.user1.pk)
+            .alias(info=first_post)
+            .annotate(info=F("info"))
+        )
+
+        msg = "Selecting a multi-column subquery as an annotation is not supported."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            list(profile)
+
     def test_composite_subquery_alias_direct_fields(self):
         first_post = (
             Post.objects.filter(user=self.user1)
