@@ -816,6 +816,52 @@ class CompositeSubqueryTupleLookupTests(TestCase):
             [],
         )
 
+    def test_exclude_exact(self):
+        projects = self.projects_with_priority_bug()
+
+        self.assertEqual(
+            list(
+                projects.exclude(priority_bug=(3, "Login crash")).values_list(
+                    "code", flat=True
+                )
+            ),
+            [],
+        )
+        self.assertEqual(
+            list(
+                projects.exclude(priority_bug=(3, "Export missing rows")).values_list(
+                    "code", flat=True
+                )
+            ),
+            ["AUTH"],
+        )
+
+    def test_exclude_in(self):
+        projects = self.projects_with_priority_bug()
+
+        self.assertEqual(
+            list(
+                projects.exclude(
+                    priority_bug__in=[
+                        (2, "Export missing rows"),
+                        (3, "Login crash"),
+                    ]
+                ).values_list("code", flat=True)
+            ),
+            [],
+        )
+        self.assertEqual(
+            list(
+                projects.exclude(
+                    priority_bug__in=[
+                        (2, "Login crash"),
+                        (3, "Export missing rows"),
+                    ]
+                ).values_list("code", flat=True)
+            ),
+            ["AUTH"],
+        )
+
     def test_or_condition(self):
         projects = self.projects_with_priority_bug()
 
@@ -863,4 +909,40 @@ class CompositeSubqueryTupleLookupTests(TestCase):
                 ).values_list("code", flat=True)
             ),
             [],
+        )
+
+    def test_exclude_component_when_inner_is_empty(self):
+        projects = self.projects_with_priority_bug(empty=True)
+
+        self.assertEqual(
+            list(
+                projects.exclude(priority_bug__severity_level=3).values_list(
+                    "code", flat=True
+                )
+            ),
+            ["AUTH"],
+        )
+
+    def test_exclude_exact_when_inner_is_empty(self):
+        projects = self.projects_with_priority_bug(empty=True)
+
+        self.assertEqual(
+            list(
+                projects.exclude(priority_bug=(3, "Login crash")).values_list(
+                    "code", flat=True
+                )
+            ),
+            ["AUTH"],
+        )
+
+    def test_exclude_in_when_inner_is_empty(self):
+        projects = self.projects_with_priority_bug(empty=True)
+
+        self.assertEqual(
+            list(
+                projects.exclude(priority_bug__in=[(3, "Login crash")]).values_list(
+                    "code", flat=True
+                )
+            ),
+            ["AUTH"],
         )
