@@ -513,17 +513,17 @@ class DecimalValidator:
     messages = {
         "invalid": _("Enter a number."),
         "max_digits": ngettext_lazy(
-            "Ensure that there are no more than %(max)s digit in total.",
+            "Ensure that there is no more than %(max)s digit in total.",
             "Ensure that there are no more than %(max)s digits in total.",
             "max",
         ),
         "max_decimal_places": ngettext_lazy(
-            "Ensure that there are no more than %(max)s decimal place.",
+            "Ensure that there is no more than %(max)s decimal place.",
             "Ensure that there are no more than %(max)s decimal places.",
             "max",
         ),
         "max_whole_digits": ngettext_lazy(
-            "Ensure that there are no more than %(max)s digit before the decimal "
+            "Ensure that there is no more than %(max)s digit before the decimal "
             "point.",
             "Ensure that there are no more than %(max)s digits before the decimal "
             "point.",
