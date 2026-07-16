@@ -338,16 +338,37 @@ class Query(BaseExpression):
 
     @property
     def output_field(self):
-        if not self.select and not self.annotation_select:
-            return None
         from django.db.models import CompositeField
 
-        return CompositeField.from_select(
-            self.select,
-            self.values_select,
-            self.annotation_select,
-            getattr(self, "selected", None),
-        )
+        output_fields = dict(self._get_output_fields())
+        return CompositeField.from_select(output_fields)
+
+    @staticmethod
+    def _get_output_field(expression):
+        return getattr(expression, "target", None) or expression.output_field
+
+    def _get_output_fields(self):
+        if self.selected is not None:
+            for name, selection in self.selected.items():
+                if isinstance(selection, int):
+                    expression = self.select[selection]
+                elif isinstance(selection, str):
+                    expression = self.annotation_select[selection]
+                else:
+                    expression = selection
+                yield name, self._get_output_field(expression)
+            return
+
+        if self.values_select:
+            for name, expression in zip(self.values_select, self.select):
+                yield name, self._get_output_field(expression)
+        else:
+            for expression in self.select:
+                field = self._get_output_field(expression)
+                yield field.name, field
+
+        for name, expression in self.annotation_select.items():
+            yield name, self._get_output_field(expression)
 
     @cached_property
     def base_table(self):
@@ -1257,8 +1278,8 @@ class Query(BaseExpression):
     @staticmethod
     def _iter_composite_field_paths(field, prefix=()):
         if getattr(field, "is_composite", False):
-            for name, subfield in field.sub_fields.items():
-                yield from Query._iter_composite_field_paths(subfield, prefix + (name,))
+            for path, subfield in field.get_fields():
+                yield prefix + path, subfield
         else:
             yield prefix, field
 
