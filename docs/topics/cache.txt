@@ -742,6 +742,18 @@ Additionally, ``cache_page`` automatically sets ``Cache-Control`` and
 ``Expires`` headers in the response which affect :ref:`downstream caches
 <downstream-caches>`.
 
+.. admonition:: Responses are cached before response middleware runs
+
+    ``cache_page`` is intended for content that is safe to reuse for requests
+    to the same URL. It does not automatically vary by authentication,
+    sessions, cookies, or other request-specific state.
+
+    As a decorator wrapping the view directly, responses are cached before
+    response middleware runs. If cache variation depends on response
+    middleware, ensure it runs before the response is cached. For example, when
+    caching views containing CSRF-protected forms, follow
+    :ref:`csrf-cache-page` to ensure the ``Vary`` header is set first.
+
 Specifying per-view cache in the URLconf
 ----------------------------------------
 
