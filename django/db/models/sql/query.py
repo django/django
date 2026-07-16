@@ -1274,7 +1274,6 @@ class Query(BaseExpression):
         for path, field in self._iter_composite_field_paths(
             join.table_subquery.output_field
         ):
-            if (field_path,) == path:
             if tuple(field_path.split(LOOKUP_SEP)) == path:
                 column_name = LOOKUP_SEP.join(path)
                 field = join.get_field(column_name)
@@ -1588,6 +1587,18 @@ class Query(BaseExpression):
                 "permitted%s" % (unsupported_lookup, output_field.__name__, suggestion)
             )
 
+    def _expression_contains_nullable_subquery_column(self, expression):
+        if expression is None:
+            return False
+        if isinstance(expression, Col):
+            join = self.alias_map.get(expression.alias)
+            return isinstance(join, SubqueryJoin) and join.join_type == LOUTER
+
+        return any(
+            self._expression_contains_nullable_subquery_column(source)
+            for source in expression.get_source_expressions()
+        )
+
     def build_filter(
         self,
         filter_expr,
@@ -1670,7 +1681,16 @@ class Query(BaseExpression):
 
         if reffed_expression:
             condition = self.build_lookup(lookups, reffed_expression, value)
-            return WhereNode([condition], connector=AND), []
+            clause = WhereNode([condition], connector=AND)
+            if (
+                current_negated
+                and condition.lookup_name != "isnull"
+                and condition.rhs is not None
+                and self._expression_contains_nullable_subquery_column(condition.lhs)
+            ):
+                lookup_class = condition.lhs.get_lookup("isnull")
+                clause.add(lookup_class(condition.lhs, False), AND)
+            return clause, []
 
         opts = self.get_meta()
         alias = self.get_initial_alias()
