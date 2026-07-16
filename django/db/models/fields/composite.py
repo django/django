@@ -196,84 +196,33 @@ class CompositeField(Field):
         super().__init__()
 
     @classmethod
-    def from_select(
-        cls, select, values_select=None, annotation_select=None, selected=None
-    ):
-        """
-        Builds a CompositeField (possibly nested) from query select exprs.
-        """
+    def from_select(cls, fields):
+        """Build an output field from an ordered mapping of selected fields."""
+        if not fields:
+            return None
+        if len(fields) == 1:
+            return next(iter(fields.values()))
 
-        def extract_field(value):
-            return (
-                getattr(value, "target", None)
-                or getattr(value, "field", None)
-                or getattr(value, "output_field", None)
-            )
+        composite = cls.__new__(cls)
+        composite.sub_fields = dict(fields)
+        Field.__init__(composite)
+        return composite
 
-        select_map = {}
-        if selected:
-            for path, val in selected.items():
-                if isinstance(val, int):
-                    field = extract_field(select[val])
-                else:
-                    field = extract_field(val)
-                if field:
-                    select_map[path] = field
-        else:
-            if values_select:
-                select_idx = 0
-                for path in values_select:
-                    if annotation_select and path in annotation_select:
-                        field = extract_field(annotation_select[path])
-                    elif select_idx < len(select):
-                        field = extract_field(select[select_idx])
-                        select_idx += 1
-                    else:
-                        field = None
-                    if field:
-                        select_map[path] = field
+    def get_fields(self):
+        for name, field in self.sub_fields.items():
+            path = tuple(name.split(LOOKUP_SEP))
+            if isinstance(field, CompositeField):
+                for subpath, subfield in field.get_fields():
+                    yield path + subpath, subfield
             else:
-                for sel in select:
-                    field = extract_field(sel)
-                    if field:
-                        select_map[field.name] = field
-
-        if annotation_select:
-            select_map.update(
-                {
-                    key: extract_field(value)
-                    for key, value in annotation_select.items()
-                    if key not in select_map
-                }
-            )
-
-        if len(select_map) == 1:
-            return next(iter(select_map.values()))
-
-        nested = {}
-        for path, field in select_map.items():
-            parts = path.split(LOOKUP_SEP)
-            current = nested
-            for part in parts[:-1]:
-                current = current.setdefault(part, {})
-            current[parts[-1]] = field
-        return cls._make_composite(nested)
-
-    @classmethod
-    def _make_composite(cls, value):
-        if isinstance(value, dict):
-            sub_fields = {k: cls._make_composite(v) for k, v in value.items()}
-            composite = cls.__new__(cls)
-            composite.sub_fields = sub_fields
-            Field.__init__(composite)
-            return composite
-        return value
+                yield path, field
 
     def get_field(self, name):
-        try:
-            return self.sub_fields[name]
-        except KeyError:
-            raise FieldError(f"{name!r} not found")
+        path = tuple(name.split(LOOKUP_SEP))
+        for field_path, field in self.get_fields():
+            if field_path == path:
+                return field
+        raise FieldError(f"{name!r} not found")
 
     def __len__(self):
         return len(self.sub_fields)
