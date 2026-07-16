@@ -22,6 +22,7 @@ from django.db.models.sql.constants import (
     ROW_COUNT,
     SINGLE,
 )
+from django.db.models.sql.datastructures import SubqueryJoin
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
 from django.utils.deprecation import RemovedInDjango70Warning
@@ -411,6 +412,11 @@ class SQLCompiler:
                 )
                 continue
 
+            ref = col.split(LOOKUP_SEP, 1)[0]
+            if isinstance(self.query.alias_map.get(ref), SubqueryJoin):
+                yield OrderBy(self.query.resolve_ref(col), descending=descending), False
+                continue
+
             if expr := self.query.annotations.get(col):
                 ref = col
                 transforms = []
@@ -418,6 +424,14 @@ class SQLCompiler:
                 ref, *transforms = col.split(LOOKUP_SEP)
                 expr = self.query.annotations.get(ref)
             if expr:
+                if transforms and not self.query.combinator:
+                    # The part after a multi-column annotation may
+                    # be a derived-table column, not a transform.
+                    # Resolve the full name first.
+                    # For example, "project_bug__severity_level"
+                    # becomes a Col for "severity_level".
+                    expr = self.query.resolve_ref(col)
+                    transforms = []
                 if self.query.combinator and self.select:
                     if transforms:
                         raise NotImplementedError(

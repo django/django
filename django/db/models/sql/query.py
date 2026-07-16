@@ -2406,7 +2406,14 @@ class Query(BaseExpression):
                 if item == "?":
                     continue
                 item = item.removeprefix("-")
-                if item in self.annotations:
+                if (
+                    item in self.annotations
+                    or item.split(LOOKUP_SEP, 1)[0] in self.annotations
+                    or isinstance(
+                        self.alias_map.get(item.split(LOOKUP_SEP, 1)[0]),
+                        SubqueryJoin,
+                    )
+                ):
                     continue
                 if self.extra and item in self.extra:
                     continue
