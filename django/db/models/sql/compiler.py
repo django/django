@@ -316,6 +316,14 @@ class SQLCompiler:
         ret = []
         col_idx = 1
         for col, alias in select:
+            explicit_output_field = col.__dict__.get("output_field")
+            if (
+                isinstance(col, Query) and Query._is_multi_column_query(col)
+            ) or getattr(explicit_output_field, "is_composite", False):
+                raise NotSupportedError(
+                    "Selecting a multi-column subquery as an annotation is not "
+                    "supported."
+                )
             try:
                 sql, params = self.compile(col)
             except EmptyResultSet:
