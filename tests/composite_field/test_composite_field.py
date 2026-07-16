@@ -110,7 +110,11 @@ class CompositeFieldTests(TestCase):
             [
                 {
                     "code": "AUTH",
-                    "critical_bug__description": None,
+                    "critical_bug__description": (
+                        ""
+                        if connection.features.interprets_empty_strings_as_nulls
+                        else None
+                    ),
                     "critical_bug__severity_level": None,
                 }
             ],
@@ -155,7 +159,10 @@ class CompositeFieldTests(TestCase):
         )
 
         sql = str(projects.query)
-        self.assertEqual(sql.count(BugReport._meta.db_table), 1)
+        self.assertEqual(
+            sql.lower().count(BugReport._meta.db_table.lower()),
+            1,
+        )
 
     def test_composite_subquery_alias_inner_ordering(self):
         project = self.data.projects.auth
@@ -373,7 +380,10 @@ class CompositeFieldTests(TestCase):
         )
 
         sql = str(profile.query)
-        self.assertEqual(sql.count(Post._meta.db_table), 1)
+        self.assertEqual(
+            sql.lower().count(Post._meta.db_table.lower()),
+            1,
+        )
 
     def test_composite_subquery_alias_rejects_invalid_field(self):
         first_post = Post.objects.filter(user=self.user1).values("title", "body")[:1]
