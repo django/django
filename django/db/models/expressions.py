@@ -1443,6 +1443,10 @@ class ColPairs(Expression):
     def select_format(self, compiler, sql, params):
         return sql, params
 
+    @property
+    def _subquery_fields_len(self):
+        return len(self)
+
 
 class Ref(Expression):
     """

@@ -35,6 +35,10 @@ class Tuple(Func):
     def __iter__(self):
         return iter(self.source_expressions)
 
+    @property
+    def _subquery_fields_len(self):
+        return len(self)
+
     def as_sqlite(self, compiler, connection):
         if connection.get_database_version() < (3, 37) and isinstance(
             first_expr := self.source_expressions[0], Tuple
@@ -87,7 +91,10 @@ class TupleLookupMixin:
         if isinstance(self.lhs, ColPairs):
             return repr(self.lhs.field.name)
         elif isinstance(self.lhs, Iterable):
-            names = ", ".join(repr(f.name) for f in self.lhs)
+            names = ", ".join(
+                repr(f.name if hasattr(f, "name") else f.output_field.name)
+                for f in self.lhs
+            )
             return f"({names})"
         elif hasattr(self.lhs, "name"):
             return repr(self.lhs.name)
