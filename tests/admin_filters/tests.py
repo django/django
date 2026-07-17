@@ -3,6 +3,7 @@ import sys
 import unittest
 
 from django.contrib.admin import (
+    AdminSite,
     AllValuesFieldListFilter,
     BooleanFieldListFilter,
     EmptyFieldListFilter,
@@ -10,7 +11,6 @@ from django.contrib.admin import (
     ModelAdmin,
     RelatedOnlyFieldListFilter,
     SimpleListFilter,
-    site,
 )
 from django.contrib.admin.filters import FacetsMixin
 from django.contrib.admin.options import IncorrectLookupParameters, ShowFacets
@@ -21,6 +21,9 @@ from django.db import connection, models
 from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 
 from .models import Book, Bookmark, Department, Employee, ImprovedBook, TaggedItem
+
+site = AdminSite(name="test_adminfilters")
+site.register(User, UserAdmin)
 
 
 def select_by(dictlist, key, value):
