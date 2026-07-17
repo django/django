@@ -3,24 +3,81 @@ from django.db import NotSupportedError, connection
 from django.db.models import Count, F, OuterRef, Q
 from django.test import TestCase, skipUnlessDBFeature
 
-from .models import BugReport, Organization, Post, Project, Task, User
-from .utils import create_composite_test_data
+from .models import BugReport, Organization, Post, Project, Task, User, Workspace
 
 
-class CompositeFieldTests(TestCase):
+class CompositeSubqueryTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.data = create_composite_test_data()
+        cls.acme = Organization.objects.create(name="Acme", slug="acme")
+        cls.beta = Organization.objects.create(name="Beta", slug="beta")
 
-    def setUp(self):
-        self.user1 = self.data.users.ada
+        cls.ada = User.objects.create(
+            name="Ada",
+            email="ada@example.com",
+            age=34,
+            organization=cls.acme,
+        )
+        cls.bob = User.objects.create(
+            name="Bob",
+            email="bob@example.com",
+            age=28,
+            organization=cls.acme,
+        )
+
+        cls.core = Workspace.objects.create(
+            organization=cls.acme, owner=cls.ada, name="Core"
+        )
+        cls.labs = Workspace.objects.create(
+            organization=cls.beta, owner=cls.ada, name="Labs"
+        )
+
+        cls.auth = Project.objects.create(
+            workspace=cls.core, owner=cls.ada, title="Authentication", code="AUTH"
+        )
+        cls.reports = Project.objects.create(
+            workspace=cls.labs, owner=cls.ada, title="Reports", code="RPT"
+        )
+
+        cls.login = Task.objects.create(
+            project=cls.auth,
+            assignee=cls.bob,
+            name="Login flow",
+            status="open",
+        )
+        cls.export = Task.objects.create(
+            project=cls.reports, assignee=None, name="Export CSV", status="blocked"
+        )
+
+        cls.crash_report = BugReport.objects.create(
+            task=cls.login,
+            reporter=cls.bob,
+            description="Login crash",
+            severity_level=3,
+        )
+        cls.missing_export_report = BugReport.objects.create(
+            task=cls.export,
+            reporter=None,
+            description="Export missing rows",
+            severity_level=2,
+        )
+
+        cls.welcome_post = Post.objects.create(
+            user=cls.ada, title="Welcome", body="Hello"
+        )
+        cls.duplicate_welcome_post = Post.objects.create(
+            user=cls.bob, title="Welcome", body="Hello"
+        )
+
+
+class CompositeFieldTests(CompositeSubqueryTestCase):
 
     def test_single_column_subquery_keeps_scalar_behavior(self):
         first_title = (
-            Post.objects.filter(user=self.user1).order_by("pk").values("title")[:1]
+            Post.objects.filter(user=self.ada).order_by("pk").values("title")[:1]
         )
         profile = (
-            User.objects.filter(pk=self.user1.pk)
+            User.objects.filter(pk=self.ada.pk)
             .annotate(first_title=first_title)
             .values("name", "first_title")
         )
@@ -33,11 +90,11 @@ class CompositeFieldTests(TestCase):
 
     def test_composite_subquery_annotation_not_supported(self):
         first_post = (
-            Post.objects.filter(user=self.user1)
+            Post.objects.filter(user=self.ada)
             .order_by("pk")
             .values("title", "body")[:1]
         )
-        profile = User.objects.filter(pk=self.user1.pk).annotate(info=first_post)
+        profile = User.objects.filter(pk=self.ada.pk).annotate(info=first_post)
 
         msg = "Selecting a multi-column subquery as an annotation is not supported."
         with self.assertRaisesMessage(NotSupportedError, msg):
@@ -45,12 +102,12 @@ class CompositeFieldTests(TestCase):
 
     def test_composite_subquery_alias_whole_annotation_not_supported(self):
         first_post = (
-            Post.objects.filter(user=self.user1)
+            Post.objects.filter(user=self.ada)
             .order_by("pk")
             .values("title", "body")[:1]
         )
         profile = (
-            User.objects.filter(pk=self.user1.pk)
+            User.objects.filter(pk=self.ada.pk)
             .alias(info=first_post)
             .annotate(info=F("info"))
         )
@@ -61,13 +118,13 @@ class CompositeFieldTests(TestCase):
 
     def test_composite_subquery_alias_direct_fields(self):
         first_post = (
-            Post.objects.filter(user=self.user1)
+            Post.objects.filter(user=self.ada)
             .order_by("pk")
             .values("title", "body")[:1]
         )
 
         profile = (
-            User.objects.filter(pk=self.user1.pk)
+            User.objects.filter(pk=self.ada.pk)
             .alias(first_post=first_post)
             .values("name", "first_post__title", "first_post__body")
         )
@@ -84,7 +141,7 @@ class CompositeFieldTests(TestCase):
         )
 
     def test_composite_subquery_alias_filter(self):
-        project = self.data.projects.auth
+        project = self.auth
         highest_priority_bug = (
             BugReport.objects.filter(task__project=project)
             .order_by("-severity_level", "pk")
@@ -114,7 +171,7 @@ class CompositeFieldTests(TestCase):
         )
 
     def test_composite_subquery_alias_preserves_outer_row_when_inner_is_empty(self):
-        project = self.data.projects.auth
+        project = self.auth
         critical_bug = (
             BugReport.objects.filter(
                 task__project=project,
@@ -150,11 +207,11 @@ class CompositeFieldTests(TestCase):
 
     def test_composite_subquery_alias_implicit_exact_filter(self):
         first_post = (
-            Post.objects.filter(user=self.user1)
+            Post.objects.filter(user=self.ada)
             .order_by("pk")
             .values("title", "body")[:1]
         )
-        profile = User.objects.filter(pk=self.user1.pk).alias(first_post=first_post)
+        profile = User.objects.filter(pk=self.ada.pk).alias(first_post=first_post)
 
         self.assertEqual(
             list(
@@ -170,7 +227,7 @@ class CompositeFieldTests(TestCase):
         )
 
     def test_composite_subquery_alias_reuses_join(self):
-        project = self.data.projects.auth
+        project = self.auth
         highest_priority_bug = (
             BugReport.objects.filter(task__project=project)
             .order_by("-severity_level", "pk")
@@ -193,10 +250,10 @@ class CompositeFieldTests(TestCase):
         )
 
     def test_composite_subquery_alias_inner_ordering(self):
-        project = self.data.projects.auth
+        project = self.auth
         BugReport.objects.create(
-            task=self.data.tasks.login,
-            reporter=self.data.users.cy,
+            task=self.login,
+            reporter=self.bob,
             description="Account takeover",
             severity_level=5,
         )
@@ -227,10 +284,10 @@ class CompositeFieldTests(TestCase):
         )
 
     def test_composite_subquery_alias_outer_ordering(self):
-        project = self.data.projects.auth
+        project = self.auth
         BugReport.objects.create(
-            task=self.data.tasks.login,
-            reporter=self.data.users.bob,
+            task=self.login,
+            reporter=self.bob,
             description="Minor alignment issue",
             severity_level=1,
         )
@@ -311,9 +368,9 @@ class CompositeFieldTests(TestCase):
         )
 
     def test_composite_subquery_alias_preserves_distinct_select_list(self):
-        organization = self.data.organizations.acme
+        organization = self.acme
         Post.objects.create(
-            user=self.data.users.bob,
+            user=self.bob,
             title="Welcome",
             body="Updated hello",
         )
@@ -343,7 +400,7 @@ class CompositeFieldTests(TestCase):
         )
 
     def test_composite_subquery_alias_relabels_when_nested(self):
-        project = self.data.projects.auth
+        project = self.auth
         priority_bug = (
             BugReport.objects.filter(task__project=project)
             .order_by("-severity_level", "pk")
@@ -362,7 +419,7 @@ class CompositeFieldTests(TestCase):
         self.assertEqual(list(projects), ["AUTH"])
 
     def test_composite_subquery_alias_supports_multiple_aliases(self):
-        project = self.data.projects.auth
+        project = self.auth
         priority_bug = (
             BugReport.objects.filter(task__project=project)
             .order_by("-severity_level", "pk")
@@ -396,13 +453,13 @@ class CompositeFieldTests(TestCase):
 
     def test_composite_subquery_alias_reuses_join_after_alias_collision(self):
         first_post = (
-            Post.objects.filter(user=self.user1)
+            Post.objects.filter(user=self.ada)
             .order_by("pk")
             .values("title", "body")[:1]
         )
         alias = User._meta.db_table
         profile = (
-            User.objects.filter(pk=self.user1.pk)
+            User.objects.filter(pk=self.ada.pk)
             .alias(**{alias: first_post})
             .values(f"{alias}__title", f"{alias}__body")
         )
@@ -414,17 +471,17 @@ class CompositeFieldTests(TestCase):
         )
 
     def test_composite_subquery_alias_rejects_invalid_field(self):
-        first_post = Post.objects.filter(user=self.user1).values("title", "body")[:1]
+        first_post = Post.objects.filter(user=self.ada).values("title", "body")[:1]
 
         with self.assertRaises(FieldError):
-            User.objects.filter(pk=self.user1.pk).alias(first_post=first_post).values(
+            User.objects.filter(pk=self.ada.pk).alias(first_post=first_post).values(
                 "first_post__does_not_exist"
             )
 
     def test_composite_subquery_alias_preserves_normal_field_resolution(self):
-        first_post = Post.objects.filter(user=self.user1).values("title", "body")[:1]
+        first_post = Post.objects.filter(user=self.ada).values("title", "body")[:1]
         profile = (
-            User.objects.filter(pk=self.user1.pk)
+            User.objects.filter(pk=self.ada.pk)
             .alias(first_post=first_post)
             .annotate(organization_slug=F("organization__slug"))
             .values("name", "organization_slug")
@@ -436,15 +493,15 @@ class CompositeFieldTests(TestCase):
         )
 
     def test_composite_subquery_alias_preserves_grouped_select_list(self):
-        organization = self.data.organizations.acme
+        organization = self.acme
         Task.objects.create(
-            project=self.data.projects.auth,
-            assignee=self.data.users.bob,
+            project=self.auth,
+            assignee=self.bob,
             name="Password reset",
             status="open",
         )
         Task.objects.create(
-            project=self.data.projects.auth,
+            project=self.auth,
             assignee=None,
             name="Two-factor rollout",
             status="blocked",
@@ -482,11 +539,11 @@ class CompositeFieldTests(TestCase):
         )
 
     def test_composite_subquery_alias_direct_nested_projected_field(self):
-        post_info = Post.objects.filter(pk=self.data.posts.welcome.pk).values(
+        post_info = Post.objects.filter(pk=self.welcome_post.pk).values(
             "user__email", "title"
         )[:1]
         profile = (
-            User.objects.filter(pk=self.user1.pk)
+            User.objects.filter(pk=self.ada.pk)
             .alias(post_info=post_info)
             .values("name", "post_info__user__email")
         )
@@ -497,11 +554,11 @@ class CompositeFieldTests(TestCase):
         )
 
     def test_composite_subquery_alias_direct_and_nested_projected_fields(self):
-        post_info = Post.objects.filter(pk=self.data.posts.welcome.pk).values(
+        post_info = Post.objects.filter(pk=self.welcome_post.pk).values(
             "user", "user__email", "title"
         )[:1]
         profile = (
-            User.objects.filter(pk=self.user1.pk)
+            User.objects.filter(pk=self.ada.pk)
             .alias(post_info=post_info)
             .values("post_info__user", "post_info__user__email")
         )
@@ -510,19 +567,19 @@ class CompositeFieldTests(TestCase):
             list(profile),
             [
                 {
-                    "post_info__user": self.user1.pk,
+                    "post_info__user": self.ada.pk,
                     "post_info__user__email": "ada@example.com",
                 }
             ],
         )
 
     def test_composite_subquery_alias_rejects_unprojected_relation_traversal(self):
-        post_info = Post.objects.filter(pk=self.data.posts.welcome.pk).values(
+        post_info = Post.objects.filter(pk=self.welcome_post.pk).values(
             "user", "title"
         )[:1]
 
         with self.assertRaises(FieldError):
-            User.objects.filter(pk=self.user1.pk).alias(post_info=post_info).values(
+            User.objects.filter(pk=self.ada.pk).alias(post_info=post_info).values(
                 "post_info__user__email"
             )
 
@@ -540,13 +597,13 @@ class CompositeFieldTests(TestCase):
             list(projects)
 
 
-class CompositeSubqueryTupleLookupTests(TestCase):
+class CompositeSubqueryTupleLookupTests(CompositeSubqueryTestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.data = create_composite_test_data()
+        super().setUpTestData()
         cls.higher_priority_bug = BugReport.objects.create(
-            task=cls.data.tasks.login,
-            reporter=cls.data.users.cy,
+            task=cls.login,
+            reporter=cls.bob,
             description="Account takeover",
             severity_level=4,
         )
@@ -557,13 +614,11 @@ class CompositeSubqueryTupleLookupTests(TestCase):
         )[:1]
 
     def projects_with_priority_bug(self, *, empty=False):
-        bug_reports = BugReport.objects.filter(pk=self.data.bug_reports.crash.pk)
+        bug_reports = BugReport.objects.filter(pk=self.crash_report.pk)
         if empty:
             bug_reports = bug_reports.filter(description="Does not exist")
         priority_bug = bug_reports.values("severity_level", "description")[:1]
-        return Project.objects.filter(pk=self.data.projects.auth.pk).alias(
-            priority_bug=priority_bug
-        )
+        return Project.objects.filter(pk=self.auth.pk).alias(priority_bug=priority_bug)
 
     def test_exact(self):
         projects = self.projects_with_priority_bug()
@@ -587,8 +642,8 @@ class CompositeSubqueryTupleLookupTests(TestCase):
 
     def test_exact_subquery(self):
         projects = self.projects_with_priority_bug()
-        matching_bug = self.bug_tuple_subquery(self.data.bug_reports.crash)
-        nonmatching_bug = self.bug_tuple_subquery(self.data.bug_reports.missing_export)
+        matching_bug = self.bug_tuple_subquery(self.crash_report)
+        nonmatching_bug = self.bug_tuple_subquery(self.missing_export_report)
 
         self.assertEqual(
             list(
@@ -752,8 +807,8 @@ class CompositeSubqueryTupleLookupTests(TestCase):
 
     @skipUnlessDBFeature("supports_tuple_comparison_against_subquery")
     def test_comparison_subqueries(self):
-        lower_bug = self.data.bug_reports.missing_export
-        equal_bug = self.data.bug_reports.crash
+        lower_bug = self.missing_export_report
+        equal_bug = self.crash_report
         higher_bug = self.higher_priority_bug
         test_cases = (
             ("gt", lower_bug, equal_bug),
@@ -820,11 +875,11 @@ class CompositeSubqueryTupleLookupTests(TestCase):
 
     def test_in_subquery(self):
         projects = self.projects_with_priority_bug()
-        matching_bugs = BugReport.objects.filter(
-            pk=self.data.bug_reports.crash.pk
-        ).values("severity_level", "description")
+        matching_bugs = BugReport.objects.filter(pk=self.crash_report.pk).values(
+            "severity_level", "description"
+        )
         nonmatching_bugs = BugReport.objects.filter(
-            pk=self.data.bug_reports.missing_export.pk
+            pk=self.missing_export_report.pk
         ).values("severity_level", "description")
 
         self.assertEqual(
