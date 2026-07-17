@@ -22,7 +22,6 @@ from django.db.models.sql.constants import (
     ROW_COUNT,
     SINGLE,
 )
-from django.db.models.sql.datastructures import SubqueryJoin
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
 from django.utils.deprecation import RemovedInDjango70Warning
@@ -316,10 +315,17 @@ class SQLCompiler:
         ret = []
         col_idx = 1
         for col, alias in select:
+            # Don't access output_field on every expression because doing
+            # so can try to infer a common type and fail for valid mixed-type
+            # selections, such as composite primary keys.
+            is_multi_column_query = isinstance(
+                col, Query
+            ) and Query._is_multi_column_query(col)
             explicit_output_field = col.__dict__.get("output_field")
-            if (
-                isinstance(col, Query) and Query._is_multi_column_query(col)
-            ) or getattr(explicit_output_field, "is_composite", False):
+            is_composite_expression = getattr(
+                explicit_output_field, "is_composite", False
+            )
+            if is_multi_column_query or is_composite_expression:
                 raise NotSupportedError(
                     "Selecting a multi-column subquery as an annotation is not "
                     "supported."
@@ -418,11 +424,6 @@ class SQLCompiler:
                     ),
                     True,
                 )
-                continue
-
-            ref = col.split(LOOKUP_SEP, 1)[0]
-            if isinstance(self.query.alias_map.get(ref), SubqueryJoin):
-                yield OrderBy(self.query.resolve_ref(col), descending=descending), False
                 continue
 
             if expr := self.query.annotations.get(col):
