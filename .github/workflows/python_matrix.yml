@@ -49,8 +49,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
-      - name: Install libmemcached-dev for pylibmc
-        run: sudo apt-get install libmemcached-dev
+      - name: Install system packages
+        run: |
+          sudo apt update
+          xargs -a .github/workflows/data/apt-packages.txt sudo apt install -y --no-install-recommends
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip wheel
       - run: python -m pip install -r tests/requirements/py3.txt -e .
