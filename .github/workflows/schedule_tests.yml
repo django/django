@@ -54,8 +54,10 @@ jobs:
         with:
           python-version: '3.14'
           cache: 'pip'
-      - name: Install libmemcached-dev for pylibmc
-        run: sudo apt-get install libmemcached-dev
+      - name: Install system packages
+        run: |
+          sudo apt update
+          xargs -a .github/workflows/data/apt-packages.txt sudo apt install -y --no-install-recommends
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip wheel
       - run: python -m pip install .
@@ -102,8 +104,10 @@ jobs:
           python-version: '3.14'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
-      - name: Install libmemcached-dev for pylibmc
-        run: sudo apt-get install libmemcached-dev
+      - name: Install system packages
+        run: |
+          sudo apt update
+          xargs -a .github/workflows/data/apt-packages.txt sudo apt install -y --no-install-recommends
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip wheel
       - run: python -m pip install -r tests/requirements/py3.txt -e .
@@ -141,8 +145,10 @@ jobs:
           python-version: '3.14'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
-      - name: Install libmemcached-dev for pylibmc
-        run: sudo apt-get install libmemcached-dev
+      - name: Install system packages
+        run: |
+          sudo apt update
+          xargs -a .github/workflows/data/apt-packages.txt sudo apt install -y --no-install-recommends
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip wheel
       - run: python -m pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .
@@ -189,8 +195,10 @@ jobs:
           python-version: '3.14'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
-      - name: Install libmemcached-dev for pylibmc
-        run: sudo apt-get install libmemcached-dev
+      - name: Install system packages
+        run: |
+          sudo apt update
+          xargs -a .github/workflows/data/apt-packages.txt sudo apt install -y --no-install-recommends
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip wheel
       - run: python -m pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .
