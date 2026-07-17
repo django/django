@@ -29,8 +29,6 @@ class TableExpression(Expression):
     is_composite = False
 
 
-
-
 class Join(Expression):
     """
     Used by sql.Query and sql.SQLCompiler to generate JOIN clauses into the
