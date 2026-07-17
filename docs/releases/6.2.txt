@@ -200,7 +200,11 @@ Models
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The request body of chunked requests is no longer discarded under WSGI when
+  the server decodes the transfer encoding and signals it with the de facto
+  ``wsgi.input_terminated`` environ key (as done by gunicorn and uWSGI). In
+  that case, :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE` is enforced while reading
+  the stream, since no ``Content-Length`` header is available up front.
 
 Security
 ~~~~~~~~

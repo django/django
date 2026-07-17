@@ -53,6 +53,21 @@ class LimitedStream(IOBase):
         return line
 
 
+class TerminatedStream(IOBase):
+    """
+    Wrap a stream that the WSGI server terminates at the end of the request
+    body, as signaled by the de facto wsgi.input_terminated environ key.
+
+    Servers that decode Transfer-Encoding themselves (e.g. gunicorn and uWSGI
+    for chunked requests) cannot provide CONTENT_LENGTH, so the stream is read
+    until EOF instead of up to a known length.
+    """
+
+    def __init__(self, stream):
+        self.read = stream.read
+        self.readline = stream.readline
+
+
 class WSGIRequest(HttpRequest):
     def __init__(self, environ):
         script_name = get_script_name(environ)
@@ -74,8 +89,19 @@ class WSGIRequest(HttpRequest):
         try:
             content_length = int(environ.get("CONTENT_LENGTH"))
         except (ValueError, TypeError):
-            content_length = 0
-        self._stream = LimitedStream(self.environ["wsgi.input"], content_length)
+            content_length = None
+        if content_length is not None:
+            self._stream = LimitedStream(self.environ["wsgi.input"], content_length)
+        elif environ.get("wsgi.input_terminated"):
+            # CONTENT_LENGTH is absent or malformed, but the server decodes
+            # any Transfer-Encoding itself and terminates the stream at the
+            # end of the request body.
+            self._stream = TerminatedStream(self.environ["wsgi.input"])
+        else:
+            # The WSGI spec allows CONTENT_LENGTH to be absent, in which case
+            # reading past the end of the body isn't safe, so treat the body
+            # as empty.
+            self._stream = LimitedStream(self.environ["wsgi.input"], 0)
         self._read_started = False
         self.resolver_match = None
 

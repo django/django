@@ -425,7 +425,24 @@ class HttpRequest:
                 self._stream.seek(0)
 
             try:
-                self._body = self.read()
+                if (
+                    settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None
+                    and not content_length
+                    and not self._stream.seekable()
+                ):
+                    # The body length isn't known up front (e.g. a chunked
+                    # request terminated by the WSGI server), so enforce the
+                    # limit while reading instead of trusting a declared
+                    # length.
+                    chunks = []
+                    remaining = settings.DATA_UPLOAD_MAX_MEMORY_SIZE + 1
+                    while remaining > 0 and (chunk := self.read(remaining)):
+                        chunks.append(chunk)
+                        remaining -= len(chunk)
+                    self._body = b"".join(chunks)
+                    self._check_data_too_big(len(self._body))
+                else:
+                    self._body = self.read()
             except OSError as e:
                 raise UnreadablePostError(*e.args) from e
             finally:

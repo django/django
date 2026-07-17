@@ -4,7 +4,7 @@ from itertools import chain
 from unittest import mock
 from urllib.parse import urlencode
 
-from django.core.exceptions import BadRequest, DisallowedHost
+from django.core.exceptions import BadRequest, DisallowedHost, RequestDataTooBig
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.files.uploadhandler import MemoryFileUploadHandler
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
@@ -1263,6 +1263,76 @@ class RequestsTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(RuntimeError, msg):
             request.multipart_parser_class = MultiPartParser
+
+
+class InputTerminatedRequestTests(SimpleTestCase):
+    """
+    WSGI servers that decode Transfer-Encoding themselves cannot set
+    CONTENT_LENGTH but signal that the input stream ends at end of body with
+    the de facto wsgi.input_terminated key (e.g. gunicorn and uWSGI for
+    Transfer-Encoding: chunked requests). The body of such requests must not
+    be discarded (#35838).
+    """
+
+    def request(self, payload, terminated=True, **extra):
+        environ = {
+            "REQUEST_METHOD": "POST",
+            "CONTENT_TYPE": "application/x-www-form-urlencoded",
+            "wsgi.input": BytesIO(payload),
+            **extra,
+        }
+        if terminated:
+            environ["wsgi.input_terminated"] = True
+        return WSGIRequest(environ)
+
+    def test_body_without_content_length(self):
+        request = self.request(b"name=value")
+        self.assertEqual(request.body, b"name=value")
+
+    def test_post_without_content_length(self):
+        request = self.request(b"name=value")
+        self.assertEqual(request.POST, {"name": ["value"]})
+
+    def test_read_without_content_length(self):
+        request = self.request(b"name=value")
+        self.assertEqual(request.read(4), b"name")
+        self.assertEqual(request.read(), b"=value")
+
+    def test_body_without_input_terminated(self):
+        # Without wsgi.input_terminated, reading past the end of the body
+        # isn't safe and the body is treated as empty.
+        request = self.request(b"name=value", terminated=False)
+        self.assertEqual(request.body, b"")
+
+    def test_content_length_takes_precedence(self):
+        request = self.request(b"name=value", CONTENT_LENGTH="4")
+        self.assertEqual(request.body, b"name")
+
+    def test_malformed_content_length(self):
+        request = self.request(b"name=value", CONTENT_LENGTH="not-a-number")
+        self.assertEqual(request.body, b"name=value")
+
+    def test_malformed_content_length_without_input_terminated(self):
+        request = self.request(
+            b"name=value", terminated=False, CONTENT_LENGTH="not-a-number"
+        )
+        self.assertEqual(request.body, b"")
+
+    @override_settings(DATA_UPLOAD_MAX_MEMORY_SIZE=5)
+    def test_data_upload_max_memory_size_enforced(self):
+        request = self.request(b"name=value")
+        with self.assertRaises(RequestDataTooBig):
+            request.body
+
+    @override_settings(DATA_UPLOAD_MAX_MEMORY_SIZE=10)
+    def test_data_upload_max_memory_size_at_limit(self):
+        request = self.request(b"name=value")
+        self.assertEqual(request.body, b"name=value")
+
+    @override_settings(DATA_UPLOAD_MAX_MEMORY_SIZE=None)
+    def test_data_upload_max_memory_size_disabled(self):
+        request = self.request(b"x" * 1024)
+        self.assertEqual(len(request.body), 1024)
 
 
 class MemoryFileUploadHandlerTests(SimpleTestCase):

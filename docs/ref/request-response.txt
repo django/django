@@ -48,6 +48,17 @@ All attributes should be considered read-only, unless stated otherwise.
     the ``body`` attribute *after* reading the request with either of these I/O
     stream methods will produce a ``RawPostDataException``.
 
+    Requests without a ``Content-Length`` header (e.g. with
+    ``Transfer-Encoding: chunked``) have an empty body under WSGI unless the
+    server decodes the transfer encoding and signals it with the de facto
+    ``wsgi.input_terminated`` environ key (as done by gunicorn and uWSGI).
+
+    .. versionchanged:: 6.2
+
+        Support for the ``wsgi.input_terminated`` environ key was added.
+        Previously, the body of requests without a ``Content-Length`` header
+        was always empty under WSGI.
+
 .. attribute:: HttpRequest.path
 
     A string representing the full path to the requested page, not including
