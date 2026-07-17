@@ -188,6 +188,8 @@ class BaseExpression:
     # Does the expression possibly return more than one row?
     set_returning = False
     # Does the expression allow composite expressions?
+    is_composite = False
+    # Does the expression allow composite expressions in source_expressions?
     allows_composite_expressions = False
 
     def __init__(self, output_field=None):
@@ -305,11 +307,12 @@ class BaseExpression:
             for expr in c.get_source_expressions()
         ]
         if not self.allows_composite_expressions and any(
-            isinstance(expr, ColPairs) for expr in source_expressions
+            isinstance(expr, Expression) and expr.is_composite
+            for expr in source_expressions
         ):
             raise ValueError(
                 f"{self.__class__.__name__} expression does not support "
-                "composite primary keys."
+                "composite expressions."
             )
         c.set_source_expressions(source_expressions)
         return c
@@ -1388,6 +1391,8 @@ class Col(Expression):
 
 
 class ColPairs(Expression):
+    is_composite = True
+
     def __init__(self, alias, targets, sources, output_field):
         super().__init__(output_field=output_field)
         self.alias = alias
