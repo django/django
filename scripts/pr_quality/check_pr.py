@@ -330,7 +330,7 @@ def check_pr_title_has_ticket(pr_title, ticket_id):
 
 
 def check_branch_description(pr_body):
-    """The branch description should be at least 5 words long."""
+    """The branch description should be at least five words long."""
     description_match = re.search(
         r"#### Branch description[ \t]*\r?\n(.*?)(?=\r?\n####|\Z)",
         pr_body,
@@ -351,7 +351,7 @@ def check_branch_description(pr_body):
 def check_ai_disclosure(pr_body):
     """Exactly one AI disclosure checkbox must be selected.
 
-    If the "AI tools were used" option is checked, at least 5 words of
+    If the "AI tools were used" option is checked, at least five words of
     additional description must be present in that section.
     """
     ai_match = re.search(
@@ -381,7 +381,7 @@ def check_ai_disclosure(pr_body):
             for line in section.splitlines()
             if line.strip() and not line.strip().startswith("- [")
         ]
-        # Ensure PR author includes at least 5 words about their AI use.
+        # Ensure PR author includes at least five words about their AI use.
         if len(" ".join(extra_lines).split()) < MIN_WORDS:
             return Message(*MISSING_AI_DESCRIPTION)
 

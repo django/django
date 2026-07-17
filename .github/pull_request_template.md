@@ -5,7 +5,7 @@
 ticket-XXXXX
 
 #### Branch description
-<!-- Provide a concise overview of the issue or rationale behind the proposed changes. 5 word minimum. -->
+<!-- Provide a concise overview of the issue or rationale behind the proposed changes. Minimum five words. -->
 
 #### AI Assistance Disclosure (REQUIRED)
 <!-- Select exactly ONE of the following: -->

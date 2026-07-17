@@ -74,7 +74,7 @@ MISSING_AI_DESCRIPTION = (
     "AI Tool Usage Not Described",
     "You indicated that AI tools were used in preparing this PR, but you have not "
     "provided a description of which tools you used or how you used them. At least "
-    "5 words of description are required.\n\n"
+    "five words of description are required.\n\n"
     "**What to do:**\n\n"
     "Add a brief description below the checked AI disclosure checkbox in your PR "
     "description. For example:\n\n"
@@ -114,7 +114,7 @@ MISSING_DESCRIPTION = (
     "Missing PR Description",
     "Your PR description must be substantive and meaningful.\n\n"
     "**What to do:**\n\n"
-    "Write a description that contains at least 5 words and addresses:\n\n"
+    "Write a description that contains at least five words and addresses:\n\n"
     "- What problem does this PR solve?\n"
     "- Why is this change necessary?\n"
     "- What approach did you take?\n\n"

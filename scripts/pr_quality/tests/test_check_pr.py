@@ -673,7 +673,7 @@ class TestIntegration(BaseTestCase):
             ticket="ticket-XXXXX",
             description=(
                 "<!-- Provide a concise overview of the issue or rationale behind"
-                " the proposed changes. 5 word minimum. -->"
+                " the proposed changes. Minimum five words. -->"
             ),
             no_ai_checked=False,
             ai_used_checked=False,
