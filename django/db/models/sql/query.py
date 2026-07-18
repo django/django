@@ -69,6 +69,19 @@ FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(
 EXPLAIN_OPTIONS_PATTERN = _lazy_re_compile(r"[\w-]+")
 
 
+class DeferredOuterRefLookup(Lookup):
+    """A lookup whose lhs cannot be resolved until its subquery is used."""
+
+    def __init__(self, lookups, lhs, rhs):
+        self.lookups = lookups
+        self.lhs = lhs
+        self.rhs = rhs
+
+    def as_sql(self, compiler, connection):
+        lookup = compiler.query.build_lookup(self.lookups, self.lhs, self.rhs)
+        return compiler.compile(lookup)
+
+
 def get_field_names_from_opts(opts):
     if opts is None:
         return set()
@@ -1421,6 +1434,8 @@ class Query(BaseExpression):
         The lookups is a list of names to extract using get_lookup()
         and get_transform().
         """
+        if isinstance(lhs, (OuterRef, ResolvedOuterRef)):
+            return DeferredOuterRefLookup(lookups, lhs, rhs)
         # __exact is the default lookup if one isn't given.
         *transforms, lookup_name = lookups or ["exact"]
         for name in transforms:
