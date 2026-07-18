@@ -411,13 +411,13 @@ file:
 
     .. function:: make_toast()
 
-    .. versionadded:: 2.2
+    .. versionadded:: 6.1
 
     Returns ``'toast'``.
 
 Since this new feature will be in an upcoming release it is also added to the
 release notes for the next version of Django. Open the release notes for the
-latest version in ``docs/releases/``, which at time of writing is ``2.2.txt``.
+latest version in ``docs/releases/``, which at time of writing is ``6.1.txt``.
 Add a note under the "Minor Features" header:
 
 .. code-block:: rst
@@ -467,10 +467,10 @@ Use the arrow keys to move up and down.
     +
     +def make_toast():
     +    return 'toast'
-    diff --git a/docs/releases/2.2.txt b/docs/releases/2.2.txt
+    diff --git a/docs/releases/6.1.txt b/docs/releases/6.1.txt
     index 7d85d30c4a..81518187b3 100644
-    --- a/docs/releases/2.2.txt
-    +++ b/docs/releases/2.2.txt
+    --- a/docs/releases/6.1.txt
+    +++ b/docs/releases/6.1.txt
     @@ -40,6 +40,11 @@ database constraints. Constraints are added to models using the
      Minor features
      --------------
@@ -497,7 +497,7 @@ Use the arrow keys to move up and down.
     +
     +.. function:: make_toast()
     +
-    +.. versionadded:: 2.2
+    +.. versionadded:: 6.1
     +
     +Returns ``'toast'``.
     diff --git a/tests/shortcuts/test_make_toast.py b/tests/shortcuts/test_make_toast.py
