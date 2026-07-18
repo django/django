@@ -30,7 +30,7 @@ from django.urls import path
 from django.utils.http import http_date
 from django.views.decorators.csrf import csrf_exempt
 
-from .urls import sync_waiter, test_filename
+from .urls import permission_denied_threads, sync_waiter, test_filename
 
 TEST_STATIC_ROOT = Path(__file__).parent / "project" / "static"
 TOO_MUCH_DATA_MSG = "Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE."
@@ -495,6 +495,30 @@ class ASGITest(SimpleTestCase):
         request_started_call, request_finished_call = signal_handler.calls
         self.assertEqual(
             request_started_call["thread"], request_finished_call["thread"]
+        )
+
+    async def test_error_handler_dispatched_with_thread_sensitive(self):
+        """
+        Error responses must be rendered on the request's thread-sensitive
+        thread, where the request's database connections are usable and remain
+        subject to close_old_connections().
+        """
+        permission_denied_threads.clear()
+        application = get_asgi_application()
+        scope = self.async_request_factory._base_scope(path="/permission_denied/")
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request"})
+        response_start = await communicator.receive_output()
+        self.assertEqual(response_start["type"], "http.response.start")
+        self.assertEqual(response_start["status"], 403)
+        response_body = await communicator.receive_output()
+        self.assertEqual(response_body["body"], b"Error handler content")
+        # Give response.close() time to finish.
+        await communicator.wait()
+
+        self.assertEqual(
+            permission_denied_threads["error_handler"],
+            permission_denied_threads["view"],
         )
 
     async def test_concurrent_async_uses_multiple_thread_pools(self):

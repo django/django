@@ -287,6 +287,12 @@ Miscellaneous
 * The minimum supported version of ``asgiref`` is increased from 3.9.1 to
   3.12.1.
 
+* In the asynchronous request path, error responses (such as those rendered by
+  ``handler404`` and ``handler500``) are now rendered on the request's
+  thread-sensitive thread, rather than on a shared thread pool, so that
+  database connections used during error handling are managed by
+  ``close_old_connections()``.
+
 .. _deprecated-features-6.2:
 
 Features deprecated in 6.2
