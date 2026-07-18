@@ -2,6 +2,7 @@ import asyncio
 import threading
 import time
 
+from django.core.exceptions import PermissionDenied
 from django.http import FileResponse, HttpResponse, StreamingHttpResponse
 from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
@@ -51,6 +52,20 @@ sync_waiter.lock = threading.Lock()
 sync_waiter.barrier = threading.Barrier(2)
 
 
+def permission_denied_view(request):
+    permission_denied_threads["view"] = threading.current_thread()
+    raise PermissionDenied
+
+
+def permission_denied_error_handler(request, exception=None):
+    permission_denied_threads["error_handler"] = threading.current_thread()
+    return HttpResponse("Error handler content", status=403)
+
+
+permission_denied_threads = {}
+handler403 = permission_denied_error_handler
+
+
 async def streaming_inner(sleep_time):
     yield b"first\n"
     await asyncio.sleep(sleep_time)
@@ -73,5 +88,6 @@ urlpatterns = [
     path("post/", post_echo),
     path("wait/", sync_waiter),
     path("delayed_hello/", hello_with_delay),
+    path("permission_denied/", permission_denied_view),
     path("streaming/", streaming_view),
 ]
