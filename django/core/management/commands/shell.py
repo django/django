@@ -1,3 +1,4 @@
+import code
 import os
 import select
 import sys
@@ -66,8 +67,6 @@ class Command(BaseCommand):
         bpython.embed(self.get_namespace(**options))
 
     def python(self, options):
-        import code
-
         # Set up a dictionary to serve as the environment for the shell.
         imported_objects = self.get_namespace(**options)
 
@@ -85,10 +84,9 @@ class Command(BaseCommand):
                     pythonrc_code = handle.read()
                 # Match the behavior of the cpython shell where an error in
                 # PYTHONSTARTUP prints an exception and continues.
-                try:
-                    exec(compile(pythonrc_code, pythonrc, "exec"), imported_objects)
-                except Exception:
-                    traceback.print_exc()
+                code.InteractiveInterpreter(imported_objects).runcode(
+                    compile(pythonrc_code, pythonrc, "exec")
+                )
 
         # By default, this will set up readline to do tab completion and to
         # read and write history to the .python_history file, but this can be
@@ -190,7 +188,7 @@ class Command(BaseCommand):
         import_errors = []
         for path in path_imports:
             try:
-                obj = import_dotted_path(path) if "." in path else import_module(path)
+                obj = import_dotted_path(path)
             except ImportError:
                 import_errors.append(path)
                 continue
@@ -259,7 +257,9 @@ class Command(BaseCommand):
     def handle(self, **options):
         # Execute the command and exit.
         if options["command"]:
-            exec(options["command"], {**globals(), **self.get_namespace(**options)})
+            code.InteractiveInterpreter(self.get_namespace(**options)).runcode(
+                compile(options["command"], "<string>", "exec")
+            )
             return
 
         # Execute stdin if it has anything to read and exit.
@@ -269,7 +269,9 @@ class Command(BaseCommand):
             and not sys.stdin.isatty()
             and select.select([sys.stdin], [], [], 0)[0]
         ):
-            exec(sys.stdin.read(), {**globals(), **self.get_namespace(**options)})
+            code.InteractiveInterpreter(self.get_namespace(**options)).runcode(
+                compile(sys.stdin.read(), "<stdin>", "exec")
+            )
             return
 
         available_shells = (
