@@ -217,25 +217,6 @@ class SubqueryJoin(Expression):
         clone.join_type = self.join_type
         return clone
 
-    @property
-    def identity(self):
-        return (
-            self.__class__,
-            self.table_subquery,
-            self.table_alias,
-            self.join_type,
-        )
-
-    def demote(self):
-        new = self.relabeled_clone({})
-        new.join_type = INNER
-        return new
-
-    def promote(self):
-        new = self.relabeled_clone({})
-        new.join_type = LOUTER
-        return new
-
     def get_field(self, name):
         field = self.table_subquery.output_field.get_field(name)
 

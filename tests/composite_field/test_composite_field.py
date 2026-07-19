@@ -1,9 +1,36 @@
 from django.core.exceptions import FieldError
-from django.db import NotSupportedError, connection
+from django.db import NotSupportedError, connection, models
 from django.db.models import Count, F, OuterRef, Q
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
 from .models import BugReport, Organization, Post, Project, Task, User, Workspace
+
+
+class CompositeFieldOutputFieldTests(SimpleTestCase):
+    def test_init_validation(self):
+        with self.assertRaises(TypeError):
+            models.CompositeField(name="name", age=models.IntegerField())
+        with self.assertRaises(ValueError):
+            models.CompositeField(name=models.CharField())
+
+    def test_fields(self):
+        info = User.objects.values("email", "age").query.output_field
+        email = User._meta.get_field("email")
+        age = User._meta.get_field("age")
+
+        self.assertEqual(
+            list(info.get_fields()),
+            [
+                (("email",), email),
+                (("age",), age),
+            ],
+        )
+        self.assertIs(info.get_field("email"), email)
+        with self.assertRaises(FieldError):
+            info.get_field("missing")
+
+    def test_empty_select(self):
+        self.assertIsNone(models.CompositeField.from_select({}))
 
 
 class CompositeSubqueryTestCase(TestCase):
@@ -569,6 +596,28 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
                 {
                     "post_info__user": self.ada.pk,
                     "post_info__user__email": "ada@example.com",
+                }
+            ],
+        )
+
+    def test_composite_subquery_alias_values_without_fields(self):
+        user_info = (
+            User.objects.filter(pk=self.ada.pk)
+            .annotate(post_count=Count("posts"))
+            .values()
+        )
+        organization = (
+            Organization.objects.filter(pk=self.acme.pk)
+            .alias(user_info=user_info)
+            .values("user_info__name", "user_info__post_count")
+        )
+
+        self.assertEqual(
+            list(organization),
+            [
+                {
+                    "user_info__name": "Ada",
+                    "user_info__post_count": 1,
                 }
             ],
         )
