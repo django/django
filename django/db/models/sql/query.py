@@ -1055,6 +1055,15 @@ class Query(BaseExpression):
             key: col.relabeled_clone(change_map)
             for key, col in self.annotations.items()
         }
+        if self.selected is not None:
+            self.selected = {
+                name: (
+                    selection
+                    if isinstance(selection, (int, str))
+                    else selection.relabeled_clone(change_map)
+                )
+                for name, selection in self.selected.items()
+            }
 
         # 2. Rename the alias in the internal table/alias datastructures.
         for old_alias, new_alias in change_map.items():
