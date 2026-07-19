@@ -573,6 +573,34 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             ],
         )
 
+    def test_composite_subquery_alias_nested_derived_columns(self):
+        post_info = Post.objects.filter(pk=self.welcome_post.pk).values(
+            "title", "body"
+        )[:1]
+        user_info = (
+            User.objects.filter(pk=self.ada.pk)
+            .alias(post_info=post_info)
+            .values("post_info__title", "post_info__body")
+        )
+        organization = (
+            Organization.objects.filter(pk=self.acme.pk)
+            .alias(user_info=user_info)
+            .values(
+                "user_info__post_info__title",
+                "user_info__post_info__body",
+            )
+        )
+
+        self.assertEqual(
+            list(organization),
+            [
+                {
+                    "user_info__post_info__title": "Welcome",
+                    "user_info__post_info__body": "Hello",
+                }
+            ],
+        )
+
     def test_composite_subquery_alias_rejects_unprojected_relation_traversal(self):
         post_info = Post.objects.filter(pk=self.welcome_post.pk).values(
             "user", "title"
