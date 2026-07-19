@@ -203,19 +203,12 @@ class CompositeField(Field):
         if len(fields) == 1:
             return next(iter(fields.values()))
 
-        composite = cls.__new__(cls)
-        composite.sub_fields = dict(fields)
-        Field.__init__(composite)
-        return composite
+        return cls(**fields)
 
     def get_fields(self):
         for name, field in self.sub_fields.items():
             path = tuple(name.split(LOOKUP_SEP))
-            if isinstance(field, CompositeField):
-                for subpath, subfield in field.get_fields():
-                    yield path + subpath, subfield
-            else:
-                yield path, field
+            yield path, field
 
     def get_field(self, name):
         path = tuple(name.split(LOOKUP_SEP))
@@ -223,9 +216,6 @@ class CompositeField(Field):
             if field_path == path:
                 return field
         raise FieldError(f"{name!r} not found")
-
-    def __len__(self):
-        return len(self.sub_fields)
 
 
 CompositeField.register_lookup(TupleExact)
