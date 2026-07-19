@@ -1348,10 +1348,6 @@ class Query(BaseExpression):
             if rest_path is None:
                 return self._resolve_inner_subquery_tuple(existing)
             return self._resolve_inner_subquery_field(existing, rest_path)
-        if isinstance(annotation, SubqueryJoin):
-            if rest_path is None:
-                return self._resolve_inner_subquery_tuple(annotation)
-            return self._resolve_inner_subquery_field(annotation, rest_path)
         self.get_initial_alias()
         table_alias, _ = self.table_alias(alias, create=True)
         join = SubqueryJoin(
