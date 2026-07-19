@@ -991,23 +991,33 @@ class QuerySet(AltersData):
 
     abulk_update.alters_data = True
 
-    def _clear_stale_reverse_one_to_one_caches(self, params):
-        # When a related object is passed as a lookup, a failed create() (or
-        # a caller-built unsaved instance) can leave an unsaved object in that
-        # related object's reverse one-to-one cache. Once an existing row has
-        # been found, drop the cache if it still holds an unsaved value so the
-        # reverse accessor resolves to the real row instead of the stale
-        # instance.
-        get_field = self.model._meta.get_field
+    def _resolve_stale_reverse_one_to_one_caches(self, params, obj=None):
+        # When a related object is passed as a lookup or default, a failed
+        # create() (or a caller-built unsaved instance) can leave an unsaved
+        # object in that related object's reverse one-to-one cache, and a
+        # select_related() to the reverse relation run before the row existed
+        # leaves None there. Both are stale once get_or_create() has resolved
+        # an existing row. When obj is given (the row about to be returned,
+        # which the caller guarantees matches every value in params), replace
+        # stale entries with it so the reverse accessor resolves without a
+        # query. When obj is None, drop them. Valid entries are never
+        # touched. This also runs on calls where no race happened, which is
+        # acceptable because it is a loop over the passed params with no
+        # queries.
         for field_name, value in params.items():
+            # Keys that are not field names (a lookup spanning a relation, an
+            # attname, a pk alias, or a property passed via defaults) have no
+            # reverse cache to resolve.
             try:
-                field = get_field(field_name)
+                field = self.model._meta.get_field(field_name)
             except exceptions.FieldDoesNotExist:
                 continue
             # Only concrete forward OneToOneFields hold a reverse one-to-one
             # cache on the related object. Reverse accessors (OneToOneRel) also
             # report one_to_one=True, but they're not concrete and their cache
             # is legitimate in-flight forward state that must not be cleared.
+            # The value is only a related object to look at when it's an
+            # instance; a one-to-one lookup may also be given a bare pk.
             # Compare against the concrete model so a field targeting a proxy
             # model still matches a concrete instance passed as the lookup.
             if (
@@ -1020,8 +1030,14 @@ class QuerySet(AltersData):
             if not remote_field.is_cached(value):
                 continue
             cached = remote_field.get_cached_value(value)
+            # A select_related() to the reverse relation caches None when no
+            # related row exists, so a cached None is stale here for the same
+            # reason an unsaved instance is.
             if cached is None or cached._state.adding:
-                remote_field.delete_cached_value(value)
+                if obj is None:
+                    remote_field.delete_cached_value(value)
+                else:
+                    remote_field.set_cached_value(value, obj)
 
     def get_or_create(self, defaults=None, **kwargs):
         """
@@ -1034,7 +1050,7 @@ class QuerySet(AltersData):
         self._for_write = True
         try:
             obj = self.get(**kwargs)
-            self._clear_stale_reverse_one_to_one_caches(kwargs)
+            self._resolve_stale_reverse_one_to_one_caches(kwargs, obj)
             return obj, False
         except self.model.DoesNotExist:
             params = self._extract_model_params(defaults, **kwargs)
@@ -1044,17 +1060,25 @@ class QuerySet(AltersData):
                     params = dict(resolve_callables(params))
                     return self.create(**params), True
             except IntegrityError:
-                # The create() that lost the race already populated the
-                # reverse one-to-one cache with its unsaved instance; clear
-                # it before the retry so a successful get() (or a re-raise)
-                # can't leave it behind. Use params (defaults plus kwargs)
-                # since create() may have been passed a related object via
-                # defaults, not just the lookup kwargs.
-                self._clear_stale_reverse_one_to_one_caches(params)
                 try:
-                    return self.get(**kwargs), False
+                    obj = self.get(**kwargs)
                 except self.model.DoesNotExist:
                     pass
+                else:
+                    # Point the lookup values' reverse one-to-one caches at
+                    # the row that won the race. The create() that lost it
+                    # left its unsaved instance there.
+                    self._resolve_stale_reverse_one_to_one_caches(kwargs, obj)
+                    return obj, False
+                finally:
+                    # Whether the retry succeeded or not, drop any stale
+                    # entries the failed create() left behind. Use params
+                    # (defaults plus kwargs) since create() may have been
+                    # passed a related object via defaults, and such a value
+                    # is not filtered on by the get() above, so obj cannot be
+                    # assumed to match it. Entries just repointed at obj are
+                    # no longer stale and are left alone.
+                    self._resolve_stale_reverse_one_to_one_caches(params)
                 raise
 
     get_or_create.alters_data = True

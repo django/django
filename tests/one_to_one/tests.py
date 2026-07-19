@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from unittest.mock import patch
 
 from django.core.exceptions import FieldFetchBlocked
@@ -701,10 +702,36 @@ class OneToOneTests(TestCase):
             FETCH_PEERS,
         )
 
+    @contextmanager
+    def simulate_lost_insert_race(self, insert_winning_row):
+        """
+        Run the enclosed block with a concurrent writer injected into
+        get_or_create().
+
+        insert_winning_row() is called from the first
+        _extract_model_params() call, which get_or_create() only makes once
+        its initial get() has found nothing, so the row it inserts makes the
+        create() that follows lose the race.
+
+        Yield a dict whose "done" key records whether the injection fired, so
+        a test can tell a real race from a patch that stopped intercepting.
+        """
+        original = QuerySet._extract_model_params
+        triggered = {"done": False}
+
+        def side_effect(queryset, defaults=None, **kwargs):
+            if not triggered["done"]:
+                triggered["done"] = True
+                insert_winning_row()
+            return original(queryset, defaults, **kwargs)
+
+        with patch(
+            "django.db.models.query.QuerySet._extract_model_params", side_effect
+        ):
+            yield triggered
+
     def test_get_or_create_race_keeps_reverse_o2o_cache_consistent(self):
         """
-        Regression test for #36489.
-
         Simulate two concurrent Bar.get_or_create(place=...) calls
         racing on the same OneToOneField. The loser of the insert must not
         leave an unsaved instance cached on the reverse side (place.bar
@@ -717,25 +744,16 @@ class OneToOneTests(TestCase):
         """
         place = Place.objects.create(name="Race Diner", address="Somewhere")
 
-        # We'll inject a concurrent get_or_create inside the first one by
-        # patching QuerySet._extract_model_params
-        original = QuerySet._extract_model_params
-        triggered = {"done": False}
+        def insert_winning_row():
+            # Use a fresh instance of place to emulate a separate thread.
+            Bar.objects.get_or_create(place=Place.objects.get(pk=place.pk))
 
-        def side_effect(self, defaults=None, **kwargs):
-            # Only re-enter once, and only for the same place kwarg.
-            if not triggered["done"] and kwargs.get("place") == place:
-                triggered["done"] = True
-                # Use a *fresh* instance of place to emulate a separate thread.
-                Bar.objects.get_or_create(place=Place.objects.get(pk=place.pk))
-            return original(self, defaults, **kwargs)
-
-        with patch(
-            "django.db.models.query.QuerySet._extract_model_params",
-            side_effect,
-        ):
+        with self.simulate_lost_insert_race(insert_winning_row) as triggered:
             bar, created = Bar.objects.get_or_create(place=place)
-            self.assertFalse(created)
+        self.assertFalse(created)
+        # Guard against the patch no longer intercepting the call, which
+        # would make this test pass without simulating any race.
+        self.assertTrue(triggered["done"])
 
         # The reverse cache must not contain an unsaved Bar.
         # Accessing place.bar should yield a saved row with a pk,
@@ -749,22 +767,142 @@ class OneToOneTests(TestCase):
         place = Place.objects.create(name="Silver Square", address="Somewhere")
         Bar.objects.create(place=place)
 
-        # Prime a valid forward cache via select_related()
-        # (we don't clear this path).
-        fetched = Bar.objects.select_related("place").get(place=place)
-
-        # Run a no-op get_or_create (no IntegrityError path taken).
-        _, created = Bar.objects.get_or_create(place=place)
+        # Run a no-op get_or_create (no IntegrityError path taken) that
+        # primes a valid forward cache via select_related().
+        fetched, created = Bar.objects.select_related("place").get_or_create(
+            place=place
+        )
         self.assertFalse(created)
 
         # Using the forward cache should not cause a query.
         with self.assertNumQueries(0):
             _ = fetched.place.id
 
+    def test_get_or_create_race_lost_insert_preserves_forward_select_related(self):
+        """
+        When the insert race is lost, the fallback get() runs on the same
+        queryset, so a select_related() on the losing call still populates
+        the forward cache of the returned object.
+        """
+        place = Place.objects.create(name="Fallback Diner", address="Somewhere")
+
+        def insert_winning_row():
+            Bar.objects.get_or_create(place=Place.objects.get(pk=place.pk))
+
+        with self.simulate_lost_insert_race(insert_winning_row) as triggered:
+            bar, created = Bar.objects.select_related("place").get_or_create(
+                place=place
+            )
+        self.assertFalse(created)
+        # Guard against the patch no longer intercepting the call, which
+        # would make this test pass without simulating any race.
+        self.assertTrue(triggered["done"])
+
+        with self.assertNumQueries(0):
+            self.assertEqual(bar.place.pk, place.pk)
+
+    def test_get_or_create_race_lost_insert_restores_reverse_o2o_cache(self):
+        """
+        A reverse one-to-one cache primed by select_related() must survive
+        losing the insert race. The cache on place mutates in this order:
+
+        1. select_related("bar") caches None on place, since no row exists.
+        2. The losing get_or_create() runs its initial get(), which raises
+           DoesNotExist. Meanwhile the concurrent winner inserts the row.
+        3. The losing create() builds Bar(place=place). The forward
+           descriptor's __set__ overwrites the cached None with that unsaved
+           Bar.
+        4. The insert raises IntegrityError.
+        5. The fallback get() fetches the winning row, and get_or_create()
+           replaces the unsaved instance in the cache with that row before
+           returning it.
+
+        Afterwards place.bar must resolve to the returned row with no query.
+        """
+        place = Place.objects.create(name="Restored Cache Diner", address="Somewhere")
+        # No bar exists yet, so select_related() caches None on the reverse
+        # relation: place.bar raises without querying.
+        place = Place.objects.select_related("bar").get(pk=place.pk)
+        with self.assertNumQueries(0):
+            with self.assertRaises(Bar.DoesNotExist):
+                place.bar
+
+        def insert_winning_row():
+            Bar.objects.get_or_create(place=Place.objects.get(pk=place.pk))
+
+        with self.simulate_lost_insert_race(insert_winning_row) as triggered:
+            bar, created = Bar.objects.get_or_create(place=place)
+        self.assertFalse(created)
+        # Guard against the patch no longer intercepting the call, which
+        # would make this test pass without simulating any race.
+        self.assertTrue(triggered["done"])
+
+        # The cache now holds the row that won the race, so the reverse
+        # accessor resolves without a query.
+        with self.assertNumQueries(0):
+            self.assertEqual(place.bar.pk, bar.pk)
+
+    def test_get_or_create_race_reraise_drops_stale_reverse_o2o_cache(self):
+        """
+        When the fallback get() after an IntegrityError also fails, the
+        IntegrityError is re-raised. The unsaved instance that the failed
+        create() left in the reverse one-to-one cache must still be dropped,
+        so the reverse accessor afterwards fetches the real row instead of
+        returning the unsaved instance.
+        """
+        place = Place.objects.create(name="Reraise Diner", address="Somewhere")
+
+        def insert_winning_row():
+            # The winner inserts a row that does not match the loser's full
+            # lookup, so the loser's fallback get() fails too.
+            Bar.objects.create(
+                place=Place.objects.get(pk=place.pk), serves_cocktails=False
+            )
+
+        with self.simulate_lost_insert_race(insert_winning_row) as triggered:
+            with self.assertRaises(IntegrityError):
+                Bar.objects.get_or_create(place=place, serves_cocktails=True)
+        # Guard against the patch no longer intercepting the call, which
+        # would make this test pass without simulating any race.
+        self.assertTrue(triggered["done"])
+
+        # The stale entry was dropped, so the reverse accessor pays a query
+        # and yields the winning row instead of the unsaved instance.
+        winner = Bar.objects.get(place=place)
+        with self.assertNumQueries(1):
+            self.assertEqual(place.bar.pk, winner.pk)
+        self.assertFalse(place.bar.serves_cocktails)
+
+    def test_get_or_create_race_drops_stale_cache_from_defaults_related_object(self):
+        """
+        A related object passed via defaults is seeded into the reverse
+        one-to-one cache by the failed create(), but it is not part of the
+        lookup, so the fallback get() proves nothing about which row it
+        relates to. Its stale entry must be dropped rather than repointed at
+        the returned row.
+        """
+        place = Place.objects.create(name="Defaults Object Diner", address="Anywhere")
+
+        def insert_winning_row():
+            Bar.objects.create(place=Place.objects.get(pk=place.pk))
+
+        with self.simulate_lost_insert_race(insert_winning_row) as triggered:
+            bar, created = Bar.objects.get_or_create(
+                serves_cocktails=True, defaults={"place": place}
+            )
+        # Guard against the patch no longer intercepting the call, which
+        # would make this test pass without simulating any race.
+        self.assertTrue(triggered["done"])
+        self.assertFalse(created)
+        self.assertEqual(bar.place_id, place.pk)
+
+        # The stale entry was dropped rather than repointed at the returned
+        # row, so the reverse accessor re-fetches before yielding it.
+        with self.assertNumQueries(1):
+            self.assertEqual(place.bar.pk, bar.pk)
+
     def test_update_or_create_race_keeps_reverse_o2o_cache_consistent(self):
         """
-        Regression test for #36489 (update_or_create path).
-
         Simulate two concurrent Bar.update_or_create(place=...) calls
         racing on the same OneToOneField. The loser of the insert must not
         leave an unsaved instance cached on the reverse side (place.bar
@@ -773,26 +911,19 @@ class OneToOneTests(TestCase):
         """
         place = Place.objects.create(name="Update Race Diner", address="Somewhere")
 
-        # Inject a concurrent get_or_create inside the first one by
-        # patching QuerySet._extract_model_params.
-        original = QuerySet._extract_model_params
-        triggered = {"done": False}
+        def insert_winning_row():
+            # Use a fresh instance of place to emulate a separate thread.
+            Bar.objects.get_or_create(place=Place.objects.get(pk=place.pk))
 
-        def side_effect(self, defaults=None, **kwargs):
-            if not triggered["done"] and kwargs.get("place") == place:
-                triggered["done"] = True
-                # Use a fresh instance of place to emulate a separate thread.
-                Bar.objects.get_or_create(place=Place.objects.get(pk=place.pk))
-            return original(self, defaults, **kwargs)
-
-        with patch(
-            "django.db.models.query.QuerySet._extract_model_params", side_effect
-        ):
+        with self.simulate_lost_insert_race(insert_winning_row) as triggered:
             bar, created = Bar.objects.update_or_create(
                 place=place,
                 defaults={"serves_cocktails": False},
             )
-            self.assertFalse(created)
+        self.assertFalse(created)
+        # Guard against the patch no longer intercepting the call, which
+        # would make this test pass without simulating any race.
+        self.assertTrue(triggered["done"])
 
         # The reverse cache must not contain an unsaved Bar.
         # Accessing place.bar should yield a saved row with a pk,
@@ -804,8 +935,6 @@ class OneToOneTests(TestCase):
 
     def test_update_or_create_race_with_defaults_reverse_o2o_cache_consistent(self):
         """
-        Regression test for #36489 (defaults/create_defaults path).
-
         Simulate two concurrent Bar.update_or_create(place=...) calls
         with non-trivial defaults. The loser of the insert must not leave an
         unsaved instance cached on the reverse side (place.bar with pk=None).
@@ -817,27 +946,21 @@ class OneToOneTests(TestCase):
         default_context = {"serves_cocktails": True}
         alt_context = {"serves_cocktails": False}
 
-        # Inject a concurrent get_or_create inside the first one.
-        original = QuerySet._extract_model_params
-        triggered = {"done": False}
+        def insert_winning_row():
+            Bar.objects.update_or_create(
+                place=Place.objects.get(pk=place.pk),
+                defaults=alt_context,
+            )
 
-        def side_effect(self, defaults=None, **kwargs):
-            if not triggered["done"] and kwargs.get("place") == place:
-                triggered["done"] = True
-                Bar.objects.update_or_create(
-                    place=Place.objects.get(pk=place.pk),
-                    defaults=alt_context,
-                )
-            return original(self, defaults, **kwargs)
-
-        with patch(
-            "django.db.models.query.QuerySet._extract_model_params", side_effect
-        ):
+        with self.simulate_lost_insert_race(insert_winning_row) as triggered:
             bar, created = Bar.objects.update_or_create(
                 place=place,
                 defaults=default_context,
             )
-            self.assertFalse(created)
+        self.assertFalse(created)
+        # Guard against the patch no longer intercepting the call, which
+        # would make this test pass without simulating any race.
+        self.assertTrue(triggered["done"])
 
         # The reverse cache must not contain an unsaved Bar.
         self.assertIsNotNone(bar.pk)
@@ -852,8 +975,6 @@ class OneToOneTests(TestCase):
 
     def test_get_or_create_initial_get_does_not_leave_stale_reverse_o2o_cache(self):
         """
-        Regression test for #36489 (initial get() path, created=False).
-
         get_or_create() must behave consistently on every path where it
         returns an existing object. The IntegrityError fallback is one such
         path; the initial get() is the other. Whether a caller hits one or
@@ -871,9 +992,10 @@ class OneToOneTests(TestCase):
         # pk=None>. The live `place` reference keeps it alive.
         Bar(place=place)
 
-        # Precondition: the reverse cache is stale (unsaved instance).
-        stale = Bar.place.field.remote_field.get_cached_value(place)
-        self.assertIsNone(stale.pk)
+        # Precondition: place.bar resolves to that unsaved instance without
+        # querying.
+        with self.assertNumQueries(0):
+            self.assertIsNone(place.bar.pk)
 
         # Create the real row through a separate Place instance so the cache
         # on the original `place` object is not updated (emulates a
@@ -893,9 +1015,78 @@ class OneToOneTests(TestCase):
         self.assertIsNotNone(place.bar.pk)
         self.assertEqual(place.bar.pk, bar.pk)
 
+    def test_get_or_create_resolves_stale_none_reverse_o2o_cache(self):
+        """
+        select_related() to a reverse one-to-one relation caches None when no
+        related row exists. If the row is then created concurrently, that
+        None is just as stale as an unsaved instance. Without handling it,
+        place.bar raises RelatedObjectDoesNotExist even though
+        get_or_create() just returned the existing row.
+
+        This exercises the initial get() path only. The cache cleanup runs
+        right after the first get() succeeds, on every get_or_create() call
+        that finds a row there, whether or not a race happened. The
+        IntegrityError fallback path is never reached here.
+        """
+        place = Place.objects.create(name="None Cache Diner", address="Somewhere")
+        # No bar exists yet, so select_related() caches None on the reverse
+        # relation: place.bar raises without querying.
+        place = Place.objects.select_related("bar").get(pk=place.pk)
+        with self.assertNumQueries(0):
+            with self.assertRaises(Bar.DoesNotExist):
+                place.bar
+
+        # A concurrent writer creates the row through a separate Place
+        # instance, so the cache on place is not refreshed.
+        real_bar = Bar.objects.create(place=Place.objects.get(pk=place.pk))
+
+        # Exactly one query (the successful get) proves the initial-get path
+        # is taken.
+        with self.assertNumQueries(1):
+            bar, created = Bar.objects.get_or_create(place=place)
+
+        self.assertFalse(created)
+        self.assertEqual(bar.pk, real_bar.pk)
+
+        # The stale None must have been replaced by the returned row, so the
+        # reverse accessor resolves without a query instead of raising
+        # RelatedObjectDoesNotExist.
+        with self.assertNumQueries(0):
+            self.assertEqual(place.bar.pk, bar.pk)
+
+    def test_get_or_create_lookup_spanning_relation(self):
+        """
+        A lookup may span the one-to-one relation ("place__name"), which is
+        not a field name of the model being queried. Such a key names no
+        reverse cache, so _resolve_stale_reverse_one_to_one_caches() must
+        skip it rather than fail to resolve it as a field.
+        """
+        place = Place.objects.create(name="Spanning Diner", address="Somewhere")
+        real_bar = Bar.objects.create(place=place)
+
+        bar, created = Bar.objects.get_or_create(place__name=place.name)
+
+        self.assertFalse(created)
+        self.assertEqual(bar.pk, real_bar.pk)
+
+    def test_get_or_create_one_to_one_lookup_by_pk_value(self):
+        """
+        A one-to-one lookup may be given the related object's primary key
+        instead of the instance. There is then no related object to hold a
+        reverse cache, so _resolve_stale_reverse_one_to_one_caches() must
+        skip the value rather than treat it as a model instance.
+        """
+        place = Place.objects.create(name="Pk Lookup Diner", address="Somewhere")
+        real_bar = Bar.objects.create(place=place)
+
+        bar, created = Bar.objects.get_or_create(place=place.pk)
+
+        self.assertFalse(created)
+        self.assertEqual(bar.pk, real_bar.pk)
+
     def test_get_or_create_reverse_o2o_lookup_preserves_forward_cache(self):
         """
-        _clear_stale_reverse_one_to_one_caches() must only act on concrete
+        _resolve_stale_reverse_one_to_one_caches() must only act on concrete
         forward OneToOneFields named in the lookup.
 
         When a reverse accessor is used as a lookup
@@ -934,7 +1125,7 @@ class OneToOneTests(TestCase):
         """
         The OneToOneField may target a proxy model while the caller passes a
         concrete instance as the lookup value. Comparing the value against the
-        concrete model lets the helper still recognize it and clear a stale
+        concrete model lets the helper still recognize it and resolve a stale
         reverse one-to-one cache.
         """
         place = Place.objects.create(name="Proxy Diner", address="Somewhere")
@@ -943,7 +1134,7 @@ class OneToOneTests(TestCase):
         # Seed the reverse cache on the concrete place with an unsaved pointer.
         stale = PlaceProxyPointer(place=ProxyPlace.objects.get(pk=place.pk))
         field.remote_field.set_cached_value(place, stale)
-        self.assertTrue(stale._state.adding)
+        self.assertIsNone(stale.pk)
 
         # Create the real row through a separate instance (emulating a
         # concurrent writer) so the cache on place is not refreshed.
@@ -956,23 +1147,25 @@ class OneToOneTests(TestCase):
         self.assertFalse(created)
         self.assertEqual(pointer.pk, real.pk)
 
-        # The stale unsaved pointer must have been cleared from the cache.
-        self.assertFalse(field.remote_field.is_cached(place))
+        # The stale unsaved pointer must have been replaced by the returned
+        # row, so the reverse accessor resolves without a query.
+        with self.assertNumQueries(0):
+            self.assertEqual(place.placeproxypointer.pk, real.pk)
 
     def test_get_or_create_clears_stale_composite_pk_reverse_o2o_cache(self):
         """
-        Regression test for #36489 (composite primary key variant).
-
-        _clear_stale_reverse_one_to_one_caches() detects unsaved instances via
-        _state.adding, so it works regardless of the primary key shape. With a
-        CompositePrimaryKey an unsaved instance has pk = (None, <value>) — a
-        tuple, not None — which a scalar `pk is None` check would mishandle.
+        _resolve_stale_reverse_one_to_one_caches() detects unsaved instances
+        via _state.adding, so it works regardless of the primary key shape.
+        With a CompositePrimaryKey an unsaved instance has
+        pk = (None, <value>), a tuple rather than None, which a scalar
+        `pk is None` check would mishandle.
         """
         place = Place.objects.create(name="Composite Race Diner", address="Somewhere")
         Branch.objects.create(place=place, number=1)
 
         # Seed the reverse cache with an unsaved Branch instance. place_id is
-        # None (not yet assigned), so pk == (None, 2) — a tuple, not None.
+        # None (not yet assigned), so pk == (None, 2), a tuple rather than
+        # None.
         stale = Branch(number=2)
         place_field = Branch._meta.get_field("place")
         place_field.remote_field.set_cached_value(place, stale)
