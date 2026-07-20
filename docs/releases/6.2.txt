@@ -58,7 +58,8 @@ Minor features
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The restriction that prevented using SRIDs other than 4326 with geography
+  field, that matched the behavior of PostGIS < 2.2, is removed.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

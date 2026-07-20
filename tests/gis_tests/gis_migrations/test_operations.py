@@ -416,6 +416,17 @@ class OperationTests(OperationTestCase):
             )
             self.assertIn("geom_within_constraint", constraints)
 
+    @skipUnlessDBFeature("supports_geography")
+    def test_add_geography_field_with_geographic_srid(self):
+        self.alter_gis_model(
+            migrations.AddField,
+            "Neighborhood",
+            "path",
+            fields.LineStringField,
+            {"geography": True, "srid": 4674},
+        )
+        self.assertColumnExists("gis_neighborhood", "path")
+
 
 @skipIfDBFeature("supports_raster")
 class NoRasterSupportTests(OperationTestCase):
