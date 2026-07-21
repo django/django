@@ -1,5 +1,5 @@
 from django.core.exceptions import FieldError
-from django.db import NotSupportedError, connection, models
+from django.db import connection, models
 from django.db.models import Count, F, OuterRef, Q
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
@@ -140,7 +140,7 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
         profile = User.objects.filter(pk=self.ada.pk).annotate(info=first_post)
 
         msg = "Selecting a multi-column subquery as an annotation is not supported."
-        with self.assertRaisesMessage(NotSupportedError, msg):
+        with self.assertRaisesMessage(NotImplementedError, msg):
             list(profile)
 
     def test_composite_subquery_alias_whole_annotation_not_supported(self):
@@ -156,7 +156,7 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
         )
 
         msg = "Selecting a multi-column subquery as an annotation is not supported."
-        with self.assertRaisesMessage(NotSupportedError, msg):
+        with self.assertRaisesMessage(NotImplementedError, msg):
             list(profile)
 
     def test_composite_subquery_alias_rejects_lookup_separator(self):
@@ -695,7 +695,7 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             "description", "severity_level"
         )[:1]
         with self.assertRaisesMessage(
-            NotSupportedError,
+            NotImplementedError,
             "Correlated multi-column subquery aliases are not supported.",
         ):
             projects = Project.objects.alias(priority_bug=priority_bug).values(
