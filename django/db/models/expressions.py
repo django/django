@@ -196,6 +196,10 @@ class BaseExpression:
         if output_field is not None:
             self.output_field = output_field
 
+    @property
+    def _subquery_fields_len(self):
+        return 1
+
     def __getstate__(self):
         state = self.__dict__.copy()
         state.pop("convert_value", None)
