@@ -115,6 +115,22 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
         )
         self.assertNotIn("JOIN (", str(profile.query))
 
+    def test_single_column_subquery_alias_allows_lookup_separator(self):
+        first_title = (
+            Post.objects.filter(user=self.ada).order_by("pk").values("title")[:1]
+        )
+        profile = (
+            User.objects.filter(pk=self.ada.pk)
+            .alias(**{"first__title": first_title})
+            .annotate(first_title=F("first__title"))
+            .values("name", "first_title")
+        )
+
+        self.assertEqual(
+            list(profile),
+            [{"name": "Ada", "first_title": "Welcome"}],
+        )
+
     def test_composite_subquery_annotation_not_supported(self):
         first_post = (
             Post.objects.filter(user=self.ada)
@@ -142,6 +158,20 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
         msg = "Selecting a multi-column subquery as an annotation is not supported."
         with self.assertRaisesMessage(NotSupportedError, msg):
             list(profile)
+
+    def test_composite_subquery_alias_rejects_lookup_separator(self):
+        first_post = (
+            Post.objects.filter(user=self.ada)
+            .order_by("pk")
+            .values("title", "body")[:1]
+        )
+
+        msg = (
+            "Multi-column subquery alias 'first__post' cannot contain the lookup "
+            "separator '__'."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            User.objects.alias(**{"first__post": first_post})
 
     def test_composite_subquery_alias_direct_fields(self):
         first_post = (
