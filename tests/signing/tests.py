@@ -249,3 +249,24 @@ class TestBase62(SimpleTestCase):
         tests = [-(10**10), 10**10, 1620378259, *range(-100, 100)]
         for i in tests:
             self.assertEqual(i, signing.b62_decode(signing.b62_encode(i)))
+
+
+class TestJSONSerializerEncoding(SimpleTestCase):
+    def test_non_ascii_round_trip(self):
+        """non-ASCII payloads survive a dumps/loads cycle unchanged."""
+        payload = {
+            "precomposed": "héllo",
+            "combining": "he\u0301llo",
+            "emoji": "🐍",
+            "zh": "你好",
+        }
+        serializer = signing.JSONSerializer()
+        decoded = serializer.loads(serializer.dumps(payload))
+        self.assertEqual(decoded, payload)
+
+    def test_loads_reads_utf_8_bytes(self):
+        """loads() decodes raw UTF-8 bytes to the original value."""
+        expected = {"text": "héllo"}
+        external_bytes = b'{"text":"h\xc3\xa9llo"}'
+        decoded = signing.JSONSerializer().loads(external_bytes)
+        self.assertEqual(decoded, expected)
