@@ -1358,6 +1358,15 @@ class Query(BaseExpression):
         """Add a single annotation expression to the Query."""
         self.check_alias(alias)
         annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None)
+        if (
+            isinstance(annotation, Query)
+            and self._is_multi_column_query(annotation)
+            and LOOKUP_SEP in alias
+        ):
+            raise ValueError(
+                f"Multi-column subquery alias {alias!r} cannot contain the lookup "
+                f"separator {LOOKUP_SEP!r}."
+            )
         if select:
             self.append_annotation_mask([alias])
         else:
