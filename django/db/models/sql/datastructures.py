@@ -4,7 +4,6 @@ the SQL domain.
 """
 
 from django.core.exceptions import FullResultSet
-from django.db.models.expressions import Expression
 from django.db.models.sql.constants import INNER, LOUTER
 
 
@@ -25,11 +24,7 @@ class Empty:
     pass
 
 
-class TableExpression(Expression):
-    is_composite = False
-
-
-class Join(Expression):
+class Join:
     """
     Used by sql.Query and sql.SQLCompiler to generate JOIN clauses into the
     FROM entry. For example, the SQL generated could be
@@ -183,7 +178,7 @@ class Join(Expression):
         return new
 
 
-class SubqueryJoin(Expression):
+class SubqueryJoin:
     def __init__(
         self,
         table_subquery,
@@ -230,7 +225,7 @@ class SubqueryJoin(Expression):
         return field
 
 
-class BaseTable(Expression):
+class BaseTable:
     """
     The BaseTable class is used for base table references in FROM clause. For
     example, the SQL "foo" in

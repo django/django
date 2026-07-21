@@ -28,7 +28,7 @@ from django.utils.hashable import make_hashable
 def _get_subquery_fields_len(expression):
     if isinstance(expression, (tuple, list)):
         return len(expression)
-    return getattr(expression, "_subquery_fields_len", 1)
+    return expression._subquery_fields_len
 
 
 class Lookup(Expression):

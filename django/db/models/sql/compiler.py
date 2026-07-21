@@ -315,18 +315,15 @@ class SQLCompiler:
         ret = []
         col_idx = 1
         for col, alias in select:
-            # Don't access output_field on every expression because doing
-            # so can try to infer a common type and fail for valid mixed-type
-            # selections, such as composite primary keys.
             is_multi_column_query = isinstance(
                 col, Query
             ) and Query._is_multi_column_query(col)
-            explicit_output_field = col.__dict__.get("output_field")
-            is_composite_expression = getattr(
-                explicit_output_field, "is_composite", False
+            is_multi_column_expression = (
+                not isinstance(col, ColPairs)
+                and getattr(col, "_subquery_fields_len", 1) > 1
             )
-            if is_multi_column_query or is_composite_expression:
-                raise NotSupportedError(
+            if is_multi_column_query or is_multi_column_expression:
+                raise NotImplementedError(
                     "Selecting a multi-column subquery as an annotation is not "
                     "supported."
                 )

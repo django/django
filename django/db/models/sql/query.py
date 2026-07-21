@@ -360,7 +360,7 @@ class Query(BaseExpression):
             return
 
         if self.values_select:
-            for name, expression in zip(self.values_select, self.select):
+            for name, expression in zip(self.values_select, self.select, strict=True):
                 yield name, self._get_output_field(expression)
         else:
             for expression in self.select:
@@ -1328,27 +1328,21 @@ class Query(BaseExpression):
         return None
 
     def _promote_inner_subquery_join(self, name):
-        rest_path = None
-        alias = None
-        if len(name.split(LOOKUP_SEP, 1)) > 1:
-            alias, rest_path = name.split(LOOKUP_SEP, 1)
-        else:
-            alias = name.split(LOOKUP_SEP, 1)[0]
+        alias, _, rest_path = name.partition(LOOKUP_SEP)
         annotation = self.annotations.get(alias)
         if annotation is None:
             return None
         if not self._is_multi_column_query(annotation):
             return None
         if annotation.has_external_references():
-            raise NotSupportedError(
+            raise NotImplementedError(
                 "Correlated multi-column subquery aliases are not supported."
             )
         existing = self._find_inner_subquery_join(alias)
         if existing is not None:
-            if rest_path is None:
+            if not rest_path:
                 return self._resolve_inner_subquery_tuple(existing)
             return self._resolve_inner_subquery_field(existing, rest_path)
-        self.get_initial_alias()
         table_alias, _ = self.table_alias(alias, create=True)
         join = SubqueryJoin(
             annotation,
@@ -1356,7 +1350,7 @@ class Query(BaseExpression):
             table_alias,
         )
         self.alias_map[table_alias] = join
-        if rest_path is None:
+        if not rest_path:
             return self._resolve_inner_subquery_tuple(join)
         return self._resolve_inner_subquery_field(join, rest_path)
 
@@ -2495,10 +2489,6 @@ class Query(BaseExpression):
                 if (
                     item in self.annotations
                     or item.split(LOOKUP_SEP, 1)[0] in self.annotations
-                    or isinstance(
-                        self.alias_map.get(item.split(LOOKUP_SEP, 1)[0]),
-                        SubqueryJoin,
-                    )
                 ):
                     continue
                 if self.extra and item in self.extra:
