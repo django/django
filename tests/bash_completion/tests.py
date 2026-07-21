@@ -3,12 +3,21 @@ A series of tests to establish that the command-line bash completion works.
 """
 
 import os
+import shutil
+import subprocess
 import sys
 import unittest
+from pathlib import Path
 
 from django.apps import apps
 from django.core.management import ManagementUtility
 from django.test.utils import captured_stdout
+
+# extras/django_bash_completion, relative to the repository root. Only present
+# in a source checkout, not in an installed Django.
+DJANGO_BASH_COMPLETION = (
+    Path(__file__).resolve().parent.parent.parent / "extras" / "django_bash_completion"
+)
 
 
 class BashCompletionTests(unittest.TestCase):
@@ -104,3 +113,75 @@ class BashCompletionTests(unittest.TestCase):
             if app_config.label.startswith("a")
         )
         self.assertEqual(output, a_labels)
+
+
+@unittest.skipUnless(
+    shutil.which("bash"), "bash is required to exercise the completion script."
+)
+@unittest.skipUnless(
+    DJANGO_BASH_COMPLETION.exists(),
+    "django_bash_completion is only shipped in a source checkout.",
+)
+class BashCompletionScriptTests(unittest.TestCase):
+    """
+    Checks for the shipped extras/django_bash_completion script itself.
+
+    Regression tests for #19806: sourcing the script must not register a
+    completion hook for the ``python`` interpreter, which would clobber the
+    upstream bash completion of ``python`` (e.g. its own option flags).
+    """
+
+    def _completion_specs(self, *commands):
+        """
+        Source the completion script in a fresh, non-interactive bash shell and
+        return ``{command: registered completion spec}`` as reported by
+        ``complete -p``. A command with no completion registered maps to "".
+
+        The script path is passed as a positional argument ($1) rather than
+        interpolated into the command string, to avoid quoting issues.
+        """
+        queries = "\n".join(
+            f'printf "### %s\\n" {cmd}; complete -p {cmd} 2>/dev/null || true'
+            for cmd in commands
+        )
+        snippet = f'. "$1" || exit 2\n{queries}\n'
+        result = subprocess.run(
+            ["bash", "-c", snippet, "bash", DJANGO_BASH_COMPLETION.as_posix()],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(
+            result.returncode,
+            0,
+            msg="Sourcing django_bash_completion failed:\n%s" % result.stderr,
+        )
+        specs = {}
+        current = None
+        for line in result.stdout.splitlines():
+            if line.startswith("### "):
+                current = line[4:]
+                specs[current] = ""
+            elif current is not None and line.strip():
+                specs[current] += line + "\n"
+        return specs
+
+    def test_python_completion_not_registered(self):
+        """
+        No Django completion hook is bound to python interpreters (#19806).
+        """
+        specs = self._completion_specs("python", "python3")
+        self.assertEqual(sorted(specs), ["python", "python3"])
+        for interpreter, spec in specs.items():
+            with self.subTest(interpreter=interpreter):
+                self.assertNotIn("_django_completion", spec)
+                self.assertNotIn("_python_django_completion", spec)
+
+    def test_manage_py_and_django_admin_still_registered(self):
+        """
+        Completion for the explicit manage.py and django-admin commands is
+        left intact.
+        """
+        specs = self._completion_specs("manage.py", "django-admin")
+        for command in ("manage.py", "django-admin"):
+            with self.subTest(command=command):
+                self.assertIn("_django_completion", specs[command])
