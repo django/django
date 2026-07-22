@@ -28,7 +28,7 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.TH "DJANGO-ADMIN" "1" "May 20, 2026" "6.1" "Django"
+.TH "DJANGO-ADMIN" "1" "July 22, 2026" "6.1" "Django"
 .SH NAME
 django-admin \- Utility script for the Django web framework
 .sp
@@ -258,7 +258,7 @@ Example usage:
 .INDENT 3.5
 .sp
 .EX
-django\-admin compilemessages \-\-ignore=cache \-\-ignore=outdated/*/locale
+django\-admin compilemessages \-\-ignore=node_modules \-\-ignore=outdated/*/locale
 .EE
 .UNINDENT
 .UNINDENT
@@ -1349,8 +1349,17 @@ django\-admin sendtestemail foo@example.com bar@example.com
 .UNINDENT
 .UNINDENT
 .sp
-There are a couple of options, and you may use any combination of them
-together:
+The following options may be used in any combination with each other and with
+recipient email arguments.
+.INDENT 0.0
+.TP
+.B \-\-using ALIAS
+.UNINDENT
+.sp
+
+.sp
+Specifies the \fBMAILERS\fP \%<#\:std-setting-MAILERS> alias to use for sending the test email to
+the recipients given as arguments. Defaults to the \fB\(dqdefault\(dq\fP mailer.
 .INDENT 0.0
 .TP
 .B \-\-managers
