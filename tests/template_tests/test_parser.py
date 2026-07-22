@@ -16,7 +16,8 @@ from django.template.base import (
     VariableDoesNotExist,
 )
 from django.template.defaultfilters import register as filter_library
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango71Warning
 from django.utils.version import PY314
 
 
@@ -184,6 +185,7 @@ class ParserTests(SimpleTestCase):
         ):
             FilterExpression(expr, parser)
 
+    @ignore_warnings(category=RemovedInDjango71Warning)
     def test_filter_numeric_argument_parsing(self):
         p = Parser("", builtins=[filter_library])
 
@@ -216,6 +218,9 @@ class ParserTests(SimpleTestCase):
             "1e",
             "e400",
             "1e.2",
+            # RemovedInDjango71Warning: When the deprecation ends, move "1e2."
+            # and "1e2.0" to invalid_numbers_and_var_names below (they will
+            # raise TemplateSyntaxError).
             "1e2.",
             "1e2.0",
             "1e2a",

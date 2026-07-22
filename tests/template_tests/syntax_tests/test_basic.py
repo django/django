@@ -3,7 +3,7 @@ from django.template.base import Origin, Template, TemplateSyntaxError
 from django.template.context import Context
 from django.template.loader_tags import BlockContext, BlockNode
 from django.test import SimpleTestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango70Warning, RemovedInDjango71Warning
 from django.views.debug import ExceptionReporter
 
 from ..utils import SilentAttrClass, SilentGetItemClass, SomeClass, setup
@@ -259,6 +259,8 @@ class BasicSyntaxTests(SimpleTestCase):
 
     # Something that starts like a number but has an extra lookup works
     # as a lookup.
+    # RemovedInDjango71Warning: When the deprecation ends, remove this test.
+    @ignore_warnings(category=RemovedInDjango71Warning)
     @setup({"basic-syntax30": "{{ 1.2.3 }}"})
     def test_basic_syntax30(self):
         output = self.engine.render_to_string(
@@ -266,6 +268,8 @@ class BasicSyntaxTests(SimpleTestCase):
         )
         self.assertEqual(output, "d")
 
+    # RemovedInDjango71Warning: When the deprecation ends, remove this test.
+    @ignore_warnings(category=RemovedInDjango71Warning)
     @setup({"basic-syntax31": "{{ 1.2.3 }}"})
     def test_basic_syntax31(self):
         output = self.engine.render_to_string(
@@ -274,6 +278,8 @@ class BasicSyntaxTests(SimpleTestCase):
         )
         self.assertEqual(output, "d")
 
+    # RemovedInDjango71Warning: When the deprecation ends, remove this test.
+    @ignore_warnings(category=RemovedInDjango71Warning)
     @setup({"basic-syntax32": "{{ 1.2.3 }}"})
     def test_basic_syntax32(self):
         output = self.engine.render_to_string(
@@ -282,6 +288,8 @@ class BasicSyntaxTests(SimpleTestCase):
         )
         self.assertEqual(output, "d")
 
+    # RemovedInDjango71Warning: When the deprecation ends, remove this test.
+    @ignore_warnings(category=RemovedInDjango71Warning)
     @setup({"basic-syntax33": "{{ 1.2.3 }}"})
     def test_basic_syntax33(self):
         output = self.engine.render_to_string(
@@ -290,12 +298,23 @@ class BasicSyntaxTests(SimpleTestCase):
         )
         self.assertEqual(output, "d")
 
+    # RemovedInDjango71Warning: When the deprecation ends, remove this test.
+    @ignore_warnings(category=RemovedInDjango71Warning)
     @setup({"basic-syntax34": "{{ 1.2.3 }}"})
     def test_basic_syntax34(self):
         output = self.engine.render_to_string(
             "basic-syntax34", {"1": ({"x": "x"}, {"y": "y"}, {"z": "z", "3": "d"})}
         )
         self.assertEqual(output, "d")
+
+    # RemovedInDjango71Warning: When the deprecation ends, add the following
+    # test in place of the five removed above.
+    # @setup({"basic-syntax-numeric": "{{ 1.2.3 }}"})
+    # def test_numeric_literal_first_component(self):
+    #     with self.assertRaisesMessage(
+    #         TemplateSyntaxError, "Invalid numeric literal: '1.2.3'"
+    #     ):
+    #         self.engine.get_template("basic-syntax-numeric")
 
     # Numbers are numbers even if their digits are in the context.
     @setup({"basic-syntax35": "{{ 1 }}"})
