@@ -866,7 +866,7 @@ expression is applied. For example, if you sum over the rows in a partition,
 the first result is the value of the first row, the second is the sum of first
 and second row.
 
-The ``frame`` parameter specifies which other rows that should be used in the
+The ``frame`` parameter specifies which other rows should be used in the
 computation. See :ref:`window-frames` for details.
 
 For example, to annotate each movie with the average rating for the movies by
