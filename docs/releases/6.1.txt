@@ -15,6 +15,9 @@ want to be aware of when upgrading from Django 6.0 or earlier. We've
 See the :doc:`/howto/upgrade-version` guide if you're updating an existing
 project.
 
+Mainstream support is expected to end in April 2027. Extended support is
+expected to end in December 2027.
+
 Python compatibility
 ====================
 
