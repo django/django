@@ -119,6 +119,9 @@ class BulkUpdateNoteTests(TestCase):
         for note in self.notes:
             note.note = Lower("note")
         Note.objects.bulk_update(self.notes, ["note"])
+        if connection.features.can_return_rows_from_update:
+            for note in self.notes:
+                self.assertEqual(note.note, "test")
         self.assertEqual(set(Note.objects.values_list("note", flat=True)), {"test"})
 
     # Tests that use self.notes go here, otherwise put them in another class.
@@ -240,11 +243,17 @@ class BulkUpdateTests(TestCase):
         )
 
     def test_field_references(self):
-        numbers = [Number.objects.create(num=0) for _ in range(10)]
+        numbers = [Number.objects.create(num=index) for index in range(10)]
         for number in numbers:
             number.num = F("num") + 1
         Number.objects.bulk_update(numbers, ["num"])
-        self.assertCountEqual(Number.objects.filter(num=1), numbers)
+        if connection.features.can_return_rows_from_update:
+            for expected_num, number in enumerate(numbers, start=1):
+                self.assertEqual(number.num, expected_num)
+        self.assertQuerySetEqual(
+            Number.objects.order_by("pk").values_list("num", flat=True),
+            list(range(1, 11)),
+        )
 
     def test_f_expression(self):
         notes = [
@@ -253,6 +262,9 @@ class BulkUpdateTests(TestCase):
         for note in notes:
             note.misc = F("note")
         Note.objects.bulk_update(notes, ["misc"])
+        if connection.features.can_return_rows_from_update:
+            for note in notes:
+                self.assertEqual(note.misc, "test_note")
         self.assertCountEqual(Note.objects.filter(misc="test_note"), notes)
 
     def test_booleanfield(self):
