@@ -7,7 +7,7 @@ from urllib.parse import urlencode
 from django.core.exceptions import BadRequest, DisallowedHost
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.files.uploadhandler import MemoryFileUploadHandler
-from django.core.handlers.wsgi import LimitedStream, WSGIRequest
+from django.core.handlers.wsgi import LimitedStream, WSGIHandler, WSGIRequest
 from django.http import (
     HttpHeaders,
     HttpRequest,
@@ -1301,6 +1301,151 @@ class MemoryFileUploadHandlerTests(SimpleTestCase):
             # content_length param is understated (0) but actual size is 15.
             handler.handle_raw_input(BytesIO(b"x" * 15), {}, 0, None)
         self.assertIs(handler.activated, False)
+
+    def test_chunked_request_without_content_length(self):
+        """
+        Requests with Transfer-Encoding: chunked and no CONTENT_LENGTH
+        must not drop the request body (regression for #35838).
+        """
+        body = b"chunked body content"
+
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "PATH_INFO": "/",
+                "SERVER_NAME": "testserver",
+                "SERVER_PORT": "80",
+                "wsgi.version": (1, 0),
+                "wsgi.input": BytesIO(body),
+                "HTTP_TRANSFER_ENCODING": "chunked",
+            }
+        )
+        self.assertEqual(request.body, body)
+
+    def test_chunked_request_empty_body(self):
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "PATH_INFO": "/",
+                "SERVER_NAME": "testserver",
+                "SERVER_PORT": "80",
+                "wsgi.version": (1, 0),
+                "wsgi.input": BytesIO(b""),
+                "HTTP_TRANSFER_ENCODING": "chunked",
+            }
+        )
+        self.assertEqual(request.body, b"")
+
+    def test_chunked_with_content_length_rejected(self):
+        """
+        RFC 9112 6.1: A request containing both Transfer-Encoding and
+        Content-Length should be rejected with a 400 Bad Request.
+        """
+        with self.assertRaises(BadRequest):
+            WSGIRequest(
+                {
+                    "REQUEST_METHOD": "POST",
+                    "PATH_INFO": "/",
+                    "SERVER_NAME": "testserver",
+                    "SERVER_PORT": "80",
+                    "wsgi.version": (1, 0),
+                    "wsgi.input": BytesIO(b"abcdef"),
+                    "HTTP_TRANSFER_ENCODING": "chunked",
+                    "CONTENT_LENGTH": "3",
+                }
+            )
+
+    def test_no_content_length_and_no_chunked_has_empty_body(self):
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "PATH_INFO": "/",
+                "SERVER_NAME": "testserver",
+                "SERVER_PORT": "80",
+                "wsgi.version": (1, 0),
+                "wsgi.input": BytesIO(b"unexpected"),
+            }
+        )
+        self.assertEqual(request.body, b"")
+
+    def test_chunked_request_with_multiple_encodings(self):
+        body = b"multi-encoded body"
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "PATH_INFO": "/",
+                "wsgi.input": BytesIO(body),
+                "HTTP_TRANSFER_ENCODING": "gzip, chunked",
+            }
+        )
+        self.assertEqual(request.body, body)
+
+    def test_imprecise_chunked_header_ignored(self):
+        """
+        Headers like 'not-chunked' should not be treated as chunked.
+        """
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "PATH_INFO": "/",
+                "wsgi.input": BytesIO(b"ignored body"),
+                "HTTP_TRANSFER_ENCODING": "not-chunked",
+            }
+        )
+        self.assertEqual(request.body, b"")
+
+    def test_long_transfer_encoding_header_ignored(self):
+        """
+        Transfer-Encoding headers longer than 2048 characters should be
+        ignored to prevent DoS attacks.
+        """
+        long_header = "chunked" + (", gzip" * 400)
+
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "PATH_INFO": "/",
+                "wsgi.input": BytesIO(b"malicious body"),
+                "HTTP_TRANSFER_ENCODING": long_header,
+            }
+        )
+        self.assertEqual(request.body, b"")
+
+    def test_non_chunked_transfer_encoding_with_content_length_rejected(self):
+        with self.assertRaises(BadRequest):
+            WSGIRequest(
+                {
+                    "REQUEST_METHOD": "POST",
+                    "PATH_INFO": "/",
+                    "wsgi.input": BytesIO(b"data"),
+                    "HTTP_TRANSFER_ENCODING": "gzip",
+                    "CONTENT_LENGTH": "4",
+                }
+            )
+
+    def test_chunked_with_zero_content_length_rejected(self):
+        with self.assertRaises(BadRequest):
+            WSGIRequest(
+                {
+                    "REQUEST_METHOD": "POST",
+                    "PATH_INFO": "/",
+                    "wsgi.input": BytesIO(b""),
+                    "HTTP_TRANSFER_ENCODING": "chunked",
+                    "CONTENT_LENGTH": "0",
+                }
+            )
+
+    def test_transfer_encoding_with_content_length_rejected(self):
+        environ = {
+            "REQUEST_METHOD": "POST",
+            "CONTENT_LENGTH": "6",
+            "wsgi.input": FakePayload("abcdef"),
+            "SERVER_NAME": "test",
+            "SERVER_PORT": "8000",
+            "HTTP_TRANSFER_ENCODING": "chunked",
+        }
+        response = WSGIHandler()(environ, lambda *a, **k: None)
+        self.assertEqual(response.status_code, 400)
 
 
 class HostValidationTests(SimpleTestCase):

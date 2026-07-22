@@ -2,8 +2,9 @@ from io import IOBase
 
 from django.conf import settings
 from django.core import signals
+from django.core.exceptions import BadRequest
 from django.core.handlers import base
-from django.http import HttpRequest, QueryDict, parse_cookie
+from django.http import HttpRequest, HttpResponseBadRequest, QueryDict, parse_cookie
 from django.urls import set_script_prefix
 from django.utils.encoding import repercent_broken_unicode
 from django.utils.functional import cached_property
@@ -71,11 +72,32 @@ class WSGIRequest(HttpRequest):
         self.method = environ["REQUEST_METHOD"].upper()
         # Set content_type, content_params, and encoding.
         self._set_content_type_params(environ)
+        transfer_encoding = environ.get("HTTP_TRANSFER_ENCODING", "").lower()
+        # RFC 9112 Section 6.3.3: If a message is received with both a
+        # Transfer-Encoding and a Content-Length header field, the
+        # Transfer-Encoding overrides the Content-Length. Such a message
+        # might indicate an attempt to perform request smuggling
+        # (Section 11.2) or response splitting (Section 11.1) and
+        # ought to be handled as an error.
+        if transfer_encoding and environ.get("CONTENT_LENGTH") is not None:
+            raise BadRequest(
+                "Request cannot have both Content-Length and "
+                "Transfer-Encoding headers."
+            )
         try:
             content_length = int(environ.get("CONTENT_LENGTH"))
         except (ValueError, TypeError):
             content_length = 0
-        self._stream = LimitedStream(self.environ["wsgi.input"], content_length)
+            if transfer_encoding and len(transfer_encoding) < 2048:
+                if any(
+                    enc.strip() == "chunked" for enc in transfer_encoding.split(",")
+                ):
+                    content_length = None
+
+        if content_length is None:
+            self._stream = self.environ["wsgi.input"]
+        else:
+            self._stream = LimitedStream(self.environ["wsgi.input"], content_length)
         self._read_started = False
         self.resolver_match = None
 
@@ -120,8 +142,12 @@ class WSGIHandler(base.BaseHandler):
     def __call__(self, environ, start_response):
         set_script_prefix(get_script_name(environ))
         signals.request_started.send(sender=self.__class__, environ=environ)
-        request = self.request_class(environ)
-        response = self.get_response(request)
+        try:
+            request = self.request_class(environ)
+        except BadRequest:
+            response = HttpResponseBadRequest()
+        else:
+            response = self.get_response(request)
 
         response._handler_class = self.__class__
 
