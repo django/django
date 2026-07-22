@@ -105,18 +105,31 @@ class GeoIP2:
         path = to_path(path)
 
         # Try the path first in case it is the full path to a database.
-        for path in (path, path / city, path / country):
-            if path.is_file():
-                self._path = path
-                self._reader = geoip2.database.Reader(path, mode=cache)
-                break
+        self._city_file = False
+        self._country_file = False
+
+        if path.is_file():
+            self._path = path
+        elif (path / city).is_file():
+            self._path = path / city
+            self._city_file = True
+        elif (path / country).is_file():
+            self._path = path / country
+            self._country_file = True
         else:
-            raise GeoIP2Exception(
-                "Path must be a valid database or directory containing databases."
-            )
+            raise GeoIP2Exception("GeoIP path must be a valid file or directory.")
+
+        try:
+            self._reader = geoip2.database.Reader(self._path, mode=cache)
+        except Exception as e:
+            raise GeoIP2Exception("Unable to read GeoIP database: %s" % e)
 
         database_type = self._metadata.database_type
-        if database_type not in SUPPORTED_DATABASE_TYPES:
+
+        if (
+            not (self._city_file or self._country_file)
+            and database_type not in SUPPORTED_DATABASE_TYPES
+        ):
             raise GeoIP2Exception(f"Unable to handle database edition: {database_type}")
 
     def __del__(self):
@@ -135,10 +148,18 @@ class GeoIP2:
 
     @cached_property
     def is_city(self):
+        if self._city_file:
+            return True
+        if self._country_file:
+            return False
         return "City" in self._metadata.database_type
 
     @cached_property
     def is_country(self):
+        if self._country_file:
+            return True
+        if self._city_file:
+            return False
         return "Country" in self._metadata.database_type
 
     def _query(self, query, *, require_city=False):
