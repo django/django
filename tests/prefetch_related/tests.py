@@ -2305,3 +2305,89 @@ class PrefetchRelatedMTICacheTests(TestCase):
         self.assertSequenceEqual(
             gp.authorwithage.authorwithagechild.favorite_authors.all(), []
         )
+
+
+class LargePrefetchBatchingTests(TestCase):
+    """
+    prefetch_related() splits queries into batches when the number of instances
+    exceeds the database's maximum query parameter limit (e.g. SQLite). These
+    tests mock a small batch size to exercise the batching code path without
+    requiring thousands of objects.
+    """
+
+    # A batch size small enough that test_size requires multiple batches.
+    mock_batch_size = 5
+    test_size = 11  # requires ceil(11/5) = 3 batches
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.book1 = Book.objects.create(title="Poems")
+        cls.book2 = Book.objects.create(title="Sense and Sensibility")
+        cls.authors = [
+            Author.objects.create(name=f"Author {i}", first_book=cls.book1)
+            for i in range(cls.test_size)
+        ]
+        cls.reader = Reader.objects.create(name="Amy")
+        # first and last authors share book1 via M2M to exercise cross-batch
+        # result merging.
+        cls.authors[0].books.add(cls.book1)
+        cls.authors[-1].books.add(cls.book2)
+        cls.reader.books_read.add(cls.book1, cls.book2)
+
+    def _mock_batch_size(self):
+        """Return a mock forcing bulk_batch_size to return mock_batch_size."""
+        return mock.patch(
+            "django.db.backends.base.operations.BaseDatabaseOperations.bulk_batch_size",
+            return_value=self.mock_batch_size,
+        )
+
+    def test_fk_batching(self):
+        """Forward FK prefetch works correctly across multiple batches."""
+        with self._mock_batch_size():
+            authors = list(Author.objects.prefetch_related("first_book"))
+        self.assertEqual(len(authors), self.test_size)
+        with self.assertNumQueries(0):
+            for author in authors:
+                self.assertEqual(author.first_book, self.book1)
+
+    def test_m2m_batching(self):
+        """M2M prefetch works correctly across multiple batches."""
+        with self._mock_batch_size():
+            authors = list(Author.objects.prefetch_related("books"))
+        self.assertEqual(len(authors), self.test_size)
+        with self.assertNumQueries(0):
+            self.assertSequenceEqual(authors[0].books.all(), [self.book1])
+            self.assertSequenceEqual(authors[-1].books.all(), [self.book2])
+            # Authors with no M2M relation get an empty list.
+            for author in authors[1:-1]:
+                self.assertSequenceEqual(author.books.all(), [])
+
+    def test_nested_prefetch_batching(self):
+        """Nested prefetch (books__read_by) works correctly across batches."""
+        with self._mock_batch_size():
+            authors = list(Author.objects.prefetch_related("books__read_by"))
+        with self.assertNumQueries(0):
+            self.assertSequenceEqual(
+                authors[0].books.all()[0].read_by.all(), [self.reader]
+            )
+            self.assertSequenceEqual(
+                authors[-1].books.all()[0].read_by.all(), [self.reader]
+            )
+
+    def test_no_duplicate_related_objects(self):
+        """
+        When multiple source instances in different batches share the same
+        related object (e.g. the same book is first_book for many authors),
+        that related object must appear exactly once in the prefetch results
+        for each source instance -- not once per batch it appears in.
+        """
+        # All authors share book1 as first_book. With batching, book1 would be
+        # fetched in every batch, producing duplicates without deduplication.
+        with self._mock_batch_size():
+            authors = list(Author.objects.prefetch_related("first_book"))
+        with self.assertNumQueries(0):
+            for author in authors:
+                # first_book is a to-one relation; it should be a single
+                # object, not a list. Accessing it should not raise and
+                # should be book1.
+                self.assertEqual(author.first_book, self.book1)
