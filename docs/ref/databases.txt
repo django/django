@@ -269,6 +269,26 @@ to ``True`` to use the ``ConnectionPool`` defaults::
         },
     }
 
+The :setting:`CONN_HEALTH_CHECKS` setting is used to set the ``check`` argument
+of :class:`~psycopg:psycopg_pool.ConnectionPool`. The :setting:`CONN_MAX_AGE`
+setting should be left unset or set to ``0`` and will be ignored. Configure the
+connection lifecycle using the ``max_lifetime`` and ``max_idle`` arguments
+instead::
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            # ...
+            "OPTIONS": {
+                "pool": {
+                    # these are the default values
+                    "max_lifetime": 3600,
+                    "max_idle": 600,
+                },
+            },
+        },
+    }
+
 This option requires ``psycopg[pool]`` or :pypi:`psycopg-pool` to be installed
 and is ignored with ``psycopg2``.
 
