@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -24,7 +24,7 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr ""
 
-#: contrib/admin/actions.py:63 contrib/admin/options.py:2528
+#: contrib/admin/actions.py:63 contrib/admin/options.py:2535
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr ""
@@ -192,7 +192,7 @@ msgstr ""
 msgid "Added."
 msgstr ""
 
-#: contrib/admin/models.py:149 contrib/admin/options.py:2785
+#: contrib/admin/models.py:149 contrib/admin/options.py:2818
 msgid "and"
 msgstr ""
 
@@ -215,122 +215,122 @@ msgstr ""
 msgid "No fields changed."
 msgstr ""
 
-#: contrib/admin/options.py:293 contrib/admin/options.py:337
+#: contrib/admin/options.py:300 contrib/admin/options.py:344
 msgid "None"
 msgstr ""
 
-#: contrib/admin/options.py:389
+#: contrib/admin/options.py:396
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
 
-#: contrib/admin/options.py:1066
+#: contrib/admin/options.py:1073
 #, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr ""
 
-#: contrib/admin/options.py:1597
+#: contrib/admin/options.py:1604
 #, python-format
 msgid "The app \"%s\" could not be found."
 msgstr ""
 
-#: contrib/admin/options.py:1639 contrib/admin/options.py:1677
+#: contrib/admin/options.py:1646 contrib/admin/options.py:1684
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr ""
 
-#: contrib/admin/options.py:1641
+#: contrib/admin/options.py:1648
 msgid "You may edit it again below."
 msgstr ""
 
-#: contrib/admin/options.py:1658
+#: contrib/admin/options.py:1665
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
 
-#: contrib/admin/options.py:1729
+#: contrib/admin/options.py:1736
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
 
-#: contrib/admin/options.py:1749
+#: contrib/admin/options.py:1756
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
 
-#: contrib/admin/options.py:1771
+#: contrib/admin/options.py:1778
 #, python-brace-format
 msgid "The {name} “{obj}” was changed successfully."
 msgstr ""
 
-#: contrib/admin/options.py:1875 contrib/admin/options.py:2359
+#: contrib/admin/options.py:1882 contrib/admin/options.py:2366
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 
-#: contrib/admin/options.py:1895
+#: contrib/admin/options.py:1902
 msgid "No action selected."
 msgstr ""
 
-#: contrib/admin/options.py:1926
+#: contrib/admin/options.py:1933
 #, python-format
 msgid "The %(name)s “%(obj)s” was deleted successfully."
 msgstr ""
 
-#: contrib/admin/options.py:2028
+#: contrib/admin/options.py:2035
 #, python-format
 msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr ""
 
-#: contrib/admin/options.py:2181
+#: contrib/admin/options.py:2188
 #, python-format
 msgid "Add %s"
 msgstr ""
 
-#: contrib/admin/options.py:2183
+#: contrib/admin/options.py:2190
 #, python-format
 msgid "Change %s"
 msgstr ""
 
-#: contrib/admin/options.py:2185
+#: contrib/admin/options.py:2192
 #, python-format
 msgid "View %s"
 msgstr ""
 
-#: contrib/admin/options.py:2288
+#: contrib/admin/options.py:2295
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/admin/options.py:2321
+#: contrib/admin/options.py:2328
 msgid "Database error"
 msgstr ""
 
-#: contrib/admin/options.py:2435
+#: contrib/admin/options.py:2442
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/admin/options.py:2441
+#: contrib/admin/options.py:2448
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr ""
 
-#: contrib/admin/options.py:2530
+#: contrib/admin/options.py:2537
 #: contrib/admin/templates/admin/delete_confirmation.html:18
 #: contrib/admin/templates/admin/submit_line.html:14
 msgid "Delete"
 msgstr ""
 
-#: contrib/admin/options.py:2588
+#: contrib/admin/options.py:2595
 #, python-format
 msgid "Change history: %s"
 msgstr ""
@@ -338,12 +338,25 @@ msgstr ""
 #. Translators: Model verbose name and instance
 #. representation, suitable to be an item in a
 #. list.
-#: contrib/admin/options.py:2779
+#: contrib/admin/options.py:2794
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr ""
 
-#: contrib/admin/options.py:2788
+#. Translators: This string is used as a
+#. separator between list elements.
+#: contrib/admin/options.py:2808 contrib/admin/options.py:2809
+msgid ", "
+msgstr ""
+
+#: contrib/admin/options.py:2811 contrib/admin/templatetags/admin_filters.py:72
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/admin/options.py:2821
 #, python-format
 msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
@@ -964,13 +977,6 @@ msgstr ""
 #: contrib/admin/templates/registration/password_reset_form.html:32
 msgid "Reset my password"
 msgstr ""
-
-#: contrib/admin/templatetags/admin_filters.py:72
-#, python-format
-msgid "…and %(count)d more object."
-msgid_plural "…and %(count)d more objects."
-msgstr[0] ""
-msgstr[1] ""
 
 #: contrib/admin/templatetags/admin_list.py:104
 msgid "Select all objects on this page for an action"

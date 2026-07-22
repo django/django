@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -149,56 +149,56 @@ msgstr ""
 msgid "Old password"
 msgstr ""
 
-#: contrib/auth/hashers.py:357 contrib/auth/hashers.py:450
-#: contrib/auth/hashers.py:541 contrib/auth/hashers.py:636
-#: contrib/auth/hashers.py:689
+#: contrib/auth/hashers.py:355 contrib/auth/hashers.py:448
+#: contrib/auth/hashers.py:539 contrib/auth/hashers.py:634
+#: contrib/auth/hashers.py:685
 msgid "algorithm"
 msgstr ""
 
-#: contrib/auth/hashers.py:358
+#: contrib/auth/hashers.py:356
 msgid "iterations"
 msgstr ""
 
-#: contrib/auth/hashers.py:359 contrib/auth/hashers.py:456
-#: contrib/auth/hashers.py:543 contrib/auth/hashers.py:640
-#: contrib/auth/hashers.py:690
+#: contrib/auth/hashers.py:357 contrib/auth/hashers.py:454
+#: contrib/auth/hashers.py:541 contrib/auth/hashers.py:638
+#: contrib/auth/hashers.py:686
 msgid "salt"
 msgstr ""
 
-#: contrib/auth/hashers.py:360 contrib/auth/hashers.py:457
-#: contrib/auth/hashers.py:641 contrib/auth/hashers.py:691
+#: contrib/auth/hashers.py:358 contrib/auth/hashers.py:455
+#: contrib/auth/hashers.py:639 contrib/auth/hashers.py:687
 msgid "hash"
 msgstr ""
 
-#: contrib/auth/hashers.py:451
+#: contrib/auth/hashers.py:449
 msgid "variety"
 msgstr ""
 
-#: contrib/auth/hashers.py:452
+#: contrib/auth/hashers.py:450
 msgid "version"
 msgstr ""
 
-#: contrib/auth/hashers.py:453
+#: contrib/auth/hashers.py:451
 msgid "memory cost"
 msgstr ""
 
-#: contrib/auth/hashers.py:454
+#: contrib/auth/hashers.py:452
 msgid "time cost"
 msgstr ""
 
-#: contrib/auth/hashers.py:455 contrib/auth/hashers.py:639
+#: contrib/auth/hashers.py:453 contrib/auth/hashers.py:637
 msgid "parallelism"
 msgstr ""
 
-#: contrib/auth/hashers.py:542 contrib/auth/hashers.py:637
+#: contrib/auth/hashers.py:540 contrib/auth/hashers.py:635
 msgid "work factor"
 msgstr ""
 
-#: contrib/auth/hashers.py:544
+#: contrib/auth/hashers.py:542
 msgid "checksum"
 msgstr ""
 
-#: contrib/auth/hashers.py:638
+#: contrib/auth/hashers.py:636
 msgid "block size"
 msgstr ""
 

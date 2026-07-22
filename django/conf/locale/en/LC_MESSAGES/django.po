@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -589,11 +589,11 @@ msgstr ""
 msgid "Null characters are not allowed."
 msgstr ""
 
-#: db/models/base.py:1656 forms/models.py:933
+#: db/models/base.py:1664 forms/models.py:933
 msgid "and"
 msgstr ""
 
-#: db/models/base.py:1658
+#: db/models/base.py:1666
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr ""
@@ -1043,27 +1043,27 @@ msgid ""
 "may be ambiguous or it may not exist."
 msgstr ""
 
-#: forms/widgets.py:553
+#: forms/widgets.py:573
 msgid "Clear"
 msgstr ""
 
-#: forms/widgets.py:554
+#: forms/widgets.py:574
 msgid "Currently"
 msgstr ""
 
-#: forms/widgets.py:555
+#: forms/widgets.py:575
 msgid "Change"
 msgstr ""
 
-#: forms/widgets.py:894
+#: forms/widgets.py:914
 msgid "Unknown"
 msgstr ""
 
-#: forms/widgets.py:895
+#: forms/widgets.py:915
 msgid "Yes"
 msgstr ""
 
-#: forms/widgets.py:896
+#: forms/widgets.py:916
 msgid "No"
 msgstr ""
 
