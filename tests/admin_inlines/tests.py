@@ -1071,6 +1071,25 @@ class TestVerboseNameInlineForms(TestDataMixin, TestCase):
         self.assertNotContains(response, '<h2>Model with both - plural name</h2>')
         self.assertNotContains(response, 'Add another Model with both - name')
 
+    def test_verbose_name_only_inline(self):
+        class VerboseNameOnlyInline(TabularInline):
+            model = VerboseNameProfile
+            verbose_name = 'Guest'
+
+        modeladmin = ModelAdmin(ProfileCollection, admin_site)
+        modeladmin.inlines = [VerboseNameOnlyInline]
+        obj = ProfileCollection.objects.create()
+        url = reverse('admin:admin_inlines_profilecollection_change', args=(obj.pk,))
+        request = self.factory.get(url)
+        request.user = self.superuser
+        response = modeladmin.changeform_view(request)
+        # verbose_name_plural should be derived from verbose_name.
+        self.assertContains(response, '<h2>Guests</h2>')
+        self.assertContains(response, 'Add another Guest')
+        # The model's own verbose_name_plural should not appear.
+        self.assertNotContains(response, '<h2>Model with verbose name onlys</h2>')
+        self.assertNotContains(response, '<h2>Profiles</h2>')
+
 
 @override_settings(ROOT_URLCONF='admin_inlines.urls')
 class SeleniumTests(AdminSeleniumTestCase):
