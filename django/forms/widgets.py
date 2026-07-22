@@ -922,6 +922,8 @@ class NullBooleanSelect(Select):
             return {
                 True: "true",
                 False: "false",
+                "True": "true",
+                "False": "false",
                 "true": "true",
                 "false": "false",
                 # For backwards compatibility with Django < 2.2.
@@ -935,9 +937,9 @@ class NullBooleanSelect(Select):
         value = data.get(name)
         return {
             True: True,
+            False: False,
             "True": True,
             "False": False,
-            False: False,
             "true": True,
             "false": False,
             # For backwards compatibility with Django < 2.2.
