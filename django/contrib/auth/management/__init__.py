@@ -83,17 +83,17 @@ def create_permissions(
     )
 
     # Find all the Permissions that have a content_type for a model we're
-    # looking for. We don't need to check for codenames since we already have
-    # a list of the ones we're going to create.
-    all_perms = set(
-        Permission.objects.using(using)
-        .filter(
-            content_type__in=set(ctypes.values()),
-        )
-        .values_list("content_type", "codename")
-    )
+    # looking for, along with their current names, to determine which
+    # permissions need to be created and which need their name updated.
+    all_perms = {
+        (ct, codename): (pk, name)
+        for pk, name, ct, codename in Permission.objects.using(using)
+        .filter(content_type__in=set(ctypes.values()))
+        .values_list("id", "name", "content_type", "codename")
+    }
 
-    perms = []
+    perms_to_create = []
+    perms_to_update = []
     for model in models:
         ctype = ctypes[model]
         for codename, name in _get_all_permissions(model._meta):
@@ -103,12 +103,23 @@ def create_permissions(
                 permission.codename = codename
                 permission.name = name
                 permission.content_type = ctype
-                perms.append(permission)
+                perms_to_create.append(permission)
+            else:
+                if name != all_perms[(ctype.pk, codename)][1]:
+                    permission = Permission()
+                    permission._state.db = using
+                    permission.pk = all_perms[(ctype.pk, codename)][0]
+                    permission.name = name
+                    perms_to_update.append(permission)
 
-    Permission.objects.using(using).bulk_create(perms)
+    Permission.objects.using(using).bulk_create(perms_to_create)
+    if perms_to_update:
+        Permission.objects.using(using).bulk_update(perms_to_update, ["name"])
     if verbosity >= 2:
-        for perm in perms:
+        for perm in perms_to_create:
             print("Adding permission '%s'" % perm)
+        for perm in perms_to_update:
+            print("Updating permission '%s'" % perm)
 
 
 def _get_permission_metadata(apps, app_label, model_name):
