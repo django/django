@@ -100,6 +100,24 @@ class BaseDatabaseIntrospection:
             if model._meta.can_migrate(self.connection)
         )
 
+    def managed_table_names(self):
+        """
+        Return a list of table names for all managed Django models that
+        physically exist on this connection, without consulting the database
+        router. This is suitable for operations (e.g. flushing) that must act
+        on every physical table regardless of routing rules.
+        """
+        from django.apps import apps
+
+        existing_tables = set(self.table_names(include_views=False))
+        return [
+            model._meta.db_table
+            for model in apps.get_models(include_auto_created=True)
+            if model._meta.managed
+            and model._meta.can_migrate(self.connection)
+            and self.identifier_converter(model._meta.db_table) in existing_tables
+        ]
+
     def django_table_names(self, only_existing=False, include_views=True):
         """
         Return a list of all table names that have associated Django models and
