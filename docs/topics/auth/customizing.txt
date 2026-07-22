@@ -18,6 +18,14 @@ can be checked through Django's authorization system.
 You can :ref:`extend <extending-user>` the default ``User`` model, or
 :ref:`substitute <auth-custom-user>` a completely customized model.
 
+.. admonition:: There are community-maintained solutions!
+
+    Django has a vibrant ecosystem. There are authentication and authorization
+    solutions highlighted on the `Community Ecosystem`_ page. The Django
+    Packages `Authentication grid`_ has even more options for you!
+
+.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#authentication-authorization
+.. _Authentication grid: https://djangopackages.org/grids/g/authentication/
 .. _authentication-backends:
 
 Other authentication sources

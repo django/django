@@ -78,6 +78,15 @@ Other topics
 
     Having problems?  Try :doc:`/faq/admin`.
 
+.. admonition:: There are community-maintained solutions!
+
+    Django has a vibrant ecosystem. There are solutions for customizing and
+    extending the admin highlighted on the `Community Ecosystem`_ page. The
+    Django Packages `Admin interface grid`_ has even more options for you!
+
+.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#admin
+.. _Admin interface grid: https://djangopackages.org/grids/g/admin-interface/
+
 ``ModelAdmin`` objects
 ======================
 

@@ -6,6 +6,15 @@ Testing tools
 
 Django provides a small set of tools that come in handy when writing tests.
 
+.. admonition:: There are community-maintained solutions!
+
+    Django has a vibrant ecosystem. There are testing and fixtures solutions
+    highlighted on the `Community Ecosystem`_ page. The Django Packages
+    `Testing tools grid`_ has even more options for you!
+
+.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#testing-fixtures
+.. _Testing tools grid: https://djangopackages.org/grids/g/testing/
+
 .. _test-client:
 
 The test client
