@@ -1,8 +1,32 @@
 from django.conf import settings
-from django.contrib.messages import constants, utils
+from django.contrib.messages import constants
+from django.contrib.messages import restrictions as res
+from django.contrib.messages import utils
 from django.utils.functional import SimpleLazyObject
 
 LEVEL_TAGS = SimpleLazyObject(utils.get_level_tags)
+
+
+class RestrictionsContainer(list):
+    res_map = {
+        res.AmountRestriction.JSON_TYPE_CODE: res.AmountRestriction,
+        res.TimeRestriction.JSON_TYPE_CODE: res.TimeRestriction,
+    }
+
+    def to_json_obj(self):
+        return [r.to_json() for r in self]
+
+    @classmethod
+    def create_from_josn(cls, enc_restrictions):
+        # set_trace()
+        ret = []
+        for r in enc_restrictions:
+            restriction_type, values = r.split(res.Restriction.JSON_SEPARATOR)
+            ret.append(cls.res_map[restriction_type].from_json_param(values))
+        return RestrictionsContainer(ret)
+
+    def __eq__(self, other):
+        return set(self) == set(other)
 
 
 class Message:
@@ -12,10 +36,14 @@ class Message:
     or template.
     """
 
-    def __init__(self, level, message, extra_tags=None):
+    def __init__(self, level, message, extra_tags=None, restrictions=[]):
         self.level = int(level)
         self.message = message
         self.extra_tags = extra_tags
+        self.restrictions = restrictions or list([res.AmountRestriction(1)])
+        self.restrictions = RestrictionsContainer(self.restrictions)
+        # if not given any restriction - one show by default
+        # todo: self.restrictions =
 
     def _prepare(self):
         """
@@ -28,10 +56,17 @@ class Message:
     def __eq__(self, other):
         if not isinstance(other, Message):
             return NotImplemented
-        return self.level == other.level and self.message == other.message
+        return (
+            self.level == other.level
+            and self.message == other.message
+            and self.restrictions == other.restrictions
+        )
 
     def __str__(self):
         return str(self.message)
+
+    def __hash__(self):
+        return hash(self.message)
 
     def __repr__(self):
         extra_tags = f", extra_tags={self.extra_tags!r}" if self.extra_tags else ""
@@ -44,6 +79,16 @@ class Message:
     @property
     def level_tag(self):
         return LEVEL_TAGS.get(self.level, "")
+
+    def active(self):
+        for r in self.restrictions:
+            if r.is_expired():
+                return False
+        return True
+
+    def on_display(self):
+        for r in self.restrictions:
+            r.on_display()
 
 
 class BaseStorage:
@@ -62,20 +107,48 @@ class BaseStorage:
         super().__init__(*args, **kwargs)
 
     def __len__(self):
-        return len(self._loaded_messages) + len(self._queued_messages)
+        # in case that there was a call for render template which would
+        # cause iterating throught messages,
+        # and then (e.g. in some middleware, would be call for iterating
+        # through messages (e.g. by iterating of context['messages'])
+        # TODO: implement a way to access messages without affecting
+        # calling __iter__ method
+        all_msgs = set(self._loaded_messages + self._queued_messages)
+        return len(all_msgs)
+        # return len(self._loaded_messages) + len(self._queued_messages)
 
     def __iter__(self):
-        self.used = True
-        if self._queued_messages:
-            self._loaded_messages.extend(self._queued_messages)
-            self._queued_messages = []
-        return iter(self._loaded_messages)
+        if not self.used:
+            self.used = True
+            if self._queued_messages:
+                self._loaded_messages.extend(self._queued_messages)
+                self._queued_messages = []
+
+            active_messages = []
+            for message in self._loaded_messages:
+                if isinstance(message, Message):
+                    if message.active():
+                        active_messages.append(message)
+                else:
+                    active_messages.append(message)
+            for x in active_messages:
+                if isinstance(x, Message):
+                    x.on_display()
+            # self._queued_messages.extend(m for m in active_messages
+            # if m not in self._queued_messages)
+            self._queued_messages = active_messages
+        return iter(self._queued_messages)
 
     def __contains__(self, item):
         return item in self._loaded_messages or item in self._queued_messages
 
     def __repr__(self):
         return f"<{self.__class__.__qualname__}: request={self.request!r}>"
+
+    def filter_store(self, messages, response, *args, **kwargs):
+        """stores only active messages from given messages in storage"""
+        filtered_messages = [x for x in messages if x.active()]
+        return self._store(filtered_messages, response, *args, **kwargs)
 
     @property
     def _loaded_messages(self):
@@ -132,14 +205,17 @@ class BaseStorage:
         If the backend has yet to be iterated, store previously stored messages
         again. Otherwise, only store messages added after the last iteration.
         """
+        # if used or used and added,
+        # then _queued_messages contains all messages that should be saved
+        # if added, then save: all messages currently stored and added ones
         self._prepare_messages(self._queued_messages)
         if self.used:
-            return self._store(self._queued_messages, response)
+            return self.filter_store(self._queued_messages, response)
         elif self.added_new:
             messages = self._loaded_messages + self._queued_messages
-            return self._store(messages, response)
+            return self.filter_store(messages, response)
 
-    def add(self, level, message, extra_tags=""):
+    def add(self, level, message, extra_tags="", restrictions=[]):
         """
         Queue a message to be stored.
 
@@ -154,7 +230,9 @@ class BaseStorage:
             return
         # Add the message.
         self.added_new = True
-        message = Message(level, message, extra_tags=extra_tags)
+        message = Message(
+            level, message, extra_tags=extra_tags, restrictions=restrictions
+        )
         self._queued_messages.append(message)
 
     def _get_level(self):
