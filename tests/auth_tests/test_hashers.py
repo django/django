@@ -156,6 +156,20 @@ class TestUtilsHashPass(SimpleTestCase):
     @override_settings(
         PASSWORD_HASHERS=["django.contrib.auth.hashers.BCryptPasswordHasher"]
     )
+    def test_bcrypt_truncation(self):
+        if bcrypt.__version__ >= "5.0.0":
+            with self.assertRaises(ValueError) as cm:
+                encoded = make_password(73 * "x", hasher="bcrypt")
+            self.assertIn("72 bytes", str(cm.exception))
+        else:
+            # Older versions silently truncated to 72 bytes
+            encoded = make_password(73 * "x", hasher="bcrypt")
+            self.assertTrue(check_password(72 * "x", encoded))
+
+    @skipUnless(bcrypt, "bcrypt not installed")
+    @override_settings(
+        PASSWORD_HASHERS=["django.contrib.auth.hashers.BCryptPasswordHasher"]
+    )
     def test_bcrypt(self):
         encoded = make_password("lètmein", hasher="bcrypt")
         self.assertTrue(is_password_usable(encoded))
