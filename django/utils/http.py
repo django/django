@@ -1,4 +1,5 @@
 import base64
+import logging
 import re
 import unicodedata
 from binascii import Error as BinasciiError
@@ -10,6 +11,8 @@ from urllib.parse import urlsplit
 
 from django.utils.datastructures import MultiValueDict
 from django.utils.regex_helper import _lazy_re_compile
+
+logger = logging.getLogger("django.request")
 
 # Based on RFC 9110 Appendix A.
 ETAG_MATCH = _lazy_re_compile(
@@ -34,6 +37,7 @@ __Y2 = r"(?P<year>[0-9]{2})"
 __T = r"(?P<hour>[0-9]{2}):(?P<min>[0-9]{2}):(?P<sec>[0-9]{2})"
 RFC1123_DATE = _lazy_re_compile(r"^\w{3}, %s %s %s %s GMT$" % (__D, __M, __Y, __T))
 RFC850_DATE = _lazy_re_compile(r"^\w{6,9}, %s-%s-%s %s GMT$" % (__D, __M, __Y2, __T))
+_RFC2231_CONTINUATION_RE = _lazy_re_compile(r"\*(\d{1,4})$", re.ASCII)
 ASCTIME_DATE = _lazy_re_compile(r"^\w{3} %s %s %s %s$" % (__M, __D2, __T, __Y))
 
 RFC3986_GENDELIMS = ":/?#[]@"
@@ -378,21 +382,37 @@ def parse_header_parameters(line, max_length=MAX_HEADER_LENGTH):
     parts = _parseparam(";" + line)
     key = parts.__next__().lower()
     pdict = {}
-    for p in parts:
-        i = p.find("=")
-        if i >= 0:
+    continuations = {}  # RFC 2231 §4.1: {base: {seg_num: (starred, value)}}
+    malformed_continuations = set()  # bases with invalid segment numbers
+    for param in parts:
+        eq_idx = param.find("=")
+        if eq_idx >= 0:
             has_encoding = False
-            name = p[:i].strip().lower()
-            if name.endswith("*"):
-                # Embedded lang/encoding, like "filename*=UTF-8''file.ext".
+            name = param[:eq_idx].strip().lower()
+            starred = name.endswith("*")
+            if starred:
                 # https://tools.ietf.org/html/rfc2231#section-4
                 name = name[:-1]
-                if p.count("'") == 2:
+                if param.count("'") == 2:
                     has_encoding = True
-            value = p[i + 1 :].strip()
+            value = param[eq_idx + 1 :].strip()
             if len(value) >= 2 and value[0] == value[-1] == '"':
                 value = value[1:-1]
                 value = value.replace("\\\\", "\\").replace('\\"', '"')
+            # RFC 2231 §4.1: only continuation params still contain * after
+            # the trailing * is stripped; skip the regex for everything else.
+            if "*" in name and (match := _RFC2231_CONTINUATION_RE.search(name)):
+                if base := name[: match.start()]:
+                    seg_str = match.group(1)
+                    if len(seg_str) > 1 and seg_str[0] == "0":
+                        # Leading zeros (e.g. *01) are invalid per RFC 2231.
+                        malformed_continuations.add(base)
+                    else:
+                        continuations.setdefault(base, {})[int(seg_str)] = (
+                            starred,
+                            value,
+                        )
+                    continue
             if has_encoding:
                 encoding, lang, value = value.split("'")
                 try:
@@ -401,6 +421,52 @@ def parse_header_parameters(line, max_length=MAX_HEADER_LENGTH):
                     msg = f"Invalid encoding {encoding!r} for RFC 2231 param."
                     raise ValueError(msg)
             pdict[name] = value
+    for base, segments in continuations.items():
+        sorted_segs = sorted(segments)
+        # Skip invalid groups: leading-zero segment, missing seg 0, or gaps.
+        if base in malformed_continuations or sorted_segs != list(
+            range(len(sorted_segs))
+        ):
+            logger.debug("Skipping malformed RFC 2231 continuation for %r.", base)
+            continue
+        charset = None
+        # Collect (is_encoded, raw_value); join encoded parts before decoding.
+        parts = []
+        for seg_num in sorted_segs:
+            is_starred, value = segments[seg_num]
+            if not is_starred:
+                parts.append((False, value))
+                continue
+            if seg_num == 0 and value.count("'") >= 2:
+                charset, _, value = value.split("'", 2)
+                charset = charset or None
+            parts.append((True, value))
+        if not charset:
+            pdict[base] = "".join(val for _, val in parts)
+            continue
+        # Join encoded parts before decoding; multi-byte sequences may
+        # span segments.
+        result = []
+        encoded_buf = []
+        for is_encoded, value in parts:
+            if is_encoded:
+                encoded_buf.append(value)
+                continue
+            if encoded_buf:
+                try:
+                    result.append(unquote("".join(encoded_buf), encoding=charset))
+                except (LookupError, UnicodeDecodeError):
+                    raise ValueError(
+                        f"Invalid encoding {charset!r} for RFC 2231 param."
+                    )
+                encoded_buf = []
+            result.append(value)
+        if encoded_buf:
+            try:
+                result.append(unquote("".join(encoded_buf), encoding=charset))
+            except (LookupError, UnicodeDecodeError):
+                raise ValueError(f"Invalid encoding {charset!r} for RFC 2231 param.")
+        pdict[base] = "".join(result)
     return key, pdict
 
 
