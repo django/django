@@ -1617,11 +1617,15 @@ customize the yielded 2-tuple choices.
 
     ``ModelChoiceIterator`` has the following method:
 
-    .. method:: __iter__()
+    .. method:: generator()
 
         Yields 2-tuple choices, in the ``(value, label)`` format used by
         :attr:`ChoiceField.choices`. The first ``value`` element is a
         :class:`ModelChoiceIteratorValue` instance.
+
+    .. versionchanged:: 6.1
+
+        ``generator`` yields choices instead of ``__iter__``.
 
 ``ModelChoiceIteratorValue``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
