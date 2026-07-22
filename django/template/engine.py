@@ -29,6 +29,7 @@ class Engine:
         libraries=None,
         builtins=None,
         autoescape=True,
+        raise_on_missing_variable=False,
     ):
         if dirs is None:
             dirs = []
@@ -61,6 +62,7 @@ class Engine:
         self.template_libraries = self.get_template_libraries(libraries)
         self.builtins = self.default_builtins + builtins
         self.template_builtins = self.get_template_builtins(self.builtins)
+        self.raise_on_missing_variable = raise_on_missing_variable
 
     def __repr__(self):
         return (
