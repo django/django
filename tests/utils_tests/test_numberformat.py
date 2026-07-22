@@ -42,6 +42,9 @@ class TestNumberFormat(SimpleTestCase):
             "10comma000",
         )
 
+    def test_empty_string(self):
+        self.assertEqual(nformat("", "."), "")
+
     def test_large_number(self):
         most_max = (
             "{}179769313486231570814527423731704356798070567525844996"

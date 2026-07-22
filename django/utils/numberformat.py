@@ -68,7 +68,7 @@ def format(
             str_number = "{:f}".format(number)
     else:
         str_number = str(number)
-    if str_number[0] == "-":
+    if str_number and str_number[0] == "-":
         sign = "-"
         str_number = str_number[1:]
     # decimal part
