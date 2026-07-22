@@ -387,6 +387,9 @@ Tests
   Previously, they would consume the streaming response's content, causing
   subsequent calls to fail.
 
+* The Oracle database backend now supports running tests in parallel with the
+  :option:`test --parallel` option.
+
 Utilities
 ~~~~~~~~~
 
