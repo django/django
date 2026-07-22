@@ -1099,3 +1099,24 @@ class ModelRefreshTests(TestCase):
         with self.assertNumQueries(1):
             a.refresh_from_db(fields=["headline"], from_queryset=from_queryset)
             self.assertEqual(a.headline, headline)
+
+    def test_refresh_copies_fetch_mode_from_plucked_instance(self):
+        a = Article.objects.create(pub_date=datetime.now())
+        fa = FeaturedArticle.objects.fetch_mode(models.FETCH_PEERS).create(article=a)
+
+        from_queryset = FeaturedArticle.objects.fetch_mode(models.RAISE).select_related(
+            "article"
+        )
+        fa.refresh_from_db(from_queryset=from_queryset)
+        self.assertEqual(fa._state.fetch_mode, models.FETCH_PEERS)
+        self.assertEqual(fa.article._state.fetch_mode, models.RAISE)
+
+    def test_refresh_ignores_fetch_mode_if_no_instance_plucked(self):
+        a = Article.objects.create(pub_date=datetime.now())
+        fa = FeaturedArticle.objects.fetch_mode(models.FETCH_PEERS).create(article=a)
+
+        # This queryset's fetch mode is not used because no fields are plucked.
+        from_queryset = FeaturedArticle.objects.fetch_mode(models.RAISE)
+        fa.refresh_from_db(from_queryset=from_queryset)
+        self.assertEqual(fa._state.fetch_mode, models.FETCH_PEERS)
+        self.assertEqual(fa.article._state.fetch_mode, models.FETCH_PEERS)
