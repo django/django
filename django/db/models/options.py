@@ -31,34 +31,55 @@ IMMUTABLE_WARNING = (
     "list for your own use, make a copy first."
 )
 
-DEFAULT_NAMES = (
-    "verbose_name",
-    "verbose_name_plural",
-    "db_table",
-    "db_table_comment",
-    "ordering",
-    "unique_together",
-    "permissions",
-    "get_latest_by",
-    "order_with_respect_to",
-    "app_label",
-    "db_tablespace",
-    "abstract",
-    "managed",
-    "proxy",
-    "swappable",
-    "auto_created",
-    "apps",
-    "default_permissions",
-    "select_on_save",
-    "default_related_name",
-    "required_db_features",
-    "required_db_vendor",
-    "base_manager_name",
-    "default_manager_name",
-    "indexes",
-    "constraints",
-)
+
+class OptionAttributes:
+    def __init__(self):
+        self.extra = tuple()
+
+    def update(self, names):
+        self.extra = self.extra + tuple(
+            name for name in names if name not in self.extra
+        )
+
+    @property
+    def defaults(self):
+        return (
+            "verbose_name",
+            "verbose_name_plural",
+            "db_table",
+            "db_table_comment",
+            "ordering",
+            "unique_together",
+            "permissions",
+            "get_latest_by",
+            "order_with_respect_to",
+            "app_label",
+            "db_tablespace",
+            "abstract",
+            "managed",
+            "proxy",
+            "swappable",
+            "auto_created",
+            "apps",
+            "default_permissions",
+            "select_on_save",
+            "default_related_name",
+            "required_db_features",
+            "required_db_vendor",
+            "base_manager_name",
+            "default_manager_name",
+            "indexes",
+            "constraints",
+        )
+
+    def __iter__(self):
+        return iter(self.defaults + self.extra)
+
+    def len(self):
+        return len(self.defaults + self.extra)
+
+
+DEFAULT_NAMES = OptionAttributes()
 
 
 def normalize_together(option_together):
