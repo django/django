@@ -155,7 +155,10 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* New hooks were added to :class:`~django.forms.models.BaseModelFormSet` and
+  :class:`~django.forms.models.BaseInlineFormSet` to allow custom subclasses to
+  utilize :meth:`~django.db.models.query.QuerySet.prefetch_related`.
+  See :ref:`inline-formset-interaction-with-prefetching` for more details.
 
 Generic Views
 ~~~~~~~~~~~~~
