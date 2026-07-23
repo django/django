@@ -3,6 +3,7 @@ Tests for geography support in PostGIS
 """
 
 import os
+import unittest
 
 from django.contrib.gis.db import models
 from django.contrib.gis.db.models.functions import Area, Distance
@@ -17,6 +18,10 @@ from ..utils import FuncTestMixin
 from .models import City, CityUnique, County, Zipcode
 
 
+@unittest.skipIf(
+    connection.vendor == "mysql" and connection.mysql_is_mariadb,
+    "MariaDB doesn't support spatial reference system tables required for these tests",
+)
 class GeographyTest(TestCase):
     fixtures = ["initial"]
 
@@ -115,6 +120,10 @@ class GeographyTest(TestCase):
             self.assertEqual(state, c.state)
 
 
+@unittest.skipIf(
+    connection.vendor == "mysql" and connection.mysql_is_mariadb,
+    "MariaDB doesn't support spatial reference system tables required for these tests",
+)
 class GeographyFunctionTests(FuncTestMixin, TestCase):
     fixtures = ["initial"]
 

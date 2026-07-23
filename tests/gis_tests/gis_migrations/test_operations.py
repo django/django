@@ -1,3 +1,4 @@
+import unittest
 from unittest import skipUnless
 
 from django.contrib.gis.db.models import fields
@@ -15,6 +16,10 @@ except NotImplementedError:
     HAS_GEOMETRY_COLUMNS = False
 
 
+@unittest.skipIf(
+    connection.vendor == "mysql" and connection.mysql_is_mariadb,
+    "MariaDB doesn't support spatial reference system tables required for these tests",
+)
 class OperationTestCase(TransactionTestCase):
     available_apps = ["gis_tests.gis_migrations"]
     get_opclass_query = """
