@@ -544,6 +544,7 @@ def formset_factory(
     absolute_max=None,
     can_delete_extra=True,
     renderer=None,
+    auto_id="id_%s",
 ):
     """Return a FormSet for the given form class."""
     if min_num is None:
@@ -569,6 +570,7 @@ def formset_factory(
         "validate_min": validate_min,
         "validate_max": validate_max,
         "renderer": renderer,
+        "auto_id": auto_id,
     }
     form_name = form.__name__
     if form_name.endswith("Form"):
