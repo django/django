@@ -85,6 +85,16 @@ class Vegetable(models.Model):
         return self.name
 
 
+class DoNothingVegetable(models.Model):
+    name = models.CharField(max_length=150)
+    is_yucky = models.BooleanField(default=True)
+
+    tags = GenericRelation(TaggedItem, on_delete=models.DO_NOTHING)
+
+    def __str__(self):
+        return self.name
+
+
 class Carrot(Vegetable):
     pass
 
