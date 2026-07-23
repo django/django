@@ -3,7 +3,7 @@ from unittest import skipUnless
 from django.contrib.gis.db.models import fields
 from django.contrib.gis.geos import MultiPolygon, Polygon
 from django.core.exceptions import ImproperlyConfigured
-from django.db import connection, migrations, models
+from django.db import DataError, connection, migrations, models
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
 from django.test import TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
@@ -415,6 +415,37 @@ class OperationTests(OperationTestCase):
                 Neighborhood._meta.db_table,
             )
             self.assertIn("geom_within_constraint", constraints)
+
+    @skipUnless(connection.vendor == "postgresql", "PostGIS-specific tests.")
+    def test_add_geography_field_with_geographic_srid(self):
+        self.alter_gis_model(
+            migrations.AddField,
+            "Neighborhood",
+            "path_1",
+            fields.LineStringField,
+            {"geography": True, "srid": 4326},
+        )
+        self.assertColumnExists("gis_neighborhood", "path_1")
+
+        self.alter_gis_model(
+            migrations.AddField,
+            "Neighborhood",
+            "path_2",
+            fields.LineStringField,
+            {"geography": True, "srid": 4674},
+        )
+        self.assertColumnExists("gis_neighborhood", "path_2")
+
+    @skipUnless(connection.vendor == "postgresql", "PostGIS-specific tests.")
+    def test_add_geography_field_with_non_geographic_srid(self):
+        with self.assertRaises(DataError):
+            self.alter_gis_model(
+                migrations.AddField,
+                "Neighborhood",
+                "path",
+                fields.LineStringField,
+                {"geography": True, "srid": 3857},
+            )
 
 
 @skipIfDBFeature("supports_raster")

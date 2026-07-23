@@ -221,7 +221,12 @@ details.
 
 .. note::
 
-    Geography support is limited to PostGIS and will force the SRID to be 4326.
+    Geography support is limited to PostGIS.
+
+.. versionchanged:: 6.2
+
+    In older versions, Django strictly enforced an SRID of 4326 for all
+    geography fields on PostGIS. It now supports any valid geographic SRID.
 
 .. _geography-type:
 
