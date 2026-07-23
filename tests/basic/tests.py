@@ -1099,3 +1099,16 @@ class ModelRefreshTests(TestCase):
         with self.assertNumQueries(1):
             a.refresh_from_db(fields=["headline"], from_queryset=from_queryset)
             self.assertEqual(a.headline, headline)
+
+    def test_refresh_does_not_copy_fetch_mode_to_plucked_instances(self):
+        a = Article.objects.fetch_mode(models.FETCH_PEERS).create(
+            pub_date=datetime.now()
+        )
+        FeaturedArticle.objects.create(article=a)
+        from_queryset = Article.objects.select_related("featured")
+        a.refresh_from_db(fields=["featured"], from_queryset=from_queryset)
+        self.assertEqual(a._state.fetch_mode, models.FETCH_PEERS)
+        # Copying FETCH_ONE from from_queryset to a.featured would be an
+        # unintentional performance downgrade, avoidable only by knowing to do:
+        # from_queryset = Article.objects.fetch_mode(a._state.fetch_mode)
+        self.assertEqual(a.featured._state.fetch_mode, models.FETCH_PEERS)
