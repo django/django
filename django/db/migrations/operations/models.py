@@ -148,6 +148,27 @@ class CreateModel(ModelOperation):
                 return True
         return False
 
+    def reduce_related(self, operation, app_label):
+        if isinstance(operation, RenameModel):
+            impacted_fields = []
+            not_impacted_fields = []
+            remote_field_old_model = f"{app_label}.{operation.old_name_lower}"
+            remote_field_new_model = f"{app_label}.{operation.new_name_lower}"
+            for _, field in self.fields:
+                if (
+                    field.remote_field
+                    and field.remote_field.model == remote_field_old_model
+                ):
+                    name, path, args, kwargs = field.deconstruct()
+                    kwargs["to"] = remote_field_new_model
+                    impacted_field = field.__class__(*args, **kwargs)
+                    impacted_fields.append((_, impacted_field))
+                else:
+                    not_impacted_fields.append((_, field))
+
+            return [replace(self, fields=not_impacted_fields + impacted_fields)]
+        return super().reduce_related(operation, app_label)
+
     def reduce(self, operation, app_label):
         if (
             isinstance(operation, DeleteModel)
