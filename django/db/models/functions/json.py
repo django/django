@@ -69,10 +69,21 @@ class JSONObject(Func):
     function = "JSON_OBJECT"
     output_field = JSONField()
 
-    def __init__(self, **fields):
-        expressions = []
-        for key, value in fields.items():
-            expressions.extend((Value(key), value))
+    def __init__(self, *expressions, **kwargs):
+        if len(expressions) > 0:
+            if kwargs:
+                raise TypeError(
+                    "JSONObject() accepts keyword arguments or positional arguments, "
+                    "not both."
+                )
+            if len(expressions) % 2 != 0:
+                raise ValueError(
+                    "JSONObject() must have an even number of positional arguments."
+                )
+        else:
+            expressions = []
+            for key, value in kwargs.items():
+                expressions.extend((Value(key), value))
         super().__init__(*expressions)
 
     def as_sql(self, compiler, connection, **extra_context):
