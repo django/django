@@ -1221,6 +1221,15 @@ Prints the SQL for the named migration. This requires an active database
 connection, which it will use to resolve constraint names; this means you must
 generate the SQL against a copy of the database you wish to later apply it on.
 
+When a migration drops or alters an existing constraint or index, Django
+inspects the target database to find the on-disk name rather than recomputing
+it. Constraint and index names depend on the database's history: prior model
+renames do not rename the underlying indexes and constraints, and Django's
+name-generation rules have changed across versions. As a result, names aren't
+always reproducible from the current model state, and ``sqlmigrate`` output is
+only valid against a database whose schema matches the state immediately
+before ``migration_name`` would be applied.
+
 Note that ``sqlmigrate`` doesn't colorize its output.
 
 .. django-admin-option:: --backwards
