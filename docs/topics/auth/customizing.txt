@@ -613,6 +613,19 @@ password resets. You must then provide some key implementation details:
             model, but should *not* contain the ``USERNAME_FIELD`` or
             ``password`` as these fields will always be prompted for.
 
+        .. note::
+
+            If ``REQUIRED_FIELDS`` contains a
+            :class:`~django.db.models.ForeignKey`, the
+            :djadmin:`createsuperuser` prompt will ask for the value of the
+            :attr:`~django.db.models.ForeignKey.to_field` (the
+            :attr:`~django.db.models.Field.primary_key` by default) of an
+            existing instance. You must define a custom manager with a
+            ``create_superuser()`` that resolves this raw value into the
+            required model instance. See
+            :meth:`~models.CustomUserManager.create_superuser` for an
+            example.
+
     .. attribute:: is_active
 
         A boolean attribute that indicates whether the user is considered
@@ -782,7 +795,29 @@ methods:
 For a :class:`~.ForeignKey` in :attr:`.USERNAME_FIELD` or
 :attr:`.REQUIRED_FIELDS`, these methods receive the value of the
 :attr:`~.ForeignKey.to_field` (the :attr:`~django.db.models.Field.primary_key`
-by default) of an existing instance.
+by default) of an existing instance. You must resolve this raw value into the
+required model instance yourself. For example, if your user model has a
+``ForeignKey`` to a ``Company`` model in ``REQUIRED_FIELDS``::
+
+    class MyUserManager(BaseUserManager):
+        def create_user(self, email, company, password=None):
+            company_instance = Company.objects.get(pk=company)
+            user = self.model(email=email, company=company_instance)
+            user.set_password(password)
+            user.save(using=self._db)
+            return user
+
+        def create_superuser(self, email, company, password=None):
+            company_instance = Company.objects.get(pk=company)
+            user = self.model(email=email, company=company_instance)
+            user.set_password(password)
+            user.is_admin = True
+            user.save(using=self._db)
+            return user
+
+Without this, ``createsuperuser`` will pass the raw primary key value (e.g.
+a string) directly to ``self.model()``, causing a ``ValueError`` since Django
+expects a model instance for ``ForeignKey`` fields.
 
 :class:`~django.contrib.auth.models.BaseUserManager` provides the following
 utility methods:
