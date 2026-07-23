@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.forms import ChoiceField, Form
+from django.forms import ChoiceField, Form, RadioSelect
 from django.test import SimpleTestCase
 
 from . import FormFieldAssertionsMixin
@@ -148,3 +148,46 @@ class ChoiceFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         msg = "'Select a valid choice. 3 is not one of the available choices.'"
         with self.assertRaisesMessage(ValidationError, msg):
             f.clean("3")
+
+    def test_choicefield_adds_required_and_id_attributes(self):
+        class MyForm(Form):
+            select = ChoiceField(
+                choices=((None, "---"), ("1", "1"), ("2", "2")),
+                widget=RadioSelect(option_attrs={"option-attr": "test"}),
+            )
+
+        form = MyForm()
+        self.maxDiff = None
+        self.assertHTMLEqual(
+            str(form),
+            """
+            <div>
+            <fieldset>
+            <legend>Select:</legend>
+            <div id="id_select">
+            <div>
+            <label for="id_select_0">
+            <input type="radio" name="select" value="" required id="id_select_0"
+            option-attr="test" checked>
+                ---
+            </label>
+            </div>
+            <div>
+            <label for="id_select_1">
+            <input type="radio" name="select" value="1" required id="id_select_1"
+            option-attr="test">
+                1
+            </label>
+            </div>
+            <div>
+            <label for="id_select_2">
+            <input type="radio" name="select" value="2" required id="id_select_2"
+            option-attr="test">
+                2
+            </label>
+            </div>
+            </div>
+            </fieldset>
+            </div>
+            """,
+        )
