@@ -64,7 +64,7 @@ class TestUUID(TestCase):
             else:
                 msg = "UUID4 is not supported on MySQL."
         elif connection.vendor == "oracle":
-            msg = "UUID4 requires Oracle version 23ai/26ai (23.9) or later."
+            msg = "UUID4 requires Oracle version 23ai/26ai (23.26.2) or later."
         else:
             msg = "UUID4 is not supported on this database backend."
 

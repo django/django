@@ -1950,7 +1950,7 @@ generated using a cryptographically secure method.
 .. admonition:: Availability
 
     Available on PostgreSQL, SQLite, MariaDB version 11.7 or later, and Oracle
-    23ai/26ai (23.9) or later.
+    23ai/26ai (23.26.2) or later.
 
 ``UUID7``
 ---------
