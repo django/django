@@ -306,3 +306,14 @@ Miscellaneous
   providing a ``chunk_size`` is deprecated. It currently falls back to a
   ``chunk_size`` of 2000, but a ``ValueError`` will be raised in
   Django 7.1.
+
+* Omitting the ``tzinfo`` argument of
+  :class:`~django.db.models.functions.Extract` and
+  :class:`~django.db.models.functions.Trunc` database functions when used in
+  migrations (for example as a
+  :attr:`db_default <django.db.models.Field.db_default>`) and :setting:`USE_TZ`
+  is ``True`` is deprecated. The timezone information is not captured during
+  migration serialization, which can lead to inconsistent behavior if
+  :setting:`TIME_ZONE` changes. Pass the ``tzinfo`` argument explicitly to
+  suppress this warning. In Django 7.1, the current timezone will be captured
+  automatically when ``tzinfo`` is omitted.
