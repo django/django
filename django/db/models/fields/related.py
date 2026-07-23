@@ -1354,13 +1354,24 @@ class OneToOneField(ForeignKey):
     one_to_many = False
     one_to_one = True
 
+    class RelatedDefaultRaiseException:
+        pass
+
     related_accessor_class = ReverseOneToOneDescriptor
     forward_related_accessor_class = ForwardOneToOneDescriptor
     rel_class = OneToOneRel
 
     description = _("One-to-one relationship")
 
-    def __init__(self, to, on_delete, to_field=None, **kwargs):
+    def __init__(
+        self,
+        to,
+        on_delete,
+        to_field=None,
+        related_default=RelatedDefaultRaiseException,
+        **kwargs,
+    ):
+        self.related_default = related_default
         kwargs["unique"] = True
         super().__init__(to, on_delete, to_field=to_field, **kwargs)
 

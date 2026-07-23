@@ -539,10 +539,18 @@ class ReverseOneToOneDescriptor:
             self.related.set_cached_value(instance, rel_obj)
 
         if rel_obj is None:
-            raise self.RelatedObjectDoesNotExist(
-                "%s has no %s."
-                % (instance.__class__.__name__, self.related.accessor_name)
-            )
+            if (
+                self.related.field.related_default
+                == self.related.field.RelatedDefaultRaiseException
+            ):
+                raise self.RelatedObjectDoesNotExist(
+                    "%s has no %s."
+                    % (instance.__class__.__name__, self.related.accessor_name)
+                )
+            elif callable(self.related.field.related_default):
+                return self.related.field.related_default.__call__()
+            else:
+                return self.related.field.related_default
         else:
             return rel_obj
 
