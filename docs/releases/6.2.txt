@@ -210,7 +210,8 @@ Security
 Serialization
 ~~~~~~~~~~~~~
 
-* ...
+* The new :ref:`model field serializers API <model-field-serializers>` allows
+  advanced customization of serialization and deserialization.
 
 Signals
 ~~~~~~~
