@@ -654,7 +654,41 @@ class Query(BaseExpression):
         Perform a COUNT() query using the current filter constraints.
         """
         obj = self.clone()
+        if obj.distinct and obj._distinct_is_redundant_for_count():
+            obj.distinct = False
         return obj.get_aggregation(using, {"__count": Count("*")})["__count"]
+
+    def _distinct_is_redundant_for_count(self):
+        """
+        Return whether distinct() can be elided for count().
+
+        This deliberately handles only base-table row counts where selected
+        results are guaranteed unique by the non-null model primary key. More
+        complex cases, such as joins and annotations, still need the existing
+        DISTINCT subquery to preserve result semantics.
+        """
+        if (
+            self.distinct_fields
+            or self.is_sliced
+            or self.combinator
+            or self.group_by is not None
+            or self.annotations
+            or self.extra
+            or self.extra_tables
+            or self.extra_order_by
+            or self.select_related
+            or self._filtered_relations
+            or self.contains_subquery
+            or self.where.contains_aggregate
+            or self.where.contains_over_clause
+            or self.model._meta.is_composite_pk
+            or self.count_active_tables() > 1
+        ):
+            return False
+        if self.default_cols:
+            return True
+        pk = self.model._meta.pk
+        return any(isinstance(expr, Col) and expr.target == pk for expr in self.select)
 
     def has_filters(self):
         return self.where

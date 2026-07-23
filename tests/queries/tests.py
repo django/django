@@ -1420,6 +1420,63 @@ class Queries2Tests(TestCase):
             [self.num8],
         )
 
+    def assertDistinctCountElided(self, queryset, expected):
+        with CaptureQueriesContext(connection) as captured_queries:
+            self.assertEqual(queryset.count(), expected)
+        sql = captured_queries[0]["sql"].lower()
+        self.assertIn("count(*)", sql)
+        self.assertNotIn("select distinct", sql)
+
+    def assertDistinctCountPreserved(self, queryset, expected):
+        with CaptureQueriesContext(connection) as captured_queries:
+            self.assertEqual(queryset.count(), expected)
+        self.assertIn("select distinct", captured_queries[0]["sql"].lower())
+
+    def test_distinct_count_elides_redundant_distinct_for_base_table(self):
+        self.assertDistinctCountElided(Number.objects.distinct(), 3)
+
+    def test_distinct_count_elides_redundant_distinct_when_pk_selected(self):
+        self.assertDistinctCountElided(Number.objects.values("id", "num").distinct(), 3)
+
+    def test_distinct_count_keeps_distinct_when_pk_not_selected(self):
+        Number.objects.create(num=4)
+        self.assertDistinctCountPreserved(Number.objects.values("num").distinct(), 3)
+
+    def test_distinct_count_keeps_distinct_for_multivalued_joins(self):
+        tag1 = Tag.objects.create(name="t1")
+        tag2 = Tag.objects.create(name="t2")
+        note = Note.objects.create(note="n1", misc="m1")
+        extra = ExtraInfo.objects.create(info="e1", note=note)
+        author = Author.objects.create(name="a1", num=1, extra=extra)
+        item = Item.objects.create(
+            name="i1",
+            created=datetime.datetime(2026, 1, 1),
+            creator=author,
+            note=note,
+        )
+        item.tags.add(tag1, tag2)
+
+        self.assertDistinctCountPreserved(
+            Item.objects.filter(tags__in=[tag1, tag2]).distinct(),
+            1,
+        )
+
+    def test_distinct_count_keeps_distinct_for_reverse_fk_joins(self):
+        report = Report.objects.create(name="r1")
+        ReportComment.objects.create(report=report)
+        ReportComment.objects.create(report=report)
+
+        self.assertDistinctCountPreserved(
+            Report.objects.filter(reportcomment__isnull=False).distinct(),
+            1,
+        )
+
+    def test_distinct_count_keeps_distinct_for_annotations(self):
+        self.assertDistinctCountPreserved(
+            Number.objects.annotate(negated_num=-F("num")).distinct(),
+            3,
+        )
+
     def test_ticket12239(self):
         # Custom lookups are registered to round float values correctly on gte
         # and lt IntegerField queries.
