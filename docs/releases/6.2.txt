@@ -195,7 +195,10 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* :meth:`.Model.validate_unique` and :meth:`.Model.full_clean` now accept a
+  ``using`` argument, and default to the database that would be used by
+  :meth:`.Model.save`, rather than always checking uniqueness against the
+  default database (:ticket:`15130`).
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

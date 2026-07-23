@@ -23,7 +23,6 @@ from django.core.exceptions import (
 from django.db import (
     DJANGO_VERSION_PICKLE_KEY,
     DatabaseError,
-    connection,
     connections,
     router,
     transaction,
@@ -1455,15 +1454,17 @@ class Model(AltersData, metaclass=ModelBase):
         """
         pass
 
-    def validate_unique(self, exclude=None):
+    def validate_unique(self, exclude=None, using=None):
         """
         Check unique constraints on the model and raise ValidationError if any
         failed.
         """
+        if using is None:
+            using = router.db_for_write(self.__class__, instance=self)
         unique_checks, date_checks = self._get_unique_checks(exclude=exclude)
 
-        errors = self._perform_unique_checks(unique_checks)
-        date_errors = self._perform_date_checks(date_checks)
+        errors = self._perform_unique_checks(unique_checks, using=using)
+        date_errors = self._perform_date_checks(date_checks, using=using)
 
         for k, v in date_errors.items():
             errors.setdefault(k, []).extend(v)
@@ -1539,7 +1540,9 @@ class Model(AltersData, metaclass=ModelBase):
                     date_checks.append((model_class, "month", name, f.unique_for_month))
         return unique_checks, date_checks
 
-    def _perform_unique_checks(self, unique_checks):
+    def _perform_unique_checks(self, unique_checks, using=None):
+        if using is None:
+            using = router.db_for_write(self.__class__, instance=self)
         errors = {}
 
         for model_class, unique_check in unique_checks:
@@ -1550,10 +1553,9 @@ class Model(AltersData, metaclass=ModelBase):
             for field_name in unique_check:
                 f = self._meta.get_field(field_name)
                 lookup_value = getattr(self, f.attname)
-                # TODO: Handle multiple backends with different feature flags.
                 if lookup_value is None or (
                     lookup_value == ""
-                    and connection.features.interprets_empty_strings_as_nulls
+                    and connections[using].features.interprets_empty_strings_as_nulls
                 ):
                     # no value, skip the lookup
                     continue
@@ -1566,7 +1568,7 @@ class Model(AltersData, metaclass=ModelBase):
             if len(unique_check) != len(lookup_kwargs):
                 continue
 
-            qs = model_class._default_manager.filter(**lookup_kwargs)
+            qs = model_class._default_manager.using(using).filter(**lookup_kwargs)
 
             # Exclude the current object from the query if we are editing an
             # instance (as opposed to creating a new one)
@@ -1588,7 +1590,9 @@ class Model(AltersData, metaclass=ModelBase):
 
         return errors
 
-    def _perform_date_checks(self, date_checks):
+    def _perform_date_checks(self, date_checks, using=None):
+        if using is None:
+            using = router.db_for_write(self.__class__, instance=self)
         errors = {}
         for model_class, lookup_type, field, unique_for in date_checks:
             lookup_kwargs = {}
@@ -1607,7 +1611,7 @@ class Model(AltersData, metaclass=ModelBase):
                 )
             lookup_kwargs[field] = getattr(self, field)
 
-            qs = model_class._default_manager.filter(**lookup_kwargs)
+            qs = model_class._default_manager.using(using).filter(**lookup_kwargs)
             # Exclude the current object from the query if we are editing an
             # instance (as opposed to creating a new one)
             if not self._state.adding and self._is_pk_set():
@@ -1695,7 +1699,9 @@ class Model(AltersData, metaclass=ModelBase):
         if errors:
             raise ValidationError(errors)
 
-    def full_clean(self, exclude=None, validate_unique=True, validate_constraints=True):
+    def full_clean(
+        self, exclude=None, validate_unique=True, validate_constraints=True, using=None
+    ):
         """
         Call clean_fields(), clean(), validate_unique(), and
         validate_constraints() on the model. Raise a ValidationError for any
@@ -1725,7 +1731,7 @@ class Model(AltersData, metaclass=ModelBase):
                 if name != NON_FIELD_ERRORS and name not in exclude:
                     exclude.add(name)
             try:
-                self.validate_unique(exclude=exclude)
+                self.validate_unique(exclude=exclude, using=using)
             except ValidationError as e:
                 errors = e.update_error_dict(errors)
 

@@ -7,6 +7,7 @@ from unittest.mock import Mock
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
+from django.core.exceptions import ValidationError
 from django.db import DEFAULT_DB_ALIAS, router, transaction
 from django.db.models import signals
 from django.db.utils import ConnectionRouter
@@ -798,6 +799,22 @@ class QueryTestCase(TestCase):
         mickey = Person.objects.create(name="Mickey")
         owner_field = Pet._meta.get_field("owner")
         self.assertEqual(owner_field.clean(mickey.pk, None), mickey.pk)
+
+    def test_validate_unique_uses_correct_database(self):
+        "Model.validate_unique() checks uniqueness against the right database"
+        Person.objects.using("default").create(name="Anne")
+
+        # A person with the same name doesn't conflict when validated against
+        # "other", where no such person exists (the bug: this used to always
+        # raise, because the check always hit "default").
+        Person(name="Anne").full_clean(using="other")
+
+        # The same, unsaved instance still correctly raises when explicitly
+        # validated against the database that does have the duplicate.
+        with self.assertRaises(ValidationError):
+            Person(name="Anne").full_clean(using="default")
+        with self.assertRaises(ValidationError):
+            Person(name="Anne").validate_unique(using="default")
 
     def test_o2o_separation(self):
         "OneToOne fields are constrained to a single database"

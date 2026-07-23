@@ -519,7 +519,9 @@ class BaseModelForm(BaseForm, AltersData):
         """
         exclude = self._get_validation_exclusions()
         try:
-            self.instance.validate_unique(exclude=exclude)
+            self.instance.validate_unique(
+                exclude=exclude, using=self.instance._state.db
+            )
         except ValidationError as e:
             self._update_errors(e)
 

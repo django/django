@@ -255,7 +255,7 @@ need to call a model's :meth:`~Model.full_clean` method if you plan to handle
 validation errors yourself, or if you have excluded fields from the
 :class:`~django.forms.ModelForm` that require validation.
 
-.. method:: Model.full_clean(exclude=None, validate_unique=True, validate_constraints=True)
+.. method:: Model.full_clean(exclude=None, validate_unique=True, validate_constraints=True, using=None)
 
 This method calls :meth:`Model.clean_fields`, :meth:`Model.clean`,
 :meth:`Model.validate_unique` (if ``validate_unique`` is ``True``),  and
@@ -268,6 +268,10 @@ names that can be excluded from validation and cleaning.
 :class:`~django.forms.ModelForm` uses this argument to exclude fields that
 aren't present on your form from being validated since any errors raised could
 not be corrected by the user.
+
+The optional ``using`` argument specifies the database alias used to check
+uniqueness during :meth:`Model.validate_unique`. If not provided, it defaults
+to the database that :meth:`Model.save` would use.
 
 Note that ``full_clean()`` will *not* be called automatically when you call
 your model's :meth:`~Model.save` method. You'll need to call it manually
@@ -394,7 +398,7 @@ Then, ``full_clean()`` will check unique constraints on your model.
                             }
                         )
 
-.. method:: Model.validate_unique(exclude=None)
+.. method:: Model.validate_unique(exclude=None, using=None)
 
 This method is similar to :meth:`~Model.clean_fields`, but validates
 uniqueness constraints defined via :attr:`.Field.unique`,
@@ -404,6 +408,12 @@ uniqueness constraints defined via :attr:`.Field.unique`,
 field values. The optional ``exclude`` argument allows you to provide a ``set``
 of field names to exclude from validation. It will raise a
 :exc:`~django.core.exceptions.ValidationError` if any fields fail validation.
+
+The optional ``using`` argument specifies the database alias to query when
+checking for existing records with conflicting values. If not provided, it
+defaults to the database that would be chosen by the :ref:`database router
+<topics-db-multi-db-routing>` for a write of this instance (the same database
+:meth:`Model.save` would use).
 
 :class:`~django.db.models.UniqueConstraint`\s defined in the
 :attr:`Meta.constraints <django.db.models.Options.constraints>` are validated
