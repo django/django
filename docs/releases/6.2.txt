@@ -225,7 +225,8 @@ Tasks
 Templates
 ~~~~~~~~~
 
-* ...
+* The :ttag:`now` template tag now supports passing a template variable as
+  the format-string.
 
 Tests
 ~~~~~
