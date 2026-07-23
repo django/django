@@ -96,6 +96,8 @@ class SchemaIndexesTests(TransactionTestCase):
 
     @skipUnlessDBFeature("supports_tablespaces")
     def test_tablespace(self):
+        if not self.has_spatial_indexes(City._meta.db_table):
+            self.skipTest("Spatial indexes in Meta.indexes are not supported.")
         index_name = "city_point_partial_tblspce_idx"
         index = Index(
             name=index_name,
