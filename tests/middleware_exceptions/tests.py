@@ -1,7 +1,14 @@
+from contextlib import nullcontext
+from unittest import mock
+
+from asgiref.sync import sync_to_async
+
 from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
 from django.http import HttpResponse
-from django.test import RequestFactory, SimpleTestCase, override_settings
+from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
+from django.utils.deprecation import MiddlewareMixin
+from django.utils.module_loading import import_string
 
 from . import middleware as mw
 
@@ -344,6 +351,76 @@ class MiddlewareSyncAsyncTests(SimpleTestCase):
         response = self.client.get("/middleware_exceptions/view/")
         self.assertEqual(response.content, b"OK")
         self.assertEqual(response.status_code, 200)
+
+
+@override_settings(
+    DEBUG=True,
+    ROOT_URLCONF="middleware_exceptions.urls",
+)
+class MiddlewareSyncAsyncTransitionTests(TestCase):
+    async def test_sync_middleware_adaptation_grouping(self):
+        real_acall = MiddlewareMixin.__acall__
+
+        async def spy_acall(self, request):
+            return await real_acall(self, request)
+
+        with (
+            # This middleware requires a second adaptation for process_view(),
+            # making it a little harder to see what's happening.
+            self.modify_settings(
+                MIDDLEWARE={"remove": "django.middleware.csrf.CsrfViewMiddleware"}
+            ),
+            mock.patch.object(
+                MiddlewareMixin,
+                "__acall__",
+                autospec=True,
+                side_effect=spy_acall,
+            ) as acall,
+        ):
+            with mock.patch(
+                "django.core.handlers.base.sync_to_async", wraps=sync_to_async
+            ) as base_adapter:
+                self.async_client.handler.load_middleware(is_async=True)
+            # Exit the mock of sync_to_async before issuing a request.
+            await self.async_client.get("/middleware_exceptions/async_view/")
+
+        # No sync-to-async adaptation via MiddlewareMixin.__acall__().
+        acall.assert_not_called()
+        # O(1) sync-to-async adaptation via BaseHandler.
+        self.assertEqual(base_adapter.call_count, 1)
+
+    async def test_sync_middleware_adaptation_grouping_isolation(self):
+        for middleware in [
+            # From startproject template.
+            "django.middleware.security.SecurityMiddleware",
+            "django.contrib.sessions.middleware.SessionMiddleware",
+            "django.middleware.common.CommonMiddleware",
+            "django.middleware.csrf.CsrfViewMiddleware",
+            "django.contrib.auth.middleware.AuthenticationMiddleware",
+            "django.contrib.messages.middleware.MessageMiddleware",
+            "django.middleware.clickjacking.XFrameOptionsMiddleware",
+            # Other subclasses of MiddlewareMixin implementing either
+            # process_response() or process_request().
+            "django.contrib.flatpages.middleware.FlatpageFallbackMiddleware",
+            "django.contrib.redirects.middleware.RedirectFallbackMiddleware",
+            "django.contrib.sites.middleware.CurrentSiteMiddleware",
+            "django.middleware.cache.FetchFromCacheMiddleware",
+            "django.middleware.cache.UpdateCacheMiddleware",
+            "django.middleware.common.BrokenLinkEmailsMiddleware",
+            "django.middleware.csp.ContentSecurityPolicyMiddleware",
+            "django.middleware.gzip.GZipMiddleware",
+            "django.middleware.http.ConditionalGetMiddleware",
+            "django.middleware.locale.LocaleMiddleware",
+        ]:
+            with (
+                self.modify_settings(
+                    INSTALLED_APPS={"append": middleware.split(".middleware")[0]}
+                )
+                if middleware.startswith("django.contrib.")
+                else nullcontext()
+            ):
+                klass = import_string(middleware)
+                self.assertIs(klass.async_capable, False)
 
 
 @override_settings(ROOT_URLCONF="middleware_exceptions.urls")

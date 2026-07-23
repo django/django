@@ -8,6 +8,8 @@ from django.middleware import MiddlewareMixin
 
 
 class RedirectFallbackMiddleware(MiddlewareMixin):
+    async_capable = False
+
     # Defined as class-level attributes to be subclassing-friendly.
     response_gone_class = HttpResponseGone
     response_redirect_class = HttpResponsePermanentRedirect

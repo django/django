@@ -171,6 +171,8 @@ class CsrfViewMiddleware(MiddlewareMixin):
     template tag.
     """
 
+    async_capable = False
+
     @cached_property
     def csrf_trusted_origins_hosts(self):
         return [

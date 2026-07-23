@@ -29,6 +29,7 @@ class CommonMiddleware(MiddlewareMixin):
           overriding the response_redirect_class attribute.
     """
 
+    async_capable = False
     response_redirect_class = HttpResponsePermanentRedirect
 
     def process_request(self, request):
@@ -118,6 +119,7 @@ class CommonMiddleware(MiddlewareMixin):
 
 
 class BrokenLinkEmailsMiddleware(MiddlewareMixin):
+    async_capable = False
     # Set to override the mail.mailers alias used for sending the email.
     using = None
 
