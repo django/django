@@ -30,7 +30,7 @@
     {% endfor %}
   {% endwith %}
 
-  {% if inline_admin_form.needs_explicit_pk_field %}{{ inline_admin_form.pk_field.field }}{% endif %}
+  {% if inline_admin_form.needs_explicit_pk_field %}{{ inline_admin_form.pk_field.field.as_hidden }}{% endif %}
   {% if inline_admin_form.fk_field %}{{ inline_admin_form.fk_field.field }}{% endif %}
 </div>{% endfor %}
   {% if inline_admin_formset.is_collapsible %}</details>{% endif %}
