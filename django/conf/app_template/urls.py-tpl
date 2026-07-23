@@ -1,0 +1,4 @@
+from django.urls import path
+
+# Create your URL patterns here.
+urlpatterns = []
