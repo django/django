@@ -105,6 +105,12 @@ LANG_INFO = {
         "name": "German",
         "name_local": "Deutsch",
     },
+    "de-ch": {
+        "bidi": False,
+        "code": "de-ch",
+        "name": "German (Switzerland)",
+        "name_local": "Deutsch (Schweiz)",
+    },
     "dsb": {
         "bidi": False,
         "code": "dsb",
