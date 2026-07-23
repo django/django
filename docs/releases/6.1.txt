@@ -717,6 +717,16 @@ Miscellaneous
 * :func:`django.db.transaction.savepoint` is deprecated in favor of
   :func:`~django.db.transaction.savepoint_create`.
 
+Bugfixes
+========
+
+:mod:`django.contrib.admin`
+---------------------------
+
+* Fixed translation of field names in admin log change messages by storing
+  the original ``verbose_name`` instead of the capitalized form label
+  (:ticket:`36884`).
+
 Features removed in 6.1
 =======================
 

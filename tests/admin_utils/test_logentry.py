@@ -10,6 +10,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import translation
 from django.utils.html import escape
+from django.utils.text import capfirst
 
 from .models import Article, ArticleProxy, Car, Site
 
@@ -92,8 +93,10 @@ class LogEntryTests(TestCase):
         ).latest("id")
         self.assertEqual(logentry.get_change_message(), "Changed Title and History.")
         with translation.override("fr"):
+            title_fr = capfirst(translation.gettext("title"))
             self.assertEqual(
-                logentry.get_change_message(), "Modification de Title et Historique."
+                logentry.get_change_message(),
+                "Modification de %s et Historique." % title_fr,
             )
 
         add_url = reverse("admin:admin_utils_article_add")
@@ -106,6 +109,36 @@ class LogEntryTests(TestCase):
         self.assertEqual(logentry.get_change_message(), "Added.")
         with translation.override("fr"):
             self.assertEqual(logentry.get_change_message(), "Ajout.")
+
+    def test_logentry_change_message_verbose_name_translation(self):
+        """
+        Field names in change messages use the model field's verbose_name
+        for correct translation (#36884).
+        """
+        post_data = {
+            "site": self.site.pk,
+            "title": "Title",
+            "hist": "Some content",
+            "created_0": "2008-03-12",
+            "created_1": "11:54",
+        }
+        change_url = reverse(
+            "admin:admin_utils_article_change", args=[quote(self.a1.pk)]
+        )
+        response = self.client.post(change_url, post_data)
+        self.assertRedirects(response, reverse("admin:admin_utils_article_changelist"))
+        logentry = LogEntry.objects.filter(
+            content_type__model__iexact="article"
+        ).latest("id")
+        self.assertEqual(
+            json.loads(logentry.change_message),
+            [{"changed": {"fields": ["History"]}}],
+        )
+        self.assertEqual(logentry.get_change_message(), "Changed History.")
+        with translation.override("fr"):
+            self.assertEqual(
+                logentry.get_change_message(), "Modification de Historique."
+            )
 
     def test_logentry_change_message_not_json(self):
         """LogEntry.change_message was a string before Django 1.10."""
@@ -177,11 +210,11 @@ class LogEntryTests(TestCase):
         self.assertEqual(
             json.loads(logentry.change_message),
             [
-                {"changed": {"fields": ["Domain"]}},
+                {"changed": {"fields": ["domain"]}},
                 {"added": {"object": "Added article", "name": "article"}},
                 {
                     "changed": {
-                        "fields": ["Title", "not_a_form_field"],
+                        "fields": ["title", "not_a_form_field"],
                         "object": "Changed Title",
                         "name": "article",
                     }
@@ -192,17 +225,18 @@ class LogEntryTests(TestCase):
         self.assertEqual(
             logentry.get_change_message(),
             "Changed Domain. Added article “Added article”. "
-            "Changed Title and not_a_form_field for article “Changed Title”. "
+            "Changed Title and Not_a_form_field for article “Changed Title”. "
             "Deleted article “Title second article”.",
         )
 
         with translation.override("fr"):
+            title_fr = capfirst(translation.gettext("title"))
             self.assertEqual(
                 logentry.get_change_message(),
                 "Modification de Domain. Ajout de article « Added article ». "
-                "Modification de Title et not_a_form_field pour l'objet "
+                "Modification de %s et Not_a_form_field pour l'objet "
                 "article « Changed Title ». "
-                "Suppression de article « Title second article ».",
+                "Suppression de article « Title second article »." % title_fr,
             )
 
     def test_logentry_get_edited_object(self):
