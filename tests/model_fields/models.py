@@ -36,7 +36,7 @@ class Foo(models.Model):
 
 
 def get_foo():
-    return Foo.objects.get(id=1).pk
+    return Foo.objects.get(id=connection.ops.get_hardcoded_pk(1)).pk
 
 
 class Bar(models.Model):

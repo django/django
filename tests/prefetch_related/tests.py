@@ -177,11 +177,12 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
                 self.assertEqual(author.name, author.bio.author.name)
 
     def test_survives_clone(self):
+        nonexistent_pk = connection.ops.get_nonexistent_pk(1000)
         with self.assertNumQueries(2):
             [
                 list(b.first_time_authors.all())
                 for b in Book.objects.prefetch_related("first_time_authors").exclude(
-                    id=1000
+                    id=nonexistent_pk
                 )
             ]
 
@@ -1749,15 +1750,16 @@ class MultiDbTests(TestCase):
 class Ticket19607Tests(TestCase):
     @classmethod
     def setUpTestData(cls):
+        pk = connection.ops.get_hardcoded_pk
         LessonEntry.objects.bulk_create(
-            LessonEntry(id=id_, name1=name1, name2=name2)
+            LessonEntry(id=pk(id_), name1=name1, name2=name2)
             for id_, name1, name2 in [
                 (1, "einfach", "simple"),
                 (2, "schwierig", "difficult"),
             ]
         )
         WordEntry.objects.bulk_create(
-            WordEntry(id=id_, lesson_entry_id=lesson_entry_id, name=name)
+            WordEntry(id=pk(id_), lesson_entry_id=pk(lesson_entry_id), name=name)
             for id_, lesson_entry_id, name in [
                 (1, 1, "einfach"),
                 (2, 1, "simple"),

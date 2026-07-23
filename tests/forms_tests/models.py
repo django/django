@@ -3,7 +3,7 @@ import itertools
 import tempfile
 
 from django.core.files.storage import FileSystemStorage
-from django.db import models
+from django.db import connection, models
 
 callable_default_counter = itertools.count()
 
@@ -80,11 +80,11 @@ def choice_default_list():
 
 
 def int_default():
-    return 1
+    return connection.ops.get_hardcoded_pk(1)
 
 
 def int_list_default():
-    return [1]
+    return [connection.ops.get_hardcoded_pk(1)]
 
 
 class ChoiceFieldModel(models.Model):

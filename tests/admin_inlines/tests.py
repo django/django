@@ -3,6 +3,7 @@ from django.contrib.admin.helpers import InlineAdminForm
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
+from django.db import connection
 from django.test import RequestFactory, TestCase, override_settings
 from django.test.selenium import screenshot_cases
 from django.urls import reverse
@@ -525,8 +526,11 @@ class TestInline(TestDataMixin, TestCase):
         The "View on Site" link is correct for locales that use thousand
         separators.
         """
-        holder = Holder.objects.create(pk=123456789, dummy=42)
-        inner = Inner.objects.create(pk=987654321, holder=holder, dummy=42, readonly="")
+        pk = connection.ops.get_hardcoded_pk
+        holder = Holder.objects.create(pk=pk(123456789), dummy=42)
+        inner = Inner.objects.create(
+            pk=pk(987654321), holder=holder, dummy=42, readonly=""
+        )
         response = self.client.get(
             reverse("admin:admin_inlines_holder_change", args=(holder.id,))
         )

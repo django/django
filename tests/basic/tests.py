@@ -220,8 +220,9 @@ class ModelInstanceCreationTests(TestCase):
         An auto field must be refreshed by Model.save() even when a value is
         set because the database may return a value of a different type.
         """
-        a = Article.objects.create(pk="123456", pub_date=datetime(2025, 9, 16))
-        self.assertEqual(a.pk, 123456)
+        pk = connection.ops.get_hardcoded_pk(123456)
+        a = Article.objects.create(pk=str(pk), pub_date=datetime(2025, 9, 16))
+        self.assertEqual(a.pk, pk)
 
 
 class ModelTest(TestCase):
@@ -273,13 +274,14 @@ class ModelTest(TestCase):
 
     def test_manually_specify_primary_key(self):
         # You can manually specify the primary key when creating a new object.
+        pk = connection.ops.get_hardcoded_pk(101)
         a101 = Article(
-            id=101,
+            id=pk,
             headline="Article 101",
             pub_date=datetime(2005, 7, 31, 12, 30, 45),
         )
         a101.save()
-        a101 = Article.objects.get(pk=101)
+        a101 = Article.objects.get(pk=pk)
         self.assertEqual(a101.headline, "Article 101")
 
     def test_create_method(self):
@@ -669,7 +671,7 @@ class ModelLookupTest(TestCase):
             ObjectDoesNotExist, "Article matching query does not exist."
         ):
             Article.objects.get(
-                id__exact=2000,
+                id__exact=connection.ops.get_nonexistent_pk(2000),
             )
         # To avoid dict-ordering related errors check only one lookup
         # in single assert.

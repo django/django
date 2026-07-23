@@ -230,7 +230,7 @@ class AsyncQuerySetTest(TestCase):
         self.assertIs(check, True)
         # Unsaved instances are not allowed, so use an ID known not to exist.
         check = await SimpleModel.objects.acontains(
-            SimpleModel(id=self.s3.id + 1, field=4)
+            SimpleModel(id=connection.ops.get_nonexistent_pk(self.s3.id), field=4)
         )
         self.assertIs(check, False)
 
