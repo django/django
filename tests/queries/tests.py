@@ -4643,6 +4643,228 @@ class Ticket23622Tests(TestCase):
         self.assertSequenceEqual(Ticket23605A.objects.filter(qx), [a2])
 
 
+class QuerySetCommentTests(TestCase):
+    """Tests for QuerySet.comment() (Trac #24638)."""
+
+    def test_select_single_comment(self):
+        with CaptureQueriesContext(connection) as ctx:
+            list(NamedCategory.objects.comment("blog.views.py 50"))
+        self.assertIn("SELECT /* blog.views.py 50 */ ", ctx.captured_queries[0]["sql"])
+
+    def test_select_multiple_comments_preserve_order(self):
+        with CaptureQueriesContext(connection) as ctx:
+            list(
+                NamedCategory.objects.comment("first")
+                .comment("second")
+                .comment("third")
+            )
+        self.assertIn(
+            "SELECT /* first */ /* second */ /* third */ ",
+            ctx.captured_queries[0]["sql"],
+        )
+
+    def test_select_with_distinct(self):
+        with CaptureQueriesContext(connection) as ctx:
+            list(NamedCategory.objects.distinct().comment("after distinct"))
+        sql = ctx.captured_queries[0]["sql"]
+        self.assertIn("DISTINCT", sql)
+        self.assertIn("/* after distinct */", sql)
+        # The comment must come after DISTINCT.
+        self.assertLess(sql.index("DISTINCT"), sql.index("/* after distinct */"))
+
+    def test_select_with_filter_preserves_comment(self):
+        with CaptureQueriesContext(connection) as ctx:
+            list(NamedCategory.objects.comment("request-id 123").filter(name="x"))
+        self.assertIn("/* request-id 123 */", ctx.captured_queries[0]["sql"])
+
+    def test_select_subquery(self):
+        with CaptureQueriesContext(connection) as ctx:
+            list(
+                NamedCategory.objects.annotate(
+                    foo=(
+                        Tag.objects.filter(category=OuterRef("id"))
+                        .comment("inner subquery")
+                        .values("name")[:1]
+                    )
+                ).comment("outer query")
+            )
+        sql = ctx.captured_queries[0]["sql"]
+        self.assertIn("/* inner subquery */", sql)
+        self.assertIn("/* outer query */", sql)
+
+    def test_aggregate_subquery(self):
+        with CaptureQueriesContext(connection) as ctx:
+            Tag.objects.comment("tag-aggregate").values("parent").annotate(
+                tag_per_parent=Count("pk")
+            ).aggregate(Max("tag_per_parent"))
+        sql = ctx.captured_queries[0]["sql"]
+        self.assertIn("/* tag-aggregate */", sql)
+
+    def test_update(self):
+        NamedCategory.objects.create(name="initial")
+        with CaptureQueriesContext(connection) as ctx:
+            NamedCategory.objects.comment("update from worker-3").update(name="renamed")
+        update_sql = next(
+            q["sql"] for q in ctx.captured_queries if q["sql"].startswith("UPDATE")
+        )
+        self.assertIn("UPDATE /* update from worker-3 */ ", update_sql)
+
+    def test_clone_preserves_comment(self):
+        base = NamedCategory.objects.comment("shared")
+        derived = base.filter(name="x").comment("extra")
+        with CaptureQueriesContext(connection) as ctx:
+            list(base)
+            list(derived)
+        self.assertIn("/* shared */", ctx.captured_queries[0]["sql"])
+        self.assertNotIn("/* extra */", ctx.captured_queries[0]["sql"])
+        derived_sql = ctx.captured_queries[1]["sql"]
+        self.assertIn("/* shared */", derived_sql)
+        self.assertIn("/* extra */", derived_sql)
+
+    def test_unicode_comment(self):
+        with CaptureQueriesContext(connection) as ctx:
+            list(NamedCategory.objects.comment("источник cron"))
+        self.assertIn("/* источник cron */", ctx.captured_queries[0]["sql"])
+
+    def test_comment_inside_union_leg(self):
+        qs = NamedCategory.objects.comment("first leg").union(
+            NamedCategory.objects.all()
+        )
+        with CaptureQueriesContext(connection) as ctx:
+            list(qs)
+        sql = ctx.captured_queries[0]["sql"]
+        self.assertEqual(sql.count("/* first leg */"), 1)
+
+    def test_comment_around_union(self):
+        qs = NamedCategory.objects.union(NamedCategory.objects.all()).comment(
+            "outer combinator"
+        )
+        with CaptureQueriesContext(connection) as ctx:
+            list(qs)
+        sql = ctx.captured_queries[0]["sql"]
+        self.assertEqual(sql.count("/* outer combinator */"), 1)
+        self.assertLess(sql.index("/* outer combinator */"), sql.index("UNION"))
+
+    @skipUnlessDBFeature("supports_select_intersection")
+    def test_comment_inside_intersection_leg(self):
+        qs = NamedCategory.objects.comment("first leg").intersection(
+            NamedCategory.objects.all()
+        )
+        with CaptureQueriesContext(connection) as ctx:
+            list(qs)
+        sql = ctx.captured_queries[0]["sql"]
+        self.assertEqual(sql.count("/* first leg */"), 1)
+
+    @skipUnlessDBFeature("supports_select_intersection")
+    def test_comment_around_intersection(self):
+        qs = NamedCategory.objects.intersection(NamedCategory.objects.all()).comment(
+            "outer combinator"
+        )
+        with CaptureQueriesContext(connection) as ctx:
+            list(qs)
+        sql = ctx.captured_queries[0]["sql"]
+        self.assertEqual(sql.count("/* outer combinator */"), 1)
+        self.assertLess(sql.index("/* outer combinator */"), sql.index("INTERSECT"))
+
+    @skipUnlessDBFeature("supports_select_difference")
+    def test_comment_inside_difference_leg(self):
+        qs = NamedCategory.objects.comment("first leg").difference(
+            NamedCategory.objects.all()
+        )
+        with CaptureQueriesContext(connection) as ctx:
+            list(qs)
+        sql = ctx.captured_queries[0]["sql"]
+        self.assertEqual(sql.count("/* first leg */"), 1)
+
+    @skipUnlessDBFeature("supports_select_difference")
+    def test_comment_around_difference(self):
+        qs = NamedCategory.objects.difference(NamedCategory.objects.all()).comment(
+            "outer combinator"
+        )
+        with CaptureQueriesContext(connection) as ctx:
+            list(qs)
+        sql = ctx.captured_queries[0]["sql"]
+        self.assertEqual(sql.count("/* outer combinator */"), 1)
+        self.assertLess(sql.index("/* outer combinator */"), sql.index("EXCEPT"))
+
+    def test_comment_leg_and_wrapper_combined(self):
+        qs = (
+            NamedCategory.objects.comment("leg")
+            .union(NamedCategory.objects.all())
+            .comment("outer")
+        )
+        with CaptureQueriesContext(connection) as ctx:
+            list(qs)
+        sql = ctx.captured_queries[0]["sql"]
+        self.assertEqual(sql.count("/* leg */"), 1)
+        self.assertEqual(sql.count("/* outer */"), 1)
+        # The outer comment leads the statement; the leg comment follows it.
+        self.assertLess(sql.index("/* outer */"), sql.index("/* leg */"))
+
+    def test_update_multiple_comments(self):
+        NamedCategory.objects.create(name="initial")
+        with CaptureQueriesContext(connection) as ctx:
+            NamedCategory.objects.comment("first").comment("second").update(
+                name="renamed"
+            )
+        update_sql = next(
+            q["sql"] for q in ctx.captured_queries if q["sql"].startswith("UPDATE")
+        )
+        self.assertIn("UPDATE /* first */ /* second */ ", update_sql)
+
+    def test_delete_statements_not_annotated(self):
+        NamedCategory.objects.create(name="doomed")
+        with CaptureQueriesContext(connection) as ctx:
+            NamedCategory.objects.comment("cleanup").filter(name="doomed").delete()
+        delete_sqls = [
+            q["sql"] for q in ctx.captured_queries if q["sql"].startswith("DELETE")
+        ]
+        self.assertTrue(delete_sqls)
+        for sql in delete_sqls:
+            self.assertNotIn("/* cleanup */", sql)
+
+    def test_insert_statements_not_annotated(self):
+        with CaptureQueriesContext(connection) as ctx:
+            DumbCategory.objects.comment("seed").bulk_create(
+                [DumbCategory(), DumbCategory()]
+            )
+        insert_sqls = [
+            q["sql"] for q in ctx.captured_queries if q["sql"].startswith("INSERT")
+        ]
+        self.assertTrue(insert_sqls)
+        for sql in insert_sqls:
+            self.assertNotIn("/* seed */", sql)
+
+    def test_rejects_non_string(self):
+        msg = "QuerySet.comment() argument must be a string."
+        for bad in [None, 42, b"bytes", ["list"], object()]:
+            with self.subTest(bad=bad), self.assertRaisesMessage(TypeError, msg):
+                NamedCategory.objects.comment(bad)
+
+    def test_rejects_disallowed_comment_characters(self):
+        msg = (
+            "QuerySet.comment() argument must contain only letters, numbers, "
+            "spaces, periods, underscores, and hyphens."
+        )
+        for bad in [
+            "",
+            "blog/views.py:50",
+            "request-id=123",
+            "foo /* bar",
+            "foo */ bar",
+            "*/-- DROP TABLE x;--/*",
+            "/* nested */",
+            "quote '",
+            'quote "',
+            "semi;colon",
+            "hash#tag",
+            "comma,value",
+            *(f"name{chr(c)}" for c in chain(range(32), range(0x7F, 0xA0))),
+        ]:
+            with self.subTest(bad=bad), self.assertRaisesMessage(ValueError, msg):
+                NamedCategory.objects.comment(bad)
+
+
 class QuerySetCloningTests(TestCase):
     @classmethod
     def setUpTestData(cls):

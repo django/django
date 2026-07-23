@@ -195,7 +195,8 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* The new :meth:`.QuerySet.comment` method allows injecting an SQL comment
+  into the generated ``SELECT`` or ``UPDATE`` statement.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
