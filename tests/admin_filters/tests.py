@@ -2051,6 +2051,20 @@ class ListFiltersTests(TestCase):
         queryset = changelist.get_queryset(request)
         self.assertEqual(list(queryset), [jane])
 
+    def test_relatedfieldlistfilter_isnull_false(self):
+        modeladmin = BookAdmin(Book, site)
+        request = self.request_factory.get("/", {"author__isnull": "False"})
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        queryset = changelist.get_queryset(request)
+        self.assertCountEqual(
+            list(queryset), [self.django_book, self.bio_book, self.djangonaut_book]
+        )
+        filters = changelist.get_filters(request)[0]
+        author_filter = filters[1]
+        choices = list(author_filter.choices(changelist))
+        self.assertIs(choices[-1]["selected"], False)
+
 
 class FacetsMixinTests(SimpleTestCase):
     def test_get_facet_counts(self):
