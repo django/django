@@ -644,6 +644,10 @@ class ContentDispositionHeaderTests(unittest.TestCase):
                 "attachment; filename*=utf-8''%22esp%C3%A9cimen%22%20filename",
             ),
             ((True, "some\nfile"), "attachment; filename*=utf-8''some%0Afile"),
+            (
+                (True, "newline-at-end\n"),
+                "attachment; filename*=utf-8''newline-at-end%0A",
+            ),
         )
 
         for (is_attachment, filename), expected in tests:
