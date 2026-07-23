@@ -157,6 +157,45 @@ class ClientTest(TestCase):
         with self.assertRaisesMessage(TypeError, msg):
             self.client.post("/post_view/", {"value": None})
 
+    def test_post_content_type_none(self):
+        """
+        Passing content_type=None to post() falls back to the multipart
+        default rather than raising a TypeError (#29268).
+        """
+        response = self.client.post(
+            "/post_view/", data={"value": "37"}, content_type=None
+        )
+        self.assertEqual(response.wsgi_request.method, "POST")
+        self.assertEqual(response.wsgi_request.content_type, "multipart/form-data")
+        self.assertEqual(response.context["data"], "37")
+
+    def test_post_content_type_none_follow_redirect(self):
+        """
+        content_type=None is also handled when following a redirect that
+        preserves the request method (#29268).
+        """
+        response = self.client.post(
+            "/redirect_view_307/",
+            data={"value": "37"},
+            content_type=None,
+            follow=True,
+        )
+        self.assertEqual(response.redirect_chain, [("/post_view/", 307)])
+        self.assertEqual(response.context["data"], "37")
+
+    def test_content_type_none_uses_default(self):
+        """
+        content_type=None uses each method's default content type (#29268).
+        """
+        for method in ("put", "patch", "delete", "options"):
+            with self.subTest(method=method):
+                response = getattr(self.client, method)(
+                    "/post_view/", data="test data", content_type=None
+                )
+                self.assertEqual(
+                    response.wsgi_request.content_type, "application/octet-stream"
+                )
+
     def test_json_serialization(self):
         """The test client serializes JSON data."""
         methods = ("post", "put", "patch", "delete")
@@ -1246,6 +1285,36 @@ class RequestFactoryTest(SimpleTestCase):
                 self.assertEqual(request.GET["example"], "data")
                 self.assertNotIn("empty", request.GET)
 
+    def test_content_type_none_uses_default(self):
+        """
+        Passing content_type=None should use the method's default content type,
+        not raise a TypeError (#29268).
+        """
+        # post() defaults to multipart/form-data and expects dict data.
+        request = self.request_factory.post(
+            "/somewhere/", data={"key": "value"}, content_type=None
+        )
+        self.assertEqual(request.method, "POST")
+        self.assertEqual(request.content_type, "multipart/form-data")
+
+        # Other methods default to application/octet-stream.
+        for method_name in ("put", "patch", "delete", "options"):
+            with self.subTest(method=method_name):
+                method = getattr(self.request_factory, method_name)
+                request = method("/somewhere/", data="test data", content_type=None)
+                self.assertEqual(request.method, method_name.upper())
+                self.assertEqual(request.content_type, "application/octet-stream")
+
+    def test_generic_content_type_none_uses_default(self):
+        """
+        Passing content_type=None to generic() should use the default
+        'application/octet-stream' content type (#29268).
+        """
+        request = self.request_factory.generic(
+            "POST", "/somewhere/", data="test data", content_type=None
+        )
+        self.assertEqual(request.content_type, "application/octet-stream")
+
 
 @override_settings(ROOT_URLCONF="test_client.urls")
 class AsyncClientTest(TestCase):
@@ -1260,6 +1329,18 @@ class AsyncClientTest(TestCase):
     async def test_response_resolver_match_middleware_urlconf(self):
         response = await self.async_client.get("/middleware_urlconf_view/")
         self.assertEqual(response.resolver_match.url_name, "middleware_urlconf_view")
+
+    async def test_post_content_type_none(self):
+        """
+        Passing content_type=None to the async client falls back to the
+        method default rather than raising a TypeError (#29268).
+        """
+        response = await self.async_client.post(
+            "/post_view/", data={"value": "37"}, content_type=None
+        )
+        self.assertEqual(response.asgi_request.method, "POST")
+        self.assertEqual(response.asgi_request.content_type, "multipart/form-data")
+        self.assertEqual(response.context["data"], "37")
 
     async def test_redirect(self):
         response = await self.async_client.get("/redirect_view/")
@@ -1445,3 +1526,33 @@ class AsyncRequestFactoryTest(SimpleTestCase):
                         data={"example": "data"},
                         query_params={"q": "terms"},
                     )
+
+    def test_content_type_none_uses_default(self):
+        """
+        Passing content_type=None should use the method's default content type,
+        not raise a TypeError (#29268).
+        """
+        # post() defaults to multipart/form-data and expects dict data.
+        request = self.request_factory.post(
+            "/somewhere/", data={"key": "value"}, content_type=None
+        )
+        self.assertEqual(request.method, "POST")
+        self.assertEqual(request.content_type, "multipart/form-data")
+
+        # Other methods default to application/octet-stream.
+        for method_name in ("put", "patch", "delete", "options"):
+            with self.subTest(method=method_name):
+                method = getattr(self.request_factory, method_name)
+                request = method("/somewhere/", data="test data", content_type=None)
+                self.assertEqual(request.method, method_name.upper())
+                self.assertEqual(request.content_type, "application/octet-stream")
+
+    def test_generic_content_type_none_uses_default(self):
+        """
+        Passing content_type=None to generic() should use the default
+        'application/octet-stream' content type (#29268).
+        """
+        request = self.request_factory.generic(
+            "POST", "/somewhere/", data="test data", content_type=None
+        )
+        self.assertEqual(request.content_type, "application/octet-stream")
