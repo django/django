@@ -3485,8 +3485,14 @@ call:
 .. code-block:: pycon
 
     >>> from django.urls import reverse
+    >>> from django.contrib.admin.utils import quote
     >>> c = Choice.objects.get(...)
-    >>> change_url = reverse("admin:polls_choice_change", args=(c.id,))
+    >>> change_url = reverse("admin:polls_choice_change", args=(quote(c.pk),))
+
+The ``change``, ``delete``, and ``history`` views expect their primary key
+argument to be escaped with ``django.contrib.admin.utils.quote()``. Otherwise
+reversing can produce URLs that the admin fails to resolve correctly when the
+key contains characters such as ``_``, ``/``, or ``:``.
 
 This will find the first registered instance of the admin application
 (whatever the instance name), and resolve to the view for changing
@@ -3499,7 +3505,9 @@ if you specifically wanted the admin view from the admin instance named
 
 .. code-block:: pycon
 
-    >>> change_url = reverse("admin:polls_choice_change", args=(c.id,), current_app="custom")
+    >>> change_url = reverse(
+    ...     "admin:polls_choice_change", args=(quote(c.pk),), current_app="custom"
+    ... )
 
 For more details, see the documentation on :ref:`reversing namespaced URLs
 <topics-http-reversing-url-namespaces>`.
@@ -3511,12 +3519,13 @@ To allow easier reversing of the admin urls in templates, Django provides an
 
     {% load admin_urls %}
     <a href="{% url opts|admin_urlname:'add' %}">Add user</a>
-    <a href="{% url opts|admin_urlname:'delete' user.pk %}">Delete this user</a>
+    <a href="{% url opts|admin_urlname:'delete' user.pk|admin_urlquote %}">Delete this user</a>
 
 The action in the examples above match the last part of the URL names for
 :class:`ModelAdmin` instances described above. The ``opts`` variable can be any
 object which has an ``app_label`` and ``model_name`` attributes and is usually
-supplied by the admin views for the current model.
+supplied by the admin views for the current model. The ``admin_urlquote``
+filter is the template equivalent of ``quote()`` above.
 
 The ``display`` decorator
 =========================
