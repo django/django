@@ -1,0 +1,26 @@
+[
+    {
+        "pk": 1,
+        "model": "multiple_database.book",
+        "fields": {
+            "title": "A Django book",
+            "published": "2026-03-11"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "multiple_database.person",
+        "fields": {
+            "name": "John Doe"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "multiple_database.review",
+        "fields": {
+            "source": "Python Weekly",
+            "content_type": 1,
+            "object_id": 1
+        }
+    }
+]
