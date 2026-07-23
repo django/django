@@ -28,6 +28,19 @@ class EventAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
 
+    def get_change_list_object_tools(self, request):
+        from django.contrib.admin import ObjectTool
+
+        return [
+            ObjectTool(
+                label="View latest",
+                url="/some/test/url",
+                classes="viewlatest",
+                preserve_filters=True,
+            ),
+            *super().get_change_list_object_tools(request),
+        ]
+
 
 site.register(Event, EventAdmin)
 

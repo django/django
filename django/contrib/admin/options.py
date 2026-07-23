@@ -61,7 +61,7 @@ from django.forms.widgets import CheckboxSelectMultiple, SelectMultiple
 from django.http import HttpResponseRedirect
 from django.http.response import HttpResponseBase
 from django.template.response import SimpleTemplateResponse, TemplateResponse
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 from django.utils.decorators import method_decorator
 from django.utils.deprecation import RemovedInDjango70Warning, warn_about_implementation
 from django.utils.html import format_html
@@ -683,6 +683,29 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         return request.user.has_module_perms(self.opts.app_label)
 
 
+@dataclass
+class ObjectTool:
+    label: str
+    url: str
+    classes: str = ""
+    preserve_filters: bool = False
+    html: str = """<a href="{url}" class="{classes}">{label}</a>"""
+
+    def render(self, context):
+        if self.preserve_filters:
+            url = add_preserved_filters(
+                context, self.url, context.get("is_popup"), context.get("to_field")
+            )
+        else:
+            url = self.url
+        return format_html(
+            self.html,
+            url=url,
+            classes=self.classes,
+            label=self.label,
+        )
+
+
 class ModelAdmin(BaseModelAdmin):
     """Encapsulate all admin options and functionality for a given model."""
 
@@ -1217,6 +1240,59 @@ class ModelAdmin(BaseModelAdmin):
             choices.append(choice)
         return choices
 
+    def get_change_list_object_tools(self, request):
+        """
+        Return a list of ObjectTool objects (or None) to be rendered in the
+        change list. Each object tool needs a label, url, and classes (string).
+        None entries will be ignored.
+        """
+        try:
+            info = self.admin_site.name, self.opts.app_label, self.opts.model_name
+            add_tool = ObjectTool(
+                label=_("Add %(name)s") % {"name": self.opts.verbose_name},
+                url=reverse("%s:%s_%s_add" % info),
+                classes="addlink",
+                preserve_filters=True,
+            )
+            return [add_tool] if self.has_add_permission(request) else []
+        except NoReverseMatch:
+            return []
+
+    def get_change_form_object_tools(self, request, obj):
+        """
+        Return a list of ObjectTool objects (or None) to be rendered in the
+        change form. Each object tool needs a label, url, and classes (string).
+        None entries will be ignored.
+        """
+        info = self.admin_site.name, self.opts.app_label, self.opts.model_name
+
+        try:
+            history_tool = (
+                ObjectTool(
+                    label=_("History"),
+                    url=reverse("%s:%s_%s_history" % info, args=(quote(obj.pk),)),
+                    classes="historylink",
+                    preserve_filters=True,
+                )
+                if obj
+                else None
+            )
+        except NoReverseMatch:
+            history_tool = None
+
+        view_on_site_url = self.get_view_on_site_url(obj)
+        view_site_tool = (
+            ObjectTool(
+                label=_("View on site"),
+                url=view_on_site_url,
+                classes="viewsitelink",
+            )
+            if view_on_site_url
+            else None
+        )
+
+        return [history_tool, view_site_tool]
+
     def get_action(self, action, action_location=ActionLocation.CHANGE_LIST):
         """
         Return a given action from a parameter, which can either be a callable,
@@ -1527,6 +1603,9 @@ class ModelAdmin(BaseModelAdmin):
                 "is_popup_var": IS_POPUP_VAR,
                 "source_model_var": SOURCE_MODEL_VAR,
                 "app_label": app_label,
+                "change_form_object_tools": self.get_change_form_object_tools(
+                    request, obj
+                ),
             }
         )
         if add and self.add_form_template is not None:
@@ -2457,6 +2536,7 @@ class ModelAdmin(BaseModelAdmin):
             "actions_on_bottom": self.actions_on_bottom,
             "actions_selection_counter": self.actions_selection_counter,
             "preserved_filters": self.get_preserved_filters(request),
+            "change_list_object_tools": self.get_change_list_object_tools(request),
             **(extra_context or {}),
         }
 
