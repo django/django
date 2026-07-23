@@ -3,7 +3,7 @@ Query subclasses which provide extra functionality beyond simple data
 retrieval.
 """
 
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models.sql.constants import (
     GET_ITERATOR_CHUNK_SIZE,
     NO_RESULTS,
@@ -98,10 +98,35 @@ class UpdateQuery(Query):
                     % field
                 )
             if model is not self.get_meta().concrete_model:
+                # Parent MTI table update: expression refs are resolved later
+                # against the parent model, which cannot see child-only fields
+                # (#33091). Detect those joins here and raise the same error as
+                # child-field updates that reference parent columns (#30044).
+                self._check_related_update_expressions(model, val)
                 self.add_related_update(model, field, val)
                 continue
             values_seq.append((field, model, val))
         return self.add_update_fields(values_seq)
+
+    def _check_related_update_expressions(self, model, val):
+        """
+        Ensure F() (and similar) references used when updating a parent table
+        are local to that parent. Child-only fields require a join.
+        """
+        joined_msg = "Joined field references are not permitted in this query"
+        local_names = {"pk"}
+        for f in model._meta.local_concrete_fields:
+            local_names.add(f.name)
+            local_names.add(f.attname)
+        for field_name, *lookups in self.model._get_expr_references(val):
+            if lookups or field_name not in local_names:
+                try:
+                    self.get_meta().get_field(field_name)
+                except FieldDoesNotExist:
+                    # Unknown name: leave for the related UpdateQuery to raise
+                    # its usual "Cannot resolve keyword … Choices are: …".
+                    continue
+                raise FieldError(joined_msg)
 
     def add_update_fields(self, values_seq):
         """
