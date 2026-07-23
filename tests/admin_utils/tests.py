@@ -36,6 +36,7 @@ from .models import (
     EventGuide,
     Location,
     Site,
+    StrAdminOrderModel,
     Vehicle,
 )
 
@@ -443,6 +444,13 @@ class UtilsTests(SimpleTestCase):
             label_for_field("test_from_property", Article, model_admin=MockModelAdmin),
             "property short description",
         )
+
+    def test_label_for_field_str_admin_order_field(self):
+        _, attr = label_for_field("__str__", StrAdminOrderModel, return_attr=True)
+        self.assertIsNot(attr, str, "Should not return the generic 'str' class")
+        self.assertIs(attr, StrAdminOrderModel.__str__)
+        self.assertTrue(hasattr(attr, "admin_order_field"))
+        self.assertEqual(attr.admin_order_field, "dummy_field")
 
     def test_help_text_for_field(self):
         tests = [
