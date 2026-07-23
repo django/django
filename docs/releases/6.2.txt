@@ -195,7 +195,9 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* The new :attr:`QuerySet.executed_queries <.QuerySet.executed_queries>`
+  attribute returns the SQL query if the QuerySet
+  has been evaluated and :setting:`DEBUG` is ``True``.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
