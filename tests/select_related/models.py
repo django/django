@@ -84,3 +84,24 @@ class TaggedItem(models.Model):
 class Bookmark(models.Model):
     url = models.URLField()
     tags = GenericRelation(TaggedItem)
+
+
+class Biome(models.Model):
+    name = models.CharField(max_length=50)
+
+
+class Tree(models.Model):
+    code = models.IntegerField(primary_key=True)
+
+
+class Moss(models.Model):
+    biome = models.ForeignKey(Biome, models.CASCADE)
+
+    tree_code = models.IntegerField()
+    tree = models.ForeignObject(
+        Tree,
+        from_fields=["tree_code"],
+        to_fields=["code"],
+        on_delete=models.CASCADE,
+        related_name="+",
+    )
