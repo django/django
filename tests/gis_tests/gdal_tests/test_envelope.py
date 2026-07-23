@@ -46,8 +46,18 @@ class EnvelopeTest(unittest.TestCase):
         self.assertEqual((0, 0), e.ll)
         self.assertEqual((2, 3), e.ur)
         self.assertEqual((0, 0, 2, 3), e.tuple)
-        self.assertEqual("POLYGON((0.0 0.0,0.0 3.0,2.0 3.0,2.0 0.0,0.0 0.0))", e.wkt)
+        self.assertEqual("POLYGON((0 0,0 3,2 3,2 0,0 0))", e.wkt)
         self.assertEqual("(0.0, 0.0, 2.0, 3.0)", str(e))
+
+    def test02b_wkt_significant_figures(self):
+        "Testing Envelope WKT uses %.15g formatting for coordinates."
+        # Decimal coordinates should use at most 15 significant figures.
+        e = Envelope(0.523, 0.217, 253.23, 523.69)
+        self.assertEqual(
+            "POLYGON((0.523 0.217,0.523 523.69,"
+            "253.23 523.69,253.23 0.217,0.523 0.217))",
+            e.wkt,
+        )
 
     def test03_equivalence(self):
         "Testing Envelope equivalence."
