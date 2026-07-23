@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.admin.actions import delete_selected
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.client import RequestFactory
 from django.urls import path, reverse
@@ -51,7 +52,10 @@ class SiteEachContextTest(TestCase):
         ctx = self.ctx
         self.assertEqual(ctx["site_header"], "Django administration")
         self.assertEqual(ctx["site_title"], "Django site admin")
-        self.assertEqual(ctx["site_url"], "/")
+        # 'site_url' is not '/' in this case because from the admin site it
+        # might lead to http://admin.example.com/ if the admin site is not
+        # hosted at the same url as the site, see #29030
+        self.assertEqual(ctx["site_url"], "http://example.com")
         self.assertIs(ctx["has_permission"], True)
 
     def test_custom_admin_titles(self):
@@ -60,6 +64,12 @@ class SiteEachContextTest(TestCase):
         ctx = custom_site.each_context(request)
         self.assertEqual(ctx["site_title"], "Custom title")
         self.assertEqual(ctx["site_header"], "Custom site")
+
+    def test_each_context_site_url_no_current_site(self):
+        request = self.request_factory.get(reverse("test_adminsite:index"))
+        request.user = self.u1
+        with override_settings(SITE_ID=Site.objects.order_by("-pk")[0].pk + 1):
+            self.assertEqual(site.each_context(request)["site_url"], "/")
 
     def test_each_context_site_url_with_script_name(self):
         request = self.request_factory.get(

@@ -2989,7 +2989,14 @@ Templates can override or extend base admin templates as described in
 
     For sites running on a subpath, the :meth:`each_context` method checks if
     the current request has ``request.META['SCRIPT_NAME']`` set and uses that
-    value if ``site_url`` isn't set to something other than ``/``.
+    value if ``site_url`` isn't set to something other than ``/``. If it isn't
+    set either, the domain of the current site (from :mod:`the sites framework
+    <django.contrib.sites>`) is used, falling back to ``/`` if it can't be
+    determined.
+
+    .. versionchanged:: 6.2
+
+        The fallback to the domain of the current site was added.
 
 .. attribute:: AdminSite.index_title
 
