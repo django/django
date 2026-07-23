@@ -6875,8 +6875,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         select2_display = self.selenium.find_element(
             By.CLASS_NAME, "select2-selection__rendered"
         )
-        # Clear button (×\n) is included in text.
-        self.assertEqual(select2_display.text, "×\n<i>edited section</i>")
+        # Clear button is rendered outside select2-selection__rendered in Select2 4.1.0.
+        self.assertEqual(select2_display.text, "<i>edited section</i>")
 
         # Add popup
         self.selenium.find_element(By.ID, "add_id_form-0-section").click()
@@ -6891,8 +6891,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         select2_display = self.selenium.find_element(
             By.CLASS_NAME, "select2-selection__rendered"
         )
-        # Clear button (×\n) is included in text.
-        self.assertEqual(select2_display.text, "×\nnew section")
+        self.assertEqual(select2_display.text, "new section")
 
     def test_inline_uuid_pk_edit_with_popup(self):
         from selenium.webdriver import ActionChains
