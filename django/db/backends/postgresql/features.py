@@ -190,3 +190,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_virtual_generated_columns = property(
         operator.attrgetter("is_postgresql_18")
     )
+    supports_uuid4_function_in_default = property(
+        operator.attrgetter("supports_uuid4_function")
+    )

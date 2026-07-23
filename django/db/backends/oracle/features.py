@@ -236,6 +236,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return self.connection.oracle_version >= (23, 9)
 
     @cached_property
+    def supports_uuid4_function_in_default(self):
+        return self.connection.oracle_version >= (23, 26, 2)
+
+    @cached_property
     def supports_stored_generated_columns(self):
         return self.connection.oracle_version >= (23, 7)
 

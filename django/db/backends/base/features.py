@@ -450,6 +450,7 @@ class BaseDatabaseFeatures:
     ]
 
     supports_uuid4_function = False
+    supports_uuid4_function_in_default = False
     supports_uuid7_function = False
     supports_uuid7_function_shift = False
 
