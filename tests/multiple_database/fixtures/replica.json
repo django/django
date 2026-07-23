@@ -1,0 +1,26 @@
+[
+    {
+        "pk": 1,
+        "model": "multiple_database.book",
+        "fields": {
+            "title": "The Definitive Guide to Django",
+            "published": "2009-7-8"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "multiple_database.person",
+        "fields": {
+            "name": "Tim Graham"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "multiple_database.review",
+        "fields": {
+            "source": "Python Weekly",
+            "content_type": 1,
+            "object_id": 1
+        }
+    }
+]
