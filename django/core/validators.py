@@ -1,16 +1,19 @@
 import ipaddress
 import math
 import re
+import warnings
 from pathlib import Path
 from urllib.parse import urlsplit
 
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
+from django.utils.deprecation import RemovedInDjango71Warning, warn_about_external_use
 from django.utils.http import MAX_URL_LENGTH
 from django.utils.ipv6 import is_valid_ipv6_address
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext_lazy
+from django.utils.warnings import django_file_prefixes
 
 # These values, if given to validate(), will trigger the self.required check.
 EMPTY_VALUES = (None, "", [], (), {})
@@ -233,6 +236,27 @@ class EmailValidator:
     )
     domain_allowlist = ["localhost"]
 
+    # RemovedInDjango71Warning.
+    validate_domain_part_deprecated_msg = (
+        "EmailValidator.validate_domain_part() is deprecated. Migrate to "
+        "validate_domain(), raising ValidationError for invalid domains."
+    )
+    # RemovedInDjango71Warning: tracks if a subclass overrides the deprecated
+    # `validate_domain_part()` hook (set in __init_subclass__()).
+    validate_domain_part_overridden = False
+
+    # RemovedInDjango71Warning: warn once if a subclass overrides the
+    # deprecated `validate_domain_part()` hook.
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        if "validate_domain_part" in cls.__dict__:
+            cls.validate_domain_part_overridden = True
+            warnings.warn(
+                cls.validate_domain_part_deprecated_msg,
+                RemovedInDjango71Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
+
     def __init__(self, message=None, code=None, allowlist=None):
         if message is not None:
             self.message = message
@@ -242,22 +266,75 @@ class EmailValidator:
             self.domain_allowlist = allowlist
 
     def __call__(self, value):
-        # The maximum length of an email is 320 characters per RFC 3696
-        # section 3.
+        username, domain = self.parse_address(value)
+        self.validate(value, username, domain)
+
+    def validate(self, value, username, domain):
+        self.validate_username(username, value)
+
+        # RemovedInDjango71Warning: honor a legacy validate_domain_part()
+        # override (the warning is issued in __init_subclass__()). The
+        # allowlist is checked here for the legacy path only, preserving that
+        # hook's contract of never being called with an allowlisted domain;
+        # validate_domain() enforces the allowlist itself. When the deprecation
+        # ends, remove this `if` branch entirely, leaving just:
+        # self.validate_domain(domain, value)
+        if self.validate_domain_part_overridden:
+            if domain not in self.domain_allowlist and not self.validate_domain_part(
+                domain
+            ):
+                raise ValidationError(
+                    self.message,
+                    code=self.code,
+                    params={"value": value, "domain": domain},
+                )
+        else:
+            self.validate_domain(domain, value)
+
+    def parse_address(self, value):
+        # The maximum length of an email is 320 chars per RFC 3696 section 3.
         if not value or "@" not in value or len(value) > 320:
             raise ValidationError(self.message, code=self.code, params={"value": value})
+        return value.rsplit("@", 1)
 
-        user_part, domain_part = value.rsplit("@", 1)
+    def validate_username(self, username, value):
+        if not self.user_regex.match(username):
+            raise ValidationError(
+                self.message,
+                code=self.code,
+                params={"value": value, "username": username},
+            )
 
-        if not self.user_regex.match(user_part):
-            raise ValidationError(self.message, code=self.code, params={"value": value})
+    def validate_domain(self, domain, value):
+        if domain in self.domain_allowlist:
+            return
 
-        if domain_part not in self.domain_allowlist and not self.validate_domain_part(
-            domain_part
-        ):
-            raise ValidationError(self.message, code=self.code, params={"value": value})
+        if self.domain_regex.match(domain):
+            return
 
+        literal_match = self.literal_regex.match(domain)
+        if literal_match:
+            ip_address = literal_match[1]
+            try:
+                validate_ipv46_address(ip_address)
+                return
+            except ValidationError:
+                pass
+        raise ValidationError(
+            self.message,
+            code=self.code,
+            params={"value": value, "domain": domain},
+        )
+
+    # RemovedInDjango71Warning.
     def validate_domain_part(self, domain_part):
+        # Warn external callers, except when reached through this class' own
+        # validate() dispatch (i.e. a legacy override calling super()).
+        warn_about_external_use(
+            self.validate_domain_part_deprecated_msg,
+            RemovedInDjango71Warning,
+            skip_frames=1,
+        )
         if self.domain_regex.match(domain_part):
             return True
 
