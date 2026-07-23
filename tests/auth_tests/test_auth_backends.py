@@ -171,6 +171,22 @@ class BaseModelBackendTest:
         user.save()
         self.assertIs(user.has_perm("auth.test"), False)
 
+    def test_has_perm_with_permission(self):
+        user = self.UserModel._default_manager.get(pk=self.user.pk)
+        perm = Permission.objects.create(
+            codename="example",
+            content_type=ContentType.objects.get(app_label="auth", model="user"),
+        )
+        user.user_permissions.add(perm)
+        user = self.UserModel._default_manager.get(pk=self.user.pk)
+        self.assertIs(user.has_perm("auth.example"), True)
+        self.assertIs(user.has_perm(perm), True)
+
+        user.user_permissions.remove(perm)
+        user = self.UserModel._default_manager.get(pk=self.user.pk)
+        self.assertIs(user.has_perm("auth.example"), False)
+        self.assertIs(user.has_perm(perm), False)
+
     async def test_ahas_perm(self):
         user = await self.UserModel._default_manager.aget(pk=self.user.pk)
         self.assertIs(await user.ahas_perm("auth.test"), False)
@@ -189,6 +205,22 @@ class BaseModelBackendTest:
         user.is_active = False
         await user.asave()
         self.assertIs(await user.ahas_perm("auth.test"), False)
+
+    async def test_ahas_perm_with_permission(self):
+        user = await self.UserModel._default_manager.aget(pk=self.user.pk)
+        perm = await Permission.objects.acreate(
+            codename="example",
+            content_type=await ContentType.objects.aget(app_label="auth", model="user"),
+        )
+        await user.user_permissions.aadd(perm)
+        user = await self.UserModel._default_manager.aget(pk=self.user.pk)
+        self.assertIs(await user.ahas_perm("auth.example"), True)
+        self.assertIs(await user.ahas_perm(perm), True)
+
+        await user.user_permissions.aremove(perm)
+        user = await self.UserModel._default_manager.aget(pk=self.user.pk)
+        self.assertIs(await user.ahas_perm("auth.example"), False)
+        self.assertIs(await user.ahas_perm(perm), False)
 
     def test_custom_perms(self):
         user = self.UserModel._default_manager.get(pk=self.user.pk)
