@@ -1,3 +1,9 @@
+.. image:: https://static.djangoproject.com/img/logos/django-logo-negative.svg
+   :alt: Django Logo
+   :width: 450px
+   :align: center
+
+
 ======
 Django
 ======
@@ -5,8 +11,12 @@ Django
 Django is a high-level Python web framework that encourages rapid development
 and clean, pragmatic design. Thanks for checking it out.
 
-All documentation is in the "``docs``" directory and online at
-https://docs.djangoproject.com/en/stable/. If you're just getting started,
+All documentation is:
+
+* in the "``docs``" directory (local)
+* and online at https://docs.djangoproject.com/en/stable/. 
+
+If you're just getting started,
 here's how we recommend you read the docs:
 
 * First, read ``docs/intro/install.txt`` for instructions on installing Django.
@@ -39,6 +49,7 @@ To contribute to Django:
 
 * Check out https://docs.djangoproject.com/en/dev/internals/contributing/ for
   information about getting involved.
+* For an tutorial, check out `Tutorial on our documentation <https://docs.djangoproject.com/en/stable/intro/contributing/>`_
 
 To run Django's test suite:
 
