@@ -218,7 +218,7 @@ class CreateViewTests(TestCase):
 
         message = (
             "Using ModelFormMixin (base class of MyCreateView) without the "
-            "'fields' attribute is prohibited."
+            "'fields' or the 'form_class' attribute is prohibited."
         )
         with self.assertRaisesMessage(ImproperlyConfigured, message):
             MyCreateView().get_form_class()
