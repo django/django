@@ -1,0 +1,159 @@
+=======================
+Sprint Quickstart Guide
+=======================
+
+This document outlines the concise guidelines for preparing to contribute to
+Django. This should be used during sprints or by people who are more familiar
+with contributing to Python open source projects.
+
+This guide assumes you're familiar with:
+
+* Git (see :doc:`/internals/contributing/writing-code/working-with-git`)
+
+* Managing multiple versions of Python
+
+* Python dependency management, including virtual environments
+
+* The concept of running tests and building documentation
+
+
+Set up
+======
+
+Fork the repository, clone your fork to your machine and configure a remote
+reference to Django's repository.
+
+.. console::
+
+    $ git clone https://github.com/YourGitHubName/django.git django-repo
+    $ cd django-repo
+    $ git remote add upstream https://github.com/django/django.git
+
+Confirm you're using a
+:ref:`compatible version of Python <faq-python-version-support>`, install
+the dependencies to run the tests and build the documentation.
+
+.. console::
+
+    $ # This needs to be >= 3.12
+    $ python -V
+    $ python -m venv .venv
+    $ source .venv/bin/activate
+    $ pip install -e . -U pip -r tests/requirements/py3.txt -r docs/requirements.txt
+
+Run the tests:
+
+.. console::
+
+    $ ./tests/runtests.py
+
+See :ref:`running-unit-tests` for more information. While tests will all pass
+in CI, they may not on every person's local environment. For example, only the
+latest point release of Python is supported. It's possible you may encounter
+errors using an earlier version of Python.
+
+If you have a small number of failures, it may be worth investigating whether
+they are known issues, or using the `django-docker-box`_ project to run the
+tests. Since this is a sprint, it may be more valuable for you to work on the
+issue at hand rather than investigating a weird machine configuration problem.
+
+Build the documentation:
+
+.. console::
+
+    $ cd docs && make html && cd ..
+
+.. _django-docker-box: https://github.com/django/django-docker-box/
+
+Finding a ticket to work on
+===========================
+
+Finding a workable ticket is a challenging task. It's important
+to read this whole section before attempting to find a ticket to work on.
+
+Assessing tickets
+-----------------
+
+When looking over tickets, it's a good idea to keep your search to
+accepted tickets that were created in the last five years. An easy way to tell
+is by the ticket number. Avoid tickets older than 10 years old. These are old
+for a reason. You're welcome to try, but they will require a high
+degree of perseverance. We recommend you start with tickets created in the
+last five years when getting started.
+
+Consider using the component filter option in Trac to limit your search
+to areas you have used before. If you've used forms in a few Django apps,
+consider filtering down to the forms components. Similarly, if you've
+never worked with geospatial projects, it's probably wise to avoid
+``django.contrib.gis``.
+
+* View `tickets with created and modified columns`_.
+
+* View `tickets for the documentation component`_.
+
+.. _tickets with created and modified columns: https://code.djangoproject.com/query?stage=Accepted&status=assigned&status=new&order=id&desc=1&col=id&col=summary&col=owner&col=type&col=component&col=time&col=changetime
+.. _tickets for the documentation component: https://code.djangoproject.com/query?component=Documentation&stage=Accepted&status=assigned&status=new&order=id&desc=1&col=id&col=summary&col=owner&col=type&col=component&col=time&col=changetime
+
+Methods to find tickets
+-----------------------
+
+Some ways to find a ticket to work on are the following:
+
+* Look at the `easy pickings`_.
+
+* Use the `vulture method`_.
+
+The vulture method is the process where you look for accepted tickets that
+haven't been touched in six months or longer. The ideal ticket has a PR
+attached to it that has a code review with explicit requests and the author
+has not responded in at least six months on the PR and on the ticket.
+
+You can view the list of `possibly vulture-able tickets here`_. The filters
+that are applied are:
+
+- Triage stage = Accepted
+- Patch needs improvement = Yes
+- Created = between `5 years ago` and `today`
+- Modified = between `5 years ago` and `6 months ago`
+
+.. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1
+.. _vulture method: https://youtube.com/shorts/D6QHet5U82U?si=j5M6sy0ufpeGy_iZ
+.. _possibly vulture-able tickets here: https://code.djangoproject.com/query?changetime=5+years+ago..6+months+ago&description=~&needs_better_patch=1&status=assigned&status=new&time=5+years+ago..today&order=id&desc=1&col=id&col=summary&col=time&col=changetime&col=needs_better_patch&col=owner&col=type&col=component
+
+Claiming a ticket
+-----------------
+
+When you find a ticket, make yourself the owner on the ticket with
+the "Modify Ticket" button near the bottom of the page. Claim the ticket
+by clicking the "assign to" radio button in the "Action" section. Your
+username will be filled in the text box by default. The :ref:`full
+documentation on claiming tickets can be found here.<claiming-tickets>`
+
+Resuming work from someone else's branch
+========================================
+
+If you're continuing the work from someone else's pull request on GitHub,
+things can be tricky. You need to pull their branch, but then push it to
+your GitHub repository fork.
+
+Run the following, but replace ``ThePRNumber`` with the **pull request number**
+and ``TheTicketNumber`` with the **Trac ticket number**.
+
+.. console::
+
+    $ git fetch upstream pull/ThePRNumber/head:ticket_TheTicketNumber
+    $ git checkout ticket_TheTicketNumber
+    $ git push origin ticket_TheTicketNumber
+
+For example, if you're working on PR 8000 which references ticket 123, the
+command to run would be:
+
+.. console::
+
+    $ git fetch upstream pull/8000/head:ticket_123
+    $ git checkout ticket_123
+    $ git push origin ticket_123
+
+When preparing your commit, please review our
+:ref:`committing guidelines <committing-guidelines>`, specifically how to
+credit co-authors.
