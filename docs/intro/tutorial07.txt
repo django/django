@@ -158,10 +158,10 @@ It works like this: There are three slots for related Choices -- as specified
 by ``extra`` -- and each time you come back to the "Change" page for an
 already-created object, you get another three extra slots.
 
-At the end of the three current slots you will find an "Add another Choice"
-link. If you click on it, a new slot will be added. If you want to remove the
-added slot, you can click on the X to the top right of the added slot. This
-image shows an added slot:
+At the end of the three current slots you will find an "Add Choice" link. If
+you click on it, a new slot will be added. If you want to remove the added
+slot, you can click on the X to the top right of the added slot. This image
+shows an added slot:
 
 .. image:: _images/admin14t.png
    :alt: Additional slot added dynamically
@@ -183,7 +183,7 @@ related objects are displayed in a more compact, table-based format:
    :alt: Add question page now has more compact choices
 
 Note that there is an extra "Delete?" column that allows removing rows added
-using the "Add another Choice" button and rows that have already been saved.
+using the "Add Choice" button and rows that have already been saved.
 
 Customize the admin change list
 ===============================
