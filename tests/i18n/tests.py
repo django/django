@@ -152,6 +152,7 @@ class TranslationTests(SimpleTestCase):
                 )
 
         french = trans_real.catalog()
+        self.assertEqual(len(french._catalog._catalogs), 4)
         # Merge a new translation file with different plural forms.
         catalog1 = _create_translation_from_string(
             'msgid ""\n'
@@ -162,6 +163,7 @@ class TranslationTests(SimpleTestCase):
             'msgstr "Je perds"\n'
         )
         french.merge(catalog1)
+        self.assertEqual(len(french._catalog._catalogs), 5)
         # Merge a second translation file with plural forms from django.conf.
         catalog2 = _create_translation_from_string(
             'msgid ""\n'
@@ -172,8 +174,20 @@ class TranslationTests(SimpleTestCase):
             'msgstr "Je gagne"\n'
         )
         french.merge(catalog2)
+        self.assertEqual(len(french._catalog._catalogs), 6)
         # Translations from this last one are supposed to win.
         self.assertEqual(french.gettext("I win"), "Je gagne")
+        # Merge a third translation file with the same plural forms.
+        catalog3 = _create_translation_from_string(
+            'msgid ""\n'
+            'msgstr ""\n'
+            '"Content-Type: text/plain; charset=UTF-8\\n"\n'
+            '"Plural-Forms: Plural-Forms: nplurals=2; plural=(n > 1);\\n"\n'
+            'msgid "I win"\n'
+            'msgstr "Je gagne"\n'
+        )
+        french.merge(catalog3)
+        self.assertEqual(len(french._catalog._catalogs), 6)
 
     def test_override(self):
         activate("de")
