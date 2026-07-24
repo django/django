@@ -705,8 +705,9 @@ When :setting:`USE_TZ` is ``False``, it is an error to set this option.
   datetime arithmetic more tricky — you must account for possible offset
   changes over DST transitions.
 
-  Consider converting to local time explicitly with ``AT TIME ZONE`` in raw SQL
-  queries instead of setting the ``TIME_ZONE`` option.
+  Consider converting to local time explicitly with a database function using
+  :class:`~django.db.models.Func` (see an example in :ref:`func-expressions`)
+  in queries instead of setting the ``TIME_ZONE`` option.
 
 .. setting:: DATABASE-DISABLE_SERVER_SIDE_CURSORS
 
