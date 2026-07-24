@@ -234,6 +234,15 @@ Tests
   :setting:`AUTHENTICATION_BACKENDS` not implementing ``(a)get_user()``, e.g.
   permission-only backends.
 
+* :meth:`~django.test.SimpleTestCase.assertWarnsMessage` now checks all
+  warnings matching the ``expected_category`` for the ``expected_message`` and
+  no longer suppresses other warnings in the category. Previously, the first
+  warning triggered in the category had to contain the message or the assertion
+  would fail, and all other warnings in the category were silently ignored
+  (regardless of message).
+  Tests that had unintentionally relied on :meth:`.assertWarnsMessage`
+  suppressing all warnings in the ``expected_category`` may need to be updated.
+
 URLs
 ~~~~
 
