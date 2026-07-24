@@ -178,6 +178,53 @@ class Join:
         return new
 
 
+class SubqueryJoin:
+    def __init__(
+        self,
+        table_subquery,
+        table_name,
+        table_alias,
+    ):
+        self.table_name = table_name
+        self.parent_alias = None
+        # Join table
+        self.table_subquery = table_subquery
+        self.table_alias = table_alias
+        # LOUTER or INNER
+        self.join_type = LOUTER
+        # Is this join nullabled?
+        self.nullable = True
+
+    def as_sql(self, compiler, connection):
+        sql, params = compiler.compile(self.table_subquery)
+        alias = compiler.quote_name(self.table_alias)
+        return (
+            "%s %s %s ON (1 = 1)" % (self.join_type, sql, alias),
+            params,
+        )
+
+    def relabeled_clone(self, change_map):
+        clone = self.__class__(
+            self.table_subquery.relabeled_clone(change_map),
+            self.table_name,
+            change_map.get(self.table_alias, self.table_alias),
+        )
+        clone.join_type = self.join_type
+        return clone
+
+    def get_field(self, name):
+        field = self.table_subquery.output_field.get_field(name)
+
+        if field.is_relation:
+            field = field.target_field
+
+        field = field.clone()
+        field.model = None
+        field.name = name
+        field.column = name
+        return field
+
+
 class BaseTable:
     """
     The BaseTable class is used for base table references in FROM clause. For

@@ -1,7 +1,9 @@
 import json
 
 from django.core import checks
+from django.core.exceptions import FieldError
 from django.db.models import NOT_PROVIDED, Field
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import ColPairs
 from django.db.models.fields.tuple_lookups import (
     TupleExact,
@@ -175,3 +177,51 @@ def unnest(fields):
             result.append(field)
 
     return result
+
+
+class CompositeField(Field):
+    is_composite = True
+
+    def __init__(self, **kwargs):
+        self.sub_fields = {}
+        for name, field in kwargs.items():
+            if not isinstance(field, Field):
+                raise TypeError(
+                    f"{name!r} should field instance"
+                )  # this message could enhance later
+
+            self.sub_fields[name] = field
+        if len(self.sub_fields) < 2:
+            raise ValueError("At least two fields should be there")
+        super().__init__()
+
+    @classmethod
+    def from_select(cls, fields):
+        """Build an output field from an ordered mapping of selected fields."""
+        if not fields:
+            return None
+        if len(fields) == 1:
+            return next(iter(fields.values()))
+
+        return cls(**fields)
+
+    def get_fields(self):
+        for name, field in self.sub_fields.items():
+            path = tuple(name.split(LOOKUP_SEP))
+            yield path, field
+
+    def get_field(self, name):
+        path = tuple(name.split(LOOKUP_SEP))
+        for field_path, field in self.get_fields():
+            if field_path == path:
+                return field
+        raise FieldError(f"{name!r} not found")
+
+
+CompositeField.register_lookup(TupleExact)
+CompositeField.register_lookup(TupleGreaterThan)
+CompositeField.register_lookup(TupleGreaterThanOrEqual)
+CompositeField.register_lookup(TupleLessThan)
+CompositeField.register_lookup(TupleLessThanOrEqual)
+CompositeField.register_lookup(TupleIn)
+CompositeField.register_lookup(TupleIsNull)

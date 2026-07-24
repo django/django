@@ -315,6 +315,18 @@ class SQLCompiler:
         ret = []
         col_idx = 1
         for col, alias in select:
+            is_multi_column_query = isinstance(
+                col, Query
+            ) and Query._is_multi_column_query(col)
+            is_multi_column_expression = (
+                not isinstance(col, ColPairs)
+                and getattr(col, "_subquery_fields_len", 1) > 1
+            )
+            if is_multi_column_query or is_multi_column_expression:
+                raise NotImplementedError(
+                    "Selecting a multi-column subquery as an annotation is not "
+                    "supported."
+                )
             try:
                 sql, params = self.compile(col)
             except EmptyResultSet:
@@ -418,6 +430,14 @@ class SQLCompiler:
                 ref, *transforms = col.split(LOOKUP_SEP)
                 expr = self.query.annotations.get(ref)
             if expr:
+                if transforms and not self.query.combinator:
+                    # The part after a multi-column annotation may
+                    # be a derived-table column, not a transform.
+                    # Resolve the full name first.
+                    # For example, "project_bug__severity_level"
+                    # becomes a Col for "severity_level".
+                    expr = self.query.resolve_ref(col)
+                    transforms = []
                 if self.query.combinator and self.select:
                     if transforms:
                         raise NotImplementedError(

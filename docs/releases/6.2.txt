@@ -195,7 +195,10 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* Multi-column ``Subquery`` expressions can now be assigned using
+  :meth:`.QuerySet.alias`. Their ``CompositeField`` subfields can be referenced
+  and traversed using the double-underscore syntax, for example,
+  ``info__email``.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
