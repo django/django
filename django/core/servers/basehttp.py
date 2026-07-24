@@ -15,7 +15,7 @@ from collections import deque
 from wsgiref import simple_server
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.handlers.wsgi import LimitedStream
+from django.core.handlers.base import LimitedStream
 from django.core.wsgi import get_wsgi_application
 from django.db import connections
 from django.utils.log import log_message
