@@ -71,12 +71,6 @@ It contains lots of great information and is a must-read for anyone who'd like
 to become a regular contributor to Django. If you've got questions, it's
 probably got the answers.
 
-.. admonition:: Python 3 required!
-
-    The current version of Django doesn't support Python 2.7. Get Python 3 at
-    `Python's download page <https://www.python.org/downloads/>`_ or with your
-    operating system's package manager.
-
 .. admonition:: For Windows users
 
     See :ref:`install_python_windows` on Windows docs for additional guidance.
@@ -411,13 +405,13 @@ file:
 
     .. function:: make_toast()
 
-    .. versionadded:: 2.2
+    .. versionadded:: 6.2
 
     Returns ``'toast'``.
 
 Since this new feature will be in an upcoming release it is also added to the
 release notes for the next version of Django. Open the release notes for the
-latest version in ``docs/releases/``, which at time of writing is ``2.2.txt``.
+latest version in ``docs/releases/``, which at time of writing is ``6.2.txt``.
 Add a note under the "Minor Features" header:
 
 .. code-block:: rst
@@ -467,11 +461,11 @@ Use the arrow keys to move up and down.
     +
     +def make_toast():
     +    return 'toast'
-    diff --git a/docs/releases/2.2.txt b/docs/releases/2.2.txt
+    diff --git a/docs/releases/6.2.txt b/docs/releases/6.2.txt
     index 7d85d30c4a..81518187b3 100644
-    --- a/docs/releases/2.2.txt
-    +++ b/docs/releases/2.2.txt
-    @@ -40,6 +40,11 @@ database constraints. Constraints are added to models using the
+    --- a/docs/releases/6.2.txt
+    +++ b/docs/releases/6.2.txt
+    @@ -34,6 +34,11 @@
      Minor features
      --------------
 
@@ -497,7 +491,7 @@ Use the arrow keys to move up and down.
     +
     +.. function:: make_toast()
     +
-    +.. versionadded:: 2.2
+    +.. versionadded:: 6.2
     +
     +Returns ``'toast'``.
     diff --git a/tests/shortcuts/test_make_toast.py b/tests/shortcuts/test_make_toast.py
