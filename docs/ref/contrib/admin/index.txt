@@ -2236,33 +2236,6 @@ return the uncompressed versions of the various JavaScript files, including
 
 .. _jQuery: https://jquery.com
 
-.. _admin-custom-validation:
-
-Adding custom validation to the admin
--------------------------------------
-
-You can also add custom validation of data in the admin. The automatic admin
-interface reuses :mod:`django.forms`, and the ``ModelAdmin`` class gives you
-the ability to define your own form::
-
-    class ArticleAdmin(admin.ModelAdmin):
-        form = MyArticleAdminForm
-
-``MyArticleAdminForm`` can be defined anywhere as long as you import where
-needed. Now within your form you can add your own custom validation for
-any field::
-
-    class MyArticleAdminForm(forms.ModelForm):
-        def clean_name(self):
-            # do something that validates your data
-            return self.cleaned_data["name"]
-
-It is important you use a ``ModelForm`` here otherwise things can break. See
-the :doc:`forms </ref/forms/index>` documentation on :doc:`custom validation
-</ref/forms/validation>` and, more specifically, the
-:ref:`model form validation notes <overriding-modelform-clean-method>` for more
-information.
-
 .. _admin-inlines:
 
 ``InlineModelAdmin`` objects
@@ -2367,6 +2340,8 @@ The ``InlineModelAdmin`` class adds or customizes:
     The value for ``form`` defaults to ``ModelForm``. This is what is passed
     through to :func:`~django.forms.models.inlineformset_factory` when
     creating the formset for this inline.
+
+    For an example see the section :ref:`admin-custom-validation`.
 
 .. warning::
     When writing custom validation for ``InlineModelAdmin`` forms, be cautious
@@ -2757,6 +2732,36 @@ any other inline. In your ``admin.py`` for this example app::
 
 See the :doc:`contenttypes documentation </ref/contrib/contenttypes>` for more
 specific information.
+
+.. _admin-custom-validation:
+
+Adding custom validation to the admin
+=====================================
+
+The admin uses :class:`~django.forms.ModelForm`. To add custom validation,
+provide your own ``ModelForm``::
+
+    class ArticleForm(forms.ModelForm):
+        def clean_name(self):
+            # do something that validates your data
+            return self.cleaned_data["name"]
+
+Then configure the :class:`ModelAdmin` to use the form::
+
+    class ArticleAdmin(admin.ModelAdmin):
+        form = ArticleForm
+
+Or configure an :class:`InlineModelAdmin` to use the form::
+
+    class ArticleInline(admin.TabularInline):
+        model = Article
+        form = ArticleForm
+
+It is important that you use a ``ModelForm``; otherwise things can break. See
+the :doc:`forms </ref/forms/index>` documentation on :doc:`custom validation
+</ref/forms/validation>` and, more specifically, the
+:ref:`model form validation notes <overriding-modelform-clean-method>` for more
+information.
 
 .. _admin-overriding-templates:
 
