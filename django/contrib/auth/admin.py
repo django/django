@@ -200,7 +200,7 @@ class UserAdmin(admin.ModelAdmin):
             form = self.change_password_form(user)
 
         fieldsets = [(None, {"fields": list(form.base_fields)})]
-        admin_form = admin.helpers.AdminForm(form, fieldsets, {})
+        admin_form = admin.helpers.AdminForm(form, fieldsets, {}, model_admin=self)
 
         if user.has_usable_password():
             title = _("Change password: %s")
