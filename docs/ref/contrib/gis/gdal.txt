@@ -1938,11 +1938,12 @@ Key               Default  Usage
     3     GDT_Int16       16 bit signed integer
     4     GDT_UInt32      32 bit unsigned integer
     5     GDT_Int32       32 bit signed integer
-    6     GDT_Float32     32 bit floating point
-    7     GDT_Float64     64 bit floating point
-    12    GDT_UInt64      64 bit unsigned integer (GDAL 3.5+)
-    13    GDT_Int64       64 bit signed integer (GDAL 3.5+)
-    14    GDT_Int8        8 bit signed integer (GDAL 3.7+)
+    6     GDT_Float16     16 bit floating point
+    7     GDT_Float32     32 bit floating point
+    8     GDT_Float64     64 bit floating point
+    13    GDT_UInt64      64 bit unsigned integer (GDAL 3.5+)
+    14    GDT_Int64       64 bit signed integer (GDAL 3.5+)
+    15    GDT_Int8        8 bit signed integer (GDAL 3.7+)
     ===== =============== ===================================
 
 .. object:: nr_of_bands
