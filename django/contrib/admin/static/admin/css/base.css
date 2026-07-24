@@ -12,24 +12,31 @@ html[data-theme="light"],
 
     --body-fg: #333;
     --body-bg: #fff;
-    --body-quiet-color: #666;
-    --body-medium-color: #444;
-    --body-loud-color: #000;
+    --body-quiet-fg: #666;
+    --body-quiet-color: var(--body-quiet-fg);
+    --body-medium-fg: #444;
+    --body-medium-color: var(--body-medium-fg);
+    --body-loud-fg: #000;
+    --body-loud-color: var(--body-loud-fg);
 
-    --header-color: #ffc;
+    --header-fg: #ffc;
+    --header-color: var(--header-fg);
     --header-branding-color: var(--accent);
     --header-bg: var(--secondary);
-    --header-link-color: var(--primary-fg);
+    --header-link-fg: var(--primary-fg);
+    --header-link-color: var(--header-link-fg);
 
     --breadcrumbs-fg: #c4dce8;
     --breadcrumbs-link-fg: var(--body-bg);
     --breadcrumbs-bg: #264b5d;
 
     --link-fg: #417893;
-    --link-hover-color: #036;
+    --link-hover-fg: #036;
+    --link-hover-color: var(--link-hover-fg);
     --link-selected-fg: var(--secondary);
 
-    --hairline-color: #e8e8e8;
+    --hairline-border: #e8e8e8;
+    --hairline-color: var(--hairline-border);
     --border-color: #ccc;
 
     --error-fg: #ba2121;
@@ -47,7 +54,8 @@ html[data-theme="light"],
 
     --darkened-bg: #f8f8f8; /* A bit darker than --body-bg */
     --selected-bg: #e4e4e4; /* E.g. selected table cells */
-    --selected-row: #ffc;
+    --selected-row-bg: #ffc;
+    --selected-row: var(--selected-row-bg);
 
     --button-fg: #fff;
     --button-bg: var(--secondary);
@@ -139,7 +147,7 @@ a img {
 
 a.section:link,
 a.section:visited {
-    color: var(--header-link-color);
+    color: var(--header-link-fg);
     text-decoration: none;
 }
 
@@ -189,7 +197,7 @@ h2.subhead {
 h3 {
     font-size: 0.875rem;
     margin: 0.8em 0 0.3em 0;
-    color: var(--body-medium-color);
+    color: var(--body-medium-fg);
     font-weight: bold;
 }
 
@@ -197,13 +205,13 @@ h4 {
     font-size: 0.75rem;
     margin: 1em 0 0.8em 0;
     padding-bottom: 3px;
-    color: var(--body-medium-color);
+    color: var(--body-medium-fg);
 }
 
 h5 {
     font-size: 0.625rem;
     margin: 1.5em 0 0.5em 0;
-    color: var(--body-quiet-color);
+    color: var(--body-quiet-fg);
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -252,7 +260,7 @@ details summary {
 
 blockquote {
     font-size: 0.6875rem;
-    color: var(--body-quiet-color);
+    color: var(--body-quiet-fg);
     margin-left: 2px;
     padding-left: 10px;
     border-left: 5px solid currentColor;
@@ -261,7 +269,7 @@ blockquote {
 code,
 pre {
     font-family: var(--font-family-monospace);
-    color: var(--body-quiet-color);
+    color: var(--body-quiet-fg);
     font-size: 0.75rem;
     overflow-x: auto;
 }
@@ -304,7 +312,7 @@ div.help,
 form div.help,
 div.help li {
     font-size: 0.6875rem;
-    color: var(--body-quiet-color);
+    color: var(--body-quiet-fg);
 }
 
 div.help ul {
@@ -327,7 +335,7 @@ td img {
 .quiet,
 a.quiet:link,
 a.quiet:visited {
-    color: var(--body-quiet-color);
+    color: var(--body-quiet-fg);
     font-weight: normal;
 }
 
@@ -366,7 +374,7 @@ th {
 
 thead th,
 tfoot td {
-    color: var(--body-quiet-color);
+    color: var(--body-quiet-fg);
     padding: 5px 10px;
     font-size: 0.6875rem;
     background: var(--body-bg);
@@ -411,7 +419,7 @@ thead th {
 
 thead th a:link,
 thead th a:visited {
-    color: var(--body-quiet-color);
+    color: var(--body-quiet-fg);
 }
 
 thead th.sorted {
@@ -482,7 +490,7 @@ table thead th.sorted .sortoptions a.sortremove:after {
     left: 3px;
     font-weight: 200;
     font-size: 1.125rem;
-    color: var(--body-quiet-color);
+    color: var(--body-quiet-fg);
 }
 
 table thead th.sorted .sortoptions a.sortremove:focus:after,
@@ -569,7 +577,7 @@ input[type="tel"]:focus,
 textarea:focus,
 select:focus,
 .vTextField:focus {
-    border-color: var(--body-quiet-color);
+    border-color: var(--body-quiet-fg);
 }
 
 select {
@@ -683,7 +691,7 @@ input[type="button"][disabled].default {
     font-size: 0.8125rem;
     text-align: left;
     background: var(--header-bg);
-    color: var(--header-link-color);
+    color: var(--header-link-fg);
 }
 
 .module caption,
@@ -962,7 +970,7 @@ a.deletelink:hover {
 }
 
 #change-history .paginator {
-    color: var(--body-quiet-color);
+    color: var(--body-quiet-fg);
     border-bottom: 1px solid var(--hairline-color);
     background: var(--body-bg);
     overflow: hidden;
@@ -1064,13 +1072,13 @@ a.deletelink:hover {
     align-items: center;
     padding: 10px 40px;
     background: var(--header-bg);
-    color: var(--header-color);
+    color: var(--header-fg);
 }
 
 #header a:link,
 #header a:visited,
 #logout-form button {
-    color: var(--header-link-color);
+    color: var(--header-link-fg);
 }
 
 #header a:focus,
@@ -1107,7 +1115,7 @@ a.deletelink:hover {
     font-size: 0.875rem;
     margin: -8px 0 8px 0;
     font-weight: normal;
-    color: var(--header-color);
+    color: var(--header-fg);
 }
 
 #branding a:hover {
@@ -1169,7 +1177,7 @@ a.deletelink:hover {
 }
 
 #content-related h3 {
-    color: var(--body-quiet-color);
+    color: var(--body-quiet-fg);
     padding: 0 16px;
     margin: 0 0 16px;
 }
@@ -1285,7 +1293,7 @@ a.deletelink:hover {
 }
 
 .paginator a[aria-current="page"] {
-    color: var(--body-quiet-color);
+    color: var(--body-quiet-fg);
     background: transparent;
     font-weight: bold;
     cursor: default;
@@ -1326,7 +1334,7 @@ a.deletelink:hover {
     border-top: none;
     border-bottom: none;
     line-height: 1.5rem;
-    color: var(--body-quiet-color);
+    color: var(--body-quiet-fg);
     width: 100%;
     box-sizing: border-box;
 }
@@ -1356,7 +1364,7 @@ a.deletelink:hover {
 }
 
 .actions select:focus {
-    border-color: var(--body-quiet-color);
+    border-color: var(--body-quiet-fg);
 }
 
 .actions label {
@@ -1381,5 +1389,5 @@ a.deletelink:hover {
 
 .actions .button:focus,
 .actions .button:hover {
-    border-color: var(--body-quiet-color);
+    border-color: var(--body-quiet-fg);
 }
