@@ -10,6 +10,8 @@ from django.views.decorators.csrf import (
     requires_csrf_token,
 )
 
+from .testcases import HttpResponseTestCase
+
 CSRF_TOKEN = "1bcdefghij2bcdefghij3bcdefghij4bcdefghij5bcdefghij6bcdefghijABCD"
 
 
@@ -161,7 +163,7 @@ class EnsureCsrfCookieTests(CsrfTestMixin, SimpleTestCase):
             self.assertEqual(response.status_code, 200)
 
 
-class CsrfExemptTests(SimpleTestCase):
+class CsrfExemptTests(HttpResponseTestCase):
     def test_wrapped_sync_function_is_not_coroutine_function(self):
         def sync_view(request):
             return HttpResponse()
@@ -182,7 +184,7 @@ class CsrfExemptTests(SimpleTestCase):
             return HttpResponse()
 
         self.assertIs(sync_view.csrf_exempt, True)
-        self.assertIsInstance(sync_view(HttpRequest()), HttpResponse)
+        self.assertIsClass(sync_view(HttpRequest()), HttpResponse)
 
     async def test_csrf_exempt_decorator_async_view(self):
         @csrf_exempt
@@ -190,4 +192,4 @@ class CsrfExemptTests(SimpleTestCase):
             return HttpResponse()
 
         self.assertIs(async_view.csrf_exempt, True)
-        self.assertIsInstance(await async_view(HttpRequest()), HttpResponse)
+        self.assertIsClass(await async_view(HttpRequest()), HttpResponse)
