@@ -170,7 +170,7 @@ Imports
       :caption: ``django/contrib/admin/example.py``
 
       # future
-      from __future__ import unicode_literals
+      from __future__ import annotations
 
       # standard library
       import json
