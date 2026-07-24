@@ -353,3 +353,24 @@ class DataSourceTest(SimpleTestCase):
         msg = "invalid field name: nonexistent"
         with self.assertRaisesMessage(GDALException, msg):
             ds[0].get_fields("nonexistent")
+
+    def test_import_gpx_without_milliseconds(self):
+
+        from django.contrib.gis.gdal import DataSource
+
+        fixture_path = (
+            Path(__file__).resolve().parent
+            / "fixtures/gpx_with_without_milliseconds.xml"
+        )
+        ds = DataSource(fixture_path)
+
+        for layer_index in range(ds.layer_count):
+            layer = ds[layer_index]
+            for feat in layer:
+                if layer.name == "track_points":
+                    extracted_datetime: datetime = feat.get("time")
+                    self.assertIsInstance(extracted_datetime, datetime)
+                    if feat.fid == 0:
+                        self.assertEqual(extracted_datetime.microsecond, 0)
+                    else:
+                        self.assertEqual(extracted_datetime.microsecond, 123000)
