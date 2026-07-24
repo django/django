@@ -1,13 +1,13 @@
-from django.contrib.admin.tests import AdminSeleniumTestCase
+from django.contrib.admin.tests import AdminPlaywrightTestCase
 from django.contrib.auth.models import User
 from django.test import override_settings
-from django.test.selenium import screenshot_cases
+from django.test.playwright import screenshot_cases
 from django.urls import reverse
 
 
 @override_settings(ROOT_URLCONF="auth_tests.urls_admin")
-class SeleniumAuthTests(AdminSeleniumTestCase):
-    available_apps = AdminSeleniumTestCase.available_apps
+class PlaywrightAuthTests(AdminPlaywrightTestCase):
+    available_apps = AdminPlaywrightTestCase.available_apps
 
     def setUp(self):
         self.superuser = User.objects.create_superuser(
@@ -22,48 +22,38 @@ class SeleniumAuthTests(AdminSeleniumTestCase):
         Enabling/disabling the usable password field shows/hides the password
         fields when adding a user.
         """
-        from selenium.common import NoSuchElementException
-        from selenium.webdriver.common.by import By
-
         user_add_url = reverse("auth_test_admin:auth_user_add")
         self.admin_login(username="super", password="secret")
-        self.selenium.get(self.live_server_url + user_add_url)
+        self.page.goto(self.live_server_url + user_add_url)
 
-        pw_switch_on = self.selenium.find_element(
-            By.CSS_SELECTOR, 'input[name="usable_password"][value="true"]'
+        pw_switch_on = self.page.locator('input[name="usable_password"][value="true"]')
+        pw_switch_off = self.page.locator(
+            'input[name="usable_password"][value="false"]'
         )
-        pw_switch_off = self.selenium.find_element(
-            By.CSS_SELECTOR, 'input[name="usable_password"][value="false"]'
-        )
-        password1 = self.selenium.find_element(
-            By.CSS_SELECTOR, 'input[name="password1"]'
-        )
-        password2 = self.selenium.find_element(
-            By.CSS_SELECTOR, 'input[name="password2"]'
-        )
+        password1 = self.page.locator('input[name="password1"]')
+        password2 = self.page.locator('input[name="password2"]')
 
         # Default is to set a password on user creation.
-        self.assertIs(pw_switch_on.is_selected(), True)
-        self.assertIs(pw_switch_off.is_selected(), False)
+        self.expect(pw_switch_on).to_be_checked()
+        self.expect(pw_switch_off).not_to_be_checked()
 
         # The password fields are visible.
-        self.assertIs(password1.is_displayed(), True)
-        self.assertIs(password2.is_displayed(), True)
+        self.expect(password1).to_be_visible()
+        self.expect(password2).to_be_visible()
 
         # Click to disable password-based authentication.
         pw_switch_off.click()
 
         # Radio buttons are updated accordingly.
-        self.assertIs(pw_switch_on.is_selected(), False)
-        self.assertIs(pw_switch_off.is_selected(), True)
+        self.expect(pw_switch_on).not_to_be_checked()
+        self.expect(pw_switch_off).to_be_checked()
 
         # The password fields are hidden.
-        self.assertIs(password1.is_displayed(), False)
-        self.assertIs(password2.is_displayed(), False)
+        self.expect(password1).to_be_hidden()
+        self.expect(password2).to_be_hidden()
 
         # The warning message should not be shown.
-        with self.assertRaises(NoSuchElementException):
-            self.selenium.find_element(By.ID, "id_unusable_warning")
+        self.expect(self.page.locator("#id_unusable_warning")).to_have_count(0)
 
     def test_change_password_for_existing_user(self):
         """A user can have their password changed or unset.
@@ -71,84 +61,72 @@ class SeleniumAuthTests(AdminSeleniumTestCase):
         Enabling/disabling the usable password field shows/hides the password
         fields and the warning about password lost.
         """
-        from selenium.webdriver.common.by import By
-
         user = User.objects.create_user(
             username="ada", password="charles", email="ada@example.com"
         )
         user_url = reverse("auth_test_admin:auth_user_password_change", args=(user.pk,))
         self.admin_login(username="super", password="secret")
-        self.selenium.get(self.live_server_url + user_url)
+        self.page.goto(self.live_server_url + user_url)
 
-        pw_switch_on = self.selenium.find_element(
-            By.CSS_SELECTOR, 'input[name="usable_password"][value="true"]'
+        pw_switch_on = self.page.locator('input[name="usable_password"][value="true"]')
+        pw_switch_off = self.page.locator(
+            'input[name="usable_password"][value="false"]'
         )
-        pw_switch_off = self.selenium.find_element(
-            By.CSS_SELECTOR, 'input[name="usable_password"][value="false"]'
-        )
-        password1 = self.selenium.find_element(
-            By.CSS_SELECTOR, 'input[name="password1"]'
-        )
-        password2 = self.selenium.find_element(
-            By.CSS_SELECTOR, 'input[name="password2"]'
-        )
-        submit_set = self.selenium.find_element(
-            By.CSS_SELECTOR, 'input[type="submit"].set-password'
-        )
-        submit_unset = self.selenium.find_element(
-            By.CSS_SELECTOR, 'input[type="submit"].unset-password'
-        )
+        password1 = self.page.locator('input[name="password1"]')
+        password2 = self.page.locator('input[name="password2"]')
+        submit_set = self.page.locator('input[type="submit"].set-password')
+        submit_unset = self.page.locator('input[type="submit"].unset-password')
 
         # By default password-based authentication is enabled.
-        self.assertIs(pw_switch_on.is_selected(), True)
-        self.assertIs(pw_switch_off.is_selected(), False)
+        self.expect(pw_switch_on).to_be_checked()
+        self.expect(pw_switch_off).not_to_be_checked()
 
         # The password fields are visible.
-        self.assertIs(password1.is_displayed(), True)
-        self.assertIs(password2.is_displayed(), True)
+        self.expect(password1).to_be_visible()
+        self.expect(password2).to_be_visible()
 
         # Only the set password submit button is visible.
-        self.assertIs(submit_set.is_displayed(), True)
-        self.assertIs(submit_unset.is_displayed(), False)
+        self.expect(submit_set).to_be_visible()
+        self.expect(submit_unset).to_be_hidden()
 
         # Click to disable password-based authentication.
         pw_switch_off.click()
 
         # Radio buttons are updated accordingly.
-        self.assertIs(pw_switch_on.is_selected(), False)
-        self.assertIs(pw_switch_off.is_selected(), True)
+        self.expect(pw_switch_on).not_to_be_checked()
+        self.expect(pw_switch_off).to_be_checked()
 
         # The password fields are hidden.
-        self.assertIs(password1.is_displayed(), False)
-        self.assertIs(password2.is_displayed(), False)
+        self.expect(password1).to_be_hidden()
+        self.expect(password2).to_be_hidden()
 
         # Only the unset password submit button is visible.
-        self.assertIs(submit_unset.is_displayed(), True)
-        self.assertIs(submit_set.is_displayed(), False)
+        self.expect(submit_unset).to_be_visible()
+        self.expect(submit_set).to_be_hidden()
 
         # The warning about password being lost is shown.
-        warning = self.selenium.find_element(By.ID, "id_unusable_warning")
-        self.assertIs(warning.is_displayed(), True)
+        warning = self.page.locator("#id_unusable_warning")
+        self.expect(warning).to_be_visible()
 
         # Click to enable password-based authentication.
         pw_switch_on.click()
 
         # The warning disappears.
-        self.assertIs(warning.is_displayed(), False)
+        self.expect(warning).to_be_hidden()
 
         # The password fields are shown.
-        self.assertIs(password1.is_displayed(), True)
-        self.assertIs(password2.is_displayed(), True)
+        self.expect(password1).to_be_visible()
+        self.expect(password2).to_be_visible()
 
         # Only the set password submit button is visible.
-        self.assertIs(submit_set.is_displayed(), True)
-        self.assertIs(submit_unset.is_displayed(), False)
+        self.expect(submit_set).to_be_visible()
+        self.expect(submit_unset).to_be_hidden()
 
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_fieldset_legend_wide_alignment(self):
         user_add_url = reverse("auth_test_admin:auth_user_add")
         self.admin_login(username="super", password="secret")
-        self.selenium.get(self.live_server_url + user_add_url)
+        self.page.goto(self.live_server_url + user_add_url)
 
         # The fieldset legend is aligned with other fields.
         self.take_screenshot("fieldset_legend_wide")

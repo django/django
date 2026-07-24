@@ -4,7 +4,7 @@ from contextlib import contextmanager
 
 from django.contrib import admin
 from django.contrib.admin.exceptions import NotRegistered
-from django.contrib.admin.tests import AdminSeleniumTestCase
+from django.contrib.admin.tests import AdminPlaywrightTestCase
 from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
@@ -394,8 +394,8 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
-class SeleniumTests(AdminSeleniumTestCase):
-    available_apps = ["admin_views"] + AdminSeleniumTestCase.available_apps
+class PlaywrightTests(AdminPlaywrightTestCase):
+    available_apps = ["admin_views"] + AdminPlaywrightTestCase.available_apps
 
     def setUp(self):
         self.superuser = User.objects.create_superuser(
@@ -409,191 +409,132 @@ class SeleniumTests(AdminSeleniumTestCase):
             login_url=reverse("autocomplete_admin:index"),
         )
 
-    @contextmanager
-    def select2_ajax_wait(self, timeout=10):
-        from selenium.common.exceptions import NoSuchElementException
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.support import expected_conditions as ec
-
-        yield
-        with self.disable_implicit_wait():
-            try:
-                loading_element = self.selenium.find_element(
-                    By.CSS_SELECTOR, "li.select2-results__option.loading-results"
-                )
-            except NoSuchElementException:
-                pass
-            else:
-                self.wait_until(ec.staleness_of(loading_element), timeout=timeout)
-
     def test_select(self):
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.common.keys import Keys
-        from selenium.webdriver.support.ui import Select
-
-        self.selenium.get(
+        self.page.goto(
             self.live_server_url + reverse("autocomplete_admin:admin_views_answer_add")
         )
-        elem = self.selenium.find_element(By.CSS_SELECTOR, ".select2-selection")
-        with self.select2_ajax_wait():
+        elem = self.page.locator(".select2-selection")
+        with self.page.expect_response(lambda r: "autocomplete" in r.url):
             elem.click()  # Open the autocomplete dropdown.
-        results = self.selenium.find_element(By.CSS_SELECTOR, ".select2-results")
-        self.assertTrue(results.is_displayed())
-        option = self.selenium.find_element(By.CSS_SELECTOR, ".select2-results__option")
-        self.assertEqual(option.text, "No results found")
-        with self.select2_ajax_wait():
-            elem.click()  # Close the autocomplete dropdown.
+        results = self.page.locator(".select2-results")
+        self.expect(results).to_be_visible()
+        option = self.page.locator(".select2-results__option")
+        self.expect(option).to_have_text("No results found")
+        elem.click()  # Close the autocomplete dropdown.
         q1 = Question.objects.create(question="Who am I?")
         Question.objects.bulk_create(
             Question(question=str(i)) for i in range(PAGINATOR_SIZE + 10)
         )
-        with self.select2_ajax_wait():
+        with self.page.expect_response(lambda r: "autocomplete" in r.url):
             elem.click()  # Reopen the dropdown now that some objects exist.
-        result_container = self.selenium.find_element(
-            By.CSS_SELECTOR, ".select2-results"
-        )
-        self.assertTrue(result_container.is_displayed())
+        result_container = self.page.locator(".select2-results")
+        self.expect(result_container).to_be_visible()
         # PAGINATOR_SIZE results and "Loading more results".
-        self.assertCountSeleniumElements(
-            ".select2-results__option",
-            PAGINATOR_SIZE + 1,
-            root_element=result_container,
+        self.expect(result_container.locator(".select2-results__option")).to_have_count(
+            PAGINATOR_SIZE + 1
         )
-        search = self.selenium.find_element(By.CSS_SELECTOR, ".select2-search__field")
+        search = self.page.locator(".select2-search__field")
         # Load next page of results by scrolling to the bottom of the list.
         for _ in range(PAGINATOR_SIZE + 1):
-            with self.select2_ajax_wait():
-                search.send_keys(Keys.ARROW_DOWN)
+            search.press("ArrowDown")
         # All objects are now loaded.
-        self.assertCountSeleniumElements(
-            ".select2-results__option",
-            PAGINATOR_SIZE + 11,
-            root_element=result_container,
+        self.expect(result_container.locator(".select2-results__option")).to_have_count(
+            PAGINATOR_SIZE + 11
         )
         # Limit the results with the search field.
-        with self.select2_ajax_wait():
-            search.send_keys("Who")
+        with self.page.expect_response(lambda r: "autocomplete" in r.url):
+            search.press_sequentially("Who")
             # Ajax request is delayed.
-            self.assertTrue(result_container.is_displayed())
-            self.assertCountSeleniumElements(
-                ".select2-results__option",
-                PAGINATOR_SIZE + 12,
-                root_element=result_container,
-            )
-        self.assertTrue(result_container.is_displayed())
-        self.assertCountSeleniumElements(
-            ".select2-results__option", 1, root_element=result_container
+            self.expect(result_container).to_be_visible()
+            self.expect(
+                result_container.locator(".select2-results__option")
+            ).to_have_count(PAGINATOR_SIZE + 12)
+        self.expect(result_container).to_be_visible()
+        self.expect(result_container.locator(".select2-results__option")).to_have_count(
+            1
         )
         # Select the result.
-        with self.select2_ajax_wait():
-            search.send_keys(Keys.RETURN)
-        select = Select(self.selenium.find_element(By.ID, "id_question"))
-        self.assertEqual(
-            select.first_selected_option.get_attribute("value"), str(q1.pk)
-        )
+        search.press("Enter")
+        select = self.page.locator("#id_question")
+        self.expect(select).to_have_value(str(q1.pk))
 
     def test_select_multiple(self):
-        from selenium.common import NoSuchElementException
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.common.keys import Keys
-        from selenium.webdriver.support.ui import Select
-
-        self.selenium.get(
+        self.page.goto(
             self.live_server_url
             + reverse("autocomplete_admin:admin_views_question_add")
         )
-        elem = self.selenium.find_element(By.CSS_SELECTOR, ".select2-selection")
-        with self.select2_ajax_wait():
+        elem = self.page.locator(".select2-selection")
+        with self.page.expect_response(lambda r: "autocomplete" in r.url):
             elem.click()  # Open the autocomplete dropdown.
-        results = self.selenium.find_element(By.CSS_SELECTOR, ".select2-results")
-        self.assertTrue(results.is_displayed())
-        option = self.selenium.find_element(By.CSS_SELECTOR, ".select2-results__option")
-        self.assertEqual(option.text, "No results found")
-        with self.select2_ajax_wait():
-            elem.click()  # Close the autocomplete dropdown.
+        results = self.page.locator(".select2-results")
+        self.expect(results).to_be_visible()
+        option = self.page.locator(".select2-results__option")
+        self.expect(option).to_have_text("No results found")
+        elem.click()  # Close the autocomplete dropdown.
         Question.objects.create(question="Who am I?")
         Question.objects.bulk_create(
             Question(question=str(i)) for i in range(PAGINATOR_SIZE + 10)
         )
-        with self.select2_ajax_wait():
+        with self.page.expect_response(lambda r: "autocomplete" in r.url):
             elem.click()  # Reopen the dropdown now that some objects exist.
-        result_container = self.selenium.find_element(
-            By.CSS_SELECTOR, ".select2-results"
+        result_container = self.page.locator(".select2-results")
+        self.expect(result_container).to_be_visible()
+        self.expect(result_container.locator(".select2-results__option")).to_have_count(
+            PAGINATOR_SIZE + 1
         )
-        self.assertIs(result_container.is_displayed(), True)
-        self.assertCountSeleniumElements(
-            ".select2-results__option",
-            PAGINATOR_SIZE + 1,
-            root_element=result_container,
-        )
-        search = self.selenium.find_element(By.CSS_SELECTOR, ".select2-search__field")
+        search = self.page.locator(".select2-search__field")
         # Load next page of results by scrolling to the bottom of the list.
         for _ in range(PAGINATOR_SIZE + 1):
-            with self.select2_ajax_wait():
-                search.send_keys(Keys.ARROW_DOWN)
-        self.assertCountSeleniumElements(
-            ".select2-results__option",
-            PAGINATOR_SIZE + 11,
-            root_element=result_container,
+            search.press("ArrowDown")
+        self.expect(result_container.locator(".select2-results__option")).to_have_count(
+            PAGINATOR_SIZE + 11
         )
         # Limit the results with the search field.
-        with self.select2_ajax_wait():
-            search.send_keys("Who")
+        with self.page.expect_response(lambda r: "autocomplete" in r.url):
+            search.press_sequentially("Who")
             # Ajax request is delayed.
-            self.assertIs(result_container.is_displayed(), True)
-            self.assertCountSeleniumElements(
-                ".select2-results__option",
-                PAGINATOR_SIZE + 12,
-                root_element=result_container,
-            )
-        self.assertIs(result_container.is_displayed(), True)
-
-        self.assertCountSeleniumElements(
-            ".select2-results__option", 1, root_element=result_container
+            self.expect(result_container).to_be_visible()
+            self.expect(
+                result_container.locator(".select2-results__option")
+            ).to_have_count(PAGINATOR_SIZE + 12)
+        self.expect(result_container).to_be_visible()
+        self.expect(result_container.locator(".select2-results__option")).to_have_count(
+            1
         )
-        with self.select2_ajax_wait():
-            # Select the result.
-            search.send_keys(Keys.RETURN)
-        with self.disable_implicit_wait():
-            with self.assertRaises(NoSuchElementException):
-                self.selenium.find_element(By.CSS_SELECTOR, ".select2-results")
-        with self.select2_ajax_wait():
-            # Reopen the dropdown.
+        # Select the result.
+        search.press("Enter")
+        self.expect(self.page.locator(".select2-results")).to_be_hidden()
+        # Reopen the dropdown.
+        with self.page.expect_response(lambda r: "autocomplete" in r.url):
             elem.click()
-        result_container = self.selenium.find_element(
-            By.CSS_SELECTOR, ".select2-results"
-        )
-        self.assertIs(result_container.is_displayed(), True)
-        with self.select2_ajax_wait():
-            # Add the first result to the selection.
-            search.send_keys(Keys.ARROW_DOWN)
-            search.send_keys(Keys.RETURN)
-        select = Select(self.selenium.find_element(By.ID, "id_related_questions"))
-        self.assertEqual(len(select.all_selected_options), 2)
+        result_container = self.page.locator(".select2-results")
+        self.expect(result_container).to_be_visible()
+        # Add the first result to the selection.
+        search.press("ArrowDown")
+        search.press("Enter")
+        self.expect(
+            self.page.locator("#id_related_questions option:checked")
+        ).to_have_count(2)
 
     def test_inline_add_another_widgets(self):
-        from selenium.webdriver.common.by import By
-
         def assertNoResults(row):
-            elem = row.find_element(By.CSS_SELECTOR, ".select2-selection")
-            with self.select2_ajax_wait():
+            elem = row.locator(".select2-selection")
+            with self.page.expect_response(lambda r: "autocomplete" in r.url):
                 elem.click()  # Open the autocomplete dropdown.
-            results = self.selenium.find_element(By.CSS_SELECTOR, ".select2-results")
-            self.assertTrue(results.is_displayed())
-            option = self.selenium.find_element(
-                By.CSS_SELECTOR, ".select2-results__option"
-            )
-            self.assertEqual(option.text, "No results found")
+            results = self.page.locator(".select2-results")
+            self.expect(results).to_be_visible()
+            option = self.page.locator(".select2-results__option")
+            self.expect(option).to_have_text("No results found")
 
         # Autocomplete works in rows present when the page loads.
-        self.selenium.get(
+        self.page.goto(
             self.live_server_url + reverse("autocomplete_admin:admin_views_book_add")
         )
-        rows = self.selenium.find_elements(By.CSS_SELECTOR, ".dynamic-authorship_set")
-        self.assertEqual(len(rows), 3)
-        assertNoResults(rows[0])
+        rows = self.page.locator(".dynamic-authorship_set")
+        self.expect(rows).to_have_count(3)
+        assertNoResults(rows.nth(0))
         # Autocomplete works in rows added using the "Add another" button.
-        self.selenium.find_element(By.LINK_TEXT, "Add another Authorship").click()
-        rows = self.selenium.find_elements(By.CSS_SELECTOR, ".dynamic-authorship_set")
-        self.assertEqual(len(rows), 4)
-        assertNoResults(rows[-1])
+        self.page.get_by_role("button", name="Add another Authorship").click()
+        rows = self.page.locator(".dynamic-authorship_set")
+        self.expect(rows).to_have_count(4)
+        assertNoResults(rows.last)

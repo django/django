@@ -6,7 +6,6 @@ import gc
 import multiprocessing
 import os
 import shutil
-import socket
 import subprocess
 import sys
 import tempfile
@@ -25,8 +24,8 @@ else:
     from django.core.exceptions import ImproperlyConfigured
     from django.db import connection, connections
     from django.test import TestCase, TransactionTestCase
+    from django.test.playwright import PlaywrightTestCase, PlaywrightTestCaseBase
     from django.test.runner import get_max_test_processes, parallel_type
-    from django.test.selenium import SeleniumTestCase, SeleniumTestCaseBase
     from django.test.utils import NullTimeKeeper, TimeKeeper, get_runner
     from django.utils.deprecation import (
         RemovedAfterNextVersionWarning,
@@ -323,23 +322,24 @@ def teardown_run_tests(state):
     del os.environ["RUNNING_DJANGOS_TEST_SUITE"]
 
 
-class ActionSelenium(argparse.Action):
+class ActionPlaywright(argparse.Action):
     """
     Validate the comma-separated list of requested browsers.
     """
 
     def __call__(self, parser, namespace, values, option_string=None):
         try:
-            import selenium  # NOQA
+            from playwright.sync_api import sync_playwright  # noqa
         except ImportError as e:
-            raise ImproperlyConfigured(f"Error loading selenium module: {e}")
+            raise ImproperlyConfigured(f"Error loading playwright module: {e}")
         browsers = values.split(",")
         for browser in browsers:
             try:
-                SeleniumTestCaseBase.import_webdriver(browser)
+                PlaywrightTestCaseBase.import_browser(browser)
             except ImportError:
                 raise argparse.ArgumentError(
-                    self, "Selenium browser specification '%s' is not valid." % browser
+                    self,
+                    "Playwright browser specification '%s' is not valid." % browser,
                 )
         setattr(namespace, self.dest, browsers)
 
@@ -593,32 +593,21 @@ if __name__ == "__main__":
         "test side effects not apparent with normal execution lineup.",
     )
     parser.add_argument(
-        "--selenium",
-        action=ActionSelenium,
-        metavar="BROWSERS",
-        help="A comma-separated list of browsers to run the Selenium tests against.",
-    )
-    parser.add_argument(
         "--screenshots",
         action="store_true",
-        help="Take screenshots during selenium tests to capture the user interface.",
+        help="Take screenshots during Playwright tests to capture the user interface.",
     )
     parser.add_argument(
         "--headless",
         action="store_true",
-        help="Run selenium tests in headless mode, if the browser supports the option.",
+        help="Run Playwright tests in headless mode, if the browser supports the "
+        "option.",
     )
     parser.add_argument(
-        "--selenium-hub",
-        help="A URL for a selenium hub instance to use in combination with --selenium.",
-    )
-    parser.add_argument(
-        "--external-host",
-        default=socket.gethostname(),
-        help=(
-            "The external host that can be reached by the selenium hub instance when "
-            "running Selenium tests via Selenium Hub."
-        ),
+        "--playwright",
+        action=ActionPlaywright,
+        metavar="BROWSERS",
+        help="A comma-separated list of browsers to run the Playwright tests against.",
     )
     parser.add_argument(
         "--debug-sql",
@@ -696,15 +685,8 @@ if __name__ == "__main__":
 
     options = parser.parse_args()
 
-    using_selenium_hub = options.selenium and options.selenium_hub
-    if options.selenium_hub and not options.selenium:
-        parser.error(
-            "--selenium-hub and --external-host require --selenium to be used."
-        )
-    if using_selenium_hub and not options.external_host:
-        parser.error("--selenium-hub and --external-host must be used together.")
-    if options.screenshots and not options.selenium:
-        parser.error("--screenshots require --selenium to be used.")
+    if options.screenshots and not options.playwright:
+        parser.error("--screenshots require --playwright to be used.")
     if options.screenshots and options.tags:
         parser.error("--screenshots and --tag are mutually exclusive.")
 
@@ -742,27 +724,24 @@ if __name__ == "__main__":
         os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test_sqlite")
         options.settings = os.environ["DJANGO_SETTINGS_MODULE"]
 
-    if options.selenium:
+    if options.playwright:
         if (
             multiprocessing.get_start_method() in {"spawn", "forkserver"}
             and options.parallel != 1
         ):
             parser.error(
-                "You cannot use --selenium with parallel tests on this system. "
-                "Pass --parallel=1 to use --selenium."
+                "You cannot use --playwright with parallel tests on this system. "
+                "Pass --parallel=1 to use --playwright."
             )
         if not options.tags:
-            options.tags = ["selenium"]
-        elif "selenium" not in options.tags:
-            options.tags.append("selenium")
-        if options.selenium_hub:
-            SeleniumTestCaseBase.selenium_hub = options.selenium_hub
-            SeleniumTestCaseBase.external_host = options.external_host
-        SeleniumTestCaseBase.headless = options.headless
-        SeleniumTestCaseBase.browsers = options.selenium
+            options.tags = ["playwright"]
+        elif "playwright" not in options.tags:
+            options.tags.append("playwright")
+        PlaywrightTestCaseBase.headless = options.headless
+        PlaywrightTestCaseBase.browsers = options.playwright
         if options.screenshots:
-            options.tags = ["screenshot"]
-            SeleniumTestCase.screenshots = options.screenshots
+            options.tags = ["playwright_screenshot"]
+            PlaywrightTestCase.screenshots = options.screenshots
 
     if options.bisect:
         bisect_tests(

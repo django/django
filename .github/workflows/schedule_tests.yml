@@ -91,9 +91,9 @@ jobs:
       - run: npm install
       - run: npm test
 
-  selenium-sqlite:
+  playwright-sqlite:
     runs-on: ubuntu-latest
-    name: Selenium tests, SQLite
+    name: Playwright tests, SQLite
     timeout-minutes: 60
     steps:
       - name: Checkout
@@ -113,14 +113,16 @@ jobs:
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip wheel
       - run: python -m pip install -r tests/requirements/py3.txt -e .
-      - name: Run Selenium tests
+      - name: Install Playwright browsers
+        run: python -m playwright install --with-deps chromium
+      - name: Run Playwright tests
         working-directory: ./tests/
         run: |
-          python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_sqlite --parallel 1
+          python -Wall runtests.py --verbosity 2 --noinput --playwright=chromium --headless --settings=test_sqlite --parallel 1
 
-  selenium-postgresql:
+  playwright-postgresql:
     runs-on: ubuntu-latest
-    name: Selenium tests, PostgreSQL
+    name: Playwright tests, PostgreSQL
     timeout-minutes: 60
     services:
       postgres:
@@ -154,12 +156,14 @@ jobs:
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip wheel
       - run: python -m pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .
+      - name: Install Playwright browsers
+        run: python -m playwright install --with-deps chromium
       - name: Create PostgreSQL settings file
         run: mv ./.github/workflows/data/test_postgres.py.tpl ./tests/test_postgres.py
-      - name: Run Selenium tests
+      - name: Run Playwright tests
         working-directory: ./tests/
         run: |
-          python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_postgres --parallel 1
+          python -Wall runtests.py --verbosity 2 --noinput --playwright=chromium --headless --settings=test_postgres --parallel 1
 
   postgresql:
     strategy:

@@ -933,7 +933,7 @@ class CustomTemplateFilterColorAdmin(admin.ModelAdmin):
     list_filter = (("warm", CustomTemplateBooleanFieldListFilter),)
 
 
-# For Selenium Prepopulated tests -------------------------------------
+# For Prepopulated tests ----------------------------------------------
 class RelatedPrepopulatedInline1(admin.StackedInline):
     fieldsets = (
         (
