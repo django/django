@@ -2735,49 +2735,30 @@ specific information.
 Adding custom validation to the admin
 =====================================
 
-Because the admin builds on :class:`~django.forms.ModelForm`, any model-level
-validation you define, for example in :meth:`~django.db.models.Model.clean`, is
-run when the admin validates an object. See :ref:`validating objects
-<validating-objects>` for more information.
+The admin uses :class:`~django.forms.ModelForm`. To add custom validation,
+provide your own ``ModelForm``::
 
-To add validation specific to the admin, define your own form.
-:class:`ModelAdmin` lets you do this with :attr:`~ModelAdmin.form`::
-
-    class ArticleAdmin(admin.ModelAdmin):
-        form = MyArticleAdminForm
-
-``MyArticleAdminForm`` can be defined anywhere as long as you import where
-needed. Now within your form you can add your own custom validation for
-any field::
-
-    class MyArticleAdminForm(forms.ModelForm):
+    class ArticleForm(forms.ModelForm):
         def clean_name(self):
             # do something that validates your data
             return self.cleaned_data["name"]
 
-It is important you use a ``ModelForm`` here otherwise things can break. See
+Then configure the :class:`ModelAdmin` to use the form::
+
+    class ArticleAdmin(admin.ModelAdmin):
+        form = ArticleForm
+
+Or configure an :class:`InlineModelAdmin` to use the form::
+
+    class ArticleInline(admin.TabularInline):
+        model = Article
+        form = ArticleForm
+
+It is important that you use a ``ModelForm``; otherwise things can break. See
 the :doc:`forms </ref/forms/index>` documentation on :doc:`custom validation
 </ref/forms/validation>` and, more specifically, the
 :ref:`model form validation notes <overriding-modelform-clean-method>` for more
 information.
-
-The same applies to inlines. Assign a custom
-:class:`~django.forms.ModelForm` to :attr:`~InlineModelAdmin.form`, while
-keeping ``model`` set::
-
-    from django import forms
-
-
-    class BookInlineForm(forms.ModelForm):
-        def clean_title(self):
-            title = self.cleaned_data["title"]
-            # do something that validates your data
-            return title
-
-
-    class BookInline(admin.TabularInline):
-        model = Book
-        form = BookInlineForm
 
 .. _admin-overriding-templates:
 
