@@ -520,6 +520,26 @@ class FileMoveSafeTests(unittest.TestCase):
 
         self.assertEqual(content, b"content")
 
+    def test_file_move_dest_exists_unoverwritten(self):
+        with tempfile.NamedTemporaryFile(delete=False) as src:
+            src.write(b"file to move")
+            src_name = src.name
+        self.addCleanup(os.remove, src_name)
+
+        with tempfile.NamedTemporaryFile(delete=False) as dest:
+            dest.write(b"existing destination")
+            dest_name = dest.name
+        self.addCleanup(os.remove, dest_name)
+
+        msg = f"Destination file {dest_name} exists and allow_overwrite is False."
+        with self.assertRaises(FileExistsError) as cm:
+            file_move_safe(src_name, dest_name, allow_overwrite=False)
+        self.assertEqual(str(cm.exception), msg)
+
+        with open(dest_name, "rb") as dest:
+            self.assertEqual(dest.read(), b"existing destination")
+        self.assertTrue(os.path.exists(src_name))
+
 
 class SpooledTempTests(unittest.TestCase):
     def test_in_memory_spooled_temp(self):
