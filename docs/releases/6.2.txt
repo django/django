@@ -155,7 +155,13 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* The new :class:`~django.forms.formsets.FormSet`,
+  :class:`~django.forms.models.ModelFormSet`, and
+  :class:`~django.forms.models.InlineFormSet` classes allow defining formsets
+  using a declarative syntax, similar to declaring model classes, as an
+  alternative to the :func:`~django.forms.formsets.formset_factory`,
+  :func:`~django.forms.models.modelformset_factory`, and
+  :func:`~django.forms.models.inlineformset_factory` functions.
 
 Generic Views
 ~~~~~~~~~~~~~
