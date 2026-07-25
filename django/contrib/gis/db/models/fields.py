@@ -14,7 +14,7 @@ from django.contrib.gis.geos import (
     Point,
     Polygon,
 )
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db.models import Field
 from django.utils.translation import gettext_lazy as _
 
@@ -78,6 +78,9 @@ class BaseSpatialField(Field):
 
     description = _("The base GIS field.")
     empty_strings_allowed = False
+    default_error_messages = {
+        "invalid": _("“%(value)s” value has an invalid format."),
+    }
 
     def __init__(self, verbose_name=None, srid=4326, spatial_index=True, **kwargs):
         """
@@ -106,6 +109,20 @@ class BaseSpatialField(Field):
         kwargs["verbose_name"] = verbose_name
 
         super().__init__(**kwargs)
+
+    def clean_fields(self, instance):
+        # Reading the attribute builds the geometry or raster from the field's
+        # value (see SpatialProxy), which raises for invalid input. Re-raise as
+        # a ValidationError so that it's reported like any other invalid value
+        # during model validation (full_clean()).
+        try:
+            super().clean_fields(instance)
+        except (GEOSException, GDALException, TypeError, ValueError) as err:
+            raise ValidationError(
+                self.error_messages["invalid"],
+                code="invalid",
+                params={"value": instance.__dict__.get(self.attname)},
+            ) from err
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
