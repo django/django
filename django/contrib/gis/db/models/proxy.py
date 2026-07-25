@@ -6,6 +6,9 @@ objects corresponding to geographic model fields.
 Thanks to Robert Coup for providing this functionality (see #4322).
 """
 
+from django.contrib.gis.gdal.error import GDALException
+from django.contrib.gis.geos import GEOSException
+from django.core.exceptions import ValidationError
 from django.db.models.query_utils import DeferredAttribute
 
 
@@ -43,7 +46,16 @@ class SpatialProxy(DeferredAttribute):
         else:
             # Otherwise, a geometry or raster object is built using the field's
             # contents, and the model's corresponding attribute is set.
-            geo_obj = self._load_func(geo_value)
+            try:
+                geo_obj = self._load_func(geo_value)
+            except (GEOSException, GDALException, TypeError, ValueError) as err:
+                # Re-raise as a ValidationError so that invalid values are
+                # reported consistently during model validation (full_clean()).
+                raise ValidationError(
+                    self.field.error_messages["invalid"],
+                    code="invalid",
+                    params={"value": geo_value},
+                ) from err
             setattr(instance, self.field.attname, geo_obj)
         return geo_obj
 

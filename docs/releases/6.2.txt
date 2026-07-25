@@ -58,7 +58,10 @@ Minor features
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Spatial fields now raise a
+  :exc:`~django.core.exceptions.ValidationError` instead of a :exc:`ValueError`
+  when validating a model instance (e.g. via ``full_clean()``) that has an
+  invalid geometry or raster value.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
