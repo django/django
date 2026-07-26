@@ -16,7 +16,7 @@ from django.contrib.admin.views.main import (
     PAGE_VAR,
     SEARCH_VAR,
 )
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
 from django.template import Library
@@ -226,6 +226,12 @@ def items_for_result(cl, result, form):
             empty_value_display = getattr(
                 attr, "empty_value_display", empty_value_display
             )
+            # Find boolean fields on relations.
+            if f is None and isinstance(field_name, str) and LOOKUP_SEP in field_name:
+                try:
+                    f = get_fields_from_path(cl.model, field_name)[-1]
+                except FieldDoesNotExist:
+                    pass  # e.g. __str__
             if f is None or f.auto_created:
                 if field_name == "action_checkbox":
                     row_classes = ["action-checkbox"]

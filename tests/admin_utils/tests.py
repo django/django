@@ -164,6 +164,7 @@ class UtilsTests(SimpleTestCase):
             ("test_from_model", article.test_from_model()),
             ("non_field", INSTANCE_ATTRIBUTE),
             ("site__domain", SITE_NAME),
+            ("site__parent", None),
         )
 
         mock_admin = MockModelAdmin()
