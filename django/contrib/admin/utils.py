@@ -314,9 +314,6 @@ def lookup_field(name, obj, model_admin=None):
                         attr = getattr(attr, part, sentinel)
                         if attr is sentinel:
                             return None, None, None
-                    # The final field is needed for displaying boolean icons.
-                    if LOOKUP_SEP in name:
-                        f = get_fields_from_path(opts.model, name)[-1]
                 value = attr
             if hasattr(model_admin, "model") and hasattr(model_admin.model, name):
                 attr = getattr(model_admin.model, name)
