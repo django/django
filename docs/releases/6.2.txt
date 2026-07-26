@@ -195,6 +195,13 @@ Migrations
 Models
 ~~~~~~
 
+* Invalid ``CharField.max_length`` and ``DecimalField.max_digits``/
+  ``decimal_places`` values now raise ``ValueError`` immediately when the
+  field is instantiated, rather than only being caught by system checks.
+  This catches mistakes earlier, including in cases where fields are used
+  standalone (e.g. as an ``output_field`` for :class:`~django.db.models.functions.Cast`)
+  and never reach a system check.
+
 * ...
 
 Requests and Responses
@@ -275,6 +282,15 @@ backends.
 * The admin history view now checks permissions before object existence,
   consistently returning an HTTP 403 response for staff users without the view
   or change permission regardless of whether the object exists.
+
+Models
+------
+
+* ``CharField.max_length`` and ``DecimalField.max_digits``/
+  ``decimal_places`` are now validated when the field is instantiated,
+  raising ``ValueError`` for invalid values (e.g. non-integers, negative
+  numbers) instead of being reported later by
+  :ref:`system checks <system-checks>`.
 
 Miscellaneous
 -------------

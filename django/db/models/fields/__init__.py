@@ -1249,6 +1249,12 @@ class CharField(Field):
         super().__init__(*args, **kwargs)
         self.db_collation = db_collation
         if self.max_length is not None:
+            if (
+                not isinstance(self.max_length, int)
+                or isinstance(self.max_length, bool)
+                or self.max_length <= 0
+            ):
+                raise ValueError("'max_length' must be a positive integer.")
             self.validators.append(validators.MaxLengthValidator(self.max_length))
 
     @property
@@ -1281,20 +1287,7 @@ class CharField(Field):
                     id="fields.E120",
                 )
             ]
-        elif (
-            not isinstance(self.max_length, int)
-            or isinstance(self.max_length, bool)
-            or self.max_length <= 0
-        ):
-            return [
-                checks.Error(
-                    "'max_length' must be a positive integer.",
-                    obj=self,
-                    id="fields.E121",
-                )
-            ]
-        else:
-            return []
+        return []
 
     def _check_db_collation(self, databases):
         errors = []
@@ -1753,6 +1746,20 @@ class DecimalField(Field):
         decimal_places=None,
         **kwargs,
     ):
+        if max_digits is not None:
+            try:
+                max_digits = int(max_digits)
+                if max_digits <= 0:
+                    raise ValueError()
+            except (TypeError, ValueError):
+                raise ValueError("'max_digits' must be a positive integer.")
+        if decimal_places is not None:
+            try:
+                decimal_places = int(decimal_places)
+                if decimal_places < 0:
+                    raise ValueError()
+            except (TypeError, ValueError):
+                raise ValueError("'decimal_places' must be a non-negative integer.")
         self.max_digits, self.decimal_places = max_digits, decimal_places
         super().__init__(verbose_name, name, **kwargs)
 
@@ -1798,19 +1805,6 @@ class DecimalField(Field):
                             id="fields.E135",
                         ),
                     ]
-        else:
-            try:
-                decimal_places = int(self.decimal_places)
-                if decimal_places < 0:
-                    raise ValueError()
-            except ValueError:
-                return [
-                    checks.Error(
-                        "'decimal_places' must be a non-negative integer.",
-                        obj=self,
-                        id="fields.E131",
-                    )
-                ]
         return []
 
     def _check_max_digits(self, databases):
@@ -1841,19 +1835,6 @@ class DecimalField(Field):
                             id="fields.E135",
                         ),
                     ]
-        else:
-            try:
-                max_digits = int(self.max_digits)
-                if max_digits <= 0:
-                    raise ValueError()
-            except ValueError:
-                return [
-                    checks.Error(
-                        "'max_digits' must be a positive integer.",
-                        obj=self,
-                        id="fields.E133",
-                    )
-                ]
         return []
 
     def _check_decimal_places_and_max_digits(self, **kwargs):
