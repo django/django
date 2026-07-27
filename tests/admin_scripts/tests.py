@@ -2579,6 +2579,43 @@ class ArgumentOrder(AdminScriptTestCase):
         )
 
 
+class DisabledManagementCommands(AdminScriptTestCase):
+    def setUp(self):
+        super().setUp()
+        self.write_settings(
+            "settings.py",
+            sdict={"DISABLED_MANAGEMENT_COMMANDS": "['base_command']"},
+        )
+        self.write_settings("alternate_settings.py")
+        self.write_settings(
+            "disabled_settings.py",
+            sdict={"DISABLED_MANAGEMENT_COMMANDS": "['base_command']"},
+        )
+
+    def test_disabled_command(self):
+        out, err = self.run_manage(["base_command"])
+        self.assertNoOutput(out)
+        self.assertOutput(
+            err,
+            "CommandError: Management command 'base_command' is disabled by "
+            "settings.DISABLED_MANAGEMENT_COMMANDS.",
+        )
+
+    def test_enabled_command(self):
+        out, err = self.run_manage(["base_command", "--settings=alternate_settings"])
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=(), options=")
+
+    def test_disabled_command_with_settings_option(self):
+        out, err = self.run_manage(["base_command", "--settings=disabled_settings"])
+        self.assertNoOutput(out)
+        self.assertOutput(
+            err,
+            "CommandError: Management command 'base_command' is disabled by "
+            "settings.DISABLED_MANAGEMENT_COMMANDS.",
+        )
+
+
 @mock.patch.dict(os.environ, {"PYTHON_COLORS": "0"})
 class ExecuteFromCommandLine(SimpleTestCase):
     def test_program_name_from_argv(self):

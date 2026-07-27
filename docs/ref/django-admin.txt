@@ -2177,6 +2177,9 @@ Note that command options that take no arguments are passed as keywords
 with ``True`` or ``False``, as you can see with the ``interactive`` option
 above.
 
+The :setting:`DISABLED_MANAGEMENT_COMMANDS` setting prevents commands from
+being executed from the command line. It doesn't affect ``call_command()``.
+
 Named arguments can be passed by using either one of the following syntaxes::
 
       # Similar to the command line

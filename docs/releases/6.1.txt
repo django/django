@@ -74,6 +74,13 @@ queries:
 
 See :doc:`fetch modes </topics/db/fetch-modes>` for more details.
 
+Management Commands
+-------------------
+
+The new :setting:`DISABLED_MANAGEMENT_COMMANDS` setting allows disabling
+selected management commands from command-line execution with ``django-admin``
+or ``manage.py``.
+
 Database-level delete options for ``ForeignKey.on_delete``
 ----------------------------------------------------------
 

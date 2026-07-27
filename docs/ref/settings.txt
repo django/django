@@ -1379,6 +1379,25 @@ Default: ``''`` (Empty string)
 Default tablespace to use for models that don't specify one, if the
 backend supports it (see :doc:`/topics/db/tablespaces`).
 
+.. setting:: DISABLED_MANAGEMENT_COMMANDS
+
+``DISABLED_MANAGEMENT_COMMANDS``
+--------------------------------
+
+Default: ``[]`` (Empty list)
+
+A list of management command names that can't be executed from the command line
+with ``django-admin`` or ``manage.py``.
+
+For example::
+
+    DISABLED_MANAGEMENT_COMMANDS = ["flush", "migrate"]
+
+Attempts to run a disabled command exit with an error before the command is
+loaded.
+
+This setting doesn't affect :func:`~django.core.management.call_command()`.
+
 .. setting:: DISALLOWED_USER_AGENTS
 
 ``DISALLOWED_USER_AGENTS``

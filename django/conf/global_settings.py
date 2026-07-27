@@ -222,6 +222,9 @@ EMAIL_TIMEOUT = None
 # List of strings representing installed apps.
 INSTALLED_APPS = []
 
+# List of management commands disabled from command-line execution.
+DISABLED_MANAGEMENT_COMMANDS = []
+
 TEMPLATES = []
 
 # Default form rendering class.

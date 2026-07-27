@@ -275,6 +275,17 @@ class ManagementUtility:
             sys.exit(1)
         return klass
 
+    def check_command_disabled(self, subcommand):
+        if not settings.configured:
+            return
+        disabled_commands = set(settings.DISABLED_MANAGEMENT_COMMANDS)
+        if subcommand in disabled_commands:
+            sys.stderr.write(
+                "CommandError: Management command %r is disabled by "
+                "settings.DISABLED_MANAGEMENT_COMMANDS.\n" % subcommand
+            )
+            sys.exit(1)
+
     def autocomplete(self):
         """
         Output completion suggestions for BASH.
@@ -431,6 +442,7 @@ class ManagementUtility:
         elif self.argv[1:] in (["--help"], ["-h"]):
             sys.stdout.write(self.main_help_text() + "\n")
         else:
+            self.check_command_disabled(subcommand)
             self.fetch_command(subcommand).run_from_argv(self.argv)
 
 
