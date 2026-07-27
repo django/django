@@ -4323,6 +4323,11 @@ class TestGenericRelations(TestCase):
         FunkyTag.objects.create(content_object=self.pl3, name="hott")
         response = self.client.get(reverse("admin:admin_views_funkytag_changelist"))
         self.assertContains(response, "%s</td>" % self.pl3)
+        self.assertContains(response, '<th scope="col" class="column-content_object">')
+        self.assertNotContains(
+            response,
+            '<th scope="col" class="sortable column-content_object">',
+        )
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")

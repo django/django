@@ -116,7 +116,9 @@ def result_headers(cl):
             # Set ordering for attr that is a property, if defined.
             if isinstance(attr, property) and hasattr(attr, "fget"):
                 admin_order_field = getattr(attr.fget, "admin_order_field", None)
-            if not admin_order_field and LOOKUP_SEP not in field_name:
+            if not admin_order_field and not (
+                LOOKUP_SEP in field_name and isinstance(attr, models.Field)
+            ):
                 is_field_sortable = False
 
         if not is_field_sortable:
