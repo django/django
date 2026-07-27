@@ -279,6 +279,12 @@ class AdminReadonlyField:
         except (AttributeError, ValueError, ObjectDoesNotExist):
             result_repr = self.empty_value_display
         else:
+            overrides = getattr(model_admin, "readonly_formfield_overrides", None)
+            if overrides and isinstance(field, str) and field in overrides:
+                widget = overrides[field]
+                if isinstance(widget, type):
+                    widget = widget()
+                return widget.render(field, value)
             if f is None:
                 if getattr(attr, "boolean", False):
                     result_repr = _boolean_icon(value)
