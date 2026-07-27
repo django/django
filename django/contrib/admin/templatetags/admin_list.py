@@ -18,7 +18,6 @@ from django.contrib.admin.views.main import (
 )
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.db.models.constants import LOOKUP_SEP
 from django.template import Library
 from django.template.loader import get_template
 from django.templatetags.static import static
@@ -96,6 +95,7 @@ def result_headers(cl):
         )
         is_field_sortable = cl.sortable_by is None or field_name in cl.sortable_by
         if attr:
+            field_name_for_ordering = field_name
             field_name = _coerce_field_name(field_name, i)
             # Potentially not sortable
 
@@ -112,11 +112,7 @@ def result_headers(cl):
                 }
                 continue
 
-            admin_order_field = getattr(attr, "admin_order_field", None)
-            # Set ordering for attr that is a property, if defined.
-            if isinstance(attr, property) and hasattr(attr, "fget"):
-                admin_order_field = getattr(attr.fget, "admin_order_field", None)
-            if not admin_order_field and LOOKUP_SEP not in field_name:
+            if not cl.get_ordering_field(field_name_for_ordering):
                 is_field_sortable = False
 
         if not is_field_sortable:

@@ -4,7 +4,7 @@ from unittest import mock
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.templatetags.admin_list import pagination
+from django.contrib.admin.templatetags.admin_list import pagination, result_headers
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.main import (
     ALL_VAR,
@@ -114,6 +114,23 @@ class ChangeListTests(TestCase):
         request.user = self.superuser
         cl = m.get_changelist_instance(request)
         self.assertEqual(repr(cl), "<ChangeList: model=Child model_admin=ChildAdmin>")
+
+    def test_default_str_column_is_not_sortable(self):
+        GrandChild.objects.create(name="Grandchild")
+        m = admin.ModelAdmin(GrandChild, custom_site)
+        request = self._mocked_authenticated_request("/grandchild/", self.superuser)
+        response = m.changelist_view(request)
+        response.render()
+        cl = response.context_data["cl"]
+
+        headers = list(result_headers(cl))
+
+        self.assertEqual(cl.list_display, ["action_checkbox", "__str__"])
+        self.assertIs(headers[1]["sortable"], False)
+        self.assertContains(response, '<th scope="col" class="column-__str__">')
+        self.assertNotContains(
+            response, '<th scope="col" class="sortable column-__str__">'
+        )
 
     def test_specified_ordering_by_f_expression(self):
         class OrderedByFBandAdmin(admin.ModelAdmin):
