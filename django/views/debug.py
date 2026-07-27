@@ -3,6 +3,7 @@ import inspect
 import itertools
 import re
 import sys
+import traceback
 import types
 import warnings
 from pathlib import Path
@@ -342,18 +343,20 @@ class ExceptionReporter:
         )
 
     def _get_exception_group_data(self, exc):
-        is_group = isinstance(exc, BaseExceptionGroup)
         data = {
             "type": exc.__class__.__name__,
             "message": exc,
-            "is_group": is_group,
         }
-        if is_group:
+        if isinstance(exc, BaseExceptionGroup):
             data["children"] = [
                 self._get_exception_group_data(child) for child in exc.exceptions
             ]
-            data["count"] = len(exc.exceptions)
         return data
+
+    def _get_exception_group_as_text(self, exc):
+        formatted = traceback.TracebackException.from_exception(self.exc_value)
+        exception_only_text = "".join(formatted.format_exception_only(show_group=True))
+        return exception_only_text
 
     def get_traceback_data(self):
         """Return a dictionary containing traceback information."""
@@ -433,6 +436,9 @@ class ExceptionReporter:
             )
             if isinstance(self.exc_value, BaseExceptionGroup):
                 c["exception_group"] = self._get_exception_group_data(self.exc_value)
+                c["exception_group_text"] = self._get_exception_group_as_text(
+                    self.exc_value
+                )
             if exc_notes := getattr(self.exc_value, "__notes__", None):
                 c["exception_notes"] = "\n" + "\n".join(exc_notes)
         if frames:

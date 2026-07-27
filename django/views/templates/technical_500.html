@@ -115,6 +115,7 @@
   <h1>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}
       {% if request %} at {{ request.path_info }}{% endif %}</h1>
   <pre class="exception_value">{% if exception_value %}{{ exception_value|force_escape }}{% if exception_notes %}{{ exception_notes }}{% endif %}{% else %}No exception message supplied{% endif %}</pre>
+  {% partialdef exception_tree %}<li><pre>{{ exception.type }}: {{ exception.message|force_escape }}</pre>{% if exception.children %}<ul>{% for exception in exception.children %}{% partial exception_tree %}{% endfor %}</ul>{% endif %}</li>{% endpartialdef %}
   <table class="meta">
 {% if request %}
     <tr>
@@ -139,10 +140,7 @@
 {% if exception_type and exception_value %}
     <tr>
       <th scope="row">Exception Value:</th>
-{% partialdef exception %}<li><pre>{{ exception.type }}: {{ exception.message }}</pre></li>{% endpartialdef %}
-{% partialdef exception_group %}<li><pre>{{ exception.type }}: {{ exception.message }}</pre><ul>{% for child in exception.children %}{% with exception=child %}{% partial exception_router %}{% endwith %}{% endfor %}</ul></li>{% endpartialdef %}
-{% partialdef exception_router %}{% if exception.is_group %}{% partial exception_group %}{% else %}{% partial exception %}{% endif %}{% endpartialdef %}
-      <td id=exception_group>{% if exception_group %}<ul>{% with exception=exception_group %}{% partial exception_router %}{% endwith %}</ul>{% else%}<pre>{{ exception_value|force_escape }}</pre>{% endif %}</td>
+      <td id="exception_group">{% if exception_group %}<ul>{% with exception=exception_group %}{% partial exception_tree %}{% endwith %}</ul>{% else %}<pre>{{ exception_value|force_escape }}</pre>{% endif %}</td>
     </tr>
 {% endif %}
 {% if lastframe %}
@@ -350,6 +348,9 @@ During handling of the above exception ({{ frame.exc_cause|force_escape }}), ano
 
 Exception Type: {{ exception_type }}{% if request %} at {{ request.path_info }}{% endif %}
 Exception Value: {{ exception_value|force_escape }}{% if exception_notes %}{{ exception_notes }}{% endif %}
+{% if exception_group_text %}Exception Group Tree:
+{{ exception_group_text }}{% endif %}
+
 </textarea>
   <br><br>
   <input type="submit" value="Share this traceback on a public website">

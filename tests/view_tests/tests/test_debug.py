@@ -787,6 +787,7 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn("<pre>RuntimeError: Oops 1</pre>", html)
         self.assertIn("<pre>ValueError: Oops 2</pre>", html)
         self.assertIn("<pre>ValueError: Oops 3</pre>", html)
+        self.assertIn("Exception Group Tree:", html)
 
     def test_nested_exception_group(self):
         request = self.rf.get("/test_view")
@@ -826,6 +827,33 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn("<pre>ValueError: Inner Oops 1</pre>", html)
         self.assertIn("<pre>ValueError: Inner Oops 2</pre>", html)
         self.assertIn("<pre>ValueError: Inner Oops 3</pre>", html)
+        self.assertIn("Exception Group Tree:", html)
+
+    def test_exception_group_text(self):
+        request = self.rf.get("/test_view")
+        try:
+            raise ExceptionGroup(
+                "Outer Oops group",
+                [
+                    RuntimeError("Outer Oops"),
+                    ExceptionGroup(
+                        "Inner Oops group",
+                        [
+                            ValueError("Inner Oops 1"),
+                            ValueError("Inner Oops 2"),
+                            ValueError("Inner Oops 3"),
+                        ],
+                    ),
+                ],
+            )
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+        text = reporter.get_traceback_text()
+        self.assertIn("Exception Group Tree:", text)
+        self.assertIn("ExceptionGroup: Outer Oops group (2 sub-exceptions)", text)
+        self.assertIn("RuntimeError: Outer Oops", text)
+        self.assertIn("ValueError: Inner Oops 1", text)
 
     def test_mid_stack_exception_without_traceback(self):
         try:
