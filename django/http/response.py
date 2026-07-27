@@ -303,9 +303,12 @@ class HttpResponseBase:
         # Browsers can ignore the Set-Cookie header if the cookie doesn't use
         # the secure flag and:
         # - the cookie name starts with "__Host-" or "__Secure-", or
-        # - the samesite is "none".
-        secure = key.startswith(("__Secure-", "__Host-")) or (
-            samesite and samesite.lower() == "none"
+        # - the samesite is "none", or
+        # - the cookie is partitioned.
+        secure = (
+            key.startswith(("__Secure-", "__Host-"))
+            or (samesite and samesite.lower() == "none")
+            or partitioned
         )
         self.set_cookie(
             key,

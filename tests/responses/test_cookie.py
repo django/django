@@ -122,10 +122,8 @@ class SetCookieTests(SimpleTestCase):
         response = HttpResponse()
         response.set_cookie("example", partitioned=True)
         example_cookie = response.cookies["example"]
-        self.assertIn(
-            "; %s" % cookies.Morsel._reserved["partitioned"], str(example_cookie)
-        )
-        self.assertIs(response.cookies["example"]["partitioned"], True)
+        self.assertIn("; Partitioned", str(example_cookie))
+        self.assertIs(example_cookie["partitioned"], True)
 
 
 class DeleteCookieTests(SimpleTestCase):
@@ -166,7 +164,12 @@ class DeleteCookieTests(SimpleTestCase):
         self.assertEqual(response.cookies["c"]["samesite"], "lax")
 
     def test_delete_cookie_partitioned(self):
-        """Test that delete_cookie respects partitioned attribute."""
+        """
+        delete_cookie() sets the partitioned and secure flags with
+        partitioned=True (without secure, browsers ignore partitioned
+        cookies).
+        """
         response = HttpResponse()
         response.delete_cookie("c", partitioned=True)
         self.assertIs(response.cookies["c"]["partitioned"], True)
+        self.assertIs(response.cookies["c"]["secure"], True)
