@@ -747,6 +747,7 @@ class QuerySet(AltersData):
     def _prepare_for_bulk_create(self, objs):
         objs_with_pk, objs_without_pk = [], []
         for obj in objs:
+            obj._prepare_related_fields_for_save(operation_name="bulk_create")
             if isinstance(obj.pk, DatabaseDefault):
                 objs_without_pk.append(obj)
             elif obj._is_pk_set():
@@ -757,7 +758,6 @@ class QuerySet(AltersData):
                     objs_with_pk.append(obj)
                 else:
                     objs_without_pk.append(obj)
-            obj._prepare_related_fields_for_save(operation_name="bulk_create")
         return objs_with_pk, objs_without_pk
 
     def _check_bulk_create_options(

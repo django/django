@@ -439,6 +439,13 @@ class BulkCreateTests(TestCase):
         child = NullableFields.objects.get(integer_field=88)
         self.assertEqual(child.auto_field, parent)
 
+    def test_pk_from_related_instance_saved_after_init(self):
+        country = Country(name="Syldavia", iso_two_letter="SW")
+        related = RelatedModel(country=country)
+        country.save()
+        RelatedModel.objects.bulk_create([related])
+        self.assertEqual(related.country_id, country.pk)
+
     def test_unsaved_parent(self):
         parent = NoFields()
         msg = (
