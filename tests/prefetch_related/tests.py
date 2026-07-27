@@ -20,6 +20,7 @@ from django.test import (
     skipUnlessDBFeature,
 )
 from django.test.utils import CaptureQueriesContext
+from django.utils.deprecation import RemovedInDjango71Warning
 
 from .models import (
     Article,
@@ -350,6 +351,13 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
         # Without the ValueError, an author was deleted due to the implicit
         # save of the relation assignment.
         self.assertEqual(self.book1.authors.count(), 3)
+
+    def test_to_attr_field_conflict(self):
+        # A field named by to_attr must not be treated as already fetched when
+        # it differs from the relationship being prefetched.
+        msg = "to_attr=title conflicts with a field on the Book model."
+        with self.assertRaisesMessage(ValueError, msg):
+            list(Book.objects.prefetch_related(Prefetch("authors", to_attr="title")))
 
     def test_reverse_m2m_to_attr_conflict(self):
         msg = "to_attr=books conflicts with a field on the Author model."
@@ -1126,6 +1134,56 @@ class CustomPrefetchTests(TestCase):
             all_houses = list(House.objects.filter(occupants=person))
             with self.assertNumQueries(0):
                 self.assertEqual(person.cached_all_houses, all_houses)
+
+    def test_to_attr_does_not_overwrite_cached_property(self):
+        person = Person.objects.get(pk=self.person1.pk)
+        # Trigger computation of the cached_property before prefetching so the
+        # existing value must be preserved.
+        cached_houses = person.cached_all_houses
+        with self.assertNumQueries(0):
+            prefetch_related_objects(
+                [person],
+                Prefetch("houses", to_attr="cached_all_houses"),
+            )
+        self.assertIs(person.cached_all_houses, cached_houses)
+
+    def test_to_attr_overwrites_instance_attribute(self):
+        person = Person.objects.get(pk=self.person1.pk)
+        person.custom_houses = object()
+        with self.assertNumQueries(1):
+            prefetch_related_objects(
+                [person],
+                Prefetch("houses", to_attr="custom_houses"),
+            )
+        self.assertEqual(person.custom_houses, [self.house1, self.house2])
+
+    def test_to_attr_writable_property(self):
+        persons = Person.objects.prefetch_related(
+            Prefetch("houses", House.objects.all(), to_attr="writable_all_houses"),
+        )
+        for person in persons:
+            # To bypass caching at the related descriptor level, don't use
+            # person.houses.all() here.
+            all_houses = list(House.objects.filter(occupants=person))
+            with self.assertNumQueries(0):
+                self.assertEqual(person.writable_all_houses, all_houses)
+
+    def test_to_attr_read_only_property_deprecation_warning(self):
+        msg = (
+            "Prefetch() with to_attr='all_houses' targeting a property without a "
+            "setter is deprecated. Add a setter, use cached_property, or use a "
+            "different to_attr. This will raise ValueError in Django 7.1."
+        )
+        with self.assertWarnsMessage(RemovedInDjango71Warning, msg):
+            with self.assertNumQueries(1):
+                persons = list(
+                    Person.objects.prefetch_related(
+                        Prefetch("houses", to_attr="all_houses"),
+                    )
+                )
+        for person in persons:
+            with self.assertNumQueries(1):
+                person.all_houses
 
     def test_filter_deferred(self):
         """

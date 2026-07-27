@@ -302,3 +302,8 @@ Miscellaneous
   providing a ``chunk_size`` is deprecated. It currently falls back to a
   ``chunk_size`` of 2000, but a ``ValueError`` will be raised in
   Django 7.1.
+
+* Using :class:`~django.db.models.Prefetch` with ``to_attr`` targeting a
+  :class:`property` without a setter is deprecated. Add a setter, use
+  :class:`~django.utils.functional.cached_property`, or use a different
+  ``to_attr``. This will raise :exc:`ValueError` in Django 7.1.

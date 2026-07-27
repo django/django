@@ -269,6 +269,17 @@ class Person(models.Model):
     def all_houses(self):
         return list(self.houses.all())
 
+    @property
+    def writable_all_houses(self):
+        try:
+            return self._writable_all_houses
+        except AttributeError:
+            return self.all_houses
+
+    @writable_all_houses.setter
+    def writable_all_houses(self, houses):
+        self._writable_all_houses = houses
+
     @cached_property
     def cached_all_houses(self):
         return self.all_houses
