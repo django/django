@@ -2794,14 +2794,15 @@ def get_prefetcher(instance, through_attr, to_attr):
     """
 
     def is_to_attr_fetched(model, to_attr):
-        # Special case cached_property instances because hasattr() triggers
+        # Special case cached_property and property instances because hasattr() triggers
         # attribute computation and assignment.
-        if isinstance(getattr(model, to_attr, None), cached_property):
+        attr = getattr(model, to_attr, None)
+        if isinstance(attr, (cached_property, property)):
 
-            def has_cached_property(instance):
+            def has_property(instance):
                 return to_attr in instance.__dict__
 
-            return has_cached_property
+            return has_property
 
         def has_to_attr_attribute(instance):
             return hasattr(instance, to_attr)
