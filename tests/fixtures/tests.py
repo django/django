@@ -1223,8 +1223,9 @@ class NonexistentFixtureTests(TestCase):
 
     def test_command_error_has_file_path(self):
         stdout_output = StringIO()
+        fixture_path = os.path.join("books", "fixtures.v1", "fixture")
         expected_error_message = (
-            "Problem installing fixture 'books/fixtures.v1/fixture': "
+            f"Problem installing fixture '{fixture_path}': "
             "csv is not a known serialization format."
         )
 
@@ -1235,8 +1236,9 @@ class NonexistentFixtureTests(TestCase):
 
     def test_command_error_has_file_path_with_verbosity_equals_two(self):
         stdout_output = StringIO()
+        fixture_path = os.path.join("books", "fixtures.v1", "fixture")
         expected_error_message = (
-            "Problem installing fixture 'books/fixtures.v1/fixture': "
+            f"Problem installing fixture '{fixture_path}': "
             "csv is not a known serialization format."
         )
 
