@@ -353,10 +353,11 @@ class ExceptionReporter:
             ]
         return data
 
-    def _get_exception_group_as_text(self, exc):
-        formatted = traceback.TracebackException.from_exception(self.exc_value)
-        exception_only_text = "".join(formatted.format_exception_only(show_group=True))
-        return exception_only_text
+    def _get_exception_group_text(self, node, indent=0):
+        text = "%s%s: %s" % ("   " * indent, node["type"], node["message"])
+        for child in node.get("children", ()):
+            text += "\n" + self._get_exception_group_text(child, indent + 1)
+        return text
 
     def get_traceback_data(self):
         """Return a dictionary containing traceback information."""
