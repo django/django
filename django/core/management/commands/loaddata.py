@@ -397,6 +397,7 @@ class Command(BaseCommand):
 
         fixture_path = PurePath(fixture_name)
         parts = fixture_path.name.rsplit(".", 2)
+        parts[0] = str(fixture_path.parent.joinpath(parts[0]))
 
         if len(parts) > 1 and parts[-1] in self.compression_formats:
             cmp_fmt = parts[-1]
@@ -416,7 +417,7 @@ class Command(BaseCommand):
         else:
             ser_fmt = None
 
-        name = str(fixture_path.parent.joinpath(".".join(parts)))
+        name = ".".join(parts)
         return name, ser_fmt, cmp_fmt
 
 
