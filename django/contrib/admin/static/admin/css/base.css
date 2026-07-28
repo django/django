@@ -5,77 +5,79 @@
 /* VARIABLE DEFINITIONS */
 html[data-theme="light"],
 :root {
-    --primary: #79aec8;
-    --secondary: #417690;
-    --accent: #f5dd5d;
-    --primary-fg: #fff;
+    /* ----------------------------------------------------- */
+    /* 1. PRIMARY PREFIXED VARIABLES                         */
+    /* ----------------------------------------------------- */
+    --django-primary: #79aec8;
+    --django-secondary: #417690;
+    --django-accent: #f5dd5d;
+    --django-primary-fg: #fff;
 
-    --body-fg: #333;
-    --body-bg: #fff;
-    --body-quiet-fg: #666;
-    --body-quiet-color: var(--body-quiet-fg);
-    --body-medium-fg: #444;
-    --body-medium-color: var(--body-medium-fg);
-    --body-loud-fg: #000;
-    --body-loud-color: var(--body-loud-fg);
+    --django-body-fg: #333;
+    --django-body-bg: #fff;
+    --django-body-quiet-fg: #666;
+    --django-body-quiet-color: var(--django-body-quiet-fg);
+    --django-body-medium-fg: #444;
+    --django-body-medium-color: var(--django-body-medium-fg);
+    --django-body-loud-fg: #000;
+    --django-body-loud-color: var(--django-body-loud-fg);
 
-    --header-fg: #ffc;
-    --header-color: var(--header-fg);
-    --header-branding-color: var(--accent);
-    --header-bg: var(--secondary);
-    --header-link-fg: var(--primary-fg);
-    --header-link-color: var(--header-link-fg);
+    --django-header-fg: #ffc;
+    --django-header-color: var(--django-header-fg);
+    --django-header-branding-color: var(--django-accent);
+    --django-header-bg: var(--django-secondary);
+    --django-header-link-fg: var(--django-primary-fg);
+    --django-header-link-color: var(--django-header-link-fg);
 
-    --breadcrumbs-fg: #c4dce8;
-    --breadcrumbs-link-fg: var(--body-bg);
-    --breadcrumbs-bg: #264b5d;
+    --django-breadcrumbs-fg: #c4dce8;
+    --django-breadcrumbs-link-fg: var(--django-body-bg);
+    --django-breadcrumbs-bg: #264b5d;
 
-    --link-fg: #417893;
-    --link-hover-fg: #036;
-    --link-hover-color: var(--link-hover-fg);
-    --link-selected-fg: var(--secondary);
+    --django-link-fg: #417893;
+    --django-link-hover-fg: #036;
+    --django-link-hover-color: var(--django-link-hover-fg);
+    --django-link-selected-fg: var(--django-secondary);
 
-    --hairline-border: #e8e8e8;
-    --hairline-color: var(--hairline-border);
-    --border-color: #ccc;
+    --django-hairline-border: #e8e8e8;
 
-    --error-fg: #ba2121;
+    --django-border-color: #ccc;
+    --django-error-fg: #ba2121;
 
-    --message-debug-bg: #efefef;
-    --message-debug-icon: url(../img/icon-debug.svg);
-    --message-info-bg: #ccefff;
-    --message-info-icon: url(../img/icon-info.svg);
-    --message-success-bg: #dfd;
-    --message-success-icon: url(../img/icon-yes.svg);
-    --message-warning-bg: #ffc;
-    --message-warning-icon: url(../img/icon-alert.svg);
-    --message-error-bg: #ffefef;
-    --message-error-icon: url(../img/icon-no.svg);
+    --django-message-debug-bg: #efefef;
+    --django-message-debug-icon: url(../img/icon-debug.svg);
+    --django-message-info-bg: #ccefff;
+    --django-message-info-icon: url(../img/icon-info.svg);
+    --django-message-success-bg: #dfd;
+    --django-message-success-icon: url(../img/icon-yes.svg);
+    --django-message-warning-bg: #ffc;
+    --django-message-warning-icon: url(../img/icon-alert.svg);
+    --django-message-error-bg: #ffefef;
+    --django-message-error-icon: url(../img/icon-no.svg);
 
-    --darkened-bg: #f8f8f8; /* A bit darker than --body-bg */
-    --selected-bg: #e4e4e4; /* E.g. selected table cells */
-    --selected-row-bg: #ffc;
-    --selected-row: var(--selected-row-bg);
+    --django-darkened-bg: #f8f8f8;
+    --django-selected-bg: #e4e4e4;
+    --django-selected-row-bg: #ffc;
+    --django-selected-row: var(--django-selected-row-bg);
 
-    --button-fg: #fff;
-    --button-bg: var(--secondary);
-    --button-hover-bg: #205067;
-    --default-button-bg: #205067;
-    --default-button-hover-bg: var(--secondary);
-    --close-button-bg: #747474;
-    --close-button-hover-bg: #333;
-    --delete-button-bg: #ba2121;
-    --delete-button-hover-bg: #a41515;
+    --django-button-fg: #fff;
+    --django-button-bg: var(--django-secondary);
+    --django-button-hover-bg: #205067;
+    --django-default-button-bg: #205067;
+    --django-default-button-hover-bg: var(--django-secondary);
+    --django-close-button-bg: #747474;
+    --django-close-button-hover-bg: #333;
+    --django-delete-button-bg: #ba2121;
+    --django-delete-button-hover-bg: #a41515;
 
-    --object-tools-fg: var(--button-fg);
-    --object-tools-bg: var(--close-button-bg);
-    --object-tools-hover-bg: var(--close-button-hover-bg);
+    --django-object-tools-fg: var(--django-button-fg);
+    --django-object-tools-bg: var(--django-close-button-bg);
+    --django-object-tools-hover-bg: var(--django-close-button-hover-bg);
 
-    --font-family-primary:
+    --django-font-family-primary:
         "Segoe UI", system-ui, Roboto, "Helvetica Neue", Arial, sans-serif,
         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
         "Noto Color Emoji";
-    --font-family-monospace:
+    --django-font-family-monospace:
         ui-monospace,
         Menlo,
         Monaco,
@@ -93,6 +95,78 @@ html[data-theme="light"],
         "Segoe UI Emoji",
         "Segoe UI Symbol",
         "Noto Color Emoji";
+
+    /* ----------------------------------------------------- */
+    /* 2. LEGACY BACKWARD-COMPATIBILITY ALIASES              */
+    /* ----------------------------------------------------- */
+    --primary: var(--django-primary);
+    --secondary: var(--django-secondary);
+    --accent: var(--django-accent);
+    --primary-fg: var(--django-primary-fg);
+
+    --body-fg: var(--django-body-fg);
+    --body-bg: var(--django-body-bg);
+    --body-quiet-fg: var(--django-body-quiet-fg);
+    --body-quiet-color: var(--django-body-quiet-color);
+    --body-medium-fg: var(--django-body-medium-fg);
+    --body-medium-color: var(--django-body-medium-color);
+    --body-loud-fg: var(--django-body-loud-fg);
+    --body-loud-color: var(--django-body-loud-color);
+
+    --header-fg: var(--django-header-fg);
+    --header-color: var(--django-header-color);
+    --header-branding-color: var(--django-header-branding-color);
+    --header-bg: var(--django-header-bg);
+    --header-link-fg: var(--django-header-link-fg);
+    --header-link-color: var(--django-header-link-color);
+
+    --breadcrumbs-fg: var(--django-breadcrumbs-fg);
+    --breadcrumbs-link-fg: var(--django-breadcrumbs-link-fg);
+    --breadcrumbs-bg: var(--django-breadcrumbs-bg);
+
+    --link-fg: var(--django-link-fg);
+    --link-hover-fg: var(--django-link-hover-fg);
+    --link-hover-color: var(--django-link-hover-color);
+    --link-selected-fg: var(--django-link-selected-fg);
+
+    --hairline-border: var(--django-hairline-border);
+    --hairline-color: var(--django-hairline-border);
+
+    --border-color: var(--django-border-color);
+    --error-fg: var(--django-error-fg);
+
+    --message-debug-bg: var(--django-message-debug-bg);
+    --message-debug-icon: var(--django-message-debug-icon);
+    --message-info-bg: var(--django-message-info-bg);
+    --message-info-icon: var(--django-message-info-icon);
+    --message-success-bg: var(--django-message-success-bg);
+    --message-success-icon: var(--django-message-success-icon);
+    --message-warning-bg: var(--django-message-warning-bg);
+    --message-warning-icon: var(--django-message-warning-icon);
+    --message-error-bg: var(--django-message-error-bg);
+    --message-error-icon: var(--django-message-error-icon);
+
+    --darkened-bg: var(--django-darkened-bg);
+    --selected-bg: var(--django-selected-bg);
+    --selected-row-bg: var(--django-selected-row-bg);
+    --selected-row: var(--django-selected-row);
+
+    --button-fg: var(--django-button-fg);
+    --button-bg: var(--django-button-bg);
+    --button-hover-bg: var(--django-button-hover-bg);
+    --default-button-bg: var(--django-default-button-bg);
+    --default-button-hover-bg: var(--django-default-button-hover-bg);
+    --close-button-bg: var(--django-close-button-bg);
+    --close-button-hover-bg: var(--django-close-button-hover-bg);
+    --delete-button-bg: var(--django-delete-button-bg);
+    --delete-button-hover-bg: var(--django-delete-button-hover-bg);
+
+    --object-tools-fg: var(--django-object-tools-fg);
+    --object-tools-bg: var(--django-object-tools-bg);
+    --object-tools-hover-bg: var(--django-object-tools-hover-bg);
+
+    --font-family-primary: var(--django-font-family-primary);
+    --font-family-monospace: var(--django-font-family-monospace);
 
     color-scheme: light;
 }
