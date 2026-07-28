@@ -209,7 +209,7 @@ this. For a small app like polls, this process isn't too difficult.
        :caption: ``django-polls/pyproject.toml``
 
        [build-system]
-       requires = ["setuptools>=77.0.3"]
+       requires = ["setuptools>83"]
        build-backend = "setuptools.build_meta"
 
        [project]
