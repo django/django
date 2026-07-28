@@ -3,7 +3,6 @@ import inspect
 import itertools
 import re
 import sys
-import traceback
 import types
 import warnings
 from pathlib import Path
@@ -436,9 +435,10 @@ class ExceptionReporter:
                 self.exc_value, "raw_error_message", self.exc_value
             )
             if isinstance(self.exc_value, BaseExceptionGroup):
-                c["exception_group"] = self._get_exception_group_data(self.exc_value)
-                c["exception_group_text"] = self._get_exception_group_as_text(
-                    self.exc_value
+                exc_group_data = self._get_exception_group_data(self.exc_value)
+                c["exception_group"] = exc_group_data
+                c["exception_group_text"] = self._get_exception_group_text(
+                    exc_group_data
                 )
             if exc_notes := getattr(self.exc_value, "__notes__", None):
                 c["exception_notes"] = "\n" + "\n".join(exc_notes)

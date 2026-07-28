@@ -349,7 +349,7 @@ During handling of the above exception ({{ frame.exc_cause|force_escape }}), ano
 Exception Type: {{ exception_type }}{% if request %} at {{ request.path_info }}{% endif %}
 Exception Value: {{ exception_value|force_escape }}{% if exception_notes %}{{ exception_notes }}{% endif %}
 {% if exception_group_text %}Exception Group Tree:
-{{ exception_group_text }}{% endif %}
+{{ exception_group_text|force_escape }}{% endif %}
 
 </textarea>
   <br><br>
