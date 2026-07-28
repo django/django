@@ -23,6 +23,7 @@ from .models import (
     DBDefaults,
     DBDefaultsFK,
     DBDefaultsFunction,
+    DBDefaultsOneToOnePK,
     DBDefaultsPK,
 )
 
@@ -136,6 +137,23 @@ class DefaultTests(TestCase):
             parent2 = DBDefaultsPK.objects.get(pk="en")
         child2 = DBDefaultsFK.objects.create(language_code=parent2)
         self.assertEqual(child2.language_code, parent2)
+
+    def test_primary_key_assigned_db_default_expression(self):
+        # Create the target of the foreign key.
+        DBDefaultsPK.objects.create(language_code="kr")
+        # Create an object that happens to match the python default for
+        # DBDefaultsOneToOnePK.language_code.
+        DBDefaultsPK.objects.create(language_code="tr")
+
+        related = DBDefaultsPK()
+        obj = DBDefaultsOneToOnePK(language_code_id=related.pk)
+        related.save()
+        obj.save()
+
+        # The python default is not used.
+        # This should either be "en" or "kr" depending on which model's
+        # DatabaseDefault is used, but this behavior varies across databases.
+        self.assertNotEqual(obj.language_code_id, "tr")
 
     @skipUnlessDBFeature("supports_expression_defaults")
     def test_case_when_db_default_returning(self):

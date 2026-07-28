@@ -1094,7 +1094,9 @@ class Model(AltersData, metaclass=ModelBase):
                 if f.name in update_fields or f.attname in update_fields
             ]
 
-        if not self._is_pk_set(meta):
+        if not self._is_pk_set(meta) and not isinstance(
+            getattr(self, meta.pk.attname), DatabaseDefault
+        ):
             pk_val = meta.pk.get_pk_value_on_save(self)
             setattr(self, meta.pk.attname, pk_val)
         pk_set = self._is_pk_set(meta)

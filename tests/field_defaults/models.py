@@ -68,3 +68,13 @@ class DBDefaultsFK(models.Model):
     language_code = models.ForeignKey(
         DBDefaultsPK, db_default="fr", on_delete=models.CASCADE
     )
+
+
+class DBDefaultsOneToOnePK(models.Model):
+    language_code = models.OneToOneField(
+        DBDefaultsPK,
+        primary_key=True,
+        default="tr",
+        db_default="kr",
+        on_delete=models.CASCADE,
+    )
