@@ -357,6 +357,9 @@ class ChangeList:
         except FieldDoesNotExist:
             # See whether field_name is a name of a non-field
             # that allows sorting.
+            if field_name == "__str__":
+                attr = getattr(self.model, "__str__")
+                return getattr(attr, "admin_order_field", None)
             if callable(field_name):
                 attr = field_name
             elif hasattr(self.model_admin, field_name):
