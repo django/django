@@ -196,7 +196,10 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* Intermediary tables created for ``ManyToManyField`` no longer declare a
+  redundant single-column index on the first foreign key column, as it is
+  covered by the leftmost prefix of the table's unique constraint. Only newly
+  created tables are affected.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
