@@ -396,7 +396,9 @@ def label_for_field(name, model, model_admin=None, return_attr=False, form=None)
                         message += f" or {form.__class__.__name__}"
                     raise AttributeError(message)
 
-            if hasattr(attr, "short_description"):
+            if hasattr(attr, "verbose_name"):
+                label = attr.verbose_name
+            elif hasattr(attr, "short_description"):
                 label = attr.short_description
             elif (
                 isinstance(attr, property)
