@@ -35,6 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: define-matrix
     strategy:
+      fail-fast: false
       matrix:
         python-version: ${{ fromJson(needs.define-matrix.outputs.python_versions_output) }}
     timeout-minutes: 60
