@@ -2,7 +2,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.prefetch import GenericPrefetch
 from django.core.exceptions import FieldError, FieldFetchBlocked
 from django.db.models import Q, prefetch_related_objects
-from django.db.models.fetch_modes import FETCH_PEERS, RAISE
+from django.db.models.fetch_modes import FETCH_PEERS, FETCH_RAISE
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
 from .models import (
@@ -813,7 +813,7 @@ class GenericRelationsTests(TestCase):
             self.assertEqual(quartz_tag.content_object, self.quartz)
 
     def test_fetch_mode_raise(self):
-        tag = TaggedItem.objects.fetch_mode(RAISE).get(tag="yellow")
+        tag = TaggedItem.objects.fetch_mode(FETCH_RAISE).get(tag="yellow")
         msg = "Fetching of TaggedItem.content_object blocked."
         with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
             tag.content_object

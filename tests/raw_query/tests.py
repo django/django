@@ -2,7 +2,7 @@ from datetime import date
 from decimal import Decimal
 
 from django.core.exceptions import FieldDoesNotExist, FieldFetchBlocked
-from django.db.models import FETCH_PEERS, RAISE
+from django.db.models import FETCH_PEERS, FETCH_RAISE
 from django.db.models.query import RawQuerySet
 from django.test import TestCase, skipUnlessDBFeature
 
@@ -168,7 +168,7 @@ class RawQueryTests(TestCase):
 
     def test_fk_fetch_mode_raise(self):
         query = "SELECT * FROM raw_query_book"
-        books = list(Book.objects.fetch_mode(RAISE).raw(query))
+        books = list(Book.objects.fetch_mode(FETCH_RAISE).raw(query))
         msg = "Fetching of Book.author blocked."
         with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
             books[0].author
@@ -320,7 +320,7 @@ class RawQueryTests(TestCase):
 
     def test_missing_fields_fetch_mode_raise(self):
         query = "SELECT id, first_name, dob FROM raw_query_author"
-        authors = list(Author.objects.fetch_mode(RAISE).raw(query))
+        authors = list(Author.objects.fetch_mode(FETCH_RAISE).raw(query))
         msg = "Fetching of Author.last_name blocked."
         with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
             authors[0].last_name
