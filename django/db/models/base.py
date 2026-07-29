@@ -28,7 +28,14 @@ from django.db import (
     router,
     transaction,
 )
-from django.db.models import NOT_PROVIDED, ExpressionWrapper, IntegerField, Max, Value
+from django.db.models import (
+    NOT_PROVIDED,
+    Expression,
+    ExpressionWrapper,
+    IntegerField,
+    Max,
+    Value,
+)
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import CASCADE, DO_NOTHING, Collector, DatabaseOnDelete
 from django.db.models.expressions import DatabaseDefault
@@ -1295,7 +1302,9 @@ class Model(AltersData, metaclass=ModelBase):
                         "%s() prohibited to prevent data loss due to unsaved "
                         "related object '%s'." % (operation_name, field.name)
                     )
-                elif getattr(self, field.attname) in field.empty_values:
+                if (
+                    field_val := getattr(self, field.attname)
+                ) in field.empty_values or isinstance(field_val, Expression):
                     # Set related object if it has been saved after an
                     # assignment.
                     setattr(self, field.name, obj)
