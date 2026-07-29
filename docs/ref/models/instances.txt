@@ -996,6 +996,12 @@ Other attributes
 
 .. method:: Model._is_pk_set()
 
-The ``_is_pk_set()`` method returns whether the model instance's ``pk`` is set.
-It abstracts the model's primary key definition, ensuring consistent behavior
-regardless of the specific ``pk`` configuration.
+    The ``_is_pk_set()`` method returns whether the model instance's ``pk`` is
+    set. It abstracts the model's primary key definition, ensuring consistent
+    behavior regardless of the specific ``pk`` configuration. A
+    ``DatabaseDefault`` on an unsaved instance is considered unset.
+
+    .. versionchanged:: 6.1
+
+        In earlier versions, ``True`` was returned for ``DatabaseDefault``
+        values.

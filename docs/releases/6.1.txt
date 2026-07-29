@@ -508,6 +508,9 @@ Models
   using :class:`.RawSQL`, might have to be adjusted to also make use of
   quoting.
 
+* :meth:`~django.db.models.Model._is_pk_set` now returns ``False`` for
+  ``DatabaseDefault`` values on unsaved instances.
+
 System checks
 -------------
 
