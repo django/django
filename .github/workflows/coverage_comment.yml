@@ -49,16 +49,16 @@ jobs:
               '**Note:** Missing lines are warnings only. Some database-specific lines may not be measured. [More information](https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#code-coverage-on-pull-requests)'
             );
 
-            const headSha = context.payload.workflow_run.head_sha;
-            const { data: prs } =
-              await github.rest.repos.listPullRequestsAssociatedWithCommit({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                commit_sha: headSha,
-              });
-            const pr = prs.find((p) => p.head.sha === headSha);
+            const run = context.payload.workflow_run;
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              head: `${run.head_repository.owner.login}:${run.head_branch}`,
+            });
+            const pr = prs[0];
             if (!pr) {
-              core.setFailed(`No PR found for commit ${headSha}.`);
+              core.setFailed(`No PR found for commit ${run.head_sha}.`);
               return;
             }
             
