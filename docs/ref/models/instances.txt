@@ -975,15 +975,21 @@ Other attributes
     The ``_state`` attribute refers to a ``ModelState`` object that tracks
     the lifecycle of the model instance.
 
-    The ``ModelState`` object has two attributes: ``adding``, a flag which is
-    ``True`` if the model has not been saved to the database yet, and ``db``,
-    a string referring to the database alias the instance was loaded from or
-    saved to.
+    The ``ModelState`` object has three attributes: ``adding``, a flag which is
+    ``True`` if the model has not been saved to the database yet, ``db``, a
+    string referring to the database alias the instance was loaded from or
+    saved to, and ``fetch_mode``, the :doc:`fetch mode
+    </topics/db/fetch-modes>` to be used in subsequent field fetches.
 
     Newly instantiated instances have ``adding=True`` and ``db=None``,
-    since they are yet to be saved. Instances fetched from a ``QuerySet``
-    will have ``adding=False`` and ``db`` set to the alias of the associated
-    database.
+    since they are yet to be saved, and ``fetch_mode=models.FETCH_ONE``.
+    Instances fetched from a ``QuerySet`` will have ``adding=False``, ``db``
+    set to the alias of the associated database, and ``fetch_mode`` copied
+    from the queryset's fetch mode.
+
+    .. versionchanged:: 6.1
+
+        The ``fetch_mode`` attribute was added.
 
 ``_is_pk_set()``
 ----------------
