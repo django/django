@@ -1167,10 +1167,6 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             )
 
     def test_loading_dotted_path_without_format(self):
-        """
-        loaddata works when a directory in the fixture path contains a dot.
-        Refs #37081
-        """
         management.call_command("loaddata", "dotted.folder/fixture")
         self.assertEqual(
             Article.objects.get().headline,
@@ -1178,10 +1174,6 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         )
 
     def test_loading_double_dotted_path_without_format(self):
-        """
-        loaddata works when a directory in the fixture path contains a dot.
-        Refs #37081
-        """
         management.call_command("loaddata", "dotted.folder/../fixture1")
         self.assertEqual(
             Site.objects.get().domain,
