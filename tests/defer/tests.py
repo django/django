@@ -1,5 +1,5 @@
 from django.core.exceptions import FieldDoesNotExist, FieldError, FieldFetchBlocked
-from django.db.models import FETCH_PEERS, RAISE
+from django.db.models import FETCH_PEERS, FETCH_RAISE
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import ignore_warnings
 from django.utils.deprecation import RemovedInDjango70Warning
@@ -241,7 +241,7 @@ class DeferTests(AssertionMixin, TestCase):
             self.assertEqual(p2.related, self.s1)
 
     def test_only_fetch_mode_raise(self):
-        p1 = Primary.objects.fetch_mode(RAISE).only("name").get(name="p1")
+        p1 = Primary.objects.fetch_mode(FETCH_RAISE).only("name").get(name="p1")
         msg = "Fetching of Primary.value blocked."
         with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
             p1.value
@@ -249,7 +249,7 @@ class DeferTests(AssertionMixin, TestCase):
         self.assertTrue(cm.exception.__suppress_context__)
 
     def test_defer_fetch_mode_raise(self):
-        p1 = Primary.objects.fetch_mode(RAISE).defer("value").get(name="p1")
+        p1 = Primary.objects.fetch_mode(FETCH_RAISE).defer("value").get(name="p1")
         msg = "Fetching of Primary.value blocked."
         with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
             p1.value

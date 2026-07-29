@@ -1104,19 +1104,19 @@ class ModelRefreshTests(TestCase):
         a = Article.objects.create(pub_date=datetime.now())
         fa = FeaturedArticle.objects.fetch_mode(models.FETCH_PEERS).create(article=a)
 
-        from_queryset = FeaturedArticle.objects.fetch_mode(models.RAISE).select_related(
-            "article"
-        )
+        from_queryset = FeaturedArticle.objects.fetch_mode(
+            models.FETCH_RAISE
+        ).select_related("article")
         fa.refresh_from_db(from_queryset=from_queryset)
         self.assertEqual(fa._state.fetch_mode, models.FETCH_PEERS)
-        self.assertEqual(fa.article._state.fetch_mode, models.RAISE)
+        self.assertEqual(fa.article._state.fetch_mode, models.FETCH_RAISE)
 
     def test_refresh_ignores_fetch_mode_if_no_instance_plucked(self):
         a = Article.objects.create(pub_date=datetime.now())
         fa = FeaturedArticle.objects.fetch_mode(models.FETCH_PEERS).create(article=a)
 
         # This queryset's fetch mode is not used because no fields are plucked.
-        from_queryset = FeaturedArticle.objects.fetch_mode(models.RAISE)
+        from_queryset = FeaturedArticle.objects.fetch_mode(models.FETCH_RAISE)
         fa.refresh_from_db(from_queryset=from_queryset)
         self.assertEqual(fa._state.fetch_mode, models.FETCH_PEERS)
         self.assertEqual(fa.article._state.fetch_mode, models.FETCH_PEERS)
