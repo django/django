@@ -48,7 +48,7 @@ Django provides three fetch modes:
    cases of the "N+1 queries problem" to two queries without any work to
    maintain a list of fields to prefetch.
 
-3. ``RAISE`` raises a :exc:`~django.core.exceptions.FieldFetchBlocked`
+3. ``FETCH_RAISE`` raises a :exc:`~django.core.exceptions.FieldFetchBlocked`
    exception.
 
    This mode can prevent unintentional queries in performance-critical

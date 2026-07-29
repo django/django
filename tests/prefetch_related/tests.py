@@ -10,7 +10,7 @@ from django.db.models import (
     QuerySet,
     prefetch_related_objects,
 )
-from django.db.models.fetch_modes import RAISE
+from django.db.models.fetch_modes import FETCH_RAISE
 from django.db.models.query import get_prefetcher
 from django.db.models.sql import Query
 from django.test import (
@@ -137,7 +137,9 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
         )
 
     def test_fetch_mode_raise(self):
-        authors = list(Author.objects.fetch_mode(RAISE).prefetch_related("first_book"))
+        authors = list(
+            Author.objects.fetch_mode(FETCH_RAISE).prefetch_related("first_book")
+        )
         authors[0].first_book  # No exception, already loaded
 
     def test_foreignkey_reverse(self):
