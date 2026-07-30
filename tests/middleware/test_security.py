@@ -309,3 +309,114 @@ class SecurityMiddlewareTest(SimpleTestCase):
             headers={"Cross-Origin-Opener-Policy": "same-origin"}
         )
         self.assertEqual(response.headers["Cross-Origin-Opener-Policy"], "same-origin")
+
+    # Cross-Origin-Embedder-Policy tests
+
+    @override_settings(SECURE_CROSS_ORIGIN_EMBEDDER_POLICY=None)
+    def test_coep_off(self):
+        """
+        With SECURE_CROSS_ORIGIN_EMBEDDER_POLICY set to None, the middleware
+        does not add a "Cross-Origin-Embedder-Policy" header to the response.
+        """
+        self.assertNotIn("Cross-Origin-Embedder-Policy", self.process_response())
+
+    def test_coep_default(self):
+        """SECURE_CROSS_ORIGIN_EMBEDDER_POLICY defaults to None (off)."""
+        self.assertNotIn("Cross-Origin-Embedder-Policy", self.process_response())
+
+    def test_coep_on(self):
+        """
+        With SECURE_CROSS_ORIGIN_EMBEDDER_POLICY set to a valid value, the
+        middleware adds a "Cross-Origin-Embedder-Policy" header to the response.
+        """
+        tests = ["require-corp", "unsafe-none", "credentialless"]
+        for value in tests:
+            with (
+                self.subTest(value=value),
+                override_settings(SECURE_CROSS_ORIGIN_EMBEDDER_POLICY=value),
+            ):
+                self.assertEqual(
+                    self.process_response().headers["Cross-Origin-Embedder-Policy"],
+                    value,
+                )
+
+    @override_settings(SECURE_CROSS_ORIGIN_EMBEDDER_POLICY="require-corp")
+    def test_coep_already_present(self):
+        """
+        The middleware doesn't override a "Cross-Origin-Embedder-Policy" header
+        already present in the response.
+        """
+        response = self.process_response(
+            headers={"Cross-Origin-Embedder-Policy": "unsafe-none"}
+        )
+        self.assertEqual(response.headers["Cross-Origin-Embedder-Policy"], "unsafe-none")
+
+    # Cross-Origin-Resource-Policy tests
+
+    @override_settings(SECURE_CROSS_ORIGIN_RESOURCE_POLICY=None)
+    def test_corp_off(self):
+        """
+        With SECURE_CROSS_ORIGIN_RESOURCE_POLICY set to None, the middleware
+        does not add a "Cross-Origin-Resource-Policy" header to the response.
+        """
+        self.assertNotIn("Cross-Origin-Resource-Policy", self.process_response())
+
+    def test_corp_default(self):
+        """SECURE_CROSS_ORIGIN_RESOURCE_POLICY defaults to same-origin."""
+        self.assertEqual(
+            self.process_response().headers["Cross-Origin-Resource-Policy"],
+            "same-origin",
+        )
+
+    def test_corp_on(self):
+        """
+        With SECURE_CROSS_ORIGIN_RESOURCE_POLICY set to a valid value, the
+        middleware adds a "Cross-Origin-Resource-Policy" header to the response.
+        """
+        tests = ["same-origin", "same-site", "cross-origin"]
+        for value in tests:
+            with (
+                self.subTest(value=value),
+                override_settings(SECURE_CROSS_ORIGIN_RESOURCE_POLICY=value),
+            ):
+                self.assertEqual(
+                    self.process_response().headers["Cross-Origin-Resource-Policy"],
+                    value,
+                )
+
+    @override_settings(SECURE_CROSS_ORIGIN_RESOURCE_POLICY="same-origin")
+    def test_corp_already_present(self):
+        """
+        The middleware doesn't override a "Cross-Origin-Resource-Policy" header
+        already present in the response.
+        """
+        response = self.process_response(
+            headers={"Cross-Origin-Resource-Policy": "cross-origin"}
+        )
+        self.assertEqual(
+            response.headers["Cross-Origin-Resource-Policy"], "cross-origin"
+        )
+
+    @override_settings(SECURE_CROSS_ORIGIN_RESOURCE_POLICY="same-origin")
+    def test_corp_decorator_overrides_setting(self):
+        """
+        The @cross_origin_resource_policy decorator overrides the global
+        SECURE_CROSS_ORIGIN_RESOURCE_POLICY setting for a specific view.
+        """
+        from django.views.decorators.cors import cross_origin_resource_policy
+
+        def my_view(request):
+            return HttpResponse()
+
+        decorated = cross_origin_resource_policy("cross-origin")(my_view)
+        request = self.request.get("/")
+        response = self.middleware()(request)
+        # Simulate decorator setting attribute on response
+        response._cross_origin_resource_policy = "cross-origin"
+        from django.middleware.security import SecurityMiddleware
+
+        middleware = SecurityMiddleware(lambda r: response)
+        final_response = middleware(request)
+        self.assertEqual(
+            final_response.headers["Cross-Origin-Resource-Policy"], "cross-origin"
+        )
