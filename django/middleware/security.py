@@ -17,6 +17,8 @@ class SecurityMiddleware(MiddlewareMixin):
         self.redirect_exempt = [re.compile(r) for r in settings.SECURE_REDIRECT_EXEMPT]
         self.referrer_policy = settings.SECURE_REFERRER_POLICY
         self.cross_origin_opener_policy = settings.SECURE_CROSS_ORIGIN_OPENER_POLICY
+        self.cross_origin_embedder_policy = settings.SECURE_CROSS_ORIGIN_EMBEDDER_POLICY
+        self.cross_origin_resource_policy = settings.SECURE_CROSS_ORIGIN_RESOURCE_POLICY
 
     def process_request(self, request):
         path = request.path.lstrip("/")
@@ -63,4 +65,17 @@ class SecurityMiddleware(MiddlewareMixin):
                 "Cross-Origin-Opener-Policy",
                 self.cross_origin_opener_policy,
             )
+
+        if self.cross_origin_embedder_policy:
+            response.setdefault(
+                "Cross-Origin-Embedder-Policy",
+                self.cross_origin_embedder_policy,
+            )
+
+        corp = getattr(response, "_cross_origin_resource_policy", None)
+        if corp is None:
+            corp = self.cross_origin_resource_policy
+        if corp:
+            response.setdefault("Cross-Origin-Resource-Policy", corp)
+
         return response
