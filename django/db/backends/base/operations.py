@@ -4,6 +4,7 @@ import json
 from importlib import import_module
 
 import sqlparse
+from sqlparse.exceptions import SQLParseError
 
 from django.conf import settings
 from django.db import NotSupportedError, transaction
@@ -802,7 +803,11 @@ class BaseDatabaseOperations:
 
     def format_debug_sql(self, sql):
         # Hook for backends (e.g. NoSQL) to customize formatting.
-        return sqlparse.format(sql, reindent=True, keyword_case="upper")
+        try:
+            return sqlparse.format(sql, reindent=True, keyword_case="upper")
+        except SQLParseError:
+            # Fallback to unformatted sql.
+            return sql
 
     def format_json_path_numeric_index(self, num):
         """
