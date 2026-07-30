@@ -191,6 +191,7 @@ class BaseExpression:
     is_composite = False
     # Does the expression allow composite expressions in source_expressions?
     allows_composite_expressions = False
+    table_source = False
 
     def __init__(self, output_field=None):
         if output_field is not None:

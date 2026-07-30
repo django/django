@@ -16,6 +16,13 @@ class GenerateSeries(Func):
     function = "generate_series"
     output_field = IntegerField()
     set_returning = True
+    table_source = True
+
+
+class SelectListGenerateSeries(Func):
+    function = "generate_series"
+    output_field = IntegerField()
+    set_returning = True
 
 
 class JsonbEach(Func):
@@ -25,17 +32,40 @@ class JsonbEach(Func):
         value=JSONField(),
     )
     set_returning = True
+    table_source = True
 
 
 class SetReturningFunctionTests(PostgreSQLSimpleTestCase):
     def test_annotate_keeps_select_list_behavior(self):
         queryset = AggregateTestModel.objects.annotate(
-            number=GenerateSeries(1, 2)
+            number=SelectListGenerateSeries(1, 2)
         ).values("number")
         sql, params = queryset.query.sql_with_params()
 
         self.assertIn('generate_series(%s, %s) AS "number"', sql)
         self.assertNotIn("CROSS JOIN", sql)
+        self.assertEqual(params, (1, 2))
+
+    def test_set_returning_alias_is_not_a_table_source(self):
+        queryset = (
+            AggregateTestModel.objects.alias(number=SelectListGenerateSeries(1, 2))
+            .annotate(result=F("number"))
+            .values("result")
+        )
+        sql, params = queryset.query.sql_with_params()
+
+        self.assertIn('generate_series(%s, %s) AS "result"', sql)
+        self.assertNotIn("CROSS JOIN", sql)
+        self.assertEqual(params, (1, 2))
+
+    def test_table_source_annotation_is_added_to_from_clause(self):
+        queryset = AggregateTestModel.objects.annotate(
+            number=GenerateSeries(1, 2)
+        ).values("number")
+        sql, params = queryset.query.sql_with_params()
+
+        self.assertIn('"number"."number" AS "number"', sql)
+        self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
         self.assertEqual(params, (1, 2))
 
     def test_scalar_function_is_added_to_from_clause(self):
@@ -225,7 +255,7 @@ class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
 
         self.assertSequenceEqual(list(results), [obj.pk, obj.pk])
 
-    def test_scalar_function_join_is_reused(self):
+    def test_chained_operations_reuse_function_join(self):
         AggregateTestModel.objects.create()
 
         results = (
@@ -233,12 +263,19 @@ class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
             .filter(number__gt=1)
             .annotate(result=F("number"))
             .order_by("result")
-            .values_list("result", flat=True)
+            .values("result")
         )
         sql, _ = results.query.sql_with_params()
 
         self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
-        self.assertSequenceEqual(list(results), [2, 3])
+        self.assertEqual(sql.count("generate_series"), 1)
+        self.assertSequenceEqual(
+            list(results),
+            [
+                {"result": 2},
+                {"result": 3},
+            ],
+        )
 
     def test_scalar_function_ordering(self):
         AggregateTestModel.objects.create()

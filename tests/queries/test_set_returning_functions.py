@@ -19,6 +19,7 @@ class JsonEach(Func):
     function = "json_each"
     output_field = TextField(db_column="value")
     set_returning = True
+    table_source = True
 
 
 class JsonEachRow(Func):
@@ -28,6 +29,7 @@ class JsonEachRow(Func):
         value=TextField(db_column="value"),
     )
     set_returning = True
+    table_source = True
 
 
 class JsonEachObjectRow(JsonEachRow):
@@ -51,6 +53,7 @@ class JsonTableArrayRow(Func):
         value=TextField(db_column="value"),
     )
     set_returning = True
+    table_source = True
 
     def _as_json_table(
         self,

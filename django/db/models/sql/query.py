@@ -1330,7 +1330,7 @@ class Query(BaseExpression):
         annotation = self.annotations.get(alias)
         if annotation is None:
             return None
-        if getattr(annotation, "set_returning", False):
+        if getattr(annotation, "table_source", False):
             output_field = annotation.output_field
 
             if rest_path:
@@ -1400,6 +1400,8 @@ class Query(BaseExpression):
         else:
             self.set_annotation_mask(set(self.annotation_select).difference({alias}))
         self.annotations[alias] = annotation
+        if select and getattr(annotation, "table_source", False):
+            self.annotations[alias] = self._promote_inner_subquery_join(alias)
         if select and self.selected:
             self.selected[alias] = alias
 
@@ -2244,7 +2246,7 @@ class Query(BaseExpression):
 
     def resolve_ref(self, name, allow_joins=True, reuse=None, summarize=False):
         annotation = self.annotations.get(name)
-        if getattr(annotation, "set_returning", False):
+        if getattr(annotation, "table_source", False):
             join_result = self._promote_inner_subquery_join(name)
             if join_result is not None:
                 return join_result
