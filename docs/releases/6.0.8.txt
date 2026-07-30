@@ -15,3 +15,7 @@ Bugfixes
   :meth:`~django.db.models.query.QuerySet.bulk_create` to crash on databases
   that support returning rows from bulk inserts when a related object providing
   the primary key was saved after assignment (:ticket:`37234`).
+
+* Fixed a long-standing bug in :mod:`django.contrib.admindocs` where URL
+  patterns containing more than one unnamed capture group were displayed with
+  duplicated and malformed paths on the "Views" page (:ticket:`37240`).
