@@ -1,5 +1,6 @@
 import os
 import re
+import unittest
 from io import StringIO
 
 from django.contrib.gis.gdal import GDAL_VERSION, Driver, GDALException
@@ -14,6 +15,10 @@ from ..test_data import TEST_DATA
 from .models import AllOGRFields
 
 
+@unittest.skipIf(
+    connection.vendor == "mysql" and connection.mysql_is_mariadb,
+    "MariaDB doesn't support spatial reference system tables required for these tests",
+)
 @skipUnlessDBFeature("supports_inspectdb")
 class InspectDbTests(TestCase):
     def test_geom_columns(self):

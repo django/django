@@ -1,3 +1,5 @@
+import unittest
+
 from django.contrib.gis.db.models.functions import (
     Area,
     Distance,
@@ -34,6 +36,10 @@ from .models import (
 )
 
 
+@unittest.skipIf(
+    connection.vendor == "mysql" and connection.mysql_is_mariadb,
+    "MariaDB doesn't support spatial reference system tables required for these tests",
+)
 class DistanceTest(TestCase):
     fixtures = ["initial"]
 
@@ -399,6 +405,10 @@ Perimeter(geom1)                                |    OK              |      :-( 
 """  # NOQA
 
 
+@unittest.skipIf(
+    connection.vendor == "mysql" and connection.mysql_is_mariadb,
+    "MariaDB doesn't support spatial reference system tables required for these tests",
+)
 class DistanceFunctionsTests(FuncTestMixin, TestCase):
     fixtures = ["initial"]
 

@@ -1,6 +1,7 @@
 import json
 import math
 import re
+import unittest
 from decimal import Decimal
 
 from django.contrib.gis.db.models import GeometryField, PolygonField, functions
@@ -32,6 +33,10 @@ from .models import (
 )
 
 
+@unittest.skipIf(
+    connection.vendor == "mysql" and connection.mysql_is_mariadb,
+    "MariaDB doesn't support spatial reference system tables required for these tests",
+)
 class GISFunctionsTests(FuncTestMixin, TestCase):
     """
     Testing functions from django/contrib/gis/db/models/functions.py.
