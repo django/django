@@ -1,4 +1,11 @@
-from django.db.models import F, Func, IntegerField
+from django.db.models import (
+    CompositeField,
+    F,
+    Func,
+    IntegerField,
+    JSONField,
+    TextField,
+)
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import AggregateTestModel
@@ -7,6 +14,15 @@ from .models import AggregateTestModel
 class GenerateSeries(Func):
     function = "generate_series"
     output_field = IntegerField()
+    set_returning = True
+
+
+class JsonbEach(Func):
+    function = "jsonb_each"
+    output_field = CompositeField(
+        key=TextField(),
+        value=JSONField(),
+    )
     set_returning = True
 
 
@@ -27,6 +43,18 @@ class SetReturningFunctionTests(PostgreSQLSimpleTestCase):
         )
         self.assertIn('AS "number"("number")', sql)
         self.assertEqual(params, (1, 2))
+
+    def test_composite_function_is_added_to_from_clause(self):
+        queryset = AggregateTestModel.objects.alias(
+            item=JsonbEach("json_field")
+        ).values("item__key", "item__value")
+        sql, params = queryset.query.sql_with_params()
+
+        self.assertIn('"item"."key" AS "item__key"', sql)
+        self.assertIn('"item"."value" AS "item__value"', sql)
+        self.assertIn("CROSS JOIN LATERAL jsonb_each", sql)
+        self.assertIn('AS "item"("key", "value")', sql)
+        self.assertEqual(params, ())
 
 
 class SetReturningFunctionExecutionTests(PostgreSQLTestCase):

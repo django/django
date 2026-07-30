@@ -4,6 +4,7 @@ the SQL domain.
 """
 
 from django.core.exceptions import FullResultSet
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.sql.constants import INNER, LOUTER
 
 
@@ -283,11 +284,20 @@ class SetReturningFunctionJoin:
     def as_postgresql(self, compiler, connection):
         sql, params = compiler.compile(self.srf_func)
         alias = compiler.quote_name(self.table_alias)
-        column = compiler.quote_name(
-            self.srf_func.output_field.db_column or self.table_name
-        )
+        output_field = self.srf_func.output_field
+
+        if getattr(output_field, "is_composite", False):
+            column_names = (
+                field.db_column or LOOKUP_SEP.join(path)
+                for path, field in output_field.get_fields()
+            )
+        else:
+            column_names = (output_field.db_column or self.table_name,)
+
+        columns = ", ".join(compiler.quote_name(name) for name in column_names)
+
         return (
-            f"{self.join_type} LATERAL {sql} AS {alias}({column})",
+            f"{self.join_type} LATERAL {sql} AS {alias}({columns})",
             params,
         )
 
@@ -302,7 +312,8 @@ class SetReturningFunctionJoin:
 
     def get_field(self, name):
         field = self.srf_func.output_field
-
+        if getattr(field, "is_composite", False):
+            field = field.get_field(name)
         if field.is_relation:
             field = field.target_field
 

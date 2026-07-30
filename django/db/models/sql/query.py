@@ -1331,8 +1331,15 @@ class Query(BaseExpression):
         if annotation is None:
             return None
         if getattr(annotation, "set_returning", False):
+            output_field = annotation.output_field
+
             if rest_path:
-                return None
+                if not getattr(output_field, "is_composite", False):
+                    return None
+                try:
+                    output_field.get_field(rest_path)
+                except FieldError:
+                    return None
             existing = next(
                 (
                     join
@@ -1344,7 +1351,7 @@ class Query(BaseExpression):
             )
             if existing is not None:
                 self.ref_alias(existing.table_alias)
-                field = existing.get_field(alias)
+                field = existing.get_field(rest_path or alias)
                 return Col(existing.table_alias, field)
             self.get_initial_alias()
             table_alias, _ = self.table_alias(alias, create=True)
@@ -1355,7 +1362,7 @@ class Query(BaseExpression):
             )
             self.alias_map[table_alias] = join
 
-            field = join.get_field(alias)
+            field = join.get_field(rest_path or alias)
             return Col(join.table_alias, field)
         if not self._is_multi_column_query(annotation):
             return None
