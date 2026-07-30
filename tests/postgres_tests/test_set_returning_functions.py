@@ -67,3 +67,17 @@ class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
 
         self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
         self.assertSequenceEqual(list(results), [2, 3])
+
+    def test_scalar_function_ordering(self):
+        AggregateTestModel.objects.create()
+
+        results = (
+            AggregateTestModel.objects.alias(number=GenerateSeries(1, 3))
+            .annotate(result=F("number"))
+            .order_by("-number")
+            .values_list("result", flat=True)
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertIn('ORDER BY "number"."number" DESC', sql)
+        self.assertSequenceEqual(list(results), [3, 2, 1])
