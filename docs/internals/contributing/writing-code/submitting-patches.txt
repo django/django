@@ -114,10 +114,7 @@ requirements:
   of a solution, but it is not the only part. A good fix should also include a
   :doc:`regression test </internals/contributing/writing-code/unit-tests>` to
   validate the behavior that has been fixed and to prevent the problem from
-  arising again. Also, if some tickets are relevant to the code that you've
-  written, mention the ticket numbers in some comments in the test so that one
-  can easily trace back the relevant discussions after your patch gets
-  committed, and the tickets get closed.
+  arising again.
 
 * If the code adds a new feature, or modifies the behavior of an existing
   feature, the change should also contain documentation.
