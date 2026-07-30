@@ -46,6 +46,7 @@ from django.db.models.sql.datastructures import (
     Empty,
     Join,
     MultiJoin,
+    SetReturningFunctionJoin,
     SubqueryJoin,
 )
 from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
@@ -1329,6 +1330,18 @@ class Query(BaseExpression):
         annotation = self.annotations.get(alias)
         if annotation is None:
             return None
+        if getattr(annotation, "set_returning", False):
+            self.get_initial_alias()
+            table_alias, _ = self.table_alias(alias, create=True)
+            join = SetReturningFunctionJoin(
+                annotation,
+                alias,
+                table_alias,
+            )
+            self.alias_map[table_alias] = join
+
+            field = join.get_field(alias)
+            return Col(join.table_alias, field)
         if not self._is_multi_column_query(annotation):
             return None
         if annotation.has_external_references():
@@ -2209,6 +2222,10 @@ class Query(BaseExpression):
 
     def resolve_ref(self, name, allow_joins=True, reuse=None, summarize=False):
         annotation = self.annotations.get(name)
+        if getattr(annotation, "set_returning", False):
+            join_result = self._promote_inner_subquery_join(name)
+            if join_result is not None:
+                return join_result
         if annotation is not None:
             if not allow_joins:
                 for alias in self._gen_col_aliases([annotation]):

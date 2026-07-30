@@ -255,6 +255,64 @@ class SubqueryJoin:
         return new
 
 
+class SetReturningFunctionJoin:
+    def __init__(
+        self,
+        srf_func,
+        table_name,
+        table_alias,
+    ):
+        self.table_name = table_name
+        self.parent_alias = None
+        # Join table
+        self.srf_func = srf_func
+        self.table_alias = table_alias
+        # CROSS or INNER
+        self.join_type = "CROSS JOIN"
+        # Is this join nullabled?
+        self.nullable = False
+
+    def as_sql(self, compiler, connection):
+        sql, params = compiler.compile(self.srf_func)
+        alias = compiler.quote_name(self.table_alias)
+        return (
+            "%s %s %s" % (self.join_type, sql, alias),
+            params,
+        )
+
+    def as_postgresql(self, compiler, connection):
+        sql, params = compiler.compile(self.srf_func)
+        alias = compiler.quote_name(self.table_alias)
+        column = compiler.quote_name(
+            self.srf_func.output_field.db_column or self.table_name
+        )
+        return (
+            f"{self.join_type} LATERAL {sql} AS {alias}({column})",
+            params,
+        )
+
+    def relabeled_clone(self, change_map):
+        clone = self.__class__(
+            self.srf_func.relabeled_clone(change_map),
+            self.table_name,
+            change_map.get(self.table_alias, self.table_alias),
+        )
+        clone.join_type = self.join_type
+        return clone
+
+    def get_field(self, name):
+        field = self.srf_func.output_field
+
+        if field.is_relation:
+            field = field.target_field
+
+        field = field.clone()
+        field.model = None
+        field.name = name
+        field.column = field.db_column or name
+        return field
+
+
 class BaseTable:
     """
     The BaseTable class is used for base table references in FROM clause. For
