@@ -847,3 +847,73 @@ class CheckSecureCSPTests(SimpleTestCase):
             with self.subTest(settings_overrides=settings_overrides):
                 with self.settings(**settings_overrides):
                     self.assertEqual(base.check_csp_nonce_context_processor(None), [])
+
+
+class CheckCrossOriginEmbedderPolicyTest(SimpleTestCase):
+    @override_settings(
+        MIDDLEWARE=["django.middleware.security.SecurityMiddleware"],
+        SECURE_CROSS_ORIGIN_EMBEDDER_POLICY=None,
+    )
+    def test_no_coep(self):
+        self.assertEqual(base.check_cross_origin_embedder_policy(None), [])
+
+    @override_settings(MIDDLEWARE=["django.middleware.security.SecurityMiddleware"])
+    def test_with_coep(self):
+        for value in ("require-corp", "unsafe-none", "credentialless"):
+            with (
+                self.subTest(value=value),
+                override_settings(SECURE_CROSS_ORIGIN_EMBEDDER_POLICY=value),
+            ):
+                self.assertEqual(base.check_cross_origin_embedder_policy(None), [])
+
+    @override_settings(
+        MIDDLEWARE=["django.middleware.security.SecurityMiddleware"],
+        SECURE_CROSS_ORIGIN_EMBEDDER_POLICY="invalid-value",
+    )
+    def test_with_invalid_coep(self):
+        self.assertEqual(
+            base.check_cross_origin_embedder_policy(None), [base.E028]
+        )
+
+    @override_settings(
+        MIDDLEWARE=[],
+        SECURE_CROSS_ORIGIN_EMBEDDER_POLICY="invalid-value",
+    )
+    def test_no_middleware_no_check(self):
+        """No error if SecurityMiddleware is not installed."""
+        self.assertEqual(base.check_cross_origin_embedder_policy(None), [])
+
+
+class CheckCrossOriginResourcePolicyTest(SimpleTestCase):
+    @override_settings(
+        MIDDLEWARE=["django.middleware.security.SecurityMiddleware"],
+        SECURE_CROSS_ORIGIN_RESOURCE_POLICY=None,
+    )
+    def test_no_corp(self):
+        self.assertEqual(base.check_cross_origin_resource_policy(None), [])
+
+    @override_settings(MIDDLEWARE=["django.middleware.security.SecurityMiddleware"])
+    def test_with_corp(self):
+        for value in ("same-origin", "same-site", "cross-origin"):
+            with (
+                self.subTest(value=value),
+                override_settings(SECURE_CROSS_ORIGIN_RESOURCE_POLICY=value),
+            ):
+                self.assertEqual(base.check_cross_origin_resource_policy(None), [])
+
+    @override_settings(
+        MIDDLEWARE=["django.middleware.security.SecurityMiddleware"],
+        SECURE_CROSS_ORIGIN_RESOURCE_POLICY="invalid-value",
+    )
+    def test_with_invalid_corp(self):
+        self.assertEqual(
+            base.check_cross_origin_resource_policy(None), [base.E029]
+        )
+
+    @override_settings(
+        MIDDLEWARE=[],
+        SECURE_CROSS_ORIGIN_RESOURCE_POLICY="invalid-value",
+    )
+    def test_no_middleware_no_check(self):
+        """No error if SecurityMiddleware is not installed."""
+        self.assertEqual(base.check_cross_origin_resource_policy(None), [])
