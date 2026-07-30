@@ -1,7 +1,15 @@
 import unittest
 
 from django.db import connection
-from django.db.models import CompositeField, F, Func, IntegerField, TextField
+from django.db.models import (
+    CompositeField,
+    F,
+    Func,
+    IntegerField,
+    JSONField,
+    TextField,
+    Value,
+)
 from django.test import TestCase
 
 from .models import JSONFieldNullable
@@ -34,6 +42,38 @@ class JsonEachTypeRow(JsonEachRow):
         key=IntegerField(db_column="key"),
         json_type=TextField(db_column="type"),
     )
+
+
+class JsonTableArrayRow(Func):
+    function = "JSON_TABLE"
+    output_field = CompositeField(
+        position=IntegerField(db_column="position"),
+        value=TextField(db_column="value"),
+    )
+    set_returning = True
+
+    def as_mysql(self, compiler, connection, **extra_context):
+        qn = connection.ops.quote_name
+        expression_template = "%(expressions)s"
+        if not connection.mysql_is_mariadb:
+            # MySQL can lose the JSON type when a column comes from a derived
+            # table. Normalize the input before passing it to JSON_TABLE().
+            expression_template = "JSON_EXTRACT(%(expressions)s, '$')"
+        template = (
+            f"%(function)s({expression_template}, '$[*]' COLUMNS ("
+            f"{qn('position')} FOR ORDINALITY, "
+            f"{qn('value')} VARCHAR(100) PATH '$'))"
+        )
+        return super().as_sql(
+            compiler,
+            connection,
+            template=template,
+            **extra_context,
+        )
+
+
+class JsonTableArrayValue(JsonTableArrayRow):
+    output_field = TextField(db_column="value")
 
 
 @unittest.skipUnless(connection.vendor == "sqlite", "SQLite tests")
@@ -153,5 +193,77 @@ class SQLiteSetReturningFunctionTests(TestCase):
                 (self.populated.pk, "alpha"),
                 (self.populated.pk, "beta"),
                 (self.populated.pk, "beta"),
+            ],
+        )
+
+
+@unittest.skipUnless(connection.vendor == "mysql", "MySQL and MariaDB tests")
+class MySQLSetReturningFunctionTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.first = JSONFieldNullable.objects.create(
+            json_field=["beta", "alpha", "beta", None]
+        )
+        cls.second = JSONFieldNullable.objects.create(json_field=["gamma"])
+        JSONFieldNullable.objects.create(json_field=[])
+        JSONFieldNullable.objects.create(json_field=None)
+
+    def test_json_table_returns_array_elements(self):
+        results = (
+            JSONFieldNullable.objects.alias(element=JsonTableArrayRow("json_field"))
+            .order_by("pk", "element__position")
+            .values_list("pk", "element__position", "element__value")
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("CROSS JOIN"), 1)
+        self.assertIn("JSON_TABLE", sql)
+        self.assertNotIn("LATERAL", sql)
+        self.assertSequenceEqual(
+            list(results),
+            [
+                (self.first.pk, 1, "beta"),
+                (self.first.pk, 2, "alpha"),
+                (self.first.pk, 3, "beta"),
+                (self.first.pk, 4, None),
+                (self.second.pk, 1, "gamma"),
+            ],
+        )
+
+    def test_json_table_scalar_filter_and_join_reuse(self):
+        results = (
+            JSONFieldNullable.objects.filter(pk=self.first.pk)
+            .alias(element=JsonTableArrayValue("json_field"))
+            .filter(element="beta")
+            .annotate(value=F("element"))
+            .order_by("element")
+            .values_list("value", flat=True)
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("CROSS JOIN"), 1)
+        self.assertSequenceEqual(list(results), ["beta", "beta"])
+
+    def test_multiple_json_table_sources(self):
+        results = (
+            JSONFieldNullable.objects.filter(pk=self.first.pk)
+            .alias(
+                first=JsonTableArrayValue(Value(["a", "b"], output_field=JSONField())),
+                second=JsonTableArrayValue(Value(["x", "y"], output_field=JSONField())),
+            )
+            .annotate(first_value=F("first"), second_value=F("second"))
+            .order_by("first", "second")
+            .values_list("first_value", "second_value")
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("CROSS JOIN"), 2)
+        self.assertSequenceEqual(
+            list(results),
+            [
+                ("a", "x"),
+                ("a", "y"),
+                ("b", "x"),
+                ("b", "y"),
             ],
         )
