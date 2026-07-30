@@ -1,5 +1,6 @@
 from django.db.models import (
     CompositeField,
+    Count,
     F,
     Func,
     IntegerField,
@@ -154,6 +155,13 @@ class CorrelatedSetReturningFunctionExecutionTests(PostgreSQLTestCase):
                 ("second", 3),
             ],
         )
+
+    def test_aggregate_over_function_column(self):
+        result = AggregateTestModel.objects.alias(
+            number=GenerateSeries(1, "integer_field")
+        ).aggregate(total=Count("number"))
+
+        self.assertEqual(result, {"total": 5})
 
 
 class MultipleSetReturningFunctionExecutionTests(PostgreSQLTestCase):
