@@ -41,3 +41,14 @@ class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
         )
 
         self.assertSequenceEqual(list(results), [1, 2])
+
+    def test_scalar_function_filter(self):
+        obj = AggregateTestModel.objects.create()
+
+        results = (
+            AggregateTestModel.objects.alias(number=GenerateSeries(1, 3))
+            .filter(number__gt=1)
+            .values_list("pk", flat=True)
+        )
+
+        self.assertSequenceEqual(list(results), [obj.pk, obj.pk])

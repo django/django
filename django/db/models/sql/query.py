@@ -1331,6 +1331,8 @@ class Query(BaseExpression):
         if annotation is None:
             return None
         if getattr(annotation, "set_returning", False):
+            if rest_path:
+                return None
             self.get_initial_alias()
             table_alias, _ = self.table_alias(alias, create=True)
             join = SetReturningFunctionJoin(
