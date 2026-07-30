@@ -3,10 +3,20 @@ from django.core.checks import Error, Tags, Warning, register
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.csp import CSP
 
+CROSS_ORIGIN_EMBEDDER_POLICY_VALUES = {
+    "require-corp",
+    "unsafe-none",
+    "credentialless",
+}
 CROSS_ORIGIN_OPENER_POLICY_VALUES = {
     "same-origin",
     "same-origin-allow-popups",
     "unsafe-none",
+}
+CROSS_ORIGIN_RESOURCE_POLICY_VALUES = {
+    "same-origin",
+    "same-site",
+    "cross-origin",
 }
 REFERRER_POLICY_VALUES = {
     "no-referrer",
@@ -36,7 +46,8 @@ W001 = Warning(
     "You do not have 'django.middleware.security.SecurityMiddleware' "
     "in your MIDDLEWARE so the SECURE_HSTS_SECONDS, "
     "SECURE_CONTENT_TYPE_NOSNIFF, SECURE_REFERRER_POLICY, "
-    "SECURE_CROSS_ORIGIN_OPENER_POLICY, and SECURE_SSL_REDIRECT settings will "
+    "SECURE_CROSS_ORIGIN_OPENER_POLICY, SECURE_CROSS_ORIGIN_EMBEDDER_POLICY, "
+    "SECURE_CROSS_ORIGIN_RESOURCE_POLICY, and SECURE_SSL_REDIRECT settings will "
     "have no effect.",
     id="security.W001",
 )
@@ -137,6 +148,24 @@ E024 = Error(
         ", ".join(sorted(CROSS_ORIGIN_OPENER_POLICY_VALUES)),
     ),
     id="security.E024",
+)
+
+E028 = Error(
+    "You have set the SECURE_CROSS_ORIGIN_EMBEDDER_POLICY setting to an invalid "
+    "value.",
+    hint="Valid values are: {}.".format(
+        ", ".join(sorted(CROSS_ORIGIN_EMBEDDER_POLICY_VALUES)),
+    ),
+    id="security.E028",
+)
+
+E029 = Error(
+    "You have set the SECURE_CROSS_ORIGIN_RESOURCE_POLICY setting to an invalid "
+    "value.",
+    hint="Valid values are: {}.".format(
+        ", ".join(sorted(CROSS_ORIGIN_RESOURCE_POLICY_VALUES)),
+    ),
+    id="security.E029",
 )
 
 W025 = Warning(SECRET_KEY_WARNING_MSG, id="security.W025")
@@ -329,6 +358,30 @@ def check_cross_origin_opener_policy(app_configs, **kwargs):
         not in CROSS_ORIGIN_OPENER_POLICY_VALUES
     ):
         return [E024]
+    return []
+
+
+@register(Tags.security, deploy=True)
+def check_cross_origin_embedder_policy(app_configs, **kwargs):
+    if (
+        _security_middleware()
+        and settings.SECURE_CROSS_ORIGIN_EMBEDDER_POLICY is not None
+        and settings.SECURE_CROSS_ORIGIN_EMBEDDER_POLICY
+        not in CROSS_ORIGIN_EMBEDDER_POLICY_VALUES
+    ):
+        return [E028]
+    return []
+
+
+@register(Tags.security, deploy=True)
+def check_cross_origin_resource_policy(app_configs, **kwargs):
+    if (
+        _security_middleware()
+        and settings.SECURE_CROSS_ORIGIN_RESOURCE_POLICY is not None
+        and settings.SECURE_CROSS_ORIGIN_RESOURCE_POLICY
+        not in CROSS_ORIGIN_RESOURCE_POLICY_VALUES
+    ):
+        return [E029]
     return []
 
 
