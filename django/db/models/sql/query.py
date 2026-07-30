@@ -1333,6 +1333,19 @@ class Query(BaseExpression):
         if getattr(annotation, "set_returning", False):
             if rest_path:
                 return None
+            existing = next(
+                (
+                    join
+                    for join in self.alias_map.values()
+                    if isinstance(join, SetReturningFunctionJoin)
+                    and join.table_name == alias
+                ),
+                None,
+            )
+            if existing is not None:
+                self.ref_alias(existing.table_alias)
+                field = existing.get_field(alias)
+                return Col(existing.table_alias, field)
             self.get_initial_alias()
             table_alias, _ = self.table_alias(alias, create=True)
             join = SetReturningFunctionJoin(

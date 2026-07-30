@@ -52,3 +52,18 @@ class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
         )
 
         self.assertSequenceEqual(list(results), [obj.pk, obj.pk])
+
+    def test_scalar_function_join_is_reused(self):
+        AggregateTestModel.objects.create()
+
+        results = (
+            AggregateTestModel.objects.alias(number=GenerateSeries(1, 3))
+            .filter(number__gt=1)
+            .annotate(result=F("number"))
+            .order_by("result")
+            .values_list("result", flat=True)
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
+        self.assertSequenceEqual(list(results), [2, 3])
