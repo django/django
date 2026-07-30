@@ -28,6 +28,16 @@ class JsonbEach(Func):
 
 
 class SetReturningFunctionTests(PostgreSQLSimpleTestCase):
+    def test_annotate_keeps_select_list_behavior(self):
+        queryset = AggregateTestModel.objects.annotate(
+            number=GenerateSeries(1, 2)
+        ).values("number")
+        sql, params = queryset.query.sql_with_params()
+
+        self.assertIn('generate_series(%s, %s) AS "number"', sql)
+        self.assertNotIn("CROSS JOIN", sql)
+        self.assertEqual(params, (1, 2))
+
     def test_scalar_function_is_added_to_from_clause(self):
         queryset = (
             AggregateTestModel.objects.alias(number=GenerateSeries(1, 2))
