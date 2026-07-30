@@ -57,6 +57,71 @@ class SetReturningFunctionTests(PostgreSQLSimpleTestCase):
         self.assertEqual(params, ())
 
 
+class CompositeSetReturningFunctionExecutionTests(PostgreSQLTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        AggregateTestModel.objects.bulk_create(
+            [
+                AggregateTestModel(char_field="empty", json_field={}),
+                AggregateTestModel(char_field="null", json_field=None),
+                AggregateTestModel(
+                    char_field="first",
+                    json_field={
+                        "active": True,
+                        "color": "blue",
+                        "count": 2,
+                        "metadata": {"region": "eu"},
+                        "nothing": None,
+                        "size": "large",
+                        "tags": ["django", "orm"],
+                    },
+                ),
+                AggregateTestModel(
+                    char_field="second",
+                    json_field={
+                        "color": "red",
+                        "count": 0,
+                        "size": "small",
+                    },
+                ),
+            ]
+        )
+
+    def test_filter_composite_columns(self):
+        results = (
+            AggregateTestModel.objects.alias(item=JsonbEach("json_field"))
+            .filter(item__key="size", item__value="large")
+            .values_list("char_field", "item__key", "item__value")
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
+        self.assertSequenceEqual(list(results), [("first", "size", "large")])
+
+    def test_returns_composite_columns(self):
+        results = (
+            AggregateTestModel.objects.alias(item=JsonbEach("json_field"))
+            .order_by("char_field", "item__key")
+            .values_list("char_field", "item__key", "item__value")
+        )
+
+        self.assertSequenceEqual(
+            list(results),
+            [
+                ("first", "active", True),
+                ("first", "color", "blue"),
+                ("first", "count", 2),
+                ("first", "metadata", {"region": "eu"}),
+                ("first", "nothing", None),
+                ("first", "size", "large"),
+                ("first", "tags", ["django", "orm"]),
+                ("second", "color", "red"),
+                ("second", "count", 0),
+                ("second", "size", "small"),
+            ],
+        )
+
+
 class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
     def test_scalar_function_returns_rows(self):
         AggregateTestModel.objects.create()
