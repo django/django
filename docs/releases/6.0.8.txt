@@ -15,3 +15,5 @@ Bugfixes
   :meth:`~django.db.models.query.QuerySet.bulk_create` to crash on databases
   that support returning rows from bulk inserts when a related object providing
   the primary key was saved after assignment (:ticket:`37234`).
+
+* Added compatibility for ``sqlparse`` 0.5.5 (:ticket:`37235`).
