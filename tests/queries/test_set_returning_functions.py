@@ -52,22 +52,46 @@ class JsonTableArrayRow(Func):
     )
     set_returning = True
 
-    def as_mysql(self, compiler, connection, **extra_context):
+    def _as_json_table(
+        self,
+        compiler,
+        connection,
+        value_type,
+        expression_template="%(expressions)s",
+        **extra_context,
+    ):
         qn = connection.ops.quote_name
-        expression_template = "%(expressions)s"
-        if not connection.mysql_is_mariadb:
-            # MySQL can lose the JSON type when a column comes from a derived
-            # table. Normalize the input before passing it to JSON_TABLE().
-            expression_template = "JSON_EXTRACT(%(expressions)s, '$')"
         template = (
             f"%(function)s({expression_template}, '$[*]' COLUMNS ("
             f"{qn('position')} FOR ORDINALITY, "
-            f"{qn('value')} VARCHAR(100) PATH '$'))"
+            f"{qn('value')} {value_type} PATH '$'))"
         )
         return super().as_sql(
             compiler,
             connection,
             template=template,
+            **extra_context,
+        )
+
+    def as_mysql(self, compiler, connection, **extra_context):
+        expression_template = "%(expressions)s"
+        if not connection.mysql_is_mariadb:
+            # MySQL can lose the JSON type when a column comes from a derived
+            # table. Normalize the input before passing it to JSON_TABLE().
+            expression_template = "JSON_EXTRACT(%(expressions)s, '$')"
+        return self._as_json_table(
+            compiler,
+            connection,
+            "VARCHAR(100)",
+            expression_template=expression_template,
+            **extra_context,
+        )
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        return self._as_json_table(
+            compiler,
+            connection,
+            "VARCHAR2(100)",
             **extra_context,
         )
 
@@ -197,8 +221,11 @@ class SQLiteSetReturningFunctionTests(TestCase):
         )
 
 
-@unittest.skipUnless(connection.vendor == "mysql", "MySQL and MariaDB tests")
-class MySQLSetReturningFunctionTests(TestCase):
+@unittest.skipUnless(
+    connection.vendor in {"mysql", "oracle"},
+    "MySQL, MariaDB, and Oracle tests",
+)
+class JsonTableSetReturningFunctionTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.first = JSONFieldNullable.objects.create(
@@ -219,13 +246,16 @@ class MySQLSetReturningFunctionTests(TestCase):
         self.assertEqual(sql.count("CROSS JOIN"), 1)
         self.assertIn("JSON_TABLE", sql)
         self.assertNotIn("LATERAL", sql)
+        json_null = (
+            "" if connection.features.interprets_empty_strings_as_nulls else None
+        )
         self.assertSequenceEqual(
             list(results),
             [
                 (self.first.pk, 1, "beta"),
                 (self.first.pk, 2, "alpha"),
                 (self.first.pk, 3, "beta"),
-                (self.first.pk, 4, None),
+                (self.first.pk, 4, json_null),
                 (self.second.pk, 1, "gamma"),
             ],
         )
