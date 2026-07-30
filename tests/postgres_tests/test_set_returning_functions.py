@@ -81,3 +81,12 @@ class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
 
         self.assertIn('ORDER BY "number"."number" DESC', sql)
         self.assertSequenceEqual(list(results), [3, 2, 1])
+
+    def test_unused_scalar_function_is_not_materialized(self):
+        obj = AggregateTestModel.objects.create()
+
+        queryset = AggregateTestModel.objects.alias(number=GenerateSeries(1, 3))
+        sql, _ = queryset.query.sql_with_params()
+
+        self.assertNotIn("generate_series", sql)
+        self.assertSequenceEqual(list(queryset), [obj])
