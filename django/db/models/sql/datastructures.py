@@ -270,16 +270,22 @@ class SetReturningFunctionJoin:
         # Join table
         self.srf_func = srf_func
         self.table_alias = table_alias
-        # CROSS or INNER
-        self.join_type = "CROSS JOIN"
+        # INNER or LOUTER
+        self.join_type = INNER
         # Is this join nullabled?
-        self.nullable = False
+        self.nullable = True
+
+    def _join_sql(self):
+        if self.join_type == LOUTER:
+            return LOUTER, " ON (1 = 1)"
+        return "CROSS JOIN", ""
 
     def as_sql(self, compiler, connection):
         sql, params = compiler.compile(self.srf_func)
         alias = compiler.quote_name(self.table_alias)
+        join_type, on_clause = self._join_sql()
         return (
-            "%s %s %s" % (self.join_type, sql, alias),
+            f"{join_type} {sql} {alias}{on_clause}",
             params,
         )
 
@@ -298,8 +304,9 @@ class SetReturningFunctionJoin:
 
         columns = ", ".join(compiler.quote_name(name) for name in column_names)
 
+        join_type, on_clause = self._join_sql()
         return (
-            f"{self.join_type} LATERAL {sql} AS {alias}({columns})",
+            f"{join_type} LATERAL {sql} AS {alias}({columns}){on_clause}",
             params,
         )
 
@@ -324,6 +331,16 @@ class SetReturningFunctionJoin:
         field.name = name
         field.column = field.db_column or name
         return field
+
+    def demote(self):
+        new = self.relabeled_clone({})
+        new.join_type = INNER
+        return new
+
+    def promote(self):
+        new = self.relabeled_clone({})
+        new.join_type = LOUTER
+        return new
 
 
 class BaseTable:

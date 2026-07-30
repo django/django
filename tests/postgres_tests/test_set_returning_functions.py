@@ -5,6 +5,7 @@ from django.db.models import (
     Func,
     IntegerField,
     JSONField,
+    Q,
     TextField,
 )
 
@@ -248,6 +249,75 @@ class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
         sql, _ = results.query.sql_with_params()
 
         self.assertEqual(sql.count("generate_series"), 1)
+        self.assertSequenceEqual(list(results), ["keep"])
+
+    def test_or_preserves_rows_when_table_source_is_empty(self):
+        AggregateTestModel.objects.bulk_create(
+            [
+                AggregateTestModel(char_field="keep"),
+                AggregateTestModel(char_field="discard"),
+            ]
+        )
+        matching = AggregateTestModel.objects.filter(char_field="keep")
+        empty_table_source = AggregateTestModel.objects.alias(
+            number=GenerateSeries(1, 0)
+        ).filter(number=1)
+
+        for order, queryset in [
+            ("table source on left", empty_table_source | matching),
+            ("table source on right", matching | empty_table_source),
+        ]:
+            with self.subTest(order):
+                results = queryset.order_by("char_field").values_list(
+                    "char_field", flat=True
+                )
+                sql, _ = results.query.sql_with_params()
+
+                self.assertEqual(sql.count("generate_series"), 1)
+                self.assertSequenceEqual(list(results), ["keep"])
+
+    def test_q_or_preserves_rows_when_table_source_is_empty(self):
+        AggregateTestModel.objects.bulk_create(
+            [
+                AggregateTestModel(char_field="keep"),
+                AggregateTestModel(char_field="discard"),
+            ]
+        )
+        results = (
+            AggregateTestModel.objects.alias(number=GenerateSeries(1, 0))
+            .filter(Q(char_field="keep") | Q(number=1))
+            .order_by("char_field")
+            .values_list("char_field", flat=True)
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertIn("LEFT OUTER JOIN LATERAL", sql)
+        self.assertNotIn("CROSS JOIN LATERAL", sql)
+        self.assertSequenceEqual(list(results), ["keep"])
+
+    def test_required_filter_demotes_optional_table_source(self):
+        AggregateTestModel.objects.bulk_create(
+            [
+                AggregateTestModel(char_field="keep"),
+                AggregateTestModel(char_field="discard"),
+            ]
+        )
+        optional = AggregateTestModel.objects.alias(number=GenerateSeries(1, 2)).filter(
+            Q(char_field="keep") | Q(number=1)
+        )
+        optional_sql, _ = optional.query.sql_with_params()
+
+        self.assertIn("LEFT OUTER JOIN LATERAL", optional_sql)
+
+        results = (
+            optional.filter(number=2)
+            .order_by("char_field")
+            .values_list("char_field", flat=True)
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertIn("CROSS JOIN LATERAL", sql)
+        self.assertNotIn("LEFT OUTER JOIN LATERAL", sql)
         self.assertSequenceEqual(list(results), ["keep"])
 
     def test_scalar_function_returns_rows(self):

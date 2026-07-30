@@ -7,6 +7,7 @@ from django.db.models import (
     Func,
     IntegerField,
     JSONField,
+    Q,
     TextField,
     Value,
 )
@@ -103,14 +104,35 @@ class JsonTableArrayValue(JsonTableArrayRow):
     output_field = TextField(db_column="value")
 
 
+class SetReturningFunctionOuterJoinMixin:
+    table_source_class = None
+
+    def test_or_preserves_rows_when_table_source_is_empty(self):
+        results = (
+            JSONFieldNullable.objects.alias(
+                element=self.table_source_class("json_field")
+            )
+            .filter(Q(pk=self.empty.pk) | Q(element="not-present"))
+            .values_list("pk", flat=True)
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertIn("LEFT OUTER JOIN", sql)
+        self.assertNotIn("CROSS JOIN", sql)
+        self.assertNotIn("LATERAL", sql)
+        self.assertSequenceEqual(list(results), [self.empty.pk])
+
+
 @unittest.skipUnless(connection.vendor == "sqlite", "SQLite tests")
-class SQLiteSetReturningFunctionTests(TestCase):
+class SQLiteSetReturningFunctionTests(SetReturningFunctionOuterJoinMixin, TestCase):
+    table_source_class = JsonEach
+
     @classmethod
     def setUpTestData(cls):
         cls.populated = JSONFieldNullable.objects.create(
             json_field=["beta", "alpha", "beta"]
         )
-        JSONFieldNullable.objects.create(json_field=[])
+        cls.empty = JSONFieldNullable.objects.create(json_field=[])
         JSONFieldNullable.objects.create(json_field=None)
 
     def test_json_each_composite_columns(self):
@@ -228,14 +250,19 @@ class SQLiteSetReturningFunctionTests(TestCase):
     connection.vendor in {"mysql", "oracle"},
     "MySQL, MariaDB, and Oracle tests",
 )
-class JsonTableSetReturningFunctionTests(TestCase):
+class JsonTableSetReturningFunctionTests(
+    SetReturningFunctionOuterJoinMixin,
+    TestCase,
+):
+    table_source_class = JsonTableArrayValue
+
     @classmethod
     def setUpTestData(cls):
         cls.first = JSONFieldNullable.objects.create(
             json_field=["beta", "alpha", "beta", None]
         )
         cls.second = JSONFieldNullable.objects.create(json_field=["gamma"])
-        JSONFieldNullable.objects.create(json_field=[])
+        cls.empty = JSONFieldNullable.objects.create(json_field=[])
         JSONFieldNullable.objects.create(json_field=None)
 
     def test_json_table_returns_array_elements(self):

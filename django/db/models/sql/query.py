@@ -1750,7 +1750,8 @@ class Query(BaseExpression):
             ):
                 lookup_class = condition.lhs.get_lookup("isnull")
                 clause.add(lookup_class(condition.lhs, False), AND)
-            return clause, []
+            used_joins.update(self._gen_col_aliases([condition]))
+            return clause, used_joins
 
         opts = self.get_meta()
         alias = self.get_initial_alias()
