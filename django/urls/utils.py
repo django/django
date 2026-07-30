@@ -136,12 +136,11 @@ def replace_unnamed_groups(pattern):
     2. ^(?P<a>\w+)/b/((x|y)\w+)$ ==> ^(?P<a>\w+)/b/<var>$
     3. ^(?P<a>\w+)/b/(\w+) ==> ^(?P<a>\w+)/b/<var>
     4. ^(?P<a>\w+)/b/((x|y)\w+) ==> ^(?P<a>\w+)/b/<var>
+    5. ^(\w+)/b/(\w+)$ ==> ^<var>/b/<var>$
     """
     final_pattern, prev_end = "", None
     for start, end, _ignored in _find_groups(pattern, _UNNAMED_GROUP_MATCHER):
-        if prev_end:
-            final_pattern += pattern[prev_end:start]
-        final_pattern += pattern[:start] + "<var>"
+        final_pattern += pattern[prev_end:start] + "<var>"
         prev_end = end
     return final_pattern + pattern[prev_end:]
 
