@@ -232,6 +232,24 @@ class MultipleSetReturningFunctionExecutionTests(PostgreSQLTestCase):
 
 
 class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
+    def test_and_combines_table_source_queryset(self):
+        AggregateTestModel.objects.bulk_create(
+            [
+                AggregateTestModel(char_field="keep"),
+                AggregateTestModel(char_field="discard"),
+            ]
+        )
+        left = AggregateTestModel.objects.filter(char_field="keep")
+        right = AggregateTestModel.objects.alias(number=GenerateSeries(1, 2)).filter(
+            number=2
+        )
+
+        results = (left & right).values_list("char_field", flat=True)
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("generate_series"), 1)
+        self.assertSequenceEqual(list(results), ["keep"])
+
     def test_scalar_function_returns_rows(self):
         AggregateTestModel.objects.create()
 

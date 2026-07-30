@@ -257,6 +257,8 @@ class SubqueryJoin:
 
 
 class SetReturningFunctionJoin:
+    filtered_relation = None
+
     def __init__(
         self,
         srf_func,
