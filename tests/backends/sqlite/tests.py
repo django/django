@@ -16,9 +16,23 @@ from django.db import (
     connections,
     transaction,
 )
-from django.db.models import Aggregate, Avg, StdDev, Sum, Variance
+from django.db.models import (
+    Aggregate,
+    Avg,
+    IntegerField,
+    Model,
+    StdDev,
+    Sum,
+    Variance,
+)
 from django.db.utils import ConnectionHandler
-from django.test import SimpleTestCase, TestCase, TransactionTestCase, override_settings
+from django.test import (
+    SimpleTestCase,
+    TestCase,
+    TransactionTestCase,
+    override_settings,
+    skipUnlessDBFeature,
+)
 from django.test.utils import CaptureQueriesContext, isolate_apps
 
 from ..models import Item, Object, Square
@@ -181,6 +195,58 @@ class SchemaTests(TransactionTestCase):
         with self.assertRaisesMessage(NotSupportedError, msg):
             with transaction.atomic(), connection.schema_editor(atomic=True):
                 pass
+
+    @skipUnlessDBFeature("supports_alter_column_nullability")
+    def test_alter_field_set_not_null_without_remake(self):
+        class Human(Model):
+            age = IntegerField(null=True)
+
+        old_field = Human._meta.get_field("age")
+        new_field = IntegerField(null=False)
+        new_field.set_attributes_from_name("age")
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Human)
+            try:
+                with mock.patch.object(editor, "_remake_table") as remake:
+                    editor._alter_field(
+                        Human,
+                        old_field,
+                        new_field,
+                        old_field.db_type(connection),
+                        new_field.db_type(connection),
+                        old_field.db_parameters(connection),
+                        new_field.db_parameters(connection),
+                    )
+                    remake.assert_not_called()
+            finally:
+                editor.delete_model(Human)
+
+    @skipUnlessDBFeature("supports_alter_column_nullability")
+    def test_alter_field_drop_not_null_without_remake(self):
+        class Human(Model):
+            age = IntegerField()
+
+        old_field = Human._meta.get_field("age")
+        new_field = IntegerField(null=True)
+        new_field.set_attributes_from_name("age")
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Human)
+            try:
+                with mock.patch.object(editor, "_remake_table") as remake:
+                    editor._alter_field(
+                        Human,
+                        old_field,
+                        new_field,
+                        old_field.db_type(connection),
+                        new_field.db_type(connection),
+                        old_field.db_parameters(connection),
+                        new_field.db_parameters(connection),
+                    )
+                    remake.assert_not_called()
+            finally:
+                editor.delete_model(Human)
 
     def test_constraint_checks_disabled_atomic_allowed(self):
         """
