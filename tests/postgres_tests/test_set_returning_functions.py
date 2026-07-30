@@ -122,6 +122,33 @@ class CompositeSetReturningFunctionExecutionTests(PostgreSQLTestCase):
         )
 
 
+class MultipleSetReturningFunctionExecutionTests(PostgreSQLTestCase):
+    def test_multiple_functions_expand_independently(self):
+        AggregateTestModel.objects.create(json_field={"color": "blue", "size": "large"})
+
+        results = (
+            AggregateTestModel.objects.alias(
+                number=GenerateSeries(1, 2),
+                item=JsonbEach("json_field"),
+            )
+            .annotate(number_value=F("number"))
+            .order_by("number_value", "item__key")
+            .values_list("number_value", "item__key", "item__value")
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("CROSS JOIN LATERAL"), 2)
+        self.assertSequenceEqual(
+            list(results),
+            [
+                (1, "color", "blue"),
+                (1, "size", "large"),
+                (2, "color", "blue"),
+                (2, "size", "large"),
+            ],
+        )
+
+
 class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
     def test_scalar_function_returns_rows(self):
         AggregateTestModel.objects.create()
