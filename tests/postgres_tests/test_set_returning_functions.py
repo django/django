@@ -277,6 +277,22 @@ class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
             ],
         )
 
+    def test_reassigned_materialized_alias_uses_new_function(self):
+        AggregateTestModel.objects.create()
+
+        results = (
+            AggregateTestModel.objects.alias(number=GenerateSeries(1, 2))
+            .filter(number=1)
+            .alias(number=GenerateSeries(7, 8))
+            .annotate(result=F("number"))
+            .order_by("result")
+            .values_list("result", flat=True)
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertSequenceEqual(list(results), [7, 8])
+        self.assertEqual(sql.count("generate_series"), 2)
+
     def test_scalar_function_ordering(self):
         AggregateTestModel.objects.create()
 
