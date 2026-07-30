@@ -9,7 +9,7 @@ from django.db.backends.base.schema import (
 )
 from django.db.backends.ddl_references import Statement
 from django.db.backends.utils import strip_quotes
-from django.db.models import CompositePrimaryKey, UniqueConstraint
+from django.db.models import CheckConstraint, CompositePrimaryKey, UniqueConstraint
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -484,6 +484,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             or constraint.deferrable
         ):
             super().add_constraint(model, constraint)
+        # On SQLite 3.53.1+, use newly supported "ALTER TABLE ...
+        # ADD CONSTRAINT ... CHECK ...".
+        elif (
+            isinstance(constraint, CheckConstraint)
+            and self.connection.features.supports_alter_column_constraints
+        ):
+            super().add_constraint(model, constraint)
         else:
             self._remake_table(model)
 
@@ -493,6 +500,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             or constraint.contains_expressions
             or constraint.include
             or constraint.deferrable
+        ):
+            super().remove_constraint(model, constraint)
+        # On SQLite 3.53.1+, use newly supported "ALTER TABLE ...
+        # DROP CONSTRAINT ...".
+        elif (
+            isinstance(constraint, CheckConstraint)
+            and self.connection.features.supports_alter_column_constraints
         ):
             super().remove_constraint(model, constraint)
         else:
