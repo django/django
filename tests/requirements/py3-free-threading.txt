@@ -3,7 +3,7 @@
 # pywatchman are omitted: they don't support free-threading and re-enable the
 # GIL on import.
 aiosmtpd >= 1.4.5
-asgiref >= 3.12.0
+asgiref >= 3.12.1
 # argon2-cffi-bindings, numpy, Pillow, and PyYAML publish free-threaded wheels
 # for Python 3.14+ only.
 argon2-cffi >= 23.1.0; python_version >= '3.14'
