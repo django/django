@@ -122,6 +122,40 @@ class CompositeSetReturningFunctionExecutionTests(PostgreSQLTestCase):
         )
 
 
+class CorrelatedSetReturningFunctionExecutionTests(PostgreSQLTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        AggregateTestModel.objects.bulk_create(
+            [
+                AggregateTestModel(char_field="empty-null", integer_field=None),
+                AggregateTestModel(char_field="empty-zero", integer_field=0),
+                AggregateTestModel(char_field="first", integer_field=2),
+                AggregateTestModel(char_field="second", integer_field=3),
+            ]
+        )
+
+    def test_function_uses_each_outer_row(self):
+        results = (
+            AggregateTestModel.objects.alias(number=GenerateSeries(1, "integer_field"))
+            .annotate(result=F("number"))
+            .order_by("char_field", "result")
+            .values_list("char_field", "result")
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
+        self.assertSequenceEqual(
+            list(results),
+            [
+                ("first", 1),
+                ("first", 2),
+                ("second", 1),
+                ("second", 2),
+                ("second", 3),
+            ],
+        )
+
+
 class MultipleSetReturningFunctionExecutionTests(PostgreSQLTestCase):
     def test_multiple_functions_expand_independently(self):
         AggregateTestModel.objects.create(json_field={"color": "blue", "size": "large"})
