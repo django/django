@@ -557,6 +557,55 @@ class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
         obj.refresh_from_db()
         self.assertEqual(obj.char_field, "original")
 
+    def test_table_source_in_uncorrelated_subquery(self):
+        AggregateTestModel.objects.bulk_create(
+            [
+                AggregateTestModel(char_field="source", integer_field=3),
+                AggregateTestModel(char_field="one", integer_field=1),
+                AggregateTestModel(char_field="two", integer_field=2),
+                AggregateTestModel(char_field="three", integer_field=3),
+                AggregateTestModel(char_field="four", integer_field=4),
+            ]
+        )
+        generated_numbers = (
+            AggregateTestModel.objects.filter(char_field="source")
+            .alias(number=GenerateSeries(1, "integer_field"))
+            .annotate(value=F("number"))
+            .values("value")
+        )
+
+        results = (
+            AggregateTestModel.objects.exclude(char_field="source")
+            .filter(integer_field__in=generated_numbers)
+            .order_by("integer_field")
+            .values_list("char_field", flat=True)
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("generate_series"), 1)
+        self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
+        self.assertSequenceEqual(list(results), ["one", "two", "three"])
+
+    def test_union_of_table_source_querysets(self):
+        AggregateTestModel.objects.create()
+        first = (
+            AggregateTestModel.objects.alias(number=GenerateSeries(1, 2))
+            .annotate(value=F("number"))
+            .values_list("value", flat=True)
+        )
+        second = (
+            AggregateTestModel.objects.alias(number=GenerateSeries(2, 3))
+            .annotate(value=F("number"))
+            .values_list("value", flat=True)
+        )
+
+        results = first.union(second).order_by("value")
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("generate_series"), 2)
+        self.assertEqual(sql.count("CROSS JOIN LATERAL"), 2)
+        self.assertSequenceEqual(list(results), [1, 2, 3])
+
     def test_and_combines_table_source_queryset(self):
         AggregateTestModel.objects.bulk_create(
             [
