@@ -9,6 +9,8 @@ from django.db.models import (
     Q,
     TextField,
 )
+from django.db.models.functions import Abs, Upper
+from django.test.utils import register_lookup
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import AggregateTestModel
@@ -170,6 +172,22 @@ class CompositeSetReturningFunctionExecutionTests(PostgreSQLTestCase):
 
         self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
         self.assertSequenceEqual(list(results), ["first"])
+
+    def test_composite_column_transform(self):
+        with register_lookup(TextField, Upper):
+            results = (
+                AggregateTestModel.objects.filter(char_field="second")
+                .alias(item=JsonbEach("json_field"))
+                .annotate(key=F("item__key__upper"))
+                .order_by("key")
+                .values_list("key", flat=True)
+            )
+            sql, _ = results.query.sql_with_params()
+
+            self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
+            self.assertEqual(sql.count("jsonb_each"), 1)
+            self.assertIn('UPPER("item"."key") AS "key"', sql)
+            self.assertSequenceEqual(list(results), ["COLOR", "COUNT", "SIZE"])
 
     def test_returns_composite_columns(self):
         results = (
@@ -412,6 +430,23 @@ class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
         )
 
         self.assertSequenceEqual(list(results), [obj.pk, obj.pk])
+
+    def test_scalar_function_transform(self):
+        AggregateTestModel.objects.create()
+
+        with register_lookup(IntegerField, Abs):
+            results = (
+                AggregateTestModel.objects.alias(number=GenerateSeries(-2, 2))
+                .annotate(result=F("number__abs"))
+                .order_by("number")
+                .values_list("result", flat=True)
+            )
+            sql, _ = results.query.sql_with_params()
+
+            self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
+            self.assertEqual(sql.count("generate_series"), 1)
+            self.assertIn('ABS("number"."number") AS "result"', sql)
+            self.assertSequenceEqual(list(results), [2, 1, 0, 1, 2])
 
     def test_chained_operations_reuse_function_join(self):
         AggregateTestModel.objects.create()

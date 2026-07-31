@@ -2295,9 +2295,14 @@ class Query(BaseExpression):
                 raise FieldError(
                     "Joined field references are not permitted in this query"
                 )
-            join_result = self._promote_inner_subquery_join(name)
-            if join_result is not None:
-                return join_result
+            for idx in range(len(field_list), 0, -1):
+                join_result = self._promote_inner_subquery_join(
+                    LOOKUP_SEP.join(field_list[:idx])
+                )
+                if join_result is not None:
+                    for transform in field_list[idx:]:
+                        join_result = self.try_transform(join_result, transform)
+                    return join_result
 
             if annotation is not None:
                 for transform in field_list[1:]:
