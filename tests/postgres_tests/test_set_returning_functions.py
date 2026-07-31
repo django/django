@@ -914,6 +914,50 @@ class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
         self.assertNotIn("CROSS JOIN LATERAL", sql)
         self.assertSequenceEqual(list(results), ["first", "second"])
 
+    def test_count_keeps_selected_table_source_required(self):
+        AggregateTestModel.objects.create()
+        queryset = AggregateTestModel.objects.annotate(number=GenerateSeries(1, 0))
+
+        with CaptureQueriesContext(connection) as captured_queries:
+            result = queryset.count()
+
+        self.assertIn("CROSS JOIN LATERAL", captured_queries[0]["sql"])
+        self.assertNotIn("LEFT OUTER JOIN LATERAL", captured_queries[0]["sql"])
+        self.assertEqual(result, 0)
+
+    def test_count_does_not_materialize_unused_table_source(self):
+        AggregateTestModel.objects.create()
+        queryset = AggregateTestModel.objects.alias(number=GenerateSeries(1, 3))
+
+        with CaptureQueriesContext(connection) as captured_queries:
+            result = queryset.count()
+
+        self.assertNotIn("generate_series", captured_queries[0]["sql"])
+        self.assertNotIn("CROSS JOIN LATERAL", captured_queries[0]["sql"])
+        self.assertEqual(result, 1)
+
+    def test_exists_keeps_selected_table_source_required(self):
+        AggregateTestModel.objects.create()
+        queryset = AggregateTestModel.objects.annotate(number=GenerateSeries(1, 0))
+
+        with CaptureQueriesContext(connection) as captured_queries:
+            result = queryset.exists()
+
+        self.assertIn("CROSS JOIN LATERAL", captured_queries[0]["sql"])
+        self.assertNotIn("LEFT OUTER JOIN LATERAL", captured_queries[0]["sql"])
+        self.assertIs(result, False)
+
+    def test_exists_does_not_materialize_unused_table_source(self):
+        AggregateTestModel.objects.create()
+        queryset = AggregateTestModel.objects.alias(number=GenerateSeries(1, 3))
+
+        with CaptureQueriesContext(connection) as captured_queries:
+            result = queryset.exists()
+
+        self.assertNotIn("generate_series", captured_queries[0]["sql"])
+        self.assertNotIn("CROSS JOIN LATERAL", captured_queries[0]["sql"])
+        self.assertIs(result, True)
+
     def test_unused_scalar_function_is_not_materialized(self):
         obj = AggregateTestModel.objects.create()
 
