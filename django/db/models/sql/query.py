@@ -944,15 +944,20 @@ class Query(BaseExpression):
             self.alias_refcount[alias] += 1
             return alias, False
 
+        alias = filtered_relation.alias if filtered_relation is not None else table_name
+
         # Create a new alias for this table.
+        if alias_list or alias in self.alias_map:
+            index = len(self.alias_map) + 1
+            alias = "%s%d" % (self.alias_prefix, index)
+            while alias in self.alias_map:
+                index += 1
+                alias = "%s%d" % (self.alias_prefix, index)
+
         if alias_list:
-            alias = "%s%d" % (self.alias_prefix, len(self.alias_map) + 1)
             alias_list.append(alias)
         else:
             # The first occurrence of a table uses the table name directly.
-            alias = (
-                filtered_relation.alias if filtered_relation is not None else table_name
-            )
             self.table_map[table_name] = [alias]
         self.alias_refcount[alias] = 1
         return alias, True

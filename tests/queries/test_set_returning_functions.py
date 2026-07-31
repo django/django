@@ -13,7 +13,7 @@ from django.db.models import (
 )
 from django.test import TestCase
 
-from .models import JSONFieldNullable
+from .models import JSONFieldNullable, Node
 
 
 class JsonEach(Func):
@@ -134,6 +134,22 @@ class SQLiteSetReturningFunctionTests(SetReturningFunctionOuterJoinMixin, TestCa
         )
         cls.empty = JSONFieldNullable.objects.create(json_field=[])
         JSONFieldNullable.objects.create(json_field=None)
+
+    def test_table_source_alias_does_not_replace_table_join(self):
+        grandparent = Node.objects.create(num=1)
+        parent = Node.objects.create(num=2, parent=grandparent)
+        child = Node.objects.create(num=3, parent=parent)
+
+        results = (
+            Node.objects.filter(parent__parent__num=grandparent.num)
+            .alias(
+                T2=JsonEach(Value(["match"], output_field=JSONField())),
+            )
+            .filter(T2="match")
+            .values_list("pk", flat=True)
+        )
+
+        self.assertSequenceEqual(list(results), [child.pk])
 
     def test_json_each_composite_columns(self):
         results = (
