@@ -1,4 +1,4 @@
-from django.contrib.gis.db.models import GeometryField
+from django.contrib.gis.db.models.fields import BaseSpatialField
 from django.db.backends.postgresql.schema import DatabaseSchemaEditor
 from django.db.models.expressions import Col, Func
 
@@ -82,10 +82,10 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
         )
 
         old_field_spatial_index = (
-            isinstance(old_field, GeometryField) and old_field.spatial_index
+            isinstance(old_field, BaseSpatialField) and old_field.spatial_index
         )
         new_field_spatial_index = (
-            isinstance(new_field, GeometryField) and new_field.spatial_index
+            isinstance(new_field, BaseSpatialField) and new_field.spatial_index
         )
         if not old_field_spatial_index and new_field_spatial_index:
             self.execute(self._create_spatial_index_sql(model, new_field))
