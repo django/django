@@ -179,6 +179,8 @@ class Join:
 
 
 class SubqueryJoin:
+    filtered_relation = None
+
     def __init__(
         self,
         table_subquery,
@@ -189,6 +191,7 @@ class SubqueryJoin:
         self.parent_alias = None
         # Join table
         self.table_subquery = table_subquery
+        self._table_subquery_identity = table_subquery
         self.table_alias = table_alias
         # LOUTER or INNER
         self.join_type = LOUTER
@@ -210,6 +213,7 @@ class SubqueryJoin:
             change_map.get(self.table_alias, self.table_alias),
         )
         clone.join_type = self.join_type
+        clone._table_subquery_identity = self._table_subquery_identity
         return clone
 
     def get_field(self, name):
@@ -223,6 +227,22 @@ class SubqueryJoin:
         field.name = name
         field.column = name
         return field
+
+    @property
+    def identity(self):
+        return (
+            self.__class__,
+            self.table_name,
+            self._table_subquery_identity,
+        )
+
+    def __eq__(self, other):
+        if not isinstance(other, SubqueryJoin):
+            return NotImplemented
+        return self.identity == other.identity
+
+    def __hash__(self):
+        return hash(self.identity)
 
 
 class BaseTable:
