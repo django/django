@@ -809,7 +809,12 @@ class SQLiteInMemoryTestDbs(TransactionTestCase):
                     },
                 }
             )
-            with mock.patch("django.test.utils.connections", new=tested_connections):
+            with (
+                mock.patch("django.test.utils.connections", new=tested_connections),
+                mock.patch.dict(
+                    settings.DATABASES, tested_connections.settings, clear=True
+                ),
+            ):
                 other = tested_connections["other"]
                 try:
                     new_test_connections = DiscoverRunner(verbosity=0).setup_databases()
