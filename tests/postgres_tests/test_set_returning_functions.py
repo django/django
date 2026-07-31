@@ -1,3 +1,4 @@
+from django.core.exceptions import FieldError
 from django.db.models import (
     CompositeField,
     Count,
@@ -233,6 +234,45 @@ class MultipleSetReturningFunctionExecutionTests(PostgreSQLTestCase):
 
 
 class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
+    def test_update_rejects_table_source_reference(self):
+        obj = AggregateTestModel.objects.create(integer_field=0)
+
+        msg = "Joined field references are not permitted in this query"
+        with self.assertRaisesMessage(FieldError, msg):
+            AggregateTestModel.objects.alias(number=GenerateSeries(1, 2)).update(
+                integer_field=F("number")
+            )
+
+        obj.refresh_from_db()
+        self.assertEqual(obj.integer_field, 0)
+
+    def test_update_rejects_annotated_table_source_reference(self):
+        obj = AggregateTestModel.objects.create(integer_field=0)
+
+        msg = "Joined field references are not permitted in this query"
+        with self.assertRaisesMessage(FieldError, msg):
+            AggregateTestModel.objects.annotate(number=GenerateSeries(1, 2)).update(
+                integer_field=F("number")
+            )
+
+        obj.refresh_from_db()
+        self.assertEqual(obj.integer_field, 0)
+
+    def test_update_rejects_table_source_column_reference(self):
+        obj = AggregateTestModel.objects.create(
+            char_field="original",
+            json_field={"color": "blue"},
+        )
+
+        msg = "Joined field references are not permitted in this query"
+        with self.assertRaisesMessage(FieldError, msg):
+            AggregateTestModel.objects.alias(item=JsonbEach("json_field")).update(
+                char_field=F("item__key")
+            )
+
+        obj.refresh_from_db()
+        self.assertEqual(obj.char_field, "original")
+
     def test_and_combines_table_source_queryset(self):
         AggregateTestModel.objects.bulk_create(
             [

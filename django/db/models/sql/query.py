@@ -2254,13 +2254,17 @@ class Query(BaseExpression):
     def resolve_ref(self, name, allow_joins=True, reuse=None, summarize=False):
         annotation = self.annotations.get(name)
         if getattr(annotation, "table_source", False):
+            if not allow_joins:
+                raise FieldError(
+                    "Joined field references are not permitted in this query"
+                )
             join_result = self._promote_inner_subquery_join(name)
             if join_result is not None:
                 return join_result
         if annotation is not None:
             if not allow_joins:
                 for alias in self._gen_col_aliases([annotation]):
-                    if isinstance(self.alias_map[alias], Join):
+                    if self.alias_map[alias].join_type is not None:
                         raise FieldError(
                             "Joined field references are not permitted in this query"
                         )
@@ -2281,6 +2285,10 @@ class Query(BaseExpression):
         else:
             field_list = name.split(LOOKUP_SEP)
             annotation = self.annotations.get(field_list[0])
+            if not allow_joins and getattr(annotation, "table_source", False):
+                raise FieldError(
+                    "Joined field references are not permitted in this query"
+                )
             join_result = self._promote_inner_subquery_join(name)
             if join_result is not None:
                 return join_result
