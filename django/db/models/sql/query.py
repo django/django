@@ -1205,7 +1205,7 @@ class Query(BaseExpression):
         alias, _ = self.table_alias(
             join.table_name, create=True, filtered_relation=join.filtered_relation
         )
-        if join.join_type:
+        if join.join_type and join.parent_alias is not None:
             if self.alias_map[join.parent_alias].join_type == LOUTER or join.nullable:
                 join_type = LOUTER
             else:

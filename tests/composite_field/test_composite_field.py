@@ -1074,6 +1074,37 @@ class CompositeSubqueryTupleLookupTests(CompositeSubqueryTestCase):
             [],
         )
 
+    def test_or_combined_querysets_reuses_join(self):
+        projects = self.projects_with_priority_bug()
+        results = (
+            projects.filter(priority_bug=(3, "Login crash"))
+            | projects.filter(priority_bug=(2, "Export missing rows"))
+        ).values_list("code", flat=True)
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("JOIN (SELECT"), 1)
+        self.assertSequenceEqual(list(results), ["AUTH"])
+
+    def test_or_combined_querysets_keeps_different_joins(self):
+        login_bug = self.bug_tuple_subquery(self.crash_report)
+        export_bug = self.bug_tuple_subquery(self.missing_export_report)
+        login_projects = (
+            Project.objects.filter(pk=self.auth.pk)
+            .alias(priority_bug=login_bug)
+            .filter(priority_bug=(3, "Login crash"))
+        )
+        export_projects = (
+            Project.objects.filter(pk=self.auth.pk)
+            .alias(priority_bug=export_bug)
+            .filter(priority_bug=(2, "Export missing rows"))
+        )
+
+        results = (login_projects | export_projects).values_list("code", flat=True)
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("JOIN (SELECT"), 2)
+        self.assertSequenceEqual(list(results), ["AUTH"])
+
     def test_and_condition(self):
         projects = self.projects_with_priority_bug()
 
