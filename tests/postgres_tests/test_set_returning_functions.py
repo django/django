@@ -1015,6 +1015,36 @@ class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
         self.assertIn('ORDER BY "number"."number" DESC', sql)
         self.assertSequenceEqual(list(results), [3, 2, 1])
 
+    def test_distinct_on_promoted_table_source_column(self):
+        AggregateTestModel.objects.bulk_create(
+            [
+                AggregateTestModel(char_field="first"),
+                AggregateTestModel(char_field="second"),
+            ]
+        )
+
+        results = (
+            AggregateTestModel.objects.alias(number=GenerateSeries(1, 3))
+            .annotate(value=F("number"))
+            .order_by("value")
+            .distinct("value")
+            .values_list("value", flat=True)
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
+        self.assertIn('DISTINCT ON ("value")', sql)
+        self.assertSequenceEqual(list(results), [1, 2, 3])
+
+    def test_distinct_on_unselected_table_source_alias(self):
+        queryset = AggregateTestModel.objects.alias(
+            number=GenerateSeries(1, 3)
+        ).distinct("number")
+
+        msg = "Cannot resolve keyword 'number' into field."
+        with self.assertRaisesMessage(FieldError, msg):
+            list(queryset)
+
     def test_ordering_only_materializes_function(self):
         AggregateTestModel.objects.bulk_create(
             [
