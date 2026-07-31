@@ -24,12 +24,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - conda-environment-file: ".github/workflows/data/conda/geolibs-pg17.yml"
+        database:
+          - conda_environment_file: ".github/workflows/data/conda/geolibs-pg17.yml"
             pg_major: "17"
-          - conda-environment-file: ".github/workflows/data/conda/geolibs-pg18.yml"
+          - conda_environment_file: ".github/workflows/data/conda/geolibs-pg18.yml"
             pg_major: "18"
-    name: PostgreSQL ${{ matrix.pg_major }}
+        python:
+          - version: "3.14"
+            conda_package: python-gil
+            django_requirements: tests/requirements/py3.txt
+            postgres_requirements: tests/requirements/postgres.txt
+          - version: "3.14t"
+            conda_package: python-freethreading
+            django_requirements: tests/requirements/py3-free-threading.txt
+            postgres_requirements: tests/requirements/postgres-free-threading.txt
+    name: PostgreSQL ${{ matrix.database.pg_major }}, Python ${{ matrix.python.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -40,15 +49,24 @@ jobs:
         uses: conda-incubator/setup-miniconda@8ee1f361103df19b6f8c8655fd3967a8ecb162d5
         with:
           activate-environment: geodjango
-          environment-file: ${{ matrix.conda-environment-file }}
+          environment-file: ${{ matrix.database.conda_environment_file }}
           channel-priority: strict
+      - name: Install Python
+        run: conda install --yes "${{ matrix.python.conda_package }}=3.14" "pip=26.*"
       - name: Install system packages
         run: |
           sudo apt update
           xargs -a .github/workflows/data/apt-packages.txt sudo apt install -y --no-install-recommends
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip wheel
-      - run: python -m pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .
+      - name: Install Python dependencies
+        run: |
+          python -m pip install \
+            -r "${{ matrix.python.django_requirements }}" \
+            -r "${{ matrix.python.postgres_requirements }}" \
+            -e .
+      - name: Show GIL status
+        run: python -c "import sys; print('GIL enabled:', sys._is_gil_enabled())"
       - name: Create PostgreSQL settings file
         run: mv ./.github/workflows/data/test_postgis.py.tpl ./tests/test_postgis.py
       - name: Initialize and start local PostgreSQL
