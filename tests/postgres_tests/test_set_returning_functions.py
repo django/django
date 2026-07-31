@@ -255,6 +255,50 @@ class CorrelatedSetReturningFunctionExecutionTests(PostgreSQLTestCase):
 
 
 class MultipleSetReturningFunctionExecutionTests(PostgreSQLTestCase):
+    def test_function_uses_previous_function_column(self):
+        AggregateTestModel.objects.bulk_create(
+            [
+                AggregateTestModel(char_field="empty", integer_field=0),
+                AggregateTestModel(char_field="first", integer_field=2),
+                AggregateTestModel(char_field="second", integer_field=3),
+            ]
+        )
+
+        results = (
+            AggregateTestModel.objects.alias(
+                upper_bound=GenerateSeries(1, "integer_field"),
+                number=GenerateSeries(1, F("upper_bound")),
+            )
+            .annotate(
+                upper_bound_value=F("upper_bound"),
+                number_value=F("number"),
+            )
+            .order_by("char_field", "upper_bound_value", "number_value")
+            .values_list("char_field", "upper_bound_value", "number_value")
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("CROSS JOIN LATERAL"), 2)
+        self.assertEqual(sql.count("generate_series"), 2)
+        self.assertIn(
+            'generate_series(%s, "upper_bound"."upper_bound")',
+            sql,
+        )
+        self.assertSequenceEqual(
+            list(results),
+            [
+                ("first", 1, 1),
+                ("first", 2, 1),
+                ("first", 2, 2),
+                ("second", 1, 1),
+                ("second", 2, 1),
+                ("second", 2, 2),
+                ("second", 3, 1),
+                ("second", 3, 2),
+                ("second", 3, 3),
+            ],
+        )
+
     def test_multiple_functions_expand_independently(self):
         AggregateTestModel.objects.create(json_field={"color": "blue", "size": "large"})
 
@@ -499,6 +543,51 @@ class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
 
         self.assertIn('ORDER BY "number"."number" DESC', sql)
         self.assertSequenceEqual(list(results), [3, 2, 1])
+
+    def test_ordering_only_materializes_function(self):
+        AggregateTestModel.objects.bulk_create(
+            [
+                AggregateTestModel(char_field="first"),
+                AggregateTestModel(char_field="second"),
+            ]
+        )
+
+        results = (
+            AggregateTestModel.objects.alias(number=GenerateSeries(1, 3))
+            .order_by("-number", "char_field")
+            .values_list("char_field", flat=True)
+        )
+        sql, _ = results.query.sql_with_params()
+        select_clause = sql.split(" FROM ", 1)[0]
+
+        self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
+        self.assertEqual(sql.count("generate_series"), 1)
+        self.assertNotIn('"number"."number"', select_clause)
+        self.assertIn('ORDER BY "number"."number" DESC', sql)
+        self.assertSequenceEqual(
+            list(results),
+            ["first", "second", "first", "second", "first", "second"],
+        )
+
+    def test_replaced_ordering_does_not_materialize_function(self):
+        AggregateTestModel.objects.bulk_create(
+            [
+                AggregateTestModel(char_field="first"),
+                AggregateTestModel(char_field="second"),
+            ]
+        )
+
+        results = (
+            AggregateTestModel.objects.alias(number=GenerateSeries(1, 3))
+            .order_by("number")
+            .order_by("char_field")
+            .values_list("char_field", flat=True)
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertNotIn("generate_series", sql)
+        self.assertNotIn("CROSS JOIN LATERAL", sql)
+        self.assertSequenceEqual(list(results), ["first", "second"])
 
     def test_unused_scalar_function_is_not_materialized(self):
         obj = AggregateTestModel.objects.create()
