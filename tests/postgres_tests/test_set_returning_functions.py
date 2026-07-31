@@ -1,5 +1,6 @@
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import FieldError
+from django.db import connection
 from django.db.models import (
     CompositeField,
     Count,
@@ -13,7 +14,7 @@ from django.db.models import (
 )
 from django.db.models.functions import Abs, Upper
 from django.db.models.lookups import GreaterThan
-from django.test.utils import register_lookup
+from django.test.utils import CaptureQueriesContext, register_lookup
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import AggregateTestModel
@@ -342,6 +343,32 @@ class CorrelatedSetReturningFunctionExecutionTests(PostgreSQLTestCase):
         ).aggregate(total=Count("number"))
 
         self.assertEqual(result, {"total": 5})
+
+    def test_q_or_then_aggregate_keeps_table_source_required(self):
+        AggregateTestModel.objects.create(char_field="keep")
+        queryset = AggregateTestModel.objects.alias(number=GenerateSeries(1, 0)).filter(
+            Q(char_field="keep") | Q(number=1)
+        )
+
+        with CaptureQueriesContext(connection) as captured_queries:
+            result = queryset.aggregate(total=Count("number"))
+
+        self.assertIn("CROSS JOIN LATERAL", captured_queries[0]["sql"])
+        self.assertNotIn("LEFT OUTER JOIN LATERAL", captured_queries[0]["sql"])
+        self.assertEqual(result, {"total": 0})
+
+    def test_q_or_then_unrelated_aggregate_keeps_table_source_optional(self):
+        AggregateTestModel.objects.create(char_field="keep")
+        queryset = AggregateTestModel.objects.alias(number=GenerateSeries(1, 0)).filter(
+            Q(char_field="keep") | Q(number=1)
+        )
+
+        with CaptureQueriesContext(connection) as captured_queries:
+            result = queryset.aggregate(total=Count("pk"))
+
+        self.assertIn("LEFT OUTER JOIN LATERAL", captured_queries[0]["sql"])
+        self.assertNotIn("CROSS JOIN LATERAL", captured_queries[0]["sql"])
+        self.assertEqual(result, {"total": 1})
 
 
 class MultipleSetReturningFunctionExecutionTests(PostgreSQLTestCase):

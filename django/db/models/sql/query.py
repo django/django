@@ -526,6 +526,7 @@ class Query(BaseExpression):
         # against each other.
         aggregates = {alias: self.annotations.pop(alias) for alias in aggregate_exprs}
         self.set_annotation_mask(annotation_select_mask)
+        self.demote_joins(self._gen_table_source_aliases(aggregates.values()))
         # Existing usage of aggregation can be determined by the presence of
         # selected aggregates but also by filters against aliased aggregates.
         _, having, qualify = self.where.split_having_qualify()
