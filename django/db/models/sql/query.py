@@ -1428,6 +1428,8 @@ class Query(BaseExpression):
                     self.unref_alias(table_alias)
         if select and getattr(annotation, "table_source", False):
             self.annotations[alias] = self._promote_inner_subquery_join(alias)
+        if select:
+            self.demote_joins(self._gen_table_source_aliases([self.annotations[alias]]))
         if select and self.selected:
             self.selected[alias] = alias
 

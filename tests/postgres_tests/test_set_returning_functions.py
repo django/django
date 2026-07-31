@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import FieldError
 from django.db.models import (
     CompositeField,
@@ -8,6 +9,7 @@ from django.db.models import (
     JSONField,
     Q,
     TextField,
+    Value,
 )
 from django.db.models.functions import Abs, Upper
 from django.db.models.lookups import GreaterThan
@@ -35,6 +37,19 @@ class JsonbEach(Func):
     output_field = CompositeField(
         key=TextField(),
         value=JSONField(),
+    )
+    set_returning = True
+    table_source = True
+
+
+class NestedUnnest(Func):
+    function = "unnest"
+    output_field = CompositeField(
+        number=IntegerField(),
+        **{
+            "item__key": TextField(),
+            "item__value": TextField(),
+        },
     )
     set_returning = True
     table_source = True
@@ -154,6 +169,43 @@ class CompositeSetReturningFunctionExecutionTests(PostgreSQLTestCase):
 
         self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
         self.assertSequenceEqual(list(results), [("first", "size", "large")])
+
+    def test_nested_composite_columns(self):
+        results = (
+            AggregateTestModel.objects.filter(char_field="first")
+            .alias(
+                row=NestedUnnest(
+                    Value([1, 2], output_field=ArrayField(IntegerField())),
+                    Value(
+                        ["color", "size"],
+                        output_field=ArrayField(TextField()),
+                    ),
+                    Value(
+                        ["blue", "large"],
+                        output_field=ArrayField(TextField()),
+                    ),
+                )
+            )
+            .order_by("row__number")
+            .values_list(
+                "row__number",
+                "row__item__key",
+                "row__item__value",
+            )
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertIn(
+            'AS "row"("number", "item__key", "item__value")',
+            sql,
+        )
+        self.assertSequenceEqual(
+            list(results),
+            [
+                (1, "color", "blue"),
+                (2, "size", "large"),
+            ],
+        )
 
     def test_q_or_keeps_selected_composite_column_required(self):
         results = (
@@ -554,6 +606,21 @@ class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
             AggregateTestModel.objects.annotate(number=GenerateSeries(1, 0))
             .filter(Q(char_field="keep") | Q(number=1))
             .values_list("char_field", "number")
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertIn("CROSS JOIN LATERAL", sql)
+        self.assertNotIn("LEFT OUTER JOIN LATERAL", sql)
+        self.assertSequenceEqual(list(results), [])
+
+    def test_q_or_then_annotation_keeps_table_source_required(self):
+        AggregateTestModel.objects.create(char_field="keep")
+
+        results = (
+            AggregateTestModel.objects.alias(number=GenerateSeries(1, 0))
+            .filter(Q(char_field="keep") | Q(number=1))
+            .annotate(result=F("number"))
+            .values_list("char_field", "result")
         )
         sql, _ = results.query.sql_with_params()
 
