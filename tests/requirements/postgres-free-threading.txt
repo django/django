@@ -1,0 +1,3 @@
+# psycopg-binary doesn't publish free-threaded wheels.
+psycopg>=3.1.12
+psycopg-pool>=3.2.0

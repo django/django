@@ -25,16 +25,28 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - conda-environment-file: ".github/workflows/data/conda/geolibs-pg17.yml"
+          - conda-environment-file: ".github/workflows/data/conda/geolibs-pg17-gil.yml"
             pg_major: "17"
-          - conda-environment-file: ".github/workflows/data/conda/geolibs-pg18.yml"
+            python: "3.14"
+          - conda-environment-file: ".github/workflows/data/conda/geolibs-pg17-freethreading.yml"
+            pg_major: "17"
+            python: "3.14t"
+          - conda-environment-file: ".github/workflows/data/conda/geolibs-pg18-gil.yml"
             pg_major: "18"
-    name: PostgreSQL ${{ matrix.pg_major }}
+            python: "3.14"
+          - conda-environment-file: ".github/workflows/data/conda/geolibs-pg18-freethreading.yml"
+            pg_major: "18"
+            python: "3.14t"
+    name: PostgreSQL ${{ matrix.pg_major }}, Python ${{ matrix.python }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
         with:
           persist-credentials: false
+      - name: Install system packages
+        run: |
+          sudo apt update
+          xargs -a .github/workflows/data/apt-packages.txt sudo apt install -y --no-install-recommends
       - name: Setup Miniforge
         # Pinned to v4.0.1
         uses: conda-incubator/setup-miniconda@8ee1f361103df19b6f8c8655fd3967a8ecb162d5
@@ -42,13 +54,6 @@ jobs:
           activate-environment: geodjango
           environment-file: ${{ matrix.conda-environment-file }}
           channel-priority: strict
-      - name: Install system packages
-        run: |
-          sudo apt update
-          xargs -a .github/workflows/data/apt-packages.txt sudo apt install -y --no-install-recommends
-      - name: Install and upgrade packaging tools
-        run: python -m pip install --upgrade pip wheel
-      - run: python -m pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .
       - name: Create PostgreSQL settings file
         run: mv ./.github/workflows/data/test_postgis.py.tpl ./tests/test_postgis.py
       - name: Initialize and start local PostgreSQL
@@ -59,6 +64,8 @@ jobs:
           pg_ctl -D "$GITHUB_WORKSPACE/.tmp/pgdata" -w start
           psql -U user -d postgres -c "CREATE EXTENSION IF NOT EXISTS postgis;"
           psql -U user -d postgres -c "SELECT PostGIS_full_version();"
+      - name: Show GIL status
+        run: python -c "import sys; print('GIL enabled:', sys._is_gil_enabled())"
       - name: Print geospatial versions
         run: |
           python -c "from django.contrib.gis import gdal, geos; print(f'GDAL: {gdal.gdal_version()}'); print(f'GEOS: {geos.geos_version()}')"
