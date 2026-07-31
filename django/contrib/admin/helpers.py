@@ -44,7 +44,8 @@ class AdminForm:
         fieldsets,
         prepopulated_fields,
         readonly_fields=None,
-        model_admin=None,
+        *,
+        model_admin,
     ):
         self.form, self.fieldsets = form, fieldsets
         self.prepopulated_fields = [
@@ -201,7 +202,7 @@ class AdminField:
 
 
 class AdminReadonlyField:
-    def __init__(self, form, field, is_first, model_admin=None):
+    def __init__(self, form, field, is_first, model_admin):
         # Make self.field look a little bit like a field. This means that
         # {{ field.name }} must be a useful class name to identify the field.
         # For convenience, store other field-related data here too.
@@ -478,7 +479,8 @@ class InlineAdminForm(AdminForm):
         prepopulated_fields,
         original,
         readonly_fields=None,
-        model_admin=None,
+        *,
+        model_admin,
         view_on_site_url=None,
     ):
         self.formset = formset
@@ -487,7 +489,11 @@ class InlineAdminForm(AdminForm):
         self.show_url = original and view_on_site_url is not None
         self.absolute_url = view_on_site_url
         super().__init__(
-            form, fieldsets, prepopulated_fields, readonly_fields, model_admin
+            form,
+            fieldsets,
+            prepopulated_fields,
+            readonly_fields,
+            model_admin=model_admin,
         )
 
     def __iter__(self):

@@ -955,7 +955,9 @@ class TestInlineAdminForm(TestCase):
         john = Parent.objects.create(name="John")
         joe = Child.objects.create(name="Joe", teacher=sally, parent=john)
 
-        iaf = InlineAdminForm(None, None, {}, {}, joe)
+        iaf = InlineAdminForm(
+            None, None, {}, {}, joe, model_admin=ModelAdmin(Child, admin_site)
+        )
         parent_ct = ContentType.objects.get_for_model(Parent)
         self.assertEqual(iaf.original.content_type, parent_ct)
 
