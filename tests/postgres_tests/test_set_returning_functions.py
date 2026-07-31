@@ -141,6 +141,36 @@ class CompositeSetReturningFunctionExecutionTests(PostgreSQLTestCase):
         self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
         self.assertSequenceEqual(list(results), [("first", "size", "large")])
 
+    def test_filter_composite_tuple(self):
+        queryset = AggregateTestModel.objects.alias(item=JsonbEach("json_field"))
+
+        for value, expected in [
+            (("color", "blue"), ["first"]),
+            (("color", "red"), ["second"]),
+            (("color", "green"), []),
+            (("size", "blue"), []),
+        ]:
+            with self.subTest(value=value):
+                results = queryset.filter(item=value).values_list(
+                    "char_field", flat=True
+                )
+                sql, _ = results.query.sql_with_params()
+
+                self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
+                self.assertSequenceEqual(list(results), expected)
+
+    def test_filter_composite_tuple_reuses_join(self):
+        results = (
+            AggregateTestModel.objects.alias(item=JsonbEach("json_field"))
+            .filter(item__key="color")
+            .filter(item=("color", "blue"))
+            .values_list("char_field", flat=True)
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
+        self.assertSequenceEqual(list(results), ["first"])
+
     def test_returns_composite_columns(self):
         results = (
             AggregateTestModel.objects.alias(item=JsonbEach("json_field"))

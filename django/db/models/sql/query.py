@@ -1319,11 +1319,10 @@ class Query(BaseExpression):
                 return Col(join.table_alias, field)
         return None
 
-    def _resolve_inner_subquery_tuple(self, join):
+    def _resolve_join_tuple(self, join, output_field):
         from django.db.models.fields.tuple_lookups import Tuple
 
         cols = []
-        output_field = join.table_subquery.output_field
         for path, field in self._iter_composite_field_paths(output_field):
             column_name = LOOKUP_SEP.join(path)
             field = join.get_field(column_name)
@@ -1357,6 +1356,8 @@ class Query(BaseExpression):
             )
             if existing is not None:
                 self.ref_alias(existing.table_alias)
+                if not rest_path and getattr(output_field, "is_composite", False):
+                    return self._resolve_join_tuple(existing, output_field)
                 field = existing.get_field(rest_path or alias)
                 return Col(existing.table_alias, field)
             self.get_initial_alias()
@@ -1367,7 +1368,8 @@ class Query(BaseExpression):
                 table_alias,
             )
             self.alias_map[table_alias] = join
-
+            if not rest_path and getattr(output_field, "is_composite", False):
+                return self._resolve_join_tuple(join, output_field)
             field = join.get_field(rest_path or alias)
             return Col(join.table_alias, field)
         if not self._is_multi_column_query(annotation):
@@ -1385,7 +1387,7 @@ class Query(BaseExpression):
         table_alias = self.join(join)
         join = self.alias_map[table_alias]
         if not rest_path:
-            return self._resolve_inner_subquery_tuple(join)
+            return self._resolve_join_tuple(join, annotation.output_field)
         return self._resolve_inner_subquery_field(join, rest_path)
 
     def add_annotation(self, annotation, alias, select=True):
@@ -1755,7 +1757,11 @@ class Query(BaseExpression):
             ):
                 lookup_class = condition.lhs.get_lookup("isnull")
                 clause.add(lookup_class(condition.lhs, False), AND)
-            used_joins.update(self._gen_col_aliases([condition]))
+            used_joins.update(
+                alias
+                for alias in self._gen_col_aliases([condition])
+                if isinstance(self.alias_map.get(alias), SetReturningFunctionJoin)
+            )
             return clause, used_joins
 
         opts = self.get_meta()
