@@ -508,6 +508,22 @@ Models
   using :class:`.RawSQL`, might have to be adjusted to also make use of
   quoting.
 
+Requests and responses
+----------------------
+
+* Most Django-provided middleware now set ``async_capable = False`` to
+  avoid repetitive context switching in ``MiddlewareMixin.__acall__()`` under
+  ASGI. For atypical use cases — high in-process concurrency over non-ORM I/O,
+  where no thread is otherwise held — the repetitive context switching may be
+  preferable to pinning a thread per request (see :ref:`async_performance`).
+  Such deployments can restore the prior behavior by setting
+  ``async_capable = True``; see :ref:`MiddlewareMixin <upgrading-middleware>`.
+  :class:`~django.contrib.auth.middleware.RemoteUserMiddleware` is unaffected,
+  because it does not use ``MiddlewareMixin``. Neither is
+  :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware` nor
+  ``django.contrib.admindocs.middleware.XViewMiddleware`` affected, as they did
+  not implement ``process_request()`` or ``process_response()``.
+
 System checks
 -------------
 

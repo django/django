@@ -414,9 +414,23 @@ The ``__call__()`` method:
 #. Calls ``self.process_response(request, response)`` (if defined).
 #. Returns the response.
 
-If used with ``MIDDLEWARE_CLASSES``, the ``__call__()`` method will
-never be used; Django calls ``process_request()`` and ``process_response()``
-directly.
+The ``__acall__()`` method adapts sync ``process_request()`` and
+``process_response()`` methods to the async context, which is usually something
+to avoid, as it causes repetitive context switching (via
+:func:`asgiref.sync.sync_to_async`) for each middleware. For this reason,
+Django's built-in middlewares that lack an ``__acall__()`` implementation set
+``async_capable = False``. Views tuned for high in-process concurrency over
+non-ORM I/O (see :ref:`async_performance`) and only light CPU-bound work in
+sync middleware may find this repetitive context switching preferable to the
+alternative -- pinning a thread per request in sync mode -- and may wish to set
+``async_capable`` to ``True``.
+
+.. versionchanged:: 6.1
+
+    In earlier versions, each of Django's middlewares without their own
+    ``__acall__()`` inherited the default value of
+    ``MiddlewareMixin.async_capable`` (``True``), making them subject to the
+    repetitive context switching described above.
 
 In most cases, inheriting from this mixin will be sufficient to make an
 old-style middleware compatible with the new system with sufficient
