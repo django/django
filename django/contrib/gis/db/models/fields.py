@@ -78,6 +78,9 @@ class BaseSpatialField(Field):
 
     description = _("The base GIS field.")
     empty_strings_allowed = False
+    default_error_messages = {
+        "invalid": _("“%(value)s” value has an invalid format."),
+    }
 
     def __init__(self, verbose_name=None, srid=4326, spatial_index=True, **kwargs):
         """

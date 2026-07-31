@@ -15,6 +15,7 @@ from django.contrib.gis.geos import (
     Polygon,
     fromstr,
 )
+from django.core.exceptions import ValidationError
 from django.core.files.temp import NamedTemporaryFile
 from django.core.management import call_command
 from django.db import DatabaseError, NotSupportedError, connection
@@ -38,6 +39,35 @@ from .models import (
     ThreeDimensionalFeature,
     Track,
 )
+
+
+class GeoModelValidationTest(TestCase):
+    def test_full_clean_invalid_geometry(self):
+        city = City(name="Foo", point="invalid")
+        msg = "“invalid” value has an invalid format."
+        with self.assertRaisesMessage(ValidationError, msg) as cm:
+            city.full_clean()
+        self.assertEqual(cm.exception.message_dict, {"point": [msg]})
+
+    def test_full_clean_valid_geometry(self):
+        city = City(name="Foo", point="POINT(5 23)")
+        city.full_clean()
+
+    def test_clean_fields_collects_all_errors(self):
+        # An invalid geometry does not prevent other fields from being
+        # validated.
+        city = City(name="", point="invalid")
+        with self.assertRaises(ValidationError) as cm:
+            city.full_clean()
+        self.assertEqual(set(cm.exception.message_dict), {"name", "point"})
+
+    def test_empty_geometry_does_not_raise(self):
+        # Empty values are not converted to a geometry and therefore never
+        # raise when the attribute is read during validation.
+        city = City(name="Foo", point="")
+        self.assertIsNone(city.point)
+        city.point = None
+        self.assertIsNone(city.point)
 
 
 class GeoModelTest(TestCase):
