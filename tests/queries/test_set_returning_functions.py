@@ -170,6 +170,25 @@ class SetReturningFunctionOuterJoinMixin:
         self.assertNotIn("LATERAL", sql)
         self.assertEqual(result, {"total": 0})
 
+    def test_negated_table_source_filter(self):
+        results = (
+            JSONFieldNullable.objects.filter(pk=self.empty.pk)
+            .alias(
+                element=self.table_source_class(
+                    Value(["keep", "discard"], output_field=JSONField())
+                )
+            )
+            .exclude(element="discard")
+            .annotate(value=F("element"))
+            .values_list("value", flat=True)
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertIn("CROSS JOIN", sql)
+        self.assertNotIn("LEFT OUTER JOIN", sql)
+        self.assertNotIn("LATERAL", sql)
+        self.assertSequenceEqual(list(results), ["keep"])
+
 
 @unittest.skipUnless(connection.vendor == "sqlite", "SQLite tests")
 class SQLiteSetReturningFunctionTests(SetReturningFunctionOuterJoinMixin, TestCase):

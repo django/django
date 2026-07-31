@@ -466,6 +466,51 @@ class MultipleSetReturningFunctionExecutionTests(PostgreSQLTestCase):
 
 
 class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
+    def test_delete_with_table_source_filter(self):
+        AggregateTestModel.objects.bulk_create(
+            [
+                AggregateTestModel(char_field="zero", integer_field=0),
+                AggregateTestModel(char_field="one", integer_field=1),
+                AggregateTestModel(char_field="two", integer_field=2),
+            ]
+        )
+
+        deleted, _ = (
+            AggregateTestModel.objects.alias(number=GenerateSeries(1, "integer_field"))
+            .filter(number=2)
+            .delete()
+        )
+
+        self.assertEqual(deleted, 1)
+        self.assertSequenceEqual(
+            list(
+                AggregateTestModel.objects.order_by("integer_field").values_list(
+                    "char_field", flat=True
+                )
+            ),
+            ["zero", "one"],
+        )
+
+    def test_delete_with_optional_table_source_filter(self):
+        AggregateTestModel.objects.bulk_create(
+            [
+                AggregateTestModel(char_field="keep"),
+                AggregateTestModel(char_field="discard"),
+            ]
+        )
+
+        deleted, _ = (
+            AggregateTestModel.objects.alias(number=GenerateSeries(1, 0))
+            .filter(Q(char_field="keep") | Q(number=1))
+            .delete()
+        )
+
+        self.assertEqual(deleted, 1)
+        self.assertSequenceEqual(
+            list(AggregateTestModel.objects.values_list("char_field", flat=True)),
+            ["discard"],
+        )
+
     def test_update_with_table_source_filter(self):
         AggregateTestModel.objects.bulk_create(
             [
