@@ -1,0 +1,15 @@
+name: geodjango
+channels:
+  - conda-forge
+dependencies:
+  - python-gil=3.14
+  - postgresql=17.*
+  - postgis=3.5.*
+  - libgdal=3.11.*
+  - geos=3.14.*
+  - proj=9.6.*
+  - pip=26.*
+  - pip:
+      - -r ../../../../tests/requirements/py3.txt
+      - -r ../../../../tests/requirements/postgres.txt
+      - -e ../../../../
