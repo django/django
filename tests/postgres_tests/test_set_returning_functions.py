@@ -46,10 +46,10 @@ class NestedUnnest(Func):
     function = "unnest"
     output_field = CompositeField(
         number=IntegerField(),
-        **{
-            "item__key": TextField(),
-            "item__value": TextField(),
-        },
+        item=CompositeField(
+            key=TextField(),
+            value=TextField(),
+        ),
     )
     set_returning = True
     table_source = True
@@ -212,6 +212,20 @@ class CompositeSetReturningFunctionExecutionTests(PostgreSQLTestCase):
             AggregateTestModel.objects.alias(item=JsonbEach("json_field"))
             .values_list("item__key", flat=True)
             .filter(Q(char_field="empty") | Q(item__key="missing"))
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertIn("CROSS JOIN LATERAL", sql)
+        self.assertNotIn("LEFT OUTER JOIN LATERAL", sql)
+        self.assertSequenceEqual(list(results), [])
+
+    def test_q_or_then_values_keeps_composite_column_required(self):
+        AggregateTestModel.objects.create(char_field="keep", json_field={})
+
+        results = (
+            AggregateTestModel.objects.alias(item=JsonbEach("json_field"))
+            .filter(Q(char_field="keep") | Q(item__key="missing"))
+            .values_list("char_field", "item__key")
         )
         sql, _ = results.query.sql_with_params()
 
@@ -627,6 +641,42 @@ class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
         self.assertIn("CROSS JOIN LATERAL", sql)
         self.assertNotIn("LEFT OUTER JOIN LATERAL", sql)
         self.assertSequenceEqual(list(results), [])
+
+    def test_q_or_then_ordering_keeps_table_source_required(self):
+        AggregateTestModel.objects.create(char_field="keep")
+
+        results = (
+            AggregateTestModel.objects.alias(number=GenerateSeries(1, 0))
+            .filter(Q(char_field="keep") | Q(number=1))
+            .order_by("number")
+            .values_list("char_field", flat=True)
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertIn("CROSS JOIN LATERAL", sql)
+        self.assertNotIn("LEFT OUTER JOIN LATERAL", sql)
+        self.assertSequenceEqual(list(results), [])
+
+    def test_replaced_ordering_keeps_table_source_optional(self):
+        AggregateTestModel.objects.bulk_create(
+            [
+                AggregateTestModel(char_field="keep"),
+                AggregateTestModel(char_field="discard"),
+            ]
+        )
+
+        results = (
+            AggregateTestModel.objects.alias(number=GenerateSeries(1, 0))
+            .filter(Q(char_field="keep") | Q(number=1))
+            .order_by("number")
+            .order_by("char_field")
+            .values_list("char_field", flat=True)
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertIn("LEFT OUTER JOIN LATERAL", sql)
+        self.assertNotIn("CROSS JOIN LATERAL", sql)
+        self.assertSequenceEqual(list(results), ["keep"])
 
     def test_q_or_keeps_previously_filtered_table_source_required(self):
         AggregateTestModel.objects.create(char_field="keep")

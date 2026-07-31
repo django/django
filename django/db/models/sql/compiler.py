@@ -514,6 +514,7 @@ class SQLCompiler:
         seen = set()
         for expr, is_ref in self._order_by_pairs():
             resolved = expr.resolve_expression(self.query, allow_joins=True, reuse=None)
+            self.query.demote_joins(self.query._gen_table_source_aliases([resolved]))
             if not is_ref and self.query.combinator and self.select:
                 src = resolved.expression
                 expr_src = expr.expression
