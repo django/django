@@ -10,6 +10,7 @@ from django.db.models import (
     TextField,
 )
 from django.db.models.functions import Abs, Upper
+from django.db.models.lookups import GreaterThan
 from django.test.utils import register_lookup
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
@@ -71,6 +72,17 @@ class SetReturningFunctionTests(PostgreSQLSimpleTestCase):
         self.assertIn('"number"."number" AS "number"', sql)
         self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
         self.assertEqual(params, (1, 2))
+
+    def test_table_source_alias_rejects_lookup_separator(self):
+        msg = (
+            "Table source alias 'some__alias' cannot contain the lookup "
+            "separator '__'."
+        )
+        for method in ("alias", "annotate"):
+            with self.subTest(method), self.assertRaisesMessage(ValueError, msg):
+                getattr(AggregateTestModel.objects, method)(
+                    **{"some__alias": GenerateSeries(1, 2)}
+                )
 
     def test_scalar_function_is_added_to_from_clause(self):
         queryset = (
@@ -142,6 +154,18 @@ class CompositeSetReturningFunctionExecutionTests(PostgreSQLTestCase):
 
         self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
         self.assertSequenceEqual(list(results), [("first", "size", "large")])
+
+    def test_q_or_keeps_selected_composite_column_required(self):
+        results = (
+            AggregateTestModel.objects.alias(item=JsonbEach("json_field"))
+            .values_list("item__key", flat=True)
+            .filter(Q(char_field="empty") | Q(item__key="missing"))
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertIn("CROSS JOIN LATERAL", sql)
+        self.assertNotIn("LEFT OUTER JOIN LATERAL", sql)
+        self.assertSequenceEqual(list(results), [])
 
     def test_filter_composite_tuple(self):
         queryset = AggregateTestModel.objects.alias(item=JsonbEach("json_field"))
@@ -255,6 +279,29 @@ class CorrelatedSetReturningFunctionExecutionTests(PostgreSQLTestCase):
 
 
 class MultipleSetReturningFunctionExecutionTests(PostgreSQLTestCase):
+    def test_or_promotes_dependent_function_chain(self):
+        AggregateTestModel.objects.bulk_create(
+            [
+                AggregateTestModel(char_field="keep"),
+                AggregateTestModel(char_field="discard"),
+            ]
+        )
+
+        results = (
+            AggregateTestModel.objects.alias(
+                upper_bound=GenerateSeries(1, 0),
+                number=GenerateSeries(1, F("upper_bound")),
+            )
+            .filter(Q(char_field="keep") | Q(number=1))
+            .order_by("char_field")
+            .values_list("char_field", flat=True)
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("LEFT OUTER JOIN LATERAL"), 2)
+        self.assertNotIn("CROSS JOIN LATERAL", sql)
+        self.assertSequenceEqual(list(results), ["keep"])
+
     def test_function_uses_previous_function_column(self):
         AggregateTestModel.objects.bulk_create(
             [
@@ -408,6 +455,58 @@ class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
                 self.assertEqual(sql.count("generate_series"), 1)
                 self.assertSequenceEqual(list(results), ["keep"])
 
+    def test_or_reuses_same_table_source(self):
+        AggregateTestModel.objects.bulk_create(
+            [
+                AggregateTestModel(char_field="first"),
+                AggregateTestModel(char_field="second"),
+            ]
+        )
+        queryset = AggregateTestModel.objects.alias(number=GenerateSeries(1, 3))
+        results = (
+            (queryset.filter(number=1) | queryset.filter(number=3))
+            .annotate(result=F("number"))
+            .order_by("char_field", "result")
+            .values_list("char_field", "result")
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("generate_series"), 1)
+        self.assertNotIn("LEFT OUTER JOIN LATERAL", sql)
+        self.assertSequenceEqual(
+            list(results),
+            [
+                ("first", 1),
+                ("first", 3),
+                ("second", 1),
+                ("second", 3),
+            ],
+        )
+
+    def test_or_keeps_different_table_sources(self):
+        AggregateTestModel.objects.bulk_create(
+            [
+                AggregateTestModel(char_field="first"),
+                AggregateTestModel(char_field="second"),
+            ]
+        )
+        left = AggregateTestModel.objects.alias(number=GenerateSeries(1, 1)).filter(
+            number=99
+        )
+        right = AggregateTestModel.objects.alias(number=GenerateSeries(7, 7)).filter(
+            number=7
+        )
+
+        results = (
+            (left | right).order_by("char_field").values_list("char_field", flat=True)
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("generate_series"), 2)
+        self.assertEqual(sql.count("LEFT OUTER JOIN LATERAL"), 2)
+        self.assertNotIn("CROSS JOIN LATERAL", sql)
+        self.assertSequenceEqual(list(results), ["first", "second"])
+
     def test_q_or_preserves_rows_when_table_source_is_empty(self):
         AggregateTestModel.objects.bulk_create(
             [
@@ -426,6 +525,56 @@ class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
         self.assertIn("LEFT OUTER JOIN LATERAL", sql)
         self.assertNotIn("CROSS JOIN LATERAL", sql)
         self.assertSequenceEqual(list(results), ["keep"])
+
+    def test_q_or_with_conditional_expression_preserves_rows(self):
+        AggregateTestModel.objects.bulk_create(
+            [
+                AggregateTestModel(char_field="keep"),
+                AggregateTestModel(char_field="discard"),
+            ]
+        )
+        results = (
+            AggregateTestModel.objects.alias(number=GenerateSeries(1, 0))
+            .filter(
+                Q(char_field="keep") | Q(GreaterThan(F("number"), 0)),
+            )
+            .order_by("char_field")
+            .values_list("char_field", flat=True)
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertIn("LEFT OUTER JOIN LATERAL", sql)
+        self.assertNotIn("CROSS JOIN LATERAL", sql)
+        self.assertSequenceEqual(list(results), ["keep"])
+
+    def test_q_or_keeps_selected_table_source_required(self):
+        AggregateTestModel.objects.create(char_field="keep")
+
+        results = (
+            AggregateTestModel.objects.annotate(number=GenerateSeries(1, 0))
+            .filter(Q(char_field="keep") | Q(number=1))
+            .values_list("char_field", "number")
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertIn("CROSS JOIN LATERAL", sql)
+        self.assertNotIn("LEFT OUTER JOIN LATERAL", sql)
+        self.assertSequenceEqual(list(results), [])
+
+    def test_q_or_keeps_previously_filtered_table_source_required(self):
+        AggregateTestModel.objects.create(char_field="keep")
+
+        results = (
+            AggregateTestModel.objects.alias(number=GenerateSeries(1, 0))
+            .filter(number=1)
+            .filter(Q(char_field="keep") | Q(number=2))
+            .values_list("char_field", flat=True)
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertIn("CROSS JOIN LATERAL", sql)
+        self.assertNotIn("LEFT OUTER JOIN LATERAL", sql)
+        self.assertSequenceEqual(list(results), [])
 
     def test_required_filter_demotes_optional_table_source(self):
         AggregateTestModel.objects.bulk_create(
@@ -529,6 +678,38 @@ class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
 
         self.assertSequenceEqual(list(results), [7, 8])
         self.assertEqual(sql.count("generate_series"), 2)
+
+    def test_reassigned_selected_alias_discards_old_function(self):
+        AggregateTestModel.objects.create()
+
+        results = (
+            AggregateTestModel.objects.annotate(number=GenerateSeries(1, 2))
+            .alias(number=GenerateSeries(7, 8))
+            .annotate(result=F("number"))
+            .order_by("result")
+            .values_list("result", flat=True)
+        )
+        sql, params = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("generate_series"), 1)
+        self.assertEqual(params, (7, 8))
+        self.assertSequenceEqual(list(results), [7, 8])
+
+    def test_reassigned_selected_alias_keeps_filtered_function(self):
+        AggregateTestModel.objects.create()
+
+        results = (
+            AggregateTestModel.objects.annotate(number=GenerateSeries(1, 2))
+            .filter(number=1)
+            .alias(number=GenerateSeries(7, 8))
+            .annotate(result=F("number"))
+            .order_by("result")
+            .values_list("result", flat=True)
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("generate_series"), 2)
+        self.assertSequenceEqual(list(results), [7, 8])
 
     def test_scalar_function_ordering(self):
         AggregateTestModel.objects.create()

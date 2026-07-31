@@ -1393,21 +1393,39 @@ class Query(BaseExpression):
     def add_annotation(self, annotation, alias, select=True):
         """Add a single annotation expression to the Query."""
         self.check_alias(alias)
+        previous_annotation = self.annotations.get(alias)
+        previously_selected = alias in self.annotation_select
         annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None)
-        if (
-            isinstance(annotation, Query)
-            and self._is_multi_column_query(annotation)
-            and LOOKUP_SEP in alias
-        ):
-            raise ValueError(
-                f"Multi-column subquery alias {alias!r} cannot contain the lookup "
-                f"separator {LOOKUP_SEP!r}."
-            )
+        if LOOKUP_SEP in alias:
+            if getattr(annotation, "table_source", False):
+                raise ValueError(
+                    f"Table source alias {alias!r} cannot contain the lookup "
+                    f"separator {LOOKUP_SEP!r}."
+                )
+            if isinstance(annotation, Query) and self._is_multi_column_query(
+                annotation
+            ):
+                raise ValueError(
+                    f"Multi-column subquery alias {alias!r} cannot contain the lookup "
+                    f"separator {LOOKUP_SEP!r}."
+                )
         if select:
             self.append_annotation_mask([alias])
         else:
             self.set_annotation_mask(set(self.annotation_select).difference({alias}))
         self.annotations[alias] = annotation
+        if previously_selected:
+            required_table_sources = set(self._gen_required_table_source_aliases())
+            previous_table_sources = set(self._gen_col_aliases([previous_annotation]))
+            for table_alias in previous_table_sources:
+                if (
+                    isinstance(
+                        self.alias_map.get(table_alias),
+                        SetReturningFunctionJoin,
+                    )
+                    and table_alias not in required_table_sources
+                ):
+                    self.unref_alias(table_alias)
         if select and getattr(annotation, "table_source", False):
             self.annotations[alias] = self._promote_inner_subquery_join(alias)
         if select and self.selected:
@@ -1725,7 +1743,8 @@ class Query(BaseExpression):
             )
             if not isinstance(condition, Lookup):
                 condition = self.build_lookup(["exact"], condition, True)
-            return WhereNode([condition], connector=AND), []
+            used_joins = set(self._gen_table_source_aliases([condition]))
+            return WhereNode([condition], connector=AND), used_joins
         arg, value = filter_expr
         if not arg:
             raise FieldError("Cannot parse keyword query %r" % arg)
@@ -1757,11 +1776,7 @@ class Query(BaseExpression):
             ):
                 lookup_class = condition.lhs.get_lookup("isnull")
                 clause.add(lookup_class(condition.lhs, False), AND)
-            used_joins.update(
-                alias
-                for alias in self._gen_col_aliases([condition])
-                if isinstance(self.alias_map.get(alias), SetReturningFunctionJoin)
-            )
+            used_joins.update(self._gen_table_source_aliases([condition]))
             return clause, used_joins
 
         opts = self.get_meta()
@@ -1869,8 +1884,18 @@ class Query(BaseExpression):
         # (Consider case where rel_a is LOUTER and rel_a__col=1 is added - if
         # rel_a doesn't produce any rows, then the whole condition must fail.
         # So, demotion is OK.
+        # A table source join may already exist only because another table
+        # source depends on it. Don't let such a dependency-only join override
+        # the join type required by q_object.
+        required_table_sources = set(self._gen_required_table_source_aliases())
         existing_inner = {
-            a for a in self.alias_map if self.alias_map[a].join_type == INNER
+            alias
+            for alias, join in self.alias_map.items()
+            if join.join_type == INNER
+            and (
+                not isinstance(join, SetReturningFunctionJoin)
+                or alias in required_table_sources
+            )
         }
         if reuse_all:
             can_reuse = set(self.alias_map)
@@ -2256,6 +2281,33 @@ class Query(BaseExpression):
     @classmethod
     def _gen_col_aliases(cls, exprs):
         yield from (expr.alias for expr in cls._gen_cols(exprs))
+
+    def _gen_table_source_aliases(self, exprs):
+        aliases = list(self._gen_col_aliases(exprs))
+        seen = set()
+
+        while aliases:
+            alias = aliases.pop()
+            if alias in seen:
+                continue
+            seen.add(alias)
+            join = self.alias_map.get(alias)
+            if not isinstance(join, SetReturningFunctionJoin):
+                continue
+            yield alias
+            # This function might use the column of an earlier table source.
+            aliases.extend(self._gen_col_aliases([join.srf_func]))
+
+    def _gen_required_table_source_aliases(self):
+        expressions = chain(
+            (self.where,),
+            self.annotation_select.values(),
+            self.select,
+            self.selected.values() if self.selected else (),
+        )
+        if self.group_by not in (None, True):
+            expressions = chain(expressions, self.group_by)
+        yield from self._gen_table_source_aliases(expressions)
 
     def resolve_ref(self, name, allow_joins=True, reuse=None, summarize=False):
         annotation = self.annotations.get(name)

@@ -342,6 +342,22 @@ class SetReturningFunctionJoin:
         new.join_type = LOUTER
         return new
 
+    @property
+    def identity(self):
+        return (
+            self.__class__,
+            self.table_name,
+            self.srf_func,
+        )
+
+    def __eq__(self, other):
+        if not isinstance(other, SetReturningFunctionJoin):
+            return NotImplemented
+        return self.identity == other.identity
+
+    def __hash__(self):
+        return hash(self.identity)
+
 
 class BaseTable:
     """
