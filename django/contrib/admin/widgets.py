@@ -221,8 +221,13 @@ class ForeignKeyRawIdWidget(forms.TextInput):
             manager = choices.queryset
         else:
             manager = self.rel.model._default_manager
+        # Only override the database when the widget is bound to one, so that a
+        # queryset which already selected its own (e.g. via
+        # Model.objects.using()) isn't reset to the default routing.
+        if self.db is not None:
+            manager = manager.using(self.db)
         try:
-            obj = manager.using(self.db).get(**{key: value})
+            obj = manager.get(**{key: value})
         except (ValueError, self.rel.model.DoesNotExist, ValidationError):
             return "", ""
 

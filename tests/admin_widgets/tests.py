@@ -831,6 +831,26 @@ class ForeignKeyRawIdWidgetTest(TestCase):
 
 
 @override_settings(ROOT_URLCONF="admin_widgets.urls")
+class ForeignKeyRawIdWidgetMultiDbTest(TestCase):
+    databases = {"default", "other"}
+
+    def test_label_and_url_for_value_preserves_queryset_database(self):
+        # A form field queryset that selected its own database (e.g. via
+        # using()) keeps it when the widget isn't bound to one, instead of
+        # falling back to the default routing (#37213).
+        apple = Inventory.objects.using("other").create(barcode=86, name="Apple")
+        rel = Inventory._meta.get_field("parent").remote_field
+        field = forms.ModelChoiceField(
+            queryset=Inventory.objects.using("other"),
+            widget=widgets.ForeignKeyRawIdWidget(rel, widget_admin_site),
+        )
+        self.assertEqual(
+            field.widget.label_and_url_for_value(apple.barcode),
+            ("Apple", "/admin_widgets/inventory/%s/change/" % apple.pk),
+        )
+
+
+@override_settings(ROOT_URLCONF="admin_widgets.urls")
 class ManyToManyRawIdWidgetTest(TestCase):
     def test_render(self):
         band = Band.objects.create(name="Linkin Park")
