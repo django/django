@@ -68,6 +68,10 @@ as possible.
 
     __ https://wiki.c2.com/?DontRepeatYourself
 
+    Wikipedia `Do Not Repeat Yourself`__
+
+    __ https://en.wikipedia.org/wiki/Don%27t_repeat_yourself
+
 .. _explicit-is-better-than-implicit:
 
 Explicit is better than implicit
