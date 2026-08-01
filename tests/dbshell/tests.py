@@ -37,3 +37,25 @@ class DbshellCommandTestCase(SimpleTestCase):
             client.runshell([])
 
         self.assertEqual(signal.getsignal(signal.SIGINT), original_handler)
+
+    @mock.patch("django.db.backends.base.client.subprocess.run")
+    def test_sigint_ignored_during_runshell_non_main_thread(self, mock_run):
+        import threading
+
+        from django.db.backends.base.client import BaseDatabaseClient
+
+        client = BaseDatabaseClient(connection)
+
+        def call_runshell():
+            with mock.patch.object(
+                client,
+                "settings_to_cmd_args_env",
+                return_value=(["mock_db_client"], None),
+            ):
+                client.runshell([])
+
+        thread = threading.Thread(target=call_runshell)
+        thread.start()
+        thread.join()
+
+        mock_run.assert_called_once()

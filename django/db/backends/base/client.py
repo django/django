@@ -31,17 +31,14 @@ class BaseDatabaseClient:
         env = {**os.environ, **env} if env else None
         sigint_handler = None
         if hasattr(signal, "SIGINT"):
-            try:
-                sigint_handler = signal.getsignal(signal.SIGINT)
-            except ValueError:
-                pass
+            sigint_handler = signal.getsignal(signal.SIGINT)
         try:
             if sigint_handler is not None:
-                signal.signal(signal.SIGINT, signal.SIG_IGN)
+                try:
+                    signal.signal(signal.SIGINT, signal.SIG_IGN)
+                except ValueError:
+                    sigint_handler = None
             subprocess.run(args, env=env, check=True)
         finally:
             if sigint_handler is not None:
-                try:
-                    signal.signal(signal.SIGINT, sigint_handler)
-                except ValueError:
-                    pass
+                signal.signal(signal.SIGINT, sigint_handler)
