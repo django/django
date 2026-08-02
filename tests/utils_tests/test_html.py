@@ -23,7 +23,7 @@ from django.utils.html import (
     strip_tags,
     urlize,
 )
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeData, SafeString, mark_safe
 
 
 @override_settings(URLIZE_ASSUME_HTTPS=True)
@@ -372,8 +372,30 @@ class TestUtilsHtml(SimpleTestCase):
     def test_conditional_escape(self):
         s = "<h1>interop</h1>"
         self.assertEqual(conditional_escape(s), "&lt;h1&gt;interop&lt;/h1&gt;")
-        self.assertEqual(conditional_escape(mark_safe(s)), s)
+        safe_s = mark_safe(s)
+        self.assertIs(conditional_escape(safe_s), safe_s)
         self.assertEqual(conditional_escape(lazystr(mark_safe(s))), s)
+
+    def test_conditional_escape_safe_data_subclass(self):
+        class CustomSafeData(SafeData):
+            def __html__(self):
+                return "<h1>safe</h1>"
+
+            def __str__(self):
+                return "<script>unsafe</script>"
+
+        value = CustomSafeData()
+        self.assertEqual(conditional_escape(value), "<h1>safe</h1>")
+        self.assertEqual(format_html("{}", value), "<h1>safe</h1>")
+
+    def test_conditional_escape_safe_string_subclass(self):
+        class CustomSafeString(SafeString):
+            def __html__(self):
+                return "<h1>safe</h1>"
+
+        value = CustomSafeString("<script>unsafe</script>")
+        self.assertEqual(conditional_escape(value), "<h1>safe</h1>")
+        self.assertEqual(format_html("{}", value), "<h1>safe</h1>")
 
     def test_html_safe(self):
         @html_safe

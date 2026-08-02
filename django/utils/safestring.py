@@ -30,6 +30,13 @@ class SafeString(str, SafeData):
 
     __slots__ = ()
 
+    def __html__(self):
+        """
+        Return a plain string so third-party force-escaping can remove the
+        safety marker.
+        """
+        return str.__str__(self)
+
     def __add__(self, rhs):
         """
         Concatenating a safe string with another safe bytestring or

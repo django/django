@@ -4,6 +4,7 @@ from unittest import mock, skipIf
 from django.contrib.auth.models import User
 from django.template import TemplateSyntaxError
 from django.test import RequestFactory, TestCase
+from django.utils.safestring import mark_safe
 
 from .test_dummy import TemplateStringsTests
 
@@ -47,6 +48,21 @@ class Jinja2Tests(TemplateStringsTests):
         template = self.engine.from_string("hello {{ foo }}!")
         content = template.render(context={"self": "self", "foo": "world"})
         self.assertEqual(content, "hello world!")
+
+    def test_forceescape_django_safe_string(self):
+        template = self.engine.from_string(
+            '<iframe srcdoc="{{ value|forceescape }}"></iframe>'
+        )
+
+        content = template.render(
+            context={"value": mark_safe('<p data-note="a&b">safe</p>')}
+        )
+
+        self.assertEqual(
+            content,
+            '<iframe srcdoc="&lt;p data-note=&#34;a&amp;b&#34;&gt;safe&lt;/p&gt;">'
+            "</iframe>",
+        )
 
     def test_exception_debug_info_min_context(self):
         with self.assertRaises(TemplateSyntaxError) as e:

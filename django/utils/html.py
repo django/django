@@ -126,7 +126,9 @@ def conditional_escape(text):
     """
     if isinstance(text, Promise):
         text = str(text)
-    if hasattr(text, "__html__"):
+    if isinstance(text, SafeString) and type(text).__html__ is SafeString.__html__:
+        return text
+    elif hasattr(text, "__html__"):
         return text.__html__()
     else:
         return escape(text)
