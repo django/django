@@ -177,6 +177,8 @@
             const deleteButton = $(e1.target);
             const row = deleteButton.closest("." + options.formCssClass);
             const inlineGroup = row.closest(".inline-group");
+            const deletedIndex = $("." + options.formCssClass).index(row);
+            const formsToReindex = row.nextAll("." + options.formCssClass);
             // Remove the parent form containing this button,
             // and also remove the relevant row with non-field errors:
             const prevRow = row.prev();
@@ -211,10 +213,24 @@
             const updateElementCallback = function () {
                 updateElementIndex(this, options.prefix, i);
             };
-            for (i = 0, formCount = forms.length; i < formCount; i++) {
+            for (
+                i = Math.max(deletedIndex, 0), formCount = forms.length;
+                i < formCount;
+                i++
+            ) {
                 updateElementIndex($(forms).get(i), options.prefix, i);
                 $(forms.get(i)).find("*").each(updateElementCallback);
             }
+            formsToReindex.each(function () {
+                this.dispatchEvent(
+                    new CustomEvent("formset:after-reindex", {
+                        bubbles: true,
+                        detail: {
+                            formsetName: options.prefix,
+                        },
+                    }),
+                );
+            });
         };
 
         const toggleDeleteButtonVisibility = function (inlineGroup) {

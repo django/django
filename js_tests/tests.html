@@ -83,6 +83,74 @@
             </div>
         </div>
     </script>
+    <script type="text/html" id="tabular-formset-with-autocomplete">
+        <div class="inline-group">
+            <div class="tabular inline-related">
+                <input id="id_autocomplete-TOTAL_FORMS" value="2">
+                <input id="id_autocomplete-MAX_NUM_FORMS" value="">
+                <input id="id_autocomplete-MIN_NUM_FORMS" value="">
+                <table class="inline">
+                    <tr id="autocomplete-0" class="form-row">
+                        <td class="field-products">
+                            <select name="autocomplete-0-products"
+                                    id="id_autocomplete-0-products"
+                                    class="admin-autocomplete"
+                                    data-ajax--cache="true"
+                                    data-ajax--delay="250"
+                                    data-ajax--type="GET"
+                                    data-ajax--url="/admin/autocomplete/"
+                                    data-app-label="admin"
+                                    data-model-name="order"
+                                    data-field-name="products"
+                                    data-theme="admin-autocomplete"
+                                    data-allow-clear="false"
+                                    data-placeholder=""
+                                    multiple></select>
+                        </td>
+                        <td class="delete"></td>
+                    </tr>
+                    <tr id="autocomplete-1" class="form-row">
+                        <td class="field-products">
+                            <select name="autocomplete-1-products"
+                                    id="id_autocomplete-1-products"
+                                    class="admin-autocomplete"
+                                    data-ajax--cache="true"
+                                    data-ajax--delay="250"
+                                    data-ajax--type="GET"
+                                    data-ajax--url="/admin/autocomplete/"
+                                    data-app-label="admin"
+                                    data-model-name="order"
+                                    data-field-name="products"
+                                    data-theme="admin-autocomplete"
+                                    data-allow-clear="false"
+                                    data-placeholder=""
+                                    multiple></select>
+                        </td>
+                        <td class="delete"></td>
+                    </tr>
+                    <tr id="autocomplete-empty" class="form-row empty-form">
+                        <td class="field-products">
+                            <select name="autocomplete-__prefix__-products"
+                                    id="id_autocomplete-__prefix__-products"
+                                    class="admin-autocomplete"
+                                    data-ajax--cache="true"
+                                    data-ajax--delay="250"
+                                    data-ajax--type="GET"
+                                    data-ajax--url="/admin/autocomplete/"
+                                    data-app-label="admin"
+                                    data-model-name="order"
+                                    data-field-name="products"
+                                    data-theme="admin-autocomplete"
+                                    data-allow-clear="false"
+                                    data-placeholder=""
+                                    multiple></select>
+                        </td>
+                        <td class="delete"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </script>
     <script type="text/html" id="nav-sidebar-filter">
       <nav class="sticky" id="nav-sidebar">
         <input type="search" id="nav-filter"
@@ -114,6 +182,7 @@
 
     <script src='../django/contrib/admin/static/admin/js/vendor/xregexp/xregexp.min.js'></script>
     <script src='../django/contrib/admin/static/admin/js/vendor/jquery/jquery.min.js'></script>
+    <script src='../django/contrib/admin/static/admin/js/vendor/select2/select2.full.js'></script>
     <script src='../django/contrib/admin/static/admin/js/jquery.init.js'></script>
     <script src='./admin/jsi18n-mocks.test.js'></script>
 
@@ -141,6 +210,8 @@
 
     <script src='../django/contrib/admin/static/admin/js/inlines.js' data-cover></script>
     <script src='./admin/inlines.test.js'></script>
+    <script src='../django/contrib/admin/static/admin/js/autocomplete.js' data-cover></script>
+    <script src='./admin/autocomplete.test.js'></script>
 
     <script src='../django/contrib/admin/static/admin/js/actions.js' data-cover></script>
     <script src='../django/contrib/admin/static/admin/js/prepopulate.js' data-cover></script>

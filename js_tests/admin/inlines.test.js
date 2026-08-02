@@ -132,6 +132,33 @@ QUnit.test(
     },
 );
 
+QUnit.test("reindex events target only subsequent rows", function (assert) {
+    const $ = django.jQuery;
+    assert.expect(4);
+    const addButton = this.table.find("tr.add-row > td > a");
+    addButton.trigger($.Event("click", { target: addButton }));
+    const afterReindexTargets = [];
+    const afterReindexHandler = function (event) {
+        afterReindexTargets.push(event.target.id);
+        assert.equal(event.detail.formsetName, "second");
+    };
+    document.addEventListener("formset:after-reindex", afterReindexHandler);
+
+    try {
+        const deleteLink = this.table.find("#second-1 .inline-deletelink");
+        deleteLink.trigger($.Event("click", { target: deleteLink }));
+
+        assert.deepEqual(afterReindexTargets, ["second-1"]);
+        assert.equal(this.table.find("#second-0").length, 1);
+        assert.equal(this.table.find("#second-1").length, 1);
+    } finally {
+        document.removeEventListener(
+            "formset:after-reindex",
+            afterReindexHandler,
+        );
+    }
+});
+
 QUnit.module("admin.inlines: tabular formsets with max_num", {
     beforeEach: function () {
         const $ = django.jQuery;

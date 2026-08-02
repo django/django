@@ -30,4 +30,11 @@
     document.addEventListener("formset:added", (event) => {
         $(event.target).find(".admin-autocomplete").djangoAdminSelect2();
     });
+
+    document.addEventListener("formset:after-reindex", (event) => {
+        $(event.target)
+            .find(".admin-autocomplete")
+            .not("[name*=__prefix__]")
+            .djangoAdminSelect2();
+    });
 }
