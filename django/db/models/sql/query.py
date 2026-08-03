@@ -1321,12 +1321,6 @@ class Query(BaseExpression):
             cols.append(Col(join.table_alias, field))
         return Tuple(*cols, output_field=output_field)
 
-    def _find_inner_subquery_join(self, annotation_alias):
-        for join in self.alias_map.values():
-            if isinstance(join, SubqueryJoin) and join.table_name == annotation_alias:
-                return join
-        return None
-
     def _promote_inner_subquery_join(self, name):
         alias, _, rest_path = name.partition(LOOKUP_SEP)
         annotation = self.annotations.get(alias)
@@ -1338,18 +1332,13 @@ class Query(BaseExpression):
             raise NotImplementedError(
                 "Correlated multi-column subquery aliases are not supported."
             )
-        existing = self._find_inner_subquery_join(alias)
-        if existing is not None:
-            if not rest_path:
-                return self._resolve_inner_subquery_tuple(existing)
-            return self._resolve_inner_subquery_field(existing, rest_path)
-        table_alias, _ = self.table_alias(alias, create=True)
         join = SubqueryJoin(
             annotation,
             alias,
-            table_alias,
+            None,
         )
-        self.alias_map[table_alias] = join
+        table_alias = self.join(join)
+        join = self.alias_map[table_alias]
         if not rest_path:
             return self._resolve_inner_subquery_tuple(join)
         return self._resolve_inner_subquery_field(join, rest_path)
