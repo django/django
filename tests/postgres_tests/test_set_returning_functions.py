@@ -23,7 +23,6 @@ from .models import AggregateTestModel
 class GenerateSeries(Func):
     function = "generate_series"
     output_field = IntegerField()
-    set_returning = True
     table_source = True
 
 
@@ -39,7 +38,6 @@ class JsonbEach(Func):
         key=TextField(),
         value=JSONField(),
     )
-    set_returning = True
     table_source = True
 
 
@@ -52,7 +50,6 @@ class NestedUnnest(Func):
             value=TextField(),
         ),
     )
-    set_returning = True
     table_source = True
 
 

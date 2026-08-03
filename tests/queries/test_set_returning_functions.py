@@ -21,7 +21,6 @@ from .models import JSONFieldNullable, Node
 class JsonEach(Func):
     function = "json_each"
     output_field = TextField(db_column="value")
-    set_returning = True
     table_source = True
 
 
@@ -31,7 +30,6 @@ class JsonEachRow(Func):
         key=IntegerField(db_column="key"),
         value=TextField(db_column="value"),
     )
-    set_returning = True
     table_source = True
 
 
@@ -55,7 +53,6 @@ class JsonTableArrayRow(Func):
         position=IntegerField(db_column="position"),
         value=TextField(db_column="value"),
     )
-    set_returning = True
     table_source = True
 
     def _as_json_table(
