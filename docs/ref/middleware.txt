@@ -207,7 +207,9 @@ Security middleware
    independently enabled or disabled with a setting.
 
    * :setting:`SECURE_CONTENT_TYPE_NOSNIFF`
+   * :setting:`SECURE_CROSS_ORIGIN_EMBEDDER_POLICY`
    * :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY`
+   * :setting:`SECURE_CROSS_ORIGIN_RESOURCE_POLICY`
    * :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
    * :setting:`SECURE_HSTS_PRELOAD`
    * :setting:`SECURE_HSTS_SECONDS`
@@ -399,6 +401,86 @@ valid values for this setting are:
     Allows the document to be added to its opener's browsing context group
     unless the opener itself has a COOP of ``same-origin`` or
     ``same-origin-allow-popups``.
+
+.. _cross-origin-embedder-policy:
+
+Cross-Origin Embedder Policy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 6.2
+
+The `Cross-Origin Embedder Policy`__ (COEP) header prevents a document from
+loading any cross-origin resources that do not explicitly grant the document
+permission (using CORP or CORS).
+
+__ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Embedder-Policy
+
+``SecurityMiddleware`` can set the ``Cross-Origin-Embedder-Policy`` header for
+you, based on the :setting:`SECURE_CROSS_ORIGIN_EMBEDDER_POLICY` setting. The
+valid values for this setting are:
+
+``unsafe-none``
+    Allows the document to fetch cross-origin resources without explicit
+    permission. This is the browser default when the setting is ``None`` and
+    the header is not sent.
+
+``require-corp``
+    Requires cross-origin resources to explicitly grant loading permission
+    via a CORP or CORS header.
+
+``credentialless``
+    Allows fetching cross-origin resources without credentials (cookies, client
+    certificates, etc.), omitting the need for CORP headers.
+
+For views that need a specific embedder policy, use a view decorator to set
+the header on those views::
+
+    from django.http import HttpResponse
+    from django.views.decorators.security import cross_origin_embedder_policy
+
+
+    @cross_origin_embedder_policy("require-corp")
+    def isolated_view(request):
+        return HttpResponse("This page is cross-origin isolated.")
+
+.. _cross-origin-resource-policy:
+
+Cross-Origin Resource Policy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 6.2
+
+The `Cross-Origin Resource Policy`__ (CORP) header allows a resource owner to
+specify which origins are allowed to load the resource. This is a defense
+against side-channel attacks such as Spectre, as it prevents cross-origin or
+cross-site reads of the resource.
+
+__ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Resource-Policy
+
+``SecurityMiddleware`` can set the ``Cross-Origin-Resource-Policy`` header for
+you, based on the :setting:`SECURE_CROSS_ORIGIN_RESOURCE_POLICY` setting. The
+valid values for this setting are:
+
+``same-origin``
+    Only allows the resource to be loaded by pages from the same origin.
+
+``same-site``
+    Allows the resource to be loaded by pages from the same site (same
+    registrable domain).
+
+``cross-origin``
+    Allows the resource to be loaded by any origin. Use this for public
+    resources such as shared static assets.
+
+For views that need to override the global policy (for example, a view
+serving a user avatar image that must be loadable cross-origin), use a view
+decorator::
+
+    from django.views.decorators.security import cross_origin_resource_policy
+
+
+    @cross_origin_resource_policy("cross-origin")
+    def user_avatar(request, user_id): ...
 
 .. _x-content-type-options:
 
