@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models.functions import Lower
+from django.db.models.functions import Lower, Now
 
 
 def validate_answer_to_universe(value):
@@ -50,6 +50,18 @@ class UniqueFieldsModel(models.Model):
     unique_charfield = models.CharField(max_length=100, unique=True)
     unique_integerfield = models.IntegerField(unique=True, db_default=42)
     non_unique_field = models.IntegerField()
+
+
+class UniqueDbDefaultExpressionModel(models.Model):
+    unique_created = models.DateTimeField(unique=True, db_default=Now())
+
+
+class UniqueTogetherDbDefaultExpressionModel(models.Model):
+    number = models.IntegerField()
+    created = models.DateTimeField(db_default=Now())
+
+    class Meta:
+        unique_together = [("number", "created")]
 
 
 class CustomPKModel(models.Model):

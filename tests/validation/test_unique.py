@@ -11,10 +11,12 @@ from .models import (
     FlexibleDatePost,
     ModelToValidate,
     Post,
+    UniqueDbDefaultExpressionModel,
     UniqueErrorsModel,
     UniqueFieldsModel,
     UniqueForDateModel,
     UniqueFuncConstraintModel,
+    UniqueTogetherDbDefaultExpressionModel,
     UniqueTogetherModel,
 )
 
@@ -159,6 +161,28 @@ class PerformUniqueChecksTest(TestCase):
                 ]
             },
         )
+
+    def test_unique_db_default_expression(self):
+        """
+        A unique field whose db_default is a non-constant expression cannot
+        be validated before the value is generated on INSERT, so the unique
+        check is skipped (uniqueness is enforced by the database constraint).
+        """
+        UniqueDbDefaultExpressionModel.objects.create()
+        m = UniqueDbDefaultExpressionModel()
+        with self.assertNumQueries(0):
+            m.full_clean()
+
+    def test_unique_together_db_default_expression(self):
+        """
+        A unique check containing a field with a non-constant db_default is
+        skipped entirely; a partial lookup on the remaining fields would be
+        incorrect.
+        """
+        UniqueTogetherDbDefaultExpressionModel.objects.create(number=1)
+        m = UniqueTogetherDbDefaultExpressionModel(number=1)
+        with self.assertNumQueries(0):
+            m.full_clean()
 
     def test_unique_for_date(self):
         Post.objects.create(

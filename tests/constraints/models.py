@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models.functions import Coalesce, Lower
+from django.db.models.functions import Coalesce, Lower, Now
 
 
 class Product(models.Model):
@@ -175,3 +175,4 @@ class ModelWithDatabaseDefault(models.Model):
     field_with_db_default = models.CharField(
         max_length=255, db_default=models.Value("field_with_db_default")
     )
+    field_with_db_default_expression = models.DateTimeField(db_default=Now())
