@@ -208,7 +208,11 @@ class CompositeField(Field):
     def get_fields(self):
         for name, field in self.sub_fields.items():
             path = tuple(name.split(LOOKUP_SEP))
-            yield path, field
+            if isinstance(field, CompositeField):
+                for subpath, subfield in field.get_fields():
+                    yield path + subpath, subfield
+            else:
+                yield path, field
 
     def get_field(self, name):
         path = tuple(name.split(LOOKUP_SEP))
@@ -216,6 +220,11 @@ class CompositeField(Field):
             if field_path == path:
                 return field
         raise FieldError(f"{name!r} not found")
+
+    def deconstruct(self):
+        name, path, args, kwargs = super().deconstruct()
+        kwargs.update((name, field.clone()) for name, field in self.sub_fields.items())
+        return name, path, args, kwargs
 
 
 CompositeField.register_lookup(TupleExact)
