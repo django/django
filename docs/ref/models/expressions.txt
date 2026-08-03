@@ -438,6 +438,82 @@ return type.
     constructing keyword arguments from untrusted user input applies as equally
     to these arguments as it does to ``**extra``.
 
+Using set-returning functions as table sources
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 6.2
+
+Some databases support set-returning functions, which return zero or more rows
+and can be used as a table in the ``FROM`` clause. Set
+:attr:`Expression.table_source` to ``True`` on a custom ``Func`` subclass to
+use it this way. For example, this PostgreSQL expression wraps
+``generate_series()``::
+
+    from django.db.models import Func, IntegerField
+
+
+    class GenerateSeries(Func):
+        function = "generate_series"
+        output_field = IntegerField()
+        table_source = True
+
+``table_source`` is independent of :attr:`Expression.set_returning`, which
+controls subquery evaluation for select-list expressions. A table-source
+expression doesn't need to set both attributes.
+
+Assign the expression with :meth:`~.QuerySet.alias`. The table source is added
+to the query only when the alias is referenced::
+
+    Company.objects.alias(number=GenerateSeries(1, 3)).filter(number__gt=1)
+
+Each row in the original queryset can produce zero or more result rows. Using
+:meth:`~.QuerySet.annotate` instead selects the generated value and adds the
+table source immediately::
+
+    Company.objects.annotate(number=GenerateSeries(1, 3))
+
+The expression's ``output_field`` describes the column returned by the table
+source. Set :attr:`.Field.db_column` when the database exposes it under a
+different name. A table source that returns multiple columns can use a
+``CompositeField`` as its output field. Its subfields can be referenced using
+the normal double-underscore syntax, as described for
+:ref:`multi-column subqueries <using-multi-column-subqueries>`.
+
+.. note::
+
+    Selecting an entire multi-column table source as a single annotation value
+    isn't supported. Assign it using :meth:`~.QuerySet.alias` and select or
+    annotate its individual subfields instead. For example, if ``table_source``
+    returns ``key`` and ``value`` columns::
+
+        from django.db.models import F
+
+        queryset.alias(item=table_source).annotate(
+            item_key=F("item__key"),
+            item_value=F("item__value"),
+        )
+
+The function syntax and table-source support vary between databases. Override
+the appropriate ``as_vendor()`` method when a backend requires different SQL.
+For example, this expression uses SQLite's ``json_each()`` by default and
+PostgreSQL's ``jsonb_array_elements_text()`` on PostgreSQL::
+
+    from django.db.models import Func, TextField
+
+
+    class JsonElements(Func):
+        function = "json_each"
+        output_field = TextField(db_column="value")
+        table_source = True
+
+        def as_postgresql(self, compiler, connection, **extra_context):
+            return super().as_sql(
+                compiler,
+                connection,
+                function="jsonb_array_elements_text",
+                **extra_context,
+            )
+
 ``Aggregate()`` expressions
 ---------------------------
 
@@ -1171,6 +1247,14 @@ calling the appropriate methods on the wrapped expression.
         Postgres set-returning functions (e.g. ``JSONB_PATH_QUERY``,
         ``UNNEST``, etc.) to skip optimization and be properly evaluated when
         annotations spawn rows themselves. Defaults to ``False``.
+
+    .. attribute:: table_source
+
+        Tells Django that this expression can be used as a table source in the
+        query's ``FROM`` clause. A table source can produce zero or more rows
+        for each row in the original queryset. When assigned using
+        :meth:`~.QuerySet.alias`, it is added to the query only when the alias
+        is referenced. Defaults to ``False``.
 
     .. attribute:: allows_composite_expressions
 

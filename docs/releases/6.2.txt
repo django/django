@@ -208,6 +208,10 @@ Models
 
 * ...
 
+* Custom set-returning database functions can now be used as table sources in
+  the query's ``FROM`` clause by setting :attr:`.Expression.table_source` to
+  ``True``.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
