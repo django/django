@@ -69,8 +69,6 @@ class SecurityMiddleware(MiddlewareMixin):
         if coep is None:
             coep = self.cross_origin_embedder_policy
         if coep:
-            response.headers.setdefault(
-                "Cross-Origin-Embedder-Policy", coep
-            )
+            response.headers.setdefault("Cross-Origin-Embedder-Policy", coep)
 
         return response
