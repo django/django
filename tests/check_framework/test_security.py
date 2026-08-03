@@ -710,13 +710,9 @@ class CheckCrossOriginEmbedderPolicyTest(SimpleTestCase):
         SECURE_CROSS_ORIGIN_EMBEDDER_POLICY=None,
     )
     def test_no_coep(self):
-        self.assertEqual(
-            base.check_cross_origin_embedder_policy(None), []
-        )
+        self.assertEqual(base.check_cross_origin_embedder_policy(None), [])
 
-    @override_settings(
-        MIDDLEWARE=["django.middleware.security.SecurityMiddleware"]
-    )
+    @override_settings(MIDDLEWARE=["django.middleware.security.SecurityMiddleware"])
     def test_with_coep(self):
         tests = ["unsafe-none", "require-corp", "credentialless"]
         for value in tests:
@@ -727,9 +723,7 @@ class CheckCrossOriginEmbedderPolicyTest(SimpleTestCase):
                 ),
             ):
                 self.assertEqual(
-                    base.check_cross_origin_embedder_policy(
-                        None
-                    ),
+                    base.check_cross_origin_embedder_policy(None),
                     [],
                 )
 

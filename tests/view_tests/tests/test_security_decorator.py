@@ -1,5 +1,4 @@
 from django.test import SimpleTestCase
-
 from django.views.decorators.security import (
     cross_origin_embedder_policy,
 )
