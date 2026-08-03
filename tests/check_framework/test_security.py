@@ -704,6 +704,46 @@ class CheckCrossOriginOpenerPolicyTest(SimpleTestCase):
         self.assertEqual(base.check_cross_origin_opener_policy(None), [base.E024])
 
 
+class CheckCrossOriginEmbedderPolicyTest(SimpleTestCase):
+    @override_settings(
+        MIDDLEWARE=["django.middleware.security.SecurityMiddleware"],
+        SECURE_CROSS_ORIGIN_EMBEDDER_POLICY=None,
+    )
+    def test_no_coep(self):
+        self.assertEqual(
+            base.check_cross_origin_embedder_policy(None), []
+        )
+
+    @override_settings(
+        MIDDLEWARE=["django.middleware.security.SecurityMiddleware"]
+    )
+    def test_with_coep(self):
+        tests = ["unsafe-none", "require-corp", "credentialless"]
+        for value in tests:
+            with (
+                self.subTest(value=value),
+                override_settings(
+                    SECURE_CROSS_ORIGIN_EMBEDDER_POLICY=value,
+                ),
+            ):
+                self.assertEqual(
+                    base.check_cross_origin_embedder_policy(
+                        None
+                    ),
+                    [],
+                )
+
+    @override_settings(
+        MIDDLEWARE=["django.middleware.security.SecurityMiddleware"],
+        SECURE_CROSS_ORIGIN_EMBEDDER_POLICY="invalid-value",
+    )
+    def test_with_invalid_coep(self):
+        self.assertEqual(
+            base.check_cross_origin_embedder_policy(None),
+            [base.E028],
+        )
+
+
 class CheckSecureCSPTests(SimpleTestCase):
     """Tests for the CSP settings check function."""
 

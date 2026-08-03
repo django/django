@@ -8,6 +8,11 @@ CROSS_ORIGIN_OPENER_POLICY_VALUES = {
     "same-origin-allow-popups",
     "unsafe-none",
 }
+CROSS_ORIGIN_EMBEDDER_POLICY_VALUES = {
+    "unsafe-none",
+    "require-corp",
+    "credentialless",
+}
 REFERRER_POLICY_VALUES = {
     "no-referrer",
     "no-referrer-when-downgrade",
@@ -137,6 +142,15 @@ E024 = Error(
         ", ".join(sorted(CROSS_ORIGIN_OPENER_POLICY_VALUES)),
     ),
     id="security.E024",
+)
+
+E028 = Error(
+    "You have set the SECURE_CROSS_ORIGIN_EMBEDDER_POLICY setting to an "
+    "invalid value.",
+    hint="Valid values are: {}.".format(
+        ", ".join(sorted(CROSS_ORIGIN_EMBEDDER_POLICY_VALUES)),
+    ),
+    id="security.E028",
 )
 
 W025 = Warning(SECRET_KEY_WARNING_MSG, id="security.W025")
@@ -329,6 +343,18 @@ def check_cross_origin_opener_policy(app_configs, **kwargs):
         not in CROSS_ORIGIN_OPENER_POLICY_VALUES
     ):
         return [E024]
+    return []
+
+
+@register(Tags.security, deploy=True)
+def check_cross_origin_embedder_policy(app_configs, **kwargs):
+    if (
+        _security_middleware()
+        and settings.SECURE_CROSS_ORIGIN_EMBEDDER_POLICY is not None
+        and settings.SECURE_CROSS_ORIGIN_EMBEDDER_POLICY
+        not in CROSS_ORIGIN_EMBEDDER_POLICY_VALUES
+    ):
+        return [E028]
     return []
 
 
