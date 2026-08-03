@@ -749,7 +749,7 @@ class JsonResponse(HttpResponse):
     :param encoder: Should be a json encoder class. Defaults to
       ``django.core.serializers.json.DjangoJSONEncoder``.
     :param safe: Controls if only ``dict`` objects may be serialized. Defaults
-      to ``True``.
+      to ``False``.
     :param json_dumps_params: A dictionary of kwargs passed to json.dumps().
     """
 
@@ -757,7 +757,8 @@ class JsonResponse(HttpResponse):
         self,
         data,
         encoder=DjangoJSONEncoder,
-        # RemovedInDjango71Warning: Remove the safe parameter.
+        # RemovedInDjango71Warning: Remove the safe parameter from here and
+        # the docstring.
         safe=None,
         json_dumps_params=None,
         **kwargs,
