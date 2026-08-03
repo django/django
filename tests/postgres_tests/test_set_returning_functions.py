@@ -383,6 +383,23 @@ class CorrelatedSetReturningFunctionExecutionTests(PostgreSQLTestCase):
 
 
 class MultipleSetReturningFunctionExecutionTests(PostgreSQLTestCase):
+    def test_reassigned_selected_alias_discards_function_dependencies(self):
+        AggregateTestModel.objects.create()
+
+        results = (
+            AggregateTestModel.objects.alias(
+                upper_bound=GenerateSeries(1, 2),
+                number=GenerateSeries(1, F("upper_bound")),
+            )
+            .annotate(result=F("number"))
+            .annotate(result=Value(7))
+            .values_list("result", flat=True)
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertNotIn("generate_series", sql)
+        self.assertSequenceEqual(list(results), [7])
+
     def test_or_promotes_dependent_function_chain(self):
         AggregateTestModel.objects.bulk_create(
             [

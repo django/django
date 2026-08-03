@@ -1417,7 +1417,9 @@ class Query(BaseExpression):
         self.annotations[alias] = annotation
         if previously_selected:
             required_table_sources = set(self._gen_required_table_source_aliases())
-            previous_table_sources = set(self._gen_col_aliases([previous_annotation]))
+            previous_table_sources = set(
+                self._gen_table_source_aliases([previous_annotation])
+            )
             for table_alias in previous_table_sources:
                 if (
                     isinstance(
