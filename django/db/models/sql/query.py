@@ -1345,30 +1345,14 @@ class Query(BaseExpression):
                     output_field.get_field(rest_path)
                 except FieldError:
                     return None
-            existing = next(
-                (
-                    join
-                    for join in self.alias_map.values()
-                    if isinstance(join, SetReturningFunctionJoin)
-                    and join.table_name == alias
-                    and join.srf_func == annotation
-                ),
-                None,
-            )
-            if existing is not None:
-                self.ref_alias(existing.table_alias)
-                if not rest_path and getattr(output_field, "is_composite", False):
-                    return self._resolve_join_tuple(existing, output_field)
-                field = existing.get_field(rest_path or alias)
-                return Col(existing.table_alias, field)
             self.get_initial_alias()
-            table_alias, _ = self.table_alias(alias, create=True)
             join = SetReturningFunctionJoin(
                 annotation,
                 alias,
-                table_alias,
+                None,
             )
-            self.alias_map[table_alias] = join
+            table_alias = self.join(join)
+            join = self.alias_map[table_alias]
             if not rest_path and getattr(output_field, "is_composite", False):
                 return self._resolve_join_tuple(join, output_field)
             field = join.get_field(rest_path or alias)
