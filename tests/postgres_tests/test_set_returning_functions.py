@@ -931,6 +931,30 @@ class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
 
         self.assertSequenceEqual(list(results), [1, 2])
 
+    def test_values_omits_selected_function_column(self):
+        obj = AggregateTestModel.objects.create()
+
+        results = AggregateTestModel.objects.annotate(
+            number=GenerateSeries(1, 2)
+        ).values_list("pk", flat=True)
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
+        self.assertNotIn('"number"."number"', sql.split(" FROM ", 1)[0])
+        self.assertSequenceEqual(list(results), [obj.pk, obj.pk])
+
+    def test_values_does_not_materialize_unselected_function(self):
+        obj = AggregateTestModel.objects.create()
+
+        results = AggregateTestModel.objects.alias(
+            number=GenerateSeries(1, 2)
+        ).values_list("pk", flat=True)
+        sql, _ = results.query.sql_with_params()
+
+        self.assertNotIn("generate_series", sql)
+        self.assertNotIn("CROSS JOIN LATERAL", sql)
+        self.assertSequenceEqual(list(results), [obj.pk])
+
     def test_scalar_function_filter(self):
         obj = AggregateTestModel.objects.create()
 
@@ -1042,6 +1066,64 @@ class SetReturningFunctionExecutionTests(PostgreSQLTestCase):
 
         self.assertIn('ORDER BY "number"."number" DESC', sql)
         self.assertSequenceEqual(list(results), [3, 2, 1])
+
+    def test_group_by_table_source_column(self):
+        AggregateTestModel.objects.bulk_create(
+            [AggregateTestModel(), AggregateTestModel()]
+        )
+
+        results = (
+            AggregateTestModel.objects.annotate(number=GenerateSeries(1, 2))
+            .values("number")
+            .annotate(total=Count("pk"))
+            .order_by("number")
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
+        self.assertIn("GROUP BY", sql)
+        self.assertSequenceEqual(
+            list(results),
+            [
+                {"number": 1, "total": 2},
+                {"number": 2, "total": 2},
+            ],
+        )
+
+    def test_distinct_with_selected_table_source_column(self):
+        AggregateTestModel.objects.bulk_create(
+            [AggregateTestModel(), AggregateTestModel()]
+        )
+
+        results = (
+            AggregateTestModel.objects.annotate(number=GenerateSeries(1, 2))
+            .values_list("number", flat=True)
+            .distinct()
+            .order_by("number")
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
+        self.assertIn('SELECT DISTINCT "number"."number"', sql)
+        self.assertSequenceEqual(list(results), [1, 2])
+
+    def test_distinct_with_omitted_table_source_column(self):
+        objects = AggregateTestModel.objects.bulk_create(
+            [AggregateTestModel(), AggregateTestModel()]
+        )
+
+        results = (
+            AggregateTestModel.objects.annotate(number=GenerateSeries(1, 2))
+            .values_list("pk", flat=True)
+            .distinct()
+            .order_by("pk")
+        )
+        sql, _ = results.query.sql_with_params()
+
+        self.assertEqual(sql.count("CROSS JOIN LATERAL"), 1)
+        self.assertIn("SELECT DISTINCT", sql)
+        self.assertNotIn('"number"."number"', sql.split(" FROM ", 1)[0])
+        self.assertSequenceEqual(list(results), [obj.pk for obj in objects])
 
     def test_distinct_on_promoted_table_source_column(self):
         AggregateTestModel.objects.bulk_create(
