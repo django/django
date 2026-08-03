@@ -1427,6 +1427,15 @@ class Query(BaseExpression):
                     and table_alias not in required_table_sources
                 ):
                     self.unref_alias(table_alias)
+        if (
+            select
+            and getattr(annotation, "table_source", False)
+            and getattr(annotation.output_field, "is_composite", False)
+        ):
+            raise NotImplementedError(
+                "Selecting a multi-column table source as an annotation is not "
+                "supported."
+            )
         if select and getattr(annotation, "table_source", False):
             self.annotations[alias] = self._promote_inner_subquery_join(alias)
         if select:

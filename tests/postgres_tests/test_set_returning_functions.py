@@ -129,6 +129,17 @@ class SetReturningFunctionTests(PostgreSQLSimpleTestCase):
         self.assertIn('AS "item"("key", "value")', sql)
         self.assertEqual(params, ())
 
+    def test_composite_table_source_annotation_not_supported(self):
+        msg = (
+            "Selecting a multi-column table source as an annotation is not "
+            "supported."
+        )
+
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            AggregateTestModel.objects.annotate(item=JsonbEach("json_field")).values(
+                "item__key"
+            )
+
 
 class CompositeSetReturningFunctionExecutionTests(PostgreSQLTestCase):
     @classmethod
