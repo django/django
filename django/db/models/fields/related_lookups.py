@@ -52,17 +52,8 @@ class RelatedIn(In):
                 self.rhs.set_values([f.name for f in self.lhs.sources])
         else:
             if self.rhs_is_direct_value():
-                from django.db.models import Model
-
                 # If we get here, we are dealing with single-column relations.
-                self.rhs = [
-                    (
-                        get_normalized_value(val, self.lhs)[0]
-                        if isinstance(val, (Model, tuple))
-                        else val
-                    )
-                    for val in self.rhs
-                ]
+                self.rhs = [get_normalized_value(val, self.lhs)[0] for val in self.rhs]
                 # We need to run the related field's get_prep_value(). Consider
                 # case ForeignKey to IntegerField given value 'abc'. The
                 # ForeignKey itself doesn't have validation for non-integers,

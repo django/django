@@ -2,7 +2,6 @@ from unittest import mock
 
 from django.db import connection, transaction
 from django.db.models import FETCH_PEERS
-from django.db.models.fields.related_lookups import get_normalized_value
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import (
@@ -91,27 +90,6 @@ class ManyToManyTests(TestCase):
         self.assertSequenceEqual(a5.publications.all(), [self.p2])
         a5.publications.remove(self.p2.pk)
         self.assertSequenceEqual(a5.publications.all(), [])
-
-    def test_related_in_prep_lookup_literal_values(self):
-        through = Article.publications.through
-        target_field = through._meta.get_field("publication").target_field
-        values = [self.p1.pk, self.p2.pk]
-        with (
-            mock.patch.object(
-                target_field, "get_prep_value", wraps=target_field.get_prep_value
-            ) as get_prep_value,
-            mock.patch(
-                "django.db.models.fields.related_lookups.get_normalized_value",
-                wraps=get_normalized_value,
-            ) as normalize,
-        ):
-            queryset = through.objects.filter(publication__in=values)
-        self.assertEqual(get_prep_value.call_count, len(values))
-        normalize.assert_not_called()
-        self.assertCountEqual(
-            queryset.values_list("publication_id", flat=True),
-            [self.p1.pk, self.p1.pk, self.p2.pk, self.p2.pk, self.p2.pk],
-        )
 
     def test_add_remove_set_by_to_field(self):
         user_1 = User.objects.create(username="Jean")
