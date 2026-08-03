@@ -1330,7 +1330,7 @@ class Query(BaseExpression):
             cols.append(Col(join.table_alias, field))
         return Tuple(*cols, output_field=output_field)
 
-    def _promote_inner_subquery_join(self, name):
+    def _promote_annotation_join(self, name):
         alias, _, rest_path = name.partition(LOOKUP_SEP)
         annotation = self.annotations.get(alias)
         if annotation is None:
@@ -1394,6 +1394,15 @@ class Query(BaseExpression):
                     f"Multi-column subquery alias {alias!r} cannot contain the lookup "
                     f"separator {LOOKUP_SEP!r}."
                 )
+        if (
+            select
+            and getattr(annotation, "table_source", False)
+            and getattr(annotation.output_field, "is_composite", False)
+        ):
+            raise NotImplementedError(
+                "Selecting a multi-column table source as an annotation is not "
+                "supported."
+            )
         if select:
             self.append_annotation_mask([alias])
         else:
@@ -1413,17 +1422,8 @@ class Query(BaseExpression):
                     and table_alias not in required_table_sources
                 ):
                     self.unref_alias(table_alias)
-        if (
-            select
-            and getattr(annotation, "table_source", False)
-            and getattr(annotation.output_field, "is_composite", False)
-        ):
-            raise NotImplementedError(
-                "Selecting a multi-column table source as an annotation is not "
-                "supported."
-            )
         if select and getattr(annotation, "table_source", False):
-            self.annotations[alias] = self._promote_inner_subquery_join(alias)
+            self.annotations[alias] = self._promote_annotation_join(alias)
         if select:
             self.demote_joins(self._gen_table_source_aliases([self.annotations[alias]]))
         if select and self.selected:
@@ -1533,7 +1533,7 @@ class Query(BaseExpression):
             if annotation:
                 for idx in range(len(lookup_splitted), 0, -1):
                     inner_query_field = LOOKUP_SEP.join(lookup_splitted[:idx])
-                    expression = self._promote_inner_subquery_join(inner_query_field)
+                    expression = self._promote_annotation_join(inner_query_field)
                     if expression is not None:
                         return lookup_splitted[idx:], (), expression
                 expression = self.annotations[annotation]
@@ -2314,7 +2314,7 @@ class Query(BaseExpression):
                 raise FieldError(
                     "Joined field references are not permitted in this query"
                 )
-            join_result = self._promote_inner_subquery_join(name)
+            join_result = self._promote_annotation_join(name)
             if join_result is not None:
                 return join_result
         if annotation is not None:
@@ -2346,7 +2346,7 @@ class Query(BaseExpression):
                     "Joined field references are not permitted in this query"
                 )
             for idx in range(len(field_list), 0, -1):
-                join_result = self._promote_inner_subquery_join(
+                join_result = self._promote_annotation_join(
                     LOOKUP_SEP.join(field_list[:idx])
                 )
                 if join_result is not None:
