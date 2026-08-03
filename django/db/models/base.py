@@ -1553,9 +1553,16 @@ class Model(AltersData, metaclass=ModelBase):
                 f = self._meta.get_field(field_name)
                 lookup_value = getattr(self, f.attname)
                 # TODO: Handle multiple backends with different feature flags.
-                if lookup_value is None or (
-                    lookup_value == ""
-                    and connection.features.interprets_empty_strings_as_nulls
+                if (
+                    lookup_value is None
+                    or (
+                        lookup_value == ""
+                        and connection.features.interprets_empty_strings_as_nulls
+                    )
+                    or (
+                        isinstance(lookup_value, DatabaseDefault)
+                        and not isinstance(lookup_value.expression, Value)
+                    )
                 ):
                     # no value, skip the lookup
                     continue
