@@ -36,6 +36,50 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+August 4, 2026 - :cve:`2026-15307`
+----------------------------------
+
+Server-side file-write and request forgery via spatial lookups.
+`Full description
+<https://www.djangoproject.com/weblog/2026/aug/04/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <39b3e2d0c743a338def6c473086ebc06865e86b6>`
+* Django 6.0 :commit:`(patch) <208f80cb682868b584ed0a78f23e4ba6304212aa>`
+* Django 5.2 :commit:`(patch) <115ffd0463a765ab1cc93de18e94b5459b8a300e>`
+
+August 4, 2026 - :cve:`2026-15337`
+----------------------------------
+
+Potential denial-of-service vulnerability in ``check_for_language()``.
+`Full description
+<https://www.djangoproject.com/weblog/2026/aug/04/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <5b3523d29be25948e1dd90b3863a002f00fc865f>`
+* Django 6.0 :commit:`(patch) <224dbc832586ad5cfb0237c2ff30d14baeaddc6f>`
+* Django 5.2 :commit:`(patch) <c72a5dbb64d0777f3f471f1be94e8b2ca91e0959>`
+
+August 4, 2026 - :cve:`2026-15830`
+----------------------------------
+
+Potential denial-of-service vulnerability via nested geometry collections.
+`Full description
+<https://www.djangoproject.com/weblog/2026/aug/04/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <9e4a3f186b6b07b483bfd9195ea06734663fcd06>`
+* Django 6.0 :commit:`(patch) <6af5da31775417c610dbf9c3f1b5b8333d42daf6>`
+* Django 5.2 :commit:`(patch) <ba80833fa656dd09660b97c4429331067db1b080>`
+
+August 4, 2026 - :cve:`2026-15920`
+----------------------------------
+
+Potential cross-site scripting via ``URLField`` values in the admin.
+`Full description
+<https://www.djangoproject.com/weblog/2026/aug/04/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <5a260d309a4c8010c2ebda24eb758a5d95e2508a>`
+* Django 6.0 :commit:`(patch) <13debb622a32720bda1bccda7622fd14fbf3931b>`
+* Django 5.2 :commit:`(patch) <b9adb81339cc418f8f56b1050cca6dfec3ab6349>`
+
 July 7, 2026 - :cve:`2026-48588`
 --------------------------------
 
