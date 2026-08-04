@@ -57,7 +57,7 @@ import warnings
 from enum import Enum
 
 from django.template.context import BaseContext
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango70Warning, RemovedInDjango71Warning
 from django.utils.formats import localize
 from django.utils.html import conditional_escape
 from django.utils.inspect import getfullargspec, signature
@@ -937,6 +937,28 @@ class Variable:
                             "Invalid character ('%s') in variable name: '%s'" % (c, var)
                         )
                 self.lookups = tuple(var.split(VARIABLE_ATTRIBUTE_SEPARATOR))
+                first_lookup = self.lookups[0]
+                try:
+                    (
+                        float(first_lookup)
+                        if "e" in first_lookup.lower()
+                        else int(first_lookup)
+                    )
+                except ValueError:
+                    pass
+                else:
+                    warnings.warn(
+                        "Support for using a numeric literal as the first "
+                        "component of a template variable is deprecated. This "
+                        "will raise a TemplateSyntaxError in Django 7.1.",
+                        RemovedInDjango71Warning,
+                        skip_file_prefixes=django_file_prefixes(),
+                    )
+                    # RemovedInDjango71Warning: when the deprecation ends,
+                    # replace the warning above with:
+                    # raise TemplateSyntaxError(
+                    #     "Invalid numeric literal: '%s'" % var
+                    # )
 
     def resolve(self, context):
         """Resolve this variable against a given context."""

@@ -22,6 +22,8 @@ details on these changes.
 
 * Calling ``QuerySet.aiterator()`` after ``prefetch_related()`` without
   providing a ``chunk_size`` will raise :exc:`ValueError`.
+* Using a numeric literal as the first component of a template variable will
+  raise ``TemplateSyntaxError``.
 
 .. _deprecation-removed-in-7.0:
 
