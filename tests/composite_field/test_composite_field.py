@@ -151,6 +151,25 @@ class CompositeSubqueryTestCase(TestCase):
 
 class CompositeFieldTests(CompositeSubqueryTestCase):
 
+    def test_composite_subquery_alias_or_preserves_outer_rows(self):
+        missing_project = Project.objects.filter(pk=-1).values("pk", "code")
+        projects = (
+            Project.objects.alias(project_info=missing_project)
+            .filter(
+                Q(pk=F("project_info__pk"), title="Authentication")
+                | Q(code="RPT")
+            )
+            .filter(Q(pk=F("project_info__pk"), title="Authentication") | Q(code="RPT"))
+            .values_list("code", flat=True)
+        )
+
+        self.assertEqual(list(projects), ["RPT"])
+
+            .values_list("code", flat=True)
+        )
+
+        self.assertEqual(list(projects), ["RPT"])
+
     def test_single_column_subquery_keeps_scalar_behavior(self):
         first_title = (
             Post.objects.filter(user=self.ada).order_by("pk").values("title")[:1]
