@@ -187,8 +187,9 @@ class CompositeField(Field):
         for name, field in kwargs.items():
             if not isinstance(field, Field):
                 raise TypeError(
-                    f"{name!r} should field instance"
-                )  # this message could enhance later
+                    f"{name!r} should be a Field instance, got "
+                    f"{type(field).__name__}."
+                )
 
             self.sub_fields[name] = field
         if len(self.sub_fields) < 2:
