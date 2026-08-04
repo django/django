@@ -31,6 +31,23 @@ class DatabaseCreationTests(TestCase):
     ):
         raise DatabaseError("ORA-01031: insufficient privileges")
 
+    def _make_execute_record_and_raise_tablespace_exists(self, executed):
+        # Record executed statements and raise "tablespace exists" the first
+        # time a tablespace is created, as a leftover clone would.
+        state = {"raised": False}
+
+        def execute(inner_self, cursor, statements, parameters, verbosity, **kwargs):
+            for statement in statements:
+                executed.append(statement.strip())
+                if (
+                    statement.strip().startswith("CREATE TABLESPACE")
+                    and not state["raised"]
+                ):
+                    state["raised"] = True
+                    raise DatabaseError("ORA-01543: tablespace 'string' already exists")
+
+        return execute
+
     def _test_database_passwd(self):
         # Mocked to avoid test user password changed
         return connection.settings_dict["SAVED_PASSWORD"]
@@ -109,3 +126,83 @@ class DatabaseCreationTests(TestCase):
                     # REUSE cannot be used with OMF.
                     self.assertNotIn("REUSE", tblspace_sql)
                     self.assertNotIn("REUSE", tblspace_tmp_sql)
+
+    def test_get_test_db_params_suffix(self, *mocked_objects):
+        """Test that _get_test_db_params generates correct suffixed names."""
+        creation = DatabaseCreation(connection)
+        # Without suffix
+        params = creation._get_test_db_params()
+        base_user = params["user"]
+        base_tblspace = params["tblspace"]
+        base_tblspace_temp = params["tblspace_temp"]
+
+        # With suffix
+        params_suffixed = creation._get_test_db_params("1")
+        self.assertEqual(params_suffixed["user"], f"{base_user}_1")
+        self.assertEqual(params_suffixed["tblspace"], f"{base_tblspace}_1")
+        self.assertEqual(params_suffixed["tblspace_temp"], f"{base_tblspace_temp}_1")
+        # dbname should not change (Oracle SID/service name stays same)
+        self.assertEqual(params_suffixed["dbname"], params["dbname"])
+
+    def test_get_test_db_clone_settings(self, *mocked_objects):
+        """Test that get_test_db_clone_settings returns correct settings."""
+        creation = DatabaseCreation(connection)
+
+        clone_settings = creation.get_test_db_clone_settings("2")
+        # USER should be suffixed
+        expected_user = creation._test_database_user("2")
+        self.assertEqual(clone_settings["USER"], expected_user)
+        # NAME should remain unchanged (Oracle SID doesn't change)
+        self.assertEqual(clone_settings["NAME"], connection.settings_dict["NAME"])
+
+    def test_datafile_suffix_no_extension(self, *mocked_objects):
+        """A custom DATAFILE without an extension is suffixed, not crashed."""
+        creation = DatabaseCreation(connection)
+        # Bare name, no dot -- previously raised ValueError on rsplit(".", 1).
+        self.assertEqual(
+            creation._insert_datafile_suffix("/u01/oradata/clone", "1"),
+            "/u01/oradata/clone_1",
+        )
+        # Normal case: suffix goes before the extension.
+        self.assertEqual(
+            creation._insert_datafile_suffix("/u01/oradata/clone.dbf", "2"),
+            "/u01/oradata/clone_2.dbf",
+        )
+
+    @mock.patch.object(DatabaseCreation, "_test_user_create", return_value=False)
+    def test_clone_test_db_tablespace_exists_keepdb(self, *mocked_objects):
+        """Test _clone_test_db handles 'tablespace exists' with keepdb=True."""
+        creation = DatabaseCreation(connection)
+        # Simulate tablespace already exists error
+        with self.patch_execute_statements(
+            self._execute_raise_tablespace_already_exists
+        ):
+            # Should not raise when keepdb=True
+            creation._clone_test_db(suffix="1", verbosity=0, keepdb=True)
+
+    @mock.patch.object(DatabaseCreation, "_run_migrations_on_clone")
+    @mock.patch.object(DatabaseCreation, "_test_user_create", return_value=False)
+    def test_clone_test_db_recreates_existing_tablespace(self, *mocked_objects):
+        """
+        Without keepdb, a clone tablespace left over from an earlier
+        interrupted run is dropped and recreated rather than aborting the run.
+        """
+        creation = DatabaseCreation(connection)
+        executed = []
+        execute = self._make_execute_record_and_raise_tablespace_exists(executed)
+        with self.patch_execute_statements(execute):
+            # Should recover instead of raising.
+            creation._clone_test_db(suffix="1", verbosity=0, keepdb=False)
+        # The leftover user and tablespace are dropped before recreating.
+        self.assertTrue(any(s.startswith("DROP USER") for s in executed))
+        self.assertTrue(any(s.startswith("DROP TABLESPACE") for s in executed))
+
+    @mock.patch.object(DatabaseCreation, "_test_user_create", return_value=False)
+    def test_clone_test_db_unexpected_error(self, *mocked_objects):
+        """Test that _clone_test_db exits on unexpected errors."""
+        creation = DatabaseCreation(connection)
+        with self.patch_execute_statements(self._execute_raise_insufficient_privileges):
+            with self.assertRaises(SystemExit):
+                creation._clone_test_db(suffix="1", verbosity=0, keepdb=False)
+            with self.assertRaises(SystemExit):
+                creation._clone_test_db(suffix="1", verbosity=0, keepdb=True)
