@@ -50,6 +50,10 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   1,500,000 to 1,800,000.
 
+* The :djadmin:`createsuperuser` and :djadmin:`changepassword` management
+  commands now display ``(input hidden)`` in their password prompts to clarify
+  that no characters are echoed while typing.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
