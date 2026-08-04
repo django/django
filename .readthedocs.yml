@@ -7,6 +7,14 @@ build:
   os: ubuntu-24.04
   tools:
     python: "3.12"
+  jobs:
+    post_build:
+      # RTD's htmlzip uses the singlehtml sphinx builder which just generates
+      # a single giant HTML file. So we build our own zip instead based on the
+      # regular HTML builder.
+      - mkdir -p $READTHEDOCS_OUTPUT/htmlzip
+      - cd $READTHEDOCS_OUTPUT/html
+      - zip -r $READTHEDOCS_OUTPUT/htmlzip/$READTHEDOCS_PROJECT.zip . -x '_sources/*' .buildinfo objects.inv
 
 sphinx:
   configuration: docs/conf.py
@@ -16,4 +24,7 @@ python:
   install:
     - requirements: docs/requirements.txt
 
-formats: all
+# htmlzip is built manually in post_build
+formats:
+  - epub
+  - pdf
