@@ -708,19 +708,22 @@ A ``Subquery`` can return multiple columns by calling
 :meth:`~.QuerySet.values` with multiple field names. In this case, the
 subquery has a ``CompositeField`` :ref:`output_field <output-field>`.
 
-The individual subfields can be referenced using the normal
-double-underscore lookup syntax:
+Assign a multi-column ``Subquery`` using :meth:`~.QuerySet.alias`. Its
+individual subfields can then be referenced using the normal double-underscore
+lookup syntax:
 
 .. code-block:: pycon
 
     >>> newest = Comment.objects.order_by("-created_at").values("email", "author__name")[:1]
     >>> Post.objects.alias(info=newest).values("info__email", "info__author__name")
 
-.. note::
+Don't pass the multi-column ``Subquery`` directly to
+:meth:`~.QuerySet.annotate`, as selecting all its columns as a single
+annotation value isn't supported:
 
-    Selecting an entire multi-column ``Subquery`` as a single annotation value
-    isn't supported. Assign it using :meth:`~.QuerySet.alias` and select or
-    annotate its individual subfields instead.
+.. code-block:: pycon
+
+    >>> Post.objects.annotate(info=newest)
 
 An uncorrelated multi-column subquery is combined with every row of the outer
 query, forming a Cartesian product. If the outer query has ``M`` rows and the
