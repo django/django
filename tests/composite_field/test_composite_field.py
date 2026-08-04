@@ -10,7 +10,8 @@ from .models import BugReport, Organization, Post, Project, Task, User, Workspac
 
 class CompositeFieldOutputFieldTests(SimpleTestCase):
     def test_init_validation(self):
-        with self.assertRaises(TypeError):
+        msg = "'name' should be a Field instance, got str."
+        with self.assertRaisesMessage(TypeError, msg):
             models.CompositeField(name="name", age=models.IntegerField())
         with self.assertRaises(ValueError):
             models.CompositeField(name=models.CharField())
