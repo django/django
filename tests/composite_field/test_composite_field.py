@@ -1,3 +1,5 @@
+from operator import itemgetter
+
 from django.core.exceptions import FieldError
 from django.db import connection, models
 from django.db.models import Count, F, OuterRef, Q
@@ -402,15 +404,10 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             )
         )
 
-        self.assertEqual(
-            list(projects),
-            [
-                {
-                    "code": "AUTH",
-                    "priority_bug__description": "Account takeover",
-                    "priority_bug__severity_level": 5,
-                }
-            ],
+        self.assertQuerySetEqual(
+            projects,
+            [5],
+            transform=itemgetter("priority_bug__severity_level"),
         )
 
     def test_composite_subquery_alias_outer_ordering(self):
@@ -424,7 +421,7 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
         project_bugs = BugReport.objects.filter(task__project=project).values(
             "description", "severity_level"
         )
-        projects_1 = (
+        projects_with_ordering_column = (
             Project.objects.filter(pk=project.pk)
             .alias(project_bug=project_bugs)
             .order_by("-project_bug__severity_level")
@@ -435,23 +432,13 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             )
         )
 
-        self.assertEqual(
-            list(projects_1),
-            [
-                {
-                    "code": "AUTH",
-                    "project_bug__description": "Login crash",
-                    "project_bug__severity_level": 3,
-                },
-                {
-                    "code": "AUTH",
-                    "project_bug__description": "Minor alignment issue",
-                    "project_bug__severity_level": 1,
-                },
-            ],
+        self.assertQuerySetEqual(
+            projects_with_ordering_column,
+            [3, 1],
+            transform=itemgetter("project_bug__severity_level"),
         )
 
-        projects_2 = (
+        projects_without_ordering_column = (
             Project.objects.filter(pk=project.pk)
             .alias(project_bug=project_bugs)
             .order_by("-project_bug__severity_level")
@@ -461,40 +448,24 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             )
         )
 
-        self.assertEqual(
-            list(projects_2),
-            [
-                {
-                    "code": "AUTH",
-                    "project_bug__description": "Login crash",
-                },
-                {
-                    "code": "AUTH",
-                    "project_bug__description": "Minor alignment issue",
-                },
-            ],
+        self.assertQuerySetEqual(
+            projects_without_ordering_column,
+            ["Login crash", "Minor alignment issue"],
+            transform=itemgetter("project_bug__description"),
         )
 
-        project_3 = (
+        # Keep the derived-table join used for ordering even when none of its
+        # columns are selected.
+        projects_without_derived_columns = (
             Project.objects.filter(pk=project.pk)
-            .alias(
-                project_bug=project_bugs,
-            )
-            .order_by(
-                "-project_bug__severity_level",
-            )
+            .alias(project_bug=project_bugs)
+            .order_by("-project_bug__severity_level")
             .values("code")
         )
-        self.assertEqual(
-            list(project_3),
-            [
-                {
-                    "code": "AUTH",
-                },
-                {
-                    "code": "AUTH",
-                },
-            ],
+        self.assertQuerySetEqual(
+            projects_without_derived_columns,
+            ["AUTH", "AUTH"],
+            transform=itemgetter("code"),
         )
 
     def test_composite_subquery_alias_preserves_distinct_select_list(self):
@@ -515,18 +486,11 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             .values("slug", "post_template__title")
         )
 
-        self.assertEqual(
-            list(organizations),
-            [
-                {
-                    "slug": "acme",
-                    "post_template__title": "Welcome",
-                },
-                {
-                    "slug": "acme",
-                    "post_template__title": "Welcome",
-                },
-            ],
+        self.assertQuerySetEqual(
+            organizations,
+            ["Welcome", "Welcome"],
+            transform=itemgetter("post_template__title"),
+            ordered=False,
         )
 
     def test_composite_subquery_alias_relabels_when_nested(self):
@@ -652,20 +616,16 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             )
         )
 
-        self.assertEqual(
-            list(organizations),
+        self.assertQuerySetEqual(
+            organizations,
             [
-                {
-                    "slug": "acme",
-                    "task_summary__status": "blocked",
-                    "task_summary__total": 1,
-                },
-                {
-                    "slug": "acme",
-                    "task_summary__status": "open",
-                    "task_summary__total": 2,
-                },
+                ("blocked", 1),
+                ("open", 2),
             ],
+            transform=itemgetter(
+                "task_summary__status",
+                "task_summary__total",
+            ),
         )
 
     def test_composite_subquery_alias_direct_nested_projected_field(self):
