@@ -1418,13 +1418,6 @@ class LookupTests(TestCase):
         bio_column = connection.ops.quote_name(Author._meta.get_field("bio").column)
         self.assertIn(f"{bio_column} IS NULL", ctx.captured_queries[0]["sql"])
 
-    def test_regex_non_string(self):
-        """
-        A regex lookup does not fail on non-string fields
-        """
-        s = Season.objects.create(year=2013, gt=444)
-        self.assertQuerySetEqual(Season.objects.filter(gt__regex=r"^444$"), [s])
-
     def test_regex_non_ascii(self):
         """
         A regex lookup does not trip on non-ASCII characters.
@@ -1795,6 +1788,108 @@ class LookupTests(TestCase):
             self.assertIs(Author.objects.filter(GreaterThan(2, 1)).exists(), True)
         # Direct values on RHS are not wrapped.
         self.assertIn("2 > 1", ctx.captured_queries[0]["sql"])
+
+
+class TextLookupsNonStringTests(TestCase):
+    """Regex and pattern lookups work on non-string fields."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.s1 = Season.objects.create(year=2013, gt=2013)
+        cls.s2 = Season.objects.create(year=2014, gt=2)
+        cls.s3 = Season.objects.create(year=2015, gt=13)
+        cls.s4 = Season.objects.create(year=2016, gt=1)
+        cls.s5 = Season.objects.create(year=2017, gt=12017)
+        cls.s6 = Season.objects.create(year=2018, gt=2017)
+        cls.s7 = Season.objects.create(year=2019, gt=2020)
+        cls.s8 = Season.objects.create(year=2020, gt=2021)
+        cls.s9 = Season.objects.create(year=20210, gt=20211)
+
+    def test_regex(self):
+        self.assertCountEqual(Season.objects.filter(gt__regex=r"^444$"), [])
+
+    def test_regex_f_expression(self):
+        self.assertCountEqual(
+            Season.objects.filter(gt__regex=F("year")), [self.s1, self.s5]
+        )
+
+    def test_iregex(self):
+        self.assertCountEqual(Season.objects.filter(gt__iregex=r"^444$"), [])
+
+    def test_iregex_f_expression(self):
+        self.assertCountEqual(
+            Season.objects.filter(gt__iregex=F("year")), [self.s1, self.s5]
+        )
+
+    def test_startswith(self):
+        self.assertCountEqual(
+            Season.objects.filter(gt__startswith="2"),
+            [self.s1, self.s2, self.s6, self.s7, self.s8, self.s9],
+        )
+
+    def test_startswith_f_expression(self):
+        self.assertCountEqual(
+            Season.objects.filter(gt__startswith=F("year")), [self.s1]
+        )
+
+    def test_istartswith(self):
+        self.assertCountEqual(
+            Season.objects.filter(gt__istartswith="2"),
+            [self.s1, self.s2, self.s6, self.s7, self.s8, self.s9],
+        )
+
+    def test_istartswith_f_expression(self):
+        self.assertCountEqual(
+            Season.objects.filter(gt__istartswith=F("year")), [self.s1]
+        )
+
+    def test_endswith(self):
+        self.assertCountEqual(
+            Season.objects.filter(gt__endswith="13"), [self.s1, self.s3]
+        )
+
+    def test_endswith_f_expression(self):
+        self.assertCountEqual(
+            Season.objects.filter(gt__endswith=F("year")), [self.s1, self.s5]
+        )
+
+    def test_iendswith(self):
+        self.assertCountEqual(
+            Season.objects.filter(gt__iendswith="13"), [self.s1, self.s3]
+        )
+
+    def test_iendswith_f_expression(self):
+        self.assertCountEqual(
+            Season.objects.filter(gt__iendswith=F("year")), [self.s1, self.s5]
+        )
+
+    def test_contains(self):
+        self.assertCountEqual(
+            Season.objects.filter(gt__contains="1"),
+            [self.s1, self.s3, self.s4, self.s5, self.s6, self.s8, self.s9],
+        )
+
+    def test_contains_f_expression(self):
+        self.assertCountEqual(
+            Season.objects.filter(gt__contains=F("year")), [self.s1, self.s5]
+        )
+
+    def test_icontains(self):
+        self.assertCountEqual(
+            Season.objects.filter(gt__icontains="1"),
+            [self.s1, self.s3, self.s4, self.s5, self.s6, self.s8, self.s9],
+        )
+
+    def test_icontains_f_expression(self):
+        self.assertCountEqual(
+            Season.objects.filter(gt__icontains=F("year")), [self.s1, self.s5]
+        )
+
+    def test_iexact(self):
+        self.assertCountEqual(Season.objects.filter(gt__iexact="2013"), [self.s1])
+
+    def test_iexact_f_expression(self):
+        self.assertCountEqual(Season.objects.filter(gt__iexact=F("year")), [self.s1])
 
 
 class LookupQueryingTests(TestCase):
