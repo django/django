@@ -155,16 +155,29 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
         missing_project = Project.objects.filter(pk=-1).values("pk", "code")
         projects = (
             Project.objects.alias(project_info=missing_project)
-            .filter(
-                Q(pk=F("project_info__pk"), title="Authentication")
-                | Q(code="RPT")
-            )
             .filter(Q(pk=F("project_info__pk"), title="Authentication") | Q(code="RPT"))
             .values_list("code", flat=True)
         )
 
         self.assertEqual(list(projects), ["RPT"])
 
+    def test_exclude_outer_field_comparison_with_empty_composite_subquery(self):
+        missing_project = Project.objects.filter(pk=-1).values("pk", "code")
+        projects = (
+            Project.objects.alias(project_info=missing_project)
+            .exclude(pk=F("project_info__pk"), title="Authentication")
+            .order_by("pk")
+            .values_list("code", flat=True)
+        )
+
+        self.assertEqual(list(projects), ["AUTH", "RPT"])
+
+    def test_exclude_outer_field_comparison_with_composite_subquery(self):
+        project_info = Project.objects.filter(pk=self.auth.pk).values("pk", "code")
+        projects = (
+            Project.objects.alias(project_info=project_info)
+            .exclude(pk=F("project_info__pk"), title="Authentication")
+            .order_by("pk")
             .values_list("code", flat=True)
         )
 
