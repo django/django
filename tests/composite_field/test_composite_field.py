@@ -276,6 +276,30 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             ],
         )
 
+    def test_composite_subquery_alias_outer_field_comparison(self):
+        ranked_posts = Post.objects.annotate(
+            rank=models.Case(
+                models.When(user=self.ada, then=2),
+                default=1,
+                output_field=models.IntegerField(),
+            )
+        ).values("pk", "rank")
+        posts = (
+            Post.objects.alias(ranked=ranked_posts)
+            .filter(pk__in=F("ranked__pk"))
+            .annotate(rank=F("ranked__rank"))
+            .order_by("-ranked__rank", "pk")
+            .values_list("pk", "rank")
+        )
+
+        self.assertQuerySetEqual(
+            posts,
+            [
+                (self.welcome_post.pk, 2),
+                (self.duplicate_welcome_post.pk, 1),
+            ],
+        )
+
     def test_composite_subquery_alias_preserves_outer_row_when_inner_is_empty(self):
         project = self.auth
         critical_bug = (

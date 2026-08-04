@@ -244,6 +244,16 @@ class SubqueryJoin:
     def __hash__(self):
         return hash(self.identity)
 
+    def demote(self):
+        new = self.relabeled_clone({})
+        new.join_type = INNER
+        return new
+
+    def promote(self):
+        new = self.relabeled_clone({})
+        new.join_type = LOUTER
+        return new
+
 
 class BaseTable:
     """
