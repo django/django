@@ -2011,6 +2011,16 @@ A number of settings can be used to adjust language cookie options:
 * :setting:`LANGUAGE_COOKIE_SAMESITE`
 * :setting:`LANGUAGE_COOKIE_SECURE`
 
+Translating text stored in models
+---------------------------------
+
+Currently Django does not support translating text stored in models. However,
+there are community maintained solutions on the `Community Ecosystem`_ page.
+The `Internationalization grid`_ has even more options for you!
+
+.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#internationalization-localization
+.. _Internationalization grid: https://djangopackages.org/grids/g/i18n/
+
 Implementation notes
 ====================
 
