@@ -1018,7 +1018,10 @@ class Query(BaseExpression):
             if self.alias_map[alias].join_type == LOUTER:
                 self.alias_map[alias] = self.alias_map[alias].demote()
                 parent_alias = self.alias_map[alias].parent_alias
-                if self.alias_map[parent_alias].join_type == INNER:
+                if (
+                    parent_alias is not None
+                    and self.alias_map[parent_alias].join_type == INNER
+                ):
                     aliases.append(parent_alias)
 
     def reset_refcounts(self, to_counts):
@@ -1332,6 +1335,7 @@ class Query(BaseExpression):
             raise NotImplementedError(
                 "Correlated multi-column subquery aliases are not supported."
             )
+        self.get_initial_alias()
         join = SubqueryJoin(
             annotation,
             alias,
