@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-25 15:04-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 07:59+0000\n"
 "Last-Translator: Ramiro Morales, 2014-2016,2020-2023,2025\n"
 "Language-Team: Spanish (Argentina) (http://app.transifex.com/django/django/"
 "language/es_AR/)\n"
@@ -16,7 +16,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es_AR\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -98,12 +99,9 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"Ha seleccionado una acción y no ha realizado ninguna modificación de campos "
-"individuales. Es probable que deba usar el botón 'Ir'  y no el botón "
-"'Grabar'."
 
 msgid "Now"
 msgstr "Ahora"
@@ -120,31 +118,28 @@ msgstr "Mediodía"
 msgid "6 p.m."
 msgstr "6 PM"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] ""
-"Nota: Ud. se encuentra en una zona horaria que está %s hora adelantada "
-"respecto a la del servidor."
-msgstr[1] ""
-"Nota: Ud. se encuentra en una zona horaria que está %s horas adelantada "
-"respecto a la del servidor."
-msgstr[2] ""
-"Nota: Ud. se encuentra en una zona horaria que está %s horas adelantada "
-"respecto a la del servidor."
+msgid "server"
+msgstr ""
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
 msgstr[0] ""
-"Nota: Ud. se encuentra en una zona horaria que está %s hora atrasada "
-"respecto a la del servidor."
 msgstr[1] ""
-"Nota: Ud. se encuentra en una zona horaria que está %s horas atrasada "
-"respecto a la del servidor."
 msgstr[2] ""
-"Nota: Ud. se encuentra en una zona horaria que está %s horas atrasada "
-"respecto a la del servidor."
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 msgid "Choose a Time"
 msgstr "Seleccione una Hora"
@@ -158,14 +153,29 @@ msgstr "Cancelar"
 msgid "Today"
 msgstr "Hoy"
 
+msgid "Today (%(date)s)"
+msgstr ""
+
 msgid "Choose a Date"
 msgstr "Seleccione una Fecha"
 
 msgid "Yesterday"
 msgstr "Ayer"
 
+msgid "Yesterday (%(date)s)"
+msgstr ""
+
 msgid "Tomorrow"
 msgstr "Mañana"
+
+msgid "Tomorrow (%(date)s)"
+msgstr ""
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr ""
+
+msgid "Next (%(month)s %(year)s)"
+msgstr ""
 
 msgid "January"
 msgstr "enero"
@@ -327,3 +337,18 @@ msgstr "V"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
+
+msgid "%(month)s %(day)s, %(year)s"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr ""

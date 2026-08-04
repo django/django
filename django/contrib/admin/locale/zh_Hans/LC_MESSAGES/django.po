@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-03-09 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: funcy39, 2026\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/django/django/"
 "language/zh_CN/)\n"
@@ -206,8 +206,13 @@ msgstr "无"
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr "按住 Control 键或 Mac 上的 Command 键来选择多项。"
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "选择此对象执行操作 - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -264,13 +269,13 @@ msgstr "修改 %s"
 msgid "View %s"
 msgstr "查看 %s"
 
-msgid "Database error"
-msgstr "数据库错误"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "总共 %(count)s 个 %(name)s 变更成功。"
+
+msgid "Database error"
+msgstr "数据库错误"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -294,6 +299,16 @@ msgstr "变更历史： %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
 
 #, python-format
 msgid ""
@@ -347,9 +362,6 @@ msgstr ""
 msgid "Run"
 msgstr "运行"
 
-msgid "Click here to select the objects across all pages"
-msgstr "点击此处选择所有页面中包含的对象。"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "选中所有的 %(total_count)s 个 %(module_name)s"
@@ -359,10 +371,6 @@ msgstr "清除选中"
 
 msgid "Breadcrumbs"
 msgstr "条形导航"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "在应用程序 %(name)s 中的模型"
 
 msgid "Model name"
 msgstr "型号名称"
@@ -471,6 +479,10 @@ msgstr "切换主题（当前主题：浅色）"
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "切换主题（当前主题：深色）"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -668,6 +680,9 @@ msgstr "取消选中 %(model)s"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "查看已选择的%(model)s"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "感谢您今天与本网站共享一段美好时光。"

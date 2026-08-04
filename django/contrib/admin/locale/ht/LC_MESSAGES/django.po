@@ -1,0 +1,799 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jean Patrick Prenis <patrickprenice@gmail.com>, 2025
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
+"Last-Translator: Jean Patrick Prenis <patrickprenice@gmail.com>, 2025\n"
+"Language-Team: Haitian (Haitian Creole) (http://app.transifex.com/django/"
+"django/language/ht/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ht\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Efase sa ou chwazi yo %(verbose_name_plural)s"
+
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "Efase avèk siksè %(count)d %(items)s"
+
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "ou Pa ka efase %(name)s"
+
+msgid "Delete multiple objects"
+msgstr "Efase plizyè eleman"
+
+msgid "Administration"
+msgstr "Administrasyon"
+
+msgid "All"
+msgstr "tout"
+
+msgid "Yes"
+msgstr "Wi"
+
+msgid "No"
+msgstr "Non"
+
+msgid "Unknown"
+msgstr "Enkoni"
+
+msgid "Any date"
+msgstr "Nenpòt dat"
+
+msgid "Today"
+msgstr "Jodi a"
+
+msgid "Past 7 days"
+msgstr "7 dènye jou yo"
+
+msgid "This month"
+msgstr "Mwa sa a"
+
+msgid "This year"
+msgstr "Ane sa "
+
+msgid "No date"
+msgstr "Pa gen dat"
+
+msgid "Has date"
+msgstr "Gen dat"
+
+msgid "Empty"
+msgstr "Vid"
+
+msgid "Not empty"
+msgstr "Li pa vid"
+
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+"Tanpri antre %(username)s ak modpas ki kòrèk pou yon kont anplwaye. Sonje "
+"byen, toude chan yo ka fè diferans ant lèt majiskil ak miniskil."
+
+msgid "Action:"
+msgstr "Aksyon:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Ajoute yon lòt %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Retire"
+
+msgid "Addition"
+msgstr "Adisyon"
+
+msgid "Change"
+msgstr "Chanje"
+
+msgid "Deletion"
+msgstr "Sipresyon"
+
+msgid "action time"
+msgstr "Tan aksyon an"
+
+msgid "user"
+msgstr "Itilizatè"
+
+msgid "content type"
+msgstr "kalite kontni"
+
+msgid "object id"
+msgstr "id objè a"
+
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/library/functions.html#repr)
+msgid "object repr"
+msgstr "Reprezantasyon objè a"
+
+msgid "action flag"
+msgstr "aksyon drapo a"
+
+msgid "change message"
+msgstr "Chanje mesaj"
+
+msgid "log entry"
+msgstr "Anrejistreman nan jounal"
+
+msgid "log entries"
+msgstr "Anrejistreman jounal yo"
+
+#, python-format
+msgid "Added “%(object)s”."
+msgstr "Ajoute “%(object)s”."
+
+#, python-format
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "Chanje “%(object)s” — %(changes)s"
+
+#, python-format
+msgid "Deleted “%(object)s.”"
+msgstr "Efase “%(object)s.”"
+
+msgid "LogEntry Object"
+msgstr "Objè antre nan jounal"
+
+#, python-brace-format
+msgid "Added {name} “{object}”."
+msgstr "Ajoute {name} “{object}”."
+
+msgid "Added."
+msgstr "Ajoute"
+
+msgid "and"
+msgstr "epi"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "Chanje {fields} pou {name} “{object}”."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr " Chanje {fields}."
+
+#, python-brace-format
+msgid "Deleted {name} “{object}”."
+msgstr "Efase {name} “{object}”."
+
+msgid "No fields changed."
+msgstr "Pa gen chan ki chanje"
+
+msgid "None"
+msgstr "Okenn"
+
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr ""
+"Kenbe “Control”, oswa “Command” sou yon Mac, pou chwazi plis pase youn."
+
+#, python-brace-format
+msgid "Select this object for an action - {}"
+msgstr "Chwazi objè sa a pou yon aksyon - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr "{name} “{obj}” te ajoute avèk siksè"
+
+msgid "You may edit it again below."
+msgstr "Ou ka modifye li ankò pi ba."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr ""
+"{name} “{obj}” te ajoute avèk siksè. Ou ka ajoute yon lòt {name} pi ba."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr "{name} “{obj}” te chanje avèk siksè. Ou ka modifye li ankò pi ba."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+"{name} “{obj}” te chanje avèk siksè. Ou ka ajoute yon lòt {name} pi ba."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "{name} “{obj}” te chanje avèk siksè."
+
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+"Atik yo dwe chwazi pou ka fè aksyon sou yo. Pa gen okenn atik ki chanje."
+
+msgid "No action selected."
+msgstr "Okenn aksyon pa chwazi."
+
+#, python-format
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "%(name)s “%(obj)s” te efase avèk siksè."
+
+#, python-format
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr "%(name)s avek ID \"%(key)s\" pa egziste. Petèt li te efase?"
+
+#, python-format
+msgid "Add %s"
+msgstr "Ajoute %s"
+
+#, python-format
+msgid "Change %s"
+msgstr "Chanje %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Afiche %s"
+
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s yo te chanje avèk siksè."
+msgstr[1] "%(count)s %(name)s yo te chanje avèk siksè."
+
+msgid "Database error"
+msgstr "Erè nan baz done a"
+
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "%(total_count)s seleksyone"
+msgstr[1] "Tout %(total_count)s seleksyone"
+
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "0 nan %(cnt)s seleksyone"
+
+msgid "Delete"
+msgstr "Efase"
+
+#, python-format
+msgid "Change history: %s"
+msgstr "Istwa chanjman: %s"
+
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+"Efase %(class_name)s %(instance)s ta mande pou efase objè pwoteje sa yo ki "
+"gen rapò ak sijè sa a: %(related_objects)s"
+
+msgid "Django site admin"
+msgstr "Admin sit Django a"
+
+msgid "Django administration"
+msgstr "Administrasyon django a"
+
+msgid "Site administration"
+msgstr "Administrasyon sit la"
+
+msgid "Log in"
+msgstr "Konekte"
+
+#, python-format
+msgid "%(app)s administration"
+msgstr "%(app)s administrasyon"
+
+msgid "Page not found"
+msgstr "Paj la pa jwenn"
+
+msgid "We’re sorry, but the requested page could not be found."
+msgstr "Nou regrèt, men paj ou te mande a pa t ka jwenn"
+
+msgid "Home"
+msgstr "Akèy"
+
+msgid "Server error"
+msgstr "Erè sèvè"
+
+msgid "Server error (500)"
+msgstr "Erè sèvè (500)"
+
+msgid "Server Error <em>(500)</em>"
+msgstr "Erè Sèvè <em>(500)</em>"
+
+msgid ""
+"There’s been an error. It’s been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Gen yon erè ki fèt. Yo rapòte l bay administratè sit la pa imel epi yo ta "
+"dwe repare l byento. Mèsi pou pasyans ou."
+
+msgid "Run"
+msgstr ""
+
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Chwazi tout %(total_count)s %(module_name)s"
+
+msgid "Clear selection"
+msgstr "Efase seleksyon an"
+
+msgid "Breadcrumbs"
+msgstr "Navigasyon chemen"
+
+msgid "Model name"
+msgstr "Non modèl"
+
+msgid "Add link"
+msgstr "Ajoute lyen"
+
+msgid "Change or view list link"
+msgstr "Chanje oswa gade lyen lis la"
+
+msgid "Add"
+msgstr "Ajoute"
+
+msgid "View"
+msgstr "Gade"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Ou pa gen pèmisyon pou gade oswa modifye anyen."
+
+msgid "After you’ve created a user, you’ll be able to edit more user options."
+msgstr ""
+"Apre ou fin kreye yon itilizatè, ou pral kapab modifye plis opsyon itilizatè."
+
+msgid "Error:"
+msgstr "Erè :"
+
+msgid "Change password"
+msgstr "Chanje modpas"
+
+msgid "Set password"
+msgstr "Mete modpas"
+
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Tanpri korije erè yo ki anba a."
+msgstr[1] "Tanpri korije erè yo ki anba a."
+
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "Antre yon nouvo modpas pou itilizatè sa <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Aksyon sa a pral <strong>aktive</strong> otantifikasyon ki baze sou modpas "
+"pou itilizatè sa a."
+
+msgid "Disable password-based authentication"
+msgstr "Dezaktive otantifikasyon ki baze sou modpas"
+
+msgid "Enable password-based authentication"
+msgstr "Aktive otantifikasyon ki baze sou modpas"
+
+msgid "Skip to main content"
+msgstr "Ale dirèk nan kontni prensipal la"
+
+msgid "Welcome,"
+msgstr "Byenvini,"
+
+msgid "View site"
+msgstr "Gade sit la"
+
+msgid "Documentation"
+msgstr "Dokimantasyon"
+
+msgid "Log out"
+msgstr "Dekonekte"
+
+#, python-format
+msgid "Add %(name)s"
+msgstr "Ajoute %(name)s"
+
+msgid "History"
+msgstr "Istwa"
+
+msgid "View on site"
+msgstr "Gade sou sit la"
+
+msgid "Filter"
+msgstr "Filtre"
+
+msgid "Hide counts"
+msgstr "Kache konte yo"
+
+msgid "Show counts"
+msgstr "Montre konte yo"
+
+msgid "Clear all filters"
+msgstr "Efase tout filtè yo"
+
+msgid "Save"
+msgstr "Anrejistre"
+
+msgid "Remove from sorting"
+msgstr "Retire nan klasman an"
+
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Priyorite klasman an: %(priority_number)s"
+
+msgid "Toggle sorting"
+msgstr "Chanje lòd triye a"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Chanje tèm nan (tèm aktyèl: otomatik)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Chanje tèm nan (tèm aktyèl: klè)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Chanje tèm nan (tèm aktyèl: fè nwa)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
+"following protected related objects:"
+msgstr ""
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
+"All of the following related items will be deleted:"
+msgstr ""
+
+msgid "Objects"
+msgstr "Objè yo"
+
+msgid "Yes, I’m sure"
+msgstr "Wi, Mwen sèten"
+
+msgid "No, take me back"
+msgstr "Non, mennen m tounen"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Si w efase %(objects_name)s ou chwazi yo, sa ap efase lòt objè ki gen "
+"relasyon avè yo. Men ou pa gen dwa efase kalite objè sa yo:"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"Si w efase %(objects_name)s ou chwazi yo, sa ap oblije efase objè ki pwoteje "
+"ki lye ak yo:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+"Èske ou vrèman vle efase %(objects_name)s ou chwazi yo? Tout objè ki anba yo "
+"ansanm ak tout lòt eleman ki lye ak yo ap efase tou:"
+
+msgid "Delete?"
+msgstr "Efase?"
+
+#, python-format
+msgid " By %(filter_title)s "
+msgstr "Pa %(filter_title)s"
+
+msgid "Summary"
+msgstr "Rezime"
+
+msgid "Recent actions"
+msgstr "Aksyon resan yo"
+
+msgid "My actions"
+msgstr "Aksyon mwen yo"
+
+msgid "None available"
+msgstr "Okenn disponib"
+
+msgid "Added:"
+msgstr "Ajoudte:"
+
+msgid "Changed:"
+msgstr "Chanje:"
+
+msgid "Deleted:"
+msgstr "Efase:"
+
+msgid "Unknown content"
+msgstr "Kontni enkoni"
+
+msgid ""
+"Something’s wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"Gen yon pwoblèm ak enstalasyon bazdone ou a. Asire w tab ki nesesè yo te "
+"kreye, epi asire w bazdone a ka li pa itilizatè ki apwopriye a."
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Ou konekte kòm %(username)s , men ou pa gen otorizasyon pou antre nan paj sa "
+"a. Èske ou vle konekte ak yon lòt kont?"
+
+msgid "Forgotten your login credentials?"
+msgstr "Ou bliye idantifyan koneksyon ou yo?"
+
+msgid "Toggle navigation"
+msgstr "Chanje navigasyon an"
+
+msgid "Sidebar"
+msgstr "Ba lateral"
+
+msgid "Start typing to filter…"
+msgstr "Kòmanse tape pou filtre…"
+
+msgid "Filter navigation items"
+msgstr "Filtre atik navigasyon yo"
+
+msgid "Date/time"
+msgstr "Dat/lè"
+
+msgid "User"
+msgstr "Itilizatè"
+
+msgid "Action"
+msgstr "Aksyon"
+
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "antre yo"
+msgstr[1] "antre yo"
+
+msgid ""
+"This object doesn’t have a change history. It probably wasn’t added via this "
+"admin site."
+msgstr ""
+"Objè sa a pa gen okenn istwa chanjman. Li pwobableman pa t ajoute atravè sit "
+"admin sa a."
+
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
+msgid "Show all"
+msgstr "Montre tout"
+
+msgid "Popup closing…"
+msgstr "Fenèt k ap fèmen…"
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
+
+msgid "Search"
+msgstr "Chache"
+
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s rezilta yo"
+msgstr[1] "%(counter)s rezilta yo"
+
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s total"
+
+msgid "Save as new"
+msgstr "Anrejistre l kòm nouvo"
+
+msgid "Save and add another"
+msgstr "Anrejistre l epi ajoute yon lòt"
+
+msgid "Save and continue editing"
+msgstr "Anrejistre l epi kontinye ap ranje l"
+
+msgid "Save and view"
+msgstr "Anrejistre l epi gade l "
+
+msgid "Close"
+msgstr "Femen"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Chanje seleksyon an %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Ajoute yon lòt %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Efase sa ou chwazi a %(model)s"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Gade seleksyone yo %(model)s"
+
+msgid "Logout"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Mèsi paske ou pase yon bon tan sou sit wèb la jodi a."
+
+msgid "Log in again"
+msgstr "Konekte ankò"
+
+msgid "Password change"
+msgstr "Chanjman modpas"
+
+msgid "Your password was changed."
+msgstr "Modpas ou te chanje."
+
+msgid ""
+"Please enter your old password, for security’s sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Tanpri antre ansyen modpas ou pou rezon sekirite, epi antre nouvo modpas ou "
+"de fwa pou nou ka verifye ou te antre l kòrèkteman."
+
+msgid "Change my password"
+msgstr "Chanje modpas mwen"
+
+msgid "Password reset"
+msgstr "Reyinisyalize modpas"
+
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "Modpas ou te defini. Ou ka kontinye epi konekte kounye a."
+
+msgid "Password reset confirmation"
+msgstr "Konfimasyon reyinisyalizasyon modpas"
+
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"Tanpri antre nouvo modpas ou de fwa pou nou ka verifye ou te antre l "
+"kòrèkteman"
+
+msgid "New password:"
+msgstr "Nouvo modpas:"
+
+msgid "Confirm password:"
+msgstr "Modpas konfime:"
+
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"Lyen pou reyinisyalize modpas la pa t valab, petèt paske li te deja itilize. "
+"Tanpri fè yon nouvo demann pou reyinisyalize modpas."
+
+msgid ""
+"We’ve emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+"Nou voye ba ou yon imel ak enstriksyon pou mete modpas ou, si gen yon kont "
+"ki egziste ak imel ou te antre a. Ou ta dwe resevwa yo byento."
+
+msgid ""
+"If you don’t receive an email, please make sure you’ve entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"Si ou pa resevwa okenn imel, tanpri asire ou antre menm adrès ou te "
+"anrejistre a, epi tcheke katab spam ou."
+
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+"Ou resevwa imel sa a paske ou te fè yon demann pou mete modpas kont ou sou "
+"%(site_name)s ajou."
+
+msgid "Please go to the following page and choose a new password:"
+msgstr "Tanpri ale sou paj ki anba a epi chwazi yon nouvo modpas :"
+
+msgid "In case you’ve forgotten, you are:"
+msgstr "Nan ka ou ta bliye, ou se :"
+
+msgid "Thanks for using our site!"
+msgstr "Mèsi paske ou itilize sit nou an!"
+
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "Ekip %(site_name)s lan"
+
+msgid ""
+"Forgotten your password? Enter your email address below, and we’ll email "
+"instructions for setting a new one."
+msgstr ""
+"Ou bliye modpas ou? Antre adrès imel ou anba a, epi nou pral voye "
+"enstriksyon pa imel pou w ka mete yon nouvo."
+
+msgid "Email address:"
+msgstr "Adrès imel :"
+
+msgid "Reset my password"
+msgstr "Reyinisyalize modpas mwen"
+
+msgid "Select all objects on this page for an action"
+msgstr "Chwazi tout objè sou paj sa a pou yon aksyon"
+
+msgid "All dates"
+msgstr "Tout dat yo"
+
+#, python-format
+msgid "Select %s"
+msgstr "chwazi %s"
+
+#, python-format
+msgid "Select %s to change"
+msgstr "chwazi %s pou chanje"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Chwazi %s pou afiche"
+
+msgid "Date:"
+msgstr "Dat:"
+
+msgid "Time:"
+msgstr "Tan:"
+
+msgid "Lookup"
+msgstr "Rechèch"
+
+msgid "Currently:"
+msgstr "Kounye a:"
+
+msgid "Change:"
+msgstr "Chanje:"

@@ -1,0 +1,85 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jean Patrick Prenis <patrickprenice@gmail.com>, 2025
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 18:45+0000\n"
+"Last-Translator: Jean Patrick Prenis <patrickprenice@gmail.com>, 2025\n"
+"Language-Team: Haitian (Haitian Creole) (http://app.transifex.com/django/"
+"django/language/ht/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ht\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "GIS"
+msgstr "GIS"
+
+msgid "The base GIS field."
+msgstr "Chanm GIS baz la."
+
+msgid ""
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
+msgstr ""
+"Chanm Jeyometri baz la — koresponn ak tip Jeyometri nan espesifikasyon "
+"OpenGIS la."
+
+msgid "Point"
+msgstr "Pwen"
+
+msgid "Line string"
+msgstr "Liy string"
+
+msgid "Polygon"
+msgstr "Poligòn"
+
+msgid "Multi-point"
+msgstr "Plizyè pwen"
+
+msgid "Multi-line string"
+msgstr "Plizyè liy string"
+
+msgid "Multi polygon"
+msgstr "Plizyè poligòn"
+
+msgid "Geometry collection"
+msgstr "Koleksyon jeyometri"
+
+msgid "Extent Aggregate Field"
+msgstr "Chan agremante ekstansyon"
+
+msgid "Raster Field"
+msgstr "Chan raster"
+
+msgid "No geometry value provided."
+msgstr "Pa gen okenn valè jeyometri"
+
+msgid "Invalid geometry value."
+msgstr "Valè jeyometri pa valab"
+
+msgid "Invalid geometry type."
+msgstr "Tip jeyometri pa valab"
+
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr ""
+"Yon erè fèt pandan y ap transfòme jeyometri a nan SRID chan fòm jeyometri a."
+
+msgid "Delete all Features"
+msgstr "Efase tout Karakteristik yo"
+
+msgid "Debugging window (serialized value)"
+msgstr "Fenèt debogaj (valè serializé)"
+
+msgid "No feeds are registered."
+msgstr "Pa gen okenn feed ki anrejistre."
+
+#, python-format
+msgid "Slug %r isn’t registered."
+msgstr "Slug %r pa anrejistre."

@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2012,2014-2015,2019
+# Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2012,2014-2015,2019
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kristian Øllegaard <kristian@oellegaard.com>, 2012
@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 18:45+0000\n"
-"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>, "
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 18:45+0000\n"
+"Last-Translator: Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, "
 "2012,2014-2015,2019\n"
 "Language-Team: Danish (http://app.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"

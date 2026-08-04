@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Batist D 🐍 <baptiste+transifex@darthenay.fr>, 2013-2016
+# Baptiste D <baptiste.darthenay@gmail.com>, 2013-2016
 # Matthieu Desplantes <matmututu@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-04-13 08:19+0000\n"
-"Last-Translator: Matthieu Desplantes <matmututu@gmail.com>\n"
-"Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 20:19+0000\n"
+"Last-Translator: Matthieu Desplantes <matmututu@gmail.com>, 2021\n"
+"Language-Team: Esperanto (http://app.transifex.com/django/django/language/"
 "eo/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -99,16 +99,16 @@ msgstr "Bonvolu instali docutils-n"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python’s <a href=\"%(link)s"
-"\">docutils</a> library."
+"The admin documentation system requires Python’s <a "
+"href=\"%(link)s\">docutils</a> library."
 msgstr ""
 
 #, python-format
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
 msgstr ""
-"Bonvolu demandi al viaj administrantoj instali <a href=\"%(link)s"
-"\">docutils</a>-n."
+"Bonvolu demandi al viaj administrantoj instali <a "
+"href=\"%(link)s\">docutils</a>-n."
 
 #, python-format
 msgid "Model: %(name)s"

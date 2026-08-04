@@ -1,0 +1,334 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jean Patrick Prenis <patrickprenice@gmail.com>, 2025
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
+"Last-Translator: Jean Patrick Prenis <patrickprenice@gmail.com>, 2025\n"
+"Language-Team: Haitian (Haitian Creole) (http://app.transifex.com/django/"
+"django/language/ht/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ht\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Personal info"
+msgstr "Enfòmasyon pèsonèl"
+
+msgid "Permissions"
+msgstr "Otorizasyon"
+
+msgid "Important dates"
+msgstr "Dat enpòtan yo"
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "%(name)s objè ki gen kle prensipal %(key)r la pa egziste"
+
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Done fòmilè ki soumèt yo an konfli. Tanpri eseye ankò."
+
+msgid "Password changed successfully."
+msgstr "Modpas la chanje avèk siksè."
+
+msgid "Password-based authentication was disabled."
+msgstr "Otantifikasyon ki baze sou modpas te dezaktive"
+
+#, python-format
+msgid "Change password: %s"
+msgstr "Chanje modpas: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Mete modpas: %s"
+
+msgid "Authentication and Authorization"
+msgstr "Otantifikasyon ak Otorizasyon"
+
+msgid "password"
+msgstr "modpas"
+
+msgid "last login"
+msgstr "dènye koneksyon"
+
+msgid "Reset password"
+msgstr "Chanje modpas ou"
+
+msgid "Set password"
+msgstr "Mete modpas"
+
+msgid "The two password fields didn’t match."
+msgstr "De chan modpas yo pa menm."
+
+msgid "Password"
+msgstr "Modpas"
+
+msgid "Password confirmation"
+msgstr "Konfimasyon modpas"
+
+msgid "Enter the same password as before, for verification."
+msgstr "Antre menm modpas la ankò, pou verifikasyon."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Si itilizatè a ap ka otantifye ak yon modpas oswa ou pa. Si opsyon sa "
+"dezaktive, yo ka toujou otantifye ak lòt ‘backend’, tankou Single Sign-On "
+"oswa LDAP."
+
+msgid "Password-based authentication"
+msgstr "Otantifikasyon ki baze sou modpas"
+
+msgid "Enabled"
+msgstr "Aktive"
+
+msgid "Disabled"
+msgstr "Dezaktive"
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+"Modpas an klè yo pa estoke, kidonk pa gen okenn fason pou wè modpas "
+"itilizatè a."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Pou pèmèt itilizatè sa a konekte ak modpas, tanpri chwazi yon modpas pou li."
+
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+"Tanpri antre non %(username)s ak modpas ki kòrèk yo. Remake byen ke tou de "
+"chan yo ka sansib a majiskil ak miniskil."
+
+msgid "This account is inactive."
+msgstr "Kont sa a pa aktif."
+
+msgid "Email"
+msgstr "imèl"
+
+msgid "New password"
+msgstr "Nouvo modpas"
+
+msgid "New password confirmation"
+msgstr "Konfimasyon nouvo modpas"
+
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Ou pa byen mete ansyen modpas ou a. Tanpri antre li ankò."
+
+msgid "Old password"
+msgstr "Ansyen modpas"
+
+msgid "algorithm"
+msgstr "algoritm"
+
+msgid "iterations"
+msgstr "iterasyon"
+
+msgid "salt"
+msgstr "sèl"
+
+msgid "hash"
+msgstr "hachaj"
+
+msgid "variety"
+msgstr "varyete"
+
+msgid "version"
+msgstr "vèsyon"
+
+msgid "memory cost"
+msgstr "pri memwa"
+
+msgid "time cost"
+msgstr "pri tan"
+
+msgid "parallelism"
+msgstr "paralelis"
+
+msgid "work factor"
+msgstr "faktè travay"
+
+msgid "checksum"
+msgstr "sòm kontwòl"
+
+msgid "block size"
+msgstr "dimansyon blòk"
+
+msgid "name"
+msgstr "non"
+
+msgid "content type"
+msgstr "kalite kontni"
+
+msgid "codename"
+msgstr "non kod"
+
+msgid "permission"
+msgstr "pèmisyon"
+
+msgid "permissions"
+msgstr "pèmisyon yo"
+
+msgid "group"
+msgstr "gwoup"
+
+msgid "groups"
+msgstr "gwoup yo"
+
+msgid "superuser status"
+msgstr "estati sipè itilizatè"
+
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Deziyen ke itilizatè sa a gen tout pèmisyon san yo pa bezwen asiyen yo youn "
+"pa youn."
+
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of their groups."
+msgstr ""
+"Gwoup itilizatè sa a fè pati ladan yo. Yon itilizatè ap jwenn tout pèmisyon "
+"ki bay chak gwoup li fè pati ladan yo."
+
+msgid "user permissions"
+msgstr "pèmisyon itilizatè yo"
+
+msgid "Specific permissions for this user."
+msgstr "Otorizasyon espesifik pou itilizatè sa a."
+
+msgid "username"
+msgstr "non itilizatè"
+
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Obligatwa. 150 karaktè oswa mwens. Lèt, chif ak @/./+/-/_ sèlman."
+
+msgid "A user with that username already exists."
+msgstr "Gen deja yon itilizatè ak non sa a."
+
+msgid "first name"
+msgstr "prenon"
+
+msgid "last name"
+msgstr "non fanmi"
+
+msgid "email address"
+msgstr "adrès imel"
+
+msgid "staff status"
+msgstr "estati anplwaye yo"
+
+msgid "Designates whether the user can log into this admin site."
+msgstr "Endike si itilizatè a ka konekte nan sit admin sa."
+
+msgid "active"
+msgstr "aktiv"
+
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Endike si yo dwe konsidere itilizatè sa a kòm aktif. Dezaktive opsyon sa a, "
+"olye pou efase kont yo."
+
+msgid "date joined"
+msgstr "dat ou rantre"
+
+msgid "user"
+msgstr "itilizatè"
+
+msgid "users"
+msgstr "itilizatè yo"
+
+#, python-format
+msgid "This password is too short. It must contain at least %d character."
+msgid_plural ""
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "Modpas ou a dwe gen omwen %d karaktè."
+msgstr[1] "Modpas sa twò kout. Li dwe gen omwen %d karaktè."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Modpas ou a dwe gen omwen %(min_length)d karaktè."
+msgstr[1] "Modpas ou a dwe gen omwen %(min_length)d karaktè."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Modpas la twò sanble ak %(verbose_name)s"
+
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "Modpas sa twò sanble ak lòt enfòmasyon pèsonèl ou yo."
+
+msgid "This password is too common."
+msgstr "Modpas sa twò komen."
+
+msgid "Your password can’t be a commonly used password."
+msgstr "Modpas ou a pa dwe yon modpas ki souvan itilize."
+
+msgid "This password is entirely numeric."
+msgstr "Modpas sa fèt sèlman ak chif."
+
+msgid "Your password can’t be entirely numeric."
+msgstr "Modpas ou a pa dwe sèlman gen chif."
+
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "Reyajiste modpas la sou %(site_name)s"
+
+msgid "No password set."
+msgstr "Pa gen modpas ki defini."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Fòma modpas ki pa valab oswa algoritm hachaj enkoni."
+
+msgid ""
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
+msgstr ""
+"Antre yon non itilizatè ki valab. Valè sa a ka genyen sèlman lèt miniskil "
+"san aksan soti nan A rive nan Z ak lèt ​​majiskil soti nan A rive nan Z, chif, "
+"ak karaktè @/./+/-/_."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Antre yon non itilizatè ki valab. Valè sa a ka genyen sèlman lèt, chif, ak "
+"karaktè @/./+/-/_."
+
+msgid "Logged out"
+msgstr "dekonekte"
+
+msgid "Password reset"
+msgstr "Reyajiste modpas"
+
+msgid "Password reset sent"
+msgstr "Nou voye yon imel pou ou ka reyajiste modpas ou"
+
+msgid "Enter new password"
+msgstr "Antre yon nouvo modpas"
+
+msgid "Password reset unsuccessful"
+msgstr "Reyajisteman modpas la pa reyisi"
+
+msgid "Password reset complete"
+msgstr "Reyajisteman modpas la fini"
+
+msgid "Password change"
+msgstr "chanje modpas ou"
+
+msgid "Password change successful"
+msgstr "Modpas ou a chanje avèk siksè"

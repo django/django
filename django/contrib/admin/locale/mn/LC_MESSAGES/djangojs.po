@@ -9,10 +9,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2019-02-13 09:19+0000\n"
-"Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
-"Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 07:59+0000\n"
+"Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011-2012,2015,2019\n"
+"Language-Team: Mongolian (http://app.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,11 +26,8 @@ msgstr "Боломжтой %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Энэ %s жагсаалт нь боломжит утгын жагсаалт. Та аль нэгийг нь сонгоод \"Сонгох"
-"\" дээр дарж нөгөө хэсэгт оруулах боломжтой."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -39,18 +36,17 @@ msgstr "Энэ нүдэнд бичээд дараах %s жагсаалтаас 
 msgid "Filter"
 msgstr "Шүүлтүүр"
 
-msgid "Choose all"
-msgstr "Бүгдийг нь сонгох"
+#, javascript-format
+msgid "Choose all %s"
+msgstr ""
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Бүгдийг сонгох бол %s дарна уу"
+msgid "Choose selected %s"
+msgstr ""
 
-msgid "Choose"
-msgstr "Сонгох"
-
-msgid "Remove"
-msgstr "Хас"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr ""
 
 #, javascript-format
 msgid "Chosen %s"
@@ -58,18 +54,25 @@ msgstr "Сонгогдсон %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Энэ %s сонгогдсон утгуудыг жагсаалт. Та аль нэгийг нь хасахыг хүсвэл сонгоох "
-"\"Хас\" дээр дарна уу."
-
-msgid "Remove all"
-msgstr "Бүгдийг арилгах"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "%s ийн сонгоод бүгдийг нь арилгана"
+msgid "Type into this box to filter down the list of selected %s."
+msgstr ""
+
+msgid "(click to clear)"
+msgstr ""
+
+#, javascript-format
+msgid "Remove all %s"
+msgstr ""
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -83,21 +86,16 @@ msgstr ""
 "Хадгалаагүй өөрчлөлтүүд байна. Энэ үйлдэлийг хийвэл өөрчлөлтүүд устах болно."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Та 1 үйлдлийг сонгосон байна, гэвч та өөрийн өөрчлөлтүүдээ тодорхой "
-"талбаруудад нь оруулагүй байна. OK дарж сануулна уу. Энэ үйлдлийг та дахин "
-"хийх шаардлагатай."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"Та 1 үйлдлийг сонгосон байна бас та ямарваа өөрчлөлт оруулсангүй. Та Save "
-"товчлуур биш Go товчлуурыг хайж байгаа бололтой."
 
 msgid "Now"
 msgstr "Одоо"
@@ -114,17 +112,26 @@ msgstr "Үд дунд"
 msgid "6 p.m."
 msgstr "18 цаг"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Та серверийн цагаас %s цагийн түрүүнд явж байна"
-msgstr[1] "Та серверийн цагаас %s цагийн түрүүнд явж байна"
+msgid "server"
+msgstr ""
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Та серверийн цагаас %s цагаар хоцорч байна"
-msgstr[1] "Та серверийн цагаас %s цагаар хоцорч байна"
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Choose a Time"
 msgstr "Цаг сонгох"
@@ -138,14 +145,29 @@ msgstr "Болих"
 msgid "Today"
 msgstr "Өнөөдөр"
 
+msgid "Today (%(date)s)"
+msgstr ""
+
 msgid "Choose a Date"
 msgstr "Өдөр сонгох"
 
 msgid "Yesterday"
 msgstr "Өчигдөр"
 
+msgid "Yesterday (%(date)s)"
+msgstr ""
+
 msgid "Tomorrow"
 msgstr "Маргааш"
+
+msgid "Tomorrow (%(date)s)"
+msgstr ""
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr ""
+
+msgid "Next (%(month)s %(year)s)"
+msgstr ""
 
 msgid "January"
 msgstr "1-р сар"
@@ -183,6 +205,103 @@ msgstr "11-р сар"
 msgid "December"
 msgstr "12-р сар"
 
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr ""
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr ""
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr ""
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr ""
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr ""
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr ""
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr ""
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr ""
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr ""
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr ""
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr ""
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr ""
+
+msgid "Sunday"
+msgstr ""
+
+msgid "Monday"
+msgstr ""
+
+msgid "Tuesday"
+msgstr ""
+
+msgid "Wednesday"
+msgstr ""
+
+msgid "Thursday"
+msgstr ""
+
+msgid "Friday"
+msgstr ""
+
+msgid "Saturday"
+msgstr ""
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr ""
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr ""
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr ""
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr ""
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr ""
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr ""
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr ""
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "Н"
@@ -211,8 +330,17 @@ msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Бя"
 
-msgid "Show"
-msgstr "Үзэх"
+msgid "%(month)s %(day)s, %(year)s"
+msgstr ""
 
-msgid "Hide"
-msgstr "Нуух"
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr ""

@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-03-09 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2026\n"
 "Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
 "id/)\n"
@@ -186,8 +186,13 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 "Tekan “Control”, atau “Command” pada Mac, untuk memilih lebih dari satu."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Pilih objek ini untuk suatu aksi - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -249,13 +254,13 @@ msgstr "Ubah %s"
 msgid "View %s"
 msgstr "Lihat %s"
 
-msgid "Database error"
-msgstr "Galat basis data"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s berhasil diubah."
+
+msgid "Database error"
+msgstr "Galat basis data"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -279,6 +284,16 @@ msgstr "Ubah riwayat: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
 
 #, python-format
 msgid ""
@@ -332,9 +347,6 @@ msgstr ""
 msgid "Run"
 msgstr "Berjalan"
 
-msgid "Click here to select the objects across all pages"
-msgstr "Klik di sini untuk memilih semua objek pada semua laman"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Pilih seluruh %(total_count)s %(module_name)s"
@@ -344,10 +356,6 @@ msgstr "Bersihkan pilihan"
 
 msgid "Breadcrumbs"
 msgstr "Breadcrumbs"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Model pada aplikasi %(name)s"
 
 msgid "Model name"
 msgstr "Nama model"
@@ -459,6 +467,10 @@ msgstr "Ganti tema (tema saat ini: terang)"
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "Ganti tema (tema saat ini: gelap)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -662,6 +674,9 @@ msgstr "Hapus %(model)s yang dipilih"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Menampilkan %(model)s terpilih"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr ""

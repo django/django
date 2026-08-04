@@ -7,10 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-07-25 07:05+0000\n"
-"Last-Translator: Jihad Bahmaid Al-Halki\n"
-"Language-Team: Arabic (Algeria) (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
+"Last-Translator: Jihad Bahmaid Al-Halki, 2022\n"
+"Language-Team: Arabic (Algeria) (http://app.transifex.com/django/django/"
 "language/ar_DZ/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -31,8 +31,8 @@ msgstr "تم حذف %(count)d %(items)s بنجاح."
 msgid "Cannot delete %(name)s"
 msgstr "لا يمكن حذف %(name)s"
 
-msgid "Are you sure?"
-msgstr "هل أنت متأكد؟"
+msgid "Delete multiple objects"
+msgstr "حذف عدّة عناصر"
 
 msgid "Administration"
 msgstr "الإدارة"
@@ -181,6 +181,14 @@ msgstr ""
 "لإختيار أكثر من أختيار واحد."
 
 #, python-brace-format
+msgid "Select this object for an action - {}"
+msgstr ""
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
+
+#, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "تمت إضافة {name} \\\"{obj}\\\" بنجاح."
 
@@ -196,10 +204,6 @@ msgstr "تمت إضافة {name} \\\"{obj}\\\" بنجاح. يمكنك إضافة
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr "تم تغيير {name} \\\"{obj}\\\" بنجاح. يمكنك تعديله مرة أخرى أدناه."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "تمت إضافة {name} \\\"{obj}\\\" بنجاح. يمكنك تعديله مرة أخرى أدناه."
 
 #, python-brace-format
 msgid ""
@@ -239,9 +243,6 @@ msgstr "عدّل %s"
 msgid "View %s"
 msgstr "عرض %s"
 
-msgid "Database error"
-msgstr "خطـأ في قاعدة البيانات"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -251,6 +252,9 @@ msgstr[2] "تم تغيير %(count)s %(name)s بنجاح."
 msgstr[3] "تم تغيير %(count)s %(name)s بنجاح."
 msgstr[4] "تم تغيير %(count)s %(name)s بنجاح."
 msgstr[5] "تم تغيير %(count)s %(name)s بنجاح."
+
+msgid "Database error"
+msgstr "خطـأ في قاعدة البيانات"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -266,6 +270,9 @@ msgstr[5] "تم تحديد %(total_count)s"
 msgid "0 of %(cnt)s selected"
 msgstr "لا شيء محدد من %(cnt)s"
 
+msgid "Delete"
+msgstr "احذف"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "تاريخ التغيير: %s"
@@ -276,6 +283,21 @@ msgstr "تاريخ التغيير: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #, python-format
 msgid ""
@@ -326,14 +348,8 @@ msgstr ""
 "كان هناك خطأ. تم إعلام المسؤولين عن الموقع عبر البريد الإلكتروني وسوف يتم "
 "إصلاح الخطأ قريباً. شكراً على صبركم."
 
-msgid "Run the selected action"
-msgstr "نفذ الإجراء المحدّد"
-
-msgid "Go"
-msgstr "نفّذ"
-
-msgid "Click here to select the objects across all pages"
-msgstr "اضغط هنا لتحديد جميع العناصر في جميع الصفحات"
+msgid "Run"
+msgstr ""
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -342,9 +358,17 @@ msgstr "اختيار %(total_count)s %(module_name)s جميعها"
 msgid "Clear selection"
 msgstr "إزالة الاختيار"
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "النماذج في تطبيق %(name)s"
+msgid "Breadcrumbs"
+msgstr ""
+
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
 
 msgid "Add"
 msgstr "أضف"
@@ -355,28 +379,44 @@ msgstr "عرض"
 msgid "You don’t have permission to view or edit anything."
 msgstr "ليس لديك الصلاحية لعرض أو تعديل أي شيء."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"أولاً، أدخل اسم مستخدم وكلمة مرور. ومن ثم تستطيع تعديل المزيد من خيارات "
-"المستخدم."
 
-msgid "Enter a username and password."
-msgstr "أدخل اسم مستخدم وكلمة مرور."
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "غيّر كلمة المرور"
 
-msgid "Please correct the error below."
-msgstr "يرجى تصحيح الخطأ أدناه."
+msgid "Set password"
+msgstr ""
 
-msgid "Please correct the errors below."
-msgstr "الرجاء تصحيح الأخطاء أدناه."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "أدخل كلمة مرور جديدة للمستخدم <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "أهلا، "
@@ -403,8 +443,17 @@ msgstr "مشاهدة على الموقع"
 msgid "Filter"
 msgstr "مرشّح"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
 msgid "Clear all filters"
 msgstr "مسح جميع المرشحات"
+
+msgid "Save"
+msgstr "احفظ"
 
 msgid "Remove from sorting"
 msgstr "إزالة من الترتيب"
@@ -416,33 +465,37 @@ msgstr "أولوية الترتيب: %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "عكس الترتيب"
 
-msgid "Delete"
-msgstr "احذف"
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"حذف العنصر %(object_name)s '%(escaped_object)s' سيتسبب بحذف العناصر المرتبطة "
-"به، إلا أنك لا تملك صلاحية حذف العناصر التالية:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"حذف %(object_name)s '%(escaped_object)s' سيتسبب أيضاً بحذف العناصر المرتبطة، "
-"إلا أن حسابك ليس لديه صلاحية حذف أنواع العناصر التالية:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"متأكد أنك تريد حذف العنصر %(object_name)s \\\"%(escaped_object)s\\\"؟ سيتم "
-"حذف جميع العناصر التالية المرتبطة به:"
 
 msgid "Objects"
 msgstr "عناصر"
@@ -452,9 +505,6 @@ msgstr "نعم، أنا متأكد"
 
 msgid "No, take me back"
 msgstr "لا, تراجع للخلف"
-
-msgid "Delete multiple objects"
-msgstr "حذف عدّة عناصر"
 
 #, python-format
 msgid ""
@@ -500,6 +550,15 @@ msgstr "إجراءاتي"
 msgid "None available"
 msgstr "لا يوجد"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "مُحتوى مجهول"
 
@@ -519,11 +578,14 @@ msgstr ""
 "أنت مسجل الدخول بإسم المستخدم %(username)s, ولكنك غير مخول للوصول لهذه "
 "الصفحة. هل ترغب بتسجيل الدخول بحساب آخر؟"
 
-msgid "Forgotten your password or username?"
-msgstr "نسيت كلمة المرور أو اسم المستخدم الخاص بك؟"
+msgid "Forgotten your login credentials?"
+msgstr ""
 
 msgid "Toggle navigation"
 msgstr "تغيير التنقل"
+
+msgid "Sidebar"
+msgstr ""
 
 msgid "Start typing to filter…"
 msgstr "ابدأ بالكتابة لبدء التصفية(الفلترة)..."
@@ -540,11 +602,18 @@ msgstr "المستخدم"
 msgid "Action"
 msgstr "إجراء"
 
-msgid "entry"
+#, python-format
+msgid "Pagination %(name)s entries"
 msgstr ""
 
-msgid "entries"
-msgstr ""
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -553,14 +622,19 @@ msgstr ""
 "ليس لهذا العنصر سجلّ تغييرات، على الأغلب أنه لم يُنشأ من خلال نظام إدارة "
 "الموقع."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "أظهر الكل"
 
-msgid "Save"
-msgstr "احفظ"
-
 msgid "Popup closing…"
 msgstr "إغلاق المنبثقة ..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "ابحث"
@@ -608,6 +682,9 @@ msgstr "حذف %(model)s المختارة"
 
 #, python-format
 msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Logout"
 msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
@@ -684,8 +761,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "رجاءً اذهب إلى الصفحة التالية واختر كلمة مرور جديدة:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "اسم المستخدم الخاص بك، في حال كنت قد نسيته:"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "شكراً لاستخدامك موقعنا!"
@@ -706,6 +783,9 @@ msgstr "عنوان البريد الإلكتروني:"
 
 msgid "Reset my password"
 msgstr "استعد كلمة مروري"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "كافة التواريخ"

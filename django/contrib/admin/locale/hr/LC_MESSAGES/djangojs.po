@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-25 15:04-0500\n"
-"PO-Revision-Date: 2025-12-03 07:59+0000\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 07:59+0000\n"
 "Last-Translator: Mislav Cimperšak <mislav.cimpersak@gmail.com>, 2015\n"
 "Language-Team: Croatian (http://app.transifex.com/django/django/language/"
 "hr/)\n"
@@ -19,8 +19,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: hr\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -102,11 +102,9 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"Odabrali ste radnju i niste uradili nikakve promjene u pojedinačnim poljima. "
-"Vjerojatno tražite gumb „Kreni“, a ne gumb „Spremi“."
 
 msgid "Now"
 msgstr "Sada"
@@ -123,19 +121,28 @@ msgstr "Podne"
 msgid "6 p.m."
 msgstr "6 popodne"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Napomena: Vi ste %s sat ispred vremena servera."
-msgstr[1] "Napomena: Vi ste %s sata ispred vremena servera."
-msgstr[2] "Napomena: Vi ste %s sati ispred vremena servera."
+msgid "server"
+msgstr ""
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Napomena: Vi ste %s sat iza vremena servera."
-msgstr[1] "Napomena: Vi ste %s sata iza vremena servera."
-msgstr[2] "Napomena: Vi ste %s sati iza vremena servera."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 msgid "Choose a Time"
 msgstr "Odaberite vrijeme"
@@ -149,14 +156,29 @@ msgstr "Odustani"
 msgid "Today"
 msgstr "Danas"
 
+msgid "Today (%(date)s)"
+msgstr ""
+
 msgid "Choose a Date"
 msgstr "Odaberite datum"
 
 msgid "Yesterday"
 msgstr "Jučer"
 
+msgid "Yesterday (%(date)s)"
+msgstr ""
+
 msgid "Tomorrow"
 msgstr "Sutra"
+
+msgid "Tomorrow (%(date)s)"
+msgstr ""
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr ""
+
+msgid "Next (%(month)s %(year)s)"
+msgstr ""
 
 msgid "January"
 msgstr "Siječanj"
@@ -318,3 +340,18 @@ msgstr "P"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
+
+msgid "%(month)s %(day)s, %(year)s"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr ""

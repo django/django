@@ -6,15 +6,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Khmer (http://www.transifex.com/django/django/language/km/)\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>, 2011\n"
+"Language-Team: Khmer (http://app.transifex.com/django/django/language/km/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: km\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr ""
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -24,11 +28,7 @@ msgstr ""
 msgid "Cannot delete %(name)s"
 msgstr ""
 
-msgid "Are you sure?"
-msgstr "តើលោកអ្នកប្រាកដទេ?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
+msgid "Delete multiple objects"
 msgstr ""
 
 msgid "Administration"
@@ -67,6 +67,12 @@ msgstr ""
 msgid "Has date"
 msgstr ""
 
+msgid "Empty"
+msgstr ""
+
+msgid "Not empty"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -83,6 +89,15 @@ msgstr ""
 msgid "Remove"
 msgstr "លប់ចេញ"
 
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "ផ្លាស់ប្តូរ"
+
+msgid "Deletion"
+msgstr ""
+
 msgid "action time"
 msgstr "ពេលវេលាប្រតិបត្តិការ"
 
@@ -96,7 +111,7 @@ msgid "object id"
 msgstr "លេខ​សំគាល់​កម្មវិធី (object id)"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "object repr"
 
@@ -113,22 +128,22 @@ msgid "log entries"
 msgstr "កំណត់ហេតុ"
 
 #, python-format
-msgid "Added \"%(object)s\"."
+msgid "Added “%(object)s”."
 msgstr ""
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
 msgstr ""
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
+msgid "Deleted “%(object)s.”"
 msgstr ""
 
 msgid "LogEntry Object"
 msgstr ""
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
+msgid "Added {name} “{object}”."
 msgstr ""
 
 msgid "Added."
@@ -138,7 +153,7 @@ msgid "and"
 msgstr "និង"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
 msgstr ""
 
 #, python-brace-format
@@ -146,7 +161,7 @@ msgid "Changed {fields}."
 msgstr ""
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
 msgstr ""
 
 msgid "No fields changed."
@@ -155,38 +170,42 @@ msgstr "ពុំមានទិន្នន័យត្រូវបានផ្
 msgid "None"
 msgstr ""
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr ""
+
+#, python-brace-format
+msgid "Select this object for an action - {}"
+msgstr ""
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+"The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
+msgid "The {name} “{obj}” was changed successfully."
 msgstr ""
 
 msgid ""
@@ -198,11 +217,11 @@ msgid "No action selected."
 msgstr ""
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "ឈ្មោះកម្មវិធី %(name)s \"%(obj)s\" ត្រូវបានលប់ដោយជោគជ័យ។"
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr ""
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr ""
 
 #, python-format
@@ -213,13 +232,17 @@ msgstr "បន្ថែម %s"
 msgid "Change %s"
 msgstr "ផ្លាស់ប្តូរ %s"
 
-msgid "Database error"
-msgstr "ទិន្នន័យមូលដ្ឋានមានបញ្ហា"
+#, python-format
+msgid "View %s"
+msgstr ""
 
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] ""
+
+msgid "Database error"
+msgstr "ទិន្នន័យមូលដ្ឋានមានបញ្ហា"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -230,15 +253,29 @@ msgstr[0] ""
 msgid "0 of %(cnt)s selected"
 msgstr ""
 
+msgid "Delete"
+msgstr "លប់"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "សកម្មភាពផ្លាស់ប្តូរកន្លងមក : %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr ""
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
 
 #, python-format
 msgid ""
@@ -265,8 +302,8 @@ msgstr ""
 msgid "Page not found"
 msgstr "ទំព័រ​ដែល​លោកអ្នកចង់​រក​នេះពុំមាន​នៅក្នុងម៉ាស៊ីនរបស់យើងខ្ញុំទេ"
 
-msgid "We're sorry, but the requested page could not be found."
-msgstr "សួមអភ័យទោស ទំព័រ​ដែល​លោកអ្នកចង់​រក​នេះពុំមាន​នឹងក្នុងម៉ាស៊ីនរបស់យើងខ្ញុំទេ"
+msgid "We’re sorry, but the requested page could not be found."
+msgstr ""
 
 msgid "Home"
 msgstr "គេហទំព័រ"
@@ -281,17 +318,11 @@ msgid "Server Error <em>(500)</em>"
 msgstr "ម៉ាស៊ីនផ្តល់សេវាកម្ម​ មានបញ្ហា  <em>(៥០០)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 
-msgid "Run the selected action"
-msgstr ""
-
-msgid "Go"
-msgstr "ស្វែងរក"
-
-msgid "Click here to select the objects across all pages"
+msgid "Run"
 msgstr ""
 
 #, python-format
@@ -301,26 +332,59 @@ msgstr ""
 msgid "Clear selection"
 msgstr ""
 
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
+msgid "Breadcrumbs"
 msgstr ""
-"តំបូងសូមបំពេញ ឈ្មោះជាសមាជិក និង ពាក្យសំងាត់​។ បន្ទាប់មកលោកអ្នកអាចបំពេញបន្ថែមជំរើសផ្សេងៗទៀតបាន។ "
 
-msgid "Enter a username and password."
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
+
+msgid "Add"
+msgstr "បន្ថែម"
+
+msgid "View"
+msgstr ""
+
+msgid "You don’t have permission to view or edit anything."
+msgstr ""
+
+msgid "After you’ve created a user, you’ll be able to edit more user options."
+msgstr ""
+
+msgid "Error:"
 msgstr ""
 
 msgid "Change password"
 msgstr "ផ្លាស់ប្តូរពាក្យសំងាត់"
 
-msgid "Please correct the error below."
+msgid "Set password"
 msgstr ""
 
-msgid "Please correct the errors below."
-msgstr ""
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr ""
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
 msgstr ""
 
 msgid "Welcome,"
@@ -348,6 +412,18 @@ msgstr "មើលនៅលើគេហទំព័រដោយផ្ទាល់
 msgid "Filter"
 msgstr "ស្វែងរកជាមួយ"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
+msgid "Clear all filters"
+msgstr ""
+
+msgid "Save"
+msgstr "រក្សាទុក"
+
 msgid "Remove from sorting"
 msgstr ""
 
@@ -358,42 +434,45 @@ msgstr ""
 msgid "Toggle sorting"
 msgstr ""
 
-msgid "Delete"
-msgstr "លប់"
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"ការលប់ %(object_name)s '%(escaped_object)s' អាចធ្វើអោយ​កម្មវិធីដែលពាក់​ព័ន្ធបាត់បង់ ។"
-" ក៏ប៉ន្តែលោកអ្នក​ពុំមាន​សិទ្ធិលប់​កម្មវិធី​ប្រភេទនេះទេ។"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"តើលោកអ្នកប្រាកដជាចង់លប់ %(object_name)s \"%(escaped_object)s"
-"\"? ការលប់ %(object_name)s '%(escaped_object)s' អាចធ្វើអោយ​កម្មវិធីដែលពាក់​ព័ន្ធបាត់បង់។"
 
 msgid "Objects"
 msgstr ""
 
-msgid "Yes, I'm sure"
-msgstr "ខ្ញុំច្បាស់​ជាចង់លប់"
-
-msgid "No, take me back"
+msgid "Yes, I’m sure"
 msgstr ""
 
-msgid "Delete multiple objects"
+msgid "No, take me back"
 msgstr ""
 
 #, python-format
@@ -415,9 +494,6 @@ msgid ""
 "following objects and their related items will be deleted:"
 msgstr ""
 
-msgid "Change"
-msgstr "ផ្លាស់ប្តូរ"
-
 msgid "Delete?"
 msgstr ""
 
@@ -428,16 +504,6 @@ msgstr "ដោយ​  %(filter_title)s "
 msgid "Summary"
 msgstr ""
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr ""
-
-msgid "Add"
-msgstr "បន្ថែម"
-
-msgid "You don't have permission to edit anything."
-msgstr "លោកអ្នកពុំមានសិទ្ធិ ផ្លាស់​ប្តូរ ទេ។"
-
 msgid "Recent actions"
 msgstr ""
 
@@ -447,16 +513,23 @@ msgstr ""
 msgid "None available"
 msgstr "គ្មាន"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr ""
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"មូលដ្ឋាន​ទិន្នន័យ​​​ របស់លោកអ្នក មានបញ្ហា។ តើ លោកអ្នកបាន បង្កើត តារាង​ របស់មូលដ្ឋានទិន្នន័យ​"
-" ហើយឬនៅ? តើ​ លោកអ្នកប្រាកដថាសមាជិកអាចអានមូលដ្ឋានទិន្នន័យនេះ​​បានឬទេ? "
 
 #, python-format
 msgid ""
@@ -464,7 +537,19 @@ msgid ""
 "page. Would you like to login to a different account?"
 msgstr ""
 
-msgid "Forgotten your password or username?"
+msgid "Forgotten your login credentials?"
+msgstr ""
+
+msgid "Toggle navigation"
+msgstr ""
+
+msgid "Sidebar"
+msgstr ""
+
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
 msgstr ""
 
 msgid "Date/time"
@@ -476,31 +561,31 @@ msgstr "សមាជិក"
 msgid "Action"
 msgstr "សកម្មភាព"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
-"កម្មវិធីនេះមិនមានសកម្មភាព​កន្លងមកទេ។ ប្រហែលជាសកម្មភាពទាំងនេះមិនបានធ្វើនៅទំព័រគ្រប់គ្រងនេះ។"
+
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
 
 msgid "Show all"
 msgstr "បង្ហាញទាំងអស់"
 
-msgid "Save"
-msgstr "រក្សាទុក"
-
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr ""
 
 #, python-format
-msgid "Change selected %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Delete selected %(model)s"
+msgid "Search %(name)s"
 msgstr ""
 
 msgid "Search"
@@ -524,8 +609,33 @@ msgstr "រក្សាទុក ហើយ បន្ថែម​ថ្មី"
 msgid "Save and continue editing"
 msgstr "រក្សាទុក ហើយ កែឯកសារដដែល"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "សូមថ្លែងអំណរគុណ ដែលបានចំណាយ ពេលវេលាដ៏មានតំលៃ របស់លោកអ្នកមកទស្សនាគេហទំព័ររបស់យើងខ្ញុំ"
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Logout"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
 
 msgid "Log in again"
 msgstr "ពិនិត្យចូលម្តងទៀត"
@@ -537,9 +647,9 @@ msgid "Your password was changed."
 msgstr "ពាក្យសំងាត់របស់លោកអ្នកបានផ្លាស់ប្តូរហើយ"
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
-msgstr "សូមបំពេញពាក្យសំងាត់ចាស់របស់លោកអ្នក។ ដើម្បីសុវត្ថភាព សូមបំពេញពាក្យសំងាត់ថ្មីខាងក្រោមពីរដង។"
+msgstr ""
 
 msgid "Change my password"
 msgstr "ផ្លាស់ប្តូរពាក្យសំងាត់"
@@ -570,12 +680,12 @@ msgid ""
 msgstr ""
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
 
@@ -588,8 +698,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr ""
 
-msgid "Your username, in case you've forgotten:"
-msgstr "ឈ្មោះជាសមាជិកក្នុងករណីភ្លេច:"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "សូមអរគុណដែលបានប្រើប្រាស់សេវាកម្មរបស់យើងខ្ញុំ"
@@ -599,7 +709,7 @@ msgid "The %(site_name)s team"
 msgstr "ក្រុមរបស់គេហទំព័រ %(site_name)s"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
 
@@ -608,6 +718,9 @@ msgstr ""
 
 msgid "Reset my password"
 msgstr "កំណត់ពាក្យសំងាត់សារជាថ្មី"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "កាលបរិច្ឆេទទាំងអស់"
@@ -619,6 +732,10 @@ msgstr "ជ្រើសរើស %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "ជ្រើសរើស %s ដើម្បីផ្លាស់ប្តូរ"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "កាលបរិច្ឆេទ"

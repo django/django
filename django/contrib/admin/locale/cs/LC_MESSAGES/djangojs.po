@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-25 15:04-0500\n"
-"PO-Revision-Date: 2026-06-01 07:59+0000\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 07:59+0000\n"
 "Last-Translator: J Nezbeda, 2026\n"
 "Language-Team: Czech (http://app.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -125,21 +125,30 @@ msgstr "Poledne"
 msgid "6 p.m."
 msgstr "6h večer"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Poznámka: Váš čas o %s hodinu předstihuje čas na serveru."
-msgstr[1] "Poznámka: Váš čas o %s hodiny předstihuje čas na serveru."
-msgstr[2] "Poznámka: Váš čas o %s hodiny předstihuje čas na serveru."
-msgstr[3] "Poznámka: Váš čas o %s hodin předstihuje čas na serveru."
+msgid "server"
+msgstr ""
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Poznámka: Váš čas se o %s hodinu zpožďuje za časem na serveru."
-msgstr[1] "Poznámka: Váš čas se o %s hodiny zpožďuje za časem na serveru."
-msgstr[2] "Poznámka: Váš čas se o %s hodiny zpožďuje za časem na serveru."
-msgstr[3] "Poznámka: Váš čas se o %s hodin zpožďuje za časem na serveru."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 msgid "Choose a Time"
 msgstr "Vyberte čas"
@@ -153,14 +162,29 @@ msgstr "Storno"
 msgid "Today"
 msgstr "Dnes"
 
+msgid "Today (%(date)s)"
+msgstr ""
+
 msgid "Choose a Date"
 msgstr "Vyberte datum"
 
 msgid "Yesterday"
 msgstr "Včera"
 
+msgid "Yesterday (%(date)s)"
+msgstr ""
+
 msgid "Tomorrow"
 msgstr "Zítra"
+
+msgid "Tomorrow (%(date)s)"
+msgstr ""
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr ""
+
+msgid "Next (%(month)s %(year)s)"
+msgstr ""
 
 msgid "January"
 msgstr "leden"
@@ -322,3 +346,18 @@ msgstr "P"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
+
+msgid "%(month)s %(day)s, %(year)s"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr ""

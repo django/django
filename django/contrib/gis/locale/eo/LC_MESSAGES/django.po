@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Batist D 🐍 <baptiste+transifex@darthenay.fr>, 2012
-# Batist D 🐍 <baptiste+transifex@darthenay.fr>, 2014-2015
+# Baptiste D <baptiste.darthenay@gmail.com>, 2012
+# Baptiste D <baptiste.darthenay@gmail.com>, 2014-2015
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 18:45+0000\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 18:45+0000\n"
 "Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2023\n"
 "Language-Team: Esperanto (http://app.transifex.com/django/django/language/"
 "eo/)\n"

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2025-03-19 11:30-0500\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
 "Last-Translator: Azat, 2023,2025\n"
 "Language-Team: Uyghur (http://app.transifex.com/django/django/language/ug/)\n"
 "MIME-Version: 1.0\n"
@@ -56,13 +56,6 @@ msgstr "پارول"
 
 msgid "last login"
 msgstr "ئاخىرقى كىرگەن ۋاقتى"
-
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr ""
-"ئىناۋەتسىز پارول پىچىمى ياكى يوچۇن مۇكەممەللىكىنى تەكشۈرۈش ھېسابلاش ئۇسۇلى."
-
-msgid "No password set."
-msgstr "پارول تەڭشەلمىگەن."
 
 msgid "Reset password"
 msgstr "ئىم ئەسلىگە قايتۇر"
@@ -300,6 +293,13 @@ msgstr "سىز ئىشلەتكەن پارول ساندىنلا تەركىپ تا�
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "%(site_name)s ئىشلەتكەن پارول ئەسلىگە قايتۇرۇلىدۇ"
+
+msgid "No password set."
+msgstr "پارول تەڭشەلمىگەن."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr ""
+"ئىناۋەتسىز پارول پىچىمى ياكى يوچۇن مۇكەممەللىكىنى تەكشۈرۈش ھېسابلاش ئۇسۇلى."
 
 msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "

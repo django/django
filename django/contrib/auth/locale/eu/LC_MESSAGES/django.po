@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-12-04 08:09+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
 "Last-Translator: Eneko Illarramendi <eneko@illarra.com>, 2017,2023\n"
 "Language-Team: Basque (http://app.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
@@ -33,12 +33,22 @@ msgstr "Data garrantzitsuak"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Ez dago %(key)r gakodun %(name)s objekturik."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr ""
+
 msgid "Password changed successfully."
 msgstr "Ondo aldatu da pasahitza."
+
+msgid "Password-based authentication was disabled."
+msgstr ""
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Pasahitza aldatu: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr ""
 
 msgid "Authentication and Authorization"
 msgstr "Autentikazio eta baimentzea"
@@ -49,11 +59,11 @@ msgstr "pasahitza"
 msgid "last login"
 msgstr "azken sarrera"
 
-msgid "No password set."
-msgstr "Pasahitza ezarri gabe."
+msgid "Reset password"
+msgstr ""
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Pasahitz formatu baliogabea edo hash algoritmo ezezaguna."
+msgid "Set password"
+msgstr ""
 
 msgid "The two password fields didn’t match."
 msgstr "Bi pasahitzak ez datoz bat."
@@ -68,11 +78,27 @@ msgid "Enter the same password as before, for verification."
 msgstr "Idatzi aurreko pasahitz bera, egiaztapenerako."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"Pasahitz gordinak ez direnez jasotzen ez dago erabiltzaile honen pasahitza "
-"ikusterik, baina pasahitza aldatu dezakezu <a href=\"{}\">hemen</a>."
+
+msgid "Password-based authentication"
+msgstr ""
+
+msgid "Enabled"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -99,9 +125,6 @@ msgstr "Zure pasahitz zaharra ez da zuzena. Idatzi ezazu berriro."
 
 msgid "Old password"
 msgstr "Pasahitz zaharra"
-
-msgid "Password (again)"
-msgstr "Pasahitza (berriro)"
 
 msgid "algorithm"
 msgstr "algoritmoak"
@@ -231,17 +254,11 @@ msgid "users"
 msgstr "erabiltzaileak"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"Pasahitz hau laburregia da. Gutxienez karaktere %(min_length)d izan behar du."
 msgstr[1] ""
-"Pasahitz hau laburregia da. Gutxienez %(min_length)d karaktere izan behar "
-"ditu."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -273,6 +290,12 @@ msgstr "Zure pasahitzak ezin du guztiz zenbakizkoa izan."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Pasahitza berrezarri %(site_name)s webgunean"
+
+msgid "No password set."
+msgstr "Pasahitza ezarri gabe."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Pasahitz formatu baliogabea edo hash algoritmo ezezaguna."
 
 msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "

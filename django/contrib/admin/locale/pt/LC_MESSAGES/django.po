@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2013-04-25 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Nuno Mariz <nmariz@gmail.com>, "
 "2013,2015,2017-2018,2023,2025\n"
 "Language-Team: Portuguese (http://app.transifex.com/django/django/language/"
@@ -25,7 +25,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pt\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
+"1000000 == 0 ? 1 : 2;\n"
 
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
@@ -188,8 +189,13 @@ msgstr ""
 "Mantenha premida a tecla  “Control”, ou “Command” no Mac, para selecionar "
 "mais do que uma."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Selecionar este objecto para uma ação - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -253,15 +259,15 @@ msgstr "Modificar %s"
 msgid "View %s"
 msgstr "View %s "
 
-msgid "Database error"
-msgstr "Erro de base de dados"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s foi modificado com sucesso."
 msgstr[1] "%(count)s %(name)s foram modificados com sucesso."
 msgstr[2] "%(count)s %(name)s foram modificados com sucesso."
+
+msgid "Database error"
+msgstr "Erro de base de dados"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -287,6 +293,18 @@ msgstr "Histórico de modificações: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #, python-format
 msgid ""
@@ -340,9 +358,6 @@ msgstr ""
 msgid "Run"
 msgstr "Executar"
 
-msgid "Click here to select the objects across all pages"
-msgstr "Clique aqui para selecionar os objetos em todas as páginas"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Selecionar todos %(total_count)s %(module_name)s"
@@ -352,10 +367,6 @@ msgstr "Remover seleção"
 
 msgid "Breadcrumbs"
 msgstr "Marcas de navegação"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modelos na aplicação %(name)s"
 
 msgid "Model name"
 msgstr "Nome do modelo"
@@ -471,6 +482,10 @@ msgstr "Mudar tema (tema corrente: claro)"
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "Mudar tema (tema corrente: escuro)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -680,6 +695,9 @@ msgstr "Remover %(model)s seleccionado"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Vista selecionada %(model)s"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Obrigado por passar algum tempo de qualidade com a página Web hoje."

@@ -1,8 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Batist D 🐍 <baptiste+transifex@darthenay.fr>, 2012-2013
-# Batist D 🐍 <baptiste+transifex@darthenay.fr>, 2013-2019
+# Baptiste D <baptiste.darthenay@gmail.com>, 2012-2013
+# Baptiste D <baptiste.darthenay@gmail.com>, 2013-2019
 # Claude Paroz <claude@2xlibre.net>, 2016
 # Dinu Gherman <gherman@darwin.in-berlin.de>, 2011
 # kristjan <kristjan.schmidt@googlemail.com>, 2012
@@ -14,10 +14,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-05-25 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Meiyer <interdist+translations@gmail.com>, 2022\n"
-"Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
+"Language-Team: Esperanto (http://app.transifex.com/django/django/language/"
 "eo/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -37,8 +37,8 @@ msgstr "Sukcese forigis %(count)d %(items)s."
 msgid "Cannot delete %(name)s"
 msgstr "Ne povas forigi %(name)s"
 
-msgid "Are you sure?"
-msgstr "Ĉu vi certas?"
+msgid "Delete multiple objects"
+msgstr "Forigi plurajn objektojn"
 
 msgid "Administration"
 msgstr "Administrado"
@@ -185,6 +185,14 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 
 #, python-brace-format
+msgid "Select this object for an action - {}"
+msgstr ""
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
+
+#, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "La {name} “{obj}” estis sukcese aldonita(j)."
 
@@ -199,10 +207,6 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -244,14 +248,14 @@ msgstr "Ŝanĝi %s"
 msgid "View %s"
 msgstr "Vidi %sn"
 
-msgid "Database error"
-msgstr "Datumbaza eraro"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s estis sukcese ŝanĝita."
 msgstr[1] "%(count)s %(name)s estis sukcese ŝanĝitaj."
+
+msgid "Database error"
+msgstr "Datumbaza eraro"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -263,6 +267,9 @@ msgstr[1] "Ĉiuj %(total_count)s elektitaj"
 msgid "0 of %(cnt)s selected"
 msgstr "0 el %(cnt)s elektita"
 
+msgid "Delete"
+msgstr "Forigi"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Ŝanĝa historio: %s"
@@ -273,6 +280,17 @@ msgstr "Ŝanĝa historio: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -321,14 +339,8 @@ msgid ""
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 
-msgid "Run the selected action"
-msgstr "Lanĉi la elektitan agon"
-
-msgid "Go"
-msgstr "Ek"
-
-msgid "Click here to select the objects across all pages"
-msgstr "Klaku ĉi-tie por elekti la objektojn trans ĉiuj paĝoj"
+msgid "Run"
+msgstr ""
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -337,9 +349,17 @@ msgstr "Elekti ĉiuj %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Viŝi elekton"
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modeloj en la aplikaĵo “%(name)s”"
+msgid "Breadcrumbs"
+msgstr ""
+
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
 
 msgid "Add"
 msgstr "Aldoni"
@@ -350,26 +370,40 @@ msgstr "Vidi"
 msgid "You don’t have permission to view or edit anything."
 msgstr ""
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
 
-msgid "Enter a username and password."
-msgstr "Enigu salutnomon kaj pasvorton."
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "Ŝanĝi pasvorton"
 
-msgid "Please correct the error below."
-msgstr "Bonvolu ĝustigi la eraron sube."
+msgid "Set password"
+msgstr ""
 
-msgid "Please correct the errors below."
-msgstr "Bonvolu ĝustigi la erarojn sube."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Enigu novan pasvorton por la uzanto <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "Bonvenon,"
@@ -396,8 +430,17 @@ msgstr "Vidi sur retejo"
 msgid "Filter"
 msgstr "Filtri"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
 msgid "Clear all filters"
 msgstr ""
+
+msgid "Save"
+msgstr "Konservi"
 
 msgid "Remove from sorting"
 msgstr "Forigi el ordigado"
@@ -409,34 +452,37 @@ msgstr "Ordiga prioritato: %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "Ŝalti ordigadon"
 
-msgid "Delete"
-msgstr "Forigi"
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Foriganti la %(object_name)s '%(escaped_object)s' rezultus en foriganti "
-"rilatajn objektojn, sed via konto ne havas permeson por forigi la sekvantajn "
-"tipojn de objektoj:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Forigi la %(object_name)s '%(escaped_object)s' postulus forigi la sekvajn "
-"protektitajn rilatajn objektojn:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Ĉu vi certas, ke vi volas forigi %(object_name)s \"%(escaped_object)s\"? "
-"Ĉiuj el la sekvaj rilataj eroj estos forigitaj:"
 
 msgid "Objects"
 msgstr "Objektoj"
@@ -446,9 +492,6 @@ msgstr "Jes, mi certas"
 
 msgid "No, take me back"
 msgstr "Ne, reen"
-
-msgid "Delete multiple objects"
-msgstr "Forigi plurajn objektojn"
 
 #, python-format
 msgid ""
@@ -494,6 +537,15 @@ msgstr "Miaj agoj"
 msgid "None available"
 msgstr "Neniu disponebla"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "Nekonata enhavo"
 
@@ -511,11 +563,14 @@ msgstr ""
 "Vi estas aŭtentikigita kiel %(username)s, sed ne havas permeson aliri tiun "
 "paĝon. Ĉu vi ŝatus ensaluti per alia konto?"
 
-msgid "Forgotten your password or username?"
-msgstr "Ĉu vi forgesis vian pasvorton aŭ vian salutnomon?"
+msgid "Forgotten your login credentials?"
+msgstr ""
 
 msgid "Toggle navigation"
 msgstr "Ŝalti navigadon"
+
+msgid "Sidebar"
+msgstr ""
 
 msgid "Start typing to filter…"
 msgstr ""
@@ -532,11 +587,14 @@ msgstr "Uzanto"
 msgid "Action"
 msgstr "Ago"
 
-msgid "entry"
+#, python-format
+msgid "Pagination %(name)s entries"
 msgstr ""
 
-msgid "entries"
-msgstr ""
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -545,14 +603,19 @@ msgstr ""
 "Ĉi tiu objekto ne havas historion de ŝanĝoj. Ĝi verŝajne ne estis aldonita "
 "per ĉi tiu administrejo."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "Montri ĉion"
 
-msgid "Save"
-msgstr "Konservi"
-
 msgid "Popup closing…"
 msgstr "Ŝprucfenesto fermiĝas…"
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "Serĉu"
@@ -596,6 +659,9 @@ msgstr "Forigi elektitan %(model)sn"
 
 #, python-format
 msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Logout"
 msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
@@ -674,8 +740,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Bonvolu iri al la sekvanta paĝo kaj elekti novan pasvorton:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Via uzantnomo, se vi forgesis ĝin:"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "Dankon pro uzo de nia retejo!"
@@ -696,6 +762,9 @@ msgstr "Retpoŝto:"
 
 msgid "Reset my password"
 msgstr "Rekomencigi mian pasvorton"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "Ĉiuj datoj"

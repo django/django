@@ -7,10 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-18 21:19+0000\n"
-"Last-Translator: Transifex Bot <>\n"
-"Language-Team: English (Australia) (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
+"Last-Translator: Tom Fifield <tom@tomfifield.net>, 2021\n"
+"Language-Team: English (Australia) (http://app.transifex.com/django/django/"
 "language/en_AU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -50,6 +50,9 @@ msgstr "Bosnian"
 
 msgid "Catalan"
 msgstr "Catalan"
+
+msgid "Central Kurdish (Sorani)"
+msgstr ""
 
 msgid "Czech"
 msgstr "Czech"
@@ -137,6 +140,9 @@ msgstr "Croatian"
 
 msgid "Upper Sorbian"
 msgstr "Upper Sorbian"
+
+msgid "Haitian Creole"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "Hungarian"
@@ -291,6 +297,9 @@ msgstr "Tatar"
 msgid "Udmurt"
 msgstr "Udmurt"
 
+msgid "Uyghur"
+msgstr ""
+
 msgid "Ukrainian"
 msgstr "Ukrainian"
 
@@ -338,6 +347,9 @@ msgstr "That page contains no results"
 msgid "Enter a valid value."
 msgstr "Enter a valid value."
 
+msgid "Enter a valid domain name."
+msgstr ""
+
 msgid "Enter a valid URL."
 msgstr "Enter a valid URL."
 
@@ -360,14 +372,18 @@ msgstr ""
 "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Enter a valid IPv4 address."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr ""
 
-msgid "Enter a valid IPv6 address."
-msgstr "Enter a valid IPv6 address."
+msgid "IPv4"
+msgstr ""
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Enter a valid IPv4 or IPv6 address."
+msgid "IPv6"
+msgstr ""
+
+msgid "IPv4 or IPv6"
+msgstr ""
 
 msgid "Enter only digits separated by commas."
 msgstr "Enter only digits separated by commas."
@@ -383,6 +399,16 @@ msgstr "Ensure this value is less than or equal to %(limit_value)s."
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Ensure this value is greater than or equal to %(limit_value)s."
+
+#, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -456,6 +482,13 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s with this %(field_labels)s already exists."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr ""
+
+msgid "- Select an option -"
+msgstr ""
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Value %(value)r is not a valid choice."
 
@@ -469,8 +502,8 @@ msgstr "This field cannot be blank."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s with this %(field_label)s already exists."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -496,6 +529,9 @@ msgstr "Boolean (Either True or False)"
 msgid "String (up to %(max_length)s)"
 msgstr "String (up to %(max_length)s)"
 
+msgid "String (unlimited)"
+msgstr ""
+
 msgid "Comma-separated integers"
 msgstr "Comma-separated integers"
 
@@ -520,11 +556,11 @@ msgstr "Date (without time)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 
 #, python-format
 msgid ""
@@ -546,11 +582,11 @@ msgstr "Decimal number"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 
 msgid "Duration"
 msgstr "Duration"
@@ -636,6 +672,10 @@ msgid "Raw binary data"
 msgstr "Raw binary data"
 
 #, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
+
+#, python-format
 msgid "“%(value)s” is not a valid UUID."
 msgstr "“%(value)s” is not a valid UUID."
 
@@ -655,8 +695,8 @@ msgid "Value must be valid JSON."
 msgstr "Value must be valid JSON."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(model)s instance with %(field)s %(value)r does not exist."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Foreign Key (type determined by related field)"
@@ -676,8 +716,8 @@ msgid "Many-to-many relationship"
 msgstr "Many-to-many relationship"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -764,16 +804,16 @@ msgstr ""
 "%(field_names)s. You may need to file a bug report if the issue persists."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Please submit at most %d form."
-msgstr[1] "Please submit at most %d forms."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Please submit at least %d form."
-msgstr[1] "Please submit at least %d forms."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Order"
 msgstr "Order"
@@ -836,6 +876,28 @@ msgstr "Yes"
 
 msgid "No"
 msgstr "No"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
+
+msgctxt "Task"
+msgid "Ready"
+msgstr ""
+
+msgctxt "Task"
+msgid "Running"
+msgstr ""
+
+msgctxt "Task"
+msgid "Failed"
+msgstr ""
+
+msgctxt "Task"
+msgid "Successful"
+msgstr ""
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1172,14 +1234,14 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1221,11 +1283,11 @@ msgstr "No %(verbose_name_plural)s available"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
@@ -1271,14 +1333,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 
 msgid "Django Documentation"
 msgstr "Django Documentation"

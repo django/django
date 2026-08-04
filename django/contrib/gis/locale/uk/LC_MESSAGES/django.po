@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Denis Podlesniy <haos616@gmail.com>, 2016
+# Denys Pidlisnyi <haos616@gmail.com>, 2016
 # Illia Volochii <illia.volochii@gmail.com>, 2021
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2016
@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 18:45+0000\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 18:45+0000\n"
 "Last-Translator: Illia Volochii <illia.volochii@gmail.com>, 2021\n"
 "Language-Team: Ukrainian (http://app.transifex.com/django/django/language/"
 "uk/)\n"

@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-06-01 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Isaac Torres, 2026\n"
 "Language-Team: Catalan (http://app.transifex.com/django/django/language/"
 "ca/)\n"
@@ -189,8 +189,13 @@ msgstr ""
 "Premeu la tecla \"Control\", o \"Command\" en un Mac, per seleccionar més "
 "d'un valor."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Selecciona aquest objecte per a una acció - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -254,14 +259,14 @@ msgstr "Modificar %s"
 msgid "View %s"
 msgstr "Visualitza %s"
 
-msgid "Database error"
-msgstr "Error de base de dades"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s s'ha modificat amb èxit."
 msgstr[1] "%(count)s %(name)s s'han modificat amb èxit."
+
+msgid "Database error"
+msgstr "Error de base de dades"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -286,6 +291,17 @@ msgstr "Modificar històric: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -340,9 +356,6 @@ msgstr ""
 msgid "Run"
 msgstr "Executar"
 
-msgid "Click here to select the objects across all pages"
-msgstr "Feu clic aquí per seleccionar els objectes a totes les pàgines"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Seleccioneu tots %(total_count)s %(module_name)s"
@@ -352,10 +365,6 @@ msgstr "Netejar la selecció"
 
 msgid "Breadcrumbs"
 msgstr "Rutes de navegació"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Models en l'aplicació %(name)s"
 
 msgid "Model name"
 msgstr "Nom del model"
@@ -467,6 +476,10 @@ msgstr "Canviar tema (tema actual: clar)"
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "Canviar tema (tema actual: fosc)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -674,6 +687,9 @@ msgstr "Esborra el %(model)s seleccionat"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Vista seleccionada %(model)s"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Gràcies per dedicar temps de qualitat avui a aquesta web."

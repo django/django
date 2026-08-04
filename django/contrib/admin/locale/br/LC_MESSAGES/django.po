@@ -2,24 +2,28 @@
 #
 # Translators:
 # Fulup <fulup.jakez@gmail.com>, 2012
-# Irriep Nala Novram <allannkorh@yahoo.fr>, 2018
+# Irriep Nala Novram <per.morvan.bzh29@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-01-18 00:36+0000\n"
-"Last-Translator: Ramiro Morales\n"
-"Language-Team: Breton (http://www.transifex.com/django/django/language/br/)\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
+"Last-Translator: Irriep Nala Novram <per.morvan.bzh29@gmail.com>, 2018\n"
+"Language-Team: Breton (http://app.transifex.com/django/django/language/br/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: br\n"
 "Plural-Forms: nplurals=5; plural=((n%10 == 1) && (n%100 != 11) && (n%100 !"
-"=71) && (n%100 !=91) ? 0 :(n%10 == 2) && (n%100 != 12) && (n%100 !=72) && (n"
-"%100 !=92) ? 1 :(n%10 ==3 || n%10==4 || n%10==9) && (n%100 < 10 || n% 100 > "
-"19) && (n%100 < 70 || n%100 > 79) && (n%100 < 90 || n%100 > 99) ? 2 :(n != 0 "
-"&& n % 1000000 == 0) ? 3 : 4);\n"
+"=71) && (n%100 !=91) ? 0 :(n%10 == 2) && (n%100 != 12) && (n%100 !=72) && "
+"(n%100 !=92) ? 1 :(n%10 ==3 || n%10==4 || n%10==9) && (n%100 < 10 || n% 100 "
+"> 19) && (n%100 < 70 || n%100 > 79) && (n%100 < 90 || n%100 > 99) ? 2 :(n != "
+"0 && n % 1000000 == 0) ? 3 : 4);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Dilemel %(verbose_name_plural)s diuzet"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -29,12 +33,8 @@ msgstr ""
 msgid "Cannot delete %(name)s"
 msgstr ""
 
-msgid "Are you sure?"
-msgstr "Ha sur oc'h?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Dilemel %(verbose_name_plural)s diuzet"
+msgid "Delete multiple objects"
+msgstr ""
 
 msgid "Administration"
 msgstr "Melestradurezh"
@@ -71,6 +71,12 @@ msgstr "Deiziad ebet"
 
 msgid "Has date"
 msgstr "D'an deiziad"
+
+msgid "Empty"
+msgstr ""
+
+msgid "Not empty"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -127,23 +133,23 @@ msgid "log entries"
 msgstr ""
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "Ouzhpennet \"%(object)s\"."
+msgid "Added “%(object)s”."
+msgstr ""
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "Cheñchet \"%(object)s\" - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr ""
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "Dilamet \"%(object)s.\""
+msgid "Deleted “%(object)s.”"
+msgstr ""
 
 msgid "LogEntry Object"
 msgstr ""
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr "Ouzhpennet {name} \"{object}\"."
+msgid "Added {name} “{object}”."
+msgstr ""
 
 msgid "Added."
 msgstr "Ouzhpennet."
@@ -152,16 +158,16 @@ msgid "and"
 msgstr "ha"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "Cheñchet {fields} evit {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
+msgstr ""
 
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr "Cheñchet {fields}."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr "Dilamet {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
+msgstr ""
 
 msgid "No fields changed."
 msgstr "Maezienn ebet cheñchet."
@@ -169,12 +175,19 @@ msgstr "Maezienn ebet cheñchet."
 msgid "None"
 msgstr "Hini ebet"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid "Select this object for an action - {}"
+msgstr ""
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
 msgstr ""
 
 msgid "You may edit it again below."
@@ -182,28 +195,22 @@ msgstr "Rankout a rit ec'h aozañ adarre dindan."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
+msgid "The {name} “{obj}” was changed successfully."
 msgstr ""
 
 msgid ""
@@ -215,11 +222,11 @@ msgid "No action selected."
 msgstr "Ober ebet diuzet."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
 msgstr ""
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr ""
 
 #, python-format
@@ -234,9 +241,6 @@ msgstr "Cheñch %s"
 msgid "View %s"
 msgstr "Gwelet %s"
 
-msgid "Database error"
-msgstr "Fazi diaz-roadennoù"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -245,6 +249,9 @@ msgstr[1] "%(count)s %(name)s a zo bet cheñchet mat. "
 msgstr[2] "%(count)s %(name)s a zo bet cheñchet mat. "
 msgstr[3] "%(count)s %(name)s a zo bet cheñchet mat."
 msgstr[4] "%(count)s %(name)s a zo bet cheñchet mat."
+
+msgid "Database error"
+msgstr "Fazi diaz-roadennoù"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -259,15 +266,33 @@ msgstr[4] "Pep %(total_count)s diuzet"
 msgid "0 of %(cnt)s selected"
 msgstr "0 diwar %(cnt)s diuzet"
 
+msgid "Delete"
+msgstr "Diverkañ"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Istor ar cheñchadurioù: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #, python-format
 msgid ""
@@ -294,7 +319,7 @@ msgstr ""
 msgid "Page not found"
 msgstr "N'eo ket bet kavet ar bajenn"
 
-msgid "We're sorry, but the requested page could not be found."
+msgid "We’re sorry, but the requested page could not be found."
 msgstr ""
 
 msgid "Home"
@@ -310,17 +335,11 @@ msgid "Server Error <em>(500)</em>"
 msgstr "Fazi servijer <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 
-msgid "Run the selected action"
-msgstr ""
-
-msgid "Go"
-msgstr "Mont"
-
-msgid "Click here to select the objects across all pages"
+msgid "Run"
 msgstr ""
 
 #, python-format
@@ -330,25 +349,63 @@ msgstr ""
 msgid "Clear selection"
 msgstr "Riñsañ an diuzadenn"
 
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
+msgid "Breadcrumbs"
 msgstr ""
 
-msgid "Enter a username and password."
-msgstr "Merkit un anv implijer hag ur ger-tremen."
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
+
+msgid "Add"
+msgstr "Ouzhpennañ"
+
+msgid "View"
+msgstr ""
+
+msgid "You don’t have permission to view or edit anything."
+msgstr ""
+
+msgid "After you’ve created a user, you’ll be able to edit more user options."
+msgstr ""
+
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "Cheñch ger-tremen"
 
-msgid "Please correct the error below."
+msgid "Set password"
 msgstr ""
 
-msgid "Please correct the errors below."
-msgstr ""
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr ""
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
 msgstr ""
 
 msgid "Welcome,"
@@ -376,6 +433,18 @@ msgstr "Gwelet war al lec'hienn"
 msgid "Filter"
 msgstr "Sil"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
+msgid "Clear all filters"
+msgstr ""
+
+msgid "Save"
+msgstr "Enrollañ"
+
 msgid "Remove from sorting"
 msgstr ""
 
@@ -386,38 +455,45 @@ msgstr ""
 msgid "Toggle sorting"
 msgstr "Eilpennañ an diuzadenn"
 
-msgid "Delete"
-msgstr "Diverkañ"
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
 
 msgid "Objects"
 msgstr ""
 
-msgid "Yes, I'm sure"
-msgstr "Ya, sur on"
-
-msgid "No, take me back"
+msgid "Yes, I’m sure"
 msgstr ""
 
-msgid "Delete multiple objects"
+msgid "No, take me back"
 msgstr ""
 
 #, python-format
@@ -439,9 +515,6 @@ msgid ""
 "following objects and their related items will be deleted:"
 msgstr ""
 
-msgid "View"
-msgstr ""
-
 msgid "Delete?"
 msgstr "Diverkañ ?"
 
@@ -450,16 +523,6 @@ msgid " By %(filter_title)s "
 msgstr " dre %(filter_title)s "
 
 msgid "Summary"
-msgstr ""
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr ""
-
-msgid "Add"
-msgstr "Ouzhpennañ"
-
-msgid "You don't have permission to view or edit anything."
 msgstr ""
 
 msgid "Recent actions"
@@ -471,11 +534,20 @@ msgstr ""
 msgid "None available"
 msgstr ""
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "Endalc'had dianav"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
@@ -486,8 +558,20 @@ msgid ""
 "page. Would you like to login to a different account?"
 msgstr ""
 
-msgid "Forgotten your password or username?"
-msgstr "Disoñjet ho ker-tremen pe hoc'h anv implijer ganeoc'h ?"
+msgid "Forgotten your login credentials?"
+msgstr ""
+
+msgid "Toggle navigation"
+msgstr ""
+
+msgid "Sidebar"
+msgstr ""
+
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr ""
 
 msgid "Date/time"
 msgstr "Deiziad/eur"
@@ -498,18 +582,35 @@ msgstr "Implijer"
 msgid "Action"
 msgstr "Ober"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
+msgstr ""
+
+#, python-format
+msgid "Pagination %(name)s"
 msgstr ""
 
 msgid "Show all"
 msgstr "Diskouez pep tra"
 
-msgid "Save"
-msgstr "Enrollañ"
-
 msgid "Popup closing…"
+msgstr ""
+
+#, python-format
+msgid "Search %(name)s"
 msgstr ""
 
 msgid "Search"
@@ -555,7 +656,14 @@ msgstr ""
 msgid "Delete selected %(model)s"
 msgstr ""
 
-msgid "Thanks for spending some quality time with the Web site today."
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Logout"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the web site today."
 msgstr ""
 
 msgid "Log in again"
@@ -568,7 +676,7 @@ msgid "Your password was changed."
 msgstr "Cheñchet eo bet ho ker-tremen."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
 
@@ -601,12 +709,12 @@ msgid ""
 msgstr ""
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
 
@@ -619,7 +727,7 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr ""
 
-msgid "Your username, in case you've forgotten:"
+msgid "In case you’ve forgotten, you are:"
 msgstr ""
 
 msgid "Thanks for using our site!"
@@ -630,7 +738,7 @@ msgid "The %(site_name)s team"
 msgstr ""
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
 
@@ -638,6 +746,9 @@ msgid "Email address:"
 msgstr ""
 
 msgid "Reset my password"
+msgstr ""
+
+msgid "Select all objects on this page for an action"
 msgstr ""
 
 msgid "All dates"

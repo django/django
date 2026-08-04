@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
 "Last-Translator: Meir Kriheli <mkriheli@gmail.com>, "
 "2012-2015,2017,2019,2023,2025\n"
 "Language-Team: Hebrew (http://app.transifex.com/django/django/language/he/)\n"
@@ -18,8 +18,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: he\n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
-"1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
+"Plural-Forms: nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
+"1 == 0) ? 1: 2;\n"
 
 msgid "Personal info"
 msgstr "מידע אישי"
@@ -59,12 +59,6 @@ msgstr "סיסמה"
 
 msgid "last login"
 msgstr "כניסה אחרונה"
-
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "תחביר סיסמה בלתי-חוקי או אלגוריתם גיבוב לא ידוע."
-
-msgid "No password set."
-msgstr "לא נקבעה סיסמה."
 
 msgid "Reset password"
 msgstr "איפוס סיסמה"
@@ -295,6 +289,12 @@ msgstr "הסיסמה שלך לא יכולה להכיל רק ספרות."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "החלפת הסיסמה ב-%(site_name)s"
+
+msgid "No password set."
+msgstr "לא נקבעה סיסמה."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "תחביר סיסמה בלתי-חוקי או אלגוריתם גיבוב לא ידוע."
 
 msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "

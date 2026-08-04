@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Ḷḷumex03 <tornes@opmbx.org>, 2014
+# Ḷḷumex03, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-09-24 14:24+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Asturian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
+"Last-Translator: Ḷḷumex03, 2014\n"
+"Language-Team: Asturian (http://app.transifex.com/django/django/language/"
 "ast/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -30,12 +30,22 @@ msgstr "Dates importantes"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr ""
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr ""
+
 msgid "Password changed successfully."
 msgstr "Contraseña camudada con ésitu."
+
+msgid "Password-based authentication was disabled."
+msgstr ""
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Camudar contraseña: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr ""
 
 msgid "Authentication and Authorization"
 msgstr ""
@@ -46,14 +56,14 @@ msgstr "contraseña"
 msgid "last login"
 msgstr "aniciu de sesión caberu"
 
-msgid "No password set."
-msgstr "Nun s'afitó la contraseña."
+msgid "Reset password"
+msgstr ""
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Formatu de contraseña inválidu o algoritmu hash inválidu."
+msgid "Set password"
+msgstr ""
 
-msgid "The two password fields didn't match."
-msgstr "Nun concasen los dos campos de contraseña."
+msgid "The two password fields didn’t match."
+msgstr ""
 
 msgid "Password"
 msgstr "Contraseña"
@@ -65,8 +75,26 @@ msgid "Enter the same password as before, for verification."
 msgstr ""
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+
+msgid "Password-based authentication"
+msgstr ""
+
+msgid "Enabled"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
 msgstr ""
 
 #, python-format
@@ -91,9 +119,6 @@ msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
 
 msgid "Old password"
-msgstr ""
-
-msgid "Password (again)"
 msgstr ""
 
 msgid "algorithm"
@@ -128,6 +153,9 @@ msgstr ""
 
 msgid "checksum"
 msgstr "suma de comprobación"
+
+msgid "block size"
+msgstr ""
 
 msgid "name"
 msgstr "nome"
@@ -211,12 +239,9 @@ msgid "users"
 msgstr "usuarios"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -230,28 +255,34 @@ msgstr[1] ""
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr ""
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
 
 msgid "This password is too common."
 msgstr ""
 
-msgid "Your password can't be a commonly used password."
+msgid "Your password can’t be a commonly used password."
 msgstr ""
 
 msgid "This password is entirely numeric."
 msgstr ""
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr ""
 
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr ""
 
+msgid "No password set."
+msgstr "Nun s'afitó la contraseña."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Formatu de contraseña inválidu o algoritmu hash inválidu."
+
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
 
 msgid ""

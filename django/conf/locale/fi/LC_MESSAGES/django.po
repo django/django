@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
 "Last-Translator: Aarni Koskela, 2015,2017-2018,2020-2022,2025\n"
 "Language-Team: Finnish (http://app.transifex.com/django/django/language/"
 "fi/)\n"
@@ -145,6 +145,9 @@ msgstr "kroatia"
 
 msgid "Upper Sorbian"
 msgstr "Yläsorbi"
+
+msgid "Haitian Creole"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "unkari"
@@ -490,6 +493,9 @@ msgstr "%(model_name)s jolla on nämä %(field_labels)s on jo olemassa."
 msgid "Constraint “%(name)s” is violated."
 msgstr "Rajoitetta \"%(name)s\" loukataan."
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Arvo %(value)r ei kelpaa."
@@ -543,8 +549,8 @@ msgid ""
 "“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"%(value)s-arvo on väärässä päivämäärämuodossa. Sen tulee olla VVVV-KK-PP -"
-"muodossa."
+"%(value)s-arvo on väärässä päivämäärämuodossa. Sen tulee olla VVVV-KK-PP "
+"-muodossa."
 
 #, python-format
 msgid ""
@@ -559,8 +565,8 @@ msgstr "Päivämäärä (ilman kellonaikaa)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "%(value)s-arvon muoto ei kelpaa. Se tulee olla VVVV-KK-PP TT:MM[:ss[.uuuuuu]]"
 "[TZ] -muodossa."
@@ -585,8 +591,8 @@ msgstr "Desimaaliluku"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr "%(value)s-arvo pitää olla muodossa [PP] TT:MM[:ss[.uuuuuu]]."
 
 msgid "Duration"
@@ -671,6 +677,10 @@ msgid "Raw binary data"
 msgstr "Raaka binaaridata"
 
 #, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
+
+#, python-format
 msgid "“%(value)s” is not a valid UUID."
 msgstr "%(value)s ei ole kelvollinen UUID."
 
@@ -711,8 +721,8 @@ msgid "Many-to-many relationship"
 msgstr "Moni-moneen -relaatio"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -872,6 +882,28 @@ msgstr "Kyllä"
 
 msgid "No"
 msgstr "Ei"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
+
+msgctxt "Task"
+msgid "Ready"
+msgstr ""
+
+msgctxt "Task"
+msgid "Running"
+msgstr ""
+
+msgctxt "Task"
+msgid "Failed"
+msgstr ""
+
+msgctxt "Task"
+msgid "Successful"
+msgstr ""
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1262,11 +1294,11 @@ msgstr "%(verbose_name_plural)s: yhtään kohdetta ei löydy"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"%(verbose_name_plural)s: tulevia kohteita ei löydy, koska %(class_name)s."
-"allow_future:n arvo on False."
+"%(verbose_name_plural)s: tulevia kohteita ei löydy, koska "
+"%(class_name)s.allow_future:n arvo on False."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
@@ -1317,10 +1349,10 @@ msgid ""
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"Näet tämän viestin, koska asetuksissasi on <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
-"rel=\"noopener\">DEBUG = True</a> etkä ole konfiguroinut yhtään URL-"
-"osoitetta."
+"Näet tämän viestin, koska asetuksissasi on <a href=\"https://"
+"docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" "
+"target=\"_blank\" rel=\"noopener\">DEBUG = True</a> etkä ole konfiguroinut "
+"yhtään URL-osoitetta."
 
 msgid "Django Documentation"
 msgstr "Django-dokumentaatio"

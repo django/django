@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-04 07:59+0000\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 07:59+0000\n"
 "Last-Translator: Markus Holtermann <info@markusholtermann.eu>, 2020,2023\n"
 "Language-Team: German (http://app.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -26,11 +26,8 @@ msgstr "Verfügbare %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Dies ist die Liste der verfügbaren %s. Einfach im unten stehenden Feld "
-"markieren und mithilfe des „Auswählen“-Pfeils auswählen."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -41,18 +38,17 @@ msgstr ""
 msgid "Filter"
 msgstr "Filter"
 
-msgid "Choose all"
-msgstr "Alle auswählen"
+#, javascript-format
+msgid "Choose all %s"
+msgstr ""
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Klicken, um alle %s auf einmal auszuwählen."
+msgid "Choose selected %s"
+msgstr ""
 
-msgid "Choose"
-msgstr "Auswählen"
-
-msgid "Remove"
-msgstr "Entfernen"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr ""
 
 #, javascript-format
 msgid "Chosen %s"
@@ -60,23 +56,20 @@ msgstr "Ausgewählte %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Dies ist die Liste der ausgewählten %s. Einfach im unten stehenden Feld "
-"markieren und mithilfe des „Entfernen“-Pfeils wieder entfernen."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr ""
 "In diesem Feld tippen, um die Liste der ausgewählten %s einzuschränken."
 
-msgid "Remove all"
-msgstr "Alle entfernen"
+msgid "(click to clear)"
+msgstr ""
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Klicken, um alle ausgewählten %s auf einmal zu entfernen."
+msgid "Remove all %s"
+msgstr ""
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -108,12 +101,9 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"Sie haben eine Aktion ausgewählt, aber keine Änderungen an bearbeitbaren "
-"Feldern vorgenommen. Sie wollten wahrscheinlich auf „Ausführen“ und nicht "
-"auf „Speichern“ klicken."
 
 msgid "Now"
 msgstr "Jetzt"
@@ -130,17 +120,26 @@ msgstr "Mittag"
 msgid "6 p.m."
 msgstr "18 Uhr"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Achtung: Sie sind %s Stunde der Serverzeit vorraus."
-msgstr[1] "Achtung: Sie sind %s Stunden der Serverzeit vorraus."
+msgid "server"
+msgstr ""
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Achtung: Sie sind %s Stunde hinter der Serverzeit."
-msgstr[1] "Achtung: Sie sind %s Stunden hinter der Serverzeit."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Choose a Time"
 msgstr "Uhrzeit wählen"
@@ -154,14 +153,29 @@ msgstr "Abbrechen"
 msgid "Today"
 msgstr "Heute"
 
+msgid "Today (%(date)s)"
+msgstr ""
+
 msgid "Choose a Date"
 msgstr "Datum wählen"
 
 msgid "Yesterday"
 msgstr "Gestern"
 
+msgid "Yesterday (%(date)s)"
+msgstr ""
+
 msgid "Tomorrow"
 msgstr "Morgen"
+
+msgid "Tomorrow (%(date)s)"
+msgstr ""
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr ""
+
+msgid "Next (%(month)s %(year)s)"
+msgstr ""
 
 msgid "January"
 msgstr "Januar"
@@ -324,8 +338,17 @@ msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Sa"
 
-msgid "Show"
-msgstr "Einblenden"
+msgid "%(month)s %(day)s, %(year)s"
+msgstr ""
 
-msgid "Hide"
-msgstr "Ausblenden"
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr ""

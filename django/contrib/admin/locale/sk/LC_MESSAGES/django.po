@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-03-09 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Adam Zahradník, 2023-2026\n"
 "Language-Team: Slovak (http://app.transifex.com/django/django/language/sk/)\n"
 "MIME-Version: 1.0\n"
@@ -187,8 +187,13 @@ msgstr ""
 "Ak chcete vybrať viac ako jednu položku na Mac, podržte „Control“, alebo "
 "„Command“"
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Vybrať tento objekt pre akciu - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -250,9 +255,6 @@ msgstr "Zmeniť %s"
 msgid "View %s"
 msgstr "Zobraziť%s"
 
-msgid "Database error"
-msgstr "Chyba databázy"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -260,6 +262,9 @@ msgstr[0] "%(count)s %(name)s bola úspešne zmenená."
 msgstr[1] "%(count)s %(name)s boli úspešne zmenené."
 msgstr[2] "%(count)s %(name)s bolo úspešne zmenených."
 msgstr[3] "%(count)s %(name)s bolo úspešne zmenených."
+
+msgid "Database error"
+msgstr "Chyba databázy"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -286,6 +291,19 @@ msgstr "Zoznam zmien: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #, python-format
 msgid ""
@@ -339,9 +357,6 @@ msgstr ""
 msgid "Run"
 msgstr "Vykonať"
 
-msgid "Click here to select the objects across all pages"
-msgstr "Kliknite sem pre výber objektov na všetkých stránkach"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Vybrať všetkých %(total_count)s %(module_name)s"
@@ -351,10 +366,6 @@ msgstr "Zrušiť výber"
 
 msgid "Breadcrumbs"
 msgstr "Mininavigácia"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modely v %(name)s aplikácii"
 
 msgid "Model name"
 msgstr "Názov modelu"
@@ -468,6 +479,10 @@ msgstr "Prepnúť vzhľad (aktuálne: svetlý)"
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "Prepnúť vzhľad (aktuálne: tmavý)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -672,6 +687,9 @@ msgstr "Odstrániť vybrané %(model)s"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Zobraziť vybrané %(model)s"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr ""

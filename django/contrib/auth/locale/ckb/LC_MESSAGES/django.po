@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2026-03-09 08:09+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
 "Last-Translator: Swara <swara09@gmail.com>, 2022,2024,2026\n"
 "Language-Team: Central Kurdish (http://app.transifex.com/django/django/"
 "language/ckb/)\n"
@@ -55,12 +55,6 @@ msgstr "تێپەڕەوشە"
 
 msgid "last login"
 msgstr "دوا چوونەژوورەوە"
-
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "شێوازی تێپەڕەوشە نادروستە یان ئەلگۆریتمێکی هاشکراوی نەناسراوە."
-
-msgid "No password set."
-msgstr "تێپەڕەوشە جێگیرنەکراوە."
 
 msgid "Reset password"
 msgstr "دانانەوەی تێپەڕەوشە"
@@ -296,6 +290,12 @@ msgstr "تێپەڕەوشەکەت نابێت بە تەواوی ژمارە بێت"
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "تێپەڕەوشەکەت دانرایەوە لە %(site_name)s"
+
+msgid "No password set."
+msgstr "تێپەڕەوشە جێگیرنەکراوە."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "شێوازی تێپەڕەوشە نادروستە یان ئەلگۆریتمێکی هاشکراوی نەناسراوە."
 
 msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "

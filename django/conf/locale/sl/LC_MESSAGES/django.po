@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
 "Last-Translator: Andrej Marsetič, 2022-2023\n"
 "Language-Team: Slovenian (http://app.transifex.com/django/django/language/"
 "sl/)\n"
@@ -147,6 +147,9 @@ msgstr "Hrvaščina"
 
 msgid "Upper Sorbian"
 msgstr "Gornjelužiška srbščina"
+
+msgid "Haitian Creole"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "Madžarščina"
@@ -351,6 +354,9 @@ msgstr "Ta stran nima zadetkov"
 msgid "Enter a valid value."
 msgstr "Vnesite veljavno vrednost."
 
+msgid "Enter a valid domain name."
+msgstr ""
+
 msgid "Enter a valid URL."
 msgstr "Vnesite veljaven URL naslov."
 
@@ -370,14 +376,18 @@ msgid ""
 "hyphens."
 msgstr ""
 
-msgid "Enter a valid IPv4 address."
-msgstr "Vnesite veljaven IPv4 naslov."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr ""
 
-msgid "Enter a valid IPv6 address."
-msgstr "Vnesite veljaven IPv6 naslov."
+msgid "IPv4"
+msgstr ""
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Vnesite veljaven IPv4 ali IPv6 naslov."
+msgid "IPv6"
+msgstr ""
+
+msgid "IPv4 or IPv6"
+msgstr ""
 
 msgid "Enter only digits separated by commas."
 msgstr "Vnesite samo števila, ločena z vejicami."
@@ -498,6 +508,9 @@ msgstr "%(model_name)s s tem %(field_labels)s že obstaja."
 msgid "Constraint “%(name)s” is violated."
 msgstr ""
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Vrednost %(value)r ni veljavna izbira."
@@ -566,8 +579,8 @@ msgstr "Datum (brez ure)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 
 #, python-format
@@ -588,8 +601,8 @@ msgstr "Decimalno število"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 
 msgid "Duration"
@@ -672,6 +685,10 @@ msgid "Raw binary data"
 msgstr "Surovi binarni podatki"
 
 #, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
+
+#, python-format
 msgid "“%(value)s” is not a valid UUID."
 msgstr ""
 
@@ -691,9 +708,8 @@ msgid "Value must be valid JSON."
 msgstr "Vrednost mora biti veljaven JSON."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
 msgstr ""
-"Instanca %(model)s s poljem %(field)s, ki ustreza %(value)r, ne obstaja."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Tuji ključ (tip odvisen od povezanega polja)"
@@ -713,8 +729,8 @@ msgid "Many-to-many relationship"
 msgstr "Relacija več-na-več"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -881,6 +897,28 @@ msgstr "Da"
 
 msgid "No"
 msgstr "Ne"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
+
+msgctxt "Task"
+msgid "Ready"
+msgstr ""
+
+msgctxt "Task"
+msgid "Running"
+msgstr ""
+
+msgctxt "Task"
+msgid "Failed"
+msgstr ""
+
+msgctxt "Task"
+msgid "Successful"
+msgstr ""
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1272,8 +1310,8 @@ msgstr "Na voljo ni noben %(verbose_name_plural)s"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
 "Prihodnje %(verbose_name_plural)s niso na voljo, ker je vrednost "
 "%(class_name)s.allow_future False."
@@ -1327,10 +1365,10 @@ msgid ""
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"To stran vidite, ker imate nastavljeno <a href=\"https://docs.djangoproject."
-"com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
-"rel=\"noopener\">DEBUG=True</a> v vaši settings.py datoteki in ker nimate "
-"nastavljenih URL-jev."
+"To stran vidite, ker imate nastavljeno <a href=\"https://"
+"docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" "
+"target=\"_blank\" rel=\"noopener\">DEBUG=True</a> v vaši settings.py "
+"datoteki in ker nimate nastavljenih URL-jev."
 
 msgid "Django Documentation"
 msgstr "Django Dokumentacija"

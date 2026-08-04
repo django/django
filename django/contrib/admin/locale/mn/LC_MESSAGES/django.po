@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Turmunkh Batkhuyag, 2023-2024\n"
 "Language-Team: Mongolian (http://app.transifex.com/django/django/language/"
 "mn/)\n"
@@ -184,8 +184,13 @@ msgstr ""
 "Нэгээс олныг сонгохын тулд \"Control\" эсвэл Mac компьютер дээр \"Command\" "
 "товчоо дарна уу."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Сонголтоо хийхийн тулд энэ объектыг сонгоно уу - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -247,14 +252,14 @@ msgstr "%s-ийг өөрчлөх"
 msgid "View %s"
 msgstr "%s харах "
 
-msgid "Database error"
-msgstr "Өгөгдлийн сангийн алдаа"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s-ийг амжилттай өөрчиллөө."
 msgstr[1] "%(count)s %(name)s-ийг амжилттай өөрчиллөө."
+
+msgid "Database error"
+msgstr "Өгөгдлийн сангийн алдаа"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -279,6 +284,17 @@ msgstr "Өөрчлөлтийн түүх: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(instance)s %(class_name)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -329,14 +345,8 @@ msgstr ""
 "Алдаа гарсан байна. И-мэйлээр админуудад мэдэгдэгдсэн бөгөөд тун удахгүй "
 "засах болно. Хамтран ажилласанд баярлалаа."
 
-msgid "Run the selected action"
-msgstr "Сонгосон үйлдэлийг ажилуулах"
-
-msgid "Go"
-msgstr "Гүйцэтгэх"
-
-msgid "Click here to select the objects across all pages"
-msgstr "Бүх хуудаснууд дээрх объектуудыг сонгох"
+msgid "Run"
+msgstr ""
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -347,10 +357,6 @@ msgstr "Сонгосонг цэвэрлэх"
 
 msgid "Breadcrumbs"
 msgstr "Талхны үүрмэг"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s хэрэглүүр дэх моделууд."
 
 msgid "Model name"
 msgstr ""
@@ -439,6 +445,9 @@ msgstr "Тооцоог харуулах"
 msgid "Clear all filters"
 msgstr "Бүх шүүлтүүрийг арилгах"
 
+msgid "Save"
+msgstr "Хадгалах"
+
 msgid "Remove from sorting"
 msgstr "Эрэмблэлтээс хасах"
 
@@ -459,29 +468,27 @@ msgid "Toggle theme (current theme: dark)"
 msgstr "Загварыг сэлгэх (одоогийн горим: шөнийн)"
 
 #, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
+
+#, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"%(object_name)s '%(escaped_object)s'-ийг устгавал холбогдох объект нь устах "
-"ч бүртгэл тань дараах төрлийн объектуудийг устгах зөвшөөрөлгүй байна:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-" %(object_name)s обектийг устгаж байна. '%(escaped_object)s' холбоотой "
-"хамгаалагдсан обектуудыг заавал утсгах хэрэгтэй :"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Та %(object_name)s \"%(escaped_object)s\"-ийг устгахдаа итгэлтэй байна уу? "
-"Үүнийг устгавал дараах холбогдох зүйлс нь бүгд устана:"
 
 msgid "Objects"
 msgstr "Бичлэгүүд"
@@ -589,6 +596,10 @@ msgstr "Хэрэглэгч"
 msgid "Action"
 msgstr "Үйлдэл"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "оролт"
@@ -601,14 +612,19 @@ msgstr ""
 "Энэ объектод өөрчлөлтийн түүх байхгүй байна. Админ сайтаар нэмээгүй байх "
 "магадлалтай."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "Бүгдийг харуулах"
 
-msgid "Save"
-msgstr "Хадгалах"
-
 msgid "Popup closing…"
 msgstr "Хааж байна..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "Хайлт"
@@ -653,6 +669,9 @@ msgstr "Сонгосон %(model)s устгах"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "View selected %(model)s"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Өнөөдөр вэб сайтад цаг заваа зарцуулсанд баярлалаа."

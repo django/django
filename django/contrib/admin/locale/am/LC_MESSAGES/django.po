@@ -5,16 +5,20 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 17:44+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Amharic (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
+"Last-Translator: Django team\n"
+"Language-Team: Amharic (http://app.transifex.com/django/django/language/"
 "am/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: am\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "የተመረጡትን %(verbose_name_plural)s አስወግድ"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -24,12 +28,8 @@ msgstr "%(count)d %(items)s በተሳካ ሁኔታ ተወግድዋል:: "
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s ማስወገድ አይቻልም"
 
-msgid "Are you sure?"
-msgstr "እርግጠኛ ነህ?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "የተመረጡትን %(verbose_name_plural)s አስወግድ"
+msgid "Delete multiple objects"
+msgstr ""
 
 msgid "Administration"
 msgstr ""
@@ -67,6 +67,12 @@ msgstr ""
 msgid "Has date"
 msgstr ""
 
+msgid "Empty"
+msgstr ""
+
+msgid "Not empty"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -83,6 +89,15 @@ msgstr "ሌላ %(verbose_name)s ጨምር"
 msgid "Remove"
 msgstr "አጥፋ"
 
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "ቀይር"
+
+msgid "Deletion"
+msgstr ""
+
 msgid "action time"
 msgstr "ተግባሩ የተፈፀመበት ጊዜ"
 
@@ -96,7 +111,7 @@ msgid "object id"
 msgstr ""
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr ""
 
@@ -113,22 +128,22 @@ msgid "log entries"
 msgstr ""
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "\"%(object)s\" ተጨምሯል::"
+msgid "Added “%(object)s”."
+msgstr ""
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "\"%(object)s\" - %(changes)s ተቀይሯል"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr ""
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "\"%(object)s.\" ተወግድዋል"
+msgid "Deleted “%(object)s.”"
+msgstr ""
 
 msgid "LogEntry Object"
 msgstr ""
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
+msgid "Added {name} “{object}”."
 msgstr ""
 
 msgid "Added."
@@ -138,7 +153,7 @@ msgid "and"
 msgstr "እና"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
 msgstr ""
 
 #, python-brace-format
@@ -146,7 +161,7 @@ msgid "Changed {fields}."
 msgstr ""
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
 msgstr ""
 
 msgid "No fields changed."
@@ -155,38 +170,42 @@ msgstr "ምንም \"ፊልድ\" አልተቀየረም::"
 msgid "None"
 msgstr "ምንም"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr ""
+
+#, python-brace-format
+msgid "Select this object for an action - {}"
+msgstr ""
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+"The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
+msgid "The {name} “{obj}” was changed successfully."
 msgstr ""
 
 msgid ""
@@ -198,11 +217,11 @@ msgid "No action selected."
 msgstr "ምንም ተግባር አልተመረጠም::"
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" በተሳካ ሁኔታ ተወግድዋል:: "
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr ""
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr ""
 
 #, python-format
@@ -213,14 +232,18 @@ msgstr "%s ጨምር"
 msgid "Change %s"
 msgstr "%s ቀይር"
 
-msgid "Database error"
-msgstr "የ(ዳታቤዝ) ችግር"
+#, python-format
+msgid "View %s"
+msgstr ""
 
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s በተሳካ ሁኔታ ተቀይሯል::"
 msgstr[1] "%(count)s %(name)s በተሳካ ሁኔታ ተቀይረዋል::"
+
+msgid "Database error"
+msgstr "የ(ዳታቤዝ) ችግር"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -232,15 +255,30 @@ msgstr[1] "ሁሉም %(total_count)s ተመርጠዋል"
 msgid "0 of %(cnt)s selected"
 msgstr "0 of %(cnt)s ተመርጠዋል"
 
+msgid "Delete"
+msgstr ""
+
 #, python-format
 msgid "Change history: %s"
 msgstr "ታሪኩን ቀይር: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr ""
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -267,8 +305,8 @@ msgstr ""
 msgid "Page not found"
 msgstr "ድህረ-ገጹ የለም"
 
-msgid "We're sorry, but the requested page could not be found."
-msgstr "ይቅርታ! የፈለጉት ድህረ-ገጽ የለም::"
+msgid "We’re sorry, but the requested page could not be found."
+msgstr ""
 
 msgid "Home"
 msgstr "ሆም"
@@ -283,17 +321,11 @@ msgid "Server Error <em>(500)</em>"
 msgstr "የሰርቨር ችግር <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 
-msgid "Run the selected action"
-msgstr "የተመረጡትን ተግባሮች አስጀምር"
-
-msgid "Go"
-msgstr "ስራ"
-
-msgid "Click here to select the objects across all pages"
+msgid "Run"
 msgstr ""
 
 #, python-format
@@ -303,26 +335,61 @@ msgstr "ሁሉንም %(total_count)s %(module_name)s ምረጥ"
 msgid "Clear selection"
 msgstr "የተመረጡትን ባዶ ኣድርግ"
 
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
+msgid "Breadcrumbs"
 msgstr ""
 
-msgid "Enter a username and password."
-msgstr "መለያስም(ዩዘርኔም) እና የይለፍቃል(ፓስወርድ) ይስገቡ::"
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
+
+msgid "Add"
+msgstr "ጨምር"
+
+msgid "View"
+msgstr ""
+
+msgid "You don’t have permission to view or edit anything."
+msgstr ""
+
+msgid "After you’ve created a user, you’ll be able to edit more user options."
+msgstr ""
+
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "የይለፍቃል(ፓስወርድ) ቅየር"
 
-msgid "Please correct the error below."
-msgstr "ከታች ያሉትን ችግሮች ያስተካክሉ::"
-
-msgid "Please correct the errors below."
+msgid "Set password"
 msgstr ""
+
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "ለ <strong>%(username)s</strong> መለያ አዲስ የይለፍቃል(ፓስወርድ) ያስገቡ::"
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "እንኳን በደህና መጡ,"
@@ -349,6 +416,18 @@ msgstr "ድህረ-ገጹ ላይ ይመልከቱ"
 msgid "Filter"
 msgstr "አጣራ"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
+msgid "Clear all filters"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
 msgid "Remove from sorting"
 msgstr ""
 
@@ -359,38 +438,45 @@ msgstr ""
 msgid "Toggle sorting"
 msgstr ""
 
-msgid "Delete"
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
+
+#, python-format
+msgid "Filter by %(field_name)s"
 msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
 
 msgid "Objects"
 msgstr ""
 
-msgid "Yes, I'm sure"
-msgstr "አዎ,እርግጠኛ ነኝ"
-
-msgid "No, take me back"
+msgid "Yes, I’m sure"
 msgstr ""
 
-msgid "Delete multiple objects"
+msgid "No, take me back"
 msgstr ""
 
 #, python-format
@@ -412,9 +498,6 @@ msgid ""
 "following objects and their related items will be deleted:"
 msgstr ""
 
-msgid "Change"
-msgstr "ቀይር"
-
 msgid "Delete?"
 msgstr "ላስወግድ?"
 
@@ -423,16 +506,6 @@ msgid " By %(filter_title)s "
 msgstr "በ %(filter_title)s"
 
 msgid "Summary"
-msgstr ""
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr ""
-
-msgid "Add"
-msgstr "ጨምር"
-
-msgid "You don't have permission to edit anything."
 msgstr ""
 
 msgid "Recent actions"
@@ -444,11 +517,20 @@ msgstr ""
 msgid "None available"
 msgstr "ምንም የለም"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr ""
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
@@ -459,8 +541,20 @@ msgid ""
 "page. Would you like to login to a different account?"
 msgstr ""
 
-msgid "Forgotten your password or username?"
-msgstr "የእርሶን መለያስም (ዩዘርኔም) ወይም የይለፍቃል(ፓስወርድ)ዘነጉት?"
+msgid "Forgotten your login credentials?"
+msgstr ""
+
+msgid "Toggle navigation"
+msgstr ""
+
+msgid "Sidebar"
+msgstr ""
+
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr ""
 
 msgid "Date/time"
 msgstr "ቀን/ጊዜ"
@@ -471,30 +565,32 @@ msgstr ""
 msgid "Action"
 msgstr ""
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
+msgstr ""
+
+#, python-format
+msgid "Pagination %(name)s"
 msgstr ""
 
 msgid "Show all"
 msgstr "ሁሉንም አሳይ"
 
-msgid "Save"
-msgstr ""
-
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr ""
 
 #, python-format
-msgid "Change selected %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Delete selected %(model)s"
+msgid "Search %(name)s"
 msgstr ""
 
 msgid "Search"
@@ -519,8 +615,33 @@ msgstr ""
 msgid "Save and continue editing"
 msgstr ""
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "ዛሬ ድህረ-ገዓችንን ላይ ጥሩ ጊዜ ስላሳለፉ እናመሰግናለን::"
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Logout"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
 
 msgid "Log in again"
 msgstr "በድጋሜ ይግቡ"
@@ -532,7 +653,7 @@ msgid "Your password was changed."
 msgstr "የይለፍቃልዎን(ፓስወርድ) ተቀይሯል::"
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
 
@@ -565,16 +686,14 @@ msgid ""
 msgstr ""
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"ኢ-ሜል ካልደረስዎት እባክዎን የተመዘገቡበትን የኢ-ሜል አድራሻ ትክክለኛነት ይረጋግጡእንዲሁም ኢ-ሜል (ስፓም) ማህደር "
-"ውስጥ ይመልከቱ::"
 
 #, python-format
 msgid ""
@@ -586,8 +705,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "እባክዎን ወደሚከተለው ድህረ-ገዕ በመሄድ አዲስ የይለፍቃል(ፓስወርድ) ያውጡ:"
 
-msgid "Your username, in case you've forgotten:"
-msgstr "ድንገት ከዘነጉት ይኌው የእርሶ መለያስም (ዩዘርኔም):"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "ድህረ-ገዓችንን ስለተጠቀሙ እናመሰግናለን!"
@@ -597,16 +716,17 @@ msgid "The %(site_name)s team"
 msgstr "%(site_name)s ቡድን"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
-"የይለፍቃልዎን(ፓስወርድ)ረሱት? ከታች የኢ-ሜል አድራሻዎን ይስገቡ እና አዲስ ፓስወርድ ለማውጣት የሚያስችል መረጃ "
-"እንልክልዎታለን::"
 
 msgid "Email address:"
 msgstr "ኢ-ሜል አድራሻ:"
 
 msgid "Reset my password"
+msgstr ""
+
+msgid "Select all objects on this page for an action"
 msgstr ""
 
 msgid "All dates"
@@ -619,6 +739,10 @@ msgstr "%sን ምረጥ"
 #, python-format
 msgid "Select %s to change"
 msgstr "ለመቀየር %sን ምረጥ"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "ቀን:"

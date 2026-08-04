@@ -3,16 +3,17 @@
 # Translators:
 # Belek <abylov.belek@gmail.com>, 2016
 # Chyngyz Monokbaev <monokbaev@gmail.com>, 2016
-# Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>, 2020-2021
-# Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>, 2020
+# Soyuzbek orozbek uulu <soyuzbek196.kg@gmail.com>, 2020-2021
+# Soyuzbek orozbek uulu <soyuzbek196.kg@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-27 14:12+0000\n"
-"Last-Translator: Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>\n"
-"Language-Team: Kyrgyz (http://www.transifex.com/django/django/language/ky/)\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
+"Last-Translator: Soyuzbek orozbek uulu <soyuzbek196.kg@gmail.com>, "
+"2020-2021\n"
+"Language-Team: Kyrgyz (http://app.transifex.com/django/django/language/ky/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -31,8 +32,8 @@ msgstr "%(count)d %(items)s ийгиликтүү өчүрүлдү."
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s өчүрүү мүмкүн эмес"
 
-msgid "Are you sure?"
-msgstr "Чечимиңиз аныкпы?"
+msgid "Delete multiple objects"
+msgstr "обекттерди өчүр"
 
 msgid "Administration"
 msgstr "Башкаруу"
@@ -180,6 +181,14 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr "Көбүрөөк тандоо үчүн “CTRL”, же макбук үчүн “Cmd” кармап туруңуз."
 
 #, python-brace-format
+msgid "Select this object for an action - {}"
+msgstr ""
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
+
+#, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} \"{obj}\" ийгиликтүү кошулду."
 
@@ -195,10 +204,6 @@ msgstr "{name} \"{obj}\" ийгиликтүү кошулду. Сиз башка 
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr "{name} “{obj}” ийгиликтүү өзгөрдү. Сиз аны төмөндө өзгөртө аласыз."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "{name} “{obj}” ийгиликтүү кошулду. Сиз аны төмөндө өзгөртө аласыз."
 
 #, python-brace-format
 msgid ""
@@ -242,13 +247,13 @@ msgstr "%s өзгөртүү"
 msgid "View %s"
 msgstr "%s көрүү"
 
-msgid "Database error"
-msgstr "Берилиштер базасында ката"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s%(name)s ийгиликтүү өзгөртүлдү."
+
+msgid "Database error"
+msgstr "Берилиштер базасында ката"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -259,15 +264,29 @@ msgstr[0] "Бүт %(total_count)s тандалды"
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s нерседен эчтемке тандалган жок"
 
+msgid "Delete"
+msgstr "Өчүрүү"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "%s тарыхын өзгөртүү"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
 
 #, python-format
 msgid ""
@@ -318,14 +337,8 @@ msgstr ""
 "Ката кетти. Сайт башкармасына экат менен кайрылсаңыз тез арада маселе "
 "чечилиши мүмкүн. Түшүнгөнүңүз үчүн рахмат."
 
-msgid "Run the selected action"
-msgstr "Тандалган аракетти иштетиңиз"
-
-msgid "Go"
-msgstr "Жөнө"
-
-msgid "Click here to select the objects across all pages"
-msgstr "Барак боюнча бүт обекттерди тандоо үчүн чыкылдатыңыз"
+msgid "Run"
+msgstr ""
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -334,9 +347,17 @@ msgstr "Бүт %(total_count)s %(module_name)s тандаңыз"
 msgid "Clear selection"
 msgstr "Тандоону бошотуу"
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s колдонмосундагы моделдер"
+msgid "Breadcrumbs"
+msgstr ""
+
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
 
 msgid "Add"
 msgstr "Кошуу"
@@ -347,28 +368,39 @@ msgstr "Көрүү"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Сиз эчнерсени көрүүгө же өзгөртүүгө жеткиңиз жок."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Оболу колдонуучу атыңызды жана сырсөздү териңиз. Ошондо гана башка "
-"маалыматтарын өзгөртө аласыз."
 
-msgid "Enter a username and password."
-msgstr "колдонуучу атыңызды жана сырсөз киргизиңиз."
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "Сырсөз өзгөртүү"
 
-msgid "Please correct the error below."
-msgstr "Төмөнкү катаны оңдоңуз."
+msgid "Set password"
+msgstr ""
 
-msgid "Please correct the errors below."
-msgstr "Төмөнкү каталарды оңдоңуз"
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "<strong>%(username)s</strong> үчүн жаңы сырсөз териңиз."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "Кош келиңиз,"
@@ -395,8 +427,17 @@ msgstr "Сайтта көрүү"
 msgid "Filter"
 msgstr "Чыпкалоо"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
 msgid "Clear all filters"
 msgstr "Бүт чыпкаларды алып салуу"
+
+msgid "Save"
+msgstr "Сактоо"
 
 msgid "Remove from sorting"
 msgstr "Ирээттөөдөн алып салуу"
@@ -408,33 +449,37 @@ msgstr "Ирээттөө абзелдүүлүгү: %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "Ирээтти алмаштыруу"
 
-msgid "Delete"
-msgstr "Өчүрүү"
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"%(object_name)s '%(escaped_object)s  өчүрүү үчүн башка байланышкан "
-"обекттерди өчүрүү да талап кылынат. Бирок сиздин буга жеткиңиз жок:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"%(object_name)s '%(escaped_object)s  өчүрүү үчүн башка байланышкан "
-"обекттерди өчүрүү да талап кылат:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Сиз чындап эле %(object_name)s \"%(escaped_object)s\" өчүрүүнү каалайсызбы? "
-"Бүт байланышкан нерселер өчүрүлөт:"
 
 msgid "Objects"
 msgstr "Обекттер"
@@ -444,9 +489,6 @@ msgstr "Ооба, мен чындап эле"
 
 msgid "No, take me back"
 msgstr "Жок, мени аркага кайтар"
-
-msgid "Delete multiple objects"
-msgstr "обекттерди өчүр"
 
 #, python-format
 msgid ""
@@ -492,6 +534,15 @@ msgstr "Менин аракеттерим"
 msgid "None available"
 msgstr "Мүмкүн эмес"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "Белгисиз мазмун"
 
@@ -511,11 +562,14 @@ msgstr ""
 "Сиз %(username)s катары киргенсиз, бирок сиздин бул баракка жеткиңиз жок. "
 "Сиз башка колдонуучу катары киресизби?"
 
-msgid "Forgotten your password or username?"
-msgstr "Колдонуучу атыңыз же сырсөздү унутуп калдыңызбы?"
+msgid "Forgotten your login credentials?"
+msgstr ""
 
 msgid "Toggle navigation"
 msgstr "Навигацияны алмаштыруу"
+
+msgid "Sidebar"
+msgstr ""
 
 msgid "Start typing to filter…"
 msgstr "чыпкалоо үчүн жазып башта"
@@ -532,19 +586,32 @@ msgstr "Колдонуучу"
 msgid "Action"
 msgstr "Аракет"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr "Бул обекттин өзгөрүү тарыхы жок."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "Баарын көрсөтүү"
 
-msgid "Save"
-msgstr "Сактоо"
-
 msgid "Popup closing…"
 msgstr "Жалтаң жабылуу..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "Издөө"
@@ -584,6 +651,13 @@ msgstr "Башка %(model)s кошуу"
 #, python-format
 msgid "Delete selected %(model)s"
 msgstr "Тандалган %(model)s обеттерин өчүрүү"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Сайтта бираз убакыт өткөргөн үчүн ыраазычылык."
@@ -659,8 +733,8 @@ msgstr "Сиз %(site_name)s боюнча сырсөз сураган үчүн �
 msgid "Please go to the following page and choose a new password:"
 msgstr "Төмөнкү баракка кириңиз да жаңы сырсөз тандаңыз."
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Сиздин колдонуучу атыңыз, унутуп калсаңыз керек болот."
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "Биздин сайтты колдонгонуңуз үчүн рахмат!"
@@ -679,6 +753,9 @@ msgstr "едарек:"
 
 msgid "Reset my password"
 msgstr "Сырсөзүмдү кыйрат"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "Бүт күндөр"

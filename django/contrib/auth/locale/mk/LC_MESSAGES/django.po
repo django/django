@@ -10,10 +10,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-09-24 14:24+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
+"Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>, 2016-2017\n"
+"Language-Team: Macedonian (http://app.transifex.com/django/django/language/"
 "mk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,12 +34,22 @@ msgstr "Важни датуми"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Не постои %(name)s објект со примарен клуч %(key)r."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr ""
+
 msgid "Password changed successfully."
 msgstr "Успешна промена на лозинката."
+
+msgid "Password-based authentication was disabled."
+msgstr ""
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Промени лозинка: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr ""
 
 msgid "Authentication and Authorization"
 msgstr "Автентикација и авторизација"
@@ -50,14 +60,14 @@ msgstr "лозинка"
 msgid "last login"
 msgstr "последна најава"
 
-msgid "No password set."
-msgstr "Нема зададена лозинка."
+msgid "Reset password"
+msgstr ""
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Невалиден формат на лозинка или непознат алгоритам за хеширање."
+msgid "Set password"
+msgstr ""
 
-msgid "The two password fields didn't match."
-msgstr "Двете полиња со лозинките не се совпаѓаат."
+msgid "The two password fields didn’t match."
+msgstr ""
 
 msgid "Password"
 msgstr "Лозинка"
@@ -69,8 +79,26 @@ msgid "Enter the same password as before, for verification."
 msgstr "Внесете ја истата лозинка како претходно, за верификација."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+
+msgid "Password-based authentication"
+msgstr ""
+
+msgid "Enabled"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
 msgstr ""
 
 #, python-format
@@ -99,9 +127,6 @@ msgstr ""
 
 msgid "Old password"
 msgstr "Стара лозинка"
-
-msgid "Password (again)"
-msgstr "Лозинка (повторно)"
 
 msgid "algorithm"
 msgstr "алгоритам"
@@ -135,6 +160,9 @@ msgstr "фактор на работа"
 
 msgid "checksum"
 msgstr "проверка"
+
+msgid "block size"
+msgstr ""
 
 msgid "name"
 msgstr "име"
@@ -226,18 +254,11 @@ msgid "users"
 msgstr "корисници"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"Оваа лозинка е премногу кратка. Мора да содржи најмалку %(min_length)d "
-"карактер."
 msgstr[1] ""
-"Оваа лозинка е премногу кратка. Мора да содржи најмалку %(min_length)d "
-"карактери."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -249,32 +270,35 @@ msgstr[1] "Вашата лозинка мора да содржи најмалк
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Лозинката е премногу слична со %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
-"Вашата лозинка не смее да биде премногу слична со други лични информации."
 
 msgid "This password is too common."
 msgstr "Оваа лозинка е премногу често користена."
 
-msgid "Your password can't be a commonly used password."
-msgstr "Вашата лозинка не смее да биде лозинка која се користи многу често."
+msgid "Your password can’t be a commonly used password."
+msgstr ""
 
 msgid "This password is entirely numeric."
 msgstr "Оваа лозинка содржи само цифри."
 
-msgid "Your password can't be entirely numeric."
-msgstr "Вашата лозинка не може да содржи само цифри."
+msgid "Your password can’t be entirely numeric."
+msgstr ""
 
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Ресетирање на лозинка за  %(site_name)s"
 
+msgid "No password set."
+msgstr "Нема зададена лозинка."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Невалиден формат на лозинка или непознат алгоритам за хеширање."
+
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Внесете валидно корисничко име. Оваа вредност може да содржи само латински "
-"букви, бројки и @/./+/-/_ знаци."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

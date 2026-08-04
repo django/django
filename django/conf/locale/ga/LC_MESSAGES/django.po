@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-10-07 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
 "Last-Translator: Aindriú Mac Giolla Eoin, 2024\n"
 "Language-Team: Irish (http://app.transifex.com/django/django/language/ga/)\n"
 "MIME-Version: 1.0\n"
@@ -147,6 +147,9 @@ msgstr "Cróitis"
 
 msgid "Upper Sorbian"
 msgstr "Sorbian Uachtarach"
+
+msgid "Haitian Creole"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "Ungáiris"
@@ -526,6 +529,9 @@ msgstr "Tá %(model_name)s leis an %(field_labels)s seo ann cheana."
 msgid "Constraint “%(name)s” is violated."
 msgstr "Tá srian “%(name)s” sáraithe."
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Ní rogha bhailí é luach %(value)r."
@@ -595,8 +601,8 @@ msgstr "Dáta (gan am)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "Tá formáid neamhbhailí ag luach “%(value)s”. Caithfidh sé a bheith san "
 "fhormáid BBBB-MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
@@ -621,8 +627,8 @@ msgstr "Uimhir deachúlach"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "Tá formáid neamhbhailí ag luach “%(value)s”. Caithfidh sé a bheith i "
 "bhformáid [DD] [[HH:]MM:]ss[.uuuuuu]."
@@ -711,6 +717,10 @@ msgid "Raw binary data"
 msgstr "Sonraí dénártha amh"
 
 #, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
+
+#, python-format
 msgid "“%(value)s” is not a valid UUID."
 msgstr "Ní UUID bailí é “%(value)s”."
 
@@ -730,8 +740,8 @@ msgid "Value must be valid JSON."
 msgstr "Caithfidh an luach a bheith bailí JSON."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "Níl sampla %(model)s le %(field)s %(value)r ann."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Eochair Eachtracha (cineál a chinnfear de réir réimse a bhaineann)"
@@ -751,8 +761,8 @@ msgid "Many-to-many relationship"
 msgstr "Go leor le go leor caidreamh"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -932,6 +942,28 @@ msgstr "Tá"
 
 msgid "No"
 msgstr "Níl"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
+
+msgctxt "Task"
+msgid "Ready"
+msgstr ""
+
+msgctxt "Task"
+msgid "Running"
+msgstr ""
+
+msgctxt "Task"
+msgid "Failed"
+msgstr ""
+
+msgctxt "Task"
+msgid "Successful"
+msgstr ""
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1346,11 +1378,11 @@ msgstr "Gan %(verbose_name_plural)s ar fáil"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"Níl %(verbose_name_plural)s sa todhchaí ar fáil mar tá  %(class_name)s."
-"allow_future Bréagach."
+"Níl %(verbose_name_plural)s sa todhchaí ar fáil mar tá  "
+"%(class_name)s.allow_future Bréagach."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
@@ -1402,10 +1434,10 @@ msgid ""
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"Tá an leathanach seo á fheiceáil agat toisc go bhfuil <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
-"rel=\"noopener\">DEBUG=True</a> i do chomhad socruithe agus nach bhfuil aon "
-"URL cumraithe agat."
+"Tá an leathanach seo á fheiceáil agat toisc go bhfuil <a href=\"https://"
+"docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" "
+"target=\"_blank\" rel=\"noopener\">DEBUG=True</a> i do chomhad socruithe "
+"agus nach bhfuil aon URL cumraithe agat."
 
 msgid "Django Documentation"
 msgstr "Doiciméadú Django"

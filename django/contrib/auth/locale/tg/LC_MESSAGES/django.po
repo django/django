@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Surush Sufiew <siriusproger@gmail.com>, 2020
+# Sirius Sufiev <siriusproger@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-05-15 00:26+0000\n"
-"Last-Translator: Surush Sufiew <siriusproger@gmail.com>\n"
-"Language-Team: Tajik (http://www.transifex.com/django/django/language/tg/)\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
+"Last-Translator: Sirius Sufiev <siriusproger@gmail.com>, 2020\n"
+"Language-Team: Tajik (http://app.transifex.com/django/django/language/tg/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -29,12 +29,22 @@ msgstr "Санаҳои муҳим"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s бо калидҳои ягонаи(pk) %(key)r вуҷуд надорад."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr ""
+
 msgid "Password changed successfully."
 msgstr "Рамз муваффақона иваз карда шуд."
+
+msgid "Password-based authentication was disabled."
+msgstr ""
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Ивазкунии рамз: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr ""
 
 msgid "Authentication and Authorization"
 msgstr "Истифодабарандагон ва гурӯҳҳо"
@@ -45,11 +55,11 @@ msgstr "рамз"
 msgid "last login"
 msgstr "охирин вуруд"
 
-msgid "No password set."
-msgstr "Рамзро ворид созед."
+msgid "Reset password"
+msgstr ""
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Формати рамз ё алгоритми ҳеш(hash) ношинос аст."
+msgid "Set password"
+msgstr ""
 
 msgid "The two password fields didn’t match."
 msgstr ""
@@ -64,8 +74,26 @@ msgid "Enter the same password as before, for verification."
 msgstr "Барои тасдиқсозӣ хоҳишмандем, бори дигар рамзро ворид созед."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+
+msgid "Password-based authentication"
+msgstr ""
+
+msgid "Enabled"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
 msgstr ""
 
 #, python-format
@@ -95,9 +123,6 @@ msgstr ""
 
 msgid "Old password"
 msgstr "Рамзи кӯҳна"
-
-msgid "Password (again)"
-msgstr "Рамз (такроран)"
 
 msgid "algorithm"
 msgstr "алгоритм"
@@ -131,6 +156,9 @@ msgstr "омили корӣ"
 
 msgid "checksum"
 msgstr "натиҷаи санҷиш"
+
+msgid "block size"
+msgstr ""
 
 msgid "name"
 msgstr "ном"
@@ -222,12 +250,9 @@ msgid "users"
 msgstr "истифодабарандаҳо"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -260,12 +285,16 @@ msgstr ""
 msgid "Password reset on %(site_name)s"
 msgstr "Барҳамдиҳии рамз дар сайти мазкур %(site_name)s"
 
+msgid "No password set."
+msgstr "Рамзро ворид созед."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Формати рамз ё алгоритми ҳеш(hash) ношинос аст."
+
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Номи истифодабарандаро дуруст ворид созед. Қимати ин майдон бояд танҳоаз "
-"ҳуруфи англисӣ, рақамҳо ва аломатҳо @/./+/-/_ иборат бошад."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

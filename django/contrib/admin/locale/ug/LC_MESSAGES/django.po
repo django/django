@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-03-09 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Abduqadir Abliz <sahranbay@gmail.com>, 2023-2024,2026\n"
 "Language-Team: Uyghur (http://app.transifex.com/django/django/language/ug/)\n"
 "MIME-Version: 1.0\n"
@@ -181,8 +181,13 @@ msgstr "يوق"
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr "Mac دىكى «كونترول» ياكى «Ctrl» نى بېسىپ ، بىردىن كۆپنى تاللاڭ."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "مەشغۇلات ئۈچۈن ئوبيېكت تاللىنىدۇ-{}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -246,14 +251,14 @@ msgstr "%sنى ئۆزگەرت"
 msgid "View %s"
 msgstr "%sكۆرۈش"
 
-msgid "Database error"
-msgstr "ساندان خاتالىقى"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)sنى %(name)sگە ئۆزگەرتىش مۇۋەپپىقىيەتلىك بولدى."
 msgstr[1] "%(count)sنى%(name)sگە ئۆزگەرتىش مۇۋەپپىقىيەتلىك بولدى"
+
+msgid "Database error"
+msgstr "ساندان خاتالىقى"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -278,6 +283,17 @@ msgstr "تارىخنى ئۆزگەرتىش: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s%(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -331,9 +347,6 @@ msgstr ""
 msgid "Run"
 msgstr "ئىجرا قىل"
 
-msgid "Click here to select the objects across all pages"
-msgstr "بارلىق بەتلەردىكى ئوبىيكتلەرنى تاللاش ئۈچۈن بۇ يەرنى چېكىڭ."
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "بارىلىق %(total_count)s%(module_name)s نى تاللا"
@@ -343,10 +356,6 @@ msgstr "تاللىغاننى تازىلا"
 
 msgid "Breadcrumbs"
 msgstr "يول كۆرسەتكۈچى"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s پروگراممىسىدىكى مودېللار"
 
 msgid "Model name"
 msgstr "مودىل ئىسمى"
@@ -460,6 +469,10 @@ msgstr "تېمىنى ئالماشتۇرۇش (ھازىرقى تېما: يورۇق
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "تېمىنى ئالماشتۇرۇش (ھازىرقى تېما: قارا)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -666,6 +679,9 @@ msgstr "تاللىغان %(model)s نى ئۆچۈر"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "تاللىغان %(model)s نى كۆرسەت"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "بۈگۈن تور بېكەتتە ساپالىق ۋاقىت سەرىب قىلغىنىڭىزغا رەھمەت."

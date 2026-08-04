@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
 "Last-Translator: Natalia, 2025\n"
 "Language-Team: Persian (http://app.transifex.com/django/django/language/"
 "fa/)\n"
@@ -159,6 +159,9 @@ msgstr "کرواتی"
 
 msgid "Upper Sorbian"
 msgstr "صربستانی بالا"
+
+msgid "Haitian Creole"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "مجاری"
@@ -499,6 +502,9 @@ msgstr "‏%(model_name)s با این %(field_labels)s وجود دارد."
 msgid "Constraint “%(name)s” is violated."
 msgstr ""
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "مقدار %(value)r انتخاب معتبری نیست. "
@@ -567,11 +573,11 @@ msgstr "تاریخ (بدون زمان)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
-"مقدار \"%(value)s\"  یک قالب نامعتبر دارد. باید در قالب YYYY-MM-DD HH:MM[:"
-"ss[.uuuuuu]][TZ] باشد."
+"مقدار \"%(value)s\"  یک قالب نامعتبر دارد. باید در قالب YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] باشد."
 
 #, python-format
 msgid ""
@@ -593,8 +599,8 @@ msgstr "عدد دهدهی"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "مقدار «%(value)s» در قالب نادرستی وارد شده است. باید در قالب ‎[DD] [HH:"
 "[MM:]]ss[.uuuuuu]‎ باشد."
@@ -662,8 +668,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"مقدار «%(value)s» در قالب نادرستی وارد شده است. باید در قالب HH:MM[:ss[."
-"uuuuuu]]‎ باشد."
+"مقدار «%(value)s» در قالب نادرستی وارد شده است. باید در قالب "
+"HH:MM[:ss[.uuuuuu]]‎ باشد."
 
 #, python-format
 msgid ""
@@ -681,6 +687,10 @@ msgstr "نشانی اینترنتی"
 
 msgid "Raw binary data"
 msgstr "دادهٔ دودویی خام"
+
+#, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -723,8 +733,8 @@ msgid "Many-to-many relationship"
 msgstr "رابطه چند به چند"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":؟.!"
 
@@ -882,6 +892,28 @@ msgstr "بله"
 
 msgid "No"
 msgstr "خیر"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
+
+msgctxt "Task"
+msgid "Ready"
+msgstr ""
+
+msgctxt "Task"
+msgid "Running"
+msgstr ""
+
+msgctxt "Task"
+msgid "Failed"
+msgstr ""
+
+msgctxt "Task"
+msgid "Successful"
+msgstr ""
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1272,11 +1304,11 @@ msgstr "هیچ %(verbose_name_plural)s موجود نیست"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"آینده %(verbose_name_plural)s امکان پذیر نیست زیرا مقدار %(class_name)s."
-"allow_future برابر False تنظیم شده است."
+"آینده %(verbose_name_plural)s امکان پذیر نیست زیرا مقدار "
+"%(class_name)s.allow_future برابر False تنظیم شده است."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
@@ -1327,10 +1359,10 @@ msgid ""
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"شما این صفحه را به این دلیل مشاهده می کنید که <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
-"rel=\"noopener\">DEBUG=True</a> در فایل تنظیمات شما وجود دارد و شما هیچ URL "
-"تنظیم نکرده اید."
+"شما این صفحه را به این دلیل مشاهده می کنید که <a href=\"https://"
+"docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" "
+"target=\"_blank\" rel=\"noopener\">DEBUG=True</a> در فایل تنظیمات شما وجود "
+"دارد و شما هیچ URL تنظیم نکرده اید."
 
 msgid "Django Documentation"
 msgstr "مستندات جنگو"

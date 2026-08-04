@@ -7,10 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-12-06 07:43+0000\n"
-"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>\n"
-"Language-Team: Malay (http://www.transifex.com/django/django/language/ms/)\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
+"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021\n"
+"Language-Team: Malay (http://app.transifex.com/django/django/language/ms/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -49,6 +49,9 @@ msgstr "Bahasa Bosnia"
 
 msgid "Catalan"
 msgstr "Bahasa Catalonia"
+
+msgid "Central Kurdish (Sorani)"
+msgstr ""
 
 msgid "Czech"
 msgstr "Bahasa Czech"
@@ -136,6 +139,9 @@ msgstr "Bahasa Kroatia"
 
 msgid "Upper Sorbian"
 msgstr "Bahasa Sorbia Atasan"
+
+msgid "Haitian Creole"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "Bahasa Hungary"
@@ -290,6 +296,9 @@ msgstr "Bahasa Tatar"
 msgid "Udmurt"
 msgstr "Bahasa Udmurt"
 
+msgid "Uyghur"
+msgstr ""
+
 msgid "Ukrainian"
 msgstr "Bahasa Ukraine"
 
@@ -337,6 +346,9 @@ msgstr "Ruangan itu tiada keputusan"
 msgid "Enter a valid value."
 msgstr "Masukkan nilai yang sah."
 
+msgid "Enter a valid domain name."
+msgstr ""
+
 msgid "Enter a valid URL."
 msgstr "Masukkan URL yang sah."
 
@@ -360,14 +372,18 @@ msgstr ""
 "Masukkan \"slug\" yang sah yang mengandungi huruf Unicode, nombor, garisan, "
 "atau tanda sempang."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Masukkan alamat IPv4 yang sah."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr ""
 
-msgid "Enter a valid IPv6 address."
-msgstr "Masukkan alamat IPv6 yang sah."
+msgid "IPv4"
+msgstr ""
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Masukkan alamat IPv4 atau IPv6 yang sah."
+msgid "IPv6"
+msgstr ""
+
+msgid "IPv4 or IPv6"
+msgstr ""
 
 msgid "Enter only digits separated by commas."
 msgstr "Hanya masukkan digit yang dipisahkan oleh koma."
@@ -383,6 +399,16 @@ msgstr "Pastikan nilai ini kurang daripada atau sama dengan %(limit_value)s."
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Pastikan nilai ini lebih daripada atau sama dengan %(limit_value)s."
+
+#, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -446,6 +472,13 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s dengan %(field_labels)s ini sudah wujud."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr ""
+
+msgid "- Select an option -"
+msgstr ""
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Nilai %(value)r bukan pilihan yang sah."
 
@@ -459,8 +492,8 @@ msgstr "Medan ini tidak boleh dibiarkan kosong."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s dengan %(field_label)s ini sudah wujud."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -484,6 +517,9 @@ msgstr "Boolean (Samada True atau False)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "String (sehingga %(max_length)s)"
+
+msgid "String (unlimited)"
+msgstr ""
 
 msgid "Comma-separated integers"
 msgstr "Integer dipisahkan dengan koma"
@@ -509,8 +545,8 @@ msgstr "Tarikh (tanpa masa)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "Nilai \"%(value)s\" mempunyai format yang tidak sah. Format harus berbentuk "
 "YYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
@@ -520,8 +556,8 @@ msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"Nilai \"%(value)s\" mempunyai format yang betul (YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ]) tetapi ia adalah tarikh/masa yang tidak sah."
+"Nilai \"%(value)s\" mempunyai format yang betul (YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ]) tetapi ia adalah tarikh/masa yang tidak sah."
 
 msgid "Date (with time)"
 msgstr "Tarikh (dengan masa)"
@@ -535,8 +571,8 @@ msgstr "Nombor titik perpuluhan"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "Nilai \"%(value)s\" mempunyai format yang tidak sah. Format harus berbentuk  "
 "[DD] [[HH:]MM:]ss[.uuuuuu]."
@@ -625,6 +661,10 @@ msgid "Raw binary data"
 msgstr "Data binari mentah"
 
 #, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
+
+#, python-format
 msgid "“%(value)s” is not a valid UUID."
 msgstr "UUID \"%(value)s\" tidak sah."
 
@@ -644,8 +684,8 @@ msgid "Value must be valid JSON."
 msgstr "Nilai harus dalam bentuk JSON yang sah."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(model)s dengan %(field)s %(value)r tidak wujud."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Kunci Asing (jenis ditentukan oleh medan yang berkaitan)"
@@ -665,8 +705,8 @@ msgid "Many-to-many relationship"
 msgstr "Hubungan banyak-ke-banyak"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -753,14 +793,14 @@ msgstr ""
 "masalah masih berterusan."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Sila hantar tidak lebih dari %d borang."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] ""
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Sila hantar sekurang-kurangnya %d borang."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] ""
 
 msgid "Order"
 msgstr "Susunan"
@@ -822,6 +862,28 @@ msgstr "Ya"
 
 msgid "No"
 msgstr "Tidak"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
+
+msgctxt "Task"
+msgid "Ready"
+msgstr ""
+
+msgctxt "Task"
+msgid "Running"
+msgstr ""
+
+msgctxt "Task"
+msgid "Failed"
+msgstr ""
+
+msgctxt "Task"
+msgid "Successful"
+msgstr ""
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1147,20 +1209,20 @@ msgid ""
 "enable them, at least for this site, or for HTTPS connections, or for “same-"
 "origin” requests."
 msgstr ""
-"Sekiranya anda telah menetapkan pelayar anda untuk mematikan header \"Referer"
-"\", sila hidupkannya semula, sekurang-kurangya bagi laman ini, atau bagi "
-"sambungan HTTPS, atau bagi permintaan \"same-origin\"."
+"Sekiranya anda telah menetapkan pelayar anda untuk mematikan header "
+"\"Referer\", sila hidupkannya semula, sekurang-kurangya bagi laman ini, atau "
+"bagi sambungan HTTPS, atau bagi permintaan \"same-origin\"."
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
-"Sekiranya anda menggunakan tag <meta name=\"referrer\" content=\"no-referrer"
-"\"> atau memasukkan header \"Referer-Policy: no-referrer\", sila buangkan "
-"ia. Perlindungan CSRF memerlukan header \"Referer\" untuk melakukan "
+"Sekiranya anda menggunakan tag <meta name=\"referrer\" content=\"no-"
+"referrer\"> atau memasukkan header \"Referer-Policy: no-referrer\", sila "
+"buangkan ia. Perlindungan CSRF memerlukan header \"Referer\" untuk melakukan "
 "penyemakan referer yang ketat. Sekiranya anda risau tentang privasi anda, "
 "gunakan alternatif seperti <a rel=\"noreferrer\" …> bagi pautan laman pihak "
 "ketiga."
@@ -1206,8 +1268,8 @@ msgstr "%(verbose_name_plural)s tiada"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
 "%(verbose_name_plural)s masa depan tiada kerana %(class_name)s.allow_future "
 "adalah False. "
@@ -1215,8 +1277,8 @@ msgstr ""
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
 msgstr ""
-"\"%(datestr)s\" tarikh yang diberikan tidak sah mengikut format \"%(format)s"
-"\""
+"\"%(datestr)s\" tarikh yang diberikan tidak sah mengikut format "
+"\"%(format)s\""
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
@@ -1258,14 +1320,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "Anda melihat ruangan ini kerana <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> terdapat didalam fail tetapan anda dan anda tidak "
-"menetapkan sebarang URL."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> terdapat didalam fail tetapan anda dan anda "
+"tidak menetapkan sebarang URL."
 
 msgid "Django Documentation"
 msgstr "Dokumentasi Django"

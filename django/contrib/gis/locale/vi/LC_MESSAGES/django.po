@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Vietnamese (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 18:45+0000\n"
+"Last-Translator: Thanh Le Viet <lethanhx2k@gmail.com>, 2013\n"
+"Language-Team: Vietnamese (http://app.transifex.com/django/django/language/"
 "vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,7 +26,7 @@ msgid "The base GIS field."
 msgstr ""
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
 
 msgid "Point"
@@ -73,9 +73,6 @@ msgstr "Có lỗi khi chuyển đổi hình học từ SRID của trường geom
 msgid "Delete all Features"
 msgstr ""
 
-msgid "WKT debugging window:"
-msgstr ""
-
 msgid "Debugging window (serialized value)"
 msgstr ""
 
@@ -83,5 +80,5 @@ msgid "No feeds are registered."
 msgstr "Không có feed nào được đăng kí"
 
 #, python-format
-msgid "Slug %r isn't registered."
-msgstr "Slug %r không được đăng kí"
+msgid "Slug %r isn’t registered."
+msgstr ""

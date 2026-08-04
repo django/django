@@ -21,8 +21,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
 "Last-Translator: Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020,2022-2025\n"
 "Language-Team: Dutch (http://app.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -503,6 +503,9 @@ msgstr "%(model_name)s met deze %(field_labels)s bestaat al."
 msgid "Constraint “%(name)s” is violated."
 msgstr "Beperking ‘%(name)s’ is geschonden."
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Waarde %(value)r is geen geldige keuze."
@@ -571,8 +574,8 @@ msgstr "Datum (zonder tijd)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "Waarde van ‘%(value)s’ heeft een ongeldige notatie. De juiste notatie is "
 "YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
@@ -582,8 +585,8 @@ msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"Waarde van ‘%(value)s’ heeft de juiste notatie (YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ]), maar het is een ongeldige datum/tijd."
+"Waarde van ‘%(value)s’ heeft de juiste notatie (YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ]), maar het is een ongeldige datum/tijd."
 
 msgid "Date (with time)"
 msgstr "Datum (met tijd)"
@@ -597,8 +600,8 @@ msgstr "Decimaal getal"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "Waarde van ‘%(value)s’ heeft een ongeldige notatie. De juiste notatie is "
 "[DD] [[HH:]MM:]ss[.uuuuuu]."
@@ -666,8 +669,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"Waarde van ‘%(value)s’ heeft een ongeldige notatie. De juiste notatie is HH:"
-"MM[:ss[.uuuuuu]]."
+"Waarde van ‘%(value)s’ heeft een ongeldige notatie. De juiste notatie is "
+"HH:MM[:ss[.uuuuuu]]."
 
 #, python-format
 msgid ""
@@ -685,6 +688,10 @@ msgstr "URL"
 
 msgid "Raw binary data"
 msgstr "Onbewerkte binaire gegevens"
+
+#, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -890,6 +897,12 @@ msgstr "Ja"
 
 msgid "No"
 msgstr "Nee"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
 
 msgctxt "Task"
 msgid "Ready"
@@ -1296,11 +1309,11 @@ msgstr "Geen %(verbose_name_plural)s beschikbaar"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"Geen toekomstige %(verbose_name_plural)s beschikbaar, omdat %(class_name)s."
-"allow_future de waarde False (Onwaar) heeft."
+"Geen toekomstige %(verbose_name_plural)s beschikbaar, omdat "
+"%(class_name)s.allow_future de waarde False (Onwaar) heeft."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
@@ -1353,9 +1366,10 @@ msgid ""
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"U ziet deze pagina, omdat uw instellingenbestand <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
-"rel=\"noopener\">DEBUG=True</a> bevat en u geen URL's hebt geconfigureerd."
+"U ziet deze pagina, omdat uw instellingenbestand <a href=\"https://"
+"docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" "
+"target=\"_blank\" rel=\"noopener\">DEBUG=True</a> bevat en u geen URL's hebt "
+"geconfigureerd."
 
 msgid "Django Documentation"
 msgstr "Django-documentatie"

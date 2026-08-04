@@ -6,17 +6,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Bosnian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 20:19+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>, 2011\n"
+"Language-Team: Bosnian (http://app.transifex.com/django/django/language/"
 "bs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: bs\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 msgid "Administrative Documentation"
 msgstr ""
@@ -89,8 +89,8 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
-"\">docutils</a> library."
+"The admin documentation system requires Python’s <a "
+"href=\"%(link)s\">docutils</a> library."
 msgstr ""
 
 #, python-format
@@ -140,12 +140,12 @@ msgid "Template: %(name)s"
 msgstr ""
 
 #, python-format
-msgid "Template: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
 msgstr ""
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
+msgid "Search path for template <q>%(name)s</q>:"
 msgstr ""
 
 msgid "(does not exist)"

@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 08:09+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
 "Last-Translator: X Bello <xbello@gmail.com>, 2023-2025\n"
 "Language-Team: Galician (http://app.transifex.com/django/django/language/"
 "gl/)\n"
@@ -60,12 +60,6 @@ msgstr "contrasinal"
 
 msgid "last login"
 msgstr "última sesión"
-
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Formato de contrasinal non válido ou algoritmo de hash descoñecido."
-
-msgid "No password set."
-msgstr "Non se configurou ningún contrasinal."
 
 msgid "Reset password"
 msgstr "Reconfigurar contrasinal"
@@ -303,6 +297,12 @@ msgstr "O seu contrasinal non pode ser únicamente numérico."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Cambio de contrasinal en %(site_name)s"
+
+msgid "No password set."
+msgstr "Non se configurou ningún contrasinal."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Formato de contrasinal non válido ou algoritmo de hash descoñecido."
 
 msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "

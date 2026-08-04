@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-12-03 08:09+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
 "Last-Translator: Abdulrahman Alfawal, 2025\n"
 "Language-Team: Arabic (http://app.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -61,13 +61,6 @@ msgstr "كلمة المرور"
 
 msgid "last login"
 msgstr "آخر دخول"
-
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr ""
-"صيغة كلمة المرور غير صحيحة أو أن خوارزمية البعثرة (hashing) غير معروفة."
-
-msgid "No password set."
-msgstr "لم يتم تعيين كلمة المرور."
 
 msgid "Reset password"
 msgstr "إعادة ضبط كلمة المرور"
@@ -306,6 +299,13 @@ msgstr "لا يمكن أن تكون كلمة المرور مكونة من أرق
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "إعادة تعيين كلمة المرور على %(site_name)s"
+
+msgid "No password set."
+msgstr "لم يتم تعيين كلمة المرور."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr ""
+"صيغة كلمة المرور غير صحيحة أو أن خوارزمية البعثرة (hashing) غير معروفة."
 
 msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "

@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
 "Last-Translator: arneatec <arneatec@gmail.com>, 2022-2024\n"
 "Language-Team: Bulgarian (http://app.transifex.com/django/django/language/"
 "bg/)\n"
@@ -148,6 +148,9 @@ msgstr "хърватски"
 
 msgid "Upper Sorbian"
 msgstr "горносорбски"
+
+msgid "Haitian Creole"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "унгарски"
@@ -495,6 +498,9 @@ msgstr "%(model_name)s с този %(field_labels)s вече съществув�
 msgid "Constraint “%(name)s” is violated."
 msgstr "Ограничението “%(name)s” е нарушено."
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Стойността %(value)r не е валиден избор."
@@ -563,8 +569,8 @@ msgstr "Дата (без час)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "Стойността '%(value)s' е с невалиден формат. Трябва да бъде във формат ГГГГ-"
 "ММ-ДД ЧЧ:ММ[:сс[.uuuuuu]][TZ]"
@@ -589,8 +595,8 @@ msgstr "Десетична дроб"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "Стойността “%(value)s” е с невалиден формат. Трябва да бъде във формат [ДД] "
 "[[ЧЧ:]ММ:]сс[.uuuuuu] format."
@@ -658,8 +664,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"Стойността \"%(value)s\"  е с невалиден формат. Тя трябва да бъде в ЧЧ:ММ [:"
-"сс[.μμμμμμ]]"
+"Стойността \"%(value)s\"  е с невалиден формат. Тя трябва да бъде в ЧЧ:ММ "
+"[:сс[.μμμμμμ]]"
 
 #, python-format
 msgid ""
@@ -677,6 +683,10 @@ msgstr "URL адрес"
 
 msgid "Raw binary data"
 msgstr "сурови двоични данни"
+
+#, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -698,8 +708,8 @@ msgid "Value must be valid JSON."
 msgstr "Стойността трябва да е валиден JSON."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "Инстанция на %(model)s с %(field)s %(value)r не съществува."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Външен ключ (тип, определен от свързаното поле)"
@@ -719,8 +729,8 @@ msgid "Many-to-many relationship"
 msgstr "Много-към-много релация"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -882,6 +892,28 @@ msgstr "Да"
 
 msgid "No"
 msgstr "Не"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
+
+msgctxt "Task"
+msgid "Ready"
+msgstr ""
+
+msgctxt "Task"
+msgid "Running"
+msgstr ""
+
+msgctxt "Task"
+msgid "Failed"
+msgstr ""
+
+msgctxt "Task"
+msgid "Successful"
+msgstr ""
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1272,11 +1304,11 @@ msgstr "Няма достъпни %(verbose_name_plural)s"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"Бъдещo %(verbose_name_plural)s е недостъпно, тъй като %(class_name)s."
-"allow_future е False."
+"Бъдещo %(verbose_name_plural)s е недостъпно, тъй като "
+"%(class_name)s.allow_future е False."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"

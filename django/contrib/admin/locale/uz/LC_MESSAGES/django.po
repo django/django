@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2024-01-25 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Shukrullo Turgunov <shukrullo@umail.uz>, 2021,2024\n"
 "Language-Team: Uzbek (http://app.transifex.com/django/django/language/uz/)\n"
 "MIME-Version: 1.0\n"
@@ -35,8 +35,8 @@ msgstr "%(count)d%(items)s muvaffaqiyatli o'chirildi."
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s o'chirib bo'lmadi"
 
-msgid "Are you sure?"
-msgstr "Ishonchingiz komilmi?"
+msgid "Delete multiple objects"
+msgstr ""
 
 msgid "Administration"
 msgstr "Administratsiya"
@@ -182,7 +182,12 @@ msgstr "Bo'sh"
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
+msgstr ""
+
+#, python-format
+msgid "The app \"%s\" could not be found."
 msgstr ""
 
 #, python-brace-format
@@ -200,10 +205,6 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -244,13 +245,13 @@ msgstr "%sni o'zgartirish"
 msgid "View %s"
 msgstr "Ko'rish %s"
 
-msgid "Database error"
-msgstr "Ma'lumotlar bazasi xatoligi yuz berdi"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] ""
+
+msgid "Database error"
+msgstr "Ma'lumotlar bazasi xatoligi yuz berdi"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -260,6 +261,9 @@ msgstr[0] ""
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr ""
+
+msgid "Delete"
+msgstr "O'chirish"
 
 #, python-format
 msgid "Change history: %s"
@@ -271,6 +275,16 @@ msgstr ""
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr ""
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
 
 #, python-format
 msgid ""
@@ -317,13 +331,7 @@ msgid ""
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 
-msgid "Run the selected action"
-msgstr "Tanlangan faoliyatni ishga tushirish"
-
-msgid "Go"
-msgstr ""
-
-msgid "Click here to select the objects across all pages"
+msgid "Run"
 msgstr ""
 
 #, python-format
@@ -336,8 +344,13 @@ msgstr ""
 msgid "Breadcrumbs"
 msgstr ""
 
-#, python-format
-msgid "Models in the %(name)s application"
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
 msgstr ""
 
 msgid "Add"
@@ -349,16 +362,17 @@ msgstr "Ko'rish"
 msgid "You don’t have permission to view or edit anything."
 msgstr ""
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
 
-msgid "Enter a username and password."
-msgstr "Username va parolni kiritish"
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "Parolni o'zgartirish"
+
+msgid "Set password"
+msgstr ""
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
@@ -366,6 +380,17 @@ msgstr[0] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr ""
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
 msgstr ""
 
 msgid "Skip to main content"
@@ -405,6 +430,9 @@ msgstr ""
 msgid "Clear all filters"
 msgstr ""
 
+msgid "Save"
+msgstr "Saqlash"
+
 msgid "Remove from sorting"
 msgstr "Tartiblashdan chiqarish"
 
@@ -424,25 +452,26 @@ msgstr ""
 msgid "Toggle theme (current theme: dark)"
 msgstr ""
 
-msgid "Delete"
-msgstr "O'chirish"
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
 
@@ -453,9 +482,6 @@ msgid "Yes, I’m sure"
 msgstr ""
 
 msgid "No, take me back"
-msgstr ""
-
-msgid "Delete multiple objects"
 msgstr ""
 
 #, python-format
@@ -520,7 +546,7 @@ msgid ""
 "page. Would you like to login to a different account?"
 msgstr ""
 
-msgid "Forgotten your password or username?"
+msgid "Forgotten your login credentials?"
 msgstr ""
 
 msgid "Toggle navigation"
@@ -544,6 +570,10 @@ msgstr ""
 msgid "Action"
 msgstr ""
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] ""
@@ -553,13 +583,18 @@ msgid ""
 "admin site."
 msgstr ""
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr ""
 
-msgid "Save"
-msgstr "Saqlash"
-
 msgid "Popup closing…"
+msgstr ""
+
+#, python-format
+msgid "Search %(name)s"
 msgstr ""
 
 msgid "Search"
@@ -603,6 +638,9 @@ msgstr ""
 
 #, python-format
 msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Logout"
 msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
@@ -669,7 +707,7 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr ""
 
-msgid "Your username, in case you’ve forgotten:"
+msgid "In case you’ve forgotten, you are:"
 msgstr ""
 
 msgid "Thanks for using our site!"

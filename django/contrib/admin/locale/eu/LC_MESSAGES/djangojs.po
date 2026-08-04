@@ -9,10 +9,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:26-0500\n"
-"PO-Revision-Date: 2022-07-25 07:59+0000\n"
-"Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
-"Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 07:59+0000\n"
+"Last-Translator: Eneko Illarramendi <eneko@illarra.com>, 2017,2022\n"
+"Language-Team: Basque (http://app.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -25,12 +25,8 @@ msgstr "%s erabilgarri"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Hau da aukeran dauden %s zerrenda. Hauetako zenbait aukera ditzakezu "
-"azpiko \n"
-"kaxan hautatu eta kutxen artean dagoen \"Aukeratu\" gezian klik eginez."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -39,18 +35,17 @@ msgstr "Idatzi kutxa honetan erabilgarri dauden %s objektuak iragazteko."
 msgid "Filter"
 msgstr "Filtroa"
 
-msgid "Choose all"
-msgstr "Denak aukeratu"
+#, javascript-format
+msgid "Choose all %s"
+msgstr ""
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Egin klik %s guztiak batera aukeratzeko."
+msgid "Choose selected %s"
+msgstr ""
 
-msgid "Choose"
-msgstr "Aukeratu"
-
-msgid "Remove"
-msgstr "Kendu"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr ""
 
 #, javascript-format
 msgid "Chosen %s"
@@ -58,18 +53,25 @@ msgstr "%s aukeratuak"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Hau da aukeratutako %s zerrenda. Hauetako zenbait ezaba ditzakezu azpiko "
-"kutxan hautatu eta bi kutxen artean dagoen \"Ezabatu\" gezian klik eginez."
-
-msgid "Remove all"
-msgstr "Kendu guztiak"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Egin klik aukeratutako %s guztiak kentzeko."
+msgid "Type into this box to filter down the list of selected %s."
+msgstr ""
+
+msgid "(click to clear)"
+msgstr ""
+
+#, javascript-format
+msgid "Remove all %s"
+msgstr ""
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -91,7 +93,7 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
 
@@ -110,17 +112,26 @@ msgstr "Eguerdia"
 msgid "6 p.m."
 msgstr "6 p.m."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Oharra: zerbitzariaren denborarekiko ordu %s aurrerago zaude"
-msgstr[1] "Oharra: zerbitzariaren denborarekiko %s ordu aurrerago zaude"
+msgid "server"
+msgstr ""
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Oharra: zerbitzariaren denborarekiko ordu %s atzerago zaude. "
-msgstr[1] "Oharra: zerbitzariaren denborarekiko %s ordu atzerago zaude. "
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Choose a Time"
 msgstr "Aukeratu ordu bat"
@@ -134,14 +145,29 @@ msgstr "Atzera"
 msgid "Today"
 msgstr "Gaur"
 
+msgid "Today (%(date)s)"
+msgstr ""
+
 msgid "Choose a Date"
 msgstr "Aukeratu data bat"
 
 msgid "Yesterday"
 msgstr "Atzo"
 
+msgid "Yesterday (%(date)s)"
+msgstr ""
+
 msgid "Tomorrow"
 msgstr "Bihar"
+
+msgid "Tomorrow (%(date)s)"
+msgstr ""
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr ""
+
+msgid "Next (%(month)s %(year)s)"
+msgstr ""
 
 msgid "January"
 msgstr "urtarrila"
@@ -227,6 +253,55 @@ msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "abe."
 
+msgid "Sunday"
+msgstr ""
+
+msgid "Monday"
+msgstr ""
+
+msgid "Tuesday"
+msgstr ""
+
+msgid "Wednesday"
+msgstr ""
+
+msgid "Thursday"
+msgstr ""
+
+msgid "Friday"
+msgstr ""
+
+msgid "Saturday"
+msgstr ""
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr ""
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr ""
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr ""
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr ""
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr ""
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr ""
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr ""
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "ig."
@@ -255,13 +330,17 @@ msgctxt "one letter Saturday"
 msgid "S"
 msgstr "lr."
 
-msgid ""
-"You have already submitted this form. Are you sure you want to submit it "
-"again?"
+msgid "%(month)s %(day)s, %(year)s"
 msgstr ""
 
-msgid "Show"
-msgstr "Erakutsi"
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr ""
 
-msgid "Hide"
-msgstr "Izkutatu"
+#, javascript-format
+msgid "%s (today)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr ""

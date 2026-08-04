@@ -1,0 +1,103 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jean Patrick Prenis <patrickprenice@gmail.com>, 2025
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 09:22+0000\n"
+"Last-Translator: Jean Patrick Prenis <patrickprenice@gmail.com>, 2025\n"
+"Language-Team: Haitian (Haitian Creole) (http://app.transifex.com/django/"
+"django/language/ht/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ht\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "PostgreSQL extensions"
+msgstr "ekstansyon PostgreSQL"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "Eleman %(nth)s nan tablo a pa valide:"
+
+msgid "Nested arrays must have the same length."
+msgstr "Tablo anndan tablo yo dwe gen menm longè."
+
+msgid "Map of strings to strings/nulls"
+msgstr "Map chenn karaktè ak chenn/nulls"
+
+#, python-format
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "Valè “%(key)s” pa yon chenn ni null."
+
+msgid "Could not load JSON data."
+msgstr "done JSON yo pa t kapab chaje."
+
+msgid "Input must be a JSON dictionary."
+msgstr "Input: la dwe yon diksyonè JSON"
+
+msgid "Enter two valid values."
+msgstr "Antre 2 valè ki valab"
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr "Kòmansman entèval la pa dwe depase fen entèval la."
+
+msgid "Enter two whole numbers."
+msgstr "Antre de nonb antye."
+
+msgid "Enter two numbers."
+msgstr "Antre de nimeyo yo"
+
+msgid "Enter two valid date/times."
+msgstr "Antre de dat/lè ki valab."
+
+msgid "Enter two valid dates."
+msgstr "Antre de dat ki valab."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+"Lis la genyen %(show_value)d atik, li pa dwe genyen plis pase %(limit_value)d"
+msgstr[1] ""
+"Lis la genyen %(show_value)d atik, li pa dwe genyen plis pase %(limit_value)d"
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+"Lis la genyen 1%(show_value)d atik, li pa dwe genyen mwens pase "
+"2%(limit_value)d."
+msgstr[1] ""
+"Lis la genyen %(show_value)d atik, li pa dwe genyen mwens pase "
+"%(limit_value)d"
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "Gen kèk kle ki te manke: %(keys)s"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr "Gen kèk kle enkoni ki te bay: %(keys)s"
+
+#, python-format
+msgid ""
+"Ensure that the upper bound of the range is not greater than %(limit_value)s."
+msgstr "Asire w ke limit anwo entèval la pa depase %(limit_value)s"
+
+#, python-format
+msgid ""
+"Ensure that the lower bound of the range is not less than %(limit_value)s."
+msgstr "Asire w ke limit anba entèval la pa pi piti pase %(limit_value)s."

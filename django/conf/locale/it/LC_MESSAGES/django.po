@@ -25,8 +25,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
 "Last-Translator: Andrea Guerra, 2024\n"
 "Language-Team: Italian (http://app.transifex.com/django/django/language/"
 "it/)\n"
@@ -34,7 +34,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: it\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
 
 msgid "Afrikaans"
 msgstr "Afrikaans"
@@ -158,6 +159,9 @@ msgstr "Croato"
 
 msgid "Upper Sorbian"
 msgstr "Sorabo superiore"
+
+msgid "Haitian Creole"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "Ungherese"
@@ -516,6 +520,9 @@ msgstr "%(model_name)s con questa %(field_labels)s esiste già."
 msgid "Constraint “%(name)s” is violated."
 msgstr "Il vincolo “%(name)s” è stato violato."
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Il valore %(value)r non è una scelta valida."
@@ -584,8 +591,8 @@ msgstr "Data (senza ora)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "Il valore \"%(value)s\" ha un formato non valido. Deve essere nel formato "
 "AAAA-MM-GG HH:MM[:ss[.uuuuuu]][TZ]."
@@ -595,8 +602,8 @@ msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"Il valore di \"%(value)s\" ha il formato corretto (AAAA-MM-GG HH:MM[:ss[."
-"uuuuuu]][TZ]) ma non è una data/ora valida."
+"Il valore di \"%(value)s\" ha il formato corretto (AAAA-MM-GG "
+"HH:MM[:ss[.uuuuuu]][TZ]) ma non è una data/ora valida."
 
 msgid "Date (with time)"
 msgstr "Data (con ora)"
@@ -610,8 +617,8 @@ msgstr "Numero decimale"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "Il valore \"%(value)s\" ha un formato non valido. Deve essere nel formato "
 "[GG] [[HH:]MM:]ss[.uuuuuu]."
@@ -700,6 +707,10 @@ msgid "Raw binary data"
 msgstr "Dati binari grezzi"
 
 #, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
+
+#, python-format
 msgid "“%(value)s” is not a valid UUID."
 msgstr "\"%(value)s\" non è uno UUID valido."
 
@@ -740,8 +751,8 @@ msgid "Many-to-many relationship"
 msgstr "Relazione molti a molti"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -912,6 +923,28 @@ msgstr "Sì"
 
 msgid "No"
 msgstr "No"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
+
+msgctxt "Task"
+msgid "Ready"
+msgstr ""
+
+msgctxt "Task"
+msgid "Running"
+msgstr ""
+
+msgctxt "Task"
+msgid "Failed"
+msgstr ""
+
+msgctxt "Task"
+msgid "Successful"
+msgstr ""
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1308,11 +1341,11 @@ msgstr "Nessun %(verbose_name_plural)s disponibile"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"%(verbose_name_plural)s futuri/e non disponibili/e poichè %(class_name)s."
-"allow_future è False."
+"%(verbose_name_plural)s futuri/e non disponibili/e poichè "
+"%(class_name)s.allow_future è False."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
@@ -1363,10 +1396,10 @@ msgid ""
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"Stai vedendo questa pagina perché hai impostato <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
-"rel=\"noopener\">DEBUG=True</a> nel tuo file di configurazione e non hai "
-"configurato nessun URL."
+"Stai vedendo questa pagina perché hai impostato <a href=\"https://"
+"docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" "
+"target=\"_blank\" rel=\"noopener\">DEBUG=True</a> nel tuo file di "
+"configurazione e non hai configurato nessun URL."
 
 msgid "Django Documentation"
 msgstr "Documentazione di Django"

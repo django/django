@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
 "Last-Translator: Manuela Silva <mmsrs@sky.com>, 2025\n"
 "Language-Team: Portuguese (http://app.transifex.com/django/django/language/"
 "pt/)\n"
@@ -20,7 +20,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pt\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
+"1000000 == 0 ? 1 : 2;\n"
 
 msgid "Personal info"
 msgstr "Informação pessoal"
@@ -61,12 +62,6 @@ msgstr "palavra-passe"
 
 msgid "last login"
 msgstr "última entrada"
-
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Formato de palavra-chave inválido ou função de mistura desconhecida."
-
-msgid "No password set."
-msgstr "Nenhuma palavra-chave definida."
 
 msgid "Reset password"
 msgstr "Redefinir palavra-passe"
@@ -305,6 +300,12 @@ msgstr "A sua palavra-passe não pode ser inteiramente numérica."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Redefinição de palavra-passe em %(site_name)s"
+
+msgid "No password set."
+msgstr "Nenhuma palavra-chave definida."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Formato de palavra-chave inválido ou função de mistura desconhecida."
 
 msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "

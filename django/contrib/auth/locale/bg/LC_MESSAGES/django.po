@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 08:09+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
 "Last-Translator: arneatec <arneatec@gmail.com>, 2022-2024\n"
 "Language-Team: Bulgarian (http://app.transifex.com/django/django/language/"
 "bg/)\n"
@@ -63,12 +63,6 @@ msgstr "парола"
 msgid "last login"
 msgstr "последно вписване"
 
-msgid "No password set."
-msgstr "Не е зададена парола."
-
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Невалиден формат за парола или неизвестен алгоритъм за хеширане."
-
 msgid "Reset password"
 msgstr "Възстановяване на парола"
 
@@ -78,14 +72,6 @@ msgstr "Задаване на парола"
 msgid "The two password fields didn’t match."
 msgstr "Двете полета за паролата не съвпадат.  "
 
-msgid ""
-"Whether the user will be able to authenticate using a password or not. If "
-"disabled, they may still be able to authenticate using other backends, such "
-"as Single Sign-On or LDAP."
-msgstr ""
-"Дали потребителят можи да влиза с парола или не. Ако е забранено, те могат "
-"да влизат чрез други способи, като Единно Влизане /Single Sign-On/ или LDAP."
-
 msgid "Password"
 msgstr "Парола"
 
@@ -94,6 +80,14 @@ msgstr "Потвърждение на паролата"
 
 msgid "Enter the same password as before, for verification."
 msgstr "Въведете същата парола като преди, за да потвърдите."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Дали потребителят можи да влиза с парола или не. Ако е забранено, те могат "
+"да влизат чрез други способи, като Единно Влизане /Single Sign-On/ или LDAP."
 
 msgid "Password-based authentication"
 msgstr "Влизане чрез парола"
@@ -264,16 +258,11 @@ msgid "users"
 msgstr "потребители"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"Паролата е прекалено къса. Трябва да съдържа поне %(min_length)d символ."
 msgstr[1] ""
-"Паролата е прекалено къса. Трябва да съдържа поне %(min_length)d символа."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -303,6 +292,12 @@ msgstr "Вашата парола не може да бъде само от ци
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Промяна на парола за %(site_name)s"
+
+msgid "No password set."
+msgstr "Не е зададена парола."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Невалиден формат за парола или неизвестен алгоритъм за хеширане."
 
 msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "

@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Muaaz Alsaied, 2020,2025\n"
 "Language-Team: Arabic (http://app.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -183,8 +183,13 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 "اضغط مفتاح ”Control“ أو ”Command“ على أجهزة ماك مطوّلًا لتحديد أكثر من عنصر."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "حدد هذا الكائن لإجراء - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -241,9 +246,6 @@ msgstr "تعديل %s"
 msgid "View %s"
 msgstr "عرض %s"
 
-msgid "Database error"
-msgstr "خطـأ في قاعدة البيانات"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -253,6 +255,9 @@ msgstr[2] "تم تغيير %(count)s %(name)s بنجاح."
 msgstr[3] "تم تغيير %(count)s %(name)s بنجاح."
 msgstr[4] "تم تغيير %(count)s %(name)s بنجاح."
 msgstr[5] "تم تغيير %(count)s %(name)s بنجاح."
+
+msgid "Database error"
+msgstr "خطـأ في قاعدة البيانات"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -281,6 +286,21 @@ msgstr "تاريخ التغيير: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #, python-format
 msgid ""
@@ -331,14 +351,8 @@ msgstr ""
 "لقد حدث خطأ. تم إبلاغ مسؤولي الموقع عبر البريد الإلكتروني وسيتم إصلاحه "
 "قريبًا. شكرا لصبرك."
 
-msgid "Run the selected action"
-msgstr "نفذ الإجراء المحدّد"
-
-msgid "Go"
-msgstr "نفّذ"
-
-msgid "Click here to select the objects across all pages"
-msgstr "اضغط هنا لتحديد جميع العناصر في جميع الصفحات"
+msgid "Run"
+msgstr ""
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -349,10 +363,6 @@ msgstr "إزالة الاختيار"
 
 msgid "Breadcrumbs"
 msgstr "روابط التنقُّل"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "النماذج في تطبيق %(name)s"
 
 msgid "Model name"
 msgstr "اسم النموذج"
@@ -447,6 +457,9 @@ msgstr "إظهار الأعداد"
 msgid "Clear all filters"
 msgstr "مسح جميع المرشحات"
 
+msgid "Save"
+msgstr "احفظ"
+
 msgid "Remove from sorting"
 msgstr "إزالة من الترتيب"
 
@@ -467,29 +480,27 @@ msgid "Toggle theme (current theme: dark)"
 msgstr "تبديل السمة (السمة الحالية: داكنة)"
 
 #, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
+
+#, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"حذف العنصر %(object_name)s '%(escaped_object)s' سيتسبب بحذف العناصر المرتبطة "
-"به، إلا أنك لا تملك صلاحية حذف العناصر التالية:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"حذف %(object_name)s '%(escaped_object)s' سيتسبب أيضاً بحذف العناصر المرتبطة، "
-"إلا أن حسابك ليس لديه صلاحية حذف أنواع العناصر التالية:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"متأكد أنك تريد حذف العنصر %(object_name)s \"%(escaped_object)s\"؟ سيتم حذف "
-"جميع العناصر التالية المرتبطة به:"
 
 msgid "Objects"
 msgstr "عناصر"
@@ -596,6 +607,10 @@ msgstr "المستخدم"
 msgid "Action"
 msgstr "إجراء"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "إدخال"
@@ -612,14 +627,19 @@ msgstr ""
 "ليس لهذا العنصر سجلّ تغييرات، على الأغلب أنه لم يُنشأ من خلال نظام إدارة "
 "الموقع."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "أظهر الكل"
 
-msgid "Save"
-msgstr "احفظ"
-
 msgid "Popup closing…"
 msgstr "جاري إغلاق النافذة المنبثقة..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "ابحث"
@@ -668,6 +688,9 @@ msgstr "حذف %(model)s المختارة"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "استعرض %(model)s المختارة"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "شكرا لقضاء بعض الوقت الجيد في الموقع اليوم."

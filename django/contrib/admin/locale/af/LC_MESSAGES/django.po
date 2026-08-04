@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: F Wolff <friedel@translate.org.za>, 2019-2020,2023-2025\n"
 "Language-Team: Afrikaans (http://app.transifex.com/django/django/language/"
 "af/)\n"
@@ -180,8 +180,13 @@ msgstr "Geen"
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr "Hou “Control” in (of “Command” op ’n Mac) om meer as een te kies."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Kies dié objek vir ’n aksie - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -243,14 +248,14 @@ msgstr "Wysig %s"
 msgid "View %s"
 msgstr "Beskou %s"
 
-msgid "Database error"
-msgstr "Databasisfout"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s is suksesvol verander."
 msgstr[1] "%(count)s %(name)s is suksesvol verander."
+
+msgid "Database error"
+msgstr "Databasisfout"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -275,6 +280,17 @@ msgstr "Verander geskiedenis: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -325,14 +341,8 @@ msgstr ""
 "’n Fout het voorgekom Dit is via e-pos aan die werfadministrateurs "
 "gerapporteer en behoort binnekort reggestel te word. Dankie vir u geduld."
 
-msgid "Run the selected action"
-msgstr "Voer die gekose aksie uit"
-
-msgid "Go"
-msgstr "Gaan"
-
-msgid "Click here to select the objects across all pages"
-msgstr "Kliek hier om die objekte oor alle bladsye te kies."
+msgid "Run"
+msgstr ""
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -343,10 +353,6 @@ msgstr "Verwyder keuses"
 
 msgid "Breadcrumbs"
 msgstr "Broodkrummels"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modelle in die %(name)s-toepassing"
 
 msgid "Model name"
 msgstr ""
@@ -438,6 +444,9 @@ msgstr "Wys tellings"
 msgid "Clear all filters"
 msgstr "Verwyder alle filters"
 
+msgid "Save"
+msgstr "Stoor"
+
 msgid "Remove from sorting"
 msgstr "Verwyder uit sortering"
 
@@ -458,30 +467,27 @@ msgid "Toggle theme (current theme: dark)"
 msgstr "Wissel tema (tans: donker)"
 
 #, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
+
+#, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Om die %(object_name)s %(escaped_object)s te skrap sou verwante objekte "
-"skrap, maar jou rekening het nie toestemming om die volgende tipes objekte "
-"te skrap nie:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Om die %(object_name)s “%(escaped_object)s” te skrap vereis dat die volgende "
-"beskermde verwante objekte geskrap word:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Wil u definitief die %(object_name)s “%(escaped_object)s” skrap? Al die "
-"volgende verwante items sal geskrap word:"
 
 msgid "Objects"
 msgstr "Objekte"
@@ -589,6 +595,10 @@ msgstr "Gebruiker"
 msgid "Action"
 msgstr "Aksie"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "inskrywing"
@@ -601,14 +611,19 @@ msgstr ""
 "Dié objek het nie 'n wysigingsgeskiedenis. Dit is waarskynlik nie deur dié "
 "adminwerf bygevoeg nie."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "Wys almal"
 
-msgid "Save"
-msgstr "Stoor"
-
 msgid "Popup closing…"
 msgstr "Opspringer sluit tans…"
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "Soek"
@@ -653,6 +668,9 @@ msgstr "Skrap gekose %(model)s"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Wys gekose %(model)s"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr ""

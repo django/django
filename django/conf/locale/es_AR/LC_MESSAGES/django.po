@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
 "Last-Translator: Ramiro Morales, 2013-2025\n"
 "Language-Team: Spanish (Argentina) (http://app.transifex.com/django/django/"
 "language/es_AR/)\n"
@@ -19,7 +19,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es_AR\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
 
 msgid "Afrikaans"
 msgstr "afrikáans"
@@ -502,6 +503,9 @@ msgstr "Ya existe un/a %(model_name)s con este/a %(field_labels)s."
 msgid "Constraint “%(name)s” is violated."
 msgstr "No se cumple la restricción “%(name)s”."
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "El valor %(value)r no es una opción válida."
@@ -571,8 +575,8 @@ msgstr "Fecha (sin hora)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "El valor de “%(value)s” tiene un formato inválido. Debe usar el formato AAAA-"
 "MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
@@ -582,8 +586,8 @@ msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"El valor de “%(value)s” tiene un formato correcto (AAAA-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ]) pero representa una fecha/hora inválida."
+"El valor de “%(value)s” tiene un formato correcto (AAAA-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ]) pero representa una fecha/hora inválida."
 
 msgid "Date (with time)"
 msgstr "Fecha (con hora)"
@@ -597,8 +601,8 @@ msgstr "Número decimal"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "El valor de “%(value)s” tiene un formato inválido. Debe usar el formato [DD] "
 "[[HH:]MM:]ss[.uuuuuu]."
@@ -666,8 +670,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"El valor de “%(value)s” tiene un formato inválido. Debe usar el formato HH:"
-"MM[:ss[.uuuuuu]]."
+"El valor de “%(value)s” tiene un formato inválido. Debe usar el formato "
+"HH:MM[:ss[.uuuuuu]]."
 
 #, python-format
 msgid ""
@@ -685,6 +689,10 @@ msgstr "URL"
 
 msgid "Raw binary data"
 msgstr "Datos binarios crudos"
+
+#, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -901,6 +909,12 @@ msgstr "Sí"
 
 msgid "No"
 msgstr "No"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
 
 msgctxt "Task"
 msgid "Ready"
@@ -1317,11 +1331,11 @@ msgstr "No hay %(verbose_name_plural)s disponibles"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"No hay %(verbose_name_plural)s futuros disponibles porque %(class_name)s."
-"allow_future tiene el valor False."
+"No hay %(verbose_name_plural)s futuros disponibles porque "
+"%(class_name)s.allow_future tiene el valor False."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"

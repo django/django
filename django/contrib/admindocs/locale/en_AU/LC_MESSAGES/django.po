@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:34+0000\n"
+"PO-Revision-Date: 2026-08-04 08:34+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: English (Australia) (http://www.transifex.com/projects/p/"
 "django/language/en_AU/)\n"
@@ -109,8 +109,8 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
-"\">docutils</a> library."
+"The admin documentation system requires Python's <a "
+"href=\"%(link)s\">docutils</a> library."
 msgstr ""
 
 #, python-format

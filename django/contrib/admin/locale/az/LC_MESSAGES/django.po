@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-03-09 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Nijat Mammadov, 2024-2026\n"
 "Language-Team: Azerbaijani (http://app.transifex.com/django/django/language/"
 "az/)\n"
@@ -184,8 +184,13 @@ msgstr ""
 "Birdən çox seçmək üçün “Control” və ya Mac üçün “Command” düyməsini basılı "
 "tutun."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Əməliyyat üçün bu obyekti seçin - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -249,14 +254,14 @@ msgstr "%s obyektini dəyiş"
 msgid "View %s"
 msgstr "%s obyektinə bax"
 
-msgid "Database error"
-msgstr "Verilənlər bazası xətası"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s uğurlu dəyişdirildi."
 msgstr[1] "%(count)s %(name)s uğurla dəyişdirildi."
+
+msgid "Database error"
+msgstr "Verilənlər bazası xətası"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -281,6 +286,17 @@ msgstr "Dəyişdirilmə tarixçəsi: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -335,9 +351,6 @@ msgstr ""
 msgid "Run"
 msgstr "İcra et"
 
-msgid "Click here to select the objects across all pages"
-msgstr "Bütün səhifələr üzrə obyektləri seçmək üçün bura klikləyin"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Hamısını seç (%(total_count)s %(module_name)s)"
@@ -347,10 +360,6 @@ msgstr "Seçimi təmizlə"
 
 msgid "Breadcrumbs"
 msgstr "Menyu sətri"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s tətbiqetməsindəki modellər"
 
 msgid "Model name"
 msgstr "Model adı"
@@ -464,6 +473,10 @@ msgstr "Görünüşü dəyiş (halhazırkı: aydın)"
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "Görünüşü dəyiş (halhazırkı: qaranlıq)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -671,6 +684,9 @@ msgstr "Seçilmiş %(model)s sil"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Bax: seçilmiş %(model)s "
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Bu gün veb saytla keyfiyyətli vaxt keçirdiyiniz üçün təşəkkür edirik."

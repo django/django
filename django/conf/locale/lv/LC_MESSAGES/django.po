@@ -18,8 +18,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
 "Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023-2025\n"
 "Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
@@ -510,6 +510,9 @@ msgstr "Jau pastāv %(model_name)s ar šādu %(field_labels)s."
 msgid "Constraint “%(name)s” is violated."
 msgstr "Nav ievērots ierobežojums “%(name)s”."
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Vērtība %(value)r nav derīga izvēle."
@@ -577,11 +580,11 @@ msgstr "Datums (bez laika)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
-"“%(value)s” vērtībai ir nederīgs pieraksts. Tai ir jābūt YYYY-MM-DD HH:MM[:"
-"ss[.uuuuuu]][TZ]."
+"“%(value)s” vērtībai ir nederīgs pieraksts. Tai ir jābūt YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ]."
 
 #, python-format
 msgid ""
@@ -603,11 +606,11 @@ msgstr "Decimāls skaitlis"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
-"“%(value)s” vērtībai ir nederīgs pieraksts. Tai ir jābūt [DD] [[HH:]MM:]ss[."
-"uuuuuu]."
+"“%(value)s” vērtībai ir nederīgs pieraksts. Tai ir jābūt [DD] "
+"[[HH:]MM:]ss[.uuuuuu]."
 
 msgid "Duration"
 msgstr "Ilgums"
@@ -672,8 +675,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"“%(value)s” vērtībai ir nepareizs pieraksts. Tai ir jābūt HH:MM[:ss[."
-"uuuuuu]]."
+"“%(value)s” vērtībai ir nepareizs pieraksts. Tai ir jābūt "
+"HH:MM[:ss[.uuuuuu]]."
 
 #, python-format
 msgid ""
@@ -691,6 +694,10 @@ msgstr "URL"
 
 msgid "Raw binary data"
 msgstr "Bināri dati"
+
+#, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -904,6 +911,12 @@ msgstr "Jā"
 
 msgid "No"
 msgstr "Nē"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
 
 msgctxt "Task"
 msgid "Ready"
@@ -1315,8 +1328,8 @@ msgstr "%(verbose_name_plural)s nav pieejami"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
 "Nākotne %(verbose_name_plural)s nav pieejama, jo %(class_name)s.allow_future "
 "ir False."
@@ -1370,9 +1383,10 @@ msgid ""
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"Tu redzi šo lapu, jo iestatījumu datnē ir <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
-"rel=\"noopener\">DEBUG=True</a> un nav konfigurēts neviens URL."
+"Tu redzi šo lapu, jo iestatījumu datnē ir <a href=\"https://"
+"docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" "
+"target=\"_blank\" rel=\"noopener\">DEBUG=True</a> un nav konfigurēts neviens "
+"URL."
 
 msgid "Django Documentation"
 msgstr "Django dokumentācija"

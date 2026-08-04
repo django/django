@@ -10,10 +10,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-20 14:00+0000\n"
-"Last-Translator: GunChleoc\n"
-"Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
+"Last-Translator: GunChleoc, 2015-2017,2021\n"
+"Language-Team: Gaelic, Scottish (http://app.transifex.com/django/django/"
 "language/gd/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -54,6 +54,9 @@ msgstr "Bosnais"
 
 msgid "Catalan"
 msgstr "Catalanais"
+
+msgid "Central Kurdish (Sorani)"
+msgstr ""
 
 msgid "Czech"
 msgstr "Seacais"
@@ -141,6 +144,9 @@ msgstr "Cròthaisis"
 
 msgid "Upper Sorbian"
 msgstr "Sòrbais Uachdarach"
+
+msgid "Haitian Creole"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "Ungairis"
@@ -295,6 +301,9 @@ msgstr "Tatarais"
 msgid "Udmurt"
 msgstr "Udmurt"
 
+msgid "Uyghur"
+msgstr ""
+
 msgid "Ukrainian"
 msgstr "Ucràinis"
 
@@ -342,6 +351,9 @@ msgstr "Chan eil toradh aig an duilleag seo"
 msgid "Enter a valid value."
 msgstr "Cuir a-steach luach dligheach."
 
+msgid "Enter a valid domain name."
+msgstr ""
+
 msgid "Enter a valid URL."
 msgstr "Cuir a-steach URL dligheach."
 
@@ -365,14 +377,18 @@ msgstr ""
 "Cuir a-steach “sluga” dligheach anns nach eil ach litrichean Unicode, "
 "àireamhan, fo-loidhnichean is tàthanan."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Cuir a-steach seòladh IPv4 dligheach."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr ""
 
-msgid "Enter a valid IPv6 address."
-msgstr "Cuir a-steach seòladh IPv6 dligheach."
+msgid "IPv4"
+msgstr ""
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Cuir a-steach seòladh IPv4 no IPv6 dligheach."
+msgid "IPv6"
+msgstr ""
+
+msgid "IPv4 or IPv6"
+msgstr ""
 
 msgid "Enter only digits separated by commas."
 msgstr "Na cuir a-steach ach àireamhan ’gan sgaradh le cromagan."
@@ -394,6 +410,16 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr ""
 "Dèan cinnteach gu bheil an luach seo nas motha na no co-ionnan ri "
 "%(limit_value)s."
+
+#, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -495,6 +521,13 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "Tha %(model_name)s lis a’ %(field_labels)s seo ann mar-thà."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr ""
+
+msgid "- Select an option -"
+msgstr ""
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Chan eil an luach %(value)r ’na roghainn dhligheach."
 
@@ -508,8 +541,8 @@ msgstr "Chan fhaod an raon seo a bhith bàn."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Tha %(model_name)s leis a’ %(field_label)s seo ann mar-thà."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -536,6 +569,9 @@ msgstr "Booleach (True no False)"
 msgid "String (up to %(max_length)s)"
 msgstr "Sreang (suas ri %(max_length)s)"
 
+msgid "String (unlimited)"
+msgstr ""
+
 msgid "Comma-separated integers"
 msgstr "Àireamhan slàna sgaraichte le cromagan"
 
@@ -560,8 +596,8 @@ msgstr "Ceann-là (gun àm)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "Tha fòrmat mì-dhligheach aig an luach “%(value)s”. Feumaidh e bhith san "
 "fhòrmat BBBB-MM-LL HH:MM[:dd[.uuuuuu]][TZ]."
@@ -586,8 +622,8 @@ msgstr "Àireamh dheicheach"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "Tha fòrmat mì-dhligheach aig an luach “%(value)s”. Feumaidh e bhith san "
 "fhòrmat [DD] [[HH:]MM:]ss[.uuuuuu]."
@@ -676,6 +712,10 @@ msgid "Raw binary data"
 msgstr "Dàta bìnearaidh amh"
 
 #, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
+
+#, python-format
 msgid "“%(value)s” is not a valid UUID."
 msgstr "Chan eil “%(value)s” ’na UUID dligheach."
 
@@ -695,8 +735,8 @@ msgid "Value must be valid JSON."
 msgstr "Feumaidh an luach a bhith ’na JSON dligheach."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "Chan eil ionstans dhe %(model)s le %(field)s %(value)r ann."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Iuchair chèin (thèid a sheòrsa a mhìneachadh leis an raon dàimheach)"
@@ -716,8 +756,8 @@ msgid "Many-to-many relationship"
 msgstr "Dàimh iomadh rud gu iomadh rud"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -818,20 +858,20 @@ msgstr ""
 "an cuir thu aithris air buga thugainn?"
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Na cuir a-null barrachd air %d fhoirm."
-msgstr[1] "Na cuir a-null barrachd air %d fhoirm."
-msgstr[2] "Na cuir a-null barrachd air %d foirmean."
-msgstr[3] "Na cuir a-null barrachd air %d foirm."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Cuir a-null %d fhoirm air a char as lugha."
-msgstr[1] "Cuir a-null %d fhoirm air a char as lugha."
-msgstr[2] "Cuir a-null %d foirmichean air a char as lugha."
-msgstr[3] "Cuir a-null %d foirm air a char as lugha."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 msgid "Order"
 msgstr "Òrdugh"
@@ -896,6 +936,28 @@ msgstr "Tha"
 
 msgid "No"
 msgstr "Chan eil"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
+
+msgctxt "Task"
+msgid "Ready"
+msgstr ""
+
+msgctxt "Task"
+msgid "Running"
+msgstr ""
+
+msgctxt "Task"
+msgid "Failed"
+msgstr ""
+
+msgctxt "Task"
+msgid "Successful"
+msgstr ""
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1251,13 +1313,13 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
-"Ma tha thu a’ cleachdadh taga <meta name=\"referrer\" content=\"no-referrer"
-"\"> no a’ gabhail a-staigh bann-cinn “'Referrer-Policy: no-referrer” feuch "
-"an doir thu air falbh iad. Iarraidh an dìon CSRF bann-cinn “Referer” gus na "
-"referers a dhearbhadh gu teann. Ma tha thu iomagaineach a thaobh do "
+"Ma tha thu a’ cleachdadh taga <meta name=\"referrer\" content=\"no-"
+"referrer\"> no a’ gabhail a-staigh bann-cinn “'Referrer-Policy: no-referrer” "
+"feuch an doir thu air falbh iad. Iarraidh an dìon CSRF bann-cinn “Referer” "
+"gus na referers a dhearbhadh gu teann. Ma tha thu iomagaineach a thaobh do "
 "prìobhaideachd, cleachd roghainnean eile mar <a rel=\"noreferrer\" …> airson "
 "ceangal gu làraichean-lìn threas-phàrtaidhean."
 
@@ -1303,8 +1365,8 @@ msgstr "Chan eil %(verbose_name_plural)s ri fhaighinn"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
 "Chan eil %(verbose_name_plural)s san àm ri teachd ri fhaighinn air sgàth ’s "
 "gun deach %(class_name)s.allow_future a shuidheachadh air False."
@@ -1358,14 +1420,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "Chì thu an duilleag seo on a tha <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> ann am faidhle nan roghainnean agad agus cha do rèitich "
-"thu URL sam bith fhathast."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> ann am faidhle nan roghainnean agad agus cha "
+"do rèitich thu URL sam bith fhathast."
 
 msgid "Django Documentation"
 msgstr "Docamaideadh Django"

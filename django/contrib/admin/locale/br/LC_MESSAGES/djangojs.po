@@ -6,19 +6,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Breton (http://www.transifex.com/django/django/language/br/)\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 07:59+0000\n"
+"Last-Translator: Fulup <fulup.jakez@gmail.com>, 2012\n"
+"Language-Team: Breton (http://app.transifex.com/django/django/language/br/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: br\n"
 "Plural-Forms: nplurals=5; plural=((n%10 == 1) && (n%100 != 11) && (n%100 !"
-"=71) && (n%100 !=91) ? 0 :(n%10 == 2) && (n%100 != 12) && (n%100 !=72) && (n"
-"%100 !=92) ? 1 :(n%10 ==3 || n%10==4 || n%10==9) && (n%100 < 10 || n% 100 > "
-"19) && (n%100 < 70 || n%100 > 79) && (n%100 < 90 || n%100 > 99) ? 2 :(n != 0 "
-"&& n % 1000000 == 0) ? 3 : 4);\n"
+"=71) && (n%100 !=91) ? 0 :(n%10 == 2) && (n%100 != 12) && (n%100 !=72) && "
+"(n%100 !=92) ? 1 :(n%10 ==3 || n%10==4 || n%10==9) && (n%100 < 10 || n% 100 "
+"> 19) && (n%100 < 70 || n%100 > 79) && (n%100 < 90 || n%100 > 99) ? 2 :(n != "
+"0 && n % 1000000 == 0) ? 3 : 4);\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -26,8 +26,7 @@ msgstr "Hegerz %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
 
 #, javascript-format
@@ -37,18 +36,17 @@ msgstr ""
 msgid "Filter"
 msgstr "Sil"
 
-msgid "Choose all"
-msgstr "Dibab an holl"
+#, javascript-format
+msgid "Choose all %s"
+msgstr ""
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Klikañ evit dibab an holl %s war un dro."
+msgid "Choose selected %s"
+msgstr ""
 
-msgid "Choose"
-msgstr "Dibab"
-
-msgid "Remove"
-msgstr "Lemel kuit"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr ""
 
 #, javascript-format
 msgid "Chosen %s"
@@ -56,16 +54,28 @@ msgstr "Dibabet %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
 
-msgid "Remove all"
-msgstr "Lemel kuit pep tra"
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr ""
+
+msgid "(click to clear)"
+msgstr ""
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Klikañ evit dilemel an holl %s dibabet war un dro."
+msgid "Remove all %s"
+msgstr ""
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -81,14 +91,14 @@ msgid ""
 msgstr ""
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
 
@@ -107,18 +117,27 @@ msgstr "Kreisteiz"
 msgid "6 p.m."
 msgstr ""
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
+msgid "server"
+msgstr ""
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 msgstr[4] ""
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
@@ -137,14 +156,29 @@ msgstr "Nullañ"
 msgid "Today"
 msgstr "Hiziv"
 
+msgid "Today (%(date)s)"
+msgstr ""
+
 msgid "Choose a Date"
 msgstr ""
 
 msgid "Yesterday"
 msgstr "Dec'h"
 
+msgid "Yesterday (%(date)s)"
+msgstr ""
+
 msgid "Tomorrow"
 msgstr "Warc'hoazh"
+
+msgid "Tomorrow (%(date)s)"
+msgstr ""
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr ""
+
+msgid "Next (%(month)s %(year)s)"
+msgstr ""
 
 msgid "January"
 msgstr ""
@@ -182,6 +216,103 @@ msgstr ""
 msgid "December"
 msgstr ""
 
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr ""
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr ""
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr ""
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr ""
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr ""
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr ""
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr ""
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr ""
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr ""
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr ""
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr ""
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr ""
+
+msgid "Sunday"
+msgstr ""
+
+msgid "Monday"
+msgstr ""
+
+msgid "Tuesday"
+msgstr ""
+
+msgid "Wednesday"
+msgstr ""
+
+msgid "Thursday"
+msgstr ""
+
+msgid "Friday"
+msgstr ""
+
+msgid "Saturday"
+msgstr ""
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr ""
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr ""
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr ""
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr ""
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr ""
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr ""
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr ""
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr ""
@@ -210,8 +341,17 @@ msgctxt "one letter Saturday"
 msgid "S"
 msgstr ""
 
-msgid "Show"
-msgstr "Diskouez"
+msgid "%(month)s %(day)s, %(year)s"
+msgstr ""
 
-msgid "Hide"
-msgstr "Kuzhat"
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr ""

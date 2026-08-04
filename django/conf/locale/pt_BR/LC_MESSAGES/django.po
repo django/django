@@ -44,8 +44,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
 "Last-Translator: Eduardo Felipe Castegnaro <eduardo@onsign.tv>, 2024-2025\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/django/django/"
 "language/pt_BR/)\n"
@@ -53,7 +53,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pt_BR\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
+"1000000 == 0 ? 1 : 2;\n"
 
 msgid "Afrikaans"
 msgstr "Africânder"
@@ -539,6 +540,9 @@ msgstr "%(model_name)s com este %(field_labels)s já existe."
 msgid "Constraint “%(name)s” is violated."
 msgstr "Restrição \"%(name)s\" foi violada."
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Valor %(value)r não é uma opção válida."
@@ -606,8 +610,8 @@ msgstr "Data (sem hora)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "O valor “%(value)s” tem um formato inválido. Deve estar no formato YYYY-MM-"
 "DD HH:MM[:ss[.uuuuuu]][TZ]."
@@ -632,8 +636,8 @@ msgstr "Número decimal"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "O valor “%(value)s” está em um formato inválido. Deve ser no formato  [DD] "
 "[[HH:]MM:]ss[.uuuuuu]."
@@ -701,8 +705,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"O valor “%(value)s” tem um formato inválido. Deve estar no formato HH:MM[:"
-"ss[.uuuuuu]]."
+"O valor “%(value)s” tem um formato inválido. Deve estar no formato "
+"HH:MM[:ss[.uuuuuu]]."
 
 #, python-format
 msgid ""
@@ -720,6 +724,10 @@ msgstr "URL"
 
 msgid "Raw binary data"
 msgstr "Dados binários bruto"
+
+#, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -931,6 +939,12 @@ msgstr "Sim"
 
 msgid "No"
 msgstr "Não"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
 
 msgctxt "Task"
 msgid "Ready"
@@ -1343,11 +1357,11 @@ msgstr "Nenhum(a) %(verbose_name_plural)s disponível"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"%(verbose_name_plural)s futuros não disponíveis pois %(class_name)s."
-"allow_future é False."
+"%(verbose_name_plural)s futuros não disponíveis pois "
+"%(class_name)s.allow_future é False."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
@@ -1399,10 +1413,10 @@ msgid ""
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"Você está vendo esta página pois possui <a href=\"https://docs.djangoproject."
-"com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
-"rel=\"noopener\">DEBUG=True</a> no seu arquivo de configurações e não "
-"configurou nenhuma URL."
+"Você está vendo esta página pois possui <a href=\"https://"
+"docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" "
+"target=\"_blank\" rel=\"noopener\">DEBUG=True</a> no seu arquivo de "
+"configurações e não configurou nenhuma URL."
 
 msgid "Django Documentation"
 msgstr "Documentação do Django"

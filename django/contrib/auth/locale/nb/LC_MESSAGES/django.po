@@ -11,10 +11,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-04-25 08:09+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
 "Last-Translator: Jon, 2017,2020,2022\n"
-"Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
+"Language-Team: Norwegian Bokmål (http://app.transifex.com/django/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,12 +35,22 @@ msgstr "Viktige datoer"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s-objekt med primærnøkkelen %(key)r finnes ikke."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr ""
+
 msgid "Password changed successfully."
 msgstr "Passordet er endret."
+
+msgid "Password-based authentication was disabled."
+msgstr ""
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Endre passord: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr ""
 
 msgid "Authentication and Authorization"
 msgstr "Autentisering og autorisasjon"
@@ -51,11 +61,11 @@ msgstr "passord"
 msgid "last login"
 msgstr "siste innlogging"
 
-msgid "No password set."
-msgstr "Passord ikke satt."
+msgid "Reset password"
+msgstr ""
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Ugyldig passordformat eller ukjent hash-algoritme."
+msgid "Set password"
+msgstr ""
 
 msgid "The two password fields didn’t match."
 msgstr "De to passordfeltene er ikke like."
@@ -70,11 +80,27 @@ msgid "Enter the same password as before, for verification."
 msgstr "Skriv inn det samme passordet som tidligere, for verifisering."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"Selve passordet lagres ikke, så det finnes ingen måte å se denne brukerens "
-"passord på. Du kan endre passordet med <a href=\"{}\">dette skjemaet</a>."
+
+msgid "Password-based authentication"
+msgstr ""
+
+msgid "Enabled"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -101,9 +127,6 @@ msgstr "Ditt gamle passord er galt. Vennligst prøv igjen."
 
 msgid "Old password"
 msgstr "Gammelt passord"
-
-msgid "Password (again)"
-msgstr "Passord (gjenta)"
 
 msgid "algorithm"
 msgstr "algoritme"
@@ -227,14 +250,11 @@ msgid "users"
 msgstr "brukere"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] "Passordet er for kort. Det må bestå av minst %(min_length)d tegn."
-msgstr[1] "Passordet er for kort. Det må bestå av minst %(min_length)d tegn."
+"This password is too short. It must contain at least %d characters."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -264,6 +284,12 @@ msgstr "Passordet ditt kan ikke inneholde bare tall."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Passord-nullstilling på %(site_name)s"
+
+msgid "No password set."
+msgstr "Passord ikke satt."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Ugyldig passordformat eller ukjent hash-algoritme."
 
 msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "

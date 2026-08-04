@@ -8,16 +8,20 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Welsh (http://www.transifex.com/django/django/language/cy/)\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
+"Last-Translator: Maredudd ap Gwyndaf <maredudd@maredudd.com>, 2014\n"
+"Language-Team: Welsh (http://app.transifex.com/django/django/language/cy/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: cy\n"
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != "
 "11) ? 2 : 3;\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Dileu y %(verbose_name_plural)s â ddewiswyd"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -27,12 +31,8 @@ msgstr "Dilëwyd %(count)d %(items)s yn llwyddiannus."
 msgid "Cannot delete %(name)s"
 msgstr "Ni ellir dileu %(name)s"
 
-msgid "Are you sure?"
-msgstr "Ydych yn sicr?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Dileu y %(verbose_name_plural)s â ddewiswyd"
+msgid "Delete multiple objects"
+msgstr ""
 
 msgid "Administration"
 msgstr "Gweinyddu"
@@ -70,6 +70,12 @@ msgstr ""
 msgid "Has date"
 msgstr ""
 
+msgid "Empty"
+msgstr ""
+
+msgid "Not empty"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -88,6 +94,15 @@ msgstr "Ychwanegu %(verbose_name)s arall"
 msgid "Remove"
 msgstr "Gwaredu"
 
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "Newid"
+
+msgid "Deletion"
+msgstr ""
+
 msgid "action time"
 msgstr "amser y weithred"
 
@@ -101,7 +116,7 @@ msgid "object id"
 msgstr "id gwrthrych"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "repr gwrthrych"
 
@@ -118,22 +133,22 @@ msgid "log entries"
 msgstr "cofnodion"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "Ychwanegwyd \"%(object)s\"."
+msgid "Added “%(object)s”."
+msgstr ""
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "Newidwyd \"%(object)s\" - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr ""
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "Dilëwyd  \"%(object)s.\""
+msgid "Deleted “%(object)s.”"
+msgstr ""
 
 msgid "LogEntry Object"
 msgstr "Gwrthrych LogEntry"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
+msgid "Added {name} “{object}”."
 msgstr ""
 
 msgid "Added."
@@ -143,7 +158,7 @@ msgid "and"
 msgstr "a"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
 msgstr ""
 
 #, python-brace-format
@@ -151,7 +166,7 @@ msgid "Changed {fields}."
 msgstr ""
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
 msgstr ""
 
 msgid "No fields changed."
@@ -160,38 +175,42 @@ msgstr "Ni newidwyd unrhwy feysydd."
 msgid "None"
 msgstr "Dim"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr ""
+
+#, python-brace-format
+msgid "Select this object for an action - {}"
+msgstr ""
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+"The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
+msgid "The {name} “{obj}” was changed successfully."
 msgstr ""
 
 msgid ""
@@ -204,11 +223,11 @@ msgid "No action selected."
 msgstr "Ni ddewiswyd gweithred."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "Dilëwyd %(name)s \"%(obj)s\" yn llwyddiannus."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr ""
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr ""
 
 #, python-format
@@ -219,8 +238,9 @@ msgstr "Ychwanegu %s"
 msgid "Change %s"
 msgstr "Newid %s"
 
-msgid "Database error"
-msgstr "Gwall cronfa ddata"
+#, python-format
+msgid "View %s"
+msgstr ""
 
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
@@ -229,6 +249,9 @@ msgstr[0] "Newidwyd %(count)s %(name)s yn llwyddiannus"
 msgstr[1] "Newidwyd %(count)s %(name)s yn llwyddiannus"
 msgstr[2] "Newidwyd %(count)s %(name)s yn llwyddiannus"
 msgstr[3] "Newidwyd %(count)s %(name)s yn llwyddiannus"
+
+msgid "Database error"
+msgstr "Gwall cronfa ddata"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -242,15 +265,32 @@ msgstr[3] "Dewiswyd %(total_count)s"
 msgid "0 of %(cnt)s selected"
 msgstr "Dewiswyd 0 o %(cnt)s"
 
+msgid "Delete"
+msgstr "Dileu"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Hanes newid: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #, python-format
 msgid ""
@@ -279,8 +319,8 @@ msgstr "Gweinyddu %(app)s"
 msgid "Page not found"
 msgstr "Ni ddarganfyddwyd y dudalen"
 
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Mae'n ddrwg gennym, ond ni ddarganfuwyd y dudalen"
+msgid "We’re sorry, but the requested page could not be found."
+msgstr ""
 
 msgid "Home"
 msgstr "Hafan"
@@ -295,21 +335,12 @@ msgid "Server Error <em>(500)</em>"
 msgstr "Gwall Gweinydd <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Mae gwall ac gyrrwyd adroddiad ohono i weinyddwyr y wefan drwy ebost a dylai "
-"gael ei drwsio yn fuan.  Diolch am fod yn amyneddgar."
 
-msgid "Run the selected action"
-msgstr "Rhedeg y weithred a ddewiswyd"
-
-msgid "Go"
-msgstr "Ffwrdd â ni"
-
-msgid "Click here to select the objects across all pages"
+msgid "Run"
 msgstr ""
-"Cliciwch fan hyn i ddewis yr holl wrthrychau ar draws yr holl dudalennau"
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -318,28 +349,63 @@ msgstr "Dewis y %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Clirio'r dewis"
 
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
+msgid "Breadcrumbs"
 msgstr ""
-"Yn gyntaf, rhowch enw defnyddiwr a chyfrinair.  Yna byddwch yn gallu golygu "
-"mwy o ddewisiadau."
 
-msgid "Enter a username and password."
-msgstr "Rhowch enw defnyddiwr a chyfrinair."
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
+
+msgid "Add"
+msgstr "Ychwanegu"
+
+msgid "View"
+msgstr ""
+
+msgid "You don’t have permission to view or edit anything."
+msgstr ""
+
+msgid "After you’ve created a user, you’ll be able to edit more user options."
+msgstr ""
+
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "Newid cyfrinair"
 
-msgid "Please correct the error below."
-msgstr "Cywirwch y gwall isod."
+msgid "Set password"
+msgstr ""
 
-msgid "Please correct the errors below."
-msgstr "Cywirwch y gwallau isod."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Rhowch gyfrinair newydd i'r defnyddiwr <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "Croeso,"
@@ -366,6 +432,18 @@ msgstr "Gweld ar y safle"
 msgid "Filter"
 msgstr "Hidl"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
+msgid "Clear all filters"
+msgstr ""
+
+msgid "Save"
+msgstr "Cadw"
+
 msgid "Remove from sorting"
 msgstr "Gwaredu o'r didoli"
 
@@ -376,43 +454,45 @@ msgstr "Blaenoriaeth didoli: %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "Toglio didoli"
 
-msgid "Delete"
-msgstr "Dileu"
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Byddai dileu %(object_name)s '%(escaped_object)s' yn golygu dileu'r "
-"gwrthrychau sy'n perthyn, ond nid oes ganddoch ganiatâd i ddileu y mathau "
-"canlynol o wrthrychau:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Byddai dileu %(object_name)s '%(escaped_object)s' yn golygu dileu'r "
-"gwrthrychau gwarchodedig canlynol sy'n perthyn:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
 
 msgid "Objects"
 msgstr ""
 
-msgid "Yes, I'm sure"
-msgstr "Ydw, rwy'n sicr"
-
-msgid "No, take me back"
+msgid "Yes, I’m sure"
 msgstr ""
 
-msgid "Delete multiple objects"
+msgid "No, take me back"
 msgstr ""
 
 #, python-format
@@ -438,9 +518,6 @@ msgstr ""
 "Ydych yn sicr eich bod am ddileu'r %(objects_name)s a ddewiswyd?  Dilëir yr "
 "holl wrthrychau canlynol a'u heitemau perthnasol:"
 
-msgid "Change"
-msgstr "Newid"
-
 msgid "Delete?"
 msgstr "Dileu?"
 
@@ -451,16 +528,6 @@ msgstr "Wrth %(filter_title)s"
 msgid "Summary"
 msgstr ""
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modelau yn y rhaglen %(name)s "
-
-msgid "Add"
-msgstr "Ychwanegu"
-
-msgid "You don't have permission to edit anything."
-msgstr "Does gennych ddim hawl i olygu unrhywbeth."
-
 msgid "Recent actions"
 msgstr ""
 
@@ -470,17 +537,23 @@ msgstr ""
 msgid "None available"
 msgstr "Dim ar gael"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "Cynnwys anhysbys"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"Mae rhywbeth o'i le ar osodiad y gronfa ddata.  Sicrhewch fod y tablau "
-"cronfa ddata priodol wedi eu creu, a sicrhewch fod y gronfa ddata yn "
-"ddarllenadwy gan y defnyddiwr priodol."
 
 #, python-format
 msgid ""
@@ -488,8 +561,20 @@ msgid ""
 "page. Would you like to login to a different account?"
 msgstr ""
 
-msgid "Forgotten your password or username?"
-msgstr "Anghofioch eich cyfrinair neu enw defnyddiwr?"
+msgid "Forgotten your login credentials?"
+msgstr ""
+
+msgid "Toggle navigation"
+msgstr ""
+
+msgid "Sidebar"
+msgstr ""
+
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr ""
 
 msgid "Date/time"
 msgstr "Dyddiad/amser"
@@ -500,32 +585,34 @@ msgstr "Defnyddiwr"
 msgid "Action"
 msgstr "Gweithred"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
-"Does dim hanes newid gan y gwrthrych yma. Mae'n debyg nad ei ychwanegwyd "
-"drwy'r safle gweinydd yma."
+
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
 
 msgid "Show all"
 msgstr "Dangos pob canlyniad"
 
-msgid "Save"
-msgstr "Cadw"
-
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr ""
 
 #, python-format
-msgid "Change selected %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Delete selected %(model)s"
+msgid "Search %(name)s"
 msgstr ""
 
 msgid "Search"
@@ -552,8 +639,33 @@ msgstr "Cadw ac ychwanegu un arall"
 msgid "Save and continue editing"
 msgstr "Cadw a pharhau i olygu"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Diolch am dreulio amser o ansawdd gyda'r safle we yma heddiw."
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Logout"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
 
 msgid "Log in again"
 msgstr "Mewngofnodi eto"
@@ -565,11 +677,9 @@ msgid "Your password was changed."
 msgstr "Newidwyd eich cyfrinair."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Rhowch eich hen gyfrinair, er mwyn diogelwch, ac yna rhowch eich cyfrinair "
-"newydd ddwywaith er mwyn gwirio y'i teipiwyd yn gywir."
 
 msgid "Change my password"
 msgstr "Newid fy nghyfrinair"
@@ -603,16 +713,14 @@ msgstr ""
 "wedi ei ddefnyddio'n barod.  Gofynnwch i ailosod y cyfrinair eto."
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"Os na dderbyniwch ebost, sicrhewych y rhoddwyd y cyfeiriad sydd wedi ei "
-"gofrestru gyda ni, ac edrychwch yn eich ffolder sbam."
 
 #, python-format
 msgid ""
@@ -625,8 +733,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Ewch i'r dudalen olynol a dewsiwch gyfrinair newydd:"
 
-msgid "Your username, in case you've forgotten:"
-msgstr "Eich enw defnyddiwr, rhag ofn eich bod wedi anghofio:"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "Diolch am ddefnyddio ein safle!"
@@ -636,17 +744,18 @@ msgid "The %(site_name)s team"
 msgstr "Tîm %(site_name)s"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
-"Anghofioch eich cyfrinair? Rhowch eich cyfeiriad ebost isod ac fe ebostiwn "
-"gyfarwyddiadau ar osod un newydd."
 
 msgid "Email address:"
 msgstr "Cyfeiriad ebost:"
 
 msgid "Reset my password"
 msgstr "Ailosod fy nghyfrinair"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "Holl ddyddiadau"
@@ -658,6 +767,10 @@ msgstr "Dewis %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Dewis %s i newid"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "Dyddiad:"

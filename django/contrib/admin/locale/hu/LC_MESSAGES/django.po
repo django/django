@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Balázs R, 2023,2025\n"
 "Language-Team: Hungarian (http://app.transifex.com/django/django/language/"
 "hu/)\n"
@@ -188,8 +188,13 @@ msgstr ""
 "Több elem kiválasztásához tartsa nyomva  a \"Control\" gombot, vagy Mac "
 "gépeken a \"Command\" gombot."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Objektum kijelölése egy művelethez - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -253,14 +258,14 @@ msgstr "%s módosítása"
 msgid "View %s"
 msgstr "%s megtekintése"
 
-msgid "Database error"
-msgstr "Adatbázishiba"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s sikeresen módosítva lett."
 msgstr[1] "%(count)s %(name)s sikeresen módosítva lett."
+
+msgid "Database error"
+msgstr "Adatbázishiba"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -285,6 +290,17 @@ msgstr "Változások története: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -338,9 +354,6 @@ msgstr ""
 msgid "Run"
 msgstr ""
 
-msgid "Click here to select the objects across all pages"
-msgstr "Kattintson ide több oldalnyi objektum kiválasztásához"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Az összes %(module_name)s kiválasztása, összesen %(total_count)s db"
@@ -350,10 +363,6 @@ msgstr "Kiválasztás törlése"
 
 msgid "Breadcrumbs"
 msgstr "Breadcrumb navigáció"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s alkalmazásban elérhető modellek."
 
 msgid "Model name"
 msgstr ""
@@ -464,6 +473,10 @@ msgstr "Téma váltás (jelenleg: világos)"
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "Téma váltás (jelenleg: sötét)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -664,6 +677,9 @@ msgstr "Kiválasztott %(model)s törlése"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Kiválasztott %(model)s megtekintése"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Köszönjük, hogy egy kis minőségi időt eltöltött ma a honlapunkon."

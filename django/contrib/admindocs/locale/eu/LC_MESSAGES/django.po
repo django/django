@@ -9,10 +9,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-25 09:47+0000\n"
-"Last-Translator: Urtzi Odriozola <urtzi.odriozola@gmail.com>\n"
-"Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 20:19+0000\n"
+"Last-Translator: Urtzi Odriozola <urtzi.odriozola@gmail.com>, 2017\n"
+"Language-Team: Basque (http://app.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -100,11 +100,9 @@ msgstr "Instalatu docutils mesedez"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
-"\">docutils</a> library."
+"The admin documentation system requires Python’s <a "
+"href=\"%(link)s\">docutils</a> library."
 msgstr ""
-"Admin dokumentazio sostemak Pythonen <a href=\"%(link)s\">docutils</a> "
-"liburutegia behar du."
 
 #, python-format
 msgid ""
@@ -155,13 +153,13 @@ msgid "Template: %(name)s"
 msgstr "Txantiloia: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Txantiloia: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr ""
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "\"%(name)s\" txantiloiaren bilaketa bidea:"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr ""
 
 msgid "(does not exist)"
 msgstr "(ez da existitzen)"

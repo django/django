@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
 "Last-Translator: Eneko Illarramendi <eneko@illarra.com>, "
 "2017-2019,2021-2022,2024\n"
 "Language-Team: Basque (http://app.transifex.com/django/django/language/eu/)\n"
@@ -149,6 +149,9 @@ msgstr "Kroaziera"
 
 msgid "Upper Sorbian"
 msgstr "Goi-sorbiera"
+
+msgid "Haitian Creole"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "Hungariera"
@@ -485,6 +488,9 @@ msgstr "%(field_labels)s hauek dauzkan %(model_name)s dagoeneko existitzen da."
 msgid "Constraint “%(name)s” is violated."
 msgstr ""
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "%(value)r balioa ez da baleko aukera bat."
@@ -552,8 +558,8 @@ msgstr "Data (ordurik gabe)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 
 #, python-format
@@ -574,8 +580,8 @@ msgstr "Zenbaki hamartarra"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "\"%(value)s\" balioa formatu okerra dauka. [EE][[OO:]MM:]ss[.uuuuuu] "
 "formatua izan behar du."
@@ -660,6 +666,10 @@ msgid "Raw binary data"
 msgstr "Datu bitar gordinak"
 
 #, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
+
+#, python-format
 msgid "“%(value)s” is not a valid UUID."
 msgstr ""
 
@@ -679,10 +689,8 @@ msgid "Value must be valid JSON."
 msgstr "Balioa baliozko JSON bat izan behar da."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
 msgstr ""
-"%(field)s %(value)r edukidun %(model)s modeloko instantziarik ez da "
-"exiistitzen."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "1-N (mota erlazionatutako eremuaren arabera)"
@@ -702,8 +710,8 @@ msgid "Many-to-many relationship"
 msgstr "M:N erlazioa"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -859,6 +867,28 @@ msgstr "Bai"
 
 msgid "No"
 msgstr "Ez"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
+
+msgctxt "Task"
+msgid "Ready"
+msgstr ""
+
+msgctxt "Task"
+msgid "Running"
+msgstr ""
+
+msgctxt "Task"
+msgid "Failed"
+msgstr ""
+
+msgctxt "Task"
+msgid "Successful"
+msgstr ""
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1234,11 +1264,11 @@ msgstr "Ez dago %(verbose_name_plural)s"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"Etorkizuneko %(verbose_name_plural)s ez dago aukeran %(class_name)s."
-"allow_future False delako"
+"Etorkizuneko %(verbose_name_plural)s ez dago aukeran "
+"%(class_name)s.allow_future False delako"
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"

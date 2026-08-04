@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Natalia, 2024\n"
 "Language-Team: Marathi (http://app.transifex.com/django/django/language/"
 "mr/)\n"
@@ -177,7 +177,12 @@ msgstr ""
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr "एकापेक्षा जास्त निवडण्यासाठी \"कंट्रोल\" किंवा मॅक वर \"कमांड\" खटका दाबा"
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
+msgstr ""
+
+#, python-format
+msgid "The app \"%s\" could not be found."
 msgstr ""
 
 #, python-brace-format
@@ -237,14 +242,14 @@ msgstr "बदला %s"
 msgid "View %s"
 msgstr "पहा %s"
 
-msgid "Database error"
-msgstr "डेटाबेस त्रुटी"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "Database error"
+msgstr "डेटाबेस त्रुटी"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -269,6 +274,17 @@ msgstr ""
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr ""
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -317,14 +333,8 @@ msgstr ""
 "त्रुटी आली आहे व ती विपत्राद्वारे सांकेतिकस्थळ व्यवस्थापकांकडे कळविण्यात आली आहे आणि लवकरच "
 "ती सुधारली जाईल. आपल्या सहनशीलतेसाठी धन्यवाद."
 
-msgid "Run the selected action"
-msgstr "निवडलेली क्रिया चालवा"
-
-msgid "Go"
-msgstr "जा"
-
-msgid "Click here to select the objects across all pages"
-msgstr "पानावरील सर्व वस्तूंची निवड करण्यासाठी येथे टिचकी मारा"
+msgid "Run"
+msgstr ""
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -335,10 +345,6 @@ msgstr "निवड काढा"
 
 msgid "Breadcrumbs"
 msgstr "ब्रेडक्रम्ब्स"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr ""
 
 msgid "Model name"
 msgstr ""
@@ -427,6 +433,9 @@ msgstr "गणना दाखवा"
 msgid "Clear all filters"
 msgstr "सर्व गाळण्या साफ करा"
 
+msgid "Save"
+msgstr "साठवा"
+
 msgid "Remove from sorting"
 msgstr "सोडवा सोडवा"
 
@@ -447,25 +456,27 @@ msgid "Toggle theme (current theme: dark)"
 msgstr "थीम खुंटी बदला (सध्याची थीम: काळोख)"
 
 #, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
+
+#, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"\"%(escaped_object)s\" %(object_name)sनावाच्या वस्तू घालवताना त्याच्या संबंधित "
-"वस्तूही घालवाव्या लागतील"
 
 msgid "Objects"
 msgstr ""
@@ -570,6 +581,10 @@ msgstr "वापरकर्ता"
 msgid "Action"
 msgstr "क्रिया"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] ""
@@ -582,14 +597,19 @@ msgstr ""
 "या वस्तूचा कोणताही बदलाचा इतिहास नाही. कदाचित तो व्यवस्थापक मार्गे नव्हता जोडला गेला "
 "असावा."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "सर्व दाखवा"
 
-msgid "Save"
-msgstr "साठवा"
-
 msgid "Popup closing…"
 msgstr "पॉपअप बंद होत आहे..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "शोधा"
@@ -634,6 +654,9 @@ msgstr "निवडलेले %(model)s घालवा"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "निवडलेले %(model)s पहा"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "आज संकेतस्थळावर अमुल्य वेळ घालवल्याबद्दल धन्यवाद."

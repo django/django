@@ -11,10 +11,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-12-23 17:25+0000\n"
-"Last-Translator: tinnguyen121221\n"
-"Language-Team: Vietnamese (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 07:59+0000\n"
+"Last-Translator: tinnguyen121221, 2021\n"
+"Language-Team: Vietnamese (http://app.transifex.com/django/django/language/"
 "vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -28,11 +28,8 @@ msgstr "Có sẵn %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Danh sách các lựa chọn đang có %s. Bạn có thể chọn bằng bách click vào mũi "
-"tên \"Chọn\" nằm giữa hai hộp."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -41,18 +38,17 @@ msgstr "Bạn hãy nhập vào ô này để lọc các danh sách sau %s."
 msgid "Filter"
 msgstr "Lọc"
 
-msgid "Choose all"
-msgstr "Chọn tất cả"
+#, javascript-format
+msgid "Choose all %s"
+msgstr ""
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Click để chọn tất cả %s ."
+msgid "Choose selected %s"
+msgstr ""
 
-msgid "Choose"
-msgstr "Chọn"
-
-msgid "Remove"
-msgstr "Xóa"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr ""
 
 #, javascript-format
 msgid "Chosen %s"
@@ -60,18 +56,24 @@ msgstr "Chọn %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Danh sách bạn đã chọn %s. Bạn có thể bỏ chọn bằng cách click vào mũi tên "
-"\"Xoá\" nằm giữa hai ô."
-
-msgid "Remove all"
-msgstr "Xoá tất cả"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Click để bỏ chọn tất cả %s"
+msgid "Type into this box to filter down the list of selected %s."
+msgstr ""
+
+msgid "(click to clear)"
+msgstr ""
+
+#, javascript-format
+msgid "Remove all %s"
+msgstr ""
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] ""
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -94,11 +96,9 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"Bạn đã chọn một hành động và bạn đã không thực hiện bất kỳ thay đổi nào trên "
-"các trường. Có lẽ bạn nên bấm nút Đi đến hơn là nút Lưu lại."
 
 msgid "Now"
 msgstr "Bây giờ"
@@ -115,18 +115,24 @@ msgstr "Buổi trưa"
 msgid "6 p.m."
 msgstr "6 giờ chiều"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] ""
-"Lưu ý: Hiện tại bạn đang thấy thời gian trước %s giờ so với thời gian máy "
-"chủ."
+msgid "server"
+msgstr ""
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
 msgstr[0] ""
-"Lưu ý: Hiện tại bạn đang thấy thời gian sau %s giờ so với thời gian máy chủ."
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
 
 msgid "Choose a Time"
 msgstr "Chọn Thời gian"
@@ -140,14 +146,29 @@ msgstr "Hủy bỏ"
 msgid "Today"
 msgstr "Hôm nay"
 
+msgid "Today (%(date)s)"
+msgstr ""
+
 msgid "Choose a Date"
 msgstr "Chọn Ngày"
 
 msgid "Yesterday"
 msgstr "Hôm qua"
 
+msgid "Yesterday (%(date)s)"
+msgstr ""
+
 msgid "Tomorrow"
 msgstr "Ngày mai"
+
+msgid "Tomorrow (%(date)s)"
+msgstr ""
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr ""
+
+msgid "Next (%(month)s %(year)s)"
+msgstr ""
 
 msgid "January"
 msgstr "Tháng Một"
@@ -233,6 +254,55 @@ msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "Tháng Mười Hai"
 
+msgid "Sunday"
+msgstr ""
+
+msgid "Monday"
+msgstr ""
+
+msgid "Tuesday"
+msgstr ""
+
+msgid "Wednesday"
+msgstr ""
+
+msgid "Thursday"
+msgstr ""
+
+msgid "Friday"
+msgstr ""
+
+msgid "Saturday"
+msgstr ""
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr ""
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr ""
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr ""
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr ""
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr ""
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr ""
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr ""
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "CN"
@@ -261,8 +331,17 @@ msgctxt "one letter Saturday"
 msgid "S"
 msgstr "7"
 
-msgid "Show"
-msgstr "Hiện ra"
+msgid "%(month)s %(day)s, %(year)s"
+msgstr ""
 
-msgid "Hide"
-msgstr "Dấu đi"
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr ""

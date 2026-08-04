@@ -23,8 +23,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 08:09+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
 "Last-Translator: Tomas Lööw <tomas.loow@mailbox.org>, 2021\n"
 "Language-Team: Swedish (http://app.transifex.com/django/django/language/"
 "sv/)\n"
@@ -72,12 +72,6 @@ msgstr "lösenord"
 
 msgid "last login"
 msgstr "senaste inloggning"
-
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Ogiltigt lösenordsformat eller okänd hashalgoritm."
-
-msgid "No password set."
-msgstr "Inget lösenord angivet."
 
 msgid "Reset password"
 msgstr "Återställ lösenord"
@@ -316,6 +310,12 @@ msgstr "Ditt lösenord kan inte bara vara numeriskt."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Lösenord nollställt på %(site_name)s"
+
+msgid "No password set."
+msgstr "Inget lösenord angivet."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Ogiltigt lösenordsformat eller okänd hashalgoritm."
 
 msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "

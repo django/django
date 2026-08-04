@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-03-09 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Jacob Walls, 2026\n"
 "Language-Team: Urdu (http://app.transifex.com/django/django/language/ur/)\n"
 "MIME-Version: 1.0\n"
@@ -179,8 +179,13 @@ msgstr "کوئی نھیں"
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr " “Control” یا “Command” میک پر اگر ایک سے زیادہ سلیکٹ کرنے کے لیئے۔"
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr " - {} تبادیل کرنے کے لئے سلیکٹ کرین"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -241,14 +246,14 @@ msgstr "%s تبدیل کریں"
 msgid "View %s"
 msgstr "%sدیکھین"
 
-msgid "Database error"
-msgstr "ڈیٹا بیس کی خرابی"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s کامیابی سے تبدیل کیا گیا تھا۔"
 msgstr[1] "%(count)s %(name)s کامیابی سے تبدیل کیے گئے تھے۔"
+
+msgid "Database error"
+msgstr "ڈیٹا بیس کی خرابی"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -273,6 +278,17 @@ msgstr "%s کی تبدیلی کا تاریخ نامہ"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s%(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -326,9 +342,6 @@ msgstr ""
 msgid "Run"
 msgstr "چلائین"
 
-msgid "Click here to select the objects across all pages"
-msgstr "تمام صفحات میں سے اشیاء منتخب کرنے کے لئے یہاں کلک کریں۔"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "تمام %(total_count)s %(module_name)s منتخب کریں"
@@ -338,10 +351,6 @@ msgstr "انتخاب صاف کریں"
 
 msgid "Breadcrumbs"
 msgstr "چہوٹا ایڈریس "
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "ماڈل ان میں سے %(name)s"
 
 msgid "Model name"
 msgstr "ماڈل کا نام"
@@ -453,6 +462,10 @@ msgstr " (current theme: لائٹ) ٹھیم تبدیل کرین"
 
 msgid "Toggle theme (current theme: dark)"
 msgstr " (current theme: ڈارک) ٹھیم تبدیل کرین"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -658,6 +671,9 @@ msgstr "منتخب شدہ %(model)s مٹائیں"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "منتخب شدہ دیکھین%(model)s"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "بہت شکریہ، بھترین وقت ہماری ویب سائٹ پعر گرارنے کا"

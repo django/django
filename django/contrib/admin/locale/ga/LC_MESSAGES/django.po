@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-10-07 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Aindriú Mac Giolla Eoin, 2024\n"
 "Language-Team: Irish (http://app.transifex.com/django/django/language/ga/)\n"
 "MIME-Version: 1.0\n"
@@ -32,8 +32,8 @@ msgstr "D'éirigh le scriosadh %(count)d %(items)s."
 msgid "Cannot delete %(name)s"
 msgstr "Ní féidir scriosadh %(name)s "
 
-msgid "Are you sure?"
-msgstr "An bhfuil tú cinnte?"
+msgid "Delete multiple objects"
+msgstr "Scrios na réadanna"
 
 msgid "Administration"
 msgstr "Riarachán"
@@ -181,8 +181,13 @@ msgstr ""
 "Coinnigh síos “Rialú”, nó “Ordú” ar Mac, chun níos mó ná ceann amháin a "
 "roghnú."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Roghnaigh an réad seo le haghaidh gnímh - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -247,9 +252,6 @@ msgstr "Aithrigh %s"
 msgid "View %s"
 msgstr "Amharc ar %s"
 
-msgid "Database error"
-msgstr "Botún bunachar sonraí"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -258,6 +260,9 @@ msgstr[1] "%(count)s %(name)s athraithe go rathúil"
 msgstr[2] "%(count)s %(name)s athraithe go rathúil"
 msgstr[3] "%(count)s %(name)s athraithe go rathúil"
 msgstr[4] "%(count)s %(name)s athraithe go rathúil"
+
+msgid "Database error"
+msgstr "Botún bunachar sonraí"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -272,6 +277,9 @@ msgstr[4] "Gach %(total_count)s roghnaithe"
 msgid "0 of %(cnt)s selected"
 msgstr "0 as %(cnt)s roghnaithe."
 
+msgid "Delete"
+msgstr "Cealaigh"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Athraigh stáir %s"
@@ -282,6 +290,20 @@ msgstr "Athraigh stáir %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #, python-format
 msgid ""
@@ -332,15 +354,8 @@ msgstr ""
 "Tharla earráid. Tuairiscíodh do riarthóirí an tsuímh trí ríomhphost agus ba "
 "cheart é a shocrú go luath. Go raibh maith agat as do foighne."
 
-msgid "Run the selected action"
-msgstr "Rith an gníomh roghnaithe"
-
-msgid "Go"
-msgstr "Té"
-
-msgid "Click here to select the objects across all pages"
+msgid "Run"
 msgstr ""
-"Cliceáil anseo chun na hobiacht go léir a roghnú ar fud gach leathanach"
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -352,9 +367,14 @@ msgstr "Scroiseadh modhnóir"
 msgid "Breadcrumbs"
 msgstr "Brioscáin aráin"
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Samhlacha ins an %(name)s iarratais"
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
 
 msgid "Add"
 msgstr "Cuir le"
@@ -365,13 +385,11 @@ msgstr "Amharc ar"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Níl cead agat aon rud a fheiceáil ná a chur in eagar."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
-msgstr "Níl cead agat aon rud a fheiceáil ná a chur in eagar."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
+msgstr ""
 
-msgid "Enter a username and password."
-msgstr "Cuir isteach ainm úsáideora agus focal faire."
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "Athraigh focal faire"
@@ -443,6 +461,9 @@ msgstr "Taispeáin comhaireamh"
 msgid "Clear all filters"
 msgstr "Glan na scagairí go léir"
 
+msgid "Save"
+msgstr "Sábháil"
+
 msgid "Remove from sorting"
 msgstr "Bain as sórtáil"
 
@@ -462,33 +483,28 @@ msgstr "Scoránaigh an téama (téama reatha: solas)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Scoránaigh an téama (téama reatha: dorcha)"
 
-msgid "Delete"
-msgstr "Cealaigh"
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Má scriossan tú  %(object_name)s '%(escaped_object)s' scriosfaidh oibiachtí "
-"gaolta. Ach níl cead ag do cuntas na oibiacht a leanúint a scriosadh:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Bheadh Scriosadh an %(object_name)s  '%(escaped_object)s' a cheangal ar an "
-"méid seo a leanas a scriosadh nithe cosanta a bhaineann le:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"An bhfuil tú cinnte na  %(object_name)s \"%(escaped_object)s\" a scroiseadh?"
-"Beidh gach oibiacht a leanúint scroiste freisin:"
 
 msgid "Objects"
 msgstr "Oibiachtaí"
@@ -498,9 +514,6 @@ msgstr "Sea, táim cinnte"
 
 msgid "No, take me back"
 msgstr "Ní hea, tóg ar ais mé"
-
-msgid "Delete multiple objects"
-msgstr "Scrios na réadanna"
 
 #, python-format
 msgid ""
@@ -576,8 +589,8 @@ msgstr ""
 "Tá tú fíordheimhnithe mar %(username)s, ach níl cead agat an leathanach seo "
 "a rochtain. Ar mhaith leat logáil isteach i gcuntas eile?"
 
-msgid "Forgotten your password or username?"
-msgstr "Dearmad déanta ar do focal faire nó ainm úsaideora"
+msgid "Forgotten your login credentials?"
+msgstr ""
 
 msgid "Toggle navigation"
 msgstr "Scoránaigh an nascleanúint"
@@ -600,6 +613,10 @@ msgstr "Úsaideoir"
 msgid "Action"
 msgstr "Aicsean"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "iontráil"
@@ -615,14 +632,19 @@ msgstr ""
 "Níl stair athruithe ag an réad seo. Is dócha nár cuireadh leis tríd an "
 "suíomh riaracháin seo."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "Taispéan gach rud"
 
-msgid "Save"
-msgstr "Sábháil"
-
 msgid "Popup closing…"
 msgstr "Preabfhuinneog ag dúnadh…"
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "Cuardach"
@@ -670,6 +692,9 @@ msgstr "Scrios roghnaithe %(model)s"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Féach ar %(model)s roghnaithe"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr ""
@@ -753,8 +778,8 @@ msgstr ""
 "Le do thoil té go dtí an leathanach a leanúint agus roghmaigh focal faire "
 "nua:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "D’ainm úsáideora, ar eagla go bhfuil dearmad déanta agat ar:"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "Go raibh maith agat le hadhaigh do cuairt!"

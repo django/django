@@ -6,10 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-09-22 09:22+0000\n"
-"Last-Translator: Transifex Bot <>\n"
-"Language-Team: Interlingua (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
+"Last-Translator: Martijn Dekker <mcdutchie@hotmail.com>, 2012,2021\n"
+"Language-Team: Interlingua (http://app.transifex.com/django/django/language/"
 "ia/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -30,12 +30,22 @@ msgstr "Datas importante"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Le objecto %(name)s con le clave primari %(key)r non existe."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr ""
+
 msgid "Password changed successfully."
 msgstr "Le cambio del contrasigno ha succedite."
+
+msgid "Password-based authentication was disabled."
+msgstr ""
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Cambia contrasigno: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr ""
 
 msgid "Authentication and Authorization"
 msgstr "Authentication e autorisation"
@@ -46,12 +56,11 @@ msgstr "contrasigno"
 msgid "last login"
 msgstr "ultime session"
 
-msgid "No password set."
-msgstr "Nulle contrasigno definite."
-
-msgid "Invalid password format or unknown hashing algorithm."
+msgid "Reset password"
 msgstr ""
-"Le formato del contrasigno es invalide o le algorithmo de hash es incognite."
+
+msgid "Set password"
+msgstr ""
 
 msgid "The two password fields didn’t match."
 msgstr "Le duo campos de contrasigno non es identic."
@@ -66,12 +75,27 @@ msgid "Enter the same password as before, for verification."
 msgstr "Scribe le mesme contrasigno que antea, pro verification."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"Le contrasignos non es immagazinate in forma de texto simple, dunque il non "
-"es possibile vider le contrasigno de iste usator, ma tu pote cambiar le "
-"contrasigno con <a href=\"{}\">iste formulario</a>."
+
+msgid "Password-based authentication"
+msgstr ""
+
+msgid "Enabled"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -98,9 +122,6 @@ msgstr "Le ancian contrasigno non es correcte. Per favor scribe lo de novo."
 
 msgid "Old password"
 msgstr "Ancian contrasigno"
-
-msgid "Password (again)"
-msgstr "Contrasigno (de novo)"
 
 msgid "algorithm"
 msgstr "algorithmo"
@@ -227,18 +248,11 @@ msgid "users"
 msgstr "usatores"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"Le contrasigno es troppo curte. Debe continer al minus %(min_length)d "
-"character."
 msgstr[1] ""
-"Le contrasigno es troppo curte. Debe continer al minus %(min_length)d "
-"characteres."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -271,12 +285,17 @@ msgstr "Le contrasigno non pote esser toto numeric."
 msgid "Password reset on %(site_name)s"
 msgstr "Reinitialisation del contrasigno in %(site_name)s"
 
-msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+msgid "No password set."
+msgstr "Nulle contrasigno definite."
+
+msgid "Invalid password format or unknown hashing algorithm."
 msgstr ""
-"Entra un nomine de usator valide. Pote continer solmente litteras anglese, "
-"numeros e le characteres @/./+/-/_."
+"Le formato del contrasigno es invalide o le algorithmo de hash es incognite."
+
+msgid ""
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
+msgstr ""
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

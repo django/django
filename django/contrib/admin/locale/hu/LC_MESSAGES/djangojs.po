@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-04 07:59+0000\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 07:59+0000\n"
 "Last-Translator: András Veres-Szentkirályi, 2016,2020-2021,2023\n"
 "Language-Team: Hungarian (http://app.transifex.com/django/django/language/"
 "hu/)\n"
@@ -29,11 +29,8 @@ msgstr "Elérhető %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Ez az elérhető %s listája. Úgy választhat közülük, hogy rákattint az alábbi "
-"dobozban, és megnyomja a dobozok közti \"Választás\" nyilat."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -42,18 +39,17 @@ msgstr "Írjon a mezőbe az elérhető %s szűréséhez."
 msgid "Filter"
 msgstr "Szűrő"
 
-msgid "Choose all"
-msgstr "Mindet kijelölni"
+#, javascript-format
+msgid "Choose all %s"
+msgstr ""
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Kattintson az összes %s kiválasztásához."
+msgid "Choose selected %s"
+msgstr ""
 
-msgid "Choose"
-msgstr "Választás"
-
-msgid "Remove"
-msgstr "Eltávolítás"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr ""
 
 #, javascript-format
 msgid "Chosen %s"
@@ -61,22 +57,19 @@ msgstr "%s kiválasztva"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Ez a kiválasztott %s listája. Eltávolíthat közülük, ha rákattint, majd a két "
-"doboz közti \"Eltávolítás\" nyílra kattint."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "Írjon a mezőbe a kiválasztott %s szűréséhez."
 
-msgid "Remove all"
-msgstr "Összes törlése"
+msgid "(click to clear)"
+msgstr ""
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Kattintson az összes %s eltávolításához."
+msgid "Remove all %s"
+msgstr ""
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -107,11 +100,9 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"Kiválasztott egy műveletet, és nem módosított egyetlen mezőt sem. "
-"Feltehetően a Mehet gombot keresi a Mentés helyett."
 
 msgid "Now"
 msgstr "Most"
@@ -128,17 +119,26 @@ msgstr "Dél"
 msgid "6 p.m."
 msgstr "Este 6 óra"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Megjegyzés: %s órával a szerveridő előtt jársz"
-msgstr[1] "Megjegyzés: %s órával a szerveridő előtt jársz"
+msgid "server"
+msgstr ""
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Megjegyzés: %s órával a szerveridő mögött jársz"
-msgstr[1] "Megjegyzés: %s órával a szerveridő mögött jársz"
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Choose a Time"
 msgstr "Válassza ki az időt"
@@ -152,14 +152,29 @@ msgstr "Mégsem"
 msgid "Today"
 msgstr "Ma"
 
+msgid "Today (%(date)s)"
+msgstr ""
+
 msgid "Choose a Date"
 msgstr "Válassza ki a dátumot"
 
 msgid "Yesterday"
 msgstr "Tegnap"
 
+msgid "Yesterday (%(date)s)"
+msgstr ""
+
 msgid "Tomorrow"
 msgstr "Holnap"
+
+msgid "Tomorrow (%(date)s)"
+msgstr ""
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr ""
+
+msgid "Next (%(month)s %(year)s)"
+msgstr ""
 
 msgid "January"
 msgstr "január"
@@ -322,8 +337,17 @@ msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
 
-msgid "Show"
-msgstr "Mutat"
+msgid "%(month)s %(day)s, %(year)s"
+msgstr ""
 
-msgid "Hide"
-msgstr "Elrejt"
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr ""

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-03-09 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016-2026\n"
 "Language-Team: Lower Sorbian (http://app.transifex.com/django/django/"
 "language/dsb/)\n"
@@ -508,6 +508,9 @@ msgstr "%(model_name)s z toś tym %(field_labels)s južo eksistěrujo."
 msgid "Constraint “%(name)s” is violated."
 msgstr "Wobranicowanje \"%(name)s\" jo pśestupjone."
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Gódnota %(value)r njejo płaśiwa wóleńska móžnosć."
@@ -689,6 +692,10 @@ msgstr "URL"
 
 msgid "Raw binary data"
 msgstr "Gropne binarne daty"
+
+#, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -911,6 +918,12 @@ msgstr "Jo"
 
 msgid "No"
 msgstr "Ně"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
 
 msgctxt "Task"
 msgid "Ready"

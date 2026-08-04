@@ -9,10 +9,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-07-25 07:05+0000\n"
-"Last-Translator: Md Arshad Hussain\n"
-"Language-Team: Bengali (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
+"Last-Translator: Md Arshad Hussain, 2022\n"
+"Language-Team: Bengali (http://app.transifex.com/django/django/language/"
 "bn/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -32,8 +32,8 @@ msgstr "%(count)d টি %(items)s সফলভাবে মুছে ফেল�
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s ডিলিট করা সম্ভব নয়"
 
-msgid "Are you sure?"
-msgstr "আপনি কি নিশ্চিত?"
+msgid "Delete multiple objects"
+msgstr "একাধিক জিনিস মুছে ফেলুন"
 
 msgid "Administration"
 msgstr "প্রয়োগ"
@@ -178,6 +178,14 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 
 #, python-brace-format
+msgid "Select this object for an action - {}"
+msgstr ""
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
+
+#, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr ""
 
@@ -193,10 +201,6 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -237,14 +241,14 @@ msgstr "%s পরিবর্তন করুন"
 msgid "View %s"
 msgstr ""
 
-msgid "Database error"
-msgstr "ডাটাবেস সমস্যা"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "Database error"
+msgstr "ডাটাবেস সমস্যা"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -256,6 +260,9 @@ msgstr[1] ""
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s টি থেকে ০ টি সিলেক্ট করা হয়েছে"
 
+msgid "Delete"
+msgstr "মুছুন"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "ইতিহাস পরিবর্তনঃ %s"
@@ -266,6 +273,17 @@ msgstr "ইতিহাস পরিবর্তনঃ %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr ""
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -312,14 +330,8 @@ msgid ""
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 
-msgid "Run the selected action"
-msgstr "চিহ্নিত কাজটি শুরু করুন"
-
-msgid "Go"
-msgstr "যান"
-
-msgid "Click here to select the objects across all pages"
-msgstr "সকল পৃষ্ঠার দ্রব্য পছন্দ করতে এখানে ক্লিক করুন"
+msgid "Run"
+msgstr ""
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -328,9 +340,17 @@ msgstr "%(total_count)s টি %(module_name)s এর সবগুলোই স�
 msgid "Clear selection"
 msgstr "চিহ্নিত অংশের চিহ্ন মুছে ফেলুন"
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s এপ্লিকেশন এর মডেল গুলো"
+msgid "Breadcrumbs"
+msgstr ""
+
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
 
 msgid "Add"
 msgstr "যোগ করুন"
@@ -341,28 +361,40 @@ msgstr "দেখুন"
 msgid "You don’t have permission to view or edit anything."
 msgstr "কোন কিছু দেখার বা সম্পাদনা/পরিবর্তন করার আপনার কোন অনুমতি নেই।"
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"প্রথমে, একজন ব্যবহারকারীর নাম এবং পাসওয়ার্ড লিখুন। তাহলে, আপনি ব্যবহারকারীর "
-"অন্যান্য অনেক অপশনগুলো পরিবর্তন করতে সক্ষম হবেন। "
 
-msgid "Enter a username and password."
-msgstr "ইউজার নেইম এবং পাসওয়ার্ড টাইপ করুন।"
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "পাসওয়ার্ড বদলান"
 
-msgid "Please correct the error below."
-msgstr "দয়া করে নিম্নবর্ণিত ভুলটি সংশোধন করুন।"
+msgid "Set password"
+msgstr ""
 
-msgid "Please correct the errors below."
-msgstr "দয়া করে নিম্নবর্ণিত ভুলগুলো সংশোধন করুন।"
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "<strong>%(username)s</strong> সদস্যের জন্য নতুন পাসওয়ার্ড দিন।"
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "স্বাগতম,"
@@ -389,8 +421,17 @@ msgstr "সাইটে দেখুন"
 msgid "Filter"
 msgstr "ফিল্টার"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
 msgid "Clear all filters"
 msgstr ""
+
+msgid "Save"
+msgstr "সংরক্ষণ করুন"
 
 msgid "Remove from sorting"
 msgstr "ক্রমানুসারে সাজানো থেকে বিরত হোন"
@@ -402,31 +443,37 @@ msgstr "সাজানোর ক্রম: %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "ক্রমানুসারে সাজানো চালু করুন/ বন্ধ করুন"
 
-msgid "Delete"
-msgstr "মুছুন"
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"%(object_name)s '%(escaped_object)s' মুছে ফেললে এর সম্পর্কিত অবজেক্টগুলোও মুছে "
-"যাবে, কিন্তু আপনার নিম্নবর্ণিত অবজেক্টগুলো মোছার অধিকার নেইঃ"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"আপনি কি %(object_name)s \"%(escaped_object)s\" মুছে ফেলার ব্যাপারে নিশ্চিত? "
-"নিম্নে বর্ণিত সকল আইটেম মুছে যাবেঃ"
 
 msgid "Objects"
 msgstr ""
@@ -436,9 +483,6 @@ msgstr "হ্যাঁ, আমি নিশ্চিত"
 
 msgid "No, take me back"
 msgstr "না, আমাক পূর্বের জায়গায় ফিরিয়ে নাও"
-
-msgid "Delete multiple objects"
-msgstr "একাধিক জিনিস মুছে ফেলুন"
 
 #, python-format
 msgid ""
@@ -478,6 +522,15 @@ msgstr "আমার করনীয়"
 msgid "None available"
 msgstr "কিছুই পাওয়া যায়নি"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "অজানা বিষয়"
 
@@ -496,10 +549,13 @@ msgid ""
 "page. Would you like to login to a different account?"
 msgstr ""
 
-msgid "Forgotten your password or username?"
-msgstr "ইউজার নেইম অথবা পাসওয়ার্ড ভুলে গেছেন?"
+msgid "Forgotten your login credentials?"
+msgstr ""
 
 msgid "Toggle navigation"
+msgstr ""
+
+msgid "Sidebar"
 msgstr ""
 
 msgid "Start typing to filter…"
@@ -517,24 +573,32 @@ msgstr "সদস্য"
 msgid "Action"
 msgstr "কার্য"
 
-msgid "entry"
+#, python-format
+msgid "Pagination %(name)s entries"
 msgstr ""
 
-msgid "entries"
-msgstr ""
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "সব দেখান"
 
-msgid "Save"
-msgstr "সংরক্ষণ করুন"
-
 msgid "Popup closing…"
+msgstr ""
+
+#, python-format
+msgid "Search %(name)s"
 msgstr ""
 
 msgid "Search"
@@ -579,6 +643,9 @@ msgstr "%(model)s নির্বাচিত অংশটি মুছুন "
 
 #, python-format
 msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Logout"
 msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
@@ -659,8 +726,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "অনুগ্রহ করে নিচের পাতাটিতে যান এবং নতুন পাসওয়ার্ড বাছাই করুনঃ"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "আপনার ব্যবহারকারীর নাম, যদি আপনি ভুলে গিয়ে থাকেন:"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "আমাদের সাইট ব্যবহারের জন্য ধন্যবাদ!"
@@ -681,6 +748,9 @@ msgstr "ইমেইল ঠিকানা:"
 
 msgid "Reset my password"
 msgstr "আমার পাসওয়ার্ড রিসেট করুন"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "সকল তারিখ"

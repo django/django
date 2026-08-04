@@ -31,8 +31,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>, 2025\n"
 "Language-Team: Swedish (http://app.transifex.com/django/django/language/"
 "sv/)\n"
@@ -202,8 +202,13 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 "Håll inne “Control”, eller “Command” på en Mac, för att välja fler än en."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Välj detta objekt för en åtgärd - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -261,14 +266,14 @@ msgstr "Ändra %s"
 msgid "View %s"
 msgstr "Visa %s"
 
-msgid "Database error"
-msgstr "Databasfel"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s ändrades."
 msgstr[1] "%(count)s %(name)s ändrades."
+
+msgid "Database error"
+msgstr "Databasfel"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -293,6 +298,17 @@ msgstr "Ändringshistorik: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -346,9 +362,6 @@ msgstr ""
 msgid "Run"
 msgstr "Kör"
 
-msgid "Click here to select the objects across all pages"
-msgstr "Klicka här för att välja alla objekt från alla sidor"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Välj alla %(total_count)s %(module_name)s"
@@ -358,10 +371,6 @@ msgstr "Rensa urval"
 
 msgid "Breadcrumbs"
 msgstr "Brödsmulor"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modeller i applikationen %(name)s"
 
 msgid "Model name"
 msgstr "Modellens namn"
@@ -474,6 +483,10 @@ msgstr "Växla tema (aktuellt tema: ljust)"
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "Växla tema (aktuellt tema: mörkt)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -681,6 +694,9 @@ msgstr "Ta bort markerade %(model)s"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Visa valda %(model)s"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Tack för att du spenderade kvalitetstid med webbplatsen idag."

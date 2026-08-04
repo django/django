@@ -5,18 +5,18 @@
 # Delgermurun Purevkhuuu <info@delgermurun.com>, 2013
 # dolugen <dolugen@gmail.com>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
-# miigaa ... <b.myagmardorj@gmail.com>, 2015
-# Zorig <zorig_ezd@yahoo.com>, 2013-2014,2017
+# miigaa .. <b.myagmardorj@gmail.com>, 2015
+# Zorig, 2013-2014,2017
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2015
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-10-19 13:49+0000\n"
-"Last-Translator: Bayarkhuu Bataa\n"
-"Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
+"Last-Translator: Bayarkhuu Bataa, 2015,2017\n"
+"Language-Team: Mongolian (http://app.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -37,12 +37,22 @@ msgstr "Чухал огноо"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(key)r анхдагч түлхүүртэй %(name)s обьект олдсонгүй."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr ""
+
 msgid "Password changed successfully."
 msgstr "Нууц үг амжилттай өөрчлөгдлөө."
+
+msgid "Password-based authentication was disabled."
+msgstr ""
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Нууц үг өөрчлөх: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr ""
 
 msgid "Authentication and Authorization"
 msgstr "Нэвтрэлт ба зөвшөөрөл"
@@ -53,14 +63,14 @@ msgstr "нууц үг"
 msgid "last login"
 msgstr "сүүлд нэвтэрсэн"
 
-msgid "No password set."
-msgstr "Нууц үг тохируулаагүй."
+msgid "Reset password"
+msgstr ""
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Нууц үгийн буруу формат эсвэл үл мэдэгдэх хаш алгоритм байна."
+msgid "Set password"
+msgstr ""
 
-msgid "The two password fields didn't match."
-msgstr "Хоёр нууц үг зөрж байна."
+msgid "The two password fields didn’t match."
+msgstr ""
 
 msgid "Password"
 msgstr "Нууц үг "
@@ -72,11 +82,27 @@ msgid "Enter the same password as before, for verification."
 msgstr "Баталгаажуулахын тулд дээрх нууц үгээ ахин оруулна уу."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"Хэрэглэгчийн нууц үгийг хувиргалгүйгээр хадгалдаггүй учир шууд харах "
-"боломжгүй, гэхдээ <a href=\"{}\">энэ маягт</a> ашиглан өөрчилж болно."
+
+msgid "Password-based authentication"
+msgstr ""
+
+msgid "Enabled"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -103,9 +129,6 @@ msgstr "Хуучин нууц үгээ буруу оруулсан байна. �
 
 msgid "Old password"
 msgstr "Хуучин нууц үг"
-
-msgid "Password (again)"
-msgstr "Нууц үг (давтан)"
 
 msgid "algorithm"
 msgstr "алгоритм"
@@ -139,6 +162,9 @@ msgstr "ажлын байгуулагч"
 
 msgid "checksum"
 msgstr "шалгах дүн"
+
+msgid "block size"
+msgstr ""
 
 msgid "name"
 msgstr "нэр"
@@ -229,18 +255,11 @@ msgid "users"
 msgstr "хэрэглэгчид"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"Нууц үг хэтэрхий богино байна. Хамгийн багадаа %(min_length)d тэмдэгтээс "
-"бүрдэх ёстой."
 msgstr[1] ""
-"Нууц үг хэтэрхий богино байна. Хамгийн багадаа %(min_length)d тэмдэгтээс "
-"бүрдэх ёстой."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -252,31 +271,35 @@ msgstr[1] "Нууц хамгийн багадаа %(min_length)d тэмдэгт�
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Нууц үг %(verbose_name)s мэдээлэлтэй хэтэрхий адилхан байна."
 
-msgid "Your password can't be too similar to your other personal information."
-msgstr "Таны нууц үг бусад хувийн мэдээлэлтэй төстэй байж болохгүй."
+msgid "Your password can’t be too similar to your other personal information."
+msgstr ""
 
 msgid "This password is too common."
 msgstr "Энэ нууц үг хэтэрхий нийтлэг байна."
 
-msgid "Your password can't be a commonly used password."
-msgstr "Таны нууц үг хүмүүсийн нийтлэг ашигладаг нууц үг байж болохгүй."
+msgid "Your password can’t be a commonly used password."
+msgstr ""
 
 msgid "This password is entirely numeric."
 msgstr "Нууц үг дан тооноос бүрдсэн байна."
 
-msgid "Your password can't be entirely numeric."
-msgstr "Таны нууц үг бүхэлдээ тооноос бүрдэж болохгүй."
+msgid "Your password can’t be entirely numeric."
+msgstr ""
 
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "%(site_name)s cайт дээрх нууц үг шинэчлэлт"
 
+msgid "No password set."
+msgstr "Нууц үг тохируулаагүй."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Нууц үгийн буруу формат эсвэл үл мэдэгдэх хаш алгоритм байна."
+
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Зөв хэрэглэгчийн нэр оруулна уу. Англи хэлний үсэг, тоо болон @ . + - _ "
-"тэмдэгтүүдийг ашиглаж болно."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

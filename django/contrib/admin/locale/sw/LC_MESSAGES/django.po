@@ -5,14 +5,14 @@
 # DOREEN WANYAMA, 2023
 # Machaku, 2013-2014
 # Machaku, 2016
-# Millicent  Atieno Obwanda <atienoobwanda@gmail.com>, 2023
-# Natalia (Django Fellow), 2023
+# Millicent A.Obwanda <atienoobwanda@gmail.com>, 2023
+# Natalia, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-25 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: DOREEN WANYAMA, 2023\n"
 "Language-Team: Swahili (http://app.transifex.com/django/django/language/"
 "sw/)\n"
@@ -34,8 +34,8 @@ msgstr "Umefanikiwa kufuta %(items)s %(count)d."
 msgid "Cannot delete %(name)s"
 msgstr "Huwezi kufuta %(name)s"
 
-msgid "Are you sure?"
-msgstr "Una uhakika?"
+msgid "Delete multiple objects"
+msgstr "Futa viumbile mbalimbali"
 
 msgid "Administration"
 msgstr "Utawala"
@@ -182,7 +182,12 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 " Shikilia 'Control', au 'Command' kwenye Mac, ili kuchagua zaidi ya moja."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
+msgstr ""
+
+#, python-format
+msgid "The app \"%s\" could not be found."
 msgstr ""
 
 #, python-brace-format
@@ -205,11 +210,6 @@ msgid ""
 msgstr ""
 "{name} “{obj}” ilibadilishwa kwa mafanikio. Unaweza kuihariri tena hapa "
 "chini."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"{name} “{obj}” imeongezwa kwa mafanikio. Unaweza kuihariri tena hapa chini."
 
 #, python-brace-format
 msgid ""
@@ -253,14 +253,14 @@ msgstr "Badilisha %s"
 msgid "View %s"
 msgstr "Muonekano %s"
 
-msgid "Database error"
-msgstr "Hitilafu katika hifadhidata"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "mabadiliko ya %(name)s %(count)s yamefanikiwa."
 msgstr[1] "mabadiliko ya %(name)s %(count)s yamefanikiwa."
+
+msgid "Database error"
+msgstr "Hitilafu katika hifadhidata"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -272,6 +272,9 @@ msgstr[1] "%(total_count)s (kila kitu) kuchaguliwa"
 msgid "0 of %(cnt)s selected"
 msgstr "Vilivyo chaguliwa ni 0 kati ya %(cnt)s"
 
+msgid "Delete"
+msgstr "Futa"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Badilisha historia: %s"
@@ -282,6 +285,17 @@ msgstr "Badilisha historia: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(instance)s %(class_name)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -332,14 +346,8 @@ msgstr ""
 "Kumekuwa na kosa. Waendeshaji wa tovuti wamearifiwa kupitia barua pepe, na "
 "linapaswa kurekebishwa hivi karibuni. Asante kwa uvumilivu wako."
 
-msgid "Run the selected action"
-msgstr "Fanya tendo lililochaguliwa."
-
-msgid "Go"
-msgstr "Nenda"
-
-msgid "Click here to select the objects across all pages"
-msgstr "Bofya hapa kuchagua viumbile katika kurasa zote"
+msgid "Run"
+msgstr ""
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -351,9 +359,14 @@ msgstr "Safisha chaguo"
 msgid "Breadcrumbs"
 msgstr "Nyayo "
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Models katika application %(name)s"
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
 
 msgid "Add"
 msgstr "Ongeza"
@@ -364,18 +377,17 @@ msgstr "Muonekano"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Huna ruhusa ya kutazama au kuhariri kitu chochote"
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Kwanza, ingiza jina la mtumiaji na nywila. Kisha, utaweza kuhariri chaguo "
-"zaidi za mtumiaji."
 
-msgid "Enter a username and password."
-msgstr "Ingiza jina la mtumiaji na nywila."
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "Badilisha nywila"
+
+msgid "Set password"
+msgstr ""
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
@@ -385,6 +397,17 @@ msgstr[1] "Tafadhali sahihisha makosa yafuatayo"
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "ingiza nywila ya mtumiaji <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
 
 msgid "Skip to main content"
 msgstr "Ruka hadi kwa maudhui makuu."
@@ -423,6 +446,9 @@ msgstr "Onesha idadi"
 msgid "Clear all filters"
 msgstr "Safisha vichungi vyote"
 
+msgid "Save"
+msgstr "Hifadhi"
+
 msgid "Remove from sorting"
 msgstr "Ondoa katika upangaji"
 
@@ -442,34 +468,28 @@ msgstr "Badilisha mandhari (mandhari ya sasa: mwanga)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Badilisha mandhari (mandhari ya sasa: giza)"
 
-msgid "Delete"
-msgstr "Futa"
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Kufutwa kwa '%(escaped_object)s' %(object_name)s  kutasababisha kufutwa kwa "
-"vitu vinavyohuisana, lakini akaunti yako haina ruhusa ya kufuta vitu vya "
-"aina zifuatazo:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Kufuta '%(escaped_object)s' %(object_name)s  kutahitaji kufuta vitu "
-"vifuatavyo ambavyo vinavyohuisana na vimelindwa:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Una uhakika kuwa unataka kufuta \"%(escaped_object)s\" %(object_name)s ? "
-"Vitu vyote vinavyohuisana kati ya vifuatavyo vitafutwa:"
 
 msgid "Objects"
 msgstr "Viumbile"
@@ -479,9 +499,6 @@ msgstr "Ndiyo, nina uhakika"
 
 msgid "No, take me back"
 msgstr "Hapana, nirudishe"
-
-msgid "Delete multiple objects"
-msgstr "Futa viumbile mbalimbali"
 
 #, python-format
 msgid ""
@@ -557,8 +574,8 @@ msgstr ""
 "Umejithibitisha kama %(username)s, lakini huna ruhusa ya kupata ukurasa huu. "
 "Ungependa kuingia kwa akaunti nyingine?"
 
-msgid "Forgotten your password or username?"
-msgstr "Umesahau jina na nenosiri lako?"
+msgid "Forgotten your login credentials?"
+msgstr ""
 
 msgid "Toggle navigation"
 msgstr "Badilisha urambazaji"
@@ -581,6 +598,10 @@ msgstr "Mtumiaji"
 msgid "Action"
 msgstr "Tendo"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "ingizo"
@@ -593,14 +614,19 @@ msgstr ""
 "Hakuna historia ya mabadiliko kwa kipande hiki. Labda hakikuongezwa kupitia "
 "tovuti hii ya usimamizi."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "Onesha yotee"
 
-msgid "Save"
-msgstr "Hifadhi"
-
 msgid "Popup closing…"
 msgstr "Udukizi inafungwa..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "Tafuta"
@@ -645,6 +671,9 @@ msgstr "Futa %(model)s husika"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Tazama %(model)s zilizochaguliwa"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Asante kwa kutumia muda wako kenye tovuti leo."
@@ -722,8 +751,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Tafadhali nenda ukurasa ufuatao na uchague nywila mpya:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Jina lako la utumiaji, ikiwa umesahau:"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "Ahsante kwa kutumia tovui yetu!"

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
 "Last-Translator: Igor Jerosimić, 2020-2021,2023-2025\n"
 "Language-Team: Serbian (http://app.transifex.com/django/django/language/"
 "sr/)\n"
@@ -58,12 +58,6 @@ msgstr "лозинка"
 
 msgid "last login"
 msgstr "последња пријава"
-
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Инвалидан формат лозинке или непознат hashing алгоритам."
-
-msgid "No password set."
-msgstr "Лозинка није унета."
 
 msgid "Reset password"
 msgstr "Ресетуј лозинку"
@@ -300,6 +294,12 @@ msgstr "Ваша лозинка не може садржати само цифр
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Ресетовање лозинке на сајту %(site_name)s"
+
+msgid "No password set."
+msgstr "Лозинка није унета."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Инвалидан формат лозинке или непознат hashing алгоритам."
 
 msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "

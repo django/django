@@ -2,21 +2,25 @@
 #
 # Translators:
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2020
-# Surush Sufiew <siriusproger@gmail.com>, 2020
-# Surush Sufiew <siriusproger@gmail.com>, 2020
+# Sirius Sufiev <siriusproger@gmail.com>, 2020
+# Sirius Sufiev <siriusproger@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-30 18:53+0000\n"
-"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>\n"
-"Language-Team: Tajik (http://www.transifex.com/django/django/language/tg/)\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
+"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2020\n"
+"Language-Team: Tajik (http://app.transifex.com/django/django/language/tg/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: tg\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Нест сохтани интихобшудаҳо %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -26,12 +30,8 @@ msgstr "Муваффақона нест сохтед %(count)d %(items)s."
 msgid "Cannot delete %(name)s"
 msgstr "Нест карда нашуд %(name)s"
 
-msgid "Are you sure?"
-msgstr "Шумо рози ҳастед ?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Нест сохтани интихобшудаҳо %(verbose_name_plural)s"
+msgid "Delete multiple objects"
+msgstr "Нестсозии якчанд объектҳо"
 
 msgid "Administration"
 msgstr "Маъмурият"
@@ -178,6 +178,14 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 
 #, python-brace-format
+msgid "Select this object for an action - {}"
+msgstr ""
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
+
+#, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr ""
 
@@ -192,10 +200,6 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -238,14 +242,14 @@ msgstr "Тағйир додан %s"
 msgid "View %s"
 msgstr "Азназаргузаронӣ %s"
 
-msgid "Database error"
-msgstr "Мушкилӣ дар базаи додаҳо"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "Database error"
+msgstr "Мушкилӣ дар базаи додаҳо"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -257,15 +261,30 @@ msgstr[1] ""
 msgid "0 of %(cnt)s selected"
 msgstr "Интихоб карда шуд 0 аз %(cnt)s "
 
+msgid "Delete"
+msgstr "Нест кардан"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Таърихи вориди тағйирот: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -314,14 +333,8 @@ msgid ""
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 
-msgid "Run the selected action"
-msgstr "Иҷрои амалҳои ихтихобшуда"
-
-msgid "Go"
-msgstr "Иҷро кардан"
-
-msgid "Click here to select the objects across all pages"
-msgstr "Барои интихоби объектҳо дар ҳамаи саҳифаҳо, инҷоро пахш намоед"
+msgid "Run"
+msgstr ""
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -330,9 +343,17 @@ msgstr "Интихоби ҳамаи %(module_name)s (%(total_count)s)"
 msgid "Clear selection"
 msgstr "Бекоркунии интихоб"
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Моелҳои барномаи %(name)s"
+msgid "Breadcrumbs"
+msgstr ""
+
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
 
 msgid "Add"
 msgstr "Илова кардан"
@@ -343,26 +364,40 @@ msgstr "Азназаргузаронӣ"
 msgid "You don’t have permission to view or edit anything."
 msgstr ""
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
 
-msgid "Enter a username and password."
-msgstr "Ном ва рамзро ворид созед."
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "Тағйир додани рамз"
 
-msgid "Please correct the error below."
-msgstr "Хоҳишмандем, хатогии зеринро ислоҳ кунед."
+msgid "Set password"
+msgstr ""
 
-msgid "Please correct the errors below."
-msgstr "Хоҳишмандем, хатогиҳои зеринро ислоҳ кунед."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Рамзи навро ворид созед <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "Марҳамат,"
@@ -389,8 +424,17 @@ msgstr "Дар сомона дидан"
 msgid "Filter"
 msgstr "Поло(Filter)"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
 msgid "Clear all filters"
 msgstr ""
+
+msgid "Save"
+msgstr "Ҳифз кардан"
 
 msgid "Remove from sorting"
 msgstr "Аз қайди навъҳо баровардан"
@@ -402,35 +446,37 @@ msgstr "Бартарии навъҳо: %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "Навъҷудокунӣ дар дигар раванд"
 
-msgid "Delete"
-msgstr "Нест кардан"
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Нест кардани %(object_name)s '%(escaped_object)s' ба нестсозии объектҳои ба "
-"он алоқаманд оварда мерасонад, аммо'ҳисоби корбарӣ'-и (аккаунт) шумо иҷозати "
-"нестсозии объектҳои зеринро надорад:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Нестсозии %(object_name)s '%(escaped_object)s' талаб менамояд, ки "
-"объектҳоиалоқаманди муҳофизатии зерин нест карда шаванд:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Шумо боварӣ доред, ки ин элементҳо нест карда шаванд: %(object_name)s "
-"\"%(escaped_object)s\"? Ҳамаи объектҳои алоқаманди зерин низ нест карда "
-"мешаванд:"
 
 msgid "Objects"
 msgstr "Объектҳо"
@@ -440,9 +486,6 @@ msgstr ""
 
 msgid "No, take me back"
 msgstr "Не, баргаштан"
-
-msgid "Delete multiple objects"
-msgstr "Нестсозии якчанд объектҳо"
 
 #, python-format
 msgid ""
@@ -489,6 +532,15 @@ msgstr "Амалҳои ман"
 msgid "None available"
 msgstr "Дастнорас"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "Шакли номуайян"
 
@@ -507,10 +559,19 @@ msgstr ""
 "азназаргузарониисаҳифаи мазкур нокифоя аст. Шояд шумо мехоҳед бо истифода аз "
 "дигар 'ҳисоби корбарӣ' вориди система шавед."
 
-msgid "Forgotten your password or username?"
-msgstr "Рамз ё номро фаромӯш кардед?"
+msgid "Forgotten your login credentials?"
+msgstr ""
 
 msgid "Toggle navigation"
+msgstr ""
+
+msgid "Sidebar"
+msgstr ""
+
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
 msgstr ""
 
 msgid "Date/time"
@@ -522,19 +583,33 @@ msgstr "Истифодабар"
 msgid "Action"
 msgstr "Амал"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "Ҳамаро нишон додан"
 
-msgid "Save"
-msgstr "Ҳифз кардан"
-
 msgid "Popup closing…"
 msgstr "Равзанаи иловагӣ пӯшида мешавад..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "Ёфтан"
@@ -576,8 +651,15 @@ msgstr "Воридсозии боз як объекти \"%(model)s\""
 msgid "Delete selected %(model)s"
 msgstr "Объекти зерини интихобшударо нест кардан \"%(model)s\""
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Барои вақти дар ин сомона сарф кардаатон миннатдорем."
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Logout"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
 
 msgid "Log in again"
 msgstr "Аз нав ворид шудан"
@@ -647,7 +729,7 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Хоҳишмандем ба ин саҳифа гузаред ва рамзи навро ворид созед:"
 
-msgid "Your username, in case you’ve forgotten:"
+msgid "In case you’ve forgotten, you are:"
 msgstr ""
 
 msgid "Thanks for using our site!"
@@ -667,6 +749,9 @@ msgstr "Суроғаи почтаи электронӣ:"
 
 msgid "Reset my password"
 msgstr "Барқароркунии рамзи ман"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "Ҳама санаҳо"

@@ -6,10 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-12-29 16:31+0000\n"
-"Last-Translator: Bedilbek Khamidov <bedilbek@gmail.com>\n"
-"Language-Team: Uzbek (http://www.transifex.com/django/django/language/uz/)\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
+"Last-Translator: Bedilbek Khamidov <bedilbek@gmail.com>, 2019\n"
+"Language-Team: Uzbek (http://app.transifex.com/django/django/language/uz/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -29,12 +29,22 @@ msgstr "Muhim sanalar"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(key)r asosiy kalitli %(name)s obyekt mavjud emas"
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr ""
+
 msgid "Password changed successfully."
 msgstr "Parol muvaffaqiyatli o'zgartirildi."
+
+msgid "Password-based authentication was disabled."
+msgstr ""
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Parolni o'zgartirish: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr ""
 
 msgid "Authentication and Authorization"
 msgstr "Autentifikatsiya va Avtorizatsiya"
@@ -45,11 +55,11 @@ msgstr "parol"
 msgid "last login"
 msgstr "oxirgi kirish"
 
-msgid "No password set."
-msgstr "Hech qanday parol qo'yilmagan."
+msgid "Reset password"
+msgstr ""
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Noto'g'ri parol formati yoki noma'lum heshlash algoritmi ishlatilgan."
+msgid "Set password"
+msgstr ""
 
 msgid "The two password fields didn’t match."
 msgstr "Ikkala parol maydoni bir-biriga mos kelmadi."
@@ -64,12 +74,27 @@ msgid "Enter the same password as before, for verification."
 msgstr "Tekshirish uchun avvalgi parolni kiriting.."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"Xom parollar saqlanmaydi, shuning uchun bu foydanaluvchining parolini "
-"ko'rishni iloji yo'q, lekin siz <a href=\"{}\"> shu formadan </a> foydalanib "
-"parolni o'zgartirishingiz mumkin. "
+
+msgid "Password-based authentication"
+msgstr ""
+
+msgid "Enabled"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -96,9 +121,6 @@ msgstr ""
 "Sizning eski parolingiz noto'g'ri kiritilgan edi. Iltimos, qaytadan kiriting."
 
 msgid "Old password"
-msgstr ""
-
-msgid "Password (again)"
 msgstr ""
 
 msgid "algorithm"
@@ -132,6 +154,9 @@ msgid "work factor"
 msgstr ""
 
 msgid "checksum"
+msgstr ""
+
+msgid "block size"
 msgstr ""
 
 msgid "name"
@@ -216,12 +241,9 @@ msgid "users"
 msgstr ""
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
 
 #, python-format
@@ -252,9 +274,15 @@ msgstr ""
 msgid "Password reset on %(site_name)s"
 msgstr ""
 
+msgid "No password set."
+msgstr "Hech qanday parol qo'yilmagan."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Noto'g'ri parol formati yoki noma'lum heshlash algoritmi ishlatilgan."
+
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
 
 msgid ""

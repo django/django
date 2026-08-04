@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Ylodi <stjepan@gmail.com>, 2011,2015\n"
 "Language-Team: Croatian (http://app.transifex.com/django/django/language/"
 "hr/)\n"
@@ -23,8 +23,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: hr\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
@@ -187,8 +187,13 @@ msgstr ""
 "Držite tipke „Control“ ili „Command“ na Macu pritisnute za biranje više od "
 "jednog."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Odaberite ovaj objekt za jednu radnju – {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -250,15 +255,15 @@ msgstr "Promijeni %s"
 msgid "View %s"
 msgstr "Prikaži %s"
 
-msgid "Database error"
-msgstr "Greška u bazi podatka"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "Uspješno promijenjeno: %(count)s %(name)s."
 msgstr[1] "Uspješno promijenjeno: %(count)s %(name)s."
 msgstr[2] "Uspješno promijenjeno: %(count)s %(name)s."
+
+msgid "Database error"
+msgstr "Greška u bazi podatka"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -284,6 +289,18 @@ msgstr "Promijeni povijest: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #, python-format
 msgid ""
@@ -337,9 +354,6 @@ msgstr ""
 msgid "Run"
 msgstr "Pokreni"
 
-msgid "Click here to select the objects across all pages"
-msgstr "Kliknite ovdje za biranje objekata kroz sve stranice"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Odaberite svih %(total_count)s %(module_name)s"
@@ -349,10 +363,6 @@ msgstr "Poništi odabir"
 
 msgid "Breadcrumbs"
 msgstr "Navigacijska staza"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modeli u aplikaciji %(name)s"
 
 msgid "Model name"
 msgstr "Ime modela"
@@ -466,6 +476,10 @@ msgstr "Uključi/Isključi temu (trenutačna tema: svijetla)"
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "Uključi/Isključi temu (trenutačna tema: tamna)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -675,6 +689,9 @@ msgstr "Izbriši odabrane %(model)s"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Prikaži odabrane %(model)s"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Hvala što ste danas proveli vrijeme na web-stranici."

@@ -20,8 +20,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Franky Bonanno, 2023\n"
 "Language-Team: Italian (http://app.transifex.com/django/django/language/"
 "it/)\n"
@@ -29,7 +29,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: it\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
 
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
@@ -43,8 +44,8 @@ msgstr "Cancellati/e con successo %(count)d %(items)s."
 msgid "Cannot delete %(name)s"
 msgstr "Impossibile cancellare %(name)s "
 
-msgid "Are you sure?"
-msgstr "Confermi?"
+msgid "Delete multiple objects"
+msgstr "Cancella più oggetti"
 
 msgid "Administration"
 msgstr "Amministrazione"
@@ -191,8 +192,13 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 "Tieni premuto \"Control\", o \"Command\" su Mac, per selezionarne più di uno."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Seleziona questo oggetto per intraprendere un'azione - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -213,12 +219,6 @@ msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
 "Il {name} \"{obj}\" è stato modificato con successo. Puoi modificarlo "
-"nuovamente qui sotto."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"Il {name} \"{obj}\" è stato aggiunto con successo. Puoi modificarlo "
 "nuovamente qui sotto."
 
 #, python-brace-format
@@ -264,15 +264,15 @@ msgstr "Modifica %s"
 msgid "View %s"
 msgstr "Vista %s"
 
-msgid "Database error"
-msgstr "Errore del database"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s modificato correttamente."
 msgstr[1] "%(count)s %(name)s modificati correttamente."
 msgstr[2] "%(count)s %(name)s modificati correttamente."
+
+msgid "Database error"
+msgstr "Errore del database"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -285,6 +285,9 @@ msgstr[2] "Tutti i %(total_count)s selezionati"
 msgid "0 of %(cnt)s selected"
 msgstr "0 di %(cnt)s selezionati"
 
+msgid "Delete"
+msgstr "Cancella"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Tracciato delle modifiche: %s"
@@ -295,6 +298,18 @@ msgstr "Tracciato delle modifiche: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #, python-format
 msgid ""
@@ -346,14 +361,8 @@ msgstr ""
 "informati per email, e vi porranno rimedio a breve. Grazie per la vostra "
 "pazienza."
 
-msgid "Run the selected action"
-msgstr "Esegui l'azione selezionata"
-
-msgid "Go"
-msgstr "Vai"
-
-msgid "Click here to select the objects across all pages"
-msgstr "Clicca qui per selezionare gli oggetti da tutte le pagine."
+msgid "Run"
+msgstr ""
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -365,9 +374,14 @@ msgstr "Annulla la selezione"
 msgid "Breadcrumbs"
 msgstr "Breadcrumbs"
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modelli nell'applicazione %(name)s"
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
 
 msgid "Add"
 msgstr "Aggiungi"
@@ -378,18 +392,17 @@ msgstr "Vista"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Non hai i permessi per visualizzare o modificare nulla."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Prima di tutto inserisci nome utente e password. Poi potrai modificare le "
-"altre impostazioni utente."
 
-msgid "Enter a username and password."
-msgstr "Inserisci nome utente e password."
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "Modifica password"
+
+msgid "Set password"
+msgstr ""
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
@@ -401,6 +414,17 @@ msgstr[2] "Si prega di correggere gli errori sottostanti."
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Inserisci una nuova password per l'utente <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
 
 msgid "Skip to main content"
 msgstr "Passa al contenuto principale"
@@ -439,6 +463,9 @@ msgstr "Mostra i conteggi "
 msgid "Clear all filters"
 msgstr "Cancella tutti i filtri"
 
+msgid "Save"
+msgstr "Salva"
+
 msgid "Remove from sorting"
 msgstr "Elimina dall'ordinamento"
 
@@ -458,34 +485,28 @@ msgstr "Cambia tema (tema corrente: chiaro)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Cambia tema (tema corrente: scuro)"
 
-msgid "Delete"
-msgstr "Cancella"
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"La cancellazione di %(object_name)s '%(escaped_object)s' causerebbe la "
-"cancellazione di oggetti collegati, ma questo account non ha i permessi per "
-"cancellare i seguenti tipi di oggetti:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"La cancellazione di %(object_name)s '%(escaped_object)s' richiederebbe "
-"l'eliminazione dei seguenti oggetti protetti correlati:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Sicuro di voler cancellare %(object_name)s \"%(escaped_object)s\"? Tutti i "
-"seguenti oggetti collegati verranno cancellati:"
 
 msgid "Objects"
 msgstr "Oggetti"
@@ -495,9 +516,6 @@ msgstr "Sì, sono sicuro"
 
 msgid "No, take me back"
 msgstr "No, torna indietro"
-
-msgid "Delete multiple objects"
-msgstr "Cancella più oggetti"
 
 #, python-format
 msgid ""
@@ -573,8 +591,8 @@ msgstr ""
 "Ti sei autenticato come %(username)s, ma non sei autorizzato ad accedere a "
 "questa pagina. Vorresti autenticarti con un altro account?"
 
-msgid "Forgotten your password or username?"
-msgstr "Hai dimenticato la password o lo username?"
+msgid "Forgotten your login credentials?"
+msgstr ""
 
 msgid "Toggle navigation"
 msgstr "Abilita/disabilita navigazione"
@@ -597,6 +615,10 @@ msgstr "Utente"
 msgid "Action"
 msgstr "Azione"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "voce"
@@ -610,14 +632,19 @@ msgstr ""
 "Questo oggetto non ha cambiamenti registrati. Probabilmente non è stato "
 "creato con questo sito di amministrazione."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "Mostra tutto"
 
-msgid "Save"
-msgstr "Salva"
-
 msgid "Popup closing…"
 msgstr "Chiusura popup..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "Cerca"
@@ -663,6 +690,9 @@ msgstr "Elimina la selezione %(model)s"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Visualizza il %(model)s selezionato"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Grazie per avere trascorso del tempo di qualità sul sito oggi."
@@ -740,8 +770,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Vai alla pagina seguente e scegli una nuova password:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Il tuo nome utente, in caso tu l'abbia dimenticato:"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "Grazie per aver usato il nostro sito!"

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 08:09+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
 "Last-Translator: znotdead <zhirafchik@gmail.com>, "
 "2016-2017,2019,2021,2023-2025\n"
 "Language-Team: Belarusian (http://app.transifex.com/django/django/language/"
@@ -59,12 +59,6 @@ msgstr "пароль"
 
 msgid "last login"
 msgstr "апошні раз уваходзіў"
-
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Няправільны фармат паролю або невядомы алгарытм хэшавання."
-
-msgid "No password set."
-msgstr "Пароль не зададзены."
 
 msgid "Reset password"
 msgstr "Узнавіць пароль"
@@ -302,6 +296,12 @@ msgstr "Ваш пароль ня можа быць цалкам лікавым."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Узнавіць пароль на %(site_name)s"
+
+msgid "No password set."
+msgstr "Пароль не зададзены."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Няправільны фармат паролю або невядомы алгарытм хэшавання."
 
 msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "

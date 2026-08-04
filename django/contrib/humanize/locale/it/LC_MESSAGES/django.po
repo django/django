@@ -17,71 +17,92 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-07 14:40+0200\n"
-"PO-Revision-Date: 2023-04-24 18:40+0000\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 18:40+0000\n"
 "Last-Translator: Paolo Melchiorre <paolo@melchiorre.org>, 2023\n"
-"Language-Team: Italian (http://www.transifex.com/django/django/language/"
+"Language-Team: Italian (http://app.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: it\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
 
 msgid "Humanize"
 msgstr "Umanizzazione "
 
+#. Translators: Ordinal format when value is 1 (1st).
+#, python-brace-format
+msgctxt "ordinal is 1"
+msgid "{}st"
+msgstr ""
+
 #. Translators: Ordinal format for 11 (11th), 12 (12th), and 13 (13th).
+#, python-brace-format
 msgctxt "ordinal 11, 12, 13"
 msgid "{}th"
 msgstr "{}esimo"
 
 #. Translators: Ordinal format when value ends with 0, e.g. 80th.
+#, python-brace-format
 msgctxt "ordinal 0"
 msgid "{}th"
 msgstr "{}esimo"
 
-#. Translators: Ordinal format when value ends with 1, e.g. 81st, except 11.
+#. Translators: Ordinal format when value ends with 1, e.g. 81st,
+#. except 11.
+#, python-brace-format
 msgctxt "ordinal 1"
 msgid "{}st"
 msgstr "{}esimo"
 
-#. Translators: Ordinal format when value ends with 2, e.g. 82nd, except 12.
+#. Translators: Ordinal format when value ends with 2, e.g. 82nd,
+#. except 12.
+#, python-brace-format
 msgctxt "ordinal 2"
 msgid "{}nd"
 msgstr "{}esimo"
 
-#. Translators: Ordinal format when value ends with 3, e.g. 83th, except 13.
+#. Translators: Ordinal format when value ends with 3, e.g. 83rd,
+#. except 13.
+#, python-brace-format
 msgctxt "ordinal 3"
 msgid "{}rd"
 msgstr "{}esimo"
 
 #. Translators: Ordinal format when value ends with 4, e.g. 84th.
+#, python-brace-format
 msgctxt "ordinal 4"
 msgid "{}th"
 msgstr "{}esimo"
 
 #. Translators: Ordinal format when value ends with 5, e.g. 85th.
+#, python-brace-format
 msgctxt "ordinal 5"
 msgid "{}th"
 msgstr "{}esimo"
 
 #. Translators: Ordinal format when value ends with 6, e.g. 86th.
+#, python-brace-format
 msgctxt "ordinal 6"
 msgid "{}th"
 msgstr "{}esimo"
 
 #. Translators: Ordinal format when value ends with 7, e.g. 87th.
+#, python-brace-format
 msgctxt "ordinal 7"
 msgid "{}th"
 msgstr "{}esimo"
 
 #. Translators: Ordinal format when value ends with 8, e.g. 88th.
+#, python-brace-format
 msgctxt "ordinal 8"
 msgid "{}th"
 msgstr "{}esimo"
 
 #. Translators: Ordinal format when value ends with 9, e.g. 89th.
+#, python-brace-format
 msgctxt "ordinal 9"
 msgid "{}th"
 msgstr "{}esimo"
@@ -199,8 +220,8 @@ msgstr "domani"
 msgid "yesterday"
 msgstr "ieri"
 
-#. Translators: delta will contain a string like '2 months' or '1 month, 2
-#. weeks'
+#. Translators: delta will contain a string like '2 months' or
+#. '1 month, 2 weeks'
 #, python-format
 msgid "%(delta)s ago"
 msgstr "%(delta)s fa"
@@ -235,8 +256,8 @@ msgstr[2] "%(count)s secondi fa"
 msgid "now"
 msgstr "adesso"
 
-#. Translators: please keep a non-breaking space (U+00A0) between count
-#. and time unit.
+#. Translators: please keep a non-breaking space (U+00A0) between
+#. count and time unit.
 #, python-format
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
@@ -244,8 +265,8 @@ msgstr[0] "tra un secondo"
 msgstr[1] "tra %(count)s secondi"
 msgstr[2] "tra %(count)s secondi"
 
-#. Translators: please keep a non-breaking space (U+00A0) between count
-#. and time unit.
+#. Translators: please keep a non-breaking space (U+00A0) between
+#. count and time unit.
 #, python-format
 msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
@@ -253,8 +274,8 @@ msgstr[0] "tra un minuto"
 msgstr[1] "tra %(count)s minuti"
 msgstr[2] "tra %(count)s minuti"
 
-#. Translators: please keep a non-breaking space (U+00A0) between count
-#. and time unit.
+#. Translators: please keep a non-breaking space (U+00A0) between
+#. count and time unit.
 #, python-format
 msgid "an hour from now"
 msgid_plural "%(count)s hours from now"
@@ -262,13 +283,14 @@ msgstr[0] "tra un'ora"
 msgstr[1] "tra %(count)s ore"
 msgstr[2] "tra %(count)s ore"
 
-#. Translators: delta will contain a string like '2 months' or '1 month, 2
-#. weeks'
+#. Translators: delta will contain a string like '2 months' or
+#. '1 month, 2 weeks'
 #, python-format
 msgid "%(delta)s from now"
 msgstr "%(delta)s da adesso"
 
-#. Translators: 'naturaltime-past' strings will be included in '%(delta)s ago'
+#. Translators: 'naturaltime-past' strings will be included in
+#. '%(delta)s ago'
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%(num)d year"
@@ -317,8 +339,8 @@ msgstr[0] "%(num)d minuto"
 msgstr[1] "%(num)d minuti"
 msgstr[2] "%(num)d minuti"
 
-#. Translators: 'naturaltime-future' strings will be included in '%(delta)s
-#. from now'
+#. Translators: 'naturaltime-future' strings will be included in
+#. '%(delta)s from now'.
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%(num)d year"

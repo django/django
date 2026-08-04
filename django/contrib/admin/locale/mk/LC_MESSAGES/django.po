@@ -12,10 +12,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-05-25 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Martino Nikolovski, 2022\n"
-"Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
+"Language-Team: Macedonian (http://app.transifex.com/django/django/language/"
 "mk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,8 +35,8 @@ msgstr "Успешно беа избришани %(count)d %(items)s."
 msgid "Cannot delete %(name)s"
 msgstr "Не може да се избрише %(name)s"
 
-msgid "Are you sure?"
-msgstr "Сигурни сте?"
+msgid "Delete multiple objects"
+msgstr "Избриши повеќе ставки"
 
 msgid "Administration"
 msgstr "Администрација"
@@ -183,6 +183,14 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr "Држете “Control” или “Command” на Mac за да изберете повеќе."
 
 #, python-brace-format
+msgid "Select this object for an action - {}"
+msgstr ""
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
+
+#, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "Успешно беше додадено {name} “{obj}”."
 
@@ -197,10 +205,6 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -243,14 +247,14 @@ msgstr "Измени %s"
 msgid "View %s"
 msgstr "Погледни %s"
 
-msgid "Database error"
-msgstr "Грешка во базата на податоци"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s ставка %(name)s беше успешно изменета."
 msgstr[1] "%(count)s ставки %(name)s беа успешно изменети."
+
+msgid "Database error"
+msgstr "Грешка во базата на податоци"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -262,6 +266,9 @@ msgstr[1] "Сите %(total_count)s одбрани"
 msgid "0 of %(cnt)s selected"
 msgstr "0 од %(cnt)s избрани"
 
+msgid "Delete"
+msgstr "Избриши"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Историја на измени: %s"
@@ -272,6 +279,17 @@ msgstr "Историја на измени: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -322,14 +340,8 @@ msgstr ""
 "Наидовте на грешка. Известени се администраторите на страницата преку имејл "
 "и би требало наскоро да биде поправена. Ви благодариме на трпението."
 
-msgid "Run the selected action"
-msgstr "Изврши ја избраната акција"
-
-msgid "Go"
-msgstr "Оди"
-
-msgid "Click here to select the objects across all pages"
-msgstr "Кликнете тука за да изберете објекти низ сите страници"
+msgid "Run"
+msgstr ""
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -338,9 +350,17 @@ msgstr "Избери ги сите %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Откажи го изборот"
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Модели во %(name)s апликација"
+msgid "Breadcrumbs"
+msgstr ""
+
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
 
 msgid "Add"
 msgstr "Додади"
@@ -351,28 +371,40 @@ msgstr "Погледни"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Немате дозвола да прегледате или промените ништо"
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Прво внесете корисничко име и лозинка па потоа ќе можете да уредувате повеќе "
-"опции за корисникот"
 
-msgid "Enter a username and password."
-msgstr "Внесете корисничко име и лозинка."
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "Промени лозинка"
 
-msgid "Please correct the error below."
-msgstr "Ве молиме поправете ја грешката подолу."
+msgid "Set password"
+msgstr ""
 
-msgid "Please correct the errors below."
-msgstr "Ве молам поправете ги грешките подолу."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Внесете нова лозинка за корисникот <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "Добредојдовте,"
@@ -399,8 +431,17 @@ msgstr "Погледни на сајтот"
 msgid "Filter"
 msgstr "Филтер"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
 msgid "Clear all filters"
 msgstr "Ресетирај ги сите филтри"
+
+msgid "Save"
+msgstr "Сними"
 
 msgid "Remove from sorting"
 msgstr "Отстрани од сортирање"
@@ -412,34 +453,37 @@ msgstr "Приоритет на сортирање: %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "Вклучи/исклучи сортирање"
 
-msgid "Delete"
-msgstr "Избриши"
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Бришење на %(object_name)s '%(escaped_object)s' ќе резултира со бришење на "
-"поврзаните објекти, но со вашата сметка немате доволно привилегии да ги "
-"бришете следните типови на објекти:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Бришење на %(object_name)s '%(escaped_object)s' ќе резултира со бришење на "
-"следниве заштитени објекти:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Сигурне сте дека сакате да ги бришете %(object_name)s „%(escaped_object)s“? "
-"Сите овие ставки ќе бидат избришани:"
 
 msgid "Objects"
 msgstr "Предмети"
@@ -449,9 +493,6 @@ msgstr "Да, сигурен сум"
 
 msgid "No, take me back"
 msgstr "Не, врати ме назад"
-
-msgid "Delete multiple objects"
-msgstr "Избриши повеќе ставки"
 
 #, python-format
 msgid ""
@@ -497,6 +538,15 @@ msgstr "Мои акции"
 msgid "None available"
 msgstr "Ништо не е достапно"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "Непозната содржина"
 
@@ -517,10 +567,13 @@ msgstr ""
 "Најавени сте како  %(username)s, но не сте авторизирани да пристапите до "
 "оваа страна. Сакате ли да се најавите како друг корисник?"
 
-msgid "Forgotten your password or username?"
-msgstr "Ја заборавивте вашата лозинка или корисничко име?"
+msgid "Forgotten your login credentials?"
+msgstr ""
 
 msgid "Toggle navigation"
+msgstr ""
+
+msgid "Sidebar"
 msgstr ""
 
 msgid "Start typing to filter…"
@@ -538,25 +591,33 @@ msgstr "Корисник"
 msgid "Action"
 msgstr "Акција"
 
-msgid "entry"
+#, python-format
+msgid "Pagination %(name)s entries"
 msgstr ""
 
-msgid "entries"
-msgstr ""
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "Прикажи ги сите"
 
-msgid "Save"
-msgstr "Сними"
-
 msgid "Popup closing…"
 msgstr "Попапот се затвара..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "Барај"
@@ -600,6 +661,9 @@ msgstr "Избриши ги избраните %(model)s"
 
 #, python-format
 msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Logout"
 msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
@@ -672,8 +736,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Ве молам одете на следната страница и внесете нова лозинка:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Вашето корисничко име, во случај да сте заборавиле:"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "Ви благодариме што го користите овој сајт!"
@@ -694,6 +758,9 @@ msgstr "Email адреса:"
 
 msgid "Reset my password"
 msgstr "Ресетирај ја мојата лозинка"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "Сите датуми"

@@ -11,7 +11,7 @@
 # Kevin Sze <leiarix@gmail.com>, 2012
 # Lele Long <schemacs@gmail.com>, 2011,2015
 # Liping Wang <lynn.config@gmail.com>, 2016-2017
-# L., 2024
+# 刘培基（奶牛）, 2024
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # Lemon Li <leeway1985@gmail.com>, 2012-2013
 # Wentao Han <wentao.han@gmail.com>, 2020
@@ -24,8 +24,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-12-03 08:09+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
 "Last-Translator: DWXXX, 2025\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/django/django/"
 "language/zh_CN/)\n"
@@ -73,12 +73,6 @@ msgstr "密码"
 
 msgid "last login"
 msgstr "上次登录"
-
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "不可用的密码格式或未知的哈希算法。"
-
-msgid "No password set."
-msgstr "密码未设置。"
 
 msgid "Reset password"
 msgstr "重置密码"
@@ -298,6 +292,12 @@ msgstr "你的密码不能全都是数字。"
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "重置 %(site_name)s 的密码"
+
+msgid "No password set."
+msgstr "密码未设置。"
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "不可用的密码格式或未知的哈希算法。"
 
 msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "

@@ -1,8 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Batist D 🐍 <baptiste+transifex@darthenay.fr>, 2012-2013
-# Batist D 🐍 <baptiste+transifex@darthenay.fr>, 2013-2019
+# Baptiste D <baptiste.darthenay@gmail.com>, 2012-2013
+# Baptiste D <baptiste.darthenay@gmail.com>, 2013-2019
 # batisteo <bapdarth@yahoo·fr>, 2011
 # Dinu Gherman <gherman@darwin.in-berlin.de>, 2011
 # kristjan <kristjan.schmidt@googlemail.com>, 2011
@@ -15,10 +15,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2022-05-25 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
 "Last-Translator: Meiyer <interdist+translations@gmail.com>, 2022\n"
-"Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
+"Language-Team: Esperanto (http://app.transifex.com/django/django/language/"
 "eo/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -58,6 +58,9 @@ msgstr "Bosnia"
 
 msgid "Catalan"
 msgstr "Kataluna"
+
+msgid "Central Kurdish (Sorani)"
+msgstr ""
 
 msgid "Czech"
 msgstr "Ĉeĥa"
@@ -145,6 +148,9 @@ msgstr "Kroata"
 
 msgid "Upper Sorbian"
 msgstr "Suprasoraba"
+
+msgid "Haitian Creole"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "Hungara"
@@ -299,6 +305,9 @@ msgstr "Tatara"
 msgid "Udmurt"
 msgstr "Udmurta"
 
+msgid "Uyghur"
+msgstr ""
+
 msgid "Ukrainian"
 msgstr "Ukraina"
 
@@ -346,6 +355,9 @@ msgstr "Tiu paĝo ne enhavas rezultojn"
 msgid "Enter a valid value."
 msgstr "Enigu ĝustan valoron."
 
+msgid "Enter a valid domain name."
+msgstr ""
+
 msgid "Enter a valid URL."
 msgstr "Enigu ĝustan retadreson."
 
@@ -369,14 +381,18 @@ msgstr ""
 "Enigu ĝustan “ĵetonvorton” konsistantan el Unikodaj literoj, ciferoj, "
 "substrekoj, aŭ dividstrekoj."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Enigu ĝustaforman IPv4-adreson."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr ""
 
-msgid "Enter a valid IPv6 address."
-msgstr "Enigu ĝustaforman IPv6-adreson."
+msgid "IPv4"
+msgstr ""
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Enigu ĝustaforman IPv4- aŭ IPv6-adreson."
+msgid "IPv6"
+msgstr ""
+
+msgid "IPv4 or IPv6"
+msgstr ""
 
 msgid "Enter only digits separated by commas."
 msgstr "Enigu nur ciferojn apartigitajn per komoj."
@@ -397,6 +413,12 @@ msgstr "Certigu ke ĉi tiu valoro estas pli ol aŭ egala al %(limit_value)s."
 #, python-format
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
 msgstr "Certigu ke ĉi tiu valoro estas oblo de paŝo-grando %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -471,6 +493,9 @@ msgstr "%(model_name)s kun tiuj %(field_labels)s jam ekzistas."
 msgid "Constraint “%(name)s” is violated."
 msgstr "Limigo “%(name)s” estas malobservita."
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Valoro %(value)r ne estas ebla elekto."
@@ -514,6 +539,9 @@ msgstr "Bulea (Vera aŭ Malvera)"
 msgid "String (up to %(max_length)s)"
 msgstr "Ĉeno (ĝis %(max_length)s)"
 
+msgid "String (unlimited)"
+msgstr ""
+
 msgid "Comma-separated integers"
 msgstr "Perkome disigitaj entjeroj"
 
@@ -538,8 +566,8 @@ msgstr "Dato (sen horo)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "La valoro “%(value)s” havas malĝustan formaton. Ĝi devas esti en la formato "
 "JJJJ-MM-TT HH:MM[:ss[.µµµµµµ]][TZ]."
@@ -549,8 +577,8 @@ msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"La valoro “%(value)s” havas la ĝustan formaton (JJJJ-MM-TT HH:MM[:ss[."
-"µµµµµµ]][TZ]), sed ĝi estas neekzistanta dato/tempo."
+"La valoro “%(value)s” havas la ĝustan formaton (JJJJ-MM-TT "
+"HH:MM[:ss[.µµµµµµ]][TZ]), sed ĝi estas neekzistanta dato/tempo."
 
 msgid "Date (with time)"
 msgstr "Dato (kun horo)"
@@ -564,8 +592,8 @@ msgstr "Dekuma nombro"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "La valoro “%(value)s” havas malĝustan formaton. Ĝi devas esti en la formato "
 "[TT] [[HH:]MM:]ss[.µµµµµµ]."
@@ -656,6 +684,10 @@ msgid "Raw binary data"
 msgstr "Kruda duuma datumo"
 
 #, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
+
+#, python-format
 msgid "“%(value)s” is not a valid UUID."
 msgstr "“%(value)s” ne estas ĝustaforma UUID."
 
@@ -675,8 +707,8 @@ msgid "Value must be valid JSON."
 msgstr "La valoro devas esti ĝustaforma JSON."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "Ekzemplero de %(model)s kun %(field)s egala al %(value)r ne ekzistas."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Fremda ŝlosilo (tipo determinita per rilata kampo)"
@@ -696,8 +728,8 @@ msgid "Many-to-many relationship"
 msgstr "Mult-al-multa rilato"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -862,6 +894,28 @@ msgstr "Jes"
 
 msgid "No"
 msgstr "Ne"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
+
+msgctxt "Task"
+msgid "Ready"
+msgstr ""
+
+msgctxt "Task"
+msgid "Running"
+msgstr ""
+
+msgctxt "Task"
+msgid "Failed"
+msgstr ""
+
+msgctxt "Task"
+msgid "Successful"
+msgstr ""
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1253,11 +1307,11 @@ msgstr "Neniuj %(verbose_name_plural)s estas disponeblaj"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"Estontaj %(verbose_name_plural)s ne disponeblas ĉar %(class_name)s."
-"allow_future estas Malvera."
+"Estontaj %(verbose_name_plural)s ne disponeblas ĉar "
+"%(class_name)s.allow_future estas Malvera."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"

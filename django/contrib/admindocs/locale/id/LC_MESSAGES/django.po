@@ -5,15 +5,15 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # rodin <romihardiyanto@gmail.com>, 2011-2012
 # rodin <romihardiyanto@gmail.com>, 2013-2014,2016
-# sag᠎e <laymonage@gmail.com>, 2019
+# S​age Abdullah <laymonage@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-09-14 00:30+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
-"Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 20:19+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2021\n"
+"Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -104,8 +104,8 @@ msgstr "Instal docutils."
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python’s <a href=\"%(link)s"
-"\">docutils</a> library."
+"The admin documentation system requires Python’s <a "
+"href=\"%(link)s\">docutils</a> library."
 msgstr ""
 "Sistem dokumentasi admin membutuhkan pustaka <a href=\"%(link)s\">docutils</"
 "a> Python."
@@ -114,8 +114,8 @@ msgstr ""
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
 msgstr ""
-"Ajukan permintaan kepada administrator Anda untuk menginstal <a href="
-"\"%(link)s\">docutils</a>."
+"Ajukan permintaan kepada administrator Anda untuk menginstal <a "
+"href=\"%(link)s\">docutils</a>."
 
 #, python-format
 msgid "Model: %(name)s"

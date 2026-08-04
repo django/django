@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
 "Last-Translator: F Wolff <friedel@translate.org.za>, 2019-2020,2023-2025\n"
 "Language-Team: Afrikaans (http://app.transifex.com/django/django/language/"
 "af/)\n"
@@ -55,12 +55,6 @@ msgstr "wagwoord"
 
 msgid "last login"
 msgstr "laas aangemeld"
-
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Ongeldige wagwoordformaat of onbekende hutsalgoritme."
-
-msgid "No password set."
-msgstr "Geen wagwoord gestel nie."
 
 msgid "Reset password"
 msgstr "Herstel wagwoord"
@@ -298,6 +292,12 @@ msgstr "Die wagwoord mag nie geheel numeries wees nie."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Wagwoordherstel op %(site_name)s"
+
+msgid "No password set."
+msgstr "Geen wagwoord gestel nie."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Ongeldige wagwoordformaat of onbekende hutsalgoritme."
 
 msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "

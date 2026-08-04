@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Venelin Stoykov <vkstoykov@gmail.com>, 2015-2017,2025\n"
 "Language-Team: Bulgarian (http://app.transifex.com/django/django/language/"
 "bg/)\n"
@@ -184,8 +184,13 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 "Задръжте “Control”, или “Command” на Mac, за да изберете повече от едно."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Изберете този обект за действие - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -250,14 +255,14 @@ msgstr "Промени %s"
 msgid "View %s"
 msgstr "Изглед %s"
 
-msgid "Database error"
-msgstr "Грешка в базата данни"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s беше променено успешно."
 msgstr[1] "%(count)s %(name)s бяха успешно променени."
+
+msgid "Database error"
+msgstr "Грешка в базата данни"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -282,6 +287,17 @@ msgstr "История на промените: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -336,9 +352,6 @@ msgstr ""
 msgid "Run"
 msgstr ""
 
-msgid "Click here to select the objects across all pages"
-msgstr "Щракнете тук, за да изберете обектите във всички страници"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Избери всички %(total_count)s %(module_name)s"
@@ -348,10 +361,6 @@ msgstr "Изчисти избраното"
 
 msgid "Breadcrumbs"
 msgstr "Трохи"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Модели в приложението %(name)s "
 
 msgid "Model name"
 msgstr ""
@@ -463,6 +472,10 @@ msgstr "Смени темата (настояща тема: светла)"
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "Смени темата (настояща тема: тъмна)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -668,6 +681,9 @@ msgstr "Изтриване на избрания %(model)s"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Виж избраните %(model)s"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Благодарим ви за добре прекараното време с този сайт днес."

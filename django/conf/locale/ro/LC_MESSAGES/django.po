@@ -14,10 +14,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
 "Last-Translator: Bogdan Mateescu, 2018-2019,2021\n"
-"Language-Team: Romanian (http://www.transifex.com/django/django/language/"
+"Language-Team: Romanian (http://app.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -148,6 +148,9 @@ msgstr "Croată"
 
 msgid "Upper Sorbian"
 msgstr "Soraba Superioară"
+
+msgid "Haitian Creole"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "Ungară"
@@ -302,6 +305,9 @@ msgstr "Tătară"
 msgid "Udmurt"
 msgstr "Udmurtă"
 
+msgid "Uyghur"
+msgstr ""
+
 msgid "Ukrainian"
 msgstr "Ucraineană"
 
@@ -349,6 +355,9 @@ msgstr "Această pagină nu conține nici un rezultat"
 msgid "Enter a valid value."
 msgstr "Introduceți o valoare validă."
 
+msgid "Enter a valid domain name."
+msgstr ""
+
 msgid "Enter a valid URL."
 msgstr "Introduceți un URL valid."
 
@@ -370,14 +379,18 @@ msgid ""
 "hyphens."
 msgstr ""
 
-msgid "Enter a valid IPv4 address."
-msgstr "Introduceţi o adresă IPv4 validă."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr ""
 
-msgid "Enter a valid IPv6 address."
-msgstr "Intoduceți o adresă IPv6 validă."
+msgid "IPv4"
+msgstr ""
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Introduceți o adresă IPv4 sau IPv6 validă."
+msgid "IPv6"
+msgstr ""
+
+msgid "IPv4 or IPv6"
+msgstr ""
 
 msgid "Enter only digits separated by commas."
 msgstr "Introduceţi numai numere separate de virgule."
@@ -399,6 +412,12 @@ msgstr ""
 
 #, python-format
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
 msgstr ""
 
 #, python-format
@@ -485,6 +504,9 @@ msgstr "%(model_name)s cu acest %(field_labels)s există deja."
 msgid "Constraint “%(name)s” is violated."
 msgstr ""
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Valoarea %(value)r nu este o opțiune validă."
@@ -550,8 +572,8 @@ msgstr "Dată (fară oră)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 
 #, python-format
@@ -572,8 +594,8 @@ msgstr "Număr zecimal"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 
 msgid "Duration"
@@ -656,6 +678,10 @@ msgid "Raw binary data"
 msgstr "Date binare brute"
 
 #, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
+
+#, python-format
 msgid "“%(value)s” is not a valid UUID."
 msgstr ""
 
@@ -675,8 +701,8 @@ msgid "Value must be valid JSON."
 msgstr ""
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "Instanța %(model)s cu %(field)s %(value)r inexistentă."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Foreign Key (tip determinat de câmpul aferent)"
@@ -696,8 +722,8 @@ msgid "Many-to-many relationship"
 msgstr "Relație multe-la-multe"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -862,6 +888,28 @@ msgstr "Da"
 
 msgid "No"
 msgstr "Nu"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
+
+msgctxt "Task"
+msgid "Ready"
+msgstr ""
+
+msgctxt "Task"
+msgid "Running"
+msgstr ""
+
+msgctxt "Task"
+msgid "Failed"
+msgstr ""
+
+msgctxt "Task"
+msgid "Successful"
+msgstr ""
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1244,11 +1292,11 @@ msgstr "%(verbose_name_plural)s nu e disponibil"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"Viitorul %(verbose_name_plural)s nu e disponibil deoarece %(class_name)s ."
-"allow_future este Fals."
+"Viitorul %(verbose_name_plural)s nu e disponibil deoarece "
+"%(class_name)s .allow_future este Fals."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"

@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-12-04 08:09+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
 "Last-Translator: Demetre Barbakadze, 2023\n"
 "Language-Team: Georgian (http://app.transifex.com/django/django/language/"
 "ka/)\n"
@@ -33,12 +33,22 @@ msgstr "მნიშვნელოვანი თარიღები"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s ობიექტი პირველადი გასაღებით %(key)r არ არსებობს."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr ""
+
 msgid "Password changed successfully."
 msgstr "პაროლი წარმატებით შეიცვალა."
+
+msgid "Password-based authentication was disabled."
+msgstr ""
 
 #, python-format
 msgid "Change password: %s"
 msgstr "შევცვალოთ პაროლი: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr ""
 
 msgid "Authentication and Authorization"
 msgstr "იდენტიფიკაცია და ავტორიზაცია"
@@ -49,11 +59,11 @@ msgstr "პაროლი"
 msgid "last login"
 msgstr "ბოლო შესვლა"
 
-msgid "No password set."
-msgstr "არ არის დაყენებული პაროლი."
+msgid "Reset password"
+msgstr ""
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "არასწორი პაროლის ფორმატი ან უცნობი ჰეშირების ალგორითმი."
+msgid "Set password"
+msgstr ""
 
 msgid "The two password fields didn’t match."
 msgstr "ორი პაროლის ველი ერთმანეთს არ ემთხვევა"
@@ -68,8 +78,26 @@ msgid "Enter the same password as before, for verification."
 msgstr "გაიმეორეთ იგივე პაროლი ვერიფიკაციისთვის."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+
+msgid "Password-based authentication"
+msgstr ""
+
+msgid "Enabled"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
 msgstr ""
 
 #, python-format
@@ -97,9 +125,6 @@ msgstr "თქვენი ძველი პაროლი შეყვან
 
 msgid "Old password"
 msgstr "ძველი პაროლი"
-
-msgid "Password (again)"
-msgstr "პაროლი (განმეორებით)"
 
 msgid "algorithm"
 msgstr "ალგორითმი"
@@ -225,16 +250,11 @@ msgid "users"
 msgstr "მომხმარებლები"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"პაროლი ძალიან მოკლეა. მინიმუმ %(min_length)dსიმბოლოს უნდა შეიცავდეს."
 msgstr[1] ""
-"პაროლი ძალიან მოკლეა. მინიმუმ %(min_length)dსიმბოლოს უნდა შეიცავდეს."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -266,6 +286,12 @@ msgstr "თქვენი პაროლი არ შეიძლება �
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "პაროლის თავიდან დაყენება %(site_name)s-ზე"
+
+msgid "No password set."
+msgstr "არ არის დაყენებული პაროლი."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "არასწორი პაროლის ფორმატი ან უცნობი ჰეშირების ალგორითმი."
 
 msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "

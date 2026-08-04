@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2025-03-19 11:30-0500\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Ronny Vedrilla, 2025\n"
 "Language-Team: German (http://app.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -186,8 +186,13 @@ msgstr ""
 "Halten Sie die Strg-Taste (⌘ für Mac) während des Klickens gedrückt, um "
 "mehrere Einträge auszuwählen."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Dieses Objekt für eine Aktion auswählen - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -252,14 +257,14 @@ msgstr "%s ändern"
 msgid "View %s"
 msgstr "%s ansehen"
 
-msgid "Database error"
-msgstr "Datenbankfehler"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s wurde erfolgreich geändert."
 msgstr[1] "%(count)s %(name)s wurden erfolgreich geändert."
+
+msgid "Database error"
+msgstr "Datenbankfehler"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -284,6 +289,17 @@ msgstr "Änderungsgeschichte: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -335,14 +351,8 @@ msgstr ""
 "Ein Fehler ist aufgetreten und wurde an die Administratoren per E-Mail "
 "gemeldet. Danke für die Geduld, der Fehler sollte in Kürze behoben sein."
 
-msgid "Run the selected action"
-msgstr "Ausgewählte Aktion ausführen"
-
-msgid "Go"
-msgstr "Ausführen"
-
-msgid "Click here to select the objects across all pages"
-msgstr "Hier klicken, um die Objekte aller Seiten auszuwählen"
+msgid "Run"
+msgstr ""
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -353,10 +363,6 @@ msgstr "Auswahl widerrufen"
 
 msgid "Breadcrumbs"
 msgstr "„Brotkrümel“"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modelle der %(name)s-Anwendung"
 
 msgid "Model name"
 msgstr "Modellname"
@@ -449,6 +455,9 @@ msgstr "Anzahl anzeigen"
 msgid "Clear all filters"
 msgstr "Alle Filter zurücksetzen"
 
+msgid "Save"
+msgstr "Sichern"
+
 msgid "Remove from sorting"
 msgstr "Aus der Sortierung entfernen"
 
@@ -469,30 +478,27 @@ msgid "Toggle theme (current theme: dark)"
 msgstr "Design wechseln (aktuelles Design: dunkel)"
 
 #, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
+
+#, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Das Löschen des %(object_name)s „%(escaped_object)s“ hätte das Löschen davon "
-"abhängiger Daten zur Folge, aber Sie haben nicht die nötigen Rechte, um die "
-"folgenden davon abhängigen Daten zu löschen:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Das Löschen von %(object_name)s „%(escaped_object)s“ würde ein Löschen der "
-"folgenden geschützten verwandten Objekte erfordern:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Sind Sie sicher, dass Sie %(object_name)s „%(escaped_object)s“ löschen "
-"wollen? Es werden zusätzlich die folgenden davon abhängigen Daten gelöscht:"
 
 msgid "Objects"
 msgstr "Objekte"
@@ -601,6 +607,10 @@ msgstr "Benutzer"
 msgid "Action"
 msgstr "Aktion"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "Eintrag"
@@ -613,14 +623,19 @@ msgstr ""
 "Dieses Objekt hat keine Änderungsgeschichte. Es wurde möglicherweise nicht "
 "über diese Verwaltungsseiten angelegt."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "Zeige alle"
 
-msgid "Save"
-msgstr "Sichern"
-
 msgid "Popup closing…"
 msgstr "Popup wird geschlossen..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "Suchen"
@@ -665,6 +680,9 @@ msgstr "Ausgewählte %(model)s löschen"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Ausgewählte %(model)s ansehen"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr ""

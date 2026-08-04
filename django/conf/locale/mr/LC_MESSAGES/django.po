@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2024-01-20 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
 "Last-Translator: Omkar Parab, 2024\n"
 "Language-Team: Marathi (http://app.transifex.com/django/django/language/"
 "mr/)\n"
@@ -140,6 +140,9 @@ msgstr "क्रोएशियन"
 
 msgid "Upper Sorbian"
 msgstr "अप्पर सोर्बियन"
+
+msgid "Haitian Creole"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "हंगेरियन"
@@ -344,6 +347,9 @@ msgstr "त्या पानावर कोणतेही परिणाम
 msgid "Enter a valid value."
 msgstr "वैध मूल्य टाका."
 
+msgid "Enter a valid domain name."
+msgstr ""
+
 msgid "Enter a valid URL."
 msgstr "एक योग्य युआरएल टाका करा."
 
@@ -363,14 +369,18 @@ msgid ""
 "hyphens."
 msgstr "योग्य \"स्लग\" टाका ज्यामध्ये यूनिकोड अक्षरे, अंक, अंडरस्कोर किंवा हायफन असतात."
 
-msgid "Enter a valid IPv4 address."
-msgstr "योग्य IPv4 पत्ता टाका."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr ""
 
-msgid "Enter a valid IPv6 address."
-msgstr "योग्य IPv6 पत्ता टाका."
+msgid "IPv4"
+msgstr ""
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "योग्य IPv4 किंवा IPv6 पत्ता नमूद करा."
+msgid "IPv6"
+msgstr ""
+
+msgid "IPv4 or IPv6"
+msgstr ""
 
 msgid "Enter only digits separated by commas."
 msgstr "स्वल्पविरामाने वेगळे केलेले अंकच फक्त नमूद करा."
@@ -460,6 +470,9 @@ msgstr "%(model_name)s सह %(field_labels)s हे अगोदरच अस�
 msgid "Constraint “%(name)s” is violated."
 msgstr "\"%(name)s\" च्या मर्यादेचं उल्लंघन आहे."
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Value %(value)r हा योग्य पर्याय नाही."
@@ -523,8 +536,8 @@ msgstr "दिनांक (वेळेशिवाय)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 
 #, python-format
@@ -545,8 +558,8 @@ msgstr ""
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 
 msgid "Duration"
@@ -629,6 +642,10 @@ msgid "Raw binary data"
 msgstr "कच्चा बायनरी डेटा"
 
 #, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
+
+#, python-format
 msgid "“%(value)s” is not a valid UUID."
 msgstr ""
 
@@ -648,7 +665,7 @@ msgid "Value must be valid JSON."
 msgstr "मूल्य योग्य JSON असणे आवश्यक."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
 msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
@@ -669,8 +686,8 @@ msgid "Many-to-many relationship"
 msgstr ""
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -818,6 +835,28 @@ msgstr "होय"
 
 msgid "No"
 msgstr "नाही"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
+
+msgctxt "Task"
+msgid "Ready"
+msgstr ""
+
+msgctxt "Task"
+msgid "Running"
+msgstr ""
+
+msgctxt "Task"
+msgid "Failed"
+msgstr ""
+
+msgctxt "Task"
+msgid "Successful"
+msgstr ""
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1204,8 +1243,8 @@ msgstr "कोणतेही %(verbose_name_plural)s उपलब्ध ना�
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
 
 #, python-format
@@ -1246,8 +1285,8 @@ msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
-"<text_to_translate>डिजांगो %(version)s साठी <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/releases/\" target=\"_blank\" "
+"<text_to_translate>डिजांगो %(version)s साठी <a href=\"https://"
+"docs.djangoproject.com/en/%(version)s/releases/\" target=\"_blank\" "
 "rel=\"noopener\">प्रदर्शित संदेश </a> पहा</text_to_translate>"
 
 #, python-format
@@ -1257,9 +1296,10 @@ msgid ""
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"तुम्ही हे पान पाहत आहात कारण तुमच्या सेटिंग्ज फाइलमध्ये <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
-"rel=\"noopener\">DEBUG=True</a> आहे आणि तुम्ही कोणतीही URL कॉन्फिगर केलेली नाही."
+"तुम्ही हे पान पाहत आहात कारण तुमच्या सेटिंग्ज फाइलमध्ये <a href=\"https://"
+"docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" "
+"target=\"_blank\" rel=\"noopener\">DEBUG=True</a> आहे आणि तुम्ही कोणतीही URL "
+"कॉन्फिगर केलेली नाही."
 
 msgid "Django Documentation"
 msgstr "जांगो दस्तऐवजीकरण"

@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-25 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
 "Last-Translator: Shukrullo Turgunov <shukrullo@umail.uz>, 2023\n"
 "Language-Team: Uzbek (http://app.transifex.com/django/django/language/uz/)\n"
 "MIME-Version: 1.0\n"
@@ -142,6 +142,9 @@ msgstr "Xorvat tili"
 
 msgid "Upper Sorbian"
 msgstr "Yuqori Sorbiya tili"
+
+msgid "Haitian Creole"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "Vengriya tili"
@@ -346,6 +349,9 @@ msgstr "Ushbu sahifada hech qanday natija yo'q"
 msgid "Enter a valid value."
 msgstr "To'g'ri qiymatni kiriting."
 
+msgid "Enter a valid domain name."
+msgstr ""
+
 msgid "Enter a valid URL."
 msgstr "To'g'ri URL manzilini kiriting."
 
@@ -369,14 +375,18 @@ msgstr ""
 "Unicode harflari, raqamlari, pastki chiziqlari yoki chiziqlardan iborat "
 "to'g'ri \"slug\" ni kiriting."
 
-msgid "Enter a valid IPv4 address."
-msgstr "To'g'ri IPv4 manzilini kiriting."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr ""
 
-msgid "Enter a valid IPv6 address."
-msgstr "To'g'ri IPv6 manzilini kiriting."
+msgid "IPv4"
+msgstr ""
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "To'g'ri IPv4 yoki IPv6 manzilini kiriting."
+msgid "IPv6"
+msgstr ""
+
+msgid "IPv4 or IPv6"
+msgstr ""
 
 msgid "Enter only digits separated by commas."
 msgstr "Faqat vergul bilan ajratilgan raqamlarni kiriting."
@@ -475,6 +485,9 @@ msgstr "%(field_labels)s bilan %(model_name)s allaqachon mavjud."
 msgid "Constraint “%(name)s” is violated."
 msgstr ""
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "%(value)r qiymati to'g'ri tanlov emas."
@@ -546,19 +559,19 @@ msgstr "Sana (vaqtsiz)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
-"\"%(value)s\" qiymati noto'g'ri formatga ega. U YYYY-MM-DD HH: MM [: ss [."
-"uuuuuu]] [TZ] formatida bo'lishi kerak."
+"\"%(value)s\" qiymati noto'g'ri formatga ega. U YYYY-MM-DD HH: MM [: ss "
+"[.uuuuuu]] [TZ] formatida bo'lishi kerak."
 
 #, python-format
 msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"\"%(value)s\" qiymati to'g'ri formatga ega (YYYY-MM-DD HH: MM [: ss [."
-"uuuuuu]] [TZ]), lekin u noto'g'ri sana / vaqt."
+"\"%(value)s\" qiymati to'g'ri formatga ega (YYYY-MM-DD HH: MM [: ss "
+"[.uuuuuu]] [TZ]), lekin u noto'g'ri sana / vaqt."
 
 msgid "Date (with time)"
 msgstr "Sana (vaqt bilan)"
@@ -572,11 +585,11 @@ msgstr "O'nli kasr son"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
-"\"%(value)s\" qiymati noto'g'ri formatga ega. U [DD] [[HH:] MM:] ss [."
-"uuuuuu] formatida bo'lishi kerak."
+"\"%(value)s\" qiymati noto'g'ri formatga ega. U [DD] [[HH:] MM:] ss "
+"[.uuuuuu] formatida bo'lishi kerak."
 
 msgid "Duration"
 msgstr "Davomiyligi"
@@ -662,6 +675,10 @@ msgid "Raw binary data"
 msgstr "Tartibsiz Ikkilik ma'lumotlar"
 
 #, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
+
+#, python-format
 msgid "“%(value)s” is not a valid UUID."
 msgstr "\"%(value)s\" to'g'ri UUID emas."
 
@@ -681,8 +698,8 @@ msgid "Value must be valid JSON."
 msgstr "Qiymat yaroqli JSON bo'lishi kerak."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(field)s %(value)r lari bilan %(model)s namunasi uchun mavjud emas."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Tashqi kalit (turi aloqador maydon tomonidan belgilanadi)"
@@ -702,8 +719,8 @@ msgid "Many-to-many relationship"
 msgstr "Ko'pchilikka-ko'pchilik munosabatlar"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -859,6 +876,28 @@ msgstr "Ha"
 
 msgid "No"
 msgstr "Yo'q"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
+
+msgctxt "Task"
+msgid "Ready"
+msgstr ""
+
+msgctxt "Task"
+msgid "Running"
+msgstr ""
+
+msgctxt "Task"
+msgid "Failed"
+msgstr ""
+
+msgctxt "Task"
+msgid "Successful"
+msgstr ""
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1241,11 +1280,11 @@ msgstr "Hech qanday %(verbose_name_plural)s lar mavjud emas"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"Kelajak %(verbose_name_plural)s lari mavjud emas, chunki %(class_name)s."
-"allow_future yolg'ondur."
+"Kelajak %(verbose_name_plural)s lari mavjud emas, chunki "
+"%(class_name)s.allow_future yolg'ondur."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
@@ -1287,9 +1326,9 @@ msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
-"Django %(version)s uchun  chiqarilgan<a href=\"https://docs.djangoproject."
-"com/en/%(version)s/releases/\" target=\"_blank\" rel=\"noopener\"> "
-"nashrlarni</a> ko'rish"
+"Django %(version)s uchun  chiqarilgan<a href=\"https://"
+"docs.djangoproject.com/en/%(version)s/releases/\" target=\"_blank\" "
+"rel=\"noopener\"> nashrlarni</a> ko'rish"
 
 #, python-format
 msgid ""
@@ -1298,10 +1337,11 @@ msgid ""
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"Siz ushbu sahifani ko'rmoqdasiz, chunki <a href=\"https://docs.djangoproject."
-"com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
-"rel=\"noopener\">DEBUG = True ifodasi</a> sizning sozlamalar faylingizda "
-"ko'rsatilgan va siz biron bir URL manzilini to'gri sozlamagansiz."
+"Siz ushbu sahifani ko'rmoqdasiz, chunki <a href=\"https://"
+"docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" "
+"target=\"_blank\" rel=\"noopener\">DEBUG = True ifodasi</a> sizning "
+"sozlamalar faylingizda ko'rsatilgan va siz biron bir URL manzilini to'gri "
+"sozlamagansiz."
 
 msgid "Django Documentation"
 msgstr "Django Hujjatlari"

@@ -21,8 +21,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Sajad Rahimi <rahimisajad@outlook.com>, 2021,2025\n"
 "Language-Team: Persian (http://app.transifex.com/django/django/language/"
 "fa/)\n"
@@ -193,7 +193,12 @@ msgstr ""
 "برای انتخاب بیش از یکی، کلید \"Control\"، یا \"Command\" روی Mac، را نگه "
 "دارید."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
+msgstr ""
+
+#, python-format
+msgid "The app \"%s\" could not be found."
 msgstr ""
 
 #, python-brace-format
@@ -259,14 +264,14 @@ msgstr "تغییر %s"
 msgid "View %s"
 msgstr "مشاهده %s"
 
-msgid "Database error"
-msgstr "خطا در بانک اطلاعاتی"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s با موفقیت تغییر کرد."
 msgstr[1] "%(count)s %(name)s با موفقیت تغییر کرد."
+
+msgid "Database error"
+msgstr "خطا در بانک اطلاعاتی"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -291,6 +296,17 @@ msgstr "تاریخچهٔ تغییر: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -341,14 +357,8 @@ msgstr ""
 "مشکلی پیش آمده. این مشکل از طریق ایمیل به مدیران وب‌گاه اطلاع داده شد و به "
 "زودی اصلاح می‌گردد. از صبر شما متشکریم."
 
-msgid "Run the selected action"
-msgstr "اجرای حرکت انتخاب شده"
-
-msgid "Go"
-msgstr "برو"
-
-msgid "Click here to select the objects across all pages"
-msgstr "برای انتخاب موجودیت‌ها در تمام صفحات اینجا را کلیک کنید"
+msgid "Run"
+msgstr ""
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -359,10 +369,6 @@ msgstr "لغو انتخاب‌ها"
 
 msgid "Breadcrumbs"
 msgstr ""
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "مدلها در برنامه %(name)s "
 
 msgid "Model name"
 msgstr ""
@@ -451,6 +457,9 @@ msgstr "نمایش تعداد"
 msgid "Clear all filters"
 msgstr "پاک کردن همه فیلترها"
 
+msgid "Save"
+msgstr "ذخیره"
+
 msgid "Remove from sorting"
 msgstr "حذف از مرتب سازی"
 
@@ -471,29 +480,27 @@ msgid "Toggle theme (current theme: dark)"
 msgstr "تغییر رنگ پوسته (حالت کنونی: تیره)"
 
 #, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
+
+#, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"حذف %(object_name)s·'%(escaped_object)s' می تواند باعث حذف اشیاء مرتبط شود. "
-"اما حساب شما دسترسی لازم برای حذف اشیای از انواع زیر را ندارد:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"حذف %(object_name)s '%(escaped_object)s' نیاز به حذف موجودیت‌های مرتبط محافظت "
-"شده ذیل دارد:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"آیا مطمئنید که می‌خواهید %(object_name)s·\"%(escaped_object)s\" را حذف کنید؟ "
-"کلیهٔ اشیای مرتبط زیر حذف خواهند شد:"
 
 msgid "Objects"
 msgstr "اشیاء"
@@ -601,6 +608,10 @@ msgstr "کاربر"
 msgid "Action"
 msgstr "عمل"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] ""
@@ -613,14 +624,19 @@ msgstr ""
 "این شیء هنوز تاریخچه تغییرات ندارد. ممکن است توسط این وب‌گاه مدیر ساخته نشده "
 "باشد."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "نمایش همه"
 
-msgid "Save"
-msgstr "ذخیره"
-
 msgid "Popup closing…"
 msgstr "در حال بستن پنجره..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "جستجو"
@@ -665,6 +681,9 @@ msgstr "حذف کردن %(model)s انتخاب شده"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "نمایش %(model)sهای انتخاب شده"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr ""

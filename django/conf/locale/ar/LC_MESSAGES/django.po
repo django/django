@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
 "Last-Translator: Abdulrahman Alfawal, 2025\n"
 "Language-Team: Arabic (http://app.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -530,6 +530,9 @@ msgstr "%(model_name)s بهذا %(field_labels)s موجود سلفاً."
 msgid "Constraint “%(name)s” is violated."
 msgstr "انتهك القيد \"%(name)s\""
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "القيمة %(value)r ليست خيارا صحيحاً."
@@ -596,8 +599,8 @@ msgstr "التاريخ (دون الوقت)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "قيمة '%(value)s' ليست من بُنية صحيحة. القيمة يجب ان تكون من البُنية YYYY-MM-DD "
 "HH:MM[:ss[.uuuuuu]][TZ] ."
@@ -622,8 +625,8 @@ msgstr "رقم عشري"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "قيمة '%(value)s' ليست بنسق صحيح. القيمة يجب ان تكون من التنسيق ([DD] "
 "[[HH:]MM:]ss[.uuuuuu])"
@@ -709,6 +712,10 @@ msgstr "رابط"
 
 msgid "Raw binary data"
 msgstr "البيانات الثنائية الخام"
+
+#, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -932,6 +939,12 @@ msgstr "نعم"
 
 msgid "No"
 msgstr "لا"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
 
 msgctxt "Task"
 msgid "Ready"
@@ -1362,11 +1375,11 @@ msgstr "لا يوجد %(verbose_name_plural)s"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"التاريخ بالمستقبل %(verbose_name_plural)s غير متوفر لأن قيمة %(class_name)s."
-"allow_future هي False."
+"التاريخ بالمستقبل %(verbose_name_plural)s غير متوفر لأن قيمة "
+"%(class_name)s.allow_future هي False."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"

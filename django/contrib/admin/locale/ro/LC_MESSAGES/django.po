@@ -13,10 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Daniel Ursache-Dogariu, 2011,2022\n"
-"Language-Team: Romanian (http://www.transifex.com/django/django/language/"
+"Language-Team: Romanian (http://app.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -37,8 +37,8 @@ msgstr "%(count)d %(items)s șterse cu succes."
 msgid "Cannot delete %(name)s"
 msgstr "Nu se poate șterge %(name)s"
 
-msgid "Are you sure?"
-msgstr "Sigur?"
+msgid "Delete multiple objects"
+msgstr "Ștergeți obiecte multiple"
 
 msgid "Administration"
 msgstr "Administrare"
@@ -185,6 +185,14 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 
 #, python-brace-format
+msgid "Select this object for an action - {}"
+msgstr ""
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
+
+#, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} \"{obj}\" a fost adăugat cu succes."
 
@@ -203,12 +211,6 @@ msgid ""
 msgstr ""
 "{name} \"{obj}\" a fost modificat cu succes. Poți să editezi în continuare "
 "mai jos."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"{name} \"{obj}\" a fost adăugat cu succes. Poți să editezi în continuare mai "
-"jos."
 
 #, python-brace-format
 msgid ""
@@ -251,15 +253,15 @@ msgstr "Schimbă %s"
 msgid "View %s"
 msgstr "Vizualizează %s"
 
-msgid "Database error"
-msgstr "Eroare de bază de date"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s s-a modificat cu succes."
 msgstr[1] "%(count)s %(name)s s-au modificat cu succes."
 msgstr[2] "%(count)s de %(name)s s-au modificat cu succes."
+
+msgid "Database error"
+msgstr "Eroare de bază de date"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -272,6 +274,9 @@ msgstr[2] "Toate %(total_count)s selectate"
 msgid "0 of %(cnt)s selected"
 msgstr "0 din %(cnt)s  selectat"
 
+msgid "Delete"
+msgstr "Șterge"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Istoric schimbări: %s"
@@ -282,6 +287,18 @@ msgstr "Istoric schimbări: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #, python-format
 msgid ""
@@ -330,14 +347,8 @@ msgid ""
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 
-msgid "Run the selected action"
-msgstr "Pornește acțiunea selectată"
-
-msgid "Go"
-msgstr "Start"
-
-msgid "Click here to select the objects across all pages"
-msgstr "Clic aici pentru a selecta obiectele la nivelul tuturor paginilor"
+msgid "Run"
+msgstr ""
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -346,9 +357,17 @@ msgstr "Selectați toate %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Deselectați"
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modele în aplicația %(name)s"
+msgid "Breadcrumbs"
+msgstr ""
+
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
 
 msgid "Add"
 msgstr "Adaugă"
@@ -359,16 +378,17 @@ msgstr "Vizualizează"
 msgid "You don’t have permission to view or edit anything."
 msgstr ""
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
 
-msgid "Enter a username and password."
-msgstr "Introduceți un nume de utilizator și o parolă."
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "Schimbă parola"
+
+msgid "Set password"
+msgstr ""
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
@@ -380,6 +400,17 @@ msgstr[2] ""
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Introduceți o parolă nouă pentru utilizatorul <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
 
 msgid "Skip to main content"
 msgstr ""
@@ -396,9 +427,6 @@ msgstr "Documentație"
 msgid "Log out"
 msgstr "Deconectează-te"
 
-msgid "Breadcrumbs"
-msgstr ""
-
 #, python-format
 msgid "Add %(name)s"
 msgstr "Adaugă %(name)s"
@@ -412,8 +440,17 @@ msgstr "Vizualizează pe site"
 msgid "Filter"
 msgstr "Filtru"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
 msgid "Clear all filters"
 msgstr "Șterge toate filtrele"
+
+msgid "Save"
+msgstr "Salvează"
 
 msgid "Remove from sorting"
 msgstr "Elimină din sortare"
@@ -434,34 +471,28 @@ msgstr ""
 msgid "Toggle theme (current theme: dark)"
 msgstr ""
 
-msgid "Delete"
-msgstr "Șterge"
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Ștergerea %(object_name)s '%(escaped_object)s' va duce și la ștergerea "
-"obiectelor asociate, însă contul dumneavoastră nu are permisiunea de a "
-"șterge următoarele tipuri de obiecte:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Ștergerea %(object_name)s '%(escaped_object)s' ar putea necesita și "
-"ștergerea următoarelor obiecte protejate asociate:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Sigur doriți ștergerea %(object_name)s \"%(escaped_object)s\"? Următoarele "
-"itemuri asociate vor fi șterse:"
 
 msgid "Objects"
 msgstr "Obiecte"
@@ -471,9 +502,6 @@ msgstr "Da, sunt sigur"
 
 msgid "No, take me back"
 msgstr "Nu, vreau să mă întorc"
-
-msgid "Delete multiple objects"
-msgstr "Ștergeți obiecte multiple"
 
 #, python-format
 msgid ""
@@ -520,6 +548,15 @@ msgstr "Acțiunile mele"
 msgid "None available"
 msgstr "Niciuna"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "Conținut necunoscut"
 
@@ -537,8 +574,8 @@ msgstr ""
 "Sunteți autentificat ca %(username)s, dar nu sunteți autorizat să accesați "
 "această pagină. Doriți să vă autentificați cu un alt cont?"
 
-msgid "Forgotten your password or username?"
-msgstr "Ați uitat parola sau utilizatorul ?"
+msgid "Forgotten your login credentials?"
+msgstr ""
 
 msgid "Toggle navigation"
 msgstr "Comutare navigație"
@@ -561,6 +598,10 @@ msgstr "Utilizator"
 msgid "Action"
 msgstr "Acțiune"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] ""
@@ -572,14 +613,19 @@ msgid ""
 "admin site."
 msgstr ""
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "Arată totul"
 
-msgid "Save"
-msgstr "Salvează"
-
 msgid "Popup closing…"
 msgstr "Fereastra se închide..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "Caută"
@@ -624,6 +670,9 @@ msgstr "Șterge %(model)s selectat"
 
 #, python-format
 msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Logout"
 msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
@@ -704,8 +753,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Mergeți la următoarea pagină și alegeți o parolă nouă:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Numele tău de utilizator, în caz că l-ai uitat:"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "Mulțumiri pentru utilizarea sitului nostru!"
@@ -726,6 +775,9 @@ msgstr "Adresă e-mail:"
 
 msgid "Reset my password"
 msgstr "Resetează-mi parola"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "Toate datele"

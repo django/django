@@ -12,10 +12,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-07-15 11:11+0000\n"
-"Last-Translator: Eugenol Man <neatusebastian@gmail.com>\n"
-"Language-Team: Romanian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
+"Last-Translator: Eugenol Man <neatusebastian@gmail.com>, 2020\n"
+"Language-Team: Romanian (http://app.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -37,12 +37,22 @@ msgstr "Date importante"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Obiectul %(name)s cu cheia primară %(key)r nu există."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr ""
+
 msgid "Password changed successfully."
 msgstr "Parolă schimbată cu succes."
+
+msgid "Password-based authentication was disabled."
+msgstr ""
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Schimbă parola: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr ""
 
 msgid "Authentication and Authorization"
 msgstr "Autentificare și autorizare"
@@ -53,12 +63,11 @@ msgstr "parolă"
 msgid "last login"
 msgstr "ultima autentificare"
 
-msgid "No password set."
-msgstr "Parola nu este setată."
-
-msgid "Invalid password format or unknown hashing algorithm."
+msgid "Reset password"
 msgstr ""
-"Parolă nu are formatarea corectă sau algoritmul de criptare nu este cunoscut."
+
+msgid "Set password"
+msgstr ""
 
 msgid "The two password fields didn’t match."
 msgstr "Cele două parole nu corespund."
@@ -73,11 +82,27 @@ msgid "Enter the same password as before, for verification."
 msgstr "Introduceți parola precedentă pentru confirmare."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"Parolele nu sunt salvate în clar așa că nu poți vedea parola. O poți schimba "
-"<a href=\"{}\">de aici</a>."
+
+msgid "Password-based authentication"
+msgstr ""
+
+msgid "Enabled"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -104,9 +129,6 @@ msgstr "Parola veche a fost introdusă greșit. Introduceți-o din nou."
 
 msgid "Old password"
 msgstr "Parolă veche"
-
-msgid "Password (again)"
-msgstr "Parolă (din nou)"
 
 msgid "algorithm"
 msgstr "algoritm"
@@ -140,6 +162,9 @@ msgstr "factor de efort"
 
 msgid "checksum"
 msgstr "sumă de control"
+
+msgid "block size"
+msgstr ""
 
 msgid "name"
 msgstr "nume"
@@ -233,21 +258,12 @@ msgid "users"
 msgstr "utilizatori"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"Parola este prea scurtă. Trebuie să conțină cel puțin %(min_length)d "
-"caracter."
 msgstr[1] ""
-"Parola este prea scurtă. Trebuie să conțină cel puțin %(min_length)d "
-"caractere."
 msgstr[2] ""
-"Parola este prea scurtă. Trebuie să conțină cel puțin %(min_length)d de "
-"caractere."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -281,12 +297,17 @@ msgstr "Parola nu poate fi doar cu numere."
 msgid "Password reset on %(site_name)s"
 msgstr "Resetează parola pentru %(site_name)s"
 
-msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+msgid "No password set."
+msgstr "Parola nu este setată."
+
+msgid "Invalid password format or unknown hashing algorithm."
 msgstr ""
-"Vă rugăm să folosiți un nume acceptat. Această valoare poate conține doar "
-"litere, cifre și caracterele @/./+/-/_."
+"Parolă nu are formatarea corectă sau algoritmul de criptare nu este cunoscut."
+
+msgid ""
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
+msgstr ""
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

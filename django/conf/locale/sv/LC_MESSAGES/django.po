@@ -30,8 +30,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>, 2025\n"
 "Language-Team: Swedish (http://app.transifex.com/django/django/language/"
 "sv/)\n"
@@ -516,6 +516,9 @@ msgstr "%(model_name)s med samma %(field_labels)s finns redan."
 msgid "Constraint “%(name)s” is violated."
 msgstr "Begränsningen “%(name)s” överträds."
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Värdet %(value)r är inget giltigt alternativ."
@@ -584,11 +587,11 @@ msgstr "Datum (utan tid)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
-"“%(value)s” har ett ogiltigt format. Det måste vara i formatet YYYY-MM-DD HH:"
-"MM[:ss[.uuuuuu]][TZ]."
+"“%(value)s” har ett ogiltigt format. Det måste vara i formatet YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ]."
 
 #, python-format
 msgid ""
@@ -610,8 +613,8 @@ msgstr "Decimaltal"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "“%(value)s” har ett ogiltigt format. Det måste vara i formatet [DD] "
 "[[HH:]MM:]ss[.uuuuuu]."
@@ -679,8 +682,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"“%(value)s” har ett ogiltigt format. Det måste vara i formatet HH:MM[:ss[."
-"uuuuuu]]."
+"“%(value)s” har ett ogiltigt format. Det måste vara i formatet "
+"HH:MM[:ss[.uuuuuu]]."
 
 #, python-format
 msgid ""
@@ -698,6 +701,10 @@ msgstr "URL"
 
 msgid "Raw binary data"
 msgstr "Rå binärdata"
+
+#, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -904,6 +911,12 @@ msgstr "Ja"
 
 msgid "No"
 msgstr "Nej"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
 
 msgctxt "Task"
 msgid "Ready"
@@ -1308,8 +1321,8 @@ msgstr "Inga %(verbose_name_plural)s är tillgängliga"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
 "Framtida %(verbose_name_plural)s är inte tillgängliga eftersom "
 "%(class_name)s.allow_future är False."

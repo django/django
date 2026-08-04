@@ -5,14 +5,14 @@
 # M Asep Indrayana <me@drayanaindra.com>, 2015
 # oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016
 # rodin <romihardiyanto@gmail.com>, 2016
-# sag​e <laymonage@gmail.com>, 2019
+# S​age Abdullah <laymonage@gmail.com>, 2019
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2024-08-07 09:22+0000\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 09:22+0000\n"
 "Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2018,2024\n"
 "Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
 "id/)\n"

@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-25 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
 "Last-Translator: Turmunkh Batkhuyag, 2023\n"
 "Language-Team: Mongolian (http://app.transifex.com/django/django/language/"
 "mn/)\n"
@@ -150,6 +150,9 @@ msgstr "Хорват"
 
 msgid "Upper Sorbian"
 msgstr "Дээд Сорбин"
+
+msgid "Haitian Creole"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "Унгар"
@@ -354,6 +357,9 @@ msgstr "Хуудас үр дүн агуулаагүй байна"
 msgid "Enter a valid value."
 msgstr "Зөв утга оруулна уу."
 
+msgid "Enter a valid domain name."
+msgstr ""
+
 msgid "Enter a valid URL."
 msgstr "Зөв, хүчинтэй хаяг (URL) оруулна уу."
 
@@ -377,14 +383,18 @@ msgstr ""
 "Юникод үсэг, тоо, доогуур зураас, зурааснаас бүрдсэн хүчинтэй \"slug\" "
 "оруулна уу."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Зөв IPv4 хаяг оруулна уу. "
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr ""
 
-msgid "Enter a valid IPv6 address."
-msgstr "Зөв IPv6  хаяг оруулна уу."
+msgid "IPv4"
+msgstr ""
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Зөв IPv4 эсвэл IPv6 хаяг оруулна уу."
+msgid "IPv6"
+msgstr ""
+
+msgid "IPv4 or IPv6"
+msgstr ""
 
 msgid "Enter only digits separated by commas."
 msgstr "Зөвхөн таслалаар тусгаарлагдсан цифр оруулна уу."
@@ -490,6 +500,9 @@ msgstr "%(field_labels)s талбар бүхий %(model_name)s аль хэди�
 msgid "Constraint “%(name)s” is violated."
 msgstr "“%(name)s” хязгаарлалтыг зөрчсөн."
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "%(value)r буруу сонголт байна."
@@ -558,8 +571,8 @@ msgstr "Огноо (цаггүй)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "“%(value)s” утга буруу форматтай байна. Энэ нь YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ] форматтай байх ёстой."
@@ -584,8 +597,8 @@ msgstr "Аравтын бутархайт тоо"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "“%(value)s” утга буруу форматтай байна. Энэ нь [DD] [[HH:]MM:]ss[.uuuuuu] "
 "форматтай байх ёстой."
@@ -674,6 +687,10 @@ msgid "Raw binary data"
 msgstr "Бинари өгөгдөл"
 
 #, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
+
+#, python-format
 msgid "“%(value)s” is not a valid UUID."
 msgstr "“%(value)s” нь хүчинтэй UUID биш."
 
@@ -693,8 +710,8 @@ msgid "Value must be valid JSON."
 msgstr "JSON утга байх боломжтой."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(field)s %(value)r утгатай %(model)s байхгүй байна."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Гадаад түлхүүр (тодорхой төрлийн холбоос талбар)"
@@ -714,8 +731,8 @@ msgid "Many-to-many relationship"
 msgstr "Олон-олон холбоос"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -878,6 +895,28 @@ msgstr "Тийм"
 
 msgid "No"
 msgstr "Үгүй"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
+
+msgctxt "Task"
+msgid "Ready"
+msgstr ""
+
+msgctxt "Task"
+msgid "Running"
+msgstr ""
+
+msgctxt "Task"
+msgid "Failed"
+msgstr ""
+
+msgctxt "Task"
+msgid "Successful"
+msgstr ""
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1265,8 +1304,8 @@ msgstr "%(verbose_name_plural)s боломжгүй"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
 "%(class_name)s.allow_future нь худлаа учраас %(verbose_name_plural)s нь "
 "боломжгүй."

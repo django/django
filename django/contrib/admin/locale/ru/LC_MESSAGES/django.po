@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-03-09 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2026\n"
 "Language-Team: Russian (http://app.transifex.com/django/django/language/"
 "ru/)\n"
@@ -191,8 +191,13 @@ msgstr ""
 "Удерживайте “Control“ (или “Command“ на Mac), чтобы выбрать несколько "
 "значений."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Выбрать этот объект, чтобы применить к нему действие - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -253,9 +258,6 @@ msgstr "Изменить %s"
 msgid "View %s"
 msgstr "Просмотреть %s"
 
-msgid "Database error"
-msgstr "Ошибка базы данных"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -263,6 +265,9 @@ msgstr[0] "%(count)s %(name)s был успешно изменен."
 msgstr[1] "%(count)s %(name)s были успешно изменены."
 msgstr[2] "%(count)s %(name)s были успешно изменены."
 msgstr[3] "%(count)s %(name)s были успешно изменены."
+
+msgid "Database error"
+msgstr "Ошибка базы данных"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -289,6 +294,19 @@ msgstr "История изменений: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #, python-format
 msgid ""
@@ -342,9 +360,6 @@ msgstr ""
 msgid "Run"
 msgstr "Запустить"
 
-msgid "Click here to select the objects across all pages"
-msgstr "Нажмите здесь, чтобы выбрать объекты на всех страницах"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Выбрать все %(module_name)s (%(total_count)s)"
@@ -354,10 +369,6 @@ msgstr "Снять выделение"
 
 msgid "Breadcrumbs"
 msgstr "Хлебные крошки"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Модели в приложении %(name)s"
 
 msgid "Model name"
 msgstr "Имя модели"
@@ -473,6 +484,10 @@ msgstr "Переключить тему (текущая: светлая)"
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "Переключить тему (текущая: тёмная)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -685,6 +700,9 @@ msgstr "Удалить выбранный объект типа \"%(model)s\""
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Просмотреть выбранный объект типа \"%(model)s\""
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Благодарим вас за время, проведенное на этом сайте."

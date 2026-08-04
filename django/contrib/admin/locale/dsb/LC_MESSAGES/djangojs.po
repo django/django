@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-25 15:04-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 07:59+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016,2020-2023,2025\n"
 "Language-Team: Lower Sorbian (http://app.transifex.com/django/django/"
 "language/dsb/)\n"
@@ -103,11 +103,9 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"Sćo akciju wubrał, ale njejsćo jadnotliwe póla změnił. Nejskerjej pytaśo "
-"skerjej za tłocaškom Start ako za tłocaškom Składowaś."
 
 msgid "Now"
 msgstr "Něnto"
@@ -124,21 +122,30 @@ msgstr "Połdnjo"
 msgid "6 p.m."
 msgstr "6:00 wótpołdnja"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Glědajśo: Waš cas jo wó %s góźinu pśéd serwerowym casom."
-msgstr[1] "Glědajśo: Waš cas jo wó %s góźinje pśéd serwerowym casom."
-msgstr[2] "Glědajśo: Waš cas jo wó %s góźiny pśéd serwerowym casom."
-msgstr[3] "Glědajśo: Waš cas jo wó %s góźin pśéd serwerowym casom."
+msgid "server"
+msgstr ""
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Glědajśo: Waš cas jo wó %s góźinu za serwerowym casom."
-msgstr[1] "Glědajśo: Waš cas jo wó %s góźinje za serwerowym casom."
-msgstr[2] "Glědajśo: Waš cas jo wó %s góźiny za serwerowym casom."
-msgstr[3] "Glědajśo: Waš cas jo wó %s góźin za serwerowym casom."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 msgid "Choose a Time"
 msgstr "Wubjeŕśo cas"
@@ -152,14 +159,29 @@ msgstr "Pśetergnuś"
 msgid "Today"
 msgstr "Źinsa"
 
+msgid "Today (%(date)s)"
+msgstr ""
+
 msgid "Choose a Date"
 msgstr "Wubjeŕśo datum"
 
 msgid "Yesterday"
 msgstr "Cora"
 
+msgid "Yesterday (%(date)s)"
+msgstr ""
+
 msgid "Tomorrow"
 msgstr "Witśe"
+
+msgid "Tomorrow (%(date)s)"
+msgstr ""
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr ""
+
+msgid "Next (%(month)s %(year)s)"
+msgstr ""
 
 msgid "January"
 msgstr "Januar"
@@ -321,3 +343,18 @@ msgstr "Pě"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "So"
+
+msgid "%(month)s %(day)s, %(year)s"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr ""

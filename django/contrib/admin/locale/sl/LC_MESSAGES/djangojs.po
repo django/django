@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 07:59+0000\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 07:59+0000\n"
 "Last-Translator: Andrej Marsetič, 2022,2024\n"
 "Language-Team: Slovenian (http://app.transifex.com/django/django/language/"
 "sl/)\n"
@@ -27,11 +27,8 @@ msgstr "Možne %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"To je seznam možnih %s. Izbrane lahko izberete z izbiro v spodnjem okvirju "
-"in s klikom na puščico \"Izberi\" med okvirjema."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -40,18 +37,17 @@ msgstr "Z vpisom niza v to polje, zožite izbor %s."
 msgid "Filter"
 msgstr "Filtriraj"
 
-msgid "Choose all"
-msgstr "Izberi vse"
+#, javascript-format
+msgid "Choose all %s"
+msgstr ""
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Kliknite za izbor vseh %s hkrati."
+msgid "Choose selected %s"
+msgstr ""
 
-msgid "Choose"
-msgstr "Izberi"
-
-msgid "Remove"
-msgstr "Odstrani"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr ""
 
 #, javascript-format
 msgid "Chosen %s"
@@ -59,22 +55,19 @@ msgstr "Izbran %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"To je seznam možnih %s. Odvečne lahko odstranite z izbiro v okvirju in "
-"klikom na puščico \"Odstrani\" med okvirjema."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "Vnesite v to polje, da filtrirate seznam izbranih %s ."
 
-msgid "Remove all"
-msgstr "Odstrani vse"
+msgid "(click to clear)"
+msgstr ""
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Kliknite za odstranitev vseh %s hkrati."
+msgid "Remove all %s"
+msgstr ""
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -108,11 +101,9 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"Izbrali ste dejanje in niste spremenili posameznih polj. Verjetno iščete "
-"gumb Pojdi in ne gumb Shrani."
 
 msgid "Now"
 msgstr "Takoj"
@@ -129,21 +120,30 @@ msgstr "Opoldne"
 msgid "6 p.m."
 msgstr "Ob 18h"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Opomba: glede na čas na strežniku ste %s uro naprej."
-msgstr[1] "Opomba: glede na čas na strežniku ste %s uri naprej."
-msgstr[2] "Opomba: glede na čas na strežniku ste %s ure naprej."
-msgstr[3] "Opomba: glede na čas na strežniku ste %s ur naprej."
+msgid "server"
+msgstr ""
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Opomba: glede na čas na strežniku ste %s uro zadaj."
-msgstr[1] "Opomba: glede na čas na strežniku ste %s uri zadaj."
-msgstr[2] "Opomba: glede na čas na strežniku ste %s ure zadaj."
-msgstr[3] "Opomba: glede na čas na strežniku ste %s ur zadaj."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 msgid "Choose a Time"
 msgstr "Izberite čas"
@@ -157,14 +157,29 @@ msgstr "Prekliči"
 msgid "Today"
 msgstr "Danes"
 
+msgid "Today (%(date)s)"
+msgstr ""
+
 msgid "Choose a Date"
 msgstr "Izberite datum"
 
 msgid "Yesterday"
 msgstr "Včeraj"
 
+msgid "Yesterday (%(date)s)"
+msgstr ""
+
 msgid "Tomorrow"
 msgstr "Jutri"
+
+msgid "Tomorrow (%(date)s)"
+msgstr ""
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr ""
+
+msgid "Next (%(month)s %(year)s)"
+msgstr ""
 
 msgid "January"
 msgstr "januar"
@@ -326,3 +341,18 @@ msgstr "P"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
+
+msgid "%(month)s %(day)s, %(year)s"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr ""

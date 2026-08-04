@@ -11,16 +11,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2022-07-25 06:49+0000\n"
-"Last-Translator: Gustavo López Hernández\n"
-"Language-Team: Spanish (Mexico) (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
+"Last-Translator: Gustavo López Hernández, 2022\n"
+"Language-Team: Spanish (Mexico) (http://app.transifex.com/django/django/"
 "language/es_MX/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es_MX\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
 
 msgid "Afrikaans"
 msgstr "afrikáans"
@@ -54,6 +55,9 @@ msgstr "Bosnio"
 
 msgid "Catalan"
 msgstr "Catalán"
+
+msgid "Central Kurdish (Sorani)"
+msgstr ""
 
 msgid "Czech"
 msgstr "Checo"
@@ -141,6 +145,9 @@ msgstr "Croata"
 
 msgid "Upper Sorbian"
 msgstr "Alto sorbio"
+
+msgid "Haitian Creole"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "Húngaro"
@@ -295,6 +302,9 @@ msgstr "Tatar"
 msgid "Udmurt"
 msgstr "udmurto"
 
+msgid "Uyghur"
+msgstr ""
+
 msgid "Ukrainian"
 msgstr "Ucraniano"
 
@@ -342,6 +352,9 @@ msgstr "Esa página no contiene resultados"
 msgid "Enter a valid value."
 msgstr "Introduzca un valor válido."
 
+msgid "Enter a valid domain name."
+msgstr ""
+
 msgid "Enter a valid URL."
 msgstr "Ingrese una URL válida."
 
@@ -365,14 +378,18 @@ msgstr ""
 "Introduzca un \"slug\" válido que conste de letras Unicode, números, guiones "
 "bajos o guiones."
 
-msgid "Enter a valid IPv4 address."
-msgstr "Introduzca una dirección IPv4 válida."
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr ""
 
-msgid "Enter a valid IPv6 address."
-msgstr "Introduzca una dirección IPv6 válida."
+msgid "IPv4"
+msgstr ""
 
-msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Introduzca una dirección IPv4 o IPv6 válida."
+msgid "IPv6"
+msgstr ""
+
+msgid "IPv4 or IPv6"
+msgstr ""
 
 msgid "Enter only digits separated by commas."
 msgstr "Introduzca sólo números separados por comas."
@@ -395,6 +412,12 @@ msgstr ""
 
 #, python-format
 msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+
+#, python-format
+msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
 msgid_plural ""
@@ -404,6 +427,9 @@ msgstr[0] ""
 "Asegúrese de que este valor tenga como mínimo %(limit_value)d caracter "
 "(tiene %(show_value)d)."
 msgstr[1] ""
+"Asegúrese de que este valor tenga como mínimo %(limit_value)d caracteres "
+"(tiene %(show_value)d)."
+msgstr[2] ""
 "Asegúrese de que este valor tenga como mínimo %(limit_value)d caracteres "
 "(tiene %(show_value)d)."
 
@@ -420,6 +446,9 @@ msgstr[0] ""
 msgstr[1] ""
 "Asegúrese de que este valor tenga como máximo %(limit_value)d caracteres "
 "(tiene %(show_value)d)."
+msgstr[2] ""
+"Asegúrese de que este valor tenga como máximo %(limit_value)d caracteres "
+"(tiene %(show_value)d)."
 
 msgid "Enter a number."
 msgstr "Introduzca un número."
@@ -429,12 +458,14 @@ msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] "Asegúrese de que no hay más de %(max)s dígito en total."
 msgstr[1] "Asegúrese de que no hay más de %(max)s dígitos en total."
+msgstr[2] "Asegúrese de que no hay más de %(max)s dígitos en total."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #, python-format
 msgid ""
@@ -443,6 +474,7 @@ msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #, python-format
 msgid ""
@@ -462,6 +494,9 @@ msgstr ""
 
 #, python-format
 msgid "Constraint “%(name)s” is violated."
+msgstr ""
+
+msgid "- Select an option -"
 msgstr ""
 
 #, python-format
@@ -504,6 +539,9 @@ msgstr "Boolean (Verdadero o Falso)"
 msgid "String (up to %(max_length)s)"
 msgstr "Cadena (máximo %(max_length)s)"
 
+msgid "String (unlimited)"
+msgstr ""
+
 msgid "Comma-separated integers"
 msgstr "Enteros separados por comas"
 
@@ -528,8 +566,8 @@ msgstr "Fecha (sin hora)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "'%(value)s' tiene un formato de fecha no válido. Este valor debe estar en el "
 "formato AAAA-MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
@@ -552,8 +590,8 @@ msgstr "Número decimal"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 
 msgid "Duration"
@@ -636,6 +674,10 @@ msgid "Raw binary data"
 msgstr "Los datos en bruto"
 
 #, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
+
+#, python-format
 msgid "“%(value)s” is not a valid UUID."
 msgstr ""
 
@@ -655,8 +697,8 @@ msgid "Value must be valid JSON."
 msgstr "El valor debe ser JSON válido"
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "La instancia de %(model)s con %(field)s %(value)r no existe."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Clave foránea (el tipo está determinado por el campo relacionado)"
@@ -676,8 +718,8 @@ msgid "Many-to-many relationship"
 msgstr "Relación muchos-a-muchos"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -719,6 +761,7 @@ msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr "Por favor envíe un archivo o marque la casilla, no ambos."
@@ -767,12 +810,14 @@ msgid "Please submit at most %(num)d form."
 msgid_plural "Please submit at most %(num)d forms."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #, python-format
 msgid "Please submit at least %(num)d form."
 msgid_plural "Please submit at least %(num)d forms."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 msgid "Order"
 msgstr "Ordenar"
@@ -836,6 +881,28 @@ msgstr "Sí"
 msgid "No"
 msgstr "No"
 
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
+
+msgctxt "Task"
+msgid "Ready"
+msgstr ""
+
+msgctxt "Task"
+msgid "Running"
+msgstr ""
+
+msgctxt "Task"
+msgid "Failed"
+msgstr ""
+
+msgctxt "Task"
+msgid "Successful"
+msgstr ""
+
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
 msgstr "sí,no,tal vez"
@@ -845,6 +912,7 @@ msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d byte"
 msgstr[1] "%(size)d bytes"
+msgstr[2] "%(size)d bytes"
 
 #, python-format
 msgid "%s KB"
@@ -1114,36 +1182,42 @@ msgid "%(num)d year"
 msgid_plural "%(num)d years"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #, python-format
 msgid "%(num)d month"
 msgid_plural "%(num)d months"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #, python-format
 msgid "%(num)d week"
 msgid_plural "%(num)d weeks"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #, python-format
 msgid "%(num)d day"
 msgid_plural "%(num)d days"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #, python-format
 msgid "%(num)d hour"
 msgid_plural "%(num)d hours"
 msgstr[0] "%(num)d hora"
 msgstr[1] "%(num)d horas"
+msgstr[2] "%(num)d horas"
 
 #, python-format
 msgid "%(num)d minute"
 msgid_plural "%(num)d minutes"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 msgid "Forbidden"
 msgstr "Prohibido"
@@ -1168,8 +1242,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 
 msgid ""
@@ -1207,11 +1281,11 @@ msgstr "No hay %(verbose_name_plural)s disponibles"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"No hay %(verbose_name_plural)s futuros disponibles porque %(class_name)s."
-"allow_future tiene el valor False."
+"No hay %(verbose_name_plural)s futuros disponibles porque "
+"%(class_name)s.allow_future tiene el valor False."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
@@ -1255,9 +1329,9 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 
 msgid "Django Documentation"

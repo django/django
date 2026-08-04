@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>, "
 "2016-2017,2019,2021,2023-2025\n"
 "Language-Team: Upper Sorbian (http://app.transifex.com/django/django/"
@@ -57,12 +57,6 @@ msgstr "hesło"
 
 msgid "last login"
 msgstr "poslednje přizjewjenje"
-
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Njepłaćiwy hesłowy format abo njeznaty kontrolny algoritmus."
-
-msgid "No password set."
-msgstr "Žane hesło nastajene."
 
 msgid "Reset password"
 msgstr "Hesło wróćo stajić"
@@ -300,6 +294,12 @@ msgstr "Waše hesło njemóže cyle numeriske być."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Hesło je so na %(site_name)s wróćo stajiło."
+
+msgid "No password set."
+msgstr "Žane hesło nastajene."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Njepłaćiwy hesłowy format abo njeznaty kontrolny algoritmus."
 
 msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "

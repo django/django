@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
 "Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2020-2025\n"
 "Language-Team: Albanian (http://app.transifex.com/django/django/language/"
 "sq/)\n"
@@ -491,6 +491,9 @@ msgstr "Ka tashmë %(model_name)s me këtë %(field_labels)s."
 msgid "Constraint “%(name)s” is violated."
 msgstr "Është cenuar kufizimi “%(name)s”."
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Vlera %(value)r s’është zgjedhje e vlefshme."
@@ -560,8 +563,8 @@ msgstr "Datë (pa kohë)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "Vlera “'%(value)s” ka një format të pavlefshëm. Duhet të jetë në formatin "
 "YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
@@ -586,8 +589,8 @@ msgstr "Numër dhjetor"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "Vlera “%(value)s” ka format të pavlefshëm. Duhet të jetë në formatin [DD] "
 "[HH:[MM:]]ss[.uuuuuu]."
@@ -655,8 +658,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"Vlera “%(value)s” ka format të pavlefshëm. Duhet të jetë në formatin HH:MM[:"
-"ss[.uuuuuu]]."
+"Vlera “%(value)s” ka format të pavlefshëm. Duhet të jetë në formatin "
+"HH:MM[:ss[.uuuuuu]]."
 
 #, python-format
 msgid ""
@@ -674,6 +677,10 @@ msgstr "URL"
 
 msgid "Raw binary data"
 msgstr "Të dhëna dyore të papërpunuara"
+
+#, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -886,6 +893,12 @@ msgstr "Po"
 
 msgid "No"
 msgstr "Jo"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
 
 msgctxt "Task"
 msgid "Ready"
@@ -1291,11 +1304,11 @@ msgstr "Nuk ka %(verbose_name_plural)s të përcaktuar"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"%(verbose_name_plural)s i ardhshëm jo i passhëm, ngaqë %(class_name)s."
-"allow_future është False."
+"%(verbose_name_plural)s i ardhshëm jo i passhëm, ngaqë "
+"%(class_name)s.allow_future është False."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"

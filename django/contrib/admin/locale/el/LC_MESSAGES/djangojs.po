@@ -13,10 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-08-04 06:47+0000\n"
-"Last-Translator: Fotis Athineos <fotis@transifex.com>\n"
-"Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-04 07:59+0000\n"
+"Last-Translator: Fotis Athineos <fotis@transifex.com>, 2021\n"
+"Language-Team: Greek (http://app.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -29,11 +29,8 @@ msgstr "Διαθέσιμο %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Αυτή είναι η λίστα των διαθέσιμων %s. Μπορείτε να επιλέξετε κάποια, από το "
-"παρακάτω πεδίο και πατώντας το βέλος \"Επιλογή\" μεταξύ των δύο πεδίων."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -43,18 +40,17 @@ msgstr ""
 msgid "Filter"
 msgstr "Φίλτρο"
 
-msgid "Choose all"
-msgstr "Επιλογή όλων"
+#, javascript-format
+msgid "Choose all %s"
+msgstr ""
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Πατήστε για επιλογή όλων των %s με τη μία."
+msgid "Choose selected %s"
+msgstr ""
 
-msgid "Choose"
-msgstr "Επιλογή"
-
-msgid "Remove"
-msgstr "Αφαίρεση"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr ""
 
 #, javascript-format
 msgid "Chosen %s"
@@ -62,19 +58,25 @@ msgstr "Επιλέχθηκε %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Αυτή είναι η λίστα των επιλεγμένων %s. Μπορείτε να αφαιρέσετε μερικά "
-"επιλέγοντας τα απο το κουτί παρακάτω και μετά κάνοντας κλίκ στο βελάκι "
-"\"Αφαίρεση\" ανάμεσα στα δύο κουτιά."
-
-msgid "Remove all"
-msgstr "Αφαίρεση όλων"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Κλίκ για να αφαιρεθούν όλα τα επιλεγμένα %s με τη μία."
+msgid "Type into this box to filter down the list of selected %s."
+msgstr ""
+
+msgid "(click to clear)"
+msgstr ""
+
+#, javascript-format
+msgid "Remove all %s"
+msgstr ""
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -99,11 +101,9 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"Έχετε επιλέξει μια ενέργεια, και δεν έχετε κάνει καμία αλλαγή στα εκάστοτε "
-"πεδία. Πιθανών θέλετε το κουμπί Go αντί του κουμπιού Αποθήκευσης."
 
 msgid "Now"
 msgstr "Τώρα"
@@ -120,17 +120,26 @@ msgstr "Μεσημέρι"
 msgid "6 p.m."
 msgstr "6 μ.μ."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Σημείωση: Είστε %s ώρα μπροστά από την ώρα του εξυπηρετητή."
-msgstr[1] "Σημείωση: Είστε %s ώρες μπροστά από την ώρα του εξυπηρετητή."
+msgid "server"
+msgstr ""
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Σημείωση: Είστε %s ώρα πίσω από την ώρα του εξυπηρετητή"
-msgstr[1] "Σημείωση: Είστε %s ώρες πίσω από την ώρα του εξυπηρετητή."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Choose a Time"
 msgstr "Επιλέξτε Χρόνο"
@@ -144,14 +153,29 @@ msgstr "Ακύρωση"
 msgid "Today"
 msgstr "Σήμερα"
 
+msgid "Today (%(date)s)"
+msgstr ""
+
 msgid "Choose a Date"
 msgstr "Επιλέξτε μια Ημερομηνία"
 
 msgid "Yesterday"
 msgstr "Χθές"
 
+msgid "Yesterday (%(date)s)"
+msgstr ""
+
 msgid "Tomorrow"
 msgstr "Αύριο"
+
+msgid "Tomorrow (%(date)s)"
+msgstr ""
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr ""
+
+msgid "Next (%(month)s %(year)s)"
+msgstr ""
 
 msgid "January"
 msgstr "Ιανουάριος"
@@ -237,6 +261,55 @@ msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "Δεκ"
 
+msgid "Sunday"
+msgstr ""
+
+msgid "Monday"
+msgstr ""
+
+msgid "Tuesday"
+msgstr ""
+
+msgid "Wednesday"
+msgstr ""
+
+msgid "Thursday"
+msgstr ""
+
+msgid "Friday"
+msgstr ""
+
+msgid "Saturday"
+msgstr ""
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr ""
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr ""
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr ""
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr ""
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr ""
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr ""
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr ""
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "Κ"
@@ -265,8 +338,17 @@ msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Σ"
 
-msgid "Show"
-msgstr "Προβολή"
+msgid "%(month)s %(day)s, %(year)s"
+msgstr ""
 
-msgid "Hide"
-msgstr "Απόκρυψη"
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr ""

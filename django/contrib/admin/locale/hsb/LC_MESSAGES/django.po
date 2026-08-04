@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016-2025\n"
 "Language-Team: Upper Sorbian (http://app.transifex.com/django/django/"
 "language/hsb/)\n"
@@ -178,8 +178,13 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 "Dźeržće „ctrl“ abo „cmd“ na Mac stłóčeny, zo byšće wjace hač jedyn wubrał."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Wubjerće tutón objekt za akciju – {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -240,9 +245,6 @@ msgstr "%s změnić"
 msgid "View %s"
 msgstr "%s pokazać"
 
-msgid "Database error"
-msgstr "Zmylk datoweje banki"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -250,6 +252,9 @@ msgstr[0] "%(count)s %(name)s je so wuspěšnje změnił."
 msgstr[1] "%(count)s %(name)s stej so wuspěšnje změniłoj."
 msgstr[2] "%(count)s %(name)s su so wuspěšnje změnili."
 msgstr[3] "%(count)s %(name)s je so wuspěšnje změniło."
+
+msgid "Database error"
+msgstr "Zmylk datoweje banki"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -276,6 +281,19 @@ msgstr "Změnowa historija: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #, python-format
 msgid ""
@@ -326,14 +344,8 @@ msgstr ""
 "Zmylk je wustupił. Je so sydłowym administratoram přez e-mejl zdźělił a "
 "dyrbjał so bórze wotstronić. Dźakujemy so za wašu sćerpliwosć."
 
-msgid "Run the selected action"
-msgstr "Wubranu akciju wuwjesć"
-
-msgid "Go"
-msgstr "Start"
-
-msgid "Click here to select the objects across all pages"
-msgstr "Klikńće tu, zo byšće objekty wšěch stronow wubrać"
+msgid "Run"
+msgstr ""
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -344,10 +356,6 @@ msgstr "Wuběr wotstronić"
 
 msgid "Breadcrumbs"
 msgstr "Chlěbowe srjódki"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modele w nałoženju %(name)s"
 
 msgid "Model name"
 msgstr "Modelowe mjeno"
@@ -441,6 +449,9 @@ msgstr "Ličby pokazać"
 msgid "Clear all filters"
 msgstr "Wšě filtry zhašeć"
 
+msgid "Save"
+msgstr "Składować"
+
 msgid "Remove from sorting"
 msgstr "Ze sortěrowanja wotstronić"
 
@@ -461,29 +472,27 @@ msgid "Toggle theme (current theme: dark)"
 msgstr "Drastu změnić (aktualna drasta: ćmowa)"
 
 #, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
+
+#, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Hdyž so %(object_name)s '%(escaped_object)s' zhašeja, so tež přisłušne "
-"objekty zhašeja, ale waše konto nima prawo slědowace typy objektow zhašeć:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Zo by so %(object_name)s '%(escaped_object)s' zhašało, dyrbja so slědowace "
-"přisłušne objekty zhašeć:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Chceće woprawdźe %(object_name)s \"%(escaped_object)s\" zhašeć? Wšě "
-"slědowace přisłušne zapiski so zhašeja:"
 
 msgid "Objects"
 msgstr "Objekty"
@@ -591,6 +600,10 @@ msgstr "Wužiwar"
 msgid "Action"
 msgstr "Akcija"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "zapisk"
@@ -605,14 +618,19 @@ msgstr ""
 "Tutón objekt nima změnowu historiju. Njeje so najskerje přez tute "
 "administratorowe sydło přidał."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "Wšě pokazać"
 
-msgid "Save"
-msgstr "Składować"
-
 msgid "Popup closing…"
 msgstr "Wuskakowace wokno so začinja…"
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "Pytać"
@@ -659,6 +677,9 @@ msgstr "Wubrane %(model)s zhašeć"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Wubrany %(model)s pokazać"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr ""

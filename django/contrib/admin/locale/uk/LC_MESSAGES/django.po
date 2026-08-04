@@ -22,8 +22,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
 "Last-Translator: Illia Volochii <illia.volochii@gmail.com>, 2021-2023,2025\n"
 "Language-Team: Ukrainian (http://app.transifex.com/django/django/language/"
 "uk/)\n"
@@ -197,8 +197,13 @@ msgstr ""
 "Натисність \"Control\" або \"Command\" на Mac-пристрої, щоб вибрати більше "
 "аніж один."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Вибрати цей об'єкт для дії – {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -257,9 +262,6 @@ msgstr "Змінити %s"
 msgid "View %s"
 msgstr "Переглянути %s"
 
-msgid "Database error"
-msgstr "Помилка бази даних"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -267,6 +269,9 @@ msgstr[0] "%(count)s %(name)s був успішно змінений."
 msgstr[1] "%(count)s %(name)s були успішно змінені."
 msgstr[2] "%(count)s %(name)s було успішно змінено."
 msgstr[3] "%(count)s %(name)s було успішно змінено."
+
+msgid "Database error"
+msgstr "Помилка бази даних"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -293,6 +298,19 @@ msgstr "Історія змін: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #, python-format
 msgid ""
@@ -343,14 +361,8 @@ msgstr ""
 "Сталася помилка. Вона була відправлена адміністраторам сайту через email і "
 "має бути вирішена швидко. Дякуємо за ваше терпіння."
 
-msgid "Run the selected action"
-msgstr "Виконати обрану дію"
-
-msgid "Go"
-msgstr "Вперед"
-
-msgid "Click here to select the objects across all pages"
-msgstr "Натисніть тут, щоб вибрати об'єкти на всіх сторінках"
+msgid "Run"
+msgstr ""
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -361,10 +373,6 @@ msgstr "Скинути вибір"
 
 msgid "Breadcrumbs"
 msgstr "Навігаційний рядок"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Моделі у %(name)s додатку"
 
 msgid "Model name"
 msgstr ""
@@ -457,6 +465,9 @@ msgstr "Показати кількість"
 msgid "Clear all filters"
 msgstr "Очистити всі фільтри"
 
+msgid "Save"
+msgstr "Зберегти"
+
 msgid "Remove from sorting"
 msgstr "Видалити з сортування"
 
@@ -477,30 +488,27 @@ msgid "Toggle theme (current theme: dark)"
 msgstr "Перемкнути тему (поточна тема: темна)"
 
 #, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
+
+#, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Видалення %(object_name)s '%(escaped_object)s' призведе до видалення "
-"пов'язаних об'єктів, але ваш реєстраційний запис не має дозволу видаляти "
-"наступні типи об'єктів:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Видалення %(object_name)s '%(escaped_object)s' вимагатиме видалення "
-"наступних пов'язаних об'єктів:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Ви впевнені, що хочете видалити %(object_name)s \"%(escaped_object)s\"? Всі "
-"пов'язані записи, що перелічені, будуть видалені:"
 
 msgid "Objects"
 msgstr "Об'єкти"
@@ -608,6 +616,10 @@ msgstr "Користувач"
 msgid "Action"
 msgstr "Дія"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "запис"
@@ -622,14 +634,19 @@ msgstr ""
 "Цей об'єкт не має історії змін. Напевно, він був доданий не через цей сайт "
 "адміністрування."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "Показати всі"
 
-msgid "Save"
-msgstr "Зберегти"
-
 msgid "Popup closing…"
 msgstr "Закриття спливаючого вікна"
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "Пошук"
@@ -676,6 +693,9 @@ msgstr "Видалити обрану %(model)s"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Переглянути обрану %(model)s"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Дякуємо за час, який був проведений сьогодні на сайті."

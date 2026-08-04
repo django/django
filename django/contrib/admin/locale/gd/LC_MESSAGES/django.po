@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-10-27 12:57+0000\n"
-"Last-Translator: GunChleoc\n"
-"Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 07:05+0000\n"
+"Last-Translator: GunChleoc, 2015-2017,2021\n"
+"Language-Team: Gaelic, Scottish (http://app.transifex.com/django/django/"
 "language/gd/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -32,8 +32,8 @@ msgstr "Chaidh %(count)d %(items)s a sguabadh às."
 msgid "Cannot delete %(name)s"
 msgstr "Chan urrainn dhuinn %(name)s a sguabadh às"
 
-msgid "Are you sure?"
-msgstr "A bheil thu cinnteach?"
+msgid "Delete multiple objects"
+msgstr "Sguab às iomadh oibseact"
 
 msgid "Administration"
 msgstr "Rianachd"
@@ -181,6 +181,14 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr "Cum sìos “Control” no “Command” air Mac gus iomadh nì a thaghadh."
 
 #, python-brace-format
+msgid "Select this object for an action - {}"
+msgstr ""
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
+
+#, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "Chaidh {name} “{obj}” a chur ris."
 
@@ -200,12 +208,6 @@ msgid ""
 msgstr ""
 "Chaidh {name} “{obj}” atharrachadh. ’S urrainn dhut a dheasachadh a-rithist "
 "gu h-ìosal."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"Chaidh {name} “{obj}” a chur ris. ’S urrainn dhut a dheasachadh a-rithist gu "
-"h-ìosal."
 
 #, python-brace-format
 msgid ""
@@ -251,9 +253,6 @@ msgstr "Atharraich %s"
 msgid "View %s"
 msgstr "Seall %s"
 
-msgid "Database error"
-msgstr "Mearachd an stòir-dhàta"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -261,6 +260,9 @@ msgstr[0] "Chaidh %(count)s %(name)s atharrachadh."
 msgstr[1] "Chaidh %(count)s %(name)s atharrachadh."
 msgstr[2] "Chaidh %(count)s %(name)s atharrachadh."
 msgstr[3] "Chaidh %(count)s %(name)s atharrachadh."
+
+msgid "Database error"
+msgstr "Mearachd an stòir-dhàta"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -274,15 +276,32 @@ msgstr[3] "Chaidh a h-uile %(total_count)s a thaghadh"
 msgid "0 of %(cnt)s selected"
 msgstr "Chaidh 0 à %(cnt)s a thaghadh"
 
+msgid "Delete"
+msgstr "Sguab às"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Eachdraidh nan atharraichean: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #, python-format
 msgid ""
@@ -334,15 +353,8 @@ msgstr ""
 "agus tha sinn an dùil gun dèid a chàradh a dh’aithghearr. Mòran taing airson "
 "d’ fhoighidinn."
 
-msgid "Run the selected action"
-msgstr "Ruith an gnìomh a thagh thu"
-
-msgid "Go"
-msgstr "Siuthad"
-
-msgid "Click here to select the objects across all pages"
+msgid "Run"
 msgstr ""
-"Briog an-seo gus na h-oibseactan a thaghadh air feadh nan duilleagan uile"
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -351,9 +363,17 @@ msgstr "Tagh a h-uile %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Falamhaich an taghadh"
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modailean ann an aplacaid %(name)s"
+msgid "Breadcrumbs"
+msgstr ""
+
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr ""
+
+msgid "Change or view list link"
+msgstr ""
 
 msgid "Add"
 msgstr "Cuir ris"
@@ -364,30 +384,44 @@ msgstr "Seall"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Chan eil cead agad gus dad a shealltainn no a dheasachadh."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Cuir ainm-cleachdaiche is facal-faire a-steach an toiseach. ’S urrainn dhut "
-"barrachd roghainnean a’ chleachdaiche a dheasachadh an uairsin."
 
-msgid "Enter a username and password."
-msgstr "Cuir ainm-cleachdaiche ’s facal-faire a-steach."
+msgid "Error:"
+msgstr ""
 
 msgid "Change password"
 msgstr "Atharraich am facal-faire"
 
-msgid "Please correct the error below."
-msgstr "Feuch an cuir thu a’ mhearachd gu h-ìosal gu ceart."
+msgid "Set password"
+msgstr ""
 
-msgid "Please correct the errors below."
-msgstr "Feuch an cuir thu na mearachdan gu h-ìosal gu ceart."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Cuir a-steach facal-faire ùr airson a’ chleachdaiche <strong>%(username)s</"
 "strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr ""
+
+msgid "Enable password-based authentication"
+msgstr ""
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "Fàilte,"
@@ -414,8 +448,17 @@ msgstr "Seall e air an làrach"
 msgid "Filter"
 msgstr "Criathraich"
 
+msgid "Hide counts"
+msgstr ""
+
+msgid "Show counts"
+msgstr ""
+
 msgid "Clear all filters"
 msgstr "Falamhaich gach crithrag"
+
+msgid "Save"
+msgstr "Sàbhail"
 
 msgid "Remove from sorting"
 msgstr "Thoir air falbh on t-seòrsachadh"
@@ -427,35 +470,37 @@ msgstr "Prìomhachas an t-seòrsachaidh: %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "Toglaich an seòrsachadh"
 
-msgid "Delete"
-msgstr "Sguab às"
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Nan sguabadh tu às %(object_name)s “%(escaped_object)s”, rachadh oibseactan "
-"dàimheach a sguabadh às cuideachd ach chan eil cead aig a’ chunntas agad gus "
-"na seòrsaichean de dh’oibseact seo a sguabadh às:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Nan sguabadh tu às %(object_name)s “%(escaped_object)s”, bhiodh againn ris "
-"na h-oibseactan dàimheach dìonta seo a sguabadh às cuideachd:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"A bheil thu cinnteach gu bheil thu airson %(object_name)s "
-"“%(escaped_object)s” a sguabadh às? Thèid a h-uile nì dàimheach a sguabadh "
-"às cuideachd:"
 
 msgid "Objects"
 msgstr "Oibseactan"
@@ -465,9 +510,6 @@ msgstr "Tha mi cinnteach"
 
 msgid "No, take me back"
 msgstr "Chan eil, air ais leam"
-
-msgid "Delete multiple objects"
-msgstr "Sguab às iomadh oibseact"
 
 #, python-format
 msgid ""
@@ -515,6 +557,15 @@ msgstr "Na gnìomhan agam"
 msgid "None available"
 msgstr "Chan eil gin ann"
 
+msgid "Added:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Deleted:"
+msgstr ""
+
 msgid "Unknown content"
 msgstr "Susbaint nach aithne dhuinn"
 
@@ -535,12 +586,14 @@ msgstr ""
 "Chaidh do dhearbhadh mar %(username)s ach chan eil ùghdarras agad gus an "
 "duilleag seo inntrigeadh. Am bu toigh leat clàradh a-steach le cunntas eile?"
 
-msgid "Forgotten your password or username?"
+msgid "Forgotten your login credentials?"
 msgstr ""
-"An do dhìochuimhnich thu am facal-faire no an t-ainm-cleachdaiche agad?"
 
 msgid "Toggle navigation"
 msgstr "Toglaich an t-seòladaireachd"
+
+msgid "Sidebar"
+msgstr ""
 
 msgid "Start typing to filter…"
 msgstr "Tòisich air sgrìobhadh airson criathradh…"
@@ -557,6 +610,17 @@ msgstr "Cleachdaiche"
 msgid "Action"
 msgstr "Gnìomh"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
@@ -564,14 +628,19 @@ msgstr ""
 "Chan eil eachdraidh nan atharraichean aig an oibseact seo. Dh’fhaoidte nach "
 "deach a chur ris leis an làrach rianachd seo."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "Seall na h-uile"
 
-msgid "Save"
-msgstr "Sàbhail"
-
 msgid "Popup closing…"
 msgstr "Tha a’ phriob-uinneag ’ga dùnadh…"
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "Lorg"
@@ -614,6 +683,13 @@ msgstr "Cuir %(model)s eile ris"
 #, python-format
 msgid "Delete selected %(model)s"
 msgstr "Sguab às a’ %(model)s a thagh thu"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr ""
@@ -698,9 +774,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Tadhail air an duilleag seo is tagh facal-faire ùr:"
 
-msgid "Your username, in case you’ve forgotten:"
+msgid "In case you’ve forgotten, you are:"
 msgstr ""
-"Seo an t-ainm-cleachdaiche agad air eagal ’s gun do dhìochuimhnich thu e:"
 
 msgid "Thanks for using our site!"
 msgstr "Mòran taing airson an làrach againn a chleachdadh!"
@@ -722,6 +797,9 @@ msgstr "Seòladh puist-d:"
 
 msgid "Reset my password"
 msgstr "Ath-shuidhich am facal-faire agam"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
 
 msgid "All dates"
 msgstr "A h-uile ceann-là"

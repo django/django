@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 06:49+0000\n"
 "Last-Translator: Resul <resulsaparov@gmail.com>, 2022-2024\n"
 "Language-Team: Turkmen (http://app.transifex.com/django/django/language/"
 "tk/)\n"
@@ -142,6 +142,9 @@ msgstr "Horwatça"
 
 msgid "Upper Sorbian"
 msgstr "Ýokarky Sorbian"
+
+msgid "Haitian Creole"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "Wengerçe"
@@ -486,6 +489,9 @@ msgstr "%(field_labels)s bilen baglanyşykly %(model_name)s eýýäm bar."
 msgid "Constraint “%(name)s” is violated."
 msgstr "Çäklendirme “%(name)s” bozuldy."
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "%(value)r dogry saýlaw däl."
@@ -554,11 +560,11 @@ msgstr "Sene (wagtsyz)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
-"\"%(value)s\" ýalňyş görnüşde ýazylan. Bu baha hökmany suratda ÝÝÝÝ-AA-GG SS:"
-"MM[:ss[.uuuuuu]][TZ] görnüşde bolmalydyr."
+"\"%(value)s\" ýalňyş görnüşde ýazylan. Bu baha hökmany suratda ÝÝÝÝ-AA-GG "
+"SS:MM[:ss[.uuuuuu]][TZ] görnüşde bolmalydyr."
 
 #, python-format
 msgid ""
@@ -580,11 +586,11 @@ msgstr "Onluk san"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
-"\"%(value)s\" ýalňyş sene görnüşine eýe. Bu hökman  [GG] [[SS:]AA:]ss[."
-"uuuuuu] görnüşinde bolmalydyr."
+"\"%(value)s\" ýalňyş sene görnüşine eýe. Bu hökman  [GG] "
+"[[SS:]AA:]ss[.uuuuuu] görnüşinde bolmalydyr."
 
 msgid "Duration"
 msgstr "Dowamlylyk"
@@ -670,6 +676,10 @@ msgid "Raw binary data"
 msgstr "Çig ikilik maglumat"
 
 #, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
+
+#, python-format
 msgid "“%(value)s” is not a valid UUID."
 msgstr "\"%(value)s\" dogry UUID däl."
 
@@ -689,8 +699,8 @@ msgid "Value must be valid JSON."
 msgstr "Bahasy JSON bolmaly."
 
 #, python-format
-msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "%(field)s%(value)r bolan %(model)s ýok."
+msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
+msgstr ""
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Daşary açary (baglanyşykly meýdança bilen kesgitlenýär)"
@@ -710,8 +720,8 @@ msgid "Many-to-many relationship"
 msgstr "Köp-köp gatnaşyk"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -870,6 +880,28 @@ msgstr "Hawa"
 
 msgid "No"
 msgstr "Ýok"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
+
+msgctxt "Task"
+msgid "Ready"
+msgstr ""
+
+msgctxt "Task"
+msgid "Running"
+msgstr ""
+
+msgctxt "Task"
+msgid "Failed"
+msgstr ""
+
+msgctxt "Task"
+msgid "Successful"
+msgstr ""
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1259,11 +1291,11 @@ msgstr "Elýeterli %(verbose_name_plural)s ýok"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"Gelejek %(verbose_name_plural)s elýeterli däl sebäbi %(class_name)s."
-"allow_future bahasy False"
+"Gelejek %(verbose_name_plural)s elýeterli däl sebäbi "
+"%(class_name)s.allow_future bahasy False"
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
@@ -1314,9 +1346,9 @@ msgid ""
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"Bu sahypany görýärsiňiz, sebäbi sazlamalar faýlyňyzda <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
-"rel=\"noopener\">DEBUG=True</a> we hiç hili URL düzmediňiz."
+"Bu sahypany görýärsiňiz, sebäbi sazlamalar faýlyňyzda <a href=\"https://"
+"docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" "
+"target=\"_blank\" rel=\"noopener\">DEBUG=True</a> we hiç hili URL düzmediňiz."
 
 msgid "Django Documentation"
 msgstr "Django resminamalary"

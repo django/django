@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 08:09+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-04 08:09+0000\n"
 "Last-Translator: Tonnes <tonnes.mb@gmail.com>, 2019,2022-2024\n"
 "Language-Team: Dutch (http://app.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -66,12 +66,6 @@ msgstr "wachtwoord"
 msgid "last login"
 msgstr "laatste aanmelding"
 
-msgid "No password set."
-msgstr "Er is geen wachtwoord ingesteld."
-
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Ongeldige wachtwoordindeling of onbekend hash-algoritme."
-
 msgid "Reset password"
 msgstr "Wachtwoord opnieuw instellen"
 
@@ -81,15 +75,6 @@ msgstr "Wachtwoord instellen"
 msgid "The two password fields didn’t match."
 msgstr "De twee wachtwoordvelden komen niet overeen."
 
-msgid ""
-"Whether the user will be able to authenticate using a password or not. If "
-"disabled, they may still be able to authenticate using other backends, such "
-"as Single Sign-On or LDAP."
-msgstr ""
-"Of de gebruiker zich kan authenticeren via een wachtwoord of niet. Wanneer "
-"uitgeschakeld, kan deze zich mogelijk alsnog authenticeren via andere "
-"backends, zoals Eenmalige aanmelding (SSO) of LDAP."
-
 msgid "Password"
 msgstr "Wachtwoord"
 
@@ -98,6 +83,15 @@ msgstr "Bevestiging wachtwoord"
 
 msgid "Enter the same password as before, for verification."
 msgstr "Voer ter verificatie nogmaals het wachtwoord in."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Of de gebruiker zich kan authenticeren via een wachtwoord of niet. Wanneer "
+"uitgeschakeld, kan deze zich mogelijk alsnog authenticeren via andere "
+"backends, zoals Eenmalige aanmelding (SSO) of LDAP."
 
 msgid "Password-based authentication"
 msgstr "Op wachtwoord gebaseerde authenticatie"
@@ -272,16 +266,11 @@ msgid "users"
 msgstr "gebruikers"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"Dit wachtwoord is te kort. De minimale lengte is %(min_length)d teken."
 msgstr[1] ""
-"Dit wachtwoord is te kort. De minimale lengte is %(min_length)d tekens."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -312,6 +301,12 @@ msgstr "Uw wachtwoord mag niet volledig uit cijfers bestaan."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Wachtwoordherinitialisatie voor %(site_name)s"
+
+msgid "No password set."
+msgstr "Er is geen wachtwoord ingesteld."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Ongeldige wachtwoordindeling of onbekend hash-algoritme."
 
 msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "
