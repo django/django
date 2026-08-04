@@ -43,6 +43,7 @@ from django.utils.deprecation import (
     warn_about_external_use,
 )
 from django.utils.functional import cached_property
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.warnings import django_file_prefixes
 
 # The maximum number of results to fetch in a get() query.
@@ -52,6 +53,7 @@ MAX_GET_RESULTS = 21
 REPR_OUTPUT_SIZE = 20
 
 DEFAULT_FETCH_MODE = FETCH_ONE
+sql_comment_re = _lazy_re_compile(r"[\w ._-]+")
 
 
 class BaseIterable:
@@ -1728,6 +1730,9 @@ class QuerySet(AltersData):
         clone.query.default_ordering = True
         self._clear_ordering_in_combined_queries(clone.query, other_qs)
         clone.query.clear_limits()
+        # Comments belong to the combined leg (`self.query`). Clear them on
+        # the outer combinator wrapper so they aren't emitted twice.
+        clone.query.comments = ()
         clone.query.combinator = combinator
         clone.query.combinator_all = all
         return clone
@@ -2001,6 +2006,19 @@ class QuerySet(AltersData):
         """Set the fetch mode for the QuerySet."""
         clone = self._chain()
         clone._fetch_mode = fetch_mode
+        return clone
+
+    def comment(self, message):
+        """Add an SQL comment to the query."""
+        if not isinstance(message, str):
+            raise TypeError("QuerySet.comment() argument must be a string.")
+        if not sql_comment_re.fullmatch(message):
+            raise ValueError(
+                "QuerySet.comment() argument must contain only letters, numbers, "
+                "spaces, periods, underscores, and hyphens."
+            )
+        clone = self._chain()
+        clone.query.comments = (*clone.query.comments, message)
         return clone
 
     ###################################

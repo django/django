@@ -816,6 +816,7 @@ class ManagerTest(SimpleTestCase):
         "aupdate",
         "aupdate_or_create",
         "fetch_mode",
+        "comment",
     ]
 
     def test_manager_methods(self):
