@@ -2208,7 +2208,20 @@ class Query(BaseExpression):
         yield from (expr.alias for expr in cls._gen_cols(exprs))
 
     def resolve_ref(self, name, allow_joins=True, reuse=None, summarize=False):
+        field_list = name.split(LOOKUP_SEP)
         annotation = self.annotations.get(name)
+        root_annotation = (
+            annotation
+            if annotation is not None
+            else self.annotations.get(field_list[0])
+        )
+        is_multi_column_query = isinstance(
+            root_annotation, Query
+        ) and self._is_multi_column_query(root_annotation)
+
+        if not allow_joins and is_multi_column_query:
+            raise FieldError("Joined field references are not permitted in this query")
+
         if annotation is not None:
             if not allow_joins:
                 for alias in self._gen_col_aliases([annotation]):
@@ -2228,45 +2241,43 @@ class Query(BaseExpression):
                         "to promote it." % name
                     )
                 return Ref(name, self.annotation_select[name])
-            if isinstance(annotation, Query) and self._is_multi_column_query(
-                annotation
-            ):
+            if is_multi_column_query:
                 join_result = self._promote_inner_subquery_join(name)
                 if join_result is not None:
                     return join_result
-            else:
-                return annotation
-        else:
-            field_list = name.split(LOOKUP_SEP)
-            annotation = self.annotations.get(field_list[0])
-            join_result = self._promote_inner_subquery_join(name)
+            return annotation
+
+        for idx in range(len(field_list), 0, -1):
+            join_result = self._promote_inner_subquery_join(
+                LOOKUP_SEP.join(field_list[:idx])
+            )
             if join_result is not None:
+                for transform in field_list[idx:]:
+                    join_result = self.try_transform(join_result, transform)
                 return join_result
 
-            if annotation is not None:
-                for transform in field_list[1:]:
-                    annotation = self.try_transform(annotation, transform)
-                return annotation
-            join_info = self.setup_joins(
-                field_list, self.get_meta(), self.get_initial_alias(), can_reuse=reuse
+        if root_annotation is not None:
+            for transform in field_list[1:]:
+                root_annotation = self.try_transform(root_annotation, transform)
+            return root_annotation
+        join_info = self.setup_joins(
+            field_list, self.get_meta(), self.get_initial_alias(), can_reuse=reuse
+        )
+        targets, final_alias, join_list = self.trim_joins(
+            join_info.targets, join_info.joins, join_info.path
+        )
+        if not allow_joins and len(join_list) > 1:
+            raise FieldError("Joined field references are not permitted in this query")
+        if len(targets) > 1:
+            raise FieldError(
+                "Referencing multicolumn fields with F() objects isn't supported"
             )
-            targets, final_alias, join_list = self.trim_joins(
-                join_info.targets, join_info.joins, join_info.path
-            )
-            if not allow_joins and len(join_list) > 1:
-                raise FieldError(
-                    "Joined field references are not permitted in this query"
-                )
-            if len(targets) > 1:
-                raise FieldError(
-                    "Referencing multicolumn fields with F() objects isn't supported"
-                )
-            # Verify that the last lookup in name is a field or a transform:
-            # transform_function() raises FieldError if not.
-            transform = join_info.transform_function(targets[0], final_alias)
-            if reuse is not None:
-                reuse.update(join_list)
-            return transform
+        # Verify that the last lookup in name is a field or a transform:
+        # transform_function() raises FieldError if not.
+        transform = join_info.transform_function(targets[0], final_alias)
+        if reuse is not None:
+            reuse.update(join_list)
+        return transform
 
     def split_exclude(self, filter_expr, can_reuse, names_with_path):
         """
