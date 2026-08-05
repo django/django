@@ -3,7 +3,9 @@ from operator import itemgetter
 from django.core.exceptions import FieldError
 from django.db import connection, models
 from django.db.models import Count, F, OuterRef, Q
+from django.db.models.functions import Upper
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test.utils import register_lookup
 
 from .models import BugReport, Organization, Post, Project, Task, User, Workspace
 
@@ -809,6 +811,36 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
                 "code", "priority_bug__description"
             )
             list(projects)
+
+    def test_composite_subquery_alias_update_rejects_reference(self):
+        project_info = Project.objects.filter(pk=self.auth.pk).values(
+            "code",
+            "title",
+        )
+        msg = "Joined field references are not permitted in this query"
+
+        for reference in ("project_info", "project_info__code"):
+            with self.subTest(reference=reference):
+                with self.assertRaisesMessage(FieldError, msg):
+                    Project.objects.alias(project_info=project_info).update(
+                        code=F(reference)
+                    )
+
+    def test_composite_subquery_alias_column_transform(self):
+        post_info = Post.objects.filter(pk=self.welcome_post.pk).values(
+            "title",
+            "body",
+        )
+
+        with register_lookup(models.CharField, Upper):
+            titles = (
+                User.objects.filter(pk=self.ada.pk)
+                .alias(post_info=post_info)
+                .annotate(upper_title=F("post_info__title__upper"))
+                .values_list("upper_title", flat=True)
+            )
+
+        self.assertEqual(list(titles), ["WELCOME"])
 
 
 class CompositeSubqueryTupleLookupTests(CompositeSubqueryTestCase):
