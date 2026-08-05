@@ -501,6 +501,47 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             transform=itemgetter("code"),
         )
 
+    def test_composite_subquery_alias_tuple_ordering(self):
+        BugReport.objects.bulk_create(
+            [
+                BugReport(
+                    task=self.login,
+                    reporter=self.bob,
+                    description="Account takeover",
+                    severity_level=3,
+                ),
+                BugReport(
+                    task=self.login,
+                    reporter=self.bob,
+                    description="Minor alignment issue",
+                    severity_level=1,
+                ),
+            ]
+        )
+        project_bugs = BugReport.objects.filter(task__project=self.auth).values(
+            "severity_level", "description"
+        )
+        projects = Project.objects.filter(pk=self.auth.pk).alias(
+            project_bug=project_bugs
+        )
+        expected = [
+            (1, "Minor alignment issue"),
+            (3, "Account takeover"),
+            (3, "Login crash"),
+        ]
+
+        for ordering in ("project_bug", F("project_bug")):
+            with self.subTest(ordering=ordering):
+                self.assertSequenceEqual(
+                    list(
+                        projects.order_by(ordering).values_list(
+                            "project_bug__severity_level",
+                            "project_bug__description",
+                        )
+                    ),
+                    expected,
+                )
+
     def test_composite_subquery_alias_preserves_distinct_select_list(self):
         organization = self.acme
         Post.objects.create(
