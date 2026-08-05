@@ -1,25 +1,31 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# alexhojinpark, 2023
 # DaHae Sung <sdh4513136@hanmail.net>, 2016
 # alexhojinpark, 2023
 # Hoseok Lee <ihooi77@gmail.com>, 2016
 # Jaehong Kim <mixe@korea.com>, 2011
 # Jamie Seol, 2025
+# Jamie Seol, 2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jay Oh <theanswer.jay@gmail.com>, 2020
 # Le Tartuffe <magno79@gmail.com>, 2014
+# Junghee Lee <daemul72@gmail.com>, 2026
 # LEE Hwanyong <hwan@ajou.ac.kr>, 2023
+# Le Tartuffe <magno79@gmail.com>, 2014
 # minsung kang, 2015
+# minsung kang, 2015
+# Seoeun(Sun☀️) Hong, 2023
 # Seoeun(Sun☀️) Hong, 2023
 # Yang Chan Woo <oizys18@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-25 15:04-0500\n"
-"PO-Revision-Date: 2025-09-17 07:59+0000\n"
-"Last-Translator: Jamie Seol, 2025\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-05 07:59+0000\n"
+"Last-Translator: Junghee Lee <daemul72@gmail.com>, 2026\n"
 "Language-Team: Korean (http://app.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -53,7 +59,7 @@ msgstr "선택한 %s 선택"
 
 #, javascript-format
 msgid "Remove selected %s"
-msgstr "선택한 %s 삭제"
+msgstr "선택한 %s 제거"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -62,34 +68,34 @@ msgstr "선택된 %s"
 #, javascript-format
 msgid ""
 "Remove %s by selecting them and then select the \"Remove\" arrow button."
-msgstr "%s 선택 후 \"삭제하기\" 화살표 버튼을 누르세요."
+msgstr "%s 선택 후 \"제거\" 화살표 버튼을 누르세요."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
-msgstr "선택된 %s의 리스트를 필터링 하려면 이 박스에 입력 하세요 ."
+msgstr "선택된 %s의 리스트를 필터링하려면 이 상자에 입력하세요."
 
 msgid "(click to clear)"
 msgstr "(클릭하여 해제)"
 
 #, javascript-format
 msgid "Remove all %s"
-msgstr "모든 %s 삭제"
+msgstr "모든 %s 제거"
 
 #, javascript-format
 msgid "%s selected option not visible"
 msgid_plural "%s selected options not visible"
-msgstr[0] "%s 선택된 옵션은 표시되지 않습니다."
+msgstr[0] "선택한 %s개 옵션이 표시되지 않음"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] "%(sel)s개가 %(cnt)s개 중에 선택됨."
+msgstr[0] "%(cnt)s개 중 %(sel)s개 선택됨"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
 "개별 편집 가능한 필드에 저장되지 않은 값이 있습니다. 액션을 수행하면 저장되"
-"지 않은 값들을 잃어버리게 됩니다."
+"지 않은 값들이 사라집니다."
 
 msgid ""
 "You have selected an action, but you haven’t saved your changes to "
@@ -101,11 +107,11 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"개별 필드에 아무런 변경이 없는 상태로 액션을 선택했습니다. 저장 버튼이 아니"
-"라 진행 버튼을 찾아보세요."
+"액션을 선택했지만 개별 필드를 변경하지 않았습니다. 저장 버튼이 아닌 실행 버튼"
+"을 찾으셨을 수 있습니다."
 
 msgid "Now"
 msgstr "현재"
@@ -122,15 +128,24 @@ msgstr "정오"
 msgid "6 p.m."
 msgstr "오후 6시"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Note: 서버 시간보다 %s 시간 빠릅니다."
+msgid "server"
+msgstr ""
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Note: 서버 시간보다 %s 시간 늦은 시간입니다."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
+msgstr[0] ""
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
 
 msgid "Choose a Time"
 msgstr "시간 선택"
@@ -144,14 +159,29 @@ msgstr "취소"
 msgid "Today"
 msgstr "오늘"
 
+msgid "Today (%(date)s)"
+msgstr ""
+
 msgid "Choose a Date"
-msgstr "시간 선택"
+msgstr "날짜 선택"
 
 msgid "Yesterday"
 msgstr "어제"
 
+msgid "Yesterday (%(date)s)"
+msgstr ""
+
 msgid "Tomorrow"
 msgstr "내일"
+
+msgid "Tomorrow (%(date)s)"
+msgstr ""
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr ""
+
+msgid "Next (%(month)s %(year)s)"
+msgstr ""
 
 msgid "January"
 msgstr "1월"
@@ -313,3 +343,18 @@ msgstr "금"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "토"
+
+msgid "%(month)s %(day)s, %(year)s"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr ""
