@@ -1955,10 +1955,19 @@ class OrderBy(Expression):
         return [self.expression]
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
+        from django.db.models.fields.tuple_lookups import Tuple
+
         if isinstance(self.expression, ColPairs):
+            cols = self.expression.get_cols()
+        elif isinstance(self.expression, Tuple):
+            cols = self.expression.get_source_expressions()
+        else:
+            cols = None
+
+        if cols is not None:
             sql_parts = []
             params = []
-            for col in self.expression.get_cols():
+            for col in cols:
                 copy = self.copy()
                 copy.set_source_expressions([col])
                 sql, col_params = compiler.compile(copy)
