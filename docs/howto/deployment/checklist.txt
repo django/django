@@ -98,9 +98,11 @@ Many settings, such as :setting:`SECRET_KEY`, differ between your local
 development environment and production. As shown above, a common approach
 is to load these values from environment variables rather than hardcoding
 them. You can set an environment variable when running a management command
-or your production server, for example::
+or your production server, for example:
 
-    CUSTOM_VAR=value python manage.py <command>
+.. code-block:: console
+
+    $ CUSTOM_VAR=value python manage.py <command>
 
 .. admonition:: Managing environment variables
 
