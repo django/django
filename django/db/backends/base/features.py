@@ -433,6 +433,9 @@ class BaseDatabaseFeatures:
     # on databases that don't use LIKE for pattern matching.
     pattern_lookup_needs_param_pattern = True
 
+    # Do the Rank/DenseRank functions require an ORDER BY clause?
+    rank_function_requires_order_by = False
+
     # A set of dotted paths to tests in Django's test suite that are expected
     # to fail on this database.
     django_test_expected_failures = set()
