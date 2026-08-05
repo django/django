@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-06-01 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 07:05+0000\n"
 "Last-Translator: Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020,2022-2026\n"
 "Language-Team: Dutch (http://app.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -188,8 +188,13 @@ msgstr ""
 "Houd ‘Control’, of ‘Command’ op een Mac, ingedrukt om meerdere items te "
 "selecteren."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Selecteer dit object voor een actie - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -254,14 +259,14 @@ msgstr "%s wijzigen"
 msgid "View %s"
 msgstr "%s weergeven"
 
-msgid "Database error"
-msgstr "Databasefout"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s is met succes gewijzigd."
 msgstr[1] "%(count)s %(name)s zijn met succes gewijzigd."
+
+msgid "Database error"
+msgstr "Databasefout"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -286,6 +291,17 @@ msgstr "Wijzigingsgeschiedenis: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -340,9 +356,6 @@ msgstr ""
 msgid "Run"
 msgstr "Uitvoeren"
 
-msgid "Click here to select the objects across all pages"
-msgstr "Klik hier om alle objecten op alle pagina's te selecteren"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Alle %(total_count)s %(module_name)s selecteren"
@@ -352,10 +365,6 @@ msgstr "Selectie wissen"
 
 msgid "Breadcrumbs"
 msgstr "Broodkruimels"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modellen in de %(name)s-toepassing"
 
 msgid "Model name"
 msgstr "Modelnaam"
@@ -469,6 +478,10 @@ msgstr "Thema wisselen (huidige thema: licht)"
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "Thema wisselen (huidige thema: donker)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -669,6 +682,9 @@ msgstr "Geselecteerde %(model)s verwijderen"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Geselecteerde %(model)s weergeven"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Bedankt voor het vandaag wat tijd besteden aan de website."
