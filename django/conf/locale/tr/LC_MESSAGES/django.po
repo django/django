@@ -2,7 +2,7 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# BouRock, 2015-2025
+# BouRock, 2015-2026
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@gmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
@@ -17,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 06:49+0000\n"
-"Last-Translator: BouRock, 2015-2025\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 06:49+0000\n"
+"Last-Translator: BouRock, 2015-2026\n"
 "Language-Team: Turkish (http://app.transifex.com/django/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -501,6 +501,9 @@ msgstr "Bu %(field_labels)s alanına sahip %(model_name)s zaten mevcut."
 msgid "Constraint “%(name)s” is violated."
 msgstr "\"%(name)s\" kısıtlaması ihlal edildi."
 
+msgid "- Select an option -"
+msgstr "- Bir seçenek seçin -"
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "%(value)r değeri geçerli bir seçim değil."
@@ -570,8 +573,8 @@ msgstr "Tarih (saat olmadan)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "“%(value)s” değeri geçersiz bir biçime sahip. YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ] biçiminde olmak zorundadır."
@@ -596,8 +599,8 @@ msgstr "Ondalık sayı"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "“%(value)s” değer geçersiz bir biçime sahip. [DD] [HH:[MM:]]ss[.uuuuuu] "
 "biçiminde olmak zorundadır."
@@ -684,6 +687,10 @@ msgstr "URL"
 
 msgid "Raw binary data"
 msgstr "Ham ikili veri"
+
+#, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr "“%(value)s” geçerli bir ikili değer değil."
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -891,6 +898,12 @@ msgstr "Evet"
 
 msgid "No"
 msgstr "Hayır"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr "Verilen sorguyla eşleşen %s yok."
 
 msgctxt "Task"
 msgid "Ready"
@@ -1299,11 +1312,11 @@ msgstr "Mevcut %(verbose_name_plural)s yok"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"Gelecek %(verbose_name_plural)s mevcut değil, çünkü %(class_name)s."
-"allow_future değeri False olarak tanımlı."
+"Gelecek %(verbose_name_plural)s mevcut değil, çünkü "
+"%(class_name)s.allow_future değeri False olarak tanımlı."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"

@@ -3,17 +3,17 @@
 # Translators:
 # Goto Hayato <habita.gh@gmail.com>, 2021
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Shinya Okano <tokibito@gmail.com>, 2012,2014-2016,2023,2025
+# Shinya Okano <tokibito@gmail.com>, 2012,2014-2016,2023,2025-2026
 # TANIGUCHI Taichi, 2022
 # Takuro Onoue <kusanaginoturugi@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2025-03-25 15:04-0500\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-05 07:59+0000\n"
 "Last-Translator: Shinya Okano <tokibito@gmail.com>, "
-"2012,2014-2016,2023,2025\n"
+"2012,2014-2016,2023,2025-2026\n"
 "Language-Team: Japanese (http://app.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -96,7 +96,7 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
 "操作を選択しましたが、フィールドに変更はありませんでした。もしかして保存ボタ"
@@ -117,15 +117,24 @@ msgstr "12時"
 msgid "6 p.m."
 msgstr "午後 6 時"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "ノート: あなたの環境はサーバー時間より、%s時間進んでいます。"
+msgid "server"
+msgstr ""
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "ノート: あなたの環境はサーバー時間より、%s時間遅れています。"
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
+msgstr[0] ""
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
 
 msgid "Choose a Time"
 msgstr "時間を選択"
@@ -139,14 +148,29 @@ msgstr "キャンセル"
 msgid "Today"
 msgstr "今日"
 
+msgid "Today (%(date)s)"
+msgstr ""
+
 msgid "Choose a Date"
 msgstr "日付を選択"
 
 msgid "Yesterday"
 msgstr "昨日"
 
+msgid "Yesterday (%(date)s)"
+msgstr ""
+
 msgid "Tomorrow"
 msgstr "明日"
+
+msgid "Tomorrow (%(date)s)"
+msgstr ""
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr ""
+
+msgid "Next (%(month)s %(year)s)"
+msgstr ""
 
 msgid "January"
 msgstr "1月"
@@ -308,3 +332,18 @@ msgstr "金"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "土"
+
+msgid "%(month)s %(day)s, %(year)s"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr ""
