@@ -1,8 +1,8 @@
-============================================
-Django 6.1 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 6.1 release notes
+========================
 
-*Expected August 2026*
+*August 5, 2026*
 
 Welcome to Django 6.1!
 
