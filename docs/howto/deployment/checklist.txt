@@ -94,7 +94,21 @@ local variables, settings, libraries used, etc.
 
 Environment-specific settings
 =============================
+Many settings, such as :setting:`SECRET_KEY`, differ between your local
+development environment and production. As shown above, a common approach
+is to load these values from environment variables rather than hardcoding
+them. You can set an environment variable when running a management command
+or your production server, for example::
 
+    CUSTOM_VAR=value python manage.py <command>
+
+.. admonition:: Managing environment variables
+
+    Manually managing environment variables across multiple environments
+    can become difficult as a project grows. Several `community maintained
+    solutions <https://github.com/django/new-features/issues/39>`_ exist to
+    help manage settings and secrets more easily.
+    
 :setting:`ALLOWED_HOSTS`
 ------------------------
 
