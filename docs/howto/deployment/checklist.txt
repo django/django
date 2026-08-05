@@ -108,7 +108,7 @@ or your production server, for example::
     can become difficult as a project grows. Several `community maintained
     solutions <https://github.com/django/new-features/issues/39>`_ exist to
     help manage settings and secrets more easily.
-    
+
 :setting:`ALLOWED_HOSTS`
 ------------------------
 
