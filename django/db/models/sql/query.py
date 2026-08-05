@@ -2235,6 +2235,12 @@ class Query(BaseExpression):
                         "to promote it." % name
                     )
                 return Ref(name, self.annotation_select[name])
+            if isinstance(annotation, Query) and self._is_multi_column_query(
+                annotation
+            ):
+                join_result = self._promote_inner_subquery_join(name)
+                if join_result is not None:
+                    return join_result
             else:
                 return annotation
         else:

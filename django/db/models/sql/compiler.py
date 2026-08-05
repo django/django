@@ -430,7 +430,14 @@ class SQLCompiler:
                 ref, *transforms = col.split(LOOKUP_SEP)
                 expr = self.query.annotations.get(ref)
             if expr:
-                if transforms and not self.query.combinator:
+                is_multi_column_subquery = (
+                    isinstance(expr, Query)
+                    and Query._is_multi_column_query(expr)
+                    and ref not in self.query.annotation_select
+                )
+                if (
+                    transforms or is_multi_column_subquery
+                ) and not self.query.combinator:
                     # The part after a multi-column annotation may
                     # be a derived-table column, not a transform.
                     # Resolve the full name first.
