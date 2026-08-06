@@ -1773,3 +1773,28 @@ class SensitiveVariablesTest(TestDataMixin, TestCase):
                 self.assertContains(
                     response, password2_fragment, html=True, status_code=500
                 )
+
+
+class UsernameFieldTest(SimpleTestCase):
+    def test_strip_whitespace_post_normalization(self):
+        """
+        UsernameField normalizes Unicode before stripping, ensuring characters
+        that normalize to whitespace (e.g. \u1680, \u3000) are stripped.
+        """
+        field = UsernameField(max_length=150)
+        tests = [
+            ("  testuser  ", "testuser"),
+            ("\u1680testuser\u1680", "testuser"),
+            ("\u3000testuser\u3000", "testuser"),
+            ("\u2000testuser\u200a", "testuser"),
+            ("   \u3000testuser\u1680   ", "testuser"),
+        ]
+        for value, expected in tests:
+            with self.subTest(value=value):
+                self.assertEqual(field.clean(value), expected)
+
+    def test_exceeding_max_length_skips_normalization(self):
+        field = UsernameField(max_length=5)
+        long_value = "a" * 10
+        with self.assertRaises(ValidationError):
+            field.clean(long_value)
