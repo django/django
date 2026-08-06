@@ -18,6 +18,11 @@ class BetterAuthor(Author):
     write_speed = models.IntegerField()
 
 
+class AuthorProxy(Author):
+    class Meta:
+        proxy = True
+
+
 class Book(models.Model):
     author = models.ForeignKey(Author, models.CASCADE)
     title = models.CharField(max_length=100)
@@ -193,6 +198,16 @@ class Player(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class TeamSponsor(models.Model):
+    primary_team = models.OneToOneField(
+        Team, models.CASCADE, related_name="primary_sponsor"
+    )
+    backup_team = models.ForeignKey(
+        Team, models.CASCADE, related_name="backup_sponsors", null=True, blank=True
+    )
+    name = models.CharField(max_length=100)
 
 
 # Models for testing custom ModelForm save methods in formsets and inline

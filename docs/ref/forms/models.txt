@@ -262,42 +262,67 @@ Declarative ``ModelFormSet``
     using declarative syntax.
 
     You can define any argument that the ``modelformset_factory`` function
-    accepts as a class attribute.
+    accepts as a class attribute, except for ``formset``: to customize the
+    base formset class, inherit from it instead.
 
-    For example, to create ``AuthorFormSet`` for the ``Author`` model:
+    For example, to create ``AuthorFormSet`` for the ``Author`` model::
 
-    .. code-block:: pycon
+        from django.forms import ModelFormSet
 
-        >>> from django.forms import models
-        >>> from myapp.models import Author
+        from myapp.models import Author
 
-        >>> class AuthorFormSet(models.ModelFormSet):
-        ...     model = Author
-        ...     fields = ["name", "title"]
-        ...     extra = 2
-        ...     can_order = True
-        ...     can_delete = True
-        ...     max_num = 10
-        ...     validate_max = True
-        ...     min_num = 3
-        ...     validate_min = True
-        ...     absolute_max = 15
-        ...     can_delete_extra = False
-        ...
 
-    You can also omit fields when the form class provides them:
+        class AuthorFormSet(ModelFormSet):
+            model = Author
+            fields = ["name", "title"]
+            extra = 2
+            can_order = True
+            can_delete = True
+            max_num = 10
+            validate_max = True
+            min_num = 3
+            validate_min = True
+            absolute_max = 15
+            can_delete_extra = False
 
-    .. code-block:: pycon
+    The ``form`` attribute behaves as it does for ``modelformset_factory()``.
+    It is used as the base class for a generated form bound to ``model``,
+    exactly as ``modelformset_factory(model, form=..., fields=...)`` does, so a
+    form's own fields and customizations are carried over::
 
-        >>> from django.forms import models
-        >>> from myapp.forms import PostForm
-        >>> from myapp.models import Post
+        from django.forms import ModelFormSet
 
-        >>> class PostFormSet(models.ModelFormSet):
-        ...     model = Post
-        ...     form = PostForm
-        ...     extra = 2
-        ...
+        from myapp.forms import AuthorForm
+        from myapp.models import Author
+
+
+        class AuthorFormSet(ModelFormSet):
+            model = Author
+            form = AuthorForm
+            extra = 2
+
+    Form-generation attributes accumulate down an inheritance chain, so a
+    subclass sees a base's ``fields``/``exclude``/``widgets``/etc. as if they
+    were passed to a single ``modelformset_factory()`` call. To ignore an
+    inherited attribute, set it back to ``None`` in the subclass; setting
+    ``form = None`` likewise drops an inherited form.
+
+    A base class intended only for subclassing can skip the required
+    attributes by declaring itself abstract. The marker isn't inherited, so
+    concrete subclasses are still validated::
+
+        from django.forms.models import ModelFormSet
+
+
+        class TenantFormSet(ModelFormSet, abstract=True):
+            can_delete = False
+
+    .. note::
+
+        The ``error_messages`` attribute customizes the error messages of
+        the generated form's fields, as in ``modelformset_factory()``. To
+        override the formset's own error messages, such as
+        ``too_few_forms``, declare ``default_error_messages`` instead.
 
 Creating inline formsets
 ========================
@@ -329,7 +354,19 @@ Declarative ``InlineFormSet``
     formsets using declarative syntax.
 
     You can define any argument that the ``inlineformset_factory`` function
-    accepts as a class attribute.
+    accepts as a class attribute, except for ``formset``: to customize the
+    base formset class, inherit from it instead. ``abstract=True`` may be
+    passed in the class definition to create a base class without the
+    required attributes.
+
+    As with :class:`ModelFormSet`, a ``form`` is used as the base class for a
+    generated form (as ``inlineformset_factory()`` does), so the parent foreign
+    key can be added without modifying the provided form class.
+
+    The foreign key between ``model`` and ``parent_model`` is resolved when
+    the class is defined, so both models must already be loaded. Define
+    inline formsets in ``forms.py``, or another module imported after the
+    app registry is ready, rather than in ``models.py``.
 
     For example, to create ``BookFormSet`` for the ``Book`` model with
     ``Author`` as the parent model:

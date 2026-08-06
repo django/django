@@ -15,7 +15,12 @@ from django.core.validators import ProhibitNullCharactersValidator
 from django.db.models.utils import AltersData, get_blank_choice_label
 from django.forms.fields import ChoiceField, Field
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
-from django.forms.formsets import BaseFormSet, FormSetMeta, formset_factory
+from django.forms.formsets import (
+    BaseFormSet,
+    DeclarativeFormSetMixin,
+    _prepare_declarative_formset,
+    formset_factory,
+)
 from django.forms.utils import ErrorList
 from django.forms.widgets import (
     HiddenInput,
@@ -38,8 +43,10 @@ __all__ = (
     "ModelMultipleChoiceField",
     "ALL_FIELDS",
     "BaseModelFormSet",
+    "ModelFormSet",
     "modelformset_factory",
     "BaseInlineFormSet",
+    "InlineFormSet",
     "inlineformset_factory",
     "modelform_factory",
 )
@@ -1105,69 +1112,82 @@ def modelformset_factory(
     return FormSet
 
 
-class ModelFormSetMeta(FormSetMeta):
-    """Metaclass for creating model formsets using declarative syntax."""
-
-    def __new__(cls, name, bases, attrs):
-        if "model" not in set(attrs):
-            raise TypeError(
-                "ModelFormSet() missing 1 required positional argument: 'model'"
-            )
-
-        kwargs = {}
-
-        form = ModelForm
-        if (passed_form := attrs.get("form")) is not None:
-            kwargs.update({"form": passed_form})
-            if hasattr(passed_form, "Meta"):
-                kwargs.update({"fields": passed_form._meta.fields})
-                kwargs.update({"exclude": passed_form._meta.exclude})
-        else:
-            kwargs.update({"form": form})
-
-        default_modelform_factory_attrs = [
-            "fields",
-            "exclude",
-            "formfield_callback",
-            "widgets",
-            "localized_fields",
-            "labels",
-            "help_texts",
-            "error_messages",
-            "field_classes",
-        ]
-        for key in default_modelform_factory_attrs:
-            if key in attrs:
-                kwargs.update({key: attrs.get(key)})
-                attrs.pop(key)
-
-        if (model := attrs.get("model")) is not None:
-            if kwargs.get("fields") is None and kwargs.get("exclude") is None:
-                raise ImproperlyConfigured(
-                    "Defining %s without defining 'fields' or 'exclude' "
-                    "explicitly is prohibited." % name
-                )
-            form = modelform_factory(model, **kwargs)
-            attrs.update({"form": form})
-
-        default_formset_attrs = {
-            "form": ModelForm,
-            "formset": BaseModelFormSet,
-            "extra": 1,
-            "can_delete_extra": True,
-        }
-        for key, value in default_formset_attrs.items():
-            if key not in attrs.keys():
-                attrs.update({key: value})
-
-        return super().__new__(cls, name, bases, attrs)
+_FORM_GENERATION_OPTIONS = (
+    "fields",
+    "exclude",
+    "formfield_callback",
+    "widgets",
+    "localized_fields",
+    "labels",
+    "help_texts",
+    "error_messages",
+    "field_classes",
+)
 
 
-class ModelFormSet(BaseModelFormSet, metaclass=ModelFormSetMeta):
+def _prepare_declarative_model_form(cls, declarative_name):
+    if cls.model is None:
+        raise ImproperlyConfigured(
+            "Creating %s without the 'model' attribute is prohibited; "
+            "formset %s needs updating." % (declarative_name, cls.__name__)
+        )
+    if "form" in cls.__dict__:
+        declared_form = cls.__dict__["form"]
+    else:
+        # Fall back to cls.form because an unprepared abstract base still
+        # holds the original form there.
+        declared_form = getattr(cls, "_declared_form", cls.form)
+    cls._declared_form = declared_form
+    options = {
+        option: value
+        for option in _FORM_GENERATION_OPTIONS
+        if (value := getattr(cls, option)) is not None
+    }
+    meta = getattr(declared_form, "Meta", None)
+    if (
+        options.get("fields") is None
+        and options.get("exclude") is None
+        and getattr(meta, "fields", None) is None
+        and getattr(meta, "exclude", None) is None
+    ):
+        raise ImproperlyConfigured(
+            "Creating %s without either the 'fields' attribute or the "
+            "'exclude' attribute is prohibited; formset %s needs updating."
+            % (declarative_name, cls.__name__)
+        )
+    cls.form = modelform_factory(cls.model, form=declared_form or ModelForm, **options)
+
+
+class ModelFormSet(BaseModelFormSet, DeclarativeFormSetMixin, abstract=True):
     """Base class for creating model formsets using declarative syntax."""
 
-    form = None
     model = None
+    form = None
+    fields = None
+    exclude = None
+    formfield_callback = None
+    widgets = None
+    localized_fields = None
+    labels = None
+    help_texts = None
+    error_messages = None
+    field_classes = None
+    extra = 1
+    can_order = False
+    can_delete = False
+    can_delete_extra = True
+    min_num = None
+    max_num = None
+    absolute_max = None
+    validate_min = False
+    validate_max = False
+    renderer = None
+    edit_only = False
+
+    @classmethod
+    def _prepare_declarative(cls):
+        _prepare_declarative_model_form(cls, "a ModelFormSet")
+        _prepare_declarative_formset(cls)
 
 
 # InlineFormSets #############################################################
@@ -1435,50 +1455,50 @@ def inlineformset_factory(
     return FormSet
 
 
-class InlineFormSetMeta(ModelFormSetMeta):
-    """Metaclass for creating inline formsets using declarative syntax."""
-
-    def __new__(cls, name, bases, attrs):
-        if "parent_model" not in set(attrs):
-            raise TypeError(
-                "InlineFormSet() missing 1 required positional argument: 'parent_model'"
-            )
-        if "model" not in set(attrs):
-            raise TypeError(
-                "InlineFormSet() missing 1 required positional argument: 'model'"
-            )
-
-        parent_model = attrs.get("parent_model", None)
-        model = attrs.get("model", None)
-        fk_name = attrs.get("fk_name", None)
-
-        default_formset_attrs = {
-            "form": ModelForm,
-            "formset": BaseInlineFormSet,
-            "extra": 3,
-            "can_delete": True,
-            "can_delete_extra": True,
-        }
-        for key, value in default_formset_attrs.items():
-            if key not in attrs.keys():
-                attrs.update({key: value})
-
-        if model is not None and parent_model is not None:
-            fk = _get_foreign_key(parent_model, model, fk_name=fk_name)
-            if fk.unique:
-                attrs.update({"max_num": 1})
-            ModelFormSet = super().__new__(cls, name, bases, attrs)
-            ModelFormSet.fk = fk
-            return ModelFormSet
-        return super().__new__(cls, name, bases, attrs)
-
-
-class InlineFormSet(BaseInlineFormSet, ModelFormSet, metaclass=InlineFormSetMeta):
+class InlineFormSet(BaseInlineFormSet, DeclarativeFormSetMixin, abstract=True):
     """Base class for creating inline formsets using declarative syntax."""
 
-    form = None
-    model = None
     parent_model = None
+    fk_name = None
+    model = None
+    form = None
+    fields = None
+    exclude = None
+    formfield_callback = None
+    widgets = None
+    localized_fields = None
+    labels = None
+    help_texts = None
+    error_messages = None
+    field_classes = None
+    extra = 3
+    can_order = False
+    can_delete = True
+    can_delete_extra = True
+    min_num = None
+    max_num = None
+    absolute_max = None
+    validate_min = False
+    validate_max = False
+    renderer = None
+    edit_only = False
+
+    @classmethod
+    def _prepare_declarative(cls):
+        if cls.parent_model is None and not hasattr(cls, "fk"):
+            raise ImproperlyConfigured(
+                "Creating an InlineFormSet without the 'parent_model' "
+                "attribute is prohibited; formset %s needs updating." % cls.__name__
+            )
+        _prepare_declarative_model_form(cls, "an InlineFormSet")
+        # Resolve the foreign key when it is not set yet or this class declares
+        # the relation.
+        if cls.parent_model is not None and (
+            not hasattr(cls, "fk")
+            or {"parent_model", "model", "fk_name"} & cls.__dict__.keys()
+        ):
+            cls.fk = _get_foreign_key(cls.parent_model, cls.model, fk_name=cls.fk_name)
+        _prepare_declarative_formset(cls)
 
 
 # Fields #####################################################################

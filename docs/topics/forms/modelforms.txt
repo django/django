@@ -1341,10 +1341,13 @@ similar to how you declare models.
     :ref:`Manually rendered can_delete and can_order
     <manually-rendered-can-delete-and-can-order>`.
 
-Overriding methods on an ``InlineFormSet``
-------------------------------------------
+Overriding methods on an inline formset
+---------------------------------------
 
-When overriding methods on ``InlineFormSet``, you should subclass
+Method 1: Using ``inlineformset_factory``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When overriding methods for use with the factory, you should subclass
 :class:`~models.BaseInlineFormSet` rather than
 :class:`~models.BaseModelFormSet`.
 
@@ -1374,6 +1377,29 @@ Then when you create your inline formset, pass in the optional argument
     ... )
     >>> author = Author.objects.get(name="Mike Royko")
     >>> formset = BookFormSet(instance=author)
+
+Method 2: Using ``InlineFormSet``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 6.2
+
+When using the declarative syntax, override methods directly on your
+``InlineFormSet`` subclass::
+
+    from django.forms import InlineFormSet
+
+
+    class BookFormSet(InlineFormSet):
+        parent_model = Author
+        model = Book
+        fields = ["title"]
+
+        def clean(self):
+            super().clean()
+            # example custom validation across forms in the formset
+            for form in self.forms:
+                # your custom formset validation
+                ...
 
 More than one foreign key to the same model
 -------------------------------------------

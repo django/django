@@ -6,7 +6,7 @@ from decimal import Decimal
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
-from django.forms.formsets import formset_factory
+from django.forms.formsets import DEFAULT_MAX_NUM, formset_factory
 from django.forms.models import (
     BaseInlineFormSet,
     BaseModelFormSet,
@@ -25,6 +25,7 @@ from .models import (
     AlternateBook,
     Author,
     AuthorMeeting,
+    AuthorProxy,
     BetterAuthor,
     Book,
     BookWithCustomPK,
@@ -48,10 +49,15 @@ from .models import (
     Restaurant,
     Revision,
     Team,
+    TeamSponsor,
 )
 
 
 class PoetForm(forms.ModelForm):
+    class Meta:
+        model = Poet
+        fields = "__all__"
+
     def save(self, commit=True):
         # change the name to "Vladimir Mayakovsky" just to be a jerk.
         author = super().save(commit=False)
@@ -80,6 +86,10 @@ class BaseAuthorFormSet(BaseModelFormSet):
 
 
 class PoemFormSave(forms.ModelForm):
+    class Meta:
+        model = Poem
+        fields = "__all__"
+
     def save(self, commit=True):
         # change the name to "Brooklyn Bridge" just to be a jerk.
         poem = super().save(commit=False)
@@ -90,6 +100,10 @@ class PoemFormSave(forms.ModelForm):
 
 
 class PoemFormSave2(forms.ModelForm):
+    class Meta:
+        model = Poem
+        fields = "__all__"
+
     def save(self, commit=True):
         poem = super().save(commit=False)
         poem.name = "%s by %s" % (poem.name, poem.poet.name)
@@ -114,6 +128,14 @@ class SimpleArrayField(forms.CharField):
 
 class BookFormArrayField(forms.ModelForm):
     title = SimpleArrayField()
+
+    class Meta:
+        model = Book
+        fields = ["title"]
+
+
+class BookFormJSONField(forms.ModelForm):
+    title = forms.JSONField()
 
     class Meta:
         model = Book
@@ -1322,9 +1344,8 @@ class ModelFormsetTestMixin:
 
         place = Place.objects.create(name="Giordanos", city="Chicago")
 
-        self.assertEqual(self.location_inlineformset.max_num, 1)
-
         formset = self.location_inlineformset(instance=place)
+        self.assertEqual(formset.max_num, 1)
         self.assertEqual(len(formset.forms), 1)
         self.assertHTMLEqual(
             formset.forms[0].as_p(),
@@ -1591,6 +1612,7 @@ class ModelFormsetTestMixin:
         self.assertEqual(player1.name, "Bobby")
 
     def test_inlineformset_with_arrayfield(self):
+        self.assertEqual(BookFormArrayField.Meta.fields, ["title"])
         data = {
             "book_set-TOTAL_FORMS": "3",
             "book_set-INITIAL_FORMS": "0",
@@ -1601,6 +1623,23 @@ class ModelFormsetTestMixin:
         }
         author = Author.objects.create(name="test")
         formset = self.book_arrayfield_inlineformset(data, instance=author)
+        self.assertEqual(BookFormArrayField.Meta.fields, ["title"])
+        self.assertEqual(
+            formset.errors,
+            [{}, {"__all__": ["Please correct the duplicate values below."]}, {}],
+        )
+
+    def test_inlineformset_with_jsonfield(self):
+        data = {
+            "book_set-TOTAL_FORMS": "3",
+            "book_set-INITIAL_FORMS": "0",
+            "book_set-MAX_NUM_FORMS": "",
+            "book_set-0-title": {"test1": "test2"},
+            "book_set-1-title": {"test1": "test2"},
+            "book_set-2-title": {"test3": "test4"},
+        }
+        author = Author.objects.create(name="test")
+        formset = self.book_jsonfield_inlineformset(data, instance=author)
         self.assertEqual(
             formset.errors,
             [{}, {"__all__": ["Please correct the duplicate values below."]}, {}],
@@ -2034,6 +2073,7 @@ class ModelFormsetTestMixin:
         formset.full_clean()
         self.assertTrue(formset.is_valid())
         self.assertEqual(formset.forms[0].clean().get("name"), "an uppercase name")
+        self.assertEqual(formset.forms[0].instance.name, "an uppercase name")
 
 
 class FactoryModelFormsetTest(TestCase, ModelFormsetTestMixin):
@@ -2163,6 +2203,9 @@ class FactoryModelFormsetTest(TestCase, ModelFormsetTestMixin):
     book_arrayfield_inlineformset = inlineformset_factory(
         Author, Book, form=BookFormArrayField
     )
+    book_jsonfield_inlineformset = inlineformset_factory(
+        Author, Book, form=BookFormJSONField
+    )
     book_inlineformset_extra_0 = inlineformset_factory(
         Author, Book, extra=0, fields="__all__"
     )
@@ -2185,6 +2228,15 @@ class FactoryModelFormsetTest(TestCase, ModelFormsetTestMixin):
         )
         with self.assertRaisesMessage(ImproperlyConfigured, message):
             modelformset_factory(Author)
+
+    def test_modelformset_factory_form_without_meta(self):
+        class NoMetaAuthorForm(forms.ModelForm):
+            pass
+
+        AuthorFormSet = modelformset_factory(
+            Author, form=NoMetaAuthorForm, fields="__all__"
+        )
+        self.assertEqual(sorted(AuthorFormSet.form.base_fields), ["name"])
 
     def test_inline_formsets_with_wrong_fk_name(self):
         """Regression for #23451."""
@@ -2259,8 +2311,10 @@ class FactoryModelFormsetTest(TestCase, ModelFormsetTestMixin):
         """
         Test that inlineformset can not be created without a parent_model.
         """
-        msg = "inlineformset_factory() missing 1 required positional "
-        "argument: 'parent_model'"
+        msg = (
+            "inlineformset_factory() missing 1 required positional "
+            "argument: 'parent_model'"
+        )
         with self.assertRaisesMessage(TypeError, msg):
             inlineformset_factory(model=Poem, form=PoemFormSave)
 
@@ -2268,9 +2322,7 @@ class FactoryModelFormsetTest(TestCase, ModelFormsetTestMixin):
         """
         Test that inlineformset can not be created without a model argument.
         """
-        msg = (
-            "inlineformset_factory() missing 1 required positional " "argument: 'model'"
-        )
+        msg = "inlineformset_factory() missing 1 required positional argument: 'model'"
         with self.assertRaisesMessage(TypeError, msg):
             inlineformset_factory(parent_model=Poet, form=PoemFormSave)
 
@@ -2353,7 +2405,6 @@ class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
 
     class DeclarativePoetFormSetWithForm(ModelFormSet):
         model = Poet
-        fields = "__all__"
         form = PoetForm
 
     class DeclarativePostFormSetPostForm1(ModelFormSet):
@@ -2496,13 +2547,11 @@ class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
         parent_model = Poet
         model = Poem
         form = PoemFormSave
-        fields = "__all__"
 
     class DeclarativePoemFormSave2InlineSet(InlineFormSet):
         parent_model = Poet
         model = Poem
         form = PoemFormSave2
-        fields = "__all__"
 
     class DeclarativeOwnerInlineSetExtra2(InlineFormSet):
         parent_model = Place
@@ -2553,6 +2602,11 @@ class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
         model = Book
         form = BookFormArrayField
 
+    class DeclarativeBookJSONFieldInlineSet(InlineFormSet):
+        parent_model = Author
+        model = Book
+        form = BookFormJSONField
+
     class DeclarativeBookInlineSetExtra0(InlineFormSet):
         parent_model = Author
         model = Book
@@ -2566,15 +2620,10 @@ class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
         fields = "__all__"
         edit_only = True
 
-    class DeclarativeCustomPoemInlineFormSet(InlineFormSet):
+    class DeclarativeCustomPoemInlineFormSet(CustomInlineFormSet, InlineFormSet):
         parent_model = Poet
         model = Poem
         form = PoemFormField
-
-        def clean(self):
-            for comment in self.cleaned_data:
-                comment["name"] = comment["name"].lower()
-            super().clean()
 
     # modelformsets
     author_formset_extra_3 = DeclarativeAuthorFormSetExtra3
@@ -2627,6 +2676,7 @@ class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
     membership_inlineformset = DeclarativeMembershipInlineSet
     player_inlineformset = DeclarativePlayerInlineSet
     book_arrayfield_inlineformset = DeclarativeBookArrayFieldInlineSet
+    book_jsonfield_inlineformset = DeclarativeBookJSONFieldInlineSet
     book_inlineformset_extra_0 = DeclarativeBookInlineSetExtra0
     book_inlineformset_edit_only = DeclarativeBookEditOnlyInlineSet
     poem_custom_inlineformset = DeclarativeCustomPoemInlineFormSet
@@ -2634,8 +2684,9 @@ class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
     def test_modelformset_without_fields(self):
         """Regression for #19733."""
         message = (
-            "Defining DeclarativeInvalidAuthorFormSet without defining "
-            "'fields' or 'exclude' explicitly is prohibited."
+            "Creating a ModelFormSet without either the 'fields' attribute "
+            "or the 'exclude' attribute is prohibited; formset "
+            "DeclarativeInvalidAuthorFormSet needs updating."
         )
         with self.assertRaisesMessage(ImproperlyConfigured, message):
 
@@ -2677,7 +2728,6 @@ class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
             form = MembershipForm
             can_delete = False
             extra = 1
-            fields = "__all__"
 
         data = {
             "membership_set-TOTAL_FORMS": "1",
@@ -2695,8 +2745,11 @@ class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
         """
         Test that modelformset can not be created without a model argument.
         """
-        msg = "ModelFormSet() missing 1 required positional argument: 'model'"
-        with self.assertRaisesMessage(TypeError, msg):
+        msg = (
+            "Creating a ModelFormSet without the 'model' attribute is "
+            "prohibited; formset DeclarativeInvalidFormSet needs updating."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
 
             class DeclarativeInvalidFormSet(ModelFormSet):
                 fields = "__all__"
@@ -2706,8 +2759,11 @@ class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
         Test that modelformset can not be created without a model argument,
         even if you pass a form argument.
         """
-        msg = "ModelFormSet() missing 1 required positional argument: 'model'"
-        with self.assertRaisesMessage(TypeError, msg):
+        msg = (
+            "Creating a ModelFormSet without the 'model' attribute is "
+            "prohibited; formset DeclarativeInvalidFormSet needs updating."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
 
             class DeclarativeInvalidFormSet(ModelFormSet):
                 form = PoetForm
@@ -2717,7 +2773,12 @@ class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
         Test that modelformset can not be created if you pass a model but
         without fields or exclude arguments or a form.
         """
-        with self.assertRaises(ImproperlyConfigured):
+        msg = (
+            "Creating a ModelFormSet without either the 'fields' attribute "
+            "or the 'exclude' attribute is prohibited; formset "
+            "DeclarativeInvalidFormSet needs updating."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
 
             class DeclarativeInvalidFormSet(ModelFormSet):
                 model = Post
@@ -2727,9 +2788,11 @@ class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
         Test that inlineformset can not be created without a parent_model.
         """
         msg = (
-            "InlineFormSet() missing 1 required positional argument: " "'parent_model'"
+            "Creating an InlineFormSet without the 'parent_model' attribute "
+            "is prohibited; formset DeclarativeInvalidInlineFormSet needs "
+            "updating."
         )
-        with self.assertRaisesMessage(TypeError, msg):
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
 
             class DeclarativeInvalidInlineFormSet(InlineFormSet):
                 model = Poem
@@ -2739,12 +2802,586 @@ class DeclarativeModelFormsetTest(TestCase, ModelFormsetTestMixin):
         """
         Test that inlineformset can not be created without a model argument.
         """
-        msg = "InlineFormSet() missing 1 required positional argument: 'model'"
-        with self.assertRaisesMessage(TypeError, msg):
+        msg = (
+            "Creating an InlineFormSet without the 'model' attribute is "
+            "prohibited; formset DeclarativeInvalidInlineFormSet needs "
+            "updating."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
 
             class DeclarativeInvalidInlineFormSet(InlineFormSet):
                 parent_model = Poet
                 form = PoemFormSave
+
+
+class DeclarativeModelFormSetInheritanceTests(TestCase):
+    def test_subclass_inherits_options(self):
+        class BaseAuthorFormSet(ModelFormSet):
+            model = Author
+            fields = "__all__"
+            extra = 4
+
+        class AuthorFormSet(BaseAuthorFormSet):
+            extra = 2
+
+        self.assertIs(AuthorFormSet.model, Author)
+        self.assertEqual(AuthorFormSet.extra, 2)
+        self.assertIs(issubclass(AuthorFormSet, BaseAuthorFormSet), True)
+        self.assertIs(issubclass(AuthorFormSet, ModelFormSet), True)
+        formset = AuthorFormSet(queryset=Author.objects.none())
+        self.assertEqual(len(formset.forms), 2)
+        self.assertEqual(sorted(formset.forms[0].fields), ["id", "name"])
+
+    def test_subclass_overrides_fields(self):
+        class BaseBookFormSet(ModelFormSet):
+            model = Book
+            fields = "__all__"
+
+        class TitleOnlyBookFormSet(BaseBookFormSet):
+            fields = ["title"]
+
+        self.assertEqual(
+            sorted(BaseBookFormSet().forms[0].fields), ["author", "id", "title"]
+        )
+        self.assertEqual(
+            sorted(TitleOnlyBookFormSet().forms[0].fields), ["id", "title"]
+        )
+
+    def test_subclass_inherits_methods(self):
+        class BaseAuthorFormSet(ModelFormSet):
+            model = Author
+            fields = "__all__"
+
+            def get_queryset(self):
+                return super().get_queryset().filter(name__startswith="Charles")
+
+        class AuthorFormSet(BaseAuthorFormSet):
+            extra = 1
+
+        Author.objects.create(name="Charles Baudelaire")
+        Author.objects.create(name="Walt Whitman")
+        formset = AuthorFormSet()
+        self.assertEqual(len(formset.get_queryset()), 1)
+
+    def test_inline_subclass_inherits_options(self):
+        class BaseBookFormSet(InlineFormSet):
+            parent_model = Author
+            model = Book
+            fields = "__all__"
+
+        class BookFormSet(BaseBookFormSet):
+            extra = 1
+            can_delete = False
+
+        self.assertIs(issubclass(BookFormSet, BaseBookFormSet), True)
+        self.assertIs(issubclass(BookFormSet, InlineFormSet), True)
+        self.assertEqual(BookFormSet.fk, BaseBookFormSet.fk)
+        author = Author.objects.create(name="Charles Baudelaire")
+        formset = BookFormSet(instance=author)
+        self.assertEqual(len(formset.forms), 1)
+
+    def test_mixin_preserved(self):
+        class SortedQuerysetMixin:
+            def get_queryset(self):
+                return super().get_queryset().order_by("-name")
+
+        class AuthorFormSet(SortedQuerysetMixin, ModelFormSet):
+            model = Author
+            fields = "__all__"
+
+        self.assertIs(issubclass(AuthorFormSet, SortedQuerysetMixin), True)
+        Author.objects.create(name="Adam")
+        Author.objects.create(name="Zoe")
+        formset = AuthorFormSet()
+        self.assertEqual(formset.get_queryset()[0].name, "Zoe")
+
+    def test_declared_form_used_as_base(self):
+        class AuthorFormBase(forms.ModelForm):
+            class Meta:
+                model = Author
+                fields = "__all__"
+
+        class AuthorFormSet(ModelFormSet):
+            model = Author
+            form = AuthorFormBase
+
+        # A declared form is used as the base for a generated form, exactly as
+        # modelformset_factory does, rather than by identity.
+        self.assertIsNot(AuthorFormSet.form, AuthorFormBase)
+        self.assertIs(issubclass(AuthorFormSet.form, AuthorFormBase), True)
+
+        class BookFormBase(forms.ModelForm):
+            class Meta:
+                model = Book
+                fields = ["title"]
+
+        class BookFormSet(InlineFormSet):
+            parent_model = Author
+            model = Book
+            form = BookFormBase
+
+        # An inline formset likewise wraps the form (like
+        # inlineformset_factory) so the parent foreign key can be added.
+        self.assertIsNot(BookFormSet.form, BookFormBase)
+        self.assertIs(issubclass(BookFormSet.form, BookFormBase), True)
+
+    def test_form_with_options_generates_from_form(self):
+        class AuthorFormBase(forms.ModelForm):
+            class Meta:
+                model = Author
+                fields = "__all__"
+
+        class AuthorFormSet(ModelFormSet):
+            model = Author
+            form = AuthorFormBase
+            fields = ["name"]
+
+        FactoryFormSet = modelformset_factory(
+            Author, form=AuthorFormBase, fields=["name"]
+        )
+        self.assertIs(issubclass(AuthorFormSet.form, AuthorFormBase), True)
+        self.assertEqual(
+            list(AuthorFormSet.form.base_fields),
+            list(FactoryFormSet.form.base_fields),
+        )
+
+    def test_inherited_options_wrap_declared_form(self):
+        class AuthorFormOverride(forms.ModelForm):
+            class Meta:
+                model = Author
+                fields = "__all__"
+
+        class BaseAuthorFormSet(ModelFormSet):
+            model = Author
+            fields = ["name"]
+
+        class AuthorFormSet(BaseAuthorFormSet):
+            form = AuthorFormOverride
+
+        self.assertIs(issubclass(AuthorFormSet.form, AuthorFormOverride), True)
+        self.assertEqual(list(AuthorFormSet.form.base_fields), ["name"])
+
+    def test_form_without_model_or_fields_error(self):
+        # A form without its own model is allowed (it is rebuilt against the
+        # formset's model), but a field source is still required.
+        class ModellessForm(forms.ModelForm):
+            pass
+
+        msg = (
+            "Creating a ModelFormSet without either the 'fields' attribute or "
+            "the 'exclude' attribute is prohibited; formset AuthorFormSet "
+            "needs updating."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+
+            class AuthorFormSet(ModelFormSet):
+                model = Author
+                form = ModellessForm
+
+    def test_modelformset_factory_with_declarative_base(self):
+        class BaseAuthorFormSet(ModelFormSet):
+            model = Author
+            fields = "__all__"
+
+            def get_queryset(self):
+                return super().get_queryset().filter(name__startswith="Charles")
+
+        AuthorFormSet = modelformset_factory(
+            Author, fields="__all__", formset=BaseAuthorFormSet
+        )
+        self.assertIs(issubclass(AuthorFormSet, BaseAuthorFormSet), True)
+        Author.objects.create(name="Charles Baudelaire")
+        Author.objects.create(name="Walt Whitman")
+        self.assertEqual(len(AuthorFormSet().get_queryset()), 1)
+
+    def test_importable_from_django_forms(self):
+        self.assertIs(forms.ModelFormSet, ModelFormSet)
+        self.assertIs(forms.InlineFormSet, InlineFormSet)
+
+    def test_abstract_base(self):
+        class TenantFormSet(ModelFormSet, abstract=True):
+            can_delete = False
+
+        class AuthorFormSet(TenantFormSet):
+            model = Author
+            fields = "__all__"
+
+        self.assertIs(AuthorFormSet.can_delete, False)
+        msg = (
+            "Creating a ModelFormSet without the 'model' attribute is "
+            "prohibited; formset BrokenFormSet needs updating."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+
+            class BrokenFormSet(TenantFormSet):
+                fields = "__all__"
+
+    def test_abstract_inline_base(self):
+        class AuditInline(InlineFormSet, abstract=True):
+            extra = 1
+
+        class BookInline(AuditInline):
+            parent_model = Author
+            model = Book
+            fields = "__all__"
+
+        self.assertEqual(BookInline.extra, 1)
+        self.assertEqual(BookInline.fk.name, "author")
+
+    def test_modelformset_factory_with_modelformset_base(self):
+        AuthorFormSet = modelformset_factory(
+            Author, fields="__all__", formset=ModelFormSet
+        )
+        self.assertIs(issubclass(AuthorFormSet, ModelFormSet), True)
+        self.assertIs(AuthorFormSet.model, Author)
+        formset = AuthorFormSet(queryset=Author.objects.none())
+        self.assertEqual(len(formset.forms), 1)
+
+    def test_inlineformset_factory_with_inlineformset_base(self):
+        BookFormSet = inlineformset_factory(
+            Author, Book, fields="__all__", formset=InlineFormSet
+        )
+        self.assertIs(issubclass(BookFormSet, InlineFormSet), True)
+        self.assertEqual(BookFormSet.fk.name, "author")
+
+    def test_factory_fk_name_overrides_declarative_base(self):
+        class SponsorInline(InlineFormSet):
+            parent_model = Team
+            model = TeamSponsor
+            fk_name = "primary_team"
+            fields = "__all__"
+
+        # The declarative base's fk is unique, capping max_num.
+        self.assertEqual(SponsorInline.fk.name, "primary_team")
+        self.assertEqual(SponsorInline().max_num, 1)
+
+        BackupSponsorFormSet = inlineformset_factory(
+            Team,
+            TeamSponsor,
+            formset=SponsorInline,
+            fk_name="backup_team",
+            fields="__all__",
+        )
+        self.assertEqual(BackupSponsorFormSet.fk.name, "backup_team")
+        self.assertEqual(BackupSponsorFormSet.max_num, 1000)
+
+        class SubFormSet(BackupSponsorFormSet):
+            pass
+
+        self.assertEqual(SubFormSet.fk.name, "backup_team")
+        self.assertEqual(SubFormSet.max_num, 1000)
+
+    def test_unique_fk_subclass_keeps_absolute_max(self):
+        class OwnerProfileInline(InlineFormSet):
+            parent_model = Owner
+            model = OwnerProfile
+            fields = "__all__"
+            absolute_max = 3
+
+        class SubInline(OwnerProfileInline):
+            pass
+
+        self.assertEqual(OwnerProfileInline.absolute_max, 3)
+        self.assertEqual(SubInline.absolute_max, 3)
+
+    def test_unique_fk_max_num_not_bypassable(self):
+        class OwnerProfileInline(InlineFormSet):
+            parent_model = Owner
+            model = OwnerProfile
+            fields = "__all__"
+
+        self.assertEqual(OwnerProfileInline().max_num, 1)
+
+        # A subclass can't lift the unique-fk cap by declaring max_num.
+        class SubInline(OwnerProfileInline):
+            max_num = 5
+
+        self.assertEqual(SubInline().max_num, 1)
+
+    def test_relation_restate_keeps_inherited_max_num(self):
+        class BaseBookInline(InlineFormSet):
+            parent_model = Author
+            model = Book
+            fields = ["title"]
+            max_num = 5
+
+        # Restating the same relation must not discard the inherited max_num.
+        class BookInline(BaseBookInline):
+            model = Book
+            fields = ["title"]
+
+        self.assertEqual(BookInline().max_num, 5)
+
+    def test_relation_repoint_recomputes_caps(self):
+        class PrimaryInline(InlineFormSet):
+            parent_model = Team
+            model = TeamSponsor
+            fk_name = "primary_team"  # unique
+            fields = "__all__"
+
+        primary = PrimaryInline()
+        self.assertEqual(primary.max_num, 1)
+        self.assertEqual(primary.absolute_max, 1 + DEFAULT_MAX_NUM)
+
+        # Re-pointing to a non-unique fk drops the unique cap and recomputes
+        # absolute_max from the effective max_num.
+        class BackupInline(PrimaryInline):
+            fk_name = "backup_team"
+
+        backup = BackupInline()
+        self.assertEqual(backup.max_num, DEFAULT_MAX_NUM)
+        self.assertEqual(backup.absolute_max, 2 * DEFAULT_MAX_NUM)
+
+    def test_form_reset_with_fields_none(self):
+        class TitleOnlyBookForm(forms.ModelForm):
+            class Meta:
+                model = Book
+                fields = ["title"]
+
+        class BaseBookFormSet(ModelFormSet):
+            model = Book
+            fields = ["author", "title"]
+
+        # Resetting the inherited fields rebuilds from the declared form rather
+        # than the base's generated one, so only the declared form's fields
+        # remain.
+        class BookFormSet(BaseBookFormSet):
+            form = TitleOnlyBookForm
+            fields = None
+
+        self.assertIs(issubclass(BookFormSet.form, TitleOnlyBookForm), True)
+        self.assertEqual(list(BookFormSet.form.base_fields), ["title"])
+
+    def test_generated_form_mro_stays_flat(self):
+        class BaseAuthorFormSet(ModelFormSet):
+            model = Author
+            fields = "__all__"
+
+        class MidAuthorFormSet(BaseAuthorFormSet):
+            widgets = {"name": forms.Textarea()}
+
+        class LeafAuthorFormSet(MidAuthorFormSet):
+            labels = {"name": "Full name"}
+
+        # Each generation rebuilds from ModelForm, so the form MRO doesn't
+        # accumulate a layer per subclass.
+        base = BaseAuthorFormSet.form.__mro__
+        leaf = LeafAuthorFormSet.form.__mro__
+        self.assertEqual(len(leaf), len(base))
+
+    def test_relation_repoint_forms_independent(self):
+        class BackupInline(InlineFormSet):
+            parent_model = Team
+            model = TeamSponsor
+            fk_name = "backup_team"
+            fields = ["name"]
+
+        class PrimaryInline(BackupInline):
+            fk_name = "primary_team"
+
+        BackupInline()
+        PrimaryInline()
+        # Re-pointing the relation gives each formset its own form, so the fk
+        # added to one does not leak into the other's fields.
+        self.assertIsNot(BackupInline.form, PrimaryInline.form)
+        self.assertNotIn("primary_team", BackupInline.form._meta.fields)
+        self.assertNotIn("backup_team", PrimaryInline.form._meta.fields)
+
+    def test_inline_direct_form_not_mutated(self):
+        class SponsorForm(forms.ModelForm):
+            class Meta:
+                model = TeamSponsor
+                fields = ["name"]
+
+        class SponsorInline(InlineFormSet):
+            parent_model = Team
+            model = TeamSponsor
+            fk_name = "primary_team"
+            form = SponsorForm
+
+        SponsorInline()  # instantiate to trigger any fk-field mutation
+        # The user's form class is left untouched. The fk was added to a
+        # formset-owned wrapper instead.
+        self.assertEqual(SponsorForm._meta.fields, ["name"])
+        self.assertIsNot(SponsorInline.form, SponsorForm)
+
+    def test_abstract_base_with_generated_form(self):
+        class AuditAuthorFormSet(ModelFormSet, abstract=True):
+            model = Author
+            fields = ["name"]
+
+        # A concrete subclass that changes nothing form-affecting still builds
+        # a form from the abstract base's declared model/fields.
+        class AuthorFormSet(AuditAuthorFormSet):
+            extra = 2
+
+        self.assertEqual(sorted(AuthorFormSet.form.base_fields), ["name"])
+
+    def test_option_without_fields_error(self):
+        msg = (
+            "Creating a ModelFormSet without either the 'fields' attribute "
+            "or the 'exclude' attribute is prohibited; formset AuthorFormSet "
+            "needs updating."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+
+            class AuthorFormSet(ModelFormSet):
+                model = Author
+                widgets = {"name": forms.Textarea()}
+
+    def test_form_for_parent_model_rebound_to_child(self):
+        # A form for a parent model may be given on a child-model formset
+        # (multi-table inheritance). It is rebuilt from the parent form and
+        # bound to the child model, exactly as modelformset_factory does.
+        class AuthorForm(forms.ModelForm):
+            class Meta:
+                model = Author
+                fields = "__all__"
+
+        class BetterAuthorFormSet(ModelFormSet):
+            model = BetterAuthor
+            form = AuthorForm
+
+        factory_form = modelformset_factory(BetterAuthor, form=AuthorForm).form
+        self.assertIsNot(BetterAuthorFormSet.form, AuthorForm)
+        self.assertIs(issubclass(BetterAuthorFormSet.form, AuthorForm), True)
+        self.assertIs(BetterAuthorFormSet.form._meta.model, BetterAuthor)
+        self.assertEqual(
+            list(BetterAuthorFormSet.form.base_fields),
+            list(factory_form.base_fields),
+        )
+
+    def test_error_messages_apply_to_generated_form(self):
+        class AuthorFormSet(ModelFormSet):
+            model = Author
+            fields = ["name"]
+            error_messages = {"name": {"required": "Name required!"}}
+
+        self.assertEqual(
+            AuthorFormSet.form.base_fields["name"].error_messages["required"],
+            "Name required!",
+        )
+
+    def test_default_error_messages_override_formset_messages(self):
+        class AuthorFormSet(ModelFormSet):
+            model = Author
+            fields = ["name"]
+            default_error_messages = {"too_few_forms": "Need more authors."}
+
+        self.assertEqual(
+            AuthorFormSet().error_messages["too_few_forms"], "Need more authors."
+        )
+
+    def test_form_for_unrelated_model_rebuilt(self):
+        # A form for an unrelated model is not validated. It is rebuilt against
+        # the formset's model, exactly as modelformset_factory does.
+        class AuthorForm(forms.ModelForm):
+            class Meta:
+                model = Author
+                fields = "__all__"
+
+        class BookFormSet(ModelFormSet):
+            model = Book
+            form = AuthorForm
+            fields = ["title"]
+
+        factory_form = modelformset_factory(
+            Book, form=AuthorForm, fields=["title"]
+        ).form
+        self.assertIs(BookFormSet.form._meta.model, Book)
+        self.assertEqual(
+            list(BookFormSet.form.base_fields), list(factory_form.base_fields)
+        )
+
+    def test_form_without_model_used_as_mixin(self):
+        # A ModelForm without its own model contributes its declared fields and
+        # behavior while the formset's model is supplied on rebuild.
+        class NoteMixin(forms.ModelForm):
+            note = forms.CharField(required=False)
+
+        class AuthorFormSet(ModelFormSet):
+            model = Author
+            form = NoteMixin
+            fields = ["name"]
+
+        self.assertIs(AuthorFormSet.form._meta.model, Author)
+        self.assertEqual(list(AuthorFormSet.form.base_fields), ["name", "note"])
+
+    def test_proxy_model_form_rebound_to_proxy(self):
+        # A form for a concrete model given on a proxy-model formset is rebuilt
+        # and bound to the proxy, matching modelformset_factory.
+        class AuthorForm(forms.ModelForm):
+            class Meta:
+                model = Author
+                fields = "__all__"
+
+        class AuthorProxyFormSet(ModelFormSet):
+            model = AuthorProxy
+            form = AuthorForm
+
+        self.assertIsNot(AuthorProxyFormSet.form, AuthorForm)
+        self.assertIs(AuthorProxyFormSet.form._meta.model, AuthorProxy)
+
+    def test_form_declared_on_abstract_base_inherited(self):
+        # A form declared on an abstract base is inherited by concrete
+        # subclasses, like the generation options.
+        class CustomAuthorForm(forms.ModelForm):
+            class Meta:
+                model = Author
+                fields = ["name"]
+
+        class BaseAuthorFormSet(ModelFormSet, abstract=True):
+            model = Author
+            form = CustomAuthorForm
+
+        class AuthorFormSet(BaseAuthorFormSet):
+            extra = 3
+
+        self.assertIs(issubclass(AuthorFormSet.form, CustomAuthorForm), True)
+
+    def test_form_none_resets_to_generated_form(self):
+        # An explicit form = None drops an inherited form, reverting to a
+        # generated ModelForm, like fields = None resets the options.
+        class CustomBookForm(forms.ModelForm):
+            class Meta:
+                model = Book
+                fields = ["title"]
+
+        class BaseBookFormSet(ModelFormSet):
+            model = Book
+            form = CustomBookForm
+
+        class PlainBookFormSet(BaseBookFormSet):
+            form = None
+            fields = ["title"]
+
+        self.assertIs(issubclass(BaseBookFormSet.form, CustomBookForm), True)
+        self.assertIs(issubclass(PlainBookFormSet.form, CustomBookForm), False)
+        self.assertEqual(list(PlainBookFormSet.form.base_fields), ["title"])
+
+    def test_formfield_callback_errors_propagate(self):
+        def broken_callback(model_field, **kwargs):
+            raise ImproperlyConfigured("broken callback")
+
+        with self.assertRaisesMessage(ImproperlyConfigured, "broken callback"):
+
+            class AuthorFormSet(ModelFormSet):
+                model = Author
+                fields = "__all__"
+                formfield_callback = broken_callback
+
+    def test_mixin_options_apply(self):
+        class TitleOnlyMixin:
+            fields = ["title"]
+
+        class BaseBookFormSet(ModelFormSet):
+            model = Book
+            fields = "__all__"
+
+        class BookFormSet(TitleOnlyMixin, BaseBookFormSet):
+            pass
+
+        self.assertEqual(list(BookFormSet.form.base_fields), ["title"])
 
 
 class TestModelFormsetOverridesTroughFormMeta(TestCase):

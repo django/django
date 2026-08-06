@@ -66,26 +66,32 @@ Declarative ``FormSet``
     declarative syntax.
 
     You can define any argument that the ``formset_factory`` function
-    accepts as a class attribute.
+    accepts as a class attribute, except for ``formset``: to customize the
+    base formset class, inherit from it instead.
 
-    Example of a declarative formset:
+    Example of a declarative formset::
 
-    .. code-block:: pycon
+        from django.forms import FormSet
 
-        >>> from django.forms import formsets
-        >>> from myapp.forms import MyForm
+        from myapp.forms import MyForm
 
-        >>> class MyFormSet(formsets.FormSet):
-        ...     form = MyForm
-        ...     extra = 2
-        ...     can_order = True
-        ...     can_delete = True
-        ...     max_num = 10
-        ...     validate_max = True
-        ...     min_num = 3
-        ...     validate_min = True
-        ...     absolute_max = 15
-        ...     can_delete_extra = False
-        ...     renderer = None
-        ...
+
+        class MyFormSet(FormSet):
+            form = MyForm
+            extra = 2
+            can_order = True
+            can_delete = True
+            max_num = 10
+            validate_max = True
+            min_num = 3
+            validate_min = True
+            absolute_max = 15
+            can_delete_extra = False
+
+    A base class intended only for subclassing can skip the required ``form``
+    attribute by declaring itself abstract. The marker isn't inherited, so
+    concrete subclasses are still validated::
+
+        class BaseArticleFormSet(FormSet, abstract=True):
+            extra = 2
 

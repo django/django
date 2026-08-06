@@ -2,7 +2,7 @@ import datetime
 from collections import Counter
 from unittest import mock
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.forms import (
     BaseForm,
     CharField,
@@ -2045,9 +2045,8 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         for formset_class, delete_html in tests:
             with self.subTest(formset_class=formset_class.__name__):
 
-                class DeclarativeArticleFormSet(FormSet):
+                class DeclarativeArticleFormSet(formset_class, FormSet):
                     form = ArticleForm
-                    formset = formset_class
                     can_delete = True
 
                 formset = DeclarativeArticleFormSet(auto_id=False)
@@ -2071,9 +2070,8 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
         for formset_class, order_html in tests:
             with self.subTest(formset_class=formset_class.__name__):
 
-                class DeclarativeArticleCanOrderFormSet(FormSet):
+                class DeclarativeArticleCanOrderFormSet(formset_class, FormSet):
                     form = ArticleForm
-                    formset = formset_class
                     can_order = True
 
                 formset = DeclarativeArticleCanOrderFormSet(auto_id=False)
@@ -2175,16 +2173,197 @@ class DeclarativeFormsetTestCase(SimpleTestCase, FormsetTestMixin):
             formsets.DEFAULT_MAX_NUM = _old_DEFAULT_MAX_NUM
 
     def test_no_form_argument_error(self):
-        with self.assertRaisesMessage(
-            TypeError, "FormSet() missing 1 required positional argument: 'form'."
-        ):
+        msg = (
+            "Creating a FormSet without the 'form' attribute is prohibited; "
+            "formset DeclarativeInvalid needs updating."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
 
             class DeclarativeInvalid(FormSet):
                 extra = 1
 
+    def test_form_none_error(self):
+        msg = (
+            "Creating a FormSet without the 'form' attribute is prohibited; "
+            "formset DeclarativeInvalid needs updating."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+
+            class DeclarativeInvalid(FormSet):
+                form = None
+
+    def test_formset_attribute_error(self):
+        msg = (
+            "Formset DeclarativeInvalid must inherit from BaseFormSet "
+            "instead of setting 'formset'."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+
+            class DeclarativeInvalid(FormSet):
+                form = Choice
+                formset = BaseFormSet
+
+
+class DeclarativeFormSetInheritanceTests(SimpleTestCase):
+    empty_data = {
+        "form-TOTAL_FORMS": "0",
+        "form-INITIAL_FORMS": "0",
+        "form-MIN_NUM_FORMS": "0",
+        "form-MAX_NUM_FORMS": "0",
+    }
+
+    def test_subclass_inherits_options(self):
+        class BaseChoiceFormSet(FormSet):
+            form = Choice
+            extra = 5
+            can_order = True
+
+        class ChoiceFormSet(BaseChoiceFormSet):
+            can_delete = True
+
+        self.assertIs(ChoiceFormSet.form, Choice)
+        self.assertEqual(ChoiceFormSet.extra, 5)
+        self.assertIs(ChoiceFormSet.can_order, True)
+        self.assertIs(ChoiceFormSet.can_delete, True)
+        self.assertEqual(len(ChoiceFormSet().forms), 5)
+
+    def test_subclass_overrides_options(self):
+        class BaseChoiceFormSet(FormSet):
+            form = Choice
+            extra = 5
+
+        class ChoiceFormSet(BaseChoiceFormSet):
+            extra = 2
+
+        self.assertEqual(ChoiceFormSet.extra, 2)
+        self.assertIs(ChoiceFormSet.form, Choice)
+        self.assertEqual(len(ChoiceFormSet().forms), 2)
+
+    def test_subclass_inherits_methods(self):
+        class BaseChoiceFormSet(FormSet):
+            form = Choice
+
+            def clean(self):
+                raise ValidationError("base clean ran")
+
+        class ChoiceFormSet(BaseChoiceFormSet):
+            extra = 1
+
+        formset = ChoiceFormSet(self.empty_data)
+        self.assertIs(formset.is_valid(), False)
+        self.assertEqual(formset.non_form_errors(), ["base clean ran"])
+
+    def test_mixin_preserved(self):
+        class CleanMixin:
+            def clean(self):
+                raise ValidationError("mixin clean ran")
+
+        class ChoiceFormSet(CleanMixin, FormSet):
+            form = Choice
+
+        self.assertIs(issubclass(ChoiceFormSet, CleanMixin), True)
+        formset = ChoiceFormSet(self.empty_data)
+        self.assertIs(formset.is_valid(), False)
+        self.assertEqual(formset.non_form_errors(), ["mixin clean ran"])
+
+    def test_issubclass_and_isinstance(self):
+        class ChoiceFormSet(FormSet):
+            form = Choice
+
+        self.assertIs(issubclass(ChoiceFormSet, FormSet), True)
+        self.assertIs(issubclass(ChoiceFormSet, BaseFormSet), True)
+        self.assertIsInstance(ChoiceFormSet(), FormSet)
+
+    def test_formset_factory_with_declarative_base(self):
+        class DeclarativeBase(FormSet):
+            form = Choice
+
+            def clean(self):
+                raise ValidationError("declarative clean ran")
+
+        ChoiceFormSet = formset_factory(Choice, formset=DeclarativeBase, extra=2)
+        self.assertIs(issubclass(ChoiceFormSet, DeclarativeBase), True)
+        self.assertEqual(ChoiceFormSet.extra, 2)
+        formset = ChoiceFormSet(self.empty_data)
+        self.assertIs(formset.is_valid(), False)
+        self.assertEqual(formset.non_form_errors(), ["declarative clean ran"])
+
+    def test_absolute_max_none(self):
+        class ChoiceFormSet(FormSet):
+            form = Choice
+            absolute_max = None
+
+        self.assertEqual(ChoiceFormSet().absolute_max, 2000)
+
+    def test_min_num_max_num_none(self):
+        class ChoiceFormSet(FormSet):
+            form = Choice
+            min_num = None
+            max_num = None
+
+        formset = ChoiceFormSet()
+        self.assertEqual(formset.min_num, 0)
+        self.assertEqual(formset.max_num, 1000)
+        self.assertEqual(formset.absolute_max, 2000)
+
+    def test_absolute_max_follows_max_num_override(self):
+        class BaseChoiceFormSet(FormSet):
+            form = Choice
+            max_num = 5
+
+        class ChoiceFormSet(BaseChoiceFormSet):
+            max_num = 1500
+
+        self.assertEqual(ChoiceFormSet().absolute_max, 2500)
+
+    def test_absolute_max_inherited_explicit(self):
+        class BaseChoiceFormSet(FormSet):
+            form = Choice
+            max_num = 5
+            absolute_max = 1500
+
+        class ChoiceFormSet(BaseChoiceFormSet):
+            max_num = 1400
+
+        self.assertEqual(ChoiceFormSet.absolute_max, 1500)
+        self.assertEqual(ChoiceFormSet().absolute_max, 1500)
+        msg = "'absolute_max' must be greater or equal to 'max_num'."
+        with self.assertRaisesMessage(ValueError, msg):
+
+            class OverCapFormSet(BaseChoiceFormSet):
+                max_num = 2000
+
+    def test_abstract_base(self):
+        class RendererFormSet(FormSet, abstract=True):
+            extra = 7
+
+        class ChoiceFormSet(RendererFormSet):
+            form = Choice
+
+        self.assertEqual(ChoiceFormSet.extra, 7)
+        self.assertIs(ChoiceFormSet.form, Choice)
+        msg = (
+            "Creating a FormSet without the 'form' attribute is prohibited; "
+            "formset BrokenFormSet needs updating."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+
+            class BrokenFormSet(RendererFormSet):
+                extra = 2
+
+    def test_importable_from_django_forms(self):
+        import django.forms
+
+        self.assertIs(django.forms.FormSet, FormSet)
+
 
 @jinja2_tests
-class Jinja2FormsFormsetTestCase(FactoryFormsetTestCase, DeclarativeFormsetTestCase):
+class Jinja2FactoryFormsetTestCase(FactoryFormsetTestCase):
+    pass
+
+
+@jinja2_tests
+class Jinja2DeclarativeFormsetTestCase(DeclarativeFormsetTestCase):
     pass
 
 
