@@ -978,10 +978,10 @@ Uses IPv6 for the development server. This changes the default IP address from
 By default, a warning is printed to the console that ``runserver`` is not
 suitable for production:
 
-.. code-block:: text
+.. parsed-literal::
 
     WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
-    For more information on production servers see: https://docs.djangoproject.com/en/|version|/howto/deployment/
+    For more information on production servers see: :djlink:`howto/deployment/`
 
 Set this environment variable to ``"true"`` to hide this warning.
 
