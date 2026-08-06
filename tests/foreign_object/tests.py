@@ -5,7 +5,7 @@ from operator import attrgetter
 
 from django.core.exceptions import FieldError, ValidationError
 from django.db import connection, models
-from django.db.models import FETCH_PEERS
+from django.db.models import FETCH_PEERS, F
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext, isolate_apps
 from django.utils import translation
@@ -60,6 +60,17 @@ class MultiColumnFKTests(TestCase):
 
         person = membership.person
         self.assertEqual((person.id, person.name), (self.bob.id, "Bob"))
+
+    def test_assign_expression(self):
+        # Expressions can't decompose into multiple columns, so they can't be
+        # assigned to multi-column relations.
+        membership = Membership()
+        msg = (
+            'Cannot assign expression "F(group_id)": "Membership.person" is a '
+            "multi-column relation."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            membership.person = F("group_id")
 
     def test_get_fails_on_multicolumn_mismatch(self):
         # Membership objects returns DoesNotExist error when there is no
