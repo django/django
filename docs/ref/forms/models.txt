@@ -223,6 +223,11 @@ Model form factory functions
     more information. Omitting any definition of the fields to use will result
     in an :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
 
+Creating model formsets
+=======================
+
+Django provides two ways to define model formsets:
+
 ``modelformset_factory``
 ------------------------
 
@@ -246,6 +251,59 @@ Model form factory functions
 
     See :ref:`model-formsets` for example usage.
 
+Declarative ``ModelFormSet``
+----------------------------
+
+.. class:: ModelFormSet
+
+    .. versionadded:: 6.2
+
+    A :class:`BaseModelFormSet` subclass that allows defining model formsets
+    using declarative syntax.
+
+    You can define any argument that the ``modelformset_factory`` function
+    accepts as a class attribute.
+
+    For example, to create ``AuthorFormSet`` for the ``Author`` model:
+
+    .. code-block:: pycon
+
+        >>> from django.forms import models
+        >>> from myapp.models import Author
+
+        >>> class AuthorFormSet(models.ModelFormSet):
+        ...     model = Author
+        ...     fields = ["name", "title"]
+        ...     extra = 2
+        ...     can_order = True
+        ...     can_delete = True
+        ...     max_num = 10
+        ...     validate_max = True
+        ...     min_num = 3
+        ...     validate_min = True
+        ...     absolute_max = 15
+        ...     can_delete_extra = False
+        ...
+
+    You can also omit fields when the form class provides them:
+
+    .. code-block:: pycon
+
+        >>> from django.forms import models
+        >>> from myapp.forms import PostForm
+        >>> from myapp.models import Post
+
+        >>> class PostFormSet(models.ModelFormSet):
+        ...     model = Post
+        ...     form = PostForm
+        ...     extra = 2
+        ...
+
+Creating inline formsets
+========================
+
+Django provides two ways to create inline formsets:
+
 ``inlineformset_factory``
 -------------------------
 
@@ -259,3 +317,31 @@ Model form factory functions
     the ``parent_model``, you must specify a ``fk_name``.
 
     See :ref:`inline-formsets` for example usage.
+
+Declarative ``InlineFormSet``
+-----------------------------
+
+.. class:: InlineFormSet
+
+    .. versionadded:: 6.2
+
+    A :class:`BaseInlineFormSet` subclass that allows defining inline
+    formsets using declarative syntax.
+
+    You can define any argument that the ``inlineformset_factory`` function
+    accepts as a class attribute.
+
+    For example, to create ``BookFormSet`` for the ``Book`` model with
+    ``Author`` as the parent model:
+
+    .. code-block:: pycon
+
+        >>> from django.forms import models
+        >>> from myapp.models import Author, Book
+
+        >>> class BookFormSet(models.InlineFormSet):
+        ...     parent_model = Author
+        ...     model = Book
+        ...     extra = 1
+        ...     fields = "__all__"
+        ...
