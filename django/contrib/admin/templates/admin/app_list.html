@@ -3,10 +3,12 @@
 {% if app_list %}
   {% for app in app_list %}
     <div class="app-{{ app.app_label }} module{% if app.app_url in request.path|urlencode %} current-app{% endif %}">
-      <ul>
-        <h2>
-          <a href="{{ app.app_url }}" class="section">{{ app.name }}</a>
-        </h2>
+      <table>
+        <caption>
+          <h2>
+           <a href="{{ app.app_url }}" class="section">{{ app.name }}</a>
+          </h2>
+        </caption>
         <thead class="visually-hidden">
           <tr>
             <th scope="col">{% translate 'Model name' %}</th>
@@ -43,7 +45,7 @@
             </tr>
           {% endwith %}
         {% endfor %}
-      </ul>
+          </table>
     </div>
   {% endfor %}
 {% else %}
