@@ -7,10 +7,26 @@ from .base import Operation, OperationCategory
 
 
 class FieldOperation(Operation):
+    # Operations that accept a one-off default set this to False.
+    preserve_default = True
+
     def __init__(self, model_name, name, field=None):
         self.model_name = model_name
         self.name = name
         self.field = field
+
+    @property
+    def state_field(self):
+        """
+        The field as it appears in the model state. A default that isn't
+        preserved only exists for the duration of the migration, so it is not
+        part of the state.
+        """
+        if self.preserve_default:
+            return self.field
+        field = self.field.clone()
+        field.default = NOT_PROVIDED
+        return field
 
     @cached_property
     def model_name_lower(self):
@@ -146,6 +162,7 @@ class AddField(FieldOperation):
                         self,
                         name=operation.name,
                         field=operation.field,
+                        preserve_default=operation.preserve_default,
                     ),
                 ]
             elif isinstance(operation, RemoveField):
