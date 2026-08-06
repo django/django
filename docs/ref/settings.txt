@@ -58,8 +58,11 @@ Each item in the list should be an email address string. Example::
 
 To safely build an address with a display name from variable content, see
 :ref:`formatting-addresses`, which recommends using
-:class:`~email.headerregistry.Address` over string formatting, but since this
-setting requires a list of strings, wrap each ``Address`` in ``str(...)``.
+:class:`~email.headerregistry.Address` over string formatting.
+
+.. versionchanged:: 6.0
+
+    Support for :class:`email.headerregistry.Address` objects was added.
 
 .. setting:: ALLOWED_HOSTS
 
@@ -1359,6 +1362,10 @@ This doesn't affect error messages sent to :setting:`ADMINS` and
 To build an address with a display name from variable content, see
 :ref:`formatting-addresses`.
 
+.. versionchanged:: 6.0
+
+    Support for :class:`email.headerregistry.Address` objects was added.
+
 .. setting:: DEFAULT_INDEX_TABLESPACE
 
 ``DEFAULT_INDEX_TABLESPACE``
@@ -2246,6 +2253,10 @@ A list in the same format as :setting:`ADMINS` that specifies who should get
 broken link notifications when
 :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` is enabled.
 
+.. versionchanged:: 6.0
+
+    Support for :class:`email.headerregistry.Address` objects was added.
+
 .. setting:: MEDIA_ROOT
 
 ``MEDIA_ROOT``
@@ -2813,6 +2824,10 @@ To build an address with a display name from variable content, see
     This address is used only for error messages. It is *not* the address that
     regular email messages sent with :func:`~django.core.mail.send_mail`
     come from; for that, see :setting:`DEFAULT_FROM_EMAIL`.
+
+.. versionchanged:: 6.0
+
+    Support for :class:`email.headerregistry.Address` objects was added.
 
 .. setting:: SHORT_DATE_FORMAT
 
