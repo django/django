@@ -8,15 +8,15 @@
           <a href="{{ app.app_url }}" class="section">{{ app.name }}</a>
         </h2>
         <thead class="visually-hidden">
-          <li>
+          <tr>
             <th scope="col">{% translate 'Model name' %}</th>
             <th scope="col">{% translate 'Add link' %}</th>
             <th scope="col">{% translate 'Change or view list link' %}</th>
-          </li>
+          </tr>
         </thead>
         {% for model in app.models %}
           {% with model_name=model.object_name|lower %}
-            <li class="model-{{ model_name }}{% if model.admin_url in request.path|urlencode %} current-model{% endif %}">
+            <tr class="model-{{ model_name }}{% if model.admin_url in request.path|urlencode %} current-model{% endif %}">
               <th scope="row" id="{{ app.app_label }}-{{ model_name }}">
                 {% if model.admin_url %}
                   <a href="{{ model.admin_url }}"{% if model.admin_url in request.path|urlencode %} aria-current="page"{% endif %}>{{ model.name }}</a>
@@ -40,7 +40,7 @@
               {% elif show_changelinks %}
                 <td></td>
               {% endif %}
-            </li>
+            </tr>
           {% endwith %}
         {% endfor %}
       </ul>
