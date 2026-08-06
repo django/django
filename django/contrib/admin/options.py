@@ -189,6 +189,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
     prepopulated_fields = {}
     formfield_overrides = {}
     readonly_fields = ()
+    readonly_formfield_overrides = {}
     ordering = None
     sortable_by = None
     view_on_site = True

@@ -1208,6 +1208,40 @@ subclass::
                     ((line,) for line in instance.get_full_address()),
                 ) or mark_safe("<span class='errors'>I can't determine this address.</span>")
 
+.. attribute:: ModelAdmin.readonly_formfield_overrides
+
+    .. versionadded:: 6.2
+
+    A dictionary mapping field names to widgets used when the field is
+    displayed as read-only, either because the field is listed in
+    :attr:`ModelAdmin.readonly_fields` or because the user doesn't have
+    change permission. For example, given a model with a
+    :class:`~django.db.models.JSONField` named ``data``, this renders its
+    value in a ``<pre>`` tag instead of as a plain string::
+
+        from django.contrib import admin
+        from django.forms import Widget
+        from django.utils.html import format_html
+
+
+        class PrettyJSONWidget(Widget):
+            def render(self, name, value, attrs=None, renderer=None):
+                return format_html("<pre>{}</pre>", value)
+
+
+        class DogAdmin(admin.ModelAdmin):
+            readonly_formfield_overrides = {"data": PrettyJSONWidget}
+
+    Without an entry in this dictionary, read-only values render as text, as
+    described in :attr:`ModelAdmin.readonly_fields`.
+
+    The widget's ``render()`` method is called with the field name and the
+    field's value, with no bound form field. Values submitted for read-only
+    fields are ignored, so the widget only controls presentation. The widget
+    is rendered without access to the request or the current user, so it
+    must not embed links or buttons that trigger actions the user may not
+    have permission for.
+
 .. attribute:: ModelAdmin.save_as
 
     Set ``save_as`` to enable a "save as new" feature on admin change forms.

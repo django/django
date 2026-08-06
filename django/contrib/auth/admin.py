@@ -1,3 +1,4 @@
+from django import forms
 from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin.options import IS_POPUP_VAR
@@ -9,6 +10,7 @@ from django.contrib.auth.forms import (
     UserChangeForm,
 )
 from django.contrib.auth.models import Group, User
+from django.contrib.auth.templatetags.auth import render_password_as_hash
 from django.core.exceptions import PermissionDenied
 from django.db import router, transaction
 from django.http import Http404, HttpResponseRedirect
@@ -37,10 +39,22 @@ class GroupAdmin(admin.ModelAdmin):
         return super().formfield_for_manytomany(db_field, request=request, **kwargs)
 
 
+class _PasswordHashDisplayWidget(forms.Widget):
+    """
+    Display-only rendering of a password hash summary for read-only admin
+    fields. Unlike ReadOnlyPasswordHashWidget, it renders no password
+    reset/set button, so it is safe for users without change permission.
+    """
+
+    def render(self, name, value, attrs=None, renderer=None):
+        return render_password_as_hash(value)
+
+
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     add_form_template = "admin/auth/user/add_form.html"
     change_user_password_template = None
+    readonly_formfield_overrides = {"password": _PasswordHashDisplayWidget}
     fieldsets = (
         (None, {"fields": ("username", "password")}),
         (_("Personal info"), {"fields": ("first_name", "last_name", "email")}),

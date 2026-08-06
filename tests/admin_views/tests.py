@@ -8009,6 +8009,113 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
+class ReadonlyFormfieldOverridesTest(TestCase):
+    """
+    ModelAdmin.readonly_formfield_overrides customizes the rendering of
+    read-only field values (#30577).
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.superuser = User.objects.create_superuser(
+            username="super", password="secret", email="super@example.com"
+        )
+        cls.viewuser = User.objects.create_user(
+            username="viewuser", password="secret", is_staff=True
+        )
+        cls.viewuser.user_permissions.add(get_perm(Post, "view_post"))
+        cls.post = Post.objects.create(
+            title="Overridden title",
+            content="Overridden content",
+            readonly_content="Readonly content",
+        )
+        cls.url = reverse(
+            "namespaced_admin:admin_views_post_change", args=(cls.post.pk,)
+        )
+
+    def test_override_applies_to_view_only_user(self):
+        """
+        For a user without change permission, every field renders read-only
+        and overridden fields use the configured widget.
+        """
+        self.client.force_login(self.viewuser)
+        response = self.client.get(self.url)
+        self.assertContains(
+            response,
+            '<span class="readonly-override">Overridden title</span>',
+            html=True,
+        )
+        self.assertContains(
+            response,
+            '<span class="readonly-override">Overridden content</span>',
+            html=True,
+        )
+        self.assertNotContains(
+            response,
+            '<div class="readonly">Overridden content</div>',
+            html=True,
+        )
+
+    def test_override_applies_to_readonly_fields(self):
+        """
+        Fields listed in readonly_fields use the configured widget even for
+        users with change permission.
+        """
+        self.client.force_login(self.superuser)
+        response = self.client.get(self.url)
+        self.assertContains(
+            response,
+            '<span class="readonly-override">Overridden content</span>',
+            html=True,
+        )
+        self.assertNotContains(
+            response,
+            '<div class="readonly">Overridden content</div>',
+            html=True,
+        )
+
+    def test_readonly_field_without_override_is_unchanged(self):
+        """A read-only field with no override keeps the default rendering."""
+        self.client.force_login(self.superuser)
+        response = self.client.get(self.url)
+        self.assertContains(
+            response,
+            '<div class="readonly">%s</div>' % formats.localize(self.post.posted),
+            html=True,
+        )
+
+    def test_override_widget_output_is_escaped(self):
+        hostile = Post.objects.create(
+            title="Hostile",
+            content="<script>alert('boom')</script>",
+            readonly_content="rc",
+        )
+        self.client.force_login(self.superuser)
+        response = self.client.get(
+            reverse("namespaced_admin:admin_views_post_change", args=(hostile.pk,))
+        )
+        self.assertContains(
+            response,
+            "&lt;script&gt;alert(&#x27;boom&#x27;)&lt;/script&gt;",
+        )
+        self.assertNotContains(response, "<script>alert('boom')</script>")
+
+    def test_override_has_no_effect_on_editable_fields(self):
+        """
+        An override entry for a field rendered as editable doesn't affect
+        the regular form widget.
+        """
+        self.client.force_login(self.superuser)
+        response = self.client.get(self.url)
+        self.assertContains(response, 'name="title"')
+        self.assertNotContains(
+            response,
+            '<span class="readonly-override">Overridden title</span>',
+            html=True,
+        )
+
+
+@override_settings(ROOT_URLCONF="admin_views.urls")
 class LimitChoicesToInAdminTest(TestCase):
     @classmethod
     def setUpTestData(cls):

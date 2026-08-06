@@ -720,6 +720,20 @@ class FieldOverridePostAdmin(PostAdmin):
     form = FieldOverridePostForm
 
 
+class ReadonlyOverrideWidget(forms.Widget):
+    def render(self, name, value, attrs=None, renderer=None):
+        return format_html('<span class="readonly-override">{}</span>', value)
+
+
+class ReadonlyOverridePostAdmin(admin.ModelAdmin):
+    fields = ("title", "content", "posted")
+    readonly_fields = ("content", "posted")
+    readonly_formfield_overrides = {
+        "title": ReadonlyOverrideWidget,
+        "content": ReadonlyOverrideWidget,
+    }
+
+
 class CustomChangeList(ChangeList):
     def get_queryset(self, request):
         return self.root_queryset.order_by("pk").filter(pk=9999)  # Doesn't exist
@@ -1456,6 +1470,7 @@ site2.register(
 site2.register(Person, save_as_continue=False)
 site2.register(ReadOnlyRelatedField, ReadOnlyRelatedFieldAdmin)
 site2.register(Language)
+site2.register(Post, ReadonlyOverridePostAdmin)
 
 site7 = admin.AdminSite(name="admin7")
 site7.register(Article, ArticleAdmin2)
