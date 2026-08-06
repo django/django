@@ -234,7 +234,9 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
         return super().formfield(
             **{
                 "form_class": SimpleArrayField,
-                "base_field": self.base_field.formfield(),
+                "base_field": self.base_field.formfield(
+                    validators=self.base_field._validators
+                ),
                 "max_length": self.size,
                 **kwargs,
             }

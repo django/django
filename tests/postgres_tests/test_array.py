@@ -1210,6 +1210,52 @@ class TestSimpleFormField(PostgreSQLSimpleTestCase):
             "Item 1 in the array did not validate: Enter a valid value.",
         )
 
+    @isolate_apps("postgres_tests")
+    def test_modelform_base_field_validators(self):
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(
+                models.IntegerField(validators=[validators.MaxValueValidator(10)])
+            )
+
+        class Form(forms.ModelForm):
+            class Meta:
+                model = MyModel
+                fields = ("field",)
+
+        form = Form({"field": "51,1"})
+        self.assertIs(form.is_valid(), False)
+        self.assertEqual(
+            form.errors,
+            {
+                "field": [
+                    "Item 1 in the array did not validate: Ensure this value is "
+                    "less than or equal to 10."
+                ]
+            },
+        )
+
+    @isolate_apps("postgres_tests")
+    def test_modelform_base_field_validators_not_duplicated(self):
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(models.CharField(max_length=3))
+
+        class Form(forms.ModelForm):
+            class Meta:
+                model = MyModel
+                fields = ("field",)
+
+        form = Form({"field": "abcd"})
+        self.assertIs(form.is_valid(), False)
+        self.assertEqual(
+            form.errors,
+            {
+                "field": [
+                    "Item 1 in the array did not validate: Ensure this value has "
+                    "at most 3 characters (it has 4)."
+                ]
+            },
+        )
+
     def test_delimiter(self):
         field = SimpleArrayField(forms.CharField(), delimiter="|")
         value = field.clean("a|b|c")
