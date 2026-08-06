@@ -877,6 +877,17 @@ class AdminDetailActionsTest(TestCase):
             "deprecated. Update the signature to get_actions(self, request, "
             "action_location=ActionLocation.CHANGE_LIST)."
         )
+        expected_warnings = {
+            get_actions_overridden_msg,
+            "Overriding get_action_choices() without the 'action_location' "
+            "parameter is deprecated. Update the signature to "
+            "get_action_choices(self, request, default_choices=None, "
+            "action_location=ActionLocation.CHANGE_LIST).",
+            "Unpacking an action tuple is deprecated. "
+            "Use Action attributes instead.",
+            "Using indexes on an action tuple is deprecated. "
+            "Use Action attributes instead.",
+        }
         with self.assertWarnsMessage(
             RemovedInDjango70Warning, get_actions_overridden_msg
         ) as warning:
@@ -890,17 +901,6 @@ class AdminDetailActionsTest(TestCase):
             response = self.client.get(changelist_url)
 
             message_warnings = [str(warning.message) for warning in warning_list]
-            expected_warnings = {
-                get_actions_overridden_msg,
-                "Overriding get_action_choices() without the 'action_location' "
-                "parameter is deprecated. Update the signature to "
-                "get_action_choices(self, request, default_choices=None, "
-                "action_location=ActionLocation.CHANGE_LIST).",
-                "Unpacking an action tuple is deprecated. "
-                "Use Action attributes instead.",
-                "Using indexes on an action tuple is deprecated. "
-                "Use Action attributes instead.",
-            }
             self.assertEqual(set(message_warnings), expected_warnings)
             self.assertEqual(
                 {warning.filename for warning in warning_list}, {admin_filename}
@@ -912,18 +912,15 @@ class AdminDetailActionsTest(TestCase):
             "action": "delete_selected",
             "index": 0,
         }
-        get_actions_overridden_msg = (
-            "Overriding get_actions() without the 'action_location' parameter is "
-            "deprecated. Update the signature to get_actions(self, request, "
-            "action_location=ActionLocation.CHANGE_LIST)."
-        )
-        with self.assertWarnsMessage(
-            RemovedInDjango70Warning, get_actions_overridden_msg
-        ) as warning:
-            response = self.client.post(
-                reverse("admin:admin_views_modelaction_changelist"), action_data
+        with warnings.catch_warnings(record=True) as warning_list:
+            warnings.simplefilter("always", RemovedInDjango70Warning)
+            response = self.client.post(changelist_url, action_data)
+
+            message_warnings = [str(warning.message) for warning in warning_list]
+            self.assertEqual(set(message_warnings), expected_warnings)
+            self.assertEqual(
+                {warning.filename for warning in warning_list}, {admin_filename}
             )
-        self.assertEqual(warning.filename, admin_filename)
         self.assertContains(
             response, "Are you sure you want to delete the selected model action?"
         )
