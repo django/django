@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-05-20 15:53-0400\n"
-"PO-Revision-Date: 2026-08-05 18:40+0000\n"
+"PO-Revision-Date: 2026-08-06 18:40+0000\n"
 "Last-Translator: Igor Jerosimić, 2021,2023-2026\n"
 "Language-Team: Serbian (Latin) (http://app.transifex.com/django/django/"
 "language/sr@latin/)\n"
@@ -220,7 +220,7 @@ msgstr "pre %(delta)s"
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
-msgstr[0] "pre sat"
+msgstr[0] "pre %(count)s sat"
 msgstr[1] "pre %(count)s sata"
 msgstr[2] "pre %(count)s sati"
 
@@ -229,7 +229,7 @@ msgstr[2] "pre %(count)s sati"
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
-msgstr[0] "pre minut"
+msgstr[0] "pre %(count)s minut"
 msgstr[1] "pre %(count)s minuta"
 msgstr[2] "pre %(count)s minuta"
 
@@ -238,7 +238,7 @@ msgstr[2] "pre %(count)s minuta"
 #, python-format
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
-msgstr[0] "pre sekund"
+msgstr[0] "pre %(count)s sekund"
 msgstr[1] "pre %(count)s sekunde"
 msgstr[2] "pre %(count)s sekundi"
 
@@ -250,7 +250,7 @@ msgstr "sada"
 #, python-format
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
-msgstr[0] "sekund od sad"
+msgstr[0] "%(count)s sekund od sad"
 msgstr[1] "%(count)s sekunde od sada"
 msgstr[2] "%(count)s sekundi od sada"
 
@@ -259,7 +259,7 @@ msgstr[2] "%(count)s sekundi od sada"
 #, python-format
 msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
-msgstr[0] "minut od sad"
+msgstr[0] "%(count)s minut od sad"
 msgstr[1] "%(count)s minuta od sada"
 msgstr[2] "%(count)s minuta od sada"
 
@@ -268,7 +268,7 @@ msgstr[2] "%(count)s minuta od sada"
 #, python-format
 msgid "an hour from now"
 msgid_plural "%(count)s hours from now"
-msgstr[0] "sat od sad"
+msgstr[0] "%(count)s sat od sad"
 msgstr[1] "%(count)s sata od sada"
 msgstr[2] "%(count)s sati od sada"
 
