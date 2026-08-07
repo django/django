@@ -548,6 +548,7 @@ class FilteredRelation:
 
     def resolve_expression(self, query, reuse, *args, **kwargs):
         clone = self.clone()
+
         clone.resolved_condition = query.build_filter(
             self.condition,
             can_reuse=reuse,
@@ -555,7 +556,13 @@ class FilteredRelation:
             split_subq=False,
             update_join_types=False,
         )[0]
+
         return clone
 
     def as_sql(self, compiler, connection):
+        if self.resolved_condition is None:
+            # fallback: empty ON condition
+            # but default join behaviour (i.e., don’t filter out rows)
+            # withput the "1=1", this method fails to compile the joins
+            return "1=1", []
         return compiler.compile(self.resolved_condition)
