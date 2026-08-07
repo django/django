@@ -24,6 +24,7 @@ from django.db.models.sql.where import AND, OR, WhereNode
 
 
 class Tuple(Func):
+    is_composite = True
     allows_composite_expressions = True
     function = ""
     output_field = models.Field()
