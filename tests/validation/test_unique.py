@@ -4,7 +4,7 @@ import unittest
 from django.apps.registry import Apps
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 
 from .models import (
     CustomPKModel,
@@ -162,6 +162,7 @@ class PerformUniqueChecksTest(TestCase):
             },
         )
 
+    @skipUnlessDBFeature("supports_expression_defaults")
     def test_unique_db_default_expression(self):
         """
         A unique field whose db_default is a non-constant expression cannot
@@ -173,6 +174,7 @@ class PerformUniqueChecksTest(TestCase):
         with self.assertNumQueries(0):
             m.full_clean()
 
+    @skipUnlessDBFeature("supports_expression_defaults")
     def test_unique_together_db_default_expression(self):
         """
         A unique check containing a field with a non-constant db_default is

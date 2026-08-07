@@ -55,12 +55,16 @@ class UniqueFieldsModel(models.Model):
 class UniqueDbDefaultExpressionModel(models.Model):
     unique_created = models.DateTimeField(unique=True, db_default=Now())
 
+    class Meta:
+        required_db_features = {"supports_expression_defaults"}
+
 
 class UniqueTogetherDbDefaultExpressionModel(models.Model):
     number = models.IntegerField()
     created = models.DateTimeField(db_default=Now())
 
     class Meta:
+        required_db_features = {"supports_expression_defaults"}
         unique_together = [("number", "created")]
 
 
