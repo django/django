@@ -525,22 +525,31 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             )
 
         if self.rhs_is_direct_value():
-            # Remove None from the list as NULL is never equal to anything.
-            try:
-                rhs = OrderedSet(self.rhs)
-                rhs.discard(None)
-            except TypeError:  # Unhashable items in self.rhs
-                rhs = [r for r in self.rhs if r is not None]
-
-            if not rhs:
-                raise EmptyResultSet
-
+            rhs = self._get_non_null_rhs_values()
             # rhs should be an iterable; use batch_process_rhs() to
             # prepare/transform those values.
             sqls, sqls_params = self.batch_process_rhs(compiler, connection, rhs)
             placeholder = "(" + ", ".join(sqls) + ")"
             return (placeholder, sqls_params)
         return super().process_rhs(compiler, connection)
+
+    def _get_non_null_rhs_values(self):
+        """
+        Return `self.rhs` with None values removed, preserving order and
+        de-duplicating where the values are hashable. NULLs are dropped
+        because they are never equal to anything in SQL semantics.
+
+        Raise EmptyResultSet if the filtered list is empty, so the caller
+        can short-circuit the whole query.
+        """
+        try:
+            rhs = OrderedSet(self.rhs)
+            rhs.discard(None)
+        except TypeError:  # Unhashable items in self.rhs
+            rhs = [r for r in self.rhs if r is not None]
+        if not rhs:
+            raise EmptyResultSet
+        return rhs
 
     def get_rhs_op(self, connection, rhs):
         return "IN %s" % rhs
@@ -554,6 +563,47 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
         ):
             return self.split_parameter_list_as_sql(compiler, connection)
         return super().as_sql(compiler, connection)
+
+    def as_postgresql(self, compiler, connection):
+        # Compile `col IN (%s, %s, ..., %s)` as `col = ANY(%s::type[])` when
+        # the right-hand side is a literal iterable of values. Postgres's
+        # parser normalizes both forms to the same ScalarArrayOpExpr during
+        # parse analysis, so query plans are unchanged. Emitting a single
+        # array-bound parameter instead of N per-element placeholders avoids
+        # O(N) client-side placeholder rewriting inside psycopg (see
+        # https://github.com/psycopg/psycopg/discussions/628) for large lists.
+        #
+        # Skipped for lookups with bilateral transforms (they need per-value
+        # SQL wrapping) and when the enclosing Query has alias_cols=False,
+        # which signals compilation for a check constraint, index expression,
+        # or generated column, where params are inlined via
+        # schema_editor.quote_value() rather than bound as driver parameters.
+        # Passing a Python list through quote_value() is not supported.
+        # TupleIn overrides this method to fall through to `as_sql` because
+        # tuple values cannot be bound as a scalar PG array. Filters on
+        # composite primary keys reach this method via the base In class
+        # with a ColPairs left-hand side; those also have to fall through.
+        query = getattr(compiler, "query", None)
+        if (
+            self.rhs_is_direct_value()
+            and not self.bilateral_transforms
+            and not isinstance(self.lhs, ColPairs)
+            and getattr(query, "alias_cols", True)
+            and (
+                array_type := connection.ops.get_field_literal_array_type(
+                    self.lhs.output_field
+                )
+            )
+            is not None
+        ):
+            rhs = self._get_non_null_rhs_values()
+            lhs_sql, lhs_params = self.process_lhs(compiler, connection)
+            _, prepared = self.get_db_prep_lookup(list(rhs), connection)
+            return (
+                "%s = ANY(%%s::%s)" % (lhs_sql, array_type),
+                (*lhs_params, prepared),
+            )
+        return self.as_sql(compiler, connection)
 
     def split_parameter_list_as_sql(self, compiler, connection):
         # This is a special case for databases which limit the number of

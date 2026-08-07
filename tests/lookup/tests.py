@@ -1,4 +1,5 @@
 import collections.abc
+import unittest
 from datetime import datetime
 from math import ceil
 from operator import attrgetter
@@ -1101,16 +1102,27 @@ class LookupTests(TestCase):
             .values("pk")
             .query
         )
-        self.assertIn(" IN (a1, a2, a3, a4, a5, a6, a7) ", str(query))
+        sql = str(query)
+        # Value ordering is preserved regardless of whether the backend
+        # compiles __in to `IN (a1, a2, ...)` or `= ANY([a1, a2, ...])`.
+        prev = -1
+        for i in range(1, 8):
+            idx = sql.find("a%d" % i)
+            self.assertGreater(idx, prev, sql)
+            prev = idx
 
     def test_in_ignore_none(self):
-        with self.assertNumQueries(1) as ctx:
-            self.assertSequenceEqual(
-                Article.objects.filter(id__in=[None, self.a1.id]),
-                [self.a1],
-            )
-        sql = ctx.captured_queries[0]["sql"]
-        self.assertIn("IN (%s)" % self.a1.pk, sql)
+        articles = Article.objects.filter(id__in=[None, self.a1.id])
+        with self.assertNumQueries(1):
+            self.assertSequenceEqual(articles, [self.a1])
+        # None values passed to __in are dropped before parameters are
+        # bound; assert they don't appear in the compiled parameter list
+        # regardless of whether the backend emits `IN (...)` or `= ANY(...)`.
+        _, params = articles.query.sql_with_params()
+        for param in params:
+            self.assertIsNotNone(param)
+            if isinstance(param, (list, tuple)):
+                self.assertNotIn(None, param)
 
     def test_in_ignore_solo_none(self):
         with self.assertNumQueries(0):
@@ -1120,13 +1132,17 @@ class LookupTests(TestCase):
         class UnhashableInt(int):
             __hash__ = None
 
-        with self.assertNumQueries(1) as ctx:
-            self.assertSequenceEqual(
-                Article.objects.filter(id__in=[None, UnhashableInt(self.a1.id)]),
-                [self.a1],
-            )
-        sql = ctx.captured_queries[0]["sql"]
-        self.assertIn("IN (%s)" % self.a1.pk, sql)
+        articles = Article.objects.filter(
+            id__in=[None, UnhashableInt(self.a1.id)],
+        )
+        with self.assertNumQueries(1):
+            self.assertSequenceEqual(articles, [self.a1])
+        # See test_in_ignore_none: None values are stripped before binding.
+        _, params = articles.query.sql_with_params()
+        for param in params:
+            self.assertIsNotNone(param)
+            if isinstance(param, (list, tuple)):
+                self.assertNotIn(None, param)
 
     def test_in_select_mismatch(self):
         msg = (
@@ -1135,6 +1151,29 @@ class LookupTests(TestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             Article.objects.filter(id__in=Article.objects.values("id", "headline"))
+
+    @unittest.skipUnless(
+        connection.features.in_lookup_operator == "ANY",
+        "Backend does not compile __in to `= ANY(%s::type[])`.",
+    )
+    def test_in_reverse_relation_uses_target_field_type(self):
+        # Regression: for a reverse relation the LHS's output_field is a
+        # ManyToOneRel whose db_type reflects the FK target column, not the
+        # local pk of the joined table. The array cast must resolve to the
+        # scalar column actually being compared.
+        sql, _ = Article.objects.filter(tag__in=[1, 2]).query.sql_with_params()
+        self.assertRegex(sql, r"= ANY\(%s::(integer|bigint)\[\]\)")
+
+    @unittest.skipUnless(
+        connection.features.in_lookup_operator == "ANY",
+        "Backend does not compile __in to `= ANY(%s::type[])`.",
+    )
+    def test_in_varchar_field_strips_column_size(self):
+        # Regression: `varchar(N)` must have its size stripped before being
+        # turned into an array cast, otherwise PostgreSQL rejects the
+        # `::varchar(N)[]` syntax.
+        sql, _ = Article.objects.filter(headline__in=["a", "b"]).query.sql_with_params()
+        self.assertRegex(sql, r"= ANY\(%s::(varchar|text)\[\]\)")
 
     def test_error_messages(self):
         # Programming errors are pointed out with nice error messages
