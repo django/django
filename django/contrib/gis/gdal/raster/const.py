@@ -32,6 +32,8 @@ GDAL_PIXEL_TYPES = {
     12: "GDT_UInt64",  # 64 bit unsigned integer (GDAL 3.5+).
     13: "GDT_Int64",  # 64 bit signed integer (GDAL 3.5+).
     14: "GDT_Int8",  # 8 bit signed integer (GDAL 3.7+).
+    15: "GDT_Float16",  # 16 bit floating point (GDAL 3.11+).
+    16: "GDT_CFloat16",  # Complex Float16 (GDAL 3.11+).
 }
 
 # A list of gdal datatypes that are integers.
@@ -57,6 +59,8 @@ GDAL_TO_CTYPES = [
     c_uint64,
     c_int64,
     c_int8,
+    None,  # _Float16 ticket https://github.com/python/cpython/issues/153740
+    None,
 ]
 
 # List of resampling algorithms that can be used to warp a GDALRaster.
