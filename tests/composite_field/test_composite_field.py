@@ -174,6 +174,17 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
 
         self.assertEqual(list(projects), ["AUTH", "RPT"])
 
+    def test_exclude_wrapped_field_from_empty_composite_subquery(self):
+        missing_user = User.objects.filter(pk=-1).values("age", "email")
+        users = (
+            User.objects.alias(user_info=missing_user)
+            .exclude(age=F("user_info__age") + 1)
+            .order_by("pk")
+            .values_list("name", flat=True)
+        )
+
+        self.assertEqual(list(users), ["Ada", "Bob"])
+
     def test_exclude_outer_field_comparison_with_composite_subquery(self):
         project_info = Project.objects.filter(pk=self.auth.pk).values("pk", "code")
         projects = (

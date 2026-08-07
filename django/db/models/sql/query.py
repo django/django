@@ -1804,11 +1804,15 @@ class Query(BaseExpression):
                         clause.add(lookup_class(col, False), AND)
                 # If someval is a nullable column, someval IS NOT NULL is
                 # added.
-                if isinstance(value, Col) and (
-                    self.is_nullable(value.target)
-                    or self._expression_contains_nullable_subquery_column(value)
-                ):
-                    lookup_class = value.target.get_lookup("isnull")
+                value_is_nullable = isinstance(value, Col) and self.is_nullable(
+                    value.target
+                )
+                value_contains_nullable_subquery_column = isinstance(
+                    value, BaseExpression
+                ) and self._expression_contains_nullable_subquery_column(value)
+
+                if value_is_nullable or value_contains_nullable_subquery_column:
+                    lookup_class = value.get_lookup("isnull")
                     clause.add(lookup_class(value, False), AND)
         return clause, used_joins if not require_outer else ()
 
