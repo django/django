@@ -1,6 +1,7 @@
 from django.core.exceptions import FieldError
 from django.db import connection
-from django.db.models import F
+from django.db.models import F, Value
+from django.db.models.functions import Lower
 from django.test import TestCase
 
 from .models import Comment, Tenant, TimeStamped, Token, User
@@ -92,6 +93,30 @@ class CompositePKUpdateTests(TestCase):
         result = Comment.objects.bulk_update(
             [comment_1, comment_2, comment_3], ["text"]
         )
+
+        self.assertEqual(result, 3)
+        comment_1 = Comment.objects.get(pk=self.comment_1.pk)
+        comment_2 = Comment.objects.get(pk=self.comment_2.pk)
+        comment_3 = Comment.objects.get(pk=self.comment_3.pk)
+        self.assertEqual(comment_1.text, "foo")
+        self.assertEqual(comment_2.text, "bar")
+        self.assertEqual(comment_3.text, "baz")
+
+    def test_bulk_update_comments_resolvable(self):
+        comment_1 = Comment.objects.get(pk=self.comment_1.pk)
+        comment_2 = Comment.objects.get(pk=self.comment_2.pk)
+        comment_3 = Comment.objects.get(pk=self.comment_3.pk)
+        comment_1.text = Lower(Value("Foo"))
+        comment_2.text = Lower(Value("Bar"))
+        comment_3.text = Lower(Value("Baz"))
+
+        result = Comment.objects.bulk_update(
+            [comment_1, comment_2, comment_3], ["text"]
+        )
+        if connection.features.can_return_rows_from_update:
+            self.assertEqual(comment_1.text, "foo")
+            self.assertEqual(comment_2.text, "bar")
+            self.assertEqual(comment_3.text, "baz")
 
         self.assertEqual(result, 3)
         comment_1 = Comment.objects.get(pk=self.comment_1.pk)
