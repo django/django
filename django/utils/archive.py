@@ -51,6 +51,9 @@ def extract(path, to_path):
     with Archive(path) as archive:
         archive.extract(to_path)
 
+def check_size(path):
+    with Archive(path) as archive:
+        return archive.check_size()
 
 class Archive:
     """
@@ -97,6 +100,9 @@ class Archive:
 
     def close(self):
         self._archive.close()
+
+    def check_size(self):
+        return self._archive.check_size()
 
 
 class BaseArchive:
@@ -206,6 +212,9 @@ class TarArchive(BaseArchive):
     def close(self):
         self._archive.close()
 
+    def check_size(self):
+        size = sum([archive_file.size for archive_file in self._archive.getmembers()])
+        return size
 
 class ZipArchive(BaseArchive):
     def __init__(self, file):
@@ -241,6 +250,9 @@ class ZipArchive(BaseArchive):
     def close(self):
         self._archive.close()
 
+    def check_size(self):
+        size = sum([archive_file.file_size for archive_file in self._archive.filelist])
+        return size
 
 extension_map = dict.fromkeys(
     (
