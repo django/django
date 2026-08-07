@@ -46,6 +46,7 @@ class Article(models.Model):
     sub_section = models.ForeignKey(
         Section, models.SET_NULL, null=True, blank=True, related_name="+"
     )
+    collapsible_open_field = models.TextField(blank=True, default="")
 
     @admin.display(ordering="title")
     def __str__(self):
