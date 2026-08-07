@@ -168,7 +168,7 @@ class CompositePKTests(TestCase):
             id_list = list(Comment.objects.values_list("pk", flat=True))
             with self.assertNumQueries(2):
                 comment_dict = Comment.objects.in_bulk(id_list=id_list)
-        self.assertQuerySetEqual(comment_dict, id_list)
+        self.assertCountEqual(comment_dict, id_list)
 
     def test_in_bulk_values(self):
         result = Comment.objects.values().in_bulk([self.comment.pk])
