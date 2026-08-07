@@ -1,9 +1,9 @@
 from unittest import skipUnless
 
-from django.contrib.gis.db.models import fields
+from django.contrib.gis.db.models import Extent, fields
 from django.contrib.gis.geos import MultiPolygon, Polygon
 from django.core.exceptions import ImproperlyConfigured
-from django.db import connection, migrations, models
+from django.db import ProgrammingError, connection, migrations, models
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
 from django.test import TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
@@ -22,6 +22,13 @@ class OperationTestCase(TransactionTestCase):
         JOIN pg_index as i on oc.oid = ANY(i.indclass)
         JOIN pg_class as c on c.oid = i.indexrelid
         WHERE c.relname = %s
+    """
+    get_column_opclass_query = """
+        SELECT opcname FROM pg_index AS i
+        JOIN pg_class AS t on t.oid = i.indrelid
+        JOIN pg_attribute AS a on a.attrelid = t.oid AND a.attnum = i.indkey[0]
+        JOIN pg_opclass AS oc on oc.oid = i.indclass[0]
+        WHERE t.relname = %s AND a.attname = %s
     """
 
     def tearDown(self):
@@ -434,6 +441,124 @@ class OperationTests(OperationTestCase):
             field_class_kwargs={"dim": 2},
         )
         self.assertFalse(Neighborhood.objects.first().geom.hasz)
+
+    @skipUnlessDBFeature("can_alter_geometry_field", "supports_geography")
+    def test_alter_geom_field_geography(self):
+        """
+        Altering between geometry and geography casts the column in both
+        directions (#23902).
+        """
+        Neighborhood = self.current_state.apps.get_model("gis", "Neighborhood")
+        p1 = Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)))
+        Neighborhood.objects.create(name="TestGeography", geom=MultiPolygon(p1, p1))
+        self.assertEqual(
+            Neighborhood.objects.aggregate(Extent("geom")),
+            {"geom__extent": (0.0, 0.0, 1.0, 1.0)},
+        )
+        # Convert to geography. Extent() is not defined for geography columns.
+        self.alter_gis_model(
+            migrations.AlterField,
+            "Neighborhood",
+            "geom",
+            fields.MultiPolygonField,
+            field_class_kwargs={"geography": True},
+        )
+        msg = "function st_extent(geography) does not exist"
+        with self.assertRaisesMessage(ProgrammingError, msg):
+            Neighborhood.objects.aggregate(Extent("geom"))
+        # Rewind to geometry.
+        self.alter_gis_model(
+            migrations.AlterField,
+            "Neighborhood",
+            "geom",
+            fields.MultiPolygonField,
+            field_class_kwargs={"geography": False},
+        )
+        self.assertEqual(
+            Neighborhood.objects.aggregate(Extent("geom")),
+            {"geom__extent": (0.0, 0.0, 1.0, 1.0)},
+        )
+
+    @skipUnlessDBFeature(
+        "can_alter_geometry_field", "supports_geography", "supports_3d_storage"
+    )
+    def test_alter_geom_field_geography_and_dim(self):
+        """
+        Altering the geography flag and the number of dimensions in a single
+        operation casts the column before forcing its dimension (#23902).
+        """
+        Neighborhood = self.current_state.apps.get_model("gis", "Neighborhood")
+        p1 = Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)))
+        Neighborhood.objects.create(name="TestGeography", geom=MultiPolygon(p1, p1))
+        self.assertFalse(Neighborhood.objects.first().geom.hasz)
+        # Add a 3rd dimension and convert to geography at the same time.
+        self.alter_gis_model(
+            migrations.AlterField,
+            "Neighborhood",
+            "geom",
+            fields.MultiPolygonField,
+            field_class_kwargs={"geography": True, "dim": 3},
+        )
+        self.assertTrue(Neighborhood.objects.first().geom.hasz)
+        msg = "function st_extent(geography) does not exist"
+        with self.assertRaisesMessage(ProgrammingError, msg):
+            Neighborhood.objects.aggregate(Extent("geom"))
+        # Rewind to a 2D geometry.
+        self.alter_gis_model(
+            migrations.AlterField,
+            "Neighborhood",
+            "geom",
+            fields.MultiPolygonField,
+            field_class_kwargs={"geography": False, "dim": 2},
+        )
+        self.assertFalse(Neighborhood.objects.first().geom.hasz)
+        self.assertEqual(
+            Neighborhood.objects.aggregate(Extent("geom")),
+            {"geom__extent": (0.0, 0.0, 1.0, 1.0)},
+        )
+
+    @skipUnlessDBFeature(
+        "can_alter_geometry_field", "supports_geography", "supports_3d_storage"
+    )
+    def test_alter_geom_field_opclass(self):
+        """
+        The spatial index is recreated when an alteration changes the operator
+        class it requires (#23902).
+        """
+        # Operator classes are a PostgreSQL concept with no corresponding
+        # database feature, so unlike the tests above this cannot be gated on
+        # one. Matches test_add_3d_field_opclass().
+        if not connection.ops.postgis:
+            self.skipTest("PostGIS-specific test.")
+
+        def assertOpclass(expected):
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    self.get_column_opclass_query, ["gis_neighborhood", "geom"]
+                )
+                self.assertEqual(cursor.fetchone(), (expected,))
+
+        def alter(**kwargs):
+            self.alter_gis_model(
+                migrations.AlterField,
+                "Neighborhood",
+                "geom",
+                fields.MultiPolygonField,
+                field_class_kwargs=kwargs,
+            )
+
+        assertOpclass("gist_geometry_ops_2d")
+        # Multidimensional geometries use the "nd" operator class.
+        alter(dim=3)
+        assertOpclass("gist_geometry_ops_nd")
+        # Which geography doesn't accept, so the index must be recreated.
+        alter(dim=3, geography=True)
+        assertOpclass("gist_geography_ops")
+        alter(dim=3)
+        assertOpclass("gist_geometry_ops_nd")
+        # Rewinding to two dimensions drops the "nd" operator class again.
+        alter(dim=2)
+        assertOpclass("gist_geometry_ops_2d")
 
     @skipUnlessDBFeature(
         "supports_column_check_constraints", "can_introspect_check_constraints"
