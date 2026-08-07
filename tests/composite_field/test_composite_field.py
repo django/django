@@ -256,6 +256,17 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
         with self.assertRaisesMessage(NotImplementedError, msg):
             list(profile)
 
+    def test_composite_subquery_alias_whole_expression_not_supported(self):
+        first_post = (
+            Post.objects.filter(user=self.ada)
+            .order_by("pk")
+            .values("title", "body")[:1]
+        )
+
+        msg = "Upper expression does not support composite expressions."
+        with self.assertRaisesMessage(ValueError, msg):
+            User.objects.alias(info=first_post).annotate(value=Upper(F("info")))
+
     def test_composite_subquery_alias_rejects_lookup_separator(self):
         first_post = (
             Post.objects.filter(user=self.ada)
