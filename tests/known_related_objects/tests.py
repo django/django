@@ -182,5 +182,6 @@ class ExistingRelatedInstancesTests(TestCase):
                     style=FilteredRelation("pool__another_style"),
                 )
                 .select_related("style")
+                .order_by("pool__pk")
             )
             self.assertEqual(p[0].style.another_pool, self.p3)

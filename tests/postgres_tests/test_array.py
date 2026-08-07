@@ -302,7 +302,7 @@ class TestQuerying(PostgreSQLTestCase):
         )
 
     def test_gt(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableIntegerArrayModel.objects.filter(field__gt=[0]), self.objs[:4]
         )
 
@@ -312,7 +312,7 @@ class TestQuerying(PostgreSQLTestCase):
         )
 
     def test_in(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableIntegerArrayModel.objects.filter(field__in=[[1], [2]]),
             self.objs[:2],
         )
@@ -338,19 +338,19 @@ class TestQuerying(PostgreSQLTestCase):
         )
 
     def test_in_as_F_object(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableIntegerArrayModel.objects.filter(field__in=[models.F("field")]),
             self.objs[:4],
         )
 
     def test_contained_by(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableIntegerArrayModel.objects.filter(field__contained_by=[1, 2]),
             self.objs[:2],
         )
 
     def test_contained_by_including_F_object(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableIntegerArrayModel.objects.filter(
                 field__contained_by=[models.F("order"), 2]
             ),
@@ -358,7 +358,7 @@ class TestQuerying(PostgreSQLTestCase):
         )
 
     def test_contains(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableIntegerArrayModel.objects.filter(field__contains=[2]),
             self.objs[1:3],
         )
@@ -371,7 +371,7 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[2:3],
         )
         inner_qs = IntegerArrayModel.objects.filter(field__contains=OuterRef("field"))
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableIntegerArrayModel.objects.filter(Exists(inner_qs)),
             self.objs[1:3],
         )
@@ -411,7 +411,7 @@ class TestQuerying(PostgreSQLTestCase):
         obj_1 = CharArrayModel.objects.create(field=["TEXT", "lower text"])
         obj_2 = CharArrayModel.objects.create(field=["lower text", "TEXT"])
         CharArrayModel.objects.create(field=["lower text", "text"])
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             CharArrayModel.objects.filter(
                 field__overlap=[
                     Upper(Value("text")),
@@ -493,12 +493,12 @@ class TestQuerying(PostgreSQLTestCase):
         )
 
     def test_index(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableIntegerArrayModel.objects.filter(field__0=2), self.objs[1:3]
         )
 
     def test_index_chained(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableIntegerArrayModel.objects.filter(field__0__lt=3), self.objs[0:3]
         )
 
@@ -535,13 +535,13 @@ class TestQuerying(PostgreSQLTestCase):
         )
 
     def test_overlap(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableIntegerArrayModel.objects.filter(field__overlap=[1, 2]),
             self.objs[0:3],
         )
 
     def test_len(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableIntegerArrayModel.objects.filter(field__len__lte=2), self.objs[0:3]
         )
 
@@ -552,7 +552,7 @@ class TestQuerying(PostgreSQLTestCase):
         )
 
     def test_slice(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableIntegerArrayModel.objects.filter(field__0_1=[2]), self.objs[1:3]
         )
 
@@ -639,7 +639,7 @@ class TestQuerying(PostgreSQLTestCase):
         queryset = NullableIntegerArrayModel.objects.annotate(
             subarray=F("field")[:1]
         ).filter(field__len=F("subarray__len"))
-        self.assertSequenceEqual(queryset, self.objs[:2])
+        self.assertCountEqual(queryset, self.objs[:2])
 
     def test_usage_in_subquery(self):
         self.assertSequenceEqual(
@@ -697,7 +697,7 @@ class TestQuerying(PostgreSQLTestCase):
         inner_qs = NullableIntegerArrayModel.objects.filter(
             field__len=models.OuterRef("field__len"),
         ).values("field")
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableIntegerArrayModel.objects.alias(
                 same_sized_fields=ArraySubquery(inner_qs),
             ).filter(same_sized_fields__len__gt=1),

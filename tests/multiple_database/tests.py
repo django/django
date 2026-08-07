@@ -932,7 +932,11 @@ class QueryTestCase(TestCase):
             ["alice"],
         )
         self.assertEqual(
-            list(User.objects.using("other").values_list("username", flat=True)),
+            list(
+                User.objects.using("other")
+                .order_by("username")
+                .values_list("username", flat=True)
+            ),
             ["bob", "charlie"],
         )
         self.assertEqual(
@@ -940,7 +944,11 @@ class QueryTestCase(TestCase):
             ["chocolate"],
         )
         self.assertEqual(
-            list(UserProfile.objects.using("other").values_list("flavor", flat=True)),
+            list(
+                UserProfile.objects.using("other")
+                .order_by("flavor")
+                .values_list("flavor", flat=True)
+            ),
             ["crunchy frog", "spring surprise"],
         )
 
@@ -957,7 +965,11 @@ class QueryTestCase(TestCase):
             ["chocolate"],
         )
         self.assertEqual(
-            list(UserProfile.objects.using("other").values_list("flavor", flat=True)),
+            list(
+                UserProfile.objects.using("other")
+                .order_by("flavor")
+                .values_list("flavor", flat=True)
+            ),
             ["crunchy frog", "spring surprise"],
         )
 
@@ -968,7 +980,11 @@ class QueryTestCase(TestCase):
             ["chocolate"],
         )
         self.assertEqual(
-            list(UserProfile.objects.using("other").values_list("flavor", flat=True)),
+            list(
+                UserProfile.objects.using("other")
+                .order_by("flavor")
+                .values_list("flavor", flat=True)
+            ),
             ["crunchy frog", "spring surprise", "tofu"],
         )
 
