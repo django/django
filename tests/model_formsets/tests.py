@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
-from django.db import models
+from django.db import connection, models
 from django.forms.formsets import formset_factory
 from django.forms.models import (
     BaseModelFormSet,
@@ -136,6 +136,7 @@ class DeletionTests(TestCase):
         PoemFormSet = inlineformset_factory(
             Poet, Poem, fields="__all__", can_delete=True
         )
+        nonexistent_pk = connection.ops.get_nonexistent_pk(poem.pk)
 
         # Simulate deletion of an object that doesn't exist in the database
         data = {
@@ -143,13 +144,13 @@ class DeletionTests(TestCase):
             "form-INITIAL_FORMS": "2",
             "form-0-id": str(poem.pk),
             "form-0-name": "foo",
-            "form-1-id": str(poem.pk + 1),  # doesn't exist
+            "form-1-id": str(nonexistent_pk),
             "form-1-name": "bar",
             "form-1-DELETE": "on",
         }
         formset = PoemFormSet(data, instance=poet, prefix="form")
 
-        # The formset is valid even though poem.pk + 1 doesn't exist,
+        # The formset is valid even though the id in form 1 doesn't exist,
         # because it's marked for deletion anyway
         self.assertTrue(formset.is_valid())
 
@@ -158,7 +159,7 @@ class DeletionTests(TestCase):
         # Make sure the save went through correctly
         self.assertEqual(Poem.objects.get(pk=poem.pk).name, "foo")
         self.assertEqual(poet.poem_set.count(), 1)
-        self.assertFalse(Poem.objects.filter(pk=poem.pk + 1).exists())
+        self.assertFalse(Poem.objects.filter(pk=nonexistent_pk).exists())
 
 
 class ModelFormsetTest(TestCase):

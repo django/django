@@ -80,12 +80,13 @@ class GetOrCreateTests(TestCase):
         """
         Using the pk property of a model is allowed.
         """
-        Thing.objects.get_or_create(pk=1)
+        Thing.objects.get_or_create(pk=connection.ops.get_hardcoded_pk(1))
 
     def test_get_or_create_with_model_property_defaults(self):
         """Using a property with a setter implemented is allowed."""
         t, _ = Thing.objects.get_or_create(
-            defaults={"capitalized_name_property": "annie"}, pk=1
+            defaults={"capitalized_name_property": "annie"},
+            pk=connection.ops.get_hardcoded_pk(1),
         )
         self.assertEqual(t.name, "Annie")
 
@@ -259,8 +260,9 @@ class GetOrCreateTransactionTests(TransactionTestCase):
         databases that delay integrity checks until the end of transactions,
         otherwise the exception is never raised.
         """
+        pk = connection.ops.get_hardcoded_pk
         try:
-            Profile.objects.get_or_create(person=Person(id=1))
+            Profile.objects.get_or_create(person=Person(id=pk(1)))
         except IntegrityError:
             pass
         else:
@@ -360,12 +362,13 @@ class UpdateOrCreateTests(TestCase):
         """
         Using the pk property of a model is allowed.
         """
-        Thing.objects.update_or_create(pk=1)
+        Thing.objects.update_or_create(pk=connection.ops.get_hardcoded_pk(1))
 
     def test_update_or_create_with_model_property_defaults(self):
         """Using a property with a setter implemented is allowed."""
         t, _ = Thing.objects.update_or_create(
-            defaults={"capitalized_name_property": "annie"}, pk=1
+            defaults={"capitalized_name_property": "annie"},
+            pk=connection.ops.get_hardcoded_pk(1),
         )
         self.assertEqual(t.name, "Annie")
 
