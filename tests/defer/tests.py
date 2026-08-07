@@ -104,7 +104,7 @@ class DeferTests(AssertionMixin, TestCase):
         # User values() won't defer anything (you get the full list of
         # dictionaries back), but it still works.
         self.assertEqual(
-            Primary.objects.defer("name").values()[0],
+            Primary.objects.defer("name").values().get(pk=self.p1.pk),
             {
                 "id": self.p1.id,
                 "name": "p1",
@@ -115,7 +115,7 @@ class DeferTests(AssertionMixin, TestCase):
 
     def test_only_values_does_not_defer(self):
         self.assertEqual(
-            Primary.objects.only("name").values()[0],
+            Primary.objects.only("name").values().get(pk=self.p1.pk),
             {
                 "id": self.p1.id,
                 "name": "p1",
@@ -138,7 +138,9 @@ class DeferTests(AssertionMixin, TestCase):
         self.assert_delayed(obj, 0)
 
     def test_only_with_select_related(self):
-        obj = Primary.objects.select_related("related").only("related__first")[0]
+        obj = Primary.objects.select_related("related").only("related__first").get(
+            pk=self.p1.pk
+        )
         self.assert_delayed(obj, 2)
         self.assert_delayed(obj.related, 1)
         self.assertEqual(obj.related_id, self.s1.pk)

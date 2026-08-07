@@ -828,7 +828,7 @@ class ManyToOneTests(TestCase):
         city = City.objects.prefetch_related("districts").get(id=c.id)
         self.assertSequenceEqual(city.districts.all(), [d1])
         d2 = city.districts.create(name="Goa")
-        self.assertSequenceEqual(city.districts.all(), [d1, d2])
+        self.assertCountEqual(city.districts.all(), [d1, d2])
 
     def test_clear_after_prefetch(self):
         c = City.objects.create(name="Musical City")

@@ -813,7 +813,7 @@ class BasicExpressionsTests(TestCase):
             ),
         )
         self.assertSequenceEqual(
-            qs.values_list("ceo_company", flat=True),
+            qs.order_by("pk").values_list("ceo_company", flat=True),
             [self.example_inc.pk, self.foobar_ltd.pk, self.gmbh.pk],
         )
 
