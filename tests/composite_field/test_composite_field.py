@@ -651,6 +651,25 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             1,
         )
 
+    def test_composite_subquery_alias_does_not_replace_generated_alias(self):
+        self.ada.manager = self.bob
+        self.ada.save(update_fields=["manager"])
+        self.bob.manager = self.ada
+        self.bob.save(update_fields=["manager"])
+        first_post = (
+            Post.objects.filter(user=self.ada)
+            .order_by("pk")
+            .values("title", "body")[:1]
+        )
+        users = (
+            User.objects.filter(manager__manager__name="Ada")
+            .alias(T2=first_post)
+            .filter(T2__title="Welcome")
+            .values_list("name", flat=True)
+        )
+
+        self.assertEqual(list(users), ["Ada"])
+
     def test_composite_subquery_alias_rejects_invalid_field(self):
         first_post = Post.objects.filter(user=self.ada).values("title", "body")[:1]
 
