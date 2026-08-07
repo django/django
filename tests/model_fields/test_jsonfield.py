@@ -1375,7 +1375,9 @@ class JSONNullTests(TestCase):
         obj = NullableJSONModel.objects.create(value=JSONNull())
         obj2 = NullableJSONModel.objects.create(value=[1])
         self.assertSequenceEqual(
-            NullableJSONModel.objects.filter(value__in=[JSONNull(), [1], "foo"]),
+            NullableJSONModel.objects.filter(
+                value__in=[JSONNull(), [1], "foo"]
+            ).order_by("pk"),
             [obj, obj2],
         )
 
@@ -1383,7 +1385,9 @@ class JSONNullTests(TestCase):
         obj1 = NullableJSONModel.objects.create(value={"key": None})
         obj2 = NullableJSONModel.objects.create(value={"key": [1]})
         self.assertSequenceEqual(
-            NullableJSONModel.objects.filter(value__key__in=[JSONNull(), [1], 0]),
+            NullableJSONModel.objects.filter(
+                value__key__in=[JSONNull(), [1], 0]
+            ).order_by("pk"),
             [obj1, obj2],
         )
 
@@ -1394,7 +1398,7 @@ class JSONNullTests(TestCase):
         obj2.value = JSONNull()
         NullableJSONModel.objects.bulk_update([obj1, obj2], fields=["value"])
         self.assertSequenceEqual(
-            NullableJSONModel.objects.filter(value=JSONNull()),
+            NullableJSONModel.objects.filter(value=JSONNull()).order_by("pk"),
             [obj1, obj2],
         )
 
