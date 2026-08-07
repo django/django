@@ -79,6 +79,7 @@ html[data-theme="dark"] {
     --darkened-bg: #212121;
     --selected-bg: #1b1b1b;
     --selected-row: #00363a;
+    --selected-col-bg: #3d3d3d;
 
     --close-button-bg: #333333;
     --close-button-hover-bg: #666666;
