@@ -902,6 +902,18 @@ File upload widgets
     * ``template_name``: ``'django/forms/widgets/file.html'``
     * Renders as: ``<input type="file" ...>``
 
+``MultipleFileInput``
+~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: MultipleFileInput
+
+    .. versionadded:: 6.2
+
+    * ``template_name``: ``'django/forms/widgets/file.html'``
+    * Renders as: ``<input type="file" multiple ...>``
+
+    Allows selecting multiple files and returns them as a list.
+
 ``ClearableFileInput``
 ~~~~~~~~~~~~~~~~~~~~~~
 
