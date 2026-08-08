@@ -1360,14 +1360,31 @@ class ModelAdmin(BaseModelAdmin):
                 bit_lookups = []
                 for orm_lookup, validate_field in orm_lookups:
                     if validate_field is not None:
-                        formfield = validate_field.formfield()
                         try:
-                            if formfield is not None:
-                                value = formfield.to_python(bit)
+                            if isinstance(validate_field, models.BooleanField):
+                                # forms.BooleanField.to_python() treats almost
+                                # any string as True. Parse boolean search
+                                # terms strictly instead, so that arbitrary
+                                # terms don't match every row with a True
+                                # value.
+                                value = forms.NullBooleanField().to_python(bit)
+                                if value is None:
+                                    # Skip this lookup for non-boolean terms.
+                                    continue
                             else:
-                                # Fields like AutoField lack a form field.
-                                value = validate_field.to_python(bit)
-                        except ValidationError:
+                                formfield = validate_field.formfield()
+                                if formfield is not None:
+                                    value = formfield.to_python(bit)
+                                else:
+                                    # Fields like AutoField lack a form field.
+                                    value = bit
+                                if isinstance(value, str):
+                                    # Form fields such as TypedChoiceField may
+                                    # return the string unconverted. Ensure
+                                    # the model field accepts the value, so
+                                    # that filtering on it cannot crash.
+                                    value = validate_field.to_python(value)
+                        except (TypeError, ValueError, ValidationError):
                             # Skip this lookup for invalid values.
                             continue
                     else:

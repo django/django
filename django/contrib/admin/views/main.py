@@ -27,6 +27,7 @@ from django.core.exceptions import (
     FieldDoesNotExist,
     ImproperlyConfigured,
     SuspiciousOperation,
+    ValidationError,
 )
 from django.core.paginator import InvalidPage
 from django.db.models import F, Field, ManyToOneRel, OrderBy
@@ -507,11 +508,16 @@ class ChangeList:
         qs = qs.order_by(*ordering)
 
         # Apply search results
-        qs, search_may_have_duplicates = self.model_admin.get_search_results(
-            request,
-            qs,
-            self.query,
-        )
+        try:
+            qs, search_may_have_duplicates = self.model_admin.get_search_results(
+                request,
+                qs,
+                self.query,
+            )
+        except (TypeError, ValueError, ValidationError) as e:
+            # A search term may be invalid for a searched field even after
+            # being validated (e.g. rejected by a field's get_prep_value()).
+            raise IncorrectLookupParameters(e) from e
 
         # Set query string for clearing all filters.
         self.clear_all_filters_qs = self.get_query_string(

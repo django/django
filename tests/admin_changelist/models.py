@@ -148,5 +148,9 @@ class ProxyUser(User):
 class MixedFieldsModel(models.Model):
     """Model with multiple field types for testing search validation."""
 
+    name = models.CharField(max_length=30, blank=True)
     int_field = models.IntegerField(null=True, blank=True)
+    choice_field = models.IntegerField(
+        choices=[(1, "Active"), (2, "Archived")], null=True, blank=True
+    )
     json_field = models.JSONField(null=True, blank=True)

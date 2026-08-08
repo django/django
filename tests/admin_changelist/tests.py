@@ -956,6 +956,73 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [obj_int])
 
+    def test_exact_lookup_for_choices_field(self):
+        """
+        Search terms that aren't valid for an exact lookup on a field with
+        choices are skipped instead of crashing the changelist.
+        """
+        john = MixedFieldsModel.objects.create(name="john", choice_field=1)
+        mary = MixedFieldsModel.objects.create(name="mary", choice_field=2)
+        m = admin.ModelAdmin(MixedFieldsModel, custom_site)
+        m.search_fields = ["name", "choice_field__exact"]
+
+        for search_term, expected_result in [
+            ("john", [john]),
+            ("mary", [mary]),
+            ("1", [john]),
+            ("2", [mary]),
+            ("random", []),
+        ]:
+            request = self.factory.get("/", data={SEARCH_VAR: search_term})
+            request.user = self.superuser
+            with self.subTest(search_term=search_term):
+                cl = m.get_changelist_instance(request)
+                self.assertCountEqual(cl.queryset, expected_result)
+
+    def test_exact_lookup_for_choices_field_changelist_view(self):
+        """
+        The changelist view doesn't crash on a search term that isn't valid
+        for an exact lookup on a field with choices.
+        """
+        self.client.force_login(self.superuser)
+        john = MixedFieldsModel.objects.create(name="john", choice_field=1)
+        MixedFieldsModel.objects.create(name="mary", choice_field=2)
+        url = reverse("admin:admin_changelist_mixedfieldsmodel_changelist")
+
+        response = self.client.get(url, {SEARCH_VAR: "john"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertCountEqual(response.context["cl"].queryset, [john])
+
+    def test_exact_lookup_for_boolean_field(self):
+        """
+        Arbitrary search terms don't match every row with a True value for an
+        exact lookup on a BooleanField, while explicit boolean search terms
+        still match.
+        """
+        john = OrderedObject.objects.create(name="john", bool=True)
+        mary = OrderedObject.objects.create(name="mary", bool=True)
+        pete = OrderedObject.objects.create(name="pete", bool=False)
+        m = admin.ModelAdmin(OrderedObject, custom_site)
+        m.search_fields = ["name", "bool__exact"]
+
+        for search_term, expected_result in [
+            ("john", [john]),
+            ("mary", [mary]),
+            ("random", []),
+            ("true", [john, mary]),
+            ("True", [john, mary]),
+            ("1", [john, mary]),
+            ("false", [pete]),
+            ("False", [pete]),
+            ("0", [pete]),
+        ]:
+            request = self.factory.get("/", data={SEARCH_VAR: search_term})
+            request.user = self.superuser
+            with self.subTest(search_term=search_term):
+                cl = m.get_changelist_instance(request)
+                self.assertCountEqual(cl.queryset, expected_result)
+
     def test_search_with_exact_lookup_for_non_string_field(self):
         child = Child.objects.create(name="Asher", age=11)
         model_admin = ChildAdmin(Child, custom_site)
