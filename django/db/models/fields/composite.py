@@ -209,11 +209,7 @@ class CompositeField(Field):
     def get_fields(self):
         for name, field in self.sub_fields.items():
             path = tuple(name.split(LOOKUP_SEP))
-            if isinstance(field, CompositeField):
-                for subpath, subfield in field.get_fields():
-                    yield path + subpath, subfield
-            else:
-                yield path, field
+            yield path, field
 
     def get_field(self, name):
         path = tuple(name.split(LOOKUP_SEP))
