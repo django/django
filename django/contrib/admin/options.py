@@ -1594,10 +1594,10 @@ class ModelAdmin(BaseModelAdmin):
             source_model_name = request.POST.get(SOURCE_MODEL_VAR)
             source_admin = None
             if source_model_name:
-                app_label, model_name = source_model_name.split(".", 1)
                 try:
+                    app_label, model_name = source_model_name.split(".", 1)
                     source_model = apps.get_model(app_label, model_name)
-                except LookupError:
+                except (LookupError, ValueError):
                     msg = _('The app "%s" could not be found.') % source_model_name
                     self.message_user(request, msg, messages.ERROR)
                 else:
