@@ -431,6 +431,20 @@ class BasicSyntaxTests(SimpleTestCase):
     #     ):
     #         self.engine.render_to_string("template")
 
+    def test_double_dot_in_literal(self):
+        tests = [
+            ('{{ "hello..world" }}', "hello..world"),
+            ("{{ 'a..b'|upper }}", "A..B"),
+            ('{{ missing|default:"a..b" }}', "a..b"),
+            ('{{ _("a..b") }}', "a..b"),
+        ]
+        engine = Engine()
+        for template_string, expected in tests:
+            with self.subTest(template_string=template_string):
+                template = engine.from_string(template_string)
+                output = template.render(Context({}))
+                self.assertEqual(output, expected)
+
 
 class BlockContextTests(SimpleTestCase):
     def test_repr(self):
