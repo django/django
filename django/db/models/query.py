@@ -35,6 +35,7 @@ from django.db.models.utils import (
     AltersData,
     create_namedtuple_class,
     resolve_callables,
+    set_executed_queries,
 )
 from django.utils import timezone
 from django.utils.deprecation import (
@@ -347,6 +348,7 @@ class QuerySet(AltersData):
         self._defer_next_filter = False
         self._deferred_filter = None
         self._cloning_enabled = True
+        self.executed_queries = None
 
     @property
     def query(self):
@@ -1654,6 +1656,7 @@ class QuerySet(AltersData):
         """Return an empty QuerySet."""
         clone = self._chain()
         clone.query.set_empty()
+        clone.executed_queries = []
         return clone
 
     ##################################################################
@@ -2258,10 +2261,19 @@ class QuerySet(AltersData):
         return c
 
     def _fetch_all(self):
+        executed_queries_length = None
+
         if self._result_cache is None:
+            executed_queries_length = len(connections[self.db].queries)
             self._result_cache = list(self._iterable_class(self))
+
         if self._prefetch_related_lookups and not self._prefetch_done:
             self._prefetch_related_objects()
+
+        if executed_queries_length is not None:
+            self.executed_queries = set_executed_queries(
+                connections[self.db].queries, executed_queries_length
+            )
 
     def _next_is_sticky(self):
         """
@@ -2410,6 +2422,7 @@ class RawQuerySet:
         self._prefetch_related_lookups = ()
         self._prefetch_done = False
         self._fetch_mode = fetch_mode
+        self.executed_queries = None
 
     def resolve_model_init_order(self):
         """Resolve the init field names and value positions."""
@@ -2458,10 +2471,18 @@ class RawQuerySet:
         return c
 
     def _fetch_all(self):
+        executed_queries_length = None
+
         if self._result_cache is None:
+            executed_queries_length = len(connections[self.db].queries)
             self._result_cache = list(self.iterator())
         if self._prefetch_related_lookups and not self._prefetch_done:
             self._prefetch_related_objects()
+
+        if executed_queries_length is not None:
+            self.executed_queries = set_executed_queries(
+                connections[self.db].queries, executed_queries_length
+            )
 
     def __len__(self):
         self._fetch_all()
