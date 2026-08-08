@@ -225,7 +225,7 @@ class SubqueryJoin:
         return clone
 
     def get_field(self, name):
-        field = self.table_subquery.output_field.get_field(name)
+        field = self.table_subquery.get_output_column(name).field
 
         if field.is_relation:
             field = field.target_field
