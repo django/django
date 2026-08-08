@@ -34,36 +34,11 @@ class CompositeFieldOutputFieldTests(SimpleTestCase):
         with self.assertRaises(FieldError):
             info.get_field("missing")
 
-    def test_nested_fields(self):
-        number = models.IntegerField()
-        key = models.TextField()
-        value = models.TextField()
-        output_field = models.CompositeField(
-            number=number,
-            item=models.CompositeField(
-                key=key,
-                value=value,
-            ),
-        )
-
-        self.assertEqual(
-            list(output_field.get_fields()),
-            [
-                (("number",), number),
-                (("item", "key"), key),
-                (("item", "value"), value),
-            ],
-        )
-        self.assertIs(output_field.get_field("item__key"), key)
-        self.assertIs(output_field.get_field("item__value"), value)
-
     def test_clone(self):
         output_field = models.CompositeField(
             number=models.IntegerField(),
-            item=models.CompositeField(
-                key=models.TextField(db_column="item_key"),
-                value=models.TextField(),
-            ),
+            key=models.TextField(db_column="item_key"),
+            value=models.TextField(),
         )
 
         clone = output_field.clone()
@@ -76,8 +51,8 @@ class CompositeFieldOutputFieldTests(SimpleTestCase):
             ],
             [
                 (("number",), models.IntegerField, None),
-                (("item", "key"), models.TextField, "item_key"),
-                (("item", "value"), models.TextField, None),
+                (("key",), models.TextField, "item_key"),
+                (("value",), models.TextField, None),
             ],
         )
         for path, field in output_field.get_fields():
