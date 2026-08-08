@@ -470,3 +470,30 @@ class SelectTest(ChoiceWidgetTest):
             '<option value="R">Ringo</option></select></div>',
             form.render(),
         )
+
+    def test_select_with_option_attrs(self):
+        # this test reaches the else
+        select = Select(
+            choices=((None, "---"), ("1", "1"), ("2", "2")),
+            option_attrs={"option-attr": "test"},
+        )
+        html_str = select.render(name='test_select', value=None)
+        self.assertHTMLEqual(
+            html_str,
+            '<select name=test_select><option option-attr="test" value="" selected>'
+            '---</option><option option-attr="test" value=1>1</option><option '
+            'option-attr="test" value=2>2</option></select>',
+        )
+
+    def test_select_without_option_attrs(self):
+        # this test reaches the elif
+        select = Select(
+            choices=((None, "---"), ("1", "1"), ("2", "2")),
+        )
+        html_str = select.render(name='test_select', value=None)
+        self.assertHTMLEqual(
+            html_str,
+            '<select name=test_select><option value="" selected>'
+            '---</option><option value=1>1</option><option '
+            'value=2>2</option></select>',
+        )

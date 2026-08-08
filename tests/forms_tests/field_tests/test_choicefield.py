@@ -150,6 +150,7 @@ class ChoiceFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             f.clean("3")
 
     def test_choicefield_adds_required_and_id_attributes(self):
+        # this test reaches if with option_attrs set
         class MyForm(Form):
             select = ChoiceField(
                 choices=((None, "---"), ("1", "1"), ("2", "2")),
@@ -157,37 +158,37 @@ class ChoiceFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             )
 
         form = MyForm()
-        self.maxDiff = None
         self.assertHTMLEqual(
             str(form),
-            """
-            <div>
-            <fieldset>
-            <legend>Select:</legend>
-            <div id="id_select">
-            <div>
-            <label for="id_select_0">
-            <input type="radio" name="select" value="" required id="id_select_0"
-            option-attr="test" checked>
-                ---
-            </label>
-            </div>
-            <div>
-            <label for="id_select_1">
-            <input type="radio" name="select" value="1" required id="id_select_1"
-            option-attr="test">
-                1
-            </label>
-            </div>
-            <div>
-            <label for="id_select_2">
-            <input type="radio" name="select" value="2" required id="id_select_2"
-            option-attr="test">
-                2
-            </label>
-            </div>
-            </div>
-            </fieldset>
-            </div>
-            """,
+            '<div><fieldset><legend>Select:</legend><div id=id_select><div><label '
+            'for=id_select_0><input id=id_select_0 name=select option-attr=test '
+            'required type=radio value=""checked> ---</label></div><div><label '
+            'for=id_select_1><input id=id_select_1 name=select option-attr=test '
+            'required type=radio value=1> 1</label></div><div><label for=id_select_2>'
+            '<input id=id_select_2 name=select option-attr=test required type=radio '
+            'value=2> 2</label></div></div></fieldset></div>',
+        )
+
+    def test_choicefield_with_attrs_and_option_attrs(self):
+        # this test reaches if with both attrs and option_attrs set
+        class MyForm(Form):
+            select = ChoiceField(
+                choices=((None, "---"), ("1", "1"), ("2", "2")),
+                widget=RadioSelect(
+                    attrs={"attr": "attr-test"},
+                    option_attrs={"option-attr": "test"}
+                ),
+            )
+
+        form = MyForm()
+        self.assertHTMLEqual(
+            str(form),
+            '<div><fieldset><legend>Select:</legend><div id=id_select><div><label '
+            'for=id_select_0><input attr=attr-test id=id_select_0 name=select '
+            'option-attr=test required type=radio value=""checked> ---</label></div>'
+            '<div><label for=id_select_1><input attr=attr-test id=id_select_1 '
+            'name=select option-attr=test required type=radio value=1> 1</label></div>'
+            '<div><label for=id_select_2><input attr=attr-test id=id_select_2 '
+            'name=select option-attr=test required type=radio value=2> 2</label></div>'
+            '</div></fieldset></div>',
         )
