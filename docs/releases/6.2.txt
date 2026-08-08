@@ -43,8 +43,9 @@ be referenced using the double-underscore syntax:
     >>> newest = Comment.objects.order_by("-created_at").values("email", "author__name")[:1]
     >>> Post.objects.alias(info=newest).values("info__email", "info__author__name")
 
-These subfields can be selected, filtered, annotated, and ordered in the same
-way as model fields. See :ref:`using-multi-column-subqueries` for more details.
+These subfields can be selected, filtered, referenced in annotations, and used
+for ordering in the same way as model fields. See
+:ref:`using-multi-column-subqueries` for more details.
 
 Minor features
 --------------
