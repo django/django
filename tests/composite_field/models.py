@@ -102,4 +102,4 @@ class Comment(models.Model):
         on_delete=models.SET_NULL,
         related_name="comments",
     )
-    text = models.CharField(max_length=255)
+    text = models.CharField(max_length=255, db_column="comment_text")

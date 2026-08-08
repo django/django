@@ -191,6 +191,14 @@ class SubqueryJoin:
         self.parent_alias = None
         # Join table
         self.table_subquery = table_subquery
+        if self.table_subquery.selected is None:
+            self.table_subquery = table_subquery.clone()
+            self.table_subquery.set_values(
+                [
+                    *self.table_subquery.values_select,
+                    *self.table_subquery.annotation_select,
+                ]
+            )
         self._table_subquery_identity = table_subquery
         self.table_alias = table_alias
         # LOUTER or INNER
