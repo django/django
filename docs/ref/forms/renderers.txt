@@ -51,19 +51,22 @@ should return a rendered template (as a string) or raise
 
         The default name of the template to use to render a form.
 
-        Defaults to ``"django/forms/div.html"`` template.
+        Defaults to ``"django/forms/div.html"`` template
+        (:source:`source <django/forms/templates/django/forms/div.html>`).
 
     .. attribute:: formset_template_name
 
         The default name of the template to use to render a formset.
 
-        Defaults to ``"django/forms/formsets/div.html"`` template.
+        Defaults to ``"django/forms/formsets/div.html"`` template
+        (:source:`source <django/forms/templates/django/forms/formsets/div.html>`).
 
     .. attribute:: field_template_name
 
         The default name of the template used to render a ``BoundField``.
 
         Defaults to ``"django/forms/field.html"``
+        (:source:`source <django/forms/templates/django/forms/field.html>`).
 
     .. attribute:: bound_field_class
 
@@ -232,8 +235,10 @@ Overriding built-in widget templates
 Each widget has a ``template_name`` attribute with a value such as
 ``input.html``. Built-in widget templates are stored in the
 ``django/forms/widgets`` path. You can provide a custom template for
-``input.html`` by defining ``django/forms/widgets/input.html``, for example.
-See :ref:`built-in widgets` for the name of each widget's template.
+``input.html`` by defining ``django/forms/widgets/input.html``
+(:source:`source <django/forms/templates/django/forms/widgets/input.html>`),
+for example. See :ref:`built-in widgets` for the name of each widget's
+template.
 
 To override widget templates, you must use the :class:`TemplatesSetting`
 renderer. Then overriding widget templates works :doc:`the same as
