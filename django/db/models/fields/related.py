@@ -601,6 +601,14 @@ class ForeignObject(RelatedField):
         obj.__dict__.pop("reverse_path_infos", None)
         return obj
 
+    @property
+    def non_db_attrs(self):
+        if isinstance(self.remote_field.on_delete, DatabaseOnDelete):
+            # Database-level on_delete options are part of the column
+            # definition.
+            return super().non_db_attrs
+        return super().non_db_attrs + ("on_delete",)
+
     def check(self, **kwargs):
         return [
             *super().check(**kwargs),
