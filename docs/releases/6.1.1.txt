@@ -9,4 +9,6 @@ Django 6.1.1 fixes several bugs in 6.1.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 6.1 where the deprecation of double-dot variable
+  lookups incorrectly applied to string and translated template literals
+  containing two consecutive dots, such as ``{{ "a..b" }}`` (:ticket:`37257`).

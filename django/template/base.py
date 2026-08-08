@@ -556,7 +556,7 @@ class Parser:
                 except TemplateSyntaxError as e:
                     raise self.error(token, e)
                 var_node = VariableNode(filter_expression)
-                if ".." in str(filter_expression.var):
+                if filter_expression.is_var and ".." in filter_expression.var.var:
                     warnings.warn(
                         "Support for double-dot lookups '..' which maps to a "
                         "lookup of the empty string is deprecated.\n"
