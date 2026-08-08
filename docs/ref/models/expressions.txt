@@ -707,6 +707,8 @@ Using multi-column subqueries
 A ``Subquery`` can return multiple columns by calling
 :meth:`~.QuerySet.values` with multiple field names. In this case, the
 subquery has a ``CompositeField`` :ref:`output_field <output-field>`.
+Using a ``CompositeField`` as a subfield of another ``CompositeField`` isn't
+supported.
 
 Assign a multi-column ``Subquery`` using :meth:`~.QuerySet.alias`. Its
 individual subfields can then be referenced using the normal double-underscore
@@ -719,7 +721,8 @@ lookup syntax:
 
 Don't pass the multi-column ``Subquery`` directly to
 :meth:`~.QuerySet.annotate`, as selecting all its columns as a single
-annotation value isn't supported:
+annotation value isn't supported. The error is raised when the queryset is
+evaluated:
 
 .. code-block:: pycon
 
