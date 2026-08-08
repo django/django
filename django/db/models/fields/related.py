@@ -1533,6 +1533,7 @@ class ManyToManyField(RelatedField):
             *self._check_relationship_model(**kwargs),
             *self._check_ignored_options(**kwargs),
             *self._check_table_uniqueness(**kwargs),
+            *self._check_on_delete(**kwargs),
         ]
 
     def _check_unique(self, **kwargs):
@@ -1892,6 +1893,49 @@ class ManyToManyField(RelatedField):
                 )
             ]
         return []
+
+    def _check_on_delete(self, **kwargs):
+        errors = []
+        if (
+            isinstance(self.remote_field.through, str)
+            or not self.remote_field.through._meta.auto_created
+        ):
+            # Not auto-created through models are checked on its own.
+            return []
+        # Database and Python variants cannot be mixed in a chain of model
+        # references. Auto-created through models are using Python variants.
+        m2m_through_remote_fields = (
+            m2m_model_field.remote_field
+            for m2m_model_field in self.remote_field.through._meta.get_fields()
+            if m2m_model_field.remote_field
+            and not isinstance(m2m_model_field.remote_field.model, str)
+        )
+        ref_model_fields = (
+            ref_model_field
+            for remote_field in m2m_through_remote_fields
+            for ref_model_field in remote_field.model._meta.get_fields()
+            if ref_model_field.related_model
+            and hasattr(ref_model_field.remote_field, "on_delete")
+        )
+        for ref_model_field in ref_model_fields:
+            if (
+                ref_model_field.remote_field.on_delete is not None
+                and ref_model_field.remote_field.on_delete != DO_NOTHING
+                and isinstance(ref_model_field.remote_field.on_delete, DatabaseOnDelete)
+            ):
+                errors.append(
+                    checks.Error(
+                        "Field specifies Python-level on_delete variant, but "
+                        "referenced model uses database-level variant.",
+                        hint=(
+                            "Use either database or Python on_delete variants "
+                            "uniformly in the references chain."
+                        ),
+                        obj=ref_model_field,
+                        id="fields.E323",
+                    )
+                )
+        return errors
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()

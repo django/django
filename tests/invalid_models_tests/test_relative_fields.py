@@ -2501,6 +2501,48 @@ class DatabaseLevelOnDeleteTests(TestCase):
         )
 
     @skipUnlessDBFeature("supports_on_delete_db_cascade")
+    def test_db_python_m2m_chain(self):
+        class OtherModelParent(models.Model):
+            pass
+
+        class OtherModel(models.Model):
+            parent = models.ForeignKey(OtherModelParent, on_delete=models.DB_CASCADE)
+
+        class Parent(models.Model):
+            pass
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, on_delete=models.DB_CASCADE)
+            other_models = models.ManyToManyField(OtherModel)
+
+        field = Child._meta.get_field("other_models")
+        self.assertEqual(
+            field.check(from_model=Child, databases=self.databases),
+            [
+                Error(
+                    "Field specifies Python-level on_delete variant, but referenced "
+                    "model uses database-level variant.",
+                    hint=(
+                        "Use either database or Python on_delete variants uniformly in "
+                        "the references chain."
+                    ),
+                    obj=Child._meta.get_field("parent"),
+                    id="fields.E323",
+                ),
+                Error(
+                    "Field specifies Python-level on_delete variant, but referenced "
+                    "model uses database-level variant.",
+                    hint=(
+                        "Use either database or Python on_delete variants uniformly in "
+                        "the references chain."
+                    ),
+                    obj=OtherModel._meta.get_field("parent"),
+                    id="fields.E323",
+                ),
+            ],
+        )
+
+    @skipUnlessDBFeature("supports_on_delete_db_cascade")
     def test_db_python_chain_auto_created(self):
         class GrandParent(models.Model):
             pass
