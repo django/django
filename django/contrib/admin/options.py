@@ -1083,8 +1083,14 @@ class ModelAdmin(BaseModelAdmin):
     def _get_base_actions(self, action_location=ActionLocation.CHANGE_LIST):
         """Return the list of actions, prior to any request-based filtering."""
         actions = []
+        # RemovedInDjango70Warning: When the deprecation ends, replace with:
+        # base_actions = (
+        #     self.get_action(action, action_location) for action in
+        #     self.actions or []
+        # )
         base_actions = (
-            self.get_action(action, action_location) for action in self.actions or []
+            self._get_action_with_action_location(action, action_location)
+            for action in self.actions or []
         )
         # get_action might have returned None, so filter any of those out.
         base_actions = [action for action in base_actions if action]
@@ -1166,11 +1172,15 @@ class ModelAdmin(BaseModelAdmin):
         default_choices=None,
         action_location=ActionLocation.CHANGE_LIST,
     ):
+        # Don't pass default_choices=None explicitly, so that overrides of
+        # get_action_choices() use the default value from their signature, as
+        # was the case when Django itself called get_action_choices().
+        kwargs = {} if default_choices is None else {"default_choices": default_choices}
         if "action_location" in get_func_args(self.get_action_choices):
             return self.get_action_choices(
                 request,
-                default_choices=default_choices,
                 action_location=action_location,
+                **kwargs,
             )
         else:
             warn_about_implementation(
@@ -1181,7 +1191,7 @@ class ModelAdmin(BaseModelAdmin):
                 RemovedInDjango70Warning,
                 self.get_action_choices,
             )
-            return self.get_action_choices(request, default_choices=default_choices)
+            return self.get_action_choices(request, **kwargs)
 
     def _get_choice_description(self, action, action_location):
         if action_location == ActionLocation.CHANGE_LIST:
@@ -1217,11 +1227,40 @@ class ModelAdmin(BaseModelAdmin):
             choices.append(choice)
         return choices
 
+    # RemovedInDjango70Warning: When the deprecation ends, remove.
+    def _get_action_with_action_location(
+        self, action, action_location=ActionLocation.CHANGE_LIST
+    ):
+        if "action_location" in get_func_args(self.get_action):
+            return self.get_action(action, action_location)
+        warn_about_implementation(
+            "Overriding get_action() without the 'action_location' parameter "
+            "is deprecated. Update the signature to get_action(self, action, "
+            "action_location=ActionLocation.CHANGE_LIST).",
+            RemovedInDjango70Warning,
+            self.get_action,
+        )
+        action = self.get_action(action)
+        if action is None:
+            return None
+        if isinstance(action, tuple):
+            func, name, description = action
+            action = Action(
+                func=func,
+                name=name,
+                description=description,
+                plural_description=getattr(func, "plural_description", description),
+                locations=getattr(func, "locations", [ActionLocation.CHANGE_LIST]),
+            )
+        if action_location not in action.locations:
+            return None
+        return action
+
     def get_action(self, action, action_location=ActionLocation.CHANGE_LIST):
         """
         Return a given action from a parameter, which can either be a callable,
-        or the name of a method on the ModelAdmin. Return is a tuple of
-        (callable, name, description).
+        or the name of a method on the ModelAdmin. Return is an Action object,
+        or None if the action isn't available in the given action_location.
         """
         # If the action is a callable, just use it.
         if callable(action):

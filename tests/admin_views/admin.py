@@ -1293,6 +1293,8 @@ class CourseAdmin(admin.ModelAdmin):
 
 # RemovedInDjango70Warning: When the deprecation ends, remove.
 class OverriddenActionAdmin(admin.ModelAdmin):
+    actions = ["test_action"]
+
     def get_actions(self, request):
         actions = super().get_actions(request)
         func, name, _ = actions["delete_selected"]
@@ -1301,7 +1303,14 @@ class OverriddenActionAdmin(admin.ModelAdmin):
         return actions
 
     def get_action_choices(self, request, default_choices=models.BLANK_CHOICE_DASH):
-        return super().get_action_choices(request, default_choices)
+        return super().get_action_choices(request, [*default_choices])
+
+    def get_action(self, action):
+        result = super().get_action(action)
+        if result is None:
+            return None
+        func, name, description = result
+        return func, name, description + " (tuple)"
 
     @admin.action(location=[ActionLocation.CHANGE_LIST, ActionLocation.CHANGE_FORM])
     def test_action(self, request, selected):

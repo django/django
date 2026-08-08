@@ -1,4 +1,5 @@
 import collections
+import warnings
 from itertools import chain
 
 from django.apps import apps
@@ -13,6 +14,7 @@ from django.db.models.expressions import Combinable
 from django.forms.models import BaseModelForm, BaseModelFormSet, _get_foreign_key
 from django.template import engines
 from django.template.backends.django import DjangoTemplates
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.module_loading import import_string
 
 
@@ -1244,7 +1246,12 @@ class ModelAdminChecks(BaseModelAdminChecks):
 
     def _check_actions(self, obj):
         errors = []
-        actions = obj._get_base_actions()
+        # RemovedInDjango70Warning: When the deprecation ends, replace with:
+        # actions = obj._get_base_actions()
+        with warnings.catch_warnings(
+            action="ignore", category=RemovedInDjango70Warning
+        ):
+            actions = obj._get_base_actions()
 
         # Actions with an allowed_permission attribute require the ModelAdmin
         # to implement a has_<perm>_permission() method for each permission.

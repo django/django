@@ -896,6 +896,9 @@ class AdminDetailActionsTest(TestCase):
                 "parameter is deprecated. Update the signature to "
                 "get_action_choices(self, request, default_choices=None, "
                 "action_location=ActionLocation.CHANGE_LIST).",
+                "Overriding get_action() without the 'action_location' parameter "
+                "is deprecated. Update the signature to get_action(self, action, "
+                "action_location=ActionLocation.CHANGE_LIST).",
                 "Unpacking an action tuple is deprecated. "
                 "Use Action attributes instead.",
                 "Using indexes on an action tuple is deprecated. "
@@ -906,6 +909,9 @@ class AdminDetailActionsTest(TestCase):
                 {warning.filename for warning in warning_list}, {admin_filename}
             )
         self.assertContains(response, "Delete selected model actions (extra)")
+        # The (func, name, description) tuple returned by the get_action()
+        # override is converted into an Action object.
+        self.assertContains(response, "Test action (tuple)")
 
         action_data = {
             ACTION_CHECKBOX_NAME: [obj.pk],

@@ -9,4 +9,7 @@ Django 6.1.1 fixes several bugs in 6.1.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 6.1 that caused a crash of the admin when
+  ``ModelAdmin.get_action()`` or ``ModelAdmin.get_action_choices()`` were
+  overridden with their pre-6.1 signatures. Such overrides now work again but
+  are deprecated (:ticket:`37265`).
