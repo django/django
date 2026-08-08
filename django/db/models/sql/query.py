@@ -157,6 +157,10 @@ JoinInfo = namedtuple(
     "JoinInfo",
     ("final_field", "targets", "opts", "joins", "path", "transform_function"),
 )
+QueryOutputColumn = namedtuple(
+    "QueryOutputColumn",
+    ("name", "expression", "field", "selection_name"),
+)
 
 
 class RawQuery:
@@ -347,7 +351,7 @@ class Query(BaseExpression):
     def _get_output_field(expression):
         return getattr(expression, "target", None) or expression.output_field
 
-    def _get_output_fields(self):
+    def _get_output_expressions(self):
         if self.selected is not None:
             for name, selection in self.selected.items():
                 if isinstance(selection, int):
@@ -356,19 +360,43 @@ class Query(BaseExpression):
                     expression = self.annotation_select[selection]
                 else:
                     expression = selection
-                yield name, self._get_output_field(expression)
+                yield name, expression
             return
 
         if self.values_select:
             for name, expression in zip(self.values_select, self.select, strict=True):
-                yield name, self._get_output_field(expression)
+                yield name, expression
         else:
             for expression in self.select:
                 field = self._get_output_field(expression)
-                yield field.name, field
+                yield field.name, expression
 
         for name, expression in self.annotation_select.items():
+            yield name, expression
+
+    def _get_output_fields(self):
+        for name, expression in self._get_output_expressions():
             yield name, self._get_output_field(expression)
+
+    @property
+    def output_columns(self):
+        """Return the ordered columns exposed by this query."""
+        return tuple(
+            QueryOutputColumn(
+                name=name,
+                expression=expression,
+                field=self._get_output_field(expression),
+                selection_name=name,
+            )
+            for name, expression in self._get_output_expressions()
+        )
+
+    def get_output_column(self, name):
+        """Return the output column with the given name."""
+        for output_column in self.output_columns:
+            if output_column.name == name:
+                return output_column
+        raise FieldError(f"{name!r} not found")
 
     @cached_property
     def base_table(self):
@@ -1293,39 +1321,23 @@ class Query(BaseExpression):
         )
 
     @staticmethod
-    def _iter_composite_field_paths(field, prefix=()):
-        if getattr(field, "is_composite", False):
-            for path, subfield in field.get_fields():
-                yield prefix + path, subfield
-        else:
-            yield prefix, field
-
-    @classmethod
-    def _is_multi_column_query(cls, query):
-        output_field = query.output_field
-        return (
-            output_field is not None
-            and sum(1 for _ in cls._iter_composite_field_paths(output_field)) > 1
-        )
+    def _is_multi_column_query(query):
+        return len(query.output_columns) > 1
 
     def _resolve_inner_subquery_field(self, join, field_path):
-        for path, field in self._iter_composite_field_paths(
-            join.table_subquery.output_field
-        ):
-            if tuple(field_path.split(LOOKUP_SEP)) == path:
-                column_name = LOOKUP_SEP.join(path)
-                field = join.get_field(column_name)
-                return Col(join.table_alias, field)
-        return None
+        try:
+            field = join.get_field(field_path)
+        except FieldError:
+            return None
+        return Col(join.table_alias, field)
 
     def _resolve_inner_subquery_tuple(self, join):
         from django.db.models.fields.tuple_lookups import Tuple
 
         cols = []
         output_field = join.table_subquery.output_field
-        for path, field in self._iter_composite_field_paths(output_field):
-            column_name = LOOKUP_SEP.join(path)
-            field = join.get_field(column_name)
+        for output_column in join.table_subquery.output_columns:
+            field = join.get_field(output_column.name)
             cols.append(Col(join.table_alias, field))
         return Tuple(*cols, output_field=output_field)
 
