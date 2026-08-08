@@ -1730,6 +1730,9 @@ specifying :attr:`~Field.db_column`, however, your code should never have to
 deal with the database column name (unless you write custom SQL). You'll always
 deal with the field names of your model object.
 
+This does not refer to the ``<field>_id`` attribute on model instances,
+which provides direct access to the related object's primary key.
+
 .. _foreign-key-arguments:
 
 Arguments
