@@ -61,3 +61,29 @@ class PrimaryKeyWithFalseyDbDefault(models.Model):
 
 class ChildPrimaryKeyWithDefault(PrimaryKeyWithDefault):
     pass
+
+
+# RemovedInDjango70Warning.
+class FromDbOldSignature(models.Model):
+    name = models.CharField(max_length=20)
+
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        instance = super().from_db(db, field_names, values)
+        instance._loaded_values = dict(zip(field_names, values))
+        return instance
+
+
+# RemovedInDjango70Warning.
+class FromDbOldSignatureRelated(models.Model):
+    old = models.ForeignKey(FromDbOldSignature, models.CASCADE)
+
+
+class FromDbNewSignature(models.Model):
+    name = models.CharField(max_length=20)
+
+    @classmethod
+    def from_db(cls, db, field_names, values, *, fetch_mode=None):
+        instance = super().from_db(db, field_names, values, fetch_mode=fetch_mode)
+        instance._from_db_fetch_mode = fetch_mode
+        return instance

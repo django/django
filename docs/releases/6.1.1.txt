@@ -34,3 +34,8 @@ Bugfixes
 * Fixed a bug in Django 6.1 where :class:`~django.db.models.DecimalField`
   without ``max_digits`` and ``decimal_places`` caused a crash when retrieving
   values on SQLite (:ticket:`37275`).
+
+* Fixed a regression in Django 6.1 that caused a crash when iterating a
+  ``QuerySet`` of a model overriding ``Model.from_db()`` without the new
+  ``fetch_mode`` keyword argument. Such overrides now work again, but are
+  deprecated and should be updated to accept ``fetch_mode`` (:ticket:`37259`).

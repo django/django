@@ -151,6 +151,9 @@ details on these changes.
 * The ``django.db.transaction.savepoint()`` alias to
   ``django.db.transaction.savepoint_create()`` will be removed.
 
+* Support for ``Model.from_db()`` methods that do not accept the
+  ``fetch_mode`` keyword argument will be removed.
+
 .. _deprecation-removed-in-6.1:
 
 6.1
