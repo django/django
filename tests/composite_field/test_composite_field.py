@@ -7,7 +7,16 @@ from django.db.models.functions import Upper
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import register_lookup
 
-from .models import BugReport, Organization, Post, Project, Task, User, Workspace
+from .models import (
+    BugReport,
+    Comment,
+    Organization,
+    Post,
+    Project,
+    Task,
+    User,
+    Workspace,
+)
 
 
 class CompositeFieldOutputFieldTests(SimpleTestCase):
@@ -124,9 +133,38 @@ class CompositeSubqueryTestCase(TestCase):
         cls.duplicate_welcome_post = Post.objects.create(
             user=cls.bob, title="Welcome", body="Hello"
         )
+        cls.comment = Comment.objects.create(
+            post=cls.welcome_post,
+            user=cls.ada,
+            text="First comment",
+        )
 
 
 class CompositeFieldTests(CompositeSubqueryTestCase):
+
+    def test_composite_subquery_alias_values_without_fields_db_column(self):
+        comment_info = Comment.objects.filter(pk=self.comment.pk).values()[:1]
+        comments = (
+            User.objects.filter(pk=self.ada.pk)
+            .alias(comment_info=comment_info)
+            .values_list("comment_info__text", flat=True)
+        )
+
+        self.assertSequenceEqual(comments, [self.comment.text])
+
+    def test_composite_subquery_alias_union_values_without_fields_db_column(self):
+        comment_info = (
+            Comment.objects.filter(pk=self.comment.pk)
+            .values()
+            .union(Comment.objects.filter(pk=-1).values())[:1]
+        )
+        comments = (
+            User.objects.filter(pk=self.ada.pk)
+            .alias(comment_info=comment_info)
+            .values_list("comment_info__text", flat=True)
+        )
+
+        self.assertSequenceEqual(comments, [self.comment.text])
 
     def test_composite_subquery_alias_or_preserves_outer_rows(self):
         missing_project = Project.objects.filter(pk=-1).values("pk", "code")
