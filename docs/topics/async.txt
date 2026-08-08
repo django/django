@@ -99,6 +99,8 @@ view functions:
 * :func:`~django.views.decorators.http.require_GET`
 * :func:`~django.views.decorators.http.require_POST`
 * :func:`~django.views.decorators.http.require_safe`
+* ``cross_origin_embedder_policy()``
+* ``cross_origin_resource_policy()``
 * :func:`~django.views.decorators.vary.vary_on_cookie`
 * :func:`~django.views.decorators.vary.vary_on_headers`
 * ``xframe_options_deny()``

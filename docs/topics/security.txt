@@ -267,6 +267,25 @@ document protected by COOP opens a cross-origin popup window, the popup’s
 attacks. See :ref:`the cross-origin opener policy section of the security
 middleware reference <cross-origin-opener-policy>` for details.
 
+Cross-origin embedder policy
+============================
+
+The cross-origin embedder policy (COEP) header prevents a document from loading
+any cross-origin resources that do not explicitly grant permission. See
+:ref:`the cross-origin embedder policy section of the security middleware
+reference <cross-origin-embedder-policy>` for details.
+
+Cross-origin resource policy
+============================
+
+The cross-origin resource policy (CORP) header allows a server to indicate
+which origins are allowed to load its resources. Setting it to ``same-origin``
+prevents cross-origin reads, which mitigates side-channel attacks
+such as Spectre. For public resources that must be loaded cross-origin, either
+change the global setting or use the ``@cross_origin_resource_policy`` per-view
+decorator. See :ref:`the cross-origin resource policy section of the security
+middleware reference <cross-origin-resource-policy>` for details.
+
 Session security
 ================
 
