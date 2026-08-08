@@ -1,9 +1,10 @@
 from collections import deque
+from unittest import mock
 
 from django.db.models import Prefetch, prefetch_related_objects
 from django.test import TestCase
 
-from .models import Author, Book, House, Reader, Room
+from .models import Author, Book, House, Person, Reader, Room
 
 
 class PrefetchRelatedObjectsTests(TestCase):
@@ -207,6 +208,64 @@ class PrefetchRelatedObjectsTests(TestCase):
             )
         with self.assertNumQueries(0):
             self.assertCountEqual(book2.the_authors, [self.author1])
+
+    def test_prefetch_object_to_internal_state_attr(self):
+        book = Book.objects.get(id=self.book1.id)
+        state = book._state
+        with self.assertNumQueries(0):
+            prefetch_related_objects(
+                [book],
+                Prefetch("authors", to_attr="_state"),
+            )
+        self.assertIs(book._state, state)
+
+    def test_prefetch_object_to_writable_property_twice(self):
+        person1 = Person.objects.create(name="Joe")
+        person2 = Person.objects.create(name="Mary")
+        person1.houses.add(self.house1)
+        person2.houses.add(self.house2)
+        lookup = Prefetch("houses", to_attr="writable_all_houses")
+
+        with self.assertNumQueries(1):
+            prefetch_related_objects([person1], lookup)
+        # person1 was already populated by the call above, so only person2's
+        # relation should be fetched.
+        with self.assertNumQueries(1):
+            prefetch_related_objects([person1, person2], lookup)
+
+        with self.assertNumQueries(0):
+            self.assertEqual(person1.writable_all_houses, [self.house1])
+            self.assertEqual(person2.writable_all_houses, [self.house2])
+
+    def test_failed_to_attr_assignment_is_not_marked_as_fetched(self):
+        person = Person.objects.create(name="Joe")
+        person.houses.add(self.house1)
+        descriptor = Person.__dict__["writable_all_houses"]
+        lookup = Prefetch("houses", to_attr="writable_all_houses")
+
+        # If the setter raises, the assignment must not be recorded as fetched,
+        # otherwise a later prefetch would be silently skipped.
+        with mock.patch.object(
+            Person,
+            "writable_all_houses",
+            property(
+                descriptor.fget,
+                mock.Mock(side_effect=ValueError("setter failed")),
+            ),
+        ):
+            with (
+                self.assertNumQueries(1),
+                self.assertRaisesMessage(ValueError, "setter failed"),
+            ):
+                prefetch_related_objects([person], lookup)
+
+        self.assertNotIn("writable_all_houses", person._state.prefetched_to_attrs)
+        # The failed assignment leaves the instance unmarked, so the
+        # prefetch is retried when the setter works again.
+        with self.assertNumQueries(1):
+            prefetch_related_objects([person], lookup)
+        with self.assertNumQueries(0):
+            self.assertEqual(person.writable_all_houses, [self.house1])
 
     def test_prefetch_queryset(self):
         book1 = Book.objects.get(id=self.book1.id)

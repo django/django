@@ -281,3 +281,16 @@ class ModelFieldsCacheTest(TestCase):
         worker2.department = department2
         self.assertEqual(worker2.department, department2)
         self.assertEqual(worker1.department, department1)
+
+    def test_prefetched_to_attrs_reset_on_copy(self):
+        department = Department.objects.create(id=1, name="department")
+        department._state.prefetched_to_attrs.add("workers")
+
+        copied_department = copy.copy(department)
+        copied_department._state.prefetched_to_attrs.add("managers")
+
+        self.assertEqual(department._state.prefetched_to_attrs, {"workers"})
+        self.assertEqual(
+            copied_department._state.prefetched_to_attrs,
+            {"workers", "managers"},
+        )

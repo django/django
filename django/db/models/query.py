@@ -7,6 +7,7 @@ import operator
 import warnings
 from contextlib import nullcontext
 from functools import reduce
+from inspect import getattr_static
 from itertools import chain, islice
 from weakref import ref as weak_ref
 
@@ -2690,7 +2691,31 @@ def prefetch_related_objects(model_instances, *related_lookups):
             # premise of prefetch_related), so what applies to first object
             # applies to all.
             first_obj = next(iter(obj_list))
-            to_attr = lookup.get_current_to_attr(level)[0]
+            to_attr, as_attr = lookup.get_current_to_attr(level)
+            # Inspect a custom destination statically so that determining
+            # whether it can be assigned doesn't execute a property getter.
+            skip_prefetch = False
+            if as_attr:
+                # Preserve the historical behavior of silently skipping
+                # Django's internal instance attributes. They must never be
+                # overwritten by a custom prefetch result.
+                if to_attr in {"_state", "_prefetched_objects_cache"}:
+                    skip_prefetch = True
+                to_attr_descriptor = getattr_static(first_obj.__class__, to_attr, None)
+                if isinstance(to_attr_descriptor, property) and not callable(
+                    to_attr_descriptor.fset
+                ):
+                    # RemovedInDjango71Warning: replace this warning with a
+                    # ValueError when the deprecation ends.
+                    warn_about_external_use(
+                        "Prefetch() with to_attr=%r targeting a property "
+                        "without a setter is deprecated. Add a setter, use "
+                        "cached_property, or use a different to_attr. This "
+                        "will raise ValueError in Django 7.1." % to_attr,
+                        category=RemovedInDjango71Warning,
+                        skip_name_prefixes=("django.db.models",),
+                    )
+                    skip_prefetch = True
             prefetcher, descriptor, attr_found, is_fetched = get_prefetcher(
                 first_obj, through_attr, to_attr
             )
@@ -2717,7 +2742,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
                 )
 
             obj_to_fetch = None
-            if prefetcher is not None:
+            if prefetcher is not None and not skip_prefetch:
                 obj_to_fetch = [obj for obj in obj_list if not is_fetched(obj)]
 
             if obj_to_fetch:
@@ -2794,19 +2819,21 @@ def get_prefetcher(instance, through_attr, to_attr):
     """
 
     def is_to_attr_fetched(model, to_attr):
-        # Special case cached_property instances because hasattr() triggers
-        # attribute computation and assignment.
-        if isinstance(getattr(model, to_attr, None), cached_property):
+        descriptor = getattr_static(model, to_attr, None)
+        if isinstance(descriptor, cached_property):
 
             def has_cached_property(instance):
-                return to_attr in instance.__dict__
+                return (
+                    to_attr in instance._state.prefetched_to_attrs
+                    or to_attr in instance.__dict__
+                )
 
             return has_cached_property
 
-        def has_to_attr_attribute(instance):
-            return hasattr(instance, to_attr)
+        def has_prefetched_to_attr(instance):
+            return to_attr in instance._state.prefetched_to_attrs
 
-        return has_to_attr_attribute
+        return has_prefetched_to_attr
 
     prefetcher = None
     is_fetched = is_to_attr_fetched(instance.__class__, to_attr)
@@ -2930,6 +2957,7 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
             if as_attr:
                 # A to_attr has been given for the prefetch.
                 setattr(obj, to_attr, val)
+                obj._state.prefetched_to_attrs.add(to_attr)
             elif is_descriptor:
                 # cache_name points to a field name in obj.
                 # This field is a descriptor for a related object.
@@ -2942,6 +2970,7 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
         else:
             if as_attr:
                 setattr(obj, to_attr, vals)
+                obj._state.prefetched_to_attrs.add(to_attr)
             else:
                 manager = getattr(obj, to_attr)
                 if leaf and lookup.queryset is not None:
