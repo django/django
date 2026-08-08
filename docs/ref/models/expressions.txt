@@ -723,7 +723,11 @@ annotation value isn't supported:
 
 .. code-block:: pycon
 
-    >>> Post.objects.annotate(info=newest)
+    >>> posts = Post.objects.annotate(info=newest)
+    >>> list(posts)
+    Traceback (most recent call last):
+    ...
+    NotImplementedError: Selecting a multi-column subquery as an annotation is not supported.
 
 An uncorrelated multi-column subquery is combined with every row of the outer
 query, forming a Cartesian product. If the outer query has ``M`` rows and the
