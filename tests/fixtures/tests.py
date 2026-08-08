@@ -1166,6 +1166,20 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
                 ],
             )
 
+    def test_loading_dotted_path_without_format(self):
+        management.call_command("loaddata", "dotted.folder/fixture")
+        self.assertEqual(
+            Article.objects.get().headline,
+            "Fixture is loaded correctly when the path contains a dot",
+        )
+
+    def test_loading_double_dotted_path_without_format(self):
+        management.call_command("loaddata", "dotted.folder/../fixture1")
+        self.assertEqual(
+            Site.objects.get().domain,
+            "example.com",
+        )
+
 
 class NonexistentFixtureTests(TestCase):
     """
@@ -1198,6 +1212,35 @@ class NonexistentFixtureTests(TestCase):
             )
         disable_constraint_checking.assert_not_called()
         enable_constraint_checking.assert_not_called()
+
+    def test_command_error_has_file_path(self):
+        stdout_output = StringIO()
+        fixture_path = os.path.join("books", "fixtures.v1", "fixture")
+        expected_error_message = (
+            f"Problem installing fixture '{fixture_path}': "
+            "csv is not a known serialization format."
+        )
+
+        with self.assertRaisesMessage(CommandError, expected_error_message):
+            management.call_command(
+                "loaddata", "books/fixtures.v1/fixture.csv", stdout=stdout_output
+            )
+
+    def test_command_error_has_file_path_with_verbosity_equals_two(self):
+        stdout_output = StringIO()
+        fixture_path = os.path.join("books", "fixtures.v1", "fixture")
+        expected_error_message = (
+            f"Problem installing fixture '{fixture_path}': "
+            "csv is not a known serialization format."
+        )
+
+        with self.assertRaisesMessage(CommandError, expected_error_message):
+            management.call_command(
+                "loaddata",
+                "books/fixtures.v1/fixture.csv",
+                stdout=stdout_output,
+                verbosity=2,
+            )
 
 
 class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
