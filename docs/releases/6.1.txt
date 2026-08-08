@@ -661,6 +661,9 @@ Miscellaneous
   is deprecated. Pass an explicit field name, like
   ``values_list("pk", flat=True)``.
 
+* Support for ``Model.from_db()`` methods that do not accept the
+  ``fetch_mode`` keyword argument is deprecated.
+
 * The use of ``None`` to represent a top-level JSON scalar ``null`` when
   querying :class:`~django.db.models.JSONField` is now deprecated in favor of
   the new :class:`~django.db.models.JSONNull` expression. At the end of the

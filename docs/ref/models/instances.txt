@@ -150,6 +150,11 @@ is done. In this case it would be possible to use a ``super()`` call in the
 
     The ``fetch_mode`` parameter was added.
 
+.. deprecated:: 6.1
+
+    Support for ``from_db()`` methods that do not accept the ``fetch_mode``
+    keyword argument is deprecated and will be removed in Django 7.0.
+
 .. _refreshing-objects:
 
 Refreshing objects from database
