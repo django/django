@@ -1,6 +1,7 @@
 import ipaddress
 import re
 import types
+import warnings
 from datetime import datetime, timedelta
 from decimal import Decimal
 from unittest import TestCase, mock
@@ -33,7 +34,8 @@ from django.core.validators import (
     validate_slug,
     validate_unicode_slug,
 )
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango71Warning
 
 try:
     from PIL import Image  # noqa
@@ -755,6 +757,268 @@ class TestValidators(SimpleTestCase):
             ValidationError, '"djangoproject.com" has more than 16 characters.'
         ):
             v("djangoproject.com")
+
+
+class EmailValidatorTests(SimpleTestCase):
+    def test_invalid_domain_error(self):
+        with self.assertRaises(ValidationError) as cm:
+            EmailValidator()("local@invalid_domain")
+        self.assertEqual(cm.exception.code, "invalid")
+        self.assertEqual(
+            cm.exception.params,
+            {"value": "local@invalid_domain", "domain": "invalid_domain"},
+        )
+
+    def test_invalid_username_error(self):
+        with self.assertRaises(ValidationError) as cm:
+            EmailValidator()("not valid@example.com")
+        self.assertEqual(cm.exception.code, "invalid")
+        self.assertEqual(
+            cm.exception.params,
+            {"value": "not valid@example.com", "username": "not valid"},
+        )
+
+    def test_validate_domain_override(self):
+        class ExampleComDomainValidator(EmailValidator):
+            def validate_domain(self, domain, value):
+                if domain != "example.com":
+                    raise ValidationError(self.message, code=self.code)
+
+        validator = ExampleComDomainValidator()
+        self.assertIsNone(validator("local@example.com"))
+        with self.assertRaises(ValidationError):
+            validator("local@example.org")
+
+    def test_validate_username_override(self):
+        class NotAdminUsernameValidator(EmailValidator):
+            def validate_username(self, username, value):
+                if username == "admin":
+                    raise ValidationError(self.message, code=self.code)
+
+        validator = NotAdminUsernameValidator()
+        self.assertIsNone(validator("other@example.com"))
+        with self.assertRaises(ValidationError):
+            validator("admin@example.com")
+
+    def test_validate_override(self):
+        class UsernameMatchingDomainValidator(EmailValidator):
+            def validate(self, value, username, domain):
+                super().validate(value, username, domain)
+                # Require the username to match the domain's leftmost label.
+                if username != domain.split(".")[0]:
+                    raise ValidationError(self.message, code=self.code)
+
+        validator = UsernameMatchingDomainValidator()
+        self.assertIsNone(validator("example@example.com"))
+        with self.assertRaises(ValidationError):
+            validator("admin@example.com")
+
+    def test_parse_address(self):
+        validator = EmailValidator()
+        username, domain = validator.parse_address("local@example.com")
+        self.assertEqual((username, domain), ("local", "example.com"))
+        # Unparseable or oversized values raise ValidationError.
+        for value in ["", "no-at-sign", "local@" + "d" * 320]:
+            with self.subTest(value=value):
+                with self.assertRaises(ValidationError):
+                    validator.parse_address(value)
+
+    def test_parse_address_override(self):
+        class SplitOnFirstAtValidator(EmailValidator):
+            def parse_address(self, value):
+                # Split on the first "@" instead of the last.
+                return value.split("@", 1)
+
+        with self.assertRaises(ValidationError) as cm:
+            SplitOnFirstAtValidator()("a@b@example.com")
+        self.assertEqual(cm.exception.params["domain"], "b@example.com")
+
+    def test_validate_domain_override_can_raise_custom_error(self):
+        class CustomDomainErrorValidator(EmailValidator):
+            def validate_domain(self, domain, value):
+                try:
+                    super().validate_domain(domain, value)
+                except ValidationError:
+                    raise ValidationError(
+                        "%(domain)s is not allowed.",
+                        code="invalid_domain",
+                        params={"value": value, "domain": domain},
+                    ) from None
+
+        with self.assertRaises(ValidationError) as cm:
+            CustomDomainErrorValidator()("local@invalid_domain")
+        self.assertEqual(cm.exception.messages, ["invalid_domain is not allowed."])
+        self.assertEqual(cm.exception.code, "invalid_domain")
+        self.assertEqual(
+            cm.exception.params,
+            {"value": "local@invalid_domain", "domain": "invalid_domain"},
+        )
+
+    def test_validate_username_override_can_raise_custom_error(self):
+        class CustomUsernameErrorValidator(EmailValidator):
+            def validate_username(self, username, value):
+                try:
+                    super().validate_username(username, value)
+                except ValidationError:
+                    raise ValidationError(
+                        "%(username)s is not a valid local part.",
+                        code="invalid_username",
+                        params={"value": value, "username": username},
+                    ) from None
+
+        with self.assertRaises(ValidationError) as cm:
+            CustomUsernameErrorValidator()("not valid@example.com")
+        self.assertEqual(
+            cm.exception.messages, ["not valid is not a valid local part."]
+        )
+        self.assertEqual(cm.exception.code, "invalid_username")
+        self.assertEqual(
+            cm.exception.params,
+            {"value": "not valid@example.com", "username": "not valid"},
+        )
+
+    def test_subclass_without_overrides(self):
+        class PlainEmailValidator(EmailValidator):
+            pass
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", RemovedInDjango71Warning)
+            validator = PlainEmailValidator()
+            self.assertIsNone(validator("local@example.com"))
+            with self.assertRaises(ValidationError):
+                validator("local@invalid_domain")
+
+    def test_validate_domain_allows_allowlisted_domain(self):
+        validator = EmailValidator()
+        # Allowlisted domains are accepted even if failing the domain regex.
+        self.assertIsNone(validator.validate_domain("localhost", "local@localhost"))
+        # A non-allowlisted domain that fails the regex still raises.
+        with self.assertRaises(ValidationError):
+            validator.validate_domain("invalid_domain", "local@invalid_domain")
+
+
+# RemovedInDjango71Warning.
+class EmailValidatorDeprecationTests(SimpleTestCase):
+    def test_legacy_validate_domain_part_override_warns(self):
+        # The deprecated override is detected once, when the class is defined.
+        with self.assertWarnsMessage(
+            RemovedInDjango71Warning,
+            EmailValidator.validate_domain_part_deprecated_msg,
+        ):
+
+            class LegacyEmailValidator(EmailValidator):
+                def validate_domain_part(self, domain_part):
+                    return domain_part == "example.com"
+
+    def test_legacy_validate_domain_part_override_with_super_warns_once(self):
+        with warnings.catch_warnings(record=True) as recorded:
+            warnings.simplefilter("always")
+
+            class LegacyEmailValidator(EmailValidator):
+                def validate_domain_part(self, domain_part):
+                    return super().validate_domain_part(domain_part)
+
+            LegacyEmailValidator()("local@example.com")
+        relevant = [w for w in recorded if w.category is RemovedInDjango71Warning]
+        self.assertEqual(len(relevant), 1)
+
+    def test_call_override_using_stock_validate_domain_part_warns(self):
+        # A subclass that overrides __call__ and calls the inherited
+        # validate_domain_part() should be warned that it is deprecated.
+        class StockDomainPartCallValidator(EmailValidator):
+            def __call__(self, value):
+                user_part, domain_part = value.rsplit("@", 1)
+                if not self.validate_domain_part(domain_part):
+                    raise ValidationError(self.message, code=self.code)
+
+        with self.assertWarnsMessage(
+            RemovedInDjango71Warning,
+            EmailValidator.validate_domain_part_deprecated_msg,
+        ):
+            StockDomainPartCallValidator()("local@example.com")
+
+    def test_validate_domain_part_direct_call_warns(self):
+        with self.assertWarnsMessage(
+            RemovedInDjango71Warning,
+            EmailValidator.validate_domain_part_deprecated_msg,
+        ):
+            EmailValidator().validate_domain_part("example.com")
+
+    @ignore_warnings(category=RemovedInDjango71Warning)
+    def test_validate_domain_part_ignores_allowlist(self):
+        validator = EmailValidator()
+        self.assertIs(validator.validate_domain_part("example.com"), True)
+        self.assertIs(validator.validate_domain_part("invalid_domain"), False)
+        # The allowlist is checked by validate(), not validate_domain_part(),
+        # so an allowlisted domain fails the plain domain check.
+        self.assertIs(validator.validate_domain_part("localhost"), False)
+
+    @ignore_warnings(category=RemovedInDjango71Warning)
+    def test_legacy_validate_domain_part_override_with_super_is_honored(self):
+        class LegacyEmailValidator(EmailValidator):
+            def validate_domain_part(self, domain_part):
+                return (
+                    super().validate_domain_part(domain_part)
+                    and domain_part != "blocked.example.com"
+                )
+
+        validator = LegacyEmailValidator()
+        self.assertIsNone(validator("local@example.com"))
+        # Rejected by the subclass's extra check.
+        with self.assertRaises(ValidationError):
+            validator("local@blocked.example.com")
+        # Rejected by the inherited (super) check.
+        with self.assertRaises(ValidationError):
+            validator("local@invalid_domain")
+
+    @ignore_warnings(category=RemovedInDjango71Warning)
+    def test_override_both_prefers_legacy_validate_domain_part(self):
+        class LegacyPreferredEmailValidator(EmailValidator):
+            def validate_domain(self, domain, value):
+                raise AssertionError("validate_domain() should not be called")
+
+            def validate_domain_part(self, domain_part):
+                return domain_part == "example.com"
+
+        validator = LegacyPreferredEmailValidator()
+        self.assertIsNone(validator("local@example.com"))
+        # validate_domain_part() takes precedence over validate_domain().
+        with self.assertRaises(ValidationError):
+            validator("local@example.org")
+
+    @ignore_warnings(category=RemovedInDjango71Warning)
+    def test_legacy_override_with_colliding_validate_domain(self):
+        # Any subclass may define validate_domain() as its own helper, with its
+        # own signature and call chain. `__call__` must route through the
+        # overridden `validate_domain_part()` and not `validate_domain()`
+        # itself, which would pass the wrong arguments.
+        class LegacyEmailValidator(EmailValidator):
+            def validate_domain(self, domain):  # Own 1-argument helper.
+                return domain == "example.com"
+
+            def validate_domain_part(self, domain_part):
+                return self.validate_domain(domain_part)
+
+        validator = LegacyEmailValidator()
+        self.assertIsNone(validator("local@example.com"))
+        with self.assertRaises(ValidationError):
+            validator("local@example.org")
+
+    @ignore_warnings(category=RemovedInDjango71Warning)
+    def test_allowlisted_domain_skips_legacy_override(self):
+        class OrgOnlyEmailValidator(EmailValidator):
+            def validate_domain_part(self, domain_part):
+                if domain_part == "myexception.com":
+                    raise AssertionError("allowlisted domains must skip the override")
+                return domain_part.endswith(".org")
+
+        validator = OrgOnlyEmailValidator(allowlist=["myexception.com"])
+        # The allowlisted domain is accepted without consulting the override.
+        self.assertIsNone(validator("local@myexception.com"))
+        # Non-allowlisted domains are still handed to the override.
+        self.assertIsNone(validator("local@myexception.org"))
+        with self.assertRaises(ValidationError):
+            validator("local@reallymyexception.com")
 
 
 class TestValidatorEquality(TestCase):
