@@ -25,3 +25,8 @@ Bugfixes
   created with :func:`~django.utils.safestring.mark_safe`, used as form media
   assets were treated as asset paths rather than being rendered verbatim
   (:ticket:`37262`).
+
+* Fixed a regression in Django 6.1 that caused ``AlterField`` operations that
+  changed only the Python-level ``on_delete`` option of ``ForeignKey`` or
+  ``OneToOneField`` fields to perform unnecessary schema changes
+  (:ticket:`37260`).
