@@ -9,4 +9,7 @@ Django 6.1.1 fixes several bugs in 6.1.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 6.1 where ``AdminEmailHandler`` and
+  ``BrokenLinkEmailsMiddleware`` no longer ignored errors raised while sending
+  error reporting emails when the :setting:`MAILERS` setting was used, causing
+  cascading failures during error handling (:ticket:`37261`).

@@ -174,7 +174,10 @@ class AdminEmailHandler(logging.Handler):
 
         try:
             mail.mail_admins(subject, message, *args, using=self.using, **kwargs)
-        except mail.MailerDoesNotExist:
+        except Exception:
+            # Ignore all errors, including an unavailable mailer and any
+            # failure sending the email, to avoid a cascading failure in the
+            # error handler.
             pass
 
     def format_subject(self, subject):

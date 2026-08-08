@@ -527,6 +527,22 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
         self.assertEqual(len(mail.outbox), 0)
 
     @override_settings(
+        MAILERS={"default": {"BACKEND": "mail.custombackend.FailingEmailBackend"}}
+    )
+    def test_no_error_when_sending_fails(self):
+        """
+        An error sending the email is ignored and the response is returned
+        (matching the fail_silently=True behavior of the deprecated
+        EMAIL_BACKEND setting).
+        """
+        self.addCleanup(FailingEmailBackend.reset)
+        self.req.META["HTTP_REFERER"] = "/another/url/"
+        # Does not raise the error from FailingEmailBackend.send_messages().
+        response = BrokenLinkEmailsMiddleware(self.get_response)(self.req)
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(len(mail.outbox), 0)
+
+    @override_settings(
         MAILERS={
             "custom": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}
         },

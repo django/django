@@ -445,6 +445,21 @@ class AdminEmailHandlerTest(SimpleTestCase):
 
     @override_settings(
         ADMINS=["admin@example.com"],
+        MAILERS={"default": {"BACKEND": "mail.custombackend.FailingEmailBackend"}},
+    )
+    def test_no_error_when_sending_fails(self):
+        """
+        An error sending the email is ignored to avoid a cascading failure in
+        the error handler (matching the fail_silently=True behavior of the
+        deprecated EMAIL_BACKEND setting).
+        """
+        self.addCleanup(FailingEmailBackend.reset)
+        # Does not raise the error from FailingEmailBackend.send_messages().
+        self.logger.error("All work and no play makes Jack a dull boy")
+        self.assertEqual(len(mail.outbox), 0)
+
+    @override_settings(
+        ADMINS=["admin@example.com"],
         MAILERS={
             "custom": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}
         },
