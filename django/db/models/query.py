@@ -2023,6 +2023,10 @@ class QuerySet(AltersData):
             and
             # A default ordering doesn't affect GROUP BY queries.
             not self.query.group_by
+            and
+            # A default ordering cannot be applied to combined queries with a
+            # limited list of selected fields, e.g. through values().
+            not (self.query.combinator and self.query.has_select_fields)
         ):
             return True
         else:

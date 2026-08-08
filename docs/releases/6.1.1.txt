@@ -16,3 +16,9 @@ Bugfixes
 * Fixed a regression in Django 6.1 where :attr:`.ModelAdmin.list_display`
   entries that traverse multiple relations using ``__`` could crash or display
   incorrect values (:ticket:`37270`).
+
+* Fixed a regression in Django 6.1 that caused a crash when combining
+  querysets with :meth:`.QuerySet.values` or :meth:`.QuerySet.values_list`,
+  e.g. through :meth:`.QuerySet.union`, on models with ``Meta.ordering``
+  when the ordering columns were not part of the selected fields
+  (:ticket:`37258`).

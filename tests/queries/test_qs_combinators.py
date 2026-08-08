@@ -1,5 +1,6 @@
 import operator
 from datetime import datetime
+from unittest import mock
 
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import (
@@ -444,6 +445,57 @@ class QuerySetSetOperationTests(TestCase):
         qs1 = Tag.objects.filter(name__in=["A", "B"])[:1]
         qs2 = Tag.objects.filter(name__in=["C"])[:1]
         self.assertSequenceEqual(qs1.union(qs2), [a, c])
+
+    @skipUnlessDBFeature("supports_slicing_ordering_in_compound")
+    def test_union_first_last_with_default_ordering(self):
+        Tag.objects.create(name="B")
+        a = Tag.objects.create(name="A")
+        c = Tag.objects.create(name="C")
+        qs = Tag.objects.all().union(Tag.objects.all())
+        self.assertEqual(qs.first(), a)
+        self.assertEqual(qs.last(), c)
+
+    @skipUnlessDBFeature("supports_slicing_ordering_in_compound")
+    def test_union_with_values_and_default_ordering(self):
+        # The default ordering is not applied to combined queries with select
+        # fields when the ordering columns are not part of the result set.
+        tag1 = Tag.objects.create(name="t1")
+        tag2 = Tag.objects.create(name="t2")
+        qs1 = Tag.objects.values("id")
+        qs2 = Tag.objects.values("id")
+        self.assertCountEqual(qs1.union(qs2), [{"id": tag1.pk}, {"id": tag2.pk}])
+        qs1 = Tag.objects.values_list("id", flat=True)
+        qs2 = Tag.objects.values_list("id", flat=True)
+        self.assertCountEqual(qs1.union(qs2), [tag1.pk, tag2.pk])
+
+    def test_union_with_values_and_default_ordering_sql(self):
+        tests = [
+            Tag.objects.values("id").union(Tag.objects.values("id")),
+            Tag.objects.values_list("id").union(Tag.objects.values_list("id")),
+            Tag.objects.all().union(Tag.objects.all()).values("id"),
+        ]
+        for i, qs in enumerate(tests):
+            with (
+                self.subTest(query_index=i),
+                mock.patch.object(
+                    connection.features,
+                    "supports_slicing_ordering_in_compound",
+                    True,
+                ),
+            ):
+                sql, _ = qs.query.get_compiler(connection=connection).as_sql()
+                self.assertNotIn(") ORDER BY", sql)
+
+    def test_union_with_values_and_default_ordering_ordered_attribute(self):
+        self.assertIs(Tag.objects.all().union(Tag.objects.all()).ordered, True)
+        self.assertIs(
+            Tag.objects.values("id").union(Tag.objects.values("id")).ordered,
+            False,
+        )
+        self.assertIs(
+            Tag.objects.values("name").union(Tag.objects.values("name")).ordered,
+            False,
+        )
 
     def test_union_multiple_models_with_values_list_and_order(self):
         reserved_name = ReservedName.objects.create(name="rn1", order=0)
