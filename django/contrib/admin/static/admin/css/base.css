@@ -154,7 +154,7 @@ p,
 ol,
 ul,
 dl {
-    margin: 0.2em 0 0.8em 0;
+    margin: 0.2em 0 0.8em;
 }
 
 p {
@@ -178,7 +178,7 @@ h1 {
 
 h2 {
     font-size: 1rem;
-    margin: 1em 0 0.5em 0;
+    margin: 1em 0 0.5em;
 }
 
 h2.subhead {
@@ -188,21 +188,21 @@ h2.subhead {
 
 h3 {
     font-size: 0.875rem;
-    margin: 0.8em 0 0.3em 0;
+    margin: 0.8em 0 0.3em;
     color: var(--body-medium-color);
     font-weight: bold;
 }
 
 h4 {
     font-size: 0.75rem;
-    margin: 1em 0 0.8em 0;
+    margin: 1em 0 0.8em;
     padding-bottom: 3px;
     color: var(--body-medium-color);
 }
 
 h5 {
     font-size: 0.625rem;
-    margin: 1.5em 0 0.5em 0;
+    margin: 1.5em 0 0.5em;
     color: var(--body-quiet-color);
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -230,7 +230,7 @@ dt {
 }
 
 dd {
-    margin-left: 0;
+    margin-inline-start: 0;
 }
 
 form {
@@ -253,9 +253,9 @@ details summary {
 blockquote {
     font-size: 0.6875rem;
     color: var(--body-quiet-color);
-    margin-left: 2px;
-    padding-left: 10px;
-    border-left: 5px solid currentColor;
+    margin-inline-start: 2px;
+    padding-inline-start: 10px;
+    border-inline-start: 5px solid currentColor;
 }
 
 code,
@@ -361,7 +361,7 @@ th {
 
 th {
     font-weight: 500;
-    text-align: left;
+    text-align: start;
 }
 
 thead th,
@@ -419,7 +419,7 @@ thead th.sorted {
 }
 
 thead th.sorted .text {
-    padding-right: 42px;
+    padding-inline-end: 42px;
 }
 
 table thead th .text span {
@@ -448,9 +448,9 @@ table thead th.sorted:hover a.sortremove {
 
 table thead th.sorted .sortoptions {
     display: block;
-    padding: 9px 5px 0 5px;
-    float: right;
-    text-align: right;
+    padding: 9px 5px 0;
+    float: inline-end;
+    text-align: end;
 }
 
 table thead th.sorted .sortpriority {
@@ -458,8 +458,7 @@ table thead th.sorted .sortpriority {
     min-width: 12px;
     text-align: center;
     vertical-align: 3px;
-    margin-left: 2px;
-    margin-right: 2px;
+    margin-inline: 2px;
 }
 
 table thead th.sorted .sortoptions a {
@@ -479,7 +478,7 @@ table thead th.sorted .sortoptions a.sortremove:after {
     content: "\\";
     position: absolute;
     top: -6px;
-    left: 3px;
+    inset-inline-start: 3px;
     font-weight: 200;
     font-size: 1.125rem;
     color: var(--body-quiet-color);
@@ -657,17 +656,16 @@ input[type="button"][disabled].default {
 .module h4,
 .module dl,
 .module pre {
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-inline: 10px;
 }
 
 .module blockquote {
-    margin-left: 12px;
+    margin-inline-start: 12px;
 }
 
 .module ul,
 .module ol {
-    margin-left: 1.5em;
+    margin-inline-start: 1.5em;
 }
 
 .module h3 {
@@ -681,7 +679,7 @@ input[type="button"][disabled].default {
     padding: 8px;
     font-weight: 400;
     font-size: 0.8125rem;
-    text-align: left;
+    text-align: start;
     background: var(--header-bg);
     color: var(--header-link-color);
 }
@@ -708,8 +706,9 @@ ul.messagelist li {
     display: block;
     font-weight: 400;
     font-size: 0.8125rem;
-    padding: 10px 10px 10px 65px;
-    margin: 0 0 10px 0;
+    padding-block: 10px;
+    padding-inline: 65px 10px;
+    margin: 0 0 10px;
     color: var(--body-fg);
     word-break: break-word;
     background-color: var(--message-info-bg);
@@ -755,7 +754,7 @@ ul.messagelist li.error {
     font-weight: 700;
     display: block;
     padding: 10px 12px;
-    margin: 0 0 10px 0;
+    margin: 0 0 10px;
     color: var(--error-fg);
     border: 1px solid var(--error-fg);
     border-radius: 4px;
@@ -806,7 +805,8 @@ td ul.errorlist + textarea {
 
 .description {
     font-size: 0.75rem;
-    padding: 5px 0 0 12px;
+    padding-block: 5px 0;
+    padding-inline: 12px 0;
 }
 
 /* BREADCRUMBS */
@@ -849,28 +849,28 @@ ol.breadcrumbs a:hover {
 
 .viewlink,
 .inlineviewlink {
-    padding-left: 16px;
+    padding-inline-start: 16px;
     background: url(../img/icon-viewlink.svg) 0 center no-repeat;
 }
 
 .hidelink {
-    padding-left: 16px;
+    padding-inline-start: 16px;
     background: url(../img/icon-hidelink.svg) 0 center no-repeat;
 }
 
 .addlink {
-    padding-left: 16px;
+    padding-inline-start: 16px;
     background: url(../img/icon-addlink.svg) 0 1px no-repeat;
 }
 
 .changelink,
 .inlinechangelink {
-    padding-left: 16px;
+    padding-inline-start: 16px;
     background: url(../img/icon-changelink.svg) 0 2px no-repeat;
 }
 
 .deletelink {
-    padding-left: 16px;
+    padding-inline-start: 16px;
     background: url(../img/icon-deletelink.svg) 0 1px no-repeat;
 }
 
@@ -907,7 +907,7 @@ a.deletelink:hover {
 }
 
 .object-tools li + li {
-    margin-left: 15px;
+    margin-inline-start: 15px;
 }
 
 .object-tools a {
@@ -917,7 +917,7 @@ a.deletelink:hover {
 .object-tools a:link,
 .object-tools a:visited {
     display: block;
-    float: left;
+    float: inline-start;
     padding: 3px 12px;
     background: var(--object-tools-bg);
     color: var(--object-tools-fg);
@@ -940,7 +940,7 @@ a.deletelink:hover {
 .object-tools a.addlink {
     background-repeat: no-repeat;
     background-position: right 7px center;
-    padding-right: 26px;
+    padding-inline-end: 26px;
 }
 
 .object-tools a.viewsitelink {
@@ -1000,7 +1000,7 @@ a.deletelink:hover {
 }
 
 .skip-to-content-link:focus {
-    left: 0px;
+    inset-inline-start: 0px;
     top: 0px;
 }
 
@@ -1013,15 +1013,15 @@ a.deletelink:hover {
 }
 
 #content-main {
-    float: left;
+    float: inline-start;
     width: 100%;
 }
 
 #content-related {
-    float: right;
+    float: inline-end;
     width: 260px;
     position: relative;
-    margin-right: -300px;
+    margin-inline-end: -300px;
 }
 
 @media (forced-colors: active) {
@@ -1033,21 +1033,21 @@ a.deletelink:hover {
 /* COLUMN TYPES */
 
 .colMS {
-    margin-right: 300px;
+    margin-inline-end: 300px;
 }
 
 .colSM {
-    margin-left: 300px;
+    margin-inline-start: 300px;
 }
 
 .colSM #content-related {
-    float: left;
-    margin-right: 0;
-    margin-left: -300px;
+    float: inline-start;
+    margin-inline-end: 0;
+    margin-inline-start: -300px;
 }
 
 .colSM #content-main {
-    float: right;
+    float: inline-end;
 }
 
 .popup .colM {
@@ -1105,7 +1105,7 @@ a.deletelink:hover {
 #branding h2 {
     padding: 0 10px;
     font-size: 0.875rem;
-    margin: -8px 0 8px 0;
+    margin: -8px 0 8px;
     font-weight: normal;
     color: var(--header-color);
 }
@@ -1126,9 +1126,10 @@ a.deletelink:hover {
 }
 
 #user-tools {
-    float: right;
-    margin: 0 0 0 20px;
-    text-align: right;
+    float: inline-end;
+    margin-block: 0;
+    margin-inline: 20px 0;
+    text-align: end;
 }
 
 #user-tools,
@@ -1179,8 +1180,7 @@ a.deletelink:hover {
 }
 
 #content-related p {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-inline: 16px;
 }
 
 #content-related .actionlist {
@@ -1191,7 +1191,7 @@ a.deletelink:hover {
 #content-related .actionlist li {
     line-height: 1.2;
     margin-bottom: 10px;
-    padding-left: 18px;
+    padding-inline-start: 18px;
 }
 
 #content-related .module h2 {
@@ -1225,7 +1225,8 @@ a.deletelink:hover {
     padding: 10px 15px;
     color: var(--button-fg);
     background: var(--close-button-bg);
-    margin: 0 0 0 10px;
+    margin-block: 0;
+    margin-inline: 10px 0;
 }
 
 .delete-confirmation form .cancel-link:active,
@@ -1264,7 +1265,7 @@ a.deletelink:hover {
 
 .paginator ul {
     margin: 0;
-    margin-right: 6px;
+    margin-inline-end: 6px;
 }
 
 .paginator ul li {
@@ -1298,7 +1299,7 @@ a.deletelink:hover {
 }
 
 .paginator input {
-    margin-left: auto;
+    margin-inline-start: auto;
 }
 
 .base-svgs {
@@ -1350,9 +1351,10 @@ a.deletelink:hover {
     border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 0.875rem;
-    padding: 0 0 0 4px;
+    padding-block: 0;
+    padding-inline: 4px 0;
     margin: 0;
-    margin-left: 10px;
+    margin-inline-start: 10px;
 }
 
 .actions select:focus {

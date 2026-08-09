@@ -52,7 +52,8 @@
 }
 
 .login .submit-row {
-    padding: 1em 0 0 0;
+    padding-block: 1em 0;
+    padding-inline: 0;
     margin: 0;
     text-align: center;
 }
