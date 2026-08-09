@@ -50,6 +50,17 @@ class CompositePKSubqueryTests(TestCase):
         )
         self.assertFalse(tokens.filter(token_info__pk=self.other_token.pk).exists())
 
+    def test_filter_composite_primary_key_and_scalar_field(self):
+        token_info = Token.objects.filter(pk=self.token.pk).values("pk", "secret")[:1]
+        token_pks = (
+            Token.objects.filter(pk=self.token.pk)
+            .alias(token_info=token_info)
+            .filter(token_info=(*self.token.pk, self.token.secret))
+            .values_list("pk", flat=True)
+        )
+
+        self.assertSequenceEqual(token_pks, [self.token.pk])
+
     @expectedFailure
     def test_filter_composite_primary_key_expression(self):
         token_info = Token.objects.filter(pk=self.token.pk).values("pk")[:1]
