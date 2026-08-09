@@ -157,10 +157,6 @@ JoinInfo = namedtuple(
     "JoinInfo",
     ("final_field", "targets", "opts", "joins", "path", "transform_function"),
 )
-QueryOutputColumn = namedtuple(
-    "QueryOutputColumn",
-    ("name", "expression", "field", "selection_name"),
-)
 
 
 class RawQuery:
@@ -289,6 +285,7 @@ class Query(BaseExpression):
     # excluding annotation_select and extra_select.
     values_select = ()
     selected = None
+    derived_table = False
 
     # SQL annotation-related attributes.
     annotation_select_mask = None
@@ -378,25 +375,12 @@ class Query(BaseExpression):
         for name, expression in self._get_output_expressions():
             yield name, self._get_output_field(expression)
 
-    @property
-    def output_columns(self):
-        """Return the ordered columns exposed by this query."""
-        return tuple(
-            QueryOutputColumn(
-                name=name,
-                expression=expression,
-                field=self._get_output_field(expression),
-                selection_name=name,
-            )
-            for name, expression in self._get_output_expressions()
-        )
-
-    def get_output_column(self, name):
-        """Return the output column with the given name."""
-        for output_column in self.output_columns:
-            if output_column.name == name:
-                return output_column
-        raise FieldError(f"{name!r} not found")
+    def get_output_expression(self, requested_name):
+        """Return the selected expression with the given name."""
+        for name, expression in self._get_output_expressions():
+            if name == requested_name:
+                return expression
+        raise FieldError(f"{requested_name!r} not found")
 
     @cached_property
     def base_table(self):
@@ -1322,13 +1306,32 @@ class Query(BaseExpression):
 
     @staticmethod
     def _is_multi_column_query(query):
-        return len(query.output_columns) > 1
+        return (
+            sum(
+                len(expression) if isinstance(expression, ColPairs) else 1
+                for _, expression in query._get_output_expressions()
+            )
+            > 1
+        )
 
     def _resolve_inner_subquery_field(self, join, field_path):
         try:
-            field = join.get_field(field_path)
+            expression = join.table_subquery.get_output_expression(field_path)
         except FieldError:
             return None
+        if isinstance(expression, ColPairs):
+            return ColPairs(
+                join.table_alias,
+                [
+                    join.get_field(
+                        LOOKUP_SEP.join((field_path, source.attname)), source
+                    )
+                    for source in expression.sources
+                ],
+                expression.sources,
+                expression.output_field,
+            )
+        field = join.get_field(field_path, self._get_output_field(expression))
         return Col(join.table_alias, field)
 
     def _resolve_inner_subquery_tuple(self, join):
@@ -1336,9 +1339,12 @@ class Query(BaseExpression):
 
         cols = []
         output_field = join.table_subquery.output_field
-        for output_column in join.table_subquery.output_columns:
-            field = join.get_field(output_column.name)
-            cols.append(Col(join.table_alias, field))
+        for name, _ in join.table_subquery._get_output_expressions():
+            expression = self._resolve_inner_subquery_field(join, name)
+            if isinstance(expression, ColPairs):
+                cols.extend(expression.get_cols())
+            else:
+                cols.append(expression)
         return Tuple(*cols, output_field=output_field)
 
     def _promote_inner_subquery_join(self, name):
@@ -1346,7 +1352,9 @@ class Query(BaseExpression):
         annotation = self.annotations.get(alias)
         if annotation is None:
             return None
-        if not self._is_multi_column_query(annotation):
+        if not isinstance(annotation, Query) or not self._is_multi_column_query(
+            annotation
+        ):
             return None
         if annotation.has_external_references():
             raise NotImplementedError(
