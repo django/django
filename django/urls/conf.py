@@ -88,7 +88,8 @@ def _path(route, view, kwargs=None, name=None, Pattern=None):
         )
     else:
         raise TypeError(
-            "view must be a callable or a list/tuple in the case of include()."
+            "view must be a callable or a list/tuple in the case of "
+            f"include(), but got {view.__class__.__name__}."
         )
 
 
