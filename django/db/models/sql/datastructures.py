@@ -190,15 +190,12 @@ class SubqueryJoin:
         self.table_name = table_name
         self.parent_alias = None
         # Join table
-        self.table_subquery = table_subquery
-        if self.table_subquery.selected is None:
-            self.table_subquery = table_subquery.clone()
-            self.table_subquery.set_values(
-                [
-                    *self.table_subquery.values_select,
-                    *self.table_subquery.annotation_select,
-                ]
-            )
+        self.table_subquery = table_subquery.clone()
+        subqueries = [self.table_subquery]
+        while subqueries:
+            subquery = subqueries.pop()
+            subquery.derived_table = True
+            subqueries.extend(subquery.combined_queries)
         self._table_subquery_identity = table_subquery
         self.table_alias = table_alias
         # LOUTER or INNER
@@ -224,9 +221,7 @@ class SubqueryJoin:
         clone._table_subquery_identity = self._table_subquery_identity
         return clone
 
-    def get_field(self, name):
-        field = self.table_subquery.get_output_column(name).field
-
+    def get_field(self, name, field):
         if field.is_relation:
             field = field.target_field
 

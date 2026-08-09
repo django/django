@@ -269,7 +269,23 @@ class SQLCompiler:
             cols = self.query.select
         selected = []
         select_fields = None
-        if self.query.selected is None:
+        if self.query.derived_table:
+            for name, expression in self.query._get_output_expressions():
+                if isinstance(expression, ColPairs):
+                    selected.extend(
+                        (
+                            LOOKUP_SEP.join((name, source.attname)),
+                            column,
+                        )
+                        for source, column in zip(
+                            expression.sources,
+                            expression.get_cols(),
+                            strict=True,
+                        )
+                    )
+                else:
+                    selected.append((name, expression))
+        elif self.query.selected is None:
             selected = [
                 *(
                     (alias, RawSQL(*args))
