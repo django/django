@@ -113,9 +113,14 @@ command or your production server, for example:
 
     For production deployments, consider using a dedicated secrets
     manager instead, which typically offers encryption, access control,
-    and audit logging. Several `community maintained solutions
-    <https://github.com/django/new-features/issues/39>`_ exist to help
-    manage settings and secrets more robustly.
+    and audit logging.
+
+.. admonition:: Managing environment variables
+
+    Django has a vibrant ecosystem. There are tools for managing
+    environment variables highlighted on the `Community Ecosystem`_ page.
+
+.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#environment-configuration
 
 :setting:`ALLOWED_HOSTS`
 ------------------------
