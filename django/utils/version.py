@@ -21,35 +21,179 @@ PY314 = sys.version_info >= (3, 14)
 PY315 = sys.version_info >= (3, 15)
 
 
+def _validate_version(version):
+    # A version is the numbers of the printed version, followed by the status
+    # and its iteration, so its last three components are always the patch
+    # number, the status, and the iteration. Keeping the numbers as printed is
+    # what makes django.VERSION >= (2028, 3) mean what it looks like.
+    assert len(version) in (4, 5)
+    assert version[-2] in ("alpha", "beta", "rc", "final")
+
+
+class VersionTuple(tuple):
+    """django.VERSION, with named access to its components.
+
+    A version is (major, minor, micro, status, iteration) for X.Y[.Z]
+    releases, and (year, patch, status, iteration) for the calendar versions
+    used from Django 2028, which have no minor component. See DEP 20. The
+    `.feature`, `.patch`, `.status`, and `.iteration` attributes answer the
+    same under both schemes:
+
+        VERSION.feature   (6, 2) for 6.2.1, and (2028,) for 2028.1
+        VERSION.patch     1 for both 6.2.1 and 2028.1
+    """
+
+    __slots__ = ()
+
+    def __new__(cls, *version):
+        _validate_version(version)
+        return super().__new__(cls, version)
+
+    def __getnewargs__(self):
+        # The components are passed to __new__() individually, so copying and
+        # pickling must unpack them.
+        return self._components
+
+    @property
+    def _components(self):
+        # The components as a plain tuple, without deprecation warnings.
+        return tuple.__getitem__(self, slice(None))
+
+    # Indexed from the end, where the two schemes agree.
+    @property
+    def feature(self):
+        return self._components[:-3]
+
+    @property
+    def patch(self):
+        return tuple.__getitem__(self, -3)
+
+    @property
+    def status(self):
+        return tuple.__getitem__(self, -2)
+
+    @property
+    def iteration(self):
+        return tuple.__getitem__(self, -1)
+
+    # RemovedInDjango2028Warning: everything from here to the end of the class
+    # only warns about the coming shape change. Remove it all when the
+    # deprecation ends. The attributes above stay.
+    def _warn(self, message):
+        if len(self._components) == 4:
+            # Calendar versions already have their final shape.
+            return
+        # Imported here to avoid a circular import: django.utils.deprecation
+        # imports django.utils.inspect, which imports this module.
+        from django.utils.deprecation import (
+            RemovedInDjango2028Warning,
+            warn_about_external_use,
+        )
+
+        warn_about_external_use(
+            f"{message} django.VERSION has four components from Django 2028, "
+            "(year, patch, status, iteration), as calendar versions have no "
+            "minor component. Use `.feature`, `.patch`, `.status`, and "
+            "`.iteration` attributes instead.",
+            RemovedInDjango2028Warning,
+            # Report the caller of the tuple operation, not the operation, and
+            # stay quiet when Django reads its own version.
+            skip_name_prefixes="django.utils.version.VersionTuple",
+        )
+
+    def _warn_comparison(self, other):
+        # A comparison against three or more components can reach the ones
+        # which move down an index, so its result can change from Django 2028.
+        if isinstance(other, tuple) and tuple.__len__(other) > 2:
+            self._warn(
+                "Comparing django.VERSION with three or more components is "
+                "deprecated."
+            )
+
+    def __getitem__(self, index):
+        # Losing the minor component moves every later component down one
+        # index: VERSION[2] is the micro version now, but the status from
+        # Django 2028. Indexing any of them is therefore deprecated.
+        length = tuple.__len__(self)
+        if isinstance(index, slice):
+            deprecated = any(i >= 2 for i in range(*index.indices(length)))
+        else:
+            position = index + length if index < 0 else index
+            deprecated = 2 <= position < length
+        if deprecated:
+            self._warn(
+                "Indexing django.VERSION from its third component on is deprecated."
+            )
+        return tuple.__getitem__(self, index)
+
+    def __iter__(self):
+        self._warn("Iterating or unpacking django.VERSION is deprecated.")
+        return tuple.__iter__(self)
+
+    def __len__(self):
+        self._warn("Relying on the length of django.VERSION is deprecated.")
+        return tuple.__len__(self)
+
+    def __eq__(self, other):
+        self._warn_comparison(other)
+        return tuple.__eq__(self, other)
+
+    def __ne__(self, other):
+        self._warn_comparison(other)
+        return tuple.__ne__(self, other)
+
+    def __lt__(self, other):
+        self._warn_comparison(other)
+        return tuple.__lt__(self, other)
+
+    def __le__(self, other):
+        self._warn_comparison(other)
+        return tuple.__le__(self, other)
+
+    def __gt__(self, other):
+        self._warn_comparison(other)
+        return tuple.__gt__(self, other)
+
+    def __ge__(self, other):
+        self._warn_comparison(other)
+        return tuple.__ge__(self, other)
+
+    __hash__ = tuple.__hash__
+
+
 def get_version(version=None):
     """Return a PEP 440-compliant version number from VERSION."""
     version = get_complete_version(version)
 
     # Now build the two parts of the version number:
-    # main = X.Y[.Z]
+    # main = X.Y[.Z] or YYYY[.N]
     # sub = .devN - for pre-alpha releases
     #     | {a|b|rc}N - for alpha, beta, and rc releases
 
     main = get_main_version(version)
+    *_, status, iteration = version
 
     sub = ""
-    if version[3] == "alpha" and version[4] == 0:
+    if status == "alpha" and iteration == 0:
         git_changeset = get_git_changeset()
         if git_changeset:
             sub = ".dev%s" % git_changeset
 
-    elif version[3] != "final":
+    elif status != "final":
         mapping = {"alpha": "a", "beta": "b", "rc": "rc"}
-        sub = mapping[version[3]] + str(version[4])
+        sub = mapping[status] + str(iteration)
 
     return main + sub
 
 
 def get_main_version(version=None):
-    """Return main version (X.Y[.Z]) from VERSION."""
+    """Return main version (X.Y[.Z] or YYYY[.N]) from VERSION."""
     version = get_complete_version(version)
-    parts = 2 if version[2] == 0 else 3
-    return ".".join(str(x) for x in version[:parts])
+    # The numbers of the printed version, without a zero patch number.
+    numbers = version[:-2]
+    if numbers[-1] == 0:
+        numbers = numbers[:-1]
+    return ".".join(str(number) for number in numbers)
 
 
 def get_complete_version(version=None):
@@ -59,19 +203,19 @@ def get_complete_version(version=None):
     """
     if version is None:
         from django import VERSION as version
-    else:
-        assert len(version) == 5
-        assert version[3] in ("alpha", "beta", "rc", "final")
+    elif not isinstance(version, VersionTuple):
+        # VersionTuple validates itself when constructed.
+        _validate_version(version)
 
     return version
 
 
 def get_docs_version(version=None):
     version = get_complete_version(version)
-    if version[3] != "final":
+    if version[-2] != "final":
         return "dev"
-    else:
-        return "%d.%d" % version[:2]
+    # Documentation is published per feature release.
+    return ".".join(str(number) for number in version[:-3])
 
 
 @functools.lru_cache

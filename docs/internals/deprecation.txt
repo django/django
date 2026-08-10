@@ -154,6 +154,16 @@ details on these changes.
 * Support for ``Model.from_db()`` methods that do not accept the
   ``fetch_mode`` keyword argument will be removed.
 
+See the :ref:`Django 6.2 release notes <deprecated-features-6.2>` for more
+details on these changes.
+
+* ``django.VERSION`` will have four components, ``(year, patch, status,
+  iteration)``, as calendar versions have no minor component. Indexing it
+  from its third component on, reading it in a way which depends on its
+  length, and comparing it against three or more components are all
+  deprecated. Use the ``.feature``, ``.patch``, ``.status``, and
+  ``.iteration`` attributes instead.
+
 .. _deprecation-removed-in-6.1:
 
 6.1
