@@ -12,3 +12,7 @@ Bugfixes
 * Fixed a regression in Django 6.1 where the deprecation of double-dot variable
   lookups incorrectly applied to string and translated template literals
   containing two consecutive dots, such as ``{{ "a..b" }}`` (:ticket:`37257`).
+
+* Fixed a regression in Django 6.1 where :attr:`.ModelAdmin.list_display`
+  entries that traverse multiple relations using ``__`` could crash or display
+  incorrect values (:ticket:`37270`).
