@@ -21,7 +21,7 @@ here's how we recommend you read the docs:
   next; from there you can jump to the HOWTOs (in ``docs/howto``) for specific
   problems, and check out the reference (``docs/ref``) for gory details.
 
-* See ``docs/README`` for instructions on building an HTML version of the docs.
+* See ``docs/README.rst`` for instructions on building an HTML version of the docs.
 
 Docs are updated rigorously. If you find any problems in the docs, or think
 they should be clarified in any way, please take 30 seconds to
