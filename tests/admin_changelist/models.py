@@ -47,6 +47,7 @@ class Band(models.Model):
 class Musician(models.Model):
     name = models.CharField(max_length=30)
     age = models.IntegerField(null=True, blank=True)
+    genre = models.ForeignKey(Genre, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.name

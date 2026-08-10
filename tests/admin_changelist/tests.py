@@ -1807,6 +1807,39 @@ class ChangeListTests(TestCase):
         response = m.changelist_view(request)
         self.assertContains(response, '<h2 class="main">I am your grandchild')
 
+    def test_list_display_second_degree_relation(self):
+        parent = Parent.objects.create(name="I am your parent")
+        child = Child.objects.create(name="I am your child", parent=parent)
+        GrandChild.objects.create(name="I am your grandchild", parent=child)
+
+        class GrandChildAdmin(admin.ModelAdmin):
+            list_display = ["name", "parent__parent"]
+
+        m = GrandChildAdmin(GrandChild, custom_site)
+        request = self._mocked_authenticated_request("/grandchild/", self.superuser)
+        response = m.changelist_view(request)
+        self.assertNotContains(response, "Child object")
+        self.assertContains(response, "Parent object")
+
+    def test_list_display_related_field_uses_display_for_field(self):
+        # Related fields must be rendered with display_for_field(), not
+        # display_for_value(), so field-specific formatting, such as FileField
+        # links, is preserved.
+        genre = Genre.objects.create(name="Rock", file="documents/test.txt")
+        Musician.objects.create(name="John", genre=genre)
+
+        class MusicianAdmin(admin.ModelAdmin):
+            list_display = ["name", "genre__file"]
+
+        m = MusicianAdmin(Musician, custom_site)
+        request = self._mocked_authenticated_request("/musician/", self.superuser)
+        response = m.changelist_view(request)
+        self.assertContains(
+            response,
+            '<a href="/documents/test.txt">documents/test.txt</a>',
+            html=True,
+        )
+
     def test_list_display_related_field_boolean_display(self):
         """
         Related boolean fields (parent__is_active) display boolean icons.
