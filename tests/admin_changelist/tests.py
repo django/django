@@ -1793,6 +1793,20 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertEqual(cl.get_ordering_field_columns(), {2: "asc"})
 
+    def test_list_display_first_degree_relation(self):
+        parent = Parent.objects.create(name="I am your parent")
+        child = Child.objects.create(name="I am your child", parent=parent)
+        grand = GrandChild.objects.create(name="I am your grandchild", parent=child)
+        GrandChild.objects.create(name="has sibling", parent=child, sibling=grand)
+
+        class GrandChildAdmin(admin.ModelAdmin):
+            list_display = ["name", "sibling"]
+
+        m = GrandChildAdmin(GrandChild, custom_site)
+        request = self._mocked_authenticated_request("/grandchild/", self.superuser)
+        response = m.changelist_view(request)
+        self.assertContains(response, '<h2 class="main">I am your grandchild')
+
     def test_list_display_related_field_boolean_display(self):
         """
         Related boolean fields (parent__is_active) display boolean icons.
