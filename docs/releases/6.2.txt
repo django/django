@@ -343,6 +343,21 @@ Features deprecated in 6.2
 Miscellaneous
 -------------
 
+* Indexing ``django.VERSION`` from its third component on, reading it in a way
+  which depends on its length, such as unpacking it or calling ``len()`` on it,
+  and comparing it against three or more components are all deprecated. Under
+  the calendar versioning adopted in `DEP 20`_, versions are ``YYYY[.N]`` and
+  have no minor component, so from Django 2028 ``django.VERSION`` has four
+  components, ``(year, patch, status, iteration)``. Use the ``.feature``,
+  ``.patch``, ``.status``, and ``.iteration`` attributes, which give the same
+  answers under both versioning schemes::
+
+      django.VERSION.feature  # (6, 2) for 6.2.1, and (2028,) for 2028.1
+      django.VERSION.patch  # 1 for both 6.2.1 and 2028.1
+
+  Comparisons against one or two components, such as
+  ``django.VERSION >= (6, 2)``, are unaffected.
+
 * The :class:`~django.middleware.MiddlewareMixin` class moved from
   ``django.utils.deprecation`` to ``django.middleware``. The old import path
   is deprecated.
