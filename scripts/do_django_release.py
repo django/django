@@ -81,6 +81,12 @@ def get_commit_hash():
     return subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
 
 
+def get_commit_timestamp():
+    return subprocess.check_output(
+        ["git", "log", "HEAD", "-1", r"--pretty=%ct"], text=True
+    ).strip()
+
+
 def parse_major_version(django_version):
     major = ".".join(django_version.split(".")[:2])
     match = re.search("[abrc]", major)
@@ -157,6 +163,9 @@ def main():
     subprocess.call(["git", "clean", "-fdx"])
 
     commit_hash = get_commit_hash()
+    commit_timestamp = get_commit_timestamp()
+    assert commit_timestamp
+    os.environ["SOURCE_DATE_EPOCH"] = commit_timestamp
 
     django_repo_path = os.path.abspath(os.path.curdir)
     dist_path = os.path.join(django_repo_path, "dist")
