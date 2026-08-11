@@ -95,14 +95,25 @@ local variables, settings, libraries used, etc.
 Environment-specific settings
 =============================
 Many settings, such as :setting:`SECRET_KEY`, differ between your local
-development environment and production. As shown above, a common approach
-is to load these values from environment variables rather than hardcoding
-them. You can set an environment variable when running a management
-command or your production server, for example:
+development environment and production. A common approach is to load
+these values from environment variables rather than hardcoding them::
+
+    import os
+
+    SECRET_KEY = os.environ["SECRET_KEY"]
+
+You can set an environment variable when running a management command
+or your production server, for example:
 
 .. code-block:: console
 
     $ CUSTOM_VAR=value python manage.py <command>
+
+.. admonition:: Managing environment variables
+
+    Django has a vibrant ecosystem. There are tools for managing
+    environment variables highlighted on the `Community Ecosystem`_ page
+    and the `Configuration grid`_ on Django Packages.
 
 .. admonition:: Environment variables carry security risks
 
@@ -115,12 +126,8 @@ command or your production server, for example:
     manager instead, which typically offers encryption, access control,
     and audit logging.
 
-.. admonition:: Managing environment variables
-
-    Django has a vibrant ecosystem. There are tools for managing
-    environment variables highlighted on the `Community Ecosystem`_ page.
-
 .. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#environment-configuration
+.. _Configuration grid: https://djangopackages.org/grids/g/configuration/
 
 :setting:`ALLOWED_HOSTS`
 ------------------------
