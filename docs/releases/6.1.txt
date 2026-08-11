@@ -511,6 +511,9 @@ Models
 * :meth:`~django.db.models.Model._is_pk_set` now returns ``False`` for
   ``DatabaseDefault`` values on unsaved instances.
 
+* ``fetch_mode=None`` is added to the signature of
+  :meth:`~django.db.models.Model.from_db`.
+
 System checks
 -------------
 
