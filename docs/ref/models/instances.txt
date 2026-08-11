@@ -81,7 +81,7 @@ need to :meth:`~Model.save`.
 Customizing model loading
 -------------------------
 
-.. classmethod:: Model.from_db(db, field_names, values)
+.. classmethod:: Model.from_db(db, field_names, values, *, fetch_mode=None)
 
 The ``from_db()`` method can be used to customize model instance creation
 when loading from the database.
@@ -94,10 +94,13 @@ fields are present, then ``values`` are guaranteed to be in the order
 ``__init__()`` expects them. That is, the instance can be created by
 ``cls(*values)``. If any fields are deferred, they won't appear in
 ``field_names``. In that case, assign a value of ``django.db.models.DEFERRED``
-to each of the missing fields.
+to each of the missing fields. The ``fetch_mode`` argument contains the
+:doc:`fetch mode </topics/db/fetch-modes>` of the query that loaded the
+instance, or ``None`` if it was loaded outside of a query.
 
 In addition to creating the new model, the ``from_db()`` method must set the
 ``adding`` and ``db`` flags in the new instance's :attr:`~Model._state`
+attribute, and, when ``fetch_mode`` is not ``None``, its ``fetch_mode``
 attribute.
 
 Below is an example showing how to record the initial values of fields that
@@ -107,7 +110,7 @@ are loaded from the database::
 
 
     @classmethod
-    def from_db(cls, db, field_names, values):
+    def from_db(cls, db, field_names, values, *, fetch_mode=None):
         # Default implementation of from_db() (subject to change and could
         # be replaced with super()).
         if len(values) != len(cls._meta.concrete_fields):
@@ -120,6 +123,8 @@ are loaded from the database::
         instance = cls(*values)
         instance._state.adding = False
         instance._state.db = db
+        if fetch_mode is not None:
+            instance._state.fetch_mode = fetch_mode
         # customization to store the original field values on the instance
         instance._loaded_values = dict(
             zip(field_names, (value for value in values if value is not DEFERRED))
@@ -140,6 +145,10 @@ are loaded from the database::
 The example above shows a full ``from_db()`` implementation to clarify how that
 is done. In this case it would be possible to use a ``super()`` call in the
 ``from_db()`` method.
+
+    .. versionchanged:: 6.1
+
+       The ``fetch_mode`` parameter was added.
 
 .. _refreshing-objects:
 
