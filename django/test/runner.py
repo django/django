@@ -2,6 +2,7 @@ import argparse
 import ctypes
 import faulthandler
 import functools
+import gc
 import hashlib
 import io
 import itertools
@@ -1161,6 +1162,22 @@ class DiscoverRunner:
             )
         return databases
 
+    @contextmanager
+    def capture_unraisable_exceptions(self):
+        unraisable_exceptions = []
+        orig_hook = sys.unraisablehook
+
+        def hook(unraisable):
+            unraisable_exceptions.append(unraisable)
+            orig_hook(unraisable)
+
+        sys.unraisablehook = hook
+        try:
+            yield unraisable_exceptions
+        finally:
+            gc.collect()
+            sys.unraisablehook = orig_hook
+
     def run_tests(self, test_labels, **kwargs):
         """
         Run the unit tests for all the test labels in the provided list.
@@ -1183,24 +1200,28 @@ class DiscoverRunner:
                 serialized_aliases=suite.serialized_aliases,
             )
         run_failed = False
-        try:
-            self.run_checks(databases)
-            result = self.run_suite(suite)
-        except Exception:
-            run_failed = True
-            raise
-        finally:
+        unraisable_exceptions = []
+        with self.capture_unraisable_exceptions() as unraisable_exceptions:
             try:
-                with self.time_keeper.timed("Total database teardown"):
-                    self.teardown_databases(old_config)
-                self.teardown_test_environment()
+                self.run_checks(databases)
+                result = self.run_suite(suite)
             except Exception:
-                # Silence teardown exceptions if an exception was raised during
-                # runs to avoid shadowing it.
-                if not run_failed:
-                    raise
+                run_failed = True
+                raise
+            finally:
+                try:
+                    with self.time_keeper.timed("Total database teardown"):
+                        self.teardown_databases(old_config)
+                    self.teardown_test_environment()
+                except Exception:
+                    # Silence teardown exceptions if an exception was raised during
+                    # runs to avoid shadowing it.
+                    if not run_failed:
+                        raise
         self.time_keeper.print_results()
-        return self.suite_result(suite, result)
+        return self.suite_result(suite, result) + len(unraisable_exceptions)
+
+
 
 
 def try_importing(label):

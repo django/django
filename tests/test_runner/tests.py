@@ -4,6 +4,7 @@ Tests for django test runner
 
 import collections.abc
 import functools
+import gc
 import multiprocessing
 import os
 import sys
@@ -1075,3 +1076,27 @@ class RunTestsExceptionHandlingTests(unittest.TestCase):
                     )
             self.assertTrue(teardown_databases.called)
             self.assertFalse(teardown_test_environment.called)
+
+    def test_unraisable_exception_causes_failure(self):
+        class NaughtyObject:
+            def __del__(self):
+                raise ValueError("Unraisable exception in __del__")
+
+        class SampleTest(unittest.TestCase):
+            def test_foo(self):
+                obj = NaughtyObject()
+                del obj
+                gc.collect()
+
+        suite = unittest.TestSuite([SampleTest("test_foo")])
+        with (
+            mock.patch("django.test.runner.DiscoverRunner.setup_test_environment"),
+            mock.patch("django.test.runner.DiscoverRunner.setup_databases"),
+            mock.patch("django.test.runner.DiscoverRunner.build_suite", return_value=suite),
+            mock.patch("django.test.runner.DiscoverRunner.run_checks"),
+            mock.patch("django.test.runner.DiscoverRunner.teardown_databases"),
+            mock.patch("django.test.runner.DiscoverRunner.teardown_test_environment"),
+        ):
+            runner = DiscoverRunner(verbosity=0, interactive=False)
+            failures = runner.run_tests([])
+            self.assertGreater(failures, 0)
