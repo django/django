@@ -1356,6 +1356,78 @@ class AssertWarnsMessageTests(SimpleTestCase):
             func1()
 
 
+class IgnoreWarningsTests(SimpleTestCase):
+    @contextmanager
+    def captured_warnings(self):
+        with warnings.catch_warnings(record=True) as captured:
+            warnings.simplefilter("always")
+            yield captured
+
+    def test_message_matched_anywhere(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(message="is deprecated"):
+                warnings.warn("get_connection() is deprecated.", UserWarning)
+        self.assertEqual(captured, [])
+
+    def test_message_special_re_chars(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(message="[.*x+]y?"):
+                warnings.warn("A message with [.*x+]y? in it.", UserWarning)
+        self.assertEqual(captured, [])
+
+    def test_message_not_matched(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(message="is deprecated"):
+                warnings.warn("Expected message", UserWarning)
+        self.assertEqual(len(captured), 1)
+
+    def test_message_re(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(message_re=r"get_\w+\(\) is deprecated\."):
+                warnings.warn("get_connection() is deprecated.", UserWarning)
+        self.assertEqual(captured, [])
+
+    def test_message_re_not_matched(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(message_re=r"get_\w+\(\) is deprecated\."):
+                warnings.warn("Expected message", UserWarning)
+        self.assertEqual(len(captured), 1)
+
+    def test_module_matched_anywhere(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(module="utils.tests"):
+                warnings.warn("Expected message", UserWarning)
+        self.assertEqual(captured, [])
+
+    def test_module_not_matched(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(module="nonexistent.module"):
+                warnings.warn("Expected message", UserWarning)
+        self.assertEqual(len(captured), 1)
+
+    def test_module_re(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(module_re=r"test_utils\.\w+"):
+                warnings.warn("Expected message", UserWarning)
+        self.assertEqual(captured, [])
+
+    def test_message_and_message_re(self):
+        msg = (
+            "ignore_warnings() received both 'message' and 'message_re'; pass "
+            "only one of them."
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            ignore_warnings(message="Expected message", message_re="Expected")
+
+    def test_module_and_module_re(self):
+        msg = (
+            "ignore_warnings() received both 'module' and 'module_re'; pass "
+            "only one of them."
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            ignore_warnings(module="test_utils.tests", module_re=r"test_utils\.\w+")
+
+
 class AssertFieldOutputTests(SimpleTestCase):
     def test_assert_field_output(self):
         error_invalid = ["Enter a valid email address."]
