@@ -2,7 +2,7 @@ from operator import itemgetter
 
 from django.core.exceptions import FieldError
 from django.db import connection, models
-from django.db.models import Count, F, OuterRef, Q
+from django.db.models import Count, Exists, F, OuterRef, Q
 from django.db.models.functions import Upper
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import register_lookup
@@ -293,6 +293,20 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             User.objects.alias(**{"first__post": first_post})
+
+    def test_exists_alias_allows_lookup_separator(self):
+        first_post = Post.objects.filter(user=self.ada, title="Welcome")
+        profile = (
+            User.objects.filter(pk=self.ada.pk)
+            .alias(**{"has__post": Exists(first_post)})
+            .annotate(has_post=F("has__post"))
+            .values("name", "has_post")
+        )
+
+        self.assertEqual(
+            list(profile),
+            [{"name": "Ada", "has_post": True}],
+        )
 
     def test_composite_subquery_alias_direct_fields(self):
         first_post = (
