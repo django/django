@@ -92,8 +92,10 @@ class TupleLookupMixin:
             return repr(self.lhs.field.name)
         else:
             names = ", ".join(
-                repr(f.name if hasattr(f, "name") else f.output_field.name)
-                for f in self.lhs
+                [
+                    repr(f.name if hasattr(f, "name") else f.output_field.name)
+                    for f in self.lhs
+                ]
             )
             return f"({names})"
 
