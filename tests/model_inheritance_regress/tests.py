@@ -258,7 +258,7 @@ class ModelInheritanceTest(TestCase):
         # be removed.
         with ignore_warnings(
             category=RemovedInDjango70Warning,
-            message=r"Calling select_related\(\) with no arguments is deprecated\.",
+            message="Calling select_related() with no arguments is deprecated.",
         ):
             wholesalers = list(Wholesaler.objects.select_related())
         self.assertEqual(wholesalers, [])

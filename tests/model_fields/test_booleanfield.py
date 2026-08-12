@@ -97,7 +97,7 @@ class BooleanFieldTests(TestCase):
         # of the test.
         with ignore_warnings(
             category=RemovedInDjango70Warning,
-            message=r"Calling select_related\(\) with no arguments is deprecated\.",
+            message="Calling select_related() with no arguments is deprecated.",
         ):
             mb = FksToBooleans.objects.select_related().get(pk=m1.id)
             mc = FksToBooleans.objects.select_related().get(pk=m2.id)

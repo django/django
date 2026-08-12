@@ -150,7 +150,7 @@ class DeferTests(AssertionMixin, TestCase):
         with self.assertNumQueries(1):
             with ignore_warnings(
                 category=RemovedInDjango70Warning,
-                message=r"Calling select_related\(\) with no arguments is deprecated\.",
+                message="Calling select_related() with no arguments is deprecated.",
             ):
                 obj = Primary.objects.defer("related").select_related()[0]
             self.assert_delayed(obj, 1)
@@ -334,7 +334,7 @@ class TestDefer2(AssertionMixin, TestCase):
         ChildProxy.objects.create(name="p1", value="xx", related=related)
         with ignore_warnings(
             category=RemovedInDjango70Warning,
-            message=r"Calling select_related\(\) with no arguments is deprecated\.",
+            message="Calling select_related() with no arguments is deprecated.",
         ):
             children = ChildProxy.objects.select_related().only("id", "name")
         self.assertEqual(len(children), 1)

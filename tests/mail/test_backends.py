@@ -1,5 +1,4 @@
 import os
-import re
 import shutil
 import socket
 import ssl
@@ -236,9 +235,7 @@ class SharedEmailBackendTests(MailTestsMixin):
             self.assertWarnsMessage(RemovedInDjango70Warning, msg),
             ignore_warnings(
                 category=RemovedInDjango70Warning,
-                message=re.escape(
-                    "Directly creating EmailBackend instances is deprecated."
-                ),
+                message="Directly creating EmailBackend instances is deprecated.",
             ),
         ):
             # alias=None tells create_backend() to _omit_ the `alias` arg.
@@ -320,7 +317,7 @@ class LocmemBackendTests(SharedEmailBackendTests, SimpleTestCase):
 
 @ignore_warnings(
     category=RemovedInDjango70Warning,
-    message=r"The EMAIL_FILE_PATH setting is deprecated\.",
+    message="The EMAIL_FILE_PATH setting is deprecated.",
 )
 class FileBackendTests(SharedEmailBackendTests, SimpleTestCase):
     backend_class = filebased.EmailBackend
@@ -599,7 +596,8 @@ class SMTPHandler:
 
 @skipUnless(HAS_AIOSMTPD, "No aiosmtpd library detected.")
 @ignore_warnings(
-    category=RemovedInDjango70Warning, message=r"The EMAIL_\w+ setting is deprecated\."
+    category=RemovedInDjango70Warning,
+    message_re=r"The EMAIL_\w+ setting is deprecated\.",
 )
 class SMTPBackendTestsBase(SimpleTestCase):
     @classmethod
@@ -626,7 +624,7 @@ class SMTPBackendTestsBase(SimpleTestCase):
 @skipUnless(HAS_AIOSMTPD, "No aiosmtpd library detected.")
 @ignore_warnings(
     category=RemovedInDjango70Warning,
-    message=re.escape("Directly creating EmailBackend instances is deprecated."),
+    message="Directly creating EmailBackend instances is deprecated.",
 )
 class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
     backend_class = smtp.EmailBackend

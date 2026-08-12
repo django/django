@@ -21,7 +21,7 @@ class RelatedGeoModelTest(TestCase):
         # queryset can be removed.
         with ignore_warnings(
             category=RemovedInDjango70Warning,
-            message=r"Calling select_related\(\) with no arguments is deprecated\.",
+            message="Calling select_related() with no arguments is deprecated.",
         ):
             qs2 = City.objects.order_by("id").select_related()
         qs3 = City.objects.order_by("id").select_related("location")

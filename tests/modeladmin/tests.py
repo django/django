@@ -1046,7 +1046,7 @@ class ModelAdminTests(TestCase):
     def test_list_select_related_true_deprecated_subclass(self):
         with ignore_warnings(
             category=RemovedInDjango70Warning,
-            message=r"Setting ModelAdmin.list_select_related to True is deprecated\.",
+            message="Setting ModelAdmin.list_select_related to True is deprecated.",
         ):
 
             class BaseTestModelAdmin(ModelAdmin):

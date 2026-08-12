@@ -32,7 +32,7 @@ class override_deprecated_email_settings(override_settings):
                 re.escape("{name}"), rf"(?:{deprecated_names_re})"
             )
             self.ignore_warnings = ignore_warnings(
-                category=RemovedInDjango70Warning, message=message_re
+                category=RemovedInDjango70Warning, message_re=message_re
             )
         else:
             self.ignore_warnings = nullcontext()
@@ -50,5 +50,5 @@ class override_deprecated_email_settings(override_settings):
 def ignore_no_default_mailer_warning():
     return ignore_warnings(
         category=RemovedInDjango70Warning,
-        message=re.escape(NO_DEFAULT_MAILER_WARNING),
+        message=NO_DEFAULT_MAILER_WARNING,
     )
