@@ -2948,7 +2948,9 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
             ignore_no_default_mailer_warning(),
             ignore_warnings(
                 category=RemovedInDjango2028Warning,
-                message=re.escape("get_connection() is deprecated."),
+                # Matches only this deprecation, and not the warnings about
+                # positional arguments to get_connection().
+                message="get_connection() is deprecated. See 'Migrating email",
             ),
         ):
             return mail.get_connection(*args, **kwargs)

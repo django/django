@@ -338,6 +338,14 @@ Miscellaneous
   database connections used during error handling are managed by
   ``close_old_connections()``.
 
+* The undocumented ``django.test.ignore_warnings()`` helper now accepts
+  explicit arguments instead of passing ``**kwargs`` through to
+  ``warnings.filterwarnings()``, and matches its ``message`` argument as a
+  literal, case-sensitive substring of the warning's message, rather than as a
+  case-insensitive regular expression anchored at the start, for consistency
+  with ``SimpleTestCase.assertWarnsMessage()``. Use the new ``message_re``
+  argument to match against a regular expression instead.
+
 .. _deprecated-features-6.2:
 
 Features deprecated in 6.2
