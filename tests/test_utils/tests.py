@@ -1370,11 +1370,59 @@ class IgnoreWarningsTests(SimpleTestCase):
                 warnings.warn("Another message", DeprecationWarning)
         self.assertEqual(captured, [])
 
+    def test_message_matched_anywhere(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(message="is deprecated"):
+                warnings.warn("get_connection() is deprecated.", UserWarning)
+        self.assertEqual(captured, [])
+
+    def test_message_special_re_chars(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(message="[.*x+]y?"):
+                warnings.warn("A message with [.*x+]y? in it.", UserWarning)
+        self.assertEqual(captured, [])
+
+    def test_message_case_sensitive(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(message="IS DEPRECATED"):
+                warnings.warn("is deprecated", UserWarning)
+        self.assertEqual(len(captured), 1)
+
+    def test_message_matched_across_newlines(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(message="second line"):
+                warnings.warn("first line\nsecond line", UserWarning)
+        self.assertEqual(captured, [])
+
     def test_message_not_matched(self):
         with self.captured_warnings() as captured:
             with ignore_warnings(message="is deprecated"):
                 warnings.warn("Expected message", UserWarning)
         self.assertEqual(len(captured), 1)
+
+    def test_message_re(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(message_re=r"get_\w+\(\) is deprecated\."):
+                warnings.warn("get_connection() is deprecated.", UserWarning)
+        self.assertEqual(captured, [])
+
+    def test_message_re_not_matched(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(message_re=r"get_\w+\(\) is deprecated\."):
+                warnings.warn("Expected message", UserWarning)
+        self.assertEqual(len(captured), 1)
+
+    def test_message_and_message_re(self):
+        msg = "Cannot specify both message and message_re."
+        for message, message_re in [
+            ("Expected message", "Expected"),
+            ("Expected message", ""),
+            ("", "Expected"),
+            ("", ""),
+        ]:
+            with self.subTest(message=message, message_re=message_re):
+                with self.assertRaisesMessage(TypeError, msg):
+                    ignore_warnings(message=message, message_re=message_re)
 
     def test_module_matched_by_prefix(self):
         with self.captured_warnings() as captured:
@@ -1412,12 +1460,37 @@ class IgnoreWarningsTests(SimpleTestCase):
                 )
         self.assertEqual(captured, [])
 
+    def test_module_and_message(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(module="test_utils", message="is deprecated"):
+                warnings.warn("get_connection() is deprecated.", UserWarning)
+                warnings.warn("Expected message", UserWarning)
+                warnings.warn_explicit(
+                    "other_function() is deprecated.",
+                    UserWarning,
+                    "other.py",
+                    1,
+                    module="other.module",
+                )
+        self.assertEqual(
+            [str(warning.message) for warning in captured],
+            ["Expected message", "other_function() is deprecated."],
+        )
+
     def test_category(self):
         with self.captured_warnings() as captured:
             with ignore_warnings(category=UserWarning):
                 warnings.warn("Expected message", UserWarning)
                 warnings.warn("Another message", UserWarning)
                 warnings.warn("Expected message", DeprecationWarning)
+        self.assertEqual(len(captured), 1)
+        self.assertIs(captured[0].category, DeprecationWarning)
+
+    def test_category_and_message_positional(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(UserWarning, "is deprecated"):
+                warnings.warn("get_connection() is deprecated.", UserWarning)
+                warnings.warn("get_connection() is deprecated.", DeprecationWarning)
         self.assertEqual(len(captured), 1)
         self.assertIs(captured[0].category, DeprecationWarning)
 
@@ -1443,6 +1516,11 @@ class IgnoreWarningsTests(SimpleTestCase):
             [str(warning.message) for warning in captured],
             [message],
         )
+
+    def test_unsupported_argument(self):
+        msg = "unexpected keyword argument 'append'"
+        with self.assertRaisesMessage(TypeError, msg):
+            ignore_warnings(append=True)
 
 
 class AssertFieldOutputTests(SimpleTestCase):
