@@ -888,7 +888,7 @@ class AggregationTests(TestCase):
         # queryset and assertion can be removed.
         with ignore_warnings(
             category=RemovedInDjango70Warning,
-            message=r"Calling select_related\(\) with no arguments is deprecated\.",
+            message="Calling select_related() with no arguments is deprecated.",
         ):
             qs = (
                 Book.objects.filter(rating__lt=4.5)

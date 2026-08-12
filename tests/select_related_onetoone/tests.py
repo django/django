@@ -94,7 +94,7 @@ class ReverseSelectRelatedTestCase(TestCase):
             self.assertNumQueries(2),
             ignore_warnings(
                 category=RemovedInDjango70Warning,
-                message=r"Calling select_related\(\) with no arguments is deprecated\.",
+                message="Calling select_related() with no arguments is deprecated.",
             ),
         ):
             u = User.objects.select_related().get(username="test")

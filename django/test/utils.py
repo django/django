@@ -758,7 +758,30 @@ class CaptureQueriesContext:
 
 
 class ignore_warnings(TestContextDecorator):
+    """
+    Ignore warnings matching the given criteria.
+
+    ``message`` and ``module`` are matched anywhere in the warning's message
+    and in the name of the module where the warning is raised, respectively,
+    for consistency with helpers such as
+    SimpleTestCase.assertWarnsMessage(). Pass ``message_re`` or ``module_re``
+    to match against a regular expression instead.
+    """
+
     def __init__(self, **kwargs):
+        for name in ("message", "module"):
+            regex_name = f"{name}_re"
+            if regex_name in kwargs:
+                if name in kwargs:
+                    raise TypeError(
+                        f"ignore_warnings() received both '{name}' and "
+                        f"'{regex_name}'; pass only one of them."
+                    )
+                kwargs[name] = kwargs.pop(regex_name)
+            elif name in kwargs:
+                # warnings.filterwarnings() anchors patterns at the start of
+                # the string, so allow any prefix to match anywhere.
+                kwargs[name] = ".*" + re.escape(kwargs[name])
         self.ignore_kwargs = kwargs
         if "message" in self.ignore_kwargs or "module" in self.ignore_kwargs:
             self.filter_func = warnings.filterwarnings

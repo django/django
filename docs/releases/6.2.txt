@@ -311,6 +311,12 @@ Miscellaneous
   database connections used during error handling are managed by
   ``close_old_connections()``.
 
+* The undocumented ``django.test.ignore_warnings()`` helper now matches each of
+  its ``message`` and ``module`` arguments as a literal substring, rather than
+  as a regular expression anchored at the start of the string, for consistency
+  with ``SimpleTestCase.assertWarnsMessage()``. Use the new ``message_re`` and
+  ``module_re`` arguments to match against a regular expression instead.
+
 .. _deprecated-features-6.2:
 
 Features deprecated in 6.2

@@ -288,7 +288,7 @@ class DeprecatedEmailSettingsTests(SimpleTestCase):
             self.assertWarnsMessage(RemovedInDjango70Warning, msg),
             ignore_warnings(
                 category=RemovedInDjango70Warning,
-                message=re.escape("get_connection() is deprecated."),
+                message="get_connection() is deprecated.",
             ),
         ):
             get_connection()
