@@ -269,7 +269,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if pool_key not in self._connection_pools:
             connect_kwargs = self.get_connection_params()
             pool_options = connect_kwargs.pop("pool")
-            if pool_options is not True:
+            if isinstance(pool_options, dict):
                 connect_kwargs.update(pool_options)
 
             pool = Database.create_pool(
