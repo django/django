@@ -1955,11 +1955,7 @@ class OrderBy(Expression):
         return [self.expression]
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
-        from django.db.models.fields.tuple_lookups import Tuple
-
-        if isinstance(self.expression, ColPairs):
-            cols = self.expression.get_cols()
-        elif isinstance(self.expression, Tuple):
+        if self.expression.is_composite:
             cols = self.expression.get_source_expressions()
         else:
             cols = None

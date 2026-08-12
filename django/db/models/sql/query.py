@@ -1077,9 +1077,9 @@ class Query(BaseExpression):
         if self.selected is not None:
             self.selected = {
                 name: (
-                    selection
-                    if isinstance(selection, (int, str))
-                    else selection.relabeled_clone(change_map)
+                    selection.relabeled_clone(change_map)
+                    if hasattr(selection, "relabeled_clone")
+                    else selection
                 )
                 for name, selection in self.selected.items()
             }
