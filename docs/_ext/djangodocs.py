@@ -7,11 +7,13 @@ import re
 from docutils import nodes
 from docutils.parsers.rst import Directive
 from docutils.statemachine import ViewList
+from github_links import get_branch
 from sphinx import addnodes
 from sphinx import version_info as sphinx_version
 from sphinx.directives.code import CodeBlock
 from sphinx.domains.std import Cmdoption
 from sphinx.util import logging
+from sphinx.util.nodes import split_explicit_title
 from sphinx.writers.html import HTMLTranslator
 
 logger = logging.getLogger(__name__)
@@ -62,6 +64,7 @@ def setup(app):
     app.add_directive("console", ConsoleDirective)
     app.connect("html-page-context", html_page_context_hook)
     app.add_role("default-role-error", default_role_error)
+    app.add_role("sourcefile", sourcefile)
     return {"parallel_read_safe": True}
 
 
@@ -372,3 +375,34 @@ def default_role_error(
     )
     logger.warning(msg, location=(inliner.document.current_source, lineno))
     return [nodes.Text(text)], []
+
+
+def sourcefile(
+    name,
+    rawtext,
+    text,
+    lineno,
+    inliner,
+    options=None,
+    content=None,
+):
+    options = options or {}
+
+    _, title, target = split_explicit_title(text)
+
+    env = inliner.document.settings.env
+    branch = get_branch(
+        version=env.config.version,
+        next_version=env.config.django_next_version,
+    )
+    url = f"https://github.com/django/django/blob/{branch}/{target}"
+
+    literal = nodes.literal(title, title)
+    reference = nodes.reference(
+        rawtext,
+        "",
+        literal,
+        refuri=url,
+        **options,
+    )
+    return [reference], []
