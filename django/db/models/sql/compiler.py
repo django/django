@@ -331,9 +331,7 @@ class SQLCompiler:
         ret = []
         col_idx = 1
         for col, alias in select:
-            is_multi_column_query = isinstance(
-                col, Query
-            ) and Query._is_multi_column_query(col)
+            is_multi_column_query = Query._get_multi_column_query(col)
             is_multi_column_expression = (
                 not isinstance(col, ColPairs)
                 and getattr(col, "_subquery_fields_len", 1) > 1
@@ -447,8 +445,7 @@ class SQLCompiler:
                 expr = self.query.annotations.get(ref)
             if expr:
                 is_multi_column_subquery = (
-                    isinstance(expr, Query)
-                    and Query._is_multi_column_query(expr)
+                    Query._get_multi_column_query(expr)
                     and ref not in self.query.annotation_select
                 )
                 if (

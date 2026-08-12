@@ -26,6 +26,7 @@ from django.db.models.expressions import (
     Col,
     ColPairs,
     Exists,
+    ExpressionWrapper,
     F,
     OuterRef,
     RawSQL,
@@ -1312,6 +1313,15 @@ class Query(BaseExpression):
             > 1
         )
 
+    @staticmethod
+    def _get_multi_column_query(expression):
+        """Return the multi-column query in a transparent expression."""
+        while type(expression) is ExpressionWrapper:
+            expression = expression.expression
+        if isinstance(expression, Query) and Query._is_multi_column_query(expression):
+            return expression
+        return None
+
     def _resolve_inner_subquery_field(self, join, field_path):
         try:
             expression = join.table_subquery.get_output_expression(field_path)
@@ -1347,12 +1357,8 @@ class Query(BaseExpression):
 
     def _promote_inner_subquery_join(self, name):
         alias, _, rest_path = name.partition(LOOKUP_SEP)
-        annotation = self.annotations.get(alias)
+        annotation = self._get_multi_column_query(self.annotations.get(alias))
         if annotation is None:
-            return None
-        if not isinstance(annotation, Query) or not self._is_multi_column_query(
-            annotation
-        ):
             return None
         if annotation.has_external_references():
             raise NotImplementedError(
@@ -1374,11 +1380,7 @@ class Query(BaseExpression):
         """Add a single annotation expression to the Query."""
         self.check_alias(alias)
         annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None)
-        if (
-            isinstance(annotation, Query)
-            and self._is_multi_column_query(annotation)
-            and LOOKUP_SEP in alias
-        ):
+        if self._get_multi_column_query(annotation) and LOOKUP_SEP in alias:
             raise ValueError(
                 f"Multi-column subquery alias {alias!r} cannot contain the lookup "
                 f"separator {LOOKUP_SEP!r}."
@@ -2249,9 +2251,7 @@ class Query(BaseExpression):
             if annotation is not None
             else self.annotations.get(field_list[0])
         )
-        is_multi_column_query = isinstance(
-            root_annotation, Query
-        ) and self._is_multi_column_query(root_annotation)
+        is_multi_column_query = self._get_multi_column_query(root_annotation)
 
         if not allow_joins and is_multi_column_query:
             raise FieldError("Joined field references are not permitted in this query")
