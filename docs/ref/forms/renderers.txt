@@ -51,19 +51,22 @@ should return a rendered template (as a string) or raise
 
         The default name of the template to use to render a form.
 
-        Defaults to ``"django/forms/div.html"`` template.
+        Defaults to the :sourcefile:`"django/forms/div.html"
+        <django/forms/templates/django/forms/div.html>` template.
 
     .. attribute:: formset_template_name
 
         The default name of the template to use to render a formset.
 
-        Defaults to ``"django/forms/formsets/div.html"`` template.
+        Defaults to the :sourcefile:`"django/forms/formsets/div.html"
+        <django/forms/templates/django/forms/formsets/div.html>` template.
 
     .. attribute:: field_template_name
 
         The default name of the template used to render a ``BoundField``.
 
-        Defaults to ``"django/forms/field.html"``
+        Defaults to :sourcefile:`"django/forms/field.html"
+        <django/forms/templates/django/forms/field.html>`.
 
     .. attribute:: bound_field_class
 
@@ -99,7 +102,7 @@ This renderer uses a standalone
 :class:`~django.template.backends.django.DjangoTemplates`
 engine (unconnected to what you might have configured in the
 :setting:`TEMPLATES` setting). It loads templates first from the built-in form
-templates directory in :source:`django/forms/templates` and then from the
+templates directory in :sourcefile:`django/forms/templates` and then from the
 installed apps' templates directories using the :class:`app_directories
 <django.template.loaders.app_directories.Loader>` loader.
 
@@ -114,7 +117,7 @@ If you want to render templates with customizations from your
 
 This renderer is the same as the :class:`DjangoTemplates` renderer except that
 it uses a :class:`~django.template.backends.jinja2.Jinja2` backend. Templates
-for the built-in widgets are located in :source:`django/forms/jinja2` and
+for the built-in widgets are located in :sourcefile:`django/forms/jinja2` and
 installed apps can provide templates in a ``jinja2`` directory.
 
 To use this backend, all the forms and widgets in your project and its
@@ -232,8 +235,10 @@ Overriding built-in widget templates
 Each widget has a ``template_name`` attribute with a value such as
 ``input.html``. Built-in widget templates are stored in the
 ``django/forms/widgets`` path. You can provide a custom template for
-``input.html`` by defining ``django/forms/widgets/input.html``, for example.
-See :ref:`built-in widgets` for the name of each widget's template.
+``input.html`` by defining
+:sourcefile:`django/forms/templates/django/forms/widgets/input.html`, for
+example. See
+:ref:`built-in widgets` for the name of each widget's template.
 
 To override widget templates, you must use the :class:`TemplatesSetting`
 renderer. Then overriding widget templates works :doc:`the same as
