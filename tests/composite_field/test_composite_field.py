@@ -2,7 +2,15 @@ from operator import itemgetter
 
 from django.core.exceptions import FieldError
 from django.db import connection, models
-from django.db.models import Count, Exists, F, OuterRef, Q
+from django.db.models import (
+    Count,
+    Exists,
+    ExpressionWrapper,
+    F,
+    OuterRef,
+    Q,
+    Subquery,
+)
 from django.db.models.functions import Upper
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import register_lookup
@@ -294,6 +302,45 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             User.objects.alias(**{"first__post": first_post})
 
+    def test_composite_subquery_alias_with_wrappers_rejects_lookup_separator(self):
+        first_post = Post.objects.filter(pk=self.welcome_post.pk).values(
+            "title", "body"
+        )
+        expressions = [
+            Subquery(first_post, output_field=models.CharField()),
+            ExpressionWrapper(
+                Subquery(first_post, output_field=models.CharField()),
+                output_field=models.CharField(),
+            ),
+        ]
+
+        msg = (
+            "Multi-column subquery alias 'first__post' cannot contain the lookup "
+            "separator '__'."
+        )
+        for expression in expressions:
+            with self.subTest(expression=expression.__class__.__name__):
+                with self.assertRaisesMessage(ValueError, msg):
+                    User.objects.alias(**{"first__post": expression})
+
+    def test_composite_subquery_alias_with_output_field_direct_fields(self):
+        first_post = Post.objects.filter(pk=self.welcome_post.pk).values(
+            "title", "body"
+        )
+
+        profile = (
+            User.objects.filter(pk=self.ada.pk)
+            .alias(first_post=Subquery(first_post, output_field=models.CharField()))
+            .filter(first_post__title="Welcome")
+            .order_by("first_post__body")
+            .values("name", "first_post__title")
+        )
+
+        self.assertEqual(
+            list(profile),
+            [{"name": "Ada", "first_post__title": "Welcome"}],
+        )
+
     def test_exists_alias_allows_lookup_separator(self):
         first_post = Post.objects.filter(user=self.ada, title="Welcome")
         profile = (
@@ -307,6 +354,37 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             list(profile),
             [{"name": "Ada", "has_post": True}],
         )
+
+    def test_custom_subquery_template_allows_lookup_separator(self):
+        posts = Post.objects.filter(user=self.ada).values("title", "body")
+        users = (
+            User.objects.filter(pk=self.ada.pk)
+            .alias(
+                **{
+                    "has__post": Subquery(
+                        posts,
+                        template="EXISTS(%(subquery)s)",
+                        output_field=models.BooleanField(),
+                    )
+                }
+            )
+            .filter(**{"has__post": True})
+            .values_list("name", flat=True)
+        )
+
+        self.assertEqual(list(users), ["Ada"])
+
+    def test_composite_subquery_annotation_with_output_field_not_supported(self):
+        first_post = Post.objects.filter(pk=self.welcome_post.pk).values(
+            "title", "body"
+        )
+        profile = User.objects.filter(pk=self.ada.pk).annotate(
+            info=Subquery(first_post, output_field=models.CharField())
+        )
+
+        msg = "Selecting a multi-column subquery as an annotation is not supported."
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            list(profile)
 
     def test_composite_subquery_alias_direct_fields(self):
         first_post = (
