@@ -412,6 +412,10 @@ Tests
 
 * The undocumented ``django.test.selenium`` module was removed.
 
+* The undocumented ``django.test.ignore_warnings()`` now matches its
+  ``message`` argument as a literal, case-sensitive substring of the warning
+  message. Use the new ``message_re`` argument for the previous behavior.
+
 Dropped support for PostgreSQL 15
 ---------------------------------
 
