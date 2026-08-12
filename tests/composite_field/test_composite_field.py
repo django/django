@@ -182,7 +182,7 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             .values_list("code", flat=True)
         )
 
-        self.assertEqual(list(projects), ["RPT"])
+        self.assertSequenceEqual(projects, ["RPT"])
 
     def test_exclude_outer_field_comparison_with_empty_composite_subquery(self):
         missing_project = Project.objects.filter(pk=-1).values("pk", "code")
@@ -193,7 +193,7 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             .values_list("code", flat=True)
         )
 
-        self.assertEqual(list(projects), ["AUTH", "RPT"])
+        self.assertSequenceEqual(projects, ["AUTH", "RPT"])
 
     def test_exclude_wrapped_field_from_empty_composite_subquery(self):
         missing_user = User.objects.filter(pk=-1).values("age", "email")
@@ -204,7 +204,7 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             .values_list("name", flat=True)
         )
 
-        self.assertEqual(list(users), ["Ada", "Bob"])
+        self.assertSequenceEqual(users, ["Ada", "Bob"])
 
     def test_exclude_outer_field_comparison_with_composite_subquery(self):
         project_info = Project.objects.filter(pk=self.auth.pk).values("pk", "code")
@@ -215,7 +215,7 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             .values_list("code", flat=True)
         )
 
-        self.assertEqual(list(projects), ["RPT"])
+        self.assertSequenceEqual(projects, ["RPT"])
 
     def test_single_column_subquery_keeps_scalar_behavior(self):
         first_title = (
@@ -227,8 +227,8 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             .values("name", "first_title")
         )
 
-        self.assertEqual(
-            list(profile),
+        self.assertSequenceEqual(
+            profile,
             [{"name": "Ada", "first_title": "Welcome"}],
         )
         self.assertNotIn("JOIN (", str(profile.query))
@@ -244,8 +244,8 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             .values("name", "first_title")
         )
 
-        self.assertEqual(
-            list(profile),
+        self.assertSequenceEqual(
+            profile,
             [{"name": "Ada", "first_title": "Welcome"}],
         )
 
@@ -336,8 +336,8 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             .values("name", "first_post__title")
         )
 
-        self.assertEqual(
-            list(profile),
+        self.assertSequenceEqual(
+            profile,
             [{"name": "Ada", "first_post__title": "Welcome"}],
         )
 
@@ -350,8 +350,8 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             .values("name", "has_post")
         )
 
-        self.assertEqual(
-            list(profile),
+        self.assertSequenceEqual(
+            profile,
             [{"name": "Ada", "has_post": True}],
         )
 
@@ -372,7 +372,7 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             .values_list("name", flat=True)
         )
 
-        self.assertEqual(list(users), ["Ada"])
+        self.assertSequenceEqual(users, ["Ada"])
 
     def test_composite_subquery_annotation_with_output_field_not_supported(self):
         first_post = Post.objects.filter(pk=self.welcome_post.pk).values(
@@ -399,8 +399,8 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             .values("name", "first_post__title", "first_post__body")
         )
 
-        self.assertEqual(
-            list(profile),
+        self.assertSequenceEqual(
+            profile,
             [
                 {
                     "name": "Ada",
@@ -429,8 +429,8 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             )
         )
 
-        self.assertEqual(
-            list(projects),
+        self.assertSequenceEqual(
+            projects,
             [
                 {
                     "code": "AUTH",
@@ -484,8 +484,8 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
                 "critical_bug__severity_level",
             )
         )
-        self.assertEqual(
-            list(projects),
+        self.assertSequenceEqual(
+            projects,
             [
                 {
                     "code": "AUTH",
@@ -713,7 +713,7 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             "code", flat=True
         )
 
-        self.assertEqual(list(projects), ["AUTH"])
+        self.assertSequenceEqual(projects, ["AUTH"])
 
     def test_composite_subquery_alias_supports_multiple_aliases(self):
         project = self.auth
@@ -736,8 +736,8 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             )
         )
 
-        self.assertEqual(
-            list(projects),
+        self.assertSequenceEqual(
+            projects,
             [
                 {
                     "code": "AUTH",
@@ -784,7 +784,7 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             .values_list("name", flat=True)
         )
 
-        self.assertEqual(list(users), ["Ada"])
+        self.assertSequenceEqual(users, ["Ada"])
 
     def test_composite_subquery_alias_rejects_invalid_field(self):
         first_post = Post.objects.filter(user=self.ada).values("title", "body")[:1]
@@ -803,8 +803,8 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             .values("name", "organization_slug")
         )
 
-        self.assertEqual(
-            list(profile),
+        self.assertSequenceEqual(
+            profile,
             [{"name": "Ada", "organization_slug": "acme"}],
         )
 
@@ -860,8 +860,8 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             .values("name", "post_info__user__email")
         )
 
-        self.assertEqual(
-            list(profile),
+        self.assertSequenceEqual(
+            profile,
             [{"name": "Ada", "post_info__user__email": "ada@example.com"}],
         )
 
@@ -875,8 +875,8 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             .values("post_info__user", "post_info__user__email")
         )
 
-        self.assertEqual(
-            list(profile),
+        self.assertSequenceEqual(
+            profile,
             [
                 {
                     "post_info__user": self.ada.pk,
@@ -897,8 +897,8 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             .values("user_info__name", "user_info__post_count")
         )
 
-        self.assertEqual(
-            list(organization),
+        self.assertSequenceEqual(
+            organization,
             [
                 {
                     "user_info__name": "Ada",
@@ -925,8 +925,8 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             )
         )
 
-        self.assertEqual(
-            list(organization),
+        self.assertSequenceEqual(
+            organization,
             [
                 {
                     "user_info__post_info__title": "Welcome",
@@ -986,7 +986,7 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
                 .values_list("upper_title", flat=True)
             )
 
-        self.assertEqual(list(titles), ["WELCOME"])
+        self.assertSequenceEqual(titles, ["WELCOME"])
 
 
 class CompositeSubqueryTupleLookupTests(CompositeSubqueryTestCase):
@@ -1368,7 +1368,7 @@ class CompositeSubqueryTupleLookupTests(CompositeSubqueryTestCase):
         sql, _ = results.query.sql_with_params()
 
         self.assertEqual(sql.count("JOIN (SELECT"), 1)
-        self.assertSequenceEqual(list(results), ["AUTH"])
+        self.assertSequenceEqual(results, ["AUTH"])
 
     def test_or_combined_querysets_keeps_different_joins(self):
         login_bug = self.bug_tuple_subquery(self.crash_report)
@@ -1388,7 +1388,7 @@ class CompositeSubqueryTupleLookupTests(CompositeSubqueryTestCase):
         sql, _ = results.query.sql_with_params()
 
         self.assertEqual(sql.count("JOIN (SELECT"), 2)
-        self.assertSequenceEqual(list(results), ["AUTH"])
+        self.assertSequenceEqual(results, ["AUTH"])
 
     def test_and_condition(self):
         projects = self.projects_with_priority_bug()
