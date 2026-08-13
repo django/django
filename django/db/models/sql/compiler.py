@@ -448,9 +448,7 @@ class SQLCompiler:
                     Query._get_multi_column_query(expr)
                     and ref not in self.query.annotation_select
                 )
-                if (
-                    transforms or is_multi_column_subquery
-                ) and not self.query.combinator:
+                if is_multi_column_subquery and not self.query.combinator:
                     # The part after a multi-column annotation may
                     # be a derived-table column, not a transform.
                     # Resolve the full name first.
