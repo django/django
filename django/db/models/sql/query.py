@@ -1316,8 +1316,12 @@ class Query(BaseExpression):
     @staticmethod
     def _get_multi_column_query(expression):
         """Return the multi-column query in a transparent expression."""
+        seen = set()
         while type(expression) is ExpressionWrapper:
-            expression = expression.expression
+            if id(expression) in seen:
+                return None
+            seen.add(id(expression))
+            expression = expression.get_source_expressions()[0]
         if isinstance(expression, Query) and Query._is_multi_column_query(expression):
             return expression
         return None
