@@ -78,6 +78,13 @@ class CompositeFieldOutputFieldTests(SimpleTestCase):
     def test_empty_select(self):
         self.assertIsNone(models.CompositeField.from_select({}))
 
+    def test_cyclic_expression_wrappers(self):
+        first = ExpressionWrapper(models.Value(1), models.IntegerField())
+        second = ExpressionWrapper(first, models.IntegerField())
+        first.set_source_expressions([second])
+
+        self.assertIsNone(Query._get_multi_column_query(first))
+
 
 class CompositeSubqueryTestCase(TestCase):
     @classmethod
