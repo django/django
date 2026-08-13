@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db import connection
 from django.forms import (
     BooleanField,
     CharField,
@@ -310,9 +311,10 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
 class ModelChoiceFieldErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
     def test_modelchoicefield(self):
         # Create choices for the model choice field tests below.
-        ChoiceModel.objects.create(pk=1, name="a")
-        ChoiceModel.objects.create(pk=2, name="b")
-        ChoiceModel.objects.create(pk=3, name="c")
+        ChoiceModel.objects.create(name="a")
+        ChoiceModel.objects.create(name="b")
+        choice3 = ChoiceModel.objects.create(name="c")
+        nonexistent_pk = connection.ops.get_nonexistent_pk(choice3.pk)
 
         # ModelChoiceField
         e = {
@@ -321,7 +323,7 @@ class ModelChoiceFieldErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
         }
         f = ModelChoiceField(queryset=ChoiceModel.objects.all(), error_messages=e)
         self.assertFormErrors(["REQUIRED"], f.clean, "")
-        self.assertFormErrors(["INVALID CHOICE"], f.clean, "4")
+        self.assertFormErrors(["INVALID CHOICE"], f.clean, str(nonexistent_pk))
 
         # ModelMultipleChoiceField
         e = {
@@ -333,8 +335,12 @@ class ModelChoiceFieldErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             queryset=ChoiceModel.objects.all(), error_messages=e
         )
         self.assertFormErrors(["REQUIRED"], f.clean, "")
-        self.assertFormErrors(["NOT A LIST OF VALUES"], f.clean, "3")
-        self.assertFormErrors(["4 IS INVALID CHOICE"], f.clean, ["4"])
+        self.assertFormErrors(["NOT A LIST OF VALUES"], f.clean, str(choice3.pk))
+        self.assertFormErrors(
+            [f"{nonexistent_pk} IS INVALID CHOICE"],
+            f.clean,
+            [str(nonexistent_pk)],
+        )
 
     def test_modelchoicefield_value_placeholder(self):
         f = ModelChoiceField(
