@@ -2273,15 +2273,15 @@ class Query(BaseExpression):
                 if join_result is not None:
                     return join_result
             return annotation
-
-        for idx in range(len(field_list), 0, -1):
-            join_result = self._promote_inner_subquery_join(
-                LOOKUP_SEP.join(field_list[:idx])
-            )
-            if join_result is not None:
-                for transform in field_list[idx:]:
-                    join_result = self.try_transform(join_result, transform)
-                return join_result
+        if is_multi_column_query:
+            for idx in range(len(field_list), 0, -1):
+                join_result = self._promote_inner_subquery_join(
+                    LOOKUP_SEP.join(field_list[:idx])
+                )
+                if join_result is not None:
+                    for transform in field_list[idx:]:
+                        join_result = self.try_transform(join_result, transform)
+                    return join_result
 
         if root_annotation is not None:
             for transform in field_list[1:]:
@@ -2535,9 +2535,8 @@ class Query(BaseExpression):
                 if item == "?":
                     continue
                 item = item.removeprefix("-")
-                if (
-                    item in self.annotations
-                    or item.split(LOOKUP_SEP, 1)[0] in self.annotations
+                if item in self.annotations or self._get_multi_column_query(
+                    self.annotations.get(item.split(LOOKUP_SEP, 1)[0])
                 ):
                     continue
                 if self.extra and item in self.extra:
