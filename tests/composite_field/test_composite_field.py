@@ -12,6 +12,7 @@ from django.db.models import (
     Subquery,
 )
 from django.db.models.functions import Upper
+from django.db.models.sql.query import Query
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import register_lookup
 
@@ -706,6 +707,7 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
 
         sql = str(projects.query)
         self.assertEqual(str(projects.query), sql)
+        self.assertEqual(sql.lower().count(BugReport._meta.db_table.lower()), 1)
         self.assertSequenceEqual(projects, ["AUTH", "AUTH"])
         self.assertSequenceEqual(projects.order_by(), ["AUTH"])
 
