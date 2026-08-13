@@ -304,6 +304,7 @@ _caches_setting_base = {
     "zero_cull": {
         "OPTIONS": {"CULL_FREQUENCY": 0, "MAX_ENTRIES": 30, "CULL_PROBABILITY": 1.0}
     },
+    "no_cull": {"OPTIONS": {"MAX_ENTRIES": None, "CULL_PROBABILITY": 1.0}},
 }
 
 
@@ -711,6 +712,17 @@ class BaseCacheTests:
 
     def test_zero_cull(self):
         self._perform_cull_test("zero_cull", 50, 19)
+
+    def test_cull_unlimited(self):
+        cull_cache = caches["no_cull"]
+        try:
+            cull_cache._max_entries = None
+        except (AttributeError, TypeError):
+            self.skipTest("Culling isn't implemented.")
+        for i in range(1, 50):
+            cull_cache.set("cull%d" % i, "value", 1000)
+        for i in range(1, 50):
+            self.assertEqual(cull_cache.get("cull%d" % i), "value")
 
     def test_cull_delete_when_store_empty(self):
         try:
@@ -1314,6 +1326,21 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
                 self.assertIn(connection.ops.quote_name("expires"), sql)
             if "cache_key" in sql:
                 self.assertIn(connection.ops.quote_name("cache_key"), sql)
+
+    def test_db_cull_unlimited_queries(self):
+        old_max_entries = cache._max_entries
+        old_cull_probability = cache._cull_probability
+        # Disable culling so no COUNT query should be executed.
+        cache._max_entries = None
+        cache._cull_probability = 1.0
+        with CaptureQueriesContext(connection) as captured_queries:
+            try:
+                cache.set("force_cull", "value", 1000)
+            finally:
+                cache._max_entries = old_max_entries
+                cache._cull_probability = old_cull_probability
+        num_count_queries = sum("COUNT" in query["sql"] for query in captured_queries)
+        self.assertEqual(num_count_queries, 0)
 
     def test_db_cull_optimized_off(self):
         # Check for expired entries every request if probability is 1.0.
