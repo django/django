@@ -457,14 +457,18 @@ class SQLCompiler:
                     expr = self.query.resolve_ref(col)
                     transforms = []
                 if self.query.combinator and self.select:
-                    if transforms:
-                        raise NotImplementedError(
-                            "Ordering combined queries by transforms is not "
-                            "implemented."
-                        )
-                    # Don't use the resolved annotation because other
-                    # combined queries might define it differently.
-                    expr = F(ref)
+                    if is_multi_column_subquery:
+                        expr = F(col)
+                        transforms = []
+                    else:
+                        if transforms:
+                            raise NotImplementedError(
+                                "Ordering combined queries by transforms is not "
+                                "implemented."
+                            )
+                        # Don't use the resolved annotation because other
+                        # combined queries might define it differently.
+                        expr = F(ref)
                 if transforms:
                     for name in transforms:
                         expr = self.query.try_transform(expr, name)
