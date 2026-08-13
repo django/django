@@ -18,9 +18,11 @@ Cache middleware
 .. module:: django.middleware.cache
    :synopsis: Middleware for the site-wide cache.
 
-.. class:: django.middleware.cache.UpdateCacheMiddleware
+.. class:: UpdateCacheMiddleware
+   :canonical: django.middleware.cache.UpdateCacheMiddleware
 
-.. class:: django.middleware.cache.FetchFromCacheMiddleware
+.. class:: FetchFromCacheMiddleware
+   :canonical: django.middleware.cache.FetchFromCacheMiddleware
 
 Enable the site-wide cache. If these are enabled, each Django-powered page will
 be cached for as long as the :setting:`CACHE_MIDDLEWARE_SECONDS` setting
@@ -32,7 +34,8 @@ defines. See the :doc:`cache documentation </topics/cache>`.
 .. module:: django.middleware.common
    :synopsis: Middleware adding "common" conveniences for perfectionists.
 
-.. class:: django.middleware.common.CommonMiddleware
+.. class:: CommonMiddleware
+   :canonical: django.middleware.common.CommonMiddleware
 
     .. attribute:: response_redirect_class
 
@@ -81,7 +84,8 @@ Adds a few conveniences for perfectionists:
 
 * Sets the ``Content-Length`` header for non-streaming responses.
 
-.. class:: django.middleware.common.BrokenLinkEmailsMiddleware
+.. class:: BrokenLinkEmailsMiddleware
+   :canonical: django.middleware.common.BrokenLinkEmailsMiddleware
 
 * Sends broken link notification emails to :setting:`MANAGERS` (see
   :doc:`/howto/error-reporting`).
@@ -92,7 +96,8 @@ GZip middleware
 .. module:: django.middleware.gzip
    :synopsis: Middleware to serve GZipped content for performance.
 
-.. class:: django.middleware.gzip.GZipMiddleware
+.. class:: GZipMiddleware
+   :canonical: django.middleware.gzip.GZipMiddleware
 
     .. attribute:: max_random_bytes
 
@@ -145,7 +150,8 @@ Conditional GET middleware
 .. module:: django.middleware.http
    :synopsis: Middleware handling advanced HTTP features.
 
-.. class:: django.middleware.http.ConditionalGetMiddleware
+.. class:: ConditionalGetMiddleware
+   :canonical: django.middleware.http.ConditionalGetMiddleware
 
     Handles conditional GET operations. If the response doesn't have an
     ``ETag`` header, the middleware adds one if needed. If the response has an
@@ -162,7 +168,8 @@ Locale middleware
 .. module:: django.middleware.locale
    :synopsis: Middleware to enable language selection based on the request.
 
-.. class:: django.middleware.locale.LocaleMiddleware
+.. class:: LocaleMiddleware
+   :canonical: django.middleware.locale.LocaleMiddleware
 
     .. attribute:: LocaleMiddleware.response_redirect_class
 
@@ -180,7 +187,8 @@ Message middleware
 .. module:: django.contrib.messages.middleware
    :synopsis: Message middleware.
 
-.. class:: django.contrib.messages.middleware.MessageMiddleware
+.. class:: MessageMiddleware
+   :canonical: django.contrib.messages.middleware.MessageMiddleware
 
     Enables cookie- and session-based message support. See the
     :doc:`messages documentation </ref/contrib/messages>`.
@@ -200,7 +208,8 @@ Security middleware
     by Django (such as static media or user-uploaded files), they will have
     the same protections as requests to your Django application.
 
-.. class:: django.middleware.security.SecurityMiddleware
+.. class:: SecurityMiddleware
+   :canonical: django.middleware.security.SecurityMiddleware
 
    The ``django.middleware.security.SecurityMiddleware`` provides several
    security enhancements to the request/response cycle. Each one can be
@@ -470,7 +479,8 @@ Session middleware
 .. module:: django.contrib.sessions.middleware
    :synopsis: Session middleware.
 
-.. class:: django.contrib.sessions.middleware.SessionMiddleware
+.. class:: SessionMiddleware
+   :canonical: django.contrib.sessions.middleware.SessionMiddleware
 
     Enables session support. See the :doc:`session documentation
     </topics/http/sessions>`.
@@ -481,7 +491,8 @@ Site middleware
 .. module:: django.contrib.sites.middleware
   :synopsis: Site middleware.
 
-.. class:: django.contrib.sites.middleware.CurrentSiteMiddleware
+.. class:: CurrentSiteMiddleware
+   :canonical: django.contrib.sites.middleware.CurrentSiteMiddleware
 
     Adds the ``site`` attribute representing the current site to every incoming
     ``HttpRequest`` object. See the :ref:`sites documentation <site-middleware>`.
@@ -492,13 +503,15 @@ Authentication middleware
 .. module:: django.contrib.auth.middleware
   :synopsis: Authentication middleware.
 
-.. class:: django.contrib.auth.middleware.AuthenticationMiddleware
+.. class:: AuthenticationMiddleware
+   :canonical: django.contrib.auth.middleware.AuthenticationMiddleware
 
     Adds the ``user`` attribute, representing the currently-logged-in user, to
     every incoming ``HttpRequest`` object. See :ref:`Authentication in web
     requests <auth-web-requests>`.
 
-.. class:: django.contrib.auth.middleware.LoginRequiredMiddleware
+.. class:: LoginRequiredMiddleware
+   :canonical: django.contrib.auth.middleware.LoginRequiredMiddleware
 
     Subclass the middleware and override the following attributes and methods
     to customize behavior for unauthenticated requests.
@@ -573,13 +586,15 @@ Customize the login URL or field name for authenticated views with the
     :ref:`enabled unauthenticated requests
     <disable-login-required-middleware-for-views>` to your login view.
 
-.. class:: django.contrib.auth.middleware.RemoteUserMiddleware
+.. class:: RemoteUserMiddleware
+   :canonical: django.contrib.auth.middleware.RemoteUserMiddleware
 
     Middleware for utilizing web server provided authentication. See
     :doc:`/howto/auth-remote-user` for usage details, including security
     considerations.
 
-.. class:: django.contrib.auth.middleware.PersistentRemoteUserMiddleware
+.. class:: PersistentRemoteUserMiddleware
+   :canonical: django.contrib.auth.middleware.PersistentRemoteUserMiddleware
 
     Middleware for utilizing web server provided authentication when enabled
     only on the login page. See :ref:`persistent-remote-user-middleware-howto`
@@ -590,7 +605,8 @@ CSRF protection middleware
 
 .. currentmodule:: django.middleware.csrf
 
-.. class:: django.middleware.csrf.CsrfViewMiddleware
+.. class:: CsrfViewMiddleware
+   :canonical: django.middleware.csrf.CsrfViewMiddleware
 
     Adds protection against Cross Site Request Forgeries by adding hidden form
     fields to POST forms and checking requests for the correct value. See the
@@ -604,7 +620,8 @@ CSRF protection middleware
 
 .. currentmodule:: django.middleware.clickjacking
 
-.. class:: django.middleware.clickjacking.XFrameOptionsMiddleware
+.. class:: XFrameOptionsMiddleware
+   :canonical: django.middleware.clickjacking.XFrameOptionsMiddleware
 
     Simple :doc:`clickjacking protection via the X-Frame-Options header
     </ref/clickjacking/>`.
@@ -614,7 +631,8 @@ Content Security Policy middleware
 
 .. currentmodule:: django.middleware.csp
 
-.. class:: django.middleware.csp.ContentSecurityPolicyMiddleware
+.. class:: ContentSecurityPolicyMiddleware
+   :canonical: django.middleware.csp.ContentSecurityPolicyMiddleware
 
 Adds support for Content Security Policy (CSP), which helps mitigate risks such
 as Cross-Site Scripting (XSS) and data injection attacks by controlling the
