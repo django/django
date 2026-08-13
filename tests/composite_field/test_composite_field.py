@@ -630,6 +630,49 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             transform=itemgetter("code"),
         )
 
+    def test_composite_subquery_alias_outer_ordering_column_transform(self):
+        BugReport.objects.bulk_create(
+            [
+                BugReport(
+                    task=self.login,
+                    reporter=self.bob,
+                    description="alpha",
+                ),
+                BugReport(
+                    task=self.login,
+                    reporter=self.bob,
+                    description="Beta",
+                ),
+            ]
+        )
+        project_bugs = BugReport.objects.filter(task__project=self.auth).values(
+            "description", "severity_level"
+        )
+        projects = Project.objects.filter(pk=self.auth.pk).alias(
+            project_bug=project_bugs
+        )
+
+        with register_lookup(models.CharField, Upper):
+            descriptions = projects.order_by(
+                "project_bug__description__upper"
+            ).values_list("project_bug__description", flat=True)
+            self.assertSequenceEqual(descriptions, ["alpha", "Beta", "Login crash"])
+
+    def test_composite_subquery_alias_outer_ordering_tuple_transform(self):
+        project_bugs = BugReport.objects.filter(task__project=self.auth).values(
+            "description", "severity_level"
+        )
+        projects = Project.objects.filter(pk=self.auth.pk).alias(
+            project_bug=project_bugs
+        )
+
+        msg = "Unsupported lookup 'upper' for CompositeField"
+        with (
+            register_lookup(models.CharField, Upper),
+            self.assertRaisesMessage(FieldError, msg),
+        ):
+            str(projects.order_by("project_bug__upper").query)
+
     def test_composite_subquery_alias_tuple_ordering(self):
         BugReport.objects.bulk_create(
             [
@@ -793,6 +836,11 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             User.objects.filter(pk=self.ada.pk).alias(first_post=first_post).values(
                 "first_post__does_not_exist"
             )
+
+    def test_composite_subquery_alias_preserves_ordering_validation(self):
+        msg = "Cannot resolve keyword 'user_name' into field."
+        with self.assertRaisesMessage(FieldError, msg):
+            User.objects.alias(user_name=F("name")).order_by("user_name__missing")
 
     def test_composite_subquery_alias_preserves_normal_field_resolution(self):
         first_post = Post.objects.filter(user=self.ada).values("title", "body")[:1]
