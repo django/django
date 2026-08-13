@@ -16,3 +16,7 @@ Bugfixes
 * Fixed a regression in Django 6.1 where :attr:`.ModelAdmin.list_display`
   entries that traverse multiple relations using ``__`` could crash or display
   incorrect values (:ticket:`37270`).
+
+* Fixed a bug in Django 6.1 where the ``fields.E323`` system check did not
+  detect mixed ``on_delete`` variants for auto-created intermediate models for
+  ``ManyToManyField``\s (:ticket:`37254`).
