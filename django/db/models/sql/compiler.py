@@ -1052,6 +1052,11 @@ class SQLCompiler:
             for target in targets:
                 if name in self.query.annotation_select:
                     result.append(self.connection.ops.quote_name(name))
+                elif name in self.query.annotations:
+                    raise FieldError(
+                        f"Cannot select the {name!r} alias. Use annotate() to "
+                        "promote it."
+                    )
                 else:
                     r, p = self.compile(transform_function(target, alias))
                     result.append(r)
