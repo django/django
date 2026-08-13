@@ -658,6 +658,50 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             ).values_list("project_bug__description", flat=True)
             self.assertSequenceEqual(descriptions, ["alpha", "Beta", "Login crash"])
 
+    def test_composite_subquery_alias_outer_ordering_expression(self):
+        BugReport.objects.create(
+            task=self.login,
+            reporter=self.bob,
+            description="Minor alignment issue",
+            severity_level=1,
+        )
+        project_bugs = BugReport.objects.filter(task__project=self.auth).values(
+            "description", "severity_level"
+        )
+        descriptions = (
+            Project.objects.filter(pk=self.auth.pk)
+            .alias(project_bug=project_bugs)
+            .order_by(F("project_bug__severity_level").desc())
+            .values_list("project_bug__description", flat=True)
+        )
+
+        self.assertSequenceEqual(
+            descriptions,
+            ["Login crash", "Minor alignment issue"],
+        )
+
+    def test_composite_subquery_alias_outer_ordering_lifecycle(self):
+        BugReport.objects.create(
+            task=self.login,
+            reporter=self.bob,
+            description="Minor alignment issue",
+            severity_level=1,
+        )
+        project_bugs = BugReport.objects.filter(task__project=self.auth).values(
+            "description", "severity_level"
+        )
+        projects = (
+            Project.objects.filter(pk=self.auth.pk)
+            .alias(project_bug=project_bugs)
+            .values_list("code", flat=True)
+            .order_by("-project_bug__severity_level")
+        )
+
+        sql = str(projects.query)
+        self.assertEqual(str(projects.query), sql)
+        self.assertSequenceEqual(projects, ["AUTH", "AUTH"])
+        self.assertSequenceEqual(projects.order_by(), ["AUTH"])
+
     def test_composite_subquery_alias_outer_ordering_tuple_transform(self):
         project_bugs = BugReport.objects.filter(task__project=self.auth).values(
             "description", "severity_level"
@@ -672,6 +716,61 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             self.assertRaisesMessage(FieldError, msg),
         ):
             str(projects.order_by("project_bug__upper").query)
+
+    def test_composite_subquery_alias_outer_ordering_invalid_field(self):
+        project_bugs = BugReport.objects.filter(task__project=self.auth).values(
+            "description", "severity_level"
+        )
+        projects = Project.objects.filter(pk=self.auth.pk).alias(
+            project_bug=project_bugs
+        )
+
+        with self.assertRaises(FieldError):
+            str(projects.order_by("project_bug__does_not_exist").query)
+
+    def test_composite_subquery_alias_union_outer_ordering(self):
+        auth_bugs = BugReport.objects.filter(task__project=self.auth).values(
+            "description", "severity_level"
+        )
+        report_bugs = BugReport.objects.filter(task__project=self.reports).values(
+            "description", "severity_level"
+        )
+        auth = Project.objects.filter(pk=self.auth.pk).alias(project_bug=auth_bugs)
+        reports = Project.objects.filter(pk=self.reports.pk).alias(
+            project_bug=report_bugs
+        )
+        projects = auth.union(reports).values_list(
+            "code", "project_bug__severity_level"
+        )
+        expected = [("RPT", 2), ("AUTH", 3)]
+
+        for ordering in (
+            "project_bug__severity_level",
+            F("project_bug__severity_level"),
+        ):
+            with self.subTest(ordering=ordering):
+                self.assertSequenceEqual(projects.order_by(ordering), expected)
+
+    def test_composite_subquery_alias_union_outer_ordering_unselected_column(self):
+        auth_bugs = BugReport.objects.filter(task__project=self.auth).values(
+            "description", "severity_level"
+        )
+        report_bugs = BugReport.objects.filter(task__project=self.reports).values(
+            "description", "severity_level"
+        )
+        auth = Project.objects.filter(pk=self.auth.pk).alias(project_bug=auth_bugs)
+        reports = Project.objects.filter(pk=self.reports.pk).alias(
+            project_bug=report_bugs
+        )
+        projects = auth.union(reports)
+
+        for ordering in (
+            "project_bug__severity_level",
+            F("project_bug__severity_level"),
+        ):
+            with self.subTest(ordering=ordering):
+                codes = projects.order_by(ordering).values_list("code", flat=True)
+                self.assertSequenceEqual(codes, ["RPT", "AUTH"])
 
     def test_composite_subquery_alias_tuple_ordering(self):
         BugReport.objects.bulk_create(
