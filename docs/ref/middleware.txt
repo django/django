@@ -646,7 +646,7 @@ Here are some hints about the ordering of various Django middleware classes:
    Before those that modify the ``Vary`` header (``SessionMiddleware``,
    ``GZipMiddleware``, ``LocaleMiddleware``).
 
-#. :class:`~django.middleware.gzip.GZipMiddleware`
+#. ``django.middleware.gzip.GZipMiddleware``
 
    Before any middleware that may change or use the response body.
 
@@ -660,7 +660,7 @@ Here are some hints about the ordering of various Django middleware classes:
 
    After ``UpdateCacheMiddleware``: Modifies ``Vary`` header.
 
-#. :class:`~django.middleware.http.ConditionalGetMiddleware`
+#. ``django.middleware.http.ConditionalGetMiddleware``
 
    Before any middleware that may change the response (it sets the ``ETag``
    header).
@@ -668,7 +668,7 @@ Here are some hints about the ordering of various Django middleware classes:
    After ``GZipMiddleware`` so it won't calculate an ``ETag`` header on gzipped
    contents.
 
-#. :class:`~django.middleware.locale.LocaleMiddleware`
+#. ``django.middleware.locale.LocaleMiddleware``
 
    One of the topmost, after ``SessionMiddleware`` (uses session data) and
    ``UpdateCacheMiddleware`` (modifies ``Vary`` header).
