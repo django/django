@@ -497,7 +497,7 @@ behavior. These arguments are provided as additional keys in the
 
   * ``MAX_ENTRIES``: The maximum number of entries allowed in
     the cache before old values are deleted. This argument
-    defaults to ``300``.
+    defaults to ``300``. Set to ``None`` to disable culling.
 
   * ``CULL_FREQUENCY``: The fraction of entries that are culled
     when ``MAX_ENTRIES`` is reached. The actual ratio is
