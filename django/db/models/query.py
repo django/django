@@ -26,7 +26,16 @@ from django.db import (
 from django.db.models import AutoField, DateField, DateTimeField, Field, Max, sql
 from django.db.models.constants import LOOKUP_SEP, OnConflict
 from django.db.models.deletion import Collector
-from django.db.models.expressions import Case, DatabaseDefault, F, OrderBy, Value, When
+from django.db.models.expressions import (
+    Case,
+    Col,
+    ColPairs,
+    DatabaseDefault,
+    F,
+    OrderBy,
+    Value,
+    When,
+)
 from django.db.models.fetch_modes import FETCH_ONE
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import PROHIBITED_FILTER_KWARGS, FilteredRelation, Q
@@ -2048,7 +2057,7 @@ class QuerySet(AltersData):
             return False
         opts = self.model._meta
         pk_fields = {f.attname for f in opts.pk_fields}
-        ordering_fields = set()
+        candidate_fields = set()
         for part in ordering:
             # Search for single field providing a total ordering.
             field_name = None
@@ -2058,7 +2067,17 @@ class QuerySet(AltersData):
                 field_name = part.name
             elif isinstance(part, OrderBy) and isinstance(part.expression, F):
                 field_name = part.expression.name
-            if field_name:
+            if annotation_col := self.query.annotations.get(field_name):
+                if isinstance(annotation_col, Col):
+                    if annotation_col.alias == self.query.base_table:
+                        candidate_fields.add(annotation_col.target)
+                elif isinstance(annotation_col, ColPairs):
+                    candidate_fields |= {
+                        c.target
+                        for c in annotation_col.get_cols()
+                        if c.alias == self.query.base_table
+                    }
+            elif field_name:
                 if field_name == "pk":
                     return True
                 # Normalize attname references by using get_field().
@@ -2068,18 +2087,21 @@ class QuerySet(AltersData):
                     # Could be "?" for random ordering or a related field
                     # lookup. Skip this part of introspection for now.
                     continue
-                # Ordering by a related field name orders by the referenced
-                # model's ordering. Skip this part of introspection for now.
-                if field.remote_field and field_name == field.name:
-                    continue
-                if field.attname in pk_fields and len(pk_fields) == 1:
-                    return True
-                if field.unique and not field.null:
-                    return True
-                ordering_fields.add(field.attname)
+                else:
+                    # Ordering by a related field name orders by the referenced
+                    # model's ordering. Skip this introspection for now.
+                    if field.remote_field and field_name == field.name:
+                        continue
+                    candidate_fields.add(field)
+
+        candidate_attnames = set()
+        for field in candidate_fields:
+            if field.unique and not field.null:
+                return True
+            candidate_attnames.add(field.attname)
 
         # Account for members of a CompositePrimaryKey.
-        if ordering_fields.issuperset(pk_fields):
+        if candidate_attnames.issuperset(pk_fields):
             return True
         # No single total ordering field, try unique_together and total
         # unique constraints.
@@ -2097,7 +2119,7 @@ class QuerySet(AltersData):
             # cannot ensure total ordering.
             if any(field.null for field in fields):
                 continue
-            if ordering_fields.issuperset(field.attname for field in fields):
+            if candidate_attnames.issuperset(field.attname for field in fields):
                 return True
 
         return False
