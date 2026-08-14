@@ -25,12 +25,6 @@ from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 
 
-def _get_subquery_fields_len(expression):
-    if isinstance(expression, (tuple, list)):
-        return len(expression)
-    return expression._subquery_fields_len
-
-
 class Lookup(Expression):
     lookup_name = None
     prepare_rhs = True
@@ -385,8 +379,8 @@ class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
                     "The QuerySet value for an exact lookup must be limited to "
                     "one result using slicing."
                 )
-            lhs_len = _get_subquery_fields_len(self.lhs)
-            if (rhs_len := query._subquery_fields_len) != lhs_len:
+            lhs_len = len(self.lhs)
+            if (rhs_len := len(query)) != lhs_len:
                 raise ValueError(
                     f"The QuerySet value for the exact lookup must have {lhs_len} "
                     f"selected fields (received {rhs_len})"
@@ -510,8 +504,8 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
         from django.db.models.sql.query import Query  # avoid circular import
 
         if isinstance(self.rhs, Query):
-            lhs_len = _get_subquery_fields_len(self.lhs)
-            if (rhs_len := self.rhs._subquery_fields_len) != lhs_len:
+            lhs_len = len(self.lhs)
+            if (rhs_len := len(self.rhs)) != lhs_len:
                 raise ValueError(
                     f"The QuerySet value for the 'in' lookup must have {lhs_len} "
                     f"selected fields (received {rhs_len})"

@@ -332,10 +332,7 @@ class SQLCompiler:
         col_idx = 1
         for col, alias in select:
             is_multi_column_query = Query._get_multi_column_query(col)
-            is_multi_column_expression = (
-                not isinstance(col, ColPairs)
-                and getattr(col, "_subquery_fields_len", 1) > 1
-            )
+            is_multi_column_expression = not isinstance(col, ColPairs) and len(col) > 1
             if is_multi_column_query or is_multi_column_expression:
                 raise NotImplementedError(
                     "Selecting a multi-column subquery as an annotation is not "
