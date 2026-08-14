@@ -1380,7 +1380,7 @@ class Query(BaseExpression):
         """Add a single annotation expression to the Query."""
         self.check_alias(alias)
         annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None)
-        if self._get_multi_column_query(annotation) and LOOKUP_SEP in alias:
+        if self._get_multi_column_query(annotation) is not None and LOOKUP_SEP in alias:
             raise ValueError(
                 f"Multi-column subquery alias {alias!r} cannot contain the lookup "
                 f"separator {LOOKUP_SEP!r}."
@@ -2248,7 +2248,9 @@ class Query(BaseExpression):
             if annotation is not None
             else self.annotations.get(field_list[0])
         )
-        is_multi_column_query = self._get_multi_column_query(root_annotation)
+        is_multi_column_query = (
+            self._get_multi_column_query(root_annotation) is not None
+        )
 
         if not allow_joins and is_multi_column_query:
             raise FieldError("Joined field references are not permitted in this query")
@@ -2539,8 +2541,11 @@ class Query(BaseExpression):
                 if item == "?":
                     continue
                 item = item.removeprefix("-")
-                if item in self.annotations or self._get_multi_column_query(
-                    self.annotations.get(item.split(LOOKUP_SEP, 1)[0])
+                if item in self.annotations or (
+                    self._get_multi_column_query(
+                        self.annotations.get(item.split(LOOKUP_SEP, 1)[0])
+                    )
+                    is not None
                 ):
                     continue
                 if self.extra and item in self.extra:
