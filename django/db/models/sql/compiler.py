@@ -331,7 +331,7 @@ class SQLCompiler:
         ret = []
         col_idx = 1
         for col, alias in select:
-            is_multi_column_query = Query._get_multi_column_query(col)
+            is_multi_column_query = Query._get_multi_column_query(col) is not None
             is_multi_column_expression = not isinstance(col, ColPairs) and len(col) > 1
             if is_multi_column_query or is_multi_column_expression:
                 raise NotImplementedError(
@@ -442,7 +442,7 @@ class SQLCompiler:
                 expr = self.query.annotations.get(ref)
             if expr:
                 is_multi_column_subquery = (
-                    Query._get_multi_column_query(expr)
+                    Query._get_multi_column_query(expr) is not None
                     and ref not in self.query.annotation_select
                 )
                 if is_multi_column_subquery and not self.query.combinator:
