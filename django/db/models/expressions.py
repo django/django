@@ -196,8 +196,8 @@ class BaseExpression:
         if output_field is not None:
             self.output_field = output_field
 
-    @property
-    def _subquery_fields_len(self):
+    def __len__(self):
+        """Return the number of columns produced by this expression."""
         return 1
 
     def __getstate__(self):
@@ -1451,10 +1451,6 @@ class ColPairs(Expression):
 
     def select_format(self, compiler, sql, params):
         return sql, params
-
-    @property
-    def _subquery_fields_len(self):
-        return len(self)
 
 
 class Ref(Expression):
