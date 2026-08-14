@@ -35,6 +35,13 @@ class Foo(models.Model):
     d = models.DecimalField(max_digits=5, decimal_places=3)
 
 
+class DecimalWithoutPrecision(models.Model):
+    value = models.DecimalField()
+
+    class Meta:
+        required_db_features = {"supports_no_precision_decimalfield"}
+
+
 def get_foo():
     return Foo.objects.get(id=1).pk
 

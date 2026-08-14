@@ -6,9 +6,9 @@ from django.core import validators
 from django.core.exceptions import ValidationError
 from django.db import connection, models
 from django.db.models import Max
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 
-from .models import BigD, Foo
+from .models import BigD, DecimalWithoutPrecision, Foo
 
 
 class DecimalFieldTests(TestCase):
@@ -158,3 +158,10 @@ class DecimalFieldTests(TestCase):
         obj = Foo.objects.create(a="bar", d=Decimal("8"))
         obj.refresh_from_db()
         self.assertEqual(obj.d.compare_total(Decimal("8.000")), Decimal("0"))
+
+    @skipUnlessDBFeature("supports_no_precision_decimalfield")
+    def test_decimalfield_without_precision(self):
+        value = Decimal("0.99")
+        obj = DecimalWithoutPrecision.objects.create(value=value)
+        obj.refresh_from_db()
+        self.assertEqual(obj.value, value)
