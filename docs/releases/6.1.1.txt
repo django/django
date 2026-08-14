@@ -30,3 +30,7 @@ Bugfixes
   changed only the Python-level ``on_delete`` option of ``ForeignKey`` or
   ``OneToOneField`` fields to perform unnecessary schema changes
   (:ticket:`37260`).
+
+* Fixed a bug in Django 6.1 where :class:`~django.db.models.DecimalField`
+  without ``max_digits`` and ``decimal_places`` caused a crash when retrieving
+  values on SQLite (:ticket:`37275`).
