@@ -8,7 +8,15 @@ from itertools import chain
 from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DatabaseError, NotSupportedError
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import ColPairs, F, OrderBy, RawSQL, Ref, Value
+from django.db.models.expressions import (
+    BaseExpression,
+    ColPairs,
+    F,
+    OrderBy,
+    RawSQL,
+    Ref,
+    Value,
+)
 from django.db.models.fields import AutoField, composite
 from django.db.models.functions import Cast, Random
 from django.db.models.lookups import Lookup
@@ -332,7 +340,11 @@ class SQLCompiler:
         col_idx = 1
         for col, alias in select:
             is_multi_column_query = Query._get_multi_column_query(col) is not None
-            is_multi_column_expression = not isinstance(col, ColPairs) and len(col) > 1
+            is_multi_column_expression = (
+                isinstance(col, BaseExpression)
+                and not isinstance(col, ColPairs)
+                and len(col) > 1
+            )
             if is_multi_column_query or is_multi_column_expression:
                 raise NotImplementedError(
                     "Selecting a multi-column subquery as an annotation is not "
