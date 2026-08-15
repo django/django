@@ -16,7 +16,6 @@ from django.utils.functional import Promise
 from django.utils.http import MAX_URL_REDIRECT_LENGTH
 from django.utils.translation import gettext as _
 
-
 def render(
     request, template_name, context=None, content_type=None, status=None, using=None
 ):
@@ -209,3 +208,5 @@ def resolve_url(to, *args, **kwargs):
 
     # Finally, fall back and assume it's a URL
     return to
+def make_toast():
+    return "toast"
