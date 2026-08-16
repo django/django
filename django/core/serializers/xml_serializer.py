@@ -15,8 +15,39 @@ from django.db import DEFAULT_DB_ALIAS, models
 from django.utils.xmlutils import SimplerXMLGenerator, UnserializableContentError
 
 
+class FieldSerializer:
+    @classmethod
+    def serialize(cls, field, obj, serializer):
+        return field.value_to_string(obj)
+
+    @classmethod
+    def deserialize(cls, field, field_node, deserializer):
+        value = getInnerText(field_node).strip()
+        return field.to_python(value)
+
+
+class JSONFieldSerializer(FieldSerializer):
+    @classmethod
+    def serialize(cls, field, obj, serializer):
+        value = super().serialize(field, obj, serializer)
+        # Dump value since value_to_string() doesn't output strings.
+        return json.dumps(value, cls=field.encoder)
+
+    @classmethod
+    def deserialize(cls, field, field_node, deserializer):
+        value = super().deserialize(field, field_node, deserializer)
+        # Load value since JSONField.to_python() isn't defined to convert
+        # strings to Python values.
+        return json.loads(value, cls=field.decoder)
+
+
 class Serializer(base.Serializer):
     """Serialize a QuerySet to XML."""
+
+    field_mapping = {
+        models.Field: FieldSerializer,
+        models.JSONField: JSONFieldSerializer,
+    }
 
     def indent(self, level):
         if self.options.get("indent") is not None:
@@ -96,11 +127,7 @@ class Serializer(base.Serializer):
 
         # Get a "string version" of the object's data.
         if getattr(obj, field.name) is not None:
-            value = field.value_to_string(obj)
-            if field.get_internal_type() == "JSONField":
-                # Dump value since JSONField.value_to_string() doesn't output
-                # strings.
-                value = json.dumps(value, cls=field.encoder)
+            value = self.serialize_field(field, obj)
             try:
                 self.xml.characters(value)
             except UnserializableContentError:
@@ -232,6 +259,8 @@ class Serializer(base.Serializer):
 class Deserializer(base.Deserializer):
     """Deserialize XML."""
 
+    serializer = Serializer
+
     def __init__(
         self,
         stream_or_string,
@@ -332,10 +361,7 @@ class Deserializer(base.Deserializer):
                 if getChildrenByTagName(field_node, "None"):
                     value = None
                 else:
-                    value = field.to_python(getInnerText(field_node).strip())
-                    # Load value since JSONField.to_python() outputs strings.
-                    if field.get_internal_type() == "JSONField":
-                        value = json.loads(value, cls=field.decoder)
+                    value = self.deserialize_field(field, field_node, self)
                 data[field.name] = value
 
         obj = base.build_instance(Model, data, self.db)
