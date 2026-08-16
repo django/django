@@ -1,5 +1,3 @@
-from unittest import expectedFailure
-
 from django.db.models import F, Q
 from django.test import TestCase
 
@@ -61,7 +59,6 @@ class CompositePKSubqueryTests(TestCase):
 
         self.assertSequenceEqual(token_pks, [self.token.pk])
 
-    @expectedFailure
     def test_filter_composite_primary_key_expression(self):
         token_info = Token.objects.filter(pk=self.token.pk).values("pk")[:1]
         token_pks = (
