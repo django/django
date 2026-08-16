@@ -1355,32 +1355,46 @@ class Query(BaseExpression):
                 cols.append(expression)
         return Tuple(*cols, output_field=output_field)
 
-    def _promote_inner_subquery_join(self, name):
-        alias, _, rest_path = name.partition(LOOKUP_SEP)
-        annotation = self._get_multi_column_query(self.annotations.get(alias))
-        if annotation is None:
-            return None
-        if annotation.has_external_references():
+    def _setup_inner_subquery_join(self, table_subquery, alias):
+        if table_subquery.has_external_references():
+            # TODO: Remove after OuterRef support.
             raise NotImplementedError(
                 "Correlated multi-column subquery aliases are not supported."
             )
         self.get_initial_alias()
         join = SubqueryJoin(
-            annotation,
+            table_subquery,
             alias,
             None,
         )
         table_alias = self.join(join)
-        join = self.alias_map[table_alias]
-        if not rest_path:
-            return self._resolve_inner_subquery_tuple(join)
-        return self._resolve_inner_subquery_field(join, rest_path)
+        return self.alias_map[table_alias]
+
+    def _resolve_inner_subquery_path(self, table_subquery, parts):
+        """Resolve a table-source output and return the unused path parts."""
+        output_names = {name for name, _ in table_subquery._get_output_expressions()}
+        field_path = None
+        resolved_idx = 1
+        for idx in range(len(parts), 1, -1):
+            candidate = LOOKUP_SEP.join(parts[1:idx])
+            if candidate in output_names:
+                field_path = candidate
+                resolved_idx = idx
+                break
+
+        join = self._setup_inner_subquery_join(table_subquery, parts[0])
+        if field_path is None:
+            expression = self._resolve_inner_subquery_tuple(join)
+        else:
+            expression = self._resolve_inner_subquery_field(join, field_path)
+        return expression, parts[resolved_idx:]
 
     def add_annotation(self, annotation, alias, select=True):
         """Add a single annotation expression to the Query."""
         self.check_alias(alias)
         annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None)
-        if self._get_multi_column_query(annotation) is not None and LOOKUP_SEP in alias:
+        table_subquery = self._get_multi_column_query(annotation)
+        if table_subquery is not None and LOOKUP_SEP in alias:
             raise ValueError(
                 f"Multi-column subquery alias {alias!r} cannot contain the lookup "
                 f"separator {LOOKUP_SEP!r}."
@@ -1499,11 +1513,15 @@ class Query(BaseExpression):
                 lookup_splitted, self.annotations
             )
             if annotation:
-                for idx in range(len(lookup_splitted), 0, -1):
-                    inner_query_field = LOOKUP_SEP.join(lookup_splitted[:idx])
-                    expression = self._promote_inner_subquery_join(inner_query_field)
-                    if expression is not None:
-                        return lookup_splitted[idx:], (), expression
+                table_subquery = self._get_multi_column_query(
+                    self.annotations[annotation]
+                )
+                if table_subquery is not None:
+                    expression, expression_lookups = self._resolve_inner_subquery_path(
+                        table_subquery,
+                        lookup_splitted,
+                    )
+                    return expression_lookups, (), expression
                 expression = self.annotations[annotation]
                 if summarize:
                     expression = Ref(annotation, expression)
@@ -2250,7 +2268,8 @@ class Query(BaseExpression):
     def resolve_ref(self, name, allow_joins=True, reuse=None, summarize=False):
         annotation = self.annotations.get(name)
         if annotation is not None:
-            is_multi_column_query = self._get_multi_column_query(annotation) is not None
+            table_subquery = self._get_multi_column_query(annotation)
+            is_multi_column_query = table_subquery is not None
             if not allow_joins and is_multi_column_query:
                 raise FieldError(
                     "Joined field references are not permitted in this query"
@@ -2275,27 +2294,27 @@ class Query(BaseExpression):
                 return Ref(name, self.annotation_select[name])
             else:
                 if is_multi_column_query:
-                    join_result = self._promote_inner_subquery_join(name)
-                    if join_result is not None:
-                        return join_result
+                    join = self._setup_inner_subquery_join(table_subquery, name)
+                    return self._resolve_inner_subquery_tuple(join)
                 return annotation
         else:
             field_list = name.split(LOOKUP_SEP)
             annotation = self.annotations.get(field_list[0])
-            is_multi_column_query = self._get_multi_column_query(annotation) is not None
+            table_subquery = self._get_multi_column_query(annotation)
+            is_multi_column_query = table_subquery is not None
             if not allow_joins and is_multi_column_query:
                 raise FieldError(
                     "Joined field references are not permitted in this query"
                 )
             if is_multi_column_query:
-                for idx in range(len(field_list), 0, -1):
-                    join_result = self._promote_inner_subquery_join(
-                        LOOKUP_SEP.join(field_list[:idx])
-                    )
-                    if join_result is not None:
-                        for transform in field_list[idx:]:
-                            join_result = self.try_transform(join_result, transform)
-                        return join_result
+                expression, transforms = self._resolve_inner_subquery_path(
+                    table_subquery,
+                    field_list,
+                )
+                for transform in transforms:
+                    expression = self.try_transform(expression, transform)
+                return expression
+
             if annotation is not None:
                 for transform in field_list[1:]:
                     annotation = self.try_transform(annotation, transform)
