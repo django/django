@@ -1777,6 +1777,18 @@ class MigrationAutodetector:
                                     self.to_state,
                                 )
                             )
+                        # Depend on the creation of every field named in the
+                        # constraint so that an AlterFooTogether for a field
+                        # being added (e.g. a field converted to a
+                        # ForeignKey) runs after the AddField.
+                        dependencies.append(
+                            OperationDependency(
+                                app_label,
+                                model_name,
+                                field_name,
+                                OperationDependency.Type.CREATE,
+                            )
+                        )
                 yield (
                     old_value,
                     new_value,

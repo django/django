@@ -1197,6 +1197,30 @@ class AutodetectorTests(BaseAutodetectorTests):
             "unique_together": {("title", "newfield2")},
         },
     )
+    book_unique_together_5 = ModelState(
+        "otherapp",
+        "Book",
+        [
+            ("id", models.AutoField(primary_key=True)),
+            ("type", models.CharField(max_length=20)),
+            ("version", models.IntegerField()),
+        ],
+        {
+            "unique_together": {("type", "version")},
+        },
+    )
+    book_unique_together_6 = ModelState(
+        "otherapp",
+        "Book",
+        [
+            ("id", models.AutoField(primary_key=True)),
+            ("a", models.ForeignKey("testapp.Author", models.CASCADE, null=True)),
+            ("version", models.IntegerField()),
+        ],
+        {
+            "unique_together": {("a", "version")},
+        },
+    )
     attribution = ModelState(
         "otherapp",
         "Attribution",
@@ -3712,6 +3736,40 @@ class AutodetectorTests(BaseAutodetectorTests):
             1,
             name="book",
             unique_together={("title", "newfield")},
+        )
+
+    def test_unique_together_convert_field_to_fk(self):
+        """
+        An AlterUniqueTogether for a field that is being added (converted to
+        a ForeignKey) is ordered after the AddField (Ticket #37281).
+        """
+        before = self.make_project_state(
+            [self.author_empty, self.book_unique_together_5]
+        )
+        after = self.make_project_state(
+            [self.author_empty, self.book_unique_together_6]
+        )
+        autodetector = MigrationAutodetector(
+            before,
+            after,
+            MigrationQuestioner({"ask_initial": True}),
+        )
+        changes = autodetector._detect_changes()
+        changes = autodetector.arrange_for_graph(changes, MigrationGraph())
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertOperationTypes(
+            changes,
+            "otherapp",
+            0,
+            ["AddField", "AlterUniqueTogether", "RemoveField"],
+        )
+        self.assertOperationAttributes(
+            changes,
+            "otherapp",
+            0,
+            1,
+            name="book",
+            unique_together={("a", "version")},
         )
 
     def test_create_model_and_unique_together(self):

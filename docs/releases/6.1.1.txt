@@ -34,3 +34,8 @@ Bugfixes
 * Fixed a bug in Django 6.1 where :class:`~django.db.models.DecimalField`
   without ``max_digits`` and ``decimal_places`` caused a crash when retrieving
   values on SQLite (:ticket:`37275`).
+
+* Fixed a regression in Django 5.0 where converting a field referenced in
+  ``unique_together`` to a ``ForeignKey`` could generate migrations that
+  ordered ``AlterUniqueTogether`` before ``AddField``, causing a
+  ``FieldDoesNotExist`` error when applying them (:ticket:`37281`).
