@@ -1323,10 +1323,7 @@ class Query(BaseExpression):
         return None
 
     def _resolve_inner_subquery_field(self, join, field_path):
-        try:
-            expression = join.table_subquery.get_output_expression(field_path)
-        except FieldError:
-            return None
+        expression = join.table_subquery.get_output_expression(field_path)
         if isinstance(expression, ColPairs):
             return ColPairs(
                 join.table_alias,
