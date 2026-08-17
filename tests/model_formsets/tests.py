@@ -8,6 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.forms.formsets import formset_factory
 from django.forms.models import (
+    BaseInlineFormSet,
     BaseModelFormSet,
     ModelForm,
     _get_foreign_key,
@@ -1141,6 +1142,48 @@ class ModelFormsetTest(TestCase):
         message = "fk_name 'title' is not a ForeignKey to 'model_formsets.Author'."
         with self.assertRaisesMessage(ValueError, message):
             inlineformset_factory(Author, Book, fields="__all__", fk_name="title")
+
+    def test_inline_formsets_with_prefetch_related(self):
+        author = Author.objects.create(name="Charles Baudelaire")
+        Book.objects.create(author=author, title="Les Paradis Artificiels")
+        Book.objects.create(author=author, title="Les Fleurs du Mal")
+        Book.objects.create(author=author, title="Flowers of Evil")
+
+        # Default formset will trigger a query
+        BookFormSet = inlineformset_factory(Author, Book, fields=["title"])
+        with self.assertNumQueries(1):
+            formset = BookFormSet(instance=author)
+            self.assertEqual(len(formset.forms), 6)
+
+        # Override to use prefetch_related query
+        class PrefetchInlineFormSet(BaseInlineFormSet):
+            def get_instance_by_queryset_index(self, i):
+                # Use list() to evaluate the lazy queryset now
+                return list(self.get_queryset())[i]
+
+            def prepare_queryset(self, queryset):
+                if self.instance.pk:
+                    rel_name = self.fk.remote_field.get_accessor_name(model=self.model)
+                    queryset = getattr(self.instance, rel_name).get_queryset()
+                    if queryset is not None:
+                        return queryset
+                return super().prepare_queryset(queryset)
+
+        BookFormSet = inlineformset_factory(
+            Author, Book, fields=["title"], formset=PrefetchInlineFormSet
+        )
+        author_with_books = Author.objects.prefetch_related("book_set").get(
+            name="Charles Baudelaire"
+        )
+        # An instance with prefetch_related should not trigger a query
+        with self.assertNumQueries(0):
+            formset = BookFormSet(instance=author_with_books)
+            self.assertEqual(len(formset.forms), 6)
+
+        # An instance without prefetch_related will trigger a query
+        with self.assertNumQueries(1):
+            formset = BookFormSet(instance=author)
+            self.assertEqual(len(formset.forms), 6)
 
     def test_custom_pk(self):
         # We need to ensure that it is displayed
