@@ -8,9 +8,7 @@ def sql_flush(style, connection, reset_sequences=True, allow_cascade=False):
     """
     Return a list of the SQL statements used to flush the database.
     """
-    tables = connection.introspection.django_table_names(
-        only_existing=True, include_views=False
-    )
+    tables = connection.introspection.managed_table_names()
     return connection.ops.sql_flush(
         style,
         tables,
