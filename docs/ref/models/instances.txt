@@ -146,9 +146,9 @@ The example above shows a full ``from_db()`` implementation to clarify how that
 is done. In this case it would be possible to use a ``super()`` call in the
 ``from_db()`` method.
 
-    .. versionchanged:: 6.1
+.. versionchanged:: 6.1
 
-       The ``fetch_mode`` parameter was added.
+    The ``fetch_mode`` parameter was added.
 
 .. _refreshing-objects:
 
