@@ -501,6 +501,13 @@ Models
   primary key when a ``QuerySet``'s ordering has been forcibly cleared by
   calling :meth:`~.QuerySet.order_by` with no arguments.
 
+* As default model ordering is now applied to combined querysets,
+  :meth:`~.QuerySet.union`, :meth:`~.QuerySet.difference`, and
+  :meth:`~.QuerySet.intersection` raise ``DatabaseError`` when a field in
+  :attr:`.Options.ordering` isn't selected by :meth:`~.QuerySet.values` or
+  :meth:`~.QuerySet.values_list`. Call :meth:`~.QuerySet.order_by` without
+  arguments before combining to clear the default ordering.
+
 * SQL ``SELECT`` aliases originating from :meth:`.QuerySet.annotate`
   calls as well as table and ``JOIN`` aliases are now systematically quoted to
   prevent special character collisions. Because quoted aliases are

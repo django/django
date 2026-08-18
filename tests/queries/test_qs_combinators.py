@@ -21,6 +21,7 @@ from .models import (
     Article,
     Author,
     Celebrity,
+    Cover,
     ExtraInfo,
     Note,
     Number,
@@ -755,6 +756,16 @@ class QuerySetSetOperationTests(TestCase):
             list(qs1.union(qs2).order_by(F("num").desc()))
         # switched order, now 'exists' again:
         list(qs2.union(qs1).order_by("num"))
+
+    def test_order_by_non_selected_column_from_default_ordering(self):
+        qs = Cover.objects.values("title")
+        msg = "ORDER BY term does not match any column in the result set"
+        with self.assertRaisesMessage(DatabaseError, msg):
+            list(qs.union(qs))
+        with self.assertRaisesMessage(DatabaseError, msg):
+            list(qs.intersection(qs))
+        with self.assertRaisesMessage(DatabaseError, msg):
+            list(qs.difference(qs))
 
     @skipUnlessDBFeature("supports_select_difference", "supports_select_intersection")
     def test_qs_with_subcompound_qs(self):
