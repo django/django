@@ -482,6 +482,14 @@ class ModelStateFetchModeDescriptor:
         return res
 
 
+class ModelStatePrefetchedToAttrsDescriptor:
+    def __get__(self, instance, cls=None):
+        if instance is None:
+            return self
+        res = instance.prefetched_to_attrs = set()
+        return res
+
+
 class ModelState:
     """Store model instance state."""
 
@@ -493,6 +501,7 @@ class ModelState:
     adding = True
     fields_cache = ModelStateFieldsCacheDescriptor()
     fetch_mode = ModelStateFetchModeDescriptor()
+    prefetched_to_attrs = ModelStatePrefetchedToAttrsDescriptor()
     peers = ()
 
     def __getstate__(self):
@@ -668,6 +677,11 @@ class Model(AltersData, metaclass=ModelBase):
         state = self.__dict__.copy()
         state["_state"] = copy.copy(state["_state"])
         state["_state"].fields_cache = state["_state"].fields_cache.copy()
+        # Copy prefetched_to_attrs only if it was initialized lazily.
+        if "prefetched_to_attrs" in state["_state"].__dict__:
+            state["_state"].prefetched_to_attrs = state[
+                "_state"
+            ].prefetched_to_attrs.copy()
         # memoryview cannot be pickled, so cast it to bytes and store
         # separately.
         _memoryview_attrs = []
