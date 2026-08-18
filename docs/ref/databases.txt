@@ -269,8 +269,33 @@ to ``True`` to use the ``ConnectionPool`` defaults::
         },
     }
 
+The :setting:`CONN_HEALTH_CHECKS` setting is used to set the ``check`` argument
+of :class:`~psycopg:psycopg_pool.ConnectionPool`. The :setting:`CONN_MAX_AGE`
+setting must be unset or ``0`` (a non-zero value raises
+:exc:`~django.core.exceptions.ImproperlyConfigured`). Configure the connection
+lifecycle using the ``max_lifetime`` and ``max_idle`` arguments instead::
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            # ...
+            "OPTIONS": {
+                "pool": {
+                    # these are the default values
+                    "max_lifetime": 3600,
+                    "max_idle": 600,
+                },
+            },
+        },
+    }
+
 This option requires ``psycopg[pool]`` or :pypi:`psycopg-pool` to be installed
 and is ignored with ``psycopg2``.
+
+When using a pool, closing a connection returns it to the pool instead of
+terminating it. This includes the automatic close performed at the end of each
+request, as well as explicit ``db.connection.close()`` and
+``db.connections.close_all()`` calls.
 
 .. _database-server-side-parameters-binding:
 
