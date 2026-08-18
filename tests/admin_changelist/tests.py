@@ -997,12 +997,13 @@ class ChangeListTests(TestCase):
     def test_exact_lookup_for_boolean_field(self):
         """
         Arbitrary search terms don't match every row with a True value for an
-        exact lookup on a BooleanField, while explicit boolean search terms
-        still match.
+        exact lookup on a BooleanField, nor a None value for a nullable one,
+        while explicit boolean search terms still match.
         """
         john = OrderedObject.objects.create(name="john", bool=True)
         mary = OrderedObject.objects.create(name="mary", bool=True)
         pete = OrderedObject.objects.create(name="pete", bool=False)
+        OrderedObject.objects.create(name="sal", bool=None)
         m = admin.ModelAdmin(OrderedObject, custom_site)
         m.search_fields = ["name", "bool__exact"]
 

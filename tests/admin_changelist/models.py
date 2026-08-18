@@ -126,7 +126,7 @@ class OrderedObject(models.Model):
     """
 
     name = models.CharField(max_length=255)
-    bool = models.BooleanField(default=True)
+    bool = models.BooleanField(default=True, null=True)
     number = models.IntegerField(default=0, db_column="number_val")
 
     objects = OrderedObjectManager()
