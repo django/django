@@ -1179,6 +1179,11 @@ calling the appropriate methods on the wrapped expression.
         ``UNNEST``, etc.) to skip optimization and be properly evaluated when
         annotations spawn rows themselves. Defaults to ``False``.
 
+    .. attribute:: is_composite
+
+        Tells Django that this expression represents a composite value.
+        Defaults to ``False``.
+
     .. attribute:: allows_composite_expressions
 
         Tells Django that this expression allows composite expressions, for
