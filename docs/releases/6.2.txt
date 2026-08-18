@@ -212,7 +212,8 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* The new :attr:`.Expression.is_composite` attribute specifies that an
+  expression represents a composite value.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
