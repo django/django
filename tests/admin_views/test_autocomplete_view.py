@@ -592,8 +592,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         rows = self.selenium.find_elements(By.CSS_SELECTOR, ".dynamic-authorship_set")
         self.assertEqual(len(rows), 3)
         assertNoResults(rows[0])
-        # Autocomplete works in rows added using the "Add another" button.
-        self.selenium.find_element(By.LINK_TEXT, "Add another Authorship").click()
+        # Autocomplete works in rows added using the "Add" button.
+        self.selenium.find_element(By.LINK_TEXT, "Add Authorship").click()
         rows = self.selenium.find_elements(By.CSS_SELECTOR, ".dynamic-authorship_set")
         self.assertEqual(len(rows), 4)
         assertNoResults(rows[-1])
