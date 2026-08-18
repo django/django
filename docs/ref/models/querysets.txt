@@ -1927,6 +1927,48 @@ For example:
     # queries the database with the 'backup' alias
     >>> Entry.objects.using("backup")
 
+``comment()``
+~~~~~~~~~~~~~
+
+.. versionadded:: 6.2
+
+.. method:: comment(message)
+
+Returns a new ``QuerySet`` that injects ``message`` into the resulting SQL as
+an ``/* ... */`` comment, after ``SELECT`` (and ``DISTINCT`` if present) or
+after ``UPDATE``.
+
+For example::
+
+    Entry.objects.comment("hello").all()
+
+roughly produces:
+
+.. code-block:: sql
+
+    SELECT /* hello */ "blog_entry"."id" FROM "blog_entry"
+
+Calls can be chained; each call appends a separate block::
+
+    Entry.objects.comment("first").comment("second").update(headline="x")
+
+produces:
+
+.. code-block:: sql
+
+    UPDATE /* first */ /* second */ "blog_entry" SET "headline" = 'x'
+
+``message`` must be a non-empty string containing only letters, numbers,
+spaces, periods, underscores, and hyphens. ``comment()`` raises
+:exc:`ValueError` if ``message`` contains any other characters, and
+:exc:`TypeError` if ``message`` is not a string.
+
+``comment()`` only affects ``SELECT`` and ``UPDATE`` statements; ``DELETE``,
+``INSERT``, and statements issued by migrations are not annotated. When
+called on a combined ``QuerySet`` (produced by :meth:`union`,
+:meth:`intersection`, or :meth:`difference`), the comment is emitted as a
+leading ``/* ... */`` block before the combined SQL.
+
 ``select_for_update()``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
