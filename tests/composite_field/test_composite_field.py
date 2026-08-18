@@ -6,6 +6,7 @@ from django.db.models import (
     Count,
     Exists,
     F,
+    Max,
     OuterRef,
     Q,
     Subquery,
@@ -148,6 +149,16 @@ class CompositeSubqueryTestCase(TestCase):
 
 
 class CompositeFieldTests(CompositeSubqueryTestCase):
+
+    def test_aggregate_composite_subquery_column(self):
+        info = User.objects.values("email", "age")
+        result = (
+            Project.objects.filter(pk=self.auth.pk)
+            .alias(info=info)
+            .aggregate(max_age=Max("info__age"))
+        )
+
+        self.assertEqual(result, {"max_age": self.ada.age})
 
     def test_composite_subquery_alias_values_without_fields_db_column(self):
         comment_info = Comment.objects.filter(pk=self.comment.pk).values()[:1]
