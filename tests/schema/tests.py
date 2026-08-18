@@ -656,7 +656,11 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Book, new_field, old_field, strict=True)
 
     @isolate_apps("schema")
-    @skipUnlessDBFeature("supports_foreign_keys", "can_introspect_foreign_keys")
+    @skipUnlessDBFeature(
+        "supports_foreign_keys",
+        "can_introspect_foreign_keys",
+        "supports_on_delete_db_cascade",
+    )
     def test_fk_alter_on_delete_db_level(self):
         class DBOnDeleteParent(Model):
             class Meta:
