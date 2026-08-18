@@ -335,7 +335,7 @@ dependencies:
 * `gettext <https://www.gnu.org/software/gettext/manual/gettext.html>`_
   (:ref:`gettext_on_windows`)
 * :pypi:`selenium` 4.23.0+
-* :pypi:`sqlparse` 0.5.0+ (required)
+* :pypi:`sqlparse` 0.6.0+ (required)
 * :pypi:`tblib` 3.0.0+
 
 You can find these dependencies in `pip requirements files

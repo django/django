@@ -305,6 +305,9 @@ Miscellaneous
 * The minimum supported version of ``asgiref`` is increased from 3.9.1 to
   3.12.1.
 
+* The minimum supported version of ``sqlparse`` is increased from 0.5.0 to
+  0.6.0.
+
 * In the asynchronous request path, error responses (such as those rendered by
   ``handler404`` and ``handler500``) are now rendered on the request's
   thread-sensitive thread, rather than on a shared thread pool, so that
