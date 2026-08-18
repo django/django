@@ -467,9 +467,9 @@ class SQLCompiler:
                     transforms = []
                 if self.query.combinator and self.select:
                     if is_multi_column_subquery:
-                        # Keep the complete reference unresolved so each combined query
-                        # resolves the derived-table column and any following transforms
-                        # against its own annotation.
+                        # Keep the complete reference unresolved so each
+                        # combined query resolves the derived-table column and
+                        # any following transforms against its own annotation.
                         expr = F(col)
                         transforms = []
                     else:
