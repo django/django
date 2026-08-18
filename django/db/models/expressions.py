@@ -187,7 +187,7 @@ class BaseExpression:
     constraint_validation_compatible = True
     # Does the expression possibly return more than one row?
     set_returning = False
-    # Does the expression allow composite expressions?
+    # Does the expression represent a composite value?
     is_composite = False
     # Does the expression allow composite expressions in source_expressions?
     allows_composite_expressions = False
