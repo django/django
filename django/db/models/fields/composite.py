@@ -207,6 +207,11 @@ class CompositeField(Field):
 
         return cls(**fields)
 
+    def contribute_to_class(self, cls, name, private_only=False):
+        if type(self) is CompositeField:
+            raise TypeError("CompositeField cannot be used as a model field.")
+        super().contribute_to_class(cls, name, private_only=private_only)
+
     def get_fields(self):
         for name, field in self.sub_fields.items():
             path = tuple(name.split(LOOKUP_SEP))

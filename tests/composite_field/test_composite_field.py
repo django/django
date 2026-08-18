@@ -13,7 +13,7 @@ from django.db.models import (
 )
 from django.db.models.functions import Upper
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import register_lookup
+from django.test.utils import isolate_apps, register_lookup
 
 from .models import (
     BugReport,
@@ -77,6 +77,20 @@ class CompositeFieldOutputFieldTests(SimpleTestCase):
 
     def test_empty_select(self):
         self.assertIsNone(models.CompositeField.from_select({}))
+
+    @isolate_apps("composite_field")
+    def test_model_field_not_supported(self):
+        msg = "CompositeField cannot be used as a model field."
+        with self.assertRaisesMessage(TypeError, msg):
+
+            class Profile(models.Model):
+                info = models.CompositeField(
+                    email=models.EmailField(),
+                    age=models.IntegerField(),
+                )
+
+                class Meta:
+                    app_label = "composite_field"
 
 
 class CompositeSubqueryTestCase(TestCase):
