@@ -185,6 +185,7 @@ class CompositeField(Field):
     def __init__(self, **kwargs):
         self.sub_fields = {}
         for name, field in kwargs.items():
+            assert LOOKUP_SEP not in name
             if not isinstance(field, Field):
                 raise TypeError(
                     f"{name!r} should be a Field instance, got "
