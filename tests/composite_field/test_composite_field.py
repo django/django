@@ -514,16 +514,14 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
         )
         profile = User.objects.filter(pk=self.ada.pk).alias(first_post=first_post)
 
-        self.assertEqual(
-            list(
-                profile.filter(first_post__title="Welcome").values(
-                    "name", "first_post__title"
-                )
+        self.assertSequenceEqual(
+            profile.filter(first_post__title="Welcome").values(
+                "name", "first_post__title"
             ),
             [{"name": "Ada", "first_post__title": "Welcome"}],
         )
-        self.assertEqual(
-            list(profile.filter(first_post__title="Missing post")),
+        self.assertSequenceEqual(
+            profile.filter(first_post__title="Missing post"),
             [],
         )
 
@@ -812,11 +810,9 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
         for ordering in ("project_bug", F("project_bug")):
             with self.subTest(ordering=ordering):
                 self.assertSequenceEqual(
-                    list(
-                        projects.order_by(ordering).values_list(
-                            "project_bug__severity_level",
-                            "project_bug__description",
-                        )
+                    projects.order_by(ordering).values_list(
+                        "project_bug__severity_level",
+                        "project_bug__description",
                     ),
                     expected,
                 )
@@ -1187,19 +1183,15 @@ class CompositeSubqueryTupleLookupTests(CompositeSubqueryTestCase):
     def test_exact(self):
         projects = self.projects_with_priority_bug()
 
-        self.assertEqual(
-            list(
-                projects.filter(priority_bug=(3, "Login crash")).values_list(
-                    "code", flat=True
-                )
+        self.assertSequenceEqual(
+            projects.filter(priority_bug=(3, "Login crash")).values_list(
+                "code", flat=True
             ),
             ["AUTH"],
         )
-        self.assertEqual(
-            list(
-                projects.filter(priority_bug=(3, "Export missing rows")).values_list(
-                    "code", flat=True
-                )
+        self.assertSequenceEqual(
+            projects.filter(priority_bug=(3, "Export missing rows")).values_list(
+                "code", flat=True
             ),
             [],
         )
@@ -1209,19 +1201,13 @@ class CompositeSubqueryTupleLookupTests(CompositeSubqueryTestCase):
         matching_bug = self.bug_tuple_subquery(self.crash_report)
         nonmatching_bug = self.bug_tuple_subquery(self.missing_export_report)
 
-        self.assertEqual(
-            list(
-                projects.filter(priority_bug=matching_bug).values_list(
-                    "code", flat=True
-                )
-            ),
+        self.assertSequenceEqual(
+            projects.filter(priority_bug=matching_bug).values_list("code", flat=True),
             ["AUTH"],
         )
-        self.assertEqual(
-            list(
-                projects.filter(priority_bug=nonmatching_bug).values_list(
-                    "code", flat=True
-                )
+        self.assertSequenceEqual(
+            projects.filter(priority_bug=nonmatching_bug).values_list(
+                "code", flat=True
             ),
             [],
         )
@@ -1229,26 +1215,22 @@ class CompositeSubqueryTupleLookupTests(CompositeSubqueryTestCase):
     def test_in(self):
         projects = self.projects_with_priority_bug()
 
-        self.assertEqual(
-            list(
-                projects.filter(
-                    priority_bug__in=[
-                        (2, "Export missing rows"),
-                        (3, "Login crash"),
-                    ]
-                ).values_list("code", flat=True)
-            ),
+        self.assertSequenceEqual(
+            projects.filter(
+                priority_bug__in=[
+                    (2, "Export missing rows"),
+                    (3, "Login crash"),
+                ]
+            ).values_list("code", flat=True),
             ["AUTH"],
         )
-        self.assertEqual(
-            list(
-                projects.filter(
-                    priority_bug__in=[
-                        (2, "Login crash"),
-                        (3, "Export missing rows"),
-                    ]
-                ).values_list("code", flat=True)
-            ),
+        self.assertSequenceEqual(
+            projects.filter(
+                priority_bug__in=[
+                    (2, "Login crash"),
+                    (3, "Export missing rows"),
+                ]
+            ).values_list("code", flat=True),
             [],
         )
 
@@ -1256,35 +1238,23 @@ class CompositeSubqueryTupleLookupTests(CompositeSubqueryTestCase):
         projects = self.projects_with_priority_bug()
         projects_without_bug = self.projects_with_priority_bug(empty=True)
 
-        self.assertEqual(
-            list(
-                projects.filter(priority_bug__isnull=False).values_list(
-                    "code", flat=True
-                )
-            ),
+        self.assertSequenceEqual(
+            projects.filter(priority_bug__isnull=False).values_list("code", flat=True),
             ["AUTH"],
         )
-        self.assertEqual(
-            list(
-                projects.filter(priority_bug__isnull=True).values_list(
-                    "code", flat=True
-                )
-            ),
+        self.assertSequenceEqual(
+            projects.filter(priority_bug__isnull=True).values_list("code", flat=True),
             [],
         )
-        self.assertEqual(
-            list(
-                projects_without_bug.filter(priority_bug__isnull=True).values_list(
-                    "code", flat=True
-                )
+        self.assertSequenceEqual(
+            projects_without_bug.filter(priority_bug__isnull=True).values_list(
+                "code", flat=True
             ),
             ["AUTH"],
         )
-        self.assertEqual(
-            list(
-                projects_without_bug.filter(priority_bug__isnull=False).values_list(
-                    "code", flat=True
-                )
+        self.assertSequenceEqual(
+            projects_without_bug.filter(priority_bug__isnull=False).values_list(
+                "code", flat=True
             ),
             [],
         )
@@ -1292,19 +1262,15 @@ class CompositeSubqueryTupleLookupTests(CompositeSubqueryTestCase):
     def test_greater_than(self):
         projects = self.projects_with_priority_bug()
 
-        self.assertEqual(
-            list(
-                projects.filter(priority_bug__gt=(2, "Anything")).values_list(
-                    "code", flat=True
-                )
+        self.assertSequenceEqual(
+            projects.filter(priority_bug__gt=(2, "Anything")).values_list(
+                "code", flat=True
             ),
             ["AUTH"],
         )
-        self.assertEqual(
-            list(
-                projects.filter(priority_bug__gt=(4, "Anything")).values_list(
-                    "code", flat=True
-                )
+        self.assertSequenceEqual(
+            projects.filter(priority_bug__gt=(4, "Anything")).values_list(
+                "code", flat=True
             ),
             [],
         )
@@ -1312,19 +1278,15 @@ class CompositeSubqueryTupleLookupTests(CompositeSubqueryTestCase):
     def test_greater_than_or_equal(self):
         projects = self.projects_with_priority_bug()
 
-        self.assertEqual(
-            list(
-                projects.filter(priority_bug__gte=(3, "Login crash")).values_list(
-                    "code", flat=True
-                )
+        self.assertSequenceEqual(
+            projects.filter(priority_bug__gte=(3, "Login crash")).values_list(
+                "code", flat=True
             ),
             ["AUTH"],
         )
-        self.assertEqual(
-            list(
-                projects.filter(priority_bug__gte=(4, "Anything")).values_list(
-                    "code", flat=True
-                )
+        self.assertSequenceEqual(
+            projects.filter(priority_bug__gte=(4, "Anything")).values_list(
+                "code", flat=True
             ),
             [],
         )
@@ -1332,19 +1294,15 @@ class CompositeSubqueryTupleLookupTests(CompositeSubqueryTestCase):
     def test_less_than(self):
         projects = self.projects_with_priority_bug()
 
-        self.assertEqual(
-            list(
-                projects.filter(priority_bug__lt=(4, "Anything")).values_list(
-                    "code", flat=True
-                )
+        self.assertSequenceEqual(
+            projects.filter(priority_bug__lt=(4, "Anything")).values_list(
+                "code", flat=True
             ),
             ["AUTH"],
         )
-        self.assertEqual(
-            list(
-                projects.filter(priority_bug__lt=(2, "Anything")).values_list(
-                    "code", flat=True
-                )
+        self.assertSequenceEqual(
+            projects.filter(priority_bug__lt=(2, "Anything")).values_list(
+                "code", flat=True
             ),
             [],
         )
@@ -1352,19 +1310,15 @@ class CompositeSubqueryTupleLookupTests(CompositeSubqueryTestCase):
     def test_less_than_or_equal(self):
         projects = self.projects_with_priority_bug()
 
-        self.assertEqual(
-            list(
-                projects.filter(priority_bug__lte=(3, "Login crash")).values_list(
-                    "code", flat=True
-                )
+        self.assertSequenceEqual(
+            projects.filter(priority_bug__lte=(3, "Login crash")).values_list(
+                "code", flat=True
             ),
             ["AUTH"],
         )
-        self.assertEqual(
-            list(
-                projects.filter(priority_bug__lte=(2, "Anything")).values_list(
-                    "code", flat=True
-                )
+        self.assertSequenceEqual(
+            projects.filter(priority_bug__lte=(2, "Anything")).values_list(
+                "code", flat=True
             ),
             [],
         )
@@ -1384,36 +1338,32 @@ class CompositeSubqueryTupleLookupTests(CompositeSubqueryTestCase):
         for lookup, matching_bug, nonmatching_bug in test_cases:
             with self.subTest(lookup=lookup):
                 projects = self.projects_with_priority_bug()
-                self.assertEqual(
-                    list(
-                        projects.filter(
-                            **{
-                                f"priority_bug__{lookup}": self.bug_tuple_subquery(
-                                    matching_bug
-                                )
-                            }
-                        ).values_list("code", flat=True)
-                    ),
+                self.assertSequenceEqual(
+                    projects.filter(
+                        **{
+                            f"priority_bug__{lookup}": self.bug_tuple_subquery(
+                                matching_bug
+                            )
+                        }
+                    ).values_list("code", flat=True),
                     ["AUTH"],
                 )
-                self.assertEqual(
-                    list(
-                        projects.filter(
-                            **{
-                                f"priority_bug__{lookup}": self.bug_tuple_subquery(
-                                    nonmatching_bug
-                                )
-                            }
-                        ).values_list("code", flat=True)
-                    ),
+                self.assertSequenceEqual(
+                    projects.filter(
+                        **{
+                            f"priority_bug__{lookup}": self.bug_tuple_subquery(
+                                nonmatching_bug
+                            )
+                        }
+                    ).values_list("code", flat=True),
                     [],
                 )
 
     def test_in_empty_list(self):
         projects = self.projects_with_priority_bug()
 
-        self.assertEqual(
-            list(projects.filter(priority_bug__in=[]).values_list("code", flat=True)),
+        self.assertSequenceEqual(
+            projects.filter(priority_bug__in=[]).values_list("code", flat=True),
             [],
         )
 
@@ -1446,19 +1396,15 @@ class CompositeSubqueryTupleLookupTests(CompositeSubqueryTestCase):
             pk=self.missing_export_report.pk
         ).values("severity_level", "description")
 
-        self.assertEqual(
-            list(
-                projects.filter(priority_bug__in=matching_bugs).values_list(
-                    "code", flat=True
-                )
+        self.assertSequenceEqual(
+            projects.filter(priority_bug__in=matching_bugs).values_list(
+                "code", flat=True
             ),
             ["AUTH"],
         )
-        self.assertEqual(
-            list(
-                projects.filter(priority_bug__in=nonmatching_bugs).values_list(
-                    "code", flat=True
-                )
+        self.assertSequenceEqual(
+            projects.filter(priority_bug__in=nonmatching_bugs).values_list(
+                "code", flat=True
             ),
             [],
         )
@@ -1466,19 +1412,15 @@ class CompositeSubqueryTupleLookupTests(CompositeSubqueryTestCase):
     def test_exclude_exact(self):
         projects = self.projects_with_priority_bug()
 
-        self.assertEqual(
-            list(
-                projects.exclude(priority_bug=(3, "Login crash")).values_list(
-                    "code", flat=True
-                )
+        self.assertSequenceEqual(
+            projects.exclude(priority_bug=(3, "Login crash")).values_list(
+                "code", flat=True
             ),
             [],
         )
-        self.assertEqual(
-            list(
-                projects.exclude(priority_bug=(3, "Export missing rows")).values_list(
-                    "code", flat=True
-                )
+        self.assertSequenceEqual(
+            projects.exclude(priority_bug=(3, "Export missing rows")).values_list(
+                "code", flat=True
             ),
             ["AUTH"],
         )
@@ -1486,48 +1428,40 @@ class CompositeSubqueryTupleLookupTests(CompositeSubqueryTestCase):
     def test_exclude_in(self):
         projects = self.projects_with_priority_bug()
 
-        self.assertEqual(
-            list(
-                projects.exclude(
-                    priority_bug__in=[
-                        (2, "Export missing rows"),
-                        (3, "Login crash"),
-                    ]
-                ).values_list("code", flat=True)
-            ),
+        self.assertSequenceEqual(
+            projects.exclude(
+                priority_bug__in=[
+                    (2, "Export missing rows"),
+                    (3, "Login crash"),
+                ]
+            ).values_list("code", flat=True),
             [],
         )
-        self.assertEqual(
-            list(
-                projects.exclude(
-                    priority_bug__in=[
-                        (2, "Login crash"),
-                        (3, "Export missing rows"),
-                    ]
-                ).values_list("code", flat=True)
-            ),
+        self.assertSequenceEqual(
+            projects.exclude(
+                priority_bug__in=[
+                    (2, "Login crash"),
+                    (3, "Export missing rows"),
+                ]
+            ).values_list("code", flat=True),
             ["AUTH"],
         )
 
     def test_or_condition(self):
         projects = self.projects_with_priority_bug()
 
-        self.assertEqual(
-            list(
-                projects.filter(
-                    Q(priority_bug=(3, "Export missing rows"))
-                    | Q(priority_bug=(3, "Login crash"))
-                ).values_list("code", flat=True)
-            ),
+        self.assertSequenceEqual(
+            projects.filter(
+                Q(priority_bug=(3, "Export missing rows"))
+                | Q(priority_bug=(3, "Login crash"))
+            ).values_list("code", flat=True),
             ["AUTH"],
         )
-        self.assertEqual(
-            list(
-                projects.filter(
-                    Q(priority_bug=(2, "Login crash"))
-                    | Q(priority_bug=(3, "Export missing rows"))
-                ).values_list("code", flat=True)
-            ),
+        self.assertSequenceEqual(
+            projects.filter(
+                Q(priority_bug=(2, "Login crash"))
+                | Q(priority_bug=(3, "Export missing rows"))
+            ).values_list("code", flat=True),
             [],
         )
 
@@ -1565,38 +1499,32 @@ class CompositeSubqueryTupleLookupTests(CompositeSubqueryTestCase):
     def test_and_condition(self):
         projects = self.projects_with_priority_bug()
 
-        self.assertEqual(
-            list(
-                projects.filter(
-                    Q(priority_bug=(3, "Login crash"))
-                    & Q(
-                        priority_bug__in=[
-                            (2, "Export missing rows"),
-                            (3, "Login crash"),
-                        ]
-                    )
-                ).values_list("code", flat=True)
-            ),
+        self.assertSequenceEqual(
+            projects.filter(
+                Q(priority_bug=(3, "Login crash"))
+                & Q(
+                    priority_bug__in=[
+                        (2, "Export missing rows"),
+                        (3, "Login crash"),
+                    ]
+                )
+            ).values_list("code", flat=True),
             ["AUTH"],
         )
-        self.assertEqual(
-            list(
-                projects.filter(
-                    Q(priority_bug=(3, "Login crash"))
-                    & Q(priority_bug__in=[(2, "Export missing rows")])
-                ).values_list("code", flat=True)
-            ),
+        self.assertSequenceEqual(
+            projects.filter(
+                Q(priority_bug=(3, "Login crash"))
+                & Q(priority_bug__in=[(2, "Export missing rows")])
+            ).values_list("code", flat=True),
             [],
         )
 
     def test_exclude_component_when_inner_is_empty(self):
         projects = self.projects_with_priority_bug(empty=True)
 
-        self.assertEqual(
-            list(
-                projects.exclude(priority_bug__severity_level=3).values_list(
-                    "code", flat=True
-                )
+        self.assertSequenceEqual(
+            projects.exclude(priority_bug__severity_level=3).values_list(
+                "code", flat=True
             ),
             ["AUTH"],
         )
@@ -1604,11 +1532,9 @@ class CompositeSubqueryTupleLookupTests(CompositeSubqueryTestCase):
     def test_exclude_exact_when_inner_is_empty(self):
         projects = self.projects_with_priority_bug(empty=True)
 
-        self.assertEqual(
-            list(
-                projects.exclude(priority_bug=(3, "Login crash")).values_list(
-                    "code", flat=True
-                )
+        self.assertSequenceEqual(
+            projects.exclude(priority_bug=(3, "Login crash")).values_list(
+                "code", flat=True
             ),
             ["AUTH"],
         )
@@ -1616,11 +1542,9 @@ class CompositeSubqueryTupleLookupTests(CompositeSubqueryTestCase):
     def test_exclude_in_when_inner_is_empty(self):
         projects = self.projects_with_priority_bug(empty=True)
 
-        self.assertEqual(
-            list(
-                projects.exclude(priority_bug__in=[(3, "Login crash")]).values_list(
-                    "code", flat=True
-                )
+        self.assertSequenceEqual(
+            projects.exclude(priority_bug__in=[(3, "Login crash")]).values_list(
+                "code", flat=True
             ),
             ["AUTH"],
         )
