@@ -41,7 +41,7 @@ be referenced using the double-underscore syntax:
 .. code-block:: pycon
 
     >>> newest = Comment.objects.order_by("-created_at").values("email", "author__name")[:1]
-    >>> Post.objects.alias(info=newest).values("info__email", "info__author__name")
+    >>> Post.objects.alias(newest=newest).values("newest__email", "newest__author__name")
 
 These subfields can be selected, filtered, referenced in annotations, and used
 for ordering in the same way as model fields. See

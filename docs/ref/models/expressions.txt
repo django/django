@@ -717,7 +717,7 @@ lookup syntax:
 .. code-block:: pycon
 
     >>> newest = Comment.objects.order_by("-created_at").values("email", "author__name")[:1]
-    >>> Post.objects.alias(info=newest).values("info__email", "info__author__name")
+    >>> Post.objects.alias(newest=newest).values("newest__email", "newest__author__name")
 
 Don't pass the multi-column ``Subquery`` directly to
 :meth:`~.QuerySet.annotate`, as selecting all its columns as a single
@@ -726,7 +726,7 @@ evaluated:
 
 .. code-block:: pycon
 
-    >>> posts = Post.objects.annotate(info=newest)
+    >>> posts = Post.objects.annotate(newest=newest)
     >>> list(posts)
     Traceback (most recent call last):
     ...
@@ -739,7 +739,7 @@ contain ``M * N`` rows. Use a ``[:1]`` slice to limit the subquery to at most
 one row. If the subquery is empty, the outer rows are preserved and the
 subfields have SQL ``NULL`` values.
 
-Correlated multi-column subqueries that use ``OuterRef`` aren't supported.
+Correlated multi-column subqueries that use :class:`OuterRef` aren't supported.
 
 The subfields can also be used in filters, annotations, ordering, and other
 expressions in the same way as model fields.
