@@ -1181,6 +1181,8 @@ calling the appropriate methods on the wrapped expression.
 
     .. attribute:: is_composite
 
+        .. versionadded:: 6.2
+
         Tells Django that this expression represents a composite value.
         Defaults to ``False``.
 
