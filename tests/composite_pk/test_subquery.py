@@ -108,6 +108,20 @@ class CompositePKSubqueryTests(TestCase):
 
         self.assertSequenceEqual(token_pks, [self.other_token.pk])
 
+    def test_exclude_composite_primary_key_from_empty_subquery(self):
+        missing_token = Token.objects.filter(pk=(-1, -1)).values("pk")
+        token_pks = (
+            Token.objects.alias(token_info=missing_token)
+            .exclude(token_info__pk=self.token.pk)
+            .order_by("tenant_id", "id")
+            .values_list("pk", flat=True)
+        )
+
+        self.assertSequenceEqual(
+            token_pks,
+            [self.token.pk, self.other_token.pk, self.other_tenant_token.pk],
+        )
+
     def test_select_composite_primary_key_and_component(self):
         token_info = Token.objects.filter(pk=self.token.pk).values("pk", "tenant_id")[
             :1
