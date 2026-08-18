@@ -958,9 +958,13 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             )
 
     def test_composite_subquery_alias_preserves_ordering_validation(self):
-        msg = "Cannot select the 'user_name' alias. Use annotate() to promote it."
+        msg = (
+            "Unsupported lookup 'missing' for CharField or join on the field not "
+            "permitted."
+        )
         with self.assertRaisesMessage(FieldError, msg):
-            User.objects.alias(user_name=F("name")).order_by("user_name__missing")
+            qs = User.objects.alias(user_name=F("name")).order_by("user_name__missing")
+            qs.first()  # raising error at compile time.
 
     def test_composite_subquery_alias_preserves_normal_field_resolution(self):
         first_post = Post.objects.filter(user=self.ada).values("title", "body")[:1]
