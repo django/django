@@ -1029,6 +1029,12 @@ Has the following optional arguments:
         class MyModel(models.Model):
             upload = models.FileField(upload_to=user_directory_path)
 
+    .. warning::
+
+        ``upload_to`` only determines the path passed to the storage backend;
+        it does not provide access control for uploaded files. Configure the
+        storage backend or file-serving layer to restrict access when required.
+
 .. attribute:: FileField.storage
 
     A storage object, or a callable which returns a storage object. This
