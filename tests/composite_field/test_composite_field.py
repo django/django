@@ -958,7 +958,7 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             )
 
     def test_composite_subquery_alias_preserves_ordering_validation(self):
-        msg = "Cannot resolve keyword 'user_name' into field."
+        msg = "Cannot select the 'user_name' alias. Use annotate() to promote it."
         with self.assertRaisesMessage(FieldError, msg):
             User.objects.alias(user_name=F("name")).order_by("user_name__missing")
 
