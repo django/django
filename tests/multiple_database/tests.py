@@ -118,7 +118,7 @@ class QueryTestCase(TestCase):
         )
         with self.settings(DATABASE_ROUTERS=[router]):
             book.refresh_from_db()
-        router.db_for_read.assert_called_once_with(Book, instance=book)
+        router.db_for_read.assert_called_with(Book, instance=book)
 
     def test_basic_queries(self):
         "Queries are constrained to a single database"

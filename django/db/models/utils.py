@@ -69,6 +69,16 @@ class AltersData:
         super().__init_subclass__(**kwargs)
 
 
+def set_executed_queries(queries, previous_queries_length):
+    executed_queries = []
+
+    if len(queries) > previous_queries_length:
+        for query in queries[previous_queries_length:]:
+            executed_queries.append(query["sql"])
+
+    return executed_queries
+
+
 # RemovedInDjango70Warning: At the end of the deprecation, remove this function
 # and use .fields.BLANK_CHOICE_LABEL directly instead.
 def get_blank_choice_label():
