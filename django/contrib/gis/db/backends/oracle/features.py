@@ -29,4 +29,17 @@ class DatabaseFeatures(BaseSpatialFeatures, OracleDatabaseFeatures):
                 },
             }
         )
+        if self.connection.oracle_version >= (23, 9):
+            skips.update(
+                {
+                    "Oracle 23ai unpacks 1-element geometry collections.": {
+                        "gis_tests.layermap.tests.LayerMapTest."
+                        "test_layermap_unique_multigeometry_fk",
+                        "gis_tests.layermap.tests.LayerMapTest."
+                        "test_null_geom_with_unique",
+                        "gis_tests.layermap.tests.LayerMapTest."
+                        "test_test_fid_range_step",
+                    },
+                },
+            )
         return skips
