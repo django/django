@@ -1073,7 +1073,11 @@ class SQLCompiler:
         """
         name, order = get_order_dir(name, default_order)
         descending = order == "DESC"
-        pieces = name.split(LOOKUP_SEP)
+        pieces = (
+            [name]
+            if self.query._filtered_relations.get(name)
+            else name.split(LOOKUP_SEP)
+        )
         (
             field,
             targets,
