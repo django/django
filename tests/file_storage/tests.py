@@ -1084,23 +1084,66 @@ class SlowFile(ContentFile):
         return super().chunks()
 
 
+class FastFile(ContentFile):
+    def chunks(self):
+        time.sleep(0.1)
+        return super().chunks()
+
+
 class FileSaveRaceConditionTest(SimpleTestCase):
     def setUp(self):
         self.storage_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.storage_dir)
-        self.storage = FileSystemStorage(self.storage_dir)
-        self.thread = threading.Thread(target=self.save_file, args=["conflict"])
+        self.storage = FileSystemStorage(self.storage_dir, allow_overwrite=False)
+        self.thread = threading.Thread(target=self.slow_save_file, args=["conflict"])
 
-    def save_file(self, name):
+    def slow_save_file(self, name):
         name = self.storage.save(name, SlowFile(b"Data"))
 
-    def test_race_condition(self):
+    def fast_save_file(self, name):
+        name = self.storage.save(name, FastFile(b"Data"))
+
+    @unittest.skipIf(
+        sys.platform == "win32",
+        "On Windows renamed is immediately visible",
+    )
+    def test_copy_race_condition_posix(self):
+        # If there are multiple copies ending almost simultaneously,
+        # `os.rename()` will be called twice. On posix compliant systems
+        # the operation is atomic.
         self.thread.start()
-        self.save_file("conflict")
+        self.slow_save_file("conflict")
+        self.thread.join()
+        files = sorted(os.listdir(self.storage_dir))
+        self.assertEqual(files[0], "conflict")
+        self.assertEqual(len(files), 1)
+
+    @unittest.skipIf(
+        sys.platform != "win32",
+        "Posix platofrms don't see a file immediately after rename",
+    )
+    def test_copy_race_condition_win32(self):
+        # If there are multiple copies ending almost simultaneously,
+        # `os.rename()` will be called twice. On posix compliant systems
+        # the operation is atomic.
+        self.thread.start()
+        self.slow_save_file("conflict")
         self.thread.join()
         files = sorted(os.listdir(self.storage_dir))
         self.assertEqual(files[0], "conflict")
         self.assertRegex(files[1], "conflict_%s" % FILE_SUFFIX_REGEX)
+        self.assertEqual(len(files), 2)
+
+    def test_no_copy_race_condition(self):
+        # If there is a bit of time between the calls,
+        # os.access will see the file and a copy will be created
+        self.thread.start()
+        self.fast_save_file("conflict")
+        self.thread.join()
+        files = sorted(os.listdir(self.storage_dir))
+        self.assertEqual(files[0], "conflict")
+        self.assertRegex(files[1], "conflict_%s" % FILE_SUFFIX_REGEX)
+        self.assertEqual(len(files), 2)
 
 
 @unittest.skipIf(
