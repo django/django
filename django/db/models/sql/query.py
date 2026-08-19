@@ -1485,6 +1485,13 @@ class Query(BaseExpression):
                 "permitted%s" % (unsupported_lookup, output_field.__name__, suggestion)
             )
 
+    def get_names_to_join(self, expr):
+        """
+        Helper method for the resolution of expressions that could either be a
+        FilteredRelation alias or a field lookup.
+        """
+        return [expr] if expr in self._filtered_relations else expr.split(LOOKUP_SEP)
+
     def build_filter(
         self,
         filter_expr,
@@ -2276,10 +2283,11 @@ class Query(BaseExpression):
         try:
             cols = []
             for name in field_names:
+                names_to_join = self.get_names_to_join(name)
                 # Join promotion note - we must not remove any rows here, so
                 # if there is no existing joins, use outer join.
                 join_info = self.setup_joins(
-                    name.split(LOOKUP_SEP), opts, alias, allow_many=allow_m2m
+                    names_to_join, opts, alias, allow_many=allow_m2m
                 )
                 targets, final_alias, joins = self.trim_joins(
                     join_info.targets,
@@ -2343,9 +2351,10 @@ class Query(BaseExpression):
                     continue
                 if self.extra and item in self.extra:
                     continue
+                names_to_join = self.get_names_to_join(item)
                 # names_to_path() validates the lookup. A descriptive
                 # FieldError will be raise if it's not.
-                self.names_to_path(item.split(LOOKUP_SEP), self.model._meta)
+                self.names_to_path(names_to_join, self.model._meta)
             elif not hasattr(item, "resolve_expression"):
                 errors.append(item)
             if getattr(item, "contains_aggregate", False):
