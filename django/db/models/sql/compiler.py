@@ -1073,7 +1073,7 @@ class SQLCompiler:
         """
         name, order = get_order_dir(name, default_order)
         descending = order == "DESC"
-        pieces = name.split(LOOKUP_SEP)
+        pieces = self.query.get_names_to_join(name)
         (
             field,
             targets,
