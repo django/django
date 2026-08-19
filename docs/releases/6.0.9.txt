@@ -8,6 +8,20 @@ Django 6.0.9 fixes one security issue with severity "low", three security
 issues with severity "moderate", and provides a fix for an insufficient
 security mitigation in 6.0.8. It also fixes one data loss issue in 4.0.
 
+CVE-2026-77050: Potential denial-of-service vulnerability in ``get_supported_language_variant()``
+=================================================================================================
+
+:func:`~django.utils.translation.get_supported_language_variant` was subject to
+a potential denial-of-service attack when processing many distinct, very long
+language codes. Language codes were used as keys in an in-memory cache before
+their length was limited, potentially consuming excessive process memory.
+
+To mitigate this vulnerability, language codes longer than 500 characters are
+now rejected or truncated before the cached lookup.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
 Bugfixes
 ========
 

@@ -1774,6 +1774,45 @@ class MiscTests(SimpleTestCase):
             g("en-" * 167, strict=True)
         self.assertEqual(g("en-" * 30000), "en")  # catastrophic test
 
+    def test_get_supported_language_variant_strict_long_lang_code_not_cached(self):
+        g = trans_real.get_supported_language_variant
+        g_cached = trans_real._get_supported_language_variant
+        self.addCleanup(g_cached.cache_clear)
+
+        for lang_code in (
+            "e" * 501,
+            "en-" * 167,  # Length 501 which is LANGUAGE_CODE_MAX_LENGTH + 1.
+            "en-" * 30000,
+        ):
+            g_cached.cache_clear()
+            with self.subTest(length=len(lang_code)):
+                with self.assertRaises(LookupError):
+                    g(lang_code, strict=True)
+
+                cache_info = g_cached.cache_info()
+                self.assertEqual(cache_info.currsize, 0)
+                self.assertEqual(cache_info.misses, 0)
+
+    def test_get_supported_language_variant_truncated_cache_key(self):
+        g = trans_real.get_supported_language_variant
+        g_cached = trans_real._get_supported_language_variant
+        self.addCleanup(g_cached.cache_clear)
+        g_cached.cache_clear()
+
+        long_code = "en-" * 167  # Length 501.
+        truncated_code = "en-" * 165 + "en"  # Length 497.
+        catastrophic_long_code = "en-" * 3000
+
+        for hits, code in enumerate(
+            [long_code, truncated_code, catastrophic_long_code]
+        ):
+            with self.subTest(code_length=len(code)):
+                self.assertEqual(g(code), "en")
+                cache_info = g_cached.cache_info()
+                self.assertEqual(cache_info.currsize, 1)
+                self.assertEqual(cache_info.hits, hits)
+                self.assertEqual(cache_info.misses, 1)
+
     def test_get_supported_language_variant_null(self):
         g = trans_null.get_supported_language_variant
         self.assertEqual(g(settings.LANGUAGE_CODE), settings.LANGUAGE_CODE)
