@@ -1166,6 +1166,41 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
                 ],
             )
 
+    def test_loading_dotted_path(self):
+        for path in ["dotted.folder/fixture", "dotted.folder/fixture.json"]:
+            with self.subTest(path=path):
+                Article.objects.all().delete()
+                management.call_command(
+                    "loaddata",
+                    path,
+                    verbosity=0,
+                )
+                self.assertSequenceEqual(
+                    Article.objects.values_list("headline", flat=True),
+                    ["Fixture is loaded correctly when the path contains a dot"],
+                )
+
+    def test_loading_dotted_path_compressed(self):
+        for path in ["dotted.folder/fixture2", "dotted.folder/fixture2.json.zip"]:
+            with self.subTest(path=path):
+                Article.objects.all().delete()
+                management.call_command(
+                    "loaddata",
+                    path,
+                    verbosity=0,
+                )
+                self.assertSequenceEqual(
+                    Article.objects.values_list("headline", flat=True),
+                    ["Django pets kitten"],
+                )
+
+    def test_loading_dotted_path_with_parent_directory(self):
+        management.call_command("loaddata", "dotted.folder/../fixture1", verbosity=0)
+        self.assertSequenceEqual(
+            Site.objects.values_list("domain", flat=True),
+            ["example.com"],
+        )
+
 
 class NonexistentFixtureTests(TestCase):
     """
@@ -1198,6 +1233,23 @@ class NonexistentFixtureTests(TestCase):
             )
         disable_constraint_checking.assert_not_called()
         enable_constraint_checking.assert_not_called()
+
+    def test_command_error_dotted_path(self):
+        fixture_path = os.path.join("books", "fixtures.v1", "fixture")
+        expected_error_message = (
+            f"Problem installing fixture '{fixture_path}': "
+            "csv is not a known serialization format."
+        )
+        for verbosity in [1, 2]:
+            with self.subTest(verbosity=verbosity):
+                stdout_output = StringIO()
+                with self.assertRaisesMessage(CommandError, expected_error_message):
+                    management.call_command(
+                        "loaddata",
+                        "books/fixtures.v1/fixture.csv",
+                        stdout=stdout_output,
+                        verbosity=verbosity,
+                    )
 
 
 class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
