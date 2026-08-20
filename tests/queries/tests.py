@@ -14,7 +14,7 @@ from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import AND, OR, NothingNode, WhereNode
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext, ignore_warnings, register_lookup
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .models import (
     FK1,
@@ -2012,10 +2012,10 @@ class SelectRelatedTests(TestCase):
         # infinitely if you forgot to specify "depth". Now we set an arbitrary
         # default upper bound.
         self.assertSequenceEqual(X.objects.all(), [])
-        # RemovedInDjango70Warning: when the deprecation ends, remove this test
-        # case.
+        # RemovedInDjango2028Warning: when the deprecation ends, remove this
+        # test case.
         with ignore_warnings(
-            category=RemovedInDjango70Warning,
+            category=RemovedInDjango2028Warning,
             message=r"Calling select_related\(\) with no arguments is deprecated\.",
         ):
             self.assertSequenceEqual(X.objects.select_related(), [])

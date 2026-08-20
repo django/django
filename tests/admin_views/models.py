@@ -1206,6 +1206,6 @@ class CamelCaseRelatedModel(models.Model):
     )
 
 
-# RemovedInDjango70Warning: When the deprecation ends, remove.
+# RemovedInDjango2028Warning: When the deprecation ends, remove.
 class ModelAction(models.Model):
     pass

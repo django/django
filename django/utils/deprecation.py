@@ -24,11 +24,12 @@ class RemovedInNextVersionWarning(DeprecationWarning):
     pass
 
 
-class RemovedInDjango70Warning(PendingDeprecationWarning):
+class RemovedInDjango2028Warning(PendingDeprecationWarning):
     pass
 
 
-RemovedAfterNextVersionWarning = RemovedInDjango70Warning
+RemovedAfterNextVersionWarning = RemovedInDjango2028Warning
+RemovedInDjango70Warning = RemovedInDjango2028Warning
 
 
 def warn_about_external_use(

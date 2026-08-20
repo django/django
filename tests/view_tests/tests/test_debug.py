@@ -497,7 +497,7 @@ class DebugViewTests(SimpleTestCase):
             response = self.client.get("/raises500/", headers={"accept": "text/plain"})
         self.assertContains(response, "Oh dear, an error occurred!", status_code=500)
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_settings(MAILERS={})
     def test_works_with_mailers_defined(self):
         with self.assertLogs("django.request", "ERROR"):

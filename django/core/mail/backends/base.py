@@ -1,9 +1,9 @@
 """Base email backend class."""
 
 from django.core.mail import InvalidMailer
-from django.utils.deprecation import RemovedInDjango70Warning, warn_about_external_use
+from django.utils.deprecation import RemovedInDjango2028Warning, warn_about_external_use
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 _NOT_PROVIDED = object()
 
 
@@ -24,7 +24,7 @@ class BaseEmailBackend:
            pass
     """
 
-    # RemovedInDjango70Warning: fail_silently, _ignore_unknown_kwargs.
+    # RemovedInDjango2028Warning: fail_silently, _ignore_unknown_kwargs.
     def __init__(
         self,
         fail_silently=_NOT_PROVIDED,
@@ -35,7 +35,7 @@ class BaseEmailBackend:
     ):
         self.alias = alias
 
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         if fail_silently is _NOT_PROVIDED:
             self._fail_silently = False
         else:
@@ -49,7 +49,7 @@ class BaseEmailBackend:
         if kwargs:
             kwarg_names = ", ".join(repr(key) for key in kwargs.keys())
 
-            # RemovedInDjango70Warning.
+            # RemovedInDjango2028Warning.
             if alias is None:
                 # Not being initialized from mail.mailers. Unknown kwargs are
                 # ignored -- with a deprecation warning if they originated from
@@ -60,23 +60,23 @@ class BaseEmailBackend:
                 class_name = f"{type(self).__module__}.{type(self).__qualname__}"
                 warn_about_external_use(
                     f"{class_name}.__init__() does not support {kwarg_names}. "
-                    "In Django 7.0, BaseEmailBackend will raise a TypeError "
+                    "In Django 2028, BaseEmailBackend will raise a TypeError "
                     "for unknown keyword arguments.",
-                    RemovedInDjango70Warning,
+                    RemovedInDjango2028Warning,
                     skip_name_prefixes="django.core.mail.backends",
                 )
                 return
 
             raise InvalidMailer(f"Unknown options {kwarg_names}.", alias=alias)
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     def __getattr__(self, name):
         if name == "fail_silently":
             msg = (
                 "BaseEmailBackend.fail_silently is deprecated. A subclass "
                 "that supports fail_silently must set its own attribute."
             )
-            warn_about_external_use(msg, RemovedInDjango70Warning)
+            warn_about_external_use(msg, RemovedInDjango2028Warning)
             return self._fail_silently
         raise AttributeError(
             f"{type(self).__name__!r} object has no attribute {name!r}"

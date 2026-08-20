@@ -15,7 +15,7 @@ from pathlib import Path
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.deprecation import (
-    RemovedInDjango70Warning,
+    RemovedInDjango2028Warning,
     django_file_prefixes,
     warn_about_external_use,
 )
@@ -25,20 +25,20 @@ ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 DEFAULT_STORAGE_ALIAS = "default"
 STATICFILES_STORAGE_ALIAS = "staticfiles"
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 SIGNED_COOKIE_LEGACY_SALT_DEPRECATED_MSG = (
     "The SIGNED_COOKIE_LEGACY_SALT_FALLBACK transitional setting is "
     "deprecated. Remove it from your settings once legacy signed cookies "
-    "have expired. They will not be accepted in Django 7.0."
+    "have expired. They will not be accepted in Django 2028."
 )
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 USE_BLANK_CHOICE_DASH_DEPRECATED_MSG = (
     "The USE_BLANK_CHOICE_DASH setting is deprecated. If you wish to define "
     "your own default blank choice label, override "
     "django.db.models.fields.BLANK_CHOICE_LABEL in your app's ready() method."
 )
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 DEPRECATED_EMAIL_SETTINGS = {
     "EMAIL_BACKEND",
     "EMAIL_FILE_PATH",
@@ -53,11 +53,11 @@ DEPRECATED_EMAIL_SETTINGS = {
     "EMAIL_USE_TLS",
 }
 EMAIL_SETTING_DEPRECATED_MSG = (
-    "The {name} setting is deprecated. Migrate to MAILERS before Django 7.0."
+    "The {name} setting is deprecated. Migrate to MAILERS before Django 2028."
 )
 
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 # Must be called with the complete set of user-defined setting names (but no
 # default settings).
 def _check_email_settings_conflicts(explicit_settings):
@@ -123,14 +123,15 @@ class LazySettings(LazyObject):
             _wrapped = self._wrapped
         val = getattr(_wrapped, name)
 
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         if name in DEPRECATED_EMAIL_SETTINGS:
             if hasattr(_wrapped, "MAILERS"):
                 raise AttributeError(
                     f"The {name} setting is not available when MAILERS is defined."
                 )
             _show_settings_deprecation_warning(
-                EMAIL_SETTING_DEPRECATED_MSG.format(name=name), RemovedInDjango70Warning
+                EMAIL_SETTING_DEPRECATED_MSG.format(name=name),
+                RemovedInDjango2028Warning,
             )
 
         # Special case some settings which require further modification.
@@ -154,18 +155,18 @@ class LazySettings(LazyObject):
         else:
             self.__dict__.pop(name, None)
 
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         if name == "SIGNED_COOKIE_LEGACY_SALT_FALLBACK":
             _show_settings_deprecation_warning(
                 SIGNED_COOKIE_LEGACY_SALT_DEPRECATED_MSG,
-                RemovedInDjango70Warning,
+                RemovedInDjango2028Warning,
             )
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         if name == "USE_BLANK_CHOICE_DASH":
             _show_settings_deprecation_warning(
-                USE_BLANK_CHOICE_DASH_DEPRECATED_MSG, RemovedInDjango70Warning
+                USE_BLANK_CHOICE_DASH_DEPRECATED_MSG, RemovedInDjango2028Warning
             )
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         if name == "MAILERS":
             # When MAILERS is set, clear any cached values of
             # deprecated settings so that __getattr__() runs again for them.
@@ -173,7 +174,8 @@ class LazySettings(LazyObject):
                 self.__dict__.pop(setting, None)
         if name in DEPRECATED_EMAIL_SETTINGS:
             _show_settings_deprecation_warning(
-                EMAIL_SETTING_DEPRECATED_MSG.format(name=name), RemovedInDjango70Warning
+                EMAIL_SETTING_DEPRECATED_MSG.format(name=name),
+                RemovedInDjango2028Warning,
             )
 
         super().__setattr__(name, value)
@@ -183,7 +185,7 @@ class LazySettings(LazyObject):
         super().__delattr__(name)
         self.__dict__.pop(name, None)
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     def __dir__(self):
         attrs = super().__dir__()
         if hasattr(self._wrapped, "MAILERS"):
@@ -206,7 +208,7 @@ class LazySettings(LazyObject):
         if self._wrapped is not empty:
             raise RuntimeError("Settings already configured.")
 
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         _check_email_settings_conflicts(options.keys())
 
         holder = UserSettingsHolder(default_settings)
@@ -271,26 +273,26 @@ class Settings:
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         if "SIGNED_COOKIE_LEGACY_SALT_FALLBACK" in self._explicit_settings:
             warnings.warn(
                 SIGNED_COOKIE_LEGACY_SALT_DEPRECATED_MSG,
-                RemovedInDjango70Warning,
+                RemovedInDjango2028Warning,
                 skip_file_prefixes=django_file_prefixes(),
             )
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         if "USE_BLANK_CHOICE_DASH" in self._explicit_settings:
             warnings.warn(
                 USE_BLANK_CHOICE_DASH_DEPRECATED_MSG,
-                RemovedInDjango70Warning,
+                RemovedInDjango2028Warning,
                 skip_file_prefixes=django_file_prefixes(),
             )
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         _check_email_settings_conflicts(self._explicit_settings)
         for name in DEPRECATED_EMAIL_SETTINGS.intersection(self._explicit_settings):
             warnings.warn(
                 EMAIL_SETTING_DEPRECATED_MSG.format(name=name),
-                RemovedInDjango70Warning,
+                RemovedInDjango2028Warning,
                 skip_file_prefixes=django_file_prefixes(),
             )
 
@@ -338,21 +340,22 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         if name == "SIGNED_COOKIE_LEGACY_SALT_FALLBACK":
             _show_settings_deprecation_warning(
                 SIGNED_COOKIE_LEGACY_SALT_DEPRECATED_MSG,
-                RemovedInDjango70Warning,
+                RemovedInDjango2028Warning,
             )
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         if name == "USE_BLANK_CHOICE_DASH":
             _show_settings_deprecation_warning(
-                USE_BLANK_CHOICE_DASH_DEPRECATED_MSG, RemovedInDjango70Warning
+                USE_BLANK_CHOICE_DASH_DEPRECATED_MSG, RemovedInDjango2028Warning
             )
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         if name in DEPRECATED_EMAIL_SETTINGS:
             _show_settings_deprecation_warning(
-                EMAIL_SETTING_DEPRECATED_MSG.format(name=name), RemovedInDjango70Warning
+                EMAIL_SETTING_DEPRECATED_MSG.format(name=name),
+                RemovedInDjango2028Warning,
             )
 
         super().__setattr__(name, value)

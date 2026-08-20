@@ -43,7 +43,7 @@ import zlib
 
 from django.conf import settings
 from django.utils.crypto import constant_time_compare, salted_hmac
-from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
+from django.utils.deprecation import RemovedInDjango2028Warning, django_file_prefixes
 from django.utils.encoding import force_bytes
 from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
@@ -98,14 +98,14 @@ def b64_decode(s):
     return base64.urlsafe_b64decode(s + pad)
 
 
-# RemovedInDjango70Warning: algorithm="sha256"
+# RemovedInDjango2028Warning: algorithm="sha256"
 def base64_hmac(salt, value, key, algorithm=None):
     if algorithm is None:
         warnings.warn(
             "The default argument for algorithm in base64_hmac() will change "
-            "from 'sha1' to 'sha256' in Django 7.0. Pass an explicit "
+            "from 'sha1' to 'sha256' in Django 2028. Pass an explicit "
             "algorithm to silence this warning.",
-            category=RemovedInDjango70Warning,
+            category=RemovedInDjango2028Warning,
             skip_file_prefixes=django_file_prefixes(),
         )
         algorithm = "sha1"
@@ -124,14 +124,14 @@ def _cookie_signer_salt(cookie_name, salt=""):
     return f"django.http.cookies.v2:{len(salt)}:{salt}{cookie_name}"
 
 
-# RemovedInDjango70Warning: When the deprecation ends, remove.
+# RemovedInDjango2028Warning: When the deprecation ends, remove.
 def _cookie_signer_legacy_salt(cookie_name, salt=""):
     return cookie_name + salt
 
 
 def _unsign_cookie(signed_value, *, cookie_name, salt="", max_age=None):
     try:
-        # RemovedInDjango70Warning: When the deprecation ends, replace the
+        # RemovedInDjango2028Warning: When the deprecation ends, replace the
         # whole function body with this single return statement.
         return get_cookie_signer(salt=_cookie_signer_salt(cookie_name, salt)).unsign(
             signed_value, max_age=max_age

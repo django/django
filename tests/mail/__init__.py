@@ -4,10 +4,10 @@ from contextlib import nullcontext
 from django.conf import DEPRECATED_EMAIL_SETTINGS, EMAIL_SETTING_DEPRECATED_MSG
 from django.core.mail.deprecation import NO_DEFAULT_MAILER_WARNING
 from django.test import ignore_warnings, override_settings
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 class override_deprecated_email_settings(override_settings):
     """Override settings, ignoring warnings for deprecated email settings.
 
@@ -32,7 +32,7 @@ class override_deprecated_email_settings(override_settings):
                 re.escape("{name}"), rf"(?:{deprecated_names_re})"
             )
             self.ignore_warnings = ignore_warnings(
-                category=RemovedInDjango70Warning, message=message_re
+                category=RemovedInDjango2028Warning, message=message_re
             )
         else:
             self.ignore_warnings = nullcontext()
@@ -46,9 +46,9 @@ class override_deprecated_email_settings(override_settings):
             super().disable()
 
 
-# RemovedInDjango70Warning: Remove this helper and all uses of it.
+# RemovedInDjango2028Warning: Remove this helper and all uses of it.
 def ignore_no_default_mailer_warning():
     return ignore_warnings(
-        category=RemovedInDjango70Warning,
+        category=RemovedInDjango2028Warning,
         message=re.escape(NO_DEFAULT_MAILER_WARNING),
     )

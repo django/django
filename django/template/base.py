@@ -57,7 +57,7 @@ import warnings
 from enum import Enum
 
 from django.template.context import BaseContext
-from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
+from django.utils.deprecation import RemovedInDjango2028Warning, django_file_prefixes
 from django.utils.formats import localize
 from django.utils.html import conditional_escape
 from django.utils.inspect import getfullargspec, signature
@@ -561,11 +561,11 @@ class Parser:
                         "lookup of the empty string is deprecated.\n"
                         f"  Template: {self.origin.name}\n"
                         f"  Line: {token.lineno}",
-                        RemovedInDjango70Warning,
+                        RemovedInDjango2028Warning,
                         skip_file_prefixes=django_file_prefixes(),
                     )
 
-                    # RemovedInDjango70Warning
+                    # RemovedInDjango2028Warning
                     # When deprecation ends elevate the warning to an error.
                     # raise self.error(
                     #     token,

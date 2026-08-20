@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style
-from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
+from django.utils.deprecation import RemovedInDjango2028Warning, django_file_prefixes
 from django.utils.module_loading import import_string
 
 request_logger = logging.getLogger("django.request")
@@ -90,7 +90,7 @@ class AdminEmailHandler(logging.Handler):
     ):
         super().__init__()
 
-        # RemovedInDjango70Warning: email_backend arg and connection error.
+        # RemovedInDjango2028Warning: email_backend arg and connection error.
         if email_backend:
             if using:
                 raise ImproperlyConfigured(
@@ -103,7 +103,7 @@ class AdminEmailHandler(logging.Handler):
                 )
             warnings.warn(
                 "The 'email_backend' argument is deprecated. Use 'using' instead.",
-                RemovedInDjango70Warning,
+                RemovedInDjango2028Warning,
                 skip_file_prefixes=django_file_prefixes(),
             )
         if hasattr(self, "connection"):
@@ -163,7 +163,7 @@ class AdminEmailHandler(logging.Handler):
         self.send_mail(subject, message, html_message=html_message)
 
     def send_mail(self, subject, message, *args, **kwargs):
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         if not mail.mailers._is_configured:
             connection = mail.get_connection(
                 backend=self.email_backend, fail_silently=True
