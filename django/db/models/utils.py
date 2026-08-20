@@ -69,8 +69,8 @@ class AltersData:
         super().__init_subclass__(**kwargs)
 
 
-# RemovedInDjango70Warning: At the end of the deprecation, remove this function
-# and use .fields.BLANK_CHOICE_LABEL directly instead.
+# RemovedInDjango2028Warning: At the end of the deprecation, remove this
+# function and use .fields.BLANK_CHOICE_LABEL directly instead.
 def get_blank_choice_label():
     from django.conf import settings
 

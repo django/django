@@ -1,4 +1,4 @@
-.. RemovedInDjango70Warning: Remove this file and references to it.
+.. RemovedInDjango2028Warning: Remove this file and references to it.
 
 .. _migrating-to-mailers:
 
@@ -50,7 +50,7 @@ use these specific features:
 
 .. deprecated:: 6.1
 
-    The following settings and functions will be removed in Django 7.0:
+    The following settings and functions will be removed in Django 2028:
 
     * :setting:`EMAIL_BACKEND`, :setting:`EMAIL_FILE_PATH`,
       :setting:`EMAIL_HOST`, :setting:`EMAIL_HOST_PASSWORD`,

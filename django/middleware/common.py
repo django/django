@@ -147,7 +147,7 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
         return response
 
     def send_mail(self, subject, message, *args, **kwargs):
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         if not mailers._is_configured:
             mail_managers(subject, message, *args, fail_silently=True, **kwargs)
             return

@@ -31,6 +31,17 @@ only officially support the latest release of each series.
 What's new in Django 6.2
 ========================
 
+Adopting calendar versioning
+----------------------------
+
+Following `DEP 20`_, the releases previously planned as Django 7.0 and 7.1 are
+now Django 2028 and 2029. Accordingly, the deprecation warning classes are
+renamed to match the calendar version in which the features they mark are
+removed: ``RemovedInDjango70Warning`` becomes ``RemovedInDjango2028Warning``,
+and ``RemovedInDjango71Warning`` becomes ``RemovedInDjango2029Warning``.
+
+.. _DEP 20: https://github.com/django/deps/blob/main/accepted/0020-annual-release-cycle.rst
+
 Minor features
 --------------
 

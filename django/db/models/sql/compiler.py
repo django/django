@@ -24,7 +24,7 @@ from django.db.models.sql.constants import (
 )
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 from django.utils.regex_helper import _lazy_re_compile
@@ -578,14 +578,14 @@ class SQLCompiler:
         self.quote_cache[name] = quoted
         return quoted
 
-    # RemovedInDjango70Warning: When the deprecation ends, remove.
+    # RemovedInDjango2028Warning: When the deprecation ends, remove.
     def quote_name_unless_alias(self, name):
         warnings.warn(
             (
                 "SQLCompiler.quote_name_unless_alias() is deprecated. "
                 "Use .quote_name() instead."
             ),
-            category=RemovedInDjango70Warning,
+            category=RemovedInDjango2028Warning,
             skip_file_prefixes=django_file_prefixes(),
         )
         return self.quote_name(name)
