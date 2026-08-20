@@ -12,7 +12,7 @@ from django.template.response import TemplateResponse
 from django.test import TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .admin import SubscriberAdmin
 from .admin import __file__ as admin_filename
@@ -867,7 +867,7 @@ class AdminDetailActionsTest(TestCase):
         response = self.client.get(response.url)
         self.assertContains(response, "No action selected.")
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     def test_overridden_admin_action_methods(self):
         self.client.force_login(self.superuser)
         obj = ModelAction.objects.create()
@@ -878,7 +878,7 @@ class AdminDetailActionsTest(TestCase):
             "action_location=ActionLocation.CHANGE_LIST)."
         )
         with self.assertWarnsMessage(
-            RemovedInDjango70Warning, get_actions_overridden_msg
+            RemovedInDjango2028Warning, get_actions_overridden_msg
         ) as warning:
             response = self.client.get(change_url)
         self.assertEqual(warning.filename, admin_filename)
@@ -886,7 +886,7 @@ class AdminDetailActionsTest(TestCase):
 
         changelist_url = reverse("admin:admin_views_modelaction_changelist")
         with warnings.catch_warnings(record=True) as warning_list:
-            warnings.simplefilter("always", RemovedInDjango70Warning)
+            warnings.simplefilter("always", RemovedInDjango2028Warning)
             response = self.client.get(changelist_url)
 
             message_warnings = [str(warning.message) for warning in warning_list]
@@ -918,7 +918,7 @@ class AdminDetailActionsTest(TestCase):
             "action_location=ActionLocation.CHANGE_LIST)."
         )
         with self.assertWarnsMessage(
-            RemovedInDjango70Warning, get_actions_overridden_msg
+            RemovedInDjango2028Warning, get_actions_overridden_msg
         ) as warning:
             response = self.client.post(
                 reverse("admin:admin_views_modelaction_changelist"), action_data

@@ -47,8 +47,8 @@ from django.db.models.utils import (
 )
 from django.utils import timezone
 from django.utils.deprecation import (
-    RemovedInDjango70Warning,
     RemovedInDjango71Warning,
+    RemovedInDjango2028Warning,
     warn_about_external_use,
 )
 from django.utils.functional import cached_property
@@ -64,7 +64,7 @@ REPR_OUTPUT_SIZE = 20
 DEFAULT_FETCH_MODE = FETCH_ONE
 
 
-# RemovedInDjango70Warning: When the deprecation ends, remove this function
+# RemovedInDjango2028Warning: When the deprecation ends, remove this function
 # and restore direct model_cls.from_db(..., fetch_mode=fetch_mode) calls at
 # its call sites.
 def _get_from_db(model_cls, fetch_mode):
@@ -86,7 +86,7 @@ def _get_from_db(model_cls, fetch_mode):
         f"{model_cls.__qualname__}.from_db() must accept a fetch_mode keyword "
         "argument. Support for from_db() methods that do not accept it is "
         "deprecated.",
-        RemovedInDjango70Warning,
+        RemovedInDjango2028Warning,
         skip_file_prefixes=django_file_prefixes(),
     )
     return from_db
@@ -152,7 +152,7 @@ class ModelIterable(BaseIterable):
         init_list = [
             f[0].target.attname for f in select[model_fields_start:model_fields_end]
         ]
-        # RemovedInDjango70Warning: When the deprecation ends, remove this
+        # RemovedInDjango2028Warning: When the deprecation ends, remove this
         # assignment and call model_cls.from_db(..., fetch_mode=fetch_mode)
         # directly in the loop below.
         from_db = _get_from_db(model_cls, fetch_mode)
@@ -245,7 +245,7 @@ class RawModelIterable(BaseIterable):
                     query_iterator, cols
                 )
             fetch_mode = self.queryset._fetch_mode
-            # RemovedInDjango70Warning: When the deprecation ends, remove
+            # RemovedInDjango2028Warning: When the deprecation ends, remove
             # this assignment and call
             # model_cls.from_db(..., fetch_mode=fetch_mode) directly in the
             # loop below.
@@ -1565,10 +1565,11 @@ class QuerySet(AltersData):
     def _values(self, *fields, **expressions):
         clone = self._chain()
         if expressions:
-            # RemovedInDjango70Warning: When the deprecation ends, deindent as:
+            # RemovedInDjango2028Warning: When the deprecation ends, deindent
+            # as:
             # clone = clone.annotate(**expressions)
             with warnings.catch_warnings(
-                action="ignore", category=RemovedInDjango70Warning
+                action="ignore", category=RemovedInDjango2028Warning
             ):
                 clone = clone.annotate(**expressions)
         clone._fields = fields
@@ -1591,8 +1592,8 @@ class QuerySet(AltersData):
                     "field."
                 )
             elif not fields:
-                # RemovedInDjango70Warning: When the deprecation ends, replace
-                # with:
+                # RemovedInDjango2028Warning: When the deprecation ends,
+                # replace with:
                 # raise TypeError(
                 #     "'flat' is not valid when values_list is called with no "
                 #     "fields."
@@ -1601,7 +1602,7 @@ class QuerySet(AltersData):
                     "Calling values_list() with no field name and flat=True "
                     "is deprecated. Pass an explicit field name instead, like "
                     "'pk'.",
-                    RemovedInDjango70Warning,
+                    RemovedInDjango2028Warning,
                 )
                 fields = [self.model._meta.concrete_fields[0].attname]
 
@@ -1841,12 +1842,12 @@ class QuerySet(AltersData):
         elif fields:
             obj.query.add_select_related(fields)
         else:
-            # RemovedInDjango70Warning: when the deprecation ends, raise a
+            # RemovedInDjango2028Warning: when the deprecation ends, raise a
             # TypeError instead.
             warn_about_external_use(
                 "Calling select_related() with no arguments is deprecated. "
                 "Specify the fields to fetch instead.",
-                category=RemovedInDjango70Warning,
+                category=RemovedInDjango2028Warning,
                 skip_name_prefixes=("django.db.models",),
             )
             obj.query.select_related = True
@@ -3079,7 +3080,7 @@ class RelatedPopulator:
             )
 
         self.model_cls = klass_info["model"]
-        # RemovedInDjango70Warning: When the deprecation ends, remove this
+        # RemovedInDjango2028Warning: When the deprecation ends, remove this
         # assignment and call
         # self.model_cls.from_db(..., fetch_mode=fetch_mode) directly in
         # populate().

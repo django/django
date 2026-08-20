@@ -24,7 +24,7 @@ from django.core.mail.message import (
 )
 from django.core.mail.utils import DNS_NAME, CachedDnsName
 from django.utils.deprecation import (
-    RemovedInDjango70Warning,
+    RemovedInDjango2028Warning,
     deprecate_posargs,
     warn_about_external_use,
 )
@@ -56,7 +56,7 @@ __all__ = [
     "mail_managers",
     "EmailAlternative",
     "EmailAttachment",
-    # RemovedInDjango70Warning: When the deprecation ends, remove the last
+    # RemovedInDjango2028Warning: When the deprecation ends, remove the last
     # entries.
     "BadHeaderError",
     "SafeMIMEText",
@@ -68,8 +68,8 @@ __all__ = [
 mailers = MailersHandler()
 
 
-# RemovedInDjango70Warning.
-@deprecate_posargs(RemovedInDjango70Warning, ["fail_silently"])
+# RemovedInDjango2028Warning.
+@deprecate_posargs(RemovedInDjango2028Warning, ["fail_silently"])
 def get_connection(backend=None, *, fail_silently=False, **kwds):
     """Load an email backend and return an instance of it.
 
@@ -82,7 +82,7 @@ def get_connection(backend=None, *, fail_silently=False, **kwds):
         "get_connection() is deprecated. See 'Migrating email to mailers' "
         "in Django's documentation for recommended replacements."
     )
-    warn_about_external_use(msg, RemovedInDjango70Warning, skip_frames=1)
+    warn_about_external_use(msg, RemovedInDjango2028Warning, skip_frames=1)
     warn_about_default_mailers_if_needed()
 
     if fail_silently:
@@ -101,7 +101,7 @@ def get_connection(backend=None, *, fail_silently=False, **kwds):
 
 
 @deprecate_posargs(
-    RemovedInDjango70Warning,
+    RemovedInDjango2028Warning,
     [
         "fail_silently",
         "auth_user",
@@ -132,7 +132,7 @@ def send_mail(
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.
     """
-    # RemovedInDjango70Warning: change entire implementation to:
+    # RemovedInDjango2028Warning: change entire implementation to:
     #   email = EmailMultiAlternatives(
     #       subject, message, from_email, recipient_list
     #   )
@@ -141,15 +141,15 @@ def send_mail(
     #   return email.send(using=using)
     if fail_silently:
         warn_about_external_use(
-            FAIL_SILENTLY_ARG_WARNING, RemovedInDjango70Warning, skip_frames=1
+            FAIL_SILENTLY_ARG_WARNING, RemovedInDjango2028Warning, skip_frames=1
         )
     if auth_user is not None or auth_password is not None:
         warn_about_external_use(
-            AUTH_ARGS_WARNING, RemovedInDjango70Warning, skip_frames=1
+            AUTH_ARGS_WARNING, RemovedInDjango2028Warning, skip_frames=1
         )
     if connection is not None:
         warn_about_external_use(
-            CONNECTION_ARG_WARNING, RemovedInDjango70Warning, skip_frames=1
+            CONNECTION_ARG_WARNING, RemovedInDjango2028Warning, skip_frames=1
         )
 
     if using is not None:
@@ -184,7 +184,7 @@ def send_mail(
 
 
 @deprecate_posargs(
-    RemovedInDjango70Warning,
+    RemovedInDjango2028Warning,
     [
         "fail_silently",
         "auth_user",
@@ -210,21 +210,21 @@ def send_mass_mail(
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.
     """
-    # RemovedInDjango70Warning: change entire implementation to:
+    # RemovedInDjango2028Warning: change entire implementation to:
     #   messages = [...]
     #   mailer = mailers.default if using is None else mailers[using]
     #   return mailer.send_messages(messages)
     if fail_silently:
         warn_about_external_use(
-            FAIL_SILENTLY_ARG_WARNING, RemovedInDjango70Warning, skip_frames=1
+            FAIL_SILENTLY_ARG_WARNING, RemovedInDjango2028Warning, skip_frames=1
         )
     if auth_user is not None or auth_password is not None:
         warn_about_external_use(
-            AUTH_ARGS_WARNING, RemovedInDjango70Warning, skip_frames=1
+            AUTH_ARGS_WARNING, RemovedInDjango2028Warning, skip_frames=1
         )
     if connection is not None:
         warn_about_external_use(
-            CONNECTION_ARG_WARNING, RemovedInDjango70Warning, skip_frames=1
+            CONNECTION_ARG_WARNING, RemovedInDjango2028Warning, skip_frames=1
         )
 
     if using is not None:
@@ -257,7 +257,7 @@ def send_mass_mail(
     return connection.send_messages(messages)
 
 
-# RemovedInDjango70Warning: fail_silently and connection args.
+# RemovedInDjango2028Warning: fail_silently and connection args.
 def _send_server_message(
     *,
     setting_name,
@@ -268,15 +268,16 @@ def _send_server_message(
     connection=None,
     using=None,
 ):
-    # RemovedInDjango70Warning: everything before `recipients = getattr(...)`.
-    # skip_frames=2: this helper's caller + its @deprecate_posargs decorator.
+    # RemovedInDjango2028Warning: everything before `recipients =
+    # getattr(...)`. skip_frames=2: this helper's caller + its
+    # @deprecate_posargs decorator.
     if fail_silently:
         warn_about_external_use(
-            FAIL_SILENTLY_ARG_WARNING, RemovedInDjango70Warning, skip_frames=2
+            FAIL_SILENTLY_ARG_WARNING, RemovedInDjango2028Warning, skip_frames=2
         )
     if connection is not None:
         warn_about_external_use(
-            CONNECTION_ARG_WARNING, RemovedInDjango70Warning, skip_frames=2
+            CONNECTION_ARG_WARNING, RemovedInDjango2028Warning, skip_frames=2
         )
 
     if using is not None:
@@ -286,18 +287,18 @@ def _send_server_message(
             "fail_silently cannot be used with a connection. "
             "Pass fail_silently to get_connection() instead."
         )
-    # ... end of RemovedInDjango70Warning.
+    # ... end of RemovedInDjango2028Warning.
 
     recipients = getattr(settings, setting_name)
     if not recipients:
         return
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     if all(isinstance(a, (list, tuple)) and len(a) == 2 for a in recipients):
         warnings.warn(
             f"Using (name, address) pairs in the {setting_name} setting is deprecated."
             " Replace with a list of email address strings.",
-            RemovedInDjango70Warning,
+            RemovedInDjango2028Warning,
             stacklevel=2,
         )
         recipients = [a[1] for a in recipients]
@@ -321,9 +322,9 @@ def _send_server_message(
     mail.send(using=using, fail_silently=fail_silently)
 
 
-# RemovedInDjango70Warning: fail_silently and connection args.
+# RemovedInDjango2028Warning: fail_silently and connection args.
 @deprecate_posargs(
-    RemovedInDjango70Warning, ["fail_silently", "connection", "html_message"]
+    RemovedInDjango2028Warning, ["fail_silently", "connection", "html_message"]
 )
 def mail_admins(
     subject,
@@ -346,9 +347,9 @@ def mail_admins(
     )
 
 
-# RemovedInDjango70Warning: fail_silently and connection args.
+# RemovedInDjango2028Warning: fail_silently and connection args.
 @deprecate_posargs(
-    RemovedInDjango70Warning, ["fail_silently", "connection", "html_message"]
+    RemovedInDjango2028Warning, ["fail_silently", "connection", "html_message"]
 )
 def mail_managers(
     subject,
@@ -371,7 +372,7 @@ def mail_managers(
     )
 
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 _deprecate_on_import = {
     "BadHeaderError": "BadHeaderError is deprecated. Replace with ValueError.",
     "SafeMIMEText": (
@@ -385,7 +386,7 @@ _deprecate_on_import = {
 }
 
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 def __getattr__(name):
     try:
         msg = _deprecate_on_import[name]
@@ -395,5 +396,5 @@ def __getattr__(name):
         # Issue deprecation warnings at time of import.
         from django.core.mail import message
 
-        warnings.warn(msg, category=RemovedInDjango70Warning)
+        warnings.warn(msg, category=RemovedInDjango2028Warning)
         return getattr(message, name)

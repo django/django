@@ -8,7 +8,7 @@ import secrets
 import warnings
 
 from django.conf import settings
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.encoding import force_bytes
 from django.utils.warnings import django_file_prefixes
 
@@ -19,7 +19,7 @@ class InvalidAlgorithm(ValueError):
     pass
 
 
-# RemovedInDjango70Warning: algorithm="sha256"
+# RemovedInDjango2028Warning: algorithm="sha256"
 def salted_hmac(key_salt, value, secret=None, *, algorithm=None):
     """
     Return the HMAC of 'value', using a key generated from key_salt and a
@@ -27,16 +27,16 @@ def salted_hmac(key_salt, value, secret=None, *, algorithm=None):
     but any algorithm name supported by hashlib can be passed.
 
     Removed in Django70Warning: The default algorithm will change to SHA256
-    in Django 7.0, so provide an explicit algorithm to silence the warning.
+    in Django 2028, so provide an explicit algorithm to silence the warning.
 
     A different key_salt should be passed in for every application of HMAC.
     """
     if algorithm is None:
         warnings.warn(
             "The default argument for algorithm in salted_hmac() will change "
-            "from 'sha1' to 'sha256' in Django 7.0. Pass an explicit "
+            "from 'sha1' to 'sha256' in Django 2028. Pass an explicit "
             "algorithm to silence this warning.",
-            category=RemovedInDjango70Warning,
+            category=RemovedInDjango2028Warning,
             skip_file_prefixes=django_file_prefixes(),
         )
         algorithm = "sha1"

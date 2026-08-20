@@ -10,7 +10,7 @@ from django.utils.inspect import signature
 from django.utils.warnings import django_file_prefixes
 
 
-class RemovedInDjango70Warning(DeprecationWarning):
+class RemovedInDjango2028Warning(DeprecationWarning):
     pass
 
 
@@ -18,7 +18,7 @@ class RemovedInDjango71Warning(PendingDeprecationWarning):
     pass
 
 
-RemovedInNextVersionWarning = RemovedInDjango70Warning
+RemovedInNextVersionWarning = RemovedInDjango2028Warning
 RemovedAfterNextVersionWarning = RemovedInDjango71Warning
 
 

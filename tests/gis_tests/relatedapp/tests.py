@@ -5,7 +5,7 @@ from django.db import NotSupportedError, connection
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import ignore_warnings, override_settings
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from ..utils import skipUnlessGISLookup
 from .models import Article, Author, Book, City, DirectoryEntry, Event, Location, Parcel
@@ -17,10 +17,10 @@ class RelatedGeoModelTest(TestCase):
     def test02_select_related(self):
         "Testing `select_related` on geographic models (see #7126)."
         qs1 = City.objects.order_by("id")
-        # RemovedInDjango70Warning: when the deprecation ends, the below
+        # RemovedInDjango2028Warning: when the deprecation ends, the below
         # queryset can be removed.
         with ignore_warnings(
-            category=RemovedInDjango70Warning,
+            category=RemovedInDjango2028Warning,
             message=r"Calling select_related\(\) with no arguments is deprecated\.",
         ):
             qs2 = City.objects.order_by("id").select_related()

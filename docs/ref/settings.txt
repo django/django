@@ -1404,7 +1404,7 @@ The backend to use for sending emails. For the list of available backends see
 
 .. deprecated:: 6.1
 
-    This setting is deprecated and will be removed in Django 7.0. Its
+    This setting is deprecated and will be removed in Django 2028. Its
     replacement is :setting:`BACKEND <MAILERS-BACKEND>` in the
     :setting:`MAILERS` ``"default"`` configuration. See
     :ref:`migrating-to-mailers`.
@@ -1421,7 +1421,7 @@ to store output files.
 
 .. deprecated:: 6.1
 
-    This setting is deprecated and will be removed in Django 7.0. Its
+    This setting is deprecated and will be removed in Django 2028. Its
     replacement is ``"file_path"`` under :setting:`OPTIONS <MAILERS-OPTIONS>`
     in a :setting:`MAILERS` definition that uses the file email backend. See
     :ref:`migrating-to-mailers`.
@@ -1439,7 +1439,7 @@ See also :setting:`EMAIL_PORT`.
 
 .. deprecated:: 6.1
 
-    This setting is deprecated and will be removed in Django 7.0. Its
+    This setting is deprecated and will be removed in Django 2028. Its
     replacement is ``"host"`` under :setting:`OPTIONS <MAILERS-OPTIONS>` in a
     :setting:`MAILERS` definition that uses the SMTP email backend. See
     :ref:`migrating-to-mailers`.
@@ -1460,7 +1460,7 @@ See also :setting:`EMAIL_HOST_USER`.
 
 .. deprecated:: 6.1
 
-    This setting is deprecated and will be removed in Django 7.0. Its
+    This setting is deprecated and will be removed in Django 2028. Its
     replacement is ``"password"`` under :setting:`OPTIONS <MAILERS-OPTIONS>` in
     a :setting:`MAILERS` definition that uses the SMTP email backend. See
     :ref:`migrating-to-mailers`.
@@ -1479,7 +1479,7 @@ See also :setting:`EMAIL_HOST_PASSWORD`.
 
 .. deprecated:: 6.1
 
-    This setting is deprecated and will be removed in Django 7.0. Its
+    This setting is deprecated and will be removed in Django 2028. Its
     replacement is ``"username"`` under :setting:`OPTIONS <MAILERS-OPTIONS>` in
     a :setting:`MAILERS` definition that uses the SMTP email backend. See
     :ref:`migrating-to-mailers`.
@@ -1495,7 +1495,7 @@ Port to use for the SMTP server defined in :setting:`EMAIL_HOST`.
 
 .. deprecated:: 6.1
 
-    This setting is deprecated and will be removed in Django 7.0. Its
+    This setting is deprecated and will be removed in Django 2028. Its
     replacement is ``"port"`` under :setting:`OPTIONS <MAILERS-OPTIONS>` in a
     :setting:`MAILERS` definition that uses the SMTP email backend. See
     :ref:`migrating-to-mailers`.
@@ -1535,7 +1535,7 @@ experiencing hanging connections, see the implicit TLS setting
 
 .. deprecated:: 6.1
 
-    This setting is deprecated and will be removed in Django 7.0. Its
+    This setting is deprecated and will be removed in Django 2028. Its
     replacement is ``"use_tls"`` under :setting:`OPTIONS <MAILERS-OPTIONS>` in
     a :setting:`MAILERS` definition that uses the SMTP email backend. See
     :ref:`migrating-to-mailers`.
@@ -1557,7 +1557,7 @@ exclusive, so only set one of those settings to ``True``.
 
 .. deprecated:: 6.1
 
-    This setting is deprecated and will be removed in Django 7.0. Its
+    This setting is deprecated and will be removed in Django 2028. Its
     replacement is ``"use_ssl"`` under :setting:`OPTIONS <MAILERS-OPTIONS>` in
     a :setting:`MAILERS` definition that uses the SMTP email backend. See
     :ref:`migrating-to-mailers`.
@@ -1590,7 +1590,7 @@ For more complex scenarios, the :ref:`SMTP EmailBackend
 
 .. deprecated:: 6.1
 
-    This setting is deprecated and will be removed in Django 7.0. Its
+    This setting is deprecated and will be removed in Django 2028. Its
     replacement is ``"ssl_certfile"`` under :setting:`OPTIONS
     <MAILERS-OPTIONS>` in a :setting:`MAILERS` definition that uses the SMTP
     email backend. See :ref:`migrating-to-mailers`.
@@ -1614,7 +1614,7 @@ for details on how the certificate chain file and private key file are handled.
 
 .. deprecated:: 6.1
 
-    This setting is deprecated and will be removed in Django 7.0. Its
+    This setting is deprecated and will be removed in Django 2028. Its
     replacement is ``"ssl_keyfile"`` under :setting:`OPTIONS <MAILERS-OPTIONS>`
     in a :setting:`MAILERS` definition that uses the SMTP email backend. See
     :ref:`migrating-to-mailers`.
@@ -1631,7 +1631,7 @@ attempt.
 
 .. deprecated:: 6.1
 
-    This setting is deprecated and will be removed in Django 7.0. Its
+    This setting is deprecated and will be removed in Django 2028. Its
     replacement is ``"timeout"`` under :setting:`OPTIONS <MAILERS-OPTIONS>` in
     a :setting:`MAILERS` definition that uses the SMTP email backend. See
     :ref:`migrating-to-mailers`.
@@ -2170,7 +2170,7 @@ configuration process will be skipped.
 
 .. versionadded:: 6.1
 
-.. RemovedInDjango70Warning: Update the default value to be ``{}``.
+.. RemovedInDjango2028Warning: Update the default value to be ``{}``.
 
 Default: Not defined
 
@@ -2209,10 +2209,10 @@ See :ref:`topic-email-configuration` for more information.
 
 .. deprecated:: 6.1
 
-    In Django 7.0, the default value will change from "Not defined" to ``{}``.
+    In Django 2028, the default value will change from "Not defined" to ``{}``.
     Until then, if ``MAILERS`` is not defined in the project's settings, Django
     will create a ``"default"`` mailer using the :setting:`EMAIL_BACKEND`
-    setting. Projects can opt into the Django 7.0 behavior at any time by
+    setting. Projects can opt into the Django 2028 behavior at any time by
     adding ``MAILERS`` and removing ``EMAIL_BACKEND`` from their settings. See
     :ref:`migrating-to-mailers-settings`.
 
@@ -2868,8 +2868,8 @@ cookies signed with Django's current unambiguous signed-cookie salt derivation.
 
 .. deprecated:: 6.1
 
-    This transitional setting will be removed in Django 7.0, when legacy signed
-    cookies will no longer be accepted.
+    This transitional setting will be removed in Django 2028, when legacy
+    signed cookies will no longer be accepted.
 
 .. setting:: SIGNING_BACKEND
 
@@ -3240,7 +3240,7 @@ transitional setting to ``True`` to revert to the previous label.
 
 .. deprecated:: 6.1
 
-    This setting will be removed in Django 7.0. To use a custom default blank
+    This setting will be removed in Django 2028. To use a custom default blank
     choice label, override ``django.db.models.fields.BLANK_CHOICE_LABEL`` in
     the app's ``ready()`` method.
 
