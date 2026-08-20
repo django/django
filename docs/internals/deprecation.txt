@@ -7,10 +7,10 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
-.. _deprecation-removed-in-7.1:
+.. _deprecation-removed-in-2029:
 
-7.1
----
+2029
+----
 
 See the :ref:`Django 6.2 release notes <deprecated-features-6.2>` for more
 details on these changes.
@@ -23,10 +23,10 @@ details on these changes.
 * Calling ``QuerySet.aiterator()`` after ``prefetch_related()`` without
   providing a ``chunk_size`` will raise :exc:`ValueError`.
 
-.. _deprecation-removed-in-7.0:
+.. _deprecation-removed-in-2028:
 
-7.0
----
+2028
+----
 
 See the :ref:`Django 6.0 release notes <deprecated-features-6.0>` for more
 details on these changes.
