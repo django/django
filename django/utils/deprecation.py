@@ -14,12 +14,12 @@ class RemovedInDjango2028Warning(DeprecationWarning):
     pass
 
 
-class RemovedInDjango71Warning(PendingDeprecationWarning):
+class RemovedInDjango2029Warning(PendingDeprecationWarning):
     pass
 
 
 RemovedInNextVersionWarning = RemovedInDjango2028Warning
-RemovedAfterNextVersionWarning = RemovedInDjango71Warning
+RemovedAfterNextVersionWarning = RemovedInDjango2029Warning
 
 
 def __getattr__(name):
@@ -27,7 +27,7 @@ def __getattr__(name):
         warnings.warn(
             "Importing MiddlewareMixin from django.utils.deprecation is deprecated. "
             "Import from django.middleware.MiddlewareMixin instead.",
-            RemovedInDjango71Warning,
+            RemovedInDjango2029Warning,
             stacklevel=2,
         )
         return _MiddlewareMixin
