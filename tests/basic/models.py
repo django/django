@@ -63,7 +63,7 @@ class ChildPrimaryKeyWithDefault(PrimaryKeyWithDefault):
     pass
 
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 class FromDbOldSignature(models.Model):
     name = models.CharField(max_length=20)
 
@@ -74,7 +74,7 @@ class FromDbOldSignature(models.Model):
         return instance
 
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 class FromDbOldSignatureRelated(models.Model):
     old = models.ForeignKey(FromDbOldSignature, models.CASCADE)
 

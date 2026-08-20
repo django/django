@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.db import connection, models
 from django.test import SimpleTestCase, TestCase
 from django.utils.choices import CallableChoiceIterator
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.functional import lazy
 
 from .models import (
@@ -150,7 +150,7 @@ class BasicFieldTests(SimpleTestCase):
         self.assertEqual(field_hash, hash(field))
 
     def test_get_placeholder_deprecation(self):
-        # RemovedInDjango70Warning: When the deprecation ends, remove
+        # RemovedInDjango2028Warning: When the deprecation ends, remove
         # completely.
         msg = (
             "Field.get_placeholder is deprecated in favor of get_placeholder_sql. "
@@ -158,14 +158,14 @@ class BasicFieldTests(SimpleTestCase):
             "test_get_placeholder_deprecation.<locals>.SomeField.get_placeholder_sql "
             "to return both SQL and parameters instead."
         )
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
 
             class SomeField(models.Field):
                 def get_placeholder(self, value, compiler, connection):
                     return "%s"
 
     def test_get_placeholder_sql_shim(self):
-        # RemovedInDjango70Warning: When the deprecation ends, remove
+        # RemovedInDjango2028Warning: When the deprecation ends, remove
         # completely.
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("always")

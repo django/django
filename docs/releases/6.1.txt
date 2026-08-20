@@ -118,7 +118,7 @@ replace :setting:`EMAIL_BACKEND` and related ``EMAIL_*`` settings in Django
 deprecation warnings: see the list of :ref:`email deprecations
 <mailers-deprecations>` below.
 
-You can opt into the new feature at any time before Django 7.0; see
+You can opt into the new feature at any time before Django 2028; see
 :ref:`migrating-to-mailers`. To ease the transition,
 :data:`mail.mailers["default"] <django.core.mail.mailers.default>` works with
 either :setting:`MAILERS` or the deprecated :setting:`EMAIL_BACKEND` setting
@@ -644,7 +644,7 @@ Email
   unknown keyword arguments. Custom email backend subclasses should ensure they
   have consumed all supported ``**kwargs`` before forwarding the remainder to
   superclass init. The base class now issues a deprecation warning for unknown
-  arguments, and it will treat them as errors starting in Django 7.0. See
+  arguments, and it will treat them as errors starting in Django 2028. See
   :ref:`migrating-to-mailers-email-backends`.
 
 * Support for ``fail_silently`` in the ``BaseEmailBackend`` is deprecated.
@@ -717,7 +717,7 @@ Miscellaneous
 * The default value of the ``algorithm`` argument for
   ``django.utils.crypto.salted_hmac()`` and
   ``django.core.signing.base64_hmac()`` is deprecated and will change from
-  ``"sha1"`` to ``"sha256"`` in Django 7.0. Pass an explicit ``algorithm``
+  ``"sha1"`` to ``"sha256"`` in Django 2028. Pass an explicit ``algorithm``
   to silence the deprecation warning.
 
 * Overriding ``ModelAdmin.get_actions()`` without the new ``action_location``

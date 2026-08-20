@@ -10,7 +10,7 @@ from django.utils.inspect import signature
 from django.utils.warnings import django_file_prefixes
 
 
-class RemovedInDjango70Warning(DeprecationWarning):
+class RemovedInDjango2028Warning(DeprecationWarning):
     pass
 
 
@@ -18,7 +18,7 @@ class RemovedInDjango71Warning(PendingDeprecationWarning):
     pass
 
 
-RemovedInNextVersionWarning = RemovedInDjango70Warning
+RemovedInNextVersionWarning = RemovedInDjango2028Warning
 RemovedAfterNextVersionWarning = RemovedInDjango71Warning
 
 
@@ -31,6 +31,13 @@ def __getattr__(name):
             stacklevel=2,
         )
         return _MiddlewareMixin
+    if name == "RemovedInDjango70Warning":
+        warnings.warn(
+            "RemovedInDjango2028Warning should be used instead of "
+            "RemovedInDjango70Warning.",
+            stacklevel=2,
+        )
+        return RemovedInDjango2028Warning
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 

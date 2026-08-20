@@ -1291,7 +1291,7 @@ class CourseAdmin(admin.ModelAdmin):
     )
 
 
-# RemovedInDjango70Warning: When the deprecation ends, remove.
+# RemovedInDjango2028Warning: When the deprecation ends, remove.
 class OverriddenActionAdmin(admin.ModelAdmin):
     def get_actions(self, request):
         actions = super().get_actions(request)
@@ -1383,7 +1383,7 @@ site.register(ParentWithUUIDPK)
 site.register(RelatedPrepopulated, search_fields=["name"])
 site.register(RelatedWithUUIDPKModel)
 site.register(ReadOnlyRelatedField, ReadOnlyRelatedFieldAdmin)
-# RemovedInDjango70Warning: When the deprecation ends, remove.
+# RemovedInDjango2028Warning: When the deprecation ends, remove.
 site.register(ModelAction, OverriddenActionAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor

@@ -4,7 +4,7 @@ from django.core import signing
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import freeze_time
 from django.utils.crypto import InvalidAlgorithm
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 
 class TestSigner(SimpleTestCase):
@@ -47,10 +47,10 @@ class TestSigner(SimpleTestCase):
     def test_base64_hmac_default_algorithm_deprecation(self):
         msg = (
             "The default argument for algorithm in base64_hmac() will change "
-            "from 'sha1' to 'sha256' in Django 7.0. Pass an explicit "
+            "from 'sha1' to 'sha256' in Django 2028. Pass an explicit "
             "algorithm to silence this warning."
         )
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
             signing.base64_hmac("salt", "value", "key")
 
     def test_custom_algorithm(self):
