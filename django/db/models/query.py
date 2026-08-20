@@ -47,8 +47,8 @@ from django.db.models.utils import (
 )
 from django.utils import timezone
 from django.utils.deprecation import (
-    RemovedInDjango71Warning,
     RemovedInDjango2028Warning,
+    RemovedInDjango2029Warning,
     warn_about_external_use,
 )
 from django.utils.functional import cached_property
@@ -632,7 +632,7 @@ class QuerySet(AltersData):
         """
         if chunk_size is None:
             if self._prefetch_related_lookups:
-                # RemovedInDjango71Warning: Replace the warning with:
+                # RemovedInDjango2029Warning: Replace the warning with:
                 # raise ValueError(
                 #     "chunk_size must be provided when using "
                 #     "QuerySet.aiterator() after prefetch_related()."
@@ -640,11 +640,11 @@ class QuerySet(AltersData):
                 warnings.warn(
                     "Using QuerySet.aiterator() after prefetch_related() without "
                     "providing a chunk_size is deprecated and will raise a "
-                    "ValueError in Django 7.1.",
-                    category=RemovedInDjango71Warning,
+                    "ValueError in Django 2029.",
+                    category=RemovedInDjango2029Warning,
                     skip_file_prefixes=django_file_prefixes(),
                 )
-                # RemovedInDjango71Warning: When the deprecation ends, remove.
+                # RemovedInDjango2029Warning: Remove when the deprecation ends.
                 chunk_size = 2000
         elif chunk_size <= 0:
             raise ValueError("Chunk size must be strictly positive.")
