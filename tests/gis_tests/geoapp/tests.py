@@ -294,16 +294,10 @@ class SaveLoadTests(TestCase):
         for _ in range(5):
             geom = f"GEOMETRYCOLLECTION({geom})"
         obj = GeometryCollectionModel.objects.create(geom=geom)
-        with (
-            mock.patch(
-                "django.contrib.gis.geos.prototypes.io._WKBReader.limit_hex"
-            ) as hex_limit_mock,
-            mock.patch(
-                "django.contrib.gis.geos.prototypes.io._WKBReader.limit_wkb"
-            ) as wkb_limit_mock,
-        ):
+        with mock.patch(
+            "django.contrib.gis.geos.prototypes.io._WKBReader.limit"
+        ) as limit_mock:
             obj.refresh_from_db()
-        limit_mock = hex_limit_mock if hex_limit_mock.call_count else wkb_limit_mock
         limit_mock.assert_called_once()
         max_geom_collections = limit_mock.call_args.args[1]
         self.assertIsNone(max_geom_collections)

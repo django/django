@@ -763,9 +763,9 @@ class GEOSGeometry(GEOSGeometryBase, ListMixin):
         The `srid` keyword specifies the Source Reference Identifier (SRID)
         number for this Geometry. If not provided, it defaults to None.
 
-        The `max_geom_collections` keyword limits how many nested (WKT) or
-        total (WKB) geometry collections the input may contain before parsing
-        is refused, guarding against segfaults from deeply nested input.
+        The `max_geom_collections` keyword limits how many nested geometry
+        collections the input may contain before parsing is refused, guarding
+        against segfaults from deeply nested input.
         """
         input_srid = None
         if isinstance(geo_input, bytes):

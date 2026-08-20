@@ -124,9 +124,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 fromstr(err.wkt)
 
         # Bad WKB
-        with self.assertRaisesMessage(
-            GEOSException, self.error_checking_geom.format("GEOSWKBReader_read_r")
-        ):
+        with self.assertRaisesMessage(GEOSException, "Invalid WKB input."):
             GEOSGeometry(memoryview(b"0"))
 
         class NotAGeometry:

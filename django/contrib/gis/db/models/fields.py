@@ -288,8 +288,8 @@ class GeometryField(BaseSpatialField):
          entry in the `USER_SDO_GEOM_METADATA` table. Defaults to 0.05.
 
         max_geom_collections:
-         The maximum number of geometry collections accepted before parsing is
-         refused, forwarded to the form field.
+         The maximum geometry collection nesting depth accepted before parsing
+         is refused, forwarded to the form field.
         """
         # Setting the dimension of the geometry field.
         self.dim = dim
@@ -302,8 +302,8 @@ class GeometryField(BaseSpatialField):
         self._extent = extent
         self._tolerance = tolerance
 
-        # Limit on nested/total geometry collections, forwarded to the form
-        # field to guard against crashes in GEOS from deeply nested input.
+        # Limit on nested geometry collections, forwarded to the form field to
+        # guard against crashes in GEOS from deeply nested input.
         self.max_geom_collections = max_geom_collections
 
         super().__init__(verbose_name=verbose_name, **kwargs)
