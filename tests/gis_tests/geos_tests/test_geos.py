@@ -102,7 +102,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 fromstr(err.wkt)
 
         # Bad WKB
-        with self.assertRaises(GEOSException):
+        with self.assertRaisesMessage(GEOSException, "Invalid WKB input."):
             GEOSGeometry(memoryview(b"0"))
 
         class NotAGeometry:
