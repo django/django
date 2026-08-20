@@ -1,3 +1,4 @@
+import unittest
 from unittest.mock import patch
 
 from django.db import NotSupportedError, connection
@@ -12,6 +13,7 @@ from django.db.models import (
     Value,
     When,
 )
+from django.db.models.fields.tuple_lookups import TupleIn
 from django.db.models.functions import Cast
 from django.db.models.lookups import Exact
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
@@ -543,6 +545,16 @@ class CompositePKFilterTests(TestCase):
         self.assertEqual(
             Comment.objects.filter(pk=F("pk")).count(),
             Comment.objects.count(),
+        )
+
+    @unittest.expectedFailure
+    def test_filter_by_pk_in_rhs_f_object_lhs(self):
+        # This no longer hangs, but it should not raise ValueError (#37383).
+        self.assertCountEqual(
+            Comment.objects.filter(
+                TupleIn(F("pk"), Comment.objects.values("pk").query)
+            ),
+            Comment.objects.all(),
         )
 
     @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
