@@ -7,6 +7,14 @@ from django.test import SimpleTestCase
 
 
 class GEOSLimitTest(SimpleTestCase):
+    @staticmethod
+    def _wkb_representations(data):
+        return [
+            (data.hex().upper(), "uppercase hex string"),
+            (data.hex().encode("ascii"), "lower hex bytes"),
+            (memoryview(data), "memoryview"),
+        ]
+
     def _generate_geometry_collection_payloads(self, depth):
         def point(endian="<", type_code=1, dims=2, srid=None):
             marker = b"\x01" if endian == "<" else b"\x00"
@@ -56,6 +64,12 @@ class GEOSLimitTest(SimpleTestCase):
             (layer() * depth + point(), "little-endian WKB", True),
             (layer(endian=">") * depth + point(endian=">"), "big-endian WKB", True),
             (
+                layer(endian=">", type_code=1007) * depth
+                + point(endian=">", type_code=1001, dims=3),
+                "big-endian ISO WKB Z",
+                True,
+            ),
+            (
                 b"".join(layer(endian="<" if i % 2 == 0 else ">") for i in range(depth))
                 + point(endian=">"),
                 "mixed-endian WKB",
@@ -67,9 +81,8 @@ class GEOSLimitTest(SimpleTestCase):
         payloads = []
         for data, label, check_geos in binary:
             payloads += [
-                (data.hex().upper(), f"{label}, uppercase hex string", check_geos),
-                (data.hex().encode("ascii"), f"{label}, lower hex bytes", check_geos),
-                (memoryview(data), f"{label}, memoryview", check_geos),
+                (payload, f"{label}, {representation}", check_geos)
+                for payload, representation in self._wkb_representations(data)
             ]
         wkt = "GEOMETRYCOLLECTION(" * depth + "POINT(0 0)" + ")" * depth
         payloads += [(wkt, "WKT", True), (wkt.encode("ascii"), "WKT bytes", True)]
@@ -86,6 +99,82 @@ class GEOSLimitTest(SimpleTestCase):
                 if check_geos:
                     GEOSGeometry(payload, max_geom_collections=6)
                     GEOSGeometry(payload, max_geom_collections=None)
+
+    def test_invalid_wkb_byte_order(self):
+        big_endian_layer = b"\x00" + struct.pack(">II", 7, 1)
+        big_endian_point = b"\x00" + struct.pack(">I", 1) + struct.pack(">dd", 0.0, 0.0)
+        big_endian = (big_endian_layer * 6 + big_endian_point).replace(
+            b"\x00", b"\x02", 1
+        )
+        little_endian_layer = b"\x01" + struct.pack("<II", 7, 1)
+        invalid_little_endian_layer = b"\x02" + struct.pack("<II", 7, 1)
+        little_endian_point = (
+            b"\x01" + struct.pack("<I", 1) + struct.pack("<dd", 0.0, 0.0)
+        )
+        nested = (
+            little_endian_layer + invalid_little_endian_layer * 6 + little_endian_point
+        )
+        for data, label in (
+            (big_endian, "invalid root byte order"),
+            (nested, "invalid nested byte order"),
+        ):
+            for payload, representation in self._wkb_representations(data):
+                with (
+                    self.subTest(payload=f"{label}, {representation}"),
+                    self.assertRaisesMessage(GEOSException, "Invalid WKB input."),
+                ):
+                    GEOSGeometry(payload, max_geom_collections=5)
+
+    def test_wkb_header_bytes_in_coordinates(self):
+        possible_collection_header = b"\x01\x07\x00\x00\x00\x00\x00\x00"
+        data = (
+            b"\x01"
+            + struct.pack("<II", 2, 2)
+            + possible_collection_header
+            + struct.pack("<d", 0.0)
+            + possible_collection_header
+            + struct.pack("<d", 1.0)
+        )
+        for payload, representation in self._wkb_representations(data):
+            with self.subTest(payload=representation):
+                geom = GEOSGeometry(payload, max_geom_collections=0)
+                self.assertEqual(geom.geom_type, "LineString")
+
+    def test_wkb_geometry_collection_breadth(self):
+        empty_collection = b"\x01" + struct.pack("<II", 7, 0)
+        num_geometries = MAX_GEOM_COLLECTIONS + 1
+        data = (
+            b"\x01"
+            + struct.pack("<II", 7, num_geometries)
+            + empty_collection * num_geometries
+        )
+        for payload, representation in self._wkb_representations(data):
+            with self.subTest(payload=representation):
+                GEOSGeometry(payload, max_geom_collections=2)
+                with self.assertRaisesMessage(
+                    ValueError, "contains too many possible GeometryCollections."
+                ):
+                    GEOSGeometry(payload, max_geom_collections=1)
+
+    def test_wkb_impossible_child_count_is_rejected(self):
+        data = b"\x01" + struct.pack("<II", 7, 0xFFFFFFFF)
+        for payload, representation in self._wkb_representations(data):
+            with (
+                self.subTest(payload=representation),
+                self.assertRaisesMessage(GEOSException, "Invalid WKB input."),
+            ):
+                GEOSGeometry(payload)
+
+    def test_wkb_missing_child_header_is_rejected(self):
+        collection = b"\x01" + struct.pack("<II", 7, 2)
+        point = b"\x01" + struct.pack("<I", 1) + struct.pack("<dd", 0.0, 0.0)
+        data = collection + point
+        for payload, representation in self._wkb_representations(data):
+            with (
+                self.subTest(payload=representation),
+                self.assertRaisesMessage(GEOSException, "Invalid WKB input."),
+            ):
+                GEOSGeometry(payload)
 
     def test_wkt_geometry_collection_flat(self):
         def wkt_payload_no_nesting(num_points):
@@ -162,15 +251,24 @@ class GEOSLimitTest(SimpleTestCase):
         with self.assertRaises(GEOSException):
             GEOSGeometry(invalid_wkt, max_geom_collections=5)
 
-    def test_malformed_multi_wkb_child_is_limited(self):
+    def test_malformed_multi_wkb_child_is_rejected(self):
         def make_invalid_geom(depth):
             point = b"\x01" + struct.pack("<I", 1) + struct.pack("<dd", 0.0, 0.0)
             collection = b"\x01" + struct.pack("<I", 7) + struct.pack("<I", 1)
             multipolygon = b"\x01" + struct.pack("<I", 6) + struct.pack("<I", 1)
             return (multipolygon + collection * depth + point).hex().upper()
 
-        msg = "WKB contains too many possible GeometryCollections."
-        # Depending on a GEOSException here would be unsafe, because the WKB
-        # grammar still allows recursion below the root.
-        with self.assertRaisesMessage(ValueError, msg):
+        # Reject the invalid child type before GEOS recursively parses it.
+        with self.assertRaisesMessage(GEOSException, "Invalid WKB input."):
             GEOSGeometry(make_invalid_geom(6), max_geom_collections=5)
+
+    def test_malformed_recursive_multi_wkb_is_rejected(self):
+        point = b"\x01" + struct.pack("<I", 1) + struct.pack("<dd", 0.0, 0.0)
+        multipoint = b"\x01" + struct.pack("<II", 4, 1)
+        data = multipoint * 6 + point
+        for payload, representation in self._wkb_representations(data):
+            with (
+                self.subTest(payload=representation),
+                self.assertRaisesMessage(GEOSException, "Invalid WKB input."),
+            ):
+                GEOSGeometry(payload, max_geom_collections=5)

@@ -212,8 +212,8 @@ Geometry Objects
 
     :param geo_input: Geometry input value (string or :class:`memoryview`)
     :param srid: spatial reference identifier
-    :param max_geom_collections: maximum number of nested (WKT) or total (WKB)
-        geometry collections accepted before parsing is refused
+    :param max_geom_collections: maximum number of nested geometry collections
+        accepted before parsing is refused
     :type srid: int
 
 This is the base class for all GEOS geometry objects. It initializes on the

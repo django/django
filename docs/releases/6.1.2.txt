@@ -83,6 +83,11 @@ policy <severity-levels>`.
 Bugfixes
 ========
 
+* Fixed a class of bugs in Django 6.0.8 that allowed bypassing the depth
+  limiter for deeply nested geometry collections (:cve:`2026-15830`). The new
+  algorithm treats WKB and WKT inputs more consistently and also fixes a rare
+  case where a valid geometry could have been rejected.
+
 * Fixed a data loss issue in Django 4.0 where :ref:`network rasters
   <gdal-raster-network>` were deleted by GeoDjango when closed.
 

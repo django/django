@@ -47,12 +47,9 @@ GeoDjango form fields take the following optional arguments.
     in the underlying GEOS library when parsing deeply nested
     ``GEOMETRYCOLLECTION`` input. It defaults to ``198``.
 
-    The limit is applied differently depending on the input format: for
-    well-known text (WKT) it bounds the nesting *depth*, while for well-known
-    binary (WKB and hex-encoded WKB) it bounds the *total* number of geometry
-    collections (both breadth and depth). As a result, the same value may
-    accept a wide, shallow collection as WKT but reject it as WKB. For GeoJSON,
-    the limit is not applied at all, since GDAL parses that input type instead.
+    The limit bounds the nesting depth for well-known text (WKT), well-known
+    binary (WKB), and hex-encoded WKB. For GeoJSON, the limit is not applied at
+    all, since GDAL parses that input type instead.
 
     Increase this value (or set to ``None``) only if you must accept
     legitimately deep geometries, since doing so reduces protection against
