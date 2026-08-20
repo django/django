@@ -2167,11 +2167,6 @@ values. When validating raster inputs, you should write custom validation.
 For defense-in-depth strategies for limiting the available raster drivers, see
 `GDAL security considerations <https://gdal.org/user/security.html>`_.
 
-.. versionchanged:: 5.2.17
-
-    In earlier versions, spatial lookups accepted ``str`` and ``dict`` types
-    for new rasters, allowing file writes and network fetches.
-
 Settings
 ========
 

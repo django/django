@@ -2851,8 +2851,6 @@ See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATE_FORMAT`.
 ``SIGNED_COOKIE_LEGACY_SALT_FALLBACK``
 ---------------------------------------
 
-.. versionadded:: 5.2.15
-
 Default: ``False``
 
 Controls whether :meth:`~django.http.HttpRequest.get_signed_cookie` accepts
