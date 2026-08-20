@@ -22,6 +22,13 @@ RemovedInNextVersionWarning = RemovedInDjango2028Warning
 RemovedAfterNextVersionWarning = RemovedInDjango2029Warning
 
 
+# Compatibility aliases for warnings added before DEP 20 adoption.
+_renamed_warnings = {
+    "RemovedInDjango70Warning": RemovedInDjango2028Warning,
+    "RemovedInDjango71Warning": RemovedInDjango2029Warning,
+}
+
+
 def __getattr__(name):
     if name == "MiddlewareMixin":
         warnings.warn(
@@ -31,6 +38,13 @@ def __getattr__(name):
             stacklevel=2,
         )
         return _MiddlewareMixin
+    if renamed_warning := _renamed_warnings.get(name):
+        warnings.warn(
+            f"{name} is deprecated. Use {renamed_warning.__name__} instead.",
+            renamed_warning,
+            stacklevel=2,
+        )
+        return renamed_warning
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
