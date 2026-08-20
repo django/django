@@ -336,4 +336,4 @@ Miscellaneous
 * Calling :meth:`.QuerySet.aiterator` after ``prefetch_related()`` without
   providing a ``chunk_size`` is deprecated. It currently falls back to a
   ``chunk_size`` of 2000, but a ``ValueError`` will be raised in
-  Django 7.1.
+  Django 2029.
