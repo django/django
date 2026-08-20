@@ -1,4 +1,5 @@
 import itertools
+import unittest
 
 from django.db.models import F
 from django.db.models.fields.tuple_lookups import (
@@ -167,6 +168,31 @@ class TupleLookupsTests(TestCase):
 
             with self.subTest(customer=customer.id, query=str(qs.query)):
                 self.assertSequenceEqual(qs, contacts)
+
+    @unittest.expectedFailure
+    def test_tuple_in_subquery_lhs_f_pk(self):
+        # This no longer hangs, but it should not raise ValueError (#37383).
+        self.assertCountEqual(
+            Contact.objects.filter(
+                TupleIn(F("pk"), Contact.objects.values("customer").query)
+            ),
+            Contact.objects.all(),
+        )
+
+    def test_tuple_lookups_f_invalid_rhs(self):
+        lookups = (
+            TupleExact,
+            TupleGreaterThan,
+            TupleGreaterThanOrEqual,
+            TupleIn,
+            TupleLessThan,
+            TupleLessThanOrEqual,
+        )
+        for lookup in lookups:
+            with self.subTest(lookup=lookup.lookup_name):
+                msg = f"{lookup.lookup_name!r} lookup of 'pk' must be a tuple or a list"
+                with self.assertRaisesMessage(ValueError, msg):
+                    lookup(F("pk"), 1)
 
     def test_tuple_in_rhs_must_be_collection_of_tuples_or_lists(self):
         test_cases = (

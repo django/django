@@ -1,4 +1,5 @@
 import itertools
+from collections.abc import Iterable
 
 from django.core.exceptions import EmptyResultSet
 from django.db import NotSupportedError, models
@@ -85,9 +86,12 @@ class TupleLookupMixin:
     def get_lhs_str(self):
         if isinstance(self.lhs, ColPairs):
             return repr(self.lhs.field.name)
-        else:
+        elif isinstance(self.lhs, Iterable):
             names = ", ".join(repr(f.name) for f in self.lhs)
             return f"({names})"
+        elif hasattr(self.lhs, "name"):
+            return repr(self.lhs.name)
+        return repr(self.lhs)
 
     def get_prep_lhs(self):
         if isinstance(self.lhs, (tuple, list)):
