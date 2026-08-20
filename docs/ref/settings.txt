@@ -2713,8 +2713,8 @@ cookies signed with Django's historical signed-cookie salt derivation based on
 
 Set this to ``False`` to reject those legacy signed cookies and only accept
 cookies signed with Django's current unambiguous signed-cookie salt derivation.
-This transitional setting will be removed in Django 7.0, when the legacy signed
-cookies will no longer be accepted.
+This transitional setting will be removed in Django 2028, when the legacy
+signed cookies will no longer be accepted.
 
 .. setting:: SIGNING_BACKEND
 

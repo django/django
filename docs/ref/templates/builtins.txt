@@ -3015,7 +3015,7 @@ If ``value`` is ``"Check out www.djangoproject.com"``, the output will be:
 .. deprecated:: 6.0
 
     The default protocol when none is provided will change from HTTP to HTTPS
-    in Django 7.0. Hence, the output will become:
+    in Django 2028. Hence, the output will become:
 
     .. code-block:: html+django
 
@@ -3066,7 +3066,7 @@ If ``value`` is ``"Check out www.djangoproject.com"``, the output would be:
 .. deprecated:: 6.0
 
     The default protocol when none is provided will change from HTTP to HTTPS
-    in Django 7.0. Hence, the output will become:
+    in Django 2028. Hence, the output will become:
 
     .. code-block:: html+django
 

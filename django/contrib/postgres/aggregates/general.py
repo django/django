@@ -4,7 +4,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db.models import Aggregate, BooleanField, JSONField
 from django.db.models import StringAgg as _StringAgg
 from django.db.models import Value
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .mixins import _DeprecatedOrdering
 
@@ -16,7 +16,7 @@ __all__ = [
     "BoolAnd",
     "BoolOr",
     "JSONBAgg",
-    "StringAgg",  # RemovedInDjango70Warning.
+    "StringAgg",  # RemovedInDjango2028Warning.
 ]
 
 
@@ -65,16 +65,16 @@ class JSONBAgg(_DeprecatedOrdering, Aggregate):
 
 # RemovedInDjango61Warning: When the deprecation ends, replace with:
 # class StringAgg(_StringAgg):
-# RemovedInDjango70Warning: When the deprecation ends, remove completely.
+# RemovedInDjango2028Warning: When the deprecation ends, remove completely.
 class StringAgg(_DeprecatedOrdering, _StringAgg):
 
     def __init__(self, expression, delimiter, **extra):
         if isinstance(delimiter, str):
             warnings.warn(
                 "delimiter: str will be resolved as a field reference instead "
-                "of a string literal on Django 7.0. Pass "
+                "of a string literal on Django 2028. Pass "
                 f"`delimiter=Value({delimiter!r})` to preserve the previous behavior.",
-                category=RemovedInDjango70Warning,
+                category=RemovedInDjango2028Warning,
                 stacklevel=2,
             )
 
@@ -83,7 +83,7 @@ class StringAgg(_DeprecatedOrdering, _StringAgg):
         warnings.warn(
             "The PostgreSQL specific StringAgg function is deprecated. Use "
             "django.db.models.aggregates.StringAgg instead.",
-            category=RemovedInDjango70Warning,
+            category=RemovedInDjango2028Warning,
             stacklevel=2,
         )
 

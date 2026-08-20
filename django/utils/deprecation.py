@@ -22,12 +22,13 @@ class RemovedInDjango61Warning(DeprecationWarning):
     pass
 
 
-class RemovedInDjango70Warning(PendingDeprecationWarning):
+class RemovedInDjango2028Warning(PendingDeprecationWarning):
     pass
 
 
 RemovedInNextVersionWarning = RemovedInDjango61Warning
-RemovedAfterNextVersionWarning = RemovedInDjango70Warning
+RemovedAfterNextVersionWarning = RemovedInDjango2028Warning
+RemovedInDjango70Warning = RemovedInDjango2028Warning
 
 
 class warn_about_renamed_method:

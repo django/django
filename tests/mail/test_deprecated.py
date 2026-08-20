@@ -1,4 +1,4 @@
-# RemovedInDjango70Warning: This entire file.
+# RemovedInDjango2028Warning: This entire file.
 from email.mime.text import MIMEText
 
 from django.core.mail import (
@@ -9,7 +9,7 @@ from django.core.mail import (
 )
 from django.core.mail.message import forbid_multi_line_headers, sanitize_address
 from django.test import SimpleTestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .tests import MailTestsMixin
 
@@ -40,7 +40,7 @@ class DeprecationWarningTests(MailTestsMixin, SimpleTestCase):
         ]
         for name, msg in cases:
             with self.subTest(name=name):
-                with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+                with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
                     __import__("django.core.mail", fromlist=[name])
 
     def test_sanitize_address_deprecated(self):
@@ -51,7 +51,7 @@ class DeprecationWarningTests(MailTestsMixin, SimpleTestCase):
             " encoding. Use Python's email.headerregistry.Address to construct"
             " formatted addresses from component parts."
         )
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
             sanitize_address("to@example.com", "ascii")
 
     def test_forbid_multi_line_headers_deprecated(self):
@@ -60,7 +60,7 @@ class DeprecationWarningTests(MailTestsMixin, SimpleTestCase):
             " Python's modern email API (with email.message.EmailMessage or"
             " email.policy.default) will reject multi-line headers."
         )
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
             forbid_multi_line_headers("To", "to@example.com", "ascii")
 
 
@@ -103,7 +103,7 @@ class UndocumentedFeatureErrorTests(SimpleTestCase):
             email.message()
 
 
-@ignore_warnings(category=RemovedInDjango70Warning)
+@ignore_warnings(category=RemovedInDjango2028Warning)
 class DeprecatedCompatibilityTests(SimpleTestCase):
     def test_bad_header_error(self):
         """

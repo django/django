@@ -444,7 +444,7 @@ three-chevron prompt (>>>) indicates you are still in the shell, you need to
 exit first using ``exit()``). Run ``python manage.py shell`` again to reload
 the models.
 
-.. RemovedInDjango70Warning: When Python 3.12 is no longer supported,
+.. RemovedInDjango2028Warning: When Python 3.12 is no longer supported,
   ``exit()`` can be replaced with ``exit``.
 
 .. code-block:: pycon

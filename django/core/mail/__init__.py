@@ -21,7 +21,7 @@ from django.core.mail.message import (
     make_msgid,
 )
 from django.core.mail.utils import DNS_NAME, CachedDnsName
-from django.utils.deprecation import RemovedInDjango70Warning, deprecate_posargs
+from django.utils.deprecation import RemovedInDjango2028Warning, deprecate_posargs
 from django.utils.functional import Promise
 from django.utils.module_loading import import_string
 
@@ -39,7 +39,7 @@ __all__ = [
     "mail_managers",
     "EmailAlternative",
     "EmailAttachment",
-    # RemovedInDjango70Warning: When the deprecation ends, remove the last
+    # RemovedInDjango2028Warning: When the deprecation ends, remove the last
     # entries.
     "BadHeaderError",
     "SafeMIMEText",
@@ -48,7 +48,7 @@ __all__ = [
 ]
 
 
-@deprecate_posargs(RemovedInDjango70Warning, ["fail_silently"])
+@deprecate_posargs(RemovedInDjango2028Warning, ["fail_silently"])
 def get_connection(backend=None, *, fail_silently=False, **kwds):
     """Load an email backend and return an instance of it.
 
@@ -62,7 +62,7 @@ def get_connection(backend=None, *, fail_silently=False, **kwds):
 
 
 @deprecate_posargs(
-    RemovedInDjango70Warning,
+    RemovedInDjango2028Warning,
     [
         "fail_silently",
         "auth_user",
@@ -109,7 +109,7 @@ def send_mail(
 
 
 @deprecate_posargs(
-    RemovedInDjango70Warning,
+    RemovedInDjango2028Warning,
     [
         "fail_silently",
         "auth_user",
@@ -162,12 +162,12 @@ def _send_server_message(
     if not recipients:
         return
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     if all(isinstance(a, (list, tuple)) and len(a) == 2 for a in recipients):
         warnings.warn(
             f"Using (name, address) pairs in the {setting_name} setting is deprecated."
             " Replace with a list of email address strings.",
-            RemovedInDjango70Warning,
+            RemovedInDjango2028Warning,
             stacklevel=2,
         )
         recipients = [a[1] for a in recipients]
@@ -192,7 +192,7 @@ def _send_server_message(
 
 
 @deprecate_posargs(
-    RemovedInDjango70Warning, ["fail_silently", "connection", "html_message"]
+    RemovedInDjango2028Warning, ["fail_silently", "connection", "html_message"]
 )
 def mail_admins(
     subject, message, *, fail_silently=False, connection=None, html_message=None
@@ -209,7 +209,7 @@ def mail_admins(
 
 
 @deprecate_posargs(
-    RemovedInDjango70Warning, ["fail_silently", "connection", "html_message"]
+    RemovedInDjango2028Warning, ["fail_silently", "connection", "html_message"]
 )
 def mail_managers(
     subject, message, *, fail_silently=False, connection=None, html_message=None
@@ -225,7 +225,7 @@ def mail_managers(
     )
 
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 _deprecate_on_import = {
     "BadHeaderError": "BadHeaderError is deprecated. Replace with ValueError.",
     "SafeMIMEText": (
@@ -239,7 +239,7 @@ _deprecate_on_import = {
 }
 
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 def __getattr__(name):
     try:
         msg = _deprecate_on_import[name]
@@ -249,5 +249,5 @@ def __getattr__(name):
         # Issue deprecation warnings at time of import.
         from django.core.mail import message
 
-        warnings.warn(msg, category=RemovedInDjango70Warning)
+        warnings.warn(msg, category=RemovedInDjango2028Warning)
         return getattr(message, name)

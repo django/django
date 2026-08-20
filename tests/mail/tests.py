@@ -40,7 +40,7 @@ from django.core.mail import (
 from django.core.mail.backends import console, dummy, filebased, locmem, smtp
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import ignore_warnings, requires_tz_support
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.translation import gettext_lazy
 
 try:
@@ -250,8 +250,8 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(message["From"], "from@example.com")
         self.assertEqual(message["To"], "to@example.com")
 
-    # RemovedInDjango70Warning.
-    @ignore_warnings(category=RemovedInDjango70Warning)
+    # RemovedInDjango2028Warning.
+    @ignore_warnings(category=RemovedInDjango2028Warning)
     @mock.patch("django.core.mail.message.MIMEText.set_payload")
     def test_nonascii_as_string_with_ascii_charset(self, mock_set_payload):
         """Line length check should encode the payload supporting
@@ -1104,7 +1104,7 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(attached_message["Content-Transfer-Encoding"], "8bit")
         self.assertEqual(attached_message.get_content_type(), "text/plain")
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     def test_attach_mime_image(self):
         """
         EmailMessage.attach() docs: "You can pass it
@@ -1119,7 +1119,7 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         image = MIMEImage(b"GIF89a...", "gif")
         image["Content-Disposition"] = "inline"
         image["Content-ID"] = "<content-id@example.org>"
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
             email.attach(image)
 
         attachments = self.get_raw_attachments(email)
@@ -1157,7 +1157,7 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(image_att.get_content(), b"GIF89a...")
         self.assertIsNone(image_att.get_filename())
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     def test_attach_mime_image_in_constructor(self):
         msg = (
             "MIMEBase attachments are deprecated."
@@ -1165,7 +1165,7 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         )
         image = MIMEImage(b"\x89PNG...", "png")
         image["Content-Disposition"] = "attachment; filename=test.png"
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
             email = EmailMessage(attachments=[image])
 
         attachments = self.get_raw_attachments(email)
@@ -1416,8 +1416,8 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         s = msg.message().as_bytes()
         self.assertIn(b"Content-Transfer-Encoding: quoted-printable", s)
 
-    # RemovedInDjango70Warning.
-    @ignore_warnings(category=RemovedInDjango70Warning)
+    # RemovedInDjango2028Warning.
+    @ignore_warnings(category=RemovedInDjango2028Warning)
     def test_sanitize_address(self):
         """Email addresses are properly sanitized."""
         # Tests the internal sanitize_address() function. Many of these cases
@@ -1512,8 +1512,8 @@ class MailTests(MailTestsMixin, SimpleTestCase):
                     sanitize_address(email_address, encoding), expected_result
                 )
 
-    # RemovedInDjango70Warning.
-    @ignore_warnings(category=RemovedInDjango70Warning)
+    # RemovedInDjango2028Warning.
+    @ignore_warnings(category=RemovedInDjango2028Warning)
     def test_sanitize_address_invalid(self):
         # Tests the internal sanitize_address() function. Note that Django's
         # EmailMessage.message() will not catch these cases, as it only calls
@@ -1538,8 +1538,8 @@ class MailTests(MailTestsMixin, SimpleTestCase):
                 with self.assertRaisesMessage(ValueError, "Invalid address"):
                     sanitize_address(email_address, encoding="utf-8")
 
-    # RemovedInDjango70Warning.
-    @ignore_warnings(category=RemovedInDjango70Warning)
+    # RemovedInDjango2028Warning.
+    @ignore_warnings(category=RemovedInDjango2028Warning)
     def test_sanitize_address_header_injection(self):
         # Tests the internal sanitize_address() function. These cases are
         # duplicated in test_address_header_handling(), which verifies headers
@@ -2000,17 +2000,17 @@ class MailTests(MailTestsMixin, SimpleTestCase):
         )
 
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 class MailDeprecatedPositionalArgsTests(SimpleTestCase):
 
-    def assertDeprecatedIn70(self, params, name):
+    def assertDeprecatedIn2028(self, params, name):
         return self.assertWarnsMessage(
-            RemovedInDjango70Warning,
+            RemovedInDjango2028Warning,
             f"Passing positional argument(s) {params} to {name}() is deprecated.",
         )
 
     def test_get_connection(self):
-        with self.assertDeprecatedIn70("'fail_silently'", "get_connection"):
+        with self.assertDeprecatedIn2028("'fail_silently'", "get_connection"):
             mail.get_connection(
                 "django.core.mail.backends.dummy.EmailBackend",
                 # Deprecated positional arg:
@@ -2018,7 +2018,7 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
             )
 
     def test_send_mail(self):
-        with self.assertDeprecatedIn70(
+        with self.assertDeprecatedIn2028(
             "'fail_silently', 'auth_user', 'auth_password', 'connection', "
             "'html_message'",
             "send_mail",
@@ -2037,7 +2037,7 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
             )
 
     def test_send_mass_mail(self):
-        with self.assertDeprecatedIn70(
+        with self.assertDeprecatedIn2028(
             "'fail_silently', 'auth_user', 'auth_password', 'connection'",
             "send_mass_mail",
         ):
@@ -2051,7 +2051,7 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
             )
 
     def test_mail_admins(self):
-        with self.assertDeprecatedIn70(
+        with self.assertDeprecatedIn2028(
             "'fail_silently', 'connection', 'html_message'", "mail_admins"
         ):
             mail_admins(
@@ -2064,7 +2064,7 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
             )
 
     def test_mail_managers(self):
-        with self.assertDeprecatedIn70(
+        with self.assertDeprecatedIn2028(
             "'fail_silently', 'connection', 'html_message'", "mail_managers"
         ):
             mail_managers(
@@ -2077,7 +2077,7 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
             )
 
     def test_email_message_init(self):
-        with self.assertDeprecatedIn70(
+        with self.assertDeprecatedIn2028(
             "'bcc', 'connection', 'attachments', 'headers', 'cc', 'reply_to'",
             "EmailMessage",
         ):
@@ -2096,7 +2096,7 @@ class MailDeprecatedPositionalArgsTests(SimpleTestCase):
             )
 
     def test_email_multi_alternatives_init(self):
-        with self.assertDeprecatedIn70(
+        with self.assertDeprecatedIn2028(
             "'bcc', 'connection', 'attachments', 'headers', 'alternatives', 'cc', "
             "'reply_to'",
             "EmailMultiAlternatives",
@@ -2143,7 +2143,7 @@ class MailTimeZoneTests(MailTestsMixin, SimpleTestCase):
         self.assertEndsWith(email.message()["Date"], "+0100")
 
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 class PythonGlobalState(SimpleTestCase):
     """
     Tests for #12422 -- Django smarts (#2472/#11212) with charset of utf-8 text
@@ -2399,7 +2399,7 @@ class BaseEmailBackendTests(MailTestsMixin):
                 mail_func("hi", "there")
                 self.assertEqual(self.get_mailbox_content(), [])
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     def test_deprecated_admins_managers_tuples(self):
         tests = (
             [("nobody", "nobody@example.com"), ("other", "other@example.com")],
@@ -2419,7 +2419,7 @@ class BaseEmailBackendTests(MailTestsMixin):
                     self.subTest(setting=setting, value=value),
                     self.settings(**{setting: value}),
                 ):
-                    with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+                    with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
                         mail_func("subject", "content")
                     message = self.get_the_message()
                     expected_to = ", ".join([str(address) for _, address in value])
@@ -2429,8 +2429,8 @@ class BaseEmailBackendTests(MailTestsMixin):
         tests = (
             "test@example.com",
             gettext_lazy("test@example.com"),
-            # RemovedInDjango70Warning: uncomment these cases when support for
-            # deprecated (name, address) tuples is removed.
+            # RemovedInDjango2028Warning: uncomment these cases when support
+            # for deprecated (name, address) tuples is removed.
             #    [
             #        ("nobody", "nobody@example.com"),
             #        ("other", "other@example.com")
@@ -3228,7 +3228,7 @@ class LegacyAPINotUsedTests(SimpleTestCase):
         django_path = django_core_mail_path.parent.parent.parent
         for abs_path in django_core_mail_path.glob("**/*.py"):
             allowed_exceptions = self.allowed_exceptions.copy()
-            # RemovedInDjango70Warning.
+            # RemovedInDjango2028Warning.
             # The following will be removed after the deprecation period.
             if abs_path.name == "message.py":
                 allowed_exceptions.update(
