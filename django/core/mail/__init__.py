@@ -3,6 +3,7 @@ Tools for sending email.
 """
 
 import warnings
+from email.headerregistry import Address
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -303,10 +304,11 @@ def _send_server_message(
         recipients = [a[1] for a in recipients]
 
     if not isinstance(recipients, (list, tuple)) or not all(
-        isinstance(address, (str, Promise)) for address in recipients
+        isinstance(address, (str, Promise, Address)) for address in recipients
     ):
         raise ImproperlyConfigured(
-            f"The {setting_name} setting must be a list of email address strings."
+            f"The {setting_name} setting must be a list of email address "
+            "strings or Address objects."
         )
 
     mail = EmailMultiAlternatives(
