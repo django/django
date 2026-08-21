@@ -244,3 +244,19 @@ class ErrorTest(SimpleTestCase):
         with self.settings(GEOIP_PATH=build_geoip_path("GeoLite2-ASN-Test.mmdb")):
             with self.assertRaisesMessage(GeoIP2Exception, msg):
                 GeoIP2()
+
+
+@mock.patch("geoip2.database.Reader")
+def test_explicit_routing_bypasses_supported_types(self, MockReader):
+    # 1. Explicit directory routing should bypass the strict string check
+    MockReader.return_value.metadata.return_value.database_type = "DBIP-Country"
+    # Passing the directory and relying on the country filename
+    GeoIP2(path=getattr(settings, "GEOIP_PATH"), country="GeoLite2-Country-Test.mmdb")
+
+    MockReader.return_value.metadata.return_value.database_type = "Geoacumen-Country"
+    GeoIP2(path=getattr(settings, "GEOIP_PATH"), country="GeoLite2-Country-Test.mmdb")
+
+    # 2. Direct file routing should still trigger strict validation
+    msg = "Unable to handle database edition: Geoacumen-Country"
+    with self.assertRaisesMessage(GeoIP2Exception, msg):
+        GeoIP2(path=build_geoip_path("GeoLite2-Country-Test.mmdb"))
