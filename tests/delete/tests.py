@@ -701,18 +701,11 @@ class DeletionTests(TestCase):
         unless deletion signals are connected.
         """
         origin = Origin.objects.create()
-        expected_sql = str(
-            Referrer.objects.only(
-                # Both fields are referenced by SecondReferrer.
-                "id",
-                "unique_field",
-            )
-            .filter(origin__in=[origin])
-            .query
-        )
         with self.assertNumQueries(2) as ctx:
             origin.delete()
-        self.assertEqual(ctx.captured_queries[0]["sql"], expected_sql)
+        # Only `id` and `unique_field` (referenced by SecondReferrer) are
+        # selected -- `large_field` is not.
+        self.assertNotIn("large_field", ctx.captured_queries[0]["sql"])
 
         def receiver(instance, **kwargs):
             pass

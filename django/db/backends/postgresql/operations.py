@@ -403,3 +403,45 @@ class DatabaseOperations(BaseDatabaseOperations):
             rhs_expr = Cast(rhs_expr, lhs_field)
 
         return lhs_expr, rhs_expr
+
+    def get_field_literal_array_type(self, field):
+        """
+        Return the PostgreSQL array type string (e.g. "uuid[]", "bigint[]")
+        used to bind a Python list of scalar values for `field` as a single
+        parameter, or None if the field cannot be safely arrayified.
+
+        Currently used by:
+        - `SQLInsertCompiler.assemble_as_sql` for UNNEST-based bulk inserts.
+        - `In.as_postgresql` for compiling `col __in [values]` as
+          `col = ANY(%s::type[])`.
+
+        In both cases the goal is to replace N placeholders with one bound
+        array parameter, sparing psycopg the O(N) client-side placeholder
+        rewriting cost for large value lists. PostgreSQL's parse analysis
+        normalizes `IN (literal, ...)` to `ScalarArrayOpExpr` anyway, so
+        query plans are unchanged.
+        """
+        # Fields with a custom placeholder (e.g. contrib.postgres.RangeField,
+        # GIS geometry fields) may depend on per-value SQL and can't share
+        # one placeholder across an array literal.
+        if hasattr(field, "get_placeholder_sql"):
+            return None
+        # For relational fields (ForeignKey, ManyToOneRel, etc.) the
+        # underlying scalar column is target_field, not the relation itself.
+        # The relation's own db_type reflects the target column's type, but
+        # for reverse relations the caller compares against the local pk,
+        # not the target. Resolve to the concrete scalar field so db_type
+        # and internal_type both refer to the same column.
+        scalar_field = field.target_field if field.is_relation else field
+        # Restrict to fields whose internal type appears in the standard
+        # data_types mapping. This filters out array, range, hstore, and
+        # geometry fields whose db_type isn't a scalar PostgreSQL type and
+        # therefore doesn't compose cleanly as `type[]`.
+        if scalar_field.get_internal_type() not in self.connection.data_types:
+            return None
+        # Strip size / precision arguments (e.g. varchar(50) -> varchar) so
+        # the array cast is legal PostgreSQL syntax.
+        db_type = scalar_field.db_type(self.connection)
+        if db_type is None:
+            return None
+        return db_type.split("(", 1)[0] + "[]"
