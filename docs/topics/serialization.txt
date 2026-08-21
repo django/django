@@ -1,16 +1,18 @@
-==========================
-Serializing Django objects
-==========================
+================================
+Serializing Django model objects
+================================
 
-Django's serialization framework provides a mechanism for "translating" Django
-models into other formats. Usually these other formats will be text-based and
-used for sending Django data over a wire, but it's possible for a
-serializer to handle any format (text-based or not).
+Django's serialization framework provides a mechanism for representing Django
+model objects in serializable formats, primarily for moving them between
+database instances. Usually these formats will be text-based and used for
+sending the data over a wire, though it is possible to customize serializers to
+handle any format (text-based or not).
 
-.. seealso::
+.. admonition:: Serializing data for APIs
 
-    If you just want to get some data from your tables into a serialized
-    form, you could use the :djadmin:`dumpdata` management command.
+    The framework is not intended for general purpose serialization, such as
+    formatting objects as JSON for an API response. In those cases it would be
+    more appropriate to use the Python JSON library directly.
 
 Serializing data
 ================
@@ -26,6 +28,11 @@ data to (see `Serialization formats`_) and a
 :class:`~django.db.models.query.QuerySet` to serialize. (Actually, the second
 argument can be any iterator that yields Django model instances, but it'll
 almost always be a QuerySet).
+
+.. seealso::
+
+    If you just want to get some data from your tables into a serialized
+    form, you could use the :djadmin:`dumpdata` management command.
 
 .. function:: django.core.serializers.get_serializer(format)
 
@@ -74,6 +81,9 @@ the resulting output; it never appears in the ``fields`` part.
 Inherited models
 ----------------
 
+Approaches to serializing models that inherit from other classes will vary
+depending on the type of inheritance.
+
 If you have a model that is defined using an :ref:`abstract base class
 <abstract-base-classes>`, you don't have to do anything special to serialize
 that model. Call the serializer on the object (or objects) that you want to
@@ -81,9 +91,9 @@ serialize, and the output will be a complete representation of the serialized
 object.
 
 However, if you have a model that uses :ref:`multi-table inheritance
-<multi-table-inheritance>`, you also need to serialize all of the base classes
-for the model. This is because only the fields that are locally defined on the
-model will be serialized. For example, consider the following models::
+<multi-table-inheritance>`, you need to intentionally serialize the base models
+as well. This is because only the fields that are locally defined on each model
+will be serialized. For example, consider the following models::
 
     class Place(models.Model):
         name = models.CharField(max_length=50)
@@ -99,11 +109,24 @@ If you only serialize the Restaurant model::
 the fields on the serialized output will only contain the ``serves_hot_dogs``
 attribute. The ``name`` attribute of the base class will be ignored.
 
-In order to fully serialize your ``Restaurant`` instances, you will need to
-serialize the ``Place`` models as well::
+To be able to deserialize the data into ``Restaurant`` model objects, you will
+need to serialize the ``Place`` model objects as well::
 
-    all_objects = [*Restaurant.objects.all(), *Place.objects.all()]
+    all_objects = [*Place.objects.all(), *Restaurant.objects.all()]
     data = serializers.serialize("json", all_objects)
+
+This will output all the ``Place`` objects with their ``name`` values, and
+then the ``Restaurant`` objects with their ``serves_hot_dogs`` values::
+
+    [
+        {"model": "myapp.place", "pk": 1, "fields": {"name": "Burger Joint"}},
+        {"model": "myapp.place", "pk": 2, "fields": {"name": "Hot Dog Palace"}},
+        {"model": "myapp.restaurant", "pk": 1, "fields": {"serves_hot_dogs": false}},
+        {"model": "myapp.restaurant", "pk": 2, "fields": {"serves_hot_dogs": true}},
+    ]
+
+This format is suitable for deserializing into a database using
+``serializers.deserialize()`` or the :djadmin:`loaddata` management command.
 
 Deserializing data
 ==================
