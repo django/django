@@ -8,6 +8,8 @@ class MessageMiddleware(MiddlewareMixin):
     Middleware that handles temporary messages.
     """
 
+    async_capable = False
+
     def process_request(self, request):
         request._messages = default_storage(request)
 
