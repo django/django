@@ -206,9 +206,6 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         for k, v in self.formfield_overrides.items():
             overrides.setdefault(k, {}).update(v)
         self.formfield_overrides = overrides
-        self._formfield_overrides_for_search = {
-            forms.BooleanField: formfields.StrictBooleanField,
-        }
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         """
@@ -300,14 +297,6 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
                     include_blank=db_field.blank, blank_choice=[("", _("None"))]
                 )
         return db_field.formfield(**kwargs)
-
-    def _formfield_for_search(self, db_field):
-        formfield = db_field.formfield()
-        for klass in formfield.__class__.mro():
-            if klass in self._formfield_overrides_for_search:
-                formfield.__class__ = self._formfield_overrides_for_search[klass]
-                break
-        return formfield
 
     def get_field_queryset(self, db, db_field, request):
         """
@@ -1367,15 +1356,19 @@ class ModelAdmin(BaseModelAdmin):
             for bit in smart_split(search_term):
                 if bit.startswith(('"', "'")) and bit[0] == bit[-1]:
                     bit = unescape_string_literal(bit)
-                # Build term lookups, skipping values invalid for their field.
+                # Build term lookups, skipping values that cannot be converted
+                # to the expected type.
                 bit_lookups = []
                 for orm_lookup, validate_field in orm_lookups:
                     if validate_field is not None:
-                        formfield = self._formfield_for_search(validate_field)
+                        formfield = validate_field.formfield()
                         try:
                             if formfield is None:
                                 # Fields like AutoField lack a form field.
                                 value = validate_field.to_python(bit)
+                            elif isinstance(formfield, forms.BooleanField):
+                                # Avoid surprising leniency for BooleanField.
+                                value = formfields.StrictBooleanField().to_python(bit)
                             elif isinstance(
                                 formfield,
                                 (
@@ -1388,7 +1381,7 @@ class ModelAdmin(BaseModelAdmin):
                             else:
                                 value = formfield.to_python(bit)
                         except ValidationError:
-                            # Skip this lookup for invalid values.
+                            # Skip this lookup for invalid types.
                             continue
                     else:
                         value = bit
