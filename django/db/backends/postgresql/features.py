@@ -124,7 +124,22 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def django_test_expected_failures(self):
-        expected_failures = set()
+        expected_failures = {
+            # Pattern lookups can't handle expressions. e.g. function
+            # replace(smallint, unknown, unknown) does not exist
+            # LINE 1: ...on"."gt"::text) LIKE '%' ||
+            # UPPER(REPLACE(REPLACE(REPLACE(("...
+            "lookup.tests.TextLookupsNonStringTests.test_contains_f_expression",
+            "lookup.tests.TextLookupsNonStringTests.test_endswith_f_expression",
+            "lookup.tests.TextLookupsNonStringTests.test_icontains_f_expression",
+            "lookup.tests.TextLookupsNonStringTests.test_iendswith_f_expression",
+            "lookup.tests.TextLookupsNonStringTests.test_iendswith_f_expression",
+            "lookup.tests.TextLookupsNonStringTests.test_iexact_f_expression",
+            "lookup.tests.TextLookupsNonStringTests.test_iregex_f_expression",
+            "lookup.tests.TextLookupsNonStringTests.test_istartswith_f_expression",
+            "lookup.tests.TextLookupsNonStringTests.test_regex_f_expression",
+            "lookup.tests.TextLookupsNonStringTests.test_startswith_f_expression",
+        }
         if self.uses_server_side_binding:
             expected_failures.update(
                 {
