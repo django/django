@@ -109,6 +109,9 @@ Asynchronous views
 Cache
 ~~~~~
 
+* The ``MAX_ENTRIES`` option may now be set to ``None`` to disable culling in
+  the ``locmem``, ``filesystem``, and ``database`` backends.
+
 * Subclasses of ``BaseDatabaseCache`` now support :ref:`culling
   <database-caching>` on a percentage of writes as an optimization. The
   default is 10%, and may be configured using the ``CULL_PROBABILITY`` option.
