@@ -14,7 +14,7 @@ class Command(BaseCommand):
     requires_migrations_checks = True
     requires_system_checks = []
 
-    def _get_pass(self, prompt="Password: "):
+    def _get_pass(self, prompt="Password (input hidden): "):
         p = getpass.getpass(prompt=prompt)
         if not p:
             raise CommandError("aborted")
@@ -57,7 +57,7 @@ class Command(BaseCommand):
         password_validated = False
         while (p1 != p2 or not password_validated) and count < MAX_TRIES:
             p1 = self._get_pass()
-            p2 = self._get_pass("Password (again): ")
+            p2 = self._get_pass("Password (again, input hidden): ")
             if p1 != p2:
                 self.stdout.write("Passwords do not match. Please try again.")
                 count += 1
