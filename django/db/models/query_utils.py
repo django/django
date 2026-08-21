@@ -333,12 +333,22 @@ class RegisterLookupMixin:
         class_lookups = [
             parent.__dict__.get("class_lookups", {}) for parent in inspect.getmro(cls)
         ]
-        return cls.merge_dicts(class_lookups)
+        return {
+            lookup_name: lookup
+            for lookup_name, lookup in cls.merge_dicts(class_lookups).items()
+            if lookup is not None
+        }
 
     def get_instance_lookups(self):
         class_lookups = self.get_class_lookups()
         if instance_lookups := getattr(self, "instance_lookups", None):
-            return {**class_lookups, **instance_lookups}
+            lookups = {**class_lookups}
+            for lookup_name, lookup in instance_lookups.items():
+                if lookup is None:
+                    lookups.pop(lookup_name, None)
+                else:
+                    lookups[lookup_name] = lookup
+            return lookups
         return class_lookups
 
     get_lookups = class_or_instance_method(get_class_lookups, get_instance_lookups)
@@ -403,29 +413,53 @@ class RegisterLookupMixin:
     )
     register_class_lookup = classmethod(register_class_lookup)
 
-    def _unregister_class_lookup(cls, lookup, lookup_name=None):
+    def unregister_class_lookup(cls, lookup, lookup_name=None):
         """
-        Remove given lookup from cls lookups. For use in tests only as it's
-        not thread-safe.
+        Remove given lookup from cls lookups. Like lookup registration, this
+        isn't thread-safe and is intended to be used during setup, e.g. in
+        AppConfig.ready().
         """
         if lookup_name is None:
             lookup_name = lookup.lookup_name
-        del cls.class_lookups[lookup_name]
+        # Raise KeyError, as deleting from class_lookups used to, rather than
+        # silently ignoring a lookup that was never registered, as that would
+        # hide typos in the lookup name.
+        if lookup_name not in cls.get_class_lookups():
+            raise KeyError(lookup_name)
+        # Shadow the lookup with a None tombstone instead of deleting it, as
+        # class_lookups may belong to a parent class and deleting from it
+        # would unregister the lookup for the parent and all of its other
+        # subclasses.
+        if "class_lookups" not in cls.__dict__:
+            cls.class_lookups = {}
+        cls.class_lookups[lookup_name] = None
         cls._clear_cached_class_lookups()
 
-    def _unregister_instance_lookup(self, lookup, lookup_name=None):
+    def unregister_instance_lookup(self, lookup, lookup_name=None):
         """
-        Remove given lookup from instance lookups. For use in tests only as
-        it's not thread-safe.
+        Remove given lookup from instance lookups. Like lookup registration,
+        this isn't thread-safe and is intended to be used during setup, e.g.
+        in AppConfig.ready().
         """
         if lookup_name is None:
             lookup_name = lookup.lookup_name
-        del self.instance_lookups[lookup_name]
+        if lookup_name not in self.get_instance_lookups():
+            raise KeyError(lookup_name)
+        # Shadow class-level lookups with a None tombstone instead of deleting
+        # them, as they are shared with the class and its other instances.
+        if "instance_lookups" not in self.__dict__:
+            self.instance_lookups = {}
+        self.instance_lookups[lookup_name] = None
 
-    _unregister_lookup = class_or_instance_method(
-        _unregister_class_lookup, _unregister_instance_lookup
+    unregister_lookup = class_or_instance_method(
+        unregister_class_lookup, unregister_instance_lookup
     )
-    _unregister_class_lookup = classmethod(_unregister_class_lookup)
+    unregister_class_lookup = classmethod(unregister_class_lookup)
+    # The private name is kept as an alias for backwards compatibility with
+    # third-party code. Its semantics intentionally changed from deleting the
+    # lookup to shadowing it with a None tombstone, which is safe to use on
+    # subclasses of the class the lookup was registered on.
+    _unregister_lookup = unregister_lookup
 
 
 def select_related_descend(field, restricted, requested, select_mask):

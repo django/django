@@ -48,7 +48,7 @@ from django.test import (
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
-from django.test.utils import CaptureQueriesContext
+from django.test.utils import CaptureQueriesContext, register_lookup
 from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import (
@@ -102,14 +102,13 @@ class TestMethods(SimpleTestCase):
         self.assertEqual(kwargs["decoder"], CustomJSONDecoder)
 
     def test_get_transforms(self):
-        @models.JSONField.register_lookup
         class MyTransform(Transform):
             lookup_name = "my_transform"
 
         field = models.JSONField()
-        transform = field.get_transform("my_transform")
-        self.assertIs(transform, MyTransform)
-        models.JSONField._unregister_lookup(MyTransform)
+        with register_lookup(models.JSONField, MyTransform):
+            transform = field.get_transform("my_transform")
+            self.assertIs(transform, MyTransform)
         transform = field.get_transform("my_transform")
         self.assertIsInstance(transform, KeyTransformFactory)
 
