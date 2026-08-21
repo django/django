@@ -13,7 +13,7 @@ from django.db.models import (
 )
 from django.db.models.fields.json import KeyTransform
 from django.db.models.functions import Cast, Concat, LPad, Substr
-from django.test.utils import Approximate
+from django.test.utils import Approximate, ignore_warnings
 from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango70Warning
 
@@ -570,7 +570,13 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             "preserve the previous behavior."
         )
 
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg) as ctx:
+        with (
+            ignore_warnings(
+                category=RemovedInDjango70Warning,
+                message="The PostgreSQL specific StringAgg function is deprecated",
+            ),
+            self.assertWarnsMessage(RemovedInDjango70Warning, msg) as ctx,
+        ):
             values = AggregateTestModel.objects.aggregate(
                 stringagg=StringAgg("char_field", delimiter="'")
             )

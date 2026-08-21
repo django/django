@@ -2931,6 +2931,13 @@ class DeprecatedInternalsTests(SimpleTestCase):
 
 
 # RemovedInDjango70Warning.
+@ignore_warnings(
+    category=RemovedInDjango70Warning,
+    message=(
+        "The 'connection' argument is deprecated. Switch to the 'using' "
+        "argument with a MAILERS alias."
+    ),
+)
 class MailDeprecatedPositionalArgsTests(SimpleTestCase):
 
     def get_connection(self, *args, **kwargs):
