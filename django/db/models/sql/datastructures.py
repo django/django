@@ -7,6 +7,16 @@ from django.core.exceptions import FullResultSet
 from django.db.models.sql.constants import INNER, LOUTER
 
 
+def table_as_sql(table_name, compiler, connection):
+    if hasattr(table_name, "as_sql"):
+        return table_name.as_sql(compiler, connection)
+    return compiler.quote_name(table_name), []
+
+
+def table_requires_alias(table_name):
+    return getattr(table_name, "always_alias", False)
+
+
 class MultiJoin(Exception):
     """
     Used by join construction code to indicate the point at which a
@@ -119,18 +129,20 @@ class Join:
                 "joining columns or extra restrictions." % declared_field.__class__
             )
         on_clause_sql = " AND ".join(join_conditions)
+        table_sql, table_params = table_as_sql(self.table_name, compiler, connection)
         alias_str = (
             ""
             if self.table_alias == self.table_name
+            and not table_requires_alias(self.table_name)
             else (" %s" % qn(self.table_alias))
         )
         sql = "%s %s%s ON (%s)" % (
             self.join_type,
-            qn(self.table_name),
+            table_sql,
             alias_str,
             on_clause_sql,
         )
-        return sql, params
+        return sql, [*table_params, *params]
 
     def relabeled_clone(self, change_map):
         new_parent_alias = change_map.get(self.parent_alias, self.parent_alias)
@@ -199,10 +211,11 @@ class BaseTable:
         alias_str = (
             ""
             if self.table_alias == self.table_name
+            and not table_requires_alias(self.table_name)
             else (" %s" % qn(self.table_alias))
         )
-        base_sql = qn(self.table_name)
-        return base_sql + alias_str, []
+        base_sql, params = table_as_sql(self.table_name, compiler, connection)
+        return base_sql + alias_str, params
 
     def relabeled_clone(self, change_map):
         return self.__class__(
