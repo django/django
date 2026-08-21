@@ -141,7 +141,9 @@ Email
 Error Reporting
 ~~~~~~~~~~~~~~~
 
-* ...
+* The HTML and plain text technical 500 debug pages now
+  display the nested exceptions in :exc:`BaseExceptionGroup`
+  instances.
 
 File Storage
 ~~~~~~~~~~~~
