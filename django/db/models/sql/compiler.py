@@ -8,7 +8,15 @@ from itertools import chain
 from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DatabaseError, NotSupportedError
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import ColPairs, F, OrderBy, RawSQL, Ref, Value
+from django.db.models.expressions import (
+    BaseExpression,
+    ColPairs,
+    F,
+    OrderBy,
+    RawSQL,
+    Ref,
+    Value,
+)
 from django.db.models.fields import AutoField, composite
 from django.db.models.functions import Cast, Random
 from django.db.models.lookups import Lookup
@@ -269,7 +277,23 @@ class SQLCompiler:
             cols = self.query.select
         selected = []
         select_fields = None
-        if self.query.selected is None:
+        if self.query.derived_table:
+            for name, expression in self.query._get_output_expressions():
+                if isinstance(expression, ColPairs):
+                    selected.extend(
+                        (
+                            LOOKUP_SEP.join((name, source.attname)),
+                            column,
+                        )
+                        for source, column in zip(
+                            expression.sources,
+                            expression.get_cols(),
+                            strict=True,
+                        )
+                    )
+                else:
+                    selected.append((name, expression))
+        elif self.query.selected is None:
             selected = [
                 *(
                     (alias, RawSQL(*args))
@@ -315,6 +339,17 @@ class SQLCompiler:
         ret = []
         col_idx = 1
         for col, alias in select:
+            is_multi_column_query = Query._get_multi_column_query(col) is not None
+            is_multi_column_expression = (
+                isinstance(col, BaseExpression)
+                and not isinstance(col, ColPairs)
+                and len(col) > 1
+            )
+            if is_multi_column_query or is_multi_column_expression:
+                raise NotImplementedError(
+                    "Selecting a multi-column subquery as an annotation is not "
+                    "supported."
+                )
             try:
                 sql, params = self.compile(col)
             except EmptyResultSet:
@@ -418,15 +453,34 @@ class SQLCompiler:
                 ref, *transforms = col.split(LOOKUP_SEP)
                 expr = self.query.annotations.get(ref)
             if expr:
+                is_multi_column_subquery = (
+                    Query._get_multi_column_query(expr) is not None
+                    and ref not in self.query.annotation_select
+                )
+                if is_multi_column_subquery and not self.query.combinator:
+                    # The part after a multi-column annotation may
+                    # be a derived-table column, not a transform.
+                    # Resolve the full name first.
+                    # For example, "project_bug__severity_level"
+                    # becomes a Col for "severity_level".
+                    expr = self.query.resolve_ref(col)
+                    transforms = []
                 if self.query.combinator and self.select:
-                    if transforms:
-                        raise NotImplementedError(
-                            "Ordering combined queries by transforms is not "
-                            "implemented."
-                        )
-                    # Don't use the resolved annotation because other
-                    # combined queries might define it differently.
-                    expr = F(ref)
+                    if is_multi_column_subquery:
+                        # Keep the complete reference unresolved so each
+                        # combined query resolves the derived-table column and
+                        # any following transforms against its own annotation.
+                        expr = F(col)
+                        transforms = []
+                    else:
+                        if transforms:
+                            raise NotImplementedError(
+                                "Ordering combined queries by transforms is not "
+                                "implemented."
+                            )
+                        # Don't use the resolved annotation because other
+                        # combined queries might define it differently.
+                        expr = F(ref)
                 if transforms:
                     for name in transforms:
                         expr = self.query.try_transform(expr, name)

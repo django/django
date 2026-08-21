@@ -31,6 +31,22 @@ only officially support the latest release of each series.
 What's new in Django 6.2
 ========================
 
+Multi-column ``Subquery`` expressions
+--------------------------------------
+
+Multi-column :class:`~django.db.models.Subquery` expressions can now be
+assigned using :meth:`.QuerySet.alias`. Their ``CompositeField`` subfields can
+be referenced using the double-underscore syntax:
+
+.. code-block:: pycon
+
+    >>> newest = Comment.objects.order_by("-created_at").values("email", "author__name")[:1]
+    >>> Post.objects.alias(newest=newest).values("newest__email", "newest__author__name")
+
+These subfields can be selected, filtered, referenced in annotations, and used
+for ordering in the same way as model fields. See
+:ref:`using-multi-column-subqueries` for more details.
+
 Minor features
 --------------
 
@@ -196,7 +212,8 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* The new :attr:`.Expression.is_composite` attribute specifies that an
+  expression represents a composite value.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
