@@ -1366,8 +1366,12 @@ class ModelAdmin(BaseModelAdmin):
                             if formfield is None:
                                 # Fields like AutoField lack a form field.
                                 value = validate_field.to_python(bit)
+                            elif isinstance(formfield, forms.NullBooleanField):
+                                # Allow explicit "None" strings.
+                                formfield = formfields.StrictNullBooleanField()
+                                value = formfield.to_python(bit)
                             elif isinstance(formfield, forms.BooleanField):
-                                # Avoid surprising leniency for BooleanField.
+                                # Avoid the coercion of most strings to True.
                                 value = formfields.StrictBooleanField().to_python(bit)
                             elif isinstance(
                                 formfield,

@@ -73,7 +73,7 @@ class Membership(models.Model):
 
 
 class Quartet(Group):
-    pass
+    plays_weddings = models.BooleanField(null=True)
 
 
 class ChordsMusician(Musician):
@@ -126,7 +126,7 @@ class OrderedObject(models.Model):
     """
 
     name = models.CharField(max_length=255)
-    bool = models.BooleanField(default=True, null=True)
+    bool = models.BooleanField(default=True)
     number = models.IntegerField(default=0, db_column="number_val")
 
     objects = OrderedObjectManager()

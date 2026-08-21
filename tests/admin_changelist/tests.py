@@ -911,19 +911,51 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [])
 
-    def test_exact_lookup_with_more_lenient_formfield(self):
+    def test_exact_boolean_lookup_is_case_insensitive(self):
         """
         Exact lookups on BooleanField use formfield().to_python() for lenient
-        parsing. Using model field's to_python() would reject 'false' whereas
-        the form field accepts it.
+        parsing. Using model field's to_python() would reject 'FALSE' whereas
+        the admin's form field accepts it.
         """
-        obj = UnorderedObject.objects.create(bool=False)
+        obj_not_nullable = UnorderedObject.objects.create(bool=False)
         UnorderedObject.objects.create(bool=True)
         m = admin.ModelAdmin(UnorderedObject, custom_site)
         m.search_fields = ["bool__exact"]
 
-        # 'false' is accepted by form field but rejected by model field.
-        request = self.factory.get("/", data={SEARCH_VAR: "false"})
+        # Nullable boolean field.
+        obj_nullable = Quartet.objects.create(plays_weddings=False)
+        Quartet.objects.create(plays_weddings=True)
+        m_nullable = admin.ModelAdmin(Quartet, custom_site)
+        m_nullable.search_fields = ["plays_weddings__exact"]
+
+        for obj, model_admin in (obj_not_nullable, m), (obj_nullable, m_nullable):
+            with self.subTest(obj=obj):
+                # 'FALSE' accepted by form field but rejected by model field.
+                request = self.factory.get("/", data={SEARCH_VAR: "FALSE"})
+                request.user = self.superuser
+
+                cl = model_admin.get_changelist_instance(request)
+                self.assertCountEqual(cl.queryset, [obj])
+
+    def test_exact_boolean_lookup_explicit_none(self):
+        UnorderedObject.objects.create(bool=False)
+        UnorderedObject.objects.create(bool=True)
+        m = admin.ModelAdmin(UnorderedObject, custom_site)
+        m.search_fields = ["bool__exact"]
+
+        request = self.factory.get("/", data={SEARCH_VAR: "None"})
+        request.user = self.superuser
+
+        cl = m.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [])
+
+        # Nullable boolean field.
+        obj = Quartet.objects.create()
+        Quartet.objects.create(plays_weddings=True)
+        m = admin.ModelAdmin(Quartet, custom_site)
+        m.search_fields = ["plays_weddings__exact"]
+
+        request = self.factory.get("/", data={SEARCH_VAR: "None"})
         request.user = self.superuser
 
         cl = m.get_changelist_instance(request)
@@ -1003,7 +1035,6 @@ class ChangeListTests(TestCase):
         john = OrderedObject.objects.create(name="john", bool=True)
         mary = OrderedObject.objects.create(name="mary", bool=True)
         pete = OrderedObject.objects.create(name="pete", bool=False)
-        OrderedObject.objects.create(name="sal", bool=None)
         m = admin.ModelAdmin(OrderedObject, custom_site)
         m.search_fields = ["name", "bool__exact"]
 
