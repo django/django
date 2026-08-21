@@ -65,3 +65,13 @@ class Book(models.Model):
         db_column="publisher_id_column",
     )
     updated = models.DateTimeField(auto_now=True)
+
+
+class Location(models.Model):
+    location_street = models.CharField(max_length=100)
+    location_updated_at = models.DateTimeField(auto_now=True)
+
+
+class Restaurant(Location):
+    menu = models.CharField(max_length=100)
+    restaurant_updated_at = models.DateTimeField(auto_now=True)
