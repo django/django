@@ -22,6 +22,7 @@ rather than the HTML rendered to the end-user.
 
 import copy
 import itertools
+import pickle
 import tempfile
 from unittest import mock
 
@@ -105,6 +106,86 @@ class ClientTest(TestCase):
         self.assertIs(response_copy.client, response.client)
         self.assertIs(response_copy.resolver_match, response.resolver_match)
         self.assertIs(response_copy.asgi_request, response.asgi_request)
+
+    def test_pickle_response(self):
+        response = self.client.get("/cbv_view/")
+        pickled = pickle.dumps(response)
+        new_response = pickle.loads(pickled)
+        self.assertIsNot(new_response, response)
+        self.assertIsNot(new_response.resolver_match, response.resolver_match)
+        self.assertIsNot(new_response.wsgi_request, response.wsgi_request)
+        for key in [
+            "headers",
+            "cookies",
+            "closed",
+            "_reason_phrase",
+            "_is_rendered",
+            "exc_info",
+        ]:
+            with self.subTest(key=key):
+                self.assertEqual(new_response.__dict__[key], response.__dict__[key])
+        for key in [
+            "path",
+            "method",
+            "content_type",
+            "content_params",
+            "_read_started",
+            "COOKIES",
+        ]:
+            with self.subTest(key=key):
+                self.assertEqual(
+                    new_response.wsgi_request.__dict__[key],
+                    response.wsgi_request.__dict__[key],
+                )
+        for key in ["defaults", "cookies", "exc_info", "extra", "headers"]:
+            with self.subTest(key=key):
+                self.assertEqual(
+                    new_response.client.__dict__[key], response.client.__dict__[key]
+                )
+        self.assertEqual(
+            repr(response.resolver_match.__dict__["_wrapped"]),
+            repr(new_response.resolver_match),
+        )
+
+    async def test_pickle_response_async(self):
+        response = await self.async_client.get("/cbv_view/")
+        pickled = pickle.dumps(response)
+        new_response = pickle.loads(pickled)
+        self.assertIsNot(new_response, response)
+        self.assertIsNot(new_response.resolver_match, response.resolver_match)
+        self.assertIsNot(new_response.asgi_request, response.asgi_request)
+        for key in [
+            "headers",
+            "cookies",
+            "closed",
+            "_reason_phrase",
+            "_is_rendered",
+            "exc_info",
+        ]:
+            with self.subTest(key=key):
+                self.assertEqual(new_response.__dict__[key], response.__dict__[key])
+        for key in [
+            "path",
+            "method",
+            "content_type",
+            "content_params",
+            "_read_started",
+            "COOKIES",
+        ]:
+            with self.subTest(key=key):
+                self.assertEqual(
+                    new_response.asgi_request.__dict__[key],
+                    response.asgi_request.__dict__[key],
+                )
+        for key in ["defaults", "cookies", "exc_info", "extra", "headers"]:
+            with self.subTest(key=key):
+                self.assertEqual(
+                    new_response.client.__dict__[key], response.client.__dict__[key]
+                )
+        self.assertEqual(
+            repr(response.resolver_match.__dict__["_wrapped"]),
+            repr(new_response.resolver_match),
+        )
 
     def test_query_string_encoding(self):
         # WSGI requires latin-1 encoded strings.

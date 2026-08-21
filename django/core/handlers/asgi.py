@@ -5,6 +5,7 @@ import tempfile
 import traceback
 from collections import defaultdict
 from contextlib import aclosing, closing
+from io import BytesIO
 
 from asgiref.sync import ThreadSensitiveContext, sync_to_async
 
@@ -145,6 +146,21 @@ class ASGIRequest(HttpRequest):
     def close(self):
         super().close()
         self._stream.close()
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state["stream"] = self._stream.read()
+        del state["_stream"]
+        return state
+
+    def __setstate__(self, state):
+        stream = state.pop("stream")
+        self.__dict__.update(state)
+        try:
+            content_length = int(self.scope.get("CONTENT_LENGTH"))
+        except (ValueError, TypeError):
+            content_length = 0
+        self._stream = base.LimitedStream(BytesIO(stream), content_length)
 
 
 class ASGIHandler(base.BaseHandler):
@@ -365,3 +381,7 @@ class ASGIHandler(base.BaseHandler):
                 (position + cls.chunk_size) >= len(data),
             )
             position += cls.chunk_size
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.load_middleware(is_async=True)
