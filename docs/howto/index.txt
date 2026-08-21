@@ -57,6 +57,7 @@ Other guides
    :maxdepth: 1
 
    auth-remote-user
+   auth-user-profile
    csp
    csrf
    custom-file-storage
