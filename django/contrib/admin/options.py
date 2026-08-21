@@ -16,7 +16,7 @@ from django import forms
 from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.admin import helpers, widgets
+from django.contrib.admin import formfields, helpers, widgets
 from django.contrib.admin.checks import (
     BaseModelAdminChecks,
     InlineModelAdminChecks,
@@ -1356,19 +1356,36 @@ class ModelAdmin(BaseModelAdmin):
             for bit in smart_split(search_term):
                 if bit.startswith(('"', "'")) and bit[0] == bit[-1]:
                     bit = unescape_string_literal(bit)
-                # Build term lookups, skipping values invalid for their field.
+                # Build term lookups, skipping values that cannot be converted
+                # to the expected type.
                 bit_lookups = []
                 for orm_lookup, validate_field in orm_lookups:
                     if validate_field is not None:
                         formfield = validate_field.formfield()
                         try:
-                            if formfield is not None:
-                                value = formfield.to_python(bit)
-                            else:
+                            if formfield is None:
                                 # Fields like AutoField lack a form field.
                                 value = validate_field.to_python(bit)
+                            elif isinstance(formfield, forms.NullBooleanField):
+                                # Allow explicit "None" strings.
+                                formfield = formfields.StrictNullBooleanField()
+                                value = formfield.to_python(bit)
+                            elif isinstance(formfield, forms.BooleanField):
+                                # Avoid the coercion of most strings to True.
+                                value = formfields.StrictBooleanField().to_python(bit)
+                            elif isinstance(
+                                formfield,
+                                (
+                                    forms.TypedChoiceField,
+                                    forms.TypedMultipleChoiceField,
+                                ),
+                            ):
+                                # Workaround for issue #34156.
+                                value = formfield.clean(bit)
+                            else:
+                                value = formfield.to_python(bit)
                         except ValidationError:
-                            # Skip this lookup for invalid values.
+                            # Skip this lookup for invalid types.
                             continue
                     else:
                         value = bit

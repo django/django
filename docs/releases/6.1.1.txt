@@ -39,3 +39,9 @@ Bugfixes
   ``QuerySet`` of a model overriding ``Model.from_db()`` without the new
   ``fetch_mode`` keyword argument. Such overrides now work again, but are
   deprecated and should be updated to accept ``fetch_mode`` (:ticket:`37259`).
+
+* Fixed a regression in Django 6.1 where an admin changelist search crashed
+  when a ``search_fields`` entry used an ``__exact`` lookup on a field with
+  ``choices``, and where any search term matched all rows with a ``True``
+  value when an ``__exact`` lookup was used on a ``BooleanField``
+  (:ticket:`37263`).
