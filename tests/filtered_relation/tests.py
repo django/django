@@ -358,6 +358,27 @@ class FilteredRelationTests(TestCase):
             ],
         )
 
+    def test_alias_values(self):
+        alias = "editor__name"
+        queryset = Book.objects.annotate(
+            **{alias: FilteredRelation("editor", condition=Q(editor__isnull=False))}
+        ).filter(title="The book by Alice")
+        self.assertSequenceEqual(queryset.values(alias), [{alias: self.editor_a.pk}])
+        self.assertSequenceEqual(queryset.values_list(alias), [(self.editor_a.pk,)])
+
+    def test_alias_order_by(self):
+        alias = "editor__name"
+        queryset = Book.objects.annotate(
+            **{alias: FilteredRelation("editor", condition=Q(editor__isnull=False))}
+        )
+        self.assertIn(
+            "ORDER BY {}.{} ASC".format(
+                connection.ops.quote_name("editor__name"),
+                connection.ops.quote_name("id"),
+            ),
+            str(queryset.order_by(alias).query),
+        )
+
     def test_extra(self):
         self.assertSequenceEqual(
             Author.objects.annotate(

@@ -2276,10 +2276,15 @@ class Query(BaseExpression):
         try:
             cols = []
             for name in field_names:
+                names_to_join = (
+                    [name]
+                    if self._filtered_relations.get(name)
+                    else name.split(LOOKUP_SEP)
+                )
                 # Join promotion note - we must not remove any rows here, so
                 # if there is no existing joins, use outer join.
                 join_info = self.setup_joins(
-                    name.split(LOOKUP_SEP), opts, alias, allow_many=allow_m2m
+                    names_to_join, opts, alias, allow_many=allow_m2m
                 )
                 targets, final_alias, joins = self.trim_joins(
                     join_info.targets,
@@ -2343,9 +2348,14 @@ class Query(BaseExpression):
                     continue
                 if self.extra and item in self.extra:
                     continue
+                names_to_join = (
+                    [item]
+                    if self._filtered_relations.get(item)
+                    else item.split(LOOKUP_SEP)
+                )
                 # names_to_path() validates the lookup. A descriptive
                 # FieldError will be raise if it's not.
-                self.names_to_path(item.split(LOOKUP_SEP), self.model._meta)
+                self.names_to_path(names_to_join, self.model._meta)
             elif not hasattr(item, "resolve_expression"):
                 errors.append(item)
             if getattr(item, "contains_aggregate", False):
