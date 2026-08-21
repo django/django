@@ -86,11 +86,24 @@ from django.utils.functional import cached_property
 
 class ForeignKeyDeferredAttribute(DeferredAttribute):
     def __set__(self, instance, value):
-        if instance.__dict__.get(self.field.attname) != value and self.field.is_cached(
-            instance
-        ):
-            self.field.delete_cached_value(instance)
+        if instance.__dict__.get(self.field.attname) != value:
+            self._clear_cached_relations(instance)
         instance.__dict__[self.field.attname] = value
+
+    def _clear_cached_relations(self, instance):
+        field = self.field
+        if not field.is_cached(instance):
+            return
+        old_related = field.get_cached_value(instance, default=None)
+        field.delete_cached_value(instance)
+        if old_related is None or field.remote_field.multiple:
+            return
+        remote_field = field.remote_field
+        if (
+            remote_field.is_cached(old_related)
+            and remote_field.get_cached_value(old_related) is instance
+        ):
+            remote_field.delete_cached_value(old_related)
 
 
 def _filter_prefetch_queryset(queryset, field_name, instances):
