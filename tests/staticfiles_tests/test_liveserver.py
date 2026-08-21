@@ -5,6 +5,7 @@ django.test.LiveServerTestCase.
 """
 
 import os
+from urllib.error import HTTPError
 from urllib.request import urlopen
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
@@ -74,5 +75,21 @@ class StaticLiveServerView(LiveServerBase):
         StaticLiveServerTestCase use of staticfiles' serve() allows it
         to discover app's static assets without having to collectstatic first.
         """
+
         with self.urlopen("/static/test/file.txt") as f:
             self.assertEqual(f.read().rstrip(b"\r\n"), b"In static directory.")
+
+    # The test is going to access a non-existent static file with
+    # a special character.
+    @modify_settings(INSTALLED_APPS={"append": "staticfiles_tests.apps.test"})
+    def test_staticfiles_special_characters(self):
+        """
+        StaticLiveServerTestCase fails on Windows with special characters
+        (':' or '|')
+        """
+        for filename in ("/static/test/file:abc.txt", "/static/test/file|abc.txt"):
+            with self.subTest(filename=filename):
+                with self.assertRaises(HTTPError) as err:
+                    self.urlopen(filename)
+                err.exception.close()
+                self.assertEqual(err.exception.code, 404, "Expected 404 response")
