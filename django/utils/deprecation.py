@@ -10,16 +10,23 @@ from django.utils.inspect import signature
 from django.utils.warnings import django_file_prefixes
 
 
-class RemovedInDjango70Warning(DeprecationWarning):
+class RemovedInDjango2028Warning(DeprecationWarning):
     pass
 
 
-class RemovedInDjango71Warning(PendingDeprecationWarning):
+class RemovedInDjango2029Warning(PendingDeprecationWarning):
     pass
 
 
-RemovedInNextVersionWarning = RemovedInDjango70Warning
-RemovedAfterNextVersionWarning = RemovedInDjango71Warning
+RemovedInNextVersionWarning = RemovedInDjango2028Warning
+RemovedAfterNextVersionWarning = RemovedInDjango2029Warning
+
+
+# Compatibility aliases for warnings added before DEP 20 adoption.
+_renamed_warnings = {
+    "RemovedInDjango70Warning": RemovedInDjango2028Warning,
+    "RemovedInDjango71Warning": RemovedInDjango2029Warning,
+}
 
 
 def __getattr__(name):
@@ -27,10 +34,17 @@ def __getattr__(name):
         warnings.warn(
             "Importing MiddlewareMixin from django.utils.deprecation is deprecated. "
             "Import from django.middleware.MiddlewareMixin instead.",
-            RemovedInDjango71Warning,
+            RemovedInDjango2029Warning,
             stacklevel=2,
         )
         return _MiddlewareMixin
+    if renamed_warning := _renamed_warnings.get(name):
+        warnings.warn(
+            f"{name} is deprecated. Use {renamed_warning.__name__} instead.",
+            renamed_warning,
+            stacklevel=2,
+        )
+        return renamed_warning
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 

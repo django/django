@@ -17,7 +17,7 @@ in a context different from the one where they were signed.
 
 Cookies are now signed with an unambiguous salt derivation. For backwards
 compatibility, cookies signed by older Django versions are accepted until
-Django 7.0. Projects affected by the above ambiguity should set
+Django 2028. Projects affected by the above ambiguity should set
 :setting:`SIGNED_COOKIE_LEGACY_SALT_FALLBACK` to ``False`` to reject older
 cookies immediately.
 

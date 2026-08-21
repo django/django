@@ -24,7 +24,7 @@ from django.http import (
     parse_cookie,
 )
 from django.test import SimpleTestCase
-from django.utils.deprecation import RemovedInDjango71Warning
+from django.utils.deprecation import RemovedInDjango2029Warning
 from django.utils.encoding import iri_to_uri
 from django.utils.functional import lazystr
 from django.utils.http import MAX_URL_REDIRECT_LENGTH
@@ -704,7 +704,7 @@ class JsonResponseTests(SimpleTestCase):
         response = JsonResponse(data)
         self.assertEqual(json.loads(response.text), data)
 
-    # RemovedInDjango71Warning: When the deprecation ends, remove this test.
+    # RemovedInDjango2029Warning: When the deprecation ends, remove this test.
     def test_json_response_raises_type_error_with_safe_arg(self):
         with (
             self.assertRaisesMessage(
@@ -713,7 +713,7 @@ class JsonResponseTests(SimpleTestCase):
                 "safe parameter to False",
             ),
             self.assertWarnsMessage(
-                RemovedInDjango71Warning, "The safe parameter is deprecated."
+                RemovedInDjango2029Warning, "The safe parameter is deprecated."
             ),
         ):
             JsonResponse([1, 2, 3], safe=True)

@@ -49,7 +49,7 @@ from django.test import (
     skipUnlessDBFeature,
 )
 from django.test.utils import CaptureQueriesContext
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .models import (
     CustomJSONDecoder,
@@ -236,8 +236,8 @@ class TestSaveLoad(TestCase):
         self.assertIsNone(obj.value)
 
     @skipUnlessDBFeature("supports_primitives_in_json_field")
-    # RemovedInDjango70Warning.
-    @ignore_warnings(category=RemovedInDjango70Warning)
+    # RemovedInDjango2028Warning.
+    @ignore_warnings(category=RemovedInDjango2028Warning)
     def test_json_null_different_from_sql_null(self):
         json_null = NullableJSONModel.objects.create(value=Value(None, JSONField()))
         NullableJSONModel.objects.update(value=Value(None, JSONField()))
@@ -251,7 +251,7 @@ class TestSaveLoad(TestCase):
         )
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value=None),
-            # RemovedInDjango70Warning: When the deprecation ends, replace
+            # RemovedInDjango2028Warning: When the deprecation ends, replace
             # with:
             # [sql_null],
             [json_null],
@@ -1476,7 +1476,7 @@ class JSONNullTests(TestCase):
         self.assertEqual(obj.value["array"], [1, None])
 
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 @skipUnlessDBFeature("supports_primitives_in_json_field")
 class JSONExactNoneDeprecationTests(TestCase):
     @classmethod
@@ -1489,7 +1489,7 @@ class JSONExactNoneDeprecationTests(TestCase):
         cls.obj = NullableJSONModel.objects.create(value=JSONNull())
 
     def test_filter(self):
-        with self.assertWarnsMessage(RemovedInDjango70Warning, self.msg):
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, self.msg):
             self.assertSequenceEqual(
                 NullableJSONModel.objects.filter(value=None), [self.obj]
             )
@@ -1498,12 +1498,12 @@ class JSONExactNoneDeprecationTests(TestCase):
         qs = NullableJSONModel.objects.annotate(
             has_empty_data=Q(value__isnull=True) | Q(value=None)
         ).filter(has_empty_data=True)
-        with self.assertWarnsMessage(RemovedInDjango70Warning, self.msg):
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, self.msg):
             self.assertSequenceEqual(qs, [self.obj])
 
     def test_case_when(self):
         qs = NullableJSONModel.objects.annotate(
             has_json_null=Case(When(value=None, then=Value(True)), default=Value(False))
         ).filter(has_json_null=True)
-        with self.assertWarnsMessage(RemovedInDjango70Warning, self.msg):
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, self.msg):
             self.assertSequenceEqual(qs, [self.obj])

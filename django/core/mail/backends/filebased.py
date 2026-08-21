@@ -17,7 +17,7 @@ class EmailBackend(ConsoleEmailBackend):
         kwargs["stream"] = None
         super().__init__(fail_silently=fail_silently, **kwargs)
 
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         if self.alias is None:
             # Use deprecated settings when MAILERS not enabled.
             if file_path is not None:

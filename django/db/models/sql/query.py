@@ -43,7 +43,7 @@ from django.db.models.query_utils import (
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
 from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
 from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.tree import Node
@@ -51,7 +51,7 @@ from django.utils.warnings import django_file_prefixes
 
 __all__ = ["Query", "RawQuery"]
 
-# RemovedInDjango70Warning: When the deprecation ends, replace with:
+# RemovedInDjango2028Warning: When the deprecation ends, replace with:
 # Quotation marks ('"`[]), whitespace characters, control characters,
 # semicolons, percent signs, hashes, or inline SQL comments are
 # forbidden in column aliases.
@@ -1220,18 +1220,18 @@ class Query(BaseExpression):
         return alias or seen[None]
 
     def check_alias(self, alias):
-        # RemovedInDjango70Warning: When the deprecation ends, remove.
+        # RemovedInDjango2028Warning: When the deprecation ends, remove.
         if "%" in alias:
             warnings.warn(
                 "Using percent signs in a column alias is deprecated.",
-                category=RemovedInDjango70Warning,
+                category=RemovedInDjango2028Warning,
                 skip_file_prefixes=django_file_prefixes(),
             )
         if FORBIDDEN_ALIAS_PATTERN.search(alias):
             raise ValueError(
                 "Column aliases cannot contain whitespace characters, hashes, "
-                # RemovedInDjango70Warning: When the deprecation ends, replace
-                # with:
+                # RemovedInDjango2028Warning: When the deprecation ends,
+                # replace with:
                 # "control characters, quotation marks, semicolons, percent "
                 # "signs, or SQL comments."
                 "control characters, quotation marks, semicolons, or SQL comments."
