@@ -226,6 +226,18 @@ class GEOSGeometryBase(GEOSBase):
         return self.num_coords
 
     @property
+    def num_dims(self):
+        """Return the number of dimensions used in this Geometry."""
+        # TODO add tests for this function
+        # TODO could be empty?
+        if self.hasz and self.hasm:
+            return 4
+        if self.hasz or self.hasm:
+            return 3
+        else:
+            return 2
+
+    @property
     def dims(self):
         "Return the dimension of this Geometry (0=point, 1=line, 2=surface)."
         return capi.get_dims(self.ptr)
@@ -406,7 +418,7 @@ class GEOSGeometryBase(GEOSBase):
     @property
     def wkt(self):
         "Return the WKT (Well-Known Text) representation of this Geometry."
-        return wkt_w(dim=3 if self.hasz else 2, trim=True).write(self).decode()
+        return wkt_w(dim=self.num_dims, trim=True).write(self).decode()
 
     @property
     def hex(self):
@@ -417,7 +429,7 @@ class GEOSGeometryBase(GEOSBase):
         """
         # A possible faster, all-python, implementation:
         #  str(self.wkb).encode('hex')
-        return wkb_w(dim=3 if self.hasz else 2).write_hex(self)
+        return wkb_w(dim=self.num_dims).write_hex(self)
 
     @property
     def hexewkb(self):
@@ -426,7 +438,7 @@ class GEOSGeometryBase(GEOSBase):
         extension of the WKB specification that includes SRID value that are
         a part of this geometry.
         """
-        return ewkb_w(dim=3 if self.hasz else 2).write_hex(self)
+        return ewkb_w(dim=self.num_dims).write_hex(self)
 
     @property
     def json(self):
@@ -444,7 +456,7 @@ class GEOSGeometryBase(GEOSBase):
         as a Python memoryview. SRID and Z values are not included, use the
         `ewkb` property instead.
         """
-        return wkb_w(3 if self.hasz else 2).write(self)
+        return wkb_w(dim=self.num_dims).write(self)
 
     @property
     def ewkb(self):
@@ -453,7 +465,7 @@ class GEOSGeometryBase(GEOSBase):
         This is an extension of the WKB specification that includes any SRID
         value that are a part of this geometry.
         """
-        return ewkb_w(3 if self.hasz else 2).write(self)
+        return ewkb_w(dim=self.num_dims).write(self)
 
     @property
     def kml(self):

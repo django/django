@@ -125,8 +125,8 @@ class GEOSIOTest(SimpleTestCase):
         wkb3d_srid = memoryview(binascii.a2b_hex(hex3d_srid))
 
         # Ensuring bad output dimensions are not accepted
-        msg = "WKB output dimension must be 2 or 3"
-        for bad_outdim in (-1, 0, 1, 4, 423, "foo", None):
+        msg = "WKB output dimension must be 2, 3, or 4"
+        for bad_outdim in (-1, 0, 1, 423, "foo", None):
             with (
                 self.subTest(bad_outdim=bad_outdim),
                 self.assertRaisesMessage(ValueError, msg),
