@@ -67,6 +67,21 @@ class ConditionalGet(SimpleTestCase):
         response = self.client.get("/condition/")
         self.assertEqual(response.status_code, 412)
 
+    def test_if_unmodified_since_without_last_modified(self):
+        # If the resource has no modification date, an If-Unmodified-Since
+        # header must be ignored (RFC 9110 Section 13.1.4).
+        for header in (
+            LAST_MODIFIED_STR,
+            EXPIRED_LAST_MODIFIED_STR,
+            LAST_MODIFIED_INVALID_STR,
+        ):
+            with self.subTest(header=header):
+                self.client.defaults["HTTP_IF_UNMODIFIED_SINCE"] = header
+                response = self.client.get("/condition/etag/")
+                self.assertFullResponse(response, check_last_modified=False)
+                response = self.client.put("/condition/etag/")
+                self.assertFullResponse(response, check_last_modified=False)
+
     def test_if_none_match(self):
         self.client.defaults["HTTP_IF_NONE_MATCH"] = ETAG
         response = self.client.get("/condition/")
@@ -227,8 +242,10 @@ class ConditionalGet(SimpleTestCase):
         self.client.defaults["HTTP_IF_UNMODIFIED_SINCE"] = EXPIRED_LAST_MODIFIED_STR
         response = self.client.get("/condition/last_modified/")
         self.assertEqual(response.status_code, 412)
+        # No Last-Modified, so If-Unmodified-Since is ignored (RFC 9110
+        # Section 13.1.4).
         response = self.client.get("/condition/etag/")
-        self.assertEqual(response.status_code, 412)
+        self.assertFullResponse(response, check_last_modified=False)
 
     def test_single_condition_8(self):
         self.client.defaults["HTTP_IF_UNMODIFIED_SINCE"] = LAST_MODIFIED_STR
@@ -239,8 +256,10 @@ class ConditionalGet(SimpleTestCase):
         self.client.defaults["HTTP_IF_UNMODIFIED_SINCE"] = EXPIRED_LAST_MODIFIED_STR
         response = self.client.get("/condition/last_modified2/")
         self.assertEqual(response.status_code, 412)
+        # No Last-Modified, so If-Unmodified-Since is ignored (RFC 9110
+        # Section 13.1.4).
         response = self.client.get("/condition/etag2/")
-        self.assertEqual(response.status_code, 412)
+        self.assertFullResponse(response, check_last_modified=False)
 
     def test_single_condition_head(self):
         self.client.defaults["HTTP_IF_MODIFIED_SINCE"] = LAST_MODIFIED_STR
