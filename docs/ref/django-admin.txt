@@ -84,6 +84,16 @@ notification and debug information that ``django-admin`` prints to the console.
 Available commands
 ==================
 
+.. admonition:: There are community-maintained solutions!
+
+    Django has a vibrant ecosystem. There are email backends
+    highlighted on the `Community Ecosystem`_ page. The Django Packages
+    `Developer Tools grid`_ has even more options for you!
+
+.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#debugging-development-tools
+.. _Developer Tools grid: https://djangopackages.org/grids/g/developer-tools/
+
+
 ``check``
 ---------
 
