@@ -818,6 +818,14 @@ def create_reverse_many_to_one_manager(superclass, rel):
                         "length of 1."
                     )
                 queryset = querysets[0]
+                if not issubclass(queryset.model, self.model):
+                    raise ValueError(
+                        'Cannot use QuerySet for "%s": Use a QuerySet for "%s".'
+                        % (
+                            queryset.model._meta.label,
+                            self.model._meta.label,
+                        )
+                    )
             else:
                 _cloning_disabled = True
                 queryset = super().get_queryset()._disable_cloning()
