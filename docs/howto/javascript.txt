@@ -1,0 +1,360 @@
+=================================================
+How to get Django and JavaScript to work together
+=================================================
+
+There tend to be two broad problems to solve when working with Django and
+JavaScript:
+
+* getting your JavaScript to the browser
+* communicating between your Django and JavaScript code
+
+This guide shows how Django and its ecosystem can help with both. We'll build
+on the polls application from the :doc:`tutorial </intro/tutorial01>` in the
+examples that follow.
+
+How to add JavaScript to your pages
+===================================
+
+The basic building block is the :ttag:`static` template tag for referencing
+your JavaScript files. For example, to add JavaScript to the polls app:
+
+.. code-block:: html+django
+
+    <script src="{% static 'polls/js/vote.js' %}" defer></script>
+
+* The file sits under ``polls/static/polls/js/`` so it's namespaced to
+  the polls app (see :doc:`/howto/static-files/index`). You could also add
+  the file to a folder in :setting:`STATICFILES_DIRS`.
+* The ``defer`` attribute tells the browser to run the script after the HTML
+  is parsed; see `MDN
+  <https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script#defer>`_.
+* If your site sends a ``Content-Security-Policy``, add the
+  :ttag:`csp_nonce_attr` template tag so the script is permitted (see
+  :doc:`/howto/csp`).
+
+As your own JavaScript grows, split it across files using `native ES modules
+<https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules>`_.
+Use ``import``/``export`` and load the entry point with ``type="module"``:
+
+.. code-block:: html+django
+
+    <script type="module" src="{% static 'polls/js/main.js' %}"></script>
+
+.. note::
+
+    To rewrite the hashed file names referenced in ``import`` statements,
+    override
+    :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
+    with a subclass that sets ``support_js_module_import_aggregation`` to
+    ``True`` or map the names yourself with an `importmap
+    <https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script/type/importmap>`_.
+
+You can load a JavaScript library straight from a CDN, or manually download
+and copy it to your static files.
+
+If you are using a JavaScript `package manager
+<https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Client-side_tools/Package_management>`_,
+you will need to link the installed libraries to your static files:
+
+* To deliver the library files unchanged, let static files read from where
+  they're installed (usually ``node_modules``); the Django ecosystem provides
+  `packages that help with this
+  <https://djangopackages.org/grids/g/javascript-tooling/>`_.
+* Or, more commonly, to combine, convert, or tree-shake your libraries (and
+  your own code), use a build tool whose output goes to a folder in the static
+  files tree.
+
+Either way, the files end up in your static files tree, so
+:djadmin:`collectstatic` gathers them for
+:doc:`deployment </howto/static-files/deployment>` like any other static
+file.
+
+.. _javascript-hmr:
+
+.. note::
+
+    Many build tools also provide a development server with features like
+    Hot Module Replacement (HMR), allowing your front-end to update as you
+    change your development files. To integrate this with Django, look for a
+    package that supports your build tool in the comparison linked above.
+
+How to communicate between Django and JavaScript
+================================================
+
+How to update part of a page without a full reload
+--------------------------------------------------
+
+You can use JavaScript to make requests to a Django view and handle its
+responses. Consider the following update to the polls tutorial.
+
+.. code-block:: html+django
+    :caption: ``polls/templates/polls/results.html``
+
+    <h1>{{ question.question_text }}</h1>
+
+    {% partialdef results-list inline %}
+    <ul id="results">
+    {% for choice in question.choice_set.all %}
+        <li>{{ choice.choice_text }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li>
+    {% endfor %}
+    </ul>
+    {% endpartialdef %}
+
+.. code-block:: html+django
+    :caption: ``polls/templates/polls/detail.html``
+
+    {# Form as in the tutorial (with id="vote-form"), plus load static and: #}
+    <div id="results"></div>
+    <script src="{% static 'polls/js/vote.js' %}" defer></script>
+
+.. code-block:: javascript
+    :caption: ``polls/static/polls/js/vote.js``
+
+    const form = document.getElementById("vote-form");
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const response = await fetch(form.action, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken"),
+                "X-Requested-With": "XMLHttpRequest",
+            },
+            mode: "same-origin",
+            body: new FormData(form),
+        });
+        document.getElementById("results").outerHTML = await response.text();
+    });
+
+The ``getCookie()`` helper is the one from
+:ref:`the CSRF documentation <acquiring-csrf-token-from-cookie>`.
+
+.. code-block:: python
+    :caption: ``polls/views.py``
+
+    def vote(request, question_id):
+        question = get_object_or_404(Question, pk=question_id)
+        try:
+            selected_choice = question.choice_set.get(pk=request.POST["choice"])
+        except (KeyError, Choice.DoesNotExist):
+            return render(request, "polls/detail.html", {...})  # as in the tutorial
+        selected_choice.votes = F("votes") + 1
+        selected_choice.save()
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            # fetch() submission: return the updated fragment, no redirect needed
+            # (no navigation occurs, so there's no back-button resubmission to guard
+            # against).
+            return render(
+                request, "polls/results.html#results-list", {"question": question}
+            )
+        # Plain form submission: Post/Redirect/Get, as in the tutorial.
+        return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
+
+This technique uses :ref:`partials <template-partials>` from the Django
+templating engine to send only the body of the results page as the response.
+JavaScript overrides the form submission and sends it to the same view,
+but with an additional identifier the view can use to choose a response path.
+
+This pattern is common enough that several JavaScript libraries handle the
+request and partial swap logic for you. Some even let you declare the behavior
+with HTML attributes, saving you from writing any JavaScript.
+
+How to mount a JavaScript component
+-----------------------------------
+
+Another common pattern is for the JavaScript to take over rendering a section
+of the page.
+
+.. code-block:: html+django
+    :caption: ``polls/templates/polls/detail.html``
+
+    <h1>{{ question.question_text }}</h1>
+    <results-widget>
+        {{ results_data|json_script }}
+    </results-widget>
+    <script src="{% static 'polls/js/results-widget.js' %}" defer></script>
+
+The :tfilter:`json_script` filter safely outputs the data for the JavaScript
+to read.
+
+.. code-block:: javascript
+    :caption: ``polls/static/polls/js/results-widget.js``
+
+    class ResultsWidget extends HTMLElement {
+        connectedCallback() {
+            const source = this.querySelector("script[type='application/json']");
+            this.data = JSON.parse(source.textContent);
+
+            // Delegate on the element itself, which survives each render()
+            // replacing its contents.
+            this.addEventListener("click", (event) => {
+                const button = event.target.closest("button[data-choice]");
+                if (button) {
+                    this.vote(button.dataset.choice);
+                }
+            });
+
+            this.render(this.data);
+        }
+
+        render({choices}) {
+            const list = document.createElement("ul");
+            for (const choice of choices) {
+                const item = document.createElement("li");
+                const button = document.createElement("button");
+                button.dataset.choice = choice.id;
+                button.textContent = choice.text;
+                item.append(button, ` -- ${choice.votes}`);
+                list.append(item);
+            }
+            this.replaceChildren(list);
+        }
+
+        async vote(choiceId) {
+            const response = await fetch(this.data.voteUrl, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json",
+                },
+                mode: "same-origin",
+                body: JSON.stringify({choice: choiceId}),
+            });
+            this.render(await response.json());
+        }
+    }
+
+    customElements.define("results-widget", ResultsWidget);
+
+The details page continues to be served by a Django view. The view is reworked
+to also pass a ``results_data`` object into the context for the `web component
+<https://developer.mozilla.org/en-US/docs/Web/API/Web_components>`_ to render.
+The vote view is changed to a JSON endpoint using
+:class:`~django.http.JsonResponse`, which updates the vote and returns the new
+state.
+
+.. code-block:: python
+    :caption: ``polls/views.py``
+
+    # Imports added to the tutorial's views.py.
+    import json
+
+    from django.http import JsonResponse
+    from django.views.decorators.http import require_POST
+
+
+    def results_data(question):
+        return {
+            "voteUrl": reverse("polls:vote_json", args=(question.id,)),
+            "choices": [
+                {"id": c.id, "text": c.choice_text, "votes": c.votes}
+                for c in question.choice_set.all()
+            ],
+        }
+
+
+    def detail(request, question_id):
+        question = get_object_or_404(Question, pk=question_id)
+        return render(
+            request,
+            "polls/detail.html",
+            {"question": question, "results_data": results_data(question)},
+        )
+
+
+    @require_POST
+    def vote_json(request, question_id):
+        question = get_object_or_404(Question, pk=question_id)
+        try:
+            choice_id = json.loads(request.body)["choice"]
+            selected_choice = question.choice_set.get(pk=choice_id)
+        except (json.JSONDecodeError, KeyError, Choice.DoesNotExist):
+            return JsonResponse({"error": "Choice does not exist."}, status=400)
+        selected_choice.votes = F("votes") + 1
+        selected_choice.save()
+        return JsonResponse(results_data(question))
+
+.. code-block:: python
+    :caption: ``polls/urls.py``
+
+    # Added to the tutorial's urlpatterns.
+    path("api/<int:question_id>/vote/", views.vote_json, name="vote_json"),
+
+As the data you are passing gets more detailed, you can look to the `ecosystem
+for a third-party package to help build an API for your models
+<https://www.djangoproject.com/community/ecosystem/#api-development>`_.
+
+How to serve a JavaScript front-end against a Django API
+--------------------------------------------------------
+
+If the front-end is rendered entirely in JavaScript (a single-page app), with
+Django serving the API, you can still serve the entry view via Django. Add a
+catch-all URL pattern with :func:`~django.urls.re_path` pointing at a
+:class:`~django.views.generic.base.TemplateView` for the client-side routing,
+and place it last so it doesn't capture your API or admin:
+
+.. code-block:: python
+    :caption: ``urls.py``
+
+    re_path(r"^.*$", TemplateView.as_view(template_name="index.html")),
+
+As before, place the JavaScript build tool's output somewhere staticfiles can
+collect, and use the ecosystem to :ref:`enable HMR <javascript-hmr>` in
+development.
+
+Alternatively, you can use the serving infrastructure of your SPA framework,
+in which case you will get HMR for free. You'll have to adjust how you pass
+the ``csrftoken`` though:
+
+* Set it on the first view the app calls with
+  :func:`~django.views.decorators.csrf.ensure_csrf_cookie`.
+* Read the token from the cookie on each request since it rotates on login.
+
+The bigger issue then is how to deal with two origins, ``localhost:8000`` and
+``localhost:9000``, in development. By default, browsers won't let JavaScript
+read from a different origin and CSRF won't work out of the box across two
+origins either. There are two possible solutions:
+
+* proxy requests so they come from one origin (your JavaScript framework's
+  serving infrastructure can typically proxy API requests to your Django
+  development server)
+* configure your system to handle two different origins
+
+It's a good idea to pick the one closest to your production setup. In
+production you can still serve everything from the same origin, either by
+using Django as above or configuring one reverse proxy for both Django and
+JavaScript.
+
+If you do need to serve the front-end from a different origin, then you
+will need to configure two things: CORS and CSRF.
+
+For `CORS <https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS>`_,
+set the appropriate headers on your Django responses. Typically you'd do this
+with a middleware and there are `packages in the ecosystem that help with this
+<https://www.djangoproject.com/community/ecosystem/#security-middleware>`_.
+
+.. code-block:: text
+
+    Access-Control-Allow-Origin: http://localhost:9000
+    Access-Control-Allow-Credentials: true
+
+Then configure :doc:`CSRF </ref/csrf>` for the two origins:
+
+* Configure :setting:`CSRF_TRUSTED_ORIGINS` ``= ["http://localhost:9000"]``.
+* In a production setup, with ``app.example.com`` and ``api.example.com``,
+  add :setting:`CSRF_COOKIE_DOMAIN` ``= ".example.com"`` too.
+* Each JavaScript ``fetch`` must send ``credentials: "include"``.
+
+The above configuration also suffices for
+:doc:`authentication </topics/auth/index>` across the two origins. The session
+cookies require those CORS headers and the fetch credentials.
+
+.. warning::
+
+    If you are using different domains, not just different subdomains, this all
+    becomes increasingly unworkable. The browser treats the cookies as
+    third-party, and the security restrictions placed on them make it difficult
+    to keep using Django's session-based auth. The alternative is token auth,
+    which you may already be using for any mobile app that consumes the API.
+    Your API package will support it, but token auth shifts more security
+    responsibility onto you than the default session cookies do, so read its
+    documentation closely.
