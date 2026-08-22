@@ -1,3 +1,4 @@
+import copy
 from inspect import getattr_static, unwrap
 
 from django.contrib.sites.shortcuts import get_current_site
@@ -10,6 +11,7 @@ from django.utils.html import escape
 from django.utils.http import http_date
 from django.utils.timezone import get_default_timezone, is_naive, make_aware
 from django.utils.translation import get_language
+from django.views import View
 
 
 def add_domain(domain, url, secure=False):
@@ -26,13 +28,18 @@ class FeedDoesNotExist(ObjectDoesNotExist):
     pass
 
 
-class Feed:
+class Feed(View):
     feed_type = feedgenerator.DefaultFeed
     title_template = None
     description_template = None
     language = None
 
     def __call__(self, request, *args, **kwargs):
+        view = copy.copy(self)
+        view.setup(request, *args, **kwargs)
+        return view.dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
         try:
             obj = self.get_object(request, *args, **kwargs)
         except ObjectDoesNotExist:

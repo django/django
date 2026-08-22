@@ -27,8 +27,7 @@ Overview
 The high-level feed-generating framework is supplied by the
 :class:`~django.contrib.syndication.views.Feed` class. To create a
 feed, write a :class:`~django.contrib.syndication.views.Feed` class
-and point to an instance of it in your :doc:`URLconf
-</topics/http/urls>`.
+and route a URL to it in your :doc:`URLconf </topics/http/urls>`.
 
 ``Feed`` classes
 ----------------
@@ -41,9 +40,6 @@ a particular category, where the category is variable).
 
 Feed classes subclass :class:`django.contrib.syndication.views.Feed`.
 They can live anywhere in your codebase.
-
-Instances of :class:`~django.contrib.syndication.views.Feed` classes
-are views which can be used in your :doc:`URLconf </topics/http/urls>`.
 
 A simple example
 ----------------
@@ -74,21 +70,19 @@ a feed of the latest five news items::
         def item_link(self, item):
             return reverse("news-item", args=[item.pk])
 
-To connect a URL to this feed, put an instance of the Feed object in
-your :doc:`URLconf </topics/http/urls>`. For example::
+To connect a URL to this feed, use ``as_view()`` in your :doc:`URLconf
+</topics/http/urls>`. For example::
 
     from django.urls import path
     from myproject.feeds import LatestEntriesFeed
 
     urlpatterns = [
         # ...
-        path("latest/feed/", LatestEntriesFeed()),
+        path("latest/feed/", LatestEntriesFeed.as_view()),
         # ...
     ]
 
 Note:
-
-* The Feed class subclasses :class:`django.contrib.syndication.views.Feed`.
 
 * ``title``, ``link`` and ``description`` correspond to the
   standard RSS ``<title>``, ``<link>`` and ``<description>`` elements,
@@ -104,6 +98,11 @@ Note:
 * If you're creating an Atom feed, rather than an RSS feed, set the
   ``subtitle`` attribute instead of the ``description`` attribute.
   See `Publishing Atom and RSS feeds in tandem`_, later, for an example.
+
+.. versionchanged:: 6.2
+
+    ``Feed`` became a subclass of :class:`~django.views.generic.base.View`.
+    Putting an instance in the URLconf still works.
 
 One thing is left to do. In an RSS feed, each ``<item>`` has a ``<title>``,
 ``<link>`` and ``<description>``. We need to tell the framework what data to
@@ -217,10 +216,15 @@ The police beat feeds could be accessible via URLs like this:
 
 These can be matched with a :doc:`URLconf </topics/http/urls>` line such as::
 
-    path("beats/<int:beat_id>/rss/", BeatFeed()),
+    path("beats/<int:beat_id>/rss/", BeatFeed.as_view()),
 
-Like a view, the arguments in the URL are passed to the ``get_object()``
-method along with the request object.
+The URL arguments and the request are passed to ``get_object()``. They are
+also available on every method as ``self.args``, ``self.kwargs``, and
+``self.request``.
+
+.. versionadded:: 6.2
+
+    ``self.request``, ``self.args``, and ``self.kwargs``.
 
 Here's the code for these beat-specific feeds::
 
@@ -376,8 +380,8 @@ And the accompanying URLconf::
 
     urlpatterns = [
         # ...
-        path("sitenews/rss/", RssSiteNewsFeed()),
-        path("sitenews/atom/", AtomSiteNewsFeed()),
+        path("sitenews/rss/", RssSiteNewsFeed.as_view()),
+        path("sitenews/atom/", AtomSiteNewsFeed.as_view()),
         # ...
     ]
 

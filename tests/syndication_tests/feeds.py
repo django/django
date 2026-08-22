@@ -2,7 +2,9 @@ from functools import wraps
 
 from django.contrib.syndication import views
 from django.utils import feedgenerator
+from django.utils.decorators import method_decorator
 from django.utils.timezone import get_fixed_timezone
+from django.views.decorators.vary import vary_on_headers
 
 from .models import Article, Entry
 
@@ -327,3 +329,13 @@ class TestInvalidAtomFeed(TestAtomFeed):
     def item_categories(self):
         # This control character is not serializable.
         return ["\x00"]
+
+
+@method_decorator(vary_on_headers("Accept"), name="dispatch")
+class TestRss2FeedWithDecoratedDispatch(TestRss2Feed):
+    pass
+
+
+class TestRss2FeedWithRequest(TestRss2Feed):
+    def title(self):
+        return f"My blog at {self.request.path}"

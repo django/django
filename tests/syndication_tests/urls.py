@@ -4,6 +4,15 @@ from . import feeds
 
 urlpatterns = [
     path("syndication/rss2/", feeds.TestRss2Feed()),
+    path("syndication/rss2/with-request/", feeds.TestRss2FeedWithRequest()),
+    path(
+        "syndication/rss2/with-request-as-view/",
+        feeds.TestRss2FeedWithRequest.as_view(),
+    ),
+    path(
+        "syndication/rss2/with-decorated-dispatch/",
+        feeds.TestRss2FeedWithDecoratedDispatch(),
+    ),
     path(
         "syndication/rss2/with-callable-object/", feeds.TestRss2FeedWithCallableObject()
     ),

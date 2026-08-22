@@ -99,7 +99,9 @@ Minor features
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :class:`~django.contrib.syndication.views.Feed` now subclasses
+  :class:`~django.views.generic.base.View`, so feeds support ``as_view()``,
+  :func:`~django.utils.decorators.method_decorator`, and ``self.request``.
 
 Asynchronous views
 ~~~~~~~~~~~~~~~~~~
@@ -285,6 +287,13 @@ backends.
 * The seconds value returned by
   :meth:`~django.contrib.gis.gdal.Field.as_datetime` is now a ``c_float``
   rather than a ``c_int``.
+
+:mod:`django.contrib.syndication`
+---------------------------------
+
+* The :class:`~django.contrib.syndication.views.Feed` no longer renders a feed
+  for non-``GET`` requests. It now follows the default behavior of class-based
+  views.
 
 Tests
 -----
