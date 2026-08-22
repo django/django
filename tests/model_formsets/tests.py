@@ -171,6 +171,59 @@ class ModelFormsetTest(TestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, message):
             modelformset_factory(Author)
 
+    def test_overridden_add_prefix(self):
+        class AuthorForm(forms.ModelForm):
+            class Meta:
+                model = Author
+                fields = "__all__"
+
+            def add_prefix(self, field_name):
+                return (
+                    "%s.%s" % (self.prefix, field_name) if self.prefix else field_name
+                )
+
+        author = Author.objects.create(name="Charles Baudelaire")
+        FormSet = modelformset_factory(Author, form=AuthorForm, fields="__all__")
+        data = {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "1",
+            "form-MAX_NUM_FORMS": "0",
+            "form-0.id": str(author.pk),
+            "form-0.name": "Charles P. Baudelaire",
+        }
+        formset = FormSet(data, queryset=Author.objects.all())
+        self.assertTrue(formset.is_valid())
+        self.assertEqual(formset[0].instance.pk, author.pk)
+        formset.save()
+        author.refresh_from_db()
+        self.assertEqual(author.name, "Charles P. Baudelaire")
+
+    def test_default_add_prefix_instantiates_form_once(self):
+        instantiations = 0
+
+        class AuthorForm(forms.ModelForm):
+            class Meta:
+                model = Author
+                fields = "__all__"
+
+            def __init__(self, *args, **kwargs):
+                nonlocal instantiations
+                instantiations += 1
+                super().__init__(*args, **kwargs)
+
+        author = Author.objects.create(name="Charles Baudelaire")
+        FormSet = modelformset_factory(Author, form=AuthorForm, fields="__all__")
+        data = {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "1",
+            "form-MAX_NUM_FORMS": "0",
+            "form-0-id": str(author.pk),
+            "form-0-name": "Charles Baudelaire",
+        }
+        formset = FormSet(data, queryset=Author.objects.all())
+        self.assertTrue(formset.is_valid())
+        self.assertEqual(instantiations, 1)
+
     def test_simple_save(self):
         qs = Author.objects.all()
         AuthorFormSet = modelformset_factory(Author, fields="__all__", extra=3)
