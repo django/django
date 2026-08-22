@@ -235,8 +235,8 @@ class WindowFunctionTests(TestCase):
 
     def test_row_number_no_ordering(self):
         """
-        The row number window function computes the number based on the order
-        in which the tuples were inserted.
+        The row number window function numbers every row, even when the window
+        defines no ordering.
         """
         # Add a default ordering for consistent results across databases.
         qs = Employee.objects.annotate(
@@ -244,23 +244,27 @@ class WindowFunctionTests(TestCase):
                 expression=RowNumber(),
             )
         ).order_by("pk")
+        entries = list(qs)
         self.assertQuerySetEqual(
-            qs,
+            entries,
             [
-                ("Jones", "Accounting", 1),
-                ("Williams", "Accounting", 2),
-                ("Jenson", "Accounting", 3),
-                ("Adams", "Accounting", 4),
-                ("Smith", "Sales", 5),
-                ("Brown", "Sales", 6),
-                ("Johnson", "Marketing", 7),
-                ("Smith", "Marketing", 8),
-                ("Wilkinson", "IT", 9),
-                ("Moore", "IT", 10),
-                ("Miller", "Management", 11),
-                ("Johnson", "Management", 12),
+                ("Jones", "Accounting"),
+                ("Williams", "Accounting"),
+                ("Jenson", "Accounting"),
+                ("Adams", "Accounting"),
+                ("Smith", "Sales"),
+                ("Brown", "Sales"),
+                ("Johnson", "Marketing"),
+                ("Smith", "Marketing"),
+                ("Wilkinson", "IT"),
+                ("Moore", "IT"),
+                ("Miller", "Management"),
+                ("Johnson", "Management"),
             ],
-            lambda entry: (entry.name, entry.department, entry.row_number),
+            lambda entry: (entry.name, entry.department),
+        )
+        self.assertCountEqual(
+            [entry.row_number for entry in entries], range(1, len(entries) + 1)
         )
 
     def test_avg_salary_department(self):

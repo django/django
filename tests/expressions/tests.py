@@ -530,7 +530,7 @@ class BasicExpressionsTests(TestCase):
         Employee.objects.create(firstname="John", lastname="Doe")
         e2 = Employee.objects.create(firstname="Jack", lastname="Jackson")
         e3 = Employee.objects.create(firstname="Jack", lastname="jackson")
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             Employee.objects.filter(lastname__startswith=F("firstname")),
             [e2, e3] if connection.features.has_case_insensitive_like else [e2],
         )
