@@ -411,3 +411,14 @@ class UUIDChild(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     title = models.CharField(max_length=128)
     parent = models.ForeignKey(UUIDParent, on_delete=models.CASCADE)
+
+
+class Playlist(models.Model):
+    favourites = models.ManyToManyField(
+        "Track", related_name="favourited_in", blank=True
+    )
+
+
+class Track(models.Model):
+    name = models.CharField(max_length=50)
+    playlist = models.ForeignKey(Playlist, models.CASCADE)

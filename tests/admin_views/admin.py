@@ -61,6 +61,7 @@ from .models import (
     CyclicTwo,
     DependentChild,
     DooHickey,
+    EditableTopping,
     EmptyModelHidden,
     EmptyModelMixin,
     EmptyModelVisible,
@@ -734,6 +735,11 @@ class ToppingAdmin(admin.ModelAdmin):
     readonly_fields = ("pizzas",)
 
 
+class EditableToppingAdmin(admin.ModelAdmin):
+    fields = ["name", "pizzas"]
+    filter_horizontal = ["pizzas"]
+
+
 class PizzaAdmin(admin.ModelAdmin):
     readonly_fields = ("toppings",)
 
@@ -1402,6 +1408,7 @@ site.register(ReadOnlyPizza, ReadOnlyPizzaAdmin)
 site.register(ReadablePizza)
 site.register(Course, CourseAdmin)
 site.register(Topping, ToppingAdmin)
+site.register(EditableTopping, EditableToppingAdmin)
 site.register(Album, AlbumAdmin)
 site.register(Song)
 site.register(Question, QuestionAdmin)
