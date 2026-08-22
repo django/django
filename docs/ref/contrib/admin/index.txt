@@ -342,6 +342,26 @@ subclass::
     order as the fields are defined in the model, followed by any fields
     defined in :attr:`~ModelAdmin.readonly_fields`.
 
+    ``fields`` can also contain the name of a reverse many-to-many relation,
+    which makes the relation editable from the model that doesn't define the
+    :class:`~django.db.models.ManyToManyField`. In this example, ``Pizza``
+    defines the field and ``ToppingAdmin`` edits it from the other side::
+
+        class Pizza(models.Model):
+            toppings = models.ManyToManyField(Topping, related_name="pizzas")
+
+
+        class ToppingAdmin(admin.ModelAdmin):
+            fields = ["name", "pizzas"]
+            filter_horizontal = ["pizzas"]
+
+    A relation without a reverse accessor, such as a symmetrical
+    :class:`~django.db.models.ManyToManyField` to ``"self"``, can't be used.
+
+    .. versionchanged:: 6.2
+
+        Support for reverse many-to-many relations was added.
+
 .. attribute:: ModelAdmin.fieldsets
 
     Set ``fieldsets`` to control the layout of admin "add" and "change" pages.
@@ -466,6 +486,13 @@ subclass::
     within the options. The unselected and selected options appear in two boxes
     side by side. See :attr:`~ModelAdmin.filter_vertical` to use a vertical
     interface.
+
+    This list can also contain a reverse many-to-many relation that
+    :attr:`~ModelAdmin.fields` or :attr:`~ModelAdmin.fieldsets` names.
+
+    .. versionchanged:: 6.2
+
+        Support for reverse many-to-many relations was added.
 
 .. attribute:: ModelAdmin.filter_vertical
 
@@ -2316,6 +2343,14 @@ adds some of its own (the shared features are actually defined in the
 - :meth:`~ModelAdmin.formfield_for_foreignkey`
 - :meth:`~ModelAdmin.formfield_for_manytomany`
 - :meth:`~ModelAdmin.has_module_permission`
+
+As with :attr:`~ModelAdmin.fields` on a ``ModelAdmin``, ``fields`` and
+``fieldsets`` accept the name of a reverse many-to-many relation on the
+inline's own model.
+
+.. versionchanged:: 6.2
+
+    Support for reverse many-to-many relations was added.
 
 The ``InlineModelAdmin`` class adds or customizes:
 

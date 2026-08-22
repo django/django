@@ -24,7 +24,7 @@ from django.db.models import (
     ManyToManyField,
     UUIDField,
 )
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 from django.test.utils import requires_tz_support
 from django.urls import reverse
 from django.utils import translation
@@ -2036,3 +2036,51 @@ class ImageFieldWidgetsPlaywrightTests(AdminWidgetPlaywrightTestCase):
         )
         # "Clear" persists checked.
         self.expect(self.page.locator(f"#{self.clear_checkbox_id}")).to_be_checked()
+
+
+@override_settings(ROOT_URLCONF="admin_widgets.urls")
+class AdminReverseManyToManyTests(TestDataMixin, TestCase):
+    def setUp(self):
+        self.request = RequestFactory().get("/")
+        self.request.user = self.superuser
+
+    def formfield(self, **admin_overrides):
+        attrs = {"fields": ["name", "current_schools"], **admin_overrides}
+        admin_class = type("MyModelAdmin", (admin.ModelAdmin,), attrs)
+        form = admin_class(Student, widget_admin_site).get_form(self.request)
+        return form.base_fields["current_schools"]
+
+    def test_filter_widgets(self):
+        for option, is_stacked in [
+            ("filter_horizontal", False),
+            ("filter_vertical", True),
+        ]:
+            with self.subTest(option=option):
+                ff = self.formfield(**{option: ["current_schools"]})
+                widget = ff.widget.widget
+                self.assertIsInstance(widget, widgets.FilteredSelectMultiple)
+                self.assertIs(widget.is_stacked, is_stacked)
+
+    def test_raw_id_field(self):
+        ff = self.formfield(raw_id_fields=["current_schools"])
+        self.assertIsInstance(ff.widget, widgets.ManyToManyRawIdWidget)
+        self.assertEqual(
+            ff.widget.get_context("current_schools", [], {})["related_url"],
+            "/admin_widgets/school/",
+        )
+
+    def test_autocomplete_field(self):
+        ff = self.formfield(autocomplete_fields=["current_schools"])
+        widget = ff.widget.widget
+        self.assertIsInstance(widget, widgets.AutocompleteSelectMultiple)
+        attrs = widget.build_attrs({})
+        self.assertEqual(attrs["data-app-label"], "admin_widgets")
+        self.assertEqual(attrs["data-model-name"], "student")
+        self.assertEqual(attrs["data-field-name"], "current_schools")
+
+    def test_widget_wrapper_points_at_related_model(self):
+        wrapper = self.formfield().widget
+        self.assertIsInstance(wrapper, widgets.RelatedFieldWidgetWrapper)
+        context = wrapper.get_context("current_schools", [], {})
+        self.assertEqual(context["add_related_url"], "/admin_widgets/school/add/")
+        self.assertIn("_source_model=admin_widgets.student", context["url_params"])

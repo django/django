@@ -37,6 +37,10 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+* :attr:`.ModelAdmin.fields` and :attr:`.ModelAdmin.fieldsets` now support
+  reverse many-to-many relations, which makes a relation editable from the
+  model that doesn't define the ``ManyToManyField``.
+
 * ...
 
 :mod:`django.contrib.admindocs`
@@ -155,6 +159,9 @@ File Uploads
 
 Forms
 ~~~~~
+
+* ``ModelForm`` now supports :ref:`reverse many-to-many relations
+  <modelforms-reverse-many-to-many>` named in ``Meta.fields``.
 
 * ...
 
@@ -317,6 +324,9 @@ Miscellaneous
   thread-sensitive thread, rather than on a shared thread pool, so that
   database connections used during error handling are managed by
   ``close_old_connections()``.
+
+* Private API ``django.forms.models.model_to_dict()`` now returns reverse
+  many-to-many relations named in ``fields``, which it previously ignored.
 
 .. _deprecated-features-6.2:
 
