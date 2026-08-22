@@ -14,12 +14,12 @@ body {
     min-width: 995px;
     max-width: 100em;
     margin: auto;
-    text-align: left;
+    text-align: start;
     padding-top: 16px;
     margin-top: 0;
 }
 #hd {
-    padding: 4px 0 12px 0;
+    padding: 4px 0 12px;
 }
 #bd {
     background: #234f32;
@@ -75,7 +75,7 @@ a.reference em {
 /*** sidebar ***/
 #sidebar div.sphinxsidebarwrapper {
     font-size: 92%;
-    margin-right: 14px;
+    margin-inline-end: 14px;
 }
 #sidebar h3,
 #sidebar h4 {
@@ -98,7 +98,7 @@ a.reference em {
 div.nav {
     margin: 0;
     font-size: 11px;
-    text-align: right;
+    text-align: end;
     color: #487858;
 }
 #hd div.nav {
@@ -113,7 +113,7 @@ div.nav {
 #global-nav {
     position: absolute;
     top: 5px;
-    margin-left: -5px;
+    margin-inline-start: -5px;
     padding: 7px 0;
     color: #263e2b;
 }
@@ -125,7 +125,7 @@ div.nav {
     padding: 0 4px;
 }
 #global-nav a.about {
-    padding-left: 0;
+    padding-inline-start: 0;
 }
 #global-nav:hover {
     color: #fff;
@@ -140,15 +140,16 @@ div.nav {
     position: relative;
 }
 #yui-main div.yui-b {
-    margin: 0 0 0 20px;
+    margin-block: 0;
+    margin-inline: 20px 0;
     background: white;
     color: black;
-    padding: 0.3em 2em 1em 2em;
+    padding: 0.3em 2em 1em;
 }
 
 /*** basic styles ***/
 dd {
-    margin-left: 15px;
+    margin-inline-start: 15px;
 }
 h1,
 h2,
@@ -218,8 +219,7 @@ dl {
 }
 #yui-main div.yui-b img {
     max-width: 50em;
-    margin-left: auto;
-    margin-right: auto;
+    margin-inline: auto;
     display: block;
 }
 caption {
@@ -227,7 +227,7 @@ caption {
     font-weight: bold;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
-    margin-left: 2px;
+    margin-inline-start: 2px;
     text-align: center;
 }
 blockquote {
@@ -237,7 +237,7 @@ blockquote {
         125% / 1.2em "Trebuchet MS",
         sans-serif;
     color: #234f32;
-    border-left: 2px solid #94da3a;
+    border-inline-start: 2px solid #94da3a;
 }
 strong {
     font-weight: bold;
@@ -252,10 +252,10 @@ ins {
 
 /*** lists ***/
 ul {
-    padding-left: 30px;
+    padding-inline-start: 30px;
 }
 ol {
-    padding-left: 30px;
+    padding-inline-start: 30px;
 }
 ol.arabic li {
     list-style-type: decimal;
@@ -274,17 +274,17 @@ ol li {
     margin-bottom: 0.4em;
 }
 ul ul {
-    padding-left: 1.2em;
+    padding-inline-start: 1.2em;
 }
 ul ul ul {
-    padding-left: 1em;
+    padding-inline-start: 1em;
 }
 ul.linklist,
 ul.toc {
-    padding-left: 0;
+    padding-inline-start: 0;
 }
 ul.toc ul {
-    margin-left: 0.6em;
+    margin-inline-start: 0.6em;
 }
 ul.toc ul li {
     list-style-type: square;
@@ -311,7 +311,7 @@ ol.toc li {
     font-size: 125%;
     padding: 0.5em;
     line-height: 1.2em;
-    clear: right;
+    clear: inline-end;
 }
 ol.toc li.b {
     background-color: #e0ffb8;
@@ -322,9 +322,9 @@ ol.toc li a:hover {
 }
 ol.toc span.release-date {
     color: #487858;
-    float: right;
+    float: inline-end;
     font-size: 85%;
-    padding-right: 0.5em;
+    padding-inline-end: 0.5em;
 }
 ol.toc span.comment-count {
     font-size: 75%;
@@ -348,7 +348,7 @@ table.docutils th {
 }
 table.docutils thead th {
     border-bottom: 2px solid #dfdfdf;
-    text-align: left;
+    text-align: start;
     font-weight: bold;
     white-space: nowrap;
 }
@@ -446,15 +446,15 @@ div.literal-block-wrapper pre {
 }
 .note,
 .admonition {
-    padding-left: 65px;
+    padding-inline-start: 65px;
     background: url(docicons-note.png) 0.8em 0.8em no-repeat;
 }
 div.admonition-philosophy {
-    padding-left: 65px;
+    padding-inline-start: 65px;
     background: url(docicons-philosophy.png) 0.8em 0.8em no-repeat;
 }
 div.admonition-behind-the-scenes {
-    padding-left: 65px;
+    padding-inline-start: 65px;
     background: url(docicons-behindscenes.png) 0.8em 0.8em no-repeat;
 }
 .admonition.warning {
@@ -478,7 +478,7 @@ div.deprecated {
 a.headerlink {
     color: #c60f0f;
     font-size: 0.8em;
-    margin-left: 4px;
+    margin-inline-start: 4px;
     opacity: 0;
     text-decoration: none;
 }
@@ -497,7 +497,7 @@ a.headerlink:focus {
 
 /*** index ***/
 table.indextable td {
-    text-align: left;
+    text-align: start;
     vertical-align: top;
 }
 table.indextable dl,

@@ -10,11 +10,12 @@
 }
 
 #index #s-getting-help {
-    float: right;
+    float: inline-end;
     width: 35em;
     background: #e1ece2;
     padding: 1em;
-    margin: 2em 0 2em 2em;
+    margin-block: 2em;
+    margin-inline: 2em 0;
 }
 #index #s-getting-help h2 {
     margin: 0;
@@ -26,7 +27,8 @@
 #index #s-django-documentation div.section div.section {
     background: #e1ece2;
     padding: 1em;
-    margin: 2em 0 2em 40.3em;
+    margin-block: 2em;
+    margin-inline: 40.3em 0;
 }
 #index #s-django-documentation div.section div.section a.reference {
     white-space: nowrap;
@@ -36,7 +38,7 @@
 #index #s-add-on-contrib-applications dl,
 #index #s-solving-specific-problems dl,
 #index #s-reference dl {
-    float: left;
+    float: inline-start;
     width: 41em;
 }
 
@@ -44,5 +46,5 @@
 #index #s-solving-specific-problems,
 #index #s-reference,
 #index #s-and-all-the-rest {
-    clear: left;
+    clear: inline-start;
 }

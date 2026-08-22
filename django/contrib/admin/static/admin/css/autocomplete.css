@@ -51,7 +51,7 @@ select.admin-autocomplete {
     .select2-selection--single
     .select2-selection__clear {
     cursor: pointer;
-    float: right;
+    float: inline-end;
     font-weight: bold;
 }
 
@@ -67,7 +67,7 @@ select.admin-autocomplete {
     height: 26px;
     position: absolute;
     top: 1px;
-    right: 1px;
+    inset-inline-end: 1px;
     width: 20px;
 }
 
@@ -75,29 +75,16 @@ select.admin-autocomplete {
     .select2-selection--single
     .select2-selection__arrow
     b {
-    border-color: #888 transparent transparent transparent;
+    border-color: #888 transparent transparent;
     border-style: solid;
-    border-width: 5px 4px 0 4px;
+    border-width: 5px 4px 0;
     height: 0;
-    left: 50%;
-    margin-left: -4px;
+    inset-inline-start: 50%;
+    margin-inline-start: -4px;
     margin-top: -2px;
     position: absolute;
     top: 50%;
     width: 0;
-}
-
-.select2-container--admin-autocomplete[dir="rtl"]
-    .select2-selection--single
-    .select2-selection__clear {
-    float: left;
-}
-
-.select2-container--admin-autocomplete[dir="rtl"]
-    .select2-selection--single
-    .select2-selection__arrow {
-    left: 1px;
-    right: auto;
 }
 
 .select2-container--admin-autocomplete.select2-container--disabled
@@ -116,8 +103,8 @@ select.admin-autocomplete {
     .select2-selection--single
     .select2-selection__arrow
     b {
-    border-color: transparent transparent #888 transparent;
-    border-width: 0 4px 5px 4px;
+    border-color: transparent transparent #888;
+    border-width: 0 4px 5px;
 }
 
 .select2-container--admin-autocomplete .select2-selection--multiple {
@@ -133,7 +120,8 @@ select.admin-autocomplete {
     box-sizing: border-box;
     list-style: none;
     margin: 0;
-    padding: 0 10px 5px 5px;
+    padding-block: 0 5px;
+    padding-inline: 5px 10px;
     width: 100%;
     display: flex;
     flex-wrap: wrap;
@@ -151,18 +139,18 @@ select.admin-autocomplete {
     .select2-selection__placeholder {
     color: var(--body-quiet-color);
     margin-top: 5px;
-    float: left;
+    float: inline-start;
 }
 
 .select2-container--admin-autocomplete
     .select2-selection--multiple
     .select2-selection__clear {
     cursor: pointer;
-    float: right;
+    float: inline-end;
     font-weight: bold;
     margin: 5px;
     position: absolute;
-    right: 0;
+    inset-inline-end: 0;
 }
 
 .select2-container--admin-autocomplete
@@ -172,8 +160,8 @@ select.admin-autocomplete {
     border: 1px solid var(--border-color);
     border-radius: 4px;
     cursor: default;
-    float: left;
-    margin-right: 5px;
+    float: inline-start;
+    margin-inline-end: 5px;
     margin-top: 5px;
     padding: 0 5px;
 }
@@ -185,7 +173,7 @@ select.admin-autocomplete {
     cursor: pointer;
     display: inline-block;
     font-weight: bold;
-    margin-right: 2px;
+    margin-inline-end: 2px;
 }
 
 .select2-container--admin-autocomplete
@@ -196,28 +184,8 @@ select.admin-autocomplete {
 
 .select2-container--admin-autocomplete[dir="rtl"]
     .select2-selection--multiple
-    .select2-selection__choice,
-.select2-container--admin-autocomplete[dir="rtl"]
-    .select2-selection--multiple
-    .select2-selection__placeholder,
-.select2-container--admin-autocomplete[dir="rtl"]
-    .select2-selection--multiple
     .select2-search--inline {
-    float: right;
-}
-
-.select2-container--admin-autocomplete[dir="rtl"]
-    .select2-selection--multiple
-    .select2-selection__choice {
-    margin-left: 5px;
-    margin-right: auto;
-}
-
-.select2-container--admin-autocomplete[dir="rtl"]
-    .select2-selection--multiple
-    .select2-selection__choice__remove {
-    margin-left: 2px;
-    margin-right: auto;
+    float: inline-start;
 }
 
 .select2-container--admin-autocomplete.select2-container--focus
@@ -241,16 +209,16 @@ select.admin-autocomplete {
     .select2-selection--single,
 .select2-container--admin-autocomplete.select2-container--open.select2-container--above
     .select2-selection--multiple {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
 }
 
 .select2-container--admin-autocomplete.select2-container--open.select2-container--below
     .select2-selection--single,
 .select2-container--admin-autocomplete.select2-container--open.select2-container--below
     .select2-selection--multiple {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
 }
 
 .select2-container--admin-autocomplete .select2-search--dropdown {
@@ -304,22 +272,22 @@ select.admin-autocomplete {
 .select2-container--admin-autocomplete
     .select2-results__option
     .select2-results__option {
-    padding-left: 1em;
+    padding-inline-start: 1em;
 }
 
 .select2-container--admin-autocomplete
     .select2-results__option
     .select2-results__option
     .select2-results__group {
-    padding-left: 0;
+    padding-inline-start: 0;
 }
 
 .select2-container--admin-autocomplete
     .select2-results__option
     .select2-results__option
     .select2-results__option {
-    margin-left: -1em;
-    padding-left: 2em;
+    margin-inline-start: -1em;
+    padding-inline-start: 2em;
 }
 
 .select2-container--admin-autocomplete
@@ -327,18 +295,8 @@ select.admin-autocomplete {
     .select2-results__option
     .select2-results__option
     .select2-results__option {
-    margin-left: -2em;
-    padding-left: 3em;
-}
-
-.select2-container--admin-autocomplete
-    .select2-results__option
-    .select2-results__option
-    .select2-results__option
-    .select2-results__option
-    .select2-results__option {
-    margin-left: -3em;
-    padding-left: 4em;
+    margin-inline-start: -2em;
+    padding-inline-start: 3em;
 }
 
 .select2-container--admin-autocomplete
@@ -346,10 +304,9 @@ select.admin-autocomplete {
     .select2-results__option
     .select2-results__option
     .select2-results__option
-    .select2-results__option
     .select2-results__option {
-    margin-left: -4em;
-    padding-left: 5em;
+    margin-inline-start: -3em;
+    padding-inline-start: 4em;
 }
 
 .select2-container--admin-autocomplete
@@ -358,10 +315,21 @@ select.admin-autocomplete {
     .select2-results__option
     .select2-results__option
     .select2-results__option
+    .select2-results__option {
+    margin-inline-start: -4em;
+    padding-inline-start: 5em;
+}
+
+.select2-container--admin-autocomplete
+    .select2-results__option
+    .select2-results__option
+    .select2-results__option
+    .select2-results__option
+    .select2-results__option
     .select2-results__option
     .select2-results__option {
-    margin-left: -5em;
-    padding-left: 6em;
+    margin-inline-start: -5em;
+    padding-inline-start: 6em;
 }
 
 .select2-container--admin-autocomplete
