@@ -3008,6 +3008,22 @@ Default: ``{}``
 Extra parameters to pass to the Task backend. Available parameters vary
 depending on the Task backend.
 
+.. setting:: TEMPLATE_TAGS_MULTILINE
+
+``TEMPLATE_TAGS_MULTILINE``
+---------------------------
+
+.. versionadded:: 6.2
+
+.. deprecated:: 6.2
+
+Default: ``True``
+
+Set this transitional setting to ``False`` to restore the old behavior where
+template tags, variables, and comments could not span multiple lines. Setting
+it to ``False`` emits a deprecation warning each time a template is compiled.
+This setting will be removed in Django 7.1.
+
 .. setting:: TEMPLATES
 
 ``TEMPLATES``

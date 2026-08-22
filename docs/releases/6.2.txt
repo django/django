@@ -31,6 +31,36 @@ only officially support the latest release of each series.
 What's new in Django 6.2
 ========================
 
+Multi-line template tags, variables, and comments
+-------------------------------------------------
+
+Template tags, variables, and comments may now span multiple lines:
+
+.. code-block:: html+django
+
+    {%
+        load
+            static
+            i18n
+    %}
+
+    {{
+        some_variable
+        | filter1
+        | filter2
+    }}
+
+    {#
+        comment
+    #}
+
+As a consequence, templates that relied on unmatched tag delimiters (such as
+``{%``, ``{{``, or ``{#``) being treated as literal text when the closing
+delimiter appeared on a later line may now render differently or raise
+``TemplateSyntaxError``. The transitional
+:setting:`TEMPLATE_TAGS_MULTILINE` setting allows restoring the old behavior
+during the deprecation period. This setting will be removed in Django 7.1.
+
 Minor features
 --------------
 
@@ -337,3 +367,8 @@ Miscellaneous
   providing a ``chunk_size`` is deprecated. It currently falls back to a
   ``chunk_size`` of 2000, but a ``ValueError`` will be raised in
   Django 7.1.
+
+* The transitional :setting:`TEMPLATE_TAGS_MULTILINE` setting is deprecated.
+  Setting it to ``False`` restores the old behavior where template tags,
+  variables, and comments could not span multiple lines. The setting will be
+  removed in Django 7.1.

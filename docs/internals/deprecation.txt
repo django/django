@@ -23,6 +23,9 @@ details on these changes.
 * Calling ``QuerySet.aiterator()`` after ``prefetch_related()`` without
   providing a ``chunk_size`` will raise :exc:`ValueError`.
 
+* The ``TEMPLATE_TAGS_MULTILINE`` transitional setting will be removed, making
+  multiline template tags mandatory.
+
 .. _deprecation-removed-in-7.0:
 
 7.0

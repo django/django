@@ -56,8 +56,12 @@ import re
 import warnings
 from enum import Enum
 
+from django.conf import settings
 from django.template.context import BaseContext
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import (
+    RemovedInDjango70Warning,
+    RemovedInDjango71Warning,
+)
 from django.utils.formats import localize
 from django.utils.html import conditional_escape
 from django.utils.inspect import getfullargspec, signature
@@ -90,7 +94,10 @@ UNKNOWN_SOURCE = "<unknown source>"
 # Match BLOCK_TAG_*, VARIABLE_TAG_*, and COMMENT_TAG_* tags and capture the
 # entire tag, including start/end delimiters. Using re.compile() is faster
 # than instantiating SimpleLazyObject with _lazy_re_compile().
-tag_re = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})")
+tag_re = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})", re.DOTALL)
+
+# RemovedInDjango71Warning: When the deprecation ends, remove.
+tag_re_legacy = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})")
 
 logger = logging.getLogger("django.template")
 
@@ -416,6 +423,21 @@ class Lexer:
             self.verbatim,
         )
 
+    # RemovedInDjango71Warning: When the deprecation ends, remove this
+    # property.
+    @property
+    def tag_re(self):
+        if settings.TEMPLATE_TAGS_MULTILINE:
+            return tag_re
+        warnings.warn(
+            "Setting TEMPLATE_TAGS_MULTILINE to False is deprecated. The "
+            "setting will be removed in Django 7.1, and template tags will "
+            "always allow multiple lines.",
+            RemovedInDjango71Warning,
+            skip_file_prefixes=django_file_prefixes(),
+        )
+        return tag_re_legacy
+
     def tokenize(self):
         """
         Return a list of tokens from a given template_string.
@@ -423,7 +445,9 @@ class Lexer:
         in_tag = False
         lineno = 1
         result = []
-        for token_string in tag_re.split(self.template_string):
+        # RemovedInDjango71Warning: When the deprecation ends, replace
+        # all usages of self.tag_re with just tag_re
+        for token_string in self.tag_re.split(self.template_string):
             if token_string:
                 result.append(self.create_token(token_string, None, lineno, in_tag))
                 lineno += token_string.count("\n")
@@ -468,7 +492,9 @@ class Lexer:
 class DebugLexer(Lexer):
     def _tag_re_split_positions(self):
         last = 0
-        for match in tag_re.finditer(self.template_string):
+        # RemovedInDjango71Warning: When the deprecation ends, replace
+        # all usages of self.tag_re with just tag_re
+        for match in self.tag_re.finditer(self.template_string):
             start, end = match.span()
             yield last, start
             yield start, end

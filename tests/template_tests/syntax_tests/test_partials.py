@@ -5,7 +5,8 @@ from django.template import (
     VariableDoesNotExist,
 )
 from django.template.base import Token, TokenType
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings, override_settings
+from django.utils.deprecation import RemovedInDjango71Warning
 from django.views.debug import ExceptionReporter
 
 from ..utils import setup
@@ -287,7 +288,6 @@ class PartialTagTests(SimpleTestCase):
             "partialdef_opening_closing_name_mismatch": (
                 "{% partialdef testing-name %}TEST{% endpartialdef invalid %}"
             ),
-            "partialdef_invalid_name": gen_partial_template("with\nnewline"),
             "partialdef_extra_params": (
                 "{% partialdef testing-name inline extra %}TEST{% endpartialdef %}"
             ),
@@ -306,6 +306,72 @@ class PartialTagTests(SimpleTestCase):
         },
     )
     def test_basic_parse_errors(self):
+        for template_name, error_msg in (
+            (
+                "partial_undefined_name",
+                "Partial 'undefined' is not defined in the current template.",
+            ),
+            ("partial_missing_name", "'partial' tag requires a single argument"),
+            ("partial_closing_tag", "Invalid block tag on line 1: 'endpartial'"),
+            ("partialdef_missing_name", "'partialdef' tag requires a name"),
+            ("partialdef_missing_close_tag", "Unclosed tag on line 1: 'partialdef'"),
+            (
+                "partialdef_opening_closing_name_mismatch",
+                "expected 'endpartialdef' or 'endpartialdef testing-name'.",
+            ),
+            ("partialdef_extra_params", "'partialdef' tag takes at most 2 arguments"),
+            (
+                "partialdef_duplicated_names",
+                "Partial 'testing-name' is already defined in the "
+                "'partialdef_duplicated_names' template.",
+            ),
+            (
+                "partialdef_duplicated_nested_names",
+                "Partial 'testing-name' is already defined in the "
+                "'partialdef_duplicated_nested_names' template.",
+            ),
+        ):
+            with (
+                self.subTest(template_name=template_name),
+                self.assertRaisesMessage(TemplateSyntaxError, error_msg),
+            ):
+                self.engine.render_to_string(template_name)
+
+    # RemovedInDjango71Warning: When the deprecation ends, remove this test.
+    @ignore_warnings(category=RemovedInDjango71Warning)
+    @override_settings(TEMPLATE_TAGS_MULTILINE=False)
+    @setup(
+        {
+            "partial_undefined_name": "{% partial undefined %}",
+            "partial_missing_name": "{% partial %}",
+            "partial_closing_tag": (
+                "{% partialdef testing-name %}TEST{% endpartialdef %}"
+                "{% partial testing-name %}{% endpartial %}"
+            ),
+            "partialdef_missing_name": "{% partialdef %}{% endpartialdef %}",
+            "partialdef_missing_close_tag": "{% partialdef name %}TEST",
+            "partialdef_opening_closing_name_mismatch": (
+                "{% partialdef testing-name %}TEST{% endpartialdef invalid %}"
+            ),
+            "partialdef_invalid_name": gen_partial_template("with\nnewline"),
+            "partialdef_extra_params": (
+                "{% partialdef testing-name inline extra %}TEST{% endpartialdef %}"
+            ),
+            "partialdef_duplicated_names": (
+                "{% partialdef testing-name %}TEST{% endpartialdef %}"
+                "{% partialdef testing-name %}TEST{% endpartialdef %}"
+                "{% partial testing-name %}"
+            ),
+            "partialdef_duplicated_nested_names": (
+                "{% partialdef testing-name %}"
+                "TEST"
+                "{% partialdef testing-name %}TEST{% endpartialdef %}"
+                "{% endpartialdef %}"
+                "{% partial testing-name %}"
+            ),
+        },
+    )
+    def test_basic_parse_errors_multiline_off(self):
         for template_name, error_msg in (
             (
                 "partial_undefined_name",
@@ -495,6 +561,36 @@ class PartialTagTests(SimpleTestCase):
         }
     )
     def test_partial_with_syntax_error_exception_info(self):
+        with self.assertRaises(TemplateSyntaxError) as cm:
+            self.engine.get_template("partial_with_syntax_error")
+
+        self.assertIn("endif", str(cm.exception).lower())
+
+        if self.engine.debug:
+            exc_debug = cm.exception.template_debug
+
+            self.assertEqual(exc_debug["during"], "{% if user %}")
+            self.assertEqual(exc_debug["name"], "partial_with_syntax_error")
+            self.assertIn("endif", exc_debug["message"].lower())
+
+    # RemovedInDjango71Warning: When the deprecation ends, remove this test.
+    @ignore_warnings(category=RemovedInDjango71Warning)
+    @override_settings(TEMPLATE_TAGS_MULTILINE=False)
+    @setup(
+        {
+            "partial_with_syntax_error": (
+                "<h1>Title</h1>\n"
+                "{% partialdef syntax_error_partial %}\n"
+                "    {% if user %}\n"
+                "        <p>User: {{ user.name }}</p>\n"
+                "    {% endif\n"
+                "    <p>Missing closing tag above</p>\n"
+                "{% endpartialdef %}\n"
+                "{% partial syntax_error_partial %}\n"
+            ),
+        }
+    )
+    def test_partial_with_syntax_error_exception_info_multiline_off(self):
         with self.assertRaises(TemplateSyntaxError) as cm:
             self.engine.get_template("partial_with_syntax_error")
 
