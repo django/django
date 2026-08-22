@@ -3020,7 +3020,11 @@ class OtherModelFormTests(TestCase):
             def label_from_instance(self, obj):
                 return ", ".join(c.name for c in obj.colors.all())
 
-        field = ColorModelChoiceField(ColorfulItem.objects.prefetch_related("colors"))
+        field = ColorModelChoiceField(
+            ColorfulItem.objects.prefetch_related(
+                models.Prefetch("colors", queryset=Color.objects.order_by("name"))
+            ).order_by("pk")
+        )
         # CPython < 3.14 calls ModelChoiceField.__len__() when coercing to
         # tuple. PyPy and Python 3.14+ don't call __len__() and so .count()
         # isn't called on the QuerySet. The following would trigger an extra

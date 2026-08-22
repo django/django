@@ -53,7 +53,20 @@ class NestedObjectsTests(TestCase):
         cls.objs = [cls.cascade_model.objects.create(num=i) for i in range(5)]
 
     def _check(self, target):
-        self.assertEqual(self.n.nested(lambda obj: obj.num), target)
+        def sorted_siblings(nodes):
+            return [
+                (
+                    sorted(sorted_siblings(node), key=repr)
+                    if isinstance(node, list)
+                    else node
+                )
+                for node in nodes
+            ]
+
+        self.assertEqual(
+            sorted_siblings(self.n.nested(lambda obj: obj.num)),
+            sorted_siblings(target),
+        )
 
     def _connect(self, i, j):
         self.objs[i].parent = self.objs[j]

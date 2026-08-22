@@ -1601,7 +1601,7 @@ class MigrateTests(MigrationTestBase):
                 for migration in recorder.applied_migrations()
                 if migration[0] in ["migrations", "migrations2"]
             ]
-            self.assertEqual(
+            self.assertCountEqual(
                 applied_migrations,
                 [
                     ("migrations", "0001_squashed_0002"),

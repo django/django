@@ -342,7 +342,7 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
             {
                 "results": [
                     {"id": str(q.pk), "text": q.question}
-                    for q in Question.objects.all()[:PAGINATOR_SIZE]
+                    for q in Question.objects.order_by("pk")[:PAGINATOR_SIZE]
                 ],
                 "pagination": {"more": True},
             },
@@ -359,7 +359,7 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
             {
                 "results": [
                     {"id": str(q.pk), "text": q.question}
-                    for q in Question.objects.all()[PAGINATOR_SIZE:]
+                    for q in Question.objects.order_by("pk")[PAGINATOR_SIZE:]
                 ],
                 "pagination": {"more": False},
             },
