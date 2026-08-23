@@ -19,6 +19,7 @@ from django.contrib.gis.geos import (
 )
 from django.contrib.gis.geos.prototypes.io import MAX_GEOM_COLLECTIONS
 from django.core.exceptions import ImproperlyConfigured
+from django.db.backends.postgresql.psycopg_any import is_psycopg3
 from django.db.models import Field
 from django.utils.translation import gettext_lazy as _
 
@@ -352,6 +353,15 @@ class GeometryField(BaseSpatialField):
         if not compiler.query.subquery:
             return compiler.connection.ops.select % sql, params
         return sql, params
+
+    if is_psycopg3:
+
+        def from_db_value(self, value, expression, connection):
+            if value is None:
+                return value
+            if isinstance(value, GEOSGeometry):
+                return value
+            return GEOSGeometry(value)
 
 
 # The OpenGIS Geometry Type Fields

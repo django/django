@@ -13,7 +13,7 @@ from django.db.backends.postgresql.operations import (
 )
 from django.db.backends.postgresql.psycopg_any import is_psycopg3
 
-from .adapter import PostGISAdapter
+from .adapter import GEOSGeometry, PostGISAdapter
 from .features import DatabaseFeatures
 from .introspection import PostGISIntrospection
 from .operations import PostGISOperations
@@ -88,6 +88,16 @@ if is_psycopg3:
         return PostGISTextDumper, PostGISBinaryDumper
 
 
+# geometry array types caster for psycopg2
+def geometry_array_caster(value, cursor):
+    if value is None:
+        return value
+    text = value.strip("{}")
+    if text == "":
+        return []
+    return [None if item == "NULL" else GEOSGeometry(item) for item in text.split(":")]
+
+
 class DatabaseWrapper(PsycopgDatabaseWrapper):
     SchemaEditorClass = PostGISSchemaEditor
     features_class = DatabaseFeatures
@@ -126,6 +136,9 @@ class DatabaseWrapper(PsycopgDatabaseWrapper):
         connection = super().get_new_connection(conn_params)
         if is_psycopg3:
             self.register_geometry_adapters(connection)
+        else:
+            # register geometries arrays types caster
+            self.register_geometry_array_casters(connection)
         return connection
 
     if is_psycopg3:
@@ -159,3 +172,43 @@ class DatabaseWrapper(PsycopgDatabaseWrapper):
             )
             pg_connection.adapters.register_dumper(PostGISAdapter, PostGISTextDumper)
             pg_connection.adapters.register_dumper(PostGISAdapter, PostGISBinaryDumper)
+
+    # register geometry array type caster for psycopg2
+    def register_geometry_array_casters(self, connection):
+        """
+        Register psycopg2 type casters for geometry[] and geography[] values.
+
+        The array OIDs are looked up dynamically from pg_type since they can
+        vary between databases, and may not exist yet (e.g. during test
+        database creation, before CREATE EXTENSION postgis has run) --
+        in that case, registration is skipped for this connection.
+        Casters are registered on the given connection only, not globally.
+        Uses new_type (not new_array_type) to sidestep psycopg2's unreliable
+        array-splitting for third-party array OIDs (see ticket #31450);
+        each caster receives the raw array literal whole and parses it
+        manually.
+        """
+        import psycopg2
+
+        old_autocommit = connection.autocommit
+        connection.autocommit = True
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT typname, typarray
+                    FROM pg_type
+                    WHERE typname IN (%s, %s)
+                    """,
+                    ("geometry", "geography"),
+                )
+                rows = dict(cursor.fetchall())
+        finally:
+            connection.autocommit = old_autocommit
+        for typname, array_oid in rows.items():
+            if not array_oid:
+                continue
+            caster = psycopg2.extensions.new_type(
+                (array_oid,), f"{typname.upper()}[]", geometry_array_caster
+            )
+            psycopg2.extensions.register_type(caster, connection)
