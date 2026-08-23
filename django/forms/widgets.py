@@ -810,7 +810,7 @@ class ChoiceWidget(Widget):
         if self.option_inherits_attrs:
             option_attrs = self.build_attrs({**self.option_attrs, **self.attrs}, attrs)
         elif self.option_attrs:
-            option_attrs = {**self.option_attrs}
+            option_attrs = self.build_attrs(self.option_attrs)
         else:
             option_attrs = {}
 
