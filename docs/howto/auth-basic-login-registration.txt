@@ -27,7 +27,9 @@ This gives you, among others, the following URLs:
 * ``accounts/logout/`` -- :class:`~django.contrib.auth.views.LogoutView`
 
 These views need templates to render. Create
-:file:`templates/registration/login.html`::
+:file:`templates/registration/login.html`:
+
+.. code-block:: html
 
     <h2>Log In</h2>
     <form method="post">
@@ -94,7 +96,9 @@ Wire it up in your URLconf, making sure it comes before the include of
         path("accounts/", include("django.contrib.auth.urls")),
     ]
 
-Create :file:`templates/registration/signup.html`::
+Create :file:`templates/registration/signup.html`:
+
+.. code-block:: html
 
     <h2>Sign Up</h2>
     <form method="post">
@@ -116,7 +120,9 @@ five templates in ``templates/registration/``:
 * ``password_reset_confirm.html`` -- the form to set a new password
 * ``password_reset_complete.html`` -- shown once the password has changed
 
-For example, ``password_reset_email.html``::
+For example, ``password_reset_email.html``:
+
+.. code-block:: text
 
     Someone asked for password reset for email {{ email }}. Follow the link
     below:
