@@ -1,8 +1,6 @@
-          
 ============================================================
 How to set up basic login, registration and password reset
 ============================================================
-
 
 This document shows how to build a basic authentication flow using Django's
 built-in :mod:`django.contrib.auth` views and forms: logging in, logging out,
