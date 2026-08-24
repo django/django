@@ -164,6 +164,7 @@ class UtilsTests(SimpleTestCase):
             ("test_from_model", article.test_from_model()),
             ("non_field", INSTANCE_ATTRIBUTE),
             ("site__domain", SITE_NAME),
+            ("site__parent", None),
         )
 
         mock_admin = MockModelAdmin()
@@ -238,6 +239,19 @@ class UtilsTests(SimpleTestCase):
         )
         expected = '<a href="http://example.com">http://example.com</a>'
         self.assertHTMLEqual(display_value, expected)
+
+    def test_url_display_for_field_invalid_url(self):
+        # An invalid URL, such as one with an unsafe scheme, is rendered as
+        # plain text instead of a clickable link.
+        model_field = models.URLField()
+        for value in [
+            "javascript:alert(1)",
+            "data:text/html,<script>alert(1)</script>",
+        ]:
+            with self.subTest(value=value):
+                display_value = display_for_field(value, model_field, self.empty_value)
+                self.assertNotIn("<a", display_value)
+                self.assertEqual(display_value, value)
 
     def test_number_formats_display_for_field(self):
         display_value = display_for_field(
@@ -443,6 +457,12 @@ class UtilsTests(SimpleTestCase):
             label_for_field("test_from_property", Article, model_admin=MockModelAdmin),
             "property short description",
         )
+
+    def test_label_for_field_str_admin_order_field(self):
+        _, attr = label_for_field("__str__", Cascade, return_attr=True)
+        self.assertIs(attr, Cascade.__str__)
+        self.assertTrue(hasattr(attr, "admin_order_field"))
+        self.assertEqual(attr.admin_order_field, "num")
 
     def test_help_text_for_field(self):
         tests = [

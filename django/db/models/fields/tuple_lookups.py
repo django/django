@@ -74,7 +74,7 @@ class TupleLookupMixin:
             )
 
     def check_rhs_is_supported_expression(self):
-        if not isinstance(self.rhs, (ResolvedOuterRef, Query)):
+        if not isinstance(self.rhs, (ColPairs, ResolvedOuterRef, Query)):
             lhs_str = self.get_lhs_str()
             rhs_cls = self.rhs.__class__.__name__
             raise ValueError(

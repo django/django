@@ -824,7 +824,9 @@ A subclass of :class:`unittest.TestCase` that adds this functionality:
   =========================================== ======================================
 
 * The ability to run tests with :ref:`modified settings <overriding-settings>`.
-* Using the :attr:`~SimpleTestCase.client` :class:`~django.test.Client`.
+* Access to the synchronous and asynchronous test clients via the
+  :attr:`~SimpleTestCase.client` and :attr:`~SimpleTestCase.async_client`
+  attributes.
 
 If your tests make any database queries, use subclasses
 :class:`~django.test.TransactionTestCase` or :class:`~django.test.TestCase`.
@@ -1127,13 +1129,14 @@ Default test client
 -------------------
 
 .. attribute:: SimpleTestCase.client
+.. attribute:: SimpleTestCase.async_client
 
-Every test case in a ``django.test.*TestCase`` instance has access to an
-instance of a Django test client. This client can be accessed as
-``self.client``. This client is recreated for each test, so you don't have to
+Every ``django.test.*TestCase`` instance has access to Django's synchronous
+and asynchronous test clients as ``self.client`` and ``self.async_client``,
+respectively. Both clients are recreated for each test, so you don't have to
 worry about state (such as cookies) carrying over from one test to another.
 
-This means, instead of instantiating a ``Client`` in each test::
+For example, rather than instantiating a ``Client`` in each test::
 
     import unittest
     from django.test import Client
@@ -1168,10 +1171,14 @@ Customizing the test client
 ---------------------------
 
 .. attribute:: SimpleTestCase.client_class
+.. attribute:: SimpleTestCase.async_client_class
 
-If you want to use a different ``Client`` class (for example, a subclass
-with customized behavior), use the :attr:`~SimpleTestCase.client_class` class
-attribute::
+If you want to use a different :class:`Client` or :class:`AsyncClient` class
+(for example, a subclass with customized behavior), use the
+:attr:`~SimpleTestCase.client_class` or
+:attr:`~SimpleTestCase.async_client_class` class attributes.
+
+For example, to customize the synchronous test client::
 
     from django.test import Client, TestCase
 
@@ -1187,6 +1194,9 @@ attribute::
         def test_my_stuff(self):
             # Here self.client is an instance of MyTestClient...
             call_some_test_code()
+
+The same pattern applies to the asynchronous test client by subclassing
+:class:`AsyncClient` and setting :attr:`~SimpleTestCase.async_client_class`.
 
 .. _topics-testing-fixtures:
 

@@ -79,39 +79,6 @@ widget on the field. In the following example, the
 See the :ref:`built-in widgets` for more information about which widgets
 are available and which arguments they accept.
 
-Widgets inheriting from the ``Select`` widget
-=============================================
-
-Widgets inheriting from the :class:`Select` widget deal with choices. They
-present the user with a list of options to choose from. The different widgets
-present this choice differently; the :class:`Select` widget itself uses a
-``<select>`` HTML list representation, while :class:`RadioSelect` uses radio
-buttons.
-
-:class:`Select` widgets are used by default on :class:`ChoiceField` fields. The
-choices displayed on the widget are inherited from the :class:`ChoiceField` and
-changing :attr:`ChoiceField.choices` will update :attr:`Select.choices`. For
-example:
-
-.. code-block:: pycon
-
-    >>> from django import forms
-    >>> CHOICES = {"1": "First", "2": "Second"}
-    >>> choice_field = forms.ChoiceField(widget=forms.RadioSelect, choices=CHOICES)
-    >>> choice_field.choices
-    [('1', 'First'), ('2', 'Second')]
-    >>> choice_field.widget.choices
-    [('1', 'First'), ('2', 'Second')]
-    >>> choice_field.widget.choices = []
-    >>> choice_field.choices = [("1", "First and only")]
-    >>> choice_field.widget.choices
-    [('1', 'First and only')]
-
-Widgets which offer a :attr:`~Select.choices` attribute can however be used
-with fields which are not based on choice -- such as a :class:`CharField` --
-but it is recommended to use a :class:`ChoiceField`-based field when the
-choices are inherent to the model and not just the representational widget.
-
 Customizing widget instances
 ============================
 

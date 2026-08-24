@@ -1594,10 +1594,10 @@ class ModelAdmin(BaseModelAdmin):
             source_model_name = request.POST.get(SOURCE_MODEL_VAR)
             source_admin = None
             if source_model_name:
-                app_label, model_name = source_model_name.split(".", 1)
                 try:
+                    app_label, model_name = source_model_name.split(".", 1)
                     source_model = apps.get_model(app_label, model_name)
-                except LookupError:
+                except (LookupError, ValueError):
                     msg = _('The app "%s" could not be found.') % source_model_name
                     self.message_user(request, msg, messages.ERROR)
                 else:
@@ -2646,6 +2646,12 @@ class ModelAdmin(BaseModelAdmin):
             if prefixes[prefix] != 1 or not prefix:
                 prefix = "%s-%s" % (prefix, prefixes[prefix])
             formset_params = self.get_formset_kwargs(request, obj, inline, prefix)
+            if formset_params.get("save_as_new") and not inline.has_add_permission(
+                request, None
+            ):
+                formset_params["data"] = formset_params["data"].copy()
+                formset_params["data"]["%s-TOTAL_FORMS" % prefix] = "0"
+                formset_params["data"]["%s-INITIAL_FORMS" % prefix] = "0"
             formset = FormSet(**formset_params)
 
             def user_deleted_form(request, obj, formset, index, inline):

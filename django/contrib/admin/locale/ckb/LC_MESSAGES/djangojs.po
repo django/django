@@ -3,15 +3,16 @@
 # Translators:
 # Bakhtawar Barzan, 2021
 # Bakhtawar Barzan, 2021
+# Kosar Tofiq Saeed <kosar.belana@gmail.com>, 2026
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2023
 # Swara <swara09@gmail.com>, 2022-2026
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-25 15:04-0500\n"
-"PO-Revision-Date: 2026-06-01 07:59+0000\n"
-"Last-Translator: Swara <swara09@gmail.com>, 2022-2026\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-05 07:59+0000\n"
+"Last-Translator: Kosar Tofiq Saeed <kosar.belana@gmail.com>, 2026\n"
 "Language-Team: Central Kurdish (http://app.transifex.com/django/django/"
 "language/ckb/)\n"
 "MIME-Version: 1.0\n"
@@ -103,6 +104,8 @@ msgid ""
 "fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
+"تۆ کردارێکت هەڵبژاردووە و هیچ گۆڕانکارییەکت لە خانە جیاوازەکاندا نەکردووە. "
+"پێدەچێت بەدوای دوگمەی جێبەجێکردندا بگەڕێیت نەک دوگمەی پاشەکەوتکردن."
 
 msgid "Now"
 msgstr "ئێستا"
@@ -119,17 +122,26 @@ msgstr "نیوەڕۆ"
 msgid "6 p.m."
 msgstr "6ی ئێوارە."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "تێبینی: تۆ %s کاتژمێر لەپێش کاتی ڕاژەوەیت."
-msgstr[1] "تێبینی: تۆ %s کاتژمێر لەپێش کاتی ڕاژەوەیت."
+msgid "server"
+msgstr ""
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "تێبینی: تۆ %s کاتژمێر لەدوای کاتی ڕاژەوەیت."
-msgstr[1] "تێبینی: تۆ %s کاتژمێر لەدوای کاتی ڕاژەوەیت."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Choose a Time"
 msgstr "کاتێک دیاریبکە"
@@ -143,98 +155,113 @@ msgstr "پاشگەزبوونەوە"
 msgid "Today"
 msgstr "ئەمڕۆ"
 
+msgid "Today (%(date)s)"
+msgstr ""
+
 msgid "Choose a Date"
 msgstr "ڕۆژێک دیاریبکە"
 
 msgid "Yesterday"
 msgstr "دوێنێ"
 
+msgid "Yesterday (%(date)s)"
+msgstr ""
+
 msgid "Tomorrow"
 msgstr "سبەینێ"
 
+msgid "Tomorrow (%(date)s)"
+msgstr ""
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr ""
+
+msgid "Next (%(month)s %(year)s)"
+msgstr ""
+
 msgid "January"
-msgstr "‎ڕێبەندان"
+msgstr "کانوونی دووەم"
 
 msgid "February"
-msgstr "‎ڕەشەمە"
+msgstr "شوبات"
 
 msgid "March"
-msgstr "نەورۆز"
+msgstr "ئازار"
 
 msgid "April"
-msgstr "‎گوڵان"
+msgstr "نیسان"
 
 msgid "May"
-msgstr "جۆزەردان"
+msgstr "ئایار"
 
 msgid "June"
-msgstr "‎پوشپەڕ"
+msgstr "حوزەیران"
 
 msgid "July"
-msgstr "گەلاوێژ "
+msgstr "تەممووز"
 
 msgid "August"
-msgstr "‎خەرمانان"
+msgstr "ئاب"
 
 msgid "September"
-msgstr "‎ڕەزبەر"
+msgstr "ئەیلوول"
 
 msgid "October"
-msgstr "‎گەڵاڕێزان"
+msgstr "تشرینی یەکەم"
 
 msgid "November"
-msgstr "‎سەرماوەرز"
+msgstr "تشرینی دووەم"
 
 msgid "December"
-msgstr "‎بەفرانبار"
+msgstr "کانوونی یەکەم"
 
 msgctxt "abbrev. month January"
 msgid "Jan"
-msgstr "‎ڕێبەندان"
+msgstr "کانوونی دووەم"
 
 msgctxt "abbrev. month February"
 msgid "Feb"
-msgstr "ڕەشەمە"
+msgstr "شوبات"
 
 msgctxt "abbrev. month March"
 msgid "Mar"
-msgstr "نەورۆز"
+msgstr "ئازار"
 
 msgctxt "abbrev. month April"
 msgid "Apr"
-msgstr "گوڵان"
+msgstr "نیسان"
 
 msgctxt "abbrev. month May"
 msgid "May"
-msgstr "‎جۆزەردان"
+msgstr "ئایار"
 
 msgctxt "abbrev. month June"
 msgid "Jun"
-msgstr "پوشپەڕ"
+msgstr "حوزەیران"
 
 msgctxt "abbrev. month July"
 msgid "Jul"
-msgstr "‎گەلاوێژ"
+msgstr "تەممووز"
 
 msgctxt "abbrev. month August"
 msgid "Aug"
-msgstr "خەرمانان"
+msgstr "ئاب"
 
 msgctxt "abbrev. month September"
 msgid "Sep"
-msgstr "‎ڕەزبەر"
+msgstr "ئەیلوول"
 
 msgctxt "abbrev. month October"
 msgid "Oct"
-msgstr "‎گەڵاڕێزان"
+msgstr "تشرینی یەکەم"
 
 msgctxt "abbrev. month November"
 msgid "Nov"
-msgstr "‎سەرماوەرز"
+msgstr "تشرینی دووەم"
 
 msgctxt "abbrev. month December"
 msgid "Dec"
-msgstr "‎بەفرانبار"
+msgstr "کانوونی یەکەم"
 
 msgid "Sunday"
 msgstr "یەکشەممە"
@@ -312,3 +339,18 @@ msgstr "هە"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "ش"
+
+msgid "%(month)s %(day)s, %(year)s"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr ""

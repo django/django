@@ -7,7 +7,7 @@ from django.core.exceptions import (
     MultipleObjectsReturned,
 )
 from django.db import IntegrityError, models, transaction
-from django.db.models import FETCH_PEERS, RAISE
+from django.db.models import FETCH_PEERS, FETCH_RAISE
 from django.test import TestCase
 from django.utils.translation import gettext_lazy
 
@@ -947,7 +947,7 @@ class ManyToOneTests(TestCase):
             a2.reporter
 
     def test_fetch_mode_raise_forward(self):
-        a = Article.objects.fetch_mode(RAISE).get(pk=self.a.pk)
+        a = Article.objects.fetch_mode(FETCH_RAISE).get(pk=self.a.pk)
         msg = "Fetching of Article.reporter blocked."
         with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
             a.reporter

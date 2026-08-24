@@ -171,7 +171,7 @@ Django core exception classes are defined in ``django.core.exceptions``.
 .. exception:: FieldFetchBlocked
 
     Raised when a field would be fetched on-demand and the
-    :attr:`~django.db.models.RAISE` fetch mode is active.
+    :attr:`~django.db.models.FETCH_RAISE` fetch mode is active.
 
 ``ValidationError``
 -------------------

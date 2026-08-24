@@ -15,7 +15,14 @@ from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.libgeos import GEOM_PTR, geos_version_tuple
 from django.contrib.gis.geos.mutable_list import ListMixin
 from django.contrib.gis.geos.prepared import PreparedGeometry
-from django.contrib.gis.geos.prototypes.io import ewkb_w, wkb_r, wkb_w, wkt_r, wkt_w
+from django.contrib.gis.geos.prototypes.io import (
+    MAX_GEOM_COLLECTIONS,
+    ewkb_w,
+    wkb_r,
+    wkb_w,
+    wkt_r,
+    wkt_w,
+)
 from django.utils.deconstruct import deconstructible
 from django.utils.encoding import force_bytes, force_str
 
@@ -114,8 +121,8 @@ class GEOSGeometryBase(GEOSBase):
         self.srid = srid
 
     @classmethod
-    def _from_wkb(cls, wkb):
-        return wkb_r().read(wkb)
+    def _from_wkb(cls, wkb, max_geom_collections=MAX_GEOM_COLLECTIONS):
+        return wkb_r().read(wkb, max_geom_collections)
 
     @staticmethod
     def from_ewkt(ewkt):
@@ -135,8 +142,8 @@ class GEOSGeometryBase(GEOSBase):
         return GEOSGeometry(GEOSGeometry._from_wkt(wkt), srid=srid)
 
     @staticmethod
-    def _from_wkt(wkt):
-        return wkt_r().read(wkt)
+    def _from_wkt(wkt, max_geom_collections=MAX_GEOM_COLLECTIONS):
+        return wkt_r().read(wkt, max_geom_collections)
 
     @classmethod
     def from_gml(cls, gml_string):
@@ -739,7 +746,9 @@ class LinearGeometryMixin:
 class GEOSGeometry(GEOSGeometryBase, ListMixin):
     "A class that, generally, encapsulates a GEOS geometry."
 
-    def __init__(self, geo_input, srid=None):
+    def __init__(
+        self, geo_input, srid=None, *, max_geom_collections=MAX_GEOM_COLLECTIONS
+    ):
         """
         The base constructor for GEOS geometry objects. It may take the
         following inputs:
@@ -753,6 +762,10 @@ class GEOSGeometry(GEOSGeometryBase, ListMixin):
 
         The `srid` keyword specifies the Source Reference Identifier (SRID)
         number for this Geometry. If not provided, it defaults to None.
+
+        The `max_geom_collections` keyword limits how many nested (WKT) or
+        total (WKB) geometry collections the input may contain before parsing
+        is refused, guarding against segfaults from deeply nested input.
         """
         input_srid = None
         if isinstance(geo_input, bytes):
@@ -763,10 +776,10 @@ class GEOSGeometry(GEOSGeometryBase, ListMixin):
                 # Handle WKT input.
                 if wkt_m["srid"]:
                     input_srid = int(wkt_m["srid"])
-                g = self._from_wkt(force_bytes(wkt_m["wkt"]))
+                g = self._from_wkt(force_bytes(wkt_m["wkt"]), max_geom_collections)
             elif hex_regex.match(geo_input):
                 # Handle HEXEWKB input.
-                g = wkb_r().read(force_bytes(geo_input))
+                g = wkb_r().read(force_bytes(geo_input), max_geom_collections)
             elif json_regex.match(geo_input):
                 # Handle GeoJSON input.
                 ogr = gdal.OGRGeometry.from_json(geo_input)
@@ -779,7 +792,7 @@ class GEOSGeometry(GEOSGeometryBase, ListMixin):
             g = geo_input
         elif isinstance(geo_input, memoryview):
             # When the input is a memoryview (WKB).
-            g = wkb_r().read(geo_input)
+            g = wkb_r().read(geo_input, max_geom_collections)
         elif isinstance(geo_input, GEOSGeometry):
             g = capi.geom_clone(geo_input.ptr)
         else:

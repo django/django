@@ -2,15 +2,15 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2021,2023-2025
+# znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2021,2023-2026
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-03-09 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 07:05+0000\n"
 "Last-Translator: znotdead <zhirafchik@gmail.com>, "
-"2016-2017,2019-2021,2023-2025\n"
+"2016-2017,2019-2021,2023-2026\n"
 "Language-Team: Belarusian (http://app.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -182,8 +182,13 @@ msgstr ""
 "Утрымлівайце націснутай кнопку“Control”, або “Command” на Mac, каб вылучыць "
 "больш за адзін."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Абярыце гэты аб'ект для дзеяньня - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr "Праграма \"%s\" не знойдзена."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -242,9 +247,6 @@ msgstr "Зьмяніць %s"
 msgid "View %s"
 msgstr "Праглядзець %s"
 
-msgid "Database error"
-msgstr "База зьвестак дала хібу"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -252,6 +254,9 @@ msgstr[0] "Зьмянілі %(count)s %(name)s."
 msgstr[1] "Зьмянілі %(count)s %(name)s."
 msgstr[2] "Зьмянілі %(count)s %(name)s."
 msgstr[3] "Зьмянілі %(count)s %(name)s."
+
+msgid "Database error"
+msgstr "База зьвестак дала хібу"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -278,6 +283,19 @@ msgstr "Гісторыя зьменаў: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ","
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] "...и %(count)d больш аб'ект."
+msgstr[1] "...и %(count)d больш аб'екта."
+msgstr[2] "...и %(count)d больш аб'ектаў."
+msgstr[3] "...и %(count)d больш аб'ектаў."
 
 #, python-format
 msgid ""
@@ -332,9 +350,6 @@ msgstr ""
 msgid "Run"
 msgstr "Выканаць"
 
-msgid "Click here to select the objects across all pages"
-msgstr "Каб абраць аб’екты на ўсіх бачынах, націсьніце сюды"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Абраць усе %(total_count)s %(module_name)s"
@@ -344,10 +359,6 @@ msgstr "Не абіраць нічога"
 
 msgid "Breadcrumbs"
 msgstr "Навігацыйны ланцужок"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Мадэлі ў %(name)s праграме"
 
 msgid "Model name"
 msgstr "Назва мадэлі"
@@ -463,6 +474,10 @@ msgstr "Пераключыць тэму (бягучая тэма: светлая
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "Пераключыць тэму (бягучая тэма: цёмная)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr "Фільтраваць па %(field_name)s"
 
 #, python-format
 msgid ""
@@ -671,6 +686,9 @@ msgstr "Выдаліць абраныя %(model)s"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Праглядзець абраныя %(model)s"
+
+msgid "Logout"
+msgstr "Выйсці"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Дзякуем за час, які вы сёньня правялі на гэтай пляцоўцы."

@@ -279,6 +279,20 @@ backends.
   consistently returning an HTTP 403 response for staff users without the view
   or change permission regardless of whether the object exists.
 
+* The undocumented ``django.contrib.admin.tests`` module was removed.
+
+:mod:`django.contrib.gis`
+-------------------------
+
+* The seconds value returned by
+  :meth:`~django.contrib.gis.gdal.Field.as_datetime` is now a ``c_float``
+  rather than a ``c_int``.
+
+Tests
+-----
+
+* The undocumented ``django.test.selenium`` module was removed.
+
 Miscellaneous
 -------------
 

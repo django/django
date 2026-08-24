@@ -1,8 +1,8 @@
-============================================
-Django 6.1 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 6.1 release notes
+========================
 
-*Expected August 2026*
+*August 5, 2026*
 
 Welcome to Django 6.1!
 
@@ -48,7 +48,7 @@ Django provides three fetch modes:
    cases of the "N+1 queries problem" to two queries without any work to
    maintain a list of fields to prefetch.
 
-3. ``RAISE`` raises a :exc:`~django.core.exceptions.FieldFetchBlocked`
+3. ``FETCH_RAISE`` raises a :exc:`~django.core.exceptions.FieldFetchBlocked`
    exception.
 
    This mode can prevent unintentional queries in performance-critical
@@ -501,12 +501,25 @@ Models
   primary key when a ``QuerySet``'s ordering has been forcibly cleared by
   calling :meth:`~.QuerySet.order_by` with no arguments.
 
+* As default model ordering is now applied to combined querysets,
+  :meth:`~.QuerySet.union`, :meth:`~.QuerySet.difference`, and
+  :meth:`~.QuerySet.intersection` raise ``DatabaseError`` when a field in
+  :attr:`.Options.ordering` isn't selected by :meth:`~.QuerySet.values` or
+  :meth:`~.QuerySet.values_list`. Call :meth:`~.QuerySet.order_by` without
+  arguments after combining to clear the default ordering.
+
 * SQL ``SELECT`` aliases originating from :meth:`.QuerySet.annotate`
   calls as well as table and ``JOIN`` aliases are now systematically quoted to
   prevent special character collisions. Because quoted aliases are
   case-sensitive, *raw* SQL references to aliases mixing case, such as when
   using :class:`.RawSQL`, might have to be adjusted to also make use of
   quoting.
+
+* :meth:`~django.db.models.Model._is_pk_set` now returns ``False`` for
+  ``DatabaseDefault`` values on unsaved instances.
+
+* ``fetch_mode=None`` is added to the signature of
+  :meth:`~django.db.models.Model.from_db`.
 
 System checks
 -------------
@@ -654,6 +667,9 @@ Miscellaneous
 * Calling :meth:`.QuerySet.values_list` with ``flat=True`` and no field name
   is deprecated. Pass an explicit field name, like
   ``values_list("pk", flat=True)``.
+
+* Support for ``Model.from_db()`` methods that do not accept the
+  ``fetch_mode`` keyword argument is deprecated.
 
 * The use of ``None`` to represent a top-level JSON scalar ``null`` when
   querying :class:`~django.db.models.JSONField` is now deprecated in favor of

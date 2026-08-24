@@ -37,6 +37,7 @@ from django.core.management import call_command
 
 HAVE_JS = ["admin"]
 LANG_OVERRIDES = {
+    "sr@latin": "sr_Latn",
     "zh_CN": "zh_Hans",
     "zh_TW": "zh_Hant",
 }

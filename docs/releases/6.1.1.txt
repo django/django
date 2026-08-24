@@ -1,0 +1,41 @@
+==========================
+Django 6.1.1 release notes
+==========================
+
+*Expected September 2, 2026*
+
+Django 6.1.1 fixes several bugs in 6.1.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 6.1 where the deprecation of double-dot variable
+  lookups incorrectly applied to string and translated template literals
+  containing two consecutive dots, such as ``{{ "a..b" }}`` (:ticket:`37257`).
+
+* Fixed a regression in Django 6.1 where :attr:`.ModelAdmin.list_display`
+  entries that traverse multiple relations using ``__`` could crash or display
+  incorrect values (:ticket:`37270`).
+
+* Fixed a bug in Django 6.1 where the ``fields.E323`` system check did not
+  detect mixed ``on_delete`` variants for auto-created intermediate models for
+  ``ManyToManyField``\s (:ticket:`37254`).
+
+* Fixed a regression in Django 6.1 where HTML-safe strings, such as those
+  created with :func:`~django.utils.safestring.mark_safe`, used as form media
+  assets were treated as asset paths rather than being rendered verbatim
+  (:ticket:`37262`).
+
+* Fixed a regression in Django 6.1 that caused ``AlterField`` operations that
+  changed only the Python-level ``on_delete`` option of ``ForeignKey`` or
+  ``OneToOneField`` fields to perform unnecessary schema changes
+  (:ticket:`37260`).
+
+* Fixed a bug in Django 6.1 where :class:`~django.db.models.DecimalField`
+  without ``max_digits`` and ``decimal_places`` caused a crash when retrieving
+  values on SQLite (:ticket:`37275`).
+
+* Fixed a regression in Django 6.1 that caused a crash when iterating a
+  ``QuerySet`` of a model overriding ``Model.from_db()`` without the new
+  ``fetch_mode`` keyword argument. Such overrides now work again, but are
+  deprecated and should be updated to accept ``fetch_mode`` (:ticket:`37259`).

@@ -23,6 +23,23 @@ class DatabaseFeatures(BaseSpatialFeatures, OracleDatabaseFeatures):
                     "gis_tests.gis_migrations.test_operations.OperationTests."
                     "test_add_check_constraint",
                 },
+                "Oracle doesn't support nested geometry collections.": {
+                    "gis_tests.geoapp.tests.SaveLoadTests."
+                    "test_geometrycollectionfield_default_max_ignored_on_read",
+                },
             }
         )
+        if self.connection.oracle_version >= (23, 9):
+            skips.update(
+                {
+                    "Oracle 23ai unpacks 1-element geometry collections.": {
+                        "gis_tests.layermap.tests.LayerMapTest."
+                        "test_layermap_unique_multigeometry_fk",
+                        "gis_tests.layermap.tests.LayerMapTest."
+                        "test_null_geom_with_unique",
+                        "gis_tests.layermap.tests.LayerMapTest."
+                        "test_test_fid_range_step",
+                    },
+                },
+            )
         return skips

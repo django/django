@@ -1,6 +1,7 @@
 import copy
 import functools
 import re
+import uuid
 from unittest import mock
 
 from django.apps import apps
@@ -757,12 +758,42 @@ class AutodetectorTests(BaseAutodetectorTests):
         {"managed": False},
         ("testapp.author",),
     )
+    author_unmanaged_uid_unique_default = ModelState(
+        "testapp",
+        "Author",
+        [
+            ("id", models.AutoField(primary_key=True)),
+            ("uid", models.UUIDField(default=uuid.uuid4, unique=True)),
+        ],
+        {"managed": False},
+        ("testapp.author",),
+    )
     author_unmanaged_name_longer = ModelState(
         "testapp",
         "Author",
         [
             ("id", models.AutoField(primary_key=True)),
             ("name", models.CharField(max_length=400)),
+        ],
+        {"managed": False},
+        ("testapp.author",),
+    )
+    author_unmanaged_name_no_default = ModelState(
+        "testapp",
+        "Author",
+        [
+            ("id", models.AutoField(primary_key=True)),
+            ("name", models.CharField(max_length=200)),
+        ],
+        {"managed": False},
+        ("testapp.author",),
+    )
+    author_unmanaged_name_nullable = ModelState(
+        "testapp",
+        "Author",
+        [
+            ("id", models.AutoField(primary_key=True)),
+            ("name", models.CharField(max_length=200, null=True)),
         ],
         {"managed": False},
         ("testapp.author",),
@@ -4132,12 +4163,31 @@ class AutodetectorTests(BaseAutodetectorTests):
         self.assertOperationTypes(changes, "testapp", 0, ["AddField"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="name")
 
+    def test_unmanaged_add_field_unique_default(self):
+        changes = self.get_changes(
+            [self.author_unmanaged_empty], [self.author_unmanaged_uid_unique_default]
+        )
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AddField"])
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="uid")
+
     def test_unmanaged_alter_field(self):
         """Tests autodetection of altered fields on an unmanaged model."""
         changes = self.get_changes(
             [self.author_unmanaged_name_default], [self.author_unmanaged_name_longer]
         )
         # Right number/type of migrations?
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterField"])
+        self.assertOperationAttributes(
+            changes, "testapp", 0, 0, name="name", preserve_default=True
+        )
+
+    def test_unmanaged_alter_field_no_default(self):
+        changes = self.get_changes(
+            [self.author_unmanaged_name_nullable],
+            [self.author_unmanaged_name_no_default],
+        )
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, ["AlterField"])
         self.assertOperationAttributes(

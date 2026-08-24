@@ -147,7 +147,12 @@ GeoDjango are only available on spatial fields.
 
 Filters on 'normal' fields (e.g. :class:`~django.db.models.CharField`)
 may be chained with those on geographic fields. Geographic lookups accept
-geometry and raster input on both sides and input types can be mixed freely.
+geometry and raster input on both sides, and input types can be mixed freely in
+most cases. However, unlike assignments to model fields, with lookups,
+types such as ``str``, :class:`pathlib.Path`, and ``dict`` must be wrapped by
+:class:`~django.contrib.gis.gdal.GDALRaster` to signify that the potential for
+file writing or network fetching is acceptable. For the rationale, see
+:ref:`raster security considerations <raster-security>`.
 
 The general structure of geographic lookups is described below. A complete
 reference can be found in the :ref:`spatial lookup reference<spatial-lookups>`.
