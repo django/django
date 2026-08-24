@@ -27,9 +27,9 @@ Some of the things you can do with the test client are:
 * Test that a given request is rendered by a given Django template, with
   a template context that contains certain values.
 
-Note that the test client is not intended to be a replacement for Selenium_ or
-other "in-browser" frameworks. Django's test client has a different focus. In
-short:
+Note that the test client is not intended to be a replacement for Playwright_
+or other "in-browser" frameworks. Django's test client has a different focus.
+In short:
 
 * Use Django's test client to establish that the correct template is being
   rendered and that the template is passed the correct context data.
@@ -37,7 +37,7 @@ short:
 * Use :class:`~django.test.RequestFactory` to test view functions directly,
   bypassing the routing and middleware layers.
 
-* Use in-browser frameworks like Selenium_ to test *rendered* HTML and the
+* Use in-browser frameworks like Playwright_ to test *rendered* HTML and the
   *behavior* of web pages, namely JavaScript functionality. Django also
   provides special support for those frameworks; see the section on
   :class:`~django.test.LiveServerTestCase` for more details.
@@ -1016,7 +1016,7 @@ It also provides an additional method:
 :class:`~django.test.TransactionTestCase` with one extra feature: it launches a
 live Django server in the background on setup, and shuts it down on teardown.
 This allows the use of automated test clients other than the
-:ref:`Django dummy client <test-client>` such as, for example, the Selenium_
+:ref:`Django dummy client <test-client>` such as, for example, the Playwright_
 client, to execute a series of functional tests inside a browser and simulate a
 real user's actions.
 
@@ -1024,12 +1024,14 @@ The live server listens on ``localhost`` and binds to port 0 which uses a free
 port assigned by the operating system. The server's URL can be accessed with
 ``self.live_server_url`` during the tests.
 
-To demonstrate how to use ``LiveServerTestCase``, let's write a Selenium test.
-First of all, you need to install the :pypi:`selenium` package:
+To demonstrate how to use ``LiveServerTestCase``, let's write a Playwright
+test. First of all, you need to install the :pypi:`playwright` package and the
+browser binaries:
 
 .. console::
 
-    $ python -m pip install "selenium >= 4.23.0"
+    $ python -m pip install playwright
+    $ python -m playwright install firefox --with-deps
 
 Then, add a ``LiveServerTestCase``-based test to your app's tests module
 (for example: ``myapp/tests.py``). For this example, we'll assume you're using
@@ -1043,50 +1045,61 @@ subclass which provides that functionality. Replace it with
 
 The code for this test may look as follows::
 
+    from functools import wraps
+
     from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-    from selenium.webdriver.common.by import By
-    from selenium.webdriver.firefox.webdriver import WebDriver
+    from playwright.sync_api import expect, sync_playwright
 
 
-    class MySeleniumTests(StaticLiveServerTestCase):
+    def playwright_test(test_func):
+        @wraps(test_func)
+        def wrapper(self, *args, **kwargs):
+            with sync_playwright() as p:
+                browser = p.firefox.launch()
+                page = browser.new_page()
+                try:
+                    return test_func(self, page, *args, **kwargs)
+                finally:
+                    page.close()
+                    browser.close()
+
+        return wrapper
+
+
+    class MyPlaywrightTests(StaticLiveServerTestCase):
         fixtures = ["user-data.json"]
 
-        @classmethod
-        def setUpClass(cls):
-            super().setUpClass()
-            cls.selenium = WebDriver()
-            cls.selenium.implicitly_wait(10)
-
-        @classmethod
-        def tearDownClass(cls):
-            cls.selenium.quit()
-            super().tearDownClass()
-
-        def test_login(self):
-            self.selenium.get(f"{self.live_server_url}/login/")
-            username_input = self.selenium.find_element(By.NAME, "username")
-            username_input.send_keys("myuser")
-            password_input = self.selenium.find_element(By.NAME, "password")
-            password_input.send_keys("secret")
-            self.selenium.find_element(By.XPATH, '//input[@value="Log in"]').click()
+        @playwright_test
+        def test_login(self, page):
+            page.goto(f"{self.live_server_url}/login/")
+            page.get_by_label("Username").fill("myuser")
+            page.get_by_label("Password").fill("secret")
+            page.get_by_role("button", name="Log in").click()
+            expect(page.get_by_text("Welcome")).to_be_visible()
 
 Finally, you may run the test as follows:
 
 .. console::
 
-    $ ./manage.py test myapp.tests.MySeleniumTests.test_login
+    $ ./manage.py test myapp.tests.MyPlaywrightTests.test_login
 
-This example will automatically open Firefox then go to the login page, enter
-the credentials and press the "Log in" button. Selenium offers other drivers in
-case you do not have Firefox installed or wish to use another browser. The
-example above is just a tiny fraction of what the Selenium client can do; check
-out the `full reference`_ for more details.
+This example will automatically open a Firefox browser then go to the login
+page, enter the credentials and press the "Log in" button. Playwright offers
+other browsers in case you wish to use Chromium or WebKit. The example above is
+just a tiny fraction of what the Playwright client can do; check out the
+`full reference`_ for more details.
 
-.. _Selenium: https://www.selenium.dev/
-.. _full reference: https://selenium-python.readthedocs.io/api.html
-.. _Firefox: https://www.mozilla.com/firefox/
+.. _Playwright: https://playwright.dev/python/
+.. _full reference: https://playwright.dev/python/docs/api/class-playwright
 
 .. note::
+
+    Using :ref:`async-unsafe <async-safety>` APIs like the ORM could throw a
+    :exc:`~django.core.exceptions.SynchronousOnlyOperation` exception from
+    Playwright due to its asyncio event loop running in the background. You
+    can set the :envvar:`DJANGO_ALLOW_ASYNC_UNSAFE` environment variable to
+    bypass this and clean up later. See :ref:`async-safety` for the general
+    rules.
 
     When using an in-memory SQLite database to run the tests, the same database
     connection will be shared by two threads in parallel: the thread in which
@@ -1094,33 +1107,7 @@ out the `full reference`_ for more details.
     important to prevent simultaneous database queries via this shared
     connection by the two threads, as that may sometimes randomly cause the
     tests to fail. So you need to ensure that the two threads don't access the
-    database at the same time. In particular, this means that in some cases
-    (for example, just after clicking a link or submitting a form), you might
-    need to check that a response is received by Selenium and that the next
-    page is loaded before proceeding with further test execution.
-    Do this, for example, by making Selenium wait until the ``<body>`` HTML tag
-    is found in the response (requires Selenium > 2.13)::
-
-        def test_login(self):
-            from selenium.webdriver.support.wait import WebDriverWait
-
-            timeout = 2
-            ...
-            self.selenium.find_element(By.XPATH, '//input[@value="Log in"]').click()
-            # Wait until the response is received
-            WebDriverWait(self.selenium, timeout).until(
-                lambda driver: driver.find_element(By.TAG_NAME, "body")
-            )
-
-    The tricky thing here is that there's really no such thing as a "page
-    load," especially in modern web apps that generate HTML dynamically after
-    the server generates the initial document. So, checking for the presence of
-    ``<body>`` in the response might not necessarily be appropriate for all use
-    cases. Please refer to the `Selenium FAQ`_ and `Selenium documentation`_
-    for more information.
-
-    .. _Selenium FAQ: https://web.archive.org/web/20160129132110/http://code.google.com/p/selenium/wiki/FrequentlyAskedQuestions#Q:_WebDriver_fails_to_find_elements_/_Does_not_block_on_page_loa
-    .. _Selenium documentation: https://www.selenium.dev/documentation/webdriver/waits/#explicit-waits
+    database at the same time.
 
 Test cases features
 ===================
