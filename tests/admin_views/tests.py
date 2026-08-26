@@ -8,7 +8,6 @@ from unittest import mock
 from urllib.parse import parse_qsl, urljoin, urlsplit
 
 from playwright_tests import AdminPlaywrightTestCase, screenshot_cases
-from selenium.webdriver.common.by import By
 
 from django import forms
 from django.contrib import admin
@@ -7376,43 +7375,24 @@ class PlaywrightTests(AdminPlaywrightTestCase):
             "Start datetime:",
         ]
         url = reverse("admin:admin_views_course_change", args=(course.pk,))
-        self.selenium.get(self.live_server_url + url)
-        fieldsets = self.selenium.find_elements(
-            By.CSS_SELECTOR, "fieldset.aligned fieldset"
-        )
-        self.assertEqual(len(fieldsets), len(expected_legend_tags_text))
-        for index, fieldset in enumerate(fieldsets):
-            legend = fieldset.find_element(By.TAG_NAME, "legend")
-            self.assertEqual(legend.text, expected_legend_tags_text[index])
-        self.assertEqual(
-            self.selenium.find_element(By.ID, "id_start_datetime_0").get_attribute(
-                "aria-describedby"
-            ),
-            "id_start_datetime_timezone_warning_helptext",
-        )
-
-        difficulty_input = self.selenium.find_element(
-            By.CSS_SELECTOR, "input[name='difficulty']"
-        )
-        difficulty_input.click()
-        self.selenium.execute_script(
-            "arguments[0].value = 'invalid';",
-            difficulty_input,
-        )
-        self.selenium.find_element(By.NAME, "_save").click()
-        difficulty_fieldset = self.selenium.find_element(
-            By.CSS_SELECTOR, "fieldset.aligned fieldset"
-        )
-        self.assertEqual(
-            difficulty_fieldset.get_attribute("aria-describedby"),
-            "id_difficulty_error",
-        )
         self.page.goto(self.live_server_url + url)
         fieldsets = self.page.locator("fieldset.aligned fieldset")
         self.expect(fieldsets).to_have_count(len(expected_legend_tags_text))
         for index, text in enumerate(expected_legend_tags_text):
             legend = fieldsets.nth(index).locator("legend")
             self.expect(legend).to_have_text(text)
+        self.assertEqual(
+            self.page.locator("#id_start_datetime_0").get_attribute("aria-describedby"),
+            "id_start_datetime_timezone_warning_helptext",
+        )
+
+        difficulty_input = self.page.locator("input[name='difficulty']").first
+        difficulty_input.click()
+        difficulty_input.evaluate("element => element.value = 'invalid'")
+        self.page.locator('[name="_save"]').click()
+        self.expect(fieldsets.first).to_have_attribute(
+            "aria-describedby", "id_difficulty_error"
+        )
 
         # FilteredSelectMultiple uses <fieldset>.
         url = reverse("admin:admin_views_camelcaserelatedmodel_add")
