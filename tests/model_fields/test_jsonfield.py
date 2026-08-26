@@ -1152,6 +1152,23 @@ class TestQuerying(TestCase):
             self.objs[4],
         )
 
+    def test_key_transform_int4_range_overflow(self):
+        # A purely numeric key segment is parsed as an array index. If that
+        # index is outside the range of integer this database's JSON path
+        # support can handle natively (PostgreSQL's int4 range; Oracle's JSON
+        # path parser has its own, much larger, limit), the lookup must not
+        # match rather than error.
+        out_of_range_key = max(connection.ops.integer_field_range("IntegerField")) + 1
+        key = str(out_of_range_key)
+        obj = NullableJSONModel.objects.create(value={key: "x"})
+        self.assertFalse(
+            NullableJSONModel.objects.filter(**{f"value__{key}": "x"}).exists()
+        )
+        if connection.features.supports_json_field_contains:
+            self.assertCountEqual(
+                NullableJSONModel.objects.filter(value__contains={key: "x"}), [obj]
+            )
+
     @skipUnlessDBFeature("has_json_operators")
     def test_key_sql_injection(self):
         with CaptureQueriesContext(connection) as queries:
