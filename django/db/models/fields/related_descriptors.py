@@ -180,6 +180,7 @@ class ForwardManyToOneDescriptor:
                     "length of 1."
                 )
             queryset = querysets[0]
+            queryset._add_hints(instance=instances[0])
         else:
             _cloning_disabled = True
             queryset = self.get_queryset(instance=instances[0])._disable_cloning()
@@ -480,6 +481,7 @@ class ReverseOneToOneDescriptor:
                     "length of 1."
                 )
             queryset = querysets[0]
+            queryset._add_hints(instance=instances[0])
         else:
             _cloning_disabled = True
             queryset = self.get_queryset(instance=instances[0])._disable_cloning()
