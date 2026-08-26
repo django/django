@@ -150,3 +150,14 @@ def cell_count(inline_admin_form):
         # Delete checkbox
         count += 1
     return count
+
+
+@register.tag(name="change_form_admin_actions")
+def admin_actions_tag(parser, token):
+    return InclusionAdminNode(
+        "change_form_admin_actions",
+        parser,
+        token,
+        func=lambda context: context,
+        template_name="change_form_actions.html",
+    )

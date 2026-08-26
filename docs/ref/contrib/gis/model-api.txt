@@ -223,6 +223,18 @@ details.
 
     Geography support is limited to PostGIS and will force the SRID to be 4326.
 
+``max_geom_collections``
+------------------------
+
+.. attribute:: GeometryField.max_geom_collections
+
+This option is forwarded to the :attr:`form field
+<django.contrib.gis.forms.Field.max_geom_collections>` generated for this model
+field, bounding how many geometry collections may be contained in submitted
+WKB/WKT inputs before raising :exc:`ValueError`. Since spatial field
+assignments are lazy, it is also checked when values are accessed, e.g. when
+saving an instance, but not when read from a database. It defaults to ``198``.
+
 .. _geography-type:
 
 Geography Type

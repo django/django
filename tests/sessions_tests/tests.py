@@ -845,6 +845,23 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
     @override_settings(
         CACHES={"default": {"BACKEND": "cache.failing_cache.CacheClass"}}
     )
+    def test_cache_delete_failure_non_fatal(self):
+        """Failing to delete from the cache does not raise errors."""
+        session = self.backend()
+        session.save()
+        session_key = session.session_key
+
+        with self.assertLogs("django.contrib.sessions", "ERROR") as cm:
+            session.delete(session_key)
+
+        # A proper ERROR log message was recorded.
+        log = cm.records[-1]
+        self.assertEqual(log.message, f"Error deleting from cache ({session._cache})")
+        self.assertEqual(str(log.exc_info[1]), "Faked exception deleting from cache")
+
+    @override_settings(
+        CACHES={"default": {"BACKEND": "cache.failing_cache.CacheClass"}}
+    )
     async def test_cache_async_set_failure_non_fatal(self):
         """Failing to write to the cache does not raise errors."""
         session = self.backend()
@@ -857,6 +874,23 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
         log = cm.records[-1]
         self.assertEqual(log.message, f"Error saving to cache ({session._cache})")
         self.assertEqual(str(log.exc_info[1]), "Faked exception saving to cache")
+
+    @override_settings(
+        CACHES={"default": {"BACKEND": "cache.failing_cache.CacheClass"}}
+    )
+    async def test_cache_async_delete_failure_non_fatal(self):
+        """Failing to delete from the cache does not raise errors."""
+        session = self.backend()
+        await session.asave()
+        session_key = session.session_key
+
+        with self.assertLogs("django.contrib.sessions", "ERROR") as cm:
+            await session.adelete(session_key)
+
+        # A proper ERROR log message was recorded.
+        log = cm.records[-1]
+        self.assertEqual(log.message, f"Error deleting from cache ({session._cache})")
+        self.assertEqual(str(log.exc_info[1]), "Faked exception deleting from cache")
 
 
 @override_settings(USE_TZ=True)

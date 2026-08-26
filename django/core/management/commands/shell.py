@@ -19,6 +19,7 @@ class Command(BaseCommand):
         "as code."
     )
 
+    requires_settings = False
     requires_system_checks = []
     shells = ["ipython", "bpython", "python"]
 

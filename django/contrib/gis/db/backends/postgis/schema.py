@@ -1,4 +1,4 @@
-from django.contrib.gis.db.models import GeometryField
+from django.contrib.gis.db.models.fields import BaseSpatialField
 from django.db.backends.postgresql.schema import DatabaseSchemaEditor
 from django.db.models.expressions import Col, Func
 
@@ -82,10 +82,10 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
         )
 
         old_field_spatial_index = (
-            isinstance(old_field, GeometryField) and old_field.spatial_index
+            isinstance(old_field, BaseSpatialField) and old_field.spatial_index
         )
         new_field_spatial_index = (
-            isinstance(new_field, GeometryField) and new_field.spatial_index
+            isinstance(new_field, BaseSpatialField) and new_field.spatial_index
         )
         if not old_field_spatial_index and new_field_spatial_index:
             self.execute(self._create_spatial_index_sql(model, new_field))
@@ -96,28 +96,29 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
         return self._create_index_name(model._meta.db_table, [field.column], "_id")
 
     def _create_spatial_index_sql(self, model, field, **kwargs):
-        expressions = None
-        opclasses = None
+        expressions = kwargs.pop("expressions", None)
+        opclasses = kwargs.pop("opclasses", None)
         fields = [field]
         if field.geom_type == "RASTER":
             # For raster fields, wrap index creation SQL statement with
             # ST_ConvexHull. Indexes on raster columns are based on the convex
-            # hull of the raster.
+            # hull of the raster. Note that expressions is None here since
+            # fields and expressions are mutually exclusive in Index creation.
             expressions = Func(Col(None, field), template=self.rast_index_template)
             fields = None
-        elif field.dim > 2 and not field.geography:
+        elif field.dim > 2 and not field.geography and not opclasses:
             # Use "nd" ops which are fast on multidimensional cases
             opclasses = [self.geom_index_ops_nd]
-        if not (name := kwargs.get("name")):
-            name = self._create_spatial_index_name(model, field)
-
+        if not kwargs.get("name"):
+            kwargs["name"] = self._create_spatial_index_name(model, field)
+        if not kwargs.get("using"):
+            kwargs["using"] = " USING %s" % self.geom_index_type
         return super()._create_index_sql(
             model,
             fields=fields,
-            name=name,
-            using=" USING %s" % self.geom_index_type,
             opclasses=opclasses,
             expressions=expressions,
+            **kwargs,
         )
 
     def _delete_spatial_index_sql(self, model, field):

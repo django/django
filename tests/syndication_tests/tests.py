@@ -17,6 +17,7 @@ from django.utils.feedgenerator import (
     rfc2822_date,
     rfc3339_date,
 )
+from django.utils.xmlutils import UnserializableContentError
 
 from .models import Article, Entry
 
@@ -525,6 +526,11 @@ class SyndicationFeedTest(FeedTestCase):
             if link.firstChild.wholeText == "http://example.com/blog/4/":
                 title = item.getElementsByTagName("title")[0]
                 self.assertEqual(title.firstChild.wholeText, "A &amp; B &lt; C &gt; D")
+
+    def test_no_control_chars_in_attributes(self):
+        msg = "Control characters are not supported in XML 1.0"
+        with self.assertRaisesMessage(UnserializableContentError, msg):
+            self.client.get("/syndication/atom/invalid/")
 
     def test_naive_datetime_conversion(self):
         """

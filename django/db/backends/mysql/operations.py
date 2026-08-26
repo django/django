@@ -3,7 +3,6 @@ import uuid
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import split_tzname_delta
-from django.db.models import Exists, ExpressionWrapper, Lookup
 from django.db.models.constants import OnConflict
 from django.utils import timezone
 from django.utils.encoding import force_str
@@ -62,7 +61,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             # EXTRACT returns 1-53 based on ISO-8601 for the week number.
             lookup_type = lookup_type.upper()
             if not self._extract_format_re.fullmatch(lookup_type):
-                raise ValueError(f"Invalid loookup type: {lookup_type!r}")
+                raise ValueError(f"Invalid lookup type: {lookup_type!r}")
             return f"EXTRACT({lookup_type} FROM {sql})", params
 
     def date_trunc_sql(self, lookup_type, sql, params, tzname=None):
@@ -392,19 +391,6 @@ class DatabaseOperations(BaseDatabaseOperations):
             ):
                 lookup = "JSON_UNQUOTE(%s)"
         return lookup
-
-    def conditional_expression_supported_in_where_clause(self, expression):
-        # MySQL ignores indexes with boolean fields unless they're compared
-        # directly to a boolean value.
-        if isinstance(expression, (Exists, Lookup)):
-            return True
-        if isinstance(expression, ExpressionWrapper) and expression.conditional:
-            return self.conditional_expression_supported_in_where_clause(
-                expression.expression
-            )
-        if getattr(expression, "conditional", False):
-            return False
-        return super().conditional_expression_supported_in_where_clause(expression)
 
     def on_conflict_suffix_sql(self, fields, on_conflict, update_fields, unique_fields):
         if on_conflict == OnConflict.UPDATE:

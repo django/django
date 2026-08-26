@@ -135,10 +135,39 @@ class ModuleImportTests(SimpleTestCase):
 
         # Test exceptions raised
         with self.assertRaises(ImportError):
-            import_string("no_dots_in_path")
+            import_string("does_not_exist")
         msg = 'Module "utils_tests" does not define a "unexistent" attribute'
         with self.assertRaisesMessage(ImportError, msg):
             import_string("utils_tests.unexistent")
+        msg = (
+            'Module "utils_tests.test_module" does not define a "unexistent" attribute'
+        )
+        with self.assertRaisesMessage(ImportError, msg):
+            import_string("utils_tests.test_module.unexistent")
+
+    def test_import_string_objects_collision_handling(self):
+        collision_dotpath = "utils_tests.test_module.collision.collider"
+        self.addCleanup(sys.modules.pop, collision_dotpath, None)
+
+        # When there is a name collision between __init__-defined variables and
+        # submodules, we get back the submodule.
+        cls = import_string(collision_dotpath)
+        mod = import_module(collision_dotpath)
+        self.assertEqual(mod, cls)
+
+    def test_import_string_unloaded_module(self):
+        module_dotpath = "utils_tests"
+        self.addCleanup(sys.modules.pop, module_dotpath, None)
+        import_string(module_dotpath)
+
+    def test_import_string_unloaded_submodule(self):
+        submodule_dotpath = "utils_tests.test_module.good_module"
+        self.addCleanup(sys.modules.pop, submodule_dotpath, None)
+        import_string(submodule_dotpath)
+
+    def test_import_string_empty(self):
+        with self.assertRaisesMessage(ValueError, "Empty module name"):
+            import_string("")
 
 
 @modify_settings(INSTALLED_APPS={"append": "utils_tests.test_module"})

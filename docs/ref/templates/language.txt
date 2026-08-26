@@ -481,8 +481,6 @@ wouldn't know which one of the blocks' content to use.
 Template partials
 =================
 
-.. versionadded:: 6.0
-
 Template partials define reusable template fragments within a template file.
 They are self-contained components that can be rendered multiple times within
 the same template, helping to avoid repetition and maintain consistent output.

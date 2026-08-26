@@ -3,21 +3,21 @@
 # Translators:
 # Bayu Satiyo <itsyuukunz@gmail.com>, 2024
 # Claude Paroz <claude@2xlibre.net>, 2014
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2025
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2026
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
 # oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016,2020
 # rodin <romihardiyanto@gmail.com>, 2011-2013
 # rodin <romihardiyanto@gmail.com>, 2013-2017
-# sag​e <laymonage@gmail.com>, 2019
+# S​age Abdullah <laymonage@gmail.com>, 2019
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 07:05+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2025\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2026-03-09 07:05+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2026\n"
 "Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -329,11 +329,8 @@ msgstr ""
 "Terjadi sebuah galat dan telah dilaporkan ke administrator situs melalui "
 "surel untuk diperbaiki. Terima kasih atas pengertian Anda."
 
-msgid "Run the selected action"
-msgstr "Jalankan aksi terpilih"
-
-msgid "Go"
-msgstr "Buka"
+msgid "Run"
+msgstr "Berjalan"
 
 msgid "Click here to select the objects across all pages"
 msgstr "Klik di sini untuk memilih semua objek pada semua laman"
@@ -441,6 +438,9 @@ msgstr "Tampilkan hitungan"
 msgid "Clear all filters"
 msgstr "Hapus semua penyaringan"
 
+msgid "Save"
+msgstr "Simpan"
+
 msgid "Remove from sorting"
 msgstr "Dihapus dari pengurutan"
 
@@ -462,29 +462,28 @@ msgstr "Ganti tema (tema saat ini: gelap)"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Menghapus %(object_name)s '%(escaped_object)s' akan menghapus objek lain "
-"yang terkait, tetapi akun Anda tidak memiliki izin untuk menghapus objek "
-"dengan tipe berikut:"
+"Menghapus %(object_name)s “%(escaped_object)s” akan menghapus objek terkait, "
+"tetapi akun anda tidak memiliki perijinan menghapus jenis objek berikut:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Menghapus %(object_name)s '%(escaped_object)s' memerlukan penghapusan objek "
-"terlindungi yang terkait sebagai berikut:"
+"Menghapus %(object_name)s “%(escaped_object)s” akan membutuhkan menghapus "
+"objek terkait terlindungi berikut:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Yakin ingin menghapus %(object_name)s \"%(escaped_object)s\"? Semua objek "
-"lain yang terkait juga akan dihapus:"
+"Apakah anda ingin menghapus %(object_name)s “%(escaped_object)s”? Semua "
+"barang terkair berikut akan dihapus:"
 
 msgid "Objects"
 msgstr "Objek"
@@ -592,6 +591,10 @@ msgstr "Pengguna"
 msgid "Action"
 msgstr "Aksi"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr "Penomoran halaman %(name)s masukan"
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "masukan"
@@ -603,14 +606,19 @@ msgstr ""
 "Objek ini tidak memiliki riwayat perubahan. Mungkin objek ini tidak "
 "ditambahkan melalui situs administrasi ini."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr "Penomoran halaman %(name)s"
+
 msgid "Show all"
 msgstr "Tampilkan semua"
 
-msgid "Save"
-msgstr "Simpan"
-
 msgid "Popup closing…"
 msgstr "Menutup jendela sembulan..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr "Mencari %(name)s"
 
 msgid "Search"
 msgstr "Cari"

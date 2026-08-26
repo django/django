@@ -330,16 +330,7 @@ def check_pr_title_has_ticket(pr_title, ticket_id):
 
 
 def check_branch_description(pr_body):
-    """The branch description must be present.
-
-    The description should not contain the placeholder, and should be at least
-    5 words long.
-    """
-    placeholder = (
-        "Provide a concise overview of the issue or rationale behind the"
-        " proposed changes."
-    )
-
+    """The branch description should be at least five words long."""
     description_match = re.search(
         r"#### Branch description[ \t]*\r?\n(.*?)(?=\r?\n####|\Z)",
         pr_body,
@@ -351,7 +342,7 @@ def check_branch_description(pr_body):
     # Strip HTML comments before evaluating content.
     cleaned = strip_html_comments(description_match.group(1)).strip()
 
-    if not cleaned or placeholder in cleaned or len(cleaned.split()) < MIN_WORDS:
+    if not cleaned or len(cleaned.split()) < MIN_WORDS:
         return Message(*MISSING_DESCRIPTION)
 
     return None
@@ -360,7 +351,7 @@ def check_branch_description(pr_body):
 def check_ai_disclosure(pr_body):
     """Exactly one AI disclosure checkbox must be selected.
 
-    If the "AI tools were used" option is checked, at least 5 words of
+    If the "AI tools were used" option is checked, at least five words of
     additional description must be present in that section.
     """
     ai_match = re.search(
@@ -390,7 +381,7 @@ def check_ai_disclosure(pr_body):
             for line in section.splitlines()
             if line.strip() and not line.strip().startswith("- [")
         ]
-        # Ensure PR author includes at least 5 words about their AI use.
+        # Ensure PR author includes at least five words about their AI use.
         if len(" ".join(extra_lines).split()) < MIN_WORDS:
             return Message(*MISSING_AI_DESCRIPTION)
 
@@ -470,10 +461,18 @@ def main(
             pr_number,
         )
         return
+    if commit_count == 0:
+        logger.info(
+            "PR #%s author has no commits -- setting size threshold to 0.",
+            pr_number,
+        )
+        threshold = 0
+    else:
+        threshold = LARGE_PR_THRESHOLD
 
     pr_title_result = SKIPPED
     total_changes = get_pr_total_changes(pr_number, repo, token)
-    ticket_result = check_trac_ticket(pr_body, total_changes)
+    ticket_result = check_trac_ticket(pr_body, total_changes, threshold)
     ticket_status_result = SKIPPED
     ticket_has_patch_result = SKIPPED
     ticket_id = extract_ticket_id(pr_body) if ticket_result is None else None

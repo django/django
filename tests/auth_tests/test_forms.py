@@ -1159,7 +1159,10 @@ class UserChangeFormTest(TestDataMixin, TestCase):
         )
 
 
-@override_settings(TEMPLATES=AUTH_TEMPLATES)
+@override_settings(
+    TEMPLATES=AUTH_TEMPLATES,
+    MAILERS={"default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}},
+)
 class PasswordResetFormTest(TestDataMixin, TestCase):
     @classmethod
     def setUpClass(cls):
@@ -1382,7 +1385,9 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
             )
         )
 
-    @override_settings(EMAIL_BACKEND="mail.custombackend.FailingEmailBackend")
+    @override_settings(
+        MAILERS={"default": {"BACKEND": "mail.custombackend.FailingEmailBackend"}}
+    )
     def test_save_send_email_exceptions_are_catched_and_logged(self):
         self.addCleanup(FailingEmailBackend.reset)
         user, username, email = self.create_dummy_user()

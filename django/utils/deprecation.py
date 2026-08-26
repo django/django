@@ -1,33 +1,37 @@
 import functools
 import inspect
-import os
+import sys
 import warnings
 from collections import Counter
-from inspect import iscoroutinefunction, markcoroutinefunction
+from inspect import iscoroutinefunction
 
-from asgiref.sync import sync_to_async
-
-import django
+from django.middleware import MiddlewareMixin as _MiddlewareMixin
 from django.utils.inspect import signature
+from django.utils.warnings import django_file_prefixes
 
 
-@functools.cache
-def django_file_prefixes():
-    file = getattr(django, "__file__", None)
-    if file is None:
-        return ()
-    return (os.path.join(os.path.dirname(file), ""),)
-
-
-class RemovedInNextVersionWarning(DeprecationWarning):
+class RemovedInDjango70Warning(DeprecationWarning):
     pass
 
 
-class RemovedInDjango70Warning(PendingDeprecationWarning):
+class RemovedInDjango71Warning(PendingDeprecationWarning):
     pass
 
 
-RemovedAfterNextVersionWarning = RemovedInDjango70Warning
+RemovedInNextVersionWarning = RemovedInDjango70Warning
+RemovedAfterNextVersionWarning = RemovedInDjango71Warning
+
+
+def __getattr__(name):
+    if name == "MiddlewareMixin":
+        warnings.warn(
+            "Importing MiddlewareMixin from django.utils.deprecation is deprecated. "
+            "Import from django.middleware.MiddlewareMixin instead.",
+            RemovedInDjango71Warning,
+            stacklevel=2,
+        )
+        return _MiddlewareMixin
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 def warn_about_external_use(
@@ -107,6 +111,58 @@ def warn_about_external_use(
 
     if not is_internal:
         warnings.warn(message, category=category, stacklevel=level + 1)
+
+
+def warn_about_implementation(message, category, target):
+    """Issue a warning about a specific function, class, or method definition.
+
+    The warning will point to the source filename and line number where
+    'target' is _defined_ (not where it is being _called_ as with other warning
+    helpers). Use this to warn about code that isn't currently on the call
+    stack, e.g., deprecation based on the return value of a called method or
+    inspecting a function's signature to see if it supports an updated API.
+
+    Supported usage:
+    warn_about_implementation(message, category, some_function)
+    warn_about_implementation(message, category, SomeClass)
+    warn_about_implementation(message, category, SomeClass.method)
+    warn_about_implementation(message, category, self.method) [a bound method]
+
+    To warn about a property without invoking its descriptor, call with
+    'target' set to inspect.getattr_static(class_or_instance, "property_name").
+    """
+    if inspect.ismethod(target) or isinstance(target, (classmethod, staticmethod)):
+        function = target.__func__
+    elif inspect.isfunction(target) or inspect.isclass(target):
+        function = target
+    elif isinstance(target, property):
+        function = target.fget
+    else:
+        raise TypeError(
+            "target must be a function, class, bound method, or unbound descriptor "
+            "(classmethod, staticmethod, or property)."
+        )
+
+    function = inspect.unwrap(function)
+
+    try:
+        filename = inspect.getsourcefile(function)
+        _, lineno = inspect.getsourcelines(function)
+    except (AttributeError, OSError, TypeError):
+        # Can't identify the source. Issue the warning generically.
+        warnings.warn(message, category, skip_file_prefixes=django_file_prefixes())
+        return
+
+    # Find or create the module's warning registry so warning filters work.
+    module = function.__module__
+    try:
+        registry = sys.modules[module].__dict__.setdefault("__warningregistry__", {})
+    except (AttributeError, KeyError):
+        registry = None
+
+    warnings.warn_explicit(
+        message, category, filename, lineno, module=module, registry=registry
+    )
 
 
 class warn_about_renamed_method:
@@ -349,62 +405,3 @@ def deprecate_posargs(deprecation_warning, remappable_names, /):
         return wrapper
 
     return decorator
-
-
-class MiddlewareMixin:
-    sync_capable = True
-    async_capable = True
-
-    def __init__(self, get_response):
-        if get_response is None:
-            raise ValueError("get_response must be provided.")
-        self.get_response = get_response
-        # If get_response is a coroutine function, turns us into async mode so
-        # a thread is not consumed during a whole request.
-        self.async_mode = iscoroutinefunction(self.get_response)
-        if self.async_mode:
-            # Mark the class as async-capable, but do the actual switch inside
-            # __call__ to avoid swapping out dunder methods.
-            markcoroutinefunction(self)
-        super().__init__()
-
-    def __repr__(self):
-        return "<%s get_response=%s>" % (
-            self.__class__.__qualname__,
-            getattr(
-                self.get_response,
-                "__qualname__",
-                self.get_response.__class__.__name__,
-            ),
-        )
-
-    def __call__(self, request):
-        # Exit out to async mode, if needed
-        if self.async_mode:
-            return self.__acall__(request)
-        response = None
-        if hasattr(self, "process_request"):
-            response = self.process_request(request)
-        response = response or self.get_response(request)
-        if hasattr(self, "process_response"):
-            response = self.process_response(request, response)
-        return response
-
-    async def __acall__(self, request):
-        """
-        Async version of __call__ that is swapped in when an async request
-        is running.
-        """
-        response = None
-        if hasattr(self, "process_request"):
-            response = await sync_to_async(
-                self.process_request,
-                thread_sensitive=True,
-            )(request)
-        response = response or await self.get_response(request)
-        if hasattr(self, "process_response"):
-            response = await sync_to_async(
-                self.process_response,
-                thread_sensitive=True,
-            )(request, response)
-        return response

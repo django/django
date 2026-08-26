@@ -4,6 +4,7 @@ advertised - especially with regards to the handling of the
 DJANGO_SETTINGS_MODULE and default settings.py files.
 """
 
+import json
 import os
 import re
 import shutil
@@ -28,8 +29,11 @@ from django.core.management import (
     call_command,
     color,
     execute_from_command_line,
+    get_commands,
+    load_command_class,
 )
 from django.core.management.base import LabelCommand, SystemCheckError
+from django.core.management.commands.listurls import Command as ListurlsCommand
 from django.core.management.commands.loaddata import Command as LoaddataCommand
 from django.core.management.commands.runserver import Command as RunserverCommand
 from django.core.management.commands.testserver import Command as TestserverCommand
@@ -255,10 +259,19 @@ class DjangoAdminNoSettings(AdminScriptTestCase):
         Commands that don't require settings succeed if the settings file
         doesn't exist.
         """
-        args = ["startproject"]
-        out, err = self.run_django_admin(args, settings_file="bad_settings")
-        self.assertNoOutput(out)
-        self.assertOutput(err, "You must provide a project name", regex=True)
+        for cmd, owner in get_commands().items():
+            if owner != "django.core":
+                continue
+            with self.subTest(command=cmd):
+                out, err = self.run_django_admin(
+                    [cmd, "--help"], settings_file="bad_settings"
+                )
+                klass = load_command_class(owner, cmd)
+                if klass.requires_settings:
+                    msg = "No module named 'bad_settings'."
+                    self.assertOutput(err, msg)
+                else:
+                    self.assertNotIn("bad_settings", err)
 
 
 class DjangoAdminDefaultSettings(AdminScriptTestCase):
@@ -886,6 +899,18 @@ class ManageNoSettings(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+
+    def test_runserver_with_bad_settings(self):
+        args = ["runserver", "--settings=bad_settings", "--nostatic"]
+        out, err = self.run_manage(args)
+        self.assertNoOutput(out)
+        self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+
+    def test_startapp_with_bad_settings(self):
+        args = ["startapp", "--settings=bad_settings", "app1"]
+        out, err = self.run_manage(args)
+        self.assertNoOutput(out)
+        self.assertNoOutput(err)
 
     def test_builtin_with_bad_environment(self):
         """
@@ -1865,6 +1890,7 @@ class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
 class ManageRunserverHelpOutput(AdminScriptTestCase):
     def test_suppressed_options(self):
         """runserver doesn't support --verbosity and --trackback options."""
+        self.write_settings("settings.py")
         out, err = self.run_manage(["runserver", "--help"])
         self.assertNotInOutput(out, "--verbosity")
         self.assertNotInOutput(out, "--trackback")
@@ -2450,7 +2476,8 @@ class CommandDBOptionChoiceTests(SimpleTestCase):
         if PY314:
             expected_error = (
                 r"Error: argument --database: invalid choice: 'deflaut', "
-                r"maybe you meant 'default'\? \(choose from default, other\)"
+                r"maybe you meant 'default'\? "
+                r"\(choose from '?default'?, '?other'?\)"
             )
         else:
             expected_error = (
@@ -2774,6 +2801,21 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, "run.py")))
+
+    def test_custom_project_template_from_tarball_by_url_bad_filename(self):
+        """
+        The startproject management command will raise SuspiciousFileOperation
+        on an ill-formed remote template archive filename.
+        """
+        template_url = "%s/bad_template_filename.tgz" % self.live_server_url
+
+        args = ["startproject", "--template", template_url, "urltestproject"]
+
+        out, err = self.run_django_admin(args)
+        self.assertOutput(
+            err,
+            "is located outside of the base path component",
+        )
 
     def test_custom_project_template_from_tarball_by_url_django_user_agent(self):
         user_agent = None
@@ -3310,6 +3352,293 @@ class Dumpdata(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertOutput(err, "You can only use --pks option with one model")
         self.assertNoOutput(out)
+
+
+@override_settings(ROOT_URLCONF="admin_scripts.app_with_urls.root_urls")
+class Listurls(AdminScriptTestCase):
+    def test_default(self):
+        self.write_settings(
+            "settings.py",
+            apps=["admin_scripts.app_with_urls"],
+        )
+
+        args = ["listurls"]
+        out, err = self.run_manage(args)
+
+        self.assertNoOutput(err)
+
+        # Check route, view and (if defined) name for each URL.
+        self.assertOutput(out, "/namespaced/named")
+        self.assertOutput(
+            out,
+            "admin_scripts.app_with_urls.views.view_func_namespaced_named",
+        )
+        self.assertOutput(out, "ns:named")
+
+        self.assertOutput(out, "/namespaced/unnamed")
+        self.assertOutput(
+            out,
+            "admin_scripts.app_with_urls.views.view_func_namespaced_unnamed",
+        )
+
+        self.assertOutput(out, "/nons/named")
+        self.assertOutput(out, "admin_scripts.app_with_urls.views.view_func_nons_named")
+        self.assertOutput(out, "app_with_urls:named")
+
+        self.assertOutput(out, "/nons/unnamed")
+        self.assertOutput(
+            out,
+            "admin_scripts.app_with_urls.views.view_func_nons_unnamed",
+        )
+
+    def test_urls_with_metachars(self):
+        self.write_settings(
+            "settings.py",
+            apps=["admin_scripts.app_with_urls"],
+        )
+
+        args = ["listurls", "--prefix", "/.well-known"]
+        out, err = self.run_manage(args)
+
+        self.assertOutput(out, "/.well-known/openid-configuration/")
+        self.assertNoOutput(err)
+
+    def test_cbv_formatting(self):
+        self.write_settings(
+            "settings.py",
+            apps=["admin_scripts.app_with_urls"],
+        )
+
+        args = ["listurls", "--prefix", "/cbv"]
+        out, err = self.run_manage(args)
+
+        self.assertOutput(out, "/cbv/named")
+        self.assertOutput(out, "admin_scripts.app_with_urls.views.CBV")
+        self.assertOutput(out, "app_with_urls_cbv:named")
+        self.assertNoOutput(err)
+
+    def test_tabular(self):
+        self.write_settings(
+            "settings.py",
+            apps=["admin_scripts.app_with_urls"],
+        )
+
+        args = ["listurls", "-f", "tabular"]
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+
+        # Check route, view and (if defined) name for each URL.
+        self.assertOutput(out, "/namespaced/named")
+        self.assertOutput(
+            out,
+            "admin_scripts.app_with_urls.views.view_func_namespaced_named",
+        )
+        self.assertOutput(out, "ns:named")
+
+        self.assertOutput(out, "/namespaced/unnamed")
+        self.assertOutput(
+            out,
+            "admin_scripts.app_with_urls.views.view_func_namespaced_unnamed",
+        )
+
+        self.assertOutput(out, "/nons/named")
+        self.assertOutput(out, "admin_scripts.app_with_urls.views.view_func_nons_named")
+        self.assertOutput(out, "app_with_urls:named")
+
+        self.assertOutput(out, "/nons/unnamed")
+        self.assertOutput(
+            out,
+            "admin_scripts.app_with_urls.views.view_func_nons_unnamed",
+        )
+
+    def test_stacked(self):
+        self.write_settings(
+            "settings.py",
+            apps=["admin_scripts.app_with_urls"],
+        )
+
+        args = ["listurls", "-f", "stacked"]
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+
+        self.assertOutput(out, "Route:")
+        self.assertOutput(out, "View:")
+        self.assertOutput(out, "Name:")
+        self.assertOutput(out, "-" * 20)
+
+        self.assertOutput(out, "/namespaced/named")
+        self.assertOutput(
+            out,
+            "admin_scripts.app_with_urls.views.view_func_namespaced_named",
+        )
+        self.assertOutput(out, "ns:named")
+
+        self.assertOutput(out, "/namespaced/unnamed")
+        self.assertOutput(
+            out, "admin_scripts.app_with_urls.views.view_func_namespaced_unnamed"
+        )
+
+        self.assertOutput(out, "/nons/named")
+        self.assertOutput(out, "app_with_urls:named")
+        self.assertOutput(out, "admin_scripts.app_with_urls.views.view_func_nons_named")
+
+        self.assertOutput(out, "/nons/unnamed")
+        self.assertOutput(
+            out,
+            "admin_scripts.app_with_urls.views.view_func_nons_unnamed",
+        )
+
+    def test_json(self):
+        self.write_settings(
+            "settings.py",
+            apps=["admin_scripts.app_with_urls"],
+        )
+
+        args = ["listurls", "-f", "json"]
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+
+        json.loads(out)
+
+        self.assertOutput(out, '"route": "/namespaced/named"')
+        self.assertOutput(
+            out,
+            '"view": "admin_scripts.app_with_urls.views.view_func_namespaced_named"',
+        )
+        self.assertOutput(out, '"name": "ns:named"')
+
+        self.assertOutput(out, '"route": "/namespaced/unnamed"')
+        self.assertOutput(
+            out,
+            '"view": "admin_scripts.app_with_urls.views.view_func_namespaced_unnamed"',
+        )
+
+        self.assertOutput(out, '"route": "/nons/named"')
+        self.assertOutput(out, "admin_scripts.app_with_urls.views.view_func_nons_named")
+        self.assertOutput(out, "app_with_urls:named")
+
+        self.assertOutput(out, "/nons/unnamed")
+        self.assertOutput(
+            out,
+            "admin_scripts.app_with_urls.views.view_func_nons_unnamed",
+        )
+
+    def test_unsorted(self):
+        self.write_settings(
+            "settings.py",
+            apps=["admin_scripts.app_with_urls"],
+        )
+
+        # JSON format is the easiest to parse and test.
+        args = ["listurls", "-f", "json", "--unsorted"]
+        out, err = self.run_manage(args)
+        url_patterns = json.loads(out)
+
+        self.assertNotEqual(
+            url_patterns,
+            sorted(url_patterns, key=lambda u: u["route"]),
+        )
+
+    def test_tabular_with_color_enabled(self):
+        out = StringIO()
+        err = StringIO()
+
+        with mock.patch(
+            "django.core.management.color.supports_color", lambda *args: True
+        ):
+            command = ListurlsCommand(stdout=out, stderr=err)
+            self.write_settings(
+                "settings.py",
+                apps=["admin_scripts.app_with_urls"],
+            )
+            call_command(command, format="tabular")
+
+        self.assertIn(command.style.COMMAND_DATA("/namespaced/named"), out.getvalue())
+        self.assertIn(
+            command.style.COMMAND_HIGHLIGHT("view_func_namespaced_named"),
+            out.getvalue(),
+        )
+        self.assertIn(command.style.COMMAND_HIGHLIGHT("named"), out.getvalue())
+
+    def test_tabular_with_color_suppressed(self):
+        out = StringIO()
+        err = StringIO()
+
+        with mock.patch(
+            "django.core.management.color.supports_color", lambda *args: True
+        ):
+            command = ListurlsCommand(stdout=out, stderr=err)
+            call_command(command, format="tabular", no_color=True)
+
+        self.assertIn("/namespaced/named", out.getvalue())
+
+        # There should be no escape codes in the output.
+        self.assertNotIn("\x1b", out.getvalue())
+
+    def test_stacked_with_color_enabled(self):
+        out = StringIO()
+        err = StringIO()
+
+        with mock.patch(
+            "django.core.management.color.supports_color", lambda *args: True
+        ):
+            command = ListurlsCommand(stdout=out, stderr=err)
+            call_command(command, format="stacked")
+
+        self.assertIn(command.style.COMMAND_DATA("/namespaced/named"), out.getvalue())
+        self.assertIn(
+            command.style.COMMAND_HIGHLIGHT("view_func_namespaced_named"),
+            out.getvalue(),
+        )
+        self.assertIn(command.style.COMMAND_HIGHLIGHT("named"), out.getvalue())
+        for header in ["Route", "View", "Name"]:
+            with self.subTest(header=header):
+                self.assertIn(
+                    command.style.COMMAND_HEADER(f"{header}: "), out.getvalue()
+                )
+
+    def test_stacked_with_color_suppressed(self):
+        out = StringIO()
+        err = StringIO()
+
+        with mock.patch(
+            "django.core.management.color.supports_color", lambda *args: True
+        ):
+            command = ListurlsCommand(stdout=out, stderr=err)
+            call_command(command, format="stacked", no_color=True)
+
+        self.assertIn("/namespaced/named", out.getvalue())
+
+        # There should be no escape codes in the output.
+        self.assertNotIn("\x1b", out.getvalue())
+
+    @override_settings(ROOT_URLCONF="urls")
+    def test_no_urls(self):
+        self.write_settings("settings.py")
+
+        args = ["listurls"]
+        out, err = self.run_manage(args)
+
+        self.assertOutput(err, "There are no URL patterns that match given prefixes")
+        self.assertNoOutput(out)
+
+    def test_prefixes(self):
+        self.write_settings(
+            "settings.py",
+            apps=["admin_scripts.app_with_urls"],
+        )
+
+        args = ["listurls", "-p", "/namespaced"]
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+
+        self.assertOutput(out, "/namespaced/named")
+        self.assertOutput(out, "ns:named")
+        self.assertOutput(out, "/namespaced/unnamed")
+
+        self.assertNotInOutput(out, "/nons/named")
+        self.assertNotInOutput(out, "app_with_urls:named")
+        self.assertNotInOutput(out, "/nons/unnamed")
 
 
 class MainModule(AdminScriptTestCase):

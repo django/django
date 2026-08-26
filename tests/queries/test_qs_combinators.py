@@ -21,6 +21,7 @@ from .models import (
     Article,
     Author,
     Celebrity,
+    Cover,
     ExtraInfo,
     Note,
     Number,
@@ -419,7 +420,6 @@ class QuerySetSetOperationTests(TestCase):
         qs2 = base_qs.filter(name="a2")
         self.assertSequenceEqual(qs1.union(qs2).order_by("pk"), [a1, a2])
 
-    @skipUnlessDBFeature("supports_slicing_ordering_in_compound")
     def test_union_with_select_related_and_first(self):
         e1 = ExtraInfo.objects.create(value=7, info="e1")
         a1 = Author.objects.create(name="a1", num=1, extra=e1)
@@ -570,7 +570,6 @@ class QuerySetSetOperationTests(TestCase):
         # Combined queries don't mutate.
         self.assertCountEqual(qs, ["a1", "a2"])
 
-    @skipUnlessDBFeature("supports_slicing_ordering_in_compound")
     def test_union_in_with_ordering(self):
         qs1 = Number.objects.filter(num__gt=7).order_by("num")
         qs2 = Number.objects.filter(num__lt=2).order_by("num")
@@ -578,6 +577,23 @@ class QuerySetSetOperationTests(TestCase):
             Number.objects.exclude(id__in=qs1.union(qs2).values("id")),
             [2, 3, 4, 5, 6, 7],
             ordered=False,
+        )
+
+    def test_double_union_in_with_default_ordering(self):
+        e1 = ExtraInfo.objects.create(value=7, info="e1")
+        Author.objects.bulk_create(
+            [Author(num=i, name=f"a{i}", extra=e1) for i in range(1, 8)]
+        )
+        qs1 = Author.objects.filter(num__lt=2)
+        qs2 = Author.objects.filter(num__gt=6)
+        qs3 = Author.objects.filter(num=4)
+        double_union = qs1.union(qs2).union(qs3)
+        # Target a column (num) other than the ordering column (name). Before,
+        # on Postgres: "each UNION query must have the same number of columns".
+        self.assertQuerySetEqual(
+            Author.objects.filter(num__in=double_union.values("num")).order_by("-name"),
+            ["a7", "a4", "a1"],
+            transform=lambda au: au.name,
         )
 
     @skipUnlessDBFeature(
@@ -607,11 +623,14 @@ class QuerySetSetOperationTests(TestCase):
         qs = Author.objects.select_related("extra").order_by()
         self.assertEqual(qs.union(qs).count(), 1)
 
-    @skipUnlessDBFeature("supports_slicing_ordering_in_compound")
     def test_count_union_with_select_related_in_values(self):
         e1 = ExtraInfo.objects.create(value=1, info="e1")
         a1 = Author.objects.create(name="a1", num=1, extra=e1)
-        qs = Author.objects.select_related("extra").values("pk", "name", "extra__value")
+        qs = (
+            Author.objects.select_related("extra")
+            .order_by()
+            .values("pk", "name", "extra__value")
+        )
         self.assertCountEqual(
             qs.union(qs), [{"pk": a1.id, "name": "a1", "extra__value": 1}]
         )
@@ -692,7 +711,7 @@ class QuerySetSetOperationTests(TestCase):
         msg = "LIMIT/OFFSET not allowed in subqueries of compound statements"
         with self.assertRaisesMessage(DatabaseError, msg):
             list(qs1.union(qs2[:10]))
-        msg = "ORDER BY not allowed in subqueries of compound statements"
+        msg = "ORDER BY not allowed in subqueries of compound statements."
         with self.assertRaisesMessage(DatabaseError, msg):
             list(qs1.order_by("id").union(qs2))
         with self.assertRaisesMessage(DatabaseError, msg):
@@ -737,6 +756,16 @@ class QuerySetSetOperationTests(TestCase):
             list(qs1.union(qs2).order_by(F("num").desc()))
         # switched order, now 'exists' again:
         list(qs2.union(qs1).order_by("num"))
+
+    def test_order_by_non_selected_column_from_default_ordering(self):
+        qs = Cover.objects.values("title")
+        msg = "ORDER BY term does not match any column in the result set"
+        with self.assertRaisesMessage(DatabaseError, msg):
+            list(qs.union(qs))
+        with self.assertRaisesMessage(DatabaseError, msg):
+            list(qs.intersection(qs))
+        with self.assertRaisesMessage(DatabaseError, msg):
+            list(qs.difference(qs))
 
     @skipUnlessDBFeature("supports_select_difference", "supports_select_intersection")
     def test_qs_with_subcompound_qs(self):

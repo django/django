@@ -2,7 +2,7 @@ import gc
 
 from django.db.models.base import ModelState, ModelStateFieldsCacheDescriptor
 from django.test import SimpleTestCase
-from django.test.utils import garbage_collect
+from django.test.utils import garbage_collect, requires_gil
 
 from .models import Worker, WorkerProfile
 
@@ -11,6 +11,7 @@ class ModelStateTests(SimpleTestCase):
     def test_fields_cache_descriptor(self):
         self.assertIsInstance(ModelState.fields_cache, ModelStateFieldsCacheDescriptor)
 
+    @requires_gil
     def test_one_to_one_field_cycle_collection(self):
         self.addCleanup(gc.set_debug, gc.get_debug())
         gc.set_debug(gc.DEBUG_SAVEALL)

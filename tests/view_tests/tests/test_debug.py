@@ -5,11 +5,12 @@ import re
 import sys
 import tempfile
 import threading
+from inspect import iscoroutinefunction
 from io import StringIO
 from pathlib import Path
 from unittest import mock, skipIf
 
-from asgiref.sync import async_to_sync, iscoroutinefunction
+from asgiref.sync import async_to_sync
 
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -49,6 +50,7 @@ from ..views import (
     multivalue_dict_key_error,
     non_sensitive_view,
     paranoid_view,
+    partially_sensitive_view,
     sensitive_args_function_caller,
     sensitive_kwargs_function_caller,
     sensitive_method_view,
@@ -495,6 +497,14 @@ class DebugViewTests(SimpleTestCase):
         with self.assertLogs("django.request", "ERROR"):
             response = self.client.get("/raises500/", headers={"accept": "text/plain"})
         self.assertContains(response, "Oh dear, an error occurred!", status_code=500)
+
+    # RemovedInDjango70Warning.
+    @override_settings(MAILERS={})
+    def test_works_with_mailers_defined(self):
+        with self.assertLogs("django.request", "ERROR"):
+            response = self.client.get("/raises500/")
+        self.assertContains(response, "MAILERS", status_code=500)
+        self.assertNotContains(response, "EMAIL_BACKEND", status_code=500)
 
 
 class DebugViewQueriesAllowedTests(SimpleTestCase):
@@ -1003,7 +1013,10 @@ class ExceptionReporterTests(SimpleTestCase):
         )
         with self.assertWarnsMessage(ExceptionCycleWarning, msg):
             tb_generator.start()
-        tb_generator.join(timeout=5)
+            # The warning is emitted in the background thread, so wait for it
+            # to finish before the assertion is checked on exiting the context
+            # manager.
+            tb_generator.join(timeout=5)
         if tb_generator.is_alive():
             # tb_generator is a daemon that runs until the main thread/process
             # exits. This is resource heavy when running the full test suite.
@@ -1586,7 +1599,10 @@ class ExceptionReportTestMixin:
                 self.assertNotIn(v, body)
 
 
-@override_settings(ROOT_URLCONF="view_tests.urls")
+@override_settings(
+    ROOT_URLCONF="view_tests.urls",
+    MAILERS={"default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}},
+)
 class ExceptionReporterFilterTests(
     ExceptionReportTestMixin, LoggingCaptureMixin, SimpleTestCase
 ):
@@ -1660,6 +1676,20 @@ class ExceptionReporterFilterTests(
         with self.settings(DEBUG=False):
             self.verify_paranoid_response(paranoid_view)
             self.verify_paranoid_email(paranoid_view)
+
+    def test_partially_sensitive_request(self):
+        """
+        No POST parameters can be seen in the default error reports for views
+        decorated with the no-argument form of sensitive_post_parameters()
+        alongside a with-arguments form of sensitive_variables().
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(partially_sensitive_view)
+            self.verify_unsafe_email(partially_sensitive_view)
+
+        with self.settings(DEBUG=False):
+            self.verify_paranoid_response(partially_sensitive_view)
+            self.verify_paranoid_email(partially_sensitive_view)
 
     def test_multivalue_dict_key_error(self):
         """

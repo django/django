@@ -13,6 +13,11 @@ from django.contrib.staticfiles import finders, storage
 from django.contrib.staticfiles.management.commands.collectstatic import (
     Command as CollectstaticCommand,
 )
+from django.contrib.staticfiles.storage import (
+    HashedFilesMixin,
+    _css_ignored_re,
+    _js_ignored_re,
+)
 from django.core.management import CommandError, call_command
 from django.test import SimpleTestCase, override_settings
 
@@ -65,7 +70,7 @@ class TestHashedFiles:
 
     def test_path_ignored_completely(self):
         relpath = self.hashed_file_path("cached/css/ignored.css")
-        self.assertEqual(relpath, "cached/css/ignored.0e15ac4a4fb4.css")
+        self.assertEqual(relpath, "cached/css/ignored.b71666be52dd.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertIn(b"#foobar", content)
@@ -89,6 +94,18 @@ class TestHashedFiles:
                 b'background: #d3d6d8 /* url("does.not.exist.png") */ '
                 b'url("/static/cached/img/relative.acae32e4532b.png") '
                 b'/*url("does.not.exist.either.png")*/',
+                content,
+            )
+            # Ignore string literals.
+            self.assertIn(b'content: "url(non_exist.png)";', content)
+            self.assertIn(b"content: 'url(non_exist.png)';", content)
+            # Tailwind-style \' in a selector must not create a false string
+            # that spans the url() value before the next string literal.
+            self.assertIn(
+                str.encode(
+                    r".tw\:bg-\[url\(\'non_exist.png\'\)\]"
+                    r' { background: url("../img/relative.acae32e4532b.png"); }'
+                ),
                 content,
             )
         self.assertPostCondition()
@@ -722,7 +739,7 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
 
     def test_module_import(self):
         relpath = self.hashed_file_path("cached/module.js")
-        self.assertEqual(relpath, "cached/module.eaa407b94311.js")
+        self.assertEqual(relpath, "cached/module.9ffdb99eeda2.js")
         tests = [
             # Relative imports.
             b'import testConst from "./module_test.477bbebe77f0.js";',
@@ -754,6 +771,27 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
             # Ignore line comments
             b'// import testConst from "./module_test_missing.js";',
             b'// const dynamicModule = import("./module_test_missing.js");',
+            # Ignore string literals
+            b"""const msg = 'import { foo } from "./module_test_missing.js";';""",
+            b"""const help = "import { bar } from './module_test_missing.js';";""",
+            b"""const tmpl = `import { baz } from "./module_test_missing.js";`;""",
+            b"""const dyn = 'const x = import("./module_test_missing.js");';""",
+            b"const multiLine = `\n"
+            b'import { baz } from "./module_test_missing.js";\n'
+            b"`;",
+            # export without from must not consume a subsequent import's from
+            b"export { testConst };",
+            b'import { firstConst } from "./module_test.477bbebe77f0.js";',
+            # Ignore imports in JSDoc block comments that follow a real import.
+            b'import"../nested/js/nested.866475c46bb4.js";',
+            b'import { something } from "./module_test_missing.js";',
+            # Automatic semicolon insertion
+            b'import * as m from "./module_test.477bbebe77f0.js"\n',
+            b'import { testConst as alias } from "./module_test.477bbebe77f0.js"\n',
+            # bare specifier imports should not be rewritten
+            b'import rootConst from "@vendor/package";',
+            b'import rootConst from "#utils";',
+            b'const buildModule = import("@vendor/package");',
         ]
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
@@ -763,7 +801,7 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
 
     def test_aggregating_modules(self):
         relpath = self.hashed_file_path("cached/module.js")
-        self.assertEqual(relpath, "cached/module.eaa407b94311.js")
+        self.assertEqual(relpath, "cached/module.9ffdb99eeda2.js")
         tests = [
             b'export * from "./module_test.477bbebe77f0.js";',
             b'export { testConst } from "./module_test.477bbebe77f0.js";',
@@ -984,3 +1022,221 @@ class TestCollectionHashedFilesCache(CollectionTestCase):
                 content = relfile.read()
                 self.assertIn(b"foo.57a5cb9ba68d.png", content)
                 self.assertIn(b"xyz.57a5cb9ba68d.png", content)
+
+
+class GetIgnoredBlocksTests(SimpleTestCase):
+    storage = HashedFilesMixin()
+
+    # CSS positive tests.
+
+    def test_css_block_comment(self):
+        content = "/* comment */"
+        blocks = self.storage.get_ignored_blocks(content, _css_ignored_re)
+        self.assertEqual(len(blocks), 1)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], "/* comment */")
+
+    def test_css_double_quoted_string(self):
+        content = '"url(fake.png)"'
+        blocks = self.storage.get_ignored_blocks(content, _css_ignored_re)
+        self.assertEqual(len(blocks), 1)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], '"url(fake.png)"')
+
+    def test_css_single_quoted_string(self):
+        content = "'url(fake.png)'"
+        blocks = self.storage.get_ignored_blocks(content, _css_ignored_re)
+        self.assertEqual(len(blocks), 1)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], "'url(fake.png)'")
+
+    def test_css_string_with_whitespace(self):
+        content = "'url(fake.png) a' \"url(fake.png)\tb\""
+        blocks = self.storage.get_ignored_blocks(content, _css_ignored_re)
+        self.assertEqual(len(blocks), 2)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], "'url(fake.png) a'")
+        start, end = blocks[1]
+        self.assertEqual(content[start:end], '"url(fake.png)\tb"')
+
+    def test_css_multiple_blocks(self):
+        content = '/* comment */ url(real.png) "url(fake.png)"'
+        blocks = self.storage.get_ignored_blocks(content, _css_ignored_re)
+        self.assertEqual(len(blocks), 2)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], "/* comment */")
+        start, end = blocks[1]
+        self.assertEqual(content[start:end], '"url(fake.png)"')
+
+    def test_css_escape_sequence(self):
+        content = r".tw\'-\' url(real.png)"
+        blocks = self.storage.get_ignored_blocks(content, _css_ignored_re)
+        self.assertEqual(len(blocks), 2)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], r"\'")
+        start, end = blocks[1]
+        self.assertEqual(content[start:end], r"\'")
+
+    def test_css_block_comment_with_strings_inside(self):
+        content = "/* \"ignored\" 'ignored' */ url(real.png)"
+        blocks = self.storage.get_ignored_blocks(content, _css_ignored_re)
+        self.assertEqual(len(blocks), 1)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], "/* \"ignored\" 'ignored' */")
+
+    def test_css_quote_inside_other_quote(self):
+        content = "\"a'b\" 'c\"d'"
+        blocks = self.storage.get_ignored_blocks(content, _css_ignored_re)
+        self.assertEqual(len(blocks), 2)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], '"a\'b"')
+        start, end = blocks[1]
+        self.assertEqual(content[start:end], "'c\"d'")
+
+    def test_css_string_with_comment_close(self):
+        content = '"a*/b"'
+        blocks = self.storage.get_ignored_blocks(content, _css_ignored_re)
+        self.assertEqual(len(blocks), 1)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], '"a*/b"')
+
+    def test_css_multiline_block_comment(self):
+        content = "/* line1\nline2\nline3 */"
+        blocks = self.storage.get_ignored_blocks(content, _css_ignored_re)
+        self.assertEqual(len(blocks), 1)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], "/* line1\nline2\nline3 */")
+
+    # CSS negative tests.
+
+    def test_css_unquoted_url_not_ignored(self):
+        blocks = self.storage.get_ignored_blocks("url(image.png)", _css_ignored_re)
+        self.assertEqual(len(blocks), 0)
+
+    def test_css_property_not_ignored(self):
+        blocks = self.storage.get_ignored_blocks(
+            "font: 12px/1.5 sans-serif;", _css_ignored_re
+        )
+        self.assertEqual(len(blocks), 0)
+
+    # JS positive tests.
+
+    def test_js_line_comment(self):
+        content = "// line comment"
+        blocks = self.storage.get_ignored_blocks(content, _js_ignored_re)
+        self.assertEqual(len(blocks), 1)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], "// line comment")
+
+    def test_js_block_comment(self):
+        content = "/* block comment */"
+        blocks = self.storage.get_ignored_blocks(content, _js_ignored_re)
+        self.assertEqual(len(blocks), 1)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], "/* block comment */")
+
+    def test_js_template_literal(self):
+        content = "`template`"
+        blocks = self.storage.get_ignored_blocks(content, _js_ignored_re)
+        self.assertEqual(len(blocks), 1)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], "`template`")
+
+    def test_js_multiline_template_literal(self):
+        content = "`line1\nline2`"
+        blocks = self.storage.get_ignored_blocks(content, _js_ignored_re)
+        self.assertEqual(len(blocks), 1)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], "`line1\nline2`")
+
+    def test_js_escaped_quote_in_string(self):
+        content = "'it\\'s'"
+        blocks = self.storage.get_ignored_blocks(content, _js_ignored_re)
+        self.assertEqual(len(blocks), 1)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], "'it\\'s'")
+
+    def test_js_string_with_whitespace(self):
+        content = "'import(\"./a.js\") a' \"import('./b.js')\tb\""
+        blocks = self.storage.get_ignored_blocks(content, _js_ignored_re)
+        self.assertEqual(len(blocks), 2)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], "'import(\"./a.js\") a'")
+        start, end = blocks[1]
+        self.assertEqual(content[start:end], "\"import('./b.js')\tb\"")
+
+    def test_js_template_with_quotes(self):
+        content = "`a'b\"c`"
+        blocks = self.storage.get_ignored_blocks(content, _js_ignored_re)
+        self.assertEqual(len(blocks), 1)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], "`a'b\"c`")
+
+    def test_js_template_with_escaped_backtick(self):
+        content = r"`a\`b`"
+        blocks = self.storage.get_ignored_blocks(content, _js_ignored_re)
+        self.assertEqual(len(blocks), 1)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], r"`a\`b`")
+
+    def test_js_block_comment_with_line_comment(self):
+        content = "/* // not a line comment */"
+        blocks = self.storage.get_ignored_blocks(content, _js_ignored_re)
+        self.assertEqual(len(blocks), 1)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], "/* // not a line comment */")
+
+    def test_js_line_comment_with_block_comment_syntax(self):
+        content = "// /* not a block */"
+        blocks = self.storage.get_ignored_blocks(content, _js_ignored_re)
+        self.assertEqual(len(blocks), 1)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], "// /* not a block */")
+
+    def test_js_string_with_comment_syntax(self):
+        content = '"//" "/*"'
+        blocks = self.storage.get_ignored_blocks(content, _js_ignored_re)
+        self.assertEqual(len(blocks), 2)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], '"//"')
+        start, end = blocks[1]
+        self.assertEqual(content[start:end], '"/*"')
+
+    def test_js_line_comment_no_trailing_newline(self):
+        content = "// comment at eof"
+        blocks = self.storage.get_ignored_blocks(content, _js_ignored_re)
+        self.assertEqual(len(blocks), 1)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], "// comment at eof")
+
+    def test_js_line_comment_followed_by_string(self):
+        content = "// has 'apos\n'real'"
+        blocks = self.storage.get_ignored_blocks(content, _js_ignored_re)
+        self.assertEqual(len(blocks), 2)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], "// has 'apos")
+        start, end = blocks[1]
+        self.assertEqual(content[start:end], "'real'")
+
+    def test_js_quote_in_regex_literal(self):
+        # The ' in /can't/ cannot span the newline, so the false match is
+        # contained and only the import path is captured.
+        content = "var r = /can't/;\nimport('./a.js');"
+        blocks = self.storage.get_ignored_blocks(content, _js_ignored_re)
+        self.assertEqual(len(blocks), 1)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], "'./a.js'")
+        content = 'var r = /can"t/;\nimport("./a.js");'
+        blocks = self.storage.get_ignored_blocks(content, _js_ignored_re)
+        self.assertEqual(len(blocks), 1)
+        start, end = blocks[0]
+        self.assertEqual(content[start:end], '"./a.js"')
+
+    # JS negative tests.
+    def test_js_unquoted_url_not_ignored(self):
+        blocks = self.storage.get_ignored_blocks("url(image.png)", _js_ignored_re)
+        self.assertEqual(len(blocks), 0)
+
+    def test_js_division_not_a_comment(self):
+        blocks = self.storage.get_ignored_blocks("10 / 2", _js_ignored_re)
+        self.assertEqual(len(blocks), 0)

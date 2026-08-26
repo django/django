@@ -6,14 +6,7 @@ from django.conf import settings
 from django.db import NotSupportedError
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import split_tzname_delta, strip_quotes, truncate_name
-from django.db.models import (
-    AutoField,
-    Exists,
-    ExpressionWrapper,
-    Lookup,
-)
-from django.db.models.expressions import RawSQL
-from django.db.models.sql.where import WhereNode
+from django.db.models import AutoField
 from django.utils import timezone
 from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
@@ -104,7 +97,7 @@ END;
         else:
             lookup_type = lookup_type.upper()
             if not self._extract_format_re.fullmatch(lookup_type):
-                raise ValueError(f"Invalid loookup type: {lookup_type!r}")
+                raise ValueError(f"Invalid lookup type: {lookup_type!r}")
             # https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/EXTRACT-datetime.html
             return f"EXTRACT({lookup_type} FROM {sql})", params
         return extract_sql, (*params, extract_param)
@@ -205,7 +198,7 @@ END;
     def time_trunc_sql(self, lookup_type, sql, params, tzname=None):
         # The implementation is similar to `datetime_trunc_sql` as both
         # `DateTimeField` and `TimeField` are stored as TIMESTAMP where
-        # the date part of the later is ignored.
+        # the date part of the latter is ignored.
         sql, params = self._convert_sql_to_tz(sql, params, tzname)
         trunc_param = None
         if lookup_type == "hour":
@@ -704,21 +697,6 @@ END;
                 params,
             )
         return super().subtract_temporals(internal_type, lhs, rhs)
-
-    def conditional_expression_supported_in_where_clause(self, expression):
-        """
-        Oracle supports only EXISTS(...) or filters in the WHERE clause, others
-        must be compared with True.
-        """
-        if isinstance(expression, (Exists, Lookup, WhereNode)):
-            return True
-        if isinstance(expression, ExpressionWrapper) and expression.conditional:
-            return self.conditional_expression_supported_in_where_clause(
-                expression.expression
-            )
-        if isinstance(expression, RawSQL) and expression.conditional:
-            return True
-        return False
 
     def format_json_path_numeric_index(self, num):
         if num < 0:

@@ -2,7 +2,7 @@
 #
 # Translators:
 # abdl erkin <84247764@qq.com>, 2018
-# Abduqadir Abliz <sahranbay@gmail.com>, 2023-2024
+# Abduqadir Abliz <sahranbay@gmail.com>, 2023-2024,2026
 # Abduqadir Abliz <sahranbay@gmail.com>, 2023
 # Azat, 2023,2025
 # Murat Orhun <oku.orhun@gmail.com>, 2023
@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 06:49+0000\n"
-"Last-Translator: Natalia, 2025\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2026-03-09 06:49+0000\n"
+"Last-Translator: Abduqadir Abliz <sahranbay@gmail.com>, 2023-2024,2026\n"
 "Language-Team: Uyghur (http://app.transifex.com/django/django/language/ug/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -145,6 +145,9 @@ msgstr "كىرودىيەچە"
 
 msgid "Upper Sorbian"
 msgstr "يۇقىرى سوربچە"
+
+msgid "Haitian Creole"
+msgstr "كرېيولچە ھايتى"
 
 msgid "Hungarian"
 msgstr "ماجارچە"
@@ -563,8 +566,8 @@ msgstr "چېسلا (سائەت مىنۇت يوق)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "«%(value)s» قىممىتى ئىناۋەتسىز. ئۇ چوقۇم YYYY-MM-DD HH: MM [: ss [.uuuuuu]] "
 "[TZ] شەكلىدە بولۇشى كېرەك."
@@ -589,8 +592,8 @@ msgstr "ئونلۇق سان"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "«%(value)s» قىممىتى ئىناۋەتسىز. ئۇ چوقۇم [DD] [[HH:] MM:] ss [.uuuuuu] "
 "شەكلىدە بولۇشى كېرەك."
@@ -719,8 +722,8 @@ msgid "Many-to-many relationship"
 msgstr "كۆپكە كۆب مۇناسىۋىتى"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -884,6 +887,22 @@ msgstr "ھەئە"
 
 msgid "No"
 msgstr "ياق"
+
+msgctxt "Task"
+msgid "Ready"
+msgstr "تەييار"
+
+msgctxt "Task"
+msgid "Running"
+msgstr "ئىجرا قىلىنىۋاتىدۇ"
+
+msgctxt "Task"
+msgid "Failed"
+msgstr "مەغلۇپ بولدى"
+
+msgctxt "Task"
+msgid "Successful"
+msgstr "مۇۋەپپەقىيەتلىك"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1276,11 +1295,11 @@ msgstr "%(verbose_name_plural)s يوق"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"كەلگۈسى %(verbose_name_plural)s ئىشلەتكىلى بولمايدۇ ، چۈنكى %(class_name)s."
-"allow_future بولسا False."
+"كەلگۈسى %(verbose_name_plural)s ئىشلەتكىلى بولمايدۇ ، چۈنكى "
+"%(class_name)s.allow_future بولسا False."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"

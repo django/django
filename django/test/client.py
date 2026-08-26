@@ -295,7 +295,10 @@ def encode_multipart(boundary, data):
     # Each bit of the multipart form data could be either a form value or a
     # file, or a *list* of form values and/or files. Remember that HTTP field
     # names can be duplicated!
-    for key, value in data.items():
+    # Use lists() if data is a MultiValueDict, so that all values for a key
+    # are preserved (e.g. a form field and a file sharing the same name).
+    raw_data = getattr(data, "lists", data.items)()
+    for key, value in raw_data:
         if value is None:
             raise TypeError(
                 "Cannot encode None for key '%s' as POST data. Did you mean "
@@ -865,10 +868,15 @@ class ClientMixin:
 
     def _get_backend(self):
         from django.contrib.auth import load_backend
+        from django.contrib.auth.backends import BaseBackend
+
+        def overrides(backend, name):
+            base = getattr(BaseBackend, name)
+            return getattr(type(backend), name, base) is not base
 
         for backend_path in settings.AUTHENTICATION_BACKENDS:
             backend = load_backend(backend_path)
-            if hasattr(backend, "get_user"):
+            if overrides(backend, "get_user") or overrides(backend, "aget_user"):
                 return backend_path
 
     def _login(self, user, backend=None):

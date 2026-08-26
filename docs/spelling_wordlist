@@ -95,6 +95,7 @@ conf
 config
 contenttypes
 contrib
+cooldown
 coroutine
 coroutines
 counterintuitive
@@ -392,7 +393,7 @@ queryset
 querysets
 querystring
 queueing
-Quickstart
+quickstart
 quoteless
 Radziej
 rasters

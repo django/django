@@ -208,10 +208,12 @@ Geometry Objects
 ``GEOSGeometry``
 ----------------
 
-.. class:: GEOSGeometry(geo_input, srid=None)
+.. class:: GEOSGeometry(geo_input, srid=None, *, max_geom_collections=198)
 
     :param geo_input: Geometry input value (string or :class:`memoryview`)
     :param srid: spatial reference identifier
+    :param max_geom_collections: maximum number of nested (WKT) or total (WKB)
+        geometry collections accepted before parsing is refused
     :type srid: int
 
 This is the base class for all GEOS geometry objects. It initializes on the
@@ -317,8 +319,6 @@ Properties
     Returns a boolean indicating whether the geometry has the Z dimension.
 
 .. attribute:: GEOSGeometry.hasm
-
-    .. versionadded:: 6.0
 
     Returns a boolean indicating whether the geometry has the M dimension.
     Requires GEOS 3.12.

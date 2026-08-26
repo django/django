@@ -193,7 +193,7 @@ Example usage:
 
 .. console::
 
-    django-admin compilemessages --ignore=cache --ignore=outdated/*/locale
+    django-admin compilemessages --ignore=node_modules --ignore=outdated/*/locale
 
 ``createcachetable``
 --------------------
@@ -431,8 +431,8 @@ The script will inspect the database and create a model for each table within
 it.
 
 As you might expect, the created models will have an attribute for every field
-in the table. Note that ``inspectdb`` has a few special cases in its field-name
-output:
+in the table. Note that ``inspectdb`` has a few special cases and limitations
+in its output:
 
 * If ``inspectdb`` cannot map a column's type to a model field type, it'll
   use ``TextField`` and will insert the Python comment
@@ -450,15 +450,21 @@ output:
   ``'Field renamed because it was a Python reserved word.'`` next to the
   field.
 
-This feature is meant as a shortcut, not as definitive model generation. After
-you run it, you'll want to look over the generated models yourself to make
-customizations. In particular, you'll need to rearrange models' order, so that
-models that refer to other models are ordered properly.
+* Database defaults are not introspected and will be absent from the generated
+  output.
 
-Django doesn't create database defaults when a
-:attr:`~django.db.models.Field.default` is specified on a model field.
-Similarly, database defaults aren't translated to model field defaults or
-detected in any fashion by ``inspectdb``.
+* Generated fields are mapped to their output field type.
+
+* Models that reference each other may not be in the correct order.
+
+* If models were managed by Django's migration framework, Python-level field
+  options that have no database-level representation will not be included. In
+  particular, ``Field.default`` will not be included, and Python variants
+  for ``on_delete`` are always emitted as ``DO_NOTHING``.
+
+As such, after you run it, you'll want to look over the generated models
+yourself to make customizations. This feature is meant as a shortcut, not as
+definitive model generation.
 
 By default, ``inspectdb`` creates unmanaged models. That is, ``managed =
 False`` in the model's ``Meta`` class tells Django not to manage each table's
@@ -498,6 +504,31 @@ Only support for PostgreSQL is implemented.
 .. django-admin-option:: --include-views
 
 If this option is provided, models are also created for database views.
+
+``listurls``
+------------
+
+.. django-admin:: listurls
+
+.. versionadded:: 6.2
+
+List URL patterns from the project's root :doc:`URLconf </topics/http/urls>`
+with optional filtering by prefixes, inspired by ``show_urls`` from
+``django-extensions``.
+
+.. django-admin-option:: --unsorted, -u
+
+Lists URLs in the original ordering from ``urlpatterns``. The default ordering
+is alphabetical by route.
+
+.. django-admin-option:: --prefix, -p [prefix ...]
+
+Filters URLs by given prefixes.
+
+.. django-admin-option:: --format, -f {tabular,stacked,json}
+
+Specifies the output format. Available values are ``tabular``, ``stacked``, and
+``json``. Default is ``tabular``.
 
 ``loaddata``
 ------------
@@ -1044,8 +1075,15 @@ recipient(s) specified. For example:
 
     django-admin sendtestemail foo@example.com bar@example.com
 
-There are a couple of options, and you may use any combination of them
-together:
+The following options may be used in any combination with each other and with
+recipient email arguments.
+
+.. django-admin-option:: --using ALIAS
+
+.. versionadded:: 6.1
+
+Specifies the :setting:`MAILERS` alias to use for sending the test email to
+the recipients given as arguments. Defaults to the ``"default"`` mailer.
 
 .. django-admin-option:: --managers
 
@@ -1078,11 +1116,6 @@ flag.
 
 See the guide on :ref:`customizing this behavior
 <customizing-shell-auto-imports>` to add or remove automatic imports.
-
-.. versionchanged:: 6.0
-
-    Automatic imports of common utilities, such as ``django.conf.settings``,
-    were added.
 
 .. django-admin-option:: --interface {ipython,bpython,python}, -i {ipython,bpython,python}
 
@@ -1274,10 +1307,6 @@ If the optional destination is provided, Django will use that name instead. If
 the directory with the given name doesn't exist, it will be created. You can
 use '.' to denote the current working directory.
 
-.. versionchanged:: 6.0
-
-    Automatic creation of the destination directory was added.
-
 For example:
 
 .. console::
@@ -1399,10 +1428,6 @@ If the optional destination is provided, Django will use that name as the
 project directory, and create ``manage.py`` and the project package within it.
 If the directory with the given name doesn't exist, it will be created. Use '.'
 to denote the current working directory.
-
-.. versionchanged:: 6.0
-
-    Automatic creation of the destination directory was added.
 
 For example:
 

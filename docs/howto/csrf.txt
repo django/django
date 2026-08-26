@@ -187,6 +187,8 @@ own view for handling this condition. To do this, set the
 CSRF failures are logged as warnings to the :ref:`django.security.csrf
 <django-security-logger>` logger.
 
+.. _csrf-cache-page:
+
 Using CSRF protection with caching
 ==================================
 

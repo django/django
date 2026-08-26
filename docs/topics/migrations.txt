@@ -756,10 +756,6 @@ You can then transition the squashed migration to a normal migration by:
     future, you should remove references to it from Django’s migrations table
     with the :option:`migrate --prune` option.
 
-.. versionchanged:: 6.0
-
-    Support for squashing squashed migrations was added.
-
 .. _migration-serializing:
 
 Serializing values
@@ -806,10 +802,6 @@ Django can serialize the following:
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method
   (:ref:`see below <custom-deconstruct-method>`)
-
-.. versionchanged:: 6.0
-
-    Serialization support for :class:`zoneinfo.ZoneInfo` instances was added.
 
 Django cannot serialize:
 

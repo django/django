@@ -3,7 +3,8 @@ import gc
 from django.core.exceptions import FieldError
 from django.db.models import FETCH_PEERS
 from django.test import SimpleTestCase, TestCase
-from django.test.utils import garbage_collect
+from django.test.utils import garbage_collect, ignore_warnings, requires_gil
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import (
     Bookmark,
@@ -61,15 +62,19 @@ class SelectRelatedTests(TestCase):
         )
 
     def setup_gc_debug(self):
+        self.addCleanup(gc.garbage.clear)
         self.addCleanup(gc.set_debug, 0)
         self.addCleanup(gc.enable)
         gc.disable()
         garbage_collect()
         gc.set_debug(gc.DEBUG_SAVEALL)
 
-    def assert_no_memory_leaks(self):
+    def assert_no_local_function_leaks(self):
         garbage_collect()
-        self.assertEqual(gc.garbage, [])
+        local_functions_leaked = [
+            obj for obj in gc.garbage if "<locals>" in getattr(obj, "__qualname__", "")
+        ]
+        self.assertEqual(local_functions_leaked, [])
 
     def test_access_fks_without_select_related(self):
         """
@@ -106,10 +111,15 @@ class SelectRelatedTests(TestCase):
                 ],
             )
 
+    # RemovedInDjango70Warning.
     def test_list_with_select_related(self):
         """select_related() applies to entire lists, not just items."""
         with self.assertNumQueries(1):
-            world = Species.objects.select_related()
+            with ignore_warnings(
+                category=RemovedInDjango70Warning,
+                message=r"Calling select_related\(\) with no arguments is deprecated\.",
+            ):
+                world = Species.objects.select_related()
             families = [o.genus.family.name for o in world]
             self.assertEqual(
                 sorted(families),
@@ -120,6 +130,15 @@ class SelectRelatedTests(TestCase):
                     "Hominidae",
                 ],
             )
+
+    # RemovedInDjango70Warning.
+    def test_select_related_no_arguments_deprecated(self):
+        msg = (
+            "Calling select_related() with no arguments is deprecated. "
+            "Specify the fields to fetch instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            Species.objects.select_related()
 
     def test_list_with_depth(self):
         """
@@ -137,15 +156,16 @@ class SelectRelatedTests(TestCase):
     def test_select_related_with_extra(self):
         s = (
             Species.objects.all()
-            .select_related()
+            .select_related("genus")
             .extra(select={"a": "select_related_species.id + 10"})[0]
         )
         self.assertEqual(s.id + 10, s.a)
 
+    @requires_gil
     def test_select_related_memory_leak(self):
         self.setup_gc_debug()
         list(Species.objects.select_related("genus"))
-        self.assert_no_memory_leaks()
+        self.assert_no_local_function_leaks()
 
     def test_certain_fields(self):
         """

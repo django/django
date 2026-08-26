@@ -4,7 +4,7 @@ from django.contrib.redirects.models import Redirect
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponseGone, HttpResponsePermanentRedirect
-from django.utils.deprecation import MiddlewareMixin
+from django.middleware import MiddlewareMixin
 
 
 class RedirectFallbackMiddleware(MiddlewareMixin):

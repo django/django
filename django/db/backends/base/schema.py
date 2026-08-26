@@ -156,6 +156,9 @@ class BaseDatabaseSchemaEditor:
         self.collect_sql = collect_sql
         if self.collect_sql:
             self.collected_sql = []
+            # Tables renamed while collecting SQL don't exist under their new
+            # name in the database, so introspection must target the old name.
+            self.collected_table_renames = {}
         self.atomic_migration = self.connection.features.can_rollback_ddl and atomic
 
     # State-managing methods
@@ -658,6 +661,26 @@ class BaseDatabaseSchemaEditor:
         }
         meta_index_names = {constraint.name for constraint in model._meta.indexes}
         columns = [model._meta.get_field(field).column for field in fields]
+
+        # Check if the constraint is still in deferred_sql. This happens when
+        # CreateModel with unique_together is followed by AlterUniqueTogether
+        # in the same migration. index_together is not affected because its
+        # indexes are created immediately in CreateModel.database_forwards.
+        is_unique_constraint = constraint_kwargs.get("unique") is True
+        table = model._meta.db_table
+        if is_unique_constraint:
+            for deferred in list(self.deferred_sql):
+                if (
+                    isinstance(deferred, Statement)
+                    and deferred.references_table(table)
+                    and all(
+                        deferred.references_column(table, column) for column in columns
+                    )
+                    and deferred.parts["columns"].columns == columns
+                ):
+                    self.deferred_sql.remove(deferred)
+                    return
+
         constraint_names = self._constraint_names(
             model,
             columns,
@@ -665,7 +688,7 @@ class BaseDatabaseSchemaEditor:
             **constraint_kwargs,
         )
         if (
-            constraint_kwargs.get("unique") is True
+            is_unique_constraint
             and constraint_names
             and self.connection.features.allows_multiple_constraints_on_same_fields
         ):
@@ -700,6 +723,14 @@ class BaseDatabaseSchemaEditor:
                 "new_table": self.quote_name(new_db_table),
             }
         )
+        if self.collect_sql:
+            # The rename isn't executed, so later introspection of the new
+            # table name must be redirected to the still-existing old one,
+            # following any earlier rename of the same table in this batch.
+            existing_table = self.collected_table_renames.pop(
+                old_db_table, old_db_table
+            )
+            self.collected_table_renames[new_db_table] = existing_table
         # Rename all references to the old table name.
         for sql in self.deferred_sql:
             if isinstance(sql, Statement):
@@ -2022,9 +2053,12 @@ class BaseDatabaseSchemaEditor:
                 )
                 for name in column_names
             ]
+        table_name = model._meta.db_table
+        if self.collect_sql:
+            table_name = self.collected_table_renames.get(table_name, table_name)
         with self.connection.cursor() as cursor:
             constraints = self.connection.introspection.get_constraints(
-                cursor, model._meta.db_table
+                cursor, table_name
             )
         result = []
         for name, infodict in constraints.items():

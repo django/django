@@ -19,7 +19,7 @@ As a reminder, Django :ref:`expects a limit to be configured
 relying on :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`.
 
 This issue has severity "low" according to the :ref:`Django security policy
-<security-disclosure>`.
+<severity-levels>`.
 
 CVE-2026-35192: Session fixation via public cached pages and ``SESSION_SAVE_EVERY_REQUEST``
 ===========================================================================================
@@ -30,7 +30,7 @@ session was not modified, but :setting:`SESSION_SAVE_EVERY_REQUEST` was
 a cached public page.
 
 This issue has severity "low" according to the :ref:`Django security policy
-<security-disclosure>`.
+<severity-levels>`.
 
 CVE-2026-6907: Potential exposure of private data due to incorrect handling of ``Vary: *`` in ``UpdateCacheMiddleware``
 =======================================================================================================================
@@ -40,7 +40,7 @@ erroneously cache requests where the ``Vary`` header contained an asterisk
 (``'*'``). This could lead to private data being stored and served.
 
 This issue has severity "low" according to the :ref:`Django security policy
-<security-disclosure>`.
+<severity-levels>`.
 
 Bugfixes
 ========

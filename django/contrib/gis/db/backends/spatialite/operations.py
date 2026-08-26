@@ -182,7 +182,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     def geom_lib_version(self):
         """
-        Return the version of the version-dependant geom library used by
+        Return the version of the version-dependent geom library used by
         SpatiaLite.
         """
         if self.spatial_version >= (5,):
@@ -230,6 +230,9 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         read = wkb_r().read
 
         def converter(value, expression, connection):
-            return None if value is None else GEOSGeometryBase(read(value), geom_class)
+            if value is not None:
+                return GEOSGeometryBase(
+                    read(value, max_geom_collections=None), geom_class
+                )
 
         return converter

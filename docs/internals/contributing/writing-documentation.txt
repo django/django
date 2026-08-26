@@ -142,6 +142,51 @@ will be themed differently than the documentation at
 `docs.djangoproject.com <https://docs.djangoproject.com/>`_. This is OK! If
 your changes look good on your local machine, they'll look good on the website.
 
+Automating documentation rebuilds
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:pypi:`sphinx-autobuild` can be used to automatically rebuild the documentation
+and reload the documentation page in the browser whenever a file changes. To
+enable auto-reloading:
+
+1. Install the package:
+
+   .. console::
+
+        $ python -m pip install sphinx-autobuild
+
+2. From the ``docs`` directory, run one of the following commands:
+
+   * On Linux and macOS:
+
+     .. code-block:: shell
+
+          $ SPHINXBUILD=sphinx-autobuild SPHINXOPTS="--open-browser --delay 0" make html
+
+   * On Windows (Command Prompt):
+
+     .. code-block:: doscon
+
+          ...\> set SPHINXBUILD=sphinx-autobuild
+          ...\> set SPHINXOPTS=--open-browser --delay 0
+          ...\> make html
+
+   * On Windows (PowerShell):
+
+     .. code-block:: powershell
+
+          PS> $env:SPHINXBUILD="sphinx-autobuild"
+          PS> $env:SPHINXOPTS="--open-browser --delay 0"
+          PS> make html
+
+   Alternatively, ``sphinx-autobuild`` can be invoked directly:
+
+   .. console::
+
+        $ sphinx-autobuild . _build/html --open-browser --delay 0
+
+The auto-reloader can be stopped with ``Ctrl+C``.
+
 Making edits to the documentation
 ---------------------------------
 

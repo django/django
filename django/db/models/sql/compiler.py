@@ -24,10 +24,11 @@ from django.db.models.sql.constants import (
 )
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
-from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 from django.utils.regex_helper import _lazy_re_compile
+from django.utils.warnings import django_file_prefixes
 
 
 class PositionRef(Ref):
@@ -465,7 +466,7 @@ class SQLCompiler:
             else:
                 if self.query.combinator and self.select:
                     # Don't use the first model's field because other
-                    # combinated queries might define it differently.
+                    # combined queries might define it differently.
                     yield OrderBy(F(col), descending=descending), False
                 else:
                     # 'col' is of the form 'field' or 'field1__field2' or
@@ -1051,6 +1052,11 @@ class SQLCompiler:
             for target in targets:
                 if name in self.query.annotation_select:
                     result.append(self.connection.ops.quote_name(name))
+                elif name in self.query.annotations:
+                    raise FieldError(
+                        f"Cannot select the {name!r} alias. Use annotate() to "
+                        "promote it."
+                    )
                 else:
                     r, p = self.compile(transform_function(target, alias))
                     result.append(r)

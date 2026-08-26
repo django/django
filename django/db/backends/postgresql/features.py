@@ -13,6 +13,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_return_rows_from_bulk_insert = True
     can_return_rows_from_update = True
     has_real_datatype = True
+    has_native_boolean_field = True
     has_native_uuid_field = True
     has_native_duration_field = True
     has_native_json_field = True
@@ -188,4 +189,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_any_value = property(operator.attrgetter("is_postgresql_16"))
     supports_virtual_generated_columns = property(
         operator.attrgetter("is_postgresql_18")
+    )
+    supports_uuid4_function_in_default = property(
+        operator.attrgetter("supports_uuid4_function")
     )

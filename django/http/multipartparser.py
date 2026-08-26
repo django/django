@@ -517,7 +517,7 @@ class LazyStream:
         """
         Update the unget history as a sanity check to see if we've pushed
         back the same number of bytes in one chunk. If we keep ungetting the
-        same number of bytes many times (here, 50), we're mostly likely in an
+        same number of bytes many times (here, 50), we're most likely in an
         infinite loop of some sort. This is usually caused by a
         maliciously-malformed MIME request.
         """

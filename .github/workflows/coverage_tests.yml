@@ -35,7 +35,7 @@ jobs:
           --health-retries 5
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -47,10 +47,10 @@ jobs:
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
 
-      - name: Update apt repo
-        run: sudo apt update
-      - name: Install libmemcached-dev for pylibmc
-        run: sudo apt install -y libmemcached-dev
+      - name: Install system packages
+        run: |
+          sudo apt update
+          xargs -a .github/workflows/data/apt-packages.txt sudo apt install -y --no-install-recommends
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip wheel
@@ -87,16 +87,10 @@ jobs:
             echo "No coverage data available." > diff-cover-report.md
           fi
 
-      - name: Save PR number
-        if: success()
-        run: echo "${{ github.event.pull_request.number }}" > pr_number.txt
-
       - name: Upload artifacts
         if: success()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-artifacts
-          path: |
-            diff-cover-report.md
-            pr_number.txt
+          path: diff-cover-report.md
           retention-days: 1

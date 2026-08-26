@@ -9,7 +9,7 @@ from django.contrib.admin.options import EMPTY_VALUE_STRING
 from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_not_required
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db.models.base import ModelBase
 from django.http import Http404, HttpResponsePermanentRedirect, HttpResponseRedirect
 from django.template.response import TemplateResponse
@@ -256,10 +256,6 @@ class AdminSite:
         return update_wrapper(inner, view)
 
     def get_urls(self):
-        # Since this module gets imported in the application's root package,
-        # it cannot import models from other applications at the module level,
-        # and django.contrib.contenttypes.views imports ContentType.
-        from django.contrib.contenttypes import views as contenttype_views
         from django.urls import include, path, re_path
 
         def wrap(view, cacheable=False):
@@ -290,7 +286,7 @@ class AdminSite:
             path("jsi18n/", wrap(self.i18n_javascript, cacheable=True), name="jsi18n"),
             path(
                 "r/<path:content_type_id>/<path:object_id>/",
-                wrap(contenttype_views.shortcut),
+                wrap(self.shortcut_view),
                 name="view_on_site",
             ),
         ]
@@ -450,6 +446,24 @@ class AdminSite:
 
     def autocomplete_view(self, request):
         return AutocompleteJsonView.as_view(admin_site=self)(request)
+
+    def shortcut_view(self, request, content_type_id, object_id):
+        from django.contrib.contenttypes import views as contenttype_views
+        from django.contrib.contenttypes.models import ContentType
+
+        try:
+            content_type = ContentType.objects.get_for_id(int(content_type_id))
+        except (ContentType.DoesNotExist, ValueError):
+            pass
+        else:
+            model_class = content_type.model_class()
+            if (
+                model_class is not None
+                and self.is_registered(model_class)
+                and not self.get_model_admin(model_class).has_view_permission(request)
+            ):
+                raise PermissionDenied
+        return contenttype_views.shortcut(request, content_type_id, object_id)
 
     @no_append_slash
     def catch_all_view(self, request, url):

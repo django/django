@@ -5,7 +5,7 @@
 # Emin Mastizada <emin@linux.com>, 2016
 # Konul Allahverdiyeva <english.koni@gmail.com>, 2016
 # Nicat Məmmədov <n1c4t97@gmail.com>, 2022
-# Nijat Mammadov, 2024-2025
+# Nijat Mammadov, 2024-2026
 # Sevdimali <sevdimaliisayev@mail.ru>, 2024
 # Zulfugar Ismayilzadeh <zulfuqar.ismayilzada@gmail.com>, 2017
 msgid ""
@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 07:05+0000\n"
-"Last-Translator: Nijat Mammadov, 2024-2025\n"
+"PO-Revision-Date: 2026-03-09 07:05+0000\n"
+"Last-Translator: Nijat Mammadov, 2024-2026\n"
 "Language-Team: Azerbaijani (http://app.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -131,10 +131,10 @@ msgid "change message"
 msgstr "dəyişmə mesajı"
 
 msgid "log entry"
-msgstr "loq yazısı"
+msgstr "jurnal qeydi"
 
 msgid "log entries"
-msgstr "loq yazıları"
+msgstr "jurnal qeydləri"
 
 #, python-format
 msgid "Added “%(object)s”."
@@ -273,7 +273,7 @@ msgstr "Sil"
 
 #, python-format
 msgid "Change history: %s"
-msgstr "Dəyişmə tarixi: %s"
+msgstr "Dəyişdirilmə tarixçəsi: %s"
 
 #. Translators: Model verbose name and instance
 #. representation, suitable to be an item in a
@@ -333,7 +333,7 @@ msgstr ""
 "edirik."
 
 msgid "Run"
-msgstr ""
+msgstr "İcra et"
 
 msgid "Click here to select the objects across all pages"
 msgstr "Bütün səhifələr üzrə obyektləri seçmək üçün bura klikləyin"
@@ -426,7 +426,7 @@ msgid "Add %(name)s"
 msgstr "%(name)s əlavə et"
 
 msgid "History"
-msgstr "Tarix"
+msgstr "Tarixçə"
 
 msgid "View on site"
 msgstr "Saytda bax"
@@ -471,27 +471,34 @@ msgid ""
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
+"%(object_name)s \"%(escaped_object)s\" silinməsi əlaqəli obyektlərin də "
+"silinməsinə səbəb olacaq, lakin sizin hesabınız aşağıdakı obyekt növlərini "
+"silmək üçün icazəyə malik deyil:"
 
 #, python-format
 msgid ""
 "Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
+"%(object_name)s \"%(escaped_object)s\" silinməsi aşağıdakı qorunan əlaqəli "
+"obyektlərin silinməsini tələb edəcək:"
 
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
+"%(object_name)s \"%(escaped_object)s\" elementini silmək istədiyinizə "
+"əminsiz? Aşağıda qeyd olunan bütün əlaqəli elementlər də silinəcək:"
 
 msgid "Objects"
 msgstr "Obyektlər"
 
 msgid "Yes, I’m sure"
-msgstr "Bəli, əminəm"
+msgstr "Hə, əminəm"
 
 msgid "No, take me back"
-msgstr "Xeyr, geri qayıt"
+msgstr "Yox, geri qayıt"
 
 #, python-format
 msgid ""
@@ -577,7 +584,7 @@ msgid "Sidebar"
 msgstr "Yan panel"
 
 msgid "Start typing to filter…"
-msgstr "Süzmək üçün yazın..."
+msgstr "Süzgəcləmək üçün yazın..."
 
 msgid "Filter navigation items"
 msgstr "Naviqasiya elementlərini süz"
@@ -593,7 +600,7 @@ msgstr "Əməliyyat"
 
 #, python-format
 msgid "Pagination %(name)s entries"
-msgstr ""
+msgstr "%(name)s girişlərinin səhifələndirilməsi"
 
 msgid "entry"
 msgid_plural "entries"
@@ -609,7 +616,7 @@ msgstr ""
 
 #, python-format
 msgid "Pagination %(name)s"
-msgstr ""
+msgstr "%(name)s səhifələndirilməsi"
 
 msgid "Show all"
 msgstr "Hamısını göstər"
@@ -619,7 +626,7 @@ msgstr "Qəfil pəncərə qapadılır…"
 
 #, python-format
 msgid "Search %(name)s"
-msgstr ""
+msgstr "%(name)s axtar"
 
 msgid "Search"
 msgstr "Axtar"

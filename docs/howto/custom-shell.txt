@@ -56,11 +56,6 @@ Running this customized ``shell`` command with ``verbosity=2`` would show:
       from django.urls import resolve, reverse
       from django.utils import timezone
 
-.. versionchanged:: 6.0
-
-    Automatic imports of common utilities, such as ``django.conf.settings``,
-    were added.
-
 If an overridden ``shell`` command includes paths that cannot be imported,
 these errors are shown when ``verbosity`` is set to ``1`` or higher. Duplicate
 imports are automatically handled.

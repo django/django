@@ -2,10 +2,6 @@
 Django's Tasks framework
 ========================
 
-.. versionadded:: 6.0
-
-    For older Django versions, the :pypi:`django-tasks` backport is available.
-
 For a web application, there's often more than just turning HTTP requests into
 HTTP responses. For some functionality, it may be beneficial to run code
 outside the request-response cycle.

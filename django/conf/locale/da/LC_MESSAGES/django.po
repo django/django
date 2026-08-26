@@ -3,7 +3,7 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Danni Randeris <danniranderis+djangocore@gmail.com>, 2014
-# Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2025
+# Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2025-2026
 # Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2020-2025
 # Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2013-2019
 # Finn Gruwier Larsen, 2011
@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 06:49+0000\n"
-"Last-Translator: Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2025\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 06:49+0000\n"
+"Last-Translator: Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2025-2026\n"
 "Language-Team: Danish (http://app.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -490,6 +490,9 @@ msgstr "%(model_name)s med dette %(field_labels)s eksisterer allerede."
 msgid "Constraint “%(name)s” is violated."
 msgstr "Begrænsning “%(name)s” er overtrådt."
 
+msgid "- Select an option -"
+msgstr "- Vælg en valgmulighed -"
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Værdien %(value)r er ikke et gyldigt valg."
@@ -558,8 +561,8 @@ msgstr "Dato (uden tid)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "“%(value)s”-værdien har et ugyldigt format. Den skal være i formatet ÅÅÅÅ-MM-"
 "DD TT:MM[:ss[.uuuuuu]][TZ]."
@@ -584,8 +587,8 @@ msgstr "Decimaltal"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "“%(value)s”-værdien har et ugyldigt format. Den skal være i formatet [DD] "
 "[[TT:]MM:]ss[.uuuuuu]."
@@ -653,8 +656,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"“%(value)s”-værdien har et ugyldigt format. Den skal være i formatet TT:MM[:"
-"ss[.uuuuuu]]."
+"“%(value)s”-værdien har et ugyldigt format. Den skal være i formatet "
+"TT:MM[:ss[.uuuuuu]]."
 
 #, python-format
 msgid ""
@@ -672,6 +675,10 @@ msgstr "URL"
 
 msgid "Raw binary data"
 msgstr "Rå binære data"
+
+#, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr "“%(value)s” er ikke en gyldig binær værdi."
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -878,6 +885,12 @@ msgstr "Ja"
 
 msgid "No"
 msgstr "Nej"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr "Ingen %s matcher den givne forespørgsel."
 
 msgctxt "Task"
 msgid "Ready"
@@ -1283,11 +1296,11 @@ msgstr "Ingen %(verbose_name_plural)s  til rådighed"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"Fremtidige %(verbose_name_plural)s  ikke tilgængelige, fordi %(class_name)s ."
-"allow_future er falsk."
+"Fremtidige %(verbose_name_plural)s  ikke tilgængelige, fordi "
+"%(class_name)s .allow_future er falsk."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"

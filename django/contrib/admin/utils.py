@@ -7,8 +7,8 @@ from operator import or_
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.templatetags.auth import render_password_as_hash
-from django.core.exceptions import FieldDoesNotExist
-from django.core.validators import EMPTY_VALUES
+from django.core.exceptions import FieldDoesNotExist, ValidationError
+from django.core.validators import EMPTY_VALUES, URLValidator
 from django.db import models, router
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
@@ -314,9 +314,6 @@ def lookup_field(name, obj, model_admin=None):
                         attr = getattr(attr, part, sentinel)
                         if attr is sentinel:
                             return None, None, None
-                    # The final field is needed for displaying boolean icons.
-                    if LOOKUP_SEP in name:
-                        f = get_fields_from_path(opts.model, name)[-1]
                 value = attr
             if hasattr(model_admin, "model") and hasattr(model_admin.model, name):
                 attr = getattr(model_admin.model, name)
@@ -375,7 +372,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False, form=None)
     except FieldDoesNotExist:
         if name == "__str__":
             label = str(model._meta.verbose_name)
-            attr = str
+            attr = model.__str__
         else:
             if callable(name):
                 attr = name
@@ -435,6 +432,7 @@ def help_text_for_field(name, model):
 
 def display_for_field(value, field, empty_value_display, avoid_link=False):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
+    from django.db.models.expressions import DatabaseDefault
 
     if field.name == "password" and field.model == get_user_model():
         return render_password_as_hash(value)
@@ -450,8 +448,10 @@ def display_for_field(value, field, empty_value_display, avoid_link=False):
     # BooleanField needs special-case null-handling, so it comes before the
     # general null test.
     elif isinstance(field, models.BooleanField):
+        if isinstance(value, DatabaseDefault):
+            return _boolean_icon(None)
         return _boolean_icon(value)
-    elif value in field.empty_values:
+    elif value in field.empty_values or isinstance(value, DatabaseDefault):
         return empty_value_display
     elif isinstance(field, models.DateTimeField):
         return formats.localize(timezone.template_localtime(value))
@@ -464,6 +464,14 @@ def display_for_field(value, field, empty_value_display, avoid_link=False):
     elif isinstance(field, models.FileField) and value and not avoid_link:
         return format_html('<a href="{}">{}</a>', value.url, value)
     elif isinstance(field, models.URLField) and value and not avoid_link:
+        # Only render a clickable link for URLs with a safe scheme, so that a
+        # potentially dangerous stored value is shown as plain text rather than
+        # an executable link. The check is deliberately independent of the
+        # field's own validators, which may permit such schemes.
+        try:
+            URLValidator()(value)
+        except ValidationError:
+            return display_for_value(value, empty_value_display)
         return format_html('<a href="{}">{}</a>', value, value)
     elif isinstance(field, models.JSONField) and value:
         try:
@@ -476,12 +484,15 @@ def display_for_field(value, field, empty_value_display, avoid_link=False):
 
 def display_for_value(value, empty_value_display, boolean=False):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
+    from django.db.models.expressions import DatabaseDefault
 
     if boolean:
+        if value in EMPTY_VALUES or isinstance(value, DatabaseDefault):
+            return _boolean_icon(None)
         return _boolean_icon(value)
     if isinstance(value, str) and not isinstance(value, SafeString):
         value = value.strip()
-    if value in EMPTY_VALUES:
+    if value in EMPTY_VALUES or isinstance(value, DatabaseDefault):
         return empty_value_display
     elif isinstance(value, bool):
         return str(value)

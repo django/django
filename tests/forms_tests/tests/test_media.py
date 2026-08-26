@@ -3,6 +3,7 @@ from django.forms.widgets import MediaAsset, Script, Stylesheet
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
 from django.utils.html import html_safe
+from django.utils.safestring import mark_safe
 
 
 @override_settings(STATIC_URL="http://media.example.com/static/")
@@ -17,20 +18,24 @@ class MediaAssetTestCase(SimpleTestCase):
     def test_eq(self):
         self.assertEqual(MediaAsset("path/to/css"), MediaAsset("path/to/css"))
         self.assertEqual(MediaAsset("path/to/css"), "path/to/css")
-        self.assertEqual(
+        self.assertNotEqual(
             MediaAsset("path/to/css", media="all"), MediaAsset("path/to/css")
         )
 
         self.assertNotEqual(MediaAsset("path/to/css"), MediaAsset("path/to/other.css"))
         self.assertNotEqual(MediaAsset("path/to/css"), "path/to/other.css")
         self.assertNotEqual(
-            MediaAsset("path/to/css", media="all"), Stylesheet("path/to/css")
+            MediaAsset("path/to/css", rel="stylesheet"), Stylesheet("path/to/css")
         )
 
     def test_hash(self):
         self.assertEqual(hash(MediaAsset("path/to/css")), hash("path/to/css"))
         self.assertEqual(
             hash(MediaAsset("path/to/css")), hash(MediaAsset("path/to/css"))
+        )
+        self.assertNotEqual(
+            hash(MediaAsset("path/to/css", rel="stylesheet")),
+            hash(MediaAsset("path/to/css")),
         )
 
     def test_str(self):
@@ -171,9 +176,10 @@ class FormsMediaTestCase(SimpleTestCase):
         )
         self.assertEqual(
             repr(m),
-            "Media(css={'all': ['path/to/css1', '/path/to/css2']}, "
-            "js=['/path/to/js1', 'http://media.other.com/path/to/js2', "
-            "'https://secure.other.com/path/to/js3'])",
+            "Media(css={'all': [Stylesheet('path/to/css1'),"
+            " Stylesheet('/path/to/css2')]}, js=[Script('/path/to/js1'),"
+            " Script('http://media.other.com/path/to/js2'),"
+            " Script('https://secure.other.com/path/to/js3')])",
         )
 
         class Foo:
@@ -807,7 +813,8 @@ class FormsMediaTestCase(SimpleTestCase):
         self.assertEqual(merged._js_lists, [["a", "b", "c"], ["a", "c", "b"]])
         msg = (
             "Detected duplicate Media files in an opposite order: "
-            "['a', 'b', 'c'], ['a', 'c', 'b']"
+            "[Script('a'), Script('b'), Script('c')],"
+            " [Script('a'), Script('c'), Script('b')]"
         )
         with self.assertWarnsMessage(RuntimeWarning, msg):
             merged._js
@@ -840,7 +847,8 @@ class FormsMediaTestCase(SimpleTestCase):
         )
         msg = (
             "Detected duplicate Media files in an opposite order: "
-            "['b.css', 'c.css'], ['c.css', 'b.css']"
+            "[Stylesheet('b.css'), Stylesheet('c.css')],"
+            " [Stylesheet('c.css'), Stylesheet('b.css')]"
         )
         with self.assertWarnsMessage(RuntimeWarning, msg):
             merged._css
@@ -851,6 +859,63 @@ class FormsMediaTestCase(SimpleTestCase):
         merged = media + empty_media
         self.assertEqual(merged._css_lists, [{"screen": ["a.css"]}])
         self.assertEqual(merged._js_lists, [["a"]])
+
+    def test_add_invalid_type(self):
+        class InvalidType:
+            pass
+
+        with self.assertRaises(TypeError):
+            Media() + InvalidType()
+
+    def test_html_safe_string_js(self):
+        tag = mark_safe('<script defer src="https://example.org/asset.js"></script>')
+        media = Media(js=[tag])
+        self.assertEqual(str(media), tag)
+
+    def test_html_safe_string_css(self):
+        tag = mark_safe('<link href="https://example.org/asset.css" rel="stylesheet">')
+        media = Media(css={"all": [tag]})
+        self.assertEqual(str(media), tag)
+
+    def test_html_safe_string_deduplication(self):
+        js_tag = mark_safe('<script defer src="https://example.org/asset.js"></script>')
+        css_tag = mark_safe(
+            '<link href="https://example.org/asset.css" rel="stylesheet">'
+        )
+        media = Media(
+            css={"all": [css_tag, css_tag, "/path/to/css1"]},
+            js=[js_tag, js_tag, Script("/path/to/js1")],
+        )
+        self.assertHTMLEqual(
+            str(media),
+            '<link href="https://example.org/asset.css" rel="stylesheet">\n'
+            '<link href="/path/to/css1" media="all" rel="stylesheet">\n'
+            '<script defer src="https://example.org/asset.js"></script>\n'
+            '<script src="/path/to/js1"></script>',
+        )
+
+    def test_html_safe_string_merging(self):
+        js_tag = mark_safe('<script defer src="https://example.org/asset.js"></script>')
+        css_tag = mark_safe(
+            '<link href="https://example.org/asset.css" rel="stylesheet">'
+        )
+        m1 = Media(
+            css={"all": [css_tag, "/path/to/css1"]},
+            js=["/path/to/js1", js_tag],
+        )
+        m2 = Media(
+            css={"all": [css_tag]},
+            js=[js_tag, Script("/path/to/js2")],
+        )
+        merged = m1 + m2
+        self.assertHTMLEqual(
+            str(merged),
+            '<link href="https://example.org/asset.css" rel="stylesheet">\n'
+            '<link href="/path/to/css1" media="all" rel="stylesheet">\n'
+            '<script src="/path/to/js1"></script>\n'
+            '<script defer src="https://example.org/asset.js"></script>\n'
+            '<script src="/path/to/js2"></script>',
+        )
 
     def test_render_js_with_attrs(self):
         media = Media(js=[Script("/path/to/js", integrity="sha256-abc")])
@@ -977,6 +1042,7 @@ class FormsMediaObjectTestCase(SimpleTestCase):
             '<link href="/path/to/css3" media="all" rel="stylesheet">\n'
             '<script src="/path/to/js1"></script>\n'
             '<script src="http://media.other.com/path/to/js2"></script>\n'
+            '<script src="/path/to/js4"></script>\n'
             '<script src="https://secure.other.com/path/to/js3"></script>\n'
             '<script src="/path/to/js4" integrity="9d947b87fdeb25030d56d01f7aa75800">'
             "</script>",

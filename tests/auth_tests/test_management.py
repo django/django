@@ -19,12 +19,14 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.db import migrations
+from django.db.utils import IntegrityError
 from django.test import TestCase, override_settings
 from django.test.testcases import TransactionTestCase
 from django.utils.translation import gettext_lazy as _
 
 from .models import (
     CustomUser,
+    CustomUserNoNaturalKey,
     CustomUserNonUniqueUsername,
     CustomUserWithFK,
     CustomUserWithM2M,
@@ -469,6 +471,66 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
         users = CustomUserNonUniqueUsername.objects.filter(username="joe")
         self.assertEqual(users.count(), 2)
+
+    @override_settings(AUTH_USER_MODEL="auth_tests.CustomUserNoNaturalKey")
+    def test_swappable_user_no_natural_key_non_interactive(self):
+        new_io = StringIO()
+        call_command(
+            "createsuperuser",
+            interactive=False,
+            email="joe@somewhere.org",
+            stdout=new_io,
+        )
+        command_output = new_io.getvalue().strip()
+        self.assertEqual(command_output, "Superuser created successfully.")
+
+        user = CustomUserNoNaturalKey._default_manager.get(email="joe@somewhere.org")
+        self.assertIsNotNone(user)
+
+    @override_settings(AUTH_USER_MODEL="auth_tests.CustomUserNoNaturalKey")
+    def test_swappable_user_no_natural_key_interactive(self):
+        @mock_inputs(
+            {
+                "Email: ": "joe@somewhere.org",
+                "password": "nopasswd",
+            }
+        )
+        def createsuperuser():
+            new_io = StringIO()
+            call_command(
+                "createsuperuser",
+                interactive=True,
+                stdout=new_io,
+                stdin=MockTTY(),
+            )
+            command_output = new_io.getvalue().strip()
+            self.assertEqual(command_output, "Superuser created successfully.")
+
+        createsuperuser()
+        user = CustomUserNoNaturalKey._default_manager.get(email="joe@somewhere.org")
+        self.assertIsNotNone(user)
+
+    @override_settings(AUTH_USER_MODEL="auth_tests.CustomUserNoNaturalKey")
+    def test_swappable_user_no_natural_key_duplicate_allowed(self):
+        """Without get_by_natural_key,
+        duplicate username validation is skipped."""
+        new_io = StringIO()
+        call_command(
+            "createsuperuser",
+            interactive=False,
+            email="joe@somewhere.org",
+            stdout=new_io,
+        )
+        # Creating a second user with the same email won't be caught by
+        # _validate_username since there's no get_by_natural_key; it will
+        # fail at the database level instead due to the unique constraint.
+        with self.assertRaises(IntegrityError):
+            call_command(
+                "createsuperuser",
+                interactive=False,
+                email="joe@somewhere.org",
+                stdout=new_io,
+            )
 
     def test_skip_if_not_in_TTY(self):
         """

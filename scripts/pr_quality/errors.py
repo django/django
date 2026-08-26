@@ -5,7 +5,7 @@ str.format() placeholders; kwargs are supplied at Message() construction time.
 
 """
 
-LEVEL_ERROR = ("🛑", "Error")
+LEVEL_ERROR = ("❗", "Error")
 LEVEL_WARNING = ("⚠️", "Warning")
 
 
@@ -74,7 +74,7 @@ MISSING_AI_DESCRIPTION = (
     "AI Tool Usage Not Described",
     "You indicated that AI tools were used in preparing this PR, but you have not "
     "provided a description of which tools you used or how you used them. At least "
-    "5 words of description are required.\n\n"
+    "five words of description are required.\n\n"
     "**What to do:**\n\n"
     "Add a brief description below the checked AI disclosure checkbox in your PR "
     "description. For example:\n\n"
@@ -112,11 +112,9 @@ MISSING_AI_DISCLOSURE = (
 
 MISSING_DESCRIPTION = (
     "Missing PR Description",
-    "Your PR description must be substantive and meaningful. The placeholder text "
-    '"*Provide a concise overview of the issue or rationale behind the proposed '
-    'changes.*" is not acceptable.\n\n'
+    "Your PR description must be substantive and meaningful.\n\n"
     "**What to do:**\n\n"
-    "Write a description that contains at least 5 words and addresses:\n\n"
+    "Write a description that contains at least five words and addresses:\n\n"
     "- What problem does this PR solve?\n"
     "- Why is this change necessary?\n"
     "- What approach did you take?\n\n"
@@ -154,6 +152,7 @@ MISSING_TRAC_TICKET = (
     "Patches submitted against unreviewed tickets are unlikely to be merged.\n"
     "3. Edit the **Trac ticket number** section of your PR description to include "
     "the ticket in the format `ticket-NNNNN` (e.g. `ticket-36991`).\n\n"
-    "For PRs with fewer than {threshold} lines changed (additions + deletions), you "
-    "may write `N/A` in the ticket field instead (e.g. `N/A - typo fix`).",
+    "Unless this is your first contribution, for PRs with fewer than {threshold} lines "
+    "changed (additions + deletions), you may write `N/A` in the ticket field instead "
+    "(e.g. `N/A - typo fix`).",
 )

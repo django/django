@@ -13,9 +13,21 @@ from django.core.files.storage import FileSystemStorage, storages
 from django.utils.functional import LazyObject
 from django.utils.regex_helper import _lazy_re_compile
 
-comment_re = _lazy_re_compile(r"\/\*[^*]*\*+([^/*][^*]*\*+)*\/", re.DOTALL)
-line_comment_re = _lazy_re_compile(
-    r"\/\*[^*]*\*+([^/*][^*]*\*+)*\/|\/\/[^\n]*", re.DOTALL
+_css_ignored_re = _lazy_re_compile(
+    r"/\*.*?\*/"  # block comment
+    r"|\\."  # escape sequence
+    r"|'(?:[^'\\\n]|\\.)*'"  # single-quoted string
+    r'|"(?:[^"\\\n]|\\.)*"',  # double-quoted string
+    re.DOTALL,
+)
+_js_ignored_re = _lazy_re_compile(
+    r"/\*.*?\*/"  # block comment
+    r"|//[^\n]*"  # line comment
+    r"|\\."  # escape sequence
+    r"|'(?:[^'\\\n]|\\.)*'"  # single-quoted string
+    r'|"(?:[^"\\\n]|\\.)*"'  # double-quoted string
+    r"|`(?:[^`\\]|\\.)*`",  # template literal
+    re.DOTALL,
 )
 
 
@@ -60,25 +72,29 @@ class HashedFilesMixin:
             (
                 (
                     r"""(?P<matched>import"""
-                    r"""(?s:(?P<import>[\s\{].*?|\*\s*as\s*\w+))"""
-                    r"""\s*from\s*['"](?P<url>[./].*?)["']\s*;)"""
+                    r"""(?P<import>[\s\{][^;]*?|\*\s*as\s*\w+)"""
+                    r"""\s*from\s*['"](?P<url>[./].*?)["'])"""
                 ),
-                """import%(import)s from "%(url)s";""",
+                """import%(import)s from "%(url)s\"""",
+                _js_ignored_re,
             ),
             (
                 (
-                    r"""(?P<matched>export(?s:(?P<exports>[\s\{].*?))"""
-                    r"""\s*from\s*["'](?P<url>[./].*?)["']\s*;)"""
+                    r"""(?P<matched>export(?P<exports>[\s\{][^;]*?)"""
+                    r"""\s*from\s*["'](?P<url>[./].*?)["'])"""
                 ),
-                """export%(exports)s from "%(url)s";""",
+                """export%(exports)s from "%(url)s\"""",
+                _js_ignored_re,
             ),
             (
-                r"""(?P<matched>import\s*['"](?P<url>[./].*?)["']\s*;)""",
-                """import"%(url)s";""",
+                r"""(?P<matched>import\s*['"](?P<url>[./].*?)["'])""",
+                """import"%(url)s\"""",
+                _js_ignored_re,
             ),
             (
-                r"""(?P<matched>import\(["'](?P<url>.*?)["']\))""",
+                r"""(?P<matched>import\(["'](?P<url>[./].*?)["']\))""",
                 """import("%(url)s")""",
+                _js_ignored_re,
             ),
         ),
     )
@@ -107,6 +123,7 @@ class HashedFilesMixin:
                 (
                     r"(?m)^(?P<matched>//# (?-i:sourceMappingURL)=(?P<url>.*))$",
                     "//# sourceMappingURL=%(url)s",
+                    _js_ignored_re,
                 ),
             ),
         ),
@@ -122,11 +139,18 @@ class HashedFilesMixin:
         for extension, patterns in self.patterns:
             for pattern in patterns:
                 if isinstance(pattern, (tuple, list)):
-                    pattern, template = pattern
+                    if len(pattern) == 3:
+                        pattern, template, ignored_re = pattern
+                    else:
+                        pattern, template = pattern
+                        ignored_re = _css_ignored_re
                 else:
                     template = self.default_template
+                    ignored_re = _css_ignored_re
                 compiled = re.compile(pattern, re.IGNORECASE)
-                self._patterns.setdefault(extension, []).append((compiled, template))
+                self._patterns.setdefault(extension, []).append(
+                    (compiled, template, ignored_re)
+                )
 
     def file_hash(self, name, content=None):
         """
@@ -210,22 +234,24 @@ class HashedFilesMixin:
         """
         return self._url(self.stored_name, name, force)
 
-    def get_comment_blocks(self, content, include_line_comments=False):
+    def get_ignored_blocks(self, content, pattern):
         """
-        Return a list of (start, end) tuples for each comment block.
+        Return a sorted list of (start, end) tuples for content that should
+        be ignored during URL rewriting based on the specified pattern:
+        e.g. block comments and string literals for CSS, plus line comments
+        (// ...) and template literals (`...`) for JS.
         """
-        pattern = line_comment_re if include_line_comments else comment_re
         return [(match.start(), match.end()) for match in re.finditer(pattern, content)]
 
-    def is_in_comment(self, pos, comments):
-        for start, end in comments:
-            if start < pos and pos < end:
+    def is_in_ignored_block(self, pos, ignored_blocks):
+        for start, end in ignored_blocks:
+            if start < pos < end:
                 return True
             if pos < start:
                 return False
         return False
 
-    def url_converter(self, name, hashed_files, template=None, comment_blocks=None):
+    def url_converter(self, name, hashed_files, template=None, ignored_blocks=None):
         """
         Return the custom URL converter for the given file name.
         """
@@ -253,8 +279,10 @@ class HashedFilesMixin:
             matched = matches["matched"]
             url = matches["url"]
 
-            # Ignore URLs in comments.
-            if comment_blocks and self.is_in_comment(matchobj.start(), comment_blocks):
+            # Ignore URLs in comments and string literals.
+            if ignored_blocks and self.is_in_ignored_block(
+                matchobj.start(), ignored_blocks
+            ):
                 return matched
 
             # Ignore absolute/protocol-relative and data-uri URLs.
@@ -414,14 +442,16 @@ class HashedFilesMixin:
                         yield name, None, exc, False
                     for extension, patterns in self._patterns.items():
                         if matches_patterns(path, (extension,)):
-                            for pattern, template in patterns:
+                            if not any(p.search(content) for p, _, _ in patterns):
+                                continue
+                            for pattern, template, ignored_re in patterns:
                                 converter = self.url_converter(
                                     name,
                                     hashed_files,
                                     template,
-                                    self.get_comment_blocks(
+                                    self.get_ignored_blocks(
                                         content,
-                                        include_line_comments=path.endswith(".js"),
+                                        ignored_re,
                                     ),
                                 )
                                 try:

@@ -2,8 +2,6 @@
 Content Security Policy
 =======================
 
-.. versionadded:: 6.0
-
 .. module:: django.middleware.csp
    :synopsis: Middleware for Content Security Policy headers
 
@@ -59,7 +57,7 @@ configured using the following settings:
      protection against active threats.
    * Use *both* to maintain an enforced baseline while experimenting with
      changes. Even for well-established policies, continuing to collect reports
-     reports can help detect regressions, unexpected changes in behavior, or
+     can help detect regressions, unexpected changes in behavior, or
      potential tampering in production environments.
 
 .. _csp-reports:

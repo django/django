@@ -1,6 +1,8 @@
 from django.core.exceptions import FieldError
 from django.db.models import FilteredRelation
 from django.test import SimpleTestCase, TestCase
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import (
     AdvancedUserStat,
@@ -86,7 +88,15 @@ class ReverseSelectRelatedTestCase(TestCase):
             self.assertEqual(u.userstat.user.username, "test")
 
     def test_not_followed_by_default(self):
-        with self.assertNumQueries(2):
+        # RemovedInDjango70Warning: when the deprecation ends, remove this
+        # test.
+        with (
+            self.assertNumQueries(2),
+            ignore_warnings(
+                category=RemovedInDjango70Warning,
+                message=r"Calling select_related\(\) with no arguments is deprecated\.",
+            ),
+        ):
             u = User.objects.select_related().get(username="test")
             self.assertEqual(u.userstat.posts, 150)
 

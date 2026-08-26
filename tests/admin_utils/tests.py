@@ -21,6 +21,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.templatetags.auth import render_password_as_hash
 from django.core.validators import EMPTY_VALUES
 from django.db import DEFAULT_DB_ALIAS, models
+from django.db.models.expressions import DatabaseDefault
 from django.test import SimpleTestCase, TestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils.formats import localize
@@ -163,6 +164,7 @@ class UtilsTests(SimpleTestCase):
             ("test_from_model", article.test_from_model()),
             ("non_field", INSTANCE_ATTRIBUTE),
             ("site__domain", SITE_NAME),
+            ("site__parent", None),
         )
 
         mock_admin = MockModelAdmin()
@@ -194,6 +196,12 @@ class UtilsTests(SimpleTestCase):
                     )
                     self.assertEqual(display_value, self.empty_value)
 
+    def test_empty_value_database_default_display_for_field(self):
+        display_value = display_for_field(
+            DatabaseDefault(models.Value(1)), models.IntegerField(), self.empty_value
+        )
+        self.assertEqual(display_value, self.empty_value)
+
     def test_empty_value_display_choices(self):
         model_field = models.CharField(choices=((None, "test_none"),))
         display_value = display_for_field(None, model_field, self.empty_value)
@@ -201,11 +209,13 @@ class UtilsTests(SimpleTestCase):
 
     def test_empty_value_display_booleanfield(self):
         model_field = models.BooleanField(null=True)
-        display_value = display_for_field(None, model_field, self.empty_value)
         expected = (
             f'<img src="{settings.STATIC_URL}admin/img/icon-unknown.svg" alt="None" />'
         )
-        self.assertHTMLEqual(display_value, expected)
+        for value in [None, DatabaseDefault(models.Value(True))]:
+            with self.subTest(empty_value=value):
+                display_value = display_for_field(value, model_field, self.empty_value)
+                self.assertHTMLEqual(display_value, expected)
 
     def test_json_display_for_field(self):
         tests = [
@@ -229,6 +239,19 @@ class UtilsTests(SimpleTestCase):
         )
         expected = '<a href="http://example.com">http://example.com</a>'
         self.assertHTMLEqual(display_value, expected)
+
+    def test_url_display_for_field_invalid_url(self):
+        # An invalid URL, such as one with an unsafe scheme, is rendered as
+        # plain text instead of a clickable link.
+        model_field = models.URLField()
+        for value in [
+            "javascript:alert(1)",
+            "data:text/html,<script>alert(1)</script>",
+        ]:
+            with self.subTest(value=value):
+                display_value = display_for_field(value, model_field, self.empty_value)
+                self.assertNotIn("<a", display_value)
+                self.assertEqual(display_value, value)
 
     def test_number_formats_display_for_field(self):
         display_value = display_for_field(
@@ -307,11 +330,25 @@ class UtilsTests(SimpleTestCase):
         self.assertEqual(display_for_value(True, ""), "True")
         self.assertEqual(display_for_value(False, ""), "False")
 
+    def test_list_display_for_value_boolean_database_default(self):
+        # DatabaseDefault expression is interpreted as unknown.
+        self.assertEqual(
+            display_for_value(DatabaseDefault(models.Value(True)), "", boolean=True),
+            '<img src="/static/admin/img/icon-unknown.svg" alt="None">',
+        )
+        self.assertEqual(display_for_value(DatabaseDefault(models.Value(True)), ""), "")
+
     def test_list_display_for_value_empty(self):
         for value in EMPTY_VALUES:
             with self.subTest(empty_value=value):
                 display_value = display_for_value(value, self.empty_value)
                 self.assertEqual(display_value, self.empty_value)
+
+    def test_list_display_for_database_default(self):
+        display_value = display_for_value(
+            DatabaseDefault(models.Value("1")), self.empty_value
+        )
+        self.assertEqual(display_value, self.empty_value)
 
     def test_list_display_for_value_consecutive_whitespace(self):
         cases = [
@@ -420,6 +457,12 @@ class UtilsTests(SimpleTestCase):
             label_for_field("test_from_property", Article, model_admin=MockModelAdmin),
             "property short description",
         )
+
+    def test_label_for_field_str_admin_order_field(self):
+        _, attr = label_for_field("__str__", Cascade, return_attr=True)
+        self.assertIs(attr, Cascade.__str__)
+        self.assertTrue(hasattr(attr, "admin_order_field"))
+        self.assertEqual(attr.admin_order_field, "num")
 
     def test_help_text_for_field(self):
         tests = [

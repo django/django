@@ -470,12 +470,18 @@ __ https://gdal.org/drivers/vector/
 
     .. method:: as_datetime()
 
-    Returns the value of the field as a tuple of date and time components:
+    Returns the value of the field as a tuple of date and time components with
+    millisecond precision:
 
     .. code-block:: pycon
 
         >>> city["Created"].as_datetime()
-        (c_long(1999), c_long(5), c_long(23), c_long(0), c_long(0), c_long(0), c_long(0))
+        (c_long(1999), c_long(5), c_long(23), c_long(0), c_long(0), c_float(0.0), c_long(0))
+
+    .. versionchanged:: 6.2
+
+        The seconds component is now returned as a ``c_float`` with millisecond
+        precision instead of a ``c_int``.
 
 ``Driver``
 ----------
@@ -1266,7 +1272,7 @@ Raster Data Objects
 ===================
 
 ``GDALRaster``
-----------------
+--------------
 
 :class:`GDALRaster` is a wrapper for the GDAL raster source object that
 supports reading data from a variety of GDAL-supported geospatial file formats
@@ -1777,7 +1783,7 @@ bands: one for red, one for green, and one for blue.
 
     .. method:: color_interp(as_string=False)
 
-        The color interpretation for the band, as an integer between 0and 16.
+        The color interpretation for the band, as an integer between 0 and 16.
         If ``as_string`` is ``True``, the data type is returned as a string
         with the following possible values: ``GCI_Undefined``,
         ``GCI_GrayIndex``, ``GCI_PaletteIndex``, ``GCI_RedBand``,
@@ -2091,16 +2097,16 @@ supported. You can use them by prepending the provided path with the
 appropriate ``/vsi*/`` prefix. See the `GDAL Virtual Filesystems
 documentation`_ for more details.
 
-.. warning:
+.. warning::
 
-    Rasters with names starting with `/vsi*/` will be treated as rasters from
+    Rasters with names starting with ``/vsi*/`` will be treated as rasters from
     the GDAL virtual filesystems. Django doesn't perform any extra validation.
 
 Compressed rasters
 ^^^^^^^^^^^^^^^^^^
 
-Instead decompressing the file and instantiating the resulting raster, GDAL can
-directly access compressed files using the ``/vsizip/``, ``/vsigzip/``, or
+Instead of decompressing the file and instantiating the resulting raster, GDAL
+can directly access compressed files using the ``/vsizip/``, ``/vsigzip/``, or
 ``/vsitar/`` virtual filesystems:
 
 .. code-block:: pycon
@@ -2131,6 +2137,35 @@ previously configured for authentication and possibly other settings (see the
 `GDAL Virtual Filesystems documentation`_ for available options).
 
 .. _`GDAL Virtual Filesystems documentation`: https://gdal.org/user/virtual_file_systems.html
+
+.. _raster-security:
+
+Security considerations
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Since :class:`GDALRaster` always opens new rasters in write mode, it is
+essential to prevent instantiating one from untrusted input. Otherwise, an
+attacker might gain the ability to write a file or make a network request.
+
+To mitigate this, :ref:`spatial lookups <spatial-lookups-intro>` prevent
+``str``, :class:`pathlib.Path`, and ``dict`` values from reaching
+:class:`GDALRaster` altogether. To use these types with lookups, wrap them
+explicitly with :class:`GDALRaster`, indicating that the value is trusted.
+Bytes are accepted without being wrapped in :class:`GDALRaster` because they
+are opened through GDAL's memory-based :ref:`virtual filesystem
+<gdal-raster-vsimem>`.
+
+This protection applies only to spatial lookups. Assigning a ``dict`` value to
+a :class:`~django.contrib.gis.db.models.RasterField` will still open a new
+raster, and assigning a ``str`` or ``Path`` will still fetch and open the
+referenced raster.
+
+When validating geometry inputs, the
+:class:`~django.contrib.gis.forms.GeometryField` form field will reject raster
+values. When validating raster inputs, you should write custom validation.
+
+For defense-in-depth strategies for limiting the available raster drivers, see
+`GDAL security considerations <https://gdal.org/user/security.html>`_.
 
 Settings
 ========

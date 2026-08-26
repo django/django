@@ -515,6 +515,26 @@ class InspectDBTestCase(TestCase):
         # The error message depends on the backend
         self.assertIn("# The error was:", output)
 
+    def test_introspection_errors_escape_table_name_and_message(self):
+        table_name = "table_name\ncontinued"
+        error_message = "error\ncontinued"
+        out = StringIO()
+        with (
+            mock.patch(
+                "django.db.connection.introspection.get_table_list",
+                return_value=[TableInfo(name=table_name, type="t")],
+            ),
+            mock.patch(
+                "django.db.connection.introspection.get_relations",
+                side_effect=RuntimeError(error_message),
+            ),
+        ):
+            call_command("inspectdb", stdout=out)
+        output = out.getvalue()
+        self.assertIn(f"# Unable to inspect table {table_name!r}", output)
+        self.assertIn(f"# The error was: {error_message!r}", output)
+        self.assertNotIn("\ncontinued", output)
+
     def test_same_relations(self):
         out = StringIO()
         call_command("inspectdb", "inspectdb_message", stdout=out)
@@ -662,6 +682,34 @@ class InspectDBTransactionalTests(TransactionTestCase):
         self.assertIn(foreign_table_model, output)
         self.assertIn(foreign_table_managed, output)
 
+    @skipUnless(connection.vendor == "sqlite", "SQLite specific SQL")
+    @skipUnlessDBFeature("can_introspect_foreign_keys")
+    def test_foreign_key_to_sqlite_schema(self):
+        with connection.constraint_checks_disabled():
+            cursor_execute("""
+                CREATE TABLE inspectdb_sqlite_schema_fk (
+                    id INTEGER PRIMARY KEY,
+                    table_name VARCHAR(64)
+                        REFERENCES sqlite_schema (tbl_name),
+                    content TEXT NOT NULL
+                )
+                """)
+
+        def cleanup():
+            with connection.constraint_checks_disabled():
+                cursor_execute("DROP TABLE IF EXISTS inspectdb_sqlite_schema_fk")
+
+        self.addCleanup(cleanup)
+        out = StringIO()
+        call_command("inspectdb", "inspectdb_sqlite_schema_fk", stdout=out)
+        output = out.getvalue()
+        self.assertIn("class InspectdbSqliteSchemaFk(models.Model):", output)
+        self.assertIn(
+            "table_name = models.ForeignKey('SqliteSchema', models.DO_NOTHING, "
+            "db_column='table_name', blank=True, null=True)",
+            output,
+        )
+
     def test_composite_primary_key(self):
         out = StringIO()
         field_type = connection.features.introspected_field_types["IntegerField"]
@@ -673,6 +721,24 @@ class InspectDBTransactionalTests(TransactionTestCase):
         )
         self.assertIn(f"column_1 = models.{field_type}()", output)
         self.assertIn(f"column_2 = models.{field_type}()", output)
+
+    def test_composite_primary_key_uses_normalized_column_names(self):
+        out = StringIO()
+        field_type = connection.features.introspected_field_types["IntegerField"]
+        call_command("inspectdb", "inspectdb_compositepkmodel2", stdout=out)
+        output = out.getvalue()
+        self.assertIn(
+            "pk = models.CompositePrimaryKey('column_1', 'column_2')",
+            output,
+        )
+        self.assertIn(
+            f"column_1 = models.{field_type}(db_column='column-1')",
+            output,
+        )
+        self.assertIn(
+            f"column_2 = models.{field_type}(db_column='column-2')",
+            output,
+        )
 
     def test_composite_primary_key_not_unique_together(self):
         out = StringIO()

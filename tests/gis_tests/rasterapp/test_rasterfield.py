@@ -1,4 +1,5 @@
 import json
+from unittest import mock
 
 from django.contrib.gis.db.models.fields import BaseSpatialField
 from django.contrib.gis.db.models.functions import Distance
@@ -211,7 +212,7 @@ class RasterFieldTest(TransactionTestCase):
                     (stx_pnt, 0, 500),
                     (stx_pnt, D(km=1000)),
                     (rast, 500),
-                    (json.loads(JSON_RASTER), 500),
+                    (GDALRaster(json.loads(JSON_RASTER)), 500),
                 ]
             elif name == "relate":
                 # Set lookup values for the relate lookup.
@@ -222,7 +223,7 @@ class RasterFieldTest(TransactionTestCase):
                     (stx_pnt, 0, "T*T***FF*"),
                     (stx_pnt, "T*T***FF*"),
                     (rast, "T*T***FF*"),
-                    (json.loads(JSON_RASTER), "T*T***FF*"),
+                    (GDALRaster(json.loads(JSON_RASTER)), "T*T***FF*"),
                 ]
             elif name == "isvalid":
                 # The isvalid lookup doesn't make sense for rasters.
@@ -236,7 +237,7 @@ class RasterFieldTest(TransactionTestCase):
                     (stx_pnt, 0),
                     stx_pnt,
                     rast,
-                    json.loads(JSON_RASTER),
+                    GDALRaster(json.loads(JSON_RASTER)),
                 ]
             else:
                 # Override band lookup for these, as it's not supported.
@@ -249,7 +250,7 @@ class RasterFieldTest(TransactionTestCase):
                     stx_pnt,
                     stx_pnt,
                     rast,
-                    json.loads(JSON_RASTER),
+                    GDALRaster(json.loads(JSON_RASTER)),
                 ]
 
             # Create query filter combinations.
@@ -277,6 +278,21 @@ class RasterFieldTest(TransactionTestCase):
             qs = RasterModel.objects.filter(Q(**combos[0]) & Q(**combos[1]))
             self.assertIn(qs.count(), [0, 1])
 
+    def test_geometry_lookup_falls_back_to_default_max_geom_collections(self):
+        def make_geom(depth):
+            geom = "POINT(0 0)"
+            for _ in range(depth):
+                geom = f"GEOMETRYCOLLECTION({geom})"
+            return geom
+
+        msg = "WKT contains too many possible GeometryCollections."
+        # RasterField has no max_geom_collections, so the module default
+        # (patched here) applies. Under the limit parses; over it is rejected.
+        with mock.patch("django.contrib.gis.db.models.fields.MAX_GEOM_COLLECTIONS", 5):
+            self.assertEqual(RasterModel.objects.filter(rast=make_geom(4)).count(), 0)
+            with self.assertRaisesMessage(ValueError, msg):
+                RasterModel.objects.filter(rast=make_geom(6))
+
     def test_dwithin_gis_lookup_output_with_rasters(self):
         """
         Check the logical functionality of the dwithin lookup for different
@@ -289,14 +305,6 @@ class RasterFieldTest(TransactionTestCase):
 
         # Filter raster with different lookup raster formats.
         qs = RasterModel.objects.filter(rastprojected__dwithin=(rast, D(km=1)))
-        self.assertEqual(qs.count(), 1)
-
-        qs = RasterModel.objects.filter(
-            rastprojected__dwithin=(json.loads(JSON_RASTER), D(km=1))
-        )
-        self.assertEqual(qs.count(), 1)
-
-        qs = RasterModel.objects.filter(rastprojected__dwithin=(JSON_RASTER, D(km=1)))
         self.assertEqual(qs.count(), 1)
 
         # Filter in an unprojected coordinate system.
@@ -459,13 +467,8 @@ class RasterFieldTest(TransactionTestCase):
         self.assertEqual(qs.count(), 0)
 
     def test_lookup_value_error(self):
-        # Test with invalid dict lookup parameter
-        obj = {}
-        msg = "Couldn't create spatial object from lookup value '%s'." % obj
-        with self.assertRaisesMessage(ValueError, msg):
-            RasterModel.objects.filter(geom__intersects=obj)
         # Test with invalid string lookup parameter
-        obj = "00000"
+        obj = "POINT()"
         msg = "Couldn't create spatial object from lookup value '%s'." % obj
         with self.assertRaisesMessage(ValueError, msg):
             RasterModel.objects.filter(geom__intersects=obj)
@@ -494,7 +497,7 @@ class RasterFieldTest(TransactionTestCase):
     def test_lhs_with_index_rhs_without_index(self):
         with CaptureQueriesContext(connection) as queries:
             RasterModel.objects.filter(
-                rast__0__contains=json.loads(JSON_RASTER)
+                rast__0__contains=GDALRaster(json.loads(JSON_RASTER))
             ).exists()
         # It's easier to check the indexes in the generated SQL than to write
         # tests that cover all index combinations.

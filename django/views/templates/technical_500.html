@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <meta name="color-scheme" content="light" />
+  <meta name="color-scheme" content="light dark" />
   <meta name="robots" content="NONE,NOARCHIVE">
   <title>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}
          {% if request %} at {{ request.path_info }}{% endif %}</title>
@@ -10,63 +10,67 @@
     html * { padding:0; margin:0; }
     body * { padding:10px 20px; }
     body * * { padding:0; }
-    body { font-family: sans-serif; background-color:#fff; color:#000; }
-    body > header, body > main, body > footer { border-bottom:1px solid #ddd; }
+    body { font-family: sans-serif; background-color: light-dark(#fff, #121212); color: light-dark(#000, #e0e0e0); }
+    body > header, body > main, body > footer { border-bottom:1px solid light-dark(#ddd, #444); }
     h1 { font-weight:normal; }
     h2 { margin-bottom:.8em; }
     h3 { margin:1em 0 .5em 0; }
     h4 { margin:0 0 .5em 0; font-weight: normal; }
     code, pre { font-size: 100%; white-space: pre-wrap; word-break: break-word; }
     summary { cursor: pointer; }
-    table { border:1px solid #ccc; border-collapse: collapse; width:100%; background:white; }
+    table { border:1px solid light-dark(#ccc, #444); border-collapse: collapse; width:100%; background: light-dark(white, #1e1e1e); }
     tbody td, tbody th { vertical-align:top; padding:2px 3px; }
     thead th {
-      padding:1px 6px 1px 3px; background:#fefefe; text-align:left;
-      font-weight:normal; font-size: 0.6875rem; border:1px solid #ddd;
+      padding:1px 6px 1px 3px; background: light-dark(#fefefe, #2a2a2a); text-align:left;
+      font-weight:normal; font-size: 0.6875rem; border:1px solid light-dark(#ddd, #444);
     }
-    tbody th { width:12em; text-align:right; color:#666; padding-right:.5em; }
+    tbody th { width:12em; text-align:right; color: light-dark(#666, #aaa); padding-right:.5em; }
     table.vars { margin:5px 10px 2px 40px; width: auto; }
     table.vars td, table.req td { font-family:monospace; }
     table td.code { width:100%; }
     table td.code pre { overflow:hidden; }
-    table.source th { color:#666; }
-    table.source td { font-family:monospace; white-space:pre; border-bottom:1px solid #eee; }
-    ul.traceback { list-style-type:none; color: #222; }
+    table.source th { color: light-dark(#666, #aaa); }
+    table.source td { font-family:monospace; white-space:pre; border-bottom:1px solid light-dark(#eee, #444); }
+    ul.traceback { list-style-type:none; color: light-dark(#222, #e0e0e0); }
     ul.traceback li.cause { word-break: break-word; }
-    ul.traceback li.frame { padding-bottom:1em; color:#4f4f4f; }
-    ul.traceback li.user { background-color:#e0e0e0; color:#000 }
+    ul.traceback li.frame { padding-bottom:1em; color: light-dark(#4f4f4f, #bbb); }
+    ul.traceback li.user { background-color: light-dark(#e0e0e0, #2a2a2a); color: light-dark(#000, #e0e0e0); }
     div.context { padding:10px 0; overflow:hidden; }
     div.context ol { padding-left:30px; margin:0 10px; list-style-position: inside; }
-    div.context ol li { font-family:monospace; white-space:pre; color:#777; cursor:pointer; padding-left: 2px; }
+    div.context ol li { font-family:monospace; white-space:pre; color: light-dark(#777, #e0e0e0); cursor:pointer; padding-left: 2px; }
     div.context ol li pre { display:inline; }
-    div.context ol.context-line li { color:#464646; background-color:#dfdfdf; padding: 3px 2px; }
+    div.context ol.context-line li { color: light-dark(#464646, #fff); background-color: light-dark(#dfdfdf, #333333); padding: 3px 2px; }
     div.context ol.context-line li span { position:absolute; right:32px; }
-    .user div.context ol.context-line li { background-color:#bbb; color:#000; }
-    .user div.context ol li { color:#666; }
+    .user div.context ol.context-line li { background-color: light-dark(#bbb, #444); color: light-dark(#000, #fff); }
+    .user div.context ol li { color: light-dark(#666, #bbb); }
     div.commands, summary.commands { margin-left: 40px; }
-    div.commands a, summary.commands { color:#555; text-decoration:none; }
-    .user div.commands a { color: black; }
-    #summary { background: #ffc; }
-    #summary h2 { font-weight: normal; color: #666; }
+    div.commands a, summary.commands { color: light-dark(#555, #aaa); text-decoration:none; }
+    .user div.commands a { color: light-dark(black, #e0e0e0); }
+    #summary { background: light-dark(#ffc, #2b2b2b); }
+    #summary h2 { font-weight: normal; color: light-dark(#666, #aaa); }
     #info { padding: 0; }
     #info > * { padding:10px 20px; }
-    #explanation { background:#eee; }
-    #template, #template-not-exist { background:#f6f6f6; }
+    #explanation { background: light-dark(#eee, #1f1f1f); }
+    #template, #template-not-exist { background: light-dark(#f6f6f6, #1e1e1e); }
     #template-not-exist ul { margin: 0 0 10px 20px; }
     #template-not-exist .postmortem-section { margin-bottom: 3px; }
-    #unicode-hint { background:#eee; }
-    #traceback { background:#eee; }
-    #requestinfo { background:#f6f6f6; padding-left:120px; }
+    #unicode-hint { background: light-dark(#eee, #1e1e1e); }
+    #traceback { background: light-dark(#eee, #121212); }
+    #requestinfo { background: light-dark(#f6f6f6, #1e1e1e); padding-left:120px; }
     #summary table { border:none; background:transparent; }
     #requestinfo h2, #requestinfo h3 { position:relative; margin-left:-100px; }
     #requestinfo h3 { margin-bottom:-1em; }
-    .error { background: #ffc; }
-    .specific { color:#cc3300; font-weight:bold; }
+    .error { background: light-dark(#ffc, #3d3d00); }
+    .specific { color: light-dark(#cc3300, #ff6b6b); font-weight:bold; }
     h2 span.commands { font-size: 0.7rem; font-weight:normal; }
-    span.commands a:link {color:#5E5694;}
-    pre.exception_value { font-family: sans-serif; color: #575757; font-size: 1.5rem; margin: 10px 0 10px 0; }
+    span.commands a:link { color: light-dark(#5E5694, #a29bfe); }
+    pre.exception_value { font-family: sans-serif; color: light-dark(#575757, #e0e0e0); font-size: 1.5rem; margin: 10px 0 10px 0; }
     .append-bottom { margin-bottom: 10px; }
     .fname { user-select: all; }
+    code { color: light-dark(#000, #e0e0e0); }
+    #pastebinTraceback { background: light-dark(#fff, #1e1e1e); }
+    textarea { background: light-dark(#fff, #1e1e1e); color: light-dark(#000, #e0e0e0); border: 1px solid light-dark(#ccc, #444); }
+    input[type="submit"] { background: light-dark(#efefef, #333); color: light-dark(#000, #e0e0e0); border: 1px solid light-dark(#ccc, #555); }
   </style>
   {% if not is_email %}
   <script>

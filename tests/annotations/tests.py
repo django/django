@@ -1481,6 +1481,12 @@ class AliasTests(TestCase):
         self.assertIs(hasattr(qs.first(), "other_age"), False)
         self.assertQuerySetEqual(qs, [34, 34, 35, 46, 57], lambda a: a.age)
 
+    def test_order_by_alias_transform(self):
+        qs = Book.objects.alias(other_pubdate=F("pubdate")).order_by(
+            "-other_pubdate__year"
+        )
+        self.assertQuerySetEqual(qs, [2008, 2007, 1995, 1991], lambda a: a.pubdate.year)
+
     def test_order_by_alias_aggregate(self):
         qs = (
             Author.objects.values("age")
@@ -1536,9 +1542,9 @@ class AliasTests(TestCase):
     @skipUnlessDBFeature("can_distinct_on_fields")
     def test_distinct_on_alias(self):
         qs = Book.objects.alias(rating_alias=F("rating") - 1)
-        msg = "Cannot resolve keyword 'rating_alias' into field."
+        msg = "Cannot select the 'rating_alias' alias. Use annotate() to promote it."
         with self.assertRaisesMessage(FieldError, msg):
-            qs.distinct("rating_alias").first()
+            qs.distinct("rating_alias").order_by("rating_alias").first()
 
     def test_values_alias(self):
         qs = Book.objects.alias(rating_alias=F("rating") - 1)

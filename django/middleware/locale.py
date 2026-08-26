@@ -1,10 +1,10 @@
 from django.conf import settings
 from django.conf.urls.i18n import is_language_prefix_patterns_used
 from django.http import HttpResponseRedirect
+from django.middleware import MiddlewareMixin
 from django.urls import get_script_prefix, is_valid_path
 from django.utils import translation
 from django.utils.cache import patch_vary_headers
-from django.utils.deprecation import MiddlewareMixin
 
 
 class LocaleMiddleware(MiddlewareMixin):

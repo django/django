@@ -7,7 +7,7 @@ from django.core.exceptions import (
     MultipleObjectsReturned,
 )
 from django.db import IntegrityError, models, transaction
-from django.db.models import FETCH_PEERS, RAISE
+from django.db.models import FETCH_PEERS, FETCH_RAISE
 from django.test import TestCase
 from django.utils.translation import gettext_lazy
 
@@ -467,15 +467,15 @@ class ManyToOneTests(TestCase):
             headline="Second", pub_date=datetime.date(1980, 4, 23), reporter=r2
         )
         self.assertEqual(
-            list(Article.objects.select_related().dates("pub_date", "day")),
+            list(Article.objects.select_related("reporter").dates("pub_date", "day")),
             [datetime.date(1980, 4, 23), datetime.date(2005, 7, 27)],
         )
         self.assertEqual(
-            list(Article.objects.select_related().dates("pub_date", "month")),
+            list(Article.objects.select_related("reporter").dates("pub_date", "month")),
             [datetime.date(1980, 4, 1), datetime.date(2005, 7, 1)],
         )
         self.assertEqual(
-            list(Article.objects.select_related().dates("pub_date", "year")),
+            list(Article.objects.select_related("reporter").dates("pub_date", "year")),
             [datetime.date(1980, 1, 1), datetime.date(2005, 1, 1)],
         )
 
@@ -947,7 +947,7 @@ class ManyToOneTests(TestCase):
             a2.reporter
 
     def test_fetch_mode_raise_forward(self):
-        a = Article.objects.fetch_mode(RAISE).get(pk=self.a.pk)
+        a = Article.objects.fetch_mode(FETCH_RAISE).get(pk=self.a.pk)
         msg = "Fetching of Article.reporter blocked."
         with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
             a.reporter

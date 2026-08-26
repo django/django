@@ -43,7 +43,12 @@ class SpatialProxy(DeferredAttribute):
         else:
             # Otherwise, a geometry or raster object is built using the field's
             # contents, and the model's corresponding attribute is set.
-            geo_obj = self._load_func(geo_value)
+            try:
+                max_geoms = self.field.max_geom_collections
+            except AttributeError:
+                geo_obj = self._load_func(geo_value)
+            else:
+                geo_obj = self._load_func(geo_value, max_geom_collections=max_geoms)
             setattr(instance, self.field.attname, geo_obj)
         return geo_obj
 
@@ -79,6 +84,6 @@ class SpatialProxy(DeferredAttribute):
                 % (instance.__class__.__name__, gtype, type(value))
             )
 
-        # Setting the objects dictionary with the value, and returning.
+        # Setting the object's dictionary with the value, and returning.
         instance.__dict__[self.field.attname] = value
         return value

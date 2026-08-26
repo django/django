@@ -59,7 +59,7 @@ class WhereNode(tree.Node):
             and self.contains_aggregate
             and not self.contains_over_clause
         ):
-            # It's must cheaper to short-circuit and stash everything in the
+            # It's much cheaper to short-circuit and stash everything in the
             # HAVING clause than split children if possible.
             return None, self, None
         where_parts = []

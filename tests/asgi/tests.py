@@ -30,7 +30,7 @@ from django.urls import path
 from django.utils.http import http_date
 from django.views.decorators.csrf import csrf_exempt
 
-from .urls import sync_waiter, test_filename
+from .urls import permission_denied_threads, sync_waiter, test_filename
 
 TEST_STATIC_ROOT = Path(__file__).parent / "project" / "static"
 TOO_MUCH_DATA_MSG = "Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE."
@@ -497,6 +497,30 @@ class ASGITest(SimpleTestCase):
             request_started_call["thread"], request_finished_call["thread"]
         )
 
+    async def test_error_handler_dispatched_with_thread_sensitive(self):
+        """
+        Error responses must be rendered on the request's thread-sensitive
+        thread, where the request's database connections are usable and remain
+        subject to close_old_connections().
+        """
+        permission_denied_threads.clear()
+        application = get_asgi_application()
+        scope = self.async_request_factory._base_scope(path="/permission_denied/")
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request"})
+        response_start = await communicator.receive_output()
+        self.assertEqual(response_start["type"], "http.response.start")
+        self.assertEqual(response_start["status"], 403)
+        response_body = await communicator.receive_output()
+        self.assertEqual(response_body["body"], b"Error handler content")
+        # Give response.close() time to finish.
+        await communicator.wait()
+
+        self.assertEqual(
+            permission_denied_threads["error_handler"],
+            permission_denied_threads["view"],
+        )
+
     async def test_concurrent_async_uses_multiple_thread_pools(self):
         sync_waiter.active_threads.clear()
 
@@ -804,6 +828,24 @@ class ASGITest(SimpleTestCase):
                 self.assertEqual(request.META["HTTP_COOKIE"], "a=abc; b=def; c=ghi")
                 self.assertEqual(request.COOKIES, {"a": "abc", "b": "def", "c": "ghi"})
 
+    def test_malformed_content_length(self):
+        body = b"hello world body"
+        cases = [
+            {"content_length_headers": [b"10", b"20"], "CONTENT_LENGTH": "10,20"},
+            {"content_length_headers": [b"abc"], "CONTENT_LENGTH": "abc"},
+        ]
+        for case in cases:
+            with self.subTest(CONTENT_LENGTH=case["CONTENT_LENGTH"]):
+                scope = self.async_request_factory._base_scope(method="POST", path="/")
+                headers = [(b"content-type", b"text/plain")]
+                for content_length in case["content_length_headers"]:
+                    headers.append((b"content-length", content_length))
+                scope["headers"] = headers
+                request = ASGIRequest(scope, BytesIO(body))
+                self.assertEqual(dict(request.POST), {})
+                self.assertEqual(request.body, body)
+                self.assertEqual(request.META["CONTENT_LENGTH"], case["CONTENT_LENGTH"])
+
 
 class MaxMemorySizeASGITests(SimpleTestCase):
     def make_request(
@@ -826,6 +868,22 @@ class MaxMemorySizeASGITests(SimpleTestCase):
 
     def test_body_size_exceeded_without_content_length(self):
         request = self.make_request(b"x" * 10)
+        with (
+            self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=5),
+            self.assertRaisesMessage(RequestDataTooBig, TOO_MUCH_DATA_MSG),
+        ):
+            request.body
+
+    def test_body_size_exceeded_with_malformed_content_length(self):
+        body = b"x" * 10
+        scope = AsyncRequestFactory()._base_scope(method="POST", path="/")
+        scope["headers"] = [
+            (b"content-type", b"application/octet-stream"),
+            (b"content-length", b"10"),
+            (b"content-length", b"20"),
+        ]
+        request = ASGIRequest(scope, BytesIO(body))
+        self.assertEqual(request.META["CONTENT_LENGTH"], "10,20")
         with (
             self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=5),
             self.assertRaisesMessage(RequestDataTooBig, TOO_MUCH_DATA_MSG),

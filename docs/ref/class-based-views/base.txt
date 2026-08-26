@@ -277,6 +277,15 @@ ancestor classes are  documented under the section title of **Ancestors
         then the query string is discarded. By default, ``query_string`` is
         ``False``.
 
+    .. attribute:: preserve_request
+
+        .. versionadded:: 6.1
+
+        Whether to preserve the HTTP method and body during the redirect. If
+        ``True``, then the redirect will use status code 307 instead of 302,
+        or 308 instead of 301 when :attr:`permanent` is ``True``. By default,
+        ``preserve_request`` is ``False``.
+
     **Methods**
 
     .. method:: get_redirect_url(*args, **kwargs)

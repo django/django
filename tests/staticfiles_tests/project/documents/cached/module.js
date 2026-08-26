@@ -14,6 +14,10 @@ import {
 } from "./module_test.js";
 import relativeModule from "../nested/js/nested.js";
 
+// automatic semicolon insertion
+import * as m from "./module_test.js"
+import { testConst as alias } from "./module_test.js"
+
 // Dynamic imports.
 const dynamicModule = import("./module_test.js");
 
@@ -35,3 +39,29 @@ const dynamicModule = import("./module_test_missing.js");
 // ignore line comments
 // import testConst from "./module_test_missing.js";
 // const dynamicModule = import("./module_test_missing.js");
+
+// imports inside string literals should be ignored
+const msg = 'import { foo } from "./module_test_missing.js";';
+const help = "import { bar } from './module_test_missing.js';";
+const tmpl = `import { baz } from "./module_test_missing.js";`;
+const dyn = 'const x = import("./module_test_missing.js");';
+const multiLine = `
+import { baz } from "./module_test_missing.js";
+`;
+
+// an export without a from clause must not consume a subsequent import's from
+export { testConst };
+import { firstConst } from "./module_test.js";
+// imports inside JSDoc block comments should be ignored even when a
+// real import precedes them (guarding against (?s:.*?) cross-boundary matches)
+import '../nested/js/nested.js';
+/**
+ * @example
+ * import { something } from "./module_test_missing.js";
+ */
+function jsdocExample() {}
+
+// bare specifier imports should not be rewritten
+import rootConst from "@vendor/package";
+import rootConst from "#utils";
+const buildModule = import("@vendor/package");

@@ -13,7 +13,7 @@ from django.db.models.expressions import (
     OrderByList,
     RawSQL,
 )
-from django.db.models.functions import Collate
+from django.db.models.functions import UUID4, Collate
 from django.db.models.lookups import GreaterThan
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
@@ -23,6 +23,9 @@ from .models import (
     DBDefaults,
     DBDefaultsFK,
     DBDefaultsFunction,
+    DBDefaultsFunctionFK,
+    DBDefaultsFunctionPK,
+    DBDefaultsOneToOnePK,
     DBDefaultsPK,
 )
 
@@ -98,6 +101,17 @@ class DefaultTests(TestCase):
         obj2 = DBDefaults.objects.create()
         self.assertEqual(obj2.both, 1)
 
+    def test_db_default_blind_overwrite(self):
+        """
+        Perform a blind overwrite: instantiate an object with a known pk
+        without fetching it, and overwrite some values. The db_default is used.
+        """
+        obj1 = DBDefaults.objects.create(null=1.2)
+        unfetched_instance = DBDefaults(pk=obj1.pk)
+        unfetched_instance.save()
+        obj1.refresh_from_db()
+        self.assertEqual(obj1.null, 1.1)
+
     def test_pk_db_default(self):
         obj1 = DBDefaultsPK.objects.create()
         if not connection.features.can_return_columns_from_insert:
@@ -125,6 +139,35 @@ class DefaultTests(TestCase):
             parent2 = DBDefaultsPK.objects.get(pk="en")
         child2 = DBDefaultsFK.objects.create(language_code=parent2)
         self.assertEqual(child2.language_code, parent2)
+
+    def test_primary_key_assigned_db_default_expression(self):
+        # Create the target of the foreign key.
+        DBDefaultsPK.objects.create(language_code="kr")
+        # Create an object that happens to match the python default for
+        # DBDefaultsOneToOnePK.language_code.
+        DBDefaultsPK.objects.create(language_code="tr")
+
+        related = DBDefaultsPK()
+        obj = DBDefaultsOneToOnePK(language_code_id=related.pk)
+        related.save()
+        obj.save()
+
+        # The python default is not used.
+        # This should either be "en" or "kr" depending on which model's
+        # DatabaseDefault is used, but this behavior varies across databases.
+        self.assertNotEqual(obj.language_code_id, "tr")
+
+    @skipUnlessDBFeature(
+        "can_return_columns_from_insert",
+        "supports_expression_defaults",
+        "supports_uuid4_function_in_default",
+    )
+    def test_foreign_key_to_parent_with_expression_pk(self):
+        parent = DBDefaultsFunctionPK(pk=UUID4())
+        obj = DBDefaultsFunctionFK(parent=parent)
+        parent.save()
+        obj.save()
+        self.assertEqual(obj.parent_id, parent.pk)
 
     @skipUnlessDBFeature("supports_expression_defaults")
     def test_case_when_db_default_returning(self):

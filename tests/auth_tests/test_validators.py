@@ -51,10 +51,19 @@ class PasswordValidationTest(SimpleTestCase):
 
         self.assertEqual(get_password_validators([]), [])
 
-    def test_get_password_validators_custom_invalid(self):
+    def test_get_password_validators_custom_nonexistent(self):
+        validator_config = [{"NAME": "does.not.exist"}]
+        msg = (
+            "The module in NAME could not be imported: does.not.exist. "
+            "Check your AUTH_PASSWORD_VALIDATORS setting."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            get_password_validators(validator_config)
+
+    def test_get_password_validators_custom_uncallable(self):
         validator_config = [{"NAME": "json.tool"}]
         msg = (
-            "The module in NAME could not be imported: json.tool. "
+            "The configured validator in NAME is not callable: json.tool. "
             "Check your AUTH_PASSWORD_VALIDATORS setting."
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):

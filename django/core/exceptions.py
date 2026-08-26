@@ -254,7 +254,7 @@ class EmptyResultSet(Exception):
 
 
 class FullResultSet(Exception):
-    """A database query predicate is matches everything."""
+    """A database query predicate that matches everything."""
 
     pass
 

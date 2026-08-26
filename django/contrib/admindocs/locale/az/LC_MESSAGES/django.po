@@ -3,14 +3,14 @@
 # Translators:
 # Ali Ismayilov <ali@ismailov.info>, 2011
 # Nicat Məmmədov <n1c4t97@gmail.com>, 2022
-# Nijat Mammadov, 2024-2025
+# Nijat Mammadov, 2024-2026
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2025-12-03 20:19+0000\n"
-"Last-Translator: Nijat Mammadov, 2024-2025\n"
+"PO-Revision-Date: 2026-03-09 20:19+0000\n"
+"Last-Translator: Nijat Mammadov, 2024-2026\n"
 "Language-Team: Azerbaijani (http://app.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -95,7 +95,7 @@ msgid "Tools for your browser to quickly access admin functionality."
 msgstr "Admin funksionallığına tez çatmağa kömək edən səyyah alətləri."
 
 msgid "Please install docutils"
-msgstr "Lütfən \"docutils\"i quraşdırın"
+msgstr "Zəhmət olmasa, \"docutils\"i quraşdırın"
 
 #, python-format
 msgid ""
@@ -109,8 +109,8 @@ msgstr ""
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
 msgstr ""
-"Lütfən administrasiyanızdan <a href=\"%(link)s\">docutils</a>in qurulmasını "
-"istəyin."
+"Zəhmət olmasa, inzibatçınızdan <a href=\"%(link)s\">docutils</a>in "
+"quraşdırmağı xahiş edin."
 
 #, python-format
 msgid "Model: %(name)s"
@@ -189,17 +189,17 @@ msgid "Template tags"
 msgstr "Şablon teqləri"
 
 msgid "Template tag documentation"
-msgstr "Şablon teq sənədləşməsi"
+msgstr "Şablon etiketi sənədləşməsi"
 
 msgid "Built-in tags"
-msgstr "Qurulu teqlər"
+msgstr "Hazır etiketlər"
 
 #, python-format
 msgid ""
 "To use these tags, put <code>%(code)s</code> in your template before using "
 "the tag."
 msgstr ""
-"Bu teqləri istifadə etmək üçün, şablonun əvvəlinə bunu qoyun: "
+"Bu etiketləri istifadə etmək üçün, şablonun əvvəlinə bunu qoyun: "
 "<code>%(code)s</code>"
 
 #, python-format
@@ -263,11 +263,11 @@ msgstr "model:"
 
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr "bağlı \"%(app_label)s.%(data_type)s\" obyekti"
+msgstr "əlaqəli \"%(app_label)s.%(data_type)s\" obyekti"
 
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr "bağlı \"%(app_label)s.%(object_name)s\" obyektləri"
+msgstr "əlaqəli \"%(app_label)s.%(object_name)s\" obyektləri"
 
 #, python-format
 msgid "all %s"

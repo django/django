@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# funcy39, 2026
 # HuanCheng Bai白宦成（Bestony） <xiqingongzi@gmail.com>, 2017-2018
 # lanbla <lanlinwen@buaa.edu.cn>, 2021
 # Daniel Duan <DaNmarner@gmail.com>, 2013
@@ -15,7 +16,7 @@
 # Le Yang <youngleocn@qq.com>, 2018
 # li beite <lbt012345@gmail.com>, 2020
 # Liping Wang <lynn.config@gmail.com>, 2016-2017
-# L., 2024
+# 刘培基（奶牛）, 2024
 # matthew Yip <yymmatthew@gmail.com>, 2020
 # Natalia, 2025
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
@@ -36,7 +37,7 @@
 # ced773123cfad7b4e8b79ca80f736af9, 2011-2012
 # Ziya Tang <tcztzy@gmail.com>, 2018
 # 付峥 <fuzheng1998@outlook.com>, 2018
-# L., 2024
+# 刘培基（奶牛）, 2024
 # LatteFang <370358679@qq.com>, 2020
 # Kevin Sze <leiarix@gmail.com>, 2012
 # 高乐喆 <gaolezhe@outlook.com>, 2023
@@ -45,8 +46,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 06:49+0000\n"
-"Last-Translator: Natalia, 2025\n"
+"PO-Revision-Date: 2026-03-09 06:49+0000\n"
+"Last-Translator: funcy39, 2026\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -179,7 +180,7 @@ msgid "Upper Sorbian"
 msgstr "上索布"
 
 msgid "Haitian Creole"
-msgstr ""
+msgstr "海地语"
 
 msgid "Hungarian"
 msgstr "匈牙利语"
@@ -443,8 +444,8 @@ msgid ""
 "Ensure this value is a multiple of step size %(limit_value)s, starting from "
 "%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
 msgstr ""
-"确保此值是步长 %(limit_value)s 的倍数，从 %(offset)s 开始，例如 "
-"%(offset)s、%(valid_value1)s、%(valid_value2)s 等等。"
+"确保此值是步长 %(limit_value)s 的倍数，从 %(offset)s 开始，例如 %(offset)s、"
+"%(valid_value1)s、%(valid_value2)s 等等。"
 
 #, python-format
 msgid ""
@@ -572,11 +573,11 @@ msgstr "日期（不带时分）"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
-"“%(value)s”的值有一个错误的日期格式。它的格式应该是YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] "
+"“%(value)s”的值有一个错误的日期格式。它的格式应该是YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] "
 
 #, python-format
 msgid ""
@@ -598,8 +599,8 @@ msgstr "小数"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "“%(value)s”的值有一个错误的格式。它的格式应该是[DD] [[HH:]MM:]ss[.uuuuuu] "
 
@@ -878,19 +879,19 @@ msgstr "否"
 
 msgctxt "Task"
 msgid "Ready"
-msgstr ""
+msgstr "就绪"
 
 msgctxt "Task"
 msgid "Running"
-msgstr ""
+msgstr "运行中"
 
 msgctxt "Task"
 msgid "Failed"
-msgstr ""
+msgstr "失败"
 
 msgctxt "Task"
 msgid "Successful"
-msgstr ""
+msgstr "成功"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1268,8 +1269,8 @@ msgstr "%(verbose_name_plural)s 可用"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
 "因为 %(class_name)s.allow_future 设置为 False，所以特性 "
 "%(verbose_name_plural)s 不可用。"

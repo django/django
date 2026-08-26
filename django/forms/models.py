@@ -1402,7 +1402,7 @@ class InlineForeignKeyField(Field):
                 return None
             # if there is no value act as we did before.
             return self.parent_instance
-        # ensure the we compare the values as equal types.
+        # ensure we compare the values as equal types.
         if self.to_field:
             orig = getattr(self.parent_instance, self.to_field)
         else:

@@ -28,7 +28,14 @@ from django.db import (
     router,
     transaction,
 )
-from django.db.models import NOT_PROVIDED, ExpressionWrapper, IntegerField, Max, Value
+from django.db.models import (
+    NOT_PROVIDED,
+    Expression,
+    ExpressionWrapper,
+    IntegerField,
+    Max,
+    Value,
+)
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import CASCADE, DO_NOTHING, Collector, DatabaseOnDelete
 from django.db.models.expressions import DatabaseDefault
@@ -709,9 +716,17 @@ class Model(AltersData, metaclass=ModelBase):
 
     def _is_pk_set(self, meta=None):
         pk_val = self._get_pk_val(meta)
+
+        def _is_unset(value):
+            return (
+                value is None
+                # Empty value when db_default is used.
+                or isinstance(value, DatabaseDefault)
+            )
+
         return not (
-            pk_val is None
-            or (isinstance(pk_val, tuple) and any(f is None for f in pk_val))
+            _is_unset(pk_val)
+            or (isinstance(pk_val, tuple) and any(_is_unset(f) for f in pk_val))
         )
 
     def get_deferred_fields(self):
@@ -1086,7 +1101,9 @@ class Model(AltersData, metaclass=ModelBase):
                 if f.name in update_fields or f.attname in update_fields
             ]
 
-        if not self._is_pk_set(meta):
+        if not self._is_pk_set(meta) and not isinstance(
+            getattr(self, meta.pk.attname), DatabaseDefault
+        ):
             pk_val = meta.pk.get_pk_value_on_save(self)
             setattr(self, meta.pk.attname, pk_val)
         pk_set = self._is_pk_set(meta)
@@ -1285,7 +1302,9 @@ class Model(AltersData, metaclass=ModelBase):
                         "%s() prohibited to prevent data loss due to unsaved "
                         "related object '%s'." % (operation_name, field.name)
                     )
-                elif getattr(self, field.attname) in field.empty_values:
+                if (
+                    field_val := getattr(self, field.attname)
+                ) in field.empty_values or isinstance(field_val, Expression):
                     # Set related object if it has been saved after an
                     # assignment.
                     setattr(self, field.name, obj)
@@ -1543,9 +1562,16 @@ class Model(AltersData, metaclass=ModelBase):
                 f = self._meta.get_field(field_name)
                 lookup_value = getattr(self, f.attname)
                 # TODO: Handle multiple backends with different feature flags.
-                if lookup_value is None or (
-                    lookup_value == ""
-                    and connection.features.interprets_empty_strings_as_nulls
+                if (
+                    lookup_value is None
+                    or (
+                        lookup_value == ""
+                        and connection.features.interprets_empty_strings_as_nulls
+                    )
+                    or (
+                        isinstance(lookup_value, DatabaseDefault)
+                        and not isinstance(lookup_value.expression, Value)
+                    )
                 ):
                     # no value, skip the lookup
                     continue
@@ -1585,7 +1611,7 @@ class Model(AltersData, metaclass=ModelBase):
         for model_class, lookup_type, field, unique_for in date_checks:
             lookup_kwargs = {}
             # there's a ticket to add a date lookup, we can remove this special
-            # case if that makes it's way in
+            # case if that makes its way in
             date = getattr(self, unique_for)
             if date is None:
                 continue

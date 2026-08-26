@@ -444,7 +444,7 @@ Use the ``django.test.Client`` class to make requests.
         require different credentials. It requires whichever credentials are
         required by your backend's ``authenticate()`` method.
 
-        ``login()`` returns ``True`` if it the credentials were accepted and
+        ``login()`` returns ``True`` if the credentials were accepted and
         login was successful.
 
         Finally, you'll need to remember to create user accounts before you can
@@ -479,14 +479,20 @@ Use the ``django.test.Client`` class to make requests.
 
         The user will have its ``backend`` attribute set to the value of the
         ``backend`` argument (which should be a dotted Python path string), or
-        to ``settings.AUTHENTICATION_BACKENDS[0]`` if a value isn't provided.
-        The :func:`~django.contrib.auth.authenticate` function called by
-        :meth:`login` normally annotates the user like this.
+        if a value isn't provided, the first backend from
+        :setting:`AUTHENTICATION_BACKENDS` implementing ``get_user()`` or
+        ``aget_user()``. The :func:`~django.contrib.auth.authenticate` function
+        called by :meth:`login` normally annotates the user like this.
 
         This method is faster than ``login()`` since the expensive
         password hashing algorithms are bypassed. Also, you can speed up
         ``login()`` by :ref:`using a weaker hasher while testing
         <speeding-up-tests-auth-hashers>`.
+
+        .. versionchanged:: 6.2
+
+            On older versions, backends not implementing ``(a)get_user()`` were
+            eligible to be selected.
 
     .. method:: Client.logout()
     .. method:: Client.alogout()
@@ -818,7 +824,9 @@ A subclass of :class:`unittest.TestCase` that adds this functionality:
   =========================================== ======================================
 
 * The ability to run tests with :ref:`modified settings <overriding-settings>`.
-* Using the :attr:`~SimpleTestCase.client` :class:`~django.test.Client`.
+* Access to the synchronous and asynchronous test clients via the
+  :attr:`~SimpleTestCase.client` and :attr:`~SimpleTestCase.async_client`
+  attributes.
 
 If your tests make any database queries, use subclasses
 :class:`~django.test.TransactionTestCase` or :class:`~django.test.TestCase`.
@@ -1121,13 +1129,14 @@ Default test client
 -------------------
 
 .. attribute:: SimpleTestCase.client
+.. attribute:: SimpleTestCase.async_client
 
-Every test case in a ``django.test.*TestCase`` instance has access to an
-instance of a Django test client. This client can be accessed as
-``self.client``. This client is recreated for each test, so you don't have to
+Every ``django.test.*TestCase`` instance has access to Django's synchronous
+and asynchronous test clients as ``self.client`` and ``self.async_client``,
+respectively. Both clients are recreated for each test, so you don't have to
 worry about state (such as cookies) carrying over from one test to another.
 
-This means, instead of instantiating a ``Client`` in each test::
+For example, rather than instantiating a ``Client`` in each test::
 
     import unittest
     from django.test import Client
@@ -1162,10 +1171,14 @@ Customizing the test client
 ---------------------------
 
 .. attribute:: SimpleTestCase.client_class
+.. attribute:: SimpleTestCase.async_client_class
 
-If you want to use a different ``Client`` class (for example, a subclass
-with customized behavior), use the :attr:`~SimpleTestCase.client_class` class
-attribute::
+If you want to use a different :class:`Client` or :class:`AsyncClient` class
+(for example, a subclass with customized behavior), use the
+:attr:`~SimpleTestCase.client_class` or
+:attr:`~SimpleTestCase.async_client_class` class attributes.
+
+For example, to customize the synchronous test client::
 
     from django.test import Client, TestCase
 
@@ -1181,6 +1194,9 @@ attribute::
         def test_my_stuff(self):
             # Here self.client is an instance of MyTestClient...
             call_some_test_code()
+
+The same pattern applies to the asynchronous test client by subclassing
+:class:`AsyncClient` and setting :attr:`~SimpleTestCase.async_client_class`.
 
 .. _topics-testing-fixtures:
 
@@ -2034,17 +2050,19 @@ creates.
 Email services
 ==============
 
-If any of your Django views send email using :doc:`Django's email
-functionality </topics/email>`, you probably don't want to send email each time
-you run a test using that view. For this reason, Django's test runner
-automatically redirects all Django-sent email to a dummy outbox. This lets you
-test every aspect of sending email -- from the number of messages sent to the
-contents of each message -- without actually sending the messages.
+If any of your code sends email using :doc:`Django's email functionality
+</topics/email>`, you probably don't want to send email each time you run a
+test that exercises that code. For this reason, Django's test runner
+automatically redirects all Django-sent email to an in-memory outbox. This lets
+you test every aspect of sending email -- from the number of messages sent to
+the contents of each message -- without actually sending the messages.
 
-The test runner accomplishes this by transparently replacing the normal
-email backend with a testing backend.
-(Don't worry -- this has no effect on any other email senders outside of
-Django, such as your machine's mail server, if you're running one.)
+The test runner accomplishes this by transparently replacing the
+:setting:`BACKEND <MAILERS-BACKEND>` for each configured :setting:`MAILERS`
+alias with the ``'locmem'`` :ref:`memory email backend
+<topic-email-memory-backend>`. (Don't worry -- this has no effect on any other
+email senders outside of Django, such as your machine's mail server, if you're
+running one.)
 
 .. currentmodule:: django.core.mail
 
@@ -2073,7 +2091,6 @@ and contents::
                 "Here is the message.",
                 "from@example.com",
                 ["to@example.com"],
-                fail_silently=False,
             )
 
             # Test that one message has been sent.
@@ -2081,6 +2098,13 @@ and contents::
 
             # Verify that the subject of the first message is correct.
             self.assertEqual(mail.outbox[0].subject, "Subject here")
+
+            # Verify the message was sent with the "default" mailer.
+            self.assertEqual(mail.outbox[0].sent_using, "default")
+
+.. versionchanged:: 6.1
+
+    The ``sent_using`` attribute was added to messages in the outbox.
 
 As noted :ref:`previously <emptying-test-outbox>`, the test outbox is emptied
 at the start of every test in a Django ``*TestCase``. To empty the outbox

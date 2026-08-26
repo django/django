@@ -24,6 +24,8 @@ from django.http import (
     parse_cookie,
 )
 from django.test import SimpleTestCase
+from django.utils.deprecation import RemovedInDjango71Warning
+from django.utils.encoding import iri_to_uri
 from django.utils.functional import lazystr
 from django.utils.http import MAX_URL_REDIRECT_LENGTH
 
@@ -498,6 +500,18 @@ class HttpResponseTests(SimpleTestCase):
                 response = response_class(long_url)
                 self.assertEqual(response.url, long_url)
 
+    def test_redirect_url_max_length_checks_encoded_location(self):
+        long_url = "/" + "é" * (MAX_URL_REDIRECT_LENGTH - 1)
+        self.assertLessEqual(len(long_url), MAX_URL_REDIRECT_LENGTH)
+        self.assertGreater(len(iri_to_uri(long_url)), MAX_URL_REDIRECT_LENGTH)
+        for response_class in (HttpResponseRedirect, HttpResponsePermanentRedirect):
+            msg = f"Unsafe redirect exceeding {MAX_URL_REDIRECT_LENGTH} characters"
+            with (
+                self.subTest(response_class=response_class),
+                self.assertRaisesMessage(DisallowedRedirect, msg),
+            ):
+                response_class(long_url)
+
     def test_redirect_url_max_length_override_via_param(self):
         base_url = "https://example.com/"
         for (max_length, length), response_class in itertools.product(
@@ -690,25 +704,31 @@ class JsonResponseTests(SimpleTestCase):
         response = JsonResponse(data)
         self.assertEqual(json.loads(response.text), data)
 
-    def test_json_response_raises_type_error_with_default_setting(self):
-        with self.assertRaisesMessage(
-            TypeError,
-            "In order to allow non-dict objects to be serialized set the "
-            "safe parameter to False",
+    # RemovedInDjango71Warning: When the deprecation ends, remove this test.
+    def test_json_response_raises_type_error_with_safe_arg(self):
+        with (
+            self.assertRaisesMessage(
+                TypeError,
+                "In order to allow non-dict objects to be serialized set the "
+                "safe parameter to False",
+            ),
+            self.assertWarnsMessage(
+                RemovedInDjango71Warning, "The safe parameter is deprecated."
+            ),
         ):
-            JsonResponse([1, 2, 3])
+            JsonResponse([1, 2, 3], safe=True)
 
     def test_json_response_text(self):
-        response = JsonResponse("foobar", safe=False)
+        response = JsonResponse("foobar")
         self.assertEqual(json.loads(response.text), "foobar")
 
     def test_json_response_list(self):
-        response = JsonResponse(["foo", "bar"], safe=False)
+        response = JsonResponse(["foo", "bar"])
         self.assertEqual(json.loads(response.text), ["foo", "bar"])
 
     def test_json_response_uuid(self):
         u = uuid.uuid4()
-        response = JsonResponse(u, safe=False)
+        response = JsonResponse(u)
         self.assertEqual(json.loads(response.text), str(u))
 
     def test_json_response_custom_encoder(self):

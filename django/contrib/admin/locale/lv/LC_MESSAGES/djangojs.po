@@ -2,7 +2,7 @@
 #
 # Translators:
 # Edgars Andersons, 2025
-# Edgars Voroboks <edgars.voroboks@gmail.com>, 2023,2025
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2023,2025-2026
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2020-2021
@@ -12,9 +12,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-25 15:04-0500\n"
-"PO-Revision-Date: 2025-09-17 07:59+0000\n"
-"Last-Translator: Edgars Andersons, 2025\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-05 07:59+0000\n"
+"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, "
+"2023,2025-2026\n"
 "Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -97,16 +98,16 @@ msgid ""
 "individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Ir atlasīta darbība, bet nav saglabātas laukos veiktās izmaiņas. Lūgums "
-"klikšķināt uz “Labi”, lai saglabātu. Darbība būs jāizpilda vēlreiz."
+"Jūs esat atlasījis darbību, bet vēl neesat saglabājis izmaiņas atsevišķos "
+"laukos. Lūdzu, noklikšķiniet uz Labi, lai saglabātu. Darbība būs jāatkārto."
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"Tu atlasīji darbību un laukos neveici nekādas izmaiņas. Iespējams, ka meklē "
-"pogu “Aiziet”, nevis “Saglabāt”."
+"Jūs esat atlasījis darbību un neesat veicis nekādas izmaiņas atsevišķos "
+"laukos. Jūs, iespējams, meklējat pogu “Izpildīt”, nevis pogu “Saglabāt”."
 
 msgid "Now"
 msgstr "Tagad"
@@ -123,19 +124,28 @@ msgstr "Pusdiena"
 msgid "6 p.m."
 msgstr "6:00"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Piezīme: Tavs laiks ir %s stundas pirms servera laika."
-msgstr[1] "Piezīme: Tavs laiks ir %s stundu pirms servera laika."
-msgstr[2] "Piezīme: Tavs laiks ir %s stundas pirms servera laika."
+msgid "server"
+msgstr ""
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Piezīme: Tavs laiks ir %s stundas pēc servera laika."
-msgstr[1] "Piezīme: Tavs laiks ir %s stundu pēc servera laika."
-msgstr[2] "Piezīme: Tavs laiks ir %s stundas pēc servera laika."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 msgid "Choose a Time"
 msgstr "Izvēlies laiku"
@@ -149,14 +159,29 @@ msgstr "Atcelt"
 msgid "Today"
 msgstr "Šodien"
 
+msgid "Today (%(date)s)"
+msgstr ""
+
 msgid "Choose a Date"
 msgstr "Izvēlies datumu"
 
 msgid "Yesterday"
 msgstr "Vakar"
 
+msgid "Yesterday (%(date)s)"
+msgstr ""
+
 msgid "Tomorrow"
 msgstr "Rīt"
+
+msgid "Tomorrow (%(date)s)"
+msgstr ""
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr ""
+
+msgid "Next (%(month)s %(year)s)"
+msgstr ""
 
 msgid "January"
 msgstr "janvāris"
@@ -318,3 +343,18 @@ msgstr "Pk"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Se"
+
+msgid "%(month)s %(day)s, %(year)s"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr ""

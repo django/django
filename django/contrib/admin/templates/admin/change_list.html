@@ -4,16 +4,17 @@
 {% block title %}{% if cl.formset and cl.formset.errors %}{% translate "Error:" %} {% endif %}{{ block.super }}{% endblock %}
 {% block extrastyle %}
   {{ block.super }}
-  <link rel="stylesheet" href="{% static "admin/css/changelists.css" %}">
+  <link rel="stylesheet" href="{% static "admin/css/changelists.css" %}" {% csp_nonce_attr %}>
   {% if cl.formset %}
-    <link rel="stylesheet" href="{% static "admin/css/forms.css" %}">
+    <link rel="stylesheet" href="{% static "admin/css/widgets.css" %}" {% csp_nonce_attr %}>
+    <link rel="stylesheet" href="{% static "admin/css/forms.css" %}" {% csp_nonce_attr %}>
   {% endif %}
   {% if cl.formset or action_form %}
-    <script src="{% url 'admin:jsi18n' %}"></script>
+    <script src="{% url 'admin:jsi18n' %}" {% csp_nonce_attr %}></script>
   {% endif %}
-  {{ media.css }}
+  {% csp_nonce_attr media.css %}
   {% if not actions_on_top and not actions_on_bottom %}
-    <style>
+    <style {% csp_nonce_attr %}>
       #changelist table thead th:first-child {width: inherit}
     </style>
   {% endif %}
@@ -21,8 +22,8 @@
 
 {% block extrahead %}
 {{ block.super }}
-{{ media.js }}
-<script src="{% static 'admin/js/filters.js' %}" defer></script>
+{% csp_nonce_attr media.js %}
+<script src="{% static 'admin/js/filters.js' %}" defer {% csp_nonce_attr %}></script>
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-list{% endblock %}

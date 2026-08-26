@@ -68,10 +68,20 @@ need to :meth:`~Model.save`.
 
         book = Book.objects.create_book("Pride and Prejudice")
 
+.. admonition:: Setting attributes does not convert types
+
+    Setting a model attribute does not convert the value to the field's Python
+    type. That conversion happens when the model is :ref:`validated
+    <validating-objects>`. Although a field assigned a value of a different
+    type (for example, a string assigned to a
+    :class:`~django.db.models.UUIDField`) may be converted when
+    :meth:`~Model.save` executes a query, the in-memory instance will keep the
+    original value until it is :ref:`reloaded <refreshing-objects>`.
+
 Customizing model loading
 -------------------------
 
-.. classmethod:: Model.from_db(db, field_names, values)
+.. classmethod:: Model.from_db(db, field_names, values, *, fetch_mode=None)
 
 The ``from_db()`` method can be used to customize model instance creation
 when loading from the database.
@@ -84,10 +94,13 @@ fields are present, then ``values`` are guaranteed to be in the order
 ``__init__()`` expects them. That is, the instance can be created by
 ``cls(*values)``. If any fields are deferred, they won't appear in
 ``field_names``. In that case, assign a value of ``django.db.models.DEFERRED``
-to each of the missing fields.
+to each of the missing fields. The ``fetch_mode`` argument contains the
+:doc:`fetch mode </topics/db/fetch-modes>` of the query that loaded the
+instance, or ``None`` if it was loaded outside of a query.
 
 In addition to creating the new model, the ``from_db()`` method must set the
 ``adding`` and ``db`` flags in the new instance's :attr:`~Model._state`
+attribute, and, when ``fetch_mode`` is not ``None``, its ``fetch_mode``
 attribute.
 
 Below is an example showing how to record the initial values of fields that
@@ -97,7 +110,7 @@ are loaded from the database::
 
 
     @classmethod
-    def from_db(cls, db, field_names, values):
+    def from_db(cls, db, field_names, values, *, fetch_mode=None):
         # Default implementation of from_db() (subject to change and could
         # be replaced with super()).
         if len(values) != len(cls._meta.concrete_fields):
@@ -110,6 +123,8 @@ are loaded from the database::
         instance = cls(*values)
         instance._state.adding = False
         instance._state.db = db
+        if fetch_mode is not None:
+            instance._state.fetch_mode = fetch_mode
         # customization to store the original field values on the instance
         instance._loaded_values = dict(
             zip(field_names, (value for value in values if value is not DEFERRED))
@@ -130,6 +145,17 @@ are loaded from the database::
 The example above shows a full ``from_db()`` implementation to clarify how that
 is done. In this case it would be possible to use a ``super()`` call in the
 ``from_db()`` method.
+
+.. versionchanged:: 6.1
+
+    The ``fetch_mode`` parameter was added.
+
+.. deprecated:: 6.1
+
+    Support for ``from_db()`` methods that do not accept the ``fetch_mode``
+    keyword argument is deprecated and will be removed in Django 7.0.
+
+.. _refreshing-objects:
 
 Refreshing objects from database
 ================================
@@ -598,12 +624,6 @@ You can pass ``force_insert=(models.Model,)`` to force an ``INSERT`` statement
 for all parents. By default, ``force_insert=True`` only forces the insertion of
 a new row for the current model.
 
-.. versionchanged:: 6.0
-
-    When a forced update does not affect any rows a
-    :exc:`~django.db.models.Model.NotUpdated` exception is raised. On previous
-    versions a generic :exc:`django.db.DatabaseError` was raised.
-
 It should be very rare that you'll need to use these parameters. Django will
 almost always do the right thing and trying to override that will lead to
 errors that are difficult to track down. This feature is for advanced use
@@ -831,7 +851,7 @@ For example::
     def get_absolute_url(self):
         return "/people/%i/" % self.id
 
-While this code is correct and simple, it may not be the most portable way to
+While this code is correct and simple, it may not be the most portable way
 to write this kind of method. The :func:`~django.urls.reverse` function is
 usually the best approach.
 
@@ -969,21 +989,33 @@ Other attributes
     The ``_state`` attribute refers to a ``ModelState`` object that tracks
     the lifecycle of the model instance.
 
-    The ``ModelState`` object has two attributes: ``adding``, a flag which is
-    ``True`` if the model has not been saved to the database yet, and ``db``,
-    a string referring to the database alias the instance was loaded from or
-    saved to.
+    The ``ModelState`` object has three attributes: ``adding``, a flag which is
+    ``True`` if the model has not been saved to the database yet, ``db``, a
+    string referring to the database alias the instance was loaded from or
+    saved to, and ``fetch_mode``, the :doc:`fetch mode
+    </topics/db/fetch-modes>` to be used in subsequent field fetches.
 
     Newly instantiated instances have ``adding=True`` and ``db=None``,
-    since they are yet to be saved. Instances fetched from a ``QuerySet``
-    will have ``adding=False`` and ``db`` set to the alias of the associated
-    database.
+    since they are yet to be saved, and ``fetch_mode=models.FETCH_ONE``.
+    Instances fetched from a ``QuerySet`` will have ``adding=False``, ``db``
+    set to the alias of the associated database, and ``fetch_mode`` copied
+    from the queryset's fetch mode.
+
+    .. versionchanged:: 6.1
+
+        The ``fetch_mode`` attribute was added.
 
 ``_is_pk_set()``
 ----------------
 
 .. method:: Model._is_pk_set()
 
-The ``_is_pk_set()`` method returns whether the model instance's ``pk`` is set.
-It abstracts the model's primary key definition, ensuring consistent behavior
-regardless of the specific ``pk`` configuration.
+    The ``_is_pk_set()`` method returns whether the model instance's ``pk`` is
+    set. It abstracts the model's primary key definition, ensuring consistent
+    behavior regardless of the specific ``pk`` configuration. A
+    ``DatabaseDefault`` on an unsaved instance is considered unset.
+
+    .. versionchanged:: 6.1
+
+        In earlier versions, ``True`` was returned for ``DatabaseDefault``
+        values.

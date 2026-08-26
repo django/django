@@ -593,6 +593,21 @@ class AggregateTestCase(TestCase):
         )
         self.assertCountEqual(books["ratings"].split(","), ["3.0", "4.0", "4.5", "5.0"])
 
+    @skipUnlessDBFeature(
+        "supports_aggregate_distinct_multiple_argument",
+        "supports_aggregate_order_by_clause",
+    )
+    def test_string_agg_distinct_with_order_by(self):
+        books = Book.objects.aggregate(
+            ratings=StringAgg(
+                Cast(F("rating"), CharField()),
+                Value(","),
+                distinct=True,
+                order_by=Cast(F("rating"), CharField()),
+            )
+        )
+        self.assertEqual(books["ratings"], "3,4,4.5,5")
+
     @skipIfDBFeature("supports_aggregate_distinct_multiple_argument")
     def test_raises_error_on_multiple_argument_distinct(self):
         message = (
@@ -2485,14 +2500,29 @@ class AggregateTestCase(TestCase):
         values = Publisher.objects.aggregate(
             stringagg=StringAgg("name", delimiter=Value("'"))
         )
-
-        self.assertEqual(
-            values,
-            {
-                "stringagg": "Apress'Sams'Prentice Hall'Morgan Kaufmann'Jonno's House "
-                "of Books",
-            },
+        self.assertCountEqual(
+            values["stringagg"].split("'"),
+            [
+                "Apress",
+                "Sams",
+                "Prentice Hall",
+                "Morgan Kaufmann",
+                "Jonno",
+                "s House of Books",
+            ],
         )
+
+    @skipUnlessDBFeature("supports_aggregate_order_by_clause")
+    def test_string_agg_empty_string_value(self):
+        Author.objects.create(name="", age=-1)
+        Author.objects.create(name="a", age=-2)
+        result = Author.objects.filter(age__lt=0).aggregate(
+            names=StringAgg("name", delimiter=Value(","), order_by="name")
+        )
+        expected_value = (
+            "a" if connection.features.interprets_empty_strings_as_nulls else ",a"
+        )
+        self.assertEqual(result["names"], expected_value)
 
     @skipUnlessDBFeature("supports_aggregate_order_by_clause")
     def test_string_agg_order_by(self):
@@ -2546,13 +2576,15 @@ class AggregateTestCase(TestCase):
                 filter=Q(name__startswith="P"),
             )
         )
-
-        expected_values = {
-            "stringagg": "Practical Django Projects;"
-            "Python Web Development with Django;Paradigms of Artificial "
-            "Intelligence Programming: Case Studies in Common Lisp",
-        }
-        self.assertEqual(values, expected_values)
+        self.assertCountEqual(
+            values["stringagg"].split(";"),
+            [
+                "Practical Django Projects",
+                "Python Web Development with Django",
+                "Paradigms of Artificial Intelligence Programming: Case "
+                "Studies in Common Lisp",
+            ],
+        )
 
     @skipUnlessDBFeature("supports_aggregate_order_by_clause")
     def test_string_agg_filter_outerref(self):
@@ -2623,16 +2655,24 @@ class AggregateTestCase(TestCase):
             ).values_list("agg", flat=True)
         )
 
-        expected_values = [
-            "Adrian Holovaty",
-            "Brad Dayley",
-            "Paul Bissex;Wesley J. Chun",
-            "Peter Norvig;Stuart Russell",
-            "Peter Norvig",
-            "" if connection.features.interprets_empty_strings_as_nulls else None,
-        ]
+        def normalize(v):
+            # Sort values for a normalized comparison since STRING_AGG() with
+            # ORDER BY isn't guaranteed to return results in a defined order.
+            if not v:  # Don't sort None or ""
+                return v
+            return ";".join(sorted(v.split(";")))
 
-        self.assertQuerySetEqual(expected_values, values, ordered=False)
+        self.assertCountEqual(
+            [normalize(v) for v in values],
+            [
+                "Adrian Holovaty",
+                "Brad Dayley",
+                "Paul Bissex;Wesley J. Chun",
+                "Peter Norvig;Stuart Russell",
+                "Peter Norvig",
+                "" if connection.features.interprets_empty_strings_as_nulls else None,
+            ],
+        )
 
     @skipUnlessDBFeature("supports_aggregate_order_by_clause")
     def test_order_by_in_subquery(self):

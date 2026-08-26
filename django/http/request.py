@@ -250,8 +250,8 @@ class HttpRequest:
             else:
                 raise
         try:
-            value = signing.get_cookie_signer(salt=key + salt).unsign(
-                cookie_value, max_age=max_age
+            value = signing._unsign_cookie(
+                cookie_value, cookie_name=key, salt=salt, max_age=max_age
             )
         except signing.BadSignature:
             if default is not RAISE_ERROR:
@@ -404,10 +404,16 @@ class HttpRequest:
                     "You cannot access body after reading from request's data stream"
                 )
 
+            # Make Content-Length fall back to 0 if malformed (e.g. ASGIRequest
+            # comma-joins duplicate Content-Length headers).
+            try:
+                content_length = int(self.META.get("CONTENT_LENGTH") or 0)
+            except (ValueError, TypeError):
+                content_length = 0
             # Limit the maximum request data size that will be handled
             # in-memory. Reject early when Content-Length is present and
             # already exceeds the limit, avoiding reading the body at all.
-            self._check_data_too_big(int(self.META.get("CONTENT_LENGTH") or 0))
+            self._check_data_too_big(content_length)
 
             # Content-Length can be absent or understated (e.g.
             # `Transfer-Encoding: chunked` on ASGI), so for seekable

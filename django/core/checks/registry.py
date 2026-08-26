@@ -17,6 +17,7 @@ class Tags:
     compatibility = "compatibility"
     database = "database"
     files = "files"
+    mail = "mail"
     models = "models"
     security = "security"
     signals = "signals"

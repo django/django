@@ -748,7 +748,3 @@ example above because they can detect the functional dependency. In general,
 ``AnyValue`` is useful when dealing with select list columns that involve
 non-aggregate functions or complex expressions not recognized by the database
 as functionally dependent on the columns in the grouping clause.
-
-.. versionchanged:: 6.0
-
-    The :class:`~django.db.models.AnyValue` aggregate was added.

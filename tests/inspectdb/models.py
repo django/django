@@ -172,6 +172,12 @@ class CompositePKModel(models.Model):
     column_2 = models.IntegerField()
 
 
+class CompositePKModel2(models.Model):
+    pk = models.CompositePrimaryKey("column_1", "column_2")
+    column_1 = models.IntegerField(db_column="column-1")
+    column_2 = models.IntegerField(db_column="column-2")
+
+
 class DbOnDeleteModel(models.Model):
     fk_do_nothing = models.ForeignKey(UniqueTogether, on_delete=models.DO_NOTHING)
     fk_db_cascade = models.ForeignKey(ColumnTypes, on_delete=models.DB_CASCADE)

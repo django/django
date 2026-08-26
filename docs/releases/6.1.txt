@@ -1,8 +1,8 @@
-============================================
-Django 6.1 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 6.1 release notes
+========================
 
-*Expected August 2026*
+*August 5, 2026*
 
 Welcome to Django 6.1!
 
@@ -14,6 +14,9 @@ want to be aware of when upgrading from Django 6.0 or earlier. We've
 
 See the :doc:`/howto/upgrade-version` guide if you're updating an existing
 project.
+
+Mainstream support is expected to end in April 2027. Extended support is
+expected to end in December 2027.
 
 Python compatibility
 ====================
@@ -45,7 +48,7 @@ Django provides three fetch modes:
    cases of the "N+1 queries problem" to two queries without any work to
    maintain a list of fields to prefetch.
 
-3. ``RAISE`` raises a :exc:`~django.core.exceptions.FieldFetchBlocked`
+3. ``FETCH_RAISE`` raises a :exc:`~django.core.exceptions.FieldFetchBlocked`
    exception.
 
    This mode can prevent unintentional queries in performance-critical
@@ -54,7 +57,7 @@ Django provides three fetch modes:
 Use the new method :meth:`.QuerySet.fetch_mode` to set the fetch mode for model
 instances fetched by the ``QuerySet``:
 
-.. code-block:: python
+.. code-block::
 
     from django.db import models
 
@@ -86,6 +89,43 @@ Python-level options, as Django does not need to load objects before deleting
 them. As a consequence, the :attr:`~django.db.models.DB_CASCADE` option does
 not trigger the ``pre_delete`` or ``post_delete`` signals.
 
+Mailers
+-------
+
+The new :setting:`MAILERS` setting supports configuring multiple email backends
+with different options, similar to existing mechanisms for :setting:`CACHES`,
+:setting:`DATABASES`, :setting:`STORAGES`, and :setting:`TASKS`::
+
+    MAILERS = {
+        "default": {
+            "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+            "OPTIONS": {"host": "smtp.example.com", "use_tls": True},
+        },
+        "marketing": {
+            "BACKEND": "example.third.party.EmailBackend",
+            "OPTIONS": {"region": "africa-1"},
+        },
+    }
+
+You can select a mailer with the new ``using`` argument to :ref:`email sending
+<topic-email-sending>` functions, or obtain an email backend instance with
+:data:`mail.mailers[alias] <django.core.mail.mailers>`. See
+:doc:`/topics/email` for more details.
+
+:setting:`MAILERS` is not yet enabled by default in existing projects. It will
+replace :setting:`EMAIL_BACKEND` and related ``EMAIL_*`` settings in Django
+7.0. Until then, the older settings will continue to work but will issue
+deprecation warnings: see the list of :ref:`email deprecations
+<mailers-deprecations>` below.
+
+You can opt into the new feature at any time before Django 7.0; see
+:ref:`migrating-to-mailers`. To ease the transition,
+:data:`mail.mailers["default"] <django.core.mail.mailers.default>` works with
+either :setting:`MAILERS` or the deprecated :setting:`EMAIL_BACKEND` setting
+defined. The deprecated :func:`~django.core.mail.get_connection` function will
+also return an instance of the default mailer when :setting:`MAILERS` is
+defined.
+
 Minor features
 --------------
 
@@ -99,10 +139,15 @@ Minor features
   preserve :ref:`named groups <field-choices-named-groups>` (e.g.
   ``choices=[("Group", [("1", "Item")]), ...]``).
 
+* When :attr:`.ModelAdmin.list_select_related` is ``False`` (the default),
+  the change list now selects only the foreign key fields specified in
+  :attr:`.ModelAdmin.list_display`, rather than all foreign key fields. This
+  should improve performance for models with many foreign key fields.
+
 * The :attr:`~django.contrib.admin.ModelAdmin.delete_confirmation_max_display`
   option allows customizing how many objects are displayed on admin delete
-  confirmation pages before the remainder is truncated. The default is
-  ``None`` (no truncation).
+  confirmation pages and inline protected deletion errors before the remainder
+  is truncated. The default is ``None`` (no truncation).
 
 * In order to improve accessibility of the admin change forms:
 
@@ -120,10 +165,17 @@ Minor features
 * :attr:`~django.contrib.admin.ModelAdmin.list_display` now uses boolean icons
   for boolean fields on related models.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* The new ``location`` keyword argument of the
+  :func:`~django.contrib.admin.action` decorator specifies which admin views
+  the action is available on. The action is available on the admin change list
+  page by default. It can also be available on the admin change form. See
+  :ref:`admin-action-availability` for details.
 
-* ...
+* The new ``description_plural`` keyword argument of the
+  :func:`~django.contrib.admin.action` decorator specifies a human-readable
+  description for actions on the admin change list page. Defaults to the
+  ``description`` value. This is useful when the action is available on both
+  the admin change list and admin change form.
 
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -136,11 +188,6 @@ Minor features
 
 * The new :attr:`.Permission.user_perm_str` property returns the string
   suitable to use with :meth:`.User.has_perm`.
-
-:mod:`django.contrib.contenttypes`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -157,11 +204,6 @@ Minor features
 * :class:`~django.contrib.gis.forms.widgets.OpenLayersWidget` is now based on
   OpenLayers 10.9.0 (previously 7.2.2).
 
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -172,47 +214,12 @@ Minor features
 * :class:`~django.contrib.postgres.constraints.ExclusionConstraint` now
   supports the Hash index type.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * :class:`~django.contrib.sessions.backends.base.SessionBase` now supports
   boolean evaluation via
   :meth:`~django.contrib.sessions.backends.base.SessionBase.__bool__`.
-
-:mod:`django.contrib.sitemaps`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.staticfiles`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Asynchronous views
-~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Cache
-~~~~~
-
-* ...
 
 CSP
 ~~~
@@ -228,35 +235,20 @@ CSP
   with ``CSP.NONCE`` in a CSP policy but
   ``django.template.context_processors.csp`` is not configured.
 
-CSRF
-~~~~
-
-* ...
-
-Decorators
-~~~~~~~~~~
-
-* ...
+* CSP nonce attributes are now added on ``<script>``, ``<style>``, and
+  ``<link>`` elements in admin templates and all built-in templates when the
+  :func:`~django.template.context_processors.csp` context processor is
+  configured. See :ref:`csp-nonce-config` for setup instructions.
 
 Email
 ~~~~~
 
-* ...
+* A new ``mail.E001`` deployment-only system check prevents using one of
+  Django's email backends that is not intended for production use in the
+  ``'default'`` :setting:`MAILERS` entry.
 
-Error Reporting
-~~~~~~~~~~~~~~~
-
-* ...
-
-File Storage
-~~~~~~~~~~~~
-
-* ...
-
-File Uploads
-~~~~~~~~~~~~
-
-* ...
+* A new ``mail.W001`` system check warns when :setting:`MAILERS` is defined but
+  does not include a ``'default'`` entry.
 
 Forms
 ~~~~~
@@ -280,17 +272,9 @@ Forms
 Generic Views
 ~~~~~~~~~~~~~
 
-* ...
-
-Internationalization
-~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Logging
-~~~~~~~
-
-* ...
+* The new :attr:`.RedirectView.preserve_request` attribute allows preserving
+  the HTTP method and body during redirects, using 307/308 status codes instead
+  of 302/301.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
@@ -303,10 +287,8 @@ Management Commands
   :data:`~django.db.models.signals.m2m_changed` signals with ``raw=True`` when
   loading fixtures.
 
-Migrations
-~~~~~~~~~~
-
-* ...
+* The :djadmin:`sendtestemail` command now supports a :option:`--using
+  <sendtestemail --using>` option to specify the :setting:`MAILERS` alias.
 
 Models
 ~~~~~~
@@ -332,7 +314,9 @@ Models
 * The new :class:`~django.db.models.functions.UUID4` and
   :class:`~django.db.models.functions.UUID7` database functions were added.
 
-* :class:`~django.db.models.GeneratedField` now supports stored columns
+* :class:`~django.db.models.GeneratedField` now supports virtual columns
+  (:attr:`~django.db.models.GeneratedField.db_persist` set to ``False``) on
+  Postgres 18+ and stored columns
   (:attr:`~django.db.models.GeneratedField.db_persist` set to ``True``) on
   Oracle 23ai/26ai (23.7+).
 
@@ -355,11 +339,6 @@ Models
   Invalid Base64 strings now raise ``ValidationError`` instead of being
   silently accepted.
 
-Pagination
-~~~~~~~~~~
-
-* ...
-
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -373,7 +352,9 @@ Requests and Responses
 Security
 ~~~~~~~~
 
-* ...
+* Signed cookies now use an unambiguous salt derivation by default. Set
+  :setting:`SIGNED_COOKIE_LEGACY_SALT_FALLBACK` to ``True`` to continue
+  accepting legacy signed cookies.
 
 Serialization
 ~~~~~~~~~~~~~
@@ -387,11 +368,6 @@ Serialization
   :exc:`~django.core.exceptions.SuspiciousOperation` when it encounters
   unexpected nested tags.
 
-Signals
-~~~~~~~
-
-* ...
-
 Tasks
 ~~~~~
 
@@ -402,11 +378,6 @@ Tasks
 * :class:`~django.tasks.Task` and :class:`~django.tasks.TaskResult` instances
   can now be pickled and unpickled.
 
-Templates
-~~~~~~~~~
-
-* ...
-
 Tests
 ~~~~~
 
@@ -416,21 +387,11 @@ Tests
   Previously, they would consume the streaming response's content, causing
   subsequent calls to fail.
 
-URLs
-~~~~
-
-* ...
-
 Utilities
 ~~~~~~~~~
 
 * :func:`~django.utils.dateparse.parse_duration` now supports ISO 8601
   time periods expressed in weeks (``PnW``).
-
-Validators
-~~~~~~~~~~
-
-* ...
 
 .. _backwards-incompatible-6.1:
 
@@ -480,12 +441,15 @@ backends.
 * The undocumented ``InclusionAdminNode.__init__()`` now takes the template tag
   ``name`` as the first positional argument.
 
+* The undocumented ``ChangeList.has_related_field_in_list_display()`` method
+  has been replaced with ``ChangeList.get_select_related_fields()``.
+
 :mod:`django.contrib.auth`
 --------------------------
 
 * Under ASGI, :class:`~django.contrib.auth.middleware.RemoteUserMiddleware` no
   longer prefixes ``HTTP_`` when looking up custom values in ``request.META``.
-  For example, to send ``-H "AuthUser": ...``, the ``header`` attribute should
+  For example, to send ``-H "AuthUser: ..."``, the ``header`` attribute should
   be ``HTTP_AUTHUSER``. This restores the behavior prior to Django 5.2. (The
   default value of ``REMOTE_USER`` is not affected.)
 
@@ -507,8 +471,42 @@ backends.
   instead of the JSON ``null`` primitive. This matches the behavior of a
   standalone :class:`~django.db.models.JSONField` when storing ``None`` values.
 
+Email
+-----
+
+* Providing ``fail_silently=True``, ``auth_user``, or ``auth_password`` to mail
+  sending functions (such as :func:`~django.core.mail.send_mail`) while also
+  providing a ``connection`` now raises a ``TypeError``.
+
+* The undocumented ``EmailMessage.get_connection()`` method is no longer used.
+  Defining it in a subclass or trying to call it now causes an error.
+
+* :meth:`.EmailMessage.send` no longer sets the ``connection`` property on the
+  ``EmailMessage``. (This behavior was never documented. The ``send()`` method
+  will still *use* a ``connection`` that is set on the message before sending.)
+
+* :meth:`.EmailMessage.message` now raises a ``ValueError`` if ``Bcc`` is
+  included in the ``headers`` argument or ``extra_headers`` attribute. Use the
+  ``bcc`` argument instead.
+
 Models
 ------
+
+* The :lookup:`iexact=None <iexact>` lookup on
+  :class:`~django.db.models.JSONField` key transforms now matches JSON
+  ``null``, to match the behavior of :lookup:`exact=None <exact>` on key
+  transforms. Previously, it was interpreted as an :lookup:`isnull` lookup.
+
+* :meth:`~.QuerySet.first` and :meth:`~.QuerySet.last` no longer order by the
+  primary key when a ``QuerySet``'s ordering has been forcibly cleared by
+  calling :meth:`~.QuerySet.order_by` with no arguments.
+
+* As default model ordering is now applied to combined querysets,
+  :meth:`~.QuerySet.union`, :meth:`~.QuerySet.difference`, and
+  :meth:`~.QuerySet.intersection` raise ``DatabaseError`` when a field in
+  :attr:`.Options.ordering` isn't selected by :meth:`~.QuerySet.values` or
+  :meth:`~.QuerySet.values_list`. Call :meth:`~.QuerySet.order_by` without
+  arguments after combining to clear the default ordering.
 
 * SQL ``SELECT`` aliases originating from :meth:`.QuerySet.annotate`
   calls as well as table and ``JOIN`` aliases are now systematically quoted to
@@ -516,6 +514,12 @@ Models
   case-sensitive, *raw* SQL references to aliases mixing case, such as when
   using :class:`.RawSQL`, might have to be adjusted to also make use of
   quoting.
+
+* :meth:`~django.db.models.Model._is_pk_set` now returns ``False`` for
+  ``DatabaseDefault`` values on unsaved instances.
+
+* ``fetch_mode=None`` is added to the signature of
+  :meth:`~django.db.models.Model.from_db`.
 
 System checks
 -------------
@@ -544,9 +548,20 @@ short-term maintenance releases. Django 6.1 supports MariaDB 10.11 and higher.
 Miscellaneous
 -------------
 
-* Providing ``fail_silently=True``, ``auth_user``, or ``auth_password`` to mail
-  sending functions (such as :func:`~django.core.mail.send_mail`) while also
-  providing a ``connection`` now raises a ``TypeError``.
+* The minimum supported version of SQLite is increased from 3.31.0 to 3.37.0.
+
+* The default value of the transitional setting
+  :setting:`SIGNED_COOKIE_LEGACY_SALT_FALLBACK` is now ``False``.
+
+* In cases where cached pages or template fragments varied on arguments, e.g.
+  :ref:`vary headers <using-vary-headers>` for
+  :func:`~django.views.decorators.cache.cache_page` and
+  :class:`~django.middleware.cache.UpdateCacheMiddleware`, or the ``vary_on``
+  arguments to the :ttag:`cache` template tag (generated by
+  :func:`~django.core.cache.utils.make_template_fragment_key`), the cache keys
+  are different from the keys generated by older versions of Django. After
+  upgrading to Django 6.1, the first request to any previously cached page or
+  template fragment that varies on additional information will be a cache miss.
 
 * :class:`~django.contrib.contenttypes.fields.GenericForeignKey` now uses a
   separate descriptor class: the private ``GenericForeignKeyDescriptor``.
@@ -554,23 +569,23 @@ Miscellaneous
 * The undocumented ``django.template.library.parse_bits()`` function no longer
   accepts the ``takes_context`` argument.
 
-* The minimum supported version of SQLite is increased from 3.31.0 to 3.37.0.
-
-* The :lookup:`iexact=None <iexact>` lookup on
-  :class:`~django.db.models.JSONField` key transforms now matches JSON
-  ``null``, to match the behavior of :lookup:`exact=None <exact>` on key
-  transforms. Previously, it was interpreted as an :lookup:`isnull` lookup.
-
-* :meth:`~.QuerySet.first` and :meth:`~.QuerySet.last` no longer order by the
-  primary key when a ``QuerySet``'s ordering has been forcibly cleared by
-  calling :meth:`~.QuerySet.order_by` with no arguments.
-
 * The :class:`~django.core.files.File` class now always evaluates to ``True``
   in boolean contexts, rather than relying on the ``name`` attribute. The
   built-in subclasses ``FieldFile``, ``UploadedFile``,
   ``TemporaryUploadedFile``, ``InMemoryUploadedFile``, and
   ``SimpleUploadedFile`` retain the previous behavior of evaluating based on
   the ``name`` attribute.
+
+* The undocumented ``connection()`` method of :class:`.log.AdminEmailHandler`
+  has been removed and is no longer called. Subclasses overriding
+  :meth:`.AdminEmailHandler.send_mail` should avoid calling ``connection()``.
+  See :ref:`migrating-to-mailers-get-connection` if specific connection
+  configuration is needed.
+
+* The internal implementation of :class:`.BrokenLinkEmailsMiddleware` has been
+  updated for mailers. If you have subclassed it to customize email sending
+  behavior (as suggested in :doc:`/howto/error-reporting`), you may want to
+  review the updates in the base :class:`.BrokenLinkEmailsMiddleware` class.
 
 * ``django.http.multipartparser.MultiPartParser`` now uses strict Base64
   validation when decoding encoded request data. Previously, invalid data could
@@ -589,24 +604,88 @@ Miscellaneous
 Features deprecated in 6.1
 ==========================
 
+.. _mailers-deprecations:
+
+Email
+-----
+
+* The :setting:`EMAIL_BACKEND`, :setting:`EMAIL_FILE_PATH`,
+  :setting:`EMAIL_HOST`, :setting:`EMAIL_HOST_PASSWORD`,
+  :setting:`EMAIL_HOST_USER`, :setting:`EMAIL_PORT`,
+  :setting:`EMAIL_USE_TLS`, :setting:`EMAIL_USE_SSL`,
+  :setting:`EMAIL_SSL_CERTFILE`, :setting:`EMAIL_SSL_KEYFILE`, and
+  :setting:`EMAIL_TIMEOUT` settings are deprecated. Replace them with a
+  :setting:`MAILERS` configuration dictionary as described in
+  :ref:`migrating-to-mailers`.
+
+* :func:`.mail.get_connection` is deprecated. See
+  :ref:`migrating-to-mailers-get-connection` for replacement options.
+
+* The ``connection`` argument to :func:`.send_mail`, :func:`.send_mass_mail`,
+  :func:`.mail_admins`, :func:`.mail_managers`, and :class:`.EmailMessage` is
+  deprecated. The ``EmailMessage.connection`` attribute is also deprecated.
+  Switch to the ``using`` argument with a :setting:`MAILERS` alias.
+
+* The ``fail_silently`` argument to :func:`.send_mail`,
+  :func:`.send_mass_mail`, :func:`.mail_admins`, :func:`.mail_managers`, and
+  :meth:`.EmailMessage.send` is deprecated. See
+  :ref:`migrating-to-mailers-fail-silently` for alternatives.
+
+* The ``auth_user`` and ``auth_password`` arguments to :func:`.send_mail` and
+  :func:`.send_mass_mail` are deprecated. Replace them with ``"username"`` and
+  ``"password"`` :setting:`OPTIONS <MAILERS-OPTIONS>` in :setting:`MAILERS`.
+  See :ref:`migrating-to-mailers-auth`.
+
+* Directly constructing and using instances of the
+  :ref:`smtp.EmailBackend <topic-email-smtp-backend>` class is deprecated. Use
+  :data:`.mail.mailers` to obtain email backend instances.
+
+* The ``BaseEmailBackend.__init__()`` constructor no longer silently ignores
+  unknown keyword arguments. Custom email backend subclasses should ensure they
+  have consumed all supported ``**kwargs`` before forwarding the remainder to
+  superclass init. The base class now issues a deprecation warning for unknown
+  arguments, and it will treat them as errors starting in Django 7.0. See
+  :ref:`migrating-to-mailers-email-backends`.
+
+* Support for ``fail_silently`` in the ``BaseEmailBackend`` is deprecated.
+  A custom email backend that wants to support ``fail_silently`` should manage
+  its own local attribute, not pass it to the base backend constructor. See
+  :ref:`migrating-to-mailers-email-backends`.
+
 Miscellaneous
 -------------
+
+* Calling :meth:`~django.db.models.query.QuerySet.select_related` with no
+  arguments to select all non-nullable related fields is deprecated. Specify
+  the related fields to fetch instead, or use the
+  :attr:`~django.db.models.FETCH_PEERS` fetch mode.
+
+* Setting :attr:`.ModelAdmin.list_select_related` to ``True`` and returning
+  ``True`` from :attr:`.ModelAdmin.get_list_select_related()` are deprecated.
+  Specify the related fields to fetch instead.
 
 * Calling :meth:`.QuerySet.values_list` with ``flat=True`` and no field name
   is deprecated. Pass an explicit field name, like
   ``values_list("pk", flat=True)``.
 
+* Support for ``Model.from_db()`` methods that do not accept the
+  ``fetch_mode`` keyword argument is deprecated.
+
 * The use of ``None`` to represent a top-level JSON scalar ``null`` when
   querying :class:`~django.db.models.JSONField` is now deprecated in favor of
-  the new :class:`~django.db.models.JSONNull` expression. At the end
-  of the deprecation period, ``None`` values compile to SQL ``IS NULL`` when
-  used as the top-level value. :lookup:`Key and index lookups <jsonfield.key>`
-  are unaffected by this deprecation.
+  the new :class:`~django.db.models.JSONNull` expression. At the end of the
+  deprecation period, ``None`` values compile to SQL ``IS NULL`` when used as
+  the top-level value. :lookup:`Key and index lookups <jsonfield.key>` are
+  unaffected by this deprecation.
 
-* The ``django.db.models.fields.BLANK_CHOICE_DASH`` constant is deprecated
-  in favor of the new constant ``django.db.models.fields.BLANK_CHOICE_LABEL``.
+* The undocumented ``django.db.models.fields.BLANK_CHOICE_DASH`` constant is
+  deprecated. See the :setting:`USE_BLANK_CHOICE_DASH` transitional setting for
+  migration advice.
 
 * The :setting:`USE_BLANK_CHOICE_DASH` transitional setting is deprecated.
+
+* The :setting:`SIGNED_COOKIE_LEGACY_SALT_FALLBACK` transitional setting is
+  deprecated.
 
 * The undocumented ``get_placeholder`` method of
   :class:`~django.db.models.Field` is deprecated in favor of the newly
@@ -620,6 +699,10 @@ Miscellaneous
   object passed as the ``compiler`` argument to the ``as_sql()`` method of
   :ref:`expressions <writing-your-own-query-expressions>`, is deprecated in
   favor of the newly introduced ``quote_name()`` method.
+
+* The ``email_backend`` argument of :class:`.log.AdminEmailHandler` is
+  deprecated in favor of the newly introduced ``using`` argument.
+  See :ref:`migrating-to-mailers-adminemailhandler` for details.
 
 * The ``BitAnd``, ``BitOr``, and ``BitXor`` classes in
   ``django.contrib.postgres.aggregates`` are deprecated in favor of the
@@ -636,6 +719,19 @@ Miscellaneous
   ``django.core.signing.base64_hmac()`` is deprecated and will change from
   ``"sha1"`` to ``"sha256"`` in Django 7.0. Pass an explicit ``algorithm``
   to silence the deprecation warning.
+
+* Overriding ``ModelAdmin.get_actions()`` without the new ``action_location``
+  parameter is deprecated.
+
+* Unpacking or indexing the dictionary values of the
+  ``ModelAdmin.get_actions()`` return value is deprecated. Use
+  :class:`~django.contrib.admin.Action` attributes instead.
+
+* Overriding ``ModelAdmin.get_action_choices()`` without the new
+  ``action_location`` parameter is deprecated.
+
+* :func:`django.db.transaction.savepoint` is deprecated in favor of
+  :func:`~django.db.transaction.savepoint_create`.
 
 Features removed in 6.1
 =======================

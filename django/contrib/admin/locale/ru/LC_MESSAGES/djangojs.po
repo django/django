@@ -10,16 +10,16 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Panasoft, 2021
 # Pavel Kutsenko <zebartcoc@gmail.com>, 2025
-# Алексей Борискин <sun.void@gmail.com>, 2012,2014-2015,2022-2023,2025
+# Алексей Борискин <sun.void@gmail.com>, 2012,2014-2015,2022-2023,2025-2026
 # Андрей Щуров <shurov9009@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-25 15:04-0500\n"
-"PO-Revision-Date: 2025-09-17 07:59+0000\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-05 07:59+0000\n"
 "Last-Translator: Алексей Борискин <sun.void@gmail.com>, "
-"2012,2014-2015,2022-2023,2025\n"
+"2012,2014-2015,2022-2023,2025-2026\n"
 "Language-Team: Russian (http://app.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -117,12 +117,11 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"Вы выбрали действие и не внесли изменений в данные. Возможно, вы хотели "
-"воспользоваться кнопкой \"Выполнить\", а не кнопкой \"Сохранить\". Если это "
-"так, то нажмите \"Отмена\", чтобы вернуться в интерфейс редактирования."
+"Вы выбрали действие, но вы не внесли изменений в данные. Возможно, вы хотели "
+"нажать кнопку \"Запустить\", а не кнопку \"Сохранить\"."
 
 msgid "Now"
 msgstr "Сейчас"
@@ -139,25 +138,30 @@ msgstr "Полдень"
 msgid "6 p.m."
 msgstr "6 вечера"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Внимание: Ваше локальное время опережает время сервера на %s час."
-msgstr[1] "Внимание: Ваше локальное время опережает время сервера на %s часа."
-msgstr[2] "Внимание: Ваше локальное время опережает время сервера на %s часов."
-msgstr[3] "Внимание: Ваше локальное время опережает время сервера на %s часов."
+msgid "server"
+msgstr ""
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
 msgstr[0] ""
-"Внимание: Ваше локальное время отстаёт от времени сервера на %s час."
 msgstr[1] ""
-"Внимание: Ваше локальное время отстаёт от времени сервера на %s часа."
 msgstr[2] ""
-"Внимание: Ваше локальное время отстаёт от времени сервера на %s часов."
 msgstr[3] ""
-"Внимание: Ваше локальное время отстаёт от времени сервера на %s часов."
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 msgid "Choose a Time"
 msgstr "Выберите время"
@@ -171,14 +175,29 @@ msgstr "Отмена"
 msgid "Today"
 msgstr "Сегодня"
 
+msgid "Today (%(date)s)"
+msgstr ""
+
 msgid "Choose a Date"
 msgstr "Выберите дату"
 
 msgid "Yesterday"
 msgstr "Вчера"
 
+msgid "Yesterday (%(date)s)"
+msgstr ""
+
 msgid "Tomorrow"
 msgstr "Завтра"
+
+msgid "Tomorrow (%(date)s)"
+msgstr ""
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr ""
+
+msgid "Next (%(month)s %(year)s)"
+msgstr ""
 
 msgid "January"
 msgstr "Январь"
@@ -340,3 +359,18 @@ msgstr "П"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "С"
+
+msgid "%(month)s %(day)s, %(year)s"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr ""

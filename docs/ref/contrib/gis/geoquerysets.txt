@@ -205,10 +205,6 @@ MySQL       ``MBRCoveredBy(poly, geom)``
 SpatiaLite  ``CoveredBy(poly, geom)``
 ==========  =============================
 
-.. versionchanged:: 6.0
-
-    MariaDB 12.0.1+ support was added.
-
 .. fieldlookup:: covers
 
 ``covers``
@@ -395,16 +391,10 @@ MariaDB, MySQL, PostGIS, SpatiaLite  ``ST_IsValid(poly)``
 Oracle                               ``SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(poly, 0.05) = 'TRUE'``
 ===================================  ================================================================
 
-.. versionchanged:: 6.0
-
-    MariaDB 12.0.1+ support was added.
-
 .. fieldlookup:: geom_type
 
 ``geom_type``
 -------------
-
-.. versionadded:: 6.0
 
 *Availability*: `PostGIS <https://postgis.net/docs/GeometryType.html>`__,
 Oracle 23c+, MariaDB, MySQL, SpatiaLite
@@ -946,10 +936,6 @@ geometry column. This is analogous to a simplified version of the
 :class:`Union` aggregate, except it can be several orders of magnitude faster
 than performing a union because it rolls up geometries into a collection or
 multi object, not caring about dissolving boundaries.
-
-.. versionchanged:: 6.0
-
-    MariaDB 12.0.1+ support was added.
 
 ``Extent``
 ~~~~~~~~~~

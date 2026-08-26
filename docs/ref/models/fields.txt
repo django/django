@@ -1346,8 +1346,8 @@ materialized view.
 
     .. versionchanged:: 6.1
 
-        Support for stored ``GeneratedField``\s was added on Oracle 23ai/26ai
-        (23.7+).
+        Support for virtual ``GeneratedField``\s was added on Postgres 18+ and
+        for stored ones on Oracle 23ai/26ai (23.7+).
 
 .. admonition:: Database limitations
 
@@ -1365,12 +1365,6 @@ materialized view.
 .. _Oracle: https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-TABLE.html#GUID-F9CE0CC3-13AE-4744-A43C-EAC7A71AAAB6__BABIIGBD
 .. _PostgreSQL: https://www.postgresql.org/docs/current/ddl-generated-columns.html
 .. _SQLite: https://www.sqlite.org/gencol.html#limitations
-
-.. versionchanged:: 6.0
-
-    ``GeneratedField``\s are now automatically refreshed from the database on
-    backends that support it (SQLite, PostgreSQL, and Oracle) and marked as
-    deferred otherwise.
 
 :attr:`~Field.null` has no effect on ``GeneratedField`` since whether the
 column is nullable depends on the database and expression used.

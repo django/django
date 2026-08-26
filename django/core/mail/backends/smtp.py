@@ -7,8 +7,10 @@ import threading
 from email.headerregistry import Address, AddressHeader
 
 from django.conf import settings
+from django.core.mail import InvalidMailer
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.utils import DNS_NAME
+from django.utils.deprecation import RemovedInDjango70Warning, warn_about_external_use
 from django.utils.encoding import force_str, punycode
 from django.utils.functional import cached_property
 
@@ -32,27 +34,69 @@ class EmailBackend(BaseEmailBackend):
         ssl_certfile=None,
         **kwargs,
     ):
-        super().__init__(fail_silently=fail_silently)
-        self.host = host or settings.EMAIL_HOST
-        self.port = port or settings.EMAIL_PORT
-        self.username = settings.EMAIL_HOST_USER if username is None else username
-        self.password = settings.EMAIL_HOST_PASSWORD if password is None else password
-        self.use_tls = settings.EMAIL_USE_TLS if use_tls is None else use_tls
-        self.use_ssl = settings.EMAIL_USE_SSL if use_ssl is None else use_ssl
-        self.timeout = settings.EMAIL_TIMEOUT if timeout is None else timeout
-        self.ssl_keyfile = (
-            settings.EMAIL_SSL_KEYFILE if ssl_keyfile is None else ssl_keyfile
-        )
-        self.ssl_certfile = (
-            settings.EMAIL_SSL_CERTFILE if ssl_certfile is None else ssl_certfile
-        )
-        if self.use_ssl and self.use_tls:
-            raise ValueError(
-                "EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so only set "
-                "one of those settings to True."
+        # RemovedInDjango70Warning.
+        if "alias" not in kwargs:
+            msg = (
+                "Directly creating EmailBackend instances is deprecated. "
+                "Use mail.mailers instead."
             )
+            warn_about_external_use(msg, RemovedInDjango70Warning)
+
+        super().__init__(**kwargs)
+        self.fail_silently = fail_silently
         self.connection = None
+        self._partial_connection = None
         self._lock = threading.RLock()
+
+        # RemovedInDjango70Warning.
+        if self.alias is None:
+            # Use deprecated settings when MAILERS not enabled.
+            self.host = host or settings.EMAIL_HOST
+            self.port = port or settings.EMAIL_PORT
+            self.username = settings.EMAIL_HOST_USER if username is None else username
+            self.password = (
+                settings.EMAIL_HOST_PASSWORD if password is None else password
+            )
+            self.use_tls = settings.EMAIL_USE_TLS if use_tls is None else use_tls
+            self.use_ssl = settings.EMAIL_USE_SSL if use_ssl is None else use_ssl
+            self.timeout = settings.EMAIL_TIMEOUT if timeout is None else timeout
+            self.ssl_keyfile = (
+                settings.EMAIL_SSL_KEYFILE if ssl_keyfile is None else ssl_keyfile
+            )
+            self.ssl_certfile = (
+                settings.EMAIL_SSL_CERTFILE if ssl_certfile is None else ssl_certfile
+            )
+            if self.use_ssl and self.use_tls:
+                raise ValueError(
+                    "EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so "
+                    "only set one of those settings to True."
+                )
+            return
+
+        self.host = host
+        self.port = port
+        self.username = username
+        self.password = password
+        self.use_tls = use_tls if use_tls is not None else False
+        self.use_ssl = use_ssl if use_ssl is not None else False
+        self.timeout = timeout
+        self.ssl_keyfile = ssl_keyfile
+        self.ssl_certfile = ssl_certfile
+        if self.host is None:
+            raise InvalidMailer("OPTIONS must define 'host'.", alias=self.alias)
+        if self.use_ssl and self.use_tls:
+            raise InvalidMailer(
+                "The 'use_ssl' and 'use_tls' OPTIONS are incompatible. "
+                "Set at most one of them to True.",
+                alias=self.alias,
+            )
+        if self.port is None:
+            if self.use_ssl:
+                self.port = 465
+            elif self.use_tls:
+                self.port = 587
+            else:
+                self.port = 25
 
     @property
     def connection_class(self):
@@ -77,6 +121,11 @@ class EmailBackend(BaseEmailBackend):
             # Nothing to do if the connection is already open.
             return False
 
+        # If a connection was partially opened before, close it.
+        if self._partial_connection is not None:
+            self._close_connection(self._partial_connection)
+            self._partial_connection = None
+
         # If local_hostname is not specified, socket.getfqdn() gets used.
         # For performance, we use the cached FQDN for local_hostname.
         connection_params = {"local_hostname": DNS_NAME.get_fqdn()}
@@ -85,39 +134,51 @@ class EmailBackend(BaseEmailBackend):
         if self.use_ssl:
             connection_params["context"] = self.ssl_context
         try:
-            self.connection = self.connection_class(
+            self._partial_connection = self.connection_class(
                 self.host, self.port, **connection_params
             )
 
             # TLS/SSL are mutually exclusive, so only attempt TLS over
             # non-secure connections.
             if not self.use_ssl and self.use_tls:
-                self.connection.starttls(context=self.ssl_context)
+                self._partial_connection.starttls(context=self.ssl_context)
             if self.username and self.password:
-                self.connection.login(self.username, self.password)
+                self._partial_connection.login(self.username, self.password)
+
+            # Don't set connection until it's fully configured.
+            self.connection = self._partial_connection
+            self._partial_connection = None
+
             return True
         except OSError:
             if not self.fail_silently:
                 raise
 
+    def _close_connection(self, connection):
+        try:
+            connection.quit()
+        except (ssl.SSLError, smtplib.SMTPServerDisconnected):
+            # This happens when calling quit() on a TLS connection
+            # sometimes, or when the connection was already disconnected
+            # by the server.
+            connection.close()
+        except smtplib.SMTPException:
+            if self.fail_silently:
+                return
+            raise
+
     def close(self):
         """Close the connection to the email server."""
-        if self.connection is None:
-            return
-        try:
+        if self._partial_connection is not None:
             try:
-                self.connection.quit()
-            except (ssl.SSLError, smtplib.SMTPServerDisconnected):
-                # This happens when calling quit() on a TLS connection
-                # sometimes, or when the connection was already disconnected
-                # by the server.
-                self.connection.close()
-            except smtplib.SMTPException:
-                if self.fail_silently:
-                    return
-                raise
-        finally:
-            self.connection = None
+                self._close_connection(self._partial_connection)
+            finally:
+                self._partial_connection = None
+        if self.connection is not None:
+            try:
+                self._close_connection(self.connection)
+            finally:
+                self.connection = None
 
     def send_messages(self, email_messages):
         """
@@ -174,8 +235,10 @@ class EmailBackend(BaseEmailBackend):
         # Django allows local mailboxes like "From: webmaster" (#15042).
         defects.discard("addr-spec local part with no domain")
         if not force_ascii:
-            # Non-ASCII local-part is valid with SMTPUTF8. Remove once
-            # https://github.com/python/cpython/issues/81074 is fixed.
+            # PY315: Non-ASCII local-part is valid with SMTPUTF8. This check
+            # can be removed once the minimum supported Python version is 3.15
+            # (so the fix for https://github.com/python/cpython/issues/81074
+            # is in all supported versions).
             defects.discard("local-part contains non-ASCII characters)")
         if defects:
             raise ValueError(f"Invalid address {address!r}: {'; '.join(defects)}")

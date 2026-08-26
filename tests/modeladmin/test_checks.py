@@ -1033,7 +1033,7 @@ class DeleteConfirmationMaxObjectsCheckTests(CheckTestCase):
                 "'delete_confirmation_max_display'"
                 " must be a non-negative integer or None."
             ),
-            "admin.E131",
+            "admin.E041",
         )
 
     def test_negative_integer(self):
@@ -1048,7 +1048,7 @@ class DeleteConfirmationMaxObjectsCheckTests(CheckTestCase):
                 "'delete_confirmation_max_display'"
                 " must be a non-negative integer or None."
             ),
-            "admin.E131",
+            "admin.E041",
         )
 
     def test_valid_case(self):
@@ -1062,6 +1062,22 @@ class DeleteConfirmationMaxObjectsCheckTests(CheckTestCase):
             delete_confirmation_max_display = None
 
         self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
+    def test_inline_not_integer(self):
+        class TestInlineModelAdmin(TabularInline):
+            delete_confirmation_max_display = "goodbye"
+            model = ValidationTestInlineModel
+
+        self.assertIsInvalid(
+            TestInlineModelAdmin,
+            ValidationTestModel,
+            (
+                "The value of "
+                "'delete_confirmation_max_display'"
+                " must be a non-negative integer or None."
+            ),
+            "admin.E041",
+        )
 
 
 class SearchFieldsCheckTests(CheckTestCase):
@@ -1233,6 +1249,8 @@ class ListSelectRelatedCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin,
             ValidationTestModel,
+            # RemovedInDjango70Warning: when the deprecation ends, replace:
+            # ... must be a tuple, list, or False.",
             "The value of 'list_select_related' must be a boolean, tuple or list.",
             "admin.E117",
         )

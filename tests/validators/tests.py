@@ -265,6 +265,10 @@ INVALID_URLS = [
     "http://[::\rffff:192.9.5.5]",
     "http://\twww.djangoproject.com/",
     "http://\t[::ffff:192.9.5.5]",
+    # Null characters are not accepted.
+    "http://www.djangoproject.com/\x00",
+    "http://www.django\x00project.com/",
+    "http://www.djangoproject.com/\x00@example.com/",
     # Trailing junk does not take forever to reject.
     "http://www.asdasdasdasdsadfm.com.br ",
     "http://www.asdasdasdasdsadfm.com.br z",
@@ -665,6 +669,8 @@ TEST_DATA = [
     (validate_domain_name, "dashinpunytld.xn---c", None),
     (validate_domain_name, "python..org", ValidationError),
     (validate_domain_name, "python-.org", ValidationError),
+    (validate_domain_name, "example.com\n", ValidationError),
+    (validate_domain_name, "example.com\r\n", ValidationError),
     (validate_domain_name, "too-long-name." * 20 + "com", ValidationError),
     (validate_domain_name, "stupid-name试", ValidationError),
     (validate_domain_name, "255.0.0.0", ValidationError),
@@ -677,6 +683,8 @@ TEST_DATA = [
         ValidationError,
     ),
     (DomainNameValidator(accept_idna=False), "ıçğü.com", ValidationError),
+    (DomainNameValidator(accept_idna=False), "example.com\n", ValidationError),
+    (DomainNameValidator(accept_idna=False), "example.com\r\n", ValidationError),
     (DomainNameValidator(accept_idna=False), "not-domain-name", ValidationError),
     (
         DomainNameValidator(accept_idna=False),

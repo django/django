@@ -56,9 +56,10 @@ Each item in the list should be an email address string. Example::
 
     ADMINS = ["john@example.com", '"Ng, Mary" <mary@example.com>']
 
-.. versionchanged:: 6.0
-
-    In older versions, required a list of (name, address) tuples.
+To safely build an address with a display name from variable content, see
+:ref:`formatting-addresses`, which recommends using
+:class:`~email.headerregistry.Address` over string formatting, but since this
+setting requires a list of strings, wrap each ``Address`` in ``str(...)``.
 
 .. setting:: ALLOWED_HOSTS
 
@@ -1284,11 +1285,6 @@ Default: ``'``:class:`django.db.models.BigAutoField`\ ``'``
 Default primary key field type to use for models that don't have a field with
 :attr:`primary_key=True <django.db.models.Field.primary_key>`.
 
-.. versionchanged:: 6.0
-
-    In older versions, the default value is
-    :class:`django.db.models.AutoField`.
-
 .. admonition:: Migrating auto-created through tables
 
     The value of ``DEFAULT_AUTO_FIELD`` will be respected when creating new
@@ -1360,6 +1356,9 @@ any format valid in the chosen email sending protocol.
 This doesn't affect error messages sent to :setting:`ADMINS` and
 :setting:`MANAGERS`. See :setting:`SERVER_EMAIL` for that.
 
+To build an address with a display name from variable content, see
+:ref:`formatting-addresses`.
+
 .. setting:: DEFAULT_INDEX_TABLESPACE
 
 ``DEFAULT_INDEX_TABLESPACE``
@@ -1397,10 +1396,18 @@ This is only used if ``CommonMiddleware`` is installed (see
 ``EMAIL_BACKEND``
 -----------------
 
-Default: ``'``:class:`django.core.mail.backends.smtp.EmailBackend`\ ``'``
+Default: ``'``:ref:`django.core.mail.backends.smtp.EmailBackend
+<topic-email-smtp-backend>`\ ``'``
 
 The backend to use for sending emails. For the list of available backends see
 :ref:`topic-email-backends`.
+
+.. deprecated:: 6.1
+
+    This setting is deprecated and will be removed in Django 7.0. Its
+    replacement is :setting:`BACKEND <MAILERS-BACKEND>` in the
+    :setting:`MAILERS` ``"default"`` configuration. See
+    :ref:`migrating-to-mailers`.
 
 .. setting:: EMAIL_FILE_PATH
 
@@ -1412,6 +1419,13 @@ Default: Not defined
 The directory used by the :ref:`file email backend <topic-email-file-backend>`
 to store output files.
 
+.. deprecated:: 6.1
+
+    This setting is deprecated and will be removed in Django 7.0. Its
+    replacement is ``"file_path"`` under :setting:`OPTIONS <MAILERS-OPTIONS>`
+    in a :setting:`MAILERS` definition that uses the file email backend. See
+    :ref:`migrating-to-mailers`.
+
 .. setting:: EMAIL_HOST
 
 ``EMAIL_HOST``
@@ -1422,6 +1436,13 @@ Default: ``'localhost'``
 The host to use for sending email.
 
 See also :setting:`EMAIL_PORT`.
+
+.. deprecated:: 6.1
+
+    This setting is deprecated and will be removed in Django 7.0. Its
+    replacement is ``"host"`` under :setting:`OPTIONS <MAILERS-OPTIONS>` in a
+    :setting:`MAILERS` definition that uses the SMTP email backend. See
+    :ref:`migrating-to-mailers`.
 
 .. setting:: EMAIL_HOST_PASSWORD
 
@@ -1437,6 +1458,13 @@ Django won't attempt authentication.
 
 See also :setting:`EMAIL_HOST_USER`.
 
+.. deprecated:: 6.1
+
+    This setting is deprecated and will be removed in Django 7.0. Its
+    replacement is ``"password"`` under :setting:`OPTIONS <MAILERS-OPTIONS>` in
+    a :setting:`MAILERS` definition that uses the SMTP email backend. See
+    :ref:`migrating-to-mailers`.
+
 .. setting:: EMAIL_HOST_USER
 
 ``EMAIL_HOST_USER``
@@ -1449,6 +1477,13 @@ If empty, Django won't attempt authentication.
 
 See also :setting:`EMAIL_HOST_PASSWORD`.
 
+.. deprecated:: 6.1
+
+    This setting is deprecated and will be removed in Django 7.0. Its
+    replacement is ``"username"`` under :setting:`OPTIONS <MAILERS-OPTIONS>` in
+    a :setting:`MAILERS` definition that uses the SMTP email backend. See
+    :ref:`migrating-to-mailers`.
+
 .. setting:: EMAIL_PORT
 
 ``EMAIL_PORT``
@@ -1457,6 +1492,13 @@ See also :setting:`EMAIL_HOST_PASSWORD`.
 Default: ``25``
 
 Port to use for the SMTP server defined in :setting:`EMAIL_HOST`.
+
+.. deprecated:: 6.1
+
+    This setting is deprecated and will be removed in Django 7.0. Its
+    replacement is ``"port"`` under :setting:`OPTIONS <MAILERS-OPTIONS>` in a
+    :setting:`MAILERS` definition that uses the SMTP email backend. See
+    :ref:`migrating-to-mailers`.
 
 .. setting:: EMAIL_SUBJECT_PREFIX
 
@@ -1491,6 +1533,13 @@ This is used for explicit TLS connections, generally on port 587. If you are
 experiencing hanging connections, see the implicit TLS setting
 :setting:`EMAIL_USE_SSL`.
 
+.. deprecated:: 6.1
+
+    This setting is deprecated and will be removed in Django 7.0. Its
+    replacement is ``"use_tls"`` under :setting:`OPTIONS <MAILERS-OPTIONS>` in
+    a :setting:`MAILERS` definition that uses the SMTP email backend. See
+    :ref:`migrating-to-mailers`.
+
 .. setting:: EMAIL_USE_SSL
 
 ``EMAIL_USE_SSL``
@@ -1505,6 +1554,13 @@ see the explicit TLS setting :setting:`EMAIL_USE_TLS`.
 
 Note that :setting:`EMAIL_USE_TLS`/:setting:`EMAIL_USE_SSL` are mutually
 exclusive, so only set one of those settings to ``True``.
+
+.. deprecated:: 6.1
+
+    This setting is deprecated and will be removed in Django 7.0. Its
+    replacement is ``"use_ssl"`` under :setting:`OPTIONS <MAILERS-OPTIONS>` in
+    a :setting:`MAILERS` definition that uses the SMTP email backend. See
+    :ref:`migrating-to-mailers`.
 
 .. setting:: EMAIL_SSL_CERTFILE
 
@@ -1527,10 +1583,17 @@ or by using OpenSSL's ``SSL_CERT_FILE`` or ``SSL_CERT_DIR`` environment
 variables to specify a custom certificate bundle (if modifying the system
 bundle is not possible or desired).
 
-For more complex scenarios, the SMTP
-:class:`~django.core.mail.backends.smtp.EmailBackend` can be subclassed to add
-root certificates to its ``ssl_context`` using
+For more complex scenarios, the :ref:`SMTP EmailBackend
+<topic-email-smtp-backend>` can be subclassed to add root certificates to its
+``ssl_context`` using
 :meth:`python:ssl.SSLContext.load_verify_locations`.
+
+.. deprecated:: 6.1
+
+    This setting is deprecated and will be removed in Django 7.0. Its
+    replacement is ``"ssl_certfile"`` under :setting:`OPTIONS
+    <MAILERS-OPTIONS>` in a :setting:`MAILERS` definition that uses the SMTP
+    email backend. See :ref:`migrating-to-mailers`.
 
 .. setting:: EMAIL_SSL_KEYFILE
 
@@ -1549,6 +1612,13 @@ They're passed to the underlying SSL connection. Please refer to the
 documentation of Python's :meth:`python:ssl.SSLContext.wrap_socket` function
 for details on how the certificate chain file and private key file are handled.
 
+.. deprecated:: 6.1
+
+    This setting is deprecated and will be removed in Django 7.0. Its
+    replacement is ``"ssl_keyfile"`` under :setting:`OPTIONS <MAILERS-OPTIONS>`
+    in a :setting:`MAILERS` definition that uses the SMTP email backend. See
+    :ref:`migrating-to-mailers`.
+
 .. setting:: EMAIL_TIMEOUT
 
 ``EMAIL_TIMEOUT``
@@ -1558,6 +1628,13 @@ Default: ``None``
 
 Specifies a timeout in seconds for blocking operations like the connection
 attempt.
+
+.. deprecated:: 6.1
+
+    This setting is deprecated and will be removed in Django 7.0. Its
+    replacement is ``"timeout"`` under :setting:`OPTIONS <MAILERS-OPTIONS>` in
+    a :setting:`MAILERS` definition that uses the SMTP email backend. See
+    :ref:`migrating-to-mailers`.
 
 .. setting:: FILE_UPLOAD_HANDLERS
 
@@ -1574,7 +1651,7 @@ Default::
 A list of handlers to use for uploading. Changing this setting allows complete
 customization -- even replacement -- of Django's upload process.
 
-See :doc:`/topics/files` for details.
+See :ref:`file-upload-handlers` for details.
 
 .. setting:: FILE_UPLOAD_MAX_MEMORY_SIZE
 
@@ -1584,7 +1661,7 @@ See :doc:`/topics/files` for details.
 Default: ``2621440`` (i.e. 2.5 MB).
 
 The maximum size (in bytes) that an upload will be before it gets streamed to
-the file system. See :doc:`/topics/files` for details.
+the file system. See :ref:`file-upload-handlers` for details.
 
 See also :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE`.
 
@@ -1655,7 +1732,7 @@ If ``None``, Django will use the standard temporary directory for the operating
 system. For example, this will default to ``/tmp`` on \*nix-style operating
 systems.
 
-See :doc:`/topics/files` for details.
+See :ref:`file-upload-handlers` for details.
 
 .. setting:: FIRST_DAY_OF_WEEK
 
@@ -1708,13 +1785,17 @@ generate correct URLs when ``FORCE_SCRIPT_NAME`` is provided.
 
 Default: ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``
 
-The class that renders forms and form widgets. It must implement
+The default class that renders forms and form widgets. It must implement
 :ref:`the low-level render API <low-level-widget-render-api>`. Included form
 renderers are:
 
 * ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``
 * ``'``:class:`django.forms.renderers.Jinja2`\ ``'``
 * ``'``:class:`django.forms.renderers.TemplatesSetting`\ ``'``
+
+Note that changing this setting affects all forms using the default renderer,
+including those in :doc:`the admin site </ref/contrib/admin/index>` or
+third-party packages.
 
 .. setting:: FORMAT_MODULE_PATH
 
@@ -2082,6 +2163,82 @@ Django project. Points at an instance of Python's :ref:`dictConfig
 If you set :setting:`LOGGING_CONFIG` to ``None``, the logging
 configuration process will be skipped.
 
+.. setting:: MAILERS
+
+``MAILERS``
+-----------
+
+.. versionadded:: 6.1
+
+.. RemovedInDjango70Warning: Update the default value to be ``{}``.
+
+Default: Not defined
+
+A dictionary containing the settings for all email backends to be used with
+Django. It is a nested dictionary that maps backend aliases to dictionaries
+containing each mailer's backend import path and configuration options.
+
+Example::
+
+    MAILERS = {
+        "default": {
+            "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+            "OPTIONS": {
+                "host": "smtp.example.net",
+            },
+        },
+        "newsletters": {
+            "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+            "OPTIONS": {
+                "host": "smtp.bulk-email-service.example.com",
+                "username": os.environ["BULK_EMAIL_SERVICE_ACCOUNT_ID"],
+                "password": os.environ["BULK_EMAIL_SERVICE_API_KEY"],
+                "use_tls": True,
+            },
+        },
+    }
+
+If you plan to send email through Django, configuring at least a ``"default"``
+mailer is recommended. Any number of additional mailers may also be specified.
+Depending on which backend is used, other options may be required.
+
+Setting ``MAILERS`` to an empty dictionary (``{}``) disables email sending and
+any attempt to send mail will raise ``MailerDoesNotExist``.
+
+See :ref:`topic-email-configuration` for more information.
+
+.. deprecated:: 6.1
+
+    In Django 7.0, the default value will change from "Not defined" to ``{}``.
+    Until then, if ``MAILERS`` is not defined in the project's settings, Django
+    will create a ``"default"`` mailer using the :setting:`EMAIL_BACKEND`
+    setting. Projects can opt into the Django 7.0 behavior at any time by
+    adding ``MAILERS`` and removing ``EMAIL_BACKEND`` from their settings. See
+    :ref:`migrating-to-mailers-settings`.
+
+.. setting:: MAILERS-BACKEND
+
+``BACKEND``
+~~~~~~~~~~~
+
+Default: ``"django.core.mail.backends.smtp.EmailBackend"``
+
+The Python import path to the email backend class. If ``"BACKEND"`` is omitted,
+Django's :ref:`topic-email-smtp-backend` is used.
+
+See :ref:`topic-email-backends` for a list of Django's built-in backends and
+pointers to community-maintained options.
+
+.. setting:: MAILERS-OPTIONS
+
+``OPTIONS``
+~~~~~~~~~~~
+
+Default: ``{}``
+
+Configuration parameters to pass to the email backend. The available and
+required options vary depending on the backend.
+
 .. setting:: MANAGERS
 
 ``MANAGERS``
@@ -2092,10 +2249,6 @@ Default: ``[]`` (Empty list)
 A list in the same format as :setting:`ADMINS` that specifies who should get
 broken link notifications when
 :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` is enabled.
-
-.. versionchanged:: 6.0
-
-    In older versions, required a list of (name, address) tuples.
 
 .. setting:: MEDIA_ROOT
 
@@ -2383,8 +2536,6 @@ have it to the value provided.
 ``SECURE_CSP``
 --------------
 
-.. versionadded:: 6.0
-
 Default: ``{}``
 
 This setting defines the directives used by the
@@ -2433,8 +2584,6 @@ This example illustrates the expected structure, using the constants defined in
 
 ``SECURE_CSP_REPORT_ONLY``
 --------------------------
-
-.. versionadded:: 6.0
 
 Default: ``{}``
 
@@ -2660,6 +2809,9 @@ The email address that error messages come from, such as those sent to
 ``From:`` header and can take any format valid in the chosen email sending
 protocol.
 
+To build an address with a display name from variable content, see
+:ref:`formatting-addresses`.
+
 .. admonition:: Why are my emails sent from a different address?
 
     This address is used only for error messages. It is *not* the address that
@@ -2693,6 +2845,29 @@ precedence and will be applied instead. See
 :tfilter:`allowed date format strings <date>`.
 
 See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATE_FORMAT`.
+
+.. setting:: SIGNED_COOKIE_LEGACY_SALT_FALLBACK
+
+``SIGNED_COOKIE_LEGACY_SALT_FALLBACK``
+---------------------------------------
+
+Default: ``False``
+
+Controls whether :meth:`~django.http.HttpRequest.get_signed_cookie` accepts
+cookies signed with Django's historical signed-cookie salt derivation based on
+``key + salt``.
+
+Set this to ``True`` to accept those legacy signed cookies in addition to
+cookies signed with Django's current unambiguous signed-cookie salt derivation.
+
+.. versionchanged:: 6.1
+
+    In older versions, the default was ``True``.
+
+.. deprecated:: 6.1
+
+    This transitional setting will be removed in Django 7.0, when legacy signed
+    cookies will no longer be accepted.
 
 .. setting:: SIGNING_BACKEND
 
@@ -2777,8 +2952,6 @@ backend definition in :setting:`STORAGES`.
 
 ``TASKS``
 ---------
-
-.. versionadded:: 6.0
 
 Default::
 
@@ -3056,12 +3229,18 @@ the correct environment.
 ------------------------------------
 
 .. versionadded:: 6.1
-.. deprecated:: 6.1
 
 Default: ``False``
 
-Set this transitional setting to ``True`` to revert back to the old default
-blank choice label in forms.
+The default blank choice label in ``Select`` widgets was changed from
+``"---------"`` to ``django.db.models.fields.BLANK_CHOICE_LABEL``. Set this
+transitional setting to ``True`` to revert to the previous label.
+
+.. deprecated:: 6.1
+
+    This setting will be removed in Django 7.0. To use a custom default blank
+    choice label, override ``django.db.models.fields.BLANK_CHOICE_LABEL`` in
+    the app's ``ready()`` method.
 
 .. setting:: USE_I18N
 
@@ -3147,7 +3326,6 @@ enabled if a proxy which sets this header is in use.
 ``URLIZE_ASSUME_HTTPS``
 -----------------------
 
-.. versionadded:: 6.0
 .. deprecated:: 6.0
 
 Default: ``False``
@@ -3844,6 +4022,7 @@ Email
 * :setting:`EMAIL_USE_LOCALTIME`
 * :setting:`EMAIL_USE_SSL`
 * :setting:`EMAIL_USE_TLS`
+* :setting:`MAILERS`
 * :setting:`MANAGERS`
 * :setting:`SERVER_EMAIL`
 
@@ -3861,6 +4040,7 @@ File uploads
 ------------
 * :setting:`FILE_UPLOAD_HANDLERS`
 * :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`
+* :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS`
 * :setting:`FILE_UPLOAD_PERMISSIONS`
 * :setting:`FILE_UPLOAD_TEMP_DIR`
 * :setting:`MEDIA_ROOT`
@@ -3941,6 +4121,7 @@ HTTP
   * :setting:`SECURE_REFERRER_POLICY`
   * :setting:`SECURE_SSL_HOST`
   * :setting:`SECURE_SSL_REDIRECT`
+* :setting:`SIGNED_COOKIE_LEGACY_SALT_FALLBACK`
 * :setting:`SIGNING_BACKEND`
 * :setting:`USE_X_FORWARDED_HOST`
 * :setting:`USE_X_FORWARDED_PORT`

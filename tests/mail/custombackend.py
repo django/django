@@ -1,5 +1,3 @@
-"""A custom backend for testing."""
-
 from django.core.mail.backends.base import BaseEmailBackend
 
 
@@ -36,8 +34,11 @@ class OptionsCapturingBackend(BaseEmailBackend):
         cls.sent_messages = []
 
     def __init__(self, **kwargs):
-        self.init_kwargs.append(kwargs.copy())
-        super().__init__(**kwargs)
+        self.init_kwargs.append(kwargs)
+        if "alias" in kwargs:
+            super().__init__(alias=kwargs["alias"])
+        else:
+            super().__init__()
 
     def send_messages(self, email_messages):
         self.sent_messages.extend(email_messages)
@@ -59,6 +60,10 @@ class FailingEmailBackend(OptionsCapturingBackend):
 
     init_kwargs = []
     sent_messages = []
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.fail_silently = kwargs.get("fail_silently", False)
 
     def send_messages(self, email_messages):
         if self.fail_silently:

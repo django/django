@@ -252,6 +252,11 @@ class AbstractBaseUserTests(SimpleTestCase):
 
 
 class AbstractUserTestCase(TestCase):
+    @override_settings(
+        MAILERS={
+            "default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}
+        }
+    )
     def test_email_user(self):
         # valid send_mail parameters
         kwargs = {
@@ -459,7 +464,7 @@ class UserWithPermTestCase(TestCase):
             )
 
     def test_invalid_backend_submodule(self):
-        with self.assertRaises(ImportError):
+        with self.assertRaises(TypeError):
             User.objects.with_perm(
                 "auth.test",
                 backend="json.tool",

@@ -270,8 +270,9 @@ class CreateDefaultSiteTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        # Delete the site created as part of the default migration process.
-        Site.objects.all().delete()
+        # Delete the sites created in post_migrate signals on test db creation.
+        for using in cls.databases:
+            Site.objects.all().using(using).delete()
 
     def setUp(self):
         self.app_config = apps.get_app_config("sites")

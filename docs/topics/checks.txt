@@ -197,10 +197,6 @@ method::
             # ... your own checks ...
             return errors
 
-.. versionchanged:: 6.0
-
-    In older versions, constraints didn't implement a ``check()`` method.
-
 Writing tests
 -------------
 

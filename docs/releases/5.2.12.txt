@@ -28,7 +28,7 @@ validation, but if you rely on custom validators, ensure they do not depend on
 the previous behavior of ``URLField.to_python()``.
 
 This issue has severity "moderate" according to the :ref:`Django security
-policy <security-disclosure>`.
+policy <severity-levels>`.
 
 CVE-2026-25674: Potential incorrect permissions on newly created file system objects
 ====================================================================================
@@ -43,7 +43,7 @@ Django now applies the requested permissions via :func:`~os.chmod` after
 :func:`~os.mkdir`, removing the dependency on the process-wide umask.
 
 This issue has severity "low" according to the :ref:`Django security policy
-<security-disclosure>`.
+<severity-levels>`.
 
 Bugfixes
 ========

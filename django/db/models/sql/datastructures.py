@@ -69,7 +69,7 @@ class Join:
         )
         # Along which field (or ForeignObjectRel in the reverse join case)
         self.join_field = join_field
-        # Is this join nullabled?
+        # Is this join nullable?
         self.nullable = nullable
         self.filtered_relation = filtered_relation
 

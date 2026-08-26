@@ -1136,13 +1136,6 @@ is defined. Instead of specifying the field name, use the :attr:`related_name
 <django.db.models.ForeignKey.related_name>` for the field on the related
 object.
 
-There may be some situations where you wish to call ``select_related()`` with a
-lot of related objects, or where you don't know all of the relations. In these
-cases it is possible to call ``select_related()`` with no arguments. This will
-follow all non-null foreign keys it can find - nullable foreign keys must be
-specified. This is not recommended in most cases as it is likely to make the
-underlying query more complex, and return more data, than is actually needed.
-
 If you need to clear the list of related fields added by past calls of
 ``select_related`` on a ``QuerySet``, you can pass ``None`` as a parameter:
 
@@ -1153,6 +1146,18 @@ If you need to clear the list of related fields added by past calls of
 Chaining ``select_related`` calls works in a similar way to other methods -
 that is that ``select_related('foo', 'bar')`` is equivalent to
 ``select_related('foo').select_related('bar')``.
+
+There may be some situations where you wish to call ``select_related()`` with a
+lot of related objects, or where you don't know all of the relations. In these
+cases it is possible to call ``select_related()`` with no arguments. This will
+follow all non-null foreign keys it can find - nullable foreign keys must be
+specified. This is not recommended in most cases as it is likely to make the
+underlying query more complex, and return more data, than is actually needed.
+
+.. deprecated:: 6.1
+
+    Calling ``select_related()`` with no arguments is deprecated, and support
+    for it will be removed in Django 7.0. Specify the fields to fetch instead.
 
 ``prefetch_related()``
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -2537,7 +2542,7 @@ them, but it has a few caveats:
     batch_size = 100
     ids_iter = iter(range(1000))
     while ids := list(islice(ids_iter, batch_size)):
-        batch = Entry.objects.filter(ids__in=ids)
+        batch = Entry.objects.filter(id__in=ids)
         for entry in batch:
             entry.headline = f"Updated headline {entry.pk}"
         Entry.objects.bulk_update(batch, ["headline"], batch_size=batch_size)
@@ -3154,7 +3159,7 @@ The output differs significantly between databases.
 ``explain()`` is supported by all built-in database backends except Oracle
 because an implementation there isn't straightforward.
 
-The ``format`` parameter changes the output format from the databases's
+The ``format`` parameter changes the output format from the database's
 default, which is usually text-based. PostgreSQL supports ``'TEXT'``,
 ``'JSON'``, ``'YAML'``, and ``'XML'`` formats. MariaDB and MySQL support
 ``'TEXT'`` (also called ``'TRADITIONAL'``) and ``'JSON'`` formats. MySQL
@@ -4014,8 +4019,6 @@ by the aggregate.
 ``AnyValue``
 ~~~~~~~~~~~~
 
-.. versionadded:: 6.0
-
 .. class:: AnyValue(expression, output_field=None, filter=None, default=None, **extra)
 
     Returns an arbitrary value from the non-null input values.
@@ -4219,8 +4222,6 @@ by the aggregate.
 
 ``StringAgg``
 ~~~~~~~~~~~~~
-
-.. versionadded:: 6.0
 
 .. class:: StringAgg(expression, delimiter, output_field=None, distinct=False, filter=None, order_by=None, default=None, **extra)
 

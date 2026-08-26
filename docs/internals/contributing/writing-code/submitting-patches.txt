@@ -15,7 +15,7 @@ If you are fixing a really trivial issue, for example changing a word in the
 documentation, the preferred way to provide the patch is using GitHub pull
 requests without a Trac ticket.
 
-See the :doc:`/internals/contributing/writing-code/working-with-git` for more
+See :doc:`/internals/contributing/writing-code/working-with-git` for more
 details on how to use pull requests.
 
 .. _claiming-tickets:
@@ -34,7 +34,7 @@ If you have identified a contribution you want to make and you're capable of
 fixing it (as measured by your coding ability, knowledge of Django internals
 and time availability), claim it by following these steps:
 
-* `Login using your GitHub account`_ or `create an account`_ in our ticket
+* `Log in using your GitHub account`_ or `create an account`_ in our ticket
   system. If you have an account but have forgotten your password, you can
   reset it using the `password reset page`_.
 
@@ -59,7 +59,7 @@ and time availability), claim it by following these steps:
 * Claim the ticket by clicking the "assign to" radio button in the "Action"
   section. Your username will be filled in the text box by default.
 
-* Finally click the "Submit changes" button at the bottom to save.
+* Finally, click the "Submit changes" button at the bottom to save.
 
 .. note::
     If your change is not :ref:`trivial <trivial-change>`, you have the option
@@ -67,7 +67,7 @@ and time availability), claim it by following these steps:
     of your contribution. This ensures that the Django Software Foundation has
     clear license to your contribution.
 
-.. _Login using your GitHub account: https://code.djangoproject.com/github/login
+.. _Log in using your GitHub account: https://code.djangoproject.com/github/login
 .. _Create an account: https://www.djangoproject.com/accounts/register/
 .. _password reset page: https://www.djangoproject.com/accounts/password/reset/
 .. _Contributor License Agreement: https://www.djangoproject.com/foundation/cla/
@@ -99,8 +99,8 @@ In the case of small changes, such as typos in the documentation or small bugs
 that will only take a few minutes to fix, you don't need to jump through the
 hoops of claiming tickets. Submit your changes directly and you're done!
 
-It is *always* acceptable, regardless whether someone has claimed it or not, to
-link proposals to a ticket if you happen to have the changes ready.
+It is *always* acceptable, regardless of whether someone has claimed it or not,
+to link proposals to a ticket if you happen to have the changes ready.
 
 .. _patch-style:
 
@@ -114,10 +114,7 @@ requirements:
   of a solution, but it is not the only part. A good fix should also include a
   :doc:`regression test </internals/contributing/writing-code/unit-tests>` to
   validate the behavior that has been fixed and to prevent the problem from
-  arising again. Also, if some tickets are relevant to the code that you've
-  written, mention the ticket numbers in some comments in the test so that one
-  can easily trace back the relevant discussions after your patch gets
-  committed, and the tickets get closed.
+  arising again.
 
 * If the code adds a new feature, or modifies the behavior of an existing
   feature, the change should also contain documentation.
@@ -271,7 +268,7 @@ mechanism for proposing and collecting community input on major new features.
 Before considering writing a DEP, it is recommended to first open a discussion
 following the :ref:`process for suggesting new features <requesting-features>`.
 This allows the community to provide feedback and helps refine the proposal.
-Once the DEP is ready the :ref:`Steering Council <steering-council>` votes on
+Once the DEP is ready, the :ref:`Steering Council <steering-council>` votes on
 whether to accept it.
 
 Some examples of DEPs that have been approved and fully implemented:
@@ -352,7 +349,8 @@ previous behavior, or standalone items that are unnecessary or unused when the
 deprecation ends. For example::
 
     import warnings
-    from django.utils.deprecation import RemovedInDjangoXXWarning, django_file_prefixes
+    from django.utils.deprecation import RemovedInDjangoXXWarning
+    from django.utils.warnings import django_file_prefixes
 
 
     # RemovedInDjangoXXWarning.
@@ -450,7 +448,7 @@ set the "Triage Stage" on the corresponding Trac ticket to "Ready for checkin".
 If you've left comments for improvement on the pull request, please tick the
 appropriate flags on the Trac ticket based on the results of your review:
 "Patch needs improvement", "Needs documentation", and/or "Needs tests". As time
-and interest permits, mergers do final reviews of "Ready for checkin" tickets
+and interest permit, mergers do final reviews of "Ready for checkin" tickets
 and will either commit the changes or bump it back to "Accepted" if further
 work needs to be done.
 
@@ -463,6 +461,34 @@ of the `Django Development Dashboard <https://dashboard.djangoproject.com/>`_.
 
 Looking to get your pull request reviewed? Ensure the Trac flags on the ticket
 are set so that the ticket appears in that queue.
+
+All tickets
+-----------
+
+* Is the pull request a single squashed commit with a message that follows our
+  :ref:`commit message format <committing-guidelines>`?
+* Are you the patch author and a new contributor? Please add yourself to the
+  :source:`AUTHORS` file. At your option, submit a
+  `Contributor License Agreement`_.
+* Does this have an accepted ticket on Trac? All contributions require a ticket
+  unless the :ref:`change is considered trivial <trivial-change>`.
+
+All code changes
+----------------
+
+* Does the :doc:`coding style
+  </internals/contributing/writing-code/coding-style>` conform to our
+  guidelines? Are there any  ``black``, ``blacken-docs``, ``flake8``,
+  ``isort``, or ``zizmor`` errors? You can install the :ref:`pre-commit
+  <coding-style-pre-commit>` hooks to automatically catch these errors.
+* If the change is backwards incompatible in any way, is there a note
+  in the release notes (``docs/releases/A.B.txt``)?
+* Is Django's test suite passing?
+* If there is a :ref:`code coverage report <code-coverage-on-pull-requests>`
+  comment on the pull request, have you reviewed the missing coverage in
+  context (considering database/platform-specific limitations)?
+* If the change affects the Django admin or rendered HTML output, has
+  :ref:`accessibility testing <accessibility-testing-baseline>` been done?
 
 Documentation
 -------------
@@ -496,33 +522,5 @@ Deprecating a feature
 ---------------------
 
 See the :ref:`deprecating-a-feature` guide.
-
-All code changes
-----------------
-
-* Does the :doc:`coding style
-  </internals/contributing/writing-code/coding-style>` conform to our
-  guidelines? Are there any  ``black``, ``blacken-docs``, ``flake8``,
-  ``isort``, or ``zizmor`` errors? You can install the :ref:`pre-commit
-  <coding-style-pre-commit>` hooks to automatically catch these errors.
-* If the change is backwards incompatible in any way, is there a note
-  in the release notes (``docs/releases/A.B.txt``)?
-* Is Django's test suite passing?
-* If there is a :ref:`code coverage report <code-coverage-on-pull-requests>`
-  comment on the pull request, have you reviewed the missing coverage in
-  context (considering database/platform-specific limitations)?
-* If the change affects the Django admin or rendered HTML output, has
-  :ref:`accessibility testing <accessibility-testing-baseline>` been done?
-
-All tickets
------------
-
-* Is the pull request a single squashed commit with a message that follows our
-  :ref:`commit message format <committing-guidelines>`?
-* Are you the patch author and a new contributor? Please add yourself to the
-  :source:`AUTHORS` file. At your option, submit a
-  `Contributor License Agreement`_.
-* Does this have an accepted ticket on Trac? All contributions require a ticket
-  unless the :ref:`change is considered trivial <trivial-change>`.
 
 .. _Contributor License Agreement: https://www.djangoproject.com/foundation/cla/

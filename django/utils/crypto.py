@@ -8,8 +8,9 @@ import secrets
 import warnings
 
 from django.conf import settings
-from django.utils.deprecation import RemovedInDjango70Warning, django_file_prefixes
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.encoding import force_bytes
+from django.utils.warnings import django_file_prefixes
 
 
 class InvalidAlgorithm(ValueError):

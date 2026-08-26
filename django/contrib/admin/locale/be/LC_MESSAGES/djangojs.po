@@ -2,14 +2,15 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016,2020-2021,2023,2025
+# znotdead <zhirafchik@gmail.com>, 2016,2020-2021,2023,2025-2026
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-25 15:04-0500\n"
-"PO-Revision-Date: 2025-09-17 07:59+0000\n"
-"Last-Translator: znotdead <zhirafchik@gmail.com>, 2016,2020-2021,2023,2025\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-05 07:59+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>, "
+"2016,2020-2021,2023,2025-2026\n"
 "Language-Team: Belarusian (http://app.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -102,7 +103,7 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
 "Абралі дзеяньне, а ў палях нічога не зьмянялі. Мажліва, вы хацелі націснуць "
@@ -123,21 +124,46 @@ msgstr "Поўдзень"
 msgid "6 p.m."
 msgstr "6 папаўдні"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Заўвага: Ваш час спяшаецца на %s г адносна часу на серверы."
-msgstr[1] "Заўвага: Ваш час спяшаецца на %s г адносна часу на серверы."
-msgstr[2] "Заўвага: Ваш час спяшаецца на %s г адносна часу на серверы."
-msgstr[3] "Заўвага: Ваш час спяшаецца на %s г адносна часу на серверы."
+msgid "server"
+msgstr "сервер"
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Заўвага: Ваш час адстае на %s г ад часу на серверы."
-msgstr[1] "Заўвага: Ваш час адстае на %s г ад часу на серверы."
-msgstr[2] "Заўвага: Ваш час адстае на %s г ад часу на серверы."
-msgstr[3] "Заўвага: Ваш час адстае на %s г ад часу на серверы."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
+msgstr[0] ""
+"Заўвага: Увядьзіце час у %(timezone)s часавым поясе. (Вы на %(offset)s "
+"гадзіну наперадзе.)"
+msgstr[1] ""
+"Заўвага: Увядьзіце час у %(timezone)s часавым поясе. (Вы на %(offset)s "
+"гадзіны наперадзе.)"
+msgstr[2] ""
+"Заўвага: Увядьзіце час у %(timezone)s часавым поясе. (Вы на %(offset)s "
+"гадзін наперадзе.)"
+msgstr[3] ""
+"Заўвага: Увядьзіце час у %(timezone)s часавым поясе. (Вы на %(offset)s "
+"гадзін наперадзе.)"
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+"Заўвага: Увядьзіце час у %(timezone)s часавым поясе. (Вы адстаеце на %"
+"(offset)s гадзіну.)"
+msgstr[1] ""
+"Заўвага: Увядьзіце час у %(timezone)s часавым поясе. (Вы адстаеце на %"
+"(offset)s гадзіны.)"
+msgstr[2] ""
+"Заўвага: Увядьзіце час у %(timezone)s часавым поясе. (Вы адстаеце на %"
+"(offset)s гадзін.)"
+msgstr[3] ""
+"Заўвага: Увядьзіце час у %(timezone)s часавым поясе. (Вы адстаеце на %"
+"(offset)s гадзін.)"
 
 msgid "Choose a Time"
 msgstr "Абярыце час"
@@ -151,14 +177,29 @@ msgstr "Скасаваць"
 msgid "Today"
 msgstr "Сёньня"
 
+msgid "Today (%(date)s)"
+msgstr "Сёньня (%(date)s)"
+
 msgid "Choose a Date"
 msgstr "Абярыце дату"
 
 msgid "Yesterday"
 msgstr "Учора"
 
+msgid "Yesterday (%(date)s)"
+msgstr "Учора (%(date)s)"
+
 msgid "Tomorrow"
 msgstr "Заўтра"
+
+msgid "Tomorrow (%(date)s)"
+msgstr "Заўтра (%(date)s)"
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr "Папярэдні (%(month)s %(year)s)"
+
+msgid "Next (%(month)s %(year)s)"
+msgstr "Далей (%(month)s %(year)s)"
 
 msgid "January"
 msgstr "Студзень"
@@ -320,3 +361,18 @@ msgstr "П"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "С"
+
+msgid "%(month)s %(day)s, %(year)s"
+msgstr "%(month)s%(day)s, %(year)s"
+
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr "%s (сёньня, бягучы выбар)"
+
+#, javascript-format
+msgid "%s (today)"
+msgstr "%s (сёньня)"
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr "%s (бягучы выбар)"

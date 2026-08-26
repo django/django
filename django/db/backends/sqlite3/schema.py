@@ -266,7 +266,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Delete the old table to make way for the new
         self.delete_model(model, handle_autom2m=False)
 
-        # Rename the new table to take way for the old
+        # Rename the new table to make way for the old
         self.alter_db_table(
             new_model,
             new_model._meta.db_table,

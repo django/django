@@ -1,6 +1,7 @@
 import threading
+from inspect import iscoroutinefunction
 
-from asgiref.sync import async_to_sync, iscoroutinefunction
+from asgiref.sync import async_to_sync
 
 from django.contrib.admindocs.middleware import XViewMiddleware
 from django.contrib.auth.middleware import (
@@ -15,6 +16,7 @@ from django.contrib.sites.middleware import CurrentSiteMiddleware
 from django.db import connection
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
+from django.middleware import MiddlewareMixin
 from django.middleware.cache import (
     CacheMiddleware,
     FetchFromCacheMiddleware,
@@ -28,7 +30,7 @@ from django.middleware.http import ConditionalGetMiddleware
 from django.middleware.locale import LocaleMiddleware
 from django.middleware.security import SecurityMiddleware
 from django.test import SimpleTestCase
-from django.utils.deprecation import MiddlewareMixin
+from django.utils.deprecation import RemovedInDjango71Warning
 
 
 class MiddlewareMixinTests(SimpleTestCase):
@@ -53,6 +55,18 @@ class MiddlewareMixinTests(SimpleTestCase):
         XFrameOptionsMiddleware,
         XViewMiddleware,
     ]
+
+    def test_deprecation_import_compatibility(self):
+        msg = (
+            "Importing MiddlewareMixin from django.utils.deprecation is deprecated. "
+            "Import from django.middleware.MiddlewareMixin instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango71Warning, msg):
+            from django.utils.deprecation import (
+                MiddlewareMixin as DeprecatedMiddlewareMixin,
+            )
+
+        self.assertIs(DeprecatedMiddlewareMixin, MiddlewareMixin)
 
     def test_repr(self):
         class GetResponse:

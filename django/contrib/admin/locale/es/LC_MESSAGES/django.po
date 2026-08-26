@@ -20,25 +20,27 @@
 # Marc Garcia <garcia.marc@gmail.com>, 2011
 # Miguel Angel Tribaldos <mtribaldos@gmail.com>, 2017
 # Miguel Gonzalez <migonzalvar@gmail.com>, 2023
+# Nahuel Villegas, 2026
 # Natalia, 2024
 # Pablo, 2015
 # Salomon Herrera, 2023
-# Uriel Medina <urimeba511@gmail.com>, 2020-2025
+# Uriel Medina <urimeba511@gmail.com>, 2020-2026
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 07:05+0000\n"
-"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020-2025\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 07:05+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020-2026\n"
 "Language-Team: Spanish (http://app.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
 
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
@@ -201,8 +203,13 @@ msgstr ""
 "Mantenga presionado \"Control\" o \"Comando\" en una Mac, para seleccionar "
 "más de uno."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Seleccione este objeto para una acción - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -267,15 +274,15 @@ msgstr "Modificar %s"
 msgid "View %s"
 msgstr "Vista %s"
 
-msgid "Database error"
-msgstr "Error en la base de datos"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s fué modificado con éxito."
 msgstr[1] "%(count)s %(name)s fueron modificados con éxito."
 msgstr[2] "%(count)s %(name)s fueron modificados con éxito."
+
+msgid "Database error"
+msgstr "Error en la base de datos"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -301,6 +308,18 @@ msgstr "Histórico de modificaciones: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #, python-format
 msgid ""
@@ -351,14 +370,8 @@ msgstr ""
 "Hubo un error. Se ha informado a los administradores del sitio por correo "
 "electrónico y debería solucionarse en breve. Gracias por su paciencia."
 
-msgid "Run the selected action"
-msgstr "Ejecutar la acción seleccionada"
-
-msgid "Go"
-msgstr "Ir"
-
-msgid "Click here to select the objects across all pages"
-msgstr "Pulse aquí para seleccionar los objetos a través de todas las páginas"
+msgid "Run"
+msgstr ""
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -369,10 +382,6 @@ msgstr "Limpiar selección"
 
 msgid "Breadcrumbs"
 msgstr "Guía-rastro"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modelos en la aplicación %(name)s"
 
 msgid "Model name"
 msgstr "Nombre del modelo"
@@ -467,6 +476,9 @@ msgstr "Mostrar recuentos"
 msgid "Clear all filters"
 msgstr "Borrar todos los filtros"
 
+msgid "Save"
+msgstr "Guardar"
+
 msgid "Remove from sorting"
 msgstr "Eliminar del ordenación"
 
@@ -487,30 +499,30 @@ msgid "Toggle theme (current theme: dark)"
 msgstr "Cambiar tema (tema actual: oscuro)"
 
 #, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
+
+#, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Eliminar el %(object_name)s '%(escaped_object)s' provocaría la eliminación "
-"de objetos relacionados, pero su cuenta no tiene permiso para borrar los "
-"siguientes tipos de objetos:"
+"Eliminar el objeto %(object_name)s \"%(escaped_object)s\" resultaria en la "
+"eliminacion de objetos relacionados con este, pero su cuenta no posee "
+"permisos para eliminar los siguientes tipos de objetos:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"La eliminación de %(object_name)s %(escaped_object)s requeriría eliminar los "
-"siguientes objetos relacionados protegidos:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"¿Está seguro de que quiere borrar los %(object_name)s "
-"\"%(escaped_object)s\"? Se borrarán los siguientes objetos relacionados:"
 
 msgid "Objects"
 msgstr "Objetos"
@@ -619,6 +631,10 @@ msgstr "Usuario"
 msgid "Action"
 msgstr "Acción"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "entrada"
@@ -632,14 +648,19 @@ msgstr ""
 "Este objeto no tiene un historial de cambios. Probablemente no se agregó a "
 "través de este sitio de administración."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "Mostrar todo"
 
-msgid "Save"
-msgstr "Guardar"
-
 msgid "Popup closing…"
 msgstr "Cerrando ventana emergente..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "Buscar"
@@ -685,6 +706,9 @@ msgstr "Eliminar %(model)s seleccionada/o"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Ver seleccionado %(model)s"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Gracias por pasar un buen rato con el sitio web hoy."

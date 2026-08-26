@@ -330,8 +330,7 @@ The sitemap framework provides a convenience class for a common case:
     of the sitemap. It may also have a ``date_field`` entry that
     specifies a date field for objects retrieved from the ``queryset``.
     This will be used for the :attr:`~Sitemap.lastmod` attribute and
-    :meth:`~Sitemap.get_latest_lastmod` methods in the in the
-    generated sitemap.
+    :meth:`~Sitemap.get_latest_lastmod` methods in the generated sitemap.
 
     The :attr:`~Sitemap.priority`, :attr:`~Sitemap.changefreq`,
     and :attr:`~Sitemap.protocol` keyword arguments allow specifying these

@@ -5,15 +5,15 @@
 # Emin Mastizada <emin@linux.com>, 2015-2016
 # Metin Amiroff <amiroff@gmail.com>, 2011
 # Nicat Məmmədov <n1c4t97@gmail.com>, 2022
-# Nijat Mammadov, 2024-2025
+# Nijat Mammadov, 2024-2026
 # Sevdimali <sevdimaliisayev@mail.ru>, 2024
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 06:49+0000\n"
-"Last-Translator: Nijat Mammadov, 2024-2025\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2026-03-09 06:49+0000\n"
+"Last-Translator: Nijat Mammadov, 2024-2026\n"
 "Language-Team: Azerbaijani (http://app.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -144,6 +144,9 @@ msgstr "Xorvat"
 
 msgid "Upper Sorbian"
 msgstr "Yuxarı Sorb"
+
+msgid "Haitian Creole"
+msgstr "Haiti kreol dili"
 
 msgid "Hungarian"
 msgstr "Macar"
@@ -364,15 +367,15 @@ msgstr "Düzgün e-poçt ünvanı daxil edin."
 msgid ""
 "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Hərflərdən, rəqəmlərdən, alt-xətlərdən və ya defislərdən ibarət düzgün "
-"qısaltma (“slug”) daxil edin."
+"Hərflər, rəqəmlər, alt xətt və ya defislərdən ibarət etibarlı bir \"slug\" "
+"daxil edin."
 
 msgid ""
 "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Unicode hərflərdən, rəqəmlərdən, alt-xətlərdən və ya defislərdən ibarət "
-"düzgün qısaltma (“slug”) daxil edin."
+"Yalnız Unikod hərfləri, rəqəmlər, alt xətt və ya defislərdən ibarət etibarlı "
+"bir \"slug\" daxil edin."
 
 #, python-format
 msgid "Enter a valid %(protocol)s address."
@@ -481,7 +484,7 @@ msgstr ""
 "uzantıları: %(allowed_extensions)s."
 
 msgid "Null characters are not allowed."
-msgstr "Null simvollara icazə verilmir."
+msgstr "Boş simvollara icazə verilmir."
 
 msgid "and"
 msgstr "və"
@@ -530,7 +533,7 @@ msgid "“%(value)s” value must be either True, False, or None."
 msgstr "“%(value)s” dəyəri True, False və ya None olmalıdır."
 
 msgid "Boolean (Either True or False)"
-msgstr "Bul (ya Doğru, ya Yalan)"
+msgstr "Məntiq operatoru (ya Doğru, ya Yalan)"
 
 #, python-format
 msgid "String (up to %(max_length)s)"
@@ -561,8 +564,8 @@ msgstr "Tarix (saatsız)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "“%(value)s” dəyərinin formatı səhvdir. Formatı YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ] olmalıdır."
@@ -587,8 +590,8 @@ msgstr "Rasional ədəd"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "“%(value)s” dəyərinin formatı səhvdir. Formatı [DD] [HH:[MM:]]ss[.uuuuuu] "
 "olmalıdır."
@@ -633,7 +636,7 @@ msgid "“%(value)s” value must be either None, True or False."
 msgstr "“%(value)s” dəyəri None, True və ya False olmalıdır."
 
 msgid "Boolean (Either True, False or None)"
-msgstr "Bul (Ya True, ya False, ya da None)"
+msgstr "Məntiq operatoru (Ya True, ya False, ya da None)"
 
 msgid "Positive big integer"
 msgstr "Müsbət böyük rəqəm"
@@ -642,7 +645,7 @@ msgid "Positive integer"
 msgstr "Müsbət tam ədəd"
 
 msgid "Positive small integer"
-msgstr "Müsbət tam kiçik ədəd"
+msgstr "Müsbət kiçik tam ədəd"
 
 #, python-format
 msgid "Slug (up to %(max_length)s)"
@@ -673,11 +676,11 @@ msgid "URL"
 msgstr "URL"
 
 msgid "Raw binary data"
-msgstr "Düz ikili (binary) məlumat"
+msgstr "Xam ikili məlumat"
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
-msgstr "“%(value)s” keçərli UUID deyil."
+msgstr "“%(value)s” düzgün bir UUID deyil."
 
 msgid "Universally unique identifier"
 msgstr "Universal təkrarolunmaz identifikator"
@@ -716,8 +719,8 @@ msgid "Many-to-many relationship"
 msgstr "Çoxun-çoxa münasibət"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -737,14 +740,14 @@ msgid "Enter a valid date/time."
 msgstr "Düzgün tarix/vaxt daxil edin."
 
 msgid "Enter a valid duration."
-msgstr "Keçərli müddət daxil edin."
+msgstr "Düzgün bir müddət daxil edin."
 
 #, python-brace-format
 msgid "The number of days must be between {min_days} and {max_days}."
 msgstr "Günlərin sayı {min_days} ilə {max_days} arasında olmalıdır."
 
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr "Fayl göndərilməyib. Vərəqənin (\"form\") şifrələmə tipini yoxlayın."
+msgstr " Heç bir fayl göndərilməyib. Formadakı kodlaşdırma növünü yoxlayın."
 
 msgid "No file was submitted."
 msgstr "Fayl göndərilməyib."
@@ -757,9 +760,11 @@ msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
-"Bu fayl adının ən çox %(max)d simvol olduğuna əmin olun (%(length)d var)."
+"Bu fayl adının %(max)d simvoldan çox olmadığına əmin olun (%(length)d simvol "
+"mövcuddur)."
 msgstr[1] ""
-"Bu fayl adının ən çox %(max)d simvol olduğuna əmin olun (%(length)d var)."
+"Bu fayl adının %(max)d simvoldan çox olmadığına əmin olun (%(length)d simvol "
+"mövcuddur)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
@@ -783,7 +788,7 @@ msgid "Enter a complete value."
 msgstr "Tam dəyər daxil edin."
 
 msgid "Enter a valid UUID."
-msgstr "Keçərli UUID daxil et."
+msgstr "Düzgün bir UUID daxil et."
 
 msgid "Enter a valid JSON."
 msgstr "Etibarlı bir JSON daxil edin."
@@ -808,14 +813,14 @@ msgstr ""
 #, python-format
 msgid "Please submit at most %(num)d form."
 msgid_plural "Please submit at most %(num)d forms."
-msgstr[0] "Zəhmət olmasa ən çox %(num)d forma təsdiqləyin."
-msgstr[1] "Zəhmət olmasa ən çox %(num)d forma təsdiqləyin."
+msgstr[0] "Zəhmət olmasa, %(num)d dənədən çox forma təsdiqləməyin."
+msgstr[1] "Zəhmət olmasa, %(num)d dənədən çox forma təsdiqləməyin."
 
 #, python-format
 msgid "Please submit at least %(num)d form."
 msgid_plural "Please submit at least %(num)d forms."
-msgstr[0] "Zəhmət olmasa ən az %(num)d forma təsdiqləyin."
-msgstr[1] "Zəhmət olmasa azı %(num)d forma təsdiqləyin."
+msgstr[0] "Zəhmət olmasa, ən az %(num)d forma təsdiqləyin."
+msgstr[1] "Zəhmət olmasa, azı %(num)d forma təsdiqləyin."
 
 msgid "Order"
 msgstr "Sırala"
@@ -879,6 +884,22 @@ msgstr "Hə"
 
 msgid "No"
 msgstr "Yox"
+
+msgctxt "Task"
+msgid "Ready"
+msgstr "Hazırdır"
+
+msgctxt "Task"
+msgid "Running"
+msgstr "İşləyir"
+
+msgctxt "Task"
+msgid "Failed"
+msgstr "Uğursuz"
+
+msgctxt "Task"
+msgid "Successful"
+msgstr "Uğurlu"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1139,7 +1160,7 @@ msgid "December"
 msgstr "Dekabr"
 
 msgid "This is not a valid IPv6 address."
-msgstr "Bu doğru IPv6 ünvanı deyil."
+msgstr "Bu, doğru IPv6 ünvanı deyil."
 
 #, python-format
 msgctxt "String to return when truncating text"
@@ -1268,11 +1289,11 @@ msgstr "%(verbose_name_plural)s seçmək mümkün deyil"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"Gələcək %(verbose_name_plural)s seçmək mümkün deyil, çünki %(class_name)s."
-"allow_future Yalan kimi qeyd olunub."
+"Gələcək %(verbose_name_plural)s seçmək mümkün deyil, çünki "
+"%(class_name)s.allow_future Yalan kimi qeyd olunub."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
@@ -1302,7 +1323,7 @@ msgstr "“%(path)s” mövcud deyil"
 
 #, python-format
 msgid "Index of %(directory)s"
-msgstr "%(directory)s-nin indeksi"
+msgstr "%(directory)s indeksi"
 
 msgid "The install worked successfully! Congratulations!"
 msgstr "Quruluş uğurla tamamlandı! Təbriklər!"
@@ -1344,4 +1365,4 @@ msgid "Django Community"
 msgstr "Django İcması"
 
 msgid "Connect, get help, or contribute"
-msgstr "Qoşul, kömək al və dəstək ol"
+msgstr "Qoşul, yardım əldə et və dəstək ol"

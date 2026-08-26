@@ -1,5 +1,5 @@
 {
-    "$schema": "https://biomejs.dev/schemas/2.4.12/schema.json",
+    "$schema": "https://biomejs.dev/schemas/2.4.15/schema.json",
     "files": {
         "includes": [
             "django/contrib/admin/static/admin/css/**/*.css",

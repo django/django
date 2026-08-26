@@ -211,7 +211,7 @@
                               "You have selected an action, but you haven’t saved your changes to individual fields yet. Please click OK to save. You’ll need to re-run the action.",
                           )
                         : gettext(
-                              "You have selected an action, and you haven’t made any changes on individual fields. You’re probably looking for the Go button rather than the Save button.",
+                              "You have selected an action, and you haven’t made any changes on individual fields. You’re probably looking for the Run button rather than the Save button.",
                           );
                     if (!confirm(text)) {
                         event.preventDefault();

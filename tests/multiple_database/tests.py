@@ -899,8 +899,7 @@ class QueryTestCase(TestCase):
 
         new_bob_profile = UserProfile(flavor="spring surprise")
 
-        # assigning a profile requires an explicit pk as the object isn't saved
-        charlie = User(pk=51, username="charlie", email="charlie@example.com")
+        charlie = User(username="charlie", email="charlie@example.com")
         charlie.set_unusable_password()
 
         # initially, no db assigned
@@ -1882,10 +1881,10 @@ class RouterTestCase(TestCase):
         managers
         """
         pro = Book.objects.using("other").create(
-            pk=1, title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Django", published=datetime.date(2008, 12, 16)
         )
 
-        marty = Person.objects.using("other").create(pk=1, name="Marty Alchin")
+        marty = Person.objects.using("other").create(name="Marty Alchin")
 
         self.assertEqual(pro.authors.db, "other")
         self.assertEqual(pro.authors.db_manager("default").db, "default")
@@ -1900,9 +1899,8 @@ class RouterTestCase(TestCase):
         FK reverse relations are represented by managers, and can be controlled
         like managers.
         """
-        marty = Person.objects.using("other").create(pk=1, name="Marty Alchin")
+        marty = Person.objects.using("other").create(name="Marty Alchin")
         Book.objects.using("other").create(
-            pk=1,
             title="Pro Django",
             published=datetime.date(2008, 12, 16),
             editor=marty,
