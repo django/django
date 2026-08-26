@@ -21,6 +21,11 @@ Bugfixes
   detect mixed ``on_delete`` variants for auto-created intermediate models for
   ``ManyToManyField``\s (:ticket:`37254`).
 
+* Fixed a regression in Django 6.1 where custom querysets used with
+  :class:`~django.db.models.Prefetch` for forward foreign key or reverse
+  one-to-one relationships were not routed using the parent queryset's
+  database (:ticket:`37300`).
+
 * Fixed a regression in Django 6.1 where HTML-safe strings, such as those
   created with :func:`~django.utils.safestring.mark_safe`, used as form media
   assets were treated as asset paths rather than being rendered verbatim
