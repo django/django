@@ -162,7 +162,7 @@ class ChoiceFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             str(form),
             "<div><fieldset><legend>Select:</legend><div id=id_select><div><label "
             "for=id_select_0><input id=id_select_0 name=select option-attr=test "
-            "required type=radio value=""checked> ---</label></div><div><label "
+            'required type=radio value="" checked> ---</label></div><div><label '
             "for=id_select_1><input id=id_select_1 name=select option-attr=test "
             "required type=radio value=1> 1</label></div><div><label for=id_select_2>"
             "<input id=id_select_2 name=select option-attr=test required type=radio "
@@ -184,7 +184,7 @@ class ChoiceFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             str(form),
             "<div><fieldset><legend>Select:</legend><div id=id_select><div><label "
             "for=id_select_0><input attr=attr-test id=id_select_0 name=select "
-            "option-attr=test required type=radio value=""checked> ---</label></div>"
+            'option-attr=test required type=radio value="" checked> ---</label></div>'
             "<div><label for=id_select_1><input attr=attr-test id=id_select_1 "
             "name=select option-attr=test required type=radio value=1> 1</label></div>"
             "<div><label for=id_select_2><input attr=attr-test id=id_select_2 "
