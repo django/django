@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
 from django.db import DEFAULT_DB_ALIAS, router, transaction
-from django.db.models import signals
+from django.db.models import Prefetch, signals
 from django.db.utils import ConnectionRouter
 from django.test import SimpleTestCase, TestCase, override_settings
 
@@ -1273,6 +1273,39 @@ class QueryTestCase(TestCase):
 
         # The editor instance should have a db state
         self.assertEqual(book.editor._state.db, "other")
+
+    @override_settings(DATABASE_ROUTERS=["multiple_database.tests.TestRouter"])
+    def test_forward_fk_prefetch_custom_queryset_uses_parent_database(self):
+        mark = Person.objects.using("default").create(name="Mark Pilgrim")
+        Person.objects.using("other").create(pk=mark.pk, name="Other Mark")
+        Book.objects.using("default").create(
+            title="Dive into Python",
+            published=datetime.date(2009, 5, 4),
+            editor=mark,
+        )
+
+        book = Book.objects.using("default").prefetch_related(
+            Prefetch("editor", queryset=Person.objects.only("name"))
+        )[0]
+
+        self.assertEqual(book._state.db, "default")
+        self.assertEqual(book.editor._state.db, "default")
+        self.assertEqual(book.editor.name, "Mark Pilgrim")
+
+    @override_settings(DATABASE_ROUTERS=["multiple_database.tests.TestRouter"])
+    def test_reverse_o2o_prefetch_custom_queryset_uses_parent_database(self):
+        alice = User.objects.db_manager("default").create_user("alice")
+        User.objects.db_manager("other").create_user("other-alice", pk=alice.pk)
+        UserProfile.objects.using("default").create(user=alice, flavor="chocolate")
+        UserProfile.objects.using("other").create(user_id=alice.pk, flavor="vanilla")
+
+        user = User.objects.using("default").prefetch_related(
+            Prefetch("userprofile", queryset=UserProfile.objects.only("flavor"))
+        )[0]
+
+        self.assertEqual(user._state.db, "default")
+        self.assertEqual(user.userprofile._state.db, "default")
+        self.assertEqual(user.userprofile.flavor, "chocolate")
 
     def test_subquery(self):
         """Make sure as_sql works with subqueries and primary/replica."""

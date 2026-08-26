@@ -39,3 +39,7 @@ Bugfixes
   ``QuerySet`` of a model overriding ``Model.from_db()`` without the new
   ``fetch_mode`` keyword argument. Such overrides now work again, but are
   deprecated and should be updated to accept ``fetch_mode`` (:ticket:`37259`).
+
+* Fixed a regression in Django 6.1 where custom querysets used with
+  ``Prefetch`` for forward foreign key or reverse one-to-one relationships were
+  not routed using the parent queryset's database (:ticket:`37300`).
