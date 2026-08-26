@@ -7395,6 +7395,29 @@ class SeleniumTests(AdminSeleniumTestCase):
         for index, fieldset in enumerate(fieldsets):
             legend = fieldset.find_element(By.TAG_NAME, "legend")
             self.assertEqual(legend.text, expected_legend_tags_text[index])
+        self.assertEqual(
+            self.selenium.find_element(By.ID, "id_start_datetime_0").get_attribute(
+                "aria-describedby"
+            ),
+            "id_start_datetime_timezone_warning_helptext",
+        )
+
+        difficulty_input = self.selenium.find_element(
+            By.CSS_SELECTOR, "input[name='difficulty']"
+        )
+        difficulty_input.click()
+        self.selenium.execute_script(
+            "arguments[0].value = 'invalid';",
+            difficulty_input,
+        )
+        self.selenium.find_element(By.NAME, "_save").click()
+        difficulty_fieldset = self.selenium.find_element(
+            By.CSS_SELECTOR, "fieldset.aligned fieldset"
+        )
+        self.assertEqual(
+            difficulty_fieldset.get_attribute("aria-describedby"),
+            "id_difficulty_error",
+        )
 
         # FilteredSelectMultiple uses <fieldset>.
         url = reverse("admin:admin_views_camelcaserelatedmodel_add")
