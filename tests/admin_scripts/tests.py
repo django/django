@@ -2604,11 +2604,12 @@ class TemplateSizeLimit(AdminScriptTestCase):
         self.target_dir = os.path.join(self.test_dir, "project_dir")
         os.mkdir(self.target_dir)
 
-    def start(self, command, name, **options):
+    def start(self, command, name, *args, **options):
         call_command(
             command,
             name,
             self.target_dir,
+            *args,
             template=self.template_path,
             verbosity=0,
             **options,
@@ -2616,7 +2617,10 @@ class TemplateSizeLimit(AdminScriptTestCase):
 
     def assertExtracted(self, extracted):
         path = os.path.join(self.target_dir, "run.py")
-        self.assertIs(os.path.exists(path), extracted)
+        if extracted:
+            self.assertTrue(os.path.exists(path))
+        else:
+            self.assertFalse(os.path.exists(path))
 
     @mock.patch("django.utils.archive.get_size", return_value=60 * 1024 * 1024)
     def test_project_template_over_limit(self, mocked_get_size):
@@ -2637,7 +2641,7 @@ class TemplateSizeLimit(AdminScriptTestCase):
 
     @mock.patch("django.utils.archive.get_size", return_value=60 * 1024 * 1024)
     def test_no_size_limit(self, mocked_get_size):
-        self.start("startproject", "sized_project", enforce_size_limit=False)
+        self.start("startproject", "sized_project", "--no-size-limit")
         self.assertExtracted(True)
 
 
