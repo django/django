@@ -43,7 +43,7 @@ class TemplateCommand(BaseCommand):
         # Allow shipping invalid .py files without byte-compilation.
         (".py-tpl", ".py"),
     )
-    max_template_size_mb = 20
+    max_template_size_mb = 50
 
     def add_arguments(self, parser):
         parser.add_argument("name", help="Name of the application or project.")
