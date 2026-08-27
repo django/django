@@ -4,10 +4,7 @@ from django.test import TestCase
 from django.test.utils import modify_settings, override_settings
 
 
-@override_settings(
-    ROOT_URLCONF="flatpages_tests.urls",
-    SITE_ID=1,
-)
+@override_settings(ROOT_URLCONF="flatpages_tests.urls")
 @modify_settings(
     INSTALLED_APPS={
         "append": ["django.contrib.sitemaps", "django.contrib.flatpages"],

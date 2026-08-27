@@ -187,7 +187,7 @@ LANG_INFO = {
         "bidi": False,
         "code": "eu",
         "name": "Basque",
-        "name_local": "Basque",
+        "name_local": "euskara",
     },
     "fa": {
         "bidi": True,
@@ -254,6 +254,12 @@ LANG_INFO = {
         "code": "hsb",
         "name": "Upper Sorbian",
         "name_local": "hornjoserbsce",
+    },
+    "ht": {
+        "bidi": False,
+        "code": "ht",
+        "name": "Haitian Creole",
+        "name_local": "Kreyòl Ayisyen",
     },
     "hu": {
         "bidi": False,

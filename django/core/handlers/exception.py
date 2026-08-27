@@ -1,8 +1,9 @@
 import logging
 import sys
 from functools import wraps
+from inspect import iscoroutinefunction
 
-from asgiref.sync import iscoroutinefunction, sync_to_async
+from asgiref.sync import sync_to_async
 
 from django.conf import settings
 from django.core import signals
@@ -42,7 +43,7 @@ def convert_exception_to_response(get_response):
                 response = await get_response(request)
             except Exception as exc:
                 response = await sync_to_async(
-                    response_for_exception, thread_sensitive=False
+                    response_for_exception, thread_sensitive=True
                 )(request, exc)
             return response
 

@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.files import File, locks
 from django.core.files.move import file_move_safe
 from django.core.signals import setting_changed
-from django.utils._os import safe_join
+from django.utils._os import safe_join, safe_makedirs
 from django.utils.deconstruct import deconstructible
 from django.utils.encoding import filepath_to_uri
 from django.utils.functional import cached_property
@@ -72,15 +72,10 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
         directory = os.path.dirname(full_path)
         try:
             if self.directory_permissions_mode is not None:
-                # Set the umask because os.makedirs() doesn't apply the "mode"
+                # Workaround because os.makedirs() doesn't apply the "mode"
                 # argument to intermediate-level directories.
-                old_umask = os.umask(0o777 & ~self.directory_permissions_mode)
-                try:
-                    os.makedirs(
-                        directory, self.directory_permissions_mode, exist_ok=True
-                    )
-                finally:
-                    os.umask(old_umask)
+                # https://github.com/python/cpython/issues/86533
+                safe_makedirs(directory, self.directory_permissions_mode, exist_ok=True)
             else:
                 os.makedirs(directory, exist_ok=True)
         except FileExistsError:

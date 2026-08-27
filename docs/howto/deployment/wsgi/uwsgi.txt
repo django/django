@@ -27,9 +27,6 @@ command. For example:
     # Install current stable version.
     $ python -m pip install uwsgi
 
-    # Or install LTS (long term support).
-    $ python -m pip install https://projects.unbit.it/downloads/uwsgi-lts.tar.gz
-
 .. _installation procedures: https://uwsgi-docs.readthedocs.io/en/latest/Install.html
 
 uWSGI model

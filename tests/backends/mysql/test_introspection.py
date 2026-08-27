@@ -81,19 +81,16 @@ class TestCrossDatabaseRelations(TestCase):
         rel_column_quoted = other_connection.ops.quote_name(rel_column)
         try:
             with other_connection.cursor() as other_cursor:
-                other_cursor.execute(
-                    f"""
+                other_cursor.execute(f"""
                     CREATE TABLE {rel_table_quoted} (
                         id integer AUTO_INCREMENT,
                         PRIMARY KEY (id)
                     )
-                    """
-                )
+                    """)
             with default_connection.cursor() as default_cursor:
                 # Create table in the default schema with a cross-database
                 # relation.
-                default_cursor.execute(
-                    f"""
+                default_cursor.execute(f"""
                     CREATE TABLE {main_table_quoted} (
                         id integer AUTO_INCREMENT,
                         {rel_column_quoted} integer NOT NULL,
@@ -101,8 +98,7 @@ class TestCrossDatabaseRelations(TestCase):
                         FOREIGN KEY ({rel_column_quoted})
                         REFERENCES {other_schema_quoted}.{rel_table_quoted}(id)
                     )
-                    """
-                )
+                    """)
                 relations = default_connection.introspection.get_relations(
                     default_cursor, main_table
                 )

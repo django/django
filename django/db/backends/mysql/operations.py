@@ -3,7 +3,6 @@ import uuid
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import split_tzname_delta
-from django.db.models import Exists, ExpressionWrapper, Lookup
 from django.db.models.constants import OnConflict
 from django.utils import timezone
 from django.utils.encoding import force_str
@@ -62,7 +61,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             # EXTRACT returns 1-53 based on ISO-8601 for the week number.
             lookup_type = lookup_type.upper()
             if not self._extract_format_re.fullmatch(lookup_type):
-                raise ValueError(f"Invalid loookup type: {lookup_type!r}")
+                raise ValueError(f"Invalid lookup type: {lookup_type!r}")
             return f"EXTRACT({lookup_type} FROM {sql})", params
 
     def date_trunc_sql(self, lookup_type, sql, params, tzname=None):
@@ -306,10 +305,12 @@ class DatabaseOperations(BaseDatabaseOperations):
             value = uuid.UUID(value)
         return value
 
-    def binary_placeholder_sql(self, value):
-        return (
-            "_binary %s" if value is not None and not hasattr(value, "as_sql") else "%s"
-        )
+    def binary_placeholder_sql(self, value, compiler):
+        if value is None:
+            return "%s", (None,)
+        elif hasattr(value, "as_sql"):
+            return compiler.compile(value)
+        return "_binary %s", (value,)
 
     def subtract_temporals(self, internal_type, lhs, rhs):
         lhs_sql, lhs_params = lhs
@@ -349,7 +350,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             format = "TREE"
         analyze = options.pop("analyze", False)
         prefix = super().explain_query_prefix(format, **options)
-        if analyze and self.connection.features.supports_explain_analyze:
+        if analyze:
             # MariaDB uses ANALYZE instead of EXPLAIN ANALYZE.
             prefix = (
                 "ANALYZE" if self.connection.mysql_is_mariadb else prefix + " ANALYZE"
@@ -391,31 +392,14 @@ class DatabaseOperations(BaseDatabaseOperations):
                 lookup = "JSON_UNQUOTE(%s)"
         return lookup
 
-    def conditional_expression_supported_in_where_clause(self, expression):
-        # MySQL ignores indexes with boolean fields unless they're compared
-        # directly to a boolean value.
-        if isinstance(expression, (Exists, Lookup)):
-            return True
-        if isinstance(expression, ExpressionWrapper) and expression.conditional:
-            return self.conditional_expression_supported_in_where_clause(
-                expression.expression
-            )
-        if getattr(expression, "conditional", False):
-            return False
-        return super().conditional_expression_supported_in_where_clause(expression)
-
     def on_conflict_suffix_sql(self, fields, on_conflict, update_fields, unique_fields):
         if on_conflict == OnConflict.UPDATE:
             conflict_suffix_sql = "ON DUPLICATE KEY UPDATE %(fields)s"
-            # The use of VALUES() is deprecated in MySQL 8.0.20+. Instead, use
-            # aliases for the new row and its columns available in MySQL
-            # 8.0.19+.
+            # The use of VALUES() is not supported in MySQL. Instead, use
+            # aliases for the new row and its columns.
             if not self.connection.mysql_is_mariadb:
-                if self.connection.mysql_version >= (8, 0, 19):
-                    conflict_suffix_sql = f"AS new {conflict_suffix_sql}"
-                    field_sql = "%(field)s = new.%(field)s"
-                else:
-                    field_sql = "%(field)s = VALUES(%(field)s)"
+                conflict_suffix_sql = f"AS new {conflict_suffix_sql}"
+                field_sql = "%(field)s = new.%(field)s"
             # Use VALUE() on MariaDB.
             else:
                 field_sql = "%(field)s = VALUE(%(field)s)"

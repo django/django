@@ -2,12 +2,13 @@
 #
 # Translators:
 # Chen Chun-Chia <ccc.larc@gmail.com>, 2015
-# coby2023t, 2024-2025
+# coby2023t, 2024-2026
 # Eric Ho <eric913@gmail.com>, 2013
 # ilay <ilay@ilay.tw>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # mail6543210 <mail6543210@yahoo.com.tw>, 2013
 # 0a3cb7bfd0810218facdfb511e592a6d_8d19d07 <c136e508049103f37d35b6c3314e9b1d_5225>, 2011
+# Natalia, 2025
 # tcc <tcchou@tcchou.org>, 2011
 # Tzu-ping Chung <uranusjr@gmail.com>, 2016-2017
 # YAO WEN LIANG, 2024
@@ -18,9 +19,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: coby2023t, 2024-2025\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2026-06-01 06:49+0000\n"
+"Last-Translator: coby2023t, 2024-2026\n"
 "Language-Team: Chinese (Taiwan) (http://app.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -151,6 +152,9 @@ msgstr "克羅埃西亞語"
 
 msgid "Upper Sorbian"
 msgstr "上索布語"
+
+msgid "Haitian Creole"
+msgstr "海地語"
 
 msgid "Hungarian"
 msgstr "匈牙利語"
@@ -540,8 +544,8 @@ msgstr "日期 (不包括時間)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "“%(value)s” 的格式錯誤。應該是 YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] 才對。"
 
@@ -564,8 +568,8 @@ msgstr "十進位數"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr "“%(value)s” 的格式錯誤。格式必須為 [DD] [[HH:]MM:]ss[.uuuuuu] 。"
 
 msgid "Duration"
@@ -688,8 +692,8 @@ msgid "Many-to-many relationship"
 msgstr "多對多關連"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -840,9 +844,25 @@ msgstr "是"
 msgid "No"
 msgstr "否"
 
+msgctxt "Task"
+msgid "Ready"
+msgstr "就緒"
+
+msgctxt "Task"
+msgid "Running"
+msgstr "執行中"
+
+msgctxt "Task"
+msgid "Failed"
+msgstr "失敗"
+
+msgctxt "Task"
+msgid "Successful"
+msgstr "成功"
+
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
-msgstr "是、否、也許"
+msgstr "是,否,也許"
 
 #, python-format
 msgid "%(size)d byte"
@@ -1216,8 +1236,8 @@ msgstr "%(verbose_name_plural)s 無法使用"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
 "未來的 %(verbose_name_plural)s 不可用，因為 %(class_name)s.allow_future 設置"
 "為 False."
@@ -1270,9 +1290,9 @@ msgid ""
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"你現在看到這個頁面，是因為在設定檔中設置了 <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
-"rel=\"noopener\">DEBUG = True</a>，且尚未配置任何網址。"
+"你現在看到這個頁面，是因為在設定檔中設置了 <a href=\"https://"
+"docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" "
+"target=\"_blank\" rel=\"noopener\">DEBUG = True</a>，且尚未配置任何網址。"
 
 msgid "Django Documentation"
 msgstr "Django 文件"

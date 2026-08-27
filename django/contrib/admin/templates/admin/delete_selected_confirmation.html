@@ -1,36 +1,36 @@
 {% extends "admin/base_site.html" %}
-{% load i18n l10n admin_urls static %}
+{% load i18n l10n admin_urls static admin_filters %}
 
 {% block extrahead %}
     {{ block.super }}
-    {{ media }}
-    <script src="{% static 'admin/js/cancel.js' %}" async></script>
+    {% csp_nonce_attr media %}
+    <script src="{% static 'admin/js/cancel.js' %}" async {% csp_nonce_attr %}></script>
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation delete-selected-confirmation{% endblock %}
 
 {% block breadcrumbs %}
-<div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
-&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
-&rsaquo; {% translate 'Delete multiple objects' %}
-</div>
+<ol class="breadcrumbs">
+<li><a href="{% url 'admin:index' %}">{% translate 'Home' %}</a></li>
+<li><a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a></li>
+<li><a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a></li>
+<li aria-current="page">{% translate 'Delete multiple objects' %}</li>
+</ol>
 {% endblock %}
 
 {% block content %}
 {% if perms_lacking %}
     <p>{% blocktranslate %}Deleting the selected {{ objects_name }} would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:{% endblocktranslate %}</p>
-    <ul>{{ perms_lacking|unordered_list }}</ul>
+    <ul>{{ perms_lacking|truncated_unordered_list:delete_confirmation_max_display }}</ul>
 {% elif protected %}
     <p>{% blocktranslate %}Deleting the selected {{ objects_name }} would require deleting the following protected related objects:{% endblocktranslate %}</p>
-    <ul>{{ protected|unordered_list }}</ul>
+    <ul>{{ protected|truncated_unordered_list:delete_confirmation_max_display }}</ul>
 {% else %}
     <p>{% blocktranslate %}Are you sure you want to delete the selected {{ objects_name }}? All of the following objects and their related items will be deleted:{% endblocktranslate %}</p>
     {% include "admin/includes/object_delete_summary.html" %}
     <h2>{% translate "Objects" %}</h2>
     {% for deletable_object in deletable_objects %}
-        <ul>{{ deletable_object|unordered_list }}</ul>
+        <ul>{{ deletable_object|truncated_unordered_list:delete_confirmation_max_display }}</ul>
     {% endfor %}
     <form method="post">{% csrf_token %}
     <div>

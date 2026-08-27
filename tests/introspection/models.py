@@ -110,3 +110,27 @@ class DbCommentModel(models.Model):
     class Meta:
         db_table_comment = "Custom table comment"
         required_db_features = {"supports_comments"}
+
+
+class DbOnDeleteCascadeModel(models.Model):
+    fk_do_nothing = models.ForeignKey(Country, on_delete=models.DO_NOTHING)
+    fk_db_cascade = models.ForeignKey(City, on_delete=models.DB_CASCADE)
+
+    class Meta:
+        required_db_features = {"supports_on_delete_db_cascade"}
+
+
+class DbOnDeleteSetNullModel(models.Model):
+    fk_set_null = models.ForeignKey(Reporter, on_delete=models.DB_SET_NULL, null=True)
+
+    class Meta:
+        required_db_features = {"supports_on_delete_db_null"}
+
+
+class DbOnDeleteSetDefaultModel(models.Model):
+    fk_db_set_default = models.ForeignKey(
+        Country, on_delete=models.DB_SET_DEFAULT, db_default=models.Value(1)
+    )
+
+    class Meta:
+        required_db_features = {"supports_on_delete_db_default"}

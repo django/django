@@ -156,12 +156,13 @@ it.
 
 To make a :class:`~django.template.response.TemplateResponse`,
 :class:`ListView` then uses
-:class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`; as
-with :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`
-above, this overrides ``get_template_names()`` to provide :meth:`a range of
-options <django.views.generic.list.MultipleObjectTemplateResponseMixin>`, with
-the most commonly-used being ``<app_label>/<model_name>_list.html``, with the
-``_list`` part again being taken from the
+:class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
+As with :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`
+above, this overrides
+:meth:`~django.views.generic.list.MultipleObjectTemplateResponseMixin.get_template_names`
+to provide a range of options, with the most commonly-used being
+``<app_label>/<model_name>_list.html``, with the ``_list`` part again
+being taken from the
 :attr:`~django.views.generic.list.MultipleObjectTemplateResponseMixin.template_name_suffix`
 attribute. (The date based generic views use suffixes such as ``_archive``,
 ``_archive_year`` and so on to use different templates for the various

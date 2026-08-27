@@ -2,15 +2,15 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016-2017,2019,2021,2023-2024
+# znotdead <zhirafchik@gmail.com>, 2016-2017,2019,2021,2023-2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 08:09+0000\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 08:09+0000\n"
 "Last-Translator: znotdead <zhirafchik@gmail.com>, "
-"2016-2017,2019,2021,2023-2024\n"
+"2016-2017,2019,2021,2023-2025\n"
 "Language-Team: Belarusian (http://app.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -60,11 +60,11 @@ msgstr "пароль"
 msgid "last login"
 msgstr "апошні раз уваходзіў"
 
-msgid "No password set."
-msgstr "Пароль не зададзены."
-
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Няправільны фармат паролю або невядомы алгарытм хэшавання."
+
+msgid "No password set."
+msgstr "Пароль не зададзены."
 
 msgid "Reset password"
 msgstr "Узнавіць пароль"
@@ -75,15 +75,6 @@ msgstr "Усталяваць пароль"
 msgid "The two password fields didn’t match."
 msgstr "Не супадаюць паролі ў двух палях."
 
-msgid ""
-"Whether the user will be able to authenticate using a password or not. If "
-"disabled, they may still be able to authenticate using other backends, such "
-"as Single Sign-On or LDAP."
-msgstr ""
-"Зможа карыстальнік прайсці аўтэнтыфікацыю з дапамогай пароля ці не. Калі "
-"гэта функцыя адключана, яны ўсё роўна могуць прайсці аўтэнтыфікацыю з "
-"дапамогай іншых бэкэндаў, такіх як Single Sign-On або LDAP."
-
 msgid "Password"
 msgstr "Пароль"
 
@@ -92,6 +83,15 @@ msgstr "Пацьвердзіце пароль"
 
 msgid "Enter the same password as before, for verification."
 msgstr "Дзеля пэўнасьці набярыце такі самы пароль яшчэ раз."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Зможа карыстальнік прайсці аўтэнтыфікацыю з дапамогай пароля ці не. Калі "
+"гэта функцыя адключана, яны ўсё роўна могуць прайсці аўтэнтыфікацыю з "
+"дапамогай іншых бэкэндаў, такіх як Single Sign-On або LDAP."
 
 msgid "Password-based authentication"
 msgstr "Аўтэнтыфікацыя на аснове пароля"
@@ -263,20 +263,13 @@ msgid "users"
 msgstr "карыстальнікі"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] ""
-"Гэты пароль занадта кароткі. Ён павінен мець не менш %(min_length)d сімвал."
-msgstr[1] ""
-"Гэты пароль занадта кароткі. Ён павінен мець не менш %(min_length)d сімвала."
-msgstr[2] ""
-"Гэты пароль занадта кароткі. Ён павінен мець не менш %(min_length)d сімвалаў."
-msgstr[3] ""
-"Гэты пароль занадта кароткі. Ён павінен мець не менш %(min_length)d сімвалаў."
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "Гэты пароль занадта кароткі. Ён павінен мець не менш %d сімвал."
+msgstr[1] "Гэты пароль занадта кароткі. Ён павінен мець не менш %d сімвала."
+msgstr[2] "Гэты пароль занадта кароткі. Ён павінен мець не менш %d сімвалаў."
+msgstr[3] "Гэты пароль занадта кароткі. Ён павінен мець не менш %d сімвалаў."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."

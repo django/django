@@ -119,18 +119,16 @@ class LiveServerInMemoryDatabaseLockTest(LiveServerBase):
         source_connection = conn.connection
         # Open a connection to the database.
         conn.connect()
+        self.addCleanup(source_connection.close)
         # Create a transaction to lock the database.
         cursor = conn.cursor()
         cursor.execute("BEGIN IMMEDIATE TRANSACTION")
+        self.addCleanup(cursor.execute, "ROLLBACK")
         try:
             with self.urlopen("/create_model_instance/") as f:
                 self.assertEqual(f.status, 200)
         except HTTPError:
             self.fail("Unexpected error due to a database lock.")
-        finally:
-            # Release the transaction.
-            cursor.execute("ROLLBACK")
-            source_connection.close()
 
 
 class FailingLiveServerThread(LiveServerThread):
@@ -211,26 +209,23 @@ class LiveServerViews(LiveServerBase):
             LiveServerViews.server_thread.port,
             timeout=1,
         )
-        try:
-            conn.request(
-                "GET", "/streaming_example_view/", headers={"Connection": "keep-alive"}
-            )
-            response = conn.getresponse()
-            self.assertTrue(response.will_close)
-            self.assertEqual(response.read(), b"Iamastream")
-            self.assertEqual(response.status, 200)
-            self.assertEqual(response.getheader("Connection"), "close")
+        self.addCleanup(conn.close)
 
-            conn.request(
-                "GET", "/streaming_example_view/", headers={"Connection": "close"}
-            )
-            response = conn.getresponse()
-            self.assertTrue(response.will_close)
-            self.assertEqual(response.read(), b"Iamastream")
-            self.assertEqual(response.status, 200)
-            self.assertEqual(response.getheader("Connection"), "close")
-        finally:
-            conn.close()
+        conn.request(
+            "GET", "/streaming_example_view/", headers={"Connection": "keep-alive"}
+        )
+        response = conn.getresponse()
+        self.assertTrue(response.will_close)
+        self.assertEqual(response.read(), b"Iamastream")
+        self.assertEqual(response.status, 200)
+        self.assertEqual(response.getheader("Connection"), "close")
+
+        conn.request("GET", "/streaming_example_view/", headers={"Connection": "close"})
+        response = conn.getresponse()
+        self.assertTrue(response.will_close)
+        self.assertEqual(response.read(), b"Iamastream")
+        self.assertEqual(response.status, 200)
+        self.assertEqual(response.getheader("Connection"), "close")
 
     def test_keep_alive_on_connection_with_content_length(self):
         """
@@ -241,45 +236,41 @@ class LiveServerViews(LiveServerBase):
         conn = HTTPConnection(
             LiveServerViews.server_thread.host, LiveServerViews.server_thread.port
         )
-        try:
-            conn.request("GET", "/example_view/", headers={"Connection": "keep-alive"})
-            response = conn.getresponse()
-            self.assertFalse(response.will_close)
-            self.assertEqual(response.read(), b"example view")
-            self.assertEqual(response.status, 200)
-            self.assertIsNone(response.getheader("Connection"))
+        self.addCleanup(conn.close)
 
-            conn.request("GET", "/example_view/", headers={"Connection": "close"})
-            response = conn.getresponse()
-            self.assertFalse(response.will_close)
-            self.assertEqual(response.read(), b"example view")
-            self.assertEqual(response.status, 200)
-            self.assertIsNone(response.getheader("Connection"))
-        finally:
-            conn.close()
+        conn.request("GET", "/example_view/", headers={"Connection": "keep-alive"})
+        response = conn.getresponse()
+        self.assertFalse(response.will_close)
+        self.assertEqual(response.read(), b"example view")
+        self.assertEqual(response.status, 200)
+        self.assertIsNone(response.getheader("Connection"))
+
+        conn.request("GET", "/example_view/", headers={"Connection": "close"})
+        response = conn.getresponse()
+        self.assertFalse(response.will_close)
+        self.assertEqual(response.read(), b"example view")
+        self.assertEqual(response.status, 200)
+        self.assertIsNone(response.getheader("Connection"))
 
     def test_keep_alive_connection_clears_previous_request_data(self):
         conn = HTTPConnection(
             LiveServerViews.server_thread.host, LiveServerViews.server_thread.port
         )
-        try:
-            conn.request(
-                "POST", "/method_view/", b"{}", headers={"Connection": "keep-alive"}
-            )
-            response = conn.getresponse()
-            self.assertFalse(response.will_close)
-            self.assertEqual(response.status, 200)
-            self.assertEqual(response.read(), b"POST")
+        self.addCleanup(conn.close)
 
-            conn.request(
-                "POST", "/method_view/", b"{}", headers={"Connection": "close"}
-            )
-            response = conn.getresponse()
-            self.assertFalse(response.will_close)
-            self.assertEqual(response.status, 200)
-            self.assertEqual(response.read(), b"POST")
-        finally:
-            conn.close()
+        conn.request(
+            "POST", "/method_view/", b"{}", headers={"Connection": "keep-alive"}
+        )
+        response = conn.getresponse()
+        self.assertFalse(response.will_close)
+        self.assertEqual(response.status, 200)
+        self.assertEqual(response.read(), b"POST")
+
+        conn.request("POST", "/method_view/", b"{}", headers={"Connection": "close"})
+        response = conn.getresponse()
+        self.assertFalse(response.will_close)
+        self.assertEqual(response.status, 200)
+        self.assertEqual(response.read(), b"POST")
 
     def test_404(self):
         with self.assertRaises(HTTPError) as err:
@@ -330,15 +321,13 @@ class SingleThreadLiveServerViews(SingleThreadLiveServerTestCase):
             SingleThreadLiveServerViews.server_thread.port,
             timeout=1,
         )
-        try:
-            conn.request("GET", "/example_view/", headers={"Connection": "keep-alive"})
-            response = conn.getresponse()
-            self.assertTrue(response.will_close)
-            self.assertEqual(response.read(), b"example view")
-            self.assertEqual(response.status, 200)
-            self.assertEqual(response.getheader("Connection"), "close")
-        finally:
-            conn.close()
+        self.addCleanup(conn.close)
+        conn.request("GET", "/example_view/", headers={"Connection": "keep-alive"})
+        response = conn.getresponse()
+        self.assertTrue(response.will_close)
+        self.assertEqual(response.read(), b"example view")
+        self.assertEqual(response.status, 200)
+        self.assertEqual(response.getheader("Connection"), "close")
 
 
 class LiveServerDatabase(LiveServerBase):

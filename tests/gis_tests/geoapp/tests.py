@@ -1,7 +1,11 @@
+import json
 from io import StringIO
+from pathlib import Path
+from unittest import mock, skipIf
 
 from django.contrib.gis import gdal
 from django.contrib.gis.db.models import Extent, MakeLine, Union, functions
+from django.contrib.gis.gdal.raster.source import DisallowedRasterLookup
 from django.contrib.gis.geos import (
     GeometryCollection,
     GEOSGeometry,
@@ -18,18 +22,22 @@ from django.core.files.temp import NamedTemporaryFile
 from django.core.management import call_command
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import F, OuterRef, Subquery
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
-from ..utils import skipUnlessGISLookup
+from ..data.rasters.textrasters import JSON_RASTER
+from ..utils import cannot_save_multipoint, skipUnlessGISLookup
 from .models import (
     City,
     Country,
     Feature,
+    GeometryCollectionModel,
+    Lines,
     MinusOneSRID,
     MultiFields,
     NonConcreteModel,
     PennsylvaniaCity,
+    Points,
     State,
     ThreeDimensionalFeature,
     Track,
@@ -269,9 +277,95 @@ class GeoModelTest(TestCase):
             self.assertEqual(feature.geom.srid, g.srid)
 
 
+class SaveLoadTests(TestCase):
+    def test_multilinestringfield(self):
+        geom = MultiLineString(
+            LineString((0, 0), (1, 1), (5, 5)),
+            LineString((0, 0), (0, 5), (5, 5), (5, 0), (0, 0)),
+        )
+        obj = Lines.objects.create(geom=geom)
+        obj.refresh_from_db()
+        self.assertEqual(obj.geom.tuple, geom.tuple)
+
+    def test_multilinestring_with_linearring(self):
+        geom = MultiLineString(
+            LineString((0, 0), (1, 1), (5, 5)),
+            LinearRing((0, 0), (0, 5), (5, 5), (5, 0), (0, 0)),
+        )
+        obj = Lines.objects.create(geom=geom)
+        obj.refresh_from_db()
+        self.assertEqual(obj.geom.tuple, geom.tuple)
+        self.assertEqual(obj.geom[1].__class__.__name__, "LineString")
+        self.assertEqual(obj.geom[0].tuple, geom[0].tuple)
+        # LinearRings are transformed to LineString.
+        self.assertEqual(obj.geom[1].__class__.__name__, "LineString")
+        self.assertEqual(obj.geom[1].tuple, geom[1].tuple)
+
+    @skipIf(cannot_save_multipoint, "MariaDB cannot save MultiPoint due to a bug.")
+    def test_multipointfield(self):
+        geom = MultiPoint(Point(1, 1), Point(0, 0))
+        obj = Points.objects.create(geom=geom)
+        obj.refresh_from_db()
+        self.assertEqual(obj.geom, geom)
+
+    def test_geometrycollectionfield(self):
+        geom = GeometryCollection(
+            Point(2, 2),
+            LineString((0, 0), (2, 2)),
+            Polygon(LinearRing((0, 0), (0, 5), (5, 5), (5, 0), (0, 0))),
+        )
+        obj = GeometryCollectionModel.objects.create(geom=geom)
+        obj.refresh_from_db()
+        self.assertIs(obj.geom.equals(geom), True)
+
+    def test_geometrycollectionfield_max(self):
+        geom = "POINT(0 0)"
+        for _ in range(6):
+            geom = f"GEOMETRYCOLLECTION({geom})"
+        msg = "WKT contains too many possible GeometryCollections."
+        with self.assertRaisesMessage(ValueError, msg):
+            GeometryCollectionModel.objects.create(geom=geom)
+        with self.assertRaisesMessage(ValueError, msg):
+            GeometryCollectionModel.objects.bulk_create(
+                [GeometryCollectionModel(geom=geom), GeometryCollectionModel(geom=geom)]
+            )
+
+    def test_geometrycollectionfield_default_max_ignored_on_read(self):
+        geom = "POINT(0 0)"
+        for _ in range(5):
+            geom = f"GEOMETRYCOLLECTION({geom})"
+        obj = GeometryCollectionModel.objects.create(geom=geom)
+        with (
+            mock.patch(
+                "django.contrib.gis.geos.prototypes.io._WKBReader.limit_hex"
+            ) as hex_limit_mock,
+            mock.patch(
+                "django.contrib.gis.geos.prototypes.io._WKBReader.limit_wkb"
+            ) as wkb_limit_mock,
+        ):
+            obj.refresh_from_db()
+        limit_mock = hex_limit_mock if hex_limit_mock.call_count else wkb_limit_mock
+        limit_mock.assert_called_once()
+        max_geom_collections = limit_mock.call_args.args[1]
+        self.assertIsNone(max_geom_collections)
+
+
+class ValidationTests(SimpleTestCase):
+    def test_geometrycollectionfield_max(self):
+        geom = "POINT(0 0)"
+        for _ in range(6):
+            geom = f"GEOMETRYCOLLECTION({geom})"
+        obj = GeometryCollectionModel(geom=geom)
+        msg = "WKT contains too many possible GeometryCollections."
+        # Spatial fields do not re-raise ValueError as ValidationError.
+        with self.assertRaisesMessage(ValueError, msg):
+            obj.full_clean()
+
+
 class GeoLookupTest(TestCase):
     fixtures = ["initial"]
 
+    @skipUnlessGISLookup("disjoint")
     def test_disjoint_lookup(self):
         "Testing the `disjoint` lookup type."
         ptown = City.objects.get(name="Pueblo")
@@ -281,22 +375,22 @@ class GeoLookupTest(TestCase):
         self.assertEqual(1, qs2.count())
         self.assertEqual("Kansas", qs2[0].name)
 
-    def test_contains_contained_lookups(self):
-        "Testing the 'contained', 'contains', and 'bbcontains' lookup types."
+    @skipUnlessGISLookup("contained")
+    def test_contained(self):
         # Getting Texas, yes we were a country -- once ;)
         texas = Country.objects.get(name="Texas")
 
         # Seeing what cities are in Texas, should get Houston and Dallas,
         #  and Oklahoma City because 'contained' only checks on the
         #  _bounding box_ of the Geometries.
-        if connection.features.supports_contained_lookup:
-            qs = City.objects.filter(point__contained=texas.mpoly)
-            self.assertEqual(3, qs.count())
-            cities = ["Houston", "Dallas", "Oklahoma City"]
-            for c in qs:
-                self.assertIn(c.name, cities)
+        qs = City.objects.filter(point__contained=texas.mpoly)
+        self.assertEqual(3, qs.count())
+        cities = ["Houston", "Dallas", "Oklahoma City"]
+        for c in qs:
+            self.assertIn(c.name, cities)
 
-        # Pulling out some cities.
+    @skipUnlessGISLookup("contains")
+    def test_contains(self):
         houston = City.objects.get(name="Houston")
         wellington = City.objects.get(name="Wellington")
         pueblo = City.objects.get(name="Pueblo")
@@ -325,13 +419,15 @@ class GeoLookupTest(TestCase):
             len(Country.objects.filter(mpoly__contains=okcity.point.wkt)), 0
         )  # Query w/WKT
 
+    @skipUnlessGISLookup("bbcontains")
+    def test_bbcontains(self):
         # OK City is contained w/in bounding box of Texas.
-        if connection.features.supports_bbcontains_lookup:
-            qs = Country.objects.filter(mpoly__bbcontains=okcity.point)
-            self.assertEqual(1, len(qs))
-            self.assertEqual("Texas", qs[0].name)
+        okcity = City.objects.get(name="Oklahoma City")
+        qs = Country.objects.filter(mpoly__bbcontains=okcity.point)
+        self.assertEqual(1, len(qs))
+        self.assertEqual("Texas", qs[0].name)
 
-    @skipUnlessDBFeature("supports_crosses_lookup")
+    @skipUnlessGISLookup("crosses")
     def test_crosses_lookup(self):
         Track.objects.create(name="Line1", line=LineString([(-95, 29), (-60, 0)]))
         self.assertEqual(
@@ -424,6 +520,7 @@ class GeoLookupTest(TestCase):
             lambda b: b.name,
         )
 
+    @skipUnlessGISLookup("same_as", "equals")
     def test_equals_lookups(self):
         "Testing the 'same_as' and 'equals' lookup types."
         pnt = fromstr("POINT (-95.363151 29.763374)", srid=4326)
@@ -612,6 +709,7 @@ class GeoLookupTest(TestCase):
             )
         )
 
+    @skipUnlessDBFeature("has_Union_function")
     def test_gis_lookups_with_complex_expressions(self):
         multiple_arg_lookups = {
             "dwithin",
@@ -625,6 +723,7 @@ class GeoLookupTest(TestCase):
                     **{"point__" + lookup: functions.Union("point", "point")}
                 ).exists()
 
+    @skipUnlessGISLookup("within")
     def test_subquery_annotation(self):
         multifields = MultiFields.objects.create(
             city=City.objects.create(point=Point(1, 1)),
@@ -641,6 +740,102 @@ class GeoLookupTest(TestCase):
             city_point__within=F("poly"),
         )
         self.assertEqual(qs.get(), multifields)
+
+    def test_lookup_rejects_writing_or_fetching_rasters(self):
+        """
+        GDALRaster enables write mode in the following cases even when the
+        value of the `write` parameter is False (default):
+        - dicts
+        - strings matching a json regex
+        - bytes
+
+        Since this could be unexpected in a lookup context, disallow dicts
+        and strings: instead, explicitly wrap with GDALRaster() to signal that
+        a write or fetch is expected. Bytes only write to the in-memory virtual
+        filesystem, so allow them.
+
+        Disallowing strings also disallows paths to local or network rasters,
+        but those didn't work in the lookup context anyway, since they were
+        never opened for writing, and lookups failed on setting the SRID with:
+
+        GDALException: Raster needs to be opened in write mode to change values
+
+        Still, a network fetch might have occurred before that failure point,
+        so disallow strings altogether.
+        """
+        # Create a vsi-based raster from scratch.
+        vsimem_path = "/vsimem/raster.tif"
+        # Keep a reference to this raster while it is being re-parsed below.
+        # Otherwise, GDALRaster.__del__() will delete the in-memory raster.
+        _rast = gdal.GDALRaster(  # NOQA: F841
+            {
+                "name": vsimem_path,
+                "driver": "tif",
+                "width": 4,
+                "height": 4,
+                "srid": 4326,
+                "bands": [
+                    {
+                        "data": range(16),
+                    }
+                ],
+            }
+        )
+        existing_path = Path(__file__).parent.parent / "data" / "rasters" / "raster.tif"
+        disallowed_cases = [
+            JSON_RASTER,
+            json.loads(JSON_RASTER),
+            "/vsicurl/someurl",
+            "/vsicurl_streaming/someurl",
+            "/vsis3/someurl",
+            vsimem_path,
+            existing_path,
+        ]
+        for obj in disallowed_cases:
+            try:
+                msg_obj = json.loads(obj)
+            except Exception:
+                if isinstance(obj, Path):
+                    msg_obj = str(obj)
+                else:
+                    msg_obj = obj
+            msg = (
+                f"Cannot use object {msg_obj!r} for a spatial lookup parameter. "
+                "If this is a raster, wrap it with GDALRaster() before using "
+                "it in a lookup to enable writing or fetching."
+            )
+            with (
+                self.subTest(obj=obj),
+                self.assertRaisesMessage(DisallowedRasterLookup, msg),
+            ):
+                State.objects.filter(poly__intersects=obj)
+
+        # Strings having nothing to do with rasters raise a more generic error.
+        for obj in str(existing_path), "invalid":
+            msg = "String input unrecognized as WKT EWKT, and HEXEWKB."
+            with self.subTest(obj=obj), self.assertRaisesMessage(ValueError, msg):
+                State.objects.filter(poly__intersects=obj)
+
+    def test_lookup_allows_writing_raster_from_bytes(self):
+        raster_path = Path(__file__).parent.parent / "data" / "rasters" / "raster.tif"
+        with open(raster_path, "rb") as raster_file:
+            raster_bytes = raster_file.read()
+        # Just get SQL to avoid gating on connection.supports_raster.
+        State.objects.filter(poly__intersects=raster_bytes).query
+
+    def test_lookup_allows_geos_geometry_string(self):
+        geojson = json.dumps({"type": "Point", "coordinates": [2, 49]})
+        # Just get SQL to avoid gating on connection.supports_raster.
+        State.objects.filter(poly__intersects=geojson).query
+
+    @skipUnlessGISLookup("exact")
+    def test_lookup_against_nested_geometry_collection(self):
+        geom = "POINT(0 0)"
+        for _ in range(6):
+            geom = f"GEOMETRYCOLLECTION({geom})"
+        msg = "WKT contains too many possible GeometryCollections."
+        with self.assertRaisesMessage(ValueError, msg):
+            GeometryCollectionModel.objects.filter(geom=geom)
 
 
 class GeoQuerySetTest(TestCase):
@@ -779,6 +974,7 @@ class GeoQuerySetTest(TestCase):
                 Union("point", tolerance="0.05))), (((1"),
             )
 
+    @skipUnlessGISLookup("within")
     def test_within_subquery(self):
         """
         Using a queryset inside a geo lookup is working (using a subquery)

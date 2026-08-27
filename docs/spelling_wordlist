@@ -4,6 +4,7 @@ accessors
 Aceh
 admindocs
 affordances
+ai
 Ai
 Alchin
 allowlist
@@ -51,6 +52,7 @@ benchmarking
 Benoit
 Berners
 Biggs
+Biome
 bitwise
 Bjørn
 blazingly
@@ -86,12 +88,14 @@ codebase
 codec
 codename
 codenamed
+codenames
 coercible
 commenters
 conf
 config
 contenttypes
 contrib
+cooldown
 coroutine
 coroutines
 counterintuitive
@@ -152,6 +156,7 @@ editability
 encodings
 Endian
 Enero
+enqueueing
 enum
 environ
 esque
@@ -190,6 +195,7 @@ gis
 GiST
 Googol
 Greenhill
+Granian
 gunicorn
 GZip
 gzipped
@@ -243,6 +249,8 @@ kwargs
 Kyrgyz
 latin
 lawrence
+lexeme
+lexemes
 Libera
 lifecycle
 lifecycles
@@ -308,8 +316,10 @@ Nanggroe
 natively
 nd
 needsinfo
+needsnewfeatureprocess
 německy
 nginx
+nitpicky
 noding
 nonces
 nonnegative
@@ -383,7 +393,7 @@ queryset
 querysets
 querystring
 queueing
-Quickstart
+quickstart
 quoteless
 Radziej
 rasters
@@ -414,6 +424,7 @@ reindent
 releaser
 releasers
 reloader
+remediator
 renderer
 renderers
 repo
@@ -528,12 +539,14 @@ unapplied
 unapplying
 uncategorized
 unclaim
+unclosed
 uncopyable
 unencoded
 unencrypted
 unescape
 unescaped
 unevaluated
+unfetched
 unglamorous
 ungrouped
 unhandled
@@ -552,7 +565,7 @@ unpythonic
 Unregisters
 unrendered
 unreproducible
-Unreviewed
+unreviewed
 unsanitized
 unselected
 unsets

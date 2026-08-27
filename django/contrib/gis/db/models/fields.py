@@ -3,6 +3,9 @@ from collections import defaultdict, namedtuple
 from django.contrib.gis import forms, gdal
 from django.contrib.gis.db.models.proxy import SpatialProxy
 from django.contrib.gis.gdal.error import GDALException
+from django.contrib.gis.gdal.raster.const import VSI_FILESYSTEM_PREFIX
+from django.contrib.gis.gdal.raster.source import DisallowedRasterLookup
+from django.contrib.gis.geometry import json_regex
 from django.contrib.gis.geos import (
     GeometryCollection,
     GEOSException,
@@ -14,6 +17,7 @@ from django.contrib.gis.geos import (
     Point,
     Polygon,
 )
+from django.contrib.gis.geos.prototypes.io import MAX_GEOM_COLLECTIONS
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Field
 from django.utils.translation import gettext_lazy as _
@@ -135,12 +139,12 @@ class BaseSpatialField(Field):
         """
         return get_srid_info(self.srid, connection).geodetic
 
-    def get_placeholder(self, value, compiler, connection):
+    def get_placeholder_sql(self, value, compiler, connection):
         """
         Return the placeholder for the spatial column for the
         given value.
         """
-        return connection.ops.get_geom_placeholder(self, value, compiler)
+        return connection.ops.get_geom_placeholder_sql(self, value, compiler)
 
     def get_srid(self, obj):
         """
@@ -170,21 +174,19 @@ class BaseSpatialField(Field):
     def get_raster_prep_value(self, value, is_candidate):
         """
         Return a GDALRaster if conversion is successful, otherwise return None.
+
+        Unless the user opts in by wrapping values in a GDALRaster, raise
+        DisallowedRasterLookup for values that fetch or write to disk.
         """
         if isinstance(value, gdal.GDALRaster):
             return value
-        elif is_candidate:
+        gdal.GDALRaster.check_raster_lookup_value(value)
+        if is_candidate:
             try:
                 return gdal.GDALRaster(value)
             except GDALException:
                 pass
-        elif isinstance(value, dict):
-            try:
-                return gdal.GDALRaster(value)
-            except GDALException:
-                raise ValueError(
-                    "Couldn't create spatial object from lookup value '%s'." % value
-                )
+        return None
 
     def get_prep_value(self, value):
         obj = super().get_prep_value(value)
@@ -201,22 +203,39 @@ class BaseSpatialField(Field):
                 obj, "__geo_interface__"
             )
             # Try to convert the input to raster.
-            raster = self.get_raster_prep_value(obj, is_candidate)
-
+            raster = None
+            blocked_err = None
+            try:
+                raster = self.get_raster_prep_value(obj, is_candidate)
+            except DisallowedRasterLookup as err:
+                if isinstance(obj, dict):
+                    raise err
+                # Don't immediately raise in case this is a valid GEOSGeometry.
+                blocked_err = err
             if raster:
                 obj = raster
             elif is_candidate:
+                max_geom_collections = getattr(
+                    self, "max_geom_collections", MAX_GEOM_COLLECTIONS
+                )
                 try:
-                    obj = GEOSGeometry(obj)
+                    obj = GEOSGeometry(obj, max_geom_collections=max_geom_collections)
+                except (TypeError, ValueError) as err:
+                    if isinstance(obj, str) and obj.startswith(VSI_FILESYSTEM_PREFIX):
+                        raise blocked_err
+                    raise err
                 except (GEOSException, GDALException):
+                    if isinstance(obj, str) and json_regex.match(obj):
+                        raise blocked_err
                     raise ValueError(
                         "Couldn't create spatial object from lookup value '%s'." % obj
                     )
             else:
-                raise ValueError(
+                msg = (
                     "Cannot use object with type %s for a spatial lookup parameter."
                     % type(obj).__name__
                 )
+                raise blocked_err or ValueError(msg)
 
         # Assigning the SRID value.
         obj.srid = self.get_srid(obj)
@@ -244,6 +263,7 @@ class GeometryField(BaseSpatialField):
         *,
         extent=(-180.0, -90.0, 180.0, 90.0),
         tolerance=0.05,
+        max_geom_collections=MAX_GEOM_COLLECTIONS,
         **kwargs,
     ):
         """
@@ -262,6 +282,10 @@ class GeometryField(BaseSpatialField):
         tolerance:
          Define the tolerance, in meters, to use for the geometry field
          entry in the `USER_SDO_GEOM_METADATA` table. Defaults to 0.05.
+
+        max_geom_collections:
+         The maximum number of geometry collections accepted before parsing is
+         refused, forwarded to the form field.
         """
         # Setting the dimension of the geometry field.
         self.dim = dim
@@ -273,6 +297,10 @@ class GeometryField(BaseSpatialField):
         # `USER_SDO_GEOM_METADATA`
         self._extent = extent
         self._tolerance = tolerance
+
+        # Limit on nested/total geometry collections, forwarded to the form
+        # field to guard against crashes in GEOS from deeply nested input.
+        self.max_geom_collections = max_geom_collections
 
         super().__init__(verbose_name=verbose_name, **kwargs)
 
@@ -287,6 +315,8 @@ class GeometryField(BaseSpatialField):
             kwargs["extent"] = self._extent
         if self._tolerance != 0.05:
             kwargs["tolerance"] = self._tolerance
+        if self.max_geom_collections != MAX_GEOM_COLLECTIONS:
+            kwargs["max_geom_collections"] = self.max_geom_collections
         return name, path, args, kwargs
 
     def contribute_to_class(self, cls, name, **kwargs):
@@ -304,6 +334,7 @@ class GeometryField(BaseSpatialField):
             "form_class": self.form_class,
             "geom_type": self.geom_type,
             "srid": self.srid,
+            "max_geom_collections": self.max_geom_collections,
             **kwargs,
         }
         if self.dim > 2 and not getattr(

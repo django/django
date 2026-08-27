@@ -2,6 +2,7 @@ import datetime
 import json
 
 from django.contrib.postgres import forms, lookups
+from django.contrib.postgres.utils import CheckPostgresInstalledMixin
 from django.db import models
 from django.db.backends.postgresql.psycopg_any import (
     DateRange,
@@ -12,7 +13,6 @@ from django.db.backends.postgresql.psycopg_any import (
 from django.db.models.functions import Cast
 from django.db.models.lookups import PostgresOperatorLookup
 
-from ..utils import CheckPostgresInstalledMixin
 from .utils import AttributeSetter
 
 __all__ = [
@@ -84,8 +84,12 @@ class RangeField(CheckPostgresInstalledMixin, models.Field):
     def _choices_is_value(cls, value):
         return isinstance(value, (list, tuple)) or super()._choices_is_value(value)
 
-    def get_placeholder(self, value, compiler, connection):
-        return "%s::{}".format(self.db_type(connection))
+    def get_placeholder_sql(self, value, compiler, connection):
+        db_type = self.db_type(connection)
+        if hasattr(value, "as_sql"):
+            sql, params = compiler.compile(value)
+            return f"{sql}::{db_type}", params
+        return f"%s::{db_type}", (value,)
 
     def get_prep_value(self, value):
         if value is None:

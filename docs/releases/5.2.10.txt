@@ -1,0 +1,18 @@
+===========================
+Django 5.2.10 release notes
+===========================
+
+*January 6, 2026*
+
+Django 5.2.10 fixes a data loss bug introduced in Django 5.2 and one bug
+related to support for Python 3.14.
+
+Bugfixes
+========
+
+* Fixed a bug in Django 5.2 where data exceeding ``max_length`` was silently
+  truncated by :meth:`.QuerySet.bulk_create` on PostgreSQL (:ticket:`33647`).
+
+* Fixed a bug where management command colorized help (introduced in
+  Python 3.14) ignored the :option:`--no-color` option and the
+  :envvar:`DJANGO_COLORS` setting (:ticket:`36376`).

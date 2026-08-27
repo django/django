@@ -38,6 +38,7 @@ class BaseDatabaseFeatures:
     can_use_chunked_reads = True
     can_return_columns_from_insert = False
     can_return_rows_from_bulk_insert = False
+    can_return_rows_from_update = False
     has_bulk_insert = True
     uses_savepoints = True
     can_release_savepoints = False
@@ -76,6 +77,9 @@ class BaseDatabaseFeatures:
 
     # Does the backend ignore unnecessary ORDER BY clauses in subqueries?
     ignores_unnecessary_order_by_in_subqueries = True
+
+    # Is there a true datatype for boolean?
+    has_native_boolean_field = False
 
     # Is there a true datatype for uuid?
     has_native_uuid_field = False
@@ -273,6 +277,12 @@ class BaseDatabaseFeatures:
     # Does the database support SQL 2023 ANY_VALUE in GROUP BY?
     supports_any_value = False
 
+    # Does the database support bitwise aggregations: BIT_AND, BIT_OR, and
+    # BIT_XOR?
+    supports_bit_aggregations = True
+    # Does the backend support the default parameter in bitwise aggregations?
+    supports_default_in_bit_aggregations = True
+
     # Does the backend support indexing a TextField?
     supports_index_on_text_field = True
 
@@ -372,6 +382,8 @@ class BaseDatabaseFeatures:
     supports_stored_generated_columns = False
     # Does the backend support virtual generated columns?
     supports_virtual_generated_columns = False
+    # Does the backend support altering data types of generated columns?
+    supports_alter_generated_column_data_type = True
 
     # Does the backend support the logical XOR operator?
     supports_logical_xor = False
@@ -382,12 +394,23 @@ class BaseDatabaseFeatures:
     # Does the backend support unlimited character columns?
     supports_unlimited_charfield = False
 
+    # Does the backend support numeric columns with no precision?
+    supports_no_precision_decimalfield = False
+
     # Does the backend support native tuple lookups (=, >, <, IN)?
     supports_tuple_lookups = True
 
     # Does the backend support native tuple gt(e), lt(e) comparisons against
     # subqueries?
     supports_tuple_comparison_against_subquery = True
+
+    # Does the backend support CASCADE, DEFAULT, NULL as delete options?
+    supports_on_delete_db_cascade = True
+    supports_on_delete_db_default = True
+    supports_on_delete_db_null = True
+
+    # Does the backend support the inspectdb management command?
+    supports_inspectdb = True
 
     # Collation names for use by the Django test suite.
     test_collations = {
@@ -406,12 +429,30 @@ class BaseDatabaseFeatures:
     # Does the Round() database function round to even?
     rounds_to_even = False
 
+    # Should PatternLookup.process_rhs() use self.param_pattern? It's unneeded
+    # on databases that don't use LIKE for pattern matching.
+    pattern_lookup_needs_param_pattern = True
+
     # A set of dotted paths to tests in Django's test suite that are expected
     # to fail on this database.
     django_test_expected_failures = set()
     # A map of reasons to sets of dotted paths to tests in Django's test suite
     # that should be skipped for this database.
     django_test_skips = {}
+
+    # DatabaseWrapper methods that should raise an error if accessed in
+    # django.test.SimpleTestCase.
+    disallowed_simple_test_case_connection_methods = [
+        ("connect", "connections"),
+        ("temporary_connection", "connections"),
+        ("cursor", "queries"),
+        ("chunked_cursor", "queries"),
+    ]
+
+    supports_uuid4_function = False
+    supports_uuid4_function_in_default = False
+    supports_uuid7_function = False
+    supports_uuid7_function_shift = False
 
     def __init__(self, connection):
         self.connection = connection

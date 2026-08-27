@@ -24,6 +24,7 @@ from .renderers import get_default_renderer
 
 __all__ = (
     "Script",
+    "Stylesheet",
     "Media",
     "MediaDefiningClass",
     "Widget",
@@ -71,25 +72,43 @@ class MediaAsset:
         self.attributes = attributes
 
     def __eq__(self, other):
-        # Compare the path only, to ensure performant comparison in
-        # Media.merge.
-        return (self.__class__ is other.__class__ and self.path == other.path) or (
-            isinstance(other, str) and self._path == other
-        )
+        # Compare path and attrs to ensure performant comparison
+        # in Media.merge.
+        return (
+            self.__class__ is other.__class__
+            and self._path == other._path
+            and self.attributes == other.attributes
+        ) or (isinstance(other, str) and self._path == other)
 
     def __hash__(self):
-        # Hash the path only, to ensure performant comparison in Media.merge.
+        # Compare path and attrs to ensure performant comparison
+        # in Media.merge.
+        if self.attributes:
+            return hash(self._path) ^ hash(frozenset(self.attributes.items()))
         return hash(self._path)
 
     def __str__(self):
-        return format_html(
-            self.element_template,
-            path=self.path,
-            attributes=flatatt(self.attributes),
-        )
+        return self.render()
 
     def __repr__(self):
         return f"{type(self).__qualname__}({self._path!r})"
+
+    def render(self, *, attrs=None):
+        if (
+            attrs
+            and self.attributes
+            and (conflicts := attrs.keys() & self.attributes.keys())
+        ):
+            conflicts = ", ".join(sorted(conflicts))
+            raise ValueError(
+                f"{self.__class__.__qualname__} has conflicting attributes: "
+                f"{conflicts}"
+            )
+        return format_html(
+            self.element_template,
+            path=self.path,
+            attributes=flatatt({**(attrs or {}), **self.attributes}),
+        )
 
     @property
     def path(self):
@@ -110,6 +129,13 @@ class Script(MediaAsset):
         super().__init__(src, **attributes)
 
 
+class Stylesheet(MediaAsset):
+    element_template = '<link href="{path}"{attributes}>'
+
+    def __init__(self, href, **attributes):
+        super().__init__(path=href, rel="stylesheet", **attributes)
+
+
 @html_safe
 class Media:
     def __init__(self, media=None, css=None, js=None):
@@ -121,8 +147,22 @@ class Media:
                 css = {}
             if js is None:
                 js = []
-        self._css_lists = [css]
-        self._js_lists = [js]
+        self._css_lists = [self._normalize_css(css)]
+        self._js_lists = [self._normalize_js(js)]
+
+    @staticmethod
+    def _normalize_js(js):
+        return [(path if hasattr(path, "__html__") else Script(path)) for path in js]
+
+    @staticmethod
+    def _normalize_css(css):
+        return {
+            medium: [
+                (path if hasattr(path, "__html__") else Stylesheet(path, media=medium))
+                for path in paths
+            ]
+            for medium, paths in css.items()
+        }
 
     def __repr__(self):
         return "Media(css=%r, js=%r)" % (self._css, self._js)
@@ -142,39 +182,35 @@ class Media:
     def _js(self):
         return self.merge(*self._js_lists)
 
-    def render(self):
+    def render(self, *, attrs=None):
         return mark_safe(
             "\n".join(
                 chain.from_iterable(
-                    getattr(self, "render_" + name)() for name in MEDIA_TYPES
+                    getattr(self, "render_" + name)(attrs=attrs) for name in MEDIA_TYPES
                 )
             )
         )
 
-    def render_js(self):
+    def render_js(self, *, attrs=None):
         return [
             (
-                path.__html__()
-                if hasattr(path, "__html__")
-                else format_html('<script src="{}"></script>', self.absolute_path(path))
+                path.render(attrs=attrs)
+                if isinstance(path, MediaAsset)
+                else path.__html__()
             )
             for path in self._js
         ]
 
-    def render_css(self):
+    def render_css(self, *, attrs=None):
         # To keep rendering order consistent, we can't just iterate over
         # items(). We need to sort the keys, and iterate over the sorted list.
         media = sorted(self._css)
         return chain.from_iterable(
             [
                 (
-                    path.__html__()
-                    if hasattr(path, "__html__")
-                    else format_html(
-                        '<link href="{}" media="{}" rel="stylesheet">',
-                        self.absolute_path(path),
-                        medium,
-                    )
+                    path.render(attrs=attrs)
+                    if isinstance(path, MediaAsset)
+                    else path.__html__()
                 )
                 for path in self._css[medium]
             ]
@@ -226,6 +262,8 @@ class Media:
             return list(dict.fromkeys(chain.from_iterable(filter(None, lists))))
 
     def __add__(self, other):
+        if not isinstance(other, Media):
+            return NotImplemented
         combined = Media()
         combined._css_lists = self._css_lists[:]
         combined._js_lists = self._js_lists[:]
@@ -307,7 +345,14 @@ class Widget(metaclass=MediaDefiningClass):
         """
         Return a value as it should appear when rendered in a template.
         """
-        if value == "" or value is None:
+        from django.db.models.expressions import DatabaseDefault
+
+        if (
+            value == ""
+            or value is None
+            # Empty value when db_default is used.
+            or isinstance(value, DatabaseDefault)
+        ):
             return None
         if self.is_localized:
             return formats.localize_input(value)
@@ -530,7 +575,7 @@ class ClearableFileInput(FileInput):
     input_text = _("Change")
     template_name = "django/forms/widgets/clearable_file_input.html"
     checked = False
-    use_fieldset = True
+    use_fieldset = False
 
     def clear_checkbox_name(self, name):
         """

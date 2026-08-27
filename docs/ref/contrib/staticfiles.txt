@@ -349,12 +349,6 @@ argument. For example::
             manifest_storage = StaticFilesStorage(location=settings.BASE_DIR)
             super().__init__(*args, manifest_storage=manifest_storage, **kwargs)
 
-.. admonition:: References in comments
-
-    ``ManifestStaticFilesStorage`` doesn't ignore paths in statements that are
-    commented out. This :ticket:`may crash on the nonexistent paths <21080>`.
-    You should check and eventually strip comments.
-
 .. attribute:: storage.ManifestStaticFilesStorage.manifest_hash
 
 This attribute provides a single hash that changes whenever a file in the

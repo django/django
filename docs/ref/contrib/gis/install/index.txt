@@ -57,10 +57,10 @@ supported versions, and any notes for each of the supported database backends:
 ==================  ==============================  ==================  =========================================
 Database            Library Requirements            Supported Versions  Notes
 ==================  ==============================  ==================  =========================================
-PostgreSQL          GEOS, GDAL, PROJ, PostGIS       14+                 Requires PostGIS.
-MySQL               GEOS, GDAL                      8.0.11+             :ref:`Limited functionality <mysql-spatial-limitations>`.
+PostgreSQL          GEOS, GDAL, PROJ, PostGIS       15+                 Requires PostGIS.
+MySQL               GEOS, GDAL                      8.4+                :ref:`Limited functionality <mysql-spatial-limitations>`.
 Oracle              GEOS, GDAL                      19+                 XE not supported.
-SQLite              GEOS, GDAL, PROJ, SpatiaLite    3.31.0+             Requires SpatiaLite 4.3+
+SQLite              GEOS, GDAL, PROJ, SpatiaLite    3.37.0+             Requires SpatiaLite 4.3+
 ==================  ==============================  ==================  =========================================
 
 See also `this comparison matrix`__ on the OSGeo Wiki for
@@ -242,8 +242,8 @@ Postgres.app
 ~~~~~~~~~~~~
 
 `Postgres.app <https://postgresapp.com/>`_ is a standalone PostgreSQL server
-that includes the PostGIS extension. You will also need to install ``gdal`` and
-``libgeoip`` with :ref:`homebrew`.
+that includes the PostGIS extension. You will also need to install ``gdal``
+with :ref:`homebrew`.
 
 After installing Postgres.app, add the following to your ``.bash_profile`` so
 you can run the package's programs from the command-line. Replace ``X.Y`` with
@@ -273,7 +273,6 @@ Summary:
     $ brew install postgresql
     $ brew install postgis
     $ brew install gdal
-    $ brew install libgeoip
 
 __ https://brew.sh/
 .. _Xcode: https://developer.apple.com/xcode/
@@ -305,12 +304,11 @@ Summary:
 
 .. code-block:: shell
 
-    $ sudo port install postgresql14-server
+    $ sudo port install postgresql15-server
     $ sudo port install geos
     $ sudo port install proj6
     $ sudo port install postgis3
     $ sudo port install gdal
-    $ sudo port install libgeoip
 
 .. note::
 
@@ -319,14 +317,14 @@ Summary:
 
     .. code-block:: shell
 
-        export PATH=/opt/local/bin:/opt/local/lib/postgresql14/bin
+        export PATH=/opt/local/bin:/opt/local/lib/postgresql15/bin
 
     In addition, add the ``DYLD_FALLBACK_LIBRARY_PATH`` setting so that
     the libraries can be found by Python:
 
     .. code-block:: shell
 
-        export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib:/opt/local/lib/postgresql14
+        export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib:/opt/local/lib/postgresql15
 
 __ https://www.macports.org/
 
@@ -364,7 +362,7 @@ keep this checked, as it is necessary to install :ref:`postgisasb`.
 .. note::
 
     If installed successfully, the PostgreSQL server will run in the background
-    each time the system as started as a Windows service. A
+    each time the system is started as a Windows service. A
     :menuselection:`PostgreSQL 15` start menu group will created and contains
     shortcuts for the Application Stack Builder (ASB) as well as the
     'SQL Shell', which will launch a ``psql`` command window.

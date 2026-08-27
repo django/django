@@ -295,6 +295,7 @@ applications:
   :doc:`API Reference </ref/contrib/auth>`
 * :doc:`Caching </topics/cache>`
 * :doc:`Logging </topics/logging>`
+* :doc:`Tasks framework </topics/tasks>`
 * :doc:`Sending emails </topics/email>`
 * :doc:`Syndication feeds (RSS/Atom) </ref/contrib/syndication>`
 * :doc:`Pagination </topics/pagination>`

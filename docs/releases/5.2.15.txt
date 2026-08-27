@@ -1,0 +1,79 @@
+===========================
+Django 5.2.15 release notes
+===========================
+
+*June 3, 2026*
+
+Django 5.2.15 fixes five security issues with severity "low" in 5.2.14.
+
+CVE-2026-6873: Signed cookie salt namespace collision
+=====================================================
+
+:meth:`~django.http.HttpRequest.get_signed_cookie` derived the signing salt by
+concatenating the cookie name (``key``) and ``salt`` arguments. When distinct
+name and salt pairs produced the same concatenation, cookies could be accepted
+in a context different from the one where they were signed.
+
+Cookies are now signed with an unambiguous salt derivation. For backwards
+compatibility, cookies signed by older Django versions are accepted until
+Django 7.0. Projects affected by the above ambiguity should set
+:setting:`SIGNED_COOKIE_LEGACY_SALT_FALLBACK` to ``False`` to reject older
+cookies immediately.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
+CVE-2026-7666: Potential unencrypted email transmission via ``STARTTLS`` in the SMTP backend
+============================================================================================
+
+When using :setting:`EMAIL_USE_TLS`, a failed ``STARTTLS`` handshake could
+leave a partially-initialized connection that would subsequently be reused for
+sending email without encryption. This can occur with ``fail_silently=True``,
+as used by :func:`~django.core.mail.send_mail` and
+:class:`~django.middleware.common.BrokenLinkEmailsMiddleware`, among others.
+Connections configured with :setting:`EMAIL_USE_SSL` are not affected.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
+CVE-2026-8404: Potential exposure of private data via case-sensitive ``Cache-Control`` directives
+=================================================================================================
+
+:class:`~django.middleware.cache.UpdateCacheMiddleware` and
+:func:`~django.views.decorators.cache.cache_page` incorrectly cached responses
+marked with private ``Cache-Control`` directives when using mixed or uppercase
+values (e.g. ``Private``).
+
+The :func:`~django.views.decorators.cache.cache_control` decorator and
+:func:`~django.utils.cache.patch_cache_control` function were not affected,
+since they normalize directives to lowercase. This issue only affects responses
+where ``Cache-Control`` is set manually.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
+CVE-2026-35193: Potential exposure of private data via missing ``Vary: Authorization``
+======================================================================================
+
+:class:`~django.middleware.cache.UpdateCacheMiddleware` and
+:func:`~django.views.decorators.cache.cache_page` decorator allowed responses
+to requests bearing an ``Authorization`` header (and without ``Cache-Control:
+public``) to be cached. To conform with the existing mechanism for constructing
+cache keys, responses to these requests will now :ref:`vary on
+<using-vary-headers>` ``Authorization``.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
+CVE-2026-48587: Potential exposure of private data via whitespace padding in ``Vary`` header
+============================================================================================
+
+:class:`~django.middleware.cache.UpdateCacheMiddleware` incorrectly cached
+responses whose ``Vary`` header values contained leading or trailing
+whitespace. Because ``has_vary_header()`` failed to strip that, a ``Vary: *``
+header value with surrounding whitespace was not recognized as containing the
+wildcard, causing it to be stored and potentially served from the cache when it
+should not have been.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.

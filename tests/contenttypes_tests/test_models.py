@@ -145,7 +145,7 @@ class ContentTypesTests(TestCase):
         ct = ContentType.objects.get_for_model(ModelCreatedOnTheFly)
         self.assertEqual(ct.app_label, "contenttypes_tests")
         self.assertEqual(ct.model, "modelcreatedonthefly")
-        self.assertEqual(str(ct), "modelcreatedonthefly")
+        self.assertEqual(str(ct), "contenttypes_tests | modelcreatedonthefly")
 
     def test_get_for_concrete_model(self):
         """
@@ -269,7 +269,7 @@ class ContentTypesTests(TestCase):
             app_label="contenttypes",
             model="OldModel",
         )
-        self.assertEqual(str(ct), "OldModel")
+        self.assertEqual(str(ct), "contenttypes | OldModel")
         self.assertIsNone(ct.model_class())
 
         # Stale ContentTypes can be fetched like any other object.
@@ -318,7 +318,7 @@ class ContentTypesTests(TestCase):
 
     def test_app_labeled_name_unknown_model(self):
         ct = ContentType(app_label="contenttypes_tests", model="unknown")
-        self.assertEqual(ct.app_labeled_name, "unknown")
+        self.assertEqual(ct.app_labeled_name, "contenttypes_tests | unknown")
 
 
 class TestRouter:

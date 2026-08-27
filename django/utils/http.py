@@ -3,9 +3,8 @@ import re
 import unicodedata
 from binascii import Error as BinasciiError
 from datetime import UTC, datetime
-from email.message import Message
-from email.utils import collapse_rfc2231_value, formatdate
-from urllib.parse import quote
+from email.utils import formatdate
+from urllib.parse import quote, unquote
 from urllib.parse import urlencode as original_urlencode
 from urllib.parse import urlsplit
 
@@ -40,6 +39,7 @@ ASCTIME_DATE = _lazy_re_compile(r"^\w{3} %s %s %s %s$" % (__M, __D2, __T, __Y))
 RFC3986_GENDELIMS = ":/?#[]@"
 RFC3986_SUBDELIMS = "!$&'()*+,;="
 MAX_URL_LENGTH = 2048
+MAX_URL_REDIRECT_LENGTH = 16384
 
 
 def urlencode(query, doseq=False):
@@ -170,11 +170,11 @@ def int_to_base36(i):
         raise ValueError("Negative base36 conversion input.")
     if i < 36:
         return char_set[i]
-    b36 = ""
+    b36_parts = []
     while i != 0:
         i, n = divmod(i, 36)
-        b36 = char_set[n] + b36
-    return b36
+        b36_parts.append(char_set[n])
+    return "".join(reversed(b36_parts))
 
 
 def urlsafe_base64_encode(s):
@@ -197,17 +197,46 @@ def urlsafe_base64_decode(s):
         raise ValueError(e)
 
 
+def split_header_value(value, sep=","):
+    """Yield stripped parts of an HTTP header value split by sep.
+
+    Use only with headers whose values are token lists (e.g. Vary,
+    Cache-Control). Do not use with headers that allow quoted strings in values
+    (e.g. Set-Cookie), as commas inside values will be used as separators.
+    """
+    for part in value.split(sep):
+        if stripped := part.strip():
+            yield stripped
+
+
+def split_directive_names(value):
+    """Yield the lowercased directive names from an HTTP header value.
+
+    Any qualified value is discarded, so that qualified forms permitted by
+    RFC 9111 (e.g. `private="Set-Cookie"`) reduce to their directive name
+    ("private").
+
+    Use to check for the presence of a directive when its value is not needed;
+    use `split_header_value()` when the value matters (e.g. `max-age`).
+    """
+    for part in split_header_value(value):
+        yield part.split("=", 1)[0].strip().lower()
+
+
 def parse_etags(etag_str):
     """
     Parse a string of ETags given in an If-None-Match or If-Match header as
     defined by RFC 9110. Return a list of quoted ETags, or ['*'] if all ETags
     should be matched.
+
+    ETags values containing a comma are not supported, as the comma is used as
+    list separator.
     """
     if etag_str.strip() == "*":
         return ["*"]
     else:
         # Parse each ETag individually, and return any that are valid.
-        etag_matches = (ETAG_MATCH.match(etag.strip()) for etag in etag_str.split(","))
+        etag_matches = (ETAG_MATCH.match(etag) for etag in split_header_value(etag_str))
         return [match[1] for match in etag_matches if match]
 
 
@@ -316,6 +345,19 @@ def escape_leading_slashes(url):
     return url
 
 
+def _parseparam(s):
+    while s[:1] == ";":
+        s = s[1:]
+        end = s.find(";")
+        while end > 0 and (s.count('"', 0, end) - s.count('\\"', 0, end)) % 2:
+            end = s.find(";", end + 1)
+        if end < 0:
+            end = len(s)
+        f = s[:end]
+        yield f.strip()
+        s = s[end:]
+
+
 def parse_header_parameters(line, max_length=MAX_HEADER_LENGTH):
     """
     Parse a Content-type like header.
@@ -323,21 +365,42 @@ def parse_header_parameters(line, max_length=MAX_HEADER_LENGTH):
 
     If `line` is longer than `max_length`, `ValueError` is raised.
     """
-    if max_length is not None and line and len(line) > max_length:
+    if not line:
+        return "", {}
+
+    if max_length is not None and len(line) > max_length:
         raise ValueError("Unable to parse header parameters (value too long).")
 
-    m = Message()
-    m["content-type"] = line
-    params = m.get_params()
+    # Fast path for no params.
+    if ";" not in line:
+        return line.strip().lower(), {}
 
+    parts = _parseparam(";" + line)
+    key = parts.__next__().lower()
     pdict = {}
-    key = params.pop(0)[0].lower()
-    for name, value in params:
-        if not name:
-            continue
-        if isinstance(value, tuple):
-            value = collapse_rfc2231_value(value)
-        pdict[name] = value
+    for p in parts:
+        i = p.find("=")
+        if i >= 0:
+            has_encoding = False
+            name = p[:i].strip().lower()
+            if name.endswith("*"):
+                # Embedded lang/encoding, like "filename*=UTF-8''file.ext".
+                # https://tools.ietf.org/html/rfc2231#section-4
+                name = name[:-1]
+                if p.count("'") == 2:
+                    has_encoding = True
+            value = p[i + 1 :].strip()
+            if len(value) >= 2 and value[0] == value[-1] == '"':
+                value = value[1:-1]
+                value = value.replace("\\\\", "\\").replace('\\"', '"')
+            if has_encoding:
+                encoding, lang, value = value.split("'")
+                try:
+                    value = unquote(value, encoding=encoding)
+                except (LookupError, UnicodeDecodeError):
+                    msg = f"Invalid encoding {encoding!r} for RFC 2231 param."
+                    raise ValueError(msg)
+            pdict[name] = value
     return key, pdict
 
 
@@ -357,7 +420,7 @@ def content_disposition_header(as_attachment, filename):
         # characters from 0x21 to 0x7e, except 0x22 (`"`) and 0x5C (`\`) which
         # can still be expressed but must be escaped with their own `\`.
         # https://datatracker.ietf.org/doc/html/rfc9110#name-quoted-strings
-        quotable_characters = r"^[\t \x21-\x7e]*$"
+        quotable_characters = r"^[\t \x21-\x7e]*\Z"
         if is_ascii and re.match(quotable_characters, filename):
             file_expr = 'filename="{}"'.format(
                 filename.replace("\\", "\\\\").replace('"', r"\"")

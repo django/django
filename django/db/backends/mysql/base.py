@@ -144,11 +144,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             _data_types["UUIDField"] = "uuid"
         return _data_types
 
-    # For these data types:
-    # - MySQL < 8.0.13 doesn't accept default values and implicitly treats them
-    #   as nullable
-    # - all versions of MySQL and MariaDB don't support full width database
-    #   indexes
+    # For these data types MySQL and MariaDB don't support full width database
+    # indexes.
     _limited_data_types = (
         "tinyblob",
         "blob",
@@ -337,6 +334,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 for column_name, (
                     referenced_column_name,
                     referenced_table_name,
+                    _,
                 ) in relations.items():
                     cursor.execute(
                         """
@@ -401,16 +399,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             # Select some server variables and test if the time zone
             # definitions are installed. CONVERT_TZ returns NULL if 'UTC'
             # timezone isn't loaded into the mysql.time_zone table.
-            cursor.execute(
-                """
+            cursor.execute("""
                 SELECT VERSION(),
                        @@sql_mode,
                        @@default_storage_engine,
                        @@sql_auto_is_null,
                        @@lower_case_table_names,
                        CONVERT_TZ('2001-01-01 01:00:00', 'UTC', 'UTC') IS NOT NULL
-            """
-            )
+            """)
             row = cursor.fetchone()
         return {
             "version": row[0],

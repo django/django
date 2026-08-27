@@ -11,7 +11,7 @@ from itertools import groupby
 
 from django.conf import settings
 from django.http import QueryDict
-from django.utils import timezone
+from django.utils import csp, timezone
 from django.utils.datastructures import DeferredSubDict
 from django.utils.html import conditional_escape, escape, format_html
 from django.utils.lorem_ipsum import paragraphs, words
@@ -1296,6 +1296,10 @@ def querystring(context, *args, **kwargs):
     Keyword arguments are treated as an extra, final mapping. These mappings
     are processed sequentially, with later arguments taking precedence.
 
+    Passing `None` as a value removes the corresponding key from the result.
+    For iterable values, `None` entries are ignored, but if all values are
+    `None`, the key is removed.
+
     A query string prefixed with `?` is returned.
 
     Raise TemplateSyntaxError if a positional argument is not a mapping or if
@@ -1327,7 +1331,8 @@ def querystring(context, *args, **kwargs):
                 "querystring requires mappings for positional arguments (got "
                 "%r instead)." % d
             )
-        for key, value in d.items():
+        items = d.lists() if isinstance(d, QueryDict) else d.items()
+        for key, value in items:
             if not isinstance(key, str):
                 raise TemplateSyntaxError(
                     "querystring requires strings for mapping keys (got %r "
@@ -1336,7 +1341,8 @@ def querystring(context, *args, **kwargs):
             if value is None:
                 params.pop(key, None)
             elif isinstance(value, Iterable) and not isinstance(value, str):
-                params.setlist(key, value)
+                # Drop None values; if no values remain, the key is removed.
+                params.setlist(key, [v for v in value if v is not None])
             else:
                 params[key] = value
     query_string = params.urlencode() if params else ""
@@ -1679,3 +1685,8 @@ def do_with(parser, token):
     nodelist = parser.parse(("endwith",))
     parser.delete_first_token()
     return WithNode(None, None, nodelist, extra_context=extra_context)
+
+
+@register.simple_tag(takes_context=True)
+def csp_nonce_attr(context, media=None):
+    return csp.nonce_attr(context, media)

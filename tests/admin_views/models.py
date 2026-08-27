@@ -47,6 +47,7 @@ class Article(models.Model):
         Section, models.SET_NULL, null=True, blank=True, related_name="+"
     )
 
+    @admin.display(ordering="title")
     def __str__(self):
         return self.title
 
@@ -128,6 +129,8 @@ class ChapterXtra2(models.Model):
 
 class RowLevelChangePermissionModel(models.Model):
     name = models.CharField(max_length=100, blank=True)
+    can_change = models.BooleanField(default=False)
+    can_view = models.BooleanField(default=False)
 
 
 class CustomArticle(models.Model):
@@ -266,7 +269,13 @@ class Person(models.Model):
         (2, "Female"),
     )
     name = models.CharField(max_length=100)
-    gender = models.IntegerField(choices=GENDER_CHOICES)
+    gender = models.IntegerField(
+        choices=GENDER_CHOICES,
+        verbose_name=(
+            "very very very very very very very very very "
+            "loooooooooooooooooooooooooooooooooooooooooong name"
+        ),
+    )
     age = models.IntegerField(default=21)
     alive = models.BooleanField(default=True)
 
@@ -321,7 +330,7 @@ class Subscriber(models.Model):
 
 
 class ExternalSubscriber(Subscriber):
-    pass
+    action = models.CharField(default="subscribe", max_length=80, blank=True)
 
 
 class OldSubscriber(Subscriber):
@@ -382,7 +391,9 @@ class Toy(models.Model):
     child = models.ForeignKey(PKChild, models.CASCADE)
 
 
-class EmptyModel(models.Model):
+class GetQuerySetModel(models.Model):
+    deleted = models.BooleanField(default=False)
+
     def __str__(self):
         return "Primary key = %s" % self.id
 
@@ -401,8 +412,8 @@ class Picture(models.Model):
 
 
 class Language(models.Model):
-    iso = models.CharField(max_length=5, primary_key=True)
-    name = models.CharField(max_length=50)
+    iso = models.CharField(max_length=5, primary_key=True, help_text="iso helptext")
+    name = models.CharField(max_length=50, help_text="name helptext")
     english_name = models.CharField(max_length=50)
     shortlist = models.BooleanField(default=False)
 
@@ -950,15 +961,17 @@ class DependentChild(models.Model):
 
 class _Manager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(pk__gt=1)
+        return super().get_queryset().filter(deleted=False)
 
 
 class FilteredManager(models.Model):
-    def __str__(self):
-        return "PK=%d" % self.pk
+    deleted = models.BooleanField(default=False)
 
-    pk_gt_1 = _Manager()
-    objects = models.Manager()
+    def __str__(self):
+        return "PK=%s" % self.pk
+
+    objects = _Manager()  # Default manager uses non-deleted instances only.
+    all_objects = models.Manager()
 
 
 class EmptyModelVisible(models.Model):
@@ -1190,3 +1203,12 @@ class CamelCaseModel(models.Model):
 class CamelCaseRelatedModel(models.Model):
     m2m = models.ManyToManyField(CamelCaseModel, related_name="m2m")
     fk = models.ForeignKey(CamelCaseModel, on_delete=models.CASCADE, related_name="fk")
+    # Add another relation that will not participate in filter_horizontal.
+    fk2 = models.ForeignKey(
+        CamelCaseModel, on_delete=models.CASCADE, related_name="fk2"
+    )
+
+
+# RemovedInDjango70Warning: When the deprecation ends, remove.
+class ModelAction(models.Model):
+    pass

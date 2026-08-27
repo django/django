@@ -33,6 +33,8 @@ logger = logging.getLogger("django.utils.autoreload")
 # file paths to allow watching them in the future.
 _error_files = []
 _exception = None
+# Exception raised while loading the URLConf.
+_url_module_exception = None
 
 try:
     import termios
@@ -62,7 +64,7 @@ def check_errors(fn):
         global _exception
         try:
             fn(*args, **kwargs)
-        except Exception:
+        except Exception as e:
             _exception = sys.exc_info()
 
             et, ev, tb = _exception
@@ -75,8 +77,10 @@ def check_errors(fn):
 
             if filename not in _error_files:
                 _error_files.append(filename)
+            if _url_module_exception is not None:
+                raise e from _url_module_exception
 
-            raise
+            raise e
 
     return wrapper
 
@@ -268,6 +272,19 @@ def trigger_reload(filename):
 
 def restart_with_reloader():
     new_environ = {**os.environ, DJANGO_AUTORELOAD_ENV: "true"}
+    orig = getattr(sys, "orig_argv", ())
+    if any(
+        (arg == "-u")
+        or (
+            arg.startswith("-")
+            and not arg.startswith(("--", "-X", "-W"))
+            and len(arg) > 2
+            and arg[1:].isalpha()
+            and "u" in arg
+        )
+        for arg in orig[1:]
+    ):
+        new_environ.setdefault("PYTHONUNBUFFERED", "1")
     args = get_child_arguments()
     while True:
         p = subprocess.run(args, env=new_environ, close_fds=False)
@@ -326,6 +343,7 @@ class BaseReloader:
             return False
 
     def run(self, django_main_thread):
+        global _url_module_exception
         logger.debug("Waiting for apps ready_event.")
         self.wait_for_apps_ready(apps, django_main_thread)
         from django.urls import get_resolver
@@ -334,10 +352,10 @@ class BaseReloader:
         # reloader starts by accessing the urlconf_module property.
         try:
             get_resolver().urlconf_module
-        except Exception:
+        except Exception as e:
             # Loading the urlconf can result in errors during development.
-            # If this occurs then swallow the error and continue.
-            pass
+            # If this occurs then store the error and continue.
+            _url_module_exception = e
         logger.debug("Apps ready_event triggered. Sending autoreload_started signal.")
         autoreload_started.send(sender=self)
         self.run_loop()
@@ -446,7 +464,7 @@ class WatchmanReloader(BaseReloader):
         # changes, however, as this is currently an internal API,  no files
         # will be being watched outside of sys.path. Fixing this by checking
         # inside watch_glob() and watch_dir() is expensive, instead this could
-        # could fall back to the StatReloader if this case is detected? For
+        # fall back to the StatReloader if this case is detected? For
         # now, watching its parent, if possible, is sufficient.
         if not root.exists():
             if not root.parent.exists():
@@ -513,8 +531,8 @@ class WatchmanReloader(BaseReloader):
         """
         Watch a directory with a specific glob. If the directory doesn't yet
         exist, attempt to watch the parent directory and amend the patterns to
-        include this. It's important this method isn't called more than one per
-        directory when updating all subscriptions. Subsequent calls will
+        include this. It's important this method isn't called more than once
+        per directory when updating all subscriptions. Subsequent calls will
         overwrite the named subscription, so it must include all possible glob
         expressions.
         """

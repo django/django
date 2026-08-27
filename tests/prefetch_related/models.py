@@ -225,6 +225,10 @@ class ArticleCustomUUID(models.Model):
         def get_prep_value(self, value):
             return str(value)
 
+        def get_db_prep_value(self, value, connection, prepared=False):
+            # Use prepared=False to ensure str -> UUID conversion is performed.
+            return super().get_db_prep_value(value, connection, prepared=False)
+
     id = CustomUUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=30)
 

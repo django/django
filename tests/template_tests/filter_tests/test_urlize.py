@@ -218,6 +218,13 @@ class FunctionTests(SimpleTestCase):
             'rel="nofollow">https://en.wikipedia.org/wiki/Django_(web_framework)</a>)',
         )
 
+    def test_parenthesis_and_bracket(self):
+        self.assertEqual(
+            urlize("[(https://en.wikipedia.org/)]"),
+            '[(<a href="https://en.wikipedia.org/" '
+            'rel="nofollow">https://en.wikipedia.org/</a>)]',
+        )
+
     def test_nofollow(self):
         """
         #12183 - Check urlize adds nofollow properly - see #12183

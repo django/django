@@ -1,4 +1,4 @@
-from asgiref.sync import iscoroutinefunction
+from inspect import iscoroutinefunction
 
 from django.http import HttpRequest, HttpResponse
 from django.test import SimpleTestCase
@@ -26,7 +26,7 @@ class NoAppendSlashTests(SimpleTestCase):
             return HttpResponse()
 
         self.assertIs(sync_view.should_append_slash, False)
-        self.assertIsInstance(sync_view(HttpRequest()), HttpResponse)
+        self.assertIs(type(sync_view(HttpRequest())), HttpResponse)
 
     async def test_no_append_slash_decorator_async_view(self):
         @no_append_slash
@@ -34,4 +34,4 @@ class NoAppendSlashTests(SimpleTestCase):
             return HttpResponse()
 
         self.assertIs(async_view.should_append_slash, False)
-        self.assertIsInstance(await async_view(HttpRequest()), HttpResponse)
+        self.assertIs(type(await async_view(HttpRequest())), HttpResponse)

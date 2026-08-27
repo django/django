@@ -444,7 +444,7 @@ Use the ``django.test.Client`` class to make requests.
         require different credentials. It requires whichever credentials are
         required by your backend's ``authenticate()`` method.
 
-        ``login()`` returns ``True`` if it the credentials were accepted and
+        ``login()`` returns ``True`` if the credentials were accepted and
         login was successful.
 
         Finally, you'll need to remember to create user accounts before you can
@@ -479,14 +479,20 @@ Use the ``django.test.Client`` class to make requests.
 
         The user will have its ``backend`` attribute set to the value of the
         ``backend`` argument (which should be a dotted Python path string), or
-        to ``settings.AUTHENTICATION_BACKENDS[0]`` if a value isn't provided.
-        The :func:`~django.contrib.auth.authenticate` function called by
-        :meth:`login` normally annotates the user like this.
+        if a value isn't provided, the first backend from
+        :setting:`AUTHENTICATION_BACKENDS` implementing ``get_user()`` or
+        ``aget_user()``. The :func:`~django.contrib.auth.authenticate` function
+        called by :meth:`login` normally annotates the user like this.
 
         This method is faster than ``login()`` since the expensive
         password hashing algorithms are bypassed. Also, you can speed up
         ``login()`` by :ref:`using a weaker hasher while testing
         <speeding-up-tests-auth-hashers>`.
+
+        .. versionchanged:: 6.2
+
+            On older versions, backends not implementing ``(a)get_user()`` were
+            eligible to be selected.
 
     .. method:: Client.logout()
     .. method:: Client.alogout()
@@ -801,29 +807,26 @@ A subclass of :class:`unittest.TestCase` that adds this functionality:
 
 * Some useful assertions like:
 
-  * Checking that a callable :meth:`raises a certain exception
-    <SimpleTestCase.assertRaisesMessage>`.
-  * Checking that a callable :meth:`triggers a certain warning
-    <SimpleTestCase.assertWarnsMessage>`.
-  * Testing form field :meth:`rendering and error treatment
-    <SimpleTestCase.assertFieldOutput>`.
-  * Testing :meth:`HTML responses for the presence/lack of a given fragment
-    <SimpleTestCase.assertContains>`.
-  * Verifying that a template :meth:`has/hasn't been used to generate a given
-    response content <SimpleTestCase.assertTemplateUsed>`.
-  * Verifying that two :meth:`URLs <SimpleTestCase.assertURLEqual>` are equal.
-  * Verifying an HTTP :meth:`redirect <SimpleTestCase.assertRedirects>` is
-    performed by the app.
-  * Robustly testing two :meth:`HTML fragments
-    <SimpleTestCase.assertHTMLEqual>` for equality/inequality or
-    :meth:`containment <SimpleTestCase.assertInHTML>`.
-  * Robustly testing two :meth:`XML fragments <SimpleTestCase.assertXMLEqual>`
-    for equality/inequality.
-  * Robustly testing two :meth:`JSON fragments
-    <SimpleTestCase.assertJSONEqual>` for equality.
+  =========================================== ======================================
+  Assertion                                   What it checks
+  =========================================== ======================================
+  :meth:`~SimpleTestCase.assertRaisesMessage` That a callable raises a certain exception
+  :meth:`~SimpleTestCase.assertWarnsMessage`  That a callable triggers a certain warning
+  :meth:`~SimpleTestCase.assertFieldOutput`   Form field rendering and error output
+  :meth:`~SimpleTestCase.assertContains`      Presence or absence of HTML fragments
+  :meth:`~SimpleTestCase.assertTemplateUsed`  Template usage in a response
+  :meth:`~SimpleTestCase.assertURLEqual`      That two URLs are equal
+  :meth:`~SimpleTestCase.assertRedirects`     That an HTTP redirect occurred
+  :meth:`~SimpleTestCase.assertHTMLEqual`     HTML fragment equality
+  :meth:`~SimpleTestCase.assertInHTML`        HTML fragment containment
+  :meth:`~SimpleTestCase.assertXMLEqual`      XML fragment equality or inequality
+  :meth:`~SimpleTestCase.assertJSONEqual`     JSON fragment equality
+  =========================================== ======================================
 
 * The ability to run tests with :ref:`modified settings <overriding-settings>`.
-* Using the :attr:`~SimpleTestCase.client` :class:`~django.test.Client`.
+* Access to the synchronous and asynchronous test clients via the
+  :attr:`~SimpleTestCase.client` and :attr:`~SimpleTestCase.async_client`
+  attributes.
 
 If your tests make any database queries, use subclasses
 :class:`~django.test.TransactionTestCase` or :class:`~django.test.TestCase`.
@@ -1126,13 +1129,14 @@ Default test client
 -------------------
 
 .. attribute:: SimpleTestCase.client
+.. attribute:: SimpleTestCase.async_client
 
-Every test case in a ``django.test.*TestCase`` instance has access to an
-instance of a Django test client. This client can be accessed as
-``self.client``. This client is recreated for each test, so you don't have to
+Every ``django.test.*TestCase`` instance has access to Django's synchronous
+and asynchronous test clients as ``self.client`` and ``self.async_client``,
+respectively. Both clients are recreated for each test, so you don't have to
 worry about state (such as cookies) carrying over from one test to another.
 
-This means, instead of instantiating a ``Client`` in each test::
+For example, rather than instantiating a ``Client`` in each test::
 
     import unittest
     from django.test import Client
@@ -1167,10 +1171,14 @@ Customizing the test client
 ---------------------------
 
 .. attribute:: SimpleTestCase.client_class
+.. attribute:: SimpleTestCase.async_client_class
 
-If you want to use a different ``Client`` class (for example, a subclass
-with customized behavior), use the :attr:`~SimpleTestCase.client_class` class
-attribute::
+If you want to use a different :class:`Client` or :class:`AsyncClient` class
+(for example, a subclass with customized behavior), use the
+:attr:`~SimpleTestCase.client_class` or
+:attr:`~SimpleTestCase.async_client_class` class attributes.
+
+For example, to customize the synchronous test client::
 
     from django.test import Client, TestCase
 
@@ -1186,6 +1194,9 @@ attribute::
         def test_my_stuff(self):
             # Here self.client is an instance of MyTestClient...
             call_some_test_code()
+
+The same pattern applies to the asynchronous test client by subclassing
+:class:`AsyncClient` and setting :attr:`~SimpleTestCase.async_client_class`.
 
 .. _topics-testing-fixtures:
 
@@ -1253,11 +1264,6 @@ affected by another test or by the order of test execution.
 By default, fixtures are only loaded into the ``default`` database. If you are
 using multiple databases and set :attr:`TransactionTestCase.databases`,
 fixtures will be loaded into all specified databases.
-
-.. versionchanged:: 5.2
-
-    For :class:`TransactionTestCase`, fixtures were made available during
-    ``setUpClass()``.
 
 URLconf configuration
 ---------------------
@@ -1347,7 +1353,7 @@ Overriding settings
 
 For testing purposes it's often useful to change a setting temporarily and
 revert to the original value after running the testing code. For this use case
-Django provides a standard Python context manager (see :pep:`343`) called
+Django provides a standard :ref:`context manager <context-managers>` called
 :meth:`~django.test.SimpleTestCase.settings`, which can be used like this::
 
     from django.test import TestCase
@@ -1400,8 +1406,7 @@ neither does ``remove`` when the value doesn't exist.
 .. function:: override_settings(**kwargs)
 
 In case you want to override a setting for a test method, Django provides the
-:func:`~django.test.override_settings` decorator (see :pep:`318`). It's used
-like this::
+:func:`~django.test.override_settings` :term:`python:decorator`::
 
     from django.test import TestCase, override_settings
 
@@ -1693,7 +1698,7 @@ your test suite.
 
 .. method:: SimpleTestCase.assertContains(response, text, count=None, status_code=200, msg_prefix='', html=False)
 
-    Asserts that a :class:`response <django.http.HttpResponse>` produced the
+    Asserts that an :class:`~django.http.HttpResponse` produced the
     given :attr:`~django.http.HttpResponse.status_code` and that ``text``
     appears in its :attr:`~django.http.HttpResponse.content`. If ``count``
     is provided, ``text`` must occur exactly ``count`` times in the response.
@@ -1706,7 +1711,7 @@ your test suite.
 
 .. method:: SimpleTestCase.assertNotContains(response, text, status_code=200, msg_prefix='', html=False)
 
-    Asserts that a :class:`response <django.http.HttpResponse>` produced the
+    Asserts that an :class:`~django.http.HttpResponse` produced the
     given :attr:`~django.http.HttpResponse.status_code` and that ``text`` does
     *not* appear in its :attr:`~django.http.HttpResponse.content`.
 
@@ -1721,8 +1726,8 @@ your test suite.
     Asserts that the template with the given name was used in rendering the
     response.
 
-    ``response`` must be a response instance returned by the
-    :class:`test client <django.test.Response>`.
+    ``response`` must be a :class:`~django.test.Response` instance returned by
+    the test client.
 
     ``template_name`` should be a string such as ``'admin/index.html'``.
 
@@ -1754,9 +1759,10 @@ your test suite.
 
 .. method:: SimpleTestCase.assertRedirects(response, expected_url, status_code=302, target_status_code=200, msg_prefix='', fetch_redirect_response=True)
 
-    Asserts that the :class:`response <django.http.HttpResponse>` returned a
-    :attr:`~django.http.HttpResponse.status_code` redirect status, redirected
-    to ``expected_url`` (including any ``GET`` data), and that the final page
+    Asserts that the :class:`~django.http.HttpResponse` returned a response
+    with a redirect status (based on its
+    :attr:`~django.http.HttpResponse.status_code`), redirected to
+    ``expected_url`` (including any ``GET`` data), and that the final response
     was received with ``target_status_code``.
 
     If your request used the ``follow`` argument, the ``expected_url`` and
@@ -2044,17 +2050,19 @@ creates.
 Email services
 ==============
 
-If any of your Django views send email using :doc:`Django's email
-functionality </topics/email>`, you probably don't want to send email each time
-you run a test using that view. For this reason, Django's test runner
-automatically redirects all Django-sent email to a dummy outbox. This lets you
-test every aspect of sending email -- from the number of messages sent to the
-contents of each message -- without actually sending the messages.
+If any of your code sends email using :doc:`Django's email functionality
+</topics/email>`, you probably don't want to send email each time you run a
+test that exercises that code. For this reason, Django's test runner
+automatically redirects all Django-sent email to an in-memory outbox. This lets
+you test every aspect of sending email -- from the number of messages sent to
+the contents of each message -- without actually sending the messages.
 
-The test runner accomplishes this by transparently replacing the normal
-email backend with a testing backend.
-(Don't worry -- this has no effect on any other email senders outside of
-Django, such as your machine's mail server, if you're running one.)
+The test runner accomplishes this by transparently replacing the
+:setting:`BACKEND <MAILERS-BACKEND>` for each configured :setting:`MAILERS`
+alias with the ``'locmem'`` :ref:`memory email backend
+<topic-email-memory-backend>`. (Don't worry -- this has no effect on any other
+email senders outside of Django, such as your machine's mail server, if you're
+running one.)
 
 .. currentmodule:: django.core.mail
 
@@ -2083,7 +2091,6 @@ and contents::
                 "Here is the message.",
                 "from@example.com",
                 ["to@example.com"],
-                fail_silently=False,
             )
 
             # Test that one message has been sent.
@@ -2091,6 +2098,13 @@ and contents::
 
             # Verify that the subject of the first message is correct.
             self.assertEqual(mail.outbox[0].subject, "Subject here")
+
+            # Verify the message was sent with the "default" mailer.
+            self.assertEqual(mail.outbox[0].sent_using, "default")
+
+.. versionchanged:: 6.1
+
+    The ``sent_using`` attribute was added to messages in the outbox.
 
 As noted :ref:`previously <emptying-test-outbox>`, the test outbox is emptied
 at the start of every test in a Django ``*TestCase``. To empty the outbox

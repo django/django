@@ -13,6 +13,7 @@ Generally, each model maps to a single database table.
 
    models
    queries
+   fetch-modes
    aggregation
    search
    managers

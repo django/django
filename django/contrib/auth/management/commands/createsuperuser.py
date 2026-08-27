@@ -298,9 +298,13 @@ class Command(BaseCommand):
             for unique_constraint in self.UserModel._meta.total_unique_constraints
         )
 
+    @cached_property
+    def natural_key_defined(self):
+        return hasattr(self.UserModel._default_manager, "get_by_natural_key")
+
     def _validate_username(self, username, verbose_field_name, database):
         """Validate username. If invalid, return a string error message."""
-        if self.username_is_unique:
+        if self.username_is_unique and self.natural_key_defined:
             try:
                 self.UserModel._default_manager.db_manager(database).get_by_natural_key(
                     username

@@ -26,6 +26,7 @@ API Reference
    schema-editor
    settings
    signals
+   tasks
    templates/index
    template-response
    unicode

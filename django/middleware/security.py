@@ -2,7 +2,7 @@ import re
 
 from django.conf import settings
 from django.http import HttpResponsePermanentRedirect
-from django.utils.deprecation import MiddlewareMixin
+from django.middleware import MiddlewareMixin
 
 
 class SecurityMiddleware(MiddlewareMixin):

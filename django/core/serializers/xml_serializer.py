@@ -9,7 +9,7 @@ from xml.sax.expatreader import ExpatParser as _ExpatParser
 
 from django.apps import apps
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, SuspiciousOperation
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
 from django.utils.xmlutils import SimplerXMLGenerator, UnserializableContentError
@@ -28,6 +28,10 @@ class Serializer(base.Serializer):
         """
         Start serialization -- open the XML document and the root element.
         """
+        # Increment the indent_level before each startElement() and decrement
+        # it following each endElement(). If the closing tag should appear on
+        # its own line, use self.indent(self.indent_level) before endElement().
+        self.indent_level = 0
         self.xml = SimplerXMLGenerator(
             self.stream, self.options.get("encoding", settings.DEFAULT_CHARSET)
         )
@@ -38,7 +42,7 @@ class Serializer(base.Serializer):
         """
         End serialization -- end the document.
         """
-        self.indent(0)
+        self.indent(self.indent_level)
         self.xml.endElement("django-objects")
         self.xml.endDocument()
 
@@ -51,28 +55,37 @@ class Serializer(base.Serializer):
                 "Non-model object (%s) encountered during serialization" % type(obj)
             )
 
-        self.indent(1)
+        self.indent_level += 1
+        self.indent(self.indent_level)
         attrs = {"model": str(obj._meta)}
-        if not self.use_natural_primary_keys or not hasattr(obj, "natural_key"):
+        if not self.use_natural_primary_keys or not self._resolve_natural_key(obj):
             obj_pk = obj.pk
             if obj_pk is not None:
                 attrs["pk"] = obj._meta.pk.value_to_string(obj)
 
-        self.xml.startElement("object", attrs)
+        try:
+            self.xml.startElement("object", attrs)
+        except UnserializableContentError:
+            raise ValueError(
+                "%s (pk:%s) contains unserializable characters"
+                % (obj.__class__.__name__, obj.pk)
+            )
 
     def end_object(self, obj):
         """
         Called after handling all fields for an object.
         """
-        self.indent(1)
+        self.indent(self.indent_level)
         self.xml.endElement("object")
+        self.indent_level -= 1
 
     def handle_field(self, obj, field):
         """
         Handle each field on an object (except for ForeignKeys and
         ManyToManyFields).
         """
-        self.indent(2)
+        self.indent_level += 1
+        self.indent(self.indent_level)
         self.xml.startElement(
             "field",
             {
@@ -99,6 +112,7 @@ class Serializer(base.Serializer):
             self.xml.addQuickElement("None")
 
         self.xml.endElement("field")
+        self.indent_level -= 1
 
     def handle_fk_field(self, obj, field):
         """
@@ -108,22 +122,23 @@ class Serializer(base.Serializer):
         self._start_relational_field(field)
         related_att = getattr(obj, field.attname)
         if related_att is not None:
-            if self.use_natural_foreign_keys and hasattr(
-                field.remote_field.model, "natural_key"
+            if self.use_natural_foreign_keys and (
+                natural_key_value := self._resolve_fk_natural_key(obj, field)
             ):
-                related = getattr(obj, field.name)
-                # If related object has a natural key, use it
-                related = related.natural_key()
                 # Iterable natural keys are rolled out as subelements
-                for key_value in related:
+                for key_value in natural_key_value:
                     self.xml.startElement("natural", {})
-                    self.xml.characters(str(key_value))
+                    if key_value is None:
+                        self.xml.addQuickElement("None")
+                    else:
+                        self.xml.characters(str(key_value))
                     self.xml.endElement("natural")
             else:
                 self.xml.characters(str(related_att))
         else:
             self.xml.addQuickElement("None")
         self.xml.endElement("field")
+        self.indent_level -= 1
 
     def handle_m2m_field(self, obj, field):
         """
@@ -133,34 +148,56 @@ class Serializer(base.Serializer):
         """
         if field.remote_field.through._meta.auto_created:
             self._start_relational_field(field)
-            if self.use_natural_foreign_keys and hasattr(
-                field.remote_field.model, "natural_key"
+            if self.use_natural_foreign_keys and self._model_supports_natural_key(
+                field.remote_field.model
             ):
                 # If the objects in the m2m have a natural key, use it
                 def handle_m2m(value):
-                    natural = value.natural_key()
-                    # Iterable natural keys are rolled out as subelements
-                    self.xml.startElement("object", {})
-                    for key_value in natural:
-                        self.xml.startElement("natural", {})
-                        self.xml.characters(str(key_value))
-                        self.xml.endElement("natural")
-                    self.xml.endElement("object")
+                    if natural := self._resolve_natural_key(value):
+                        # Iterable natural keys are rolled out as subelements
+                        self.xml.startElement("object", {})
+                        for key_value in natural:
+                            self.xml.startElement("natural", {})
+                            if key_value is None:
+                                self.xml.addQuickElement("None")
+                            else:
+                                self.xml.characters(str(key_value))
+                            self.xml.endElement("natural")
+                        self.xml.endElement("object")
+                    else:
+                        self.xml.addQuickElement("object", attrs={"pk": str(value.pk)})
 
                 def queryset_iterator(obj, field):
                     attr = getattr(obj, field.name)
                     chunk_size = (
                         2000 if getattr(attr, "prefetch_cache_name", None) else None
                     )
-                    return attr.iterator(chunk_size)
+                    query_set = attr.all()
+                    if not query_set.totally_ordered:
+                        current_ordering = (
+                            query_set.query.order_by
+                            or query_set.model._meta.ordering
+                            or []
+                        )
+                        query_set = query_set.order_by(*current_ordering, "pk")
+                    return query_set.iterator(chunk_size)
 
             else:
 
                 def handle_m2m(value):
+                    # Put each object on its own line.
+                    self.indent(self.indent_level + 1)
                     self.xml.addQuickElement("object", attrs={"pk": str(value.pk)})
 
                 def queryset_iterator(obj, field):
                     query_set = getattr(obj, field.name).select_related(None).only("pk")
+                    if not query_set.totally_ordered:
+                        current_ordering = (
+                            query_set.query.order_by
+                            or query_set.model._meta.ordering
+                            or []
+                        )
+                        query_set = query_set.order_by(*current_ordering, "pk")
                     chunk_size = 2000 if query_set._prefetch_related_lookups else None
                     return query_set.iterator(chunk_size=chunk_size)
 
@@ -168,14 +205,20 @@ class Serializer(base.Serializer):
                 field.name,
                 queryset_iterator(obj, field),
             )
+            relobj = None
             for relobj in m2m_iter:
                 handle_m2m(relobj)
-
+            if relobj:
+                # If there are related objects (which appear each on their own
+                # line), put the closing </field> on the next line.
+                self.indent(self.indent_level)
             self.xml.endElement("field")
+            self.indent_level -= 1
 
     def _start_relational_field(self, field):
         """Output the <field> element for relational fields."""
-        self.indent(2)
+        self.indent_level += 1
+        self.indent(self.indent_level)
         self.xml.startElement(
             "field",
             {
@@ -234,7 +277,7 @@ class Deserializer(base.Deserializer):
 
         field_names = {f.name for f in Model._meta.get_fields()}
         # Deserialize each field.
-        for field_node in node.getElementsByTagName("field"):
+        for field_node in getChildrenByTagName(node, "field"):
             # If the field is missing the name attribute, bail (are you
             # sensing a pattern here?)
             field_name = field_node.getAttribute("name")
@@ -259,10 +302,14 @@ class Deserializer(base.Deserializer):
                 if value == base.DEFER_FIELD:
                     deferred_fields[field] = [
                         [
-                            getInnerText(nat_node).strip()
-                            for nat_node in obj_node.getElementsByTagName("natural")
+                            (
+                                None
+                                if getChildrenByTagName(nat_node, "None")
+                                else getInnerText(nat_node).strip()
+                            )
+                            for nat_node in getChildrenByTagName(obj_node, "natural")
                         ]
-                        for obj_node in field_node.getElementsByTagName("object")
+                        for obj_node in getChildrenByTagName(field_node, "object")
                     ]
                 else:
                     m2m_data[field.name] = value
@@ -272,13 +319,17 @@ class Deserializer(base.Deserializer):
                 value = self._handle_fk_field_node(field_node, field)
                 if value == base.DEFER_FIELD:
                     deferred_fields[field] = [
-                        getInnerText(k).strip()
-                        for k in field_node.getElementsByTagName("natural")
+                        (
+                            None
+                            if getChildrenByTagName(k, "None")
+                            else getInnerText(k).strip()
+                        )
+                        for k in getChildrenByTagName(field_node, "natural")
                     ]
                 else:
                     data[field.attname] = value
             else:
-                if field_node.getElementsByTagName("None"):
+                if getChildrenByTagName(field_node, "None"):
                     value = None
                 else:
                     value = field.to_python(getInnerText(field_node).strip())
@@ -297,16 +348,21 @@ class Deserializer(base.Deserializer):
         Handle a <field> node for a ForeignKey
         """
         # Check if there is a child node named 'None', returning None if so.
-        if node.getElementsByTagName("None"):
+        natural_keys = getChildrenByTagName(node, "natural")
+        if getChildrenByTagName(node, "None") and not natural_keys:
             return None
         else:
             model = field.remote_field.model
             if hasattr(model._default_manager, "get_by_natural_key"):
-                keys = node.getElementsByTagName("natural")
-                if keys:
+                if natural_keys:
                     # If there are 'natural' subelements, it must be a natural
                     # key
-                    field_value = [getInnerText(k).strip() for k in keys]
+                    field_value = []
+                    for k in natural_keys:
+                        if getChildrenByTagName(k, "None"):
+                            field_value.append(None)
+                        else:
+                            field_value.append(getInnerText(k).strip())
                     try:
                         obj = model._default_manager.db_manager(
                             self.db
@@ -343,11 +399,16 @@ class Deserializer(base.Deserializer):
         if hasattr(default_manager, "get_by_natural_key"):
 
             def m2m_convert(n):
-                keys = n.getElementsByTagName("natural")
+                keys = getChildrenByTagName(n, "natural")
                 if keys:
                     # If there are 'natural' subelements, it must be a natural
                     # key
-                    field_value = [getInnerText(k).strip() for k in keys]
+                    field_value = []
+                    for k in keys:
+                        if getChildrenByTagName(k, "None"):
+                            field_value.append(None)
+                        else:
+                            field_value.append(getInnerText(k).strip())
                     obj_pk = (
                         default_manager.db_manager(self.db)
                         .get_by_natural_key(*field_value)
@@ -365,8 +426,10 @@ class Deserializer(base.Deserializer):
 
         values = []
         try:
-            for c in node.getElementsByTagName("object"):
+            for c in getChildrenByTagName(node, "object"):
                 values.append(m2m_convert(c))
+        except SuspiciousOperation:
+            raise
         except Exception as e:
             if isinstance(e, ObjectDoesNotExist) and self.handle_forward_references:
                 return base.DEFER_FIELD
@@ -395,22 +458,35 @@ class Deserializer(base.Deserializer):
             )
 
 
+def check_element_type(element):
+    if element.childNodes:
+        raise SuspiciousOperation(f"Unexpected element: {element.tagName!r}")
+    return element.nodeType in (element.TEXT_NODE, element.CDATA_SECTION_NODE)
+
+
+def getChildrenByTagName(node, tag_name):
+    """
+    Like Element.getElementsByTagName() but return only direct children.
+
+    Element.getElementsByTagName() searches all descendants (direct children,
+    children's children, etc.). This prevents correct deserialization of
+    third-party nested fields. For example:
+
+      <field name="author" type="EmbeddedModelField">
+        <object model="app.Model">
+          <field name="id" type="..."><None></None></field>
+    """
+    return [
+        n
+        for n in node.childNodes
+        if n.nodeType == node.ELEMENT_NODE and n.tagName == tag_name
+    ]
+
+
 def getInnerText(node):
-    """Get all the inner text of a DOM node (recursively)."""
-    # inspired by
-    # https://mail.python.org/pipermail/xml-sig/2005-March/011022.html
-    inner_text = []
-    for child in node.childNodes:
-        if (
-            child.nodeType == child.TEXT_NODE
-            or child.nodeType == child.CDATA_SECTION_NODE
-        ):
-            inner_text.append(child.data)
-        elif child.nodeType == child.ELEMENT_NODE:
-            inner_text.extend(getInnerText(child))
-        else:
-            pass
-    return "".join(inner_text)
+    return "".join(
+        [child.data for child in node.childNodes if check_element_type(child)]
+    )
 
 
 # Below code based on Christian Heimes' defusedxml

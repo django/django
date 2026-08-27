@@ -1,7 +1,8 @@
 from datetime import date
 from decimal import Decimal
 
-from django.core.exceptions import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, FieldFetchBlocked
+from django.db.models import FETCH_PEERS, FETCH_RAISE
 from django.db.models.query import RawQuerySet
 from django.test import TestCase, skipUnlessDBFeature
 
@@ -136,8 +137,8 @@ class RawQueryTests(TestCase):
         """
         Basic test of raw query with a simple database query
         """
-        query = "SELECT * FROM raw_query_author"
-        authors = Author.objects.all()
+        query = "SELECT * FROM raw_query_author ORDER BY id"
+        authors = Author.objects.order_by("pk")
         self.assertSuccessfulRawQuery(Author, query, authors)
 
     def test_raw_query_lazy(self):
@@ -154,17 +155,33 @@ class RawQueryTests(TestCase):
         """
         Test of a simple raw query against a model containing a foreign key
         """
-        query = "SELECT * FROM raw_query_book"
-        books = Book.objects.all()
+        query = "SELECT * FROM raw_query_book ORDER BY id"
+        books = Book.objects.order_by("pk")
         self.assertSuccessfulRawQuery(Book, query, books)
+
+    def test_fk_fetch_mode_peers(self):
+        query = "SELECT * FROM raw_query_book"
+        books = list(Book.objects.fetch_mode(FETCH_PEERS).raw(query))
+        with self.assertNumQueries(1):
+            books[0].author
+            books[1].author
+
+    def test_fk_fetch_mode_raise(self):
+        query = "SELECT * FROM raw_query_book"
+        books = list(Book.objects.fetch_mode(FETCH_RAISE).raw(query))
+        msg = "Fetching of Book.author blocked."
+        with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
+            books[0].author
+        self.assertIsNone(cm.exception.__cause__)
+        self.assertTrue(cm.exception.__suppress_context__)
 
     def test_db_column_handler(self):
         """
         Test of a simple raw query against a model containing a field with
         db_column defined.
         """
-        query = "SELECT * FROM raw_query_coffee"
-        coffees = Coffee.objects.all()
+        query = "SELECT * FROM raw_query_coffee ORDER BY id"
+        coffees = Coffee.objects.order_by("pk")
         self.assertSuccessfulRawQuery(Coffee, query, coffees)
 
     def test_pk_with_mixed_case_db_column(self):
@@ -184,8 +201,8 @@ class RawQueryTests(TestCase):
         )
 
         for select in selects:
-            query = "SELECT %s FROM raw_query_author" % select
-            authors = Author.objects.all()
+            query = "SELECT %s FROM raw_query_author ORDER BY id" % select
+            authors = Author.objects.order_by("pk")
             self.assertSuccessfulRawQuery(Author, query, authors)
 
     def test_translations(self):
@@ -195,10 +212,10 @@ class RawQueryTests(TestCase):
         """
         query = (
             "SELECT first_name AS first, last_name AS last, dob, id "
-            "FROM raw_query_author"
+            "FROM raw_query_author ORDER BY id"
         )
         translations = {"first": "first_name", "last": "last_name"}
-        authors = Author.objects.all()
+        authors = Author.objects.order_by("pk")
         self.assertSuccessfulRawQuery(Author, query, authors, translations=translations)
 
     def test_params(self):
@@ -270,15 +287,15 @@ class RawQueryTests(TestCase):
         """
         Test of a simple raw query against a model containing a m2m field
         """
-        query = "SELECT * FROM raw_query_reviewer"
-        reviewers = Reviewer.objects.all()
+        query = "SELECT * FROM raw_query_reviewer ORDER BY id"
+        reviewers = Reviewer.objects.order_by("pk")
         self.assertSuccessfulRawQuery(Reviewer, query, reviewers)
 
     def test_extra_conversions(self):
         """Extra translations are ignored."""
-        query = "SELECT * FROM raw_query_author"
+        query = "SELECT * FROM raw_query_author ORDER BY id"
         translations = {"something": "else"}
-        authors = Author.objects.all()
+        authors = Author.objects.order_by("pk")
         self.assertSuccessfulRawQuery(Author, query, authors, translations=translations)
 
     def test_missing_fields(self):
@@ -293,6 +310,23 @@ class RawQueryTests(TestCase):
         msg = "Raw query must include the primary key"
         with self.assertRaisesMessage(FieldDoesNotExist, msg):
             list(Author.objects.raw(query))
+
+    def test_missing_fields_fetch_mode_peers(self):
+        query = "SELECT id, first_name, dob FROM raw_query_author"
+        authors = list(Author.objects.fetch_mode(FETCH_PEERS).raw(query))
+        with self.assertNumQueries(1):
+            authors[0].last_name
+            authors[1].last_name
+
+    def test_missing_fields_fetch_mode_raise(self):
+        query = "SELECT id, first_name, dob FROM raw_query_author"
+        authors = list(Author.objects.fetch_mode(FETCH_RAISE).raw(query))
+        msg = "Fetching of Author.last_name blocked."
+        with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
+            authors[0].last_name
+        self.assertIsNone(cm.exception.__cause__)
+        self.assertTrue(cm.exception.__suppress_context__)
+        self.assertTrue(cm.exception.__suppress_context__)
 
     def test_annotations(self):
         query = (
@@ -311,13 +345,13 @@ class RawQueryTests(TestCase):
         self.assertSuccessfulRawQuery(Author, query, authors, expected_annotations)
 
     def test_white_space_query(self):
-        query = "    SELECT * FROM raw_query_author"
-        authors = Author.objects.all()
+        query = "    SELECT * FROM raw_query_author ORDER BY id"
+        authors = Author.objects.order_by("pk")
         self.assertSuccessfulRawQuery(Author, query, authors)
 
     def test_multiple_iterations(self):
-        query = "SELECT * FROM raw_query_author"
-        normal_authors = Author.objects.all()
+        query = "SELECT * FROM raw_query_author ORDER BY id"
+        normal_authors = Author.objects.order_by("pk")
         raw_authors = Author.objects.raw(query)
 
         # First Iteration

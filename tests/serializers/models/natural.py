@@ -2,6 +2,7 @@
 
 import uuid
 
+from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
 
 
@@ -74,3 +75,47 @@ class FKAsPKNoNaturalKey(models.Model):
 
     def natural_key(self):
         raise NotImplementedError("This method was not expected to be called.")
+
+
+class SubclassNaturalKeyOptOutUser(AbstractBaseUser):
+    email = models.EmailField(unique=False, null=True, blank=True)
+    USERNAME_FIELD = "email"
+
+    def natural_key(self):
+        return ()
+
+
+class PostToOptOutSubclassUser(models.Model):
+    author = models.ForeignKey(SubclassNaturalKeyOptOutUser, on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+    subscribers = models.ManyToManyField(
+        SubclassNaturalKeyOptOutUser, related_name="subscribed_posts", blank=True
+    )
+
+
+class NaturalKeyWithNullableFieldManager(models.Manager):
+    def get_by_natural_key(self, name, optional_id):
+        return self.get(name=name, optional_id=optional_id)
+
+
+class NaturalKeyWithNullableField(models.Model):
+    name = models.CharField(max_length=100)
+    optional_id = models.CharField(max_length=100, null=True, blank=True)
+
+    objects = NaturalKeyWithNullableFieldManager()
+
+    class Meta:
+        unique_together = [["name", "optional_id"]]
+
+    def natural_key(self):
+        return (self.name, self.optional_id)
+
+
+class FKToNaturalKeyWithNullable(models.Model):
+    ref = models.ForeignKey(
+        NaturalKeyWithNullableField, on_delete=models.CASCADE, null=True
+    )
+    refs = models.ManyToManyField(
+        NaturalKeyWithNullableField, related_name="m2m_referrers"
+    )
+    data = models.CharField(max_length=100, default="")

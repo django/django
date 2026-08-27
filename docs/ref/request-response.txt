@@ -186,7 +186,7 @@ All attributes should be considered read-only, unless stated otherwise.
     .. code-block:: pycon
 
         >>> request.headers
-        {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6', ...}
+        {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6', ...)}
 
         >>> "User-Agent" in request.headers
         True
@@ -217,6 +217,30 @@ All attributes should be considered read-only, unless stated otherwise.
     which means it's available in all views but not in middleware which are
     executed before URL resolving takes place (you can use it in
     :meth:`process_view` though).
+
+.. attribute:: HttpRequest.multipart_parser_class
+
+    .. versionadded:: 6.1
+
+    The class used to parse ``multipart/form-data`` request data. By default,
+    this is ``django.http.multipartparser.MultiPartParser``.
+
+    You can set this attribute to use a custom multipart parser, either via
+    middleware or directly in views::
+
+        from django.http.multipartparser import MultiPartParser
+
+
+        class CustomMultiPartParser(MultiPartParser):
+            def parse(self):
+                post = QueryDict(mutable=True)
+                files = MultiValueDict()
+                # Custom processing logic here
+                return post, files
+
+
+        # In middleware or view:
+        request.multipart_parser_class = CustomMultiPartParser
 
 Attributes set by application code
 ----------------------------------
@@ -283,8 +307,7 @@ middleware class is listed in :setting:`MIDDLEWARE`.
         else:
             ...  # Do something for anonymous users.
 
-    The :meth:`auser` method does the same thing but can be used from async
-    contexts.
+    The :meth:`auser` can be used to access the user in async contexts.
 
 Methods
 -------
@@ -395,11 +418,14 @@ Methods
     no longer valid. If you provide the ``default`` argument the exception
     will be suppressed and that default value will be returned instead.
 
-    The optional ``salt`` argument can be used to provide extra protection
-    against brute force attacks on your secret key. If supplied, the
-    ``max_age`` argument will be checked against the signed timestamp
-    attached to the cookie value to ensure the cookie is not older than
-    ``max_age`` seconds.
+    The optional ``salt`` argument can be used to put the cookie into a
+    separate signature namespace. If supplied, the ``max_age`` argument will
+    be checked against the signed timestamp attached to the cookie value to
+    ensure the cookie is not older than ``max_age`` seconds.
+
+    Cookies signed by older Django versions are accepted by default for
+    backwards compatibility. Set :setting:`SIGNED_COOKIE_LEGACY_SALT_FALLBACK`
+    to ``False`` to reject them.
 
     For example:
 
@@ -428,8 +454,6 @@ Methods
     HTTPS.
 
 .. method:: HttpRequest.get_preferred_type(media_types)
-
-    .. versionadded:: 5.2
 
     Returns the preferred mime type from ``media_types``, based on the
     ``Accept`` header, or ``None`` if the client does not accept any of the
@@ -882,8 +906,6 @@ Attributes
 
 .. attribute:: HttpResponse.text
 
-    .. versionadded:: 5.2
-
     A string representation of :attr:`HttpResponse.content`, decoded using the
     response's :attr:`HttpResponse.charset` (defaulting to ``UTF-8`` if empty).
 
@@ -1046,8 +1068,9 @@ Methods
     Like :meth:`~HttpResponse.set_cookie`, but
     :doc:`cryptographic signing </topics/signing>` the cookie before setting
     it. Use in conjunction with :meth:`HttpRequest.get_signed_cookie`.
-    You can use the optional ``salt`` argument for added key strength, but
-    you will need to remember to pass it to the corresponding
+    You can use the optional ``salt`` argument to put the cookie into a
+    separate signature namespace, but you will need to remember to pass it to
+    the corresponding
     :meth:`HttpRequest.get_signed_cookie` call.
 
 .. method:: HttpResponse.delete_cookie(key, path='/', domain=None, samesite=None)
@@ -1062,7 +1085,7 @@ Methods
 .. method:: HttpResponse.close()
 
     This method is called at the end of the request directly by the WSGI
-    server.
+    or ASGI server.
 
 .. method:: HttpResponse.write(content)
 
@@ -1123,26 +1146,26 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     that defaults to ``False``, producing a response with a 302 status code. If
     ``preserve_request`` is ``True``, the status code will be 307 instead.
 
+    The constructor accepts an optional ``max_length`` keyword argument to
+    override the maximum allowed length for the redirect URL. You can set it
+    to ``None`` to disable the length check.
+
     See :class:`HttpResponse` for other optional constructor arguments.
+
+    .. versionchanged:: 6.1
+
+       ``max_length`` was added.
 
     .. attribute:: HttpResponseRedirect.url
 
         This read-only attribute represents the URL the response will redirect
         to (equivalent to the ``Location`` response header).
 
-    .. versionchanged:: 5.2
-
-        The ``preserve_request`` argument was added.
-
 .. class:: HttpResponsePermanentRedirect
 
     Like :class:`HttpResponseRedirect`, but it returns a permanent redirect
     (HTTP status code 301) instead of a "found" redirect (status code 302).
     When ``preserve_request=True``, the response's status code is 308.
-
-    .. versionchanged:: 5.2
-
-        The ``preserve_request`` argument was added.
 
 .. class:: HttpResponseNotModified
 
@@ -1199,7 +1222,7 @@ can create it with the help of :class:`http.HTTPStatus`. For example::
 ``JsonResponse`` objects
 ========================
 
-.. class:: JsonResponse(data, encoder=DjangoJSONEncoder, safe=True, json_dumps_params=None, **kwargs)
+.. class:: JsonResponse(data, encoder=DjangoJSONEncoder, safe=False, json_dumps_params=None, **kwargs)
 
     An :class:`HttpResponse` subclass that helps to create a JSON-encoded
     response. It inherits most behavior from its superclass with a couple
@@ -1216,13 +1239,21 @@ can create it with the help of :class:`http.HTTPStatus`. For example::
     serialize the data. See :ref:`JSON serialization
     <serialization-formats-json>` for more details about this serializer.
 
-    The ``safe`` boolean parameter defaults to ``True``. If it's set to
+    The ``safe`` boolean parameter defaults to ``False``. If it's set to
     ``False``, any object can be passed for serialization (otherwise only
     ``dict`` instances are allowed). If ``safe`` is ``True`` and a non-``dict``
     object is passed as the first argument, a :exc:`TypeError` will be raised.
 
     The ``json_dumps_params`` parameter is a dictionary of keyword arguments
     to pass to the ``json.dumps()`` call used to generate the response.
+
+.. versionchanged:: 6.2
+
+    In earlier versions, the ``safe`` parameter defaulted to ``True``.
+
+.. deprecated:: 6.2
+
+    The ``safe`` parameter is deprecated.
 
 Usage
 -----
@@ -1239,28 +1270,21 @@ Typical usage could look like:
 Serializing non-dictionary objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In order to serialize objects other than ``dict`` you must set the ``safe``
-parameter to ``False``:
+Objects other than ``dict`` can be serialized:
 
 .. code-block:: pycon
 
-    >>> response = JsonResponse([1, 2, 3], safe=False)
-
-Without passing ``safe=False``, a :exc:`TypeError` will be raised.
+    >>> response = JsonResponse([1, 2, 3])
 
 Note that an API based on ``dict`` objects is more extensible, flexible, and
 makes it easier to maintain forwards compatibility. Therefore, you should avoid
-using non-dict objects in JSON-encoded response.
+using non-dict objects in JSON-encoded responses.
 
-.. warning::
+.. versionchanged:: 6.2
 
-    Before the `5th edition of ECMAScript
-    <https://262.ecma-international.org/5.1/#sec-11.1.4>`_ it was possible to
-    poison the JavaScript ``Array`` constructor. For this reason, Django does
-    not allow passing non-dict objects to the
-    :class:`~django.http.JsonResponse` constructor by default. However, most
-    modern browsers implement ECMAScript 5 which removes this attack vector.
-    Therefore it is possible to disable this security precaution.
+    In earlier versions, it was necessary to pass ``safe=False`` to serialize
+    other objects besides dictionaries, as the (now deprecated) ``safe``
+    parameter defaulted to ``True``, raising :exc:`TypeError`.
 
 Changing the default JSON encoder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

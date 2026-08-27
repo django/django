@@ -1,6 +1,7 @@
+import contextvars
+import gc
+from inspect import markcoroutinefunction
 from unittest import mock
-
-from asgiref.sync import markcoroutinefunction
 
 from django import dispatch
 from django.apps.registry import Apps
@@ -14,26 +15,34 @@ from .models import Author, Book, Car, Page, Person
 
 
 class BaseSignalSetup:
+    def _signal_counts(self):
+        # Clear dead receivers before counting.
+        counts = []
+        for signal in (
+            signals.pre_save,
+            signals.post_save,
+            signals.pre_delete,
+            signals.post_delete,
+        ):
+            with signal.lock:
+                signal._clear_dead_receivers()
+            counts.append(len(signal.receivers))
+        return tuple(counts)
+
     def setUp(self):
-        # Save up the number of connected signals so that we can check at the
-        # end that all the signals we register get properly unregistered
-        # (#9989)
-        self.pre_signals = (
-            len(signals.pre_save.receivers),
-            len(signals.post_save.receivers),
-            len(signals.pre_delete.receivers),
-            len(signals.post_delete.receivers),
-        )
+        # The count comparison in tearDown() is a regression check for
+        # Signal.disconnect() failing to remove entries (#9989). Collect first
+        # so the baseline contains only reachable receivers; a receiver
+        # connected elsewhere in the suite and then garbage-collected could
+        # linger as a dead weakref, inflating the count (#29187). No collection
+        # in tearDown(): a weak receiver kept alive by a cycle should be
+        # counted, to catch a forgotten disconnect.
+        gc.collect()
+        self.pre_signals = self._signal_counts()
 
     def tearDown(self):
         # All our signals got disconnected properly.
-        post_signals = (
-            len(signals.pre_save.receivers),
-            len(signals.post_save.receivers),
-            len(signals.pre_delete.receivers),
-            len(signals.post_delete.receivers),
-        )
-        self.assertEqual(self.pre_signals, post_signals)
+        self.assertEqual(self.pre_signals, self._signal_counts())
 
 
 class SignalTests(BaseSignalSetup, TestCase):
@@ -645,3 +654,238 @@ class AsyncReceiversTests(SimpleTestCase):
 
         result = await signal.asend_robust(self.__class__)
         self.assertEqual(result, [(async_handler, 1)])
+
+
+class TestReceiversContextVarsSharing(SimpleTestCase):
+    def setUp(self):
+        self.ctx_var = contextvars.ContextVar("test_var", default=0)
+
+        class CtxSyncHandler:
+            def __init__(self, ctx_var):
+                self.ctx_var = ctx_var
+                self.values = []
+
+            def __call__(self, **kwargs):
+                val = self.ctx_var.get()
+                self.ctx_var.set(val + 1)
+                self.values.append(self.ctx_var.get())
+                return self.ctx_var.get()
+
+        class CtxAsyncHandler:
+            def __init__(self, ctx_var):
+                self.ctx_var = ctx_var
+                self.values = []
+                markcoroutinefunction(self)
+
+            async def __call__(self, **kwargs):
+                val = self.ctx_var.get()
+                self.ctx_var.set(val + 1)
+                self.values.append(self.ctx_var.get())
+                return self.ctx_var.get()
+
+        self.CtxSyncHandler = CtxSyncHandler
+        self.CtxAsyncHandler = CtxAsyncHandler
+
+    async def test_asend_correct_contextvars_sharing_async_receivers(self):
+        handler1 = self.CtxAsyncHandler(self.ctx_var)
+        handler2 = self.CtxAsyncHandler(self.ctx_var)
+        signal = dispatch.Signal()
+        signal.connect(handler1)
+        signal.connect(handler2)
+
+        # set custom value outer signal
+        self.ctx_var.set(1)
+
+        await signal.asend(self.__class__)
+
+        self.assertEqual(len(handler1.values), 1)
+        self.assertEqual(len(handler2.values), 1)
+        self.assertEqual(sorted([*handler1.values, *handler2.values]), [2, 3])
+        self.assertEqual(self.ctx_var.get(), 3)
+
+    async def test_asend_correct_contextvars_sharing_sync_receivers(self):
+        handler1 = self.CtxSyncHandler(self.ctx_var)
+        handler2 = self.CtxSyncHandler(self.ctx_var)
+        signal = dispatch.Signal()
+        signal.connect(handler1)
+        signal.connect(handler2)
+
+        # set custom value outer signal
+        self.ctx_var.set(1)
+
+        await signal.asend(self.__class__)
+
+        self.assertEqual(len(handler1.values), 1)
+        self.assertEqual(len(handler2.values), 1)
+        self.assertEqual(sorted([*handler1.values, *handler2.values]), [2, 3])
+        self.assertEqual(self.ctx_var.get(), 3)
+
+    async def test_asend_correct_contextvars_sharing_mix_receivers(self):
+        handler1 = self.CtxSyncHandler(self.ctx_var)
+        handler2 = self.CtxAsyncHandler(self.ctx_var)
+        signal = dispatch.Signal()
+        signal.connect(handler1)
+        signal.connect(handler2)
+
+        # set custom value outer signal
+        self.ctx_var.set(1)
+
+        await signal.asend(self.__class__)
+
+        self.assertEqual(len(handler1.values), 1)
+        self.assertEqual(len(handler2.values), 1)
+        self.assertEqual(sorted([*handler1.values, *handler2.values]), [2, 3])
+        self.assertEqual(self.ctx_var.get(), 3)
+
+    async def test_asend_robust_correct_contextvars_sharing_async_receivers(self):
+        handler1 = self.CtxAsyncHandler(self.ctx_var)
+        handler2 = self.CtxAsyncHandler(self.ctx_var)
+        signal = dispatch.Signal()
+        signal.connect(handler1)
+        signal.connect(handler2)
+
+        # set custom value outer signal
+        self.ctx_var.set(1)
+
+        await signal.asend_robust(self.__class__)
+
+        self.assertEqual(len(handler1.values), 1)
+        self.assertEqual(len(handler2.values), 1)
+        self.assertEqual(sorted([*handler1.values, *handler2.values]), [2, 3])
+        self.assertEqual(self.ctx_var.get(), 3)
+
+    async def test_asend_robust_correct_contextvars_sharing_sync_receivers(self):
+        handler1 = self.CtxSyncHandler(self.ctx_var)
+        handler2 = self.CtxSyncHandler(self.ctx_var)
+        signal = dispatch.Signal()
+        signal.connect(handler1)
+        signal.connect(handler2)
+
+        # set custom value outer signal
+        self.ctx_var.set(1)
+
+        await signal.asend_robust(self.__class__)
+
+        self.assertEqual(len(handler1.values), 1)
+        self.assertEqual(len(handler2.values), 1)
+        self.assertEqual(sorted([*handler1.values, *handler2.values]), [2, 3])
+        self.assertEqual(self.ctx_var.get(), 3)
+
+    async def test_asend_robust_correct_contextvars_sharing_mix_receivers(self):
+        handler1 = self.CtxSyncHandler(self.ctx_var)
+        handler2 = self.CtxAsyncHandler(self.ctx_var)
+        signal = dispatch.Signal()
+        signal.connect(handler1)
+        signal.connect(handler2)
+
+        # set custom value outer signal
+        self.ctx_var.set(1)
+
+        await signal.asend_robust(self.__class__)
+
+        self.assertEqual(len(handler1.values), 1)
+        self.assertEqual(len(handler2.values), 1)
+        self.assertEqual(sorted([*handler1.values, *handler2.values]), [2, 3])
+        self.assertEqual(self.ctx_var.get(), 3)
+
+    def test_send_correct_contextvars_sharing_async_receivers(self):
+        handler1 = self.CtxAsyncHandler(self.ctx_var)
+        handler2 = self.CtxAsyncHandler(self.ctx_var)
+        signal = dispatch.Signal()
+        signal.connect(handler1)
+        signal.connect(handler2)
+
+        # set custom value outer signal
+        self.ctx_var.set(1)
+
+        signal.send(self.__class__)
+
+        self.assertEqual(len(handler1.values), 1)
+        self.assertEqual(len(handler2.values), 1)
+        self.assertEqual(sorted([*handler1.values, *handler2.values]), [2, 3])
+        self.assertEqual(self.ctx_var.get(), 3)
+
+    def test_send_correct_contextvars_sharing_sync_receivers(self):
+        handler1 = self.CtxSyncHandler(self.ctx_var)
+        handler2 = self.CtxSyncHandler(self.ctx_var)
+        signal = dispatch.Signal()
+        signal.connect(handler1)
+        signal.connect(handler2)
+
+        # set custom value outer signal
+        self.ctx_var.set(1)
+
+        signal.send(self.__class__)
+
+        self.assertEqual(len(handler1.values), 1)
+        self.assertEqual(len(handler2.values), 1)
+        self.assertEqual(sorted([*handler1.values, *handler2.values]), [2, 3])
+        self.assertEqual(self.ctx_var.get(), 3)
+
+    def test_send_correct_contextvars_sharing_mix_receivers(self):
+        handler1 = self.CtxSyncHandler(self.ctx_var)
+        handler2 = self.CtxAsyncHandler(self.ctx_var)
+        signal = dispatch.Signal()
+        signal.connect(handler1)
+        signal.connect(handler2)
+
+        # set custom value outer signal
+        self.ctx_var.set(1)
+
+        signal.send(self.__class__)
+
+        self.assertEqual(len(handler1.values), 1)
+        self.assertEqual(len(handler2.values), 1)
+        self.assertEqual(sorted([*handler1.values, *handler2.values]), [2, 3])
+        self.assertEqual(self.ctx_var.get(), 3)
+
+    def test_send_robust_correct_contextvars_sharing_async_receivers(self):
+        handler1 = self.CtxAsyncHandler(self.ctx_var)
+        handler2 = self.CtxAsyncHandler(self.ctx_var)
+        signal = dispatch.Signal()
+        signal.connect(handler1)
+        signal.connect(handler2)
+
+        # set custom value outer signal
+        self.ctx_var.set(1)
+
+        signal.send_robust(self.__class__)
+
+        self.assertEqual(len(handler1.values), 1)
+        self.assertEqual(len(handler2.values), 1)
+        self.assertEqual(sorted([*handler1.values, *handler2.values]), [2, 3])
+        self.assertEqual(self.ctx_var.get(), 3)
+
+    def test_send_robust_correct_contextvars_sharing_sync_receivers(self):
+        handler1 = self.CtxSyncHandler(self.ctx_var)
+        handler2 = self.CtxSyncHandler(self.ctx_var)
+        signal = dispatch.Signal()
+        signal.connect(handler1)
+        signal.connect(handler2)
+
+        # set custom value outer signal
+        self.ctx_var.set(1)
+
+        signal.send_robust(self.__class__)
+
+        self.assertEqual(len(handler1.values), 1)
+        self.assertEqual(len(handler2.values), 1)
+        self.assertEqual(sorted([*handler1.values, *handler2.values]), [2, 3])
+        self.assertEqual(self.ctx_var.get(), 3)
+
+    def test_send_robust_correct_contextvars_sharing_mix_receivers(self):
+        handler1 = self.CtxSyncHandler(self.ctx_var)
+        handler2 = self.CtxAsyncHandler(self.ctx_var)
+        signal = dispatch.Signal()
+        signal.connect(handler1)
+        signal.connect(handler2)
+
+        # set custom value outer signal
+        self.ctx_var.set(1)
+
+        signal.send_robust(self.__class__)
+
+        self.assertEqual(len(handler1.values), 1)
+        self.assertEqual(len(handler2.values), 1)
+        self.assertEqual(sorted([*handler1.values, *handler2.values]), [2, 3])
+        self.assertEqual(self.ctx_var.get(), 3)

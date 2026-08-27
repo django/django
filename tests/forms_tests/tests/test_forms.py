@@ -1,11 +1,14 @@
 import copy
 import datetime
 import json
+import textwrap
 import uuid
 
+from django.conf import USE_BLANK_CHOICE_DASH_DEPRECATED_MSG
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import MaxValueValidator, RegexValidator
+from django.db.models.utils import get_blank_choice_label
 from django.forms import (
     BooleanField,
     BoundField,
@@ -42,9 +45,10 @@ from django.forms.renderers import DjangoTemplates, get_default_renderer
 from django.forms.utils import ErrorDict, ErrorList
 from django.http import QueryDict
 from django.template import Context, Template
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
 from django.test.utils import override_settings
 from django.utils.datastructures import MultiValueDict
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.safestring import mark_safe
 
 from . import jinja2_tests
@@ -795,6 +799,37 @@ aria-describedby="id_birthday_error">
 <option value="P">Python</option>
 <option value="J">Java</option>
 </select>""",
+        )
+
+    # RemovedInDjango70Warning
+    @ignore_warnings(category=RemovedInDjango70Warning)
+    @override_settings(USE_BLANK_CHOICE_DASH=True)
+    def test_blank_choice_dash(self):
+        class SomeForm(Form):
+            somechoices = ChoiceField(
+                choices=(
+                    ("0", get_blank_choice_label()),
+                    ("1", "Test 1"),
+                    ("2", "Test 2"),
+                )
+            )
+
+        f = SomeForm()
+
+        self.assertHTMLEqual(
+            f.as_p(),
+            textwrap.dedent("""
+            <p>
+                <label for="id_somechoices">Somechoices:</label>
+                <select name="somechoices" id="id_somechoices">
+                <option value="0">---------</option>
+                <option value="1">Test 1</option>
+                <option value="2">Test 2</option></select>
+            </p>"""),
+        )
+
+        self.assertWarnsMessage(
+            RemovedInDjango70Warning, USE_BLANK_CHOICE_DASH_DEPRECATED_MSG
         )
 
     def test_forms_with_radio(self):
@@ -1659,6 +1694,13 @@ aria-describedby="id_birthday_error">
 
         with self.assertRaisesMessage(ValueError, "has no field named"):
             f.add_error("missing_field", "Some error.")
+
+        with self.assertRaisesMessage(
+            TypeError,
+            "The argument `field` must be `None` when the `error` argument is a "
+            "dictionary.",
+        ):
+            f.add_error("password1", ValidationError({"password1": "Some error."}))
 
     def test_update_error_dict(self):
         class CodeForm(Form):
@@ -3664,7 +3706,8 @@ Options: <select multiple name="options" aria-invalid="true" required>
         self.assertTrue(f.is_valid())
 
         file1 = SimpleUploadedFile(
-            "我隻氣墊船裝滿晒鱔.txt", "मेरी मँडराने वाली नाव सर्पमीनों से भरी ह".encode()
+            "我隻氣墊船裝滿晒鱔.txt",
+            "मेरी मँडराने वाली नाव सर्पमीनों से भरी ह".encode(),
         )
         f = FileForm(data={}, files={"file1": file1}, auto_id=False)
         self.assertHTMLEqual(
@@ -3913,7 +3956,7 @@ aria-describedby="id_age_error"></td></tr>""",
         )
         self.assertHTMLEqual(
             f["field"].legend_tag(),
-            '<legend for="id_field" class="required">Field:</legend>',
+            '<legend class="required">Field:</legend>',
         )
         self.assertHTMLEqual(
             f["field"].label_tag(attrs={"class": "foo"}),
@@ -3921,14 +3964,14 @@ aria-describedby="id_age_error"></td></tr>""",
         )
         self.assertHTMLEqual(
             f["field"].legend_tag(attrs={"class": "foo"}),
-            '<legend for="id_field" class="foo required">Field:</legend>',
+            '<legend class="foo required">Field:</legend>',
         )
         self.assertHTMLEqual(
             f["field2"].label_tag(), '<label for="id_field2">Field2:</label>'
         )
         self.assertHTMLEqual(
             f["field2"].legend_tag(),
-            '<legend for="id_field2">Field2:</legend>',
+            "<legend>Field2:</legend>",
         )
 
     def test_label_split_datetime_not_displayed(self):
@@ -4190,31 +4233,47 @@ aria-describedby="id_age_error"></td></tr>""",
 
         boundfield = SomeForm()["field"]
 
-        testcases = [  # (args, kwargs, expected)
-            # without anything: just print the <label>
-            ((), {}, '<%(tag)s for="id_field">Field:</%(tag)s>'),
+        testcases = [  # (args, kwargs, expected_label, expected_legend)
+            # without anything: just print the <label>/<legend>
+            ((), {}, '<label for="id_field">Field:</label>', "<legend>Field:</legend>"),
             # passing just one argument: overrides the field's label
-            (("custom",), {}, '<%(tag)s for="id_field">custom:</%(tag)s>'),
+            (
+                ("custom",),
+                {},
+                '<label for="id_field">custom:</label>',
+                "<legend>custom:</legend>",
+            ),
             # the overridden label is escaped
-            (("custom&",), {}, '<%(tag)s for="id_field">custom&amp;:</%(tag)s>'),
-            ((mark_safe("custom&"),), {}, '<%(tag)s for="id_field">custom&:</%(tag)s>'),
-            # Passing attrs to add extra attributes on the <label>
+            (
+                ("custom&",),
+                {},
+                '<label for="id_field">custom&amp;:</label>',
+                "<legend>custom&amp;:</legend>",
+            ),
+            (
+                (mark_safe("custom&"),),
+                {},
+                '<label for="id_field">custom&:</label>',
+                "<legend>custom&:</legend>",
+            ),
+            # Passing attrs to add extra attributes on the <label>/<legend>
             (
                 (),
                 {"attrs": {"class": "pretty"}},
-                '<%(tag)s for="id_field" class="pretty">Field:</%(tag)s>',
+                '<label for="id_field" class="pretty">Field:</label>',
+                '<legend class="pretty">Field:</legend>',
             ),
         ]
 
-        for args, kwargs, expected in testcases:
+        for args, kwargs, expected_label, expected_legend in testcases:
             with self.subTest(args=args, kwargs=kwargs):
                 self.assertHTMLEqual(
                     boundfield.label_tag(*args, **kwargs),
-                    expected % {"tag": "label"},
+                    expected_label,
                 )
                 self.assertHTMLEqual(
                     boundfield.legend_tag(*args, **kwargs),
-                    expected % {"tag": "legend"},
+                    expected_legend,
                 )
 
     def test_boundfield_label_tag_no_id(self):
@@ -4252,7 +4311,7 @@ aria-describedby="id_age_error"></td></tr>""",
         )
         self.assertHTMLEqual(
             form["custom"].legend_tag(),
-            '<legend for="custom_id_custom">Custom:</legend>',
+            "<legend>Custom:</legend>",
         )
         self.assertHTMLEqual(form["empty"].label_tag(), "<label>Empty:</label>")
         self.assertHTMLEqual(form["empty"].legend_tag(), "<legend>Empty:</legend>")
@@ -4266,7 +4325,7 @@ aria-describedby="id_age_error"></td></tr>""",
         self.assertHTMLEqual(boundfield.label_tag(), '<label for="id_field"></label>')
         self.assertHTMLEqual(
             boundfield.legend_tag(),
-            '<legend for="id_field"></legend>',
+            "<legend></legend>",
         )
 
     def test_boundfield_id_for_label(self):
@@ -4339,7 +4398,7 @@ aria-describedby="id_age_error"></td></tr>""",
         )
         self.assertHTMLEqual(
             boundfield.legend_tag(label_suffix="$"),
-            '<legend for="id_field">Field$</legend>',
+            "<legend>Field$</legend>",
         )
 
     def test_error_dict(self):
@@ -4879,7 +4938,7 @@ aria-describedby="id_age_error"></td></tr>""",
         )
         self.assertEqual(
             field.legend_tag(),
-            '<legend for="id_first_name">First name:</legend>',
+            "<legend>First name:</legend>",
         )
 
     @override_settings(USE_THOUSAND_SEPARATOR=True)
@@ -4892,7 +4951,7 @@ aria-describedby="id_age_error"></td></tr>""",
         )
         self.assertHTMLEqual(
             field.legend_tag(attrs={"number": 9999}),
-            '<legend number="9999" for="id_first_name">First name:</legend>',
+            '<legend number="9999">First name:</legend>',
         )
 
     def test_remove_cached_field(self):
@@ -5204,12 +5263,12 @@ class TemplateTests(SimpleTestCase):
         self.assertHTMLEqual(
             t.render(Context({"form": f})),
             "<form>"
-            '<p><legend for="id_username">Username:</legend>'
+            "<p><legend>Username:</legend>"
             '<input id="id_username" type="text" name="username" maxlength="10" '
             'aria-describedby="id_username_helptext" required></p>'
-            '<p><legend for="id_password1">Password1:</legend>'
+            "<p><legend>Password1:</legend>"
             '<input type="password" name="password1" id="id_password1" required></p>'
-            '<p><legend for="id_password2">Password2:</legend>'
+            "<p><legend>Password2:</legend>"
             '<input type="password" name="password2" id="id_password2" required></p>'
             '<input type="submit" required>'
             "</form>",

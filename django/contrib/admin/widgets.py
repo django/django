@@ -28,6 +28,8 @@ class FilteredSelectMultiple(forms.SelectMultiple):
     catalog has been loaded in the page
     """
 
+    use_fieldset = True
+
     class Media:
         js = [
             "admin/js/core.js",
@@ -122,6 +124,7 @@ class AdminRadioSelect(forms.RadioSelect):
 
 class AdminFileWidget(forms.ClearableFileInput):
     template_name = "admin/widgets/clearable_file_input.html"
+    use_fieldset = True
 
 
 def url_params_from_lookup_dict(lookups):
@@ -299,7 +302,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         self.can_view_related = supported and can_view_related
         # To check if the related object is registered with this AdminSite.
         self.admin_site = admin_site
-        self.use_fieldset = True
+        self.use_fieldset = widget.use_fieldset
 
     def __deepcopy__(self, memo):
         obj = copy.copy(self)
@@ -332,16 +335,24 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         )
 
     def get_context(self, name, value, attrs):
-        from django.contrib.admin.views.main import IS_POPUP_VAR, TO_FIELD_VAR
+        from django.contrib.admin.views.main import (
+            IS_POPUP_VAR,
+            SOURCE_MODEL_VAR,
+            TO_FIELD_VAR,
+        )
 
         rel_opts = self.rel.model._meta
         info = (rel_opts.app_label, rel_opts.model_name)
         related_field_name = self.rel.get_related_field().name
+        app_label = self.rel.field.model._meta.app_label
+        model_name = self.rel.field.model._meta.model_name
+
         url_params = "&".join(
             "%s=%s" % param
             for param in [
                 (TO_FIELD_VAR, related_field_name),
                 (IS_POPUP_VAR, 1),
+                (SOURCE_MODEL_VAR, f"{app_label}.{model_name}"),
             ]
         )
         context = {

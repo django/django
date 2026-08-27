@@ -16,14 +16,14 @@
 # Pouya Abbassi, 2016
 # rahim agh <rahim.aghareb@gmail.com>, 2021
 # Reza Mohammadi <reza@teeleh.ir>, 2013-2014
-# Sajad Rahimi <rahimisajad@outlook.com>, 2021
+# Sajad Rahimi <rahimisajad@outlook.com>, 2021,2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 07:05+0000\n"
-"Last-Translator: ali salehi, 2023\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 07:05+0000\n"
+"Last-Translator: Sajad Rahimi <rahimisajad@outlook.com>, 2021,2025\n"
 "Language-Team: Persian (http://app.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -44,8 +44,8 @@ msgstr "%(count)d تا %(items)s با موفقیت حذف شدند."
 msgid "Cannot delete %(name)s"
 msgstr "امکان حذف %(name)s نیست."
 
-msgid "Are you sure?"
-msgstr "آیا مطمئن هستید؟"
+msgid "Delete multiple objects"
+msgstr "حذف اشیاء متعدد"
 
 msgid "Administration"
 msgstr "مدیریت"
@@ -218,12 +218,6 @@ msgstr ""
 "پایین ویرایش کنید."
 
 #, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-" {name} \"{obj}\" به موفقیت اضافه شد. شما میتوانید در قسمت پایین، دوباره آن "
-"را ویرایش کنید."
-
-#, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
@@ -283,6 +277,9 @@ msgstr[1] "همه موارد %(total_count)s انتخاب شده"
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 از %(cnt)s انتخاب شده‌اند"
+
+msgid "Delete"
+msgstr "حذف"
 
 #, python-format
 msgid "Change history: %s"
@@ -367,6 +364,15 @@ msgstr ""
 msgid "Models in the %(name)s application"
 msgstr "مدلها در برنامه %(name)s "
 
+msgid "Model name"
+msgstr ""
+
+msgid "Add link"
+msgstr "اضافه‌کردن پیوند"
+
+msgid "Change or view list link"
+msgstr "تغییر یا مشاهده لیست پیوند"
+
 msgid "Add"
 msgstr "اضافه کردن"
 
@@ -376,18 +382,17 @@ msgstr "مشاهده"
 msgid "You don’t have permission to view or edit anything."
 msgstr "شما اجازهٔ مشاهده یا ویرایش چیزی را ندارید."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
-msgstr ""
-"ابتدا یک نام کاربری و گذرواژه وارد کنید. سپس می توانید مشخصات دیگر کاربر را "
-"ویرایش کنید."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
+msgstr "پس از ساخت یک کاربر، امکان ثبت یا تغییر گزینه‌های بیشتری را دارید."
 
-msgid "Enter a username and password."
-msgstr "یک نام کاربری و رمز عبور را وارد کنید."
+msgid "Error:"
+msgstr "خطا:"
 
 msgid "Change password"
 msgstr "تغییر گذرواژه"
+
+msgid "Set password"
+msgstr "تنظیم رمز عبور جدید"
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
@@ -397,6 +402,17 @@ msgstr[1] ""
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "برای کابر <strong>%(username)s</strong> یک گذرنامهٔ جدید وارد کنید."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+
+msgid "Disable password-based authentication"
+msgstr "غیرفعال کردن احراز هویت مبتنی بر گذرواژه"
+
+msgid "Enable password-based authentication"
+msgstr "فعال کردن احراز هویت مبتنی بر گذرواژه"
 
 msgid "Skip to main content"
 msgstr "انتقال به محتوای اصلی"
@@ -427,7 +443,7 @@ msgid "Filter"
 msgstr "فیلتر"
 
 msgid "Hide counts"
-msgstr ""
+msgstr "مخفی‌کردن تعداد"
 
 msgid "Show counts"
 msgstr "نمایش تعداد"
@@ -453,9 +469,6 @@ msgstr "تغییر رنگ پوسته (حالت کنونی: روشن)"
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "تغییر رنگ پوسته (حالت کنونی: تیره)"
-
-msgid "Delete"
-msgstr "حذف"
 
 #, python-format
 msgid ""
@@ -490,9 +503,6 @@ msgstr "بله، مطمئن هستم."
 
 msgid "No, take me back"
 msgstr "نه، من را برگردان"
-
-msgid "Delete multiple objects"
-msgstr "حذف اشیاء متعدد"
 
 #, python-format
 msgid ""
@@ -567,7 +577,7 @@ msgstr ""
 "شما به عنوان %(username)sوارد شده اید. ولی اجازه مشاهده صفحه فوق را نداریدو "
 "آیا مایلید با کاربر دیگری وارد شوید؟"
 
-msgid "Forgotten your password or username?"
+msgid "Forgotten your login credentials?"
 msgstr "گذرواژه یا نام کاربری خود را فراموش کرده‌اید؟"
 
 msgid "Toggle navigation"
@@ -733,8 +743,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "لطفاً به صفحهٔ زیر بروید و یک گذرواژهٔ جدید انتخاب کنید:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "نام کاربری‌تان، چنانچه احیاناً یادتان رفته است:"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "ممنون از استفادهٔ شما از وب‌گاه ما"
@@ -757,7 +767,7 @@ msgid "Reset my password"
 msgstr "ایجاد گذرواژهٔ جدید"
 
 msgid "Select all objects on this page for an action"
-msgstr ""
+msgstr "انتخاب تمام اشیاء داخل صفحه برای انجام یک اقدام"
 
 msgid "All dates"
 msgstr "همهٔ تاریخ‌ها"

@@ -91,7 +91,7 @@ This example is equivalent to::
 ``redirect()``
 ==============
 
-.. function:: redirect(to, *args, permanent=False, preserve_request=False, **kwargs)
+.. function:: redirect(to, *args, permanent=False, preserve_request=False, max_length=MAX_URL_REDIRECT_LENGTH, **kwargs)
 
    Returns an :class:`~django.http.HttpResponseRedirect` to the appropriate URL
    for the arguments passed.
@@ -125,9 +125,13 @@ This example is equivalent to::
    ``True``   ``True``         308
    =========  ================ ================
 
-   .. versionchanged:: 5.2
+   An optional ``max_length`` keyword argument can be provided to override
+   the maximum allowed length for the redirect URL. Set it to ``None`` to
+   disable the length check.
 
-       The argument ``preserve_request`` was added.
+   .. versionchanged:: 6.1
+
+        ``max_length`` was added.
 
 Examples
 --------
@@ -188,6 +192,78 @@ original HTTP method::
             return redirect(obj, preserve_request=True)
         # ...
 
+``resolve_url()``
+=================
+
+.. function:: resolve_url(to, *args, **kwargs)
+
+   Returns a URL string by resolving and normalizing the given ``to`` argument
+   into a concrete URL. The parameter ``to`` may be:
+
+   * An object implementing :meth:`~django.db.models.Model.get_absolute_url`,
+     in which case the method will be called and its result returned.
+
+   * A view name, view function, or view class, possibly with arguments passed
+     as ``*args`` and ``**kwargs``, in which case :func:`~django.urls.reverse`
+     will be used to reverse-resolve the view.
+
+   * A URL string, which will be returned unchanged.
+
+   This function is used internally by the :func:`redirect` shortcut to
+   determine the target URL for the redirect location.
+
+Examples
+--------
+
+#. Resolving a URL for a model that defines
+   :meth:`~django.db.models.Model.get_absolute_url`:
+
+   .. code-block:: python
+       :caption: ``models.py``
+
+       from django.db import models
+       from django.urls import reverse
+
+
+       class Article(models.Model):
+           title = models.CharField(max_length=100)
+
+           def get_absolute_url(self):
+               return reverse("article-detail", args=[self.pk])
+
+
+   .. code-block:: python
+       :caption: ``views.py``
+
+       from django.http import JsonResponse
+       from django.shortcuts import get_object_or_404, resolve_url
+       from .models import Article
+
+
+       def article_api_view(request, pk):
+           """Return metadata about an article, including its canonical URL."""
+           article = get_object_or_404(Article, pk=pk)
+           return JsonResponse(
+               {
+                   "id": article.pk,
+                   "title": article.title,
+                   "url": resolve_url(article),
+               }
+           )
+
+#. Resolving a target URL for use outside of a redirect, such as in an HTTP
+   response header::
+
+    from django.conf import settings
+    from django.http import HttpResponse
+    from django.shortcuts import resolve_url
+
+
+    def login_success(request):
+        response = HttpResponse("Login successful")
+        response["X-Next-URL"] = resolve_url(settings.LOGIN_REDIRECT_URL)
+        return response
+
 ``get_object_or_404()``
 =======================
 
@@ -210,7 +286,7 @@ Arguments
     the object.
 
 ``*args``
-    :class:`Q objects <django.db.models.Q>`.
+    :ref:`q-objects`.
 
 ``**kwargs``
     Lookup parameters, which should be in the format accepted by ``get()`` and
@@ -290,7 +366,7 @@ Arguments
     list.
 
 ``*args``
-    :class:`Q objects <django.db.models.Q>`.
+    :ref:`q-objects`.
 
 ``**kwargs``
     Lookup parameters, which should be in the format accepted by ``get()`` and

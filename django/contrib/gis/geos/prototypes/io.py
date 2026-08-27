@@ -1,3 +1,4 @@
+import re
 import threading
 from ctypes import POINTER, Structure, byref, c_byte, c_char_p, c_int, c_size_t
 
@@ -15,6 +16,7 @@ from django.contrib.gis.geos.prototypes.errcheck import (
 from django.contrib.gis.geos.prototypes.geom import c_uchar_p, geos_char_p
 from django.utils.encoding import force_bytes
 from django.utils.functional import SimpleLazyObject
+from django.utils.regex_helper import _lazy_re_compile
 
 
 # ### The WKB/WKT Reader/Writer structures and pointers ###
@@ -145,6 +147,58 @@ class IOBase(GEOSBase):
 
 # ### Base WKB/WKT Reading and Writing objects ###
 
+# Sits just under PostGIS's effective ceiling: liblwgeom's LW_PARSER_MAX_DEPTH
+# is 200 and counts the leaf geometry, so PostGIS rejects at 199 nested
+# collections. 198 keeps Django's guard below that (and far below the GEOS
+# segfault threshold) so it rejects before any backend supporting nested
+# geometries does. (Oracle and MariaDB don't support nesting.)
+MAX_GEOM_COLLECTIONS = 198
+
+# GEOS accepts any amount of whitespace around the optional dimension marker,
+# so the separators must be \s*, not \s? or \s+. The root variants also allow
+# leading whitespace, which GEOS skips before the geometry type.
+_WKT_COLLECTION_START_RE = _lazy_re_compile(
+    r"\bGEOMETRYCOLLECTION(?:\s*(?:ZM|Z|M))?\s*\(",
+    re.IGNORECASE,
+)
+_WKT_COLLECTION_START_BYTES_RE = _lazy_re_compile(
+    rb"\bGEOMETRYCOLLECTION(?:\s*(?:ZM|Z|M))?\s*\(",
+    re.IGNORECASE,
+)
+_WKT_COLLECTION_ROOT_RE = _lazy_re_compile(
+    r"\s*\bGEOMETRYCOLLECTION(?:\s*(?:ZM|Z|M))?\s*\(",
+    re.IGNORECASE,
+)
+_WKT_COLLECTION_ROOT_BYTES_RE = _lazy_re_compile(
+    rb"\s*\bGEOMETRYCOLLECTION(?:\s*(?:ZM|Z|M))?\s*\(",
+    re.IGNORECASE,
+)
+
+
+def _build_collection_header_re():
+    """GEOS normalizes WKB types using: (type_code & 0xFFFF) % 1000
+
+    Therefore, every low 16-bit value congruent to 7 modulo 1000 is interpreted
+    as a GeometryCollection. Upper 16 bits may contain arbitrary EWKB flags.
+    """
+    low_types = range(7, 0x10000, 1000)
+    little_endian_types = b"|".join(
+        re.escape(type_code.to_bytes(2, "little")) for type_code in low_types
+    )
+    big_endian_types = b"|".join(
+        re.escape(type_code.to_bytes(2, "big")) for type_code in low_types
+    )
+    return _lazy_re_compile(
+        rb"(?=("
+        rb"\x01(?:" + little_endian_types + rb")[\x00-\xff]{2}"
+        rb"|"
+        rb"\x00[\x00-\xff]{2}(?:" + big_endian_types + rb")"
+        rb"))"
+    )
+
+
+_COLLECTION_HEADER_RE = _build_collection_header_re()
+
 
 # Non-public WKB/WKT reader classes for internal use because
 # their `read` methods return _pointers_ instead of GEOSGeometry
@@ -154,9 +208,48 @@ class _WKTReader(IOBase):
     ptr_type = WKT_READ_PTR
     destructor = wkt_reader_destroy
 
-    def read(self, wkt):
+    def limit(self, wkt, max_geom_collections):
+        if max_geom_collections is None:
+            return
+        if isinstance(wkt, str):
+            pattern = _WKT_COLLECTION_START_RE
+            root_pattern = _WKT_COLLECTION_ROOT_RE
+            open_paren = "("
+            close_paren = ")"
+        else:
+            pattern = _WKT_COLLECTION_START_BYTES_RE
+            root_pattern = _WKT_COLLECTION_ROOT_BYTES_RE
+            open_paren = ord("(")
+            close_paren = ord(")")
+        if root_pattern.match(wkt) is None:
+            # Fast path: If the beginning does not match GEOMETRYCOLLECTION(,
+            # then GEOS rejects early (no need to limit):
+            # GEOS_ERROR: countered : 'GEOMETRYCOLLECTION'
+            return
+        collection_starts = {match.end() - 1 for match in pattern.finditer(wkt)}
+        # Nesting depth can't exceed the total number of collections, so if the
+        # total is already within the limit, there is nothing to walk.
+        if len(collection_starts) <= max_geom_collections:
+            return
+        collection_depth = 0
+        parentheses = []
+        for index, char in enumerate(wkt):
+            if char == open_paren:
+                is_collection = index in collection_starts
+                parentheses.append(is_collection)
+                if is_collection:
+                    collection_depth += 1
+            elif char == close_paren and parentheses:
+                if parentheses.pop():
+                    collection_depth -= 1
+            if collection_depth > max_geom_collections:
+                msg = "WKT contains too many possible GeometryCollections."
+                raise ValueError(msg)
+
+    def read(self, wkt, max_geom_collections=MAX_GEOM_COLLECTIONS):
         if not isinstance(wkt, (bytes, str)):
             raise TypeError(f"'wkt' must be bytes or str (got {wkt!r} instead).")
+        self.limit(wkt, max_geom_collections)
         return wkt_reader_read(self.ptr, force_bytes(wkt))
 
 
@@ -165,20 +258,64 @@ class _WKBReader(IOBase):
     ptr_type = WKB_READ_PTR
     destructor = wkb_reader_destroy
 
-    def read(self, wkb):
+    def limit_wkb(self, wkb, max_geom_collections):
+        if max_geom_collections is None:
+            return
+        for count, _ in enumerate(_COLLECTION_HEADER_RE.finditer(wkb), 1):
+            if count > max_geom_collections:
+                msg = "WKB contains too many possible GeometryCollections."
+                raise ValueError(msg)
+
+    def limit_hex(self, wkb, max_geom_collections):
+        if max_geom_collections is None:
+            return
+
+        def _byteswap_uint32(value):
+            return (
+                ((value & 0x000000FF) << 24)
+                | ((value & 0x0000FF00) << 8)
+                | ((value & 0x00FF0000) >> 8)
+                | ((value & 0xFF000000) >> 24)
+            )
+
+        count = 0
+        for index in range(0, len(wkb) - 9, 2):
+            byte_order = wkb[index : index + 2]
+            if byte_order not in (b"00", b"01"):
+                continue
+            try:
+                geometry_type = int(wkb[index + 2 : index + 10], 16)
+            except ValueError:
+                continue
+            geometry_type = _byteswap_uint32(geometry_type)
+            # Match GEOS WKBReader's geometry-type normalization.
+            if (geometry_type & 0xFFFF) % 1000 == 7:  # GeometryCollection.
+                count += 1
+                if count > max_geom_collections:
+                    msg = "WKB contains too many possible GeometryCollections."
+                    raise ValueError(msg)
+
+    def read(self, wkb, max_geom_collections=MAX_GEOM_COLLECTIONS):
         "Return a _pointer_ to C GEOS Geometry object from the given WKB."
+        limiter = self.limit_hex
+        reader = wkb_reader_read_hex
+
         if isinstance(wkb, memoryview):
-            wkb_s = bytes(wkb)
-            return wkb_reader_read(self.ptr, wkb_s, len(wkb_s))
-        elif isinstance(wkb, bytes):
-            return wkb_reader_read_hex(self.ptr, wkb, len(wkb))
+            wkb = bytes(wkb)
+            limiter = self.limit_wkb
+            reader = wkb_reader_read
         elif isinstance(wkb, str):
-            wkb_s = wkb.encode()
-            return wkb_reader_read_hex(self.ptr, wkb_s, len(wkb_s))
-        else:
+            wkb = wkb.encode()
+        elif not isinstance(wkb, bytes):
             raise TypeError(
                 f"'wkb' must be bytes, str or memoryview (got {wkb!r} instead)."
             )
+
+        # Limit nested geometry collections. Should become unnecessary when
+        # GEOS 3.15.0 is the minimum supported version. See:
+        # https://github.com/libgeos/geos/commit/8b8b3da7a3d9fb8953ff60bc49aa0320d51ae45c
+        limiter(wkb, max_geom_collections)
+        return reader(self.ptr, wkb, len(wkb))
 
 
 def default_trim_value():

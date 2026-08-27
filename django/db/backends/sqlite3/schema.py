@@ -3,7 +3,10 @@ from decimal import Decimal
 
 from django.apps.registry import Apps
 from django.db import NotSupportedError
-from django.db.backends.base.schema import BaseDatabaseSchemaEditor
+from django.db.backends.base.schema import (
+    BaseDatabaseSchemaEditor,
+    _related_non_m2m_objects,
+)
 from django.db.backends.ddl_references import Statement
 from django.db.backends.utils import strip_quotes
 from django.db.models import CompositePrimaryKey, UniqueConstraint
@@ -13,7 +16,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_table = "DROP TABLE %(table)s"
     sql_create_fk = None
     sql_create_inline_fk = (
-        "REFERENCES %(to_table)s (%(to_column)s) DEFERRABLE INITIALLY DEFERRED"
+        "REFERENCES %(to_table)s (%(to_column)s)%(on_delete_db)s DEFERRABLE INITIALLY "
+        "DEFERRED"
     )
     sql_create_column_inline_fk = sql_create_inline_fk
     sql_create_unique = "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)"
@@ -144,7 +148,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # Choose a default and insert it into the copy map
             if (
                 not create_field.has_db_default()
-                and not (create_field.many_to_many or create_field.generated)
+                and not create_field.generated
                 and create_field.concrete
             ):
                 mapping[create_field.column] = self.prepare_default(
@@ -262,7 +266,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Delete the old table to make way for the new
         self.delete_model(model, handle_autom2m=False)
 
-        # Rename the new table to take way for the old
+        # Rename the new table to make way for the old
         self.alter_db_table(
             new_model,
             new_model._meta.db_table,
@@ -338,10 +342,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 self.delete_model(field.remote_field.through)
             # For explicit "through" M2M fields, do nothing
         elif (
-            self.connection.features.can_alter_table_drop_column
             # Primary keys, unique fields, indexed fields, and foreign keys are
             # not supported in ALTER TABLE DROP COLUMN.
-            and not field.primary_key
+            not field.primary_key
             and not field.unique
             and not field.db_index
             and not (field.remote_field and field.db_constraint)
@@ -391,17 +394,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if new_field.unique and (
             old_type != new_type or old_collation != new_collation
         ):
-            related_models = set()
-            opts = new_field.model._meta
-            for remote_field in opts.related_objects:
+            related_models = {
+                rel.related_model
+                for _, rel in _related_non_m2m_objects(old_field, new_field)
                 # Ignore self-relationship since the table was already rebuilt.
-                if remote_field.related_model == model:
-                    continue
-                if not remote_field.many_to_many:
-                    if remote_field.field_name == new_field.name:
-                        related_models.add(remote_field.related_model)
-                elif new_field.primary_key and remote_field.through._meta.auto_created:
-                    related_models.add(remote_field.through)
+                if rel.related_model != model
+            }
+            opts = new_field.model._meta
             if new_field.primary_key:
                 for many_to_many in opts.many_to_many:
                     # Ignore self-relationship since the table was already

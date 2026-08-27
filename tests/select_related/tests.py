@@ -1,5 +1,10 @@
+import gc
+
 from django.core.exceptions import FieldError
+from django.db.models import FETCH_PEERS
 from django.test import SimpleTestCase, TestCase
+from django.test.utils import garbage_collect, ignore_warnings, requires_gil
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import (
     Bookmark,
@@ -56,6 +61,21 @@ class SelectRelatedTests(TestCase):
             "Amanita muscaria"
         )
 
+    def setup_gc_debug(self):
+        self.addCleanup(gc.garbage.clear)
+        self.addCleanup(gc.set_debug, 0)
+        self.addCleanup(gc.enable)
+        gc.disable()
+        garbage_collect()
+        gc.set_debug(gc.DEBUG_SAVEALL)
+
+    def assert_no_local_function_leaks(self):
+        garbage_collect()
+        local_functions_leaked = [
+            obj for obj in gc.garbage if "<locals>" in getattr(obj, "__qualname__", "")
+        ]
+        self.assertEqual(local_functions_leaked, [])
+
     def test_access_fks_without_select_related(self):
         """
         Normally, accessing FKs doesn't fill in related objects
@@ -91,10 +111,15 @@ class SelectRelatedTests(TestCase):
                 ],
             )
 
+    # RemovedInDjango70Warning.
     def test_list_with_select_related(self):
         """select_related() applies to entire lists, not just items."""
         with self.assertNumQueries(1):
-            world = Species.objects.select_related()
+            with ignore_warnings(
+                category=RemovedInDjango70Warning,
+                message=r"Calling select_related\(\) with no arguments is deprecated\.",
+            ):
+                world = Species.objects.select_related()
             families = [o.genus.family.name for o in world]
             self.assertEqual(
                 sorted(families),
@@ -105,6 +130,15 @@ class SelectRelatedTests(TestCase):
                     "Hominidae",
                 ],
             )
+
+    # RemovedInDjango70Warning.
+    def test_select_related_no_arguments_deprecated(self):
+        msg = (
+            "Calling select_related() with no arguments is deprecated. "
+            "Specify the fields to fetch instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            Species.objects.select_related()
 
     def test_list_with_depth(self):
         """
@@ -122,10 +156,16 @@ class SelectRelatedTests(TestCase):
     def test_select_related_with_extra(self):
         s = (
             Species.objects.all()
-            .select_related()
+            .select_related("genus")
             .extra(select={"a": "select_related_species.id + 10"})[0]
         )
         self.assertEqual(s.id + 10, s.a)
+
+    @requires_gil
+    def test_select_related_memory_leak(self):
+        self.setup_gc_debug()
+        list(Species.objects.select_related("genus"))
+        self.assert_no_local_function_leaks()
 
     def test_certain_fields(self):
         """
@@ -209,6 +249,37 @@ class SelectRelatedTests(TestCase):
         message = "Cannot call select_related() after .values() or .values_list()"
         with self.assertRaisesMessage(TypeError, message):
             list(Species.objects.values_list("name").select_related("genus"))
+
+    def test_fetch_mode_copied_fetching_one(self):
+        fly = (
+            Species.objects.fetch_mode(FETCH_PEERS)
+            .select_related("genus__family")
+            .get(name="melanogaster")
+        )
+        self.assertEqual(fly._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            fly.genus._state.fetch_mode,
+            FETCH_PEERS,
+        )
+        self.assertEqual(
+            fly.genus.family._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_fetching_many(self):
+        specieses = list(
+            Species.objects.fetch_mode(FETCH_PEERS).select_related("genus__family")
+        )
+        species = specieses[0]
+        self.assertEqual(species._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            species.genus._state.fetch_mode,
+            FETCH_PEERS,
+        )
+        self.assertEqual(
+            species.genus.family._state.fetch_mode,
+            FETCH_PEERS,
+        )
 
 
 class SelectRelatedValidationTests(SimpleTestCase):

@@ -2,10 +2,10 @@
 #
 # The *_FORMAT strings use the Django date format syntax,
 # see https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
-DATE_FORMAT = r"Y\k\o N j\a"
+DATE_FORMAT = r"Y(\e)\k\o N\k j"
 TIME_FORMAT = "H:i"
-DATETIME_FORMAT = r"Y\k\o N j\a, H:i"
-YEAR_MONTH_FORMAT = r"Y\k\o F"
+DATETIME_FORMAT = r"Y(\e)\k\o N\k j, H:i"
+YEAR_MONTH_FORMAT = r"Y(\e)\k\o F"
 MONTH_DAY_FORMAT = r"F\r\e\n j\a"
 SHORT_DATE_FORMAT = "Y-m-d"
 SHORT_DATETIME_FORMAT = "Y-m-d H:i"

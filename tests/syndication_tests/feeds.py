@@ -321,3 +321,9 @@ class TestMultipleEnclosureAtomFeed(TestAtomFeed):
             feedgenerator.Enclosure("http://example.com/hello.png", "0", "image/png"),
             feedgenerator.Enclosure("http://example.com/goodbye.png", "0", "image/png"),
         ]
+
+
+class TestInvalidAtomFeed(TestAtomFeed):
+    def item_categories(self):
+        # This control character is not serializable.
+        return ["\x00"]

@@ -198,7 +198,7 @@ It's difficult to give an official citation format, for two reasons: citation
 formats can vary wildly between publications, and citation standards for
 software are still a matter of some debate.
 
-For example, `APA style`_,  would dictate something like:
+For example, `APA style`_, would dictate something like:
 
 .. code-block:: text
 
@@ -217,7 +217,7 @@ If you need a web address, use https://www.djangoproject.com/.
 If you need a name, just use "Django", without any tagline.
 
 If you need a publication date, use the year of release of the version you're
-referencing (e.g., 2013 for v1.5)
+referencing (e.g., 2013 for v1.5).
 
 .. _APA style: https://apastyle.apa.org/
 

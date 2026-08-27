@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 from math import pi
 
@@ -13,16 +13,9 @@ from django.db.models.expressions import (
     OrderByList,
     RawSQL,
 )
-from django.db.models.functions import Collate
+from django.db.models.functions import UUID4, Collate
 from django.db.models.lookups import GreaterThan
-from django.test import (
-    SimpleTestCase,
-    TestCase,
-    override_settings,
-    skipIfDBFeature,
-    skipUnlessDBFeature,
-)
-from django.utils import timezone
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
 from .models import (
     Article,
@@ -30,6 +23,9 @@ from .models import (
     DBDefaults,
     DBDefaultsFK,
     DBDefaultsFunction,
+    DBDefaultsFunctionFK,
+    DBDefaultsFunctionPK,
+    DBDefaultsOneToOnePK,
     DBDefaultsPK,
 )
 
@@ -44,47 +40,55 @@ class DefaultTests(TestCase):
         self.assertEqual(a.headline, "Default headline")
         self.assertLess((now - a.pub_date).seconds, 5)
 
-    @skipUnlessDBFeature(
-        "can_return_columns_from_insert", "supports_expression_defaults"
-    )
+    @skipUnlessDBFeature("supports_expression_defaults")
     def test_field_db_defaults_returning(self):
         a = DBArticle()
         a.save()
         self.assertIsInstance(a.id, int)
-        self.assertEqual(a.headline, "Default headline")
-        self.assertIsInstance(a.pub_date, datetime)
-        self.assertEqual(a.cost, Decimal("3.33"))
+        expected_num_queries = (
+            0 if connection.features.can_return_columns_from_insert else 3
+        )
+        with self.assertNumQueries(expected_num_queries):
+            self.assertEqual(a.headline, "Default headline")
+            self.assertIsInstance(a.pub_date, datetime)
+            self.assertEqual(a.cost, Decimal("3.33"))
 
-    @skipIfDBFeature("can_return_columns_from_insert")
     @skipUnlessDBFeature("supports_expression_defaults")
     def test_field_db_defaults_refresh(self):
         a = DBArticle()
         a.save()
-        a.refresh_from_db()
+        expected_num_queries = (
+            0 if connection.features.can_return_columns_from_insert else 3
+        )
         self.assertIsInstance(a.id, int)
-        self.assertEqual(a.headline, "Default headline")
-        self.assertIsInstance(a.pub_date, datetime)
-        self.assertEqual(a.cost, Decimal("3.33"))
+        with self.assertNumQueries(expected_num_queries):
+            self.assertEqual(a.headline, "Default headline")
+            self.assertIsInstance(a.pub_date, datetime)
+            self.assertEqual(a.cost, Decimal("3.33"))
 
     def test_null_db_default(self):
         obj1 = DBDefaults.objects.create()
-        if not connection.features.can_return_columns_from_insert:
-            obj1.refresh_from_db()
-        self.assertEqual(obj1.null, 1.1)
+        expected_num_queries = (
+            0 if connection.features.can_return_columns_from_insert else 1
+        )
+        with self.assertNumQueries(expected_num_queries):
+            self.assertEqual(obj1.null, 1.1)
 
         obj2 = DBDefaults.objects.create(null=None)
-        self.assertIsNone(obj2.null)
+        with self.assertNumQueries(0):
+            self.assertIsNone(obj2.null)
 
     @skipUnlessDBFeature("supports_expression_defaults")
-    @override_settings(USE_TZ=True)
     def test_db_default_function(self):
         m = DBDefaultsFunction.objects.create()
-        if not connection.features.can_return_columns_from_insert:
-            m.refresh_from_db()
-        self.assertAlmostEqual(m.number, pi)
-        self.assertEqual(m.year, timezone.now().year)
-        self.assertAlmostEqual(m.added, pi + 4.5)
-        self.assertEqual(m.multiple_subfunctions, 4.5)
+        expected_num_queries = (
+            0 if connection.features.can_return_columns_from_insert else 4
+        )
+        with self.assertNumQueries(expected_num_queries):
+            self.assertAlmostEqual(m.number, pi)
+            self.assertEqual(m.year, datetime.now(UTC).year)
+            self.assertAlmostEqual(m.added, pi + 4.5)
+            self.assertEqual(m.multiple_subfunctions, 4.5)
 
     @skipUnlessDBFeature("insert_test_table_with_defaults")
     def test_both_default(self):
@@ -96,6 +100,17 @@ class DefaultTests(TestCase):
 
         obj2 = DBDefaults.objects.create()
         self.assertEqual(obj2.both, 1)
+
+    def test_db_default_blind_overwrite(self):
+        """
+        Perform a blind overwrite: instantiate an object with a known pk
+        without fetching it, and overwrite some values. The db_default is used.
+        """
+        obj1 = DBDefaults.objects.create(null=1.2)
+        unfetched_instance = DBDefaults(pk=obj1.pk)
+        unfetched_instance.save()
+        obj1.refresh_from_db()
+        self.assertEqual(obj1.null, 1.1)
 
     def test_pk_db_default(self):
         obj1 = DBDefaultsPK.objects.create()
@@ -125,14 +140,44 @@ class DefaultTests(TestCase):
         child2 = DBDefaultsFK.objects.create(language_code=parent2)
         self.assertEqual(child2.language_code, parent2)
 
+    def test_primary_key_assigned_db_default_expression(self):
+        # Create the target of the foreign key.
+        DBDefaultsPK.objects.create(language_code="kr")
+        # Create an object that happens to match the python default for
+        # DBDefaultsOneToOnePK.language_code.
+        DBDefaultsPK.objects.create(language_code="tr")
+
+        related = DBDefaultsPK()
+        obj = DBDefaultsOneToOnePK(language_code_id=related.pk)
+        related.save()
+        obj.save()
+
+        # The python default is not used.
+        # This should either be "en" or "kr" depending on which model's
+        # DatabaseDefault is used, but this behavior varies across databases.
+        self.assertNotEqual(obj.language_code_id, "tr")
+
     @skipUnlessDBFeature(
-        "can_return_columns_from_insert", "supports_expression_defaults"
+        "can_return_columns_from_insert",
+        "supports_expression_defaults",
+        "supports_uuid4_function_in_default",
     )
+    def test_foreign_key_to_parent_with_expression_pk(self):
+        parent = DBDefaultsFunctionPK(pk=UUID4())
+        obj = DBDefaultsFunctionFK(parent=parent)
+        parent.save()
+        obj.save()
+        self.assertEqual(obj.parent_id, parent.pk)
+
+    @skipUnlessDBFeature("supports_expression_defaults")
     def test_case_when_db_default_returning(self):
         m = DBDefaultsFunction.objects.create()
-        self.assertEqual(m.case_when, 3)
+        expected_num_queries = (
+            0 if connection.features.can_return_columns_from_insert else 1
+        )
+        with self.assertNumQueries(expected_num_queries):
+            self.assertEqual(m.case_when, 3)
 
-    @skipIfDBFeature("can_return_columns_from_insert")
     @skipUnlessDBFeature("supports_expression_defaults")
     def test_case_when_db_default_no_returning(self):
         m = DBDefaultsFunction.objects.create()
@@ -171,13 +216,12 @@ class DefaultTests(TestCase):
         self.assertCountEqual(headlines, ["Default headline", "Something else"])
 
     @skipUnlessDBFeature("supports_expression_defaults")
-    @override_settings(USE_TZ=True)
     def test_bulk_create_mixed_db_defaults_function(self):
         instances = [DBDefaultsFunction(), DBDefaultsFunction(year=2000)]
         DBDefaultsFunction.objects.bulk_create(instances)
 
         years = DBDefaultsFunction.objects.values_list("year", flat=True)
-        self.assertCountEqual(years, [2000, timezone.now().year])
+        self.assertCountEqual(years, [2000, datetime.now(UTC).year])
 
     @skipUnlessDBFeature("supports_expression_defaults")
     def test_full_clean(self):

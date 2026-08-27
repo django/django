@@ -38,13 +38,16 @@ import base64
 import datetime
 import json
 import time
+import warnings
 import zlib
 
 from django.conf import settings
 from django.utils.crypto import constant_time_compare, salted_hmac
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.encoding import force_bytes
 from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
+from django.utils.warnings import django_file_prefixes
 
 _SEP_UNSAFE = _lazy_re_compile(r"^[A-z0-9-_=]*$")
 BASE62_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
@@ -96,7 +99,17 @@ def b64_decode(s):
     return base64.urlsafe_b64decode(s + pad)
 
 
-def base64_hmac(salt, value, key, algorithm="sha1"):
+# RemovedInDjango70Warning: algorithm="sha256"
+def base64_hmac(salt, value, key, algorithm=None):
+    if algorithm is None:
+        warnings.warn(
+            "The default argument for algorithm in base64_hmac() will change "
+            "from 'sha1' to 'sha256' in Django 7.0. Pass an explicit "
+            "algorithm to silence this warning.",
+            category=RemovedInDjango70Warning,
+            skip_file_prefixes=django_file_prefixes(),
+        )
+        algorithm = "sha1"
     return b64_encode(
         salted_hmac(salt, value, key, algorithm=algorithm).digest()
     ).decode()
@@ -105,6 +118,33 @@ def base64_hmac(salt, value, key, algorithm="sha1"):
 def _cookie_signer_key(key):
     # SECRET_KEYS items may be str or bytes.
     return b"django.http.cookies" + force_bytes(key)
+
+
+def _cookie_signer_salt(cookie_name, salt=""):
+    # Prefix the salt length so (cookie_name, salt) pairs can't collide.
+    return f"django.http.cookies.v2:{len(salt)}:{salt}{cookie_name}"
+
+
+# RemovedInDjango70Warning: When the deprecation ends, remove.
+def _cookie_signer_legacy_salt(cookie_name, salt=""):
+    return cookie_name + salt
+
+
+def _unsign_cookie(signed_value, *, cookie_name, salt="", max_age=None):
+    try:
+        # RemovedInDjango70Warning: When the deprecation ends, replace the
+        # whole function body with this single return statement.
+        return get_cookie_signer(salt=_cookie_signer_salt(cookie_name, salt)).unsign(
+            signed_value, max_age=max_age
+        )
+    except BadSignature as exc:
+        if settings.SIGNED_COOKIE_LEGACY_SALT_FALLBACK and not isinstance(
+            exc, SignatureExpired
+        ):
+            return get_cookie_signer(
+                salt=_cookie_signer_legacy_salt(cookie_name, salt)
+            ).unsign(signed_value, max_age=max_age)
+        raise
 
 
 def get_cookie_signer(salt="django.core.signing.get_cookie_signer"):

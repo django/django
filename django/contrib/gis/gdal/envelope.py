@@ -128,7 +128,7 @@ class Envelope:
                         (args[0][0], args[0][1], args[0][0], args[0][1])
                     )
                 elif len(args[0]) == 4:
-                    (minx, miny, maxx, maxy) = args[0]
+                    minx, miny, maxx, maxy = args[0]
                     if minx < self._envelope.MinX:
                         self._envelope.MinX = minx
                     if miny < self._envelope.MinY:

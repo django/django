@@ -10,10 +10,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Croatian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-12-03 07:59+0000\n"
+"Last-Translator: Mislav Cimperšak <mislav.cimpersak@gmail.com>, 2015\n"
+"Language-Team: Croatian (http://app.transifex.com/django/django/language/"
 "hr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -28,31 +28,27 @@ msgstr "Dostupno %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
-msgstr ""
-"Ovo je popis dostupnih %s. Možete dodati pojedine na način da ih izaberete u "
-"polju ispod i kliknete \"Izaberi\" strelicu između dva polja. "
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
+msgstr "Odaberite %s tako da ih odabereš, a zatim odaber strelicu „Odaberi“."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr "Tipkajte u ovo polje da filtrirate listu dostupnih %s."
+msgstr "Tipkajte u ovo polje za filtriranje popisa dostupnih %s."
 
 msgid "Filter"
-msgstr "Filter"
-
-msgid "Choose all"
-msgstr "Odaberi sve"
+msgstr "Filtar"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Kliknite da odabrete sve %s odjednom."
+msgid "Choose all %s"
+msgstr "Odaberi sve %s"
 
-msgid "Choose"
-msgstr "Izaberi"
+#, javascript-format
+msgid "Choose selected %s"
+msgstr "Odaberi odabrane %s"
 
-msgid "Remove"
-msgstr "Ukloni"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "Ukloni odabrane %s"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -60,47 +56,57 @@ msgstr "Odabrano %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Ovo je popis odabranih %s. Možete ukloniti pojedine na način da ih izaberete "
-"u polju ispod i kliknete \"Ukloni\" strelicu između dva polja. "
-
-msgid "Remove all"
-msgstr "Ukloni sve"
+"Uklonite %s tako da ih odaberete, a zatim odaberite gumb sa strelicom "
+"„Ukloni“."
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Kliknite da uklonite sve izabrane %s odjednom."
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Tipkajte u ovo polje za filtriranje popisa odabranih %s."
+
+msgid "(click to clear)"
+msgstr "(kliknite za brisanje)"
+
+#, javascript-format
+msgid "Remove all %s"
+msgstr "Ukloni sve %s"
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s odabrana opcija nije vidljiva"
+msgstr[1] "%s odabrane opcije nisu vidljive"
+msgstr[2] "%s odabranih opcija nije vidljivo"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] "odabrano %(sel)s od %(cnt)s"
-msgstr[1] "odabrano %(sel)s od %(cnt)s"
-msgstr[2] "odabrano %(sel)s od %(cnt)s"
+msgstr[0] "odabrano: %(sel)s od %(cnt)s"
+msgstr[1] "odabrano: %(sel)s od %(cnt)s"
+msgstr[2] "odabrano: %(sel)s od %(cnt)s"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
-"Neke promjene nisu spremljene na pojedinim polja za uređivanje. Ako "
-"pokrenete akciju, nespremljene promjene će biti izgubljene."
+"Neke promjene nisu spremljene u pojedinim polja za uređivanje. Ako pokrenete "
+"radnju, nespremljene promjene će se izgubiti."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Odabrali ste akciju, ali niste još spremili promjene na pojedinim polja. "
-"Molimo kliknite OK za spremanje. Morat ćete ponovno pokrenuti akciju."
+"Odabrali ste radnju, ali još niste spremili promjene za pojedinačna polja. "
+"Kliknite „U redu“ za spremanje. Radnju ćete morati ponovo pokrenuti."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Odabrali ste akciju, a niste napravili nikakve izmjene na pojedinim poljima. "
-"Vjerojatno tražite gumb Idi umjesto gumb Spremi."
+"Odabrali ste radnju i niste uradili nikakve promjene u pojedinačnim poljima. "
+"Vjerojatno tražite gumb „Kreni“, a ne gumb „Spremi“."
 
 msgid "Now"
 msgstr "Sada"
@@ -120,22 +126,22 @@ msgstr "6 popodne"
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Napomena: Vi ste %s sat ispred vremena servera."
+msgstr[1] "Napomena: Vi ste %s sata ispred vremena servera."
+msgstr[2] "Napomena: Vi ste %s sati ispred vremena servera."
 
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Napomena: Vi ste %s sat iza vremena servera."
+msgstr[1] "Napomena: Vi ste %s sata iza vremena servera."
+msgstr[2] "Napomena: Vi ste %s sati iza vremena servera."
 
 msgid "Choose a Time"
-msgstr "Izaberite vrijeme"
+msgstr "Odaberite vrijeme"
 
 msgid "Choose a time"
-msgstr "Izaberite vrijeme"
+msgstr "Odaberite vrijeme"
 
 msgid "Cancel"
 msgstr "Odustani"
@@ -153,71 +159,162 @@ msgid "Tomorrow"
 msgstr "Sutra"
 
 msgid "January"
-msgstr ""
+msgstr "Siječanj"
 
 msgid "February"
-msgstr ""
+msgstr "Veljača"
 
 msgid "March"
-msgstr ""
+msgstr "Ožujak"
 
 msgid "April"
-msgstr ""
+msgstr "Travanj"
 
 msgid "May"
-msgstr ""
+msgstr "Svibanj"
 
 msgid "June"
-msgstr ""
+msgstr "Lipanj"
 
 msgid "July"
-msgstr ""
+msgstr "Srpanj"
 
 msgid "August"
-msgstr ""
+msgstr "Kolovoz"
 
 msgid "September"
-msgstr ""
+msgstr "Rujan"
 
 msgid "October"
-msgstr ""
+msgstr "Listopad"
 
 msgid "November"
-msgstr ""
+msgstr "Studeni"
 
 msgid "December"
-msgstr ""
+msgstr "Prosinac"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Sij"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Velj"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Ožu"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Tra"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Svi"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Lip"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Srp"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Kol"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Ruj"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Lis"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Stu"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Pro"
+
+msgid "Sunday"
+msgstr "nedjelja"
+
+msgid "Monday"
+msgstr "ponedjeljak"
+
+msgid "Tuesday"
+msgstr "utorak"
+
+msgid "Wednesday"
+msgstr "srijeda"
+
+msgid "Thursday"
+msgstr "četvrtak"
+
+msgid "Friday"
+msgstr "petak"
+
+msgid "Saturday"
+msgstr "subota"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "ned"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "pon"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "uto"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "sri"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "čet"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "pet"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "sub"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "N"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "P"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "U"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "S"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "Č"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "P"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
-
-msgid "Show"
-msgstr "Prikaži"
-
-msgid "Hide"
-msgstr "Sakri"
+msgstr "S"

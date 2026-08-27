@@ -10,16 +10,16 @@
 # Sergey <inoks@mail.ru>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # SeryiMysh <vital@dorokhin.kz>, 2020
-# Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2024
+# Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2026
 # Дмитрий <nerosketch@gmail.com>, 2019
 # Bobsans <mr.bobsans@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 07:05+0000\n"
-"Last-Translator: Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2024\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2026-03-09 07:05+0000\n"
+"Last-Translator: Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2026\n"
 "Language-Team: Russian (http://app.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -42,8 +42,8 @@ msgstr "Успешно удалены %(count)d %(items)s."
 msgid "Cannot delete %(name)s"
 msgstr "Не удается удалить %(name)s"
 
-msgid "Are you sure?"
-msgstr "Вы уверены?"
+msgid "Delete multiple objects"
+msgstr "Удалить несколько объектов"
 
 msgid "Administration"
 msgstr "Администрирование"
@@ -276,6 +276,9 @@ msgstr[3] "Выбраны все %(total_count)s"
 msgid "0 of %(cnt)s selected"
 msgstr "Выбрано 0 объектов из %(cnt)s "
 
+msgid "Delete"
+msgstr "Удалить"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "История изменений: %s"
@@ -336,11 +339,8 @@ msgstr ""
 "Произошла ошибка. О ней сообщено администраторам сайта по электронной почте, "
 "ошибка должна быть вскоре исправлена. Благодарим вас за терпение."
 
-msgid "Run the selected action"
-msgstr "Выполнить выбранное действие"
-
-msgid "Go"
-msgstr "Выполнить"
+msgid "Run"
+msgstr "Запустить"
 
 msgid "Click here to select the objects across all pages"
 msgstr "Нажмите здесь, чтобы выбрать объекты на всех страницах"
@@ -359,6 +359,15 @@ msgstr "Хлебные крошки"
 msgid "Models in the %(name)s application"
 msgstr "Модели в приложении %(name)s"
 
+msgid "Model name"
+msgstr "Имя модели"
+
+msgid "Add link"
+msgstr "Добавить"
+
+msgid "Change or view list link"
+msgstr "Просмотреть или редактировать"
+
 msgid "Add"
 msgstr "Добавить"
 
@@ -368,15 +377,13 @@ msgstr "Просмотреть"
 msgid "You don’t have permission to view or edit anything."
 msgstr "У вас недостаточно полномочий для просмотра или изменения чего либо."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Сначала введите имя пользователя и пароль. Затем вы сможете ввести больше "
-"информации о пользователе."
+"После того, как вы создадите пользователя, у вас появится больше "
+"возможностей по редактированию."
 
-msgid "Enter a username and password."
-msgstr "Введите имя пользователя и пароль."
+msgid "Error:"
+msgstr "Ошибка:"
 
 msgid "Change password"
 msgstr "Изменить пароль"
@@ -445,6 +452,9 @@ msgstr "Показать счётчики"
 msgid "Clear all filters"
 msgstr "Сбросить все фильтры"
 
+msgid "Save"
+msgstr "Сохранить"
+
 msgid "Remove from sorting"
 msgstr "Удалить из сортировки"
 
@@ -464,34 +474,32 @@ msgstr "Переключить тему (текущая: светлая)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Переключить тему (текущая: тёмная)"
 
-msgid "Delete"
-msgstr "Удалить"
-
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Удаление %(object_name)s '%(escaped_object)s' приведет к удалению связанных "
-"объектов, но ваша учетная запись не имеет прав для удаления следующих типов "
-"объектов:"
+"Удаление объекта типа %(object_name)s\"%(escaped_object)s\" потребовало бы "
+"удаления следующих объектов, связанных с ним, но у вашей учётной записи нет "
+"прав на удаление этого типа объектов:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Удаление %(object_name)s '%(escaped_object)s' потребует удаления следующих "
-"связанных защищенных объектов:"
+"Удаление объекта типа %(object_name)s \"%(escaped_object)s\" потребовало бы "
+"удаления следующих защищённых объектов, связанных с ним:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Вы уверены, что хотите удалить %(object_name)s \"%(escaped_object)s\"? Все "
-"следующие связанные объекты также будут удалены:"
+"Вы уверены, что хотите удалить объект "
+"типа%(object_name)s\"%(escaped_object)s\"? Указанные ниже связанные объекты "
+"при этом будут также удалены:"
 
 msgid "Objects"
 msgstr "Объекты"
@@ -501,9 +509,6 @@ msgstr "Да, я уверен"
 
 msgid "No, take me back"
 msgstr "Нет, отменить и вернуться к выбору"
-
-msgid "Delete multiple objects"
-msgstr "Удалить несколько объектов"
 
 #, python-format
 msgid ""
@@ -579,8 +584,8 @@ msgstr ""
 "просмотра данной страницы. Возможно, вы хотели бы войти в систему, используя "
 "другую учётную запись?"
 
-msgid "Forgotten your password or username?"
-msgstr "Забыли свой пароль или имя пользователя?"
+msgid "Forgotten your login credentials?"
+msgstr "Забыли пароль?"
 
 msgid "Toggle navigation"
 msgstr "Переключить навигацию"
@@ -603,6 +608,10 @@ msgstr "Пользователь"
 msgid "Action"
 msgstr "Действие"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr "Паджинация записей %(name)s "
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "запись"
@@ -617,14 +626,19 @@ msgstr ""
 "Данный объект не имеет истории изменений. Возможно, он был добавлен не через "
 "данный административный сайт."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr "Паджинация %(name)s"
+
 msgid "Show all"
 msgstr "Показать все"
 
-msgid "Save"
-msgstr "Сохранить"
-
 msgid "Popup closing…"
 msgstr "Всплывающее окно закрывается..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr "Искать %(name)s"
 
 msgid "Search"
 msgstr "Найти"
@@ -750,8 +764,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Пожалуйста, перейдите на эту страницу и введите новый пароль:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Ваше имя пользователя (на случай, если вы его забыли):"
+msgid "In case you’ve forgotten, you are:"
+msgstr "На случай, если вы забыли, вы: "
 
 msgid "Thanks for using our site!"
 msgstr "Спасибо, что используете наш сайт!"

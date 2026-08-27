@@ -144,7 +144,7 @@ class SessionStore(SessionBase):
         obj = await self.acreate_model_instance(data)
         using = router.db_for_write(self.model, instance=obj)
         try:
-            # This code MOST run in a transaction, so it requires
+            # This code MUST run in a transaction, so it requires
             # @sync_to_async wrapping until transaction.atomic() supports
             # async.
             @sync_to_async

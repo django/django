@@ -2,12 +2,12 @@
 {% load i18n %}
 
 {% block breadcrumbs %}
-<div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% translate 'Documentation' %}</a>
-&rsaquo; {% translate 'Templates' %}
-&rsaquo; {{ name }}
-</div>
+<ol class="breadcrumbs">
+<li><a href="{% url 'admin:index' %}">{% translate 'Home' %}</a></li>
+<li><a href="{% url 'django-admindocs-docroot' %}">{% translate 'Documentation' %}</a></li>
+<li>{% translate 'Templates' %}</li>
+<li aria-current="page">{{ name }}</li>
+</ol>
 {% endblock %}
 
 {% block title %}{% blocktranslate %}Template: {{ name }}{% endblocktranslate %}{% endblock %}

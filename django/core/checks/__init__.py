@@ -20,6 +20,7 @@ import django.core.checks.commands  # NOQA isort:skip
 import django.core.checks.compatibility.django_4_0  # NOQA isort:skip
 import django.core.checks.database  # NOQA isort:skip
 import django.core.checks.files  # NOQA isort:skip
+import django.core.checks.mail  # NOQA isort:skip
 import django.core.checks.model_checks  # NOQA isort:skip
 import django.core.checks.security.base  # NOQA isort:skip
 import django.core.checks.security.csrf  # NOQA isort:skip
@@ -27,7 +28,6 @@ import django.core.checks.security.sessions  # NOQA isort:skip
 import django.core.checks.templates  # NOQA isort:skip
 import django.core.checks.translation  # NOQA isort:skip
 import django.core.checks.urls  # NOQA isort:skip
-
 
 __all__ = [
     "CheckMessage",

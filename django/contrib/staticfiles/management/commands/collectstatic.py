@@ -154,7 +154,11 @@ class Command(BaseCommand):
                     # Add a blank line before the traceback, otherwise it's
                     # too easy to miss the relevant part of the error message.
                     self.stderr.write()
-                    raise processed
+                    # Re-raise exceptions as CommandError and display notes.
+                    message = str(processed)
+                    if hasattr(processed, "__notes__"):
+                        message += "\n" + "\n".join(processed.__notes__)
+                    raise CommandError(message) from processed
                 if processed:
                     self.log(
                         "Post-processed '%s' as '%s'" % (original_path, processed_path),

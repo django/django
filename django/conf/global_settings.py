@@ -92,6 +92,7 @@ LANGUAGES = [
     ("hi", gettext_noop("Hindi")),
     ("hr", gettext_noop("Croatian")),
     ("hsb", gettext_noop("Upper Sorbian")),
+    ("ht", gettext_noop("Haitian Creole")),
     ("hu", gettext_noop("Hungarian")),
     ("hy", gettext_noop("Armenian")),
     ("ia", gettext_noop("Interlingua")),
@@ -186,21 +187,29 @@ DATABASES = {}
 # Classes used to implement DB routing behavior.
 DATABASE_ROUTERS = []
 
+# Mailer configurations. No mailers are defined by default.
+# RemovedInDjango70Warning: uncomment the next line.
+# MAILERS = {}
+
+# RemovedInDjango70Warning.
 # The email backend to use. For possible shortcuts see django.core.mail.
 # The default is to use the SMTP backend.
 # Third-party backends can be specified by providing a Python path
 # to a module that defines an EmailBackend class.
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
+# RemovedInDjango70Warning.
 # Host for sending email.
 EMAIL_HOST = "localhost"
 
+# RemovedInDjango70Warning.
 # Port for sending email.
 EMAIL_PORT = 25
 
 # Whether to send SMTP 'Date' header in the local time zone or in UTC.
 EMAIL_USE_LOCALTIME = False
 
+# RemovedInDjango70Warning.
 # Optional SMTP authentication information for EMAIL_HOST.
 EMAIL_HOST_USER = ""
 EMAIL_HOST_PASSWORD = ""
@@ -217,6 +226,9 @@ TEMPLATES = []
 
 # Default form rendering class.
 FORM_RENDERER = "django.forms.renderers.DjangoTemplates"
+# RemovedInDjango70Warning: This setting allows to revert back to the old
+# blank choice label in Django 6.1.
+USE_BLANK_CHOICE_DASH = False
 
 # Default email address to use for various automated correspondence from
 # the site managers.
@@ -549,6 +561,7 @@ AUTH_PASSWORD_VALIDATORS = []
 # SIGNING #
 ###########
 
+SIGNED_COOKIE_LEGACY_SALT_FALLBACK = False
 SIGNING_BACKEND = "django.core.signing.TimestampSigner"
 
 ########
@@ -672,3 +685,8 @@ SECURE_CSP_REPORT_ONLY = {}
 # HTTPS as the default protocol in urlize and urlizetrunc when no protocol is
 # provided. Set to True to assume HTTPS during the Django 6.x release cycle.
 URLIZE_ASSUME_HTTPS = False
+
+#########
+# TASKS #
+#########
+TASKS = {"default": {"BACKEND": "django.tasks.backends.immediate.ImmediateBackend"}}

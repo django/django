@@ -7,8 +7,8 @@ from operator import or_
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.templatetags.auth import render_password_as_hash
-from django.core.exceptions import FieldDoesNotExist
-from django.core.validators import EMPTY_VALUES
+from django.core.exceptions import FieldDoesNotExist, ValidationError
+from django.core.validators import EMPTY_VALUES, URLValidator
 from django.db import models, router
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
@@ -18,6 +18,7 @@ from django.utils import formats, timezone
 from django.utils.hashable import make_hashable
 from django.utils.html import format_html
 from django.utils.regex_helper import _lazy_re_compile
+from django.utils.safestring import SafeString
 from django.utils.text import capfirst
 from django.utils.translation import ngettext
 from django.utils.translation import override as translation_override
@@ -129,8 +130,11 @@ def get_deleted_objects(objs, request, admin_site):
     must be a homogeneous iterable of objects (e.g. a QuerySet).
 
     Return a nested list of strings suitable for display in the
-    template with the ``unordered_list`` filter.
+    template with the ``unordered_list``
+    and ``truncated_unordered_list`` filters.
     """
+    from django.contrib.admin.options import EMPTY_VALUE_STRING
+
     try:
         obj = objs[0]
     except IndexError:
@@ -164,8 +168,12 @@ def get_deleted_objects(objs, request, admin_site):
                 return no_edit_link
 
             # Display a link to the admin page.
+            obj_display = display_for_value(str(obj), EMPTY_VALUE_STRING)
             return format_html(
-                '{}: <a href="{}">{}</a>', capfirst(opts.verbose_name), admin_url, obj
+                '{}: <a href="{}">{}</a>',
+                capfirst(opts.verbose_name),
+                admin_url,
+                obj_display,
             )
         else:
             # Don't display link to edit, because it either has no
@@ -184,8 +192,8 @@ def get_deleted_objects(objs, request, admin_site):
 
 
 class NestedObjects(Collector):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, force_collection=True, **kwargs):
+        super().__init__(*args, force_collection=force_collection, **kwargs)
         self.edges = {}  # {from_instance: [to_instances]}
         self.protected = set()
         self.model_objs = defaultdict(set)
@@ -242,13 +250,6 @@ class NestedObjects(Collector):
             roots.extend(self._nested(root, seen, format_callback))
         return roots
 
-    def can_fast_delete(self, *args, **kwargs):
-        """
-        We always want to load the objects into memory so that we can display
-        them to the user in confirm page.
-        """
-        return False
-
 
 def model_format_dict(obj):
     """
@@ -294,6 +295,7 @@ def lookup_field(name, obj, model_admin=None):
     except (FieldDoesNotExist, FieldIsAForeignKeyColumnName):
         # For non-regular field values, the value is either a method,
         # property, related field, or returned via a callable.
+        f = None
         if callable(name):
             attr = name
             value = attr(obj)
@@ -315,7 +317,6 @@ def lookup_field(name, obj, model_admin=None):
                 value = attr
             if hasattr(model_admin, "model") and hasattr(model_admin.model, name):
                 attr = getattr(model_admin.model, name)
-        f = None
     else:
         attr = None
         value = getattr(obj, name)
@@ -371,7 +372,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False, form=None)
     except FieldDoesNotExist:
         if name == "__str__":
             label = str(model._meta.verbose_name)
-            attr = str
+            attr = model.__str__
         else:
             if callable(name):
                 attr = name
@@ -431,6 +432,7 @@ def help_text_for_field(name, model):
 
 def display_for_field(value, field, empty_value_display, avoid_link=False):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
+    from django.db.models.expressions import DatabaseDefault
 
     if field.name == "password" and field.model == get_user_model():
         return render_password_as_hash(value)
@@ -446,8 +448,10 @@ def display_for_field(value, field, empty_value_display, avoid_link=False):
     # BooleanField needs special-case null-handling, so it comes before the
     # general null test.
     elif isinstance(field, models.BooleanField):
+        if isinstance(value, DatabaseDefault):
+            return _boolean_icon(None)
         return _boolean_icon(value)
-    elif value in field.empty_values:
+    elif value in field.empty_values or isinstance(value, DatabaseDefault):
         return empty_value_display
     elif isinstance(field, models.DateTimeField):
         return formats.localize(timezone.template_localtime(value))
@@ -460,6 +464,14 @@ def display_for_field(value, field, empty_value_display, avoid_link=False):
     elif isinstance(field, models.FileField) and value and not avoid_link:
         return format_html('<a href="{}">{}</a>', value.url, value)
     elif isinstance(field, models.URLField) and value and not avoid_link:
+        # Only render a clickable link for URLs with a safe scheme, so that a
+        # potentially dangerous stored value is shown as plain text rather than
+        # an executable link. The check is deliberately independent of the
+        # field's own validators, which may permit such schemes.
+        try:
+            URLValidator()(value)
+        except ValidationError:
+            return display_for_value(value, empty_value_display)
         return format_html('<a href="{}">{}</a>', value, value)
     elif isinstance(field, models.JSONField) and value:
         try:
@@ -472,10 +484,15 @@ def display_for_field(value, field, empty_value_display, avoid_link=False):
 
 def display_for_value(value, empty_value_display, boolean=False):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
+    from django.db.models.expressions import DatabaseDefault
 
     if boolean:
+        if value in EMPTY_VALUES or isinstance(value, DatabaseDefault):
+            return _boolean_icon(None)
         return _boolean_icon(value)
-    elif value in EMPTY_VALUES:
+    if isinstance(value, str) and not isinstance(value, SafeString):
+        value = value.strip()
+    if value in EMPTY_VALUES or isinstance(value, DatabaseDefault):
         return empty_value_display
     elif isinstance(value, bool):
         return str(value)
@@ -559,21 +576,21 @@ def construct_change_message(form, formsets, add):
     Translations are deactivated so that strings are stored untranslated.
     Translation happens later on LogEntry access.
     """
+    change_message = []
+    if add:
+        change_message.append({"added": {}})
     # Evaluating `form.changed_data` prior to disabling translations is
     # required to avoid fields affected by localization from being included
     # incorrectly, e.g. where date formats differ such as MM/DD/YYYY vs
     # DD/MM/YYYY.
-    changed_data = form.changed_data
-    with translation_override(None):
-        # Deactivate translations while fetching verbose_name for form
-        # field labels and using `field_name`, if verbose_name is not provided.
-        # Translations will happen later on LogEntry access.
-        changed_field_labels = _get_changed_field_labels_from_form(form, changed_data)
-
-    change_message = []
-    if add:
-        change_message.append({"added": {}})
-    elif form.changed_data:
+    elif changed_data := form.changed_data:
+        with translation_override(None):
+            # Deactivate translations while fetching verbose_name for form
+            # field labels and using `field_name`, if verbose_name is not
+            # provided. Translations will happen later on LogEntry access.
+            changed_field_labels = _get_changed_field_labels_from_form(
+                form, changed_data
+            )
         change_message.append({"changed": {"fields": changed_field_labels}})
     if formsets:
         with translation_override(None):

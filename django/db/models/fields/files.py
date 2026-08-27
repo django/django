@@ -34,6 +34,9 @@ class FieldFile(File, AltersData):
     def __hash__(self):
         return hash(self.name)
 
+    def __bool__(self):
+        return bool(self.name)
+
     # The standard File contains most of the necessary properties, but
     # FieldFiles can be instantiated without a name, so that needs to
     # be checked for here.
@@ -248,7 +251,7 @@ class FileField(Field):
     ):
         self._primary_key_set_explicitly = "primary_key" in kwargs
 
-        self.storage = storage or default_storage
+        self.storage = storage if storage is not None else default_storage
         if callable(self.storage):
             # Hold a reference to the callable for deconstruct().
             self._storage_callable = self.storage

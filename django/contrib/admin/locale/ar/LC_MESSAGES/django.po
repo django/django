@@ -5,17 +5,17 @@
 # Bashar Al-Abdulhadi, 2014
 # Eyad Toma <d.eyad.t@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Muaaz Alsaied, 2020
-# Tony xD <tony23dz@gmail.com>, 2020
+# Muaaz Alsaied, 2020,2025
+# Tony Ayoub <tony23dz@gmail.com>, 2020
 # صفا الفليج <safaalfulaij@hotmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-10-15 21:11+0000\n"
-"Last-Translator: Bashar Al-Abdulhadi\n"
-"Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-09-17 07:05+0000\n"
+"Last-Translator: Muaaz Alsaied, 2020,2025\n"
+"Language-Team: Arabic (http://app.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -35,8 +35,8 @@ msgstr "نجح حذف %(count)d من %(items)s."
 msgid "Cannot delete %(name)s"
 msgstr "تعذّر حذف %(name)s"
 
-msgid "Are you sure?"
-msgstr "هل أنت متأكد؟"
+msgid "Delete multiple objects"
+msgstr "حذف عدّة عناصر"
 
 msgid "Administration"
 msgstr "الإدارة"
@@ -85,7 +85,7 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
-"من فضلك أدخِل قيمة %(username)s الصحيحة وكلمة السر لحساب الطاقم الإداري. "
+"من فضلك أدخِل قيمة %(username)s الصحيحة وكلمة المرور لحساب الطاقم الإداري. "
 "الحقلين حسّاسين لحالة الأحرف."
 
 msgid "Action:"
@@ -163,52 +163,51 @@ msgstr "و"
 
 #, python-brace-format
 msgid "Changed {fields} for {name} “{object}”."
-msgstr "تغيّرت {fields} ‏{name} ‏”{object}“."
+msgstr "تم تغيير {fields} لـ {name} \"{object}\"."
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr "تغيّرت {fields}."
+msgstr "تم تغيير {fields}."
 
 #, python-brace-format
 msgid "Deleted {name} “{object}”."
 msgstr "حُذف {name} ‏”{object}“."
 
 msgid "No fields changed."
-msgstr "لم يتغيّر أي حقل."
+msgstr "لم يتم تغيير أية حقول."
 
 msgid "None"
 msgstr "بلا"
 
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
-"اضغط مفتاح ”Contrl“ (أو ”Command“ على أجهزة ماك) مطوّلًا لتحديد أكثر من عنصر."
+"اضغط مفتاح ”Control“ أو ”Command“ على أجهزة ماك مطوّلًا لتحديد أكثر من عنصر."
+
+msgid "Select this object for an action - {}"
+msgstr "حدد هذا الكائن لإجراء - {}"
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "نجحت إضافة {name} ‏”{obj}“."
 
 msgid "You may edit it again below."
-msgstr "يمكنك تعديله ثانيةً أسفله."
+msgstr "يمكن تعديله مرة أخرى أدناه."
 
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was added successfully. You may add another {name} below."
-msgstr "نجحت إضافة {name} ‏”{obj}“. يمكنك إضافة {name} آخر أسفله."
+msgstr "تمت إضافة {name} “{obj}” بنجاح. يمكنك إضافة {name} آخر أدناه."
 
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
-msgstr "نجح تعديل {name} ‏”{obj}“. يمكنك تعديله ثانيةً أسفله."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr "نجحت إضافة {name} ‏”{obj}“. يمكنك تعديله ثانيةً أسفله."
+msgstr "تم تعديل {name} “{obj}” بنجاح. يمكنك تعديله مجدداً أدناه."
 
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
-msgstr "تمت إضافة {name} “{obj}” بنجاح، يمكنك إضافة {name} أخر بالأسفل."
+msgstr "تم تعديل {name} “{obj}” بنجاح. يمكنك إضافة {name} آخر أدناه."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was changed successfully."
@@ -269,12 +268,16 @@ msgstr[5] "تم تحديد %(total_count)s"
 msgid "0 of %(cnt)s selected"
 msgstr "لا شيء محدد من %(cnt)s"
 
+msgid "Delete"
+msgstr "احذف"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "تاريخ التغيير: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -307,7 +310,7 @@ msgid "Page not found"
 msgstr "تعذر العثور على الصفحة"
 
 msgid "We’re sorry, but the requested page could not be found."
-msgstr "نحن آسفون، لكننا لم نعثر على الصفحة المطلوبة."
+msgstr "عذراً، تعذَّر العثور على الصفحة المطلوبة."
 
 msgid "Home"
 msgstr "الرئيسية"
@@ -344,9 +347,21 @@ msgstr "اختيار %(total_count)s %(module_name)s جميعها"
 msgid "Clear selection"
 msgstr "إزالة الاختيار"
 
+msgid "Breadcrumbs"
+msgstr "روابط التنقُّل"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "النماذج في تطبيق %(name)s"
+
+msgid "Model name"
+msgstr "اسم النموذج"
+
+msgid "Add link"
+msgstr "أضف رابط"
+
+msgid "Change or view list link"
+msgstr "عدِّل أو استعرض رابط القائمة"
 
 msgid "Add"
 msgstr "أضف"
@@ -355,30 +370,48 @@ msgid "View"
 msgstr "استعراض"
 
 msgid "You don’t have permission to view or edit anything."
-msgstr "ليست لديك الصلاحية لاستعراض أو لتعديل أي شيء."
+msgstr "ليس لديك إذن لعرض أو تغديل أي شيء."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
-msgstr ""
-"أولاً ، أدخل اسم المستخدم وكلمة المرور. بعد ذلك ، ستتمكن من تعديل المزيد من "
-"خيارات المستخدم."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
+msgstr "بعد إضافة مستخدم, ستكون قادراً على تعديل المزيد من إعدادات المستخدم."
 
-msgid "Enter a username and password."
-msgstr "أدخل اسم مستخدم وكلمة مرور."
+msgid "Error:"
+msgstr "خطأ:"
 
 msgid "Change password"
 msgstr "غيّر كلمة المرور"
 
-msgid "Please correct the error below."
-msgstr "الرجاء تصحيح الأخطاء أدناه."
+msgid "Set password"
+msgstr "اختر كلمة مرور"
 
-msgid "Please correct the errors below."
-msgstr "الرجاء تصحيح الأخطاء أدناه."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "لا توجد أخطاء لتصحيحها."
+msgstr[1] "الرجاء تصحيح الخطأ أدناه."
+msgstr[2] "الرجاء تصحيح الأخطاء أدناه."
+msgstr[3] "الرجاء تصحيح الأخطاء أدناه."
+msgstr[4] "الرجاء تصحيح الأخطاء أدناه."
+msgstr[5] "الرجاء تصحيح الأخطاء أدناه."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "أدخل كلمة مرور جديدة للمستخدم <strong>%(username)s</strong>."
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"<strong>ستُفعِّل</strong> هذه العملية المصادقة المعتمدة على كلمة المرور لهذا "
+"المستخدم."
+
+msgid "Disable password-based authentication"
+msgstr "تعطيل المصادقة المعتمدة على كلمة المرور"
+
+msgid "Enable password-based authentication"
+msgstr "تفعيل المصادقة المعتمدة على كلمة المرور"
+
+msgid "Skip to main content"
+msgstr "الانتقال إلى المحتوى الرئيسي"
 
 msgid "Welcome,"
 msgstr "أهلا، "
@@ -405,6 +438,12 @@ msgstr "مشاهدة على الموقع"
 msgid "Filter"
 msgstr "مرشّح"
 
+msgid "Hide counts"
+msgstr "إخفاء الأعداد"
+
+msgid "Show counts"
+msgstr "إظهار الأعداد"
+
 msgid "Clear all filters"
 msgstr "مسح جميع المرشحات"
 
@@ -418,8 +457,14 @@ msgstr "أولوية الترتيب: %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "عكس الترتيب"
 
-msgid "Delete"
-msgstr "احذف"
+msgid "Toggle theme (current theme: auto)"
+msgstr "تبديل السمة (السمة الحالية: تلقائي)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "تبديل السمة (السمة الحالية: فاتح)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "تبديل السمة (السمة الحالية: داكنة)"
 
 #, python-format
 msgid ""
@@ -454,9 +499,6 @@ msgstr "نعم، أنا متأكد"
 
 msgid "No, take me back"
 msgstr "لا, تراجع للخلف"
-
-msgid "Delete multiple objects"
-msgstr "حذف عدّة عناصر"
 
 #, python-format
 msgid ""
@@ -502,6 +544,15 @@ msgstr "إجراءاتي"
 msgid "None available"
 msgstr "لا يوجد"
 
+msgid "Added:"
+msgstr "تم الإضافة:"
+
+msgid "Changed:"
+msgstr "تم التعديل:"
+
+msgid "Deleted:"
+msgstr "تم الحذف:"
+
 msgid "Unknown content"
 msgstr "مُحتوى مجهول"
 
@@ -521,11 +572,14 @@ msgstr ""
 "أنت مسجل الدخول بإسم المستخدم  %(username)s, ولكنك غير مخول للوصول لهذه "
 "الصفحة. هل ترغب بتسجيل الدخول بحساب آخر؟"
 
-msgid "Forgotten your password or username?"
-msgstr "نسيت كلمة المرور أو اسم المستخدم الخاص بك؟"
+msgid "Forgotten your login credentials?"
+msgstr "هل نسيت بيانات تسجيل الدخول؟"
 
 msgid "Toggle navigation"
 msgstr "تغيير التصفّح"
+
+msgid "Sidebar"
+msgstr "الشريط الجانبي"
 
 msgid "Start typing to filter…"
 msgstr "ابدأ الكتابة للتصفية ..."
@@ -541,6 +595,15 @@ msgstr "المستخدم"
 
 msgid "Action"
 msgstr "إجراء"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "إدخال"
+msgstr[1] "إدخال"
+msgstr[2] "الإدخالات"
+msgstr[3] "الإدخالات"
+msgstr[4] "الإدخالات"
+msgstr[5] "الإدخالات"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -601,6 +664,10 @@ msgstr "أضف %(model)s آخر"
 #, python-format
 msgid "Delete selected %(model)s"
 msgstr "حذف %(model)s المختارة"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr "استعرض %(model)s المختارة"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "شكرا لقضاء بعض الوقت الجيد في الموقع اليوم."
@@ -677,8 +744,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "رجاءً اذهب إلى الصفحة التالية واختر كلمة مرور جديدة:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "اسم المستخدم الخاص بك، في حال كنت قد نسيته:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "في حال نسيت، أنت:"
 
 msgid "Thanks for using our site!"
 msgstr "شكراً لاستخدامك موقعنا!"
@@ -699,6 +766,9 @@ msgstr "عنوان البريد الإلكتروني:"
 
 msgid "Reset my password"
 msgstr "استعد كلمة مروري"
+
+msgid "Select all objects on this page for an action"
+msgstr "حدد جميع الكائنات في هذه الصفحة لإجراء"
 
 msgid "All dates"
 msgstr "كافة التواريخ"

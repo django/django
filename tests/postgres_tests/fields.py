@@ -57,3 +57,12 @@ except ImportError:
 class EnumField(models.CharField):
     def get_prep_value(self, value):
         return value.value if isinstance(value, enum.Enum) else value
+
+
+class OffByOneField(models.IntegerField):
+    def get_placeholder_sql(self, value, compiler, connection):
+        if hasattr(value, "as_sql"):
+            sql, params = compiler.compile(value)
+        else:
+            sql, params = "%s", (value,)
+        return f"({sql} + %s)", (*params, 1)

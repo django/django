@@ -6,11 +6,20 @@ from django import forms
 from django.apps import apps
 from django.conf import SettingsReference, settings
 from django.core import checks, exceptions
-from django.db import connection, router
+from django.db import connection, connections, router
 from django.db.backends import utils
-from django.db.models import Q
+from django.db.models import NOT_PROVIDED, Q
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
+from django.db.models.deletion import (
+    CASCADE,
+    DB_CASCADE,
+    DB_SET_DEFAULT,
+    DB_SET_NULL,
+    DO_NOTHING,
+    SET_DEFAULT,
+    SET_NULL,
+    DatabaseOnDelete,
+)
 from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
 from django.utils.functional import cached_property
@@ -339,6 +348,24 @@ class RelatedField(FieldCacheMixin, Field):
                     )
                 )
 
+        # Check clash between reverse accessor and manager names on
+        # the target model.
+        if not rel_is_hidden:
+            manager_names = {m.name for m in rel_opts.managers}
+            if rel_name in manager_names:
+                errors.append(
+                    checks.Error(
+                        f"Related name '{rel_name}' for '{field_name}' "
+                        f"clashes with the name of a model manager.",
+                        hint=(
+                            "Rename the model manager or change the related_name "
+                            "argument in the definition for field '%s'." % field_name
+                        ),
+                        obj=self,
+                        id="fields.E348",
+                    )
+                )
+
         return errors
 
     def db_type(self, connection):
@@ -574,13 +601,20 @@ class ForeignObject(RelatedField):
         obj.__dict__.pop("reverse_path_infos", None)
         return obj
 
+    @property
+    def non_db_attrs(self):
+        if isinstance(self.remote_field.on_delete, DatabaseOnDelete):
+            # Database-level on_delete options are part of the column
+            # definition.
+            return super().non_db_attrs
+        return super().non_db_attrs + ("on_delete",)
+
     def check(self, **kwargs):
         return [
             *super().check(**kwargs),
             *self._check_to_fields_exist(),
             *self._check_to_fields_composite_pk(),
             *self._check_unique_target(),
-            *self._check_conflict_with_managers(),
         ]
 
     def _check_to_fields_exist(self):
@@ -709,27 +743,6 @@ class ForeignObject(RelatedField):
                     )
                 ]
         return []
-
-    def _check_conflict_with_managers(self):
-        errors = []
-        manager_names = {manager.name for manager in self.opts.managers}
-        for rel_objs in self.model._meta.related_objects:
-            related_object_name = rel_objs.name
-            if related_object_name in manager_names:
-                field_name = f"{self.model._meta.object_name}.{self.name}"
-                errors.append(
-                    checks.Error(
-                        f"Related name '{related_object_name}' for '{field_name}' "
-                        "clashes with the name of a model manager.",
-                        hint=(
-                            "Rename the model manager or change the related_name "
-                            f"argument in the definition for field '{field_name}'."
-                        ),
-                        obj=self,
-                        id="fields.E348",
-                    )
-                )
-        return errors
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
@@ -1041,18 +1054,50 @@ class ForeignKey(ForeignObject):
         return cls
 
     def check(self, **kwargs):
+        databases = kwargs.get("databases") or []
         return [
             *super().check(**kwargs),
-            *self._check_on_delete(),
+            *self._check_on_delete(databases),
             *self._check_unique(),
         ]
 
-    def _check_on_delete(self):
+    def _check_on_delete_db_support(self, on_delete, feature_flag, databases):
+        for db in databases:
+            if not router.allow_migrate_model(db, self.model):
+                continue
+            connection = connections[db]
+            if feature_flag in self.model._meta.required_db_features or getattr(
+                connection.features, feature_flag
+            ):
+                continue
+            no_db_option_name = on_delete.__name__.removeprefix("DB_")
+            yield checks.Error(
+                f"{connection.display_name} does not support a {on_delete.__name__}.",
+                hint=f"Change the on_delete rule to {no_db_option_name}.",
+                obj=self,
+                id="fields.E324",
+            )
+
+    def _check_on_delete(self, databases):
         on_delete = getattr(self.remote_field, "on_delete", None)
-        if on_delete == SET_NULL and not self.null:
-            return [
+        errors = []
+        if on_delete == DB_CASCADE:
+            errors.extend(
+                self._check_on_delete_db_support(
+                    on_delete, "supports_on_delete_db_cascade", databases
+                )
+            )
+        if on_delete == DB_SET_NULL:
+            errors.extend(
+                self._check_on_delete_db_support(
+                    on_delete, "supports_on_delete_db_null", databases
+                )
+            )
+        if on_delete in [DB_SET_NULL, SET_NULL] and not self.null:
+            errors.append(
                 checks.Error(
-                    "Field specifies on_delete=SET_NULL, but cannot be null.",
+                    f"Field specifies on_delete={on_delete.__name__}, but cannot be "
+                    "null.",
                     hint=(
                         "Set null=True argument on the field, or change the on_delete "
                         "rule."
@@ -1060,18 +1105,67 @@ class ForeignKey(ForeignObject):
                     obj=self,
                     id="fields.E320",
                 )
-            ]
+            )
         elif on_delete == SET_DEFAULT and not self.has_default():
-            return [
+            errors.append(
                 checks.Error(
                     "Field specifies on_delete=SET_DEFAULT, but has no default value.",
                     hint="Set a default value, or change the on_delete rule.",
                     obj=self,
                     id="fields.E321",
                 )
-            ]
-        else:
-            return []
+            )
+        elif on_delete == DB_SET_DEFAULT:
+            if self.db_default is NOT_PROVIDED:
+                errors.append(
+                    checks.Error(
+                        "Field specifies on_delete=DB_SET_DEFAULT, but has "
+                        "no db_default value.",
+                        hint="Set a db_default value, or change the on_delete rule.",
+                        obj=self,
+                        id="fields.E322",
+                    )
+                )
+            errors.extend(
+                self._check_on_delete_db_support(
+                    on_delete, "supports_on_delete_db_default", databases
+                )
+            )
+        if not isinstance(self.remote_field.model, str) and on_delete != DO_NOTHING:
+            # Database and Python variants cannot be mixed in a chain of
+            # model references.
+            is_db_on_delete = isinstance(on_delete, DatabaseOnDelete)
+            ref_model_related_fields = (
+                ref_model_field.remote_field
+                for ref_model_field in self.remote_field.model._meta.get_fields()
+                if ref_model_field.related_model
+                and hasattr(ref_model_field.remote_field, "on_delete")
+            )
+
+            for ref_remote_field in ref_model_related_fields:
+                if (
+                    ref_remote_field.on_delete is not None
+                    and ref_remote_field.on_delete != DO_NOTHING
+                    and isinstance(ref_remote_field.on_delete, DatabaseOnDelete)
+                    is not is_db_on_delete
+                ):
+                    on_delete_type = "database" if is_db_on_delete else "Python"
+                    ref_on_delete_type = "Python" if is_db_on_delete else "database"
+                    errors.append(
+                        checks.Error(
+                            f"Field specifies {on_delete_type}-level on_delete "
+                            "variant, but referenced model uses "
+                            f"{ref_on_delete_type}-level variant.",
+                            hint=(
+                                "Use either database or Python on_delete variants "
+                                "uniformly in the references chain."
+                            ),
+                            obj=self,
+                            id="fields.E323",
+                        )
+                    )
+                    break
+        return errors
 
     def _check_unique(self, **kwargs):
         return (
@@ -1447,6 +1541,7 @@ class ManyToManyField(RelatedField):
             *self._check_relationship_model(**kwargs),
             *self._check_ignored_options(**kwargs),
             *self._check_table_uniqueness(**kwargs),
+            *self._check_on_delete(**kwargs),
         ]
 
     def _check_unique(self, **kwargs):
@@ -1807,6 +1902,50 @@ class ManyToManyField(RelatedField):
             ]
         return []
 
+    def _check_on_delete(self, **kwargs):
+        errors = []
+        if (
+            isinstance(self.remote_field.through, str)
+            or not self.remote_field.through._meta.auto_created
+        ):
+            # Manually created through models are checked on their own.
+            return []
+        # Database and Python cascade variants cannot be mixed in a chain of
+        # model references. Auto-created through models are using Python
+        # variants.
+        m2m_through_remote_fields = (
+            m2m_model_field.remote_field
+            for m2m_model_field in self.remote_field.through._meta.get_fields()
+            if m2m_model_field.remote_field
+            and not isinstance(m2m_model_field.remote_field.model, str)
+        )
+        ref_model_fields = (
+            ref_model_field
+            for remote_field in m2m_through_remote_fields
+            for ref_model_field in remote_field.model._meta.get_fields()
+            if ref_model_field.related_model
+            and hasattr(ref_model_field.remote_field, "on_delete")
+        )
+        for ref_model_field in ref_model_fields:
+            if (
+                ref_model_field.remote_field.on_delete is not None
+                and ref_model_field.remote_field.on_delete != DO_NOTHING
+                and isinstance(ref_model_field.remote_field.on_delete, DatabaseOnDelete)
+            ):
+                errors.append(
+                    checks.Error(
+                        "Field specifies database-level on_delete variant, but "
+                        "auto-created intermediary model uses Python-level variant.",
+                        hint=(
+                            "Use either one of the Python on_delete variants or "
+                            f"create a through model for {self}."
+                        ),
+                        obj=ref_model_field,
+                        id="fields.E323",
+                    )
+                )
+        return errors
+
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
         # Handle the simpler arguments.
@@ -1848,6 +1987,10 @@ class ManyToManyField(RelatedField):
                 swappable_setting,
             )
         return name, path, args, kwargs
+
+    def get_attname_column(self):
+        attname, _ = super().get_attname_column()
+        return attname, None
 
     def _get_path_info(self, direct=False, filtered_relation=None):
         """Called by both direct and indirect m2m traversal."""

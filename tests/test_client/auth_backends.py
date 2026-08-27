@@ -1,4 +1,4 @@
-from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth.backends import BaseBackend, ModelBackend
 
 
 class TestClientBackend(ModelBackend):
@@ -6,4 +6,10 @@ class TestClientBackend(ModelBackend):
 
 
 class BackendWithoutGetUserMethod:
+    pass
+
+
+class PermissionOnlyBackend(BaseBackend):
+    """This class inherits from BaseBackend but does not implement get_user."""
+
     pass

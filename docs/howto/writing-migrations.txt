@@ -336,7 +336,7 @@ model, the default migration will delete the existing table and create a new
 one, losing the existing relations. To avoid this, you can use
 :class:`.SeparateDatabaseAndState` to rename the existing table to the new
 table name while telling the migration autodetector that the new model has
-been created. You can check the existing table name through
+been created. You can check the existing table name and constraint name through
 :djadmin:`sqlmigrate` or :djadmin:`dbshell`. You can check the new table name
 with the through model's ``_meta.db_table`` property. Your new ``through``
 model should use the same names for the ``ForeignKey``\s as Django did. Also if
@@ -394,6 +394,14 @@ For example, if we had a ``Book`` model with a ``ManyToManyField`` linking to
                                 ),
                             ),
                         ],
+                        options={
+                            "constraints": [
+                                models.UniqueConstraint(
+                                    fields=["author", "book"],
+                                    name="unique_author_book",
+                                )
+                            ],
+                        },
                     ),
                     migrations.AlterField(
                         model_name="book",

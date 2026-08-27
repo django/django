@@ -1,7 +1,10 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models, transaction
+from django.db.models.utils import get_blank_choice_label
 from django.test import SimpleTestCase, TestCase
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import BooleanModel, FksToBooleans, NullBooleanModel
 
@@ -48,7 +51,9 @@ class BooleanFieldTests(TestCase):
         """
         choices = [(1, "Si"), (2, "No")]
         f = models.BooleanField(choices=choices)
-        self.assertEqual(f.formfield().choices, [("", "---------")] + choices)
+        self.assertEqual(
+            f.formfield().choices, [("", get_blank_choice_label())] + choices
+        )
 
     def test_nullbooleanfield_formfield(self):
         f = models.BooleanField(null=True)
@@ -88,8 +93,14 @@ class BooleanFieldTests(TestCase):
         self.assertIs(ma.nbf.nbfield, True)
 
         # select_related()
-        mb = FksToBooleans.objects.select_related().get(pk=m1.id)
-        mc = FksToBooleans.objects.select_related().get(pk=m2.id)
+        # RemovedInDjango70Warning: when the deprecation ends, remove this part
+        # of the test.
+        with ignore_warnings(
+            category=RemovedInDjango70Warning,
+            message=r"Calling select_related\(\) with no arguments is deprecated\.",
+        ):
+            mb = FksToBooleans.objects.select_related().get(pk=m1.id)
+            mc = FksToBooleans.objects.select_related().get(pk=m2.id)
         self.assertIs(mb.bf.bfield, True)
         self.assertIs(mb.nbf.nbfield, True)
         self.assertIs(mc.bf.bfield, False)

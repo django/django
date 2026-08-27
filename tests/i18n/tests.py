@@ -59,7 +59,10 @@ from django.utils.translation.reloader import (
     translation_file_changed,
     watch_for_translation_changes,
 )
-from django.utils.translation.trans_real import LANGUAGE_CODE_MAX_LENGTH
+from django.utils.translation.trans_real import (
+    LANGUAGE_CODE_MAX_LENGTH,
+    translation_catalog_exists,
+)
 
 from .forms import CompanyForm, I18nForm, SelectDateForm
 from .models import Company, TestModel
@@ -1158,6 +1161,47 @@ class FormattingTests(SimpleTestCase):
                 ),
             )
 
+    def test_uncommon_locale_formats(self):
+        testcases = {
+            # French Canadian locale uses 'h' as time format separator.
+            ("fr-ca", time_format, (self.t, "TIME_FORMAT")): "10\xa0h\xa015",
+            (
+                "fr-ca",
+                date_format,
+                (self.dt, "DATETIME_FORMAT"),
+            ): "31 décembre 2009, 20\xa0h\xa050",
+            (
+                "fr-ca",
+                date_format,
+                (self.dt, "SHORT_DATETIME_FORMAT"),
+            ): "2009-12-31 20\xa0h\xa050",
+        }
+        for testcase, expected in testcases.items():
+            locale, format_function, format_args = testcase
+            with self.subTest(locale=locale, expected=expected):
+                with translation.override(locale, deactivate=True):
+                    self.assertEqual(expected, format_function(*format_args))
+
+    def test_basque_date_formats(self):
+        # Basque locale uses parenthetical suffixes for conditional declension:
+        # (e)ko for years and declined month/day forms.
+        with translation.override("eu", deactivate=True):
+            self.assertEqual(date_format(self.d), "2009(e)ko abe.k 31")
+            self.assertEqual(
+                date_format(self.dt, "DATETIME_FORMAT"),
+                "2009(e)ko abe.k 31, 20:50",
+            )
+            self.assertEqual(
+                date_format(self.d, "YEAR_MONTH_FORMAT"), "2009(e)ko abendua"
+            )
+            self.assertEqual(date_format(self.d, "MONTH_DAY_FORMAT"), "abenduaren 31a")
+            # Day 11 (hamaika in Basque) ends in 'a' as a word, but the
+            # numeral form does not, so appending 'a' is correct here.
+            self.assertEqual(
+                date_format(datetime.date(2009, 12, 11), "MONTH_DAY_FORMAT"),
+                "abenduaren 11a",
+            )
+
     def test_sub_locales(self):
         """
         Check if sublocales fall back to the main locale
@@ -2039,6 +2083,25 @@ class CountrySpecificLanguageTests(SimpleTestCase):
         self.assertFalse(check_for_language("tr-TR.UTF-8"))
         self.assertFalse(check_for_language("tr-TR.UTF8"))
         self.assertFalse(check_for_language("de-DE.utf-8"))
+
+    def test_check_for_language_lang_code_max_length(self):
+        self.addCleanup(translation_catalog_exists.cache_clear)
+
+        # Overly long codes are rejected before the cached lookup, so they are
+        # not retained as cache keys, potentially consuming too much memory.
+        # Codes at the maximum length can reach the cached lookup.
+        for length, cache_size in [
+            (LANGUAGE_CODE_MAX_LENGTH - 1, 1),
+            (LANGUAGE_CODE_MAX_LENGTH, 1),
+            (LANGUAGE_CODE_MAX_LENGTH + 1, 0),
+        ]:
+            translation_catalog_exists.cache_clear()
+            with self.subTest(length=length):
+                self.assertIs(check_for_language("a" * length), False)
+                self.assertEqual(
+                    translation_catalog_exists.cache_info().currsize,
+                    cache_size,
+                )
 
     def test_check_for_language_null(self):
         self.assertIs(trans_null.check_for_language("en"), True)

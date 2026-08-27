@@ -42,8 +42,6 @@ General-purpose aggregation functions
 
     .. attribute:: order_by
 
-        .. versionadded:: 5.2
-
         An optional string of a field name (with an optional ``"-"`` prefix
         which indicates descending order) or an expression (or a tuple or list
         of strings and/or expressions) that specifies the ordering of the
@@ -56,11 +54,6 @@ General-purpose aggregation functions
             ArrayAgg("a_field", order_by="-some_field")
             ArrayAgg("a_field", order_by=F("some_field").desc())
 
-    .. deprecated:: 5.2
-
-        The ``ordering`` keyword argument is deprecated. Use
-        :attr:`ArrayAgg.order_by` instead.
-
 ``BitAnd``
 ----------
 
@@ -68,6 +61,11 @@ General-purpose aggregation functions
 
     Returns an ``int`` of the bitwise ``AND`` of all non-null input values, or
     ``default`` if all values are null.
+
+    .. deprecated:: 6.1
+
+        This class is deprecated in favor of the generally available
+        :class:`~django.db.models.BitAnd` class.
 
 ``BitOr``
 ---------
@@ -77,13 +75,23 @@ General-purpose aggregation functions
     Returns an ``int`` of the bitwise ``OR`` of all non-null input values, or
     ``default`` if all values are null.
 
+    .. deprecated:: 6.1
+
+        This class is deprecated in favor of the generally available
+        :class:`~django.db.models.BitOr` class.
+
 ``BitXor``
 ----------
 
 .. class:: BitXor(expression, filter=None, default=None, **extra)
 
     Returns an ``int`` of the bitwise ``XOR`` of all non-null input values, or
-    ``default`` if all values are null. It requires PostgreSQL 14+.
+    ``default`` if all values are null.
+
+    .. deprecated:: 6.1
+
+        This class is deprecated in favor of the generally available
+        :class:`~django.db.models.BitXor` class.
 
 ``BoolAnd``
 -----------
@@ -149,8 +157,6 @@ General-purpose aggregation functions
 
     .. attribute:: order_by
 
-        .. versionadded:: 5.2
-
         An optional string of a field name (with an optional ``"-"`` prefix
         which indicates descending order) or an expression (or a tuple or list
         of strings and/or expressions) that specifies the ordering of the
@@ -184,11 +190,6 @@ General-purpose aggregation functions
             {'parking': True, 'double_bed': True}
         ]}]>
 
-    .. deprecated:: 5.2
-
-        The ``ordering`` keyword argument is deprecated. Use
-        :attr:`JSONBAgg.order_by` instead.
-
 ``StringAgg``
 -------------
 
@@ -196,12 +197,21 @@ General-purpose aggregation functions
 
     .. deprecated:: 6.0
 
+        The PostgreSQL ``StringAgg`` class is deprecated in favor of the
+        generally available :class:`~django.db.models.StringAgg` class.
+
     Returns the input values concatenated into a string, separated by
     the ``delimiter`` string, or ``default`` if there are no values.
 
     .. attribute:: delimiter
 
-        Required argument. Needs to be a string.
+        Required argument. A string, :class:`~django.db.models.Value`, or
+        expression representing the string for separating values. For example,
+        ``Value(",")``.
+
+        .. deprecated:: 6.0
+
+            Support for providing a string is deprecated.
 
     .. attribute:: distinct
 
@@ -209,8 +219,6 @@ General-purpose aggregation functions
         will be distinct. Defaults to ``False``.
 
     .. attribute:: order_by
-
-        .. versionadded:: 5.2
 
         An optional string of a field name (with an optional ``"-"`` prefix
         which indicates descending order) or an expression (or a tuple or list
@@ -247,11 +255,6 @@ General-purpose aggregation functions
         <QuerySet [{
             'headline': 'NASA uses Python', 'publication_names': 'Science News, The Python Journal'
         }]>
-
-    .. deprecated:: 5.2
-
-        The ``ordering`` keyword argument is deprecated. Use
-        :attr:`StringAgg.order_by` instead.
 
 Aggregate functions for statistics
 ==================================

@@ -30,6 +30,7 @@ class GeneratedField(Field):
         self.expression = expression
         self.output_field = output_field
         self.db_persist = db_persist
+        self.has_null_arg = "null" in kwargs
         super().__init__(**kwargs)
 
     @cached_property
@@ -66,12 +67,23 @@ class GeneratedField(Field):
             sql = f"CASE WHEN {sql} THEN 1 ELSE 0 END"
         return sql, params
 
+    @cached_property
+    def referenced_fields(self):
+        resolved_expression = self.expression.resolve_expression(
+            self._query, allow_joins=False
+        )
+        referenced_fields = []
+        for col in self._query._gen_cols([resolved_expression]):
+            referenced_fields.append(col.target)
+        return frozenset(referenced_fields)
+
     def check(self, **kwargs):
         databases = kwargs.get("databases") or []
         errors = [
             *super().check(**kwargs),
             *self._check_supported(databases),
             *self._check_persistence(databases),
+            *self._check_ignored_options(databases),
         ]
         output_field_clone = self.output_field.clone()
         output_field_clone.model = self.model
@@ -177,6 +189,20 @@ class GeneratedField(Field):
                     )
                 )
         return errors
+
+    def _check_ignored_options(self, databases):
+        warnings = []
+
+        if self.has_null_arg:
+            warnings.append(
+                checks.Warning(
+                    "null has no effect on GeneratedField.",
+                    obj=self,
+                    id="fields.W225",
+                )
+            )
+
+        return warnings
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()

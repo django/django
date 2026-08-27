@@ -327,12 +327,6 @@ The ``django.template.loader`` module defines two functions to load templates.
     See :ref:`template-partials` for more information about defining and using
     template fragments.
 
-    .. versionchanged:: 6.0
-
-        Support for loading template partials when using the
-        :class:`~django.template.backends.django.DjangoTemplates` backend was
-        added.
-
 .. function:: select_template(template_name_list, using=None)
 
     ``select_template()`` is just like ``get_template()``, except it takes a

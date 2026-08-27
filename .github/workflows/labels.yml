@@ -3,9 +3,12 @@ name: Labels
 on:
   pull_request_target:
     types: [ edited, opened, reopened, ready_for_review ]
+    branches:
+      - main
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # Avoid github.ref, which is always main for the pull_request_target trigger.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 permissions:
@@ -17,11 +20,10 @@ jobs:
     if: github.repository == 'django/django'
     name: "Flag if no Trac ticket is found in the title"
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
-
       - name: "Check title and manage labels"
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const title = context.payload.pull_request.title;

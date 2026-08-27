@@ -4,7 +4,7 @@ related data structures. OGR_Dr_*, OGR_DS_*, OGR_L_*, OGR_F_*,
 OGR_Fld_* routines are relevant here.
 """
 
-from ctypes import POINTER, c_char_p, c_double, c_int, c_long, c_uint, c_void_p
+from ctypes import POINTER, c_char_p, c_double, c_float, c_int, c_long, c_uint, c_void_p
 
 from django.contrib.gis.gdal.envelope import OGREnvelope
 from django.contrib.gis.gdal.libgdal import lgdal
@@ -21,6 +21,7 @@ from django.contrib.gis.gdal.prototypes.generation import (
 )
 
 c_int_p = POINTER(c_int)  # shortcut type
+c_float_p = POINTER(c_float)
 
 GDAL_OF_READONLY = 0x00
 GDAL_OF_UPDATE = 0x01
@@ -91,6 +92,11 @@ get_field_as_datetime = int_output(
     lgdal.OGR_F_GetFieldAsDateTime,
     [c_void_p, c_int, c_int_p, c_int_p, c_int_p, c_int_p, c_int_p, c_int_p],
 )
+get_field_as_datetime_x = int_output(
+    lgdal.OGR_F_GetFieldAsDateTimeEx,
+    [c_void_p, c_int, c_int_p, c_int_p, c_int_p, c_int_p, c_int_p, c_float_p, c_int_p],
+)
+
 get_field_as_double = double_output(lgdal.OGR_F_GetFieldAsDouble, [c_void_p, c_int])
 get_field_as_integer = int_output(lgdal.OGR_F_GetFieldAsInteger, [c_void_p, c_int])
 get_field_as_integer64 = int64_output(

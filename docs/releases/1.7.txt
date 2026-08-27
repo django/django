@@ -422,7 +422,7 @@ Minor features
 
 * Any ``**kwargs`` passed to
   :meth:`~django.contrib.auth.models.User.email_user` are passed to the
-  underlying :meth:`~django.core.mail.send_mail` call.
+  underlying :func:`~django.core.mail.send_mail` call.
 
 * The :func:`~django.contrib.auth.decorators.permission_required` decorator can
   take a list of permissions as well as a single permission.
@@ -571,7 +571,7 @@ Email
   parameter for sending a multipart :mimetype:`text/plain` and
   :mimetype:`text/html` email.
 
-* The SMTP :class:`~django.core.mail.backends.smtp.EmailBackend` now accepts a
+* The :ref:`SMTP EmailBackend <topic-email-smtp-backend>` now accepts a
   ``timeout`` parameter.
 
 File Storage

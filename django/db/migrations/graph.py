@@ -1,6 +1,7 @@
 from functools import total_ordering
 
 from django.db.migrations.state import ProjectState
+from django.utils.datastructures import OrderedSet
 
 from .exceptions import CircularDependencyError, NodeNotFoundError
 
@@ -305,12 +306,12 @@ class MigrationGraph:
         )
 
     def _generate_plan(self, nodes, at_end):
-        plan = []
+        plan = OrderedSet()
         for node in nodes:
             for migration in self.forwards_plan(node):
                 if migration not in plan and (at_end or migration not in nodes):
-                    plan.append(migration)
-        return plan
+                    plan.add(migration)
+        return list(plan)
 
     def make_state(self, nodes=None, at_end=True, real_apps=None):
         """

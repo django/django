@@ -73,8 +73,10 @@ To use nonces in your CSP policy, beside the basic config, you need to:
         },
     ]
 
-3. In your templates, add the ``nonce`` attribute to the relevant inline
-   ``<style>`` or ``<script>`` tags, using the ``csp_nonce`` context variable:
+3. In your templates, add the nonce to elements that require it:
+
+   For inline ``<style>`` or ``<script>`` tags, use the ``csp_nonce`` context
+   variable directly:
 
    .. code-block:: html+django
 
@@ -85,6 +87,26 @@ To use nonces in your CSP policy, beside the basic config, you need to:
       <script nonce="{{ csp_nonce }}">
         // This inline JavaScript will be allowed.
       </script>
+
+   For external ``<script src="...">`` and ``<link rel="stylesheet">``
+   elements, use the :ttag:`csp_nonce_attr` template tag:
+
+   .. code-block:: html+django
+
+      <script src="/path/to/script.js" {% csp_nonce_attr %}></script>
+      <link rel="stylesheet" href="/path/to/style.css" {% csp_nonce_attr %}>
+
+   To render a :class:`~django.forms.Media` object's assets with the nonce
+   applied to each element, pass the object to the :ttag:`csp_nonce_attr` tag:
+
+   .. code-block:: html+django
+
+      {% csp_nonce_attr form.media %}
+
+   .. versionchanged:: 6.1
+
+       The :ttag:`csp_nonce_attr` template tag was added, including support for
+       rendering :class:`~django.forms.Media` objects.
 
 .. admonition:: Caching and Nonce Reuse
 

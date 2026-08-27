@@ -324,7 +324,3 @@ preference, use :func:`django.http.HttpRequest.get_preferred_type`::
                     "pk": self.object.pk,
                 }
                 return JsonResponse(data)
-
-.. versionchanged:: 5.2
-
-    The :meth:`.HttpRequest.get_preferred_type` method was added.

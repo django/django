@@ -130,9 +130,21 @@ ensures the age field is never less than 18.
 ``UniqueConstraint``
 ====================
 
-.. class:: UniqueConstraint(*expressions, fields=(), name=None, condition=None, deferrable=None, include=None, opclasses=(), nulls_distinct=None, violation_error_code=None, violation_error_message=None)
+.. class:: UniqueConstraint(*expressions, fields=(), name, condition=None, deferrable=None, include=None, opclasses=(), nulls_distinct=None, violation_error_code=None, violation_error_message=None)
 
-    Creates a unique constraint in the database.
+    Creates a uniqueness guarantee in the database, enforced by either a
+    unique constraint or a unique index depending on the options used.
+
+.. admonition:: Constraint vs. index implementation
+
+    Setting only :attr:`UniqueConstraint.fields` creates a true database
+    constraint (``ADD CONSTRAINT ... UNIQUE``). Specifying any of
+    :attr:`UniqueConstraint.expressions`, :attr:`UniqueConstraint.opclasses`,
+    :attr:`UniqueConstraint.condition`, or :attr:`UniqueConstraint.include`
+    creates a unique index (``CREATE UNIQUE INDEX``) instead.
+
+    In this documentation, the term "unique constraint" is used for both
+    cases to mean a uniqueness guarantee enforced by the database.
 
 ``expressions``
 ---------------
@@ -202,6 +214,11 @@ are ``Deferrable.DEFERRED`` or ``Deferrable.IMMEDIATE``. For example::
 By default constraints are not deferred. A deferred constraint will not be
 enforced until the end of the transaction. An immediate constraint will be
 enforced immediately after every command.
+
+Unique constraints with :attr:`~UniqueConstraint.condition`,
+:attr:`~UniqueConstraint.include`, :attr:`~UniqueConstraint.opclasses`, or
+:attr:`~UniqueConstraint.expressions` may be implemented as unique indexes
+rather than unique constraints. In that case, ``deferrable`` cannot be set.
 
 .. admonition:: MySQL, MariaDB, and SQLite.
 
@@ -273,7 +290,7 @@ creates a unique constraint that only allows one row to store a ``NULL`` value
 in the ``ordering`` column.
 
 Unique constraints with ``nulls_distinct`` are ignored for databases besides
-PostgreSQL 15+.
+PostgreSQL.
 
 ``violation_error_code``
 ------------------------
@@ -293,13 +310,6 @@ If :attr:`.UniqueConstraint.fields` is set without a
 code when there are multiple fields, and to the :attr:`.Field.unique` error
 code when there is a single field.
 
-.. versionchanged:: 5.2
-
-    In older versions, the provided
-    :attr:`.UniqueConstraint.violation_error_code` was not used when
-    :attr:`.UniqueConstraint.fields` was set without a
-    :attr:`.UniqueConstraint.condition`.
-
 ``violation_error_message``
 ---------------------------
 
@@ -317,10 +327,3 @@ If :attr:`.UniqueConstraint.fields` is set without a
 :attr:`Meta.unique_together <django.db.models.Options.unique_together>` error
 message when there are multiple fields, and to the :attr:`.Field.unique` error
 message when there is a single field.
-
-.. versionchanged:: 5.2
-
-    In older versions, the provided
-    :attr:`.UniqueConstraint.violation_error_message` was not used when
-    :attr:`.UniqueConstraint.fields` was set without a
-    :attr:`.UniqueConstraint.condition`.

@@ -2,6 +2,10 @@ import secrets
 from enum import StrEnum
 
 from django.utils.functional import SimpleLazyObject, empty
+from django.utils.html import format_html
+
+# Template context key for the CSP nonce.
+CONTEXT_KEY = "csp_nonce"
 
 
 class CSP(StrEnum):
@@ -63,21 +67,31 @@ class LazyNonce(SimpleLazyObject):
 
     Example Django template usage with context processors enabled:
 
-        <script{% if csp_nonce %} nonce="{{ csp_nonce }}"...{% endif %}>
+        <script {% csp_nonce_attr %}></script>
 
-    The `{% if %}` block will only render if the nonce has been evaluated
-    elsewhere.
+    ``{% csp_nonce_attr %}`` will only render the nonce attribute if the nonce
+    has been evaluated (i.e. accessed) elsewhere in the request/response cycle.
 
     """
 
     def __init__(self):
-        super().__init__(self._generate)
-
-    def _generate(self):
-        return secrets.token_urlsafe(16)
+        super().__init__(generate_nonce)
 
     def __bool__(self):
         return self._wrapped is not empty
+
+
+def nonce_attr(context, media=None):
+    nonce = context.get(CONTEXT_KEY)
+    if media:
+        return media.render(attrs={"nonce": nonce} if nonce is not None else None)
+    if nonce is None:
+        return ""
+    return format_html('nonce="{}"', nonce)
+
+
+def generate_nonce():
+    return secrets.token_urlsafe(16)
 
 
 def build_policy(config, nonce=None):

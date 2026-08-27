@@ -73,8 +73,10 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         "ForcePolygonCW": "ST_ForceLHR",
         "FromWKB": "ST_GeomFromWKB",
         "FromWKT": "ST_GeomFromText",
+        "IsEmpty": "ST_IsEmpty",
         "Length": "ST_Length",
         "LineLocatePoint": "ST_Line_Locate_Point",
+        "NumDimensions": "ST_NDims",
         "NumPoints": "ST_NPoints",
         "Reverse": "ST_Reverse",
         "Scale": "ScaleCoords",
@@ -84,7 +86,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def unsupported_functions(self):
-        unsupported = {"GeometryDistance", "IsEmpty", "MemSize", "Rotate"}
+        unsupported = {"GeometryDistance", "MemSize", "Rotate"}
         if not self.geom_lib_version():
             unsupported |= {"Azimuth", "GeoHash", "MakeValid"}
         if self.spatial_version < (5, 1):
@@ -180,7 +182,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     def geom_lib_version(self):
         """
-        Return the version of the version-dependant geom library used by
+        Return the version of the version-dependent geom library used by
         SpatiaLite.
         """
         if self.spatial_version >= (5,):
@@ -228,6 +230,9 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         read = wkb_r().read
 
         def converter(value, expression, connection):
-            return None if value is None else GEOSGeometryBase(read(value), geom_class)
+            if value is not None:
+                return GEOSGeometryBase(
+                    read(value, max_geom_collections=None), geom_class
+                )
 
         return converter

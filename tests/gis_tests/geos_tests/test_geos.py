@@ -1295,11 +1295,9 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
                 # Testing __getitem__ (doesn't work on Point or Polygon)
                 if isinstance(g, Point):
-                    # IndexError is not raised in GEOS 3.8.0.
-                    if geos_version_tuple() != (3, 8, 0):
-                        msg = "Invalid GEOS Geometry index:"
-                        with self.assertRaisesMessage(IndexError, msg):
-                            g.x
+                    msg = "Invalid GEOS Geometry index:"
+                    with self.assertRaisesMessage(IndexError, msg):
+                        g.x
                 elif isinstance(g, Polygon):
                     lr = g.shell
                     self.assertEqual("LINEARRING EMPTY", lr.wkt)
@@ -1348,6 +1346,10 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
         # And, they should be equal.
         self.assertEqual(gc1, gc2)
+
+        # GeometryCollections can themselves contain GeometryCollections.
+        gc3 = GeometryCollection(gc2)
+        self.assertEqual(gc1, gc3[0])
 
     def test_gdal(self):
         "Testing `ogr` and `srs` properties."

@@ -1,7 +1,7 @@
 import decimal
 
 from django.core.management.color import no_style
-from django.db import NotSupportedError, connection, transaction
+from django.db import NotSupportedError, connection, models, transaction
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.models import DurationField
 from django.db.models.expressions import Col
@@ -11,10 +11,11 @@ from django.test import (
     TransactionTestCase,
     override_settings,
     skipIfDBFeature,
+    skipUnlessDBFeature,
 )
 from django.utils import timezone
 
-from ..models import Author, Book
+from ..models import Author, Book, Person
 
 
 class SimpleDatabaseOperationTests(SimpleTestCase):
@@ -171,6 +172,19 @@ class DatabaseOperationTests(TestCase):
     def setUp(self):
         self.ops = BaseDatabaseOperations(connection=connection)
 
+    def test_last_executed_query_base_fallback(self):
+        sql = "INVALID SQL"
+        params = []
+        with connection.cursor() as cursor:
+            cursor.close()
+            try:
+                cursor.execute(sql, params)
+            except connection.features.closed_cursor_error_class:
+                pass
+            self.assertIsNotNone(
+                connection.ops.last_executed_query(cursor, sql, params),
+            )
+
     @skipIfDBFeature("can_distinct_on_fields")
     def test_distinct_on_fields(self):
         msg = "DISTINCT ON fields is not supported by this database backend"
@@ -187,6 +201,55 @@ class DatabaseOperationTests(TestCase):
         )
         with self.assertRaisesMessage(NotSupportedError, msg):
             self.ops.subtract_temporals(duration_field_internal_type, None, None)
+
+    @skipUnlessDBFeature("max_query_params")
+    def test_bulk_batch_size_limited(self):
+        max_query_params = connection.features.max_query_params
+        objects = range(max_query_params + 1)
+        first_name_field = Person._meta.get_field("first_name")
+        last_name_field = Person._meta.get_field("last_name")
+        composite_pk = models.CompositePrimaryKey("first_name", "last_name")
+        composite_pk.fields = [first_name_field, last_name_field]
+
+        self.assertEqual(connection.ops.bulk_batch_size([], objects), len(objects))
+        self.assertEqual(
+            connection.ops.bulk_batch_size([first_name_field], objects),
+            max_query_params,
+        )
+        self.assertEqual(
+            connection.ops.bulk_batch_size(
+                [first_name_field, last_name_field], objects
+            ),
+            max_query_params // 2,
+        )
+        self.assertEqual(
+            connection.ops.bulk_batch_size([composite_pk, first_name_field], objects),
+            max_query_params // 3,
+        )
+
+    @skipIfDBFeature("max_query_params")
+    def test_bulk_batch_size_unlimited(self):
+        objects = range(2**16 + 1)
+        first_name_field = Person._meta.get_field("first_name")
+        last_name_field = Person._meta.get_field("last_name")
+        composite_pk = models.CompositePrimaryKey("first_name", "last_name")
+        composite_pk.fields = [first_name_field, last_name_field]
+
+        self.assertEqual(connection.ops.bulk_batch_size([], objects), len(objects))
+        self.assertEqual(
+            connection.ops.bulk_batch_size([first_name_field], objects),
+            len(objects),
+        )
+        self.assertEqual(
+            connection.ops.bulk_batch_size(
+                [first_name_field, last_name_field], objects
+            ),
+            len(objects),
+        )
+        self.assertEqual(
+            connection.ops.bulk_batch_size([composite_pk, first_name_field], objects),
+            len(objects),
+        )
 
 
 class SqlFlushTests(TransactionTestCase):

@@ -13,10 +13,10 @@ from urllib.parse import urlsplit
 from django.conf import settings
 from django.core.exceptions import DisallowedHost, ImproperlyConfigured
 from django.http import HttpHeaders, UnreadablePostError
+from django.middleware import MiddlewareMixin
 from django.urls import get_callable
 from django.utils.cache import patch_vary_headers
 from django.utils.crypto import constant_time_compare, get_random_string
-from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import cached_property
 from django.utils.http import is_same_domain
 from django.utils.log import log_response
@@ -287,11 +287,11 @@ class CsrfViewMiddleware(MiddlewareMixin):
             parsed_origin = urlsplit(request_origin)
         except ValueError:
             return False
-        request_scheme = parsed_origin.scheme
-        request_netloc = parsed_origin.netloc
+        parsed_origin_scheme = parsed_origin.scheme
+        parsed_origin_netloc = parsed_origin.netloc
         return any(
-            is_same_domain(request_netloc, host)
-            for host in self.allowed_origin_subdomains.get(request_scheme, ())
+            is_same_domain(parsed_origin_netloc, host)
+            for host in self.allowed_origin_subdomains.get(parsed_origin_scheme, ())
         )
 
     def _check_referer(self, request):

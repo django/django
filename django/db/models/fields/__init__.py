@@ -1,3 +1,4 @@
+import binascii
 import copy
 import datetime
 import decimal
@@ -15,6 +16,7 @@ from django.core import checks, exceptions, validators
 from django.db import connection, connections, router
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
+from django.db.models.utils import get_blank_choice_label
 from django.db.utils import NotSupportedError
 from django.utils import timezone
 from django.utils.choices import (
@@ -30,15 +32,19 @@ from django.utils.dateparse import (
     parse_duration,
     parse_time,
 )
-from django.utils.duration import duration_microseconds, duration_string
+from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.duration import duration_string
 from django.utils.functional import Promise, cached_property
 from django.utils.ipv6 import MAX_IPV6_ADDRESS_LENGTH, clean_ipv6_address
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
+from django.utils.warnings import django_file_prefixes
 
 __all__ = [
     "AutoField",
+    # RemovedInDjango70Warning
     "BLANK_CHOICE_DASH",
+    "BLANK_CHOICE_LABEL",
     "BigAutoField",
     "BigIntegerField",
     "BinaryField",
@@ -80,9 +86,13 @@ class NOT_PROVIDED:
     pass
 
 
-# The values to use for "blank" in SelectFields. Will be appended to the start
-# of most "choices" lists.
+# RemovedInDjango70Warning: From Django 6.1, the values to use for "blank"
+# in SelectFields will be defined by the below BLANK_CHOICE_LABEL constant.
+# Will be appended to the start of most "choices" lists.
+# BLANK_CHOICE_DASH is still available as a constant in Django 6.1.
 BLANK_CHOICE_DASH = [("", "---------")]
+# This allows any app's ready() method to overwrite BLANK_CHOICE_LABEL.
+BLANK_CHOICE_LABEL = _("- Select an option -")
 
 
 def _load_field(app_label, model_name, field_name):
@@ -155,8 +165,6 @@ class Field(RegisterLookupMixin):
         "error_messages",
         "help_text",
         "limit_choices_to",
-        # Database-level options are not supported, see #21961.
-        "on_delete",
         "related_name",
         "related_query_name",
         "validators",
@@ -182,6 +190,32 @@ class Field(RegisterLookupMixin):
         }
 
     description = property(_description)
+
+    def __init_subclass__(cls, **kwargs):
+        # RemovedInDjango70Warning: When the deprecation ends, remove
+        # completely.
+        # Allow for both `get_placeholder` and `get_placeholder_sql` to
+        # be declared to ease the deprecation process for third-party apps.
+        if (
+            get_placeholder := cls.__dict__.get("get_placeholder")
+        ) is not None and "get_placeholder_sql" not in cls.__dict__:
+            warnings.warn(
+                "Field.get_placeholder is deprecated in favor of get_placeholder_sql. "
+                f"Define {cls.__module__}.{cls.__qualname__}.get_placeholder_sql "
+                "to return both SQL and parameters instead.",
+                category=RemovedInDjango70Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
+
+            def get_placeholder_sql(self, value, compiler, connection):
+                placeholder = get_placeholder(self, value, compiler, connection)
+                if hasattr(value, "as_sql"):
+                    sql, params = compiler.compile(value)
+                    return placeholder % sql, params
+                return placeholder, (value,)
+
+            setattr(cls, "get_placeholder_sql", get_placeholder_sql)
+        return super().__init_subclass__(**kwargs)
 
     def __init__(
         self,
@@ -318,11 +352,13 @@ class Field(RegisterLookupMixin):
         if not self.choices:
             return []
 
-        if not isinstance(self.choices, Iterable) or isinstance(self.choices, str):
+        if not isinstance(self.choices, Iterable) or isinstance(
+            self.choices, (str, set, frozenset)
+        ):
             return [
                 checks.Error(
-                    "'choices' must be a mapping (e.g. a dictionary) or an iterable "
-                    "(e.g. a list or tuple).",
+                    "'choices' must be a mapping (e.g. a dictionary) or an "
+                    "ordered iterable (e.g. a list or tuple, but not a set).",
                     obj=self,
                     id="fields.E004",
                 )
@@ -599,68 +635,73 @@ class Field(RegisterLookupMixin):
         arguments over positional ones, and omit parameters with their default
         values.
         """
-        # Short-form way of fetching all the default parameters
+        # Work out path - we shorten it for known Django core fields
+        path = f"{self.__class__.__module__}.{self.__class__.__qualname__}"
+        if path.startswith("django.db.models.fields."):
+            submodule, _, remainder = path.removeprefix(
+                "django.db.models.fields."
+            ).partition(".")
+            if submodule in (
+                "related",
+                "files",
+                "generated",
+                "json",
+                "proxy",
+                "composite",
+            ):
+                path = f"django.db.models.{remainder}"
+            else:
+                path = "django.db.models" + path.removeprefix("django.db.models.fields")
+
+        # Build keywords dict of non-default values
         keywords = {}
-        possibles = {
-            "verbose_name": None,
-            "primary_key": False,
-            "max_length": None,
-            "unique": False,
-            "blank": False,
-            "null": False,
-            "db_index": False,
-            "default": NOT_PROVIDED,
-            "db_default": NOT_PROVIDED,
-            "editable": True,
-            "serialize": True,
-            "unique_for_date": None,
-            "unique_for_month": None,
-            "unique_for_year": None,
-            "choices": None,
-            "help_text": "",
-            "db_column": None,
-            "db_comment": None,
-            "db_tablespace": None,
-            "auto_created": False,
-            "validators": [],
-            "error_messages": None,
-        }
-        attr_overrides = {
-            "unique": "_unique",
-            "error_messages": "_error_messages",
-            "validators": "_validators",
-            "verbose_name": "_verbose_name",
-            "db_tablespace": "_db_tablespace",
-        }
-        equals_comparison = {"choices", "validators"}
-        for name, default in possibles.items():
-            value = getattr(self, attr_overrides.get(name, name))
+        if (value := self._verbose_name) is not None:
+            keywords["verbose_name"] = value
+        if (value := self.primary_key) is not False:
+            keywords["primary_key"] = value
+        if (value := self.max_length) is not None:
+            keywords["max_length"] = value
+        if (value := self._unique) is not False:
+            keywords["unique"] = value
+        if (value := self.blank) is not False:
+            keywords["blank"] = value
+        if (value := self.null) is not False:
+            keywords["null"] = value
+        if (value := self.db_index) is not False:
+            keywords["db_index"] = value
+        if (value := self.default) is not NOT_PROVIDED:
+            keywords["default"] = value
+        if (value := self.db_default) is not NOT_PROVIDED:
+            keywords["db_default"] = value
+        if (value := self.editable) is not True:
+            keywords["editable"] = value
+        if (value := self.serialize) is not True:
+            keywords["serialize"] = value
+        if (value := self.unique_for_date) is not None:
+            keywords["unique_for_date"] = value
+        if (value := self.unique_for_month) is not None:
+            keywords["unique_for_month"] = value
+        if (value := self.unique_for_year) is not None:
+            keywords["unique_for_year"] = value
+        if (value := self.choices) is not None:
             if isinstance(value, CallableChoiceIterator):
                 value = value.func
-            # Do correct kind of comparison
-            if name in equals_comparison:
-                if value != default:
-                    keywords[name] = value
-            else:
-                if value is not default:
-                    keywords[name] = value
-        # Work out path - we shorten it for known Django core fields
-        path = "%s.%s" % (self.__class__.__module__, self.__class__.__qualname__)
-        if path.startswith("django.db.models.fields.related"):
-            path = path.replace("django.db.models.fields.related", "django.db.models")
-        elif path.startswith("django.db.models.fields.files"):
-            path = path.replace("django.db.models.fields.files", "django.db.models")
-        elif path.startswith("django.db.models.fields.generated"):
-            path = path.replace("django.db.models.fields.generated", "django.db.models")
-        elif path.startswith("django.db.models.fields.json"):
-            path = path.replace("django.db.models.fields.json", "django.db.models")
-        elif path.startswith("django.db.models.fields.proxy"):
-            path = path.replace("django.db.models.fields.proxy", "django.db.models")
-        elif path.startswith("django.db.models.fields.composite"):
-            path = path.replace("django.db.models.fields.composite", "django.db.models")
-        elif path.startswith("django.db.models.fields"):
-            path = path.replace("django.db.models.fields", "django.db.models")
-        # Return basic info - other fields should override this.
+            keywords["choices"] = value
+        if (value := self.help_text) != "":
+            keywords["help_text"] = value
+        if (value := self.db_column) is not None:
+            keywords["db_column"] = value
+        if (value := self.db_comment) is not None:
+            keywords["db_comment"] = value
+        if (value := self._db_tablespace) is not None:
+            keywords["db_tablespace"] = value
+        if (value := self.auto_created) is not False:
+            keywords["auto_created"] = value
+        if (value := self._validators) != []:
+            keywords["validators"] = value
+        if (value := self._error_messages) is not None:
+            keywords["error_messages"] = value
+
         return (self.name, path, [], keywords)
 
     def clone(self):
@@ -1032,9 +1073,9 @@ class Field(RegisterLookupMixin):
         if self.has_db_default():
             from django.db.models.expressions import DatabaseDefault
 
-            return lambda: DatabaseDefault(
-                self._db_default_expression, output_field=self
-            )
+            default = DatabaseDefault(self._db_default_expression, output_field=self)
+
+            return lambda: default
 
         if (
             not self.empty_strings_allowed
@@ -1056,7 +1097,7 @@ class Field(RegisterLookupMixin):
     def get_choices(
         self,
         include_blank=True,
-        blank_choice=BLANK_CHOICE_DASH,
+        blank_choice=None,
         limit_choices_to=None,
         ordering=(),
     ):
@@ -1064,6 +1105,8 @@ class Field(RegisterLookupMixin):
         Return choices with a default blank choices included, for use
         as <select> choices for this field.
         """
+        if blank_choice is None:
+            blank_choice = [("", get_blank_choice_label())]
         if self.choices is not None:
             if include_blank:
                 return BlankChoiceIterator(self.choices, blank_choice)
@@ -1715,10 +1758,11 @@ class DecimalField(Field):
 
     def check(self, **kwargs):
         errors = super().check(**kwargs)
+        databases = kwargs.get("databases") or []
 
         digits_errors = [
-            *self._check_decimal_places(),
-            *self._check_max_digits(),
+            *self._check_decimal_places(databases),
+            *self._check_max_digits(databases),
         ]
         if not digits_errors:
             errors.extend(self._check_decimal_places_and_max_digits(**kwargs))
@@ -1726,55 +1770,95 @@ class DecimalField(Field):
             errors.extend(digits_errors)
         return errors
 
-    def _check_decimal_places(self):
-        try:
-            decimal_places = int(self.decimal_places)
-            if decimal_places < 0:
-                raise ValueError()
-        except TypeError:
-            return [
-                checks.Error(
-                    "DecimalFields must define a 'decimal_places' attribute.",
-                    obj=self,
-                    id="fields.E130",
-                )
-            ]
-        except ValueError:
-            return [
-                checks.Error(
-                    "'decimal_places' must be a non-negative integer.",
-                    obj=self,
-                    id="fields.E131",
-                )
-            ]
-        else:
-            return []
+    def _check_decimal_places(self, databases):
+        if self.decimal_places is None:
+            for db in databases:
+                if not router.allow_migrate_model(db, self.model):
+                    continue
+                connection = connections[db]
 
-    def _check_max_digits(self):
-        try:
-            max_digits = int(self.max_digits)
-            if max_digits <= 0:
-                raise ValueError()
-        except TypeError:
-            return [
-                checks.Error(
-                    "DecimalFields must define a 'max_digits' attribute.",
-                    obj=self,
-                    id="fields.E132",
-                )
-            ]
-        except ValueError:
-            return [
-                checks.Error(
-                    "'max_digits' must be a positive integer.",
-                    obj=self,
-                    id="fields.E133",
-                )
-            ]
+                if (
+                    not connection.features.supports_no_precision_decimalfield
+                    and "supports_no_precision_decimalfield"
+                    not in self.model._meta.required_db_features
+                ):
+                    return [
+                        checks.Error(
+                            "DecimalFields must define a 'decimal_places' attribute.",
+                            obj=self,
+                            id="fields.E130",
+                        )
+                    ]
+                elif self.max_digits is not None:
+                    return [
+                        checks.Error(
+                            "DecimalField’s max_digits and decimal_places must both "
+                            "be defined or both omitted.",
+                            obj=self,
+                            id="fields.E135",
+                        ),
+                    ]
         else:
-            return []
+            try:
+                decimal_places = int(self.decimal_places)
+                if decimal_places < 0:
+                    raise ValueError()
+            except ValueError:
+                return [
+                    checks.Error(
+                        "'decimal_places' must be a non-negative integer.",
+                        obj=self,
+                        id="fields.E131",
+                    )
+                ]
+        return []
+
+    def _check_max_digits(self, databases):
+        if self.max_digits is None:
+            for db in databases:
+                if not router.allow_migrate_model(db, self.model):
+                    continue
+                connection = connections[db]
+
+                if (
+                    not connection.features.supports_no_precision_decimalfield
+                    and "supports_no_precision_decimalfield"
+                    not in self.model._meta.required_db_features
+                ):
+                    return [
+                        checks.Error(
+                            "DecimalFields must define a 'max_digits' attribute.",
+                            obj=self,
+                            id="fields.E132",
+                        )
+                    ]
+                elif self.decimal_places is not None:
+                    return [
+                        checks.Error(
+                            "DecimalField’s max_digits and decimal_places must both "
+                            "be defined or both omitted.",
+                            obj=self,
+                            id="fields.E135",
+                        ),
+                    ]
+        else:
+            try:
+                max_digits = int(self.max_digits)
+                if max_digits <= 0:
+                    raise ValueError()
+            except ValueError:
+                return [
+                    checks.Error(
+                        "'max_digits' must be a positive integer.",
+                        obj=self,
+                        id="fields.E133",
+                    )
+                ]
+        return []
 
     def _check_decimal_places_and_max_digits(self, **kwargs):
+        if self.decimal_places is None or self.max_digits is None:
+            return []
         if int(self.decimal_places) > int(self.max_digits):
             return [
                 checks.Error(
@@ -1890,11 +1974,7 @@ class DurationField(Field):
         )
 
     def get_db_prep_value(self, value, connection, prepared=False):
-        if connection.features.has_native_duration_field:
-            return value
-        if value is None:
-            return None
-        return duration_microseconds(value)
+        return connection.ops.adapt_durationfield_value(value)
 
     def get_db_converters(self, connection):
         converters = []
@@ -2665,6 +2745,9 @@ class URLField(CharField):
 class BinaryField(Field):
     description = _("Raw binary data")
     empty_values = [None, b""]
+    default_error_messages = {
+        "invalid": _("“%(value)s” is not a valid binary value."),
+    }
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("editable", False)
@@ -2698,8 +2781,8 @@ class BinaryField(Field):
     def get_internal_type(self):
         return "BinaryField"
 
-    def get_placeholder(self, value, compiler, connection):
-        return connection.ops.binary_placeholder_sql(value)
+    def get_placeholder_sql(self, value, compiler, connection):
+        return connection.ops.binary_placeholder_sql(value, compiler)
 
     def get_default(self):
         if self.has_default() and not callable(self.default):
@@ -2722,7 +2805,15 @@ class BinaryField(Field):
     def to_python(self, value):
         # If it's a string, it should be base64-encoded data
         if isinstance(value, str):
-            return memoryview(b64decode(value.encode("ascii")))
+            try:
+                return memoryview(b64decode(value.encode("ascii"), validate=True))
+            except (UnicodeEncodeError, binascii.Error):
+                raise exceptions.ValidationError(
+                    self.error_messages["invalid"],
+                    code="invalid",
+                    params={"value": value},
+                )
+
         return value
 
 
@@ -2752,7 +2843,7 @@ class UUIDField(Field):
     def get_db_prep_value(self, value, connection, prepared=False):
         if value is None:
             return None
-        if not isinstance(value, uuid.UUID):
+        if not prepared and not isinstance(value, uuid.UUID):
             value = self.to_python(value)
 
         if connection.features.has_native_uuid_field:
@@ -2816,10 +2907,14 @@ class AutoFieldMixin:
         pass
 
     def get_db_prep_value(self, value, connection, prepared=False):
-        if not prepared:
-            value = self.get_prep_value(value)
-            value = connection.ops.validate_autopk_value(value)
-        return value
+        return value if prepared else self.get_prep_value(value)
+
+    def get_db_prep_save(self, value, connection):
+        if hasattr(value, "as_sql"):
+            return value
+        value = self.get_prep_value(value)
+        value = connection.ops.validate_autopk_value(value)
+        return self.get_db_prep_value(value, connection=connection, prepared=True)
 
     def contribute_to_class(self, cls, name, **kwargs):
         if cls._meta.auto_field:

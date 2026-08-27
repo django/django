@@ -58,6 +58,22 @@ class QueryStringTagTests(SimpleTestCase):
         context = RequestContext(request)
         self.assertRenderEqual("querystring_multiple", context, expected="?x=y&amp;a=b")
 
+    @setup({"querystring_multiple_lists": "{% querystring %}"})
+    def test_querystring_multiple_lists(self):
+        request = self.request_factory.get("/", {"x": ["y", "z"], "a": ["b", "c"]})
+        context = RequestContext(request)
+        expected = "?x=y&amp;x=z&amp;a=b&amp;a=c"
+        self.assertRenderEqual("querystring_multiple_lists", context, expected=expected)
+
+    @setup({"querystring_lists_with_replacement": "{% querystring a=1 %}"})
+    def test_querystring_lists_with_replacement(self):
+        request = self.request_factory.get("/", {"x": ["y", "z"], "a": ["b", "c"]})
+        context = RequestContext(request)
+        expected = "?x=y&amp;x=z&amp;a=1"
+        self.assertRenderEqual(
+            "querystring_lists_with_replacement", context, expected=expected
+        )
+
     @setup({"querystring_empty_params": "{% querystring qd %}"})
     def test_querystring_empty_params(self):
         cases = [{}, QueryDict()]
@@ -110,6 +126,44 @@ class QueryStringTagTests(SimpleTestCase):
         request = self.request_factory.get("/", {"test": "value"})
         context = RequestContext(request, {"my_dict": {"test": None}})
         self.assertRenderEqual("querystring_remove_dict", context, expected="?a=1")
+
+    @setup({"querystring_remove_querydict": "{% querystring request my_query_dict %}"})
+    def test_querystring_remove_querydict(self):
+        request = self.request_factory.get("/", {"x": "1"})
+        my_qd = QueryDict(mutable=True)
+        my_qd["x"] = None
+        context = RequestContext(
+            request, {"request": request.GET, "my_query_dict": my_qd}
+        )
+        self.assertRenderEqual("querystring_remove_querydict", context, expected="?")
+
+    @setup(
+        {"querystring_remove_querydict_many": "{% querystring request my_query_dict %}"}
+    )
+    def test_querystring_remove_querydict_many(self):
+        request = self.request_factory.get(
+            "/", {"test": ["value1", "value2"], "a": [1, 2]}
+        )
+
+        qd_none = QueryDict(mutable=True)
+        qd_none["test"] = None
+
+        qd_list_none = QueryDict(mutable=True)
+        qd_list_none.setlist("test", [None, None])
+
+        qd_empty_list = QueryDict(mutable=True)
+        qd_empty_list.setlist("test", [])
+
+        for qd in (qd_none, qd_list_none, qd_empty_list):
+            with self.subTest(my_query_dict=qd):
+                context = RequestContext(
+                    request, {"request": request.GET, "my_query_dict": qd}
+                )
+                self.assertRenderEqual(
+                    "querystring_remove_querydict_many",
+                    context,
+                    expected="?a=1&amp;a=2",
+                )
 
     @setup({"querystring_variable": "{% querystring a=a %}"})
     def test_querystring_variable(self):

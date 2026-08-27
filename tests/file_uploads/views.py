@@ -157,7 +157,7 @@ def file_upload_filename_case_view(request):
     file = request.FILES["file_field"]
     obj = FileModel()
     obj.testfile.save(file.name, file)
-    return HttpResponse("%d" % obj.pk)
+    return HttpResponse("%s" % obj.pk)
 
 
 def file_upload_content_type_extra(request):

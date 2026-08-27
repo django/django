@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -13,42 +13,42 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: contrib/flatpages/admin.py:12
+#: contrib/flatpages/admin.py:13
 msgid "Advanced options"
 msgstr ""
 
-#: contrib/flatpages/apps.py:7
+#: contrib/flatpages/apps.py:8
 msgid "Flat Pages"
 msgstr ""
 
-#: contrib/flatpages/forms.py:9 contrib/flatpages/models.py:9
+#: contrib/flatpages/forms.py:11 contrib/flatpages/models.py:9
 msgid "URL"
 msgstr ""
 
-#: contrib/flatpages/forms.py:12
+#: contrib/flatpages/forms.py:15
 msgid ""
 "Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
 
-#: contrib/flatpages/forms.py:15
+#: contrib/flatpages/forms.py:20
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr ""
 
-#: contrib/flatpages/forms.py:29
+#: contrib/flatpages/forms.py:34
 msgid "Example: “/about/contact”. Make sure to have a leading slash."
 msgstr ""
 
-#: contrib/flatpages/forms.py:42
+#: contrib/flatpages/forms.py:47
 msgid "URL is missing a leading slash."
 msgstr ""
 
-#: contrib/flatpages/forms.py:47
+#: contrib/flatpages/forms.py:52
 msgid "URL is missing a trailing slash."
 msgstr ""
 
-#: contrib/flatpages/forms.py:64
+#: contrib/flatpages/forms.py:69
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
 msgstr ""
@@ -79,18 +79,18 @@ msgstr ""
 msgid "registration required"
 msgstr ""
 
-#: contrib/flatpages/models.py:24
+#: contrib/flatpages/models.py:25
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
 
-#: contrib/flatpages/models.py:27
+#: contrib/flatpages/models.py:29
 msgid "sites"
 msgstr ""
 
-#: contrib/flatpages/models.py:31
+#: contrib/flatpages/models.py:33
 msgid "flat page"
 msgstr ""
 
-#: contrib/flatpages/models.py:32
+#: contrib/flatpages/models.py:34
 msgid "flat pages"
 msgstr ""

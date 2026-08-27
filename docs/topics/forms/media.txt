@@ -126,6 +126,25 @@ HTML:
     <link href="https://static.example.com/lo_res.css" media="tv,projector" rel="stylesheet">
     <link href="https://static.example.com/newspaper.css" media="print" rel="stylesheet">
 
+``Stylesheet`` objects
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 6.1
+
+.. class:: Stylesheet(href, **attributes)
+
+    Represents a stylesheet link. The ``rel`` attribute is set to
+    ``"stylesheet"``.
+
+    The first parameter, ``href``, is the string path to the stylesheet file.
+    See :ref:`the section on paths <form-asset-paths>` for details on how to
+    specify paths to these files.
+
+    The optional keyword arguments, ``**attributes``, are additional HTML
+    attributes set on the rendered ``<link>`` tag.
+
+    See :ref:`form-media-asset-objects` for usage examples.
+
 ``js``
 ------
 
@@ -135,8 +154,6 @@ paths to these files.
 
 ``Script`` objects
 ~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 5.2
 
 .. class:: Script(src, **attributes)
 
@@ -297,8 +314,8 @@ Or if :mod:`~django.contrib.staticfiles` is configured using the
 Paths as objects
 ----------------
 
-Assets may also be object-based, using :class:`.Script`.
-Furthermore, these allow you to pass custom HTML attributes::
+Assets may also be object-based, using :class:`.Script` or
+:class:`.Stylesheet`. These allow you to pass custom HTML attributes::
 
     class Media:
         js = [
@@ -321,12 +338,35 @@ HTML:
             async>
     </script>
 
-.. versionchanged:: 5.2
+Similarly, a :class:`.Stylesheet` object can be used to add a stylesheet
+link with custom HTML attributes::
 
-    The object class ``Script`` was added.
+    class Media:
+        css = {
+            "all": [
+                Stylesheet(
+                    "https://cdn.example.com/print.css",
+                    crossorigin="anonymous",
+                    media="print",
+                ),
+            ]
+        }
+
+If this Media definition were to be rendered, it would become:
+
+.. code-block:: html+django
+
+    <link href="https://cdn.example.com/print.css"
+          crossorigin="anonymous"
+          media="print"
+          rel="stylesheet">
 
 ``Media`` objects
 =================
+
+.. class:: Media
+
+    Represents a collection of media assets required by a widget or form.
 
 When you interrogate the ``media`` attribute of a widget or form, the
 value that is returned is a ``forms.Media`` object. As we have already

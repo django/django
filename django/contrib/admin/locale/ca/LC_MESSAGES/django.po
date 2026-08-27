@@ -8,6 +8,7 @@
 # GerardoGa <ggarciamaristany@gmail.com>, 2018
 # Gil Obradors Via <gil.obradors@gmail.com>, 2019
 # Gil Obradors Via <gil.obradors@gmail.com>, 2019
+# Isaac Torres, 2026
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Manel Clos <manelclos@gmail.com>, 2020
 # Marc Compte <marc@compte.cat>, 2021
@@ -16,10 +17,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-07-25 07:05+0000\n"
-"Last-Translator: Emilio Carrion\n"
-"Language-Team: Catalan (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2026-06-01 07:05+0000\n"
+"Last-Translator: Isaac Torres, 2026\n"
+"Language-Team: Catalan (http://app.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -39,8 +40,8 @@ msgstr "Eliminat/s %(count)d %(items)s satisfactòriament."
 msgid "Cannot delete %(name)s"
 msgstr "No es pot esborrar %(name)s"
 
-msgid "Are you sure?"
-msgstr "N'esteu segur?"
+msgid "Delete multiple objects"
+msgstr "Eliminar múltiples objectes"
 
 msgid "Administration"
 msgstr "Administració"
@@ -188,6 +189,9 @@ msgstr ""
 "Premeu la tecla \"Control\", o \"Command\" en un Mac, per seleccionar més "
 "d'un valor."
 
+msgid "Select this object for an action - {}"
+msgstr "Selecciona aquest objecte per a una acció - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "El {name} \"{obj}\" fou afegit amb èxit."
@@ -207,11 +211,6 @@ msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
 "El {name} \"{obj}\" fou canviat amb èxit. Podeu editar-lo de nou a sota."
-
-#, python-brace-format
-msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
-"El  {name} \"{obj}\" s'ha afegit amb èxit. Podeu editar-lo de nou a sota."
 
 #, python-brace-format
 msgid ""
@@ -274,6 +273,9 @@ msgstr[1] "Tots %(total_count)s seleccionat(s)"
 msgid "0 of %(cnt)s selected"
 msgstr "0 de %(cnt)s seleccionats"
 
+msgid "Delete"
+msgstr "Eliminar"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Modificar històric: %s"
@@ -335,11 +337,8 @@ msgstr ""
 "correu electrònic, i hauria d'arreglar-se en breu. Gràcies per la vostra "
 "paciència."
 
-msgid "Run the selected action"
-msgstr "Executar l'acció seleccionada"
-
-msgid "Go"
-msgstr "Anar"
+msgid "Run"
+msgstr "Executar"
 
 msgid "Click here to select the objects across all pages"
 msgstr "Feu clic aquí per seleccionar els objectes a totes les pàgines"
@@ -351,9 +350,21 @@ msgstr "Seleccioneu tots %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Netejar la selecció"
 
+msgid "Breadcrumbs"
+msgstr "Rutes de navegació"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Models en l'aplicació %(name)s"
+
+msgid "Model name"
+msgstr "Nom del model"
+
+msgid "Add link"
+msgstr "Afegir enllaç"
+
+msgid "Change or view list link"
+msgstr "Canviar o visualitzar enllaç de la llista"
 
 msgid "Add"
 msgstr "Afegir"
@@ -364,28 +375,42 @@ msgstr "Visualitza"
 msgid "You don’t have permission to view or edit anything."
 msgstr "No teniu permisos per veure o editar"
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
-msgstr ""
-"Primer, entreu un nom d'usuari i una contrasenya. Després podreu editar més "
-"opcions de l'usuari."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
+msgstr "Després de crear un usuari, podreu editar més opcions de l'usuari."
 
-msgid "Enter a username and password."
-msgstr "Introduïu un nom d'usuari i contrasenya."
+msgid "Error:"
+msgstr "Error:"
 
 msgid "Change password"
 msgstr "Canviar contrasenya"
 
-msgid "Please correct the error below."
-msgstr "Si us plau, corregiu l'error de sota."
+msgid "Set password"
+msgstr "Establir contrasenya"
 
-msgid "Please correct the errors below."
-msgstr "Si us plau, corregiu els errors mostrats a sota."
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Si us plau, corregiu l'error de sota."
+msgstr[1] "Si us plau, corregiu els errors de sota."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Introduïu una contrasenya per l'usuari <strong>%(username)s</strong>"
+
+msgid ""
+"This action will <strong>enable</strong> password-based authentication for "
+"this user."
+msgstr ""
+"Aquesta acció <strong>habilitarà</strong> l'autenticació basada en "
+"contrasenya per a aquest usuari."
+
+msgid "Disable password-based authentication"
+msgstr "Deshabilitar l'autenticació basada en contrasenya"
+
+msgid "Enable password-based authentication"
+msgstr "Habilitar l'autenticació basada en contrasenya"
+
+msgid "Skip to main content"
+msgstr "Saltar al contingut principal"
 
 msgid "Welcome,"
 msgstr "Benvingut/da,"
@@ -412,8 +437,17 @@ msgstr "Veure al lloc"
 msgid "Filter"
 msgstr "Filtre"
 
+msgid "Hide counts"
+msgstr "Ocultar reompte"
+
+msgid "Show counts"
+msgstr "Mostrar recompte"
+
 msgid "Clear all filters"
 msgstr "Netejar tots els filtres"
+
+msgid "Save"
+msgstr "Desar"
 
 msgid "Remove from sorting"
 msgstr "Treure de la ordenació"
@@ -425,34 +459,40 @@ msgstr "Prioritat d'ordenació: %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "Commutar ordenació"
 
-msgid "Delete"
-msgstr "Eliminar"
+msgid "Toggle theme (current theme: auto)"
+msgstr "Canviar tema (tema actual: automàtic)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Canviar tema (tema actual: clar)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Canviar tema (tema actual: fosc)"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Eliminar el/la %(object_name)s '%(escaped_object)s' provocaria l'eliminació "
-"d'objectes relacionats, però el vostre compte no te permisos per esborrar "
-"els tipus d'objecte següents:"
+"Eliminar %(object_name)s \"%(escaped_object)s\" resultarà en l'eliminació "
+"dels objectes relacionats, però el vostre compte no té permisos per eliminar "
+"els següents tipus d'objectes:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Esborrar %(object_name)s '%(escaped_object)s' requeriria esborrar els "
-"següents objectes relacionats protegits:"
+"Eliminar %(object_name)s \"%(escaped_object)s\" requeriria eliminar els "
+"següents objectes protegits relacionats:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Esteu segurs de voler esborrar els/les %(object_name)s \"%(escaped_object)s"
-"\"? S'esborraran els següents elements relacionats:"
+"Esteu segurs de voler esborrar els/les %(object_name)s "
+"\"%(escaped_object)s\"? S'esborraran els següents elements relacionats:"
 
 msgid "Objects"
 msgstr "Objectes"
@@ -462,9 +502,6 @@ msgstr "Sí, n'estic segur"
 
 msgid "No, take me back"
 msgstr "No, torna endarrere"
-
-msgid "Delete multiple objects"
-msgstr "Eliminar múltiples objectes"
 
 #, python-format
 msgid ""
@@ -511,6 +548,15 @@ msgstr "Les meves accions"
 msgid "None available"
 msgstr "Cap disponible"
 
+msgid "Added:"
+msgstr "Afegit:"
+
+msgid "Changed:"
+msgstr "Canviat:"
+
+msgid "Deleted:"
+msgstr "Eliminat:"
+
 msgid "Unknown content"
 msgstr "Contingut desconegut"
 
@@ -531,11 +577,14 @@ msgstr ""
 "Esteu identificats com a %(username)s, però no esteu autoritzats a accedir a "
 "aquesta pàgina. Voleu identificar-vos amb un compte d'usuari diferent?"
 
-msgid "Forgotten your password or username?"
-msgstr "Heu oblidat la vostra contrasenya o nom d'usuari?"
+msgid "Forgotten your login credentials?"
+msgstr "Heu oblidat les vostres credencials d'accés?"
 
 msgid "Toggle navigation"
 msgstr "Canviar mode de navegació"
+
+msgid "Sidebar"
+msgstr "Barra lateral"
 
 msgid "Start typing to filter…"
 msgstr "Comença a teclejar per filtrar ..."
@@ -552,11 +601,14 @@ msgstr "Usuari"
 msgid "Action"
 msgstr "Acció"
 
-msgid "entry"
-msgstr "entrada"
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr "Paginació %(name)s entrades"
 
-msgid "entries"
-msgstr "entrades"
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "entrada"
+msgstr[1] "entrades"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -565,14 +617,19 @@ msgstr ""
 "Aquest objecte no té historial de canvis. Probablement no es va afegir "
 "utilitzant aquest lloc administratiu."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr "Paginació %(name)s"
+
 msgid "Show all"
 msgstr "Mostrar tots"
 
-msgid "Save"
-msgstr "Desar"
-
 msgid "Popup closing…"
 msgstr "Tancant finestra emergent..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr "Cerca %(name)s"
 
 msgid "Search"
 msgstr "Cerca"
@@ -696,8 +753,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Si us plau, aneu a la pàgina següent i escolliu una nova contrasenya:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "El vostre nom d'usuari, en cas que l'hagueu oblidat:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "En cas que ho hagueu oblidat, sou:"
 
 msgid "Thanks for using our site!"
 msgstr "Gràcies per fer ús del nostre lloc!"
@@ -718,6 +775,9 @@ msgstr "Adreça de correu electrònic:"
 
 msgid "Reset my password"
 msgstr "Restablir la meva contrasenya"
+
+msgid "Select all objects on this page for an action"
+msgstr "Seleccionar tots els objectes d'aquesta pàgina per realitzar una acció"
 
 msgid "All dates"
 msgstr "Totes les dates"

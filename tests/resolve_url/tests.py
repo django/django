@@ -3,7 +3,7 @@ from django.test import SimpleTestCase, override_settings
 from django.urls import NoReverseMatch, reverse_lazy
 
 from .models import UnimportantThing
-from .urls import some_view
+from .views import params_cbv, params_view, some_cbv, some_view
 
 
 @override_settings(ROOT_URLCONF="resolve_url.urls")
@@ -49,6 +49,28 @@ class ResolveUrlTests(SimpleTestCase):
         """
         resolved_url = resolve_url(some_view)
         self.assertEqual("/some-url/", resolved_url)
+
+    def test_view_function_with_kwargs(self):
+        self.assertEqual("/params/django/", resolve_url(params_view, slug="django"))
+
+    def test_view_function_with_args(self):
+        self.assertEqual("/params/django/", resolve_url(params_view, "django"))
+
+    def test_class_based_view(self):
+        self.assertEqual("/some-cbv/", resolve_url(some_cbv))
+
+    def test_class_based_view_with_kwargs(self):
+        self.assertEqual("/params-cbv/5/", resolve_url(params_cbv, pk=5))
+
+    def test_class_based_view_with_args(self):
+        self.assertEqual("/params-cbv/5/", resolve_url(params_cbv, 5))
+
+    def test_missing_params_raise_no_reverse_match(self):
+        with self.assertRaises(NoReverseMatch):
+            resolve_url(params_view)
+
+        with self.assertRaises(NoReverseMatch):
+            resolve_url(params_cbv)
 
     def test_lazy_reverse(self):
         """

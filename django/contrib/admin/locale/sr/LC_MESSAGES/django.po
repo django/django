@@ -2,16 +2,16 @@
 #
 # Translators:
 # Branko Kokanovic <branko@kokanovic.org>, 2018
-# Igor Jerosimić, 2019,2021,2023-2025
+# Igor Jerosimić, 2019,2021,2023-2026
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: Igor Jerosimić, 2019,2021,2023-2025\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 07:05+0000\n"
+"Last-Translator: Igor Jerosimić, 2019,2021,2023-2026\n"
 "Language-Team: Serbian (http://app.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -182,8 +182,13 @@ msgstr ""
 "Држите „Control“, или „Command“ на Mac-у да бисте обележили више од једне "
 "ставке."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Изабери овај објекат за радњу - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr "Апликација \"%s\" није пронађена."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -246,15 +251,15 @@ msgstr "Измени објекат класе %s"
 msgid "View %s"
 msgstr "Преглед %s"
 
-msgid "Database error"
-msgstr "Грешка у бази података"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "Успешно промењен %(count)s %(name)s."
 msgstr[1] "Успешно промењена %(count)s %(name)s."
 msgstr[2] "Успешно промењених %(count)s %(name)s."
+
+msgid "Database error"
+msgstr "Грешка у бази података"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -280,6 +285,18 @@ msgstr "Историјат измена: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ", "
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] "...и још %(count)d објекат."
+msgstr[1] "...и још %(count)d објекта."
+msgstr[2] "...и још %(count)d објеката."
 
 #, python-format
 msgid ""
@@ -330,14 +347,8 @@ msgstr ""
 "Десила се грешка. Пријављена је администраторима сајта преко е-поште и "
 "требало би да ускоро буде исправљена. Хвала Вам на стрпљењу."
 
-msgid "Run the selected action"
-msgstr "Покрени одабрану радњу"
-
-msgid "Go"
-msgstr "Почни"
-
-msgid "Click here to select the objects across all pages"
-msgstr "Изабери све објекте на овој страници."
+msgid "Run"
+msgstr "Покрени"
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -348,10 +359,6 @@ msgstr "Поништи избор"
 
 msgid "Breadcrumbs"
 msgstr "Мрвице"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Модели у апликацији %(name)s"
 
 msgid "Model name"
 msgstr "Име модела"
@@ -444,6 +451,9 @@ msgstr "Прикажи бројање"
 msgid "Clear all filters"
 msgstr "Обриши све филтере"
 
+msgid "Save"
+msgstr "Сачувај"
+
 msgid "Remove from sorting"
 msgstr "Избаци из сортирања"
 
@@ -464,30 +474,34 @@ msgid "Toggle theme (current theme: dark)"
 msgstr "Укључи/искључи тему (тренутна тема: тамна)"
 
 #, python-format
+msgid "Filter by %(field_name)s"
+msgstr "Филтрирај по %(field_name)s"
+
+#, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Уклањање %(object_name)s „%(escaped_object)s“ повлачи уклањање свих објеката "
-"који су повезани са овим објектом, али ваш налог нема дозволе за брисање "
-"следећих типова објеката:"
+"Брисање %(object_name)s “%(escaped_object)s” би резултирало брисањем "
+"повезаних објеката, али ваш налог нема дозволу за брисање следећих типова "
+"објеката:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Да би избрисали изабран %(object_name)s „%(escaped_object)s“ потребно је "
-"брисати и следеће заштићене повезане објекте:"
+"Брисање %(object_name)s “%(escaped_object)s” би захтевало брисање следећих "
+"заштићених повезаних објеката:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Да сигурни да желите да обришете %(object_name)s „%(escaped_object)s“? "
-"Следећи објекти који су у вези са овим објектом ће такође бити обрисани:"
+"Да ли сте сигурни да желите да обришете %(object_name)s "
+"“%(escaped_object)s”? Све следеће повезане ставке ће бити обрисане:"
 
 msgid "Objects"
 msgstr "Објекти"
@@ -595,6 +609,10 @@ msgstr "Корисник"
 msgid "Action"
 msgstr "Радња"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr "Уноси пагинације %(name)s"
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "унос"
@@ -608,14 +626,19 @@ msgstr ""
 "Овај објекат нема забележен историјат измена. Вероватно није додат кроз овај "
 "сајт за администрацију."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr "Пагинација %(name)s"
+
 msgid "Show all"
 msgstr "Прикажи све"
 
-msgid "Save"
-msgstr "Сачувај"
-
 msgid "Popup closing…"
 msgstr "Попуп се затвара..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr "Претрага %(name)s"
 
 msgid "Search"
 msgstr "Претрага"
@@ -661,6 +684,9 @@ msgstr "Обриши одабрани модел %(model)s"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Изабран приказ %(model)s"
+
+msgid "Logout"
+msgstr "Одјави се"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Хвала што сте данас провели време на овом сајту."

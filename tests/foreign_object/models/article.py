@@ -22,7 +22,7 @@ class ColConstraint:
         self.alias, self.col, self.value = alias, col, value
 
     def as_sql(self, compiler, connection):
-        qn = compiler.quote_name_unless_alias
+        qn = compiler.quote_name
         return "%s.%s = %%s" % (qn(self.alias), qn(self.col)), [self.value]
 
 

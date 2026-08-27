@@ -2,13 +2,19 @@ import datetime
 import decimal
 import json
 from importlib import import_module
+from itertools import chain
 
 import sqlparse
+from sqlparse.exceptions import SQLParseError
 
 from django.conf import settings
-from django.db import NotSupportedError, transaction
-from django.db.models.expressions import Col
+from django.db import NotSupportedError, models, transaction
+from django.db.models import Exists, ExpressionWrapper, Lookup
+from django.db.models.expressions import Col, RawSQL
+from django.db.models.fields.composite import CompositePrimaryKey
+from django.db.models.sql.where import WhereNode
 from django.utils import timezone
+from django.utils.duration import duration_microseconds
 from django.utils.encoding import force_str
 
 
@@ -77,7 +83,17 @@ class BaseDatabaseOperations:
         are the fields going to be inserted in the batch, the objs contains
         all the objects to be inserted.
         """
-        return len(objs)
+        if self.connection.features.max_query_params is None or not fields:
+            return len(objs)
+
+        return self.connection.features.max_query_params // len(
+            list(
+                chain.from_iterable(
+                    field.fields if isinstance(field, CompositePrimaryKey) else [field]
+                    for field in fields
+                )
+            )
+        )
 
     def format_for_duration_arithmetic(self, sql):
         raise NotImplementedError(
@@ -252,6 +268,16 @@ class BaseDatabaseOperations:
             )
             if sql
         )
+
+    def fk_on_delete_sql(self, operation):
+        """
+        Return the SQL to make an ON DELETE statement.
+        """
+        if operation in ["CASCADE", "SET NULL", "SET DEFAULT"]:
+            return f" ON DELETE {operation}"
+        if operation == "":
+            return ""
+        raise NotImplementedError(f"ON DELETE {operation} is not supported.")
 
     def bulk_insert_sql(self, fields, placeholder_rows):
         placeholder_rows_sql = (", ".join(row) for row in placeholder_rows)
@@ -564,6 +590,16 @@ class BaseDatabaseOperations:
             return None
         return str(value)
 
+    def adapt_durationfield_value(self, value):
+        """
+        Transform a timedelta value into an object compatible with what is
+        expected by the backend driver for duration columns (by default,
+        an integer of microseconds).
+        """
+        if value is None:
+            return None
+        return duration_microseconds(value)
+
     def adapt_timefield_value(self, value):
         """
         Transform a time value to an object compatible with what is expected
@@ -651,6 +687,25 @@ class BaseDatabaseOperations:
         if value is not None:
             return datetime.timedelta(0, 0, value)
 
+    def convert_trunc_expression(self, value, expression):
+        if isinstance(expression.output_field, models.DateTimeField):
+            if not settings.USE_TZ:
+                pass
+            elif value is not None:
+                value = value.replace(tzinfo=None)
+                value = timezone.make_aware(value, expression.tzinfo)
+            elif not self.connection.features.has_zoneinfo_database:
+                raise ValueError(
+                    "Database returned an invalid datetime value. Are time "
+                    "zone definitions for your database installed?"
+                )
+        elif isinstance(value, datetime.datetime):
+            if isinstance(expression.output_field, models.DateField):
+                value = value.date()
+            elif isinstance(expression.output_field, models.TimeField):
+                value = value.time()
+        return value
+
     def check_expression_support(self, expression):
         """
         Check that the backend supports the provided expression.
@@ -664,10 +719,25 @@ class BaseDatabaseOperations:
 
     def conditional_expression_supported_in_where_clause(self, expression):
         """
-        Return True, if the conditional expression is supported in the WHERE
-        clause.
+        Return True, if the conditional expression is directly supported in the
+        WHERE clause.
         """
-        return True
+        # If the backend supports native boolean field it can accept any
+        # direct conditional expression usage.
+        if self.connection.features.has_native_boolean_field:
+            return True
+        # Most backends support direct EXISTS and lookups usage.
+        if isinstance(expression, (Exists, Lookup, WhereNode)):
+            return True
+        # Nested expression wrappers should be unwrapped.
+        if isinstance(expression, ExpressionWrapper) and expression.conditional:
+            return self.conditional_expression_supported_in_where_clause(
+                expression.expression
+            )
+        # Trust that direct usage of RawSQL can be used by itself.
+        if isinstance(expression, RawSQL) and expression.conditional:
+            return True
+        return False
 
     def combine_expression(self, connector, sub_expressions):
         """
@@ -682,12 +752,14 @@ class BaseDatabaseOperations:
     def combine_duration_expression(self, connector, sub_expressions):
         return self.combine_expression(connector, sub_expressions)
 
-    def binary_placeholder_sql(self, value):
+    def binary_placeholder_sql(self, value, compiler):
         """
         Some backends require special syntax to insert binary content (MySQL
         for example uses '_binary %s').
         """
-        return "%s"
+        if hasattr(value, "as_sql"):
+            return compiler.compile(value)
+        return "%s", (value,)
 
     def modify_insert_params(self, placeholder, params):
         """
@@ -802,7 +874,11 @@ class BaseDatabaseOperations:
 
     def format_debug_sql(self, sql):
         # Hook for backends (e.g. NoSQL) to customize formatting.
-        return sqlparse.format(sql, reindent=True, keyword_case="upper")
+        try:
+            return sqlparse.format(sql, reindent=True, keyword_case="upper")
+        except SQLParseError:
+            # Fallback to unformatted sql.
+            return sql
 
     def format_json_path_numeric_index(self, num):
         """

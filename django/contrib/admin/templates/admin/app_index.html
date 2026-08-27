@@ -6,13 +6,13 @@
 {% if not is_popup %}
 {% block nav-breadcrumbs %}
   <nav aria-label="{% translate 'Breadcrumbs' %}">
-    <div class="breadcrumbs">
-      <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-      &rsaquo;
-      {% for app in app_list %}
-        {{ app.name }}
+    <ol class="breadcrumbs">
+      <li><a href="{% url 'admin:index' %}">{% translate 'Home' %}</a></li>
+      <li aria-current="page">
+      {% for app in app_list %}{{ app.name }}
       {% endfor %}
-    </div>
+      </li>
+    </ol>
   </nav>
 {% endblock %}
 {% endif %}

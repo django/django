@@ -99,20 +99,20 @@ class DomainNameValidator(RegexValidator):
     def __init__(self, **kwargs):
         self.accept_idna = kwargs.pop("accept_idna", True)
 
-        if self.accept_idna:
-            self.regex = _lazy_re_compile(
-                r"^" + self.hostname_re + self.domain_re + self.tld_re + r"$",
-                re.IGNORECASE,
-            )
-        else:
-            self.regex = _lazy_re_compile(
-                r"^"
-                + self.ascii_only_hostname_re
-                + self.ascii_only_domain_re
-                + self.ascii_only_tld_re
-                + r"$",
-                re.IGNORECASE,
-            )
+        regex_parts = [
+            "^",
+            *(
+                (self.hostname_re, self.domain_re, self.tld_re)
+                if self.accept_idna
+                else (
+                    self.ascii_only_hostname_re,
+                    self.ascii_only_domain_re,
+                    self.ascii_only_tld_re,
+                )
+            ),
+            r"\Z",
+        ]
+        self.regex = _lazy_re_compile("".join(regex_parts), re.IGNORECASE)
         super().__init__(**kwargs)
 
     def __call__(self, value):
@@ -152,7 +152,7 @@ class URLValidator(RegexValidator):
     )
     message = _("Enter a valid URL.")
     schemes = ["http", "https", "ftp", "ftps"]
-    unsafe_chars = frozenset("\t\r\n")
+    unsafe_chars = frozenset("\t\r\n\x00")
     max_length = MAX_URL_LENGTH
 
     def __init__(self, schemes=None, **kwargs):
@@ -513,17 +513,17 @@ class DecimalValidator:
     messages = {
         "invalid": _("Enter a number."),
         "max_digits": ngettext_lazy(
-            "Ensure that there are no more than %(max)s digit in total.",
+            "Ensure that there is no more than %(max)s digit in total.",
             "Ensure that there are no more than %(max)s digits in total.",
             "max",
         ),
         "max_decimal_places": ngettext_lazy(
-            "Ensure that there are no more than %(max)s decimal place.",
+            "Ensure that there is no more than %(max)s decimal place.",
             "Ensure that there are no more than %(max)s decimal places.",
             "max",
         ),
         "max_whole_digits": ngettext_lazy(
-            "Ensure that there are no more than %(max)s digit before the decimal "
+            "Ensure that there is no more than %(max)s digit before the decimal "
             "point.",
             "Ensure that there are no more than %(max)s digits before the decimal "
             "point.",

@@ -1,18 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# berislavlopac <berislav.lopac@gmail.com>, 2012
+# Berislav Lopac <berislav.lopac@gmail.com>, 2012
 # Davor Lučić <r.dav.lc@gmail.com>, 2012
 # Filip Cuk <filipcuk2@gmail.com>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Milo Ivir <mail@milotype.de>, 2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Croatian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2025-12-03 18:45+0000\n"
+"Last-Translator: Milo Ivir <mail@milotype.de>, 2025\n"
+"Language-Team: Croatian (http://app.transifex.com/django/django/language/"
 "hr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -22,41 +23,43 @@ msgstr ""
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
 msgid "GIS"
-msgstr ""
+msgstr "Geografski informacijski sustav"
 
 msgid "The base GIS field."
-msgstr ""
+msgstr "Osnovno polje geografskog informacijskog sustava."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
+"Osnovno polje geografskog informacijskog sustava – mapira na geometrijsku "
+"vrstu OpenGIS specifikacije."
 
 msgid "Point"
 msgstr "Točka"
 
 msgid "Line string"
-msgstr "Linija (Line string)"
+msgstr "Linija"
 
 msgid "Polygon"
 msgstr "Poligon"
 
 msgid "Multi-point"
-msgstr "Više točaka"
+msgstr "Višestruki broj točaka"
 
 msgid "Multi-line string"
-msgstr "Više linija (Line string)"
+msgstr "Višestruki broj linija"
 
 msgid "Multi polygon"
-msgstr "Više poligona"
+msgstr "Višestruki broj poligona"
 
 msgid "Geometry collection"
-msgstr "Geometrijska kolekcija"
+msgstr "Geometrijska zbirka"
 
 msgid "Extent Aggregate Field"
-msgstr ""
+msgstr "Agregirano polje raspona"
 
 msgid "Raster Field"
-msgstr ""
+msgstr "Rastersko polje"
 
 msgid "No geometry value provided."
 msgstr "Geometrijska vrijednost nije priložena."
@@ -65,7 +68,7 @@ msgid "Invalid geometry value."
 msgstr "Neispravna geometrijska vrijednost."
 
 msgid "Invalid geometry type."
-msgstr "Neispravan geometrijski tip."
+msgstr "Neispravna geometrijska vrsta."
 
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
@@ -75,17 +78,14 @@ msgstr ""
 "forme."
 
 msgid "Delete all Features"
-msgstr "Izbriši sve značajke"
-
-msgid "WKT debugging window:"
-msgstr ""
+msgstr "Izbriši sve funkcije"
 
 msgid "Debugging window (serialized value)"
-msgstr ""
+msgstr "Prozor za otklanjanje grešaka (serijalizirana vrijednost)"
 
 msgid "No feeds are registered."
-msgstr "Nema registriranih izvora."
+msgstr "Nema registriranih feedova."
 
 #, python-format
-msgid "Slug %r isn't registered."
-msgstr "Slug %r nije registriran."
+msgid "Slug %r isn’t registered."
+msgstr "URL indikator %r nije registriran."

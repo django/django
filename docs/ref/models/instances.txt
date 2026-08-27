@@ -68,10 +68,20 @@ need to :meth:`~Model.save`.
 
         book = Book.objects.create_book("Pride and Prejudice")
 
+.. admonition:: Setting attributes does not convert types
+
+    Setting a model attribute does not convert the value to the field's Python
+    type. That conversion happens when the model is :ref:`validated
+    <validating-objects>`. Although a field assigned a value of a different
+    type (for example, a string assigned to a
+    :class:`~django.db.models.UUIDField`) may be converted when
+    :meth:`~Model.save` executes a query, the in-memory instance will keep the
+    original value until it is :ref:`reloaded <refreshing-objects>`.
+
 Customizing model loading
 -------------------------
 
-.. classmethod:: Model.from_db(db, field_names, values)
+.. classmethod:: Model.from_db(db, field_names, values, *, fetch_mode=None)
 
 The ``from_db()`` method can be used to customize model instance creation
 when loading from the database.
@@ -84,10 +94,13 @@ fields are present, then ``values`` are guaranteed to be in the order
 ``__init__()`` expects them. That is, the instance can be created by
 ``cls(*values)``. If any fields are deferred, they won't appear in
 ``field_names``. In that case, assign a value of ``django.db.models.DEFERRED``
-to each of the missing fields.
+to each of the missing fields. The ``fetch_mode`` argument contains the
+:doc:`fetch mode </topics/db/fetch-modes>` of the query that loaded the
+instance, or ``None`` if it was loaded outside of a query.
 
 In addition to creating the new model, the ``from_db()`` method must set the
 ``adding`` and ``db`` flags in the new instance's :attr:`~Model._state`
+attribute, and, when ``fetch_mode`` is not ``None``, its ``fetch_mode``
 attribute.
 
 Below is an example showing how to record the initial values of fields that
@@ -97,7 +110,7 @@ are loaded from the database::
 
 
     @classmethod
-    def from_db(cls, db, field_names, values):
+    def from_db(cls, db, field_names, values, *, fetch_mode=None):
         # Default implementation of from_db() (subject to change and could
         # be replaced with super()).
         if len(values) != len(cls._meta.concrete_fields):
@@ -110,6 +123,8 @@ are loaded from the database::
         instance = cls(*values)
         instance._state.adding = False
         instance._state.db = db
+        if fetch_mode is not None:
+            instance._state.fetch_mode = fetch_mode
         # customization to store the original field values on the instance
         instance._loaded_values = dict(
             zip(field_names, (value for value in values if value is not DEFERRED))
@@ -130,6 +145,17 @@ are loaded from the database::
 The example above shows a full ``from_db()`` implementation to clarify how that
 is done. In this case it would be possible to use a ``super()`` call in the
 ``from_db()`` method.
+
+.. versionchanged:: 6.1
+
+    The ``fetch_mode`` parameter was added.
+
+.. deprecated:: 6.1
+
+    Support for ``from_db()`` methods that do not accept the ``fetch_mode``
+    keyword argument is deprecated and will be removed in Django 7.0.
+
+.. _refreshing-objects:
 
 Refreshing objects from database
 ================================
@@ -180,10 +206,10 @@ update, you could write a test similar to this::
         obj.refresh_from_db()
         self.assertEqual(obj.val, 2)
 
-Note that when deferred fields are accessed, the loading of the deferred
-field's value happens through this method. Thus it is possible to customize
-the way deferred loading happens. The example below shows how one can reload
-all of the instance's fields when a deferred field is reloaded::
+When a deferred field is loaded on-demand for a single model instance, the
+loading happens through this method. Thus it is possible to customize the way
+this loading happens. The example below shows how one can reload all of the
+instance's fields when a deferred field is loaded on-demand::
 
     class ExampleModel(models.Model):
         def refresh_from_db(self, using=None, fields=None, **kwargs):
@@ -465,11 +491,6 @@ field or fields compose the primary key for the model. You can read and set
 this value, just as you would for any other attribute, and it will update the
 correct fields in the model.
 
-.. versionchanged:: 5.2
-
-    Support for the primary key to be composed of multiple fields was added via
-    ``CompositePrimaryKey``.
-
 Explicitly specifying auto-primary-key values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -603,12 +624,6 @@ You can pass ``force_insert=(models.Model,)`` to force an ``INSERT`` statement
 for all parents. By default, ``force_insert=True`` only forces the insertion of
 a new row for the current model.
 
-.. versionchanged:: 6.0
-
-    When a forced update does not affect any rows a
-    :exc:`~django.db.models.Model.NotUpdated` exception is raised. On previous
-    versions a generic :exc:`django.db.DatabaseError` was raised.
-
 It should be very rare that you'll need to use these parameters. Django will
 almost always do the right thing and trying to override that will lead to
 errors that are difficult to track down. This feature is for advanced use
@@ -637,10 +652,9 @@ the value of 11 will be written back to the database.
 The process can be made robust, :ref:`avoiding a race condition
 <avoiding-race-conditions-using-f>`, as well as slightly faster by expressing
 the update relative to the original field value, rather than as an explicit
-assignment of a new value. Django provides :class:`F expressions
-<django.db.models.F>` for performing this kind of relative update. Using
-:class:`F expressions <django.db.models.F>`, the previous example is expressed
-as:
+assignment of a new value. Django provides :ref:`f-expressions` for performing
+this kind of relative update. Using :ref:`f-expressions`, the previous example
+is expressed as:
 
 .. code-block:: pycon
 
@@ -649,9 +663,8 @@ as:
     >>> product.number_sold = F("number_sold") + 1
     >>> product.save()
 
-For more details, see the documentation on :class:`F expressions
-<django.db.models.F>` and their :ref:`use in update queries
-<topics-db-queries-update>`.
+For more details, see the documentation on :ref:`f-expressions` and their
+:ref:`use in update queries <topics-db-queries-update>`.
 
 .. _ref-models-update-fields:
 
@@ -700,7 +713,11 @@ Issues an SQL ``DELETE`` for the object. This only deletes the object in the
 database; the Python instance will still exist and will still have data in
 its fields, except for the primary key set to ``None``. This method returns the
 number of objects deleted and a dictionary with the number of deletions per
-object type.
+object type. The return value will count instances from related models if
+Django is emulating cascade behavior via Python :attr:`~ForeignKey.on_delete`
+variants. Otherwise, for database variants such as
+:attr:`~django.db.models.DB_CASCADE`, the return value will report only
+instances of the :class:`.QuerySet`'s model.
 
 For more details, including how to delete objects in bulk, see
 :ref:`topics-db-queries-delete`.
@@ -711,6 +728,10 @@ method. See :ref:`overriding-model-methods` for more details.
 Sometimes with :ref:`multi-table inheritance <multi-table-inheritance>` you may
 want to delete only a child model's data. Specifying ``keep_parents=True`` will
 keep the parent model's data.
+
+.. versionchanged:: 6.1
+
+    Support for the ``DB_*`` variants of ``on_delete`` attribute was added.
 
 Pickling objects
 ================
@@ -813,7 +834,7 @@ The ``__hash__()`` method is based on the instance's primary key value. It
 is effectively ``hash(obj.pk)``. If the instance doesn't have a primary key
 value then a ``TypeError`` will be raised (otherwise the ``__hash__()``
 method would return different values before and after the instance is
-saved, but changing the :meth:`~object.__hash__` value of an instance is
+saved), but changing the :meth:`~object.__hash__` value of an instance is
 forbidden in Python.
 
 ``get_absolute_url()``
@@ -830,7 +851,7 @@ For example::
     def get_absolute_url(self):
         return "/people/%i/" % self.id
 
-While this code is correct and simple, it may not be the most portable way to
+While this code is correct and simple, it may not be the most portable way
 to write this kind of method. The :func:`~django.urls.reverse` function is
 usually the best approach.
 
@@ -968,23 +989,33 @@ Other attributes
     The ``_state`` attribute refers to a ``ModelState`` object that tracks
     the lifecycle of the model instance.
 
-    The ``ModelState`` object has two attributes: ``adding``, a flag which is
-    ``True`` if the model has not been saved to the database yet, and ``db``,
-    a string referring to the database alias the instance was loaded from or
-    saved to.
+    The ``ModelState`` object has three attributes: ``adding``, a flag which is
+    ``True`` if the model has not been saved to the database yet, ``db``, a
+    string referring to the database alias the instance was loaded from or
+    saved to, and ``fetch_mode``, the :doc:`fetch mode
+    </topics/db/fetch-modes>` to be used in subsequent field fetches.
 
     Newly instantiated instances have ``adding=True`` and ``db=None``,
-    since they are yet to be saved. Instances fetched from a ``QuerySet``
-    will have ``adding=False`` and ``db`` set to the alias of the associated
-    database.
+    since they are yet to be saved, and ``fetch_mode=models.FETCH_ONE``.
+    Instances fetched from a ``QuerySet`` will have ``adding=False``, ``db``
+    set to the alias of the associated database, and ``fetch_mode`` copied
+    from the queryset's fetch mode.
+
+    .. versionchanged:: 6.1
+
+        The ``fetch_mode`` attribute was added.
 
 ``_is_pk_set()``
 ----------------
 
 .. method:: Model._is_pk_set()
 
-.. versionadded:: 5.2
+    The ``_is_pk_set()`` method returns whether the model instance's ``pk`` is
+    set. It abstracts the model's primary key definition, ensuring consistent
+    behavior regardless of the specific ``pk`` configuration. A
+    ``DatabaseDefault`` on an unsaved instance is considered unset.
 
-The ``_is_pk_set()`` method returns whether the model instance's ``pk`` is set.
-It abstracts the model's primary key definition, ensuring consistent behavior
-regardless of the specific ``pk`` configuration.
+    .. versionchanged:: 6.1
+
+        In earlier versions, ``True`` was returned for ``DatabaseDefault``
+        values.

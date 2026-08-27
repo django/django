@@ -3,12 +3,12 @@
 # The *_FORMAT strings use the Django date format syntax,
 # see https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
 DATE_FORMAT = "j F Y"  # 31 janvier 2024
-TIME_FORMAT = "H\xa0h\xa0i"  # 13 h 40
-DATETIME_FORMAT = "j F Y, H\xa0h\xa0i"  # 31 janvier 2024, 13 h 40
+TIME_FORMAT = "H\xa0\\h\xa0i"  # 13 h 40
+DATETIME_FORMAT = "j F Y, H\xa0\\h\xa0i"  # 31 janvier 2024, 13 h 40
 YEAR_MONTH_FORMAT = "F Y"
 MONTH_DAY_FORMAT = "j F"
 SHORT_DATE_FORMAT = "Y-m-d"
-SHORT_DATETIME_FORMAT = "Y-m-d H\xa0h\xa0i"
+SHORT_DATETIME_FORMAT = "Y-m-d H\xa0\\h\xa0i"
 FIRST_DAY_OF_WEEK = 0  # Dimanche
 
 # The *_INPUT_FORMATS strings use the Python strftime format syntax,

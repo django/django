@@ -1,6 +1,5 @@
 from functools import wraps
-
-from asgiref.sync import iscoroutinefunction
+from inspect import iscoroutinefunction
 
 from django.middleware.cache import CacheMiddleware
 from django.utils.cache import add_never_cache_headers, patch_cache_control

@@ -40,20 +40,28 @@ class RedirectURLMixin:
     def get_success_url(self):
         return self.get_redirect_url() or self.get_default_redirect_url()
 
-    def get_redirect_url(self):
-        """Return the user-originating redirect URL if it's safe."""
-        redirect_to = self.request.POST.get(
-            self.redirect_field_name, self.request.GET.get(self.redirect_field_name)
+    def get_redirect_url(self, request=None):
+        """Return the user-originating redirect URL if it's safe.
+
+        Optionally takes a request argument, allowing use outside class-based
+        views.
+        """
+        if request is None:
+            request = self.request
+        redirect_to = request.POST.get(
+            self.redirect_field_name, request.GET.get(self.redirect_field_name)
         )
         url_is_safe = url_has_allowed_host_and_scheme(
             url=redirect_to,
-            allowed_hosts=self.get_success_url_allowed_hosts(),
-            require_https=self.request.is_secure(),
+            allowed_hosts=self.get_success_url_allowed_hosts(request),
+            require_https=request.is_secure(),
         )
         return redirect_to if url_is_safe else ""
 
-    def get_success_url_allowed_hosts(self):
-        return {self.request.get_host(), *self.success_url_allowed_hosts}
+    def get_success_url_allowed_hosts(self, request=None):
+        if request is None:
+            request = self.request
+        return {request.get_host(), *self.success_url_allowed_hosts}
 
     def get_default_redirect_url(self):
         """Return the default redirect URL."""

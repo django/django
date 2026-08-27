@@ -2,15 +2,15 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2021,2023-2024
+# znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2021,2023-2026
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-08-07 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 07:05+0000\n"
 "Last-Translator: znotdead <zhirafchik@gmail.com>, "
-"2016-2017,2019-2021,2023-2024\n"
+"2016-2017,2019-2021,2023-2026\n"
 "Language-Team: Belarusian (http://app.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -33,8 +33,8 @@ msgstr "Выдалілі %(count)d %(items)s."
 msgid "Cannot delete %(name)s"
 msgstr "Не ўдаецца выдаліць %(name)s"
 
-msgid "Are you sure?"
-msgstr "Ці ўпэўненыя вы?"
+msgid "Delete multiple objects"
+msgstr "Выдаліць некалькі аб’ектаў"
 
 msgid "Administration"
 msgstr "Адміністрацыя"
@@ -182,8 +182,13 @@ msgstr ""
 "Утрымлівайце націснутай кнопку“Control”, або “Command” на Mac, каб вылучыць "
 "больш за адзін."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Абярыце гэты аб'ект для дзеяньня - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr "Праграма \"%s\" не знойдзена."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -242,9 +247,6 @@ msgstr "Зьмяніць %s"
 msgid "View %s"
 msgstr "Праглядзець %s"
 
-msgid "Database error"
-msgstr "База зьвестак дала хібу"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -252,6 +254,9 @@ msgstr[0] "Зьмянілі %(count)s %(name)s."
 msgstr[1] "Зьмянілі %(count)s %(name)s."
 msgstr[2] "Зьмянілі %(count)s %(name)s."
 msgstr[3] "Зьмянілі %(count)s %(name)s."
+
+msgid "Database error"
+msgstr "База зьвестак дала хібу"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -265,6 +270,9 @@ msgstr[3] "Абралі ўсе %(total_count)s"
 msgid "0 of %(cnt)s selected"
 msgstr "Абралі 0 аб’ектаў з %(cnt)s"
 
+msgid "Delete"
+msgstr "Выдаліць"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Гісторыя зьменаў: %s"
@@ -275,6 +283,19 @@ msgstr "Гісторыя зьменаў: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ","
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] "...и %(count)d больш аб'ект."
+msgstr[1] "...и %(count)d больш аб'екта."
+msgstr[2] "...и %(count)d больш аб'ектаў."
+msgstr[3] "...и %(count)d больш аб'ектаў."
 
 #, python-format
 msgid ""
@@ -326,14 +347,8 @@ msgstr ""
 "сайту па электроннай пошце і яна павінна быць выпраўлена ў бліжэйшы час. "
 "Дзякуй за ваша цярпенне."
 
-msgid "Run the selected action"
-msgstr "Выканаць абранае дзеяньне"
-
-msgid "Go"
+msgid "Run"
 msgstr "Выканаць"
-
-msgid "Click here to select the objects across all pages"
-msgstr "Каб абраць аб’екты на ўсіх бачынах, націсьніце сюды"
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -345,9 +360,14 @@ msgstr "Не абіраць нічога"
 msgid "Breadcrumbs"
 msgstr "Навігацыйны ланцужок"
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Мадэлі ў %(name)s праграме"
+msgid "Model name"
+msgstr "Назва мадэлі"
+
+msgid "Add link"
+msgstr "Дадаць спасылку"
+
+msgid "Change or view list link"
+msgstr "Змяніць ці праглядзець спіс спасылак"
 
 msgid "Add"
 msgstr "Дадаць"
@@ -358,15 +378,13 @@ msgstr "Праглядзець"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Вы ня маеце дазволу праглядаць ці нешта зьмяняць."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Спачатку пазначце імя карыстальніка ды пароль. Потым можна будзе наставіць "
-"іншыя можнасьці."
+"Пасля стварэння карыстальніка вы зможаце рэдагаваць дадатковыя параметры "
+"карыстальніка."
 
-msgid "Enter a username and password."
-msgstr "Пазначце імя карыстальніка ды пароль."
+msgid "Error:"
+msgstr "Памылка:"
 
 msgid "Change password"
 msgstr "Зьмяніць пароль"
@@ -435,6 +453,9 @@ msgstr "Паказаць падлік"
 msgid "Clear all filters"
 msgstr "Ачысьціць усе фільтры"
 
+msgid "Save"
+msgstr "Захаваць"
+
 msgid "Remove from sorting"
 msgstr "Прыбраць з упарадкаванага"
 
@@ -454,33 +475,34 @@ msgstr "Пераключыць тэму (бягучая тэма: светлая
 msgid "Toggle theme (current theme: dark)"
 msgstr "Пераключыць тэму (бягучая тэма: цёмная)"
 
-msgid "Delete"
-msgstr "Выдаліць"
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr "Фільтраваць па %(field_name)s"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Калі выдаліць %(object_name)s «%(escaped_object)s», выдаляцца зьвязаныя "
-"аб’екты, але ваш рахунак ня мае дазволу выдаляць наступныя віды аб’ектаў:"
+"Калі выдаліць %(object_name)s \"%(escaped_object)s\", выдаляцца зьвязаныя "
+"аб’екты, але ваш рахунак ня мае дазволу выдаляць наступныя віды аб’ектаў:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Каб выдаліць %(object_name)s «%(escaped_object)s», трэба выдаліць і "
+"Каб выдаліць %(object_name)s \"%(escaped_object)s\", трэба выдаліць і "
 "зьвязаныя абароненыя аб’екты:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Ці выдаліць %(object_name)s «%(escaped_object)s»? Усе наступныя зьвязаныя "
-"складнікі выдаляцца:"
+"Вы ўпэўнены что жадаеце выдаліць %(object_name)s \"%(escaped_object)s\"? Усе "
+"наступныя зьвязаныя складнікі выдаляцца:"
 
 msgid "Objects"
 msgstr "Аб'екты"
@@ -490,9 +512,6 @@ msgstr "Так, я ўпэўнены"
 
 msgid "No, take me back"
 msgstr "Не, вярнуцца назад"
-
-msgid "Delete multiple objects"
-msgstr "Выдаліць некалькі аб’ектаў"
 
 #, python-format
 msgid ""
@@ -566,8 +585,8 @@ msgstr ""
 "Вы апазнаны як %(username)s але не аўтарызаваны для доступу гэтай бачыны. Не "
 "жадаеце лі вы ўвайсці пад іншым карыстальнікам?"
 
-msgid "Forgotten your password or username?"
-msgstr "Забыліся на імя ці пароль?"
+msgid "Forgotten your login credentials?"
+msgstr "Забыліся на імя?"
 
 msgid "Toggle navigation"
 msgstr "Пераключыць навігацыю"
@@ -590,6 +609,10 @@ msgstr "Карыстальнік"
 msgid "Action"
 msgstr "Дзеяньне"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr "Пагінацыя %(name)s запісаў"
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "запіс"
@@ -604,14 +627,19 @@ msgstr ""
 "Аб’ект ня мае гісторыі зьменаў. Мажліва, яго дадавалі не праз кіраўнічую "
 "пляцоўку."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr "Пагінацыя %(name)s"
+
 msgid "Show all"
 msgstr "Паказаць усё"
 
-msgid "Save"
-msgstr "Захаваць"
-
 msgid "Popup closing…"
 msgstr "Усплывальнае акно зачыняецца..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr "Пошук %(name)s"
 
 msgid "Search"
 msgstr "Шукаць"
@@ -658,6 +686,9 @@ msgstr "Выдаліць абраныя %(model)s"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Праглядзець абраныя %(model)s"
+
+msgid "Logout"
+msgstr "Выйсці"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Дзякуем за час, які вы сёньня правялі на гэтай пляцоўцы."
@@ -734,8 +765,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Перайдзіце да наступнае бачыны ды абярыце новы пароль:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Імя карыстальніка, калі раптам вы забыліся:"
+msgid "In case you’ve forgotten, you are:"
+msgstr "Калі вы забыліся, то вы:"
 
 msgid "Thanks for using our site!"
 msgstr "Дзякуем, што карыстаецеся нашаю пляцоўкаю!"

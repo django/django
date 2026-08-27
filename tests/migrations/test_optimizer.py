@@ -3,8 +3,8 @@ from django.db.migrations import operations
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.models.functions import Abs
 
+from .base import OptimizerTestBase
 from .models import EmptyManager, UnicodeModel
-from .test_base import OptimizerTestBase
 
 
 class OptimizerTests(OptimizerTestBase):

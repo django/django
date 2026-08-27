@@ -15,6 +15,7 @@ from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
 from django.db import DEFAULT_DB_ALIAS, connections
+from django.utils.version import PY314, PY315
 
 ALL_CHECKS = "__all__"
 
@@ -57,6 +58,11 @@ class CommandParser(ArgumentParser):
     ):
         self.missing_args_message = missing_args_message
         self.called_from_command_line = called_from_command_line
+        if PY314:
+            if not PY315:
+                kwargs.setdefault("suggest_on_error", True)
+            if os.environ.get("DJANGO_COLORS") == "nocolor" or "--no-color" in sys.argv:
+                kwargs.setdefault("color", False)
         super().__init__(**kwargs)
 
     def parse_args(self, args=None, namespace=None):
@@ -239,6 +245,10 @@ class BaseCommand:
         A boolean; if ``True``, the command prints a warning if the set of
         migrations on disk don't match the migrations in the database.
 
+    ``requires_settings``
+        A boolean; if ``False``, an ``ImportError`` from a missing settings
+        module is suppressed.
+
     ``requires_system_checks``
         A list or tuple of tags, e.g. [Tags.staticfiles, Tags.models]. System
         checks registered in the chosen tags will be checked for errors prior
@@ -263,6 +273,7 @@ class BaseCommand:
     _called_from_command_line = False
     output_transaction = False  # Whether to wrap the output in a "BEGIN; COMMIT;"
     requires_migrations_checks = False
+    requires_settings = True
     requires_system_checks = "__all__"
     # Arguments, common to all commands, which aren't defined by the argument
     # parser.

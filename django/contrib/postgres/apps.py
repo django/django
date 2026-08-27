@@ -65,6 +65,11 @@ class PostgresConfig(AppConfig):
                         3910: "django.contrib.postgres.fields.DateTimeRangeField",
                         3912: "django.contrib.postgres.fields.DateRangeField",
                         3926: "django.contrib.postgres.fields.BigIntegerRangeField",
+                        # PostgreSQL OIDs may vary depending on the
+                        # installation, especially for datatypes from
+                        # extensions, e.g. "hstore". In such cases, the
+                        # type_display attribute (psycopg 3.2+) should be used.
+                        "hstore": "django.contrib.postgres.fields.HStoreField",
                     }
                 )
                 if conn.connection is not None:

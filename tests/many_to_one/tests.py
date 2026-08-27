@@ -1,8 +1,13 @@
 import datetime
 from copy import deepcopy
 
-from django.core.exceptions import FieldError, MultipleObjectsReturned
+from django.core.exceptions import (
+    FieldError,
+    FieldFetchBlocked,
+    MultipleObjectsReturned,
+)
 from django.db import IntegrityError, models, transaction
+from django.db.models import FETCH_PEERS, FETCH_RAISE
 from django.test import TestCase
 from django.utils.translation import gettext_lazy
 
@@ -273,33 +278,6 @@ class ManyToOneTests(TestCase):
             ),
             [new_article1, self.a],
         )
-        # The underlying query only makes one join when a related table is
-        # referenced twice.
-        queryset = Article.objects.filter(
-            reporter__first_name__exact="John", reporter__last_name__exact="Smith"
-        )
-        self.assertNumQueries(1, list, queryset)
-        self.assertEqual(
-            queryset.query.get_compiler(queryset.db).as_sql()[0].count("INNER JOIN"), 1
-        )
-
-        # The automatically joined table has a predictable name.
-        self.assertSequenceEqual(
-            Article.objects.filter(reporter__first_name__exact="John").extra(
-                where=["many_to_one_reporter.last_name='Smith'"]
-            ),
-            [new_article1, self.a],
-        )
-        # ... and should work fine with the string that comes out of
-        # forms.Form.cleaned_data.
-        self.assertQuerySetEqual(
-            (
-                Article.objects.filter(reporter__first_name__exact="John").extra(
-                    where=["many_to_one_reporter.last_name='%s'" % "Smith"]
-                )
-            ),
-            [new_article1, self.a],
-        )
         # Find all Articles for a Reporter.
         # Use direct ID check, pk check, and object comparison
         self.assertSequenceEqual(
@@ -335,6 +313,45 @@ class ManyToOneTests(TestCase):
                 .values("pk")
                 .query
             ).distinct(),
+            [new_article1, self.a],
+        )
+
+    def test_joined_sql(self):
+        # The underlying query only makes one join when a related table is
+        # referenced twice.
+        queryset = Article.objects.filter(
+            reporter__first_name__exact="John", reporter__last_name__exact="Smith"
+        )
+        self.assertNumQueries(1, list, queryset)
+        self.assertEqual(
+            queryset.query.get_compiler(queryset.db).as_sql()[0].count("INNER JOIN"), 1
+        )
+
+    def test_joined_extra(self):
+        new_article1 = self.r.article_set.create(
+            headline="John's second story",
+            pub_date=datetime.date(2005, 7, 29),
+        )
+        self.r2.article_set.create(
+            headline="Paul's story",
+            pub_date=datetime.date(2006, 1, 17),
+        )
+        # The automatically joined table has a predictable name.
+        self.assertSequenceEqual(
+            Article.objects.filter(reporter__first_name__exact="John").extra(
+                where=["many_to_one_reporter.last_name='Smith'"]
+            ),
+            [new_article1, self.a],
+        )
+        # ... and should work fine with the string that comes out of
+        # forms.Form.cleaned_data.
+        self.assertQuerySetEqual(
+            (
+                Article.objects.filter(reporter__first_name__exact="John").extra(
+                    where=["many_to_one_reporter.last_name=%s"],
+                    params=["Smith"],
+                )
+            ),
             [new_article1, self.a],
         )
 
@@ -450,15 +467,15 @@ class ManyToOneTests(TestCase):
             headline="Second", pub_date=datetime.date(1980, 4, 23), reporter=r2
         )
         self.assertEqual(
-            list(Article.objects.select_related().dates("pub_date", "day")),
+            list(Article.objects.select_related("reporter").dates("pub_date", "day")),
             [datetime.date(1980, 4, 23), datetime.date(2005, 7, 27)],
         )
         self.assertEqual(
-            list(Article.objects.select_related().dates("pub_date", "month")),
+            list(Article.objects.select_related("reporter").dates("pub_date", "month")),
             [datetime.date(1980, 4, 1), datetime.date(2005, 7, 1)],
         )
         self.assertEqual(
-            list(Article.objects.select_related().dates("pub_date", "year")),
+            list(Article.objects.select_related("reporter").dates("pub_date", "year")),
             [datetime.date(1980, 1, 1), datetime.date(2005, 1, 1)],
         )
 
@@ -811,7 +828,7 @@ class ManyToOneTests(TestCase):
         city = City.objects.prefetch_related("districts").get(id=c.id)
         self.assertSequenceEqual(city.districts.all(), [d1])
         d2 = city.districts.create(name="Goa")
-        self.assertSequenceEqual(city.districts.all(), [d1, d2])
+        self.assertCountEqual(city.districts.all(), [d1, d2])
 
     def test_clear_after_prefetch(self):
         c = City.objects.create(name="Musical City")
@@ -884,7 +901,7 @@ class ManyToOneTests(TestCase):
     def test_add_remove_set_by_pk_raises(self):
         usa = Country.objects.create(name="United States")
         chicago = City.objects.create(name="Chicago")
-        msg = "'City' instance expected, got %s" % chicago.pk
+        msg = "'City' instance expected, got %r" % chicago.pk
         with self.assertRaisesMessage(TypeError, msg):
             usa.cities.add(chicago.pk)
         with self.assertRaisesMessage(TypeError, msg):
@@ -916,3 +933,85 @@ class ManyToOneTests(TestCase):
                 instances=countries,
                 querysets=[City.objects.all(), City.objects.all()],
             )
+
+    def test_fetch_mode_fetch_peers_forward(self):
+        Article.objects.create(
+            headline="This is another test",
+            pub_date=datetime.date(2005, 7, 27),
+            reporter=self.r2,
+        )
+        a1, a2 = Article.objects.fetch_mode(FETCH_PEERS)
+        with self.assertNumQueries(1):
+            a1.reporter
+        with self.assertNumQueries(0):
+            a2.reporter
+
+    def test_fetch_mode_raise_forward(self):
+        a = Article.objects.fetch_mode(FETCH_RAISE).get(pk=self.a.pk)
+        msg = "Fetching of Article.reporter blocked."
+        with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
+            a.reporter
+        self.assertIsNone(cm.exception.__cause__)
+        self.assertTrue(cm.exception.__suppress_context__)
+
+    def test_fetch_mode_copied_forward_fetching_one(self):
+        a1 = Article.objects.fetch_mode(FETCH_PEERS).get()
+        self.assertEqual(a1._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            a1.reporter._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_forward_fetching_many(self):
+        Article.objects.create(
+            headline="This is another test",
+            pub_date=datetime.date(2005, 7, 27),
+            reporter=self.r2,
+        )
+        a1, a2 = Article.objects.fetch_mode(FETCH_PEERS)
+        self.assertEqual(a1._state.fetch_mode, FETCH_PEERS)
+        self.assertEqual(
+            a1.reporter._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_reverse_fetching_one(self):
+        r1 = Reporter.objects.fetch_mode(FETCH_PEERS).get(pk=self.r.pk)
+        self.assertEqual(r1._state.fetch_mode, FETCH_PEERS)
+        article = r1.article_set.get()
+        self.assertEqual(
+            article._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_copied_reverse_fetching_many(self):
+        Article.objects.create(
+            headline="This is another test",
+            pub_date=datetime.date(2005, 7, 27),
+            reporter=self.r2,
+        )
+        r1, r2 = Reporter.objects.fetch_mode(FETCH_PEERS)
+        self.assertEqual(r1._state.fetch_mode, FETCH_PEERS)
+        a1 = r1.article_set.get()
+        self.assertEqual(
+            a1._state.fetch_mode,
+            FETCH_PEERS,
+        )
+        a2 = r2.article_set.get()
+        self.assertEqual(
+            a2._state.fetch_mode,
+            FETCH_PEERS,
+        )
+
+    def test_fetch_mode_fetch_peers_reverse_with_deferred_fk(self):
+        Article.objects.create(
+            headline="Another article",
+            pub_date=datetime.date(2005, 7, 27),
+            reporter=self.r,
+        )
+        r = Reporter.objects.fetch_mode(FETCH_PEERS).get(pk=self.r.pk)
+        a1, a2 = r.article_set.defer("reporter")
+        with self.assertNumQueries(2):
+            self.assertEqual(a1.reporter, self.r)
+        with self.assertNumQueries(0):
+            self.assertEqual(a2.reporter, self.r)

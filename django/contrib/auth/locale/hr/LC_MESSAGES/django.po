@@ -4,6 +4,7 @@
 # Bojan Mihelač <bmihelac@mihelac.org>, 2012
 # Davor Lučić <r.dav.lc@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Milo Ivir <mail@milotype.de>, 2025-2026
 # Mislav Cimperšak <mislav.cimpersak@gmail.com>, 2013,2015
 # Nino <ninonandroid@gmail.com>, 2013
 # senko <senko.rasic@dobarkod.hr>, 2012
@@ -12,55 +13,71 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-09-24 14:24+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Croatian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2026-03-09 08:09+0000\n"
+"Last-Translator: Milo Ivir <mail@milotype.de>, 2025-2026\n"
+"Language-Team: Croatian (http://app.transifex.com/django/django/language/"
 "hr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: hr\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
 msgid "Personal info"
 msgstr "Osobni podaci"
 
 msgid "Permissions"
-msgstr "Privilegije"
+msgstr "Dozvole"
 
 msgid "Important dates"
 msgstr "Važni datumi"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Unos %(name)s sa primarnim ključem %(key)r ne postoji."
+msgstr "Objekt %(name)s s primarnim ključem %(key)r ne postoji."
+
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Poslani su konfliktni podaci obrasca. Pokušajte ponovo."
 
 msgid "Password changed successfully."
 msgstr "Lozinka uspješno promijenjena."
+
+msgid "Password-based authentication was disabled."
+msgstr "Autentifikacija na osnovi lozinke je deaktivirana."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Promijeni lozinku: %s"
 
+#, python-format
+msgid "Set password: %s"
+msgstr "Postavi lozinku: %s"
+
 msgid "Authentication and Authorization"
-msgstr ""
+msgstr "Autentifikacija i autorizacija"
 
 msgid "password"
 msgstr "lozinka"
 
 msgid "last login"
-msgstr "posljednja prijava"
+msgstr "zadnja prijava"
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Neispravan format lozinke ili nepoznat hashing algoritam."
 
 msgid "No password set."
 msgstr "Lozinka nije postavljena."
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Neispravan format lozinke ili nepoznati hashing algoritam."
+msgid "Reset password"
+msgstr "Resetiraj lozinku"
 
-msgid "The two password fields didn't match."
-msgstr "Dva polja za lozinku nisu jednaka."
+msgid "Set password"
+msgstr "Postavi lozinku"
+
+msgid "The two password fields didn’t match."
+msgstr "Polja lozinki se ne poklapaju."
 
 msgid "Password"
 msgstr "Lozinka"
@@ -69,12 +86,37 @@ msgid "Password confirmation"
 msgstr "Potvrda lozinke"
 
 msgid "Enter the same password as before, for verification."
-msgstr "Unesite istu lozinku, za potvrdu."
+msgstr "Unesite istu lozinku za potvrdu."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
+"Hoće li se korisnik moći autentificirati pomoću lozinke. Ako je "
+"deaktivirano, i dalje će se moći autentificirati pomoću drugih pozadinskih "
+"sustava, kao što su Single Sign-On ili LDAP."
+
+msgid "Password-based authentication"
+msgstr "Autentifikacija na osnovi lozinke"
+
+msgid "Enabled"
+msgstr "Aktivirano"
+
+msgid "Disabled"
+msgstr "Deaktivirano"
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+"Neobrađene lozinke se ne spremaju, tako da ne postoji način da se vidi "
+"korisnička lozinka."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"Aktiviraj autentifikaciju na osnovi lozinke za ovog korisnika putem "
+"postavljanja lozinke."
 
 #, python-format
 msgid ""
@@ -82,7 +124,7 @@ msgid ""
 "be case-sensitive."
 msgstr ""
 "Unesite ispravno %(username)s i lozinku. Imajte na umu da oba polja mogu "
-"biti velika i mala slova."
+"sadržati velika i mala slova."
 
 msgid "This account is inactive."
 msgstr "Ovaj korisnički račun nije aktivan."
@@ -97,13 +139,10 @@ msgid "New password confirmation"
 msgstr "Potvrda nove lozinke"
 
 msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "Vaša stara lozinka je pogrešno unesena. Molim unesite ponovo."
+msgstr "Vaša stara lozinka je pogrešno unesena. Unesite je ponovo."
 
 msgid "Old password"
 msgstr "Stara lozinka"
-
-msgid "Password (again)"
-msgstr "Lozinka (unesi ponovo)"
 
 msgid "algorithm"
 msgstr "algoritam"
@@ -118,19 +157,19 @@ msgid "hash"
 msgstr "hash"
 
 msgid "variety"
-msgstr ""
+msgstr "raznolikost"
 
 msgid "version"
-msgstr ""
+msgstr "verzija"
 
 msgid "memory cost"
-msgstr ""
+msgstr "troškovi memorije"
 
 msgid "time cost"
-msgstr ""
+msgstr "troškovi vremena"
 
 msgid "parallelism"
-msgstr ""
+msgstr "paralelnost"
 
 msgid "work factor"
 msgstr "količina rada"
@@ -138,20 +177,23 @@ msgstr "količina rada"
 msgid "checksum"
 msgstr "zbroj za provjeru"
 
+msgid "block size"
+msgstr "veličina bloka"
+
 msgid "name"
 msgstr "ime"
 
 msgid "content type"
-msgstr "tip sadržaja"
+msgstr "vrsta sadržaja"
 
 msgid "codename"
 msgstr "kodno ime"
 
 msgid "permission"
-msgstr "privilegija"
+msgstr "dozvola"
 
 msgid "permissions"
-msgstr "privilegije"
+msgstr "dozvole"
 
 msgid "group"
 msgstr "grupa"
@@ -160,36 +202,37 @@ msgid "groups"
 msgstr "grupe"
 
 msgid "superuser status"
-msgstr "superuser status"
+msgstr "status superkorisnika"
 
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
-"Određuje da ovaj korisnik ima sve privilegije te uklanja potrebu da se "
-"privilegije unose eksplicitno/ručno."
+"Određuje da ovaj korisnik ima sve dozvole bez izričitog dodjeljivanja "
+"dozvola."
 
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
-"Grupe kojima ovaj korisnik pripada. Korisnik će imati sve privilegije grupa "
-"kojima pripada."
+"Grupe kojima ovaj korisnik pripada. Korisnik će imati sve dozvole koje su mu "
+"dodijeljene za svaku od svojih grupa."
 
 msgid "user permissions"
-msgstr "privilegije korisnika"
+msgstr "dozvole korisnika"
 
 msgid "Specific permissions for this user."
-msgstr "Određene privilegije za korisnika."
+msgstr "Određene dozvole za ovog korisnika."
 
 msgid "username"
 msgstr "korisničko ime"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
+"Obavezno. 150 znakova ili manje. Samo slova, znamenke i znakovi@/./+/-/_."
 
 msgid "A user with that username already exists."
-msgstr "Korisnik sa navedenim imenom već postoji."
+msgstr "Korisnik s navedenim imenom već postoji."
 
 msgid "first name"
 msgstr "ime"
@@ -204,7 +247,8 @@ msgid "staff status"
 msgstr "status osoblja"
 
 msgid "Designates whether the user can log into this admin site."
-msgstr "Određuje može li se korisnik prijaviti na ove stranice administracije."
+msgstr ""
+"Određuje je li se korisnik može prijaviti na ove stranice administracije."
 
 msgid "active"
 msgstr "aktivan"
@@ -213,8 +257,8 @@ msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
-"Određuje treba li se ovaj korisnik tretirati kao aktivan korisnik. Koristite "
-"ovu opciju umjesto brisanja korisničkih računa."
+"Određuje je li se ovaj korisnik mora tretirati kao aktivan korisnik. "
+"Koristite ovu opciju umjesto brisanja korisničkih računa."
 
 msgid "date joined"
 msgstr "datum učlanjenja"
@@ -226,63 +270,60 @@ msgid "users"
 msgstr "korisnici"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] ""
-"Lozinka nije dovoljno dugačka. Mora sadržavati minimalno %(min_length)d znak."
-msgstr[1] ""
-"Lozinka nije dovoljno dugačka. Mora sadržavati minimalno %(min_length)d "
-"znaka."
-msgstr[2] ""
-"Lozinka nije dovoljno dugačka. Mora sadržavati minimalno %(min_length)d "
-"znakova."
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "Lozinka je prekratka. Mora sadržavati barem %d znak."
+msgstr[1] "Lozinka je prekratka. Mora sadržavati barem %d znaka."
+msgstr[2] "Lozinka je prekratka. Mora sadržavati barem %d znakova."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] "Lozinka mora sadržavati minimalno %(min_length)d znak."
-msgstr[1] "Lozinka mora sadržavati minimalno %(min_length)d znaka."
-msgstr[2] "Lozinka mora sadržavati minimalno %(min_length)d znakova."
+msgstr[0] "Lozinka mora sadržavati barem %(min_length)d znak."
+msgstr[1] "Lozinka mora sadržavati barem %(min_length)d znaka."
+msgstr[2] "Lozinka mora sadržavati barem %(min_length)d znakova."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "Lozinka je previše slična kao %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
-msgstr ""
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "Lozinka ne smije biti previše slična ostalim osobnim podacima."
 
 msgid "This password is too common."
-msgstr ""
+msgstr "Ova se lozinka prečesto koristi."
 
-msgid "Your password can't be a commonly used password."
-msgstr ""
+msgid "Your password can’t be a commonly used password."
+msgstr "Lozinka ne smije biti učestalo korištena lozinka."
 
 msgid "This password is entirely numeric."
-msgstr "Lozinka se u potpunosti sastoji od brojeva."
+msgstr "Ova lozinka sadržava samo znamenke."
 
-msgid "Your password can't be entirely numeric."
-msgstr "Lozinka se ne smije u potpunosti sastojati od brojeva."
+msgid "Your password can’t be entirely numeric."
+msgstr "Lozinka ne smije sadržavati samo znamenke."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Resetiranje lozinke na %(site_name)s"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
+"Unesite valjano korisničko ime. Ova vrijednost može sadržati samo "
+"nenaglašena mala slova a do z i velika slova A do Z, znamenke i znakove @/./"
+"+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
+"Unesite valjano korisničko ime. Ova vrijednost može sadržati samo slova, "
+"znamenke i znakove @/./+/-/_."
 
 msgid "Logged out"
-msgstr "Niste logirani"
+msgstr "Odjavljeni ste"
 
 msgid "Password reset"
 msgstr "Resetiranje lozinke"
@@ -294,7 +335,7 @@ msgid "Enter new password"
 msgstr "Unesite novu lozinku"
 
 msgid "Password reset unsuccessful"
-msgstr "Resetiranje lozinke neuspješno"
+msgstr "Resetiranje lozinke neuspjelo"
 
 msgid "Password reset complete"
 msgstr "Resetiranje lozinke završeno"
@@ -303,4 +344,4 @@ msgid "Password change"
 msgstr "Promjena lozinke"
 
 msgid "Password change successful"
-msgstr "Promjena lozinke uspješna"
+msgstr "Promjena lozinke uspjela"

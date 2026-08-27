@@ -210,11 +210,25 @@ class FilteredRelationTests(TestCase):
             ),
         ).filter(book_alice__isnull=False)
         self.assertIn(
-            "INNER JOIN {} book_alice ON".format(
-                connection.ops.quote_name("filtered_relation_book")
+            "INNER JOIN {} {} ON".format(
+                connection.ops.quote_name("filtered_relation_book"),
+                connection.ops.quote_name("book_alice"),
             ),
             str(queryset.query),
         )
+
+    def test_period_forbidden(self):
+        msg = (
+            "FilteredRelation doesn't support aliases with periods (got 'book.alice')."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Author.objects.annotate(
+                **{
+                    "book.alice": FilteredRelation(
+                        "book", condition=Q(book__title__iexact="poem by alice")
+                    )
+                }
+            )
 
     def test_multiple(self):
         qs = (
@@ -368,7 +382,7 @@ class FilteredRelationTests(TestCase):
                 "book", condition=Q(book__title__iexact="the book by jane a")
             ),
         ).filter(book_jane__isnull=False)
-        self.assertSequenceEqual(qs1.union(qs2), [self.author1, self.author2])
+        self.assertCountEqual(qs1.union(qs2), [self.author1, self.author2])
 
     @skipUnlessDBFeature("supports_select_intersection")
     def test_intersection(self):

@@ -100,6 +100,13 @@ class Options:
         "managers_map",
         "base_manager",
         "default_manager",
+        "db_returning_fields",
+        "_property_names",
+        "pk_fields",
+        "total_unique_constraints",
+        "all_parents",
+        "swapped",
+        "verbose_name_raw",
     }
     REVERSE_PROPERTIES = {"related_objects", "fields_map", "_relation_tree"}
 
@@ -219,7 +226,7 @@ class Options:
             if self.verbose_name_plural is None:
                 self.verbose_name_plural = format_lazy("{}s", self.verbose_name)
 
-            # order_with_respect_and ordering are mutually exclusive.
+            # order_with_respect_to and ordering are mutually exclusive.
             self._ordering_clash = bool(self.ordering and self.order_with_respect_to)
 
             # Any leftover attributes must be invalid.

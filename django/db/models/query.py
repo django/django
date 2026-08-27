@@ -6,8 +6,9 @@ import copy
 import operator
 import warnings
 from contextlib import nullcontext
-from functools import reduce
+from functools import partial, reduce
 from itertools import chain, islice
+from weakref import ref as weak_ref
 
 from asgiref.sync import sync_to_async
 
@@ -25,9 +26,19 @@ from django.db import (
 from django.db.models import AutoField, DateField, DateTimeField, Field, Max, sql
 from django.db.models.constants import LOOKUP_SEP, OnConflict
 from django.db.models.deletion import Collector
-from django.db.models.expressions import Case, DatabaseDefault, F, Value, When
+from django.db.models.expressions import (
+    Case,
+    Col,
+    ColPairs,
+    DatabaseDefault,
+    F,
+    OrderBy,
+    Value,
+    When,
+)
+from django.db.models.fetch_modes import FETCH_ONE
 from django.db.models.functions import Cast, Trunc
-from django.db.models.query_utils import FilteredRelation, Q
+from django.db.models.query_utils import PROHIBITED_FILTER_KWARGS, FilteredRelation, Q
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, ROW_COUNT
 from django.db.models.utils import (
     AltersData,
@@ -35,14 +46,50 @@ from django.db.models.utils import (
     resolve_callables,
 )
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import (
+    RemovedInDjango70Warning,
+    RemovedInDjango71Warning,
+    warn_about_external_use,
+)
 from django.utils.functional import cached_property
+from django.utils.inspect import func_accepts_kwargs, func_supports_parameter
+from django.utils.warnings import django_file_prefixes
 
 # The maximum number of results to fetch in a get() query.
 MAX_GET_RESULTS = 21
 
 # The maximum number of items to display in a QuerySet.__repr__
 REPR_OUTPUT_SIZE = 20
+
+DEFAULT_FETCH_MODE = FETCH_ONE
+
+
+# RemovedInDjango70Warning: When the deprecation ends, remove this function
+# and restore direct model_cls.from_db(..., fetch_mode=fetch_mode) calls at
+# its call sites.
+def _get_from_db(model_cls, fetch_mode):
+    """
+    Return a callable equivalent to model_cls.from_db with fetch_mode already
+    bound, accommodating deprecated from_db() overrides that don't accept the
+    fetch_mode keyword argument.
+    """
+    from django.db.models import Model
+
+    from_db = model_cls.from_db
+    if (
+        from_db.__func__ is Model.from_db.__func__
+        or func_supports_parameter(from_db, "fetch_mode")
+        or func_accepts_kwargs(from_db)
+    ):
+        return partial(from_db, fetch_mode=fetch_mode)
+    warnings.warn(
+        f"{model_cls.__qualname__}.from_db() must accept a fetch_mode keyword "
+        "argument. Support for from_db() methods that do not accept it is "
+        "deprecated.",
+        RemovedInDjango70Warning,
+        skip_file_prefixes=django_file_prefixes(),
+    )
+    return from_db
 
 
 class BaseIterable:
@@ -88,6 +135,7 @@ class ModelIterable(BaseIterable):
         queryset = self.queryset
         db = queryset.db
         compiler = queryset.query.get_compiler(using=db)
+        fetch_mode = queryset._fetch_mode
         # Execute the query. This will also fill compiler.select, klass_info,
         # and annotations.
         results = compiler.execute_sql(
@@ -104,28 +152,37 @@ class ModelIterable(BaseIterable):
         init_list = [
             f[0].target.attname for f in select[model_fields_start:model_fields_end]
         ]
-        related_populators = get_related_populators(klass_info, select, db)
+        # RemovedInDjango70Warning: When the deprecation ends, remove this
+        # assignment and call model_cls.from_db(..., fetch_mode=fetch_mode)
+        # directly in the loop below.
+        from_db = _get_from_db(model_cls, fetch_mode)
+        related_populators = get_related_populators(klass_info, select, db, fetch_mode)
         known_related_objects = [
             (
                 field,
                 related_objs,
-                operator.attrgetter(
-                    *[
-                        (
-                            field.attname
-                            if from_field == "self"
-                            else queryset.model._meta.get_field(from_field).attname
-                        )
-                        for from_field in field.from_fields
-                    ]
-                ),
+                attnames := [
+                    (
+                        field.attname
+                        if from_field == "self"
+                        else queryset.model._meta.get_field(from_field).attname
+                    )
+                    for from_field in field.from_fields
+                ],
+                operator.attrgetter(*attnames),
             )
             for field, related_objs in queryset._known_related_objects.items()
         ]
+        peers = []
         for row in compiler.results_iter(results):
-            obj = model_cls.from_db(
-                db, init_list, row[model_fields_start:model_fields_end]
+            obj = from_db(
+                db,
+                init_list,
+                row[model_fields_start:model_fields_end],
             )
+            if fetch_mode.track_peers:
+                peers.append(weak_ref(obj))
+                obj._state.peers = peers
             for rel_populator in related_populators:
                 rel_populator.populate(row, obj)
             if annotation_col_map:
@@ -133,9 +190,13 @@ class ModelIterable(BaseIterable):
                     setattr(obj, attr_name, row[col_pos])
 
             # Add the known related objects to the model.
-            for field, rel_objs, rel_getter in known_related_objects:
+            for field, rel_objs, rel_attnames, rel_getter in known_related_objects:
                 # Avoid overwriting objects loaded by, e.g., select_related().
                 if field.is_cached(obj):
+                    continue
+                # Avoid fetching potentially deferred attributes that would
+                # result in unexpected queries.
+                if any(attname not in obj.__dict__ for attname in rel_attnames):
                     continue
                 rel_obj_id = rel_getter(obj)
                 try:
@@ -183,10 +244,20 @@ class RawModelIterable(BaseIterable):
                 query_iterator = compiler.composite_fields_to_tuples(
                     query_iterator, cols
                 )
+            fetch_mode = self.queryset._fetch_mode
+            # RemovedInDjango70Warning: When the deprecation ends, remove
+            # this assignment and call
+            # model_cls.from_db(..., fetch_mode=fetch_mode) directly in the
+            # loop below.
+            from_db = _get_from_db(model_cls, fetch_mode)
+            peers = []
             for values in query_iterator:
                 # Associate fields to values
                 model_init_values = [values[pos] for pos in model_init_pos]
-                instance = model_cls.from_db(db, model_init_names, model_init_values)
+                instance = from_db(db, model_init_names, model_init_values)
+                if fetch_mode.track_peers:
+                    peers.append(weak_ref(instance))
+                    instance._state.peers = peers
                 if annotation_fields:
                     for column, pos in annotation_fields:
                         setattr(instance, column, values[pos])
@@ -278,6 +349,28 @@ class FlatValuesListIterable(BaseIterable):
             yield row[0]
 
 
+class PreventQuerySetCloning:
+    """
+    Temporarily prevent the given QuerySet from creating new QuerySet instances
+    on each mutating operation (e.g: filter(), exclude() etc), instead
+    modifying the QuerySet in-place.
+
+    @contextlib.contextmanager is intentionally not used for performance
+    reasons.
+    """
+
+    __slots__ = ("queryset",)
+
+    def __init__(self, queryset):
+        self.queryset = queryset
+
+    def __enter__(self):
+        return self.queryset._disable_cloning()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.queryset._enable_cloning()
+
+
 class QuerySet(AltersData):
     """Represent a lazy database lookup for a set of objects."""
 
@@ -293,9 +386,11 @@ class QuerySet(AltersData):
         self._prefetch_done = False
         self._known_related_objects = {}  # {rel_field: {pk: rel_obj}}
         self._iterable_class = ModelIterable
+        self._fetch_mode = DEFAULT_FETCH_MODE
         self._fields = None
         self._defer_next_filter = False
         self._deferred_filter = None
+        self._cloning_enabled = True
 
     @property
     def query(self):
@@ -530,18 +625,36 @@ class QuerySet(AltersData):
         )
         return self._iterator(use_chunked_fetch, chunk_size)
 
-    async def aiterator(self, chunk_size=2000):
+    async def aiterator(self, chunk_size=None):
         """
         An asynchronous iterator over the results from applying this QuerySet
         to the database.
         """
-        if chunk_size <= 0:
+        if chunk_size is None:
+            if self._prefetch_related_lookups:
+                # RemovedInDjango71Warning: Replace the warning with:
+                # raise ValueError(
+                #     "chunk_size must be provided when using "
+                #     "QuerySet.aiterator() after prefetch_related()."
+                # )
+                warnings.warn(
+                    "Using QuerySet.aiterator() after prefetch_related() without "
+                    "providing a chunk_size is deprecated and will raise a "
+                    "ValueError in Django 7.1.",
+                    category=RemovedInDjango71Warning,
+                    skip_file_prefixes=django_file_prefixes(),
+                )
+                # RemovedInDjango71Warning: When the deprecation ends, remove.
+                chunk_size = 2000
+        elif chunk_size <= 0:
             raise ValueError("Chunk size must be strictly positive.")
         use_chunked_fetch = not connections[self.db].settings_dict.get(
             "DISABLE_SERVER_SIDE_CURSORS"
         )
         iterable = self._iterable_class(
-            self, chunked_fetch=use_chunked_fetch, chunk_size=chunk_size
+            self,
+            chunked_fetch=use_chunked_fetch,
+            chunk_size=chunk_size or 2000,
         )
         if self._prefetch_related_lookups:
             results = []
@@ -665,6 +778,7 @@ class QuerySet(AltersData):
         obj = self.model(**kwargs)
         self._for_write = True
         obj.save(force_insert=True, using=self.db)
+        obj._state.fetch_mode = self._fetch_mode
         return obj
 
     create.alters_data = True
@@ -677,6 +791,7 @@ class QuerySet(AltersData):
     def _prepare_for_bulk_create(self, objs):
         objs_with_pk, objs_without_pk = [], []
         for obj in objs:
+            obj._prepare_related_fields_for_save(operation_name="bulk_create")
             if isinstance(obj.pk, DatabaseDefault):
                 objs_without_pk.append(obj)
             elif obj._is_pk_set():
@@ -687,7 +802,6 @@ class QuerySet(AltersData):
                     objs_with_pk.append(obj)
                 else:
                     objs_without_pk.append(obj)
-            obj._prepare_related_fields_for_save(operation_name="bulk_create")
         return objs_with_pk, objs_without_pk
 
     def _check_bulk_create_options(
@@ -725,7 +839,7 @@ class QuerySet(AltersData):
                     "Unique fields that can trigger the upsert must be provided."
                 )
             # Updating primary keys and non-concrete fields is forbidden.
-            if any(not f.concrete or f.many_to_many for f in update_fields):
+            if any(not f.concrete for f in update_fields):
                 raise ValueError(
                     "bulk_create() can only be used with concrete fields in "
                     "update_fields."
@@ -736,7 +850,7 @@ class QuerySet(AltersData):
                     "update_fields."
                 )
             if unique_fields:
-                if any(not f.concrete or f.many_to_many for f in unique_fields):
+                if any(not f.concrete for f in unique_fields):
                     raise ValueError(
                         "bulk_create() can only be used with concrete fields "
                         "in unique_fields."
@@ -821,8 +935,7 @@ class QuerySet(AltersData):
                 )
                 for obj_with_pk, results in zip(objs_with_pk, returned_columns):
                     for result, field in zip(results, opts.db_returning_fields):
-                        if field != opts.pk:
-                            setattr(obj_with_pk, field.attname, result)
+                        setattr(obj_with_pk, field.attname, result)
                 for obj_with_pk in objs_with_pk:
                     obj_with_pk._state.adding = False
                     obj_with_pk._state.db = self.db
@@ -916,7 +1029,7 @@ class QuerySet(AltersData):
             raise ValueError("All bulk_update() objects must have a primary key set.")
         opts = self.model._meta
         fields = [opts.get_field(name) for name in fields]
-        if any(not f.concrete or f.many_to_many for f in fields):
+        if any(not f.concrete for f in fields):
             raise ValueError("bulk_update() can only be used with concrete fields.")
         all_pk_fields = set(opts.pk_fields)
         for parent in opts.all_parents:
@@ -1135,7 +1248,7 @@ class QuerySet(AltersData):
 
     def first(self):
         """Return the first object of a query or None if no match is found."""
-        if self.ordered:
+        if self.ordered or not self.query.default_ordering:
             queryset = self
         else:
             self._check_ordering_first_last_queryset_aggregation(method="first")
@@ -1148,7 +1261,7 @@ class QuerySet(AltersData):
 
     def last(self):
         """Return the last object of a query or None if no match is found."""
-        if self.ordered:
+        if self.ordered or not self.query.default_ordering:
             queryset = self.reverse()
         else:
             self._check_ordering_first_last_queryset_aggregation(method="last")
@@ -1166,8 +1279,8 @@ class QuerySet(AltersData):
         """
         if self.query.is_sliced:
             raise TypeError("Cannot use 'limit' or 'offset' with in_bulk().")
-        if not issubclass(self._iterable_class, ModelIterable):
-            raise TypeError("in_bulk() cannot be used with values() or values_list().")
+        if id_list is not None and not id_list:
+            return {}
         opts = self.model._meta
         unique_fields = [
             constraint.fields[0]
@@ -1184,24 +1297,76 @@ class QuerySet(AltersData):
                 "in_bulk()'s field_name must be a unique field but %r isn't."
                 % field_name
             )
+
+        qs = self
+
+        def get_obj(obj):
+            return obj
+
+        if issubclass(self._iterable_class, ModelIterable):
+            # Raise an AttributeError if field_name is deferred.
+            get_key = operator.attrgetter(field_name)
+
+        elif issubclass(self._iterable_class, ValuesIterable):
+            if field_name not in self.query.values_select:
+                qs = qs.values(field_name, *self.query.values_select)
+
+                def get_obj(obj):  # noqa: F811
+                    # We can safely mutate the dictionaries returned by
+                    # ValuesIterable here, since they are limited to the scope
+                    # of this function, and get_key runs before get_obj.
+                    del obj[field_name]
+                    return obj
+
+            get_key = operator.itemgetter(field_name)
+
+        elif issubclass(self._iterable_class, ValuesListIterable):
+            try:
+                field_index = self.query.values_select.index(field_name)
+            except ValueError:
+                # field_name is missing from values_select, so add it.
+                field_index = 0
+                if issubclass(self._iterable_class, NamedValuesListIterable):
+                    kwargs = {"named": True}
+                else:
+                    kwargs = {}
+                    get_obj = operator.itemgetter(slice(1, None))
+                qs = qs.values_list(field_name, *self.query.values_select, **kwargs)
+
+            get_key = operator.itemgetter(field_index)
+
+        elif issubclass(self._iterable_class, FlatValuesListIterable):
+            if self.query.values_select == (field_name,):
+                # Mapping field_name to itself.
+                get_key = get_obj
+            else:
+                # Transform it back into a non-flat values_list().
+                qs = qs.values_list(field_name, *self.query.values_select)
+                get_key = operator.itemgetter(0)
+                get_obj = operator.itemgetter(1)
+
+        else:
+            raise TypeError(
+                f"in_bulk() cannot be used with {self._iterable_class.__name__}."
+            )
+
         if id_list is not None:
-            if not id_list:
-                return {}
             filter_key = "{}__in".format(field_name)
             id_list = tuple(id_list)
             batch_size = connections[self.db].ops.bulk_batch_size([opts.pk], id_list)
             # If the database has a limit on the number of query parameters
             # (e.g. SQLite), retrieve objects in batches if necessary.
             if batch_size and batch_size < len(id_list):
-                qs = ()
+                results = ()
                 for offset in range(0, len(id_list), batch_size):
                     batch = id_list[offset : offset + batch_size]
-                    qs += tuple(self.filter(**{filter_key: batch}))
+                    results += tuple(qs.filter(**{filter_key: batch}))
+                qs = results
             else:
-                qs = self.filter(**{filter_key: id_list})
+                qs = qs.filter(**{filter_key: id_list})
         else:
-            qs = self._chain()
-        return {getattr(obj, field_name): obj for obj in qs}
+            qs = qs._chain()
+        return {get_key(obj): get_obj(obj) for obj in qs}
 
     async def ain_bulk(self, id_list=None, *, field_name="pk"):
         return await sync_to_async(self.in_bulk)(
@@ -1267,6 +1432,8 @@ class QuerySet(AltersData):
         self._not_support_combined_queries("update")
         if self.query.is_sliced:
             raise TypeError("Cannot update a query once a slice has been taken.")
+        if self.query.distinct_fields:
+            raise TypeError("Cannot call update() after .distinct(*fields).")
         self._for_write = True
         query = self.query.chain(sql.UpdateQuery)
         query.add_update_values(kwargs)
@@ -1306,7 +1473,7 @@ class QuerySet(AltersData):
 
     aupdate.alters_data = True
 
-    def _update(self, values):
+    def _update(self, values, returning_fields=None):
         """
         A version of update() that accepts field objects instead of field
         names. Used primarily for model saving and not intended for use by
@@ -1320,7 +1487,9 @@ class QuerySet(AltersData):
         # Clear any annotations so that they won't be present in subqueries.
         query.annotations = {}
         self._result_cache = None
-        return query.get_compiler(self.db).execute_sql(ROW_COUNT)
+        if returning_fields is None:
+            return query.get_compiler(self.db).execute_sql(ROW_COUNT)
+        return query.get_compiler(self.db).execute_returning_sql(returning_fields)
 
     _update.alters_data = True
     _update.queryset_only = False
@@ -1388,6 +1557,7 @@ class QuerySet(AltersData):
             params=params,
             translations=translations,
             using=using,
+            fetch_mode=self._fetch_mode,
         )
         qs._prefetch_related_lookups = self._prefetch_related_lookups[:]
         return qs
@@ -1414,11 +1584,26 @@ class QuerySet(AltersData):
     def values_list(self, *fields, flat=False, named=False):
         if flat and named:
             raise TypeError("'flat' and 'named' can't be used together.")
-        if flat and len(fields) > 1:
-            raise TypeError(
-                "'flat' is not valid when values_list is called with more than one "
-                "field."
-            )
+        if flat:
+            if len(fields) > 1:
+                raise TypeError(
+                    "'flat' is not valid when values_list is called with more than one "
+                    "field."
+                )
+            elif not fields:
+                # RemovedInDjango70Warning: When the deprecation ends, replace
+                # with:
+                # raise TypeError(
+                #     "'flat' is not valid when values_list is called with no "
+                #     "fields."
+                # )
+                warnings.warn(
+                    "Calling values_list() with no field name and flat=True "
+                    "is deprecated. Pass an explicit field name instead, like "
+                    "'pk'.",
+                    RemovedInDjango70Warning,
+                )
+                fields = [self.model._meta.concrete_fields[0].attname]
 
         field_names = {f: False for f in fields if not hasattr(f, "resolve_expression")}
         _fields = []
@@ -1554,6 +1739,9 @@ class QuerySet(AltersData):
         return clone
 
     def _filter_or_exclude_inplace(self, negate, args, kwargs):
+        if invalid_kwargs := PROHIBITED_FILTER_KWARGS.intersection(kwargs):
+            invalid_kwargs_str = ", ".join(f"'{k}'" for k in sorted(invalid_kwargs))
+            raise TypeError(f"The following kwargs are invalid: {invalid_kwargs_str}")
         if negate:
             self._query.add_q(~Q(*args, **kwargs))
         else:
@@ -1581,8 +1769,9 @@ class QuerySet(AltersData):
         clone = self._chain()
         # Clear limits and ordering so they can be reapplied
         clone.query.clear_ordering(force=True)
+        clone.query.default_ordering = True
+        self._clear_ordering_in_combined_queries(clone.query, other_qs)
         clone.query.clear_limits()
-        clone.query.combined_queries = (self.query, *(qs.query for qs in other_qs))
         clone.query.combinator = combinator
         clone.query.combinator_all = all
         return clone
@@ -1652,6 +1841,14 @@ class QuerySet(AltersData):
         elif fields:
             obj.query.add_select_related(fields)
         else:
+            # RemovedInDjango70Warning: when the deprecation ends, raise a
+            # TypeError instead.
+            warn_about_external_use(
+                "Calling select_related() with no arguments is deprecated. "
+                "Specify the fields to fetch instead.",
+                category=RemovedInDjango70Warning,
+                skip_name_prefixes=("django.db.models",),
+            )
             obj.query.select_related = True
         return obj
 
@@ -1844,6 +2041,12 @@ class QuerySet(AltersData):
         clone._db = alias
         return clone
 
+    def fetch_mode(self, fetch_mode):
+        """Set the fetch mode for the QuerySet."""
+        clone = self._chain()
+        clone._fetch_mode = fetch_mode
+        return clone
+
     ###################################
     # PUBLIC INTROSPECTION ATTRIBUTES #
     ###################################
@@ -1868,6 +2071,93 @@ class QuerySet(AltersData):
             return True
         else:
             return False
+
+    @property
+    def totally_ordered(self):
+        """
+        Returns True if the QuerySet is ordered and the ordering is
+        deterministic. This requires that the ordering includes a field
+        (or set of fields) that is unique and non-nullable.
+
+        For queries involving a GROUP BY clause, the model's default
+        ordering is ignored. Ordering specified via .extra(order_by=...)
+        is also ignored.
+        """
+        if not self.ordered:
+            return False
+        ordering = self.query.order_by
+        if not ordering and self.query.default_ordering:
+            ordering = self.query.get_meta().ordering
+        if not ordering:
+            return False
+        opts = self.model._meta
+        pk_fields = {f.attname for f in opts.pk_fields}
+        candidate_fields = set()
+        for part in ordering:
+            # Search for single field providing a total ordering.
+            field_name = None
+            if isinstance(part, str):
+                field_name = part.lstrip("-")
+            elif isinstance(part, F):
+                field_name = part.name
+            elif isinstance(part, OrderBy) and isinstance(part.expression, F):
+                field_name = part.expression.name
+            if annotation_col := self.query.annotations.get(field_name):
+                if isinstance(annotation_col, Col):
+                    if annotation_col.alias == self.query.base_table:
+                        candidate_fields.add(annotation_col.target)
+                elif isinstance(annotation_col, ColPairs):
+                    candidate_fields |= {
+                        c.target
+                        for c in annotation_col.get_cols()
+                        if c.alias == self.query.base_table
+                    }
+            elif field_name:
+                if field_name == "pk":
+                    return True
+                # Normalize attname references by using get_field().
+                try:
+                    field = opts.get_field(field_name)
+                except exceptions.FieldDoesNotExist:
+                    # Could be "?" for random ordering or a related field
+                    # lookup. Skip this part of introspection for now.
+                    continue
+                else:
+                    # Ordering by a related field name orders by the referenced
+                    # model's ordering. Skip this introspection for now.
+                    if field.remote_field and field_name == field.name:
+                        continue
+                    candidate_fields.add(field)
+
+        candidate_attnames = set()
+        for field in candidate_fields:
+            if field.unique and not field.null:
+                return True
+            candidate_attnames.add(field.attname)
+
+        # Account for members of a CompositePrimaryKey.
+        if candidate_attnames.issuperset(pk_fields):
+            return True
+        # No single total ordering field, try unique_together and total
+        # unique constraints.
+        constraint_field_names = (
+            *opts.unique_together,
+            *(constraint.fields for constraint in opts.total_unique_constraints),
+        )
+        for field_names in constraint_field_names:
+            # Normalize attname references by using get_field().
+            try:
+                fields = [opts.get_field(field_name) for field_name in field_names]
+            except exceptions.FieldDoesNotExist:
+                continue
+            # Composite unique constraints containing a nullable column
+            # cannot ensure total ordering.
+            if any(field.null for field in fields):
+                continue
+            if candidate_attnames.issuperset(field.attname for field in fields):
+                return True
+
+        return False
 
     @property
     def db(self):
@@ -1955,12 +2245,50 @@ class QuerySet(AltersData):
                 )
         return inserted_rows
 
+    def _disable_cloning(self):
+        """
+        Prevent calls to _chain() from creating a new QuerySet via _clone().
+        All subsequent QuerySet mutations will occur on this instance until
+        _enable_cloning() is used.
+        """
+        self._cloning_enabled = False
+        return self
+
+    def _enable_cloning(self):
+        """
+        Allow calls to _chain() to create a new QuerySet via _clone(). Restores
+        the default behavior where any QuerySet mutation will return a new
+        QuerySet instance. Necessary only when there has been a
+        _disable_cloning() call previously.
+        """
+        self._cloning_enabled = True
+        return self
+
+    def _avoid_cloning(self):
+        """
+        Temporarily prevent QuerySet _clone() operations, restoring the default
+        behavior on exit. For the duration of the context managed statement,
+        all operations (e.g. filter(), exclude(), etc.) will mutate the same
+        QuerySet instance.
+
+        @contextlib.contextmanager is intentionally not used for performance
+        reasons.
+        """
+        return PreventQuerySetCloning(self)
+
     def _chain(self):
         """
         Return a copy of the current QuerySet that's ready for another
         operation.
+
+        If the QuerySet has opted in to in-place mutations via
+        _disable_cloning() temporarily, the copy doesn't occur and instead the
+        same QuerySet instance will be modified.
         """
-        obj = self._clone()
+        if not self._cloning_enabled:
+            obj = self
+        else:
+            obj = self._clone()
         if obj._sticky_filter:
             obj.query.filter_is_sticky = True
             obj._sticky_filter = False
@@ -1982,6 +2310,7 @@ class QuerySet(AltersData):
         c._prefetch_related_lookups = self._prefetch_related_lookups[:]
         c._known_related_objects = self._known_related_objects
         c._iterable_class = self._iterable_class
+        c._fetch_mode = self._fetch_mode
         c._fields = self._fields
         return c
 
@@ -2072,13 +2401,27 @@ class QuerySet(AltersData):
             raise TypeError(f"Cannot use {operator_} operator with combined queryset.")
 
     def _check_ordering_first_last_queryset_aggregation(self, method):
-        if isinstance(self.query.group_by, tuple) and not any(
-            col.output_field is self.model._meta.pk for col in self.query.group_by
+        if (
+            isinstance(self.query.group_by, tuple)
+            # Raise if the pk fields are not in the group_by.
+            and self.model._meta.pk
+            not in {col.output_field for col in self.query.group_by}
+            and set(self.model._meta.pk_fields).difference(
+                {col.target for col in self.query.group_by}
+            )
         ):
             raise TypeError(
                 f"Cannot use QuerySet.{method}() on an unordered queryset performing "
                 f"aggregation. Add an ordering with order_by()."
             )
+
+    def _clear_ordering_in_combined_queries(self, cloned_query, other_qs):
+        combined_queries = [self.query]
+        for qs in other_qs:
+            query = qs.query.clone()
+            query.clear_ordering(force=False, clear_default=False)
+            combined_queries.append(query)
+        cloned_query.combined_queries = tuple(combined_queries)
 
 
 class InstanceCheckMeta(type):
@@ -2111,6 +2454,7 @@ class RawQuerySet:
         translations=None,
         using=None,
         hints=None,
+        fetch_mode=DEFAULT_FETCH_MODE,
     ):
         self.raw_query = raw_query
         self.model = model
@@ -2122,6 +2466,7 @@ class RawQuerySet:
         self._result_cache = None
         self._prefetch_related_lookups = ()
         self._prefetch_done = False
+        self._fetch_mode = fetch_mode
 
     def resolve_model_init_order(self):
         """Resolve the init field names and value positions."""
@@ -2220,6 +2565,7 @@ class RawQuerySet:
             params=self.params,
             translations=self.translations,
             using=alias,
+            fetch_mode=self._fetch_mode,
         )
 
     @cached_property
@@ -2331,8 +2677,8 @@ def normalize_prefetch_lookups(lookups, prefix=None):
 
 def prefetch_related_objects(model_instances, *related_lookups):
     """
-    Populate prefetched object caches for a list of model instances based on
-    the lookups/Prefetch instances given.
+    Populate prefetched object caches for an iterable of model instances based
+    on the lookups/Prefetch instances given.
     """
     if not model_instances:
         return  # nothing to do
@@ -2400,7 +2746,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
             # We assume that objects retrieved are homogeneous (which is the
             # premise of prefetch_related), so what applies to first object
             # applies to all.
-            first_obj = obj_list[0]
+            first_obj = next(iter(obj_list))
             to_attr = lookup.get_current_to_attr(level)[0]
             prefetcher, descriptor, attr_found, is_fetched = get_prefetcher(
                 first_obj, through_attr, to_attr
@@ -2656,7 +3002,7 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
             else:
                 manager = getattr(obj, to_attr)
                 if leaf and lookup.queryset is not None:
-                    qs = manager._apply_rel_filters(lookup.queryset)
+                    qs = manager._apply_rel_filters(lookup.queryset._chain())
                 else:
                     qs = manager.get_queryset()
                 qs._result_cache = vals
@@ -2683,8 +3029,9 @@ class RelatedPopulator:
     model instance.
     """
 
-    def __init__(self, klass_info, select, db):
+    def __init__(self, klass_info, select, db, fetch_mode):
         self.db = db
+        self.fetch_mode = fetch_mode
         # Pre-compute needed attributes. The attributes are:
         #  - model_cls: the possibly deferred model class to instantiate
         #  - either:
@@ -2732,12 +3079,19 @@ class RelatedPopulator:
             )
 
         self.model_cls = klass_info["model"]
+        # RemovedInDjango70Warning: When the deprecation ends, remove this
+        # assignment and call
+        # self.model_cls.from_db(..., fetch_mode=fetch_mode) directly in
+        # populate().
+        self.from_db = _get_from_db(self.model_cls, fetch_mode)
         # A primary key must have all of its constituents not-NULL as
         # NULL != NULL and thus NULL cannot be referenced through a foreign
         # relationship. Therefore checking for a single member of the primary
         # key is enough to determine if the referenced object exists or not.
         self.pk_idx = self.init_list.index(self.model_cls._meta.pk_fields[0].attname)
-        self.related_populators = get_related_populators(klass_info, select, self.db)
+        self.related_populators = get_related_populators(
+            klass_info, select, self.db, fetch_mode
+        )
         self.local_setter = klass_info["local_setter"]
         self.remote_setter = klass_info["remote_setter"]
 
@@ -2749,7 +3103,11 @@ class RelatedPopulator:
         if obj_data[self.pk_idx] is None:
             obj = None
         else:
-            obj = self.model_cls.from_db(self.db, self.init_list, obj_data)
+            obj = self.from_db(
+                self.db,
+                self.init_list,
+                obj_data,
+            )
             for rel_iter in self.related_populators:
                 rel_iter.populate(row, obj)
         self.local_setter(from_obj, obj)
@@ -2757,10 +3115,10 @@ class RelatedPopulator:
             self.remote_setter(obj, from_obj)
 
 
-def get_related_populators(klass_info, select, db):
+def get_related_populators(klass_info, select, db, fetch_mode):
     iterators = []
     related_klass_infos = klass_info.get("related_klass_infos", [])
     for rel_klass_info in related_klass_infos:
-        rel_cls = RelatedPopulator(rel_klass_info, select, db)
+        rel_cls = RelatedPopulator(rel_klass_info, select, db, fetch_mode)
         iterators.append(rel_cls)
     return iterators

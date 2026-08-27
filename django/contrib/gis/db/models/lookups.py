@@ -19,7 +19,7 @@ class GISLookup(Lookup):
     band_lhs = None
 
     def __init__(self, lhs, rhs):
-        rhs, *self.rhs_params = rhs if isinstance(rhs, (list, tuple)) else [rhs]
+        rhs, *self.rhs_params = rhs if isinstance(rhs, (list, tuple)) else (rhs,)
         super().__init__(lhs, rhs)
         self.template_params = {}
         self.process_rhs_params()
@@ -62,12 +62,12 @@ class GISLookup(Lookup):
             # If rhs is some Query, don't touch it.
             return super().process_rhs(compiler, connection)
         if isinstance(self.rhs, Expression):
-            self.rhs = self.rhs.resolve_expression(compiler.query)
-        rhs, rhs_params = super().process_rhs(compiler, connection)
-        placeholder = connection.ops.get_geom_placeholder(
-            self.lhs.output_field, self.rhs, compiler
+            rhs = self.rhs.resolve_expression(compiler.query)
+        else:
+            rhs = connection.ops.Adapter(self.rhs)
+        return connection.ops.get_geom_placeholder_sql(
+            self.lhs.output_field, rhs, compiler
         )
-        return placeholder % rhs, rhs_params
 
     def get_rhs_op(self, connection, rhs):
         # Unlike BuiltinLookup, the GIS get_rhs_op() implementation should

@@ -5,14 +5,14 @@
 # Dimitris Glezos <glezos@transifex.com>, 2012
 # Emin Mastizada <emin@linux.com>, 2018,2020
 # Emin Mastizada <emin@linux.com>, 2015
-# Nijat Mammadov, 2024
+# Nijat Mammadov, 2024,2026
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2024-08-07 19:03+0000\n"
-"Last-Translator: Nijat Mammadov, 2024\n"
+"PO-Revision-Date: 2026-03-09 19:03+0000\n"
+"Last-Translator: Nijat Mammadov, 2024,2026\n"
 "Language-Team: Azerbaijani (http://app.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -48,10 +48,10 @@ msgstr ""
 "Məsələn, “/about/contact”. Əvvəldəki çəpəki xəttin olmasına diqqət edin."
 
 msgid "URL is missing a leading slash."
-msgstr "URL əvvəlində çəpəki xətt əskikdir."
+msgstr "URL əvvəlində əyri xətt əskikdir."
 
 msgid "URL is missing a trailing slash."
-msgstr "Ünvan sonunda çəpəki xətt əksikdir."
+msgstr "Ünvan sonunda əyri xətt əksikdir."
 
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"

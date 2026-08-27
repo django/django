@@ -199,8 +199,8 @@ class CharFieldTests(TestCase):
             field.check(),
             [
                 Error(
-                    "'choices' must be a mapping (e.g. a dictionary) or an iterable "
-                    "(e.g. a list or tuple).",
+                    "'choices' must be a mapping (e.g. a dictionary) or an "
+                    "ordered iterable (e.g. a list or tuple, but not a set).",
                     obj=field,
                     id="fields.E004",
                 ),
@@ -599,15 +599,16 @@ class DateTimeFieldTests(SimpleTestCase):
 
 
 @isolate_apps("invalid_models_tests")
-class DecimalFieldTests(SimpleTestCase):
-    def test_required_attributes(self):
+class DecimalFieldTests(TestCase):
+    def test_both_attributes_omitted(self):
         class Model(models.Model):
             field = models.DecimalField()
 
         field = Model._meta.get_field("field")
-        self.assertEqual(
-            field.check(),
-            [
+        if connection.features.supports_no_precision_decimalfield:
+            expected = []
+        else:
+            expected = [
                 Error(
                     "DecimalFields must define a 'decimal_places' attribute.",
                     obj=field,
@@ -618,6 +619,52 @@ class DecimalFieldTests(SimpleTestCase):
                     obj=field,
                     id="fields.E132",
                 ),
+            ]
+        self.assertEqual(field.check(databases=self.databases), expected)
+
+    def test_both_attributes_omitted_required_db_features(self):
+        class Model(models.Model):
+            field = models.DecimalField()
+
+            class Meta:
+                required_db_features = {"supports_no_precision_decimalfield"}
+
+        field = Model._meta.get_field("field")
+        self.assertEqual(field.check(databases=self.databases), [])
+
+    @skipUnlessDBFeature("supports_no_precision_decimalfield")
+    def test_only_max_digits_defined(self):
+        class Model(models.Model):
+            field = models.DecimalField(max_digits=13)
+
+        field = Model._meta.get_field("field")
+        self.assertEqual(
+            field.check(databases=self.databases),
+            [
+                Error(
+                    "DecimalField’s max_digits and decimal_places must both "
+                    "be defined or both omitted.",
+                    obj=field,
+                    id="fields.E135",
+                ),
+            ],
+        )
+
+    @skipUnlessDBFeature("supports_no_precision_decimalfield")
+    def test_only_decimal_places_defined(self):
+        class Model(models.Model):
+            field = models.DecimalField(decimal_places=5)
+
+        field = Model._meta.get_field("field")
+        self.assertEqual(
+            field.check(databases=self.databases),
+            [
+                Error(
+                    "DecimalField’s max_digits and decimal_places must both "
+                    "be defined or both omitted.",
+                    obj=field,
+                    id="fields.E135",
+                ),
             ],
         )
 
@@ -627,7 +674,7 @@ class DecimalFieldTests(SimpleTestCase):
 
         field = Model._meta.get_field("field")
         self.assertEqual(
-            field.check(),
+            field.check(databases=self.databases),
             [
                 Error(
                     "'decimal_places' must be a non-negative integer.",
@@ -648,7 +695,7 @@ class DecimalFieldTests(SimpleTestCase):
 
         field = Model._meta.get_field("field")
         self.assertEqual(
-            field.check(),
+            field.check(databases=self.databases),
             [
                 Error(
                     "'decimal_places' must be a non-negative integer.",
@@ -684,7 +731,7 @@ class DecimalFieldTests(SimpleTestCase):
             field = models.DecimalField(max_digits=10, decimal_places=10)
 
         field = Model._meta.get_field("field")
-        self.assertEqual(field.check(), [])
+        self.assertEqual(field.check(databases=self.databases), [])
 
 
 @isolate_apps("invalid_models_tests")
@@ -859,8 +906,42 @@ class IntegerFieldTests(SimpleTestCase):
             field.check(),
             [
                 Error(
-                    "'choices' must be a mapping (e.g. a dictionary) or an iterable "
-                    "(e.g. a list or tuple).",
+                    "'choices' must be a mapping (e.g. a dictionary) or an "
+                    "ordered iterable (e.g. a list or tuple, but not a set).",
+                    obj=field,
+                    id="fields.E004",
+                ),
+            ],
+        )
+
+    def test_unordered_choices_set(self):
+        class Model(models.Model):
+            field = models.IntegerField(choices={1, 2, 3})
+
+        field = Model._meta.get_field("field")
+        self.assertEqual(
+            field.check(),
+            [
+                Error(
+                    "'choices' must be a mapping (e.g. a dictionary) or an "
+                    "ordered iterable (e.g. a list or tuple, but not a set).",
+                    obj=field,
+                    id="fields.E004",
+                ),
+            ],
+        )
+
+    def test_unordered_choices_frozenset(self):
+        class Model(models.Model):
+            field = models.IntegerField(choices=frozenset({1, 2, 3}))
+
+        field = Model._meta.get_field("field")
+        self.assertEqual(
+            field.check(),
+            [
+                Error(
+                    "'choices' must be a mapping (e.g. a dictionary) or an "
+                    "ordered iterable (e.g. a list or tuple, but not a set).",
                     obj=field,
                     id="fields.E004",
                 ),
@@ -1423,6 +1504,29 @@ class GeneratedFieldTests(TestCase):
                 "(fields.W122)",
                 obj=Model._meta.get_field("field"),
                 id="fields.W224",
+            ),
+        ]
+        self.assertEqual(
+            Model._meta.get_field("field").check(databases={"default"}),
+            expected_warnings,
+        )
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_with_null_argument(self):
+        class Model(models.Model):
+            value = models.IntegerField()
+            field = models.GeneratedField(
+                expression=models.F("value") * 2,
+                output_field=models.IntegerField(),
+                db_persist=True,
+                null=True,
+            )
+
+        expected_warnings = [
+            DjangoWarning(
+                "null has no effect on GeneratedField.",
+                obj=Model._meta.get_field("field"),
+                id="fields.W225",
             ),
         ]
         self.assertEqual(

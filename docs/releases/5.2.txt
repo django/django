@@ -23,8 +23,9 @@ end in April 2026.
 Python compatibility
 ====================
 
-Django 5.2 supports Python 3.10, 3.11, 3.12, and 3.13. We **highly recommend**
-and only officially support the latest release of each series.
+Django 5.2 supports Python 3.10, 3.11, 3.12, 3.13, and 3.14 (as of 5.2.8). We
+**highly recommend** and only officially support the latest release of each
+series.
 
 .. _whats-new-5.2:
 

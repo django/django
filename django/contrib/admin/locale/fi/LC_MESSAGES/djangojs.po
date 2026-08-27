@@ -4,14 +4,14 @@
 # Aarni Koskela, 2015,2017,2020-2022,2025
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Jiri Grönroos <jiri.gronroos@iki.fi>, 2021,2023
+# Jiri Grönroos <jiri.gronroos@iki.fi>, 2021,2023,2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-25 15:04-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: Aarni Koskela, 2015,2017,2020-2022,2025\n"
+"PO-Revision-Date: 2025-12-03 07:59+0000\n"
+"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>, 2021,2023,2025\n"
 "Language-Team: Finnish (http://app.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -38,15 +38,15 @@ msgstr "Suodatin"
 
 #, javascript-format
 msgid "Choose all %s"
-msgstr ""
+msgstr "Valitse kaikki %s"
 
 #, javascript-format
 msgid "Choose selected %s"
-msgstr ""
+msgstr "Valitse valitut %s"
 
 #, javascript-format
 msgid "Remove selected %s"
-msgstr ""
+msgstr "Poista valitut %s"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -66,7 +66,7 @@ msgstr ""
 
 #, javascript-format
 msgid "Remove all %s"
-msgstr ""
+msgstr "Poista kaikki %s"
 
 #, javascript-format
 msgid "%s selected option not visible"

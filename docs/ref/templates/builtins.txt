@@ -101,6 +101,36 @@ Sample usage:
 This tag is used for CSRF protection, as described in the documentation for
 :doc:`Cross Site Request Forgeries </ref/csrf>`.
 
+.. templatetag:: csp_nonce_attr
+
+``csp_nonce_attr``
+------------------
+
+.. versionadded:: 6.1
+
+When called without arguments, renders a ``nonce="<value>"`` HTML attribute
+when the :func:`~django.template.context_processors.csp` context processor is
+configured, and an empty string otherwise. Use it in ``<script>`` or
+``<link>`` elements to allow them under a nonce-based Content Security Policy:
+
+.. code-block:: html+django
+
+    <script src="/path/to/script.js" {% csp_nonce_attr %}></script>
+    <link rel="stylesheet" href="/path/to/style.css" {% csp_nonce_attr %}>
+
+When called with a :class:`~django.forms.Media` object as the argument,
+renders its assets with the CSP nonce applied to each ``<script>`` and
+``<link>`` element:
+
+.. code-block:: html+django
+
+    {% csp_nonce_attr form.media %}
+
+In both forms, if the context processor is not configured, assets are rendered
+without a nonce attribute.
+
+See :ref:`csp-nonce` for full configuration details.
+
 .. templatetag:: cycle
 
 ``cycle``
@@ -427,10 +457,6 @@ Variable                    Description
 ``forloop.parentloop``      For nested loops, this is the loop surrounding
                             the current one
 ==========================  ===============================================
-
-.. versionchanged:: 6.0
-
-    The variable ``forloop.length`` was added.
 
 ``for`` ... ``empty``
 ---------------------
@@ -962,8 +988,6 @@ output (as a string) inside a variable. This is useful if you want to use
 ``partial``
 -----------
 
-.. versionadded:: 6.0
-
 Renders a template fragment that was defined with :ttag:`partialdef`, inserting
 the matching partial at this location.
 
@@ -992,8 +1016,6 @@ rendered three times:
 
 ``partialdef``
 --------------
-
-.. versionadded:: 6.0
 
 Defines a reusable template fragment that can be rendered multiple times within
 the same template or accessed directly via :ref:`template loading or inclusion
@@ -1057,10 +1079,6 @@ links, and an empty result could prevent the page from reloading as expected.
     enabled. If it's not enabled, you must either explicitly pass the
     ``request`` object into the template context, or provide a ``QueryDict``
     instance to this tag.
-
-.. versionchanged:: 6.0
-
-    A ``?`` was prepended to the query string for empty results.
 
 Basic usage
 ~~~~~~~~~~~
@@ -1136,10 +1154,6 @@ If all keys are removed by setting them to ``None``, this outputs ``?``:
 
 Similarly, if all positional arguments are empty and keyword arguments do not
 contribute any new params, the output will also be ``?``.
-
-.. versionchanged:: 6.0
-
-    Support for multiple positional mapping arguments was added.
 
 Dynamic usage
 ~~~~~~~~~~~~~
@@ -2860,8 +2874,7 @@ Newlines in the HTML content will be preserved.
 .. admonition:: Size of input string
 
     Processing large, potentially malformed HTML strings can be
-    resource-intensive and impact service performance. ``truncatechars_html``
-    limits input to the first five million characters.
+    resource-intensive and impact service performance.
 
 .. templatefilter:: truncatewords
 
@@ -2908,8 +2921,7 @@ Newlines in the HTML content will be preserved.
 .. admonition:: Size of input string
 
     Processing large, potentially malformed HTML strings can be
-    resource-intensive and impact service performance. ``truncatewords_html``
-    limits input to the first five million characters.
+    resource-intensive and impact service performance.
 
 .. templatefilter:: unordered_list
 

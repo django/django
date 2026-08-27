@@ -1,3 +1,4 @@
+import copy
 import sqlite3
 from unittest import mock, skipUnless
 
@@ -29,3 +30,13 @@ class FeaturesTests(TestCase):
         finally:
             connection.connection.setlimit(limit_name, current_limit)
         self.assertEqual(connection.features.max_query_params, current_limit)
+
+    def test_max_query_params_without_established_connection(self):
+        new_connection = connection.copy()
+        new_connection.settings_dict = copy.deepcopy(connection.settings_dict)
+        self.assertIsNone(new_connection.connection)
+        try:
+            result = new_connection.features.max_query_params
+            self.assertIsInstance(result, int)
+        finally:
+            new_connection._close()

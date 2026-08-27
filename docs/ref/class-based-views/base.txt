@@ -113,8 +113,9 @@ ancestor classes are  documented under the section title of **Ancestors
         If the view was called with an HTTP method it doesn't support, this
         method is called instead.
 
-        The default implementation returns ``HttpResponseNotAllowed`` with a
-        list of allowed methods in plain text.
+        The default implementation returns ``HttpResponseNotAllowed`` with the
+        list of allowed methods in the ``Allow`` header, as required by
+        :rfc:`RFC 7231 <7231#section-6.5.5>`. The response body is empty.
 
     .. method:: options(request, *args, **kwargs)
 
@@ -275,6 +276,15 @@ ancestor classes are  documented under the section title of **Ancestors
         ``True``, then the query string is appended to the URL. If ``False``,
         then the query string is discarded. By default, ``query_string`` is
         ``False``.
+
+    .. attribute:: preserve_request
+
+        .. versionadded:: 6.1
+
+        Whether to preserve the HTTP method and body during the redirect. If
+        ``True``, then the redirect will use status code 307 instead of 302,
+        or 308 instead of 301 when :attr:`permanent` is ``True``. By default,
+        ``preserve_request`` is ``False``.
 
     **Methods**
 

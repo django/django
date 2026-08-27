@@ -1,5 +1,3 @@
-import warnings
-
 from django.db import transaction
 from django.db.models import (
     CharField,
@@ -17,20 +15,20 @@ from django.db.models.fields.json import KeyTransform
 from django.db.models.functions import Cast, Concat, LPad, Substr
 from django.test.utils import Approximate
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango61Warning, RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from . import PostgreSQLTestCase
 from .models import AggregateTestModel, HotelReservation, Room, StatTestModel
 
 try:
+    from django.contrib.postgres.aggregates import BitAnd  # RemovedInDjango70Warning
+    from django.contrib.postgres.aggregates import BitOr  # RemovedInDjango70Warning
+    from django.contrib.postgres.aggregates import BitXor  # RemovedInDjango70Warning
     from django.contrib.postgres.aggregates import (
         StringAgg,  # RemovedInDjango70Warning.
     )
     from django.contrib.postgres.aggregates import (
         ArrayAgg,
-        BitAnd,
-        BitOr,
-        BitXor,
         BoolAnd,
         BoolOr,
         Corr,
@@ -93,12 +91,9 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             ArrayAgg("char_field"),
             ArrayAgg("integer_field"),
             ArrayAgg("boolean_field"),
-            BitAnd("integer_field"),
-            BitOr("integer_field"),
             BoolAnd("boolean_field"),
             BoolOr("boolean_field"),
             JSONBAgg("integer_field"),
-            BitXor("integer_field"),
         ]
         for aggregation in tests:
             with self.subTest(aggregation=aggregation):
@@ -121,8 +116,6 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             (ArrayAgg("char_field", default=["<empty>"]), ["<empty>"]),
             (ArrayAgg("integer_field", default=[0]), [0]),
             (ArrayAgg("boolean_field", default=[False]), [False]),
-            (BitAnd("integer_field", default=0), 0),
-            (BitOr("integer_field", default=0), 0),
             (BoolAnd("boolean_field", default=False), False),
             (BoolOr("boolean_field", default=False), False),
             (JSONBAgg("integer_field", default=["<empty>"]), ["<empty>"]),
@@ -130,7 +123,6 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                 JSONBAgg("integer_field", default=Value(["<empty>"], JSONField())),
                 ["<empty>"],
             ),
-            (BitXor("integer_field", default=0), 0),
         ]
         for aggregation, expected_result in tests:
             with self.subTest(aggregation=aggregation):
@@ -146,46 +138,6 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                         aggregation=aggregation,
                     )
                     self.assertEqual(values, {"aggregation": expected_result})
-
-    def test_ordering_warns_of_deprecation(self):
-        msg = "The ordering argument is deprecated. Use order_by instead."
-        with self.assertWarnsMessage(RemovedInDjango61Warning, msg) as ctx:
-            values = AggregateTestModel.objects.aggregate(
-                arrayagg=ArrayAgg("integer_field", ordering=F("integer_field").desc())
-            )
-            self.assertEqual(values, {"arrayagg": [2, 1, 0, 0]})
-        self.assertEqual(ctx.filename, __file__)
-
-    # RemovedInDjango61Warning: Remove this test
-    def test_ordering_and_order_by_causes_error(self):
-        with warnings.catch_warnings(record=True, action="always") as wm:
-            with self.assertRaisesMessage(
-                TypeError,
-                "Cannot specify both order_by and ordering.",
-            ):
-                AggregateTestModel.objects.aggregate(
-                    stringagg=StringAgg(
-                        "char_field",
-                        delimiter=Value("'"),
-                        order_by="char_field",
-                        ordering="char_field",
-                    )
-                )
-
-        first_warning = wm[0]
-        self.assertEqual(first_warning.category, RemovedInDjango70Warning)
-        self.assertEqual(
-            "The PostgreSQL specific StringAgg function is deprecated. Use "
-            "django.db.models.aggregate.StringAgg instead.",
-            str(first_warning.message),
-        )
-
-        second_warning = wm[1]
-        self.assertEqual(second_warning.category, RemovedInDjango61Warning)
-        self.assertEqual(
-            "The ordering argument is deprecated. Use order_by instead.",
-            str(second_warning.message),
-        )
 
     def test_array_agg_charfield(self):
         values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg("char_field"))
@@ -375,61 +327,6 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                 ).values("ids")[:1]
             )
         )
-
-    def test_bit_and_general(self):
-        values = AggregateTestModel.objects.filter(integer_field__in=[0, 1]).aggregate(
-            bitand=BitAnd("integer_field")
-        )
-        self.assertEqual(values, {"bitand": 0})
-
-    def test_bit_and_on_only_true_values(self):
-        values = AggregateTestModel.objects.filter(integer_field=1).aggregate(
-            bitand=BitAnd("integer_field")
-        )
-        self.assertEqual(values, {"bitand": 1})
-
-    def test_bit_and_on_only_false_values(self):
-        values = AggregateTestModel.objects.filter(integer_field=0).aggregate(
-            bitand=BitAnd("integer_field")
-        )
-        self.assertEqual(values, {"bitand": 0})
-
-    def test_bit_or_general(self):
-        values = AggregateTestModel.objects.filter(integer_field__in=[0, 1]).aggregate(
-            bitor=BitOr("integer_field")
-        )
-        self.assertEqual(values, {"bitor": 1})
-
-    def test_bit_or_on_only_true_values(self):
-        values = AggregateTestModel.objects.filter(integer_field=1).aggregate(
-            bitor=BitOr("integer_field")
-        )
-        self.assertEqual(values, {"bitor": 1})
-
-    def test_bit_or_on_only_false_values(self):
-        values = AggregateTestModel.objects.filter(integer_field=0).aggregate(
-            bitor=BitOr("integer_field")
-        )
-        self.assertEqual(values, {"bitor": 0})
-
-    def test_bit_xor_general(self):
-        AggregateTestModel.objects.create(integer_field=3)
-        values = AggregateTestModel.objects.filter(
-            integer_field__in=[1, 3],
-        ).aggregate(bitxor=BitXor("integer_field"))
-        self.assertEqual(values, {"bitxor": 2})
-
-    def test_bit_xor_on_only_true_values(self):
-        values = AggregateTestModel.objects.filter(
-            integer_field=1,
-        ).aggregate(bitxor=BitXor("integer_field"))
-        self.assertEqual(values, {"bitxor": 1})
-
-    def test_bit_xor_on_only_false_values(self):
-        values = AggregateTestModel.objects.filter(
-            integer_field=0,
-        ).aggregate(bitxor=BitXor("integer_field"))
-        self.assertEqual(values, {"bitxor": 0})
 
     def test_bool_and_general(self):
         values = AggregateTestModel.objects.aggregate(booland=BoolAnd("boolean_field"))
@@ -683,7 +580,7 @@ class TestGeneralAggregate(PostgreSQLTestCase):
     def test_string_agg_deprecation(self):
         msg = (
             "The PostgreSQL specific StringAgg function is deprecated. Use "
-            "django.db.models.aggregate.StringAgg instead."
+            "django.db.models.aggregates.StringAgg instead."
         )
 
         with self.assertWarnsMessage(RemovedInDjango70Warning, msg) as ctx:
@@ -691,6 +588,22 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                 stringagg=StringAgg("char_field", delimiter=Value("'"))
             )
             self.assertEqual(values, {"stringagg": "Foo1'Foo2'Foo4'Foo3"})
+        self.assertEqual(ctx.filename, __file__)
+
+    def test_bit_agg_deprecation(self):
+        for BitAggregate in [BitAnd, BitOr, BitXor]:
+            msg = (
+                f"The PostgreSQL-specific {BitAggregate.__name__} function is "
+                f"deprecated. Use django.db.models.aggregates.{BitAggregate.__name__} "
+                "instead."
+            )
+            with (
+                self.subTest(BitAggregate.__name__),
+                self.assertWarnsMessage(RemovedInDjango70Warning, msg) as ctx,
+            ):
+                AggregateTestModel.objects.aggregate(
+                    bitagg=BitAggregate("integer_field")
+                )
         self.assertEqual(ctx.filename, __file__)
 
 

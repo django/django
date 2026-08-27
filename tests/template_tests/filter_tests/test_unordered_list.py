@@ -160,6 +160,19 @@ class FunctionTests(SimpleTestCase):
             "<li>D</li>",
         )
 
+    def test_non_iterable_list_subclass(self):
+        class NonIterableList(list):
+            def __iter__(self):
+                raise TypeError
+
+            def __str__(self):
+                return "non-iterable-list"
+
+        self.assertEqual(
+            unordered_list(["A", NonIterableList(["x"]), "B"]),
+            "\t<li>A</li>\n\t<li>non-iterable-list</li>\n\t<li>B</li>",
+        )
+
     def test_ulitem_autoescape_off(self):
         class ULItem:
             def __init__(self, title):

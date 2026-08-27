@@ -32,8 +32,65 @@ class RChild(R):
     pass
 
 
+class RProxy(R):
+    class Meta:
+        proxy = True
+
+
 class RChildChild(RChild):
     pass
+
+
+class RelatedDbOptionGrandParent(models.Model):
+    pass
+
+
+class RelatedDbOptionParent(models.Model):
+    p = models.ForeignKey(RelatedDbOptionGrandParent, models.DB_CASCADE, null=True)
+
+    class Meta:
+        required_db_features = {"supports_on_delete_db_cascade"}
+
+
+class CascadeDbModel(models.Model):
+    name = models.CharField(max_length=30)
+    db_cascade = models.ForeignKey(
+        RelatedDbOptionParent, models.DB_CASCADE, related_name="db_cascade_set"
+    )
+
+    class Meta:
+        required_db_features = {"supports_on_delete_db_cascade"}
+
+
+class SetNullDbModel(models.Model):
+    db_setnull = models.ForeignKey(
+        RelatedDbOptionParent,
+        models.DB_SET_NULL,
+        null=True,
+        related_name="db_setnull_set",
+    )
+
+    class Meta:
+        required_db_features = {"supports_on_delete_db_null"}
+
+
+class SetDefaultDbModel(models.Model):
+    db_setdefault = models.ForeignKey(
+        RelatedDbOptionParent,
+        models.DB_SET_DEFAULT,
+        db_default=models.Value(1),
+        related_name="db_setdefault_set",
+    )
+    db_setdefault_none = models.ForeignKey(
+        RelatedDbOptionParent,
+        models.DB_SET_DEFAULT,
+        db_default=None,
+        null=True,
+        related_name="db_setnull_nullable_set",
+    )
+
+    class Meta:
+        required_db_features = {"supports_on_delete_db_default"}
 
 
 class A(models.Model):
@@ -179,7 +236,7 @@ class RelToBase(models.Model):
 
 
 class Origin(models.Model):
-    pass
+    r_proxy = models.ForeignKey("RProxy", models.CASCADE, null=True)
 
 
 class Referrer(models.Model):

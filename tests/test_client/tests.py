@@ -25,8 +25,9 @@ import itertools
 import tempfile
 from unittest import mock
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission, User
 from django.core import mail
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpResponse, HttpResponseNotAllowed
 from django.test import (
     AsyncRequestFactory,
@@ -38,6 +39,7 @@ from django.test import (
     override_settings,
 )
 from django.urls import reverse_lazy
+from django.utils.datastructures import MultiValueDict
 from django.utils.decorators import async_only_middleware
 from django.views.generic import RedirectView
 
@@ -61,7 +63,10 @@ def async_middleware_urlconf(get_response):
     return middleware
 
 
-@override_settings(ROOT_URLCONF="test_client.urls")
+@override_settings(
+    ROOT_URLCONF="test_client.urls",
+    MAILERS={"default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}},
+)
 class ClientTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -791,6 +796,25 @@ class ClientTest(TestCase):
         self.client.force_login(self.u1)
         self.assertEqual(self.u1.backend, "django.contrib.auth.backends.ModelBackend")
 
+    @override_settings(
+        AUTHENTICATION_BACKENDS=[
+            "test_client.auth_backends.PermissionOnlyBackend",
+            "django.contrib.auth.backends.ModelBackend",
+        ]
+    )
+    def test_force_login_skips_noop_get_user_backend(self):
+        """force_login() skips auth backends without concrete get_user()."""
+        self.client.force_login(self.u1)
+        self.assertEqual(self.u1.backend, "django.contrib.auth.backends.ModelBackend")
+
+    @override_settings(
+        AUTHENTICATION_BACKENDS=[
+            "test_client.auth_backends.PermissionOnlyBackend",
+        ]
+    )
+    def test_force_login_all_backends_noop(self):
+        self.assertIsNone(self.client._get_backend())
+
     @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.signed_cookies")
     def test_logout_cookie_sessions(self):
         self.test_logout()
@@ -814,7 +838,15 @@ class ClientTest(TestCase):
             response, "/accounts/login/?next=/permission_protected_view/"
         )
 
-        # TODO: Log in with right permissions and request the page again
+        permission = Permission.objects.get(
+            content_type__app_label="auth", codename="add_user"
+        )
+        self.u1.user_permissions.add(permission)
+
+        # Request the page again. Access is granted.
+        response = self.client.get("/permission_protected_view/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["user"].username, "testclient")
 
     def test_view_with_permissions_exception(self):
         """
@@ -853,7 +885,15 @@ class ClientTest(TestCase):
             response, "/accounts/login/?next=/permission_protected_method_view/"
         )
 
-        # TODO: Log in with right permissions and request the page again
+        permission = Permission.objects.get(
+            content_type__app_label="auth", codename="add_user"
+        )
+        self.u1.user_permissions.add(permission)
+
+        # Request the page again. Access is granted.
+        response = self.client.get("/permission_protected_method_view/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["user"].username, "testclient")
 
     def test_external_redirect(self):
         response = self.client.get("/django_project_redirect/")
@@ -867,6 +907,16 @@ class ClientTest(TestCase):
             "/redirect_to_different_hostname/", follow=True, HTTP_HOST="hostname1"
         )
         self.assertEqual(response.content, b"hostname2")
+
+    @override_settings(PREPEND_WWW=True, ALLOWED_HOSTS=["testserver", "www.testserver"])
+    def test_prepend_www_follow_redirect(self):
+        response = self.client.get("/get_view/", follow=True)
+        self.assertRedirects(
+            response,
+            "http://www.testserver/get_view/",
+            status_code=301,
+            target_status_code=200,
+        )
 
     def test_external_redirect_without_trailing_slash(self):
         """
@@ -1007,6 +1057,23 @@ class ClientTest(TestCase):
             )
         self.assertEqual(response.content, b"named_temp_file")
 
+    def test_uploading_file_and_field_with_same_name(self):
+        """
+        A form field and file uploads sharing the same name in a
+        MultiValueDict are both preserved when posted by the test client.
+        """
+        file = SimpleUploadedFile("file.txt", b"content")
+        response = self.client.post(
+            "/upload_view/",
+            data=MultiValueDict({"shared": ["field_value", file]}),
+        )
+        request = response.wsgi_request
+        self.assertEqual(request.POST.getlist("shared"), ["field_value"])
+        self.assertEqual(
+            [f.name for f in request.FILES.getlist("shared")],
+            ["file.txt"],
+        )
+
     def test_query_params(self):
         tests = (
             "get",
@@ -1036,6 +1103,13 @@ class ClientTest(TestCase):
                         data={"example": "data"},
                         query_params={"q": "terms"},
                     )
+
+    def test_follow_redirect_with_query_params(self):
+        response = self.client.get(
+            "/redirect_view/", query_params={"next": "x"}, follow=True
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.wsgi_request.get_full_path(), "/get_view/?next=x")
 
 
 @override_settings(
@@ -1176,8 +1250,11 @@ class RequestFactoryTest(SimpleTestCase):
         for method in tests:
             with self.subTest(method=method):
                 factory = getattr(self.request_factory, method)
-                request = factory("/somewhere", query_params={"example": "data"})
+                request = factory(
+                    "/somewhere", query_params={"example": "data", "empty": []}
+                )
                 self.assertEqual(request.GET["example"], "data")
+                self.assertNotIn("empty", request.GET)
 
 
 @override_settings(ROOT_URLCONF="test_client.urls")

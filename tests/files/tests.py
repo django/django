@@ -233,6 +233,9 @@ class NoNameFileTestCase(unittest.TestCase):
     def test_noname_file_get_size(self):
         self.assertEqual(File(BytesIO(b"A file with no name")).size, 19)
 
+    def test_noname_bool(self):
+        self.assertTrue(bool(File(BytesIO(b"A file with no name"))))
+
 
 class ContentFileTestCase(unittest.TestCase):
     def test_content_file_default_name(self):

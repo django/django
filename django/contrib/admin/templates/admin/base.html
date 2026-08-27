@@ -1,30 +1,32 @@
-{% load i18n static %}<!DOCTYPE html>
+{% load i18n static tz %}<!DOCTYPE html>
 {% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}">
 <head>
 <title>{% block title %}{% endblock %}</title>
-<link rel="stylesheet" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}">
+<meta name="color-scheme" content="light dark" />
+<link rel="stylesheet" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}" {% csp_nonce_attr %}>
 {% block dark-mode-vars %}
-  <link rel="stylesheet" href="{% static "admin/css/dark_mode.css" %}">
-  <script src="{% static "admin/js/theme.js" %}"></script>
+  <link rel="stylesheet" href="{% static "admin/css/dark_mode.css" %}" {% csp_nonce_attr %}>
+  <script src="{% static "admin/js/theme.js" %}" {% csp_nonce_attr %}></script>
 {% endblock %}
 {% if not is_popup and is_nav_sidebar_enabled %}
-  <link rel="stylesheet" href="{% static "admin/css/nav_sidebar.css" %}">
-  <script src="{% static 'admin/js/nav_sidebar.js' %}" defer></script>
+  <link rel="stylesheet" href="{% static "admin/css/nav_sidebar.css" %}" {% csp_nonce_attr %}>
+  <script src="{% static 'admin/js/nav_sidebar.js' %}" defer {% csp_nonce_attr %}></script>
 {% endif %}
 {% block extrastyle %}{% endblock %}
-{% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}">{% endif %}
+{% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}" {% csp_nonce_attr %}>{% endif %}
 {% block extrahead %}{% endblock %}
 {% block responsive %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static "admin/css/responsive.css" %}">
-    {% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% static "admin/css/responsive_rtl.css" %}">{% endif %}
+    <link rel="stylesheet" href="{% static "admin/css/responsive.css" %}" {% csp_nonce_attr %}>
+    {% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% static "admin/css/responsive_rtl.css" %}" {% csp_nonce_attr %}>{% endif %}
 {% endblock %}
 {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE">{% endblock %}
 </head>
 
 <body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}"
-  data-admin-utc-offset="{% now "Z" %}">
+  data-admin-utc-offset="{% now "Z" %}"
+  data-admin-server-timezone="{% get_current_timezone as time_zone %}{{ time_zone }}">
 <a href="#content-start" class="skip-to-content-link">{% translate 'Skip to main content' %}</a>
 <!-- Container -->
 <div id="container">
@@ -72,10 +74,10 @@
     {% block nav-breadcrumbs %}
       <nav aria-label="{% translate 'Breadcrumbs' %}">
         {% block breadcrumbs %}
-          <div class="breadcrumbs">
-            <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-            {% if title %} &rsaquo; {{ title }}{% endif %}
-          </div>
+          <ol class="breadcrumbs">
+            <li><a href="{% url 'admin:index' %}">{% translate 'Home' %}</a></li>
+            {% if title %}<li aria-current="page">{{ title }}</li>{% endif %}
+          </ol>
         {% endblock %}
       </nav>
     {% endblock %}
@@ -97,11 +99,15 @@
         {% endblock messages %}
         <!-- Content -->
         <div id="content" class="{% block coltype %}colM{% endblock %}">
-          {% block pretitle %}{% endblock %}
-          {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
-          {% block content_subtitle %}{% if subtitle %}<h2>{{ subtitle }}</h2>{% endif %}{% endblock %}
-          {% block content %}
+          <div class="titles-and-tools">
+            <div class="titles">
+              {% block pretitle %}{% endblock %}
+              {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
+              {% block content_subtitle %}{% if subtitle %}<h2>{{ subtitle }}</h2>{% endif %}{% endblock %}
+            </div>
             {% block object-tools %}{% endblock %}
+          </div>
+          {% block content %}
             {{ content }}
           {% endblock %}
           {% block sidebar %}{% endblock %}

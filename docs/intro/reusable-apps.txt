@@ -143,8 +143,10 @@ this. For a small app like polls, this process isn't too difficult.
    to ``django_polls``.
 
 #. Edit ``django_polls/apps.py`` so that :attr:`~.AppConfig.name` refers to the
-   new module name and add :attr:`~.AppConfig.label` to give a short name for
-   the app:
+   new module name, add :attr:`~.AppConfig.label` to give a short name for
+   the app, and set :attr:`~.AppConfig.default_auto_field` to ensure your
+   migrations are not affected by changes to :setting:`DEFAULT_AUTO_FIELD`
+   made by users of your reusable app:
 
    .. code-block:: python
        :caption: ``django-polls/django_polls/apps.py``
@@ -153,6 +155,7 @@ this. For a small app like polls, this process isn't too difficult.
 
 
        class PollsConfig(AppConfig):
+           default_auto_field = "django.db.models.BigAutoField"
            name = "django_polls"
            label = "polls"
 
@@ -208,7 +211,7 @@ this. For a small app like polls, this process isn't too difficult.
        :caption: ``django-polls/pyproject.toml``
 
        [build-system]
-       requires = ["setuptools>=69.3"]
+       requires = ["setuptools>83"]
        build-backend = "setuptools.build_meta"
 
        [project]
@@ -219,6 +222,7 @@ this. For a small app like polls, this process isn't too difficult.
        ]
        description = "A Django app to conduct web-based polls."
        readme = "README.rst"
+       license = "BSD-3-Clause"
        requires-python = ">= 3.12"
        authors = [
            {name = "Your Name", email = "yourname@example.com"},
@@ -228,13 +232,13 @@ this. For a small app like polls, this process isn't too difficult.
            "Framework :: Django",
            "Framework :: Django :: X.Y",  # Replace "X.Y" as appropriate
            "Intended Audience :: Developers",
-           "License :: OSI Approved :: BSD License",
            "Operating System :: OS Independent",
            "Programming Language :: Python",
            "Programming Language :: Python :: 3",
            "Programming Language :: Python :: 3 :: Only",
            "Programming Language :: Python :: 3.12",
            "Programming Language :: Python :: 3.13",
+           "Programming Language :: Python :: 3.14",
            "Topic :: Internet :: WWW/HTTP",
            "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
        ]

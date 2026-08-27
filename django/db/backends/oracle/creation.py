@@ -10,6 +10,8 @@ TEST_DATABASE_PREFIX = "test_"
 
 
 class DatabaseCreation(BaseDatabaseCreation):
+    destroy_test_db_connection_close_method = "close"
+
     @cached_property
     def _maindb_connection(self):
         """

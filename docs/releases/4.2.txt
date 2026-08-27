@@ -474,7 +474,7 @@ Miscellaneous
 
 * Support for ``PROJ`` < 5 is removed.
 
-* :class:`~django.core.mail.backends.smtp.EmailBackend` now verifies a
+* :ref:`SMTP EmailBackend <topic-email-smtp-backend>` now verifies a
   :attr:`hostname <ssl.SSLContext.check_hostname>` and
   :attr:`certificates <ssl.SSLContext.verify_mode>`. If you need the
   previous behavior that is less restrictive and not recommended, subclass

@@ -1,12 +1,15 @@
 import logging
 import logging.config  # needed when logging_config doesn't start with logging.config
+import warnings
 from copy import copy
 
 from django.conf import settings
 from django.core import mail
-from django.core.mail import get_connection
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.module_loading import import_string
+from django.utils.warnings import django_file_prefixes
 
 request_logger = logging.getLogger("django.request")
 
@@ -83,10 +86,36 @@ class AdminEmailHandler(logging.Handler):
     request data will be provided in the email report.
     """
 
-    def __init__(self, include_html=False, email_backend=None, reporter_class=None):
+    def __init__(
+        self, include_html=False, email_backend=None, reporter_class=None, using=None
+    ):
         super().__init__()
+
+        # RemovedInDjango70Warning: email_backend arg and connection error.
+        if email_backend:
+            if using:
+                raise ImproperlyConfigured(
+                    "The 'email_backend' argument is not compatible with 'using'."
+                )
+            if mail.mailers._is_configured:
+                raise ImproperlyConfigured(
+                    "The 'email_backend' argument is not valid when "
+                    "settings.MAILERS is defined."
+                )
+            warnings.warn(
+                "The 'email_backend' argument is deprecated. Use 'using' instead.",
+                RemovedInDjango70Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
+        if hasattr(self, "connection"):
+            raise AttributeError(
+                "The undocumented AdminEmailHandler.connection() method is no longer "
+                "used."
+            )
+
         self.include_html = include_html
         self.email_backend = email_backend
+        self.using = using
         self.reporter_class = import_string(
             reporter_class or settings.DEFAULT_EXCEPTION_REPORTER
         )
@@ -132,15 +161,21 @@ class AdminEmailHandler(logging.Handler):
             reporter.get_traceback_text(),
         )
         html_message = reporter.get_traceback_html() if self.include_html else None
-        self.send_mail(subject, message, fail_silently=True, html_message=html_message)
+        self.send_mail(subject, message, html_message=html_message)
 
     def send_mail(self, subject, message, *args, **kwargs):
-        mail.mail_admins(
-            subject, message, *args, connection=self.connection(), **kwargs
-        )
+        # RemovedInDjango70Warning.
+        if not mail.mailers._is_configured:
+            connection = mail.get_connection(
+                backend=self.email_backend, fail_silently=True
+            )
+            mail.mail_admins(subject, message, *args, connection=connection, **kwargs)
+            return
 
-    def connection(self):
-        return get_connection(backend=self.email_backend, fail_silently=True)
+        try:
+            mail.mail_admins(subject, message, *args, using=self.using, **kwargs)
+        except mail.MailerDoesNotExist:
+            pass
 
     def format_subject(self, subject):
         """
@@ -214,6 +249,46 @@ class ServerFormatter(logging.Formatter):
         return self._fmt.find("{server_time}") >= 0
 
 
+def log_message(
+    logger,
+    message,
+    *args,
+    level=None,
+    status_code=None,
+    request=None,
+    exception=None,
+    **extra,
+):
+    """Log `message` using `logger` based on `status_code` and logger `level`.
+
+    Pass `request`, `status_code` (if defined) and any provided `extra` as such
+    to the logging method,
+
+    Arguments from `args` will be escaped to avoid potential log injections.
+
+    """
+    extra = {"request": request, **extra}
+    if status_code is not None:
+        extra["status_code"] = status_code
+        if level is None:
+            if status_code >= 500:
+                level = "error"
+            elif status_code >= 400:
+                level = "warning"
+
+    escaped_args = tuple(
+        a.encode("unicode_escape").decode("ascii") if isinstance(a, str) else a
+        for a in args
+    )
+
+    getattr(logger, level or "info")(
+        message,
+        *escaped_args,
+        extra=extra,
+        exc_info=exception,
+    )
+
+
 def log_response(
     message,
     *args,
@@ -237,26 +312,13 @@ def log_response(
     if getattr(response, "_has_been_logged", False):
         return
 
-    if level is None:
-        if response.status_code >= 500:
-            level = "error"
-        elif response.status_code >= 400:
-            level = "warning"
-        else:
-            level = "info"
-
-    escaped_args = tuple(
-        a.encode("unicode_escape").decode("ascii") if isinstance(a, str) else a
-        for a in args
-    )
-
-    getattr(logger, level)(
+    log_message(
+        logger,
         message,
-        *escaped_args,
-        extra={
-            "status_code": response.status_code,
-            "request": request,
-        },
-        exc_info=exception,
+        *args,
+        level=level,
+        status_code=response.status_code,
+        request=request,
+        exception=exception,
     )
     response._has_been_logged = True

@@ -12,7 +12,7 @@ from django.core.exceptions import (
     ValidationError,
 )
 from django.core.validators import ProhibitNullCharactersValidator
-from django.db.models.utils import AltersData
+from django.db.models.utils import AltersData, get_blank_choice_label
 from django.forms.fields import ChoiceField, Field
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import BaseFormSet, formset_factory
@@ -776,8 +776,9 @@ class BaseModelFormSet(BaseFormSet, AltersData):
             # If the queryset isn't already ordered we need to add an
             # artificial ordering here to make sure that all formsets
             # constructed from this queryset have the same form order.
-            if not qs.ordered:
-                qs = qs.order_by(self.model._meta.pk.name)
+            if not qs.totally_ordered:
+                current_ordering = qs.query.order_by or qs.model._meta.ordering or []
+                qs = qs.order_by(*current_ordering, "pk")
 
             # Removed queryset limiting here. As per discussion re: #13023
             # on django-dev, max_num should not prevent existing
@@ -1401,7 +1402,7 @@ class InlineForeignKeyField(Field):
                 return None
             # if there is no value act as we did before.
             return self.parent_instance
-        # ensure the we compare the values as equal types.
+        # ensure we compare the values as equal types.
         if self.to_field:
             orig = getattr(self.parent_instance, self.to_field)
         else:
@@ -1480,7 +1481,7 @@ class ModelChoiceField(ChoiceField):
         self,
         queryset,
         *,
-        empty_label="---------",
+        empty_label="",
         required=True,
         widget=None,
         label=None,
@@ -1507,6 +1508,8 @@ class ModelChoiceField(ChoiceField):
         ):
             self.empty_label = None
         else:
+            if empty_label == "":
+                empty_label = get_blank_choice_label()
             self.empty_label = empty_label
         self.queryset = queryset
         self.limit_choices_to = limit_choices_to  # limit the queryset later.

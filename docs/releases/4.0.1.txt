@@ -19,7 +19,7 @@ In order to mitigate this issue, relatively long values are now ignored by
 ``UserAttributeSimilarityValidator``.
 
 This issue has severity "medium" according to the :ref:`Django security policy
-<security-disclosure>`.
+<severity-levels>`.
 
 CVE-2021-45116: Potential information disclosure in ``dictsort`` template filter
 ================================================================================
@@ -35,7 +35,7 @@ dictionaries.
 As a reminder, all untrusted user input should be validated before use.
 
 This issue has severity "low" according to the :ref:`Django security policy
-<security-disclosure>`.
+<severity-levels>`.
 
 CVE-2021-45452: Potential directory-traversal via ``Storage.save()``
 ====================================================================
@@ -44,7 +44,7 @@ CVE-2021-45452: Potential directory-traversal via ``Storage.save()``
 crafted file names.
 
 This issue has severity "low" according to the :ref:`Django security policy
-<security-disclosure>`.
+<severity-levels>`.
 
 Bugfixes
 ========

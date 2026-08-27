@@ -6,7 +6,6 @@ import gc
 import multiprocessing
 import os
 import shutil
-import socket
 import subprocess
 import sys
 import tempfile
@@ -20,17 +19,18 @@ except ImportError as e:
         "Django module not found, reference tests/README.rst for instructions."
     ) from e
 else:
+    from playwright_tests import PlaywrightTestCase, PlaywrightTestCaseMeta
+
     from django.apps import apps
     from django.conf import settings
     from django.core.exceptions import ImproperlyConfigured
     from django.db import connection, connections
     from django.test import TestCase, TransactionTestCase
     from django.test.runner import get_max_test_processes, parallel_type
-    from django.test.selenium import SeleniumTestCase, SeleniumTestCaseBase
     from django.test.utils import NullTimeKeeper, TimeKeeper, get_runner
     from django.utils.deprecation import (
-        RemovedInDjango61Warning,
-        RemovedInDjango70Warning,
+        RemovedAfterNextVersionWarning,
+        RemovedInNextVersionWarning,
     )
     from django.utils.functional import classproperty
     from django.utils.log import DEFAULT_LOGGING
@@ -46,8 +46,8 @@ else:
     warnings.filterwarnings("ignore", r"\(1003, *", category=MySQLdb.Warning)
 
 # Make deprecation warnings errors to ensure no usage of deprecated features.
-warnings.simplefilter("error", RemovedInDjango70Warning)
-warnings.simplefilter("error", RemovedInDjango61Warning)
+warnings.simplefilter("error", RemovedInNextVersionWarning)
+warnings.simplefilter("error", RemovedAfterNextVersionWarning)
 # Make resource and runtime warning errors to ensure no usage of error prone
 # patterns.
 warnings.simplefilter("error", ResourceWarning)
@@ -65,15 +65,6 @@ RUNTESTS_DIR = os.path.abspath(os.path.dirname(__file__))
 
 TEMPLATE_DIR = os.path.join(RUNTESTS_DIR, "templates")
 
-# Create a specific subdirectory for the duration of the test suite.
-TMPDIR = tempfile.mkdtemp(prefix="django_")
-# Set the TMPDIR environment variable in addition to tempfile.tempdir
-# so that children processes inherit it.
-tempfile.tempdir = os.environ["TMPDIR"] = TMPDIR
-
-# Removing the temporary TMPDIR.
-atexit.register(shutil.rmtree, TMPDIR)
-
 # Add variables enabling coverage to trace code in subprocesses.
 os.environ["RUNTESTS_DIR"] = RUNTESTS_DIR
 os.environ["COVERAGE_PROCESS_START"] = os.path.join(RUNTESTS_DIR, ".coveragerc")
@@ -82,7 +73,7 @@ os.environ["COVERAGE_PROCESS_START"] = os.path.join(RUNTESTS_DIR, ".coveragerc")
 # This is a dict mapping RUNTESTS_DIR subdirectory to subdirectories of that
 # directory to skip when searching for test modules.
 SUBDIRS_TO_SKIP = {
-    "": {"import_error_package", "test_runner_apps"},
+    "": {"import_error_package", "playwright_tests", "test_runner_apps"},
     "gis_tests": {"data"},
 }
 
@@ -201,6 +192,7 @@ def get_filtered_test_modules(start_at, start_after, gis_enabled, test_labels=No
 
 
 def setup_collect_tests(start_at, start_after, test_labels=None):
+    TMPDIR = os.environ["TMPDIR"]
     state = {
         "INSTALLED_APPS": settings.INSTALLED_APPS,
         "ROOT_URLCONF": getattr(settings, "ROOT_URLCONF", ""),
@@ -328,33 +320,27 @@ def setup_run_tests(verbosity, start_at, start_after, test_labels=None):
 
 def teardown_run_tests(state):
     teardown_collect_tests(state)
-    # Discard the multiprocessing.util finalizer that tries to remove a
-    # temporary directory that's already removed by this script's
-    # atexit.register(shutil.rmtree, TMPDIR) handler. Prevents
-    # FileNotFoundError at the end of a test run (#27890).
-    from multiprocessing.util import _finalizer_registry
-
-    _finalizer_registry.pop((-100, 0), None)
     del os.environ["RUNNING_DJANGOS_TEST_SUITE"]
 
 
-class ActionSelenium(argparse.Action):
+class ActionPlaywright(argparse.Action):
     """
     Validate the comma-separated list of requested browsers.
     """
 
     def __call__(self, parser, namespace, values, option_string=None):
         try:
-            import selenium  # NOQA
+            from playwright.sync_api import sync_playwright  # noqa
         except ImportError as e:
-            raise ImproperlyConfigured(f"Error loading selenium module: {e}")
+            raise ImproperlyConfigured(f"Error loading playwright module: {e}")
         browsers = values.split(",")
         for browser in browsers:
             try:
-                SeleniumTestCaseBase.import_webdriver(browser)
+                PlaywrightTestCaseMeta.import_browser(browser)
             except ImportError:
                 raise argparse.ArgumentError(
-                    self, "Selenium browser specification '%s' is not valid." % browser
+                    self,
+                    "Playwright browser specification '%s' is not valid." % browser,
                 )
         setattr(namespace, self.dest, browsers)
 
@@ -535,6 +521,14 @@ def paired_tests(paired_test, options, test_labels, start_at, start_after):
 
 
 if __name__ == "__main__":
+    # Create a specific subdirectory for the duration of the test suite.
+    TMPDIR = tempfile.mkdtemp(prefix="django_")
+    # Set the TMPDIR environment variable in addition to tempfile.tempdir
+    # so that children processes inherit it.
+    tempfile.tempdir = os.environ["TMPDIR"] = TMPDIR
+    # Remove the temporary TMPDIR.
+    atexit.register(shutil.rmtree, TMPDIR)
+
     parser = argparse.ArgumentParser(description="Run the Django test suite.")
     parser.add_argument(
         "modules",
@@ -600,32 +594,27 @@ if __name__ == "__main__":
         "test side effects not apparent with normal execution lineup.",
     )
     parser.add_argument(
-        "--selenium",
-        action=ActionSelenium,
+        "--playwright",
+        action=ActionPlaywright,
         metavar="BROWSERS",
-        help="A comma-separated list of browsers to run the Selenium tests against.",
+        help="A comma-separated list of browsers to run the Playwright tests against.",
     )
     parser.add_argument(
         "--screenshots",
         action="store_true",
-        help="Take screenshots during selenium tests to capture the user interface.",
+        help="Take screenshots during Playwright tests to capture the user interface.",
     )
     parser.add_argument(
-        "--headless",
+        "--headed",
         action="store_true",
-        help="Run selenium tests in headless mode, if the browser supports the option.",
+        help="Run Playwright tests in headed mode (with a visible browser window).",
     )
     parser.add_argument(
-        "--selenium-hub",
-        help="A URL for a selenium hub instance to use in combination with --selenium.",
-    )
-    parser.add_argument(
-        "--external-host",
-        default=socket.gethostname(),
-        help=(
-            "The external host that can be reached by the selenium hub instance when "
-            "running Selenium tests via Selenium Hub."
-        ),
+        "--slowmo",
+        type=int,
+        default=0,
+        metavar="MS",
+        help="Slow down Playwright operations by the specified number of milliseconds.",
     )
     parser.add_argument(
         "--debug-sql",
@@ -703,15 +692,12 @@ if __name__ == "__main__":
 
     options = parser.parse_args()
 
-    using_selenium_hub = options.selenium and options.selenium_hub
-    if options.selenium_hub and not options.selenium:
-        parser.error(
-            "--selenium-hub and --external-host require --selenium to be used."
-        )
-    if using_selenium_hub and not options.external_host:
-        parser.error("--selenium-hub and --external-host must be used together.")
-    if options.screenshots and not options.selenium:
-        parser.error("--screenshots require --selenium to be used.")
+    if options.screenshots and not options.playwright:
+        parser.error("--screenshots require --playwright to be used.")
+    if options.headed and not options.playwright:
+        parser.error("--headed requires --playwright to be used.")
+    if options.slowmo and not options.playwright:
+        parser.error("--slowmo requires --playwright to be used.")
     if options.screenshots and options.tags:
         parser.error("--screenshots and --tag are mutually exclusive.")
 
@@ -749,24 +735,25 @@ if __name__ == "__main__":
         os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test_sqlite")
         options.settings = os.environ["DJANGO_SETTINGS_MODULE"]
 
-    if options.selenium:
-        if multiprocessing.get_start_method() == "spawn" and options.parallel != 1:
+    if options.playwright:
+        if (
+            multiprocessing.get_start_method() in {"spawn", "forkserver"}
+            and options.parallel != 1
+        ):
             parser.error(
-                "You cannot use --selenium with parallel tests on this system. "
-                "Pass --parallel=1 to use --selenium."
+                "You cannot use --playwright with parallel tests on this system. "
+                "Pass --parallel=1 to use --playwright."
             )
         if not options.tags:
-            options.tags = ["selenium"]
-        elif "selenium" not in options.tags:
-            options.tags.append("selenium")
-        if options.selenium_hub:
-            SeleniumTestCaseBase.selenium_hub = options.selenium_hub
-            SeleniumTestCaseBase.external_host = options.external_host
-        SeleniumTestCaseBase.headless = options.headless
-        SeleniumTestCaseBase.browsers = options.selenium
+            options.tags = ["playwright"]
+        elif "playwright" not in options.tags:
+            options.tags.append("playwright")
+        PlaywrightTestCaseMeta.headed = options.headed
+        PlaywrightTestCaseMeta.slow_mo = options.slowmo
+        PlaywrightTestCaseMeta.browsers = options.playwright
         if options.screenshots:
-            options.tags = ["screenshot"]
-            SeleniumTestCase.screenshots = options.screenshots
+            options.tags = ["playwright_screenshot"]
+            PlaywrightTestCase.screenshots = options.screenshots
 
     if options.bisect:
         bisect_tests(

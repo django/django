@@ -2,11 +2,16 @@ import re
 from io import StringIO
 from unittest import mock, skipUnless
 
-from django.core.management import call_command
+from django.core.management import CommandError, call_command
 from django.core.management.commands import inspectdb
 from django.db import connection
 from django.db.backends.base.introspection import TableInfo
-from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.test import (
+    TestCase,
+    TransactionTestCase,
+    skipIfDBFeature,
+    skipUnlessDBFeature,
+)
 
 from .models import PeopleMoreData, test_collation
 
@@ -40,6 +45,7 @@ def cursor_execute(*queries):
     return results
 
 
+@skipUnlessDBFeature("supports_inspectdb")
 class InspectDBTestCase(TestCase):
     unique_re = re.compile(r".*unique_together = \((.+),\).*")
 
@@ -202,6 +208,13 @@ class InspectDBTestCase(TestCase):
         output = out.getvalue()
         self.assertIn("char_field = models.CharField()", output)
 
+    @skipUnlessDBFeature("supports_no_precision_decimalfield")
+    def test_decimal_field_no_precision(self):
+        out = StringIO()
+        call_command("inspectdb", "inspectdb_decimalfieldnoprec", stdout=out)
+        output = out.getvalue()
+        self.assertIn("decimal_field_no_precision = models.DecimalField()", output)
+
     def test_number_field_types(self):
         """Test introspection of various Django field types"""
         assertFieldType = self.make_field_type_asserter()
@@ -228,13 +241,8 @@ class InspectDBTestCase(TestCase):
             assertFieldType(
                 "decimal_field", "models.DecimalField(max_digits=6, decimal_places=1)"
             )
-        else:  # Guessed arguments on SQLite, see #5014
-            assertFieldType(
-                "decimal_field",
-                "models.DecimalField(max_digits=10, decimal_places=5)  "
-                "# max_digits and decimal_places have been guessed, "
-                "as this database handles decimal fields as float",
-            )
+        else:
+            assertFieldType("decimal_field", "models.DecimalField()")
 
         assertFieldType("float_field", "models.FloatField()")
         assertFieldType(
@@ -297,6 +305,31 @@ class InspectDBTestCase(TestCase):
             "to_field_fk = models.ForeignKey('InspectdbPeoplemoredata', "
             "models.DO_NOTHING, to_field='people_unique_id')",
             out.getvalue(),
+        )
+
+    @skipUnlessDBFeature(
+        "can_introspect_foreign_keys",
+        "supports_on_delete_db_cascade",
+        "supports_on_delete_db_null",
+    )
+    def test_foreign_key_db_on_delete(self):
+        out = StringIO()
+        call_command("inspectdb", "inspectdb_dbondeletemodel", stdout=out)
+        output = out.getvalue()
+        self.assertIn(
+            "fk_do_nothing = models.ForeignKey('InspectdbUniquetogether', "
+            "models.DO_NOTHING)",
+            output,
+        )
+        self.assertIn(
+            "fk_db_cascade = models.ForeignKey('InspectdbColumntypes', "
+            "models.DB_CASCADE)",
+            output,
+        )
+        self.assertIn(
+            "fk_set_null = models.ForeignKey('InspectdbDigitsincolumnname', "
+            "models.DB_SET_NULL, blank=True, null=True)",
+            output,
         )
 
     def test_digits_column_name_introspection(self):
@@ -482,6 +515,26 @@ class InspectDBTestCase(TestCase):
         # The error message depends on the backend
         self.assertIn("# The error was:", output)
 
+    def test_introspection_errors_escape_table_name_and_message(self):
+        table_name = "table_name\ncontinued"
+        error_message = "error\ncontinued"
+        out = StringIO()
+        with (
+            mock.patch(
+                "django.db.connection.introspection.get_table_list",
+                return_value=[TableInfo(name=table_name, type="t")],
+            ),
+            mock.patch(
+                "django.db.connection.introspection.get_relations",
+                side_effect=RuntimeError(error_message),
+            ),
+        ):
+            call_command("inspectdb", stdout=out)
+        output = out.getvalue()
+        self.assertIn(f"# Unable to inspect table {table_name!r}", output)
+        self.assertIn(f"# The error was: {error_message!r}", output)
+        self.assertNotIn("\ncontinued", output)
+
     def test_same_relations(self):
         out = StringIO()
         call_command("inspectdb", "inspectdb_message", stdout=out)
@@ -492,6 +545,7 @@ class InspectDBTestCase(TestCase):
         )
 
 
+@skipUnlessDBFeature("supports_inspectdb")
 class InspectDBTransactionalTests(TransactionTestCase):
     available_apps = ["inspectdb"]
 
@@ -628,6 +682,34 @@ class InspectDBTransactionalTests(TransactionTestCase):
         self.assertIn(foreign_table_model, output)
         self.assertIn(foreign_table_managed, output)
 
+    @skipUnless(connection.vendor == "sqlite", "SQLite specific SQL")
+    @skipUnlessDBFeature("can_introspect_foreign_keys")
+    def test_foreign_key_to_sqlite_schema(self):
+        with connection.constraint_checks_disabled():
+            cursor_execute("""
+                CREATE TABLE inspectdb_sqlite_schema_fk (
+                    id INTEGER PRIMARY KEY,
+                    table_name VARCHAR(64)
+                        REFERENCES sqlite_schema (tbl_name),
+                    content TEXT NOT NULL
+                )
+                """)
+
+        def cleanup():
+            with connection.constraint_checks_disabled():
+                cursor_execute("DROP TABLE IF EXISTS inspectdb_sqlite_schema_fk")
+
+        self.addCleanup(cleanup)
+        out = StringIO()
+        call_command("inspectdb", "inspectdb_sqlite_schema_fk", stdout=out)
+        output = out.getvalue()
+        self.assertIn("class InspectdbSqliteSchemaFk(models.Model):", output)
+        self.assertIn(
+            "table_name = models.ForeignKey('SqliteSchema', models.DO_NOTHING, "
+            "db_column='table_name', blank=True, null=True)",
+            output,
+        )
+
     def test_composite_primary_key(self):
         out = StringIO()
         field_type = connection.features.introspected_field_types["IntegerField"]
@@ -640,7 +722,36 @@ class InspectDBTransactionalTests(TransactionTestCase):
         self.assertIn(f"column_1 = models.{field_type}()", output)
         self.assertIn(f"column_2 = models.{field_type}()", output)
 
+    def test_composite_primary_key_uses_normalized_column_names(self):
+        out = StringIO()
+        field_type = connection.features.introspected_field_types["IntegerField"]
+        call_command("inspectdb", "inspectdb_compositepkmodel2", stdout=out)
+        output = out.getvalue()
+        self.assertIn(
+            "pk = models.CompositePrimaryKey('column_1', 'column_2')",
+            output,
+        )
+        self.assertIn(
+            f"column_1 = models.{field_type}(db_column='column-1')",
+            output,
+        )
+        self.assertIn(
+            f"column_2 = models.{field_type}(db_column='column-2')",
+            output,
+        )
+
     def test_composite_primary_key_not_unique_together(self):
         out = StringIO()
         call_command("inspectdb", "inspectdb_compositepkmodel", stdout=out)
         self.assertNotIn("unique_together", out.getvalue())
+
+
+@skipIfDBFeature("supports_inspectdb")
+class InspectDBNotSupportedTests(TestCase):
+    def test_not_supported(self):
+        msg = (
+            "Database inspection isn't supported for the currently selected "
+            "database backend."
+        )
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command("inspectdb")

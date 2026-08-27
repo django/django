@@ -17,7 +17,7 @@ from django.db.models import CompositePrimaryKey
 from django.forms import modelform_factory
 from django.test import TestCase
 
-from .models import Comment, Post, Tenant, TimeStamped, User
+from .models import Comment, Post, PostDbDefault, Tenant, TimeStamped, Token, User
 
 
 class CommentForm(forms.ModelForm):
@@ -63,6 +63,12 @@ class CompositePKTests(TestCase):
         self.assertEqual(user.tenant_id, 9132)
         self.assertIsNone(user.id)
         self.assertIs(user._is_pk_set(), False)
+
+    def test_pk_not_set_db_default(self):
+        post = PostDbDefault(tenant=self.tenant)
+        self.assertEqual(post.tenant_id, self.tenant.pk)
+        self.assertIsNotNone(post.id)
+        self.assertIs(post._is_pk_set(), False)
 
     def test_hash(self):
         self.assertEqual(hash(User(pk=(1, 2))), hash((1, 2)))
@@ -149,23 +155,81 @@ class CompositePKTests(TestCase):
 
     def test_in_bulk_batching(self):
         Comment.objects.all().delete()
-        batching_required = connection.features.max_query_params is not None
-        expected_queries = 2 if batching_required else 1
+        num_objects = 10
+        connection.features.__dict__.pop("max_query_params", None)
         with unittest.mock.patch.object(
-            type(connection.features), "max_query_params", 10
+            type(connection.features), "max_query_params", num_objects
         ):
-            num_requiring_batching = (
-                connection.ops.bulk_batch_size([Comment._meta.pk], []) + 1
-            )
             comments = [
                 Comment(id=i, tenant=self.tenant, user=self.user)
-                for i in range(1, num_requiring_batching + 1)
+                for i in range(1, num_objects + 1)
             ]
             Comment.objects.bulk_create(comments)
             id_list = list(Comment.objects.values_list("pk", flat=True))
-            with self.assertNumQueries(expected_queries):
+            with self.assertNumQueries(2):
                 comment_dict = Comment.objects.in_bulk(id_list=id_list)
-        self.assertQuerySetEqual(comment_dict, id_list)
+        self.assertCountEqual(comment_dict, id_list)
+
+    def test_in_bulk_values(self):
+        result = Comment.objects.values().in_bulk([self.comment.pk])
+        self.assertEqual(
+            result,
+            {
+                self.comment.pk: {
+                    "tenant_id": self.comment.tenant_id,
+                    "id": self.comment.id,
+                    "user_id": self.comment.user_id,
+                    "text": self.comment.text,
+                    "integer": self.comment.integer,
+                }
+            },
+        )
+
+    def test_in_bulk_values_field(self):
+        result = Comment.objects.values("text").in_bulk([self.comment.pk])
+        self.assertEqual(
+            result,
+            {self.comment.pk: {"text": self.comment.text}},
+        )
+
+    def test_in_bulk_values_fields(self):
+        result = Comment.objects.values("pk", "text").in_bulk([self.comment.pk])
+        self.assertEqual(
+            result,
+            {self.comment.pk: {"pk": self.comment.pk, "text": self.comment.text}},
+        )
+
+    def test_in_bulk_values_list(self):
+        result = Comment.objects.values_list("text").in_bulk([self.comment.pk])
+        self.assertEqual(result, {self.comment.pk: (self.comment.text,)})
+
+    def test_in_bulk_values_list_multiple_fields(self):
+        result = Comment.objects.values_list("pk", "text").in_bulk([self.comment.pk])
+        self.assertEqual(
+            result, {self.comment.pk: (self.comment.pk, self.comment.text)}
+        )
+
+    def test_in_bulk_values_list_fields_are_pk(self):
+        result = Comment.objects.values_list("tenant", "id").in_bulk([self.comment.pk])
+        self.assertEqual(
+            result, {self.comment.pk: (self.comment.tenant_id, self.comment.id)}
+        )
+
+    def test_in_bulk_values_list_flat(self):
+        result = Comment.objects.values_list("text", flat=True).in_bulk(
+            [self.comment.pk]
+        )
+        self.assertEqual(result, {self.comment.pk: self.comment.text})
+
+    def test_in_bulk_values_list_flat_pk(self):
+        result = Comment.objects.values_list("pk", flat=True).in_bulk([self.comment.pk])
+        self.assertEqual(result, {self.comment.pk: self.comment.pk})
+
+    def test_in_bulk_values_list_flat_tenant(self):
+        result = Comment.objects.values_list("tenant", flat=True).in_bulk(
+            [self.comment.pk]
+        )
+        self.assertEqual(result, {self.comment.pk: self.tenant.id})
 
     def test_iterator(self):
         """
@@ -223,6 +287,16 @@ class CompositePKTests(TestCase):
             FieldError, "Unknown field(s) (pk) specified for Comment"
         ):
             self.assertIsNone(modelform_factory(Comment, fields=["pk"]))
+
+    def test_totally_ordered(self):
+        """
+        QuerySet.totally_ordered returns True when ordering by all fields of a
+        composite primary key and False when ordering by a subset.
+        """
+        qs_ordered = Token.objects.order_by("tenant_id", "id")
+        self.assertIs(qs_ordered.totally_ordered, True)
+        qs_partial = Token.objects.order_by("tenant_id")
+        self.assertIs(qs_partial.totally_ordered, False)
 
 
 class CompositePKFixturesTests(TestCase):

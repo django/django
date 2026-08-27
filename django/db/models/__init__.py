@@ -6,6 +6,9 @@ from django.db.models.constraints import *  # NOQA
 from django.db.models.constraints import __all__ as constraints_all
 from django.db.models.deletion import (
     CASCADE,
+    DB_CASCADE,
+    DB_SET_DEFAULT,
+    DB_SET_NULL,
     DO_NOTHING,
     PROTECT,
     RESTRICT,
@@ -25,6 +28,7 @@ from django.db.models.expressions import (
     ExpressionWrapper,
     F,
     Func,
+    JSONNull,
     OrderBy,
     OuterRef,
     RowRange,
@@ -36,6 +40,7 @@ from django.db.models.expressions import (
     WindowFrame,
     WindowFrameExclusion,
 )
+from django.db.models.fetch_modes import FETCH_ONE, FETCH_PEERS, FETCH_RAISE
 from django.db.models.fields import *  # NOQA
 from django.db.models.fields import __all__ as fields_all
 from django.db.models.fields.composite import CompositePrimaryKey
@@ -68,12 +73,14 @@ from django.db.models.fields.related import (  # isort:skip
     OneToOneRel,
 )
 
-
 __all__ = aggregates_all + constraints_all + enums_all + fields_all + indexes_all
 __all__ += [
     "ObjectDoesNotExist",
     "signals",
     "CASCADE",
+    "DB_CASCADE",
+    "DB_SET_DEFAULT",
+    "DB_SET_NULL",
     "DO_NOTHING",
     "PROTECT",
     "RESTRICT",
@@ -90,6 +97,7 @@ __all__ += [
     "ExpressionWrapper",
     "F",
     "Func",
+    "JSONNull",
     "OrderBy",
     "OuterRef",
     "RowRange",
@@ -105,6 +113,9 @@ __all__ += [
     "GeneratedField",
     "JSONField",
     "OrderWrt",
+    "FETCH_ONE",
+    "FETCH_PEERS",
+    "FETCH_RAISE",
     "Lookup",
     "Transform",
     "Manager",

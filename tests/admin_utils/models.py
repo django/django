@@ -5,6 +5,9 @@ from django.utils.translation import gettext_lazy as _
 
 class Site(models.Model):
     domain = models.CharField(max_length=100)
+    parent = models.ForeignKey(
+        "self", models.CASCADE, related_name="children", blank=True, null=True
+    )
 
     def __str__(self):
         return self.domain
@@ -40,9 +43,25 @@ class ArticleProxy(Article):
         proxy = True
 
 
-class Count(models.Model):
+class Cascade(models.Model):
     num = models.PositiveSmallIntegerField()
     parent = models.ForeignKey("self", models.CASCADE, null=True)
+
+    class Meta:
+        ordering = ("num",)
+
+    @admin.display(ordering="num")
+    def __str__(self):
+        return str(self.num)
+
+
+class DBCascade(models.Model):
+    num = models.PositiveSmallIntegerField()
+    parent = models.ForeignKey("self", models.DB_CASCADE, null=True)
+
+    class Meta:
+        ordering = ("num",)
+        required_db_features = {"supports_on_delete_db_cascade"}
 
     def __str__(self):
         return str(self.num)

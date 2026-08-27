@@ -1,6 +1,5 @@
 from functools import wraps
-
-from asgiref.sync import iscoroutinefunction
+from inspect import iscoroutinefunction
 
 
 def xframe_options_deny(view_func):

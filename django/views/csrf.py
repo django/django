@@ -24,6 +24,7 @@ def csrf_failure(request, reason="", template_name=CSRF_FAILURE_TEMPLATE_NAME):
     Default view used when request fails CSRF protection
     """
     from django.middleware.csrf import REASON_NO_CSRF_COOKIE, REASON_NO_REFERER
+    from django.template.context_processors import csp
 
     c = {
         "title": _("Forbidden"),
@@ -64,7 +65,7 @@ def csrf_failure(request, reason="", template_name=CSRF_FAILURE_TEMPLATE_NAME):
         "DEBUG": settings.DEBUG,
         "docs_version": get_docs_version(),
         "more": _("More information is available with DEBUG=True."),
-    }
+    } | csp(request)
     try:
         t = loader.get_template(template_name)
         body = t.render(request=request)

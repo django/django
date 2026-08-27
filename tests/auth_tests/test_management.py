@@ -10,7 +10,6 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import get_permission_codename, management
 from django.contrib.auth.management import (
-    RenamePermission,
     create_permissions,
     get_default_username,
 )
@@ -19,13 +18,15 @@ from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.db import migrations, models
+from django.db import migrations
+from django.db.utils import IntegrityError
 from django.test import TestCase, override_settings
 from django.test.testcases import TransactionTestCase
 from django.utils.translation import gettext_lazy as _
 
 from .models import (
     CustomUser,
+    CustomUserNoNaturalKey,
     CustomUserNonUniqueUsername,
     CustomUserWithFK,
     CustomUserWithM2M,
@@ -471,6 +472,66 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         users = CustomUserNonUniqueUsername.objects.filter(username="joe")
         self.assertEqual(users.count(), 2)
 
+    @override_settings(AUTH_USER_MODEL="auth_tests.CustomUserNoNaturalKey")
+    def test_swappable_user_no_natural_key_non_interactive(self):
+        new_io = StringIO()
+        call_command(
+            "createsuperuser",
+            interactive=False,
+            email="joe@somewhere.org",
+            stdout=new_io,
+        )
+        command_output = new_io.getvalue().strip()
+        self.assertEqual(command_output, "Superuser created successfully.")
+
+        user = CustomUserNoNaturalKey._default_manager.get(email="joe@somewhere.org")
+        self.assertIsNotNone(user)
+
+    @override_settings(AUTH_USER_MODEL="auth_tests.CustomUserNoNaturalKey")
+    def test_swappable_user_no_natural_key_interactive(self):
+        @mock_inputs(
+            {
+                "Email: ": "joe@somewhere.org",
+                "password": "nopasswd",
+            }
+        )
+        def createsuperuser():
+            new_io = StringIO()
+            call_command(
+                "createsuperuser",
+                interactive=True,
+                stdout=new_io,
+                stdin=MockTTY(),
+            )
+            command_output = new_io.getvalue().strip()
+            self.assertEqual(command_output, "Superuser created successfully.")
+
+        createsuperuser()
+        user = CustomUserNoNaturalKey._default_manager.get(email="joe@somewhere.org")
+        self.assertIsNotNone(user)
+
+    @override_settings(AUTH_USER_MODEL="auth_tests.CustomUserNoNaturalKey")
+    def test_swappable_user_no_natural_key_duplicate_allowed(self):
+        """Without get_by_natural_key,
+        duplicate username validation is skipped."""
+        new_io = StringIO()
+        call_command(
+            "createsuperuser",
+            interactive=False,
+            email="joe@somewhere.org",
+            stdout=new_io,
+        )
+        # Creating a second user with the same email won't be caught by
+        # _validate_username since there's no get_by_natural_key; it will
+        # fail at the database level instead due to the unique constraint.
+        with self.assertRaises(IntegrityError):
+            call_command(
+                "createsuperuser",
+                interactive=False,
+                email="joe@somewhere.org",
+                stdout=new_io,
+            )
+
     def test_skip_if_not_in_TTY(self):
         """
         If the command is not called from a TTY, it should be skipped and a
@@ -613,7 +674,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         email = Email.objects.create(email="mymail@gmail.com")
         Group.objects.all().delete()
         nonexistent_group_id = 1
-        msg = f"group instance with id {nonexistent_group_id} is not a valid choice."
+        msg = f"group instance with id {nonexistent_group_id!r} is not a valid choice."
 
         with self.assertRaisesMessage(CommandError, msg):
             call_command(
@@ -630,7 +691,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         email = Email.objects.create(email="mymail@gmail.com")
         Group.objects.all().delete()
         nonexistent_group_id = 1
-        msg = f"group instance with id {nonexistent_group_id} is not a valid choice."
+        msg = f"group instance with id {nonexistent_group_id!r} is not a valid choice."
 
         with mock.patch.dict(
             os.environ,
@@ -650,7 +711,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         email = Email.objects.create(email="mymail@gmail.com")
         Group.objects.all().delete()
         nonexistent_group_id = 1
-        msg = f"group instance with id {nonexistent_group_id} is not a valid choice."
+        msg = f"group instance with id {nonexistent_group_id!r} is not a valid choice."
 
         @mock_inputs(
             {
@@ -1547,44 +1608,43 @@ class PermissionRenameOperationsTests(TransactionTestCase):
         "auth_tests",
     ]
 
-    def setUp(self):
-        app_config = apps.get_app_config("auth_tests")
-        models.signals.post_migrate.connect(
-            self.assertOperationsInjected, sender=app_config
-        )
-        self.addCleanup(
-            models.signals.post_migrate.disconnect,
-            self.assertOperationsInjected,
-            sender=app_config,
-        )
+    databases = {"default", "other"}
 
-    def assertOperationsInjected(self, plan, **kwargs):
-        for migration, _backward in plan:
-            operations = iter(migration.operations)
-            for operation in operations:
-                if isinstance(operation, migrations.RenameModel):
-                    next_operation = next(operations)
-                    self.assertIsInstance(next_operation, RenamePermission)
-                    self.assertEqual(next_operation.app_label, migration.app_label)
-                    self.assertEqual(next_operation.old_model, operation.old_name)
-                    self.assertEqual(next_operation.new_model, operation.new_name)
+    def setUp(self):
+        self.stdout = StringIO()
+        self.addCleanup(self.stdout.close)
 
     def test_permission_rename(self):
-        ct = ContentType.objects.create(app_label="auth_tests", model="oldmodel")
-        actions = ["add", "change", "delete", "view"]
-        for action in actions:
-            Permission.objects.create(
-                codename=f"{action}_oldmodel",
-                name=f"Can {action} old model",
-                content_type=ct,
-            )
+        # Create initial content type and permissions for OldModel.
+        call_command("migrate", "auth_tests", "0001", verbosity=0)
+        # Apply the migration that renames OldModel to NewModel.
+        call_command("migrate", "auth_tests", "0002", verbosity=0)
 
-        call_command("migrate", "auth_tests", verbosity=0)
+        actions = ContentType._meta.default_permissions
+
         for action in actions:
             self.assertFalse(
                 Permission.objects.filter(codename=f"{action}_oldmodel").exists()
             )
             self.assertTrue(
+                Permission.objects.filter(codename=f"{action}_newmodel").exists()
+            )
+
+        # Unapply that migration, renaming NewModel back to OldModel.
+        call_command(
+            "migrate",
+            "auth_tests",
+            "0001",
+            database="default",
+            interactive=False,
+            verbosity=0,
+        )
+
+        for action in actions:
+            self.assertTrue(
+                Permission.objects.filter(codename=f"{action}_oldmodel").exists()
+            )
+            self.assertFalse(
                 Permission.objects.filter(codename=f"{action}_newmodel").exists()
             )
 
@@ -1597,38 +1657,26 @@ class PermissionRenameOperationsTests(TransactionTestCase):
             verbosity=0,
         )
 
-        for action in actions:
-            self.assertTrue(
-                Permission.objects.filter(codename=f"{action}_oldmodel").exists()
-            )
-            self.assertFalse(
-                Permission.objects.filter(codename=f"{action}_newmodel").exists()
-            )
-
     @mock.patch(
         "django.db.router.allow_migrate_model",
         return_value=False,
     )
     def test_rename_skipped_if_router_disallows(self, _):
+        # Create them manually, auto permissions won't create
+        # since router disallows
+
         ct = ContentType.objects.create(app_label="auth_tests", model="oldmodel")
         Permission.objects.create(
             codename="change_oldmodel",
             name="Can change old model",
             content_type=ct,
         )
-        # The rename operation should not be there when disallowed by router.
-        app_config = apps.get_app_config("auth_tests")
-        models.signals.post_migrate.disconnect(
-            self.assertOperationsInjected, sender=app_config
-        )
 
-        call_command(
-            "migrate",
-            "auth_tests",
-            database="default",
-            interactive=False,
-            verbosity=0,
-        )
+        # Create initial content type and permissions for OldModel.
+        call_command("migrate", "auth_tests", "0001", verbosity=0)
+        # Apply the migration that renames OldModel to NewModel.
+        call_command("migrate", "auth_tests", "0002", verbosity=0)
+
         self.assertTrue(Permission.objects.filter(codename="change_oldmodel").exists())
         self.assertFalse(Permission.objects.filter(codename="change_newmodel").exists())
 
@@ -1641,7 +1689,16 @@ class PermissionRenameOperationsTests(TransactionTestCase):
             verbosity=0,
         )
 
-    def test_rename_backward_does_nothing_if_no_permissions(self):
+    def test_rename_backward_without_permissions(self):
+        """
+        Backward migration handles the case where permissions
+        don't exist (e.g., they were manually deleted).
+        """
+        # Create initial content type and permissions for OldModel.
+        call_command("migrate", "auth_tests", "0001", verbosity=0)
+        # Apply the migration that renames OldModel to NewModel.
+        call_command("migrate", "auth_tests", "0002", verbosity=0)
+
         Permission.objects.filter(content_type__app_label="auth_tests").delete()
 
         call_command(
@@ -1658,38 +1715,144 @@ class PermissionRenameOperationsTests(TransactionTestCase):
             ).exists()
         )
 
+        call_command(
+            "migrate",
+            "auth_tests",
+            "zero",
+            database="default",
+            interactive=False,
+            verbosity=0,
+        )
+
     def test_rename_permission_conflict(self):
-        ct = ContentType.objects.create(app_label="auth_tests", model="oldmodel")
-        Permission.objects.create(
+        # Create initial content type and permissions for OldModel.
+        call_command("migrate", "auth_tests", "0001", verbosity=0)
+
+        ct = ContentType.objects.get(app_label="auth_tests", model="oldmodel")
+        old_perm = Permission.objects.get(
+            codename="change_oldmodel",
+            name="Can change old model",
+        )
+        conflicting_perm = Permission.objects.create(
             codename="change_newmodel",
             name="Can change new model",
             content_type=ct,
         )
-        Permission.objects.create(
-            codename="change_oldmodel",
-            name="Can change old model",
-            content_type=ct,
+
+        with self.assertRaises(RuntimeError):
+            # Apply the migration that renames OldModel to NewModel.
+            call_command(
+                "migrate",
+                "auth_tests",
+                "0002",
+                database="default",
+                interactive=False,
+                stdout=self.stdout,
+            )
+
+        command_output = self.stdout.getvalue()
+
+        self.assertIn(
+            f"Failed to rename permission {old_perm.pk} "
+            f"from '{old_perm.codename}' to '{conflicting_perm.codename}'. "
+            f"Please resolve the conflict manually.",
+            command_output,
+        )
+
+        self.assertTrue(Permission.objects.filter(codename="change_oldmodel").exists())
+
+        with self.assertRaises(RuntimeError):
+            call_command(
+                "migrate",
+                "auth_tests",
+                "zero",
+                database="default",
+                interactive=False,
+                verbosity=0,
+            )
+
+    def test_permission_rename_respects_other_db(self):
+        # Create initial content type and permissions for OldModel.
+        call_command("migrate", "auth_tests", "0001", verbosity=0)
+
+        permission = Permission.objects.using("default").get(
+            codename="add_oldmodel",
+            name="Can add old model",
+        )
+
+        # Create initial content type and permissions for OldModel.
+        call_command("migrate", "auth_tests", "0001", verbosity=0, database="other")
+        # Apply the migration that renames OldModel to NewModel.
+        call_command("migrate", "auth_tests", "0002", verbosity=0, database="other")
+
+        permission.refresh_from_db()
+        self.assertEqual(permission.codename, "add_oldmodel")
+        self.assertFalse(
+            Permission.objects.using("other").filter(codename="add_oldmodel").exists()
+        )
+        self.assertTrue(
+            Permission.objects.using("other").filter(codename="add_newmodel").exists()
         )
 
         call_command(
             "migrate",
             "auth_tests",
+            "zero",
+            database="other",
+            interactive=False,
+            verbosity=0,
+        )
+        call_command(
+            "migrate",
+            "auth_tests",
+            "zero",
             database="default",
             interactive=False,
             verbosity=0,
         )
-        self.assertTrue(
-            Permission.objects.filter(
-                codename="change_oldmodel",
-                name="Can change old model",
-            ).exists()
+
+    def test_verbosity_prints(self):
+        # Create initial content type and permissions for OldModel.
+        call_command("migrate", "auth_tests", "0001", verbosity=0)
+        # Apply the migration that renames OldModel to NewModel.
+        call_command("migrate", "auth_tests", "0002", verbosity=2, stdout=self.stdout)
+
+        command_output = self.stdout.getvalue()
+        self.assertIn(
+            "Renamed permission(s): auth_tests.add_oldmodel → add_newmodel",
+            command_output,
         )
-        self.assertEqual(
-            Permission.objects.filter(
-                codename="change_newmodel",
-                name="Can change new model",
-            ).count(),
-            1,
+        self.assertIn(
+            "Renamed permission(s): auth_tests.change_oldmodel → change_newmodel",
+            command_output,
+        )
+        self.assertIn(
+            "Renamed permission(s): auth_tests.view_oldmodel → view_newmodel",
+            command_output,
+        )
+        self.assertIn(
+            "Renamed permission(s): auth_tests.delete_oldmodel → delete_newmodel",
+            command_output,
+        )
+
+        call_command("migrate", "auth_tests", "0001", verbosity=2, stdout=self.stdout)
+
+        command_output = self.stdout.getvalue()
+        self.assertIn(
+            "Renamed permission(s): auth_tests.add_newmodel → add_oldmodel",
+            command_output,
+        )
+        self.assertIn(
+            "Renamed permission(s): auth_tests.change_newmodel → change_oldmodel",
+            command_output,
+        )
+        self.assertIn(
+            "Renamed permission(s): auth_tests.view_newmodel → view_oldmodel",
+            command_output,
+        )
+        self.assertIn(
+            "Renamed permission(s): auth_tests.delete_newmodel → delete_oldmodel",
+            command_output,
         )
 
         call_command(

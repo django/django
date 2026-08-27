@@ -1,11 +1,11 @@
 import multiprocessing
 import sys
 from io import StringIO
-from unittest import skipIf
+from unittest import mock, skipIf
 
 from django.apps import apps
 from django.core import checks
-from django.core.checks import Error, Warning
+from django.core.checks import Error, Tags, Warning
 from django.core.checks.messages import CheckMessage
 from django.core.checks.registry import CheckRegistry
 from django.core.management import call_command
@@ -91,6 +91,21 @@ class SystemCheckFrameworkTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(TypeError, msg):
             registry.run_checks()
+
+    def test_run_checks_database_exclusion(self):
+        registry = CheckRegistry()
+
+        database_errors = [checks.Warning("Database Check")]
+
+        @registry.register(Tags.database)
+        def database_system_check(**kwargs):
+            return database_errors
+
+        errors = registry.run_checks()
+        self.assertEqual(errors, [])
+
+        errors = registry.run_checks(databases=["default"])
+        self.assertEqual(errors, database_errors)
 
 
 class MessageTests(SimpleTestCase):
@@ -190,10 +205,12 @@ class CheckCommandTests(SimpleTestCase):
     def test_simple_call(self):
         call_command("check")
         self.assertEqual(
-            simple_system_check.kwargs, {"app_configs": None, "databases": None}
+            simple_system_check.kwargs,
+            {"app_configs": None, "databases": ["default", "other"]},
         )
         self.assertEqual(
-            tagged_system_check.kwargs, {"app_configs": None, "databases": None}
+            tagged_system_check.kwargs,
+            {"app_configs": None, "databases": ["default", "other"]},
         )
 
     @override_system_checks([simple_system_check, tagged_system_check])
@@ -203,11 +220,17 @@ class CheckCommandTests(SimpleTestCase):
         admin_config = apps.get_app_config("admin")
         self.assertEqual(
             simple_system_check.kwargs,
-            {"app_configs": [auth_config, admin_config], "databases": None},
+            {
+                "app_configs": [auth_config, admin_config],
+                "databases": ["default", "other"],
+            },
         )
         self.assertEqual(
             tagged_system_check.kwargs,
-            {"app_configs": [auth_config, admin_config], "databases": None},
+            {
+                "app_configs": [auth_config, admin_config],
+                "databases": ["default", "other"],
+            },
         )
 
     @override_system_checks([simple_system_check, tagged_system_check])
@@ -215,7 +238,8 @@ class CheckCommandTests(SimpleTestCase):
         call_command("check", tags=["simpletag"])
         self.assertIsNone(simple_system_check.kwargs)
         self.assertEqual(
-            tagged_system_check.kwargs, {"app_configs": None, "databases": None}
+            tagged_system_check.kwargs,
+            {"app_configs": None, "databases": ["default", "other"]},
         )
 
     @override_system_checks([simple_system_check, tagged_system_check])
@@ -267,6 +291,17 @@ class CheckCommandTests(SimpleTestCase):
     def test_fail_level(self):
         with self.assertRaises(CommandError):
             call_command("check", fail_level="WARNING")
+
+    def test_database_system_checks(self):
+        database_check = mock.Mock(return_value=[], tags=[Tags.database])
+
+        with override_system_checks([database_check]):
+            call_command("check")
+            database_check.assert_not_called()
+            call_command("check", databases=["default"])
+            database_check.assert_called_once_with(
+                app_configs=None, databases=["default"]
+            )
 
 
 def custom_error_system_check(app_configs, **kwargs):

@@ -1,8 +1,9 @@
 import asyncio
 import os
+from inspect import iscoroutinefunction
 from unittest import mock
 
-from asgiref.sync import async_to_sync, iscoroutinefunction
+from asgiref.sync import async_to_sync
 
 from django.core.cache import DEFAULT_CACHE_ALIAS, caches
 from django.core.exceptions import ImproperlyConfigured, SynchronousOnlyOperation
@@ -117,7 +118,7 @@ class ViewTests(SimpleTestCase):
                 if is_coroutine:
                     response = asyncio.run(response)
 
-                self.assertIsInstance(response, HttpResponse)
+                self.assertIs(type(response), HttpResponse)
 
     def test_http_method_not_allowed_responds_correctly(self):
         request_factory = RequestFactory()
@@ -136,7 +137,7 @@ class ViewTests(SimpleTestCase):
                 if is_coroutine:
                     response = asyncio.run(response)
 
-                self.assertIsInstance(response, HttpResponseNotAllowed)
+                self.assertIs(type(response), HttpResponseNotAllowed)
 
     def test_base_view_class_is_sync(self):
         """

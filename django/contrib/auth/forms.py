@@ -134,6 +134,9 @@ class SetPasswordMixin:
             user.save()
         return user
 
+    def __class_getitem__(cls, *args, **kwargs):
+        return cls
+
 
 class SetUnusablePasswordMixin:
     """
@@ -155,7 +158,7 @@ class SetUnusablePasswordMixin:
             required=False,
             initial="true",
             choices={"true": _("Enabled"), "false": _("Disabled")},
-            widget=forms.RadioSelect(attrs={"class": "radiolist inline"}),
+            widget=forms.RadioSelect(attrs={"class": "radiolist"}),
             help_text=help_text,
         )
 

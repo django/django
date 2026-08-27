@@ -135,7 +135,7 @@ def normalize(pattern):
                             raise ValueError(
                                 "Non-reversible reg-exp portion: '(?P%s'" % ch
                             )
-                        # We are in a named capturing group. Extra the name and
+                        # This is a named capturing group. Extract the name and
                         # then skip to the end.
                         if ch == "<":
                             terminal_char = ">"

@@ -12,10 +12,10 @@ import re
 import uuid
 from decimal import Decimal, DecimalException
 from io import BytesIO
-from urllib.parse import urlsplit, urlunsplit
 
 from django.core import validators
 from django.core.exceptions import ValidationError
+from django.db.models.utils import get_blank_choice_label
 from django.forms.boundfield import BoundField
 from django.forms.utils import from_current_timezone, to_current_timezone
 from django.forms.widgets import (
@@ -41,6 +41,7 @@ from django.forms.widgets import (
 )
 from django.utils import formats
 from django.utils.choices import normalize_choices
+from django.utils.datastructures import OrderedSet
 from django.utils.dateparse import parse_datetime, parse_duration
 from django.utils.duration import duration_string
 from django.utils.ipv6 import MAX_IPV6_ADDRESS_LENGTH, clean_ipv6_address
@@ -780,33 +781,24 @@ class URLField(CharField):
         super().__init__(strip=True, **kwargs)
 
     def to_python(self, value):
-        def split_url(url):
-            """
-            Return a list of url parts via urlsplit(), or raise
-            ValidationError for some malformed URLs.
-            """
-            try:
-                return list(urlsplit(url))
-            except ValueError:
-                # urlsplit can raise a ValueError with some
-                # misformatted URLs.
-                raise ValidationError(self.error_messages["invalid"], code="invalid")
-
         value = super().to_python(value)
         if value:
-            url_fields = split_url(value)
-            if not url_fields[0]:
-                # If no URL scheme given, add a scheme.
-                url_fields[0] = self.assume_scheme
-            if not url_fields[1]:
-                # Assume that if no domain is provided, that the path segment
-                # contains the domain.
-                url_fields[1] = url_fields[2]
-                url_fields[2] = ""
-                # Rebuild the url_fields list, since the domain segment may now
-                # contain the path too.
-                url_fields = split_url(urlunsplit(url_fields))
-            value = urlunsplit(url_fields)
+            # Detect scheme via partition to avoid calling urlsplit() on
+            # potentially large or slow-to-normalize inputs.
+            scheme, sep, _ = value.partition(":")
+            if (
+                not sep
+                or not scheme
+                or not scheme[0].isascii()
+                or not scheme[0].isalpha()
+                or "/" in scheme
+            ):
+                # No valid scheme found -- prepend the assumed scheme. Handle
+                # scheme-relative URLs ("//example.com") separately.
+                if value.startswith("//"):
+                    value = self.assume_scheme + ":" + value
+                else:
+                    value = self.assume_scheme + "://" + value
         return value
 
 
@@ -975,7 +967,8 @@ class MultipleChoiceField(ChoiceField):
         if self.required and not value:
             raise ValidationError(self.error_messages["required"], code="required")
         # Validate that each value in the value list is in self.choices.
-        for val in value:
+        # Avoid redundant validation, and keep elements ordered.
+        for val in OrderedSet(value):
             if not self.valid_value(val):
                 raise ValidationError(
                     self.error_messages["invalid_choice"],
@@ -1204,29 +1197,31 @@ class FilePathField(ChoiceField):
         self.path, self.match, self.recursive = path, match, recursive
         self.allow_files, self.allow_folders = allow_files, allow_folders
         super().__init__(choices=(), **kwargs)
+        self.set_choices()
 
+    def set_choices(self):
         if self.required:
             self.choices = []
         else:
-            self.choices = [("", "---------")]
+            self.choices = [("", get_blank_choice_label())]
 
         if self.match is not None:
             self.match_re = re.compile(self.match)
 
-        if recursive:
+        if self.recursive:
             for root, dirs, files in sorted(os.walk(self.path)):
                 if self.allow_files:
                     for f in sorted(files):
                         if self.match is None or self.match_re.search(f):
                             f = os.path.join(root, f)
-                            self.choices.append((f, f.replace(path, "", 1)))
+                            self.choices.append((f, f.replace(self.path, "", 1)))
                 if self.allow_folders:
                     for f in sorted(dirs):
                         if f == "__pycache__":
                             continue
                         if self.match is None or self.match_re.search(f):
                             f = os.path.join(root, f)
-                            self.choices.append((f, f.replace(path, "", 1)))
+                            self.choices.append((f, f.replace(self.path, "", 1)))
         else:
             choices = []
             with os.scandir(self.path) as entries:
@@ -1395,6 +1390,8 @@ class JSONField(CharField):
         return json.dumps(value, ensure_ascii=False, cls=self.encoder)
 
     def has_changed(self, initial, data):
+        if self.disabled:
+            return False
         if super().has_changed(initial, data):
             return True
         # For purposes of seeing whether something has changed, True isn't the

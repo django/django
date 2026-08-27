@@ -3,15 +3,16 @@
 # Translators:
 # aljosa <aljosa.mohorovic@gmail.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Milo Ivir <mail@milotype.de>, 2025
 # Mislav Cimperšak <mislav.cimpersak@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Mislav Cimperšak <mislav.cimpersak@gmail.com>\n"
-"Language-Team: Croatian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2025-12-03 19:03+0000\n"
+"Last-Translator: Milo Ivir <mail@milotype.de>, 2025\n"
+"Language-Team: Croatian (http://app.transifex.com/django/django/language/"
 "hr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,16 +25,16 @@ msgid "Advanced options"
 msgstr "Napredne opcije"
 
 msgid "Flat Pages"
-msgstr "Statične stranice"
+msgstr "Statične „flat” stranice"
 
 msgid "URL"
 msgstr "URL"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
-"Primjer: '/about/contact/'. Provjerite ako imate prvi i preostale slash-eve "
-"(/)."
+"Primjer: „/about/contact/“. Obavezno koristite kosu crtu na početku i na "
+"kraju."
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
@@ -42,15 +43,20 @@ msgstr ""
 "Ova vrijednost može sadržavati samo slova, brojeve, točke, podvlake, crtice, "
 "kose crte ili tilde."
 
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr "Primjer: „/about/contact“. Obavezno koristite kosu crtu na početku."
+
 msgid "URL is missing a leading slash."
-msgstr "URL-u nedostaje početni /."
+msgstr "URL-u nedostaje kosa crta na početku."
 
 msgid "URL is missing a trailing slash."
-msgstr "URL-u nedostaje / na kraju."
+msgstr "URL-u nedostaje kosa crta na kraju."
 
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
-msgstr "Stranica sa URL-om %(url)s već postoji za web %(site)s"
+msgstr ""
+"Statična stranica iz baze podataka s URL-om %(url)s već postoji za web-"
+"stranicu %(site)s"
 
 msgid "title"
 msgstr "naslov"
@@ -62,27 +68,26 @@ msgid "enable comments"
 msgstr "uključi komentare"
 
 msgid "template name"
-msgstr "ime template-a"
+msgstr "ime predloška"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
-"Primjer: 'flatpages/contact_page.html'. Ako navedeno nije definirano sistem "
-"će koristiti 'flatpages/default.html'."
+"Primjer: „flatpages/contact_page.html“. Ako ovo nije navedeno, sustav će "
+"koristiti „flatpages/default.html“."
 
 msgid "registration required"
-msgstr "registracija obavezna"
+msgstr "zahtijeva registraciju"
 
 msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-"Ako je ovo selektirano samo logirani korisnici moći će vidjeti ovu stranicu."
+msgstr "Ako je ovo odabrano, stranicu će vidjeti samo prijavljeni korisnici."
 
 msgid "sites"
-msgstr "stranice"
+msgstr "web-stranice"
 
 msgid "flat page"
-msgstr "statična stranica"
+msgstr "statična „flat” stranica"
 
 msgid "flat pages"
-msgstr "statične stranice"
+msgstr "statične „flat” stranice"

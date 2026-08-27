@@ -11,6 +11,7 @@ from contextlib import contextmanager
 from copy import copy, deepcopy
 from difflib import get_close_matches
 from functools import wraps
+from inspect import iscoroutinefunction
 from unittest import mock
 from unittest.suite import _DebugResult
 from unittest.util import safe_repr
@@ -25,7 +26,7 @@ from urllib.parse import (
 )
 from urllib.request import url2pathname
 
-from asgiref.sync import async_to_sync, iscoroutinefunction
+from asgiref.sync import async_to_sync
 
 from django.apps import apps
 from django.conf import settings
@@ -43,6 +44,7 @@ from django.db.backends.base.base import NO_DB_ALIAS, BaseDatabaseWrapper
 from django.forms.fields import CharField
 from django.http import QueryDict
 from django.http.request import split_domain_port, validate_host
+from django.template.base import PartialTemplate
 from django.test.client import AsyncClient, Client
 from django.test.html import HTMLParseError, parse_html
 from django.test.signals import template_rendered
@@ -138,10 +140,22 @@ class _AssertTemplateUsedContext:
         self.rendered_templates.append(template)
         self.context.append(copy(context))
 
+    @property
+    def rendered_template_names(self):
+        return [
+            (
+                f"{t.origin.template_name}#{t.name}"
+                if isinstance(t, PartialTemplate)
+                else t.name
+            )
+            for t in self.rendered_templates
+            if t.name is not None
+        ]
+
     def test(self):
         self.test_case._assert_template_used(
             self.template_name,
-            [t.name for t in self.rendered_templates if t.name is not None],
+            self.rendered_template_names,
             self.msg_prefix,
             self.count,
         )
@@ -159,11 +173,8 @@ class _AssertTemplateUsedContext:
 
 class _AssertTemplateNotUsedContext(_AssertTemplateUsedContext):
     def test(self):
-        rendered_template_names = [
-            t.name for t in self.rendered_templates if t.name is not None
-        ]
         self.test_case.assertFalse(
-            self.template_name in rendered_template_names,
+            self.template_name in self.rendered_template_names,
             f"{self.msg_prefix}Template '{self.template_name}' was used "
             f"unexpectedly in rendering the response",
         )
@@ -178,7 +189,7 @@ class _DatabaseFailure:
         self.wrapped = wrapped
         self.message = message
 
-    def __call__(self):
+    def __call__(self, *args, **kwargs):
         raise DatabaseOperationForbidden(self.message)
 
 
@@ -198,12 +209,6 @@ class SimpleTestCase(unittest.TestCase):
         "proper test isolation or add %(alias)r to %(test)s.databases to silence "
         "this failure."
     )
-    _disallowed_connection_methods = [
-        ("connect", "connections"),
-        ("temporary_connection", "connections"),
-        ("cursor", "queries"),
-        ("chunked_cursor", "queries"),
-    ]
 
     @classmethod
     def setUpClass(cls):
@@ -243,7 +248,10 @@ class SimpleTestCase(unittest.TestCase):
             if alias in cls.databases:
                 continue
             connection = connections[alias]
-            for name, operation in cls._disallowed_connection_methods:
+            disallowed_methods = (
+                connection.features.disallowed_simple_test_case_connection_methods
+            )
+            for name, operation in disallowed_methods:
                 message = cls._disallowed_database_msg % {
                     "test": "%s.%s" % (cls.__module__, cls.__qualname__),
                     "alias": alias,
@@ -265,7 +273,10 @@ class SimpleTestCase(unittest.TestCase):
             if alias in cls.databases:
                 continue
             connection = connections[alias]
-            for name, _ in cls._disallowed_connection_methods:
+            disallowed_methods = (
+                connection.features.disallowed_simple_test_case_connection_methods
+            )
+            for name, _ in disallowed_methods:
                 method = getattr(connection, name)
                 setattr(connection, name, method.wrapped)
 
@@ -564,6 +575,8 @@ class SimpleTestCase(unittest.TestCase):
 
         if response.streaming:
             content = b"".join(response.streaming_content)
+            # Reset the content so it can be checked again (idempotency).
+            response.streaming_content = [content]
         else:
             content = response.content
         response_content = content
@@ -1513,11 +1526,11 @@ class TestCase(TransactionTestCase):
                             try:
                                 callback()
                             except Exception as e:
-                                logger.error(
-                                    f"Error calling {callback.__qualname__} in "
-                                    f"on_commit() (%s).",
+                                name = getattr(callback, "__qualname__", callback)
+                                logger.exception(
+                                    "Error calling %s in on_commit() (%s).",
+                                    name,
                                     e,
-                                    exc_info=True,
                                 )
                         else:
                             callback()
@@ -1770,11 +1783,12 @@ class LiveServerThread(threading.Thread):
         )
 
     def terminate(self):
-        if hasattr(self, "httpd"):
-            # Stop the WSGI server
-            self.httpd.shutdown()
-            self.httpd.server_close()
-        self.join()
+        if self.is_ready.is_set():
+            if hasattr(self, "httpd"):
+                # Stop the WSGI server
+                self.httpd.shutdown()
+                self.httpd.server_close()
+            self.join()
 
 
 class LiveServerTestCase(TransactionTestCase):

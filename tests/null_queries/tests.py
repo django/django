@@ -1,5 +1,5 @@
 from django.core.exceptions import FieldError
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 
 from .models import Choice, Inner, OuterA, OuterB, Poll
 
@@ -43,6 +43,18 @@ class NullQueriesTests(TestCase):
         # Can't use None on anything other than __exact and __iexact
         with self.assertRaisesMessage(ValueError, "Cannot use None as a query value"):
             Choice.objects.filter(id__gt=None)
+
+    @skipUnlessDBFeature("interprets_empty_strings_as_nulls")
+    def test_empty_string_is_null(self):
+        p = Poll.objects.create(question="?")
+        c1 = Choice.objects.create(poll=p, choice=None)
+        c2 = Choice.objects.create(poll=p, choice="")
+        cases = [{"choice__exact": ""}, {"choice__iexact": ""}]
+        for lookup in cases:
+            with self.subTest(lookup):
+                self.assertSequenceEqual(
+                    Choice.objects.filter(**lookup).order_by("id"), [c1, c2]
+                )
 
     def test_unsaved(self):
         poll = Poll(question="How?")

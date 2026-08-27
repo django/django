@@ -8,12 +8,12 @@ class GEOSContextHandle(GEOSBase):
     """Represent a GEOS context handle."""
 
     ptr_type = CONTEXT_PTR
-    destructor = lgeos.finishGEOS_r
+    destructor = lgeos.GEOS_finish_r
 
     def __init__(self):
-        # Initializing the context handler for this thread with
-        # the notice and error handler.
-        self.ptr = lgeos.initGEOS_r(notice_h, error_h)
+        self.ptr = lgeos.GEOS_init_r()
+        lgeos.GEOSContext_setNoticeHandler_r(self.ptr, notice_h)
+        lgeos.GEOSContext_setErrorHandler_r(self.ptr, error_h)
 
 
 # Defining a thread-local object and creating an instance

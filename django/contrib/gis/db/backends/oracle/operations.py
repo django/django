@@ -132,6 +132,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
             "LineLocatePoint",
             "MakeValid",
             "MemSize",
+            "NumDimensions",
             "Rotate",
             "Scale",
             "SnapToGrid",
@@ -203,10 +204,10 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
         return [dist_param]
 
-    def get_geom_placeholder(self, f, value, compiler):
+    def get_geom_placeholder_sql(self, f, value, compiler):
         if value is None:
-            return "NULL"
-        return super().get_geom_placeholder(f, value, compiler)
+            return "NULL", ()
+        return super().get_geom_placeholder_sql(f, value, compiler)
 
     def spatial_aggregate_name(self, agg_name):
         """
@@ -243,7 +244,10 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
         def converter(value, expression, connection):
             if value is not None:
-                geom = GEOSGeometryBase(read(memoryview(value.read())), geom_class)
+                geom = GEOSGeometryBase(
+                    read(memoryview(value.read()), max_geom_collections=None),
+                    geom_class,
+                )
                 if srid:
                     geom.srid = srid
                 return geom

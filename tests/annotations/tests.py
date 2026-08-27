@@ -1,5 +1,6 @@
 import datetime
 from decimal import Decimal
+from itertools import chain
 from unittest import skipUnless
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
@@ -482,6 +483,17 @@ class NonAggregateAnnotationTestCase(TestCase):
         with self.assertRaisesMessage(FieldError, expected_message % article_fields):
             Book.objects.annotate(annotation=Value(1)).values_list("annotation_typo")
 
+    def test_chained_values_masked_annotation_error_message(self):
+        msg = (
+            "Cannot select the 'author_id' alias. It was excluded by a "
+            "previous values() or values_list() call. Include 'author_id' in "
+            "that call to select it."
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Book.objects.annotate(
+                author_name=F("authors__name"), author_id=F("authors__id")
+            ).values("author_name").values("author_id")
+
     def test_decimal_annotation(self):
         salary = Decimal(10) ** -Employee._meta.get_field("salary").decimal_places
         Employee.objects.create(
@@ -730,8 +742,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         4. model_related_fields
         """
         store = Store.objects.first()
-        Employee.objects.create(
-            id=1,
+        e1 = Employee.objects.create(
             first_name="Max",
             manager=True,
             last_name="Paine",
@@ -739,8 +750,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             age=23,
             salary=Decimal(50000.00),
         )
-        Employee.objects.create(
-            id=2,
+        e2 = Employee.objects.create(
             first_name="Buffy",
             manager=False,
             last_name="Summers",
@@ -758,8 +768,18 @@ class NonAggregateAnnotationTestCase(TestCase):
         )
 
         rows = [
-            (1, "Max", True, 42, "Paine", 23, Decimal(50000.00), store.name, 17),
-            (2, "Buffy", False, 42, "Summers", 18, Decimal(40000.00), store.name, 17),
+            (e1.pk, "Max", True, 42, "Paine", 23, Decimal(50000.00), store.name, 17),
+            (
+                e2.pk,
+                "Buffy",
+                False,
+                42,
+                "Summers",
+                18,
+                Decimal(40000.00),
+                store.name,
+                17,
+            ),
         ]
 
         self.assertQuerySetEqual(
@@ -780,8 +800,7 @@ class NonAggregateAnnotationTestCase(TestCase):
 
     def test_column_field_ordering_with_deferred(self):
         store = Store.objects.first()
-        Employee.objects.create(
-            id=1,
+        e1 = Employee.objects.create(
             first_name="Max",
             manager=True,
             last_name="Paine",
@@ -789,8 +808,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             age=23,
             salary=Decimal(50000.00),
         )
-        Employee.objects.create(
-            id=2,
+        e2 = Employee.objects.create(
             first_name="Buffy",
             manager=False,
             last_name="Summers",
@@ -808,8 +826,18 @@ class NonAggregateAnnotationTestCase(TestCase):
         )
 
         rows = [
-            (1, "Max", True, 42, "Paine", 23, Decimal(50000.00), store.name, 17),
-            (2, "Buffy", False, 42, "Summers", 18, Decimal(40000.00), store.name, 17),
+            (e1.pk, "Max", True, 42, "Paine", 23, Decimal(50000.00), store.name, 17),
+            (
+                e2.pk,
+                "Buffy",
+                False,
+                42,
+                "Summers",
+                18,
+                Decimal(40000.00),
+                store.name,
+                17,
+            ),
         ]
 
         # and we respect deferred columns!
@@ -1158,32 +1186,42 @@ class NonAggregateAnnotationTestCase(TestCase):
         )
 
     def test_alias_sql_injection(self):
-        crafted_alias = """injected_name" from "annotations_book"; --"""
         # RemovedInDjango70Warning: When the deprecation ends, replace with:
         # msg = (
-        #    "Column aliases cannot contain whitespace characters, quotation "
-        #    "marks, semicolons, percent signs, or SQL comments."
+        #    "Column aliases cannot contain whitespace characters, hashes, "
+        #    "quotation marks, semicolons, percent signs, or SQL comments."
         # )
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, "
+            "control characters, quotation marks, semicolons, or SQL comments."
         )
-        with self.assertRaisesMessage(ValueError, msg):
-            Book.objects.annotate(**{crafted_alias: Value(1)})
+        for crafted_alias in [
+            """injected_name" from "annotations_book"; --""",
+            # Control characters.
+            *(f"name{chr(c)}" for c in chain(range(32), range(0x7F, 0xA0))),
+        ]:
+            with self.subTest(crafted_alias):
+                with self.assertRaisesMessage(ValueError, msg):
+                    Book.objects.annotate(**{crafted_alias: Value(1)})
 
     def test_alias_filtered_relation_sql_injection(self):
-        crafted_alias = """injected_name" from "annotations_book"; --"""
         # RemovedInDjango70Warning: When the deprecation ends, replace with:
         # msg = (
-        #    "Column aliases cannot contain whitespace characters, quotation "
-        #    "marks, semicolons, percent signs, or SQL comments."
+        #    "Column aliases cannot contain whitespace characters, hashes, "
+        #    "quotation marks, semicolons, percent signs, or SQL comments."
         # )
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, "
+            "control characters, quotation marks, semicolons, or SQL comments."
         )
-        with self.assertRaisesMessage(ValueError, msg):
-            Book.objects.annotate(**{crafted_alias: FilteredRelation("author")})
+        for crafted_alias in [
+            """injected_name" from "annotations_book"; --""",
+            # Control characters.
+            *(f"name{chr(c)}" for c in chain(range(32), range(0x7F, 0xA0))),
+        ]:
+            with self.subTest(crafted_alias):
+                with self.assertRaisesMessage(ValueError, msg):
+                    Book.objects.annotate(**{crafted_alias: FilteredRelation("author")})
 
     def test_alias_forbidden_chars(self):
         tests = [
@@ -1199,18 +1237,20 @@ class NonAggregateAnnotationTestCase(TestCase):
             "alias;",
             # RemovedInDjango70Warning: When the deprecation ends, add this:
             # "alias%",
-            # [] are used by MSSQL.
+            # [] and # are used by MSSQL.
             "alias[",
             "alias]",
+            "ali#as",
+            "ali\0as",
         ]
         # RemovedInDjango70Warning: When the deprecation ends, replace with:
         # msg = (
-        #    "Column aliases cannot contain whitespace characters, quotation "
-        #    "marks, semicolons, percent signs, or SQL comments."
+        #    "Column aliases cannot contain whitespace characters, hashes, "
+        #    "quotation marks, semicolons, percent signs, or SQL comments."
         # )
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, "
+            "control characters, quotation marks, semicolons, or SQL comments."
         )
         for crafted_alias in tests:
             with self.subTest(crafted_alias):
@@ -1441,6 +1481,12 @@ class AliasTests(TestCase):
         self.assertIs(hasattr(qs.first(), "other_age"), False)
         self.assertQuerySetEqual(qs, [34, 34, 35, 46, 57], lambda a: a.age)
 
+    def test_order_by_alias_transform(self):
+        qs = Book.objects.alias(other_pubdate=F("pubdate")).order_by(
+            "-other_pubdate__year"
+        )
+        self.assertQuerySetEqual(qs, [2008, 2007, 1995, 1991], lambda a: a.pubdate.year)
+
     def test_order_by_alias_aggregate(self):
         qs = (
             Author.objects.values("age")
@@ -1496,9 +1542,9 @@ class AliasTests(TestCase):
     @skipUnlessDBFeature("can_distinct_on_fields")
     def test_distinct_on_alias(self):
         qs = Book.objects.alias(rating_alias=F("rating") - 1)
-        msg = "Cannot resolve keyword 'rating_alias' into field."
+        msg = "Cannot select the 'rating_alias' alias. Use annotate() to promote it."
         with self.assertRaisesMessage(FieldError, msg):
-            qs.distinct("rating_alias").first()
+            qs.distinct("rating_alias").order_by("rating_alias").first()
 
     def test_values_alias(self):
         qs = Book.objects.alias(rating_alias=F("rating") - 1)
@@ -1513,29 +1559,49 @@ class AliasTests(TestCase):
         self.assertEqual(qs.get(pk=self.b1.pk), (self.b1.pk,))
 
     def test_alias_sql_injection(self):
-        crafted_alias = """injected_name" from "annotations_book"; --"""
         # RemovedInDjango70Warning: When the deprecation ends, replace with:
         # msg = (
-        #    "Column aliases cannot contain whitespace characters, quotation "
-        #    "marks, semicolons, percent signs, or SQL comments."
+        #    "Column aliases cannot contain whitespace characters, hashes, "
+        #    "quotation marks, semicolons, percent signs, or SQL comments."
         # )
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, "
+            "control characters, quotation marks, semicolons, or SQL comments."
         )
-        with self.assertRaisesMessage(ValueError, msg):
-            Book.objects.alias(**{crafted_alias: Value(1)})
+        for crafted_alias in [
+            """injected_name" from "annotations_book"; --""",
+            # Control characters.
+            *(f"name{chr(c)}" for c in chain(range(32), range(0x7F, 0xA0))),
+        ]:
+            with self.subTest(crafted_alias):
+                with self.assertRaisesMessage(ValueError, msg):
+                    Book.objects.alias(**{crafted_alias: Value(1)})
 
     def test_alias_filtered_relation_sql_injection(self):
-        crafted_alias = """injected_name" from "annotations_book"; --"""
         # RemovedInDjango70Warning: When the deprecation ends, replace with:
         # msg = (
-        #    "Column aliases cannot contain whitespace characters, quotation "
-        #    "marks, semicolons, percent signs, or SQL comments."
+        #    "Column aliases cannot contain whitespace characters, hashes, "
+        #    "quotation marks, semicolons, percent signs, or SQL comments."
         # )
         msg = (
-            "Column aliases cannot contain whitespace characters, quotation marks, "
-            "semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, "
+            "control characters, quotation marks, semicolons, or SQL comments."
         )
-        with self.assertRaisesMessage(ValueError, msg):
-            Book.objects.alias(**{crafted_alias: FilteredRelation("authors")})
+        for crafted_alias in [
+            """injected_name" from "annotations_book"; --""",
+            # Control characters.
+            *(f"name{chr(c)}" for c in chain(range(32), range(0x7F, 0xA0))),
+        ]:
+            with self.subTest(crafted_alias):
+                with self.assertRaisesMessage(ValueError, msg):
+                    Book.objects.alias(**{crafted_alias: FilteredRelation("authors")})
+
+    def test_values_wrong_alias(self):
+        expected_message = (
+            "Cannot resolve keyword 'alias_typo' into field. Choices are: %s"
+        )
+        alias_fields = ", ".join(
+            sorted(["my_alias"] + list(get_field_names_from_opts(Book._meta)))
+        )
+        with self.assertRaisesMessage(FieldError, expected_message % alias_fields):
+            Book.objects.alias(my_alias=F("pk")).order_by("alias_typo")

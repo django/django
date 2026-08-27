@@ -170,6 +170,18 @@ Here's the formal declaration of a ``QuerySet``:
         :meth:`order_by` clause or a default ordering on the model.
         ``False`` otherwise.
 
+    .. attribute:: totally_ordered
+
+        .. versionadded:: 6.1
+
+        Returns ``True`` if the ``QuerySet`` is ordered and the ordering is
+        deterministic. This requires that the ordering includes a field
+        (or set of fields) that is unique and non-nullable.
+
+        For queries involving a ``GROUP BY`` clause, the model's default
+        ordering is ignored. Ordering specified via ``.extra(order_by=...)``
+        is also ignored.
+
     .. attribute:: db
 
         The database that will be used if this query is executed now.
@@ -209,7 +221,7 @@ The lookup parameters (``**kwargs``) should be in the format described in
 underlying SQL statement.
 
 If you need to execute more complex queries (for example, queries with ``OR``
-statements), you can use :class:`Q objects <django.db.models.Q>` (``*args``).
+statements), you can use :ref:`q-objects` (``*args``).
 
 ``exclude()``
 ~~~~~~~~~~~~~
@@ -259,8 +271,8 @@ statements), you can use :class:`Q objects <django.db.models.Q>` (``*args``).
 .. method:: annotate(*args, **kwargs)
 
 Annotates each object in the ``QuerySet`` with the provided list of :doc:`query
-expressions </ref/models/expressions>` or :class:`~django.db.models.Q` objects.
-Each object can be annotated with:
+expressions </ref/models/expressions>` or :ref:`q-objects`. Each object can be
+annotated with:
 
 * a simple value,  via ``Value()``;
 * a reference to a field on the model (or any related models), via ``F()``;
@@ -330,9 +342,9 @@ interested in the exact number of entries, you could do this:
     >>> blogs = Blog.objects.alias(entries=Count("entry")).filter(entries__gt=5)
 
 ``alias()`` can be used in conjunction with :meth:`annotate`, :meth:`exclude`,
-:meth:`filter`, :meth:`order_by`, and :meth:`update`. To use aliased expression
-with other methods (e.g. :meth:`aggregate`), you must promote it to an
-annotation::
+:meth:`filter`, :meth:`order_by`, and :meth:`update`. To use an aliased
+expression with other methods (e.g. :meth:`aggregate`), you must promote it to
+an annotation::
 
     Blog.objects.alias(entries=Count("entry")).annotate(
         entries=F("entries"),
@@ -341,9 +353,9 @@ annotation::
 :meth:`filter` and :meth:`order_by` can take expressions directly, but
 expression construction and usage often does not happen in the same place (for
 example, ``QuerySet`` method creates expressions, for later use in views).
-``alias()`` allows building complex expressions incrementally, possibly
-spanning multiple methods and modules, refer to the expression parts by their
-aliases and only use :meth:`annotate` for the final result.
+``alias()`` allows building complex expressions incrementally (possibly
+spanning multiple methods and modules), referring to the expression parts by
+their aliases, and only using :meth:`annotate` for the final result.
 
 ``order_by()``
 ~~~~~~~~~~~~~~
@@ -549,22 +561,17 @@ Examples (those after the first will only work on PostgreSQL):
 .. code-block:: pycon
 
     >>> Author.objects.distinct()
-    [...]
-
+    <QuerySet [...]>
     >>> Entry.objects.order_by("pub_date").distinct("pub_date")
-    [...]
-
+    <QuerySet [...]>
     >>> Entry.objects.order_by("blog").distinct("blog")
-    [...]
-
+    <QuerySet [...]>
     >>> Entry.objects.order_by("author", "pub_date").distinct("author", "pub_date")
-    [...]
-
+    <QuerySet [...]>
     >>> Entry.objects.order_by("blog__name", "mod_date").distinct("blog__name", "mod_date")
-    [...]
-
+    <QuerySet [...]>
     >>> Entry.objects.order_by("author", "pub_date").distinct("author")
-    [...]
+    <QuerySet [...]>
 
 .. note::
     Keep in mind that :meth:`order_by` uses any default related model ordering
@@ -750,11 +757,6 @@ You can also refer to fields on related models with reverse relations through
     ``"true"``, ``"false"``, and ``"null"`` strings for
     :class:`~django.db.models.JSONField` key transforms.
 
-.. versionchanged:: 5.2
-
-    The ``SELECT`` clause generated when using ``values()`` was updated to
-    respect the order of the specified ``*fields`` and ``**expressions``.
-
 ``values_list()``
 ~~~~~~~~~~~~~~~~~
 
@@ -844,11 +846,6 @@ not having any author:
     ``values_list()`` will return ``True``, ``False``, and ``None`` instead of
     ``"true"``, ``"false"``, and ``"null"`` strings for
     :class:`~django.db.models.JSONField` key transforms.
-
-.. versionchanged:: 5.2
-
-    The ``SELECT`` clause generated when using ``values_list()`` was updated to
-    respect the order of the specified ``*fields``.
 
 ``dates()``
 ~~~~~~~~~~~
@@ -1032,15 +1029,38 @@ Uses SQL's ``EXCEPT`` operator to keep only elements present in the
 
 See :meth:`union` for some restrictions.
 
+``fetch_mode()``
+~~~~~~~~~~~~~~~~
+
+.. versionadded:: 6.1
+
+.. method:: fetch_mode(mode)
+
+Returns a ``QuerySet`` that sets the given fetch mode for all model instances
+created by this ``QuerySet``. The fetch mode controls on-demand loading of
+fields when they are accessed, such as for foreign keys and deferred fields.
+For example, to use the :attr:`~django.db.models.FETCH_PEERS` mode to
+batch-load all related objects on first access:
+
+.. code-block:: python
+
+    from django.db import models
+
+    books = Book.objects.fetch_mode(models.FETCH_PEERS)
+
+See more in the :doc:`fetch mode topic guide </topics/db/fetch-modes>`.
+
 ``select_related()``
 ~~~~~~~~~~~~~~~~~~~~
 
 .. method:: select_related(*fields)
 
-Returns a ``QuerySet`` that will "follow" foreign-key relationships, selecting
-additional related-object data when it executes its query. This is a
-performance booster which results in a single more complex query but means
-later use of foreign-key relationships won't require database queries.
+Returns a ``QuerySet`` that will join in the named foreign-key relationships,
+selecting additional related objects when it executes its query. This method
+can be a performance booster, fetching data ahead of time rather than
+triggering on-demand loading through the model instances'
+:doc:`fetch mode </topics/db/fetch-modes>`, at the cost of a more complex
+initial query.
 
 The following examples illustrate the difference between plain lookups and
 ``select_related()`` lookups. Here's standard lookup::
@@ -1060,20 +1080,8 @@ And here's ``select_related`` lookup::
     # in the previous query.
     b = e.blog
 
-You can use ``select_related()`` with any queryset of objects::
-
-    from django.utils import timezone
-
-    # Find all the blogs with entries scheduled to be published in the future.
-    blogs = set()
-
-    for e in Entry.objects.filter(pub_date__gt=timezone.now()).select_related("blog"):
-        # Without select_related(), this would make a database query for each
-        # loop iteration in order to fetch the related blog for each entry.
-        blogs.add(e.blog)
-
-The order of ``filter()`` and ``select_related()`` chaining isn't important.
-These querysets are equivalent::
+You can use ``select_related()`` with any queryset. The order of chaining with
+other methods isn't important. For example, these querysets are equivalent::
 
     Entry.objects.filter(pub_date__gt=timezone.now()).select_related("blog")
     Entry.objects.select_related("blog").filter(pub_date__gt=timezone.now())
@@ -1128,13 +1136,6 @@ is defined. Instead of specifying the field name, use the :attr:`related_name
 <django.db.models.ForeignKey.related_name>` for the field on the related
 object.
 
-There may be some situations where you wish to call ``select_related()`` with a
-lot of related objects, or where you don't know all of the relations. In these
-cases it is possible to call ``select_related()`` with no arguments. This will
-follow all non-null foreign keys it can find - nullable foreign keys must be
-specified. This is not recommended in most cases as it is likely to make the
-underlying query more complex, and return more data, than is actually needed.
-
 If you need to clear the list of related fields added by past calls of
 ``select_related`` on a ``QuerySet``, you can pass ``None`` as a parameter:
 
@@ -1146,17 +1147,32 @@ Chaining ``select_related`` calls works in a similar way to other methods -
 that is that ``select_related('foo', 'bar')`` is equivalent to
 ``select_related('foo').select_related('bar')``.
 
+There may be some situations where you wish to call ``select_related()`` with a
+lot of related objects, or where you don't know all of the relations. In these
+cases it is possible to call ``select_related()`` with no arguments. This will
+follow all non-null foreign keys it can find - nullable foreign keys must be
+specified. This is not recommended in most cases as it is likely to make the
+underlying query more complex, and return more data, than is actually needed.
+
+.. deprecated:: 6.1
+
+    Calling ``select_related()`` with no arguments is deprecated, and support
+    for it will be removed in Django 7.0. Specify the fields to fetch instead.
+
 ``prefetch_related()``
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. method:: prefetch_related(*lookups)
 
-Returns a ``QuerySet`` that will automatically retrieve, in a single batch,
-related objects for each of the specified lookups.
+Returns a ``QuerySet`` that will automatically retrieve the given lookups, each
+in one extra batch query. Prefetching is a way to optimize database access
+when you know you'll be accessing related objects later, so you can avoid
+triggering the on-demand loading behavior of the model instances'
+:doc:`fetch mode </topics/db/fetch-modes>`.
 
-This has a similar purpose to ``select_related``, in that both are designed to
-stop the deluge of database queries that is caused by accessing related
-objects, but the strategy is quite different.
+This method has a similar purpose to :meth:`select_related`, in that both are
+designed to eagerly fetch related objects. However, they work in different
+ways.
 
 ``select_related`` works by creating an SQL join and including the fields of
 the related object in the ``SELECT`` statement. For this reason,
@@ -1200,7 +1216,7 @@ and run:
 .. code-block:: pycon
 
     >>> Pizza.objects.all()
-    ["Hawaiian (ham, pineapple)", "Seafood (prawns, smoked salmon)"...
+    <QuerySet [<Pizza: Hawaiian (ham, pineapple)>, <Pizza: Seafood (prawns, smoked salmon)>, ...]>
 
 The problem with this is that every time ``Pizza.__str__()`` asks for
 ``self.toppings.all()`` it has to query the database, so
@@ -1272,9 +1288,9 @@ database.
     :meth:`~django.db.models.fields.related.RelatedManager.create`,
     :meth:`~django.db.models.fields.related.RelatedManager.remove`,
     :meth:`~django.db.models.fields.related.RelatedManager.clear` or
-    :meth:`~django.db.models.fields.related.RelatedManager.set`, on
-    :class:`related managers<django.db.models.fields.related.RelatedManager>`,
-    any prefetched cache for the relation will be cleared.
+    :meth:`~django.db.models.fields.related.RelatedManager.set`, on a
+    :class:`~django.db.models.fields.related.RelatedManager`, any prefetched
+    cache for the relation will be cleared.
 
 You can also use the normal join syntax to do related fields of related
 fields. Suppose we have an additional model to the example above::
@@ -1429,8 +1445,8 @@ where prefetching with a custom ``QuerySet`` is useful:
 
 * You want to prefetch only a subset of the related objects.
 
-* You want to use performance optimization techniques like
-  :meth:`deferred fields <defer()>`:
+* You want to use performance optimization techniques like deferring fields,
+  for example, via :meth:`defer` or :meth:`only`:
 
   .. code-block:: pycon
 
@@ -1793,11 +1809,10 @@ will always be fetched into the resulting queryset.
     normalize your models and put the non-loaded data into a separate model
     (and database table). If the columns *must* stay in the one table for some
     reason, create a model with ``Meta.managed = False`` (see the
-    :attr:`managed attribute <django.db.models.Options.managed>` documentation)
-    containing just the fields you normally need to load and use that where you
-    might otherwise call ``defer()``. This makes your code more explicit to the
-    reader, is slightly faster and consumes a little less memory in the Python
-    process.
+    :attr:`~django.db.models.Options.managed` documentation) containing just
+    the fields you normally need to load and use that where you might otherwise
+    call ``defer()``. This makes your code more explicit to the reader, is
+    slightly faster and consumes a little less memory in the Python process.
 
     For example, both of these models use the same underlying database table::
 
@@ -1987,13 +2002,12 @@ them:
 .. code-block:: pycon
 
     >>> Person.objects.select_related("hometown").select_for_update().exclude(hometown=None)
-    <QuerySet [<Person: ...)>, ...]>
+    <QuerySet [<Person: ...>, ...]>
 
 The ``postgresql``, ``oracle``, and ``mysql`` database backends support
-``select_for_update()``. However, MariaDB only supports the ``nowait``
-argument, MariaDB 10.6+ also supports the ``skip_locked`` argument, and MySQL
-supports the ``nowait``, ``skip_locked``, and ``of`` arguments. The ``no_key``
-argument is only supported on PostgreSQL.
+``select_for_update()``. However, MariaDB only supports the ``nowait`` and
+``skip_locked`` arguments, and MySQL supports the ``nowait``, ``skip_locked``,
+and ``of`` arguments. The ``no_key`` argument is only supported on PostgreSQL.
 
 Passing ``nowait=True``, ``skip_locked=True``, ``no_key=True``, or ``of`` to
 ``select_for_update()`` using database backends that do not support these
@@ -2262,9 +2276,9 @@ found, ``get_or_create()`` returns a tuple of that object and ``False``.
     inserted.
 
 You can specify more complex conditions for the retrieved object by chaining
-``get_or_create()`` with ``filter()`` and using :class:`Q objects
-<django.db.models.Q>`. For example, to retrieve Robert or Bob Marley if either
-exists, and create the latter otherwise::
+``get_or_create()`` with ``filter()`` and using :ref:`q-objects`. For example,
+to retrieve Robert or Bob Marley if either exists, and create the latter
+otherwise::
 
     from django.db.models import Q
 
@@ -2429,14 +2443,15 @@ are), and returns created objects as a list, in the same order as provided:
 
 This has a number of caveats though:
 
-* The model's ``save()`` method will not be called, and the ``pre_save`` and
+* The model's ``save()`` method :ref:`will not be called
+  <methods-not-called-on-bulk-operations>`, and the ``pre_save`` and
   ``post_save`` signals will not be sent.
 * It does not work with child models in a multi-table inheritance scenario.
 * If the model's primary key is an :class:`~django.db.models.AutoField` or has
   a :attr:`~django.db.models.Field.db_default` value, and ``ignore_conflicts``
   is ``False``, the primary key attribute can only be retrieved on certain
-  databases (currently PostgreSQL, MariaDB, and SQLite 3.35+). On other
-  databases, it will not be set.
+  databases (currently PostgreSQL, MariaDB, and SQLite). On other databases, it
+  will not be set.
 * It does not work with many-to-many relationships.
 * It casts ``objs`` to a list, which fully evaluates ``objs`` if it's a
   generator. The cast allows inspecting all objects so that any objects with a
@@ -2455,8 +2470,8 @@ This has a number of caveats though:
         Entry.objects.bulk_create(batch, batch_size)
 
 The ``batch_size`` parameter controls how many objects are created in a single
-query. The default is to create all objects in one batch, except for SQLite
-where the default is such that at most 999 variables per query are used.
+query. The default is to create as many objects in one batch as the database
+will allow. (SQLite and Oracle limit the number of parameters in a query.)
 
 On databases that support it (all but Oracle), setting the ``ignore_conflicts``
 parameter to ``True`` tells the database to ignore failure to insert any rows
@@ -2510,12 +2525,28 @@ than iterating through the list of models and calling ``save()`` on each of
 them, but it has a few caveats:
 
 * You cannot update the model's primary key.
-* Each model's ``save()`` method isn't called, and the
+* Each model's ``save()`` method :ref:`isn't called
+  <methods-not-called-on-bulk-operations>`, and the
   :attr:`~django.db.models.signals.pre_save` and
   :attr:`~django.db.models.signals.post_save` signals aren't sent.
 * If updating a large number of columns in a large number of rows, the SQL
   generated can be very large. Avoid this by specifying a suitable
   ``batch_size``.
+* When updating a large number of objects, be aware that ``bulk_update()``
+  prepares all of the ``WHEN`` clauses for every object across all batches
+  before executing any queries. This can require more memory than expected. To
+  reduce memory usage, you can use an approach like this::
+
+    from itertools import islice
+
+    batch_size = 100
+    ids_iter = iter(range(1000))
+    while ids := list(islice(ids_iter, batch_size)):
+        batch = Entry.objects.filter(id__in=ids)
+        for entry in batch:
+            entry.headline = f"Updated headline {entry.pk}"
+        Entry.objects.bulk_update(batch, ["headline"], batch_size=batch_size)
+
 * Updating fields defined on multi-table inheritance ancestors will incur an
   extra query per ancestor.
 * When an individual batch contains duplicates, only the first instance in that
@@ -2598,6 +2629,11 @@ Example:
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 
+.. versionchanged:: 6.1
+
+    Support for chaining ``in_bulk()`` after :meth:`values` or
+    :meth:`values_list` was added.
+
 ``iterator()``
 ~~~~~~~~~~~~~~
 
@@ -2606,15 +2642,14 @@ If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 
 *Asynchronous version*: ``aiterator()``
 
-Evaluates the ``QuerySet`` (by performing the query) and returns an iterator
-(see :pep:`234`) over the results, or an asynchronous iterator (see :pep:`492`)
-if you call its asynchronous version ``aiterator``.
+Evaluates the ``QuerySet`` (by performing the query) and returns an
+:term:`python:iterator` over the results, or an :term:`python:asynchronous
+iterator` if you call its asynchronous version ``aiterator``.
 
 A ``QuerySet`` typically caches its results internally so that repeated
 evaluations do not result in additional queries. In contrast, ``iterator()``
-will read results directly, without doing any caching at the ``QuerySet`` level
-(internally, the default iterator calls ``iterator()`` and caches the return
-value). For a ``QuerySet`` which returns a large number of objects that you
+will read results directly, without doing any caching at the ``QuerySet``
+level. For a ``QuerySet`` which returns a large number of objects that you
 only need to access once, this can result in better performance and a
 significant reduction in memory.
 
@@ -2755,8 +2790,9 @@ the direction is changed.
 *Asynchronous version*: ``afirst()``
 
 Returns the first object matched by the queryset, or ``None`` if there
-is no matching object. If the ``QuerySet`` has no ordering defined, then the
-queryset is automatically ordered by the primary key. This can affect
+is no matching object. If the ``QuerySet`` has no ordering defined (and has not
+had ordering forcibly cleared by calling :meth:`order_by` with no arguments),
+then the queryset is automatically ordered by the primary key. This can affect
 aggregation results as described in :ref:`aggregation-ordering-interaction`.
 
 Example::
@@ -2770,6 +2806,12 @@ equivalent to the above example::
         p = Article.objects.order_by("title", "pub_date")[0]
     except IndexError:
         p = None
+
+.. versionchanged:: 6.1
+
+    ``first()`` and :meth:`last` no longer order by the primary key when
+    ordering has been forcibly cleared by calling :meth:`order_by` with no
+    arguments.
 
 ``last()``
 ~~~~~~~~~~
@@ -2976,7 +3018,8 @@ and calling ``save()``.
     such filter conditions on MySQL.
 
 Finally, realize that ``update()`` does an update at the SQL level and, thus,
-does not call any ``save()`` methods on your models, nor does it emit the
+method :ref:`does not call<methods-not-called-on-bulk-operations>` any
+``save()`` methods on your models, nor does it emit the
 :attr:`~django.db.models.signals.pre_save` or
 :attr:`~django.db.models.signals.post_save` signals (which are a consequence of
 calling :meth:`Model.save() <django.db.models.Model.save>`). If you want to
@@ -3012,7 +3055,11 @@ unique field in the order that is specified without conflicts. For example::
 
 Performs an SQL delete query on all rows in the :class:`.QuerySet` and
 returns the number of objects deleted and a dictionary with the number of
-deletions per object type.
+deletions per object type. The return value will count instances from related
+models if Django is emulating cascade behavior via Python
+:attr:`~django.db.models.ForeignKey.on_delete` variants. Otherwise, for
+database variants such as :attr:`~django.db.models.DB_CASCADE`, the return
+value will report only instances of the :class:`.QuerySet`'s model.
 
 The ``delete()`` is applied instantly. You cannot call ``delete()`` on a
 :class:`.QuerySet` that has had a slice taken or can otherwise no longer be
@@ -3045,23 +3092,34 @@ This cascade behavior is customizable via the
 :attr:`~django.db.models.ForeignKey.on_delete` argument to the
 :class:`~django.db.models.ForeignKey`.
 
-The ``delete()`` method does a bulk delete and does not call any ``delete()``
-methods on your models. It does, however, emit the
-:data:`~django.db.models.signals.pre_delete` and
-:data:`~django.db.models.signals.post_delete` signals for all deleted objects
-(including cascaded deletions).
+The ``delete()`` method does a bulk delete and :ref:`does not call
+<methods-not-called-on-bulk-operations>` any ``delete()`` methods on your
+models. It does, however, emit the :data:`~django.db.models.signals.pre_delete`
+and :data:`~django.db.models.signals.post_delete` signals for all deleted
+objects (including cascaded deletions). Signals won't be sent when
+``DB_CASCADE`` is used. Also, ``delete()`` doesn't return information about
+objects deleted from database variants (``DB_*``) of the
+:attr:`~django.db.models.ForeignKey.on_delete` argument, e.g. ``DB_CASCADE``.
 
-Django needs to fetch objects into memory to send signals and handle cascades.
-However, if there are no cascades and no signals, then Django may take a
-fast-path and delete objects without fetching into memory. For large
-deletes this can result in significantly reduced memory usage. The amount of
-executed queries can be reduced, too.
+Django won’t need to fetch objects into memory when deleting them in the
+following cases:
+
+#. If related fields use ``DB_*`` options.
+#. If there are no cascades and no delete signal receivers.
+
+In these cases, Django may take a fast path and delete objects without fetching
+them, which can result in significantly reduced memory usage and fewer executed
+queries.
 
 ForeignKeys which are set to :attr:`~django.db.models.ForeignKey.on_delete`
 ``DO_NOTHING`` do not prevent taking the fast-path in deletion.
 
 Note that the queries generated in object deletion is an implementation
 detail subject to change.
+
+.. versionchanged:: 6.1
+
+    Support for the ``DB_*`` variants of ``on_delete`` attribute was added.
 
 ``as_manager()``
 ~~~~~~~~~~~~~~~~
@@ -3101,7 +3159,7 @@ The output differs significantly between databases.
 ``explain()`` is supported by all built-in database backends except Oracle
 because an implementation there isn't straightforward.
 
-The ``format`` parameter changes the output format from the databases's
+The ``format`` parameter changes the output format from the database's
 default, which is usually text-based. PostgreSQL supports ``'TEXT'``,
 ``'JSON'``, ``'YAML'``, and ``'XML'`` formats. MariaDB and MySQL support
 ``'TEXT'`` (also called ``'TRADITIONAL'``) and ``'JSON'`` formats. MySQL
@@ -3122,13 +3180,8 @@ Pass these flags as keyword arguments. For example, when using PostgreSQL:
 
 On some databases, flags may cause the query to be executed which could have
 adverse effects on your database. For example, the ``ANALYZE`` flag supported
-by MariaDB, MySQL 8.0.18+, and PostgreSQL could result in changes to data if
-there are triggers or if a function is called, even for a ``SELECT`` query.
-
-.. versionchanged:: 5.2
-
-    Support for the ``memory`` and ``serialize`` options on PostgreSQL 17+ was
-    added.
+by MariaDB, MySQL, and PostgreSQL could result in changes to data if there are
+triggers or if a function is called, even for a ``SELECT`` query.
 
 .. _field-lookups:
 
@@ -3155,6 +3208,8 @@ As a convenience when no lookup type is provided (like in
 
 Exact match. If the value provided for comparison is ``None``, it will be
 interpreted as an SQL ``NULL`` (see :lookup:`isnull` for more details).
+:lookup:`Key and index lookups <jsonfield.key>` are exceptions: they
+interpret ``None`` as JSON ``null`` instead.
 
 Examples::
 
@@ -3224,6 +3279,8 @@ SQL equivalent:
 
     SELECT ... WHERE headline LIKE '%Lennon%';
 
+(The exact SQL syntax varies for each database engine.)
+
 Note this will match the headline ``'Lennon honored today'`` but not ``'lennon
 honored today'``.
 
@@ -3250,6 +3307,8 @@ SQL equivalent:
 .. code-block:: sql
 
     SELECT ... WHERE headline ILIKE '%Lennon%';
+
+(The exact SQL syntax varies for each database engine.)
 
 .. admonition:: SQLite users
 
@@ -3376,6 +3435,8 @@ SQL equivalent:
 
     SELECT ... WHERE headline LIKE 'Lennon%';
 
+(The exact SQL syntax varies for each database engine.)
+
 SQLite doesn't support case-sensitive ``LIKE`` statements; ``startswith`` acts
 like ``istartswith`` for SQLite.
 
@@ -3395,6 +3456,8 @@ SQL equivalent:
 .. code-block:: sql
 
     SELECT ... WHERE headline ILIKE 'Lennon%';
+
+(The exact SQL syntax varies for each database engine.)
 
 .. admonition:: SQLite users
 
@@ -3418,6 +3481,8 @@ SQL equivalent:
 
     SELECT ... WHERE headline LIKE '%Lennon';
 
+(The exact SQL syntax varies for each database engine.)
+
 .. admonition:: SQLite users
 
     SQLite doesn't support case-sensitive ``LIKE`` statements; ``endswith``
@@ -3439,7 +3504,9 @@ SQL equivalent:
 
 .. code-block:: sql
 
-    SELECT ... WHERE headline ILIKE '%Lennon'
+    SELECT ... WHERE headline ILIKE '%Lennon';
+
+(The exact SQL syntax varies for each database engine.)
 
 .. admonition:: SQLite users
 
@@ -3929,8 +3996,8 @@ An optional argument that represents the :doc:`model field
 ``filter``
 ~~~~~~~~~~
 
-An optional :class:`Q object <django.db.models.Q>` that's used to filter the
-rows that are aggregated.
+An optional :ref:`Q object <q-objects>` that's used to filter the rows that
+are aggregated.
 
 See :ref:`conditional-aggregation` and :ref:`filtering-on-annotations` for
 example usage.
@@ -3951,8 +4018,6 @@ by the aggregate.
 
 ``AnyValue``
 ~~~~~~~~~~~~
-
-.. versionadded:: 6.0
 
 .. class:: AnyValue(expression, output_field=None, filter=None, default=None, **extra)
 
@@ -4021,6 +4086,42 @@ by the aggregate.
         Optional. If ``distinct=True``, ``Avg`` returns the mean value of
         unique values. This is the SQL equivalent of ``AVG(DISTINCT <field>)``.
         The default value is ``False``.
+
+``BitAnd``
+~~~~~~~~~~
+
+.. class:: BitAnd(expression, filter=None, default=None, **extra)
+
+    .. versionadded:: 6.1
+
+    Returns an ``int`` of the bitwise ``AND`` of all non-null input values, or
+    ``default`` if all values are null.
+
+    The ``default`` parameter is not supported on MariaDB, MySQL, and Oracle.
+
+``BitOr``
+~~~~~~~~~
+
+.. class:: BitOr(expression, filter=None, default=None, **extra)
+
+    .. versionadded:: 6.1
+
+    Returns an ``int`` of the bitwise ``OR`` of all non-null input values, or
+    ``default`` if all values are null.
+
+    The ``default`` parameter is not supported on MariaDB, MySQL, and Oracle.
+
+``BitXor``
+~~~~~~~~~~
+
+.. class:: BitXor(expression, filter=None, default=None, **extra)
+
+    .. versionadded:: 6.1
+
+    Returns an ``int`` of the bitwise ``XOR`` of all non-null input values, or
+    ``default`` if all values are null.
+
+    The ``default`` parameter is not supported on MariaDB, MySQL, and Oracle.
 
 ``Count``
 ~~~~~~~~~
@@ -4122,8 +4223,6 @@ by the aggregate.
 ``StringAgg``
 ~~~~~~~~~~~~~
 
-.. versionadded:: 6.0
-
 .. class:: StringAgg(expression, delimiter, output_field=None, distinct=False, filter=None, order_by=None, default=None, **extra)
 
     Returns the input values concatenated into a string, separated by the
@@ -4136,13 +4235,22 @@ by the aggregate.
     .. attribute:: delimiter
 
         A ``Value`` or expression representing the string that should separate
-        each of the values. For example, ``Value(",")``.
+        each of the values. For example, ``Value(",")``. (On SQLite, the
+        literal delimiter ``Value(",")`` is the only delimiter compatible with
+        ``distinct=True``.)
+
+        .. versionchanged:: 6.1
+
+            Support for using ``distinct=True`` with a delimiter of
+            ``Value(",")`` on SQLite was added.
 
 Query-related tools
 ===================
 
 This section provides reference material for query-related tools not documented
 elsewhere.
+
+.. _q-objects:
 
 ``Q()`` objects
 ---------------
@@ -4200,7 +4308,7 @@ attribute:
 
     >>> prefetch = Prefetch("choice_set", queryset=voted_choices, to_attr="voted_choices")
     >>> Question.objects.prefetch_related(prefetch).get().voted_choices
-    [<Choice: The sky>]
+    <QuerySet [<Choice: The sky>]>
     >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()
     <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
 
@@ -4223,8 +4331,9 @@ Prefetches the given lookups on an iterable of model instances. This is useful
 in code that receives a list of model instances as opposed to a ``QuerySet``;
 for example, when fetching models from a cache or instantiating them manually.
 
-Pass an iterable of model instances (must all be of the same class) and the
-lookups or :class:`Prefetch` objects you want to prefetch for. For example:
+Pass an iterable of model instances (must all be of the same class and able to
+be iterated multiple times) and the lookups or :class:`Prefetch` objects you
+want to prefetch for. For example:
 
 .. code-block:: pycon
 
@@ -4247,7 +4356,7 @@ overridden by using a custom queryset in a related lookup.
 
     .. attribute:: FilteredRelation.condition
 
-        A :class:`~django.db.models.Q` object to control the filtering.
+        A :ref:`Q object <q-objects>` to control the filtering.
 
 ``FilteredRelation`` is used with :meth:`~.QuerySet.annotate` to create an
 ``ON`` clause when a ``JOIN`` is performed. It doesn't act on the default

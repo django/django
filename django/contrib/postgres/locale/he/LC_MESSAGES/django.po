@@ -1,29 +1,30 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Meir Kriheli <mkriheli@gmail.com>, 2015,2017,2019,2023
+# Meir Kriheli <mkriheli@gmail.com>, 2015,2017,2019,2023,2025
 # אורי רודברג <uri@speedy.net>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-12-04 09:22+0000\n"
-"Last-Translator: Meir Kriheli <mkriheli@gmail.com>, 2015,2017,2019,2023\n"
+"PO-Revision-Date: 2025-12-03 09:22+0000\n"
+"Last-Translator: Meir Kriheli <mkriheli@gmail.com>, "
+"2015,2017,2019,2023,2025\n"
 "Language-Team: Hebrew (http://app.transifex.com/django/django/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: he\n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
-"1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
+"Plural-Forms: nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
+"1 == 0) ? 1: 2;\n"
 
 msgid "PostgreSQL extensions"
 msgstr "הרחבות PostgreSQL"
 
 #, python-format
 msgid "Item %(nth)s in the array did not validate:"
-msgstr "פריט %(nth)s במערך לא עבר בדיקת חוקיות: "
+msgstr "פריט %(nth)s במערך לא עבר בדיקת חוקיות:"
 
 msgid "Nested arrays must have the same length."
 msgstr "מערכים מקוננים חייבים להיות באותו האורך."
@@ -72,8 +73,6 @@ msgstr[1] ""
 "הרשימה מכילה %(show_value)d פריטים, עליה להכיל לא יותר מ-%(limit_value)d."
 msgstr[2] ""
 "הרשימה מכילה %(show_value)d פריטים, עליה להכיל לא יותר מ-%(limit_value)d."
-msgstr[3] ""
-"הרשימה מכילה %(show_value)d פריטים, עליה להכיל לא יותר מ-%(limit_value)d."
 
 #, python-format
 msgid ""
@@ -87,8 +86,6 @@ msgstr[0] ""
 msgstr[1] ""
 "הרשימה מכילה %(show_value)d פריטים, עליה להכיל לא פחות מ-%(limit_value)d."
 msgstr[2] ""
-"הרשימה מכילה %(show_value)d פריטים, עליה להכיל לא פחות מ-%(limit_value)d."
-msgstr[3] ""
 "הרשימה מכילה %(show_value)d פריטים, עליה להכיל לא פחות מ-%(limit_value)d."
 
 #, python-format

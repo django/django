@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Edgars Andersons, 2025
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2019
 # peterisb <pb@sungis.lv>, 2016
@@ -9,8 +10,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-18 11:41-0300\n"
-"PO-Revision-Date: 2023-12-04 18:45+0000\n"
-"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2019\n"
+"PO-Revision-Date: 2025-09-17 18:45+0000\n"
+"Last-Translator: Edgars Andersons, 2025\n"
 "Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -29,7 +30,7 @@ msgstr "ĢIS bāzes lauks."
 msgid ""
 "The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
-"Bāzes Ģeometrijas lauks -- atbilst OpenGIS specifikācijas Geometry tipam."
+"Pamata Ģeometrijas lauks — atbilst OpenGIS specifikācijas Geometry veidam."
 
 msgid "Point"
 msgstr "Punkts"
@@ -50,7 +51,7 @@ msgid "Multi polygon"
 msgstr "Vairāki daudzstūri"
 
 msgid "Geometry collection"
-msgstr "Ģeometrijas kolekcija"
+msgstr "Ģeometrijas krājums"
 
 msgid "Extent Aggregate Field"
 msgstr "Apjoma agregācijas lauks"
@@ -62,19 +63,20 @@ msgid "No geometry value provided."
 msgstr "Nav norādīta ģeometrijas vērtība."
 
 msgid "Invalid geometry value."
-msgstr "Nekorekta ģeometrijas vērtība."
+msgstr "Nederīga ģeometrijas vērtība."
 
 msgid "Invalid geometry type."
-msgstr "Nekorekts ģeometrijas tips."
+msgstr "Nederīgs ģeometrijas veids."
 
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr ""
-"Sastapta kļūda, pārveidojot ģeometriju uz ģeometriskās formas lauka SRID."
+"Veidlapas ģeometrijas lauka ģeometrijas pārveidošanas uz SRID laikā "
+"atgadījās kļūda."
 
 msgid "Delete all Features"
-msgstr "Dzēst visus objektus"
+msgstr "Izdzēst visus objektus"
 
 msgid "Debugging window (serialized value)"
 msgstr "Atkļūdošanas logs (serializēta vērtība)"

@@ -56,8 +56,9 @@ I think I've found a security problem! What should I do?
 ========================================================
 
 If you think you've found a security problem with Django, please send a message
-to security@djangoproject.com. This is a private list only open to long-time,
-highly trusted Django developers, and its archives are not publicly readable.
+to ``security@djangoproject.com``. This is a private list only open to
+long-time, highly trusted Django developers, and its archives are not publicly
+readable.
 
 Due to the sensitive nature of security issues, we ask that if you think you
 have found a security problem, *please* don't post a message on the forum, the

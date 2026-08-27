@@ -86,9 +86,10 @@ class Coalesce(Func):
         return None
 
     def as_oracle(self, compiler, connection, **extra_context):
-        # Oracle prohibits mixing TextField (NCLOB) and CharField (NVARCHAR2),
-        # so convert all fields to NCLOB when that type is expected.
-        if self.output_field.get_internal_type() == "TextField":
+        # Oracle prohibits mixing TextField, JSONField (NCLOB) and CharField
+        # (NVARCHAR2), so convert all fields to NCLOB when that type is
+        # expected.
+        if self.output_field.get_internal_type() in ("TextField", "JSONField"):
             clone = self.copy()
             clone.set_source_expressions(
                 [

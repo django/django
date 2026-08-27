@@ -4,6 +4,7 @@ import re
 
 from django.core import serializers
 from django.core.serializers.base import DeserializationError
+from django.core.serializers.jsonl import Deserializer as JsonlDeserializer
 from django.db import models
 from django.test import TestCase, TransactionTestCase
 from django.test.utils import isolate_apps
@@ -269,3 +270,22 @@ class JsonSerializerTransactionTestCase(
         }""",
     ]
     fwd_ref_str = "\n".join([s.replace("\n", "") for s in fwd_ref_str])
+
+
+class JsonlDeserializerTests(TestCase):
+    def test_subclass_can_override_get_lines(self):
+        collected = []
+
+        class CustomDeserializer(JsonlDeserializer):
+            @staticmethod
+            def _get_lines(stream):
+                for obj in JsonlDeserializer._get_lines(stream):
+                    collected.append(obj)
+                    yield obj
+
+        data = (
+            '{"pk": 1, "model": "serializers.author", "fields": {"name": "Jane"}}\n'
+            '{"pk": 2, "model": "serializers.author", "fields": {"name": "Joe"}}\n'
+        )
+        list(CustomDeserializer(data))
+        self.assertEqual(len(collected), 2)

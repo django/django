@@ -1,5 +1,6 @@
 import inspect
 import threading
+import time
 from datetime import datetime, timedelta
 from unittest import mock
 
@@ -12,6 +13,7 @@ from django.db import (
     models,
     transaction,
 )
+from django.db.models.functions import Now
 from django.db.models.manager import BaseManager
 from django.db.models.query import MAX_GET_RESULTS, EmptyQuerySet
 from django.test import (
@@ -22,6 +24,7 @@ from django.test import (
 )
 from django.test.utils import CaptureQueriesContext
 from django.utils.connection import ConnectionDoesNotExist
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.translation import gettext_lazy
 
 from .models import (
@@ -29,6 +32,9 @@ from .models import (
     ArticleSelectOnSave,
     ChildPrimaryKeyWithDefault,
     FeaturedArticle,
+    FromDbNewSignature,
+    FromDbOldSignature,
+    FromDbOldSignatureRelated,
     PrimaryKeyWithDbDefault,
     PrimaryKeyWithDefault,
     PrimaryKeyWithFalseyDbDefault,
@@ -213,6 +219,14 @@ class ModelInstanceCreationTests(TestCase):
         with self.assertNumQueries(1):
             PrimaryKeyWithFalseyDbDefault().save()
 
+    def test_auto_field_with_value_refreshed(self):
+        """
+        An auto field must be refreshed by Model.save() even when a value is
+        set because the database may return a value of a different type.
+        """
+        a = Article.objects.create(pk="123456", pub_date=datetime(2025, 9, 16))
+        self.assertEqual(a.pk, 123456)
+
 
 class ModelTest(TestCase):
     def test_objects_attribute_is_only_available_on_the_class_itself(self):
@@ -279,6 +293,13 @@ class ModelTest(TestCase):
             pub_date=datetime(2005, 7, 31, 12, 30, 45),
         )
         self.assertEqual(Article.objects.get(headline="Article 10"), a10)
+
+    def test_create_method_propagates_fetch_mode(self):
+        article = Article.objects.fetch_mode(models.FETCH_PEERS).create(
+            headline="Article 10",
+            pub_date=datetime(2005, 7, 31, 12, 30, 45),
+        )
+        self.assertEqual(article._state.fetch_mode, models.FETCH_PEERS)
 
     def test_year_lookup_edge_case(self):
         # Edge-case test: A year lookup should retrieve all objects in
@@ -537,6 +558,7 @@ class ModelTest(TestCase):
         cases = [
             Article(),
             Article(id=None),
+            PrimaryKeyWithDbDefault(),
         ]
         for case in cases:
             with self.subTest(case=case):
@@ -557,6 +579,26 @@ class ModelTest(TestCase):
         for case in cases:
             with self.subTest(case=case):
                 self.assertIs(case._is_pk_set(), True)
+
+    def test_save_expressions(self):
+        article = Article(pub_date=Now())
+        article.save()
+        expected_num_queries = (
+            0 if connection.features.can_return_columns_from_insert else 1
+        )
+        with self.assertNumQueries(expected_num_queries):
+            article_pub_date = article.pub_date
+        self.assertIsInstance(article_pub_date, datetime)
+        # Sleep slightly to ensure a different database level NOW().
+        time.sleep(0.1)
+        article.pub_date = Now()
+        article.save()
+        expected_num_queries = (
+            0 if connection.features.can_return_rows_from_update else 1
+        )
+        with self.assertNumQueries(expected_num_queries):
+            self.assertIsInstance(article.pub_date, datetime)
+        self.assertGreater(article.pub_date, article_pub_date)
 
 
 class ModelLookupTest(TestCase):
@@ -777,6 +819,7 @@ class ManagerTest(SimpleTestCase):
         "alatest",
         "aupdate",
         "aupdate_or_create",
+        "fetch_mode",
     ]
 
     def test_manager_methods(self):
@@ -1060,3 +1103,75 @@ class ModelRefreshTests(TestCase):
         with self.assertNumQueries(1):
             a.refresh_from_db(fields=["headline"], from_queryset=from_queryset)
             self.assertEqual(a.headline, headline)
+
+    def test_refresh_copies_fetch_mode_from_plucked_instance(self):
+        a = Article.objects.create(pub_date=datetime.now())
+        fa = FeaturedArticle.objects.fetch_mode(models.FETCH_PEERS).create(article=a)
+
+        from_queryset = FeaturedArticle.objects.fetch_mode(
+            models.FETCH_RAISE
+        ).select_related("article")
+        fa.refresh_from_db(from_queryset=from_queryset)
+        self.assertEqual(fa._state.fetch_mode, models.FETCH_PEERS)
+        self.assertEqual(fa.article._state.fetch_mode, models.FETCH_RAISE)
+
+    def test_refresh_ignores_fetch_mode_if_no_instance_plucked(self):
+        a = Article.objects.create(pub_date=datetime.now())
+        fa = FeaturedArticle.objects.fetch_mode(models.FETCH_PEERS).create(article=a)
+
+        # This queryset's fetch mode is not used because no fields are plucked.
+        from_queryset = FeaturedArticle.objects.fetch_mode(models.FETCH_RAISE)
+        fa.refresh_from_db(from_queryset=from_queryset)
+        self.assertEqual(fa._state.fetch_mode, models.FETCH_PEERS)
+        self.assertEqual(fa.article._state.fetch_mode, models.FETCH_PEERS)
+
+
+class ModelFromDbTests(TestCase):
+    # RemovedInDjango70Warning: Remove the FromDbOldSignature tests when the
+    # deprecation ends.
+    deprecation_msg = (
+        "FromDbOldSignature.from_db() must accept a fetch_mode keyword "
+        "argument. Support for from_db() methods that do not accept it is "
+        "deprecated."
+    )
+
+    def test_old_signature_iteration(self):
+        obj = FromDbOldSignature.objects.create(name="test")
+        with self.assertWarnsMessage(RemovedInDjango70Warning, self.deprecation_msg):
+            instances = list(FromDbOldSignature.objects.all())
+        self.assertEqual(instances, [obj])
+        self.assertEqual(instances[0]._loaded_values, {"id": obj.pk, "name": "test"})
+
+    def test_old_signature_get(self):
+        obj = FromDbOldSignature.objects.create(name="test")
+        with self.assertWarnsMessage(RemovedInDjango70Warning, self.deprecation_msg):
+            fetched = FromDbOldSignature.objects.get(pk=obj.pk)
+        self.assertEqual(fetched._loaded_values, {"id": obj.pk, "name": "test"})
+
+    def test_old_signature_select_related(self):
+        obj = FromDbOldSignature.objects.create(name="test")
+        related = FromDbOldSignatureRelated.objects.create(old=obj)
+        with self.assertWarnsMessage(RemovedInDjango70Warning, self.deprecation_msg):
+            fetched = FromDbOldSignatureRelated.objects.select_related("old").get(
+                pk=related.pk
+            )
+        self.assertEqual(fetched.old._loaded_values, {"id": obj.pk, "name": "test"})
+
+    def test_old_signature_raw(self):
+        obj = FromDbOldSignature.objects.create(name="test")
+        with self.assertWarnsMessage(RemovedInDjango70Warning, self.deprecation_msg):
+            instances = list(
+                FromDbOldSignature.objects.raw("SELECT * FROM basic_fromdboldsignature")
+            )
+        self.assertEqual(instances, [obj])
+        self.assertEqual(instances[0]._loaded_values, {"id": obj.pk, "name": "test"})
+
+    def test_new_signature_receives_fetch_mode(self):
+        obj = FromDbNewSignature.objects.create(name="test")
+        fetched = FromDbNewSignature.objects.get(pk=obj.pk)
+        self.assertIs(fetched._from_db_fetch_mode, models.FETCH_ONE)
+
+    def test_new_signature_receives_fetch_mode_peers(self):
+        FromDbNewSignature.objects.create(name="test")
+        (fetched,) = FromDbNewSignature.objects.fetch_mode(models.FETCH_PEERS)
+        self.assertIs(fetched._from_db_fetch_mode, models.FETCH_PEERS)

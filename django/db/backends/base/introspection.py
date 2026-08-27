@@ -1,5 +1,7 @@
 from collections import namedtuple
 
+from django.db.models import DB_CASCADE, DB_SET_DEFAULT, DB_SET_NULL, DO_NOTHING
+
 # Structure returned by DatabaseIntrospection.get_table_list()
 TableInfo = namedtuple("TableInfo", ["name", "type"])
 
@@ -15,6 +17,13 @@ class BaseDatabaseIntrospection:
     """Encapsulate backend-specific introspection utilities."""
 
     data_types_reverse = {}
+    on_delete_types = {
+        "CASCADE": DB_CASCADE,
+        "NO ACTION": DO_NOTHING,
+        "SET DEFAULT": DB_SET_DEFAULT,
+        "SET NULL": DB_SET_NULL,
+        # DB_RESTRICT - "RESTRICT" is not supported.
+    }
 
     def __init__(self, connection):
         self.connection = connection
@@ -169,8 +178,11 @@ class BaseDatabaseIntrospection:
 
     def get_relations(self, cursor, table_name):
         """
-        Return a dictionary of {field_name: (field_name_other_table,
-        other_table)} representing all foreign keys in the given table.
+        Return a dictionary of
+            {
+                field_name: (field_name_other_table, other_table, db_on_delete)
+            }
+        representing all foreign keys in the given table.
         """
         raise NotImplementedError(
             "subclasses of BaseDatabaseIntrospection may require a "

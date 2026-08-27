@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Edgars Andersons, 2025
 # edgars <edgars.jekabsons@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # peterisb <pb@sungis.lv>, 2016
@@ -9,9 +10,9 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: peterisb <pb@sungis.lv>\n"
-"Language-Team: Latvian (http://www.transifex.com/django/django/language/"
+"PO-Revision-Date: 2025-09-17 18:05+0000\n"
+"Last-Translator: Edgars Andersons, 2025\n"
+"Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,7 +25,7 @@ msgid "Sites"
 msgstr "Vietnes"
 
 msgid "The domain name cannot contain any spaces or tabs."
-msgstr "Domēna nosaukumā nevar būt tukšumi vai tabulatori."
+msgstr "Domēna vārdā nevar būt atstarpes vai atkāpes."
 
 msgid "domain name"
 msgstr "domēna vārds"

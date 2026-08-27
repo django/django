@@ -7,7 +7,10 @@ from operator import attrgetter
 from unittest import expectedFailure
 
 from django import forms
+from django.db.models import FETCH_PEERS
 from django.test import TestCase
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import (
     ArticleWithAuthor,
@@ -251,7 +254,13 @@ class ModelInheritanceTest(TestCase):
         """
         Regression test for #11764
         """
-        wholesalers = list(Wholesaler.objects.select_related())
+        # RemovedInDjango70Warning: when the deprecation ends, this test can
+        # be removed.
+        with ignore_warnings(
+            category=RemovedInDjango70Warning,
+            message=r"Calling select_related\(\) with no arguments is deprecated\.",
+        ):
+            wholesalers = list(Wholesaler.objects.select_related())
         self.assertEqual(wholesalers, [])
 
     def test_issue_7853(self):
@@ -527,7 +536,7 @@ class ModelInheritanceTest(TestCase):
         Supplier.objects.create(name="Jane", restaurant=r2)
 
         self.assertQuerySetEqual(
-            Supplier.objects.order_by("name").select_related(),
+            Supplier.objects.order_by("name").select_related("restaurant"),
             [
                 "Jane",
                 "John",
@@ -599,6 +608,22 @@ class ModelInheritanceTest(TestCase):
             restaurant = italian_restaurant.restaurant_ptr
             self.assertEqual(restaurant.place_ptr.restaurant, restaurant)
             self.assertEqual(restaurant.italianrestaurant, italian_restaurant)
+
+    def test_parent_access_copies_fetch_mode(self):
+        italian_restaurant = ItalianRestaurant.objects.create(
+            name="Mom's Spaghetti",
+            address="2131 Woodward Ave",
+            serves_hot_dogs=False,
+            serves_pizza=False,
+            serves_gnocchi=True,
+        )
+
+        # No queries are made when accessing the parent objects.
+        italian_restaurant = ItalianRestaurant.objects.fetch_mode(FETCH_PEERS).get(
+            pk=italian_restaurant.pk
+        )
+        restaurant = italian_restaurant.restaurant_ptr
+        self.assertEqual(restaurant._state.fetch_mode, FETCH_PEERS)
 
     def test_id_field_update_on_ancestor_change(self):
         place1 = Place.objects.create(name="House of Pasta", address="944 Fullerton")

@@ -1,10 +1,24 @@
 import functools
 import inspect
+import threading
+from contextlib import contextmanager
+
+from django.utils.version import PY314, PY315
+
+if PY314:
+    import annotationlib
+
+    if not PY315:
+        lock = threading.Lock()
+        safe_signature_from_callable = functools.partial(
+            inspect._signature_from_callable,
+            annotation_format=annotationlib.Format.FORWARDREF,
+        )
 
 
 @functools.lru_cache(maxsize=512)
 def _get_func_parameters(func, remove_first):
-    parameters = tuple(inspect.signature(func).parameters.values())
+    parameters = tuple(signature(func).parameters.values())
     if remove_first:
         parameters = parameters[1:]
     return parameters
@@ -74,3 +88,64 @@ def method_has_no_args(meth):
 
 def func_supports_parameter(func, name):
     return any(param.name == name for param in _get_callable_parameters(func))
+
+
+def is_module_level_function(func):
+    if not inspect.isfunction(func) or inspect.isbuiltin(func):
+        return False
+
+    if "<locals>" in func.__qualname__:
+        return False
+
+    return True
+
+
+@contextmanager
+def lazy_annotations():
+    """
+    inspect.getfullargspec eagerly evaluates type annotations. To add
+    compatibility with Python 3.14+ deferred evaluation, patch the module-level
+    helper to provide the annotation_format that we are using elsewhere.
+
+    This private helper should only be used for Python 3.14, as
+    https://github.com/python/cpython/issues/141560 was fixed in 3.15.
+
+    This context manager is not reentrant.
+    """
+    if PY315 or not PY314:
+        yield
+        return
+    with lock:
+        original_helper = inspect._signature_from_callable
+        inspect._signature_from_callable = safe_signature_from_callable
+        try:
+            yield
+        finally:
+            inspect._signature_from_callable = original_helper
+
+
+def getfullargspec(*args, annotation_format=None, **kwargs):
+    """
+    A wrapper around inspect.getfullargspec that leaves deferred annotations
+    unevaluated on Python 3.14+, since they are not used in our case.
+    """
+    if PY315:
+        return inspect.getfullargspec(
+            *args, **kwargs, annotation_format=annotationlib.Format.FORWARDREF
+        )
+    if PY314:
+        with lazy_annotations():
+            return inspect.getfullargspec(*args, **kwargs)
+    else:
+        return inspect.getfullargspec(*args, **kwargs)
+
+
+def signature(obj):
+    """
+    A wrapper around inspect.signature that leaves deferred annotations
+    unevaluated on Python 3.14+, since they are not used in our case.
+    """
+    if PY314:
+        return inspect.signature(obj, annotation_format=annotationlib.Format.FORWARDREF)
+    else:
+        return inspect.signature(obj)

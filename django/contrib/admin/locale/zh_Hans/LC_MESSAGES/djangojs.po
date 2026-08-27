@@ -3,7 +3,7 @@
 # Translators:
 # HuanCheng Bai白宦成（Bestony） <xiqingongzi@gmail.com>, 2018
 # Fan Xu <xlivevil@aliyun.com>, 2022
-# jack yang, 2023
+# sunfkny, 2023
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kaiqi Zhu, 2023
 # Kewei Ma <marknv.42@gmail.com>, 2016
@@ -11,6 +11,7 @@
 # Liping Wang <lynn.config@gmail.com>, 2016
 # matthew Yip <yymmatthew@gmail.com>, 2020
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
+# Shuanghe Yu (Samon Yu), 2025
 # slene <vslene@gmail.com>, 2011
 # Veoco <one@nomox.cn>, 2021
 # spaceoi <zhangzhaoyu@gmail.com>, 2016
@@ -21,9 +22,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-25 07:59+0000\n"
-"Last-Translator: jack yang, 2023\n"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-12-03 07:59+0000\n"
+"Last-Translator: Shuanghe Yu (Samon Yu), 2025\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -38,11 +39,8 @@ msgstr "可用 %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
-msgstr ""
-"这是可用的%s列表。你可以在选择框下面进行选择，然后点击两选框之间的“选择”箭"
-"头。"
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
+msgstr "想选择%s可以先选择它们然后点击“选择”箭头按钮。"
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -51,18 +49,17 @@ msgstr "在此框中键入以过滤可用的%s列表"
 msgid "Filter"
 msgstr "过滤"
 
-msgid "Choose all"
-msgstr "全选"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "选取全部%s"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "点击选择全部%s。"
+msgid "Choose selected %s"
+msgstr "选取已选择的%s"
 
-msgid "Choose"
-msgstr "选择"
-
-msgid "Remove"
-msgstr "删除"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "移除已选择的%s"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -70,22 +67,19 @@ msgstr "选中的 %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
-msgstr ""
-"这是选中的 %s 的列表。你可以在选择框下面进行选择，然后点击两选框之间的“删"
-"除”箭头进行删除。"
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
+msgstr "想移除%s可以先选择它们然后点击“移除”箭头按钮。"
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr "在该框中键入以过滤所选%s的列表。"
 
-msgid "Remove all"
-msgstr "删除全部"
+msgid "(click to clear)"
+msgstr "（点击以清除）"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "删除所有已选择的%s。"
+msgid "Remove all %s"
+msgstr "移除全部%s"
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -324,9 +318,3 @@ msgstr "F"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
-
-msgid "Show"
-msgstr "显示"
-
-msgid "Hide"
-msgstr "隐藏"

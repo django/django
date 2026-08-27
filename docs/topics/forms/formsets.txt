@@ -50,8 +50,9 @@ following example will create a formset class to display two blank forms:
 
 Formsets can be iterated and indexed, accessing forms in the order they were
 created. You can reorder the forms by overriding the default
-:meth:`iteration <object.__iter__>` and
-:meth:`indexing <object.__getitem__>` behavior if needed.
+:meth:`~object.__iter__` and :meth:`~object.__getitem__` methods if needed.
+(For more information on implementing these methods, see the
+:term:`Python documentation on sequences <sequence>`.)
 
 .. _formsets-initial-data:
 

@@ -3,7 +3,8 @@ from collections import namedtuple
 from django.db.backends.base.introspection import BaseDatabaseIntrospection
 from django.db.backends.base.introspection import FieldInfo as BaseFieldInfo
 from django.db.backends.base.introspection import TableInfo as BaseTableInfo
-from django.db.models import Index
+from django.db.backends.postgresql.base import psycopg_version
+from django.db.models import DB_CASCADE, DB_SET_DEFAULT, DB_SET_NULL, DO_NOTHING, Index
 
 FieldInfo = namedtuple("FieldInfo", [*BaseFieldInfo._fields, "is_autofield", "comment"])
 TableInfo = namedtuple("TableInfo", [*BaseTableInfo._fields, "comment"])
@@ -38,6 +39,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     ignored_tables = []
 
+    on_delete_types = {
+        "a": DO_NOTHING,
+        "c": DB_CASCADE,
+        "d": DB_SET_DEFAULT,
+        "n": DB_SET_NULL,
+        # DB_RESTRICT - "r" is not supported.
+    }
+
     def get_field_type(self, data_type, description):
         field_type = super().get_field_type(data_type, description)
         if description.is_autofield or (
@@ -55,8 +64,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_table_list(self, cursor):
         """Return a list of table and view names in the current database."""
-        cursor.execute(
-            """
+        cursor.execute("""
             SELECT
                 c.relname,
                 CASE
@@ -70,8 +78,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             WHERE c.relkind IN ('f', 'm', 'p', 'r', 'v')
                 AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
                 AND pg_catalog.pg_table_is_visible(c.oid)
-        """
-        )
+        """)
         return [
             TableInfo(*row)
             for row in cursor.fetchall()
@@ -112,15 +119,26 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         cursor.execute(
             "SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name)
         )
+
+        # PostgreSQL OIDs may vary depending on the installation, especially
+        # for datatypes from extensions, e.g. "hstore". In such cases, the
+        # type_display attribute (psycopg 3.2+) should be used.
+        type_display_available = psycopg_version() >= (3, 2)
         return [
             FieldInfo(
                 line.name,
-                line.type_code,
+                (
+                    line.type_display
+                    if type_display_available and line.type_display == "hstore"
+                    else line.type_code
+                ),
                 # display_size is always None on psycopg2.
                 line.internal_size if line.display_size is None else line.display_size,
                 line.internal_size,
-                line.precision,
-                line.scale,
+                # precision and scale are always 2^16 - 1 on psycopg2 for
+                # DecimalFields with no precision.
+                None if line.precision == 2**16 - 1 else line.precision,
+                None if line.scale == 2**16 - 1 else line.scale,
                 *field_map[line.name],
             )
             for line in cursor.description
@@ -154,12 +172,15 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_relations(self, cursor, table_name):
         """
-        Return a dictionary of {field_name: (field_name_other_table,
-        other_table)} representing all foreign keys in the given table.
+        Return a dictionary of
+            {
+                field_name: (field_name_other_table, other_table, db_on_delete)
+            }
+        representing all foreign keys in the given table.
         """
         cursor.execute(
             """
-            SELECT a1.attname, c2.relname, a2.attname
+            SELECT a1.attname, c2.relname, a2.attname, con.confdeltype
             FROM pg_constraint con
             LEFT JOIN pg_class c1 ON con.conrelid = c1.oid
             LEFT JOIN pg_class c2 ON con.confrelid = c2.oid
@@ -175,7 +196,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """,
             [table_name],
         )
-        return {row[0]: (row[2], row[1]) for row in cursor.fetchall()}
+        return {
+            row[0]: (row[2], row[1], self.on_delete_types.get(row[3]))
+            for row in cursor.fetchall()
+        }
 
     def get_constraints(self, cursor, table_name):
         """
@@ -206,7 +230,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 cl.reloptions
             FROM pg_constraint AS c
             JOIN pg_class AS cl ON c.conrelid = cl.oid
-            WHERE cl.relname = %s AND pg_catalog.pg_table_is_visible(cl.oid)
+            WHERE cl.relname = %s
+                AND pg_catalog.pg_table_is_visible(cl.oid)
+                AND c.contype != 'n'
         """,
             [table_name],
         )

@@ -63,24 +63,12 @@ class BaseSpatialFeatures:
     empty_intersection_returns_none = True
 
     @property
-    def supports_bbcontains_lookup(self):
-        return "bbcontains" in self.connection.ops.gis_operators
-
-    @property
-    def supports_contained_lookup(self):
-        return "contained" in self.connection.ops.gis_operators
-
-    @property
     def supports_crosses_lookup(self):
         return "crosses" in self.connection.ops.gis_operators
 
     @property
     def supports_distances_lookups(self):
         return self.has_Distance_function
-
-    @property
-    def supports_dwithin_lookup(self):
-        return "dwithin" in self.connection.ops.gis_operators
 
     @property
     def supports_relate_lookup(self):

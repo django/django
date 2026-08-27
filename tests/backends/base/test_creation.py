@@ -1,6 +1,7 @@
 import copy
 import datetime
 import os
+import sys
 from unittest import mock
 
 from django.db import DEFAULT_DB_ALIAS, connection, connections
@@ -67,6 +68,13 @@ class TestDbSignatureTests(SimpleTestCase):
 class TestDbCreationTests(SimpleTestCase):
     available_apps = ["backends.base.app_unmigrated"]
 
+    @staticmethod
+    def patch_close_connection(creation):
+        # If DatabaseCreation.destroy_test_db() closes the database connection,
+        # that behavior must be disabled to prevent each test from crashing.
+        if close_method_name := creation.destroy_test_db_connection_close_method:
+            setattr(creation.connection, close_method_name, mock.Mock())
+
     @mock.patch("django.db.migrations.executor.MigrationExecutor.migrate")
     def test_migrate_test_setting_false(
         self, mocked_migrate, mocked_sync_apps, *mocked_objects
@@ -74,9 +82,7 @@ class TestDbCreationTests(SimpleTestCase):
         test_connection = get_connection_copy()
         test_connection.settings_dict["TEST"]["MIGRATE"] = False
         creation = test_connection.creation_class(test_connection)
-        if connection.vendor == "oracle":
-            # Don't close connection on Oracle.
-            creation.connection.close = mock.Mock()
+        self.patch_close_connection(creation)
         old_database_name = test_connection.settings_dict["NAME"]
         try:
             with mock.patch.object(creation, "_create_test_db"):
@@ -104,9 +110,7 @@ class TestDbCreationTests(SimpleTestCase):
         test_connection = get_connection_copy()
         test_connection.settings_dict["TEST"]["MIGRATE"] = False
         creation = test_connection.creation_class(test_connection)
-        if connection.vendor == "oracle":
-            # Don't close connection on Oracle.
-            creation.connection.close = mock.Mock()
+        self.patch_close_connection(creation)
         old_database_name = test_connection.settings_dict["NAME"]
         try:
             with mock.patch.object(creation, "_create_test_db"):
@@ -128,9 +132,7 @@ class TestDbCreationTests(SimpleTestCase):
         test_connection = get_connection_copy()
         test_connection.settings_dict["TEST"]["MIGRATE"] = True
         creation = test_connection.creation_class(test_connection)
-        if connection.vendor == "oracle":
-            # Don't close connection on Oracle.
-            creation.connection.close = mock.Mock()
+        self.patch_close_connection(creation)
         old_database_name = test_connection.settings_dict["NAME"]
         try:
             with mock.patch.object(creation, "_create_test_db"):
@@ -158,9 +160,7 @@ class TestDbCreationTests(SimpleTestCase):
         """
         test_connection = get_connection_copy()
         creation = test_connection.creation_class(test_connection)
-        if connection.vendor == "oracle":
-            # Don't close connection on Oracle.
-            creation.connection.close = mock.Mock()
+        self.patch_close_connection(creation)
         old_database_name = test_connection.settings_dict["NAME"]
         try:
             with mock.patch.object(creation, "_create_test_db"):
@@ -175,9 +175,7 @@ class TestDbCreationTests(SimpleTestCase):
     def test_serialize_deprecation(self, serialize_db_to_string, *mocked_objects):
         test_connection = get_connection_copy()
         creation = test_connection.creation_class(test_connection)
-        if connection.vendor == "oracle":
-            # Don't close connection on Oracle.
-            creation.connection.close = mock.Mock()
+        self.patch_close_connection(creation)
         old_database_name = test_connection.settings_dict["NAME"]
         msg = (
             "DatabaseCreation.create_test_db(serialize) is deprecated. Call "
@@ -336,6 +334,10 @@ class TestMarkTests(SimpleTestCase):
                 "backends.base.test_creation.skip_test_function",
             },
         }
+        # Emulate the scenario where the parent module for
+        # backends.base.test_creation has not been imported yet.
+        popped_module = sys.modules.pop("backends.base")
+        self.addCleanup(sys.modules.__setitem__, "backends.base", popped_module)
         creation.mark_expected_failures_and_skips()
         self.assertIs(
             expected_failure_test_function.__unittest_expecting_failure__,

@@ -1,10 +1,12 @@
+from asgiref.sync import sync_to_async
+
 from django.conf import settings
-from django.contrib.auth import REDIRECT_FIELD_NAME, alogin, alogout
+from django.contrib.auth import REDIRECT_FIELD_NAME, alogin, alogout, login, logout
 from django.contrib.auth.middleware import (
     AuthenticationMiddleware,
     LoginRequiredMiddleware,
 )
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest, HttpResponse
 from django.test import TestCase, modify_settings, override_settings
@@ -68,6 +70,14 @@ class TestAuthenticationMiddleware(TestCase):
         auser_second = await self.request.auser()
         self.assertEqual(auser_second, self.user2)
 
+    async def test_auser_after_login(self):
+        self.middleware(self.request)
+        auser = await self.request.auser()
+        self.assertEqual(auser, self.user)
+        await sync_to_async(login)(self.request, self.user2)
+        auser_second = await self.request.auser()
+        self.assertEqual(auser_second, self.user2)
+
     async def test_auser_after_alogout(self):
         self.middleware(self.request)
         auser = await self.request.auser()
@@ -75,6 +85,43 @@ class TestAuthenticationMiddleware(TestCase):
         await alogout(self.request)
         auser_second = await self.request.auser()
         self.assertTrue(auser_second.is_anonymous)
+
+    async def test_auser_after_logout(self):
+        self.middleware(self.request)
+        auser = await self.request.auser()
+        self.assertEqual(auser, self.user)
+        await sync_to_async(logout)(self.request)
+        auser_second = await self.request.auser()
+        self.assertTrue(auser_second.is_anonymous)
+
+
+class TestAsyncLoginLogoutAfterSyncMiddleware(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
+            "test_user", "test@example.com", "test_password"
+        )
+        cls.user2 = User.objects.create_user(
+            "test_user2", "test2@example.com", "test_password2"
+        )
+
+    def setUp(self):
+        self.middleware = AuthenticationMiddleware(lambda req: HttpResponse())
+        self.client.force_login(self.user)
+        self.request = HttpRequest()
+        self.request.session = self.client.session
+        # Populate self.request.user.
+        self.middleware(self.request)
+        # .user is lazy, so materialize it by accessing an attribute.
+        self.request.user.is_authenticated
+
+    async def test_user_after_alogin(self):
+        await alogin(self.request, self.user2)
+        self.assertEqual(self.request.user, self.user2)
+
+    async def test_user_after_alogout(self):
+        await alogout(self.request)
+        self.assertEqual(self.request.user, AnonymousUser())
 
 
 @override_settings(ROOT_URLCONF="auth_tests.urls")

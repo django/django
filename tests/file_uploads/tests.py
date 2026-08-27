@@ -14,6 +14,7 @@ from django.core.exceptions import SuspiciousFileOperation
 from django.core.files import temp as tempfile
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
+from django.core.handlers.wsgi import WSGIRequest
 from django.http.multipartparser import (
     FILE,
     MAX_TOTAL_HEADER_SIZE,
@@ -172,15 +173,18 @@ class FileUploadTests(TestCase):
         )
         payload.write(b"\r\n!\r\n")
         payload.write("--" + client.BOUNDARY + "--\r\n")
-        r = {
-            "CONTENT_LENGTH": len(payload),
-            "CONTENT_TYPE": client.MULTIPART_CONTENT,
-            "PATH_INFO": "/echo_content/",
-            "REQUEST_METHOD": "POST",
-            "wsgi.input": payload,
-        }
-        response = self.client.request(**r)
-        self.assertEqual(response.json()["file"], "")
+        request = WSGIRequest(
+            {
+                "CONTENT_LENGTH": len(payload),
+                "CONTENT_TYPE": client.MULTIPART_CONTENT,
+                "PATH_INFO": "/echo_content/",
+                "REQUEST_METHOD": "POST",
+                "wsgi.input": payload,
+            }
+        )
+        msg = "Could not decode base64 data."
+        with self.assertRaisesMessage(MultiPartParserError, msg):
+            request.POST
 
     def test_unicode_file_name(self):
         with sys_tempfile.TemporaryDirectory() as temp_dir:
@@ -800,8 +804,7 @@ class FileUploadTests(TestCase):
             "multipart/form-data; boundary=%(boundary)s" % vars,
         )
         self.assertEqual(response.status_code, 200)
-        id = int(response.content)
-        obj = FileModel.objects.get(pk=id)
+        obj = FileModel.objects.get(pk=response.content.decode())
         # The name of the file uploaded and the file stored in the server-side
         # shouldn't differ.
         self.assertEqual(os.path.basename(obj.testfile.path), "MiXeD_cAsE.txt")

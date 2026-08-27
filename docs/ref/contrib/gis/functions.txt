@@ -323,8 +323,6 @@ reversed coordinates.
 ``Rotate``
 ----------
 
-.. versionadded:: 6.0
-
 .. class:: Rotate(expression, angle, origin=None, **extra)
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Rotate.html>`__
@@ -609,10 +607,6 @@ result.
 
 __ https://en.wikipedia.org/wiki/Geohash
 
-.. versionchanged:: 6.0
-
-    MariaDB 12.0.1+ support was added.
-
 Miscellaneous
 =============
 
@@ -621,10 +615,15 @@ Miscellaneous
 
 .. class:: IsEmpty(expr)
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_IsEmpty.html>`__
+*Availability*: `PostGIS <https://postgis.net/docs/ST_IsEmpty.html>`__,
+SpatiaLite
 
 Accepts a geographic field or expression and tests if the value is an empty
 geometry. Returns ``True`` if its value is empty and ``False`` otherwise.
+
+.. versionchanged:: 6.1
+
+    SpatiaLite support was added.
 
 ``IsValid``
 -----------
@@ -638,14 +637,8 @@ geometry. Returns ``True`` if its value is empty and ``False`` otherwise.
 Accepts a geographic field or expression and tests if the value is well formed.
 Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
 
-.. versionchanged:: 6.0
-
-    MariaDB 12.0.1+ support was added.
-
 ``GeometryType``
 ----------------
-
-.. versionadded:: 6.0
 
 .. class:: GeometryType(expr)
 
@@ -663,6 +656,19 @@ Accepts a geographic field or expression and returns its geometry type.
 
 Accepts a single geographic field or expression and returns the memory size
 (number of bytes) that the geometry field takes.
+
+``NumDimensions``
+-----------------
+
+.. versionadded:: 6.1
+
+.. class:: NumDimensions(expression, **extra)
+
+*Availability*: `PostGIS <https://postgis.net/docs/ST_NDims.html>`__,
+SpatiaLite
+
+Accepts a single geometry field or expression and returns the number of
+dimensions used by the geometry.
 
 ``NumGeometries``
 -----------------

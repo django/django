@@ -2,6 +2,7 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Karolis Ryselis <karolis@esperonus.com>, 2026
 # Kostas <tamosiunas@gmail.com>, 2011
 # Matas Dailyda <matas@dailyda.com>, 2015-2016
 # Povilas Balzaravičius <pavvka@gmail.com>, 2011
@@ -10,10 +11,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
-"Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-05 07:59+0000\n"
+"Last-Translator: Karolis Ryselis <karolis@esperonus.com>, 2026\n"
+"Language-Team: Lithuanian (http://app.transifex.com/django/django/language/"
 "lt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -29,12 +30,10 @@ msgstr "Galimi %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Tai yra sąrašas prieinamų %s. Dėžutėje žemiau pažymėdami keletą iš jų ir "
-"paspausdami „Pasirinkti“ rodyklę tarp dviejų dėžučių jūs galite pasirinkti "
-"keletą iš jų."
+"Norėdami pasirinkti %s, pažymėkite juos, ir tada paspauskite „Pasirinkti“ "
+"rodyklės mygtuką."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -43,18 +42,17 @@ msgstr "Rašykite į šią dėžutę, kad išfiltruotumėte prieinamų %s sąra�
 msgid "Filter"
 msgstr "Filtras"
 
-msgid "Choose all"
-msgstr "Pasirinkti visus"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "Pasirinkti visus %s"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Spustelėkite, kad iš karto pasirinktumėte visus %s."
+msgid "Choose selected %s"
+msgstr "Pasirinkti pažymėtus %s"
 
-msgid "Choose"
-msgstr "Pasirinkti"
-
-msgid "Remove"
-msgstr "Pašalinti"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "Pašalinti pažymėtus %s"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -62,19 +60,29 @@ msgstr "Pasirinktas %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Tai yra sąrašas pasirinktų %s. Dėžutėje žemiau pažymėdami keletą iš jų ir "
-"paspausdami „Pašalinti“ rodyklę tarp dviejų dėžučių jūs galite pašalinti "
-"keletą iš jų."
-
-msgid "Remove all"
-msgstr "Pašalinti visus"
+"Norėdami pašalinti %s, pažymėkite juos ir pasirinkite „Pašalinti“ rodyklės "
+"mygtuką."
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Spustelėkite, kad iš karto pašalintumėte visus pasirinktus %s."
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Norėdami filtruoti pasirinktų %s sąrašą, rašykite šiame laukelyje."
+
+msgid "(click to clear)"
+msgstr "(paspauskite norėdami išvalyti)"
+
+#, javascript-format
+msgid "Remove all %s"
+msgstr "Pašalinti visus %s"
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s pažymėtas pasirinkimas nematomas"
+msgstr[1] "%s pažymėti pasirinkimai nematomi"
+msgstr[2] "%s pažymėtų pasirinkimų nematomi"
+msgstr[3] "%s pažymėtų pasirinkimų nematomi"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -90,19 +98,20 @@ msgstr ""
 "Turite neišsaugotų pakeitimų. Jeigu tęsite, Jūsų pakeitimai bus prarasti."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Pasirinkote veiksmą, bet dar neesate išsaugoję pakeitimų. Nuspauskite Gerai "
-"norėdami išsaugoti. Jus reikės iš naujo paleisti veiksmą."
+"Pasirinkote veiksmą, bet dar neišsaugojote pakeitimų atskiriems laukams. "
+"Paspauskite „Gerai“, kad išsaugotumėte. Jums reikės įvykdyti veiksmą iš "
+"naujo."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"Pasirinkote veiksmą, bet neesate pakeitę laukų reikšmių. Jūs greičiausiai "
+"Pasirinkote veiksmą, bet nesate pakeitę laukų reikšmių. Jūs greičiausiai "
 "ieškote mygtuko Vykdyti, o ne mygtuko Saugoti."
 
 msgid "Now"
@@ -120,29 +129,46 @@ msgstr "Vidurdienis"
 msgid "6 p.m."
 msgstr "18:00"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] ""
-"Pastaba: Jūsų laikrodis rodo %s valanda daugiau nei serverio laikrodis."
-msgstr[1] ""
-"Pastaba: Jūsų laikrodis rodo %s valandomis daugiau nei serverio laikrodis."
-msgstr[2] ""
-"Pastaba: Jūsų laikrodis rodo %s valandų daugiau nei serverio laikrodis."
-msgstr[3] ""
-"Pastaba: Jūsų laikrodis rodo %s valandų daugiau nei serverio laikrodis."
+msgid "server"
+msgstr "serverio"
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
 msgstr[0] ""
-"Pastaba: Jūsų laikrodis rodo %s valanda mažiau nei serverio laikrodis."
+"Pastaba: įveskite laikus %(timezone)s laiko juosta. (Jus esate %(offset)s "
+"valanda priekyje.)"
 msgstr[1] ""
-"Pastaba: Jūsų laikrodis rodo %s valandomis mažiau nei serverio laikrodis."
+"Pastaba: įveskite laikus %(timezone)s laiko juosta. (Jus esate %(offset)s "
+"valandas priekyje.)"
 msgstr[2] ""
-"Pastaba: Jūsų laikrodis rodo %s valandų mažiau nei serverio laikrodis."
+"Pastaba: įveskite laikus %(timezone)s laiko juosta. (Jus esate %(offset)s "
+"valandos priekyje.)"
 msgstr[3] ""
-"Pastaba: Jūsų laikrodis rodo %s valandų mažiau nei serverio laikrodis."
+"Pastaba: įveskite laikus %(timezone)s laiko juosta. (Jus esate %(offset)s "
+"valandų priekyje.)"
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+"Pastaba: įveskite laikus %(timezone)s laiko juosta. (Jus atsiliekate %"
+"(offset)s valanda.)"
+msgstr[1] ""
+"Pastaba: įveskite laikus %(timezone)s laiko juosta. (Jus atsiliekate %"
+"(offset)s valandomis.)"
+msgstr[2] ""
+"Pastaba: įveskite laikus %(timezone)s laiko juosta. (Jus atsiliekate %"
+"(offset)s valandos.)"
+msgstr[3] ""
+"Pastaba: įveskite laikus %(timezone)s laiko juosta. (Jus atsiliekate %"
+"(offset)s valandų.)"
 
 msgid "Choose a Time"
 msgstr "Pasirinkite laiką"
@@ -156,14 +182,29 @@ msgstr "Atšaukti"
 msgid "Today"
 msgstr "Šiandien"
 
+msgid "Today (%(date)s)"
+msgstr ""
+
 msgid "Choose a Date"
 msgstr "Pasirinkite datą"
 
 msgid "Yesterday"
 msgstr "Vakar"
 
+msgid "Yesterday (%(date)s)"
+msgstr ""
+
 msgid "Tomorrow"
 msgstr "Rytoj"
+
+msgid "Tomorrow (%(date)s)"
+msgstr ""
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr ""
+
+msgid "Next (%(month)s %(year)s)"
+msgstr ""
 
 msgid "January"
 msgstr "Sausis"
@@ -201,6 +242,103 @@ msgstr "Lapkritis"
 msgid "December"
 msgstr "Gruodis"
 
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Sau"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Vas"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Kov"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Bal"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Geg"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Bir"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Lie"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Rugp"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Rugs"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Spa"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Lap"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Gru"
+
+msgid "Sunday"
+msgstr "Sekmadienis"
+
+msgid "Monday"
+msgstr "Pirmadienis"
+
+msgid "Tuesday"
+msgstr "Antradienis"
+
+msgid "Wednesday"
+msgstr "Trečiadienis"
+
+msgid "Thursday"
+msgstr "Ketvirtadienis"
+
+msgid "Friday"
+msgstr "Penktadienis"
+
+msgid "Saturday"
+msgstr "Šeštadienis"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "Sek"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "Pir"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "Ant"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "Tre"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "Ket"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "Pen"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "Šeš"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "S"
@@ -229,8 +367,17 @@ msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Š"
 
-msgid "Show"
-msgstr "Parodyti"
+msgid "%(month)s %(day)s, %(year)s"
+msgstr ""
 
-msgid "Hide"
-msgstr "Slėpti"
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr ""

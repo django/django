@@ -68,7 +68,7 @@ class ChoiceOptionModel(models.Model):
         ordering = ("name",)
 
     def __str__(self):
-        return "ChoiceOption %d" % self.pk
+        return "ChoiceOption %s" % self.pk
 
 
 def choice_default():

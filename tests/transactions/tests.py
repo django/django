@@ -12,11 +12,13 @@ from django.db import (
     transaction,
 )
 from django.test import (
+    SimpleTestCase,
     TestCase,
     TransactionTestCase,
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import Reporter
 
@@ -214,7 +216,7 @@ class AtomicTests(TransactionTestCase):
     def test_prevent_rollback(self):
         with transaction.atomic():
             reporter = Reporter.objects.create(first_name="Tintin")
-            sid = transaction.savepoint()
+            sid = transaction.savepoint_create()
             # trigger a database error inside an inner atomic without savepoint
             with self.assertRaises(DatabaseError):
                 with transaction.atomic(savepoint=False):
@@ -467,6 +469,7 @@ class AtomicMiscTests(TransactionTestCase):
                 # exists.
                 connection.savepoint_rollback(sid)
 
+    @skipUnlessDBFeature("supports_transactions")
     def test_mark_for_rollback_on_error_in_transaction(self):
         with transaction.atomic(savepoint=False):
             # Swallow the intentional error raised.
@@ -512,6 +515,7 @@ class AtomicMiscTests(TransactionTestCase):
         Reporter.objects.create()
 
 
+@skipUnlessDBFeature("supports_transactions")
 class NonAutocommitTests(TransactionTestCase):
     available_apps = []
 
@@ -520,6 +524,7 @@ class NonAutocommitTests(TransactionTestCase):
         self.addCleanup(transaction.set_autocommit, True)
         self.addCleanup(transaction.rollback)
 
+    @skipUnlessDBFeature("supports_foreign_keys")
     def test_orm_query_after_error_and_rollback(self):
         """
         ORM queries are allowed after an error and a rollback in non-autocommit
@@ -586,3 +591,10 @@ class DurableTransactionTests(DurableTestsBase, TransactionTestCase):
 
 class DurableTests(DurableTestsBase, TestCase):
     pass
+
+
+class SavepointTests(SimpleTestCase):
+    def test_deprecation_warning(self):
+        msg = "savepoint() is deprecated. Use savepoint_create() instead."
+        with self.assertRaisesMessage(RemovedInDjango70Warning, msg):
+            transaction.savepoint()

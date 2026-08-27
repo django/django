@@ -6,7 +6,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
 # madisvain <madisvain@gmail.com>, 2011
-# Martin <martinpajuste@gmail.com>, 2014-2015,2021-2025
+# Martin <martinpajuste@gmail.com>, 2014-2015,2021-2026
 # Martin <martinpajuste@gmail.com>, 2016-2017,2019-2020
 # Marti Raudsepp <marti@juffo.org>, 2014,2016
 # Ragnar Rebase <rrebase@gmail.com>, 2019
@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: Martin <martinpajuste@gmail.com>, 2014-2015,2021-2025\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 06:49+0000\n"
+"Last-Translator: Martin <martinpajuste@gmail.com>, 2014-2015,2021-2026\n"
 "Language-Team: Estonian (http://app.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -147,6 +147,9 @@ msgstr "horvaatia"
 
 msgid "Upper Sorbian"
 msgstr "ülemsorbi"
+
+msgid "Haitian Creole"
+msgstr "haiti"
 
 msgid "Hungarian"
 msgstr "ungari"
@@ -490,6 +493,9 @@ msgstr "%(model_name)s väljaga %(field_labels)s on juba olemas."
 msgid "Constraint “%(name)s” is violated."
 msgstr "Kitsendust “%(name)s” on rikutud."
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Väärtus %(value)r ei ole kehtiv valik."
@@ -558,11 +564,11 @@ msgstr "Kuupäev (kellaajata)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
-"“%(value)s” väärtusel on vale formaat. Peab olema formaadis AAAA-KK-PP HH:"
-"MM[:ss[.uuuuuu]][TZ]."
+"“%(value)s” väärtusel on vale formaat. Peab olema formaadis AAAA-KK-PP "
+"HH:MM[:ss[.uuuuuu]][TZ]."
 
 #, python-format
 msgid ""
@@ -584,8 +590,8 @@ msgstr "Kümnendmurd"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "“%(value)s” väärtusel on vale formaat. Peab olema formaadis [DD] "
 "[[HH:]MM:]ss[.uuuuuu]."
@@ -653,8 +659,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"“%(value)s” väärtusel on vale formaat. Peab olema formaadis HH:MM[:ss[."
-"uuuuuu]]."
+"“%(value)s” väärtusel on vale formaat. Peab olema formaadis "
+"HH:MM[:ss[.uuuuuu]]."
 
 #, python-format
 msgid ""
@@ -672,6 +678,10 @@ msgstr "URL"
 
 msgid "Raw binary data"
 msgstr "Töötlemata binaarandmed"
+
+#, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -714,8 +724,8 @@ msgid "Many-to-many relationship"
 msgstr "Mitu-mitmele seos"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -833,8 +843,6 @@ msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
-"Please correct the duplicate data for %(field_name)s which must be unique "
-"for the %(lookup)s in %(date_field)s."
 
 msgid "Please correct the duplicate values below."
 msgstr "Palun parandage allolevad duplikaat-väärtused"
@@ -874,6 +882,28 @@ msgstr "Jah"
 
 msgid "No"
 msgstr "Ei"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
+
+msgctxt "Task"
+msgid "Ready"
+msgstr "Valmis"
+
+msgctxt "Task"
+msgid "Running"
+msgstr "Käivitatud"
+
+msgctxt "Task"
+msgid "Failed"
+msgstr "Ebaõnnestus"
+
+msgctxt "Task"
+msgid "Successful"
+msgstr "Õnnestus"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1263,11 +1293,11 @@ msgstr "Ei leitud %(verbose_name_plural)s"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
-"Tulevane %(verbose_name_plural)s pole saadaval, sest %(class_name)s."
-"allow_future on False."
+"Tulevane %(verbose_name_plural)s pole saadaval, sest "
+"%(class_name)s.allow_future on False."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
@@ -1317,10 +1347,10 @@ msgid ""
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"Näete seda lehte, kuna teil on määratud <a href=\"https://docs.djangoproject."
-"com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
-"rel=\"noopener\">DEBUG=True</a> Django seadete failis ja te ei ole ühtki "
-"URLi seadistanud."
+"Näete seda lehte, kuna teil on määratud <a href=\"https://"
+"docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" "
+"target=\"_blank\" rel=\"noopener\">DEBUG=True</a> Django seadete failis ja "
+"te ei ole ühtki URLi seadistanud."
 
 msgid "Django Documentation"
 msgstr "Django dokumentatsioon"

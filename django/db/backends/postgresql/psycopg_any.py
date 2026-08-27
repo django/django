@@ -2,9 +2,8 @@ import ipaddress
 from functools import lru_cache
 
 try:
-    from psycopg import ClientCursor, IsolationLevel, adapt, adapters, errors, sql
+    from psycopg import ClientCursor, IsolationLevel, adapt, adapters, errors, pq, sql
     from psycopg.postgres import types
-    from psycopg.types.datetime import TimestamptzLoader
     from psycopg.types.json import Jsonb
     from psycopg.types.range import Range, RangeDumper
     from psycopg.types.string import TextLoader
@@ -16,23 +15,30 @@ try:
 
     TSRANGE_OID = types["tsrange"].oid
     TSTZRANGE_OID = types["tstzrange"].oid
+    orig_tz_loader_cls = adapters.get_loader(
+        types["timestamptz"].oid,
+        pq.Format.TEXT,
+    )
 
     def mogrify(sql, params, connection):
         with connection.cursor() as cursor:
             return ClientCursor(cursor.connection).mogrify(sql, params)
 
     # Adapters.
-    class BaseTzLoader(TimestamptzLoader):
+    class BaseTzLoader(adapt.Loader):
         """
-        Load a PostgreSQL timestamptz using the a specific timezone.
+        Load a PostgreSQL timestamptz using a specific timezone.
         The timezone can be None too, in which case it will be chopped.
         """
 
         timezone = None
 
+        def __init__(self, oid, context):
+            super().__init__(oid, context)
+            self.orig_loader = orig_tz_loader_cls(oid, context)
+
         def load(self, data):
-            res = super().load(data)
-            return res.replace(tzinfo=self.timezone)
+            return self.orig_loader.load(data).replace(tzinfo=self.timezone)
 
     def register_tzloader(tz, context):
         class SpecificTzLoader(BaseTzLoader):

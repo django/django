@@ -112,8 +112,9 @@ field. This is used when the ``Field`` is displayed in a ``Form``.
 
 As explained in :ref:`ref-forms-api-outputting-html`, the default label for a
 ``Field`` is generated from the field name by converting all underscores to
-spaces and upper-casing the first letter. Specify ``label`` if that default
-behavior doesn't result in an adequate label.
+spaces and upper-casing the first letter. Specify a string for ``label`` if
+that default behavior doesn't result in an adequate label. Use an empty string
+(``""``) to hide the label.
 
 Here's a full example ``Form`` that implements ``label`` for two of its fields.
 We've specified ``auto_id=False`` to simplify the output:
@@ -272,15 +273,13 @@ fields. We've specified ``auto_id=False`` to simplify the output:
     >>> class HelpTextContactForm(forms.Form):
     ...     subject = forms.CharField(max_length=100, help_text="100 characters max.")
     ...     message = forms.CharField()
-    ...     sender = forms.EmailField(help_text="A valid email address, please.")
-    ...     cc_myself = forms.BooleanField(required=False)
+    ...     contact_email = forms.EmailField(help_text="Your email (so we can reply).")
     ...
     >>> f = HelpTextContactForm(auto_id=False)
     >>> print(f)
     <div>Subject:<div class="helptext">100 characters max.</div><input type="text" name="subject" maxlength="100" required></div>
     <div>Message:<input type="text" name="message" required></div>
-    <div>Sender:<div class="helptext">A valid email address, please.</div><input type="email" name="sender" required></div>
-    <div>Cc myself:<input type="checkbox" name="cc_myself"></div>
+    <div>Contact email:<div class="helptext">Your email (so we can reply).</div><input type="email" name="contact_email" maxlength="320" required></div>
 
 When a field has help text it is associated with its input using the
 ``aria-describedby`` HTML attribute. If the widget is rendered in a
@@ -398,8 +397,6 @@ template, see also :ref:`overriding-built-in-field-templates`.
 ---------------------
 
 .. attribute:: Field.bound_field_class
-
-.. versionadded:: 5.2
 
 The ``bound_field_class`` attribute allows a per-field override of
 :attr:`.Form.bound_field_class`.
@@ -724,6 +721,26 @@ For each field, we describe the default widget used if you don't specify
         Optional. Either ``True`` or ``False``. Default is ``False``. Specifies
         whether folders in the specified location should be included. Either
         this or :attr:`allow_files` must be ``True``.
+
+    ``FilePathField`` has the following method:
+
+    .. method:: set_choices()
+
+        .. versionadded:: 6.1
+
+        Scans the directory at :attr:`path` and refreshes the field's
+        choices. This is called automatically during ``__init__()``, but it can
+        also be called explicitly to pick up files added to the directory
+        after the field was first instantiated (usually at server startup). For
+        example, call it in a form's ``__init__()`` to get fresh choices per
+        request::
+
+            class MyForm(forms.Form):
+                my_file = forms.FilePathField(path="/path/to/dir")
+
+                def __init__(self, *args, **kwargs):
+                    super().__init__(*args, **kwargs)
+                    self.fields["my_file"].set_choices()
 
 ``FloatField``
 --------------
@@ -1385,7 +1402,7 @@ generating choices. See :ref:`iterating-relationship-choices` for details.
 
         By default the ``<select>`` widget used by ``ModelChoiceField`` will
         have an empty choice at the top of the list. You can change the text of
-        this label (which is ``"---------"`` by default) with the
+        this label (which is ``"- Select an option -"`` by default) with the
         ``empty_label`` attribute, or you can disable the empty label entirely
         by setting ``empty_label`` to ``None``::
 
@@ -1400,6 +1417,11 @@ generating choices. See :ref:`iterating-relationship-choices` for details.
         default initial value, or a ``widget`` is set to
         :class:`~django.forms.RadioSelect` and the
         :attr:`~ModelChoiceField.blank` argument is ``False``.
+
+    .. versionchanged:: 6.1
+
+        The default empty label was changed from ``"---------"`` to
+        ``"- Select an option -"``.
 
     .. attribute:: to_field_name
 

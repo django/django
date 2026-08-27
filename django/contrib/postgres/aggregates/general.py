@@ -1,18 +1,20 @@
 import warnings
 
 from django.contrib.postgres.fields import ArrayField
-from django.db.models import Aggregate, BooleanField, JSONField
+from django.db.models import Aggregate
+from django.db.models import BitAnd as _BitAnd
+from django.db.models import BitOr as _BitOr
+from django.db.models import BitXor as _BitXor
+from django.db.models import BooleanField, JSONField
 from django.db.models import StringAgg as _StringAgg
 from django.db.models import Value
 from django.utils.deprecation import RemovedInDjango70Warning
 
-from .mixins import _DeprecatedOrdering
-
 __all__ = [
     "ArrayAgg",
-    "BitAnd",
-    "BitOr",
-    "BitXor",
+    "BitAnd",  # RemovedInDjango70Warning
+    "BitOr",  # RemovedInDjango70Warning
+    "BitXor",  # RemovedInDjango70Warning
     "BoolAnd",
     "BoolOr",
     "JSONBAgg",
@@ -20,9 +22,7 @@ __all__ = [
 ]
 
 
-# RemovedInDjango61Warning: When the deprecation ends, replace with:
-# class ArrayAgg(Aggregate):
-class ArrayAgg(_DeprecatedOrdering, Aggregate):
+class ArrayAgg(Aggregate):
     function = "ARRAY_AGG"
     allow_distinct = True
     allow_order_by = True
@@ -32,16 +32,37 @@ class ArrayAgg(_DeprecatedOrdering, Aggregate):
         return ArrayField(self.source_expressions[0].output_field)
 
 
-class BitAnd(Aggregate):
-    function = "BIT_AND"
+class BitAnd(_BitAnd):
+    def __init__(self, expression, **extra):
+        warnings.warn(
+            "The PostgreSQL-specific BitAnd function is deprecated. Use "
+            "django.db.models.aggregates.BitAnd instead.",
+            category=RemovedInDjango70Warning,
+            stacklevel=2,
+        )
+        super().__init__(expression, **extra)
 
 
-class BitOr(Aggregate):
-    function = "BIT_OR"
+class BitOr(_BitOr):
+    def __init__(self, expression, **extra):
+        warnings.warn(
+            "The PostgreSQL-specific BitOr function is deprecated. Use "
+            "django.db.models.aggregates.BitOr instead.",
+            category=RemovedInDjango70Warning,
+            stacklevel=2,
+        )
+        super().__init__(expression, **extra)
 
 
-class BitXor(Aggregate):
-    function = "BIT_XOR"
+class BitXor(_BitXor):
+    def __init__(self, expression, **extra):
+        warnings.warn(
+            "The PostgreSQL-specific BitXor function is deprecated. Use "
+            "django.db.models.aggregates.BitXor instead.",
+            category=RemovedInDjango70Warning,
+            stacklevel=2,
+        )
+        super().__init__(expression, **extra)
 
 
 class BoolAnd(Aggregate):
@@ -54,19 +75,15 @@ class BoolOr(Aggregate):
     output_field = BooleanField()
 
 
-# RemovedInDjango61Warning: When the deprecation ends, replace with:
-# class JSONBAgg(Aggregate):
-class JSONBAgg(_DeprecatedOrdering, Aggregate):
+class JSONBAgg(Aggregate):
     function = "JSONB_AGG"
     allow_distinct = True
     allow_order_by = True
     output_field = JSONField()
 
 
-# RemovedInDjango61Warning: When the deprecation ends, replace with:
-# class StringAgg(_StringAgg):
 # RemovedInDjango70Warning: When the deprecation ends, remove completely.
-class StringAgg(_DeprecatedOrdering, _StringAgg):
+class StringAgg(_StringAgg):
 
     def __init__(self, expression, delimiter, **extra):
         if isinstance(delimiter, str):
@@ -82,7 +99,7 @@ class StringAgg(_DeprecatedOrdering, _StringAgg):
 
         warnings.warn(
             "The PostgreSQL specific StringAgg function is deprecated. Use "
-            "django.db.models.aggregate.StringAgg instead.",
+            "django.db.models.aggregates.StringAgg instead.",
             category=RemovedInDjango70Warning,
             stacklevel=2,
         )

@@ -426,6 +426,12 @@ Django is compatible with versions of PyPy corresponding to the supported
 Python versions, but you will need to check the compatibility of other
 libraries you rely on.
 
+That said, a lot of a web framework's work is done by concatenating
+strings, and PyPy has an issue with that (see
+`this PyPy blog
+<https://pypy.org/posts/2023/01/string-concatenation-quadratic.html>`_).
+This may cause performance issues, depending on your use.
+
 C implementations of Python libraries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

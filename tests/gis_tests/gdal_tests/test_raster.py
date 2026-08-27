@@ -151,6 +151,7 @@ class GDALRasterTests(SimpleTestCase):
     def test_file_based_raster_creation(self):
         # Prepare tempfile
         rstfile = NamedTemporaryFile(suffix=".tif")
+        self.addCleanup(rstfile.close)
 
         # Create file-based raster from scratch
         GDALRaster(
@@ -265,8 +266,15 @@ class GDALRasterTests(SimpleTestCase):
         # The vsi buffer is None for rasters that are not vsi based.
         self.assertIsNone(self.rs.vsi_buffer)
 
+    def test_vsi_buffer_length(self):
+        with open(self.rs_path, "rb") as rst_file:
+            rst_bytes = rst_file.read()
+        vsimem = GDALRaster(rst_bytes)
+        self.assertEqual(len(vsimem.vsi_buffer), len(rst_bytes))
+
     def test_vsi_vsizip_filesystem(self):
         rst_zipfile = NamedTemporaryFile(suffix=".zip")
+        self.addCleanup(rst_zipfile.close)
         with zipfile.ZipFile(rst_zipfile, mode="w") as zf:
             zf.write(self.rs_path, "raster.tif")
         rst_path = "/vsizip/" + os.path.join(rst_zipfile.name, "raster.tif")
@@ -410,6 +418,7 @@ class GDALRasterTests(SimpleTestCase):
 
     def test_compressed_file_based_raster_creation(self):
         rstfile = NamedTemporaryFile(suffix=".tif")
+        self.addCleanup(rstfile.close)
         # Make a compressed copy of an existing raster.
         compressed = self.rs.warp(
             {"papsz_options": {"compress": "packbits"}, "name": rstfile.name}
@@ -567,6 +576,7 @@ class GDALRasterTests(SimpleTestCase):
 
     def test_raster_clone(self):
         rstfile = NamedTemporaryFile(suffix=".tif")
+        self.addCleanup(rstfile.close)
         tests = [
             ("MEM", "", 23),  # In memory raster.
             ("tif", rstfile.name, 99),  # In file based raster.
@@ -613,6 +623,7 @@ class GDALRasterTests(SimpleTestCase):
             with self.subTest(srs=srs):
                 # Prepare tempfile and nodata value.
                 rstfile = NamedTemporaryFile(suffix=".tif")
+                self.addCleanup(rstfile.close)
                 ndv = 99
                 # Create in file based raster.
                 source = GDALRaster(
@@ -714,6 +725,7 @@ class GDALRasterTests(SimpleTestCase):
         with mock.patch.object(GDALRaster, "clone") as mocked_clone:
             # Create in file based raster.
             rstfile = NamedTemporaryFile(suffix=".tif")
+            self.addCleanup(rstfile.close)
             source = GDALRaster(
                 {
                     "datatype": 1,
@@ -742,6 +754,7 @@ class GDALRasterTests(SimpleTestCase):
     def test_raster_transform_clone_name(self):
         # Create in file based raster.
         rstfile = NamedTemporaryFile(suffix=".tif")
+        self.addCleanup(rstfile.close)
         source = GDALRaster(
             {
                 "datatype": 1,

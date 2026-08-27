@@ -56,7 +56,7 @@ class MigrationRecorder:
     def has_table(self):
         """Return True if the django_migrations table exists."""
         # If the migrations table has already been confirmed to exist, don't
-        # recheck it's existence.
+        # recheck its existence.
         if self._has_table:
             return True
         # It hasn't been confirmed to exist, recheck.

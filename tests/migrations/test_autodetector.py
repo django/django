@@ -1,6 +1,7 @@
 import copy
 import functools
 import re
+import uuid
 from unittest import mock
 
 from django.apps import apps
@@ -712,6 +713,102 @@ class AutodetectorTests(BaseAutodetectorTests):
     author_unmanaged = ModelState(
         "testapp", "AuthorUnmanaged", [], {"managed": False}, ("testapp.author",)
     )
+    author_unmanaged_empty = ModelState(
+        "testapp",
+        "Author",
+        [("id", models.AutoField(primary_key=True))],
+        {"managed": False},
+        ("testapp.author",),
+    )
+    author_unmanaged_name_check_constraint = ModelState(
+        "testapp",
+        "Author",
+        [
+            ("id", models.AutoField(primary_key=True)),
+            ("name", models.CharField(max_length=200, default="Ada Lovelace")),
+        ],
+        {
+            "managed": False,
+            "constraints": [
+                models.CheckConstraint(
+                    condition=models.Q(name__contains="Bob"), name="name_contains_bob"
+                )
+            ],
+        },
+        ("testapp.author",),
+    )
+    author_unmanaged_with_book = ModelState(
+        "testapp",
+        "Author",
+        [
+            ("id", models.AutoField(primary_key=True)),
+            ("name", models.CharField(max_length=200)),
+            ("book", models.ForeignKey("otherapp.Book", models.CASCADE)),
+        ],
+        {"managed": False},
+        ("testapp.author",),
+    )
+    author_unmanaged_name_default = ModelState(
+        "testapp",
+        "Author",
+        [
+            ("id", models.AutoField(primary_key=True)),
+            ("name", models.CharField(max_length=200, default="Ada Lovelace")),
+        ],
+        {"managed": False},
+        ("testapp.author",),
+    )
+    author_unmanaged_uid_unique_default = ModelState(
+        "testapp",
+        "Author",
+        [
+            ("id", models.AutoField(primary_key=True)),
+            ("uid", models.UUIDField(default=uuid.uuid4, unique=True)),
+        ],
+        {"managed": False},
+        ("testapp.author",),
+    )
+    author_unmanaged_name_longer = ModelState(
+        "testapp",
+        "Author",
+        [
+            ("id", models.AutoField(primary_key=True)),
+            ("name", models.CharField(max_length=400)),
+        ],
+        {"managed": False},
+        ("testapp.author",),
+    )
+    author_unmanaged_name_no_default = ModelState(
+        "testapp",
+        "Author",
+        [
+            ("id", models.AutoField(primary_key=True)),
+            ("name", models.CharField(max_length=200)),
+        ],
+        {"managed": False},
+        ("testapp.author",),
+    )
+    author_unmanaged_name_nullable = ModelState(
+        "testapp",
+        "Author",
+        [
+            ("id", models.AutoField(primary_key=True)),
+            ("name", models.CharField(max_length=200, null=True)),
+        ],
+        {"managed": False},
+        ("testapp.author",),
+    )
+    author_unmanaged_renamed_with_book = ModelState(
+        "testapp",
+        "Writer",
+        [
+            ("id", models.AutoField(primary_key=True)),
+            ("name", models.CharField(max_length=200)),
+            ("book", models.ForeignKey("otherapp.Book", models.CASCADE)),
+        ],
+        {"managed": False},
+        ("testapp.author",),
+    )
     author_unmanaged_managed = ModelState(
         "testapp", "AuthorUnmanaged", [], {}, ("testapp.author",)
     )
@@ -739,6 +836,13 @@ class AutodetectorTests(BaseAutodetectorTests):
         [
             ("id", models.AutoField(primary_key=True)),
             ("publishers", models.ManyToManyField("testapp.Publisher", blank=True)),
+        ],
+    )
+    other_publisher = ModelState(
+        "testapp",
+        "OtherPublisher",
+        [
+            ("id", models.AutoField(primary_key=True)),
         ],
     )
     author_with_m2m_through = ModelState(
@@ -821,6 +925,17 @@ class AutodetectorTests(BaseAutodetectorTests):
             ("id", models.AutoField(primary_key=True)),
         ],
         {"db_table": "author_three"},
+    )
+    book_unmanaged = ModelState(
+        "otherapp",
+        "Book",
+        [
+            ("id", models.AutoField(primary_key=True)),
+            ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
+            ("title", models.CharField(max_length=200)),
+        ],
+        {"managed": False},
+        ("otherapp.book",),
     )
     contract = ModelState(
         "testapp",
@@ -960,6 +1075,17 @@ class AutodetectorTests(BaseAutodetectorTests):
             ("author", models.ForeignKey("testapp.Writer", models.CASCADE)),
             ("title", models.CharField(max_length=200)),
         ],
+    )
+    book_with_author_unmanaged_renamed = ModelState(
+        "otherapp",
+        "Book",
+        [
+            ("id", models.AutoField(primary_key=True)),
+            ("author", models.ForeignKey("testapp.Writer", models.CASCADE)),
+            ("title", models.CharField(max_length=200)),
+        ],
+        {"managed": False},
+        ("otherapp.book",),
     )
     book_with_field_and_author_renamed = ModelState(
         "otherapp",
@@ -4012,8 +4138,64 @@ class AutodetectorTests(BaseAutodetectorTests):
         )
         self.assertEqual(fk_field.remote_field.model, "testapp.AAuthorProxyProxy")
 
+    def test_unmanaged_add_constraints(self):
+        """Test change detection of new constraints on an unmanaged model."""
+        changes = self.get_changes(
+            [self.author_unmanaged_name_default],
+            [self.author_unmanaged_name_check_constraint],
+        )
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AddConstraint"])
+        added_constraint = models.CheckConstraint(
+            condition=models.Q(name__contains="Bob"), name="name_contains_bob"
+        )
+        self.assertOperationAttributes(
+            changes, "testapp", 0, 0, model_name="author", constraint=added_constraint
+        )
+
+    def test_unmanaged_add_field(self):
+        """Tests autodetection of new fields on an unmanaged model."""
+        changes = self.get_changes(
+            [self.author_unmanaged_empty], [self.author_unmanaged_name_default]
+        )
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AddField"])
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="name")
+
+    def test_unmanaged_add_field_unique_default(self):
+        changes = self.get_changes(
+            [self.author_unmanaged_empty], [self.author_unmanaged_uid_unique_default]
+        )
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AddField"])
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="uid")
+
+    def test_unmanaged_alter_field(self):
+        """Tests autodetection of altered fields on an unmanaged model."""
+        changes = self.get_changes(
+            [self.author_unmanaged_name_default], [self.author_unmanaged_name_longer]
+        )
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterField"])
+        self.assertOperationAttributes(
+            changes, "testapp", 0, 0, name="name", preserve_default=True
+        )
+
+    def test_unmanaged_alter_field_no_default(self):
+        changes = self.get_changes(
+            [self.author_unmanaged_name_nullable],
+            [self.author_unmanaged_name_no_default],
+        )
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterField"])
+        self.assertOperationAttributes(
+            changes, "testapp", 0, 0, name="name", preserve_default=True
+        )
+
     def test_unmanaged_create(self):
-        """The autodetector correctly deals with managed models."""
+        """The autodetector correctly deals with unmanaged models."""
         # First, we test adding an unmanaged model
         changes = self.get_changes(
             [self.author_empty], [self.author_empty, self.author_unmanaged]
@@ -4024,6 +4206,50 @@ class AutodetectorTests(BaseAutodetectorTests):
         self.assertOperationAttributes(
             changes, "testapp", 0, 0, name="AuthorUnmanaged", options={"managed": False}
         )
+
+    def test_unmanaged_remove_field(self):
+        """Tests autodetection of removed fields on an unmanaged model."""
+        changes = self.get_changes(
+            [self.author_unmanaged_name_default], [self.author_unmanaged_empty]
+        )
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["RemoveField"])
+        self.assertOperationAttributes(
+            changes, "testapp", 0, 0, name="name", model_name="author"
+        )
+
+    def test_unmanaged_remove_constraints(self):
+        """Test change detection of new constraints on an umnanaged model."""
+        changes = self.get_changes(
+            [self.author_unmanaged_name_check_constraint],
+            [self.author_unmanaged_name_default],
+        )
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["RemoveConstraint"])
+        self.assertOperationAttributes(
+            changes, "testapp", 0, 0, model_name="author", name="name_contains_bob"
+        )
+
+    def test_unmanaged_rename_model(self):
+        """Tests autodetection of renamed models on an unmanaged model."""
+        changes = self.get_changes(
+            [self.author_unmanaged_with_book, self.book_unmanaged],
+            [
+                self.author_unmanaged_renamed_with_book,
+                self.book_with_author_unmanaged_renamed,
+            ],
+            MigrationQuestioner({"ask_rename_model": True}),
+        )
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["RenameModel"])
+        self.assertOperationAttributes(
+            changes, "testapp", 0, 0, old_name="Author", new_name="Writer"
+        )
+        # Now that RenameModel handles related fields too, there should be
+        # no AlterField for the related field.
+        self.assertNumberMigrations(changes, "otherapp", 0)
 
     def test_unmanaged_delete(self):
         changes = self.get_changes(
@@ -4556,6 +4782,46 @@ class AutodetectorTests(BaseAutodetectorTests):
             changes, "testapp", 0, 2, name="publishers", model_name="author"
         )
         self.assertOperationFieldAttributes(changes, "testapp", 0, 2, max_length=100)
+
+    def test_m2m_target_change_generates_remove_and_add(self):
+        before = [
+            self.publisher,
+            self.other_publisher,
+            self.author_with_m2m,  # m2m to self.publisher.
+        ]
+
+        after = [
+            self.publisher,
+            self.other_publisher,
+            ModelState(
+                "testapp",
+                "Author",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    # Repoint m2m to self.other_publisher.
+                    ("publishers", models.ManyToManyField("testapp.OtherPublisher")),
+                ],
+            ),
+        ]
+        changes = self.get_changes(before, after)
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["RemoveField", "AddField"])
+        self.assertOperationAttributes(
+            changes,
+            "testapp",
+            0,
+            0,
+            name="publishers",
+            model_name="author",
+        )
+        self.assertOperationAttributes(
+            changes,
+            "testapp",
+            0,
+            1,
+            name="publishers",
+            model_name="author",
+        )
 
     def test_non_circular_foreignkey_dependency_removal(self):
         """
@@ -5541,6 +5807,51 @@ class AutodetectorTests(BaseAutodetectorTests):
             name="id",
             model_name="foo",
             preserve_default=True,
+        )
+
+    def test_does_not_crash_after_rename_on_unique_together(self):
+        fields = ("first", "second")
+        before = self.make_project_state(
+            [
+                ModelState(
+                    "app",
+                    "Foo",
+                    [
+                        ("id", models.AutoField(primary_key=True)),
+                        ("first", models.IntegerField()),
+                        ("second", models.IntegerField()),
+                    ],
+                    options={"unique_together": {fields}},
+                ),
+            ]
+        )
+        after = before.clone()
+        after.rename_field("app", "foo", "first", "first_renamed")
+
+        changes = MigrationAutodetector(
+            before, after, MigrationQuestioner({"ask_rename": True})
+        )._detect_changes()
+
+        self.assertNumberMigrations(changes, "app", 1)
+        self.assertOperationTypes(
+            changes, "app", 0, ["RenameField", "AlterUniqueTogether"]
+        )
+        self.assertOperationAttributes(
+            changes,
+            "app",
+            0,
+            0,
+            model_name="foo",
+            old_name="first",
+            new_name="first_renamed",
+        )
+        self.assertOperationAttributes(
+            changes,
+            "app",
+            0,
+            1,
+            name="foo",
+            unique_together={("first_renamed", "second")},
         )
 
 

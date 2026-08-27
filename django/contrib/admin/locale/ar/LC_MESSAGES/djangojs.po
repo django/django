@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Abdulrahman Alfawal, 2025
 # Bashar Al-Abdulhadi, 2015,2020-2021
 # Bashar Al-Abdulhadi, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -9,10 +10,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-10-15 21:27+0000\n"
-"Last-Translator: Bashar Al-Abdulhadi\n"
-"Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
+"POT-Creation-Date: 2025-03-25 15:04-0500\n"
+"PO-Revision-Date: 2025-12-03 07:59+0000\n"
+"Last-Translator: Abdulrahman Alfawal, 2025\n"
+"Language-Team: Arabic (http://app.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -26,11 +27,8 @@ msgstr "%s المتوفرة"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
-msgstr ""
-"هذه قائمة %s المتوفرة. يمكنك اختيار بعضها بانتقائها في الصندوق أدناه ثم "
-"الضغط على سهم الـ\"اختيار\" بين الصندوقين."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
+msgstr "اختر %s بواسطة تحديدها ثم اضغط على زر السهم \"اختيار\"."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -39,18 +37,17 @@ msgstr "اكتب في هذا الصندوق لتصفية قائمة %s المت�
 msgid "Filter"
 msgstr "تصفية"
 
-msgid "Choose all"
-msgstr "اختر الكل"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "اختر جميع %s"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "اضغط لاختيار جميع %s جملة واحدة."
+msgid "Choose selected %s"
+msgstr "اختر %s المحددة"
 
-msgid "Choose"
-msgstr "اختيار"
-
-msgid "Remove"
-msgstr "احذف"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "إزالة %s المحددة"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -58,18 +55,29 @@ msgstr "%s المُختارة"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
-msgstr ""
-"هذه قائمة %s المحددة. يمكنك إزالة بعضها باختيارها في الصندوق أدناه ثم اضغط "
-"على سهم الـ\"إزالة\" بين الصندوقين."
-
-msgid "Remove all"
-msgstr "إزالة الكل"
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
+msgstr "أزل %s بواسطة تحديدها ثم اضغط على زر السهم \"إزالة\"."
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "اضغط لإزالة جميع %s المحددة جملة واحدة."
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "اكتب في هذا المربع لتصفية قائمة %s المحددة."
+
+msgid "(click to clear)"
+msgstr "(اضغط للإزالة)"
+
+#, javascript-format
+msgid "Remove all %s"
+msgstr "إزالة جميع %s"
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s خيار محدد غير ظاهر"
+msgstr[1] "%s خيار محدد غير ظاهر"
+msgstr[2] "%s خيارات محددة غير ظاهرة"
+msgstr[3] "%s خيارات محددة غير ظاهرة"
+msgstr[4] "%s خيارات محددة غير ظاهرة"
+msgstr[5] "%s خيارات محددة غير ظاهرة"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -243,6 +251,55 @@ msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "ديسمبر"
 
+msgid "Sunday"
+msgstr "الأحد"
+
+msgid "Monday"
+msgstr "الاثنين"
+
+msgid "Tuesday"
+msgstr "الثلاثاء"
+
+msgid "Wednesday"
+msgstr "الأربعاء"
+
+msgid "Thursday"
+msgstr "الخميس"
+
+msgid "Friday"
+msgstr "الجمعة"
+
+msgid "Saturday"
+msgstr "السبت"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "الأحد"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "الاثنين"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "الثلاثاء"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "الأربعاء"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "الخميس"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "الجمعة"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "السبت"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "أحد"
@@ -270,9 +327,3 @@ msgstr "جمعة"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "سبت"
-
-msgid "Show"
-msgstr "أظهر"
-
-msgid "Hide"
-msgstr "اخف"

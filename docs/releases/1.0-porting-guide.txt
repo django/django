@@ -620,7 +620,7 @@ Dictionary access to ``HttpRequest``
 access; previously, both ``GET`` and ``POST`` data were directly
 available on the ``HttpRequest`` object (e.g., you could check for a
 piece of form data by using ``if 'some_form_key' in request`` or by
-reading ``request['some_form_key']``. This is no longer supported; if
+reading ``request['some_form_key']``). This is no longer supported; if
 you need access to the combined ``GET`` and ``POST`` data, use
 ``request.REQUEST`` instead.
 

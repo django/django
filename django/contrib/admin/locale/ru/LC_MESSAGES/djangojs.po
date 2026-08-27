@@ -9,16 +9,17 @@
 # crazyzubr <hjcnbckfd@gmail.com>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Panasoft, 2021
-# Алексей Борискин <sun.void@gmail.com>, 2012,2014-2015,2022-2023
+# Pavel Kutsenko <zebartcoc@gmail.com>, 2025
+# Алексей Борискин <sun.void@gmail.com>, 2012,2014-2015,2022-2023,2025-2026
 # Андрей Щуров <shurov9009@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2023-12-04 07:59+0000\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-05 07:59+0000\n"
 "Last-Translator: Алексей Борискин <sun.void@gmail.com>, "
-"2012,2014-2015,2022-2023\n"
+"2012,2014-2015,2022-2023,2025-2026\n"
 "Language-Team: Russian (http://app.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -35,11 +36,10 @@ msgstr "Доступные %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"Это список всех доступных %s. Вы можете выбрать некоторые из них, выделив их "
-"в поле ниже и кликнув \"Выбрать\", либо двойным щелчком."
+"Выделите элементы в списке \"%s\" и нажмите кнопку со стрелкой вправо, чтобы "
+"добавить их к выбранным."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -49,18 +49,17 @@ msgstr ""
 msgid "Filter"
 msgstr "Фильтр"
 
-msgid "Choose all"
-msgstr "Выбрать все"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "Выбрать все %s"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "Нажмите, чтобы выбрать все %s сразу."
+msgid "Choose selected %s"
+msgstr "Выбрать отмеченные %s"
 
-msgid "Choose"
-msgstr "Выбрать"
-
-msgid "Remove"
-msgstr "Удалить"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "Удалить отмеченные %s"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -68,23 +67,22 @@ msgstr "Выбранные %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"Это список выбранных %s. Вы можете удалить некоторые из них, выделив их в "
-"поле ниже и кликнув \"Удалить\", либо двойным щелчком."
+"Выделите элементы в списке \"%s\" и и нажмите стрелку влево, чтобы убрать их "
+"из выбранных."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
 msgstr ""
 "Набирайте символы в этом поле, чтобы отфильтровать список выбранных %s."
 
-msgid "Remove all"
-msgstr "Удалить все"
+msgid "(click to clear)"
+msgstr "(нажмите, чтобы очистить)"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "Нажмите чтобы удалить все %s сразу."
+msgid "Remove all %s"
+msgstr "Удалить все %s"
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -119,12 +117,11 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"Вы выбрали действие и не внесли изменений в данные. Возможно, вы хотели "
-"воспользоваться кнопкой \"Выполнить\", а не кнопкой \"Сохранить\". Если это "
-"так, то нажмите \"Отмена\", чтобы вернуться в интерфейс редактирования."
+"Вы выбрали действие, но вы не внесли изменений в данные. Возможно, вы хотели "
+"нажать кнопку \"Запустить\", а не кнопку \"Сохранить\"."
 
 msgid "Now"
 msgstr "Сейчас"
@@ -141,25 +138,30 @@ msgstr "Полдень"
 msgid "6 p.m."
 msgstr "6 вечера"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Внимание: Ваше локальное время опережает время сервера на %s час."
-msgstr[1] "Внимание: Ваше локальное время опережает время сервера на %s часа."
-msgstr[2] "Внимание: Ваше локальное время опережает время сервера на %s часов."
-msgstr[3] "Внимание: Ваше локальное время опережает время сервера на %s часов."
+msgid "server"
+msgstr ""
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
 msgstr[0] ""
-"Внимание: Ваше локальное время отстаёт от времени сервера на %s час."
 msgstr[1] ""
-"Внимание: Ваше локальное время отстаёт от времени сервера на %s часа."
 msgstr[2] ""
-"Внимание: Ваше локальное время отстаёт от времени сервера на %s часов."
 msgstr[3] ""
-"Внимание: Ваше локальное время отстаёт от времени сервера на %s часов."
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 msgid "Choose a Time"
 msgstr "Выберите время"
@@ -173,14 +175,29 @@ msgstr "Отмена"
 msgid "Today"
 msgstr "Сегодня"
 
+msgid "Today (%(date)s)"
+msgstr ""
+
 msgid "Choose a Date"
 msgstr "Выберите дату"
 
 msgid "Yesterday"
 msgstr "Вчера"
 
+msgid "Yesterday (%(date)s)"
+msgstr ""
+
 msgid "Tomorrow"
 msgstr "Завтра"
+
+msgid "Tomorrow (%(date)s)"
+msgstr ""
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr ""
+
+msgid "Next (%(month)s %(year)s)"
+msgstr ""
 
 msgid "January"
 msgstr "Январь"
@@ -343,8 +360,17 @@ msgctxt "one letter Saturday"
 msgid "S"
 msgstr "С"
 
-msgid "Show"
-msgstr "Показать"
+msgid "%(month)s %(day)s, %(year)s"
+msgstr ""
 
-msgid "Hide"
-msgstr "Скрыть"
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr ""

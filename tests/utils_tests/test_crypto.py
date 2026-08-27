@@ -8,6 +8,7 @@ from django.utils.crypto import (
     pbkdf2,
     salted_hmac,
 )
+from django.utils.deprecation import RemovedInDjango70Warning
 
 
 class TestUtilsCryptoMisc(SimpleTestCase):
@@ -24,20 +25,30 @@ class TestUtilsCryptoMisc(SimpleTestCase):
 
     def test_salted_hmac(self):
         tests = [
-            ((b"salt", b"value"), {}, "b51a2e619c43b1ca4f91d15c57455521d71d61eb"),
-            (("salt", "value"), {}, "b51a2e619c43b1ca4f91d15c57455521d71d61eb"),
+            (
+                (b"salt", b"value"),
+                {"algorithm": "sha1"},
+                "b51a2e619c43b1ca4f91d15c57455521d71d61eb",
+            ),
             (
                 ("salt", "value"),
-                {"secret": "abcdefg"},
+                {"algorithm": "sha1"},
+                "b51a2e619c43b1ca4f91d15c57455521d71d61eb",
+            ),
+            (
+                ("salt", "value"),
+                {"secret": "abcdefg", "algorithm": "sha1"},
                 "8bbee04ccddfa24772d1423a0ba43bd0c0e24b76",
             ),
             (
                 ("salt", "value"),
-                {"secret": "x" * hashlib.sha1().block_size},
+                {"secret": "x" * hashlib.sha1().block_size, "algorithm": "sha1"},
                 "bd3749347b412b1b0a9ea65220e55767ac8e96b0",
             ),
             (
                 ("salt", "value"),
+                # RemovedInDjango70Warning: Remove the explicit algorithm to
+                # test the new default value.
                 {"algorithm": "sha256"},
                 "ee0bf789e4e009371a5372c90f73fcf17695a8439c9108b0480f14e347b3f9ec",
             ),
@@ -55,6 +66,15 @@ class TestUtilsCryptoMisc(SimpleTestCase):
         for args, kwargs, digest in tests:
             with self.subTest(args=args, kwargs=kwargs):
                 self.assertEqual(salted_hmac(*args, **kwargs).hexdigest(), digest)
+
+    def test_salted_hmac_default_algorithm_deprecation(self):
+        msg = (
+            "The default argument for algorithm in salted_hmac() will change "
+            "from 'sha1' to 'sha256' in Django 7.0. Pass an explicit "
+            "algorithm to silence this warning."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            salted_hmac("salt", "value")
 
     def test_invalid_algorithm(self):
         msg = "'whatever' is not an algorithm accepted by the hashlib module."

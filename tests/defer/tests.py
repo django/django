@@ -1,5 +1,8 @@
-from django.core.exceptions import FieldDoesNotExist, FieldError
+from django.core.exceptions import FieldDoesNotExist, FieldError, FieldFetchBlocked
+from django.db.models import FETCH_PEERS, FETCH_RAISE
 from django.test import SimpleTestCase, TestCase
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango70Warning
 
 from .models import (
     BigChild,
@@ -29,6 +32,7 @@ class DeferTests(AssertionMixin, TestCase):
     def setUpTestData(cls):
         cls.s1 = Secondary.objects.create(first="x1", second="y1")
         cls.p1 = Primary.objects.create(name="p1", value="xx", related=cls.s1)
+        cls.p2 = Primary.objects.create(name="p2", value="yy", related=cls.s1)
 
     def test_defer(self):
         qs = Primary.objects.all()
@@ -47,9 +51,9 @@ class DeferTests(AssertionMixin, TestCase):
         # of them except the model's primary key see #15494
         self.assert_delayed(qs.only("pk")[0], 3)
         # You can use 'pk' with reverse foreign key lookups.
-        # The related_id is always set even if it's not fetched from the DB,
-        # so pk and related_id are not deferred.
-        self.assert_delayed(self.s1.primary_set.only("pk")[0], 2)
+        # The related_id is not set if it's not fetched from the DB,
+        # so pk is not deferred, but related_id is.
+        self.assert_delayed(self.s1.primary_set.only("pk")[0], 3)
 
     def test_defer_only_chaining(self):
         qs = Primary.objects.all()
@@ -82,6 +86,15 @@ class DeferTests(AssertionMixin, TestCase):
         with self.assertRaisesMessage(TypeError, msg):
             Primary.objects.only(None)
 
+    def test_only_related_manager_optimization(self):
+        s = Secondary.objects.create(first="one", second="two")
+        Primary.objects.bulk_create(
+            [Primary(name="p1", value="v1", related=s) for _ in range(5)]
+        )
+        with self.assertNumQueries(1):
+            for p in s.primary_set.only("pk"):
+                _ = p.pk
+
     def test_defer_extra(self):
         qs = Primary.objects.all()
         self.assert_delayed(qs.defer("name").extra(select={"a": 1})[0], 1)
@@ -91,7 +104,7 @@ class DeferTests(AssertionMixin, TestCase):
         # User values() won't defer anything (you get the full list of
         # dictionaries back), but it still works.
         self.assertEqual(
-            Primary.objects.defer("name").values()[0],
+            Primary.objects.defer("name").values().get(pk=self.p1.pk),
             {
                 "id": self.p1.id,
                 "name": "p1",
@@ -102,7 +115,7 @@ class DeferTests(AssertionMixin, TestCase):
 
     def test_only_values_does_not_defer(self):
         self.assertEqual(
-            Primary.objects.only("name").values()[0],
+            Primary.objects.only("name").values().get(pk=self.p1.pk),
             {
                 "id": self.p1.id,
                 "name": "p1",
@@ -118,30 +131,38 @@ class DeferTests(AssertionMixin, TestCase):
         self.assert_delayed(qs.only("name").get(pk=self.p1.pk), 2)
 
     def test_defer_with_select_related(self):
-        obj = Primary.objects.select_related().defer(
+        obj = Primary.objects.select_related("related").defer(
             "related__first", "related__second"
         )[0]
         self.assert_delayed(obj.related, 2)
         self.assert_delayed(obj, 0)
 
     def test_only_with_select_related(self):
-        obj = Primary.objects.select_related().only("related__first")[0]
+        obj = (
+            Primary.objects.select_related("related")
+            .only("related__first")
+            .get(pk=self.p1.pk)
+        )
         self.assert_delayed(obj, 2)
         self.assert_delayed(obj.related, 1)
         self.assertEqual(obj.related_id, self.s1.pk)
         self.assertEqual(obj.name, "p1")
 
+    # RemovedInDjango70Warning: when the deprecation ends, remove this test.
     def test_defer_foreign_keys_are_deferred_and_not_traversed(self):
         # select_related() overrides defer().
         with self.assertNumQueries(1):
-            obj = Primary.objects.defer("related").select_related()[0]
+            with ignore_warnings(
+                category=RemovedInDjango70Warning,
+                message=r"Calling select_related\(\) with no arguments is deprecated\.",
+            ):
+                obj = Primary.objects.defer("related").select_related()[0]
             self.assert_delayed(obj, 1)
             self.assertEqual(obj.related.id, self.s1.pk)
 
     def test_saving_object_with_deferred_field(self):
         # Saving models with deferred fields is possible (but inefficient,
         # since every field has to be retrieved first).
-        Primary.objects.create(name="p2", value="xy", related=self.s1)
         obj = Primary.objects.defer("value").get(name="p2")
         obj.name = "a new name"
         obj.save()
@@ -181,9 +202,84 @@ class DeferTests(AssertionMixin, TestCase):
         self.assertEqual(obj.name, "adonis")
 
     def test_defer_fk_attname(self):
-        primary = Primary.objects.defer("related_id").get()
+        primary = Primary.objects.defer("related_id").get(name="p1")
         with self.assertNumQueries(1):
             self.assertEqual(primary.related_id, self.p1.related_id)
+
+    def test_only_fetch_mode_fetch_peers(self):
+        p1, p2 = Primary.objects.fetch_mode(FETCH_PEERS).only("name")
+        with self.assertNumQueries(1):
+            p1.value
+        with self.assertNumQueries(0):
+            p2.value
+
+    def test_only_fetch_mode_fetch_peers_single(self):
+        p1 = Primary.objects.fetch_mode(FETCH_PEERS).only("name").get(name="p1")
+        with self.assertNumQueries(1):
+            p1.value
+
+    def test_defer_fetch_mode_fetch_peers(self):
+        p1, p2 = Primary.objects.fetch_mode(FETCH_PEERS).defer("value")
+        with self.assertNumQueries(1):
+            p1.value
+        with self.assertNumQueries(0):
+            p2.value
+
+    def test_defer_fetch_mode_fetch_peers_single(self):
+        p1 = Primary.objects.fetch_mode(FETCH_PEERS).defer("value").get(name="p1")
+        with self.assertNumQueries(1):
+            p1.value
+
+    def test_defer_fk_fetch_mode_fetch_peers(self):
+        p1, p2 = Primary.objects.fetch_mode(FETCH_PEERS).defer("related")
+        with self.assertNumQueries(2):
+            self.assertEqual(p1.related, self.s1)
+        with self.assertNumQueries(0):
+            self.assertEqual(p2.related, self.s1)
+
+    def test_only_fk_fetch_mode_fetch_peers(self):
+        p1, p2 = Primary.objects.fetch_mode(FETCH_PEERS).only("name")
+        with self.assertNumQueries(2):
+            self.assertEqual(p1.related, self.s1)
+        with self.assertNumQueries(0):
+            self.assertEqual(p2.related, self.s1)
+
+    def test_only_fetch_mode_raise(self):
+        p1 = Primary.objects.fetch_mode(FETCH_RAISE).only("name").get(name="p1")
+        msg = "Fetching of Primary.value blocked."
+        with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
+            p1.value
+        self.assertIsNone(cm.exception.__cause__)
+        self.assertTrue(cm.exception.__suppress_context__)
+
+    def test_defer_fetch_mode_raise(self):
+        p1 = Primary.objects.fetch_mode(FETCH_RAISE).defer("value").get(name="p1")
+        msg = "Fetching of Primary.value blocked."
+        with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
+            p1.value
+        self.assertIsNone(cm.exception.__cause__)
+        self.assertTrue(cm.exception.__suppress_context__)
+
+
+class DeferOtherDatabaseTests(TestCase):
+    databases = {"other"}
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.s1 = Secondary.objects.using("other").create(first="x1", second="y1")
+        cls.p1 = Primary.objects.using("other").create(
+            name="p1", value="xx", related=cls.s1
+        )
+        cls.p2 = Primary.objects.using("other").create(
+            name="p2", value="yy", related=cls.s1
+        )
+
+    def test_defer_fetch_mode_fetch_peers(self):
+        p1, p2 = Primary.objects.using("other").fetch_mode(FETCH_PEERS).defer("value")
+        with self.assertNumQueries(1, using="other"):
+            p1.value
+        with self.assertNumQueries(0, using="other"):
+            p2.value
 
 
 class BigChildDeferTests(AssertionMixin, TestCase):
@@ -240,7 +336,11 @@ class TestDefer2(AssertionMixin, TestCase):
         """
         related = Secondary.objects.create(first="x1", second="x2")
         ChildProxy.objects.create(name="p1", value="xx", related=related)
-        children = ChildProxy.objects.select_related().only("id", "name")
+        with ignore_warnings(
+            category=RemovedInDjango70Warning,
+            message=r"Calling select_related\(\) with no arguments is deprecated\.",
+        ):
+            children = ChildProxy.objects.select_related().only("id", "name")
         self.assertEqual(len(children), 1)
         child = children[0]
         self.assert_delayed(child, 2)

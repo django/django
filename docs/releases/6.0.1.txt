@@ -1,0 +1,52 @@
+==========================
+Django 6.0.1 release notes
+==========================
+
+*January 6, 2026*
+
+Django 6.0.1 fixes one data loss bug introduced in Django 5.2 as well as
+several other bugs in Django 6.0.
+
+Bugfixes
+========
+
+* Fixed a bug in Django 5.2 where data exceeding ``max_length`` was silently
+  truncated by :meth:`.QuerySet.bulk_create` on PostgreSQL (:ticket:`33647`).
+
+* Fixed a regression in Django 6.0 where :ttag:`querystring` mishandled
+  multi-value :class:`~django.http.QueryDict` keys, both by only preserving the
+  last value and by incorrectly handling ``None`` values (:ticket:`36783`).
+
+* Fixed a regression in Django 6.0 that prevented changing the name of a
+  :class:`~django.db.models.ManyToManyField` from taking effect when applying
+  migrations (:ticket:`36800`).
+
+* Fixed a bug where management command colorized help (introduced in
+  Python 3.14) ignored the :option:`--no-color` option and the
+  :envvar:`DJANGO_COLORS` setting (:ticket:`36376`).
+
+* Fixed a regression in Django 6.0 that caused
+  :meth:`~django.db.models.query.QuerySet.bulk_create` to crash
+  when introspecting the connection on SQLite (:ticket:`36818`).
+
+* Fixed a visual regression in Django 6.0 for admin form fields grouped under a
+  ``<fieldset>`` in Safari (:ticket:`36807`).
+
+* Fixed a crash in Django 6.0 caused by infinite recursion when calling
+  ``repr()`` on an unevaluated ``django.utils.csp.LazyNonce`` instance
+  (:ticket:`36810`).
+
+* Fixed a regression in Django 6.0 where :func:`~django.urls.path` routes
+  defined using :func:`~django.utils.translation.gettext_lazy` failed to
+  resolve correctly (:ticket:`36796`).
+
+* Fixed a regression in Django 6.0 where the :attr:`.Widget.use_fieldset`
+  attribute of :class:`~django.forms.ClearableFileInput` was flipped
+  from ``False`` to ``True`` (:ticket:`36829`).
+
+* Reverted an undocumented optimization in Django 6.0 that modified permission
+  :attr:`~django.contrib.auth.models.Permission.name` and
+  :attr:`~django.contrib.auth.models.Permission.codename` values when renaming
+  models via a migration. This change could affect unrelated
+  :class:`~django.contrib.auth.models.Permission` objects (:ticket:`36843`) and
+  did not report conflicts (:ticket:`36793`).

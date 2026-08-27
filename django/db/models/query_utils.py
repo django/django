@@ -21,6 +21,8 @@ from django.utils.hashable import make_hashable
 
 logger = logging.getLogger("django.db.models")
 
+PROHIBITED_FILTER_KWARGS = frozenset(["_connector", "_negated"])
+
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both
 # sides of the relation. The join_field is the field backing the relation.
@@ -48,13 +50,26 @@ class Q(tree.Node):
     XOR = "XOR"
     default = AND
     conditional = True
+    connectors = (None, AND, OR, XOR)
 
     def __init__(self, *args, _connector=None, _negated=False, **kwargs):
+        self._check_connector(_connector)
         super().__init__(
             children=[*args, *sorted(kwargs.items())],
             connector=_connector,
             negated=_negated,
         )
+
+    @classmethod
+    def create(cls, children=None, connector=None, negated=False):
+        cls._check_connector(connector)
+        return super().create(children=children, connector=connector, negated=negated)
+
+    @classmethod
+    def _check_connector(cls, connector):
+        if connector not in cls.connectors:
+            connector_reprs = ", ".join(f"{conn!r}" for conn in cls.connectors[1:])
+            raise ValueError(f"connector must be one of {connector_reprs}, or None.")
 
     def _combine(self, other, conn):
         if getattr(other, "conditional", False) is False:
@@ -159,8 +174,7 @@ class Q(tree.Node):
         matches against the expressions.
         """
         # Avoid circular imports.
-        from django.db.models import BooleanField, Value
-        from django.db.models.functions import Coalesce
+        from django.db.models import Value
         from django.db.models.sql import Query
         from django.db.models.sql.constants import SINGLE
 
@@ -172,10 +186,7 @@ class Q(tree.Node):
         query.add_annotation(Value(1), "_check")
         connection = connections[using]
         # This will raise a FieldError if a field is missing in "against".
-        if connection.features.supports_comparing_boolean_expr:
-            query.add_q(Q(Coalesce(self, True, output_field=BooleanField())))
-        else:
-            query.add_q(self)
+        query.add_q(self)
         compiler = query.get_compiler(using=using)
         context_manager = (
             transaction.atomic(using=using)
@@ -264,7 +275,8 @@ class DeferredAttribute:
                         f"Cannot retrieve deferred field {field_name!r} "
                         "from an unsaved model."
                     )
-                instance.refresh_from_db(fields=[field_name])
+
+                instance._state.fetch_mode.fetch(self, instance)
             else:
                 data[field_name] = val
         return data[field_name]
@@ -280,6 +292,20 @@ class DeferredAttribute:
         if self.field.primary_key and self.field != link_field:
             return getattr(instance, link_field.attname)
         return None
+
+    def fetch_one(self, instance):
+        instance.refresh_from_db(fields=[self.field.attname])
+
+    def fetch_many(self, instances):
+        attname = self.field.attname
+        db = instances[0]._state.db
+        value_by_pk = (
+            self.field.model._base_manager.using(db)
+            .values_list(attname, flat=True)
+            .in_bulk({i.pk for i in instances})
+        )
+        for instance in instances:
+            setattr(instance, attname, value_by_pk[instance.pk])
 
 
 class class_or_instance_method:

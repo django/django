@@ -120,7 +120,7 @@ raster models:
     >>> dem = Elevation(name="Canyon", rast=rast)
     >>> dem.save()
 
-Note that this equivalent to:
+Note that this is equivalent to:
 
 .. code-block:: pycon
 
@@ -147,7 +147,12 @@ GeoDjango are only available on spatial fields.
 
 Filters on 'normal' fields (e.g. :class:`~django.db.models.CharField`)
 may be chained with those on geographic fields. Geographic lookups accept
-geometry and raster input on both sides and input types can be mixed freely.
+geometry and raster input on both sides, and input types can be mixed freely in
+most cases. However, unlike assignments to model fields, with lookups,
+types such as ``str``, :class:`pathlib.Path`, and ``dict`` must be wrapped by
+:class:`~django.contrib.gis.gdal.GDALRaster` to signify that the potential for
+file writing or network fetching is acceptable. For the rationale, see
+:ref:`raster security considerations <raster-security>`.
 
 The general structure of geographic lookups is described below. A complete
 reference can be found in the :ref:`spatial lookup reference<spatial-lookups>`.
@@ -363,8 +368,9 @@ Lookup Type                        PostGIS    Oracle    MariaDB      MySQL [#]_ 
 :lookup:`exact <same_as>`          X          X         X            X            X          B
 :lookup:`geom_type`                X          X (≥ 23c) X            X            X
 :lookup:`intersects`               X          X         X            X            X          B
-:lookup:`isempty`                  X
+:lookup:`isempty`                  X                                              X
 :lookup:`isvalid`                  X          X         X (≥ 12.0.1) X            X
+:lookup:`num_dimensions`           X                                              X
 :lookup:`overlaps`                 X          X         X            X            X          B
 :lookup:`relate`                   X          X         X                         X          C
 :lookup:`same_as`                  X          X         X            X            X          B
@@ -414,12 +420,13 @@ Function                              PostGIS  Oracle         MariaDB      MySQL
 :class:`GeometryDistance`             X
 :class:`GeometryType`                 X        X (≥ 23c)      X            X           X
 :class:`Intersection`                 X        X              X            X           X
-:class:`IsEmpty`                      X
+:class:`IsEmpty`                      X                                                X
 :class:`IsValid`                      X        X              X (≥ 12.0.1) X           X
 :class:`Length`                       X        X              X            X           X
 :class:`LineLocatePoint`              X                                                X
 :class:`MakeValid`                    X                                                X (LWGEOM/RTTOPO)
 :class:`MemSize`                      X
+:class:`NumDimensions`                X                                                X
 :class:`NumGeometries`                X        X              X            X           X
 :class:`NumPoints`                    X        X              X            X           X
 :class:`Perimeter`                    X        X                                       X
