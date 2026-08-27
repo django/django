@@ -199,7 +199,6 @@ Minor features
   session engines now provide async API. The new asynchronous methods all have
   ``a`` prefixed names, e.g. ``aget()``, ``akeys()``, or ``acycle_key()``.
 
-
 Database backends
 ~~~~~~~~~~~~~~~~~
 
