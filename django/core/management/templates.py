@@ -86,12 +86,23 @@ class TemplateCommand(BaseCommand):
                 "__pycache__. Can be used multiple times."
             ),
         )
+        parser.add_argument(
+            "--no-size-limit",
+            action="store_false",
+            dest="enforce_size_limit",
+            help=(
+                "Extract the template archive even if it is larger than {} MB.".format(
+                    self.max_template_size_mb
+                )
+            ),
+        )
 
     def handle(self, app_or_project, name, target=None, **options):
         self.app_or_project = app_or_project
         self.a_or_an = "an" if app_or_project == "app" else "a"
         self.paths_to_remove = []
         self.verbosity = options["verbosity"]
+        self.enforce_size_limit = options["enforce_size_limit"]
 
         self.validate_name(name)
 
@@ -255,14 +266,20 @@ class TemplateCommand(BaseCommand):
             else:
                 absolute_path = os.path.abspath(expanded_template)
             if os.path.exists(absolute_path):
-                filesize_in_mb = archive.get_size(absolute_path) / 1024 / 1024
-                if filesize_in_mb > self.max_template_size_mb:
-                    response = input(
-                        f"The template is large ({filesize_in_mb:.2f}MB). Are "
-                        "you sure you want to extract it? [y/N]: "
-                    )
-                    if response.lower() != "y":
-                        raise CommandError("The template is too large.")
+                if self.enforce_size_limit:
+                    size_in_mb = archive.get_size(absolute_path) / 1024 / 1024
+                    if size_in_mb > self.max_template_size_mb:
+                        raise CommandError(
+                            "%s template %s extracts to %.1f MB, more than the "
+                            "%s MB limit. Pass --no-size-limit to extract it "
+                            "anyway."
+                            % (
+                                self.app_or_project,
+                                template,
+                                size_in_mb,
+                                self.max_template_size_mb,
+                            )
+                        )
                 return self.extract(absolute_path)
 
         raise CommandError(
