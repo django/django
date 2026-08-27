@@ -47,29 +47,30 @@
 
   {% if bad_origin %}
   {% if forwarded_may_fix %}
-  <p>The <code>Origin</code> header does not match
-  the expected server origin,
-  but common proxy headers are present in the request
-  and may include parts of the <code>Origin</code> header.</p>
+  <p>The <code>Origin</code> header does not match the expected server origin,
+  but common proxy headers are present in the request and may include parts of 
+  the <code>Origin</code> header.</p>
   <ul>
     <li><strong><code>X-Forwarded-Proto</code></strong>:
       <code>{{ x_forwarded_proto }}</code></li>
     <li><strong><code>X-Forwarded-Host</code></strong>:
       <code>{{ x_forwarded_host }}</code></li>
   </ul>
-  <p>If you’re sure that you are only running behind a secure proxy
-     that always set these headers to avoid spoofing as described in
-     <a href="https://docs.djangoproject.com/en/{{ docs_version }}/ref/settings/#secure-proxy-ssl-header">this warning in the docs</a>,
-     you may wish to add one or more of the following
-     settings to permit Django to trust these headers.</p>
+  <p>If you are running behind a secure proxy that sets these headers, you may 
+    want to add one or more of the following settings to permit Django to trust 
+    these headers.</p>
   <p><pre>
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     USE_X_FORWARDED_HOST = True
-  </pre></p>
+  </pre>
+  Modifying these setting can compromise your site’s security. Ensure you fully
+  understand your setup before changing it. See <a 
+  href="https://docs.djangoproject.com/en/{{ docs_version }}/ref/settings/#secure-proxy
+  -ssl-header"><code>SECURE_PROXY_SSL_HEADER</code></a>
+  for more details.</p>
   {% else %}
-  If the expected server origin looks correct,
-  you may wish to add the origin to the <code>CSRF_TRUSTED_ORIGINS</code>
-  setting.
+  If the expected server origin looks correct, you may wish to add the origin
+  to the <code>CSRF_TRUSTED_ORIGINS</code> setting.
   {% endif %}
   {% else %}
 

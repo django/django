@@ -1100,7 +1100,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
 
     @override_settings(ALLOWED_HOSTS=["www.example.com", "localhost"], DEBUG=True)
     def test_bad_origin_x_forwarded_host_with_port(self):
-        """Give a helpful message if we see a likely X-Forwarded-Host header."""
+        """Give a helpful message for a likely X-Forwarded-Host header."""
         req = self._get_POST_request_with_token()
         req.META["HTTP_HOST"] = "localhost:8000"
         req.META["HTTP_ORIGIN"] = "http://www.example.com:8080"
@@ -1118,10 +1118,39 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         )
         self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
         self.assertContains(response, "X-Forwarded-Host", status_code=403)
+        self.assertContains(
+            response, "<code>www.example.com:8080</code>", status_code=403
+        )
+
+    @override_settings(ALLOWED_HOSTS=["www.example.com"], DEBUG=True)
+    def test_bad_origin_x_forwarded_proto_already_secure(self):
+        """Don't blame a stray X-Forwarded-Proto header if already secure."""
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META["HTTP_HOST"] = "www.example.com"
+        req.META["HTTP_ORIGIN"] = "https://badorigin.example.com"
+        req.META["HTTP_X_FORWARDED_PROTO"] = "https"
+        mw = CsrfViewMiddleware(post_form_view)
+        self._check_referer_rejects(mw, req)
+        self.assertIs(mw._origin_verified(req, "https://www.example.com"), False)
+        with self.assertLogs("django.security.csrf", "WARNING") as cm:
+            response = mw.process_view(req, post_form_view, (), {})
+        self.assertEqual(response.status_code, 403)
+        msg = (
+            "Origin checking failed - 'https://badorigin.example.com' "
+            "does not match 'https://www.example.com' "
+            "or any other trusted origins."
+        )
+        self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
+        self.assertContains(
+            response, "If the expected server origin looks correct", status_code=403
+        )
+        self.assertContains(response, "you may wish to add the origin", status_code=403)
+        self.assertContains(response, "CSRF_TRUSTED_ORIGINS", status_code=403)
 
     @override_settings(ALLOWED_HOSTS=["www.example.com", "localhost"], DEBUG=True)
     def test_bad_origin_x_forwarded_host_no_port(self):
-        """Give a helpful message if we see a likely X-Forwarded-Host header."""
+        """Give a helpful message for a likely X-Forwarded-Host header."""
         req = self._get_POST_request_with_token()
         req.META["HTTP_HOST"] = "localhost"
         req.META["HTTP_ORIGIN"] = "http://www.example.com"
@@ -1142,7 +1171,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
 
     @override_settings(ALLOWED_HOSTS=["www.example.com"], DEBUG=True)
     def test_bad_origin_x_forwarded_proto(self):
-        """Give a helpful message if we see a likely X-Forwarded-Proto header."""
+        """Give a helpful message for a likely X-Forwarded-Proto header."""
         req = self._get_POST_request_with_token()
         req.META["HTTP_HOST"] = "www.example.com"
         req.META["HTTP_ORIGIN"] = "https://www.example.com"
@@ -1160,6 +1189,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         )
         self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
         self.assertContains(response, "X-Forwarded-Proto", status_code=403)
+        self.assertContains(response, "<code>https</code>", status_code=403)
 
     @override_settings(ALLOWED_HOSTS=["www.example.com"], DEBUG=True)
     def test_no_likely_proxy_headers(self):
@@ -1182,9 +1212,7 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         self.assertContains(
             response, "If the expected server origin looks correct", status_code=403
         )
-        self.assertContains(
-            response, "you may wish to add the origin to", status_code=403
-        )
+        self.assertContains(response, "you may wish to add the origin", status_code=403)
         self.assertContains(response, "CSRF_TRUSTED_ORIGINS", status_code=403)
 
 

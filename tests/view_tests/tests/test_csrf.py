@@ -176,3 +176,24 @@ class CsrfViewTests(SimpleTestCase):
         self.assertContains(
             response, "https://docs.djangoproject.com/en/4.2/", status_code=403
         )
+
+    @override_settings(DEBUG=True)
+    def test_bad_origin_shows_origin_help(self):
+        """Shows origin-specific help, not the generic CSRF help."""
+        response = self.client.post(
+            "/", headers={"origin": "https://badorigin.example.com"}
+        )
+        self.assertContains(response, "CSRF_TRUSTED_ORIGINS", status_code=403)
+        self.assertNotContains(
+            response, "genuine Cross Site Request Forgery", status_code=403
+        )
+
+    @override_settings(DEBUG=True)
+    def test_no_cookie_does_not_show_origin_help(self):
+        """Shows the generic help, not origin-specific hints."""
+        response = self.client.post("/")
+        self.assertContains(
+            response, "genuine Cross Site Request Forgery", status_code=403
+        )
+        self.assertNotContains(response, "CSRF_TRUSTED_ORIGINS", status_code=403)
+        self.assertNotContains(response, "X-Forwarded-Proto", status_code=403)
