@@ -2519,6 +2519,21 @@ If ``True``, the :class:`~django.middleware.security.SecurityMiddleware`
 sets the :ref:`x-content-type-options` header on all responses that do not
 already have it.
 
+.. setting:: SECURE_CROSS_ORIGIN_EMBEDDER_POLICY
+
+``SECURE_CROSS_ORIGIN_EMBEDDER_POLICY``
+---------------------------------------
+
+.. versionadded:: 6.2
+
+Default: ``None``
+
+Unless set to ``None``, the
+:class:`~django.middleware.security.SecurityMiddleware` sets the
+:ref:`cross-origin-embedder-policy` header on all responses that do not already
+have it to the value provided. For views that need a different policy, use the
+``cross_origin_embedder_policy()`` decorator.
+
 .. setting:: SECURE_CROSS_ORIGIN_OPENER_POLICY
 
 ``SECURE_CROSS_ORIGIN_OPENER_POLICY``
@@ -2530,6 +2545,21 @@ Unless set to ``None``, the
 :class:`~django.middleware.security.SecurityMiddleware` sets the
 :ref:`cross-origin-opener-policy` header on all responses that do not already
 have it to the value provided.
+
+.. setting:: SECURE_CROSS_ORIGIN_RESOURCE_POLICY
+
+``SECURE_CROSS_ORIGIN_RESOURCE_POLICY``
+---------------------------------------
+
+.. versionadded:: 6.2
+
+Default: ``None``
+
+Unless set to ``None``, the
+:class:`~django.middleware.security.SecurityMiddleware` sets the
+:ref:`cross-origin-resource-policy` header on all responses that do not already
+have it to the value provided. For views that need a different policy, use the
+``cross_origin_resource_policy()`` decorator.
 
 .. setting:: SECURE_CSP
 

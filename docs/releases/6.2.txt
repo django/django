@@ -201,7 +201,13 @@ Models
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* ``SecurityMiddleware`` now supports setting the ``Cross-Origin-Embedder-Policy``
+  (COEP) and ``Cross-Origin-Resource-Policy`` (CORP) headers via the
+  :setting:`SECURE_CROSS_ORIGIN_EMBEDDER_POLICY` and
+  :setting:`SECURE_CROSS_ORIGIN_RESOURCE_POLICY` settings. The
+  ``cross_origin_embedder_policy()`` and
+  ``cross_origin_resource_policy()``
+  decorators can be used to set these headers on individual views.
 
 Security
 ~~~~~~~~
