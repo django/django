@@ -50,9 +50,13 @@ class BaseBackend:
         }
 
     def has_perm(self, user_obj, perm, obj=None):
+        if isinstance(perm, Permission):
+            perm = f"{perm.content_type.app_label}.{perm.codename}"
         return perm in self.get_all_permissions(user_obj, obj=obj)
 
     async def ahas_perm(self, user_obj, perm, obj=None):
+        if isinstance(perm, Permission):
+            perm = f"{perm.content_type.app_label}.{perm.codename}"
         return perm in await self.aget_all_permissions(user_obj, obj)
 
 
