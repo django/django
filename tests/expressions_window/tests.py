@@ -15,10 +15,12 @@ from django.db.models import (
     OuterRef,
     Q,
     RowRange,
+    StdDev,
     Subquery,
     Sum,
     Value,
     ValueRange,
+    Variance,
     When,
     Window,
     WindowFrame,
@@ -201,6 +203,23 @@ class WindowFunctionTests(TestCase):
             ordered=False,
         )
 
+    @skipIfDBFeature("rank_function_requires_order_by")
+    def test_rank_no_order_by(self):
+        # Rank() with no order_by: all rows are tied so every row gets rank 1.
+        ranks = list(
+            Employee.objects.annotate(r=Window(Rank())).values_list("r", flat=True)
+        )
+        self.assertEqual(ranks, [1] * 12)
+
+    @skipIfDBFeature("rank_function_requires_order_by")
+    def test_dense_rank_no_order_by(self):
+        # DenseRank() with no order_by: all rows are tied so every row gets
+        # rank 1.
+        ranks = list(
+            Employee.objects.annotate(r=Window(DenseRank())).values_list("r", flat=True)
+        )
+        self.assertEqual(ranks, [1] * 12)
+
     def test_row_number(self):
         """
         The row number window function computes the number based on the order
@@ -293,6 +312,78 @@ class WindowFunctionTests(TestCase):
                 row.department,
                 row.avg_salary,
             ),
+        )
+
+    def test_window_count(self):
+        self.assertQuerySetEqual(
+            Employee.objects.annotate(
+                department_count=Window(Count("pk"), partition_by="department"),
+            ).order_by("department", "name"),
+            [
+                ("Adams", "Accounting", 4),
+                ("Jenson", "Accounting", 4),
+                ("Jones", "Accounting", 4),
+                ("Williams", "Accounting", 4),
+                ("Moore", "IT", 2),
+                ("Wilkinson", "IT", 2),
+                ("Johnson", "Management", 2),
+                ("Miller", "Management", 2),
+                ("Johnson", "Marketing", 2),
+                ("Smith", "Marketing", 2),
+                ("Brown", "Sales", 2),
+                ("Smith", "Sales", 2),
+            ],
+            transform=lambda row: (row.name, row.department, row.department_count),
+        )
+
+    def test_window_stddev(self):
+        # Partition by department on age: Accounting √168.75≈12.99,
+        # IT/Sales 0.0, Management/Marketing 5.0.
+        self.assertQuerySetEqual(
+            Employee.objects.annotate(
+                age_stddev=Window(StdDev("age"), partition_by="department"),
+            ).order_by("department", "name"),
+            [
+                ("Adams", "Accounting", round((168.75) ** 0.5, 2)),
+                ("Jenson", "Accounting", round((168.75) ** 0.5, 2)),
+                ("Jones", "Accounting", round((168.75) ** 0.5, 2)),
+                ("Williams", "Accounting", round((168.75) ** 0.5, 2)),
+                ("Moore", "IT", 0.0),
+                ("Wilkinson", "IT", 0.0),
+                ("Johnson", "Management", 5.0),
+                ("Miller", "Management", 5.0),
+                ("Johnson", "Marketing", 5.0),
+                ("Smith", "Marketing", 5.0),
+                ("Brown", "Sales", 0.0),
+                ("Smith", "Sales", 0.0),
+            ],
+            transform=lambda row: (
+                row.name,
+                row.department,
+                round(row.age_stddev, 2),
+            ),
+        )
+
+    def test_window_variance(self):
+        self.assertQuerySetEqual(
+            Employee.objects.annotate(
+                age_variance=Window(Variance("age"), partition_by="department"),
+            ).order_by("department", "name"),
+            [
+                ("Adams", "Accounting", 168.75),
+                ("Jenson", "Accounting", 168.75),
+                ("Jones", "Accounting", 168.75),
+                ("Williams", "Accounting", 168.75),
+                ("Moore", "IT", 0.0),
+                ("Wilkinson", "IT", 0.0),
+                ("Johnson", "Management", 25.0),
+                ("Miller", "Management", 25.0),
+                ("Johnson", "Marketing", 25.0),
+                ("Smith", "Marketing", 25.0),
+                ("Brown", "Sales", 0.0),
+                ("Smith", "Sales", 0.0),
+            ],
+            transform=lambda row: (row.name, row.department, row.age_variance),
         )
 
     def test_lag(self):
@@ -681,6 +772,45 @@ class WindowFunctionTests(TestCase):
             ),
         )
 
+    def test_nthvalue_full_partition_frame(self):
+        """
+        With ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING, every
+        row sees the whole partition, so the first row in each department
+        returns the 2nd salary.
+        """
+        qs = Employee.objects.annotate(
+            nth_value=Window(
+                expression=NthValue(expression="salary", nth=2),
+                order_by=[F("hire_date").asc(), F("name").desc()],
+                partition_by=F("department"),
+                frame=RowRange(),
+            )
+        ).order_by("department", "hire_date", "name")
+        self.assertQuerySetEqual(
+            qs,
+            [
+                ("Jones", "Accounting", datetime.date(2005, 11, 1), 45000, 45000),
+                ("Jenson", "Accounting", datetime.date(2008, 4, 1), 45000, 45000),
+                ("Williams", "Accounting", datetime.date(2009, 6, 1), 37000, 45000),
+                ("Adams", "Accounting", datetime.date(2013, 7, 1), 50000, 45000),
+                ("Wilkinson", "IT", datetime.date(2011, 3, 1), 60000, 34000),
+                ("Moore", "IT", datetime.date(2013, 8, 1), 34000, 34000),
+                ("Miller", "Management", datetime.date(2005, 6, 1), 100000, 80000),
+                ("Johnson", "Management", datetime.date(2005, 7, 1), 80000, 80000),
+                ("Smith", "Marketing", datetime.date(2009, 10, 1), 38000, 40000),
+                ("Johnson", "Marketing", datetime.date(2012, 3, 1), 40000, 40000),
+                ("Smith", "Sales", datetime.date(2007, 6, 1), 55000, 53000),
+                ("Brown", "Sales", datetime.date(2009, 9, 1), 53000, 53000),
+            ],
+            lambda row: (
+                row.name,
+                row.department,
+                row.hire_date,
+                row.salary,
+                row.nth_value,
+            ),
+        )
+
     def test_lead(self):
         """
         Determine what the next person hired in the same department makes.
@@ -798,6 +928,37 @@ class WindowFunctionTests(TestCase):
                 ("Smith", "Marketing", 38000, 4),
                 ("Williams", "Accounting", 37000, 4),
                 ("Moore", "IT", 34000, 4),
+            ],
+            lambda x: (x.name, x.department, x.salary, x.ntile),
+        )
+
+    def test_ntile_uneven_distribution(self):
+        """
+        With an uneven row count, extra rows go to the first buckets.
+        12 rows / 5 buckets → first 2 buckets get 3 rows each, last 3 buckets
+        get 2 rows each.
+        """
+        qs = Employee.objects.annotate(
+            ntile=Window(
+                expression=Ntile(num_buckets=5),
+                order_by=F("salary").desc(),
+            )
+        ).order_by("ntile", F("salary").desc(), "name")
+        self.assertQuerySetEqual(
+            qs,
+            [
+                ("Miller", "Management", 100000, 1),
+                ("Johnson", "Management", 80000, 1),
+                ("Wilkinson", "IT", 60000, 1),
+                ("Smith", "Sales", 55000, 2),
+                ("Brown", "Sales", 53000, 2),
+                ("Adams", "Accounting", 50000, 2),
+                ("Jenson", "Accounting", 45000, 3),
+                ("Jones", "Accounting", 45000, 3),
+                ("Johnson", "Marketing", 40000, 4),
+                ("Smith", "Marketing", 38000, 4),
+                ("Williams", "Accounting", 37000, 5),
+                ("Moore", "IT", 34000, 5),
             ],
             lambda x: (x.name, x.department, x.salary, x.ntile),
         )
@@ -1213,6 +1374,71 @@ class WindowFunctionTests(TestCase):
         sql = ctx.captured_queries[0]["sql"].lower()
         self.assertEqual(sql.count("select"), 3)
         self.assertNotIn("group by", sql)
+
+    def test_aggregate_filter(self):
+        qs = Employee.objects.annotate(
+            sales_salary=Window(Sum("salary", filter=Q(department="Sales"))),
+        )
+        # Every row sees the same global window (no partition), so all rows
+        # should show the sum of Sales salaries (55000 + 53000 = 108000).
+        self.assertTrue(all(emp.sales_salary == 108000 for emp in qs))
+
+    def test_stddev_filter(self):
+        qs = Employee.objects.annotate(
+            sales_stddev=Window(StdDev("salary", filter=Q(department="Sales"))),
+        )
+        # Sales salaries: 55000, 53000. stddev_pop = 1000.0.
+        self.assertTrue(all(emp.sales_stddev == 1000.0 for emp in qs))
+
+    def test_variance_filter(self):
+        qs = Employee.objects.annotate(
+            sales_variance=Window(Variance("salary", filter=Q(department="Sales"))),
+        )
+        # Sales salaries: 55000, 53000. variance_pop = 1000000.0.
+        self.assertTrue(all(emp.sales_variance == 1000000.0 for emp in qs))
+
+    def test_window_order_by_nulls_last(self):
+        Employee.objects.create(
+            name="nullbonus",
+            salary=0,
+            department="Accounting",
+            hire_date=datetime.date(2020, 1, 1),
+            age=30,
+            bonus=None,
+        )
+        # Filter on the window result so the window runs over all 13 rows
+        # before filtering; rank 13 belongs exclusively to nullbonus.
+        qs = (
+            Employee.objects.annotate(
+                r=Window(Rank(), order_by=F("bonus").asc(nulls_last=True))
+            )
+            .filter(r=13)
+            .values_list("name", flat=True)
+        )
+        # 12 existing employees have non-null bonuses, so only the null-bonus
+        # employee sorts last and gets rank 13.
+        self.assertSequenceEqual(qs, ["nullbonus"])
+
+    def test_window_order_by_nulls_first(self):
+        Employee.objects.create(
+            name="nullbonus",
+            salary=0,
+            department="Accounting",
+            hire_date=datetime.date(2020, 1, 1),
+            age=30,
+            bonus=None,
+        )
+        # Filter on the window result so the window runs over all 1 rows before
+        # filtering; rank 1 belongs exclusively to nullbonus.
+        qs = (
+            Employee.objects.annotate(
+                r=Window(Rank(), order_by=F("bonus").asc(nulls_first=True))
+            )
+            .filter(r=1)
+            .values_list("name", flat=True)
+        )
+        # The nullbonus employee sorts before all 12 non-null employees.
+        self.assertSequenceEqual(qs, ["nullbonus"])
 
     @skipUnlessDBFeature("supports_frame_range_fixed_distance")
     def test_range_n_preceding_and_following(self):
@@ -1705,6 +1931,53 @@ class WindowFunctionTests(TestCase):
             with self.subTest(result=val):
                 self.assertEqual(qs[idx], val)
 
+    def test_multiple_windows_different_complex_order_by(self):
+        """
+        Two windows with different complex (non-column) order_by() expressions
+        over the same partition.
+
+        hire_year + salary and hire_year + age both produce unique values
+        within every partition, so there are no ties and the cumulative sums
+        are deterministic.
+        """
+        qs = Employee.objects.annotate(
+            sum_by_year_salary=Window(
+                Sum("salary"),
+                partition_by="department",
+                order_by=(ExtractYear(F("hire_date")) + F("salary")).asc(),
+            ),
+            sum_by_year_age=Window(
+                Sum("salary"),
+                partition_by="department",
+                order_by=(ExtractYear(F("hire_date")) + F("age")).asc(),
+            ),
+        ).order_by("pk")
+        self.assertQuerySetEqual(
+            qs,
+            [
+                # Accounting: year+salary order is Williams,Jones,Jenson,Adams;
+                #             year+age order is Jones,Jenson,Williams,Adams.
+                ("Jones", 82000, 45000),
+                ("Williams", 37000, 127000),
+                ("Jenson", 127000, 90000),
+                ("Adams", 177000, 177000),
+                # Sales: year+salary Brown,Smith; year+age Smith,Brown.
+                ("Smith", 108000, 55000),
+                ("Brown", 53000, 108000),
+                # Marketing: same order for both expressions.
+                ("Johnson", 78000, 78000),
+                ("Smith", 38000, 38000),
+                # IT: year+salary Moore,Wilkinson; year+age Wilkinson,Moore.
+                ("Wilkinson", 94000, 60000),
+                ("Moore", 34000, 94000),
+                # Management: year+salary Johnson,Miller;
+                # year+age Miller,Johnson.
+                ("Miller", 180000, 100000),
+                ("Johnson", 80000, 180000),
+            ],
+            transform=lambda e: (e.name, e.sum_by_year_salary, e.sum_by_year_age),
+        )
+
     def test_fail_update(self):
         """Window expressions can't be used in an UPDATE statement."""
         msg = (
@@ -1751,6 +2024,19 @@ class WindowFunctionTests(TestCase):
                 {"department": "Management", "salary": 100000},
             ],
         )
+
+    def test_window_filter_in_subquery(self):
+        # A subquery that filters on a window result.
+        top_earner = (
+            Employee.objects.annotate(r=Window(Rank(), order_by=F("salary").desc()))
+            .filter(r=1)
+            .values("name")
+        )
+        qs = Employee.objects.filter(name__in=Subquery(top_earner)).values_list(
+            "name", flat=True
+        )
+        # Miller has the highest salary (100000), so only he gets rank 1.
+        self.assertSequenceEqual(qs, ["Miller"])
 
     @skipUnlessDBFeature("supports_json_field")
     def test_key_transform(self):

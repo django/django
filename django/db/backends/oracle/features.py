@@ -80,6 +80,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_on_delete_db_default = False
     supports_no_precision_decimalfield = True
     supports_default_in_bit_aggregations = False
+    rank_function_requires_order_by = True
     test_now_utc_template = "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
     django_test_expected_failures = {
         # A bug in Django/oracledb with respect to string handling (#23843).
