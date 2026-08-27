@@ -156,7 +156,9 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* The new :class:`~django.forms.MultipleFileField` and
+  :class:`~django.forms.MultipleFileInput` classes support uploading and
+  validating multiple files with a single form field.
 
 Generic Views
 ~~~~~~~~~~~~~

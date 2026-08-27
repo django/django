@@ -675,7 +675,9 @@ For each field, we describe the default widget used if you don't specify
     When you use a ``FileField`` in a form, you must also remember to
     :ref:`bind the file data to the form <binding-uploaded-files>`.
 
-    The ``max_length`` error refers to the length of the filename. In the error
+    The ``empty`` and ``max_length`` error messages may contain
+    ``%(file_name)s``, which will be replaced with the submitted filename. The
+    ``max_length`` error refers to the length of the filename. In the error
     message for that key, ``%(max)d`` will be replaced with the maximum
     filename length and ``%(length)d`` will be replaced with the current
     filename length.
@@ -986,6 +988,27 @@ For each field, we describe the default widget used if you don't specify
 
     Takes one extra required argument, ``choices``, as for
     :class:`ChoiceField`.
+
+``MultipleFileField``
+---------------------
+
+.. class:: MultipleFileField(**kwargs)
+
+    .. versionadded:: 6.2
+
+    * Default widget: :class:`MultipleFileInput`
+    * Empty value: ``[]`` (an empty list)
+    * Normalizes to: A list of
+      :class:`~django.core.files.uploadedfile.UploadedFile` objects.
+    * Validates each uploaded file using the same validation as
+      :class:`FileField`.
+    * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``,
+      ``max_length``
+
+    Accepts the same arguments as :class:`FileField`.
+
+    This field supports multiple files at the form level. It cannot store
+    multiple files in a single model :class:`~django.db.models.FileField`.
 
 ``NullBooleanField``
 --------------------
