@@ -191,11 +191,15 @@ def translate_url(url, lang_code):
     except Resolver404:
         pass
     else:
-        to_be_reversed = (
-            "%s:%s" % (match.namespace, match.url_name)
-            if match.namespace
-            else match.url_name
-        )
+        if match.url_name is None:
+            to_be_reversed = match.func
+        else:
+            to_be_reversed = (
+                "%s:%s" % (match.namespace, match.url_name)
+                if match.namespace
+                else match.url_name
+            )
+
         with override(lang_code):
             try:
                 url = reverse(to_be_reversed, args=match.args, kwargs=match.kwargs)
