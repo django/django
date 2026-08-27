@@ -177,6 +177,15 @@ Minor features
   ``description`` value. This is useful when the action is available on both
   the admin change list and admin change form.
 
+* Manually defined primary keys will now be read only in the model update
+  form and inline update form. Behavior for model instance creation remains
+  unchanged.
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
