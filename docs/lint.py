@@ -176,6 +176,8 @@ if __name__ == "__main__":
                 "_theme",
                 "--ignore",
                 "_ext",
+                "--ignore",
+                "requirements.txt",
                 "--enable",
                 "all",
                 "--disable",
