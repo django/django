@@ -1169,6 +1169,29 @@ class TestQuerying(TestCase):
                 NullableJSONModel.objects.filter(value__contains={key: "x"}), [obj]
             )
 
+    def test_key_transform_int4_range_overflow_isnull(self):
+        # __isnull on a key segment outside the range in
+        # test_key_transform_int4_range_overflow() must not match rather than
+        # error, the same as an ordinary exact lookup on that key.
+        out_of_range_key = max(connection.ops.integer_field_range("IntegerField")) + 1
+        key = str(out_of_range_key)
+        obj = NullableJSONModel.objects.create(value={key: "x"})
+        self.assertTrue(
+            NullableJSONModel.objects.filter(
+                pk=obj.pk, **{f"value__{key}__isnull": True}
+            ).exists(),
+        )
+
+    def test_key_transform_int4_range_overflow_isnull_ancestor(self):
+        out_of_range_key = max(connection.ops.integer_field_range("IntegerField")) + 1
+        key = str(out_of_range_key)
+        obj = NullableJSONModel.objects.create(value={"other": {"x": "y"}})
+        self.assertTrue(
+            NullableJSONModel.objects.filter(
+                pk=obj.pk, **{f"value__{key}__x__isnull": True}
+            ).exists(),
+        )
+
     @skipUnlessDBFeature("has_json_operators")
     def test_key_sql_injection(self):
         with CaptureQueriesContext(connection) as queries:

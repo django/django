@@ -291,6 +291,26 @@ class HasKeyOrArrayIndex(HasKey):
     def compile_json_path_final_key(self, connection, key_transform):
         return connection.ops.compile_json_path([key_transform], include_root=False)
 
+    def as_oracle(self, compiler, connection):
+        min_value, max_value = connection.ops.integer_field_range("IntegerField")
+        keys = [self.rhs]
+        previous = self.lhs
+        while isinstance(previous, KeyTransform):
+            keys.append(previous.key_name)
+            previous = previous.lhs
+        for key in keys:
+            try:
+                index = int(key)
+            except ValueError:
+                continue
+            if not (min_value <= index <= max_value):
+                # Oracle's JSON path parser cannot lex an array subscript
+                # this long ("ORA-40597: Array subscript too long"). An
+                # index this large can never exist in any real array, so
+                # the key/index can never be present.
+                return "(1=0)", ()
+        return super().as_oracle(compiler, connection)
+
 
 class CaseInsensitiveMixin:
     """
