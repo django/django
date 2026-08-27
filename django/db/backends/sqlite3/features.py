@@ -54,7 +54,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         "expressions.tests.FTimeDeltaTests.test_mixed_comparisons1",
     }
     insert_test_table_with_defaults = 'INSERT INTO {} ("null") VALUES (1)'
-    supports_default_keyword_in_insert = False
+    supports_default_keyword_in_insert = True
     supports_unlimited_charfield = True
     supports_no_precision_decimalfield = True
     can_return_columns_from_insert = True
