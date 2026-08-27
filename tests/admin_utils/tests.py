@@ -5,6 +5,7 @@ from django import forms
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import helpers
+from django.contrib.admin.models import LogEntry
 from django.contrib.admin.utils import (
     NestedObjects,
     build_q_object_from_lookup_parameters,
@@ -432,10 +433,26 @@ class UtilsTests(SimpleTestCase):
         self.assertEqual(label_for_field("site_id", Article), "Site id")
         # The correct name and attr are returned when `__` is in the field
         # name.
-        self.assertEqual(label_for_field("site__domain", Article), "Site  domain")
+        self.assertEqual(label_for_field("site__domain", Article), "Site > Domain")
         self.assertEqual(
             label_for_field("site__domain", Article, return_attr=True),
-            ("Site  domain", Site._meta.get_field("domain")),
+            ("Site > Domain", Site._meta.get_field("domain")),
+        )
+        # Reverse relations use the related model's verbose_name.
+        self.assertEqual(
+            label_for_field("admin_articles__title", Site), "Article > Title"
+        )
+
+    def test_label_for_field_related_verbose_name(self):
+        """
+        Related lookups use each field's verbose_name, including lazily
+        translated and multi-word ones.
+        """
+        self.assertEqual(
+            label_for_field("user__email", LogEntry), "User > Email address"
+        )
+        self.assertEqual(
+            label_for_field("user__first_name", LogEntry), "User > First name"
         )
 
     def test_label_for_field_failed_lookup(self):
