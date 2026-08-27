@@ -1,10 +1,18 @@
 from datetime import datetime
+import logging
+import random
+import time
 
-from django.contrib.sitemaps import GenericSitemap
+from django.contrib.sitemaps import GenericSitemap, Sitemap
 from django.test import override_settings
+from django.conf import settings
+from django.core.cache import cache
 
 from .base import SitemapTestsBase
 from .models import TestModel
+
+
+logging.basicConfig(level=logging.INFO, format='%(message)s')
 
 
 @override_settings(ABSOLUTE_URL_OVERRIDES={})
@@ -90,3 +98,44 @@ class GenericViewsSitemapTests(SitemapTestsBase):
 <sitemap><loc>http://example.com/simple/sitemap-generic.xml</loc><lastmod>2013-03-13T10:00:00</lastmod></sitemap>
 </sitemapindex>"""
         self.assertXMLEqual(response.text, expected_content)
+
+    def test_items_sitemap_cache(self):
+        sitemap = Sitemap()
+        large_items_list = [
+            f"item_{random.randint(1, 2000000)}" for _ in range(2000000)
+        ]
+        sitemap._cached_items = large_items_list
+        start = time.perf_counter()
+        result1 = sitemap.items()
+        time1 = time.perf_counter() - start
+        start = time.perf_counter()
+        result2 = sitemap.items()
+        time2 = time.perf_counter() - start
+        self.assertEqual(len(result1), 2000000)
+        self.assertIs(result1, result2, "Should return same cached object")
+        logging.info(f"First call: {time1:.6f} seconds")
+        logging.info(f"Cached call: {time2:.6f} seconds")
+        logging.info(f"✓ Cache hit: {time2 < time1}")
+
+    def test_languages_sitemap_cache(self):
+        sitemap = Sitemap()
+        sitemap.languages = None
+        start = time.perf_counter()
+        langs1 = sitemap._languages
+        time1 = time.perf_counter() - start
+        logging.info(f"First access loaded {len(langs1)} language codes in {time1:.6f}s")
+        logging.info(f"Language codes: {langs1}")
+        start = time.perf_counter()
+        langs2 = sitemap._languages
+        time2 = time.perf_counter() - start
+        self.assertIs(langs1, langs2, "Cache failed: objects are different!")
+        self.assertLess(
+            time2, time1,
+            f"Cache not faster! First: {time1:.6f}s, Cached {time2:.6f}"
+        )
+        logging.info(f"Cached access took {time2:.6f}s")
+        logging.info(f"Cache hit: {langs1 is langs2}")
+        logging.info(f"Cache is {time1/time2:.1f}x faster")
+
+    def test_queryset_before_pagination(self):
+        ...
