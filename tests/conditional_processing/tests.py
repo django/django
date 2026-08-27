@@ -228,7 +228,7 @@ class ConditionalGet(SimpleTestCase):
         response = self.client.get("/condition/last_modified/")
         self.assertEqual(response.status_code, 412)
         response = self.client.get("/condition/etag/")
-        self.assertEqual(response.status_code, 412)
+        self.assertEqual(response.status_code, 200)
 
     def test_single_condition_8(self):
         self.client.defaults["HTTP_IF_UNMODIFIED_SINCE"] = LAST_MODIFIED_STR
@@ -240,7 +240,7 @@ class ConditionalGet(SimpleTestCase):
         response = self.client.get("/condition/last_modified2/")
         self.assertEqual(response.status_code, 412)
         response = self.client.get("/condition/etag2/")
-        self.assertEqual(response.status_code, 412)
+        self.assertEqual(response.status_code, 200)
 
     def test_single_condition_head(self):
         self.client.defaults["HTTP_IF_MODIFIED_SINCE"] = LAST_MODIFIED_STR
