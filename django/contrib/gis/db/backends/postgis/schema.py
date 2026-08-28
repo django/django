@@ -8,11 +8,15 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
     geom_index_ops_nd = "GIST_GEOMETRY_OPS_ND"
     rast_index_template = "ST_ConvexHull(%(expressions)s)"
 
+    # ST_Force2D()/ST_Force3D() only accept geometries, so the column is cast
+    # before being forced. The cast is a no-op for geometry columns.
     sql_alter_column_to_3d = (
-        "ALTER COLUMN %(column)s TYPE %(type)s USING ST_Force3D(%(column)s)::%(type)s"
+        "ALTER COLUMN %(column)s TYPE %(type)s "
+        "USING ST_Force3D(%(column)s::geometry)::%(type)s"
     )
     sql_alter_column_to_2d = (
-        "ALTER COLUMN %(column)s TYPE %(type)s USING ST_Force2D(%(column)s)::%(type)s"
+        "ALTER COLUMN %(column)s TYPE %(type)s "
+        "USING ST_Force2D(%(column)s::geometry)::%(type)s"
     )
 
     def geo_quote_name(self, name):
@@ -33,7 +37,8 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
         self, model, old_field, new_field, new_type, old_collation, new_collation
     ):
         """
-        Special case when dimension changed.
+        Special case changes in dimensions and conversions from
+        geography to geometry.
         """
         if not hasattr(old_field, "dim") or not hasattr(new_field, "dim"):
             return super()._alter_column_type_sql(
@@ -45,7 +50,9 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
         elif old_field.dim == 3 and new_field.dim == 2:
             sql_alter = self.sql_alter_column_to_2d
         else:
-            sql_alter = self.sql_alter_column_type
+            return super()._alter_column_type_sql(
+                model, old_field, new_field, new_type, old_collation, new_collation
+            )
         return (
             (
                 sql_alter
