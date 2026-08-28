@@ -339,6 +339,11 @@ class TypeSerializer(BaseSerializer):
                 return string, set(imports)
         if hasattr(self.value, "__module__"):
             module = self.value.__module__
+            if "<" in self.value.__qualname__:
+                raise ValueError(
+                    "Cannot serialize class %s: local classes cannot be imported."
+                    % self.value.__name__
+                )
             if module == builtins.__name__:
                 return self.value.__name__, set()
             else:
