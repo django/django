@@ -33,6 +33,8 @@ class DatabaseFeatures(BaseSpatialFeatures, OracleDatabaseFeatures):
             skips.update(
                 {
                     "Oracle 23ai unpacks 1-element geometry collections.": {
+                        "gis_tests.geogapp.tests.GeographyTest."
+                        "test05_geography_layermapping",
                         "gis_tests.layermap.tests.LayerMapTest."
                         "test_layermap_unique_multigeometry_fk",
                         "gis_tests.layermap.tests.LayerMapTest."
