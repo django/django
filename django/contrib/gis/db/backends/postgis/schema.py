@@ -30,14 +30,14 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
         return self._create_spatial_index_sql(model, fields[0], **kwargs)
 
     def _alter_column_type_sql(
-        self, table, old_field, new_field, new_type, old_collation, new_collation
+        self, model, old_field, new_field, new_type, old_collation, new_collation
     ):
         """
         Special case when dimension changed.
         """
         if not hasattr(old_field, "dim") or not hasattr(new_field, "dim"):
             return super()._alter_column_type_sql(
-                table, old_field, new_field, new_type, old_collation, new_collation
+                model, old_field, new_field, new_type, old_collation, new_collation
             )
 
         if old_field.dim == 2 and new_field.dim == 3:
