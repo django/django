@@ -75,12 +75,11 @@ class ConditionalGet(SimpleTestCase):
             EXPIRED_LAST_MODIFIED_STR,
             LAST_MODIFIED_INVALID_STR,
         ):
-            with self.subTest(header=header):
-                self.client.defaults["HTTP_IF_UNMODIFIED_SINCE"] = header
-                response = self.client.get("/condition/etag/")
-                self.assertFullResponse(response, check_last_modified=False)
-                response = self.client.put("/condition/etag/")
-                self.assertFullResponse(response, check_last_modified=False)
+            for method in ("get", "put"):
+                with self.subTest(header=header, method=method):
+                    self.client.defaults["HTTP_IF_UNMODIFIED_SINCE"] = header
+                    response = getattr(self.client, method)("/condition/etag/")
+                    self.assertFullResponse(response, check_last_modified=False)
 
     def test_if_none_match(self):
         self.client.defaults["HTTP_IF_NONE_MATCH"] = ETAG
