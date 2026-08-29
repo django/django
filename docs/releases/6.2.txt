@@ -156,7 +156,8 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* The undocumented ``Textarea.input_type`` attribute is now set to
+  ``"textarea"`` for consistency with other built-in widgets.
 
 Generic Views
 ~~~~~~~~~~~~~
