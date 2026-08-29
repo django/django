@@ -245,7 +245,9 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* An ``input_type`` of ``"textarea"`` was added to the
+  :class:`~django.forms.Textarea` widget. Like other widgets, when set to
+  ``"hidden"`` it now renders the ``hidden`` HTML attribute.
 
 Generic Views
 ~~~~~~~~~~~~~

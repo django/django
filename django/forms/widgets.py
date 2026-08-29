@@ -646,6 +646,7 @@ class ClearableFileInput(FileInput):
 
 class Textarea(Widget):
     template_name = "django/forms/widgets/textarea.html"
+    input_type = "textarea"
 
     def __init__(self, attrs=None):
         # Use slightly better defaults than HTML's 20x2 box
