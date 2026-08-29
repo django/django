@@ -49,38 +49,8 @@ class CompositeAttribute:
             setattr(instance, attname, value)
 
 
-class CompositeField(Field):
+class CompositeFieldBase(Field):
     is_composite = True
-
-    def __init__(self, **kwargs):
-        for name, field in kwargs.items():
-            assert LOOKUP_SEP not in name
-            if not isinstance(field, Field):
-                raise TypeError(
-                    f"{name!r} should be a Field instance, got "
-                    f"{type(field).__name__}."
-                )
-
-        self.field_names = tuple(kwargs)
-        self.fields = tuple(kwargs.values())
-        if len(self.fields) < 2:
-            raise ValueError("At least two fields should be there")
-        super().__init__()
-
-    @staticmethod
-    def from_select(fields):
-        """Build an output field from an ordered mapping of selected fields."""
-        if not fields:
-            return None
-        if len(fields) == 1:
-            return next(iter(fields.values()))
-
-        return CompositeField(**fields)
-
-    def contribute_to_class(self, cls, name, private_only=False):
-        if type(self) is CompositeField:
-            raise TypeError("CompositeField cannot be used as a model field.")
-        super().contribute_to_class(cls, name, private_only=private_only)
 
     def get_fields(self):
         for name, field in zip(self.field_names, self.fields, strict=True):
@@ -94,6 +64,36 @@ class CompositeField(Field):
                 return field
         raise FieldError(f"{name!r} not found")
 
+
+class CompositeField(CompositeFieldBase):
+    def __init__(self, **kwargs):
+        for name, field in kwargs.items():
+            assert LOOKUP_SEP not in name
+            if not isinstance(field, Field):
+                raise TypeError(
+                    f"{name!r} should be a Field instance, got "
+                    f"{field.__class__.__name__}."
+                )
+
+        self.field_names = tuple(kwargs)
+        self.fields = tuple(kwargs.values())
+        if len(self.fields) < 2:
+            raise ValueError("CompositeField requires at least two fields")
+        super().__init__()
+
+    @classmethod
+    def from_select(cls, fields):
+        """Build an output field from an ordered mapping of selected fields."""
+        if not fields:
+            return None
+        if len(fields) == 1:
+            return next(iter(fields.values()))
+
+        return cls(**fields)
+
+    def contribute_to_class(self, cls, name, private_only=False):
+        raise TypeError("CompositeField cannot be used as a model field.")
+
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
         kwargs.update(
@@ -103,16 +103,16 @@ class CompositeField(Field):
         return name, path, args, kwargs
 
 
-CompositeField.register_lookup(TupleExact)
-CompositeField.register_lookup(TupleGreaterThan)
-CompositeField.register_lookup(TupleGreaterThanOrEqual)
-CompositeField.register_lookup(TupleLessThan)
-CompositeField.register_lookup(TupleLessThanOrEqual)
-CompositeField.register_lookup(TupleIn)
-CompositeField.register_lookup(TupleIsNull)
+CompositeFieldBase.register_lookup(TupleExact)
+CompositeFieldBase.register_lookup(TupleGreaterThan)
+CompositeFieldBase.register_lookup(TupleGreaterThanOrEqual)
+CompositeFieldBase.register_lookup(TupleLessThan)
+CompositeFieldBase.register_lookup(TupleLessThanOrEqual)
+CompositeFieldBase.register_lookup(TupleIn)
+CompositeFieldBase.register_lookup(TupleIsNull)
 
 
-class CompositePrimaryKey(CompositeField):
+class CompositePrimaryKey(CompositeFieldBase):
     descriptor_class = CompositeAttribute
 
     def __init__(self, *args, **kwargs):
@@ -138,11 +138,11 @@ class CompositePrimaryKey(CompositeField):
             raise ValueError("CompositePrimaryKey must be blank.")
 
         self.field_names = args
-        Field.__init__(self, **kwargs)
+        super().__init__(**kwargs)
 
     def deconstruct(self):
         # args is always [] so it can be ignored.
-        name, path, _, kwargs = Field.deconstruct(self)
+        name, path, _, kwargs = super().deconstruct()
         return name, path, self.field_names, kwargs
 
     @cached_property

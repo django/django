@@ -13,7 +13,7 @@ from django import forms
 from django.core import serializers
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import IntegrityError, connection
-from django.db.models import CompositeField, CompositePrimaryKey
+from django.db.models import CompositePrimaryKey
 from django.forms import modelform_factory
 from django.test import TestCase
 
@@ -123,7 +123,6 @@ class CompositePKTests(TestCase):
     def test_pk_field(self):
         pk = User._meta.get_field("pk")
         self.assertIsInstance(pk, CompositePrimaryKey)
-        self.assertIsInstance(pk, CompositeField)
         self.assertIs(User._meta.pk, pk)
         self.assertIs(
             pk.get_field("tenant_id"),
