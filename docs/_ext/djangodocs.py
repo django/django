@@ -106,6 +106,10 @@ class DjangoHTMLTranslator(HTMLTranslator):
     Django-specific reST to HTML tweaks.
     """
 
+    def __init__(self, document, builder):
+        super().__init__(document, builder)
+        self._desc_nesting_level = 0
+
     # Don't use border=1, which docutils does by default.
     def visit_table(self, node):
         self.context.append(self.compact_p)
@@ -141,6 +145,23 @@ class DjangoHTMLTranslator(HTMLTranslator):
 
     def depart_desc_parameterlist(self, node):
         self.body.append(")")
+
+    # Add ARIA attributes to class, function, etc descriptions so they appear
+    # to screen readers as headings. See #36304
+    def visit_desc(self, node):
+        self._desc_nesting_level += 1
+        super().visit_desc(node)
+
+    def depart_desc(self, node):
+        self._desc_nesting_level -= 1
+        super().depart_desc(node)
+
+    def visit_desc_name(self, node):
+        attributes = {
+            "role": "heading",
+            "aria-level": min(self.section_level + self._desc_nesting_level, 6),
+        }
+        self.body.append(self.starttag(node, "span", "", False, **attributes))
 
     #
     # Turn the "new in version" stuff (versionadded/versionchanged) into a
