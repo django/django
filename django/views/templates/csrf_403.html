@@ -59,12 +59,13 @@
   <p>If you are running behind a secure proxy that sets these headers, you may 
     want to add one or more of the following settings to permit Django to trust 
     these headers.</p>
-  <p><pre>
+    <br/>
+  <pre>
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     USE_X_FORWARDED_HOST = True
   </pre>
-  Modifying these setting can compromise your site’s security. Ensure you fully
-  understand your setup before changing it. See <a 
+  <p>Modifying these settings can compromise your site’s security. Ensure you fully
+  understand your setup before changing it. See <a
   href="https://docs.djangoproject.com/en/{{ docs_version }}/ref/settings/#secure-proxy
   -ssl-header"><code>SECURE_PROXY_SSL_HEADER</code></a>
   for more details.</p>
