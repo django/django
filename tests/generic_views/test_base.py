@@ -31,6 +31,11 @@ class PostOnlyView(View):
         return HttpResponse("This view only accepts POST")
 
 
+class QueryView(View):
+    def query(self, request):
+        return HttpResponse(request.body)
+
+
 class CustomizableView(SimpleView):
     parameter = {}
 
@@ -135,6 +140,23 @@ class ViewTest(LoggingAssertionMixin, SimpleTestCase):
         """
         response = PostOnlyView.as_view()(self.rf.head("/"))
         self.assertEqual(response.status_code, 405)
+
+    def test_query(self):
+        """
+        A view supplying a query() method responds to QUERY with the query
+        content available as request.body.
+        """
+        response = QueryView.as_view()(self.rf.query("/", data=b"q=django"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b"q=django")
+
+    def test_query_not_allowed(self):
+        """
+        A view supplying no query() method responds to QUERY with HTTP 405.
+        """
+        response = SimpleView.as_view()(self.rf.query("/"))
+        self.assertEqual(response.status_code, 405)
+        self.assertNotIn("QUERY", response.headers["Allow"])
 
     def test_get_and_post(self):
         """
@@ -569,6 +591,12 @@ class RedirectViewTest(LoggingAssertionMixin, SimpleTestCase):
     def test_redirect_DELETE(self):
         "Default is a temporary redirect"
         response = RedirectView.as_view(url="/bar/")(self.rf.delete("/foo/"))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/bar/")
+
+    def test_redirect_QUERY(self):
+        "Default is a temporary redirect"
+        response = RedirectView.as_view(url="/bar/")(self.rf.query("/foo/"))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, "/bar/")
 
