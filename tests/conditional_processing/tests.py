@@ -18,7 +18,7 @@ class ConditionalGet(SimpleTestCase):
     def assertFullResponse(self, response, check_last_modified=True, check_etag=True):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, FULL_RESPONSE.encode())
-        if response.request["REQUEST_METHOD"] in ("GET", "HEAD"):
+        if response.request["REQUEST_METHOD"] in ("GET", "HEAD", "QUERY"):
             if check_last_modified:
                 self.assertEqual(response.headers["Last-Modified"], LAST_MODIFIED_STR)
             if check_etag:
@@ -246,6 +246,23 @@ class ConditionalGet(SimpleTestCase):
         self.client.defaults["HTTP_IF_MODIFIED_SINCE"] = LAST_MODIFIED_STR
         response = self.client.head("/condition/")
         self.assertNotModified(response)
+
+    def test_query_if_modified_since(self):
+        self.client.defaults["HTTP_IF_MODIFIED_SINCE"] = LAST_MODIFIED_STR
+        self.assertNotModified(self.client.query("/condition/"))
+        self.client.defaults["HTTP_IF_MODIFIED_SINCE"] = EXPIRED_LAST_MODIFIED_STR
+        self.assertFullResponse(self.client.query("/condition/"))
+
+    def test_query_if_none_match(self):
+        self.client.defaults["HTTP_IF_NONE_MATCH"] = ETAG
+        self.assertNotModified(self.client.query("/condition/"))
+        self.client.defaults["HTTP_IF_NONE_MATCH"] = EXPIRED_ETAG
+        self.assertFullResponse(self.client.query("/condition/"))
+
+    def test_query_if_unmodified_since(self):
+        self.client.defaults["HTTP_IF_UNMODIFIED_SINCE"] = EXPIRED_LAST_MODIFIED_STR
+        response = self.client.query("/condition/")
+        self.assertEqual(response.status_code, 412)
 
     def test_unquoted(self):
         """

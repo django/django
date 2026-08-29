@@ -325,6 +325,19 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertIsInstance(response, TemplateResponse)
         self.assertEqual(response.status_code, 200)
 
+    def test_basic_add_QUERY(self):
+        """
+        QUERY on the add_view renders the form like GET, without opening a
+        transaction.
+        """
+        section_count = Section.objects.count()
+        with mock.patch("django.contrib.admin.options.transaction.atomic") as atomic:
+            response = self.client.query(reverse("admin:admin_views_section_add"))
+        atomic.assert_not_called()
+        self.assertIsInstance(response, TemplateResponse)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Section.objects.count(), section_count)
+
     def test_add_with_GET_args(self):
         response = self.client.get(
             reverse("admin:admin_views_section_add"), {"name": "My Section"}

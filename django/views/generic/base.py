@@ -49,6 +49,7 @@ class View:
         "head",
         "options",
         "trace",
+        "query",
     ]
 
     def __init__(self, **kwargs):
@@ -288,4 +289,7 @@ class RedirectView(View):
         return self.get(request, *args, **kwargs)
 
     def patch(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
+
+    def query(self, request, *args, **kwargs):
         return self.get(request, *args, **kwargs)

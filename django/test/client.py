@@ -635,6 +635,30 @@ class RequestFactory:
             **extra,
         )
 
+    def query(
+        self,
+        path,
+        data="",
+        content_type="application/octet-stream",
+        secure=False,
+        *,
+        headers=None,
+        query_params=None,
+        **extra,
+    ):
+        """Construct a QUERY request."""
+        data = self._encode_json(data, content_type)
+        return self.generic(
+            "QUERY",
+            path,
+            data,
+            content_type,
+            secure=secure,
+            headers=headers,
+            query_params=query_params,
+            **extra,
+        )
+
     def generic(
         self,
         method,
@@ -1352,6 +1376,41 @@ class Client(ClientMixin, RequestFactory):
             )
         return response
 
+    def query(
+        self,
+        path,
+        data="",
+        content_type="application/octet-stream",
+        follow=False,
+        secure=False,
+        *,
+        headers=None,
+        query_params=None,
+        **extra,
+    ):
+        """Send a QUERY request to the server."""
+        self.extra = extra
+        self.headers = headers
+        response = super().query(
+            path,
+            data=data,
+            content_type=content_type,
+            secure=secure,
+            headers=headers,
+            query_params=query_params,
+            **extra,
+        )
+        if follow:
+            response = self._handle_redirects(
+                response,
+                data=data,
+                content_type=content_type,
+                headers=headers,
+                query_params=query_params,
+                **extra,
+            )
+        return response
+
     def trace(
         self,
         path,
@@ -1690,6 +1749,41 @@ class AsyncClient(ClientMixin, AsyncRequestFactory):
         self.extra = extra
         self.headers = headers
         response = await super().delete(
+            path,
+            data=data,
+            content_type=content_type,
+            secure=secure,
+            headers=headers,
+            query_params=query_params,
+            **extra,
+        )
+        if follow:
+            response = await self._ahandle_redirects(
+                response,
+                data=data,
+                content_type=content_type,
+                headers=headers,
+                query_params=query_params,
+                **extra,
+            )
+        return response
+
+    async def query(
+        self,
+        path,
+        data="",
+        content_type="application/octet-stream",
+        follow=False,
+        secure=False,
+        *,
+        headers=None,
+        query_params=None,
+        **extra,
+    ):
+        """Send a QUERY request to the server."""
+        self.extra = extra
+        self.headers = headers
+        response = await super().query(
             path,
             data=data,
             content_type=content_type,
