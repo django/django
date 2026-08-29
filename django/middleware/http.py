@@ -5,7 +5,7 @@ from django.utils.http import parse_http_date_safe, split_directive_names
 
 class ConditionalGetMiddleware(MiddlewareMixin):
     """
-    Handle conditional GET operations. If the response has an ETag or
+    Handle conditional GET and QUERY operations. If the response has an ETag or
     Last-Modified header and the request has If-None-Match or
     If-Modified-Since, replace the response with HttpNotModified. Add an ETag
     header if needed.
@@ -15,7 +15,7 @@ class ConditionalGetMiddleware(MiddlewareMixin):
         # It's too late to prevent an unsafe request with a 412 response, and
         # for a HEAD request, the response body is always empty so computing
         # an accurate ETag isn't possible.
-        if request.method != "GET":
+        if request.method not in ("GET", "QUERY"):
             return response
 
         if self.needs_etag(response) and not response.has_header("ETag"):

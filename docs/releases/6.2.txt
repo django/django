@@ -31,6 +31,49 @@ only officially support the latest release of each series.
 What's new in Django 6.2
 ========================
 
+Support for the HTTP ``QUERY`` method
+-------------------------------------
+
+Django now recognizes the :rfc:`QUERY <10008>` method, which performs a safe,
+idempotent query with the query content in the request body rather than in the
+URL's query string.
+
+``QUERY`` is treated as a safe method throughout Django: it is exempt from CSRF
+protection, it participates in conditional request processing via
+:class:`~django.middleware.http.ConditionalGetMiddleware` and
+:func:`~django.views.decorators.http.condition`, and it is accepted by
+:func:`~django.views.decorators.http.require_safe`.
+:attr:`View.http_method_names
+<django.views.generic.base.View.http_method_names>` now includes ``"query"``,
+so a class-based view handles ``QUERY`` requests by defining a ``query()``
+method::
+
+    import json
+
+    from django.http import JsonResponse
+    from django.views import View
+    from books.models import Book
+
+
+    class BookSearchView(View):
+        def query(self, request):
+            criteria = json.loads(request.body)
+            authors = criteria["authors"]
+            books = Book.objects.filter(authors__name__in=authors).distinct()
+            return JsonResponse({"books": list(books.values("title"))})
+
+The query content is available as :attr:`HttpRequest.body
+<django.http.HttpRequest.body>` and is not parsed into
+:attr:`HttpRequest.POST <django.http.HttpRequest.POST>`; parse it yourself
+according to the request's ``Content-Type``.
+
+Caching of ``QUERY`` responses is not supported yet. The cache key for a
+``QUERY`` request must incorporate the request content, which
+:class:`~django.middleware.cache.UpdateCacheMiddleware`,
+:class:`~django.middleware.cache.FetchFromCacheMiddleware`, and
+:func:`~django.views.decorators.cache.cache_page` don't do, so they continue to
+ignore ``QUERY`` requests.
+
 Minor features
 --------------
 
@@ -235,6 +278,10 @@ Tests
   :setting:`AUTHENTICATION_BACKENDS` not implementing ``(a)get_user()``, e.g.
   permission-only backends.
 
+* The new :meth:`.Client.query` method makes an HTTP ``QUERY`` request. It is
+  also available on ``AsyncClient``, ``RequestFactory``, and
+  ``AsyncRequestFactory``.
+
 URLs
 ~~~~
 
@@ -293,6 +340,20 @@ Tests
 
 Miscellaneous
 -------------
+
+* Views decorated with :func:`~django.views.decorators.http.require_safe` now
+  also accept the ``QUERY`` method, which :rfc:`RFC 10008 <10008#section-2>`
+  defines as safe and idempotent. Use ``require_http_methods(["GET", "HEAD"])``
+  to keep the previous behavior.
+
+* :class:`~django.middleware.http.ConditionalGetMiddleware` now computes
+  ``ETag`` headers for, and returns HTTP 304 responses to, conditional
+  ``QUERY`` requests.
+
+* With :setting:`DEBUG` and :setting:`APPEND_SLASH` enabled,
+  :class:`~django.middleware.common.CommonMiddleware` now raises a
+  ``RuntimeError`` for ``QUERY`` requests to a URL without a trailing slash, as
+  it already did for ``DELETE``, ``POST``, ``PUT``, and ``PATCH``.
 
 * To facilitate the deprecation of the ``safe`` parameter of
   :class:`~django.http.JsonResponse`, it now defaults to ``False``, because the

@@ -43,10 +43,14 @@ a :class:`django.http.HttpResponseNotAllowed` if the conditions are not met.
 
 .. function:: require_safe()
 
-    Decorator to require that a view only accepts the GET and HEAD methods.
-    These methods are commonly considered "safe" because they should not have
-    the significance of taking an action other than retrieving the requested
-    resource.
+    Decorator to require that a view only accepts the GET, HEAD, and QUERY
+    methods. These methods are commonly considered "safe" because they should
+    not have the significance of taking an action other than retrieving the
+    requested resource.
+
+    .. versionchanged:: 6.2
+
+        The ``QUERY`` method was added to the accepted methods.
 
     .. note::
         Web servers should automatically strip the content of responses to HEAD

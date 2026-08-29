@@ -11,6 +11,7 @@ urlpatterns = [
     path("post_view/", views.post_view),
     path("post_then_get_view/", views.post_then_get_view),
     path("put_view/", views.put_view),
+    path("query_view/", views.query_view),
     path("trace_view/", views.trace_view),
     path("header_view/", views.view_with_header),
     path("raw_post_view/", views.raw_post_view),

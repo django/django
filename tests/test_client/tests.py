@@ -199,6 +199,19 @@ class ClientTest(TestCase):
         self.assertEqual(response.context["data"], "{'foo': 'bar'}")
         self.assertEqual(response.context["Content-Length"], "14")
 
+    def test_query(self):
+        response = self.client.query(
+            "/query_view/",
+            data="q=django",
+            content_type="application/x-www-form-urlencoded",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.templates[0].name, "QUERY Template")
+        self.assertEqual(response.context["data"], "q=django")
+        self.assertEqual(
+            response.context["Content-Type"], "application/x-www-form-urlencoded"
+        )
+
     def test_trace(self):
         """TRACE a view"""
         response = self.client.trace("/trace_view/")
@@ -1307,6 +1320,14 @@ class AsyncClientTest(TestCase):
     async def test_post_data(self):
         response = await self.async_client.post("/post_view/", {"value": 37})
         self.assertContains(response, "Data received: 37 is the value.")
+
+    async def test_query_data(self):
+        response = await self.async_client.query(
+            "/query_view/",
+            data="q=django",
+            content_type="application/x-www-form-urlencoded",
+        )
+        self.assertContains(response, "Query received: q=django is the body.")
 
     async def test_body_read_on_get_data(self):
         response = await self.async_client.get("/post_view/")

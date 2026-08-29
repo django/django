@@ -400,6 +400,22 @@ Use the ``django.test.Client`` class to make requests.
         The ``follow``, ``secure``, ``headers``, ``query_params``, and
         ``extra`` parameters act the same as for :meth:`Client.get`.
 
+    .. method:: Client.query(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, query_params=None, **extra)
+
+        .. versionadded:: 6.2
+
+        Makes a :rfc:`QUERY <10008#section-2>` request on the provided ``path``
+        and returns a ``Response`` object. Useful for testing endpoints that
+        accept a safe, idempotent query in the request body.
+
+        When ``data`` is provided, it is used as the request body, and
+        a ``Content-Type`` header is set to ``content_type``. :rfc:`RFC 10008
+        <10008#section-2>` requires servers to reject QUERY requests without a
+        ``Content-Type``, so pass a type matching the query format you send.
+
+        The ``follow``, ``secure``, ``headers``, ``query_params``, and
+        ``extra`` parameters act the same as for :meth:`Client.get`.
+
     .. method:: Client.trace(path, follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
         Makes a TRACE request on the provided ``path`` and returns a
