@@ -1959,10 +1959,6 @@ class OrderBy(Expression):
     def as_sql(self, compiler, connection, template=None, **extra_context):
         if self.expression.is_composite:
             cols = self.expression.get_source_expressions()
-        else:
-            cols = None
-
-        if cols is not None:
             sql_parts = []
             params = []
             for col in cols:
