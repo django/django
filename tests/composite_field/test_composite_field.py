@@ -32,7 +32,8 @@ class CompositeFieldOutputFieldTests(SimpleTestCase):
         msg = "'name' should be a Field instance, got str."
         with self.assertRaisesMessage(TypeError, msg):
             models.CompositeField(name="name", age=models.IntegerField())
-        with self.assertRaises(ValueError):
+        msg = "CompositeField requires at least two fields"
+        with self.assertRaisesMessage(ValueError, msg):
             models.CompositeField(name=models.CharField())
 
     def test_fields(self):
@@ -48,7 +49,7 @@ class CompositeFieldOutputFieldTests(SimpleTestCase):
             ],
         )
         self.assertIs(info.get_field("email"), email)
-        with self.assertRaises(FieldError):
+        with self.assertRaisesMessage(FieldError, "'missing' not found"):
             info.get_field("missing")
 
     def test_clone(self):
@@ -73,7 +74,8 @@ class CompositeFieldOutputFieldTests(SimpleTestCase):
             ],
         )
         for path, field in output_field.get_fields():
-            self.assertIsNot(clone.get_field("__".join(path)), field)
+            with self.subTest(path=path):
+                self.assertIsNot(clone.get_field("__".join(path)), field)
 
     def test_empty_select(self):
         self.assertIsNone(models.CompositeField.from_select({}))
@@ -234,7 +236,7 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
         project_info = Project.objects.filter(pk=self.auth.pk).values("pk", "code")
         projects = (
             Project.objects.alias(project_info=project_info)
-            .exclude(pk=F("project_info__pk"), title="Authentication")
+            .exclude(pk=F("project_info__pk"))
             .order_by("pk")
             .values_list("code", flat=True)
         )
@@ -263,7 +265,7 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
         )
         profile = (
             User.objects.filter(pk=self.ada.pk)
-            .alias(**{"first__title": first_title})
+            .alias(first__title=first_title)
             .annotate(first_title=F("first__title"))
             .values("name", "first_title")
         )
@@ -324,7 +326,7 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             "separator '__'."
         )
         with self.assertRaisesMessage(ValueError, msg):
-            User.objects.alias(**{"first__post": first_post})
+            User.objects.alias(first__post=first_post)
 
     def test_composite_subquery_scalar_output_field(self):
         first_post = Post.objects.filter(pk=self.welcome_post.pk).values(
@@ -340,7 +342,7 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
         first_post = Post.objects.filter(user=self.ada, title="Welcome")
         profile = (
             User.objects.filter(pk=self.ada.pk)
-            .alias(**{"has__post": Exists(first_post)})
+            .alias(has__post=Exists(first_post))
             .annotate(has_post=F("has__post"))
             .values("name", "has_post")
         )
@@ -355,15 +357,13 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
         users = (
             User.objects.filter(pk=self.ada.pk)
             .alias(
-                **{
-                    "has__post": Subquery(
-                        posts,
-                        template="EXISTS(%(subquery)s)",
-                        output_field=models.BooleanField(),
-                    )
-                }
+                has__post=Subquery(
+                    posts,
+                    template="EXISTS(%(subquery)s)",
+                    output_field=models.BooleanField(),
+                )
             )
-            .filter(**{"has__post": True})
+            .filter(has__post=True)
             .values_list("name", flat=True)
         )
 
@@ -617,12 +617,12 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
                 BugReport(
                     task=self.login,
                     reporter=self.bob,
-                    description="alpha",
+                    description="Alpha",
                 ),
                 BugReport(
                     task=self.login,
                     reporter=self.bob,
-                    description="Beta",
+                    description="beta",
                 ),
             ]
         )
@@ -637,7 +637,7 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             descriptions = projects.order_by(
                 "project_bug__description__upper"
             ).values_list("project_bug__description", flat=True)
-            self.assertSequenceEqual(descriptions, ["alpha", "Beta", "Login crash"])
+            self.assertSequenceEqual(descriptions, ["Alpha", "beta", "Login crash"])
 
     def test_composite_subquery_alias_outer_ordering_expression(self):
         BugReport.objects.create(
@@ -678,6 +678,8 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             .order_by("-project_bug__severity_level")
         )
 
+        # Recompiling must reuse the table-source join added while resolving
+        # ordering.
         sql = str(projects.query)
         self.assertEqual(str(projects.query), sql)
         self.assertEqual(sql.lower().count(BugReport._meta.db_table.lower()), 1)
@@ -707,7 +709,8 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             project_bug=project_bugs
         )
 
-        with self.assertRaises(FieldError):
+        msg = "Unsupported lookup 'does_not_exist' for CompositeField"
+        with self.assertRaisesMessage(FieldError, msg):
             str(projects.order_by("project_bug__does_not_exist").query)
 
     def test_composite_subquery_alias_union_outer_ordering(self):
@@ -928,7 +931,11 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
     def test_composite_subquery_alias_rejects_invalid_field(self):
         first_post = Post.objects.filter(user=self.ada).values("title", "body")[:1]
 
-        with self.assertRaises(FieldError):
+        msg = (
+            "Unsupported lookup 'does_not_exist' for CompositeField or join on the "
+            "field not permitted."
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             User.objects.filter(pk=self.ada.pk).alias(first_post=first_post).values(
                 "first_post__does_not_exist"
             )
@@ -938,8 +945,8 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             "Unsupported lookup 'missing' for CharField or join on the field not "
             "permitted."
         )
+        qs = User.objects.alias(user_name=F("name")).order_by("user_name__missing")
         with self.assertRaisesMessage(FieldError, msg):
-            qs = User.objects.alias(user_name=F("name")).order_by("user_name__missing")
             qs.first()  # raising error at compile time.
 
     def test_composite_subquery_alias_preserves_normal_field_resolution(self):
@@ -1088,7 +1095,11 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             "user", "title"
         )[:1]
 
-        with self.assertRaises(FieldError):
+        msg = (
+            "Unsupported lookup 'email' for BigAutoField or join on the field not "
+            "permitted."
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             User.objects.filter(pk=self.ada.pk).alias(post_info=post_info).values(
                 "post_info__user__email"
             )
@@ -1101,10 +1112,9 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             NotImplementedError,
             "Correlated multi-column subquery aliases are not supported.",
         ):
-            projects = Project.objects.alias(priority_bug=priority_bug).values(
+            Project.objects.alias(priority_bug=priority_bug).values(
                 "code", "priority_bug__description"
             )
-            list(projects)
 
     def test_composite_subquery_alias_update_rejects_reference(self):
         project_info = Project.objects.filter(pk=self.auth.pk).values(
