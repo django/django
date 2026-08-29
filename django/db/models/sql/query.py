@@ -316,8 +316,8 @@ class Query(BaseExpression):
         self.alias_refcount = {}
         # alias_map is the most important data structure regarding joins.
         # It's used for recording which joins exist in the query and what
-        # types they are. The key is the alias of the joined table or table
-        # expression and the value is a Join-like object (see
+        # types they are. The key is the alias of the joined table (possibly
+        # the table name) and the value is a Join-like object (see
         # sql.datastructures.Join for more information).
         self.alias_map = {}
         # Whether to provide alias to columns during reference resolving.
@@ -349,21 +349,21 @@ class Query(BaseExpression):
     def _get_output_field(expression):
         return getattr(expression, "target", None) or expression.output_field
 
+    def _get_selected_expression(self, selection):
+        if isinstance(selection, int):
+            return self.select[selection]
+        if isinstance(selection, str):
+            return self.annotation_select[selection]
+        return selection
+
     def _get_output_expressions(self):
         if self.selected is not None:
             for name, selection in self.selected.items():
-                if isinstance(selection, int):
-                    expression = self.select[selection]
-                elif isinstance(selection, str):
-                    expression = self.annotation_select[selection]
-                else:
-                    expression = selection
-                yield name, expression
+                yield name, self._get_selected_expression(selection)
             return
 
         if self.values_select:
-            for name, expression in zip(self.values_select, self.select, strict=True):
-                yield name, expression
+            yield from zip(self.values_select, self.select, strict=True)
         else:
             for expression in self.select:
                 field = self._get_output_field(expression)
@@ -1303,14 +1303,10 @@ class Query(BaseExpression):
             query.has_external_references() for query in self.combined_queries
         )
 
-    @staticmethod
-    def _is_multi_column_query(query):
+    @property
+    def has_multiple_output_columns(self):
         return (
-            sum(
-                len(expression) if isinstance(expression, ColPairs) else 1
-                for _, expression in query._get_output_expressions()
-            )
-            > 1
+            sum(len(expression) for _, expression in self._get_output_expressions()) > 1
         )
 
     @staticmethod
@@ -1318,7 +1314,7 @@ class Query(BaseExpression):
         """Return the multi-column query represented by expression."""
         if isinstance(expression, ExpressionWrapper):
             expression = expression.get_source_expressions()[0]
-        if isinstance(expression, Query) and Query._is_multi_column_query(expression):
+        if isinstance(expression, Query) and expression.has_multiple_output_columns:
             return expression
         return None
 
@@ -2299,11 +2295,12 @@ class Query(BaseExpression):
             annotation = self.annotations.get(field_list[0])
             table_subquery = self._get_multi_column_query(annotation)
             is_multi_column_query = table_subquery is not None
-            if not allow_joins and is_multi_column_query:
-                raise FieldError(
-                    "Joined field references are not permitted in this query"
-                )
+
             if is_multi_column_query:
+                if not allow_joins:
+                    raise FieldError(
+                        "Joined field references are not permitted in this query"
+                    )
                 expression, transforms = self._resolve_inner_subquery_path(
                     table_subquery,
                     field_list,
