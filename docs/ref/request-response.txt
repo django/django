@@ -78,6 +78,12 @@ All attributes should be considered read-only, unless stated otherwise.
         elif request.method == "POST":
             do_something_else()
 
+    Django treats the :rfc:`QUERY <10008#section-2>` method as safe and
+    idempotent, like ``GET`` and ``HEAD``: it's exempt from CSRF protection and
+    takes part in conditional request processing. The query content isn't
+    parsed into :attr:`HttpRequest.POST`; read it from :attr:`HttpRequest.body`
+    and parse it according to the request's ``Content-Type``.
+
 .. attribute:: HttpRequest.encoding
 
     A string representing the current encoding used to decode form submission

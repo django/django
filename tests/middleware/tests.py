@@ -114,8 +114,8 @@ class CommonMiddlewareTest(SimpleTestCase):
     def test_append_slash_no_redirect_in_DEBUG(self):
         """
         While in debug mode, an exception is raised with a warning
-        when a failed attempt is made to DELETE, POST, PUT, or PATCH to an URL
-        which would normally be redirected to a slashed version.
+        when a failed attempt is made to DELETE, POST, PUT, PATCH, or QUERY to
+        an URL which would normally be redirected to a slashed version.
         """
         msg = "maintaining %s data. Change your form to point to testserver/slash/"
         request = self.rf.get("/slash")
@@ -131,6 +131,9 @@ class CommonMiddlewareTest(SimpleTestCase):
         with self.assertRaisesMessage(RuntimeError, msg % request.method):
             CommonMiddleware(get_response_404)(request)
         request = self.rf.delete("/slash")
+        with self.assertRaisesMessage(RuntimeError, msg % request.method):
+            CommonMiddleware(get_response_404)(request)
+        request = self.rf.query("/slash")
         with self.assertRaisesMessage(RuntimeError, msg % request.method):
             CommonMiddleware(get_response_404)(request)
 
@@ -622,6 +625,18 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
                 self.resp_headers["Cache-Control"] = cc
                 response = ConditionalGetMiddleware(self.get_response)(self.req)
                 self.assertIs(response.has_header("ETag"), False)
+
+    def test_query_calculates_etag(self):
+        req = self.request_factory.query("/")
+        resp = ConditionalGetMiddleware(self.get_response)(req)
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotEqual("", resp["ETag"])
+
+    def test_query_if_none_match_and_same_etag(self):
+        req = self.request_factory.query("/", headers={"if-none-match": '"spam"'})
+        self.resp_headers["ETag"] = '"spam"'
+        resp = ConditionalGetMiddleware(self.get_response)(req)
+        self.assertEqual(resp.status_code, 304)
 
     def test_if_none_match_and_no_etag(self):
         self.req.META["HTTP_IF_NONE_MATCH"] = "spam"
