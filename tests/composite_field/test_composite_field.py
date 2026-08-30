@@ -52,6 +52,12 @@ class CompositeFieldOutputFieldTests(SimpleTestCase):
         with self.assertRaisesMessage(FieldError, "'missing' not found"):
             info.get_field("missing")
 
+    def test_fields_from_select(self):
+        query = User.objects.all().query
+        query.add_fields(["email", "age"])
+
+        self.assertEqual(query.output_field.field_names, ("email", "age"))
+
     def test_clone(self):
         output_field = models.CompositeField(
             number=models.IntegerField(),
