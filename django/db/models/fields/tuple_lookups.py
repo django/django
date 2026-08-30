@@ -53,6 +53,7 @@ class TupleLookupMixin:
     def get_prep_lookup(self):
         if self.rhs_is_direct_value():
             self.check_rhs_is_tuple_or_list()
+            self.rhs = self._flatten_rhs(self.rhs)
             self.check_rhs_length_equals_lhs_length()
         else:
             self.check_rhs_is_supported_expression()
@@ -73,6 +74,22 @@ class TupleLookupMixin:
             raise ValueError(
                 f"{self.lookup_name!r} lookup of {lhs_str} must have {len_lhs} elements"
             )
+
+    def _flatten_rhs(self, rhs):
+        output_field = getattr(self.lhs, "output_field", None)
+        fields = getattr(output_field, "fields", ())
+        if len(fields) != len(rhs):
+            return rhs
+
+        values = []
+        for field, value in zip(fields, rhs, strict=True):
+            if getattr(field, "is_composite", False):
+                if not isinstance(value, (tuple, list)):
+                    return rhs
+                values.extend(value)
+            else:
+                values.append(value)
+        return tuple(values)
 
     def check_rhs_is_supported_expression(self):
         if not isinstance(self.rhs, (ColPairs, ResolvedOuterRef, Query)):
