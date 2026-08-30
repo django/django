@@ -6,8 +6,10 @@ import warnings
 from asgiref.sync import sync_to_async
 
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import RemovedInDjango71Warning
 from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
+from django.utils.warnings import django_file_prefixes
 
 
 class InvalidCacheBackendError(ImproperlyConfigured):
@@ -59,6 +61,18 @@ class BaseCache:
     _missing_key = object()
 
     def __init__(self, params, alias=None, **kwargs):
+        # RemovedInDjango71Warning.
+        # should probably remove the default value for alias
+        # since discussion in the new-features issue, 3rd-party
+        # packages depend on alias being provided
+        if alias is None:
+            warnings.warn(
+                "`alias` argument of cache backend should be provided.",
+                category=RemovedInDjango71Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
+        # RemovedInDjango71Warning.
+
         self.alias = alias
 
         timeout = params.get("timeout", params.get("TIMEOUT", 300))
