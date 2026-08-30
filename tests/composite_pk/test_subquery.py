@@ -53,7 +53,7 @@ class CompositePKSubqueryTests(TestCase):
         token_pks = (
             Token.objects.filter(pk=self.token.pk)
             .alias(token_info=token_info)
-            .filter(token_info=(self.token.pk, self.token.secret))
+            .filter(token_info=(*self.token.pk, self.token.secret))
             .values_list("pk", flat=True)
         )
 
