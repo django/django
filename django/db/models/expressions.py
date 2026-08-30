@@ -1860,9 +1860,10 @@ class Subquery(BaseExpression, Combinable):
                 self.output_field
             except AttributeError:
                 return resolved.query
-            if getattr(
-                resolved.query.output_field, "is_composite", False
-            ) and not getattr(self.output_field, "is_composite", False):
+            if (
+                resolved.query.output_field.is_composite
+                and not self.output_field.is_composite
+            ):
                 raise ValueError(
                     "A multi-column Subquery cannot use a scalar output_field."
                 )
