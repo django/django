@@ -815,13 +815,41 @@ Model formsets
 
 Like :doc:`regular formsets </topics/forms/formsets>`, Django provides a couple
 of enhanced formset classes to make working with Django models more
-convenient. Let's reuse the ``Author`` model from above:
+convenient. To create a model formset out of the ``Author`` model from above,
+you have two options:
+
+Method 1: Using ``modelformset_factory``
+----------------------------------------
 
 .. code-block:: pycon
 
     >>> from django.forms import modelformset_factory
     >>> from myapp.models import Author
     >>> AuthorFormSet = modelformset_factory(Author, fields=["name", "title"])
+
+
+Method 2: Using ``ModelFormSet``
+--------------------------------
+
+.. versionadded:: 6.2
+
+.. code-block:: pycon
+
+    >>> from django.forms import models
+    >>> from myapp.models import Author
+    >>> class AuthorFormSet(models.ModelFormSet):
+    ...     model = Author
+    ...     fields = ("name", "title")
+    ...
+
+Using the declarative syntax, you can define the formset directly as a class,
+similar to how you declare models.
+
+.. note::
+
+    You can customize model formset behavior by overriding methods on either
+    ``BaseModelFormSet`` or ``ModelFormSet``, depending on the syntax you
+    choose.
 
 Using ``fields`` restricts the formset to use only the given fields.
 Alternatively, you can take an "opt-out" approach, specifying which fields to
@@ -849,10 +877,8 @@ with the ``Author`` model. It works just like a regular formset:
 
 .. note::
 
-    :func:`~django.forms.models.modelformset_factory` uses
-    :func:`~django.forms.formsets.formset_factory` to generate formsets. This
-    means that a model formset is an extension of a basic formset that knows
-    how to interact with a particular model.
+    A model formset is an extension of a basic formset that knows how to
+    interact with a particular model.
 
 .. note::
 
@@ -1265,7 +1291,10 @@ you have these two models::
         title = models.CharField(max_length=100)
 
 If you want to create a formset that allows you to edit books belonging to
-a particular author, you could do this:
+a particular author, you have two options:
+
+Method 1: Using ``inlineformset_factory``
+-----------------------------------------
 
 .. code-block:: pycon
 
@@ -1274,25 +1303,51 @@ a particular author, you could do this:
     >>> author = Author.objects.get(name="Mike Royko")
     >>> formset = BookFormSet(instance=author)
 
+Method 2: Using ``InlineFormSet``
+---------------------------------
+
+.. versionadded:: 6.2
+
+.. code-block:: pycon
+
+    >>> from django.forms import models
+    >>> class BookFormSet(models.InlineFormSet):
+    ...     parent_model = Author
+    ...     model = Book
+    ...     fields = ("title",)
+    ...
+    >>> author = Author.objects.get(name="Mike Royko")
+    >>> formset = BookFormSet(instance=author)
+
+Using the declarative syntax, you can define the formset directly as a class,
+similar to how you declare models.
+
+.. note::
+
+    You can customize inline formset behavior by overriding methods on either
+    ``BaseInlineFormSet`` or ``InlineFormSet``, depending on the syntax you
+    choose.
+
 ``BookFormSet``'s :ref:`prefix <formset-prefix>` is ``'book_set'``
 (``<model name>_set`` ). If ``Book``'s ``ForeignKey`` to ``Author`` has a
 :attr:`~django.db.models.ForeignKey.related_name`, that's used instead.
 
 .. note::
 
-    :func:`~django.forms.models.inlineformset_factory` uses
-    :func:`~django.forms.models.modelformset_factory` and marks
-    ``can_delete=True``.
+    Inline formsets set ``can_delete=True`` by default.
 
 .. seealso::
 
     :ref:`Manually rendered can_delete and can_order
     <manually-rendered-can-delete-and-can-order>`.
 
-Overriding methods on an ``InlineFormSet``
-------------------------------------------
+Overriding methods on an inline formset
+---------------------------------------
 
-When overriding methods on ``InlineFormSet``, you should subclass
+Method 1: Using ``inlineformset_factory``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When overriding methods for use with the factory, you should subclass
 :class:`~models.BaseInlineFormSet` rather than
 :class:`~models.BaseModelFormSet`.
 
@@ -1322,6 +1377,29 @@ Then when you create your inline formset, pass in the optional argument
     ... )
     >>> author = Author.objects.get(name="Mike Royko")
     >>> formset = BookFormSet(instance=author)
+
+Method 2: Using ``InlineFormSet``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 6.2
+
+When using the declarative syntax, override methods directly on your
+``InlineFormSet`` subclass::
+
+    from django.forms import InlineFormSet
+
+
+    class BookFormSet(InlineFormSet):
+        parent_model = Author
+        model = Book
+        fields = ["title"]
+
+        def clean(self):
+            super().clean()
+            # example custom validation across forms in the formset
+            for form in self.forms:
+                # your custom formset validation
+                ...
 
 More than one foreign key to the same model
 -------------------------------------------
