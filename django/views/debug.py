@@ -341,6 +341,23 @@ class ExceptionReporter:
             path=self.request.get_full_path(),
         )
 
+    def _get_exception_group_data(self, exc):
+        data = {
+            "type": exc.__class__.__name__,
+            "message": exc,
+        }
+        if isinstance(exc, BaseExceptionGroup):
+            data["children"] = [
+                self._get_exception_group_data(child) for child in exc.exceptions
+            ]
+        return data
+
+    def _get_exception_group_text(self, node, indent=0):
+        text = "%s%s: %s" % ("   " * indent, node["type"], node["message"])
+        for child in node.get("children", ()):
+            text += "\n" + self._get_exception_group_text(child, indent + 1)
+        return text
+
     def get_traceback_data(self):
         """Return a dictionary containing traceback information."""
         if self.exc_type and issubclass(self.exc_type, TemplateDoesNotExist):
@@ -417,6 +434,12 @@ class ExceptionReporter:
             c["exception_value"] = getattr(
                 self.exc_value, "raw_error_message", self.exc_value
             )
+            if isinstance(self.exc_value, BaseExceptionGroup):
+                exc_group_data = self._get_exception_group_data(self.exc_value)
+                c["exception_group"] = exc_group_data
+                c["exception_group_text"] = self._get_exception_group_text(
+                    exc_group_data
+                )
             if exc_notes := getattr(self.exc_value, "__notes__", None):
                 c["exception_notes"] = "\n" + "\n".join(exc_notes)
         if frames:
