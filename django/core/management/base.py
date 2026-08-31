@@ -435,6 +435,11 @@ class BaseCommand:
             else:
                 self.stderr.write("%s: %s" % (e.__class__.__name__, e))
             sys.exit(e.returncode)
+        except KeyboardInterrupt:
+            if options.traceback:
+                raise
+            self.stderr.write("\nOperation cancelled.")
+            sys.exit(1)
         finally:
             try:
                 connections.close_all()
