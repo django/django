@@ -61,6 +61,8 @@ Minor features
 * :class:`~django.contrib.gis.gdal.DataSource` now preserves millisecond
   precision when reading time and datetime fields.
 
+* The GDAL library and its functions are now loaded lazily.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -285,6 +287,12 @@ backends.
 * The seconds value returned by
   :meth:`~django.contrib.gis.gdal.Field.as_datetime` is now a ``c_float``
   rather than a ``c_int``.
+
+* The undocumented factory functions in
+  ``django.contrib.gis.gdal.prototypes.generation`` were replaced by
+  class-based factories following a naming pattern where lowercase snake_case
+  names became PascalCase (e.g., ``bool_output`` is now ``BoolOutput``,
+  ``const_string_output`` is now ``ConstStringOutput``, etc.).
 
 Tests
 -----
