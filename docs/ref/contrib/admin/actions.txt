@@ -407,7 +407,8 @@ decorator and passing the ``permissions`` argument::
         queryset.update(status="p")
 
 The ``make_published()`` action will only be available to users that pass the
-:meth:`.ModelAdmin.has_change_permission` check.
+:meth:`.ModelAdmin.has_change_permission` check when it is called with
+``obj=None``.
 
 If ``permissions`` has more than one permission, the action will be available
 as long as the user passes at least one of the checks.
@@ -440,6 +441,21 @@ For example::
             opts = self.opts
             codename = get_permission_codename("publish", opts)
             return request.user.has_perm("%s.%s" % (opts.app_label, codename))
+
+The admin doesn't automatically check object-level permissions for each
+selected object when executing an action. To limit which objects an action may
+modify based on object-level permissions, perform those checks in the action
+itself. For example::
+
+    class ArticleAdmin(admin.ModelAdmin):
+        actions = ["make_published"]
+
+        @admin.action(permissions=["change"])
+        def make_published(self, request, queryset):
+            for obj in queryset:
+                if self.has_change_permission(request, obj=obj):
+                    obj.status = "p"
+                    obj.save(update_fields=["status"])
 
 .. _admin-action-availability:
 
