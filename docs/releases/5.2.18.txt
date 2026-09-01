@@ -22,6 +22,25 @@ now rejected or truncated before the cached lookup.
 This issue has severity "low" according to the :ref:`Django security policy
 <severity-levels>`.
 
+CVE-2026-84429: Potential denial-of-service vulnerability in HTTP header parsing
+================================================================================
+
+``django.utils.http.parse_header_parameters()`` was subject to a potential
+denial-of-service attack due to quadratic time complexity when parsing a value
+with many separators inside a quoted parameter. An unauthenticated request
+could reach this parsing through headers such as ``Accept`` or
+``Content-Type``, for instance via the content negotiation performed by
+``HttpRequest.accepts()``. The per-call length limit does not bound the
+combined size of repeated headers.
+
+The undocumented ``django.utils.http.parse_header_parameters()`` function now
+uses Python's :class:`email.message.Message` for parsing. As a result, parsing
+of some malformed or unusual header values may differ, for example,
+:rfc:`2231` values with a missing encoding are now decoded.
+
+This issue has severity "moderate" according to the :ref:`Django security
+policy <severity-levels>`.
+
 Bugfixes
 ========
 
