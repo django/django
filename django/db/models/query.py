@@ -1275,13 +1275,22 @@ class QuerySet(AltersData):
         def get_obj(obj):
             return obj
 
+        selected_fields = tuple(
+            self.query.selected
+            or (
+                *self.query.extra_select,
+                *self.query.values_select,
+                *self.query.annotation_select,
+            )
+        )
+
         if issubclass(self._iterable_class, ModelIterable):
             # Raise an AttributeError if field_name is deferred.
             get_key = operator.attrgetter(field_name)
 
         elif issubclass(self._iterable_class, ValuesIterable):
             if field_name not in self.query.values_select:
-                qs = qs.values(field_name, *self.query.values_select)
+                qs = qs.values(field_name, *selected_fields)
 
                 def get_obj(obj):  # noqa: F811
                     # We can safely mutate the dictionaries returned by
@@ -1294,16 +1303,16 @@ class QuerySet(AltersData):
 
         elif issubclass(self._iterable_class, ValuesListIterable):
             try:
-                field_index = self.query.values_select.index(field_name)
+                field_index = selected_fields.index(field_name)
             except ValueError:
-                # field_name is missing from values_select, so add it.
+                # field_name isn't selected, so add it.
                 field_index = 0
                 if issubclass(self._iterable_class, NamedValuesListIterable):
                     kwargs = {"named": True}
                 else:
                     kwargs = {}
                     get_obj = operator.itemgetter(slice(1, None))
-                qs = qs.values_list(field_name, *self.query.values_select, **kwargs)
+                qs = qs.values_list(field_name, *selected_fields, **kwargs)
 
             get_key = operator.itemgetter(field_index)
 
@@ -1313,7 +1322,7 @@ class QuerySet(AltersData):
                 get_key = get_obj
             else:
                 # Transform it back into a non-flat values_list().
-                qs = qs.values_list(field_name, *self.query.values_select)
+                qs = qs.values_list(field_name, *selected_fields)
                 get_key = operator.itemgetter(0)
                 get_obj = operator.itemgetter(1)
 

@@ -368,6 +368,94 @@ class LookupTests(TestCase):
             {self.a1.pk: {"headline": "Article 1"}},
         )
 
+    def test_in_bulk_values_annotation(self):
+        arts = (
+            Article.objects.annotate(author_name=F("author__name"))
+            .values("headline", "author_name")
+            .in_bulk([self.a1.pk])
+        )
+        self.assertEqual(
+            arts,
+            {
+                self.a1.pk: {
+                    "headline": "Article 1",
+                    "author_name": "Author 1",
+                }
+            },
+        )
+
+    def test_in_bulk_values_annotation_all_fields(self):
+        arts = (
+            Article.objects.annotate(author_name=F("author__name"))
+            .values()
+            .in_bulk([self.a1.pk])
+        )
+        self.assertEqual(
+            arts,
+            {
+                self.a1.pk: {
+                    "id": self.a1.pk,
+                    "author_id": self.au1.pk,
+                    "headline": "Article 1",
+                    "pub_date": self.a1.pub_date,
+                    "slug": "a1",
+                    "author_name": "Author 1",
+                }
+            },
+        )
+
+    def test_in_bulk_values_extra_select_all_fields(self):
+        arts = (
+            Article.objects.extra(select={"marker": "1"}).values().in_bulk([self.a1.pk])
+        )
+        self.assertEqual(
+            arts,
+            {
+                self.a1.pk: {
+                    "marker": 1,
+                    "id": self.a1.pk,
+                    "author_id": self.au1.pk,
+                    "headline": "Article 1",
+                    "pub_date": self.a1.pub_date,
+                    "slug": "a1",
+                }
+            },
+        )
+
+    def test_in_bulk_values_list_annotation(self):
+        arts = (
+            Article.objects.annotate(author_name=F("author__name"))
+            .values_list("author_name", "headline")
+            .in_bulk([self.a1.pk])
+        )
+        self.assertEqual(arts, {self.a1.pk: ("Author 1", "Article 1")})
+
+    def test_in_bulk_values_list_annotation_before_pk(self):
+        arts = (
+            Article.objects.annotate(author_name=F("author__name"))
+            .values_list("author_name", "pk")
+            .in_bulk([self.a1.pk])
+        )
+        self.assertEqual(arts, {self.a1.pk: ("Author 1", self.a1.pk)})
+
+    def test_in_bulk_values_list_named_annotation(self):
+        arts = (
+            Article.objects.annotate(author_name=F("author__name"))
+            .values_list("headline", "author_name", named=True)
+            .in_bulk([self.a1.pk])
+        )
+        article = arts[self.a1.pk]
+        self.assertEqual(article._fields, ("pk", "headline", "author_name"))
+        self.assertEqual(article, (self.a1.pk, "Article 1", "Author 1"))
+
+    def test_in_bulk_values_list_flat_annotation(self):
+        arts = (
+            Article.objects.annotate(author_name=F("author__name"))
+            .values_list("author_name", flat=True)
+            .in_bulk([self.a1.pk])
+        )
+        self.assertEqual(arts, {self.a1.pk: "Author 1"})
+
     def test_in_bulk_values_fields_including_pk(self):
         arts = Article.objects.values("pk", "headline").in_bulk([self.a1.pk])
         self.assertEqual(
