@@ -460,7 +460,7 @@ itself. For example::
 .. _admin-action-availability:
 
 Controlling where actions are available
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------
 
 .. versionadded:: 6.1
 
