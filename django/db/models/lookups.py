@@ -1,5 +1,6 @@
 import itertools
 import math
+from collections.abc import Iterator
 
 from django.core.exceptions import EmptyResultSet, FullResultSet
 from django.db.models.expressions import (
@@ -292,7 +293,9 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
     def get_prep_lookup(self):
         if hasattr(self.rhs, "resolve_expression"):
             return self.rhs
-        if any(hasattr(value, "resolve_expression") for value in self.rhs):
+        # Prevent iterator from being consumed by any().
+        rhs = list(self.rhs) if isinstance(self.rhs, Iterator) else self.rhs
+        if any(hasattr(value, "resolve_expression") for value in rhs):
             # Wrap direct values in Value expressions so they are handled by
             # the database at compilation time, along with other expressions.
             return ExpressionList(
@@ -302,11 +305,11 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
                         if hasattr(value, "resolve_expression")
                         else Value(value, getattr(self.lhs, "output_field", None))
                     )
-                    for value in self.rhs
+                    for value in rhs
                 ]
             )
         prepared_values = []
-        for rhs_value in self.rhs:
+        for rhs_value in rhs:
             if (
                 self.prepare_rhs
                 and hasattr(self.lhs, "output_field")
