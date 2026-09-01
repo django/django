@@ -647,10 +647,9 @@ class Model(AltersData, metaclass=ModelBase):
             return NotImplemented
         if self._meta.concrete_model != other._meta.concrete_model:
             return False
-        my_pk = self.pk
-        if my_pk is None:
+        if not self._is_pk_set():
             return self is other
-        return my_pk == other.pk
+        return self.pk == other.pk
 
     def __hash__(self):
         if not self._is_pk_set():

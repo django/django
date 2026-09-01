@@ -491,6 +491,10 @@ class ModelTest(TestCase):
         self.assertEqual(a, a)
         self.assertEqual(a, mock.ANY)
         self.assertNotEqual(Article(), a)
+        # DatabaseDefault is not None, but the pk is unset.
+        db_default = PrimaryKeyWithDbDefault()
+        self.assertEqual(db_default, db_default)
+        self.assertNotEqual(PrimaryKeyWithDbDefault(), db_default)
 
     def test_hash(self):
         # Value based on PK

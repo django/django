@@ -790,9 +790,18 @@ For example::
 
 The equality method is defined such that instances with the same primary
 key value and the same concrete class are considered equal, except that
-instances with a primary key value of ``None`` aren't equal to anything except
-themselves. For proxy models, concrete class is defined as the model's first
-non-proxy parent; for all other models it's simply the model's class.
+instances without a set primary key aren't equal to anything except
+themselves. Whether the primary key is set is determined by
+:meth:`~django.db.models.Model._is_pk_set`. For proxy models, concrete class
+is defined as the model's first non-proxy parent; for all other models it's
+simply the model's class.
+
+.. versionchanged:: 6.2
+
+    Equality now uses :meth:`~django.db.models.Model._is_pk_set` instead of
+    comparing ``pk is None``. Unsaved instances with a composite primary key
+    or a ``db_default`` primary key are compared by identity, matching simple
+    ``None`` primary keys.
 
 For example::
 
