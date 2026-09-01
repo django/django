@@ -5,7 +5,7 @@ from django.contrib.sites.models import Site
 from django.contrib.syndication import views
 from django.core.exceptions import ImproperlyConfigured
 from django.templatetags.static import static
-from django.test import TestCase, override_settings
+from django.test import RequestFactory, TestCase, override_settings
 from django.test.utils import requires_tz_support
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -19,6 +19,7 @@ from django.utils.feedgenerator import (
 )
 from django.utils.xmlutils import UnserializableContentError
 
+from . import feeds
 from .models import Article, Entry
 
 TZ = timezone.get_default_timezone()
@@ -850,3 +851,27 @@ class SyndicationFeedTest(FeedTestCase):
     def test_get_non_existent_object(self):
         response = self.client.get("/syndication/rss2/articles/0/")
         self.assertEqual(response.status_code, 404)
+
+    def test_request_available(self):
+        for url in [
+            "/syndication/rss2/with-request/",
+            "/syndication/rss2/with-request-as-view/",
+        ]:
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                doc = minidom.parseString(response.content)
+                chan = doc.getElementsByTagName("channel")[0]
+                self.assertChildNodeContent(chan, {"title": f"My blog at {url}"})
+
+    def test_request_not_set_on_urlconf_instance(self):
+        feed = feeds.TestRss2FeedWithRequest()
+        feed(RequestFactory().get("/"))
+        self.assertEqual(vars(feed), {})
+
+    def test_method_decorator(self):
+        response = self.client.get("/syndication/rss2/with-decorated-dispatch/")
+        self.assertEqual(response.headers["Vary"], "Accept")
+
+    def test_disallowed_method(self):
+        response = self.client.post("/syndication/rss2/")
+        self.assertEqual(response.status_code, 405)
