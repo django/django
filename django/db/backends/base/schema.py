@@ -129,6 +129,7 @@ class BaseDatabaseSchemaEditor:
     sql_create_inline_fk = None
     sql_create_column_inline_fk = None
     sql_delete_fk = sql_delete_constraint
+    sql_alter_fk = None
 
     sql_create_index = (
         "CREATE INDEX %(name)s ON %(table)s "
@@ -993,7 +994,6 @@ class BaseDatabaseSchemaEditor:
         strict=False,
     ):
         """Perform a "physical" (non-ManyToMany) field update."""
-        # Drop any FK constraints, we'll remake them later
         fks_dropped = set()
         if (
             self.connection.features.supports_foreign_keys
@@ -1005,6 +1005,12 @@ class BaseDatabaseSchemaEditor:
                 ignore={"db_comment"},
             )
         ):
+            # Drop any FK constraints, we'll remake them later.
+            should_recreate = (
+                self.connection.features.requires_fk_constraints_to_be_recreated
+                or not old_field.related_model == new_field.related_model
+                or getattr(new_field, "db_constraint", True) is False
+            )
             fk_names = self._constraint_names(
                 model, [old_field.column], foreign_key=True
             )
@@ -1018,8 +1024,11 @@ class BaseDatabaseSchemaEditor:
                     )
                 )
             for fk_name in fk_names:
-                fks_dropped.add((old_field.column,))
-                self.execute(self._delete_fk_sql(model, fk_name))
+                if self.sql_alter_fk:
+                    self.execute(self._alter_fk_sql(model, fk_name))
+                if should_recreate:
+                    fks_dropped.add((old_field.column,))
+                    self.execute(self._delete_fk_sql(model, fk_name))
         # Has unique been removed?
         if old_field.unique and (
             not new_field.unique or self._field_became_primary_key(old_field, new_field)
@@ -1822,6 +1831,9 @@ class BaseDatabaseSchemaEditor:
 
     def _delete_fk_sql(self, model, name):
         return self._delete_constraint_sql(self.sql_delete_fk, model, name)
+
+    def _alter_fk_sql(self, model, name):
+        return self._delete_constraint_sql(self.sql_alter_fk, model, name)
 
     def _deferrable_constraint_sql(self, deferrable):
         if deferrable is None:
