@@ -29,14 +29,13 @@ class MediaAssetTestCase(SimpleTestCase):
         )
 
     def test_hash(self):
-        self.assertEqual(hash(MediaAsset("path/to/css")), hash("path/to/css"))
-        self.assertEqual(
-            hash(MediaAsset("path/to/css")), hash(MediaAsset("path/to/css"))
-        )
-        self.assertNotEqual(
-            hash(MediaAsset("path/to/css", rel="stylesheet")),
-            hash(MediaAsset("path/to/css")),
-        )
+        path = "path/to/css"
+        self.assertEqual(hash(MediaAsset(path)), hash(path))
+        self.assertEqual(hash(MediaAsset(path)), hash(MediaAsset(path)))
+        asset = MediaAsset(path, rel="stylesheet")
+        self.assertEqual(asset, path)
+        self.assertEqual(hash(asset), hash(path))
+        self.assertIn(path, {asset})
 
     def test_str(self):
         self.assertEqual(

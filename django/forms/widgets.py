@@ -81,10 +81,7 @@ class MediaAsset:
         ) or (isinstance(other, str) and self._path == other)
 
     def __hash__(self):
-        # Compare path and attrs to ensure performant comparison
-        # in Media.merge.
-        if self.attributes:
-            return hash(self._path) ^ hash(frozenset(self.attributes.items()))
+        # Hash the path only to match equality with string paths.
         return hash(self._path)
 
     def __str__(self):
