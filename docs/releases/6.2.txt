@@ -286,6 +286,12 @@ backends.
   :meth:`~django.contrib.gis.gdal.Field.as_datetime` is now a ``c_float``
   rather than a ``c_int``.
 
+Models
+------
+
+* Unsaved instances with a composite primary key or a ``db_default`` primary
+  key no longer compare equal to other instances.
+
 Tests
 -----
 

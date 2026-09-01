@@ -70,6 +70,18 @@ class CompositePKTests(TestCase):
         self.assertIsNotNone(post.id)
         self.assertIs(post._is_pk_set(), False)
 
+    def test_eq(self):
+        self.assertEqual(User(pk=(1, 2)), User(pk=(1, 2)))
+        self.assertEqual(User(tenant_id=2, id=3), User(tenant_id=2, id=3))
+        self.assertNotEqual(User(pk=(1, 2)), User(pk=(1, 3)))
+        self.assertNotEqual(User(pk=(1, 2)), object())
+        unset = User()
+        self.assertEqual(unset, unset)
+        self.assertNotEqual(User(), unset)
+        self.assertNotEqual(User(tenant_id=1), User(tenant_id=1))
+        self.assertNotEqual(User(id=1), User(id=1))
+        self.assertNotEqual(User(tenant_id=1), User(pk=(1, 2)))
+
     def test_hash(self):
         self.assertEqual(hash(User(pk=(1, 2))), hash((1, 2)))
         self.assertEqual(hash(User(tenant_id=2, id=3)), hash((2, 3)))
