@@ -1959,14 +1959,23 @@ default templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.has_view_permission(request, obj=None)
 
-    Should return ``True`` if viewing ``obj`` is permitted, ``False``
-    otherwise. If obj is ``None``, should return ``True`` or ``False`` to
-    indicate whether viewing of objects of this type is permitted in general
-    (e.g., ``False`` will be interpreted as meaning that the current user is
-    not permitted to view any object of this type).
+    Should return ``True`` if the user is permitted to access the change or
+    history view for ``obj``, and ``False`` otherwise. If obj is ``None``,
+    should return ``True`` or ``False`` to indicate whether viewing of objects
+    of this type is permitted in general (e.g., ``False`` will be interpreted
+    as meaning that the current user is not permitted to view any object of
+    this type).
 
     The default implementation returns ``True`` if the user has either the
     "change" or "view" permission.
+
+    .. admonition:: Object-level view permissions aren't visibility filters
+
+        Object-level view permissions don't prevent information about an object
+        from appearing elsewhere in the admin, including in the admin
+        changelist, related field choices, autocomplete results, and recent
+        actions. To restrict this information, customize the querysets used by
+        the relevant views and form fields.
 
 .. method:: ModelAdmin.has_add_permission(request)
 
