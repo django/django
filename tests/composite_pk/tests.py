@@ -437,6 +437,11 @@ class CompositePKFixturesTests(TestCase):
         self.assertIn('<object model="composite_pk.user" pk=\'["1", "1"]\'>', result)
         self.assert_deserializer(format="xml", users=users, serialized_users=result)
 
+    def test_serialize_unsaved_user_xml_omits_pk(self):
+        result = serializers.serialize("xml", [User()])
+        self.assertIn('<object model="composite_pk.user">', result)
+        self.assertNotIn(" pk=", result)
+
     def test_serialize_post_uuid(self):
         posts = Post.objects.filter(pk=(2, "11111111-1111-1111-1111-111111111111"))
         result = serializers.serialize("json", posts)
