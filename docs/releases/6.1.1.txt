@@ -50,3 +50,7 @@ Bugfixes
   ``choices``, and where any search term matched all rows with a ``True``
   value when an ``__exact`` lookup was used on a ``BooleanField``
   (:ticket:`37263`).
+
+* Fixed a regression in Django 6.1 that caused ``__in`` lookups on annotations
+  to erroneously return empty querysets and ``__range`` lookups to crash when
+  passed an iterator (:ticket:`37311`).

@@ -1087,6 +1087,28 @@ class LookupTests(TestCase):
     def test_in_empty_list(self):
         self.assertSequenceEqual(Article.objects.filter(id__in=[]), [])
 
+    def test_in_iterator_rhs(self):
+        tests = [
+            ("direct values", [self.a1.id, self.a2.id]),
+            ("expression", [self.a1.id, Value(self.a2.id)]),
+        ]
+        for case, values in tests:
+            with self.subTest(case=case):
+                self.assertCountEqual(
+                    Article.objects.alias(article_id=F("id")).filter(
+                        article_id__in=iter(values)
+                    ),
+                    [self.a1, self.a2],
+                )
+
+    def test_range_iterator_rhs(self):
+        self.assertCountEqual(
+            Article.objects.alias(article_id=F("id")).filter(
+                article_id__range=iter([self.a1.id, self.a2.id])
+            ),
+            [self.a1, self.a2],
+        )
+
     def test_in_different_database(self):
         with self.assertRaisesMessage(
             ValueError,
