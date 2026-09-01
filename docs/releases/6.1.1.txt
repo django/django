@@ -54,3 +54,7 @@ Bugfixes
 * Fixed a regression in Django 6.1 that caused ``__in`` lookups on annotations
   to erroneously return empty querysets and ``__range`` lookups to crash when
   passed an iterator (:ticket:`37311`).
+
+* Fixed a bug in Django 6.1 where :meth:`.QuerySet.in_bulk` chained after
+  :meth:`.QuerySet.values` or :meth:`.QuerySet.values_list` could drop selected
+  annotations or produce incorrect mapping keys (:ticket:`37312`).
