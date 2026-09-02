@@ -196,7 +196,9 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* ``F()`` expressions can now be assigned to ``ForeignKey`` and
+  ``OneToOneField`` attributes on model instances. See
+  :ref:`assigning-f-objects-to-related-fields`.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
