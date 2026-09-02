@@ -72,6 +72,8 @@ class RequireSafeDecoratorTest(SimpleTestCase):
         self.assertIs(type(my_safe_view(request)), HttpResponse)
         request.method = "HEAD"
         self.assertIs(type(my_safe_view(request)), HttpResponse)
+        request.method = "QUERY"
+        self.assertIs(type(my_safe_view(request)), HttpResponse)
         request.method = "POST"
         self.assertIs(type(my_safe_view(request)), HttpResponseNotAllowed)
         request.method = "PUT"
@@ -88,6 +90,8 @@ class RequireSafeDecoratorTest(SimpleTestCase):
         request.method = "GET"
         self.assertIs(type(await async_view(request)), HttpResponse)
         request.method = "HEAD"
+        self.assertIs(type(await async_view(request)), HttpResponse)
+        request.method = "QUERY"
         self.assertIs(type(await async_view(request)), HttpResponse)
         request.method = "POST"
         self.assertIs(type(await async_view(request)), HttpResponseNotAllowed)

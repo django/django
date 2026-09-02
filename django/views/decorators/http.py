@@ -73,9 +73,9 @@ require_GET.__doc__ = "Decorator to require that a view only accepts the GET met
 require_POST = require_http_methods(["POST"])
 require_POST.__doc__ = "Decorator to require that a view only accepts the POST method."
 
-require_safe = require_http_methods(["GET", "HEAD"])
+require_safe = require_http_methods(["GET", "HEAD", "QUERY"])
 require_safe.__doc__ = (
-    "Decorator to require that a view only accepts safe methods: GET and HEAD."
+    "Decorator to require that a view only accepts safe methods: GET, HEAD, and QUERY."
 )
 
 
@@ -124,7 +124,7 @@ def condition(etag_func=None, last_modified_func=None):
         def _post_process_request(request, response, res_etag, res_last_modified):
             # Set relevant headers on the response if they don't already exist
             # and if the request method is safe.
-            if request.method in ("GET", "HEAD"):
+            if request.method in ("GET", "HEAD", "QUERY"):
                 if res_last_modified and not response.has_header("Last-Modified"):
                     response.headers["Last-Modified"] = http_date(res_last_modified)
                 if res_etag:
