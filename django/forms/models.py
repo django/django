@@ -963,11 +963,12 @@ class BaseModelFormSet(BaseFormSet, AltersData):
         forms_to_delete = self.deleted_forms
         for form in self.initial_forms:
             obj = form.instance
-            # If the pk is None, it means either:
-            # 1. The object is an unexpected empty model, created by invalid
-            #    POST data such as an object outside the formset's queryset.
+            # If the pk is unset or the instance is being added, it could mean:
+            # 1. The object is an unexpected unfetched instance, created by
+            #    invalid POST data such as an object outside the formset's
+            #    queryset, or a formset with edit_only=True.
             # 2. The object was already deleted from the database.
-            if not obj._is_pk_set():
+            if not obj._is_pk_set() or obj._state.adding:
                 continue
             if form in forms_to_delete:
                 self.deleted_objects.append(obj)
