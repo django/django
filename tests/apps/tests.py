@@ -13,7 +13,8 @@ from django.test import (
     override_settings,
     skipUnlessDBFeature,
 )
-from django.test.utils import extend_sys_path, isolate_apps
+from django.test.utils import extend_sys_path, ignore_warnings, isolate_apps
+from django.utils.deprecation import RemovedInDjango71Warning
 from django.utils.functional import cached_property
 
 from .models import SoAlternative, TotallyNormal, new_apps
@@ -504,6 +505,7 @@ class AppConfigTests(SimpleTestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             MyAppConfig("test_app", Stub())
 
+    @ignore_warnings(category=RemovedInDjango71Warning)
     @override_settings(
         INSTALLED_APPS=["apps.apps.ModelPKAppsConfig"],
         DEFAULT_AUTO_FIELD="django.db.models.SmallAutoField",
@@ -516,6 +518,7 @@ class AppConfigTests(SimpleTestCase):
         )
         self.assertIs(apps_config._is_default_auto_field_overridden, True)
 
+    @ignore_warnings(category=RemovedInDjango71Warning)
     @override_settings(
         INSTALLED_APPS=["apps.apps.PlainAppsConfig"],
         DEFAULT_AUTO_FIELD="django.db.models.SmallAutoField",
