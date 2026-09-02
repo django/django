@@ -37,7 +37,10 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Object tools can be customized by overriding the
+  :attr:`~django.contrib.admin.ModelAdmin.get_change_form_object_tools` and
+  :attr:`~django.contrib.admin.ModelAdmin.get_change_list_object_tools`
+  methods.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
