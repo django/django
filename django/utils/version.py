@@ -46,9 +46,12 @@ def get_version(version=None):
 
 
 def get_main_version(version=None):
-    """Return main version (X.Y[.Z]) from VERSION."""
+    """Return main version (X.Y[.Z] or YYYY[.N]) from VERSION."""
     version = get_complete_version(version)
-    parts = 2 if version[2] == 0 else 3
+    if version[0] >= 2028:
+        parts = 1 if version[1] == 0 else 2
+    else:
+        parts = 2 if version[2] == 0 else 3
     return ".".join(str(x) for x in version[:parts])
 
 
@@ -70,6 +73,8 @@ def get_docs_version(version=None):
     version = get_complete_version(version)
     if version[3] != "final":
         return "dev"
+    elif version[0] >= 2028:
+        return str(version[0])
     else:
         return "%d.%d" % version[:2]
 
