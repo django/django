@@ -202,6 +202,16 @@ objects in the same way as any other :doc:`Django model
     myuser.user_permissions.remove(permission, permission, ...)
     myuser.user_permissions.clear()
 
+.. admonition:: There are community-maintained solutions!
+
+    Django has a vibrant ecosystem. There are authentication and authorization
+    solutions highlighted on the `Community Ecosystem`_ page. The Django
+    Packages `Authorization grid`_ has even more options for you!
+
+.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#authentication-authorization
+.. _Authorization grid: https://djangopackages.org/grids/g/authorization/
+
+
 Default permissions
 -------------------
 
