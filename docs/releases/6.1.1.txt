@@ -2,7 +2,7 @@
 Django 6.1.1 release notes
 ==========================
 
-*Expected September 2, 2026*
+*September 2, 2026*
 
 Django 6.1.1 fixes one crash in Django 5.2 and several bugs in 6.1.
 
