@@ -1,7 +1,9 @@
 import json
 
 from django.core import checks
+from django.core.exceptions import FieldError
 from django.db.models import NOT_PROVIDED, Field
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import ColPairs
 from django.db.models.fields.tuple_lookups import (
     TupleExact,
@@ -47,7 +49,70 @@ class CompositeAttribute:
             setattr(instance, attname, value)
 
 
-class CompositePrimaryKey(Field):
+class CompositeFieldBase(Field):
+    is_composite = True
+
+    def get_fields(self):
+        for name, field in zip(self.field_names, self.fields, strict=True):
+            path = tuple(name.split(LOOKUP_SEP))
+            yield path, field
+
+    def get_field(self, name):
+        path = tuple(name.split(LOOKUP_SEP))
+        for field_path, field in self.get_fields():
+            if field_path == path:
+                return field
+        raise FieldError(f"{name!r} not found")
+
+
+class CompositeField(CompositeFieldBase):
+    def __init__(self, **kwargs):
+        for name, field in kwargs.items():
+            assert LOOKUP_SEP not in name
+            if not isinstance(field, Field):
+                raise TypeError(
+                    f"{name!r} should be a Field instance, got "
+                    f"{field.__class__.__name__}."
+                )
+
+        self.field_names = tuple(kwargs)
+        self.fields = tuple(kwargs.values())
+        if len(self.fields) < 2:
+            raise ValueError("CompositeField requires at least two fields")
+        super().__init__()
+
+    @classmethod
+    def from_select(cls, fields):
+        """Build an output field from an ordered mapping of selected fields."""
+        if not fields:
+            return None
+        if len(fields) == 1:
+            return next(iter(fields.values()))
+
+        return cls(**fields)
+
+    def contribute_to_class(self, cls, name, private_only=False):
+        raise TypeError("CompositeField cannot be used as a model field.")
+
+    def deconstruct(self):
+        name, path, args, kwargs = super().deconstruct()
+        kwargs.update(
+            (name, field.clone())
+            for name, field in zip(self.field_names, self.fields, strict=True)
+        )
+        return name, path, args, kwargs
+
+
+CompositeFieldBase.register_lookup(TupleExact)
+CompositeFieldBase.register_lookup(TupleGreaterThan)
+CompositeFieldBase.register_lookup(TupleGreaterThanOrEqual)
+CompositeFieldBase.register_lookup(TupleLessThan)
+CompositeFieldBase.register_lookup(TupleLessThanOrEqual)
+CompositeFieldBase.register_lookup(TupleIn)
+CompositeFieldBase.register_lookup(TupleIsNull)
+
+
+class CompositePrimaryKey(CompositeFieldBase):
     descriptor_class = CompositeAttribute
 
     def __init__(self, *args, **kwargs):
@@ -154,15 +219,6 @@ class CompositePrimaryKey(Field):
                 for field, val in zip(self.fields, vals, strict=True)
             ]
         return value
-
-
-CompositePrimaryKey.register_lookup(TupleExact)
-CompositePrimaryKey.register_lookup(TupleGreaterThan)
-CompositePrimaryKey.register_lookup(TupleGreaterThanOrEqual)
-CompositePrimaryKey.register_lookup(TupleLessThan)
-CompositePrimaryKey.register_lookup(TupleLessThanOrEqual)
-CompositePrimaryKey.register_lookup(TupleIn)
-CompositePrimaryKey.register_lookup(TupleIsNull)
 
 
 def unnest(fields):

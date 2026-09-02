@@ -24,6 +24,7 @@ from django.db.models.sql.where import AND, OR, WhereNode
 
 
 class Tuple(Func):
+    is_composite = True
     allows_composite_expressions = True
     function = ""
     output_field = models.Field()
@@ -86,7 +87,12 @@ class TupleLookupMixin:
         if isinstance(self.lhs, ColPairs):
             return repr(self.lhs.field.name)
         else:
-            names = ", ".join(repr(f.name) for f in self.lhs)
+            names = ", ".join(
+                [
+                    repr(f.name if hasattr(f, "name") else f.output_field.name)
+                    for f in self.lhs
+                ]
+            )
             return f"({names})"
 
     def get_prep_lhs(self):

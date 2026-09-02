@@ -662,8 +662,11 @@ Limiting a subquery to a single column
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There are times when a single column must be returned from a ``Subquery``, for
-instance, to use a ``Subquery`` as the target of an ``__in`` lookup. To return
-all comments for posts published within the last day:
+instance, to use a ``Subquery`` as the target of an :lookup:`in` lookup on a
+:class:`~django.db.models.ForeignKey`. Most lookups in Django expect a single
+column. See
+:ref:`using-multi-column-subqueries` for lookups that expect multiple columns.
+To return all comments for posts published within the last day:
 
 .. code-block:: pycon
 
@@ -693,6 +696,91 @@ row: the email address of the most recently created comment.
 (Using :meth:`~.QuerySet.get` instead of a slice would fail because the
 ``OuterRef`` cannot be resolved until the queryset is used within a
 ``Subquery``.)
+
+.. _using-multi-column-subqueries:
+
+Using multi-column subqueries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 6.2
+
+A ``Subquery`` can return multiple columns by calling
+:meth:`~.QuerySet.values` with multiple field names. In this case, the
+subquery has a ``CompositeField`` :ref:`output_field <output-field>`.
+Using a ``CompositeField`` as a subfield of another ``CompositeField`` isn't
+supported.
+
+Assign a multi-column ``Subquery`` using :meth:`~.QuerySet.alias`. Its
+individual subfields can then be referenced using the normal double-underscore
+lookup syntax:
+
+.. code-block:: pycon
+
+    >>> newest = Comment.objects.order_by("-created_at").values("email", "author__name")[:1]
+    >>> Post.objects.alias(newest=newest).values("newest__email", "newest__author__name")
+
+A multi-column ``Subquery`` cannot be selected as one annotation because there
+is no single result column for Django to place in ``SELECT``. Assign it using
+:meth:`~.QuerySet.alias` and select its individual subfields instead. Passing
+it directly to :meth:`~.QuerySet.annotate` raises an error when the queryset is
+evaluated:
+
+.. code-block:: pycon
+
+    >>> posts = Post.objects.annotate(newest=newest)
+    >>> list(posts)
+    Traceback (most recent call last):
+    ...
+    NotImplementedError: Selecting a multi-column subquery as an annotation is not supported.
+
+When the queryset assigned to :meth:`~.QuerySet.alias` doesn't use
+:class:`OuterRef`, its results don't depend on the outer queryset. Django
+combines each row returned by it with every row of the outer queryset. For
+example:
+
+.. code-block:: pycon
+
+    >>> comments = Comment.objects.values("email", "author__name")
+    >>> Post.objects.alias(comment=comments).values("title", "comment__email")
+
+If the ``Post`` queryset returns two rows and ``comments`` returns three rows,
+the resulting queryset can return six rows. Use a ``[:1]`` slice when each
+outer row should be combined with at most one subquery row. If the subquery is
+empty, the outer rows are preserved and its subfields have SQL ``NULL`` values.
+
+Using :class:`OuterRef` in a multi-column ``Subquery`` isn't currently
+supported. Support may be added in a future release. For example, the following
+attempts to select the newest comment separately for each post and isn't
+supported:
+
+.. code-block:: pycon
+
+    >>> newest_for_post = (
+    ...     Comment.objects.filter(post=OuterRef("pk"))
+    ...     .order_by("-created_at")
+    ...     .values("email", "author__name")[:1]
+    ... )
+    >>> Post.objects.alias(newest=newest_for_post).values(
+    ...     "newest__email", "newest__author__name"
+    ... )
+
+The subfields can be used in filters, annotations, ordering, and other
+expressions in the same way as model fields. For example:
+
+.. code-block:: pycon
+
+    >>> posts = Post.objects.alias(newest=newest)
+    >>> posts.filter(newest__email__endswith="@example.com")
+    >>> posts.order_by("newest__author__name")
+
+A multi-column ``Subquery`` can also be compared as a whole using tuple
+lookups, including :lookup:`exact`, :lookup:`lt`, :lookup:`in`, and
+:lookup:`gt`. The values in the tuple follow the order of the fields passed to
+:meth:`~.QuerySet.values`:
+
+.. code-block:: pycon
+
+    >>> posts.filter(newest=("alice@example.com", "Alice"))
 
 ``Exists()`` subqueries
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1124,6 +1212,13 @@ calling the appropriate methods on the wrapped expression.
         Postgres set-returning functions (e.g. ``JSONB_PATH_QUERY``,
         ``UNNEST``, etc.) to skip optimization and be properly evaluated when
         annotations spawn rows themselves. Defaults to ``False``.
+
+    .. attribute:: is_composite
+
+        .. versionadded:: 6.2
+
+        Tells Django that this expression represents a composite value.
+        Defaults to ``False``.
 
     .. attribute:: allows_composite_expressions
 

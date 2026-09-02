@@ -26,6 +26,7 @@ from django.db.models.expressions import (
     Col,
     ColPairs,
     Exists,
+    ExpressionWrapper,
     F,
     OuterRef,
     RawSQL,
@@ -41,7 +42,13 @@ from django.db.models.query_utils import (
     refs_expression,
 )
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
-from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
+from django.db.models.sql.datastructures import (
+    BaseTable,
+    Empty,
+    Join,
+    MultiJoin,
+    SubqueryJoin,
+)
 from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
 from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.functional import cached_property
@@ -279,6 +286,7 @@ class Query(BaseExpression):
     # excluding annotation_select and extra_select.
     values_select = ()
     selected = None
+    derived_table = False
 
     # SQL annotation-related attributes.
     annotation_select_mask = None
@@ -332,11 +340,48 @@ class Query(BaseExpression):
 
     @property
     def output_field(self):
-        if len(self.select) == 1:
-            select = self.select[0]
-            return getattr(select, "target", None) or select.field
-        elif len(self.annotation_select) == 1:
-            return next(iter(self.annotation_select.values())).output_field
+        from django.db.models import CompositeField
+
+        output_fields = dict(self._get_output_fields())
+        return CompositeField.from_select(output_fields)
+
+    @staticmethod
+    def _get_output_field(expression):
+        return getattr(expression, "target", None) or expression.output_field
+
+    def _get_selected_expression(self, selection):
+        if isinstance(selection, int):
+            return self.select[selection]
+        if isinstance(selection, str):
+            return self.annotation_select[selection]
+        return selection
+
+    def _get_output_expressions(self):
+        if self.selected is not None:
+            for name, selection in self.selected.items():
+                yield name, self._get_selected_expression(selection)
+            return
+
+        if self.values_select:
+            yield from zip(self.values_select, self.select, strict=True)
+        else:
+            for expression in self.select:
+                field = self._get_output_field(expression)
+                yield field.name, expression
+
+        for name, expression in self.annotation_select.items():
+            yield name, expression
+
+    def _get_output_fields(self):
+        for name, expression in self._get_output_expressions():
+            yield name, self._get_output_field(expression)
+
+    def get_output_expression(self, requested_name):
+        """Return the selected expression with the given name."""
+        for name, expression in self._get_output_expressions():
+            if name == requested_name:
+                return expression
+        raise FieldError(f"{requested_name!r} not found")
 
     @cached_property
     def base_table(self):
@@ -911,15 +956,18 @@ class Query(BaseExpression):
             self.alias_refcount[alias] += 1
             return alias, False
 
+        alias = filtered_relation.alias if filtered_relation is not None else table_name
+
         # Create a new alias for this table.
-        if alias_list:
-            alias = "%s%d" % (self.alias_prefix, len(self.alias_map) + 1)
-            alias_list.append(alias)
-        else:
+        if alias_list or alias in self.alias_map:
+            index = len(self.alias_map) + 1
+            alias = "%s%d" % (self.alias_prefix, index)
+            while alias in self.alias_map:
+                index += 1
+                alias = "%s%d" % (self.alias_prefix, index)
+
+        if not alias_list:
             # The first occurrence of a table uses the table name directly.
-            alias = (
-                filtered_relation.alias if filtered_relation is not None else table_name
-            )
             self.table_map[table_name] = [alias]
         self.alias_refcount[alias] = 1
         return alias, True
@@ -986,7 +1034,10 @@ class Query(BaseExpression):
             if self.alias_map[alias].join_type == LOUTER:
                 self.alias_map[alias] = self.alias_map[alias].demote()
                 parent_alias = self.alias_map[alias].parent_alias
-                if self.alias_map[parent_alias].join_type == INNER:
+                if (
+                    parent_alias is not None
+                    and self.alias_map[parent_alias].join_type == INNER
+                ):
                     aliases.append(parent_alias)
 
     def reset_refcounts(self, to_counts):
@@ -1023,6 +1074,15 @@ class Query(BaseExpression):
             key: col.relabeled_clone(change_map)
             for key, col in self.annotations.items()
         }
+        if self.selected is not None:
+            self.selected = {
+                name: (
+                    selection.relabeled_clone(change_map)
+                    if hasattr(selection, "relabeled_clone")
+                    else selection
+                )
+                for name, selection in self.selected.items()
+            }
 
         # 2. Rename the alias in the internal table/alias datastructures.
         for old_alias, new_alias in change_map.items():
@@ -1164,7 +1224,7 @@ class Query(BaseExpression):
         alias, _ = self.table_alias(
             join.table_name, create=True, filtered_relation=join.filtered_relation
         )
-        if join.join_type:
+        if join.join_type and join.parent_alias is not None:
             if self.alias_map[join.parent_alias].join_type == LOUTER or join.nullable:
                 join_type = LOUTER
             else:
@@ -1237,10 +1297,101 @@ class Query(BaseExpression):
                 "control characters, quotation marks, semicolons, or SQL comments."
             )
 
+    def has_external_references(self):
+        """Return whether this query references a column from an outer query"""
+        return bool(self.get_external_cols()) or any(
+            query.has_external_references() for query in self.combined_queries
+        )
+
+    @property
+    def has_multiple_output_columns(self):
+        return (
+            sum(len(expression) for _, expression in self._get_output_expressions()) > 1
+        )
+
+    @staticmethod
+    def _get_multi_column_query(expression):
+        """Return the multi-column query represented by expression."""
+        if isinstance(expression, ExpressionWrapper):
+            expression = expression.get_source_expressions()[0]
+        if isinstance(expression, Query) and expression.has_multiple_output_columns:
+            return expression
+        return None
+
+    def _resolve_inner_subquery_field(self, join, field_path):
+        expression = join.table_subquery.get_output_expression(field_path)
+        if isinstance(expression, ColPairs):
+            return ColPairs(
+                join.table_alias,
+                [
+                    join.get_field(
+                        LOOKUP_SEP.join((field_path, source.attname)), source
+                    )
+                    for source in expression.sources
+                ],
+                expression.sources,
+                expression.output_field,
+            )
+        field = join.get_field(field_path, self._get_output_field(expression))
+        return Col(join.table_alias, field)
+
+    def _resolve_inner_subquery_tuple(self, join):
+        from django.db.models.fields.tuple_lookups import Tuple
+
+        cols = []
+        output_field = join.table_subquery.output_field
+        for name, _ in join.table_subquery._get_output_expressions():
+            expression = self._resolve_inner_subquery_field(join, name)
+            if isinstance(expression, ColPairs):
+                cols.extend(expression.get_cols())
+            else:
+                cols.append(expression)
+        return Tuple(*cols, output_field=output_field)
+
+    def _setup_inner_subquery_join(self, table_subquery, alias):
+        if table_subquery.has_external_references():
+            # TODO: Remove after OuterRef support.
+            raise NotImplementedError(
+                "Correlated multi-column subquery aliases are not supported."
+            )
+        self.get_initial_alias()
+        join = SubqueryJoin(
+            table_subquery,
+            alias,
+            None,
+        )
+        table_alias = self.join(join)
+        return self.alias_map[table_alias]
+
+    def _resolve_inner_subquery_path(self, table_subquery, parts):
+        """Resolve a table-source output and return the unused path parts."""
+        output_names = {name for name, _ in table_subquery._get_output_expressions()}
+        field_path = None
+        resolved_idx = 1
+        for idx in range(len(parts), 1, -1):
+            candidate = LOOKUP_SEP.join(parts[1:idx])
+            if candidate in output_names:
+                field_path = candidate
+                resolved_idx = idx
+                break
+
+        join = self._setup_inner_subquery_join(table_subquery, parts[0])
+        if field_path is None:
+            expression = self._resolve_inner_subquery_tuple(join)
+        else:
+            expression = self._resolve_inner_subquery_field(join, field_path)
+        return expression, parts[resolved_idx:]
+
     def add_annotation(self, annotation, alias, select=True):
         """Add a single annotation expression to the Query."""
         self.check_alias(alias)
         annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None)
+        table_subquery = self._get_multi_column_query(annotation)
+        if table_subquery is not None and LOOKUP_SEP in alias:
+            raise ValueError(
+                f"Multi-column subquery alias {alias!r} cannot contain the lookup "
+                f"separator {LOOKUP_SEP!r}."
+            )
         if select:
             self.append_annotation_mask([alias])
         else:
@@ -1249,8 +1400,12 @@ class Query(BaseExpression):
         if select and self.selected:
             self.selected[alias] = alias
 
-    @property
-    def _subquery_fields_len(self):
+    def __bool__(self):
+        """Return True regardless of the number of selected columns."""
+        return True
+
+    def __len__(self):
+        """Return the number of columns selected by this query."""
         if not self.has_select_fields or not self.select:
             return len(self.model._meta.pk_fields)
         return len(self.select) + sum(
@@ -1351,6 +1506,15 @@ class Query(BaseExpression):
                 lookup_splitted, self.annotations
             )
             if annotation:
+                table_subquery = self._get_multi_column_query(
+                    self.annotations[annotation]
+                )
+                if table_subquery is not None:
+                    expression, expression_lookups = self._resolve_inner_subquery_path(
+                        table_subquery,
+                        lookup_splitted,
+                    )
+                    return expression_lookups, (), expression
                 expression = self.annotations[annotation]
                 if summarize:
                     expression = Ref(annotation, expression)
@@ -1485,6 +1649,18 @@ class Query(BaseExpression):
                 "permitted%s" % (unsupported_lookup, output_field.__name__, suggestion)
             )
 
+    def _expression_contains_nullable_subquery_column(self, expression):
+        if expression is None:
+            return False
+        if isinstance(expression, Col):
+            join = self.alias_map.get(expression.alias)
+            return isinstance(join, SubqueryJoin) and join.join_type == LOUTER
+
+        return any(
+            self._expression_contains_nullable_subquery_column(source)
+            for source in expression.get_source_expressions()
+        )
+
     def get_names_to_join(self, expr):
         """
         Helper method for the resolution of expressions that could either be a
@@ -1574,7 +1750,16 @@ class Query(BaseExpression):
 
         if reffed_expression:
             condition = self.build_lookup(lookups, reffed_expression, value)
-            return WhereNode([condition], connector=AND), []
+            clause = WhereNode([condition], connector=AND)
+            if (
+                current_negated
+                and condition.lookup_name != "isnull"
+                and condition.rhs is not None
+                and self._expression_contains_nullable_subquery_column(condition.lhs)
+            ):
+                lookup_class = condition.lhs.get_lookup("isnull")
+                clause.add(lookup_class(condition.lhs, False), AND)
+            return clause, []
 
         opts = self.get_meta()
         alias = self.get_initial_alias()
@@ -1659,8 +1844,15 @@ class Query(BaseExpression):
                         clause.add(lookup_class(col, False), AND)
                 # If someval is a nullable column, someval IS NOT NULL is
                 # added.
-                if isinstance(value, Col) and self.is_nullable(value.target):
-                    lookup_class = value.target.get_lookup("isnull")
+                value_is_nullable = isinstance(value, Col) and self.is_nullable(
+                    value.target
+                )
+                value_contains_nullable_subquery_column = isinstance(
+                    value, BaseExpression
+                ) and self._expression_contains_nullable_subquery_column(value)
+
+                if value_is_nullable or value_contains_nullable_subquery_column:
+                    lookup_class = value.get_lookup("isnull")
                     clause.add(lookup_class(value, False), AND)
         return clause, used_joins if not require_outer else ()
 
@@ -2069,6 +2261,12 @@ class Query(BaseExpression):
     def resolve_ref(self, name, allow_joins=True, reuse=None, summarize=False):
         annotation = self.annotations.get(name)
         if annotation is not None:
+            table_subquery = self._get_multi_column_query(annotation)
+            is_multi_column_query = table_subquery is not None
+            if not allow_joins and is_multi_column_query:
+                raise FieldError(
+                    "Joined field references are not permitted in this query"
+                )
             if not allow_joins:
                 for alias in self._gen_col_aliases([annotation]):
                     if isinstance(self.alias_map[alias], Join):
@@ -2088,10 +2286,29 @@ class Query(BaseExpression):
                     )
                 return Ref(name, self.annotation_select[name])
             else:
+                if is_multi_column_query:
+                    join = self._setup_inner_subquery_join(table_subquery, name)
+                    return self._resolve_inner_subquery_tuple(join)
                 return annotation
         else:
             field_list = name.split(LOOKUP_SEP)
             annotation = self.annotations.get(field_list[0])
+            table_subquery = self._get_multi_column_query(annotation)
+            is_multi_column_query = table_subquery is not None
+
+            if is_multi_column_query:
+                if not allow_joins:
+                    raise FieldError(
+                        "Joined field references are not permitted in this query"
+                    )
+                expression, transforms = self._resolve_inner_subquery_path(
+                    table_subquery,
+                    field_list,
+                )
+                for transform in transforms:
+                    expression = self.try_transform(expression, transform)
+                return expression
+
             if annotation is not None:
                 for transform in field_list[1:]:
                     annotation = self.try_transform(annotation, transform)
@@ -2347,7 +2564,12 @@ class Query(BaseExpression):
                 if item == "?":
                     continue
                 item = item.removeprefix("-")
-                if item in self.annotations:
+                if item in self.annotations or (
+                    self._get_multi_column_query(
+                        self.annotations.get(item.split(LOOKUP_SEP, 1)[0])
+                    )
+                    is not None
+                ):
                     continue
                 if self.extra and item in self.extra:
                     continue
@@ -2632,6 +2854,8 @@ class Query(BaseExpression):
                                 f"Cannot select the '{f}' alias. Use annotate() "
                                 f"to promote it."
                             )
+                    elif f.split(LOOKUP_SEP, 1)[0] in self.annotations:
+                        selected[f] = self.resolve_ref(f)
                     else:
                         # Call `names_to_path` to ensure a FieldError including
                         # annotations about to be masked as valid choices if
