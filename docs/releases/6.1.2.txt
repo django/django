@@ -66,6 +66,20 @@ should be validated before use.
 This issue has severity "moderate" according to the :ref:`Django security
 policy <severity-levels>`.
 
+CVE-2026-87975: Privilege abuse in model formsets with editable primary keys
+============================================================================
+
+Model formsets incorrectly allowed forged ``POST`` data to either delete
+instances outside the limiting queryset or create instances via :ref:`edit-only
+<model-formsets-edit-only>` formsets when the model's primary key could be set
+through the form, such as with: a ``OneToOneField`` (or parent link used as the
+primary key of an inline formset's model), or a natural or UUID primary key
+included in the form's fields. Models using the default ``BigAutoField``
+primary key were not affected.
+
+This issue has severity "moderate" according to the :ref:`Django security
+policy <severity-levels>`.
+
 Bugfixes
 ========
 
