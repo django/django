@@ -216,7 +216,7 @@ class GDALRaster(GDALRasterBase):
             )
 
     def __del__(self):
-        if self.is_vsi_based:
+        if self._is_vsimem_based:
             # Remove the temporary file from the VSI in-memory filesystem.
             capi.unlink_vsi_file(force_bytes(self.name))
         super().__del__()
@@ -275,9 +275,7 @@ class GDALRaster(GDALRasterBase):
 
     @property
     def vsi_buffer(self):
-        if not (
-            self.is_vsi_based and self.name.startswith(VSI_MEM_FILESYSTEM_BASE_PATH)
-        ):
+        if not self._is_vsimem_based:
             return None
         # Prepare an integer that will contain the buffer length.
         out_length = c_int()
@@ -293,6 +291,10 @@ class GDALRaster(GDALRasterBase):
     @cached_property
     def is_vsi_based(self):
         return self._ptr and self.name.startswith(VSI_FILESYSTEM_PREFIX)
+
+    @cached_property
+    def _is_vsimem_based(self):
+        return self._ptr and self.name.startswith(VSI_MEM_FILESYSTEM_BASE_PATH)
 
     @property
     def name(self):
