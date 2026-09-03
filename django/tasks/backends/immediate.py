@@ -6,6 +6,7 @@ from django.tasks.signals import task_enqueued, task_finished, task_started
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.json import normalize_json
+from django.utils.module_loading import qualname
 
 from .base import BaseTaskBackend
 
@@ -59,9 +60,7 @@ class ImmediateBackend(BaseTaskBackend):
             exception_type = type(e)
             task_result.errors.append(
                 TaskError(
-                    exception_class_path=(
-                        f"{exception_type.__module__}.{exception_type.__qualname__}"
-                    ),
+                    exception_class_path=qualname(exception_type),
                     traceback="".join(format_exception(e)),
                 )
             )
