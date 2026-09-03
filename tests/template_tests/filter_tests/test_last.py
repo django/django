@@ -25,3 +25,8 @@ class LastTests(SimpleTestCase):
     def test_empty_list(self):
         output = self.engine.render_to_string("empty_list", {"a": []})
         self.assertEqual(output, "")
+
+    @setup({"dict": "{% autoescape off %}{{ a|last }}{% endautoescape %}"})
+    def test_dict(self):
+        output = self.engine.render_to_string("dict", {"a": {"x": 1}})
+        self.assertEqual(output, "")

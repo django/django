@@ -36,3 +36,9 @@ class FunctionTests(SimpleTestCase):
 
     def test_string(self):
         self.assertEqual(first("test"), "t")
+
+    def test_dict(self):
+        self.assertEqual(first({"a": 1}), "")
+
+    def test_empty_dict(self):
+        self.assertEqual(first({}), "")

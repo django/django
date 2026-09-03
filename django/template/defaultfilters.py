@@ -604,7 +604,7 @@ def first(value):
     """Return the first item in a list."""
     try:
         return value[0]
-    except IndexError:
+    except (IndexError, KeyError):
         return ""
 
 
@@ -626,7 +626,7 @@ def last(value):
     """Return the last item in a list."""
     try:
         return value[-1]
-    except IndexError:
+    except (IndexError, KeyError):
         return ""
 
 
@@ -644,7 +644,7 @@ def random(value):
     """Return a random item from the list."""
     try:
         return random_module.choice(value)
-    except IndexError:
+    except (IndexError, KeyError):
         return ""
 
 

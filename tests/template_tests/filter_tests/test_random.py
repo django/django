@@ -29,3 +29,8 @@ class RandomTests(SimpleTestCase):
     def test_empty_list(self):
         output = self.engine.render_to_string("empty_list", {"list": []})
         self.assertEqual(output, "")
+
+    @setup({"dict": "{{ a|random }}"})
+    def test_dict(self):
+        output = self.engine.render_to_string("dict", {"a": {"x": 1}})
+        self.assertEqual(output, "")
