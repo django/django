@@ -2,6 +2,7 @@
 
 from django.core.mail import InvalidMailer
 from django.utils.deprecation import RemovedInDjango2028Warning, warn_about_external_use
+from django.utils.module_loading import qualname
 
 # RemovedInDjango2028Warning.
 _NOT_PROVIDED = object()
@@ -57,7 +58,7 @@ class BaseEmailBackend:
                 # backend or a super.__init__() call from a custom subclass).
                 # Use something more precise than self.__class__.__name__,
                 # which is often just "EmailBackend".
-                class_name = f"{type(self).__module__}.{type(self).__qualname__}"
+                class_name = qualname(type(self))
                 warn_about_external_use(
                     f"{class_name}.__init__() does not support {kwarg_names}. "
                     "In Django 2028, BaseEmailBackend will raise a TypeError "
