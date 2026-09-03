@@ -9,7 +9,4 @@ Django 6.1.2 fixes several bugs in 6.1.1.
 Bugfixes
 ========
 
-* Fixed a long-standing bug where copying an admin related field widget shared
-  the ``attrs`` dictionary with the original widget, so setting widget
-  attributes on one form instance leaked into others, for example across the
-  rows of a ``list_editable`` changelist (:ticket:`12134`).
+* ...
