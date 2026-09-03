@@ -5,7 +5,6 @@ import warnings
 from collections import Counter
 from inspect import iscoroutinefunction
 
-from django.middleware import MiddlewareMixin as _MiddlewareMixin
 from django.utils.inspect import signature
 from django.utils.warnings import django_file_prefixes
 
@@ -23,6 +22,7 @@ RemovedAfterNextVersionWarning = RemovedInDjango2029Warning
 
 
 def __getattr__(name):
+    # RemovedInDjango2029Warning: remove the whole if-block.
     if name == "MiddlewareMixin":
         warnings.warn(
             "Importing MiddlewareMixin from django.utils.deprecation is deprecated. "
@@ -30,7 +30,13 @@ def __getattr__(name):
             RemovedInDjango2029Warning,
             stacklevel=2,
         )
-        return _MiddlewareMixin
+        # Imported here, not at module level, so that merely importing this
+        # module doesn't require django.middleware's own dependencies. That
+        # matters this early, e.g. while a build backend is reading
+        # django.__version__ before Django's own dependencies are installed.
+        from django.middleware import MiddlewareMixin
+
+        return MiddlewareMixin
     if name == "RemovedInDjango70Warning":
         warnings.warn(
             "RemovedInDjango2028Warning should be used instead of "
