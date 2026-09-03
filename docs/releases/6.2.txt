@@ -69,6 +69,11 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+* :class:`~django.contrib.postgres.fields.ArrayField` now collects and
+  reports validation errors for all invalid array items, rather than
+  stopping at the first one, when calling ``validate()`` or
+  ``run_validators()`` (:ticket:`37245`).
+
 * ...
 
 :mod:`django.contrib.redirects`
