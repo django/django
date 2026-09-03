@@ -2089,6 +2089,13 @@ Here's how to create a raster and return it as a file in an
     ... )
     >>> HttpResponse(rast.vsi_buffer, "image/tiff")
 
+.. warning::
+
+    The memory-based virtual filesystem doesn't make untrusted raster data
+    safe. Raster data may reference local or remote resources, for example
+    through a VRT source, causing GDAL to access files or make network
+    requests. Only instantiate :class:`GDALRaster` from trusted input.
+
 Using other Virtual Filesystems
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2150,17 +2157,14 @@ essential to prevent instantiating one from untrusted input. Otherwise, an
 attacker might gain the ability to write a file or make a network request.
 
 To mitigate this, :ref:`spatial lookups <spatial-lookups-intro>` prevent
-``str``, :class:`pathlib.Path`, and ``dict`` values from reaching
+``bytes``, ``str``, :class:`pathlib.Path`, and ``dict`` values from reaching
 :class:`GDALRaster` altogether. To use these types with lookups, wrap them
 explicitly with :class:`GDALRaster`, indicating that the value is trusted.
-Bytes are accepted without being wrapped in :class:`GDALRaster` because they
-are opened through GDAL's memory-based :ref:`virtual filesystem
-<gdal-raster-vsimem>`.
 
-This protection applies only to spatial lookups. Assigning a ``dict`` value to
-a :class:`~django.contrib.gis.db.models.RasterField` will still open a new
-raster, and assigning a ``str`` or ``Path`` will still fetch and open the
-referenced raster.
+This protection applies only to spatial lookups. Assigning a ``dict`` or
+``bytes`` value to a :class:`~django.contrib.gis.db.models.RasterField` will
+still open a new raster, and assigning a ``str`` or ``Path`` will still fetch
+and open the referenced raster.
 
 When validating geometry inputs, the
 :class:`~django.contrib.gis.forms.GeometryField` form field will reject raster
