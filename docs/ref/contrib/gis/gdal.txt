@@ -1688,7 +1688,7 @@ bands: one for red, one for green, and one for blue.
     .. attribute:: vsi_buffer
 
         A ``bytes`` representation of this raster. Returns ``None`` for rasters
-        that are not stored in GDAL's virtual filesystem.
+        that are not stored in GDAL's in-memory virtual filesystem.
 
     .. attribute:: is_vsi_based
 
@@ -2115,6 +2115,8 @@ can directly access compressed files using the ``/vsizip/``, ``/vsigzip/``, or
    >>> rst = GDALRaster("/vsizip/path/to/your/file.zip/path/to/raster.tif")
    >>> rst = GDALRaster("/vsigzip/path/to/your/file.gz")
    >>> rst = GDALRaster("/vsitar/path/to/your/file.tar/path/to/raster.tif")
+
+.. _gdal-raster-network:
 
 Network rasters
 ^^^^^^^^^^^^^^^
