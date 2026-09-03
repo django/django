@@ -41,6 +41,30 @@ of some malformed or unusual header values may differ, for example,
 This issue has severity "moderate" according to the :ref:`Django security
 policy <severity-levels>`.
 
+CVE-2026-87890: Potential request forgery via spatial lookup byte values
+========================================================================
+
+Spatial lookups accepted raster values provided as ``bytes`` without requiring
+them to be explicitly wrapped in :class:`~django.contrib.gis.gdal.GDALRaster`.
+Although these values were opened through GDAL's in-memory virtual filesystem,
+they could contain a VRT document referencing an external raster source. This
+could cause GDAL to issue network requests as the Django process user while
+preparing the lookup.
+
+This issue could be exploited by applications that passed attacker-controlled
+bytes directly to a spatial lookup. It was overlooked in the fix for
+CVE-2026-15307.
+
+To mitigate this issue, raster values provided as ``bytes`` must now be wrapped
+in :class:`~django.contrib.gis.gdal.GDALRaster` before being used in spatial
+lookups. Byte values representing valid hexadecimal geometries remain accepted.
+
+This is a backward incompatible change. As a reminder, all untrusted user input
+should be validated before use.
+
+This issue has severity "moderate" according to the :ref:`Django security
+policy <severity-levels>`.
+
 Bugfixes
 ========
 
