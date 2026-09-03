@@ -85,21 +85,27 @@ class Serializer(base.Serializer):
         """
         self.indent_level += 1
         self.indent(self.indent_level)
-        self.xml.startElement(
-            "field",
-            {
-                "name": field.name,
-                "type": field.get_internal_type(),
-            },
-        )
+        attrs = {
+            "name": field.name,
+            "type": field.get_internal_type(),
+        }
 
         # Get a "string version" of the object's data.
+        value = None
         if getattr(obj, field.name) is not None:
             value = field.value_to_string(obj)
             if field.get_internal_type() == "JSONField":
                 # Dump value since JSONField.value_to_string() doesn't output
                 # strings.
                 value = json.dumps(value, cls=field.encoder)
+            if value.strip() != value:
+                # Deserialization strips surrounding whitespace so that
+                # hand-indented fixtures load as intended. Mark values whose
+                # own whitespace is significant, so they survive a round trip.
+                attrs["xml:space"] = "preserve"
+
+        self.xml.startElement("field", attrs)
+        if value is not None:
             try:
                 self.xml.characters(value)
             except UnserializableContentError:
@@ -331,7 +337,7 @@ class Deserializer(base.Deserializer):
                 if getChildrenByTagName(field_node, "None"):
                     value = None
                 else:
-                    value = field.to_python(getInnerText(field_node).strip())
+                    value = field.to_python(getFieldText(field_node))
                     # Load value since JSONField.to_python() outputs strings.
                     if field.get_internal_type() == "JSONField":
                         value = json.loads(value, cls=field.decoder)
@@ -486,6 +492,20 @@ def getInnerText(node):
     return "".join(
         [child.data for child in node.childNodes if check_element_type(child)]
     )
+
+
+def getFieldText(node):
+    """
+    Return the text of a <field> node.
+
+    Surrounding whitespace is stripped, so that hand-indented fixtures load as
+    intended, unless the node is marked xml:space="preserve" -- which the
+    serializer does for values whose own whitespace would otherwise be lost.
+    """
+    text = getInnerText(node)
+    if node.getAttribute("xml:space") == "preserve":
+        return text
+    return text.strip()
 
 
 # Below code based on Christian Heimes' defusedxml
