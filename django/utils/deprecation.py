@@ -237,7 +237,7 @@ def deprecate_posargs(deprecation_warning, remappable_names, /):
     The decorated function will map any positional arguments after the ``*`` to
     the corresponding keyword arguments and issue a deprecation warning.
 
-    The decorator takes two arguments: a RemovedInDjangoXXWarning warning
+    The decorator takes two arguments: a RemovedInDjangoXXXXWarning warning
     category and a list of parameter names that have been changed from
     positional-or-keyword to keyword-only, in their original positional order.
 
@@ -252,7 +252,7 @@ def deprecate_posargs(deprecation_warning, remappable_names, /):
 
     to::
 
-        @deprecate_posargs(RemovedInDjangoXXWarning, ["option1", "option2"])
+        @deprecate_posargs(RemovedInDjangoXXXXWarning, ["option1", "option2"])
         def some_func(request, *, option1, option2=True):
             ...
 
@@ -265,7 +265,7 @@ def deprecate_posargs(deprecation_warning, remappable_names, /):
     parameters or change the remaining ones. For example, this attempt to add a
     new param would break code using the deprecated posargs::
 
-        @deprecate_posargs(RemovedInDjangoXXWarning, ["option1", "option2"])
+        @deprecate_posargs(RemovedInDjangoXXXXWarning, ["option1", "option2"])
         def some_func(request, wrong_new_param=None, *, option1, option2=True):
             # Broken: existing code may pass a value intended as option1 in the
             # wrong_new_param position.
@@ -276,7 +276,7 @@ def deprecate_posargs(deprecation_warning, remappable_names, /):
     @deprecate_posargs is kept in the original posargs order. This change will
     work without breaking existing code::
 
-        @deprecate_posargs(RemovedInDjangoXXWarning, ["option1", "option2"])
+        @deprecate_posargs(RemovedInDjangoXXXXWarning, ["option1", "option2"])
         def some_func(request, *, new_param=None, option2=True, option1):
             ...
 
