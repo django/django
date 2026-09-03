@@ -1,10 +1,10 @@
-==========================
-Django 6.1.2 release notes
-==========================
+===========================
+Django 5.2.18 release notes
+===========================
 
 *Expected October 6, 2026*
 
-Django 6.1.2 fixes one data loss issue in 4.0 and several bugs in 6.1.1.
+Django 5.2.18 fixes one data loss issue in 4.0.
 
 Bugfixes
 ========
