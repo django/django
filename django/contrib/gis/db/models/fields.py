@@ -220,11 +220,15 @@ class BaseSpatialField(Field):
                 try:
                     obj = GEOSGeometry(obj, max_geom_collections=max_geom_collections)
                 except (TypeError, ValueError) as err:
-                    if isinstance(obj, str) and obj.startswith(VSI_FILESYSTEM_PREFIX):
+                    if isinstance(obj, bytes) or (
+                        isinstance(obj, str) and obj.startswith(VSI_FILESYSTEM_PREFIX)
+                    ):
                         raise blocked_err
                     raise err
                 except (GEOSException, GDALException):
-                    if isinstance(obj, str) and json_regex.match(obj):
+                    if isinstance(obj, bytes) or (
+                        isinstance(obj, str) and json_regex.match(obj)
+                    ):
                         raise blocked_err
                     raise ValueError(
                         "Couldn't create spatial object from lookup value '%s'." % obj
