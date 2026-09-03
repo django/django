@@ -488,7 +488,7 @@ class WatchmanReloader(BaseReloader):
         root, rel_path = self._watch_root(directory)
         # Only receive notifications of files changing, filtering out other
         # types like special files:
-        # https://facebook.github.io/watchman/docs/type
+        # https://facebook.github.io/watchman/docs/expr/type
         only_files_expression = [
             "allof",
             ["anyof", ["type", "f"], ["type", "l"]],
