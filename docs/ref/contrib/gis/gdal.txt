@@ -2116,6 +2116,8 @@ can directly access compressed files using the ``/vsizip/``, ``/vsigzip/``, or
    >>> rst = GDALRaster("/vsigzip/path/to/your/file.gz")
    >>> rst = GDALRaster("/vsitar/path/to/your/file.tar/path/to/raster.tif")
 
+.. _gdal-raster-network:
+
 Network rasters
 ^^^^^^^^^^^^^^^
 
