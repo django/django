@@ -300,11 +300,11 @@ There are a couple of reasons that code in Django might be deprecated:
 
 As the :ref:`deprecation policy<internal-release-deprecation-policy>`
 describes, the first release of Django that deprecates a feature (``A.B``)
-should raise a ``RemovedInDjangoXXWarning`` (where XX is the Django version
+should raise a ``RemovedInDjangoXXXXWarning`` (where XXXX is the Django version
 where the feature will be removed) when the deprecated feature is invoked.
 Assuming we have good test coverage, these warnings are converted to errors
 when :ref:`running the test suite <running-unit-tests>` with warnings enabled:
-``python -Wa runtests.py``. Thus, when adding a ``RemovedInDjangoXXWarning``
+``python -Wa runtests.py``. Thus, when adding a ``RemovedInDjangoXXXXWarning``
 you need to eliminate or silence any warnings generated when running the tests.
 
 The first step is to remove any use of the deprecated behavior by Django
@@ -315,45 +315,45 @@ test or class level:
 #) In a particular test::
 
     from django.test import ignore_warnings
-    from django.utils.deprecation import RemovedInDjangoXXWarning
+    from django.utils.deprecation import RemovedInDjangoXXXXWarning
 
 
-    @ignore_warnings(category=RemovedInDjangoXXWarning)
+    @ignore_warnings(category=RemovedInDjangoXXXXWarning)
     def test_foo(self): ...
 
 #) For an entire test case::
 
     from django.test import ignore_warnings
-    from django.utils.deprecation import RemovedInDjangoXXWarning
+    from django.utils.deprecation import RemovedInDjangoXXXXWarning
 
 
-    @ignore_warnings(category=RemovedInDjangoXXWarning)
+    @ignore_warnings(category=RemovedInDjangoXXXXWarning)
     class MyDeprecatedTests(unittest.TestCase): ...
 
 You should also add a test for the deprecation warning::
 
-    from django.utils.deprecation import RemovedInDjangoXXWarning
+    from django.utils.deprecation import RemovedInDjangoXXXXWarning
 
 
     def test_foo_deprecation_warning(self):
         msg = "Expected deprecation message"
-        with self.assertWarnsMessage(RemovedInDjangoXXWarning, msg) as ctx:
+        with self.assertWarnsMessage(RemovedInDjangoXXXXWarning, msg) as ctx:
             # invoke deprecated behavior
             ...
         self.assertEqual(ctx.filename, __file__)
 
-It's important to include a ``RemovedInDjangoXXWarning`` comment above code
+It's important to include a ``RemovedInDjangoXXXXWarning`` comment above code
 which has no warning reference, but will need to be changed or removed when the
 deprecation ends. This could include hooks which have been added to keep the
 previous behavior, or standalone items that are unnecessary or unused when the
 deprecation ends. For example::
 
     import warnings
-    from django.utils.deprecation import RemovedInDjangoXXWarning
+    from django.utils.deprecation import RemovedInDjangoXXXXWarning
     from django.utils.warnings import django_file_prefixes
 
 
-    # RemovedInDjangoXXWarning.
+    # RemovedInDjangoXXXXWarning.
     def old_private_helper():
         # Helper function that is only used in foo().
         pass
@@ -362,7 +362,7 @@ deprecation ends. For example::
     def foo():
         warnings.warn(
             "foo() is deprecated.",
-            category=RemovedInDjangoXXWarning,
+            category=RemovedInDjangoXXXXWarning,
             skip_file_prefixes=django_file_prefixes(),
         )
         old_private_helper()
@@ -384,7 +384,7 @@ Finally, there are a couple of updates to Django's documentation to make:
 
 Once you have completed these steps, you are finished with the deprecation.
 In each :term:`feature release <Feature release>`, all
-``RemovedInDjangoXXWarning``\s matching the new version are removed.
+``RemovedInDjangoXXXXWarning``\s matching the new version are removed.
 
 The ``django.utils.deprecation`` module provides some helpful deprecation
 utilities, such as a ``@deprecate_posargs`` decorator to assist with converting
