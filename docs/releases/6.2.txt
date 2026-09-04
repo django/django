@@ -322,6 +322,12 @@ Miscellaneous
   ``datetime.datetime(2000, 1, 1, 0, 0, 0, 1)`` now serializes to
   ``"2000-01-01T00:00:00"`` rather than ``"2000-01-01T00:00:00.000"``.
 
+* The XML serializer now sets ``xml:space="preserve"`` on ``<field>`` elements
+  whose value has leading or trailing whitespace, so that such values survive a
+  :djadmin:`dumpdata`/:djadmin:`loaddata` round trip. Previously the
+  deserializer stripped them. Field text is still stripped when the
+  attribute is absent, so existing fixtures load unchanged.
+
 * :func:`.utils.module_loading.import_string` now deterministically favors
   submodules in ambiguous cases where depending on prior import state, a
   same-named attribute of the parent module might have been returned instead.
