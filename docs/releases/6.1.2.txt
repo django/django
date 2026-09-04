@@ -11,3 +11,6 @@ Bugfixes
 
 * Fixed a data loss issue in Django 4.0 where :ref:`network rasters
   <gdal-raster-network>` were deleted by GeoDjango when closed.
+* Fixed a regression in Django 6.1 where using the invalid ``srid=None`` option
+  on a spatial field could cause values to be stored as ``NULL`` on PostGIS
+  instead of raising an error (:ticket:`37322`).
