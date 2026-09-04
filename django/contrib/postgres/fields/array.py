@@ -204,35 +204,49 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
 
     def validate(self, value, model_instance):
         super().validate(value, model_instance)
+        error_list = []
         for index, part in enumerate(value):
             try:
                 self.base_field.validate(part, model_instance)
             except exceptions.ValidationError as error:
-                raise prefix_validation_error(
-                    error,
-                    prefix=self.error_messages["item_invalid"],
-                    code="item_invalid",
-                    params={"nth": index + 1},
+                error_list.append(
+                    prefix_validation_error(
+                        error,
+                        prefix=self.error_messages["item_invalid"],
+                        code="item_invalid",
+                        params={"nth": index + 1},
+                    )
                 )
         if isinstance(self.base_field, ArrayField):
             if len({len(i) for i in value}) > 1:
-                raise exceptions.ValidationError(
-                    self.error_messages["nested_array_mismatch"],
-                    code="nested_array_mismatch",
+                error_list.append(
+                    exceptions.ValidationError(
+                        self.error_messages["nested_array_mismatch"],
+                        code="nested_array_mismatch",
+                    )
                 )
+
+        if len(error_list) > 0:
+            raise exceptions.ValidationError(error_list)
 
     def run_validators(self, value):
         super().run_validators(value)
+        error_list = []
         for index, part in enumerate(value):
             try:
                 self.base_field.run_validators(part)
             except exceptions.ValidationError as error:
-                raise prefix_validation_error(
-                    error,
-                    prefix=self.error_messages["item_invalid"],
-                    code="item_invalid",
-                    params={"nth": index + 1},
+                error_list.append(
+                    prefix_validation_error(
+                        error,
+                        prefix=self.error_messages["item_invalid"],
+                        code="item_invalid",
+                        params={"nth": index + 1},
+                    )
                 )
+
+        if len(error_list) > 0:
+            raise exceptions.ValidationError(error_list)
 
     def formfield(self, **kwargs):
         return super().formfield(
