@@ -4,7 +4,13 @@ from pathlib import Path
 from unittest import mock, skipIf
 
 from django.contrib.gis import gdal
-from django.contrib.gis.db.models import Extent, MakeLine, Union, functions
+from django.contrib.gis.db.models import (
+    Extent,
+    GeometryField,
+    MakeLine,
+    Union,
+    functions,
+)
 from django.contrib.gis.gdal.raster.source import DisallowedRasterLookup
 from django.contrib.gis.geos import (
     GeometryCollection,
@@ -21,7 +27,7 @@ from django.contrib.gis.geos import (
 from django.core.files.temp import NamedTemporaryFile
 from django.core.management import call_command
 from django.db import DatabaseError, NotSupportedError, connection
-from django.db.models import F, OuterRef, Subquery
+from django.db.models import F, OuterRef, Subquery, Value
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
@@ -154,6 +160,29 @@ class GeoModelTest(TestCase):
         m1 = MinusOneSRID(geom=Point(17, 23, srid=4326))
         m1.save()
         self.assertEqual(-1, m1.geom.srid)
+
+    @skipUnlessDBFeature("supports_transform")
+    def test_insert_undefined_field_srid(self):
+        point = Point(1, 1, srid=4326)
+        field = City._meta.get_field("point")
+        msg = "Cannot transform a spatial value to an undefined SRID."
+        with (
+            mock.patch.object(field, "srid", None),
+            self.assertRaisesMessage(ValueError, msg),
+        ):
+            City.objects.create(name="No SRID", point=point)
+
+    @skipUnlessDBFeature("supports_transform")
+    def test_update_expression_undefined_field_srid(self):
+        point = Point(1, 1, srid=4326)
+        value = Value(point, output_field=GeometryField())
+        field = City._meta.get_field("point")
+        msg = "Cannot transform a spatial value to an undefined SRID."
+        with (
+            mock.patch.object(field, "srid", None),
+            self.assertRaisesMessage(ValueError, msg),
+        ):
+            City.objects.update(point=value)
 
     def test_createnull(self):
         "Testing creating a model instance and the geometry being None"
