@@ -1084,6 +1084,9 @@ class BaseDatabaseSchemaEditor:
             and (not new_field.db_index or new_field.unique)
         ):
             # Find the index for this field
+            meta_constraint_names = {
+                constraint.name for constraint in model._meta.constraints
+            }
             meta_index_names = {index.name for index in model._meta.indexes}
             # Retrieve only BTREE indexes since this is what's created with
             # db_index=True.
@@ -1092,7 +1095,7 @@ class BaseDatabaseSchemaEditor:
                 [old_field.column],
                 index=True,
                 type_=Index.suffix,
-                exclude=meta_index_names,
+                exclude=meta_constraint_names | meta_index_names,
             )
             for index_name in index_names:
                 # The only way to check if an index was created with
