@@ -66,6 +66,9 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         if "crs" in connection.features.unsupported_geojson_options:
             del houston_json["crs"]
             del chicago_json["crs"]
+        elif connection.ops.mysql:
+            for expected_json in (houston_json, chicago_json):
+                expected_json["crs"]["properties"]["name"] = "MySQL:0"
         if "bbox" in connection.features.unsupported_geojson_options:
             del chicago_json["bbox"]
             del victoria_json["bbox"]
