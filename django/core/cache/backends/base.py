@@ -60,21 +60,16 @@ def get_key_func(key_func):
 class BaseCache:
     _missing_key = object()
 
-    def __init__(self, params, alias=None, **kwargs):
+    # RemovedInDjango71Warning: Change alias to required.
+    def __init__(self, params, *, alias=None):
         # RemovedInDjango71Warning.
-        # should probably remove the default value for alias
-        # since discussion in the new-features issue, 3rd-party
-        # packages depend on alias being provided
         if alias is None:
             warnings.warn(
-                "`alias` argument of cache backend should be provided.",
+                "Cache subclasses must pass 'alias' to BaseCache.",
                 category=RemovedInDjango71Warning,
                 skip_file_prefixes=django_file_prefixes(),
             )
-        # RemovedInDjango71Warning.
-
         self.alias = alias
-
         timeout = params.get("timeout", params.get("TIMEOUT", 300))
         if timeout is not None:
             try:
