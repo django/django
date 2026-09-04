@@ -160,6 +160,14 @@ class RasterFieldTest(TransactionTestCase):
         for val, exp in zip(r.rast.geotransform, expected):
             self.assertAlmostEqual(exp, val)
 
+    def test_minus_one_srid(self):
+        raster = GDALRaster(json.loads(JSON_RASTER))
+        field = RasterModel._meta.get_field("rast")
+        with mock.patch.object(field, "srid", -1):
+            obj = RasterModel.objects.create(rast=raster)
+            obj.refresh_from_db()
+        self.assertEqual(obj.rast.srid, -1)
+
     def test_verbose_name_arg(self):
         """
         RasterField should accept a positional verbose name argument.
