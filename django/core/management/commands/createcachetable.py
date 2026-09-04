@@ -47,7 +47,15 @@ class Command(BaseCommand):
         if tablenames:
             # Legacy behavior, tablename specified as argument
             for tablename in tablenames:
-                self.create_table(db, tablename, dry_run, tablename)
+                cache_alias = next(
+                    (
+                        alias
+                        for alias, cache in settings.CACHES.items()
+                        if cache.get("LOCATION") == tablename
+                    ),
+                    "<<unknown>>",
+                )
+                self.create_table(db, tablename, dry_run, cache_alias)
         else:
             for cache_alias in settings.CACHES:
                 cache = caches[cache_alias]
