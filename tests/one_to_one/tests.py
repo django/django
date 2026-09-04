@@ -14,8 +14,10 @@ from .models import (
     Pointer,
     RelatedModel,
     Restaurant,
+    SandBar,
     School,
     Target,
+    TikiBar,
     ToFieldPointer,
     UndergroundBar,
     Waiter,
@@ -695,3 +697,17 @@ class OneToOneTests(TestCase):
             p1.restaurant._state.fetch_mode,
             FETCH_PEERS,
         )
+
+    def test_related_default_value(self):
+        # confirm self.p1.tikibar gives the default of None
+        self.assertIsNone(self.p1.tikibar)
+        # confirm normal behavior when tikibar exists
+        tiki = TikiBar.objects.create(place=self.p1)
+        self.assertEqual(self.p1.tikibar, tiki)
+
+    def test_related_default_callable(self):
+        # confirm self.p1.tikibar gives the callable default of DEFAULT_VALUE
+        self.assertEqual(self.p1.sandbar, "DEFAULT_VALUE")
+        # confirm normal behavior when sandbar exists
+        sandy = SandBar.objects.create(place=self.p1)
+        self.assertEqual(self.p1.sandbar, sandy)
