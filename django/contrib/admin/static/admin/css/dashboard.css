@@ -14,13 +14,13 @@
 
 .dashboard .module table td a {
     display: block;
-    padding-right: 0.6em;
+    padding-inline-end: 0.6em;
 }
 
 /* RECENT ACTIONS MODULE */
 
 .module ul.actionlist {
-    margin-left: 0;
+    margin-inline-start: 0;
 }
 
 ul.actionlist li {

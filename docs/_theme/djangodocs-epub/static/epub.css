@@ -6,7 +6,8 @@ h1 {
 ol,
 ul {
     margin: 0;
-    padding: 0 0 0 1.3em;
+    padding-block: 0;
+    padding-inline: 1.3em 0;
 }
 
 /* Images should never exceed the width of the page. */
@@ -24,13 +25,13 @@ img {
     text-align: center;
 }
 .epub-cover h1 {
-    margin: 4em 0 0 0;
+    margin: 4em 0 0;
 }
 .epub-cover h2 {
     margin: 1em 0;
 }
 .epub-cover h3 {
-    margin: 3em 0 2em 0;
+    margin: 3em 0 2em;
 }
 
 /* Code examples should never exceed the width of the page, so wrap instead. */
@@ -72,7 +73,8 @@ fitted after the icon, to allow text resizing with breaking. */
 .admonition {
     background-position: 9px 0.8em;
     background-repeat: no-repeat;
-    padding: 0.8em 1em 0.8em 65px;
+    padding-block: 0.8em;
+    padding-inline: 65px 1em;
     margin: 1em 0;
     border: 0.01em solid black;
 }

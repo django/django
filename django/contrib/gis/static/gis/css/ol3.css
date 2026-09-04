@@ -1,9 +1,6 @@
 .dj_map_wrapper {
     position: relative;
-    float: left;
-}
-html[dir="rtl"] .dj_map_wrapper {
-    float: right;
+    float: inline-start;
 }
 
 .switch-type {
@@ -16,7 +13,7 @@ html[dir="rtl"] .dj_map_wrapper {
 
 .type-Point {
     background-image: url("../img/draw_point_off.svg");
-    right: 5px;
+    inset-inline-end: 5px;
 }
 .type-Point.type-active {
     background-image: url("../img/draw_point_on.svg");
@@ -24,7 +21,7 @@ html[dir="rtl"] .dj_map_wrapper {
 
 .type-LineString {
     background-image: url("../img/draw_line_off.svg");
-    right: 30px;
+    inset-inline-end: 30px;
 }
 .type-LineString.type-active {
     background-image: url("../img/draw_line_on.svg");
@@ -32,7 +29,7 @@ html[dir="rtl"] .dj_map_wrapper {
 
 .type-Polygon {
     background-image: url("../img/draw_polygon_off.svg");
-    right: 55px;
+    inset-inline-end: 55px;
 }
 .type-Polygon.type-active {
     background-image: url("../img/draw_polygon_on.svg");

@@ -1,0 +1,41 @@
+engine biome(1.0)
+language css
+
+or {
+    // Physical properties.
+    CssDeclarationWithSemicolon() as $decl where {
+        $decl <: r"([\w-]+)\s*:[\s\S]*"($property),
+        $property <: r"[\w-]*(?:left|right)[\w-]*",
+        $property <: r"[a-z][\w-]*",
+        register_diagnostic(
+            span=$decl,
+            message="Prefer the logical inline equivalent over `left`/`right`.",
+            severity="error",
+        )
+    },
+    // Physical values.
+    CssDeclarationWithSemicolon() as $decl where {
+        $decl <: r"(?:float|clear|text-align)\s*:\s*(?:left|right)\s*;?",
+        register_diagnostic(
+            span=$decl,
+            message="Prefer the logical flow-relative value over `left`/`right`.",
+            severity="error",
+        )
+    },
+    // 4-value shorthands.
+    CssDeclarationWithSemicolon() as $decl where {
+        $decl <: or {
+            `margin: $_ $_ $_ $_;`,
+            `padding: $_ $_ $_ $_;`,
+            `inset: $_ $_ $_ $_;`,
+            `border-width: $_ $_ $_ $_;`,
+            `border-style: $_ $_ $_ $_;`,
+            `border-color: $_ $_ $_ $_;`
+        },
+        register_diagnostic(
+            span=$decl,
+            message="Avoid the 4-value box shorthand.",
+            severity="error",
+        )
+    }
+}

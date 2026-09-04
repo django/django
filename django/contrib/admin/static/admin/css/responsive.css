@@ -54,7 +54,7 @@ button {
         margin: 0;
         font-weight: 400;
         line-height: 1.85;
-        text-align: left;
+        text-align: start;
     }
 
     #user-tools a {
@@ -69,23 +69,23 @@ button {
     }
 
     #content-related {
-        margin-right: -290px;
+        margin-inline-end: -290px;
     }
 
     .colSM #content-related {
-        margin-left: -290px;
+        margin-inline-start: -290px;
     }
 
     .colMS {
-        margin-right: 290px;
+        margin-inline-end: 290px;
     }
 
     .colSM {
-        margin-left: 290px;
+        margin-inline-start: 290px;
     }
 
     .dashboard .module table td a {
-        padding-right: 0;
+        padding-inline-end: 0;
     }
 
     td .changelink,
@@ -114,7 +114,8 @@ button {
         flex: 1 0 auto;
         width: 0;
         height: 1.375rem;
-        margin: 0 10px 0 6px;
+        margin-block: 0;
+        margin-inline: 6px 10px;
     }
 
     #toolbar form input[type="submit"] {
@@ -124,7 +125,8 @@ button {
     #changelist-search .quiet {
         width: 0;
         flex: 1 0 auto;
-        margin: 5px 0 0 25px;
+        margin-block: 5px 0;
+        margin-inline: 25px 0;
     }
 
     .actions {
@@ -151,7 +153,8 @@ button {
     .actions span.question,
     .actions span.action-counter {
         font-size: 0.6875rem;
-        margin: 0 10px 0 0;
+        margin-block: 0;
+        margin-inline: 0 10px;
     }
 
     #changelist-filter {
@@ -220,11 +223,11 @@ button {
     .aligned .datetimeshortcuts,
     .aligned .related-lookup + strong {
         align-self: center;
-        margin-left: 0.5rem;
+        margin-inline-start: 0.5rem;
     }
 
     form .aligned div.radiolist {
-        margin-left: 2px;
+        margin-inline-start: 2px;
     }
 
     .submit-row {
@@ -346,7 +349,8 @@ button {
     /* Messages */
 
     ul.messagelist li {
-        padding: 10px 10px 10px 55px;
+        padding-block: 10px;
+        padding-inline: 55px 10px;
         background-position-x: 30px;
     }
 
@@ -435,7 +439,7 @@ button {
     }
 
     #changelist-filter {
-        margin-left: 0;
+        margin-inline-start: 0;
     }
 
     .actions label {
@@ -505,7 +509,8 @@ button {
 
     .aligned .vCheckboxLabel {
         flex: 1 0;
-        padding: 1px 0 0 5px;
+        padding-block: 1px 0;
+        padding-inline: 5px 0;
     }
 
     .aligned p.file-upload {
@@ -513,7 +518,7 @@ button {
     }
 
     span.clearable-file-input {
-        margin-left: 15px;
+        margin-inline-start: 15px;
     }
 
     span.clearable-file-input label {
@@ -576,7 +581,7 @@ button {
     }
 
     .selector ul.selector-chooser li {
-        float: left;
+        float: inline-start;
     }
 
     .selector-remove {
@@ -639,7 +644,7 @@ button {
     }
 
     .inline-group[data-inline-type="stacked"] .inline-related h3 .inline_label {
-        margin-right: auto;
+        margin-inline-end: auto;
     }
 
     .inline-group[data-inline-type="stacked"] .inline-related h3 span.delete {
@@ -673,7 +678,8 @@ button {
     .inline-group div.add-row a,
     .inline-group .tabular tr.add-row td a {
         display: block;
-        padding: 8px 10px 8px 26px;
+        padding-block: 8px;
+        padding-inline: 26px 10px;
         background-position: 8px 9px;
     }
 
@@ -704,7 +710,8 @@ button {
     /* Messages */
 
     ul.messagelist li {
-        padding: 10px 10px 10px 40px;
+        padding-block: 10px;
+        padding-inline: 40px 10px;
         background-position-x: 15px;
     }
 
@@ -775,7 +782,7 @@ button {
     .clockbox {
         position: fixed !important;
         top: 50% !important;
-        left: 50% !important;
+        inset-inline-start: 50% !important;
         transform: translate(-50%, -50%);
         margin: 0;
         border: none;

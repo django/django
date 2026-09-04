@@ -28,7 +28,7 @@
 }
 
 .change-list .filtered table {
-    border-right: none;
+    border-inline-end: none;
 }
 
 .change-list .filtered {
@@ -42,7 +42,7 @@
 }
 
 .change-list .filtered table tbody th {
-    padding-right: 1em;
+    padding-inline-end: 1em;
 }
 
 #changelist-form .results {
@@ -153,7 +153,7 @@
 
 #changelist-search img {
     vertical-align: middle;
-    margin-right: 4px;
+    margin-inline-end: 4px;
 }
 
 #changelist-search .help {
@@ -166,8 +166,9 @@
     flex: 0 0 240px;
     order: 1;
     background: var(--darkened-bg);
-    border-left: none;
-    margin: 0 0 0 30px;
+    border-inline-start: none;
+    margin-block: 0;
+    margin-inline: 30px 0;
 }
 
 @media (forced-colors: active) {
@@ -226,8 +227,8 @@
 
 #changelist-filter li {
     list-style-type: none;
-    margin-left: 0;
-    padding-left: 0;
+    margin-inline-start: 0;
+    padding-inline-start: 0;
 }
 
 #changelist-filter a {
@@ -241,9 +242,9 @@
 }
 
 #changelist-filter li.selected {
-    border-left: 5px solid var(--hairline-color);
-    padding-left: 10px;
-    margin-left: -15px;
+    border-inline-start: 5px solid var(--hairline-color);
+    padding-inline-start: 10px;
+    margin-inline-start: -15px;
 }
 
 #changelist-filter li.selected a {
@@ -290,7 +291,7 @@
 /* ACTIONS */
 
 .filtered .actions {
-    border-right: none;
+    border-inline-end: none;
 }
 
 #changelist table input {

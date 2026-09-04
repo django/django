@@ -1,7 +1,7 @@
 @import url("{{ pathto('_static/fontawesome/css/fa-brands.min.css', 1) }}");
 
 .console-block {
-    text-align: right;
+    text-align: end;
 }
 
 .console-block *:before,
@@ -11,7 +11,7 @@
 
 .console-block > section {
     display: none;
-    text-align: left;
+    text-align: start;
 }
 
 .console-block > input.c-tab-unix,

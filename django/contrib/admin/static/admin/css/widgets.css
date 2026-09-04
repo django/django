@@ -73,14 +73,14 @@
     color: var(--body-quiet-color);
     font-size: 0.625rem;
     margin: 0;
-    text-align: left;
+    text-align: start;
     display: flex;
     gap: 8px;
 }
 
 .selector .selector-filter label,
 .inline-group .aligned .selector .selector-filter label {
-    float: left;
+    float: inline-start;
     margin: 7px 0 0;
     width: 18px;
     height: 18px;
@@ -172,7 +172,7 @@
 .selector-chooseall,
 .selector-clearall {
     display: inline-block;
-    text-align: left;
+    text-align: start;
     padding: 4px 5px;
     margin: 0 auto;
     overflow: hidden;
@@ -214,7 +214,7 @@
 /* STACKED SELECTORS */
 
 .stacked {
-    float: left;
+    float: inline-start;
     width: 490px;
     display: block;
 }
@@ -241,15 +241,16 @@
     display: flex;
     height: 30px;
     width: 64px;
-    margin: 0 auto 10px auto;
+    margin: 0 auto 10px;
     background-color: #eee;
     border-radius: 10px;
     transform: none;
 }
 
 .stacked .selector-chooser li {
-    float: left;
-    padding: 3px 3px 3px 5px;
+    float: inline-start;
+    padding-block: 3px;
+    padding-inline: 5px 3px;
 }
 
 .stacked .selector-chooseall,
@@ -295,7 +296,8 @@
     background: url(../img/icon-unknown.svg) 0 0 no-repeat;
     display: inline-block;
     vertical-align: middle;
-    margin: -2px 0 0 2px;
+    margin-block: -2px 0;
+    margin-inline: 2px 0;
     width: 13px;
     height: 13px;
 }
@@ -341,8 +343,8 @@ p.datetime label {
 
 table p.datetime {
     font-size: 0.6875rem;
-    margin-left: 0;
-    padding-left: 0;
+    margin-inline-start: 0;
+    padding-inline-start: 0;
 }
 
 .datetimeshortcuts button {
@@ -419,7 +421,7 @@ p.file-upload {
 }
 
 .file-upload .deletelink {
-    margin-left: 5px;
+    margin-inline-start: 5px;
 }
 
 span.clearable-file-input label {
@@ -567,12 +569,12 @@ span.clearable-file-input label {
 }
 
 .calendarnav-previous {
-    left: 10px;
+    inset-inline-start: 10px;
     background: url(../img/calendar-icons.svg) 0 0 no-repeat;
 }
 
 .calendarnav-next {
-    right: 10px;
+    inset-inline-end: 10px;
     background: url(../img/calendar-icons.svg) 0 -15px no-repeat;
 }
 
@@ -609,7 +611,7 @@ ul.timelist,
 /* EDIT INLINE */
 
 .inline-deletelink {
-    float: right;
+    float: inline-end;
     text-indent: -9999px;
     background: url(../img/inline-delete.svg) center center no-repeat;
     background-size: contain;

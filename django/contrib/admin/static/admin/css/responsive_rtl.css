@@ -1,46 +1,12 @@
 /* TABLETS */
 
 @media (max-width: 1024px) {
-    [dir="rtl"] .colMS {
-        margin-right: 0;
-    }
-
-    [dir="rtl"] #user-tools {
-        text-align: right;
-    }
-
-    [dir="rtl"] .actions label {
-        padding-left: 10px;
-        padding-right: 0;
-    }
-
-    [dir="rtl"] .actions select {
-        margin-left: 0;
-        margin-right: 15px;
-    }
-
-    [dir="rtl"] .change-list .filtered .results,
-    [dir="rtl"] .change-list .filtered .paginator,
-    [dir="rtl"] .filtered #toolbar,
-    [dir="rtl"] .filtered div.xfull,
-    [dir="rtl"] .filtered .actions,
-    [dir="rtl"] #changelist-filter {
-        margin-left: 0;
-    }
-
     [dir="rtl"] .inline-group div.add-row a,
     [dir="rtl"] .inline-group .tabular tr.add-row td a {
-        padding: 8px 26px 8px 10px;
         background-position: calc(100% - 8px) 9px;
     }
 
-    [dir="rtl"] .dashboard .module table td a {
-        padding-left: 0;
-        padding-right: 16px;
-    }
-
     [dir="rtl"] ul.messagelist li {
-        padding: 10px 55px 10px 10px;
         background-position-x: calc(100% - 30px);
     }
 }
@@ -48,15 +14,6 @@
 /* MOBILE */
 
 @media (max-width: 767px) {
-    [dir="rtl"] #changelist-filter {
-        margin-left: 0;
-        margin-right: 0;
-    }
-
-    [dir="rtl"] .aligned .vCheckboxLabel {
-        padding: 1px 5px 0 0;
-    }
-
     [dir="rtl"] .selector-remove {
         background-position: 0 0;
     }
@@ -76,7 +33,6 @@
     }
 
     [dir="rtl"] ul.messagelist li {
-        padding: 10px 40px 10px 10px;
         background-position-x: calc(100% - 15px);
     }
 }
