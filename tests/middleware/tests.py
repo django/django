@@ -1049,6 +1049,36 @@ class GZipMiddlewareTest(SimpleTestCase):
         self.assertEqual(self.decompress(r.content), self.compressible_string)
         self.assertEqual(r.get("Content-Encoding"), "gzip")
 
+    def test_no_compress_on_responses_without_body(self):
+        """
+        Do not compress responses that cannot contain a body
+        according to RFC 9112 Section 6.3.
+        """
+        for status_code in [101, 204, 304]:
+            with self.subTest(status_code=status_code):
+                self.resp.status_code = status_code
+                r = GZipMiddleware(self.get_response)(self.req)
+                self.assertEqual(r.content, self.compressible_string)
+                self.assertIsNone(r.get("Content-Encoding"))
+
+    def test_no_compress_on_streaming_responses_without_body(self):
+        """
+        Do not compress streaming responses that cannot contain a body
+        according to RFC 9112 Section 6.3.
+        """
+        for status_code in [101, 204, 304]:
+            with self.subTest(status_code=status_code):
+
+                def get_response(req):
+                    empty_content = iter([])
+                    response = StreamingHttpResponse(empty_content)
+                    response.status_code = status_code
+                    return response
+
+                r = GZipMiddleware(get_response)(self.req)
+                self.assertIsNone(next(iter(r), None))
+                self.assertIsNone(r.get("Content-Encoding"))
+
     def test_no_compress_short_response(self):
         """
         Compression isn't performed on responses with short content.
