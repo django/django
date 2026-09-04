@@ -677,6 +677,11 @@ class ReadOnlyPizza(Pizza):
         default_permissions = ()
 
 
+class EditableTopping(Topping):
+    class Meta:
+        proxy = True
+
+
 class Album(models.Model):
     owner = models.ForeignKey(User, models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=30)
