@@ -67,6 +67,17 @@ class PlaywrightTestCaseMeta(type(LiveServerTestCase)):
                 "Playwright browser specification '%s' is not valid." % browser
             )
 
+    def get_test_variations(cls):
+        if not cls.browsers or cls.browser != cls.browsers[0]:
+            return (cls,)
+        module = sys.modules[cls.__module__]
+        variations = [cls]
+        for browser in cls.browsers[1:]:
+            variations.append(
+                getattr(module, "%s%s" % (browser.capitalize(), cls.__name__))
+            )
+        return tuple(variations)
+
 
 class ChangeViewportSize:
     def __init__(self, width, height, page):
