@@ -365,3 +365,37 @@ class GenericInlineFormsetTests(TestCase):
         self.assertEqual(len(formset), 2)
         self.assertNotIn("DELETE", formset.forms[0].fields)
         self.assertNotIn("DELETE", formset.forms[1].fields)
+
+
+class TaggedItemFormWithClean(forms.ModelForm):
+    class Meta:
+        model = TaggedItem
+        fields = "__all__"
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if getattr(self.instance, "content_type_id", None) is None:
+            raise forms.ValidationError("content_type is missing in form instance!")
+        if getattr(self.instance, "object_id", None) is None:
+            raise forms.ValidationError("object_id is missing in form instance!")
+        return cleaned_data
+
+
+class Ticket18357Test(TestCase):
+    def test_generic_inlineformset_validation_with_clean(self):
+        GenericFormSet = generic_inlineformset_factory(
+            TaggedItem, form=TaggedItemFormWithClean
+        )
+        platypus = Animal.objects.create(
+            common_name="Platypus", latin_name="Ornithorhynchus anatinus"
+        )
+
+        data = {
+            "generic_relations-taggeditem-content_type-object_id-TOTAL_FORMS": "1",
+            "generic_relations-taggeditem-content_type-object_id-INITIAL_FORMS": "0",
+            "generic_relations-taggeditem-content_type-object_id-MAX_NUM_FORMS": "10",
+            "generic_relations-taggeditem-content_type-object_id-0-tag": "shiny",
+        }
+
+        formset = GenericFormSet(data=data, instance=platypus)
+        self.assertTrue(formset.is_valid(), formset.errors)
