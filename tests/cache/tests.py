@@ -1,5 +1,6 @@
 # Unit tests for cache framework
 # Uses whatever cache backend is set in the test settings file.
+from django.utils.deprecation import RemovedInDjango71Warning
 import copy
 import io
 import os
@@ -85,6 +86,11 @@ class Unpicklable:
 
 def empty_response(request):
     return HttpResponse()
+
+
+class DeprecatedNoAliasCache(BaseCache):
+    def __init__(self, server, param):
+        super().__init__(param)
 
 
 KEY_ERRORS_WITH_MEMCACHED_MSG = (
@@ -3497,3 +3503,15 @@ class CacheHandlerTest(SimpleTestCase):
         # .all() initializes all caches.
         self.assertEqual(len(test_caches.all(initialized_only=True)), 2)
         self.assertEqual(test_caches.all(), test_caches.all(initialized_only=True))
+
+    def test_backend_with_no_alias_deprecation_warning(self):
+        test_cache = CacheHandler(
+            {
+                "default": {
+                    "BACKEND": "cache.tests.DeprecatedNoAliasCache",
+                }
+            }
+        )
+        msg = "Cache backends must pass the 'alias' arg to BaseCache."
+        with self.assertWarnsMessage(RemovedInDjango71Warning, msg):
+            test_cache["default"]
