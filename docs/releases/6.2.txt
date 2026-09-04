@@ -341,4 +341,5 @@ Miscellaneous
   Django 7.1.
 
 * Cache backends that don't have ``alias`` or ``**kwargs`` as parameter are
-  deprecated.
+  deprecated. Custom cache backends must accept and forward an ``alias`` argument (or
+  varilable ``**kwargs``) to the ``BaseCache`` constructor.

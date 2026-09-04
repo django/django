@@ -23,6 +23,9 @@ details on these changes.
 * Calling ``QuerySet.aiterator()`` after ``prefetch_related()`` without
   providing a ``chunk_size`` will raise :exc:`ValueError`.
 
+* Cache backends that don't have ``alias`` or ``**kwargs`` as parameter are
+  deprecated.
+
 .. _deprecation-removed-in-7.0:
 
 7.0
