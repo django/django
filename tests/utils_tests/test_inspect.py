@@ -101,6 +101,10 @@ class TestInspectMethods(unittest.TestCase):
             inspect.func_supports_parameter(Person().all_kinds, "zone"),
             False,
         )
+        self.assertIs(inspect.func_supports_parameter(Person.all_kinds, "args"), False)
+        self.assertIs(
+            inspect.func_supports_parameter(Person.all_kinds, "kwargs"), False
+        )
 
     def test_func_accepts_kwargs(self):
         self.assertIs(inspect.func_accepts_kwargs(Person.just_args), False)
