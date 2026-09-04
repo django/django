@@ -24,7 +24,7 @@ from django.core.cache.backends.base import (
 )
 from django.utils.connection import BaseConnectionHandler, ConnectionProxy
 from django.utils.deprecation import RemovedInDjango71Warning, django_file_prefixes
-from django.utils.inspect import func_supports_parameter
+from django.utils.inspect import func_supports_parameter, func_accepts_kwargs
 from django.utils.module_loading import import_string
 
 __all__ = [
@@ -55,18 +55,17 @@ class CacheHandler(BaseConnectionHandler):
                 "Could not find backend '%s': %s" % (backend, e)
             ) from e
         # RemovedInDjango71Warning.
-        if func_supports_parameter(
-            backend_cls.__init__, "alias"
-        ) or func_supports_parameter(backend_cls.__init__, "kwargs"):
-            return backend_cls(location, params, alias=alias)
-        else:
+        if not (
+            func_supports_parameter(backend_cls.__init__, "alias")
+            or func_accepts_kwargs(backend_cls.__init__)
+        ):
             warnings.warn(
-                "cache backends should include an `alias` or `**kwargs` parameter",
+                "Cache backends must pass the 'alias' arg to BaseCache.",
                 category=RemovedInDjango71Warning,
                 skip_file_prefixes=django_file_prefixes(),
             )
             return backend_cls(location, params)
-        # RemovedInDjango71Warning.
+        return backend_cls(location, params, alias=alias)
 
 
 caches = CacheHandler()
