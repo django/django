@@ -288,6 +288,14 @@ class TemporaryUploadedFileTests(unittest.TestCase):
         with TemporaryUploadedFile("test.txt", "text/plain", 1, "utf8") as temp_file:
             self.assertTrue(temp_file.file.name.endswith(".upload.txt"))
 
+    def test_long_extension_dropped(self):
+        for filename in ("test." + "a" * 250, "test." + "🦊" * 100):
+            with self.subTest(filename=filename):
+                with TemporaryUploadedFile(
+                    filename, "text/plain", 1, "utf8"
+                ) as temp_file:
+                    self.assertTrue(temp_file.file.name.endswith(".upload"))
+
     def test_file_upload_temp_dir_pathlib(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
             with override_settings(FILE_UPLOAD_TEMP_DIR=Path(tmp_dir)):
