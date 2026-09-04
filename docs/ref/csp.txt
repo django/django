@@ -321,3 +321,6 @@ To ensure nonce-based policies remain effective:
 * If caching is necessary, use a strategy that injects a fresh nonce on each
   request, or consider refactoring your application to avoid inline scripts and
   styles altogether.
+* ``ContentSecurityPolicyMiddleware`` sets ``Cache-Control: private`` on
+  nonce-rendering responses automatically, though this doesn't cover
+  ``cache_page``, since it caches the response before any middleware runs.
