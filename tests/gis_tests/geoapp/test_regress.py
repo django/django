@@ -1,12 +1,13 @@
 from datetime import datetime
 
-from django.contrib.gis.db.models import Extent
+from django.contrib.gis.db.models import Extent, PolygonField
+from django.contrib.gis.geos import Polygon
 from django.contrib.gis.shortcuts import render_to_kmz
-from django.db.models import Count, Min
+from django.db.models import Count, Min, Value
 from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import skipUnlessGISLookup
-from .models import City, PennsylvaniaCity, State, Truth
+from .models import City, NoneSRID, PennsylvaniaCity, State, Truth
 
 
 class GeoRegressionTests(TestCase):
@@ -109,3 +110,12 @@ class GeoRegressionTests(TestCase):
         # verify values
         self.assertIs(val1, True)
         self.assertIs(val2, False)
+
+    @skipUnlessDBFeature("supports_transform")
+    def test_no_transform_attempted_for_invalid_srid_expression(self):
+        poly = Polygon.from_bbox((0, 0, 2, 2))
+        state = State.objects.create(poly=poly)
+        msg = "Cannot transform a spatial value to an undefined SRID."
+        for value in poly, Value(poly, output_field=PolygonField()):
+            with self.subTest(value=value), self.assertRaisesMessage(ValueError, msg):
+                NoneSRID.objects.filter(pk=state.pk).update(poly=value)

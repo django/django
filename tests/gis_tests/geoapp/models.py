@@ -84,6 +84,17 @@ class MinusOneSRID(models.Model):
     geom = models.PointField(srid=-1)  # Minus one SRID.
 
 
+class NoneSRID(models.Model):
+    # srid=-1 is the documented way to express an unknown srid. This srid=None
+    # usage is not supported, but it's being tested here to cover a regression.
+    poly = models.PolygonField(srid=None, null=gisfield_may_be_null)
+
+    class Meta:
+        app_label = "geoapp"
+        managed = False
+        db_table = State._meta.db_table
+
+
 class NonConcreteField(models.IntegerField):
     def db_type(self, connection):
         return None
