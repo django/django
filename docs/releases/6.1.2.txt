@@ -9,4 +9,6 @@ Django 6.1.2 fixes several bugs in 6.1.1.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 6.1 that caused saving a spatial value to a
+  field with ``srid=None`` to store ``NULL`` on PostGIS instead of raising an
+  error (:ticket:`37322`).
