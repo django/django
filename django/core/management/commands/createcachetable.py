@@ -1,3 +1,4 @@
+import warnings
 from django.conf import settings
 from django.core.cache import caches
 from django.core.cache.backends.db import BaseDatabaseCache
@@ -10,7 +11,8 @@ from django.db import (
     router,
     transaction,
 )
-
+from django.utils.deprecation import RemovedInDjango2029Warning
+from django.utils.warnings import django_file_prefixes
 
 class Command(BaseCommand):
     help = "Creates the tables needed to use the SQL cache backend."
@@ -46,6 +48,12 @@ class Command(BaseCommand):
         dry_run = options["dry_run"]
         if tablenames:
             # Legacy behavior, tablename specified as argument
+            warnings.warn(
+                "Passing table names to createcachetable is deprecated. "
+                "The command will use cache table names from settings.CACHES.",
+                RemovedInDjango2029Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
             for tablename in tablenames:
                 self.create_table(db, tablename, dry_run)
         else:

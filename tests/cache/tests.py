@@ -13,7 +13,7 @@ import unittest
 from functools import wraps
 from pathlib import Path
 from unittest import mock, skipIf
-
+from django.utils.deprecation import RemovedInDjango2029Warning
 import django
 from django.conf import settings
 from django.core import management, signals
@@ -1433,12 +1433,17 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         """
         self.drop_table()
         out = io.StringIO()
-        management.call_command(
-            "createcachetable",
-            "test cache table",
-            verbosity=2,
-            stdout=out,
+        msg = (
+            "Passing table names to createcachetable is deprecated. "
+            "The command will use cache table names from settings.CACHES."
         )
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, msg):
+            management.call_command(
+                "createcachetable",
+                "test cache table",
+                verbosity=2,
+                stdout=out,
+            )
         self.assertEqual(out.getvalue(), "Cache table 'test cache table' created.\n")
 
     def test_has_key_query_columns_quoted(self):

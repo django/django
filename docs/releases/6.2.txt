@@ -385,3 +385,6 @@ Miscellaneous
   :setting:`TIME_ZONE` changes. Pass the ``tzinfo`` argument explicitly to
   suppress this warning. In Django 2029, the current timezone will be captured
   automatically when ``tzinfo`` is omitted.
+
+* Passing positional table names to :djadmin:`createcachetable` is deprecated.
+  The command will use cache table names from the :setting:`CACHES` setting.
