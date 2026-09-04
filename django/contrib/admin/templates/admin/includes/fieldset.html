@@ -10,7 +10,7 @@
     {% for line in fieldset %}
         <div class="form-row{% if not line.fields|length == 1 %} flex-container form-multiline{% endif %}{% if not line.has_visible_field %} hidden{% endif %}{% for field in line %}{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% endfor %}">
             {% for field in line %}
-                {% if field.is_fieldset %}<fieldset{% if field.field.help_text %} aria-describedby="{{ field.field.id_for_label }}_helptext"{% endif %}>{{ field.label_tag }}{% endif %}
+                {% if field.is_fieldset %}<fieldset{% if field.field.aria_describedby %} aria-describedby="{{ field.field.aria_describedby }}"{% endif %}>{{ field.label_tag }}{% endif %}
                 <div class="flex-container{% if not field.is_readonly and field.errors or line.fields|length == 1 and line.errors %} errors{% endif %}{% if not line.fields|length == 1 %} fieldBox{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% if field.field.is_hidden %} hidden{% endif %}{% endif %}{% if field.is_checkbox %} checkbox-row{% endif %}">
                     {% if field.is_checkbox %}
                         <div class="checkbox">
@@ -21,7 +21,7 @@
                         {% if not field.is_fieldset %}{{ field.label_tag }}{% endif %}
                     {% endif %}
                     {% if field.field.help_text %}
-                        <div class="help{% if field.field.is_hidden %} hidden{% endif %}"{% if field.field.id_for_label %} id="{{ field.field.id_for_label }}_helptext"{% endif %}>
+                        <div class="help{% if field.field.is_hidden %} hidden{% endif %}"{% if field.field.auto_id %} id="{{ field.field.auto_id }}_helptext"{% endif %}>
                             <div>{{ field.field.help_text|safe }}</div>
                         </div>
                     {% endif %}
