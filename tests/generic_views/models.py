@@ -6,6 +6,7 @@ from django.urls import reverse
 
 class Artist(models.Model):
     name = models.CharField(max_length=100)
+    birthday = models.DateField(null=True, blank=True)
 
     class Meta:
         ordering = ["name"]
@@ -43,6 +44,7 @@ class Book(models.Model):
     slug = models.SlugField()
     pages = models.IntegerField()
     authors = models.ManyToManyField(Author)
+    artist = models.ForeignKey(Artist, on_delete=models.CASCADE, null=True)
     pubdate = models.DateField()
 
     objects = models.Manager()
