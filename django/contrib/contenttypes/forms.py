@@ -51,6 +51,34 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
             return 0
         return super().initial_form_count()
 
+    def _construct_form(self, i, **kwargs):
+        form = super()._construct_form(i, **kwargs)
+        if self.save_as_new:
+            mutable = getattr(form.data, "_mutable", None)
+            # Allow modifying an immutable QueryDict.
+            if mutable is not None:
+                form.data._mutable = True
+            # Remove the primary key from the form's data, we are only
+            # creating new instances
+            form.data[form.add_prefix(self._pk_field.name)] = None
+            # Remove the foreign keys from the form's data
+            form.data[form.add_prefix(self.ct_field.name)] = None
+            form.data[form.add_prefix(self.ct_fk_field.name)] = None
+            if mutable is not None:
+                form.data._mutable = mutable
+
+        if self.instance is not None:
+            # Set the fk values here so that the form can do its validation.
+            setattr(form.instance, self.ct_fk_field.attname, self.instance.pk)
+            setattr(
+                form.instance,
+                self.ct_field.attname,
+                ContentType.objects.get_for_model(
+                    self.instance, for_concrete_model=self.for_concrete_model
+                ).pk,
+            )
+        return form
+
     @classmethod
     def get_default_prefix(cls):
         opts = cls.model._meta
