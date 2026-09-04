@@ -18,6 +18,10 @@ Bugfixes
 * Fixed an infinite loop in Django 5.2 in tuple lookups (e.g. ``TupleIn``) when
   an ``F()`` expression was used as the left-hand side (:ticket:`37291`).
 
+* Fixed a regression in Django 6.1 where saving spatial values to a field
+  with an invalid configuration of ``srid=None`` could silently persist
+  ``NULL`` on some databases instead of raising an error (:ticket:`37322`).
+
 * Fixed a bug in Django 6.1 where the ``fields.W225`` system check incorrectly
   warned that ``null`` has no effect on ``GeneratedField`` (:ticket:`37348`).
 
