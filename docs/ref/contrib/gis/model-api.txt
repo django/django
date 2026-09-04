@@ -112,6 +112,10 @@ Sets the SRID [#fnogcsrid]_ (Spatial Reference System Identity) of the geometry
 field to the given value. Defaults to 4326 (also known as `WGS84`__, units are
 in degrees of longitude and latitude).
 
+Setting the SRID to ``-1`` disables automatic SRID transformations when saving
+geometries or rasters. The assigned value's SRID is set to ``-1``, discarding
+any explicit SRID it had.
+
 __ https://en.wikipedia.org/wiki/WGS84
 
 .. _selecting-an-srid:
