@@ -121,6 +121,9 @@ def retry(retries=3, delay=1):
 class DummyCacheTests(SimpleTestCase):
     # The Dummy cache backend doesn't really behave like a test backend,
     # so it has its own test case.
+    def test_backend_has_access_to_alias(self):
+        self.assertTrue(hasattr(cache, "alias"))
+        self.assertEqual(cache.alias, "default")
 
     def test_simple(self):
         "Dummy cache backend ignores cache set calls"
@@ -296,6 +299,7 @@ def custom_key_func(key, key_prefix, version):
 
 _caches_setting_base = {
     "default": {},
+    "alias": {},
     "prefix": {"KEY_PREFIX": "cacheprefix{}".format(os.getpid())},
     "v2": {"VERSION": 2},
     "custom_key": {"KEY_FUNCTION": custom_key_func},
@@ -337,6 +341,11 @@ class BaseCacheTests:
     def test_backend_has_access_to_alias(self):
         self.assertTrue(hasattr(cache, "alias"))
         self.assertEqual(cache.alias, "default")
+
+    def test_alias_avilable_in_non_default_backends(self):
+        alias_backend = caches["alias"]
+        self.assertTrue(hasattr(alias_backend, "alias"))
+        self.assertEqual(alias_backend.alias, "alias")
 
     def test_simple(self):
         # Simple cache set/get works
