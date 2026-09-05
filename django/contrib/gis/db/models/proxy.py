@@ -76,7 +76,7 @@ class SpatialProxy(DeferredAttribute):
             pass
         elif isinstance(value, Combinable):
             # Query expressions (F(), functions, etc.) are resolved later
-            # during query compilation 
+            # during query compilation
             pass
         elif isinstance(value, self._klass):
             # The geometry type must match that of the field -- unless the

@@ -217,7 +217,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         )
 
         return SpatialiteGeometryColumns
-    
+
     def returning_columns(self, fields):
         """
         Wrap spatial columns with AsEWKB (via `self.select`) so RETURNING

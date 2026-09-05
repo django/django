@@ -53,7 +53,7 @@ class GeoExpressionsTests(TestCase):
             self.assertTrue(
                 obj.point3.equals_exact(p1.transform(3857, clone=True), 0.1)
             )
-    
+
     def test_assign_expression_to_field(self):
         p1 = Point(1, 1, srid=4326)
         p2 = Point(2, 2, srid=4326)
@@ -67,9 +67,9 @@ class GeoExpressionsTests(TestCase):
         obj.save()
         obj.refresh_from_db()
 
-        print('P1', p1)
-        print('P2', p2)
-        print('obj.point2', obj.point2)
+        print("P1", p1)
+        print("P2", p2)
+        print("obj.point2", obj.point2)
 
         self.assertEqual(obj.point2, p1)
 
