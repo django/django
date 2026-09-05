@@ -20,6 +20,7 @@ except ImportError as e:
     ) from e
 else:
     from playwright_tests import PlaywrightTestCase, PlaywrightTestCaseMeta
+    from playwright_tests.base import PLAYWRIGHT_RECORD_MODES
 
     from django.apps import apps
     from django.conf import settings
@@ -617,6 +618,22 @@ if __name__ == "__main__":
         help="Slow down Playwright operations by the specified number of milliseconds.",
     )
     parser.add_argument(
+        "--tracing",
+        choices=PLAYWRIGHT_RECORD_MODES,
+        default="off",
+        metavar="MODE",
+        help="Record a Playwright trace for each test (off, on, or "
+        "retain-on-failure).",
+    )
+    parser.add_argument(
+        "--video",
+        choices=PLAYWRIGHT_RECORD_MODES,
+        default="off",
+        metavar="MODE",
+        help="Record a Playwright video for each test (off, on, or "
+        "retain-on-failure).",
+    )
+    parser.add_argument(
         "--debug-sql",
         action="store_true",
         help="Turn on the SQL query logger within tests.",
@@ -698,6 +715,10 @@ if __name__ == "__main__":
         parser.error("--headed requires --playwright to be used.")
     if options.slowmo and not options.playwright:
         parser.error("--slowmo requires --playwright to be used.")
+    if options.tracing != "off" and not options.playwright:
+        parser.error("--tracing requires --playwright to be used.")
+    if options.video != "off" and not options.playwright:
+        parser.error("--video requires --playwright to be used.")
     if options.screenshots and options.tags:
         parser.error("--screenshots and --tag are mutually exclusive.")
 
@@ -751,6 +772,8 @@ if __name__ == "__main__":
         PlaywrightTestCaseMeta.headed = options.headed
         PlaywrightTestCaseMeta.slow_mo = options.slowmo
         PlaywrightTestCaseMeta.browsers = options.playwright
+        PlaywrightTestCase.tracing = options.tracing
+        PlaywrightTestCase.video = options.video
         if options.screenshots:
             options.tags = ["playwright_screenshot"]
             PlaywrightTestCase.screenshots = options.screenshots

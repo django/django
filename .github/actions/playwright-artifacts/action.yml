@@ -1,0 +1,36 @@
+name: Playwright artifacts
+
+inputs:
+  browser:
+    required: true
+  sha:
+    required: true
+  path:
+    required: true
+  artifact-name:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Organize Playwright artifacts
+      shell: bash
+      env:
+        ARTIFACT_PATH: ${{ inputs.path }}
+        ARTIFACT_SHA: ${{ inputs.sha }}
+        BROWSER: ${{ inputs.browser }}
+      run: |
+        mkdir --parents "${ARTIFACT_PATH}/${ARTIFACT_SHA}"
+        if [ -d "tests/videos/${BROWSER}" ]; then
+          mv "tests/videos/${BROWSER}" "${ARTIFACT_PATH}/${ARTIFACT_SHA}/videos"
+        fi
+        if [ -d "tests/traces/${BROWSER}" ]; then
+          mv "tests/traces/${BROWSER}" "${ARTIFACT_PATH}/${ARTIFACT_SHA}/traces"
+        fi
+
+    - name: Upload Playwright artifacts
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.path }}/
+        if-no-files-found: ignore
