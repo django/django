@@ -1939,6 +1939,11 @@ class Query(BaseExpression):
         def final_transformer(field, alias):
             if not self.alias_cols:
                 alias = None
+            if getattr(field, "model", None) is None and names[0] in self.annotations:
+                # annotate() may introduce fields that aren't attached to a
+                # model, and those have no column to build a Col from. Apply
+                # the transforms to the annotation expression instead.
+                return self.annotations[names[0]]
             return field.get_col(alias)
 
         # Try resolving all the names as fields first. If there's an error,
