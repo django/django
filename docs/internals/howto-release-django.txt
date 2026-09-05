@@ -255,9 +255,13 @@ A few days before any release
 
         $ python scripts/manage_translations.py fetch -v 1 --since=<some date>
 
-   To determine a good value for ``--since``, check the date of the most recent
-   commit with wording similar to ``Updated translations from Transifex`` and
-   use a date a few days prior.
+   The value for ``--since`` should precede the last commit that fetched
+   translations. In addition, if this is the first fetch for a feature release
+   series, it should also precede the *first* commit that updated the
+   translation catalogs for that version: usually, the one for the alpha, not
+   for the release candidate. Look for commits with wording similar to "Updated
+   translations from Transifex" (or "Updated source translation catalogs"), and
+   choose a date a few days prior.
 
    This command takes some time to run. When done, carefully inspect the output
    for potential errors and/or warnings. If there are some, you will need to
