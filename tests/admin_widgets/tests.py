@@ -999,6 +999,7 @@ class AdminWidgetPlaywrightTestCase(AdminPlaywrightTestCase):
     available_apps = ["admin_widgets"] + AdminPlaywrightTestCase.available_apps
 
     def setUp(self):
+        super().setUp()
         self.u1 = User.objects.create_superuser(
             username="super", password="secret", email="super@example.com"
         )
