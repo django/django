@@ -647,6 +647,9 @@ The template used to render a field's ``<label>``, used when calling
 form by overriding this attribute or more generally by overriding the default
 template, see also :ref:`overriding-built-in-form-templates`.
 
+By default this is :sourcefile:`'django/forms/label.html'
+<django/forms/templates/django/forms/label.html>`.
+
 Output styles
 -------------
 
@@ -673,7 +676,9 @@ template name.
 
 .. attribute:: Form.template_name_div
 
-The template used by ``as_div()``. Default: ``'django/forms/div.html'``.
+The template used by ``as_div()``. Default:
+:sourcefile:`'django/forms/div.html'
+<django/forms/templates/django/forms/div.html>`.
 
 .. method:: Form.as_div()
 
@@ -711,7 +716,9 @@ The template used by ``as_div()``. Default: ``'django/forms/div.html'``.
 
 .. attribute:: Form.template_name_p
 
-The template used by ``as_p()``. Default: ``'django/forms/p.html'``.
+The template used by ``as_p()``. Default:
+:sourcefile:`'django/forms/p.html'
+<django/forms/templates/django/forms/p.html>`.
 
 .. method:: Form.as_p()
 
@@ -737,7 +744,9 @@ containing one field:
 
 .. attribute:: Form.template_name_ul
 
-The template used by ``as_ul()``. Default: ``'django/forms/ul.html'``.
+The template used by ``as_ul()``. Default:
+:sourcefile:`'django/forms/ul.html'
+<django/forms/templates/django/forms/ul.html>`.
 
 .. method:: Form.as_ul()
 
@@ -764,7 +773,9 @@ you can specify any HTML attributes on the ``<ul>`` for flexibility:
 
 .. attribute:: Form.template_name_table
 
-The template used by ``as_table()``. Default: ``'django/forms/table.html'``.
+The template used by ``as_table()``. Default:
+:sourcefile:`'django/forms/table.html'
+<django/forms/templates/django/forms/table.html>`.
 
 .. method:: Form.as_table()
 
@@ -1086,19 +1097,25 @@ Customizing the error list format
 
         The name of the template used when calling ``__str__`` or
         :meth:`render`. By default this is
-        ``'django/forms/errors/list/default.html'`` which is a proxy for the
+        :sourcefile:`'django/forms/errors/list/default.html'
+        <django/forms/templates/django/forms/errors/list/default.html>`,
+        which is a proxy for the
         ``'ul.html'`` template.
 
     .. attribute:: template_name_text
 
         The name of the template used when calling :meth:`.as_text`. By default
-        this is ``'django/forms/errors/list/text.html'``. This template renders
+        this is :sourcefile:`'django/forms/errors/list/text.txt'
+        <django/forms/templates/django/forms/errors/list/text.txt>`.
+        This template renders
         the errors as a list of bullet points.
 
     .. attribute:: template_name_ul
 
         The name of the template used when calling :meth:`.as_ul`. By default
-        this is ``'django/forms/errors/list/ul.html'``. This template renders
+        this is :sourcefile:`'django/forms/errors/list/ul.html'
+        <django/forms/templates/django/forms/errors/list/ul.html>`.
+        This template renders
         the errors in ``<li>`` tags with a wrapping ``<ul>`` with the CSS
         classes as defined by :attr:`.error_class`.
 
