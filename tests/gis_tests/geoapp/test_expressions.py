@@ -67,10 +67,6 @@ class GeoExpressionsTests(TestCase):
         obj.save()
         obj.refresh_from_db()
 
-        print("P1", p1)
-        print("P2", p2)
-        print("obj.point2", obj.point2)
-
         self.assertEqual(obj.point2, p1)
 
     @skipUnlessDBFeature("has_Distance_function")
