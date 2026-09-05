@@ -140,6 +140,9 @@ class Feed:
         current_site = get_current_site(request)
 
         link = self._get_dynamic_attr("link", obj)
+        if link is None:
+            raise ImproperlyConfigured("Feed class must define a 'link' attribute.")
+
         link = add_domain(current_site.domain, link, request.is_secure())
 
         feed = self.feed_type(
