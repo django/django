@@ -217,6 +217,26 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         )
 
         return SpatialiteGeometryColumns
+    
+    def returning_columns(self, fields):
+        """
+        Wrap spatial columns with AsEWKB (via `self.select`) so RETURNING
+        hands back parseable EWKB instead of SpatiaLite's internal BLOB
+        format. Non-spatial columns (e.g. an AutoField pk) are returned
+        unwrapped, exactly as the base implementation does.
+        """
+        if not fields:
+            return "", ()
+        columns = []
+        for field in fields:
+            col = "%s.%s" % (
+                self.quote_name(field.model._meta.db_table),
+                self.quote_name(field.column),
+            )
+            if hasattr(field, "geom_type"):
+                col = self.select % col
+            columns.append(col)
+        return "RETURNING %s" % ", ".join(columns), ()
 
     def spatial_ref_sys(self):
         from django.contrib.gis.db.backends.spatialite.models import (
