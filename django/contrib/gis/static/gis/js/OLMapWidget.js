@@ -125,7 +125,9 @@ class MapWidget {
         } else {
             this.map.getView().setCenter(this.defaultCenter());
         }
-        this.createInteractions();
+        if (!this.options.is_readonly) {
+            this.createInteractions();
+        }
         if (initial_value && !this.options.is_collection) {
             this.disableDrawing();
         }
