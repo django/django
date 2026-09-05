@@ -74,7 +74,9 @@ class CookieTests(BaseTests, SimpleTestCase):
         # The message contains what's expected.
         self.assertEqual(list(storage), example_messages)
 
-    @override_settings(SESSION_COOKIE_SAMESITE="Strict")
+    @override_settings(
+        SESSION_COOKIE_SAMESITE="Strict", SESSION_COOKIE_PARTITIONED=True
+    )
     def test_cookie_settings(self):
         """
         CookieStorage honors SESSION_COOKIE_DOMAIN, SESSION_COOKIE_SECURE, and
@@ -93,6 +95,7 @@ class CookieTests(BaseTests, SimpleTestCase):
         self.assertIs(response.cookies["messages"]["secure"], True)
         self.assertIs(response.cookies["messages"]["httponly"], True)
         self.assertEqual(response.cookies["messages"]["samesite"], "Strict")
+        self.assertEqual(response.cookies["messages"]["partitioned"], True)
 
         # Deletion of the cookie (storing with an empty value) after the
         # messages have been consumed.
