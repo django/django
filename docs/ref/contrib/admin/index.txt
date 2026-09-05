@@ -2013,8 +2013,8 @@ default templates used by the :class:`ModelAdmin` views:
     accessing the module's index page is permitted, ``False`` otherwise.
     Uses :meth:`User.has_module_perms()
     <django.contrib.auth.models.User.has_module_perms>` by default. Overriding
-    it does not restrict access to the view, add, change, or delete views,
-    :meth:`~ModelAdmin.has_view_permission`,
+    it does not restrict access to the changelist, view, add, change, or
+    delete views, :meth:`~ModelAdmin.has_view_permission`,
     :meth:`~ModelAdmin.has_add_permission`,
     :meth:`~ModelAdmin.has_change_permission`, and
     :meth:`~ModelAdmin.has_delete_permission` should be used for that.
