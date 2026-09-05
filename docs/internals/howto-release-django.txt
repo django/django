@@ -511,7 +511,7 @@ Building the artifacts
 
     .. code-block:: shell
 
-        $ PGP_KEY_ID=<key-id> PGP_KEY_URL=<key-url> DEST_FOLDER=~/releases scripts/do_django_release.py
+        $ PGP_KEY_ID=<key-id> PGP_KEY_URL=<key-url> DEST_FOLDER=~/releases SOURCE_DATE_EPOCH=1 scripts/do_django_release.py
 
     * Verify the release (after artifacts were uploaded):
 
@@ -529,8 +529,9 @@ Building the artifacts
 
 #. Make sure you have an absolutely clean tree by running ``git clean -dfx``.
 
-#. Run ``python -m build`` to generate the release packages. This will create
-   the release artifacts (tarball and wheel) in a ``dist/`` directory.
+#. Run ``SOURCE_DATE_EPOCH=1 python -m build`` to generate the release
+   packages. This will create the release artifacts (tarball and wheel) in a
+   ``dist/`` directory.
 
 #. Generate the hashes of the release packages:
 
