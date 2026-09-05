@@ -518,7 +518,7 @@ msgid "Constraint “%(name)s” is violated."
 msgstr "Omezení \"%(name)s\" je porušeno."
 
 msgid "- Select an option -"
-msgstr ""
+msgstr "- Vyberte možnost -"
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
