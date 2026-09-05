@@ -54,6 +54,21 @@ class GeoExpressionsTests(TestCase):
                 obj.point3.equals_exact(p1.transform(3857, clone=True), 0.1)
             )
 
+    def test_assign_expression_to_field(self):
+        p1 = Point(1, 1, srid=4326)
+        p2 = Point(2, 2, srid=4326)
+        obj = ManyPointModel.objects.create(
+            point1=p1,
+            point2=p2,
+            point3=p2.transform(3857, clone=True),
+        )
+
+        obj.point2 = F("point1")
+        obj.save()
+        obj.refresh_from_db()
+
+        self.assertEqual(obj.point2, p1)
+
     @skipUnlessDBFeature("has_Distance_function")
     def test_multiple_annotation(self):
         multi_field = MultiFields.objects.create(
