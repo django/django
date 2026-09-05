@@ -2620,21 +2620,29 @@ class Query(BaseExpression):
                     if extra := self.extra_select.get(f):
                         extra_names.append(f)
                         selected[f] = RawSQL(*extra)
-                    elif f in self.annotation_select:
+                    # Check exact aliases before considering transforms like
+                    # "published__year", since an alias can contain LOOKUP_SEP.
+                    elif (alias := f) in self.annotations or (
+                        (alias := f.split(LOOKUP_SEP, 1)[0]) in self.annotations
+                    ):
+                        if alias not in self.annotation_select:
+                            if self.annotation_select:
+                                raise FieldError(
+                                    f"Cannot select the '{alias}' alias. It was "
+                                    f"excluded by a previous values() or "
+                                    f"values_list() call. Include '{alias}' in "
+                                    f"that call to select it."
+                                )
+                            else:
+                                raise FieldError(
+                                    f"Cannot select the '{alias}' alias. Use "
+                                    f"annotate() to promote it."
+                                )
+                        if f not in self.annotations:
+                            # Resolve transforms.
+                            self.annotations[f] = self.resolve_ref(f)
                         annotation_names.append(f)
                         selected[f] = f
-                    elif f in self.annotations:
-                        if self.annotation_select:
-                            raise FieldError(
-                                f"Cannot select the '{f}' alias. It was excluded "
-                                f"by a previous values() or values_list() call. "
-                                f"Include '{f}' in that call to select it."
-                            )
-                        else:
-                            raise FieldError(
-                                f"Cannot select the '{f}' alias. Use annotate() "
-                                f"to promote it."
-                            )
                     else:
                         # Call `names_to_path` to ensure a FieldError including
                         # annotations about to be masked as valid choices if

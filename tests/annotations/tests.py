@@ -10,6 +10,7 @@ from django.db.models import (
     Case,
     CharField,
     Count,
+    DateField,
     DateTimeField,
     DecimalField,
     Exists,
@@ -587,6 +588,21 @@ class NonAggregateAnnotationTestCase(TestCase):
         self.assertEqual(book["other_rating"], 4)
         self.assertEqual(book["other_isbn"], "155860191")
 
+    def test_values_annotation_with_transform(self):
+        qs = Book.objects.annotate(
+            constant=Value(datetime.date(2026, 1, 1), output_field=DateField())
+        ).values("constant__year")
+        self.assertEqual(qs.get(pk=self.b1.pk)["constant__year"], 2026)
+
+    @register_lookup(CharField, Length)
+    def test_values_transform_on_annotation_of_related_field(self):
+        # Book and Publisher both have a "name" column.
+        qs = Book.objects.annotate(publisher_name=F("publisher__name"))
+        self.assertEqual(
+            qs.values_list("publisher_name__length", flat=True).get(pk=self.b1.pk),
+            len(self.p1.name),
+        )
+
     def test_values_transform_on_annotation_grouped(self):
         qs = (
             Book.objects.filter(pk=self.b1.pk)
@@ -609,6 +625,20 @@ class NonAggregateAnnotationTestCase(TestCase):
             list(qs.values("published__year")),
             [{"published__year": self.b1.pubdate.year}],
         )
+
+    def test_values_unsupported_transform_on_annotation(self):
+        """
+        An unsupported transform over an annotation alias reports the
+        unsupported lookup rather than failing while building the column.
+        """
+        msg = (
+            "Unsupported lookup 'not_a_transform' for DateField or join on the "
+            "field not permitted."
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Book.objects.annotate(published=TruncMonth("pubdate")).values(
+                "published__not_a_transform"
+            )
 
     def test_values_fields_annotations_order(self):
         qs = Book.objects.annotate(other_rating=F("rating") - 1).values(
@@ -1577,6 +1607,27 @@ class AliasTests(TestCase):
             with self.subTest(operation=operation):
                 with self.assertRaisesMessage(FieldError, msg):
                     getattr(qs, operation)("rating_alias")
+
+    def test_values_transform_on_alias(self):
+        qs = Book.objects.alias(published=TruncMonth("pubdate"))
+        msg = "Cannot select the 'published' alias. Use annotate() to promote it."
+        for operation in ["values", "values_list"]:
+            with self.subTest(operation=operation):
+                with self.assertRaisesMessage(FieldError, msg):
+                    getattr(qs, operation)("published__year")
+
+    def test_values_transform_on_annotation_masked_by_values(self):
+        qs = Book.objects.annotate(published=TruncMonth("pubdate"))
+        msg = "Cannot select the 'published' alias. Use annotate() to promote it."
+        with self.assertRaisesMessage(FieldError, msg):
+            qs.values("pk").values("published__year")
+        msg = (
+            "Cannot select the 'published' alias. It was excluded by a previous "
+            "values() or values_list() call. Include 'published' in that call to "
+            "select it."
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            qs.annotate(other=F("rating")).values("other").values("published__year")
 
     def test_values_alias_containing_lookup_separator(self):
         msg = "Cannot select the 'pub__date' alias. Use annotate() to promote it."
