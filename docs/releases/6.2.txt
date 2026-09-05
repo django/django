@@ -329,6 +329,9 @@ Miscellaneous
 * The minimum supported version of ``asgiref`` is increased from 3.9.1 to
   3.12.1.
 
+* The minimum supported version of ``oracledb`` is increased from 2.3.0 to
+  4.0.2.
+
 * In the asynchronous request path, error responses (such as those rendered by
   ``handler404`` and ``handler500``) are now rendered on the request's
   thread-sensitive thread, rather than on a shared thread pool, so that
