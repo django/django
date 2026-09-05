@@ -59,6 +59,7 @@ from django.db.models.query import (
     prefetch_related_objects,
 )
 from django.db.models.query_utils import FilteredRelation, Q
+from django.db.models.table_references import SchemaQualifiedTable
 
 # Imports that would create circular imports if sorted
 from django.db.models.base import DEFERRED, Model  # isort:skip
@@ -84,6 +85,7 @@ __all__ += [
     "DO_NOTHING",
     "PROTECT",
     "RESTRICT",
+    "SchemaQualifiedTable",
     "SET",
     "SET_DEFAULT",
     "SET_NULL",

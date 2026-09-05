@@ -472,6 +472,8 @@ Models
   not supported for that option.
 * **models.E050**: The model cannot have related fields with both
   database-level and Python-level ``on_delete`` variants.
+* **models.E051**: ``managed`` must be ``False`` when ``db_table`` is a
+  ``SchemaQualifiedTable``.
 
 Management Commands
 -------------------
