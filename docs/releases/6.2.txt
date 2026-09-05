@@ -199,6 +199,12 @@ Management Commands
   configurable by the new :attr:`.BaseCommand.requires_settings` attribute
   (default ``True``). In previous versions, such errors were always suppressed.
 
+* As a hardening measure against decompression bombs, where a small archive
+  expands to enough data to exhaust time or disk space, the :djadmin:`startapp`
+  and :djadmin:`startproject` commands now refuse to extract a ``--template``
+  archive whose contents are larger than 50 MB. The new ``--no-size-limit``
+  option extracts such an archive anyway.
+
 Migrations
 ~~~~~~~~~~
 
@@ -315,6 +321,11 @@ Miscellaneous
   :class:`~django.http.JsonResponse`, it now defaults to ``False``, because the
   pollution vulnerability in the ``Array`` prototype was fixed in
   `ES5 <https://262.ecma-international.org/5.1/#sec-11.1.4>`_.
+
+* To harden extraction against decompression bombs, the :djadmin:`startapp` and
+  :djadmin:`startproject` commands now raise a ``CommandError`` when a
+  ``--template`` archive extracts to more than 50 MB. Pass the new
+  ``--no-size-limit`` option to restore the previous behavior.
 
 * :class:`~django.core.serializers.json.DjangoJSONEncoder` now omits the
   millisecond component of serialized ``datetime.datetime`` and

@@ -2594,6 +2594,57 @@ class ExecuteFromCommandLine(SimpleTestCase):
         self.assertEqual(err.getvalue(), "")
 
 
+class TemplateSizeLimit(AdminScriptTestCase):
+    """Oversized templates are refused unless --no-size-limit is given."""
+
+    template_path = os.path.join(custom_templates_dir, "project_template.tgz")
+
+    def setUp(self):
+        super().setUp()
+        self.target_dir = os.path.join(self.test_dir, "project_dir")
+        os.mkdir(self.target_dir)
+
+    def start(self, command, name, *args, **options):
+        call_command(
+            command,
+            name,
+            self.target_dir,
+            *args,
+            template=self.template_path,
+            verbosity=0,
+            **options,
+        )
+
+    def assertExtracted(self, extracted):
+        path = os.path.join(self.target_dir, "run.py")
+        if extracted:
+            self.assertTrue(os.path.exists(path))
+        else:
+            self.assertFalse(os.path.exists(path))
+
+    @mock.patch("django.utils.archive.get_size", return_value=60 * 1024 * 1024)
+    def test_project_template_over_limit(self, mocked_get_size):
+        msg = (
+            "project template %s extracts to 60.0 MB, more than the 50 MB "
+            "limit. Pass --no-size-limit to extract it anyway." % self.template_path
+        )
+        with self.assertRaisesMessage(CommandError, msg):
+            self.start("startproject", "sized_project")
+        self.assertExtracted(False)
+
+    @mock.patch("django.utils.archive.get_size", return_value=60 * 1024 * 1024)
+    def test_app_template_over_limit(self, mocked_get_size):
+        msg = "app template %s extracts to 60.0 MB" % self.template_path
+        with self.assertRaisesMessage(CommandError, msg):
+            self.start("startapp", "sized_app")
+        self.assertExtracted(False)
+
+    @mock.patch("django.utils.archive.get_size", return_value=60 * 1024 * 1024)
+    def test_no_size_limit(self, mocked_get_size):
+        self.start("startproject", "sized_project", "--no-size-limit")
+        self.assertExtracted(True)
+
+
 @override_settings(ROOT_URLCONF="admin_scripts.urls")
 class StartProject(LiveServerTestCase, AdminScriptTestCase):
     available_apps = [
