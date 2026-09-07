@@ -4,7 +4,7 @@ from django.core.exceptions import FieldError
 from django.db import IntegrityError, connection, transaction
 from django.db.models import Case, CharField, Count, F, IntegerField, Max, When
 from django.db.models.functions import Abs, Concat, Lower
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import register_lookup
 
 from .models import (
@@ -310,6 +310,108 @@ class AdvancedTests(TestCase):
         msg = "Cannot negate non-conditional expressions."
         with self.assertRaisesMessage(TypeError, msg):
             DataPoint.objects.update(is_active=~F("name"))
+
+    @skipUnlessDBFeature("can_return_rows_from_update")
+    def test_update_returning(self):
+        dps = DataPoint.objects.order_by("id").update(
+            {"is_active": False},
+            returning=True,
+        )
+        for dp, expected_dp in zip(dps, [self.d0, self.d2, self.d3]):
+            with self.subTest(dp), self.assertNumQueries(0):
+                self.assertEqual(dp.get_deferred_fields(), set())
+                self.assertEqual(dp, expected_dp)
+                self.assertIs(dp.is_active, False)
+                self.assertEqual(dp.name, expected_dp.name)
+        dps = (
+            DataPoint.objects.filter(pk__in=[self.d0.pk, self.d3.pk])
+            .order_by("id")
+            .update({"is_active": True}, returning=["id", "is_active", "name"])
+        )
+        for dp, expected_dp in zip(dps, [self.d0, self.d3]):
+            with self.subTest(dp), self.assertNumQueries(0):
+                self.assertEqual(dp.get_deferred_fields(), {"another_value", "value"})
+                self.assertEqual(dp, expected_dp)
+                self.assertIs(dp.is_active, True)
+                self.assertEqual(dp.name, expected_dp.name)
+
+    @skipUnlessDBFeature("can_return_rows_from_update")
+    def test_update_returning_values(self):
+        values = (
+            DataPoint.objects.filter(pk__in=[self.d2.pk, self.d3.pk])
+            .order_by("id")
+            .update(
+                {"is_active": False},
+                returning_values=True,
+            )
+        )
+        self.assertEqual(
+            values,
+            [
+                {
+                    "id": 2,
+                    "name": "d2",
+                    "value": "banana",
+                    "another_value": "",
+                    "is_active": False,
+                },
+                {
+                    "id": 3,
+                    "name": "d3",
+                    "value": "banana",
+                    "another_value": "",
+                    "is_active": False,
+                },
+            ],
+        )
+        values = DataPoint.objects.order_by("id").update(
+            {"is_active": False},
+            returning_values=["id", "is_active", "name"],
+        )
+        self.assertEqual(
+            values,
+            [
+                {
+                    "id": 1,
+                    "name": "d0",
+                    "is_active": False,
+                },
+                {
+                    "id": 2,
+                    "name": "d2",
+                    "is_active": False,
+                },
+                {
+                    "id": 3,
+                    "name": "d3",
+                    "is_active": False,
+                },
+            ],
+        )
+
+    @skipUnlessDBFeature("can_return_rows_from_update")
+    def test_update_returning_values_list(self):
+        values_list = DataPoint.objects.order_by("id").update(
+            {"is_active": False},
+            returning_values_list=True,
+        )
+        self.assertEqual(
+            values_list,
+            [
+                (1, "d0", "apple", "", False),
+                (2, "d2", "banana", "", False),
+                (3, "d3", "banana", "", False),
+            ],
+        )
+        values_list = (
+            DataPoint.objects.filter(pk=self.d3.pk)
+            .order_by("id")
+            .update(
+                {"is_active": False},
+                returning_values_list=["id", "is_active", "name"],
+            )
+        )
+        self.assertEqual(values_list, [(3, False, "d3")])
 
 
 @unittest.skipUnless(
