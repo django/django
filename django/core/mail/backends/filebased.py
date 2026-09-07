@@ -10,7 +10,7 @@ from django.core.mail.backends.console import EmailBackend as ConsoleEmailBacken
 
 
 class EmailBackend(ConsoleEmailBackend):
-    def __init__(self, fail_silently=False, file_path=None, **kwargs):
+    def __init__(self, fail_silently=False, file_path=None, raw=True, **kwargs):
         self._fname = None
         # Since we're using the console-based backend as a base, force the
         # stream to be None, so we don't default to stdout.
