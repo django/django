@@ -7,6 +7,9 @@ from .base import WidgetTest
 class TextareaTest(WidgetTest):
     widget = Textarea()
 
+    def test_input_type(self):
+        self.assertEqual(self.widget.input_type, "textarea")
+
     def test_render(self):
         self.check_html(
             self.widget,

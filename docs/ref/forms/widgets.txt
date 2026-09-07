@@ -688,6 +688,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
 .. class:: Textarea
 
+    * ``input_type``: ``'textarea'``
     * ``template_name``: ``'django/forms/widgets/textarea.html'``
     * Renders as: ``<textarea>...</textarea>``
 
