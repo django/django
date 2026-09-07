@@ -53,7 +53,7 @@ class TupleLookupMixin:
         if self.rhs_is_direct_value():
             if (
                 self.lookup_name == "exact"
-                and isinstance(self.rhs, (tuple, list))
+                and isinstance(self.rhs, list)
                 and len(self.rhs) == 1
             ):
                 self.rhs = self.rhs[0]
