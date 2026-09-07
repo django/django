@@ -408,6 +408,14 @@ class DeleteModel(ModelOperation):
         # related fields.
         return True
 
+    def reduce(self, operation, app_label):
+        if (
+            isinstance(operation, RemoveField)
+            and self.name_lower == operation.model_name_lower
+        ):
+            return [self]
+        return super().reduce(operation, app_label)
+
     def describe(self):
         return "Delete model %s" % self.name
 
