@@ -912,6 +912,20 @@ class BasicExpressionsTests(TestCase):
         ).filter(ceo_manager=max_manager)
         self.assertEqual(qs.get(), self.gmbh)
 
+    def test_subquery_with_custom_template(self):
+        custom_subquery = Company.objects.filter(
+            ceo__salary__in=Subquery(
+                Employee.objects.all().values("salary"),
+                salary=20,
+                template="(SELECT salary FROM (%(subquery)s) _subquery "
+                "WHERE salary = %(salary)s)",
+            ),
+        )
+        expected_companies = Company.objects.filter(name="Foobar Ltd.")
+        self.assertQuerySetEqual(
+            custom_subquery.order_by("name"), expected_companies.order_by("name")
+        )
+
     def test_aggregate_subquery_annotation(self):
         with self.assertNumQueries(1) as ctx:
             aggregate = Company.objects.annotate(
