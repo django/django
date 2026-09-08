@@ -11,9 +11,11 @@ without a solution.
 Typo fixes and trivial documentation changes
 ============================================
 
-If you are fixing a really trivial issue, for example changing a word in the
-documentation, the preferred way to provide the patch is using GitHub pull
-requests without a Trac ticket.
+If you've contributed to Django before and just want to fix a really trivial
+issue, for example changing a word in the documentation, the preferred way to
+provide the patch is using GitHub pull requests without a Trac ticket. If you
+haven't contributed before, go ahead and open a ticket to get used to our
+workflow.
 
 See :doc:`/internals/contributing/writing-code/working-with-git` for more
 details on how to use pull requests.
