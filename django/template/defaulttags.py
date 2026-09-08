@@ -915,7 +915,18 @@ class TemplateLiteral(Literal):
         return self.text
 
     def eval(self, context):
-        return self.value.resolve(context, ignore_failures=True)
+        try:
+            return self.value.resolve(context, ignore_failures=True)
+        except VariableDoesNotExist:
+            # ignore_failures=True only covers a failed lookup of the variable
+            # being filtered, not one in a filter's argument. Without this,
+            # `{% if missing|default:missing or True %}` lets the exception
+            # escape as far as the `or` operator, which catches everything and
+            # returns False -- so an expression ending in `or True` renders as
+            # falsey, and swapping the operands changes the result. Treating a
+            # failed lookup here the same way ignore_failures does keeps the
+            # exception where it happened. Refs #17664.
+            return None
 
 
 class TemplateIfParser(IfParser):
