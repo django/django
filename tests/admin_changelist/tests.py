@@ -62,6 +62,7 @@ from .models import (
     Concert,
     CustomIdUser,
     Event,
+    GeneratedBoolean,
     Genre,
     GrandChild,
     Group,
@@ -1979,6 +1980,26 @@ class ChangeListTests(TestCase):
         self.assertContains(response, 'alt="True"')
         self.assertContains(response, 'alt="False"')
         # Ensure "True" and "False" text are NOT in the response.
+        self.assertNotContains(response, ">True<")
+        self.assertNotContains(response, ">False<")
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_list_display_generated_boolean_display(self):
+        """Generated BooleanField values display boolean icons (#37332)."""
+        GeneratedBoolean.objects.create(value=True)
+        GeneratedBoolean.objects.create(value=False)
+
+        class GeneratedBooleanAdmin(admin.ModelAdmin):
+            list_display = ["is_done"]
+
+        m = GeneratedBooleanAdmin(GeneratedBoolean, custom_site)
+        request = self._mocked_authenticated_request(
+            "/generatedboolean/", self.superuser
+        )
+        response = m.changelist_view(request)
+
+        self.assertContains(response, 'alt="True"')
+        self.assertContains(response, 'alt="False"')
         self.assertNotContains(response, ">True<")
         self.assertNotContains(response, ">False<")
 
