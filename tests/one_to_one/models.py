@@ -31,6 +31,16 @@ class Bar(models.Model):
     serves_cocktails = models.BooleanField(default=True)
 
 
+class TikiBar(models.Model):
+    place = models.OneToOneField(Place, models.CASCADE, related_default=None)
+
+
+class SandBar(models.Model):
+    place = models.OneToOneField(
+        Place, models.CASCADE, related_default=lambda: "DEFAULT_VALUE"
+    )
+
+
 class UndergroundBar(models.Model):
     place = models.OneToOneField(Place, models.SET_NULL, null=True)
     serves_cocktails = models.BooleanField(default=True)
