@@ -1,3 +1,4 @@
+import copy
 import gettext
 import os
 import re
@@ -977,6 +978,46 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
         </div>
         """
         self.assertHTMLEqual(output, expected)
+
+    def test_deepcopy_attrs_follow_copied_widget(self):
+        rel = Album._meta.get_field("band").remote_field
+        wrapper = widgets.RelatedFieldWidgetWrapper(
+            forms.Select(), rel, widget_admin_site
+        )
+        wrapper_copy = copy.deepcopy(wrapper)
+        self.assertIsNot(wrapper_copy.widget, wrapper.widget)
+        self.assertIs(wrapper_copy.attrs, wrapper_copy.widget.attrs)
+        self.assertIsNot(wrapper_copy.attrs, wrapper.widget.attrs)
+
+    def test_deepcopy_attrs_not_shared_between_copies(self):
+        rel = Album._meta.get_field("band").remote_field
+        wrapper = widgets.RelatedFieldWidgetWrapper(
+            forms.Select(), rel, widget_admin_site
+        )
+        wrapper_copy = copy.deepcopy(wrapper)
+        wrapper_copy.attrs["class"] = "copy-only"
+        self.assertNotIn("class", wrapper.attrs)
+        self.assertNotIn("class", wrapper.widget.attrs)
+        self.assertIn('class="copy-only"', wrapper_copy.render("band", None))
+        self.assertNotIn("copy-only", wrapper.render("band", None))
+
+    def test_attrs_set_per_form_instance_are_not_shared(self):
+        rel = Album._meta.get_field("band").remote_field
+        wrapper = widgets.RelatedFieldWidgetWrapper(
+            forms.Select(), rel, widget_admin_site
+        )
+
+        class AlbumForm(forms.Form):
+            band = forms.CharField(widget=wrapper)
+
+            def __init__(self, marker, **kwargs):
+                super().__init__(**kwargs)
+                self.fields["band"].widget.attrs["data-marker"] = marker
+
+        first, second = AlbumForm("first"), AlbumForm("second")
+        self.assertEqual(first.fields["band"].widget.attrs["data-marker"], "first")
+        self.assertEqual(second.fields["band"].widget.attrs["data-marker"], "second")
+        self.assertNotIn("data-marker", wrapper.attrs)
 
     def test_non_select_widget_cant_change_delete_related(self):
         main_band = Event._meta.get_field("main_band")
