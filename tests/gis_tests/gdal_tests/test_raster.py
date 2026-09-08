@@ -1006,3 +1006,26 @@ class GDALBandTests(SimpleTestCase):
                 )
             else:
                 self.assertEqual(band.data(), list(combo[2]))
+
+    def test_16bit_float(self):
+        rstfile = NamedTemporaryFile(suffix=".tif")
+        self.addCleanup(rstfile.close)
+        rst = GDALRaster(
+            {
+                "driver": "GTiff",
+                "name": rstfile.name,
+                "srid": 4326,
+                "width": 255,
+                "height": 255,
+                "nr_of_bands": 1,
+                "papsz_options": dict(NBITS=16),
+            }
+        )
+        if GDAL_VERSION < (3, 11):
+            self.assertEqual(rst.bands[0].datatype(as_string=True), "GDT_Float32")
+        else:
+            with self.assertRaisesMessage(
+                NotImplementedError,
+                "16 bit floating point (GDT_Float16) is not yet supported.",
+            ):
+                rst.bands[0].data()
