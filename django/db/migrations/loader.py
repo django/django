@@ -207,6 +207,12 @@ class MigrationLoader:
             # Ignore __first__ references to the same app.
             if parent[0] == key[0] and parent[1] != "__first__":
                 self.graph.add_dependency(migration, key, parent, skip_validation=True)
+                if parent in self.replacements:
+                    for replaced in self.replacements[parent].replaces:
+                        if replaced in self.graph.nodes:
+                            self.graph.add_dependency(
+                                migration, key, replaced, skip_validation=True
+                            )
 
     def add_external_dependencies(self, key, migration):
         for parent in migration.dependencies:
@@ -216,6 +222,12 @@ class MigrationLoader:
             parent = self.check_key(parent, key[0])
             if parent is not None:
                 self.graph.add_dependency(migration, key, parent, skip_validation=True)
+                if parent in self.replacements:
+                    for replaced in self.replacements[parent].replaces:
+                        if replaced in self.graph.nodes:
+                            self.graph.add_dependency(
+                                migration, key, replaced, skip_validation=True
+                            )
         for child in migration.run_before:
             child = self.check_key(child, key[0])
             if child is not None:
