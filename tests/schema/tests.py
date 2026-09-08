@@ -4113,6 +4113,46 @@ class SchemaTests(TransactionTestCase):
         finally:
             AuthorWithIndexedName._meta.indexes = []
 
+    @skipUnlessDBFeature("allows_multiple_constraints_on_same_fields")
+    def test_remove_db_index_doesnt_remove_unique_constraints(self):
+        """
+        Changing db_index to False doesn't remove UniqueConstraints from
+        Meta.constraints.
+        """
+        with connection.schema_editor() as editor:
+            editor.create_model(AuthorCharFieldWithIndex)
+        constraint = UniqueConstraint(
+            fields=["char_field"], name="author_char_field_uniq"
+        )
+        try:
+            AuthorCharFieldWithIndex._meta.constraints = [constraint]
+            with connection.schema_editor() as editor:
+                editor.add_constraint(AuthorCharFieldWithIndex, constraint)
+                db_index_name = editor._create_index_name(
+                    table_name=AuthorCharFieldWithIndex._meta.db_table,
+                    column_names=("char_field",),
+                )
+            old_constraints = self.get_constraints(
+                AuthorCharFieldWithIndex._meta.db_table
+            )
+            self.assertIn(constraint.name, old_constraints)
+            self.assertIn(db_index_name, old_constraints)
+
+            old_field = AuthorCharFieldWithIndex._meta.get_field("char_field")
+            new_field = CharField(max_length=31)
+            new_field.set_attributes_from_name("char_field")
+            with connection.schema_editor() as editor:
+                editor.alter_field(
+                    AuthorCharFieldWithIndex, old_field, new_field, strict=True
+                )
+            new_constraints = self.get_constraints(
+                AuthorCharFieldWithIndex._meta.db_table
+            )
+            self.assertNotIn(db_index_name, new_constraints)
+            self.assertIn(constraint.name, new_constraints)
+        finally:
+            AuthorCharFieldWithIndex._meta.constraints = []
+
     def test_order_index(self):
         """
         Indexes defined with ordering (ASC/DESC) defined on column
