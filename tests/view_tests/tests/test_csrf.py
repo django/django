@@ -179,14 +179,14 @@ class CsrfViewTests(SimpleTestCase):
 
     @override_settings(DEBUG=True)
     def test_bad_origin_shows_origin_help(self):
-        """Shows origin-specific help, not the generic CSRF help."""
+        """Shows the generic CSRF help followed by origin-specific help."""
         response = self.client.post(
             "/", headers={"origin": "https://badorigin.example.com"}
         )
-        self.assertContains(response, "CSRF_TRUSTED_ORIGINS", status_code=403)
-        self.assertNotContains(
+        self.assertContains(
             response, "genuine Cross Site Request Forgery", status_code=403
         )
+        self.assertContains(response, "CSRF_TRUSTED_ORIGINS", status_code=403)
 
     @override_settings(DEBUG=True)
     def test_no_cookie_does_not_show_origin_help(self):

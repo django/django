@@ -908,7 +908,10 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
         self.assertEqual(response.status_code, 403)
-        msg = "Host is not allowed."
+        msg = (
+            "Invalid HTTP_HOST header: 'www.disallowed.com'. You may need to "
+            "add 'www.disallowed.com' to ALLOWED_HOSTS."
+        )
         self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
 
     @override_settings(ALLOWED_HOSTS=["www.example.com"])
@@ -1213,6 +1216,23 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
             response, "If the expected server origin looks correct", status_code=403
         )
         self.assertContains(response, "you may wish to add the origin", status_code=403)
+        self.assertContains(response, "CSRF_TRUSTED_ORIGINS", status_code=403)
+
+    @override_settings(ALLOWED_HOSTS=["www.example.com"], DEBUG=True)
+    def test_no_likely_proxy_headers_malformed_origin(self):
+        """Don't mistake a malformed Origin header for a likely proxy fix."""
+        req = self._get_POST_request_with_token()
+        req.META["HTTP_HOST"] = "www.example.com"
+        req.META["HTTP_ORIGIN"] = "https://"
+        mw = CsrfViewMiddleware(post_form_view)
+        self._check_referer_rejects(mw, req)
+        self.assertIs(mw._origin_verified(req, "https://www.example.com"), False)
+        with self.assertLogs("django.security.csrf", "WARNING"):
+            response = mw.process_view(req, post_form_view, (), {})
+        self.assertEqual(response.status_code, 403)
+        self.assertContains(
+            response, "If the expected server origin looks correct", status_code=403
+        )
         self.assertContains(response, "CSRF_TRUSTED_ORIGINS", status_code=403)
 
 

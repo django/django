@@ -26,7 +26,6 @@ logger = logging.getLogger("django.security.csrf")
 # This matches if any character is not in CSRF_ALLOWED_CHARS.
 invalid_token_chars_re = _lazy_re_compile("[^a-zA-Z0-9]")
 
-REASON_DISALLOWED_HOST = "Host is not allowed."
 REASON_BAD_ORIGIN = (
     "Origin checking failed - %r does not match %r or any other trusted origins."
 )
@@ -434,8 +433,8 @@ class CsrfViewMiddleware(MiddlewareMixin):
                     "https" if request.is_secure() else "http",
                     request.get_host(),
                 )
-            except DisallowedHost:
-                return self._reject(request, REASON_DISALLOWED_HOST)
+            except DisallowedHost as exc:
+                return self._reject(request, str(exc))
             if not self._origin_verified(request, host_origin):
                 return self._reject(
                     request,

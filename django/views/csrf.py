@@ -19,11 +19,29 @@ def builtin_template_path(name):
     return Path(__file__).parent / "templates" / name
 
 
+def _forwarded_may_fix(request):
+    """
+    Return whether trusting X-Forwarded-Proto/X-Forwarded-Host could plausibly
+    resolve the Origin mismatch that caused this CSRF failure.
+    """
+    if request.headers.get("X-Forwarded-Proto") == "https" and not request.is_secure():
+        return True
+    forwarded_host = request.headers.get("X-Forwarded-Host")
+    if forwarded_host is None:
+        return False
+    origin = request.headers.get("Origin", "")
+    return origin.endswith(f"://{forwarded_host}")
+
+
 def csrf_failure(request, reason="", template_name=CSRF_FAILURE_TEMPLATE_NAME):
     """
     Default view used when request fails CSRF protection
     """
-    from django.middleware.csrf import REASON_NO_CSRF_COOKIE, REASON_NO_REFERER
+    from django.middleware.csrf import (
+        REASON_BAD_ORIGIN,
+        REASON_NO_CSRF_COOKIE,
+        REASON_NO_REFERER,
+    )
     from django.template.context_processors import csp
 
     c = {
@@ -62,14 +80,8 @@ def csrf_failure(request, reason="", template_name=CSRF_FAILURE_TEMPLATE_NAME):
             "re-enable them, at least for this site, or for “same-origin” "
             "requests."
         ),
-        "bad_origin": reason.startswith("Origin checking failed"),
-        "forwarded_may_fix": (
-            request.headers.get("X-Forwarded-Proto", "") == "https"
-            and not request.is_secure()
-            or request.headers.get("Origin", "").endswith(
-                f'://{request.headers.get("X-Forwarded-Host", "")}'
-            )
-        ),
+        "bad_origin": reason.startswith(REASON_BAD_ORIGIN.split("%r", 1)[0]),
+        "forwarded_may_fix": _forwarded_may_fix(request),
         "x_forwarded_proto": request.headers.get("X-Forwarded-Proto"),
         "x_forwarded_host": request.headers.get("X-Forwarded-Host"),
         "DEBUG": settings.DEBUG,
