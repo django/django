@@ -42,6 +42,8 @@ class RequireHttpMethodsTest(SimpleTestCase):
         self.assertIs(type(my_view(request)), HttpResponseNotAllowed)
         request.method = "DELETE"
         self.assertIs(type(my_view(request)), HttpResponseNotAllowed)
+        request.method = "QUERY"
+        self.assertIs(type(my_view(request)), HttpResponseNotAllowed)
 
     async def test_require_http_methods_methods_async_view(self):
         @require_http_methods(["GET", "PUT"])
@@ -58,6 +60,8 @@ class RequireHttpMethodsTest(SimpleTestCase):
         request.method = "POST"
         self.assertIs(type(await my_view(request)), HttpResponseNotAllowed)
         request.method = "DELETE"
+        self.assertIs(type(await my_view(request)), HttpResponseNotAllowed)
+        request.method = "QUERY"
         self.assertIs(type(await my_view(request)), HttpResponseNotAllowed)
 
 
