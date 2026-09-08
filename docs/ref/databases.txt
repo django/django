@@ -254,10 +254,18 @@ database configuration in :setting:`DATABASES`::
 Connection pool
 ---------------
 
+A connection pool lets the threads of a worker process (for instance
+Gunicorn's ``gthread`` worker) share and reuse a bounded set of database
+connections, instead of opening a new one per request or holding one
+:setting:`CONN_MAX_AGE` connection per thread. Closing a connection returns
+it to the pool instead of terminating it, including the automatic close
+at the end of each request and explicit ``db.connection.close()`` and
+``db.connections.close_all()`` calls.
+
 To use a connection pool with `psycopg`_, you can either set ``"pool"`` in the
 :setting:`OPTIONS` part of your database configuration in :setting:`DATABASES`
 to be a dict to be passed to :class:`~psycopg:psycopg_pool.ConnectionPool`, or
-to ``True`` to use the ``ConnectionPool`` defaults::
+to ``True`` to use the :class:`~psycopg:psycopg_pool.ConnectionPool` defaults::
 
     DATABASES = {
         "default": {
@@ -269,8 +277,29 @@ to ``True`` to use the ``ConnectionPool`` defaults::
         },
     }
 
-This option requires ``psycopg[pool]`` or :pypi:`psycopg-pool` to be installed
-and is ignored with ``psycopg2``.
+The :setting:`CONN_HEALTH_CHECKS` setting is used to set the ``check`` argument
+of :class:`~psycopg:psycopg_pool.ConnectionPool`. The :setting:`CONN_MAX_AGE`
+setting must be unset or ``0`` (a non-zero value raises
+:exc:`~django.core.exceptions.ImproperlyConfigured`). Configure the connection
+lifecycle using the ``max_lifetime`` and ``max_idle`` arguments instead::
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            # ...
+            "OPTIONS": {
+                "pool": {
+                    # these are the default values
+                    "max_lifetime": 3600,
+                    "max_idle": 600,
+                },
+            },
+        },
+    }
+
+This option is only supported with `psycopg`_ and requires ``psycopg[pool]``
+(which adds :pypi:`psycopg-pool`) to be installed. Setting it while using
+``psycopg2`` raises :exc:`~django.core.exceptions.ImproperlyConfigured`.
 
 .. _database-server-side-parameters-binding:
 
