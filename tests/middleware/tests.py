@@ -626,18 +626,6 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
                 response = ConditionalGetMiddleware(self.get_response)(self.req)
                 self.assertIs(response.has_header("ETag"), False)
 
-    def test_query_calculates_etag(self):
-        req = self.request_factory.query("/")
-        resp = ConditionalGetMiddleware(self.get_response)(req)
-        self.assertEqual(resp.status_code, 200)
-        self.assertNotEqual("", resp["ETag"])
-
-    def test_query_if_none_match_and_same_etag(self):
-        req = self.request_factory.query("/", headers={"if-none-match": '"spam"'})
-        self.resp_headers["ETag"] = '"spam"'
-        resp = ConditionalGetMiddleware(self.get_response)(req)
-        self.assertEqual(resp.status_code, 304)
-
     def test_if_none_match_and_no_etag(self):
         self.req.META["HTTP_IF_NONE_MATCH"] = "spam"
         resp = ConditionalGetMiddleware(self.get_response)(self.req)
@@ -809,6 +797,17 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
         request = self.request_factory.head("/")
         conditional_get_response = ConditionalGetMiddleware(get_200_response)(request)
         self.assertNotIn("ETag", conditional_get_response)
+
+
+class ConditionalQueryMiddlewareTest(ConditionalGetMiddlewareTest):
+    """
+    ConditionalGetMiddleware handles a QUERY request (RFC 10008) the same way
+    as a GET request.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.req = self.request_factory.query("/")
 
 
 class XFrameOptionsMiddlewareTest(SimpleTestCase):
