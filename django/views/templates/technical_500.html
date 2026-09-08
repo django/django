@@ -58,6 +58,13 @@
     #traceback { background: light-dark(#eee, #121212); }
     #requestinfo { background: light-dark(#f6f6f6, #1e1e1e); padding-left:120px; }
     #summary table { border:none; background:transparent; }
+    #exception_group li { list-style: none; }
+    #exception_group ul ul li { padding-left: 40px; }
+    #exception_group ul li { position: relative; line-height: 1.25em;}
+    #exception_group ul li::before { position: absolute; left: 30px; top: 0px; border-left: 1.5px dashed; border-bottom: 1.5px dashed; content: ""; width: 9px; height: 0.5em; }
+    #exception_group ul li::after { position: absolute; left: 30px; bottom: 0px; border-left: 1.5px dashed; content: ""; width: 6px; height: 100%; }
+    #exception_group ul li:last-child::after { display: none }
+    #exception_group > ul > li::before { display: none }
     #requestinfo h2, #requestinfo h3 { position:relative; margin-left:-100px; }
     #requestinfo h3 { margin-bottom:-1em; }
     .error { background: light-dark(#ffc, #3d3d00); }
@@ -108,6 +115,7 @@
   <h1>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}
       {% if request %} at {{ request.path_info }}{% endif %}</h1>
   <pre class="exception_value">{% if exception_value %}{{ exception_value|force_escape }}{% if exception_notes %}{{ exception_notes }}{% endif %}{% else %}No exception message supplied{% endif %}</pre>
+  {% partialdef exception_tree %}<li><pre>{{ exception.type }}: {{ exception.message|force_escape }}</pre>{% if exception.children %}<ul>{% for exception in exception.children %}{% partial exception_tree %}{% endfor %}</ul>{% endif %}</li>{% endpartialdef %}
   <table class="meta">
 {% if request %}
     <tr>
@@ -132,7 +140,7 @@
 {% if exception_type and exception_value %}
     <tr>
       <th scope="row">Exception Value:</th>
-      <td><pre>{{ exception_value|force_escape }}</pre></td>
+      <td id="exception_group">{% if exception_group %}<ul>{% with exception=exception_group %}{% partial exception_tree %}{% endwith %}</ul>{% else %}<pre>{{ exception_value|force_escape }}</pre>{% endif %}</td>
     </tr>
 {% endif %}
 {% if lastframe %}
@@ -340,6 +348,9 @@ During handling of the above exception ({{ frame.exc_cause|force_escape }}), ano
 
 Exception Type: {{ exception_type }}{% if request %} at {{ request.path_info }}{% endif %}
 Exception Value: {{ exception_value|force_escape }}{% if exception_notes %}{{ exception_notes }}{% endif %}
+{% if exception_group_text %}Exception Group Tree:
+{{ exception_group_text|force_escape }}{% endif %}
+
 </textarea>
   <br><br>
   <input type="submit" value="Share this traceback on a public website">
