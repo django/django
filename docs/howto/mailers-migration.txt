@@ -47,6 +47,7 @@ use these specific features:
 * :ref:`migrating-to-mailers-email-backends`
 * :ref:`migrating-to-mailers-auth`
 * :ref:`migrating-to-mailers-adminemailhandler`
+* :ref:`migrating-to-mailers-error-reporting`
 
 .. deprecated:: 6.1
 
@@ -444,3 +445,47 @@ Replace that with::
             "BACKEND": "third.party.EmailBackend",
         },
     }
+
+.. _migrating-to-mailers-error-reporting:
+
+Ignoring transient failures in error reporting
+----------------------------------------------
+
+Django includes two features that report errors via email:
+:class:`.AdminEmailHandler` and :class:`.BrokenLinkEmailsMiddleware`. In
+earlier releases, those features used the deprecated :ref:`fail_silently
+<migrating-to-mailers-fail-silently>` argument. Starting in Django 2028 -- or
+immediately once the :setting:`MAILERS` setting is defined -- those features no
+longer use ``fail_silently`` so no longer ignore certain backend-specific
+errors.
+
+This may affect projects that use those features with an unreliable SMTP
+connection and rely on silently ignoring network glitches. If you want to
+continue dropping error notification emails that cannot be sent, define a
+:setting:`MAILERS` configuration with the ``"fail_silently"`` option enabled
+for use by those error handlers::
+
+    MAILERS = {
+        "default": {...},
+        "admin-logging": {
+            "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+            "OPTIONS": {
+                # ... other SMTP options ...
+                "fail_silently": True,
+            },
+        },
+    }
+
+To use this for :class:`.AdminEmailHandler`, set the ``"using"`` option in the
+:setting:`LOGGING` config as shown in the previous section.
+
+To use this for :class:`.BrokenLinkEmailsMiddleware`, create a subclass that
+defines ``using``, and then specify the path to that subclass in your
+:setting:`MIDDLEWARE` setting::
+
+    from django.core.middleware.common import BrokenLinkEmailsMiddleware
+
+
+    class CustomBrokenLinkEmailsMiddleware(BrokenLinkEmailsMiddleware):
+        using = "admin-logging"
+
