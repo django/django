@@ -293,6 +293,8 @@ backends.
 :mod:`django.contrib.gis`
 -------------------------
 
+* Support for GEOS 3.10 is removed.
+
 * The seconds value returned by
   :meth:`~django.contrib.gis.gdal.Field.as_datetime` is now a ``c_float``
   rather than a ``c_int``.
