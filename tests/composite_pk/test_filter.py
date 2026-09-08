@@ -12,6 +12,7 @@ from django.db.models import (
     Value,
     When,
 )
+from django.db.models.fields.tuple_lookups import TupleIn
 from django.db.models.functions import Cast
 from django.db.models.lookups import Exact
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
@@ -543,6 +544,12 @@ class CompositePKFilterTests(TestCase):
         self.assertEqual(
             Comment.objects.filter(pk=F("pk")).count(),
             Comment.objects.count(),
+        )
+
+    def test_filter_by_pk_in_rhs_f_object(self):
+        self.assertCountEqual(
+            Comment.objects.filter(TupleIn(F("pk"), Comment.objects.values("pk"))),
+            Comment.objects.all(),
         )
 
     @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
