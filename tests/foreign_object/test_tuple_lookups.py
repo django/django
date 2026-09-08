@@ -73,6 +73,16 @@ class TupleLookupsTests(TestCase):
                 Contact.objects.filter(customer=subquery).order_by("id"), ()
             )
 
+    def test_exact_single_element_list(self):
+        lhs = (F("customer_code"), F("company_code"))
+        rhs = [(self.customer_1.customer_id, self.customer_1.company)]
+        lookup = TupleExact(lhs, rhs)
+
+        self.assertSequenceEqual(
+            Contact.objects.filter(lookup).order_by("id"),
+            (self.contact_1, self.contact_2, self.contact_5),
+        )
+
     def test_in(self):
         cust_1, cust_2, cust_3, cust_4, cust_5 = (
             self.customer_1,
@@ -431,7 +441,6 @@ class TupleLookupsTests(TestCase):
         m_2_elements = "'%s' lookup of 'customer' must have 2 elements"
         m_2_elements_each = "'in' lookup of 'customer' must have 2 elements each"
         test_cases = (
-            ({"customer": 1}, m_2_elements % "exact"),
             ({"customer": (1, 2, 3)}, m_2_elements % "exact"),
             ({"customer__in": (1, 2, 3)}, m_2_elements_each),
             ({"customer__in": ("foo", "bar")}, m_2_elements_each),
