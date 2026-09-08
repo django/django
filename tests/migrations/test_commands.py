@@ -2880,7 +2880,7 @@ class MakeMigrationsTests(MigrationTestBase):
             self.assertIs(os.path.exists(migration_file), False)
             new_migration_file = os.path.join(
                 migration_dir,
-                "0002_delete_tribble_remove_author_silly_field_and_more.py",
+                "0002_delete_tribble_author_rating_modelwithcustombase_and_more.py",
             )
             with open(new_migration_file) as fp:
                 self.assertNotEqual(initial_content, fp.read())

@@ -4703,10 +4703,13 @@ class AutodetectorTests(BaseAutodetectorTests):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "otherapp", 1)
         self.assertOperationTypes(
-            changes, "otherapp", 0, ["DeleteModel", "DeleteModel"]
+            changes, "otherapp", 0, ["RemoveField", "DeleteModel", "DeleteModel"]
         )
-        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="Attribution")
-        self.assertOperationAttributes(changes, "otherapp", 0, 1, name="Book")
+        self.assertOperationAttributes(
+            changes, "otherapp", 0, 0, name="authors", model_name="book"
+        )
+        self.assertOperationAttributes(changes, "otherapp", 0, 1, name="Attribution")
+        self.assertOperationAttributes(changes, "otherapp", 0, 2, name="Book")
 
     def test_m2m_w_through_multistep_remove(self):
         """
@@ -4725,10 +4728,13 @@ class AutodetectorTests(BaseAutodetectorTests):
             changes,
             "testapp",
             0,
-            ["DeleteModel", "DeleteModel"],
+            ["RemoveField", "DeleteModel", "DeleteModel"],
         )
-        self.assertOperationAttributes(changes, "testapp", 0, 0, name="Author")
+        self.assertOperationAttributes(
+            changes, "testapp", 0, 0, name="publishers", model_name="author"
+        )
         self.assertOperationAttributes(changes, "testapp", 0, 1, name="Contract")
+        self.assertOperationAttributes(changes, "testapp", 0, 2, name="Author")
 
     def test_concrete_field_changed_to_many_to_many(self):
         """
@@ -4824,9 +4830,14 @@ class AutodetectorTests(BaseAutodetectorTests):
         )
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "testapp", 1)
-        self.assertOperationTypes(changes, "testapp", 0, ["DeleteModel", "DeleteModel"])
-        self.assertOperationAttributes(changes, "testapp", 0, 0, name="Author")
-        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Publisher")
+        self.assertOperationTypes(
+            changes, "testapp", 0, ["RemoveField", "DeleteModel", "DeleteModel"]
+        )
+        self.assertOperationAttributes(
+            changes, "testapp", 0, 0, name="author", model_name="publisher"
+        )
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Author")
+        self.assertOperationAttributes(changes, "testapp", 0, 2, name="Publisher")
 
     def test_alter_model_options(self):
         """Changing a model's options should make a change."""
