@@ -16,6 +16,7 @@ from django.test.utils import (
     captured_stderr,
     captured_stdout,
 )
+from playwright_tests.base import PlaywrightTestCase
 
 
 @contextmanager
@@ -184,6 +185,24 @@ class DiscoverRunnerTests(SimpleTestCase):
         )
 
         self.assertEqual(count, 4)
+
+    def test_playwright_test_variations_count(self):
+        class TestBrowser(PlaywrightTestCase):
+            browsers = ("chromium", "firefox")
+
+            def test_one(self):
+                pass
+
+            def test_two(self):
+                pass
+
+        runner = DiscoverRunner(verbosity=0)
+        tests = TestSuite([TestBrowser("test_one"), TestBrowser("test_two")])
+        with mock.patch.object(runner.test_loader, "loadTestsFromName") as loader:
+            loader.return_value = tests
+            suite = runner.load_tests_for_label("test_label", {})
+
+        self.assertEqual(suite.countTestCases(), 4)
 
     def test_dotted_test_class_vanilla_unittest(self):
         count = (
