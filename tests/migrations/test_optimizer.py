@@ -686,6 +686,61 @@ class OptimizerTests(OptimizerTestBase):
             ],
         )
 
+    def test_create_model_add_field_not_preserve_default(self):
+        """
+        A default that isn't preserved is only used by the migration that adds
+        the field, so it must not end up in CreateModel.
+        """
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel(
+                    name="Foo",
+                    fields=[("name", models.CharField(max_length=255))],
+                ),
+                migrations.AddField(
+                    "Foo",
+                    "age",
+                    models.IntegerField(default=42),
+                    preserve_default=False,
+                ),
+            ],
+            [
+                migrations.CreateModel(
+                    name="Foo",
+                    fields=[
+                        ("name", models.CharField(max_length=255)),
+                        ("age", models.IntegerField()),
+                    ],
+                ),
+            ],
+        )
+
+    def test_create_model_alter_field_not_preserve_default(self):
+        """
+        A default that isn't preserved is only used by the migration that
+        alters the field, so it must not end up in CreateModel.
+        """
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel(
+                    name="Foo",
+                    fields=[("age", models.IntegerField(null=True))],
+                ),
+                migrations.AlterField(
+                    "Foo",
+                    "age",
+                    models.IntegerField(default=42),
+                    preserve_default=False,
+                ),
+            ],
+            [
+                migrations.CreateModel(
+                    name="Foo",
+                    fields=[("age", models.IntegerField())],
+                ),
+            ],
+        )
+
     def test_create_model_rename_field(self):
         """
         RenameField should optimize into CreateModel.
@@ -807,6 +862,31 @@ class OptimizerTests(OptimizerTestBase):
             [
                 migrations.AddField(
                     "Foo", name="age", field=models.FloatField(default=2.4)
+                ),
+            ],
+        )
+
+    def test_add_field_alter_field_not_preserve_default(self):
+        """
+        AlterField should optimize into AddField, keeping whether the altered
+        field's default is preserved.
+        """
+        self.assertOptimizesTo(
+            [
+                migrations.AddField("Foo", "age", models.IntegerField(null=True)),
+                migrations.AlterField(
+                    "Foo",
+                    "age",
+                    models.IntegerField(default=42),
+                    preserve_default=False,
+                ),
+            ],
+            [
+                migrations.AddField(
+                    "Foo",
+                    name="age",
+                    field=models.IntegerField(default=42),
+                    preserve_default=False,
                 ),
             ],
         )
