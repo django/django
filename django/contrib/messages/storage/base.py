@@ -157,6 +157,17 @@ class BaseStorage:
         message = Message(level, message, extra_tags=extra_tags)
         self._queued_messages.append(message)
 
+    def clear(self):
+        """
+        Clear all loaded and queued messages and mark storage as used so
+        backends flush any stored messages.
+        """
+        self._loaded_messages
+        self._loaded_data = []
+        self._queued_messages = []
+        self.used = True
+        self.added_new = False
+
     def _get_level(self):
         """
         Return the minimum recorded level.
