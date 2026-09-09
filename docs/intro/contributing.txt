@@ -89,22 +89,33 @@ For this tutorial, you'll need Git installed to download the current
 development version of Django and to generate a branch for the changes you
 make.
 
-To check whether or not you have Git installed, enter ``git`` into the command
+To check whether or not you have Git installed, enter ``git --version`` into the command
 line. If you get messages saying that this command could not be found, you'll
-have to download and install it, see `Git's download page`__.
+have to download and install it, see `Git's download page <https://git-scm.com/download>`__.
 
 If you're not that familiar with Git, you can always find out more about its
 commands (once it's installed) by typing ``git help`` into the command line.
-
-__ https://git-scm.com/download
 
 Getting a copy of Django's development version
 ==============================================
 
 The first step to contributing to Django is to get a copy of the source code.
-First, `fork Django on GitHub <https://github.com/django/django/fork>`__. Then,
-from the command line, use the ``cd`` command to navigate to the directory
-where you'll want your local copy of Django to live.
+1. `Fork Django on GitHub <https://github.com/django/django/fork>`__.
+2. Open your terminal (macOS/Linux) or Command Prompt/PowerShell (Windows).
+3. Use ``cd`` to navigate to the folder where you want your local copy of
+   Django to live, for example:
+
+   **macOS/Linux:**
+
+   .. code-block:: console
+
+       $ cd ~/projects
+
+   **Windows:**
+
+   .. code-block:: doscon
+
+       C:\>cd C:\Users\YourName\projects
 
 Download the Django source code repository using the following command:
 
@@ -113,10 +124,18 @@ Download the Django source code repository using the following command:
     $ git clone https://github.com/YourGitHubName/django.git
 
 .. admonition:: Low bandwidth connection?
+    If you are on a slow internet connection, or if you want to explicitly test how the script behaves under restricted networking environments, select the command matching your operating system below:
 
-    You can add the ``--depth 1`` argument to ``git clone`` to skip downloading
-    all of Django's commit history, which reduces data transfer from ~250 MB
-    to ~70 MB.
+    === "Windows"
+        bash
+        # Execute the main setup using the low bandwidth package manager flag
+        python main.py --low-bandwidth
+        
+
+    === "macOS"
+        bash
+        # Execute the main setup using the low bandwidth package manager flag
+        python3 main.py --low-bandwidth
 
 Now that you have a local copy of Django, you can install it just like you
 would install any package using ``pip``. The most convenient way to do so is by
@@ -131,17 +150,38 @@ example in ``.virtualenvs/`` in your home directory.
 
 Create a new virtual environment by running:
 
-.. console::
+.. tabs::
 
-    $ python3 -m venv ~/.virtualenvs/djangodev
+    .. group-tab:: macOS/Linux
+
+        .. code-block:: console
+
+            $ python3 -m venv ~/.virtualenvs/djangodev
+
+    .. group-tab:: Windows
+
+        .. code-block:: doscon
+
+            C:\>python -m venv C:\Users\YourName\.virtualenvs\djangodev
+
 
 The path is where the new environment will be saved on your computer.
 
 The final step in setting up your virtual environment is to activate it:
 
-.. code-block:: console
+.. tabs::
 
-    $ source ~/.virtualenvs/djangodev/bin/activate
+    .. group-tab:: macOS/Linux
+
+        .. code-block:: console
+
+            $ source ~/.virtualenvs/djangodev/bin/activate
+
+    .. group-tab:: Windows
+
+        .. code-block:: doscon
+
+            C:\>C:\Users\YourName\.virtualenvs\djangodev\Scripts\activate.bat
 
 If the ``source`` command is not available, you can try using a dot instead:
 
@@ -165,15 +205,15 @@ command line to help you keep track of which one you are using. Anything you
 install through ``pip`` while this name is displayed will be installed in that
 virtual environment, isolated from other environments and system-wide packages.
 
-Go ahead and install the previously cloned copy of Django:
+Now install the copy of Django you cloned earlier:
 
 .. console::
 
     $ python -m pip install -e /path/to/your/local/clone/django/
 
-The installed version of Django is now pointing at your local copy by
-installing in editable mode. You will immediately see any changes you make to
-it, which is of great help when testing your first contribution.
+This installs Django in *editable mode*, pointing your local install at your
+cloned copy. Any changes you make will take effect immediately, which is
+very useful when testing your first contribution.
 
 Running Django's test suite for the first time
 ==============================================
@@ -186,8 +226,8 @@ haven't broken other parts of Django. If you've never run Django's test suite
 before, it's a good idea to run it once beforehand to get familiar with its
 output.
 
-Before running the test suite, enter the Django ``tests/`` directory using the
-``cd tests`` command, and install test dependencies by running:
+Before running the test suite, move into Django's ``tests/`` directory with
+``cd tests``, and install the test dependencies:
 
 .. console::
 
@@ -204,16 +244,22 @@ Now we are ready to run the test suite:
 
     $ ./runtests.py
 
+.. admonition:: For Windows users
+
+    On Windows, run the test suite with:
+
+    .. code-block:: doscon
+
+        ...\>runtests.py
+
 Now sit back and relax. Django's entire test suite has thousands of tests, and
 it takes at least a few minutes to run, depending on the speed of your
 computer.
 
-While Django's test suite is running, you'll see a stream of characters
-representing the status of each test as it completes. ``E`` indicates that an
-error was raised during a test, and ``F`` indicates that a test's assertions
-failed. Both of these are considered to be test failures. Meanwhile, ``x`` and
-``s`` indicate expected failures and skipped tests, respectively. Dots indicate
-passing tests.
+While it runs, you'll see a stream of characters showing each test's status
+as it finishes: ``E`` means a test raised an error, and ``F`` means a test's
+assertions failed — both count as failures. ``x`` and ``s`` mean expected
+failures and skipped tests. A dot means the test passed.
 
 Skipped tests are typically due to missing external libraries required to run
 the test; see :ref:`running-unit-tests-dependencies` for a list of dependencies
@@ -336,12 +382,20 @@ Running your new test
 ---------------------
 
 Since we haven't made any modifications to ``django.shortcuts`` yet, our test
-should fail. Let's run all the tests in the ``shortcuts`` folder to make sure
+should fail. Let's run just the tests in the ``shortcuts`` folder to make sure
 that's really what happens. ``cd`` to the Django ``tests/`` directory and run:
 
 .. console::
 
     $ ./runtests.py shortcuts
+
+.. admonition:: For Windows users
+
+    On Windows, run:
+
+    .. code-block:: doscon
+
+        ...\>runtests.py shortcuts
 
 If the tests ran correctly, you should see one failure corresponding to the
 test method we added, with this error:
@@ -364,13 +418,21 @@ bottom, add::
     def make_toast():
         return "toast"
 
-Now we need to make sure that the test we wrote earlier passes, so we can see
-whether the code we added is working correctly. Again, navigate to the Django
-``tests/`` directory and run:
+Now let's confirm the test we wrote earlier passes, to check that the code
+we added is working correctly. Again, ``cd`` into Django's ``tests/``
+directory and run:
 
 .. console::
 
     $ ./runtests.py shortcuts
+
+.. admonition:: For Windows users
+
+    On Windows, run:
+
+    .. code-block:: doscon
+
+        ...\>runtests.py shortcuts
 
 Everything should pass. If it doesn't, make sure you correctly added the
 function to the correct file.
@@ -378,7 +440,7 @@ function to the correct file.
 Running Django's test suite for the second time
 ===============================================
 
-Once you've verified that your changes and test are working correctly, it's
+Once you've confirmed that your changes and test are working correctly, it's
 a good idea to run the entire Django test suite to verify that your change
 hasn't introduced any bugs into other areas of Django. While successfully
 passing the entire test suite doesn't guarantee your code is bug free, it does
@@ -391,10 +453,18 @@ directory and run:
 
     $ ./runtests.py
 
+.. admonition:: For Windows users
+
+    On Windows, run:
+
+    .. code-block:: doscon
+
+        ...\>runtests.py
+
 Writing Documentation
 =====================
 
-This is a new feature, so it should be documented. Open the file
+This is a new feature, so it needs documented. Open the file
 ``docs/topics/http/shortcuts.txt`` and add the following at the end of the
 file:
 
