@@ -987,6 +987,16 @@ class DiscoverRunner:
             with self.load_with_patterns():
                 tests = self.test_loader.loadTestsFromName(label)
             if tests.countTestCases():
+                test_cases = list(iter_test_cases(tests))
+                get_test_variations = getattr(
+                    type(test_cases[0]), "get_test_variations", None
+                )
+                if get_test_variations is not None:
+                    tests = self.test_suite(
+                        test_class(test._testMethodName)
+                        for test in test_cases
+                        for test_class in get_test_variations()
+                    )
                 return tests
         # Try discovery if "label" is a package or directory.
         is_importable, is_package = try_importing(label)
