@@ -7,6 +7,8 @@ from contextlib import contextmanager
 from importlib import import_module
 from unittest import TestSuite, TextTestRunner, defaultTestLoader, mock
 
+from playwright_tests.base import PlaywrightTestCase
+
 from django.db import connections
 from django.test import SimpleTestCase
 from django.test.runner import DiscoverRunner, get_max_test_processes
@@ -16,7 +18,6 @@ from django.test.utils import (
     captured_stderr,
     captured_stdout,
 )
-from playwright_tests.base import PlaywrightTestCase
 
 
 @contextmanager
