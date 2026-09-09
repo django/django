@@ -947,3 +947,70 @@ class TestValidatorEquality(TestCase):
             DomainNameValidator(message="custom error message"),
             DomainNameValidator(message="custom error message", code="custom_code"),
         )
+        self.assertEqual(DomainNameValidator(), mock.ANY)
+        self.assertNotEqual(
+            DomainNameValidator(accept_idna=True),
+            DomainNameValidator(accept_idna=False),
+        )
+
+    def test_url_validator_equality(self):
+        self.assertEqual(URLValidator(), URLValidator())
+        self.assertEqual(URLValidator(), mock.ANY)
+        self.assertNotEqual(
+            URLValidator(schemes=["http"]),
+            URLValidator(schemes=["ftp"]),
+        )
+        self.assertEqual(
+            URLValidator(schemes=["http", "https"]),
+            URLValidator(schemes=["https", "http"]),
+        )
+        self.assertNotEqual(URLValidator(), "invalid_type")
+
+    def test_step_value_validator_equality(self):
+        self.assertEqual(
+            StepValueValidator(2, offset=1),
+            StepValueValidator(2, offset=1),
+        )
+        self.assertEqual(StepValueValidator(2), StepValueValidator(2))
+        self.assertEqual(StepValueValidator(2), mock.ANY)
+        self.assertNotEqual(
+            StepValueValidator(2, offset=1),
+            StepValueValidator(2, offset=5),
+        )
+        self.assertNotEqual(
+            StepValueValidator(2),
+            StepValueValidator(2, offset=0),
+        )
+
+    def test_email_validator_regex_equality(self):
+        self.assertEqual(EmailValidator(), mock.ANY)
+        self.assertNotEqual(EmailValidator(), "not_a_validator")
+
+        validate_email_no_idna = EmailValidator()
+        validate_email_no_idna.hostname_re = DomainNameValidator.ascii_only_domain_re
+        validate_email_no_idna.domain_re = DomainNameValidator.ascii_only_domain_re
+        validate_email_no_idna.tld_no_fqdn_re = DomainNameValidator.ascii_only_tld_re
+        self.assertNotEqual(validate_email_no_idna, EmailValidator())
+
+        validate_email_custom = EmailValidator()
+        validate_email_custom.domain_regex = re.compile(r"^example\.com\Z")
+        self.assertNotEqual(validate_email_custom, EmailValidator())
+
+        validate_email_custom_user = EmailValidator()
+        validate_email_custom_user.user_regex = re.compile(r"^custom\Z")
+        self.assertNotEqual(validate_email_custom_user, EmailValidator())
+
+        validate_email_custom_literal = EmailValidator()
+        validate_email_custom_literal.literal_regex = re.compile(r"^\[custom\]\Z")
+        self.assertNotEqual(validate_email_custom_literal, EmailValidator())
+
+    def test_file_extension_validator_none_vs_empty(self):
+        self.assertEqual(FileExtensionValidator(), mock.ANY)
+        self.assertNotEqual(
+            FileExtensionValidator(None),
+            FileExtensionValidator([]),
+        )
+        self.assertNotEqual(
+            FileExtensionValidator([]),
+            FileExtensionValidator(None),
+        )

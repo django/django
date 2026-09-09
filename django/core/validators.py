@@ -55,9 +55,10 @@ class RegexValidator:
             raise ValidationError(self.message, code=self.code, params={"value": value})
 
     def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return (
-            isinstance(other, RegexValidator)
-            and self.regex.pattern == other.regex.pattern
+            self.regex.pattern == other.regex.pattern
             and self.regex.flags == other.regex.flags
             and (self.message == other.message)
             and (self.code == other.code)
@@ -121,6 +122,11 @@ class DomainNameValidator(RegexValidator):
         if not self.accept_idna and not value.isascii():
             raise ValidationError(self.message, code=self.code, params={"value": value})
         super().__call__(value)
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return super().__eq__(other) and (self.accept_idna == other.accept_idna)
 
 
 validate_domain_name = DomainNameValidator()
@@ -193,6 +199,11 @@ class URLValidator(RegexValidator):
         # that's used to indicate absolute names in DNS.
         if splitted_url.hostname is None or len(splitted_url.hostname) > 253:
             raise ValidationError(self.message, code=self.code, params={"value": value})
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return super().__eq__(other) and (set(self.schemes) == set(other.schemes))
 
 
 integer_validator = RegexValidator(
@@ -272,8 +283,18 @@ class EmailValidator:
         return False
 
     def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return (
-            isinstance(other, EmailValidator)
+            self.domain_regex.pattern == other.domain_regex.pattern
+            and self.domain_regex.flags == other.domain_regex.flags
+            and self.user_regex.pattern == other.user_regex.pattern
+            and self.user_regex.flags == other.user_regex.flags
+            and self.literal_regex.pattern == other.literal_regex.pattern
+            and self.literal_regex.flags == other.literal_regex.flags
+            and self.hostname_re == other.hostname_re
+            and self.domain_re == other.domain_re
+            and self.tld_no_fqdn_re == other.tld_no_fqdn_re
             and (set(self.domain_allowlist) == set(other.domain_allowlist))
             and (self.message == other.message)
             and (self.code == other.code)
@@ -466,6 +487,11 @@ class StepValueValidator(BaseValidator):
         offset = 0 if self.offset is None else self.offset
         return not math.isclose(math.remainder(a - offset, b), 0, abs_tol=1e-9)
 
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return super().__eq__(other) and self.offset == other.offset
+
 
 @deconstructible
 class MinLengthValidator(BaseValidator):
@@ -584,9 +610,10 @@ class DecimalValidator:
             )
 
     def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return (
-            isinstance(other, self.__class__)
-            and self.max_digits == other.max_digits
+            self.max_digits == other.max_digits
             and self.decimal_places == other.decimal_places
         )
 
@@ -627,10 +654,15 @@ class FileExtensionValidator:
             )
 
     def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        allowed_extensions_equal = (
+            self.allowed_extensions == other.allowed_extensions
+            if self.allowed_extensions is None or other.allowed_extensions is None
+            else set(self.allowed_extensions) == set(other.allowed_extensions)
+        )
         return (
-            isinstance(other, self.__class__)
-            and set(self.allowed_extensions or [])
-            == set(other.allowed_extensions or [])
+            allowed_extensions_equal
             and self.message == other.message
             and self.code == other.code
         )
@@ -670,8 +702,6 @@ class ProhibitNullCharactersValidator:
             raise ValidationError(self.message, code=self.code, params={"value": value})
 
     def __eq__(self, other):
-        return (
-            isinstance(other, self.__class__)
-            and self.message == other.message
-            and self.code == other.code
-        )
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.message == other.message and self.code == other.code
