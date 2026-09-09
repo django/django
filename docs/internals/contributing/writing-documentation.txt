@@ -322,6 +322,76 @@ cases, we do not want to update a "redirected" link, e.g. a rewrite to always
 point to the latest or stable version of the documentation, e.g.
 ``/en/stable/`` → ``/en/3.2/``.
 
+.. _documentation-voice:
+
+Voice
+=====
+
+We value the human voice in Django's documentation, in which the reader can
+have the experience of one person addressing another.
+
+The Django documentation is successful because it contains human rhythms and
+patterns. It speaks in the way an expert would speak to help a fellow
+developer. It expresses things in lively and imaginative ways. It's systematic
+but not mechanical.
+
+The documentation doesn't erase the personality of its authors or smooth
+everything into a slippery, dull surface. Some friction is necessary for a
+reader to grasp a concept.
+
+The documentation should not reach for grandiose but empty descriptions: for
+example, by overusing superlatives such as *clear*, *robust*, or *structured*.
+
+To make this more concrete, we present the same information in two versions:
+human and frictionless. The "human" example is excerpted from this
+documentation. The "frictionless" version was produced by prompting an AI tool
+for a version "suitable for a pull request (smooth and professional)":
+
+.. admonition:: Human version (excerpted from Django's documentation)
+
+  How Django knows to UPDATE vs. INSERT
+
+  You may have noticed Django database objects use the same ``save()`` method
+  for creating and changing objects. Django abstracts the need to use
+  ``INSERT`` or ``UPDATE`` SQL statements. Specifically, when you call
+  ``save()`` and the object's primary key attribute does **not** define a
+  :attr:`~django.db.models.Field.default` or
+  :attr:`~django.db.models.Field.db_default`, Django follows this algorithm:
+  ...
+
+  The one gotcha here is that you should be careful not to specify a
+  primary-key value explicitly when saving new objects, if you cannot guarantee
+  the primary-key value is unused.
+
+.. admonition:: Frictionless version
+
+  How Django determines UPDATE vs. INSERT
+
+  Django model instances use a single method, ``save()``, for both creating and
+  updating records. Internally, Django determines whether to issue an
+  ``INSERT`` or ``UPDATE`` SQL statement based on the state of the model
+  instance and its primary key.
+
+  When calling ``save()``, Django follows this general logic: ...
+
+  One important caveat is to avoid explicitly assigning a primary key value
+  when creating new objects unless you can guarantee that the value is unique.
+  Providing a conflicting primary key may lead to unexpected behavior or
+  database errors.
+
+Notice how the revision does not address the reader (originally: "you may have
+noticed"). Notice the deleted figurative language (originally: "Django knows")
+and a deleted technical term appropriate for the context (originally:
+"algorithm"). Notice how a self-evident point is belabored (revised: "may lead
+to unexpected behavior or database errors"). Finally, notice how the original
+version poses a problem (an abstraction is provided: how?), whereas the revised
+version merely summarizes ("Django determines ... based on the state of ..."),
+impairing the sense that the design was intentional.
+
+Without a doubt, a different prompt would produce a different, perhaps improved
+result. Still, we include this example to illustrate how easily the
+documentation can be undermined when attention is not given to voice.
+
 Writing style
 =============
 
