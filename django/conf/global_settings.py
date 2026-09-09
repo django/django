@@ -67,6 +67,7 @@ LANGUAGES = [
     ("cy", gettext_noop("Welsh")),
     ("da", gettext_noop("Danish")),
     ("de", gettext_noop("German")),
+    ("de-ch", gettext_noop("Swiss German")),
     ("dsb", gettext_noop("Lower Sorbian")),
     ("el", gettext_noop("Greek")),
     ("en", gettext_noop("English")),
