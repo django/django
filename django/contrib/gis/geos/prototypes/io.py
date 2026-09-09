@@ -154,6 +154,29 @@ class IOBase(GEOSBase):
 # geometries does. (Oracle and MariaDB don't support nesting.)
 MAX_GEOM_COLLECTIONS = 198
 
+
+def geos_has_geometry_collection_limit():
+    return geos_version_tuple() >= (3, 15)
+
+
+GEOS_HAS_GEOMETRY_COLLECTION_LIMIT = SimpleLazyObject(
+    geos_has_geometry_collection_limit
+)
+
+
+def _get_max_geom_collections(max_geom_collections):
+    """
+    Return the collection limit applicable to the installed GEOS version.
+
+    GEOS 3.15 and later provide built-in protection against deeply nested
+    geometry collections. See:
+    https://github.com/libgeos/geos/commit/8b8b3da7a3d9fb8953ff60bc49aa0320d51ae45c
+    """
+    if GEOS_HAS_GEOMETRY_COLLECTION_LIMIT:
+        return None
+    return max_geom_collections
+
+
 # GEOS accepts any amount of whitespace around the optional dimension marker,
 # so the separators must be \s*, not \s? or \s+. The root variants also allow
 # leading whitespace, which GEOS skips before the geometry type.
@@ -249,6 +272,7 @@ class _WKTReader(IOBase):
     def read(self, wkt, max_geom_collections=MAX_GEOM_COLLECTIONS):
         if not isinstance(wkt, (bytes, str)):
             raise TypeError(f"'wkt' must be bytes or str (got {wkt!r} instead).")
+        max_geom_collections = _get_max_geom_collections(max_geom_collections)
         self.limit(wkt, max_geom_collections)
         return wkt_reader_read(self.ptr, force_bytes(wkt))
 
@@ -311,9 +335,8 @@ class _WKBReader(IOBase):
                 f"'wkb' must be bytes, str or memoryview (got {wkb!r} instead)."
             )
 
-        # Limit nested geometry collections. Should become unnecessary when
-        # GEOS 3.15.0 is the minimum supported version. See:
-        # https://github.com/libgeos/geos/commit/8b8b3da7a3d9fb8953ff60bc49aa0320d51ae45c
+        # Limit nested geometry collections.
+        max_geom_collections = _get_max_geom_collections(max_geom_collections)
         limiter(wkb, max_geom_collections)
         return reader(self.ptr, wkb, len(wkb))
 

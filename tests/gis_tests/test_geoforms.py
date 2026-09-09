@@ -1,8 +1,10 @@
 import re
+from unittest import skipIf, skipUnless
 
 from django.contrib.gis import forms
 from django.contrib.gis.forms import BaseGeometryWidget, OpenLayersWidget
 from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos.libgeos import geos_version_tuple
 from django.contrib.gis.geos.prototypes.io import MAX_GEOM_COLLECTIONS
 from django.core.exceptions import ValidationError
 from django.template.defaultfilters import json_script
@@ -52,10 +54,16 @@ class GeometryFieldTest(SimpleTestCase):
         self.assertEqual(fld.widget.max_geom_collections, MAX_GEOM_COLLECTIONS)
 
     def test_max_geom_collections_override(self):
-        """A per-field limit is enforced when cleaning nested collections."""
         fld = forms.GeometryField(max_geom_collections=5)
-        # The override is propagated to the widget that does the parsing.
+        self.assertEqual(fld.max_geom_collections, 5)
         self.assertEqual(fld.widget.max_geom_collections, 5)
+
+    @skipIf(
+        geos_version_tuple() >= (3, 15),
+        "GEOS 3.15+ ignores max_geom_collections.",
+    )
+    def test_max_geom_collections_override_enforced(self):
+        fld = forms.GeometryField(max_geom_collections=5)
 
         def make_geom(depth):
             return "GEOMETRYCOLLECTION(" * depth + "POINT(0 0)" + ")" * depth
@@ -64,6 +72,10 @@ class GeometryFieldTest(SimpleTestCase):
             fld.clean(make_geom(6))
         self.assertIsNotNone(fld.clean(make_geom(5)))
 
+    @skipIf(
+        geos_version_tuple() >= (3, 15),
+        "GEOS 3.15+ ignores max_geom_collections.",
+    )
     def test_max_geom_collections_widget_without_deserialize(self):
         # A widget without deserialize() (e.g. TextInput) uses to_python's
         # fallback, which still applies the field's limit.
@@ -76,6 +88,10 @@ class GeometryFieldTest(SimpleTestCase):
             fld.clean(make_geom(6))
         self.assertIsNotNone(fld.clean(make_geom(5)))
 
+    @skipIf(
+        geos_version_tuple() >= (3, 15),
+        "GEOS 3.15+ ignores max_geom_collections.",
+    )
     def test_max_geom_collections_custom_widget_uses_default(self):
         # A custom widget overriding deserialize() and ignoring the field's
         # max_geom_collections still gets the default limit via GEOSGeometry.
@@ -93,6 +109,21 @@ class GeometryFieldTest(SimpleTestCase):
         # ...but the default (198) still guards against deeper input.
         with self.assertRaises(ValueError):
             fld.clean(make_geom(MAX_GEOM_COLLECTIONS + 1))
+
+    @skipUnless(
+        geos_version_tuple() >= (3, 15),
+        "GEOS 3.15+ is required.",
+    )
+    def test_max_geom_collections_ignored(self):
+        geom = "GEOMETRYCOLLECTION(" * 6 + "POINT(0 0)" + ")" * 6
+
+        for widget in OpenLayersWidget, forms.TextInput:
+            with self.subTest(widget=widget):
+                field = forms.GeometryField(
+                    max_geom_collections=5,
+                    widget=widget,
+                )
+                self.assertIsNotNone(field.clean(geom))
 
     def test_null(self):
         "Testing GeometryField's handling of null (None) geometries."

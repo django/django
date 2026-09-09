@@ -1,9 +1,10 @@
 import copy
-from unittest import mock
+from unittest import mock, skipIf
 
 from django.contrib.gis.db.models import GeometryField
 from django.contrib.gis.db.models.fields import BaseSpatialField
 from django.contrib.gis.db.models.sql import AreaField, DistanceField
+from django.contrib.gis.geos.libgeos import geos_version_tuple
 from django.test import SimpleTestCase
 
 
@@ -71,6 +72,10 @@ class GeometryFieldTests(SimpleTestCase):
         field = GeometryField(max_geom_collections=128)
         self.assertEqual(field.formfield().max_geom_collections, 128)
 
+    @skipIf(
+        geos_version_tuple() >= (3, 15),
+        "GEOS 3.15+ ignores max_geom_collections.",
+    )
     def test_get_prep_value_without_max_geom_collections_uses_default(self):
         # A spatial field that is not RASTER nor defines max_geom_collections
         # still applies the default limit when preparing a lookup value.

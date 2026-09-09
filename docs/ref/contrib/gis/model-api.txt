@@ -235,6 +235,13 @@ WKB/WKT inputs before raising :exc:`ValueError`. Since spatial field
 assignments are lazy, it is also checked when values are accessed, e.g. when
 saving an instance, but not when read from a database. It defaults to ``198``.
 
+On GEOS 3.15 and later, this option is ignored because GEOS provides built-in
+protection against deeply nested geometry collections.
+
+.. versionchanged:: 6.2
+
+    ``max_geom_collections`` is now ignored when using GEOS 3.15 or later.
+
 .. _geography-type:
 
 Geography Type
