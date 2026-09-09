@@ -339,6 +339,14 @@ LANG_INFO = {
         "name": "Khmer",
         "name_local": "Khmer",
     },
+
+    'de_CH': {
+    'bidi': False,
+    'code': 'de_CH',
+    'name': 'Swiss German',
+    'name_local': 'Schwiizerdütsch',
+    'script': 'Latn',
+     },
     "kn": {
         "bidi": False,
         "code": "kn",
