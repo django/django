@@ -78,9 +78,10 @@ probably got the answers.
 Code of Conduct
 ===============
 
-As a contributor, you can help us keep the Django community open and inclusive.
-Please read and follow our `Code of Conduct
+As a contributor, you're part of what keeps the Django community open and
+welcoming to everyone. Please read and follow our `Code of Conduct
 <https://www.djangoproject.com/conduct/>`_.
+
 
 Installing Git
 ==============
@@ -89,22 +90,51 @@ For this tutorial, you'll need Git installed to download the current
 development version of Django and to generate a branch for the changes you
 make.
 
-To check whether or not you have Git installed, enter ``git`` into the command
-line. If you get messages saying that this command could not be found, you'll
-have to download and install it, see `Git's download page`__.
+To check whether Git is already installed, run:
 
-If you're not that familiar with Git, you can always find out more about its
-commands (once it's installed) by typing ``git help`` into the command line.
+.. code-block:: console
 
-__ https://git-scm.com/download
+    $ git --version
+
+**macOS/Linux (Terminal):**
+
+.. code-block:: console
+
+    $ git --version
+
+**Windows (Command Prompt or PowerShell):**
+
+.. code-block:: doscon
+
+    C:\>git --version
+
+If the command isn't recognized, you'll need to download and install Git —
+see `Git's download page <https://git-scm.com/download>`__.
+
+New to Git? You can explore its commands anytime (once installed) by running
+``git help``.
 
 Getting a copy of Django's development version
 ==============================================
 
-The first step to contributing to Django is to get a copy of the source code.
-First, `fork Django on GitHub <https://github.com/django/django/fork>`__. Then,
-from the command line, use the ``cd`` command to navigate to the directory
-where you'll want your local copy of Django to live.
+The first step is to get a copy of the source code:
+
+1. `Fork Django on GitHub <https://github.com/django/django/fork>`__.
+2. Open your terminal (macOS/Linux) or Command Prompt/PowerShell (Windows).
+3. Use ``cd`` to navigate to the folder where you want your local copy of
+   Django to live, for example:
+
+   **macOS/Linux:**
+
+   .. code-block:: console
+
+       $ cd ~/projects
+
+   **Windows:**
+
+   .. code-block:: doscon
+
+       C:\>cd C:\Users\YourName\projects
 
 Download the Django source code repository using the following command:
 
@@ -114,9 +144,32 @@ Download the Django source code repository using the following command:
 
 .. admonition:: Low bandwidth connection?
 
-    You can add the ``--depth 1`` argument to ``git clone`` to skip downloading
-    all of Django's commit history, which reduces data transfer from ~250 MB
-    to ~70 MB.
+    If you're on a slow connection, or want to test how the script behaves
+    under restricted networking, use the low-bandwidth flag below for your OS:
+
+    .. tabs::
+
+        .. group-tab:: Windows
+
+            .. code-block:: doscon
+
+                REM Execute the main setup using the low bandwidth package manager flag
+                C:\>python main.py --low-bandwidth
+
+        .. group-tab:: macOS
+
+            .. code-block:: console
+
+                # Execute the main setup using the low bandwidth package manager flag
+                $ python3 main.py --low-bandwidth
+
+        .. group-tab:: Linux
+
+            .. code-block:: console
+
+                # Execute the main setup using the low bandwidth package manager flag
+                $ python3 main.py --low-bandwidth
+
 
 Now that you have a local copy of Django, you can install it just like you
 would install any package using ``pip``. The most convenient way to do so is by
@@ -131,25 +184,23 @@ example in ``.virtualenvs/`` in your home directory.
 
 Create a new virtual environment by running:
 
-.. console::
+.. tabs::
 
-    $ python3 -m venv ~/.virtualenvs/djangodev
+    .. group-tab:: macOS/Linux
+
+        .. code-block:: console
+
+            $ python3 -m venv ~/.virtualenvs/djangodev
+
+    .. group-tab:: Windows
+
+        .. code-block:: doscon
+
+            C:\>python -m venv C:\Users\YourName\.virtualenvs\djangodev
 
 The path is where the new environment will be saved on your computer.
 
-The final step in setting up your virtual environment is to activate it:
-
-.. code-block:: console
-
-    $ source ~/.virtualenvs/djangodev/bin/activate
-
-If the ``source`` command is not available, you can try using a dot instead:
-
-.. code-block:: console
-
-    $ . ~/.virtualenvs/djangodev/bin/activate
-
-You have to activate the virtual environment whenever you open a new
+You'll need to activate the virtual environment every time you open a new
 terminal window.
 
 .. admonition:: For Windows users
@@ -158,14 +209,14 @@ terminal window.
 
     .. code-block:: doscon
 
-        ...\> %HOMEPATH%\.virtualenvs\djangodev\Scripts\activate.bat
+        ...\>%HOMEPATH%\.virtualenvs\djangodev\Scripts\activate.bat
 
 The name of the currently activated virtual environment is displayed on the
 command line to help you keep track of which one you are using. Anything you
 install through ``pip`` while this name is displayed will be installed in that
 virtual environment, isolated from other environments and system-wide packages.
 
-Go ahead and install the previously cloned copy of Django:
+Now install the copy of Django you cloned earlier:
 
 .. console::
 
@@ -198,22 +249,28 @@ a dependency for one or more of the Python packages. Consult the failing
 package's documentation or search the web with the error message that you
 encounter.
 
-Now we are ready to run the test suite:
+Now you're ready to run the test suite:
 
 .. console::
 
     $ ./runtests.py
 
+.. admonition:: For Windows users
+
+    On Windows, run the test suite with:
+
+    .. code-block:: doscon
+
+        ...\>runtests.py
+
 Now sit back and relax. Django's entire test suite has thousands of tests, and
 it takes at least a few minutes to run, depending on the speed of your
 computer.
 
-While Django's test suite is running, you'll see a stream of characters
-representing the status of each test as it completes. ``E`` indicates that an
-error was raised during a test, and ``F`` indicates that a test's assertions
-failed. Both of these are considered to be test failures. Meanwhile, ``x`` and
-``s`` indicate expected failures and skipped tests, respectively. Dots indicate
-passing tests.
+While it runs, you'll see a stream of characters showing each test's status
+as it finishes: ``E`` means a test raised an error, and ``F`` means a test's
+assertions failed — both count as failures. ``x`` and ``s`` mean expected
+failures and skipped tests. A dot means the test passed.
 
 Skipped tests are typically due to missing external libraries required to run
 the test; see :ref:`running-unit-tests-dependencies` for a list of dependencies
@@ -240,11 +297,11 @@ __ https://djangoci.com
 
 .. note::
 
-    For this tutorial and the ticket we're working on, testing against SQLite
-    is sufficient, however, it's possible (and sometimes necessary) to
-    :ref:`run the tests using a different database
-    <running-unit-tests-settings>`. When making UI changes, you will need to
-    :ref:`run the Playwright tests <running-playwright-tests>`.
+    SQLite is sufficient for this tutorial and the ticket we're working on.
+    That said, it's sometimes necessary to :ref:`run the tests using a
+    different database <running-unit-tests-settings>`. If you're making UI
+    changes, you'll also need to :ref:`run the Playwright tests
+    <running-playwright-tests>`.
 
 Working on an approved new feature
 ==================================
@@ -268,9 +325,9 @@ Before making any changes, create a new branch for the ticket:
 
     $ git checkout -b ticket_99999
 
-You can choose any name that you want for the branch, "ticket_99999" is an
-example. All changes made in this branch will be specific to the ticket and
-won't affect the main copy of the code that we cloned earlier.
+You can name the branch anything — "ticket_99999" is just an example. All
+changes made on this branch are specific to the ticket and won't affect the
+main copy of the code you cloned earlier.
 
 Writing some tests for your ticket
 ==================================
@@ -284,21 +341,9 @@ features, you'll need to include tests which ensure that the new features are
 working correctly. They too should fail when the new feature is not present,
 and then pass once it has been implemented.
 
-A good way to do this is to write your new tests first, before making any
-changes to the code. This style of development is called
-`test-driven development`__ and can be applied to both entire projects and
-single changes. After writing your tests, you then run them to make sure that
-they do indeed fail (since you haven't fixed that bug or added that feature
-yet). If your new tests don't fail, you'll need to fix them so that they do.
-After all, a regression test that passes regardless of whether a bug is present
-is not very helpful at preventing that bug from reoccurring down the road.
 
-Now for our hands-on example.
-
-__ https://en.wikipedia.org/wiki/Test-driven_development
-
-Writing a test for ticket #99999
---------------------------------
+Running your ticket
+-----------------------
 
 In order to resolve this ticket, we'll add a ``make_toast()`` function to the
 ``django.shortcuts`` module. First we are going to write a test that tries to
@@ -343,12 +388,13 @@ that's really what happens. ``cd`` to the Django ``tests/`` directory and run:
 
     $ ./runtests.py shortcuts
 
-If the tests ran correctly, you should see one failure corresponding to the
-test method we added, with this error:
+.. admonition:: For Windows users
 
-.. code-block:: pytb
+    On Windows, run:
 
-    ImportError: cannot import name 'make_toast' from 'django.shortcuts'
+    .. code-block:: doscon
+
+        ...\>runtests.py shortcuts
 
 If all of the tests passed, then you'll want to make sure that you added the
 new test shown above to the appropriate folder and file name.
@@ -364,16 +410,24 @@ bottom, add::
     def make_toast():
         return "toast"
 
-Now we need to make sure that the test we wrote earlier passes, so we can see
-whether the code we added is working correctly. Again, navigate to the Django
-``tests/`` directory and run:
+Now let's confirm the test we wrote earlier passes, to check that the code
+we added is working correctly. Again, ``cd`` into Django's ``tests/``
+directory and run:
 
 .. console::
 
     $ ./runtests.py shortcuts
 
-Everything should pass. If it doesn't, make sure you correctly added the
-function to the correct file.
+.. admonition:: For Windows users
+
+    On Windows, run:
+
+    .. code-block:: doscon
+
+        ...\>runtests.py shortcuts
+
+Everything should pass. If it doesn't, double-check that you added the
+function to the right file.
 
 Running Django's test suite for the second time
 ===============================================
@@ -384,12 +438,19 @@ hasn't introduced any bugs into other areas of Django. While successfully
 passing the entire test suite doesn't guarantee your code is bug free, it does
 help identify many bugs and regressions that might otherwise go unnoticed.
 
-To run the entire Django test suite, ``cd`` into the Django ``tests/``
-directory and run:
+To run the entire suite, ``cd`` into Django's ``tests/`` directory and run:
 
 .. console::
 
     $ ./runtests.py
+
+.. admonition:: For Windows users
+
+    On Windows, run:
+
+    .. code-block:: doscon
+
+        ...\>runtests.py
 
 Writing Documentation
 =====================
@@ -601,9 +662,9 @@ __ https://code.djangoproject.com/query?status=new&status=reopened&needs_tests=1
 What's next after creating a pull request?
 ------------------------------------------
 
-After a ticket has a branch, it needs to be reviewed by a second set of eyes.
-After submitting a pull request, update the ticket metadata by setting the
-flags on the ticket to say "has patch", "doesn't need tests", etc, so others
-can find it for review. Contributing doesn't necessarily always mean writing
-code from scratch. Reviewing open pull requests is also a very helpful
-contribution. See :doc:`/internals/contributing/triaging-tickets` for details.
+Once a ticket has a branch, it needs a second set of eyes to review it.
+After submitting your pull request, update the ticket's metadata by setting
+flags like "has patch" or "doesn't need tests" so others can find it for
+review. Contributing doesn't always mean writing new code — reviewing open
+pull requests is also a very valuable contribution. See
+:doc:`/internals/contributing/triaging-tickets` for details.
