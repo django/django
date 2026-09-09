@@ -353,6 +353,13 @@ class GeometryField(BaseSpatialField):
             return compiler.connection.ops.select % sql, params
         return sql, params
 
+    def from_db_value(self, value, expression, connection):
+        if value is None:
+            return value
+        if isinstance(value, GEOSGeometry):
+            return value
+        return GEOSGeometry(value)
+
 
 # The OpenGIS Geometry Type Fields
 class PointField(GeometryField):
