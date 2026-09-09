@@ -6753,6 +6753,34 @@ class PlaywrightTests(AdminPlaywrightTestCase):
         self.expect(self.page.locator("#id_title")).to_be_visible()
         self.take_screenshot("expanded")
 
+    @screenshot_cases(["desktop_size", "mobile_size", "dark", "high_contrast"])
+    def test_collapsible_open_fieldset(self):
+        """
+        The 'collapse-open' class in fieldsets definition allows showing
+        on load the appropriate field section.
+        """
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_views_article_add")
+        )
+        self.assertTrue(
+            self.selenium.find_element(
+                By.ID, "id_collapsible_open_field"
+            ).is_displayed()
+        )
+        self.take_screenshot("collapsible-open-expanded")
+        self.selenium.find_elements(By.TAG_NAME, "summary")[1].click()
+        self.assertFalse(
+            self.selenium.find_element(
+                By.ID, "id_collapsible_open_field"
+            ).is_displayed()
+        )
+        self.take_screenshot("collapsible-open-collapsed")
+
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_selectbox_height_collapsible_fieldset(self):
         self.admin_login(

@@ -1,6 +1,6 @@
 <fieldset class="module aligned {{ fieldset.classes }}"{% if fieldset.name %} aria-labelledby="{{ prefix }}-{{ id_prefix}}-{{ id_suffix }}-heading"{% endif %}>
     {% if fieldset.name %}
-        {% if fieldset.is_collapsible %}<details><summary>{% endif %}
+        {% if fieldset.is_collapsible %}<details {% if 'collapse-open' in fieldset.classes %}open{% endif %}><summary>{% endif %}
         <h{{ heading_level|default:2 }} id="{{ prefix }}-{{ id_prefix}}-{{ id_suffix }}-heading" class="fieldset-heading">{{ fieldset.name }}</h{{ heading_level|default:2 }}>
         {% if fieldset.is_collapsible %}</summary>{% endif %}
     {% endif %}
