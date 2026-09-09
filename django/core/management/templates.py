@@ -271,8 +271,8 @@ class TemplateCommand(BaseCommand):
                     if size_in_mb > self.max_template_size_mb:
                         raise CommandError(
                             "%s template %s extracts to %.1f MB, more than the "
-                            "%s MB limit. Pass --no-size-limit to extract it "
-                            "anyway."
+                            "%s MB limit. Pass --no-size-limit for a large "
+                            "template you trust."
                             % (
                                 self.app_or_project,
                                 template,

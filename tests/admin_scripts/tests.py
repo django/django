@@ -2626,7 +2626,8 @@ class TemplateSizeLimit(AdminScriptTestCase):
     def test_project_template_over_limit(self, mocked_get_size):
         msg = (
             "project template %s extracts to 60.0 MB, more than the 50 MB "
-            "limit. Pass --no-size-limit to extract it anyway." % self.template_path
+            "limit. Pass --no-size-limit for a large template you trust."
+            % self.template_path
         )
         with self.assertRaisesMessage(CommandError, msg):
             self.start("startproject", "sized_project")
