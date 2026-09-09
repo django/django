@@ -1386,12 +1386,15 @@ class Model(AltersData, metaclass=ModelBase):
             order = "_order" if is_next else "-_order"
             order_field = self._meta.order_with_respect_to
             filter_args = order_field.get_filter_kwargs_for_object(self)
+            manager = self.__class__._default_manager.db_manager(
+                hints={"instance": self}
+            )
             obj = (
-                self.__class__._default_manager.filter(**filter_args)
+                manager.filter(**filter_args)
                 .filter(
                     **{
                         "_order__%s"
-                        % op: self.__class__._default_manager.values("_order").filter(
+                        % op: manager.values("_order").filter(
                             **{self._meta.pk.name: self.pk}
                         )
                     }
