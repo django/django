@@ -1777,6 +1777,17 @@ class MigrationAutodetector:
                                     self.to_state,
                                 )
                             )
+                        # Fields added in the same migration must be created
+                        # before they can be used in the constraint.
+                        if (app_label, model_name, field_name) in self.new_field_keys:
+                            dependencies.append(
+                                OperationDependency(
+                                    app_label,
+                                    model_name,
+                                    field_name,
+                                    OperationDependency.Type.CREATE,
+                                )
+                            )
                 yield (
                     old_value,
                     new_value,
