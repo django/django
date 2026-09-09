@@ -19,6 +19,16 @@ documentation</ref/class-based-views/index>`.
    generic-editing
    mixins
 
+.. admonition:: There are community-maintained solutions!
+
+    Django has a vibrant ecosystem. There are generic view extensions
+    highlighted on the `Community Ecosystem`_ page that build on Django's
+    class-based views. The Django Packages `Class Based Views grid`_ has
+    even more options for you!
+
+.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#forms-views
+.. _Class Based Views grid: https://djangopackages.org/grids/g/cbv/
+
 Basic examples
 ==============
 

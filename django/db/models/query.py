@@ -47,8 +47,8 @@ from django.db.models.utils import (
 )
 from django.utils import timezone
 from django.utils.deprecation import (
-    RemovedInDjango70Warning,
-    RemovedInDjango71Warning,
+    RemovedInDjango2028Warning,
+    RemovedInDjango2029Warning,
     warn_about_external_use,
 )
 from django.utils.functional import cached_property
@@ -64,7 +64,7 @@ REPR_OUTPUT_SIZE = 20
 DEFAULT_FETCH_MODE = FETCH_ONE
 
 
-# RemovedInDjango70Warning: When the deprecation ends, remove this function
+# RemovedInDjango2028Warning: When the deprecation ends, remove this function
 # and restore direct model_cls.from_db(..., fetch_mode=fetch_mode) calls at
 # its call sites.
 def _get_from_db(model_cls, fetch_mode):
@@ -86,7 +86,7 @@ def _get_from_db(model_cls, fetch_mode):
         f"{model_cls.__qualname__}.from_db() must accept a fetch_mode keyword "
         "argument. Support for from_db() methods that do not accept it is "
         "deprecated.",
-        RemovedInDjango70Warning,
+        RemovedInDjango2028Warning,
         skip_file_prefixes=django_file_prefixes(),
     )
     return from_db
@@ -152,7 +152,7 @@ class ModelIterable(BaseIterable):
         init_list = [
             f[0].target.attname for f in select[model_fields_start:model_fields_end]
         ]
-        # RemovedInDjango70Warning: When the deprecation ends, remove this
+        # RemovedInDjango2028Warning: When the deprecation ends, remove this
         # assignment and call model_cls.from_db(..., fetch_mode=fetch_mode)
         # directly in the loop below.
         from_db = _get_from_db(model_cls, fetch_mode)
@@ -245,7 +245,7 @@ class RawModelIterable(BaseIterable):
                     query_iterator, cols
                 )
             fetch_mode = self.queryset._fetch_mode
-            # RemovedInDjango70Warning: When the deprecation ends, remove
+            # RemovedInDjango2028Warning: When the deprecation ends, remove
             # this assignment and call
             # model_cls.from_db(..., fetch_mode=fetch_mode) directly in the
             # loop below.
@@ -632,7 +632,7 @@ class QuerySet(AltersData):
         """
         if chunk_size is None:
             if self._prefetch_related_lookups:
-                # RemovedInDjango71Warning: Replace the warning with:
+                # RemovedInDjango2029Warning: Replace the warning with:
                 # raise ValueError(
                 #     "chunk_size must be provided when using "
                 #     "QuerySet.aiterator() after prefetch_related()."
@@ -640,11 +640,11 @@ class QuerySet(AltersData):
                 warnings.warn(
                     "Using QuerySet.aiterator() after prefetch_related() without "
                     "providing a chunk_size is deprecated and will raise a "
-                    "ValueError in Django 7.1.",
-                    category=RemovedInDjango71Warning,
+                    "ValueError in Django 2029.",
+                    category=RemovedInDjango2029Warning,
                     skip_file_prefixes=django_file_prefixes(),
                 )
-                # RemovedInDjango71Warning: When the deprecation ends, remove.
+                # RemovedInDjango2029Warning: Remove when the deprecation ends.
                 chunk_size = 2000
         elif chunk_size <= 0:
             raise ValueError("Chunk size must be strictly positive.")
@@ -1303,13 +1303,22 @@ class QuerySet(AltersData):
         def get_obj(obj):
             return obj
 
+        selected_fields = tuple(
+            self.query.selected
+            or (
+                *self.query.extra_select,
+                *self.query.values_select,
+                *self.query.annotation_select,
+            )
+        )
+
         if issubclass(self._iterable_class, ModelIterable):
             # Raise an AttributeError if field_name is deferred.
             get_key = operator.attrgetter(field_name)
 
         elif issubclass(self._iterable_class, ValuesIterable):
             if field_name not in self.query.values_select:
-                qs = qs.values(field_name, *self.query.values_select)
+                qs = qs.values(field_name, *selected_fields)
 
                 def get_obj(obj):  # noqa: F811
                     # We can safely mutate the dictionaries returned by
@@ -1322,16 +1331,16 @@ class QuerySet(AltersData):
 
         elif issubclass(self._iterable_class, ValuesListIterable):
             try:
-                field_index = self.query.values_select.index(field_name)
+                field_index = selected_fields.index(field_name)
             except ValueError:
-                # field_name is missing from values_select, so add it.
+                # field_name isn't selected, so add it.
                 field_index = 0
                 if issubclass(self._iterable_class, NamedValuesListIterable):
                     kwargs = {"named": True}
                 else:
                     kwargs = {}
                     get_obj = operator.itemgetter(slice(1, None))
-                qs = qs.values_list(field_name, *self.query.values_select, **kwargs)
+                qs = qs.values_list(field_name, *selected_fields, **kwargs)
 
             get_key = operator.itemgetter(field_index)
 
@@ -1341,7 +1350,7 @@ class QuerySet(AltersData):
                 get_key = get_obj
             else:
                 # Transform it back into a non-flat values_list().
-                qs = qs.values_list(field_name, *self.query.values_select)
+                qs = qs.values_list(field_name, *selected_fields)
                 get_key = operator.itemgetter(0)
                 get_obj = operator.itemgetter(1)
 
@@ -1565,10 +1574,10 @@ class QuerySet(AltersData):
     def _values(self, *fields, **expressions):
         clone = self._chain()
         if expressions:
-            # RemovedInDjango70Warning: When the deprecation ends, deindent as:
+            # RemovedInDjango2028Warning: When the deprecation ends, deindent:
             # clone = clone.annotate(**expressions)
             with warnings.catch_warnings(
-                action="ignore", category=RemovedInDjango70Warning
+                action="ignore", category=RemovedInDjango2028Warning
             ):
                 clone = clone.annotate(**expressions)
         clone._fields = fields
@@ -1591,8 +1600,8 @@ class QuerySet(AltersData):
                     "field."
                 )
             elif not fields:
-                # RemovedInDjango70Warning: When the deprecation ends, replace
-                # with:
+                # RemovedInDjango2028Warning: When the deprecation ends,
+                # replace with:
                 # raise TypeError(
                 #     "'flat' is not valid when values_list is called with no "
                 #     "fields."
@@ -1601,7 +1610,7 @@ class QuerySet(AltersData):
                     "Calling values_list() with no field name and flat=True "
                     "is deprecated. Pass an explicit field name instead, like "
                     "'pk'.",
-                    RemovedInDjango70Warning,
+                    RemovedInDjango2028Warning,
                 )
                 fields = [self.model._meta.concrete_fields[0].attname]
 
@@ -1841,12 +1850,12 @@ class QuerySet(AltersData):
         elif fields:
             obj.query.add_select_related(fields)
         else:
-            # RemovedInDjango70Warning: when the deprecation ends, raise a
+            # RemovedInDjango2028Warning: when the deprecation ends, raise a
             # TypeError instead.
             warn_about_external_use(
                 "Calling select_related() with no arguments is deprecated. "
                 "Specify the fields to fetch instead.",
-                category=RemovedInDjango70Warning,
+                category=RemovedInDjango2028Warning,
                 skip_name_prefixes=("django.db.models",),
             )
             obj.query.select_related = True
@@ -3079,7 +3088,7 @@ class RelatedPopulator:
             )
 
         self.model_cls = klass_info["model"]
-        # RemovedInDjango70Warning: When the deprecation ends, remove this
+        # RemovedInDjango2028Warning: When the deprecation ends, remove this
         # assignment and call
         # self.model_cls.from_db(..., fetch_mode=fetch_mode) directly in
         # populate().

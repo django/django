@@ -267,6 +267,22 @@ document protected by COOP opens a cross-origin popup window, the popup’s
 attacks. See :ref:`the cross-origin opener policy section of the security
 middleware reference <cross-origin-opener-policy>` for details.
 
+Cross-origin resource sharing (CORS)
+====================================
+
+Cross-Origin Resource Sharing (CORS) controls which origins are permitted to
+access resources from your site via the browser. Django does not include
+built-in support for CORS headers.
+
+.. admonition:: There are community-maintained solutions!
+
+    Django has a vibrant ecosystem. There are CORS and middleware solutions
+    highlighted on the `Community Ecosystem`_ page. The Django Packages
+    `Security grid`_ has even more options for you!
+
+.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#security-middleware
+.. _Security grid: https://djangopackages.org/grids/g/security/
+
 Session security
 ================
 

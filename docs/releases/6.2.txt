@@ -31,6 +31,17 @@ only officially support the latest release of each series.
 What's new in Django 6.2
 ========================
 
+Adopting calendar versioning
+----------------------------
+
+Following `DEP 20`_, the releases previously planned as Django 7.0 and 7.1 are
+now Django 2028 and 2029. Accordingly, the deprecation warning classes are
+renamed to match the calendar version in which the features they mark are
+removed: ``RemovedInDjango70Warning`` becomes ``RemovedInDjango2028Warning``,
+and ``RemovedInDjango71Warning`` becomes ``RemovedInDjango2029Warning``.
+
+.. _DEP 20: https://github.com/django/deps/blob/main/accepted/0020-annual-release-cycle.rst
+
 Minor features
 --------------
 
@@ -288,9 +299,17 @@ backends.
 :mod:`django.contrib.gis`
 -------------------------
 
+* Support for GEOS 3.10 is removed.
+
 * The seconds value returned by
   :meth:`~django.contrib.gis.gdal.Field.as_datetime` is now a ``c_float``
   rather than a ``c_int``.
+
+Models
+------
+
+* Unsaved instances with a composite primary key or a ``db_default`` primary
+  key no longer compare equal to other instances.
 
 Tests
 -----
@@ -323,6 +342,9 @@ Miscellaneous
 * The minimum supported version of ``asgiref`` is increased from 3.9.1 to
   3.12.1.
 
+* The minimum supported version of ``oracledb`` is increased from 2.3.0 to
+  4.0.2.
+
 * In the asynchronous request path, error responses (such as those rendered by
   ``handler404`` and ``handler500``) are now rendered on the request's
   thread-sensitive thread, rather than on a shared thread pool, so that
@@ -337,6 +359,21 @@ Features deprecated in 6.2
 Miscellaneous
 -------------
 
+* Indexing ``django.VERSION`` from its third component on, reading it in a way
+  which depends on its length, such as unpacking it or calling ``len()`` on it,
+  and comparing it against three or more components are all deprecated. Under
+  the calendar versioning adopted in `DEP 20`_, versions are ``YYYY[.N]`` and
+  have no minor component, so from Django 2028 ``django.VERSION`` has four
+  components, ``(year, patch, status, iteration)``. Use the ``.feature``,
+  ``.patch``, ``.status``, and ``.iteration`` attributes, which give the same
+  answers under both versioning schemes::
+
+      django.VERSION.feature  # (6, 2) for 6.2.1, and (2028,) for 2028.1
+      django.VERSION.patch  # 1 for both 6.2.1 and 2028.1
+
+  Comparisons against one or two components, such as
+  ``django.VERSION >= (6, 2)``, are unaffected.
+
 * The :class:`~django.middleware.MiddlewareMixin` class moved from
   ``django.utils.deprecation`` to ``django.middleware``. The old import path
   is deprecated.
@@ -347,4 +384,15 @@ Miscellaneous
 * Calling :meth:`.QuerySet.aiterator` after ``prefetch_related()`` without
   providing a ``chunk_size`` is deprecated. It currently falls back to a
   ``chunk_size`` of 2000, but a ``ValueError`` will be raised in
-  Django 7.1.
+  Django 2029.
+
+* Omitting the ``tzinfo`` argument of
+  :class:`~django.db.models.functions.Extract` and
+  :class:`~django.db.models.functions.Trunc` database functions when used in
+  migrations (for example as a
+  :attr:`db_default <django.db.models.Field.db_default>`) and :setting:`USE_TZ`
+  is ``True`` is deprecated. The timezone information is not captured during
+  migration serialization, which can lead to inconsistent behavior if
+  :setting:`TIME_ZONE` changes. Pass the ``tzinfo`` argument explicitly to
+  suppress this warning. In Django 2029, the current timezone will be captured
+  automatically when ``tzinfo`` is omitted.

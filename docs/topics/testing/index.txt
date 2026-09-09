@@ -28,6 +28,15 @@ You can also use any *other* Python test framework; Django provides an API and
 tools for that kind of integration. They are described in the
 :ref:`other-testing-frameworks` section of :doc:`/topics/testing/advanced`.
 
+.. admonition:: There are community-maintained solutions!
+
+    Django has a vibrant ecosystem. There are testing and fixtures solutions
+    highlighted on the `Community Ecosystem`_ page. The Django Packages
+    `Testing tools grid`_ has even more options for you!
+
+.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#testing-fixtures
+.. _Testing tools grid: https://djangopackages.org/grids/g/testing/
+
 .. toctree::
    :maxdepth: 1
 

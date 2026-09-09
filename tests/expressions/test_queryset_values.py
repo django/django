@@ -2,7 +2,7 @@ from itertools import chain
 
 from django.db.models import F, Sum
 from django.test import TestCase, skipUnlessDBFeature
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .models import Company, Employee, JSONFieldModel
 
@@ -39,7 +39,7 @@ class ValuesExpressionsTests(TestCase):
 
     def test_values_expression_containing_percent_sign_deprecation_warns_once(self):
         msg = "Using percent signs in a column alias is deprecated."
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg) as cm:
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg) as cm:
             Company.objects.values(**{"alias%": F("id")})
         self.assertEqual(len(cm.warnings), 1)
 

@@ -53,7 +53,7 @@ from django.test.utils import (
     teardown_test_environment,
 )
 from django.urls import NoReverseMatch, path, reverse, reverse_lazy
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.html import VOID_ELEMENTS
 
 from .models import Car, Person, PossessedCar
@@ -1844,8 +1844,8 @@ class SetupTestEnvironmentTests(SimpleTestCase):
                     setup_test_environment()
                     self.assertEqual(settings.ALLOWED_HOSTS, ["*", "testserver"])
 
-    # RemovedInDjango70Warning.
-    @ignore_warnings(category=RemovedInDjango70Warning)
+    # RemovedInDjango2028Warning.
+    @ignore_warnings(category=RemovedInDjango2028Warning)
     def test_email_backend_override(self):
         with (
             self.mock_test_state(),
@@ -1892,7 +1892,7 @@ class SetupTestEnvironmentTests(SimpleTestCase):
             )
             # setup_test_environment() shouldn't mutate original setting value.
             self.assertEqual(settings_value, expected_value)
-            # RemovedInDjango70Warning: Remove both EMAIL_BACKEND assertions.
+            # RemovedInDjango2028Warning: Remove both EMAIL_BACKEND assertions.
             self.assertFalse(hasattr(settings, "EMAIL_BACKEND"))
 
             teardown_test_environment()

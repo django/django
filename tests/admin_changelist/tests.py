@@ -911,19 +911,51 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [])
 
-    def test_exact_lookup_with_more_lenient_formfield(self):
+    def test_exact_boolean_lookup_is_case_insensitive(self):
         """
         Exact lookups on BooleanField use formfield().to_python() for lenient
-        parsing. Using model field's to_python() would reject 'false' whereas
-        the form field accepts it.
+        parsing. Using model field's to_python() would reject 'FALSE' whereas
+        the admin's form field accepts it.
         """
-        obj = UnorderedObject.objects.create(bool=False)
+        obj_not_nullable = UnorderedObject.objects.create(bool=False)
         UnorderedObject.objects.create(bool=True)
         m = admin.ModelAdmin(UnorderedObject, custom_site)
         m.search_fields = ["bool__exact"]
 
-        # 'false' is accepted by form field but rejected by model field.
-        request = self.factory.get("/", data={SEARCH_VAR: "false"})
+        # Nullable boolean field.
+        obj_nullable = Quartet.objects.create(plays_weddings=False)
+        Quartet.objects.create(plays_weddings=True)
+        m_nullable = admin.ModelAdmin(Quartet, custom_site)
+        m_nullable.search_fields = ["plays_weddings__exact"]
+
+        for obj, model_admin in (obj_not_nullable, m), (obj_nullable, m_nullable):
+            with self.subTest(obj=obj):
+                # 'FALSE' accepted by form field but rejected by model field.
+                request = self.factory.get("/", data={SEARCH_VAR: "FALSE"})
+                request.user = self.superuser
+
+                cl = model_admin.get_changelist_instance(request)
+                self.assertCountEqual(cl.queryset, [obj])
+
+    def test_exact_boolean_lookup_explicit_none(self):
+        UnorderedObject.objects.create(bool=False)
+        UnorderedObject.objects.create(bool=True)
+        m = admin.ModelAdmin(UnorderedObject, custom_site)
+        m.search_fields = ["bool__exact"]
+
+        request = self.factory.get("/", data={SEARCH_VAR: "None"})
+        request.user = self.superuser
+
+        cl = m.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [])
+
+        # Nullable boolean field.
+        obj = Quartet.objects.create()
+        Quartet.objects.create(plays_weddings=True)
+        m = admin.ModelAdmin(Quartet, custom_site)
+        m.search_fields = ["plays_weddings__exact"]
+
+        request = self.factory.get("/", data={SEARCH_VAR: "None"})
         request.user = self.superuser
 
         cl = m.get_changelist_instance(request)
@@ -955,6 +987,86 @@ class ChangeListTests(TestCase):
 
         cl = m.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [obj_int])
+
+    def test_exact_lookup_for_choices_field(self):
+        """
+        Search terms that aren't valid for an exact lookup on a field with
+        choices are skipped instead of crashing the changelist.
+        """
+        john = MixedFieldsModel.objects.create(name="john", choice_field=1)
+        mary = MixedFieldsModel.objects.create(name="mary", choice_field=2)
+        m = admin.ModelAdmin(MixedFieldsModel, custom_site)
+        m.search_fields = ["name", "choice_field__exact"]
+
+        for search_term, expected_result in [
+            ("john", [john]),
+            ("mary", [mary]),
+            ("1", [john]),
+            ("2", [mary]),
+            ("random", []),
+        ]:
+            request = self.factory.get("/", data={SEARCH_VAR: search_term})
+            request.user = self.superuser
+            with self.subTest(search_term=search_term):
+                cl = m.get_changelist_instance(request)
+                self.assertCountEqual(cl.queryset, expected_result)
+
+    def test_exact_lookup_for_choices_field_changelist_view(self):
+        """
+        The changelist view doesn't crash on a search term that isn't valid
+        for an exact lookup on a field with choices.
+        """
+        self.client.force_login(self.superuser)
+        john = MixedFieldsModel.objects.create(name="john", choice_field=1)
+        MixedFieldsModel.objects.create(name="mary", choice_field=2)
+        url = reverse("admin:admin_changelist_mixedfieldsmodel_changelist")
+
+        response = self.client.get(url, {SEARCH_VAR: "john"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertCountEqual(response.context["cl"].queryset, [john])
+
+    def test_exact_lookup_for_boolean_field(self):
+        """
+        Arbitrary search terms don't match every row with a True value for an
+        exact lookup on a BooleanField, while explicit boolean terms do match.
+        """
+        john = OrderedObject.objects.create(name="john", bool=True)
+        mary = OrderedObject.objects.create(name="mary", bool=True)
+        pete = OrderedObject.objects.create(name="pete", bool=False)
+        m = admin.ModelAdmin(OrderedObject, custom_site)
+        m.search_fields = ["name", "bool__exact"]
+
+        for search_term, expected_result in [
+            ("john", [john]),
+            ("mary", [mary]),
+            ("random", []),
+            ("true", [john, mary]),
+            ("True", [john, mary]),
+            ("1", [john, mary]),
+            ("false", [pete]),
+            ("False", [pete]),
+            ("0", [pete]),
+        ]:
+            request = self.factory.get("/", data={SEARCH_VAR: search_term})
+            request.user = self.superuser
+            with self.subTest(search_term=search_term):
+                cl = m.get_changelist_instance(request)
+                self.assertCountEqual(cl.queryset, expected_result)
+
+    def test_exact_lookup_for_null_boolean_field(self):
+        """
+        Arbitrary search terms don't match every row with a None value for an
+        exact lookup on a nullable BooleanField, while explicit terms do match.
+        """
+        Quartet.objects.create(plays_weddings=None)
+        model_admin = admin.ModelAdmin(Quartet, custom_site)
+        model_admin.search_fields = ["plays_weddings__exact"]
+
+        request = self.factory.get("/", data={SEARCH_VAR: "arbitrary"})
+        request.user = self.superuser
+        cl = model_admin.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [])
 
     def test_search_with_exact_lookup_for_non_string_field(self):
         child = Child.objects.create(name="Asher", age=11)
@@ -1934,6 +2046,17 @@ class PlaywrightTests(AdminPlaywrightTestCase):
     def setUp(self):
         User.objects.create_superuser(username="super", password="secret", email=None)
 
+    def collapse_filter(self, detail):
+        """Collapse a filter and wait for its state to be stored."""
+        title = detail.get_attribute("data-filter-title")
+        detail.locator("summary").click()
+        self.expect(detail).not_to_have_attribute("open")
+        self.page.wait_for_function(
+            "title => JSON.parse(sessionStorage.getItem("
+            "'django.admin.filtersState'))?.[title] === false",
+            arg=title,
+        )
+
     def test_add_row_selection(self):
         """
         The status line for selected rows gets updated correctly (#22038).
@@ -2142,8 +2265,7 @@ class PlaywrightTests(AdminPlaywrightTestCase):
             self.expect(detail).to_have_attribute("open")
         # Collapse "staff' and "superuser" filters.
         for detail in details[:2]:
-            detail.locator("summary").click()
-            self.expect(detail).not_to_have_attribute("open")
+            self.collapse_filter(detail)
         # Filters are in the same state after refresh.
         self.page.reload()
         self.expect(
@@ -2159,7 +2281,8 @@ class PlaywrightTests(AdminPlaywrightTestCase):
         self.page.goto(
             self.live_server_url + reverse("admin:admin_changelist_band_changelist")
         )
-        self.page.locator("summary").click()
+        detail = self.page.locator("[data-filter-title='number of members']")
+        self.collapse_filter(detail)
         # Go to Users view and then, back again to Bands view.
         self.page.goto(self.live_server_url + reverse("admin:auth_user_changelist"))
         self.page.goto(
@@ -2176,8 +2299,7 @@ class PlaywrightTests(AdminPlaywrightTestCase):
         self.page.goto(self.live_server_url + changelist_url)
         # Title is escaped.
         filter_title = self.page.locator("[data-filter-title='It\\'s OK']")
-        filter_title.locator("summary").click()
-        self.expect(filter_title).not_to_have_attribute("open")
+        self.collapse_filter(filter_title)
         # Filter is in the same state after refresh.
         self.page.reload()
         self.expect(

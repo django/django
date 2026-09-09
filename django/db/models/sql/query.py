@@ -43,7 +43,7 @@ from django.db.models.query_utils import (
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
 from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
 from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.tree import Node
@@ -51,7 +51,7 @@ from django.utils.warnings import django_file_prefixes
 
 __all__ = ["Query", "RawQuery"]
 
-# RemovedInDjango70Warning: When the deprecation ends, replace with:
+# RemovedInDjango2028Warning: When the deprecation ends, replace with:
 # Quotation marks ('"`[]), whitespace characters, control characters,
 # semicolons, percent signs, hashes, or inline SQL comments are
 # forbidden in column aliases.
@@ -1220,18 +1220,18 @@ class Query(BaseExpression):
         return alias or seen[None]
 
     def check_alias(self, alias):
-        # RemovedInDjango70Warning: When the deprecation ends, remove.
+        # RemovedInDjango2028Warning: When the deprecation ends, remove.
         if "%" in alias:
             warnings.warn(
                 "Using percent signs in a column alias is deprecated.",
-                category=RemovedInDjango70Warning,
+                category=RemovedInDjango2028Warning,
                 skip_file_prefixes=django_file_prefixes(),
             )
         if FORBIDDEN_ALIAS_PATTERN.search(alias):
             raise ValueError(
                 "Column aliases cannot contain whitespace characters, hashes, "
-                # RemovedInDjango70Warning: When the deprecation ends, replace
-                # with:
+                # RemovedInDjango2028Warning: When the deprecation ends,
+                # replace with:
                 # "control characters, quotation marks, semicolons, percent "
                 # "signs, or SQL comments."
                 "control characters, quotation marks, semicolons, or SQL comments."
@@ -1484,6 +1484,13 @@ class Query(BaseExpression):
                 "Unsupported lookup '%s' for %s or join on the field not "
                 "permitted%s" % (unsupported_lookup, output_field.__name__, suggestion)
             )
+
+    def get_names_to_join(self, expr):
+        """
+        Helper method for the resolution of expressions that could either be a
+        FilteredRelation alias or a field lookup.
+        """
+        return [expr] if expr in self._filtered_relations else expr.split(LOOKUP_SEP)
 
     def build_filter(
         self,
@@ -2276,10 +2283,11 @@ class Query(BaseExpression):
         try:
             cols = []
             for name in field_names:
+                names_to_join = self.get_names_to_join(name)
                 # Join promotion note - we must not remove any rows here, so
                 # if there is no existing joins, use outer join.
                 join_info = self.setup_joins(
-                    name.split(LOOKUP_SEP), opts, alias, allow_many=allow_m2m
+                    names_to_join, opts, alias, allow_many=allow_m2m
                 )
                 targets, final_alias, joins = self.trim_joins(
                     join_info.targets,
@@ -2343,9 +2351,10 @@ class Query(BaseExpression):
                     continue
                 if self.extra and item in self.extra:
                     continue
+                names_to_join = self.get_names_to_join(item)
                 # names_to_path() validates the lookup. A descriptive
                 # FieldError will be raise if it's not.
-                self.names_to_path(item.split(LOOKUP_SEP), self.model._meta)
+                self.names_to_path(names_to_join, self.model._meta)
             elif not hasattr(item, "resolve_expression"):
                 errors.append(item)
             if getattr(item, "contains_aggregate", False):

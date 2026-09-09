@@ -24,7 +24,7 @@ from django.db.models.sql.constants import (
 )
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 from django.utils.regex_helper import _lazy_re_compile
@@ -357,11 +357,30 @@ class SQLCompiler:
         # Avoid computing `selected_exprs` if there is no `ordering` as it's
         # relatively expensive.
         if ordering and (select := self.select):
+            distinct_fields = self.query.distinct_fields
+            annotation_select = self.query.annotation_select
+            # An expression can be selected at more than one position, e.g.
+            # when two lookup paths resolve to the same column. get_distinct()
+            # refers to such selections by expression and PostgreSQL binds an
+            # expression reference to the first position it is selected at, so
+            # ordering must refer to that position as well for the prefixes of
+            # both clauses to match. Raw selections are excluded as equal SQL
+            # is not necessarily interchangeable, e.g. a volatile function
+            # selected twice.
+            first_positions = {}
             for ordinal, (expr, _, alias) in enumerate(select, start=1):
                 pos_expr = PositionRef(ordinal, alias, expr)
+                if distinct_fields and not isinstance(expr, RawSQL):
+                    first_pos_expr = first_positions.setdefault(expr, pos_expr)
+                else:
+                    first_pos_expr = pos_expr
                 if alias:
-                    selected_exprs[alias] = pos_expr
-                selected_exprs[expr] = pos_expr
+                    # get_distinct() refers to annotations by alias, which
+                    # binds to their own position.
+                    selected_exprs[alias] = (
+                        pos_expr if alias in annotation_select else first_pos_expr
+                    )
+                selected_exprs[expr] = first_pos_expr
 
         for field in ordering:
             if hasattr(field, "resolve_expression"):
@@ -559,14 +578,14 @@ class SQLCompiler:
         self.quote_cache[name] = quoted
         return quoted
 
-    # RemovedInDjango70Warning: When the deprecation ends, remove.
+    # RemovedInDjango2028Warning: When the deprecation ends, remove.
     def quote_name_unless_alias(self, name):
         warnings.warn(
             (
                 "SQLCompiler.quote_name_unless_alias() is deprecated. "
                 "Use .quote_name() instead."
             ),
-            category=RemovedInDjango70Warning,
+            category=RemovedInDjango2028Warning,
             skip_file_prefixes=django_file_prefixes(),
         )
         return self.quote_name(name)
@@ -1073,7 +1092,7 @@ class SQLCompiler:
         """
         name, order = get_order_dir(name, default_order)
         descending = order == "DESC"
-        pieces = name.split(LOOKUP_SEP)
+        pieces = self.query.get_names_to_join(name)
         (
             field,
             targets,

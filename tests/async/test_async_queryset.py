@@ -7,7 +7,7 @@ from asgiref.sync import async_to_sync, sync_to_async
 from django.db import NotSupportedError, connection
 from django.db.models import Prefetch, Sum
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.utils.deprecation import RemovedInDjango71Warning
+from django.utils.deprecation import RemovedInDjango2029Warning
 
 from .models import RelatedModel, SimpleModel
 
@@ -66,7 +66,7 @@ class AsyncQuerySetTest(TestCase):
         )
         qs = SimpleModel.objects.prefetch_related("relatedmodel_set").aiterator()
 
-        # RemovedInDjango71Warning: When the deprecation ends, replace with:
+        # RemovedInDjango2029Warning: When the deprecation ends, replace with:
         # with self.assertRaisesMessage(
         #     ValueError,
         #     "chunk_size must be provided when using QuerySet.aiterator() "
@@ -75,7 +75,7 @@ class AsyncQuerySetTest(TestCase):
         #     async for _ in qs:
         #         pass
         results = []
-        with self.assertWarnsMessage(RemovedInDjango71Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, msg):
             async for s in qs:
                 results.append(s)
         self.assertCountEqual(results, [self.s1, self.s2, self.s3])
