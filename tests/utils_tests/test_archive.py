@@ -51,6 +51,26 @@ class TestArchive(unittest.TestCase):
                         os.path.isfile(os.path.join(tmpdir, "foo", "bar", "2"))
                     )
 
+    def test_get_size(self):
+        """
+        archive.get_size() reports the total size of the archive's contents,
+        matching the bytes actually written by archive.extract().
+        """
+        with os.scandir(self.testdir) as entries:
+            for entry in entries:
+                if (entry.name.endswith(".bz2") and not HAS_BZ2) or (
+                    entry.name.endswith((".lzma", ".xz")) and not HAS_LZMA
+                ):
+                    continue
+                with self.subTest(entry.name), tempfile.TemporaryDirectory() as tmpdir:
+                    archive.extract(entry.path, tmpdir)
+                    extracted_size = sum(
+                        os.path.getsize(os.path.join(dirpath, name))
+                        for dirpath, _, names in os.walk(tmpdir)
+                        for name in names
+                    )
+                    self.assertEqual(archive.get_size(entry.path), extracted_size)
+
     @unittest.skipIf(
         sys.platform == "win32", "Python on Windows has a limited os.chmod()."
     )
