@@ -1,7 +1,9 @@
 import struct
+from unittest import skipIf, skipUnless
 
 from django.contrib.gis.geos import GEOSGeometry, WKTReader
 from django.contrib.gis.geos.error import GEOSException
+from django.contrib.gis.geos.libgeos import geos_version_tuple
 from django.contrib.gis.geos.prototypes.io import MAX_GEOM_COLLECTIONS
 from django.test import SimpleTestCase
 
@@ -75,6 +77,10 @@ class GEOSLimitTest(SimpleTestCase):
         payloads += [(wkt, "WKT", True), (wkt.encode("ascii"), "WKT bytes", True)]
         return payloads
 
+    @skipIf(
+        geos_version_tuple() >= (3, 15),
+        "GEOS 3.15+ ignores max_geom_collections.",
+    )
     def test_geometry_collection_limit_exceeded(self):
         msg = "contains too many possible GeometryCollections."
         payloads = self._generate_geometry_collection_payloads(depth=6)
@@ -87,6 +93,15 @@ class GEOSLimitTest(SimpleTestCase):
                     GEOSGeometry(payload, max_geom_collections=6)
                     GEOSGeometry(payload, max_geom_collections=None)
 
+    @skipUnless(geos_version_tuple() >= (3, 15), "GEOS 3.15+ is required.")
+    def test_geometry_collection_limit_ignored(self):
+        payloads = self._generate_geometry_collection_payloads(depth=6)
+
+        for payload, label, check_geos in payloads:
+            if check_geos:
+                with self.subTest(payload=label):
+                    GEOSGeometry(payload, max_geom_collections=5)
+
     def test_wkt_geometry_collection_flat(self):
         def wkt_payload_no_nesting(num_points):
             # Many parentheses, but only one collection level.
@@ -98,6 +113,10 @@ class GEOSLimitTest(SimpleTestCase):
 
         GEOSGeometry(wkt_payload_no_nesting(num_points=5), max_geom_collections=1)
 
+    @skipIf(
+        geos_version_tuple() >= (3, 15),
+        "GEOS 3.15+ ignores max_geom_collections.",
+    )
     def test_wkt_mixed_case_and_inner_whitespace_is_limited(self):
         two_collections = (
             "GEOMETRYCOLLECTION   ( "
@@ -110,6 +129,10 @@ class GEOSLimitTest(SimpleTestCase):
             GEOSGeometry(two_collections, max_geom_collections=1)
         GEOSGeometry(two_collections, max_geom_collections=2)
 
+    @skipIf(
+        geos_version_tuple() >= (3, 15),
+        "GEOS 3.15+ ignores max_geom_collections.",
+    )
     def test_from_ewkt_leading_whitespace_is_limited(self):
         # from_ewkt() hands the part after the SRID to the low-level reader,
         # so leading whitespace never passes through wkt_regex.
@@ -120,6 +143,10 @@ class GEOSLimitTest(SimpleTestCase):
                 with self.assertRaisesMessage(ValueError, msg):
                     GEOSGeometry.from_ewkt(value)
 
+    @skipIf(
+        geos_version_tuple() >= (3, 15),
+        "GEOS 3.15+ ignores max_geom_collections.",
+    )
     def test_wkt_dimension_marker_whitespace_is_limited(self):
         def two_collections(separator):
             collection = f"GEOMETRYCOLLECTION{separator}ZM"
@@ -134,6 +161,10 @@ class GEOSLimitTest(SimpleTestCase):
                     GEOSGeometry(value, max_geom_collections=1)
                 GEOSGeometry(value, max_geom_collections=2)
 
+    @skipIf(
+        geos_version_tuple() >= (3, 15),
+        "GEOS 3.15+ ignores max_geom_collections.",
+    )
     def test_wkt_reader_whitespace_is_limited(self):
         # WKTReader.read() takes str and bytes directly, so the whitespace
         # GEOS tolerates but wkt_regex rejects reaches the limiter.
@@ -162,6 +193,10 @@ class GEOSLimitTest(SimpleTestCase):
         with self.assertRaises(GEOSException):
             GEOSGeometry(invalid_wkt, max_geom_collections=5)
 
+    @skipIf(
+        geos_version_tuple() >= (3, 15),
+        "GEOS 3.15+ ignores max_geom_collections.",
+    )
     def test_malformed_multi_wkb_child_is_limited(self):
         def make_invalid_geom(depth):
             point = b"\x01" + struct.pack("<I", 1) + struct.pack("<dd", 0.0, 0.0)

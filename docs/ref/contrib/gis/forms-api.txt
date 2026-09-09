@@ -58,6 +58,13 @@ GeoDjango form fields take the following optional arguments.
     legitimately deep geometries, since doing so reduces protection against
     fatal errors.
 
+    On GEOS 3.15 and later, this option is ignored because GEOS provides
+    built-in protection against deeply nested geometry collections.
+
+    .. versionchanged:: 6.2
+
+        ``max_geom_collections`` is now ignored when using GEOS 3.15 or later.
+
 Form field classes
 ==================
 
