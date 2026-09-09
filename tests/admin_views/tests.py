@@ -7381,6 +7381,18 @@ class PlaywrightTests(AdminPlaywrightTestCase):
         for index, text in enumerate(expected_legend_tags_text):
             legend = fieldsets.nth(index).locator("legend")
             self.expect(legend).to_have_text(text)
+        self.assertEqual(
+            self.page.locator("#id_start_datetime_0").get_attribute("aria-describedby"),
+            "id_start_datetime_timezone_warning_helptext",
+        )
+
+        difficulty_input = self.page.locator("input[name='difficulty']").first
+        difficulty_input.click()
+        difficulty_input.evaluate("element => element.value = 'invalid'")
+        self.page.locator('[name="_save"]').click()
+        self.expect(fieldsets.first).to_have_attribute(
+            "aria-describedby", "id_difficulty_error"
+        )
 
         # FilteredSelectMultiple uses <fieldset>.
         url = reverse("admin:admin_views_camelcaserelatedmodel_add")
