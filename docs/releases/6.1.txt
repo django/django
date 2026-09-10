@@ -599,6 +599,14 @@ Miscellaneous
   entries containing non-standard or corrupted Base64 data may no longer be
   readable.
 
+* The undocumented ``get_success_url_allowed_hosts()`` and
+  ``get_redirect_url()`` methods of
+  ``django.contrib.auth.views.RedirectURLMixin``, used by
+  :class:`~django.contrib.auth.views.LoginView` and
+  :class:`~django.contrib.auth.views.LogoutView`, now accept an optional
+  ``request`` argument. Subclasses overriding these methods must add
+  ``request=None`` to their signatures to avoid a ``TypeError``.
+
 .. _deprecated-features-6.1:
 
 Features deprecated in 6.1
