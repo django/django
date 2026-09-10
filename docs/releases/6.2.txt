@@ -340,6 +340,11 @@ Miscellaneous
   database connections used during error handling are managed by
   ``close_old_connections()``.
 
+* :meth:`~django.forms.Widget.format_value` of
+  :class:`~django.forms.NullBooleanSelect` now returns a list containing a
+  single string, consistent with other ``ChoiceWidget`` subclasses, rather
+  than a bare string.
+
 .. _deprecated-features-6.2:
 
 Features deprecated in 6.2

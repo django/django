@@ -7,6 +7,18 @@ from .base import WidgetTest
 class NullBooleanSelectTest(WidgetTest):
     widget = NullBooleanSelect()
 
+    def test_format_value(self):
+        self.assertEqual(self.widget.format_value(None), ["unknown"])
+        self.assertEqual(self.widget.format_value(True), ["true"])
+        self.assertEqual(self.widget.format_value(False), ["false"])
+        self.assertEqual(self.widget.format_value("unknown"), ["unknown"])
+        self.assertEqual(self.widget.format_value("true"), ["true"])
+        self.assertEqual(self.widget.format_value("false"), ["false"])
+        # For backwards compatibility with Django < 2.2.
+        self.assertEqual(self.widget.format_value("1"), ["unknown"])
+        self.assertEqual(self.widget.format_value("2"), ["true"])
+        self.assertEqual(self.widget.format_value("3"), ["false"])
+
     def test_render_true(self):
         self.check_html(
             self.widget,

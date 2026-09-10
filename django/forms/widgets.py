@@ -919,7 +919,7 @@ class NullBooleanSelect(Select):
 
     def format_value(self, value):
         try:
-            return {
+            formatted = {
                 True: "true",
                 False: "false",
                 "true": "true",
@@ -929,7 +929,8 @@ class NullBooleanSelect(Select):
                 "3": "false",
             }[value]
         except KeyError:
-            return "unknown"
+            formatted = "unknown"
+        return [formatted]
 
     def value_from_datadict(self, data, files, name):
         value = data.get(name)
