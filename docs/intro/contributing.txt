@@ -118,7 +118,7 @@ Getting a copy of Django's development version
 The first step is to get a copy of the source code:
 
 1. `Fork Django on GitHub <https://github.com/django/django/fork>`__.
-2. Open your terminal (macOS/Linux) or Command Prompt/PowerShell (Windows).
+2. Open your terminal (macOS/Linux) or Command Prompt (Windows).
 3. Use ``cd`` to navigate to the folder where you want your local copy of
    Django to live, for example:
 
