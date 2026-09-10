@@ -1771,16 +1771,8 @@ class Model(AltersData, metaclass=ModelBase):
         for f in self._meta.fields:
             if f.name in exclude or f.generated:
                 continue
-            # Skip validation for empty fields with blank=True. The developer
-            # is responsible for making sure they have a valid value.
-            raw_value = getattr(self, f.attname)
-            if f.blank and raw_value in f.empty_values:
-                continue
-            # Skip validation for empty fields when db_default is used.
-            if isinstance(raw_value, DatabaseDefault):
-                continue
             try:
-                setattr(self, f.attname, f.clean(raw_value, self))
+                f.clean_fields(self)
             except ValidationError as e:
                 errors[f.name] = e.error_list
 
