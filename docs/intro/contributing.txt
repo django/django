@@ -13,7 +13,7 @@ want added (but remember that proposals for new features should follow the
 Contributing back to Django itself is the best way to see your own concerns
 addressed. This may seem daunting at first, but it's a well-traveled path with
 documentation, tooling, and a community to support you. We'll walk you through
-the entire process, so you can learn by example.
+the entire process, so you can learn by examples.
 
 Who's this tutorial for?
 ------------------------
