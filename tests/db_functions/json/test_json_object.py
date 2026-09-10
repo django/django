@@ -1,6 +1,6 @@
 from django.db import NotSupportedError
-from django.db.models import F, Value
-from django.db.models.functions import JSONObject, Lower
+from django.db.models import F, TextField, Value
+from django.db.models.functions import Cast, JSONObject, Lower
 from django.test import TestCase
 from django.test.testcases import skipIfDBFeature, skipUnlessDBFeature
 from django.utils import timezone
@@ -23,9 +23,35 @@ class JSONObjectTests(TestCase):
         obj = Author.objects.annotate(json_object=JSONObject()).first()
         self.assertEqual(obj.json_object, {})
 
+    def test_args(self):
+        obj = Author.objects.annotate(json_object=JSONObject("alias", "name")).first()
+        self.assertEqual(obj.json_object, {"iivanov": "Ivan Ivanov"})
+
+    def test_args_wrong_length(self):
+        msg = "JSONObject() must have an even number of positional arguments."
+        with self.assertRaisesMessage(ValueError, msg):
+            Author.objects.annotate(
+                json_object=JSONObject("alias", "name", "goes_by")
+            ).first()
+
+    def test_args_and_kwargs(self):
+        msg = (
+            "JSONObject() accepts keyword arguments or positional arguments, not both."
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            Author.objects.annotate(
+                json_object=JSONObject("alias", name="name")
+            ).first()
+
     def test_basic(self):
         obj = Author.objects.annotate(json_object=JSONObject(name="name")).first()
         self.assertEqual(obj.json_object, {"name": "Ivan Ivanov"})
+
+    def test_non_string_key(self):
+        obj = Author.objects.annotate(
+            json_object=JSONObject(Cast("age", TextField()), "name")
+        ).first()
+        self.assertEqual(obj.json_object, {"30": "Ivan Ivanov"})
 
     def test_expressions(self):
         obj = Author.objects.annotate(
