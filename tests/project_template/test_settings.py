@@ -56,3 +56,17 @@ class TestStartProjectSettings(SimpleTestCase):
         with self.settings(MAILERS=MAILERS):
             backend = mail.mailers.default
             self.assertIsInstance(backend, console.EmailBackend)
+
+    #Mine (so I can find it easier)
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": ":memory:",
+        }
+    }
+    SECRET_KEY = "test-key"
+    INSTALLED_APPS = [
+        "django.contrib.contenttypes",
+        "django.contrib.auth",
+        "django.contrib.admin",
+    ]

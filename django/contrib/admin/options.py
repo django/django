@@ -1307,6 +1307,7 @@ class ModelAdmin(BaseModelAdmin):
         and a boolean indicating if the results may contain duplicates.
         """
 
+        #Mine (so I can find it easier)
         # Apply keyword searches.
         def construct_search(field_name):
             """
@@ -1331,14 +1332,28 @@ class ModelAdmin(BaseModelAdmin):
                     path_part = opts.pk.name
                 try:
                     field = opts.get_field(path_part)
+                    
+                #Mine (so I can find it easier)
                 except FieldDoesNotExist:
+                    # Check for 'and_' prefixed lookups (e.g., and_iexact -> iexact)
+                    is_and_lookup = path_part.startswith("and_")
+                    lookup = path_part.removeprefix("and_") if is_and_lookup else path_part
+
                     # Use valid query lookups.
-                    if prev_field and prev_field.get_lookup(path_part):
-                        if path_part == "exact" and not isinstance(
+                    if prev_field and prev_field.get_lookup(lookup):
+                        if lookup == "exact" and not isinstance(
                             prev_field, (models.CharField, models.TextField)
                         ):
                             # Use prev_field to validate the search term.
                             return field_name, prev_field
+                        
+                        # If it was an 'and_' lookup, strip 'and_' for the actual ORM query
+                        if is_and_lookup:
+                            clean_name = LOOKUP_SEP.join(
+                                lookup_fields[:-1] + [lookup]
+                            )
+                            return clean_name, None
+                        
                         return field_name, None
                 else:
                     prev_field = field
