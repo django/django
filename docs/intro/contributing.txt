@@ -100,7 +100,7 @@ To check whether Git is already installed, run:
 
     $ git --version
 
-**Windows (Command Prompt or PowerShell):**
+**Windows (Command Prompt):**
 
 .. code-block:: doscon
 
@@ -145,29 +145,17 @@ Download the Django source code repository using the following command:
     If you're on a slow connection, or want to test how the script behaves
     under restricted networking, use the low-bandwidth flag below for your OS:
 
-.. tabs::
+.. admonition:: For Windows users
 
-        .. group-tab:: Windows
+    .. code-block:: doscon
 
-            .. code-block:: doscon
+        REM Execute the main setup using the low bandwidth package manager flag
+        C:\>python main.py --low-bandwidth
 
-                REM Execute the main setup using the low bandwidth package manager flag
-                C:\>python main.py --low-bandwidth
+.. code-block:: console
 
-        .. group-tab:: macOS
-
-            .. code-block:: console
-
-                # Execute the main setup using the low bandwidth package manager flag
-                $ python3 main.py --low-bandwidth
-
-        .. group-tab:: Linux
-
-            .. code-block:: console
-
-                # Execute the main setup using the low bandwidth package manager flag
-                $ python3 main.py --low-bandwidth
-
+    # Execute the main setup using the low bandwidth package manager flag
+    $ python3 main.py --low-bandwidth
 
 Now that you have a local copy of Django, you can install it just like you
 would install any package using ``pip``. The most convenient way to do so is by
@@ -182,37 +170,29 @@ example in ``.virtualenvs/`` in your home directory.
 
 Create a new virtual environment by running:
 
-.. tabs::
+.. code-block:: console
 
-    .. group-tab:: macOS/Linux
+    $ python3 -m venv ~/.virtualenvs/djangodev
 
-        .. code-block:: console
+.. admonition:: For Windows users
 
-            $ python3 -m venv ~/.virtualenvs/djangodev
+    .. code-block:: doscon
 
-    .. group-tab:: Windows
-
-        .. code-block:: doscon
-
-            C:\>python -m venv C:\Users\YourName\.virtualenvs\djangodev
+        C:\>python -m venv C:\Users\YourName\.virtualenvs\djangodev
 
 The path is where the new environment will be saved on your computer.
 
 The final step in setting up your virtual environment is to activate it:
 
-.. tabs::
+.. code-block:: console
 
-    .. group-tab:: macOS/Linux
+    $ source ~/.virtualenvs/djangodev/bin/activate
 
-        .. code-block:: console
+.. admonition:: For Windows users
 
-            $ source ~/.virtualenvs/djangodev/bin/activate
+    .. code-block:: doscon
 
-    .. group-tab:: Windows
-
-        .. code-block:: doscon
-
-            C:\>C:\Users\YourName\.virtualenvs\djangodev\Scripts\activate.bat
+        C:\>C:\Users\YourName\.virtualenvs\djangodev\Scripts\activate.bat
 
 If the ``source`` command is not available, you can try using a dot instead:
 
