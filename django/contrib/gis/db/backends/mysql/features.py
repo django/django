@@ -13,7 +13,12 @@ class DatabaseFeatures(BaseSpatialFeatures, MySQLDatabaseFeatures):
     supports_transform = False
     supports_null_geometries = False
     supports_num_points_poly = False
-    unsupported_geojson_options = {"crs"}
+
+    @cached_property
+    def unsupported_geojson_options(self):
+        if self.connection.mysql_is_mariadb or self.connection.mysql_version < (9, 5):
+            return {"crs"}
+        return set()
 
     @cached_property
     def supports_geometry_field_unique_index(self):
