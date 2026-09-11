@@ -139,7 +139,7 @@ example in ``.virtualenvs/`` in your home directory.
 
 Create a new virtual environment by running:
 
-.. console:: 
+.. console::
 
     $ python3 -m venv ~/.virtualenvs/djangodev
 
