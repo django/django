@@ -186,7 +186,7 @@ class Queries1Tests(TestCase):
         cls.c2 = Cover.objects.create(title="second", item=cls.i2)
 
     def test_subquery_condition(self):
-        qs1 = Tag.objects.filter(pk__lte=0)
+        qs1 = Tag.objects.filter(pk__lte=connection.ops.get_hardcoded_pk(0))
         qs2 = Tag.objects.filter(parent__in=qs1)
         qs3 = Tag.objects.filter(parent__in=qs2)
         self.assertEqual(qs3.query.subq_aliases, {"T", "U", "V"})
@@ -449,9 +449,11 @@ class Queries1Tests(TestCase):
         self.assertNotIn("order by", captured_queries[0]["sql"].lower())
 
     def test_tickets_4088_4306(self):
+        pk = connection.ops.get_hardcoded_pk
+        # Without a chained lookup, the ForeignKey's to_field, num, is queried.
         self.assertSequenceEqual(Report.objects.filter(creator=1001), [self.r1])
         self.assertSequenceEqual(Report.objects.filter(creator__num=1001), [self.r1])
-        self.assertSequenceEqual(Report.objects.filter(creator__id=1001), [])
+        self.assertSequenceEqual(Report.objects.filter(creator__id=pk(1001)), [])
         self.assertSequenceEqual(
             Report.objects.filter(creator__id=self.a1.id), [self.r1]
         )
@@ -552,7 +554,7 @@ class Queries1Tests(TestCase):
         self.assertSequenceEqual(Item.objects.filter(tags__in=[t]), [self.i4])
 
     def test_avoid_infinite_loop_on_too_many_subqueries(self):
-        x = Tag.objects.filter(pk=1)
+        x = Tag.objects.filter(pk=connection.ops.get_hardcoded_pk(1))
         local_recursion_limit = sys.getrecursionlimit() // 16
         msg = "Maximum recursion depth exceeded: too many subqueries."
         with self.assertRaisesMessage(RecursionError, msg):
@@ -560,7 +562,7 @@ class Queries1Tests(TestCase):
                 x = Tag.objects.filter(pk__in=x)
 
     def test_reasonable_number_of_subq_aliases(self):
-        x = Tag.objects.filter(pk=1)
+        x = Tag.objects.filter(pk=connection.ops.get_hardcoded_pk(1))
         for _ in range(20):
             x = Tag.objects.filter(pk__in=x)
         self.assertEqual(
@@ -893,11 +895,12 @@ class Queries1Tests(TestCase):
         # An EmptyQuerySet should not raise exceptions if it is filtered.
         Eaten.objects.create(meal="m")
         q = Eaten.objects.none()
+        pk = connection.ops.get_hardcoded_pk
         with self.assertNumQueries(0):
             self.assertSequenceEqual(q.all(), [])
             self.assertSequenceEqual(q.filter(meal="m"), [])
             self.assertSequenceEqual(q.exclude(meal="m"), [])
-            self.assertSequenceEqual(q.complex_filter({"pk": 1}), [])
+            self.assertSequenceEqual(q.complex_filter({"pk": pk(1)}), [])
             self.assertSequenceEqual(q.select_related("food"), [])
             self.assertSequenceEqual(q.annotate(Count("food")), [])
             self.assertSequenceEqual(q.order_by("meal", "food"), [])
@@ -2148,12 +2151,12 @@ class Queries6Tests(TestCase):
         # Incorrect SQL was being generated for certain types of exclude()
         # queries that crossed multi-valued relations (#8921, #9188 and some
         # preemptively discovered cases).
-
+        id_ = connection.ops.get_hardcoded_pk(1)
         self.assertSequenceEqual(
-            PointerA.objects.filter(connection__pointerb__id=1), []
+            PointerA.objects.filter(connection__pointerb__id=id_), []
         )
         self.assertSequenceEqual(
-            PointerA.objects.exclude(connection__pointerb__id=1), []
+            PointerA.objects.exclude(connection__pointerb__id=id_), []
         )
 
         self.assertSequenceEqual(
@@ -3937,9 +3940,10 @@ class JoinReuseTest(TestCase):
 
 class DisjunctionPromotionTests(TestCase):
     def test_disjunction_promotion_select_related(self):
+        pk = connection.ops.get_hardcoded_pk
         fk1 = FK1.objects.create(f1="f1", f2="f2")
         basea = BaseA.objects.create(a=fk1)
-        qs = BaseA.objects.filter(Q(a=fk1) | Q(b=2))
+        qs = BaseA.objects.filter(Q(a=fk1) | Q(b=pk(2)))
         self.assertEqual(str(qs.query).count(" JOIN "), 0)
         qs = qs.select_related("a", "b")
         self.assertEqual(str(qs.query).count(" INNER JOIN "), 0)
@@ -3995,7 +3999,8 @@ class DisjunctionPromotionTests(TestCase):
         self.assertEqual(str(qs.query).count("LEFT OUTER JOIN"), 1)
 
     def test_disjunction_promotion4_demote(self):
-        qs = BaseA.objects.filter(Q(a=1) | Q(a=2))
+        pk = connection.ops.get_hardcoded_pk
+        qs = BaseA.objects.filter(Q(a=pk(1)) | Q(a=pk(2)))
         self.assertEqual(str(qs.query).count("JOIN"), 0)
         # Demote needed for the "a" join. It is marked as outer join by
         # above filter (even if it is trimmed away).
@@ -4003,13 +4008,15 @@ class DisjunctionPromotionTests(TestCase):
         self.assertEqual(str(qs.query).count("INNER JOIN"), 1)
 
     def test_disjunction_promotion4(self):
+        pk = connection.ops.get_hardcoded_pk
         qs = BaseA.objects.filter(a__f1="foo")
         self.assertEqual(str(qs.query).count("INNER JOIN"), 1)
-        qs = qs.filter(Q(a=1) | Q(a=2))
+        qs = qs.filter(Q(a=pk(1)) | Q(a=pk(2)))
         self.assertEqual(str(qs.query).count("INNER JOIN"), 1)
 
     def test_disjunction_promotion5_demote(self):
-        qs = BaseA.objects.filter(Q(a=1) | Q(a=2))
+        pk = connection.ops.get_hardcoded_pk
+        qs = BaseA.objects.filter(Q(a=pk(1)) | Q(a=pk(2)))
         # Note that the above filters on a force the join to an
         # inner join even if it is trimmed.
         self.assertEqual(str(qs.query).count("JOIN"), 0)
@@ -4021,12 +4028,13 @@ class DisjunctionPromotionTests(TestCase):
         qs = BaseA.objects.filter(Q(a__f1="foo") | Q(b__f1="foo"))
         # Now the join to a is created as LOUTER
         self.assertEqual(str(qs.query).count("LEFT OUTER JOIN"), 2)
-        qs = qs.filter(Q(a=1) | Q(a=2))
+        qs = qs.filter(Q(a=pk(1)) | Q(a=pk(2)))
         self.assertEqual(str(qs.query).count("INNER JOIN"), 1)
         self.assertEqual(str(qs.query).count("LEFT OUTER JOIN"), 1)
 
     def test_disjunction_promotion6(self):
-        qs = BaseA.objects.filter(Q(a=1) | Q(a=2))
+        pk = connection.ops.get_hardcoded_pk
+        qs = BaseA.objects.filter(Q(a=pk(1)) | Q(a=pk(2)))
         self.assertEqual(str(qs.query).count("JOIN"), 0)
         qs = BaseA.objects.filter(Q(a__f1="foo") & Q(b__f1="foo"))
         self.assertEqual(str(qs.query).count("INNER JOIN"), 2)
@@ -4035,12 +4043,13 @@ class DisjunctionPromotionTests(TestCase):
         qs = BaseA.objects.filter(Q(a__f1="foo") & Q(b__f1="foo"))
         self.assertEqual(str(qs.query).count("LEFT OUTER JOIN"), 0)
         self.assertEqual(str(qs.query).count("INNER JOIN"), 2)
-        qs = qs.filter(Q(a=1) | Q(a=2))
+        qs = qs.filter(Q(a=pk(1)) | Q(a=pk(2)))
         self.assertEqual(str(qs.query).count("INNER JOIN"), 2)
         self.assertEqual(str(qs.query).count("LEFT OUTER JOIN"), 0)
 
     def test_disjunction_promotion7(self):
-        qs = BaseA.objects.filter(Q(a=1) | Q(a=2))
+        pk = connection.ops.get_hardcoded_pk
+        qs = BaseA.objects.filter(Q(a=pk(1)) | Q(a=pk(2)))
         self.assertEqual(str(qs.query).count("JOIN"), 0)
         qs = BaseA.objects.filter(Q(a__f1="foo") | (Q(b__f1="foo") & Q(a__f1="bar")))
         self.assertEqual(str(qs.query).count("INNER JOIN"), 1)
@@ -4066,7 +4075,8 @@ class DisjunctionPromotionTests(TestCase):
             Q(a__f1=F("b__f1")) | Q(a__f2=F("b__f2")) | Q(c__f1="foo")
         )
         self.assertEqual(str(qs.query).count("LEFT OUTER JOIN"), 3)
-        qs = BaseA.objects.filter(Q(a__f1=F("c__f1")) | (Q(pk=1) & Q(pk=2)))
+        pk = connection.ops.get_hardcoded_pk
+        qs = BaseA.objects.filter(Q(a__f1=F("c__f1")) | (Q(pk=pk(1)) & Q(pk=pk(2))))
         self.assertEqual(str(qs.query).count("LEFT OUTER JOIN"), 2)
         self.assertEqual(str(qs.query).count("INNER JOIN"), 0)
 
@@ -4422,13 +4432,14 @@ class ValuesJoinPromotionTests(TestCase):
         self.assertIn(" INNER JOIN ", str(qs.query))
 
     def test_ticket_21376(self):
+        pk = connection.ops.get_hardcoded_pk
         a = ObjectA.objects.create()
         ObjectC.objects.create(objecta=a)
         qs = ObjectC.objects.filter(
             Q(objecta=a) | Q(objectb__objecta=a),
         )
         qs = qs.filter(
-            Q(objectb=1) | Q(objecta=a),
+            Q(objectb=pk(1)) | Q(objecta=a),
         )
         self.assertEqual(qs.count(), 1)
         tblname = connection.ops.quote_name(ObjectB._meta.db_table)

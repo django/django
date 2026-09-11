@@ -1,6 +1,6 @@
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
-from django.db import models
+from django.db import connection, models
 
 
 class Award(models.Model):
@@ -87,11 +87,18 @@ class Location(models.Model):
     version = models.ForeignKey(Version, models.SET_NULL, blank=True, null=True)
 
 
+pk = connection.ops.get_hardcoded_pk
+
+
 class Item(models.Model):
     version = models.ForeignKey(Version, models.CASCADE)
     location = models.ForeignKey(Location, models.SET_NULL, blank=True, null=True)
     location_value = models.ForeignKey(
-        Location, models.SET(42), default=1, db_constraint=False, related_name="+"
+        Location,
+        models.SET(pk(42)),
+        default=pk(1),
+        db_constraint=False,
+        related_name="+",
     )
 
 

@@ -18,7 +18,7 @@ from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.db import migrations
+from django.db import connection, migrations
 from django.db.utils import IntegrityError
 from django.test import TestCase, override_settings
 from django.test.testcases import TransactionTestCase
@@ -673,7 +673,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
     def test_validate_fk(self):
         email = Email.objects.create(email="mymail@gmail.com")
         Group.objects.all().delete()
-        nonexistent_group_id = 1
+        nonexistent_group_id = connection.ops.get_hardcoded_pk(1)
         msg = f"group instance with id {nonexistent_group_id!r} is not a valid choice."
 
         with self.assertRaisesMessage(CommandError, msg):
@@ -690,7 +690,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
     def test_validate_fk_environment_variable(self):
         email = Email.objects.create(email="mymail@gmail.com")
         Group.objects.all().delete()
-        nonexistent_group_id = 1
+        nonexistent_group_id = connection.ops.get_hardcoded_pk(1)
         msg = f"group instance with id {nonexistent_group_id!r} is not a valid choice."
 
         with mock.patch.dict(
@@ -710,7 +710,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
     def test_validate_fk_via_option_interactive(self):
         email = Email.objects.create(email="mymail@gmail.com")
         Group.objects.all().delete()
-        nonexistent_group_id = 1
+        nonexistent_group_id = connection.ops.get_hardcoded_pk(1)
         msg = f"group instance with id {nonexistent_group_id!r} is not a valid choice."
 
         @mock_inputs(

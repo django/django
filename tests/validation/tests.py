@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import NON_FIELD_ERRORS
+from django.db import connection
 from django.test import TestCase
 from django.utils.functional import lazy
 
@@ -27,7 +28,8 @@ class BaseModelValidationTests(ValidationAssertions, TestCase):
         self.assertFailsValidation(mtv.full_clean, [NON_FIELD_ERRORS, "name"])
 
     def test_wrong_FK_value_raises_error(self):
-        mtv = ModelToValidate(number=10, name="Some Name", parent_id=3)
+        parent_id = connection.ops.get_hardcoded_pk(3)
+        mtv = ModelToValidate(number=10, name="Some Name", parent_id=parent_id)
         self.assertFieldFailsValidationWithMessage(
             mtv.full_clean,
             "parent",

@@ -1,3 +1,4 @@
+from django.db import connection
 from django.db.models import Subquery, TextField
 from django.db.models.functions import Coalesce, Lower
 from django.test import TestCase
@@ -65,11 +66,15 @@ class CoalesceTests(TestCase):
     def test_empty_queryset(self):
         Author.objects.create(name="John Smith")
         queryset = Author.objects.values("id")
+        zero = connection.ops.get_hardcoded_pk(0)
         tests = [
             (queryset.none(), "QuerySet.none()"),
-            (queryset.filter(id=0), "QuerySet.filter(id=0)"),
+            (queryset.filter(id=zero), f"QuerySet.filter(id={zero})"),
             (Subquery(queryset.none()), "Subquery(QuerySet.none())"),
-            (Subquery(queryset.filter(id=0)), "Subquery(Queryset.filter(id=0)"),
+            (
+                Subquery(queryset.filter(id=zero)),
+                f"Subquery(Queryset.filter(id={zero})",
+            ),
         ]
         for empty_query, description in tests:
             with self.subTest(description), self.assertNumQueries(1):

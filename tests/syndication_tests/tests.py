@@ -4,6 +4,7 @@ from xml.dom import minidom
 from django.contrib.sites.models import Site
 from django.contrib.syndication import views
 from django.core.exceptions import ImproperlyConfigured
+from django.db import connection
 from django.templatetags.static import static
 from django.test import TestCase, override_settings
 from django.test.utils import requires_tz_support
@@ -848,5 +849,6 @@ class SyndicationFeedTest(FeedTestCase):
         )
 
     def test_get_non_existent_object(self):
-        response = self.client.get("/syndication/rss2/articles/0/")
+        pk = connection.ops.get_nonexistent_pk(-1)
+        response = self.client.get(f"/syndication/rss2/articles/{pk}/")
         self.assertEqual(response.status_code, 404)
