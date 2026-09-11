@@ -235,7 +235,7 @@ class AdminSite:
         def inner(request, *args, **kwargs):
             if not self.has_permission(request):
                 if request.path == reverse("admin:logout", current_app=self.name):
-                    index_path = reverse("admin:index", current_app=self.name)
+                    index_path = self.get_index_url(request)
                     return HttpResponseRedirect(index_path)
                 # Inner import to prevent django.contrib.admin (app) from
                 # importing django.contrib.auth.models.User (unrelated model).
@@ -320,6 +320,22 @@ class AdminSite:
     @property
     def urls(self):
         return self.get_urls(), "admin", self.name
+
+    def get_index_url(self, request=None):
+        try:
+            return reverse("admin:index", current_app=self.name)
+        except NoReverseMatch:
+            return ""
+
+    def get_app_list_url(self, app_label, request=None):
+        try:
+            return reverse(
+                "admin:app_list",
+                kwargs={"app_label": app_label},
+                current_app=self.name,
+            )
+        except NoReverseMatch:
+            return ""
 
     def each_context(self, request):
         """
@@ -419,8 +435,8 @@ class AdminSite:
         from django.contrib.admin.forms import AdminAuthenticationForm
         from django.contrib.auth.views import LoginView
 
-        redirect_url = LoginView().get_redirect_url(request) or reverse(
-            "admin:index", current_app=self.name
+        redirect_url = LoginView().get_redirect_url(request) or self.get_index_url(
+            request
         )
         if request.method == "GET" and self.has_permission(request):
             # Already logged-in, redirect accordingly.
@@ -510,7 +526,6 @@ class AdminSite:
             if True not in perms.values():
                 continue
 
-            info = (app_label, model._meta.model_name)
             model_dict = {
                 "model": model,
                 "name": capfirst(model._meta.verbose_name_plural),
@@ -522,16 +537,14 @@ class AdminSite:
             if perms.get("change") or perms.get("view"):
                 model_dict["view_only"] = not perms.get("change")
                 try:
-                    model_dict["admin_url"] = reverse(
-                        "admin:%s_%s_changelist" % info, current_app=self.name
+                    model_dict["admin_url"] = model_admin.get_changelist_url(
+                        request=request
                     )
                 except NoReverseMatch:
                     pass
             if perms.get("add"):
                 try:
-                    model_dict["add_url"] = reverse(
-                        "admin:%s_%s_add" % info, current_app=self.name
-                    )
+                    model_dict["add_url"] = model_admin.get_add_url(request=request)
                 except NoReverseMatch:
                     pass
 
@@ -541,11 +554,7 @@ class AdminSite:
                 app_dict[app_label] = {
                     "name": apps.get_app_config(app_label).verbose_name,
                     "app_label": app_label,
-                    "app_url": reverse(
-                        "admin:app_list",
-                        kwargs={"app_label": app_label},
-                        current_app=self.name,
-                    ),
+                    "app_url": self.get_app_list_url(app_label, request=request),
                     "has_module_perms": has_module_perms,
                     "models": [model_dict],
                 }
