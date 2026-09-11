@@ -138,6 +138,17 @@ class Tests(TestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             new_connection.pool
 
+    def test_large_textfield_lookups(self):
+        from ..models import Post
+
+        large_text = "A" * 2500 + "HELLO_TARGET" + "B" * 2500
+        self.assertGreater(len(large_text), 4000)
+        Post.objects.create(name="large_post", text=large_text)
+
+        self.assertEqual(Post.objects.filter(text__contains="HELLO_TARGET").count(), 1)
+        self.assertEqual(Post.objects.filter(text=large_text).count(), 1)
+        self.assertEqual(Post.objects.filter(text__regex=r"HELLO_TARGET").count(), 1)
+
 
 @unittest.skipUnless(connection.vendor == "oracle", "Oracle tests")
 class TransactionalTests(TransactionTestCase):
