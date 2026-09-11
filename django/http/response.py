@@ -245,6 +245,23 @@ class HttpResponseBase:
         - int/float specifying seconds,
         - ``datetime.timedelta`` object.
         """
+        if key.startswith("__Secure-") and not secure:
+            raise ValueError(
+                'Cookies with names starting with "__Secure-" must set secure=True.'
+            )
+        if key.startswith("__Host-"):
+            if not secure:
+                raise ValueError(
+                    'Cookies with names starting with "__Host-" must set secure=True.'
+                )
+            if path != "/":
+                raise ValueError(
+                    'Cookies with names starting with "__Host-" must set path="/".'
+                )
+            if domain is not None:
+                raise ValueError(
+                    'Cookies with names starting with "__Host-" must not set domain.'
+                )
         self.cookies[key] = value
         if expires is not None:
             if isinstance(expires, datetime.datetime):
