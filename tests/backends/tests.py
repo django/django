@@ -11,6 +11,7 @@ from django.db import (
     DEFAULT_DB_ALIAS,
     DatabaseError,
     IntegrityError,
+    ProgrammingError,
     connection,
     connections,
     reset_queries,
@@ -180,9 +181,9 @@ class ParameterHandlingTest(TestCase):
                 connection.ops.quote_name("root"),
                 connection.ops.quote_name("square"),
             )
-            with self.assertRaises(Exception):
+            with self.assertRaises(ProgrammingError):
                 cursor.executemany(query, [(1, 2, 3)])
-            with self.assertRaises(Exception):
+            with self.assertRaises(ProgrammingError):
                 cursor.executemany(query, [(1,)])
 
 

@@ -125,7 +125,7 @@ class DatabaseWrapperLoggingTests(TransactionTestCase):
         conn = connections[DEFAULT_DB_ALIAS]
         with CaptureQueriesContext(conn):
             with self.assertLogs("django.db.backends", "DEBUG") as cm:
-                with self.assertRaises(Exception), transaction.atomic():
+                with self.assertRaises(Exception), transaction.atomic():  # noqa: B017 - intentionally catching forced Exception
                     Person.objects.create(first_name="first", last_name="last")
                     raise Exception("Force rollback")
 
@@ -140,7 +140,7 @@ class DatabaseWrapperLoggingTests(TransactionTestCase):
         if isinstance(self._outcome.result, DebugSQLTextTestResult):
             self.skipTest("--debug-sql interferes with this test")
         with self.assertNoLogs("django.db.backends", "DEBUG"):
-            with self.assertRaises(Exception), transaction.atomic():
+            with self.assertRaises(Exception), transaction.atomic():  # noqa: B017 - intentionally catching forced Exception
                 Person.objects.create(first_name="first", last_name="last")
                 raise Exception("Force rollback")
 

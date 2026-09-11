@@ -797,11 +797,11 @@ class StreamingHttpResponseTests(SimpleTestCase):
 
         # additional content cannot be written to the response.
         r = StreamingHttpResponse(iter(["hello", "world"]))
-        with self.assertRaises(Exception):
+        with self.assertRaises(OSError):
             r.write("!")
 
         # and we can't tell the current position.
-        with self.assertRaises(Exception):
+        with self.assertRaises(OSError):
             r.tell()
 
         r = StreamingHttpResponse(iter(["hello", "world"]))

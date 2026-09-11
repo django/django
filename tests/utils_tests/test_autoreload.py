@@ -110,7 +110,7 @@ class TestIterModulesAndFiles(SimpleTestCase):
         filename.write_text("raise Exception")
         with extend_sys_path(str(filename.parent)):
             try:
-                with self.assertRaises(Exception):
+                with self.assertRaises(Exception):  # noqa: B017 - intentionally catching arbitrary import exceptions
                     autoreload.check_errors(import_module)("test_exception")
             finally:
                 autoreload._exception = None
