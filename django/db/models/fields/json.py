@@ -291,6 +291,26 @@ class HasKeyOrArrayIndex(HasKey):
     def compile_json_path_final_key(self, connection, key_transform):
         return connection.ops.compile_json_path([key_transform], include_root=False)
 
+    def as_oracle(self, compiler, connection):
+        min_value, max_value = connection.ops.integer_field_range("IntegerField")
+        keys = [self.rhs]
+        previous = self.lhs
+        while isinstance(previous, KeyTransform):
+            keys.append(previous.key_name)
+            previous = previous.lhs
+        for key in keys:
+            try:
+                index = int(key)
+            except ValueError:
+                continue
+            if not (min_value <= index <= max_value):
+                # Oracle's JSON path parser cannot lex an array subscript
+                # this long ("ORA-40597: Array subscript too long"). An
+                # index this large can never exist in any real array, so
+                # the key/index can never be present.
+                return "(1=0)", ()
+        return super().as_oracle(compiler, connection)
+
 
 class CaseInsensitiveMixin:
     """
@@ -498,6 +518,18 @@ class KeyTransform(ProcessJSONLHSMixin, Transform):
 
     def as_oracle(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
+        min_value, max_value = connection.ops.integer_field_range("IntegerField")
+        for key_transform in key_transforms:
+            try:
+                index = int(key_transform)
+            except ValueError:
+                continue
+            if not (min_value <= index <= max_value):
+                # Oracle's JSON path parser cannot lex an array subscript
+                # this long ("ORA-40597: Array subscript too long"). Treat
+                # it as a non-matching index, the same as Oracle itself
+                # treats an in-bounds-length but out-of-bounds index.
+                return "NULL", params
         return self._process_as_oracle(lhs, params, connection, key_transforms)
 
     def as_postgresql(self, compiler, connection):
@@ -507,6 +539,11 @@ class KeyTransform(ProcessJSONLHSMixin, Transform):
             return sql, (*params, key_transforms)
         try:
             lookup = int(self.key_name)
+            min_value, max_value = connection.ops.integer_field_range("IntegerField")
+            if not (min_value <= lookup <= max_value):
+                # No int4 overload of the operator can be bound to a value
+                # this large. Treat it as a non-matching index.
+                return "(%s %s NULL::integer)" % (lhs, self.postgres_operator), params
         except ValueError:
             lookup = self.key_name
         return "(%s %s %%s)" % (lhs, self.postgres_operator), (*params, lookup)
