@@ -1,0 +1,140 @@
+.. _migrations-internals:
+
+====================
+Migrations internals
+====================
+
+Django's migration framework turns changes to models into a sequence of
+operations, records which migrations a database has applied, and applies or
+unapplies the operations in dependency order. This page explains the parts of
+that framework that are useful when contributing to Django.
+
+For using migrations in a project, see the :doc:`migration topic guide
+</topics/migrations>`. For the public migration operation API, see
+:doc:`/ref/migration-operations`. The implementation classes described here
+are contributor-facing internals rather than an extension API for third-party
+projects.
+
+The migration graph
+===================
+
+A migration module defines a ``Migration`` class with a name, app label,
+dependencies, and a sequence of ``Operation`` instances. ``MigrationLoader``
+discovers these modules in installed applications and turns them into migration
+instances.
+
+The loader builds a ``MigrationGraph`` whose nodes are
+``(app_label, migration_name)`` pairs. A dependency becomes an edge from the
+migration that depends on it to the migration it requires. The graph validates
+missing and cyclic dependencies, finds root and leaf migrations, and produces
+the forward or backward plan for a target.
+
+A migration can declare that it replaces several older migrations after
+squashing. The loader resolves those replacements against the applied
+migrations, so a replacement is used only when the database's history allows
+it. When it has a database connection, the loader obtains that history through
+``MigrationRecorder``, which stores applied migrations in the
+``django_migrations`` table.
+
+Project state
+=============
+
+A ``ProjectState`` represents a complete version of a project's models in
+memory. Its ``models`` mapping contains ``ModelState`` objects keyed by app
+label and lowercased model name. Keeping one state for the whole project lets
+Django resolve relationships that cross application boundaries.
+
+``ProjectState.apps`` renders that description into a temporary app registry
+containing historical model classes. The registry is constructed lazily and is
+reloaded when state changes affect related models. Code that runs in a
+migration must use these historical models when it needs a model definition
+from that point in the migration history.
+
+Each operation has a ``state_forwards()`` method that updates a
+``ProjectState`` without touching the database. For example,
+``AddField.state_forwards()`` adds a field to the appropriate
+``ModelState``. Operations also have database methods that receive the state
+before and after the operation, allowing them to use the correct historical
+models while changing the schema.
+
+Generating migrations
+=====================
+
+The :djadmin:`makemigrations` command compares two project states:
+
+* The state produced by applying the migration graph on disk.
+* The state built from the current installed applications.
+
+``MigrationAutodetector`` compares those states and generates operations for
+model, field, option, index, and constraint changes. It detects some renames
+and asks a ``MigrationQuestioner`` about choices that need user input, such
+as adding a non-nullable field without a default.
+
+The autodetector collects operations per application, orders them for their
+dependencies, and groups them into migrations. ``MigrationWriter`` then
+serializes the resulting migrations to Python files. The dependency graph is
+important throughout this process: an operation may need a migration in another
+application to run first, even when ``makemigrations`` was invoked for one
+application.
+
+Applying migrations
+===================
+
+The :djadmin:`migrate` command uses ``MigrationExecutor`` to calculate a
+plan from the graph and the recorder's applied history. It executes forward
+plans in dependency order and reverse plans in the order required to safely
+remove dependents.
+
+Before applying an operation, ``Migration.apply()`` keeps a copy of the old
+project state and calls ``state_forwards()`` on the current state. It then
+calls ``database_forwards()`` with both states and a database
+``SchemaEditor``. This separation means an operation can update in-memory
+history even when it produces no SQL, such as a data migration. Reverse
+migration similarly preserves intermediate states before calling
+``database_backwards()`` in reverse operation order.
+
+After a migration has been applied successfully, the executor records it. The
+recorder's history and the graph must remain consistent: an applied migration
+cannot have an unapplied dependency.
+
+Working on migration internals
+==============================
+
+An operation describes both model history and database effects. When changing
+or adding one, consider all of the following:
+
+* ``state_forwards()`` must leave ``ProjectState`` with the model history
+  that later operations and historical models expect.
+* ``database_forwards()`` and ``database_backwards()`` must work with the
+  states supplied by the migration framework and each supported backend.
+* Field instances in ``ModelState.fields`` must be replaced rather than
+  mutated because state clones share those instances.
+* ``deconstruct()`` must provide enough information for
+  ``MigrationWriter`` to serialize the operation.
+* ``reduce()`` must preserve the same state and database behavior when the
+  migration optimizer combines operations.
+
+Tests for migration changes often need to exercise both state transitions and
+database behavior. The tests in :source:`tests/migrations/` cover the loader,
+graph, autodetector, executor, optimizer, writer, and operations. Schema tests
+in :source:`tests/schema/` cover backend-specific database behavior.
+
+Source map
+==========
+
+The following modules are useful entry points when investigating a migration
+change:
+
+* :source:`django/core/management/commands/makemigrations.py` builds the two
+  states and writes newly detected migrations.
+* :source:`django/db/migrations/loader.py` loads migration modules, applied
+  history, and the dependency graph.
+* :source:`django/db/migrations/graph.py` validates and traverses the graph.
+* :source:`django/db/migrations/state.py` defines ``ProjectState``,
+  ``ModelState``, and the historical app registry.
+* :source:`django/db/migrations/autodetector.py` compares states and creates
+  operations for ``makemigrations``.
+* :source:`django/db/migrations/executor.py` plans and applies migrations.
+* :source:`django/db/migrations/operations/` defines the operation classes,
+  and :source:`django/db/migrations/migration.py` coordinates operations
+  within one migration.
