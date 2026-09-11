@@ -118,6 +118,39 @@ class SetCookieTests(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             HttpResponse().set_cookie("example", samesite="invalid")
 
+    def test_secure_prefix_requires_secure(self):
+        """
+        set_cookie() refuses to emit __Secure-/__Host- cookies without
+        Secure, which browsers would silently drop.
+        """
+        for prefix in ("Secure", "Host"):
+            with self.subTest(prefix=prefix):
+                msg = (
+                    'Cookies with names starting with "__%s-" must set '
+                    "secure=True." % prefix
+                )
+                with self.assertRaisesMessage(ValueError, msg):
+                    HttpResponse().set_cookie("__%s-c" % prefix, "value")
+
+    def test_secure_prefix_with_secure(self):
+        response = HttpResponse()
+        for prefix in ("Secure", "Host"):
+            with self.subTest(prefix=prefix):
+                response.set_cookie("__%s-c" % prefix, "value", secure=True)
+                self.assertIs(response.cookies["__%s-c" % prefix]["secure"], True)
+
+    def test_host_prefix_requires_path_root(self):
+        msg = 'Cookies with names starting with "__Host-" must set path="/".'
+        with self.assertRaisesMessage(ValueError, msg):
+            HttpResponse().set_cookie("__Host-c", "value", secure=True, path="/sub/")
+
+    def test_host_prefix_forbids_domain(self):
+        msg = 'Cookies with names starting with "__Host-" must not set domain.'
+        with self.assertRaisesMessage(ValueError, msg):
+            HttpResponse().set_cookie(
+                "__Host-c", "value", secure=True, domain="example.com"
+            )
+
 
 class DeleteCookieTests(SimpleTestCase):
     def test_default(self):
