@@ -193,7 +193,8 @@ before, it's a good idea to run it once beforehand to get familiar with its
 output.
 
 What is a test suite?
-A test suite is a collection of automated tests that check whether the code actually works correctly.
+A test suite is a collection of automated tests that check whether the
+code actually works correctly.
 
 Before running the test suite, enter the Django ``tests/`` directory using the
 ``cd tests`` command, and install test dependencies by running:
