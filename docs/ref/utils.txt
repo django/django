@@ -214,7 +214,7 @@ The functions defined in this module share the following properties:
 .. function:: sync_and_async_middleware(middleware)
 
     Marks a middleware as :ref:`sync and async compatible <async-middleware>`,
-    this allows to avoid converting requests. You must implement detection of
+    this allows avoiding converting requests. You must implement detection of
     the current request type to use this decorator. See :ref:`asynchronous
     middleware documentation <async-middleware>` for details.
 
