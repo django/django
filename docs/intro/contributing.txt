@@ -13,7 +13,7 @@ want added (but remember that proposals for new features should follow the
 Contributing back to Django itself is the best way to see your own concerns
 addressed. This may seem daunting at first, but it's a well-traveled path with
 documentation, tooling, and a community to support you. We'll walk you through
-the entire process, so you can learn by examples.
+the entire process, so you can learn by example.
 
 Who's this tutorial for?
 ------------------------
@@ -90,7 +90,7 @@ and to create a branch for the changes you make.
 
 To check whether Git is already installed, run:
 
-.. code-block:: console
+.. console::
 
     $ git --version
 
@@ -110,10 +110,9 @@ The first step is to get a copy of the source code:
 3. Use ``cd`` to navigate to the folder where you want your local copy of
    Django to live, for example:
 
-  .. code-block:: console
+   .. code-block:: console
 
        $ cd ~/projects
-
 
 Download the Django source code repository using the following command:
 
@@ -123,13 +122,9 @@ Download the Django source code repository using the following command:
 
 .. admonition:: Low bandwidth connection?
 
-    If you're on a slow connection, or want to test how the script behaves
-    under restricted networking, use the low-bandwidth flag below for your OS:
-
-.. code-block:: console
-
-    # Execute the main setup using the low bandwidth package manager flag
-    $ python3 main.py --low-bandwidth
+    You can add the ``--depth 1`` argument to ``git clone`` to skip downloading
+    all of Django's commit history, which reduces data transfer from ~250 MB
+    to ~70 MB.
 
 Now that you have a local copy of Django, you can install it just like you
 would install any package using ``pip``. The most convenient way to do so is by
@@ -144,7 +139,7 @@ example in ``.virtualenvs/`` in your home directory.
 
 Create a new virtual environment by running:
 
-.. code-block:: console
+.. console:: 
 
     $ python3 -m venv ~/.virtualenvs/djangodev
 
@@ -155,6 +150,14 @@ The final step in setting up your virtual environment is to activate it:
 .. code-block:: console
 
     $ source ~/.virtualenvs/djangodev/bin/activate
+
+.. admonition:: For Windows users
+
+    To activate your virtual environment on Windows, run:
+
+    .. code-block:: doscon
+
+        ...\>%HOMEPATH%\.virtualenvs\djangodev\Scripts\activate.bat
 
 You'll need to activate the virtual environment every time you open a new
 terminal window.
@@ -193,8 +196,11 @@ before, it's a good idea to run it once beforehand to get familiar with its
 output.
 
 What is a test suite?
-A test suite is a collection of automated tests that check whether the
-code actually works correctly.
+
+.. note::
+
+    A test suite is a collection of automated tests that check whether the
+    code actually works correctly.
 
 Before running the test suite, enter the Django ``tests/`` directory using the
 ``cd tests`` command, and install test dependencies by running:
@@ -203,9 +209,10 @@ Before running the test suite, enter the Django ``tests/`` directory using the
 
     $ python -m pip install -r requirements/py3.txt
 
-If installation fails, your system might be missing a dependency for one of
-the Python packages. Check the failing package's documentation, or search
-the web using the exact error message you got.
+If you encounter an error during the installation, your system might be missing
+a dependency for one or more of the Python packages. Consult the failing
+package's documentation or search the web with the error message that you
+encounter.
 
 Now you're ready to run the test suite:
 
@@ -241,31 +248,30 @@ to Django's code, the entire test suite **should** pass. If you get failures or
 errors make sure you've followed all of the previous steps properly. See
 :ref:`running-unit-tests` for more information.
 
-Note that Django's "main" branch is under active development and may not
-always be stable. If tests fail while you're working against "main", check
-`Django's continuous integration builds`__ to see whether the failure is
-specific to your machine, or if it's already happening in Django's official
-builds too. Each build page has a "Configuration Matrix" showing failures
-broken down by Python version and database backend, which can help you
-narrow down the cause.
+Note that the latest Django "main" branch may not always be stable. When
+developing against "main", you can check `Django's continuous integration
+builds`__ to determine if the failures are specific to your machine or if they
+are also present in Django's official builds. If you click to view a particular
+build, you can view the "Configuration Matrix" which shows failures broken down
+by Python version and database backend.
 
 __ https://djangoci.com
 
 .. note::
 
-    SQLite is sufficient for this tutorial and the ticket we're working on.
-    That said, it's sometimes necessary to :ref:`run the tests using a
-    different database <running-unit-tests-settings>`. If you're making UI
-    changes, you'll also need to :ref:`run the Playwright tests
-    <running-playwright-tests>`.
+    For this tutorial and the ticket we're working on, testing against SQLite
+    is sufficient, however, it's possible (and sometimes necessary) to
+    :ref:`run the tests using a different database
+    <running-unit-tests-settings>`. When making UI changes, you will need to
+    :ref:`run the Playwright tests <running-playwright-tests>`.
 
 Working on an approved new feature
 ==================================
 
-Tickets are how Django tracks bugs, feature requests, and other work that
-needs to be done. Each ticket describes one specific problem or improvement,
-and contributors can claim a ticket to let others know they're working on
-it, avoiding duplicated effort.
+Django tracks bugs, feature requests, and other work through *tickets* on
+its ticket tracker (Trac), at https://code.djangoproject.com/. For this
+tutorial, we'll work on a "fake accepted ticket" as a case study. Here are
+the imaginary details:
 
 You can view, search, and create tickets on Django's ticket tracker (Trac)
 at https://code.djangoproject.com/.
@@ -357,9 +363,9 @@ __ https://diveintopython3.net/unit-testing.html
 Running your new test
 ---------------------
 
-Since we haven't made any changes to ``django.shortcuts`` yet, our test
-should fail. Let's run just the tests in the ``shortcuts`` folder to confirm
-that's really what happens. ``cd`` into Django's ``tests/`` directory and run:
+Since we haven't made any modifications to ``django.shortcuts`` yet, our test
+should fail. Let's run all the tests in the ``shortcuts`` folder to make sure
+that's really what happens. ``cd`` to the Django ``tests/`` directory and run:
 
 .. console::
 
@@ -386,9 +392,9 @@ bottom, add::
     def make_toast():
         return "toast"
 
-Now let's confirm the test we wrote earlier passes, to check that the code
-we added is working correctly. Again, ``cd`` into Django's ``tests/``
-directory and run:
+Now we need to make sure that the test we wrote earlier passes, so we can see
+whether the code we added is working correctly. Again, navigate to the Django
+``tests/`` directory and run:
 
 .. console::
 
@@ -406,7 +412,8 @@ hasn't introduced any bugs into other areas of Django. While successfully
 passing the entire test suite doesn't guarantee your code is bug free, it does
 help identify many bugs and regressions that might otherwise go unnoticed.
 
-To run the entire suite, ``cd`` into Django's ``tests/`` directory and run:
+To run the entire Django test suite, ``cd`` into the Django ``tests/``
+directory and run:
 
 .. console::
 
