@@ -94,18 +94,6 @@ To check whether Git is already installed, run:
 
     $ git --version
 
-**macOS/Linux (Terminal):**
-
-.. code-block:: console
-
-    $ git --version
-
-**Windows (Command Prompt):**
-
-.. code-block:: doscon
-
-    C:\>git --version
-
 If the command isn't recognized, you'll need to download and install Git —
 see `Git's download page <https://git-scm.com/download>`__.
 
@@ -122,17 +110,10 @@ The first step is to get a copy of the source code:
 3. Use ``cd`` to navigate to the folder where you want your local copy of
    Django to live, for example:
 
-**macOS/Linux:**
-
-   .. code-block:: console
+  .. code-block:: console
 
        $ cd ~/projects
 
-   **Windows:**
-
-   .. code-block:: doscon
-
-       C:\>cd C:\Users\YourName\projects
 
 Download the Django source code repository using the following command:
 
@@ -144,13 +125,6 @@ Download the Django source code repository using the following command:
 
     If you're on a slow connection, or want to test how the script behaves
     under restricted networking, use the low-bandwidth flag below for your OS:
-
-.. admonition:: For Windows users
-
-    .. code-block:: doscon
-
-        REM Execute the main setup using the low bandwidth package manager flag
-        C:\>python main.py --low-bandwidth
 
 .. code-block:: console
 
@@ -174,12 +148,6 @@ Create a new virtual environment by running:
 
     $ python3 -m venv ~/.virtualenvs/djangodev
 
-.. admonition:: For Windows users
-
-    .. code-block:: doscon
-
-        C:\>python -m venv C:\Users\YourName\.virtualenvs\djangodev
-
 The path is where the new environment will be saved on your computer.
 
 The final step in setting up your virtual environment is to activate it:
@@ -188,28 +156,15 @@ The final step in setting up your virtual environment is to activate it:
 
     $ source ~/.virtualenvs/djangodev/bin/activate
 
-.. admonition:: For Windows users
+You'll need to activate the virtual environment every time you open a new
+terminal window.
 
-    .. code-block:: doscon
-
-        C:\>C:\Users\YourName\.virtualenvs\djangodev\Scripts\activate.bat
-
-If the ``source`` command is not available, you can try using a dot instead:
+If your shell doesn't support the ``source`` command, you can use a dot
+(``.``) instead — it works the same way. For example:
 
 .. code-block:: console
 
     $ . ~/.virtualenvs/djangodev/bin/activate
-
-You'll need to activate the virtual environment every time you open a new
-terminal window..
-
-.. admonition:: For Windows users
-
-    To activate your virtual environment on Windows, run:
-
-    .. code-block:: doscon
-
-        ...\>%HOMEPATH%\.virtualenvs\djangodev\Scripts\activate.bat
 
 The name of the currently activated virtual environment is displayed on the
 command line to help you keep track of which one you are using. Anything you
@@ -237,6 +192,9 @@ haven't broken other parts of Django. If you've never run Django's test suite
 before, it's a good idea to run it once beforehand to get familiar with its
 output.
 
+What is a test suite?
+A test suite is a collection of automated tests that check whether the code actually works correctly.
+
 Before running the test suite, enter the Django ``tests/`` directory using the
 ``cd tests`` command, and install test dependencies by running:
 
@@ -254,22 +212,19 @@ Now you're ready to run the test suite:
 
     $ ./runtests.py
 
-.. admonition:: For Windows users
-
-    On Windows, run the test suite with:
-
-    .. code-block:: doscon
-
-        ...\>runtests.py
-
 Now sit back and relax. Django's entire test suite has thousands of tests, and
 it takes at least a few minutes to run, depending on the speed of your
 computer.
 
 While it runs, you'll see a stream of characters showing each test's status
-as it finishes: ``E`` means a test raised an error, and ``F`` means a test's
-assertions failed — both count as failures. ``x`` and ``s`` mean expected
-failures and skipped tests. A dot means the test passed.
+as it finishes:
+
+* A dot (``.``) means the test passed.
+* ``E`` means a test raised an error.
+* ``F`` means a test's assertions failed.
+* ``x`` and ``s`` mean expected failures and skipped tests.
+
+``E`` and ``F`` both count as test failures.
 
 Skipped tests are typically due to missing external libraries required to run
 the test; see :ref:`running-unit-tests-dependencies` for a list of dependencies
@@ -285,12 +240,13 @@ to Django's code, the entire test suite **should** pass. If you get failures or
 errors make sure you've followed all of the previous steps properly. See
 :ref:`running-unit-tests` for more information.
 
-Note that the latest Django "main" branch may not always be stable. When
-developing against "main", you can check `Django's continuous integration
-builds`__ to determine if the failures are specific to your machine or if they
-are also present in Django's official builds. If you click to view a particular
-build, you can view the "Configuration Matrix" which shows failures broken down
-by Python version and database backend.
+Note that Django's "main" branch is under active development and may not
+always be stable. If tests fail while you're working against "main", check
+`Django's continuous integration builds`__ to see whether the failure is
+specific to your machine, or if it's already happening in Django's official
+builds too. Each build page has a "Configuration Matrix" showing failures
+broken down by Python version and database backend, which can help you
+narrow down the cause.
 
 __ https://djangoci.com
 
@@ -304,6 +260,14 @@ __ https://djangoci.com
 
 Working on an approved new feature
 ==================================
+
+Tickets are how Django tracks bugs, feature requests, and other work that
+needs to be done. Each ticket describes one specific problem or improvement,
+and contributors can claim a ticket to let others know they're working on
+it, avoiding duplicated effort.
+
+You can view, search, and create tickets on Django's ticket tracker (Trac)
+at https://code.djangoproject.com/.
 
 For this tutorial, we'll work on a "fake accepted ticket" as a case study. Here
 are the imaginary details:
@@ -331,14 +295,15 @@ won't affect the main copy of the code that we cloned earlier.
 Writing some tests for your ticket
 ==================================
 
-In most cases, for a contribution to be accepted into Django it has to include
-tests. For bug fix contributions, this means writing a regression test to
-ensure that the bug is never reintroduced into Django later on. A regression
-test should be written in such a way that it will fail while the bug still
-exists and pass once the bug has been fixed. For contributions containing new
-features, you'll need to include tests which ensure that the new features are
-working correctly. They too should fail when the new feature is not present,
-and then pass once it has been implemented.
+Most contributions need tests to be accepted into Django.
+
+* **Bug fixes** need a regression test — one that fails while the bug still
+  exists, and passes once you've fixed it.
+* **New features** need tests that fail before the feature exists, and pass
+  once you've implemented it.
+
+This proves your change actually works, and helps catch the same bug or
+missing feature if it's ever accidentally reintroduced later.
 
 A good way to do this is to write your new tests first, before making any
 changes to the code. This style of development is called
@@ -399,14 +364,6 @@ that's really what happens. ``cd`` into Django's ``tests/`` directory and run:
 
     $ ./runtests.py shortcuts
 
-.. admonition:: For Windows users
-
-    On Windows, run:
-
-    .. code-block:: doscon
-
-        ...\>runtests.py shortcuts
-
 If the tests ran correctly, you should see one failure corresponding to the
 test method we added, with this error:
 
@@ -436,14 +393,6 @@ directory and run:
 
     $ ./runtests.py shortcuts
 
-.. admonition:: For Windows users
-
-    On Windows, run:
-
-    .. code-block:: doscon
-
-        ...\>runtests.py shortcuts
-
 Everything should pass. If it doesn't, make sure you correctly added the
 function to the correct file.
 
@@ -461,14 +410,6 @@ To run the entire suite, ``cd`` into Django's ``tests/`` directory and run:
 .. console::
 
     $ ./runtests.py
-
-.. admonition:: For Windows users
-
-    On Windows, run:
-
-    .. code-block:: doscon
-
-        ...\>runtests.py
 
 Writing Documentation
 =====================
