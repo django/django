@@ -169,7 +169,7 @@ instead of listing all users.
 
 You can filter empty values using ``EmptyFieldListFilter``, which can
 filter on both empty strings and nulls, depending on what the field
-allows to store::
+allows storing::
 
     class BookAdmin(admin.ModelAdmin):
         list_filter = [
