@@ -1052,6 +1052,13 @@ Methods
       Use ``samesite='None'`` (string) to explicitly state that this cookie is
       sent with all same-site and cross-site requests.
 
+    * Cookies with names starting with ``__Secure-`` must set ``secure=True``.
+      Cookies with names starting with ``__Host-`` must set ``secure=True``,
+      ``path="/"``, and must not set ``domain``. Browsers silently reject
+      cookies with these prefixes that don't meet these requirements, so a
+      ``ValueError`` is raised instead of emitting a cookie that would never
+      be stored.
+
     .. _HttpOnly: https://owasp.org/www-community/HttpOnly
     .. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#samesitesamesite-value
 
