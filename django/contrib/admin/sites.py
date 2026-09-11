@@ -322,14 +322,20 @@ class AdminSite:
         return self.get_urls(), "admin", self.name
 
     def get_index_url(self, request=None):
-        return reverse("admin:index", current_app=self.name)
+        try:
+            return reverse("admin:index", current_app=self.name)
+        except NoReverseMatch:
+            return ""
 
     def get_app_list_url(self, app_label, request=None):
-        return reverse(
-            "admin:app_list",
-            kwargs={"app_label": app_label},
-            current_app=self.name,
-        )
+        try:
+            return reverse(
+                "admin:app_list",
+                kwargs={"app_label": app_label},
+                current_app=self.name,
+            )
+        except NoReverseMatch:
+            return ""
 
     def each_context(self, request):
         """

@@ -61,7 +61,7 @@ from django.forms.widgets import CheckboxSelectMultiple, SelectMultiple
 from django.http import HttpResponseRedirect
 from django.http.response import HttpResponseBase
 from django.template.response import SimpleTemplateResponse, TemplateResponse
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 from django.utils.decorators import method_decorator
 from django.utils.deprecation import (
     RemovedInDjango2028Warning,
@@ -432,16 +432,22 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         return self.admin_site.get_app_list_url(self.opts.app_label, request=request)
 
     def get_changelist_url(self, request=None, **kwargs):
-        return reverse(
-            "admin:%s_%s_changelist" % (self.opts.app_label, self.opts.model_name),
-            current_app=self.admin_site.name,
-        )
+        try:
+            return reverse(
+                "admin:%s_%s_changelist" % (self.opts.app_label, self.opts.model_name),
+                current_app=self.admin_site.name,
+            )
+        except NoReverseMatch:
+            return ""
 
     def get_add_url(self, request=None, **kwargs):
-        return reverse(
-            "admin:%s_%s_add" % (self.opts.app_label, self.opts.model_name),
-            current_app=self.admin_site.name,
-        )
+        try:
+            return reverse(
+                "admin:%s_%s_add" % (self.opts.app_label, self.opts.model_name),
+                current_app=self.admin_site.name,
+            )
+        except NoReverseMatch:
+            return ""
 
     def get_change_url(self, object_id, request=None, **kwargs):
         if object_id is None or object_id == "":
@@ -449,11 +455,14 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         object_id = getattr(object_id, "pk", object_id)
         if object_id is None or object_id == "":
             return ""
-        return reverse(
-            "admin:%s_%s_change" % (self.opts.app_label, self.opts.model_name),
-            args=(quote(object_id),),
-            current_app=self.admin_site.name,
-        )
+        try:
+            return reverse(
+                "admin:%s_%s_change" % (self.opts.app_label, self.opts.model_name),
+                args=(quote(object_id),),
+                current_app=self.admin_site.name,
+            )
+        except NoReverseMatch:
+            return ""
 
     def get_delete_url(self, object_id, request=None, **kwargs):
         if object_id is None or object_id == "":
@@ -461,11 +470,14 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         object_id = getattr(object_id, "pk", object_id)
         if object_id is None or object_id == "":
             return ""
-        return reverse(
-            "admin:%s_%s_delete" % (self.opts.app_label, self.opts.model_name),
-            args=(quote(object_id),),
-            current_app=self.admin_site.name,
-        )
+        try:
+            return reverse(
+                "admin:%s_%s_delete" % (self.opts.app_label, self.opts.model_name),
+                args=(quote(object_id),),
+                current_app=self.admin_site.name,
+            )
+        except NoReverseMatch:
+            return ""
 
     def get_history_url(self, object_id, request=None, **kwargs):
         if object_id is None or object_id == "":
@@ -473,11 +485,14 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         object_id = getattr(object_id, "pk", object_id)
         if object_id is None or object_id == "":
             return ""
-        return reverse(
-            "admin:%s_%s_history" % (self.opts.app_label, self.opts.model_name),
-            args=(quote(object_id),),
-            current_app=self.admin_site.name,
-        )
+        try:
+            return reverse(
+                "admin:%s_%s_history" % (self.opts.app_label, self.opts.model_name),
+                args=(quote(object_id),),
+                current_app=self.admin_site.name,
+            )
+        except NoReverseMatch:
+            return ""
 
     def get_empty_value_display(self):
         """
