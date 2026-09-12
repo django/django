@@ -41,7 +41,13 @@ from django.db.models.query_utils import (
     refs_expression,
 )
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
-from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
+from django.db.models.sql.datastructures import (
+    BaseTable,
+    Empty,
+    Join,
+    MultiJoin,
+    table_requires_alias,
+)
 from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
 from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.functional import cached_property
@@ -916,10 +922,12 @@ class Query(BaseExpression):
             alias = "%s%d" % (self.alias_prefix, len(self.alias_map) + 1)
             alias_list.append(alias)
         else:
-            # The first occurrence of a table uses the table name directly.
-            alias = (
-                filtered_relation.alias if filtered_relation is not None else table_name
-            )
+            if filtered_relation is not None:
+                alias = filtered_relation.alias
+            elif table_requires_alias(table_name):
+                alias = "%s%d" % (self.alias_prefix, len(self.alias_map) + 1)
+            else:
+                alias = table_name
             self.table_map[table_name] = [alias]
         self.alias_refcount[alias] = 1
         return alias, True
