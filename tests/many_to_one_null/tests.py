@@ -4,6 +4,15 @@ from .models import Article, Car, Driver, Reporter
 
 
 class ManyToOneNullTests(TestCase):
+    def test_exclude_reverse_relation_with_nullable_target(self):
+        null_make = Car.objects.create(make=None)
+        driven = Car.objects.create(make="driven")
+        Car.objects.create(make="undriven")
+        Driver.objects.create(car=driven)
+        Driver.objects.create(car=None)
+        # Preserve the existing correlation semantics for NULL target keys.
+        self.assertCountEqual(Car.objects.exclude(drivers=None), [null_make, driven])
+
     @classmethod
     def setUpTestData(cls):
         # Create a Reporter.

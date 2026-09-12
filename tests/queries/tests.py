@@ -4,12 +4,24 @@ import sys
 import unittest
 from itertools import chain
 from operator import attrgetter
+from unittest import mock
 
 from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DEFAULT_DB_ALIAS, connection
-from django.db.models import CharField, Count, Exists, F, Max, OuterRef, Q
+from django.db.models import (
+    CharField,
+    Count,
+    Exists,
+    F,
+    FilteredRelation,
+    Max,
+    OuterRef,
+    Q,
+)
 from django.db.models.expressions import RawSQL
+from django.db.models.fields.related_lookups import RelatedIsNull
 from django.db.models.functions import ExtractYear, Length, LTrim
+from django.db.models.lookups import Exact
 from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import AND, OR, NothingNode, WhereNode
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
@@ -4540,6 +4552,177 @@ class TestInvalidFilterArguments(TestCase):
         msg = "The following kwargs are invalid: '_connector', '_negated'"
         with self.assertRaisesMessage(TypeError, msg):
             School.objects.filter(pk=school.pk, _negated=True, _connector="evil")
+
+
+class ReverseRelationExcludeTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.alive_related = Individual.objects.create(alive=True)
+        cls.dead_related = Individual.objects.create(alive=False)
+        cls.alive_unrelated = Individual.objects.create(alive=True)
+        cls.dead_unrelated = Individual.objects.create(alive=False)
+        RelatedIndividual.objects.bulk_create(
+            [
+                RelatedIndividual(related=cls.alive_related),
+                RelatedIndividual(related=cls.alive_related),
+                RelatedIndividual(related=cls.dead_related),
+            ]
+        )
+
+    def test_exclude_missing_related_rows(self):
+        for lookup, value in (
+            ("related_individual", None),
+            ("related_individual__exact", None),
+            ("related_individual__isnull", True),
+            ("related_individual__pk", None),
+            ("related_individual__pk__isnull", True),
+        ):
+            with self.subTest(lookup=lookup):
+                query = Individual.objects.exclude(**{lookup: value})
+                self.assertCountEqual(query, [self.alive_related, self.dead_related])
+                self.assertNotIn("LEFT OUTER JOIN", str(query.query))
+
+    def test_negated_absence_with_other_conditions(self):
+        missing = Q(related_individual=None)
+        for condition, expected in (
+            (Q(alive=True) & ~missing, [self.alive_related]),
+            (
+                Q(alive=True) | ~missing,
+                [
+                    self.alive_related,
+                    self.dead_related,
+                    self.alive_unrelated,
+                ],
+            ),
+            (
+                ~(Q(alive=True) & missing),
+                [
+                    self.alive_related,
+                    self.dead_related,
+                    self.dead_unrelated,
+                ],
+            ),
+            (~~missing, [self.alive_unrelated, self.dead_unrelated]),
+        ):
+            with self.subTest(condition=condition):
+                self.assertCountEqual(Individual.objects.filter(condition), expected)
+
+    def test_nullable_related_field(self):
+        category = NamedCategory.objects.create(name="category")
+        mixed = Tag.objects.create(name="mixed")
+        populated = Tag.objects.create(name="populated")
+        Tag.objects.create(name="empty")
+        Tag.objects.create(name="null", parent=mixed)
+        Tag.objects.create(name="set", parent=mixed, category=category)
+        Tag.objects.create(name="set2", parent=populated, category=category)
+        self.assertSequenceEqual(
+            Tag.objects.exclude(children__category__isnull=True), [populated]
+        )
+
+    def test_nullable_prefix(self):
+        parent = Tag.objects.create(name="parent")
+        child = Tag.objects.create(name="child", parent=parent)
+        Tag.objects.create(name="unrelated")
+        self.assertSequenceEqual(Tag.objects.exclude(parent__children=None), [child])
+
+    def test_reused_join(self):
+        related = self.alive_related.related_individual.first()
+        for condition, expected in (
+            (
+                Q(related_individual=related) & ~Q(related_individual=None),
+                [self.alive_related],
+            ),
+            (
+                Q(related_individual=related) | ~Q(related_individual=None),
+                [self.alive_related, self.alive_related, self.dead_related],
+            ),
+        ):
+            with self.subTest(condition=condition):
+                self.assertCountEqual(Individual.objects.filter(condition), expected)
+
+    def test_to_field(self):
+        parent = Node.objects.create(num=17)
+        Node.objects.create(num=42, parent=parent)
+        Node.objects.create(num=31)
+        query = Node.objects.exclude(node=None)
+        self.assertSequenceEqual(query, [parent])
+        self.assertNotIn("LEFT OUTER JOIN", str(query.query))
+
+    def test_to_field_with_empty_strings(self):
+        eaten = Food.objects.create(name="eaten")
+        Food.objects.create(name="uneaten")
+        Eaten.objects.create(food=eaten, meal="dinner")
+        Eaten.objects.create(food=None, meal="lunch")
+        query = Food.objects.exclude(eaten=None)
+        self.assertSequenceEqual(query, [eaten])
+        # Oracle allows NULL in this non-PK CharField, even with null=False.
+        # The query may use Oracle while the default connection does not.
+        with mock.patch.object(
+            connection.features, "interprets_empty_strings_as_nulls", False
+        ):
+            query = Food.objects.exclude(eaten=None)
+            self.assertIn("LEFT OUTER JOIN", str(query.query))
+
+    def test_self_referential_relation_with_forward_join(self):
+        root = Tag.objects.create(name="root")
+        branch = Tag.objects.create(name="branch", parent=root)
+        leaf = Tag.objects.create(name="leaf", parent=root)
+        Tag.objects.create(name="grand", parent=branch)
+        for condition, expected in (
+            (Q(parent__name="root") & ~Q(children=None), [branch]),
+            (Q(parent__name="root") | ~Q(children=None), [root, branch, leaf]),
+        ):
+            with self.subTest(condition=condition):
+                self.assertCountEqual(Tag.objects.filter(condition), expected)
+
+    def test_longer_reverse_path(self):
+        mixed = Tag.objects.create(name="mixed")
+        populated = Tag.objects.create(name="populated")
+        Tag.objects.create(name="empty", parent=mixed)
+        child = Tag.objects.create(name="child", parent=mixed)
+        Tag.objects.create(name="grand1", parent=child)
+        child = Tag.objects.create(name="child2", parent=populated)
+        Tag.objects.create(name="grand2", parent=child)
+        self.assertSequenceEqual(
+            Tag.objects.exclude(children__children=None), [populated]
+        )
+
+    def test_filtered_relation(self):
+        related = self.alive_related.related_individual.first()
+        query = Individual.objects.alias(
+            matching=FilteredRelation(
+                "related_individual", condition=Q(related_individual__pk=related.pk)
+            )
+        ).exclude(matching=None)
+        self.assertSequenceEqual(query, [self.alive_related])
+
+    def test_extra_join_restriction(self):
+        root = Tag.objects.create(name="root")
+        branch = Tag.objects.create(name="branch", parent=root)
+        Tag.objects.create(name="leaf", parent=branch)
+        name = Tag._meta.get_field("name")
+
+        def restriction(alias, related_alias):
+            return Exact(name.get_col(alias), "root")
+
+        with mock.patch.object(
+            Tag._meta.get_field("parent"), "get_extra_restriction", restriction
+        ):
+            self.assertSequenceEqual(Tag.objects.exclude(children=None), [root])
+
+    def test_custom_isnull_lookup(self):
+        class NotIsNull(RelatedIsNull):
+            def as_sql(self, compiler, connection):
+                return RelatedIsNull(self.lhs, not self.rhs).as_sql(
+                    compiler, connection
+                )
+
+        field = RelatedIndividual._meta.get_field("related")
+        with register_lookup(field, NotIsNull):
+            self.assertCountEqual(
+                Individual.objects.exclude(related_individual=None),
+                [self.alive_unrelated, self.dead_unrelated],
+            )
 
 
 class TestTicket24605(TestCase):

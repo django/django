@@ -34,7 +34,7 @@ from django.db.models.expressions import (
     Value,
 )
 from django.db.models.fields import Field
-from django.db.models.lookups import Lookup
+from django.db.models.lookups import IsNull, Lookup
 from django.db.models.query_utils import (
     Q,
     check_rel_lookup_compatibility,
@@ -2146,6 +2146,12 @@ class Query(BaseExpression):
             filter_rhs = OuterRef(filter_rhs.name)
         query.add_filter(filter_lhs, filter_rhs)
         query.clear_ordering(force=True)
+        negate_exists = query._can_invert_reverse_relation_absence()
+        if negate_exists:
+            # Removing the absence check allows the parent join to be trimmed.
+            related_alias = query.where.children[0].lhs.alias
+            query.clear_where()
+            query.demote_joins([related_alias])
         # Try to have as simple as possible subquery -> trim leading joins from
         # the subquery.
         trimmed_prefix, contains_louter = query.trim_start(names_with_path)
@@ -2153,7 +2159,9 @@ class Query(BaseExpression):
         col = query.select[0]
         select_field = col.target
         alias = col.alias
-        if alias in can_reuse:
+        # An inverted absence lookup must correlate to the parent, regardless
+        # of any outer joins which happen to reuse the inner table's alias.
+        if alias in can_reuse and not negate_exists:
             pk = select_field.model._meta.pk
             # Need to add a restriction so that outer query's filters are in
             # effect for the subquery, too.
@@ -2169,7 +2177,10 @@ class Query(BaseExpression):
             lookup = lookup_class(col, ResolvedOuterRef(trimmed_prefix))
             query.where.add(lookup, AND)
 
-        condition, needed_inner = self.build_filter(Exists(query))
+        exists = Exists(query)
+        condition, needed_inner = self.build_filter(
+            ~exists if negate_exists else exists
+        )
 
         if contains_louter:
             or_null_condition, _ = self.build_filter(
@@ -2185,6 +2196,53 @@ class Query(BaseExpression):
             # correct. If the IS NULL check is removed, then if outercol
             # IS NULL we will not match the row.
         return condition, needed_inner
+
+    def _can_invert_reverse_relation_absence(self):
+        """Check if reverse relation absence can use a negated EXISTS."""
+        from django.db.models.fields.related_lookups import RelatedIsNull
+
+        if len(self.where.children) != 1:
+            return False
+
+        lookup = self.where.children[0]
+        if (
+            type(lookup) not in (IsNull, RelatedIsNull)
+            or lookup.rhs is not True
+            or not isinstance(lookup.lhs, Col)
+        ):
+            return False
+
+        # A direct reverse relation's nonnullable primary key is NULL only
+        # when no related row exists. Nullable fields and longer paths can
+        # contain both NULL and non-NULL values among related rows.
+        related_field = lookup.lhs.target
+        if (
+            not related_field.primary_key
+            or self.is_nullable(related_field)
+            or len(self._lookup_joins) != 2
+        ):
+            return False
+
+        join = self.alias_map[lookup.lhs.alias]
+        if (
+            not join.join_field.one_to_many
+            or join.filtered_relation
+            or len(join.join_fields) != 1
+        ):
+            return False
+
+        parent_field, _ = join.join_fields[0]
+        if self.is_nullable(parent_field):
+            return False
+        # Non-PK text keys can be NULL on Oracle, even with null=False.
+        # Don't rely on the default connection's nullability rules.
+        if not parent_field.primary_key and parent_field.empty_strings_allowed:
+            return False
+
+        return (
+            join.join_field.get_extra_restriction(join.table_alias, join.parent_alias)
+            is None
+        )
 
     def set_empty(self):
         self.where.add(NothingNode(), AND)
