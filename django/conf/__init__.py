@@ -16,6 +16,7 @@ from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.deprecation import (
     RemovedInDjango2028Warning,
+    RemovedInDjango2029Warning,
     warn_about_external_use,
 )
 from django.utils.functional import LazyObject, empty
@@ -24,6 +25,11 @@ from django.utils.warnings import django_file_prefixes
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 DEFAULT_STORAGE_ALIAS = "default"
 STATICFILES_STORAGE_ALIAS = "staticfiles"
+
+# RemovedInDjango2029Warning.
+DEFAULT_AUTO_FIELD_DEPRECATED_MSG = (
+    "The DEFAULT_AUTO_FIELD setting is deprecated. Use DEFAULT_PK_FIELD instead."
+)
 
 # RemovedInDjango2028Warning.
 SIGNED_COOKIE_LEGACY_SALT_DEPRECATED_MSG = (
@@ -134,12 +140,12 @@ class LazySettings(LazyObject):
                 RemovedInDjango2028Warning,
             )
 
-        # RemovedInDjango71Warning.
+        # RemovedInDjango2029Warning.
         if name == "DEFAULT_AUTO_FIELD" and _wrapped.is_overridden(
             "DEFAULT_AUTO_FIELD"
         ):
             _show_settings_deprecation_warning(
-                DEFAULT_AUTO_FIELD_DEPRECATED_MSG, RemovedInDjango71Warning
+                DEFAULT_AUTO_FIELD_DEPRECATED_MSG, RemovedInDjango2029Warning
             )
 
         # Special case some settings which require further modification.
@@ -186,10 +192,10 @@ class LazySettings(LazyObject):
                 RemovedInDjango2028Warning,
             )
 
-        # RemovedInDjango71Warning.
+        # RemovedInDjango2029Warning.
         if name == "DEFAULT_AUTO_FIELD":
             _show_settings_deprecation_warning(
-                DEFAULT_AUTO_FIELD_DEPRECATED_MSG, RemovedInDjango71Warning
+                DEFAULT_AUTO_FIELD_DEPRECATED_MSG, RemovedInDjango2029Warning
             )
 
         super().__setattr__(name, value)
@@ -294,6 +300,13 @@ class Settings:
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
+        # RemovedInDjango2029Warning.
+        if self.is_overridden("DEFAULT_AUTO_FIELD"):
+            _show_settings_deprecation_warning(
+                DEFAULT_AUTO_FIELD_DEPRECATED_MSG,
+                RemovedInDjango2029Warning,
+            )
+
         # RemovedInDjango2028Warning.
         if "SIGNED_COOKIE_LEGACY_SALT_FALLBACK" in self._explicit_settings:
             warnings.warn(
@@ -376,10 +389,10 @@ class UserSettingsHolder:
                 EMAIL_SETTING_DEPRECATED_MSG.format(name=name),
                 RemovedInDjango2028Warning,
             )
-        # RemovedInDjango71Warning.
+        # RemovedInDjango2029Warning.
         if name == "DEFAULT_AUTO_FIELD":
             _show_settings_deprecation_warning(
-                DEFAULT_AUTO_FIELD_DEPRECATED_MSG, RemovedInDjango71Warning
+                DEFAULT_AUTO_FIELD_DEPRECATED_MSG, RemovedInDjango2029Warning
             )
 
         super().__setattr__(name, value)
