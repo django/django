@@ -63,6 +63,7 @@ from django.utils.cache import (
     patch_cache_control,
     patch_vary_headers,
 )
+from django.utils.deprecation import RemovedInDjango2029Warning
 from django.views.decorators.cache import cache_control, cache_page
 
 from .models import Poll, expensive_calculation
@@ -1426,6 +1427,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         output = out.getvalue()
         self.assertTrue(output.startswith("CREATE TABLE"))
 
+    # RemovedInDjango2029Warning: When the deprecation ends, remove this test.
     def test_createcachetable_with_table_argument(self):
         """
         Delete and recreate cache table with legacy behavior (explicitly
@@ -1433,12 +1435,14 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         """
         self.drop_table()
         out = io.StringIO()
-        management.call_command(
-            "createcachetable",
-            "test cache table",
-            verbosity=2,
-            stdout=out,
-        )
+        msg = "Passing table names to createcachetable is deprecated."
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, msg):
+            management.call_command(
+                "createcachetable",
+                "test cache table",
+                verbosity=2,
+                stdout=out,
+            )
         self.assertEqual(out.getvalue(), "Cache table 'test cache table' created.\n")
 
     def test_has_key_query_columns_quoted(self):
