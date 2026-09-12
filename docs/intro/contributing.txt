@@ -195,9 +195,7 @@ haven't broken other parts of Django. If you've never run Django's test suite
 before, it's a good idea to run it once beforehand to get familiar with its
 output.
 
-What is a test suite?
-
-.. note::
+.. admonition:: What is a test suite?
 
     A test suite is a collection of automated tests that check whether the
     code actually works correctly.
