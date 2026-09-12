@@ -181,3 +181,11 @@ class ManyToOneNullTests(TestCase):
 
         with self.assertNumQueries(0):
             self.assertEqual(car.drivers.count(), 0)
+
+    def test_exclude_reverse_relation_with_nullable_target(self):
+        null_make = Car.objects.create(make=None)
+        driven = Car.objects.create(make="driven")
+        Car.objects.create(make="undriven")
+        Driver.objects.create(car=driven)
+        Driver.objects.create(car=None)
+        self.assertCountEqual(Car.objects.exclude(drivers=None), [null_make, driven])

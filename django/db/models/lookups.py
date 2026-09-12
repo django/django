@@ -667,6 +667,10 @@ class IsNull(BuiltinLookup):
     lookup_name = "isnull"
     prepare_rhs = False
 
+    @classmethod
+    def _is_builtin_isnull(cls):
+        return cls is IsNull
+
     def as_sql(self, compiler, connection):
         if not isinstance(self.rhs, bool):
             raise ValueError(
