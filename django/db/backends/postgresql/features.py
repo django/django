@@ -89,6 +89,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def supports_uuid7_function_shift(self):
         return self.is_postgresql_18
 
+    # Force partial newline-sensitive matching by default for consistency.
+    regexp_functions_flags_default = "p"
+    # The `m` flag is supported for newline-sensitive matching, but it is
+    # considered a historical synonym for `n` in PostgreSQL.
+    regexp_functions_flags_mapping = {"m": "n"}
+
     @cached_property
     def django_test_skips(self):
         skips = {

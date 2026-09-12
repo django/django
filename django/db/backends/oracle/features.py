@@ -81,6 +81,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_no_precision_decimalfield = True
     supports_default_in_bit_aggregations = False
     test_now_utc_template = "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
+
+    # For Oracle, `n` is used instead of `s` for newline-sensitive matching.
+    regexp_functions_flags_mapping = {"s": "n"}
+
     django_test_expected_failures = {
         # A bug in Django/oracledb with respect to string handling (#23843).
         "annotations.tests.NonAggregateAnnotationTestCase.test_custom_functions",
@@ -136,6 +140,34 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "GeneratedField expressions (ORA-54003).": {
                 "schema.tests.SchemaTests.test_add_generated_field_contains",
                 "schema.tests.SchemaTests.test_add_generated_field_with_kt_model",
+            },
+            "Oracle doesn't support lookahead/lookbehind assertions.": {
+                "db_functions.text.test_regexpcount.RegexpCountTests.test_lookahead",
+                "db_functions.text.test_regexpcount.RegexpCountTests.test_lookbehind",
+                "db_functions.text.test_regexplike.RegexpLikeTests.test_lookahead",
+                "db_functions.text.test_regexplike.RegexpLikeTests.test_lookbehind",
+                "db_functions.text.test_regexpreplace.RegexpReplaceTests."
+                "test_lookahead",
+                "db_functions.text.test_regexpreplace.RegexpReplaceTests."
+                "test_lookbehind",
+                "db_functions.text.test_regexpstrindex.RegexpStrIndexTests."
+                "test_lookahead",
+                "db_functions.text.test_regexpstrindex.RegexpStrIndexTests."
+                "test_lookbehind",
+                "db_functions.text.test_regexpsubstr.RegexpSubstrTests.test_lookahead",
+                "db_functions.text.test_regexpsubstr.RegexpSubstrTests.test_lookbehind",
+            },
+            "Oracle doesn't support comments in extended regular expressions.": {
+                "db_functions.text.test_regexpcount.RegexpCountFlagTests."
+                "test_extended_flag_with_comments",
+                "db_functions.text.test_regexplike.RegexpLikeFlagTests."
+                "test_extended_flag_with_comments",
+                "db_functions.text.test_regexpreplace.RegexpReplaceFlagTests."
+                "test_extended_flag_with_comments",
+                "db_functions.text.test_regexpstrindex.RegexpStrIndexFlagTests."
+                "test_extended_flag_with_comments",
+                "db_functions.text.test_regexpsubstr.RegexpSubstrFlagTests."
+                "test_extended_flag_with_comments",
             },
         }
         if self.connection.oracle_version < (23,):
