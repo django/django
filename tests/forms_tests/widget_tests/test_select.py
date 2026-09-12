@@ -94,6 +94,26 @@ class SelectTest(ChoiceWidgetTest):
             </select>"""),
         )
 
+    def test_constructor_option_attrs(self):
+        """
+        Select options shouldn't inherit the parent widget attrs.
+        """
+        widget = Select(
+            attrs={"class": "super", "id": "super"},
+            option_attrs={"data-test": "custom", "class": "other"},
+            choices=[(1, 1), (2, 2), (3, 3)],
+        )
+        self.check_html(
+            widget,
+            "num",
+            2,
+            html=("""<select name="num" class="super" id="super">
+              <option value="1" data-test="custom" class="other">1</option>
+              <option value="2" data-test="custom" class="other" selected>2</option>
+              <option value="3" data-test="custom" class="other">3</option>
+            </select>"""),
+        )
+
     def test_compare_to_str(self):
         """
         The value is compared to its str().
@@ -390,6 +410,23 @@ class SelectTest(ChoiceWidgetTest):
             with self.subTest(choices):
                 self._test_optgroups(choices)
 
+    def test_options_with_option_attrs(self):
+        options = list(
+            self.widget(choices=self.beatles, option_attrs={"class": "other"}).options(
+                "name",
+                ["J"],
+                attrs={"class": "super"},
+            )
+        )
+        self.assertEqual(len(options), 4)
+        for option, (i, (value, label)) in zip(options, enumerate(self.beatles)):
+            self.assertEqual(option["name"], "name")
+            self.assertEqual(option["value"], value)
+            self.assertEqual(option["label"], label)
+            self.assertEqual(option["index"], str(i))
+            self.assertEqual(option["attrs"]["class"], "other")
+            self.assertIs(option["selected"], value == "J")
+
     def test_doesnt_render_required_when_impossible_to_select_empty_field(self):
         widget = self.widget(choices=[("J", "John"), ("P", "Paul")])
         self.assertIs(widget.use_required_attribute(initial=None), False)
@@ -432,4 +469,31 @@ class SelectTest(ChoiceWidgetTest):
             '<option value="G">George</option>'
             '<option value="R">Ringo</option></select></div>',
             form.render(),
+        )
+
+    def test_select_with_option_attrs(self):
+        # this test reaches the else
+        select = Select(
+            choices=((None, "---"), ("1", "1"), ("2", "2")),
+            option_attrs={"option-attr": "test"},
+        )
+        html_str = select.render(name="test_select", value=None)
+        self.assertHTMLEqual(
+            html_str,
+            '<select name=test_select><option option-attr="test" value="" selected>'
+            '---</option><option option-attr="test" value=1>1</option><option '
+            'option-attr="test" value=2>2</option></select>',
+        )
+
+    def test_select_without_option_attrs(self):
+        # this test reaches the elif
+        select = Select(
+            choices=((None, "---"), ("1", "1"), ("2", "2")),
+        )
+        html_str = select.render(name="test_select", value=None)
+        self.assertHTMLEqual(
+            html_str,
+            '<select name=test_select><option value="" selected>'
+            "---</option><option value=1>1</option><option "
+            "value=2>2</option></select>",
         )
