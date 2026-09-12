@@ -157,11 +157,6 @@ file writing or network fetching is acceptable. For the rationale, see
 The general structure of geographic lookups is described below. A complete
 reference can be found in the :ref:`spatial lookup reference<spatial-lookups>`.
 
-.. versionchanged:: 5.2.17
-
-    In earlier versions, spatial lookups accepted ``str`` and ``dict`` types
-    for new rasters, allowing file writes and network fetches.
-
 Geometry Lookups
 ----------------
 

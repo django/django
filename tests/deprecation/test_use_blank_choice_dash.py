@@ -8,15 +8,15 @@ from django.conf import (
     settings,
 )
 from django.test import SimpleTestCase
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 class UseBlankChoiceDashDeprecationTests(SimpleTestCase):
     msg = USE_BLANK_CHOICE_DASH_DEPRECATED_MSG
 
     def test_override_settings_warning(self):
-        with self.assertRaisesMessage(RemovedInDjango70Warning, self.msg):
+        with self.assertRaisesMessage(RemovedInDjango2028Warning, self.msg):
             with self.settings(USE_BLANK_CHOICE_DASH=True):
                 pass
 
@@ -26,14 +26,14 @@ class UseBlankChoiceDashDeprecationTests(SimpleTestCase):
         settings_module.USE_BLANK_CHOICE_DASH = True
         sys.modules["fake_settings_module"] = settings_module
         try:
-            with self.assertRaisesMessage(RemovedInDjango70Warning, self.msg):
+            with self.assertRaisesMessage(RemovedInDjango2028Warning, self.msg):
                 Settings("fake_settings_module")
         finally:
             del sys.modules["fake_settings_module"]
 
     def test_settings_assignment_warning(self):
         settings = LazySettings()
-        with self.assertRaisesMessage(RemovedInDjango70Warning, self.msg):
+        with self.assertRaisesMessage(RemovedInDjango2028Warning, self.msg):
             settings.USE_BLANK_CHOICE_DASH = True
 
     def test_access(self):

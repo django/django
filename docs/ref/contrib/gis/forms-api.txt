@@ -41,8 +41,6 @@ GeoDjango form fields take the following optional arguments.
 
 .. attribute:: Field.max_geom_collections
 
-    .. versionadded:: 5.2.17
-
     The maximum number of geometry collections the field accepts before
     refusing to parse the input and raising a
     :exc:`~django.core.exceptions.ValidationError`. This guards against crashes

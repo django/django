@@ -531,7 +531,7 @@ Miscellaneous
   :class:`~django.db.models.Aggregate` class.
 
 * The default protocol in :tfilter:`urlize` and :tfilter:`urlizetrunc` will
-  change from HTTP to HTTPS in Django 7.0. Set the transitional setting
+  change from HTTP to HTTPS in Django 2028. Set the transitional setting
   :setting:`URLIZE_ASSUME_HTTPS` to ``True`` to opt into assuming HTTPS during
   the Django 6.x release cycle.
 

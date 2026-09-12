@@ -70,6 +70,18 @@ class CompositePKTests(TestCase):
         self.assertIsNotNone(post.id)
         self.assertIs(post._is_pk_set(), False)
 
+    def test_eq(self):
+        self.assertEqual(User(pk=(1, 2)), User(pk=(1, 2)))
+        self.assertEqual(User(tenant_id=2, id=3), User(tenant_id=2, id=3))
+        self.assertNotEqual(User(pk=(1, 2)), User(pk=(1, 3)))
+        self.assertNotEqual(User(pk=(1, 2)), object())
+        unset = User()
+        self.assertEqual(unset, unset)
+        self.assertNotEqual(User(), unset)
+        self.assertNotEqual(User(tenant_id=1), User(tenant_id=1))
+        self.assertNotEqual(User(id=1), User(id=1))
+        self.assertNotEqual(User(tenant_id=1), User(pk=(1, 2)))
+
     def test_hash(self):
         self.assertEqual(hash(User(pk=(1, 2))), hash((1, 2)))
         self.assertEqual(hash(User(tenant_id=2, id=3)), hash((2, 3)))
@@ -168,7 +180,7 @@ class CompositePKTests(TestCase):
             id_list = list(Comment.objects.values_list("pk", flat=True))
             with self.assertNumQueries(2):
                 comment_dict = Comment.objects.in_bulk(id_list=id_list)
-        self.assertQuerySetEqual(comment_dict, id_list)
+        self.assertCountEqual(comment_dict, id_list)
 
     def test_in_bulk_values(self):
         result = Comment.objects.values().in_bulk([self.comment.pk])
@@ -424,6 +436,11 @@ class CompositePKFixturesTests(TestCase):
         result = serializers.serialize("xml", users)
         self.assertIn('<object model="composite_pk.user" pk=\'["1", "1"]\'>', result)
         self.assert_deserializer(format="xml", users=users, serialized_users=result)
+
+    def test_serialize_unsaved_user_xml_omits_pk(self):
+        result = serializers.serialize("xml", [User()])
+        self.assertIn('<object model="composite_pk.user">', result)
+        self.assertNotIn(" pk=", result)
 
     def test_serialize_post_uuid(self):
         posts = Post.objects.filter(pk=(2, "11111111-1111-1111-1111-111111111111"))

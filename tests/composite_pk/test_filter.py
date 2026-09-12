@@ -539,6 +539,12 @@ class CompositePKFilterTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             Comment.objects.filter(pk=pk)
 
+    def test_filter_by_pk_exact_rhs_f_object(self):
+        self.assertEqual(
+            Comment.objects.filter(pk=F("pk")).count(),
+            Comment.objects.count(),
+        )
+
     @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
     def test_filter_comments_by_pk_exact_subquery(self):
         self.assertSequenceEqual(

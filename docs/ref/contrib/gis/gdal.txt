@@ -1688,7 +1688,7 @@ bands: one for red, one for green, and one for blue.
     .. attribute:: vsi_buffer
 
         A ``bytes`` representation of this raster. Returns ``None`` for rasters
-        that are not stored in GDAL's virtual filesystem.
+        that are not stored in GDAL's in-memory virtual filesystem.
 
     .. attribute:: is_vsi_based
 
@@ -2116,6 +2116,8 @@ can directly access compressed files using the ``/vsizip/``, ``/vsigzip/``, or
    >>> rst = GDALRaster("/vsigzip/path/to/your/file.gz")
    >>> rst = GDALRaster("/vsitar/path/to/your/file.tar/path/to/raster.tif")
 
+.. _gdal-raster-network:
+
 Network rasters
 ^^^^^^^^^^^^^^^
 
@@ -2166,11 +2168,6 @@ values. When validating raster inputs, you should write custom validation.
 
 For defense-in-depth strategies for limiting the available raster drivers, see
 `GDAL security considerations <https://gdal.org/user/security.html>`_.
-
-.. versionchanged:: 5.2.17
-
-    In earlier versions, spatial lookups accepted ``str`` and ``dict`` types
-    for new rasters, allowing file writes and network fetches.
 
 Settings
 ========

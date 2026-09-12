@@ -1,6 +1,6 @@
-from django.utils.version import get_version
+from django.utils.version import VersionTuple, get_version
 
-VERSION = (6, 2, 0, "alpha", 0)
+VERSION = VersionTuple(6, 2, 0, "alpha", 0)
 
 __version__ = get_version(VERSION)
 

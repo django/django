@@ -1157,7 +1157,7 @@ underlying query more complex, and return more data, than is actually needed.
 .. deprecated:: 6.1
 
     Calling ``select_related()`` with no arguments is deprecated, and support
-    for it will be removed in Django 7.0. Specify the fields to fetch instead.
+    for it will be removed in Django 2028. Specify the fields to fetch instead.
 
 ``prefetch_related()``
 ~~~~~~~~~~~~~~~~~~~~~~

@@ -24,7 +24,7 @@ from django.http import HttpResponse
 from django.http.multipartparser import MultiPartParserError
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.log import (
     DEFAULT_LOGGING,
     AdminEmailHandler,
@@ -307,7 +307,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
             record.request = self.request_factory.get(url_path, *args, **kwargs)
         return record
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_deprecated_email_settings(
         ADMINS=["admin@example.com"],
         EMAIL_BACKEND="mail.custombackend.FailingEmailBackend",
@@ -411,14 +411,14 @@ class AdminEmailHandlerTest(SimpleTestCase):
         self.assertNotIn("\r", mail.outbox[0].subject)
         self.assertEqual(mail.outbox[0].subject, expected_subject)
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_settings(ADMINS=["admin@example.com"])
     @ignore_no_default_mailer_warning()
     def test_uses_custom_email_backend(self):
         del settings.MAILERS
         self.addCleanup(OptionsCapturingBackend.reset)
         msg = "The 'email_backend' argument is deprecated. Use 'using' instead."
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
             handler = AdminEmailHandler(
                 email_backend="mail.custombackend.OptionsCapturingBackend"
             )
@@ -455,7 +455,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].sent_using, "custom")
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     def test_using_conflicts_with_email_backend(self):
         msg = "The 'email_backend' argument is not compatible with 'using'."
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
@@ -463,7 +463,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
                 email_backend="logging_tests.logconfig.MyEmailBackend", using="custom"
             )
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_settings(MAILERS={})
     def test_email_backend_not_valid_when_mailers_defined(self):
         msg = (
@@ -473,7 +473,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             AdminEmailHandler(email_backend="logging_tests.logconfig.MyEmailBackend")
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     def test_error_when_subclass_defines_undocumented_connection_method(self):
 
         class CustomAdminEmailHandler(AdminEmailHandler):

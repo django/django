@@ -1347,6 +1347,10 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         # And, they should be equal.
         self.assertEqual(gc1, gc2)
 
+        # GeometryCollections can themselves contain GeometryCollections.
+        gc3 = GeometryCollection(gc2)
+        self.assertEqual(gc1, gc3[0])
+
     def test_gdal(self):
         "Testing `ogr` and `srs` properties."
         g1 = fromstr("POINT(5 23)")

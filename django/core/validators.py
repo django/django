@@ -152,7 +152,7 @@ class URLValidator(RegexValidator):
     )
     message = _("Enter a valid URL.")
     schemes = ["http", "https", "ftp", "ftps"]
-    unsafe_chars = frozenset("\t\r\n")
+    unsafe_chars = frozenset("\t\r\n\x00")
     max_length = MAX_URL_LENGTH
 
     def __init__(self, schemes=None, **kwargs):

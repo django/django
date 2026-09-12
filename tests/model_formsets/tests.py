@@ -2,6 +2,7 @@ import datetime
 import re
 from datetime import date
 from decimal import Decimal
+from unittest import mock
 
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
@@ -1987,6 +1988,58 @@ class ModelFormsetTest(TestCase):
         # The name of other_author shouldn't be changed and new models aren't
         # created.
         self.assertSequenceEqual(Author.objects.all(), [author, other_author])
+
+    def test_overridden_add_prefix(self):
+        class AuthorForm(forms.ModelForm):
+            class Meta:
+                model = Author
+                fields = "__all__"
+
+            def add_prefix(self, field_name):
+                return f"{self.prefix}.{field_name}" if self.prefix else field_name
+
+        author = Author.objects.create(name="Charles Baudelaire")
+        AuthorFormSet = modelformset_factory(Author, form=AuthorForm)
+        data = {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "1",
+            "form-MAX_NUM_FORMS": "0",
+            "form-0.id": str(author.pk),
+            "form-0.name": "Charles P. Baudelaire",
+        }
+        formset = AuthorFormSet(data, queryset=Author.objects.all())
+
+        self.assertIs(formset.is_valid(), True)
+        self.assertEqual(formset.forms[0].instance, author)
+        formset.save()
+        author.refresh_from_db()
+        self.assertEqual(author.name, "Charles P. Baudelaire")
+
+    def test_form_initialized_once_with_default_add_prefix(self):
+        initialization = mock.Mock()
+
+        class AuthorForm(forms.ModelForm):
+            class Meta:
+                model = Author
+                fields = "__all__"
+
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                initialization()
+
+        author = Author.objects.create(name="Charles Baudelaire")
+        AuthorFormSet = modelformset_factory(Author, form=AuthorForm)
+        formset = AuthorFormSet(
+            {
+                "form-TOTAL_FORMS": "1",
+                "form-INITIAL_FORMS": "1",
+                "form-0-id": str(author.pk),
+            },
+            queryset=Author.objects.all(),
+        )
+
+        self.assertEqual(formset.forms[0].instance, author)
+        initialization.assert_called_once_with()
 
     def test_validation_without_id(self):
         AuthorFormSet = modelformset_factory(Author, fields="__all__")

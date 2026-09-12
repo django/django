@@ -35,7 +35,6 @@ accessibility easier.
 .. _AA-level guidelines: https://www.w3.org/WAI/WCAG22/quickref/?currentsidebar=%23col_overview&levels=aaa
 .. _AAA-level guidelines: https://www.w3.org/WAI/WCAG22/quickref/?currentsidebar=%23col_overview&levels=a%2Caa
 .. _WCAG 3.0: https://www.w3.org/TR/wcag-3.0/
-.. _WCAG 3.0: https://www.w3.org/TR/wcag-3.0/
 .. _Authoring Tool Accessibility Guidelines: https://www.w3.org/TR/ATAG20/
 .. _The A11Y Project: https://www.a11yproject.com/
 
@@ -130,7 +129,7 @@ For Linux:
 
 For mobile or tablet:
 
-* VoiceOver on iOS, or TalkBack on Android
+* VoiceOver on iOS, or `TalkBack`_ on Android
 
 The following are popular licensed options. If you are a user of these, or can
 work with a user holding a license, also test against:
@@ -143,7 +142,7 @@ work with a user holding a license, also test against:
 .. _NVDA: https://www.nvaccess.org/
 .. _Narrator: https://support.microsoft.com/en-us/windows/complete-guide-to-narrator-e4397a0d-ef4f-b386-d8ae-c172f109bdb1
 .. _VoiceOver: https://support.apple.com/en-gb/guide/voiceover-guide/welcome/web
-.. _TalBack: https://support.google.com/accessibility/android/answer/6283677
+.. _TalkBack: https://support.google.com/accessibility/android/answer/6283677
 .. _Contrast themes: https://support.microsoft.com/en-us/windows/change-color-contrast-in-windows-fedc744c-90ac-69df-aed5-c8a90125e696
 .. _JAWS: https://www.freedomscientific.com/products/software/jaws/
 .. _Dragon: https://www.nuance.com/en-gb/dragon.html

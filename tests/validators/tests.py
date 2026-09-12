@@ -265,6 +265,10 @@ INVALID_URLS = [
     "http://[::\rffff:192.9.5.5]",
     "http://\twww.djangoproject.com/",
     "http://\t[::ffff:192.9.5.5]",
+    # Null characters are not accepted.
+    "http://www.djangoproject.com/\x00",
+    "http://www.django\x00project.com/",
+    "http://www.djangoproject.com/\x00@example.com/",
     # Trailing junk does not take forever to reject.
     "http://www.asdasdasdasdsadfm.com.br ",
     "http://www.asdasdasdasdsadfm.com.br z",

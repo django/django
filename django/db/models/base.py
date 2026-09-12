@@ -647,10 +647,9 @@ class Model(AltersData, metaclass=ModelBase):
             return NotImplemented
         if self._meta.concrete_model != other._meta.concrete_model:
             return False
-        my_pk = self.pk
-        if my_pk is None:
+        if not self._is_pk_set():
             return self is other
-        return my_pk == other.pk
+        return self.pk == other.pk
 
     def __hash__(self):
         if not self._is_pk_set():
@@ -1562,9 +1561,16 @@ class Model(AltersData, metaclass=ModelBase):
                 f = self._meta.get_field(field_name)
                 lookup_value = getattr(self, f.attname)
                 # TODO: Handle multiple backends with different feature flags.
-                if lookup_value is None or (
-                    lookup_value == ""
-                    and connection.features.interprets_empty_strings_as_nulls
+                if (
+                    lookup_value is None
+                    or (
+                        lookup_value == ""
+                        and connection.features.interprets_empty_strings_as_nulls
+                    )
+                    or (
+                        isinstance(lookup_value, DatabaseDefault)
+                        and not isinstance(lookup_value.expression, Value)
+                    )
                 ):
                     # no value, skip the lookup
                     continue

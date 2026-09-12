@@ -1,11 +1,12 @@
 import datetime
 from unittest import mock
 
+from playwright_tests import AdminPlaywrightTestCase
+
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.templatetags.admin_list import pagination, result_headers
-from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.main import (
     ALL_VAR,
     IS_FACETS_VAR,
@@ -910,19 +911,51 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [])
 
-    def test_exact_lookup_with_more_lenient_formfield(self):
+    def test_exact_boolean_lookup_is_case_insensitive(self):
         """
         Exact lookups on BooleanField use formfield().to_python() for lenient
-        parsing. Using model field's to_python() would reject 'false' whereas
-        the form field accepts it.
+        parsing. Using model field's to_python() would reject 'FALSE' whereas
+        the admin's form field accepts it.
         """
-        obj = UnorderedObject.objects.create(bool=False)
+        obj_not_nullable = UnorderedObject.objects.create(bool=False)
         UnorderedObject.objects.create(bool=True)
         m = admin.ModelAdmin(UnorderedObject, custom_site)
         m.search_fields = ["bool__exact"]
 
-        # 'false' is accepted by form field but rejected by model field.
-        request = self.factory.get("/", data={SEARCH_VAR: "false"})
+        # Nullable boolean field.
+        obj_nullable = Quartet.objects.create(plays_weddings=False)
+        Quartet.objects.create(plays_weddings=True)
+        m_nullable = admin.ModelAdmin(Quartet, custom_site)
+        m_nullable.search_fields = ["plays_weddings__exact"]
+
+        for obj, model_admin in (obj_not_nullable, m), (obj_nullable, m_nullable):
+            with self.subTest(obj=obj):
+                # 'FALSE' accepted by form field but rejected by model field.
+                request = self.factory.get("/", data={SEARCH_VAR: "FALSE"})
+                request.user = self.superuser
+
+                cl = model_admin.get_changelist_instance(request)
+                self.assertCountEqual(cl.queryset, [obj])
+
+    def test_exact_boolean_lookup_explicit_none(self):
+        UnorderedObject.objects.create(bool=False)
+        UnorderedObject.objects.create(bool=True)
+        m = admin.ModelAdmin(UnorderedObject, custom_site)
+        m.search_fields = ["bool__exact"]
+
+        request = self.factory.get("/", data={SEARCH_VAR: "None"})
+        request.user = self.superuser
+
+        cl = m.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [])
+
+        # Nullable boolean field.
+        obj = Quartet.objects.create()
+        Quartet.objects.create(plays_weddings=True)
+        m = admin.ModelAdmin(Quartet, custom_site)
+        m.search_fields = ["plays_weddings__exact"]
+
+        request = self.factory.get("/", data={SEARCH_VAR: "None"})
         request.user = self.superuser
 
         cl = m.get_changelist_instance(request)
@@ -954,6 +987,86 @@ class ChangeListTests(TestCase):
 
         cl = m.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [obj_int])
+
+    def test_exact_lookup_for_choices_field(self):
+        """
+        Search terms that aren't valid for an exact lookup on a field with
+        choices are skipped instead of crashing the changelist.
+        """
+        john = MixedFieldsModel.objects.create(name="john", choice_field=1)
+        mary = MixedFieldsModel.objects.create(name="mary", choice_field=2)
+        m = admin.ModelAdmin(MixedFieldsModel, custom_site)
+        m.search_fields = ["name", "choice_field__exact"]
+
+        for search_term, expected_result in [
+            ("john", [john]),
+            ("mary", [mary]),
+            ("1", [john]),
+            ("2", [mary]),
+            ("random", []),
+        ]:
+            request = self.factory.get("/", data={SEARCH_VAR: search_term})
+            request.user = self.superuser
+            with self.subTest(search_term=search_term):
+                cl = m.get_changelist_instance(request)
+                self.assertCountEqual(cl.queryset, expected_result)
+
+    def test_exact_lookup_for_choices_field_changelist_view(self):
+        """
+        The changelist view doesn't crash on a search term that isn't valid
+        for an exact lookup on a field with choices.
+        """
+        self.client.force_login(self.superuser)
+        john = MixedFieldsModel.objects.create(name="john", choice_field=1)
+        MixedFieldsModel.objects.create(name="mary", choice_field=2)
+        url = reverse("admin:admin_changelist_mixedfieldsmodel_changelist")
+
+        response = self.client.get(url, {SEARCH_VAR: "john"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertCountEqual(response.context["cl"].queryset, [john])
+
+    def test_exact_lookup_for_boolean_field(self):
+        """
+        Arbitrary search terms don't match every row with a True value for an
+        exact lookup on a BooleanField, while explicit boolean terms do match.
+        """
+        john = OrderedObject.objects.create(name="john", bool=True)
+        mary = OrderedObject.objects.create(name="mary", bool=True)
+        pete = OrderedObject.objects.create(name="pete", bool=False)
+        m = admin.ModelAdmin(OrderedObject, custom_site)
+        m.search_fields = ["name", "bool__exact"]
+
+        for search_term, expected_result in [
+            ("john", [john]),
+            ("mary", [mary]),
+            ("random", []),
+            ("true", [john, mary]),
+            ("True", [john, mary]),
+            ("1", [john, mary]),
+            ("false", [pete]),
+            ("False", [pete]),
+            ("0", [pete]),
+        ]:
+            request = self.factory.get("/", data={SEARCH_VAR: search_term})
+            request.user = self.superuser
+            with self.subTest(search_term=search_term):
+                cl = m.get_changelist_instance(request)
+                self.assertCountEqual(cl.queryset, expected_result)
+
+    def test_exact_lookup_for_null_boolean_field(self):
+        """
+        Arbitrary search terms don't match every row with a None value for an
+        exact lookup on a nullable BooleanField, while explicit terms do match.
+        """
+        Quartet.objects.create(plays_weddings=None)
+        model_admin = admin.ModelAdmin(Quartet, custom_site)
+        model_admin.search_fields = ["plays_weddings__exact"]
+
+        request = self.factory.get("/", data={SEARCH_VAR: "arbitrary"})
+        request.user = self.superuser
+        cl = model_admin.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [])
 
     def test_search_with_exact_lookup_for_non_string_field(self):
         child = Child.objects.create(name="Asher", age=11)
@@ -1793,6 +1906,53 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertEqual(cl.get_ordering_field_columns(), {2: "asc"})
 
+    def test_list_display_first_degree_relation(self):
+        parent = Parent.objects.create(name="I am your parent")
+        child = Child.objects.create(name="I am your child", parent=parent)
+        grand = GrandChild.objects.create(name="I am your grandchild", parent=child)
+        GrandChild.objects.create(name="has sibling", parent=child, sibling=grand)
+
+        class GrandChildAdmin(admin.ModelAdmin):
+            list_display = ["name", "sibling"]
+
+        m = GrandChildAdmin(GrandChild, custom_site)
+        request = self._mocked_authenticated_request("/grandchild/", self.superuser)
+        response = m.changelist_view(request)
+        self.assertContains(response, '<h2 class="main">I am your grandchild')
+
+    def test_list_display_second_degree_relation(self):
+        parent = Parent.objects.create(name="I am your parent")
+        child = Child.objects.create(name="I am your child", parent=parent)
+        GrandChild.objects.create(name="I am your grandchild", parent=child)
+
+        class GrandChildAdmin(admin.ModelAdmin):
+            list_display = ["name", "parent__parent"]
+
+        m = GrandChildAdmin(GrandChild, custom_site)
+        request = self._mocked_authenticated_request("/grandchild/", self.superuser)
+        response = m.changelist_view(request)
+        self.assertNotContains(response, "Child object")
+        self.assertContains(response, "Parent object")
+
+    def test_list_display_related_field_uses_display_for_field(self):
+        # Related fields must be rendered with display_for_field(), not
+        # display_for_value(), so field-specific formatting, such as FileField
+        # links, is preserved.
+        genre = Genre.objects.create(name="Rock", file="documents/test.txt")
+        Musician.objects.create(name="John", genre=genre)
+
+        class MusicianAdmin(admin.ModelAdmin):
+            list_display = ["name", "genre__file"]
+
+        m = MusicianAdmin(Musician, custom_site)
+        request = self._mocked_authenticated_request("/musician/", self.superuser)
+        response = m.changelist_view(request)
+        self.assertContains(
+            response,
+            '<a href="/documents/test.txt">documents/test.txt</a>',
+            html=True,
+        )
+
     def test_list_display_related_field_boolean_display(self):
         """
         Related boolean fields (parent__is_active) display boolean icons.
@@ -1880,333 +2040,273 @@ class GetAdminLogTests(TestCase):
 
 
 @override_settings(ROOT_URLCONF="admin_changelist.urls")
-class SeleniumTests(AdminSeleniumTestCase):
-    available_apps = ["admin_changelist"] + AdminSeleniumTestCase.available_apps
+class PlaywrightTests(AdminPlaywrightTestCase):
+    available_apps = ["admin_changelist"] + AdminPlaywrightTestCase.available_apps
 
     def setUp(self):
         User.objects.create_superuser(username="super", password="secret", email=None)
+
+    def collapse_filter(self, detail):
+        """Collapse a filter and wait for its state to be stored."""
+        title = detail.get_attribute("data-filter-title")
+        detail.locator("summary").click()
+        self.expect(detail).not_to_have_attribute("open")
+        self.page.wait_for_function(
+            "title => JSON.parse(sessionStorage.getItem("
+            "'django.admin.filtersState'))?.[title] === false",
+            arg=title,
+        )
 
     def test_add_row_selection(self):
         """
         The status line for selected rows gets updated correctly (#22038).
         """
-        from selenium.webdriver.common.by import By
-
         self.admin_login(username="super", password="secret")
-        self.selenium.get(self.live_server_url + reverse("admin:auth_user_changelist"))
+        self.page.goto(self.live_server_url + reverse("admin:auth_user_changelist"))
 
         form_id = "#changelist-form"
 
         # Test amount of rows in the Changelist
-        rows = self.selenium.find_elements(
-            By.CSS_SELECTOR, "%s #result_list tbody tr" % form_id
-        )
-        self.assertEqual(len(rows), 1)
-        row = rows[0]
+        rows = self.page.locator("%s #result_list tbody tr" % form_id)
+        self.expect(rows).to_have_count(1)
+        row = rows.first
 
-        selection_indicator = self.selenium.find_element(
-            By.CSS_SELECTOR, "%s .action-counter" % form_id
-        )
-        all_selector = self.selenium.find_element(By.ID, "action-toggle")
-        row_selector = self.selenium.find_element(
-            By.CSS_SELECTOR,
-            "%s #result_list tbody tr:first-child .action-select" % form_id,
+        selection_indicator = self.page.locator("%s .action-counter" % form_id)
+        all_selector = self.page.locator("#action-toggle")
+        row_selector = self.page.locator(
+            "%s #result_list tbody tr:first-child .action-select" % form_id
         )
 
         # Test current selection
-        self.assertEqual(selection_indicator.text, "0 of 1 selected")
-        self.assertIs(all_selector.get_property("checked"), False)
-        self.assertEqual(row.get_attribute("class"), "")
+        self.expect(selection_indicator).to_have_text("0 of 1 selected")
+        self.expect(all_selector).not_to_be_checked()
+        self.expect(row).not_to_have_class("selected")
 
         # Select a row and check again
         row_selector.click()
-        self.assertEqual(selection_indicator.text, "1 of 1 selected")
-        self.assertIs(all_selector.get_property("checked"), True)
-        self.assertEqual(row.get_attribute("class"), "selected")
+        self.expect(selection_indicator).to_have_text("1 of 1 selected")
+        self.expect(all_selector).to_be_checked()
+        self.expect(row).to_have_class("selected")
 
         # Deselect a row and check again
         row_selector.click()
-        self.assertEqual(selection_indicator.text, "0 of 1 selected")
-        self.assertIs(all_selector.get_property("checked"), False)
-        self.assertEqual(row.get_attribute("class"), "")
+        self.expect(selection_indicator).to_have_text("0 of 1 selected")
+        self.expect(all_selector).not_to_be_checked()
+        self.expect(row).to_have_attribute("class", "")
 
     def test_modifier_allows_multiple_section(self):
         """
         Selecting a row and then selecting another row whilst holding shift
         should select all rows in-between.
         """
-        from selenium.webdriver.common.action_chains import ActionChains
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.common.keys import Keys
-
         Parent.objects.bulk_create([Parent(name="parent%d" % i) for i in range(5)])
         self.admin_login(username="super", password="secret")
-        self.selenium.get(
+        self.page.goto(
             self.live_server_url + reverse("admin:admin_changelist_parent_changelist")
         )
-        checkboxes = self.selenium.find_elements(
-            By.CSS_SELECTOR, "tr input.action-select"
-        )
-        self.assertEqual(len(checkboxes), 5)
-        for c in checkboxes:
-            self.assertIs(c.get_property("checked"), False)
+        checkboxes = self.page.locator("tr input.action-select")
+        self.expect(checkboxes).to_have_count(5)
+        all_checkboxes = checkboxes.all()
+        for c in all_checkboxes:
+            self.expect(c).not_to_be_checked()
         # Check first row. Hold-shift and check next-to-last row.
-        checkboxes[0].click()
-        ActionChains(self.selenium).key_down(Keys.SHIFT).click(checkboxes[-2]).key_up(
-            Keys.SHIFT
-        ).perform()
-        for c in checkboxes[:-2]:
-            self.assertIs(c.get_property("checked"), True)
-        self.assertIs(checkboxes[-1].get_property("checked"), False)
+        all_checkboxes[0].click()
+        all_checkboxes[-2].click(modifiers=["Shift"])
+        for c in all_checkboxes[:-2]:
+            self.expect(c).to_be_checked()
+        self.expect(all_checkboxes[-1]).not_to_be_checked()
 
     def test_selection_counter_is_synced_when_page_is_shown(self):
-        from selenium.webdriver.common.by import By
-
         self.admin_login(username="super", password="secret")
-        self.selenium.get(self.live_server_url + reverse("admin:auth_user_changelist"))
+        self.page.goto(self.live_server_url + reverse("admin:auth_user_changelist"))
 
         form_id = "#changelist-form"
         first_row_checkbox_selector = (
             f"{form_id} #result_list tbody tr:first-child .action-select"
         )
         selection_indicator_selector = f"{form_id} .action-counter"
-        selection_indicator = self.selenium.find_element(
-            By.CSS_SELECTOR, selection_indicator_selector
-        )
-        row_checkbox = self.selenium.find_element(
-            By.CSS_SELECTOR, first_row_checkbox_selector
-        )
+
+        selection_indicator = self.page.locator(selection_indicator_selector)
+        row_checkbox = self.page.locator(first_row_checkbox_selector)
+
         # Select a row.
         row_checkbox.click()
-        self.assertEqual(selection_indicator.text, "1 of 1 selected")
+        self.expect(selection_indicator).to_have_text("1 of 1 selected")
         # Go to another page and get back.
-        self.selenium.get(
+        self.page.goto(
             self.live_server_url + reverse("admin:admin_changelist_parent_changelist")
         )
-        self.selenium.back()
+        self.page.go_back()
         # The selection indicator is synced with the selected checkboxes.
-        selection_indicator = self.selenium.find_element(
-            By.CSS_SELECTOR, selection_indicator_selector
-        )
-        row_checkbox = self.selenium.find_element(
-            By.CSS_SELECTOR, first_row_checkbox_selector
-        )
-        selected_rows = 1 if row_checkbox.is_selected() else 0
-        self.assertEqual(selection_indicator.text, f"{selected_rows} of 1 selected")
+        selection_indicator = self.page.locator(selection_indicator_selector)
+        row_checkbox = self.page.locator(first_row_checkbox_selector)
+        selected_rows = 1 if row_checkbox.is_checked() else 0
+        self.expect(selection_indicator).to_have_text(f"{selected_rows} of 1 selected")
 
     def test_select_all_across_pages(self):
-        from selenium.webdriver.common.by import By
-
         Parent.objects.bulk_create([Parent(name="parent%d" % i) for i in range(101)])
         self.admin_login(username="super", password="secret")
-        self.selenium.get(
+        self.page.goto(
             self.live_server_url + reverse("admin:admin_changelist_parent_changelist")
         )
 
-        selection_indicator = self.selenium.find_element(
-            By.CSS_SELECTOR, ".action-counter"
-        )
-        select_all_indicator = self.selenium.find_element(
-            By.CSS_SELECTOR, ".actions .all"
-        )
-        question = self.selenium.find_element(By.CSS_SELECTOR, ".actions > .question")
-        clear = self.selenium.find_element(By.CSS_SELECTOR, ".actions > .clear")
-        select_all = self.selenium.find_element(By.ID, "action-toggle")
-        select_across = self.selenium.find_elements(By.NAME, "select_across")
+        selection_indicator = self.page.locator(".action-counter").first
+        select_all_indicator = self.page.locator(".actions .all").first
+        question = self.page.locator(".actions > .question").first
+        clear = self.page.locator(".actions > .clear").first
+        select_all = self.page.locator("#action-toggle")
+        select_across = self.page.locator("[name='select_across']").all()
 
-        self.assertIs(question.is_displayed(), False)
-        self.assertIs(clear.is_displayed(), False)
-        self.assertIs(select_all.get_property("checked"), False)
+        self.expect(question).to_be_hidden()
+        self.expect(clear).to_be_hidden()
+        self.expect(select_all).not_to_be_checked()
         for hidden_input in select_across:
-            self.assertEqual(hidden_input.get_property("value"), "0")
-        self.assertIs(selection_indicator.is_displayed(), True)
-        self.assertEqual(selection_indicator.text, "0 of 100 selected")
-        self.assertIs(select_all_indicator.is_displayed(), False)
+            self.expect(hidden_input).to_have_value("0")
+        self.expect(selection_indicator).to_be_visible()
+        self.expect(selection_indicator).to_have_text("0 of 100 selected")
+        self.expect(select_all_indicator).to_be_hidden()
 
         select_all.click()
-        self.assertIs(question.is_displayed(), True)
-        self.assertIs(clear.is_displayed(), False)
-        self.assertIs(select_all.get_property("checked"), True)
+        self.expect(question).to_be_visible()
+        self.expect(clear).to_be_hidden()
+        self.expect(select_all).to_be_checked()
         for hidden_input in select_across:
-            self.assertEqual(hidden_input.get_property("value"), "0")
-        self.assertIs(selection_indicator.is_displayed(), True)
-        self.assertEqual(selection_indicator.text, "100 of 100 selected")
-        self.assertIs(select_all_indicator.is_displayed(), False)
+            self.expect(hidden_input).to_have_value("0")
+        self.expect(selection_indicator).to_be_visible()
+        self.expect(selection_indicator).to_have_text("100 of 100 selected")
+        self.expect(select_all_indicator).to_be_hidden()
 
         question.click()
-        self.assertIs(question.is_displayed(), False)
-        self.assertIs(clear.is_displayed(), True)
-        self.assertIs(select_all.get_property("checked"), True)
+        self.expect(question).to_be_hidden()
+        self.expect(clear).to_be_visible()
+        self.expect(select_all).to_be_checked()
         for hidden_input in select_across:
-            self.assertEqual(hidden_input.get_property("value"), "1")
-        self.assertIs(selection_indicator.is_displayed(), False)
-        self.assertIs(select_all_indicator.is_displayed(), True)
+            self.expect(hidden_input).to_have_value("1")
+        self.expect(selection_indicator).to_be_hidden()
+        self.expect(select_all_indicator).to_be_visible()
 
         clear.click()
-        self.assertIs(question.is_displayed(), False)
-        self.assertIs(clear.is_displayed(), False)
-        self.assertIs(select_all.get_property("checked"), False)
+        self.expect(question).to_be_hidden()
+        self.expect(clear).to_be_hidden()
+        self.expect(select_all).not_to_be_checked()
         for hidden_input in select_across:
-            self.assertEqual(hidden_input.get_property("value"), "0")
-        self.assertIs(selection_indicator.is_displayed(), True)
-        self.assertEqual(selection_indicator.text, "0 of 100 selected")
-        self.assertIs(select_all_indicator.is_displayed(), False)
+            self.expect(hidden_input).to_have_attribute("value", "0")
+        self.expect(selection_indicator).to_be_visible()
+        self.expect(selection_indicator).to_have_text("0 of 100 selected")
+        self.expect(select_all_indicator).to_be_hidden()
 
     def test_actions_warn_on_pending_edits(self):
-        from selenium.webdriver.common.by import By
-
         Parent.objects.create(name="foo")
-
         self.admin_login(username="super", password="secret")
-        self.selenium.get(
+        self.page.goto(
             self.live_server_url + reverse("admin:admin_changelist_parent_changelist")
         )
 
-        name_input = self.selenium.find_element(By.ID, "id_form-0-name")
-        name_input.clear()
-        name_input.send_keys("bar")
-        self.selenium.find_element(By.ID, "action-toggle").click()
-        self.selenium.find_element(By.NAME, "index").click()  # Go
-        alert = self.selenium.switch_to.alert
-        try:
-            self.assertEqual(
-                alert.text,
-                "You have unsaved changes on individual editable fields. If you "
-                "run an action, your unsaved changes will be lost.",
-            )
-        finally:
-            alert.dismiss()
+        self.page.locator("#id_form-0-name").fill("bar")
+        self.page.locator("#action-toggle").click()
+
+        self.page.once("dialog", lambda dialog: dialog.dismiss())
+        with self.page.expect_event("dialog") as dialog_info:
+            self.page.locator('[name="index"]').first.click()
+        self.assertEqual(
+            dialog_info.value.message,
+            "You have unsaved changes on individual editable fields. If you "
+            "run an action, your unsaved changes will be lost.",
+        )
 
     def test_save_with_changes_warns_on_pending_action(self):
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.support.ui import Select
-
         Parent.objects.create(name="parent")
-
         self.admin_login(username="super", password="secret")
-        self.selenium.get(
+        self.page.goto(
             self.live_server_url + reverse("admin:admin_changelist_parent_changelist")
         )
 
-        name_input = self.selenium.find_element(By.ID, "id_form-0-name")
-        name_input.clear()
-        name_input.send_keys("other name")
-        Select(self.selenium.find_element(By.NAME, "action")).select_by_value(
-            "delete_selected"
+        self.page.locator("#id_form-0-name").fill("other name")
+        self.page.locator('[name="action"]').first.select_option("delete_selected")
+
+        self.page.once("dialog", lambda dialog: dialog.dismiss())
+        with self.page.expect_event("dialog") as dialog_info:
+            self.page.locator('[name="_save"]').first.click()
+        self.assertEqual(
+            dialog_info.value.message,
+            "You have selected an action, but you haven’t saved your "
+            "changes to individual fields yet. Please click OK to save. "
+            "You’ll need to re-run the action.",
         )
-        self.selenium.find_element(By.NAME, "_save").click()
-        alert = self.selenium.switch_to.alert
-        try:
-            self.assertEqual(
-                alert.text,
-                "You have selected an action, but you haven’t saved your "
-                "changes to individual fields yet. Please click OK to save. "
-                "You’ll need to re-run the action.",
-            )
-        finally:
-            alert.dismiss()
 
     def test_save_without_changes_warns_on_pending_action(self):
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.support.ui import Select
-
         Parent.objects.create(name="parent")
-
         self.admin_login(username="super", password="secret")
-        self.selenium.get(
+        self.page.goto(
             self.live_server_url + reverse("admin:admin_changelist_parent_changelist")
         )
 
-        Select(self.selenium.find_element(By.NAME, "action")).select_by_value(
-            "delete_selected"
+        self.page.locator('[name="action"]').first.select_option("delete_selected")
+
+        self.page.once("dialog", lambda dialog: dialog.dismiss())
+        with self.page.expect_event("dialog") as dialog_info:
+            self.page.locator('[name="_save"]').first.click()
+        self.assertEqual(
+            dialog_info.value.message,
+            "You have selected an action, and you haven’t made any "
+            "changes on individual fields. You’re probably looking for "
+            "the Run button rather than the Save button.",
         )
-        self.selenium.find_element(By.NAME, "_save").click()
-        alert = self.selenium.switch_to.alert
-        try:
-            self.assertEqual(
-                alert.text,
-                "You have selected an action, and you haven’t made any "
-                "changes on individual fields. You’re probably looking for "
-                "the Run button rather than the Save button.",
-            )
-        finally:
-            alert.dismiss()
 
     def test_collapse_filters(self):
-        from selenium.webdriver.common.by import By
-
         self.admin_login(username="super", password="secret")
-        self.selenium.get(self.live_server_url + reverse("admin:auth_user_changelist"))
+        self.page.goto(self.live_server_url + reverse("admin:auth_user_changelist"))
 
         # The UserAdmin has 3 field filters by default: "staff status",
         # "superuser status", and "active".
-        details = self.selenium.find_elements(By.CSS_SELECTOR, "details")
+        details = self.page.locator("details").all()
         # All filters are opened at first.
         for detail in details:
-            self.assertTrue(detail.get_attribute("open"))
+            self.expect(detail).to_have_attribute("open")
         # Collapse "staff' and "superuser" filters.
         for detail in details[:2]:
-            summary = detail.find_element(By.CSS_SELECTOR, "summary")
-            summary.click()
-            self.assertFalse(detail.get_attribute("open"))
+            self.collapse_filter(detail)
         # Filters are in the same state after refresh.
-        self.selenium.refresh()
-        self.assertFalse(
-            self.selenium.find_element(
-                By.CSS_SELECTOR, "[data-filter-title='staff status']"
-            ).get_attribute("open")
-        )
-        self.assertFalse(
-            self.selenium.find_element(
-                By.CSS_SELECTOR, "[data-filter-title='superuser status']"
-            ).get_attribute("open")
-        )
-        self.assertTrue(
-            self.selenium.find_element(
-                By.CSS_SELECTOR, "[data-filter-title='active']"
-            ).get_attribute("open")
-        )
+        self.page.reload()
+        self.expect(
+            self.page.locator("[data-filter-title='staff status']")
+        ).not_to_have_attribute("open")
+        self.expect(
+            self.page.locator("[data-filter-title='superuser status']")
+        ).not_to_have_attribute("open")
+        self.expect(
+            self.page.locator("[data-filter-title='active']")
+        ).to_have_attribute("open")
         # Collapse a filter on another view (Bands).
-        self.selenium.get(
+        self.page.goto(
             self.live_server_url + reverse("admin:admin_changelist_band_changelist")
         )
-        self.selenium.find_element(By.CSS_SELECTOR, "summary").click()
+        detail = self.page.locator("[data-filter-title='number of members']")
+        self.collapse_filter(detail)
         # Go to Users view and then, back again to Bands view.
-        self.selenium.get(self.live_server_url + reverse("admin:auth_user_changelist"))
-        self.selenium.get(
+        self.page.goto(self.live_server_url + reverse("admin:auth_user_changelist"))
+        self.page.goto(
             self.live_server_url + reverse("admin:admin_changelist_band_changelist")
         )
         # The filter remains in the same state.
-        self.assertFalse(
-            self.selenium.find_element(
-                By.CSS_SELECTOR,
-                "[data-filter-title='number of members']",
-            ).get_attribute("open")
-        )
+        self.expect(
+            self.page.locator("[data-filter-title='number of members']")
+        ).not_to_have_attribute("open")
 
     def test_collapse_filter_with_unescaped_title(self):
-        from selenium.webdriver.common.by import By
-
         self.admin_login(username="super", password="secret")
         changelist_url = reverse("admin:admin_changelist_proxyuser_changelist")
-        self.selenium.get(self.live_server_url + changelist_url)
+        self.page.goto(self.live_server_url + changelist_url)
         # Title is escaped.
-        filter_title = self.selenium.find_element(
-            By.CSS_SELECTOR, "[data-filter-title='It\\'s OK']"
-        )
-        filter_title.find_element(By.CSS_SELECTOR, "summary").click()
-        self.assertFalse(filter_title.get_attribute("open"))
+        filter_title = self.page.locator("[data-filter-title='It\\'s OK']")
+        self.collapse_filter(filter_title)
         # Filter is in the same state after refresh.
-        self.selenium.refresh()
-        self.assertFalse(
-            self.selenium.find_element(
-                By.CSS_SELECTOR, "[data-filter-title='It\\'s OK']"
-            ).get_attribute("open")
-        )
+        self.page.reload()
+        self.expect(
+            self.page.locator("[data-filter-title='It\\'s OK']")
+        ).not_to_have_attribute("open")
 
     def test_list_display_ordering(self):
-        from selenium.webdriver.common.by import By
-
         parent_a = Parent.objects.create(name="Parent A")
         child_l = Child.objects.create(name="Child L", parent=None)
         child_m = Child.objects.create(name="Child M", parent=parent_a)
@@ -2216,12 +2316,15 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         self.admin_login(username="super", password="secret")
         changelist_url = reverse("admin:admin_changelist_grandchild_changelist")
-        self.selenium.get(self.live_server_url + changelist_url)
+        self.page.goto(self.live_server_url + changelist_url)
 
         def find_result_row_texts():
-            table = self.selenium.find_element(By.ID, "result_list")
+            table = self.page.locator("#result_list")
             # Drop header from the result list
-            return [row.text for row in table.find_elements(By.TAG_NAME, "tr")][1:]
+            return [
+                row.inner_text().replace("\t", " ").strip()
+                for row in table.locator("tr").all()[1:]
+            ]
 
         def expected_from_queryset(qs):
             return [
@@ -2253,7 +2356,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         ]
         for css_selector, ordering in cases:
             with self.subTest(ordering=ordering):
-                self.selenium.find_element(By.CSS_SELECTOR, css_selector).click()
+                self.page.locator(css_selector).click()
+                self.page.wait_for_load_state("load")
                 expected = expected_from_queryset(
                     GrandChild.objects.all().order_by(*ordering)
                 )

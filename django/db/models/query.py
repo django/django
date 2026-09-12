@@ -6,7 +6,7 @@ import copy
 import operator
 import warnings
 from contextlib import nullcontext
-from functools import reduce
+from functools import partial, reduce
 from itertools import chain, islice
 from weakref import ref as weak_ref
 
@@ -26,7 +26,16 @@ from django.db import (
 from django.db.models import AutoField, DateField, DateTimeField, Field, Max, sql
 from django.db.models.constants import LOOKUP_SEP, OnConflict
 from django.db.models.deletion import Collector
-from django.db.models.expressions import Case, DatabaseDefault, F, OrderBy, Value, When
+from django.db.models.expressions import (
+    Case,
+    Col,
+    ColPairs,
+    DatabaseDefault,
+    F,
+    OrderBy,
+    Value,
+    When,
+)
 from django.db.models.fetch_modes import FETCH_ONE
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import PROHIBITED_FILTER_KWARGS, FilteredRelation, Q
@@ -38,11 +47,12 @@ from django.db.models.utils import (
 )
 from django.utils import timezone
 from django.utils.deprecation import (
-    RemovedInDjango70Warning,
-    RemovedInDjango71Warning,
+    RemovedInDjango2028Warning,
+    RemovedInDjango2029Warning,
     warn_about_external_use,
 )
 from django.utils.functional import cached_property
+from django.utils.inspect import func_accepts_kwargs, func_supports_parameter
 from django.utils.warnings import django_file_prefixes
 
 # The maximum number of results to fetch in a get() query.
@@ -52,6 +62,34 @@ MAX_GET_RESULTS = 21
 REPR_OUTPUT_SIZE = 20
 
 DEFAULT_FETCH_MODE = FETCH_ONE
+
+
+# RemovedInDjango2028Warning: When the deprecation ends, remove this function
+# and restore direct model_cls.from_db(..., fetch_mode=fetch_mode) calls at
+# its call sites.
+def _get_from_db(model_cls, fetch_mode):
+    """
+    Return a callable equivalent to model_cls.from_db with fetch_mode already
+    bound, accommodating deprecated from_db() overrides that don't accept the
+    fetch_mode keyword argument.
+    """
+    from django.db.models import Model
+
+    from_db = model_cls.from_db
+    if (
+        from_db.__func__ is Model.from_db.__func__
+        or func_supports_parameter(from_db, "fetch_mode")
+        or func_accepts_kwargs(from_db)
+    ):
+        return partial(from_db, fetch_mode=fetch_mode)
+    warnings.warn(
+        f"{model_cls.__qualname__}.from_db() must accept a fetch_mode keyword "
+        "argument. Support for from_db() methods that do not accept it is "
+        "deprecated.",
+        RemovedInDjango2028Warning,
+        skip_file_prefixes=django_file_prefixes(),
+    )
+    return from_db
 
 
 class BaseIterable:
@@ -114,6 +152,10 @@ class ModelIterable(BaseIterable):
         init_list = [
             f[0].target.attname for f in select[model_fields_start:model_fields_end]
         ]
+        # RemovedInDjango2028Warning: When the deprecation ends, remove this
+        # assignment and call model_cls.from_db(..., fetch_mode=fetch_mode)
+        # directly in the loop below.
+        from_db = _get_from_db(model_cls, fetch_mode)
         related_populators = get_related_populators(klass_info, select, db, fetch_mode)
         known_related_objects = [
             (
@@ -133,11 +175,10 @@ class ModelIterable(BaseIterable):
         ]
         peers = []
         for row in compiler.results_iter(results):
-            obj = model_cls.from_db(
+            obj = from_db(
                 db,
                 init_list,
                 row[model_fields_start:model_fields_end],
-                fetch_mode=fetch_mode,
             )
             if fetch_mode.track_peers:
                 peers.append(weak_ref(obj))
@@ -204,13 +245,16 @@ class RawModelIterable(BaseIterable):
                     query_iterator, cols
                 )
             fetch_mode = self.queryset._fetch_mode
+            # RemovedInDjango2028Warning: When the deprecation ends, remove
+            # this assignment and call
+            # model_cls.from_db(..., fetch_mode=fetch_mode) directly in the
+            # loop below.
+            from_db = _get_from_db(model_cls, fetch_mode)
             peers = []
             for values in query_iterator:
                 # Associate fields to values
                 model_init_values = [values[pos] for pos in model_init_pos]
-                instance = model_cls.from_db(
-                    db, model_init_names, model_init_values, fetch_mode=fetch_mode
-                )
+                instance = from_db(db, model_init_names, model_init_values)
                 if fetch_mode.track_peers:
                     peers.append(weak_ref(instance))
                     instance._state.peers = peers
@@ -588,7 +632,7 @@ class QuerySet(AltersData):
         """
         if chunk_size is None:
             if self._prefetch_related_lookups:
-                # RemovedInDjango71Warning: Replace the warning with:
+                # RemovedInDjango2029Warning: Replace the warning with:
                 # raise ValueError(
                 #     "chunk_size must be provided when using "
                 #     "QuerySet.aiterator() after prefetch_related()."
@@ -596,11 +640,11 @@ class QuerySet(AltersData):
                 warnings.warn(
                     "Using QuerySet.aiterator() after prefetch_related() without "
                     "providing a chunk_size is deprecated and will raise a "
-                    "ValueError in Django 7.1.",
-                    category=RemovedInDjango71Warning,
+                    "ValueError in Django 2029.",
+                    category=RemovedInDjango2029Warning,
                     skip_file_prefixes=django_file_prefixes(),
                 )
-                # RemovedInDjango71Warning: When the deprecation ends, remove.
+                # RemovedInDjango2029Warning: Remove when the deprecation ends.
                 chunk_size = 2000
         elif chunk_size <= 0:
             raise ValueError("Chunk size must be strictly positive.")
@@ -1259,13 +1303,22 @@ class QuerySet(AltersData):
         def get_obj(obj):
             return obj
 
+        selected_fields = tuple(
+            self.query.selected
+            or (
+                *self.query.extra_select,
+                *self.query.values_select,
+                *self.query.annotation_select,
+            )
+        )
+
         if issubclass(self._iterable_class, ModelIterable):
             # Raise an AttributeError if field_name is deferred.
             get_key = operator.attrgetter(field_name)
 
         elif issubclass(self._iterable_class, ValuesIterable):
             if field_name not in self.query.values_select:
-                qs = qs.values(field_name, *self.query.values_select)
+                qs = qs.values(field_name, *selected_fields)
 
                 def get_obj(obj):  # noqa: F811
                     # We can safely mutate the dictionaries returned by
@@ -1278,16 +1331,16 @@ class QuerySet(AltersData):
 
         elif issubclass(self._iterable_class, ValuesListIterable):
             try:
-                field_index = self.query.values_select.index(field_name)
+                field_index = selected_fields.index(field_name)
             except ValueError:
-                # field_name is missing from values_select, so add it.
+                # field_name isn't selected, so add it.
                 field_index = 0
                 if issubclass(self._iterable_class, NamedValuesListIterable):
                     kwargs = {"named": True}
                 else:
                     kwargs = {}
                     get_obj = operator.itemgetter(slice(1, None))
-                qs = qs.values_list(field_name, *self.query.values_select, **kwargs)
+                qs = qs.values_list(field_name, *selected_fields, **kwargs)
 
             get_key = operator.itemgetter(field_index)
 
@@ -1297,7 +1350,7 @@ class QuerySet(AltersData):
                 get_key = get_obj
             else:
                 # Transform it back into a non-flat values_list().
-                qs = qs.values_list(field_name, *self.query.values_select)
+                qs = qs.values_list(field_name, *selected_fields)
                 get_key = operator.itemgetter(0)
                 get_obj = operator.itemgetter(1)
 
@@ -1521,10 +1574,10 @@ class QuerySet(AltersData):
     def _values(self, *fields, **expressions):
         clone = self._chain()
         if expressions:
-            # RemovedInDjango70Warning: When the deprecation ends, deindent as:
+            # RemovedInDjango2028Warning: When the deprecation ends, deindent:
             # clone = clone.annotate(**expressions)
             with warnings.catch_warnings(
-                action="ignore", category=RemovedInDjango70Warning
+                action="ignore", category=RemovedInDjango2028Warning
             ):
                 clone = clone.annotate(**expressions)
         clone._fields = fields
@@ -1547,8 +1600,8 @@ class QuerySet(AltersData):
                     "field."
                 )
             elif not fields:
-                # RemovedInDjango70Warning: When the deprecation ends, replace
-                # with:
+                # RemovedInDjango2028Warning: When the deprecation ends,
+                # replace with:
                 # raise TypeError(
                 #     "'flat' is not valid when values_list is called with no "
                 #     "fields."
@@ -1557,7 +1610,7 @@ class QuerySet(AltersData):
                     "Calling values_list() with no field name and flat=True "
                     "is deprecated. Pass an explicit field name instead, like "
                     "'pk'.",
-                    RemovedInDjango70Warning,
+                    RemovedInDjango2028Warning,
                 )
                 fields = [self.model._meta.concrete_fields[0].attname]
 
@@ -1797,12 +1850,12 @@ class QuerySet(AltersData):
         elif fields:
             obj.query.add_select_related(fields)
         else:
-            # RemovedInDjango70Warning: when the deprecation ends, raise a
+            # RemovedInDjango2028Warning: when the deprecation ends, raise a
             # TypeError instead.
             warn_about_external_use(
                 "Calling select_related() with no arguments is deprecated. "
                 "Specify the fields to fetch instead.",
-                category=RemovedInDjango70Warning,
+                category=RemovedInDjango2028Warning,
                 skip_name_prefixes=("django.db.models",),
             )
             obj.query.select_related = True
@@ -2048,7 +2101,7 @@ class QuerySet(AltersData):
             return False
         opts = self.model._meta
         pk_fields = {f.attname for f in opts.pk_fields}
-        ordering_fields = set()
+        candidate_fields = set()
         for part in ordering:
             # Search for single field providing a total ordering.
             field_name = None
@@ -2058,7 +2111,17 @@ class QuerySet(AltersData):
                 field_name = part.name
             elif isinstance(part, OrderBy) and isinstance(part.expression, F):
                 field_name = part.expression.name
-            if field_name:
+            if annotation_col := self.query.annotations.get(field_name):
+                if isinstance(annotation_col, Col):
+                    if annotation_col.alias == self.query.base_table:
+                        candidate_fields.add(annotation_col.target)
+                elif isinstance(annotation_col, ColPairs):
+                    candidate_fields |= {
+                        c.target
+                        for c in annotation_col.get_cols()
+                        if c.alias == self.query.base_table
+                    }
+            elif field_name:
                 if field_name == "pk":
                     return True
                 # Normalize attname references by using get_field().
@@ -2068,18 +2131,21 @@ class QuerySet(AltersData):
                     # Could be "?" for random ordering or a related field
                     # lookup. Skip this part of introspection for now.
                     continue
-                # Ordering by a related field name orders by the referenced
-                # model's ordering. Skip this part of introspection for now.
-                if field.remote_field and field_name == field.name:
-                    continue
-                if field.attname in pk_fields and len(pk_fields) == 1:
-                    return True
-                if field.unique and not field.null:
-                    return True
-                ordering_fields.add(field.attname)
+                else:
+                    # Ordering by a related field name orders by the referenced
+                    # model's ordering. Skip this introspection for now.
+                    if field.remote_field and field_name == field.name:
+                        continue
+                    candidate_fields.add(field)
+
+        candidate_attnames = set()
+        for field in candidate_fields:
+            if field.unique and not field.null:
+                return True
+            candidate_attnames.add(field.attname)
 
         # Account for members of a CompositePrimaryKey.
-        if ordering_fields.issuperset(pk_fields):
+        if candidate_attnames.issuperset(pk_fields):
             return True
         # No single total ordering field, try unique_together and total
         # unique constraints.
@@ -2097,7 +2163,7 @@ class QuerySet(AltersData):
             # cannot ensure total ordering.
             if any(field.null for field in fields):
                 continue
-            if ordering_fields.issuperset(field.attname for field in fields):
+            if candidate_attnames.issuperset(field.attname for field in fields):
                 return True
 
         return False
@@ -3022,6 +3088,11 @@ class RelatedPopulator:
             )
 
         self.model_cls = klass_info["model"]
+        # RemovedInDjango2028Warning: When the deprecation ends, remove this
+        # assignment and call
+        # self.model_cls.from_db(..., fetch_mode=fetch_mode) directly in
+        # populate().
+        self.from_db = _get_from_db(self.model_cls, fetch_mode)
         # A primary key must have all of its constituents not-NULL as
         # NULL != NULL and thus NULL cannot be referenced through a foreign
         # relationship. Therefore checking for a single member of the primary
@@ -3041,11 +3112,10 @@ class RelatedPopulator:
         if obj_data[self.pk_idx] is None:
             obj = None
         else:
-            obj = self.model_cls.from_db(
+            obj = self.from_db(
                 self.db,
                 self.init_list,
                 obj_data,
-                fetch_mode=self.fetch_mode,
             )
             for rel_iter in self.related_populators:
                 rel_iter.populate(row, obj)

@@ -377,6 +377,9 @@ class FlexibleDatePost(models.Model):
 class Color(models.Model):
     name = models.CharField(max_length=50)
 
+    class Meta:
+        ordering = ("name",)
+
     def __iter__(self):
         yield from range(5)
 
@@ -387,6 +390,9 @@ class Color(models.Model):
 class ColorfulItem(models.Model):
     name = models.CharField(max_length=50)
     colors = models.ManyToManyField(Color)
+
+    class Meta:
+        ordering = ("pk",)
 
 
 class CustomErrorMessage(models.Model):

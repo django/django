@@ -2573,6 +2573,33 @@ class OperationTests(OperationTestBase):
                 operation.database_forwards(app_label, editor, new_state, project_state)
         self.assertColumnExists(rider_table, "pony_id")
 
+    def test_alter_field_python_level_on_delete_noop(self):
+        """
+        AlterField operation is a noop when changing only the Python-level
+        on_delete option.
+        """
+        app_label = "test_alflodnoop"
+        project_state = self.set_up_test_model(app_label, related_model=True)
+        operation = migrations.AlterField(
+            "Rider", "pony", models.ForeignKey("Pony", models.PROTECT)
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        self.assertIs(
+            project_state.models[app_label, "rider"]
+            .fields["pony"]
+            .remote_field.on_delete,
+            models.CASCADE,
+        )
+        self.assertIs(
+            new_state.models[app_label, "rider"].fields["pony"].remote_field.on_delete,
+            models.PROTECT,
+        )
+        with connection.schema_editor() as editor, self.assertNumQueries(0):
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        with connection.schema_editor() as editor, self.assertNumQueries(0):
+            operation.database_backwards(app_label, editor, new_state, project_state)
+
     def test_alter_field_foreignobject_noop(self):
         app_label = "test_alflfo_noop"
         project_state = self.set_up_test_model(app_label)
