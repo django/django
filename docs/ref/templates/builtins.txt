@@ -2481,6 +2481,12 @@ For example:
 If ``value`` is ``Totally LOVING this Album!``, the output will be
 ``totally loving this album!``.
 
+.. warning::
+
+    Since HTML entities are case-sensitive, the ``lower`` filter may convert
+    uppercase HTML entities into their lowercase equivalents (e.g. ``&AMP;``
+    to ``&amp;``).
+
 .. templatefilter:: make_list
 
 ``make_list``
@@ -2963,6 +2969,13 @@ For example:
     {{ value|upper }}
 
 If ``value`` is ``"Joel is a slug"``, the output will be ``"JOEL IS A SLUG"``.
+
+.. warning::
+
+    Since HTML entities are case-sensitive, the ``upper`` filter may convert
+    lowercase HTML entities into their uppercase equivalents, which can make
+    them invalid (e.g. ``&amp;`` to ``&AMP;``). For this reason, the ``upper``
+    filter does not mark its output as safe.
 
 .. templatefilter:: urlencode
 
