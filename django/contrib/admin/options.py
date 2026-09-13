@@ -1307,7 +1307,6 @@ class ModelAdmin(BaseModelAdmin):
         and a boolean indicating if the results may contain duplicates.
         """
 
-        #Mine (so I can find it easier)
         # Apply keyword searches.
         def construct_search(field_name):
             """
@@ -1333,7 +1332,6 @@ class ModelAdmin(BaseModelAdmin):
                 try:
                     field = opts.get_field(path_part)
                     
-                #Mine (so I can find it easier)
                 except FieldDoesNotExist:
                     # Check for 'and_' prefixed lookups (e.g., and_iexact -> iexact)
                     is_and_lookup = path_part.startswith("and_")
