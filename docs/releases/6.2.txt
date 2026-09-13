@@ -299,6 +299,8 @@ backends.
   :meth:`~django.contrib.gis.gdal.Field.as_datetime` is now a ``c_float``
   rather than a ``c_int``.
 
+* Support for PostGIS 3.2 is removed.
+
 Models
 ------
 
@@ -309,6 +311,12 @@ Tests
 -----
 
 * The undocumented ``django.test.selenium`` module was removed.
+
+Dropped support for PostgreSQL 15
+---------------------------------
+
+Upstream support for PostgreSQL 15 ends in November 2027. Django 6.2 supports
+PostgreSQL 16 and higher.
 
 Miscellaneous
 -------------
