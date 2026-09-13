@@ -1520,3 +1520,109 @@ class OptimizerTests(OptimizerTestBase):
                 ),
             ],
         )
+
+    def test_optimize_through_add_index(self):
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("A", fields=[("id", models.BigAutoField())]),
+                migrations.AddIndex("b", models.Index(fields=["id"], name="b_idx")),
+                migrations.AddField("a", "name", models.IntegerField()),
+            ],
+            [
+                migrations.AddIndex("b", models.Index(fields=["id"], name="b_idx")),
+                migrations.CreateModel("A", fields=[("id", models.BigAutoField()), ("name", models.IntegerField())]),
+            ],
+        )
+
+    def test_not_optimize_through_add_index_same_field(self):
+        self.assertDoesNotOptimize(
+            [
+                migrations.AddField("a", "name", models.IntegerField()),
+                migrations.AddIndex("a", models.Index(fields=["name"], name="a_idx")),
+                migrations.RenameField("a", "name", "new_name"),
+            ],
+        )
+
+    def test_not_optimize_through_add_index_expressions(self):
+        self.assertDoesNotOptimize(
+            [
+                migrations.AddField("a", "name", models.IntegerField()),
+                migrations.AddIndex("a", models.Index(models.F("id"), name="a_idx")),
+                migrations.RenameField("a", "name", "new_name"),
+            ],
+        )
+
+    def test_optimize_through_add_contraint(self):
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("A", fields=[("id", models.BigAutoField())]),
+                migrations.AddConstraint("b", models.UniqueConstraint(fields=["id"], name="b_uniq")),
+                migrations.AddField("a", "name", models.IntegerField()),
+            ],
+            [
+                migrations.AddConstraint("b", models.UniqueConstraint(fields=["id"], name="b_uniq")),
+                migrations.CreateModel(
+                    "A",
+                    fields=[
+                        ("id", models.BigAutoField()),
+                        ("name", models.IntegerField()),
+                    ],
+                ),
+            ],
+        )
+
+    def test_not_optimize_through_add_contraint_same_field(self):
+        self.assertDoesNotOptimize(
+            [
+                migrations.AddField("a", "name", models.IntegerField()),
+                migrations.AddConstraint("a", models.UniqueConstraint(fields=["name"], name="a_uniq")),
+                migrations.RenameField("a", "name", "new_name"),
+            ],
+        )
+
+    def test_not_optimize_through_add_contraint_expressions(self):
+        self.assertDoesNotOptimize(
+            [
+                migrations.AddField("a", "name", models.IntegerField()),
+                migrations.AddConstraint("a", models.UniqueConstraint(models.F("id"), name="a_uniq")),
+                migrations.RenameField("a", "name", "new_name"),
+            ],
+        )
+
+
+    def test_optimize_through_alter_contraint(self):
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("A", fields=[("id", models.BigAutoField())]),
+                migrations.AlterConstraint("b", "b_uniq", models.UniqueConstraint(fields=["id"], name="b_uniq")),
+                migrations.AddField("a", "name", models.IntegerField()),
+            ],
+            [
+                migrations.AlterConstraint("b", "b_uniq", models.UniqueConstraint(fields=["id"], name="b_uniq")),
+                migrations.CreateModel(
+                    "A",
+                    fields=[
+                        ("id", models.BigAutoField()),
+                        ("name", models.IntegerField()),
+                    ],
+                ),
+            ],
+        )
+
+    def test_not_optimize_through_alter_contraint_same_field(self):
+        self.assertDoesNotOptimize(
+            [
+                migrations.AddField("a", "name", models.IntegerField()),
+                migrations.AlterConstraint("a", "a_uniq", models.UniqueConstraint(fields=["name"], name="a_uniq")),
+                migrations.RenameField("a", "name", "new_name"),
+            ],
+        )
+
+    def test_not_optimize_through_alter_contraint_expressions(self):
+        self.assertDoesNotOptimize(
+            [
+                migrations.AddField("a", "name", models.IntegerField()),
+                migrations.AlterConstraint("a", "a_uniq", models.UniqueConstraint(models.F("id"), name="a_uniq")),
+                migrations.RenameField("a", "name", "new_name"),
+            ],
+        )
