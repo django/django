@@ -4,6 +4,9 @@ retrieval.
 """
 
 from django.core.exceptions import FieldError
+from django.db.models.aggregates import Aggregate
+from django.db.models.constants import LOOKUP_SEP
+from django.db.models.expressions import F, Subquery
 from django.db.models.sql.constants import (
     GET_ITERATOR_CHUNK_SIZE,
     NO_RESULTS,
@@ -113,11 +116,30 @@ class UpdateQuery(Query):
             # Omit generated fields.
             if field.generated:
                 continue
-            if hasattr(val, "resolve_expression"):
+            if isinstance(val, Aggregate):
+                val = self._write_subquery(model, val)
+            elif hasattr(val, "resolve_expression"):
                 # Resolve expressions here so that annotations are no longer
                 # needed
                 val = val.resolve_expression(self, allow_joins=False, for_save=True)
             self.values.append((field, model, val))
+
+    def _write_subquery(self, model, val):
+        source_list: list = val.get_source_expressions()
+        expression, filter, order_by = tuple(source_list)
+        expression = expression.name if isinstance(expression, F) else expression
+        related_name, field = expression.split(LOOKUP_SEP, 1)
+
+        related_field = model._meta.get_field(related_name)
+        related_model = related_field.related_model
+        query = Subquery(
+            related_model.objects.filter(**filter if filter else {})
+            .order_by(*order_by if order_by else ())
+            .values(related_field.field.attname)
+            .annotate(result=val.__class__(field))
+            .values("result")[:1]
+        )
+        return query
 
     def add_related_update(self, model, field, value):
         """
