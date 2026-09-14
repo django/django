@@ -1,6 +1,7 @@
 from datetime import datetime
 from operator import attrgetter
 
+from django.db import connection
 from django.db.models import Q
 from django.test import TestCase
 
@@ -94,8 +95,9 @@ class OrLookupsTests(TestCase):
             attrgetter("headline"),
         )
 
+        nonexistent_pk = connection.ops.get_nonexistent_pk(40000)
         self.assertQuerySetEqual(
-            Article.objects.filter(pk__in=[self.a1, self.a2, self.a3, 40000]),
+            Article.objects.filter(pk__in=[self.a1, self.a2, self.a3, nonexistent_pk]),
             ["Hello", "Goodbye", "Hello and goodbye"],
             attrgetter("headline"),
         )

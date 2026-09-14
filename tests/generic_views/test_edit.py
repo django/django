@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
+from django.db import connection
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
@@ -239,7 +240,7 @@ class UpdateViewTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.author = Author.objects.create(
-            pk=1,  # Required for OneAuthorUpdate.
+            pk=connection.ops.get_hardcoded_pk(1),  # Required for OneAuthorUpdate.
             name="Randall Munroe",
             slug="randall-munroe",
         )

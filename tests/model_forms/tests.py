@@ -2173,19 +2173,17 @@ class ModelMultipleChoiceFieldTests(TestCase):
 
         # Add a Category object *after* the ModelMultipleChoiceField has
         # already been instantiated. This proves clean() checks the database
-        # during clean() rather than caching it at time of instantiation. Note,
-        # we are using an id of 1006 here since tests that run before this may
-        # create categories with primary keys up to 6. Use a number that will
-        # not conflict.
-        c6 = Category.objects.create(id=1006, name="Sixth", url="6th")
-        self.assertCountEqual(f.clean([c6.id]), [c6])
+        # during clean() rather than caching it at time of instantiation.
+        pk = connection.ops.get_nonexistent_pk(self.c3.pk)
+        c4 = Category.objects.create(id=pk, name="Fourth", url="4th")
+        self.assertCountEqual(f.clean([c4.id]), [c4])
 
         # Delete a Category object *after* the ModelMultipleChoiceField has
         # already been instantiated. This proves clean() checks the database
         # during clean() rather than caching it at time of instantiation.
-        Category.objects.get(url="6th").delete()
+        Category.objects.get(url="4th").delete()
         with self.assertRaises(ValidationError):
-            f.clean([c6.id])
+            f.clean([c4.id])
 
     def test_model_multiple_choice_required_false(self):
         f = forms.ModelMultipleChoiceField(Category.objects.all(), required=False)
