@@ -14,3 +14,6 @@ Bugfixes
 
 * Fixed a bug in Django 6.1 where the ``fields.W225`` system check incorrectly
   warned that ``null`` has no effect on ``GeneratedField`` (:ticket:`37348`).
+
+* Fixed a bug in Django 6.1 where ``FETCH_PEERS`` did not batch instances
+  loaded by ``select_related()``, causing unnecessary queries (#37344).

@@ -3060,6 +3060,7 @@ class RelatedPopulator:
         self.related_populators = get_related_populators(
             klass_info, select, self.db, fetch_mode
         )
+        self.peers = []
         self.local_setter = klass_info["local_setter"]
         self.remote_setter = klass_info["remote_setter"]
 
@@ -3076,6 +3077,9 @@ class RelatedPopulator:
                 self.init_list,
                 obj_data,
             )
+            if self.fetch_mode.track_peers:
+                self.peers.append(weak_ref(obj))
+                obj._state.peers = self.peers
             for rel_iter in self.related_populators:
                 rel_iter.populate(row, obj)
         self.local_setter(from_obj, obj)
