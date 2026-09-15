@@ -364,10 +364,10 @@ def check_ai_disclosure(pr_body):
 
     section = strip_html_comments(ai_match.group(1))
     no_ai_checked = bool(
-        re.search(r"-\s*\[x\].*?No AI tools were used", section, re.IGNORECASE)
+        re.search(r"[-*]\s*\[x\].*?No AI tools were used", section, re.IGNORECASE)
     )
     ai_used_checked = bool(
-        re.search(r"-\s*\[x\].*?If AI tools were used", section, re.IGNORECASE)
+        re.search(r"[-*]\s*\[x\].*?If AI tools were used", section, re.IGNORECASE)
     )
 
     # Must check exactly one option.
@@ -379,7 +379,7 @@ def check_ai_disclosure(pr_body):
         extra_lines = [
             line.strip()
             for line in section.splitlines()
-            if line.strip() and not line.strip().startswith("- [")
+            if line.strip() and not re.match(r"[-*]\s*\[", line.strip())
         ]
         # Ensure PR author includes at least five words about their AI use.
         if len(" ".join(extra_lines).split()) < MIN_WORDS:
@@ -396,7 +396,8 @@ def check_checklist(pr_body):
     if not checklist_match:
         return Message(*INCOMPLETE_CHECKLIST)
 
-    checkboxes = re.findall(r"-\s*\[(.)\]", checklist_match.group(1))
+    section = strip_html_comments(checklist_match.group(1))
+    checkboxes = re.findall(r"[-*]\s*\[(.)\]", section)
 
     if len(checkboxes) < 5 or not all(c.lower() == "x" for c in checkboxes[:5]):
         return Message(*INCOMPLETE_CHECKLIST)

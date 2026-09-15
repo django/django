@@ -511,6 +511,10 @@ class TestCheckAIDisclosure(BaseTestCase):
     def test_no_ai_checked_passes(self):
         self.assertIsNone(check_pr.check_ai_disclosure(VALID_PR_BODY))
 
+    def test_no_ai_checked_with_asterisk_markers_passes(self):
+        body = make_pr_body().replace("- [", "* [")
+        self.assertIsNone(check_pr.check_ai_disclosure(body))
+
     def test_ai_used_with_description_passes(self):
         body = make_pr_body(
             no_ai_checked=False,
@@ -521,13 +525,39 @@ class TestCheckAIDisclosure(BaseTestCase):
         )
         self.assertIsNone(check_pr.check_ai_disclosure(body))
 
+    def test_ai_used_with_asterisk_markers_and_description_passes(self):
+        body = make_pr_body(
+            no_ai_checked=False,
+            ai_used_checked=True,
+            ai_description="I used ChatGPT and reviewed its output.",
+        ).replace("- [", "* [")
+        self.assertIsNone(check_pr.check_ai_disclosure(body))
+
     def test_neither_option_checked_fails(self):
         body = make_pr_body(no_ai_checked=False, ai_used_checked=False)
         self.assertIsNotNone(check_pr.check_ai_disclosure(body))
 
+    def test_neither_option_checked_with_asterisk_markers_fails(self):
+        body = make_pr_body(no_ai_checked=False, ai_used_checked=False).replace(
+            "- [", "* ["
+        )
+        result = check_pr.check_ai_disclosure(body)
+        self.assertIsInstance(result, Message)
+        self.assertEqual(result.title, check_pr.MISSING_AI_DISCLOSURE[0])
+
     def test_both_options_checked_fails(self):
         body = make_pr_body(no_ai_checked=True, ai_used_checked=True)
         self.assertIsNotNone(check_pr.check_ai_disclosure(body))
+
+    def test_both_options_checked_with_asterisk_markers_fails(self):
+        body = make_pr_body(
+            no_ai_checked=True,
+            ai_used_checked=True,
+            ai_description="I used ChatGPT and reviewed its output.",
+        ).replace("- [", "* [")
+        result = check_pr.check_ai_disclosure(body)
+        self.assertIsInstance(result, Message)
+        self.assertEqual(result.title, check_pr.MISSING_AI_DISCLOSURE[0])
 
     def test_ai_used_no_description_fails(self):
         body = make_pr_body(
@@ -540,6 +570,24 @@ class TestCheckAIDisclosure(BaseTestCase):
             no_ai_checked=False, ai_used_checked=True, ai_description="Used Copilot."
         )
         self.assertIsNotNone(check_pr.check_ai_disclosure(body))
+
+    def test_ai_used_with_asterisk_markers_and_invalid_description_fails(self):
+        for description in [
+            "",
+            "Used Copilot.",
+            "Used Copilot for code.",
+            "<!-- I used ChatGPT and reviewed its output. -->",
+            "Used Copilot. <!-- I reviewed and verified its output. -->",
+        ]:
+            with self.subTest(description=description):
+                body = make_pr_body(
+                    no_ai_checked=False,
+                    ai_used_checked=True,
+                    ai_description=description,
+                ).replace("- [", "* [")
+                result = check_pr.check_ai_disclosure(body)
+                self.assertIsInstance(result, Message)
+                self.assertEqual(result.title, check_pr.MISSING_AI_DESCRIPTION[0])
 
     def test_ai_used_exactly_five_word_description_passes(self):
         body = make_pr_body(
@@ -566,6 +614,14 @@ class TestCheckAIDisclosure(BaseTestCase):
             "<!-- - [x] No AI tools were used -->\n- [ ] **No AI tools were used**",
         )
         self.assertIsNotNone(check_pr.check_ai_disclosure(body))
+
+    def test_commented_out_asterisk_checkbox_not_counted(self):
+        body = make_pr_body().replace("- [", "* [")
+        body = body.replace(
+            "* [ ] **If AI tools were used**",
+            "<!-- * [x] If AI tools were used -->\n* [ ] **If AI tools were used**",
+        )
+        self.assertIsNone(check_pr.check_ai_disclosure(body))
 
 
 class TestStripHtmlComments(BaseTestCase):
@@ -599,6 +655,14 @@ class TestCheckChecklist(BaseTestCase):
     def test_first_five_checked_passes(self):
         self.assertIsNone(check_pr.check_checklist(VALID_PR_BODY))
 
+    def test_first_five_checked_with_asterisk_markers_passes(self):
+        body = make_pr_body().replace("- [", "* [")
+        self.assertIsNone(check_pr.check_checklist(body))
+
+    def test_first_five_checked_with_mixed_markers_passes(self):
+        body = make_pr_body().replace("- [x] This PR follows", "* [x] This PR follows")
+        self.assertIsNone(check_pr.check_checklist(body))
+
     def test_all_nine_checked_passes(self):
         body = make_pr_body(checked_items=9)
         self.assertIsNone(check_pr.check_checklist(body))
@@ -614,6 +678,31 @@ class TestCheckChecklist(BaseTestCase):
     def test_three_of_five_checked_fails(self):
         body = make_pr_body(checked_items=3)
         self.assertIsNotNone(check_pr.check_checklist(body))
+
+    def test_unchecked_required_item_with_checked_optional_items_fails(self):
+        for marker in ["-", "*"]:
+            with self.subTest(marker=marker):
+                body = make_pr_body(checked_items=9).replace(
+                    "- [x] This PR follows", "- [ ] This PR follows"
+                )
+                body = body.replace("- [", f"{marker} [")
+                self.assertIsNotNone(check_pr.check_checklist(body))
+
+    def test_unchecked_required_asterisk_item_with_checked_hyphen_items_fails(self):
+        body = make_pr_body(checked_items=9).replace(
+            "- [x] This PR follows", "* [ ] This PR follows"
+        )
+        self.assertIsNotNone(check_pr.check_checklist(body))
+
+    def test_commented_out_checkboxes_not_counted(self):
+        for marker in ["-", "*"]:
+            with self.subTest(marker=marker):
+                body = make_pr_body(checked_items=4).replace(
+                    "#### Checklist\n",
+                    "#### Checklist\n<!--\n- [x] Commented-out item\n-->\n",
+                )
+                body = body.replace("- [", f"{marker} [")
+                self.assertIsNotNone(check_pr.check_checklist(body))
 
     def test_missing_section_fails(self):
         body = VALID_PR_BODY.replace("#### Checklist\n", "")
