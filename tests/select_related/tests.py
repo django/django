@@ -281,6 +281,19 @@ class SelectRelatedTests(TestCase):
             FETCH_PEERS,
         )
 
+    def test_fetch_peers_for_select_related_objects(self):
+        species = (
+            Species.objects.select_related("genus__family")
+            .fetch_mode(FETCH_PEERS)
+            .order_by("pk")
+        )
+        with self.assertNumQueries(2):
+            orders = [obj.genus.family.order.name for obj in species]
+            self.assertEqual(
+                orders,
+                ["Diptera", "Primates", "Fabales", "Agaricales"],
+            )
+
 
 class SelectRelatedValidationTests(SimpleTestCase):
     """
