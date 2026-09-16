@@ -14,6 +14,7 @@ urlpatterns = [
     path("not_in_transaction_using_none/", views.not_in_transaction_using_none),
     path("not_in_transaction_using_text/", views.not_in_transaction_using_text),
     path("bad_request/", views.bad_request),
+    path("errored/", views.errored),
     path("suspicious/", views.suspicious),
     path("malformed_post/", views.malformed_post),
     path("httpstatus_enum/", views.httpstatus_enum),

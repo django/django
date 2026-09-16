@@ -138,9 +138,9 @@ def response_for_exception(request, exc):
         )
 
     else:
-        signals.got_request_exception.send(sender=None, request=request)
+        signals.got_request_exception.send_robust(sender=None, request=request)
         response = handle_uncaught_exception(
-            request, get_resolver(get_urlconf()), sys.exc_info()
+            request, get_resolver(get_urlconf()), (type(exc), exc, exc.__traceback__)
         )
         log_response(
             "%s: %s",
@@ -164,9 +164,11 @@ def get_exception_response(request, resolver, status_code, exception):
     try:
         callback = resolver.resolve_error_handler(status_code)
         response = callback(request, exception=exception)
-    except Exception:
-        signals.got_request_exception.send(sender=None, request=request)
-        response = handle_uncaught_exception(request, resolver, sys.exc_info())
+    except Exception as exc:
+        signals.got_request_exception.send_robust(sender=None, request=request)
+        response = handle_uncaught_exception(
+            request, resolver, (type(exc), exc, exc.__traceback__)
+        )
 
     return response
 

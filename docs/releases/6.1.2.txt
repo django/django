@@ -11,3 +11,7 @@ Bugfixes
 
 * Fixed a data loss issue in Django 4.0 where :ref:`network rasters
   <gdal-raster-network>` were deleted by GeoDjango when closed.
+
+* Fixed a crash in the exception-handling pipeline where a failing
+  ``got_request_exception`` signal receiver could prevent the original
+  exception from producing a proper 500 response (:ticket:`21777`).

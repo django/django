@@ -47,6 +47,10 @@ def bad_request(request):
     raise BadRequest()
 
 
+def errored(request):
+    raise ValueError("boom")
+
+
 def suspicious(request):
     raise SuspiciousOperation("dubious")
 
