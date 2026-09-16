@@ -314,6 +314,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         if hasattr(value, "as_sql"):
             sql, params = compiler.compile(value)
             if value.field.srid != f.srid:
+                self._validate_transform_srid(f)
                 sql = f"{transform_func}({sql}, %s)"
                 params = (*params, f.srid)
             return sql, params
@@ -329,6 +330,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         if value_srid is None or value_srid == f.srid:
             return "%s", (value,)
         else:
+            self._validate_transform_srid(f)
             return f"{transform_func}(%s, %s)", (value, f.srid)
 
     def _get_postgis_func(self, func):
