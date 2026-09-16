@@ -47,6 +47,14 @@ def bad_request(request):
     raise BadRequest()
 
 
+def errored(request):
+    raise ValueError("boom")
+
+
+def failing_404_handler(request, exception):
+    raise ValueError("handler boom")
+
+
 def suspicious(request):
     raise SuspiciousOperation("dubious")
 
