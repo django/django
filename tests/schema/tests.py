@@ -1111,6 +1111,53 @@ class SchemaTests(TransactionTestCase):
             "generated", self.get_indexes(GeneratedFieldIndexedModel._meta.db_table)
         )
 
+    def _test_alter_generated_field_remove_null(self, db_persist):
+        class GeneratedFieldNullModel(Model):
+            number = IntegerField(null=True)
+            generated = GeneratedField(
+                expression=F("number") + 1,
+                db_persist=db_persist,
+                output_field=IntegerField(),
+                null=True,
+            )
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(GeneratedFieldNullModel)
+        self.isolated_local_models = [GeneratedFieldNullModel]
+        obj = GeneratedFieldNullModel.objects.create()
+
+        old_field = GeneratedFieldNullModel._meta.get_field("generated")
+        new_field = GeneratedField(
+            expression=F("number") + 1,
+            db_persist=db_persist,
+            output_field=IntegerField(),
+        )
+        new_field.contribute_to_class(GeneratedFieldNullModel, "generated")
+        with connection.schema_editor() as editor:
+            editor.alter_field(GeneratedFieldNullModel, old_field, new_field)
+
+        # The column is still nullable and still generated.
+        columns = self.column_classes(GeneratedFieldNullModel)
+        self.assertIs(columns["generated"][1].null_ok, True)
+        obj.refresh_from_db()
+        self.assertIsNone(obj.generated)
+        GeneratedFieldNullModel.objects.update(number=1)
+        obj.refresh_from_db()
+        self.assertEqual(obj.generated, 2)
+
+    @isolate_apps("schema")
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_alter_generated_field_remove_null_stored(self):
+        self._test_alter_generated_field_remove_null(db_persist=True)
+
+    @isolate_apps("schema")
+    @skipUnlessDBFeature("supports_virtual_generated_columns")
+    def test_alter_generated_field_remove_null_virtual(self):
+        self._test_alter_generated_field_remove_null(db_persist=False)
+
     @isolate_apps("schema")
     @skipUnlessDBFeature(
         "supports_stored_generated_columns",
