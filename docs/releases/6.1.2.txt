@@ -11,3 +11,5 @@ Bugfixes
 
 * Fixed a data loss issue in Django 4.0 where :ref:`network rasters
   <gdal-raster-network>` were deleted by GeoDjango when closed.
+* Fixed an infinite loop in ``TupleIn`` lookups when an ``F()`` expression was
+  used as the left-hand side.

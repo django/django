@@ -85,9 +85,12 @@ class TupleLookupMixin:
     def get_lhs_str(self):
         if isinstance(self.lhs, ColPairs):
             return repr(self.lhs.field.name)
-        else:
+        elif isinstance(self.lhs, (tuple, list, Tuple)):
             names = ", ".join(repr(f.name) for f in self.lhs)
             return f"({names})"
+        elif hasattr(self.lhs, "name"):
+            return repr(self.lhs.name)
+        return repr(self.lhs)
 
     def get_prep_lhs(self):
         if isinstance(self.lhs, (tuple, list)):
@@ -298,12 +301,20 @@ class TupleLessThanOrEqual(TupleLookupMixin, LessThanOrEqual):
 
 class TupleIn(TupleLookupMixin, In):
     def get_prep_lookup(self):
+        from django.db.models.query import QuerySet
+
+        if isinstance(self.rhs, QuerySet):
+            rhs = self.rhs.query.clone()
+            rhs._db = self.rhs._db
+            self.rhs = rhs
         if self.rhs_is_direct_value():
             self.check_rhs_is_tuple_or_list()
             self.check_rhs_is_collection_of_tuples_or_lists()
             self.check_rhs_elements_length_equals_lhs_length()
         else:
             self.check_rhs_is_query()
+            if isinstance(self.lhs, models.F):
+                return self.rhs
             super(TupleLookupMixin, self).get_prep_lookup()
 
         return self.rhs  # skip checks from mixin
