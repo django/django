@@ -111,10 +111,11 @@ example, here are the `tickets for the documentation component`_.
 Methods to find tickets
 -----------------------
 
-There are two recommended ways to find a ticket:
+There are three recommended ways to find a ticket:
 
 * Look at the `easy pickings`_.
 * Use the `vulture method`_.
+* Look at tickets owned by `Django Sprints`_.
 
 The vulture method is the process of looking for accepted tickets that haven't
 been touched in six months or longer. The ideal ticket has a PR linked to it
@@ -133,6 +134,7 @@ that are applied are:
 
 .. _easy pickings: https://code.djangoproject.com/query?easy=1&stage=Accepted&status=assigned&status=new&time=5+years+ago..today&order=id&desc=1&col=id&col=summary&col=owner&col=type&col=component&col=time&col=changetime
 .. _vulture method: https://youtube.com/shorts/D6QHet5U82U?si=j5M6sy0ufpeGy_iZ
+.. _Django Sprints: https://code.djangoproject.com/query?owner=Django+Sprints&status=assigned&status=new&order=id&desc=1&col=id&col=summary&col=owner&col=type&col=component&col=time&col=changetime
 .. _possibly vulture-able tickets here: https://code.djangoproject.com/query?stage=Accepted&changetime=5+years+ago..6+months+ago&needs_better_patch=1&status=assigned&status=new&time=5+years+ago..today&order=id&desc=1&col=id&col=summary&col=time&col=changetime&col=needs_better_patch&col=owner&col=type&col=component
 
 Claiming a ticket
