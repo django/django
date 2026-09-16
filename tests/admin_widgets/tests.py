@@ -1285,7 +1285,6 @@ class HorizontalVerticalFilterPlaywrightTests(AdminWidgetPlaywrightTestCase):
 
     def assertButtonsDisabled(
         self,
-        mode,
         field_name,
         choose_btn_disabled=False,
         remove_btn_disabled=False,
@@ -1304,17 +1303,16 @@ class HorizontalVerticalFilterPlaywrightTests(AdminWidgetPlaywrightTestCase):
             self.expect(remove_button).to_be_disabled()
         else:
             self.expect(remove_button).to_be_enabled()
-        if mode == "horizontal":
-            if choose_all_btn_disabled:
-                self.expect(choose_all_button).to_be_disabled()
-            else:
-                self.expect(choose_all_button).to_be_enabled()
-            if remove_all_btn_disabled:
-                self.expect(remove_all_button).to_be_disabled()
-            else:
-                self.expect(remove_all_button).to_be_enabled()
+        if choose_all_btn_disabled:
+            self.expect(choose_all_button).to_be_disabled()
+        else:
+            self.expect(choose_all_button).to_be_enabled()
+        if remove_all_btn_disabled:
+            self.expect(remove_all_button).to_be_disabled()
+        else:
+            self.expect(remove_all_button).to_be_enabled()
 
-    def execute_basic_operations(self, mode, field_name):
+    def execute_basic_operations(self, field_name):
         original_url = self.page.url
 
         from_box = "#id_%s_from" % field_name
@@ -1338,7 +1336,6 @@ class HorizontalVerticalFilterPlaywrightTests(AdminWidgetPlaywrightTestCase):
         )
         self.assertSelectOptions(to_box, [str(self.lisa.id), str(self.peter.id)])
         self.assertButtonsDisabled(
-            mode,
             field_name,
             choose_btn_disabled=True,
             remove_btn_disabled=True,
@@ -1347,17 +1344,7 @@ class HorizontalVerticalFilterPlaywrightTests(AdminWidgetPlaywrightTestCase):
         )
 
         # Click 'Choose all' --------------------------------------------------
-        if mode == "horizontal":
-            self.page.locator(choose_all_button).click()
-        elif mode == "vertical":
-            # There's no 'Choose all' button in vertical mode, so individually
-            # select all options and click 'Choose'.
-            all_values = [
-                el.get_attribute("value")
-                for el in self.page.locator(f"{from_box} > option").all()
-            ]
-            self.page.locator(from_box).select_option(value=all_values)
-            self.page.locator(choose_button).click()
+        self.page.locator(choose_all_button).click()
         self.assertSelectOptions(from_box, [])
         self.assertSelectOptions(
             to_box,
@@ -1373,7 +1360,6 @@ class HorizontalVerticalFilterPlaywrightTests(AdminWidgetPlaywrightTestCase):
             ],
         )
         self.assertButtonsDisabled(
-            mode,
             field_name,
             choose_btn_disabled=True,
             remove_btn_disabled=True,
@@ -1382,17 +1368,7 @@ class HorizontalVerticalFilterPlaywrightTests(AdminWidgetPlaywrightTestCase):
         )
 
         # Click 'Remove all' --------------------------------------------------
-        if mode == "horizontal":
-            self.page.locator(remove_all_button).click()
-        elif mode == "vertical":
-            # There's no 'Remove all' button in vertical mode, so individually
-            # select all options and click 'Remove'.
-            all_values = [
-                el.get_attribute("value")
-                for el in self.page.locator(f"{to_box} > option").all()
-            ]
-            self.page.locator(to_box).select_option(value=all_values)
-            self.page.locator(remove_button).click()
+        self.page.locator(remove_all_button).click()
         self.assertSelectOptions(
             from_box,
             [
@@ -1408,7 +1384,6 @@ class HorizontalVerticalFilterPlaywrightTests(AdminWidgetPlaywrightTestCase):
         )
         self.assertSelectOptions(to_box, [])
         self.assertButtonsDisabled(
-            mode,
             field_name,
             choose_btn_disabled=True,
             remove_btn_disabled=True,
@@ -1435,7 +1410,6 @@ class HorizontalVerticalFilterPlaywrightTests(AdminWidgetPlaywrightTestCase):
             ]
         )
         self.assertButtonsDisabled(
-            mode,
             field_name,
             choose_btn_disabled=False,
             remove_btn_disabled=True,
@@ -1444,7 +1418,6 @@ class HorizontalVerticalFilterPlaywrightTests(AdminWidgetPlaywrightTestCase):
         )
         self.page.locator(choose_button).click()
         self.assertButtonsDisabled(
-            mode,
             field_name,
             choose_btn_disabled=True,
             remove_btn_disabled=True,
@@ -1484,7 +1457,6 @@ class HorizontalVerticalFilterPlaywrightTests(AdminWidgetPlaywrightTestCase):
             value=[str(self.lisa.id), str(self.bob.id)]
         )
         self.assertButtonsDisabled(
-            mode,
             field_name,
             choose_btn_disabled=True,
             remove_btn_disabled=False,
@@ -1493,7 +1465,6 @@ class HorizontalVerticalFilterPlaywrightTests(AdminWidgetPlaywrightTestCase):
         )
         self.page.locator(remove_button).click()
         self.assertButtonsDisabled(
-            mode,
             field_name,
             choose_btn_disabled=True,
             remove_btn_disabled=True,
@@ -1581,8 +1552,8 @@ class HorizontalVerticalFilterPlaywrightTests(AdminWidgetPlaywrightTestCase):
                 + reverse("admin:admin_widgets_school_change", args=(self.school.id,))
             )
 
-            self.execute_basic_operations("vertical", "students")
-            self.execute_basic_operations("horizontal", "alumni")
+            self.execute_basic_operations("students")
+            self.execute_basic_operations("alumni")
 
             # Save, everything should be stored properly stored in the
             # database.

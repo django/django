@@ -30,6 +30,10 @@ details on these changes.
 
 * Passing positional table names to :djadmin:`createcachetable` will no longer
   be supported.
+  
+* The undocumented ``EmailValidator.validate_domain_part()`` method will be
+  removed.
+
 
 .. _deprecation-removed-in-2028:
 
