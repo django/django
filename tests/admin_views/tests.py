@@ -13,7 +13,7 @@ from django import forms
 from django.contrib import admin
 from django.contrib.admin import AdminSite, ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
-from django.contrib.admin.models import ADDITION, DELETION, LogEntry
+from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.contrib.admin.options import SOURCE_MODEL_VAR, TO_FIELD_VAR
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import quote
@@ -9732,3 +9732,52 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
         response = self.client.get(unknown_url)
         # Does not redirect to the admin login.
         self.assertEqual(response.status_code, 404)
+
+
+@override_settings(ROOT_URLCONF="admin_views.urls")
+class AdminReverseManyToManyViewTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.superuser = User.objects.create_superuser(
+            username="super", password="secret", email="super@example.com"
+        )
+        cls.margherita = Pizza.objects.create(name="Margherita")
+        cls.marinara = Pizza.objects.create(name="Marinara")
+        cls.cheese = Topping.objects.create(name="Cheese")
+        cls.margherita.toppings.add(cls.cheese)
+        cls.add_url = reverse("admin:admin_views_editabletopping_add")
+        cls.changelist_url = reverse("admin:admin_views_editabletopping_changelist")
+        cls.change_url = reverse(
+            "admin:admin_views_editabletopping_change", args=(cls.cheese.pk,)
+        )
+
+    def setUp(self):
+        self.client.force_login(self.superuser)
+
+    def test_change_view_initial(self):
+        response = self.client.get(self.change_url)
+        self.assertEqual(
+            response.context["adminform"].form.initial["pizzas"], [self.margherita]
+        )
+
+    def test_add_saves_relation(self):
+        response = self.client.post(
+            self.add_url, {"name": "Basil", "pizzas": [self.marinara.pk]}
+        )
+        self.assertRedirects(response, self.changelist_url)
+        basil = Topping.objects.get(name="Basil")
+        self.assertSequenceEqual(basil.pizzas.all(), [self.marinara])
+
+    def test_change_saves_relation_and_logs_it(self):
+        response = self.client.post(
+            self.change_url, {"name": "Cheese", "pizzas": [self.marinara.pk]}
+        )
+        self.assertRedirects(response, self.changelist_url)
+        self.assertSequenceEqual(self.cheese.pizzas.all(), [self.marinara])
+        self.assertSequenceEqual(self.margherita.toppings.all(), [])
+        log = LogEntry.objects.filter(action_flag=CHANGE).latest("id")
+        self.assertEqual(log.get_change_message(), "Changed Pizzas.")
+
+    def test_change_clears_relation(self):
+        self.client.post(self.change_url, {"name": "Cheese", "pizzas": []})
+        self.assertSequenceEqual(self.cheese.pizzas.all(), [])
