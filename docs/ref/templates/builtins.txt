@@ -974,6 +974,16 @@ This would display as "It is the 4th of September".
 
         It is {% now "SHORT_DATETIME_FORMAT" %}
 
+You can also pass a template variable as the format string:
+
+.. code-block:: html+django
+
+    It is {% now my_date_format %}
+
+.. versionchanged:: 6.2
+
+    Support for resolving template variables was added.
+
 You can also use the syntax ``{% now "Y" as current_year %}`` to store the
 output (as a string) inside a variable. This is useful if you want to use
 ``{% now %}`` inside a template tag like :ttag:`blocktranslate` for example:
