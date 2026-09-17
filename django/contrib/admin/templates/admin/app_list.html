@@ -5,7 +5,9 @@
     <div class="app-{{ app.app_label }} module{% if app.app_url in request.path|urlencode %} current-app{% endif %}">
       <table>
         <caption>
-          <a href="{{ app.app_url }}" class="section">{{ app.name }}</a>
+          <h2>
+           <a href="{{ app.app_url }}" class="section">{{ app.name }}</a>
+          </h2>
         </caption>
         <thead class="visually-hidden">
           <tr>
@@ -43,7 +45,7 @@
             </tr>
           {% endwith %}
         {% endfor %}
-      </table>
+          </table>
     </div>
   {% endfor %}
 {% else %}
