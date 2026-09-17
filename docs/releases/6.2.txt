@@ -388,6 +388,13 @@ required ``{% endverbatim a   b %}`` to close it. It now also matches
 ``{% endverbatim a b %}``, which may cause a verbatim block to end earlier than
 intended.
 
+You can temporarily restore the previous parsing behavior by setting
+``"allow_multiline_tags": False`` in the
+:class:`~django.template.backends.django.DjangoTemplates` backend's
+:setting:`OPTIONS <TEMPLATES-OPTIONS>`. Remove the option once your templates
+are updated. This transitional option is deprecated and will be removed in
+Django 2029.
+
 Database backend API
 --------------------
 

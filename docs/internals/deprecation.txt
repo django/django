@@ -33,6 +33,9 @@ details on these changes.
 
 * ``django.utils.functional.cached_property`` will be removed.
 
+* The ``allow_multiline_tags`` transitional template engine option will be
+  removed.
+
 .. _deprecation-removed-in-2028:
 
 2028
