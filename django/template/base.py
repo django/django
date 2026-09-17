@@ -91,6 +91,8 @@ UNKNOWN_SOURCE = "<unknown source>"
 # entire tag, including start/end delimiters. Using re.compile() is faster
 # than instantiating SimpleLazyObject with _lazy_re_compile().
 tag_re = re.compile(r"({%[\s\S]*?%}|{{.*?}}|{#.*?#})")
+# RemovedInDjango2029Warning.
+tag_re_legacy = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})")
 
 logger = logging.getLogger("django.template")
 
@@ -184,9 +186,19 @@ class Template:
         template source.
         """
         if self.engine.debug:
-            lexer = DebugLexer(self.source)
+            # RemovedInDjango2029Warning: When the deprecation ends, replace:
+            # lexer = DebugLexer(self.source)
+            lexer = DebugLexer(
+                self.source,
+                allow_multiline_tags=self.engine.allow_multiline_tags,
+            )
         else:
-            lexer = Lexer(self.source)
+            # RemovedInDjango2029Warning: When the deprecation ends, replace:
+            # lexer = Lexer(self.source)
+            lexer = Lexer(
+                self.source,
+                allow_multiline_tags=self.engine.allow_multiline_tags,
+            )
 
         tokens = lexer.tokenize()
         parser = Parser(
@@ -433,8 +445,12 @@ class Lexer:
         % (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END))
     )
 
-    def __init__(self, template_string):
+    # RemovedInDjango2029Warning: When the deprecation ends, replace with:
+    # def __init__(self, template_string):
+    def __init__(self, template_string, allow_multiline_tags=True):
         self.template_string = template_string
+        # RemovedInDjango2029Warning.
+        self.tag_re = tag_re if allow_multiline_tags else tag_re_legacy
 
     def __repr__(self):
         return '<%s template_string="%s...">' % (
@@ -488,7 +504,10 @@ class Lexer:
         raw_end_re = None
 
         while True:
-            regex = raw_end_re if raw_end_re is not None else tag_re
+            # RemovedInDjango2029Warning: When the deprecation ends, replace
+            # with:
+            # regex = raw_end_re if raw_end_re is not None else tag_re
+            regex = raw_end_re if raw_end_re is not None else self.tag_re
             match = regex.search(self.template_string, last)
             if match is None:
                 break
@@ -519,7 +538,7 @@ class Lexer:
         # Use the faster regex split when no raw opening tag is present.
         # False positives use the raw-aware splitter.
         if self._raw_start_re.search(self.template_string) is None:
-            token_strings = tag_re.split(self.template_string)
+            token_strings = self.tag_re.split(self.template_string)
         else:
             token_strings = (
                 token_string for token_string, position in self._tag_re_split()
