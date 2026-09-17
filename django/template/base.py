@@ -91,6 +91,8 @@ UNKNOWN_SOURCE = "<unknown source>"
 # entire tag, including start/end delimiters. Using re.compile() is faster
 # than instantiating SimpleLazyObject with _lazy_re_compile().
 tag_re = re.compile(r"({%[\s\S]*?%}|{{.*?}}|{#.*?#})")
+# RemovedInDjango2029Warning.
+tag_re_legacy = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})")
 
 logger = logging.getLogger("django.template")
 
@@ -184,9 +186,19 @@ class Template:
         template source.
         """
         if self.engine.debug:
-            lexer = DebugLexer(self.source)
+            # RemovedInDjango2029Warning: When the deprecation ends, replace:
+            # lexer = DebugLexer(self.source)
+            lexer = DebugLexer(
+                self.source,
+                allow_multiline_tags=self.engine.allow_multiline_tags,
+            )
         else:
-            lexer = Lexer(self.source)
+            # RemovedInDjango2029Warning: When the deprecation ends, replace:
+            # lexer = Lexer(self.source)
+            lexer = Lexer(
+                self.source,
+                allow_multiline_tags=self.engine.allow_multiline_tags,
+            )
 
         tokens = lexer.tokenize()
         parser = Parser(
@@ -422,9 +434,13 @@ class Token:
 
 
 class Lexer:
-    def __init__(self, template_string):
+    # RemovedInDjango2029Warning: When the deprecation ends, replace with:
+    # def __init__(self, template_string):
+    def __init__(self, template_string, allow_multiline_tags=True):
         self.template_string = template_string
         self.verbatim = False
+        # RemovedInDjango2029Warning.
+        self.tag_re = tag_re if allow_multiline_tags else tag_re_legacy
 
     def __repr__(self):
         return '<%s template_string="%s...", verbatim=%s>' % (
@@ -467,7 +483,10 @@ class Lexer:
 
         while True:
             if raw_end_re is None:
-                match = tag_re.search(self.template_string, last)
+                # RemovedInDjango2029Warning: When the deprecation ends,
+                # replace with:
+                # match = tag_re.search(self.template_string, last)
+                match = self.tag_re.search(self.template_string, last)
             else:
                 match = raw_end_re.search(self.template_string, last)
 

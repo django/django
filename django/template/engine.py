@@ -1,6 +1,8 @@
 import functools
+import warnings
 
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import RemovedInDjango2029Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
@@ -29,6 +31,7 @@ class Engine:
         libraries=None,
         builtins=None,
         autoescape=True,
+        allow_multiline_tags=None,  # RemovedInDjango2029Warning.
     ):
         if dirs is None:
             dirs = []
@@ -61,6 +64,17 @@ class Engine:
         self.template_libraries = self.get_template_libraries(libraries)
         self.builtins = self.default_builtins + builtins
         self.template_builtins = self.get_template_builtins(self.builtins)
+        # RemovedInDjango2029Warning.
+        if allow_multiline_tags is not None:
+            warnings.warn(
+                "The 'allow_multiline_tags' transitional template engine "
+                "option is deprecated.",
+                RemovedInDjango2029Warning,
+                stacklevel=2,
+            )
+        else:
+            allow_multiline_tags = True
+        self.allow_multiline_tags = allow_multiline_tags
 
     def __repr__(self):
         return (
