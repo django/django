@@ -1,5 +1,7 @@
-from django.template import TemplateSyntaxError
+from django.template import Context, Engine, TemplateSyntaxError
 from django.test import SimpleTestCase
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango2029Warning
 
 from ..utils import setup
 
@@ -124,6 +126,15 @@ class VerbatimTagTests(SimpleTestCase):
     def test_named_verbatim_name_whitespace_not_preserved(self):
         with self.assertRaises(TemplateSyntaxError):
             self.engine.render_to_string("verbatim")
+
+    # RemovedInDjango2029Warning.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
+    def test_named_verbatim_preserves_name_whitespace_legacy(self):
+        engine = Engine(allow_multiline_tags=False)
+        template = engine.from_string(
+            "{% verbatim a  b %}{% endverbatim a b %}{% endverbatim a  b %}"
+        )
+        self.assertEqual(template.render(Context()), "{% endverbatim a b %}")
 
     @setup(
         {
