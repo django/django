@@ -416,6 +416,62 @@ class Lexer:
             self.verbatim,
         )
 
+    def _raw_end_tag_re(self, token_string):
+        if not token_string.startswith(BLOCK_TAG_START):
+            return None
+
+        content = token_string[2:-2].strip()
+        bits = content.split()
+        if not bits:
+            return None
+
+        if bits[0] == "comment":
+            end_bits = ["endcomment"]
+        elif bits[0] == "verbatim":
+            # Named verbatim blocks must use the same name in their closing
+            # tag.
+            end_bits = ["endverbatim", *bits[1:]]
+        else:
+            return None
+
+        end_content = r"[^\S\n]+".join(re.escape(bit) for bit in end_bits)
+        return re.compile(
+            r"%s[^\S\n]*%s[^\S\n]*%s"
+            % (
+                re.escape(BLOCK_TAG_START),
+                end_content,
+                re.escape(BLOCK_TAG_END),
+            )
+        )
+
+    def _tag_re_split_positions(self):
+        last = 0
+        raw_end_re = None
+
+        while True:
+            if raw_end_re is None:
+                match = tag_re.search(self.template_string, last)
+            else:
+                match = raw_end_re.search(self.template_string, last)
+
+            if match is None:
+                break
+
+            start, end = match.span()
+            # Always yield the text position, even when empty. tokenize()
+            # relies on alternating text and tag positions.
+            yield last, start
+            yield start, end
+            last = end
+
+            if raw_end_re is None:
+                raw_end_re = self._raw_end_tag_re(match.group())
+            else:
+                # The matched tag closed the current raw block.
+                raw_end_re = None
+
+        yield last, len(self.template_string)
+
     def tokenize(self):
         """
         Return a list of tokens from a given template_string.
@@ -423,7 +479,8 @@ class Lexer:
         in_tag = False
         lineno = 1
         result = []
-        for token_string in tag_re.split(self.template_string):
+        for position in self._tag_re_split_positions():
+            token_string = self.template_string[slice(*position)]
             if token_string:
                 result.append(self.create_token(token_string, None, lineno, in_tag))
                 lineno += token_string.count("\n")
@@ -445,15 +502,18 @@ class Lexer:
             token_start = token_string[0:2]
             if token_start == BLOCK_TAG_START:
                 content = token_string[2:-2].strip()
+                normalized_content = " ".join(content.split())
                 if self.verbatim:
                     # Then a verbatim block is being processed.
-                    if content != self.verbatim:
+                    if normalized_content != self.verbatim:
                         return Token(TokenType.TEXT, token_string, position, lineno)
                     # Otherwise, the current verbatim block is ending.
                     self.verbatim = False
-                elif content[:9] in ("verbatim", "verbatim "):
-                    # Then a verbatim block is starting.
-                    self.verbatim = "end%s" % content
+                else:
+                    bits = content.split()
+                    if bits and bits[0] == "verbatim":
+                        # Then a verbatim block is starting.
+                        self.verbatim = " ".join(["endverbatim", *bits[1:]])
                 return Token(TokenType.BLOCK, content, position, lineno)
             if not self.verbatim:
                 content = token_string[2:-2].strip()
@@ -466,16 +526,6 @@ class Lexer:
 
 
 class DebugLexer(Lexer):
-    def _tag_re_split_positions(self):
-        last = 0
-        for match in tag_re.finditer(self.template_string):
-            start, end = match.span()
-            yield last, start
-            yield start, end
-            last = end
-        yield last, len(self.template_string)
-
-    # This parallels the use of tag_re.split() in Lexer.tokenize().
     def _tag_re_split(self):
         for position in self._tag_re_split_positions():
             yield self.template_string[slice(*position)], position
