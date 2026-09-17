@@ -69,6 +69,12 @@ To preserve this output, use:
     This is the opening delimiter {% templatetag openblock %}.
     This is the closing delimiter {% templatetag closeblock %}.
 
+To restore the previous parsing behavior, in which block tags cannot span
+multiple lines, set ``"allow_multiline_tags": False`` in the
+:class:`~django.template.backends.django.DjangoTemplates` backend's
+:setting:`OPTIONS <TEMPLATES-OPTIONS>`. This transitional option is deprecated
+and will be removed in Django 2029.
+
 Adopting calendar versioning
 ----------------------------
 
