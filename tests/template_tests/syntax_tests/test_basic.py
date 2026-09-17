@@ -3,7 +3,10 @@ from django.template.base import Origin, Template, TemplateSyntaxError
 from django.template.context import Context
 from django.template.loader_tags import BlockContext, BlockNode
 from django.test import SimpleTestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango2028Warning
+from django.utils.deprecation import (
+    RemovedInDjango2028Warning,
+    RemovedInDjango2029Warning,
+)
 from django.views.debug import ExceptionReporter
 
 from ..utils import SilentAttrClass, SilentGetItemClass, SomeClass, setup
@@ -472,6 +475,29 @@ class BasicSyntaxTests(SimpleTestCase):
             output,
             "<p>The open tag: {%</p>\n" "<p>The close tag: %}</p>",
         )
+
+    def test_allow_multiline_tags_disabled(self):
+        msg = (
+            "The 'allow_multiline_tags' transitional template engine "
+            "option is deprecated."
+        )
+        tests = [
+            ("<p>The open tag: {%</p>\n" "<p>The close tag: %}</p>"),
+            "{%\ncsrf_token\n%}",
+        ]
+
+        for debug in (False, True):
+            with self.subTest(debug=debug):
+                with self.assertWarnsMessage(RemovedInDjango2029Warning, msg):
+                    engine = Engine(
+                        debug=debug,
+                        allow_multiline_tags=False,
+                    )
+
+                for source in tests:
+                    with self.subTest(source=source):
+                        template = engine.from_string(source)
+                        self.assertEqual(template.render(Context()), source)
 
     @setup({"template": "{% block content %}"})
     def test_unclosed_block(self):

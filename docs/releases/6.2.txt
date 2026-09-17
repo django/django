@@ -55,6 +55,11 @@ previously treated as text may now be interpreted as a template tag. Use the
 :ttag:`templatetag` tag with ``openblock`` and ``closeblock`` to output these
 sequences as text.
 
+To temporarily restore the previous behavior, set
+``"allow_multiline_tags": False`` in the Django template backend's
+:setting:`OPTIONS <TEMPLATES-OPTIONS>`. This transitional option is deprecated
+and will be removed in Django 2029.
+
 Adopting calendar versioning
 ----------------------------
 

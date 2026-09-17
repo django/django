@@ -4,6 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.template import Context
 from django.template.engine import Engine
 from django.test import SimpleTestCase, override_settings
+from django.utils.deprecation import RemovedInDjango2029Warning
 
 from .utils import ROOT, TEMPLATE_DIR
 
@@ -45,6 +46,17 @@ class EngineTest(SimpleTestCase):
             "'django.template.defaultfilters', 'django.template.loader_tags'] "
             "autoescape=False>",
         )
+
+    # RemovedInDjango2029Warning.
+    def test_allow_multiline_tags_option_deprecated(self):
+        msg = (
+            "The 'allow_multiline_tags' transitional template engine "
+            "option is deprecated."
+        )
+        for value in (True, False):
+            with self.subTest(value=value):
+                with self.assertWarnsMessage(RemovedInDjango2029Warning, msg):
+                    Engine(allow_multiline_tags=value)
 
 
 class RenderToStringTest(SimpleTestCase):
