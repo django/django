@@ -69,8 +69,11 @@ class LazyNonce(SimpleLazyObject):
 
         <script {% csp_nonce_attr %}></script>
 
-    ``{% csp_nonce_attr %}`` will only render the nonce attribute if the nonce
-    has been evaluated (i.e. accessed) elsewhere in the request/response cycle.
+    ``{% csp_nonce_attr %}`` renders the nonce attribute whenever the nonce is
+    present in the template context, evaluating and generating the nonce when
+    needed. To test whether the nonce has already been evaluated (i.e.
+    accessed) elsewhere in the request/response cycle, check its truthiness
+    with ``{% if csp_nonce %}``.
 
     """
 
