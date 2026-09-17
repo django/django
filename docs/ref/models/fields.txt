@@ -1508,8 +1508,12 @@ To query ``JSONField`` in the database, see :ref:`querying-jsonfield`.
     queried. PostgreSQL's ``json`` field is stored as the original string
     representation of the JSON and must be decoded on the fly when queried
     based on keys. The ``jsonb`` field is stored based on the actual structure
-    of the JSON which allows indexing. The trade-off is a small additional cost
-    on writing to the ``jsonb`` field. ``JSONField`` uses ``jsonb``.
+    of the JSON, which allows indexing but doesn't preserve the order of object
+    keys. The trade-off is a small additional cost on writing to the ``jsonb``
+    field. ``JSONField`` uses ``jsonb``.
+
+    For more details, see PostgreSQL's `documentation on JSON types
+    <https://www.postgresql.org/docs/current/datatype-json.html>`_.
 
 .. admonition:: Oracle users
 
