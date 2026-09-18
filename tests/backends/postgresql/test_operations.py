@@ -1,7 +1,7 @@
 import unittest
 
 from django.core.management.color import no_style
-from django.db import connection
+from django.db import connection, models
 from django.db.models.expressions import Col
 from django.db.models.functions import Cast
 from django.test import SimpleTestCase
@@ -78,3 +78,13 @@ class PostgreSQLOperationsTests(SimpleTestCase):
         self.assertEqual(
             rhs_expr, Cast(Col(book_table, book_fk_field), author_id_field)
         )
+
+    def test_get_field_literal_array_type_db_type_none(self):
+        # A field whose db_type() returns None (e.g. a virtual field) can't
+        # be arrayified; the operation must fall back to None so callers
+        # emit `IN (%s, ...)` rather than a malformed cast.
+        class NoDBTypeField(models.IntegerField):
+            def db_type(self, connection):
+                return None
+
+        self.assertIsNone(connection.ops.get_field_literal_array_type(NoDBTypeField()))

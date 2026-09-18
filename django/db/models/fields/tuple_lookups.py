@@ -409,6 +409,11 @@ class TupleIn(TupleLookupMixin, In):
             raise EmptyResultSet
         return root.as_sql(compiler, connection)
 
+    def as_postgresql(self, compiler, connection):
+        # Bypass In.as_postgresql: composite-column right-hand sides are
+        # tuples that can't be bound as a scalar PostgreSQL array.
+        return self.as_sql(compiler, connection)
+
 
 tuple_lookups = {
     "exact": TupleExact,
