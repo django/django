@@ -106,7 +106,9 @@ class TemplateCommand(BaseCommand):
         else:
             top_dir = os.path.abspath(os.path.expanduser(target))
             if app_or_project == "app":
-                self.validate_name(os.path.basename(top_dir), "directory")
+                self.validate_name(
+                    os.path.basename(top_dir), "directory", target=top_dir
+                )
             if not os.path.exists(top_dir):
                 try:
                     os.makedirs(top_dir)
@@ -260,7 +262,7 @@ class TemplateCommand(BaseCommand):
             "couldn't handle %s template %s." % (self.app_or_project, template)
         )
 
-    def validate_name(self, name, name_or_dir="name"):
+    def validate_name(self, name, name_or_dir="name", target=None):
         if name is None:
             raise CommandError(
                 "you must provide {an} {app} name".format(
@@ -278,18 +280,28 @@ class TemplateCommand(BaseCommand):
                     type=name_or_dir,
                 )
             )
-        # Check that __spec__ doesn't exist.
-        if find_spec(name) is not None:
-            raise CommandError(
-                "'{name}' conflicts with the name of an existing Python "
-                "module and cannot be used as {an} {app} {type}. Please try "
-                "another {type}.".format(
-                    name=name,
-                    an=self.a_or_an,
-                    app=self.app_or_project,
-                    type=name_or_dir,
-                )
+        # Check that the name does not conflict with an existing Python module.
+        spec = find_spec(name)
+        if spec is not None:
+            is_target_namespace = (
+                target is not None
+                and os.path.isdir(target)
+                and spec.loader is None
+                and spec.submodule_search_locations is not None
+                and len(spec.submodule_search_locations) == 1
+                and os.path.samefile(spec.submodule_search_locations[0], target)
             )
+            if not is_target_namespace:
+                raise CommandError(
+                    "'{name}' conflicts with the name of an existing Python "
+                    "module and cannot be used as {an} {app} {type}. Please try "
+                    "another {type}.".format(
+                        name=name,
+                        an=self.a_or_an,
+                        app=self.app_or_project,
+                        type=name_or_dir,
+                    )
+                )
 
     def download(self, url):
         """

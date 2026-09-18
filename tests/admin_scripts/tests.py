@@ -3155,6 +3155,55 @@ class StartApp(AdminScriptTestCase):
             "another directory.",
         )
 
+    def test_importable_target_name_with_manage(self):
+        """startapp rejects importable target names when run with manage.py."""
+        os.mkdir(os.path.join(self.test_dir, "os"))
+
+        _, err = self.run_manage(["startapp", "app", "os"])
+
+        self.assertOutput(
+            err,
+            "CommandError: 'os' conflicts with the name of an existing Python "
+            "module and cannot be used as an app directory. Please try "
+            "another directory.",
+        )
+
+    def test_existing_target_directory_with_manage(self):
+        """
+        startapp allows an existing target directory when run with manage.py.
+        """
+        app_dir = os.path.join(self.test_dir, "destination")
+        os.mkdir(app_dir)
+
+        out, err = self.run_manage(["startapp", "app", "destination"])
+
+        self.assertNoOutput(out)
+        self.assertNoOutput(err)
+        self.assertTrue(os.path.exists(os.path.join(app_dir, "apps.py")))
+
+    def test_existing_target_directory_conflicts_with_namespace_package(self):
+        """
+        startapp rejects a target that conflicts with another namespace
+        package.
+        """
+        app_dir = os.path.join(self.test_dir, "destination")
+        os.mkdir(app_dir)
+
+        namespace_dir = os.path.join(
+            os.path.dirname(self.test_dir),
+            "destination",
+        )
+        os.mkdir(namespace_dir)
+
+        _, err = self.run_manage(["startapp", "app", "destination"])
+
+        self.assertOutput(
+            err,
+            "CommandError: 'destination' conflicts with the name of an existing "
+            "Python module and cannot be used as an app directory. Please try "
+            "another directory.",
+        )
+
     def test_trailing_slash_in_target_app_directory_name(self):
         app_dir = os.path.join(self.test_dir, "apps", "app1")
         os.makedirs(app_dir)
