@@ -18,6 +18,7 @@ from django.contrib.gis.geos import (
     Polygon,
     fromstr,
 )
+from django.contrib.gis.geos.libgeos import geos_version_tuple
 from django.core.files.temp import NamedTemporaryFile
 from django.core.management import call_command
 from django.db import DatabaseError, NotSupportedError, connection
@@ -318,6 +319,10 @@ class SaveLoadTests(TestCase):
         obj.refresh_from_db()
         self.assertIs(obj.geom.equals(geom), True)
 
+    @skipIf(
+        geos_version_tuple() >= (3, 15),
+        "GEOS 3.15+ ignores max_geom_collections.",
+    )
     def test_geometrycollectionfield_max(self):
         geom = "POINT(0 0)"
         for _ in range(6):
@@ -351,6 +356,10 @@ class SaveLoadTests(TestCase):
 
 
 class ValidationTests(SimpleTestCase):
+    @skipIf(
+        geos_version_tuple() >= (3, 15),
+        "GEOS 3.15+ ignores max_geom_collections.",
+    )
     def test_geometrycollectionfield_max(self):
         geom = "POINT(0 0)"
         for _ in range(6):
@@ -829,6 +838,10 @@ class GeoLookupTest(TestCase):
         State.objects.filter(poly__intersects=geojson).query
 
     @skipUnlessGISLookup("exact")
+    @skipIf(
+        geos_version_tuple() >= (3, 15),
+        "GEOS 3.15+ ignores max_geom_collections.",
+    )
     def test_lookup_against_nested_geometry_collection(self):
         geom = "POINT(0 0)"
         for _ in range(6):
