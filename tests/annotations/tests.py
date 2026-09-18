@@ -1267,6 +1267,50 @@ class NonAggregateAnnotationTestCase(TestCase):
         with self.assertRaisesMessage(RemovedInDjango2028Warning, msg):
             Book.objects.annotate(**{"alias%": Value(1)})
 
+    def test_annotation_alias_conflicts_with_lookup(self):
+        msg = (
+            "The annotation 'publisher__name' conflicts with a field path on the "
+            "model."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Book.objects.annotate(publisher__name=Value("shadowed"))
+
+    def test_annotation_alias_conflicts_with_transform(self):
+        msg = "The annotation 'pubdate__year' conflicts with a transform on the model."
+        with self.assertRaisesMessage(ValueError, msg):
+            Book.objects.annotate(pubdate__year=Value(1))
+
+    def test_annotation_alias_conflicts_with_lookup_suffix(self):
+        msg = "The annotation 'rating__gt' conflicts with a lookup on the model."
+        with self.assertRaisesMessage(ValueError, msg):
+            Book.objects.annotate(rating__gt=Value(1))
+
+    def test_annotation_alias_conflicts_with_lookup_with_restricted_rhs(self):
+        msg = (
+            "The annotation 'publisher__name__isnull' conflicts with a lookup on "
+            "the model."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Book.objects.annotate(publisher__name__isnull=Value(True))
+
+    def test_annotation_alias_with_lookup_sep_allowed_when_not_lookup(self):
+        qs = Book.objects.annotate(not_a_field__alias=Value("test")).values(
+            "not_a_field__alias"
+        )
+        self.assertEqual(qs[0]["not_a_field__alias"], "test")
+
+    def test_annotation_default_alias_with_lookup_sep_allowed_when_not_lookup(self):
+        qs = Book.objects.annotate(Count("authors")).values("authors__count")
+        self.assertGreaterEqual(qs[0]["authors__count"], 0)
+
+    def test_alias_conflicts_with_lookup(self):
+        msg = (
+            "The annotation 'publisher__name' conflicts with a field path on the "
+            "model."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Book.objects.alias(publisher__name=Value("shadowed"))
+
     @skipUnless(connection.vendor == "postgresql", "PostgreSQL tests")
     @skipUnlessDBFeature("supports_json_field")
     def test_set_returning_functions(self):

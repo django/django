@@ -1941,6 +1941,47 @@ class QuerySet(AltersData):
                     "The annotation '%s' conflicts with a field on "
                     "the model." % alias
                 )
+            if LOOKUP_SEP in alias and not isinstance(annotation, FilteredRelation):
+                query = clone.query.chain()
+                query.annotations = {}
+                try:
+                    _, final_field, targets, lookups = query.names_to_path(
+                        alias.split(LOOKUP_SEP),
+                        query.get_meta(),
+                    )
+                except exceptions.FieldError:
+                    conflict = None
+                else:
+                    if not lookups:
+                        conflict = "field path"
+                    else:
+                        if len(targets) == 1:
+                            lhs = targets[0].get_col(None, final_field)
+                        else:
+                            lhs = ColPairs(None, targets, targets, final_field)
+                        *transforms, lookup_name = lookups
+                        for transform_name in transforms:
+                            transform_class = lhs.get_transform(transform_name)
+                            if transform_class is None:
+                                conflict = None
+                                break
+                            lhs = transform_class(lhs)
+                        else:
+                            if lhs.get_lookup(lookup_name) is not None:
+                                conflict = "lookup"
+                            elif (
+                                transform_class := lhs.get_transform(lookup_name)
+                            ) is not None and transform_class(lhs).get_lookup(
+                                "exact"
+                            ) is not None:
+                                conflict = "transform"
+                            else:
+                                conflict = None
+                if conflict:
+                    raise ValueError(
+                        "The annotation '%s' conflicts with a %s on the model."
+                        % (alias, conflict)
+                    )
             if isinstance(annotation, FilteredRelation):
                 clone.query.add_filtered_relation(annotation, alias)
             else:
