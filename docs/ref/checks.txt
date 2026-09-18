@@ -14,9 +14,6 @@ system checks, see the :doc:`System check topic guide </topics/checks>`.
 API reference
 =============
 
-``CheckMessage``
-----------------
-
 .. class:: CheckMessage(level, msg, hint=None, obj=None, id=None)
 
     The warnings and errors raised by system checks must be instances of

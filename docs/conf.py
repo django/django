@@ -108,7 +108,8 @@ root_doc = "contents"
 
 # Disable auto-created table of contents entries for all domain objects (e.g.
 # functions, classes, attributes, etc.) in Sphinx 5.2+.
-toc_object_entries = False
+toc_object_entries = True
+toc_object_entries_show_parents = "hide"
 
 # General substitutions.
 project = "Django"
