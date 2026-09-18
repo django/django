@@ -20,6 +20,10 @@ class GZipMiddleware(MiddlewareMixin):
         if not response.streaming and len(response.content) < 200:
             return response
 
+        # RFC 9112 Section 6.3
+        if 100 <= response.status_code < 200 or response.status_code in (204, 304):
+            return response
+
         # Avoid gzipping if we've already got a content-encoding.
         if response.has_header("Content-Encoding"):
             return response
