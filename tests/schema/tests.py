@@ -1120,7 +1120,9 @@ class SchemaTests(TransactionTestCase):
         class GenFieldModelComment(Model):
             name = CharField(max_length=100)
             name_lower = GeneratedField(
-                expression=Lower("name"), db_persist=True, output_field=CharField()
+                expression=Lower("name"),
+                db_persist=True,
+                output_field=CharField(max_length=100),
             )
 
             class Meta:
