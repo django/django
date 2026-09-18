@@ -6,6 +6,7 @@ objects corresponding to geographic model fields.
 Thanks to Robert Coup for providing this functionality (see #4322).
 """
 
+from django.db.models.expressions import Combinable
 from django.db.models.query_utils import DeferredAttribute
 
 
@@ -38,6 +39,10 @@ class SpatialProxy(DeferredAttribute):
 
         if isinstance(geo_value, self._klass):
             geo_obj = geo_value
+        elif isinstance(geo_value, Combinable):
+            # Query expressions (F(), functions, etc.) are resolved later
+            # during query compilation
+            return geo_value
         elif (geo_value is None) or (geo_value == ""):
             geo_obj = None
         else:
@@ -68,6 +73,10 @@ class SpatialProxy(DeferredAttribute):
         ):
             # For raster fields, ensure input is None or a string, dict, or
             # raster instance.
+            pass
+        elif isinstance(value, Combinable):
+            # Query expressions (F(), functions, etc.) are resolved later
+            # during query compilation
             pass
         elif isinstance(value, self._klass):
             # The geometry type must match that of the field -- unless the
