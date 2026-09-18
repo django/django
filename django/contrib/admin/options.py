@@ -2329,17 +2329,17 @@ class ModelAdmin(BaseModelAdmin):
         try:
             cl = self.get_changelist_instance(request)
         except IncorrectLookupParameters:
-            # Wacky lookup parameters were given, so redirect to the main
-            # changelist page, without parameters, and pass an 'invalid=1'
-            # parameter via the query string. If wacky parameters were given
-            # and the 'invalid=1' parameter was already in the query string,
-            # something is screwed up with the database, so display an error
-            # page.
+            # Wacky params were given, so redirect to the changelist
+            # without them, adding ERROR_FLAG ('e=1') to the query string.
+            # IncorrectLookupParameters also wraps other errors (bad
+            # list_filter field, invalid date_hierarchy, etc.), so if
+            # 'e=1' is already set, the params aren't the cause —
+            # something's actually broken — so show an error page.
             if ERROR_FLAG in request.GET:
                 return SimpleTemplateResponse(
                     "admin/invalid_setup.html",
                     {
-                        "title": _("Database error"),
+                        "title": _("Server error"),
                     },
                 )
             return HttpResponseRedirect(request.path + "?" + ERROR_FLAG + "=1")
