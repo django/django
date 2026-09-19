@@ -340,6 +340,32 @@ extra attribute ``field_lower`` produced, roughly, from the following SQL:
 See :doc:`/ref/models/database-functions` for a list of built-in database
 functions.
 
+``Func`` expressions can also be used to perform local time conversions. For
+example:
+
+.. code-block:: python
+
+    from django.db.models import DateTimeField, Func, Value
+
+
+    class PostgresTimeZone(Func):
+        function = "timezone"
+        output_field = DateTimeField()
+
+
+    Company.objects.annotate(
+        local_contacted=PostgresTimeZone(
+            Value("Europe/Paris"),  # Timezone value
+            "last_contacted",  # Column name
+        )
+    )
+
+.. note::
+
+    This example uses the PostgreSQL-specific ``timezone`` function. Other
+    database backends may require their own respective functions for timezone
+    conversions.
+
 The ``Func`` API is as follows:
 
 .. class:: Func(*expressions, **extra)
