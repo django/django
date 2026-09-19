@@ -93,3 +93,31 @@ class CommentSyntaxTests(SimpleTestCase):
     def test_comment_tag05(self):
         output = self.engine.render_to_string("comment-tag05")
         self.assertEqual(output, "foo")
+
+    @setup({"comment": "{% comment %}{{% endcomment %}visible"})
+    def test_closing_tag_after_literal_opening_brace(self):
+        output = self.engine.render_to_string("comment")
+        self.assertEqual(output, "visible")
+
+    @setup({"comment": "{% comment %}content{%\n" "endcomment\n" "%}"})
+    def test_multiline_raw_block_closing_tags(self):
+        output = self.engine.render_to_string("comment")
+        self.assertEqual(output, "")
+
+    @setup(
+        {
+            "comment": (
+                "{% comment %}\n"
+                "{% if user %}Hello, {{ user }}{% endif %}\n"
+                "{% endcomment %}"
+            ),
+        }
+    )
+    def test_template_syntax_in_raw_blocks(self):
+        output = self.engine.render_to_string("comment")
+        self.assertEqual(output, "")
+
+    @setup({"comment": "{% comment %}\n{%\n{% endcomment %}"})
+    def test_literal_multiline_block_opener_in_raw_blocks(self):
+        output = self.engine.render_to_string("comment")
+        self.assertEqual(output, "")
