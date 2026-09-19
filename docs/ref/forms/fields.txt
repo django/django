@@ -13,6 +13,11 @@ When you create a ``Form`` class, the most important part is defining the
 fields of the form. Each field has custom validation logic, along with a few
 other hooks.
 
+.. note::
+   Some fields expect input in specific formats (e.g., dates, times, JSON).
+   See :ref:`form-field-formats` for guidelines on communicating these
+   requirements to users.
+
 .. method:: Field.clean(value)
 
 Although the primary way you'll use ``Field`` classes is in ``Form`` classes,
