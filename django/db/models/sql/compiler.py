@@ -686,6 +686,18 @@ class SQLCompiler:
         inner_query = self.query.clone()
         inner_query.subquery = True
         inner_query.where = inner_query.where.__class__(where_parts)
+        # A ColPairs selection, e.g. a composite primary key selected with
+        # values(), is compiled to one column per target but is only given a
+        # single column alias, so the outer query cannot refer to all of its
+        # columns. The primary key selected on behalf of an aggregation is
+        # not consumed by the outer query and is left alone.
+        if self.query.values_select and any(
+            isinstance(expr, ColPairs) for expr, _, _ in self.select
+        ):
+            raise NotSupportedError(
+                "Filtering against window expressions is not supported when a "
+                "composite primary key is selected."
+            )
         # Augment the inner query with any window function references that
         # might have been masked via values() and alias(). If any masked
         # aliases are added they'll be masked again to avoid fetching
