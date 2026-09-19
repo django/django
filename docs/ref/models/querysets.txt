@@ -2973,6 +2973,13 @@ here we update the ``comments_on`` and ``headline`` fields:
     ...     comments_on=False, headline="This is old"
     ... )
 
+You can also use aggregate functions within ``update()``. For example, to
+set each author's ``rating`` to the average rating of their books:
+
+.. code-block:: pycon
+
+    >>> Author.objects.update(rating=Avg('books__rating'))
+
 The ``update()`` method is applied instantly, and the only restriction on the
 :class:`.QuerySet` that is updated is that it can only update columns in the
 model's main table, not on related models. You can't do this, for example:
