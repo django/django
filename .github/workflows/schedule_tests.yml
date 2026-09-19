@@ -126,7 +126,7 @@ jobs:
     timeout-minutes: 60
     services:
       postgres:
-        image: postgres:15-alpine
+        image: postgres:16-alpine
         env:
           POSTGRES_DB: django
           POSTGRES_USER: user
@@ -169,7 +169,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [16, 17, 18]
+        version: [17, 18]
         server_side_bindings: [0, 1]
     runs-on: ubuntu-latest
     name: PostgreSQL Versions

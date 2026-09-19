@@ -57,7 +57,7 @@ supported versions, and any notes for each of the supported database backends:
 ==================  ==============================  ==================  =========================================
 Database            Library Requirements            Supported Versions  Notes
 ==================  ==============================  ==================  =========================================
-PostgreSQL          GEOS, GDAL, PROJ, PostGIS       15+                 Requires PostGIS.
+PostgreSQL          GEOS, GDAL, PROJ, PostGIS       16+                 Requires PostGIS.
 MySQL               GEOS, GDAL                      8.4+                :ref:`Limited functionality <mysql-spatial-limitations>`.
 Oracle              GEOS, GDAL                      19+                 XE not supported.
 SQLite              GEOS, GDAL, PROJ, SpatiaLite    3.37.0+             Requires SpatiaLite 4.3+
@@ -304,7 +304,7 @@ Summary:
 
 .. code-block:: shell
 
-    $ sudo port install postgresql15-server
+    $ sudo port install postgresql16-server
     $ sudo port install geos
     $ sudo port install proj6
     $ sudo port install postgis3
@@ -317,14 +317,14 @@ Summary:
 
     .. code-block:: shell
 
-        export PATH=/opt/local/bin:/opt/local/lib/postgresql15/bin
+        export PATH=/opt/local/bin:/opt/local/lib/postgresql16/bin
 
     In addition, add the ``DYLD_FALLBACK_LIBRARY_PATH`` setting so that
     the libraries can be found by Python:
 
     .. code-block:: shell
 
-        export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib:/opt/local/lib/postgresql15
+        export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib:/opt/local/lib/postgresql16
 
 __ https://www.macports.org/
 
@@ -346,7 +346,7 @@ for further information.
 PostgreSQL
 ~~~~~~~~~~
 
-Download the latest `PostgreSQL 15.x installer`__ from the
+Download the latest `PostgreSQL 16.x installer`__ from the
 `EnterpriseDB`__ website. After downloading, run the installer, follow the
 on-screen directions, and keep the default options unless you know the
 consequences of changing them.
@@ -363,7 +363,7 @@ keep this checked, as it is necessary to install :ref:`postgisasb`.
 
     If installed successfully, the PostgreSQL server will run in the background
     each time the system is started as a Windows service. A
-    :menuselection:`PostgreSQL 15` start menu group will created and contains
+    :menuselection:`PostgreSQL 16` start menu group will created and contains
     shortcuts for the Application Stack Builder (ASB) as well as the
     'SQL Shell', which will launch a ``psql`` command window.
 
@@ -376,11 +376,11 @@ PostGIS
 ~~~~~~~
 
 From within the Stack Builder (to run outside of the installer,
-:menuselection:`Start --> PostgreSQL 15 --> Application Stack Builder`), select
-:menuselection:`PostgreSQL 15 (x64) on port 5432` from the drop down
+:menuselection:`Start --> PostgreSQL 16 --> Application Stack Builder`), select
+:menuselection:`PostgreSQL 16 (x64) on port 5432` from the drop down
 menu and click next. Expand the
 :menuselection:`Categories --> Spatial Extensions` menu tree and select
-:menuselection:`PostGIS X.Y for PostgreSQL 15`.
+:menuselection:`PostGIS X.Y for PostgreSQL 16`.
 
 After clicking next, you will be prompted to confirm the selected package and
 "Download directory". Click next again, this will download PostGIS and you will
