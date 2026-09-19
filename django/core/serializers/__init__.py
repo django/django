@@ -97,6 +97,17 @@ def unregister_serializer(format):
     del _serializers[format]
 
 
+def register_field_serializer(format, field):
+    "Decorate a field serializer to register it for a given format and field."
+
+    def _register_field_serializer(field_serializer):
+        serializer = get_serializer(format)
+        serializer.field_mapping[field] = field_serializer
+        return field_serializer
+
+    return _register_field_serializer
+
+
 def get_serializer(format):
     if not _serializers:
         _load_serializers()
