@@ -98,6 +98,18 @@ class GEOSLimitTest(SimpleTestCase):
 
         GEOSGeometry(wkt_payload_no_nesting(num_points=5), max_geom_collections=1)
 
+    def test_wkt_geometry_collections_breadth(self):
+        """A wide breadth of geometry collections is not counted as depth."""
+
+        def wkt_payload_breadth(num_colls):
+            return (
+                "GEOMETRYCOLLECTION("
+                + ",".join("GEOMETRYCOLLECTION(POINT(0 0))" for _ in range(num_colls))
+                + ")"
+            )
+
+        GEOSGeometry(wkt_payload_breadth(num_colls=5), max_geom_collections=2)
+
     def test_wkt_mixed_case_and_inner_whitespace_is_limited(self):
         two_collections = (
             "GEOMETRYCOLLECTION   ( "
