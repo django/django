@@ -62,6 +62,18 @@ class TupleLookupsTests(TestCase):
                     Contact.objects.filter(lookup).order_by("id"), contacts
                 )
 
+    def test_exact_single_nested_tuple_rhs(self):
+        contacts = (self.contact_1, self.contact_2, self.contact_5)
+        for rhs in (
+            [(self.customer_1.customer_id, self.customer_1.company)],
+            ((self.customer_1.customer_id, self.customer_1.company),),
+        ):
+            with self.subTest(rhs=rhs):
+                lookup = TupleExact((F("customer_code"), F("company_code")), rhs)
+                self.assertSequenceEqual(
+                    Contact.objects.filter(lookup).order_by("id"), contacts
+                )
+
     def test_exact_subquery(self):
         msg = (
             "The QuerySet value for the exact lookup must have 2 selected "

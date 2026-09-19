@@ -51,11 +51,20 @@ class TupleLookupMixin:
 
     def get_prep_lookup(self):
         if self.rhs_is_direct_value():
+            if (
+                self.lookup_name == "exact"
+                and isinstance(self.rhs, (tuple, list))
+                and len(self.rhs) == 1
+                and isinstance(self.rhs[0], (tuple, list))
+                and len(self.rhs[0]) == len(self.lhs)
+            ):
+                self.rhs = self.rhs[0]
+                return self.rhs
             self.check_rhs_is_tuple_or_list()
             self.check_rhs_length_equals_lhs_length()
         else:
             self.check_rhs_is_supported_expression()
-            super().get_prep_lookup()
+        super().get_prep_lookup()
         return self.rhs
 
     def check_rhs_is_tuple_or_list(self):
