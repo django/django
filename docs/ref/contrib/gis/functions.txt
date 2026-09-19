@@ -456,7 +456,7 @@ Keyword Argument       Description
 
 ``crs``                Set this to ``True`` if you want the coordinate
                        reference system to be included in the returned
-                       GeoJSON. Ignored on MySQL and Oracle.
+                       GeoJSON. Ignored on MySQL < 9.5, MariaDB, and Oracle.
 
 ``precision``          It may be used to specify the number of significant
                        digits for the coordinates in the GeoJSON
