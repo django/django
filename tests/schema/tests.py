@@ -1113,6 +1113,7 @@ class SchemaTests(TransactionTestCase):
 
     @isolate_apps("schema")
     @skipUnlessDBFeature(
+        "supports_comments",
         "supports_stored_generated_columns",
         "supports_independent_comment_alteration",
     )
