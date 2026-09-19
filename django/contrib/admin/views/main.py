@@ -236,16 +236,16 @@ class ChangeList:
                         int(month[-1] if month is not None else 1),
                         int(day[-1] if day is not None else 1),
                     )
-                except ValueError as e:
+                    if day:
+                        to_date = from_date + timedelta(days=1)
+                    elif month:
+                        # In this branch, from_date will always be the first of
+                        # a month, so advancing 32 days gives the next month.
+                        to_date = (from_date + timedelta(days=32)).replace(day=1)
+                    else:
+                        to_date = from_date.replace(year=from_date.year + 1)
+                except (ValueError, OverflowError) as e:
                     raise IncorrectLookupParameters(e) from e
-                if day:
-                    to_date = from_date + timedelta(days=1)
-                elif month:
-                    # In this branch, from_date will always be the first of a
-                    # month, so advancing 32 days gives the next month.
-                    to_date = (from_date + timedelta(days=32)).replace(day=1)
-                else:
-                    to_date = from_date.replace(year=from_date.year + 1)
                 if settings.USE_TZ:
                     from_date = make_aware(from_date)
                     to_date = make_aware(to_date)
