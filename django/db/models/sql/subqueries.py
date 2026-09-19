@@ -6,7 +6,7 @@ retrieval.
 from django.core.exceptions import FieldError
 from django.db.models.aggregates import Aggregate
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import F, Subquery
+from django.db.models.expressions import Col, Combinable, F, Func, Subquery
 from django.db.models.sql.constants import (
     GET_ITERATOR_CHUNK_SIZE,
     NO_RESULTS,
@@ -116,30 +116,95 @@ class UpdateQuery(Query):
             # Omit generated fields.
             if field.generated:
                 continue
-            if isinstance(val, Aggregate):
-                val = self._write_subquery(model, val)
+            if isinstance(val, (F, Aggregate)) and self.annotations:
+                val = self._write_subquery(field, model, val)
             elif hasattr(val, "resolve_expression"):
                 # Resolve expressions here so that annotations are no longer
                 # needed
                 val = val.resolve_expression(self, allow_joins=False, for_save=True)
             self.values.append((field, model, val))
 
-    def _write_subquery(self, model, val):
-        source_list: list = val.get_source_expressions()
-        expression, filter, order_by = tuple(source_list)
-        expression = expression.name if isinstance(expression, F) else expression
-        related_name, field = expression.split(LOOKUP_SEP, 1)
+    def _write_subquery(self, model_field, model, val):
+        def get_direct_aggregate_query():
+            expression, filter, order_by = val.get_source_expressions()
+            expression = expression.name if isinstance(expression, F) else expression
+            related_name, field = expression.split(LOOKUP_SEP, 1)
+            related_field = model._meta.get_field(related_name)
+            related_model = related_field.related_model
+            func = val.__class__
+            return (
+                related_model.objects.filter(**filter if filter else {})
+                .order_by(*order_by if order_by else ())
+                .values(related_field.field.attname)
+                .annotate(expression=func(field))
+                .values(expression)
+            )
 
-        related_field = model._meta.get_field(related_name)
-        related_model = related_field.related_model
-        query = Subquery(
-            related_model.objects.filter(**filter if filter else {})
-            .order_by(*order_by if order_by else ())
-            .values(related_field.field.attname)
-            .annotate(result=val.__class__(field))
-            .values("result")[:1]
-        )
-        return query
+        def get_direct_annotation_query(
+            model=model, val=val, annotations={}, group_by=()
+        ):
+            if isinstance(val, F):
+                annotated_field = val.name
+                resolved_annotation = annotations.get(annotated_field)
+                filters = {}
+                order_by = ()
+                if isinstance(resolved_annotation, Aggregate):
+                    val = resolved_annotation
+                    resolved_annotation, filters, order_by = (
+                        resolved_annotation.get_source_expressions()
+                    )
+                elif isinstance(resolved_annotation, Func):
+                    args, kwargs = getattr(
+                        resolved_annotation, "_constructor_args", ((), {})
+                    )
+                    _args = ()
+                    for arg in args:
+                        if isinstance(arg, Col):
+                            related_field = arg.target.attname
+                            pre_related_field = (
+                                arg.target.model.relatedpoint_set.field.attname.split(
+                                    "_id", 1
+                                )
+                            )
+                            _args += (
+                                resolved_annotation.__class__(
+                                    f"{pre_related_field[0]}__{related_field}"
+                                ),
+                            )
+                        else:
+                            _args += (arg,)
+
+                    return get_direct_annotation_query(
+                        model=model,
+                        val=annotated_field,
+                        annotations={
+                            annotated_field: resolved_annotation.__class__(
+                                *_args, **kwargs
+                            )
+                        },
+                    )
+                target_field = resolved_annotation.target.attname
+                related_model = resolved_annotation.target.model
+                return (
+                    get_direct_annotation_query(
+                        model=related_model,
+                        val=annotated_field,
+                        group_by=(target_field,),
+                        annotations={annotated_field: val.__class__(target_field)},
+                    )
+                    .filter(**filters if filters else {})
+                    .order_by(*order_by if order_by else ())
+                )
+            else:
+                return (
+                    model.objects.values(*group_by).annotate(**annotations).values(val)
+                )
+
+        if isinstance(val, Aggregate):
+            query = get_direct_aggregate_query()
+        else:
+            query = get_direct_annotation_query(annotations=self.annotations)
+        return Subquery(query[:1])
 
     def add_related_update(self, model, field, value):
         """
