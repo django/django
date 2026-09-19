@@ -352,6 +352,12 @@ Miscellaneous
   database connections used during error handling are managed by
   ``close_old_connections()``.
 
+* ``django.utils.formats.get_format()`` now respects
+  :setting:`USE_I18N` when the ``use_l10n`` argument is not provided.
+  Projects running with ``USE_I18N = False`` now receive format values from
+  settings such as :setting:`FIRST_DAY_OF_WEEK` instead of the active
+  locale's format module.
+
 .. _deprecated-features-6.2:
 
 Features deprecated in 6.2
