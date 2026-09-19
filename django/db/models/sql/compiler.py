@@ -79,6 +79,12 @@ class SQLCompiler:
             with_col_aliases=with_col_aliases,
         )
         self.col_count = len(self.select)
+        # A ColPairs selection is compiled to as many columns as it has
+        # targets, e.g. when a composite primary key is selected, so rows can
+        # be composed of more columns than there are selections.
+        self.row_col_count = sum(
+            len(expr) if isinstance(expr, ColPairs) else 1 for expr, _, _ in self.select
+        )
 
     def pre_sql_setup(self, with_col_aliases=False):
         """
@@ -1667,7 +1673,7 @@ class SQLCompiler:
             try:
                 val = cursor.fetchone()
                 if val:
-                    return val[0 : self.col_count]
+                    return val[0 : self.row_col_count]
                 return val
             finally:
                 # done with the cursor
@@ -1679,7 +1685,7 @@ class SQLCompiler:
         result = cursor_iter(
             cursor,
             self.connection.features.empty_fetchmany_value,
-            self.col_count if self.has_extra_select else None,
+            self.row_col_count if self.has_extra_select else None,
             chunk_size,
         )
         if not chunked_fetch or not self.connection.features.can_use_chunked_reads:
@@ -2267,6 +2273,8 @@ class SQLAggregateCompiler(SQLCompiler):
             sql.append(ann_sql)
             params.extend(ann_params)
         self.col_count = len(self.query.annotation_select)
+        # Aggregations are always compiled to a single column each.
+        self.row_col_count = self.col_count
         sql = ", ".join(sql)
         params = tuple(params)
 
