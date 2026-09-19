@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path("example_view/", views.example_view),
+    path("wrong_length_view/", views.wrong_length_view),
     path("streaming_example_view/", views.streaming_example_view),
     path("model_view/", views.model_view),
     path("create_model_instance/", views.create_model_instance),
