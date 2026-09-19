@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.middleware import MiddlewareMixin
+from django.utils.cache import patch_cache_control
 from django.utils.csp import CSP, LazyNonce, build_policy
 
 
@@ -8,6 +9,9 @@ def get_nonce(request):
 
 
 class ContentSecurityPolicyMiddleware(MiddlewareMixin):
+    # Subclass and set to False if you handle nonce-safe caching yourself.
+    nonce_cache_control = True
+
     def process_request(self, request):
         request._csp_nonce = LazyNonce()
 
@@ -29,5 +33,9 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
             # An empty config means CSP headers are not added to the response.
             if config and header not in response:
                 response.headers[str(header)] = build_policy(config, nonce)
+
+        # A nonce is single-use; don't let a shared cache replay it.
+        if nonce and self.nonce_cache_control:
+            patch_cache_control(response, private=True)
 
         return response
