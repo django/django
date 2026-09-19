@@ -223,11 +223,13 @@ are required.
 
 * ``subject``: A string.
 * ``message``: A string.
-* ``from_email``: A string. If ``None``, Django will use the value of the
+* ``from_email``: A string or :class:`~email.headerregistry.Address` object.
+  If ``None``, Django will use the value of the
   :setting:`DEFAULT_FROM_EMAIL` setting.
-* ``recipient_list``: A list of strings, each an email address. Each
-  member of ``recipient_list`` will see the other recipients in the "To:"
-  field of the email message.
+* ``recipient_list``: A list of strings or
+  :class:`~email.headerregistry.Address` objects, each an email address.
+  Each member of ``recipient_list`` will see the other recipients in the
+  "To:" field of the email message.
 
 The following parameters are optional, and must be given as keyword arguments
 if used.
@@ -494,12 +496,19 @@ email backend API :ref:`provides an alternative
 
     * ``body``: The body text. This should be a plain text message.
 
-    * ``from_email``: The sender's address. Both ``fred@example.com`` and
-      ``"Fred" <fred@example.com>`` forms are supported (see
+    * ``from_email``: The sender's address, as a string or
+      :class:`~email.headerregistry.Address` object. Both ``fred@example.com``
+      and ``"Fred" <fred@example.com>`` forms are supported (see
       :ref:`formatting-addresses`). If omitted, the
       :setting:`DEFAULT_FROM_EMAIL` setting is used.
 
-    * ``to``: A list or tuple of recipient addresses.
+      .. versionchanged:: 6.2
+
+          The ``from_email`` now supports using an
+          :class:`~email.headerregistry.Address` object in place of a string.
+
+    * ``to``: A list or tuple of recipient addresses, each a string or
+      :class:`~email.headerregistry.Address` object.
 
     The following parameters must be given as keyword arguments if used:
 
@@ -511,6 +520,12 @@ email backend API :ref:`provides an alternative
 
     * ``reply_to``: A list or tuple of recipient addresses used in the
       "Reply-To" header when sending the email.
+
+      .. versionchanged:: 6.2
+
+          The address lists (``to``, ``cc``, ``bcc``, and ``reply_to``) now
+          support using :class:`~email.headerregistry.Address` objects in
+          place of strings.
 
     * ``attachments``: A list of attachments to put on the message. Each can
       be an instance of :class:`~email.message.MIMEPart` or
