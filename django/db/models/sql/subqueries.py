@@ -6,7 +6,7 @@ retrieval.
 from django.core.exceptions import FieldError
 from django.db.models.aggregates import Aggregate
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import Col, Combinable, F, Func, Subquery
+from django.db.models.expressions import Col, F, Func, Subquery
 from django.db.models.sql.constants import (
     GET_ITERATOR_CHUNK_SIZE,
     NO_RESULTS,

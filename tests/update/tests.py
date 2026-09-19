@@ -226,7 +226,7 @@ class AdvancedTests(TestCase):
         self.assertEqual(qs.update(name=F("max")), 1)
 
     def test_update_with_joined_field_annotation(self):
-        msg = "Joined field references are not permitted in this query"
+        # Joined field references are permitted in this query
         with register_lookup(CharField, Lower):
             for annotation in (
                 F("data__name"),
