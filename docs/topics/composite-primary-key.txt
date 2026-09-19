@@ -107,8 +107,8 @@ supported::
 Because ``ForeignKey`` currently cannot reference models with composite primary
 keys.
 
-To work around this limitation, ``ForeignObject`` can be used as an
-alternative::
+For relations to a model with a composite primary key, use
+:class:`~django.db.models.ForeignObject`::
 
     class Foo(models.Model):
         item_order_id = models.CharField(max_length=20)
@@ -120,9 +120,7 @@ alternative::
             to_fields=("order_id", "product_id"),
         )
 
-``ForeignObject`` is much like ``ForeignKey``, except that it doesn't create
-any columns (e.g. ``item_id``), foreign key constraints or indexes in the
-database, and the ``on_delete`` argument is ignored.
+See :ref:`foreign-object` for the full reference.
 
 .. _cpk-and-database-functions:
 
