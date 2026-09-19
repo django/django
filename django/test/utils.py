@@ -758,18 +758,54 @@ class CaptureQueriesContext:
 
 
 class ignore_warnings(TestContextDecorator):
-    def __init__(self, **kwargs):
-        self.ignore_kwargs = kwargs
-        if "message" in self.ignore_kwargs or "module" in self.ignore_kwargs:
-            self.filter_func = warnings.filterwarnings
-        else:
-            self.filter_func = warnings.simplefilter
+    """
+    Ignore warnings matching the given criteria.
+
+    ``message`` is matched as a literal, case-sensitive substring of the
+    warning's message, for consistency with
+    SimpleTestCase.assertWarnsMessage(). Pass ``message_re`` to match it
+    against a regular expression instead.
+
+    ``category``, ``module`` and ``lineno`` are passed through to
+    warnings.filterwarnings(), so ``module`` is a regular expression matched
+    against the start of the name of the module raising the warning.
+    """
+
+    def __init__(
+        self,
+        category=None,
+        message=None,
+        *,
+        module=None,
+        lineno=None,
+        message_re=None,
+    ):
+        self.ignore_kwargs = {}
+        if category is not None:
+            self.ignore_kwargs["category"] = category
+
+        if message is not None:
+            if message_re is not None:
+                raise TypeError("Cannot specify both message and message_re.")
+            # Ignore warnings containing message as a substring: "(?s:.*)"
+            # allows any prefix, including newlines, and "(?-i:...)" undoes
+            # the re.IGNORECASE that filterwarnings() compiles with.
+            self.ignore_kwargs["message"] = rf"(?s:.*)(?-i:{re.escape(message)})"
+        elif message_re is not None:
+            self.ignore_kwargs["message"] = message_re
+
+        if module is not None:
+            self.ignore_kwargs["module"] = module
+
+        if lineno is not None:
+            self.ignore_kwargs["lineno"] = lineno
+
         super().__init__()
 
     def enable(self):
         self.catch_warnings = warnings.catch_warnings()
         self.catch_warnings.__enter__()
-        self.filter_func("ignore", **self.ignore_kwargs)
+        warnings.filterwarnings("ignore", **self.ignore_kwargs)
 
     def disable(self):
         self.catch_warnings.__exit__(*sys.exc_info())

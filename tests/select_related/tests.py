@@ -117,7 +117,7 @@ class SelectRelatedTests(TestCase):
         with self.assertNumQueries(1):
             with ignore_warnings(
                 category=RemovedInDjango2028Warning,
-                message=r"Calling select_related\(\) with no arguments is deprecated\.",
+                message="Calling select_related() with no arguments is deprecated.",
             ):
                 world = Species.objects.select_related()
             families = [o.genus.family.name for o in world]
