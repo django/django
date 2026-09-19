@@ -127,3 +127,9 @@ class OperationsTests(TransactionTestCase):
         self.assertIn("BACKENDS_PERSON_SQ", statements[5])
         self.assertIn("BACKENDS_VERYLONGMODELN7BE2_SQ", statements[6])
         self.assertIn("BACKENDS_TAG_SQ", statements[7])
+
+    def test_lookup_cast(self):
+        self.assertEqual(connection.ops.lookup_cast("contains", "TextField"), "%s")
+        self.assertEqual(connection.ops.lookup_cast("exact", "TextField"), "%s")
+        self.assertEqual(connection.ops.lookup_cast("regex", "TextField"), "%s")
+        self.assertEqual(connection.ops.lookup_cast("iregex", "TextField"), "%s")
