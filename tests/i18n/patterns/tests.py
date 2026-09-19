@@ -186,6 +186,10 @@ class URLTranslationTests(URLTestCaseBase):
                 translate_url("/en/account/register-as-path/", "nl"),
                 "/nl/profiel/registreren-als-pad/",
             )
+            self.assertEqual(
+                translate_url("/en/register-as-path/", "nl"),
+                "/nl/registreren-als-pad/",
+            )
             self.assertEqual(translation.get_language(), "en")
             # re_path() URL with parameters.
             self.assertEqual(
