@@ -11,10 +11,11 @@ from playwright_tests import AdminPlaywrightTestCase, screenshot_cases
 
 from django import forms
 from django.contrib import admin
-from django.contrib.admin import AdminSite, ModelAdmin
+from django.contrib.admin import ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import ADDITION, DELETION, LogEntry
 from django.contrib.admin.options import SOURCE_MODEL_VAR, TO_FIELD_VAR
+from django.contrib.admin.sites import AdminSite
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import quote
 from django.contrib.admin.views.main import IS_POPUP_VAR
@@ -5264,6 +5265,20 @@ class AdminViewListEditable(TestCase):
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class AdminSearchTest(TestCase):
+    def test_search_inherited_model_and_iexact(self):
+        site = AdminSite()
+
+        class EmployeeAdmin(ModelAdmin):
+            search_fields = ["name__and_iexact"]
+
+        factory = RequestFactory()
+        request = factory.get("/admin/admin_views/employee/", {"q": "test"})
+        ma = EmployeeAdmin(Employee, site)
+        qs, use_distinct = ma.get_search_results(
+            request, Employee.objects.all(), "test"
+        )
+        list(qs)
+
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create_superuser(
