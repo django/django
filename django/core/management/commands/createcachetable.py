@@ -1,3 +1,5 @@
+import warnings
+
 from django.conf import settings
 from django.core.cache import caches
 from django.core.cache.backends.db import BaseDatabaseCache
@@ -10,6 +12,7 @@ from django.db import (
     router,
     transaction,
 )
+from django.utils.deprecation import RemovedInDjango2029Warning
 
 
 class Command(BaseCommand):
@@ -18,6 +21,7 @@ class Command(BaseCommand):
     requires_system_checks = []
 
     def add_arguments(self, parser):
+        # RemovedInDjango2029Warning.
         parser.add_argument(
             "args",
             metavar="table_name",
@@ -46,6 +50,10 @@ class Command(BaseCommand):
         dry_run = options["dry_run"]
         if tablenames:
             # Legacy behavior, tablename specified as argument
+            warnings.warn(
+                "Passing table names to createcachetable is deprecated.",
+                RemovedInDjango2029Warning,
+            )
             for tablename in tablenames:
                 self.create_table(db, tablename, dry_run)
         else:

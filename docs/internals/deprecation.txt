@@ -28,8 +28,12 @@ details on these changes.
   the current timezone in migrations when the ``tzinfo`` argument is omitted
   and :setting:`USE_TZ` is ``True``.
 
+* Passing positional table names to :djadmin:`createcachetable` will no longer
+  be supported.
+  
 * The undocumented ``EmailValidator.validate_domain_part()`` method will be
   removed.
+
 
 .. _deprecation-removed-in-2028:
 
