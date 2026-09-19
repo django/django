@@ -3,9 +3,8 @@ import pathlib
 from django.core.checks import Warning
 from django.core.checks.caches import (
     E001,
-    check_cache_location_not_exposed,
+    check_all_caches,
     check_default_cache_is_configured,
-    check_file_based_cache_is_absolute,
 )
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
@@ -63,7 +62,7 @@ class CheckCacheLocationTest(SimpleTestCase):
             with self.subTest(setting=setting), self.settings(**settings):
                 msg = self.warning_message % ("matches", setting)
                 self.assertEqual(
-                    check_cache_location_not_exposed(None),
+                    check_all_caches(None),
                     [
                         Warning(msg, id="caches.W002"),
                     ],
@@ -76,7 +75,7 @@ class CheckCacheLocationTest(SimpleTestCase):
             with self.subTest(setting=setting), self.settings(**settings):
                 msg = self.warning_message % ("is inside", setting)
                 self.assertEqual(
-                    check_cache_location_not_exposed(None),
+                    check_all_caches(None),
                     [
                         Warning(msg, id="caches.W002"),
                     ],
@@ -89,7 +88,7 @@ class CheckCacheLocationTest(SimpleTestCase):
             with self.subTest(setting=setting), self.settings(**settings):
                 msg = self.warning_message % ("contains", setting)
                 self.assertEqual(
-                    check_cache_location_not_exposed(None),
+                    check_all_caches(None),
                     [
                         Warning(msg, id="caches.W002"),
                     ],
@@ -100,7 +99,7 @@ class CheckCacheLocationTest(SimpleTestCase):
         for setting in ("MEDIA_ROOT", "STATIC_ROOT", "STATICFILES_DIRS"):
             settings = self.get_settings(setting, root / "cache", root / "other")
             with self.subTest(setting=setting), self.settings(**settings):
-                self.assertEqual(check_cache_location_not_exposed(None), [])
+                self.assertEqual(check_all_caches(None), [])
 
     def test_staticfiles_dirs_prefix(self):
         root = pathlib.Path.cwd()
@@ -118,7 +117,7 @@ class CheckCacheLocationTest(SimpleTestCase):
             with self.subTest(path=setting_path), self.settings(**settings):
                 msg = self.warning_message % (msg, "STATICFILES_DIRS")
                 self.assertEqual(
-                    check_cache_location_not_exposed(None),
+                    check_all_caches(None),
                     [
                         Warning(msg, id="caches.W002"),
                     ],
@@ -132,7 +131,7 @@ class CheckCacheLocationTest(SimpleTestCase):
             ("prefix", root / "other"),
         )
         with self.settings(**settings):
-            self.assertEqual(check_cache_location_not_exposed(None), [])
+            self.assertEqual(check_all_caches(None), [])
 
 
 class CheckCacheAbsolutePath(SimpleTestCase):
@@ -145,7 +144,7 @@ class CheckCacheAbsolutePath(SimpleTestCase):
                 },
             }
         ):
-            self.assertEqual(check_file_based_cache_is_absolute(None), [])
+            self.assertEqual(check_all_caches(None), [])
 
     def test_relative_path(self):
         with self.settings(
@@ -157,7 +156,7 @@ class CheckCacheAbsolutePath(SimpleTestCase):
             }
         ):
             self.assertEqual(
-                check_file_based_cache_is_absolute(None),
+                check_all_caches(None),
                 [
                     Warning(
                         "Your 'default' cache LOCATION path is relative. Use an "
