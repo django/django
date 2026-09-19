@@ -1112,6 +1112,43 @@ class SchemaTests(TransactionTestCase):
         )
 
     @isolate_apps("schema")
+    @skipUnlessDBFeature(
+        "supports_stored_generated_columns",
+        "supports_independent_comment_alteration",
+    )
+    def test_alter_generated_field_base_field_comment(self):
+        class GenFieldModelComment(Model):
+            name = CharField(max_length=100)
+            name_lower = GeneratedField(
+                expression=Lower("name"),
+                db_persist=True,
+                output_field=CharField(max_length=100),
+            )
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(GenFieldModelComment)
+
+        old_field = GenFieldModelComment._meta.get_field("name")
+        new_field = CharField(max_length=100, db_comment="Super useful comment")
+        new_field.set_attributes_from_name("name")
+        new_field.model = GenFieldModelComment
+        with (
+            connection.schema_editor() as editor,
+            CaptureQueriesContext(connection) as ctx,
+        ):
+            editor.alter_field(GenFieldModelComment, old_field, new_field, strict=True)
+
+        self.assertEqual(len(ctx), 1)
+        self.assertIn("COMMENT ON COLUMN", ctx.captured_queries[0]["sql"])
+        self.assertEqual(
+            self.get_column_comment(GenFieldModelComment._meta.db_table, "name"),
+            "Super useful comment",
+        )
+
+    @isolate_apps("schema")
     def test_add_auto_field(self):
         class AddAutoFieldModel(Model):
             name = CharField(max_length=255, primary_key=True)
@@ -4113,6 +4150,42 @@ class SchemaTests(TransactionTestCase):
         finally:
             AuthorWithIndexedName._meta.indexes = []
 
+    @skipUnlessDBFeature("allows_multiple_constraints_on_same_fields")
+    def test_remove_db_index_doesnt_remove_unique_constraints(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(AuthorCharFieldWithIndex)
+        constraint = UniqueConstraint(
+            fields=["char_field"], name="author_char_field_uniq"
+        )
+        try:
+            AuthorCharFieldWithIndex._meta.constraints = [constraint]
+            with connection.schema_editor() as editor:
+                editor.add_constraint(AuthorCharFieldWithIndex, constraint)
+                db_index_name = editor._create_index_name(
+                    table_name=AuthorCharFieldWithIndex._meta.db_table,
+                    column_names=("char_field",),
+                )
+            old_constraints = self.get_constraints(
+                AuthorCharFieldWithIndex._meta.db_table
+            )
+            self.assertIn(constraint.name, old_constraints)
+            self.assertIn(db_index_name, old_constraints)
+
+            old_field = AuthorCharFieldWithIndex._meta.get_field("char_field")
+            new_field = CharField(max_length=31)
+            new_field.set_attributes_from_name("char_field")
+            with connection.schema_editor() as editor:
+                editor.alter_field(
+                    AuthorCharFieldWithIndex, old_field, new_field, strict=True
+                )
+            new_constraints = self.get_constraints(
+                AuthorCharFieldWithIndex._meta.db_table
+            )
+            self.assertNotIn(db_index_name, new_constraints)
+            self.assertIn(constraint.name, new_constraints)
+        finally:
+            AuthorCharFieldWithIndex._meta.constraints = []
+
     def test_order_index(self):
         """
         Indexes defined with ordering (ASC/DESC) defined on column
@@ -5103,12 +5176,19 @@ class SchemaTests(TransactionTestCase):
     def test_alter_db_comment(self):
         with connection.schema_editor() as editor:
             editor.create_model(Author)
-        # Add comment.
         old_field = Author._meta.get_field("name")
         new_field = CharField(max_length=255, db_comment="Custom comment")
         new_field.set_attributes_from_name("name")
-        with connection.schema_editor() as editor:
+        with (
+            connection.schema_editor() as editor,
+            CaptureQueriesContext(connection) as ctx,
+        ):
             editor.alter_field(Author, old_field, new_field, strict=True)
+        self.assertEqual(len(ctx), 1)
+        if connection.features.supports_independent_comment_alteration:
+            self.assertIn("COMMENT ON COLUMN", ctx.captured_queries[0]["sql"])
+        else:
+            self.assertIn("ALTER TABLE", ctx.captured_queries[0]["sql"])
         self.assertEqual(
             self.get_column_comment(Author._meta.db_table, "name"),
             "Custom comment",

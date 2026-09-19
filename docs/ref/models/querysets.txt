@@ -265,6 +265,11 @@ Note the second example is more restrictive.
 If you need to execute more complex queries (for example, queries with ``OR``
 statements), you can use :class:`Q objects <django.db.models.Q>` (``*args``).
 
+.. admonition:: ``NULL`` values and three-valued logic
+
+    You should avoid passing iterables with ``NULL`` values to the :lookup:`in`
+    lookup. See :ref:`this note <null-and-three-valued-logic>` for details.
+
 ``annotate()``
 ~~~~~~~~~~~~~~
 
@@ -748,6 +753,11 @@ You can also refer to fields on related models with reverse relations through
    multiplier effect on the size of your result set. This will be especially
    pronounced if you include multiple such fields in your ``values()`` query,
    in which case all possible combinations will be returned.
+
+.. admonition:: ``NULL`` values and three-valued logic
+
+    You should avoid passing iterables with ``NULL`` values to the :lookup:`in`
+    lookup. See :ref:`this note <null-and-three-valued-logic>` for details.
 
 .. admonition:: Special values for ``JSONField`` on SQLite
 
@@ -3368,6 +3378,32 @@ extract two field values, where only one is expected::
     # Bad code! Will raise a TypeError.
     inner_qs = Blog.objects.filter(name__contains="Ch").values("name", "id")
     entries = Entry.objects.filter(blog__name__in=inner_qs)
+
+.. _null-and-three-valued-logic:
+
+.. admonition:: ``NULL`` values and three-valued logic
+
+    If the right-hand side of an ``__in`` lookup contains ``NULL`` (or
+    ``None``), it can produce unexpected or empty query results due to SQL's
+    three-valued logic.
+
+    For example, when using ``exclude(field__in=...)``, if the right-hand side
+    contains even a single ``NULL`` value, the SQL ``NOT IN`` comparison
+    evaluates to ``UNKNOWN`` for all rows, resulting in an empty queryset.
+
+    To avoid this, filter out ``NULL`` values from the right-hand side::
+
+        # For a subquery
+        inner_qs = Blog.objects.filter(name__isnull=False).values("pk")
+        entries = Entry.objects.exclude(blog__in=inner_qs)
+
+        # For a list of values
+        values = [1, 2, None]
+        non_null_values = [v for v in values if v is not None]
+        entries = Entry.objects.exclude(blog__in=non_null_values)
+
+    Alternatively, rewrite the query to use a NULL-safe
+    :class:`~django.db.models.Exists` subquery.
 
 .. _nested-queries-performance:
 
