@@ -1,4 +1,9 @@
 from django.contrib.gis.db import models
+from django.contrib.gis.db.models.fields import PointField, PolygonField
+from django.db import connection
+
+if connection.vendor == "postgresql":
+    from django.contrib.postgres.fields.array import ArrayField
 
 from ..utils import gisfield_may_be_null
 
@@ -114,3 +119,15 @@ class Lines(models.Model):
 
 class GeometryCollectionModel(models.Model):
     geom = models.GeometryCollectionField(max_geom_collections=5)
+
+
+# see ticket #31450
+if connection.vendor == "postgresql":
+
+    class Foo(models.Model):
+        bar = ArrayField(models.TextField(), null=True)
+        baz = ArrayField(PointField(), null=True)  # PointField()
+        baz_geo = ArrayField(
+            PointField(geography=True), null=True
+        )  # PointField(geography=True)
+        pl = ArrayField(PolygonField(), null=True)  # PolygonField
