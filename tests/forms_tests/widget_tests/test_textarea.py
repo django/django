@@ -66,6 +66,17 @@ class TextareaTest(WidgetTest):
             ),
         )
 
+    def test_render_hidden(self):
+        class HiddenTextarea(Textarea):
+            input_type = "hidden"
+
+        self.check_html(
+            HiddenTextarea(),
+            "msg",
+            "value",
+            html='<textarea rows="10" cols="40" name="msg" hidden>value</textarea>',
+        )
+
     def test_fieldset(self):
         class TestForm(Form):
             template_name = "forms_tests/use_fieldset.html"
