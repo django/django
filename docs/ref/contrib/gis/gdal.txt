@@ -1946,8 +1946,8 @@ Key               Default  Usage
     5     GDT_Int32       32 bit signed integer
     6     GDT_Float32     32 bit floating point
     7     GDT_Float64     64 bit floating point
-    12    GDT_UInt64      64 bit unsigned integer (GDAL 3.5+)
-    13    GDT_Int64       64 bit signed integer (GDAL 3.5+)
+    12    GDT_UInt64      64 bit unsigned integer
+    13    GDT_Int64       64 bit signed integer
     14    GDT_Int8        8 bit signed integer (GDAL 3.7+)
     ===== =============== ===================================
 
