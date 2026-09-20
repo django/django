@@ -98,7 +98,7 @@ jobs:
           for SHA in $COMMITS; do
             MSG=$(git log -1 --pretty=%s $SHA)
             echo "Checking commit $SHA: $MSG"
-            if [[ "${MSG: -1}" != "." ]]; then
+            if [[ "$MSG" != *. && "$MSG" != *.\" ]]; then
               echo "❌ Commit $SHA must end with a period."
               echo "Refer to the guidelines linked in the PR checklist for commit message format."
               echo "For how to rewrite commit messages, see https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/working-with-git/#editing-commit-messages"
