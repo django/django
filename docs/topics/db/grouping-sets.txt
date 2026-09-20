@@ -184,7 +184,7 @@ Preserve SQL grouping semantics
 ``Rollup`` preserves argument order. Composite elements such as
 ``Cube(("region", "category"), "year")`` keep the tuple together. Adjacent
 grouping items combine as SQL defines them; repeated grouping sets may produce
-duplicate result rows and must not be silently deduplicated.
+duplicate result rows, which must be preserved.
 
 In SQL, the empty grouping set produces a group even over an empty input. Its
 count is zero and its sum is ``NULL``. Empty-query optimizations, including
@@ -226,7 +226,7 @@ examples unchanged.
 
 An alternative is a grouping option on an existing QuerySet method. That
 avoids a new method but couples grouping to projection or annotation. The
-design discussion should decide this tradeoff before the compiler is changed.
+design discussion should decide this choice before the compiler is changed.
 In either case, the SQL-derived construct names and exact grouping semantics
 would be the same.
 
@@ -248,12 +248,12 @@ of SQL function wrappers:
 * Declare backend capabilities and fail unsupported operations explicitly.
 
 Reuse ``Author``, ``Book``, and ``Publisher`` in the aggregation test apps.
-Use a small nullable dataset for grouping masks, empty input, ordered rollups,
-cube combinations, composite items, and repeated grouping sets. Compare result
-multisets where duplicates matter. Add composition tests for expression
-aliases, related fields, WHERE/HAVING, ordering, query cloning, and terminal
-operations.
-Run existing aggregation regressions to protect implicit grouping.
+Use a small nullable dataset for grouping masks, empty input, ordered
+``Rollup`` queries, cube combinations, composite items, and repeated grouping
+sets. Compare result rows while preserving duplicate occurrences. Add tests for
+expression aliases, related fields, WHERE/HAVING, ordering, query cloning, and
+terminal operations. Run existing aggregation regressions to protect implicit
+grouping.
 
 The first executable prototype should run the focused ``aggregation`` and
 ``aggregation_regress`` suites on PostgreSQL and SQLite, with unsupported
