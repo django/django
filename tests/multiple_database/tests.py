@@ -931,8 +931,8 @@ class QueryTestCase(TestCase):
             list(User.objects.using("default").values_list("username", flat=True)),
             ["alice"],
         )
-        self.assertEqual(
-            list(User.objects.using("other").values_list("username", flat=True)),
+        self.assertCountEqual(
+            User.objects.using("other").values_list("username", flat=True),
             ["bob", "charlie"],
         )
         self.assertEqual(

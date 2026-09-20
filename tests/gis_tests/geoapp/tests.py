@@ -808,25 +808,25 @@ class GeoLookupTest(TestCase):
                 self.subTest(obj=obj),
                 self.assertRaisesMessage(DisallowedRasterLookup, msg),
             ):
-                City.objects.filter(point__contained=obj)
+                State.objects.filter(poly__intersects=obj)
 
         # Strings having nothing to do with rasters raise a more generic error.
         for obj in str(existing_path), "invalid":
             msg = "String input unrecognized as WKT EWKT, and HEXEWKB."
             with self.subTest(obj=obj), self.assertRaisesMessage(ValueError, msg):
-                City.objects.filter(point__contained=obj)
+                State.objects.filter(poly__intersects=obj)
 
     def test_lookup_allows_writing_raster_from_bytes(self):
         raster_path = Path(__file__).parent.parent / "data" / "rasters" / "raster.tif"
         with open(raster_path, "rb") as raster_file:
             raster_bytes = raster_file.read()
         # Just get SQL to avoid gating on connection.supports_raster.
-        City.objects.filter(point__contained=raster_bytes).query
+        State.objects.filter(poly__intersects=raster_bytes).query
 
     def test_lookup_allows_geos_geometry_string(self):
         geojson = json.dumps({"type": "Point", "coordinates": [2, 49]})
         # Just get SQL to avoid gating on connection.supports_raster.
-        City.objects.filter(point__contained=geojson).query
+        State.objects.filter(poly__intersects=geojson).query
 
     @skipUnlessGISLookup("exact")
     def test_lookup_against_nested_geometry_collection(self):

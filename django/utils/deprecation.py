@@ -5,32 +5,45 @@ import warnings
 from collections import Counter
 from inspect import iscoroutinefunction
 
-from django.middleware import MiddlewareMixin as _MiddlewareMixin
 from django.utils.inspect import signature
 from django.utils.warnings import django_file_prefixes
 
 
-class RemovedInDjango70Warning(DeprecationWarning):
+class RemovedInDjango2028Warning(DeprecationWarning):
     pass
 
 
-class RemovedInDjango71Warning(PendingDeprecationWarning):
+class RemovedInDjango2029Warning(PendingDeprecationWarning):
     pass
 
 
-RemovedInNextVersionWarning = RemovedInDjango70Warning
-RemovedAfterNextVersionWarning = RemovedInDjango71Warning
+RemovedInNextVersionWarning = RemovedInDjango2028Warning
+RemovedAfterNextVersionWarning = RemovedInDjango2029Warning
 
 
 def __getattr__(name):
+    # RemovedInDjango2029Warning: remove the whole if-block.
     if name == "MiddlewareMixin":
         warnings.warn(
             "Importing MiddlewareMixin from django.utils.deprecation is deprecated. "
             "Import from django.middleware.MiddlewareMixin instead.",
-            RemovedInDjango71Warning,
+            RemovedInDjango2029Warning,
             stacklevel=2,
         )
-        return _MiddlewareMixin
+        # Imported here, not at module level, so that merely importing this
+        # module doesn't require django.middleware's own dependencies. That
+        # matters this early, e.g. while a build backend is reading
+        # django.__version__ before Django's own dependencies are installed.
+        from django.middleware import MiddlewareMixin
+
+        return MiddlewareMixin
+    if name == "RemovedInDjango70Warning":
+        warnings.warn(
+            "RemovedInDjango2028Warning should be used instead of "
+            "RemovedInDjango70Warning.",
+            stacklevel=2,
+        )
+        return RemovedInDjango2028Warning
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
@@ -239,7 +252,7 @@ def deprecate_posargs(deprecation_warning, remappable_names, /):
     The decorated function will map any positional arguments after the ``*`` to
     the corresponding keyword arguments and issue a deprecation warning.
 
-    The decorator takes two arguments: a RemovedInDjangoXXWarning warning
+    The decorator takes two arguments: a RemovedInDjangoXXXXWarning warning
     category and a list of parameter names that have been changed from
     positional-or-keyword to keyword-only, in their original positional order.
 
@@ -254,7 +267,7 @@ def deprecate_posargs(deprecation_warning, remappable_names, /):
 
     to::
 
-        @deprecate_posargs(RemovedInDjangoXXWarning, ["option1", "option2"])
+        @deprecate_posargs(RemovedInDjangoXXXXWarning, ["option1", "option2"])
         def some_func(request, *, option1, option2=True):
             ...
 
@@ -267,7 +280,7 @@ def deprecate_posargs(deprecation_warning, remappable_names, /):
     parameters or change the remaining ones. For example, this attempt to add a
     new param would break code using the deprecated posargs::
 
-        @deprecate_posargs(RemovedInDjangoXXWarning, ["option1", "option2"])
+        @deprecate_posargs(RemovedInDjangoXXXXWarning, ["option1", "option2"])
         def some_func(request, wrong_new_param=None, *, option1, option2=True):
             # Broken: existing code may pass a value intended as option1 in the
             # wrong_new_param position.
@@ -278,7 +291,7 @@ def deprecate_posargs(deprecation_warning, remappable_names, /):
     @deprecate_posargs is kept in the original posargs order. This change will
     work without breaking existing code::
 
-        @deprecate_posargs(RemovedInDjangoXXWarning, ["option1", "option2"])
+        @deprecate_posargs(RemovedInDjangoXXXXWarning, ["option1", "option2"])
         def some_func(request, *, new_param=None, option2=True, option1):
             ...
 

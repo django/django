@@ -59,8 +59,7 @@ class Serializer(base.Serializer):
         self.indent(self.indent_level)
         attrs = {"model": str(obj._meta)}
         if not self.use_natural_primary_keys or not self._resolve_natural_key(obj):
-            obj_pk = obj.pk
-            if obj_pk is not None:
+            if obj._is_pk_set():
                 attrs["pk"] = obj._meta.pk.value_to_string(obj)
 
         try:

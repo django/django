@@ -19,7 +19,7 @@ from django.core.mail import EmailMessage, InvalidMailer
 from django.core.mail.backends import console, dummy, filebased, locmem, smtp
 from django.core.mail.backends.base import BaseEmailBackend
 from django.test import SimpleTestCase, ignore_warnings, override_settings
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .tests import MailTestsMixin, message_from_bytes
 
@@ -36,15 +36,15 @@ class BaseEmailBackendTests(SimpleTestCase):
         backend = BaseEmailBackend(alias="test_alias")
         self.assertEqual(backend.alias, "test_alias")
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     def test_fail_silently_arg_accepted(self):
         msg_init = "BaseEmailBackend.__init__() does not support 'fail_silently'."
         msg_use = "BaseEmailBackend.fail_silently is deprecated."
         for value in [True, False]:
             with self.subTest(fail_silently=value):
-                with self.assertWarnsMessage(RemovedInDjango70Warning, msg_init):
+                with self.assertWarnsMessage(RemovedInDjango2028Warning, msg_init):
                     backend = BaseEmailBackend(fail_silently=value)
-                with self.assertWarnsMessage(RemovedInDjango70Warning, msg_use):
+                with self.assertWarnsMessage(RemovedInDjango2028Warning, msg_use):
                     self.assertIs(backend.fail_silently, value)
 
     def test_unknown_kwargs_error(self):
@@ -52,16 +52,16 @@ class BaseEmailBackendTests(SimpleTestCase):
         with self.assertRaisesMessage(InvalidMailer, msg):
             BaseEmailBackend(alias="test_alias", oops_typo="foo", unknown="bar")
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     def test_unknown_kwargs_ignored(self):
         # In compatibility mode (without alias), unknown keyword args are
         # ignored with a deprecation warning.
         msg = (
             "BaseEmailBackend.__init__() does not support 'oops_typo', "
-            "'unknown'. In Django 7.0, BaseEmailBackend will raise a "
+            "'unknown'. In Django 2028, BaseEmailBackend will raise a "
             "TypeError for unknown keyword arguments."
         )
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
             backend = BaseEmailBackend(oops_typo="foo", unknown="foo")
             self.assertIsInstance(backend, BaseEmailBackend)
             self.assertFalse(hasattr(backend, "oops_typo"))
@@ -113,7 +113,7 @@ class SharedEmailBackendTests(MailTestsMixin):
         backend = self.create_backend(alias="this-alias")
         self.assertEqual(backend.alias, "this-alias")
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     def test_alias_is_optional_during_transition_to_mailers(self):
         # alias=None tells create_backend() to _omit_ the `alias` arg.
         backend = self.create_backend(alias=None)
@@ -192,9 +192,9 @@ class SharedEmailBackendTests(MailTestsMixin):
 
         backend.close.assert_called_once()
 
-    # RemovedInDjango70Warning. (But keep overrides in subclasses.)
+    # RemovedInDjango2028Warning. (But keep overrides in subclasses.)
     def test_fail_silently_arg_accepted(self):
-        # In Django 7.0, the fail_silently arg will *not* be accepted by
+        # In Django 2028, the fail_silently arg will *not* be accepted by
         # BaseEmailBackend. Backends that *do* support fail_silently must
         # handle that argument themselves. Tests for those backends should
         # override this test case to reflect continuing fail_silently support.
@@ -206,9 +206,9 @@ class SharedEmailBackendTests(MailTestsMixin):
             msg_use = "EmailBackend.fail_silently is deprecated."
             for value in [True, False]:
                 with self.subTest(fail_silently=value):
-                    with self.assertWarnsMessage(RemovedInDjango70Warning, msg_init):
+                    with self.assertWarnsMessage(RemovedInDjango2028Warning, msg_init):
                         backend = self.create_backend(alias=None, fail_silently=value)
-                    with self.assertWarnsMessage(RemovedInDjango70Warning, msg_use):
+                    with self.assertWarnsMessage(RemovedInDjango2028Warning, msg_use):
                         self.assertIs(backend.fail_silently, value)
 
         with self.subTest("Updated configuration"):
@@ -222,20 +222,20 @@ class SharedEmailBackendTests(MailTestsMixin):
         with self.assertRaisesMessage(InvalidMailer, msg):
             self.create_backend(oops_typo=True, unknown="foo")
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     def test_unknown_kwargs_ignored(self):
         # In compatibility mode (without alias), unknown keyword args are
         # ignored with a deprecation warning.
         backend_module = self.backend_class.__module__
         msg = (
             f"{backend_module}.EmailBackend.__init__() does not support "
-            "'unknown_kwarg'. In Django 7.0, BaseEmailBackend will raise a "
+            "'unknown_kwarg'. In Django 2028, BaseEmailBackend will raise a "
             "TypeError for unknown keyword arguments."
         )
         with (
-            self.assertWarnsMessage(RemovedInDjango70Warning, msg),
+            self.assertWarnsMessage(RemovedInDjango2028Warning, msg),
             ignore_warnings(
-                category=RemovedInDjango70Warning,
+                category=RemovedInDjango2028Warning,
                 message=re.escape(
                     "Directly creating EmailBackend instances is deprecated."
                 ),
@@ -319,7 +319,7 @@ class LocmemBackendTests(SharedEmailBackendTests, SimpleTestCase):
 
 
 @ignore_warnings(
-    category=RemovedInDjango70Warning,
+    category=RemovedInDjango2028Warning,
     message=r"The EMAIL_FILE_PATH setting is deprecated\.",
 )
 class FileBackendTests(SharedEmailBackendTests, SimpleTestCase):
@@ -357,7 +357,7 @@ class FileBackendTests(SharedEmailBackendTests, SimpleTestCase):
         return messages
 
     def test_fail_silently_arg_accepted(self):
-        # RemovedInDjango70Warning: remove this comment (but keep the test).
+        # RemovedInDjango2028Warning: remove this comment (but keep the test).
         # The file backend continues to support fail_silently. Override the
         # SharedEmailBackendTests case that treats it as deprecated.
         for value in [True, False]:
@@ -368,14 +368,14 @@ class FileBackendTests(SharedEmailBackendTests, SimpleTestCase):
     def test_create_from_mailers(self):
         super().test_create_from_mailers(required_options={"file_path": self.tmp_dir})
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     def test_email_file_path_use_settings(self):
         file_path_settings = self.mkdtemp()
         with self.settings(EMAIL_FILE_PATH=file_path_settings):
             backend = filebased.EmailBackend()
         self.assertEqual(backend.file_path, str(file_path_settings))
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     def test_email_file_path_override_settings(self):
         file_path_settings = self.mkdtemp()
         file_path_override = self.mkdtemp()
@@ -385,7 +385,7 @@ class FileBackendTests(SharedEmailBackendTests, SimpleTestCase):
             backend = filebased.EmailBackend(file_path=file_path_override)
         self.assertEqual(backend.file_path, str(file_path_override))
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     def test_error_if_email_file_path_setting_not_defined(self):
         msg = "The EMAIL_FILE_PATH setting must be set to use the file EmailBackend."
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
@@ -396,7 +396,7 @@ class FileBackendTests(SharedEmailBackendTests, SimpleTestCase):
         with self.assertRaisesMessage(InvalidMailer, msg):
             filebased.EmailBackend(alias="test_alias")
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_settings(EMAIL_FILE_PATH="/this/path/does/not/exist")
     def test_ignores_settings_when_initialized_with_alias(self):
         backend = self.create_backend()
@@ -412,7 +412,7 @@ class FileBackendTests(SharedEmailBackendTests, SimpleTestCase):
         with self.assertRaisesMessage(InvalidMailer, msg):
             self.create_backend(file_path=tmp_file)
 
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         with self.subTest("Compatibility"):
             msg = (
                 "Path for saving email messages exists, but is not a "
@@ -431,7 +431,7 @@ class FileBackendTests(SharedEmailBackendTests, SimpleTestCase):
         with self.assertRaisesMessage(InvalidMailer, msg):
             self.create_backend(file_path="/dev/null/foo")
 
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         with self.subTest("Compatibility"):
             msg = "Could not create directory for saving email messages: /dev/null/foo"
             with self.assertRaisesMessage(ImproperlyConfigured, msg):
@@ -449,7 +449,7 @@ class FileBackendTests(SharedEmailBackendTests, SimpleTestCase):
         with self.assertRaisesMessage(InvalidMailer, msg):
             self.create_backend(file_path=self.tmp_dir)
 
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         with self.subTest("Compatibility"):
             msg = f"Could not write to directory: {self.tmp_dir}"
             with self.assertRaisesMessage(ImproperlyConfigured, msg):
@@ -544,7 +544,7 @@ class ConsoleBackendTests(SharedEmailBackendTests, SimpleTestCase):
         return [message_from_bytes(m.encode()) for m in messages if m]
 
     def test_fail_silently_arg_accepted(self):
-        # RemovedInDjango70Warning: remove this comment (but keep the test).
+        # RemovedInDjango2028Warning: remove this comment (but keep the test).
         # The console backend continues to support fail_silently. Override the
         # SharedEmailBackendTests case that treats it as deprecated.
         for value in [True, False]:
@@ -599,7 +599,8 @@ class SMTPHandler:
 
 @skipUnless(HAS_AIOSMTPD, "No aiosmtpd library detected.")
 @ignore_warnings(
-    category=RemovedInDjango70Warning, message=r"The EMAIL_\w+ setting is deprecated\."
+    category=RemovedInDjango2028Warning,
+    message=r"The EMAIL_\w+ setting is deprecated\.",
 )
 class SMTPBackendTestsBase(SimpleTestCase):
     @classmethod
@@ -625,7 +626,7 @@ class SMTPBackendTestsBase(SimpleTestCase):
 
 @skipUnless(HAS_AIOSMTPD, "No aiosmtpd library detected.")
 @ignore_warnings(
-    category=RemovedInDjango70Warning,
+    category=RemovedInDjango2028Warning,
     message=re.escape("Directly creating EmailBackend instances is deprecated."),
 )
 class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
@@ -651,7 +652,7 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         return self.smtp_handler.smtp_envelopes
 
     def test_fail_silently_arg_accepted(self):
-        # RemovedInDjango70Warning: remove this comment (but keep the test).
+        # RemovedInDjango2028Warning: remove this comment (but keep the test).
         # The SMTP backend continues to support fail_silently. Override the
         # SharedEmailBackendTests case that treats it as deprecated.
         for value in [True, False]:
@@ -662,7 +663,7 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
     def test_create_from_mailers(self):
         super().test_create_from_mailers(required_options={"host": "example.com"})
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_settings(
         EMAIL_HOST="mail.example.com",
         EMAIL_PORT=822,
@@ -685,13 +686,13 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         self.assertIsNone(backend.ssl_certfile)
         self.assertIsNone(backend.ssl_keyfile)
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     def test_direct_construction_deprecated(self):
         msg = (
             "Directly creating EmailBackend instances is deprecated. Use "
             "mail.mailers instead."
         )
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
             backend = self.backend_class(use_tls=True)
         # Default values come from deprecated settings without special handling
         # for port.
@@ -716,14 +717,14 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
                 )
                 self.assertEqual(backend.port, expected_port)
 
-        # RemovedInDjango70Warning: Until Django 7.0, the dynamic port default
-        # applies only when initialized through mail.mailers.
+        # RemovedInDjango2028Warning: Until Django 2028, the dynamic port
+        # default applies only when initialized through mail.mailers.
         for case, kwargs, _ in cases:
             with self.subTest(f"compatibility {case}"):
                 backend = self.backend_class(host="mail.example.com", **kwargs)
                 self.assertEqual(backend.port, 25)
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_settings(
         EMAIL_HOST="mail.example.com",
         EMAIL_PORT=822,
@@ -733,7 +734,7 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         self.assertEqual(backend.host, "mail.example.com")
         self.assertEqual(backend.port, 822)
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_settings(
         EMAIL_HOST="mail.example.com",
         EMAIL_PORT=822,
@@ -757,7 +758,7 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
             "mail.example.com", 5322, local_hostname=mock.ANY
         )
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_settings(
         EMAIL_HOST_USER="not empty username",
         EMAIL_HOST_PASSWORD="not empty password",
@@ -767,7 +768,7 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         self.assertEqual(backend.username, "not empty username")
         self.assertEqual(backend.password, "not empty password")
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_settings(
         EMAIL_HOST_USER="not empty username",
         EMAIL_HOST_PASSWORD="not empty password",
@@ -777,7 +778,7 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         self.assertEqual(backend.username, "username")
         self.assertEqual(backend.password, "password")
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_settings(
         EMAIL_HOST_USER="not empty username",
         EMAIL_HOST_PASSWORD="not empty password",
@@ -842,13 +843,13 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         self.assertIsNone(partial_conn.sock)
         self.assertIsNotNone(backend._partial_connection.sock)
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_settings(EMAIL_USE_TLS=True)
     def test_email_tls_use_settings(self):
         backend = smtp.EmailBackend()
         self.assertIs(backend.use_tls, True)
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_settings(EMAIL_USE_TLS=True)
     def test_email_tls_override_settings(self):
         backend = smtp.EmailBackend(use_tls=False)
@@ -866,7 +867,7 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         with self.assertRaisesMessage(InvalidMailer, msg):
             self.create_backend(use_ssl=True, use_tls=True)
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     def test_ssl_tls_settings_mutually_exclusive(self):
         msg = (
             "EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so only set "
@@ -878,13 +879,13 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         ):
             smtp.EmailBackend()
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_settings(EMAIL_USE_SSL=True)
     def test_email_ssl_use_settings(self):
         backend = smtp.EmailBackend()
         self.assertIs(backend.use_ssl, True)
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_settings(EMAIL_USE_SSL=True)
     def test_email_ssl_override_settings(self):
         backend = smtp.EmailBackend(use_ssl=False)
@@ -894,13 +895,13 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         backend = self.create_backend()
         self.assertIs(backend.use_ssl, False)
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_settings(EMAIL_SSL_CERTFILE="foo")
     def test_email_ssl_certfile_use_settings(self):
         backend = smtp.EmailBackend()
         self.assertEqual(backend.ssl_certfile, "foo")
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_settings(EMAIL_SSL_CERTFILE="foo")
     def test_email_ssl_certfile_override_settings(self):
         backend = smtp.EmailBackend(ssl_certfile="bar")
@@ -910,13 +911,13 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         backend = self.create_backend()
         self.assertIsNone(backend.ssl_certfile)
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_settings(EMAIL_SSL_KEYFILE="foo")
     def test_email_ssl_keyfile_use_settings(self):
         backend = smtp.EmailBackend()
         self.assertEqual(backend.ssl_keyfile, "foo")
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_settings(EMAIL_SSL_KEYFILE="foo")
     def test_email_ssl_keyfile_override_settings(self):
         backend = smtp.EmailBackend(ssl_keyfile="bar")
@@ -973,13 +974,13 @@ class SMTPBackendTests(SharedEmailBackendTests, SMTPBackendTestsBase):
         self.assertEqual(myemailbackend.timeout, 42)
         self.assertEqual(myemailbackend.connection.timeout, 42)
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_settings(EMAIL_TIMEOUT=10)
     def test_email_timeout_use_settings(self):
         backend = smtp.EmailBackend()
         self.assertEqual(backend.timeout, 10)
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_settings(EMAIL_TIMEOUT=10)
     def test_email_timeout_override_settings(self):
         backend = smtp.EmailBackend(timeout=15)
@@ -1155,7 +1156,7 @@ class SMTPBackendStoppedServerTests(SMTPBackendTestsBase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        # RemovedInDjango70Warning: alias argument can be removed (needed
+        # RemovedInDjango2028Warning: alias argument can be removed (needed
         # during mail.mailers transition to prevent compatibility mode).
         cls.backend = smtp.EmailBackend(
             alias="test_alias",

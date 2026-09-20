@@ -3,7 +3,7 @@ Example docstring
 """
 
 from django.utils.functional import cached_property
-from tests.sphinx.testdata.package.wildcard_module import *  # noqa
+from tests.sphinx_tests.testdata.package.wildcard_module import *  # noqa
 
 from . import other_module  # noqa
 from .other_module import MyOtherClass  # noqa

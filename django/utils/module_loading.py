@@ -1,6 +1,7 @@
 import copy
 import os
 import sys
+import types
 from importlib import import_module
 from importlib.util import find_spec as importlib_find
 
@@ -118,3 +119,22 @@ def module_dir(module):
         if filename is not None:
             return os.path.dirname(filename)
     raise ValueError("Cannot determine directory containing %s" % module)
+
+
+def qualname(value):
+    """
+    Return the fully qualified name (dotted module path) for a class, function,
+    type, or module (e.g. 'django.db.models.Model').
+    """
+    if isinstance(value, types.ModuleType):
+        return value.__name__
+    if not hasattr(value, "__module__") or value.__module__ is None:
+        msg = f"Cannot determine module path for {value!r}: no __module__ attribute."
+        raise ValueError(msg)
+    if not hasattr(value, "__qualname__"):
+        msg = f"Cannot determine module path for {value!r}: no __qualname__ attribute."
+        raise ValueError(msg)
+    if "<" in value.__qualname__:
+        msg = f"Cannot determine module path for {value!r}: local or anonymous object."
+        raise ValueError(msg)
+    return f"{value.__module__}.{value.__qualname__}"

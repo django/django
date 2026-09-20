@@ -85,10 +85,12 @@ class OrderedByExpressionGrandChild(models.Model):
 
 class BarcodedArticle(models.Model):
     rank = models.IntegerField(unique=True, null=True)
+    unique_rank = models.IntegerField(unique=True)
     headline = models.CharField(max_length=100)
     slug = models.CharField(max_length=100, default="slug")
     pub_date = models.DateField(null=True)
     barcode = models.CharField(max_length=30, default="bar")
+    parent = models.ForeignKey("self", models.SET_NULL, null=True)
 
     class Meta:
         required_db_features = {"supports_partial_indexes"}

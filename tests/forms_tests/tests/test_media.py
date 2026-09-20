@@ -3,6 +3,7 @@ from django.forms.widgets import MediaAsset, Script, Stylesheet
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
 from django.utils.html import html_safe
+from django.utils.safestring import mark_safe
 
 
 @override_settings(STATIC_URL="http://media.example.com/static/")
@@ -865,6 +866,56 @@ class FormsMediaTestCase(SimpleTestCase):
 
         with self.assertRaises(TypeError):
             Media() + InvalidType()
+
+    def test_html_safe_string_js(self):
+        tag = mark_safe('<script defer src="https://example.org/asset.js"></script>')
+        media = Media(js=[tag])
+        self.assertEqual(str(media), tag)
+
+    def test_html_safe_string_css(self):
+        tag = mark_safe('<link href="https://example.org/asset.css" rel="stylesheet">')
+        media = Media(css={"all": [tag]})
+        self.assertEqual(str(media), tag)
+
+    def test_html_safe_string_deduplication(self):
+        js_tag = mark_safe('<script defer src="https://example.org/asset.js"></script>')
+        css_tag = mark_safe(
+            '<link href="https://example.org/asset.css" rel="stylesheet">'
+        )
+        media = Media(
+            css={"all": [css_tag, css_tag, "/path/to/css1"]},
+            js=[js_tag, js_tag, Script("/path/to/js1")],
+        )
+        self.assertHTMLEqual(
+            str(media),
+            '<link href="https://example.org/asset.css" rel="stylesheet">\n'
+            '<link href="/path/to/css1" media="all" rel="stylesheet">\n'
+            '<script defer src="https://example.org/asset.js"></script>\n'
+            '<script src="/path/to/js1"></script>',
+        )
+
+    def test_html_safe_string_merging(self):
+        js_tag = mark_safe('<script defer src="https://example.org/asset.js"></script>')
+        css_tag = mark_safe(
+            '<link href="https://example.org/asset.css" rel="stylesheet">'
+        )
+        m1 = Media(
+            css={"all": [css_tag, "/path/to/css1"]},
+            js=["/path/to/js1", js_tag],
+        )
+        m2 = Media(
+            css={"all": [css_tag]},
+            js=[js_tag, Script("/path/to/js2")],
+        )
+        merged = m1 + m2
+        self.assertHTMLEqual(
+            str(merged),
+            '<link href="https://example.org/asset.css" rel="stylesheet">\n'
+            '<link href="/path/to/css1" media="all" rel="stylesheet">\n'
+            '<script src="/path/to/js1"></script>\n'
+            '<script defer src="https://example.org/asset.js"></script>\n'
+            '<script src="/path/to/js2"></script>',
+        )
 
     def test_render_js_with_attrs(self):
         media = Media(js=[Script("/path/to/js", integrity="sha256-abc")])

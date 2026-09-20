@@ -192,8 +192,8 @@ mitigated at the server level in production environments.
     Django's built-in development server does not enforce these limits because
     it is not designed to be a production server.
 
-.. _`4k bytes for a URL`: https://docs.gunicorn.org/en/stable/settings.html#limit-request-line
-.. _`8k bytes for a request header`: https://docs.gunicorn.org/en/stable/settings.html#limit-request-field-size
+.. _`4k bytes for a URL`: https://gunicorn.org/reference/settings/#limit_request_line
+.. _`8k bytes for a request header`: https://gunicorn.org/reference/settings/#limit_request_field_size
 
 The request body must be under 2.5 MB
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

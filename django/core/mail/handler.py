@@ -30,19 +30,19 @@ class MailersHandler:
 
     @property
     def settings(self):
-        # RemovedInDjango70Warning: change to:
+        # RemovedInDjango2028Warning: change to:
         #   return settings.MAILERS
         return getattr(settings, "MAILERS", {})
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @property
     def _is_configured(self):
         """True if settings.py has opted into MAILERS support."""
         return hasattr(settings, "MAILERS")
 
-    # RemovedInDjango70Warning: _deprecated_kwargs.
+    # RemovedInDjango2028Warning: _deprecated_kwargs.
     def create_connection(self, alias, /, *, _deprecated_kwargs=None):
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         if not self._is_configured and alias == DEFAULT_MAILER_ALIAS:
             # Create mailers.default from deprecated settings.
             from django.core.mail import get_connection
@@ -59,7 +59,7 @@ class MailersHandler:
         if "alias" in options:
             raise InvalidMailer("OPTIONS must not define 'alias'.", alias=alias)
 
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         if _deprecated_kwargs:
             # Being called from get_connection() to create default mailer
             # instance with some overrides. _ignore_unknown_kwargs prevents

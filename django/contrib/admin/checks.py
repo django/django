@@ -1101,7 +1101,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
 
         if not isinstance(obj.list_select_related, (bool, list, tuple)):
             return must_be(
-                # RemovedInDjango70Warning: when the deprecation ends, replace:
+                # RemovedInDjango2028Warning: replace with:
                 # "a tuple, list, or False",
                 # and also update docs/ref/checks.txt.
                 "a boolean, tuple or list",

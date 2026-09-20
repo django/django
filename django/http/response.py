@@ -20,7 +20,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import timezone
 from django.utils.datastructures import CaseInsensitiveMapping
-from django.utils.deprecation import RemovedInDjango71Warning
+from django.utils.deprecation import RemovedInDjango2029Warning
 from django.utils.encoding import iri_to_uri
 from django.utils.functional import cached_property
 from django.utils.http import (
@@ -757,22 +757,22 @@ class JsonResponse(HttpResponse):
         self,
         data,
         encoder=DjangoJSONEncoder,
-        # RemovedInDjango71Warning: Remove the safe parameter from here and
+        # RemovedInDjango2029Warning: Remove the safe parameter from here and
         # the docstring.
         safe=None,
         json_dumps_params=None,
         **kwargs,
     ):
-        # RemovedInDjango71Warning.
+        # RemovedInDjango2029Warning.
         if safe is None:
             safe = False
         else:
             warnings.warn(
                 "The safe parameter is deprecated.",
-                category=RemovedInDjango71Warning,
+                category=RemovedInDjango2029Warning,
                 skip_file_prefixes=django_file_prefixes(),
             )
-        # RemovedInDjango71Warning.
+        # RemovedInDjango2029Warning.
         if safe and not isinstance(data, dict):
             raise TypeError(
                 "In order to allow non-dict objects to be serialized set the "

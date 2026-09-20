@@ -16,6 +16,7 @@ from .models import (
     GeneratedFieldVirtualProduct,
     JSONFieldModel,
     ModelWithDatabaseDefault,
+    ModelWithDatabaseDefaultExpression,
     Product,
     UniqueConstraintConditionProduct,
     UniqueConstraintDeferrable,
@@ -1503,3 +1504,29 @@ class UniqueConstraintTests(TestCase):
                 Upper("field_with_db_default"),
                 name="unique_field_with_db_default_expression",
             ).validate(ModelWithDatabaseDefault, ModelWithDatabaseDefault())
+
+    @skipUnlessDBFeature("supports_expression_defaults")
+    def test_database_default_expression(self):
+        """
+        A field whose db_default is a non-constant expression cannot be
+        validated before the value is generated on INSERT, so the constraint
+        check is skipped.
+        """
+        ModelWithDatabaseDefaultExpression.objects.create()
+        with self.assertNumQueries(0):
+            models.UniqueConstraint(
+                fields=["field_with_db_default_expression"],
+                name="unique_field_with_db_default_expression_field",
+            ).validate(
+                ModelWithDatabaseDefaultExpression, ModelWithDatabaseDefaultExpression()
+            )
+        # A multi-field constraint containing such a field is skipped
+        # entirely, even if the other fields have concrete values.
+        with self.assertNumQueries(0):
+            models.UniqueConstraint(
+                fields=["field", "field_with_db_default_expression"],
+                name="unique_field_and_db_default_expression_field",
+            ).validate(
+                ModelWithDatabaseDefaultExpression,
+                ModelWithDatabaseDefaultExpression(field="value"),
+            )

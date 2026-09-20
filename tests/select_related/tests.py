@@ -4,7 +4,7 @@ from django.core.exceptions import FieldError
 from django.db.models import FETCH_PEERS
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import garbage_collect, ignore_warnings, requires_gil
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .models import (
     Bookmark,
@@ -111,12 +111,12 @@ class SelectRelatedTests(TestCase):
                 ],
             )
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     def test_list_with_select_related(self):
         """select_related() applies to entire lists, not just items."""
         with self.assertNumQueries(1):
             with ignore_warnings(
-                category=RemovedInDjango70Warning,
+                category=RemovedInDjango2028Warning,
                 message=r"Calling select_related\(\) with no arguments is deprecated\.",
             ):
                 world = Species.objects.select_related()
@@ -131,13 +131,13 @@ class SelectRelatedTests(TestCase):
                 ],
             )
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     def test_select_related_no_arguments_deprecated(self):
         msg = (
             "Calling select_related() with no arguments is deprecated. "
             "Specify the fields to fetch instead."
         )
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
             Species.objects.select_related()
 
     def test_list_with_depth(self):
@@ -280,6 +280,19 @@ class SelectRelatedTests(TestCase):
             species.genus.family._state.fetch_mode,
             FETCH_PEERS,
         )
+
+    def test_fetch_peers_for_select_related_objects(self):
+        species = (
+            Species.objects.select_related("genus__family")
+            .fetch_mode(FETCH_PEERS)
+            .order_by("pk")
+        )
+        with self.assertNumQueries(2):
+            orders = [obj.genus.family.order.name for obj in species]
+            self.assertEqual(
+                orders,
+                ["Diptera", "Primates", "Fabales", "Agaricales"],
+            )
 
 
 class SelectRelatedValidationTests(SimpleTestCase):

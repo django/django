@@ -1,4 +1,4 @@
-# RemovedInDjango70Warning: This entire file.
+# RemovedInDjango2028Warning: This entire file.
 import re
 import types
 import warnings
@@ -21,7 +21,7 @@ from django.core.mail import (
 from django.core.mail.deprecation import NO_DEFAULT_MAILER_WARNING
 from django.core.mail.message import forbid_multi_line_headers, sanitize_address
 from django.test import SimpleTestCase, ignore_warnings, override_settings
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from . import override_deprecated_email_settings
 from .tests import MailTestsMixin
@@ -53,7 +53,7 @@ class DeprecationWarningTests(MailTestsMixin, SimpleTestCase):
         ]
         for name, msg in cases:
             with self.subTest(name=name):
-                with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+                with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
                     __import__("django.core.mail", fromlist=[name])
 
     def test_sanitize_address_deprecated(self):
@@ -64,7 +64,7 @@ class DeprecationWarningTests(MailTestsMixin, SimpleTestCase):
             " encoding. Use Python's email.headerregistry.Address to construct"
             " formatted addresses from component parts."
         )
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
             sanitize_address("to@example.com", "ascii")
 
     def test_forbid_multi_line_headers_deprecated(self):
@@ -73,7 +73,7 @@ class DeprecationWarningTests(MailTestsMixin, SimpleTestCase):
             " Python's modern email API (with email.message.EmailMessage or"
             " email.policy.default) will reject multi-line headers."
         )
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
             forbid_multi_line_headers("To", "to@example.com", "ascii")
 
 
@@ -131,7 +131,7 @@ class UndocumentedFeatureErrorTests(SimpleTestCase):
             email.send()
 
 
-@ignore_warnings(category=RemovedInDjango70Warning)
+@ignore_warnings(category=RemovedInDjango2028Warning)
 class DeprecatedCompatibilityTests(SimpleTestCase):
     def test_bad_header_error(self):
         """
@@ -228,24 +228,24 @@ class DeprecatedEmailSettingsTests(SimpleTestCase):
         for name in self.deprecated_settings:
             msg = (
                 f"The {name} setting is deprecated. Migrate to "
-                "MAILERS before Django 7.0."
+                "MAILERS before Django 2028."
             )
             settings = {name: "foo"}
             with self.subTest(name=name):
                 with (
                     self.subTest("settings module"),
                     self.mock_settings_module(**settings),
-                    self.assertWarnsMessage(RemovedInDjango70Warning, msg),
+                    self.assertWarnsMessage(RemovedInDjango2028Warning, msg),
                 ):
                     self.init_simulated_settings()
                 with (
                     self.subTest("settings.configure()"),
-                    self.assertWarnsMessage(RemovedInDjango70Warning, msg),
+                    self.assertWarnsMessage(RemovedInDjango2028Warning, msg),
                 ):
                     LazySettings().configure(**settings)
                 with (
                     self.subTest("override_settings()"),
-                    self.assertWarnsMessage(RemovedInDjango70Warning, msg),
+                    self.assertWarnsMessage(RemovedInDjango2028Warning, msg),
                 ):
                     with override_settings(**settings):
                         pass
@@ -256,18 +256,18 @@ class DeprecatedEmailSettingsTests(SimpleTestCase):
         expected_warning_count = len(settings)
 
         with self.subTest("settings module"), self.mock_settings_module(**settings):
-            with self.assertWarnsRegex(RemovedInDjango70Warning, msg_re) as cm:
+            with self.assertWarnsRegex(RemovedInDjango2028Warning, msg_re) as cm:
                 self.init_simulated_settings()
             self.assertEqual(len(cm.warnings), expected_warning_count)
 
         with self.subTest("settings.configure()"):
-            with self.assertWarnsRegex(RemovedInDjango70Warning, msg_re) as cm:
+            with self.assertWarnsRegex(RemovedInDjango2028Warning, msg_re) as cm:
                 LazySettings().configure(**settings)
             self.assertEqual(len(cm.warnings), expected_warning_count)
 
         with self.subTest("override_settings()"):
             with (
-                self.assertWarnsRegex(RemovedInDjango70Warning, msg_re) as cm,
+                self.assertWarnsRegex(RemovedInDjango2028Warning, msg_re) as cm,
                 override_settings(**settings),
             ):
                 pass
@@ -285,22 +285,22 @@ class DeprecatedEmailSettingsTests(SimpleTestCase):
         msg = NO_DEFAULT_MAILER_WARNING
         with (
             self.subTest("get_connection()"),
-            self.assertWarnsMessage(RemovedInDjango70Warning, msg),
+            self.assertWarnsMessage(RemovedInDjango2028Warning, msg),
             ignore_warnings(
-                category=RemovedInDjango70Warning,
+                category=RemovedInDjango2028Warning,
                 message=re.escape("get_connection() is deprecated."),
             ),
         ):
             get_connection()
         with (
             self.subTest("mailers.default"),
-            self.assertWarnsMessage(RemovedInDjango70Warning, msg),
+            self.assertWarnsMessage(RemovedInDjango2028Warning, msg),
         ):
             _ = mailers.default
 
         # The warning is not issued on startup, to avoid creating noise for
         # projects that don't send email at all.
-        with self.assertNotWarnsMessage(RemovedInDjango70Warning, msg):
+        with self.assertNotWarnsMessage(RemovedInDjango2028Warning, msg):
             settings = self.init_simulated_settings()
         self.assertHasOnlyDefaultEmailSettings(settings, msg="invalid test")
 
@@ -317,7 +317,7 @@ class DeprecatedEmailSettingsTests(SimpleTestCase):
             with (
                 self.subTest(name=name),
                 override_deprecated_email_settings(**{name: value}),
-                self.assertNotWarnsMessage(RemovedInDjango70Warning, msg),
+                self.assertNotWarnsMessage(RemovedInDjango2028Warning, msg),
             ):
                 _ = mailers.default
         with (
@@ -329,7 +329,7 @@ class DeprecatedEmailSettingsTests(SimpleTestCase):
                     }
                 }
             ),
-            self.assertNotWarnsMessage(RemovedInDjango70Warning, msg),
+            self.assertNotWarnsMessage(RemovedInDjango2028Warning, msg),
         ):
             _ = mailers.default
 
@@ -359,12 +359,12 @@ class DeprecatedEmailSettingsTests(SimpleTestCase):
         for name in self.deprecated_settings:
             msg = (
                 f"The {name} setting is deprecated. Migrate to "
-                "MAILERS before Django 7.0."
+                "MAILERS before Django 2028."
             )
             with (
                 self.subTest(name=name),
                 override_deprecated_email_settings(**{name: "foo"}),
-                self.assertWarnsMessage(RemovedInDjango70Warning, msg),
+                self.assertWarnsMessage(RemovedInDjango2028Warning, msg),
             ):
                 getattr(django.conf.settings, name)
 
@@ -399,7 +399,7 @@ class DeprecatedEmailSettingsTests(SimpleTestCase):
                 with self.assertRaisesMessage(AttributeError, msg):
                     getattr(django.conf.settings, name)
 
-    @ignore_warnings(category=RemovedInDjango70Warning)
+    @ignore_warnings(category=RemovedInDjango2028Warning)
     def test_direct_settings_manipulation(self):
         settings = self.init_simulated_settings()
 
@@ -445,7 +445,7 @@ class DeprecatedEmailSettingsTests(SimpleTestCase):
             del django.conf.settings.EMAIL_HOST
             self.assertNotIn("EMAIL_HOST", dir(django.conf.settings))
 
-    @ignore_warnings(category=RemovedInDjango70Warning)
+    @ignore_warnings(category=RemovedInDjango2028Warning)
     def test_deprecated_settings_defaults_unchanged(self):
         # Django's test runner overrides EMAIL_BACKEND in django.conf.settings,
         # so construct a fresh settings object for this test.
@@ -460,7 +460,7 @@ class DeprecatedEmailSettingsTests(SimpleTestCase):
                 else:
                     self.assertEqual(actual, expected)
 
-    @ignore_warnings(category=RemovedInDjango70Warning)
+    @ignore_warnings(category=RemovedInDjango2028Warning)
     def test_email_backend_override_during_tests(self):
         self.assertEqual(
             django.conf.settings.EMAIL_BACKEND,

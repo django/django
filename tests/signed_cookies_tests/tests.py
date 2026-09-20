@@ -4,7 +4,7 @@ from django.core import signing
 from django.http import HttpRequest, HttpResponse
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import freeze_time, ignore_warnings
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 
 class SignedCookieTest(SimpleTestCase):
@@ -36,8 +36,8 @@ class SignedCookieTest(SimpleTestCase):
         with self.assertRaises(signing.BadSignature):
             request.get_signed_cookie("ab", salt="c")
 
-    # RemovedInDjango70Warning: When the deprecation ends, remove this test.
-    @ignore_warnings(category=RemovedInDjango70Warning)
+    # RemovedInDjango2028Warning: When the deprecation ends, remove this test.
+    @ignore_warnings(category=RemovedInDjango2028Warning)
     @override_settings(SIGNED_COOKIE_LEGACY_SALT_FALLBACK=True)
     def test_expired_legacy_cookie_raises_signature_expired(self):
         with freeze_time(123456789):
@@ -49,8 +49,8 @@ class SignedCookieTest(SimpleTestCase):
             with self.assertRaises(signing.SignatureExpired):
                 request.get_signed_cookie("a", salt="bc", max_age=10)
 
-    # RemovedInDjango70Warning: When the deprecation ends, remove this test.
-    @ignore_warnings(category=RemovedInDjango70Warning)
+    # RemovedInDjango2028Warning: When the deprecation ends, remove this test.
+    @ignore_warnings(category=RemovedInDjango2028Warning)
     @override_settings(SIGNED_COOKIE_LEGACY_SALT_FALLBACK=True)
     def test_legacy_salt_namespace_is_accepted(self):
         request = HttpRequest()
@@ -62,7 +62,7 @@ class SignedCookieTest(SimpleTestCase):
         # No protection since SIGNED_COOKIE_LEGACY_SALT_FALLBACK=True.
         self.assertEqual(request.get_signed_cookie("ab", salt="c"), "hello")
 
-    # RemovedInDjango70Warning: When the deprecation ends, remove this test.
+    # RemovedInDjango2028Warning: When the deprecation ends, remove this test.
     def test_legacy_salt_namespace_not_accepted(self):
         request = HttpRequest()
         request.COOKIES["a"] = signing.get_cookie_signer(
@@ -71,8 +71,8 @@ class SignedCookieTest(SimpleTestCase):
         with self.assertRaises(signing.BadSignature):
             request.get_signed_cookie("a", salt="bc")
 
-    # RemovedInDjango70Warning: When the deprecation ends, remove this test.
-    @ignore_warnings(category=RemovedInDjango70Warning)
+    # RemovedInDjango2028Warning: When the deprecation ends, remove this test.
+    @ignore_warnings(category=RemovedInDjango2028Warning)
     @override_settings(SIGNED_COOKIE_LEGACY_SALT_FALLBACK=True)
     def test_expired_new_style_cookie_does_not_fallback_to_legacy_salt(self):
         with freeze_time(123456789):

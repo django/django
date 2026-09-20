@@ -503,7 +503,7 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
         BrokenLinkEmailsMiddleware(self.get_response)(self.req)
         self.assertEqual(len(mail.outbox), 1)
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_deprecated_email_settings(
         EMAIL_BACKEND="mail.custombackend.FailingEmailBackend"
     )

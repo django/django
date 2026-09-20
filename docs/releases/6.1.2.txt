@@ -1,0 +1,19 @@
+==========================
+Django 6.1.2 release notes
+==========================
+
+*Expected October 6, 2026*
+
+Django 6.1.2 fixes one data loss issue in 4.0 and several bugs in 6.1.1.
+
+Bugfixes
+========
+
+* Fixed a data loss issue in Django 4.0 where :ref:`network rasters
+  <gdal-raster-network>` were deleted by GeoDjango when closed.
+
+* Fixed a bug in Django 6.1 where the ``fields.W225`` system check incorrectly
+  warned that ``null`` has no effect on ``GeneratedField`` (:ticket:`37348`).
+
+* Fixed a bug in Django 6.1 where ``FETCH_PEERS`` did not batch instances
+  loaded by ``select_related()``, causing unnecessary queries (#37344).

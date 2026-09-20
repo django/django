@@ -844,8 +844,7 @@ class GenericRelationsTests(TestCase):
         self.assertEqual(tag._state.fetch_mode, FETCH_PEERS)
 
     def test_fetch_mode_copied_reverse_fetching_many(self):
-        animals = list(Animal.objects.fetch_mode(FETCH_PEERS))
-        animal = animals[0]
+        animal = Animal.objects.fetch_mode(FETCH_PEERS).get(pk=self.lion.pk)
         self.assertEqual(animal._state.fetch_mode, FETCH_PEERS)
         tags = list(animal.tags.all())
         tag = tags[0]

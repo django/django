@@ -1747,6 +1747,38 @@ class MultiDbTests(TestCase):
             )
         self.assertEqual(books, "Poems ()\n" "Sense and Sensibility ()\n")
 
+    def test_forward_fk_prefetch_custom_queryset_uses_parent_database(self):
+        book1 = Book.objects.using("default").create(title="Dive into Python")
+        Author.objects.using("default").create(name="Mark", first_book=book1)
+        book2 = Book.objects.using("other").create(title="Dive into Rust")
+        Author.objects.using("other").create(name="Mark", first_book=book2)
+
+        author = (
+            Author.objects.using("other")
+            .prefetch_related(Prefetch("first_book", queryset=Book.objects.all()))
+            .get(name="Mark")
+        )
+
+        self.assertEqual(author._state.db, "other")
+        self.assertEqual(author.first_book._state.db, "other")
+        self.assertEqual(author.first_book.title, "Dive into Rust")
+
+    def test_reverse_o2o_prefetch_custom_queryset_uses_parent_database(self):
+        BookWithYear.objects.using("default").create(title="Poems", published_year=2000)
+        BookWithYear.objects.using("other").create(title="Poems", published_year=2001)
+
+        book = (
+            Book.objects.using("other")
+            .prefetch_related(
+                Prefetch("bookwithyear", queryset=BookWithYear.objects.all())
+            )
+            .get(title="Poems")
+        )
+
+        self.assertEqual(book._state.db, "other")
+        self.assertEqual(book.bookwithyear._state.db, "other")
+        self.assertEqual(book.bookwithyear.published_year, 2001)
+
 
 class Ticket19607Tests(TestCase):
     @classmethod

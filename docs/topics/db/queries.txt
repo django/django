@@ -1099,7 +1099,7 @@ while exact-matching ``JSONNull()`` is used to match JSON ``null``.
     >>> Dog.objects.create(name="Archie", data=JSONNull())  # JSON null.
     <Dog: Archie>
     >>> Dog.objects.filter(data=None)
-    ...: RemovedInDjango70Warning: Using None as the right-hand side of an
+    ...: RemovedInDjango2028Warning: Using None as the right-hand side of an
     exact lookup on JSONField to mean JSON scalar 'null' is deprecated. Use
     JSONNull() instead (or use the __isnull lookup if you meant SQL NULL).
     ...
@@ -1111,7 +1111,7 @@ while exact-matching ``JSONNull()`` is used to match JSON ``null``.
     >>> Dog.objects.filter(data__isnull=False)
     <QuerySet [<Dog: Archie>]>
 
-.. RemovedInDjango70Warning: Alter the example with the deprecation warning to:
+.. RemovedInDjango2028Warning: Alter the example with the deprecation warning to:
   <QuerySet [<Dog: Max>]>.
 
 Unless you are sure you wish to work with SQL ``NULL`` values, consider setting

@@ -10,7 +10,7 @@ from django.conf import settings
 from django.core.mail import InvalidMailer
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.utils import DNS_NAME
-from django.utils.deprecation import RemovedInDjango70Warning, warn_about_external_use
+from django.utils.deprecation import RemovedInDjango2028Warning, warn_about_external_use
 from django.utils.encoding import force_str, punycode
 from django.utils.functional import cached_property
 
@@ -34,13 +34,13 @@ class EmailBackend(BaseEmailBackend):
         ssl_certfile=None,
         **kwargs,
     ):
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         if "alias" not in kwargs:
             msg = (
                 "Directly creating EmailBackend instances is deprecated. "
                 "Use mail.mailers instead."
             )
-            warn_about_external_use(msg, RemovedInDjango70Warning)
+            warn_about_external_use(msg, RemovedInDjango2028Warning)
 
         super().__init__(**kwargs)
         self.fail_silently = fail_silently
@@ -48,7 +48,7 @@ class EmailBackend(BaseEmailBackend):
         self._partial_connection = None
         self._lock = threading.RLock()
 
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         if self.alias is None:
             # Use deprecated settings when MAILERS not enabled.
             self.host = host or settings.EMAIL_HOST

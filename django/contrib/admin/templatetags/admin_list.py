@@ -228,7 +228,7 @@ def items_for_result(cl, result, form):
             empty_value_display = getattr(
                 attr, "empty_value_display", empty_value_display
             )
-            # Find boolean fields on relations.
+            # Find a terminal field from a chain of relations.
             if f is None and isinstance(field_name, str) and LOOKUP_SEP in field_name:
                 try:
                     f = get_fields_from_path(cl.model, field_name)[-1]
@@ -246,11 +246,10 @@ def items_for_result(cl, result, form):
                     row_classes.append("nowrap")
             else:
                 if isinstance(f.remote_field, models.ManyToOneRel):
-                    field_val = getattr(result, f.name)
-                    if field_val is None:
+                    if value is None:
                         result_repr = empty_value_display
                     else:
-                        result_repr = field_val
+                        result_repr = value
                 else:
                     result_repr = display_for_field(
                         value,

@@ -22,7 +22,7 @@ from django.db.models.utils import get_blank_choice_label
 from django.forms.widgets import Select
 from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.test.utils import ignore_warnings, isolate_apps
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .models import Band, Concert, Song
 
@@ -1033,19 +1033,19 @@ class ModelAdminTests(TestCase):
             r"Setting ModelAdmin.list_select_related to True is deprecated. "
             r"Use False or a list or tuple of fields to fetch instead."
         )
-        # RemovedInDjango70Warning:
+        # RemovedInDjango2028Warning:
         # with self.assertRaisesMessage(ValueError, msg)
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg) as warning:
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg) as warning:
 
             class TestModelAdmin(ModelAdmin):
                 list_select_related = True
 
         self.assertEqual(warning.filename, __file__)
 
-    # RemovedInDjango70Warning: when the deprecation ends, remove.
+    # RemovedInDjango2028Warning: when the deprecation ends, remove.
     def test_list_select_related_true_deprecated_subclass(self):
         with ignore_warnings(
-            category=RemovedInDjango70Warning,
+            category=RemovedInDjango2028Warning,
             message=r"Setting ModelAdmin.list_select_related to True is deprecated\.",
         ):
 
@@ -1056,7 +1056,7 @@ class ModelAdminTests(TestCase):
         class TestModelAdmin(BaseTestModelAdmin):
             pass
 
-    # RemovedInDjango70Warning: when the deprecation ends, rename.
+    # RemovedInDjango2028Warning: when the deprecation ends, rename.
     def test_get_list_select_related_returns_true_deprecated(self):
         msg = (
             "Returning True from ModelAdmin.get_list_select_related() is "
@@ -1073,9 +1073,9 @@ class ModelAdminTests(TestCase):
             username="bob", email="bob@test.com", password="test"
         )
 
-        # RemovedInDjango70Warning:
+        # RemovedInDjango2028Warning:
         # with self.assertRaisesMessage(ValueError, msg)
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg) as warning:
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg) as warning:
             TestModelAdmin(Band, self.site).get_changelist_instance(request)
         self.assertEqual(warning.filename, __file__)
 

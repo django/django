@@ -8,7 +8,7 @@ from asgiref.sync import async_to_sync, sync_to_async
 
 from django.db.models.enums import TextChoices
 from django.utils.json import normalize_json
-from django.utils.module_loading import import_string
+from django.utils.module_loading import import_string, qualname
 from django.utils.translation import pgettext_lazy
 
 from .exceptions import TaskResultMismatch
@@ -145,7 +145,7 @@ class Task:
 
     @property
     def module_path(self):
-        return f"{self.func.__module__}.{self.func.__qualname__}"
+        return qualname(self.func)
 
 
 def task(

@@ -111,11 +111,11 @@ approaches.
 
 .. deprecated:: 6.1
 
-    Until Django 7.0, if the :setting:`MAILERS` setting is not defined then the
-    earlier behavior still applies: Django will default to using an SMTP server
-    on localhost (but will issue deprecation warnings). Starting in Django 7.0,
-    attempts to send email without :setting:`MAILERS` defined will result in a
-    ``MailerDoesNotExist`` error.
+    Until Django 2028, if the :setting:`MAILERS` setting is not defined then
+    the earlier behavior still applies: Django will default to using an SMTP
+    server on localhost (but will issue deprecation warnings). Starting in
+    Django 2028, attempts to send email without :setting:`MAILERS` defined will
+    result in a ``MailerDoesNotExist`` error.
 
     Existing projects can opt into the new behavior early by adding
     :setting:`MAILERS` to ``settings.py``. See :ref:`migrating-to-mailers`.
@@ -1093,7 +1093,7 @@ Example::
     respectively. (There is no setting equivalent to the ``"fail_silently"``
     option.)
 
-.. RemovedInDjango70Warning: class documentation for smtp.EmailBackend.
+.. RemovedInDjango2028Warning: class documentation for smtp.EmailBackend.
 
 .. class:: backends.smtp.EmailBackend
 
@@ -1113,7 +1113,7 @@ Example::
     .. deprecated:: 6.1
 
         Directly constructing an instance of an ``EmailBackend`` class will be
-        unsupported in Django 7.0. Undocumented use will result in different
+        unsupported in Django 2028. Undocumented use will result in different
         default argument handling compared to earlier releases.
 
 .. _topic-email-smtp-private-ca:
@@ -1317,7 +1317,7 @@ backends.
         :setting:`EMAIL_BACKEND` and related settings. This supports backward
         compatibility with Django 6.0 and earlier.
 
-        This behavior (and those settings) will be removed in Django 7.0.
+        This behavior (and those settings) will be removed in Django 2028.
 
 .. function:: get_connection(backend=None, *, fail_silently=False, **kwargs)
 

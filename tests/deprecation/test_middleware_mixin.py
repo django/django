@@ -30,7 +30,7 @@ from django.middleware.http import ConditionalGetMiddleware
 from django.middleware.locale import LocaleMiddleware
 from django.middleware.security import SecurityMiddleware
 from django.test import SimpleTestCase
-from django.utils.deprecation import RemovedInDjango71Warning
+from django.utils.deprecation import RemovedInDjango2029Warning
 
 
 class MiddlewareMixinTests(SimpleTestCase):
@@ -61,7 +61,7 @@ class MiddlewareMixinTests(SimpleTestCase):
             "Importing MiddlewareMixin from django.utils.deprecation is deprecated. "
             "Import from django.middleware.MiddlewareMixin instead."
         )
-        with self.assertWarnsMessage(RemovedInDjango71Warning, msg):
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, msg):
             from django.utils.deprecation import (
                 MiddlewareMixin as DeprecatedMiddlewareMixin,
             )

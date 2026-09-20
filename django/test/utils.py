@@ -142,7 +142,7 @@ def setup_test_environment(debug=None):
     saved_data.debug = settings.DEBUG
     settings.DEBUG = debug
 
-    # RemovedInDjango70Warning: Override MAILERS unconditionally;
+    # RemovedInDjango2028Warning: Override MAILERS unconditionally;
     # remove EMAIL_BACKEND override.
     if hasattr(settings, "MAILERS"):
         saved_data.mailers = settings.MAILERS
@@ -173,7 +173,7 @@ def teardown_test_environment():
 
     settings.ALLOWED_HOSTS = saved_data.allowed_hosts
     settings.DEBUG = saved_data.debug
-    # RemovedInDjango70Warning: Restore MAILERS unconditionally;
+    # RemovedInDjango2028Warning: Restore MAILERS unconditionally;
     # remove EMAIL_BACKEND support.
     if hasattr(saved_data, "mailers"):
         settings.MAILERS = saved_data.mailers

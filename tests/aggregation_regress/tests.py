@@ -27,7 +27,7 @@ from django.db.models import (
 from django.db.models.functions import Cast, Concat
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import Approximate, ignore_warnings
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .models import (
     Alfa,
@@ -884,10 +884,10 @@ class AggregationTests(TestCase):
 
     def test_annotate_select_related(self):
         # Regression for #10127 - Empty select_related() works with annotate
-        # RemovedInDjango70Warning: when the deprecation ends, the below
+        # RemovedInDjango2028Warning: when the deprecation ends, the below
         # queryset and assertion can be removed.
         with ignore_warnings(
-            category=RemovedInDjango70Warning,
+            category=RemovedInDjango2028Warning,
             message=r"Calling select_related\(\) with no arguments is deprecated\.",
         ):
             qs = (

@@ -15,17 +15,17 @@ from django.db.models.fields.json import KeyTransform
 from django.db.models.functions import Cast, Concat, LPad, Substr
 from django.test.utils import Approximate
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from . import PostgreSQLTestCase
 from .models import AggregateTestModel, HotelReservation, Room, StatTestModel
 
 try:
-    from django.contrib.postgres.aggregates import BitAnd  # RemovedInDjango70Warning
-    from django.contrib.postgres.aggregates import BitOr  # RemovedInDjango70Warning
-    from django.contrib.postgres.aggregates import BitXor  # RemovedInDjango70Warning
+    from django.contrib.postgres.aggregates import BitAnd  # RemovedInDjango2028Warning
+    from django.contrib.postgres.aggregates import BitOr  # RemovedInDjango2028Warning
+    from django.contrib.postgres.aggregates import BitXor  # RemovedInDjango2028Warning
     from django.contrib.postgres.aggregates import (
-        StringAgg,  # RemovedInDjango70Warning.
+        StringAgg,  # RemovedInDjango2028Warning.
     )
     from django.contrib.postgres.aggregates import (
         ArrayAgg,
@@ -566,11 +566,11 @@ class TestGeneralAggregate(PostgreSQLTestCase):
     def test_string_agg_delimiter_deprecation(self):
         msg = (
             "delimiter: str will be resolved as a field reference instead "
-            'of a string literal on Django 7.0. Pass `delimiter=Value("\'")` to '
-            "preserve the previous behavior."
+            'of a string literal on Django 2028. Pass `delimiter=Value("\'")` '
+            "to preserve the previous behavior."
         )
 
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg) as ctx:
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg) as ctx:
             values = AggregateTestModel.objects.aggregate(
                 stringagg=StringAgg("char_field", delimiter="'")
             )
@@ -583,7 +583,7 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             "django.db.models.aggregates.StringAgg instead."
         )
 
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg) as ctx:
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg) as ctx:
             values = AggregateTestModel.objects.aggregate(
                 stringagg=StringAgg("char_field", delimiter=Value("'"))
             )
@@ -599,7 +599,7 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             )
             with (
                 self.subTest(BitAggregate.__name__),
-                self.assertWarnsMessage(RemovedInDjango70Warning, msg) as ctx,
+                self.assertWarnsMessage(RemovedInDjango2028Warning, msg) as ctx,
             ):
                 AggregateTestModel.objects.aggregate(
                     bitagg=BitAggregate("integer_field")

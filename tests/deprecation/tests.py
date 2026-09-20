@@ -3,6 +3,7 @@ import warnings
 from django.test import SimpleTestCase
 from django.utils.deprecation import (
     RemovedAfterNextVersionWarning,
+    RemovedInDjango2028Warning,
     RenameMethodsBase,
 )
 
@@ -181,3 +182,16 @@ class RenameMethodsTests(SimpleTestCase):
         self.assertTrue(
             issubclass(RemovedAfterNextVersionWarning, PendingDeprecationWarning)
         )
+
+
+# RemovedInDjango2028Warning.
+class DeprecatedWarningsTests(SimpleTestCase):
+    def test_removed_in_django_70_warning_alias(self):
+        msg = (
+            "RemovedInDjango2028Warning should be used instead of "
+            "RemovedInDjango70Warning."
+        )
+        with self.assertWarnsMessage(UserWarning, msg):
+            from django.utils.deprecation import RemovedInDjango70Warning
+
+        self.assertIs(RemovedInDjango70Warning, RemovedInDjango2028Warning)

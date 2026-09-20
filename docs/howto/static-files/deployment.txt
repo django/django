@@ -25,6 +25,18 @@ As with all deployment tasks, the devil's in the details. Every production
 setup will be a bit different, so you'll need to adapt the basic outline to fit
 your needs. Below are a few common patterns that might help.
 
+Having your Django application serve static files
+-------------------------------------------------
+
+While web servers are much better and faster at serving static files, it is
+possible to have Django serve them using community-maintained packages. There
+are static file packages highlighted on the `Community Ecosystem`_ page. The
+Django Packages `Static Builders grid`_ has even more options for you!
+
+.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#storage-static-files
+.. _Static Builders grid: https://djangopackages.org/grids/g/static-builders/
+
+
 Serving the site and your static files from the same server
 -----------------------------------------------------------
 

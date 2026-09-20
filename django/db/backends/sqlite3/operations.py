@@ -315,7 +315,10 @@ class DatabaseOperations(BaseDatabaseOperations):
     def get_decimalfield_converter(self, expression):
         # SQLite stores only 15 significant digits. Digits coming from
         # float inaccuracy must be removed.
-        if isinstance(expression, Col):
+        if (
+            isinstance(expression, Col)
+            and expression.output_field.decimal_places is not None
+        ):
             quantize_value = decimal.Decimal(1).scaleb(
                 -expression.output_field.decimal_places
             )
