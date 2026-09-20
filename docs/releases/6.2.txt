@@ -314,6 +314,9 @@ Models
 * Unsaved instances with a composite primary key or a ``db_default`` primary
   key no longer compare equal to other instances.
 
+* ``models.E025`` is now raised when a related field accessor overrides a
+  property declared on the same model.
+
 * :class:`django.db.models.GenericIPAddressField` now validates IPv6 input
   strictly when saving and querying. Invalid IPv6 addresses now raise
   ``ValidationError`` instead of being silently accepted, and surrounding
