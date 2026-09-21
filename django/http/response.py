@@ -231,6 +231,7 @@ class HttpResponseBase:
         secure=False,
         httponly=False,
         samesite=None,
+        partitioned=False,
     ):
         """
         Set a cookie.
@@ -283,6 +284,8 @@ class HttpResponseBase:
             if samesite.lower() not in ("lax", "none", "strict"):
                 raise ValueError('samesite must be "lax", "none", or "strict".')
             self.cookies[key]["samesite"] = samesite
+        if partitioned:
+            self.cookies[key]["partitioned"] = True
 
     def setdefault(self, key, value):
         """Set a header unless it has already been set."""
@@ -294,13 +297,18 @@ class HttpResponseBase:
         ).sign(value)
         return self.set_cookie(key, value, **kwargs)
 
-    def delete_cookie(self, key, path="/", domain=None, samesite=None):
+    def delete_cookie(
+        self, key, path="/", domain=None, samesite=None, partitioned=False
+    ):
         # Browsers can ignore the Set-Cookie header if the cookie doesn't use
         # the secure flag and:
         # - the cookie name starts with "__Host-" or "__Secure-", or
-        # - the samesite is "none".
-        secure = key.startswith(("__Secure-", "__Host-")) or (
-            samesite and samesite.lower() == "none"
+        # - the samesite is "none", or
+        # - the cookie is partitioned.
+        secure = (
+            key.startswith(("__Secure-", "__Host-"))
+            or (samesite and samesite.lower() == "none")
+            or partitioned
         )
         self.set_cookie(
             key,
@@ -310,6 +318,7 @@ class HttpResponseBase:
             secure=secure,
             expires="Thu, 01 Jan 1970 00:00:00 GMT",
             samesite=samesite,
+            partitioned=partitioned,
         )
 
     # Common methods used by subclasses

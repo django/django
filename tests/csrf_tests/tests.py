@@ -1150,6 +1150,14 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
             resp = mw(req)
             self.assertEqual(resp.cookies["csrfcookie"]["samesite"], "Strict")
 
+    def test_csrf_cookie_partitioned(self):
+        req = self._get_request()
+        with self.settings(CSRF_COOKIE_NAME="csrfcookie", CSRF_COOKIE_PARTITIONED=True):
+            mw = CsrfViewMiddleware(token_view)
+            mw.process_view(req, token_view, (), {})
+            resp = mw(req)
+            self.assertIs(resp.cookies["csrfcookie"]["partitioned"], True)
+
     def test_bad_csrf_cookie_characters(self):
         """
         If the CSRF cookie has invalid characters in a POST request, the
