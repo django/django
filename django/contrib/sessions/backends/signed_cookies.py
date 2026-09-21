@@ -1,5 +1,18 @@
+import datetime
+import time
+
 from django.contrib.sessions.backends.base import SessionBase
 from django.core import signing
+
+
+class _SessionSigner(signing.TimestampSigner):
+    def unsign_object_with_timestamp(
+        self, signed_obj, serializer=signing.JSONSerializer
+    ):
+        value = super().unsign_object(signed_obj, serializer=serializer)
+        # The signature and timestamp have been validated by unsign_object().
+        timestamp = signed_obj.rsplit(self.sep, 2)[1]
+        return value, signing.b62_decode(timestamp)
 
 
 class SessionStore(SessionBase):
@@ -10,13 +23,24 @@ class SessionStore(SessionBase):
         if signature fails.
         """
         try:
-            return signing.loads(
+            session_data, timestamp = _SessionSigner(
+                salt="django.contrib.sessions.backends.signed_cookies"
+            ).unsign_object_with_timestamp(
                 self.session_key,
                 serializer=self.serializer,
-                # This doesn't handle non-default expiry dates, see #19201
-                max_age=self.get_session_cookie_age(),
-                salt="django.contrib.sessions.backends.signed_cookies",
             )
+            expiry = session_data.get("_session_expiry")
+            if isinstance(expiry, str):
+                expiry = datetime.datetime.fromisoformat(expiry)
+                tz = expiry.tzinfo
+            else:
+                tz = datetime.UTC
+            modification = datetime.datetime.fromtimestamp(timestamp, tz=tz)
+            if self.get_expiry_date(modification=modification, expiry=expiry) <= (
+                datetime.datetime.fromtimestamp(time.time(), tz=tz)
+            ):
+                raise signing.SignatureExpired
+            return session_data
         except Exception:
             # BadSignature, ValueError, or unpickling exceptions. If any of
             # these happen, reset the session.
