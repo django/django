@@ -1614,11 +1614,13 @@ class PermissionRenameOperationsTests(TransactionTestCase):
         self.stdout = StringIO()
         self.addCleanup(self.stdout.close)
 
-    def test_permission_rename(self):
+    def test_permission_rename_chain(self):
         # Create initial content type and permissions for OldModel.
         call_command("migrate", "auth_tests", "0001", verbosity=0)
-        # Apply the migration that renames OldModel to NewModel.
-        call_command("migrate", "auth_tests", "0002", verbosity=0)
+        content_type = ContentType.objects.get(app_label="auth_tests", model="oldmodel")
+        # Rename OldModel to NewModel in 0002, then NewModel to
+        # IntermediateModel to AnotherModel within 0003.
+        call_command("migrate", "auth_tests", "0003", verbosity=0)
 
         actions = ContentType._meta.default_permissions
 
@@ -1626,11 +1628,21 @@ class PermissionRenameOperationsTests(TransactionTestCase):
             self.assertFalse(
                 Permission.objects.filter(codename=f"{action}_oldmodel").exists()
             )
-            self.assertTrue(
+            self.assertFalse(
                 Permission.objects.filter(codename=f"{action}_newmodel").exists()
             )
+            self.assertFalse(
+                Permission.objects.filter(
+                    codename=f"{action}_intermediatemodel"
+                ).exists()
+            )
+            self.assertTrue(
+                Permission.objects.filter(
+                    content_type=content_type, codename=f"{action}_anothermodel"
+                ).exists()
+            )
 
-        # Unapply that migration, renaming NewModel back to OldModel.
+        # Unapply migrations back to 0001.
         call_command(
             "migrate",
             "auth_tests",
@@ -1642,10 +1654,20 @@ class PermissionRenameOperationsTests(TransactionTestCase):
 
         for action in actions:
             self.assertTrue(
-                Permission.objects.filter(codename=f"{action}_oldmodel").exists()
+                Permission.objects.filter(
+                    content_type=content_type, codename=f"{action}_oldmodel"
+                ).exists()
             )
             self.assertFalse(
                 Permission.objects.filter(codename=f"{action}_newmodel").exists()
+            )
+            self.assertFalse(
+                Permission.objects.filter(
+                    codename=f"{action}_intermediatemodel"
+                ).exists()
+            )
+            self.assertFalse(
+                Permission.objects.filter(codename=f"{action}_anothermodel").exists()
             )
 
         call_command(
@@ -1655,6 +1677,55 @@ class PermissionRenameOperationsTests(TransactionTestCase):
             database="default",
             interactive=False,
             verbosity=0,
+        )
+
+    def test_permission_rename_duplicate_codename_across_content_types(self):
+        # Create initial content type and permissions for OldModel.
+        call_command("migrate", "auth_tests", "0001", verbosity=0)
+        other_ct = ContentType.objects.create(
+            app_label="auth_tests", model="othermodel"
+        )
+        Permission.objects.create(
+            name="Can add oldmodel", codename="add_oldmodel", content_type=other_ct
+        )
+        # Apply migrations that rename OldModel to NewModel to AnotherModel.
+        call_command("migrate", "auth_tests", "0003", verbosity=0)
+
+        # Nothing about "othermodel"'s add_oldmodel permission has changed.
+        self.assertEqual(
+            Permission.objects.get(
+                content_type=other_ct, codename="add_oldmodel"
+            ).content_type.model,
+            "othermodel",
+        )
+        # The rename took effect.
+        self.assertEqual(
+            Permission.objects.get(codename="add_anothermodel").content_type.model,
+            "anothermodel",
+        )
+
+        call_command(
+            "migrate",
+            "auth_tests",
+            "zero",
+            database="default",
+            interactive=False,
+            verbosity=0,
+        )
+
+    def test_permission_rename_chain_to_zero_uninterrupted(self):
+        call_command("migrate", "auth_tests", "0003", verbosity=0)
+        call_command(
+            "migrate",
+            "auth_tests",
+            "zero",
+            database="default",
+            interactive=False,
+            verbosity=0,
+        )
+
+        self.assertEqual(
+            Permission.objects.get(codename="add_oldmodel").name, "Can add OldModel"
         )
 
     @mock.patch(
