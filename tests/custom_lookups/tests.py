@@ -34,11 +34,11 @@ class Div3Transform(models.Transform):
     lookup_name = "div3"
 
     def as_sql(self, compiler, connection):
-        lhs, lhs_params = compiler.compile(self.lhs)
+        lhs, lhs_params = self.process_lhs(compiler, connection)
         return "(%s) %%%% 3" % lhs, lhs_params
 
     def as_oracle(self, compiler, connection, **extra_context):
-        lhs, lhs_params = compiler.compile(self.lhs)
+        lhs, lhs_params = self.process_lhs(compiler, connection)
         return "mod(%s, 3)" % lhs, lhs_params
 
 
@@ -51,7 +51,7 @@ class Mult3BilateralTransform(models.Transform):
     lookup_name = "mult3"
 
     def as_sql(self, compiler, connection):
-        lhs, lhs_params = compiler.compile(self.lhs)
+        lhs, lhs_params = self.process_lhs(compiler, connection)
         return "3 * (%s)" % lhs, lhs_params
 
 
@@ -59,7 +59,7 @@ class LastDigitTransform(models.Transform):
     lookup_name = "lastdigit"
 
     def as_sql(self, compiler, connection):
-        lhs, lhs_params = compiler.compile(self.lhs)
+        lhs, lhs_params = self.process_lhs(compiler, connection)
         return "SUBSTR(CAST(%s AS CHAR(2)), 2, 1)" % lhs, lhs_params
 
 
@@ -68,7 +68,7 @@ class UpperBilateralTransform(models.Transform):
     lookup_name = "upper"
 
     def as_sql(self, compiler, connection):
-        lhs, lhs_params = compiler.compile(self.lhs)
+        lhs, lhs_params = self.process_lhs(compiler, connection)
         return "UPPER(%s)" % lhs, lhs_params
 
 
@@ -77,7 +77,7 @@ class YearTransform(models.Transform):
     lookup_name = "testyear"
 
     def as_sql(self, compiler, connection):
-        lhs_sql, params = compiler.compile(self.lhs)
+        lhs_sql, params = self.process_lhs(compiler, connection)
         return connection.ops.date_extract_sql("year", lhs_sql, params)
 
     @property
@@ -219,7 +219,7 @@ class DateTimeTransform(models.Transform):
         return models.DateTimeField()
 
     def as_sql(self, compiler, connection):
-        lhs, params = compiler.compile(self.lhs)
+        lhs, params = self.process_lhs(compiler, connection)
         return "from_unixtime({})".format(lhs), params
 
 
@@ -618,7 +618,7 @@ class TrackCallsYearTransform(YearTransform):
     call_order = []
 
     def as_sql(self, compiler, connection):
-        lhs_sql, params = compiler.compile(self.lhs)
+        lhs_sql, params = self.process_lhs(compiler, connection)
         return connection.ops.date_extract_sql("year", lhs_sql), params
 
     @property
