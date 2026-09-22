@@ -49,7 +49,7 @@ from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.warnings import django_file_prefixes
 
-_SEP_UNSAFE = _lazy_re_compile(r"^[A-z0-9-_=]*$")
+_SEP_UNSAFE = _lazy_re_compile(r"^[A-Za-z0-9-_=]*$")
 BASE62_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
 
