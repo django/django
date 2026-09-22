@@ -31,5 +31,10 @@ Bugfixes
   loaded by ``select_related()``, causing unnecessary queries
   (:ticket:`37344`).
 
+* Fixed a bug in Django 6.1 where permissions were not renamed for chained
+  :class:`~django.db.migrations.operations.RenameModel` operations, and where
+  permissions with matching codenames on other models in the same app were
+  also renamed (:ticket:`37361`).
+
 * Fixed a visual regression in Django 6.1 where an extra empty breadcrumb was
   rendered on the admindocs model index page (:ticket:`37378`).
