@@ -162,6 +162,12 @@ def rename_permissions_after_model_rename(
     if not renames:
         return
 
+    all_perms = list(
+        Permission.objects.using(db).filter(content_type__app_label=app_label)
+    )
+    perm_objects = {p.pk: p for p in all_perms}
+    codename_to_pk = {p.codename: p.pk for p in all_perms}
+
     planned = []
     conflicts = []
 
@@ -170,34 +176,27 @@ def rename_permissions_after_model_rename(
         new_suffix = f"_{new_name.lower()}"
 
         actions, verbose_name_raw = _get_permission_metadata(apps, app_label, new_name)
-        perms = Permission.objects.using(db).filter(
-            content_type__app_label=app_label,
-            codename__in=[f"{action}{old_suffix}" for action in actions],
-        )
 
-        for perm in perms:
-            for action in actions:
-                if not perm.codename.startswith(action + "_"):
-                    continue
+        for action in actions:
+            old_codename = f"{action}{old_suffix}"
+            new_codename = f"{action}{new_suffix}"
 
-                old_codename = perm.codename
-                new_codename = f"{action}{new_suffix}"
-                new_name_str = f"Can {action} {verbose_name_raw}"
+            if old_codename not in codename_to_pk:
+                continue
 
-                planned.append((perm, old_codename, new_codename, new_name_str))
+            pk = codename_to_pk[old_codename]
+            perm = perm_objects[pk]
 
-    existing = {
-        p.codename
-        for p in Permission.objects.using(db).filter(
-            content_type__app_label=app_label,
-            codename__in=[new for _, _, new, _ in planned],
-        )
-    }
+            target_pk = codename_to_pk.get(new_codename)
+            if target_pk is not None and target_pk != pk:
+                conflicts.append((pk, old_codename, new_codename))
+                continue
 
-    # Look for conflicts
-    for perm, old, new, _ in planned:
-        if new in existing and perm.codename != new:
-            conflicts.append((perm.pk, old, new))
+            new_name_str = f"Can {action} {verbose_name_raw}"
+            planned.append((perm, old_codename, new_codename, new_name_str))
+
+            del codename_to_pk[old_codename]
+            codename_to_pk[new_codename] = pk
 
     # Raise error if conflicts found
     if conflicts:

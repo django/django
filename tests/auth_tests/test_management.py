@@ -1657,6 +1657,55 @@ class PermissionRenameOperationsTests(TransactionTestCase):
             verbosity=0,
         )
 
+    def test_permission_rename_chain(self):
+        # Create initial content type and permissions for OldModel.
+        call_command("migrate", "auth_tests", "0001", verbosity=0)
+        # Apply migrations that rename OldModel to NewModel to AnotherModel.
+        call_command("migrate", "auth_tests", "0003", verbosity=0)
+
+        actions = ContentType._meta.default_permissions
+
+        for action in actions:
+            self.assertFalse(
+                Permission.objects.filter(codename=f"{action}_oldmodel").exists()
+            )
+            self.assertFalse(
+                Permission.objects.filter(codename=f"{action}_newmodel").exists()
+            )
+            self.assertTrue(
+                Permission.objects.filter(codename=f"{action}_anothermodel").exists()
+            )
+
+        # Unapply migrations back to 0001.
+        call_command(
+            "migrate",
+            "auth_tests",
+            "0001",
+            database="default",
+            interactive=False,
+            verbosity=0,
+        )
+
+        for action in actions:
+            self.assertTrue(
+                Permission.objects.filter(codename=f"{action}_oldmodel").exists()
+            )
+            self.assertFalse(
+                Permission.objects.filter(codename=f"{action}_newmodel").exists()
+            )
+            self.assertFalse(
+                Permission.objects.filter(codename=f"{action}_anothermodel").exists()
+            )
+
+        call_command(
+            "migrate",
+            "auth_tests",
+            "zero",
+            database="default",
+            interactive=False,
+            verbosity=0,
+        )
+
     @mock.patch(
         "django.db.router.allow_migrate_model",
         return_value=False,
