@@ -129,7 +129,7 @@ def register(*models, site=None):
 
 
 def register_view(page_class=None, *, site=None):
-    """Register an AdminPage on the default or supplied admin site."""
+    """Register an AdminView on the default or supplied admin site."""
     from django.contrib.admin.sites import AdminSite
     from django.contrib.admin.sites import site as default_site
 

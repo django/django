@@ -8,9 +8,10 @@ from django.contrib.auth.management import create_permissions
 from django.contrib.auth.models import Group, Permission, User
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
+from django.db.migrations.state import ProjectState
 from django.http import HttpResponse
 from django.test import Client, SimpleTestCase, TestCase, override_settings
-from django.urls import path, reverse
+from django.urls import path, resolve, reverse
 from django.utils.module_loading import autodiscover_modules
 
 from .models import Article
@@ -20,14 +21,14 @@ other_site = admin.AdminSite(name="other_pages")
 
 
 @admin.register_view(site=site)
-class ReportsPage(admin.AdminPage):
+class ReportsPage(admin.AdminView):
     title = "Reports"
     path = "/reports/"
     url_name = "admin:reports"
 
 
 @admin.register_view(site=site)
-class PublicPage(admin.AdminPage):
+class PublicPage(admin.AdminView):
     title = "Overview"
     path = "overview/"
     url_name = "overview"
@@ -39,6 +40,42 @@ class PublicPage(admin.AdminPage):
         if request.method == "POST":
             return HttpResponse("Saved")
         return super().view(request)
+
+
+class ContextModelAdmin(admin.ModelAdmin):
+    def get_context_data(self, request, **kwargs):
+        return super().get_context_data(request, source="shared context", **kwargs)
+
+
+site.register(Article, ContextModelAdmin)
+
+
+@admin.register_view(site=site)
+class StandalonePage(admin.AdminSitePage):
+    def get_admin_page_meta(self):
+        return admin.AdminSitePageMeta(
+            app_label="admin_views",
+            title="Standalone",
+            path="standalone/",
+            url_name="standalone",
+            model_name="standalonepage",
+        )
+
+    def get_urls(self):
+        return [path("standalone/", self._wrap_view(self.view), name="standalone")]
+
+    def get_navigation_item(self, request):
+        if not self.has_permission(request):
+            return None
+        return {
+            "name": "Standalone",
+            "object_name": "standalone",
+            "admin_url": reverse("admin:standalone", current_app=self.admin_site.name),
+            "view_only": True,
+        }
+
+    def view(self, request):
+        return HttpResponse(self.get_context_data(request)["title"])
 
 
 other_site.register_view(ReportsPage)
@@ -63,11 +100,31 @@ class RegistrationTests(SimpleTestCase):
         with self.assertRaises(ValueError):
             local_site.register_view(object)
 
-    def test_decorator(self):
-        try:
-            self.assertIs(admin.register_view(ReportsPage), ReportsPage)
-        finally:
-            admin.site.unregister_view(ReportsPage)
+    def test_decorator_uses_default_site_without_site_argument(self):
+        @admin.register_view
+        class DefaultSiteView(admin.AdminView):
+            title = "Default site"
+            path = "default-site/"
+
+        self.addCleanup(admin.site.unregister_view, DefaultSiteView)
+        view = admin.site._page_registry[DefaultSiteView]
+        self.assertIsInstance(view, DefaultSiteView)
+        self.assertIs(view.admin_site, admin.site._wrapped)
+        self.assertNotIn(DefaultSiteView, site._page_registry)
+        self.assertNotIn(DefaultSiteView, other_site._page_registry)
+
+    def test_decorator_with_parentheses_uses_default_site(self):
+        @admin.register_view()
+        class DefaultSiteView(admin.AdminView):
+            title = "Default site"
+            path = "default-site/"
+
+        self.addCleanup(admin.site.unregister_view, DefaultSiteView)
+        view = admin.site._page_registry[DefaultSiteView]
+        self.assertIsInstance(view, DefaultSiteView)
+        self.assertIs(view.admin_site, admin.site._wrapped)
+        self.assertNotIn(DefaultSiteView, site._page_registry)
+        self.assertNotIn(DefaultSiteView, other_site._page_registry)
 
     def test_default_site(self):
         self.assertIs(ReportsPage().admin_site, admin.site)
@@ -134,6 +191,12 @@ class RegistrationTests(SimpleTestCase):
                 page = type("InvalidPage", (ReportsPage,), options)
                 with self.assertRaises(ImproperlyConfigured):
                     admin.AdminSite().register_view(page)
+
+    def test_class_name_fits_content_type(self):
+        view = type("V" * 89, (ReportsPage,), {})
+        msg = "AdminView class names must be at most 88 characters."
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            admin.AdminSite().register_view(view)
 
     def test_model_url_conflicts(self):
         for options in ({"path": "article/"}, {"url_name": "index"}):
@@ -271,6 +334,43 @@ class PageTests(TestCase):
         self.staff.save()
         self.assertEqual(self.client.get(reverse("pages:reports")).status_code, 200)
 
+    def test_declarative_view_uses_shared_protection(self):
+        url = reverse("pages:reports")
+        self.assertEqual(self.client.get(url).status_code, 403)
+        self.staff.user_permissions.add(self.permission)
+        response = self.client.get(url)
+        self.assertContains(response, "Reports")
+        self.assertEqual(response.wsgi_request.current_app, "pages")
+        self.assertIn("no-store", response.headers["Cache-Control"])
+        self.assertIs(
+            resolve(url).func.admin_site_page, site._page_registry[ReportsPage]
+        )
+        self.client.logout()
+        self.assertRedirects(
+            self.client.get(url), reverse("pages:login") + "?next=" + url
+        )
+
+    def test_site_uses_base_interface(self):
+        self.assertContains(self.client.get(reverse("pages:standalone")), "Standalone")
+        self.assertContains(self.client.get(reverse("pages:index")), "standalone/")
+        self.assertIn(site.get_model_admin(Article), site.get_registered_pages())
+        self.assertIn(site._page_registry[StandalonePage], site.get_registered_pages())
+
+    def test_model_context_and_callback_compatibility(self):
+        self.staff.user_permissions.add(
+            Permission.objects.get(
+                content_type__app_label="admin_views", codename="view_article"
+            )
+        )
+        url = reverse("pages:admin_views_article_changelist")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["source"], "shared context")
+        self.assertEqual(response.context["app_url"], "/admin/admin_views/")
+        model_admin = site.get_model_admin(Article)
+        self.assertIs(resolve(url).func.model_admin, model_admin)
+        self.assertIs(response.context["page"], model_admin)
+
     def test_custom_template_and_context(self):
         templates = [
             {
@@ -328,13 +428,17 @@ class PageTests(TestCase):
         self.assertIsNone(apps.get_app_config("messages").models_module)
         local_site = admin.AdminSite()
 
-        class MessageReport(admin.AdminPage):
+        class MessageReport(admin.AdminView):
             app_label = "messages"
             title = "Message report"
             path = "report/"
 
         local_site.register_view(MessageReport)
-        create_permissions(apps.get_app_config("admin"), verbosity=0)
+        migration_apps = ProjectState.from_apps(apps).apps
+        self.assertNotIn("messages", migration_apps.app_configs)
+        create_permissions(
+            apps.get_app_config("admin"), apps=migration_apps, verbosity=0
+        )
         self.assertEqual(
             list(
                 Permission.objects.filter(
