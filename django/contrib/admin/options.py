@@ -42,6 +42,7 @@ from django.core.exceptions import (
     BadRequest,
     FieldDoesNotExist,
     FieldError,
+    ImproperlyConfigured,
     PermissionDenied,
     ValidationError,
 )
@@ -175,6 +176,138 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
 }
 
 csrf_protect_m = method_decorator(csrf_protect)
+
+
+@dataclass(frozen=True)
+class AdminPageMeta:
+    app_label: str
+    title: str
+    path: str
+    url_name: str
+    model_name: str
+    default_permissions: tuple = ("view",)
+    permissions: tuple = ()
+
+    @property
+    def verbose_name_raw(self):
+        return self.title
+
+
+class AdminPage:
+    """A model-free counterpart to BaseModelAdmin, registered with an AdminSite."""
+
+    app_label = None
+    title = None
+    path = None
+    url_name = None
+    required_permissions = ()
+    template_name = "admin/page.html"
+
+    def __init__(self, site=None):
+        from django.contrib.admin.sites import AdminSite
+        from django.contrib.admin.sites import site as default_site
+
+        self.admin_site = site or default_site
+        if not isinstance(self.admin_site, AdminSite):
+            raise ValueError("site must subclass AdminSite")
+        app_config = apps.get_containing_app_config(self.__module__)
+        app_label = self.app_label or (app_config.label if app_config else None)
+        try:
+            apps.get_app_config(app_label)
+        except LookupError as exc:
+            raise ImproperlyConfigured(
+                "AdminPage.app_label must identify an installed application."
+            ) from exc
+        if not self.title or not isinstance(self.path, str) or not self.path.strip("/"):
+            raise ImproperlyConfigured(
+                "AdminPage requires a title and a nonempty path."
+            )
+        route = self.path.lstrip("/")
+        if any(char in route for char in "<>?#") or any(
+            part in {".", "..", ""} for part in route.rstrip("/").split("/")
+        ):
+            raise ImproperlyConfigured("AdminPage.path must be a static URL path.")
+        name = self.url_name or f"{app_label}_{self.__class__.__name__.lower()}"
+        if not isinstance(name, str):
+            raise ImproperlyConfigured("AdminPage.url_name must be a string.")
+        name = name.removeprefix("admin:")
+        if not name or ":" in name:
+            raise ImproperlyConfigured(
+                "AdminPage.url_name must be an unqualified name."
+            )
+        permissions = self.required_permissions or ()
+        if not isinstance(permissions, (list, tuple)) or any(
+            not isinstance(perm, str) or "." not in perm or not all(perm.split(".", 1))
+            for perm in permissions
+        ):
+            raise ImproperlyConfigured(
+                "AdminPage.required_permissions must contain 'app_label.codename' strings."
+            )
+        for perm in permissions:
+            label, codename = perm.split(".", 1)
+            if len(codename) > 100:
+                raise ImproperlyConfigured(
+                    "AdminPage permission codenames must be at most 100 characters."
+                )
+            try:
+                apps.get_app_config(label)
+            except LookupError as exc:
+                raise ImproperlyConfigured(
+                    "AdminPage permissions must belong to installed applications."
+                ) from exc
+        model_name = self.__class__.__name__.lower()
+        if len(model_name) > 95:
+            raise ImproperlyConfigured(
+                "AdminPage class names must be at most 95 characters."
+            )
+        if any(
+            model._meta.model_name == model_name
+            for model in apps.get_app_config(app_label).get_models()
+        ):
+            raise ImproperlyConfigured(
+                "AdminPage class names must not conflict with model names."
+            )
+        self._meta = AdminPageMeta(app_label, self.title, route, name, model_name)
+
+    def get_admin_page_meta(self):
+        return self._meta
+
+    def has_permission(self, request):
+        opts = self.get_admin_page_meta()
+        codename = get_permission_codename("view", opts)
+        return (
+            self.admin_site.has_permission(request)
+            and request.user.has_perm(f"{opts.app_label}.{codename}")
+            and request.user.has_perms(self.required_permissions or ())
+        )
+
+    def get_context_data(self, request, **kwargs):
+        meta = self.get_admin_page_meta()
+        return {
+            **self.admin_site.each_context(request),
+            "title": meta.title,
+            "subtitle": None,
+            "page": self,
+            "app_label": meta.app_label,
+            "app_name": apps.get_app_config(meta.app_label).verbose_name,
+            "app_url": reverse(
+                "admin:app_list",
+                kwargs={"app_label": meta.app_label},
+                current_app=self.admin_site.name,
+            ),
+            **kwargs,
+        }
+
+    def view(self, request):
+        return TemplateResponse(
+            request, self.template_name, self.get_context_data(request)
+        )
+
+    def _view(self, request):
+        if not self.has_permission(request):
+            raise PermissionDenied
+        request.current_app = self.admin_site.name
+        return self.view(request)
 
 
 class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
@@ -741,6 +874,17 @@ class ModelAdmin(BaseModelAdmin):
         self.opts = model._meta
         self.admin_site = admin_site
         super().__init__()
+
+    def get_admin_page_meta(self):
+        return AdminPageMeta(
+            app_label=self.opts.app_label,
+            title=capfirst(self.opts.verbose_name_plural),
+            path=f"{self.opts.model_name}/",
+            url_name=f"{self.opts.app_label}_{self.opts.model_name}_changelist",
+            model_name=self.opts.model_name,
+            default_permissions=self.opts.default_permissions,
+            permissions=self.opts.permissions,
+        )
 
     def __str__(self):
         return "%s.%s" % (self.opts.app_label, self.__class__.__name__)

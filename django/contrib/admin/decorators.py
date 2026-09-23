@@ -126,3 +126,18 @@ def register(*models, site=None):
         return admin_class
 
     return _model_admin_wrapper
+
+
+def register_view(page_class=None, *, site=None):
+    """Register an AdminPage on the default or supplied admin site."""
+    from django.contrib.admin.sites import AdminSite
+    from django.contrib.admin.sites import site as default_site
+
+    def decorator(cls):
+        admin_site = site or default_site
+        if not isinstance(admin_site, AdminSite):
+            raise ValueError("site must subclass AdminSite")
+        admin_site.register_view(cls)
+        return cls
+
+    return decorator if page_class is None else decorator(page_class)

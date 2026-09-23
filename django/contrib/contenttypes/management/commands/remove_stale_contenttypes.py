@@ -44,6 +44,12 @@ class Command(BaseCommand):
             return
         ContentType.objects.clear_cache()
 
+        page_content_types = set()
+        if apps.is_installed("django.contrib.admin"):
+            from django.contrib.admin.management import get_page_permission_options
+
+            page_content_types = set(get_page_permission_options())
+
         apps_content_types = itertools.groupby(
             ContentType.objects.using(db).order_by("app_label", "model"),
             lambda obj: obj.app_label,
@@ -51,7 +57,12 @@ class Command(BaseCommand):
         for app_label, content_types in apps_content_types:
             if not include_stale_apps and app_label not in apps.app_configs:
                 continue
-            to_remove = [ct for ct in content_types if ct.model_class() is None]
+            to_remove = [
+                ct
+                for ct in content_types
+                if ct.model_class() is None
+                and (app_label, ct.model) not in page_content_types
+            ]
             # Confirm that the content type is stale before deletion.
             using = router.db_for_write(ContentType)
             if to_remove:

@@ -5,7 +5,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.admin import ModelAdmin, actions
 from django.contrib.admin.exceptions import AlreadyRegistered, NotRegistered
-from django.contrib.admin.options import EMPTY_VALUE_STRING
+from django.contrib.admin.options import EMPTY_VALUE_STRING, AdminPage
 from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_not_required
@@ -17,7 +17,6 @@ from django.urls import NoReverseMatch, Resolver404, resolve, reverse, reverse_l
 from django.utils.decorators import method_decorator
 from django.utils.functional import LazyObject
 from django.utils.module_loading import import_string
-from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy
 from django.views.decorators.cache import never_cache
@@ -66,6 +65,7 @@ class AdminSite:
 
     def __init__(self, name="admin"):
         self._registry = {}  # model_class class -> admin_class instance
+        self._page_registry = {}
         self.name = name
         self._actions = {"delete_selected": actions.delete_selected}
         self._global_actions = self._actions.copy()
@@ -147,6 +147,32 @@ class AdminSite:
 
                 # Instantiate the admin class to save in the registry
                 self._registry[model] = admin_class(model, self)
+
+    def register_view(self, page_class):
+        """Register an AdminPage subclass without instantiating a model."""
+        if not isinstance(page_class, type) or not issubclass(page_class, AdminPage):
+            raise ValueError("page_class must subclass AdminPage.")
+        if page_class in self._page_registry:
+            raise AlreadyRegistered(
+                f"The page {page_class.__name__} is already registered."
+            )
+        page = page_class(self)
+        meta = page.get_admin_page_meta()
+        for registered in self._page_registry.values():
+            other = registered.get_admin_page_meta()
+            if meta.url_name == other.url_name or (
+                meta.app_label == other.app_label and meta.path == other.path
+            ):
+                raise AlreadyRegistered(
+                    "An admin page with this URL is already registered."
+                )
+        self._page_registry[page_class] = page
+
+    def unregister_view(self, page_class):
+        try:
+            del self._page_registry[page_class]
+        except KeyError:
+            raise NotRegistered(f"The page {page_class.__name__} is not registered.")
 
     def unregister(self, model_or_iterable):
         """
@@ -294,6 +320,37 @@ class AdminSite:
         # Add in each model's views, and create a list of valid URLS for the
         # app_index
         valid_app_labels = []
+        for page in self._page_registry.values():
+            meta = page.get_admin_page_meta()
+            route = f"{meta.app_label}/{meta.path}"
+            reserved_names = {pattern.name for pattern in urlpatterns}
+            model_prefixes = {
+                f"{model._meta.app_label}/{model._meta.model_name}/"
+                for model in self._registry
+            }
+            model_names = {
+                f"{model._meta.app_label}_{model._meta.model_name}_{suffix}"
+                for model in self._registry
+                for suffix in ("changelist", "add", "history", "delete", "change")
+            }
+            if (
+                meta.url_name in reserved_names | model_names | {"app_list"}
+                or any(pattern.pattern.match(route) for pattern in urlpatterns)
+                or any(route.startswith(prefix) for prefix in model_prefixes)
+            ):
+                raise ImproperlyConfigured(
+                    f"Admin page {meta.url_name!r} conflicts with an existing admin URL."
+                )
+            urlpatterns.append(
+                path(
+                    f"{meta.app_label}/{meta.path}",
+                    wrap(page._view),
+                    name=meta.url_name,
+                )
+            )
+            if meta.app_label not in valid_app_labels:
+                valid_app_labels.append(meta.app_label)
+
         for model, model_admin in self._registry.items():
             urlpatterns += [
                 path(
@@ -510,10 +567,11 @@ class AdminSite:
             if True not in perms.values():
                 continue
 
+            meta = model_admin.get_admin_page_meta()
             info = (app_label, model._meta.model_name)
             model_dict = {
                 "model": model,
-                "name": capfirst(model._meta.verbose_name_plural),
+                "name": meta.title,
                 "object_name": model._meta.object_name,
                 "perms": perms,
                 "admin_url": None,
@@ -523,7 +581,7 @@ class AdminSite:
                 model_dict["view_only"] = not perms.get("change")
                 try:
                     model_dict["admin_url"] = reverse(
-                        "admin:%s_%s_changelist" % info, current_app=self.name
+                        f"admin:{meta.url_name}", current_app=self.name
                     )
                 except NoReverseMatch:
                     pass
@@ -549,6 +607,36 @@ class AdminSite:
                     "has_module_perms": has_module_perms,
                     "models": [model_dict],
                 }
+
+        for page in self._page_registry.values():
+            meta = page.get_admin_page_meta()
+            if (label and label != meta.app_label) or not page.has_permission(request):
+                continue
+            if meta.app_label not in app_dict:
+                app_dict[meta.app_label] = {
+                    "name": apps.get_app_config(meta.app_label).verbose_name,
+                    "app_label": meta.app_label,
+                    "app_url": reverse(
+                        "admin:app_list",
+                        kwargs={"app_label": meta.app_label},
+                        current_app=self.name,
+                    ),
+                    "has_module_perms": True,
+                    "models": [],
+                }
+            app_dict[meta.app_label]["models"].append(
+                {
+                    "name": meta.title,
+                    "object_name": f"page-{meta.url_name}",
+                    "perms": {"view": True},
+                    "admin_url": reverse(
+                        f"admin:{meta.url_name}", current_app=self.name
+                    ),
+                    "add_url": None,
+                    "view_only": True,
+                    "page": page,
+                }
+            )
 
         return app_dict
 

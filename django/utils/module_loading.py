@@ -68,6 +68,11 @@ def autodiscover_modules(*args, **kwargs):
             try:
                 if register_to:
                     before_import_registry = copy.copy(register_to._registry)
+                    before_import_pages = (
+                        copy.copy(register_to._page_registry)
+                        if hasattr(register_to, "_page_registry")
+                        else None
+                    )
 
                 import_module("%s.%s" % (app_config.name, module_to_search))
             except Exception:
@@ -77,6 +82,8 @@ def autodiscover_modules(*args, **kwargs):
                 # exceptions (see #8245).
                 if register_to:
                     register_to._registry = before_import_registry
+                    if before_import_pages is not None:
+                        register_to._page_registry = before_import_pages
 
                 # Decide whether to bubble up this error. If the app just
                 # doesn't have the module in question, we can ignore the error

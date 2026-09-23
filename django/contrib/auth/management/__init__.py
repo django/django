@@ -69,6 +69,7 @@ def create_permissions(
     )
 
     app_label = app_config.label
+    create_admin_pages = app_config.name == "django.contrib.admin"
     try:
         app_config = apps.get_app_config(app_label)
         ContentType = apps.get_model("contenttypes", "ContentType")
@@ -82,21 +83,34 @@ def create_permissions(
         *models, for_concrete_models=False
     )
 
-    # Find all the Permissions that have a content_type for a model we're
-    # looking for. We don't need to check for codenames since we already have
-    # a list of the ones we're going to create.
+    permission_options = [(ctypes[model], model._meta) for model in models]
+    # Collect model-free pages once, when processing the admin application.
+    # This also includes pages in applications without a models module, which
+    # don't receive post_migrate themselves.
+    if create_admin_pages and router.allow_migrate_model(using, ContentType):
+        from django.contrib.admin.management import get_page_permission_options
+
+        for (label, model_name), opts in get_page_permission_options().items():
+            if label not in apps.app_configs:
+                continue
+            ctype, _ = ContentType.objects.using(using).get_or_create(
+                app_label=label, model=model_name
+            )
+            permission_options.append((ctype, opts))
+
+    # Find existing permissions for the model and page content types. We
+    # already have the metadata needed to determine which codenames to create.
     all_perms = set(
         Permission.objects.using(using)
         .filter(
-            content_type__in=set(ctypes.values()),
+            content_type__in={ctype for ctype, opts in permission_options},
         )
         .values_list("content_type", "codename")
     )
 
     perms = []
-    for model in models:
-        ctype = ctypes[model]
-        for codename, name in _get_all_permissions(model._meta):
+    for ctype, opts in permission_options:
+        for codename, name in _get_all_permissions(opts):
             if (ctype.pk, codename) not in all_perms:
                 permission = Permission()
                 permission._state.db = using

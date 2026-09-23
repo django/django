@@ -1,0 +1,12 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+&rsaquo; <a href="{{ app_url }}">{{ app_name }}</a>
+&rsaquo; {{ title }}
+</div>
+{% endblock %}
+
+{% block content %}{% endblock %}
