@@ -1,6 +1,7 @@
 import itertools
 import math
 from collections.abc import Iterator
+from functools import cached_property
 
 from django.core.exceptions import EmptyResultSet, FullResultSet
 from django.db.models.expressions import (
@@ -22,7 +23,6 @@ from django.db.models.fields import (
 )
 from django.db.models.query_utils import RegisterLookupMixin
 from django.utils.datastructures import OrderedSet
-from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 
 

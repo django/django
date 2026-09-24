@@ -1,8 +1,8 @@
 import os
+from functools import cached_property
 from io import BytesIO, StringIO, UnsupportedOperation
 
 from django.core.files.utils import FileProxyMixin
-from django.utils.functional import cached_property
 
 
 class File(FileProxyMixin):

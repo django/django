@@ -479,6 +479,8 @@ compatibility
 
 .. class:: cached_property(func)
 
+    .. deprecated:: 6.1
+
     The ``@cached_property`` decorator caches the result of a method with a
     single ``self`` argument as a property. The cached result will persist
     as long as the instance does, so if the instance is passed around and the

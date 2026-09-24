@@ -101,8 +101,8 @@ of parentheses, but will call callables automatically, hiding the above
 distinction.
 
 Be careful with your own custom properties - it is up to you to implement
-caching when required, for example using the
-:class:`~django.utils.functional.cached_property` decorator.
+caching when required, for example using Python's
+:func:`@cached_property <functools.cached_property>` decorator.
 
 Use the ``with`` template tag
 -----------------------------

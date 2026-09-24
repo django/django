@@ -9,11 +9,11 @@ all about the internals of models in order to get the information it needs.
 
 import copy
 import difflib
-import functools
 import sys
 import warnings
 from collections import Counter, namedtuple
 from collections.abc import Iterable, Iterator, Mapping
+from functools import cached_property, partial
 from itertools import chain, count, product
 from string import ascii_uppercase
 
@@ -44,7 +44,6 @@ from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
 from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
 from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
 from django.utils.deprecation import RemovedInDjango2028Warning
-from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.tree import Node
 from django.utils.warnings import django_file_prefixes
@@ -1977,7 +1976,7 @@ class Query(BaseExpression):
                     else:
                         raise
 
-            final_transformer = functools.partial(
+            final_transformer = partial(
                 transform, name=name, previous=final_transformer
             )
             final_transformer.has_transforms = True

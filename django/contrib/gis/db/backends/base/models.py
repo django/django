@@ -1,5 +1,6 @@
+from functools import cached_property
+
 from django.contrib.gis import gdal
-from django.utils.functional import cached_property
 
 
 class SpatialRefSysMixin:

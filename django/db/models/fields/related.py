@@ -1,6 +1,6 @@
 import functools
 import inspect
-from functools import partial
+from functools import cached_property, partial
 
 from django import forms
 from django.apps import apps
@@ -22,7 +22,6 @@ from django.db.models.deletion import (
 )
 from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
-from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from . import Field
