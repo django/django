@@ -19,6 +19,7 @@ from .models import (
     Person,
     Profile,
     Publisher,
+    Restaurant,
     Tag,
     Thing,
 )
@@ -603,6 +604,73 @@ class UpdateOrCreateTests(TestCase):
                 self.assertIn(connection.ops.quote_name("updated"), update_sql)
                 # Name should not be updated.
                 self.assertNotIn(connection.ops.quote_name("name"), update_sql)
+
+    def test_mti_update_or_create_pre_save_child_fields_only(self):
+        """
+        When updating only child model fields, only the child model's
+        pre_save fields (e.g. auto_now) should be included in update_fields.
+        Parent pre_save fields should not be updated (#35890).
+        """
+        restaurant = Restaurant.objects.create(location_street="Main St", menu="Lunch")
+        original_location_updated_at = restaurant.location_updated_at
+        restaurant, created = Restaurant.objects.update_or_create(
+            pk=restaurant.pk,
+            defaults={"menu": "Dinner"},
+        )
+        self.assertIs(created, False)
+        self.assertEqual(restaurant.menu, "Dinner")
+        # Child auto_now should update.
+        self.assertGreater(
+            restaurant.restaurant_updated_at, original_location_updated_at
+        )
+        restaurant.refresh_from_db()
+        # Parent auto_now should NOT update since no parent fields were
+        # in defaults.
+        self.assertEqual(restaurant.location_updated_at, original_location_updated_at)
+
+    def test_mti_update_or_create_pre_save_parent_fields_only(self):
+        """
+        When updating only parent model fields, only the parent model's
+        pre_save fields should be included (#35890).
+        """
+        restaurant = Restaurant.objects.create(location_street="Main St", menu="Lunch")
+        original_restaurant_updated_at = restaurant.restaurant_updated_at
+        restaurant, created = Restaurant.objects.update_or_create(
+            pk=restaurant.pk,
+            defaults={"location_street": "Oak Ave"},
+        )
+        self.assertIs(created, False)
+        self.assertEqual(restaurant.location_street, "Oak Ave")
+        restaurant.refresh_from_db()
+        # Parent auto_now should update.
+        self.assertGreater(
+            restaurant.location_updated_at, original_restaurant_updated_at
+        )
+        # Child auto_now should NOT update since no child fields were
+        # in defaults.
+        self.assertEqual(
+            restaurant.restaurant_updated_at, original_restaurant_updated_at
+        )
+
+    def test_mti_update_or_create_pre_save_both_models(self):
+        """
+        When updating fields from both parent and child models, pre_save
+        fields from both should be included (#35890).
+        """
+        restaurant = Restaurant.objects.create(location_street="Main St", menu="Lunch")
+        original_location_updated_at = restaurant.location_updated_at
+        original_restaurant_updated_at = restaurant.restaurant_updated_at
+        restaurant, created = Restaurant.objects.update_or_create(
+            pk=restaurant.pk,
+            defaults={"location_street": "Oak Ave", "menu": "Dinner"},
+        )
+        self.assertIs(created, False)
+        restaurant.refresh_from_db()
+        # Both auto_now fields should update.
+        self.assertGreater(restaurant.location_updated_at, original_location_updated_at)
+        self.assertGreater(
+            restaurant.restaurant_updated_at, original_restaurant_updated_at
+        )
 
 
 class UpdateOrCreateTestsWithManualPKs(TestCase):
