@@ -11,6 +11,7 @@ from unittest import mock
 from django.core.exceptions import ImproperlyConfigured
 from django.db import (
     DEFAULT_DB_ALIAS,
+    InterfaceError,
     NotSupportedError,
     connection,
     connections,
@@ -143,6 +144,49 @@ class Tests(TestCase):
                 self.assertEqual(value, 2000)
         finally:
             connections["default"]._close()
+
+    def test_nested_path_name(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            settings_dict = {
+                "default": {
+                    "ENGINE": "django.db.backends.sqlite3",
+                    "NAME": Path(tmp) / "subdir" / "test.db",
+                },
+            }
+            connections = ConnectionHandler(settings_dict)
+            connections["default"].ensure_connection()
+            connections["default"].close()
+            self.assertTrue(os.path.isfile(os.path.join(tmp, "subdir", "test.db")))
+
+    def test_nested_str_path_name(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            settings_dict = {
+                "default": {
+                    "ENGINE": "django.db.backends.sqlite3",
+                    "NAME": os.path.join(tmp, "subdir", "test.db"),
+                },
+            }
+            connections = ConnectionHandler(settings_dict)
+            connections["default"].ensure_connection()
+            connections["default"].close()
+            self.assertTrue(os.path.isfile(os.path.join(tmp, "subdir", "test.db")))
+
+    def test_database_name_with_file_parent_not_allowed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            settings_dict = {
+                "default": {
+                    "ENGINE": "django.db.backends.sqlite3",
+                    "NAME": Path(tmp) / "subdir" / "test.db",
+                },
+            }
+            # write a file to the parent path
+            (Path(tmp) / "subdir").write_text("test")
+            connections = ConnectionHandler(settings_dict)
+            with self.assertRaisesMessage(
+                InterfaceError,
+                "SQLite database parent path is a file, expected directory.",
+            ):
+                connections["default"].ensure_connection()
 
 
 @unittest.skipUnless(connection.vendor == "sqlite", "SQLite tests")
