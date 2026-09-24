@@ -36,10 +36,11 @@ from django.test import (
     override_settings,
     skipUnlessDBFeature,
 )
-from django.test.utils import override_script_prefix
+from django.test.utils import ignore_warnings, override_script_prefix
 from django.urls import NoReverseMatch, resolve, reverse
 from django.utils import formats, translation
 from django.utils.cache import get_max_age
+from django.utils.deprecation import RemovedInDjango70Warning
 from django.utils.encoding import iri_to_uri
 from django.utils.html import escape
 from django.utils.http import urlencode
@@ -1180,6 +1181,74 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         # Regression test for #18530
         response = self.client.get(changelist_url, {"pub_date__gte": "foo"})
         self.assertRedirects(response, "%s?e=1" % changelist_url)
+
+        # When 'e=1' is set in query params, IncorrectLookupParameters renders
+        # the admin/invalid_setup.html error page.
+        response = self.client.get(changelist_url, {"notarealfield": "5", "e": "1"})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "admin/invalid_setup.html")
+        self.assertContains(
+            response,
+            "Something went wrong while loading this page. Please check the "
+            "administration configuration for this model.",
+        )
+        self.assertContains(response, "Server error")
+
+    @ignore_warnings(category=RemovedInDjango70Warning)
+    def test_negative_list_per_page_renders_invalid_setup(self):
+        """Negative list_per_page setting redirects to ?e=1, then renders
+        admin/invalid_setup.html.
+        """
+        changelist_url = reverse("admin:admin_views_thing_changelist")
+        from .admin import ThingAdmin
+
+        with mock.patch.object(ThingAdmin, "list_per_page", -1):
+            response = self.client.get(changelist_url)
+            self.assertRedirects(response, "%s?e=1" % changelist_url)
+
+            response = self.client.get(changelist_url, {"e": "1"})
+            self.assertEqual(response.status_code, 200)
+            self.assertTemplateUsed(response, "admin/invalid_setup.html")
+            self.assertContains(
+                response,
+                "Something went wrong while loading this page. Please check the "
+                "administration configuration for this model.",
+            )
+            self.assertContains(response, "Server error")
+
+    def test_bad_default_filter_renders_invalid_setup(self):
+        """FieldListFilter with invalid default parameter redirects to ?e=1,
+        then renders admin/invalid_setup.html.
+        """
+        changelist_url = reverse("admin:admin_views_thing_changelist")
+
+        class DefaultBadFilter(admin.FieldListFilter):
+            def __init__(self, field, request, params, model, model_admin, field_path):
+                super().__init__(
+                    field, request, params, model, model_admin, field_path
+                )
+                self.used_parameters["id__exact"] = "not_an_int"
+
+            def expected_parameters(self):
+                return ["id__exact"]
+
+        from .admin import ThingAdmin
+
+        with mock.patch.object(
+            ThingAdmin, "list_filter", (("id", DefaultBadFilter),)
+        ):
+            response = self.client.get(changelist_url)
+            self.assertRedirects(response, "%s?e=1" % changelist_url)
+
+            response = self.client.get(changelist_url, {"e": "1"})
+            self.assertEqual(response.status_code, 200)
+            self.assertTemplateUsed(response, "admin/invalid_setup.html")
+            self.assertContains(
+                response,
+                "Something went wrong while loading this page. Please check the "
+                "administration configuration for this model.",
+            )
+            self.assertContains(response, "Server error")
 
     def test_isnull_lookups(self):
         """Ensure is_null is handled correctly."""
