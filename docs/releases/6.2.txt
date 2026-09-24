@@ -258,6 +258,9 @@ Utilities
   top-level modules did not work, and submodules only worked if already
   imported.
 
+* The new :func:`django.utils.asyncio.maybe_closing` returns a context manager that
+  calls ``aclose()`` on a caller provided iterator only if it defines one.
+
 * ...
 
 Validators
