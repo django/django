@@ -11,10 +11,14 @@ https://docs.djangoproject.com/en/{{ docs_version }}/ref/settings/
 """
 
 from pathlib import Path
+# import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Directory where custom Django apps live (uncomment sys import and below lines for sub apps dirs)
+# APPS_DIR = BASE_DIR / "apps"
+# sys.path.insert(0, str(APPS_DIR))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/{{ docs_version }}/howto/deployment/checklist/
