@@ -146,6 +146,10 @@ exception is made for ``Count``.
     Max("pk")  # ValueError
     Count("pk")  # OK
 
+Filtering against :class:`~django.db.models.expressions.Window` expressions is
+not implemented on querysets that select a composite primary key with
+``values()`` or ``values_list()``, and raises ``NotImplementedError``.
+
 Composite primary keys in forms
 ===============================
 
