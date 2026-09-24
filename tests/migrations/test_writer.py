@@ -25,7 +25,7 @@ from django.db.migrations.writer import MigrationWriter, OperationWriter
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import extend_sys_path
 from django.utils.deconstruct import deconstructible
-from django.utils.functional import SimpleLazyObject
+from django.utils.functional import SimpleLazyObject, lazy
 from django.utils.timezone import get_default_timezone, get_fixed_timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -110,6 +110,10 @@ def function_with_cache():
 @functools.lru_cache(maxsize=10)
 def function_with_lru_cache():
     pass
+
+
+def get_lazy_data():
+    return (("A", "A value"), ("B", "B value"))
 
 
 class OperationWriterTests(SimpleTestCase):
@@ -365,10 +369,28 @@ class WriterTests(SimpleTestCase):
             ("[list, tuple, dict, set, frozenset]", set()),
         )
 
-    def test_serialize_lazy_objects(self):
+    def test_serialize_simple_lazy_objects(self):
         pattern = re.compile(r"^foo$")
         lazy_pattern = SimpleLazyObject(lambda: pattern)
         self.assertEqual(self.serialize_round_trip(lazy_pattern), pattern)
+
+    def test_serialize_lazy_objects(self):
+        types_to_test = [
+            (tuple, "tuple"),
+            (list, "list"),
+            (dict, "dict"),
+        ]
+
+        for coll_type, type_name in types_to_test:
+            with self.subTest(coll_type=type_name):
+                lazy_obj = lazy(get_lazy_data, coll_type)()
+
+                self.assertSerializedEqual(lazy_obj)
+                string, imports = MigrationWriter.serialize(lazy_obj)
+                self.assertIn(
+                    f"lazy(migrations.test_writer.get_lazy_data, {type_name})", string
+                )
+                self.assertIn("from django.utils.functional import lazy", imports)
 
     def test_serialize_enums(self):
         self.assertSerializedResultEqual(
