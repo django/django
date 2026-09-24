@@ -2,11 +2,17 @@ from playwright_tests import PlaywrightTestCase
 from utils_tests.test_csp import basic_config, basic_policy
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.core.cache import DEFAULT_CACHE_ALIAS, caches
+from django.middleware.csp import ContentSecurityPolicyMiddleware
 from django.test import SimpleTestCase
 from django.test.utils import modify_settings, override_settings
 from django.utils.csp import CSP
 
 from .views import csp_reports
+
+
+class CSPMiddlewareCachingDisabled(ContentSecurityPolicyMiddleware):
+    nonce_cache_control = False
 
 
 @override_settings(
@@ -46,12 +52,46 @@ class CSPMiddlewareTest(SimpleTestCase):
     def test_csp_basic_with_nonce_but_unused(self):
         """
         Test if `request.csp_nonce` is never accessed, it is not added to the
-        header.
+        header, and caching is left untouched.
         """
         response = self.client.get("/csp-base/")
         nonce = response.text
         self.assertIsNotNone(nonce)
         self.assertEqual(response[CSP.HEADER_ENFORCE], basic_policy)
+        self.assertNotIn("Cache-Control", response)
+
+    @override_settings(SECURE_CSP={"default-src": [CSP.SELF, CSP.NONCE]})
+    def test_csp_nonce_overrides_explicit_public_cache_control(self):
+        """A rendered nonce overrides an explicit public Cache-Control."""
+        response = self.client.get("/csp-nonce-public/")
+        self.assertTrue(response.text)
+        self.assertIn("private", response["Cache-Control"])
+        self.assertNotIn("public", response["Cache-Control"])
+
+    @override_settings(
+        MIDDLEWARE=["middleware.test_csp.CSPMiddlewareCachingDisabled"],
+        SECURE_CSP={"default-src": [CSP.SELF, CSP.NONCE]},
+    )
+    def test_csp_nonce_cache_control_can_be_disabled(self):
+        """A project that opts out shouldn't get Cache-Control forced on it."""
+        response = self.client.get("/csp-nonce/")
+        self.assertTrue(response.text)
+        self.assertNotIn("Cache-Control", response)
+
+    @override_settings(
+        MIDDLEWARE=[
+            "django.middleware.cache.UpdateCacheMiddleware",
+            "django.middleware.csp.ContentSecurityPolicyMiddleware",
+            "django.middleware.cache.FetchFromCacheMiddleware",
+        ],
+        SECURE_CSP={"default-src": [CSP.SELF, CSP.NONCE]},
+    )
+    def test_csp_nonce_not_reused_across_cached_responses(self):
+        """A cached response must not replay one visitor's nonce to another."""
+        self.addCleanup(caches[DEFAULT_CACHE_ALIAS].clear)
+        first_nonce = self.client.get("/csp-nonce/").text
+        second_nonce = self.client.get("/csp-nonce/").text
+        self.assertNotEqual(first_nonce, second_nonce)
 
     @override_settings(SECURE_CSP=None, SECURE_CSP_REPORT_ONLY=basic_config)
     def test_csp_report_only_basic(self):
