@@ -93,6 +93,26 @@ jobs:
       - run: npm install
       - run: npm test
 
+  javascript-browser-tests:
+    runs-on: ubuntu-latest
+    name: JavaScript browser tests (Vitest)
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: '**/package.json'
+      - run: npm install
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run test:browser
+
   scripts-tests:
     runs-on: ubuntu-latest
     name: Scripts tests

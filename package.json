@@ -3,16 +3,19 @@
   "private": true,
   "scripts": {
     "test": "grunt test --verbose",
-    "biome": "biome check"
+    "biome": "biome check",
+    "test:browser": "vitest run"
   },
   "engines": {
     "npm": ">=1.3.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.15",
+    "@vitest/browser-playwright": "^5.0.1",
     "grunt": "^1.6.2",
     "grunt-cli": "^1.5.0",
     "grunt-contrib-qunit": "^10.2.0",
-    "qunit": "^2.25.0"
+    "qunit": "^2.25.0",
+    "vitest": "^5.0.1"
   }
 }
