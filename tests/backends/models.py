@@ -170,3 +170,16 @@ class SQLKeywordsModel(models.Model):
 
     class Meta:
         db_table = "order"
+
+
+class DeferrableUnique(models.Model):
+    value = models.CharField(max_length=255)
+
+    class Meta:
+        constraints = (
+            models.UniqueConstraint(
+                name="deferrable_unique_value",
+                fields=("value",),
+                deferrable=models.Deferrable.IMMEDIATE,
+            ),
+        )
