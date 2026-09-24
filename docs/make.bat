@@ -221,7 +221,7 @@ if "%1" == "check" (
 	exit /b
 
 :run_black
-	for /f "usebackq tokens=*" %%i in (`dir *.txt /s /b ^| findstr /v /c:"_build" /c:"_theme"`) do (
+	for /f "usebackq tokens=*" %%i in (`dir *.txt /s /b ^| findstr /v /c:"_build" /c:"_ext" /c:"_static" /c:"_theme" /c:"requirements.txt"`) do (
 		blacken-docs --rst-literal-block %%i
 	)
 	echo.
