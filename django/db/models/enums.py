@@ -40,7 +40,7 @@ class ChoicesType(EnumType):
     @property
     def choices(cls):
         empty = [(None, cls.__empty__)] if hasattr(cls, "__empty__") else []
-        return empty + [(member.value, member.label) for member in cls]
+        return empty + [(member, member.label) for member in cls]
 
     @property
     def labels(cls):
@@ -55,6 +55,9 @@ class Choices(enum.Enum, metaclass=ChoicesType):
     """Class for creating enumerated choices."""
 
     do_not_call_in_templates = enum.nonmember(True)
+
+    def __str__(self):
+        return str(self.value)
 
     @enum_property
     def label(self):
