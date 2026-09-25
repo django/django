@@ -182,6 +182,68 @@ class OperationTests(OperationTestBase):
                 ],
             )
 
+    def test_alter_index_together_preserves_overlapping_indexes(self):
+        """
+        AlterIndexTogether should preserve overlapping indexes when changing
+        from [('a', 'b')] to [('a', 'b'), ('a', 'b', 'c')].
+        Regression test for #36632.
+        """
+        # Create the exact operations sequence from the bug report
+        operations = [
+            migrations.CreateModel(
+                "MyModel",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("a", models.IntegerField()),
+                    ("b", models.IntegerField()),
+                ],
+                options={"index_together": {("a", "b")}},
+            ),
+            migrations.AddField(
+                model_name="MyModel",
+                name="c",
+                field=models.IntegerField(default=0),
+            ),
+            migrations.AlterIndexTogether(
+                name="MyModel",
+                index_together={("a", "b"), ("a", "b", "c")},
+            ),
+        ]
+
+        # Apply operations - if this doesn't raise an exception, bug is fixed
+        project_state = self.apply_operations("testapp", ProjectState(), operations)
+
+        # Basic sanity check
+        self.assertEqual(
+            project_state.models["testapp", "mymodel"].options["index_together"],
+            {("a", "b"), ("a", "b", "c")},
+        )
+
+    def test_model_indexes_sql_includes_historical_index_together(self):
+        """Coverage test for _model_indexes_sql index_together addition."""
+        project_state = ProjectState()
+        project_state.add_model(
+            ModelState(
+                "testapp",
+                "CoverageModel",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("f1", models.IntegerField()),
+                    ("f2", models.IntegerField()),
+                ],
+                {
+                    "index_together": {("f1", "f2")},
+                },
+            )
+        )
+
+        model = project_state.apps.get_model("testapp", "CoverageModel")
+
+        with connection.schema_editor() as editor:
+            result = editor._model_indexes_sql(model)
+
+            self.assertIsInstance(result, list)
+
     def test_create_model_with_unique_after(self):
         """
         Tests the CreateModel operation directly followed by an
