@@ -21,7 +21,14 @@ def _make_books(n, base_date):
 class TestDataMixin:
     @classmethod
     def setUpTestData(cls):
-        cls.artist1 = Artist.objects.create(name="Rene Magritte")
+        cls.artist1 = Artist.objects.create(
+            name="Rene Magritte",
+            birthday=datetime.date(2003, 10, 1),
+        )
+        cls.artist2 = Artist.objects.create(
+            name="Salvador Dali",
+            birthday=datetime.date(2003, 9, 1),
+        )
         cls.author1 = Author.objects.create(
             name="Roberto Bolaño", slug="roberto-bolano"
         )
@@ -29,13 +36,18 @@ class TestDataMixin:
             name="Scott Rosenberg", slug="scott-rosenberg"
         )
         cls.book1 = Book.objects.create(
-            name="2066", slug="2066", pages=800, pubdate=datetime.date(2008, 10, 1)
+            name="2066",
+            slug="2066",
+            pages=800,
+            artist=cls.artist1,
+            pubdate=datetime.date(2008, 10, 1),
         )
         cls.book1.authors.add(cls.author1)
         cls.book2 = Book.objects.create(
             name="Dreaming in Code",
             slug="dreaming-in-code",
             pages=300,
+            artist=cls.artist2,
             pubdate=datetime.date(2006, 5, 1),
         )
         cls.page1 = Page.objects.create(
@@ -470,6 +482,19 @@ class MonthArchiveViewTests(TestDataMixin, TestCase):
     def test_month_view_invalid_pattern(self):
         res = self.client.get("/dates/books/2007/no_month/")
         self.assertEqual(res.status_code, 404)
+
+    def test_month_view_based_on_related_fields(self):
+        res = self.client.get("/dates/books/2003/10/related_field/")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(
+            list(res.context["object_list"]),
+            list(
+                Book.objects.filter(
+                    artist__birthday__year=2003,
+                    artist__birthday__month=10,
+                )
+            ),
+        )
 
     def test_previous_month_without_content(self):
         "Content can exist on any day of the previous month. Refs #14711"

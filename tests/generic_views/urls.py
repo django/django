@@ -276,6 +276,13 @@ urlpatterns = [
         "dates/books/<int:year>/<month>/paginated/",
         views.BookMonthArchive.as_view(paginate_by=30),
     ),
+    path(
+        "dates/books/<int:year>/<int:month>/related_field/",
+        views.BookMonthArchive.as_view(
+            date_field="artist__birthday",
+            month_format="%m",
+        ),
+    ),
     path("dates/books/<int:year>/no_month/", views.BookMonthArchive.as_view()),
     path(
         "dates/booksignings/<int:year>/<month>/",
