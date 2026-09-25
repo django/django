@@ -10,9 +10,9 @@ class _JSONArrayConcat(Func):
     # Concatenate multiple JSON arrays into a single JSON array.
     # If any value is NULL, the entire array is NULL.
     # Duplicates are preserved.
-    # This function cannot take objects because the behavior is backend dependent.
-    # For example, on MySQL the merge is recursive, but on PostgreSQL
-    # it is not.
+    # This function cannot take objects because the behavior is backend
+    # dependent. For example, on MySQL the merge is recursive, but on
+    # PostgreSQL it is not.
 
     function = None
     output_field = JSONField()
@@ -62,8 +62,9 @@ class JSONArray(Func):
         super().__init__(*expressions)
 
     def _absent_on_null_workaround(self, compiler):
-        # On backends that do not support ABSENT ON NULL, we can implement the behavior
-        # so long as the backend has a way to concatenate JSON arrays.
+        # On backends that do not support ABSENT ON NULL, we can implement
+        # the behavior so long as the backend has a way to concatenate JSON
+        # arrays.
         unit_arrays = [
             Case(
                 When(IsNull(expression, True), then=JSONArray()),
@@ -99,8 +100,8 @@ class JSONArray(Func):
         return super().as_sql(compiler, connection, **extra_context)
 
     def as_native(self, compiler, connection, *, returning, **extra_context):
-        # Providing the ON NULL clause when no source expressions are provided is a
-        # syntax error on some backends.
+        # Providing the ON NULL clause when no source expressions are
+        # provided is a syntax error on some backends.
         if len(self.get_source_expressions()) == 0:
             on_null_clause = ""
         elif self.absent_on_null:
