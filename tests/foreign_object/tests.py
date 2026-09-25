@@ -61,6 +61,19 @@ class MultiColumnFKTests(TestCase):
         person = membership.person
         self.assertEqual((person.id, person.name), (self.bob.id, "Bob"))
 
+    def test_exclude_missing_reverse_relation(self):
+        Membership.objects.create(
+            membership_country=self.usa,
+            person_id=self.bob.pk,
+            group_id=self.cia.pk,
+        )
+        Membership.objects.create(
+            membership_country=self.soviet_union,
+            person_id=self.jim.pk,
+            group_id=self.kgb.pk,
+        )
+        self.assertSequenceEqual(Person.objects.exclude(membership=None), [self.bob])
+
     def test_get_fails_on_multicolumn_mismatch(self):
         # Membership objects returns DoesNotExist error when there is no
         # Person with the same id and country_id
