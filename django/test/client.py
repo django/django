@@ -14,8 +14,8 @@ from asgiref.sync import sync_to_async
 
 from django.conf import settings
 from django.core.handlers.asgi import ASGIRequest
-from django.core.handlers.base import BaseHandler
-from django.core.handlers.wsgi import LimitedStream, WSGIRequest
+from django.core.handlers.base import BaseHandler, LimitedStream
+from django.core.handlers.wsgi import WSGIRequest
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.signals import got_request_exception, request_finished, request_started
 from django.db import close_old_connections
@@ -209,6 +209,10 @@ class ClientHandler(BaseHandler):
 
         return response
 
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.load_middleware()
+
 
 class AsyncClientHandler(BaseHandler):
     """An async version of ClientHandler."""
@@ -260,6 +264,10 @@ class AsyncClientHandler(BaseHandler):
             await sync_to_async(response.close, thread_sensitive=False)()
             request_finished.connect(close_old_connections)
         return response
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.load_middleware(is_async=True)
 
 
 def store_rendered_templates(store, signal, sender, template, context, **kwargs):
