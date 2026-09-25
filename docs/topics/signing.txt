@@ -114,8 +114,9 @@ generate signatures. You can use a different secret by passing it to the
 
     Returns a signer which uses ``key`` to generate signatures and ``sep`` to
     separate values. ``sep`` cannot be in the :rfc:`URL safe base64 alphabet
-    <4648#section-5>`. This alphabet contains alphanumeric characters, hyphens,
-    and underscores. ``algorithm`` must be an algorithm supported by
+    <4648#section-5>` or be the ``=`` padding character. This alphabet
+    contains alphanumeric characters, hyphens, and underscores.
+    ``algorithm`` must be an algorithm supported by
     :mod:`hashlib`, it defaults to ``'sha256'``. ``fallback_keys`` is a list
     of additional values used to validate signed data, defaults to
     :setting:`SECRET_KEY_FALLBACKS`.
