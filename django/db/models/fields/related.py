@@ -2037,6 +2037,10 @@ class ManyToManyField(RelatedField):
     def reverse_path_infos(self):
         return self.get_reverse_path_info()
 
+    @property
+    def through(self):
+        return self.remote_field.through
+
     def _get_m2m_db_table(self, opts):
         """
         Function that can be curried to provide the m2m table name for this
