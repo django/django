@@ -721,6 +721,17 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertGreater(p4, p3)
         self.assertLess(p3, p4)
 
+    def test_point_comparison(self):
+        p1 = Point(0, 0, 0)
+        p2 = Point(0, 0, 1)
+        self.assertNotEqual(p1, p2)
+
+        # Fallback to 2d comparison if both the points don't have Z values
+        p3 = Point(0, 0)
+
+        self.assertEqual(p1, p3)
+        self.assertEqual(p2, p3)
+
     def test_multipolygons(self):
         "Testing MultiPolygon objects."
         fromstr("POINT (0 0)")
