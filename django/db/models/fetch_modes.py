@@ -1,4 +1,10 @@
-from django.core.exceptions import FieldFetchBlocked
+from django.core.exceptions import FieldFetchBlocked, SynchronousOnlyOperation
+
+ASYNC_UNSAFE_FETCH_MSG = (
+    "Fetching of {model}.{field} would require a database query, which cannot "
+    "be done from an async context. Use select_related() or "
+    "prefetch_related() to fetch it in advance, or use sync_to_async()."
+)
 
 
 class FetchMode:
@@ -9,12 +15,23 @@ class FetchMode:
     def fetch(self, fetcher, instance):
         raise NotImplementedError("Subclasses must implement this method.")
 
+    def _raise_async_unsafe(self, fetcher, instance, exc):
+        raise SynchronousOnlyOperation(
+            ASYNC_UNSAFE_FETCH_MSG.format(
+                model=instance.__class__.__qualname__,
+                field=fetcher.field.name,
+            )
+        ) from exc
+
 
 class FetchOne(FetchMode):
     __slots__ = ()
 
     def fetch(self, fetcher, instance):
-        fetcher.fetch_one(instance)
+        try:
+            fetcher.fetch_one(instance)
+        except SynchronousOnlyOperation as exc:
+            self._raise_async_unsafe(fetcher, instance, exc)
 
     def __reduce__(self):
         return "FETCH_ONE"
@@ -34,10 +51,13 @@ class FetchPeers(FetchMode):
             for peer_weakref in instance._state.peers
             if (peer := peer_weakref()) is not None
         ]
-        if len(instances) > 1:
-            fetcher.fetch_many(instances)
-        else:
-            fetcher.fetch_one(instance)
+        try:
+            if len(instances) > 1:
+                fetcher.fetch_many(instances)
+            else:
+                fetcher.fetch_one(instance)
+        except SynchronousOnlyOperation as exc:
+            self._raise_async_unsafe(fetcher, instance, exc)
 
     def __reduce__(self):
         return "FETCH_PEERS"
