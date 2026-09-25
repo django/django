@@ -146,6 +146,7 @@ extlinks = {
     # A file or directory. GitHub redirects from blob to tree if needed.
     "source": ("https://github.com/django/django/blob/main/%s", "%s"),
     "ticket": ("https://code.djangoproject.com/ticket/%s", "#%s"),
+    "djlink": (f"https://docs.djangoproject.com/en/{version}/%s", None),
 }
 
 if sphinx_version < (8, 1):
