@@ -192,6 +192,7 @@ class GeneratedField(Field):
         name, path, args, kwargs = super().deconstruct()
         del kwargs["blank"]
         del kwargs["editable"]
+        kwargs.pop("null", None)
         kwargs["db_persist"] = self.db_persist
         kwargs["expression"] = self.expression
         kwargs["output_field"] = self.output_field
