@@ -1321,30 +1321,54 @@ class ModelAdmin(BaseModelAdmin):
                 return "%s__iexact" % field_name.removeprefix("="), None
             elif field_name.startswith("@"):
                 return "%s__search" % field_name.removeprefix("@"), None
-            # Use field_name if it includes a lookup.
+
             opts = queryset.model._meta
             lookup_fields = field_name.split(LOOKUP_SEP)
-            # Go through the fields, following all relations.
+
+            # Resolve leading 'pk' on multi-table inherited models
+            if lookup_fields[0] == "pk" and opts.pk.is_relation:
+                lookup_fields = [
+                    opts.pk.name,
+                    opts.pk.target_field.name,
+                ] + lookup_fields[1:]
+                field_name = LOOKUP_SEP.join(lookup_fields)
+
             prev_field = None
             for path_part in lookup_fields:
                 if path_part == "pk":
-                    path_part = opts.pk.name
+                    if opts.pk.remote_field:
+                        path_part = opts.pk.target_field.name
+                    else:
+                        path_part = opts.pk.name
+
+                if prev_field and prev_field.is_relation:
+                    opts = prev_field.remote_field.model._meta
+
                 try:
                     field = opts.get_field(path_part)
+
                 except FieldDoesNotExist:
+                    # Check for 'and_' prefixed lookups
+                    # (e.g., and_iexact -> iexact)
+                    is_and_lookup = path_part.startswith("and_")
+                    lookup = (
+                        path_part.removeprefix("and_") if is_and_lookup else path_part
+                    )
+
                     # Use valid query lookups.
-                    if prev_field and prev_field.get_lookup(path_part):
-                        if path_part == "exact" and not isinstance(
+                    if prev_field and prev_field.get_lookup(lookup):
+                        if lookup == "exact" and not isinstance(
                             prev_field, (models.CharField, models.TextField)
                         ):
                             # Use prev_field to validate the search term.
                             return field_name, prev_field
                         return field_name, None
+                    raise
                 else:
                     prev_field = field
                     if hasattr(field, "path_infos"):
-                        # Update opts to follow the relation.
                         opts = field.path_infos[-1].to_opts
+
             # Otherwise, use the field with icontains.
             return "%s__icontains" % field_name, None
 
