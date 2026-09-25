@@ -268,6 +268,21 @@ class TestUtilsHashPass(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg % "lolcat"):
             identify_hasher("lolcat$salt$hash")
 
+    def test_default_algorithm_sentinel_collision(self):
+        """
+        identify_hasher() must not mistake an encoded hash whose algorithm
+        segment is the literal string "default" for get_hasher()'s "default"
+        sentinel. Refs #37362.
+        """
+        msg = (
+            "Unknown password hashing algorithm '%s'. Did you specify it in "
+            "the PASSWORD_HASHERS setting?"
+        )
+        with self.assertRaisesMessage(ValueError, msg % "default"):
+            identify_hasher("default$salt$hash")
+        # check_password() must fail closed instead of raising AssertionError.
+        self.assertFalse(check_password("lètmein", "default$salt$hash"))
+
     def test_is_password_usable(self):
         passwords = ("lètmein_badencoded", "", None)
         for password in passwords:

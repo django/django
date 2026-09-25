@@ -173,9 +173,9 @@ def identify_hasher(encoded):
     """
     Return an instance of a loaded password hasher.
 
-    Identify hasher algorithm by examining encoded hash, and call
-    get_hasher() to return hasher. Raise ValueError if
-    algorithm cannot be identified, or if hasher is not loaded.
+    Identify hasher algorithm by examining encoded hash, and return the
+    corresponding hasher. Raise ValueError if algorithm cannot be
+    identified, or if hasher is not loaded.
     """
     # Ancient versions of Django created plain MD5 passwords and accepted
     # MD5 passwords with an empty salt.
@@ -188,7 +188,17 @@ def identify_hasher(encoded):
         algorithm = "unsalted_sha1"
     else:
         algorithm = encoded.split("$", 1)[0]
-    return get_hasher(algorithm)
+    try:
+        # Don't use get_hasher() here: its "default" sentinel would match an
+        # encoded hash whose algorithm segment is the literal string
+        # "default", selecting the first configured hasher instead of raising
+        # ValueError for the unknown algorithm (#37362).
+        return get_hashers_by_algorithm()[algorithm]
+    except KeyError:
+        raise ValueError(
+            "Unknown password hashing algorithm '%s'. "
+            "Did you specify it in the PASSWORD_HASHERS setting?" % algorithm
+        )
 
 
 def mask_hash(hash, show=6, char="*"):
