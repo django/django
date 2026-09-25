@@ -290,6 +290,14 @@ Management Commands
 * The :djadmin:`sendtestemail` command now supports a :option:`--using
   <sendtestemail --using>` option to specify the :setting:`MAILERS` alias.
 
+* Management commands now handle ``KeyboardInterrupt`` (e.g. pressing
+  :kbd:`Ctrl-C`) gracefully by exiting with status code 1 instead of showing a
+  Python traceback, unless the :option:`--traceback` option is used.
+
+* The :djadmin:`dbshell` command now forwards :kbd:`Ctrl-C` (SIGINT) to the
+  underlying database client on all backends, preventing the parent
+  ``manage.py`` process from crashing and leaving orphaned shell processes.
+
 Models
 ~~~~~~
 
