@@ -16,4 +16,5 @@ Bugfixes
   warned that ``null`` has no effect on ``GeneratedField`` (:ticket:`37348`).
 
 * Fixed a bug in Django 6.1 where ``FETCH_PEERS`` did not batch instances
-  loaded by ``select_related()``, causing unnecessary queries (#37344).
+  loaded by ``select_related()``, causing unnecessary queries
+  (:ticket:`37344`).
