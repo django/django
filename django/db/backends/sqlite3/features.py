@@ -52,6 +52,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         # The django_format_dtdelta() function doesn't properly handle mixed
         # Date/DateTime fields and timedeltas.
         "expressions.tests.FTimeDeltaTests.test_mixed_comparisons1",
+        # This backend's regex lookup can't handle column references.
+        "lookup.tests.TextLookupsNonStringTests.test_regex_f_expression",
     }
     insert_test_table_with_defaults = 'INSERT INTO {} ("null") VALUES (1)'
     supports_default_keyword_in_insert = False
