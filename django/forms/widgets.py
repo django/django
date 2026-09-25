@@ -39,6 +39,7 @@ __all__ = (
     "HiddenInput",
     "MultipleHiddenInput",
     "FileInput",
+    "MultipleFileInput",
     "ClearableFileInput",
     "Textarea",
     "DateInput",
@@ -564,6 +565,10 @@ class FileInput(Input):
 
     def use_required_attribute(self, initial):
         return super().use_required_attribute(initial) and not initial
+
+
+class MultipleFileInput(FileInput):
+    allow_multiple_selected = True
 
 
 FILE_INPUT_CONTRADICTION = object()

@@ -4,8 +4,9 @@ import unittest
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import validate_image_file_extension
-from django.forms import FileField, FileInput
+from django.forms import FileField, Form, MultipleFileField, MultipleFileInput
 from django.test import SimpleTestCase
+from django.utils.datastructures import MultiValueDict
 
 try:
     from PIL import Image  # NOQA
@@ -120,23 +121,25 @@ class FileFieldTest(SimpleTestCase):
     def test_file_picklable(self):
         self.assertIsInstance(pickle.loads(pickle.dumps(FileField())), FileField)
 
-
-class MultipleFileInput(FileInput):
-    allow_multiple_selected = True
-
-
-class MultipleFileField(FileField):
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault("widget", MultipleFileInput())
-        super().__init__(*args, **kwargs)
-
-    def clean(self, data, initial=None):
-        single_file_clean = super().clean
-        if isinstance(data, (list, tuple)):
-            result = [single_file_clean(d, initial) for d in data]
-        else:
-            result = single_file_clean(data, initial)
-        return result
+    def test_file_name_error_param(self):
+        tests = [
+            (
+                FileField(),
+                SimpleUploadedFile("empty.txt", b""),
+                "empty",
+            ),
+            (
+                FileField(max_length=5),
+                SimpleUploadedFile("too-long.txt", b"content"),
+                "max_length",
+            ),
+        ]
+        for field, file, code in tests:
+            with self.subTest(code=code):
+                with self.assertRaises(ValidationError) as cm:
+                    field.clean(file)
+                self.assertEqual(cm.exception.code, code)
+                self.assertEqual(cm.exception.params["file_name"], file.name)
 
 
 class MultipleFileFieldTest(SimpleTestCase):
@@ -148,13 +151,49 @@ class MultipleFileFieldTest(SimpleTestCase):
         ]
         self.assertEqual(f.clean(files), files)
 
+    def test_file_single(self):
+        f = MultipleFileField()
+        file = SimpleUploadedFile("name", b"Content")
+        self.assertEqual(f.clean(file), [file])
+
+    def test_file_empty(self):
+        required = MultipleFileField()
+        with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
+            required.clean([])
+        optional = MultipleFileField(required=False)
+        self.assertEqual(optional.clean([]), [])
+        self.assertEqual(optional.clean(None), [])
+
+    def test_file_initial(self):
+        f = MultipleFileField()
+        initial = [
+            SimpleUploadedFile("name1", b"Content 1"),
+            SimpleUploadedFile("name2", b"Content 2"),
+        ]
+        self.assertEqual(f.clean([], initial), initial)
+
     def test_file_multiple_empty(self):
         f = MultipleFileField()
         files = [
-            SimpleUploadedFile("empty", b""),
-            SimpleUploadedFile("nonempty", b"Some Content"),
+            SimpleUploadedFile("empty.txt", b""),
+            SimpleUploadedFile("nonempty.txt", b"Some Content"),
         ]
-        msg = "'The submitted file is empty.'"
+        msg = "'The submitted file empty.txt is empty.'"
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean(files)
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean(files[::-1])
+
+    def test_file_multiple_max_length(self):
+        f = MultipleFileField(max_length=8)
+        files = [
+            SimpleUploadedFile("too_long.txt", b"Some Content"),
+            SimpleUploadedFile("short", b"Some Content"),
+        ]
+        msg = (
+            "'Ensure the filename too_long.txt has at most 8 characters "
+            "(it has 12).'"
+        )
         with self.assertRaisesMessage(ValidationError, msg):
             f.clean(files)
         with self.assertRaisesMessage(ValidationError, msg):
@@ -185,3 +224,69 @@ class MultipleFileFieldTest(SimpleTestCase):
         for rotated_evil_files in evil_rotations:
             with self.assertRaisesMessage(ValidationError, msg):
                 f.clean(rotated_evil_files)
+
+    def test_has_changed(self):
+        f = MultipleFileField()
+        self.assertIs(f.has_changed(None, None), False)
+        self.assertIs(f.has_changed(None, []), False)
+        self.assertIs(
+            f.has_changed(None, [SimpleUploadedFile("name", b"Content")]), True
+        )
+
+    def test_disabled_has_changed(self):
+        f = MultipleFileField(disabled=True)
+        self.assertIs(
+            f.has_changed(None, [SimpleUploadedFile("name", b"Content")]), False
+        )
+
+    def test_widget(self):
+        f = MultipleFileField()
+        self.assertIsInstance(f.widget, MultipleFileInput)
+        self.assertIs(f.widget.allow_multiple_selected, True)
+
+    def test_form(self):
+        class MultipleFileForm(Form):
+            files = MultipleFileField()
+
+        files = [
+            SimpleUploadedFile("name1", b"Content 1"),
+            SimpleUploadedFile("name2", b"Content 2"),
+        ]
+        form = MultipleFileForm({}, MultiValueDict({"files": files}))
+        self.assertIs(form.is_valid(), True)
+        self.assertEqual(form.cleaned_data["files"], files)
+        self.assertHTMLEqual(
+            str(MultipleFileForm()),
+            '<div><label for="id_files">Files:</label>'
+            '<input type="file" name="files" multiple required id="id_files"></div>',
+        )
+
+    def test_form_required(self):
+        class MultipleFileForm(Form):
+            files = MultipleFileField()
+
+        form = MultipleFileForm({}, MultiValueDict())
+        self.assertIs(form.is_valid(), False)
+        self.assertEqual(form.errors["files"], ["This field is required."])
+
+    def test_form_optional(self):
+        class MultipleFileForm(Form):
+            files = MultipleFileField(required=False)
+
+        form = MultipleFileForm({}, MultiValueDict())
+        self.assertIs(form.is_valid(), True)
+        self.assertEqual(form.cleaned_data["files"], [])
+        self.assertEqual(form.changed_data, [])
+
+    def test_form_initial(self):
+        class MultipleFileForm(Form):
+            files = MultipleFileField()
+
+        initial = [
+            SimpleUploadedFile("name1", b"Content 1"),
+            SimpleUploadedFile("name2", b"Content 2"),
+        ]
+        form = MultipleFileForm({}, MultiValueDict(), initial={"files": initial})
+        self.assertIs(form.is_valid(), True)
+        self.assertEqual(form.cleaned_data["files"], initial)
+        self.assertEqual(form.changed_data, [])
