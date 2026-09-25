@@ -10,6 +10,7 @@ from django.contrib.admin.utils import (
     quote,
 )
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import models
 from django.db.models.fields.related import (
     ForeignObjectRel,
     ManyToManyRel,
@@ -335,13 +336,30 @@ class InlineAdminFormSet:
         self.has_delete_permission = has_delete_permission
         self.has_view_permission = has_view_permission
 
+    def _get_readonly_fields_for_existing(self):
+        """
+        Return readonly fields for editing existing inline objects.
+        Includes the primary key to prevent accidental creation of new objects
+        (refs #2259).
+        """
+        readonly_fields = list(self.readonly_fields)
+        if not self.has_change_permission:
+            readonly_fields = readonly_fields + flatten_fieldsets(self.fieldsets)
+
+        # Make pk readonly when editing existing inline objects.
+        pk = self.opts.opts.pk
+        if (
+            pk.editable
+            and not pk.auto_created
+            and not isinstance(pk, models.AutoField)
+            and pk.name not in readonly_fields
+        ):
+            readonly_fields = list(readonly_fields) + [pk.name]
+
+        return readonly_fields
+
     def __iter__(self):
-        if self.has_change_permission:
-            readonly_fields_for_editing = self.readonly_fields
-        else:
-            readonly_fields_for_editing = self.readonly_fields + flatten_fieldsets(
-                self.fieldsets
-            )
+        readonly_fields_for_editing = self._get_readonly_fields_for_existing()
 
         for form, original in zip(
             self.formset.initial_forms, self.formset.get_queryset()
@@ -502,15 +520,15 @@ class InlineAdminForm(AdminForm):
             )
 
     def needs_explicit_pk_field(self):
+        pk = self.form._meta.model._meta.pk
         return (
             # Auto fields are editable, so check for auto or non-editable pk.
             self.form._meta.model._meta.auto_field
-            or not self.form._meta.model._meta.pk.editable
+            or not pk.editable
             # The pk can be editable, but excluded from the inline.
-            or (
-                self.form._meta.exclude
-                and self.form._meta.model._meta.pk.name in self.form._meta.exclude
-            )
+            or (self.form._meta.exclude and pk.name in self.form._meta.exclude)
+            # The pk can be editable but set as readonly (refs #2259).
+            or pk.name in self.readonly_fields
             or
             # Also search any parents for an auto field. (The pk info is
             # propagated to child models so that does not need to be checked
