@@ -1,9 +1,9 @@
 from unittest import skipUnless
 
-from django.contrib.gis.db.models import fields
+from django.contrib.gis.db.models import Extent, fields
 from django.contrib.gis.geos import MultiPolygon, Polygon
 from django.core.exceptions import ImproperlyConfigured
-from django.db import connection, migrations, models
+from django.db import ProgrammingError, connection, migrations, models
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
 from django.test import TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
@@ -434,6 +434,73 @@ class OperationTests(OperationTestCase):
             field_class_kwargs={"dim": 2},
         )
         self.assertFalse(Neighborhood.objects.first().geom.hasz)
+
+    @skipUnlessDBFeature("can_alter_geometry_field", "supports_geography")
+    def test_alter_geom_field_geography(self):
+        Neighborhood = self.current_state.apps.get_model("gis", "Neighborhood")
+        p1 = Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)))
+        Neighborhood.objects.create(name="TestGeography", geom=MultiPolygon(p1, p1))
+        self.assertEqual(
+            Neighborhood.objects.aggregate(Extent("geom")),
+            {"geom__extent": (0.0, 0.0, 1.0, 1.0)},
+        )
+        # Convert to geography. Extent() is not defined for geography columns.
+        self.alter_gis_model(
+            migrations.AlterField,
+            "Neighborhood",
+            "geom",
+            fields.MultiPolygonField,
+            field_class_kwargs={"geography": True},
+        )
+        msg = "function st_extent(geography) does not exist"
+        with self.assertRaisesMessage(ProgrammingError, msg):
+            Neighborhood.objects.aggregate(Extent("geom"))
+        # Rewind to geometry.
+        self.alter_gis_model(
+            migrations.AlterField,
+            "Neighborhood",
+            "geom",
+            fields.MultiPolygonField,
+            field_class_kwargs={"geography": False},
+        )
+        self.assertEqual(
+            Neighborhood.objects.aggregate(Extent("geom")),
+            {"geom__extent": (0.0, 0.0, 1.0, 1.0)},
+        )
+
+    @skipUnlessDBFeature(
+        "can_alter_geometry_field", "supports_geography", "supports_3d_storage"
+    )
+    def test_alter_geom_field_geography_and_dim(self):
+        Neighborhood = self.current_state.apps.get_model("gis", "Neighborhood")
+        p1 = Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)))
+        Neighborhood.objects.create(name="TestGeography", geom=MultiPolygon(p1, p1))
+        self.assertIs(Neighborhood.objects.first().geom.hasz, False)
+        # Add a 3rd dimension and convert to geography at the same time.
+        self.alter_gis_model(
+            migrations.AlterField,
+            "Neighborhood",
+            "geom",
+            fields.MultiPolygonField,
+            field_class_kwargs={"geography": True, "dim": 3},
+        )
+        self.assertIs(Neighborhood.objects.first().geom.hasz, True)
+        msg = "function st_extent(geography) does not exist"
+        with self.assertRaisesMessage(ProgrammingError, msg):
+            Neighborhood.objects.aggregate(Extent("geom"))
+        # Rewind to a 2D geometry.
+        self.alter_gis_model(
+            migrations.AlterField,
+            "Neighborhood",
+            "geom",
+            fields.MultiPolygonField,
+            field_class_kwargs={"geography": False, "dim": 2},
+        )
+        self.assertIs(Neighborhood.objects.first().geom.hasz, False)
+        self.assertEqual(
+            Neighborhood.objects.aggregate(Extent("geom")),
+            {"geom__extent": (0.0, 0.0, 1.0, 1.0)},
+        )
 
     @skipUnlessDBFeature(
         "supports_column_check_constraints", "can_introspect_check_constraints"
