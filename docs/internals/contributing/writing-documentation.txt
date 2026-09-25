@@ -626,57 +626,84 @@ Our policy for new features is:
     development version. Assume documentation readers are using the latest
     release, not the development version.
 
-Our preferred way for marking new features is by prefacing the features'
-documentation with: "``.. versionadded:: X.Y``", followed by a mandatory
-blank line and an optional description (indented).
+New features and significant changes should be identified using Sphinx's
+``versionadded`` and ``versionchanged`` directives in their documentation, and
+should also be mentioned in the appropriate section of the release notes
+(``docs/releases/A.B.txt``).
 
-General improvements or other changes to the APIs that should be emphasized
-should use the "``.. versionchanged:: X.Y``" directive (with the same format
-as the ``versionadded`` mentioned above).
-
-These ``versionadded`` and ``versionchanged`` blocks should be
-"self-contained." In other words, since we only keep these annotations around
-for two releases, it's nice to be able to remove the annotation and its
-contents without having to reflow, reindent, or edit the surrounding text. For
-example, instead of putting the entire description of a new or changed feature
-in a block, do something like this:
+Our preferred way to mark a new feature is to preface its documentation with
+"``.. versionadded:: A.B``". This should usually be placed at the top of a
+section, just below the heading or Sphinx directive that introduces the new
+feature:
 
 .. code-block:: rst
 
-    .. class:: Author(first_name, last_name, middle_name=None)
-
-        A person who writes books.
-
-        ``first_name`` is ...
-
-        ...
-
-        ``middle_name`` is ...
-
-        .. versionchanged:: A.B
-
-            The ``middle_name`` argument was added.
-
-Put the changed annotation notes at the bottom of a section, not the top.
-
-Also, avoid referring to a specific version of Django outside a
-``versionadded`` or ``versionchanged`` block. Even inside a block, it's often
-redundant to do so as these annotations render as "New in Django A.B:" and
-"Changed in Django A.B", respectively.
-
-If a function, attribute, etc. is added, it's also okay to use a
-``versionadded`` annotation like this:
-
-.. code-block:: rst
-
-    .. attribute:: Author.middle_name
+    .. class:: Author(last_name, first_name)
 
         .. versionadded:: A.B
 
-        An author's middle name.
+        A person who writes books...
 
-We can remove the ``.. versionadded:: A.B`` annotation without any indentation
-changes when the time comes.
+If the new feature doesn't have its own section, the ``versionadded``
+annotation can be placed near where it is mentioned and should be followed by a
+blank line and an indented description of what was added:
+
+.. code-block:: rst
+
+    Books
+    -----
+
+    Books are...
+
+    Each book can have one or more :class:`Author`\s...
+
+    .. versionadded:: A.B
+
+        Support for multiple authors.
+
+Sphinx renders this as "Added in version A.B: Support for multiple authors."
+Avoid using "added" or similar words in the description when it would be
+redundant.
+
+General improvements and significant changes to APIs should be marked with
+"``.. versionchanged:: A.B``" followed by a blank line and an indented
+description of the changes. Sphinx renders this as "Changed in version A.B:"
+followed by the description.
+
+Put ``versionchanged`` notes at the bottom of a section. Related changes in the
+same release can be collected in a single note, split into multiple paragraphs
+if helpful for readability. Adjacent ``versionchanged`` directives covering
+different releases should be sorted from oldest to newest version.
+
+These ``versionadded`` and ``versionchanged`` blocks should be
+"self-contained." Since we only keep these annotations around for two releases,
+it's nice to be able to remove the annotation and its contents without having
+to reflow, reindent, or edit the surrounding text. For example, instead of
+mentioning what's new or changed in the same paragraphs that describe the
+feature, do something like this:
+
+.. code-block:: rst
+
+    .. class:: Author(last_name, first_name=None)
+
+        A person who writes books...
+
+        ``last_name`` and ``first_name`` are...
+
+        .. versionchanged:: A.B
+
+            The ``first_name`` argument was made optional.
+
+    .. class:: Book(author)
+
+When the time comes, we can delete the lines containing ``.. versionchanged::
+A.B`` and its indented description without editing any other lines.
+
+For similar reasons, avoid referring to a specific version of Django outside a
+``versionadded`` or ``versionchanged`` block. Such references become outdated
+and are difficult to maintain. (Even inside one of those blocks, it's often
+redundant to mention the version number in the description. Sphinx already
+includes it the "Added in version A.B" or "Changed in version A.B" prefix.)
 
 Minimizing images
 =================
