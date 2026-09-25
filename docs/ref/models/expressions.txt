@@ -183,6 +183,29 @@ the field value of each one, and saving each one back to the database::
 * getting the database, rather than Python, to do work
 * reducing the number of queries some operations require
 
+.. _assigning-f-objects-to-related-fields:
+
+Assigning ``F()`` objects to related fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``F()`` objects can also be assigned to :class:`~django.db.models.ForeignKey`
+and :class:`~django.db.models.OneToOneField` attributes::
+
+    company = Company.objects.get(name="Test GmbH")
+    company.point_of_contact = F("ceo")
+    company.save()
+
+The expression is resolved by the database when the object is saved, so the
+related object cannot be accessed until then; accessing it earlier raises
+``ValueError``. Expressions cannot be assigned to primary keys (such as the
+parent links created by :ref:`multi-table inheritance
+<multi-table-inheritance>`) or when inserting new rows.
+
+.. versionchanged:: 6.2
+
+    Support for assigning ``F()`` objects to ``ForeignKey`` and
+    ``OneToOneField`` attributes was added.
+
 .. _slicing-using-f:
 
 Slicing ``F()`` expressions
