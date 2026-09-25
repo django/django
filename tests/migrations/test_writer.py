@@ -2,6 +2,7 @@ import datetime
 import decimal
 import enum
 import functools
+import json
 import math
 import os
 import pathlib
@@ -970,6 +971,24 @@ class WriterTests(SimpleTestCase):
             MigrationWriter.serialize(models.Model),
             ("('models.Model', {'from django.db import models'})", set()),
         )
+
+    def test_serialize_type_local_class(self):
+        class LocalClass:
+            pass
+
+        msg = "Cannot serialize class LocalClass: local classes cannot be imported."
+        with self.assertRaisesMessage(ValueError, msg):
+            MigrationWriter.serialize(LocalClass)
+
+    def test_serialize_jsonfield_with_local_decoder(self):
+        class LocalJSONDecoder(json.JSONDecoder):
+            pass
+
+        msg = (
+            "Cannot serialize class LocalJSONDecoder: local classes cannot be imported."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            MigrationWriter.serialize(models.JSONField(decoder=LocalJSONDecoder))
 
     def test_database_on_delete_serializer_value(self):
         db_level_on_delete_options = [
