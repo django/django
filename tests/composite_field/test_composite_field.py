@@ -932,6 +932,14 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             .values_list("name", flat=True)
         )
 
+        self.assertSequenceEqual(
+            users.query.table_map[User._meta.db_table],
+            [
+                alias
+                for alias, join in users.query.alias_map.items()
+                if join.table_name == User._meta.db_table
+            ],
+        )
         self.assertSequenceEqual(users, ["Ada"])
 
     def test_composite_subquery_alias_rejects_invalid_field(self):
