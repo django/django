@@ -9732,3 +9732,112 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
         response = self.client.get(unknown_url)
         # Does not redirect to the admin login.
         self.assertEqual(response.status_code, 404)
+
+
+@override_settings(ROOT_URLCONF="admin_views.urls")
+class AdminURLHooksTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.article = Article.objects.create(
+            title="Test Article",
+            content="Content",
+            date=datetime.date(2026, 1, 1),
+        )
+
+    def test_admin_site_get_urls(self):
+        site = AdminSite(name="admin")
+        self.assertEqual(site.get_index_url(), "/test_admin/admin/")
+        self.assertEqual(
+            site.get_app_list_url("admin_views"), "/test_admin/admin/admin_views/"
+        )
+
+    def test_modeladmin_get_urls(self):
+        site = AdminSite(name="admin")
+        ma = ModelAdmin(Article, site)
+        self.assertEqual(ma.get_index_url(), "/test_admin/admin/")
+        self.assertEqual(ma.get_app_list_url(), "/test_admin/admin/admin_views/")
+        self.assertEqual(
+            ma.get_changelist_url(), "/test_admin/admin/admin_views/article/"
+        )
+        self.assertEqual(ma.get_add_url(), "/test_admin/admin/admin_views/article/add/")
+        self.assertEqual(
+            ma.get_change_url(self.article.pk),
+            f"/test_admin/admin/admin_views/article/{self.article.pk}/change/",
+        )
+        self.assertEqual(
+            ma.get_change_url(self.article),
+            f"/test_admin/admin/admin_views/article/{self.article.pk}/change/",
+        )
+        self.assertEqual(
+            ma.get_delete_url(self.article.pk),
+            f"/test_admin/admin/admin_views/article/{self.article.pk}/delete/",
+        )
+        self.assertEqual(
+            ma.get_delete_url(self.article),
+            f"/test_admin/admin/admin_views/article/{self.article.pk}/delete/",
+        )
+        self.assertEqual(
+            ma.get_history_url(self.article.pk),
+            f"/test_admin/admin/admin_views/article/{self.article.pk}/history/",
+        )
+        self.assertEqual(
+            ma.get_history_url(self.article),
+            f"/test_admin/admin/admin_views/article/{self.article.pk}/history/",
+        )
+
+        self.assertEqual(ma.get_change_url(None), "")
+        self.assertEqual(ma.get_change_url(""), "")
+        self.assertEqual(ma.get_delete_url(None), "")
+        self.assertEqual(ma.get_delete_url(""), "")
+        self.assertEqual(ma.get_history_url(None), "")
+        self.assertEqual(ma.get_history_url(""), "")
+
+    def test_modeladmin_custom_url_hooks(self):
+        site = AdminSite(name="admin")
+
+        class CustomArticleAdmin(ModelAdmin):
+            def get_changelist_url(self, request=None, **kwargs):
+                return "/custom/articles/"
+
+            def get_add_url(self, request=None, **kwargs):
+                return "/custom/articles/add/"
+
+            def get_change_url(self, object_id, request=None, **kwargs):
+                return f"/custom/articles/{object_id}/"
+
+            def get_delete_url(self, object_id, request=None, **kwargs):
+                return f"/custom/articles/{object_id}/delete/"
+
+            def get_history_url(self, object_id, request=None, **kwargs):
+                return f"/custom/articles/{object_id}/history/"
+
+        ma = CustomArticleAdmin(Article, site)
+        req = RequestFactory().get("/custom/articles/")
+        user = User.objects.create_superuser("superuser", "super@example.com", "secret")
+        req.user = user
+        from django.contrib.messages.storage.cookie import CookieStorage
+
+        setattr(req, "_messages", CookieStorage(req))
+
+        self.assertEqual(ma.get_changelist_url(req), "/custom/articles/")
+        self.assertEqual(ma.get_add_url(req), "/custom/articles/add/")
+        self.assertEqual(
+            ma.get_change_url(self.article.pk, req),
+            f"/custom/articles/{self.article.pk}/",
+        )
+        self.assertEqual(
+            ma.get_delete_url(self.article.pk, req),
+            f"/custom/articles/{self.article.pk}/delete/",
+        )
+        self.assertEqual(
+            ma.get_history_url(self.article.pk, req),
+            f"/custom/articles/{self.article.pk}/history/",
+        )
+
+        response = ma._response_post_save(req, self.article)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/custom/articles/")
+
+        response = ma.response_delete(req, "Test Article", self.article.pk)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/custom/articles/")
