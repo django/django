@@ -2,6 +2,7 @@ import datetime
 from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
+from django.db import connection
 from django.test import TestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import requires_tz_support
 
@@ -884,14 +885,18 @@ class DateDetailViewTests(TestDataMixin, TestCase):
         self.assertEqual(res.context["book"], self.book2)
         self.assertTemplateUsed(res, "generic_views/book_detail.html")
 
+        nonexistent_pk = connection.ops.get_nonexistent_pk(9999998)
         res = self.client.get(
-            "/dates/books/get_object_custom_queryset/2008/oct/01/9999999/"
+            f"/dates/books/get_object_custom_queryset/2008/oct/01/{nonexistent_pk}/"
         )
         self.assertEqual(res.status_code, 404)
 
     def test_get_object_custom_queryset_numqueries(self):
+        id_ = connection.ops.get_hardcoded_pk(2)
         with self.assertNumQueries(1):
-            self.client.get("/dates/books/get_object_custom_queryset/2006/may/01/2/")
+            self.client.get(
+                f"/dates/books/get_object_custom_queryset/2006/may/01/{id_}/"
+            )
 
     def test_datetime_date_detail(self):
         bs = BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))
