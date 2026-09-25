@@ -178,17 +178,25 @@ class AcceptHeaderTests(TestCase):
                 "*/*; q=0.8",
             ],
         )
+
+    def test_accept_headers_with_quoted_comma(self):
+        request = HttpRequest()
+        request.META["HTTP_ACCEPT"] = 'text/plain; param="a,b", application/json'
+        self.assertEqual(
+            [str(accepted_type) for accepted_type in request.accepted_types],
+            [
+                'text/plain; param=a,b',
+                "application/json",
+            ],
+        )
         self.assertEqual(
             [
                 str(accepted_type)
                 for accepted_type in request.accepted_types_by_precedence
             ],
             [
-                "text/html",
-                "application/xhtml+xml",
-                "application/xml; q=0.9",
-                "text/*",
-                "*/*; q=0.8",
+                'text/plain; param=a,b',
+                "application/json",
             ],
         )
 

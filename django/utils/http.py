@@ -200,13 +200,21 @@ def urlsafe_base64_decode(s):
 def split_header_value(value, sep=","):
     """Yield stripped parts of an HTTP header value split by sep.
 
-    Use only with headers whose values are token lists (e.g. Vary,
-    Cache-Control). Do not use with headers that allow quoted strings in values
-    (e.g. Set-Cookie), as commas inside values will be used as separators.
+    Commas (or other separators) inside quoted strings will not be treated as a
+    separator.
     """
-    for part in value.split(sep):
-        if stripped := part.strip():
+    s = sep + value
+    while s[:1] == sep:
+        s = s[1:]
+        end = s.find(sep)
+        while end > 0 and (s.count('"', 0, end) - s.count('\\"', 0, end)) % 2:
+            end = s.find(sep, end + 1)
+        if end < 0:
+            end = len(s)
+        f = s[:end]
+        if stripped := f.strip():
             yield stripped
+        s = s[end:]
 
 
 def split_directive_names(value):

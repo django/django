@@ -28,7 +28,7 @@ from django.utils.datastructures import (
 )
 from django.utils.encoding import escape_uri_path, iri_to_uri
 from django.utils.functional import cached_property
-from django.utils.http import is_same_domain, parse_header_parameters
+from django.utils.http import is_same_domain, parse_header_parameters, split_header_value
 from django.utils.regex_helper import _lazy_re_compile
 
 RAISE_ERROR = object()
@@ -99,8 +99,8 @@ class HttpRequest:
         return sorted(
             (
                 media_type
-                for token in header_value.split(",")
-                if token.strip() and (media_type := MediaType(token)).quality != 0
+                for token in split_header_value(header_value)
+                if token and (media_type := MediaType(token)).quality != 0
             ),
             key=operator.attrgetter("quality", "specificity"),
             reverse=True,
