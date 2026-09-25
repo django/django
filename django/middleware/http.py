@@ -11,6 +11,8 @@ class ConditionalGetMiddleware(MiddlewareMixin):
     header if needed.
     """
 
+    async_capable = False
+
     def process_response(self, request, response):
         # It's too late to prevent an unsafe request with a 412 response, and
         # for a HEAD request, the response body is always empty so computing

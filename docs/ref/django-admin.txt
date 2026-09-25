@@ -1114,8 +1114,7 @@ Starts the Python interactive interpreter.
 
 All models from installed apps are automatically imported into the shell environment.
 When multiple models share the same name, the one from the app listed earlier in
-:setting:`INSTALLED_APPS` takes precedence. See
-:ref:`handling-model-name-collisions` for details.
+:setting:`INSTALLED_APPS` takes precedence.
 
 If ``--verbosity`` is ``2`` or higher, the imported objects will be listed.
 To disable automatic importing, use the :option:`--no-imports <shell --no-imports>` flag.
@@ -1127,8 +1126,8 @@ See :ref:`customizing-shell-auto-imports` for guidance on adding or removing aut
 .. note::
 
     If the ``isort`` package is installed in the Python environment, the 
-    automatic imports listed in the standard output for verbose option 2 
-    or higher of the `shell` command are sorted by ``isort``. This
+    automatic imports listed in the standard output when verbosity is 2 
+    or higher are sorted by ``isort``. This
     does not change what is actually imported, meaning that the standard 
     output of imports may misalign with the true import order.
 

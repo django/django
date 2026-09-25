@@ -469,6 +469,22 @@ class ChangeListTests(TestCase):
         with self.assertRaises(IncorrectLookupParameters):
             m.get_changelist_instance(request)
 
+    def test_date_hierarchy_out_of_range(self):
+        """
+        An out-of-range year in a date_hierarchy lookup raises
+        IncorrectLookupParameters rather than letting ValueError or
+        OverflowError propagate (which would surface as an HTTP 500).
+        """
+        m = EventAdmin(Event, custom_site)
+        # "9999" builds a valid from_date but to_date's year + 1 == 10000
+        # raises ValueError; the huge value raises OverflowError in datetime().
+        for invalid_year in ["9999", "99999999999999999999"]:
+            with self.subTest(year=invalid_year):
+                request = self.factory.get("/event/", data={"date__year": invalid_year})
+                request.user = self.superuser
+                with self.assertRaises(IncorrectLookupParameters):
+                    m.get_changelist_instance(request)
+
     @skipUnlessDBFeature("uses_savepoints")
     def test_list_editable_atomicity(self):
         a = Swallow.objects.create(origin="Swallow A", load=4, speed=1)
@@ -2046,6 +2062,17 @@ class PlaywrightTests(AdminPlaywrightTestCase):
     def setUp(self):
         User.objects.create_superuser(username="super", password="secret", email=None)
 
+    def collapse_filter(self, detail):
+        """Collapse a filter and wait for its state to be stored."""
+        title = detail.get_attribute("data-filter-title")
+        detail.locator("summary").click()
+        self.expect(detail).not_to_have_attribute("open")
+        self.page.wait_for_function(
+            "title => JSON.parse(sessionStorage.getItem("
+            "'django.admin.filtersState'))?.[title] === false",
+            arg=title,
+        )
+
     def test_add_row_selection(self):
         """
         The status line for selected rows gets updated correctly (#22038).
@@ -2254,8 +2281,7 @@ class PlaywrightTests(AdminPlaywrightTestCase):
             self.expect(detail).to_have_attribute("open")
         # Collapse "staff' and "superuser" filters.
         for detail in details[:2]:
-            detail.locator("summary").click()
-            self.expect(detail).not_to_have_attribute("open")
+            self.collapse_filter(detail)
         # Filters are in the same state after refresh.
         self.page.reload()
         self.expect(
@@ -2271,7 +2297,8 @@ class PlaywrightTests(AdminPlaywrightTestCase):
         self.page.goto(
             self.live_server_url + reverse("admin:admin_changelist_band_changelist")
         )
-        self.page.locator("summary").click()
+        detail = self.page.locator("[data-filter-title='number of members']")
+        self.collapse_filter(detail)
         # Go to Users view and then, back again to Bands view.
         self.page.goto(self.live_server_url + reverse("admin:auth_user_changelist"))
         self.page.goto(
@@ -2288,8 +2315,7 @@ class PlaywrightTests(AdminPlaywrightTestCase):
         self.page.goto(self.live_server_url + changelist_url)
         # Title is escaped.
         filter_title = self.page.locator("[data-filter-title='It\\'s OK']")
-        filter_title.locator("summary").click()
-        self.expect(filter_title).not_to_have_attribute("open")
+        self.collapse_filter(filter_title)
         # Filter is in the same state after refresh.
         self.page.reload()
         self.expect(
