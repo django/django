@@ -169,6 +169,22 @@ class ModelChoiceFieldTests(TestCase):
         Category.objects.all().delete()
         self.assertIs(bool(f.choices), False)
 
+    def test_empty_label_one_query(self):
+        class MyForm(forms.Form):
+            f = forms.ModelChoiceField(Category.objects.all(), empty_label=None)
+
+        form = MyForm()
+        with self.assertNumQueries(1):
+            form.as_ul()
+        # Ensure the query re-runs when re-rendering the form.
+        with self.assertNumQueries(1):
+            form.as_ul()
+
+        # Ensure the iterator stops after yielding its choices.
+        choice_iterator = iter(form.fields["f"].choices)
+        self.assertEqual(len(list(choice_iterator)), 3)
+        self.assertEqual(len(list(choice_iterator)), 0)
+
     def test_choices_bool_empty_label(self):
         f = forms.ModelChoiceField(Category.objects.all(), empty_label="--------")
         Category.objects.all().delete()
