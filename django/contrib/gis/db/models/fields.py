@@ -20,6 +20,7 @@ from django.contrib.gis.geos import (
 from django.contrib.gis.geos.prototypes.io import MAX_GEOM_COLLECTIONS
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Field
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 # Local cache of the spatial_ref_sys table, which holds SRID data for each
@@ -352,6 +353,21 @@ class GeometryField(BaseSpatialField):
         if not compiler.query.subquery:
             return compiler.connection.ops.select % sql, params
         return sql, params
+
+    def render_readonly(self, value, empty_value_display):
+        formfield = self.formfield()
+        widget = formfield.widget
+        rendered = widget.render(
+            name=self.name,
+            value=value,
+            attrs={
+                "id": "id_%s" % self.name,
+                "is_readonly": True,
+                "display_raw": True,
+            },
+        )
+
+        return mark_safe(rendered.replace("\n", " "))
 
 
 # The OpenGIS Geometry Type Fields
