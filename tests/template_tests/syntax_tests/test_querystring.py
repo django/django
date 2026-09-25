@@ -1,5 +1,5 @@
 from django.http import QueryDict
-from django.template import RequestContext
+from django.template import Context, RequestContext
 from django.template.base import TemplateSyntaxError
 from django.test import RequestFactory, SimpleTestCase
 
@@ -265,6 +265,28 @@ class QueryStringTagTests(SimpleTestCase):
 
     @setup({"querystring_no_request_no_query_dict": "{% querystring %}"})
     def test_querystring_without_request_or_explicit_query_dict(self):
-        msg = "'Context' object has no attribute 'request'"
-        with self.assertRaisesMessage(AttributeError, msg):
+        msg = "'Context' object has no key 'request'"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string("querystring_no_request_no_query_dict")
+
+    @setup({"querystring_with_context_object": "{% querystring my_query_dict %}"})
+    def test_querystring_with_context_object(self):
+        context = Context({"my_query_dict": QueryDict("a=1&b=2")})
+        self.assertRenderEqual(
+            "querystring_with_context_object", context, expected="?a=1&amp;b=2"
+        )
+
+    @setup({"querystring_with_empty_context_object": "{% querystring %}"})
+    def test_querystring_with_empty_context_object(self):
+        msg = "'Context' object has no key 'request'"
+        context = Context()
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string("querystring_with_empty_context_object")
+        
+    @setup({"querystring_with_context_object_containing_request": "{% querystring a=my_list %}"})
+    def test_querystring_with_context_object_containing_request(self):
+        request = self.request_factory.get("/")
+        context = Context({"request": request, "my_list": [2, 3]})
+        self.assertRenderEqual(
+            "querystring_with_context_object_containing_request", context, expected="?a=2&amp;a=3"
+        )
