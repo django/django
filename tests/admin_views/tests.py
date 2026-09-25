@@ -7820,6 +7820,185 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
+class ReadonlyFormfieldOverridesTest(TestCase):
+    """
+    ModelAdmin.readonly_formfield_overrides customizes the rendering of
+    read-only field values.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.superuser = User.objects.create_superuser(
+            username="super", password="secret", email="super@example.com"
+        )
+        cls.viewuser = User.objects.create_user(
+            username="viewuser", password="secret", is_staff=True
+        )
+        cls.viewuser.user_permissions.add(get_perm(Post, "view_post"))
+        cls.post = Post.objects.create(
+            title="Overridden title",
+            content="Overridden content",
+            readonly_content="Readonly content",
+            public=True,
+        )
+        cls.url = reverse(
+            "namespaced_admin:admin_views_post_change", args=(cls.post.pk,)
+        )
+
+    def test_override_applies_to_view_only_user(self):
+        """
+        For a user without change permission, every field renders read-only
+        and overridden fields use the configured widget.
+        """
+        self.client.force_login(self.viewuser)
+        response = self.client.get(self.url)
+        self.assertContains(
+            response,
+            '<span class="readonly-override">Overridden title</span>',
+            html=True,
+        )
+        self.assertContains(
+            response,
+            '<span class="readonly-override">Overridden content</span>',
+            html=True,
+        )
+        self.assertNotContains(
+            response,
+            '<div class="readonly">Overridden content</div>',
+            html=True,
+        )
+
+    def test_override_by_field_class_covers_every_field_of_that_type(self):
+        """
+        One entry keyed by a field class covers every read-only field of that
+        type, on ModelAdmin subclasses that don't repeat the declaration.
+        """
+        self.client.force_login(self.superuser)
+        response = self.client.get(self.url)
+        self.assertContains(
+            response,
+            '<span class="readonly-override">Overridden content</span>',
+            html=True,
+        )
+        self.assertContains(
+            response,
+            '<span class="readonly-override">Readonly content</span>',
+            html=True,
+        )
+
+    def test_override_entry_without_a_widget_uses_the_default_rendering(self):
+        """An entry with no "widget" key leaves the field's rendering alone."""
+        self.client.force_login(self.superuser)
+        response = self.client.get(self.url)
+        self.assertContains(response, 'alt="True"')
+
+    def test_overrides_do_not_apply_to_callables(self):
+        """
+        A read-only entry that resolves to a ModelAdmin method or a model
+        attribute has no model field, so no override can apply to it.
+        """
+        self.client.force_login(self.superuser)
+        response = self.client.get(self.url)
+        self.assertContains(
+            response, '<div class="readonly">Very awesome.</div>', html=True
+        )
+
+    def test_get_readonly_widget_can_target_a_single_field(self):
+        """
+        Overriding get_readonly_widget() targets one field, while another
+        field of the same class still uses readonly_formfield_overrides.
+        """
+        self.client.force_login(self.superuser)
+        response = self.client.get(
+            reverse("admin7:admin_views_post_change", args=(self.post.pk,))
+        )
+        self.assertContains(
+            response,
+            '<span class="per-field-override">Readonly content</span>',
+            html=True,
+        )
+        self.assertContains(
+            response,
+            '<span class="readonly-override">Overridden content</span>',
+            html=True,
+        )
+
+    def test_override_accepts_a_configured_widget_instance(self):
+        """
+        An entry may hold a widget instance instead of a class, and the
+        instance's own attrs are available to its render(), which receives the
+        field's raw value.
+        """
+        self.client.force_login(self.superuser)
+        response = self.client.get(
+            reverse("admin7:admin_views_post_change", args=(self.post.pk,))
+        )
+        self.assertContains(
+            response,
+            '<span data-mode="read">%s</span>' % self.post.posted.isoformat(),
+            html=True,
+        )
+
+    def test_override_applies_to_readonly_fields(self):
+        """
+        Fields listed in readonly_fields use the configured widget even for
+        users with change permission.
+        """
+        self.client.force_login(self.superuser)
+        response = self.client.get(self.url)
+        self.assertContains(
+            response,
+            '<span class="readonly-override">Overridden content</span>',
+            html=True,
+        )
+        self.assertNotContains(
+            response,
+            '<div class="readonly">Overridden content</div>',
+            html=True,
+        )
+
+    def test_readonly_field_without_override_is_unchanged(self):
+        """A read-only field with no override keeps the default rendering."""
+        self.client.force_login(self.superuser)
+        response = self.client.get(self.url)
+        self.assertContains(
+            response,
+            '<div class="readonly">%s</div>' % formats.localize(self.post.posted),
+            html=True,
+        )
+
+    def test_override_widget_output_is_escaped(self):
+        hostile = Post.objects.create(
+            title="Hostile",
+            content="<script>alert('boom')</script>",
+            readonly_content="rc",
+        )
+        self.client.force_login(self.superuser)
+        response = self.client.get(
+            reverse("namespaced_admin:admin_views_post_change", args=(hostile.pk,))
+        )
+        self.assertContains(
+            response,
+            "&lt;script&gt;alert(&#x27;boom&#x27;)&lt;/script&gt;",
+        )
+        self.assertNotContains(response, "<script>alert('boom')</script>")
+
+    def test_override_has_no_effect_on_editable_fields(self):
+        """
+        An override entry for a field rendered as editable doesn't affect
+        the regular form widget.
+        """
+        self.client.force_login(self.superuser)
+        response = self.client.get(self.url)
+        self.assertContains(response, 'name="title"')
+        self.assertNotContains(
+            response,
+            '<span class="readonly-override">Overridden title</span>',
+            html=True,
+        )
+
+
+@override_settings(ROOT_URLCONF="admin_views.urls")
 class LimitChoicesToInAdminTest(TestCase):
     @classmethod
     def setUpTestData(cls):
