@@ -593,6 +593,36 @@ class FileStorageTests(SimpleTestCase):
             self.assertEqual(f.read(), b"custom contents")
         self.addCleanup(self.storage.delete, p)
 
+    def test_get_file_extension(self):
+        # Without max_length, all suffixes are preserved.
+        self.assertEqual(self.storage.get_file_extension("archive.tar.gz"), ".tar.gz")
+        self.assertEqual(self.storage.get_file_extension("file.txt"), ".txt")
+        self.assertEqual(self.storage.get_file_extension("no_extension"), "")
+        self.assertEqual(
+            self.storage.get_file_extension("this.is.a.very.long.name.txt"),
+            ".is.a.very.long.name.txt",
+        )
+        # With a max_length large enough, all suffixes are still preserved.
+        self.assertEqual(
+            self.storage.get_file_extension("archive.tar.gz", max_length=100),
+            ".tar.gz",
+        )
+        # With a max_length that forces trimming, shorter chains are returned.
+        # ext_limit = max_length - 9 = 21; ".is.a.very.long.name.txt" = 24
+        # chars, but ".a.very.long.name.txt" = 21 chars fits.
+        self.assertEqual(
+            self.storage.get_file_extension(
+                "this.is.a.very.long.name.txt", max_length=30
+            ),
+            ".a.very.long.name.txt",
+        )
+        # When even the last suffix exceeds ext_limit, it is returned as a
+        # fallback so the existing SuspiciousFileOperation guard still fires.
+        self.assertEqual(
+            self.storage.get_file_extension("file.longext", max_length=5),
+            ".longext",
+        )
+
 
 class CustomStorage(FileSystemStorage):
     def get_available_name(self, name, max_length=None):
@@ -707,6 +737,18 @@ class OverwritingStorageTests(FileStorageTests):
             SuspiciousFileOperation, "Storage can not find an available filename"
         ):
             self.storage.save(name, file, max_length=5)
+
+    def test_file_name_truncation_with_dots_in_name(self):
+        # Saving a file whose name contains multiple dots should not raise
+        # SuspiciousFileOperation when a max_length forces truncation. The
+        # dots that are part of the stem (not a file extension) should not
+        # prevent truncation. Regression test for #35818.
+        name = "this.is.a.very." + "o" * 50 + ".txt"
+        file = ContentFile(b"content")
+        max_length = 30
+        stored_name = self.storage.save(name, file, max_length=max_length)
+        self.addCleanup(self.storage.delete, stored_name)
+        self.assertLessEqual(len(stored_name), max_length)
 
 
 class DiscardingFalseContentStorage(FileSystemStorage):
@@ -830,12 +872,21 @@ class FileFieldStorageTests(TestCase):
 
     def test_duplicate_filename(self):
         # Multiple files with the same name get _(7 random chars) appended to
-        # them.
+        # them. Multi-part extensions (e.g. .tar.gz) are preserved when they
+        # fit within the field's max_length.
         tests = [
-            ("multiple_files", "txt"),
-            ("multiple_files_many_extensions", "tar.gz"),
+            (
+                "multiple_files",
+                "txt",
+                f"tests/multiple_files_{FILE_SUFFIX_REGEX}\\.txt",
+            ),
+            (
+                "multiple_files_many_extensions",
+                "tar.gz",
+                f"tests/multiple_files_many_extensions_{FILE_SUFFIX_REGEX}\\.tar\\.gz",
+            ),
         ]
-        for filename, extension in tests:
+        for filename, extension, expected_pattern in tests:
             with self.subTest(filename=filename):
                 objs = [Storage() for i in range(2)]
                 for o in objs:
@@ -843,9 +894,7 @@ class FileFieldStorageTests(TestCase):
                 try:
                     names = [o.normal.name for o in objs]
                     self.assertEqual(names[0], f"tests/{filename}.{extension}")
-                    self.assertRegex(
-                        names[1], f"tests/{filename}_{FILE_SUFFIX_REGEX}.{extension}"
-                    )
+                    self.assertRegex(names[1], expected_pattern)
                 finally:
                     for o in objs:
                         o.delete()
