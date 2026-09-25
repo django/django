@@ -878,6 +878,23 @@ class Field(RegisterLookupMixin):
         self.run_validators(value)
         return value
 
+    def clean_fields(self, instance):
+        """
+        Read this field's value from the model instance, clean it, and store
+        the cleaned value back on the instance. Called by Model.clean_fields().
+        """
+        from django.db.models.expressions import DatabaseDefault
+
+        raw_value = getattr(instance, self.attname)
+        # Skip validation for empty fields with blank=True. The developer is
+        # responsible for making sure they have a valid value.
+        if self.blank and raw_value in self.empty_values:
+            return
+        # Skip validation for empty fields when db_default is used.
+        if isinstance(raw_value, DatabaseDefault):
+            return
+        setattr(instance, self.attname, self.clean(raw_value, instance))
+
     def db_type_parameters(self, connection):
         return DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
 
