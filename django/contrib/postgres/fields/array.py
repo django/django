@@ -10,6 +10,7 @@ from django.contrib.postgres.validators import ArrayMaxLengthValidator
 from django.core import checks, exceptions
 from django.db.models import Field, Func, IntegerField, Transform, Value
 from django.db.models.fields.mixins import CheckFieldDefaultMixin
+from django.db.models.functions import Cast
 from django.db.models.lookups import Exact, In
 from django.utils.translation import gettext_lazy as _
 
@@ -251,22 +252,32 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
         return SliceTransform(start, end, expression)
 
 
+def _array_expression(values, base_field):
+    """
+    Build an ARRAY[...] expression, so that elements which are expressions are
+    rendered as SQL instead of being passed as query parameters.
+    """
+    expressions = [
+        (
+            value
+            if hasattr(value, "resolve_expression")
+            else Value(base_field.get_prep_value(value))
+        )
+        for value in values
+    ]
+    return Func(
+        *expressions,
+        function="ARRAY",
+        template="%(function)s[%(expressions)s]",
+    )
+
+
 class ArrayRHSMixin:
     def __init__(self, lhs, rhs):
         # Don't wrap arrays that contains only None values, psycopg doesn't
         # allow this.
         if isinstance(rhs, (tuple, list)) and any(self._rhs_not_none_values(rhs)):
-            expressions = []
-            for value in rhs:
-                if not hasattr(value, "resolve_expression"):
-                    field = lhs.output_field
-                    value = Value(field.base_field.get_prep_value(value))
-                expressions.append(value)
-            rhs = Func(
-                *expressions,
-                function="ARRAY",
-                template="%(function)s[%(expressions)s]",
-            )
+            rhs = _array_expression(rhs, lhs.output_field.base_field)
         super().__init__(lhs, rhs)
 
     def process_rhs(self, compiler, connection):
@@ -328,6 +339,14 @@ class ArrayInLookup(In):
         for value in values:
             if hasattr(value, "resolve_expression"):
                 prepared_values.append(value)
+            elif any(hasattr(item, "resolve_expression") for item in value):
+                output_field = self.lhs.output_field
+                prepared_values.append(
+                    Cast(
+                        _array_expression(value, output_field.base_field),
+                        output_field,
+                    )
+                )
             else:
                 prepared_values.append(tuple(value))
         return prepared_values
