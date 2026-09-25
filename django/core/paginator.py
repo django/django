@@ -120,6 +120,9 @@ class BasePaginator:
         else:
             yield from range(number + 1, num_pages + 1)
 
+    def get_page_class(self):
+        return getattr(self, "page_class", Page)
+
     def _get_page(self, *args, **kwargs):
         """
         Return an instance of a single page.
@@ -127,7 +130,13 @@ class BasePaginator:
         This hook can be used by subclasses to use an alternative to the
         standard :cls:`Page` object.
         """
-        return Page(*args, **kwargs)
+        warnings.warn(
+            "Paginator._get_page() is deprecated in favor of "
+            "Paginator.get_page_class().",
+            RemovedInDjango70Warning,
+            stacklevel=2,
+        )
+        return self.get_page_class()(*args, **kwargs)
 
     def _validate_number(self, number, num_pages):
         """Validate the given 1-based page number."""
@@ -172,7 +181,17 @@ class Paginator(BasePaginator):
         top = bottom + self.per_page
         if top + self.orphans >= self.count:
             top = self.count
-        return self._get_page(self.object_list[bottom:top], number, self)
+
+        if type(self)._get_page != BasePaginator._get_page:
+            warnings.warn(
+                "Paginator._get_page() is deprecated in favor of "
+                "Paginator.get_page_class().",
+                RemovedInDjango70Warning,
+                stacklevel=2,
+            )
+            return self._get_page(self.object_list[bottom:top], number, self)
+
+        return self.get_page_class()(self.object_list[bottom:top], number, self)
 
     @cached_property
     def count(self):
@@ -248,10 +267,28 @@ class AsyncPaginator(BasePaginator):
         if top + self.orphans >= count:
             top = count
 
-        return self._get_page(self.object_list[bottom:top], number, self)
+        if type(self)._get_page != AsyncPaginator._get_page:
+            warnings.warn(
+                "AsyncPaginator._get_page() is deprecated in favor of "
+                "AsyncPaginator.get_page_class().",
+                RemovedInDjango70Warning,
+                stacklevel=2,
+            )
+            return self._get_page(self.object_list[bottom:top], number, self)
+
+        return self.get_page_class()(self.object_list[bottom:top], number, self)
+
+    def get_page_class(self):
+        return getattr(self, "page_class", AsyncPage)
 
     def _get_page(self, *args, **kwargs):
-        return AsyncPage(*args, **kwargs)
+        warnings.warn(
+            "AsyncPaginator._get_page() is deprecated in favor of "
+            "AsyncPaginator.get_page_class().",
+            RemovedInDjango70Warning,
+            stacklevel=2,
+        )
+        return self.get_page_class()(*args, **kwargs)
 
     async def acount(self):
         """See Paginator.count()."""

@@ -426,8 +426,15 @@ class PaginationTests(SimpleTestCase):
         """
         eleven = "abcdefghijk"
         paginator = ValidAdjacentNumsPaginator(eleven, per_page=6)
-        page1 = paginator.page(1)
-        page2 = paginator.page(2)
+        msg = (
+            "Paginator._get_page() is deprecated in favor of "
+            "Paginator.get_page_class()."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            page1 = paginator.page(1)
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            page2 = paginator.page(2)
+
         self.assertIsNone(page1.previous_page_number())
         self.assertEqual(page1.next_page_number(), 2)
         self.assertEqual(page2.previous_page_number(), 1)
@@ -440,12 +447,53 @@ class PaginationTests(SimpleTestCase):
         """
         eleven = "abcdefghijk"
         paginator = AsyncValidAdjacentNumsPaginator(eleven, per_page=6)
-        page1 = await paginator.apage(1)
-        page2 = await paginator.apage(2)
+        msg = (
+            "AsyncPaginator._get_page() is deprecated in favor of "
+            "AsyncPaginator.get_page_class()."
+        )
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            page1 = await paginator.apage(1)
+        with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+            page2 = await paginator.apage(2)
+
         self.assertIsNone(await page1.aprevious_page_number())
         self.assertEqual(await page1.anext_page_number(), 2)
         self.assertEqual(await page2.aprevious_page_number(), 1)
         self.assertIsNone(await page2.anext_page_number())
+
+    def test_page_class_attribute(self):
+        """
+        A Paginator subclass can use the ``page_class`` attribute to
+        return an alternative to the standard Page class.
+        """
+        from django.core.paginator import Page
+
+        class MyPage(Page):
+            pass
+
+        class CustomPagePaginator(Paginator):
+            page_class = MyPage
+
+        paginator = CustomPagePaginator("abcdefghijk", per_page=6)
+        page1 = paginator.page(1)
+        self.assertIsInstance(page1, MyPage)
+
+    async def test_page_class_attribute_async(self):
+        """
+        An AsyncPaginator subclass can use the ``page_class`` attribute to
+        return an alternative to the standard AsyncPage class.
+        """
+        from django.core.paginator import AsyncPage
+
+        class MyAsyncPage(AsyncPage):
+            pass
+
+        class CustomAsyncPagePaginator(AsyncPaginator):
+            page_class = MyAsyncPage
+
+        paginator = CustomAsyncPagePaginator("abcdefghijk", per_page=6)
+        page1 = await paginator.apage(1)
+        self.assertIsInstance(page1, MyAsyncPage)
 
     def test_page_range_iterator(self):
         """
