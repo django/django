@@ -234,6 +234,13 @@ class TemplateCommand(BaseCommand):
 
         run_formatters([top_dir], **formatter_paths, stderr=self.stderr)
 
+        if self.verbosity >= 1:
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f'Success! Created {self.app_or_project} "{name}" at "{top_dir}".'
+                )
+            )
+
     def handle_template(self, template, subdir):
         """
         Determine where the app or project templates are.
