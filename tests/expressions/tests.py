@@ -425,11 +425,11 @@ class BasicExpressionsTests(TestCase):
             "foo",
         )
 
-        msg = "Joined field references are not permitted in this query"
-        with self.assertRaisesMessage(FieldError, msg):
-            Company.objects.exclude(
-                ceo__firstname=F("point_of_contact__firstname")
-            ).update(name=F("point_of_contact__lastname"))
+        "Joined field references are now permitted in this query"
+        count = Company.objects.exclude(
+            ceo__firstname=F("point_of_contact__firstname")
+        ).update(name=F("point_of_contact__lastname"))
+        self.assertEqual(count, 1)
 
     def test_object_update(self):
         # F expressions can be used to update attributes on single objects
@@ -484,14 +484,14 @@ class BasicExpressionsTests(TestCase):
         test_gmbh.point_of_contact = self.gmbh.ceo
         test_gmbh.save()
         test_gmbh.name = F("ceo__lastname")
-        msg = "Joined field references are not permitted in this query"
-        with self.assertRaisesMessage(FieldError, msg):
-            test_gmbh.save()
+        "Joined field references are now permitted in this query"
+        test_gmbh.save()
+        self.assertEqual(test_gmbh.name, "Mustermann")
 
     def test_update_inherited_field_value(self):
-        msg = "Joined field references are not permitted in this query"
-        with self.assertRaisesMessage(FieldError, msg):
-            RemoteEmployee.objects.update(adjusted_salary=F("salary") * 5)
+        "Joined field references are now permitted in this query"
+        count = RemoteEmployee.objects.update(adjusted_salary=F("salary") * 5)
+        self.assertEqual(count, 0)
 
     def test_object_update_unsaved_objects(self):
         # F expressions cannot be used to update attributes on objects which do

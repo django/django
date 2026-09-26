@@ -4,12 +4,16 @@ retrieval.
 """
 
 from django.core.exceptions import FieldError
+from django.db.models.aggregates import Aggregate
+from django.db.models.expressions import OuterRef, Subquery
+from django.db.models.query_utils import Q
 from django.db.models.sql.constants import (
     GET_ITERATOR_CHUNK_SIZE,
     NO_RESULTS,
     ROW_COUNT,
 )
 from django.db.models.sql.query import Query
+from django.db.models.sql.where import WhereNode
 
 __all__ = ["DeleteQuery", "UpdateQuery", "InsertQuery", "AggregateQuery"]
 
@@ -103,6 +107,22 @@ class UpdateQuery(Query):
             values_seq.append((field, model, val))
         return self.add_update_fields(values_seq)
 
+    def _convert_to_subquery(self, field, model, val):
+        inner = self.chain(klass=Query)
+        inner.where = WhereNode()
+        inner.add_q(Q(pk=OuterRef("pk")))
+
+        inner.clear_select_clause()
+        # Re-resolve the original expression, so joins are
+        # created in inner.If `val` is F("new_name"), substitute
+        # the annotation's source expression first.
+        resolved = val.resolve_expression(inner, allow_joins=True, for_save=True)
+        inner.add_annotation(resolved, f"subquery_{field.attname}", select=True)
+        inner.set_annotation_mask([f"subquery_{field.attname}"])
+        inner.set_limits(high=1)
+        inner._wrap_subquery = True
+        return Subquery(inner)
+
     def add_update_fields(self, values_seq):
         """
         Append a sequence of (field, model, value) triples to the internal list
@@ -116,7 +136,18 @@ class UpdateQuery(Query):
             if hasattr(val, "resolve_expression"):
                 # Resolve expressions here so that annotations are no longer
                 # needed
-                val = val.resolve_expression(self, allow_joins=False, for_save=True)
+                try:
+                    if hasattr(val, "name") and (
+                        isinstance(val, Aggregate)
+                        or isinstance(self.annotations.get(val.name), Aggregate)
+                    ):
+                        val = self._convert_to_subquery(field, model, val)
+                    else:
+                        val = val.resolve_expression(
+                            self, allow_joins=False, for_save=True
+                        )
+                except FieldError:
+                    val = self._convert_to_subquery(field, model, val)
             self.values.append((field, model, val))
 
     def add_related_update(self, model, field, value):

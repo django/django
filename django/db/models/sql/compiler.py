@@ -8,7 +8,14 @@ from itertools import chain
 from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DatabaseError, NotSupportedError
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import ColPairs, F, OrderBy, RawSQL, Ref, Value
+from django.db.models.expressions import (
+    ColPairs,
+    F,
+    OrderBy,
+    RawSQL,
+    Ref,
+    Value,
+)
 from django.db.models.fields import AutoField, composite
 from django.db.models.functions import Cast, Random
 from django.db.models.lookups import Lookup
@@ -962,6 +969,15 @@ class SQLCompiler:
 
             if for_update_part and not features.for_update_after_from:
                 result.append(for_update_part)
+
+            # Some databases (e.g., MySQL) does not allow to select from
+            # the same table the UPDATE operation is performing on.
+            if (
+                self.query.subquery
+                and not features.supports_same_table_select_as_update
+                and self.query._wrap_subquery
+            ):
+                extra_select = True if not extra_select else extra_select
 
             if self.query.subquery and extra_select:
                 # If the query is used as a subquery, the extra selects would
@@ -2073,11 +2089,6 @@ class SQLUpdateCompiler(SQLCompiler):
                 val = val.resolve_expression(
                     self.query, allow_joins=False, for_save=True
                 )
-                if val.contains_aggregate:
-                    raise FieldError(
-                        "Aggregate functions are not allowed in this query "
-                        "(%s=%r)." % (field.name, val)
-                    )
                 if val.contains_over_clause:
                     raise FieldError(
                         "Window expressions are not allowed in this query "
