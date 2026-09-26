@@ -167,7 +167,12 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* The undocumented ``Textarea.input_type`` attribute is now set to
+  ``"textarea"`` for consistency with other built-in widgets.
+
+* ``Textarea`` now renders the ``hidden`` HTML attribute when the widget's
+  ``is_hidden`` property is ``True``, matching the behavior of other
+  widgets.
 
 Generic Views
 ~~~~~~~~~~~~~
