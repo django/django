@@ -203,6 +203,25 @@ some load external information into the template to be used by later variables.
 Some tags require beginning and ending tags (i.e. ``{% tag %} ... tag contents
 ... {% endtag %}``).
 
+Tags can span multiple lines, which can make tags with several arguments
+easier to read:
+
+.. code-block:: html+django
+
+    {% include
+        "blog/includes/article_card.html"
+        with
+            article=article
+            show_author=True
+            show_publication_date=True
+            extra_classes="featured-article"
+        only
+    %}
+
+.. versionchanged:: 6.2
+
+    Support for template tags spanning multiple lines was added.
+
 Django ships with about two dozen built-in template tags. You can read all
 about them in the :ref:`built-in tag reference <ref-templates-builtins-tags>`.
 To give you a taste of what's available, here are some of the more commonly

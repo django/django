@@ -90,7 +90,7 @@ UNKNOWN_SOURCE = "<unknown source>"
 # Match BLOCK_TAG_*, VARIABLE_TAG_*, and COMMENT_TAG_* tags and capture the
 # entire tag, including start/end delimiters. Using re.compile() is faster
 # than instantiating SimpleLazyObject with _lazy_re_compile().
-tag_re = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})")
+tag_re = re.compile(r"({%[\s\S]*?%}|{{.*?}}|{#.*?#})")
 
 logger = logging.getLogger("django.template")
 
@@ -257,11 +257,16 @@ class Template:
         source_lines = []
         before = during = after = ""
         for num, next in enumerate(linebreak_iter(self.source)):
-            if start >= upto and end <= next:
+            if start >= upto and start < next:
                 line = num
                 before = self.source[upto:start]
                 during = self.source[start:end]
-                after = self.source[end:next]
+                after_end = self.source.find("\n", end)
+                if after_end == -1:
+                    after_end = len(self.source)
+                else:
+                    after_end += 1
+                after = self.source[end:after_end]
             source_lines.append((num, self.source[upto:next]))
             upto = next
         total = len(source_lines)
@@ -357,7 +362,14 @@ def linebreak_iter(template_source):
 
 
 class Token:
-    def __init__(self, token_type, contents, position=None, lineno=None):
+    def __init__(
+        self,
+        token_type,
+        contents,
+        position=None,
+        lineno=None,
+        raw_contents=None,
+    ):
         """
         A token representing a string from the template.
 
@@ -375,11 +387,16 @@ class Token:
         lineno
             The line number the token appears on in the template source.
             This is used for traceback information and gettext files.
+
+        raw_contents
+            The original token raw contents, including its opening and closing
+            delimiters.
         """
         self.token_type = token_type
         self.contents = contents
         self.lineno = lineno
         self.position = position
+        self.raw_contents = raw_contents
 
     def __repr__(self):
         token_name = self.token_type.name.capitalize()
@@ -434,9 +451,9 @@ class Lexer:
         else:
             return None
 
-        end_content = r"[^\S\n]+".join(re.escape(bit) for bit in end_bits)
+        end_content = r"\s+".join(re.escape(bit) for bit in end_bits)
         return re.compile(
-            r"%s[^\S\n]*%s[^\S\n]*%s"
+            r"%s\s*%s\s*%s"
             % (
                 re.escape(BLOCK_TAG_START),
                 end_content,
@@ -514,7 +531,13 @@ class Lexer:
                     if bits and bits[0] == "verbatim":
                         # Then a verbatim block is starting.
                         self.verbatim = " ".join(["endverbatim", *bits[1:]])
-                return Token(TokenType.BLOCK, content, position, lineno)
+                return Token(
+                    TokenType.BLOCK,
+                    content,
+                    position,
+                    lineno,
+                    raw_contents=token_string if "\n" in token_string else None,
+                )
             if not self.verbatim:
                 content = token_string[2:-2].strip()
                 if token_start == VARIABLE_TAG_START:
@@ -697,30 +720,61 @@ class Parser:
             e.token = token
         return e
 
+    def _multiline_block_tag_message(self, token, opening=False):
+        if token.raw_contents is None or "\n" not in token.raw_contents:
+            return ""
+
+        source = token.raw_contents
+        if len(source) > 200:
+            source = "%s...%s" % (source[:100], source[-100:])
+
+        end_lineno = token.lineno + token.raw_contents.count("\n")
+        if opening:
+            message = "\nThe opening tag spans lines %d-%d: %r." % (
+                token.lineno,
+                end_lineno,
+                source,
+            )
+        else:
+            message = "\nDjango interpreted lines %d-%d as a single block tag: %r." % (
+                token.lineno,
+                end_lineno,
+                source,
+            )
+
+        return message + (
+            "\nIf the '{%' and '%}' sequences were intended as text, use "
+            "'{% templatetag openblock %}' and "
+            "'{% templatetag closeblock %}', respectively."
+        )
+
     def invalid_block_tag(self, token, command, parse_until=None):
+        multiline_message = self._multiline_block_tag_message(token)
         if parse_until:
             raise self.error(
                 token,
                 "Invalid block tag on line %d: '%s', expected %s. Did you "
-                "forget to register or load this tag?"
+                "forget to register or load this tag?%s"
                 % (
                     token.lineno,
                     command,
                     get_text_list(["'%s'" % p for p in parse_until], "or"),
+                    multiline_message,
                 ),
             )
         raise self.error(
             token,
             "Invalid block tag on line %d: '%s'. Did you forget to register "
-            "or load this tag?" % (token.lineno, command),
+            "or load this tag?%s" % (token.lineno, command, multiline_message),
         )
 
     def unclosed_block_tag(self, parse_until):
         command, token = self.command_stack.pop()
-        msg = "Unclosed tag on line %d: '%s'. Looking for one of: %s." % (
+        msg = "Unclosed tag on line %d: '%s'. Looking for one of: %s.%s" % (
             token.lineno,
             command,
             ", ".join(parse_until),
+            self._multiline_block_tag_message(token, opening=True),
         )
         raise self.error(token, msg)
 

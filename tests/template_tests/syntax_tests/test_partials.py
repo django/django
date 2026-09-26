@@ -287,7 +287,9 @@ class PartialTagTests(SimpleTestCase):
             "partialdef_opening_closing_name_mismatch": (
                 "{% partialdef testing-name %}TEST{% endpartialdef invalid %}"
             ),
-            "partialdef_invalid_name": gen_partial_template("with\nnewline"),
+            "partialdef_inline_without_parameters": gen_partial_template(
+                "with\nnewline"
+            ),
             "partialdef_extra_params": (
                 "{% partialdef testing-name inline extra %}TEST{% endpartialdef %}"
             ),
@@ -319,7 +321,11 @@ class PartialTagTests(SimpleTestCase):
                 "partialdef_opening_closing_name_mismatch",
                 "expected 'endpartialdef' or 'endpartialdef testing-name'.",
             ),
-            ("partialdef_invalid_name", "Invalid block tag on line 3: 'endpartialdef'"),
+            (
+                "partialdef_inline_without_parameters",
+                "The 'inline' argument does not have any parameters; "
+                "either use 'inline' or remove it completely.",
+            ),
             ("partialdef_extra_params", "'partialdef' tag takes at most 2 arguments"),
             (
                 "partialdef_duplicated_names",
@@ -495,15 +501,17 @@ class PartialTagTests(SimpleTestCase):
         }
     )
     def test_partial_with_syntax_error_exception_info(self):
-        with self.assertRaises(TemplateSyntaxError) as cm:
+        msg = (
+            'Malformed template tag at line 5: "endif\n'
+            "    <p>Missing closing tag above</p>\n"
+            '{% endpartialdef"'
+        )
+        with self.assertRaisesMessage(TemplateSyntaxError, msg) as cm:
             self.engine.get_template("partial_with_syntax_error")
-
-        self.assertIn("endif", str(cm.exception).lower())
 
         if self.engine.debug:
             exc_debug = cm.exception.template_debug
-
-            self.assertIn("endpartialdef", exc_debug["during"])
+            self.assertEqual("{% if user %}", exc_debug["during"])
             self.assertEqual(exc_debug["name"], "partial_with_syntax_error")
             self.assertIn("endif", exc_debug["message"].lower())
 
