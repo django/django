@@ -907,15 +907,31 @@ class MigrationAutodetector:
         new_keys = self.new_model_keys
         deleted_models = self.old_model_keys - new_keys
         all_deleted_models = sorted(deleted_models)
+        relations = self.from_state.relations
         for app_label, model_name in all_deleted_models:
             model_state = self.from_state.models[app_label, model_name]
             # Gather related fields
             related_fields = {}
             for field_name, field in model_state.fields.items():
                 if field.remote_field:
-                    if field.remote_field.model:
-                        related_fields[field_name] = field
-                    if getattr(field.remote_field, "through", None):
+                    rel_model = field.remote_field.model
+                    rel_key = (
+                        resolve_relation(rel_model, app_label, model_name)
+                        if rel_model
+                        else None
+                    )
+                    if rel_key and rel_key in deleted_models:
+                        has_cycle = any(
+                            not f.many_to_many
+                            for f in relations.get(rel_key, {})
+                            .get((app_label, model_name), {})
+                            .values()
+                        )
+                        if has_cycle and (app_label, model_name) < rel_key:
+                            continue
+                    if field.remote_field.model or getattr(
+                        field.remote_field, "through", None
+                    ):
                         related_fields[field_name] = field
             # Generate option removal first
             unique_together = model_state.options.pop("unique_together", None)
@@ -946,12 +962,13 @@ class MigrationAutodetector:
                         ),
                     )
             # Then remove each related field
-            for name in sorted(related_fields):
+            for name, field in sorted(related_fields.items()):
                 self.add_operation(
                     app_label,
                     operations.RemoveField(
                         model_name=model_name,
                         name=name,
+                        field=field,
                     ),
                     dependencies=[
                         OperationDependency(
@@ -968,10 +985,25 @@ class MigrationAutodetector:
             # a through model the field that references it.
             dependencies = []
             relations = self.from_state.relations
+            model_key = (app_label, model_state.name_lower)
             for (
                 related_object_app_label,
                 object_name,
-            ), relation_related_fields in relations[app_label, model_name].items():
+            ), relation_related_fields in relations[model_key].items():
+                related_key = (related_object_app_label, object_name.lower())
+                has_cycle = any(
+                    not f.many_to_many
+                    for f in relations.get(related_key, {}).get(model_key, {}).values()
+                )
+                if related_key in deleted_models and not has_cycle:
+                    dependencies.append(
+                        OperationDependency(
+                            related_object_app_label,
+                            object_name,
+                            None,
+                            OperationDependency.Type.REMOVE,
+                        ),
+                    )
                 for field_name, field in relation_related_fields.items():
                     dependencies.append(
                         OperationDependency(
@@ -1008,6 +1040,7 @@ class MigrationAutodetector:
                 app_label,
                 operations.DeleteModel(
                     name=model_state.name,
+                    fields=list(related_fields.items()),
                 ),
                 dependencies=list(set(dependencies)),
             )
@@ -1204,11 +1237,13 @@ class MigrationAutodetector:
             self._generate_removed_field(app_label, model_name, field_name)
 
     def _generate_removed_field(self, app_label, model_name, field_name):
+        field = self.from_state.models[app_label, model_name].get_field(field_name)
         self.add_operation(
             app_label,
             operations.RemoveField(
                 model_name=model_name,
                 name=field_name,
+                field=field,
             ),
             # Include dependencies such as order_with_respect_to, constraints,
             # and any generated fields that may depend on this field. These

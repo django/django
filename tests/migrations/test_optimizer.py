@@ -837,6 +837,81 @@ class OptimizerTests(OptimizerTestBase):
             ],
         )
 
+    def test_remove_field_delete_model(self):
+        """
+        DeleteModel should absorb RemoveField of same model
+        """
+        self.assertOptimizesTo(
+            [
+                migrations.RemoveField("Foo", "age"),
+                migrations.DeleteModel("Foo"),
+            ],
+            [
+                migrations.DeleteModel("Foo"),
+            ],
+        )
+        self.assertOptimizesTo(
+            [
+                migrations.RemoveField("foo", "age"),
+                migrations.DeleteModel("FOO"),
+            ],
+            [
+                migrations.DeleteModel("FOO"),
+            ],
+        )
+        self.assertOptimizesTo(
+            [
+                migrations.DeleteModel("Foo"),
+                migrations.RemoveField("Foo", "age"),
+            ],
+            [
+                migrations.DeleteModel("Foo"),
+            ],
+        )
+
+    def test_remove_field_delete_model_different_models(self):
+        """
+        DeleteModel on ModelB should not absorb RemoveField on ModelA
+        """
+        self.assertDoesNotOptimize(
+            [
+                migrations.RemoveField("Foo", "age"),
+                migrations.DeleteModel("Bar"),
+            ],
+        )
+
+    def test_multiple_remove_field_delete_model(self):
+        """
+        DeleteModel should absorb multiple RemoveField on the same model
+        """
+        self.assertOptimizesTo(
+            [
+                migrations.RemoveField("Foo", "age"),
+                migrations.RemoveField("Foo", "name"),
+                migrations.DeleteModel("Foo"),
+            ],
+            [
+                migrations.DeleteModel("Foo"),
+            ],
+        )
+
+    def test_remove_field_delete_model_intervening_delete_model(self):
+        """
+        DeleteModel should absorb RemoveField when an intervening DeleteModel
+        is present.
+        """
+        self.assertOptimizesTo(
+            [
+                migrations.RemoveField("ModelC", "related_field"),
+                migrations.DeleteModel("ModelB"),
+                migrations.DeleteModel("ModelC"),
+            ],
+            [
+                migrations.DeleteModel("ModelB"),
+                migrations.DeleteModel("ModelC"),
+            ],
+        )
+
     def _test_create_alter_foo_field(self, alter):
         """
         CreateModel, AlterFooTogether/AlterOrderWithRespectTo followed by an
