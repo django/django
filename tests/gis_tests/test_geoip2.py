@@ -11,7 +11,11 @@ from django.test import SimpleTestCase, override_settings
 if HAS_GEOIP2:
     import geoip2
 
-    from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
+    from django.contrib.gis.geoip2 import (
+        SUPPORTED_DATABASE_TYPES,
+        GeoIP2,
+        GeoIP2Exception,
+    )
 
 
 def build_geoip_path(*parts):
@@ -244,3 +248,41 @@ class ErrorTest(SimpleTestCase):
         with self.settings(GEOIP_PATH=build_geoip_path("GeoLite2-ASN-Test.mmdb")):
             with self.assertRaisesMessage(GeoIP2Exception, msg):
                 GeoIP2()
+
+    def test_default_supported_types(self):
+        self.assertIn("DBIP-City", SUPPORTED_DATABASE_TYPES)
+        self.assertIn("DBIP-Country", SUPPORTED_DATABASE_TYPES)
+
+    @mock.patch("geoip2.database.Reader")
+    def test_custom_supported_types_instance(self, MockReader):
+        MockReader.return_value.metadata.return_value.database_type = (
+            "Geoacumen-Country"
+        )
+        # Allowed via instance parameter.
+        g = GeoIP2(
+            path=build_geoip_path("GeoLite2-Country-Test.mmdb"),
+            supported_types=["Geoacumen-Country"],
+        )
+        self.assertIn("Geoacumen-Country", g.supported_types)
+
+        # Rejected when not in supported_types.
+        msg = "Unable to handle database edition: Geoacumen-Country"
+        with self.assertRaisesMessage(GeoIP2Exception, msg):
+            GeoIP2(
+                path=build_geoip_path("GeoLite2-Country-Test.mmdb"),
+                supported_types=["DBIP-Country"],
+            )
+
+    @mock.patch("geoip2.database.Reader")
+    def test_custom_supported_types_module_set(self, MockReader):
+        MockReader.return_value.metadata.return_value.database_type = (
+            "Geoacumen-Country"
+        )
+        # Extending the module-level set allows custom editions without
+        # monkey-patching.
+        SUPPORTED_DATABASE_TYPES.add("Geoacumen-Country")
+        try:
+            g = GeoIP2(path=build_geoip_path("GeoLite2-Country-Test.mmdb"))
+            self.assertIn("Geoacumen-Country", g.supported_types)
+        finally:
+            SUPPORTED_DATABASE_TYPES.discard("Geoacumen-Country")

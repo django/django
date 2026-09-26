@@ -204,6 +204,12 @@ Minor features
 * :class:`~django.contrib.gis.forms.widgets.OpenLayersWidget` is now based on
   OpenLayers 10.9.0 (previously 7.2.2).
 
+* :class:`~django.contrib.gis.geoip2.GeoIP2` now supports commercial DB-IP
+  (``'DBIP-City'`` and ``'DBIP-Country'``) database editions out of the box,
+  and adds the ``supported_types`` parameter as well as the
+  :data:`~django.contrib.gis.geoip2.SUPPORTED_DATABASE_TYPES` set to allow
+  custom database editions.
+
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
