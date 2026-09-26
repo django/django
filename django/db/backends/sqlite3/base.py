@@ -7,10 +7,11 @@ import decimal
 import warnings
 from collections.abc import Mapping
 from itertools import chain, tee
+from pathlib import Path
 from sqlite3 import dbapi2 as Database
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db import IntegrityError
+from django.db import IntegrityError, InterfaceError
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.utils.asyncio import async_unsafe
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
@@ -202,6 +203,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @async_unsafe
     def get_new_connection(self, conn_params):
+        if not self.is_in_memory_db():
+            try:
+                Path(conn_params["database"]).parent.mkdir(exist_ok=True, parents=True)
+            except OSError as e:
+                raise InterfaceError(
+                    "SQLite database parent path is a file, expected directory."
+                ) from e
         conn = Database.connect(**conn_params)
         register_functions(conn)
 
