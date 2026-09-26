@@ -500,6 +500,14 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
             resp = mw.process_view(req, post_form_view, (), {})
         self.assertForbiddenReason(resp, cm, REASON_NO_CSRF_COOKIE)
 
+    def test_query_accepted(self):
+        """
+        The HTTP QUERY method is safe (RFC 10008) and isn't CSRF protected.
+        """
+        req = self._get_request(method="QUERY")
+        mw = CsrfViewMiddleware(post_form_view)
+        self.assertIsNone(mw.process_view(req, post_form_view, (), {}))
+
     def test_put_and_delete_allowed(self):
         """
         HTTP PUT and DELETE can get through with X-CSRFToken and a cookie.
