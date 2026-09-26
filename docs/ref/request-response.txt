@@ -41,7 +41,8 @@ All attributes should be considered read-only, unless stated otherwise.
     The raw HTTP request body as a bytestring. This is useful for processing
     data in different ways than conventional HTML forms: binary images,
     XML payload etc. For processing conventional form data, use
-    :attr:`HttpRequest.POST`.
+    :attr:`HttpRequest.POST`. For other request content, such as the content of
+    ``PUT`` or ``QUERY`` requests, use this attribute.
 
     You can also read from an ``HttpRequest`` using a file-like interface with
     :meth:`HttpRequest.read` or :meth:`HttpRequest.readline`. Accessing
@@ -77,12 +78,6 @@ All attributes should be considered read-only, unless stated otherwise.
             do_something()
         elif request.method == "POST":
             do_something_else()
-
-    Django treats the :rfc:`QUERY <10008#section-2>` method as safe and
-    idempotent, like ``GET`` and ``HEAD``: it's exempt from CSRF protection and
-    takes part in conditional request processing. The query content isn't
-    parsed into :attr:`HttpRequest.POST`; read it from :attr:`HttpRequest.body`
-    and parse it according to the request's ``Content-Type``.
 
 .. attribute:: HttpRequest.encoding
 

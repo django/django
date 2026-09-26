@@ -47,7 +47,9 @@ Support for the HTTP ``QUERY`` method
 
 Django now recognizes the :rfc:`QUERY <10008>` method, which performs a safe,
 idempotent query with the query content in the request body rather than in the
-URL's query string.
+URL's query string. Use ``QUERY`` for read-only operations whose input is more
+naturally expressed in a request body, such as searches with complex,
+structured filters.
 
 ``QUERY`` is treated as a safe method throughout Django: it is exempt from CSRF
 protection, it participates in conditional request processing via
@@ -78,12 +80,11 @@ The query content is available as :attr:`HttpRequest.body
 :attr:`HttpRequest.POST <django.http.HttpRequest.POST>`; parse it yourself
 according to the request's ``Content-Type``.
 
-Caching of ``QUERY`` responses is not supported yet. The cache key for a
-``QUERY`` request must incorporate the request content, which
 :class:`~django.middleware.cache.UpdateCacheMiddleware`,
-:class:`~django.middleware.cache.FetchFromCacheMiddleware`, and
-:func:`~django.views.decorators.cache.cache_page` don't do, so they continue to
-ignore ``QUERY`` requests.
+:class:`~django.middleware.cache.FetchFromCacheMiddleware` and
+:func:`~django.views.decorators.cache.cache_page` do not cache ``QUERY``
+responses. Conditional request processing with ``ETag`` or ``Last-Modified``
+validators is supported.
 
 Minor features
 --------------
