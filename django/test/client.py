@@ -23,6 +23,7 @@ from django.http import HttpHeaders, HttpRequest, QueryDict, SimpleCookie
 from django.test import signals
 from django.test.utils import ContextList
 from django.urls import resolve
+from django.utils.asyncio import maybe_aclosing
 from django.utils.encoding import force_bytes
 from django.utils.functional import SimpleLazyObject
 from django.utils.http import urlencode
@@ -128,8 +129,9 @@ def closing_iterator_wrapper(iterable, close):
 
 async def aclosing_iterator_wrapper(iterable, close):
     try:
-        async for chunk in iterable:
-            yield chunk
+        async with maybe_aclosing(aiter(iterable)) as it:
+            async for chunk in it:
+                yield chunk
     finally:
         request_finished.disconnect(close_old_connections)
         close()  # will fire request_finished
