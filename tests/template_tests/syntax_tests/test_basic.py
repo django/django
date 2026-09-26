@@ -3,7 +3,10 @@ from django.template.base import Origin, Template, TemplateSyntaxError
 from django.template.context import Context
 from django.template.loader_tags import BlockContext, BlockNode
 from django.test import SimpleTestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango2028Warning
+from django.utils.deprecation import (
+    RemovedInDjango2028Warning,
+    RemovedInDjango2029Warning,
+)
 from django.views.debug import ExceptionReporter
 
 from ..utils import SilentAttrClass, SilentGetItemClass, SomeClass, setup
@@ -327,6 +330,174 @@ class BasicSyntaxTests(SimpleTestCase):
             "basic-syntax38", {"var": {"callable": lambda: "foo bar"}}
         )
         self.assertEqual(output, "foo bar")
+
+    @setup({"multiline_block_token": """
+                {% if
+                    foo
+                    or bar
+                %}a{%
+                    else
+                %}b{%
+                    endif
+                %}{% with a=3
+                     b='bar'|upper
+                     c=foo|upper
+                %}{{ a }} {{ b }} {{ c }}{% endwith %}
+            """})
+    def test_multiline_block_tags(self):
+        for context, expected_output in [
+            ({"foo": "cat", "bar": True}, "a3 BAR CAT"),
+            ({"foo": "cat", "bar": False}, "a3 BAR CAT"),
+            ({"foo": "", "bar": True}, "a3 BAR"),
+            ({"foo": "", "bar": False}, "b3 BAR"),
+        ]:
+            with self.subTest(context=context):
+                output = self.engine.render_to_string(
+                    "multiline_block_token", context
+                ).strip()
+                self.assertEqual(output, expected_output)
+
+    @setup({"newline_rendering": """
+              <p
+                data-test='{{% for item in item_list %}
+                  "{{ item }}": {"key": "value"},
+                {% endfor %}}'
+              ></p>
+            """})
+    def test_multiline_block_tag_between_literal_braces(self):
+        for context, contains_output in [
+            ({"item_list": []}, "data-test='{}'"),
+            ({"item_list": ["item_1"]}, '"item_1": {"key": "value"},'),
+        ]:
+            with self.subTest(context=context):
+                output = self.engine.render_to_string("newline_rendering", context)
+                self.assertIn(contains_output, output)
+
+    @setup({"unclosed_multiline_tag": "The open tag: {%\nif user %}"})
+    def test_unclosed_multiline_block_tag_error_suggests_templatetag(self):
+        msg = (
+            "Unclosed tag on line 1: 'if'. Looking for one of: elif, else, "
+            "endif.\n"
+            "The opening tag spans lines 1-2: '{%\\nif user %}'.\n"
+            "If the '{%' and '%}' sequences were intended as text, use "
+            "'{% templatetag openblock %}' and "
+            "'{% templatetag closeblock %}', respectively."
+        )
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string("unclosed_multiline_tag")
+
+    @setup(
+        {
+            "inside_block": (
+                "{% if user %}\n"
+                "<p>The open tag: {%</p>\n"
+                "<p>The close tag: %}</p>\n"
+                "{% endif %}"
+            ),
+        }
+    )
+    def test_multiline_block_tag_error_inside_block(self):
+        msg = (
+            "Invalid block tag on line 2: '</p>', expected 'elif', 'else' or "
+            "'endif'. Did you forget to register or load this tag?\n"
+            "Django interpreted lines 2-3 as a single block tag: "
+            "'{%</p>\\n<p>The close tag: %}'.\n"
+            "If the '{%' and '%}' sequences were intended as text, use "
+            "'{% templatetag openblock %}' and "
+            "'{% templatetag closeblock %}', respectively."
+        )
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string("inside_block")
+
+    @setup({"long_error": "{%" + ("a" * 150) + "\n" + ("b" * 150) + "%}"})
+    def test_multiline_block_tag_message_truncates_source(self):
+        command = "a" * 150
+        start = "a" * 98
+        end = "b" * 98
+        msg = (
+            f"Invalid block tag on line 1: {command!r}. Did you forget to "
+            "register or load this tag?\n"
+            "Django interpreted lines 1-2 as a single block tag: "
+            f"'{{%{start}...{end}%}}'.\n"
+            "If the '{%' and '%}' sequences were intended as text, use "
+            "'{% templatetag openblock %}' and "
+            "'{% templatetag closeblock %}', respectively."
+        )
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string("long_error")
+
+    @setup({"in_text": "<p>The open tag: {%</p>\n<p>The close tag: %}</p>"})
+    def test_multiline_block_tag_error_message(self):
+        msg = (
+            "Invalid block tag on line 1: '</p>'. Did you forget to register "
+            "or load this tag?\n"
+            "Django interpreted lines 1-2 as a single block tag: "
+            "'{%</p>\\n<p>The close tag: %}'.\n"
+            "If the '{%' and '%}' sequences were intended as text, use "
+            "'{% templatetag openblock %}' and "
+            "'{% templatetag closeblock %}', respectively."
+        )
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string("in_text")
+
+    def test_multiline_block_tag_debug_info(self):
+        engine = Engine(debug=True)
+        source = "<p>The open tag: {%</p>\n<p>The close tag: %}</p>"
+
+        with self.assertRaises(TemplateSyntaxError) as cm:
+            engine.from_string(source)
+
+        self.assertEqual(
+            cm.exception.template_debug["during"],
+            "{%</p>\n<p>The close tag: %}",
+        )
+        self.assertEqual(cm.exception.template_debug["line"], 1)
+        self.assertEqual(
+            cm.exception.template_debug["start"],
+            source.index("{%"),
+        )
+        self.assertEqual(
+            cm.exception.template_debug["end"],
+            source.index("%}") + 2,
+        )
+
+    @setup(
+        {
+            "escaped_block_tags": (
+                "<p>The open tag: {% templatetag openblock %}</p>\n"
+                "<p>The close tag: {% templatetag closeblock %}</p>"
+            ),
+        }
+    )
+    def test_block_tags_rendered_as_text(self):
+        output = self.engine.render_to_string("escaped_block_tags")
+        self.assertEqual(
+            output,
+            "<p>The open tag: {%</p>\n" "<p>The close tag: %}</p>",
+        )
+
+    def test_allow_multiline_tags_disabled(self):
+        msg = (
+            "The 'allow_multiline_tags' transitional template engine "
+            "option is deprecated."
+        )
+        tests = [
+            ("<p>The open tag: {%</p>\n" "<p>The close tag: %}</p>"),
+            "{%\ncsrf_token\n%}",
+        ]
+
+        for debug in (False, True):
+            with self.subTest(debug=debug):
+                with self.assertWarnsMessage(RemovedInDjango2029Warning, msg):
+                    engine = Engine(
+                        debug=debug,
+                        allow_multiline_tags=False,
+                    )
+
+                for source in tests:
+                    with self.subTest(source=source):
+                        template = engine.from_string(source)
+                        self.assertEqual(template.render(Context()), source)
 
     @setup({"template": "{% block content %}"})
     def test_unclosed_block(self):

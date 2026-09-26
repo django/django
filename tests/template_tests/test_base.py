@@ -28,6 +28,15 @@ class LexerTestMixin:
         ]
         self.assertEqual(token_tuples, self.make_expected())
 
+    def test_tokenize_multiline_block(self):
+        template = "before\n{%\nif foo\n%}after"
+        token = self.lexer_class(template).tokenize()[1]
+
+        self.assertEqual(token.token_type, TokenType.BLOCK)
+        self.assertEqual(token.contents, "if foo")
+        self.assertEqual(token.lineno, 2)
+        self.assertEqual(token.raw_contents, "{%\nif foo\n%}")
+
     def make_expected(self):
         raise NotImplementedError("This method must be implemented by a subclass.")
 
