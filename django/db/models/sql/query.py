@@ -1665,15 +1665,17 @@ class Query(BaseExpression):
                 "permitted%s" % (unsupported_lookup, output_field.__name__, suggestion)
             )
 
-    def _expression_contains_nullable_subquery_column(self, expression):
+    def _expression_has_nullable_source(self, expression):
         if expression is None:
             return False
+        if self.is_nullable(expression.output_field):
+            return True
         if isinstance(expression, Col):
             join = self.alias_map.get(expression.alias)
-            return isinstance(join, SubqueryJoin) and join.join_type == LOUTER
+            return join is not None and join.join_type == LOUTER
 
         return any(
-            self._expression_contains_nullable_subquery_column(source)
+            self._expression_has_nullable_source(source)
             for source in expression.get_source_expressions()
         )
 
@@ -1771,7 +1773,7 @@ class Query(BaseExpression):
                 current_negated
                 and condition.lookup_name != "isnull"
                 and condition.rhs is not None
-                and self._expression_contains_nullable_subquery_column(condition.lhs)
+                and self._expression_has_nullable_source(condition.lhs)
             ):
                 lookup_class = condition.lhs.get_lookup("isnull")
                 clause.add(lookup_class(condition.lhs, False), AND)
@@ -1860,14 +1862,9 @@ class Query(BaseExpression):
                         clause.add(lookup_class(col, False), AND)
                 # If someval is a nullable column, someval IS NOT NULL is
                 # added.
-                value_is_nullable = isinstance(value, Col) and self.is_nullable(
-                    value.target
-                )
-                value_contains_nullable_subquery_column = isinstance(
+                if isinstance(
                     value, BaseExpression
-                ) and self._expression_contains_nullable_subquery_column(value)
-
-                if value_is_nullable or value_contains_nullable_subquery_column:
+                ) and self._expression_has_nullable_source(value):
                     lookup_class = value.get_lookup("isnull")
                     clause.add(lookup_class(value, False), AND)
         return clause, used_joins if not require_outer else ()

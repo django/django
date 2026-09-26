@@ -433,6 +433,29 @@ class BasicExpressionsTests(TestCase):
                 ceo__firstname=F("point_of_contact__firstname")
             ).update(name=F("point_of_contact__lastname"))
 
+    def test_exclude_with_nullable_join_rhs(self):
+        companies = Company.objects.exclude(
+            ceo__firstname=F("point_of_contact__firstname")
+        ).order_by("pk")
+
+        self.assertSequenceEqual(
+            companies,
+            [self.example_inc, self.foobar_ltd, self.gmbh],
+        )
+
+    def test_exclude_with_coalesced_nullable_join_rhs(self):
+        companies = Company.objects.exclude(
+            ceo__firstname=Coalesce(
+                F("point_of_contact__firstname"),
+                Value("Nobody"),
+            )
+        ).order_by("pk")
+
+        self.assertSequenceEqual(
+            companies,
+            [self.example_inc, self.foobar_ltd, self.gmbh],
+        )
+
     def test_object_update(self):
         # F expressions can be used to update attributes on single objects
         self.gmbh.num_employees = F("num_employees") + 4
