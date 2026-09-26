@@ -340,10 +340,24 @@ class Query(BaseExpression):
 
     @property
     def output_field(self):
+        return self._resolve_output_field()
+
+    def _resolve_output_field(self):
         from django.db.models import CompositeField
 
-        output_fields = dict(self._get_output_fields())
-        return CompositeField.from_select(output_fields)
+        output_fields = list(self._get_output_fields())
+        if not output_fields:
+            return None
+        if len(output_fields) == 1:
+            return output_fields[0][1]
+
+        fields = []
+        for name, field in output_fields:
+            field = field.clone()
+            field.name = name
+            field.db_column = None
+            fields.append(field)
+        return CompositeField(*fields)
 
     @staticmethod
     def _get_output_field(expression):

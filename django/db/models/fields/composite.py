@@ -66,43 +66,36 @@ class CompositeFieldBase(Field):
 
 
 class CompositeField(CompositeFieldBase):
-    def __init__(self, **kwargs):
-        for name, field in kwargs.items():
-            assert LOOKUP_SEP not in name
+    def __init__(self, *fields):
+        for field in fields:
             if not isinstance(field, Field):
                 raise TypeError(
-                    f"{name!r} should be a Field instance, got "
+                    "CompositeField arguments must be Field instances, got "
                     f"{field.__class__.__name__}."
                 )
-
             if isinstance(field, CompositeField):
                 raise TypeError("CompositeField cannot contain another CompositeField.")
+            if field.name is None:
+                raise ValueError("CompositeField fields must have a name.")
+            assert LOOKUP_SEP not in field.name
 
-        self.field_names = tuple(kwargs)
-        self.fields = tuple(kwargs.values())
+        self.field_names = tuple(field.name for field in fields)
+        if len(set(self.field_names)) != len(self.field_names):
+            raise ValueError("CompositeField field names must be unique.")
+        self.fields = fields
         if len(self.fields) < 2:
             raise ValueError("CompositeField requires at least two fields")
         super().__init__()
-
-    @classmethod
-    def from_select(cls, fields):
-        """Build an output field from an ordered mapping of selected fields."""
-        if not fields:
-            return None
-        if len(fields) == 1:
-            return next(iter(fields.values()))
-
-        return cls(**fields)
 
     def contribute_to_class(self, cls, name, private_only=False):
         raise TypeError("CompositeField cannot be used as a model field.")
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
-        kwargs.update(
-            (name, field.clone())
-            for name, field in zip(self.field_names, self.fields, strict=True)
-        )
+        for field_name, field in zip(self.field_names, self.fields, strict=True):
+            field = field.clone()
+            field.name = field_name
+            args.append(field)
         return name, path, args, kwargs
 
 
