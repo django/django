@@ -25,7 +25,6 @@ from django.db import (
 )
 from django.db.models import (
     AutoField,
-    BooleanField,
     DateField,
     DateTimeField,
     Field,
@@ -41,7 +40,6 @@ from django.db.models.expressions import (
     DatabaseDefault,
     F,
     OrderBy,
-    RawSQL,
     Value,
     When,
 )
@@ -49,6 +47,7 @@ from django.db.models.fetch_modes import FETCH_ONE
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import PROHIBITED_FILTER_KWARGS, FilteredRelation, Q
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, ROW_COUNT
+from django.db.models.sql.query import _ExtraRawSQL
 from django.db.models.utils import (
     AltersData,
     create_namedtuple_class,
@@ -295,7 +294,7 @@ class ValuesIterable(BaseIterable):
             extra_names = []
             annotation_select = []
             for alias, expression in query.annotation_select.items():
-                if isinstance(expression, _ExtraSelectFirstRawSQL):
+                if isinstance(expression, _ExtraRawSQL):
                     extra_names.append(alias)
                 else:
                     annotation_select.append(alias)
@@ -345,7 +344,7 @@ class NamedValuesListIterable(ValuesListIterable):
             extra_names = []
             annotation_select = []
             for alias, expression in query.annotation_select.items():
-                if isinstance(expression, _ExtraSelectFirstRawSQL):
+                if isinstance(expression, _ExtraRawSQL):
                     extra_names.append(alias)
                 else:
                     annotation_select.append(alias)
@@ -395,17 +394,6 @@ class PreventQuerySetCloning:
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.queryset._enable_cloning()
-
-
-# RemovedInDjango2029Warning
-class _ExtraSelectFirstRawSQL(RawSQL):
-    """
-    Internal RawSQL subclass used during the deprecation of extra(select) to
-    preserve the undocumented implicit ordering of members at the beginning of
-    the SELECT clause.
-    """
-
-    implicitly_select_first = True
 
 
 class QuerySet(AltersData):
@@ -2017,6 +2005,8 @@ class QuerySet(AltersData):
         obj.query.add_distinct_fields(*field_names)
         return obj
 
+    # RemovedInDjango2029Warning: When the deprecation ends remove all the
+    # parameters except for `tables`.
     def extra(
         self,
         select=None,
@@ -2031,68 +2021,7 @@ class QuerySet(AltersData):
         if self.query.is_sliced:
             raise TypeError("Cannot change a query once a slice has been taken.")
         clone = self._chain()
-        if tables:
-            clone.query.add_extra_tables(tables)
-        if select and (not clone.query.values_select or clone.query.values_select_all):
-            warnings.warn(
-                "extra(select) usage is deprecated, use annotate() with RawSQL "
-                "instead.",
-                category=RemovedInDjango2029Warning,
-                stacklevel=2,
-            )
-            if select_params:
-                param_iter = iter(select_params)
-            else:
-                param_iter = iter([])
-            for name, entry in select.items():
-                self.query.check_alias(name)
-                entry = str(entry)
-                entry_params = []
-                pos = entry.find("%s")
-                while pos != -1:
-                    if pos == 0 or entry[pos - 1] != "%":
-                        entry_params.append(next(param_iter))
-                    pos = entry.find("%s", pos + 2)
-                clone.query.add_annotation(
-                    _ExtraSelectFirstRawSQL(entry, entry_params), name
-                )
-        if where:
-            warnings.warn(
-                "extra(where) usage is deprecated, use filter() with RawSQL instead.",
-                category=RemovedInDjango2029Warning,
-                stacklevel=2,
-            )
-            clone = clone.filter(
-                RawSQL(
-                    " AND ".join(f"({w})" for w in where), params or (), BooleanField()
-                )
-            )
-        if order_by:
-            warnings.warn(
-                "extra(order_by) usage is deprecated, use order_by() instead.",
-                category=RemovedInDjango2029Warning,
-                stacklevel=2,
-            )
-            order_by_exprs = []
-            for order_sql in order_by:
-                descending = False
-                if order_sql.startswith("-"):
-                    order_sql = order_sql[1:]
-                    descending = True
-                if "." in order_sql:
-                    alias, column = order_sql.split(".", 1)
-                    target = Field(db_column=column)
-                    target.set_attributes_from_name(name=None)
-                    order_expr = Col(alias, target)
-                else:
-                    try:
-                        clone.query.names_to_path([order_sql], self.model._meta)
-                    except exceptions.FieldError:
-                        order_expr = RawSQL(order_sql, ())
-                    else:
-                        order_expr = F(order_sql)
-                order_by_exprs.append(OrderBy(order_expr, descending))
-            clone = clone.order_by(*order_by_exprs)
+        clone.query.add_extra(select, select_params, where, params, tables, order_by)
         return clone
 
     def reverse(self):

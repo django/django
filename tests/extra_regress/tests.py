@@ -475,19 +475,38 @@ class ExtraRegressTests(TestCase):
 
 class ExtraDeprecationTests(SimpleTestCase):
     def test_extra_select_deprecation(self):
-        msg = "extra(select) usage is deprecated, use annotate() with RawSQL instead."
+        msg = "extra(select) is deprecated, use annotate(field=RawSQL('%s', [1])) instead."
         with self.assertWarnsMessage(RemovedInDjango2029Warning, msg) as ctx:
-            TestObject.objects.all().extra(select={"select": "%s"}, select_params=(1,))
+            TestObject.objects.extra(select={"field": "%s"}, select_params=(1,))
         self.assertEqual(ctx.filename, __file__)
 
     def test_extra_where_deprecation(self):
-        msg = "extra(where) usage is deprecated, use filter() with RawSQL instead."
+        msg = (
+            "extra(where) is deprecated, use "
+            "filter(RawSQL('(foo = %s) AND (bar IS NULL)', (1,), BooleanField())) "
+            "instead."
+        )
         with self.assertWarnsMessage(RemovedInDjango2029Warning, msg) as ctx:
-            TestObject.objects.all().extra(where={"where": "foo = %s"}, params=(1,))
+            TestObject.objects.extra(where=["foo = %s", "bar IS NULL"], params=(1,))
         self.assertEqual(ctx.filename, __file__)
 
     def test_extra_order_by_deprecation(self):
-        msg = "extra(order_by) usage is deprecated, use order_by() instead."
+        msg = (
+            "extra(order_by) is deprecated, use order_by("
+            "RawSQL('extra_regress_testobject.first', ()), "
+            "RawSQL('random()', ()), "
+            "'second', "
+            "OrderBy(RawSQL('extra_regress_testobject.first', ()), descending=True), "
+            "OrderBy(RawSQL('random()', ()), descending=True), "
+            "'-second') instead."
+        )
         with self.assertWarnsMessage(RemovedInDjango2029Warning, msg) as ctx:
-            TestObject.objects.all().extra(order_by={"order_by": "random()"})
+            TestObject.objects.extra(order_by=[
+                "extra_regress_testobject.first",
+                "random()",
+                "second",
+                "-extra_regress_testobject.first",
+                "-random()",
+                "-second",
+            ])
         self.assertEqual(ctx.filename, __file__)

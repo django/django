@@ -27,12 +27,14 @@ from django.db.models.expressions import (
     ColPairs,
     Exists,
     F,
+    OrderBy,
     OuterRef,
+    RawSQL,
     Ref,
     ResolvedOuterRef,
     Value,
 )
-from django.db.models.fields import Field
+from django.db.models.fields import BooleanField, Field
 from django.db.models.lookups import Lookup
 from django.db.models.query_utils import (
     Q,
@@ -42,7 +44,10 @@ from django.db.models.query_utils import (
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
 from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
 from django.db.models.sql.where import AND, OR, NothingNode, WhereNode
-from django.utils.deprecation import RemovedInDjango2028Warning
+from django.utils.deprecation import (
+    RemovedInDjango2028Warning,
+    RemovedInDjango2029Warning,
+)
 from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.tree import Node
@@ -2430,8 +2435,105 @@ class Query(BaseExpression):
                 d = d.setdefault(part, {})
         self.select_related = field_dict
 
-    def add_extra_tables(self, tables):
-        self.extra_tables += tuple(tables)
+    # RemovedInDjango2029Warning: When the deprecation ends remove all the
+    # parameters except for `tables` and adjust the docstring.
+    def add_extra(self, select, select_params, where, params, tables, order_by):
+        """
+        Add data to the various extra_* attributes for user-created additions
+        to the query.
+        """
+        if tables:
+            self.extra_tables += tuple(tables)
+        # RemovedInDjango2029Warning: Remove the rest of this method.
+        if select and (not self.values_select or self.values_select_all):
+            if select_params:
+                param_iter = iter(select_params)
+            else:
+                param_iter = iter([])
+            annotations = {}
+            for name, entry in select.items():
+                self.check_alias(name)
+                entry = str(entry)
+                entry_params = []
+                pos = entry.find("%s")
+                while pos != -1:
+                    if pos == 0 or entry[pos - 1] != "%":
+                        entry_params.append(next(param_iter))
+                    pos = entry.find("%s", pos + 2)
+                annotations[name] = (entry, entry_params)
+            annotate_repr_members = []
+            for name, (entry, entry_params) in annotations.items():
+                self.annotations[name] = _ExtraRawSQL(entry, entry_params)
+                annotate_repr_members.append(
+                    f"{name}=RawSQL({entry!r}, {entry_params!r})"
+                )
+            annotate_repr = ", ".join(annotate_repr_members)
+            warnings.warn(
+                f"extra(select) is deprecated, use annotate({annotate_repr}) instead.",
+                category=RemovedInDjango2029Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
+        if where:
+            filter_sql = " AND ".join(f"({w})" for w in where)
+            if params is None:
+                params = ()
+            self.add_q(
+                Q(
+                    _ExtraRawSQL(
+                        filter_sql,
+                        params,
+                        BooleanField(),
+                    )
+                )
+            )
+            filter_repr = f"RawSQL({filter_sql!r}, {params!r}, BooleanField())"
+            warnings.warn(
+                f"extra(where) is deprecated, use filter({filter_repr}) instead.",
+                category=RemovedInDjango2029Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
+        if order_by:
+            order_by_exprs = []
+            order_by_repr_members = []
+            for order_sql in order_by:
+                descending = False
+                if order_sql.startswith("-"):
+                    order_sql = order_sql[1:]
+                    descending = True
+                if "." in order_sql:
+                    alias, column = order_sql.split(".", 1)
+                    target = Field(db_column=column)
+                    target.set_attributes_from_name(name=None)
+                    order_expr = Col(alias, target)
+                    order_by_repr_members.append(
+                        f"OrderBy(RawSQL({order_sql!r}, ()), descending=True)"
+                        if descending
+                        else f"RawSQL({order_sql!r}, ())"
+                    )
+                else:
+                    try:
+                        self.names_to_path([order_sql], self.model._meta)
+                    except FieldError:
+                        order_expr = _ExtraRawSQL(order_sql, ())
+                        order_by_repr_members.append(
+                            f"OrderBy(RawSQL({order_sql!r}, ()), descending=True)"
+                            if descending
+                            else f"RawSQL({order_sql!r}, ())"
+                        )
+                    else:
+                        order_expr = F(order_sql)
+                        order_by_repr_members.append(
+                            repr(f"-{order_sql}" if descending else order_sql)
+                        )
+                order_by_exprs.append(OrderBy(order_expr, descending))
+            self.add_ordering(*order_by_exprs)
+            order_by_repr = ", ".join(order_by_repr_members)
+            warnings.warn(
+                f"extra(order_by) is deprecated, use order_by({order_by_repr}) "
+                "instead.",
+                category=RemovedInDjango2029Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
 
     def clear_deferred_loading(self):
         """Remove any fields from the deferred loading set."""
@@ -2806,3 +2908,15 @@ class JoinPromoter:
         query.promote_joins(to_promote)
         query.demote_joins(to_demote)
         return to_demote
+
+
+# RemovedInDjango2029Warning: Remove this class.
+class _ExtraRawSQL(RawSQL):
+    """
+    Internal RawSQL marker subclass to trace back the origin of annotate(),
+    filter(), and order_by() calls that were generated from extra() during
+    its deprecation period.
+
+    This is also used to preserve the undocumented implicit ordering of
+    members at the beginning of the SELECT clause.
+    """

@@ -22,7 +22,7 @@ from django.db.models.sql.constants import (
     ROW_COUNT,
     SINGLE,
 )
-from django.db.models.sql.query import Query, get_order_dir
+from django.db.models.sql.query import Query, _ExtraRawSQL, get_order_dir
 from django.db.transaction import TransactionManagementError
 from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.functional import cached_property
@@ -281,7 +281,7 @@ class SQLCompiler:
             annotation_select = []
             if self.query.values_select_all:
                 for alias, expression in self.query.annotation_select.items():
-                    if getattr(expression, "implicitly_select_first", False):
+                    if isinstance(expression, _ExtraRawSQL):
                         leading_annotation_select.append((alias, expression))
                     else:
                         annotation_select.append((alias, expression))
