@@ -35,6 +35,13 @@ class CompositeFieldOutputFieldTests(SimpleTestCase):
         msg = "CompositeField requires at least two fields"
         with self.assertRaisesMessage(ValueError, msg):
             models.CompositeField(name=models.CharField())
+        inner = models.CompositeField(
+            key=models.TextField(),
+            value=models.TextField(),
+        )
+        msg = "CompositeField cannot contain another CompositeField."
+        with self.assertRaisesMessage(TypeError, msg):
+            models.CompositeField(item=inner, number=models.IntegerField())
 
     def test_fields(self):
         info = User.objects.values("email", "age").query.output_field
