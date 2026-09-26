@@ -93,6 +93,9 @@ class Lookup(Expression):
             if hasattr(self.lhs.output_field, "get_prep_value"):
                 return self.lhs.output_field.get_prep_value(self.rhs)
         elif self.rhs_is_direct_value():
+            # is the if block really needed?
+            if self.rhs is None:
+                return
             return Value(self.rhs)
         return self.rhs
 
@@ -502,6 +505,7 @@ class IntegerLessThanOrEqual(IntegerFieldOverflow, LessThanOrEqual):
 @Field.register_lookup
 class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     lookup_name = "in"
+    contains_none = False
 
     def get_prep_lookup(self):
         from django.db.models.sql.query import Query  # avoid circular import
@@ -517,6 +521,18 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             if not self.rhs.has_select_fields:
                 self.rhs.clear_select_clause()
                 self.rhs.add_fields(["pk"])
+        else:
+            try:
+                # Remove None from the list as NULL is never equal to anything.
+                rhs = OrderedSet(self.rhs)
+                if None in rhs:
+                    self.contains_none = True
+                    rhs.discard(None)
+            except TypeError:  # Unhashable items in self.rhs
+                rhs = [r for r in self.rhs if r is not None]
+
+            self.rhs = rhs
+
         return super().get_prep_lookup()
 
     def process_rhs(self, compiler, connection):
@@ -528,19 +544,12 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             )
 
         if self.rhs_is_direct_value():
-            # Remove None from the list as NULL is never equal to anything.
-            try:
-                rhs = OrderedSet(self.rhs)
-                rhs.discard(None)
-            except TypeError:  # Unhashable items in self.rhs
-                rhs = [r for r in self.rhs if r is not None]
-
-            if not rhs:
+            if not self.rhs:
                 raise EmptyResultSet
 
             # rhs should be an iterable; use batch_process_rhs() to
             # prepare/transform those values.
-            sqls, sqls_params = self.batch_process_rhs(compiler, connection, rhs)
+            sqls, sqls_params = self.batch_process_rhs(compiler, connection, self.rhs)
             placeholder = "(" + ", ".join(sqls) + ")"
             return (placeholder, sqls_params)
         return super().process_rhs(compiler, connection)
@@ -550,13 +559,26 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
 
     def as_sql(self, compiler, connection):
         max_in_list_size = connection.ops.max_in_list_size()
-        if (
-            self.rhs_is_direct_value()
-            and max_in_list_size
-            and len(self.rhs) > max_in_list_size
-        ):
-            return self.split_parameter_list_as_sql(compiler, connection)
-        return super().as_sql(compiler, connection)
+        lhs_sql, lhs_params = self.process_lhs(compiler, connection)
+        try:
+            if (
+                self.rhs_is_direct_value()
+                and max_in_list_size
+                and len(self.rhs) > max_in_list_size
+            ):
+                sql, params = self.split_parameter_list_as_sql(compiler, connection)
+            else:
+                sql, params = super().as_sql(compiler, connection)
+        except EmptyResultSet:
+            if self.contains_none:
+                sql = f"{lhs_sql} IS NULL"
+                params = lhs_params
+                return sql, params
+            raise
+        if self.contains_none:
+            sql = f"({sql} OR {lhs_sql} IS NULL)"
+            params += lhs_params
+        return sql, params
 
     def split_parameter_list_as_sql(self, compiler, connection):
         # This is a special case for databases which limit the number of
