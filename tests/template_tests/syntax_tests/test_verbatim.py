@@ -101,6 +101,11 @@ class VerbatimTagTests(SimpleTestCase):
             "\n{%\n{% endverbatim %}\n",
         )
 
+    @setup({"verbatim": "{% verbatim %}content{%\nendverbatim\n%}"})
+    def test_multiline_raw_block_closing_tags(self):
+        output = self.engine.render_to_string("verbatim")
+        self.assertEqual(output, "content")
+
     @setup(
         {
             "verbatim": (
@@ -118,3 +123,19 @@ class VerbatimTagTests(SimpleTestCase):
     def test_literal_multiline_block_opener_in_raw_blocks(self):
         output = self.engine.render_to_string("verbatim")
         self.assertEqual(output, "\n{%\n")
+
+    @setup(
+        {
+            "verbatim": (
+                "{% verbatim example %}"
+                "content"
+                "{%\n"
+                "    endverbatim\n"
+                "    example\n"
+                "%}"
+            ),
+        }
+    )
+    def test_multiline_named_closing_tag(self):
+        output = self.engine.render_to_string("verbatim")
+        self.assertEqual(output, "content")

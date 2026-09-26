@@ -31,6 +31,44 @@ only officially support the latest release of each series.
 What's new in Django 6.2
 ========================
 
+Multiline template tags
+-----------------------
+
+The :class:`~django.template.backends.django.DjangoTemplates` backend now
+supports template tags spanning multiple lines. This can make tags with several
+arguments easier to read:
+
+.. code-block:: html+django
+
+    {% include
+        "blog/includes/article_card.html"
+        with
+            article=article
+            show_author=True
+            extra_classes="featured-article"
+        only
+    %}
+
+As a consequence, ``{%`` and ``%}`` sequences on separate lines that were
+previously treated as text may now be interpreted as a template tag. This
+can change the rendered output or raise a
+:exc:`~django.template.TemplateSyntaxError`. Use the :ttag:`templatetag` tag
+with ``openblock`` and ``closeblock`` to output these sequences as text.
+
+For example, previously the following was rendered as text:
+
+.. code-block:: text
+
+    This is the opening delimiter {%.
+    This is the closing delimiter %}.
+
+To preserve this output, use:
+
+.. code-block:: html+django
+
+    This is the opening delimiter {% templatetag openblock %}.
+    This is the closing delimiter {% templatetag closeblock %}.
+
 Adopting calendar versioning
 ----------------------------
 
