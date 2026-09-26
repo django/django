@@ -80,3 +80,13 @@ class NamedEndblockTests(SimpleTestCase):
     def test_namedendblocks07(self):
         output = self.engine.render_to_string("namedendblocks07")
         self.assertEqual(output, "1_2_3")
+
+    @setup({"namedendblock_multiline": """
+        {% block navheader %}header
+        {%
+            endblock
+            navheader
+        %}"""})
+    def test_namedendblock_multiline(self):
+        output = self.engine.render_to_string("namedendblock_multiline", {}).strip()
+        self.assertEqual(output, "header")
