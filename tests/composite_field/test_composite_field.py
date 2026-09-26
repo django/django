@@ -29,19 +29,28 @@ from .models import (
 
 class CompositeFieldOutputFieldTests(SimpleTestCase):
     def test_init_validation(self):
-        msg = "'name' should be a Field instance, got str."
+        msg = "CompositeField arguments must be Field instances, got str."
         with self.assertRaisesMessage(TypeError, msg):
-            models.CompositeField(name="name", age=models.IntegerField())
+            models.CompositeField("name", models.IntegerField(name="age"))
         msg = "CompositeField requires at least two fields"
         with self.assertRaisesMessage(ValueError, msg):
-            models.CompositeField(name=models.CharField())
+            models.CompositeField(models.CharField(name="name"))
         inner = models.CompositeField(
-            key=models.TextField(),
-            value=models.TextField(),
+            models.TextField(name="key"),
+            models.TextField(name="value"),
         )
         msg = "CompositeField cannot contain another CompositeField."
         with self.assertRaisesMessage(TypeError, msg):
-            models.CompositeField(item=inner, number=models.IntegerField())
+            models.CompositeField(inner, models.IntegerField(name="number"))
+        msg = "CompositeField fields must have a name."
+        with self.assertRaisesMessage(ValueError, msg):
+            models.CompositeField(models.IntegerField(), models.TextField())
+        msg = "CompositeField field names must be unique."
+        with self.assertRaisesMessage(ValueError, msg):
+            models.CompositeField(
+                models.IntegerField(name="value"),
+                models.TextField(name="value"),
+            )
 
     def test_fields(self):
         info = User.objects.values("email", "age").query.output_field
@@ -49,13 +58,14 @@ class CompositeFieldOutputFieldTests(SimpleTestCase):
         age = User._meta.get_field("age")
 
         self.assertEqual(
-            list(info.get_fields()),
+            [(path, type(field), field.name) for path, field in info.get_fields()],
             [
-                (("email",), email),
-                (("age",), age),
+                (("email",), models.EmailField, "email"),
+                (("age",), models.IntegerField, "age"),
             ],
         )
-        self.assertIs(info.get_field("email"), email)
+        self.assertIsNot(info.get_field("email"), email)
+        self.assertIsNot(info.get_field("age"), age)
         with self.assertRaisesMessage(FieldError, "'missing' not found"):
             info.get_field("missing")
 
@@ -65,11 +75,33 @@ class CompositeFieldOutputFieldTests(SimpleTestCase):
 
         self.assertEqual(query.output_field.field_names, ("email", "age"))
 
+    def test_empty_select(self):
+        self.assertIsNone(User.objects.all().query.output_field)
+
+    def test_single_field_select(self):
+        output_field = User.objects.values("email").query.output_field
+
+        self.assertIs(output_field, User._meta.get_field("email"))
+
+    def test_fields_use_selected_names(self):
+        output_field = (
+            Comment.objects.annotate(score=models.Value(1), copy_text=F("text"))
+            .values("score", "copy_text")
+            .query.output_field
+        )
+
+        self.assertEqual(output_field.field_names, ("score", "copy_text"))
+        self.assertEqual(
+            [(field.name, field.db_column) for _, field in output_field.get_fields()],
+            [("score", None), ("copy_text", None)],
+        )
+        self.assertEqual(Comment._meta.get_field("text").db_column, "comment_text")
+
     def test_clone(self):
         output_field = models.CompositeField(
-            number=models.IntegerField(),
-            key=models.TextField(db_column="item_key"),
-            value=models.TextField(),
+            models.IntegerField(name="number"),
+            models.TextField(name="key", db_column="item_key"),
+            models.TextField(name="value"),
         )
 
         clone = output_field.clone()
@@ -90,9 +122,6 @@ class CompositeFieldOutputFieldTests(SimpleTestCase):
             with self.subTest(path=path):
                 self.assertIsNot(clone.get_field("__".join(path)), field)
 
-    def test_empty_select(self):
-        self.assertIsNone(models.CompositeField.from_select({}))
-
     @isolate_apps("composite_field")
     def test_model_field_not_supported(self):
         msg = "CompositeField cannot be used as a model field."
@@ -100,8 +129,8 @@ class CompositeFieldOutputFieldTests(SimpleTestCase):
 
             class Profile(models.Model):
                 info = models.CompositeField(
-                    email=models.EmailField(),
-                    age=models.IntegerField(),
+                    models.EmailField(name="email"),
+                    models.IntegerField(name="age"),
                 )
 
                 class Meta:
@@ -198,6 +227,20 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
         )
 
         self.assertSequenceEqual(comments, [self.comment.text])
+
+    def test_composite_subquery_alias_annotation_db_column(self):
+        comment_info = (
+            Comment.objects.filter(pk=self.comment.pk)
+            .annotate(content=F("text"), score=models.Value(1))
+            .values("content", "score")[:1]
+        )
+        comments = (
+            User.objects.filter(pk=self.ada.pk)
+            .alias(comment_info=comment_info)
+            .values_list("comment_info__content", "comment_info__score")
+        )
+
+        self.assertSequenceEqual(comments, [(self.comment.text, 1)])
 
     def test_composite_subquery_alias_union_values_without_fields_db_column(self):
         comment_info = (
