@@ -72,6 +72,11 @@ Minor features
 * :class:`~django.contrib.gis.gdal.DataSource` now preserves millisecond
   precision when reading time and datetime fields.
 
+* GeoDjango users are encouraged to upgrade to GEOS 3.15 or later for its
+  built-in protection against deeply nested geometry collections. When using
+  GEOS 3.15 or later, Django no longer applies the ``max_geom_collections``
+  limit.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
