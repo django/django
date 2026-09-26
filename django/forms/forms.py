@@ -4,13 +4,13 @@ Form classes
 
 import copy
 import datetime
+from functools import cached_property
 
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.forms.fields import Field
 from django.forms.utils import ErrorDict, ErrorList, RenderableFormMixin
 from django.forms.widgets import Media, MediaDefiningClass
 from django.utils.datastructures import MultiValueDict
-from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 
 from .renderers import get_default_renderer

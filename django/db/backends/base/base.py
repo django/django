@@ -8,6 +8,7 @@ import warnings
 import zoneinfo
 from collections import deque
 from contextlib import contextmanager
+from functools import cached_property
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -19,7 +20,6 @@ from django.db.backends.utils import debug_transaction
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseErrorWrapper, ProgrammingError
 from django.utils.asyncio import async_unsafe
-from django.utils.functional import cached_property
 
 NO_DB_ALIAS = "__no_db__"
 RAN_DB_VERSION_CHECK = set()

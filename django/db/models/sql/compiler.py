@@ -2,7 +2,7 @@ import collections
 import json
 import re
 import warnings
-from functools import partial
+from functools import cached_property, partial
 from itertools import chain
 
 from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
@@ -25,7 +25,6 @@ from django.db.models.sql.constants import (
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
 from django.utils.deprecation import RemovedInDjango2028Warning
-from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.warnings import django_file_prefixes

@@ -6,7 +6,7 @@ import copy
 import operator
 import warnings
 from contextlib import nullcontext
-from functools import partial, reduce
+from functools import cached_property, partial, reduce
 from itertools import chain, islice
 from weakref import ref as weak_ref
 
@@ -51,7 +51,6 @@ from django.utils.deprecation import (
     RemovedInDjango2029Warning,
     warn_about_external_use,
 )
-from django.utils.functional import cached_property
 from django.utils.inspect import func_accepts_kwargs, func_supports_parameter
 from django.utils.warnings import django_file_prefixes
 

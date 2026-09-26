@@ -1,4 +1,5 @@
 import json
+from functools import cached_property
 
 from django.core import checks
 from django.db.models import NOT_PROVIDED, Field
@@ -12,7 +13,6 @@ from django.db.models.fields.tuple_lookups import (
     TupleLessThan,
     TupleLessThanOrEqual,
 )
-from django.utils.functional import cached_property
 
 
 class AttributeSetter:

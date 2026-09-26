@@ -258,6 +258,9 @@ Utilities
   top-level modules did not work, and submodules only worked if already
   imported.
 
+* :func:`~django.utils.functional.cached_property` is deprecated. Use Python's
+  builtin decorator :func:`functools.cached_property` instead.
+
 * ...
 
 Validators

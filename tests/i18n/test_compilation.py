@@ -3,6 +3,7 @@ import os
 import re
 import stat
 import unittest
+from functools import cached_property
 from io import StringIO
 from pathlib import Path
 from subprocess import run
@@ -14,7 +15,6 @@ from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.utils import translation
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING
-from django.utils.functional import cached_property
 from django.utils.translation import gettext
 
 from .utils import RunInTmpDirMixin, copytree

@@ -1,9 +1,9 @@
 import copy
 import datetime
-import functools
 from collections import defaultdict
 from decimal import Decimal
 from enum import Enum
+from functools import cached_property, lru_cache
 from itertools import chain
 from types import NoneType
 from uuid import UUID
@@ -14,7 +14,7 @@ from django.db.models import fields
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import PROHIBITED_FILTER_KWARGS, Q
 from django.utils.deconstruct import deconstructible
-from django.utils.functional import cached_property, classproperty
+from django.utils.functional import classproperty
 from django.utils.hashable import make_hashable
 from django.utils.inspect import signature
 
@@ -521,7 +521,7 @@ class Expression(BaseExpression, Combinable):
     """An expression that can be combined with other expressions."""
 
     @classproperty
-    @functools.lru_cache(maxsize=128)
+    @lru_cache(maxsize=128)
     def _constructor_signature(cls):
         return signature(cls.__init__)
 
@@ -715,7 +715,7 @@ def _register_combinable_fields():
 _register_combinable_fields()
 
 
-@functools.lru_cache(maxsize=128)
+@lru_cache(maxsize=128)
 def _resolve_combined_type(connector, lhs_type, rhs_type):
     combinators = _connector_combinators.get(connector, ())
     for combinator_lhs_type, combinator_rhs_type, combined_type in combinators:
