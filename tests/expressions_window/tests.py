@@ -52,7 +52,7 @@ from .models import Classification, Detail, Employee, PastEmployeeDepartment
 class WindowFunctionTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        classification = Classification.objects.create()
+        cls.classification = classification = Classification.objects.create()
         Employee.objects.bulk_create(
             [
                 Employee(
@@ -1054,6 +1054,30 @@ class WindowFunctionTests(TestCase):
         self.assertSequenceEqual(
             qs.filter(department_salary_rank=1),
             ["ADAMS", "WILKINSON", "MILLER", "JOHNSON", "SMITH"],
+        )
+
+    def test_filter_values_duplicated_selected_columns(self):
+        # "classification_id" and "classification__id" resolve to the same
+        # column, which must not be masked away by the outer query.
+        qs = (
+            Employee.objects.annotate(
+                department_salary_rank=Window(
+                    Rank(), partition_by="department", order_by="-salary"
+                ),
+            )
+            .filter(department_salary_rank=1)
+            .order_by("department")
+            .values_list("classification_id", "classification__id", "name")
+        )
+        self.assertSequenceEqual(
+            qs,
+            [
+                (self.classification.pk, self.classification.pk, "Adams"),
+                (self.classification.pk, self.classification.pk, "Wilkinson"),
+                (self.classification.pk, self.classification.pk, "Miller"),
+                (self.classification.pk, self.classification.pk, "Johnson"),
+                (self.classification.pk, self.classification.pk, "Smith"),
+            ],
         )
 
     def test_filter_alias(self):
