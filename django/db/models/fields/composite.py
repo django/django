@@ -75,6 +75,9 @@ class CompositeField(CompositeFieldBase):
                     f"{field.__class__.__name__}."
                 )
 
+            if isinstance(field, CompositeField):
+                raise TypeError("CompositeField cannot contain another CompositeField.")
+
         self.field_names = tuple(kwargs)
         self.fields = tuple(kwargs.values())
         if len(self.fields) < 2:
