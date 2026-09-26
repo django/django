@@ -13,7 +13,7 @@ import functools
 import sys
 import warnings
 from collections import Counter, namedtuple
-from collections.abc import Iterable, Iterator, Mapping
+from collections.abc import Iterator, Mapping
 from itertools import chain, count, product
 from string import ascii_uppercase
 
@@ -1623,7 +1623,7 @@ class Query(BaseExpression):
 
         require_outer = (
             lookup_type == "isnull" and condition.rhs is True and not current_negated
-        )
+        ) or (lookup_type == "in" and condition.contains_none)
         if (
             current_negated
             and (lookup_type != "isnull" or condition.rhs is False)
@@ -1646,17 +1646,7 @@ class Query(BaseExpression):
                 ):
                     lookup_class = targets[0].get_lookup("isnull")
                     col = self._get_col(targets[0], join_info.targets[0], alias)
-                    # Use OR + IS NULL when RHS `in` values include None.
-                    if (
-                        lookup_type == "in"
-                        # Check containers (not strings or bytes).
-                        and isinstance(condition.rhs, Iterable)
-                        and not isinstance(condition.rhs, (str, bytes))
-                        and any(v is None for v in condition.rhs)
-                    ):
-                        clause.add(lookup_class(col, True), OR)
-                    else:
-                        clause.add(lookup_class(col, False), AND)
+                    clause.add(lookup_class(col, False), AND)
                 # If someval is a nullable column, someval IS NOT NULL is
                 # added.
                 if isinstance(value, Col) and self.is_nullable(value.target):
