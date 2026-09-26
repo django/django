@@ -15,6 +15,7 @@ from pathlib import Path
 
 from django.contrib.gis.gdal.driver import Driver
 from django.contrib.gis.gdal.error import GDALException
+from django.contrib.gis.gdal.prototypes import ds as ds_capi
 from django.contrib.gis.gdal.prototypes import raster as capi
 from django.contrib.gis.gdal.raster.band import BandList
 from django.contrib.gis.gdal.raster.base import GDALRasterBase
@@ -83,7 +84,7 @@ class GDALRaster(GDALRasterBase):
     destructor = capi.close_ds
 
     def __init__(self, ds_input, write=False):
-        self._write = 1 if write else 0
+        self._write = ds_capi.GDAL_OF_UPDATE if write else ds_capi.GDAL_OF_READONLY
         Driver.ensure_registered()
 
         ds_input = self._preprocess_input(ds_input)
@@ -97,15 +98,21 @@ class GDALRaster(GDALRasterBase):
                     'Unable to read raster source input "%s".' % ds_input
                 )
             try:
-                # GDALOpen will auto-detect the data source type.
-                self._ptr = capi.open_ds(force_bytes(ds_input), self._write)
+                # GDALOpenEx will auto-detect the data source type.
+                self._ptr = ds_capi.open_ds(
+                    force_bytes(ds_input),
+                    self._write | ds_capi.GDAL_OF_RASTER,
+                    None,
+                    None,
+                    None,
+                )
             except GDALException as err:
                 raise GDALException(
                     'Could not open the datasource at "{}" ({}).'.format(ds_input, err)
                 )
         elif isinstance(ds_input, bytes):
             # Create a new raster in write mode.
-            self._write = 1
+            self._write = ds_capi.GDAL_OF_UPDATE
             # Get size of buffer.
             size = len(ds_input)
             # Pass data to ctypes, keeping a reference to the ctypes object so
@@ -123,14 +130,20 @@ class GDALRaster(GDALRasterBase):
             )
             # Open the new vsimem file as a GDALRaster.
             try:
-                self._ptr = capi.open_ds(force_bytes(vsi_path), self._write)
+                self._ptr = ds_capi.open_ds(
+                    force_bytes(vsi_path),
+                    self._write | ds_capi.GDAL_OF_RASTER,
+                    None,
+                    None,
+                    None,
+                )
             except GDALException:
                 # Remove the broken file from the VSI filesystem.
                 capi.unlink_vsi_file(force_bytes(vsi_path))
                 raise GDALException("Failed creating VSI raster from the input buffer.")
         elif isinstance(ds_input, dict):
             # A new raster needs to be created in write mode
-            self._write = 1
+            self._write = ds_capi.GDAL_OF_UPDATE
 
             # Create driver (in memory by default)
             driver = Driver(ds_input.get("driver", "MEM"))
