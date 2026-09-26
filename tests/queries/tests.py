@@ -2018,7 +2018,7 @@ class SelectRelatedTests(TestCase):
         # test case.
         with ignore_warnings(
             category=RemovedInDjango2028Warning,
-            message=r"Calling select_related\(\) with no arguments is deprecated\.",
+            message="Calling select_related() with no arguments is deprecated.",
         ):
             self.assertSequenceEqual(X.objects.select_related(), [])
 
