@@ -1247,7 +1247,7 @@ def partialdef_func(parser, token):
 
     nodelist = parser.parse(valid_endpartials)
     endpartial = parser.next_token()
-    if endpartial.contents not in valid_endpartials:
+    if " ".join(endpartial.split_contents()) not in valid_endpartials:
         parser.invalid_block_tag(endpartial, "endpartialdef", valid_endpartials)
 
     pos_close = getattr(endpartial, "position", None)
