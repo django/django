@@ -207,7 +207,8 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* :meth:`~django.db.models.query.QuerySet.update` now supports aggregate
+  functions in the fields being updated (:ticket:`25643`).
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
