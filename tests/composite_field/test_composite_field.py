@@ -83,6 +83,16 @@ class CompositeFieldOutputFieldTests(SimpleTestCase):
 
         self.assertIs(output_field, User._meta.get_field("email"))
 
+    def test_null(self):
+        self.assertIs(
+            User.objects.values("email", "age").query.output_field.null,
+            False,
+        )
+        self.assertIs(
+            User.objects.values("organization", "age").query.output_field.null,
+            True,
+        )
+
     def test_fields_use_selected_names(self):
         output_field = (
             Comment.objects.annotate(score=models.Value(1), copy_text=F("text"))

@@ -85,7 +85,7 @@ class CompositeField(CompositeFieldBase):
         self.fields = fields
         if len(self.fields) < 2:
             raise ValueError("CompositeField requires at least two fields")
-        super().__init__()
+        super().__init__(null=any(field.null for field in fields))
 
     def contribute_to_class(self, cls, name, private_only=False):
         raise TypeError("CompositeField cannot be used as a model field.")
