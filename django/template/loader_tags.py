@@ -237,7 +237,7 @@ def do_block(parser, token):
     # This check is kept for backwards-compatibility. See #3100.
     endblock = parser.next_token()
     acceptable_endblocks = ("endblock", "endblock %s" % block_name)
-    if endblock.contents not in acceptable_endblocks:
+    if " ".join(endblock.split_contents()) not in acceptable_endblocks:
         parser.invalid_block_tag(endblock, "endblock", acceptable_endblocks)
 
     return BlockNode(block_name, nodelist)
