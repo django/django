@@ -3554,12 +3554,7 @@ class NullInExcludeTest(TestCase):
 
     def test_col_not_in_list_containing_null(self):
         self.assertQuerySetEqual(
-            NullableName.objects.exclude(name__in=[None]),
-            ["i1", None],
-            attrgetter("name"),
-            # # the below comparison fails!
-            # NullableName.objects.exclude(name__in=[None]),
-            # NullableName.objects.exclude(IsNull(F("name"), True))
+            NullableName.objects.exclude(name__in=[None]), ["i1"], attrgetter("name")
         )
 
     def test_double_exclude(self):
