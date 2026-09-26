@@ -23,7 +23,14 @@ from django.db import (
     router,
     transaction,
 )
-from django.db.models import AutoField, DateField, DateTimeField, Field, Max, sql
+from django.db.models import (
+    AutoField,
+    DateField,
+    DateTimeField,
+    Field,
+    Max,
+    sql,
+)
 from django.db.models.constants import LOOKUP_SEP, OnConflict
 from django.db.models.deletion import Collector
 from django.db.models.expressions import (
@@ -40,6 +47,7 @@ from django.db.models.fetch_modes import FETCH_ONE
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import PROHIBITED_FILTER_KWARGS, FilteredRelation, Q
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, ROW_COUNT
+from django.db.models.sql.query import _ExtraRawSQL
 from django.db.models.utils import (
     AltersData,
     create_namedtuple_class,
@@ -281,11 +289,19 @@ class ValuesIterable(BaseIterable):
         if query.selected:
             names = list(query.selected)
         else:
-            # extra(select=...) cols are always at the start of the row.
+            # RemovedInDjango60Warning: place extra(select) entries at the
+            # beginning of the SELECT clause until it's completely removed.
+            extra_names = []
+            annotation_select = []
+            for alias, expression in query.annotation_select.items():
+                if isinstance(expression, _ExtraRawSQL):
+                    extra_names.append(alias)
+                else:
+                    annotation_select.append(alias)
             names = [
-                *query.extra_select,
+                *extra_names,
                 *query.values_select,
-                *query.annotation_select,
+                *annotation_select,
             ]
         indexes = range(len(names))
         for row in compiler.results_iter(
@@ -323,10 +339,19 @@ class NamedValuesListIterable(ValuesListIterable):
             names = queryset._fields
         else:
             query = queryset.query
+            # RemovedInDjango60Warning: place extra(select) entries at the
+            # beginning of the SELECT clause until it's completely removed.
+            extra_names = []
+            annotation_select = []
+            for alias, expression in query.annotation_select.items():
+                if isinstance(expression, _ExtraRawSQL):
+                    extra_names.append(alias)
+                else:
+                    annotation_select.append(alias)
             names = [
-                *query.extra_select,
+                *extra_names,
                 *query.values_select,
-                *query.annotation_select,
+                *annotation_select,
             ]
         tuple_class = create_namedtuple_class(*names)
         new = tuple.__new__
@@ -1306,7 +1331,6 @@ class QuerySet(AltersData):
         selected_fields = tuple(
             self.query.selected
             or (
-                *self.query.extra_select,
                 *self.query.values_select,
                 *self.query.annotation_select,
             )
@@ -1981,6 +2005,8 @@ class QuerySet(AltersData):
         obj.query.add_distinct_fields(*field_names)
         return obj
 
+    # RemovedInDjango2029Warning: When the deprecation ends remove all the
+    # parameters except for `tables`.
     def extra(
         self,
         select=None,
@@ -2068,7 +2094,7 @@ class QuerySet(AltersData):
         """
         if isinstance(self, EmptyQuerySet):
             return True
-        if self.query.extra_order_by or self.query.order_by:
+        if self.query.order_by:
             return True
         elif (
             self.query.default_ordering
@@ -2347,7 +2373,6 @@ class QuerySet(AltersData):
         """Check that two QuerySet classes may be merged."""
         if self._fields is not None and (
             set(self.query.values_select) != set(other.query.values_select)
-            or set(self.query.extra_select) != set(other.query.extra_select)
             or set(self.query.annotation_select) != set(other.query.annotation_select)
         ):
             raise TypeError(

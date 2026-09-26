@@ -27,13 +27,14 @@ from django.db.models.expressions import (
     ColPairs,
     Exists,
     F,
+    OrderBy,
     OuterRef,
     RawSQL,
     Ref,
     ResolvedOuterRef,
     Value,
 )
-from django.db.models.fields import Field
+from django.db.models.fields import BooleanField, Field
 from django.db.models.lookups import Lookup
 from django.db.models.query_utils import (
     Q,
@@ -42,8 +43,11 @@ from django.db.models.query_utils import (
 )
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
 from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
-from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
-from django.utils.deprecation import RemovedInDjango2028Warning
+from django.db.models.sql.where import AND, OR, NothingNode, WhereNode
+from django.utils.deprecation import (
+    RemovedInDjango2028Warning,
+    RemovedInDjango2029Warning,
+)
 from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.tree import Node
@@ -165,7 +169,6 @@ class RawQuery:
         # Mirror some properties of a normal query so that
         # the compiler can be used to process results.
         self.low_mark, self.high_mark = 0, None  # Used for offset/limit
-        self.extra_select = {}
         self.annotation_select = {}
 
     def chain(self, using):
@@ -276,8 +279,9 @@ class Query(BaseExpression):
     # Arbitrary limit for select_related to prevents infinite recursion.
     max_depth = 5
     # Holds the selects defined by a call to values() or values_list()
-    # excluding annotation_select and extra_select.
+    # excluding annotation_select.
     values_select = ()
+    values_select_all = None
     selected = None
 
     # SQL annotation-related attributes.
@@ -289,13 +293,9 @@ class Query(BaseExpression):
     combinator_all = False
     combined_queries = ()
 
-    # These are for extensions. The contents are more or less appended verbatim
+    # This is for extensions. The contents are more or less appended verbatim
     # to the appropriate clause.
-    extra_select_mask = None
-    _extra_select_cache = None
-
     extra_tables = ()
-    extra_order_by = ()
 
     # A tuple that is a set of model field names and either True, if these are
     # the fields to defer, or False if these are the only fields to load.
@@ -324,9 +324,6 @@ class Query(BaseExpression):
         self.where = WhereNode()
         # Maps alias -> Annotation Expression.
         self.annotations = {}
-        # These are for extensions. The contents are more or less appended
-        # verbatim to the appropriate clause.
-        self.extra = {}  # Maps col_alias -> (col_sql, params).
 
         self._filtered_relations = {}
 
@@ -413,11 +410,6 @@ class Query(BaseExpression):
         # It will get re-populated in the cloned queryset the next time it's
         # used.
         obj._annotation_select_cache = None
-        obj.extra = self.extra.copy()
-        if self.extra_select_mask is not None:
-            obj.extra_select_mask = self.extra_select_mask.copy()
-        if self._extra_select_cache is not None:
-            obj._extra_select_cache = self._extra_select_cache.copy()
         if self.select_related is not False:
             # Use deepcopy because select_related stores fields in nested
             # dicts.
@@ -609,7 +601,6 @@ class Query(BaseExpression):
             self.select = ()
             self.selected = None
             self.default_cols = False
-            self.extra = {}
             if self.annotations:
                 # Inline reference to existing annotations and mask them as
                 # they are unnecessary given only the summarized aggregations
@@ -784,35 +775,17 @@ class Query(BaseExpression):
         w.relabel_aliases(change_map)
         self.where.add(w, connector)
 
-        # Selection columns and extra extensions are those provided by 'rhs'.
+        # Selection columns are those provided by 'rhs'.
         if rhs.select:
             self.set_select([col.relabeled_clone(change_map) for col in rhs.select])
         else:
             self.select = ()
 
-        if connector == OR:
-            # It would be nice to be able to handle this, but the queries don't
-            # really make sense (or return consistent value sets). Not worth
-            # the extra complexity when you can write a real query instead.
-            if self.extra and rhs.extra:
-                raise ValueError(
-                    "When merging querysets using 'or', you cannot have "
-                    "extra(select=...) on both sides."
-                )
-        self.extra.update(rhs.extra)
-        extra_select_mask = set()
-        if self.extra_select_mask is not None:
-            extra_select_mask.update(self.extra_select_mask)
-        if rhs.extra_select_mask is not None:
-            extra_select_mask.update(rhs.extra_select_mask)
-        if extra_select_mask:
-            self.set_extra_mask(extra_select_mask)
         self.extra_tables += rhs.extra_tables
 
         # Ordering uses the 'rhs' ordering, unless it has none, in which case
         # the current ordering is used.
         self.order_by = rhs.order_by or self.order_by
-        self.extra_order_by = rhs.extra_order_by or self.extra_order_by
 
     def _get_defer_select_mask(self, opts, mask, select_mask=None):
         if select_mask is None:
@@ -2242,19 +2215,19 @@ class Query(BaseExpression):
         self.select = ()
         self.default_cols = False
         self.select_related = False
-        self.set_extra_mask(())
         self.set_annotation_mask(())
         self.selected = None
 
     def clear_select_fields(self):
         """
-        Clear the list of fields to select (but not extra_select columns).
+        Clear the list of fields to select.
         Some queryset types completely replace any existing list of select
         columns.
         """
         self.select = ()
         self.values_select = ()
         self.selected = None
+        self.values_select_all = None
 
     def add_select_col(self, col, name):
         self.select += (col,)
@@ -2322,7 +2295,6 @@ class Query(BaseExpression):
                 names = sorted(
                     [
                         *get_field_names_from_opts(opts),
-                        *self.extra,
                         *self.annotation_select,
                         *self._filtered_relations,
                     ]
@@ -2349,8 +2321,6 @@ class Query(BaseExpression):
                 item = item.removeprefix("-")
                 if item in self.annotations:
                     continue
-                if self.extra and item in self.extra:
-                    continue
                 names_to_join = self.get_names_to_join(item)
                 # names_to_path() validates the lookup. A descriptive
                 # FieldError will be raise if it's not.
@@ -2371,10 +2341,6 @@ class Query(BaseExpression):
 
     @property
     def orderby_issubset_groupby(self):
-        if self.extra_order_by:
-            # Raw SQL from extra(order_by=...) can't be reliably compared
-            # against resolved OrderBy/Col expressions. Treat as not a subset.
-            return False
         if self.group_by in (None, True):
             # There is either no aggregation at all (None), or the group by
             # is generated automatically from model fields (True), in which
@@ -2409,7 +2375,6 @@ class Query(BaseExpression):
         ):
             return
         self.order_by = ()
-        self.extra_order_by = ()
         if clear_default:
             self.default_ordering = False
         # Ordering is cleared on combined queries with clear_default=False
@@ -2470,21 +2435,22 @@ class Query(BaseExpression):
                 d = d.setdefault(part, {})
         self.select_related = field_dict
 
+    # RemovedInDjango2029Warning: When the deprecation ends remove all the
+    # parameters except for `tables` and adjust the docstring.
     def add_extra(self, select, select_params, where, params, tables, order_by):
         """
         Add data to the various extra_* attributes for user-created additions
         to the query.
         """
-        if select:
-            # We need to pair any placeholder markers in the 'select'
-            # dictionary with their parameters in 'select_params' so that
-            # subsequent updates to the select dictionary also adjust the
-            # parameters appropriately.
-            select_pairs = {}
+        if tables:
+            self.extra_tables += tuple(tables)
+        # RemovedInDjango2029Warning: Remove the rest of this method.
+        if select and (not self.values_select or self.values_select_all):
             if select_params:
                 param_iter = iter(select_params)
             else:
                 param_iter = iter([])
+            annotations = {}
             for name, entry in select.items():
                 self.check_alias(name)
                 entry = str(entry)
@@ -2494,14 +2460,80 @@ class Query(BaseExpression):
                     if pos == 0 or entry[pos - 1] != "%":
                         entry_params.append(next(param_iter))
                     pos = entry.find("%s", pos + 2)
-                select_pairs[name] = (entry, entry_params)
-            self.extra.update(select_pairs)
-        if where or params:
-            self.where.add(ExtraWhere(where, params), AND)
-        if tables:
-            self.extra_tables += tuple(tables)
+                annotations[name] = (entry, entry_params)
+            annotate_repr_members = []
+            for name, (entry, entry_params) in annotations.items():
+                self.annotations[name] = _ExtraRawSQL(entry, entry_params)
+                annotate_repr_members.append(
+                    f"{name}=RawSQL({entry!r}, {entry_params!r})"
+                )
+            annotate_repr = ", ".join(annotate_repr_members)
+            warnings.warn(
+                f"extra(select) is deprecated, use annotate({annotate_repr}) instead.",
+                category=RemovedInDjango2029Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
+        if where:
+            filter_sql = " AND ".join(f"({w})" for w in where)
+            if params is None:
+                params = ()
+            self.add_q(
+                Q(
+                    _ExtraRawSQL(
+                        filter_sql,
+                        params,
+                        BooleanField(),
+                    )
+                )
+            )
+            filter_repr = f"RawSQL({filter_sql!r}, {params!r}, BooleanField())"
+            warnings.warn(
+                f"extra(where) is deprecated, use filter({filter_repr}) instead.",
+                category=RemovedInDjango2029Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
         if order_by:
-            self.extra_order_by = order_by
+            order_by_exprs = []
+            order_by_repr_members = []
+            for order_sql in order_by:
+                descending = False
+                if order_sql.startswith("-"):
+                    order_sql = order_sql[1:]
+                    descending = True
+                if "." in order_sql:
+                    alias, column = order_sql.split(".", 1)
+                    target = Field(db_column=column)
+                    target.set_attributes_from_name(name=None)
+                    order_expr = Col(alias, target)
+                    order_by_repr_members.append(
+                        f"OrderBy(RawSQL({order_sql!r}, ()), descending=True)"
+                        if descending
+                        else f"RawSQL({order_sql!r}, ())"
+                    )
+                else:
+                    try:
+                        self.names_to_path([order_sql], self.model._meta)
+                    except FieldError:
+                        order_expr = _ExtraRawSQL(order_sql, ())
+                        order_by_repr_members.append(
+                            f"OrderBy(RawSQL({order_sql!r}, ()), descending=True)"
+                            if descending
+                            else f"RawSQL({order_sql!r}, ())"
+                        )
+                    else:
+                        order_expr = F(order_sql)
+                        order_by_repr_members.append(
+                            repr(f"-{order_sql}" if descending else order_sql)
+                        )
+                order_by_exprs.append(OrderBy(order_expr, descending))
+            self.add_ordering(*order_by_exprs)
+            order_by_repr = ", ".join(order_by_repr_members)
+            warnings.warn(
+                f"extra(order_by) is deprecated, use order_by({order_by_repr}) "
+                "instead.",
+                category=RemovedInDjango2029Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
 
     def clear_deferred_loading(self):
         """Remove any fields from the deferred loading set."""
@@ -2579,17 +2611,6 @@ class Query(BaseExpression):
         if self.annotation_select_mask is not None:
             self.set_annotation_mask(self.annotation_select_mask.union(names))
 
-    def set_extra_mask(self, names):
-        """
-        Set the mask of extra select items that will be returned by SELECT.
-        Don't remove them from the Query since they might be used later.
-        """
-        if names is None:
-            self.extra_select_mask = None
-        else:
-            self.extra_select_mask = set(names)
-        self._extra_select_cache = None
-
     @property
     def has_select_fields(self):
         return self.selected is not None
@@ -2604,20 +2625,16 @@ class Query(BaseExpression):
             for field in fields:
                 self.check_alias(field)
             field_names = []
-            extra_names = []
             annotation_names = []
-            if not self.extra and not self.annotations:
-                # Shortcut - if there are no extra or annotations, then
+            if not self.annotations:
+                # Shortcut - if there are no annotations, then
                 # the values() clause must be just field names.
                 field_names = list(fields)
                 selected = dict(zip(fields, range(len(fields))))
             else:
                 self.default_cols = False
                 for f in fields:
-                    if extra := self.extra_select.get(f):
-                        extra_names.append(f)
-                        selected[f] = RawSQL(*extra)
-                    elif f in self.annotation_select:
+                    if f in self.annotation_select:
                         annotation_names.append(f)
                         selected[f] = f
                     elif f in self.annotations:
@@ -2640,7 +2657,6 @@ class Query(BaseExpression):
                             self.names_to_path(f.split(LOOKUP_SEP), self.model._meta)
                         selected[f] = len(field_names)
                         field_names.append(f)
-            self.set_extra_mask(extra_names)
             self.set_annotation_mask(annotation_names)
         else:
             field_names = [f.attname for f in self.model._meta.concrete_fields]
@@ -2666,6 +2682,7 @@ class Query(BaseExpression):
             self.group_by = tuple(group_by)
 
         self.values_select = tuple(field_names)
+        self.values_select_all = not fields
         self.add_fields(field_names, True)
         self.selected = selected if fields else None
 
@@ -2688,20 +2705,6 @@ class Query(BaseExpression):
             return self._annotation_select_cache
         else:
             return self.annotations
-
-    @property
-    def extra_select(self):
-        if self._extra_select_cache is not None:
-            return self._extra_select_cache
-        if not self.extra:
-            return {}
-        elif self.extra_select_mask is not None:
-            self._extra_select_cache = {
-                k: v for k, v in self.extra.items() if k in self.extra_select_mask
-            }
-            return self._extra_select_cache
-        else:
-            return self.extra
 
     def trim_start(self, names_with_path):
         """
@@ -2905,3 +2908,15 @@ class JoinPromoter:
         query.promote_joins(to_promote)
         query.demote_joins(to_demote)
         return to_demote
+
+
+# RemovedInDjango2029Warning: Remove this class.
+class _ExtraRawSQL(RawSQL):
+    """
+    Internal RawSQL marker subclass to trace back the origin of annotate(),
+    filter(), and order_by() calls that were generated from extra() during
+    its deprecation period.
+
+    This is also used to preserve the undocumented implicit ordering of
+    members at the beginning of the SELECT clause.
+    """

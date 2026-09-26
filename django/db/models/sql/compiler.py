@@ -22,7 +22,7 @@ from django.db.models.sql.constants import (
     ROW_COUNT,
     SINGLE,
 )
-from django.db.models.sql.query import Query, get_order_dir
+from django.db.models.sql.query import Query, _ExtraRawSQL, get_order_dir
 from django.db.transaction import TransactionManagementError
 from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.functional import cached_property
@@ -267,23 +267,32 @@ class SQLCompiler:
             # self.query.select is a special case. These columns never go to
             # any model.
             cols = self.query.select
+        if cols:
+            klass_info = {
+                "model": self.query.model,
+                "select_fields": list(range(len(cols))),
+            }
         selected = []
         select_fields = None
         if self.query.selected is None:
+            # RemovedInDjango60Warning: place extra(select) entries at the
+            # beginning of the SELECT clause until it's completely removed.
+            leading_annotation_select = []
+            annotation_select = []
+            if self.query.values_select_all:
+                for alias, expression in self.query.annotation_select.items():
+                    if isinstance(expression, _ExtraRawSQL):
+                        leading_annotation_select.append((alias, expression))
+                    else:
+                        annotation_select.append((alias, expression))
+            else:
+                annotation_select = self.query.annotation_select.items()
             selected = [
-                *(
-                    (alias, RawSQL(*args))
-                    for alias, args in self.query.extra_select.items()
-                ),
+                *leading_annotation_select,
                 *((None, col) for col in cols),
-                *self.query.annotation_select.items(),
+                *annotation_select,
             ]
-            select_fields = list(
-                range(
-                    len(self.query.extra_select),
-                    len(self.query.extra_select) + len(cols),
-                )
-            )
+            select_fields = list(range(len(cols)))
         else:
             select_fields = []
             for index, (alias, expression) in enumerate(self.query.selected.items()):
@@ -337,9 +346,7 @@ class SQLCompiler:
         return ret, klass_info, annotations
 
     def _order_by_pairs(self):
-        if self.query.extra_order_by:
-            ordering = self.query.extra_order_by
-        elif not self.query.default_ordering:
+        if not self.query.default_ordering:
             ordering = self.query.order_by
         elif self.query.order_by:
             ordering = self.query.order_by
@@ -455,46 +462,18 @@ class SQLCompiler:
                 yield OrderBy(expr, descending=descending), False
                 continue
 
-            if "." in field and field in self.query.extra_order_by:
-                # This came in through an extra(order_by=...) addition. Pass it
-                # on verbatim.
-                table, col = col.split(".", 1)
-                yield (
-                    OrderBy(
-                        RawSQL("%s.%s" % (self.quote_name(table), col), []),
-                        descending=descending,
-                    ),
-                    False,
-                )
-                continue
-
-            if self.query.extra and col in self.query.extra:
-                if col in self.query.extra_select:
-                    yield (
-                        OrderBy(
-                            Ref(col, RawSQL(*self.query.extra[col])),
-                            descending=descending,
-                        ),
-                        True,
-                    )
-                else:
-                    yield (
-                        OrderBy(RawSQL(*self.query.extra[col]), descending=descending),
-                        False,
-                    )
+            elif self.query.combinator and self.select:
+                # Don't use the first model's field because other
+                # combined queries might define it differently.
+                yield OrderBy(F(col), descending=descending), False
             else:
-                if self.query.combinator and self.select:
-                    # Don't use the first model's field because other
-                    # combined queries might define it differently.
-                    yield OrderBy(F(col), descending=descending), False
-                else:
-                    # 'col' is of the form 'field' or 'field1__field2' or
-                    # '-field1__field2__field', etc.
-                    yield from self.find_ordering_name(
-                        field,
-                        self.query.get_meta(),
-                        default_order=default_order,
-                    )
+                # 'col' is of the form 'field' or 'field1__field2' or
+                # '-field1__field2__field', etc.
+                yield from self.find_ordering_name(
+                    field,
+                    self.query.get_meta(),
+                    default_order=default_order,
+                )
 
     def get_order_by(self):
         """
@@ -2206,7 +2185,6 @@ class SQLUpdateCompiler(SQLCompiler):
         query = self.query.chain(klass=Query)
         query.select_related = False
         query.clear_ordering(force=True)
-        query.extra = {}
         query.select = []
         meta = query.get_meta()
         fields = [meta.pk.name]
