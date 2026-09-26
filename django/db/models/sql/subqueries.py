@@ -20,7 +20,8 @@ class DeleteQuery(Query):
     compiler = "SQLDeleteCompiler"
 
     def do_query(self, table, where, using):
-        self.alias_map = {table: self.alias_map[table]}
+        table_alias = self.table_map[table][0]
+        self.alias_map = {table_alias: self.alias_map[table_alias]}
         self.where = where
         return self.get_compiler(using).execute_sql(ROW_COUNT)
 
