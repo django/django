@@ -93,9 +93,6 @@ class Lookup(Expression):
             if hasattr(self.lhs.output_field, "get_prep_value"):
                 return self.lhs.output_field.get_prep_value(self.rhs)
         elif self.rhs_is_direct_value():
-            # is the if block really needed?
-            if self.rhs is None:
-                return
             return Value(self.rhs)
         return self.rhs
 
