@@ -17,6 +17,7 @@ from django.db.models import (
     BooleanField,
     Case,
     CharField,
+    CompositeField,
     Count,
     DateField,
     DateTimeField,
@@ -57,6 +58,7 @@ from django.db.models.expressions import (
     RawSQL,
     Ref,
 )
+from django.db.models.fields.tuple_lookups import Tuple
 from django.db.models.functions import (
     Coalesce,
     Concat,
@@ -1525,6 +1527,37 @@ class ExpressionsTests(TestCase):
         self.assertSequenceEqual(
             Employee.objects.filter(firstname__iendswith=F("lastname")),
             [claude],
+        )
+
+
+class CompositeFieldExpressionTests(SimpleTestCase):
+    def test_expression_with_composite_output_field(self):
+        output_field = CompositeField(
+            IntegerField(name="first"),
+            IntegerField(name="second"),
+        )
+        expression = ExpressionWrapper(Value(1), output_field=output_field)
+
+        msg = "Upper expression does not support composite expressions."
+        with self.assertRaisesMessage(ValueError, msg):
+            Upper(expression).resolve_expression()
+
+    def test_expression_without_output_field(self):
+        self.assertIs(Value(None).is_composite, False)
+
+    def test_output_field(self):
+        expression = Tuple(Value(1), Value("text"))
+
+        self.assertTrue(expression.is_composite)
+        self.assertEqual(
+            [
+                (path, type(field), field.db_column)
+                for path, field in expression.output_field.get_fields()
+            ],
+            [
+                (("0",), IntegerField, None),
+                (("1",), CharField, None),
+            ],
         )
 
 

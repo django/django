@@ -187,8 +187,6 @@ class BaseExpression:
     constraint_validation_compatible = True
     # Does the expression possibly return more than one row?
     set_returning = False
-    # Does the expression represent a composite value?
-    is_composite = False
     # Does the expression allow composite expressions in source_expressions?
     allows_composite_expressions = False
 
@@ -527,6 +525,13 @@ class BaseExpression:
 class Expression(BaseExpression, Combinable):
     """An expression that can be combined with other expressions."""
 
+    @property
+    def is_composite(self):
+        try:
+            return self.output_field.is_composite
+        except FieldError:
+            return False
+
     @classproperty
     @functools.lru_cache(maxsize=128)
     def _constructor_signature(cls):
@@ -567,6 +572,19 @@ class Expression(BaseExpression, Combinable):
 
     def __hash__(self):
         return hash(self.identity)
+
+
+class CompositeFieldExpression(Expression):
+    def _resolve_output_field(self):
+        from django.db.models.fields.composite import CompositeField
+
+        fields = []
+        for index, source in enumerate(self.get_source_expressions()):
+            field = source.output_field.clone()
+            field.name = str(index)
+            field.db_column = None
+            fields.append(field)
+        return CompositeField(*fields)
 
 
 # Type inference for CombinedExpression.output_field.
@@ -1394,9 +1412,7 @@ class Col(Expression):
         ) + self.target.get_db_converters(connection)
 
 
-class ColPairs(Expression):
-    is_composite = True
-
+class ColPairs(CompositeFieldExpression):
     def __init__(self, alias, targets, sources, output_field):
         super().__init__(output_field=output_field)
         self.alias = alias
@@ -1958,7 +1974,7 @@ class OrderBy(Expression):
         return [self.expression]
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
-        if self.expression.is_composite:
+        if self.expression.output_field.is_composite:
             cols = self.expression.get_source_expressions()
             sql_parts = []
             params = []

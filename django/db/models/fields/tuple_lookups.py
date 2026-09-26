@@ -4,6 +4,7 @@ from django.core.exceptions import EmptyResultSet
 from django.db import NotSupportedError, models
 from django.db.models.expressions import (
     ColPairs,
+    CompositeFieldExpression,
     Exists,
     Func,
     ResolvedOuterRef,
@@ -23,11 +24,9 @@ from django.db.models.sql import Query
 from django.db.models.sql.where import AND, OR, WhereNode
 
 
-class Tuple(Func):
-    is_composite = True
+class Tuple(CompositeFieldExpression, Func):
     allows_composite_expressions = True
     function = ""
-    output_field = models.Field()
 
     def __len__(self):
         return len(self.source_expressions)
