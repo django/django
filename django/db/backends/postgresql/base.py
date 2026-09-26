@@ -492,8 +492,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         afterward.
         """
         with self.cursor() as cursor:
-            cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
-            cursor.execute("SET CONSTRAINTS ALL DEFERRED")
+            cursor.execute("""
+                SAVEPOINT check_constraints;
+                SET CONSTRAINTS ALL IMMEDIATE;
+                ROLLBACK TO SAVEPOINT check_constraints;
+            """)
 
     def is_usable(self):
         if self.connection is None:
