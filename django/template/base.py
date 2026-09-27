@@ -405,6 +405,18 @@ class Token:
 
 
 class Lexer:
+    _raw_start_re = _lazy_re_compile(
+        r"%s\s*(?:comment|verbatim)\b" % re.escape(BLOCK_TAG_START)
+    )
+    _comment_end_re = _lazy_re_compile(
+        r"%s[^\S\n]*endcomment[^\S\n]*%s"
+        % (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END))
+    )
+    _verbatim_end_re = _lazy_re_compile(
+        r"%s[^\S\n]*endverbatim[^\S\n]*%s"
+        % (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END))
+    )
+
     def __init__(self, template_string):
         self.template_string = template_string
 
@@ -429,8 +441,10 @@ class Lexer:
             return None
 
         if bits[0] == "comment":
-            end_bits = ["endcomment"]
+            return self._comment_end_re
         elif bits[0] == "verbatim":
+            if len(bits) == 1:
+                return self._verbatim_end_re
             # Named verbatim blocks must use the same name in their closing
             # tag.
             end_bits = ["endverbatim", *bits[1:]]
@@ -447,9 +461,9 @@ class Lexer:
             )
         )
 
-    def _tag_re_split_positions(self):
+    def _tag_re_split(self):
         """
-        Yield alternating text and tag spans as (start, end) pairs.
+        Yield alternating text and tags as (text, (start, end)) pairs.
 
         Inside comment and verbatim blocks, search only for the matching
         closing tag so template syntax in the content remains text.
@@ -464,19 +478,20 @@ class Lexer:
                 break
 
             start, end = match.span()
-            # Always yield the text position, even when empty. tokenize()
-            # relies on alternating text and tag positions.
-            yield last, start
-            yield start, end
+            token_string = match.group()
+            # Always yield the text, even when empty. tokenize() relies on
+            # alternating text and tags.
+            yield self.template_string[last:start], (last, start)
+            yield token_string, (start, end)
             last = end
 
             if raw_end_re is None:
-                raw_end_re = self._raw_end_tag_re(match.group())
+                raw_end_re = self._raw_end_tag_re(token_string)
             else:
                 # The matched tag closed the current raw block.
                 raw_end_re = None
 
-        yield last, len(self.template_string)
+        yield self.template_string[last:], (last, len(self.template_string))
 
     def tokenize(self):
         """
@@ -485,8 +500,15 @@ class Lexer:
         in_tag = False
         lineno = 1
         result = []
-        for position in self._tag_re_split_positions():
-            token_string = self.template_string[slice(*position)]
+        # Use the faster regex split when no raw opening tag is present.
+        # False positives use the raw-aware splitter.
+        if self._raw_start_re.search(self.template_string) is None:
+            token_strings = tag_re.split(self.template_string)
+        else:
+            token_strings = (
+                token_string for token_string, position in self._tag_re_split()
+            )
+        for token_string in token_strings:
             if token_string:
                 result.append(self.create_token(token_string, None, lineno, in_tag))
                 lineno += token_string.count("\n")
@@ -517,10 +539,6 @@ class Lexer:
 
 
 class DebugLexer(Lexer):
-    def _tag_re_split(self):
-        for position in self._tag_re_split_positions():
-            yield self.template_string[slice(*position)], position
-
     def tokenize(self):
         """
         Split a template string into tokens and annotate each token with its
