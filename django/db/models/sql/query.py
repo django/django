@@ -980,11 +980,7 @@ class Query(BaseExpression):
                 index += 1
                 alias = "%s%d" % (self.alias_prefix, index)
 
-        if not alias_list:
-            # The first occurrence of a table uses the table name directly.
-            self.table_map[table_name] = [alias]
-        else:
-            self.table_map[table_name].append(alias)
+        self.table_map.setdefault(table_name, []).append(alias)
         self.alias_refcount[alias] = 1
         return alias, True
 
