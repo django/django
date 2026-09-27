@@ -206,6 +206,11 @@ class SubqueryJoin:
     def as_sql(self, compiler, connection):
         sql, params = compiler.compile(self.table_subquery)
         alias = compiler.quote_name(self.table_alias)
+        if self.join_type == INNER:
+            return (
+                "%s %s %s" % ("CROSS JOIN", sql, alias),
+                params,
+            )
         return (
             "%s %s %s ON (1 = 1)" % (self.join_type, sql, alias),
             params,
