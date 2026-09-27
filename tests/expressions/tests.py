@@ -447,7 +447,7 @@ class BasicExpressionsTests(TestCase):
         companies = Company.objects.exclude(
             ceo__firstname=Coalesce(
                 F("point_of_contact__firstname"),
-                Value("Nobody"),
+                F("ceo__lastname"),
             )
         ).order_by("pk")
 
