@@ -29,6 +29,7 @@ class ForeignObjectRel(FieldCacheMixin):
     auto_created = True
     concrete = False
     editable = False
+    is_composite = False
     is_relation = True
 
     # Reverse relations are always nullable (Django can't enforce that a
