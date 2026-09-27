@@ -74,8 +74,6 @@ Use the ``--settings`` command-line argument to specify the settings manually:
 
     django-admin runserver --settings=mysite.settings
 
-.. _django-admin: ../django-admin/
-
 On the server (``mod_wsgi``)
 ----------------------------
 
