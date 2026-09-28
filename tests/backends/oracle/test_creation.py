@@ -42,8 +42,8 @@ class DatabaseCreationTests(TestCase):
         )
 
     @mock.patch.object(DatabaseCreation, "_test_user_create", return_value=False)
-    @unittest.skipUnless(
-        os.environ.get("TESTPILOT_USER") is not None,
+    @unittest.skipIf(
+        os.environ.get("TESTPILOT_USERNAME") is not None,
         "Not possible with Oracle Test Pilot",
     )
     def test_create_test_db(self, *mocked_objects):
@@ -67,8 +67,8 @@ class DatabaseCreationTests(TestCase):
                 creation._create_test_db(verbosity=0, keepdb=True)
 
     @mock.patch.object(DatabaseCreation, "_test_database_create", return_value=False)
-    @unittest.skipUnless(
-        os.environ.get("TESTPILOT_USER") is not None,
+    @unittest.skipIf(
+        os.environ.get("TESTPILOT_USERNAME") is not None,
         "Not possible with Oracle Test Pilot",
     )
     def test_create_test_user(self, *mocked_objects):
