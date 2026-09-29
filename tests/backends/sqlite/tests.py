@@ -150,13 +150,15 @@ class Tests(TestCase):
             settings_dict = {
                 "default": {
                     "ENGINE": "django.db.backends.sqlite3",
-                    "NAME": Path(tmp) / "subdir" / "test.db",
+                    "NAME": Path(tmp) / "subdir" / "subsubdir" / "test.db",
                 },
             }
             connections = ConnectionHandler(settings_dict)
             connections["default"].ensure_connection()
             connections["default"].close()
-            self.assertTrue(os.path.isfile(os.path.join(tmp, "subdir", "test.db")))
+            self.assertTrue(
+                os.path.isfile(os.path.join(tmp, "subdir", "subsubdir", "test.db"))
+            )
 
     def test_nested_str_path_name(self):
         with tempfile.TemporaryDirectory() as tmp:
