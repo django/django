@@ -1,0 +1,50 @@
+/* Match admonition icons to earlier Django docs themes. */
+html {
+    --pst-icon-file-lines: "\f15c"; /* fa-solid fa-file-lines */
+    --pst-icon-gears: "\f085"; /* fa-solid fa-gears */
+
+    /* Change admonition default from --pst-icon-bell. */
+    --pst-icon-admonition-default: var(--pst-icon-file-lines);
+    /* Change note from --pst-icon-info-circle. */
+    --pst-icon-admonition-note: var(--pst-icon-file-lines);
+}
+div.admonition.admonition-behind-the-scenes > .admonition-title::after {
+    content: var(--pst-icon-gears);
+}
+div.admonition.admonition-philosophy > .admonition-title::after {
+    content: var(--pst-icon-lightbulb);
+}
+
+.console-block {
+    /* Use pydata-sphinx-theme and Bootstrap design tokens for console tabs. */
+    --tab-gap: 0.375rem;
+    --tab-padding-block: 0.25em;
+    --tab-padding-inline: 0.5em;
+    --tab-label-size: var(--pst-font-size-milli);
+    --tab-label-color: var(--pst-color-text-muted);
+    --tab-border-radius: var(--bs-border-radius);
+    --tab-border-color: var(--pst-color-border-muted);
+    --tab-active-label-color: var(--pst-color-text-base);
+    --tab-active-border-color: var(--pst-color-border);
+    --tab-active-highlight-color: var(--pst-color-primary);
+    --tab-focus-outline: var(--bs-focus-ring-width) solid var(--bs-focus-ring-color);
+
+    /* Adapt python-sphinx-theme's code blocks for console tabs. */
+    section {
+        div.highlight,
+        div.highlight-console,
+        div.highlight-doscon,
+        pre {
+            margin-block-start: 0;
+            border-start-end-radius: 0;
+        }
+    }
+}
+
+/* Keep Read the Docs' floating panels from covering header and footer. */
+body:has(readthedocs-filetreediff:not([hidden])) .bd-header {
+    padding-block-start: 2rem;
+}
+body:has(readthedocs-flyout:not([hidden])) .bd-footer {
+    padding-block-end: 6rem;
+}
