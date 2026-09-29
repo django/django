@@ -2,9 +2,11 @@
 Django 5.2.18 release notes
 ===========================
 
-*Expected October 6, 2026*
+*October 6, 2026*
 
-Django 5.2.18 fixes one data loss issue in 4.0.
+Django 5.2.18 fixes one security issue with severity "low", three security
+issues with severity "moderate", and provides a fix for an insufficient
+security mitigation in 5.2.17. It also fixes one data loss issue in 4.0.
 
 Bugfixes
 ========
