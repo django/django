@@ -150,7 +150,9 @@ class BaseDatabaseIntrospection:
             )
         tables = list(tables)
         if only_existing:
-            existing_tables = set(self.table_names(include_views=include_views))
+            existing_tables = set(
+                self.table_names(include_views=include_views, only_tables=tables)
+            )
             tables = [
                 t for t in tables if self.identifier_converter(t) in existing_tables
             ]
