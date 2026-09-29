@@ -307,6 +307,10 @@ backends.
   :meth:`~django.contrib.gis.gdal.Field.as_datetime` is now a ``c_float``
   rather than a ``c_int``.
 
+* The :class:`FromWKB() <django.contrib.gis.db.models.functions.FromWKB>` and
+  :class:`FromWKT() <django.contrib.gis.db.models.functions.FromWKT>` functions
+  now support the optional ``srid`` argument on Oracle.
+
 * Support for PostGIS 3.2 is removed.
 
 * Support for GDAL 3.3 and 3.4 is removed.
