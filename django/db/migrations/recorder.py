@@ -82,6 +82,7 @@ class MigrationRecorder:
             raise MigrationSchemaMissing(
                 "Unable to create the django_migrations table (%s)" % exc
             )
+        self._has_table = True
 
     def applied_migrations(self):
         """

@@ -5,6 +5,7 @@ import sys
 import tempfile
 from importlib import import_module
 from pathlib import Path
+from unittest import mock
 
 from django.conf import settings
 from django.db import connection, connections
@@ -60,6 +61,21 @@ class RecorderTests(TestCase):
         """
         recorder = MigrationRecorder(connection)
         self.assertIs(recorder.has_table(), True)
+        with self.assertNumQueries(0):
+            self.assertIs(recorder.has_table(), True)
+
+    def test_ensure_schema_caches_has_table(self):
+        """
+        ensure_schema() caches that the migrations table exists after creating
+        it.
+        """
+        recorder = MigrationRecorder(connection)
+        with (
+            mock.patch.object(connection.introspection, "table_names", return_value=[]),
+            mock.patch.object(connection, "schema_editor") as schema_editor,
+        ):
+            recorder.ensure_schema()
+        schema_editor.assert_called_once()
         with self.assertNumQueries(0):
             self.assertIs(recorder.has_table(), True)
 
