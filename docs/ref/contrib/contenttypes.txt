@@ -117,7 +117,8 @@ model it represents, or to retrieve objects from that model:
 .. method:: ContentType.model_class()
 
     Returns the model class represented by this
-    :class:`~django.contrib.contenttypes.models.ContentType` instance.
+    :class:`~django.contrib.contenttypes.models.ContentType` instance, or
+    ``None`` in case of a stale content type for a deleted model.
 
 For example, we could look up the
 :class:`~django.contrib.contenttypes.models.ContentType` for the
