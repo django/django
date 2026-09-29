@@ -286,7 +286,13 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* ...
+* ``DatabaseIntrospection.table_names()`` now accepts an ``only_tables``
+  argument to return only the tables with the given names. Backends can
+  implement the new ``DatabaseIntrospection.get_table_list_for_names()`` method
+  to filter these tables in the database, instead of in Python. Subclasses of
+  built-in backends that override ``get_table_list()`` should also override
+  ``get_table_list_for_names()``, otherwise ``table_names()`` filters the
+  result of ``get_table_list()`` in Python.
 
 :mod:`django.contrib.admin`
 ---------------------------

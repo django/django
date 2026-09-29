@@ -3,6 +3,8 @@ from unittest import skipUnless
 from django.db import connection, connections
 from django.test import TestCase
 
+from ..models import Person
+
 
 @skipUnless(connection.vendor == "mysql", "MySQL tests")
 class ParsingTests(TestCase):
@@ -27,6 +29,16 @@ class ParsingTests(TestCase):
             with self.subTest(check_clause):
                 check_columns = _parse_constraint_columns(check_clause, table_columns)
                 self.assertEqual(list(check_columns), expected_columns)
+
+
+@skipUnless(connection.vendor == "mysql", "MySQL tests")
+class TableListTests(TestCase):
+    def test_get_table_list_for_names(self):
+        with connection.cursor() as cursor:
+            table_list = connection.introspection.get_table_list_for_names(
+                cursor, {Person._meta.db_table, "backends_nonexistent"}
+            )
+        self.assertEqual([table.name for table in table_list], [Person._meta.db_table])
 
 
 @skipUnless(connection.vendor == "mysql", "MySQL tests")
