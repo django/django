@@ -18,6 +18,11 @@ class FieldsTests(SimpleTestCase):
 
 
 class GeometryFieldTests(SimpleTestCase):
+    def test_undefined_srid(self):
+        msg = "Spatial fields cannot have an undefined SRID."
+        with self.assertRaisesMessage(ValueError, msg):
+            GeometryField(srid=None)
+
     def test_deconstruct_empty(self):
         field = GeometryField()
         *_, kwargs = field.deconstruct()

@@ -97,6 +97,8 @@ class BaseSpatialField(Field):
          Set this instead of 'db_index' for geographic fields since index
          creation is different for geometry columns.
         """
+        if srid is None:
+            raise ValueError("Spatial fields cannot have an undefined SRID.")
 
         # Setting the index flag with the value of the `spatial_index` keyword.
         self.spatial_index = spatial_index

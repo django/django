@@ -18,3 +18,7 @@ Bugfixes
 * Fixed a bug in Django 6.1 where ``FETCH_PEERS`` did not batch instances
   loaded by ``select_related()``, causing unnecessary queries
   (:ticket:`37344`).
+
+* Fixed a regression in Django 6.1 where using the invalid ``srid=None`` option
+  on a spatial field could cause values to be stored as ``NULL`` on PostGIS
+  instead of raising an error (:ticket:`37322`).
