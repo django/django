@@ -51,6 +51,7 @@ class MigrationLoader:
         replace_migrations=True,
     ):
         self.connection = connection
+        self.recorder = None if connection is None else MigrationRecorder(connection)
         self.disk_migrations = None
         self.applied_migrations = None
         self.ignore_no_migrations = ignore_no_migrations
@@ -284,8 +285,7 @@ class MigrationLoader:
         if self.connection is None:
             self.applied_migrations = {}
         else:
-            recorder = MigrationRecorder(self.connection)
-            self.applied_migrations = recorder.applied_migrations()
+            self.applied_migrations = self.recorder.applied_migrations()
         # To start, populate the migration graph with nodes for ALL migrations
         # and their dependencies. Also make note of replacing migrations at
         # this step.
@@ -346,7 +346,10 @@ class MigrationLoader:
         Raise InconsistentMigrationHistory if any applied migrations have
         unapplied dependencies.
         """
-        recorder = MigrationRecorder(connection)
+        if connection is self.connection:
+            recorder = self.recorder
+        else:
+            recorder = MigrationRecorder(connection)
         applied = recorder.applied_migrations()
         for migration in applied:
             # If the migration is unknown, skip it.
