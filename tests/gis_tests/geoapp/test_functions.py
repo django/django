@@ -823,6 +823,40 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         self.assertLess(ptown.x - h.pt.x, 1)
         self.assertLess(ptown.y - h.pt.y, 1)
 
+    @skipUnlessDBFeature("has_Transform_function")
+    @skipUnlessDBFeature("has_FromWKB_function")
+    def test_transform_from_wkb(self):
+        # Pre-transformed points for Houston and Pueblo.
+        ptown = fromstr("POINT(992363.390841912 481455.395105533)", srid=2774)
+        wkb = functions.FromWKB(Value(bytes(ptown.wkb)), srid=ptown.srid)
+
+        # Asserting the result of the transform operation with the values in
+        #  the pre-transformed points.
+        h = City.objects.annotate(pt=functions.Transform(wkb, ptown.srid)).values_list(
+            "pt", named=True
+        )[0]
+        self.assertEqual(2774, h.pt.srid)
+        # Precision is low due to version variations in PROJ and GDAL.
+        self.assertLess(ptown.x - h.pt.x, 1)
+        self.assertLess(ptown.y - h.pt.y, 1)
+
+    @skipUnlessDBFeature("has_Transform_function")
+    @skipUnlessDBFeature("has_FromWKT_function")
+    def test_transform_from_wkt(self):
+        # Pre-transformed points for Houston and Pueblo.
+        ptown = fromstr("POINT(992363.390841912 481455.395105533)", srid=2774)
+        wkt = functions.FromWKT(Value(ptown.wkt), srid=ptown.srid)
+
+        # Asserting the result of the transform operation with the values in
+        #  the pre-transformed points.
+        h = City.objects.annotate(pt=functions.Transform(wkt, ptown.srid)).values_list(
+            "pt", named=True
+        )[0]
+        self.assertEqual(2774, h.pt.srid)
+        # Precision is low due to version variations in PROJ and GDAL.
+        self.assertLess(ptown.x - h.pt.x, 1)
+        self.assertLess(ptown.y - h.pt.y, 1)
+
     @skipUnlessDBFeature("has_Translate_function")
     def test_translate(self):
         xfac, yfac = 5, -23
