@@ -1,5 +1,6 @@
 pyenchant
 Sphinx>=4.5.0
+pydata-sphinx-theme @ git+https://github.com/medmunds/pydata-sphinx-theme@2446-fix-virtual-docnames-in-toctree
 sphinxcontrib-spelling
 blacken-docs
 sphinx-lint
