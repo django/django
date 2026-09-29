@@ -1029,6 +1029,53 @@ class TestQuerying(TestCase):
                     NullableJSONModel.objects.filter(value__in=lookup_value), expected
                 )
 
+    @skipUnlessDBFeature("supports_primitives_in_json_field")
+    @skipIfDBFeature("has_native_json_field")
+    def test_in_value_without_explicit_output_field(self):
+        tests = [
+            ([Value(True)], [self.objs[8]]),
+            ([Value(False)], [self.objs[9]]),
+            ([Value("yes")], [self.objs[10]]),
+            ([Value(7)], [self.objs[11]]),
+            ([Value(9.6)], [self.objs[12]]),
+        ]
+        for lookup_value, expected in tests:
+            with self.subTest(value__in=lookup_value), transaction.atomic():
+                self.assertSequenceEqual(
+                    NullableJSONModel.objects.filter(value__in=lookup_value), expected
+                )
+
+    @skipUnlessDBFeature("supports_primitives_in_json_field")
+    @skipIfDBFeature("has_native_json_field")
+    def test_in_value_explicit_output_field(self):
+        tests = [
+            ([Value("7", output_field=IntegerField())], [self.objs[11]]),
+            ([Value("yes", output_field=models.CharField())], [self.objs[10]]),
+        ]
+        for lookup_value, expected in tests:
+            with self.subTest(value__in=lookup_value), transaction.atomic():
+                self.assertSequenceEqual(
+                    NullableJSONModel.objects.filter(value__in=lookup_value), expected
+                )
+
+    def test_in_json_whitespace(self):
+        tests = [
+            ('{"a":1}', {"a": 1}),
+            ('{ "a" : 1 }', {"a": 1}),
+            ("[1,2]", [1, 2]),
+            ("[ 1, 2 ]", [1, 2]),
+        ]
+        for raw, value in tests:
+            with self.subTest(raw=raw):
+                # Use RawSQL to avoid whitespace from Django's serialization.
+                obj = NullableJSONModel.objects.create(
+                    value=RawSQL(self.raw_sql, [raw]),
+                )
+                self.assertSequenceEqual(
+                    NullableJSONModel.objects.filter(pk=obj.pk, value__in=[value]),
+                    [obj],
+                )
+
     def test_key_in(self):
         tests = [
             ("value__c__in", [14], self.objs[3:5]),
