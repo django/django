@@ -207,9 +207,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             try:
                 Path(conn_params["database"]).parent.mkdir(exist_ok=True, parents=True)
             except OSError as e:
-                raise InterfaceError(
-                    "SQLite database parent path is a file, expected directory."
-                ) from e
+                raise InterfaceError(f"Error creating path to SQLite database: {e}.")
         conn = Database.connect(**conn_params)
         register_functions(conn)
 

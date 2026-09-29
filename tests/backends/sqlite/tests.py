@@ -173,20 +173,43 @@ class Tests(TestCase):
             connections["default"].close()
             self.assertTrue(os.path.isfile(os.path.join(tmp, "subdir", "test.db")))
 
-    def test_database_name_with_file_parent_not_allowed(self):
+    def test_database_name_with_file_in_path_not_allowed(self):
+        tests = ("subdir/test.db", "subdir/subsubdir/test.db")
+        for db_path in tests:
+            with self.subTest(db_path):
+                with tempfile.TemporaryDirectory() as tmp:
+                    settings_dict = {
+                        "default": {
+                            "ENGINE": "django.db.backends.sqlite3",
+                            "NAME": Path(tmp) / db_path,
+                        },
+                    }
+                    # write a file to the parent path
+                    (Path(tmp) / "subdir").write_text("test")
+                    connections = ConnectionHandler(settings_dict)
+                    with self.assertRaisesMessage(
+                        InterfaceError,
+                        "Error creating path to SQLite database",
+                    ):
+                        connections["default"].ensure_connection()
+
+    @mock.patch(
+        "django.db.backends.sqlite3.base.Path.mkdir",
+        side_effect=OSError(1, "A mock error"),
+    )
+    def test_make_parent_path_oserror(self, mock_oserror):
         with tempfile.TemporaryDirectory() as tmp:
             settings_dict = {
                 "default": {
                     "ENGINE": "django.db.backends.sqlite3",
-                    "NAME": Path(tmp) / "subdir" / "test.db",
+                    "NAME": Path(tmp) / "db" / "test.db",
                 },
             }
-            # write a file to the parent path
-            (Path(tmp) / "subdir").write_text("test")
+
             connections = ConnectionHandler(settings_dict)
             with self.assertRaisesMessage(
                 InterfaceError,
-                "SQLite database parent path is a file, expected directory.",
+                "Error creating path to SQLite database: [Errno 1] A mock error",
             ):
                 connections["default"].ensure_connection()
 
