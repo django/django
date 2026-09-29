@@ -2,9 +2,12 @@
 Django 6.1.2 release notes
 ==========================
 
-*Expected October 6, 2026*
+*October 6, 2026*
 
-Django 6.1.2 fixes one data loss issue in 4.0 and several bugs in 6.1.1.
+Django 6.1.2 fixes one security issue with severity "low", three security
+issues with severity "moderate", and provides a fix for an insufficient
+security mitigation in 6.1. It also fixes one data loss issue in 4.0 and
+several bugs in 6.1.1.
 
 Bugfixes
 ========
