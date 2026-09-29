@@ -382,11 +382,15 @@ class FromWKB(GeoFunc):
         super().__init__(*expressions, **extra)
 
     def as_oracle(self, compiler, connection, **extra_context):
-        # Oracle doesn't support the srid parameter.
+        # Oracle uses NULL instead of 0 for unknown SRIDs.
         source_expressions = self.get_source_expressions()
-        clone = self.copy()
-        clone.set_source_expressions(source_expressions[:1])
-        return super(FromWKB, clone).as_sql(compiler, connection, **extra_context)
+        srid = source_expressions[1]
+        if srid.value == 0:
+            clone = self.copy()
+            # NULL is the default, so just omit the expression.
+            clone.set_source_expressions(source_expressions[:1])
+            return super(FromWKB, clone).as_sql(compiler, connection, **extra_context)
+        return super().as_sql(compiler, connection, **extra_context)
 
 
 class FromWKT(FromWKB):
