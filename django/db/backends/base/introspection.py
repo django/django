@@ -49,19 +49,29 @@ class BaseDatabaseIntrospection:
         """
         return name
 
-    def table_names(self, cursor=None, include_views=False):
+    def table_names(self, cursor=None, include_views=False, only_tables=None):
         """
         Return a list of names of all tables that exist in the database.
         Sort the returned table list by Python's default sorting. Do NOT use
         the database's ORDER BY here to avoid subtle differences in sorting
         order between databases.
+
+        If only_tables is given, return only the tables whose names are in it.
         """
+        if only_tables is not None:
+            only_tables = {self.identifier_converter(name) for name in only_tables}
+            if not only_tables:
+                return []
 
         def get_names(cursor):
             return sorted(
                 ti.name
-                for ti in self.get_table_list(cursor)
-                if include_views or ti.type == "t"
+                for ti in self.get_table_list(cursor, only_tables=only_tables)
+                if (include_views or ti.type == "t")
+                and (
+                    only_tables is None
+                    or self.identifier_converter(ti.name) in only_tables
+                )
             )
 
         if cursor is None:
@@ -69,10 +79,14 @@ class BaseDatabaseIntrospection:
                 return get_names(cursor)
         return get_names(cursor)
 
-    def get_table_list(self, cursor):
+    def get_table_list(self, cursor, only_tables=None):
         """
         Return an unsorted list of TableInfo named tuples of all tables and
         views that exist in the database.
+
+        only_tables is None or a set of names converted with
+        identifier_converter(). If it's given, the result may be limited to the
+        tables and views whose names are in it.
         """
         raise NotImplementedError(
             "subclasses of BaseDatabaseIntrospection may require a get_table_list() "

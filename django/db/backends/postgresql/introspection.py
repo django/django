@@ -62,9 +62,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 return "SmallAutoField"
         return field_type
 
-    def get_table_list(self, cursor):
+    def get_table_list(self, cursor, only_tables=None):
         """Return a list of table and view names in the current database."""
-        cursor.execute("""
+        sql = """
             SELECT
                 c.relname,
                 CASE
@@ -78,7 +78,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             WHERE c.relkind IN ('f', 'm', 'p', 'r', 'v')
                 AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
                 AND pg_catalog.pg_table_is_visible(c.oid)
-        """)
+        """
+        params = None
+        if only_tables is not None:
+            sql += " AND c.relname = ANY(%s)"
+            params = [sorted(only_tables)]
+        cursor.execute(sql, params)
         return [
             TableInfo(*row)
             for row in cursor.fetchall()
