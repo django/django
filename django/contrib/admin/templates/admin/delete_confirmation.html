@@ -28,7 +28,9 @@
 {% elif protected %}
   {% block delete_protected %}
     <p>{% blocktranslate %}Deleting the {{ object_name }} “{{ escaped_object }}” would require deleting the following protected related objects:{% endblocktranslate %}</p>
-    <ul id="deleted-objects">{{ protected|truncated_unordered_list:delete_confirmation_max_display }}</ul>
+    {% if delete_confirmation_max_display is None or delete_confirmation_max_display > 0 %}
+      <ul id="deleted-objects">{{ protected|truncated_unordered_list:delete_confirmation_max_display }}</ul>
+    {% endif %}
   {% endblock %}
 {% else %}
   {% block delete_confirm %}

@@ -27,6 +27,11 @@ Bugfixes
   should be migrated to lowercase so that it can be queried correctly
   (:ticket:`37376`).
 
+* Fixed a bug in Django 6.1 where the admin still displayed objects in inline
+  error messages and on the delete confirmation pages when setting
+  :attr:`~django.contrib.admin.ModelAdmin.delete_confirmation_max_display` to 0
+  (:ticket:`37386`).
+
 * Fixed a bug in Django 6.1 where ``FETCH_PEERS`` did not batch instances
   loaded by ``select_related()``, causing unnecessary queries
   (:ticket:`37344`).
