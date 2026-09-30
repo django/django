@@ -181,6 +181,25 @@ class AdminActionsTest(TestCase):
         )
         self.assertEqual(Question.objects.count(), 2)
 
+    def test_delete_protected_message_lists_nothing_when_limit_zero(self):
+        question = Question.objects.create(question="Why?")
+        Answer.objects.bulk_create(
+            [Answer(question=question, answer=f"Because {i}.") for i in range(3)]
+        )
+        response = self.client.post(
+            reverse("admin_zero_display:admin_views_question_changelist"),
+            {
+                ACTION_CHECKBOX_NAME: [question.pk],
+                "action": "delete_selected",
+                "index": 0,
+            },
+        )
+        self.assertContains(
+            response,
+            "Deleting the selected question would require deleting the "
+            "following protected related objects:",
+        )
+
     def test_model_admin_default_delete_action_no_change_url(self):
         """
         The default delete action doesn't break if a ModelAdmin removes the
@@ -240,6 +259,21 @@ class AdminActionsTest(TestCase):
         self.assertContains(response, "…and 2 more objects.")
         self.assertNotContains(response, "another object")
         self.assertNotContains(response, "last object")
+
+    def test_delete_selected_hides_objects_when_limit_zero(self):
+        book = Book.objects.create(name="Test Book")
+        response = self.client.post(
+            reverse("admin_zero_display:admin_views_book_changelist"),
+            {
+                ACTION_CHECKBOX_NAME: [book.pk],
+                "action": "delete_selected",
+                "index": 0,
+            },
+        )
+        self.assertContains(response, "<h2>Summary</h2>", html=True)
+        self.assertContains(response, "<ul", count=1)
+        self.assertNotContains(response, "<h2>Objects</h2>", html=True)
+        self.assertNotContains(response, "a deletable object")
 
     def test_custom_function_mail_action(self):
         """A custom action may be defined in a function."""
