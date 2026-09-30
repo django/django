@@ -2170,11 +2170,6 @@ Note that, with static (middleware-less) translation, the language is in
 ``settings.LANGUAGE_CODE``, while with dynamic (middleware) translation, it's
 in ``request.LANGUAGE_CODE``.
 
-.. _settings file: ../settings/
-.. _middleware documentation: ../middleware/
-.. _session: ../sessions/
-.. _request object: ../request_response/#httprequest-objects
-
 .. _how-django-discovers-translations:
 
 How Django discovers translations
