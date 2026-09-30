@@ -4067,6 +4067,19 @@ class AdminViewDeletedObjectsTest(TestCase):
             % reverse("admin:admin_views_answer_change", args=(a2.pk,)),
         )
 
+    def test_protected_zero_display(self):
+        question = Question.objects.create(question="Why?")
+        Answer.objects.create(question=question, answer="Because.")
+        response = self.client.get(
+            reverse(
+                "admin_zero_display:admin_views_question_delete", args=(question.pk,)
+            )
+        )
+        self.assertContains(
+            response, "would require deleting the following protected related objects"
+        )
+        self.assertNotContains(response, "<ul")
+
     def test_post_delete_protected(self):
         """
         A POST request to delete protected objects should display the page
