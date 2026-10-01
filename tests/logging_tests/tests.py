@@ -757,6 +757,80 @@ format=%(message)s
 
 
 class LogFormattersTests(SimpleTestCase):
+    def test_server_formatter_server_time_by_style(self):
+        cases = [
+            ("[{server_time}] {message}", "{", "[fixed] message"),
+            ("[%(server_time)s] %(message)s", "%", "[fixed] message"),
+            ("[$server_time] $message", "$", "[fixed] message"),
+        ]
+        for fmt, style, expected in cases:
+            with self.subTest(style=style):
+                formatter = ServerFormatter(fmt=fmt, style=style)
+                record = logging.makeLogRecord({"msg": "message"})
+                record.server_time = "fixed"
+                with mock.patch.object(formatter, "formatTime") as format_time:
+                    self.assertEqual(formatter.format(record), expected)
+                format_time.assert_not_called()
+
+    def test_server_formatter_adds_server_time_for_percent_style(self):
+        formatter = ServerFormatter(fmt="[%(server_time)s] %(message)s", style="%")
+        record = logging.makeLogRecord({"msg": "message"})
+        with mock.patch.object(formatter, "formatTime", return_value="generated"):
+            self.assertEqual(formatter.format(record), "[generated] message")
+        self.assertEqual(record.server_time, "generated")
+
+    def test_server_formatter_brace_field_with_dot_in_index(self):
+        formatter = ServerFormatter(fmt="{server_time[foo.bar]}", style="{")
+        record = logging.makeLogRecord({"msg": "message"})
+        with mock.patch.object(
+            formatter, "formatTime", return_value={"foo.bar": "generated"}
+        ):
+            self.assertEqual(formatter.format(record), "generated")
+
+    def test_server_formatter_brace_field_in_nested_format_spec(self):
+        formatter = ServerFormatter(fmt="{message:{server_time}}", style="{")
+        record = logging.makeLogRecord({"msg": "x"})
+        with mock.patch.object(formatter, "formatTime", return_value="5"):
+            self.assertEqual(formatter.format(record), "x    ")
+
+    def test_server_formatter_ignores_escaped_server_time(self):
+        cases = [
+            ("{{server_time}} {message}", "{", "{server_time} message"),
+            ("%%(server_time)s %(message)s", "%", "%(server_time)s message"),
+            ("%%%%(server_time)s %(message)s", "%", "%%(server_time)s message"),
+            ("$$server_time $message", "$", "$server_time message"),
+            ("%(server_time)s {message}", "{", "%(server_time)s message"),
+            ("{server_time} %(message)s", "%", "{server_time} message"),
+        ]
+        for fmt, style, expected in cases:
+            with self.subTest(style=style):
+                formatter = ServerFormatter(fmt=fmt, style=style)
+                record = logging.makeLogRecord({"msg": "message"})
+                self.assertEqual(formatter.format(record), expected)
+                self.assertNotIn("server_time", record.__dict__)
+
+    def test_server_formatter_recognizes_percent_placeholder_after_escape(self):
+        formatter = ServerFormatter(fmt="%%%(server_time)s %(message)s", style="%")
+        record = logging.makeLogRecord({"msg": "message"})
+        with mock.patch.object(formatter, "formatTime", return_value="generated"):
+            self.assertEqual(formatter.format(record), "%generated message")
+        self.assertEqual(record.server_time, "generated")
+
+    def test_server_formatter_preserves_format_errors(self):
+        formatter = ServerFormatter(fmt="%(missing)s", style="%")
+        record = logging.makeLogRecord({"msg": "message"})
+        with self.assertRaisesRegex(ValueError, "Formatting field not found"):
+            formatter.format(record)
+        self.assertNotIn("server_time", record.__dict__)
+
+        formatter = ServerFormatter(fmt="%(server_time)q %(message)s", style="%")
+        with self.assertRaisesRegex(ValueError, "Formatting field not found"):
+            formatter.format(record)
+        self.assertNotIn("server_time", record.__dict__)
+
+        with self.assertRaises(ValueError):
+            ServerFormatter(fmt="{server_time", style="{")
+
     def test_server_formatter_styles(self):
         color_style = color.make_style("")
         formatter = ServerFormatter()

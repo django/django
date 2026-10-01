@@ -1,5 +1,6 @@
 import logging
 import logging.config  # needed when logging_config doesn't start with logging.config
+import string
 import warnings
 from copy import copy
 
@@ -246,7 +247,49 @@ class ServerFormatter(logging.Formatter):
         return super().format(record)
 
     def uses_server_time(self):
-        return self._fmt.find("{server_time}") >= 0
+        if isinstance(self._style, logging.StrFormatStyle):
+            formatter = string.Formatter()
+
+            def format_uses_server_time(fmt):
+                for _, field_name, format_spec, _ in formatter.parse(fmt):
+                    if field_name:
+                        separators = (field_name.find("."), field_name.find("["))
+                        root_end = min(
+                            (index for index in separators if index >= 0),
+                            default=len(field_name),
+                        )
+                        if field_name[:root_end] == "server_time":
+                            return True
+                    if format_spec and format_uses_server_time(format_spec):
+                        return True
+                return False
+
+            try:
+                return format_uses_server_time(self._fmt)
+            except ValueError:
+                return False
+        if isinstance(self._style, logging.PercentStyle):
+            index = 0
+            while index < len(self._fmt):
+                if self._fmt.startswith("%%", index):
+                    index += 2
+                elif (
+                    self._fmt.startswith("%(server_time)", index)
+                    and logging.PercentStyle.validation_pattern.match(
+                        self._fmt, index
+                    )
+                ):
+                    return True
+                else:
+                    index += 1
+            return False
+        if isinstance(self._style, logging.StringTemplateStyle):
+            return any(
+                match.group("named") == "server_time"
+                or match.group("braced") == "server_time"
+                for match in string.Template.pattern.finditer(self._fmt)
+            )
+        return False
 
 
 def log_message(
