@@ -133,6 +133,9 @@ It will NOT compress content if any of the following are true:
 * The request (the browser) hasn't sent an ``Accept-Encoding`` header
   containing ``gzip``.
 
+* The response status code is 204, 304 or in [100..200) range.
+  In these cases there is no content body present (according to RFC 9112).
+
 If the response has an ``ETag`` header, the ETag is made weak to comply with
 :rfc:`9110#section-8.8.1`.
 
