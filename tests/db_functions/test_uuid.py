@@ -21,6 +21,11 @@ class TestUUID(TestCase):
         self.assertEqual(m1.uuid.version, 4)
         self.assertNotEqual(m1.uuid, m2.uuid)
 
+    @skipUnlessDBFeature("supports_uuid4_function")
+    def test_uuid4_lookup(self):
+        m1 = UUIDModel.objects.create(uuid=UUID4())
+        self.assertEqual(UUIDModel.objects.get(uuid=m1.uuid), m1)
+
     @skipUnlessDBFeature("supports_uuid7_function")
     def test_uuid7(self):
         m1 = UUIDModel.objects.create()
