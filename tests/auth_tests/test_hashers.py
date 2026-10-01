@@ -268,6 +268,25 @@ class TestUtilsHashPass(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg % "lolcat"):
             identify_hasher("lolcat$salt$hash")
 
+    def test_bad_encoded_hash_algorithm(self):
+        for encoded, algorithm in (
+            ("default$$$$", "default"),
+            ("unknown$salt$hash", "unknown"),
+            ("unsalted_md5$hash", "unsalted_md5"),
+            ("unsalted_sha1$hash", "unsalted_sha1"),
+        ):
+            with self.subTest(encoded=encoded):
+                with self.assertRaisesMessage(ValueError, algorithm):
+                    identify_hasher(encoded)
+                self.assertFalse(check_password("guess", encoded))
+
+        # Existing algorithms, including the legacy PBKDF2-SHA1 hasher, remain
+        # identifiable from correctly formatted encoded passwords.
+        self.assertEqual(
+            identify_hasher("pbkdf2_sha1$salt$hash").algorithm, "pbkdf2_sha1"
+        )
+        self.assertEqual(get_hasher("default").algorithm, "pbkdf2_sha256")
+
     def test_is_password_usable(self):
         passwords = ("lètmein_badencoded", "", None)
         for password in passwords:

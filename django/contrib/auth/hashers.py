@@ -188,6 +188,11 @@ def identify_hasher(encoded):
         algorithm = "unsalted_sha1"
     else:
         algorithm = encoded.split("$", 1)[0]
+    if algorithm == "default":
+        raise ValueError(
+            "Unknown password hashing algorithm 'default'. Did you specify it in "
+            "the PASSWORD_HASHERS setting?"
+        )
     return get_hasher(algorithm)
 
 
