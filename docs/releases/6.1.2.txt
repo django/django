@@ -21,6 +21,12 @@ Bugfixes
 * Fixed a bug in Django 6.1 where the ``fields.W225`` system check incorrectly
   warned that ``null`` has no effect on ``GeneratedField`` (:ticket:`37348`).
 
+* Fixed a bug in Django 6.1 where the
+  :class:`~django.db.models.functions.UUID4` function persisted uppercase
+  values on Oracle. Any data already created using this function on Oracle
+  should be migrated to lowercase so that it can be queried correctly
+  (:ticket:`37376`).
+
 * Fixed a bug in Django 6.1 where ``FETCH_PEERS`` did not batch instances
   loaded by ``select_related()``, causing unnecessary queries
   (:ticket:`37344`).
