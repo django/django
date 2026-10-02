@@ -1383,3 +1383,9 @@ a.deletelink:hover {
 .actions .button:hover {
     border-color: var(--body-quiet-color);
 }
+
+/* DOCS */
+
+.module table.xfull {
+    width: 100%;
+}

@@ -1,6 +1,8 @@
 import sys
 import unittest
 
+from playwright_tests import screenshot_cases
+
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admindocs import utils, views
@@ -16,7 +18,7 @@ from django.urls import include, path, reverse
 from django.utils.functional import SimpleLazyObject
 
 from .models import Company, Person
-from .tests import AdminDocsTestCase, TestDataMixin
+from .tests import AdminDocsPlaywrightTestCase, AdminDocsTestCase, TestDataMixin
 
 
 @unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
@@ -601,6 +603,23 @@ class TestModelIndexView(TestDataMixin, AdminDocsTestCase):
             "</ol>",
             html=True,
         )
+
+
+@unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
+class TestModelIndexViewPlaywrightTest(AdminDocsPlaywrightTestCase):
+    @screenshot_cases(["desktop_size"])
+    def test_model_index_table_full_width(self):
+        self.admin_login(username="super", password="secret")
+        self.page.goto(self.live_server_url + reverse("django-admindocs-models-index"))
+        self.take_screenshot("model_index_table_full_width")
+
+        module = self.page.locator("#content-main .module").first
+        table = module.locator("table.xfull")
+        module_box = module.bounding_box()
+        table_box = table.bounding_box()
+        self.assertIsNotNone(module_box)
+        self.assertIsNotNone(table_box)
+        self.assertAlmostEqual(table_box["width"], module_box["width"], delta=1)
 
 
 class CustomField(models.Field):
