@@ -10,6 +10,7 @@ from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.functional import cached_property
 from django.utils.inspect import method_has_no_args
 from django.utils.translation import gettext_lazy as _
+from django.utils.warnings import django_file_prefixes
 
 
 class UnorderedObjectListWarning(RuntimeWarning):
@@ -87,7 +88,7 @@ class BasePaginator:
                 "Pagination may yield inconsistent results with an unordered "
                 "object_list: {}.".format(obj_list_repr),
                 UnorderedObjectListWarning,
-                stacklevel=3,
+                skip_file_prefixes=django_file_prefixes(),
             )
 
     def _get_elided_page_range(
