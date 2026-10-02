@@ -2821,13 +2821,20 @@ class InlineModelAdmin(BaseModelAdmin):
                             "class_name": self._meta.model._meta.verbose_name,
                             "instance": self.instance,
                         }
+                        if delete_confirmation_max_display == 0:
+                            raise ValidationError(
+                                _(
+                                    "Deleting %(class_name)s %(instance)s would "
+                                    "require deleting some protected related "
+                                    "objects."
+                                ),
+                                code="deleting_protected",
+                                params=params,
+                            )
                         remaining_object_count = (
                             len(collector.protected) - delete_confirmation_max_display
                         )
-                        if (
-                            remaining_object_count > 0
-                            and delete_confirmation_max_display
-                        ):
+                        if remaining_object_count > 0:
                             related = (
                                 # Translators: This string is used as a
                                 # separator between list elements.

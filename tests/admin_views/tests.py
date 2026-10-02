@@ -4200,9 +4200,9 @@ class AdminViewDeletedObjectsTest(TestCase):
             )
         )
         self.assertContains(
-            response, "would require deleting the following protected related objects"
+            response, "would require deleting some protected related objects."
         )
-        self.assertNotContains(response, "<ul")
+        self.assertNotContains(response, 'id="deleted-objects"')
 
     def test_post_delete_protected(self):
         """
