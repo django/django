@@ -1,10 +1,12 @@
 import datetime
 
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase, override_settings
+from django.core.paginator import UnorderedObjectListWarning
+from django.test import RequestFactory, TestCase, override_settings
 from django.views.generic.base import View
 
 from .models import Artist, Author, Book, Page
+from .views import AuthorList
 
 
 @override_settings(ROOT_URLCONF="generic_views.urls")
@@ -159,6 +161,15 @@ class ListViewTests(TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(len(res.context["object_list"]), 1)
+
+    def test_paginated_unordered_queryset_warning_points_at_caller(self):
+        view = AuthorList.as_view(paginate_by=5, queryset=Author.objects.order_by())
+        request = RequestFactory().get("/")
+        with self.assertWarns(UnorderedObjectListWarning) as cm:
+            view(request)
+        # The warning points at the code outside Django that triggered the
+        # pagination rather than at Django's ListView internals.
+        self.assertEqual(cm.filename, __file__)
 
     def test_verbose_name(self):
         res = self.client.get("/list/artists/")

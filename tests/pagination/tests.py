@@ -1,6 +1,4 @@
 import collections.abc
-import inspect
-import pathlib
 import unittest.mock
 import warnings
 from contextlib import aclosing
@@ -9,7 +7,6 @@ from datetime import datetime
 from django.core.paginator import (
     AsyncPage,
     AsyncPaginator,
-    BasePaginator,
     EmptyPage,
     InvalidPage,
     PageNotAnInteger,
@@ -902,14 +899,8 @@ class ModelPaginationTests(TestCase):
         )
         with self.assertWarnsMessage(UnorderedObjectListWarning, msg) as cm:
             AsyncPaginator(Article.objects.all(), 5)
-        # The warning points at the BasePaginator caller.
-        # The reason is that the UnorderedObjectListWarning occurs in
-        # BasePaginator.
-        base_paginator_path = pathlib.Path(inspect.getfile(BasePaginator))
-        self.assertIn(
-            cm.filename,
-            [str(base_paginator_path), str(base_paginator_path.with_suffix(".py"))],
-        )
+        # The warning points at the AsyncPaginator caller.
+        self.assertEqual(cm.filename, __file__)
 
     def test_paginating_empty_queryset_does_not_warn(self):
         with warnings.catch_warnings(record=True) as recorded:
