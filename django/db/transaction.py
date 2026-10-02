@@ -1,4 +1,5 @@
 import warnings
+from asyncio import iscoroutinefunction
 from contextlib import ContextDecorator, contextmanager
 from functools import wraps
 
@@ -342,9 +343,17 @@ def _non_atomic_requests(view, using):
     except AttributeError:
         databases = {using}
 
-    @wraps(view)
-    def wrapper(*args, **kwargs):
-        return view(*args, **kwargs)
+    if iscoroutinefunction(view):
+
+        @wraps(view)
+        async def wrapper(*args, **kwargs):
+            return await view(*args, **kwargs)
+
+    else:
+
+        @wraps(view)
+        def wrapper(*args, **kwargs):
+            return view(*args, **kwargs)
 
     wrapper._non_atomic_requests = databases
     return wrapper
