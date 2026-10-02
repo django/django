@@ -196,9 +196,10 @@ class AdminActionsTest(TestCase):
         )
         self.assertContains(
             response,
-            "Deleting the selected question would require deleting the "
-            "following protected related objects:",
+            "Deleting the selected question would require deleting some "
+            "protected related objects.",
         )
+        self.assertNotContains(response, "<ul")
 
     def test_model_admin_default_delete_action_no_change_url(self):
         """

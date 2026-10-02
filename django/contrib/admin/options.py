@@ -2824,10 +2824,9 @@ class InlineModelAdmin(BaseModelAdmin):
                         remaining_object_count = (
                             len(collector.protected) - delete_confirmation_max_display
                         )
-                        if (
-                            remaining_object_count > 0
-                            and delete_confirmation_max_display
-                        ):
+                        if delete_confirmation_max_display == 0:
+                            related = None
+                        elif remaining_object_count > 0:
                             related = (
                                 # Translators: This string is used as a
                                 # separator between list elements.
@@ -2842,12 +2841,18 @@ class InlineModelAdmin(BaseModelAdmin):
                             )
                         else:
                             related = get_text_list(objs, _("and"))
-                        params["related_objects"] = related
-                        msg = _(
-                            "Deleting %(class_name)s %(instance)s would require "
-                            "deleting the following protected related objects: "
-                            "%(related_objects)s"
-                        )
+                        if related:
+                            params["related_objects"] = related
+                            msg = _(
+                                "Deleting %(class_name)s %(instance)s would require "
+                                "deleting the following protected related objects: "
+                                "%(related_objects)s"
+                            )
+                        else:
+                            msg = _(
+                                "Deleting %(class_name)s %(instance)s would require "
+                                "deleting some protected related objects."
+                            )
                         raise ValidationError(
                             msg, code="deleting_protected", params=params
                         )
