@@ -1764,16 +1764,30 @@ class Query(BaseExpression):
 
         if reffed_expression:
             condition = self.build_lookup(lookups, reffed_expression, value)
+            lookup_type = condition.lookup_name
             clause = WhereNode([condition], connector=AND)
+            require_outer = (
+                lookup_type == "isnull"
+                and condition.rhs is True
+                and not current_negated
+            )
             if (
                 current_negated
-                and condition.lookup_name != "isnull"
+                and (lookup_type != "isnull" or condition.rhs is False)
                 and condition.rhs is not None
-                and self._expression_has_nullable_source(condition.lhs)
             ):
-                lookup_class = condition.lhs.get_lookup("isnull")
-                clause.add(lookup_class(condition.lhs, False), AND)
-            return clause, []
+                require_outer = True
+                if lookup_type != "isnull" and self._expression_has_nullable_source(
+                    condition.lhs
+                ):
+                    lookup_class = condition.lhs.get_lookup("isnull")
+                    clause.add(lookup_class(condition.lhs, False), AND)
+            used_joins.update(
+                alias
+                for alias in self._gen_col_aliases([condition])
+                if isinstance(self.alias_map.get(alias), SubqueryJoin)
+            )
+            return clause, used_joins if not require_outer else ()
 
         opts = self.get_meta()
         alias = self.get_initial_alias()

@@ -276,6 +276,14 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
 
         self.assertSequenceEqual(projects, ["RPT"])
 
+    def test_composite_subquery_alias_filter_uses_cross_join(self):
+        project_info = Project.objects.values("code", "title")[:1]
+        projects = Project.objects.alias(project_info=project_info).filter(
+            project_info__code="AUTH"
+        )
+
+        self.assertIn("CROSS JOIN", str(projects.query))
+
     def test_exclude_outer_field_comparison_with_empty_composite_subquery(self):
         missing_project = Project.objects.filter(pk=-1).values("pk", "code")
         projects = (
