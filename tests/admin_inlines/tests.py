@@ -926,11 +926,9 @@ class TestInline(TestDataMixin, TestCase):
         inline_formset = response.context_data["inline_admin_formsets"][0]
         self.assertEqual(1, len(inline_formset.non_form_errors()))
         error_message = inline_formset.non_form_errors()[0]
-        self.assertTrue(
-            error_message.startswith(
-                f"Deleting chapter Chapter object ({chapter.pk}) would require "
-                "deleting the following protected related objects:"
-            ),
+        self.assertEqual(
+            f"Deleting chapter Chapter object ({chapter.pk}) would require "
+            "deleting some protected related objects.",
             error_message,
         )
         self.assertNotIn("FootNote object", error_message)
