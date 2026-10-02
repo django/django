@@ -370,10 +370,6 @@ button {
 
     /* Docs */
 
-    .module table.xfull {
-        width: 100%;
-    }
-
     pre.literal-block {
         overflow: auto;
     }
