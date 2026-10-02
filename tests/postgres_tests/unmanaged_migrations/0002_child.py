@@ -5,18 +5,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('postgres_tests', '0001_initial'),
+        ("postgres_tests", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Child',
+            name="Child",
             fields=[
-                ('parent_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='postgres_tests.parent')),
+                (
+                    "parent_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="postgres_tests.parent",
+                    ),
+                ),
             ],
             options={
-                'managed': False,
+                "managed": False,
             },
-            bases=('postgres_tests.parent',),
+            bases=("postgres_tests.parent",),
         ),
     ]

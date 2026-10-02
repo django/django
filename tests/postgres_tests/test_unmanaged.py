@@ -1,7 +1,6 @@
 import unittest
 
 from django.core.management import call_command
-
 from django.db import connection
 from django.test import TransactionTestCase, override_settings
 
@@ -17,4 +16,3 @@ class TestMigrations(TransactionTestCase):
     )
     def test_adding_field_with_default(self):
         call_command("migrate", "postgres_tests", verbosity=0)
-
