@@ -70,5 +70,5 @@ jobs:
       - name: Print geospatial versions
         run: |
           python -c "from django.contrib.gis import gdal, geos; print(f'GDAL: {gdal.gdal_version()}'); print(f'GEOS: {geos.geos_version()}')"
-      - name: Run PostGIS tests
-        run: python -Wall tests/runtests.py -v2 --settings=test_postgis
+      - name: Run GIS tests
+        run: python -Wall tests/runtests.py -v2 gis_tests --settings=test_postgis
