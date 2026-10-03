@@ -389,7 +389,7 @@ class BaseDatabaseOperations:
         columns = [
             "%s.%s"
             % (
-                self.quote_name(field.model._meta.db_table),
+                self.quote_table_name(field.model._meta.db_table),
                 self.quote_name(field.column),
             )
             for field in fields
@@ -412,6 +412,11 @@ class BaseDatabaseOperations:
         if self._cache is None:
             self._cache = import_module(self.compiler_module)
         return getattr(self._cache, compiler_name)
+
+    def quote_table_name(self, table_name):
+        if hasattr(table_name, "as_sql_name"):
+            return table_name.as_sql_name(self.connection)
+        return self.quote_name(table_name)
 
     def quote_name(self, name):
         """
