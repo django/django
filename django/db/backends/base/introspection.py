@@ -49,19 +49,33 @@ class BaseDatabaseIntrospection:
         """
         return name
 
-    def table_names(self, cursor=None, include_views=False):
+    def table_names(self, cursor=None, include_views=False, only_tables=None):
         """
         Return a list of names of all tables that exist in the database.
         Sort the returned table list by Python's default sorting. Do NOT use
         the database's ORDER BY here to avoid subtle differences in sorting
         order between databases.
+
+        If only_tables is given, return only the tables whose names are in it.
         """
+        if only_tables is not None:
+            only_tables = {self.identifier_converter(name) for name in only_tables}
+            if not only_tables:
+                return []
 
         def get_names(cursor):
+            if only_tables is not None and self._can_filter_table_list():
+                table_list = self.get_table_list_for_names(cursor, only_tables)
+            else:
+                table_list = self.get_table_list(cursor)
             return sorted(
                 ti.name
-                for ti in self.get_table_list(cursor)
-                if include_views or ti.type == "t"
+                for ti in table_list
+                if (include_views or ti.type == "t")
+                and (
+                    only_tables is None
+                    or self.identifier_converter(ti.name) in only_tables
+                )
             )
 
         if cursor is None:
@@ -78,6 +92,23 @@ class BaseDatabaseIntrospection:
             "subclasses of BaseDatabaseIntrospection may require a get_table_list() "
             "method"
         )
+
+    def get_table_list_for_names(self, cursor, table_names):
+        """
+        Return an unsorted list of TableInfo named tuples of the tables and
+        views whose names are in table_names, a set of names converted with
+        identifier_converter(). Other tables may be included.
+        """
+        return self.get_table_list(cursor)
+
+    def _can_filter_table_list(self):
+        # Don't bypass get_table_list() if a subclass overrides it but not
+        # get_table_list_for_names().
+        for klass in type(self).__mro__:
+            if "get_table_list_for_names" in vars(klass):
+                return True
+            if "get_table_list" in vars(klass):
+                return False
 
     def get_table_description(self, cursor, table_name):
         """
@@ -119,7 +150,9 @@ class BaseDatabaseIntrospection:
             )
         tables = list(tables)
         if only_existing:
-            existing_tables = set(self.table_names(include_views=include_views))
+            existing_tables = set(
+                self.table_names(include_views=include_views, only_tables=tables)
+            )
             tables = [
                 t for t in tables if self.identifier_converter(t) in existing_tables
             ]

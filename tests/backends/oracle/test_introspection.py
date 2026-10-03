@@ -1,7 +1,7 @@
 import unittest
 
 from django.db import connection
-from django.test import TransactionTestCase, skipUnlessDBFeature
+from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from ..models import Person, Square
 
@@ -84,3 +84,24 @@ class DatabaseSequenceTests(TransactionTestCase):
                 self.assertNotEqual(columns[0].collation, collation)
             finally:
                 cursor.execute(f"DROP MATERIALIZED VIEW {person_mview}")
+
+
+@unittest.skipUnless(connection.vendor == "oracle", "Oracle tests")
+class TableListTests(TestCase):
+    def test_get_table_list_for_names(self):
+        with connection.cursor() as cursor:
+            table_list = connection.introspection.get_table_list_for_names(
+                cursor, {Person._meta.db_table, "backends_nonexistent"}
+            )
+        self.assertEqual([table.name for table in table_list], [Person._meta.db_table])
+
+    def test_table_names_only_tables_exceeding_max_in_list_size(self):
+        only_tables = [
+            f"backends_nonexistent_{i}"
+            for i in range(connection.ops.max_in_list_size())
+        ]
+        only_tables.append(Person._meta.db_table)
+        self.assertEqual(
+            connection.introspection.table_names(only_tables=only_tables),
+            [Person._meta.db_table],
+        )
