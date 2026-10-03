@@ -228,16 +228,10 @@ class ConsoleDirective(CodeBlock):
                 return ViewList(lines)
             return None
 
-        env = self.state.document.settings.env
         self.arguments = ["console"]
         lit_blk_obj = super().run()[0]
 
-        # Only do work when an HTML-format Sphinx builder is being used,
-        # invoke the default behavior for the rest.
-        if env.app.builder.format != "html":
-            return [lit_blk_obj]
-
-        lit_blk_obj["uid"] = str(env.new_serialno("console"))
+        lit_blk_obj["uid"] = str(self.env.new_serialno("console"))
         # Only add the tabbed UI if there is actually a Windows-specific
         # version of the CLI example.
         win_content = code_block_to_win(self.content)
