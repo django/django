@@ -55,6 +55,16 @@ class Task:
     def __post_init__(self):
         self.get_backend().validate_task(self)
 
+    def __lt__(self, other):
+        try:
+            return (self.priority, self.run_after is not None, self.run_after) < (
+                other.priority,
+                other.run_after is not None,
+                other.run_after,
+            )
+        except AttributeError:
+            return NotImplemented
+
     @classmethod
     def _reconstruct(cls, kwargs):
         func_path = kwargs["func"]
@@ -223,6 +233,29 @@ class TaskResult:
     def __post_init__(self):
         object.__setattr__(self, "args", normalize_json(self.args))
         object.__setattr__(self, "kwargs", normalize_json(self.kwargs))
+
+    def __eq__(self, other):
+        try:
+            return (self.id, self.status, self.last_attempted_at) == (
+                other.id,
+                other.status,
+                other.last_attempted_at,
+            )
+        except AttributeError:
+            return NotImplemented
+
+    def __hash__(self):
+        return hash((self.id, self.status, self.last_attempted_at))
+
+    def __lt__(self, other):
+        try:
+            return (self.task, self.enqueued_at is not None, self.enqueued_at) < (
+                other.task,
+                other.enqueued_at is not None,
+                other.enqueued_at,
+            )
+        except AttributeError:
+            return NotImplemented
 
     @property
     def return_value(self):
