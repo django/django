@@ -3525,6 +3525,24 @@ class FormFieldCallbackTests(SimpleTestCase):
         form = modelform_factory(Person, fields="__all__")
         self.assertEqual(list(form.base_fields), ["name"])
 
+    def test_modelform_factory_declared_fields_fields_and_exclude(self):
+        """
+        modelform_factory respects fields and exclude for declared fields.
+        """
+
+        class CustomForm(forms.ModelForm):
+            extra = forms.IntegerField(initial=0)
+
+            class Meta:
+                model = Person
+                fields = "__all__"
+
+        form_fields = modelform_factory(Person, form=CustomForm, fields=["name"])
+        self.assertEqual(list(form_fields.base_fields), ["name"])
+
+        form_exclude = modelform_factory(Person, form=CustomForm, exclude=["extra"])
+        self.assertEqual(list(form_exclude.base_fields), ["name"])
+
     def test_custom_callback(self):
         """A custom formfield_callback is used if provided"""
         callback_args = []

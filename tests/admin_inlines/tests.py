@@ -2,6 +2,7 @@ import re
 
 from playwright_tests import AdminPlaywrightTestCase, screenshot_cases
 
+from django import forms
 from django.contrib.admin import ModelAdmin, TabularInline
 from django.contrib.admin.helpers import InlineAdminForm
 from django.contrib.auth.models import Permission, User
@@ -901,6 +902,45 @@ class TestInline(TestDataMixin, TestCase):
         )
         self.assertEqual(error_message.count("FootNote object"), 3)
         self.assertNotIn("more", error_message)
+
+    def test_inline_custom_form_with_excluded_declared_field(self):
+        """
+        Hidden declared fields on a custom ModelForm do not cause validation
+        errors on empty extra inline forms.
+        """
+
+        class ChildCustomForm(forms.ModelForm):
+            extra_field = forms.IntegerField(initial=0)
+
+            class Meta:
+                model = SomeChildModel
+                fields = "__all__"
+
+        class ChildInline(TabularInline):
+            model = SomeChildModel
+            form = ChildCustomForm
+            fields = ["name"]
+            extra = 2
+
+        class ParentAdmin(ModelAdmin):
+            inlines = [ChildInline]
+
+        admin_instance = ParentAdmin(SomeParentModel, admin_site)
+        request = self.factory.get("/")
+        request.user = self.superuser
+        inline = admin_instance.get_inline_instances(request)[0]
+        FormSetClass = inline.get_formset(request)
+        formset = FormSetClass(
+            data={
+                "somechildmodel_set-TOTAL_FORMS": "2",
+                "somechildmodel_set-INITIAL_FORMS": "0",
+                "somechildmodel_set-MIN_NUM_FORMS": "0",
+                "somechildmodel_set-MAX_NUM_FORMS": "1000",
+                "somechildmodel_set-0-name": "",
+                "somechildmodel_set-1-name": "",
+            }
+        )
+        self.assertTrue(formset.is_valid())
 
 
 @override_settings(ROOT_URLCONF="admin_inlines.urls")

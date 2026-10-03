@@ -269,10 +269,12 @@ class ModelFormOptions:
         self.error_messages = getattr(options, "error_messages", None)
         self.field_classes = getattr(options, "field_classes", None)
         self.formfield_callback = getattr(options, "formfield_callback", None)
+        self._factory_fields = getattr(options, "_factory_fields", False)
 
 
 class ModelFormMetaclass(DeclarativeFieldsMetaclass):
     def __new__(mcs, name, bases, attrs):
+        direct_declared_fields = {k for k, v in attrs.items() if isinstance(v, Field)}
         new_class = super().__new__(mcs, name, bases, attrs)
 
         if bases == (BaseModelForm,):
@@ -334,8 +336,22 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
                 message = "Unknown field(s) (%s) specified for %s"
                 message %= (", ".join(missing_fields), opts.model.__name__)
                 raise FieldError(message)
-            # Include all the other declared fields.
-            fields.update(new_class.declared_fields)
+            # Include all the other declared fields that are allowed.
+            for k, v in new_class.declared_fields.items():
+                if (
+                    opts.exclude is not None
+                    and k in opts.exclude
+                    and k not in direct_declared_fields
+                ):
+                    if opts.fields is None or k not in opts.fields:
+                        continue
+                if (
+                    opts.fields is None
+                    or not opts._factory_fields
+                    or k in opts.fields
+                    or k in direct_declared_fields
+                ):
+                    fields[k] = v
         else:
             fields = new_class.declared_fields
 
@@ -638,6 +654,7 @@ def modelform_factory(
     attrs = {"model": model}
     if fields is not None:
         attrs["fields"] = fields
+        attrs["_factory_fields"] = True
     if exclude is not None:
         attrs["exclude"] = exclude
     if widgets is not None:
