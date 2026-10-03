@@ -478,3 +478,21 @@ class TestValidator(PostgreSQLSimpleTestCase):
         self.assertEqual(
             kwargs, {"keys": ["a", "b"], "strict": True, "messages": messages}
         )
+
+    def test_equality(self):
+        self.assertEqual(
+            KeysValidator(keys=["a", "b"]),
+            KeysValidator(keys=["b", "a"]),
+        )
+        self.assertNotEqual(
+            KeysValidator(keys=["a", "b"]),
+            KeysValidator(keys=["a"]),
+        )
+        self.assertNotEqual(
+            KeysValidator(keys=["a", "b"], strict=True),
+            KeysValidator(keys=["a", "b"], strict=False),
+        )
+        self.assertNotEqual(
+            KeysValidator(keys=["a", "b"]),
+            "invalid_type",
+        )
