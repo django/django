@@ -96,3 +96,51 @@ class NowTagTests(SimpleTestCase):
             TemplateSyntaxError, "'now' statement takes one argument"
         ):
             self.engine.render_to_string("no_args")
+
+    @setup({"now_var": "{% now my_format %}"})
+    def test_now_variable(self):
+        output = self.engine.render_to_string("now_var", {"my_format": "j n Y"})
+        self.assertEqual(
+            output,
+            "%d %d %d"
+            % (
+                datetime.now().day,
+                datetime.now().month,
+                datetime.now().year,
+            ),
+        )
+
+    @setup({"now_var_as": "{% now my_format as N %}-{{ N }}-"})
+    def test_now_variable_as(self):
+        output = self.engine.render_to_string("now_var_as", {"my_format": "j n Y"})
+        self.assertEqual(
+            output,
+            "-%d %d %d-"
+            % (
+                datetime.now().day,
+                datetime.now().month,
+                datetime.now().year,
+            ),
+        )
+
+    @setup({"now_var_escape": "{% now my_format %}"})
+    def test_now_var_escape(self):
+        """
+        Test that dynamic variables are properly escaped to prevent XSS.
+        """
+        evil_format = r"\<\i\m\g \s\r\c=\x\o\n\e\r\r\o\r=\a\l\e\r\t\(1\)\>"
+        output = self.engine.render_to_string(
+            "now_var_escape", {"my_format": evil_format}
+        )
+        self.assertEqual(output, "&lt;img src=xonerror=alert(1)&gt;")
+
+    @setup({"now_filter_escape": '{% now ""|add:my_format %}'})
+    def test_now_filter_escape(self):
+        """
+        Test that formats constructed via filter chains are properly escaped.
+        """
+        evil_format = r"\<\i\m\g \s\r\c=\x\o\n\e\r\r\o\r=\a\l\e\r\t\(1\)\>"
+        output = self.engine.render_to_string(
+            "now_filter_escape", {"my_format": evil_format}
+        )
+        self.assertEqual(output, "&lt;img src=xonerror=alert(1)&gt;")
