@@ -87,6 +87,10 @@ class CsUnaryPredicate(GEOSFuncFactory):
 cs_clone = CsOutput("GEOSCoordSeq_clone", argtypes=[CS_PTR])
 create_cs = CsOutput("GEOSCoordSeq_create", argtypes=[c_uint, c_uint])
 get_cs = CsOutput("GEOSGeom_getCoordSeq", argtypes=[GEOM_PTR])
+coordseq_from_buffer = CsOutput(
+    "GEOSCoordSeq_copyFromBuffer",
+    argtypes=[POINTER(c_double), c_uint, c_int, c_int],
+)
 
 # Getting, setting ordinate
 cs_getordinate = CsOperation("GEOSCoordSeq_getOrdinate", ordinate=True, get=True)
