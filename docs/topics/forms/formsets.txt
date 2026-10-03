@@ -4,8 +4,6 @@ Formsets
 
 .. currentmodule:: django.forms.formsets
 
-.. class:: BaseFormSet
-
 A formset is a layer of abstraction to work with multiple forms on the same
 page. It can be best compared to a data grid. Let's say you have the following
 form:
@@ -19,16 +17,42 @@ form:
     ...
 
 You might want to allow the user to create several articles at once. To create
-a formset out of an ``ArticleForm`` you would do:
+a formset out of an ``ArticleForm``, you have two options:
+
+Method 1: Using ``formset_factory``
+===================================
 
 .. code-block:: pycon
 
     >>> from django.forms import formset_factory
     >>> ArticleFormSet = formset_factory(ArticleForm)
 
-You now have created a formset class named ``ArticleFormSet``.
-Instantiating the formset gives you the ability to iterate over the forms
-in the formset and display them as you would with a regular form:
+Method 2: Using ``FormSet``
+===========================
+
+.. versionadded:: 6.2
+
+.. code-block:: pycon
+
+    >>> from django.forms import formsets
+    >>> class ArticleFormSet(formsets.FormSet):
+    ...     form = ArticleForm
+    ...
+
+Using the declarative syntax, you can define the formset directly as a class,
+similar to how you declare models.
+
+.. note::
+
+    Formset behavior can be customized by overriding methods, on either
+    ``BaseFormSet`` or ``FormSet`` depending on the syntax you choose. Both
+    approaches give the same results. As with ``formset_factory``, the
+    ``form`` attribute is required when defining a ``FormSet`` subclass.
+
+Regardless of which option you choose, you have now created a formset class
+named ``ArticleFormSet``. Instantiating the formset gives you the ability to
+iterate over the forms in the formset and display them as you would with a
+regular form:
 
 .. code-block:: pycon
 
@@ -357,6 +381,9 @@ And here is a custom error message:
 Custom formset validation
 -------------------------
 
+Method 1: Using ``BaseFormSet``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 A formset has a ``clean`` method similar to the one on a ``Form`` class. This
 is where you define your own validation that works at the formset level:
 
@@ -413,6 +440,55 @@ help distinguish them from form-specific errors. For example,
     <ul class="errorlist nonform">
         <li>Articles in a set must have distinct titles.</li>
     </ul>
+
+Method 2: Using ``FormSet``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 6.2
+
+Instead of using :func:`~django.forms.formsets.formset_factory`, you can
+create your formset with the ``FormSet`` class and override the ``clean``
+method directly on the class. This gives the same results as above:
+
+.. code-block:: pycon
+
+    >>> from django.core.exceptions import ValidationError
+    >>> from django.forms import formsets
+    >>> from myapp.forms import ArticleForm
+
+    >>> class ArticleFormSet(formsets.FormSet):
+    ...     form = ArticleForm
+    ...     def clean(self):
+    ...         """Checks that no two articles have the same title."""
+    ...         if any(self.errors):
+    ...             # Don't bother validating the formset unless each form is valid on its own
+    ...             return
+    ...         titles = set()
+    ...         for form in self.forms:
+    ...             if self.can_delete and self._should_delete_form(form):
+    ...                 continue
+    ...             title = form.cleaned_data.get("title")
+    ...             if title in titles:
+    ...                 raise ValidationError("Articles in a set must have distinct titles.")
+    ...             titles.add(title)
+    ...
+
+    >>> data = {
+    ...     "form-TOTAL_FORMS": "2",
+    ...     "form-INITIAL_FORMS": "0",
+    ...     "form-MAX_NUM_FORMS": "",
+    ...     "form-0-title": "Test",
+    ...     "form-0-pub_date": "1904-06-16",
+    ...     "form-1-title": "Test",
+    ...     "form-1-pub_date": "1912-06-23",
+    ... }
+    >>> formset = ArticleFormSet(data)
+    >>> formset.is_valid()
+    False
+    >>> formset.errors
+    [{}, {}]
+    >>> formset.non_form_errors()
+    ['Articles in a set must have distinct titles.']
 
 Validating the number of forms in a formset
 ===========================================
@@ -775,6 +851,9 @@ remove the option to delete extra forms.
 Adding additional fields to a formset
 =====================================
 
+Method 1: Using ``BaseFormSet``
+-------------------------------
+
 If you need to add additional fields to the formset this can be easily
 accomplished. The formset base class provides an ``add_fields`` method. You
 can override this method to add your own fields or even redefine the default
@@ -792,6 +871,33 @@ fields/attributes of the order and deletion fields:
     ...
 
     >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet)
+    >>> formset = ArticleFormSet()
+    >>> for form in formset:
+    ...     print(form)
+    ...
+    <div><label for="id_form-0-title">Title:</label><input type="text" name="form-0-title" id="id_form-0-title"></div>
+    <div><label for="id_form-0-pub_date">Pub date:</label><input type="text" name="form-0-pub_date" id="id_form-0-pub_date"></div>
+    <div><label for="id_form-0-my_field">My field:</label><input type="text" name="form-0-my_field" id="id_form-0-my_field"></div>
+
+Method 2: Using ``FormSet``
+---------------------------
+
+.. versionadded:: 6.2
+
+Additional fields can also be added when using the ``FormSet`` class.
+Similar to the method above, override the ``add_fields`` method:
+
+.. code-block:: pycon
+
+    >>> from django.forms import formsets
+    >>> from myapp.forms import ArticleForm
+    >>> class ArticleFormSet(formsets.FormSet):
+    ...     form = ArticleForm
+    ...     def add_fields(self, form, index):
+    ...         super().add_fields(form, index)
+    ...         form.fields["my_field"] = forms.CharField()
+    ...
+
     >>> formset = ArticleFormSet()
     >>> for form in formset:
     ...     print(form)
