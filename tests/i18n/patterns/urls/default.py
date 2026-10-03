@@ -21,6 +21,8 @@ urlpatterns = [
 urlpatterns += i18n_patterns(
     path("prefixed/", view, name="prefixed"),
     path("prefixed.xml", view, name="prefixed_xml"),
+    # Unnamed translated path using the same view as the named patterns.
+    path(_("register-as-path/"), view),
     re_path(
         _(r"^with-arguments/(?P<argument>[\w-]+)/(?:(?P<optional>[\w-]+).html)?$"),
         view,
