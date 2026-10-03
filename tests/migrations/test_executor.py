@@ -3,7 +3,10 @@ from unittest import mock
 from django.apps.registry import apps as global_apps
 from django.db import DatabaseError, connection, migrations, models
 from django.db.backends.base.introspection import BaseDatabaseIntrospection
-from django.db.migrations.exceptions import InvalidMigrationPlan
+from django.db.migrations.exceptions import (
+    InvalidMigrationPlan,
+    MigrationOperationError,
+)
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
@@ -153,8 +156,12 @@ class ExecutorTests(MigrationTestBase):
         Applying a non-atomic migration works as expected.
         """
         executor = MigrationExecutor(connection)
-        with self.assertRaisesMessage(RuntimeError, "Abort migration"):
+        with self.assertRaisesMessage(
+            MigrationOperationError, "Raw Python operation"
+        ) as cm:
             executor.migrate([("migrations", "0001_initial")])
+        self.assertIsInstance(cm.exception.__cause__, RuntimeError)
+        self.assertIn("Abort migration", str(cm.exception.__cause__))
         self.assertTableExists("migrations_publisher")
         migrations_apps = executor.loader.project_state(
             ("migrations", "0001_initial")
@@ -173,8 +180,12 @@ class ExecutorTests(MigrationTestBase):
         migration.
         """
         executor = MigrationExecutor(connection)
-        with self.assertRaisesMessage(RuntimeError, "Abort migration"):
+        with self.assertRaisesMessage(
+            MigrationOperationError, "Raw Python operation"
+        ) as cm:
             executor.migrate([("migrations", "0001_initial")])
+        self.assertIsInstance(cm.exception.__cause__, RuntimeError)
+        self.assertIn("Abort migration", str(cm.exception.__cause__))
         migrations_apps = executor.loader.project_state(
             ("migrations", "0001_initial")
         ).apps
@@ -185,8 +196,12 @@ class ExecutorTests(MigrationTestBase):
         # Rebuild the graph to reflect the new DB state.
         executor.loader.build_graph()
         # Migrating backwards is also atomic.
-        with self.assertRaisesMessage(RuntimeError, "Abort migration"):
+        with self.assertRaisesMessage(
+            MigrationOperationError, "Raw Python operation"
+        ) as cm:
             executor.migrate([("migrations", None)])
+        self.assertIsInstance(cm.exception.__cause__, RuntimeError)
+        self.assertIn("Abort migration", str(cm.exception.__cause__))
         self.assertFalse(Editor.objects.exists())
 
     @override_settings(
@@ -365,8 +380,9 @@ class ExecutorTests(MigrationTestBase):
         )
         # Applying the migration should raise a database level error
         # because we haven't given the --fake-initial option
-        with self.assertRaises(DatabaseError):
+        with self.assertRaises(MigrationOperationError) as cm:
             executor.migrate([("migrations", "0001_initial")])
+        self.assertIsInstance(cm.exception.__cause__, DatabaseError)
         # Reset the faked state
         state = {"faked": None}
         # Allow faking of initial CreateModel operations
@@ -873,6 +889,24 @@ class FakeMigration:
 
 class ExecutorUnitTests(SimpleTestCase):
     """(More) isolated unit tests for executor methods."""
+
+    def test_migration_state_forwards_error_is_propagated(self):
+        migration_key = ("test_app", "0001_initial")
+        migration = migrations.Migration("0001_initial", "test_app")
+        migration.operations = [migrations.DeleteModel("MissingModel")]
+        graph = MigrationGraph()
+        graph.add_node(migration_key, migration)
+        executor = MigrationExecutor(None)
+        executor.loader = FakeLoader(graph, {migration_key: migration})
+        executor.loader.unmigrated_apps = set()
+
+        with self.assertRaisesMessage(
+            MigrationOperationError,
+            "Error applying migration 'test_app.0001_initial' at operation "
+            "'Delete model MissingModel'",
+        ) as cm:
+            executor._create_project_state(with_applied_migrations=True)
+        self.assertIsInstance(cm.exception.__cause__, KeyError)
 
     def test_minimize_rollbacks(self):
         """

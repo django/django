@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from django.core.exceptions import FieldDoesNotExist
 from django.db import IntegrityError, connection, migrations, models, transaction
+from django.db.migrations.exceptions import MigrationOperationError
 from django.db.migrations.migration import Migration
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.operations.fields import FieldOperation
@@ -6097,18 +6098,20 @@ class OperationTests(OperationTestBase):
                 ).objects.count(),
                 0,
             )
-            with self.assertRaises(ValueError):
+            with self.assertRaises(MigrationOperationError) as cm:
                 with connection.schema_editor() as editor:
                     atomic_migration.apply(project_state, editor)
+            self.assertIsInstance(cm.exception.__cause__, ValueError)
             self.assertEqual(
                 project_state.apps.get_model(
                     "test_runpythonatomic", "Pony"
                 ).objects.count(),
                 0,
             )
-            with self.assertRaises(ValueError):
+            with self.assertRaises(MigrationOperationError) as cm:
                 with connection.schema_editor() as editor:
                     non_atomic_migration.apply(project_state, editor)
+            self.assertIsInstance(cm.exception.__cause__, ValueError)
             self.assertEqual(
                 project_state.apps.get_model(
                     "test_runpythonatomic", "Pony"
@@ -6123,18 +6126,20 @@ class OperationTests(OperationTestBase):
                 ).objects.count(),
                 0,
             )
-            with self.assertRaises(ValueError):
+            with self.assertRaises(MigrationOperationError) as cm:
                 with connection.schema_editor() as editor:
                     atomic_migration.apply(project_state, editor)
+            self.assertIsInstance(cm.exception.__cause__, ValueError)
             self.assertEqual(
                 project_state.apps.get_model(
                     "test_runpythonatomic", "Pony"
                 ).objects.count(),
                 0,
             )
-            with self.assertRaises(ValueError):
+            with self.assertRaises(MigrationOperationError) as cm:
                 with connection.schema_editor() as editor:
                     non_atomic_migration.apply(project_state, editor)
+            self.assertIsInstance(cm.exception.__cause__, ValueError)
             self.assertEqual(
                 project_state.apps.get_model(
                     "test_runpythonatomic", "Pony"
@@ -6153,18 +6158,20 @@ class OperationTests(OperationTestBase):
                 ).objects.count(),
                 0,
             )
-            with self.assertRaises(ValueError):
+            with self.assertRaises(MigrationOperationError) as cm:
                 with connection.schema_editor() as editor:
                     atomic_migration.unapply(project_state, editor)
+            self.assertIsInstance(cm.exception.__cause__, ValueError)
             self.assertEqual(
                 project_state.apps.get_model(
                     "test_runpythonatomic", "Pony"
                 ).objects.count(),
                 0,
             )
-            with self.assertRaises(ValueError):
+            with self.assertRaises(MigrationOperationError) as cm:
                 with connection.schema_editor() as editor:
                     non_atomic_migration.unapply(project_state, editor)
+            self.assertIsInstance(cm.exception.__cause__, ValueError)
             self.assertEqual(
                 project_state.apps.get_model(
                     "test_runpythonatomic", "Pony"
@@ -6179,18 +6186,20 @@ class OperationTests(OperationTestBase):
                 ).objects.count(),
                 0,
             )
-            with self.assertRaises(ValueError):
+            with self.assertRaises(MigrationOperationError) as cm:
                 with connection.schema_editor() as editor:
                     atomic_migration.unapply(project_state, editor)
+            self.assertIsInstance(cm.exception.__cause__, ValueError)
             self.assertEqual(
                 project_state.apps.get_model(
                     "test_runpythonatomic", "Pony"
                 ).objects.count(),
                 0,
             )
-            with self.assertRaises(ValueError):
+            with self.assertRaises(MigrationOperationError) as cm:
                 with connection.schema_editor() as editor:
                     non_atomic_migration.unapply(project_state, editor)
+            self.assertIsInstance(cm.exception.__cause__, ValueError)
             self.assertEqual(
                 project_state.apps.get_model(
                     "test_runpythonatomic", "Pony"
@@ -6202,6 +6211,68 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[0], "RunPython")
         self.assertEqual(definition[1], [])
         self.assertEqual(sorted(definition[2]), ["atomic", "code", "reverse_code"])
+
+    def test_apply_error_is_enriched(self):
+        """
+        If an operation raises during apply(), a MigrationOperationError with
+        the migration and operation name is raised, chaining the original
+        error.
+        """
+
+        def boom(apps, schema_editor):
+            raise ValueError("database forward boom")
+
+        migration = Migration("0001_initial", "test_app")
+        migration.operations = [migrations.RunPython(boom)]
+        with self.assertRaisesMessage(
+            MigrationOperationError,
+            "Error applying migration 'test_app.0001_initial' at operation "
+            "'Raw Python operation'",
+        ) as cm:
+            with connection.schema_editor() as editor:
+                migration.apply(ProjectState(), editor)
+        self.assertIsInstance(cm.exception.__cause__, ValueError)
+
+    def test_unapply_phase1_error_is_enriched(self):
+        """
+        If state_forwards() raises during the unapply() state-reconstruction
+        phase, a MigrationOperationError with the migration and operation name
+        is raised, chaining the original error.
+        """
+        migration = Migration("0001_initial", "test_app")
+        migration.operations = [migrations.DeleteModel("MissingModel")]
+        with self.assertRaisesMessage(
+            MigrationOperationError,
+            "Error reversing migration 'test_app.0001_initial' at operation "
+            "'Delete model MissingModel'",
+        ) as cm:
+            with connection.schema_editor() as editor:
+                migration.unapply(ProjectState(), editor)
+        self.assertIsInstance(cm.exception.__cause__, KeyError)
+
+    def test_unapply_phase2_error_is_enriched(self):
+        """
+        If database_backwards() raises during unapply(), a
+        MigrationOperationError with the migration and operation name is
+        raised, chaining the original error.
+        """
+
+        def noop(apps, schema_editor):
+            pass
+
+        def boom(apps, schema_editor):
+            raise ValueError("database backward boom")
+
+        migration = Migration("0001_initial", "test_app")
+        migration.operations = [migrations.RunPython(noop, reverse_code=boom)]
+        with self.assertRaisesMessage(
+            MigrationOperationError,
+            "Error reversing migration 'test_app.0001_initial' at operation "
+            "'Raw Python operation'",
+        ) as cm:
+            with connection.schema_editor() as editor:
+                migration.unapply(ProjectState(), editor)
+        self.assertIsInstance(cm.exception.__cause__, ValueError)
 
     def test_run_python_related_assignment(self):
         """
@@ -6657,8 +6728,12 @@ class OperationTests(OperationTestBase):
                 f"{app_label}.Pony.modified_pink must be removed and re-added with the "
                 "new definition."
             )
-            with self.assertRaisesMessage(ValueError, msg):
+            with self.assertRaisesMessage(
+                MigrationOperationError, "Alter field modified_pink on Pony"
+            ) as cm:
                 self.apply_operations(app_label, project_state, operations)
+            self.assertIsInstance(cm.exception.__cause__, ValueError)
+            self.assertIn(msg, str(cm.exception.__cause__))
 
     @skipUnlessDBFeature("supports_stored_generated_columns")
     def test_invalid_generated_field_changes_stored(self):
@@ -6701,8 +6776,12 @@ class OperationTests(OperationTestBase):
             f"{app_label}.Pony.modified_pink must be removed and re-added with the "
             "new definition."
         )
-        with self.assertRaisesMessage(ValueError, msg):
+        with self.assertRaisesMessage(
+            MigrationOperationError, "Alter field modified_pink on Pony"
+        ) as cm:
             self.apply_operations(app_label, new_state, operations)
+        self.assertIsInstance(cm.exception.__cause__, ValueError)
+        self.assertIn(msg, str(cm.exception.__cause__))
 
     @skipUnlessDBFeature("supports_stored_generated_columns")
     def test_invalid_generated_field_changes_on_rename_stored(self):
@@ -6744,8 +6823,12 @@ class OperationTests(OperationTestBase):
             f"{app_label}.Pony.modified_pink must be removed and re-added with the "
             "new definition."
         )
-        with self.assertRaisesMessage(ValueError, msg):
+        with self.assertRaisesMessage(
+            MigrationOperationError, "Alter field modified_pink on Pony"
+        ) as cm:
             self.apply_operations(app_label, project_state, operations)
+        self.assertIsInstance(cm.exception.__cause__, ValueError)
+        self.assertIn(msg, str(cm.exception.__cause__))
 
     def _test_add_generated_field(self, db_persist):
         app_label = "test_agf"
