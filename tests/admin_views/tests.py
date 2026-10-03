@@ -1520,6 +1520,26 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         with self.assertRaises(AttributeError):
             self.client.get(reverse("admin:admin_views_simple_changelist"))
 
+    def test_delete_protected_message_lists_nothing_when_limit_zero(self):
+        question = Question.objects.create(question="Why?")
+        Answer.objects.bulk_create(
+            [Answer(question=question, answer=f"Because {i}.") for i in range(3)]
+        )
+        response = self.client.post(
+            reverse("admin_zero_display:admin_views_question_changelist"),
+            {
+                ACTION_CHECKBOX_NAME: [question.pk],
+                "action": "delete_selected",
+                "index": 0,
+            },
+        )
+        self.assertContains(
+            response,
+            "Deleting the selected question would require deleting some "
+            "protected related objects.",
+        )
+        self.assertNotContains(response, "<ul")
+
     def test_changelist_with_no_change_url(self):
         """
         ModelAdmin.changelist_view shouldn't result in a NoReverseMatch if url
@@ -4190,6 +4210,19 @@ class AdminViewDeletedObjectsTest(TestCase):
             '<li>Answer: <a href="%s">Yes.</a></li>'
             % reverse("admin:admin_views_answer_change", args=(a2.pk,)),
         )
+
+    def test_protected_zero_display(self):
+        question = Question.objects.create(question="Why?")
+        Answer.objects.create(question=question, answer="Because.")
+        response = self.client.get(
+            reverse(
+                "admin_zero_display:admin_views_question_delete", args=(question.pk,)
+            )
+        )
+        self.assertContains(
+            response, "would require deleting the following protected related objects"
+        )
+        self.assertNotContains(response, "<ul")
 
     def test_post_delete_protected(self):
         """
