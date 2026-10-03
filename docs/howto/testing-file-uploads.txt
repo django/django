@@ -1,0 +1,127 @@
+==============================
+How to test file uploads in Django
+==============================
+
+Testing file uploads is a very common need in many Django projects, such as when dealing with user profile pictures, documents, or any kind of media input. This guide demonstrates how to simulate file uploads in your tests and verify that file handling works as expected.
+
+------------
+Prerequisites
+------------
+
+You should be familiar with Django's testing framework and the basics of Django's file handling using `FileField` or `ImageField`.
+
+We will use Django’s built-in test client and the `SimpleUploadedFile` helper from `django.core.files.uploadedfile`.
+
+-------------------------
+Simulating a File Upload
+-------------------------
+
+Here’s a minimal example of a model and a form that accepts file uploads:
+
+.. code-block:: python
+
+    # In your models.py
+    from django.db import models
+
+    class Document(models.Model):
+        title = models.CharField(max_length=100)
+        file = models.FileField(upload_to='documents/')# assuming the documents folder is where the file will be uploaded to
+
+.. code-block:: python
+
+    # forms.py
+    from django import forms
+    from .models import Document
+
+    class DocumentForm(forms.ModelForm):
+        class Meta:
+            model = Document
+            fields = ('title', 'file')
+
+Now, here's a test that simulates uploading a file:
+
+.. code-block:: python
+
+    # tests.py
+    from django.test import TestCase
+    from django.core.files.uploadedfile import SimpleUploadedFile
+    from django.urls import reverse
+    from .models import Document
+
+    class FileUploadTests(TestCase):
+        def test_file_upload(self):
+            file_data = SimpleUploadedFile(
+                "test.txt", b"This is a test file.", content_type="text/plain"
+            )
+
+            response = self.client.post(
+                reverse('upload_view'),
+                {'title': 'Test Document', 'file': file_data},
+                follow=True
+            )
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(Document.objects.count(), 1)
+            self.assertTrue(Document.objects.first().file.name.startswith("documents/test"))
+
+------------------------
+Testing File Persistence
+------------------------
+
+You may also want to test that the file was saved correctly:
+
+.. code-block:: python
+
+    import os
+    from django.conf import settings
+
+    class FileUploadTests(TestCase):
+        def test_file_saved_to_disk(self):
+            file_data = SimpleUploadedFile("myfile.txt", b"Hello, world!")
+
+            response = self.client.post(
+                reverse('upload_view'),
+                {'title': 'Disk Test', 'file': file_data},
+                follow=True
+            )
+
+            doc = Document.objects.get(title="Disk Test")
+            file_path = os.path.join(settings.MEDIA_ROOT, doc.file.name)
+
+            self.assertTrue(os.path.exists(file_path))
+
+------------------------
+Cleaning Up After Tests
+------------------------
+
+To avoid leaving test files behind, override Django's `MEDIA_ROOT` during tests:
+
+.. code-block:: python
+
+    import tempfile
+    from django.test import override_settings
+
+    TEST_MEDIA_ROOT = tempfile.mkdtemp()
+
+    @override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
+    class TempMediaTest(TestCase):
+        def test_upload_in_temp_dir(self):
+            file_data = SimpleUploadedFile("tempfile.txt", b"Temp data")
+            self.client.post(reverse('upload_view'), {'title': 'Temp', 'file': file_data})
+            self.assertEqual(Document.objects.count(), 1)
+
+You can also clean up in `tearDown()`:
+
+.. code-block:: python
+
+    import shutil
+
+    def tearDown(self):
+        shutil.rmtree(TEST_MEDIA_ROOT, ignore_errors=True)
+
+------------
+Conclusion
+------------
+
+Testing file uploads is a crucial step in ensuring your application handles user-submitted files reliably. Django's `SimpleUploadedFile` and test client make it straightforward to simulate file uploads, and using a temporary `MEDIA_ROOT` helps keep your tests clean and isolated.
+
