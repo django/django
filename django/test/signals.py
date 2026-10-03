@@ -158,7 +158,7 @@ def language_changed(*, setting, **kwargs):
 
 @receiver(setting_changed)
 def localize_settings_changed(*, setting, **kwargs):
-    if setting in FORMAT_SETTINGS or setting == "USE_THOUSAND_SEPARATOR":
+    if setting in FORMAT_SETTINGS or setting in ("USE_THOUSAND_SEPARATOR", "USE_I18N"):
         reset_format_cache()
 
 

@@ -715,6 +715,37 @@ class FormattingTests(SimpleTestCase):
                 # Even a second time (after the format has been cached)...
                 self.assertEqual(1, get_format("FIRST_DAY_OF_WEEK"))
 
+    def test_first_day_of_week_i18n_disabled(self):
+        """
+        FIRST_DAY_OF_WEEK falls back to the setting when USE_I18N is
+        disabled, and locale formats take precedence when it's enabled
+        (#36145).
+        """
+        with translation.override("fr"):
+            with self.settings(FIRST_DAY_OF_WEEK=3):
+                self.assertEqual(1, get_format("FIRST_DAY_OF_WEEK"))
+                with self.settings(USE_I18N=False):
+                    self.assertEqual(3, get_format("FIRST_DAY_OF_WEEK"))
+                    # Even a second time (after the format has been cached)...
+                    self.assertEqual(3, get_format("FIRST_DAY_OF_WEEK"))
+                self.assertEqual(1, get_format("FIRST_DAY_OF_WEEK"))
+
+    def test_first_day_of_week_i18n_disabled_forced_localization(self):
+        """
+        With USE_I18N disabled, an explicit lang doesn't leak the settings
+        value into a subsequent forced-localization lookup (#36145).
+        """
+        with self.settings(USE_I18N=False, FIRST_DAY_OF_WEEK=3):
+            self.assertEqual(3, get_format("FIRST_DAY_OF_WEEK", lang="fr"))
+            self.assertEqual(
+                1, get_format("FIRST_DAY_OF_WEEK", lang="fr", use_l10n=True)
+            )
+            # ...and in the opposite order, to catch a shared cache entry.
+            self.assertEqual(
+                1, get_format("FIRST_DAY_OF_WEEK", lang="ca", use_l10n=True)
+            )
+            self.assertEqual(3, get_format("FIRST_DAY_OF_WEEK", lang="ca"))
+
     def test_l10n_enabled(self):
         self.maxDiff = 3000
         # Catalan locale
