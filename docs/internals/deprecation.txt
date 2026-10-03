@@ -31,6 +31,9 @@ details on these changes.
 * The undocumented ``EmailValidator.validate_domain_part()`` method will be
   removed.
 
+* Cache backends that don't have ``alias`` or ``**kwargs`` as a parameter are
+  deprecated.
+
 .. _deprecation-removed-in-2028:
 
 2028
