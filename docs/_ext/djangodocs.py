@@ -2,8 +2,6 @@
 Sphinx plugins for Django documentation.
 """
 
-import re
-
 from docutils import nodes
 from docutils.statemachine import ViewList
 from github_links import get_branch
@@ -15,8 +13,6 @@ from sphinx.util.nodes import split_explicit_title
 from sphinx.writers.html import HTMLTranslator
 
 logger = logging.getLogger(__name__)
-# RE for option descriptions without a '--' prefix
-simple_option_desc_re = re.compile(r"([-_a-zA-Z0-9]+)(\s*.*?)(?=,\s+(?:/|-|--)|$)")
 
 
 def setup(app):
