@@ -1,8 +1,10 @@
 from django.core.exceptions import FieldDoesNotExist, FieldError, FieldFetchBlocked
 from django.db.models import FETCH_PEERS, FETCH_RAISE
-from django.test import SimpleTestCase, TestCase
-from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango2028Warning
+from django.test import SimpleTestCase, TestCase, ignore_warnings
+from django.utils.deprecation import (
+    RemovedInDjango2028Warning,
+    RemovedInDjango2029Warning,
+)
 
 from .models import (
     BigChild,
@@ -95,6 +97,8 @@ class DeferTests(AssertionMixin, TestCase):
             for p in s.primary_set.only("pk"):
                 _ = p.pk
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     def test_defer_extra(self):
         qs = Primary.objects.all()
         self.assert_delayed(qs.defer("name").extra(select={"a": 1})[0], 1)

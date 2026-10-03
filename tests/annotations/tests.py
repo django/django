@@ -39,9 +39,12 @@ from django.db.models.functions import (
     Trim,
 )
 from django.db.models.sql.query import get_field_names_from_opts
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.test.utils import register_lookup
-from django.utils.deprecation import RemovedInDjango2028Warning
+from django.utils.deprecation import (
+    RemovedInDjango2028Warning,
+    RemovedInDjango2029Warning,
+)
 
 from .models import (
     Author,
@@ -736,10 +739,9 @@ class NonAggregateAnnotationTestCase(TestCase):
         Columns are aligned in the correct order for resolve_columns. This test
         will fail on MySQL if column ordering is out. Column fields should be
         aligned as:
-        1. extra_select
-        2. model_fields
-        3. annotation_fields
-        4. model_related_fields
+        1. model_fields
+        2. annotation_fields
+        3. model_related_fields
         """
         store = Store.objects.first()
         e1 = Employee.objects.create(
@@ -759,13 +761,15 @@ class NonAggregateAnnotationTestCase(TestCase):
             salary=Decimal(40000.00),
         )
 
-        qs = (
-            Employee.objects.extra(select={"random_value": "42"})
-            .select_related("store")
-            .annotate(
-                annotated_value=Value(17),
+        # random_value annotation can be removed once deprecation period ends.
+        with ignore_warnings(category=RemovedInDjango2029Warning):
+            qs = (
+                Employee.objects.extra(select={"random_value": "42"})
+                .select_related("store")
+                .annotate(
+                    annotated_value=Value(17),
+                )
             )
-        )
 
         rows = [
             (e1.pk, "Max", True, 42, "Paine", 23, Decimal(50000.00), store.name, 17),
@@ -817,13 +821,15 @@ class NonAggregateAnnotationTestCase(TestCase):
             salary=Decimal(40000.00),
         )
 
-        qs = (
-            Employee.objects.extra(select={"random_value": "42"})
-            .select_related("store")
-            .annotate(
-                annotated_value=Value(17),
+        # random_value annotation can be removed once deprecation period ends.
+        with ignore_warnings(category=RemovedInDjango2029Warning):
+            qs = (
+                Employee.objects.extra(select={"random_value": "42"})
+                .select_related("store")
+                .annotate(
+                    annotated_value=Value(17),
+                )
             )
-        )
 
         rows = [
             (e1.pk, "Max", True, 42, "Paine", 23, Decimal(50000.00), store.name, 17),
