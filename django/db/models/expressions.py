@@ -1880,6 +1880,27 @@ class Subquery(BaseExpression, Combinable):
         sql = template % template_params
         return sql, sql_params
 
+    def as_mysql(self, compiler, connection, template=None, **extra_context):
+        connection.ops.check_expression_support(self)
+        template_params = {**self.extra, **extra_context}
+        subquery_sql, sql_params = self.query.as_sql(compiler, connection)
+        sub_compiler = self.query.get_compiler(connection=connection)
+        sub_compiler.pre_sql_setup()
+        sub_selects, sub_params = connection.ops.compile_subquery(sub_compiler.select)
+
+        # Only relevant for UPDATE: MySQL/MariaDB reject a subquery
+        # that directly references the table being written to.
+        # The solution for this is to wrap the subquery in the
+        # derived table.
+        template_params["subquery"] = "SELECT %s FROM (%s) subquery" % (
+            ", ".join(sub_selects),
+            subquery_sql[1:-1],
+        )
+
+        template = template or template_params.get("template", self.template)
+        sql = template % template_params
+        return sql, (sub_params + sql_params)
+
     def get_group_by_cols(self):
         return self.query.get_group_by_cols(wrapper=self)
 
@@ -1909,6 +1930,13 @@ class Exists(Subquery):
             if not features.supports_boolean_expr_in_select_clause:
                 return "1=0", ()
             return compiler.compile(Value(False))
+
+    def as_mysql(self, compiler, *args, **kwargs):
+        # MySQL does not support boolean expressions in SELECT
+        # or GROUP BY lists. Defined the function to stop calling
+        # the parent's method and breaking in case of EmptyResultSet.
+        sql, params = self.as_sql(compiler, *args, **kwargs)
+        return sql, params
 
 
 @deconstructible(path="django.db.models.OrderBy")

@@ -8,7 +8,15 @@ from itertools import chain
 from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DatabaseError, NotSupportedError
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import ColPairs, F, OrderBy, RawSQL, Ref, Value
+from django.db.models.expressions import (
+    ColPairs,
+    F,
+    OrderBy,
+    RawSQL,
+    Ref,
+    Subquery,
+    Value,
+)
 from django.db.models.fields import AutoField, composite
 from django.db.models.functions import Cast, Random
 from django.db.models.lookups import Lookup
@@ -2069,34 +2077,35 @@ class SQLUpdateCompiler(SQLCompiler):
         qn = self.quote_name
         values, update_params = [], []
         for field, model, val in self.query.values:
-            if hasattr(val, "resolve_expression"):
-                val = val.resolve_expression(
-                    self.query, allow_joins=False, for_save=True
-                )
-                if val.contains_aggregate:
-                    raise FieldError(
-                        "Aggregate functions are not allowed in this query "
-                        "(%s=%r)." % (field.name, val)
+            if not isinstance(val, Subquery):
+                if hasattr(val, "resolve_expression"):
+                    val = val.resolve_expression(
+                        self.query, allow_joins=False, for_save=True
                     )
-                if val.contains_over_clause:
-                    raise FieldError(
-                        "Window expressions are not allowed in this query "
-                        "(%s=%r)." % (field.name, val)
-                    )
-                if isinstance(val, ColPairs):
-                    raise FieldError(
-                        "Composite primary keys expressions are not allowed "
-                        "in this query (%s=F('pk'))." % field.name
-                    )
-            elif hasattr(val, "prepare_database_save"):
-                if field.remote_field:
-                    val = val.prepare_database_save(field)
-                else:
-                    raise TypeError(
-                        "Tried to update field %s with a model instance, %r. "
-                        "Use a value compatible with %s."
-                        % (field, val, field.__class__.__name__)
-                    )
+                    if val.contains_aggregate:
+                        raise FieldError(
+                            "Aggregate functions are not allowed in this query "
+                            "(%s=%r)." % (field.name, val)
+                        )
+                    if val.contains_over_clause:
+                        raise FieldError(
+                            "Window expressions are not allowed in this query "
+                            "(%s=%r)." % (field.name, val)
+                        )
+                    if isinstance(val, ColPairs):
+                        raise FieldError(
+                            "Composite primary keys expressions are not allowed "
+                            "in this query (%s=F('pk'))." % field.name
+                        )
+                elif hasattr(val, "prepare_database_save"):
+                    if field.remote_field:
+                        val = val.prepare_database_save(field)
+                    else:
+                        raise TypeError(
+                            "Tried to update field %s with a model instance, %r. "
+                            "Use a value compatible with %s."
+                            % (field, val, field.__class__.__name__)
+                        )
             val = field.get_db_prep_save(val, connection=self.connection)
 
             quoted_name = qn(field.column)

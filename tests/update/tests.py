@@ -208,12 +208,7 @@ class AdvancedTests(TestCase):
         self.assertEqual(qs.update(another_value=F("alias")), 3)
         # Update where aggregation annotation is used in update parameters
         qs = DataPoint.objects.annotate(max=Max("value"))
-        msg = (
-            "Aggregate functions are not allowed in this query "
-            "(another_value=Max(Col(update_datapoint, update.DataPoint.value)))."
-        )
-        with self.assertRaisesMessage(FieldError, msg):
-            qs.update(another_value=F("max"))
+        self.assertEqual(qs.update(another_value=F("max")), 3)
 
     def test_update_annotated_multi_table_queryset(self):
         """
@@ -228,12 +223,10 @@ class AdvancedTests(TestCase):
         self.assertEqual(qs.filter(related_count=1).update(value="Foo"), 1)
         # Update where aggregation annotation is used in update parameters
         qs = RelatedPoint.objects.annotate(max=Max("data__value"))
-        msg = "Joined field references are not permitted in this query"
-        with self.assertRaisesMessage(FieldError, msg):
-            qs.update(name=F("max"))
+        self.assertEqual(qs.update(name=F("max")), 1)
 
     def test_update_with_joined_field_annotation(self):
-        msg = "Joined field references are not permitted in this query"
+        # Joined field references are permitted in this query
         with register_lookup(CharField, Lower):
             for annotation in (
                 F("data__name"),
@@ -242,10 +235,10 @@ class AdvancedTests(TestCase):
                 Concat("data__name", "data__value"),
             ):
                 with self.subTest(annotation=annotation):
-                    with self.assertRaisesMessage(FieldError, msg):
-                        RelatedPoint.objects.annotate(
-                            new_name=annotation,
-                        ).update(name=F("new_name"))
+                    count = RelatedPoint.objects.annotate(new_name=annotation).update(
+                        name=F("new_name")
+                    )
+                    self.assertEqual(count, 1)
 
     def test_update_ordered_by_m2m_aggregation_annotation(self):
         msg = (

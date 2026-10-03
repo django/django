@@ -535,9 +535,13 @@ class NonAggregateAnnotationTestCase(TestCase):
 
     def test_update_with_annotation(self):
         book_preupdate = Book.objects.get(pk=self.b2.pk)
-        Book.objects.annotate(other_rating=F("rating") - 1).update(
-            rating=F("other_rating")
-        )
+        # Since updation with annotations are now supported with annotations
+        # living in Subquery so either provide proper filtering logic for the
+        # annotation or use direct F expression
+        Book.objects.filter(pk=book_preupdate.pk).annotate(
+            other_rating=F("rating") - 1
+        ).update(rating=F("other_rating"))
+
         book_postupdate = Book.objects.get(pk=self.b2.pk)
         self.assertEqual(book_preupdate.rating - 1, book_postupdate.rating)
 

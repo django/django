@@ -417,3 +417,27 @@ class DatabaseOperations(BaseDatabaseOperations):
             update_fields,
             unique_fields,
         )
+
+    def compile_subquery(self, selects):
+        # To support joins inside update in MySQL and MariaDB with using
+        # subquery to update the field. MySQL and MariaDB do not support
+        # joins inside update, so we use a subquery to update the field.
+        # If the field belongs to the same table as the update target,
+        # we use a subquery with alias to update the field.
+        sub_selects = []
+        sub_params = []
+        for index, (select, _, alias) in enumerate(selects, start=1):
+            if alias:
+                sub_selects.append(
+                    "%s.%s"
+                    % (
+                        self.quote_name("subquery"),
+                        self.quote_name(alias),
+                    )
+                )
+            else:
+                select_clone = select.relabeled_clone({select.alias: "subquery"})
+                subselect, subparams = select_clone.as_sql(self, self.connection)
+                sub_selects.append(subselect)
+                sub_params.extend(subparams)
+        return sub_selects, tuple(sub_params)
