@@ -288,6 +288,9 @@ class AdminReadonlyField:
                     else:
                         result_repr = linebreaksbr(value)
             else:
+                widget = model_admin.get_readonly_widget(f)
+                if widget is not None:
+                    return widget.render(field, value)
                 if isinstance(f.remote_field, ManyToManyRel) and value is not None:
                     result_repr = ", ".join(map(str, value.all()))
                 elif (
