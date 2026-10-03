@@ -65,8 +65,8 @@ def process_commit_message(lines, branch, cherry_sha=None):
 
     summary = body_lines[0].strip()
 
-    # Ensure summary ends with a period.
-    if not summary.endswith("."):
+    # Ensure summary ends with a period, possibly inside a closing quote.
+    if not (summary.endswith(".") or summary.endswith('."')):
         summary += "."
 
     # On stable branches, add the [A.B.x] prefix if missing.
