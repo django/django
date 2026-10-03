@@ -116,7 +116,7 @@ class RelatedGeoModelTest(TestCase):
         ]
         for union, ref in tests:
             for point, ref_point in zip(sorted(union), sorted(ref), strict=True):
-                self.assertIs(point.equals_exact(ref_point, tolerance=6), True)
+                self.assertIs(point.equals_exact(ref_point, tolerance=1e-6), True)
 
     def test05_select_related_fk_to_subclass(self):
         """
