@@ -1,0 +1,277 @@
+:orphan:
+
+=============================================
+Grouping sets: API proposal for ticket #27646
+=============================================
+
+.. warning::
+
+    This is a design proposal, not documentation of an available Django API.
+    The Python grouping API shown below has not been implemented. This document
+    is intended to resolve the public interface before an implementation is
+    submitted. It is not ready to merge as user documentation.
+
+The reporting problem
+=====================
+
+A report may need totals by region and category, subtotals by region, and a
+grand total. SQL can express these grouping levels in a single query. Django's
+automatic grouping handles ordinary grouped annotations, but does not expose
+``GROUPING SETS``, ``ROLLUP``, or ``CUBE`` through a supported public API.
+
+The proposed change lets the database perform these operations while retaining
+the ORM's field resolution, parameter binding, and query composition. It does
+not change the behavior of queries that use implicit grouping.
+
+This proposal follows :ticket:`27646`, including its request for documentation
+and design feedback before implementation. The earlier `draft PR #12807
+<https://github.com/django/django/pull/12807>`_ explored explicit grouping but
+did not settle the interface.
+
+Proposed interface
+==================
+
+Use SQL terminology for the public names:
+
+* ``GroupingSets(("region", "category"), ("region",), ())`` selects the exact
+  grouping combinations, including ``()`` for a grand total.
+* ``Rollup("region", "category")`` selects the same combinations by taking
+  successive prefixes. Argument order matters.
+* ``Cube("region", "category")`` also includes grouping by category alone.
+* ``Grouping("region", "category")`` returns a grouping mask that distinguishes
+  omitted grouping keys from stored ``NULL`` values.
+
+The first three are grouping-clause constructs. ``Grouping`` is a function
+returning information about a result group's keys, not an aggregate such as
+``Sum``. The proposed import locations are ``django.db.models`` for grouping
+constructs and ``django.db.models.functions`` for ``Grouping``. These locations
+are part of the design question, not existing imports.
+
+The proposed entry point is ``QuerySet.group_by(*items)``. It sets an explicit
+grouping clause on a clone without changing the selected output fields. For
+the initial scope, call it on a ``values()`` or ``values_list()`` queryset;
+subtotal rows do not generally represent model instances.
+
+For a ``Sale`` model with nullable ``region`` and ``category`` fields and an
+integer ``amount`` field, the proposed API would be:
+
+.. code-block:: python
+
+    # Proposed API: this example does not run on current Django.
+    from django.db.models import F, Rollup, Sum
+    from django.db.models.functions import Grouping
+
+    totals = (
+        Sale.objects.values("region", "category")
+        .group_by(Rollup("region", "category"))
+        .annotate(
+            total=Sum("amount"),
+            grouping=Grouping("region", "category"),
+        )
+        .order_by(
+            "grouping",
+            F("region").asc(nulls_last=True),
+            F("category").asc(nulls_last=True),
+        )
+    )
+
+Ignoring database-specific quoting, its intended SQL is:
+
+.. code-block:: sql
+
+    SELECT region, category, SUM(amount) AS total,
+           GROUPING(region, category) AS grouping
+    FROM sale
+    GROUP BY ROLLUP(region, category)
+    ORDER BY grouping, region NULLS LAST, category NULLS LAST;
+
+Consider these input rows:
+
+.. list-table::
+    :header-rows: 1
+
+    * - region
+      - category
+      - amount
+    * - North
+      - books
+      - 10
+    * - North
+      - games
+      - 20
+    * - South
+      - books
+      - 30
+    * - ``NULL``
+      - books
+      - 5
+
+The SQL produces:
+
+.. list-table::
+    :header-rows: 1
+
+    * - region
+      - category
+      - total
+      - grouping
+    * - North
+      - books
+      - 10
+      - 0
+    * - North
+      - games
+      - 20
+      - 0
+    * - South
+      - books
+      - 30
+      - 0
+    * - ``NULL``
+      - books
+      - 5
+      - 0
+    * - North
+      - ``NULL``
+      - 30
+      - 1
+    * - South
+      - ``NULL``
+      - 30
+      - 1
+    * - ``NULL``
+      - ``NULL``
+      - 5
+      - 1
+    * - ``NULL``
+      - ``NULL``
+      - 65
+      - 3
+
+The last two rows show why ``Grouping`` belongs in the initial feature. Testing
+``region IS NULL`` cannot distinguish a region subtotal from the grand total.
+The mask uses the rightmost argument as its least-significant bit: ``1`` means
+category was omitted; ``3`` means both region and category were omitted.
+
+Decisions to agree before implementation
+========================================
+
+Explicit grouping is exact
+--------------------------
+
+An explicit grouping clause must remain exact. Later ``values()``,
+``annotate()``, ``filter()``, and ``order_by()`` calls must not silently add
+grouping keys and remove subtotal rows. An incompatible selected or ordered
+expression should produce an error, not a different report. The division
+between ORM validation and database validation needs agreement.
+
+By contrast, current implicit grouping may add columns referenced by SELECT,
+HAVING, and ORDER BY. That behavior remains unchanged when ``group_by()`` has
+not been called. A second explicit ``group_by()`` call would replace the first,
+following ``order_by()``. A call with no items would raise ``TypeError``; an
+explicit grand-total-only clause would use ``GroupingSets(())``.
+
+``group_by()`` would not select fields or clear explicit ordering. Model
+``Meta.ordering`` would remain ignored as in ordinary grouped queries. An
+invalid explicit ordering must not be silently dropped. Aggregate predicates
+and predicates on ``Grouping`` belong in HAVING; input-row predicates normally
+belong in WHERE. Mixed predicates need the same care as existing aggregation
+queries.
+
+Preserve SQL grouping semantics
+-------------------------------
+
+``Rollup`` preserves argument order. Composite elements such as
+``Cube(("region", "category"), "year")`` keep the tuple together. Adjacent
+grouping items combine as SQL defines them; repeated grouping sets may produce
+duplicate result rows, which must be preserved.
+
+In SQL, the empty grouping set produces a group even over an empty input. Its
+count is zero and its sum is ``NULL``. Empty-query optimizations, including
+empty ``__in`` filters, must therefore be reviewed. The interaction with
+``none()`` needs a separate decision: it promises an empty queryset, which
+conflicts with producing a grand-total row. The implementation must not change
+that contract accidentally. ``count()`` counts output groups, including
+subtotal and duplicate rows. Query cloning, slicing, subqueries, and outer
+aggregation must preserve these semantics.
+
+The initial proposal does not include ``GROUP BY DISTINCT`` or emulation of
+grouping sets with UNION queries. ``Grouping`` is limited to explicit grouped
+queries; standalone ``aggregate()`` and window-function use are outside this
+proposed interface.
+
+Backend support is explicit
+---------------------------
+
+PostgreSQL is the proposed first implementation and execution target because
+it supports all four concepts. Whether the first merge must also support
+Oracle is a scope decision; the public API should not be placed in
+``django.contrib.postgres`` solely because PostgreSQL is tested first.
+
+Unsupported operations would raise ``NotSupportedError`` through backend
+capability checks. Oracle's multi-expression grouping mask is named
+``GROUPING_ID``, so a portable ``Grouping`` requires deliberate translation.
+MySQL and MariaDB support different subsets and syntax; they should not share
+one blanket capability flag. Validate supported syntax against Django's
+minimum database versions rather than the versions mentioned in the old ticket.
+
+Why a new entry point?
+----------------------
+
+The old PR raised a reasonable concern: a method named ``group_by()`` might
+encourage people to replace ordinary ``values().annotate()`` queries with
+manual grouping. The proposed documentation would recommend it for explicit
+grouping sets and their shorthand forms, while keeping ordinary aggregation
+examples unchanged.
+
+An alternative is a grouping option on an existing QuerySet method. That
+avoids a new method but couples grouping to projection or annotation. The
+design discussion should decide this choice before the compiler is changed.
+In either case, the SQL-derived construct names and exact grouping semantics
+would be the same.
+
+Implementation and validation plan
+==================================
+
+This should become one coherent implementation PR containing code, tests, and
+user documentation after the public contract is agreed. It is not just a set
+of SQL function wrappers:
+
+* Represent explicit grouping separately from the implicit grouping mode and
+  preserve it through cloning, alias relabeling, and query composition.
+* Compile the grouping tree without adding selected or ordered dimensions
+  outside it. Prevent aggregate annotations from rebuilding explicit grouping.
+* Preserve the grouped result through ``count()``, ``exists()``, subqueries,
+  and supported outer aggregation. Audit empty-result shortcuts.
+* Resolve ``Grouping`` arguments through normal expression resolution, preserve
+  grouping masks, and route grouping predicates to HAVING.
+* Declare backend capabilities and fail unsupported operations explicitly.
+
+Reuse ``Author``, ``Book``, and ``Publisher`` in the aggregation test apps.
+Use a small nullable dataset for grouping masks, empty input, ordered
+``Rollup`` queries, cube combinations, composite items, and repeated grouping
+sets. Compare result rows while preserving duplicate occurrences. Add tests for
+expression aliases, related fields, WHERE/HAVING, ordering, query cloning, and
+terminal operations. Run existing aggregation regressions to protect implicit
+grouping.
+
+The first executable prototype should run the focused ``aggregation`` and
+``aggregation_regress`` suites on PostgreSQL and SQLite, with unsupported
+operations tested on SQLite. Broaden to the affected expression and query
+suites, supported backends, and the contribution checks before an
+implementation is submitted as ready. SQL examples alone do not validate an
+ORM implementation.
+
+References
+==========
+
+* `PostgreSQL grouping sets, CUBE, and ROLLUP
+  <https://www.postgresql.org/docs/current/queries-table-expressions.html#QUERIES-GROUPING-SETS>`_.
+* `PostgreSQL grouping operations
+  <https://www.postgresql.org/docs/current/functions-aggregate.html#FUNCTIONS-GROUPING-TABLE>`_.
+* `Oracle GROUPING_ID
+  <https://docs.oracle.com/en/database/oracle/oracle-database/26/sqlrf/GROUPING_ID.html>`_.
+* `MySQL grouping modifiers
+  <https://dev.mysql.com/doc/refman/8.4/en/group-by-modifiers.html>`_.
+* `MariaDB SELECT WITH ROLLUP
+  <https://mariadb.com/docs/server/reference/sql-statements/data-manipulation/selecting-data/select-with-rollup>`_.
