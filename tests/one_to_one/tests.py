@@ -245,6 +245,45 @@ class OneToOneTests(TestCase):
         b.place_id = self.p2.pk
         self.assertTrue(UndergroundBar.place.is_cached(b))
 
+    def test_assign_o2o_id_value_clears_old_reverse_cache(self):
+        p3 = Place.objects.create(name="Gamma Grill", address="1 Main St")
+        p4 = Place.objects.create(name="Delta Diner", address="2 Main St")
+        bar = Bar.objects.create(place=p3)
+        self.assertEqual(p3.bar, bar)
+
+        bar.place_id = p4.pk
+        bar.save()
+
+        with self.assertNumQueries(1):
+            with self.assertRaises(Bar.DoesNotExist):
+                p3.bar
+
+    def test_assign_o2o_id_value_populates_reverse_cache_after_related_access(self):
+        p3 = Place.objects.create(name="Echo Eatery", address="3 Main St")
+        p4 = Place.objects.create(name="Foxtrot Food", address="4 Main St")
+        bar = Bar.objects.create(place=p3)
+        with self.assertRaises(Bar.DoesNotExist):
+            p4.bar
+
+        bar.place_id = p4.pk
+        bar.save()
+
+        related_place = bar.place
+        self.assertEqual(related_place, p4)
+        with self.assertNumQueries(0):
+            self.assertEqual(related_place.bar, bar)
+
+    def test_assign_nullable_o2o_id_value_clears_old_reverse_cache(self):
+        bar = UndergroundBar.objects.create(place=self.p1)
+        self.assertEqual(self.p1.undergroundbar, bar)
+
+        bar.place_id = self.p2.pk
+        bar.save()
+
+        with self.assertNumQueries(1):
+            with self.assertRaises(UndergroundBar.DoesNotExist):
+                self.p1.undergroundbar
+
     def test_assign_o2o_id_none(self):
         b = UndergroundBar.objects.create(place=self.p1)
         b.place_id = None
