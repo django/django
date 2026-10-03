@@ -23,7 +23,7 @@ import django
 from django.core.management import call_command
 from django.db import connections
 from django.test import SimpleTestCase, TestCase
-from django.test.utils import NullTimeKeeper, TimeKeeper, iter_test_cases
+from django.test.utils import NullTimeKeeper, TimeKeeper, _TestState, iter_test_cases
 from django.test.utils import setup_databases as _setup_databases
 from django.test.utils import setup_test_environment
 from django.test.utils import teardown_databases as _teardown_databases
@@ -542,6 +542,14 @@ def _run_subsuite(args):
     runner_class, subsuite_index, subsuite, failfast, buffer = args
     runner = runner_class(failfast=failfast, buffer=buffer)
     result = runner.run(subsuite)
+    if hasattr(_TestState, "saved_data"):
+        unhandled = getattr(_TestState.saved_data, "unhandled_thread_exceptions", [])
+        if unhandled:
+            exc_values = [exc_info[1] for exc_info in unhandled]
+            raise RuntimeError(
+                f"Unhandled exception(s) in parallel subsuite worker: {exc_values}"
+            )
+
     return subsuite_index, result.events
 
 
