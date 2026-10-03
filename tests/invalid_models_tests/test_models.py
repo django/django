@@ -957,6 +957,26 @@ class FieldNamesTests(TestCase):
             ],
         )
 
+    def test_quoted_column_collision(self):
+        quoted_name = connection.ops.quote_name("id")
+
+        class DuplicateColumnModel(models.Model):
+            key = models.IntegerField(primary_key=True, db_column=quoted_name)
+            score = models.IntegerField(db_column="id")
+
+        self.assertEqual(
+            DuplicateColumnModel.check(databases=["default"]),
+            [
+                Error(
+                    "Field 'score' has column name 'id' that is used by "
+                    "another field.",
+                    hint="Specify a 'db_column' for the field.",
+                    obj=DuplicateColumnModel,
+                    id="models.E007",
+                )
+            ],
+        )
+
 
 @isolate_apps("invalid_models_tests")
 class ShadowingFieldsTests(SimpleTestCase):
