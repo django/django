@@ -1,7 +1,9 @@
 from collections import namedtuple
 from uuid import UUID
 
-from django.test import TestCase
+from django.db.models import F, Window
+from django.db.models.functions import RowNumber
+from django.test import TestCase, skipUnlessDBFeature
 
 from .models import Comment, Post, Tenant, User
 
@@ -224,3 +226,38 @@ class CompositePKValuesTests(TestCase):
                     values[0]["user"], (self.user_1.tenant_id, self.user_1.id)
                 )
                 self.assertEqual(values[0]["integer"], 42)
+
+    @skipUnlessDBFeature("supports_over_clause")
+    def test_values_pk_with_filtered_window(self):
+        # The filtered window wraps the query and masks the outer query by
+        # column aliases, which a composite primary key selection cannot
+        # carry for each of its columns.
+        qs = User.objects.annotate(
+            rn=Window(RowNumber(), partition_by=F("tenant_id"), order_by="id")
+        ).filter(rn=1)
+        msg = (
+            "Filtering against window expressions is not implemented when "
+            "a composite primary key is selected."
+        )
+        for queryset in (
+            qs.values("pk"),
+            qs.values("pk", "email"),
+            qs.values_list("pk", "email"),
+            qs.values_list("pk", flat=True),
+        ):
+            with self.subTest(queryset=queryset):
+                with self.assertRaisesMessage(NotImplementedError, msg):
+                    list(queryset)
+        self.assertSequenceEqual(
+            qs.values_list("email", flat=True).order_by("email"),
+            [self.USER_1_EMAIL, self.USER_3_EMAIL],
+        )
+        self.assertEqual(qs.count(), 2)
+        self.assertEqual(
+            User.objects.alias(
+                rn=Window(RowNumber(), partition_by=F("tenant_id"), order_by="id")
+            )
+            .filter(rn=1)
+            .count(),
+            2,
+        )
