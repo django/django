@@ -116,6 +116,68 @@ class DatabaseCache(BaseDatabaseCache):
         key = self.make_and_validate_key(key, version=version)
         return self._base_set("touch", key, None, timeout)
 
+    def incr(self, key, delta=1, version=None):
+        cache_key = self.make_and_validate_key(key, version=version)
+        db = router.db_for_write(self.cache_model_class)
+        connection = connections[db]
+        quote_name = connection.ops.quote_name
+        table = quote_name(self._table)
+        value_column = quote_name("value")
+        expires_column = quote_name("expires")
+        cache_key_column = quote_name("cache_key")
+        key_found = False
+
+        with transaction.atomic(using=db), connection.cursor() as cursor:
+            select = "SELECT %s, %s FROM %s WHERE %s = %%s" % (
+                value_column,
+                expires_column,
+                table,
+                cache_key_column,
+            )
+            if connection.features.has_select_for_update:
+                select = "%s %s" % (select, connection.ops.for_update_sql())
+            else:
+                # Acquire a write lock before reading on databases without
+                # SELECT ... FOR UPDATE support, such as SQLite.
+                cursor.execute(
+                    "UPDATE %s SET %s = %s WHERE %s = %%s"
+                    % (table, value_column, value_column, cache_key_column),
+                    [cache_key],
+                )
+            cursor.execute(select, [cache_key])
+            result = cursor.fetchone()
+            if result:
+                value, expires = result
+                expression = models.Expression(output_field=models.DateTimeField())
+                for converter in connection.ops.get_db_converters(
+                    expression
+                ) + expression.get_db_converters(connection):
+                    expires = converter(expires, expression, connection)
+                if expires < tz_now():
+                    cursor.execute(
+                        "DELETE FROM %s WHERE %s = %%s" % (table, cache_key_column),
+                        [cache_key],
+                    )
+                else:
+                    value = connection.ops.process_clob(value)
+                    value = pickle.loads(
+                        base64.b64decode(value.encode(), validate=True)
+                    )
+                    value = value + delta
+                    encoded = base64.b64encode(
+                        pickle.dumps(value, self.pickle_protocol)
+                    ).decode("latin1")
+                    cursor.execute(
+                        "UPDATE %s SET %s = %%s WHERE %s = %%s"
+                        % (table, value_column, cache_key_column),
+                        [encoded, cache_key],
+                    )
+                    key_found = True
+
+        if not key_found:
+            raise ValueError("Key '%s' not found" % key)
+        return value
+
     def _base_set(self, mode, key, value, timeout=DEFAULT_TIMEOUT):
         timeout = self.get_backend_timeout(timeout)
         db = router.db_for_write(self.cache_model_class)
