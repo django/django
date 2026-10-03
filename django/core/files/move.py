@@ -38,27 +38,51 @@ def file_move_safe(
             f"Destination file {new_file_name} exists and allow_overwrite is False."
         )
 
-    try:
-        os.rename(old_file_name, new_file_name)
-        return
-    except OSError:
-        # OSError happens with os.rename() if moving to another filesystem or
-        # when moving opened files on certain operating systems.
-        pass
+    if allow_overwrite:
+        try:
+            os.rename(old_file_name, new_file_name)
+            return
+        except OSError:
+            # OSError happens with os.rename() if moving to another filesystem
+            # or when moving opened files on certain operating systems.
+            pass
+    else:
+        try:
+            os.link(old_file_name, new_file_name)
+        except FileExistsError:
+            raise FileExistsError(
+                f"Destination file {new_file_name} exists and allow_overwrite is False."
+            )
+        except OSError:
+            # os.link() can fail across filesystems or if hard links are
+            # unsupported.
+            pass
+        else:
+            try:
+                os.unlink(old_file_name)
+            except PermissionError as e:
+                if getattr(e, "winerror", 0) != 32:
+                    raise
+            return
 
     # first open the old file, so that it won't go away
     with open(old_file_name, "rb") as old_file:
         # now open the new file, not forgetting allow_overwrite
-        fd = os.open(
-            new_file_name,
-            (
-                os.O_WRONLY
-                | os.O_CREAT
-                | getattr(os, "O_BINARY", 0)
-                | (os.O_EXCL if not allow_overwrite else 0)
-                | os.O_TRUNC
-            ),
-        )
+        try:
+            fd = os.open(
+                new_file_name,
+                (
+                    os.O_WRONLY
+                    | os.O_CREAT
+                    | getattr(os, "O_BINARY", 0)
+                    | (os.O_EXCL if not allow_overwrite else 0)
+                    | os.O_TRUNC
+                ),
+            )
+        except FileExistsError:
+            raise FileExistsError(
+                f"Destination file {new_file_name} exists and allow_overwrite is False."
+            )
         try:
             locks.lock(fd, locks.LOCK_EX)
             current_chunk = None
