@@ -1,5 +1,5 @@
 pyenchant
-Sphinx>=4.5.0
+Sphinx>=7.3.0
 sphinxcontrib-spelling
 blacken-docs
 sphinx-lint
