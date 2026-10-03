@@ -46,7 +46,7 @@ class ParserTests(SimpleTestCase):
         lexer = Lexer("{% for i in 1 %}{{ a }}\n{% endfor %}")
         self.assertEqual(
             repr(lexer),
-            '<Lexer template_string="{% for i in 1 %}{{ a...", verbatim=False>',
+            '<Lexer template_string="{% for i in 1 %}{{ a...">',
         )
 
     def test_filter_parsing(self):
