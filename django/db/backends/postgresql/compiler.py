@@ -36,26 +36,16 @@ class SQLInsertCompiler(BaseSQLInsertCompiler):
             # Lack of fields denote the usage of the DEFAULT keyword
             # for the insertion of empty rows.
             or any(field is None for field in fields)
-            # Field.get_placeholder_sql takes value as an argument, so the
-            # resulting placeholder might be dependent on the value.
-            # in UNNEST requires a single placeholder to "fit all values" in
-            # the array.
-            or any(hasattr(field, "get_placeholder_sql") for field in fields)
-            # Fields that don't use standard internal types might not be
-            # unnest'able (e.g. array and geometry types are known to be
-            # problematic).
-            or any(
-                (field.target_field if field.is_relation else field).get_internal_type()
-                not in self.connection.data_types
-                for field in fields
-            )
             # Compilable cannot be combined in an array of literal values.
             or any(any(hasattr(value, "as_sql") for value in row) for row in value_rows)
         ):
             return super().assemble_as_sql(fields, value_rows)
-        # Manually remove parameters from `db_type` to ensure no data
-        # truncation takes place (e.g. varchar[] instead of varchar(50)[]).
-        db_types = [field.db_type(self.connection).split("(")[0] for field in fields]
-        return InsertUnnest(["(%%s)::%s[]" % db_type for db_type in db_types]), [
+        # Every field must be arrayifiable: same gate used by In.as_postgresql.
+        array_types = [
+            self.connection.ops.get_field_literal_array_type(field) for field in fields
+        ]
+        if any(array_type is None for array_type in array_types):
+            return super().assemble_as_sql(fields, value_rows)
+        return InsertUnnest(["(%%s)::%s" % array_type for array_type in array_types]), [
             list(map(list, zip(*value_rows)))
         ]
