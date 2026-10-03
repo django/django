@@ -182,12 +182,21 @@ class TestSigner(SimpleTestCase):
     def test_invalid_sep(self):
         """should warn on invalid separator"""
         msg = (
-            "Unsafe Signer separator: %r (cannot be empty or consist of only A-z0-9-_=)"
+            "Unsafe Signer separator: %r (cannot be empty or consist of only "
+            "A-Za-z0-9-_=)"
         )
         separators = ["", "-", "abc"]
         for sep in separators:
             with self.assertRaisesMessage(ValueError, msg % sep):
                 signing.Signer(sep=sep)
+
+    def test_sep_excluded_ascii_range(self):
+        # Regression test: an "A-z" typo in the separator validation regex
+        # used to also match "[", "\", "]", "^", and "`", which sit between
+        # "Z" and "a" in the ASCII table but aren't in "A-Za-z0-9-_=".
+        for sep in ["[", "\\", "]", "^", "`"]:
+            signer = signing.Signer(key="predictable-secret", sep=sep)
+            self.assertIn(sep, signer.sign("foo"))
 
     def test_verify_with_non_default_key(self):
         old_signer = signing.Signer(key="secret")
