@@ -809,7 +809,8 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertEqual(cl.queryset.count(), 1)
 
-        request = self.factory.get("/concert/", data={SEARCH_VAR: band.pk + 5})
+        nonexistent_pk = connection.ops.get_nonexistent_pk(band.pk)
+        request = self.factory.get("/concert/", data={SEARCH_VAR: nonexistent_pk})
         request.user = self.superuser
         cl = m.get_changelist_instance(request)
         self.assertEqual(cl.queryset.count(), 0)
@@ -1139,7 +1140,8 @@ class ChangeListTests(TestCase):
             self.assertIs(cl.queryset.query.distinct, False)
 
         # A ManyToManyField in params does have distinct applied.
-        request = self.factory.get("/band/", {"genres": "0"})
+        pk_value = str(connection.ops.get_hardcoded_pk(0))
+        request = self.factory.get("/band/", {"genres": pk_value})
         request.user = self.superuser
         cl = m.get_changelist_instance(request)
         self.assertIs(cl.queryset.query.distinct, True)
@@ -1616,9 +1618,10 @@ class ChangeListTests(TestCase):
         default ordering defined (#17198).
         """
         superuser = self._create_superuser("superuser")
+        pk = connection.ops.get_hardcoded_pk
 
         for counter in range(1, 51):
-            UnorderedObject.objects.create(id=counter, bool=True)
+            UnorderedObject.objects.create(id=pk(counter), bool=True)
 
         class UnorderedObjectAdmin(admin.ModelAdmin):
             list_per_page = 10
@@ -1634,7 +1637,7 @@ class ChangeListTests(TestCase):
                 response = model_admin.changelist_view(request)
                 for result in response.context_data["cl"].result_list:
                     counter += 1 if ascending else -1
-                    self.assertEqual(result.id, counter)
+                    self.assertEqual(result.id, pk(counter))
             custom_site.unregister(UnorderedObject)
 
         # When no order is defined at all, everything is ordered by '-pk'.
@@ -1677,9 +1680,10 @@ class ChangeListTests(TestCase):
         defines a default ordering (#17198).
         """
         superuser = self._create_superuser("superuser")
+        pk = connection.ops.get_hardcoded_pk
 
         for counter in range(1, 51):
-            OrderedObject.objects.create(id=counter, bool=True, number=counter)
+            OrderedObject.objects.create(id=pk(counter), bool=True, number=counter)
 
         class OrderedObjectAdmin(admin.ModelAdmin):
             list_per_page = 10
@@ -1695,7 +1699,7 @@ class ChangeListTests(TestCase):
                 response = model_admin.changelist_view(request)
                 for result in response.context_data["cl"].result_list:
                     counter += 1 if ascending else -1
-                    self.assertEqual(result.id, counter)
+                    self.assertEqual(result.id, pk(counter))
             custom_site.unregister(OrderedObject)
 
         # When no order is defined at all, use the model's default ordering

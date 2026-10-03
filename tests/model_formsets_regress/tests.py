@@ -1,4 +1,5 @@
 from django import forms
+from django.db import connection
 from django.forms.formsets import DELETION_FIELD_NAME, BaseFormSet
 from django.forms.models import (
     BaseModelFormSet,
@@ -201,15 +202,16 @@ class InlineFormsetTests(TestCase):
         """
         FormSet = inlineformset_factory(UserProfile, ProfileNetwork, exclude=[])
 
-        user = User.objects.create(username="guido", serial=1337, pk=1)
-        self.assertEqual(user.pk, 1)
-        profile = UserProfile.objects.create(user=user, about="about", pk=2)
-        self.assertEqual(profile.pk, 2)
+        user = User.objects.create(username="guido", serial=1337)
+        profile = UserProfile.objects.create(
+            user=user, about="about", pk=connection.ops.get_nonexistent_pk(user.pk)
+        )
+        self.assertNotEqual(user.pk, profile.pk)
         ProfileNetwork.objects.create(profile=profile, network=10, identifier=10)
         formset = FormSet(instance=profile)
 
         # Testing the inline model's relation
-        self.assertEqual(formset[0].instance.profile_id, 1)
+        self.assertEqual(formset[0].instance.profile_id, user.pk)
 
     def test_formset_with_none_instance(self):
         "A formset with instance=None can be created. Regression for #11872"
