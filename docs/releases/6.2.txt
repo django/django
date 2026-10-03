@@ -80,7 +80,8 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Lookups for :class:`~django.contrib.postgres.fields.ArrayField` now allow
+  nested arrays containing expressions as right-hand sides.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
