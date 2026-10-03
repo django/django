@@ -408,6 +408,8 @@ class UtilsTests(SimpleTestCase):
             label_for_field("site__domain", Article, return_attr=True),
             ("Site  domain", Site._meta.get_field("domain")),
         )
+        # Ensure explicit verbose_name on related field is respected.
+        self.assertEqual(label_for_field("site__owner", Article), "Site's owner")
 
     def test_label_for_field_failed_lookup(self):
         msg = "Unable to lookup 'site__unknown' on Article"

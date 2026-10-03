@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 class Site(models.Model):
     domain = models.CharField(max_length=100)
+    owner = models.CharField(verbose_name=_("Site's owner"), blank=True, null=True)
     parent = models.ForeignKey(
         "self", models.CASCADE, related_name="children", blank=True, null=True
     )
