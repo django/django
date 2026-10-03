@@ -38,6 +38,7 @@ from .models import (
     Parent,
     ParentModelWithCustomPk,
     Person,
+    Playlist,
     Poll,
     Profile,
     ProfileCollection,
@@ -47,6 +48,7 @@ from .models import (
     SomeChildModel,
     SomeParentModel,
     Teacher,
+    Track,
     UUIDChild,
     UUIDParent,
     VerboseNamePluralProfile,
@@ -2569,3 +2571,43 @@ class PlaywrightTests(AdminPlaywrightTestCase):
         select.select_option(index=0)
         selector.locator("p.selector-filter input").first.click()
         self.take_screenshot("focus_out")
+
+
+@override_settings(ROOT_URLCONF="admin_inlines.urls")
+class TestInlineReverseManyToMany(TestDataMixin, TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.playlist = Playlist.objects.create()
+        cls.other = Playlist.objects.create()
+        cls.track = Track.objects.create(name="One", playlist=cls.playlist)
+        cls.playlist.favourites.add(cls.track)
+        cls.url = reverse(
+            "admin:admin_inlines_playlist_change", args=(cls.playlist.pk,)
+        )
+
+    def setUp(self):
+        self.client.force_login(self.superuser)
+
+    def test_inline_renders_reverse_relation(self):
+        response = self.client.get(self.url)
+        formset = response.context["inline_admin_formsets"][0].formset
+        self.assertIn("favourited_in", formset.forms[0].fields)
+        self.assertEqual(formset.forms[0].initial["favourited_in"], [self.playlist])
+
+    def test_inline_saves_reverse_relation(self):
+        data = {
+            "track_set-TOTAL_FORMS": "1",
+            "track_set-INITIAL_FORMS": "1",
+            "track_set-MIN_NUM_FORMS": "0",
+            "track_set-MAX_NUM_FORMS": "1000",
+            "track_set-0-id": str(self.track.pk),
+            "track_set-0-playlist": str(self.playlist.pk),
+            "track_set-0-name": "One",
+            "track_set-0-favourited_in": [str(self.other.pk)],
+        }
+        response = self.client.post(self.url, data)
+        self.assertRedirects(
+            response, reverse("admin:admin_inlines_playlist_changelist")
+        )
+        self.assertSequenceEqual(self.track.favourited_in.all(), [self.other])
