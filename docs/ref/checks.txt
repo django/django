@@ -622,6 +622,10 @@ configured:
 * **security.W027**: Your Content Security Policy includes ``CSP.NONCE`` and
   :class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` is enabled,
   but ``django.template.context_processors.csp`` is not configured.
+* **security.W028**: Your :setting:`SECURE_CSP` or :setting:`SECURE_CSP_REPORT_ONLY`
+  setting has a directive whose only source is ``CSP.NONCE``. On responses that
+  do not access the nonce, the directive is omitted from the header, silently
+  weakening the policy.
 
 Signals
 -------

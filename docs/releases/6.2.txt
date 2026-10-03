@@ -219,7 +219,16 @@ Requests and Responses
 Security
 ~~~~~~~~
 
-* ...
+* The :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY` setting now accepts the
+  ``"noopener-allow-popups"`` value, which severs the opener relationship for
+  opened documents (including same-origin popups) while still allowing popups.
+
+* A new system check (``security.W028``) warns
+  when a :setting:`SECURE_CSP` or :setting:`SECURE_CSP_REPORT_ONLY` directive's
+  only source is ``CSP.NONCE``. Such a directive is dropped from the header on
+  responses that do not access the nonce, silently weakening the policy; pair
+  ``CSP.NONCE`` with an explicit fallback such as ``CSP.SELF``,
+  ``CSP.STRICT_DYNAMIC``, or ``CSP.NONE``.
 
 Serialization
 ~~~~~~~~~~~~~

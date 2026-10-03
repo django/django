@@ -4,6 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.csp import CSP
 
 CROSS_ORIGIN_OPENER_POLICY_VALUES = {
+    "noopener-allow-popups",
     "same-origin",
     "same-origin-allow-popups",
     "unsafe-none",
@@ -159,6 +160,20 @@ W027 = Warning(
     id="security.W027",
 )
 
+W028 = Warning(
+    "Your %s setting has the directive '%s' whose only source is CSP.NONCE. On "
+    "responses that do not access the nonce (for example error pages, or views "
+    "with no nonce-tagged element), the directive is omitted from the header, so "
+    "requests fall back to 'default-src' or, if that is not set, to no policy at "
+    "all. This silently weakens the Content Security Policy.",
+    hint=(
+        "Add an explicit fallback source alongside CSP.NONCE, such as CSP.SELF, "
+        "CSP.STRICT_DYNAMIC, or CSP.NONE, so the directive stays effective when "
+        "the nonce is unused."
+    ),
+    id="security.W028",
+)
+
 
 def _security_middleware():
     return "django.middleware.security.SecurityMiddleware" in settings.MIDDLEWARE
@@ -188,6 +203,31 @@ def _csp_policy_contains_nonce(policy):
         except TypeError:
             pass
     return False
+
+
+def _csp_sole_nonce_directives(policy):
+    # Directives whose only source is CSP.NONCE. These are dropped from the
+    # header by build_policy() on responses that never access the nonce (see
+    # django.utils.csp.build_policy), silently weakening the policy. Mirror
+    # build_policy()'s value normalization so the check matches the output.
+    try:
+        items = policy.items()
+    except AttributeError:
+        return []
+    directives = []
+    for directive, values in items:
+        if values is True or values is None or values is False:
+            continue
+        if isinstance(values, str):
+            values = [values]
+        else:
+            try:
+                values = list(values)
+            except TypeError:
+                values = [values]
+        if values == [CSP.NONCE]:
+            directives.append(directive)
+    return directives
 
 
 def _csp_context_processor_configured():
@@ -360,3 +400,14 @@ def check_csp_nonce_context_processor(app_configs, **kwargs):
     ):
         return [W027]
     return []
+
+
+@register(Tags.security)
+def check_csp_nonce_without_fallback(app_configs, **kwargs):
+    if not _csp_middleware():
+        return []
+    warnings = []
+    for name in ("SECURE_CSP", "SECURE_CSP_REPORT_ONLY"):
+        for directive in _csp_sole_nonce_directives(getattr(settings, name, None)):
+            warnings.append(Warning(W028.msg % (name, directive), id=W028.id))
+    return warnings

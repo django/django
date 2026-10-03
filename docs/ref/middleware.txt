@@ -395,6 +395,12 @@ valid values for this setting are:
     either don't set COOP or which opt out of isolation by setting a COOP of
     ``unsafe-none``.
 
+``noopener-allow-popups``
+    Severs the opener relationship with any document this document opens,
+    including same-origin popups, while still allowing popups to be opened.
+
+    .. versionadded:: 6.2
+
 ``unsafe-none``
     Allows the document to be added to its opener's browsing context group
     unless the opener itself has a COOP of ``same-origin`` or

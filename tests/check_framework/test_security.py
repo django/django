@@ -686,7 +686,12 @@ class CheckCrossOriginOpenerPolicyTest(SimpleTestCase):
 
     @override_settings(MIDDLEWARE=["django.middleware.security.SecurityMiddleware"])
     def test_with_coop(self):
-        tests = ["same-origin", "same-origin-allow-popups", "unsafe-none"]
+        tests = [
+            "noopener-allow-popups",
+            "same-origin",
+            "same-origin-allow-popups",
+            "unsafe-none",
+        ]
         for value in tests:
             with (
                 self.subTest(value=value),
@@ -847,3 +852,101 @@ class CheckSecureCSPTests(SimpleTestCase):
             with self.subTest(settings_overrides=settings_overrides):
                 with self.settings(**settings_overrides):
                     self.assertEqual(base.check_csp_nonce_context_processor(None), [])
+
+
+class CheckCspNonceWithoutFallbackTests(SimpleTestCase):
+    """Tests for security.W028 (nonce-only CSP directive fails open)."""
+
+    csp_middleware = ["django.middleware.csp.ContentSecurityPolicyMiddleware"]
+
+    def _warning(self, setting, directive):
+        return Warning(base.W028.msg % (setting, directive), id=base.W028.id)
+
+    @override_settings(
+        MIDDLEWARE=csp_middleware,
+        SECURE_CSP={"script-src": [CSP.NONCE]},
+        SECURE_CSP_REPORT_ONLY={},
+    )
+    def test_sole_nonce_in_csp(self):
+        self.assertEqual(
+            base.check_csp_nonce_without_fallback(None),
+            [self._warning("SECURE_CSP", "script-src")],
+        )
+
+    @override_settings(
+        MIDDLEWARE=csp_middleware,
+        SECURE_CSP={},
+        SECURE_CSP_REPORT_ONLY={"script-src": [CSP.NONCE]},
+    )
+    def test_sole_nonce_in_csp_report_only(self):
+        self.assertEqual(
+            base.check_csp_nonce_without_fallback(None),
+            [self._warning("SECURE_CSP_REPORT_ONLY", "script-src")],
+        )
+
+    def test_sole_nonce_normalized_values(self):
+        # The sentinel may arrive as a bare value, list, tuple, set, or
+        # generator; all normalize to a sole-nonce directive.
+        tests = [
+            CSP.NONCE,
+            [CSP.NONCE],
+            (CSP.NONCE,),
+            {CSP.NONCE},
+            (v for v in [CSP.NONCE]),
+        ]
+        for values in tests:
+            with (
+                self.subTest(values=values),
+                self.settings(
+                    MIDDLEWARE=self.csp_middleware, SECURE_CSP={"script-src": values}
+                ),
+            ):
+                self.assertEqual(
+                    base.check_csp_nonce_without_fallback(None),
+                    [self._warning("SECURE_CSP", "script-src")],
+                )
+
+    def test_multiple_sole_nonce_directives(self):
+        with self.settings(
+            MIDDLEWARE=self.csp_middleware,
+            SECURE_CSP={"script-src": [CSP.NONCE], "style-src": [CSP.NONCE]},
+        ):
+            self.assertEqual(
+                base.check_csp_nonce_without_fallback(None),
+                [
+                    self._warning("SECURE_CSP", "script-src"),
+                    self._warning("SECURE_CSP", "style-src"),
+                ],
+            )
+
+    def test_no_warning_cases(self):
+        tests = [
+            # Middleware not enabled.
+            {"MIDDLEWARE": [], "SECURE_CSP": {"script-src": [CSP.NONCE]}},
+            # Nonce paired with a fallback (recommended form, fails closed).
+            {
+                "MIDDLEWARE": self.csp_middleware,
+                "SECURE_CSP": {"script-src": [CSP.SELF, CSP.NONCE]},
+            },
+            {
+                "MIDDLEWARE": self.csp_middleware,
+                "SECURE_CSP": {"script-src": [CSP.STRICT_DYNAMIC, CSP.NONCE]},
+            },
+            # No nonce at all.
+            {
+                "MIDDLEWARE": self.csp_middleware,
+                "SECURE_CSP": {"script-src": [CSP.SELF]},
+            },
+            # Standalone/boolean and empty directives.
+            {
+                "MIDDLEWARE": self.csp_middleware,
+                "SECURE_CSP": {"upgrade-insecure-requests": True},
+            },
+            {"MIDDLEWARE": self.csp_middleware, "SECURE_CSP": {"script-src": None}},
+            {"MIDDLEWARE": self.csp_middleware, "SECURE_CSP": {}},
+            {"MIDDLEWARE": self.csp_middleware, "SECURE_CSP": None},
+        ]
+        for settings_overrides in tests:
+            with self.subTest(settings_overrides=settings_overrides):
+                with self.settings(**settings_overrides):
+                    self.assertEqual(base.check_csp_nonce_without_fallback(None), [])
