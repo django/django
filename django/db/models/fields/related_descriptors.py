@@ -251,7 +251,14 @@ class ForwardManyToOneDescriptor:
             rel_obj = self.field.get_cached_value(instance)
         except KeyError:
             rel_obj = None
-            has_value = None not in self.field.get_local_related_value(instance)
+            local_values = self.field.get_local_related_value(instance)
+            if any(hasattr(value, "resolve_expression") for value in local_values):
+                raise ValueError(
+                    'Cannot access "%s.%s": it was assigned an expression that '
+                    "must first be resolved by saving the object."
+                    % (instance._meta.object_name, self.field.name)
+                )
+            has_value = None not in local_values
             if has_value:
                 model = self.field.model
                 for current_instance, ancestor in _traverse_ancestors(model, instance):
@@ -301,6 +308,25 @@ class ForwardManyToOneDescriptor:
         - ``instance`` is the ``child`` instance
         - ``value`` is the ``parent`` instance on the right of the equal sign
         """
+        # Expressions are resolved by the database at save() time, so they
+        # can't be validated as related instances or stored in the relation
+        # cache. Set the expression on the foreign key attribute so that it's
+        # picked up by save().
+        if value is not None and hasattr(value, "resolve_expression"):
+            if self.field.primary_key:
+                raise ValueError(
+                    'Cannot assign expression "%r": "%s.%s" is a primary key.'
+                    % (value, instance._meta.object_name, self.field.name)
+                )
+            if len(self.field.related_fields) > 1:
+                raise ValueError(
+                    'Cannot assign expression "%r": "%s.%s" is a multi-column '
+                    "relation." % (value, instance._meta.object_name, self.field.name)
+                )
+            if self.field.is_cached(instance):
+                self.field.delete_cached_value(instance)
+            setattr(instance, self.field.related_fields[0][0].attname, value)
+            return
         # An object must be an instance of the related class.
         if value is not None and not isinstance(
             value, self.field.remote_field.model._meta.concrete_model

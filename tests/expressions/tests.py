@@ -474,19 +474,66 @@ class BasicExpressionsTests(TestCase):
             )
 
     def test_object_update_fk(self):
-        # F expressions cannot be used to update attributes which are foreign
-        # keys, or attributes which involve joins.
+        # F expressions can be used to update foreign key attributes on
+        # single objects.
         test_gmbh = Company.objects.get(pk=self.gmbh.pk)
-        msg = 'F(ceo)": "Company.point_of_contact" must be a "Employee" instance.'
-        with self.assertRaisesMessage(ValueError, msg):
-            test_gmbh.point_of_contact = F("ceo")
-
-        test_gmbh.point_of_contact = self.gmbh.ceo
+        test_gmbh.point_of_contact = F("ceo")
         test_gmbh.save()
+        test_gmbh.refresh_from_db()
+        self.assertEqual(test_gmbh.point_of_contact, self.max)
+        # Attributes which involve joins cannot be saved.
         test_gmbh.name = F("ceo__lastname")
         msg = "Joined field references are not permitted in this query"
         with self.assertRaisesMessage(FieldError, msg):
             test_gmbh.save()
+
+    def test_object_update_fk_attname(self):
+        # F expressions can be assigned to the underlying foreign key
+        # attribute.
+        test_gmbh = Company.objects.get(pk=self.gmbh.pk)
+        test_gmbh.point_of_contact_id = F("ceo")
+        test_gmbh.save()
+        test_gmbh.refresh_from_db()
+        self.assertEqual(test_gmbh.point_of_contact, self.max)
+
+    def test_object_update_fk_expression_access(self):
+        # The related object cannot be accessed until the assigned expression
+        # has been resolved by saving the object.
+        test_gmbh = Company.objects.get(pk=self.gmbh.pk)
+        test_gmbh.point_of_contact = self.max
+        test_gmbh.point_of_contact = F("ceo")
+        self.assertEqual(test_gmbh.point_of_contact_id, F("ceo"))
+        msg = (
+            'Cannot access "Company.point_of_contact": it was assigned an '
+            "expression that must first be resolved by saving the object."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            test_gmbh.point_of_contact
+
+    def test_object_update_fk_parent_link(self):
+        remote = RemoteEmployee(
+            firstname="John", lastname="Doe", salary=10, adjusted_salary=100
+        )
+        msg = (
+            'Cannot assign expression "F(adjusted_salary)": '
+            '"RemoteEmployee.employee_ptr" is a primary key.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            remote.employee_ptr = F("adjusted_salary")
+
+    def test_object_create_fk_expression(self):
+        # F expressions on foreign keys cannot be used when inserting new
+        # rows.
+        acme = Company(
+            name="The Acme Widget Co.",
+            num_employees=12,
+            num_chairs=5,
+            ceo=self.max,
+            point_of_contact=F("ceo"),
+        )
+        msg = "F() expressions can only be used to update, not to insert."
+        with self.assertRaisesMessage(ValueError, msg):
+            acme.save()
 
     def test_update_inherited_field_value(self):
         msg = "Joined field references are not permitted in this query"
