@@ -985,12 +985,88 @@ class TestQuerying(TestCase):
             objs_with_value,
         )
 
+    def test_lookup_exclude_other_lookups(self):
+        # As with exact (test_lookup_exclude_nonexistent_key), fields without
+        # the key are ignored when excluding any key lookup. self.objs[0] (a
+        # SQL null) is always present because Django adds an isnull alternative
+        # to negated key lookups.
+        null = [self.objs[0]]
+        objs_with_c = [self.objs[3], self.objs[4]]
+        tests = [
+            # Both objects with the "c" key have c=14, so excluding any of
+            # these conditions leaves only the SQL null (not the keyless
+            # objects).
+            (Q(value__c__gt=10), null),
+            (Q(value__c__lt=20), null),
+            (Q(value__c__gte=14), null),
+            (Q(value__c__in=[14]), null),
+            # c=14 doesn't satisfy these conditions, so objs[3] and objs[4]
+            # (which have the "c" key) are included alongside the SQL null.
+            (Q(value__c__gt=14), null + objs_with_c),
+            (Q(value__c__lt=14), null + objs_with_c),
+            (Q(value__c__gte=15), null + objs_with_c),
+            (Q(value__c__in=[13]), null + objs_with_c),
+            # "foo" is "bax" (objs[6]) and "bar" (objs[7]).
+            (Q(value__foo__startswith="ba"), null),
+            (Q(value__foo__icontains="A"), null),
+            (Q(value__foo__regex="^ba"), null),
+            # objs[7] ("bar") matches; objs[6] ("bax") has the key but doesn't
+            # match, so it's included while keyless docs aren't.
+            (Q(value__foo__endswith="r"), null + [self.objs[6]]),
+            (Q(value__foo__startswith="bar"), null + [self.objs[6]]),
+            (Q(value__foo__icontains="ar"), null + [self.objs[6]]),
+            (Q(value__foo__regex="^bar"), null + [self.objs[6]]),
+        ]
+        for condition, expected in tests:
+            with self.subTest(condition=condition):
+                self.assertCountEqual(
+                    NullableJSONModel.objects.exclude(condition),
+                    expected,
+                )
+                self.assertCountEqual(
+                    NullableJSONModel.objects.filter(~condition),
+                    expected,
+                )
+
     def test_usage_in_subquery(self):
         self.assertCountEqual(
             NullableJSONModel.objects.filter(
                 id__in=NullableJSONModel.objects.filter(value__c=14),
             ),
             self.objs[3:5],
+        )
+
+    def test_exclude_full_result_set(self):
+        self.assertCountEqual(
+            NullableJSONModel.objects.exclude(value__k="x", num__in=[]), self.objs
+        )
+
+    def test_exclude_empty_result_set(self):
+        self.assertCountEqual(
+            NullableJSONModel.objects.exclude(Q(value__k="x") | ~Q(num__in=[])),
+            [],
+        )
+
+    def test_exclude_full_result_set_leaf(self):
+        self.assertCountEqual(
+            NullableJSONModel.objects.exclude(
+                Q(value__k="x") & Q(num__range=(None, None))
+            ),
+            self.objs,
+        )
+
+    def test_exclude_empty_result_set_leaf(self):
+        self.assertCountEqual(
+            NullableJSONModel.objects.exclude(Q(value__k="x") | Q(num__in=[])),
+            [self.objs[0], self.objs[4], self.objs[6]],
+        )
+
+    def test_exclude_never_true_or_branches(self):
+        self.assertCountEqual(
+            NullableJSONModel.objects.exclude(
+                Q(value__k="x") & Q(num__in=[]) | Q(num__in=[])
+            ),
+            self.objs,
         )
 
     @skipUnlessDBFeature("supports_json_field_contains")
