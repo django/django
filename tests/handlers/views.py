@@ -33,6 +33,11 @@ def not_in_transaction(request):
     return HttpResponse(str(connection.in_atomic_block))
 
 
+@transaction.non_atomic_requests
+async def not_in_transaction_async(request):
+    return HttpResponse(str(connection.in_atomic_block))
+
+
 @transaction.non_atomic_requests(using=None)
 def not_in_transaction_using_none(request):
     return HttpResponse(str(connection.in_atomic_block))

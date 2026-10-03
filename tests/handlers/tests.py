@@ -155,6 +155,15 @@ class TransactionsPerRequestTests(TransactionTestCase):
         self.assertEqual(wrapped_once._non_atomic_requests, {"default"})
         self.assertEqual(wrapped_twice._non_atomic_requests, {"default", "other"})
 
+    async def test_no_auto_transaction_async(self):
+        old_atomic_requests = connection.settings_dict["ATOMIC_REQUESTS"]
+        try:
+            connection.settings_dict["ATOMIC_REQUESTS"] = True
+            response = await self.async_client.get("/not_in_transaction_async/")
+        finally:
+            connection.settings_dict["ATOMIC_REQUESTS"] = old_atomic_requests
+        self.assertContains(response, "False")
+
 
 @override_settings(ROOT_URLCONF="handlers.urls")
 class SignalsTests(SimpleTestCase):
