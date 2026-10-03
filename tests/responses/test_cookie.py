@@ -118,6 +118,13 @@ class SetCookieTests(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             HttpResponse().set_cookie("example", samesite="invalid")
 
+    def test_partitioned_cookie(self):
+        response = HttpResponse()
+        response.set_cookie("example", partitioned=True)
+        example_cookie = response.cookies["example"]
+        self.assertIn("; Partitioned", str(example_cookie))
+        self.assertIs(example_cookie["partitioned"], True)
+
 
 class DeleteCookieTests(SimpleTestCase):
     def test_default(self):
@@ -130,6 +137,7 @@ class DeleteCookieTests(SimpleTestCase):
         self.assertEqual(cookie["secure"], "")
         self.assertEqual(cookie["domain"], "")
         self.assertEqual(cookie["samesite"], "")
+        self.assertEqual(cookie["partitioned"], "")
 
     def test_delete_cookie_secure_prefix(self):
         """
@@ -154,3 +162,14 @@ class DeleteCookieTests(SimpleTestCase):
         response = HttpResponse()
         response.delete_cookie("c", samesite="lax")
         self.assertEqual(response.cookies["c"]["samesite"], "lax")
+
+    def test_delete_cookie_partitioned(self):
+        """
+        delete_cookie() sets the partitioned and secure flags with
+        partitioned=True (without secure, browsers ignore partitioned
+        cookies).
+        """
+        response = HttpResponse()
+        response.delete_cookie("c", partitioned=True)
+        self.assertIs(response.cookies["c"]["partitioned"], True)
+        self.assertIs(response.cookies["c"]["secure"], True)
