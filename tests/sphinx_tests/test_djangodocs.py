@@ -1,3 +1,5 @@
+import tempfile
+
 from .tests import SimpleSphinxTestCase
 
 
@@ -332,6 +334,22 @@ class ConsoleDirectiveTests(DjangoDocsTestCase):
             # No win content is rendered.
             self.assertNotIn("highlight-doscon", epub_content)
             self.assertNotIn(r"...\>", epub_content)
+
+    def test_doctree_is_cacheable(self):
+        # The console directive must not create a builder-specific doctree,
+        # which would cause inconsistent outputs when reusing the doctreedir.
+        source = """
+            .. console::
+
+                $ ./manage.py runserver
+            """
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = self.build_sphinx(source, working_dir=tmpdir, buildername="text")
+            text_content = result.files["index.txt"]
+            result = self.build_sphinx(source, working_dir=tmpdir, buildername="html")
+            html_content = result.files["index.html"]
+        self.assertNotIn("console-block", text_content)
+        self.assertIn("console-block", html_content)
 
 
 class SourcefileRoleTests(DjangoDocsTestCase):
