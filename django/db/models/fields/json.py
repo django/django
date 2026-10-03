@@ -412,6 +412,14 @@ class JSONIn(ProcessJSONLHSMixin, lookups.In):
         if not connection.features.has_native_json_field and (
             not hasattr(param, "as_sql") or isinstance(param, expressions.Value)
         ):
+            if isinstance(param, expressions.Value) and not isinstance(
+                param._output_field_or_none, JSONField
+            ):
+                output_field = param._output_field_or_none
+                value = param.value
+                if output_field is not None:
+                    value = output_field.get_prep_value(value)
+                params = [connection.ops.adapt_json_value(value, None)]
             if connection.vendor == "oracle":
                 value = param.value if hasattr(param, "value") else json.loads(param)
                 sql = "%s(JSON_OBJECT('value' VALUE %%s FORMAT JSON), '$.value')"
@@ -433,6 +441,13 @@ class JSONIn(ProcessJSONLHSMixin, lookups.In):
         if isinstance(self.lhs, KeyTransform):
             return sql, params
         if connection.vendor == "mysql":
+            if connection.mysql_is_mariadb:
+                # lookup_cast() has applied JSON_UNQUOTE() to the lhs, so
+                # build the extract-then-unquote order from the raw column.
+                sql, params = compiler.compile(self.lhs)
+                sql, params = self._process_as_mysql(sql, params, connection)
+                sql = "JSON_UNQUOTE(%s)" % sql
+                return sql, params
             return self._process_as_mysql(sql, params, connection)
         elif connection.vendor == "oracle":
             return self._process_as_oracle(sql, params, connection)

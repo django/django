@@ -38,3 +38,9 @@ Bugfixes
 
 * Fixed a visual regression in Django 6.1 where an extra empty breadcrumb was
   rendered on the admindocs model index page (:ticket:`37378`).
+
+* Fixed a bug in Django 6.1 where a :class:`~django.db.models.Value`
+  expression without an explicit ``JSONField`` output field crashed or
+  returned an incorrect result when used in a top-level
+  :class:`~django.db.models.JSONField` ``__in`` lookup on databases without
+  native JSON support (:ticket:`37377`).
