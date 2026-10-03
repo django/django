@@ -47,6 +47,16 @@ CSRF_ALLOWED_CHARS = string.ascii_letters + string.digits
 CSRF_SESSION_KEY = "_csrftoken"
 
 
+def _make_xlat(chars: str):
+    xlat = [0 for _ in range(1 + max((ord(x) for x in chars)))]
+    for i, c in enumerate(chars):
+        xlat[ord(c)] = i
+    return xlat
+
+
+CSRF_XLAT = _make_xlat(CSRF_ALLOWED_CHARS)
+
+
 def _get_failure_view():
     """Return the view to be used for CSRF rejections."""
     return get_callable(settings.CSRF_FAILURE_VIEW)
@@ -63,7 +73,7 @@ def _mask_cipher_secret(secret):
     """
     mask = _get_new_csrf_string()
     chars = CSRF_ALLOWED_CHARS
-    pairs = zip((chars.index(x) for x in secret), (chars.index(x) for x in mask))
+    pairs = zip((CSRF_XLAT[ord(x)] for x in secret), (CSRF_XLAT[ord(x)] for x in mask))
     cipher = "".join(chars[(x + y) % len(chars)] for x, y in pairs)
     return mask + cipher
 
@@ -77,7 +87,7 @@ def _unmask_cipher_token(token):
     mask = token[:CSRF_SECRET_LENGTH]
     token = token[CSRF_SECRET_LENGTH:]
     chars = CSRF_ALLOWED_CHARS
-    pairs = zip((chars.index(x) for x in token), (chars.index(x) for x in mask))
+    pairs = zip((CSRF_XLAT[ord(x)] for x in token), (CSRF_XLAT[ord(x)] for x in mask))
     return "".join(chars[x - y] for x, y in pairs)  # Note negative values are ok
 
 
