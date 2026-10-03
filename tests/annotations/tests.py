@@ -10,6 +10,7 @@ from django.db.models import (
     Case,
     CharField,
     Count,
+    DateField,
     DateTimeField,
     DecimalField,
     Exists,
@@ -585,6 +586,36 @@ class NonAggregateAnnotationTestCase(TestCase):
         book = qs.annotate(other_isbn=F("isbn")).get(other_rating=4)
         self.assertEqual(book["other_rating"], 4)
         self.assertEqual(book["other_isbn"], "155860191")
+
+    def test_values_transform_on_annotation_with_unbound_output_field(self):
+        """
+        A transform can be applied to an annotation alias in values() when the
+        annotation's output_field is not attached to a model.
+        """
+        qs = Book.objects.annotate(
+            published=ExpressionWrapper(F("pubdate"), output_field=DateField())
+        ).values("published__year")
+        self.assertEqual(qs.get(pk=self.b1.pk)["published__year"], self.b1.pubdate.year)
+
+    def test_values_transform_on_value_annotation(self):
+        qs = Book.objects.annotate(
+            constant=Value(datetime.date(2026, 1, 1), output_field=DateField())
+        ).values("constant__year")
+        self.assertEqual(qs.get(pk=self.b1.pk)["constant__year"], 2026)
+
+    def test_values_unsupported_transform_on_annotation(self):
+        """
+        An unsupported transform over an annotation alias reports the
+        unsupported lookup rather than failing while building the column.
+        """
+        msg = (
+            "Unsupported lookup 'not_a_transform' for DateField or join on the "
+            "field not permitted."
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Book.objects.annotate(
+                published=ExpressionWrapper(F("pubdate"), output_field=DateField())
+            ).values("published__not_a_transform")
 
     def test_values_fields_annotations_order(self):
         qs = Book.objects.annotate(other_rating=F("rating") - 1).values(
