@@ -13,7 +13,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import router, transaction
 from django.http import Http404, HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.urls import path, reverse
+from django.urls import path
 from django.utils.decorators import method_decorator
 from django.utils.html import escape
 from django.utils.translation import gettext
@@ -186,15 +186,7 @@ class UserAdmin(admin.ModelAdmin):
                 messages.success(request, msg)
                 update_session_auth_hash(request, form.user)
                 return HttpResponseRedirect(
-                    reverse(
-                        "%s:%s_%s_change"
-                        % (
-                            self.admin_site.name,
-                            user._meta.app_label,
-                            user._meta.model_name,
-                        ),
-                        args=(user.pk,),
-                    )
+                    self.get_change_url(user.pk, request=request)
                 )
         else:
             form = self.change_password_form(user)
@@ -222,6 +214,7 @@ class UserAdmin(admin.ModelAdmin):
             "original": user,
             "save_as": False,
             "show_save": True,
+            "model_admin": self,
             **self.admin_site.each_context(request),
         }
 
