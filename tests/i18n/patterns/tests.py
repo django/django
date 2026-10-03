@@ -206,6 +206,16 @@ class URLTranslationTests(URLTestCaseBase):
 
         with translation.override("nl"):
             self.assertEqual(translate_url("/nl/gebruikers/", "en"), "/en/users/")
+            # Translated URL patterns without a language prefix are resolved
+            # using the active language (#28567).
+            self.assertEqual(translate_url("/vertaald/", "en"), "/translated/")
+            self.assertEqual(
+                translate_url("/vertaald-regex/", "en"), "/translated-regex/"
+            )
+            self.assertEqual(
+                translate_url("/vertaald/default-slug/", "en"),
+                "/translated/default-slug/",
+            )
             self.assertEqual(translation.get_language(), "nl")
 
     def test_reverse_translated_with_captured_kwargs(self):
