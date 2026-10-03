@@ -1,10 +1,10 @@
 import operator
 import sqlite3
+from functools import cached_property
 
 from django.db import transaction
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.db.utils import OperationalError
-from django.utils.functional import cached_property
 from django.utils.version import PY314
 
 from .base import Database

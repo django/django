@@ -1,6 +1,7 @@
 import functools
 import itertools
 from collections import defaultdict
+from functools import cached_property
 
 from asgiref.sync import sync_to_async
 
@@ -22,7 +23,6 @@ from django.db.models.query_utils import PathInfo
 from django.db.models.sql import AND
 from django.db.models.sql.where import WhereNode
 from django.db.models.utils import AltersData
-from django.utils.functional import cached_property
 
 
 class GenericForeignKey(FieldCacheMixin, Field):

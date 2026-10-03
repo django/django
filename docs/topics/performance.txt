@@ -168,17 +168,23 @@ Implementing caching should not be regarded as an alternative to improving code
 that's performing poorly because it has been written badly. It's one of the
 final steps toward producing well-performing code, not a shortcut.
 
-:class:`~django.utils.functional.cached_property`
--------------------------------------------------
+Caching class properties
+------------------------
 
 It's common to have to call a class instance's method more than once. If
 that function is expensive, then doing so can be wasteful.
 
-Using the :class:`~django.utils.functional.cached_property` decorator saves the
-value returned by a property; the next time the function is called on that
-instance, it will return the saved value rather than re-computing it. Note that
-this only works on methods that take ``self`` as their only argument and that
-it changes the method to a property.
+Using Python's builtin :func:`@cached_property <functools.cached_property>`
+decorator saves the value returned by a property; the next time the function is
+called on that instance, it will return the saved value rather than
+re-computing it. Note that this only works on methods that take ``self`` as
+their only argument and that it changes the method to a property.
+
+.. note::
+
+    Until version 2028, Django offered its own implementation of this decorator
+    located at ``django.utils.functional.cached_property`` with identical
+    functionality.
 
 Certain Django components also have their own caching functionality; these are
 discussed below in the sections related to those components.

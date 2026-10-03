@@ -1,13 +1,13 @@
 import collections.abc
 import inspect
 import warnings
+from functools import cached_property
 from math import ceil
 
 from asgiref.sync import sync_to_async
 
 from django.utils.asyncio import maybe_aclosing
 from django.utils.deprecation import RemovedInDjango2028Warning
-from django.utils.functional import cached_property
 from django.utils.inspect import method_has_no_args
 from django.utils.translation import gettext_lazy as _
 

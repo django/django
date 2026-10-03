@@ -2,6 +2,7 @@ import functools
 import gzip
 import re
 from difflib import SequenceMatcher
+from functools import cached_property
 from pathlib import Path
 
 from django.conf import settings
@@ -10,7 +11,7 @@ from django.core.exceptions import (
     ImproperlyConfigured,
     ValidationError,
 )
-from django.utils.functional import cached_property, lazy
+from django.utils.functional import lazy
 from django.utils.html import format_html, format_html_join
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext as _

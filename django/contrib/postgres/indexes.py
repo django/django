@@ -1,5 +1,6 @@
+from functools import cached_property
+
 from django.db.models import Func, Index
-from django.utils.functional import cached_property
 
 from .utils import CheckPostgresInstalledMixin
 

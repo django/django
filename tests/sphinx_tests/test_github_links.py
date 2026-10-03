@@ -55,7 +55,7 @@ class I:
         self.assertEqual(
             last_n_parts(path, 5), "tests/sphinx_tests/testdata/package/module.py"
         )
-        self.assertEqual(line, 12)
+        self.assertEqual(line, 13)
 
     def test_get_path_and_line_func(self):
         path, line = github_links.get_path_and_line(
@@ -65,7 +65,7 @@ class I:
         self.assertEqual(
             last_n_parts(path, 5), "tests/sphinx_tests/testdata/package/module.py"
         )
-        self.assertEqual(line, 24)
+        self.assertEqual(line, 25)
 
     def test_get_path_and_line_method(self):
         path, line = github_links.get_path_and_line(
@@ -76,7 +76,7 @@ class I:
         self.assertEqual(
             last_n_parts(path, 5), "tests/sphinx_tests/testdata/package/module.py"
         )
-        self.assertEqual(line, 16)
+        self.assertEqual(line, 17)
 
     def test_get_path_and_line_cached_property(self):
         path, line = github_links.get_path_and_line(
@@ -87,7 +87,7 @@ class I:
         self.assertEqual(
             last_n_parts(path, 5), "tests/sphinx_tests/testdata/package/module.py"
         )
-        self.assertEqual(line, 20)
+        self.assertEqual(line, 21)
 
     def test_get_path_and_line_forwarded_import(self):
         path, line = github_links.get_path_and_line(
@@ -179,7 +179,7 @@ class I:
                 "py", info, version="3.2", next_version="3.2"
             ),
             "https://github.com/django/django/blob/main/tests/sphinx_tests/"
-            "testdata/package/module.py#L12",
+            "testdata/package/module.py#L13",
         )
 
     def test_github_linkcode_resolve_link_to_class_older_version(self):
@@ -192,7 +192,7 @@ class I:
                 "py", info, version="2.2", next_version="3.2"
             ),
             "https://github.com/django/django/blob/stable/2.2.x/"
-            "tests/sphinx_tests/testdata/package/module.py#L12",
+            "tests/sphinx_tests/testdata/package/module.py#L13",
         )
 
     def test_import_error(self):

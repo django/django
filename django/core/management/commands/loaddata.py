@@ -22,7 +22,6 @@ from django.db import (
     router,
     transaction,
 )
-from django.utils.functional import cached_property
 
 try:
     import bz2
@@ -109,7 +108,7 @@ class Command(BaseCommand):
         if transaction.get_autocommit(self.using):
             connections[self.using].close()
 
-    @cached_property
+    @functools.cached_property
     def compression_formats(self):
         """A dict mapping format names to (open function, mode arg) tuples."""
         # Forcing binary mode may be revisited after dropping Python 2 support
@@ -352,7 +351,7 @@ class Command(BaseCommand):
 
         return fixture_files
 
-    @cached_property
+    @functools.cached_property
     def fixture_dirs(self):
         """
         Return a list of fixture directories.

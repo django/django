@@ -3,14 +3,13 @@ Code to manage the creation and SQL rendering of 'where' constraints.
 """
 
 import operator
-from functools import reduce
+from functools import cached_property, reduce
 
 from django.core.exceptions import EmptyResultSet, FullResultSet
 from django.db.models.expressions import Case, When
 from django.db.models.functions import Mod
 from django.db.models.lookups import Exact
 from django.utils import tree
-from django.utils.functional import cached_property
 
 # Connection types
 AND = "AND"

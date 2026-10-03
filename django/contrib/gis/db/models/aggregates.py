@@ -1,3 +1,5 @@
+from functools import cached_property
+
 from django.contrib.gis.db.models.fields import (
     ExtentField,
     GeometryCollectionField,
@@ -5,7 +7,6 @@ from django.contrib.gis.db.models.fields import (
     LineStringField,
 )
 from django.db.models import Aggregate, Func, Value
-from django.utils.functional import cached_property
 
 __all__ = ["Collect", "Extent", "Extent3D", "MakeLine", "Union"]
 

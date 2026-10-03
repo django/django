@@ -1,4 +1,5 @@
 import inspect
+from functools import cached_property
 from importlib import import_module
 from inspect import cleandoc
 from pathlib import Path
@@ -19,7 +20,6 @@ from django.urls import get_mod_func, get_resolver, get_urlconf
 from django.urls.utils import extract_views_from_urlpatterns, simplify_regex
 from django.utils._os import safe_join
 from django.utils.decorators import method_decorator
-from django.utils.functional import cached_property
 from django.utils.inspect import (
     func_accepts_kwargs,
     func_accepts_var_args,
