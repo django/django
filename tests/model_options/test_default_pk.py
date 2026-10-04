@@ -189,7 +189,10 @@ class TestDefaultPK(SimpleTestCase):
 
     @isolate_apps("model_options.apps.ModelPKEmptyFieldConfig")
     def test_app_default_pk_field_none(self):
-        msg = "model_options.apps.ModelPKEmptyFieldConfig.default_pk_field must not be empty."
+        msg = (
+            "model_options.apps.ModelPKEmptyFieldConfig.default_pk_field "
+            "must not be empty."
+        )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
 
             class Model(models.Model):

@@ -546,9 +546,7 @@ class AppConfigTests(SimpleTestCase):
     )
     def test_default_pk_field_setting(self):
         apps_config = apps.get_app_config("apps")
-        self.assertEqual(
-            apps_config.default_pk_field, "django.db.models.BigAutoField"
-        )
+        self.assertEqual(apps_config.default_pk_field, "django.db.models.BigAutoField")
         self.assertIs(apps_config._is_default_pk_field_overridden, False)
 
 
