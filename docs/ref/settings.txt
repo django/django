@@ -1375,7 +1375,11 @@ Default: ``None``
 The default primary key field type to use for models that don't define a
 primary key field explicitly.
 
-When set to ``None``, Django uses :setting:`DEFAULT_AUTO_FIELD`.
+When set to ``None``, Django uses :setting:`DEFAULT_AUTO_FIELD`. An application's
+:attr:`~django.apps.AppConfig.default_pk_field` takes precedence over this
+setting. For compatibility, an explicitly configured
+:attr:`~django.apps.AppConfig.default_auto_field` also takes precedence and
+raises a deprecation warning when used as the fallback.
 
 This setting is the recommended replacement for
 :setting:`DEFAULT_AUTO_FIELD`, which is deprecated.

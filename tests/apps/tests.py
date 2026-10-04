@@ -517,6 +517,12 @@ class AppConfigTests(SimpleTestCase):
             "django.db.models.BigAutoField",
         )
         self.assertIs(apps_config._is_default_auto_field_overridden, True)
+        with self.assertWarnsMessage(
+            RemovedInDjango2029Warning, "AppConfig.default_auto_field is deprecated."
+        ):
+            self.assertEqual(
+                apps_config.default_pk_field, "django.db.models.BigAutoField"
+            )
 
     @ignore_warnings(category=RemovedInDjango2029Warning)
     @override_settings(
@@ -530,6 +536,20 @@ class AppConfigTests(SimpleTestCase):
             "django.db.models.SmallAutoField",
         )
         self.assertIs(apps_config._is_default_auto_field_overridden, False)
+        self.assertEqual(
+            apps_config.default_pk_field, "django.db.models.SmallAutoField"
+        )
+
+    @override_settings(
+        INSTALLED_APPS=["apps.apps.PlainAppsConfig"],
+        DEFAULT_PK_FIELD="django.db.models.BigAutoField",
+    )
+    def test_default_pk_field_setting(self):
+        apps_config = apps.get_app_config("apps")
+        self.assertEqual(
+            apps_config.default_pk_field, "django.db.models.BigAutoField"
+        )
+        self.assertIs(apps_config._is_default_pk_field_overridden, False)
 
 
 class NamespacePackageAppTests(SimpleTestCase):

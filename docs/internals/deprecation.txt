@@ -17,6 +17,8 @@ details on these changes.
 
 * The ``DEFAULT_AUTO_FIELD`` setting will be removed.
 
+* ``AppConfig.default_auto_field`` will be removed.
+
 * The ``django.utils.deprecation.MiddlewareMixin`` import path will be removed.
   Use ``django.middleware.MiddlewareMixin`` instead.
 
