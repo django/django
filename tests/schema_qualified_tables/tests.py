@@ -60,6 +60,13 @@ class SchemaQualifiedTableTests(TestCase):
         self.assertIn(self.table_sql(BillingCustomer), billing_sql)
         self.assertIn(self.table_sql(SalesCustomer), sales_sql)
 
+    def test_same_table_name_has_distinct_identity_in_different_schemas(self):
+        billing_table = BillingCustomer._meta.db_table
+        sales_table = SalesCustomer._meta.db_table
+
+        self.assertNotEqual(billing_table, sales_table)
+        self.assertEqual(len({billing_table, sales_table}), 2)
+
     def test_join_uses_schema_qualified_table(self):
         self.set_schema_qualified_table_references_support(True)
 
