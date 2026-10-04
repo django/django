@@ -103,14 +103,25 @@ class Q(tree.Node):
     ):
         # We must promote any new joins to left outer joins so that when Q is
         # used as an expression, rows aren't filtered due to joins.
-        clause, joins = query._add_q(
-            self,
-            reuse,
-            allow_joins=allow_joins,
-            split_subq=False,
-            check_filterable=False,
-            summarize=summarize,
-        )
+        # Track sibling aliases for split subqueries without restricting the
+        # joins reusable by positive predicates when reuse is None.
+        previous_split_reuse = query._split_reuse
+        split_reuse = reuse if reuse is not None else previous_split_reuse
+        if split_reuse is None:
+            split_reuse = set()
+        query._split_reuse = split_reuse
+        try:
+            clause, joins = query._add_q(
+                self,
+                reuse,
+                allow_joins=allow_joins,
+                split_subq=query._split_subq,
+                check_filterable=False,
+                summarize=summarize,
+                split_reuse=split_reuse,
+            )
+        finally:
+            query._split_reuse = previous_split_reuse
         query.promote_joins(joins)
         return clause
 
@@ -548,13 +559,19 @@ class FilteredRelation:
 
     def resolve_expression(self, query, reuse, *args, **kwargs):
         clone = self.clone()
-        clone.resolved_condition = query.build_filter(
-            self.condition,
-            can_reuse=reuse,
-            allow_joins=True,
-            split_subq=False,
-            update_join_types=False,
-        )[0]
+        # Nested expressions in an ON clause also operate on the joined row.
+        split_subq = query._split_subq
+        query._split_subq = False
+        try:
+            clone.resolved_condition = query.build_filter(
+                self.condition,
+                can_reuse=reuse,
+                allow_joins=True,
+                split_subq=False,
+                update_join_types=False,
+            )[0]
+        finally:
+            query._split_subq = split_subq
         return clone
 
     def as_sql(self, compiler, connection):

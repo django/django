@@ -7,12 +7,14 @@ transcript.
 """
 
 from django.db import connection
-from django.db.models import F, Value
+from django.db.models import Case, Count, F, OuterRef, Q, Subquery, Value, When, Window
+from django.db.models.lookups import Exact
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import Character, Line, LineSavedSearch, Scene
 
 try:
+    from django.contrib.postgres.aggregates import ArrayAgg
     from django.contrib.postgres.search import (
         Lexeme,
         SearchConfig,
@@ -144,6 +146,81 @@ class SimpleSearchTest(GrailTestData, PostgreSQLTestCase):
 
 
 class SearchVectorFieldTest(GrailTestData, PostgreSQLTestCase):
+    def test_conditional_config_before_negated_sibling(self):
+        scene = Scene.objects.create(scene="Conditional sibling", setting="Forest")
+        for dialogue in ("first", "second"):
+            Line.objects.create(scene=scene, character=self.minstrel, dialogue=dialogue)
+        config = Case(
+            When(line__dialogue="first", then=Value("english")),
+            default=Value("simple"),
+        )
+        for vector in (
+            SearchVector(Value("running"), config=config),
+            SearchQuery("running", config=config),
+            Window(
+                ArrayAgg(SearchVector(Value("running"), config=config)),
+                partition_by=[F("pk")],
+            ),
+        ):
+            base = Scene.objects.filter(pk=scene.pk).annotate(
+                value=F("line__dialogue"), vector=vector
+            )
+            condition = Q(vector__isnull=False) & ~Q(line__dialogue="first")
+            for expression in (
+                condition,
+                Case(When(condition, then=True), default=False),
+            ):
+                with self.subTest(vector=vector, expression=expression):
+                    self.assertSequenceEqual(
+                        base.annotate(flag=expression)
+                        .order_by("value")
+                        .values_list("value", "flag"),
+                        [("first", False), ("second", True)],
+                    )
+
+    def test_subquery_config_preserves_outer_aggregate_grouping(self):
+        scene = Scene.objects.create(scene="Grouped config", setting="Forest")
+        for dialogue in ("first", "second"):
+            Line.objects.create(scene=scene, character=self.minstrel, dialogue=dialogue)
+        inner = (
+            Scene.objects.filter(pk=OuterRef("pk"))
+            .annotate(
+                vector=SearchVector(
+                    Value("running"),
+                    config=Case(
+                        When(Exact(OuterRef("total"), Value(2)), then=Value("english")),
+                        default=Value("simple"),
+                    ),
+                )
+            )
+            .values("vector")[:1]
+        )
+        self.assertSequenceEqual(
+            Scene.objects.filter(pk=scene.pk)
+            .annotate(total=Count("line"), vector=Subquery(inner))
+            .values_list("total", "vector"),
+            [(2, "'run':1")],
+        )
+
+    def test_aggregate_conditional_config_is_per_related_row(self):
+        scene = Scene.objects.create(scene="Conditional config", setting="Forest")
+        for dialogue in ("first", "second"):
+            Line.objects.create(scene=scene, character=self.minstrel, dialogue=dialogue)
+        config = Case(
+            When(~Q(line__dialogue="first"), then=Value("english")),
+            default=Value("simple"),
+        )
+        result = (
+            Scene.objects.filter(pk=scene.pk)
+            .annotate(
+                count=Count("line"),
+                vectors=ArrayAgg(SearchVector(Value("running"), config=config)),
+            )
+            .get()
+        )
+        self.assertEqual(result.count, 2)
+        self.assertEqual(sorted(result.vectors), ["'run':1", "'running':1"])
+
     def test_existing_vector(self):
         Line.objects.update(dialogue_search_vector=SearchVector("dialogue"))
         searched = Line.objects.filter(

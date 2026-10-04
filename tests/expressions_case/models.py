@@ -50,6 +50,11 @@ class FKCaseTestModel(models.Model):
     integer = models.IntegerField()
 
 
+class M2MCaseTestModel(models.Model):
+    related = models.ManyToManyField(CaseTestModel, related_name="m2m_rel")
+    integer = models.IntegerField()
+
+
 class Client(models.Model):
     REGULAR = "R"
     GOLD = "G"

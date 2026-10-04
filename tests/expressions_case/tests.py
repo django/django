@@ -2,30 +2,45 @@ import unittest
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from operator import attrgetter, itemgetter
+from unittest import mock
 from uuid import UUID
 
 from django.core.exceptions import FieldError
-from django.db import connection
+from django.db import NotSupportedError, connection
 from django.db.models import (
     BinaryField,
     BooleanField,
     Case,
     Count,
     DecimalField,
+    ExpressionWrapper,
     F,
     GenericIPAddressField,
     IntegerField,
     Max,
     Min,
+    OuterRef,
     Q,
+    Subquery,
     Sum,
     TextField,
     Value,
     When,
+    Window,
 )
-from django.test import SimpleTestCase, TestCase
+from django.db.models.expressions import DatabaseDefault
+from django.db.models.functions import Abs, Lag, RowNumber
+from django.db.models.lookups import Exact
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test.utils import isolate_apps
 
-from .models import CaseTestModel, Client, FKCaseTestModel, O2OCaseTestModel
+from .models import (
+    CaseTestModel,
+    Client,
+    FKCaseTestModel,
+    M2MCaseTestModel,
+    O2OCaseTestModel,
+)
 
 try:
     from PIL import Image
@@ -1500,6 +1515,1352 @@ class CaseExpressionTests(TestCase):
                     ],
                     transform=itemgetter("string", "case", "integer_sum"),
                 )
+
+
+class NegatedQExpressionTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.parents = [
+            CaseTestModel.objects.create(integer=value) for value in range(1, 5)
+        ]
+        for parent, children in zip(cls.parents, ((1, 2), (1,), (2, 3), ())):
+            for value in children:
+                FKCaseTestModel.objects.create(fk=parent, integer=value)
+                M2MCaseTestModel.objects.create(integer=value).related.add(parent)
+
+    def test_negated_reverse_relation_condition(self):
+        expression = Case(When(~Q(fk_rel__integer=1), then=True), default=False)
+        queryset = CaseTestModel.objects.annotate(flag=expression).order_by("integer")
+        self.assertSequenceEqual(
+            queryset.values_list("integer", "flag"),
+            [(1, False), (2, False), (3, True), (4, True)],
+        )
+        self.assertSequenceEqual(
+            queryset.filter(flag=True).values_list("integer", flat=True), [3, 4]
+        )
+
+    def test_negated_q_annotation(self):
+        queryset = CaseTestModel.objects.annotate(flag=~Q(fk_rel__integer=1))
+        self.assertSequenceEqual(
+            queryset.order_by("integer").values_list("integer", "flag"),
+            [(1, False), (2, False), (3, True), (4, True)],
+        )
+
+    def test_negated_condition_rhs_annotation_expression(self):
+        for lookup, rhs in (
+            ("fk_rel__integer", F("target")),
+            ("fk_rel__integer", F("target") + 0),
+            ("fk_rel__integer", Abs(F("target"))),
+            ("fk_rel__integer__in", [F("target")]),
+            ("fk_rel__integer__range", (F("target"), F("target") + 0)),
+            (
+                "fk_rel__integer",
+                Subquery(
+                    FKCaseTestModel.objects.filter(integer=OuterRef("target")).values(
+                        "integer"
+                    )[:1]
+                ),
+            ),
+        ):
+            with self.subTest(lookup=lookup, rhs=rhs):
+                queryset = CaseTestModel.objects.annotate(
+                    target=F("integer") + 1,
+                ).annotate(flag=~Q(**{lookup: rhs}))
+                self.assertSequenceEqual(
+                    queryset.order_by("integer").values_list("integer", "flag"),
+                    [(1, False), (2, True), (3, True), (4, True)],
+                )
+
+    def test_composed_conditions(self):
+        cases = [
+            (~(Q(fk_rel__integer=1) | Q(integer=3)), [False, False, False, True]),
+            (~(Q(fk_rel__integer=1) & Q(integer=1)), [False, True, True, True]),
+            (~Q(fk_rel__integer=F("integer")), [False, True, False, True]),
+            (~Q(fk_rel__fk__integer=1), [False, True, True, True]),
+        ]
+        for condition, expected in cases:
+            with self.subTest(condition=condition):
+                queryset = CaseTestModel.objects.annotate(
+                    flag=Case(When(condition, then=True), default=False)
+                )
+                self.assertSequenceEqual(
+                    queryset.order_by("integer").values_list("flag", flat=True),
+                    expected,
+                )
+
+    def test_negated_condition_preserves_outer_reference_scope(self):
+        for lookup, rhs in (
+            ("fk_rel__integer", OuterRef("integer")),
+            ("fk_rel__integer", OuterRef("integer") + 0),
+            ("fk_rel__integer__in", [OuterRef("integer")]),
+        ):
+            with self.subTest(lookup=lookup, rhs=rhs):
+                inner = (
+                    CaseTestModel.objects.filter(integer=OuterRef("integer") + 1)
+                    .annotate(flag=~Q(**{lookup: rhs}))
+                    .values("flag")[:1]
+                )
+                queryset = CaseTestModel.objects.annotate(flag=Subquery(inner))
+                self.assertSequenceEqual(
+                    queryset.order_by("integer").values_list("integer", "flag"),
+                    [(1, False), (2, False), (3, True), (4, None)],
+                )
+
+    def test_negated_condition_prepares_queryset_rhs(self):
+        cases = (
+            (
+                "fk_rel__in",
+                FKCaseTestModel.objects.filter(integer=1),
+                [False, False, True, True],
+            ),
+            (
+                "fk_rel",
+                FKCaseTestModel.objects.filter(fk=self.parents[0], integer=1)[:1],
+                [False, True, True, True],
+            ),
+        )
+        for lookup, rhs, expected in cases:
+            with self.subTest(lookup=lookup):
+                queryset = CaseTestModel.objects.annotate(
+                    flag=~Q(**{lookup: rhs}),
+                )
+                self.assertSequenceEqual(
+                    queryset.order_by("integer").values_list("flag", flat=True),
+                    expected,
+                )
+
+    def test_negated_condition_validates_queryset_rhs(self):
+        cases = (
+            (
+                "fk_rel",
+                FKCaseTestModel.objects.all(),
+                "must be limited to one result",
+            ),
+            (
+                "fk_rel__integer__in",
+                FKCaseTestModel.objects.values("integer", "fk"),
+                "must have 1 selected fields",
+            ),
+            (
+                "fk_rel__in",
+                CaseTestModel.objects.all(),
+                "Cannot use QuerySet",
+            ),
+        )
+        for lookup, rhs, message in cases:
+            with self.subTest(lookup=lookup):
+                with self.assertRaisesMessage(ValueError, message):
+                    CaseTestModel.objects.annotate(flag=~Q(**{lookup: rhs}))
+
+    def test_negated_condition_with_aggregate_rhs(self):
+        parent = CaseTestModel.objects.create(integer=5)
+        FKCaseTestModel.objects.create(fk=parent, integer=2)
+        for lookup, rhs in (
+            ("fk_rel__integer", F("total")),
+            ("fk_rel__integer", F("total") + 0),
+            ("fk_rel__integer", Abs(F("total"))),
+            ("fk_rel__integer", Count("fk_rel")),
+            ("fk_rel__integer__in", [F("total")]),
+            ("fk_rel__integer__range", (F("total"), F("total") + 0)),
+        ):
+            condition = ~Q(**{lookup: rhs})
+            for expression in (
+                condition,
+                Case(When(condition, then=True), default=False),
+            ):
+                with self.subTest(lookup=lookup, rhs=rhs, expression=expression):
+                    queryset = (
+                        CaseTestModel.objects.filter(pk=parent.pk)
+                        .annotate(total=Count("pk"))
+                        .annotate(flag=expression)
+                    )
+                    self.assertSequenceEqual(
+                        queryset.values_list("integer", "total", "flag"),
+                        [(5, 1, True)],
+                    )
+        queryset = (
+            CaseTestModel.objects.filter(integer__lte=4)
+            .annotate(total=Count("fk_rel"))
+            .annotate(flag=~Q(fk_rel__integer=F("total")))
+        )
+        self.assertSequenceEqual(
+            queryset.order_by("integer", "flag").values_list(
+                "integer", "total", "flag"
+            ),
+            [
+                (1, 1, False),
+                (1, 1, True),
+                (2, 1, False),
+                (3, 1, True),
+                (3, 1, True),
+                (4, 0, True),
+            ],
+        )
+
+    def test_negated_condition_with_outer_aggregate_subquery_rhs(self):
+        inner = (
+            CaseTestModel.objects.filter(pk=OuterRef("pk"))
+            .annotate(value=OuterRef("total"))
+            .values("value")[:1]
+        )
+        for aggregate in (Count("fk_rel"), Count("*"), Count(Value(1))):
+            with self.subTest(aggregate=aggregate):
+                queryset = (
+                    CaseTestModel.objects.filter(pk=self.parents[0].pk)
+                    .annotate(total=aggregate)
+                    .annotate(flag=~Q(fk_rel__integer=Subquery(inner)))
+                )
+                self.assertSequenceEqual(
+                    queryset.order_by("flag").values_list("total", "flag"),
+                    [(1, False), (1, True)],
+                )
+
+    def test_negated_sibling_with_unresolved_nested_outer_reference(self):
+        for depth in (2, 4):
+            with self.subTest(depth=depth):
+                reference = "integer"
+                for _ in range(depth):
+                    reference = OuterRef(reference)
+                inner = CaseTestModel.objects.annotate(value=reference).values("value")[
+                    :1
+                ]
+                nested = (
+                    CaseTestModel.objects.order_by("pk")
+                    .annotate(flag=Q(integer=Subquery(inner)) & ~Q(fk_rel__integer=99))
+                    .values("flag")[:1]
+                )
+                for _ in range(depth - 2):
+                    nested = CaseTestModel.objects.annotate(
+                        flag=Subquery(nested)
+                    ).values("flag")[:1]
+                queryset = CaseTestModel.objects.annotate(flag=Subquery(nested))
+                self.assertSequenceEqual(
+                    queryset.order_by("integer").values_list("integer", "flag"),
+                    [(1, True), (2, False), (3, False), (4, False)],
+                )
+
+    def test_negated_condition_with_nested_outer_aggregate_rhs(self):
+        direct = (
+            CaseTestModel.objects.filter(pk=OuterRef("pk"))
+            .annotate(value=OuterRef("total"))
+            .values("value")[:1]
+        )
+        deepest = (
+            CaseTestModel.objects.filter(pk=OuterRef("pk"))
+            .annotate(value=OuterRef(OuterRef("total")))
+            .values("value")[:1]
+        )
+        nested = (
+            CaseTestModel.objects.filter(pk=OuterRef("pk"))
+            .annotate(value=Subquery(deepest))
+            .values("value")[:1]
+        )
+        copied = (
+            CaseTestModel.objects.filter(pk=OuterRef("pk"))
+            .annotate(value=OuterRef("copied"))
+            .values("value")[:1]
+        )
+        for rhs in (Subquery(direct) + 0, Subquery(nested), Subquery(copied)):
+            for wrap in (False, True):
+                with self.subTest(rhs=rhs, wrap=wrap):
+                    condition = ~Q(fk_rel__integer=rhs)
+                    queryset = (
+                        CaseTestModel.objects.filter(pk=self.parents[0].pk)
+                        .annotate(total=Count("*"), copied=Subquery(direct))
+                        .annotate(
+                            flag=(
+                                Case(When(condition, then=True), default=False)
+                                if wrap
+                                else condition
+                            )
+                        )
+                    )
+                    self.assertSequenceEqual(
+                        queryset.order_by("flag").values_list("total", "flag"),
+                        [(1, False), (1, True)],
+                    )
+
+    def test_negated_condition_with_local_aggregate_rhs(self):
+        for aggregate in (
+            Count("pk"),
+            Count(F("pk") + OuterRef("pk")),
+            Count(Value(1)),
+        ):
+            with self.subTest(aggregate=aggregate):
+                inner = (
+                    CaseTestModel.objects.filter(pk=OuterRef("pk"))
+                    .annotate(value=aggregate)
+                    .values("value")[:1]
+                )
+                queryset = (
+                    CaseTestModel.objects.filter(pk=self.parents[0].pk)
+                    .annotate(total=Count("fk_rel"))
+                    .annotate(flag=~Q(fk_rel__integer=Subquery(inner)))
+                )
+                self.assertSequenceEqual(
+                    queryset.values_list("total", "flag"), [(2, False)]
+                )
+
+    def test_negated_condition_ignores_unused_outer_aggregate(self):
+        inner = (
+            CaseTestModel.objects.filter(pk=OuterRef("pk"))
+            .alias(unused=OuterRef("total"))
+            .values("integer")[:1]
+        )
+        queryset = (
+            CaseTestModel.objects.filter(pk=self.parents[0].pk)
+            .annotate(total=Count(Value(1)), related=Count("fk_rel"))
+            .annotate(flag=~Q(fk_rel__integer=Subquery(inner)))
+        )
+        self.assertSequenceEqual(queryset.values_list("total", "flag"), [(2, False)])
+
+    def test_negated_condition_with_outer_column_aggregate_subquery_rhs(self):
+        inner = (
+            CaseTestModel.objects.filter(pk=OuterRef("pk"))
+            .annotate(value=Count(OuterRef("pk")))
+            .values("value")[:1]
+        )
+        queryset = (
+            CaseTestModel.objects.filter(pk=self.parents[0].pk)
+            .annotate(total=Count("fk_rel"))
+            .annotate(flag=~Q(fk_rel__integer=Subquery(inner)))
+        )
+        self.assertSequenceEqual(
+            queryset.order_by("flag").values_list("total", "flag"),
+            [(1, False), (1, True)],
+        )
+
+    def test_negated_condition_with_nonfilterable_rhs(self):
+        class NonfilterableValue(Value):
+            filterable = False
+
+        condition = ~Q(fk_rel__integer=NonfilterableValue(2))
+        for expression in (
+            condition,
+            Case(When(condition, then=True), default=False),
+        ):
+            with self.subTest(expression=expression):
+                queryset = CaseTestModel.objects.annotate(flag=expression)
+                self.assertSequenceEqual(
+                    queryset.order_by("integer").values_list("integer", "flag"),
+                    [(1, False), (2, True), (3, False), (4, True)],
+                )
+        queryset = (
+            CaseTestModel.objects.filter(pk=self.parents[0].pk)
+            .annotate(value=F("fk_rel__integer"))
+            .annotate(flag=Q(value=1) & condition)
+        )
+        self.assertSequenceEqual(
+            queryset.order_by("value").values_list("value", "flag"),
+            [(1, True), (2, False)],
+        )
+        msg = "NonfilterableValue is disallowed in the filter clause."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            CaseTestModel.objects.filter(condition)
+
+    def test_negated_condition_with_aggregate_subquery_rhs(self):
+        inner = (
+            FKCaseTestModel.objects.filter(fk=OuterRef("pk"))
+            .order_by()
+            .values("fk")
+            .annotate(total=Count("pk"))
+            .values("total")[:1]
+        )
+        queryset = CaseTestModel.objects.annotate(
+            flag=~Q(fk_rel__integer=Subquery(inner)),
+        )
+        self.assertSequenceEqual(
+            queryset.order_by("integer").values_list("integer", "flag"),
+            [(1, False), (2, False), (3, False), (4, True)],
+        )
+
+    def test_aggregate_comparison_before_negated_sibling(self):
+        parent = CaseTestModel.objects.create(integer=2)
+        for _ in range(2):
+            FKCaseTestModel.objects.create(fk=parent, integer=2)
+        for condition in (
+            Q(integer__lte=Count("fk_rel")),
+            Q(integer__lte=Count("fk_rel") + 0),
+            Q(integer__lte=Count("fk_rel", filter=~Q(fk_rel__integer=3))),
+            Q(Exact(F("integer"), Count("fk_rel"))),
+            Q(Case(When(integer__lte=Count("fk_rel"), then=True), default=False)),
+            Q(fk_rel__integer__lte=Count("fk_rel")),
+            Q(integer__lte=Count("fk_rel") + F("fk_rel__integer") - 2),
+            Q(fk_rel__integer=2) & Q(integer__lte=Count("fk_rel")),
+        ):
+            with self.subTest(condition=condition):
+                queryset = CaseTestModel.objects.filter(pk=parent.pk).annotate(
+                    flag=condition & ~Q(fk_rel__integer=1),
+                )
+                self.assertSequenceEqual(
+                    queryset.values_list("integer", "flag"), [(2, True)]
+                )
+        queryset = (
+            CaseTestModel.objects.filter(pk=parent.pk)
+            .annotate(total=Count("fk_rel"))
+            .annotate(flag=Q(integer__lte=F("total")) & ~Q(fk_rel__integer=1))
+        )
+        self.assertSequenceEqual(
+            queryset.values_list("integer", "total", "flag"), [(2, 2, True)]
+        )
+        for condition, expected in (
+            (
+                Q(fk_rel__integer=2)
+                & ~Q(~Q(fk_rel__integer=2))
+                & Q(integer__lte=Count("fk_rel")),
+                True,
+            ),
+            (
+                Q(fk_rel__integer=2)
+                & Q(integer__lte=Count("fk_rel"))
+                & ~Q(~Q(fk_rel__integer=2)),
+                True,
+            ),
+            (
+                Q(fk_rel__integer=2)
+                & ~Q(~Q(fk_rel__integer=1))
+                & Q(integer__lte=Count("fk_rel")),
+                False,
+            ),
+            (
+                Q(fk_rel__integer=2)
+                & ~(Q(integer__lte=Count("fk_rel")) & ~Q(fk_rel__integer=2)),
+                True,
+            ),
+        ):
+            with self.subTest(condition=condition):
+                queryset = CaseTestModel.objects.filter(pk=parent.pk).annotate(
+                    flag=condition,
+                )
+                self.assertSequenceEqual(
+                    queryset.values_list("integer", "flag"), [(2, expected)]
+                )
+
+    def test_negated_sibling_null_lookup_preparation(self):
+        for integer, value in ((100, None), (101, 1), (102, 2)):
+            parent = CaseTestModel.objects.create(integer=integer)
+            CaseTestModel.objects.create(integer=10, integer2=value, fk=parent)
+        CaseTestModel.objects.create(integer=103)
+        for lookup, rhs in (
+            ("casetestmodel__integer2", None),
+            ("casetestmodel__integer2__exact", None),
+            ("casetestmodel__integer2__iexact", None),
+            ("casetestmodel__integer2__isnull", True),
+        ):
+            with self.subTest(lookup=lookup):
+                condition = Q(casetestmodel__integer=10) & ~Q(**{lookup: rhs})
+                queryset = CaseTestModel.objects.filter(integer__gte=100).annotate(
+                    flag=condition,
+                )
+                self.assertSequenceEqual(
+                    queryset.order_by("integer").values_list("integer", "flag"),
+                    [(100, False), (101, True), (102, True), (103, False)],
+                )
+
+    def test_negated_condition_iterable_expression_rhs(self):
+        class SequenceOnly:
+            def __init__(self, values):
+                self.values = values
+
+            def __getitem__(self, index):
+                return self.values[index]
+
+        parent = CaseTestModel.objects.create(integer=2)
+        for _ in range(2):
+            FKCaseTestModel.objects.create(fk=parent, integer=2)
+        factories = (
+            list,
+            tuple,
+            set,
+            frozenset,
+            iter,
+            lambda values: (value for value in values),
+            lambda values: map(lambda value: value, values),
+            dict.fromkeys,
+            SequenceOnly,
+        )
+        for rhs, expected in (
+            (Count("fk_rel"), False),
+            (F("total"), False),
+            (F("target"), True),
+        ):
+            for factory in factories:
+                with self.subTest(rhs=rhs, factory=factory):
+                    queryset = (
+                        CaseTestModel.objects.filter(pk=parent.pk)
+                        .annotate(total=Count("fk_rel"), target=F("integer") + 1)
+                        .annotate(flag=~Q(fk_rel__integer__in=factory([rhs])))
+                    )
+                    self.assertSequenceEqual(
+                        queryset.values_list("integer", "total", "flag"),
+                        [(2, 2, expected)],
+                    )
+        queryset = CaseTestModel.objects.filter(pk=parent.pk).annotate(
+            flag=~Q(fk_rel__integer__range=iter([Count("fk_rel"), Count("fk_rel")])),
+        )
+        self.assertSequenceEqual(queryset.values_list("integer", "flag"), [(2, False)])
+        queryset = CaseTestModel.objects.filter(pk=parent.pk).annotate(
+            flag=~Q(fk_rel__integer__in=iter([])),
+        )
+        self.assertSequenceEqual(queryset.values_list("integer", "flag"), [(2, True)])
+
+    def test_negated_sibling_with_another_multivalued_path(self):
+        queryset = CaseTestModel.objects.annotate(
+            flag=Q(fk_rel__integer=2) & ~Q(fk_rel__fk__m2m_rel__integer=1),
+        )
+        self.assertSequenceEqual(
+            queryset.filter(flag=True)
+            .order_by("integer")
+            .values_list("integer", flat=True),
+            [3],
+        )
+
+    def test_negated_sibling_with_annotation_columns(self):
+        parent = CaseTestModel.objects.create(integer=100)
+        for value in (1, 2):
+            FKCaseTestModel.objects.create(fk=parent, integer=value)
+        for condition in (
+            Q(value=2),
+            Q(wrapped=2),
+            Q(Exact(F("value"), Value(2))),
+            Q(Exact(Value(2), F("value"))),
+            Q(integer=F("value") + 98),
+            Q(integer__in=[F("value") + 98]),
+            Q(integer__range=(F("value") + 98, F("value") + 98)),
+        ):
+            with self.subTest(condition=condition):
+                queryset = (
+                    CaseTestModel.objects.filter(pk=parent.pk)
+                    .annotate(value=F("fk_rel__integer"), wrapped=Abs(F("value")))
+                    .annotate(flag=condition & ~Q(fk_rel__integer=1))
+                    .order_by("value")
+                )
+                self.assertSequenceEqual(
+                    queryset.values_list("value", "flag"), [(1, False), (2, True)]
+                )
+        for integer in (10, 20):
+            child = CaseTestModel.objects.create(integer=integer, fk=parent)
+            FKCaseTestModel.objects.create(fk=child, integer=3)
+        queryset = (
+            CaseTestModel.objects.filter(pk=parent.pk)
+            .annotate(value=F("casetestmodel__fk_rel__integer"))
+            .annotate(flag=Q(value=3) & ~Q(casetestmodel__integer=20))
+            .order_by("casetestmodel__integer")
+        )
+        self.assertSequenceEqual(
+            queryset.values_list("casetestmodel__integer", "flag"),
+            [(10, True), (20, False)],
+        )
+
+    def test_negated_sibling_with_subquery_annotation_columns(self):
+        parent = CaseTestModel.objects.create(integer=100)
+        for value in (1, 2):
+            FKCaseTestModel.objects.create(fk=parent, integer=value)
+        inner = (
+            CaseTestModel.objects.filter(pk=OuterRef("pk"))
+            .annotate(copied=OuterRef("value"))
+            .values("copied")
+        )
+        nested = (
+            CaseTestModel.objects.filter(pk=OuterRef(OuterRef("pk")))
+            .annotate(copied=OuterRef(OuterRef("value")))
+            .values("copied")
+        )
+        middle = (
+            CaseTestModel.objects.filter(pk=OuterRef("pk"))
+            .annotate(copied=Subquery(nested[:1]))
+            .values("copied")
+        )
+        empty = (
+            CaseTestModel.objects.filter(pk=0)
+            .annotate(copied=Value(0))
+            .values("copied")
+        )
+        combined = empty.union(inner)
+        middle_combined = (
+            CaseTestModel.objects.filter(pk=OuterRef("pk"))
+            .annotate(copied=Subquery(empty.union(nested)[:1]))
+            .values("copied")
+        )
+        for index, subquery in enumerate((inner, middle, combined, middle_combined)):
+            for sibling in (
+                Q(copied=2),
+                Q(wrapped=2),
+                Q(Exact(F("copied"), Value(2))),
+                Q(integer=F("copied") + 98),
+                Q(integer__in=[F("copied") + 98]),
+                Q(integer__range=(F("copied") + 98, F("copied") + 98)),
+            ):
+                condition = sibling & ~Q(fk_rel__integer=1)
+                for expression in (
+                    condition,
+                    Case(When(condition, then=True), default=False),
+                ):
+                    with self.subTest(subquery=index, expression=expression):
+                        queryset = (
+                            CaseTestModel.objects.filter(pk=parent.pk)
+                            .annotate(
+                                value=F("fk_rel__integer"),
+                                copied=Subquery(subquery[:1]),
+                            )
+                            .annotate(wrapped=Abs(F("copied")), flag=expression)
+                            .order_by("value")
+                        )
+                        self.assertSequenceEqual(
+                            queryset.values_list("value", "flag"),
+                            [(1, False), (2, True)],
+                        )
+
+    def test_negated_sibling_does_not_reuse_subquery_internal_columns(self):
+        parent = CaseTestModel.objects.create(integer=100)
+        for value in (1, 2):
+            FKCaseTestModel.objects.create(fk=parent, integer=value)
+        children = FKCaseTestModel.objects.filter(fk=OuterRef("pk"))
+        for index, inner in enumerate(
+            (
+                children.order_by("-integer").values("integer")[:1],
+                children.values("fk").annotate(total=Count("pk")).values("total"),
+                CaseTestModel.objects.filter(pk=OuterRef("pk"))
+                .alias(unused=OuterRef("value"))
+                .annotate(copied=Value(2))
+                .values("copied"),
+                CaseTestModel.objects.filter(pk=OuterRef("pk"))
+                .annotate(unused=OuterRef("value"), copied=Value(2))
+                .values("copied"),
+            )
+        ):
+            condition = Q(copied=2) & ~Q(fk_rel__integer=1)
+            for expression in (
+                condition,
+                Case(When(condition, then=True), default=False),
+            ):
+                with self.subTest(subquery=index, expression=expression):
+                    queryset = (
+                        CaseTestModel.objects.filter(pk=parent.pk)
+                        .annotate(value=F("fk_rel__integer"), copied=Subquery(inner))
+                        .annotate(flag=expression)
+                        .order_by("value")
+                    )
+                    self.assertSequenceEqual(
+                        queryset.values_list("value", "flag"), [(1, False), (2, False)]
+                    )
+
+    def test_negated_sibling_with_subquery_ordering_annotation(self):
+        parent = CaseTestModel.objects.create(integer=100)
+        for value in (-1, 1):
+            FKCaseTestModel.objects.create(fk=parent, integer=value)
+        for name, ordering, extra_ordering, expected in (
+            ("key", "key", None, [(-1, 1, False), (1, -1, True)]),
+            ("key", F("key").asc(), None, [(-1, 1, False), (1, -1, True)]),
+            ("key", (F("key") + 0).asc(), None, [(-1, 1, False), (1, -1, True)]),
+            ("key__alias", "key__alias", None, [(-1, 1, False), (1, -1, True)]),
+            (
+                "key__alias",
+                F("key__alias").asc(),
+                None,
+                [(-1, 1, False), (1, -1, True)],
+            ),
+            ("key", "integer", ["key"], [(-1, 1, False), (1, -1, True)]),
+            ("key", "key", ["integer"], [(-1, -1, False), (1, -1, False)]),
+        ):
+            inner = (
+                FKCaseTestModel.objects.filter(fk=OuterRef("pk"))
+                .alias(**{name: OuterRef("value") * F("integer")})
+                .order_by(ordering)
+                .values("integer")
+            )
+            if extra_ordering is not None:
+                inner = inner.extra(order_by=extra_ordering)
+            inner = inner[:1]
+            condition = Q(copied=-1) & ~Q(fk_rel__integer=-1)
+            for expression in (
+                condition,
+                Case(When(condition, then=True), default=False),
+            ):
+                with self.subTest(
+                    ordering=ordering,
+                    extra_ordering=extra_ordering,
+                    expression=expression,
+                ):
+                    queryset = (
+                        CaseTestModel.objects.filter(pk=parent.pk)
+                        .annotate(value=F("fk_rel__integer"), copied=Subquery(inner))
+                        .annotate(flag=expression)
+                        .order_by("value")
+                    )
+                    self.assertSequenceEqual(
+                        queryset.values_list("value", "copied", "flag"),
+                        expected,
+                    )
+
+    def test_negated_sibling_with_subquery_ordering_alias_starting_minus(self):
+        parent = CaseTestModel.objects.create(integer=100)
+        for value in (-1, 1):
+            FKCaseTestModel.objects.create(fk=parent, integer=value)
+        inner = (
+            FKCaseTestModel.objects.filter(fk=OuterRef("pk"))
+            .alias(**{"-key": OuterRef("value") * F("integer")})
+            .order_by("--key")
+            .values("integer")[:1]
+        )
+        condition = Q(copied=1) & ~Q(fk_rel__integer=-1)
+        for expression in (
+            condition,
+            Case(When(condition, then=True), default=False),
+        ):
+            with self.subTest(expression=expression):
+                queryset = (
+                    CaseTestModel.objects.filter(pk=parent.pk)
+                    .annotate(value=F("fk_rel__integer"), copied=Subquery(inner))
+                    .annotate(flag=expression)
+                    .order_by("value")
+                )
+                self.assertSequenceEqual(
+                    queryset.values_list("value", "copied", "flag"),
+                    [(-1, -1, False), (1, 1, True)],
+                )
+
+    @isolate_apps("expressions_case")
+    def test_negated_sibling_with_subquery_default_ordering(self):
+        class OrderedFKCaseTestModel(FKCaseTestModel):
+            class Meta:
+                proxy = True
+                ordering = ["fk__integer"]
+
+        parent = CaseTestModel.objects.create(integer=100)
+        for value in (-1, 1):
+            FKCaseTestModel.objects.create(fk=parent, integer=value)
+        inner = (
+            OrderedFKCaseTestModel.objects.filter(fk=OuterRef("pk"))
+            .alias(**{"fk__integer": OuterRef("value") * F("integer")})
+            .values("integer")[:1]
+        )
+        condition = Q(copied=-1) & ~Q(fk_rel__integer=-1)
+        for expression in (
+            condition,
+            Case(When(condition, then=True), default=False),
+        ):
+            with self.subTest(expression=expression):
+                queryset = (
+                    CaseTestModel.objects.filter(pk=parent.pk)
+                    .annotate(value=F("fk_rel__integer"), copied=Subquery(inner))
+                    .annotate(flag=expression)
+                    .order_by("value")
+                )
+                self.assertSequenceEqual(
+                    queryset.values_list("value", "copied", "flag"),
+                    [(-1, 1, False), (1, -1, True)],
+                )
+
+    def test_mixed_aggregate_comparison_before_negated_sibling(self):
+        parent = CaseTestModel.objects.create(integer=100)
+        for value in (1, 2):
+            FKCaseTestModel.objects.create(fk=parent, integer=value)
+        base = (
+            CaseTestModel.objects.filter(pk=parent.pk)
+            .annotate(total=Count("fk_rel"), value=F("fk_rel__integer"))
+            .annotate(combined=F("total") + F("value"))
+        )
+        for sibling in (
+            Q(combined=3),
+            Q(Exact(F("combined"), Value(3))),
+            Q(integer=F("combined") + 97),
+            Q(fk_rel__integer=F("total") + 1),
+        ):
+            condition = sibling & ~Q(fk_rel__integer=1)
+            for expression in (
+                condition,
+                Case(When(condition, then=True), default=False),
+            ):
+                with self.subTest(sibling=sibling, expression=expression):
+                    queryset = base.annotate(flag=expression).order_by("value")
+                    self.assertSequenceEqual(
+                        queryset.values_list("total", "value", "combined", "flag"),
+                        [(1, 1, 2, False), (1, 2, 3, True)],
+                    )
+
+    @skipUnlessDBFeature("supports_over_clause")
+    def test_window_aggregate_comparison_before_negated_sibling(self):
+        parent = CaseTestModel.objects.create(integer=100)
+        for value in (1, 2):
+            FKCaseTestModel.objects.create(fk=parent, integer=value)
+        base = CaseTestModel.objects.filter(pk=parent.pk).annotate(
+            value=F("fk_rel__integer"),
+            total=Window(Count("fk_rel"), partition_by=[F("pk")]),
+        )
+        condition = Q(total=2) & ~Q(fk_rel__integer=1)
+        for expression in (
+            condition,
+            Case(When(condition, then=True), default=False),
+        ):
+            with self.subTest(expression=expression):
+                queryset = base.annotate(flag=expression).order_by("value")
+                self.assertSequenceEqual(
+                    queryset.values_list("value", "total", "flag"),
+                    [(1, 2, False), (2, 2, True)],
+                )
+
+    @skipUnlessDBFeature("supports_over_clause")
+    def test_window_grouped_argument_before_negated_sibling(self):
+        parent = CaseTestModel.objects.create(integer=100)
+        for value in (1, 2):
+            FKCaseTestModel.objects.create(fk=parent, integer=value)
+        base = (
+            CaseTestModel.objects.filter(pk=parent.pk)
+            .annotate(total=Count("fk_rel"))
+            .annotate(previous=Window(Lag("total", default=2), partition_by=[F("pk")]))
+        )
+        condition = Q(previous=2) & ~Q(fk_rel__integer=1)
+        self.assertSequenceEqual(
+            base.annotate(flag=condition).values_list("total", "flag"),
+            [(2, False)],
+        )
+
+    def test_negated_sibling_with_subquery_mixed_aggregate_columns(self):
+        parent = CaseTestModel.objects.create(integer=100)
+        for value in (1, 2):
+            FKCaseTestModel.objects.create(fk=parent, integer=value)
+        inner = (
+            CaseTestModel.objects.filter(pk=OuterRef("pk"))
+            .annotate(v=OuterRef("combined"))
+            .values("v")[:1]
+        )
+        queryset = (
+            CaseTestModel.objects.filter(pk=parent.pk)
+            .annotate(total=Count("fk_rel"), value=F("fk_rel__integer"))
+            .annotate(combined=F("total") + F("value"))
+            .annotate(copied=Subquery(inner))
+            .annotate(flag=Q(copied=3) & ~Q(fk_rel__integer=1))
+            .order_by("value")
+        )
+        self.assertSequenceEqual(
+            queryset.values_list("total", "value", "copied", "flag"),
+            [(1, 1, 2, False), (1, 2, 3, True)],
+        )
+
+    def test_subquery_sibling_preserves_compound_aggregate_grouping(self):
+        parent = CaseTestModel.objects.create(integer=100)
+        for value in (1, 2):
+            FKCaseTestModel.objects.create(fk=parent, integer=value)
+        empty = CaseTestModel.objects.filter(pk=0).annotate(v=Value(0)).values("v")
+        inner = (
+            CaseTestModel.objects.filter(pk=OuterRef("pk"))
+            .annotate(v=OuterRef("total"))
+            .values("v")
+        )
+        queryset = CaseTestModel.objects.filter(pk=parent.pk).annotate(
+            total=Count("fk_rel"), copied=Subquery(empty.union(inner)[:1])
+        )
+        self.assertSequenceEqual(queryset.values_list("total", "copied"), [(2, 2)])
+        condition = Q(copied=2) & ~Q(fk_rel__integer=1)
+        self.assertSequenceEqual(
+            queryset.annotate(flag=condition).values_list("total", "copied", "flag"),
+            [(2, 2, False)],
+        )
+
+    def test_negated_multihop_sibling_preserves_aggregate(self):
+        parent = CaseTestModel.objects.create(integer=2)
+        for _ in range(2):
+            child = CaseTestModel.objects.create(integer=10, fk=parent)
+            FKCaseTestModel.objects.create(fk=child, integer=3)
+        for condition, expected in (
+            (~Q(casetestmodel__fk_rel__integer=1), True),
+            (~Q(casetestmodel__fk_rel__integer=3), False),
+            (~Q(~Q(casetestmodel__fk_rel__integer=3)), True),
+        ):
+            with self.subTest(condition=condition):
+                queryset = (
+                    CaseTestModel.objects.filter(pk=parent.pk)
+                    .values("pk")
+                    .annotate(total=Count("casetestmodel"))
+                    .annotate(flag=Q(casetestmodel__integer=10) & condition)
+                )
+                self.assertSequenceEqual(
+                    queryset.values_list("total", "flag"), [(2, expected)]
+                )
+                with mock.patch.object(
+                    connection.features, "allows_group_by_select_index", False
+                ):
+                    _, _, group_by = queryset.query.get_compiler(
+                        connection=connection
+                    ).pre_sql_setup()
+                self.assertFalse(any("SELECT" in sql for sql, params in group_by))
+
+    def test_negated_multihop_null_condition_with_scalar_sibling(self):
+        parents = []
+        for descendants in ((), ((),), ((3, 4),), ((), (3,))):
+            parent = CaseTestModel.objects.create(integer=1)
+            parents.append(parent)
+            for values in descendants:
+                child = CaseTestModel.objects.create(integer=10, fk=parent)
+                for value in values:
+                    FKCaseTestModel.objects.create(fk=child, integer=value)
+        other = CaseTestModel.objects.create(integer=2)
+        child = CaseTestModel.objects.create(integer=10, fk=other)
+        FKCaseTestModel.objects.create(fk=child, integer=3)
+        parents.append(other)
+
+        for lookup, rhs, expected in (
+            (
+                "casetestmodel__fk_rel__integer__isnull",
+                True,
+                [False, False, True, False, False],
+            ),
+            (
+                "casetestmodel__fk_rel__integer",
+                None,
+                [False, False, True, False, False],
+            ),
+            (
+                "casetestmodel__fk_rel__integer__isnull",
+                False,
+                [True, True, False, False, False],
+            ),
+        ):
+            condition = Q(integer=1) & ~Q(**{lookup: rhs})
+            for expression in (
+                condition,
+                Case(When(condition, then=True), default=False),
+            ):
+                with self.subTest(lookup=lookup, rhs=rhs, expression=expression):
+                    queryset = (
+                        CaseTestModel.objects.filter(pk__in=[p.pk for p in parents])
+                        .annotate(flag=expression)
+                        .order_by("pk")
+                    )
+                    self.assertSequenceEqual(
+                        queryset.values_list("flag", flat=True), expected
+                    )
+
+    def test_negated_null_condition_with_scalar_sibling(self):
+        parents = []
+        for children in ((), (2, 3), (None, 2)):
+            parent = CaseTestModel.objects.create(integer=1)
+            parents.append(parent)
+            for value in children:
+                CaseTestModel.objects.create(integer=10, integer2=value, fk=parent)
+        for condition in (
+            ~Q(casetestmodel__integer2__isnull=True),
+            Q(integer=1) & ~Q(casetestmodel__integer2__isnull=True),
+            Q(integer=1) & ~Q(casetestmodel__integer2=None),
+        ):
+            for expression in (
+                condition,
+                Case(When(condition, then=True), default=False),
+            ):
+                with self.subTest(expression=expression):
+                    queryset = (
+                        CaseTestModel.objects.filter(pk__in=[p.pk for p in parents])
+                        .annotate(flag=expression)
+                        .order_by("pk")
+                    )
+                    self.assertSequenceEqual(
+                        queryset.values_list("flag", flat=True), [False, True, False]
+                    )
+
+    def test_negated_sibling_with_different_join_paths(self):
+        anchor = CaseTestModel.objects.create(integer=99)
+        parent = CaseTestModel.objects.create(integer=1, integer2=5, fk=anchor)
+        for value in (1, 2):
+            child = CaseTestModel.objects.create(integer=10, integer2=value, fk=parent)
+            FKCaseTestModel.objects.create(fk=child, integer=value)
+        for sibling in (Q(fk__integer=99), Q(value=99)):
+            for lookup in ("casetestmodel__integer2", "casetestmodel__fk_rel__integer"):
+                condition = sibling & ~Q(**{lookup: 1})
+                for expression in (
+                    condition,
+                    Case(When(condition, then=True), default=False),
+                ):
+                    with self.subTest(
+                        sibling=sibling, lookup=lookup, expression=expression
+                    ):
+                        queryset = (
+                            CaseTestModel.objects.filter(pk=parent.pk)
+                            .alias(value=F("fk__integer"))
+                            .annotate(flag=expression)
+                        )
+                        self.assertSequenceEqual(
+                            queryset.values_list("integer", "flag"), [(1, False)]
+                        )
+
+    def test_negated_null_condition_with_single_valued_prefix(self):
+        anchor = CaseTestModel.objects.create(integer=99)
+        parent = CaseTestModel.objects.create(integer=1, integer2=5, fk=anchor)
+        CaseTestModel.objects.create(integer=20, integer2=None, fk=anchor)
+        for lookup, rhs, expected in (
+            ("fk__casetestmodel__integer2__isnull", True, False),
+            ("fk__casetestmodel__integer2", None, False),
+            ("fk__casetestmodel__integer2__isnull", False, False),
+        ):
+            condition = Q(fk__integer=99) & ~Q(**{lookup: rhs})
+            for expression in (
+                condition,
+                Case(When(condition, then=True), default=False),
+            ):
+                with self.subTest(lookup=lookup, rhs=rhs, expression=expression):
+                    queryset = CaseTestModel.objects.filter(pk=parent.pk).annotate(
+                        flag=expression
+                    )
+                    self.assertSequenceEqual(
+                        queryset.values_list("flag", flat=True), [expected]
+                    )
+
+    def test_negated_multihop_sibling_cardinality(self):
+        for descendants, expected in (
+            (((3, 3), (3, 3)), [(2, True)]),
+            (((1, 1), (1, 1)), [(2, False)]),
+            (((1, 1), (3, 3)), [(1, False), (1, True)]),
+            (((), ()), [(2, True)]),
+            ((), [(0, None)]),
+        ):
+            with self.subTest(descendants=descendants):
+                parent = CaseTestModel.objects.create(integer=2)
+                for values in descendants:
+                    child = CaseTestModel.objects.create(integer=10, fk=parent)
+                    for value in values:
+                        FKCaseTestModel.objects.create(fk=child, integer=value)
+                queryset = (
+                    CaseTestModel.objects.filter(pk=parent.pk)
+                    .values("pk")
+                    .annotate(total=Count("casetestmodel"))
+                    .annotate(
+                        flag=Q(casetestmodel__integer=10)
+                        & ~Q(casetestmodel__fk_rel__integer=1)
+                    )
+                    .order_by("flag")
+                )
+                self.assertSequenceEqual(
+                    queryset.values_list("total", "flag"), expected
+                )
+
+    def test_negated_multihop_sibling_outer_reference(self):
+        parent = CaseTestModel.objects.create(integer=2)
+        child = CaseTestModel.objects.create(integer=10, fk=parent)
+        FKCaseTestModel.objects.create(fk=child, integer=3)
+        inner = CaseTestModel.objects.filter(pk=OuterRef("pk")).annotate(
+            flag=Q(casetestmodel__integer=10)
+            & ~Q(casetestmodel__fk_rel__integer=OuterRef("integer"))
+        )
+        queryset = CaseTestModel.objects.filter(pk=parent.pk).annotate(
+            flag=Subquery(inner.values("flag")[:1])
+        )
+        self.assertSequenceEqual(queryset.values_list("flag", flat=True), [True])
+        # Resolving the subquery must leave its reusable expression intact.
+        self.assertSequenceEqual(queryset.all().values_list("flag", flat=True), [True])
+        self.assertSequenceEqual(
+            CaseTestModel.objects.filter(pk=parent.pk)
+            .annotate(flag=Subquery(inner.values("flag")[:1]))
+            .values_list("flag", flat=True),
+            [True],
+        )
+
+    def test_negated_multihop_sibling_outer_annotation_grouping(self):
+        parent = CaseTestModel.objects.create(integer=2)
+        child = CaseTestModel.objects.create(integer=10, fk=parent)
+        FKCaseTestModel.objects.create(fk=child, integer=3)
+        for integer in (2, 3):
+            FKCaseTestModel.objects.create(fk=parent, integer=integer)
+        inner = CaseTestModel.objects.filter(pk=OuterRef("pk")).annotate(
+            flag=Q(casetestmodel__integer=10)
+            & ~Q(casetestmodel__fk_rel__integer=OuterRef("target"))
+        )
+        queryset = (
+            CaseTestModel.objects.filter(pk=parent.pk)
+            .annotate(target=F("fk_rel__integer"))
+            .values("pk")
+            .annotate(total=Count("casetestmodel"))
+            .annotate(flag=Subquery(inner.values("flag")[:1]))
+            .order_by("flag")
+        )
+        self.assertSequenceEqual(
+            queryset.values_list("total", "flag"), [(1, False), (1, True)]
+        )
+
+    def test_negated_multihop_sibling_combined_queries(self):
+        parents = []
+        for integer in (1, 3, 4):
+            parent = CaseTestModel.objects.create(integer=2)
+            parents.append(parent.pk)
+            child = CaseTestModel.objects.create(integer=10, fk=parent)
+            FKCaseTestModel.objects.create(fk=child, integer=integer)
+
+        def matching(needle):
+            return (
+                CaseTestModel.objects.filter(pk__in=parents)
+                .annotate(
+                    flag=Q(casetestmodel__integer=10)
+                    & ~Q(casetestmodel__fk_rel__integer=needle)
+                )
+                .filter(flag=True)
+            )
+
+        first, second = matching(1), matching(3)
+        self.assertCountEqual((first | second).values_list("pk", flat=True), parents)
+        self.assertSequenceEqual(
+            (first & second).values_list("pk", flat=True), [parents[2]]
+        )
+
+    @skipUnlessDBFeature("supports_over_clause")
+    def test_negated_condition_window_rhs(self):
+        parent = CaseTestModel.objects.create(integer=2)
+        for _ in range(2):
+            FKCaseTestModel.objects.create(fk=parent, integer=2)
+        for condition, flags in (
+            (~Q(fk_rel__integer=F("row")), (True, False)),
+            (
+                Q(fk_rel__integer=2) & ~Q(fk_rel__integer=F("row")),
+                (True, False),
+            ),
+            (
+                Q(fk_rel__integer=2) & ~Q(~Q(fk_rel__integer=F("row"))),
+                (False, True),
+            ),
+            (~Q(fk_rel__integer=F("row") + 0), (True, False)),
+            (~Q(fk_rel__integer__in=iter([F("row")])), (True, False)),
+        ):
+            with self.subTest(condition=condition):
+                queryset = (
+                    CaseTestModel.objects.filter(pk=parent.pk)
+                    .annotate(row=Window(RowNumber(), order_by="pk"))
+                    .annotate(flag=condition)
+                    .order_by("row")
+                )
+                self.assertSequenceEqual(
+                    queryset.values_list("integer", "row", "flag"),
+                    [(2, 1, flags[0]), (2, 2, flags[1])],
+                )
+
+    def test_negated_many_to_many_condition(self):
+        queryset = CaseTestModel.objects.annotate(
+            flag=Case(When(~Q(m2m_rel__integer=1), then=True), default=False)
+        )
+        self.assertSequenceEqual(
+            queryset.order_by("integer").values_list("integer", "flag"),
+            [(1, False), (2, False), (3, True), (4, True)],
+        )
+
+    def test_condition_with_existing_related_filter(self):
+        queryset = CaseTestModel.objects.filter(fk_rel__integer=2).annotate(
+            flag=Case(When(~Q(fk_rel__integer=1), then=True), default=False)
+        )
+        self.assertSequenceEqual(
+            queryset.order_by("integer").values_list("integer", "flag"),
+            [(1, False), (3, True)],
+        )
+
+    def test_negated_nullable_foreign_key_condition(self):
+        self.parents[0].fk = self.parents[1]
+        self.parents[0].save()
+        self.parents[2].fk = self.parents[0]
+        self.parents[2].save()
+        queryset = CaseTestModel.objects.annotate(
+            flag=Case(When(~Q(fk__integer=1), then=True), default=False)
+        )
+        self.assertSequenceEqual(
+            queryset.order_by("integer").values_list("integer", "flag"),
+            [(1, True), (2, True), (3, False), (4, True)],
+        )
+
+    def test_aggregate_conditions_are_per_related_row(self):
+        expression = Case(When(~Q(fk_rel__integer=1), then=1), default=2)
+        queryset = CaseTestModel.objects.annotate(
+            count=Count("fk_rel", filter=~Q(fk_rel__integer=1)),
+            total=Sum(ExpressionWrapper(expression, output_field=IntegerField())),
+        )
+        self.assertSequenceEqual(
+            queryset.order_by("integer").values_list("integer", "count", "total"),
+            [(1, 1, 3), (2, 0, 2), (3, 2, 2), (4, 0, 1)],
+        )
+
+    def test_aggregate_condition_in_database_default(self):
+        expression = Case(When(~Q(fk_rel__integer=1), then=1), default=2)
+        queryset = CaseTestModel.objects.annotate(
+            total=Sum(DatabaseDefault(expression)),
+        )
+        self.assertSequenceEqual(
+            queryset.order_by("integer").values_list("integer", "total"),
+            [(1, 3), (2, 2), (3, 2), (4, 1)],
+        )
+
+    def test_condition_after_failed_aggregate_resolution(self):
+        queryset = CaseTestModel.objects.all()
+        with self.assertRaises(FieldError):
+            queryset.query.add_annotation(Sum("missing"), "total")
+        queryset = queryset.annotate(flag=~Q(fk_rel__integer=1))
+        self.assertSequenceEqual(
+            queryset.order_by("integer").values_list("integer", "flag"),
+            [(1, False), (2, False), (3, True), (4, True)],
+        )
+
+    def test_condition_reused_outside_aggregate(self):
+        expression = Case(When(~Q(fk_rel__integer=1), then=1), default=2)
+        queryset = CaseTestModel.objects.annotate(total=Sum(expression)).annotate(
+            flag=expression,
+        )
+        self.assertSequenceEqual(
+            queryset.order_by("integer").values_list("integer", "total", "flag"),
+            [(1, 3, 2), (2, 2, 2), (3, 2, 1), (4, 1, 1)],
+        )
+
+    def test_boolean_expression_inside_aggregate_q_condition(self):
+        condition = Q(Case(When(~Q(fk_rel__integer=1), then=True), default=False))
+        queryset = CaseTestModel.objects.annotate(
+            count=Count("fk_rel", filter=condition),
+        )
+        self.assertSequenceEqual(
+            queryset.order_by("integer").values_list("integer", "count"),
+            [(1, 1), (2, 0), (3, 2), (4, 0)],
+        )
+
+    def test_lookup_expression_inside_aggregate_condition(self):
+        expression = Case(When(~Q(fk_rel__integer=1), then=True), default=False)
+        for condition in (
+            Exact(expression, Value(True)),
+            Exact(Value(True), expression),
+        ):
+            with self.subTest(condition=condition):
+                queryset = CaseTestModel.objects.annotate(
+                    count=Count("fk_rel", filter=condition),
+                )
+                self.assertSequenceEqual(
+                    queryset.order_by("integer").values_list("integer", "count"),
+                    [(1, 1), (2, 0), (3, 2), (4, 0)],
+                )
+
+    def test_lookup_rhs_inside_aggregate_q_condition(self):
+        expression = Case(When(~Q(fk_rel__integer=1), then=1), default=2)
+        for lookup, value in (
+            ("fk_rel__integer", expression),
+            ("fk_rel__integer__in", [expression]),
+        ):
+            with self.subTest(lookup=lookup):
+                queryset = CaseTestModel.objects.annotate(
+                    count=Count("fk_rel", filter=Q(**{lookup: value})),
+                )
+                self.assertSequenceEqual(
+                    queryset.order_by("integer").values_list("integer", "count"),
+                    [(1, 0), (2, 0), (3, 0), (4, 0)],
+                )
+
+    def test_composed_condition_reuses_sibling_alias(self):
+        for condition, expected in (
+            (Q(fk_rel__integer=2) & ~Q(fk_rel__integer=1), [1, 3]),
+            (
+                Q(Exact(F("fk_rel__integer"), Value(2))) & ~Q(fk_rel__integer=1),
+                [1, 3],
+            ),
+            (Q(integer__lt=F("fk_rel__integer")) & ~Q(fk_rel__integer=1), [1]),
+            (
+                Q(fk_rel__integer=2)
+                & Q(Case(When(~Q(fk_rel__integer=1), then=True), default=False)),
+                [1, 3],
+            ),
+            (
+                Q(fk_rel__integer=2)
+                & Q(
+                    Exact(
+                        Case(When(~Q(fk_rel__integer=1), then=1), default=0),
+                        Value(1),
+                    )
+                ),
+                [1, 3],
+            ),
+            (
+                Q(fk_rel__integer=2)
+                & Q(integer=Case(When(~Q(fk_rel__integer=1), then=1), default=0)),
+                [1],
+            ),
+            (
+                Q(Exact(F("fk_rel__integer"), Value(2)))
+                & Q(Case(When(~Q(fk_rel__integer=1), then=True), default=False)),
+                [1, 3],
+            ),
+            (~Q(fk_rel__integer=1) & Q(fk_rel__integer=2), [3]),
+        ):
+            with self.subTest(condition=condition):
+                queryset = CaseTestModel.objects.annotate(flag=condition)
+                self.assertSequenceEqual(
+                    queryset.filter(flag=True)
+                    .order_by("integer")
+                    .values_list("integer", flat=True),
+                    expected,
+                )
+
+    def test_sibling_aliases_do_not_leak_after_failed_resolution(self):
+        query = CaseTestModel.objects.all().query
+        condition = Q(fk_rel__integer=2) & Q(
+            Case(When(~Q(missing=1), then=True), default=False)
+        )
+        with self.assertRaises(FieldError):
+            query.add_annotation(condition, "broken")
+        query.add_annotation(~Q(fk_rel__integer=1), "flag")
+        queryset = CaseTestModel.objects.all()
+        queryset.query = query
+        self.assertSequenceEqual(
+            queryset.order_by("integer", "flag").values_list("integer", "flag"),
+            [(1, False), (1, False), (2, False), (3, True), (3, True), (4, True)],
+        )
+
+    def test_sibling_aliases_do_not_leak_into_subqueries(self):
+        inner = (
+            CaseTestModel.objects.filter(pk=OuterRef("pk"))
+            .annotate(flag=~Q(fk_rel__integer=1))
+            .values("flag")
+        )
+        condition = Q(fk_rel__integer=2) & Q(Exact(Subquery(inner), Value(True)))
+        queryset = CaseTestModel.objects.annotate(flag=condition)
+        self.assertSequenceEqual(
+            queryset.filter(flag=True)
+            .order_by("integer")
+            .values_list("integer", flat=True),
+            [3],
+        )
+
+    def test_positive_condition_reuses_existing_annotation_join(self):
+        queryset = CaseTestModel.objects.annotate(value=F("fk_rel__integer")).annotate(
+            flag=Case(When(fk_rel__integer=1, then=True), default=False),
+        )
+        self.assertSequenceEqual(
+            queryset.order_by("integer", "value").values_list(
+                "integer", "value", "flag"
+            ),
+            [
+                (1, 1, True),
+                (1, 2, False),
+                (2, 1, True),
+                (3, 2, False),
+                (3, 3, False),
+                (4, None, False),
+            ],
+        )
+
+    def test_nullable_reverse_relation_condition(self):
+        for parent, value in (
+            (self.parents[0], None),
+            (self.parents[0], 1),
+            (self.parents[1], None),
+            (self.parents[2], 2),
+        ):
+            CaseTestModel.objects.create(integer=10, integer2=value, fk=parent)
+        queryset = CaseTestModel.objects.filter(integer__lte=4).annotate(
+            flag=Case(When(~Q(casetestmodel__integer2=1), then=True), default=False)
+        )
+        self.assertSequenceEqual(
+            queryset.order_by("integer").values_list("integer", "flag"),
+            [(1, False), (2, True), (3, True), (4, True)],
+        )
+
+    def test_condition_in_subquery_of_aggregate(self):
+        inner = CaseTestModel.objects.filter(pk=OuterRef("pk")).annotate(
+            flag=Case(When(~Q(fk_rel__integer=1), then=1), default=0),
+        )
+        queryset = CaseTestModel.objects.annotate(
+            total=Sum(Subquery(inner.values("flag"))),
+        )
+        self.assertSequenceEqual(
+            queryset.order_by("integer").values_list("integer", "total"),
+            [(1, 0), (2, 0), (3, 1), (4, 1)],
+        )
 
 
 class CaseDocumentationExamples(TestCase):

@@ -66,6 +66,30 @@ class FilteredRelationTests(TestCase):
         cls.author1.favorite_books.add(cls.book2)
         cls.author1.favorite_books.add(cls.book3)
 
+    def test_nested_negated_case_condition(self):
+        condition = ~Q(book__pk=self.book1.pk)
+        for expression in (
+            Q(Case(When(condition, then=True), default=False)),
+            Q(
+                book__pk=Case(
+                    When(condition, then=F("book__pk")),
+                    default=Value(0),
+                )
+            ),
+        ):
+            with self.subTest(expression=expression):
+                queryset = Author.objects.annotate(
+                    selected=FilteredRelation("book", condition=expression)
+                ).order_by("pk", "selected__pk")
+                self.assertSequenceEqual(
+                    queryset.values_list("pk", "selected__pk"),
+                    [
+                        (self.author1.pk, self.book4.pk),
+                        (self.author2.pk, self.book2.pk),
+                        (self.author2.pk, self.book3.pk),
+                    ],
+                )
+
     def test_select_related(self):
         qs = (
             Author.objects.annotate(

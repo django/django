@@ -122,7 +122,15 @@ class Aggregate(Func):
         self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
     ):
         # Aggregates are not allowed in UPDATE queries, so ignore for_save
-        c = super().resolve_expression(query, allow_joins, reuse, summarize)
+        # Aggregate conditions apply to individual joined rows.
+        split_subq = query._split_subq if query is not None else None
+        if query is not None:
+            query._split_subq = False
+        try:
+            c = super().resolve_expression(query, allow_joins, reuse, summarize)
+        finally:
+            if query is not None:
+                query._split_subq = split_subq
         if summarize:
             # Summarized aggregates cannot refer to summarized aggregates.
             for ref in c.get_refs():

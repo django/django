@@ -209,6 +209,10 @@ class BaseExpression:
     def get_source_expressions(self):
         return []
 
+    def _get_sources_for_alias_reuse(self):
+        """Return SQL dependencies for row reuse without changing grouping."""
+        return self.get_source_expressions()
+
     def set_source_expressions(self, exprs):
         assert not exprs
 
@@ -967,6 +971,13 @@ class ResolvedOuterRef(F):
                 f"Referencing outer query window expression is not supported: "
                 f"{self.name}."
             )
+        # Preserve the scope of annotation expressions, including aggregates
+        # with no columns. Don't mutate a shared outer annotation.
+        col = col.copy()
+        if not isinstance(col, (Col, ColPairs)):
+            col._outer_ref_depth = getattr(col, "_outer_ref_depth", 0) + getattr(
+                self, "_outer_ref_depth", 1
+            )
         # FIXME: Rename possibly_multivalued to multivalued and fix detection
         # for non-multivalued JOINs (e.g. foreign key fields). This should take
         # into account only many-to-many and one-to-many relationships.
@@ -986,8 +997,15 @@ class OuterRef(F):
 
     def resolve_expression(self, *args, **kwargs):
         if isinstance(self.name, self.__class__):
-            return self.name
-        return ResolvedOuterRef(self.name)
+            ref = self.name.copy()
+        else:
+            ref = ResolvedOuterRef(self.name)
+        ref._outer_ref_depth = (
+            getattr(ref, "_outer_ref_depth", 0)
+            + getattr(self, "_outer_ref_depth", 0)
+            + 1
+        )
+        return ref
 
     def relabeled_clone(self, relabels):
         return self

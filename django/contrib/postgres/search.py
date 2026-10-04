@@ -138,6 +138,9 @@ class SearchVector(SearchVectorCombinable, Func):
             weight = Value(weight)
         self.weight = weight
 
+    def _get_sources_for_alias_reuse(self):
+        return [*self.get_source_expressions(), self.config, self.weight]
+
     def resolve_expression(
         self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
     ):

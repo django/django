@@ -23,6 +23,7 @@ from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import (
     BaseExpression,
+    Case,
     Col,
     ColPairs,
     Exists,
@@ -32,10 +33,13 @@ from django.db.models.expressions import (
     Ref,
     ResolvedOuterRef,
     Value,
+    When,
+    Window,
 )
 from django.db.models.fields import Field
 from django.db.models.lookups import Lookup
 from django.db.models.query_utils import (
+    FilteredRelation,
     Q,
     check_rel_lookup_compatibility,
     refs_expression,
@@ -67,6 +71,17 @@ FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(
 # Inspired from
 # https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
 EXPLAIN_OPTIONS_PATTERN = _lazy_re_compile(r"[\w-]+")
+
+
+class _ResolvedOuterExpression(OuterRef):
+    """Defer an outer expression without relabeling its resolved columns."""
+
+    def resolve_expression(self, *args, **kwargs):
+        if getattr(self.name, "contains_over_clause", False):
+            raise NotSupportedError(
+                "Referencing outer query window expressions is not supported."
+            )
+        return self.name
 
 
 def get_field_names_from_opts(opts):
@@ -233,6 +248,8 @@ class Query(BaseExpression):
     """A single SQL query."""
 
     alias_prefix = "T"
+    _split_subq = True
+    _split_reuse = None
     empty_result_set_value = None
     subq_aliases = frozenset([alias_prefix])
 
@@ -394,6 +411,9 @@ class Query(BaseExpression):
         obj.__class__ = self.__class__
         # Copy references to everything.
         obj.__dict__ = self.__dict__.copy()
+        # Expression resolution context belongs to the current query only.
+        obj._split_subq = True
+        obj._split_reuse = None
         # Clone attributes that can't use shallow copy.
         obj.alias_refcount = self.alias_refcount.copy()
         obj.alias_map = self.alias_map.copy()
@@ -1164,6 +1184,13 @@ class Query(BaseExpression):
         alias, _ = self.table_alias(
             join.table_name, create=True, filtered_relation=join.filtered_relation
         )
+        if (
+            join.filtered_relation is not None
+            and join.filtered_relation.resolved_condition is not None
+        ):
+            join.filtered_relation = join.filtered_relation.relabeled_clone(
+                {join.table_alias: alias}
+            )
         if join.join_type:
             if self.alias_map[join.parent_alias].join_type == LOUTER or join.nullable:
                 join_type = LOUTER
@@ -1172,7 +1199,9 @@ class Query(BaseExpression):
             join.join_type = join_type
         join.table_alias = alias
         self.alias_map[alias] = join
-        if filtered_relation := join.filtered_relation:
+        if (
+            filtered_relation := join.filtered_relation
+        ) and filtered_relation.resolved_condition is None:
             resolve_reuse = reuse
             if resolve_reuse is not None:
                 resolve_reuse = set(reuse) | {alias}
@@ -1277,6 +1306,15 @@ class Query(BaseExpression):
             if hasattr(resolved, "external_aliases"):
                 resolved.external_aliases.update(clone.external_aliases)
             clone.annotations[key] = resolved
+        for alias, join in clone.alias_map.items():
+            if isinstance(join, Join) and join.filtered_relation is not None:
+                join = join.relabeled_clone({})
+                join.filtered_relation.resolved_condition = (
+                    join.filtered_relation.resolved_condition.resolve_expression(
+                        query, *args, **kwargs
+                    )
+                )
+                clone.alias_map[alias] = join
         # Outer query's aliases are considered external.
         for alias, table in query.alias_map.items():
             clone.external_aliases[alias] = (
@@ -1288,7 +1326,15 @@ class Query(BaseExpression):
         return clone
 
     def get_external_cols(self):
-        exprs = chain(self.annotations.values(), self.where.children)
+        exprs = chain(
+            self.annotations.values(),
+            self.where.children,
+            (
+                join.filtered_relation.resolved_condition
+                for join in self.alias_map.values()
+                if isinstance(join, Join) and join.filtered_relation is not None
+            ),
+        )
         return [
             col
             for col in self._gen_cols(exprs, include_external=True)
@@ -1496,6 +1542,11 @@ class Query(BaseExpression):
             else expr.split(LOOKUP_SEP)
         )
 
+    def _contains_expression(self, value, attribute):
+        if isinstance(value, (list, tuple)):
+            return any(self._contains_expression(item, attribute) for item in value)
+        return getattr(value, attribute, False)
+
     def build_filter(
         self,
         filter_expr,
@@ -1507,6 +1558,7 @@ class Query(BaseExpression):
         check_filterable=True,
         summarize=False,
         update_join_types=True,
+        split_reuse=None,
     ):
         """
         Build a WhereNode for a single filter clause but don't add it
@@ -1546,13 +1598,23 @@ class Query(BaseExpression):
                 check_filterable=check_filterable,
                 summarize=summarize,
                 update_join_types=update_join_types,
+                split_reuse=split_reuse,
             )
         if hasattr(filter_expr, "resolve_expression"):
             if not getattr(filter_expr, "conditional", False):
                 raise TypeError("Cannot filter against a non-conditional expression.")
+            pre_joins = self.alias_refcount.copy() if split_reuse is not None else None
             condition = filter_expr.resolve_expression(
                 self, allow_joins=allow_joins, reuse=can_reuse, summarize=summarize
             )
+            if split_reuse is not None and self._split_subq:
+                if not condition.contains_aggregate:
+                    split_reuse.update(
+                        alias
+                        for alias, count in self.alias_refcount.items()
+                        if count > pre_joins.get(alias, 0)
+                    )
+                split_reuse.update(self._gen_reusable_aliases([condition]))
             if not isinstance(condition, Lookup):
                 condition = self.build_lookup(["exact"], condition, True)
             return WhereNode([condition], connector=AND), []
@@ -1567,17 +1629,52 @@ class Query(BaseExpression):
         if not allow_joins and len(parts) > 1:
             raise FieldError("Joined field references are not permitted in this query")
 
+        if (
+            lookups
+            and lookups[-1] in {"in", "range"}
+            and not isinstance(value, (list, tuple))
+            and not hasattr(value, "resolve_expression")
+        ):
+            # Resolve iterable expressions before inspecting aggregate context.
+            try:
+                iterator = iter(value)
+            except TypeError:
+                pass
+            else:
+                value = list(iterator)
         pre_joins = self.alias_refcount.copy()
         value = self.resolve_lookup_value(value, can_reuse, allow_joins, summarize)
+        contains_aggregate = self._contains_expression(value, "contains_aggregate") or (
+            not check_filterable and self._has_outer_aggregate(value)
+        )
+        track_reuse = split_reuse is not None and self._split_subq
+        # Reference counts include aggregate-only joins. Collect scalar
+        # expression columns separately for mixed comparisons.
+        track_joins = (
+            track_reuse
+            and not contains_aggregate
+            and not getattr(reffed_expression, "contains_aggregate", False)
+        )
         used_joins = {
             k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0)
         }
+        if track_joins:
+            split_reuse.update(used_joins)
+        if track_reuse:
+            split_reuse.update(self._gen_reusable_aliases([value]))
 
         if check_filterable:
             self.check_filterable(value)
+        elif contains_aggregate or self._contains_expression(
+            value, "contains_over_clause"
+        ):
+            # Aggregate and window comparisons must remain in the outer query.
+            split_subq = False
 
         if reffed_expression:
             condition = self.build_lookup(lookups, reffed_expression, value)
+            if track_reuse:
+                split_reuse.update(self._gen_reusable_aliases([condition]))
             return WhereNode([condition], connector=AND), []
 
         opts = self.get_meta()
@@ -1602,7 +1699,13 @@ class Query(BaseExpression):
             # lookup parts
             self._lookup_joins = join_info.joins
         except MultiJoin as e:
-            return self.split_exclude(filter_expr, can_reuse, e.names_with_path)
+            return self.split_exclude(
+                (arg, value),
+                split_reuse if split_reuse is not None else can_reuse,
+                e.names_with_path,
+                current_negated=current_negated,
+                check_filterable=check_filterable,
+            )
 
         # Update used_joins before trimming since they are reused to determine
         # which joins could be later promoted to INNER.
@@ -1612,6 +1715,8 @@ class Query(BaseExpression):
         )
         if can_reuse is not None:
             can_reuse.update(join_list)
+        if track_joins:
+            split_reuse.update(join_list)
 
         if join_info.final_field.is_relation:
             if len(targets) == 1:
@@ -1622,6 +1727,8 @@ class Query(BaseExpression):
             col = self._get_col(targets[0], join_info.final_field, alias)
 
         condition = self.build_lookup(lookups, col, value)
+        if track_reuse:
+            split_reuse.update(self._gen_reusable_aliases([condition]))
         lookup_type = condition.lookup_name
         clause = WhereNode([condition], connector=AND)
 
@@ -1711,6 +1818,7 @@ class Query(BaseExpression):
         check_filterable=True,
         summarize=False,
         update_join_types=True,
+        split_reuse=None,
     ):
         """Add a Q-object to the current filter."""
         connector = q_object.connector
@@ -1731,6 +1839,7 @@ class Query(BaseExpression):
                 check_filterable=check_filterable,
                 summarize=summarize,
                 update_join_types=update_join_types,
+                split_reuse=split_reuse,
             )
             joinpromoter.add_votes(needed_inner)
             if child_clause:
@@ -2068,7 +2177,181 @@ class Query(BaseExpression):
 
     @classmethod
     def _gen_col_aliases(cls, exprs):
-        yield from (expr.alias for expr in cls._gen_cols(exprs))
+        for expr in exprs:
+            if isinstance(expr, (list, tuple)):
+                yield from cls._gen_col_aliases(expr)
+            else:
+                yield from (col.alias for col in cls._gen_cols([expr]))
+
+    def _get_dependency_sources(self):
+        """Emitted expressions, excluding compound query branches."""
+        yield from self.annotation_select.values()
+        yield from self.select
+        yield from self.where.children
+        for join in self.alias_map.values():
+            if isinstance(join, Join) and join.filtered_relation is not None:
+                yield join.filtered_relation.resolved_condition
+        if self.extra_order_by:
+            ordering = self.extra_order_by
+        elif not self.default_ordering or self.order_by:
+            ordering = self.order_by
+        elif not self.group_by and (meta := self.get_meta()) and meta.ordering:
+            ordering = meta.ordering
+        else:
+            ordering = ()
+        yield from ordering
+
+    def _has_outer_aggregate(self, expression):
+        """Find grouped dependencies belonging to this query or its ancestors.
+
+        Subquery.contains_aggregate describes the subquery as an expression;
+        it doesn't describe aggregates borrowed through OuterRef. Keep this
+        analysis separate from the metadata used for SQL grouping.
+        """
+
+        def sources(expr):
+            if isinstance(expr, (list, tuple)):
+                return expr
+            getter = getattr(expr, "_get_sources_for_alias_reuse", None)
+            if getter is None:
+                getter = getattr(expr, "get_source_expressions", None)
+            return getter() if getter else ()
+
+        def column_level(alias, scopes):
+            for query, level in reversed(scopes):
+                if alias in query.alias_map:
+                    return level
+            if alias in self.external_aliases:
+                return -1
+            return None
+
+        def annotation(expr, scopes):
+            if isinstance(expr, (OuterRef, ResolvedOuterRef)):
+                return expr
+            if isinstance(expr, (F, str)):
+                name = expr.name if isinstance(expr, F) else expr.removeprefix("-")
+                annotations = scopes[-1][0].annotations
+                return annotations.get(name, annotations.get(name.split(LOOKUP_SEP)[0]))
+            return expr
+
+        def free_columns(expr, level, scopes, aggregate_level):
+            expr = annotation(expr, scopes)
+            if isinstance(expr, (Col, ColPairs)):
+                owner = column_level(expr.alias, scopes)
+                if owner is not None and owner <= aggregate_level:
+                    yield owner
+            elif isinstance(expr, Query):
+                yield from query_columns(expr, level + 1, scopes, aggregate_level)
+            else:
+                level -= getattr(expr, "_outer_ref_depth", 0)
+                for source in sources(expr):
+                    yield from free_columns(source, level, scopes, aggregate_level)
+
+        def query_columns(query, level, scopes, aggregate_level):
+            scopes = (*scopes, (query, level))
+            for source in query._get_dependency_sources():
+                yield from free_columns(source, level, scopes, aggregate_level)
+            for branch in query.combined_queries:
+                yield from query_columns(branch, level, scopes, aggregate_level)
+
+        def visit_query(query, level, scopes):
+            scopes = (*scopes, (query, level))
+            return any(
+                visit(source, level, scopes)
+                for source in query._get_dependency_sources()
+            ) or any(
+                visit_query(branch, level, scopes) for branch in query.combined_queries
+            )
+
+        def visit(expr, level, scopes, skip_aggregate=False):
+            expr = annotation(expr, scopes)
+            level -= getattr(expr, "_outer_ref_depth", 0)
+            if isinstance(expr, Query):
+                return visit_query(expr, level + 1, scopes)
+            if isinstance(expr, Window):
+                function, *over = expr.get_source_expressions()
+                return visit(function, level, scopes, skip_aggregate=True) or any(
+                    visit(source, level, scopes) for source in over
+                )
+            if (
+                not skip_aggregate
+                and getattr(type(expr), "contains_aggregate", False) is True
+            ):
+                if level <= 0:
+                    return True
+                owners = [
+                    owner
+                    for source in sources(expr)
+                    for owner in free_columns(source, level, scopes, level)
+                ]
+                if owners and max(owners) <= 0:
+                    return True
+            return any(visit(source, level, scopes) for source in sources(expr))
+
+        return visit(expression, 0, ((self, 0),))
+
+    @classmethod
+    def _gen_reusable_col_aliases(cls, exprs, annotations=None, skip_aggregates=True):
+        """Find row dependencies without crossing query or aggregate scopes."""
+        for expr in exprs:
+            if isinstance(expr, (list, tuple)):
+                yield from cls._gen_reusable_col_aliases(
+                    expr, annotations, skip_aggregates
+                )
+            elif isinstance(expr, Window):
+                # The window function operates on rows. Its arguments may
+                # still contain aggregates evaluated by the grouped query.
+                function, *over = expr.get_source_expressions()
+                yield from cls._gen_reusable_col_aliases(
+                    [function], annotations, skip_aggregates=False
+                )
+                yield from cls._gen_reusable_col_aliases(over, annotations)
+            # Skip aggregate nodes, but retain scalar siblings in expressions
+            # that contain an aggregate.
+            elif (
+                skip_aggregates
+                and getattr(type(expr), "contains_aggregate", False) is True
+            ):
+                continue
+            elif isinstance(expr, Col):
+                yield expr.alias
+            elif isinstance(expr, (OuterRef, ResolvedOuterRef)):
+                # Unresolved outer names don't refer to local annotations.
+                continue
+            elif annotations is not None and isinstance(expr, (F, str)):
+                name = expr.name if isinstance(expr, F) else expr.removeprefix("-")
+                annotation = annotations.get(name)
+                if annotation is None:
+                    annotation = annotations.get(name.split(LOOKUP_SEP)[0])
+                if annotation is not None:
+                    yield from cls._gen_reusable_col_aliases(
+                        [annotation], skip_aggregates=skip_aggregates
+                    )
+            elif isinstance(expr, Query):
+                yield from (
+                    alias
+                    for alias in cls._gen_reusable_col_aliases(
+                        chain(expr._get_dependency_sources(), expr.combined_queries),
+                        expr.annotations,
+                    )
+                    if alias in expr.external_aliases
+                )
+            else:
+                if hasattr(expr, "_get_sources_for_alias_reuse"):
+                    sources = expr._get_sources_for_alias_reuse()
+                elif hasattr(expr, "get_source_expressions"):
+                    sources = expr.get_source_expressions()
+                else:
+                    sources = []
+                yield from cls._gen_reusable_col_aliases(sources, annotations)
+                if not sources and callable(getattr(expr, "get_external_cols", None)):
+                    yield from (col.alias for col in expr.get_external_cols())
+
+    def _gen_reusable_aliases(self, exprs):
+        for alias in self._gen_reusable_col_aliases(exprs):
+            while alias in self.alias_map:
+                yield alias
+                alias = self.alias_map[alias].parent_alias
 
     def resolve_ref(self, name, allow_joins=True, reuse=None, summarize=False):
         annotation = self.annotations.get(name)
@@ -2121,11 +2404,49 @@ class Query(BaseExpression):
                 reuse.update(join_list)
             return transform
 
-    def split_exclude(self, filter_expr, can_reuse, names_with_path):
+    def _find_reusable_alias(self, inner_alias, inner_joins, can_reuse):
+        """Match an inner join's full path to an established outer row."""
+        if can_reuse is None:
+            return None
+        for candidate in reversed(self.alias_map):
+            if candidate not in can_reuse:
+                continue
+            inner, outer = inner_alias, candidate
+            while True:
+                inner_join = inner_joins.get(inner)
+                outer_join = self.alias_map.get(outer)
+                if isinstance(inner_join, BaseTable):
+                    if (
+                        isinstance(outer_join, BaseTable)
+                        and outer == self.base_table
+                        and inner_join.table_name == outer_join.table_name
+                    ):
+                        return candidate
+                    break
+                if not isinstance(inner_join, Join) or not isinstance(outer_join, Join):
+                    break
+                if (
+                    inner_join.relabeled_clone(
+                        {inner_join.parent_alias: outer_join.parent_alias}
+                    )
+                    != outer_join
+                ):
+                    break
+                inner, outer = inner_join.parent_alias, outer_join.parent_alias
+        return None
+
+    def split_exclude(
+        self,
+        filter_expr,
+        can_reuse,
+        names_with_path,
+        current_negated=False,
+        check_filterable=True,
+    ):
         """
         When doing an exclude against any kind of N-to-many relation, we need
         to use a subquery. This method constructs the nested query, given the
-        original exclude filter (filter_expr) and the portion up to the first
+        exclude filter with its resolved RHS and the portion up to the first
         N-to-many relation field.
 
         For example, if the origin filter is ~Q(child__name='foo'), filter_expr
@@ -2144,12 +2465,30 @@ class Query(BaseExpression):
         query = self.__class__(self.model)
         query._filtered_relations = self._filtered_relations
         filter_lhs, filter_rhs = filter_expr
-        if isinstance(filter_rhs, OuterRef):
-            filter_rhs = OuterRef(filter_rhs)
-        elif isinstance(filter_rhs, F):
-            filter_rhs = OuterRef(filter_rhs.name)
-        query.add_filter(filter_lhs, filter_rhs)
+        # Keep outer annotations and existing OuterRef scopes intact while
+        # allowing the lookup to prepare its RHS (e.g. an IN subquery).
+        clause, _ = query.build_filter(
+            Q((filter_lhs, _ResolvedOuterExpression(filter_rhs))),
+            can_reuse=set(),
+            check_filterable=check_filterable,
+        )
+        query.where.add(clause, AND)
+        lookup = query.where.children[0]
+        # Inner alias changes must not relabel the prepared outer expression.
+        lookup.rhs = _ResolvedOuterExpression(lookup.rhs)
         query.clear_ordering(force=True)
+        if self._split_reuse is not None:
+            # trim_start() replaces the first active join with a BaseTable.
+            # Keep its original path to compare with reusable outer joins.
+            inner_joins = query.alias_map.copy()
+            first_multivalued = next(
+                index
+                for index, info in enumerate(
+                    chain.from_iterable(path for _, path in names_with_path)
+                )
+                if info.m2m
+            )
+            first_multivalued_alias = query._lookup_joins[first_multivalued + 1]
         # Try to have as simple as possible subquery -> trim leading joins from
         # the subquery.
         trimmed_prefix, contains_louter = query.trim_start(names_with_path)
@@ -2157,15 +2496,36 @@ class Query(BaseExpression):
         col = query.select[0]
         select_field = col.target
         alias = col.alias
-        if alias in can_reuse:
+        if self._split_reuse is not None:
+            alias = self._find_reusable_alias(alias, inner_joins, can_reuse)
+        if can_reuse is not None and alias in can_reuse:
+            if self._split_reuse is not None and isinstance(
+                self.alias_map[alias], Join
+            ):
+                _, parts, _ = self.solve_lookup_type(filter_lhs)
+                path, _, _, _ = self.names_to_path(parts, self.get_meta())
+                if (
+                    col.alias == first_multivalued_alias
+                    and sum(info.m2m for info in path) == 1
+                ):
+                    # Reuse the established row without grouping by its PK.
+                    return self.build_filter(
+                        (filter_lhs, _ResolvedOuterExpression(filter_rhs)),
+                        current_negated=current_negated,
+                        can_reuse=can_reuse,
+                        split_subq=False,
+                        check_filterable=check_filterable,
+                    )
             pk = select_field.model._meta.pk
             # Need to add a restriction so that outer query's filters are in
             # effect for the subquery, too.
             query.bump_prefix(self)
-            lookup_class = select_field.get_lookup("exact")
+            lookup_class = pk.get_lookup("exact")
             # Note that the query.select[0].alias is different from alias
             # due to bump_prefix above.
-            lookup = lookup_class(pk.get_col(query.select[0].alias), pk.get_col(alias))
+            lookup = lookup_class(
+                pk.get_col(query.select[0].alias, pk), pk.get_col(alias, pk)
+            )
             query.where.add(lookup, AND)
             query.external_aliases[alias] = True
         else:
@@ -2174,6 +2534,43 @@ class Query(BaseExpression):
             query.where.add(lookup, AND)
 
         condition, needed_inner = self.build_filter(Exists(query))
+
+        if (
+            self._split_reuse is not None
+            and can_reuse is not None
+            and alias in can_reuse
+            and isinstance(self.alias_map[alias], Join)
+        ):
+            # Match at most one copy of the established row. Keeping EXISTS in
+            # the join condition avoids grouping by its PK or a subquery.
+            row_join = self.alias_map[alias]
+            row_alias = self.join(
+                Join(
+                    row_join.table_name,
+                    row_join.parent_alias,
+                    None,
+                    LOUTER,
+                    row_join.join_field,
+                    nullable=True,
+                ),
+                reuse=set(),
+            )
+            row_col = pk.get_col(row_alias, pk)
+            equality = pk.get_lookup("exact")(row_col, pk.get_col(alias, pk))
+            filtered_relation = FilteredRelation(
+                row_join.join_field.name, condition=Q(equality, condition)
+            )
+            filtered_relation.alias = row_alias
+            filtered_relation.resolved_condition = WhereNode(
+                [equality, condition], connector=AND
+            )
+            self.alias_map[row_alias].filtered_relation = filtered_relation
+            condition, needed_inner = self.build_filter(
+                Case(
+                    When(pk.get_lookup("isnull")(row_col, False), then=True),
+                    default=False,
+                )
+            )
 
         if contains_louter:
             or_null_condition, _ = self.build_filter(

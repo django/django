@@ -43,6 +43,28 @@ class CompositePKAggregateTests(TestCase):
         self.assertEqual(user_3, self.user_3)
         self.assertEqual(user_3.comments__id__count, 3)
 
+    def test_negated_multihop_condition_preserves_count(self):
+        tenant = Tenant.objects.create()
+        for number in (10, 11):
+            user = User.objects.create(
+                tenant=tenant, id=number, email=f"user{number}@example.com"
+            )
+            Comment.objects.create(user=user, id=number, integer=10)
+        for integer, expected in ((1, True), (10, False)):
+            with self.subTest(integer=integer):
+                queryset = (
+                    Tenant.objects.filter(pk=tenant.pk)
+                    .values("pk")
+                    .annotate(total=Count("comments"))
+                    .annotate(
+                        flag=Q(comments__integer=10)
+                        & ~Q(comments__user__comments__integer=integer)
+                    )
+                )
+                self.assertSequenceEqual(
+                    queryset.values_list("total", "flag"), [(2, expected)]
+                )
+
     def test_users_annotated_with_aliased_comments_id_count(self):
         user_1, user_2, user_3 = User.objects.annotate(
             comments_count=Count("comments__id")
