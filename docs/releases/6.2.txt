@@ -318,12 +318,12 @@ backends.
 Models
 ------
 
-* Negated :class:`~django.db.models.Q` objects in annotations now use subqueries
-  when traversing multivalued relationships, matching the behavior of
-  :meth:`~django.db.models.query.QuerySet.filter`. This avoids incorrect results
-  and duplicate rows in conditional expressions. Conditions inside aggregates
-  continue to apply to individual related rows, and comparisons involving
-  aggregate expressions retain their grouped evaluation.
+* Negated :class:`~django.db.models.Q` objects in annotations now use
+  subqueries when traversing multivalued relationships, matching the behavior
+  of :meth:`~django.db.models.query.QuerySet.filter`. This avoids incorrect
+  results and duplicate rows in conditional expressions. Conditions inside
+  aggregates continue to apply to individual related rows, and comparisons
+  involving aggregate expressions retain their grouped evaluation.
 
 * Unsaved instances with a composite primary key or a ``db_default`` primary
   key no longer compare equal to other instances.
