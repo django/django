@@ -338,14 +338,16 @@ class Atomic(ContextDecorator):
     async def __aenter__(self):
         blocks = _async_atomic_blocks.get()
         if blocks or await sync_to_async(self._in_atomic_block)():
-            # Nested block: we are either in a nested async block or an
-            # atomic block got created in a sync context. Reuse the current
-            # worker thread, and so its connection.__enter__() creates a savepoint.
-            # This also applies when a sync atomic block is open on the thread that
-            # called async_to_sync(), for example the atomic block of a TestCase.
+            # Nested block: we are either in a nested async block or an atomic
+            # block got created in a sync context. Reuse the current worker
+            # thread, and so its connection.__enter__() creates a savepoint.
+            # This also applies when a sync atomic block is open on the thread
+            # that called async_to_sync(), for example the atomic block of a
+            # TestCase.
             worker_context = None
         else:
-            # Independent transaction: use a fresh worker and its own connection.
+            # Independent transaction: use a fresh worker and its own
+            # connection.
             worker = ThreadPoolExecutor(max_workers=1)
             worker_context = (ThreadSensitiveContext(executor=worker), worker)
             await worker_context[0].__aenter__()
@@ -373,8 +375,9 @@ class Atomic(ContextDecorator):
     @staticmethod
     async def _aexit_thread_context(thread_context, worker):
         try:
-            # Queue connection cleanup before shutdown, without joining the worker
-            # on the event-loop thread. Cancellation must not cancel the cleanup.
+            # Queue connection cleanup before shutdown, without joining the
+            # worker on the event-loop thread. Cancellation must not cancel the
+            # cleanup.
             cleanup = worker.submit(connections.close_all)
             worker.shutdown(wait=False)
             await asyncio.shield(asyncio.wrap_future(cleanup))

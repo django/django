@@ -159,7 +159,8 @@ class AsyncAtomicTests(TransactionTestCase):
                 async with transaction.atomic():
                     pass
             finally:
-                # Cancellation must restore the parent context before returning.
+                # Cancellation must restore the parent context before
+                # returning.
                 self.assertEqual(await get(), parent)
 
         with (
