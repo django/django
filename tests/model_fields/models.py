@@ -655,6 +655,7 @@ class GeneratedModelNull(models.Model):
         expression=Lower("name"),
         output_field=models.CharField(max_length=10),
         db_persist=True,
+        null=True,
     )
 
     class Meta:
@@ -667,6 +668,7 @@ class GeneratedModelNullVirtual(models.Model):
         expression=Lower("name"),
         output_field=models.CharField(max_length=10),
         db_persist=False,
+        null=True,
     )
 
     class Meta:

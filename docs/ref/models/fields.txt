@@ -1366,9 +1366,6 @@ materialized view.
 .. _PostgreSQL: https://www.postgresql.org/docs/current/ddl-generated-columns.html
 .. _SQLite: https://www.sqlite.org/gencol.html#limitations
 
-:attr:`~Field.null` has no effect on ``GeneratedField`` since whether the
-column is nullable depends on the database and expression used.
-
 ``GenericIPAddressField``
 -------------------------
 

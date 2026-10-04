@@ -7,7 +7,7 @@ from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    minimum_database_version = (15,)
+    minimum_database_version = (16,)
     allows_group_by_selected_pks = True
     can_return_columns_from_insert = True
     can_return_rows_from_bulk_insert = True
@@ -25,6 +25,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_no_key_update = True
     can_release_savepoints = True
     supports_comments = True
+    supports_independent_comment_alteration = True
     supports_tablespaces = True
     supports_transactions = True
     can_introspect_materialized_views = True
@@ -174,10 +175,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         }
 
     @cached_property
-    def is_postgresql_16(self):
-        return self.connection.pg_version >= 160000
-
-    @cached_property
     def is_postgresql_17(self):
         return self.connection.pg_version >= 170000
 
@@ -186,7 +183,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return self.connection.pg_version >= 180000
 
     supports_unlimited_charfield = True
-    supports_any_value = property(operator.attrgetter("is_postgresql_16"))
+    supports_any_value = True
     supports_virtual_generated_columns = property(
         operator.attrgetter("is_postgresql_18")
     )

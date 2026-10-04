@@ -1487,10 +1487,14 @@ class Query(BaseExpression):
 
     def get_names_to_join(self, expr):
         """
-        Helper method for the resolution of expressions that could either be a
-        FilteredRelation alias or a field lookup.
+        Helper method for the resolution of expressions that could either be an
+        annotation alias (including FilteredRelation) or a field lookup.
         """
-        return [expr] if expr in self._filtered_relations else expr.split(LOOKUP_SEP)
+        return (
+            [expr]
+            if (expr in self._filtered_relations or expr in self.annotations)
+            else expr.split(LOOKUP_SEP)
+        )
 
     def build_filter(
         self,

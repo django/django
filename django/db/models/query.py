@@ -5,7 +5,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import operator
 import warnings
-from contextlib import nullcontext
+from contextlib import aclosing, nullcontext
 from functools import partial, reduce
 from itertools import chain, islice
 from weakref import ref as weak_ref
@@ -656,28 +656,29 @@ class QuerySet(AltersData):
             chunked_fetch=use_chunked_fetch,
             chunk_size=chunk_size or 2000,
         )
-        if self._prefetch_related_lookups:
-            results = []
+        async with aclosing(aiter(iterable)) as iterator:
+            if self._prefetch_related_lookups:
+                results = []
 
-            async for item in iterable:
-                results.append(item)
-                if len(results) >= chunk_size:
+                async for item in iterator:
+                    results.append(item)
+                    if len(results) >= chunk_size:
+                        await aprefetch_related_objects(
+                            results, *self._prefetch_related_lookups
+                        )
+                        for result in results:
+                            yield result
+                        results.clear()
+
+                if results:
                     await aprefetch_related_objects(
                         results, *self._prefetch_related_lookups
                     )
                     for result in results:
                         yield result
-                    results.clear()
-
-            if results:
-                await aprefetch_related_objects(
-                    results, *self._prefetch_related_lookups
-                )
-                for result in results:
-                    yield result
-        else:
-            async for item in iterable:
-                yield item
+            else:
+                async for item in iterator:
+                    yield item
 
     def aggregate(self, *args, **kwargs):
         """
@@ -3101,6 +3102,7 @@ class RelatedPopulator:
         self.related_populators = get_related_populators(
             klass_info, select, self.db, fetch_mode
         )
+        self.peers = []
         self.local_setter = klass_info["local_setter"]
         self.remote_setter = klass_info["remote_setter"]
 
@@ -3117,6 +3119,9 @@ class RelatedPopulator:
                 self.init_list,
                 obj_data,
             )
+            if self.fetch_mode.track_peers:
+                self.peers.append(weak_ref(obj))
+                obj._state.peers = self.peers
             for rel_iter in self.related_populators:
                 rel_iter.populate(row, obj)
         self.local_setter(from_obj, obj)

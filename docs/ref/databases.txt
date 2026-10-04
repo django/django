@@ -119,7 +119,7 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 15 and higher. `psycopg`_ 3.1.12+ or `psycopg2`_
+Django supports PostgreSQL 16 and higher. `psycopg`_ 3.1.12+ or `psycopg2`_
 2.9.9+ is required, though the latest `psycopg`_ 3.1.12+ is recommended.
 
 .. note::
@@ -254,10 +254,18 @@ database configuration in :setting:`DATABASES`::
 Connection pool
 ---------------
 
-To use a connection pool with `psycopg`_, you can either set ``"pool"`` in the
-:setting:`OPTIONS` part of your database configuration in :setting:`DATABASES`
-to be a dict to be passed to :class:`~psycopg:psycopg_pool.ConnectionPool`, or
-to ``True`` to use the ``ConnectionPool`` defaults::
+Connection pooling allows connections to be reused across threads, reducing
+connection setup overhead. When enabled, Django maintains a separate pool for
+each database alias in each process. Closing a Django database connection
+returns it to the pool for reuse.
+
+Connection pooling is supported only with `psycopg`_ and requires
+``psycopg[pool]`` (which installs :pypi:`psycopg-pool`).
+
+To enable connection pooling, set ``"pool"`` in the :setting:`OPTIONS` part of
+your database configuration in :setting:`DATABASES` to a dictionary of options
+to pass to :class:`~psycopg:psycopg_pool.ConnectionPool`, or to ``True`` to use
+the :class:`~psycopg:psycopg_pool.ConnectionPool` defaults::
 
     DATABASES = {
         "default": {
@@ -269,8 +277,13 @@ to ``True`` to use the ``ConnectionPool`` defaults::
         },
     }
 
-This option requires ``psycopg[pool]`` or :pypi:`psycopg-pool` to be installed
-and is ignored with ``psycopg2``.
+The :setting:`CONN_MAX_AGE` setting must be ``0`` when connection pooling is
+enabled. Configure connection lifetime with the ``max_lifetime`` pool option
+instead.
+
+Unless a ``check`` callback is provided in the pool options,
+:setting:`CONN_HEALTH_CHECKS` determines whether connections are checked when
+retrieved from the pool.
 
 .. _database-server-side-parameters-binding:
 

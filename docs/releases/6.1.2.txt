@@ -2,12 +2,39 @@
 Django 6.1.2 release notes
 ==========================
 
-*Expected October 6, 2026*
+*October 6, 2026*
 
-Django 6.1.2 fixes one data loss issue in 4.0 and several bugs in 6.1.1.
+Django 6.1.2 fixes one security issue with severity "low", three security
+issues with severity "moderate", and provides a fix for an insufficient
+security mitigation in 6.1. It also fixes one data loss issue in 4.0, one
+infinite loop in 5.2, and several bugs in 6.1.1.
 
 Bugfixes
 ========
 
 * Fixed a data loss issue in Django 4.0 where :ref:`network rasters
   <gdal-raster-network>` were deleted by GeoDjango when closed.
+
+* Fixed an infinite loop in Django 5.2 in tuple lookups (e.g. ``TupleIn``) when
+  an ``F()`` expression was used as the left-hand side (:ticket:`37291`).
+
+* Fixed a bug in Django 6.1 where the ``fields.W225`` system check incorrectly
+  warned that ``null`` has no effect on ``GeneratedField`` (:ticket:`37348`).
+
+* Fixed a bug in Django 6.1 where the
+  :class:`~django.db.models.functions.UUID4` function persisted uppercase
+  values on Oracle. Any data already created using this function on Oracle
+  should be migrated to lowercase so that it can be queried correctly
+  (:ticket:`37376`).
+
+* Fixed a bug in Django 6.1 where ``FETCH_PEERS`` did not batch instances
+  loaded by ``select_related()``, causing unnecessary queries
+  (:ticket:`37344`).
+
+* Fixed a bug in Django 6.1 where permissions were not renamed for chained
+  :class:`~django.db.migrations.operations.RenameModel` operations, and where
+  permissions with matching codenames on other models in the same app were
+  also renamed (:ticket:`37361`).
+
+* Fixed a visual regression in Django 6.1 where an extra empty breadcrumb was
+  rendered on the admindocs model index page (:ticket:`37378`).

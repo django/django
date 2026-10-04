@@ -1063,7 +1063,7 @@ class SQLCompiler:
         opts = self.query.get_meta()
 
         for name in self.query.distinct_fields:
-            parts = name.split(LOOKUP_SEP)
+            parts = self.query.get_names_to_join(name)
             _, targets, alias, joins, path, _, transform_function = self._setup_joins(
                 parts, opts, None
             )

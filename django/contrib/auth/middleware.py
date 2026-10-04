@@ -27,6 +27,8 @@ async def auser(request):
 
 
 class AuthenticationMiddleware(MiddlewareMixin):
+    async_capable = False
+
     def process_request(self, request):
         if not hasattr(request, "session"):
             raise ImproperlyConfigured(

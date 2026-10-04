@@ -469,6 +469,22 @@ class ChangeListTests(TestCase):
         with self.assertRaises(IncorrectLookupParameters):
             m.get_changelist_instance(request)
 
+    def test_date_hierarchy_out_of_range(self):
+        """
+        An out-of-range year in a date_hierarchy lookup raises
+        IncorrectLookupParameters rather than letting ValueError or
+        OverflowError propagate (which would surface as an HTTP 500).
+        """
+        m = EventAdmin(Event, custom_site)
+        # "9999" builds a valid from_date but to_date's year + 1 == 10000
+        # raises ValueError; the huge value raises OverflowError in datetime().
+        for invalid_year in ["9999", "99999999999999999999"]:
+            with self.subTest(year=invalid_year):
+                request = self.factory.get("/event/", data={"date__year": invalid_year})
+                request.user = self.superuser
+                with self.assertRaises(IncorrectLookupParameters):
+                    m.get_changelist_instance(request)
+
     @skipUnlessDBFeature("uses_savepoints")
     def test_list_editable_atomicity(self):
         a = Swallow.objects.create(origin="Swallow A", load=4, speed=1)

@@ -147,7 +147,9 @@ Decorators
 Email
 ~~~~~
 
-* ...
+* The :setting:`ADMINS`, :setting:`DEFAULT_FROM_EMAIL`, :setting:`MANAGERS`,
+  and :setting:`SERVER_EMAIL` settings now support
+  :class:`~email.headerregistry.Address` objects.
 
 Error Reporting
 ~~~~~~~~~~~~~~~
@@ -266,12 +268,22 @@ Utilities
   top-level modules did not work, and submodules only worked if already
   imported.
 
+* The new :func:`django.utils.asyncio.maybe_aclosing` returns a context manager
+  that calls ``aclose()`` on a caller-provided iterator only if it defines one.
+
 * ...
 
 Validators
 ~~~~~~~~~~
 
-* ...
+* :class:`~django.core.validators.EmailValidator` now includes the invalid
+  ``username`` or ``domain`` in the ``params`` dict of the
+  :exc:`~django.core.exceptions.ValidationError` it raises. The new
+  :meth:`~django.core.validators.EmailValidator.parse_address`,
+  :meth:`~django.core.validators.EmailValidator.validate`,
+  :meth:`~django.core.validators.EmailValidator.validate_domain`, and
+  :meth:`~django.core.validators.EmailValidator.validate_username` methods can
+  be overridden to customize how the address is parsed and validated.
 
 .. _backwards-incompatible-6.2:
 
@@ -301,11 +313,15 @@ backends.
 :mod:`django.contrib.gis`
 -------------------------
 
-* Support for GEOS 3.10 is removed.
-
 * The seconds value returned by
   :meth:`~django.contrib.gis.gdal.Field.as_datetime` is now a ``c_float``
   rather than a ``c_int``.
+
+* Support for PostGIS 3.2 is removed.
+
+* Support for GDAL 3.3 and 3.4 is removed.
+
+* Support for GEOS 3.10 is removed.
 
 Models
 ------
@@ -313,10 +329,37 @@ Models
 * Unsaved instances with a composite primary key or a ``db_default`` primary
   key no longer compare equal to other instances.
 
+* :class:`django.db.models.GenericIPAddressField` now validates IPv6 input
+  strictly when saving and querying. Invalid IPv6 addresses now raise
+  ``ValidationError`` instead of being silently accepted, and surrounding
+  whitespace is stripped.
+
+Requests and responses
+----------------------
+
+* Most Django-provided middleware now set ``async_capable = False`` to
+  avoid repetitive context switching in ``MiddlewareMixin.__acall__()`` under
+  ASGI. For atypical use cases, e.g. high in-process concurrency over non-ORM
+  I/O, where no thread is otherwise held, the repetitive context switching may
+  be preferable to pinning a thread per request (see :ref:`async_performance`).
+  Such deployments can restore the prior behavior by setting
+  ``async_capable = True``; see :ref:`MiddlewareMixin <upgrading-middleware>`.
+  :class:`~django.contrib.auth.middleware.RemoteUserMiddleware` is unaffected,
+  because it does not use ``MiddlewareMixin``. Neither is
+  :class:`~django.contrib.auth.middleware.LoginRequiredMiddleware` nor
+  ``django.contrib.admindocs.middleware.XViewMiddleware`` affected, as they did
+  not implement ``process_request()`` or ``process_response()``.
+
 Tests
 -----
 
 * The undocumented ``django.test.selenium`` module was removed.
+
+Dropped support for PostgreSQL 15
+---------------------------------
+
+Upstream support for PostgreSQL 15 ends in November 2027. Django 6.2 supports
+PostgreSQL 16 and higher.
 
 Miscellaneous
 -------------
@@ -352,6 +395,13 @@ Miscellaneous
 
 Features deprecated in 6.2
 ==========================
+
+Validators
+----------
+
+* The undocumented ``EmailValidator.validate_domain_part()`` method is
+  deprecated in favor of the new
+  :meth:`~django.core.validators.EmailValidator.validate_domain` method.
 
 Miscellaneous
 -------------

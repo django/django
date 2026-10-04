@@ -1,5 +1,5 @@
 from django.db import connection
-from django.db.models import CharField, F, FloatField, Max
+from django.db.models import CharField, F, FloatField, Max, Value
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import Lower
 from django.test import TestCase, skipUnlessDBFeature
@@ -312,3 +312,9 @@ class DistinctOnTests(TestCase):
         msg = "Cannot call update() after .distinct(*fields)."
         with self.assertRaisesMessage(TypeError, msg):
             qs.update(name="p4")
+
+    def test_distinct_on_annotation_alias_with_lookup_separator(self):
+        celebrities = Celebrity.objects.annotate(
+            celebrity__something=Value(1)
+        ).distinct("celebrity__something")
+        self.assertEqual(len(celebrities), 1)

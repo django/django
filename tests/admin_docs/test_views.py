@@ -589,6 +589,19 @@ class TestModelIndexView(TestDataMixin, AdminDocsTestCase):
             html=True,
         )
 
+    def test_model_index_breadcrumbs(self):
+        self.client.force_login(self.superuser)
+        response = self.client.get(reverse("django-admindocs-models-index"))
+        self.assertContains(
+            response,
+            '<ol class="breadcrumbs">'
+            '<li><a href="/admin/">Home</a></li>'
+            '<li><a href="/admindocs/">Documentation</a></li>'
+            '<li aria-current="page">Models</li>'
+            "</ol>",
+            html=True,
+        )
+
 
 class CustomField(models.Field):
     description = "A custom field type"

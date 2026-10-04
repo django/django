@@ -226,7 +226,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return super()._rename_field_sql(table, old_field, new_field, new_type)
 
     def _alter_column_comment_sql(self, model, new_field, new_type, new_db_comment):
-        # Comment is alter when altering the column type.
+        # Comment is altered when altering the column type.
         return "", []
 
     def _comment_sql(self, comment):

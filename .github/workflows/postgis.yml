@@ -38,6 +38,7 @@ jobs:
             pg_major: "18"
             python: "3.14t"
     name: PostgreSQL ${{ matrix.pg_major }}, Python ${{ matrix.python }}
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v7

@@ -223,11 +223,13 @@ are required.
 
 * ``subject``: A string.
 * ``message``: A string.
-* ``from_email``: A string. If ``None``, Django will use the value of the
+* ``from_email``: A string or :class:`~email.headerregistry.Address` object.
+  If ``None``, Django will use the value of the
   :setting:`DEFAULT_FROM_EMAIL` setting.
-* ``recipient_list``: A list of strings, each an email address. Each
-  member of ``recipient_list`` will see the other recipients in the "To:"
-  field of the email message.
+* ``recipient_list``: A list of strings or
+  :class:`~email.headerregistry.Address` objects, each an email address.
+  Each member of ``recipient_list`` will see the other recipients in the
+  "To:" field of the email message.
 
 The following parameters are optional, and must be given as keyword arguments
 if used.
@@ -280,6 +282,11 @@ can be ``0`` or ``1`` since it can only send one message).
     and ``auth_password`` when a ``connection`` was also provided.
     This now raises a ``TypeError``.
 
+.. versionchanged:: 6.2
+
+    The ``from_email`` and ``recipient_list`` arguments now support
+    :class:`~email.headerregistry.Address` objects in place of strings.
+
 ``send_mass_mail()``
 --------------------
 
@@ -290,6 +297,9 @@ can be ``0`` or ``1`` since it can only send one message).
 ``datatuple`` is a tuple in which each element is in this format::
 
     (subject, message, from_email, recipient_list)
+
+``from_email`` and ``recipient_list`` accept the same values as in
+:func:`send_mail`, including :class:`~email.headerregistry.Address` objects.
 
 ``fail_silently``, ``auth_user``, ``auth_password`` and ``connection`` have the
 same functions as in :func:`send_mail`. They must be given as keyword arguments
@@ -344,6 +354,11 @@ The return value will be the number of successfully delivered messages.
     Older versions ignored ``fail_silently=True``, ``auth_user``,
     and ``auth_password`` when a ``connection`` was also provided.
     This now raises a ``TypeError``.
+
+.. versionchanged:: 6.2
+
+    The ``from_email`` and ``recipient_list`` arguments now support
+    :class:`~email.headerregistry.Address` objects in place of strings.
 
 ``send_mass_mail()`` vs. ``send_mail()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -494,12 +509,14 @@ email backend API :ref:`provides an alternative
 
     * ``body``: The body text. This should be a plain text message.
 
-    * ``from_email``: The sender's address. Both ``fred@example.com`` and
-      ``"Fred" <fred@example.com>`` forms are supported (see
+    * ``from_email``: The sender's address, as a string or
+      :class:`~email.headerregistry.Address` object. Both ``fred@example.com``
+      and ``"Fred" <fred@example.com>`` forms are supported (see
       :ref:`formatting-addresses`). If omitted, the
       :setting:`DEFAULT_FROM_EMAIL` setting is used.
 
-    * ``to``: A list or tuple of recipient addresses.
+    * ``to``: A list or tuple of recipient addresses, each a string or
+      :class:`~email.headerregistry.Address` object.
 
     The following parameters must be given as keyword arguments if used:
 
@@ -543,6 +560,12 @@ email backend API :ref:`provides an alternative
 
         Passing all except the first four parameters as positional arguments is
         deprecated.
+
+    .. versionchanged:: 6.2
+
+        The ``from_email``, ``to``, ``cc``, ``bcc``, and ``reply_to`` arguments
+        now support :class:`~email.headerregistry.Address` objects in place of
+        strings.
 
     For example::
 
