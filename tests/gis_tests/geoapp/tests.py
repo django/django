@@ -47,7 +47,7 @@ from .models import (
 
 
 class GeoModelTest(TestCase):
-    fixtures = ["initial"]
+    fixtures = ["geoapp_initial"]
 
     def test_fixtures(self):
         "Testing geographic model initialization from fixtures."
@@ -359,7 +359,7 @@ class ValidationTests(SimpleTestCase):
 
 
 class GeoLookupTest(TestCase):
-    fixtures = ["initial"]
+    fixtures = ["geoapp_initial"]
 
     @skipUnlessGISLookup("disjoint")
     def test_disjoint_lookup(self):
@@ -845,7 +845,7 @@ class GeoLookupUnsafeTests(TestCase):
 
 class GeoQuerySetTest(TestCase):
     # TODO: GeoQuerySet is removed, organize these test better.
-    fixtures = ["initial"]
+    fixtures = ["geoapp_initial"]
 
     @skipUnlessDBFeature("supports_extent_aggr")
     def test_extent(self):

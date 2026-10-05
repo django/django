@@ -18,7 +18,7 @@ from .models import City, CityUnique, County, Zipcode
 
 
 class GeographyTest(TestCase):
-    fixtures = ["initial"]
+    fixtures = ["geogapp_initial"]
 
     def test01_fixture_load(self):
         "Ensure geography features loaded properly."
@@ -116,7 +116,7 @@ class GeographyTest(TestCase):
 
 
 class GeographyFunctionTests(FuncTestMixin, TestCase):
-    fixtures = ["initial"]
+    fixtures = ["geogapp_initial"]
 
     @skipUnlessDBFeature("supports_extent_aggr")
     def test_cast_aggregate(self):

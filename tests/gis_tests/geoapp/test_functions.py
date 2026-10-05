@@ -40,7 +40,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
     Please keep the tests in function's alphabetic order.
     """
 
-    fixtures = ["initial"]
+    fixtures = ["geoapp_initial"]
 
     def test_asgeojson(self):
         if not connection.features.has_AsGeoJSON_function:
