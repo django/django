@@ -261,31 +261,51 @@ Use ``async with transaction.atomic()`` with asynchronous ORM methods::
 
 Nesting in the same task uses the same thread worker and connection,
 and so nested atomics will create savepoints. The outermost atomic block
-will commit or rollback the transaction.
-However, if another task is created with ``asyncio.create_task()`` from inside
-a task that contains an async atomic block, that new task's atomic block
-will run in a new thread worker and connection, and use an independent
-transaction. This is necessary to prevent concurrent savepoints
-becoming interleaved and affecting each other.
-However, the consequence is that different concurrent tasks, say created
-from the context of the same view, will have independent transactions
-where one could commit and the other could rollback. This is analogous
-to non-async code that might create separate transactions in different
-threads. Therefore, to get full atomic transaction behaviour, it is encouraged
-to avoid creating new tasks within an async context that will interact
-with the database. This also applies to new tasks created by an
-``async_to_sync()`` bridge inside an async atomic context.
+will commit or rollback the transaction. This is the preferred setup.
 
-Creating a task alone does not start an independent transaction. Its ORM calls
-can still use the parent's transaction unless the task enters its own
-``async with transaction.atomic()`` block.
+In contrast, if another task is created with ``asyncio.create_task()``
+from inside a task that contains an async atomic block, that new task's
+atomic block will run in a new thread worker and connection, and use an
+independent transaction. This is necessary to prevent concurrent savepoints
+becoming interleaved and affecting each other. This also applies to tasks
+created by an ``async_to_sync()`` bridge inside an async atomic context.
 
-An async block reached through ``async_to_sync()`` can still join an existing
-synchronous transaction, including the transaction wrapping a
+There are several problems that can occur.
+
+The first is that different concurrent tasks, say created from the context
+of the same view, will have independent transactions when each enters its
+own atomic block. One could commit while another rolls back. This is
+conceptually analogous to sync code that might create separate transactions
+in different threads.
+
+The second issue is that creating a task alone does not start an
+independent transaction. Any ORM calls made in the new task can still use
+the parent's transaction. Separation occurs only when the child enters its
+own ``async with transaction.atomic()`` block.
+
+The third and final issue is the danger of deadlocks.
+Consider the following scenario:
+
+1. A parent transaction updates a row and holds its lock.
+2. The parent creates **and awaits** a new child task.
+3. The child opens an independent transaction and updates that same row.
+
+The problem is that the child waits for the parent’s lock (on the row), but
+the parent is now also awaiting the child task, resulting in a deadlock.
+The database may not detect this deadlock because the parent is waiting in
+Python, not for another database lock.
+
+For these reasons, keep database work in the same task when it must commit
+or roll back together.
+
+If there is no inherited async atomic context, an async block reached
+through ``async_to_sync()`` can still join an existing synchronous
+transaction, including the transaction wrapping a
 :class:`~django.test.TestCase`. Only one task at a time may have async atomic
-blocks open on that shared transaction. Overlapping entry by another task raises
-:exc:`~django.db.transaction.TransactionManagementError` before creating a
-savepoint. Run these blocks in sequence to keep using the shared transaction.
+blocks open on that shared transaction. Overlapping entry by another task
+raises :exc:`~django.db.transaction.TransactionManagementError` before
+creating a savepoint. Run these blocks in sequence to keep using the shared
+transaction.
 
 An async atomic block must be exited in the task that entered it. If
 you use the async context manager form, this will be automatic.
