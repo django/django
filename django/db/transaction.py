@@ -358,7 +358,7 @@ class Atomic(ContextDecorator):
             worker_context = (ThreadSensitiveContext(executor=worker), worker)
             await worker_context[0].__aenter__()
         try:
-            await sync_to_async(self.__enter__)()
+            await sync_to_async(self._enter_async)(task)
         except BaseException:
             if worker_context is not None:
                 await self._aexit_thread_context(*worker_context)
@@ -374,13 +374,34 @@ class Atomic(ContextDecorator):
             )
         _async_atomic_blocks.set(tuple(blocks))
         try:
-            await sync_to_async(self.__exit__)(exc_type, exc_value, traceback)
+            await sync_to_async(self._exit_async)(exc_type, exc_value, traceback)
         finally:
             if worker_context is not None:
                 await self._aexit_thread_context(*worker_context)
 
     def _in_atomic_block(self):
         return get_connection(self.using).in_atomic_block
+
+    def _enter_async(self, task):
+        connection = get_connection(self.using)
+        # A sync parent has no async owner for sibling tasks to inherit.
+        # Check ownership and enter on the worker in one call, so two tasks
+        # cannot both see an unclaimed connection before creating a savepoint.
+        tasks = connection._async_atomic_tasks
+        if tasks and tasks[-1] is not task:
+            raise TransactionManagementError(
+                "Cannot enter an async atomic block while another task is using "
+                "this connection's transaction."
+            )
+        self.__enter__()
+        tasks.append(task)
+
+    def _exit_async(self, exc_type, exc_value, traceback):
+        connection = get_connection(self.using)
+        try:
+            return self.__exit__(exc_type, exc_value, traceback)
+        finally:
+            connection._async_atomic_tasks.pop()
 
     @staticmethod
     async def _aexit_thread_context(thread_context, worker):

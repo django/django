@@ -247,6 +247,161 @@ class AsyncAtomicTests(TransactionTestCase):
             await sync_to_async(sync_caller)()
         self.assertEqual(await Reporter.objects.acount(), 0)
 
+    async def test_synchronous_parent_rejects_overlapping_tasks(self):
+        """Tasks cannot overlap savepoints in an inherited sync transaction."""
+        events = {
+            name: asyncio.Event() for name in ("a_entered", "b_attempted", "a_exited")
+        }
+
+        async def rollback_a():
+            try:
+                with self.assertRaisesMessage(ValueError, "Undo A"):
+                    async with transaction.atomic():
+                        await Reporter.objects.acreate(first_name="Haddock")
+                        async with transaction.atomic():
+                            self.assertEqual(await Reporter.objects.acount(), 2)
+                        events["a_entered"].set()
+                        await events["b_attempted"].wait()
+                        raise ValueError("Undo A")
+            finally:
+                events["a_exited"].set()
+
+        async def overlap_b():
+            await events["a_entered"].wait()
+            try:
+                async with transaction.atomic():
+                    await Reporter.objects.acreate(first_name="Sakharine")
+                    events["b_attempted"].set()
+                    await events["a_exited"].wait()
+            except transaction.TransactionManagementError as exc:
+                return str(exc)
+            finally:
+                events["b_attempted"].set()
+
+        async def after_overlap():
+            async with transaction.atomic():
+                await Reporter.objects.acreate(first_name="Calculus")
+
+        async def callback():
+            async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
+                tasks.create_task(rollback_a())
+                rejected = tasks.create_task(overlap_b())
+            # A new task can use the parent after rejection and rollback.
+            await asyncio.create_task(after_overlap())
+            return rejected.result()
+
+        def sync_caller():
+            with transaction.atomic():
+                Reporter.objects.create(first_name="Tintin")
+                return async_to_sync(callback)()
+
+        error = await sync_to_async(sync_caller)()
+        self.assertEqual(
+            [r.first_name async for r in Reporter.objects.order_by("first_name")],
+            ["Calculus", "Tintin"],
+        )
+        self.assertEqual(
+            error,
+            "Cannot enter an async atomic block while another task is using "
+            "this connection's transaction.",
+        )
+
+    async def test_synchronous_parent_reusable_after_async_errors(self):
+        """Failed entry or exit must release task ownership."""
+
+        async def successful_block():
+            async with transaction.atomic():
+                async with transaction.atomic():
+                    await Reporter.objects.acreate(first_name="Calculus")
+
+        async def callback():
+            for method in ("__enter__", "__exit__"):
+                atomic = transaction.atomic()
+                original = getattr(atomic, method)
+
+                def fail(*args):
+                    if method == "__exit__":
+                        original(*args)
+                    raise ValueError("Atomic failed")
+
+                async def failing_block():
+                    with self.assertRaisesMessage(ValueError, "Atomic failed"):
+                        async with atomic:
+                            pass
+
+                with mock.patch.object(atomic, method, side_effect=fail):
+                    await asyncio.create_task(failing_block())
+                await asyncio.create_task(successful_block())
+
+        def sync_caller():
+            with transaction.atomic():
+                async_to_sync(callback)()
+                self.assertEqual(Reporter.objects.count(), 2)
+                raise ValueError("Undo parent")
+
+        with self.assertRaisesMessage(ValueError, "Undo parent"):
+            await sync_to_async(sync_caller)()
+        self.assertEqual(await Reporter.objects.acount(), 0)
+
+    async def test_synchronous_parent_reusable_after_async_cancellation(self):
+        """Cancelling an async block releases ownership, not its parent."""
+        ready = asyncio.Event()
+        callbacks = []
+
+        async def cancelled_block():
+            async with transaction.atomic():
+                await Reporter.objects.acreate(first_name="Haddock")
+                await sync_to_async(transaction.on_commit)(
+                    lambda: callbacks.append("cancelled")
+                )
+                ready.set()
+                await asyncio.Event().wait()
+
+        async def successful_block():
+            async with transaction.atomic():
+                self.assertEqual(await Reporter.objects.acount(), 1)
+                await Reporter.objects.acreate(first_name="Calculus")
+                await sync_to_async(transaction.on_commit)(
+                    lambda: callbacks.append("successful")
+                )
+
+        async def callback():
+            async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
+                task = tasks.create_task(cancelled_block())
+                await ready.wait()
+                task.cancel()
+            self.assertIs(task.cancelled(), True)
+            await asyncio.create_task(successful_block())
+            self.assertEqual(callbacks, [])
+
+        def sync_caller():
+            with transaction.atomic():
+                Reporter.objects.create(first_name="Tintin")
+                async_to_sync(callback)()
+
+        await sync_to_async(sync_caller)()
+        self.assertEqual(
+            [r.first_name async for r in Reporter.objects.order_by("first_name")],
+            ["Calculus", "Tintin"],
+        )
+        self.assertEqual(callbacks, ["successful"])
+
+    async def test_child_without_atomic_uses_parent_transaction(self):
+        """Creating a task alone does not isolate its ORM calls."""
+        get = sync_to_async(current_thread_and_connection)
+
+        async def child():
+            self.assertEqual(await get(), parent)
+            await Reporter.objects.acreate(first_name="Haddock")
+
+        with self.assertRaisesMessage(ValueError, "Undo parent"):
+            async with transaction.atomic():
+                parent = await get()
+                async with asyncio.timeout(10):
+                    await asyncio.create_task(child())
+                raise ValueError("Undo parent")
+        self.assertEqual(await Reporter.objects.acount(), 0)
+
     async def test_worker_not_reused(self):
         get = sync_to_async(current_thread_and_connection)
         async with transaction.atomic():
@@ -506,6 +661,34 @@ class AsyncAtomicIsolationTests(TransactionTestCase):
         self.assertEqual(
             [r.first_name async for r in Reporter.objects.all()], ["Tintin"]
         )
+
+
+@skipUnlessDBFeature("uses_savepoints")
+class AsyncAtomicMultipleDatabaseTests(TransactionTestCase):
+    available_apps = ["transactions"]
+    databases = {"default", "other"}
+
+    async def test_synchronous_parents_allow_tasks_on_separate_connections(self):
+        """Ownership belongs to each connection, not to the worker thread."""
+        both_entered = asyncio.Barrier(2)
+
+        async def child(using):
+            async with transaction.atomic(using=using):
+                await Reporter.objects.using(using).acreate(first_name="Tintin")
+                await both_entered.wait()
+
+        async def callback():
+            async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
+                for using in self.databases:
+                    tasks.create_task(child(using))
+
+        def sync_caller():
+            with transaction.atomic(), transaction.atomic(using="other"):
+                async_to_sync(callback)()
+
+        await sync_to_async(sync_caller)()
+        for using in self.databases:
+            self.assertEqual(await Reporter.objects.using(using).acount(), 1)
 
 
 @skipUnlessDBFeature("uses_savepoints")

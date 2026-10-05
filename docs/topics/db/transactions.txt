@@ -269,12 +269,23 @@ transaction. This is necessary to prevent concurrent savepoints
 becoming interleaved and affecting each other.
 However, the consequence is that different concurrent tasks, say created
 from the context of the same view, will have independent transactions
-were one could commit and the other could rollback. This is analogous
+where one could commit and the other could rollback. This is analogous
 to non-async code that might create separate transactions in different
 threads. Therefore, to get full atomic transaction behaviour, it is encouraged
 to avoid creating new tasks within an async context that will interact
 with the database. This also applies to new tasks created by an
 ``async_to_sync()`` bridge inside an async atomic context.
+
+Creating a task alone does not start an independent transaction. Its ORM calls
+can still use the parent's transaction unless the task enters its own
+``async with transaction.atomic()`` block.
+
+An async block reached through ``async_to_sync()`` can still join an existing
+synchronous transaction, including the transaction wrapping a
+:class:`~django.test.TestCase`. Only one task at a time may have async atomic
+blocks open on that shared transaction. Overlapping entry by another task raises
+:exc:`~django.db.transaction.TransactionManagementError` before creating a
+savepoint. Run these blocks in sequence to keep using the shared transaction.
 
 An async atomic block must be exited in the task that entered it. If
 you use the async context manager form, this will be automatic.

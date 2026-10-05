@@ -75,6 +75,9 @@ class BaseDatabaseWrapper:
         self.savepoint_ids = []
         # Stack of active 'atomic' blocks.
         self.atomic_blocks = []
+        # Tasks with open async atomic blocks, innermost last.
+        # Access this stack only on the connection's thread.
+        self._async_atomic_tasks = []
         # Tracks if the outermost 'atomic' block should commit on exit,
         # ie. if autocommit was active on entry.
         self.commit_on_exit = True
