@@ -10,7 +10,7 @@ from .models import City, PennsylvaniaCity, State, Truth
 
 
 class GeoRegressionTests(TestCase):
-    fixtures = ["initial"]
+    fixtures = ["geoapp_initial"]
 
     def test_update(self):
         "Testing QuerySet.update() (#10411)."
