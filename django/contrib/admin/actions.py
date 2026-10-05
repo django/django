@@ -8,6 +8,7 @@ from django.contrib.admin.decorators import action
 from django.contrib.admin.utils import model_ngettext
 from django.core.exceptions import PermissionDenied
 from django.template.response import TemplateResponse
+from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy
 
@@ -76,6 +77,7 @@ def delete_selected(modeladmin, request, queryset):
         "perms_lacking": perms_needed,
         "protected": protected,
         "opts": opts,
+        "module_name": str(capfirst(opts.verbose_name_plural)),
         "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
         "media": modeladmin.media,
     }
