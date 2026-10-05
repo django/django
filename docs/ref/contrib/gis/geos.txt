@@ -251,6 +251,13 @@ WKB / EWKB               ``memoryview``
 For the GeoJSON format, the SRID is set based on the ``crs`` member. If ``crs``
 isn't provided, the SRID defaults to 4326.
 
+On GEOS 3.15 and later, ``max_geom_collections`` is ignored because GEOS
+provides built-in protection against deeply nested geometry collections.
+
+.. versionchanged:: 6.2
+
+    ``max_geom_collections`` is now ignored when using GEOS 3.15 or later.
+
 .. classmethod:: GEOSGeometry.from_gml(gml_string)
 
     Constructs a :class:`GEOSGeometry` from the given GML string.

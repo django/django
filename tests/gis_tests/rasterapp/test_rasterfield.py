@@ -1,5 +1,5 @@
 import json
-from unittest import mock
+from unittest import mock, skipIf
 
 from django.contrib.gis.db.models.fields import BaseSpatialField
 from django.contrib.gis.db.models.functions import Distance
@@ -10,6 +10,7 @@ from django.contrib.gis.db.models.lookups import (
 )
 from django.contrib.gis.gdal import GDALRaster
 from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos.libgeos import geos_version_tuple
 from django.contrib.gis.measure import D
 from django.contrib.gis.shortcuts import numpy
 from django.db import connection
@@ -278,6 +279,10 @@ class RasterFieldTest(TransactionTestCase):
             qs = RasterModel.objects.filter(Q(**combos[0]) & Q(**combos[1]))
             self.assertIn(qs.count(), [0, 1])
 
+    @skipIf(
+        geos_version_tuple() >= (3, 15),
+        "GEOS 3.15+ ignores max_geom_collections.",
+    )
     def test_geometry_lookup_falls_back_to_default_max_geom_collections(self):
         def make_geom(depth):
             geom = "POINT(0 0)"
