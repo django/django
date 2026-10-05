@@ -1034,13 +1034,15 @@ this, see the advice on prefetching in :ref:`topics-db-queries-related`.
 Transactions
 ------------
 
-Transactions are **not** currently supported with asynchronous queries and
-updates. You will find that trying to use one raises
-``SynchronousOnlyOperation``.
+Use ``async with transaction.atomic()`` for asynchronous queries and updates
+inside a transaction. A nested transaction with another
+``async with transaction.atomic()`` will create a savepoint. However, additional
+async tasks created from a task that already has an atomic context will get their
+own independent transaction, not a savepoint. See :ref:`async-atomic` for details.
 
-If you wish to use a transaction, we suggest you write your ORM code inside a
-separate, synchronous function and then call that using ``sync_to_async`` - see
-:doc:`/topics/async` for more.
+The synchronous ``with transaction.atomic()`` form cannot be used directly in
+async code, but it can still be wrapped inside ``sync_to_async``.
+See :doc:`/topics/async`.
 
 .. _querying-jsonfield:
 

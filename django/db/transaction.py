@@ -157,8 +157,9 @@ def on_commit(func, using=None, robust=False):
 #################################
 
 # Async atomic blocks entered in the current context, innermost last. Each item
-# is a (ThreadSensitiveContext, worker) pair when the block owns a worker,
-# or None when it reuses the worker of an enclosing block.
+# is an (owning task, worker context) pair. The worker context is a
+# (ThreadSensitiveContext, worker) pair when this block owns a worker, or None
+# when it reuses the worker of an enclosing block in the same task.
 _async_atomic_blocks = ContextVar("async_atomic_blocks", default=())
 
 
@@ -337,13 +338,18 @@ class Atomic(ContextDecorator):
 
     async def __aenter__(self):
         blocks = _async_atomic_blocks.get()
-        if blocks or await sync_to_async(self._in_atomic_block)():
-            # Nested block: we are either in a nested async block or an atomic
-            # block got created in a sync context. Reuse the current worker
-            # thread, and so its connection.__enter__() creates a savepoint.
-            # This also applies when a sync atomic block is open on the thread
-            # that called async_to_sync(), for example the atomic block of a
-            # TestCase.
+        task = asyncio.current_task()
+        if blocks:
+            # Tasks inherit context variables, not ownership of a transaction.
+            # Only same-task nesting can use this connection's savepoint stack.
+            # Do not inspect the inherited connection in another task: it may
+            # belong to an active parent, or its worker may already be closed.
+            nested = blocks[-1][0] is task
+        else:
+            # An async bridge may be inside a sync atomic block, including
+            # the transaction wrapping a TestCase. Preserve that connection.
+            nested = await sync_to_async(self._in_atomic_block)()
+        if nested:
             worker_context = None
         else:
             # Independent transaction: use a fresh worker and its own
@@ -357,11 +363,15 @@ class Atomic(ContextDecorator):
             if worker_context is not None:
                 await self._aexit_thread_context(*worker_context)
             raise
-        _async_atomic_blocks.set((*blocks, worker_context))
+        _async_atomic_blocks.set((*blocks, (task, worker_context)))
         return self
 
     async def __aexit__(self, exc_type, exc_value, traceback):
-        *blocks, worker_context = _async_atomic_blocks.get()
+        *blocks, (task, worker_context) = _async_atomic_blocks.get()
+        if task is not asyncio.current_task():
+            raise TransactionManagementError(
+                "An async atomic block must be exited in the task that entered it."
+            )
         _async_atomic_blocks.set(tuple(blocks))
         try:
             await sync_to_async(self.__exit__)(exc_type, exc_value, traceback)

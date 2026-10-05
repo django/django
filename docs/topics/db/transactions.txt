@@ -243,6 +243,46 @@ Django provides a single API to control database transactions.
     You may use ``atomic`` when autocommit is turned off. It will only use
     savepoints, even for the outermost block.
 
+.. _async-atomic:
+
+Asynchronous atomic blocks
+--------------------------
+
+Use ``async with transaction.atomic()`` with asynchronous ORM methods::
+
+    async def create_reporter():
+        # This is the first atomic block in the async task, so it opens a transaction.
+        async with transaction.atomic():
+            reporter = await Reporter.objects.acreate(first_name="Tintin")
+            # This is a nested atomic that is part of the same async task
+            async with transaction.atomic():
+                # A savepoint in the same task and transaction.
+                await Reporter.objects.filter(pk=reporter.pk).aupdate(last_name="Reporter")
+
+Nesting in the same task uses the same thread worker and connection,
+and so nested atomics will create savepoints. The outermost atomic block
+will commit or rollback the transaction.
+However, if another task is created with ``asyncio.create_task()`` from inside
+a task that contains an async atomic block, that new task's atomic block
+will run in a new thread worker and connection, and use an independent
+transaction. This is necessary to prevent concurrent savepoints
+becoming interleaved and affecting each other.
+However, the consequence is that different concurrent tasks, say created
+from the context of the same view, will have independent transactions
+were one could commit and the other could rollback. This is analogous
+to non-async code that might create separate transactions in different
+threads. Therefore, to get full atomic transaction behaviour, it is encouraged
+to avoid creating new tasks within an async context that will interact
+with the database. This also applies to new tasks created by an
+``async_to_sync()`` bridge inside an async atomic context.
+
+An async atomic block must be exited in the task that entered it. If
+you use the async context manager form, this will be automatic.
+The ``atomic`` decorator will not work if called directly from an async
+context, and ``SynchronousOnlyOperation`` will be raised. But the
+``atomic`` decorator will work as normal on sync code inside
+``sync_to_async``.
+
 .. admonition:: Performance considerations
 
     Open transactions have a performance cost for your database server. To

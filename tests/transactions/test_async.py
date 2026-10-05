@@ -3,7 +3,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 from unittest import mock
 
-from asgiref.sync import sync_to_async
+from asgiref.sync import async_to_sync, sync_to_async
 
 from django.db import connection, connections, transaction
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
@@ -88,6 +88,164 @@ class AsyncAtomicTests(TransactionTestCase):
         self.assertIsNot(block_connection, outer_connection)
         self.assertIs(nested_thread, block_thread)
         self.assertIs(nested_connection, block_connection)
+
+    async def test_child_task_uses_independent_worker(self):
+        """A child gets its own worker, even inside a parent's savepoint."""
+        get = sync_to_async(current_thread_and_connection)
+
+        async def child():
+            async with transaction.atomic(durable=True):
+                child_thread, child_connection = await get()
+                self.assertIsNot(child_thread, parent_thread)
+                self.assertIsNot(child_connection, parent_connection)
+                async with transaction.atomic():
+                    self.assertEqual(await get(), (child_thread, child_connection))
+            return child_thread, child_connection
+
+        async with transaction.atomic():
+            parent_thread, parent_connection = await get()
+            async with transaction.atomic():
+                async with asyncio.timeout(10):
+                    worker, _ = await asyncio.create_task(child())
+                self.assertEqual(await get(), (parent_thread, parent_connection))
+            self.assertIsNotNone(parent_connection.connection)
+        await asyncio.to_thread(worker.join, 5)
+        self.assertIs(worker.is_alive(), False)
+
+    async def test_reuse_atomic_in_child_task(self):
+        """Reusing a manager does not share its task's transaction state."""
+        atomic = transaction.atomic()
+        get = sync_to_async(current_thread_and_connection)
+
+        async def child():
+            async with atomic:
+                child_thread, child_connection = await get()
+                self.assertIsNot(child_thread, parent_thread)
+                self.assertIsNot(child_connection, parent_connection)
+                async with atomic:
+                    self.assertEqual(await get(), (child_thread, child_connection))
+
+        async with atomic:
+            parent_thread, parent_connection = await get()
+            async with asyncio.timeout(10):
+                await asyncio.create_task(child())
+            self.assertEqual(await get(), (parent_thread, parent_connection))
+
+    async def test_child_enters_after_parent_exit(self):
+        """An inherited, closed worker is not consulted before child entry."""
+        release = asyncio.Event()
+        get = sync_to_async(current_thread_and_connection)
+
+        async def child():
+            await release.wait()
+            async with transaction.atomic():
+                return await get()
+
+        async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
+            async with transaction.atomic():
+                parent_thread, parent_connection = await get()
+                task = tasks.create_task(child())
+            release.set()
+        child_thread, child_connection = task.result()
+        self.assertIsNot(child_thread, parent_thread)
+        self.assertIsNot(child_connection, parent_connection)
+        await asyncio.to_thread(child_thread.join, 5)
+        self.assertIs(child_thread.is_alive(), False)
+
+    async def test_child_cancellation_preserves_parent(self):
+        """Cancelling a child's block leaves its parent's block usable."""
+        ready = asyncio.Event()
+        get = sync_to_async(current_thread_and_connection)
+        callbacks = []
+        child_workers = []
+
+        async def child():
+            async with transaction.atomic():
+                child_workers.append(await get())
+                await sync_to_async(transaction.on_commit)(
+                    lambda: callbacks.append("child")
+                )
+                ready.set()
+                await asyncio.Event().wait()
+
+        async with transaction.atomic():
+            parent = await get()
+            await sync_to_async(transaction.on_commit)(
+                lambda: callbacks.append("parent")
+            )
+            async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
+                task = tasks.create_task(child())
+                await ready.wait()
+                task.cancel()
+            self.assertEqual(await get(), parent)
+            self.assertIs(
+                await sync_to_async(lambda: connection.in_atomic_block)(), True
+            )
+            async with transaction.atomic():
+                self.assertEqual(await get(), parent)
+            self.assertEqual(callbacks, [])
+        self.assertEqual(callbacks, ["parent"])
+        child_thread, child_connection = child_workers[0]
+        self.assertIsNot(child_thread, parent[0])
+        await asyncio.to_thread(child_thread.join, 5)
+        self.assertIs(child_thread.is_alive(), False)
+
+    async def test_exit_from_another_task_is_rejected(self):
+        """Cross-task exit must not pop or close the parent's transaction."""
+        atomic = transaction.atomic()
+        get = sync_to_async(current_thread_and_connection)
+        async with atomic:
+            parent = await get()
+            with self.assertRaisesMessage(
+                transaction.TransactionManagementError,
+                "An async atomic block must be exited in the task that entered it.",
+            ):
+                await asyncio.create_task(atomic.__aexit__(None, None, None))
+            self.assertEqual(await get(), parent)
+            self.assertIs(
+                await sync_to_async(lambda: connection.in_atomic_block)(), True
+            )
+            await Reporter.objects.acreate(first_name="Tintin")
+        self.assertEqual(await Reporter.objects.acount(), 1)
+
+    async def test_async_bridge_task_uses_independent_worker(self):
+        """An async bridge's new task follows the same ownership rule."""
+        get = sync_to_async(current_thread_and_connection)
+
+        async def callback():
+            async with transaction.atomic():
+                return await get()
+
+        async with transaction.atomic():
+            parent = await get()
+            async with asyncio.timeout(10):
+                child_thread, child_connection = await sync_to_async(
+                    async_to_sync(callback)
+                )()
+            self.assertIsNot(child_thread, parent[0])
+            self.assertIsNot(child_connection, parent[1])
+            async with transaction.atomic():
+                self.assertEqual(await get(), parent)
+        await asyncio.to_thread(child_thread.join, 5)
+        self.assertIs(child_thread.is_alive(), False)
+
+    async def test_async_block_joins_synchronous_transaction(self):
+        """An async bridge can join an existing synchronous transaction."""
+
+        async def callback():
+            async with transaction.atomic():
+                self.assertEqual(await Reporter.objects.acount(), 1)
+                await Reporter.objects.acreate(first_name="Haddock")
+
+        def sync_caller():
+            with transaction.atomic():
+                Reporter.objects.create(first_name="Tintin")
+                async_to_sync(callback)()
+                raise ValueError("Undo both writes")
+
+        with self.assertRaisesMessage(ValueError, "Undo both writes"):
+            await sync_to_async(sync_caller)()
+        self.assertEqual(await Reporter.objects.acount(), 0)
 
     async def test_worker_not_reused(self):
         get = sync_to_async(current_thread_and_connection)
@@ -251,6 +409,81 @@ class AsyncAtomicIsolationTests(TransactionTestCase):
         await asyncio.gather(task_one(), task_two())
         self.assertEqual(
             [r.first_name async for r in Reporter.objects.all()], ["Haddock"]
+        )
+
+    async def test_child_commit_survives_parent_rollback(self):
+        """A completed child transaction is not a parent's savepoint."""
+        get = sync_to_async(current_thread_and_connection)
+        callbacks = []
+        child_workers = []
+
+        async def child():
+            async with transaction.atomic():
+                child_thread, child_connection = await get()
+                child_workers.append((child_thread, child_connection))
+                self.assertIsNot(child_thread, parent_thread)
+                self.assertIsNot(child_connection, parent_connection)
+                self.assertIs(
+                    await Reporter.objects.filter(pk=parent.pk).aexists(), False
+                )
+                await Reporter.objects.acreate(first_name="Haddock")
+                await sync_to_async(transaction.on_commit)(
+                    lambda: callbacks.append("child")
+                )
+
+        with self.assertRaisesMessage(ValueError, "Undo parent"):
+            async with transaction.atomic():
+                parent_thread, parent_connection = await get()
+                parent = await Reporter.objects.acreate(first_name="Tintin")
+                await sync_to_async(transaction.on_commit)(
+                    lambda: callbacks.append("parent")
+                )
+                async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
+                    tasks.create_task(child())
+                self.assertEqual(callbacks, ["child"])
+                self.assertEqual(await get(), (parent_thread, parent_connection))
+                raise ValueError("Undo parent")
+        self.assertEqual(
+            [r.first_name async for r in Reporter.objects.all()], ["Haddock"]
+        )
+        self.assertEqual(callbacks, ["child"])
+        child_thread, child_connection = child_workers[0]
+        await asyncio.to_thread(child_thread.join, 5)
+        self.assertIs(child_thread.is_alive(), False)
+        self.assertIsNone(child_connection.connection)
+
+    async def test_overlapping_child_blocks_rollback_their_own_writes(self):
+        """Crossed child exits must not pop each other's savepoints."""
+        a_entered = asyncio.Event()
+        b_entered = asyncio.Event()
+        a_exited = asyncio.Event()
+
+        async def rollback_a():
+            try:
+                with self.assertRaisesMessage(ValueError, "Undo A"):
+                    async with transaction.atomic():
+                        await Reporter.objects.acreate(first_name="Haddock")
+                        a_entered.set()
+                        await b_entered.wait()
+                        raise ValueError("Undo A")
+            finally:
+                a_exited.set()
+
+        async def commit_b():
+            await a_entered.wait()
+            async with transaction.atomic():
+                await Reporter.objects.acreate(first_name="Calculus")
+                b_entered.set()
+                await a_exited.wait()
+
+        async with transaction.atomic():
+            await Reporter.objects.acreate(first_name="Tintin")
+            async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
+                tasks.create_task(rollback_a())
+                tasks.create_task(commit_b())
+        self.assertEqual(
+            [r.first_name async for r in Reporter.objects.order_by("first_name")],
+            ["Calculus", "Tintin"],
         )
 
     async def test_concurrent_transactions(self):
