@@ -118,9 +118,7 @@ class FileBasedCache(BaseCache):
             self._delete(fname)
 
     def _createdir(self):
-        # Workaround because os.makedirs() doesn't apply the "mode" argument
-        # to intermediate-level directories.
-        # https://github.com/python/cpython/issues/86533
+        # Apply the mode to intermediate-level directories too.
         safe_makedirs(self._dir, mode=0o700, exist_ok=True)
 
     def _key_to_file(self, key, version=None):
