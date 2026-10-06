@@ -1039,11 +1039,13 @@ Default: ``2621440`` (i.e. 2.5 MB).
 
 The maximum size in bytes that a request body may be before a
 :exc:`~django.core.exceptions.SuspiciousOperation` (``RequestDataTooBig``) is
-raised. The check is done when accessing ``request.body`` or ``request.POST``
-and is calculated against the total request size excluding any file upload
-data (``request.FILES``). You can set this to ``None`` to disable the check.
-Applications that are expected to receive unusually large form posts should
-tune this setting.
+raised. The check is done when accessing ``request.body`` or ``request.POST``.
+For ``request.body``, the check is calculated against the full size of the
+request, including any file upload data, since the entire body must be read
+into memory to populate it. For ``request.POST``, the calculation excludes
+any file upload data (``request.FILES``). You can set this to ``None`` to
+disable the check. Applications that are expected to receive unusually large
+form posts should tune this setting.
 
 Under ASGI, the entire request may be spooled to disk before this limit is
 enforced. Therefore, it is strongly recommended to place additional protections
