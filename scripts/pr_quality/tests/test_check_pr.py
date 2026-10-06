@@ -778,7 +778,11 @@ class TestIntegration(BaseTestCase):
             mock_gh.call_args_list,
             [
                 mock.call(
-                    "GET", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+                    "GET",
+                    "/issues/10/comments",
+                    "test-token",
+                    "test/repo",
+                    params={"per_page": 100, "page": 1},
                 ),
                 mock.call(
                     "POST", "/issues/10/comments", "test-token", "test/repo", mock.ANY
@@ -794,7 +798,11 @@ class TestIntegration(BaseTestCase):
             mock_gh.call_args_list,
             [
                 mock.call(
-                    "GET", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+                    "GET",
+                    "/issues/10/comments",
+                    "test-token",
+                    "test/repo",
+                    params={"per_page": 100, "page": 1},
                 ),
                 mock.call(
                     "POST", "/issues/10/comments", "test-token", "test/repo", mock.ANY
@@ -813,7 +821,11 @@ class TestIntegration(BaseTestCase):
             mock_gh.call_args_list,
             [
                 mock.call(
-                    "GET", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+                    "GET",
+                    "/issues/10/comments",
+                    "test-token",
+                    "test/repo",
+                    params={"per_page": 100, "page": 1},
                 ),
                 mock.call(
                     "POST", "/issues/10/comments", "test-token", "test/repo", mock.ANY
@@ -832,7 +844,11 @@ class TestIntegration(BaseTestCase):
             mock_gh.call_args_list,
             [
                 mock.call(
-                    "GET", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+                    "GET",
+                    "/issues/10/comments",
+                    "test-token",
+                    "test/repo",
+                    params={"per_page": 100, "page": 1},
                 ),
                 mock.call(
                     "POST", "/issues/10/comments", "test-token", "test/repo", mock.ANY
@@ -852,7 +868,11 @@ class TestIntegration(BaseTestCase):
             mock_gh.call_args_list,
             [
                 mock.call(
-                    "GET", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+                    "GET",
+                    "/issues/10/comments",
+                    "test-token",
+                    "test/repo",
+                    params={"per_page": 100, "page": 1},
                 ),
                 mock.call(
                     "POST", "/issues/10/comments", "test-token", "test/repo", mock.ANY
@@ -870,7 +890,11 @@ class TestIntegration(BaseTestCase):
             mock_gh.call_args_list,
             [
                 mock.call(
-                    "GET", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+                    "GET",
+                    "/issues/10/comments",
+                    "test-token",
+                    "test/repo",
+                    params={"per_page": 100, "page": 1},
                 ),
                 mock.call(
                     "POST", "/issues/10/comments", "test-token", "test/repo", mock.ANY
