@@ -9,4 +9,5 @@ Django 6.1.3 fixes several bugs in 6.1.2.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 6.1 where the YAML serializer crashed if passed
+  the ``sort_keys`` option (:ticket:`37405`).
