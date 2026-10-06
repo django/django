@@ -17,3 +17,16 @@ passed to upload handlers, potentially consuming excessive memory.
 
 This issue has severity "low" according to the :ref:`Django security policy
 <severity-levels>`.
+
+CVE-2026-111211: Potential log injection via unescaped geometry form values
+===========================================================================
+
+:class:`~django.contrib.gis.forms.GeometryField` and its widgets logged invalid
+submitted values directly, allowing control characters (e.g. newlines or ANSI
+escape sequences) to be written unescaped into logs. This could enable log
+injection or forgery, letting attackers manipulate log appearance or
+structure, especially in logs processed by external systems or viewed in
+terminals.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
