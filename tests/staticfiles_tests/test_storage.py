@@ -913,7 +913,7 @@ class TestStaticFilePermissions(CollectionTestCase):
         for directory in tests:
             with self.subTest(directory=directory):
                 dir_mode = directory.stat().st_mode & 0o777
-                self.assertEqual(dir_mode, 0o765)
+                self.assertEqual(dir_mode, 0o765 & ~self.umask)
 
     @override_settings(
         FILE_UPLOAD_PERMISSIONS=None,
