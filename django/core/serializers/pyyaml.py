@@ -46,11 +46,11 @@ class Serializer(PythonSerializer):
 
     def end_serialization(self):
         self.options.setdefault("allow_unicode", True)
+        self.options.setdefault("sort_keys", False)
         yaml.dump(
             self.objects,
             self.stream,
             Dumper=DjangoSafeDumper,
-            sort_keys=False,
             **self.options,
         )
 
