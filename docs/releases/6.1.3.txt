@@ -11,3 +11,10 @@ Bugfixes
 
 * Fixed a regression in Django 6.1 where the YAML serializer crashed if passed
   the ``sort_keys`` option (:ticket:`37405`).
+
+* Fixed a regression in Django 6.1 where a :class:`~django.db.models.Value`
+  expression with a ``None`` value and an output field other than
+  :class:`~django.db.models.JSONField` crashed on SQLite when used in a
+  top-level :class:`~django.db.models.JSONField` :lookup:`in` lookup
+  (:ticket:`37403`). Using such an expression in an ``IN`` lookup is likely
+  unintended, since SQL ``NULL`` cannot match any value.
