@@ -1051,6 +1051,9 @@ class TestQuerying(TestCase):
         tests = [
             ([Value("7", output_field=IntegerField())], [self.objs[11]]),
             ([Value("yes", output_field=models.CharField())], [self.objs[10]]),
+            # None with anything but JSONField is almost certainly not what the
+            # user intends--nothing is IN (NULL)--but it shouldn't crash.
+            ([Value(None, output_field=models.CharField())], []),
         ]
         for lookup_value, expected in tests:
             with self.subTest(value__in=lookup_value), transaction.atomic():

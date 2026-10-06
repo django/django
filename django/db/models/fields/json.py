@@ -429,19 +429,26 @@ class JSONIn(ProcessJSONLHSMixin, lookups.In):
             sql,
             param,
         )
-        if not connection.features.has_native_json_field and (
-            not hasattr(param, "as_sql") or isinstance(param, expressions.Value)
+        is_value = isinstance(param, expressions.Value)
+        if (
+            not connection.features.has_native_json_field
+            and (not hasattr(param, "as_sql") or is_value)
+            # A non-JSON Value(None) compiles to a literal NULL with no params,
+            # so there is nothing to encode or wrap.
+            and not (
+                is_value
+                and param.value is None
+                and not isinstance(param._output_field_or_none, JSONField)
+            )
         ):
-            if isinstance(param, expressions.Value) and not isinstance(
-                param._output_field_or_none, JSONField
-            ):
+            if is_value and not isinstance(param._output_field_or_none, JSONField):
                 output_field = param._output_field_or_none
                 value = param.value
                 if output_field is not None:
                     value = output_field.get_prep_value(value)
                 params = [connection.ops.adapt_json_value(value, None)]
             if connection.vendor == "oracle":
-                value = param.value if hasattr(param, "value") else json.loads(param)
+                value = param.value if is_value else json.loads(param)
                 sql = "%s(JSON_OBJECT('value' VALUE %%s FORMAT JSON), '$.value')"
                 if isinstance(value, (list, dict)):
                     sql %= "JSON_QUERY"
