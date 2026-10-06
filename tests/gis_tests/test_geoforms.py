@@ -559,6 +559,39 @@ class GeometryWidgetTests(SimpleTestCase):
         context = widget.get_context("geometry", None, None)
         self.assertEqual(context["widget"]["attrs"]["geom_name"], "Geometry")
 
+    def test_deserialize_logs_escaped_value(self):
+        # log_message() is fully covered by logging_tests in
+        # LogResponseRealLoggerTests.test_unicode_escape_escaping().
+        test_cases = [
+            ("line\nbreak", "line\\nbreak"),
+            ("map 🗺️", "map \\U0001f5fa\\ufe0f"),
+            ("escape\x1b[31mred\x1b[0m", "escape\\x1b[31mred\\x1b[0m"),
+        ]
+        for value, escaped_value in test_cases:
+            with (
+                self.subTest(value=value),
+                self.assertLogs("django.contrib.gis", "ERROR") as logs,
+            ):
+                self.assertIsNone(BaseGeometryWidget().deserialize(value))
+                message = logs.records[0].getMessage()
+                self.assertEqual(
+                    message,
+                    f"Error creating geometry from value '{escaped_value}' "
+                    "(String input unrecognized as WKT EWKT, and HEXEWKB.)",
+                )
+
+    def test_deserialize_logs_trimmed_value(self):
+        value = "x" * 5000
+        with self.assertLogs("django.contrib.gis", "ERROR") as logs:
+            self.assertIsNone(BaseGeometryWidget().deserialize(value))
+        self.maxDiff = None
+        self.assertEqual(
+            logs.records[0].getMessage(),
+            "Error creating geometry from value "
+            "'%s… <trimmed 904 chars out of 5000>' "
+            "(String input unrecognized as WKT EWKT, and HEXEWKB.)" % ("x" * 4096),
+        )
+
     def test_subwidgets(self):
         widget = forms.BaseGeometryWidget()
         self.assertEqual(
