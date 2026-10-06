@@ -371,6 +371,19 @@ Miscellaneous
   submodules in ambiguous cases where depending on prior import state, a
   same-named attribute of the parent module might have been returned instead.
 
+* Directories created by :class:`~django.core.files.storage.FileSystemStorage`
+  when :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS` (or
+  :attr:`~django.core.files.storage.FileSystemStorage.directory_permissions_mode`)
+  is set, and by the file-based cache backend, now have the requested mode
+  combined with the process's umask value, matching the semantics of Python's
+  :func:`os.mkdir`. For example, a typical ``0o022`` umask leaves ``0o755``
+  unchanged but turns ``0o775`` into ``0o755``, and the set-group-ID bit is no
+  longer explicitly set. If a deployment relies on group-writable modes or the
+  set-group-ID bit, adjust the umask of the process running Django (e.g. with
+  the ``UMask=`` option of ``systemd``) or set the set-group-ID bit on the
+  parent directory so that new subdirectories inherit it.
+  :setting:`FILE_UPLOAD_PERMISSIONS` is unaffected.
+
 * The minimum supported version of ``asgiref`` is increased from 3.9.1 to
   3.12.1.
 

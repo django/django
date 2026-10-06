@@ -1679,15 +1679,25 @@ See also :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE`.
 
 Default: ``None``
 
-The numeric mode to apply to directories created in the process of uploading
-files.
+The numeric mode (e.g. ``0o755``) to apply to directories created in the
+process of uploading files, including any newly-created, intermediate-level
+directories. As with Python's :func:`os.mkdir`, this mode is combined with the
+process's umask value, and bits other than the last 9, such as the set-group-ID
+bit in ``0o2775``, are platform-dependent and may be ignored.
+
+The file permission bits of existing parent directories are not changed. Always
+prefix the mode with ``0o`` (see :setting:`FILE_UPLOAD_PERMISSIONS`).
+
+If ``None``, directories are created with the default mode, which is also
+combined with the process's umask value.
 
 This setting also determines the default permissions for collected static
 directories when using the :djadmin:`collectstatic` management command. See
 :djadmin:`collectstatic` for details on overriding it.
 
-This value mirrors the functionality and caveats of the
-:setting:`FILE_UPLOAD_PERMISSIONS` setting.
+.. versionchanged:: 6.2
+
+    The mode is now combined with the process's umask value.
 
 .. setting:: FILE_UPLOAD_PERMISSIONS
 
