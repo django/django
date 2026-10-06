@@ -36,6 +36,51 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+October 6, 2026 - :cve:`2026-77050`
+-----------------------------------
+
+Potential denial-of-service vulnerability in
+``get_supported_language_variant()``.
+`Full description
+<https://www.djangoproject.com/weblog/2026/oct/06/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <7e878b0f8bd42260903e6a0d38996a93b0474a0b>`
+* Django 6.0 :commit:`(patch) <3d32ee80ae52745d686bf94d3555000ddf073267>`
+* Django 5.2 :commit:`(patch) <02a69e3791e3df23d45ea4ea7e7fc489f0eef2be>`
+
+October 6, 2026 - :cve:`2026-84429`
+-----------------------------------
+
+Potential denial-of-service vulnerability in HTTP header parsing.
+`Full description
+<https://www.djangoproject.com/weblog/2026/oct/06/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <de56deeabd4c48dfb5193f0001469d80102fb367>`
+* Django 6.0 :commit:`(patch) <3d8f121695c21234aff3071de0d38b6bd38c3f52>`
+* Django 5.2 :commit:`(patch) <6ecd66e09a383be004a78a3a738ea9727ff07b0e>`
+
+October 6, 2026 - :cve:`2026-87890`
+-----------------------------------
+
+Potential request forgery via spatial lookup byte values.
+`Full description
+<https://www.djangoproject.com/weblog/2026/oct/06/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <4e77ef1e69c94780006b82795aa7db101996c3af>`
+* Django 6.0 :commit:`(patch) <a2347fe8234a1831d56c875acc0ea51e0742957c>`
+* Django 5.2 :commit:`(patch) <dd0558d1617619e0d66163675ef02135d0f54e5f>`
+
+October 6, 2026 - :cve:`2026-87975`
+-----------------------------------
+
+Privilege abuse in model formsets with editable primary keys.
+`Full description
+<https://www.djangoproject.com/weblog/2026/oct/06/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <cce6c57ed30ea83725f9d6abb2fe5ee932bab107>`
+* Django 6.0 :commit:`(patch) <b83ab92bc5474558b083a840ea4628b3261b2cfe>`
+* Django 5.2 :commit:`(patch) <ff27883ca055aa9ab23015b50674a5b10dfe5a41>`
+
 August 4, 2026 - :cve:`2026-15307`
 ----------------------------------
 
