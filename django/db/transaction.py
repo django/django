@@ -339,21 +339,17 @@ class Atomic(ContextDecorator):
     async def __aenter__(self):
         blocks = _async_atomic_blocks.get()
         task = asyncio.current_task()
-        if blocks:
-            # Tasks inherit context variables, not ownership of a transaction.
-            # Only same-task nesting can use this connection's savepoint stack.
-            # Do not inspect the inherited connection in another task: it may
-            # belong to an active parent, or its worker may already be closed.
-            nested = blocks[-1][0] is task
-        else:
-            # An async bridge may be inside a sync atomic block, including
-            # the transaction wrapping a TestCase. Preserve that connection.
-            nested = await sync_to_async(self._in_atomic_block)()
-        if nested:
-            worker_context = None
-        else:
-            # Independent transaction: use a fresh worker and its own
-            # connection.
+        # Only the owning task can nest. Reject inherited contexts before
+        # consulting a worker that may already have been shut down.
+        if blocks and blocks[-1][0] is not task:
+            raise TransactionManagementError(
+                "Cannot enter an async atomic block in another "
+                "task's atomic context."
+            )
+        worker_context = None
+        # Reuse the worker of an enclosing async block or sync transaction,
+        # including the transaction wrapping a TestCase.
+        if not blocks and not await sync_to_async(self._in_atomic_block)():
             worker = ThreadPoolExecutor(max_workers=1)
             worker_context = (ThreadSensitiveContext(executor=worker), worker)
             await worker_context[0].__aenter__()

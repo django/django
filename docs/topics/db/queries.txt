@@ -1035,13 +1035,12 @@ Transactions
 ------------
 
 Use ``async with transaction.atomic()`` for asynchronous queries and updates
-inside a transaction. A nested transaction with another
-``async with transaction.atomic()`` will create a savepoint. However,
-additional async tasks created from a task that already has an atomic context
-will get their own independent transaction, not a savepoint, when they enter
-their own ``async with transaction.atomic()`` block. Creating a task alone
-does not isolate its ORM calls from the parent's transaction.
-See :ref:`async-atomic` for details.
+inside a transaction. Nested blocks in the same task use savepoints. A task
+that inherits another task's async atomic context cannot enter an async atomic
+block; attempting to do so raises
+:exc:`~django.db.transaction.TransactionManagementError`. Creating a task alone
+does not isolate its ORM calls from the parent's transaction. See
+:ref:`async-atomic` for task ownership and child-task lifetime requirements.
 
 The synchronous ``with transaction.atomic()`` form cannot be used directly in
 async code, but it can still be wrapped inside ``sync_to_async``.

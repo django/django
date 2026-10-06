@@ -165,10 +165,11 @@ Asynchronous model methods that use the database are also supported::
         await book.tags.aset(tags)
 
 Use ``async with transaction.atomic()`` for transactions with asynchronous ORM
-methods. Nested blocks in the same task use savepoints. A new task
-that inherits an async atomic context and enters its own atomic block gets an
-independent transaction. See :ref:`async-atomic` for task ownership and nesting
-rules.
+methods. Nested blocks in the same task use savepoints. A task that inherits
+another task's async atomic context cannot enter an async atomic block;
+attempting to do so raises
+:exc:`~django.db.transaction.TransactionManagementError`. See :ref:`async-atomic`
+for task ownership and nesting rules.
 
 Existing synchronous transaction code can still be wrapped in a single function
 and called using :func:`sync_to_async`.

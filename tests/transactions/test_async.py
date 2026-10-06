@@ -15,6 +15,17 @@ def current_thread_and_connection():
     return threading.current_thread(), connections["default"]
 
 
+def current_transaction_state():
+    """Snapshot the state that rejected atomic entry must leave unchanged."""
+    return {
+        "thread_and_connection": current_thread_and_connection(),
+        "atomic_blocks": tuple(connection.atomic_blocks),
+        "savepoint_ids": tuple(connection.savepoint_ids),
+        "savepoint_counter": connection.savepoint_state,
+        "owning_tasks": tuple(connection._async_atomic_tasks),
+    }
+
+
 @skipUnlessDBFeature("uses_savepoints")
 class AsyncAtomicTests(TransactionTestCase):
     available_apps = ["transactions"]
@@ -62,6 +73,22 @@ class AsyncAtomicTests(TransactionTestCase):
                     raise Exception("Oops, that's his last name")
         self.assertEqual(await Reporter.objects.acount(), 1)
 
+    async def test_awaited_coroutine_can_nest(self):
+        """An ordinary await keeps transaction ownership in the same task."""
+        get = sync_to_async(current_thread_and_connection)
+
+        async def create():
+            async with transaction.atomic():
+                self.assertEqual(await get(), parent)
+                await Reporter.objects.acreate(first_name="Tintin")
+
+        with self.assertRaisesMessage(ValueError, "Undo parent"):
+            async with transaction.atomic():
+                parent = await get()
+                await create()
+                raise ValueError("Undo parent")
+        self.assertEqual(await Reporter.objects.acount(), 0)
+
     async def test_sync_atomic_inside_async_atomic(self):
         def create_and_fail():
             with transaction.atomic():
@@ -89,106 +116,182 @@ class AsyncAtomicTests(TransactionTestCase):
         self.assertIs(nested_thread, block_thread)
         self.assertIs(nested_connection, block_connection)
 
-    async def test_child_task_uses_independent_worker(self):
-        """A child gets its own worker, even inside a parent's savepoint."""
-        get = sync_to_async(current_thread_and_connection)
+    async def test_child_task_cannot_enter_atomic(self):
+        """Reject child entry without a new worker or savepoint changes."""
+        get_state = sync_to_async(current_transaction_state)
+        callbacks = []
 
-        async def child():
-            async with transaction.atomic(durable=True):
-                child_thread, child_connection = await get()
-                self.assertIsNot(child_thread, parent_thread)
-                self.assertIsNot(child_connection, parent_connection)
-                async with transaction.atomic():
-                    self.assertEqual(await get(), (child_thread, child_connection))
-            return child_thread, child_connection
+        async def child(**options):
+            async with transaction.atomic(**options):
+                self.fail("A child task must not enter an async atomic block.")
 
+        # Open a parent transaction and savepoint before creating children.
         async with transaction.atomic():
-            parent_thread, parent_connection = await get()
+            await Reporter.objects.acreate(first_name="Tintin")
+            await sync_to_async(transaction.on_commit)(
+                lambda: callbacks.append("parent")
+            )
             async with transaction.atomic():
-                async with asyncio.timeout(10):
-                    worker, _ = await asyncio.create_task(child())
-                self.assertEqual(await get(), (parent_thread, parent_connection))
-            self.assertIsNotNone(parent_connection.connection)
-        await asyncio.to_thread(worker.join, 5)
-        self.assertIs(worker.is_alive(), False)
+                parent_state = await get_state()
+                # Rejection must not change parent state or create a worker.
+                with mock.patch(
+                    "django.db.transaction.ThreadPoolExecutor", wraps=ThreadPoolExecutor
+                ) as create_worker:
+                    for options in ({}, {"savepoint": False}, {"durable": True}):
+                        with self.subTest(options=options):
+                            with self.assertRaisesMessage(
+                                transaction.TransactionManagementError,
+                                "Cannot enter an async atomic block in another "
+                                "task's atomic context.",
+                            ):
+                                async with asyncio.timeout(10):
+                                    await asyncio.create_task(child(**options))
+                            self.assertEqual(await get_state(), parent_state)
+                    create_worker.assert_not_called()
+                # The parent must still be able to write and commit.
+                await Reporter.objects.acreate(first_name="Haddock")
+            self.assertEqual(callbacks, [])
+        self.assertEqual(callbacks, ["parent"])
+        self.assertEqual(
+            [r.first_name async for r in Reporter.objects.order_by("first_name")],
+            ["Haddock", "Tintin"],
+        )
 
-    async def test_reuse_atomic_in_child_task(self):
-        """Reusing a manager does not share its task's transaction state."""
+    async def test_reuse_atomic_in_child_task_is_rejected(self):
+        """A rejected child does not prevent same-task reuse of the manager."""
         atomic = transaction.atomic()
-        get = sync_to_async(current_thread_and_connection)
+        get_state = sync_to_async(current_transaction_state)
 
         async def child():
             async with atomic:
-                child_thread, child_connection = await get()
-                self.assertIsNot(child_thread, parent_thread)
-                self.assertIsNot(child_connection, parent_connection)
-                async with atomic:
-                    self.assertEqual(await get(), (child_thread, child_connection))
+                self.fail("A child task must not enter an async atomic block.")
 
         async with atomic:
-            parent_thread, parent_connection = await get()
-            async with asyncio.timeout(10):
-                await asyncio.create_task(child())
-            self.assertEqual(await get(), (parent_thread, parent_connection))
+            before = await get_state()
+            with self.assertRaisesMessage(
+                transaction.TransactionManagementError,
+                "Cannot enter an async atomic block in another task's atomic context.",
+            ):
+                async with asyncio.timeout(10):
+                    await asyncio.create_task(child())
+            self.assertEqual(await get_state(), before)
+            async with atomic:
+                await Reporter.objects.acreate(first_name="Tintin")
+        self.assertEqual(await Reporter.objects.acount(), 1)
 
-    async def test_child_enters_after_parent_exit(self):
-        """An inherited, closed worker is not consulted before child entry."""
+    async def test_child_entry_after_parent_exit_is_rejected(self):
+        """Reject an inherited context even after its worker has stopped."""
         release = asyncio.Event()
         get = sync_to_async(current_thread_and_connection)
 
         async def child():
             await release.wait()
-            async with transaction.atomic():
-                return await get()
+            with self.assertRaisesMessage(
+                transaction.TransactionManagementError,
+                "Cannot enter an async atomic block in another task's atomic context.",
+            ):
+                async with transaction.atomic():
+                    self.fail("A child task must not enter an async atomic block.")
 
         async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
             async with transaction.atomic():
-                parent_thread, parent_connection = await get()
-                task = tasks.create_task(child())
+                parent_thread, _ = await get()
+                tasks.create_task(child())
+            await asyncio.to_thread(parent_thread.join, 5)
+            self.assertIs(parent_thread.is_alive(), False)
             release.set()
-        child_thread, child_connection = task.result()
-        self.assertIsNot(child_thread, parent_thread)
-        self.assertIsNot(child_connection, parent_connection)
-        await asyncio.to_thread(child_thread.join, 5)
-        self.assertIs(child_thread.is_alive(), False)
 
-    async def test_child_cancellation_preserves_parent(self):
-        """Cancelling a child's block leaves its parent's block usable."""
-        ready = asyncio.Event()
-        get = sync_to_async(current_thread_and_connection)
+    async def test_rejected_children_preserve_parent_rollback(self):
+        """Repeated child rejections leave the owner's rollback intact."""
         callbacks = []
-        child_workers = []
+
+        async def child():
+            with self.assertRaisesMessage(
+                transaction.TransactionManagementError,
+                "Cannot enter an async atomic block in another task's atomic context.",
+            ):
+                async with transaction.atomic():
+                    self.fail("A child task must not enter an async atomic block.")
+
+        with self.assertRaisesMessage(ValueError, "Undo parent"):
+            async with transaction.atomic():
+                await Reporter.objects.acreate(first_name="Tintin")
+                await sync_to_async(transaction.on_commit)(
+                    lambda: callbacks.append("parent")
+                )
+                async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
+                    tasks.create_task(child())
+                    tasks.create_task(child())
+                async with transaction.atomic():
+                    await Reporter.objects.acreate(first_name="Haddock")
+                raise ValueError("Undo parent")
+        self.assertEqual(await Reporter.objects.acount(), 0)
+        self.assertEqual(callbacks, [])
+
+    async def test_unhandled_child_rejection_rolls_back_parent(self):
+        """An unhandled child rejection rolls back the parent."""
+        get = sync_to_async(current_thread_and_connection)
+        parent = await get()
+        callbacks = []
 
         async def child():
             async with transaction.atomic():
-                child_workers.append(await get())
-                await sync_to_async(transaction.on_commit)(
-                    lambda: callbacks.append("child")
-                )
-                ready.set()
-                await asyncio.Event().wait()
+                self.fail("A child task must not enter an async atomic block.")
 
-        async with transaction.atomic():
-            parent = await get()
-            await sync_to_async(transaction.on_commit)(
-                lambda: callbacks.append("parent")
-            )
-            async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
-                task = tasks.create_task(child())
-                await ready.wait()
-                task.cancel()
-            self.assertEqual(await get(), parent)
-            self.assertIs(
-                await sync_to_async(lambda: connection.in_atomic_block)(), True
-            )
+        with self.assertRaises(ExceptionGroup) as raised:
             async with transaction.atomic():
+                worker, _ = await get()
+                await Reporter.objects.acreate(first_name="Tintin")
+                await sync_to_async(transaction.on_commit)(
+                    lambda: callbacks.append("parent")
+                )
+                async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
+                    tasks.create_task(child())
+        errors = raised.exception.exceptions
+        self.assertEqual(len(errors), 1)
+        self.assertIsInstance(errors[0], transaction.TransactionManagementError)
+        self.assertEqual(
+            str(errors[0]),
+            "Cannot enter an async atomic block in another task's atomic context.",
+        )
+        self.assertEqual(await Reporter.objects.acount(), 0)
+        self.assertEqual(callbacks, [])
+        self.assertEqual(await get(), parent)
+        await asyncio.to_thread(worker.join, 5)
+        self.assertIs(worker.is_alive(), False)
+
+    async def test_cancellation_rolls_back_transaction(self):
+        """Cancelling the owner rolls back its writes and stops its worker."""
+        ready = asyncio.Event()
+        get = sync_to_async(current_thread_and_connection)
+        callbacks = []
+        workers = []
+        parent = await get()
+
+        async def owner():
+            try:
+                async with transaction.atomic():
+                    workers.append(await get())
+                    await Reporter.objects.acreate(first_name="Tintin")
+                    await sync_to_async(transaction.on_commit)(
+                        lambda: callbacks.append("owner")
+                    )
+                    ready.set()
+                    await asyncio.Event().wait()
+            finally:
                 self.assertEqual(await get(), parent)
-            self.assertEqual(callbacks, [])
-        self.assertEqual(callbacks, ["parent"])
-        child_thread, child_connection = child_workers[0]
-        self.assertIsNot(child_thread, parent[0])
-        await asyncio.to_thread(child_thread.join, 5)
-        self.assertIs(child_thread.is_alive(), False)
+
+        async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
+            task = tasks.create_task(owner())
+            await ready.wait()
+            task.cancel()
+        self.assertIs(task.cancelled(), True)
+        self.assertEqual(await Reporter.objects.acount(), 0)
+        self.assertEqual(callbacks, [])
+        worker, _ = workers[0]
+        self.assertIsNot(worker, parent[0])
+        await asyncio.to_thread(worker.join, 5)
+        self.assertIs(worker.is_alive(), False)
 
     async def test_exit_from_another_task_is_rejected(self):
         """Cross-task exit must not pop or close the parent's transaction."""
@@ -208,26 +311,26 @@ class AsyncAtomicTests(TransactionTestCase):
             await Reporter.objects.acreate(first_name="Tintin")
         self.assertEqual(await Reporter.objects.acount(), 1)
 
-    async def test_async_bridge_task_uses_independent_worker(self):
-        """An async bridge's new task follows the same ownership rule."""
-        get = sync_to_async(current_thread_and_connection)
+    async def test_async_bridge_task_cannot_enter_atomic(self):
+        """An async bridge cannot transfer ownership to its new task."""
+        get_state = sync_to_async(current_transaction_state)
 
         async def callback():
             async with transaction.atomic():
-                return await get()
+                self.fail("A bridge task must not enter an async atomic block.")
 
         async with transaction.atomic():
-            parent = await get()
-            async with asyncio.timeout(10):
-                child_thread, child_connection = await sync_to_async(
-                    async_to_sync(callback)
-                )()
-            self.assertIsNot(child_thread, parent[0])
-            self.assertIsNot(child_connection, parent[1])
+            before = await get_state()
+            with self.assertRaisesMessage(
+                transaction.TransactionManagementError,
+                "Cannot enter an async atomic block in another task's atomic context.",
+            ):
+                async with asyncio.timeout(10):
+                    await sync_to_async(async_to_sync(callback))()
+            self.assertEqual(await get_state(), before)
             async with transaction.atomic():
-                self.assertEqual(await get(), parent)
-        await asyncio.to_thread(child_thread.join, 5)
-        self.assertIs(child_thread.is_alive(), False)
+                await Reporter.objects.acreate(first_name="Tintin")
+        self.assertEqual(await Reporter.objects.acount(), 1)
 
     async def test_async_block_joins_synchronous_transaction(self):
         """An async bridge can join an existing synchronous transaction."""
@@ -249,6 +352,7 @@ class AsyncAtomicTests(TransactionTestCase):
 
     async def test_synchronous_parent_rejects_overlapping_tasks(self):
         """Tasks cannot overlap savepoints in an inherited sync transaction."""
+        # Order: A enters, B is rejected, A rolls back, then C succeeds.
         events = {
             name: asyncio.Event() for name in ("a_entered", "b_attempted", "a_exited")
         }
@@ -272,36 +376,38 @@ class AsyncAtomicTests(TransactionTestCase):
                 async with transaction.atomic():
                     await Reporter.objects.acreate(first_name="Sakharine")
                     events["b_attempted"].set()
+                    # If entry is wrongly allowed, keep B open until A exits.
+                    # This reproduces the unsafe savepoint order.
                     await events["a_exited"].wait()
             except transaction.TransactionManagementError as exc:
                 return str(exc)
             finally:
                 events["b_attempted"].set()
 
-        async def after_overlap():
+        async def write_c():
             async with transaction.atomic():
                 await Reporter.objects.acreate(first_name="Calculus")
 
-        async def callback():
+        async def run_tasks():
             async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
                 tasks.create_task(rollback_a())
-                rejected = tasks.create_task(overlap_b())
+                rejected_task = tasks.create_task(overlap_b())
             # A new task can use the parent after rejection and rollback.
-            await asyncio.create_task(after_overlap())
-            return rejected.result()
+            await asyncio.create_task(write_c())
+            return rejected_task.result()
 
-        def sync_caller():
+        def sync_parent():
             with transaction.atomic():
                 Reporter.objects.create(first_name="Tintin")
-                return async_to_sync(callback)()
+                return async_to_sync(run_tasks)()
 
-        error = await sync_to_async(sync_caller)()
+        rejection_message = await sync_to_async(sync_parent)()
         self.assertEqual(
             [r.first_name async for r in Reporter.objects.order_by("first_name")],
             ["Calculus", "Tintin"],
         )
         self.assertEqual(
-            error,
+            rejection_message,
             "Cannot enter an async atomic block while another task is using "
             "this connection's transaction.",
         )
@@ -440,58 +546,67 @@ class AsyncAtomicTests(TransactionTestCase):
         self.assertIs(thread.is_alive(), False)
 
     async def test_cancellation_does_not_cancel_queued_cleanup(self):
-        get = sync_to_async(current_thread_and_connection)
-        parent = await get()
+        """Connection cleanup still runs if its owning task is cancelled."""
+        # Block the worker, queue cleanup, cancel the owner, then release the
+        # worker and check that cleanup still runs.
+        get_thread_and_connection = sync_to_async(current_thread_and_connection)
+        original_thread_and_connection = await get_thread_and_connection()
         loop = asyncio.get_running_loop()
-        worker_busy = asyncio.Event()
-        release = threading.Event()
+        worker_blocked = asyncio.Event()
+        release_worker = threading.Event()
         cleanup_finished = threading.Event()
         worker_threads = []
-        close_all = connections.close_all
-        worker = ThreadPoolExecutor(max_workers=1)
-        submit = worker.submit
+        original_close_all = connections.close_all
+        executor = ThreadPoolExecutor(max_workers=1)
+        original_submit = executor.submit
 
-        def blocking():
+        def block_worker():
             worker_threads.append(threading.current_thread())
-            loop.call_soon_threadsafe(worker_busy.set)
-            release.wait(10)
+            loop.call_soon_threadsafe(worker_blocked.set)
+            release_worker.wait(10)
 
-        def cleanup():
+        def close_connections():
             self.assertIs(threading.current_thread(), worker_threads[0])
-            close_all()
+            original_close_all()
             cleanup_finished.set()
 
-        def submit_work(func, *args, **kwargs):
+        def queue_blocker_before_cleanup(func, *args, **kwargs):
             if func is connections.close_all:
                 # Hold the worker so cleanup is queued, but has not started.
-                submit(blocking)
-            return submit(func, *args, **kwargs)
+                original_submit(block_worker)
+            return original_submit(func, *args, **kwargs)
 
-        async def run():
+        async def own_transaction():
             try:
                 async with transaction.atomic():
                     pass
             finally:
-                # Cancellation must restore the parent context before
-                # returning.
-                self.assertEqual(await get(), parent)
+                # The original thread and connection must already be restored.
+                self.assertEqual(
+                    await get_thread_and_connection(), original_thread_and_connection
+                )
 
         with (
-            mock.patch("django.db.transaction.ThreadPoolExecutor", return_value=worker),
-            mock.patch.object(worker, "submit", side_effect=submit_work),
-            mock.patch.object(connections, "close_all", side_effect=cleanup),
+            mock.patch(
+                "django.db.transaction.ThreadPoolExecutor", return_value=executor
+            ),
+            mock.patch.object(
+                executor, "submit", side_effect=queue_blocker_before_cleanup
+            ),
+            mock.patch.object(connections, "close_all", side_effect=close_connections),
         ):
-            task = asyncio.create_task(run())
+            owner_task = asyncio.create_task(own_transaction())
             try:
-                await asyncio.wait_for(worker_busy.wait(), 5)
-                task.cancel()
+                await asyncio.wait_for(worker_blocked.wait(), 5)
+                owner_task.cancel()
                 with self.assertRaises(asyncio.CancelledError):
-                    await asyncio.wait_for(task, 5)
+                    await asyncio.wait_for(owner_task, 5)
+                # The owner has stopped, but cleanup must still be waiting.
                 self.assertIs(cleanup_finished.is_set(), False)
             finally:
-                release.set()
-                await asyncio.gather(task, return_exceptions=True)
-                worker.shutdown(wait=False)
+                release_worker.set()
+                await asyncio.gather(owner_task, return_exceptions=True)
+                executor.shutdown(wait=False)
                 for thread in worker_threads:
                     await asyncio.to_thread(thread.join, 5)
                     self.assertIs(thread.is_alive(), False)
@@ -566,81 +681,6 @@ class AsyncAtomicIsolationTests(TransactionTestCase):
             [r.first_name async for r in Reporter.objects.all()], ["Haddock"]
         )
 
-    async def test_child_commit_survives_parent_rollback(self):
-        """A completed child transaction is not a parent's savepoint."""
-        get = sync_to_async(current_thread_and_connection)
-        callbacks = []
-        child_workers = []
-
-        async def child():
-            async with transaction.atomic():
-                child_thread, child_connection = await get()
-                child_workers.append((child_thread, child_connection))
-                self.assertIsNot(child_thread, parent_thread)
-                self.assertIsNot(child_connection, parent_connection)
-                self.assertIs(
-                    await Reporter.objects.filter(pk=parent.pk).aexists(), False
-                )
-                await Reporter.objects.acreate(first_name="Haddock")
-                await sync_to_async(transaction.on_commit)(
-                    lambda: callbacks.append("child")
-                )
-
-        with self.assertRaisesMessage(ValueError, "Undo parent"):
-            async with transaction.atomic():
-                parent_thread, parent_connection = await get()
-                parent = await Reporter.objects.acreate(first_name="Tintin")
-                await sync_to_async(transaction.on_commit)(
-                    lambda: callbacks.append("parent")
-                )
-                async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
-                    tasks.create_task(child())
-                self.assertEqual(callbacks, ["child"])
-                self.assertEqual(await get(), (parent_thread, parent_connection))
-                raise ValueError("Undo parent")
-        self.assertEqual(
-            [r.first_name async for r in Reporter.objects.all()], ["Haddock"]
-        )
-        self.assertEqual(callbacks, ["child"])
-        child_thread, child_connection = child_workers[0]
-        await asyncio.to_thread(child_thread.join, 5)
-        self.assertIs(child_thread.is_alive(), False)
-        self.assertIsNone(child_connection.connection)
-
-    async def test_overlapping_child_blocks_rollback_their_own_writes(self):
-        """Crossed child exits must not pop each other's savepoints."""
-        a_entered = asyncio.Event()
-        b_entered = asyncio.Event()
-        a_exited = asyncio.Event()
-
-        async def rollback_a():
-            try:
-                with self.assertRaisesMessage(ValueError, "Undo A"):
-                    async with transaction.atomic():
-                        await Reporter.objects.acreate(first_name="Haddock")
-                        a_entered.set()
-                        await b_entered.wait()
-                        raise ValueError("Undo A")
-            finally:
-                a_exited.set()
-
-        async def commit_b():
-            await a_entered.wait()
-            async with transaction.atomic():
-                await Reporter.objects.acreate(first_name="Calculus")
-                b_entered.set()
-                await a_exited.wait()
-
-        async with transaction.atomic():
-            await Reporter.objects.acreate(first_name="Tintin")
-            async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
-                tasks.create_task(rollback_a())
-                tasks.create_task(commit_b())
-        self.assertEqual(
-            [r.first_name async for r in Reporter.objects.order_by("first_name")],
-            ["Calculus", "Tintin"],
-        )
-
     async def test_concurrent_transactions(self):
         both_started = asyncio.Barrier(2)
 
@@ -651,11 +691,12 @@ class AsyncAtomicIsolationTests(TransactionTestCase):
                 if fail:
                     raise ValueError(name)
 
-        results = await asyncio.gather(
-            create("Tintin", fail=False),
-            create("Haddock", fail=True),
-            return_exceptions=True,
-        )
+        async with asyncio.timeout(10):
+            results = await asyncio.gather(
+                create("Tintin", fail=False),
+                create("Haddock", fail=True),
+                return_exceptions=True,
+            )
         self.assertIsNone(results[0])
         self.assertIsInstance(results[1], ValueError)
         self.assertEqual(

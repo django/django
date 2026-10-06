@@ -251,52 +251,35 @@ Asynchronous atomic blocks
 Use ``async with transaction.atomic()`` with asynchronous ORM methods::
 
     async def create_reporter():
-        # This is the first atomic block in the async task, so it opens a transaction.
+        # This task owns the async atomic block.
         async with transaction.atomic():
             reporter = await Reporter.objects.acreate(first_name="Tintin")
-            # This is a nested atomic that is part of the same async task
+            # A savepoint in the same task and transaction.
             async with transaction.atomic():
-                # A savepoint in the same task and transaction.
                 await Reporter.objects.filter(pk=reporter.pk).aupdate(last_name="Reporter")
 
-Nesting in the same task uses the same thread worker and connection,
-and so nested atomics will create savepoints. The outermost atomic block
-will commit or rollback the transaction. This is the preferred setup.
+Each outermost async atomic block belongs to the task that enters it.
+Nesting in the same task uses the same worker and connection and normally
+creates savepoints. Calling another coroutine with ``await`` does not create
+a new task, so that coroutine can also enter nested atomic blocks.
 
-In contrast, if another task is created with ``asyncio.create_task()``
-from inside a task that contains an async atomic block, that new task's
-atomic block will run in a new thread worker and connection, and use an
-independent transaction. This is necessary to prevent concurrent savepoints
-becoming interleaved and affecting each other. This also applies to tasks
-created by an ``async_to_sync()`` bridge inside an async atomic context.
+A task that inherits another task's async atomic context cannot enter an
+async atomic block. Django raises
+:exc:`~django.db.transaction.TransactionManagementError` before creating a
+savepoint or allocating a new worker. This applies even if the parent
+immediately awaits the child. It includes tasks created by
+``asyncio.create_task()`` or ``asyncio.gather()``, and tasks created by an
+``async_to_sync()`` bridge inside an async atomic context.
 
-There are several problems that can occur.
+Prefer to keep database work in the owning task. If you create child tasks,
+ensure they all finish before the atomic block exits, for example by using
+``asyncio.TaskGroup`` inside the block. Their ORM calls can still share the
+parent's transaction. Creating a task does not isolate its database work or
+guarantee the order of concurrent queries.
 
-The first is that different concurrent tasks, say created from the context
-of the same view, will have independent transactions when each enters its
-own atomic block. One could commit while another rolls back. This is
-conceptually analogous to sync code that might create separate transactions
-in different threads.
-
-The second issue is that creating a task alone does not start an
-independent transaction. Any ORM calls made in the new task can still use
-the parent's transaction. Separation occurs only when the child enters its
-own ``async with transaction.atomic()`` block.
-
-The third and final issue is the danger of deadlocks.
-Consider the following scenario:
-
-1. A parent transaction updates a row and holds its lock.
-2. The parent creates **and awaits** a new child task.
-3. The child opens an independent transaction and updates that same row.
-
-The problem is that the child waits for the parent’s lock (on the row), but
-the parent is now also awaiting the child task, resulting in a deadlock.
-The database may not detect this deadlock because the parent is waiting in
-Python, not for another database lock.
-
-For these reasons, keep database work in the same task when it must commit
-or roll back together.
+Outside an existing transaction, separate tasks can each enter an outermost
+async atomic block. These use independent workers and connections, so one
+transaction can commit while another rolls back.
 
 If there is no inherited async atomic context, an async block reached
 through ``async_to_sync()`` can still join an existing synchronous
