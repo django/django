@@ -1,4 +1,5 @@
 import asyncio
+import gc
 import threading
 from concurrent.futures import ThreadPoolExecutor
 from unittest import mock
@@ -7,6 +8,7 @@ from asgiref.sync import async_to_sync, sync_to_async
 
 from django.db import connection, connections, transaction
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.test.utils import ignore_warnings
 
 from .models import Reporter
 
@@ -29,6 +31,18 @@ def current_transaction_state():
 @skipUnlessDBFeature("uses_savepoints")
 class AsyncAtomicTests(TransactionTestCase):
     available_apps = ["transactions"]
+
+    def tearDown(self):
+        super().tearDown()
+        if connection.vendor == "sqlite" and connection.is_in_memory_db():
+            with ignore_warnings(
+                category=ResourceWarning,
+                message=r"unclosed database in <sqlite3\.Connection object at ",
+            ):
+                # Django ignores close() for in-memory SQLite databases. Collect
+                # unreachable worker connections so sqlite3's finalizers close
+                # them while their unclosed-connection warnings are suppressed.
+                gc.collect()
 
     async def test_commit(self):
         async with transaction.atomic():
