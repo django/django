@@ -347,6 +347,8 @@ Miscellaneous
   database connections used during error handling are managed by
   ``close_old_connections()``.
 
+* Django no longer claims compatibility with `PyPy <https://pypy.org/>`_.
+
 .. _deprecated-features-6.2:
 
 Features deprecated in 6.2
