@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.models import User as AuthUser
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks, management
-from django.db import DEFAULT_DB_ALIAS, models, transaction
+from django.db import DEFAULT_DB_ALIAS, models
 from django.db.models import signals
 from django.test import TestCase, override_settings
 from django.test.utils import isolate_apps
@@ -102,31 +102,56 @@ class ProxyModelTests(TestCase):
         pp = sorted(mpp.name for mpp in MyPersonProxy.objects.all())
         self.assertEqual(pp, ["Bazza del Frob", "Foo McBar", "homer"])
 
-    def test_proxy_included_in_ancestors(self):
-        """
-        Proxy models are included in the ancestors for a model's DoesNotExist,
-        MultipleObjectsReturned, and NotUpdated
-        """
+    def test_proxy_of_proxy_included_in_ancestors_for_does_not_exist(self):
+        Person.objects.create(name="Foo McBar")
+        MyPerson.objects.create(name="Bazza del Frob")
+        LowerStatusPerson.objects.create(status="low", name="homer")
+
+        with self.assertRaises(Person.DoesNotExist):
+            MyPersonProxy.objects.get(name="Zathras")
+
+    def test_subclass_of_proxy_included_in_ancestors_for_does_not_exist(self):
+        Person.objects.create(name="Foo McBar")
+        MyPerson.objects.create(name="Bazza del Frob")
+        LowerStatusPerson.objects.create(status="low", name="homer")
+
+        with self.assertRaises(Person.DoesNotExist):
+            StatusPerson.objects.get(name="Zathras")
+
+    def test_proxy_of_proxy_included_in_ancestors_for_not_updated(self):
+        Person.objects.create(name="Foo McBar")
+        MyPerson.objects.create(name="Bazza del Frob")
+        LowerStatusPerson.objects.create(status="low", name="homer")
+
+        with self.assertRaises(Person.NotUpdated):
+            MyPersonProxy(id=999).save(update_fields={"name"})
+
+    def test_subclass_of_proxy_included_in_ancestors_for_not_updated(self):
+        Person.objects.create(name="Foo McBar")
+        MyPerson.objects.create(name="Bazza del Frob")
+        LowerStatusPerson.objects.create(status="low", name="homer")
+
+        with self.assertRaises(Person.NotUpdated):
+            StatusPerson(id=999).save(update_fields={"name"})
+
+    def test_proxy_of_proxy_included_in_ancestors_for_multiple_objects_returned(self):
         Person.objects.create(name="Foo McBar")
         MyPerson.objects.create(name="Bazza del Frob")
         LowerStatusPerson.objects.create(status="low", name="homer")
         max_id = Person.objects.aggregate(max_id=models.Max("id"))["max_id"]
 
-        with self.assertRaises(Person.DoesNotExist):
-            MyPersonProxy.objects.get(name="Zathras")
         with self.assertRaises(Person.MultipleObjectsReturned):
-            MyPersonProxy.objects.get(id__lt=max_id + 1)
-        with self.assertRaises(Person.DoesNotExist):
-            StatusPerson.objects.get(name="Zathras")
-        with self.assertRaises(Person.NotUpdated), transaction.atomic():
-            StatusPerson(id=999).save(update_fields={"name"})
+            MyPersonProxy.objects.get(id__lte=max_id)
 
+    def test_subclass_of_proxy_included_in_ancestors_for_multiple_objects_returned(
+        self,
+    ):
         StatusPerson.objects.create(name="Bazza Jr.")
         StatusPerson.objects.create(name="Foo Jr.")
         max_id = Person.objects.aggregate(max_id=models.Max("id"))["max_id"]
 
         with self.assertRaises(Person.MultipleObjectsReturned):
-            StatusPerson.objects.get(id__lt=max_id + 1)
+            StatusPerson.objects.get(id__lte=max_id)
 
     def test_abstract_base_with_model_fields(self):
         msg = (
