@@ -1,9 +1,10 @@
 import os
 from datetime import UTC, datetime
+from tempfile import mkstemp
 from urllib.parse import urljoin
 
 from django.conf import settings
-from django.core.files import File, locks
+from django.core.files import File
 from django.core.files.move import file_move_safe
 from django.core.signals import setting_changed
 from django.utils._os import safe_join, safe_makedirs
@@ -62,10 +63,45 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
             self._directory_permissions_mode, settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS
         )
 
+    @cached_property
+    def umask(self):
+        # There is no way to get a umask without setting it in the standard
+        # library. This presents a thread safety issue if another thread
+        # creates a file while umask is being retrieved.
+        # 0o666 is the least bad alternative for a file to be created with.
+        umask = os.umask(0o666)
+        os.umask(umask)
+        return umask
+
     def _open(self, name, mode="rb"):
         return File(open(self.path(name), mode))
 
     def _save(self, name, content):
+
+        # A file that has a temporary file path and just needs copying.
+        if hasattr(content, "temporary_file_path"):
+            src_file_name = content.temporary_file_path()
+        else:
+            # This is a normal uploaded file that we can stream into a temp
+            # file and eventually move over to destination.
+            temp_fd, src_file_name = mkstemp()
+
+            os.fchmod(temp_fd, 0o666 & ~self.umask)
+            _file = None
+            try:
+                for chunk in content.chunks():
+                    if _file is None:
+                        mode = "wb" if isinstance(chunk, bytes) else "wt"
+                        _file = os.fdopen(temp_fd, mode)
+                    _file.write(chunk)
+            finally:
+                if _file is not None:
+                    _file.close()
+                else:
+                    os.close(temp_fd)
+
+        # Start moving the file to the final destination.
+
         full_path = self.path(name)
 
         # Create any intermediate directories that do not exist.
@@ -82,49 +118,18 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
             raise FileExistsError("%s exists and is not a directory." % directory)
 
         # There's a potential race condition between get_available_name and
-        # saving the file; it's possible that two threads might return the
+        # moving the file; it's possible that two threads might return the
         # same name, at which point all sorts of fun happens. So we need to
         # try to create the file, but if it already exists we have to go back
         # to get_available_name() and try again.
 
         while True:
             try:
-                # This file has a file path that we can move.
-                if hasattr(content, "temporary_file_path"):
-                    file_move_safe(
-                        content.temporary_file_path(),
-                        full_path,
-                        allow_overwrite=self._allow_overwrite,
-                    )
-
-                # This is a normal uploadedfile that we can stream.
-                else:
-                    # The combination of O_CREAT and O_EXCL makes os.open()
-                    # raises an OSError if the file already exists before it's
-                    # opened.
-                    open_flags = (
-                        os.O_WRONLY
-                        | os.O_CREAT
-                        | os.O_EXCL
-                        | getattr(os, "O_BINARY", 0)
-                    )
-                    if self._allow_overwrite:
-                        open_flags = open_flags & ~os.O_EXCL | os.O_TRUNC
-                    fd = os.open(full_path, open_flags, 0o666)
-                    _file = None
-                    try:
-                        locks.lock(fd, locks.LOCK_EX)
-                        for chunk in content.chunks():
-                            if _file is None:
-                                mode = "wb" if isinstance(chunk, bytes) else "wt"
-                                _file = os.fdopen(fd, mode)
-                            _file.write(chunk)
-                    finally:
-                        locks.unlock(fd)
-                        if _file is not None:
-                            _file.close()
-                        else:
-                            os.close(fd)
+                file_move_safe(
+                    src_file_name,
+                    full_path,
+                    allow_overwrite=self._allow_overwrite,
+                )
             except FileExistsError:
                 # A new name is needed if the file exists.
                 name = self.get_available_name(name)
@@ -135,6 +140,11 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
 
         if self.file_permissions_mode is not None:
             os.chmod(full_path, self.file_permissions_mode)
+        else:
+            # file_move_safe may copy the file from one fs to another. In which
+            # case we want to ensure that we're setting the old default
+            # permissions.
+            os.chmod(full_path, 0o666 & ~self.umask)
 
         # Ensure the saved path is always relative to the storage root.
         name = os.path.relpath(full_path, self.location)
