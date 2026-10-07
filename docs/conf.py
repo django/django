@@ -165,8 +165,7 @@ locale_dirs = ["locale/"]
 today_fmt = "%B %d, %Y"
 
 # List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files. If this changes, be sure
-# to update similar exclusions in Makefile, make.bat, and lint.py.
+# directories to ignore when looking for source files.
 exclude_patterns = ["_build", "_ext", "_static", "_theme", "requirements.txt"]
 
 # The reST default role (used for this markup: `text`) to use for all
