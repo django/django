@@ -257,8 +257,8 @@ All Python code blocks should be formatted using the :pypi:`blacken-docs`
 auto-formatter. This is automatically run by the :ref:`pre-commit hook
 <coding-style-pre-commit>` if configured.
 
-The check can also be run manually: provided that ``blacken-docs`` is
-installed, run the following command from the ``docs`` directory:
+The check can also be run manually: provided that ``blacken-docs`` and Sphinx
+are installed, run the following command from the ``docs`` directory:
 
 .. console::
 
@@ -276,8 +276,8 @@ Django's documentation is checked for reStructuredText style and formal issues
 using :pypi:`sphinx-lint`. This helps catch problems like stray tabs, trailing
 whitespace, excessive line length, and similar formatting problems.
 
-Once ``sphinx-lint`` is installed, the check can be run with the following
-command from the ``docs`` directory:
+Once ``sphinx-lint`` and Sphinx are installed, the check can be run with the
+following command from the ``docs`` directory:
 
 .. console::
 
