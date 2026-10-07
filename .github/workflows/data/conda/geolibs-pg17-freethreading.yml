@@ -5,7 +5,7 @@ dependencies:
   - python-freethreading=3.14
   - postgresql=17.*
   - postgis>=3.5.4,<3.6
-  - libgdal=3.11.*
+  - libgdal=3.13.*
   - geos=3.14.*
   - proj=9.6.*
   - pip=26.*
