@@ -405,3 +405,17 @@ class ManyToManyRel(ForeignObjectRel):
                 if rel and rel.model == self.model:
                     break
         return field.foreign_related_fields[0]
+
+    def as_field(self):
+        from django.db.models import ManyToManyField
+
+        field = ManyToManyField(
+            self.related_model,
+            through=self.through,
+            blank=True,
+            editable=self.field.editable,
+        )
+        field.set_attributes_from_name(self.name)
+        field.attname = self.accessor_name
+        field.model = self.model
+        return field
