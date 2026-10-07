@@ -148,3 +148,16 @@ def permission_denied(request, exception, template_name=ERROR_403_TEMPLATE_NAME)
     return HttpResponseForbidden(
         template.render(request=request, context={"exception": str(exception)})
     )
+
+
+@requires_csrf_token
+def content_too_large(request, exception, template_name=ERROR_400_TEMPLATE_NAME):
+    """
+    413 error handler.
+
+    Templates: :template:`400.html`
+    Context: None
+    """
+    response = bad_request(request, exception, template_name)
+    response.status_code = 413
+    return response
