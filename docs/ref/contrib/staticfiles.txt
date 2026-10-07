@@ -551,8 +551,8 @@ This unittest TestCase subclass extends
 
 Just like its parent, you can use it to write tests that involve running the
 code under test and consuming it with testing tools through HTTP (e.g.
-Selenium, PhantomJS, etc.), because of which it's needed that the static assets
-are also published.
+Playwright, PhantomJS, etc.), because of which it's needed that the static
+assets are also published.
 
 But given the fact that it makes use of the
 :func:`django.contrib.staticfiles.views.serve` view described above, it can
