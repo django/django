@@ -5,9 +5,11 @@ on:
     types: [ edited, opened, reopened, ready_for_review, synchronize ]
     branches:
       - main
+  schedule:
+    - cron: '17 0 * * *'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || 'scheduled' }}
   cancel-in-progress: true
 
 permissions:
@@ -17,8 +19,9 @@ permissions:
 jobs:
   pr_quality:
     name: Run Quality Checks on a PR
+    if: github.event_name != 'schedule' || github.repository == 'django/django'
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: ${{ github.event_name == 'schedule' && 30 || 5 }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -35,6 +38,7 @@ jobs:
       - name: Run PR quality checks
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RECHECK: ${{ github.event_name == 'schedule' }}
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           PR_BODY: ${{ github.event.pull_request.body }}
           PR_TITLE: ${{ github.event.pull_request.title }}
