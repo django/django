@@ -2,6 +2,7 @@ import asyncio
 import logging
 import types
 from inspect import iscoroutinefunction
+from io import IOBase
 
 from asgiref.sync import async_to_sync, sync_to_async
 
@@ -16,6 +17,47 @@ from django.utils.module_loading import import_string
 from .exception import convert_exception_to_response
 
 logger = logging.getLogger("django.request")
+
+
+class LimitedStream(IOBase):
+    """
+    Wrap another stream to disallow reading it past a number of bytes.
+
+    Based on the implementation from werkzeug.wsgi.LimitedStream. See:
+    https://github.com/pallets/werkzeug/blob/dbf78f67/src/werkzeug/wsgi.py#L828
+    """
+
+    def __init__(self, stream, limit):
+        self._read = stream.read
+        self._readline = stream.readline
+        self._pos = 0
+        self.limit = limit
+
+    def read(self, size=-1, /):
+        _pos = self._pos
+        limit = self.limit
+        if _pos >= limit:
+            return b""
+        if size == -1 or size is None:
+            size = limit - _pos
+        else:
+            size = min(size, limit - _pos)
+        data = self._read(size)
+        self._pos += len(data)
+        return data
+
+    def readline(self, size=-1, /):
+        _pos = self._pos
+        limit = self.limit
+        if _pos >= limit:
+            return b""
+        if size == -1 or size is None:
+            size = limit - _pos
+        else:
+            size = min(size, limit - _pos)
+        line = self._readline(size)
+        self._pos += len(line)
+        return line
 
 
 class BaseHandler:
@@ -365,6 +407,14 @@ class BaseHandler:
             if response:
                 return response
         return None
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state["_view_middleware"]
+        del state["_template_response_middleware"]
+        del state["_exception_middleware"]
+        del state["_middleware_chain"]
+        return state
 
 
 def reset_urlconf(sender, **kwargs):
