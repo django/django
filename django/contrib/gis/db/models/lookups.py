@@ -8,7 +8,7 @@ from django.utils.regex_helper import _lazy_re_compile
 
 class RasterBandTransform(Transform):
     def as_sql(self, compiler, connection):
-        return compiler.compile(self.lhs)
+        return self.process_lhs(compiler, connection)
 
 
 class GISLookup(Lookup):
