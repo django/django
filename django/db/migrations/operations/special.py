@@ -205,6 +205,9 @@ class RunPython(Operation):
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if self.reverse_code is None:
             raise NotImplementedError("You cannot reverse this operation")
+        # RunPython has access to all models. Ensure that all models are
+        # reloaded in case any are delayed.
+        from_state.clear_delayed_apps_cache()
         if router.allow_migrate(
             schema_editor.connection.alias, app_label, **self.hints
         ):
