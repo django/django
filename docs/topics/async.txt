@@ -126,7 +126,7 @@ asynchronous handlers, you will need to override ``dispatch`` to make it
     class MyClass(View):
         @method_decorator(never_cache)
         async def dispatch(self, *args, **kwargs):
-            return super().dispatch(*args, **kwargs)
+            return await super().dispatch(*args, **kwargs)
 
         async def get(self, request): ...
 
