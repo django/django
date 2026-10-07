@@ -603,6 +603,15 @@ class NonAggregateAnnotationTestCase(TestCase):
         ).values("constant__year")
         self.assertEqual(qs.get(pk=self.b1.pk)["constant__year"], 2026)
 
+    @register_lookup(CharField, Length)
+    def test_values_transform_on_annotation_of_related_field(self):
+        # Book and Publisher both have a "name" column.
+        qs = Book.objects.annotate(publisher_name=F("publisher__name"))
+        self.assertEqual(
+            qs.values_list("publisher_name__length", flat=True).get(pk=self.b1.pk),
+            len(self.p1.name),
+        )
+
     def test_values_unsupported_transform_on_annotation(self):
         """
         An unsupported transform over an annotation alias reports the
