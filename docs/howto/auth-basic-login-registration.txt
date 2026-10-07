@@ -1,0 +1,143 @@
+============================================================
+How to set up basic login, registration and password reset
+============================================================
+
+This document shows how to build a basic authentication flow using Django's
+built-in :mod:`django.contrib.auth` views and forms: logging in, logging out,
+registering new users, and resetting a forgotten password. It assumes you
+already have a working Django project and are familiar with the basics of
+:doc:`Django's authentication system </topics/auth/index>`.
+
+Login and logout
+=================
+
+Django ships with ready-to-use views for logging in and out. Include them in
+your project's URLconf::
+
+    from django.urls import include, path
+
+    urlpatterns = [
+        ...,
+        path("accounts/", include("django.contrib.auth.urls")),
+    ]
+
+This gives you, among others, the following URLs:
+
+* ``accounts/login/`` -- :class:`~django.contrib.auth.views.LoginView`
+* ``accounts/logout/`` -- :class:`~django.contrib.auth.views.LogoutView`
+
+These views need templates to render. Create
+:file:`templates/registration/login.html`:
+
+.. code-block:: html
+
+    <h2>Log In</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Log In</button>
+    </form>
+
+By default, :setting:`LOGIN_REDIRECT_URL` sends users to
+``accounts/profile/`` after a successful login. Point it at a view of your
+own in :file:`settings.py`::
+
+    LOGIN_REDIRECT_URL = "home"
+
+Logging out uses :class:`~django.contrib.auth.views.LogoutView`, which by
+default renders ``registration/logged_out.html``.
+
+Registration
+============
+
+Django does not ship a registration view, since the exact fields a project
+needs (username, email, additional profile data, etc.) vary. You can build
+one on top of :class:`~django.contrib.auth.forms.UserCreationForm`.
+
+In ``forms.py``::
+
+    from django import forms
+    from django.contrib.auth.forms import UserCreationForm
+    from django.contrib.auth.models import User
+
+
+    class SignUpForm(UserCreationForm):
+        email = forms.EmailField(required=True)
+
+        class Meta:
+            model = User
+            fields = ["username", "email", "password1", "password2"]
+
+In ``views.py``::
+
+    from django.shortcuts import render, redirect
+    from django.contrib.auth import login
+
+    from .forms import SignUpForm
+
+
+    def signup(request):
+        if request.method == "POST":
+            form = SignUpForm(request.POST)
+            if form.is_valid():
+                user = form.save()
+                login(request, user)
+                return redirect("home")
+        else:
+            form = SignUpForm()
+        return render(request, "registration/signup.html", {"form": form})
+
+Wire it up in your URLconf, making sure it comes before the include of
+``django.contrib.auth.urls``::
+
+    urlpatterns = [
+        ...,
+        path("accounts/signup/", views.signup, name="signup"),
+        path("accounts/", include("django.contrib.auth.urls")),
+    ]
+
+Create :file:`templates/registration/signup.html`:
+
+.. code-block:: html
+
+    <h2>Sign Up</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Sign Up</button>
+    </form>
+
+Password reset
+===============
+
+Django also ships with views for resetting a forgotten password, included
+via the same ``django.contrib.auth.urls`` line used above. This flow needs
+five templates in ``templates/registration/``:
+
+* ``password_reset_form.html`` -- the form to request a reset email
+* ``password_reset_done.html`` -- shown after the request is submitted
+* ``password_reset_email.html`` -- the plain-text content of the email sent
+* ``password_reset_confirm.html`` -- the form to set a new password
+* ``password_reset_complete.html`` -- shown once the password has changed
+
+For example, ``password_reset_email.html``:
+
+.. code-block:: text
+
+    Someone asked for password reset for email {{ email }}. Follow the link
+    below:
+    {{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
+
+During development, you can avoid configuring a real mail server by using
+the console email backend, which prints outgoing emails to the terminal
+instead of sending them::
+
+    MAILERS = {
+        "default": {
+            "BACKEND": "django.core.mail.backends.console.EmailBackend",
+        },
+    }
+
+With this in place, requesting a password reset prints the reset link to
+your terminal, which you can open directly in a browser to complete the
+flow.
