@@ -63,6 +63,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_json_negative_indexing = False
 
     @cached_property
+    def rank_function_requires_order_by(self):
+        return self.connection.mysql_is_mariadb
+
+    @cached_property
     def minimum_database_version(self):
         if self.connection.mysql_is_mariadb:
             return (10, 11)
