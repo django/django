@@ -674,7 +674,7 @@ This example illustrates all possible attributes and methods for a
         def get_context_data(self, **kwargs):
             """
             Returns a dictionary to use as extra context if either
-            description_template or item_template are used.
+            title_template or description_template are used.
 
             Default implementation preserves the old behavior
             of using {'obj': item, 'site': current_site} as the context.
