@@ -20,6 +20,15 @@ class Child(models.Model):
     is_active = models.BooleanField(default=True)
 
 
+class GeneratedBoolean(models.Model):
+    value = models.BooleanField(default=False)
+    is_done = models.GeneratedField(
+        expression=models.F("value"),
+        output_field=models.BooleanField(),
+        db_persist=True,
+    )
+
+
 class GrandChild(models.Model):
     parent = models.ForeignKey(Child, models.SET_NULL, editable=False, null=True)
     name = models.CharField(max_length=30, blank=True)
