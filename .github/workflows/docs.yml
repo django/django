@@ -64,8 +64,15 @@ jobs:
           python-version: '3.14'
           cache: 'pip'
           cache-dependency-path: 'docs/requirements.txt'
-      - name: Install system spell checker
-        run: choco install aspell.portable --no-progress -y
+      - name: Install Aspell via MSYS2
+        # msys2/setup-msys2@v2.33.0
+        uses: msys2/setup-msys2@ec48f7c5447b3140e2b088413ae3a55687bccb6e
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            mingw-w64-ucrt-x86_64-aspell
+            mingw-w64-ucrt-x86_64-aspell-en
       - run: python -m pip install -r requirements.txt
       - name: Lint
         run: .\make.bat lint
