@@ -30,7 +30,6 @@ double_output = partial(double_output, cpl=True)
 create_ds = voidptr_output(
     std_call("GDALCreate"), [c_void_p, c_char_p, c_int, c_int, c_int, c_int, c_void_p]
 )
-open_ds = voidptr_output(std_call("GDALOpen"), [c_char_p, c_int])
 close_ds = void_output(std_call("GDALClose"), [c_void_p], errcheck=False)
 flush_ds = int_output(std_call("GDALFlushCache"), [c_void_p])
 copy_ds = voidptr_output(
