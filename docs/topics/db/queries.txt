@@ -1203,6 +1203,16 @@ directly, but you can still use dictionary unpacking to use it in a query:
 
     Oracle 21c+ support for negative JSON array indices was added.
 
+.. admonition:: Integer-like dictionary keys
+
+    In JSON, dictionary keys are always strings, but they can consist of digits
+    (for example, ``{"0": "value"}``). Because Django interprets any integer
+    key as an index transform, querying dictionary keys that can be parsed as
+    integers (such as ``data__0="value"``) is not supported and will not match.
+
+    While chaining subsequent lookups (such as ``data__0__nested``) may work
+    on PostgreSQL, this behavior is not portable to other database backends.
+
 If the key you wish to query by clashes with the name of another lookup, use
 the :lookup:`contains <jsonfield.contains>` lookup instead.
 
