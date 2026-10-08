@@ -78,7 +78,12 @@ class SQLCompiler:
         self.select, self.klass_info, self.annotation_col_map = self.get_select(
             with_col_aliases=with_col_aliases,
         )
-        self.col_count = len(self.select)
+        # A ColPairs selection is compiled to as many columns as it has
+        # targets, e.g. when a composite primary key is selected, so rows can
+        # be composed of more columns than there are selections.
+        self.col_count = sum(
+            len(expr) if isinstance(expr, ColPairs) else 1 for expr, _, _ in self.select
+        )
 
     def pre_sql_setup(self, with_col_aliases=False):
         """
