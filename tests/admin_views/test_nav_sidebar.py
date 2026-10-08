@@ -68,7 +68,8 @@ class AdminSidebarTests(TestCase):
             response, '<nav class="sticky" id="nav-sidebar" aria-label="Sidebar">'
         )
         self.assertContains(
-            response, '<a href="%s" aria-current="page">Users</a>' % url
+            response,
+            '<a href="%s" aria-current="page" class="model-name">Users</a>' % url,
         )
 
     @override_settings(
@@ -93,7 +94,7 @@ class AdminSidebarTests(TestCase):
             response, '<nav class="sticky" id="nav-sidebar" aria-label="Sidebar">'
         )
         # Does not include aria-current attribute.
-        self.assertContains(response, '<a href="%s">Users</a>' % url)
+        self.assertContains(response, '<a href="%s" class="model-name">Users</a>' % url)
 
     @override_settings(DEBUG=True)
     def test_included_app_list_template_context_fully_set(self):
@@ -108,14 +109,14 @@ class AdminSidebarTests(TestCase):
         self.assertContains(
             response, '<div class="app-admin_views module current-app">'
         )
-        self.assertContains(response, '<tr class="model-héllo current-model">')
-        self.assertContains(
-            response,
-            '<th scope="row" id="admin_views-héllo">'
-            '<a href="/test_sidebar/admin/admin_views/h%C3%A9llo/" aria-current="page">'
-            "Héllos</a></th>",
-            html=True,
+        self.assertContains(response, "Héllos</a>")
+        # Use reverse() to handle cross-platform URL encodings.
+        model_url = reverse("test_with_sidebar:admin_views_héllo_changelist")
+        expected_html = (
+            f'<a href="{model_url}" aria-current="page" '
+            'class="model-name">Héllos</a>'
         )
+        self.assertContains(response, expected_html, html=True)
 
 
 @override_settings(ROOT_URLCONF="admin_views.test_nav_sidebar")
@@ -153,7 +154,6 @@ class PlaywrightTests(AdminPlaywrightTestCase):
         self.expect(nav_sidebar).to_have_attribute("aria-expanded", "true")
         self.expect(nav_sidebar).to_be_visible()
         toggle_button.click()
-
         # Hidden sidebar is not visible.
         self.expect(nav_sidebar).to_have_attribute("aria-expanded", "false")
         self.expect(nav_sidebar).to_be_hidden()
@@ -170,7 +170,9 @@ class PlaywrightTests(AdminPlaywrightTestCase):
         toggle_button = self.page.locator("#toggle-nav-sidebar")
         toggle_button.click()
         self.assertEqual(
-            self.page.local_storage.get_item("django.admin.navSidebarIsOpen"),
+            self.selenium.execute_script(
+                "return localStorage.getItem('django.admin.navSidebarIsOpen')",
+            ),
             "false",
         )
         self.page.goto(
