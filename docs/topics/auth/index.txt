@@ -1,6 +1,6 @@
-=============================
-User authentication in Django
-=============================
+===================
+User authentication
+===================
 
 .. toctree::
    :hidden:
@@ -86,4 +86,4 @@ Usage
 
 :doc:`Customizing Users and authentication </topics/auth/customizing>`
 
-:doc:`Password management in Django </topics/auth/passwords>`
+:doc:`/topics/auth/passwords`

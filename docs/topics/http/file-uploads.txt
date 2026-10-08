@@ -1,5 +1,5 @@
 ============
-File Uploads
+File uploads
 ============
 
 .. currentmodule:: django.core.files.uploadedfile
