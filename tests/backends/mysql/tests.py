@@ -2,6 +2,7 @@ import unittest
 from contextlib import contextmanager
 from unittest import mock
 
+from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
 from django.db import NotSupportedError, connection
 from django.test import TestCase, override_settings
@@ -115,3 +116,32 @@ class Tests(TestCase):
         with self.assertRaisesMessage(NotSupportedError, msg):
             connection.check_database_version_supported()
         self.assertTrue(mocked_get_database_version.called)
+
+    def test_contains_uses_cast_binary(self):
+        """
+        Standard lookups should use CAST(... AS BINARY) instead of the
+        deprecated BINARY operator.
+        """
+        qs = User.objects.filter(username__contains="test")
+        sql, params = qs.query.get_compiler(connection.alias).as_sql()
+
+        # Verify modern syntax is used
+        self.assertIn("LIKE (CAST(", sql)
+        self.assertIn("AS BINARY))", sql)
+        # Ensure the old deprecated operator is GONE
+        self.assertNotIn("LIKE BINARY", sql)
+
+    def test_regex_uses_cast_binary_on_mariadb(self):
+        """
+        Regex lookups on MariaDB should use CAST(... AS BINARY).
+        On standard MySQL, REGEXP_LIKE is used which is already safe.
+        """
+        if not connection.mysql_is_mariadb:
+            self.skipTest("This test is specific to MariaDB.")
+
+        qs = User.objects.filter(username__regex="test")
+        sql, params = qs.query.get_compiler(connection.alias).as_sql()
+
+        self.assertIn("REGEXP (CAST(", sql)
+        self.assertIn("AS BINARY))", sql)
+        self.assertNotIn("REGEXP BINARY", sql)
