@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.models import User as AuthUser
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks, management
-from django.db import DEFAULT_DB_ALIAS, models, transaction
+from django.db import DEFAULT_DB_ALIAS, connection, models, transaction
 from django.db.models import signals
 from django.test import TestCase, override_settings
 from django.test.utils import isolate_apps
@@ -398,7 +398,7 @@ class ProxyModelTests(TestCase):
 
     def test_proxy_load_from_fixture(self):
         management.call_command("loaddata", "mypeople.json", verbosity=0)
-        p = MyPerson.objects.get(pk=100)
+        p = MyPerson.objects.get(pk=connection.ops.get_hardcoded_pk(100))
         self.assertEqual(p.name, "Elvis Presley")
 
     def test_select_related_only(self):
@@ -408,7 +408,8 @@ class ProxyModelTests(TestCase):
         self.assertEqual(qs.get(), issue)
 
     def test_eq(self):
-        self.assertEqual(MyPerson(id=100), Person(id=100))
+        id_ = connection.ops.get_hardcoded_pk(100)
+        self.assertEqual(MyPerson(id=id_), Person(id=id_))
 
 
 @override_settings(ROOT_URLCONF="proxy_models.urls")
