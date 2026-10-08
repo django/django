@@ -156,13 +156,12 @@ User-facing features
 * **Content**:
   :doc:`Flatpages </ref/contrib/flatpages>` |
   :doc:`Redirects </ref/contrib/redirects>` |
-  :doc:`Unicode in Django </ref/unicode>` |
   :doc:`Pagination </topics/pagination>` |
   :doc:`Messages framework </ref/contrib/messages>`
 
 * **Forms**:
   :doc:`/topics/forms/index` |
-  :doc:`Form API </ref/forms/api>` |
+  :doc:`/ref/forms/api` |
   :doc:`Built-in fields </ref/forms/fields>` |
   :doc:`Built-in widgets </ref/forms/widgets>` |
   :doc:`Forms for models </topics/forms/modelforms>` |
@@ -172,10 +171,10 @@ User-facing features
 
 * **Internationalization and localization**:
   :doc:`Introduction to internationalization </topics/i18n/index>` |
-  :doc:`Internationalization </topics/i18n/translation>` |
-  :ref:`Localization <how-to-create-language-files>` |
-  :doc:`Localized web UI formatting and form input </topics/i18n/formatting>` |
-  :doc:`Time zones </topics/i18n/timezones>`
+  :doc:`/topics/i18n/translation` |
+  :doc:`/topics/i18n/formatting` |
+  :doc:`/topics/i18n/timezones` |
+  :doc:`/ref/unicode`
 
 * **Authentication**:
   :doc:`/topics/auth/index` |

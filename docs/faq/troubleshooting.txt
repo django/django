@@ -53,5 +53,5 @@ pitfalls producing this error:
 
 Related resources:
 
-* :doc:`Unicode in Django </ref/unicode>`
+* :doc:`/ref/unicode`
 * https://wiki.python.org/moin/UnicodeDecodeError
