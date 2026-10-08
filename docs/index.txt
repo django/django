@@ -11,7 +11,8 @@ First steps
 
 * **Getting started**:
   :doc:`/intro/overview` |
-  :doc:`Installation </intro/install>`
+  :doc:`Installation </intro/install>` |
+  :doc:`Third-party distributions </misc/distributions>`
 
 The tutorial takes you by the hand through a series of steps to create a
 web application.
@@ -132,12 +133,10 @@ customized.
 Other core functionality
 ========================
 
-* **Settings**:
+* **Configuration**:
   :doc:`/topics/settings` |
-  :doc:`Full list of settings </ref/settings>`
-
-* **Applications**:
-  :doc:`/ref/applications`
+  :doc:`Full list of settings </ref/settings>` |
+  :doc:`Applications </ref/applications>`
 
 * **Exceptions**:
   :doc:`/ref/exceptions`
@@ -278,16 +277,8 @@ supportive community that welcomes new contributors:
 
 * **Processes and policies**:
   :doc:`The release process </internals/release-process>` |
-  :doc:`Security policies </internals/security>`
-
-* **Design philosophies**:
-  :doc:`/misc/design-philosophies`
-
-* **Documentation**:
-  :doc:`About this documentation </internals/contributing/writing-documentation>`
-
-* **Third-party distributions**:
-  :doc:`/misc/distributions`
+  :doc:`Security policies </internals/security>` |
+  :doc:`Design philosophies </misc/design-philosophies>`
 
 * **Django over time**:
   :doc:`API stability </misc/api-stability>` |
