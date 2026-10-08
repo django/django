@@ -114,6 +114,14 @@ Potential denial-of-service vulnerability via nested geometry collections.
 * Django 6.0 :commit:`(patch) <6af5da31775417c610dbf9c3f1b5b8333d42daf6>`
 * Django 5.2 :commit:`(patch) <ba80833fa656dd09660b97c4429331067db1b080>`
 
+There was an additional hardening with new patch releases published on Oct 6,
+2026. `Full description
+<https://www.djangoproject.com/weblog/2026/oct/06/security-releases/>`__
+
+* Django 6.1.2 :commit:`(patch) <75d401a1491e04a907ed745c128836d51c982c0f>`
+* Django 6.0.9 :commit:`(patch) <4353dfb56f8ba3a6fccc4bdd7f2ef2fbee3aa638>`
+* Django 5.2.18 :commit:`(patch) <1eafa1a80f1363283f89208ba4499ed54e35f085>`
+
 August 4, 2026 - :cve:`2026-15920`
 ----------------------------------
 
