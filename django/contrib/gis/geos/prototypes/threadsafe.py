@@ -20,6 +20,7 @@ class GEOSContextHandle(GEOSBase):
 # to hold a reference to GEOSContextHandle for this thread.
 class GEOSContext(threading.local):
     handle = None
+    last_error = None
 
 
 thread_context = GEOSContext()
