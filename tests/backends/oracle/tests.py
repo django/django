@@ -49,6 +49,24 @@ class Tests(TestCase):
             cursor.execute("BEGIN %s := 'X'; END; ", [var])
             self.assertEqual(var.getvalue(), "X")
 
+    def test_explicit_blob_parameter(self):
+        """oracledb 26+ requires temporary LOBs for use in PL/SQL functions."""
+
+        class Blob(bytes):
+            # Request conversion to LOB.
+            input_size = connection.Database.DB_TYPE_BLOB
+
+            def __init__(self, data):
+                self.data = data
+
+            def bind_parameter(self, cursor):
+                return self.data
+
+        data = b"\x00" * 32_768  # 1 byte above max PL/SQL RAW size.
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT DBMS_LOB.GETLENGTH(%s) FROM dual", [Blob(data)])
+            self.assertEqual(cursor.fetchone()[0], len(data))
+
     def test_order_of_nls_parameters(self):
         """
         An 'almost right' datetime works with configured NLS parameters

@@ -18,3 +18,5 @@ Bugfixes
   top-level :class:`~django.db.models.JSONField` :lookup:`in` lookup
   (:ticket:`37403`). Using such an expression in an ``IN`` lookup is likely
   unintended, since SQL ``NULL`` cannot match any value.
+
+* Added compatibility for ``oracledb`` 26.0.0 (:ticket:`37411`).
