@@ -1034,13 +1034,17 @@ this, see the advice on prefetching in :ref:`topics-db-queries-related`.
 Transactions
 ------------
 
-Transactions are **not** currently supported with asynchronous queries and
-updates. You will find that trying to use one raises
-``SynchronousOnlyOperation``.
+Use ``async with transaction.atomic()`` for asynchronous queries and updates
+inside a transaction. Nested blocks in the same task use savepoints. A task
+that inherits another task's async atomic context cannot enter an async atomic
+block; attempting to do so raises
+:exc:`~django.db.transaction.TransactionManagementError`. Creating a task alone
+does not isolate its ORM calls from the parent's transaction. See
+:ref:`async-atomic` for task ownership and child-task lifetime requirements.
 
-If you wish to use a transaction, we suggest you write your ORM code inside a
-separate, synchronous function and then call that using ``sync_to_async`` - see
-:doc:`/topics/async` for more.
+The synchronous ``with transaction.atomic()`` form cannot be used directly in
+async code, but it can still be wrapped inside ``sync_to_async``.
+See :doc:`/topics/async`.
 
 .. _querying-jsonfield:
 

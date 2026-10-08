@@ -1,6 +1,11 @@
+import asyncio
 import warnings
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import ContextDecorator, contextmanager
+from contextvars import ContextVar
 from functools import wraps
+
+from asgiref.sync import ThreadSensitiveContext, sync_to_async
 
 from django.db import (
     DEFAULT_DB_ALIAS,
@@ -150,6 +155,12 @@ def on_commit(func, using=None, robust=False):
 #################################
 # Decorators / context managers #
 #################################
+
+# Async atomic blocks entered in the current context, innermost last. Each item
+# is an (owning task, worker context) pair. The worker context is a
+# (ThreadSensitiveContext, worker) pair when this block owns a worker, or None
+# when it reuses the worker of an enclosing block in the same task.
+_async_atomic_blocks = ContextVar("async_atomic_blocks", default=())
 
 
 class Atomic(ContextDecorator):
@@ -324,6 +335,81 @@ class Atomic(ContextDecorator):
                     connection.connection = None
                 else:
                     connection.in_atomic_block = False
+
+    async def __aenter__(self):
+        blocks = _async_atomic_blocks.get()
+        task = asyncio.current_task()
+        # Only the owning task can nest. Reject inherited contexts before
+        # consulting a worker that may already have been shut down.
+        if blocks and blocks[-1][0] is not task:
+            raise TransactionManagementError(
+                "Cannot enter an async atomic block in another "
+                "task's atomic context."
+            )
+        worker_context = None
+        # Reuse the worker of an enclosing async block or sync transaction,
+        # including the transaction wrapping a TestCase.
+        if not blocks and not await sync_to_async(self._in_atomic_block)():
+            worker = ThreadPoolExecutor(max_workers=1)
+            worker_context = (ThreadSensitiveContext(executor=worker), worker)
+            await worker_context[0].__aenter__()
+        try:
+            await sync_to_async(self._enter_async)(task)
+        except BaseException:
+            if worker_context is not None:
+                await self._aexit_thread_context(*worker_context)
+            raise
+        _async_atomic_blocks.set((*blocks, (task, worker_context)))
+        return self
+
+    async def __aexit__(self, exc_type, exc_value, traceback):
+        *blocks, (task, worker_context) = _async_atomic_blocks.get()
+        if task is not asyncio.current_task():
+            raise TransactionManagementError(
+                "An async atomic block must be exited in the task that entered it."
+            )
+        _async_atomic_blocks.set(tuple(blocks))
+        try:
+            await sync_to_async(self._exit_async)(exc_type, exc_value, traceback)
+        finally:
+            if worker_context is not None:
+                await self._aexit_thread_context(*worker_context)
+
+    def _in_atomic_block(self):
+        return get_connection(self.using).in_atomic_block
+
+    def _enter_async(self, task):
+        connection = get_connection(self.using)
+        # A sync parent has no async owner for sibling tasks to inherit.
+        # Check ownership and enter on the worker in one call, so two tasks
+        # cannot both see an unclaimed connection before creating a savepoint.
+        tasks = connection._async_atomic_tasks
+        if tasks and tasks[-1] is not task:
+            raise TransactionManagementError(
+                "Cannot enter an async atomic block while another task is using "
+                "this connection's transaction."
+            )
+        self.__enter__()
+        tasks.append(task)
+
+    def _exit_async(self, exc_type, exc_value, traceback):
+        connection = get_connection(self.using)
+        try:
+            return self.__exit__(exc_type, exc_value, traceback)
+        finally:
+            connection._async_atomic_tasks.pop()
+
+    @staticmethod
+    async def _aexit_thread_context(thread_context, worker):
+        try:
+            # Queue connection cleanup before shutdown, without joining the
+            # worker on the event-loop thread. Cancellation must not cancel the
+            # cleanup.
+            cleanup = worker.submit(connections.close_all)
+            worker.shutdown(wait=False)
+            await asyncio.shield(asyncio.wrap_future(cleanup))
+        finally:
+            await thread_context.__aexit__(None, None, None)
 
 
 def atomic(using=None, savepoint=True, durable=False):

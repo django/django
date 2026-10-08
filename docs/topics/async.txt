@@ -164,9 +164,15 @@ Asynchronous model methods that use the database are also supported::
         book = await Book.objects.acreate(...)
         await book.tags.aset(tags)
 
-Transactions do not yet work in async mode. If you have a piece of code that
-needs transactions behavior, we recommend you write that piece as a single
-synchronous function and call it using :func:`sync_to_async`.
+Use ``async with transaction.atomic()`` for transactions with asynchronous ORM
+methods. Nested blocks in the same task use savepoints. A task that inherits
+another task's async atomic context cannot enter an async atomic block;
+attempting to do so raises
+:exc:`~django.db.transaction.TransactionManagementError`. See :ref:`async-atomic`
+for task ownership and nesting rules.
+
+Existing synchronous transaction code can still be wrapped in a single function
+and called using :func:`sync_to_async`.
 
 :ref:`Persistent database connections <persistent-database-connections>`, set
 via the :setting:`CONN_MAX_AGE` setting, should also be disabled in async mode.

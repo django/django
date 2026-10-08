@@ -3,6 +3,7 @@ import argparse
 import atexit
 import copy
 import gc
+import logging
 import multiprocessing
 import os
 import shutil
@@ -52,6 +53,16 @@ warnings.simplefilter("error", RemovedAfterNextVersionWarning)
 # patterns.
 warnings.simplefilter("error", ResourceWarning)
 warnings.simplefilter("error", RuntimeWarning)
+
+# Silence the spurious "CancelledError exception in shielded future" logging
+# from asyncio.shield() on Python 3.14. Remove once the upstream fix is
+# released.
+# See: https://code.djangoproject.com/ticket/37385#comment:6
+logging.getLogger("asyncio").addFilter(
+    lambda record: not record.getMessage().startswith(
+        "CancelledError exception in shielded future"
+    )
+)
 
 # Reduce garbage collection frequency to improve performance. Since CPython
 # uses refcounting, garbage collection only collects objects with cyclic

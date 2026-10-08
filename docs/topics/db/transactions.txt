@@ -243,6 +243,60 @@ Django provides a single API to control database transactions.
     You may use ``atomic`` when autocommit is turned off. It will only use
     savepoints, even for the outermost block.
 
+.. _async-atomic:
+
+Asynchronous atomic blocks
+--------------------------
+
+Use ``async with transaction.atomic()`` with asynchronous ORM methods::
+
+    async def create_reporter():
+        # This task owns the async atomic block.
+        async with transaction.atomic():
+            reporter = await Reporter.objects.acreate(first_name="Tintin")
+            # A savepoint in the same task and transaction.
+            async with transaction.atomic():
+                await Reporter.objects.filter(pk=reporter.pk).aupdate(last_name="Reporter")
+
+Each outermost async atomic block belongs to the task that enters it.
+Nesting in the same task uses the same worker and connection and normally
+creates savepoints. Calling another coroutine with ``await`` does not create
+a new task, so that coroutine can also enter nested atomic blocks.
+
+A task that inherits another task's async atomic context cannot enter an
+async atomic block. Django raises
+:exc:`~django.db.transaction.TransactionManagementError` before creating a
+savepoint or allocating a new worker. This applies even if the parent
+immediately awaits the child. It includes tasks created by
+``asyncio.create_task()`` or ``asyncio.gather()``, and tasks created by an
+``async_to_sync()`` bridge inside an async atomic context.
+
+Prefer to keep database work in the owning task. If you create child tasks,
+ensure they all finish before the atomic block exits, for example by using
+``asyncio.TaskGroup`` inside the block. Their ORM calls can still share the
+parent's transaction. Creating a task does not isolate its database work or
+guarantee the order of concurrent queries.
+
+Outside an existing transaction, separate tasks can each enter an outermost
+async atomic block. These use independent workers and connections, so one
+transaction can commit while another rolls back.
+
+If there is no inherited async atomic context, an async block reached
+through ``async_to_sync()`` can still join an existing synchronous
+transaction, including the transaction wrapping a
+:class:`~django.test.TestCase`. Only one task at a time may have async atomic
+blocks open on that shared transaction. Overlapping entry by another task
+raises :exc:`~django.db.transaction.TransactionManagementError` before
+creating a savepoint. Run these blocks in sequence to keep using the shared
+transaction.
+
+An async atomic block must be exited in the task that entered it. If
+you use the async context manager form, this will be automatic.
+The ``atomic`` decorator will not work if called directly from an async
+context, and ``SynchronousOnlyOperation`` will be raised. But the
+``atomic`` decorator will work as normal on sync code inside
+``sync_to_async``.
+
 .. admonition:: Performance considerations
 
     Open transactions have a performance cost for your database server. To
