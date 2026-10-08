@@ -313,8 +313,9 @@ help navigate the site:
   steps to create a web application. Start here if you're new to Django or web
   application development.
 
-* :doc:`Topic guides </topics/index>` explain Django's functionality in detail,
-  and provide an overview of key topics and concepts.
+* :doc:`Topic guides </topics/index>` explain Django's functionality in detail
+  and provide an overview of key concepts and how individual parts of Django
+  can be used.
 
 * :doc:`Reference guides </ref/index>` contain technical reference for APIs and
   other aspects of Django's machinery.
