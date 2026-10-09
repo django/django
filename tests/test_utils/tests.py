@@ -2040,6 +2040,69 @@ class OverrideSettingsTests(SimpleTestCase):
             self.assertIn(expected_location, finder.locations)
 
 
+class TestBadSetUpTestDataWithoutTransactionSupport(TestCase):
+    """
+    An exception in TestCase.setUpTestData() shouldn't leave data in the
+    database on a database that doesn't support transactions, where
+    TestCase._fixture_setup() calls setUpTestData() directly instead of
+    wrapping it in an atomic block.
+    """
+
+    # Scope flush() to this app's tables only, so cleaning up after the
+    # simulated failure doesn't touch (and desync) tables like
+    # django_content_type that are shared with, and expected to stay in
+    # sync across, other test databases.
+    available_apps = ["test_utils"]
+
+    class MyException(Exception):
+        pass
+
+    _setup_attempted = False
+
+    @classmethod
+    def _databases_support_transactions(cls):
+        # Force the code path taken when a database doesn't support
+        # transactions, where _fixture_setup() calls setUpTestData()
+        # directly (once per test) instead of TestCase.setUpClass()
+        # wrapping a single call in an atomic block.
+        return False
+
+    @classmethod
+    def setUpClass(cls):
+        # TestCase.setUpClass() is a no-op when transactions aren't
+        # supported (see _fixture_setup() below), so call _pre_setup()
+        # directly here to simulate what would otherwise happen before the
+        # first test method.
+        super().setUpClass()
+        try:
+            cls._pre_setup()
+        except cls.MyException:
+            cls._data_leaked = Person.objects.exists()
+
+    @classmethod
+    def setUpTestData(cls):
+        # Simulate a broken setUpTestData() that creates data before
+        # raising, as could happen on a database that doesn't support
+        # transactions. Only fail the first time: _pre_setup() (and
+        # therefore this method) runs again before the test method below,
+        # via the normal per-test flow, and needs to succeed that time for
+        # the test to run and make its assertion. (_post_teardown() always
+        # unwinds available_apps once per test that actually ran
+        # _pre_setup(), so letting the retry happen naturally -- rather
+        # than skipping it -- keeps set_available_apps()/
+        # unset_available_apps() calls balanced.)
+        if cls._setup_attempted:
+            return
+        cls._setup_attempted = True
+        Person.objects.create(name="leaked")
+        raise cls.MyException()
+
+    def test_failure_in_setUpTestData_should_not_leak_data(self):
+        # _pre_setup() calls _fixture_teardown() so that any data created
+        # before the exception doesn't leak into other tests.
+        self.assertFalse(self._data_leaked)
+
+
 @skipUnlessDBFeature("uses_savepoints")
 class TestBadSetUpTestData(TestCase):
     """
