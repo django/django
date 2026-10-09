@@ -444,6 +444,10 @@ backends.
 * The undocumented ``ChangeList.has_related_field_in_list_display()`` method
   has been replaced with ``ChangeList.get_select_related_fields()``.
 
+* In order to improve accessibility, the admin's breadcrumbs are now rendered
+  as ``<li>`` elements within an ``<ol>`` instead of ``<div>`` elements. The
+  breadcrumb for the current page is now marked with ``aria-current="page"``.
+
 :mod:`django.contrib.auth`
 --------------------------
 
