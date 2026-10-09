@@ -393,16 +393,15 @@ the default option for all four is "No".
 OSGeo4W
 ~~~~~~~
 
-The `OSGeo4W installer`_ helps to install the PROJ, GDAL, and GEOS libraries
-required by GeoDjango. First, download the `OSGeo4W installer`_, and
-run it. Select :menuselection:`Express Web-GIS Install` and click next. In the
+The `OSGeo4W installer <https://trac.osgeo.org/osgeo4w/>`__ helps to install
+the PROJ, GDAL, and GEOS libraries required by GeoDjango. First, download the
+`OSGeo4W installer <https://trac.osgeo.org/osgeo4w/>`__, and run it. Select
+:menuselection:`Express Web-GIS Install` and click next. In the
 'Select Packages' list, ensure that GDAL is selected. If any other packages are
 enabled by default, they are not required by GeoDjango and may be unchecked
 safely. After clicking next and accepting the license agreements, the packages
 will be automatically downloaded and installed, after which you may exit the
 installer.
-
-.. _OSGeo4W installer: https://trac.osgeo.org/osgeo4w/
 
 Modify Windows environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
