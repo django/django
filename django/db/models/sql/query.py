@@ -2636,6 +2636,15 @@ class Query(BaseExpression):
                                 f"Cannot select the '{f}' alias. Use annotate() "
                                 f"to promote it."
                             )
+                    elif LOOKUP_SEP in f and f.split(LOOKUP_SEP)[0] in self.annotations:
+                        # A transform over an annotation alias, e.g.
+                        # values("published__year"). resolve_ref() already
+                        # builds the transform chain for this shape; without
+                        # it the name falls through to names_to_path() and is
+                        # resolved as a model field.
+                        self.annotations[f] = self.resolve_ref(f)
+                        annotation_names.append(f)
+                        selected[f] = f
                     else:
                         # Call `names_to_path` to ensure a FieldError including
                         # annotations about to be masked as valid choices if
