@@ -612,6 +612,33 @@ class NonAggregateAnnotationTestCase(TestCase):
             len(self.p1.name),
         )
 
+    def test_values_transform_on_annotation_grouped(self):
+        qs = (
+            Book.objects.filter(pk=self.b1.pk)
+            .annotate(
+                published=ExpressionWrapper(F("pubdate"), output_field=DateField())
+            )
+            .values("published__year")
+            .annotate(count=Count("pk"))
+        )
+        self.assertEqual(
+            list(qs.values_list("published__year", "count")),
+            [(self.b1.pubdate.year, 1)],
+        )
+
+    def test_values_transform_on_annotation_chained(self):
+        qs = (
+            Book.objects.filter(pk=self.b1.pk)
+            .annotate(
+                published=ExpressionWrapper(F("pubdate"), output_field=DateField())
+            )
+            .values("published__year")
+        )
+        self.assertEqual(
+            list(qs.values("published__year")),
+            [{"published__year": self.b1.pubdate.year}],
+        )
+
     def test_values_unsupported_transform_on_annotation(self):
         """
         An unsupported transform over an annotation alias reports the
