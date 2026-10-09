@@ -94,12 +94,28 @@ The ``task`` decorator
         this feature. Otherwise,
         :exc:`~django.tasks.exceptions.InvalidTask` is raised.
 
+    .. attribute:: Task.metadata
+
+        .. versionadded:: 6.2
+
+        A :class:`dict` of additional data stored alongside the ``Task``,
+        separate from its arguments. Defaults to ``{}``. Values must be
+        JSON-serializable, and keys must be strings.
+
+        This attribute can be set using :meth:`~Task.using`.
+
+        The backend must have :attr:`.supports_metadata` set to ``True`` to
+        use this feature. Otherwise,
+        :exc:`~django.tasks.exceptions.InvalidTask` is raised.
+
+        See :ref:`Task metadata <task-metadata>` for details.
+
     .. attribute:: Task.name
 
         The name of the function decorated with :func:`task`. This name is not
         necessarily unique.
 
-    .. method:: Task.using(*, priority=None, backend=None, queue_name=None, run_after=None)
+    .. method:: Task.using(*, priority=None, backend=None, queue_name=None, run_after=None, metadata=None)
 
         Creates a new ``Task`` with modified defaults. The existing ``Task`` is
         left unchanged.
@@ -110,8 +126,13 @@ The ``task`` decorator
         * :attr:`backend <Task.backend>`
         * :attr:`queue_name <Task.queue_name>`
         * :attr:`run_after <Task.run_after>`
+        * :attr:`metadata <Task.metadata>`
 
         See :ref:`modifying Tasks <modifying-tasks>` for usage examples.
+
+        .. versionchanged:: 6.2
+
+            The ``metadata`` argument was added.
 
     .. method:: Task.enqueue(*args, **kwargs)
 
@@ -164,6 +185,39 @@ Task context
 
         The number of the current execution attempts for this Task, starting at
         1.
+
+    .. attribute:: TaskContext.metadata
+
+        .. versionadded:: 6.2
+
+        A mutable :class:`dict` containing the metadata of the ``Task``,
+        excluding :ref:`reserved keys <task-metadata-reserved-keys>`.
+
+        Changes made to this dictionary are saved when the ``Task`` finishes,
+        whether it succeeds or fails, or when :meth:`save_metadata` is called.
+
+    .. method:: TaskContext.save_metadata()
+
+        .. versionadded:: 6.2
+
+        Saves :attr:`metadata` using the backend's
+        :meth:`~django.tasks.backends.base.BaseTaskBackend.save_metadata`.
+        Keys starting with an underscore are ignored.
+
+        If the metadata isn't JSON-serializable, :exc:`TypeError` or
+        :exc:`ValueError` is raised.
+
+    .. method:: TaskContext.asave_metadata()
+
+        .. versionadded:: 6.2
+
+        The ``async`` variant of :meth:`save_metadata`.
+
+    .. attribute:: TaskContext.metadata_modified
+
+        .. versionadded:: 6.2
+
+        Whether :attr:`metadata` has been modified since it was last saved.
 
 Task results
 ============
@@ -249,6 +303,22 @@ Task results
         raised.
 
         See :ref:`return values <task-return-values>` for usage examples.
+
+    .. attribute:: TaskResult.metadata
+
+        .. versionadded:: 6.2
+
+        A copy of the ``Task``'s metadata, excluding :ref:`reserved keys
+        <task-metadata-reserved-keys>`. Modifying this dictionary has no
+        effect. Use :attr:`TaskContext.metadata` to modify metadata from
+        within a running ``Task``.
+
+    .. attribute:: TaskResult.raw_metadata
+
+        .. versionadded:: 6.2
+
+        The ``Task``'s metadata, including reserved keys. This is intended for
+        use by backends and libraries.
 
     .. method:: TaskResult.refresh
 
@@ -345,6 +415,24 @@ Base backend
 
         The ``async`` variant of :meth:`BaseTaskBackend.get_result`.
 
+    .. method:: BaseTaskBackend.save_metadata(task_result, metadata)
+
+        .. versionadded:: 6.2
+
+        Persists ``metadata``, a :class:`dict` including reserved keys, for
+        the given :class:`~django.tasks.TaskResult`.
+
+        Backends with :attr:`supports_metadata` set to ``True`` must implement
+        this method and/or :meth:`asave_metadata`. If only one is implemented,
+        the other calls it. If neither is implemented,
+        :exc:`NotImplementedError` is raised.
+
+    .. method:: BaseTaskBackend.asave_metadata(task_result, metadata)
+
+        .. versionadded:: 6.2
+
+        The ``async`` variant of :meth:`BaseTaskBackend.save_metadata`.
+
     .. method:: BaseTaskBackend.validate_task(task)
 
         Validates whether the provided ``Task`` is able to be enqueued using
@@ -378,6 +466,13 @@ behavior accordingly.
     Whether the backend supports executing Tasks as ordered by their
     :attr:`~django.tasks.Task.priority`.
 
+.. attribute:: BaseTaskBackend.supports_metadata
+
+    .. versionadded:: 6.2
+
+    Whether the backend supports storing and saving
+    :attr:`~django.tasks.Task.metadata`.
+
 The below table notes which of the :ref:`built-in backends
 <task-available-backends>` support which features:
 
@@ -388,6 +483,7 @@ Feature                      :class:`.DummyBackend`  :class:`.ImmediateBackend`
 :attr:`.supports_async_task` Yes                     Yes
 :attr:`.supports_get_result` No                      No [#fnimmediateresult]_
 :attr:`.supports_priority`   Yes [#fndummypriority]_ Yes [#fnimmediatepriority]_
+:attr:`.supports_metadata`   Yes                     Yes
 ============================ ======================= ===========================
 
 .. _task-available-backends:

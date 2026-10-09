@@ -222,6 +222,67 @@ To receive the Task context as an argument to your Task function, pass
             subject=subject, message=message, from_email=None, recipient_list=emails
         )
 
+.. _task-metadata:
+
+Task metadata
+-------------
+
+.. versionadded:: 6.2
+
+Metadata is additional data stored alongside a ``Task``, separate from its
+arguments. It's useful for storing data such as a trace ID, or recording the
+progress of a long-running ``Task``. Like arguments, metadata must be a
+:class:`dict` of JSON-serializable values.
+
+Metadata can be set when enqueueing a ``Task`` using
+:meth:`~django.tasks.Task.using`::
+
+    result = email_users.using(metadata={"trace_id": "abc123"}).enqueue(
+        emails=["user@example.com"], subject="Hello", message="Hi!"
+    )
+
+Within a ``Task`` which :ref:`takes context <task-context>`, metadata can be
+read and modified using :attr:`context.metadata
+<django.tasks.TaskContext.metadata>`. Changes are saved when the ``Task``
+finishes, whether it succeeds or fails. To save changes sooner, call
+:meth:`~django.tasks.TaskContext.save_metadata` (or
+:meth:`~django.tasks.TaskContext.asave_metadata`)::
+
+    @task(takes_context=True)
+    def process_items(context, item_ids):
+        for i, item_id in enumerate(item_ids):
+            process_item(item_id)
+            context.metadata["processed"] = i + 1
+            context.save_metadata()
+
+Metadata can be read from the result using
+:attr:`TaskResult.metadata <django.tasks.TaskResult.metadata>`:
+
+.. code-block:: pycon
+
+    >>> result.metadata
+    {'trace_id': 'abc123'}
+
+Not all backends support metadata. Check
+:attr:`~django.tasks.backends.base.BaseTaskBackend.supports_metadata` before
+relying on it.
+
+.. _task-metadata-reserved-keys:
+
+Reserved keys
+~~~~~~~~~~~~~
+
+Metadata keys starting with an underscore (``_``) are reserved, and shouldn't
+be set by users. Keys starting with ``_django`` are reserved for Django and its
+first-party backends. Backend and library developers may use their own prefix,
+provided it starts with an underscore.
+
+Reserved keys are stored by the backend, but are excluded from
+:attr:`TaskResult.metadata <django.tasks.TaskResult.metadata>` and
+:attr:`TaskContext.metadata <django.tasks.TaskContext.metadata>`. They're
+also ignored when metadata is saved from a ``Task``. Backends can access them
+using :attr:`TaskResult.raw_metadata <django.tasks.TaskResult.raw_metadata>`.
+
 .. _modifying-tasks:
 
 Modifying Tasks
