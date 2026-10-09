@@ -189,6 +189,9 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
+* The :djadmin:`startproject` and :djadmin:`startapp` commands now display a
+  success message after creating a project or app.
+
 * The new :djadmin:`listurls` command lists the URLs from the project's root
   URLconf, including the view class or function (and name, if present).
 
