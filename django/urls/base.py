@@ -7,7 +7,13 @@ from django.utils.functional import lazy
 from django.utils.translation import override
 
 from .exceptions import NoReverseMatch, Resolver404
-from .resolvers import _get_cached_resolver, get_ns_resolver, get_resolver
+from .resolvers import (
+    RegexPattern,
+    URLResolver,
+    _get_cached_resolver,
+    get_ns_resolver,
+    get_resolver,
+)
 from .utils import get_callable
 
 # SCRIPT_NAME prefixes for each thread are stored here. If there's no entry for
@@ -191,14 +197,17 @@ def translate_url(url, lang_code):
     except Resolver404:
         pass
     else:
-        to_be_reversed = (
-            "%s:%s" % (match.namespace, match.url_name)
-            if match.namespace
-            else match.url_name
-        )
         with override(lang_code):
             try:
-                url = reverse(to_be_reversed, args=match.args, kwargs=match.kwargs)
+                if match.url_name is None:
+                    url = _reverse_matched_pattern(match)
+                else:
+                    to_be_reversed = (
+                        "%s:%s" % (match.namespace, match.url_name)
+                        if match.namespace
+                        else match.url_name
+                    )
+                    url = reverse(to_be_reversed, args=match.args, kwargs=match.kwargs)
             except NoReverseMatch:
                 pass
             else:
@@ -206,3 +215,24 @@ def translate_url(url, lang_code):
                     (parsed.scheme, parsed.netloc, url, parsed.query, parsed.fragment)
                 )
     return url
+
+
+def _reverse_matched_pattern(match):
+    """
+    Reverse the exact URL pattern that produced the given ResolverMatch.
+
+    Unnamed patterns can't be reversed by name, and reversing by the view
+    callable is ambiguous when the same view is used by several patterns. The
+    last entry of ``match.tried`` is the chain of resolvers ending with the
+    pattern that matched, so build a throwaway resolver tree containing only
+    that chain and reverse the view against it.
+    """
+    *resolvers, pattern = match.tried[-1]
+    for resolver in reversed(resolvers):
+        pattern = URLResolver(
+            resolver.pattern, [pattern], default_kwargs=resolver.default_kwargs
+        )
+    resolver = URLResolver(RegexPattern(r"^/"), [pattern])
+    return resolver._reverse_with_prefix(
+        match.func, get_script_prefix(), *match.args, **match.kwargs
+    )
