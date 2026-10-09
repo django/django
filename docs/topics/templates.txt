@@ -589,6 +589,17 @@ applications. This generic name was kept for backwards-compatibility.
   Tags and filters from built-in libraries can be used without first calling
   the :ttag:`{% load %} <load>` tag.
 
+* ``'allow_multiline_tags'``: Set to ``False`` to restore legacy template
+  parsing, in which block tags cannot span multiple lines.
+
+.. versionchanged:: 6.2
+
+    The ``allow_multiline_tags`` option was added.
+
+.. deprecated:: 6.2
+
+    Support for the ``allow_multiline_tags`` option is deprecated.
+
 .. module:: django.template.backends.jinja2
 
 .. class:: Jinja2
