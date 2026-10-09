@@ -1138,7 +1138,7 @@ Unless you are sure you wish to work with SQL ``NULL`` values, consider setting
 Key, index, and path transforms
 -------------------------------
 
-To query based on a given dictionary key, use that key as the lookup name:
+To query based on a given object key, use that key as the lookup name:
 
 .. code-block:: pycon
 
@@ -1203,11 +1203,11 @@ directly, but you can still use dictionary unpacking to use it in a query:
 
     Oracle 21c+ support for negative JSON array indices was added.
 
-.. admonition:: Integer-like dictionary keys
+.. admonition:: Integer-like object keys
 
-    In JSON, dictionary keys are always strings, but they can consist of digits
+    In JSON, object keys are always strings, but they can consist of digits
     (for example, ``{"0": "value"}``). Because Django interprets any integer
-    key as an index transform, querying dictionary keys that can be parsed as
+    key as an index transform, querying object keys that can be parsed as
     integers (such as ``data__0="value"``) is not supported and will not match.
 
     While chaining subsequent lookups (such as ``data__0__nested``) may work
@@ -1243,7 +1243,7 @@ To query for missing keys, use the ``isnull`` lookup:
 
     Represents the text value of a key, index, or path transform of
     :class:`~django.db.models.JSONField`. You can use the double underscore
-    notation in ``lookup`` to chain dictionary key and index transforms.
+    notation in ``lookup`` to chain object key and index transforms.
 
     For example:
 
