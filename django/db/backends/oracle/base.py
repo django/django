@@ -385,6 +385,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             cursor.execute("SET CONSTRAINTS ALL DEFERRED")
 
     def is_usable(self):
+        if self.connection is None:
+            return False
         try:
             self.connection.ping()
         except Database.Error:
