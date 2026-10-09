@@ -6,3 +6,14 @@ Django 6.0.10 release notes
 
 Django 6.0.10 fixes five security issues with severity "low" and one security
 issue with severity "moderate" in 6.0.9.
+
+CVE-2026-108147: Potential memory exhaustion in ``MultiPartParser`` via base64-encoded file upload
+==================================================================================================
+
+When using ``django.http.multipartparser.MultiPartParser``, multipart uploads
+with ``Content-Transfer-Encoding: base64`` could be buffered entirely in
+memory, regardless of :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`, before being
+passed to upload handlers, potentially consuming excessive memory.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
