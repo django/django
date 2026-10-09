@@ -46,7 +46,7 @@ Available ``Meta`` options
 
 .. attribute:: Options.db_table
 
-    The name of the database table to use for the model::
+    The database table to use for the model. This is usually a string::
 
         db_table = "music_album"
 
@@ -90,6 +90,44 @@ OK. Django quotes column and table names behind the scenes.
    Such quoted names can also be used with Django's other supported database
    backends; except for Oracle, however, the quotes have no effect. See the
    :ref:`Oracle notes <oracle-notes>` for more details.
+
+.. _schema-qualified-table-references:
+
+Schema-qualified table references
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: SchemaQualifiedTable(table, *, schema)
+
+    A reference to an existing table in a database schema. PostgreSQL supports
+    schema-qualified table references.
+
+Set ``db_table`` to a ``SchemaQualifiedTable`` and :attr:`.managed` to
+``False`` to map an unmanaged model to an existing schema-qualified table. For
+example:
+
+.. code-block:: python
+
+    from django.db import models
+
+
+    class Customer(models.Model):
+        name = models.CharField(max_length=100)
+
+        class Meta:
+            db_table = models.SchemaQualifiedTable(
+                "customer",
+                schema="billing",
+            )
+            managed = False
+
+This maps the model to the SQL table reference ``"billing"."customer"``.
+
+This is useful when the same table name exists in multiple schemas in the same
+database.
+
+The schema and table must already exist. Django doesn't create, alter, or
+delete schemas or tables referenced by ``SchemaQualifiedTable``. It also
+doesn't provide dynamic per-request schema selection.
 
 ``db_table_comment``
 --------------------
