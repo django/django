@@ -134,6 +134,8 @@ class AuthTemplateTests(TestCase):
             response,
             '<div class="flex-container errors">'
             '<label for="id_new_password2">Confirm password:</label>'
+            '<div class="help" id="id_new_password2_helptext">'
+            "Enter the same password as before, for verification.</div>"
             '<ul class="errorlist" id="id_new_password2_error">'
             "<li>This field is required.</li></ul>"
             '<input type="password" name="new_password2" autocomplete="new-password" '
