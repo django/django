@@ -1507,6 +1507,7 @@ class Query(BaseExpression):
         check_filterable=True,
         summarize=False,
         update_join_types=True,
+        can_reuse_exclude=None,
     ):
         """
         Build a WhereNode for a single filter clause but don't add it
@@ -1528,6 +1529,9 @@ class Query(BaseExpression):
         upper in the code by add_q().
 
         The 'can_reuse' is a set of reusable joins for multijoins.
+        The 'can_reuse_exclude' restricts negative subquery correlation to
+        inherited joins. Joins referenced by the right-hand expression are
+        also allowed.
 
         The method will create a filter clause that can be added to the current
         query. However, if the filter isn't added to the query then the caller
@@ -1546,6 +1550,7 @@ class Query(BaseExpression):
                 check_filterable=check_filterable,
                 summarize=summarize,
                 update_join_types=update_join_types,
+                can_reuse_exclude=can_reuse_exclude,
             )
         if hasattr(filter_expr, "resolve_expression"):
             if not getattr(filter_expr, "conditional", False):
@@ -1602,7 +1607,11 @@ class Query(BaseExpression):
             # lookup parts
             self._lookup_joins = join_info.joins
         except MultiJoin as e:
-            return self.split_exclude(filter_expr, can_reuse, e.names_with_path)
+            if can_reuse_exclude is not None:
+                can_reuse_exclude = can_reuse_exclude | used_joins
+            return self.split_exclude(
+                filter_expr, can_reuse, e.names_with_path, can_reuse_exclude
+            )
 
         # Update used_joins before trimming since they are reused to determine
         # which joins could be later promoted to INNER.
@@ -1711,8 +1720,13 @@ class Query(BaseExpression):
         check_filterable=True,
         summarize=False,
         update_join_types=True,
+        can_reuse_exclude=None,
     ):
         """Add a Q-object to the current filter."""
+        if can_reuse_exclude is None and used_aliases is not None:
+            # Correlate negative subqueries only to inherited joins, not joins
+            # introduced while building sibling filter conditions.
+            can_reuse_exclude = used_aliases.copy()
         connector = q_object.connector
         current_negated ^= q_object.negated
         branch_negated = branch_negated or q_object.negated
@@ -1731,6 +1745,7 @@ class Query(BaseExpression):
                 check_filterable=check_filterable,
                 summarize=summarize,
                 update_join_types=update_join_types,
+                can_reuse_exclude=can_reuse_exclude,
             )
             joinpromoter.add_votes(needed_inner)
             if child_clause:
@@ -2121,7 +2136,9 @@ class Query(BaseExpression):
                 reuse.update(join_list)
             return transform
 
-    def split_exclude(self, filter_expr, can_reuse, names_with_path):
+    def split_exclude(
+        self, filter_expr, can_reuse, names_with_path, can_reuse_exclude=None
+    ):
         """
         When doing an exclude against any kind of N-to-many relation, we need
         to use a subquery. This method constructs the nested query, given the
@@ -2157,7 +2174,9 @@ class Query(BaseExpression):
         col = query.select[0]
         select_field = col.target
         alias = col.alias
-        if alias in can_reuse:
+        if can_reuse_exclude is None:
+            can_reuse_exclude = can_reuse
+        if alias in can_reuse_exclude:
             pk = select_field.model._meta.pk
             # Need to add a restriction so that outer query's filters are in
             # effect for the subquery, too.
