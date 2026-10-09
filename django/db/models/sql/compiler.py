@@ -10,7 +10,7 @@ from django.db import DatabaseError, NotSupportedError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import ColPairs, F, OrderBy, RawSQL, Ref, Value
 from django.db.models.fields import AutoField, composite
-from django.db.models.functions import Cast, Random
+from django.db.models.functions import Random
 from django.db.models.lookups import Lookup
 from django.db.models.query_utils import select_related_descend
 from django.db.models.sql.constants import (
@@ -384,9 +384,6 @@ class SQLCompiler:
 
         for field in ordering:
             if hasattr(field, "resolve_expression"):
-                if isinstance(field, Value):
-                    # output_field must be resolved for constants.
-                    field = Cast(field, field.output_field)
                 if not isinstance(field, OrderBy):
                     field = field.asc()
                 if not self.query.standard_ordering:
@@ -449,9 +446,6 @@ class SQLCompiler:
                 if transforms:
                     for name in transforms:
                         expr = self.query.try_transform(expr, name)
-                if isinstance(expr, Value):
-                    # output_field must be resolved for constants.
-                    expr = Cast(expr, expr.output_field)
                 yield OrderBy(expr, descending=descending), False
                 continue
 
