@@ -30,9 +30,12 @@ from django.db.models.lookups import (
     LessThan,
     LessThanOrEqual,
 )
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.test.utils import ignore_warnings, isolate_apps, register_lookup
-from django.utils.deprecation import RemovedInDjango2028Warning
+from django.test import TestCase, ignore_warnings, skipIfDBFeature, skipUnlessDBFeature
+from django.test.utils import isolate_apps, register_lookup
+from django.utils.deprecation import (
+    RemovedInDjango2028Warning,
+    RemovedInDjango2029Warning,
+)
 
 from .models import (
     Article,
@@ -404,6 +407,8 @@ class LookupTests(TestCase):
             },
         )
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     def test_in_bulk_values_extra_select_all_fields(self):
         arts = (
             Article.objects.extra(select={"marker": "1"}).values().in_bulk([self.a1.pk])
@@ -732,6 +737,8 @@ class LookupTests(TestCase):
             ],
         )
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     def test_values_extra(self):
         # The values() method works with "extra" fields specified in
         # extra(select).
@@ -859,6 +866,8 @@ class LookupTests(TestCase):
             ],
         )
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     def test_values_nonexistent_field(self):
         # However, an exception FieldDoesNotExist will be thrown if you specify
         # a nonexistent field name in values() (a field that is neither in the
@@ -971,6 +980,8 @@ class LookupTests(TestCase):
             ],
         )
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     def test_values_list_extra(self):
         self.assertSequenceEqual(
             Article.objects.extra(select={"id_plus_one": "id+1"})

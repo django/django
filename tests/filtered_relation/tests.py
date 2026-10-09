@@ -18,8 +18,9 @@ from django.db.models import (
 )
 from django.db.models.functions import Concat
 from django.db.models.lookups import Exact, IStartsWith
-from django.test import TestCase
+from django.test import TestCase, ignore_warnings
 from django.test.testcases import skipUnlessDBFeature
+from django.utils.deprecation import RemovedInDjango2029Warning
 
 from .models import (
     Author,
@@ -381,6 +382,8 @@ class FilteredRelationTests(TestCase):
         ).filter(title__contains="outer space")
         self.assertSequenceEqual(queryset.order_by(alias), [book5, book6])
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     def test_extra(self):
         self.assertSequenceEqual(
             Author.objects.annotate(

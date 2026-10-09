@@ -23,7 +23,14 @@ from django.db import (
     router,
     transaction,
 )
-from django.db.models import AutoField, DateField, DateTimeField, Field, Max, sql
+from django.db.models import (
+    AutoField,
+    DateField,
+    DateTimeField,
+    Field,
+    Max,
+    sql,
+)
 from django.db.models.constants import LOOKUP_SEP, OnConflict
 from django.db.models.deletion import Collector
 from django.db.models.expressions import (
@@ -281,11 +288,13 @@ class ValuesIterable(BaseIterable):
         if query.selected:
             names = list(query.selected)
         else:
-            # extra(select=...) cols are always at the start of the row.
+            # RemovedInDjango2029Warning: remove the `extra` partitioning and
+            # expand *query.annotation_select when deprecation period ends.
+            extra, annotation_select = query._partition_extra_annotation_select()
             names = [
-                *query.extra_select,
+                *extra,
                 *query.values_select,
-                *query.annotation_select,
+                *annotation_select,
             ]
         indexes = range(len(names))
         for row in compiler.results_iter(
@@ -323,10 +332,13 @@ class NamedValuesListIterable(ValuesListIterable):
             names = queryset._fields
         else:
             query = queryset.query
+            # RemovedInDjango2029Warning: remove the `extra` partitioning and
+            # expand *query.annotation_select when deprecation period ends.
+            extra, annotation_select = query._partition_extra_annotation_select()
             names = [
-                *query.extra_select,
+                *extra,
                 *query.values_select,
-                *query.annotation_select,
+                *annotation_select,
             ]
         tuple_class = create_namedtuple_class(*names)
         new = tuple.__new__
@@ -1307,7 +1319,6 @@ class QuerySet(AltersData):
         selected_fields = tuple(
             self.query.selected
             or (
-                *self.query.extra_select,
                 *self.query.values_select,
                 *self.query.annotation_select,
             )
@@ -1982,6 +1993,8 @@ class QuerySet(AltersData):
         obj.query.add_distinct_fields(*field_names)
         return obj
 
+    # RemovedInDjango2029Warning: When the deprecation ends remove all the
+    # parameters except for `tables`.
     def extra(
         self,
         select=None,
@@ -2069,7 +2082,7 @@ class QuerySet(AltersData):
         """
         if isinstance(self, EmptyQuerySet):
             return True
-        if self.query.extra_order_by or self.query.order_by:
+        if self.query.order_by:
             return True
         elif (
             self.query.default_ordering
@@ -2090,8 +2103,7 @@ class QuerySet(AltersData):
         (or set of fields) that is unique and non-nullable.
 
         For queries involving a GROUP BY clause, the model's default
-        ordering is ignored. Ordering specified via .extra(order_by=...)
-        is also ignored.
+        ordering is ignored.
         """
         if not self.ordered:
             return False
@@ -2348,7 +2360,6 @@ class QuerySet(AltersData):
         """Check that two QuerySet classes may be merged."""
         if self._fields is not None and (
             set(self.query.values_select) != set(other.query.values_select)
-            or set(self.query.extra_select) != set(other.query.extra_select)
             or set(self.query.annotation_select) != set(other.query.annotation_select)
         ):
             raise TypeError(
