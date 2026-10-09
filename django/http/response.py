@@ -9,6 +9,7 @@ import time
 import warnings
 from contextlib import aclosing
 from email.header import Header
+from functools import cached_property
 from http.client import responses
 from urllib.parse import urlsplit
 
@@ -24,7 +25,6 @@ from django.utils.asyncio import maybe_aclosing
 from django.utils.datastructures import CaseInsensitiveMapping
 from django.utils.deprecation import RemovedInDjango2029Warning
 from django.utils.encoding import iri_to_uri
-from django.utils.functional import cached_property
 from django.utils.http import (
     MAX_URL_REDIRECT_LENGTH,
     content_disposition_header,

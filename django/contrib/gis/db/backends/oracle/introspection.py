@@ -1,7 +1,8 @@
+from functools import cached_property
+
 import oracledb
 
 from django.db.backends.oracle.introspection import DatabaseIntrospection
-from django.utils.functional import cached_property
 
 
 class OracleIntrospection(DatabaseIntrospection):

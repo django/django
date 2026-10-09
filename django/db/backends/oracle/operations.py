@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from functools import lru_cache
+from functools import cached_property, lru_cache
 
 from django.conf import settings
 from django.db import NotSupportedError
@@ -9,7 +9,6 @@ from django.db.backends.utils import split_tzname_delta, strip_quotes, truncate_
 from django.db.models import AutoField
 from django.utils import timezone
 from django.utils.encoding import force_bytes, force_str
-from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 
 from .base import Database

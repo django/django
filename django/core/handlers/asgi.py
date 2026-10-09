@@ -5,6 +5,7 @@ import tempfile
 import traceback
 from collections import defaultdict
 from contextlib import aclosing, closing
+from functools import cached_property
 
 from asgiref.sync import ThreadSensitiveContext, sync_to_async
 
@@ -22,7 +23,6 @@ from django.http import (
     parse_cookie,
 )
 from django.urls import set_script_prefix
-from django.utils.functional import cached_property
 
 logger = logging.getLogger("django.request")
 

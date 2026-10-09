@@ -1,7 +1,7 @@
 import operator
+from functools import cached_property
 
 from django.db.backends.base.features import BaseDatabaseFeatures
-from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):

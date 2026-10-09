@@ -1,9 +1,9 @@
 import re
+from functools import cached_property
 
 from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
-from django.utils.functional import cached_property
 
 test_srs = (
     {

@@ -1,5 +1,7 @@
 from django.test import SimpleTestCase
-from django.utils.functional import cached_property, classproperty, lazy
+from django.utils.deprecation import RemovedInDjango2029Warning
+from django.utils.functional import cached_property as deprecated_cached_property
+from django.utils.functional import classproperty, lazy
 
 
 class FunctionalTests(SimpleTestCase):
@@ -74,59 +76,62 @@ class FunctionalTests(SimpleTestCase):
             self.assertNotEqual(get(obj), get(obj2))
             self.assertNotEqual(get(subobj), get(subobj2))
             # It behaves like a property when there's no instance.
-            self.assertIsInstance(get(Class), cached_property)
-            self.assertIsInstance(get(SubClass), cached_property)
+            self.assertIsInstance(get(Class), deprecated_cached_property)
+            self.assertIsInstance(get(SubClass), deprecated_cached_property)
             # 'other_value' doesn't become a property.
             self.assertTrue(callable(obj.other_value))
             self.assertTrue(callable(subobj.other_value))
 
-    def test_cached_property(self):
-        """cached_property caches its value and behaves like a property."""
+    def test_deprecated_cached_property(self):
+        """deprecated cached_property remains implemented until 2029."""
 
-        class Class:
-            @cached_property
-            def value(self):
-                """Here is the docstring..."""
-                return 1, object()
+        with self.assertWarns(PendingDeprecationWarning):
 
-            @cached_property
-            def __foo__(self):
-                """Here is the docstring..."""
-                return 1, object()
+            class Class:
+                @deprecated_cached_property
+                def value(self):
+                    """Here is the docstring..."""
+                    return 1, object()
 
-            def other_value(self):
-                """Here is the docstring..."""
-                return 1, object()
+                @deprecated_cached_property
+                def __foo__(self):
+                    """Here is the docstring..."""
+                    return 1, object()
 
-            other = cached_property(other_value)
+                def other_value(self):
+                    """Here is the docstring..."""
+                    return 1, object()
+
+                other = deprecated_cached_property(other_value)
 
         attrs = ["value", "other", "__foo__"]
         for attr in attrs:
             self.assertCachedPropertyWorks(attr, Class)
 
-    def test_cached_property_auto_name(self):
+    def test_deprecated_cached_property_auto_name(self):
         """
-        cached_property caches its value and behaves like a property
-        on mangled methods or when the name kwarg isn't set.
+        deprecated cached_property remains implemented until 2029.
         """
 
-        class Class:
-            @cached_property
-            def __value(self):
-                """Here is the docstring..."""
-                return 1, object()
+        with self.assertWarns(PendingDeprecationWarning):
 
-            def other_value(self):
-                """Here is the docstring..."""
-                return 1, object()
+            class Class:
+                @deprecated_cached_property
+                def __value(self):
+                    """Here is the docstring..."""
+                    return 1, object()
 
-            other = cached_property(other_value)
+                def other_value(self):
+                    """Here is the docstring..."""
+                    return 1, object()
+
+                other = deprecated_cached_property(other_value)
 
         attrs = ["_Class__value", "other"]
         for attr in attrs:
             self.assertCachedPropertyWorks(attr, Class)
 
-    def test_cached_property_reuse_different_names(self):
+    def test_deprecated_cached_property_reuse_different_names(self):
         """
         Disallow this case because the decorated function wouldn't be cached.
         """
@@ -137,42 +142,47 @@ class FunctionalTests(SimpleTestCase):
         error_type = TypeError
         msg = type_msg
 
-        with self.assertRaisesMessage(error_type, msg):
+        with self.assertWarns(PendingDeprecationWarning):
 
-            class ReusedCachedProperty:
-                @cached_property
-                def a(self):
-                    pass
+            with self.assertRaisesMessage(error_type, msg):
 
-                b = a
+                class ReusedCachedProperty:
+                    @deprecated_cached_property
+                    def a(self):
+                        pass
 
-    def test_cached_property_reuse_same_name(self):
+                    b = a
+
+    def test_deprecated_cached_property_reuse_same_name(self):
         """
-        Reusing a cached_property on different classes under the same name is
-        allowed.
+        deprecated cached_property remains implemented until 2029.
         """
         counter = 0
 
-        @cached_property
-        def _cp(_self):
-            nonlocal counter
-            counter += 1
-            return counter
+        with self.assertWarns(PendingDeprecationWarning):
 
-        class A:
-            cp = _cp
+            @deprecated_cached_property
+            def _cp(_self):
+                nonlocal counter
+                counter += 1
+                return counter
 
-        class B:
-            cp = _cp
+            class A:
+                cp = _cp
 
-        a = A()
-        b = B()
+            class B:
+                cp = _cp
+
+            a = A()
+            b = B()
+
         self.assertEqual(a.cp, 1)
         self.assertEqual(b.cp, 2)
         self.assertEqual(a.cp, 1)
 
-    def test_cached_property_set_name_not_called(self):
-        cp = cached_property(lambda s: None)
+    def test_deprecated_cached_property_set_name_not_called(self):
+        with self.assertWarns(PendingDeprecationWarning):
+            cp = deprecated_cached_property(lambda s: None)
 
         class Foo:
             pass
@@ -183,6 +193,14 @@ class FunctionalTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(TypeError, msg):
             Foo().cp
+
+    def test_deprecated_cached_property_deprecation_warning(self):
+        with self.assertWarnsMessage(
+            RemovedInDjango2029Warning,
+            "django.utils.functional.cached_property is deprecated. "
+            "Use functools.cached_property instead.",
+        ):
+            deprecated_cached_property(lambda s: None)
 
     def test_lazy_add_int(self):
         lazy_4 = lazy(lambda: 4, int)

@@ -1,7 +1,6 @@
 import functools
 
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
 from .base import Template
@@ -111,7 +110,7 @@ class Engine:
                 return engine.engine
         raise ImproperlyConfigured("No DjangoTemplates backend is configured.")
 
-    @cached_property
+    @functools.cached_property
     def template_context_processors(self):
         context_processors = _builtin_context_processors
         context_processors += tuple(self.context_processors)
@@ -126,7 +125,7 @@ class Engine:
             loaded[name] = import_library(path)
         return loaded
 
-    @cached_property
+    @functools.cached_property
     def template_loaders(self):
         return self.get_template_loaders(self.loaders)
 

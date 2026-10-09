@@ -2,7 +2,7 @@ import copy
 import typing
 from collections import defaultdict
 from contextlib import contextmanager
-from functools import partial
+from functools import cached_property, partial
 
 from django.apps import AppConfig
 from django.apps.registry import Apps
@@ -15,7 +15,6 @@ from django.db.models import NOT_PROVIDED
 from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
 from django.db.models.options import DEFAULT_NAMES, normalize_together
 from django.db.models.utils import make_model_tuple
-from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.version import get_docs_version
 

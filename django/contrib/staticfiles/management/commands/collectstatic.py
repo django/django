@@ -1,4 +1,5 @@
 import os
+from functools import cached_property
 
 from django.apps import apps
 from django.contrib.staticfiles.finders import get_finders
@@ -7,7 +8,6 @@ from django.core.checks import Tags
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
-from django.utils.functional import cached_property
 
 
 class Command(BaseCommand):
