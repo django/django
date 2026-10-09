@@ -1625,47 +1625,47 @@ class Query(BaseExpression):
         lookup_type = condition.lookup_name
         clause = WhereNode([condition], connector=AND)
 
-        require_outer = (
-            lookup_type == "isnull" and condition.rhs is True and not current_negated
-        )
-        if (
-            current_negated
-            and (lookup_type != "isnull" or condition.rhs is False)
-            and condition.rhs is not None
-        ):
+        require_outer = False
+        if lookup_type == "isnull":
+            # Both `NOT (field IS NOT NULL)` and `field IS NULL` require an
+            # OUTER JOIN to effectively include related `NULL` values.
+            # Otherwise an INNER JOIN can be used as it excludes them.
+            require_outer = (
+                condition.rhs is False if current_negated else condition.rhs is True
+            )
+        elif current_negated and condition.rhs is not None:
             require_outer = True
-            if lookup_type != "isnull":
-                # The condition added here will be SQL like this:
-                # NOT (col IS NOT NULL), where the first NOT is added in
-                # upper layers of code. The reason for addition is that if col
-                # is null, then col != someval will result in SQL "unknown"
-                # which isn't the same as in Python. The Python None handling
-                # is wanted, and it can be gotten by
-                # (col IS NULL OR col != someval)
-                #   <=>
-                # NOT (col IS NOT NULL AND col = someval).
+            # The condition added below will be SQL like this:
+            # `NOT (col IS NOT NULL)`, where the first NOT is added in
+            # upper layers of code. The reason for addition is that if col
+            # `IS NULL`, then `col != someval` will result in SQL "unknown"
+            # which isn't the same as in Python. The Python None handling
+            # is wanted, and it can be achieved by
+            # `(col != someval OR col IS NULL)` which is equivalent to
+            # `NOT (col = someval AND col IS NOT NULL)`. The second form is
+            # required here as the condition is negated per `current_negated`.
+            if (
+                self.is_nullable(targets[0])
+                or self.alias_map[join_list[-1]].join_type == LOUTER
+            ):
+                lookup_class = targets[0].get_lookup("isnull")
+                col = self._get_col(targets[0], join_info.targets[0], alias)
+                # Use OR + IS NULL when RHS `in` values include None.
                 if (
-                    self.is_nullable(targets[0])
-                    or self.alias_map[join_list[-1]].join_type == LOUTER
+                    lookup_type == "in"
+                    # Check containers (not strings or bytes).
+                    and isinstance(condition.rhs, Iterable)
+                    and not isinstance(condition.rhs, (str, bytes))
+                    and any(v is None for v in condition.rhs)
                 ):
-                    lookup_class = targets[0].get_lookup("isnull")
-                    col = self._get_col(targets[0], join_info.targets[0], alias)
-                    # Use OR + IS NULL when RHS `in` values include None.
-                    if (
-                        lookup_type == "in"
-                        # Check containers (not strings or bytes).
-                        and isinstance(condition.rhs, Iterable)
-                        and not isinstance(condition.rhs, (str, bytes))
-                        and any(v is None for v in condition.rhs)
-                    ):
-                        clause.add(lookup_class(col, True), OR)
-                    else:
-                        clause.add(lookup_class(col, False), AND)
-                # If someval is a nullable column, someval IS NOT NULL is
-                # added.
-                if isinstance(value, Col) and self.is_nullable(value.target):
-                    lookup_class = value.target.get_lookup("isnull")
-                    clause.add(lookup_class(value, False), AND)
+                    clause.add(lookup_class(col, True), OR)
+                else:
+                    clause.add(lookup_class(col, False), AND)
+            # If someval is a nullable column, someval IS NOT NULL is
+            # added.
+            if isinstance(value, Col) and self.is_nullable(value.target):
+                lookup_class = value.target.get_lookup("isnull")
+                clause.add(lookup_class(value, False), AND)
         return clause, used_joins if not require_outer else ()
 
     def add_filter(self, filter_lhs, filter_rhs):
