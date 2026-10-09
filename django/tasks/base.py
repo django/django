@@ -20,6 +20,7 @@ TASK_MAX_PRIORITY = 100
 TASK_MIN_PRIORITY = -100
 TASK_REFRESH_ATTRS = {
     "errors",
+    "metadata",
     "_return_value",
     "finished_at",
     "started_at",
@@ -52,6 +53,9 @@ class Task:
     # Whether the Task receives the Task context when executed.
     takes_context: bool = False
 
+    # Additional JSON-compatible data stored alongside the Task.
+    metadata: dict[str, Any] = field(default_factory=dict, hash=False)
+
     def __post_init__(self):
         self.get_backend().validate_task(self)
 
@@ -83,6 +87,7 @@ class Task:
         queue_name=None,
         run_after=None,
         backend=None,
+        metadata=None,
     ):
         """Create a new Task with modified defaults."""
 
@@ -95,6 +100,8 @@ class Task:
             changes["run_after"] = run_after
         if backend is not None:
             changes["backend"] = backend
+        if metadata is not None:
+            changes["metadata"] = metadata
         return replace(self, **changes)
 
     def enqueue(self, *args, **kwargs):
@@ -218,11 +225,14 @@ class TaskResult:
     errors: list[TaskError]  # Errors raised when running the task.
     worker_ids: list[str]  # Workers which have processed the task.
 
+    metadata: dict[str, Any] = field(default_factory=dict)
+
     _return_value: Any | None = field(init=False, default=None)
 
     def __post_init__(self):
         object.__setattr__(self, "args", normalize_json(self.args))
         object.__setattr__(self, "kwargs", normalize_json(self.kwargs))
+        object.__setattr__(self, "metadata", normalize_json(self.metadata))
 
     @property
     def return_value(self):
@@ -270,3 +280,19 @@ class TaskContext:
     @property
     def attempt(self):
         return self.task_result.attempts
+
+    @property
+    def metadata(self):
+        return self.task_result.metadata
+
+    def save_metadata(self):
+        """Persist the task's metadata."""
+        metadata = normalize_json(self.metadata)
+        self.task_result.task.get_backend().save_metadata(self.task_result, metadata)
+
+    async def asave_metadata(self):
+        """See save_metadata()."""
+        metadata = normalize_json(self.metadata)
+        await self.task_result.task.get_backend().asave_metadata(
+            self.task_result, metadata
+        )
