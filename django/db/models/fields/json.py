@@ -486,7 +486,12 @@ class JSONIn(ProcessJSONLHSMixin, lookups.In):
         if (
             connection.features.supports_primitives_in_json_field
             and isinstance(self.rhs, expressions.ExpressionList)
-            and expressions.JSONNull() in self.rhs.get_source_expressions()
+            and any(
+                isinstance(expr, expressions.Value)
+                and expr.value is None
+                and isinstance(expr._output_field_or_none, JSONField)
+                for expr in self.rhs.get_source_expressions()
+            )
         ):
             # Break the lookup into multiple exact lookups combined with OR, as
             # Oracle does not support directly extracting JSON scalar null as a

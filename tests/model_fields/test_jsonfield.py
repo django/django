@@ -1061,6 +1061,14 @@ class TestQuerying(TestCase):
                     NullableJSONModel.objects.filter(value__in=lookup_value), expected
                 )
 
+    @skipUnlessDBFeature("supports_primitives_in_json_field")
+    def test_in_value_none_json_output_field(self):
+        obj = NullableJSONModel.objects.create(value=JSONNull())
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value__in=[Value(None, JSONField())]),
+            [obj],
+        )
+
     def test_in_json_whitespace(self):
         tests = [
             ('{"a":1}', {"a": 1}),
