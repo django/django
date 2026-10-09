@@ -6,8 +6,10 @@ import warnings
 from asgiref.sync import sync_to_async
 
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import RemovedInDjango2029Warning
 from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
+from django.utils.warnings import django_file_prefixes
 
 
 class InvalidCacheBackendError(ImproperlyConfigured):
@@ -58,7 +60,16 @@ def get_key_func(key_func):
 class BaseCache:
     _missing_key = object()
 
-    def __init__(self, params):
+    # RemovedInDjango2029Warning: Change alias to required.
+    def __init__(self, params, *, alias=None):
+        # RemovedInDjango2029Warning
+        if alias is None:
+            warnings.warn(
+                "Cache subclasses must pass 'alias' to BaseCache.",
+                category=RemovedInDjango2029Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
+        self.alias = alias
         timeout = params.get("timeout", params.get("TIMEOUT", 300))
         if timeout is not None:
             try:
