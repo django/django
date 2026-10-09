@@ -1,3 +1,4 @@
+import base64
 import copy
 from io import BytesIO
 from itertools import chain
@@ -6,7 +7,7 @@ from urllib.parse import urlencode
 
 from django.core.exceptions import BadRequest, DisallowedHost
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.core.files.uploadhandler import MemoryFileUploadHandler
+from django.core.files.uploadhandler import FileUploadHandler, MemoryFileUploadHandler
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
 from django.http import (
     HttpHeaders,
@@ -972,25 +973,105 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(len(files), 1)
         self.assertEqual(files["file"].read(), b"\x00\x00\x00")
 
-        # The alignment loop must read in `chunk-sized` units rather than one
-        # byte at a time, otherwise each whitespace byte triggers a separate
-        # read() call with a costly internal unget() cycle.
-        # Parsing this payload should issue exactly 8 LazyStream.read() calls:
+        # The base64 alignment must not issue extra reads, otherwise each
+        # whitespace byte could trigger a separate read() call with a costly
+        # internal unget() cycle. Bytes needed to complete the 4-byte base64
+        # group that spans the chunk boundary are carried over to the next
+        # chunk instead. Parsing this payload should issue exactly 7
+        # LazyStream.read() calls:
         # 1. main_stream.read(1)     -- BoundaryIter.__init__ probe, preamble
         # 2. sub_stream.read(1024)   -- parse_boundary_stream, preamble headers
         # 3. main_stream.read(1)     -- BoundaryIter.__init__ probe, file field
         # 4. field_stream.read(1024) -- parse_boundary_stream, file headers
-        # 5. field_stream.read(65536)-- base64 alignment loop: one chunk-sized
-        #                               read to find the non-whitespace bytes
-        #                               needed to complete the 4-byte base64
-        #                               group that spans the chunk boundary
-        # 6. main_stream.read(1)     -- BoundaryIter.__init__ probe, epilogue
-        # 7. sub_stream.read(1024)   -- parse_boundary_stream, epilogue headers
-        # 8. main_stream.read(1)     -- BoundaryIter.__init__ probe, exhausted
+        # 5. main_stream.read(1)     -- BoundaryIter.__init__ probe, epilogue
+        # 6. sub_stream.read(1024)   -- parse_boundary_stream, epilogue headers
+        # 7. main_stream.read(1)     -- BoundaryIter.__init__ probe, exhausted
         #                               stream; returns b"" and stops iteration
-        # A byte-at-a-time implementation of read() in step 5 would do instead
-        # one read(1) per whitespace byte past the chunk boundary (4488 calls).
-        self.assertEqual(reads, [1, 1024, 1, 1024, 65536, 1, 1024, 1])
+        # A byte-at-a-time alignment would instead do one read(1) per
+        # whitespace byte past the chunk boundary (4488 calls).
+        self.assertEqual(reads, [1, 1024, 1, 1024, 1, 1024, 1])
+
+    def test_multipart_file_upload_base64_streamed_in_chunks(self):
+        # Decoded data is passed to upload handlers in bounded chunks whatever
+        # the alignment of the base64 data relative to the chunk boundaries.
+        # The filename length shifts that alignment.
+        content = bytes(range(256)) * 1024
+        encoded = base64.b64encode(content)
+        chunk_size = 2**16
+
+        class RecordingUploadHandler(FileUploadHandler):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                self.chunks = []
+
+            def receive_data_chunk(self, raw_data, start):
+                self.chunks.append(raw_data)
+
+            def file_complete(self, file_size):
+                return None
+
+        for filename in ["a", "ab", "abc", "abcd"]:
+            with self.subTest(filename=filename):
+                payload = FakePayload(
+                    "\r\n".join(
+                        [
+                            f"--{BOUNDARY}",
+                            'Content-Disposition: form-data; name="file"; '
+                            f'filename="{filename}"',
+                            "Content-Type: application/octet-stream",
+                            "Content-Transfer-Encoding: base64",
+                            "",
+                            "",
+                        ]
+                    )
+                )
+                payload.write(encoded + b"\r\n")
+                payload.write(f"--{BOUNDARY}--\r\n")
+                request = WSGIRequest(
+                    {
+                        "REQUEST_METHOD": "POST",
+                        "CONTENT_TYPE": MULTIPART_CONTENT,
+                        "CONTENT_LENGTH": len(payload),
+                        "wsgi.input": payload,
+                    }
+                )
+                handler = RecordingUploadHandler()
+                request.upload_handlers = [handler]
+                request.FILES  # evaluate
+
+                self.assertEqual(b"".join(handler.chunks), content)
+                self.assertGreater(len(handler.chunks), 1)
+                self.assertLessEqual(max(map(len, handler.chunks)), chunk_size)
+
+    def test_multipart_file_upload_base64_truncated(self):
+        for data in ["A", "AA", "AAA", "AAAAA"]:
+            with self.subTest(data=data):
+                payload = FakePayload(
+                    "\r\n".join(
+                        [
+                            f"--{BOUNDARY}",
+                            'Content-Disposition: form-data; name="file"; '
+                            'filename="test.txt"',
+                            "Content-Type: application/octet-stream",
+                            "Content-Transfer-Encoding: base64",
+                            "",
+                            data,
+                            f"--{BOUNDARY}--",
+                            "",
+                        ]
+                    )
+                )
+                request = WSGIRequest(
+                    {
+                        "REQUEST_METHOD": "POST",
+                        "CONTENT_TYPE": MULTIPART_CONTENT,
+                        "CONTENT_LENGTH": len(payload),
+                        "wsgi.input": payload,
+                    }
+                )
+                msg = "Could not decode base64 data."
+                with self.assertRaisesMessage(MultiPartParserError, msg):
+                    request.FILES
 
     def test_POST_after_body_read_and_stream_read_multipart(self):
         """

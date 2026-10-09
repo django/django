@@ -299,28 +299,26 @@ class MultiPartParser:
                             except StopFutureHandlers:
                                 break
 
+                        base64_remainder = b""
                         for chunk in field_stream:
                             if transfer_encoding == "base64":
                                 # We only special-case base64 transfer encoding
                                 # We should always decode base64 chunks by
-                                # multiple of 4, ignoring whitespace.
-
-                                stripped_parts = [b"".join(chunk.split())]
-                                stripped_length = len(stripped_parts[0])
-
-                                while stripped_length % 4 != 0:
-                                    over_chunk = field_stream.read(self._chunk_size)
-                                    if not over_chunk:
-                                        break
-                                    over_stripped = b"".join(over_chunk.split())
-                                    stripped_parts.append(over_stripped)
-                                    stripped_length += len(over_stripped)
-
-                                stripped_chunk = b"".join(stripped_parts)
+                                # multiple of 4, ignoring whitespace. Carry the
+                                # trailing 1-3 bytes over to the next chunk
+                                # rather than reading ahead, so that memory use
+                                # stays bounded by the chunk size.
+                                stripped_chunk = base64_remainder + b"".join(
+                                    chunk.split()
+                                )
+                                aligned_length = len(stripped_chunk) // 4 * 4
+                                base64_remainder = stripped_chunk[aligned_length:]
+                                if not aligned_length:
+                                    continue
 
                                 try:
                                     chunk = base64.b64decode(
-                                        stripped_chunk, validate=True
+                                        stripped_chunk[:aligned_length], validate=True
                                     )
                                 except Exception as exc:
                                     # Since this is only a chunk, any error is
@@ -337,6 +335,10 @@ class MultiPartParser:
                                     # Don't continue if the chunk received by
                                     # the handler is None.
                                     break
+
+                        if base64_remainder:
+                            # Leftover bytes mean the base64 data is truncated.
+                            raise MultiPartParserError("Could not decode base64 data.")
 
                     except SkipFile:
                         self._close_files()
