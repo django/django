@@ -2,6 +2,7 @@ import gettext as gettext_module
 import os
 import re
 import stat
+import sys
 import unittest
 from io import StringIO
 from pathlib import Path
@@ -43,6 +44,7 @@ class PoFileTests(MessageCompilationTests):
         self.assertIn("file has a BOM (Byte Order Mark)", stderr.getvalue())
         self.assertFalse(os.path.exists(self.MO_FILE))
 
+    @unittest.skipIf(sys.platform == "win32", "Windows only partially supports chmod.")
     def test_no_write_access(self):
         mo_file_en = Path(self.MO_FILE_EN)
         err_buffer = StringIO()
