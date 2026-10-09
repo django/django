@@ -1,11 +1,35 @@
+import uuid
+
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.test import SimpleTestCase, override_settings
-from django.test.utils import isolate_apps
+from django.test.utils import ignore_warnings, isolate_apps
+from django.utils.deprecation import RemovedInDjango2029Warning
 
 
 class MyBigAutoField(models.BigAutoField):
     pass
+
+
+class UUID4DefaultPrimaryKeyField(models.UUIDField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("default", uuid.uuid4)
+        kwargs.setdefault("editable", False)
+        super().__init__(*args, **kwargs)
+
+
+class UUID4DBDefaultPrimaryKeyField(models.UUIDField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("db_default", models.functions.UUID4())
+        kwargs.setdefault("editable", False)
+        super().__init__(*args, **kwargs)
+
+
+class UUID7DBDefaultPrimaryKeyField(models.UUIDField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("db_default", models.functions.UUID7())
+        kwargs.setdefault("editable", False)
+        super().__init__(*args, **kwargs)
 
 
 @isolate_apps("model_options")
@@ -18,6 +42,7 @@ class TestDefaultPK(SimpleTestCase):
 
         self.assertIsInstance(MyModel._meta.pk, models.BigAutoField)
 
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     @override_settings(DEFAULT_AUTO_FIELD="django.db.models.NonexistentAutoField")
     def test_default_auto_field_setting_nonexistent(self):
         msg = (
@@ -30,6 +55,158 @@ class TestDefaultPK(SimpleTestCase):
             class Model(models.Model):
                 pass
 
+    @override_settings(DEFAULT_PK_FIELD="django.db.models.NonexistentField")
+    def test_default_pk_field_setting_nonexistent(self):
+        msg = (
+            "DEFAULT_PK_FIELD refers to the module "
+            "'django.db.models.NonexistentField' that could not be imported."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+
+            class Model(models.Model):
+                pass
+
+    @override_settings(
+        DEFAULT_PK_FIELD=(
+            "model_options.test_default_pk." "UUID4DefaultPrimaryKeyField"
+        )
+    )
+    def test_default_pk_field_can_use_uuid4_application_default(self):
+        class Model(models.Model):
+            pass
+
+        self.assertIsInstance(
+            Model._meta.pk,
+            UUID4DefaultPrimaryKeyField,
+        )
+        self.assertEqual(Model._meta.pk.name, "id")
+        self.assertTrue(Model._meta.pk.primary_key)
+        self.assertFalse(Model._meta.pk.editable)
+        self.assertIs(Model._meta.pk.default, uuid.uuid4)
+
+    @override_settings(
+        DEFAULT_PK_FIELD=(
+            "model_options.test_default_pk." "UUID4DBDefaultPrimaryKeyField"
+        )
+    )
+    def test_default_pk_field_can_use_uuid4_database_default(self):
+        class Model(models.Model):
+            pass
+
+        self.assertIsInstance(
+            Model._meta.pk,
+            UUID4DBDefaultPrimaryKeyField,
+        )
+        self.assertEqual(Model._meta.pk.name, "id")
+        self.assertTrue(Model._meta.pk.primary_key)
+        self.assertFalse(Model._meta.pk.editable)
+        self.assertIsInstance(
+            Model._meta.pk.db_default,
+            models.functions.UUID4,
+        )
+
+    @override_settings(
+        DEFAULT_PK_FIELD=(
+            "model_options.test_default_pk." "UUID7DBDefaultPrimaryKeyField"
+        )
+    )
+    def test_default_pk_field_can_use_uuid7_database_default(self):
+        class Model(models.Model):
+            pass
+
+        self.assertIsInstance(
+            Model._meta.pk,
+            UUID7DBDefaultPrimaryKeyField,
+        )
+        self.assertEqual(Model._meta.pk.name, "id")
+        self.assertTrue(Model._meta.pk.primary_key)
+        self.assertFalse(Model._meta.pk.editable)
+        self.assertIsInstance(
+            Model._meta.pk.db_default,
+            models.functions.UUID7,
+        )
+
+    @override_settings(DEFAULT_PK_FIELD="django.db.models.Model")
+    def test_default_pk_field_setting_non_field(self):
+        msg = (
+            "Primary key 'django.db.models.Model' referred by "
+            "DEFAULT_PK_FIELD must subclass Field."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+
+            class Model(models.Model):
+                pass
+
+    @isolate_apps("model_options.apps.ModelNewPKConfig")
+    @override_settings(DEFAULT_PK_FIELD="django.db.models.BigAutoField")
+    def test_app_default_pk_field_precedes_setting(self):
+        class Model(models.Model):
+            pass
+
+        self.assertIsInstance(Model._meta.pk, UUID4DefaultPrimaryKeyField)
+
+    @isolate_apps("model_options.apps.ModelBothPKConfig")
+    def test_app_default_pk_field_precedes_legacy_app_attribute(self):
+        class Model(models.Model):
+            pass
+
+        self.assertIsInstance(Model._meta.pk, UUID4DefaultPrimaryKeyField)
+
+    @isolate_apps("model_options.apps.ModelPKConfig")
+    @override_settings(DEFAULT_PK_FIELD="django.db.models.BigAutoField")
+    def test_legacy_app_default_auto_field_precedes_setting(self):
+        msg = "AppConfig.default_auto_field is deprecated."
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, msg):
+
+            class Model(models.Model):
+                pass
+
+        self.assertIsInstance(Model._meta.pk, models.SmallAutoField)
+
+    @isolate_apps("model_options.apps.ModelPKNonexistentFieldConfig")
+    def test_app_default_pk_field_nonexistent(self):
+        msg = (
+            "model_options.apps.ModelPKNonexistentFieldConfig.default_pk_field "
+            "refers to the module 'django.db.models.NonexistentField' "
+            "that could not be imported."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+
+            class Model(models.Model):
+                pass
+
+    @isolate_apps("model_options.apps.ModelPKNonFieldConfig")
+    def test_app_default_pk_field_non_field(self):
+        msg = (
+            "Primary key 'django.db.models.Model' referred by "
+            "model_options.apps.ModelPKNonFieldConfig.default_pk_field must "
+            "subclass Field."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+
+            class Model(models.Model):
+                pass
+
+    @isolate_apps("model_options.apps.ModelPKEmptyFieldConfig")
+    def test_app_default_pk_field_none(self):
+        msg = (
+            "model_options.apps.ModelPKEmptyFieldConfig.default_pk_field "
+            "must not be empty."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+
+            class Model(models.Model):
+                pass
+
+    @isolate_apps("model_options.apps.ModelNewPKConfig")
+    def test_m2m_app_default_pk_field(self):
+        class Model(models.Model):
+            m2m = models.ManyToManyField("self")
+
+        m2m_pk = Model._meta.get_field("m2m").remote_field.through._meta.pk
+        self.assertIsInstance(m2m_pk, UUID4DefaultPrimaryKeyField)
+
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     @isolate_apps("model_options.apps.ModelPKNonexistentConfig")
     def test_app_default_auto_field_nonexistent(self):
         msg = (
@@ -42,6 +219,7 @@ class TestDefaultPK(SimpleTestCase):
             class Model(models.Model):
                 pass
 
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     @override_settings(DEFAULT_AUTO_FIELD="django.db.models.TextField")
     def test_default_auto_field_setting_non_auto(self):
         msg = (
@@ -53,6 +231,7 @@ class TestDefaultPK(SimpleTestCase):
             class Model(models.Model):
                 pass
 
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     @isolate_apps("model_options.apps.ModelPKNonAutoConfig")
     def test_app_default_auto_field_non_auto(self):
         msg = (
@@ -65,6 +244,7 @@ class TestDefaultPK(SimpleTestCase):
             class Model(models.Model):
                 pass
 
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     @override_settings(DEFAULT_AUTO_FIELD=None)
     def test_default_auto_field_setting_none(self):
         msg = "DEFAULT_AUTO_FIELD must not be empty."
@@ -73,6 +253,7 @@ class TestDefaultPK(SimpleTestCase):
             class Model(models.Model):
                 pass
 
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     @isolate_apps("model_options.apps.ModelPKNoneConfig")
     def test_app_default_auto_field_none(self):
         msg = (
@@ -84,6 +265,7 @@ class TestDefaultPK(SimpleTestCase):
             class Model(models.Model):
                 pass
 
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     @isolate_apps("model_options.apps.ModelDefaultPKConfig")
     @override_settings(DEFAULT_AUTO_FIELD="django.db.models.SmallAutoField")
     def test_default_auto_field_setting(self):
@@ -92,8 +274,9 @@ class TestDefaultPK(SimpleTestCase):
 
         self.assertIsInstance(Model._meta.pk, models.SmallAutoField)
 
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     @override_settings(
-        DEFAULT_AUTO_FIELD="model_options.test_default_pk.MyBigAutoField"
+        DEFAULT_AUTO_FIELD=("model_options.test_default_pk.MyBigAutoField")
     )
     def test_default_auto_field_setting_bigautofield_subclass(self):
         class Model(models.Model):
@@ -101,6 +284,7 @@ class TestDefaultPK(SimpleTestCase):
 
         self.assertIsInstance(Model._meta.pk, MyBigAutoField)
 
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     @isolate_apps("model_options.apps.ModelPKConfig")
     @override_settings(DEFAULT_AUTO_FIELD="django.db.models.AutoField")
     def test_app_default_auto_field(self):
@@ -109,6 +293,7 @@ class TestDefaultPK(SimpleTestCase):
 
         self.assertIsInstance(Model._meta.pk, models.SmallAutoField)
 
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     @isolate_apps("model_options.apps.ModelDefaultPKConfig")
     @override_settings(DEFAULT_AUTO_FIELD="django.db.models.SmallAutoField")
     def test_m2m_default_auto_field_setting(self):
@@ -118,6 +303,7 @@ class TestDefaultPK(SimpleTestCase):
         m2m_pk = M2MModel._meta.get_field("m2m").remote_field.through._meta.pk
         self.assertIsInstance(m2m_pk, models.SmallAutoField)
 
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     @isolate_apps("model_options.apps.ModelPKConfig")
     @override_settings(DEFAULT_AUTO_FIELD="django.db.models.AutoField")
     def test_m2m_app_default_auto_field(self):

@@ -10,6 +10,7 @@ from django.db import connections
 from django.db.models import (
     AutoField,
     CompositePrimaryKey,
+    Field,
     Manager,
     OrderWrt,
     UniqueConstraint,
@@ -259,19 +260,36 @@ class Options:
         return new_objs
 
     def _get_default_pk_class(self):
-        pk_class_path = getattr(
-            self.app_config,
-            "default_auto_field",
-            settings.DEFAULT_AUTO_FIELD,
-        )
-        if self.app_config and self.app_config._is_default_auto_field_overridden:
-            app_config_class = type(self.app_config)
+        if self.app_config and self.app_config._is_default_pk_field_overridden:
+            pk_class_path = self.app_config.default_pk_field
             source = (
-                f"{app_config_class.__module__}."
-                f"{app_config_class.__qualname__}.default_auto_field"
+                f"{self.app_config.__class__.__module__}."
+                f"{self.app_config.__class__.__qualname__}.default_pk_field"
             )
+            pk_class_required_base = Field
+        elif self.app_config and self.app_config._is_default_auto_field_overridden:
+            pk_class_path = self.app_config.default_pk_field
+            source = (
+                f"{self.app_config.__class__.__module__}."
+                f"{self.app_config.__class__.__qualname__}.default_auto_field"
+            )
+            pk_class_required_base = AutoField
+        elif settings.DEFAULT_PK_FIELD is not None:
+            pk_class_path = (
+                self.app_config.default_pk_field
+                if self.app_config
+                else settings.DEFAULT_PK_FIELD
+            )
+            source = "DEFAULT_PK_FIELD"
+            pk_class_required_base = Field
         else:
+            pk_class_path = (
+                self.app_config.default_pk_field
+                if self.app_config
+                else settings.DEFAULT_AUTO_FIELD
+            )
             source = "DEFAULT_AUTO_FIELD"
+            pk_class_required_base = AutoField
         if not pk_class_path:
             raise ImproperlyConfigured(f"{source} must not be empty.")
         try:
@@ -282,10 +300,10 @@ class Options:
                 f"not be imported."
             )
             raise ImproperlyConfigured(msg) from e
-        if not issubclass(pk_class, AutoField):
+        if not issubclass(pk_class, pk_class_required_base):
             raise ValueError(
                 f"Primary key '{pk_class_path}' referred by {source} must "
-                f"subclass AutoField."
+                f"subclass {pk_class_required_base.__name__}."
             )
         return pk_class
 

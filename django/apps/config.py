@@ -1,8 +1,10 @@
 import inspect
 import os
+import warnings
 from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import RemovedInDjango2029Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string, module_has_submodule
 
@@ -67,6 +69,28 @@ class AppConfig:
     @property
     def _is_default_auto_field_overridden(self):
         return self.__class__.default_auto_field is not AppConfig.default_auto_field
+
+    @cached_property
+    def default_pk_field(self):
+        from django.conf import settings
+
+        if self._is_default_auto_field_overridden:
+            warnings.warn(
+                "AppConfig.default_auto_field is deprecated. Use "
+                "AppConfig.default_pk_field instead.",
+                RemovedInDjango2029Warning,
+                stacklevel=2,
+            )
+            return self.default_auto_field
+        return (
+            settings.DEFAULT_PK_FIELD
+            if settings.DEFAULT_PK_FIELD is not None
+            else settings.DEFAULT_AUTO_FIELD
+        )
+
+    @property
+    def _is_default_pk_field_overridden(self):
+        return self.__class__.default_pk_field is not AppConfig.default_pk_field
 
     def _path_from_module(self, module):
         """Attempt to determine app's filesystem path from its module."""

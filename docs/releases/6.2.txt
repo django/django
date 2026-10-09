@@ -209,6 +209,14 @@ Migrations
 Models
 ~~~~~~
 
+* The new :setting:`DEFAULT_PK_FIELD` setting allows projects to configure the
+  default primary key field type for models that don't define a primary key
+  explicitly, without requiring the field to subclass
+  :class:`~django.db.models.AutoField`.
+
+* The new :attr:`~django.apps.AppConfig.default_pk_field` attribute allows apps
+  to configure their implicit primary key field type.
+
 * ...
 
 Requests and Responses
@@ -419,6 +427,12 @@ Miscellaneous
 
 * The ``safe`` parameter is deprecated from :class:`~django.http.JsonResponse`.
   Omitting the argument is equivalent to the prior ``safe=False`` usage.
+
+* The ``DEFAULT_AUTO_FIELD`` setting is deprecated in favor of
+  :setting:`DEFAULT_PK_FIELD`.
+
+* :attr:`~django.apps.AppConfig.default_auto_field` is deprecated in favor of
+  :attr:`~django.apps.AppConfig.default_pk_field`.
 
 * Calling :meth:`.QuerySet.aiterator` after ``prefetch_related()`` without
   providing a ``chunk_size`` is deprecated. It currently falls back to a
