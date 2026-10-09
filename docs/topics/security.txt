@@ -19,14 +19,51 @@ on securing a Django-powered site.
     mind particularly when assessing individual points in security audits.
 
 .. _sanitize-user-input:
+.. _user-controlled-data-safety:
 
-Always sanitize user input
-==========================
+Handle user-controlled data safely
+==================================
 
-The golden rule of web application security is to never trust user-controlled
-data. Hence, all user input should be sanitized before being used in your
-application. See the :doc:`forms documentation </topics/forms/index>` for
-details on validating user inputs in Django.
+The golden rule of web application security is to **never trust user-controlled
+data**. This includes form fields, query parameters, uploaded files, HTTP
+headers, cookies, content from external services, and any other data that
+originates outside your control. That data can include malicious content, and
+the vulnerabilities it tries to exploit may not be obvious.
+
+There are two important techniques for handling user-controlled data safely:
+
+* **Validate inputs**: Ensure input data adheres to the expected format and
+  any application rules before storing or processing. Django's :doc:`form
+  validation </ref/forms/validation>` and :doc:`validators </ref/validators>`
+  can assist with this.
+
+  Format validation alone does not make data safe or trustworthy. A valid URL
+  could point to a phishing site, and a comment that fits a character limit
+  might still contain spam. Apply additional content and business-rule
+  validation that is appropriate for your application.
+
+* **Prevent unsafe interpretation at use**: Escape, encode, sanitize,
+  parameterize, or otherwise appropriately protect against untrusted data at
+  the point where it is used (output, rendered, passed to something that
+  expects trusted input, etc.).
+
+  Context matters: HTML, CSS, JavaScript, JSON, SQL, URLs, HTTP headers, email,
+  CSV, and other formats all have different rules, so require different tools
+  to neutralize potentially malicious data. For example, :func:`.html.escape`
+  works for HTML output, but won't make a value safe inside a JavaScript
+  ``<script>`` tag.
+
+  Django provides protections for many common contexts, such as automatic HTML
+  escaping in templates and SQL parameterization through the ORM. These
+  features (and some important limitations) are described below. When using
+  untrusted data in other contexts, you are responsible for choosing the
+  appropriate tool. Python's standard library and Django include several
+  utilities that can help.
+
+These techniques are complementary. Validation at time of input rejects data
+your application should not accept. Escaping, encoding, and other protections
+at time of use help prevent accepted data from being interpreted as code or
+control syntax in the specific context where it is used.
 
 .. _cross-site-scripting:
 
