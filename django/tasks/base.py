@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from copy import deepcopy
 from dataclasses import dataclass, field, fields, replace
 from datetime import datetime
 from inspect import isclass, iscoroutinefunction
@@ -18,8 +19,12 @@ DEFAULT_TASK_PRIORITY = 0
 DEFAULT_TASK_QUEUE_NAME = "default"
 TASK_MAX_PRIORITY = 100
 TASK_MIN_PRIORITY = -100
+# Metadata keys starting with this prefix are reserved for backends and
+# libraries. They're hidden from users, and preserved when saving metadata.
+RESERVED_METADATA_PREFIX = "_"
 TASK_REFRESH_ATTRS = {
     "errors",
+    "raw_metadata",
     "_return_value",
     "finished_at",
     "started_at",
@@ -28,6 +33,15 @@ TASK_REFRESH_ATTRS = {
     "enqueued_at",
     "worker_ids",
 }
+
+
+def get_user_metadata(raw_metadata):
+    """Return a copy of the metadata without reserved keys."""
+    return {
+        key: value
+        for key, value in raw_metadata.items()
+        if not key.startswith(RESERVED_METADATA_PREFIX)
+    }
 
 
 class TaskResultStatus(TextChoices):
@@ -51,6 +65,9 @@ class Task:
 
     # Whether the Task receives the Task context when executed.
     takes_context: bool = False
+
+    # Additional JSON-compatible data stored alongside the Task.
+    metadata: dict[str, Any] = field(default_factory=dict, hash=False)
 
     def __post_init__(self):
         self.get_backend().validate_task(self)
@@ -83,6 +100,7 @@ class Task:
         queue_name=None,
         run_after=None,
         backend=None,
+        metadata=None,
     ):
         """Create a new Task with modified defaults."""
 
@@ -95,6 +113,8 @@ class Task:
             changes["run_after"] = run_after
         if backend is not None:
             changes["backend"] = backend
+        if metadata is not None:
+            changes["metadata"] = metadata
         return replace(self, **changes)
 
     def enqueue(self, *args, **kwargs):
@@ -218,11 +238,24 @@ class TaskResult:
     errors: list[TaskError]  # Errors raised when running the task.
     worker_ids: list[str]  # Workers which have processed the task.
 
+    # Metadata about the task, including reserved keys.
+    raw_metadata: dict[str, Any] = field(default_factory=dict)
+
     _return_value: Any | None = field(init=False, default=None)
 
     def __post_init__(self):
         object.__setattr__(self, "args", normalize_json(self.args))
         object.__setattr__(self, "kwargs", normalize_json(self.kwargs))
+        object.__setattr__(self, "raw_metadata", normalize_json(self.raw_metadata))
+
+    @property
+    def metadata(self):
+        """
+        A copy of the task's metadata, excluding reserved keys.
+
+        Use TaskContext.metadata to modify metadata from within a task.
+        """
+        return get_user_metadata(self.raw_metadata)
 
     @property
     def return_value(self):
@@ -267,6 +300,44 @@ class TaskResult:
 class TaskContext:
     task_result: TaskResult
 
+    # A mutable copy of the task's metadata, excluding reserved keys.
+    metadata: dict[str, Any] = field(init=False)
+
+    def __post_init__(self):
+        object.__setattr__(self, "metadata", deepcopy(self.task_result.metadata))
+
     @property
     def attempt(self):
         return self.task_result.attempts
+
+    @property
+    def metadata_modified(self):
+        """Whether metadata has changed since it was last saved."""
+        return self.metadata != self.task_result.metadata
+
+    def _get_metadata_to_save(self):
+        # Reserved keys can't be modified by users, so retain their existing
+        # values.
+        raw_metadata = {
+            key: value
+            for key, value in self.task_result.raw_metadata.items()
+            if key.startswith(RESERVED_METADATA_PREFIX)
+        }
+        raw_metadata.update(get_user_metadata(self.metadata))
+        return normalize_json(raw_metadata)
+
+    def save_metadata(self):
+        """Persist the task's metadata."""
+        raw_metadata = self._get_metadata_to_save()
+        self.task_result.task.get_backend().save_metadata(
+            self.task_result, raw_metadata
+        )
+        object.__setattr__(self.task_result, "raw_metadata", raw_metadata)
+
+    async def asave_metadata(self):
+        """See save_metadata()."""
+        raw_metadata = self._get_metadata_to_save()
+        await self.task_result.task.get_backend().asave_metadata(
+            self.task_result, raw_metadata
+        )
+        object.__setattr__(self.task_result, "raw_metadata", raw_metadata)

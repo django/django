@@ -13,6 +13,7 @@ class DummyBackend(BaseTaskBackend):
     supports_defer = True
     supports_async_task = True
     supports_priority = True
+    supports_metadata = True
 
     def __init__(self, alias, params):
         super().__init__(alias, params)
@@ -39,6 +40,7 @@ class DummyBackend(BaseTaskBackend):
             backend=self.alias,
             errors=[],
             worker_ids=[],
+            raw_metadata=task.metadata,
         )
 
         self._store_result(result)
@@ -59,6 +61,14 @@ class DummyBackend(BaseTaskBackend):
             return next(result for result in self.results if result.id == result_id)
         except StopIteration:
             raise TaskResultDoesNotExist(result_id) from None
+
+    def save_metadata(self, task_result, metadata):
+        stored_result = self.get_result(task_result.id)
+        object.__setattr__(stored_result, "raw_metadata", deepcopy(metadata))
+
+    async def asave_metadata(self, task_result, metadata):
+        stored_result = await self.aget_result(task_result.id)
+        object.__setattr__(stored_result, "raw_metadata", deepcopy(metadata))
 
     def clear(self):
         self.results.clear()

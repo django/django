@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 class ImmediateBackend(BaseTaskBackend):
     supports_async_task = True
     supports_priority = True
+    supports_metadata = True
 
     def __init__(self, alias, params):
         super().__init__(alias, params)
@@ -39,11 +40,15 @@ class ImmediateBackend(BaseTaskBackend):
 
         try:
             if task.takes_context:
-                raw_return_value = task.call(
-                    TaskContext(task_result=task_result),
-                    *task_result.args,
-                    **task_result.kwargs,
-                )
+                context = TaskContext(task_result=task_result)
+                try:
+                    raw_return_value = task.call(
+                        context, *task_result.args, **task_result.kwargs
+                    )
+                finally:
+                    # Save metadata modified by the task, even if it failed.
+                    if context.metadata_modified:
+                        context.save_metadata()
             else:
                 raw_return_value = task.call(*task_result.args, **task_result.kwargs)
 
@@ -87,8 +92,13 @@ class ImmediateBackend(BaseTaskBackend):
             backend=self.alias,
             errors=[],
             worker_ids=[],
+            raw_metadata=task.metadata,
         )
 
         self._execute_task(task_result)
 
         return task_result
+
+    def save_metadata(self, task_result, metadata):
+        # Results aren't stored, so there's nothing else to persist.
+        object.__setattr__(task_result, "raw_metadata", metadata)
