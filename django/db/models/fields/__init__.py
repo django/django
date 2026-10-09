@@ -993,6 +993,10 @@ class Field(RegisterLookupMixin):
         self.model = cls
         cls._meta.add_field(self, private=private_only)
         if self.column:
+            if self.is_relation and isinstance(
+                cls.__dict__.get(self.attname), property
+            ):
+                self._overridden_property = True
             setattr(cls, self.attname, self.descriptor_class(self))
         if self.choices is not None:
             # Don't override a get_FOO_display() method defined explicitly on
