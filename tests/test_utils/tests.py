@@ -1356,6 +1356,148 @@ class AssertWarnsMessageTests(SimpleTestCase):
             func1()
 
 
+class IgnoreWarningsTests(SimpleTestCase):
+    @contextmanager
+    def captured_warnings(self):
+        with warnings.catch_warnings(record=True) as captured:
+            warnings.simplefilter("always")
+            yield captured
+
+    def test_message_matched_anywhere(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(message="is deprecated"):
+                warnings.warn("get_connection() is deprecated.", UserWarning)
+        self.assertEqual(captured, [])
+
+    def test_message_special_re_chars(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(message="[.*x+]y?"):
+                warnings.warn("A message with [.*x+]y? in it.", UserWarning)
+        self.assertEqual(captured, [])
+
+    def test_message_case_sensitive(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(message="IS DEPRECATED"):
+                warnings.warn("get_connection() is deprecated.", UserWarning)
+        self.assertEqual(len(captured), 1)
+
+    def test_message_matched_across_newlines(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(message="second line"):
+                warnings.warn("first line\nsecond line", UserWarning)
+        self.assertEqual(captured, [])
+
+    def test_message_not_matched(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(message="is deprecated"):
+                warnings.warn("Expected message", UserWarning)
+        self.assertEqual(len(captured), 1)
+
+    def test_message_re(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(message_re=r"get_\w+\(\) is deprecated\."):
+                warnings.warn("get_connection() is deprecated.", UserWarning)
+        self.assertEqual(captured, [])
+
+    def test_message_re_not_matched(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(message_re=r"get_\w+\(\) is deprecated\."):
+                warnings.warn("Expected message", UserWarning)
+        self.assertEqual(len(captured), 1)
+
+    def test_module_matched_by_prefix(self):
+        # test_module_* assume this name for the current module.
+        self.assertEqual(__name__, "test_utils.tests")
+        with self.captured_warnings() as captured:
+            with ignore_warnings(module="test_utils"):
+                warnings.warn("Expected message", UserWarning)
+        self.assertEqual(captured, [])
+
+    def test_module_not_matched_in_the_middle(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(module="utils.tests"):
+                warnings.warn("Expected message", UserWarning)
+        self.assertEqual(len(captured), 1)
+
+    def test_module_not_matched(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(module="nonexistent.module"):
+                warnings.warn("Expected message", UserWarning)
+        self.assertEqual(len(captured), 1)
+
+    def test_module_regex(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(module=r"test_utils\.\w+"):
+                warnings.warn("Expected message", UserWarning)
+        self.assertEqual(captured, [])
+
+    def test_message_and_message_re(self):
+        msg = "Cannot specify both message and message_re."
+        with self.assertRaisesMessage(TypeError, msg):
+            ignore_warnings(message="Expected message", message_re="Expected")
+        with self.assertRaisesMessage(TypeError, msg):
+            ignore_warnings(message="Expected message", message_re="")
+
+    def test_category(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(category=UserWarning):
+                warnings.warn("Expected message", UserWarning)
+                warnings.warn("Another message", UserWarning)
+                warnings.warn("Expected message", DeprecationWarning)
+        self.assertEqual(len(captured), 1)
+        self.assertIs(captured[0].category, DeprecationWarning)
+
+    def test_module_and_message(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(module="test_utils", message="is deprecated"):
+                warnings.warn("get_connection() is deprecated.", UserWarning)
+                warnings.warn("Expected message", UserWarning)
+                warnings.warn_explicit(
+                    "other_function() is deprecated.",
+                    UserWarning,
+                    "other.py",
+                    1,
+                    module="other.module",
+                )
+        self.assertEqual(
+            [str(warning.message) for warning in captured],
+            ["Expected message", "other_function() is deprecated."],
+        )
+
+    def test_category_and_message_positional(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(UserWarning, "is deprecated"):
+                warnings.warn("get_connection() is deprecated.", UserWarning)
+                warnings.warn("get_connection() is deprecated.", DeprecationWarning)
+        self.assertEqual(len(captured), 1)
+        self.assertIs(captured[0].category, DeprecationWarning)
+
+    def test_lineno(self):
+        def func1():
+            warnings.warn("Expected message", UserWarning)
+
+        lineno = func1.__code__.co_firstlineno + 1
+        with self.captured_warnings() as captured:
+            with ignore_warnings(lineno=lineno):
+                func1()
+        self.assertEqual(captured, [])
+
+    def test_lineno_not_matched(self):
+        def func1():
+            warnings.warn("Expected message", UserWarning)
+
+        lineno = func1.__code__.co_firstlineno + 1
+        with self.captured_warnings() as captured:
+            with ignore_warnings(lineno=lineno + 1):
+                func1()
+        self.assertEqual(len(captured), 1)
+
+    def test_unsupported_argument(self):
+        msg = "unexpected keyword argument 'append'"
+        with self.assertRaisesMessage(TypeError, msg):
+            ignore_warnings(append=True)
+
+
 class AssertFieldOutputTests(SimpleTestCase):
     def test_assert_field_output(self):
         error_invalid = ["Enter a valid email address."]
