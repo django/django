@@ -264,7 +264,9 @@ localflavor
 localhost
 localizable
 localizers
+lookahead
 lookaround
+lookbehind
 lookups
 loopback
 lorem
