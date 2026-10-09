@@ -180,7 +180,7 @@ class FileUploadTests(TestCase):
             "wsgi.input": payload,
         }
         response = self.client.request(**r)
-        self.assertEqual(response.json()["file"], "")
+        self.assertEqual(response.status_code, 400)
 
     def test_unicode_file_name(self):
         with sys_tempfile.TemporaryDirectory() as temp_dir:
