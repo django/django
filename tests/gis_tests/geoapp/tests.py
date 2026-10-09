@@ -940,18 +940,26 @@ class GeoQuerySetTest(TestCase):
             name="Forney",
         )
         tx = Country.objects.get(name="Texas").mpoly
-        # Tolerance is greater than distance between Forney and Dallas, that's
-        # why Dallas is ignored.
+        # Tolerance is greater than the distance between Forney and Dallas, so
+        # either one may be ignored.
         forney_houston = GEOSGeometry(
             "MULTIPOINT(-95.363151 29.763374, -96.467222 32.751389)",
             srid=4326,
         )
+        forney_houston.normalize()
+        dallas_houston = GEOSGeometry(
+            "MULTIPOINT(-95.363151 29.763374, -96.801611 32.782057)",
+            srid=4326,
+        )
+        dallas_houston.normalize()
+        result = City.objects.filter(point__within=tx).aggregate(
+            Union("point", tolerance=32000),
+        )["point__union"]
+        result.normalize()
         self.assertIs(
-            forney_houston.equals_exact(
-                City.objects.filter(point__within=tx).aggregate(
-                    Union("point", tolerance=32000),
-                )["point__union"],
-                tolerance=10e-6,
+            any(
+                expected.equals_exact(result, tolerance=10e-6)
+                for expected in (forney_houston, dallas_houston)
             ),
             True,
         )
