@@ -246,7 +246,17 @@ class ServerFormatter(logging.Formatter):
         return super().format(record)
 
     def uses_server_time(self):
-        return self._fmt.find("{server_time}") >= 0
+        if self._fmt:
+            if isinstance(self._style, logging.StrFormatStyle):
+                return self._fmt.find("{server_time}") >= 0
+            if isinstance(self._style, logging.StringTemplateStyle):
+                return (
+                    self._fmt.find("$server_time") >= 0
+                    or self._fmt.find("${server_time}") >= 0
+                )
+            if isinstance(self._style, logging.PercentStyle):
+                return self._fmt.find("%(server_time)") >= 0
+        return False
 
 
 def log_message(
