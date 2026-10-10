@@ -291,9 +291,10 @@ A few days before any release
         $ cd docs
         $ make man
         $ man _build/man/django.1  # do a quick sanity check
-        $ cp _build/man/django.1 man/django.1 man/django-admin.1
+        $ cp _build/man/django.1 man/django.1
+        $ cp _build/man/django.1 man/django-admin.1
 
-   and then commit the changed man page.
+   and then commit the changed man pages.
 
 #. If this is the "dot zero" release of a new series, create a new branch from
    the current stable branch in the `django-docs-translations

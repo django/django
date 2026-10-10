@@ -99,7 +99,7 @@ class DjangoCLIDirective(GenericObject):
     parse_node = staticmethod(parse_django_cli_node)
 
     def run(self):
-        # Keep the original object type so existing command anchors remain valid.
+        # Keep the original object type to preserve existing command anchors.
         self.name = "std:django-admin"
         return super().run()
 
