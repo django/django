@@ -4,7 +4,6 @@ from decimal import Decimal
 from operator import attrgetter, itemgetter
 from uuid import UUID
 
-from django.core.exceptions import FieldError
 from django.db import connection
 from django.db.models import (
     BinaryField,
@@ -793,28 +792,35 @@ class CaseExpressionTests(TestCase):
         )
 
     def test_update_with_join_in_condition_raise_field_error(self):
-        with self.assertRaisesMessage(
-            FieldError, "Joined field references are not permitted in this query"
-        ):
-            CaseTestModel.objects.update(
-                integer=Case(
-                    When(integer2=F("o2o_rel__integer") + 1, then=2),
-                    When(integer2=F("o2o_rel__integer"), then=3),
-                ),
-            )
+        "Joined field references are now permitted in this query"
+        CaseTestModel.objects.update(
+            integer=Case(
+                When(integer2=F("o2o_rel__integer") + 1, then=2),
+                When(integer2=F("o2o_rel__integer"), then=3),
+                default=F("integer2"),  # introduced to avoid NULL constraint error
+            ),
+        )
+        self.assertQuerySetEqual(
+            CaseTestModel.objects.order_by("pk"),
+            [3, 2, 2, 3, 2, 3, 5],
+            transform=attrgetter("integer"),
+        )
 
     def test_update_with_join_in_predicate_raise_field_error(self):
-        with self.assertRaisesMessage(
-            FieldError, "Joined field references are not permitted in this query"
-        ):
-            CaseTestModel.objects.update(
-                string=Case(
-                    When(o2o_rel__integer=1, then=Value("one")),
-                    When(o2o_rel__integer=2, then=Value("two")),
-                    When(o2o_rel__integer=3, then=Value("three")),
-                    default=Value("other"),
-                ),
-            )
+        "Joined field references are now permitted in this query"
+        CaseTestModel.objects.update(
+            string=Case(
+                When(o2o_rel__integer=1, then=Value("one")),
+                When(o2o_rel__integer=2, then=Value("two")),
+                When(o2o_rel__integer=3, then=Value("three")),
+                default=Value("other"),
+            ),
+        )
+        self.assertQuerySetEqual(
+            CaseTestModel.objects.order_by("pk"),
+            ["one", "two", "three", "two", "three", "three", "one"],
+            transform=attrgetter("string"),
+        )
 
     def test_update_big_integer(self):
         CaseTestModel.objects.update(

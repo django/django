@@ -247,6 +247,7 @@ class Query(BaseExpression):
 
     filter_is_sticky = False
     subquery = False
+    _wrap_subquery = False
     contains_subquery = False
 
     # SQL-related attributes.
