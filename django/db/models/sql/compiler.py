@@ -157,9 +157,15 @@ class SQLCompiler:
         # set to group by. So, we need to add cols in select, order_by, and
         # having into the select in any case.
         selected_expr_positions = {}
-        for ordinal, (expr, _, alias) in enumerate(select, start=1):
+        ordinal = 1
+        for expr, _, alias in select:
             if alias:
                 selected_expr_positions[expr] = ordinal
+            # A ColPairs selection is compiled to as many columns as it has
+            # targets, e.g. when a composite primary key is selected, so the
+            # next selection is that many positions further down the select
+            # clause.
+            ordinal += len(expr) if isinstance(expr, ColPairs) else 1
             # Skip members of the select clause that are already explicitly
             # grouped against.
             if alias in group_by_refs:
@@ -368,7 +374,8 @@ class SQLCompiler:
             # is not necessarily interchangeable, e.g. a volatile function
             # selected twice.
             first_positions = {}
-            for ordinal, (expr, _, alias) in enumerate(select, start=1):
+            ordinal = 1
+            for expr, _, alias in select:
                 pos_expr = PositionRef(ordinal, alias, expr)
                 if distinct_fields and not isinstance(expr, RawSQL):
                     first_pos_expr = first_positions.setdefault(expr, pos_expr)
@@ -381,6 +388,11 @@ class SQLCompiler:
                         pos_expr if alias in annotation_select else first_pos_expr
                     )
                 selected_exprs[expr] = first_pos_expr
+                # A ColPairs selection is compiled to as many columns as it
+                # has targets, e.g. when a composite primary key is selected,
+                # so the next selection is that many positions further down
+                # the select clause.
+                ordinal += len(expr) if isinstance(expr, ColPairs) else 1
 
         for field in ordering:
             if hasattr(field, "resolve_expression"):
