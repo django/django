@@ -154,6 +154,19 @@ class ServerHandler(simple_server.ServerHandler):
         if self.headers.get("Connection") == "close":
             self.request_handler.close_connection = True
 
+    def finish_content(self):
+        super().finish_content()
+
+        content_length = self.headers.get("Content-Length")
+        if content_length is not None:
+            try:
+                content_length = int(content_length)
+            except (TypeError, ValueError):
+                return
+            if self.bytes_sent < content_length:
+                self.request_handler.close_connection = True
+                self.request_handler.connection.close()
+
     def close(self):
         self.get_stdin().read()
         super().close()
