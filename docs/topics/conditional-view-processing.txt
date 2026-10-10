@@ -64,7 +64,11 @@ if it doesn't exist.
 
 The decorator sets the ``ETag`` and ``Last-Modified`` headers on the response
 if they are not already set by the view and if the request's method is safe
-(``GET`` or ``HEAD``).
+(``GET``, ``HEAD`` or ``QUERY``).
+
+.. versionchanged:: 6.2
+
+    Support for the ``QUERY`` method was added.
 
 Using this feature usefully is probably best explained with an example.
 Suppose you have this pair of models, representing a small blog system::
@@ -164,8 +168,8 @@ simultaneously to work out the right action to take.
 Using the decorators with other HTTP methods
 ============================================
 
-The ``condition`` decorator is useful for more than only ``GET`` and
-``HEAD`` requests (``HEAD`` requests are the same as ``GET`` in this
+The ``condition`` decorator is useful for more than only ``GET``, ``HEAD`` and
+``QUERY`` requests (``HEAD`` requests are the same as ``GET`` in this
 situation). It can also be used to provide checking for ``POST``,
 ``PUT`` and ``DELETE`` requests. In these situations, the idea isn't to return
 a "not modified" response, but to tell the client that the resource they are
@@ -194,21 +198,27 @@ every time.
 .. admonition:: Validator headers with non-safe request methods
 
     The ``condition`` decorator only sets validator headers (``ETag`` and
-    ``Last-Modified``) for safe HTTP methods, i.e. ``GET`` and ``HEAD``. If you
-    wish to return them in other cases, set them in your view. See
-    :rfc:`9110#section-9.3.4` to learn about the distinction between setting a
-    validator header in response to requests made with ``PUT`` versus ``POST``.
+    ``Last-Modified``) for safe HTTP methods, i.e. ``GET``, ``HEAD`` and
+    ``QUERY``. If you wish to return them in other cases, set them in your
+    view. See :rfc:`9110#section-9.3.4` to learn about the distinction between
+    setting a validator header in response to requests made with ``PUT`` versus
+    ``POST``.
 
 Comparison with middleware conditional processing
 =================================================
 
-Django provides conditional ``GET`` handling via
+Django provides conditional ``GET`` and ``QUERY`` handling via
 :class:`django.middleware.http.ConditionalGetMiddleware`. While being suitable
 for many situations, the middleware has limitations for advanced usage:
 
 * It's applied globally to all views in your project.
 * It doesn't save you from generating the response, which may be expensive.
-* It's only appropriate for HTTP ``GET`` requests.
+* It's only appropriate for HTTP ``GET`` and ``QUERY`` requests.
+
+.. versionchanged:: 6.2
+
+    Support for the ``QUERY`` method was added to
+    :class:`~django.middleware.http.ConditionalGetMiddleware`.
 
 You should choose the most appropriate tool for your particular problem here.
 If you have a way to compute ETags and modification times quickly and if some

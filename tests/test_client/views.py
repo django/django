@@ -75,6 +75,21 @@ def put_view(request):
     return HttpResponse(t.render(c))
 
 
+def query_view(request):
+    if request.method == "QUERY":
+        t = Template("Query received: {{ data }} is the body.", name="QUERY Template")
+        c = Context(
+            {
+                "Content-Type": request.META["CONTENT_TYPE"],
+                "data": request.body.decode(),
+            }
+        )
+    else:
+        t = Template("Viewing GET page.", name="Empty GET Template")
+        c = Context()
+    return HttpResponse(t.render(c))
+
+
 def post_view(request):
     """A view that expects a POST, and returns a different template depending
     on whether any POST data is available
