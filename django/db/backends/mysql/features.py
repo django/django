@@ -237,6 +237,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             return self.connection.mysql_version >= (11, 7)
         return False
 
+    supports_uuid4_function_in_default = property(
+        operator.attrgetter("supports_uuid4_function")
+    )
+
     @cached_property
     def supports_uuid7_function(self):
         if self.connection.mysql_is_mariadb:

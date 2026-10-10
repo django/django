@@ -8,6 +8,8 @@ def get_nonce(request):
 
 
 class ContentSecurityPolicyMiddleware(MiddlewareMixin):
+    async_capable = False
+
     def process_request(self, request):
         request._csp_nonce = LazyNonce()
 

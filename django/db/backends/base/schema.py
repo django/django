@@ -1084,6 +1084,9 @@ class BaseDatabaseSchemaEditor:
             and (not new_field.db_index or new_field.unique)
         ):
             # Find the index for this field
+            meta_constraint_names = {
+                constraint.name for constraint in model._meta.constraints
+            }
             meta_index_names = {index.name for index in model._meta.indexes}
             # Retrieve only BTREE indexes since this is what's created with
             # db_index=True.
@@ -1092,7 +1095,7 @@ class BaseDatabaseSchemaEditor:
                 [old_field.column],
                 index=True,
                 type_=Index.suffix,
-                exclude=meta_index_names,
+                exclude=meta_constraint_names | meta_index_names,
             )
             for index_name in index_names:
                 # The only way to check if an index was created with
@@ -1151,6 +1154,7 @@ class BaseDatabaseSchemaEditor:
             or (
                 self.connection.features.supports_comments
                 and old_field.db_comment != new_field.db_comment
+                and not self.connection.features.supports_independent_comment_alteration
             )
         ):
             fragment, other_actions = self._alter_column_type_sql(
@@ -1158,6 +1162,15 @@ class BaseDatabaseSchemaEditor:
             )
             actions.append(fragment)
             post_actions.extend(other_actions)
+        elif (
+            self.connection.features.supports_comments
+            and old_field.db_comment != new_field.db_comment
+            and self.connection.features.supports_independent_comment_alteration
+        ):
+            sql, params = self._alter_column_comment_sql(
+                model, new_field, new_type, new_field.db_comment
+            )
+            post_actions.append((sql, params))
 
         if new_field.has_db_default():
             if (

@@ -27,8 +27,17 @@ from django.contrib.gis.gdal.raster.const import (
 )
 from django.contrib.gis.gdal.srs import SpatialReference, SRSException
 from django.contrib.gis.geometry import json_regex
+from django.core.exceptions import SuspiciousOperation
 from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
+
+
+class DisallowedRasterLookup(SuspiciousOperation):
+    """
+    Types that force GDALRaster to open in write mode or values that could
+    reference external sources, are not allowed in lookup contexts.
+    Instead, wrap values in GDALRaster explicitly.
+    """
 
 
 class TransformPoint(list):
@@ -77,14 +86,10 @@ class GDALRaster(GDALRasterBase):
         self._write = 1 if write else 0
         Driver.ensure_registered()
 
-        # Preprocess json inputs. This converts json strings to dictionaries,
-        # which are parsed below the same way as direct dictionary inputs.
-        if isinstance(ds_input, str) and json_regex.match(ds_input):
-            ds_input = json.loads(ds_input)
+        ds_input = self._preprocess_input(ds_input)
 
         # If input is a valid file path, try setting file as source.
-        if isinstance(ds_input, (str, Path)):
-            ds_input = str(ds_input)
+        if isinstance(ds_input, str):
             if not ds_input.startswith(VSI_FILESYSTEM_PREFIX) and not os.path.exists(
                 ds_input
             ):
@@ -212,7 +217,7 @@ class GDALRaster(GDALRasterBase):
             )
 
     def __del__(self):
-        if self.is_vsi_based:
+        if self._is_vsimem_based:
             # Remove the temporary file from the VSI in-memory filesystem.
             capi.unlink_vsi_file(force_bytes(self.name))
         super().__del__()
@@ -225,6 +230,42 @@ class GDALRaster(GDALRasterBase):
         Short-hand representation because WKB may be very large.
         """
         return "<Raster object at %s>" % hex(addressof(self._ptr))
+
+    @classmethod
+    def _preprocess_input(cls, ds_input):
+        """
+        Preprocess json and Path inputs. This converts json strings to
+        dictionaries, which are then parsed just like direct dictionary inputs.
+        This also stringifies Path objects.
+        """
+        if isinstance(ds_input, str) and json_regex.match(ds_input):
+            ds_input = json.loads(ds_input)
+        if isinstance(ds_input, Path):
+            ds_input = str(ds_input)
+        return ds_input
+
+    @classmethod
+    def check_raster_lookup_value(cls, ds_input):
+        """
+        Raise DisallowedRasterLookup for values inappropriate in lookups:
+        - No dicts, which GDALRaster(write=False) might still write to.
+        - No strings, bytes, or Paths, which might fetch over the virtual
+          filesystem.
+        """
+        normalized = cls._preprocess_input(ds_input)
+        if isinstance(normalized, (dict, str, bytes)):
+            value_repr = repr(normalized)
+            if len(value_repr) > 4096:
+                value_repr = "%s… <trimmed %d bytes string>" % (
+                    value_repr[:4096],
+                    len(value_repr),
+                )
+            msg = (
+                f"Cannot use object {value_repr} for a spatial lookup "
+                "parameter. If this is a raster, wrap it with GDALRaster() "
+                "before using it in a lookup to enable writing or fetching."
+            )
+            raise DisallowedRasterLookup(msg)
 
     def _flush(self):
         """
@@ -242,9 +283,7 @@ class GDALRaster(GDALRasterBase):
 
     @property
     def vsi_buffer(self):
-        if not (
-            self.is_vsi_based and self.name.startswith(VSI_MEM_FILESYSTEM_BASE_PATH)
-        ):
+        if not self._is_vsimem_based:
             return None
         # Prepare an integer that will contain the buffer length.
         out_length = c_int()
@@ -260,6 +299,10 @@ class GDALRaster(GDALRasterBase):
     @cached_property
     def is_vsi_based(self):
         return self._ptr and self.name.startswith(VSI_FILESYSTEM_PREFIX)
+
+    @cached_property
+    def _is_vsimem_based(self):
+        return self._ptr and self.name.startswith(VSI_MEM_FILESYSTEM_BASE_PATH)
 
     @property
     def name(self):

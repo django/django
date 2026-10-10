@@ -144,6 +144,15 @@ class TransactionsPerRequestTests(TransactionTestCase):
         # The non_atomic_requests decorator is used for an incorrect table.
         self.assertContains(response, "True")
 
+    async def test_no_auto_transaction_async(self):
+        old_atomic_requests = connection.settings_dict["ATOMIC_REQUESTS"]
+        try:
+            connection.settings_dict["ATOMIC_REQUESTS"] = True
+            response = await self.async_client.get("/not_in_transaction_async/")
+        finally:
+            connection.settings_dict["ATOMIC_REQUESTS"] = old_atomic_requests
+        self.assertContains(response, "False")
+
     def test_non_atomic_requests_does_not_mutate_original(self):
         def my_view(request):
             return HttpResponse("Ok")

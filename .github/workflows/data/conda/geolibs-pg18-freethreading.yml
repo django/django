@@ -1,0 +1,15 @@
+name: geodjango
+channels:
+  - conda-forge
+dependencies:
+  - python-freethreading=3.14
+  - postgresql=18.*
+  - postgis=3.6.*
+  - libgdal=3.13.*
+  - geos=3.14.*
+  - proj=9.8.*
+  - pip=26.*
+  - pip:
+      - -r ../../../../tests/requirements/py3-free-threading.txt
+      - -r ../../../../tests/requirements/postgres-free-threading.txt
+      - -e ../../../../

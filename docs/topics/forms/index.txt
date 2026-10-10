@@ -109,6 +109,15 @@ Django handles three distinct parts of the work involved in forms:
 It is *possible* to write code that does all of this manually, but Django can
 take care of it all for you.
 
+.. admonition:: There are community-maintained solutions!
+
+    Django has a vibrant ecosystem. There are solutions for customizing how
+    forms are rendered highlighted on the `Community Ecosystem`_ page. The
+    Django Packages `Forms grid`_ has even more options for you!
+
+.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#forms-views
+.. _Forms grid: https://djangopackages.org/grids/g/forms/
+
 Forms in Django
 ===============
 
@@ -602,8 +611,10 @@ in the required layout. For example:
       {{ form.urgent.as_field_group }}
     </div>
 
-By default Django uses the ``"django/forms/field.html"`` template which is
-designed for use with the default ``"django/forms/div.html"`` form style.
+By default Django uses the :sourcefile:`"django/forms/field.html"
+<django/forms/templates/django/forms/field.html>` template which is designed
+for use with the default :sourcefile:`"django/forms/div.html"
+<django/forms/templates/django/forms/div.html>` form style.
 
 The default template can be customized by setting
 :attr:`~django.forms.renderers.BaseRenderer.field_template_name` in your

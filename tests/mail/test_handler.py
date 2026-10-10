@@ -89,8 +89,8 @@ class MailersTests(SimpleTestCase):
         backend = mailers.default
         self.assertEqual(backend.alias, "default")
 
-    # RemovedInDjango70Warning: remove override_settings (but keep the test).
-    # (MAILERS={} becomes the default in Django 7.0.)
+    # RemovedInDjango2028Warning: remove override_settings (but keep the test).
+    # (MAILERS={} becomes the default in Django 2028.)
     @override_settings(MAILERS={})
     def test_default_mailers(self):
         msg = "The mailer 'default' is not configured."
@@ -204,7 +204,7 @@ class MailersTests(SimpleTestCase):
             MailerDoesNotExist("Some other configuration problem")
 
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 class MailersCompatibilityTests(SimpleTestCase):
     """mailers.default is usable even when MAILERS is not defined."""
 

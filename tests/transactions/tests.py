@@ -18,7 +18,7 @@ from django.test import (
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .models import Reporter
 
@@ -596,5 +596,5 @@ class DurableTests(DurableTestsBase, TestCase):
 class SavepointTests(SimpleTestCase):
     def test_deprecation_warning(self):
         msg = "savepoint() is deprecated. Use savepoint_create() instead."
-        with self.assertRaisesMessage(RemovedInDjango70Warning, msg):
+        with self.assertRaisesMessage(RemovedInDjango2028Warning, msg):
             transaction.savepoint()

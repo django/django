@@ -463,13 +463,12 @@ div.admonition-behind-the-scenes {
 }
 
 /*** versionadded/changes ***/
-div.versionadded span.title,
-div.versionchanged span.title,
 span.versionmodified {
     font-weight: bold;
 }
 div.versionadded,
 div.versionchanged,
+div.versionremoved,
 div.deprecated {
     color: #555;
 }

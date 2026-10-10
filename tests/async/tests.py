@@ -9,7 +9,7 @@ from django.core.cache import DEFAULT_CACHE_ALIAS, caches
 from django.core.exceptions import ImproperlyConfigured, SynchronousOnlyOperation
 from django.http import HttpResponse, HttpResponseNotAllowed
 from django.test import RequestFactory, SimpleTestCase
-from django.utils.asyncio import async_unsafe
+from django.utils.asyncio import async_unsafe, maybe_aclosing
 from django.views.generic.base import View
 
 from .models import SimpleModel
@@ -65,6 +65,44 @@ class AsyncUnsafeTest(SimpleTestCase):
             self.fail("SynchronousOnlyOperation should not be raised.")
 
 
+class MaybeAClosingTest(SimpleTestCase):
+    async def test_calls_aclose_on_iterator_with_aclose(self):
+        finally_ran = False
+
+        async def gen():
+            nonlocal finally_ran
+            try:
+                yield 1
+                yield 2
+            finally:
+                finally_ran = True
+
+        iterator = gen()
+        async with maybe_aclosing(iterator) as it:
+            self.assertIs(it, iterator)
+            self.assertEqual(await anext(it), 1)
+        self.assertTrue(finally_ran)
+
+    async def test_no_aclose_on_iterator_without_aclose(self):
+        class PlainAsyncIterator:
+            def __init__(self):
+                self.values = iter([1, 2])
+
+            def __aiter__(self):
+                return self
+
+            async def __anext__(self):
+                try:
+                    return next(self.values)
+                except StopIteration:
+                    raise StopAsyncIteration
+
+        iterator = PlainAsyncIterator()
+        async with maybe_aclosing(iterator) as it:
+            self.assertIs(it, iterator)
+            self.assertEqual(await anext(it), 1)
+
+
 class SyncView(View):
     def get(self, request, *args, **kwargs):
         return HttpResponse("Hello (sync) world!")
@@ -118,7 +156,7 @@ class ViewTests(SimpleTestCase):
                 if is_coroutine:
                     response = asyncio.run(response)
 
-                self.assertIsInstance(response, HttpResponse)
+                self.assertIs(type(response), HttpResponse)
 
     def test_http_method_not_allowed_responds_correctly(self):
         request_factory = RequestFactory()
@@ -137,7 +175,7 @@ class ViewTests(SimpleTestCase):
                 if is_coroutine:
                     response = asyncio.run(response)
 
-                self.assertIsInstance(response, HttpResponseNotAllowed)
+                self.assertIs(type(response), HttpResponseNotAllowed)
 
     def test_base_view_class_is_sync(self):
         """

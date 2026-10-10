@@ -322,6 +322,76 @@ cases, we do not want to update a "redirected" link, e.g. a rewrite to always
 point to the latest or stable version of the documentation, e.g.
 ``/en/stable/`` → ``/en/3.2/``.
 
+.. _documentation-voice:
+
+Voice
+=====
+
+We value the human voice in Django's documentation, in which the reader can
+have the experience of one person addressing another.
+
+The Django documentation is successful because it contains human rhythms and
+patterns. It speaks in the way an expert would speak to help a fellow
+developer. It expresses things in lively and imaginative ways. It's systematic
+but not mechanical.
+
+The documentation doesn't erase the personality of its authors or smooth
+everything into a slippery, dull surface. Some friction is necessary for a
+reader to grasp a concept.
+
+The documentation should not reach for grandiose but empty descriptions: for
+example, by overusing superlatives such as *clear*, *robust*, or *structured*.
+
+To make this more concrete, we present the same information in two versions:
+human and frictionless. The "human" example is excerpted from this
+documentation. The "frictionless" version was produced by prompting an AI tool
+for a version "suitable for a pull request (smooth and professional)":
+
+.. admonition:: Human version (excerpted from Django's documentation)
+
+  How Django knows to UPDATE vs. INSERT
+
+  You may have noticed Django database objects use the same ``save()`` method
+  for creating and changing objects. Django abstracts the need to use
+  ``INSERT`` or ``UPDATE`` SQL statements. Specifically, when you call
+  ``save()`` and the object's primary key attribute does **not** define a
+  :attr:`~django.db.models.Field.default` or
+  :attr:`~django.db.models.Field.db_default`, Django follows this algorithm:
+  ...
+
+  The one gotcha here is that you should be careful not to specify a
+  primary-key value explicitly when saving new objects, if you cannot guarantee
+  the primary-key value is unused.
+
+.. admonition:: Frictionless version
+
+  How Django determines UPDATE vs. INSERT
+
+  Django model instances use a single method, ``save()``, for both creating and
+  updating records. Internally, Django determines whether to issue an
+  ``INSERT`` or ``UPDATE`` SQL statement based on the state of the model
+  instance and its primary key.
+
+  When calling ``save()``, Django follows this general logic: ...
+
+  One important caveat is to avoid explicitly assigning a primary key value
+  when creating new objects unless you can guarantee that the value is unique.
+  Providing a conflicting primary key may lead to unexpected behavior or
+  database errors.
+
+Notice how the revision does not address the reader (originally: "you may have
+noticed"). Notice the deleted figurative language (originally: "Django knows")
+and a deleted technical term appropriate for the context (originally:
+"algorithm"). Notice how a self-evident point is belabored (revised: "may lead
+to unexpected behavior or database errors"). Finally, notice how the original
+version poses a problem (an abstraction is provided: how?), whereas the revised
+version merely summarizes ("Django determines ... based on the state of ..."),
+impairing the sense that the design was intentional.
+
+Without a doubt, a different prompt would produce a different, perhaps improved
+result. Still, we include this example to illustrate how easily the
+documentation can be undermined when attention is not given to voice.
+
 Writing style
 =============
 
@@ -626,57 +696,84 @@ Our policy for new features is:
     development version. Assume documentation readers are using the latest
     release, not the development version.
 
-Our preferred way for marking new features is by prefacing the features'
-documentation with: "``.. versionadded:: X.Y``", followed by a mandatory
-blank line and an optional description (indented).
+New features and significant changes should be identified using Sphinx's
+``versionadded`` and ``versionchanged`` directives in their documentation, and
+should also be mentioned in the appropriate section of the release notes
+(``docs/releases/A.B.txt``).
 
-General improvements or other changes to the APIs that should be emphasized
-should use the "``.. versionchanged:: X.Y``" directive (with the same format
-as the ``versionadded`` mentioned above).
-
-These ``versionadded`` and ``versionchanged`` blocks should be
-"self-contained." In other words, since we only keep these annotations around
-for two releases, it's nice to be able to remove the annotation and its
-contents without having to reflow, reindent, or edit the surrounding text. For
-example, instead of putting the entire description of a new or changed feature
-in a block, do something like this:
+Our preferred way to mark a new feature is to preface its documentation with
+"``.. versionadded:: A.B``". This should usually be placed at the top of a
+section, just below the heading or Sphinx directive that introduces the new
+feature:
 
 .. code-block:: rst
 
-    .. class:: Author(first_name, last_name, middle_name=None)
-
-        A person who writes books.
-
-        ``first_name`` is ...
-
-        ...
-
-        ``middle_name`` is ...
-
-        .. versionchanged:: A.B
-
-            The ``middle_name`` argument was added.
-
-Put the changed annotation notes at the bottom of a section, not the top.
-
-Also, avoid referring to a specific version of Django outside a
-``versionadded`` or ``versionchanged`` block. Even inside a block, it's often
-redundant to do so as these annotations render as "New in Django A.B:" and
-"Changed in Django A.B", respectively.
-
-If a function, attribute, etc. is added, it's also okay to use a
-``versionadded`` annotation like this:
-
-.. code-block:: rst
-
-    .. attribute:: Author.middle_name
+    .. class:: Author(last_name, first_name)
 
         .. versionadded:: A.B
 
-        An author's middle name.
+        A person who writes books...
 
-We can remove the ``.. versionadded:: A.B`` annotation without any indentation
-changes when the time comes.
+If the new feature doesn't have its own section, the ``versionadded``
+annotation can be placed near where it is mentioned and should be followed by a
+blank line and an indented description of what was added:
+
+.. code-block:: rst
+
+    Books
+    -----
+
+    Books are...
+
+    Each book can have one or more :class:`Author`\s...
+
+    .. versionadded:: A.B
+
+        Support for multiple authors.
+
+Sphinx renders this as "Added in version A.B: Support for multiple authors."
+Avoid using "added" or similar words in the description when it would be
+redundant.
+
+General improvements and significant changes to APIs should be marked with
+"``.. versionchanged:: A.B``" followed by a blank line and an indented
+description of the changes. Sphinx renders this as "Changed in version A.B:"
+followed by the description.
+
+Put ``versionchanged`` notes at the bottom of a section. Related changes in the
+same release can be collected in a single note, split into multiple paragraphs
+if helpful for readability. Adjacent ``versionchanged`` directives covering
+different releases should be sorted from oldest to newest version.
+
+These ``versionadded`` and ``versionchanged`` blocks should be
+"self-contained." Since we only keep these annotations around for two releases,
+it's nice to be able to remove the annotation and its contents without having
+to reflow, reindent, or edit the surrounding text. For example, instead of
+mentioning what's new or changed in the same paragraphs that describe the
+feature, do something like this:
+
+.. code-block:: rst
+
+    .. class:: Author(last_name, first_name=None)
+
+        A person who writes books...
+
+        ``last_name`` and ``first_name`` are...
+
+        .. versionchanged:: A.B
+
+            The ``first_name`` argument was made optional.
+
+    .. class:: Book(author)
+
+When the time comes, we can delete the lines containing ``.. versionchanged::
+A.B`` and its indented description without editing any other lines.
+
+For similar reasons, avoid referring to a specific version of Django outside a
+``versionadded`` or ``versionchanged`` block. Such references become outdated
+and are difficult to maintain. (Even inside one of those blocks, it's often
+redundant to mention the version number in the description. Sphinx already
+includes it in the "Added in version A.B" or "Changed in version A.B" prefix.)
 
 Minimizing images
 =================

@@ -1155,6 +1155,9 @@ class MigrationAutodetector:
         # which don't allow empty strings as default.
         time_fields = (models.DateField, models.DateTimeField, models.TimeField)
         auto_fields = (models.AutoField, models.SmallAutoField, models.BigAutoField)
+        is_managed = self.to_state.models[app_label, model_name].options.get(
+            "managed", True
+        )
         preserve_default = (
             field.null
             or field.has_default()
@@ -1163,6 +1166,7 @@ class MigrationAutodetector:
             or (field.blank and field.empty_strings_allowed)
             or (isinstance(field, time_fields) and field.auto_now)
             or (isinstance(field, auto_fields))
+            or not is_managed
         )
         if not preserve_default:
             field = field.clone()
@@ -1174,7 +1178,12 @@ class MigrationAutodetector:
                 field.default = self.questioner.ask_not_null_addition(
                     field_name, model_name
                 )
-        if field.unique and field.has_default() and callable(field.default):
+        if (
+            field.unique
+            and field.has_default()
+            and callable(field.default)
+            and is_managed
+        ):
             self.questioner.ask_unique_callable_default_addition(field_name, model_name)
         self.add_operation(
             app_label,
@@ -1322,6 +1331,9 @@ class MigrationAutodetector:
                 target_changed = (
                     both_m2m and new_field_dec[2]["to"] != old_field_dec[2]["to"]
                 )
+                is_managed = self.to_state.models[app_label, model_name].options.get(
+                    "managed", True
+                )
                 if (both_m2m or neither_m2m) and not target_changed:
                     # Either both fields are m2m or neither is
                     preserve_default = True
@@ -1331,6 +1343,7 @@ class MigrationAutodetector:
                         and not new_field.has_default()
                         and not new_field.has_db_default()
                         and not new_field.many_to_many
+                        and is_managed
                     ):
                         field = new_field.clone()
                         new_default = self.questioner.ask_not_null_alteration(

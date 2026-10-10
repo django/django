@@ -48,7 +48,7 @@ from django.template import Context, Template
 from django.test import SimpleTestCase, ignore_warnings
 from django.test.utils import override_settings
 from django.utils.datastructures import MultiValueDict
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.safestring import mark_safe
 
 from . import jinja2_tests
@@ -801,8 +801,8 @@ aria-describedby="id_birthday_error">
 </select>""",
         )
 
-    # RemovedInDjango70Warning
-    @ignore_warnings(category=RemovedInDjango70Warning)
+    # RemovedInDjango2028Warning
+    @ignore_warnings(category=RemovedInDjango2028Warning)
     @override_settings(USE_BLANK_CHOICE_DASH=True)
     def test_blank_choice_dash(self):
         class SomeForm(Form):
@@ -829,7 +829,7 @@ aria-describedby="id_birthday_error">
         )
 
         self.assertWarnsMessage(
-            RemovedInDjango70Warning, USE_BLANK_CHOICE_DASH_DEPRECATED_MSG
+            RemovedInDjango2028Warning, USE_BLANK_CHOICE_DASH_DEPRECATED_MSG
         )
 
     def test_forms_with_radio(self):

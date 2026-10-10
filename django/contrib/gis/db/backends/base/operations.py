@@ -117,7 +117,13 @@ class BaseSpatialOperations:
 
     @staticmethod
     def _must_transform_value(value, field):
-        return value is not None and value.srid != field.srid
+        if value is None:
+            return False
+        if value.srid == field.srid:
+            return False
+        if field.srid is None:
+            raise ValueError("Cannot transform a spatial value to an undefined SRID.")
+        return True
 
     def get_geom_placeholder_sql(self, f, value, compiler):
         """

@@ -11,6 +11,7 @@ from html.parser import HTMLParser
 from io import BytesIO
 
 from django.core.exceptions import SuspiciousFileOperation
+from django.utils.asyncio import maybe_aclosing
 from django.utils.functional import (
     SimpleLazyObject,
     cached_property,
@@ -397,12 +398,13 @@ async def acompress_sequence(sequence, *, max_random_bytes=None):
     ) as zfile:
         # Output headers...
         yield buf.read()
-        async for item in sequence:
-            zfile.write(item)
-            zfile.flush()
-            data = buf.read()
-            if data:
-                yield data
+        async with maybe_aclosing(aiter(sequence)) as it:
+            async for item in it:
+                zfile.write(item)
+                zfile.flush()
+                data = buf.read()
+                if data:
+                    yield data
     yield buf.read()
 
 

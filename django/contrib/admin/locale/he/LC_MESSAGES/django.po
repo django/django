@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-06-01 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 07:05+0000\n"
 "Last-Translator: Omer Mendler, 2026\n"
 "Language-Team: Hebrew (http://app.transifex.com/django/django/language/he/)\n"
 "MIME-Version: 1.0\n"
@@ -181,8 +181,13 @@ msgstr "ללא"
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr "יש להחזיק \"Control\" או \"Command\" במק, כדי לבחור יותר מאחד."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "בחירת אובייקט זה עבור פעולה - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -239,15 +244,15 @@ msgstr "שינוי %s"
 msgid "View %s"
 msgstr "צפיה ב%s"
 
-msgid "Database error"
-msgstr "שגיאת בסיס נתונים"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "שינוי %(count)s %(name)s בוצע בהצלחה."
 msgstr[1] "שינוי %(count)s %(name)s בוצע בהצלחה."
 msgstr[2] "שינוי %(count)s %(name)s בוצע בהצלחה."
+
+msgid "Database error"
+msgstr "שגיאת בסיס נתונים"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -273,6 +278,18 @@ msgstr "היסטוריית שינוי: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #, python-format
 msgid ""
@@ -325,9 +342,6 @@ msgstr ""
 msgid "Run"
 msgstr "הרצה"
 
-msgid "Click here to select the objects across all pages"
-msgstr "לחיצה כאן תבחר את האובייקטים בכל העמודים"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "בחירת כל %(total_count)s ה־%(module_name)s"
@@ -337,10 +351,6 @@ msgstr "איפוס בחירה"
 
 msgid "Breadcrumbs"
 msgstr "פירורי לחם"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "מודלים ביישום %(name)s"
 
 msgid "Model name"
 msgstr "שם דגם"
@@ -453,6 +463,10 @@ msgstr "החלפת ערכת נושא (נוכחית: בהירה)"
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "החלפת ערכת נושא (נוכחית: כהה)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -651,6 +665,9 @@ msgstr "מחיקת %(model)s הנבחר."
 #, python-format
 msgid "View selected %(model)s"
 msgstr "צפיה ב%(model)s אשר נבחרו."
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "תודה על בילוי זמן איכות עם האתר."

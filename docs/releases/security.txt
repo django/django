@@ -36,6 +36,103 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+October 6, 2026 - :cve:`2026-77050`
+-----------------------------------
+
+Potential denial-of-service vulnerability in
+``get_supported_language_variant()``.
+`Full description
+<https://www.djangoproject.com/weblog/2026/oct/06/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <7e878b0f8bd42260903e6a0d38996a93b0474a0b>`
+* Django 6.0 :commit:`(patch) <3d32ee80ae52745d686bf94d3555000ddf073267>`
+* Django 5.2 :commit:`(patch) <02a69e3791e3df23d45ea4ea7e7fc489f0eef2be>`
+
+October 6, 2026 - :cve:`2026-84429`
+-----------------------------------
+
+Potential denial-of-service vulnerability in HTTP header parsing.
+`Full description
+<https://www.djangoproject.com/weblog/2026/oct/06/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <de56deeabd4c48dfb5193f0001469d80102fb367>`
+* Django 6.0 :commit:`(patch) <3d8f121695c21234aff3071de0d38b6bd38c3f52>`
+* Django 5.2 :commit:`(patch) <6ecd66e09a383be004a78a3a738ea9727ff07b0e>`
+
+October 6, 2026 - :cve:`2026-87890`
+-----------------------------------
+
+Potential request forgery via spatial lookup byte values.
+`Full description
+<https://www.djangoproject.com/weblog/2026/oct/06/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <4e77ef1e69c94780006b82795aa7db101996c3af>`
+* Django 6.0 :commit:`(patch) <a2347fe8234a1831d56c875acc0ea51e0742957c>`
+* Django 5.2 :commit:`(patch) <dd0558d1617619e0d66163675ef02135d0f54e5f>`
+
+October 6, 2026 - :cve:`2026-87975`
+-----------------------------------
+
+Privilege abuse in model formsets with editable primary keys.
+`Full description
+<https://www.djangoproject.com/weblog/2026/oct/06/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <cce6c57ed30ea83725f9d6abb2fe5ee932bab107>`
+* Django 6.0 :commit:`(patch) <b83ab92bc5474558b083a840ea4628b3261b2cfe>`
+* Django 5.2 :commit:`(patch) <ff27883ca055aa9ab23015b50674a5b10dfe5a41>`
+
+August 4, 2026 - :cve:`2026-15307`
+----------------------------------
+
+Server-side file-write and request forgery via spatial lookups.
+`Full description
+<https://www.djangoproject.com/weblog/2026/aug/04/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <39b3e2d0c743a338def6c473086ebc06865e86b6>`
+* Django 6.0 :commit:`(patch) <208f80cb682868b584ed0a78f23e4ba6304212aa>`
+* Django 5.2 :commit:`(patch) <115ffd0463a765ab1cc93de18e94b5459b8a300e>`
+
+August 4, 2026 - :cve:`2026-15337`
+----------------------------------
+
+Potential denial-of-service vulnerability in ``check_for_language()``.
+`Full description
+<https://www.djangoproject.com/weblog/2026/aug/04/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <5b3523d29be25948e1dd90b3863a002f00fc865f>`
+* Django 6.0 :commit:`(patch) <224dbc832586ad5cfb0237c2ff30d14baeaddc6f>`
+* Django 5.2 :commit:`(patch) <c72a5dbb64d0777f3f471f1be94e8b2ca91e0959>`
+
+August 4, 2026 - :cve:`2026-15830`
+----------------------------------
+
+Potential denial-of-service vulnerability via nested geometry collections.
+`Full description
+<https://www.djangoproject.com/weblog/2026/aug/04/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <9e4a3f186b6b07b483bfd9195ea06734663fcd06>`
+* Django 6.0 :commit:`(patch) <6af5da31775417c610dbf9c3f1b5b8333d42daf6>`
+* Django 5.2 :commit:`(patch) <ba80833fa656dd09660b97c4429331067db1b080>`
+
+There was an additional hardening with new patch releases published on Oct 6,
+2026. `Full description
+<https://www.djangoproject.com/weblog/2026/oct/06/security-releases/>`__
+
+* Django 6.1.2 :commit:`(patch) <75d401a1491e04a907ed745c128836d51c982c0f>`
+* Django 6.0.9 :commit:`(patch) <4353dfb56f8ba3a6fccc4bdd7f2ef2fbee3aa638>`
+* Django 5.2.18 :commit:`(patch) <1eafa1a80f1363283f89208ba4499ed54e35f085>`
+
+August 4, 2026 - :cve:`2026-15920`
+----------------------------------
+
+Potential cross-site scripting via ``URLField`` values in the admin.
+`Full description
+<https://www.djangoproject.com/weblog/2026/aug/04/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <5a260d309a4c8010c2ebda24eb758a5d95e2508a>`
+* Django 6.0 :commit:`(patch) <13debb622a32720bda1bccda7622fd14fbf3931b>`
+* Django 5.2 :commit:`(patch) <b9adb81339cc418f8f56b1050cca6dfec3ab6349>`
+
 July 7, 2026 - :cve:`2026-48588`
 --------------------------------
 

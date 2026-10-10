@@ -217,7 +217,7 @@ class OFTTime(Field):
             seconds = int(ss.value)
             milliseconds = int(round((ss.value - seconds) * 1000))
             return time(hh.value, mn.value, seconds, milliseconds * 1000)
-        except (ValueError, GDALException):
+        except (TypeError, ValueError, GDALException):
             return None
 
 

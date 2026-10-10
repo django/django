@@ -104,12 +104,12 @@ much effort.
 The "peer" instances are tracked in a list of weak references, to avoid
 memory leaks where some peer instances are discarded.
 
-.. attribute:: RAISE
+.. attribute:: FETCH_RAISE
 
 Raises a :exc:`~django.core.exceptions.FieldFetchBlocked` exception.
 
-Using ``RAISE`` for the above example would raise an exception at the access of
-``book.author``, like:
+Using ``FETCH_RAISE`` for the above example would raise an exception at the
+access of ``book.author``, like:
 
 .. code-block:: python
 

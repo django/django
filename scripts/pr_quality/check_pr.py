@@ -9,7 +9,7 @@ when no ticket is found, since they require a ticket ID to be meaningful.
 
 Required environment variables:
     GITHUB_TOKEN  GitHub API token
-    PR_NUMBER     Pull request number
+    PR_NUMBER     Pull request number (unless RECHECK is true)
     PR_REPO       Repository in "owner/repo" format
 
 Optional environment variables:
@@ -18,6 +18,7 @@ Optional environment variables:
     PR_BODY       Pull request body text
     PR_CREATED_AT PR creation timestamp (ISO 8601)
     PR_TITLE      Pull request title
+    RECHECK       Set to "true" to recheck open PRs after their grace period
 """
 
 import json
@@ -54,6 +55,7 @@ MIN_WORDS = 5
 SKIPPED = object()  # Sentinel: check was not applicable and was skipped.
 TICKET_NOT_FOUND = object()  # Sentinel: Trac returned HTTP 404 for the ticket.
 URLOPEN_TIMEOUT_SECONDS = 15
+AUTOCLOSE_GRACE_PERIOD = timedelta(days=1)
 # PRs opened before these dates predate PR template additions.
 PR_TEMPLATE_DATE = date(2024, 3, 4)  # 3fcef50 -- PR template introduced
 AI_DISCLOSURE_DATE = date(2026, 1, 8)  # 4f580c4 -- AI disclosure added
@@ -155,7 +157,7 @@ def get_comment_ids_to_delete(pr_number, repo, token):
             f"/issues/{pr_number}/comments",
             token,
             repo,
-            {"per_page": GITHUB_PER_PAGE, "page": page},
+            params={"per_page": GITHUB_PER_PAGE, "page": page},
         )
         for comment in comments:
             if CHECKS_HEADER in comment["body"]:
@@ -427,40 +429,31 @@ def write_job_summary(pr_number, results, summary_file=None):
         f.write("\n".join(lines) + "\n")
 
 
-def main(
+def run_checks(
     repo,
     token,
-    pr_author,
     pr_body,
     pr_number,
-    pr_title="",
-    pr_created_at=None,
-    autoclose=True,
-    summary_file=None,
-    gha_formatter=False,
+    pr_title,
+    created_date,
+    commit_count,
 ):
-    setup_logging(logger, gha_formatter)
-
-    created_date = (
-        datetime.fromisoformat(pr_created_at).date() if pr_created_at else None
-    )
+    """Return check results without modifying the PR or its comments."""
     if created_date is not None and created_date <= PR_TEMPLATE_DATE:
         logger.info(
             "PR #%s is older than PR template (%s) -- skipping all checks.",
             pr_number,
             PR_TEMPLATE_DATE,
         )
-        return
+        return []
 
-    commit_count = get_recent_commit_count(
-        pr_author, repo, token, since_days=365 * 3, max_count=5
-    )
     if commit_count >= 5:
         logger.info(
             "PR #%s author is an established contributor -- skipping all checks.",
             pr_number,
         )
-        return
+        return []
+
     if commit_count == 0:
         logger.info(
             "PR #%s author has no commits -- setting size threshold to 0.",
@@ -511,6 +504,39 @@ def main(
         ("AI disclosure completed", ai_disclosure_result, LEVEL_ERROR),
         ("Checklist completed", check_checklist(pr_body), LEVEL_ERROR),
     ]
+    return results
+
+
+def main(
+    repo,
+    token,
+    pr_author,
+    pr_body,
+    pr_number,
+    pr_title="",
+    pr_created_at=None,
+    autoclose=True,
+    summary_file=None,
+    gha_formatter=False,
+):
+    """Post quality-check feedback without closing the PR."""
+    setup_logging(logger, gha_formatter)
+
+    created_at = datetime.fromisoformat(pr_created_at) if pr_created_at else None
+    commit_count = get_recent_commit_count(
+        pr_author, repo, token, since_days=365 * 3, max_count=5
+    )
+    results = run_checks(
+        repo=repo,
+        token=token,
+        pr_body=pr_body,
+        pr_number=pr_number,
+        pr_title=pr_title,
+        created_date=created_at.date() if created_at else None,
+        commit_count=commit_count,
+    )
+    if not results:
+        return
     write_job_summary(pr_number, results, summary_file)
 
     failures = [
@@ -523,52 +549,139 @@ def main(
         for _, msg, level in results
         if msg is not None and msg is not SKIPPED and level == LEVEL_WARNING
     ]
+    # Remove outdated feedback, including when all checks now pass.
+    for comment_id in get_comment_ids_to_delete(pr_number, repo, token):
+        github_request("DELETE", f"/issues/comments/{comment_id}", token, repo)
+
     if not failures and not warning_msgs:
         logger.info("PR #%s passed all quality checks.", pr_number)
         return
 
-    for id_to_delete in get_comment_ids_to_delete(pr_number, repo, token):
-        github_request(
-            "DELETE",
-            f"/issues/comments/{id_to_delete}",
-            token,
-            repo,
+    comment_parts = [CHECKS_HEADER]
+    if (
+        failures
+        and autoclose
+        and created_at is not None
+        and datetime.now(timezone.utc) <= created_at + timedelta(days=5)
+        and commit_count == 0
+    ):
+        comment_parts.append(
+            "Please address the issues below. A daily check may automatically "
+            "close this PR if required checks still fail once it is at least "
+            "24 hours old. Scheduled checks cover PRs up to five days old."
         )
+    comment_parts.extend([*failures, *warning_msgs, CHECKS_FOOTER])
 
     github_request(
         "POST",
         f"/issues/{pr_number}/comments",
         token,
         repo,
-        {"body": "\n\n".join([CHECKS_HEADER, *failures, *warning_msgs, CHECKS_FOOTER])},
+        {"body": "\n\n".join(comment_parts)},
     )
-    if not failures:
-        logger.warning(
-            "PR #%s has %s warning(s), adding informational comment.",
-            pr_number,
-            len(warning_msgs),
-        )
-        return
+    logger.warning(
+        "PR #%s has %s failure(s) and %s warning(s), adding comment with details.",
+        pr_number,
+        len(failures),
+        len(warning_msgs),
+    )
+    return 1 if failures else None
 
-    msg = "PR #%s failed %s check(s), adding comment with details."
-    if not autoclose or commit_count > 0:
-        logger.warning(
-            msg + " Not closing the PR given %s.",
-            pr_number,
-            len(failures),
-            "warning-only mode" if not autoclose else "recent contributions",
+
+def recheck_open_prs(repo, token, autoclose, summary_file=None, gha_formatter=False):
+    """Recheck eligible PRs and close those with failures, without commenting.
+
+    Return 1 if an exception prevents checking a PR, otherwise 0.
+    """
+    setup_logging(logger, gha_formatter)
+    if not autoclose:
+        return 0
+
+    # Collect numbers before closing any PRs, which changes pagination.
+    pr_numbers = []
+    page = 1
+    now = datetime.now(timezone.utc)
+    oldest = now - timedelta(days=5)
+    cutoff = now - AUTOCLOSE_GRACE_PERIOD
+    while True:
+        prs = github_request(
+            "GET",
+            "/pulls",
+            token,
+            repo,
+            params={
+                "state": "open",
+                "base": "main",
+                "sort": "created",
+                "direction": "desc",
+                "per_page": GITHUB_PER_PAGE,
+                "page": page,
+            },
         )
-    else:
-        logger.error(
-            msg + " Closing the PR given lack of recent contributions.",
-            pr_number,
-            len(failures),
-        )
-        github_request("PATCH", f"/pulls/{pr_number}", token, repo, {"state": "closed"})
-    return 1
+        for pr in prs:
+            created_at = datetime.fromisoformat(pr["created_at"])
+            if created_at < oldest:
+                break
+            if created_at <= cutoff:
+                pr_numbers.append(pr["number"])
+
+        if (
+            len(prs) < GITHUB_PER_PAGE
+            or datetime.fromisoformat(prs[-1]["created_at"]) < oldest
+        ):
+            break
+        page += 1
+
+    failed = False
+    for pr_number in pr_numbers:
+        try:
+            # The PR may have been edited or closed since listing it.
+            pr = github_request("GET", f"/pulls/{pr_number}", token, repo)
+            if pr["state"] != "open" or pr["base"]["ref"] != "main":
+                continue
+            commit_count = get_recent_commit_count(
+                pr["user"]["login"], repo, token, since_days=365 * 3, max_count=5
+            )
+            if commit_count > 0:
+                continue
+            results = run_checks(
+                repo=repo,
+                token=token,
+                pr_body=pr["body"] or "",
+                pr_number=pr_number,
+                pr_title=pr["title"],
+                created_date=datetime.fromisoformat(pr["created_at"]).date(),
+                commit_count=commit_count,
+            )
+            write_job_summary(pr_number, results, summary_file)
+
+            has_failures = any(
+                msg is not None and msg is not SKIPPED and level == LEVEL_ERROR
+                for _, msg, level in results
+            )
+            if has_failures:
+                logger.info("PR #%s still fails required checks -- closing.", pr_number)
+                github_request(
+                    "PATCH", f"/pulls/{pr_number}", token, repo, {"state": "closed"}
+                )
+        except Exception:
+            # A failure checking one PR must not prevent checking the rest.
+            logger.exception("Could not recheck PR #%s.", pr_number)
+            failed = True
+    return int(failed)
 
 
 if __name__ == "__main__":
+    if os.environ.get("RECHECK", "").lower() == "true":
+        sys.exit(
+            recheck_open_prs(
+                repo=os.environ["PR_REPO"],
+                token=os.environ["GITHUB_TOKEN"],
+                autoclose=os.environ.get("AUTOCLOSE", "").lower() == "true",
+                summary_file=os.environ.get("GITHUB_STEP_SUMMARY"),
+                gha_formatter=os.environ.get("GITHUB_ACTIONS"),
+            )
+        )
     sys.exit(
         main(
             repo=os.environ["PR_REPO"],

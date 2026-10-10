@@ -13,7 +13,7 @@ from django.db.models.expressions import (
     OrderByList,
     RawSQL,
 )
-from django.db.models.functions import Collate
+from django.db.models.functions import UUID4, Collate
 from django.db.models.lookups import GreaterThan
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
@@ -23,6 +23,8 @@ from .models import (
     DBDefaults,
     DBDefaultsFK,
     DBDefaultsFunction,
+    DBDefaultsFunctionFK,
+    DBDefaultsFunctionPK,
     DBDefaultsOneToOnePK,
     DBDefaultsPK,
 )
@@ -154,6 +156,18 @@ class DefaultTests(TestCase):
         # This should either be "en" or "kr" depending on which model's
         # DatabaseDefault is used, but this behavior varies across databases.
         self.assertNotEqual(obj.language_code_id, "tr")
+
+    @skipUnlessDBFeature(
+        "can_return_columns_from_insert",
+        "supports_expression_defaults",
+        "supports_uuid4_function_in_default",
+    )
+    def test_foreign_key_to_parent_with_expression_pk(self):
+        parent = DBDefaultsFunctionPK(pk=UUID4())
+        obj = DBDefaultsFunctionFK(parent=parent)
+        parent.save()
+        obj.save()
+        self.assertEqual(obj.parent_id, parent.pk)
 
     @skipUnlessDBFeature("supports_expression_defaults")
     def test_case_when_db_default_returning(self):

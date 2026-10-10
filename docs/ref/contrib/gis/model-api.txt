@@ -112,6 +112,10 @@ Sets the SRID [#fnogcsrid]_ (Spatial Reference System Identity) of the geometry
 field to the given value. Defaults to 4326 (also known as `WGS84`__, units are
 in degrees of longitude and latitude).
 
+Setting the SRID to ``-1`` disables automatic SRID transformations when saving
+geometries. The assigned geometry's SRID is set to ``-1``, discarding any
+explicit SRID it had.
+
 __ https://en.wikipedia.org/wiki/WGS84
 
 .. _selecting-an-srid:
@@ -222,6 +226,18 @@ details.
 .. note::
 
     Geography support is limited to PostGIS and will force the SRID to be 4326.
+
+``max_geom_collections``
+------------------------
+
+.. attribute:: GeometryField.max_geom_collections
+
+This option is forwarded to the :attr:`form field
+<django.contrib.gis.forms.Field.max_geom_collections>` generated for this model
+field, bounding the geometry collection nesting depth in submitted WKB/WKT
+inputs before raising :exc:`ValueError`. Since spatial field
+assignments are lazy, it is also checked when values are accessed, e.g. when
+saving an instance, but not when read from a database. It defaults to ``198``.
 
 .. _geography-type:
 

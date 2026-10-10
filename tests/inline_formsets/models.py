@@ -27,7 +27,7 @@ class ParentUUIDPk(models.Model):
 
     class Meta:
         required_db_features = {
-            "supports_uuid4_function",
+            "supports_uuid4_function_in_default",
             "supports_expression_defaults",
         }
 
@@ -38,7 +38,7 @@ class ChildUUIDPk(models.Model):
 
     class Meta:
         required_db_features = {
-            "supports_uuid4_function",
+            "supports_uuid4_function_in_default",
             "supports_expression_defaults",
         }
 

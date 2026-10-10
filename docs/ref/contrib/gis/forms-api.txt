@@ -36,6 +36,25 @@ GeoDjango form fields take the following optional arguments.
     be set up depending on the field class. It matches the OpenGIS standard
     geometry name.
 
+``max_geom_collections``
+------------------------
+
+.. attribute:: Field.max_geom_collections
+
+    The maximum number of geometry collections the field accepts before
+    refusing to parse the input and raising a
+    :exc:`~django.core.exceptions.ValidationError`. This guards against crashes
+    in the underlying GEOS library when parsing deeply nested
+    ``GEOMETRYCOLLECTION`` input. It defaults to ``198``.
+
+    The limit bounds the nesting depth for well-known text (WKT), well-known
+    binary (WKB), and hex-encoded WKB. For GeoJSON, the limit is not applied at
+    all, since GDAL parses that input type instead.
+
+    Increase this value (or set to ``None``) only if you must accept
+    legitimately deep geometries, since doing so reduces protection against
+    fatal errors.
+
 Form field classes
 ==================
 

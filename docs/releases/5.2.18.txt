@@ -1,0 +1,91 @@
+===========================
+Django 5.2.18 release notes
+===========================
+
+*October 6, 2026*
+
+Django 5.2.18 fixes one security issue with severity "low", three security
+issues with severity "moderate", and provides a fix for an insufficient
+security mitigation in 5.2.17. It also fixes one data loss issue in 4.0.
+
+CVE-2026-77050: Potential denial-of-service vulnerability in ``get_supported_language_variant()``
+=================================================================================================
+
+:func:`~django.utils.translation.get_supported_language_variant` was subject to
+a potential denial-of-service attack when processing many distinct, very long
+language codes. Language codes were used as keys in an in-memory cache before
+their length was limited, potentially consuming excessive process memory.
+
+To mitigate this vulnerability, language codes longer than 500 characters are
+now rejected or truncated before the cached lookup.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
+CVE-2026-84429: Potential denial-of-service vulnerability in HTTP header parsing
+================================================================================
+
+``django.utils.http.parse_header_parameters()`` was subject to a potential
+denial-of-service attack due to quadratic time complexity when parsing a value
+with many separators inside a quoted parameter. An unauthenticated request
+could reach this parsing through headers such as ``Accept`` or
+``Content-Type``, for instance via the content negotiation performed by
+``HttpRequest.accepts()``. The per-call length limit does not bound the
+combined size of repeated headers.
+
+The undocumented ``django.utils.http.parse_header_parameters()`` function now
+uses Python's :class:`email.message.Message` for parsing. As a result, parsing
+of some malformed or unusual header values may differ, for example,
+:rfc:`2231` values with a missing encoding are now decoded.
+
+This issue has severity "moderate" according to the :ref:`Django security
+policy <severity-levels>`.
+
+CVE-2026-87890: Potential request forgery via spatial lookup byte values
+========================================================================
+
+Spatial lookups accepted raster values provided as ``bytes`` without requiring
+them to be explicitly wrapped in :class:`~django.contrib.gis.gdal.GDALRaster`.
+Although these values were opened through GDAL's in-memory virtual filesystem,
+they could contain a VRT document referencing an external raster source. This
+could cause GDAL to issue network requests as the Django process user while
+preparing the lookup.
+
+This issue could be exploited by applications that passed attacker-controlled
+bytes directly to a spatial lookup. It was overlooked in the fix for
+CVE-2026-15307.
+
+To mitigate this issue, raster values provided as ``bytes`` must now be wrapped
+in :class:`~django.contrib.gis.gdal.GDALRaster` before being used in spatial
+lookups. Byte values representing valid hexadecimal geometries remain accepted.
+
+This is a backward incompatible change. As a reminder, all untrusted user input
+should be validated before use.
+
+This issue has severity "moderate" according to the :ref:`Django security
+policy <severity-levels>`.
+
+CVE-2026-87975: Privilege abuse in model formsets with editable primary keys
+============================================================================
+
+Model formsets incorrectly allowed forged ``POST`` data to either delete
+instances outside the limiting queryset or create instances via :ref:`edit-only
+<model-formsets-edit-only>` formsets when the model's primary key could be set
+through the form, such as with: a ``OneToOneField`` (or parent link used as the
+primary key of an inline formset's model), or a natural or UUID primary key
+included in the form's fields. Models using the default ``BigAutoField``
+primary key were not affected.
+
+This issue has severity "moderate" according to the :ref:`Django security
+policy <severity-levels>`.
+
+Bugfixes
+========
+
+* Fixed a class of bugs in Django 5.2.17 that allowed bypassing the depth
+  limiter for deeply nested geometry collections (:cve:`2026-15830`). The new
+  algorithm treats WKB and WKT inputs more consistently and also fixes a rare
+  case where a valid geometry could have been rejected.
+
+* Fixed a data loss issue in Django 4.0 where :ref:`network rasters
+  <gdal-raster-network>` were deleted by GeoDjango when closed.

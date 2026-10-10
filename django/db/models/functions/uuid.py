@@ -32,7 +32,16 @@ class UUID4(Func):
             raise NotSupportedError(
                 "UUID4 requires Oracle version 23ai/26ai (23.9) or later."
             )
-        return self.as_sql(compiler, connection, function="UUID", **extra_context)
+        # UUID4() produces a RAW(16) on Oracle, which is implicitly uppercased
+        # via RAWTOHEX() when persisted to UUIDField's VARCHAR2(32) type. For
+        # parity with python UUID values, make explicit and wrap with LOWER().
+        return self.as_sql(
+            compiler,
+            connection,
+            function="UUID",
+            template=f"LOWER(RAWTOHEX({self.template}))",
+            **extra_context,
+        )
 
 
 class UUID7(Func):

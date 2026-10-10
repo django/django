@@ -1,8 +1,11 @@
+import json
 from io import StringIO
-from unittest import skipIf
+from pathlib import Path
+from unittest import mock, skipIf
 
 from django.contrib.gis import gdal
 from django.contrib.gis.db.models import Extent, MakeLine, Union, functions
+from django.contrib.gis.gdal.raster.source import DisallowedRasterLookup
 from django.contrib.gis.geos import (
     GeometryCollection,
     GEOSGeometry,
@@ -19,9 +22,10 @@ from django.core.files.temp import NamedTemporaryFile
 from django.core.management import call_command
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import F, OuterRef, Subquery
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
+from ..data.rasters.textrasters import JSON_RASTER
 from ..utils import cannot_save_multipoint, skipUnlessGISLookup
 from .models import (
     City,
@@ -313,6 +317,43 @@ class SaveLoadTests(TestCase):
         obj = GeometryCollectionModel.objects.create(geom=geom)
         obj.refresh_from_db()
         self.assertIs(obj.geom.equals(geom), True)
+
+    def test_geometrycollectionfield_max(self):
+        geom = "POINT(0 0)"
+        for _ in range(6):
+            geom = f"GEOMETRYCOLLECTION({geom})"
+        msg = "WKT contains too many possible GeometryCollections."
+        with self.assertRaisesMessage(ValueError, msg):
+            GeometryCollectionModel.objects.create(geom=geom)
+        with self.assertRaisesMessage(ValueError, msg):
+            GeometryCollectionModel.objects.bulk_create(
+                [GeometryCollectionModel(geom=geom), GeometryCollectionModel(geom=geom)]
+            )
+
+    def test_geometrycollectionfield_default_max_ignored_on_read(self):
+        geom = "POINT(0 0)"
+        for _ in range(5):
+            geom = f"GEOMETRYCOLLECTION({geom})"
+        obj = GeometryCollectionModel.objects.create(geom=geom)
+        with mock.patch(
+            "django.contrib.gis.geos.prototypes.io._WKBReader.limit"
+        ) as limit_mock:
+            obj.refresh_from_db()
+        limit_mock.assert_called_once()
+        max_geom_collections = limit_mock.call_args.args[1]
+        self.assertIsNone(max_geom_collections)
+
+
+class ValidationTests(SimpleTestCase):
+    def test_geometrycollectionfield_max(self):
+        geom = "POINT(0 0)"
+        for _ in range(6):
+            geom = f"GEOMETRYCOLLECTION({geom})"
+        obj = GeometryCollectionModel(geom=geom)
+        msg = "WKT contains too many possible GeometryCollections."
+        # Spatial fields do not re-raise ValueError as ValidationError.
+        with self.assertRaisesMessage(ValueError, msg):
+            obj.full_clean()
 
 
 class GeoLookupTest(TestCase):
@@ -694,6 +735,98 @@ class GeoLookupTest(TestCase):
         )
         self.assertEqual(qs.get(), multifields)
 
+    def test_lookup_rejects_writing_or_fetching_rasters(self):
+        """
+        GDALRaster enables write mode in the following cases even when the
+        value of the `write` parameter is False (default):
+        - dicts
+        - strings matching a json regex
+        - bytes
+
+        Since this could be unexpected in a lookup context, disallow dicts,
+        bytes, and strings: instead, explicitly wrap with GDALRaster() to
+        signal that a write or fetch is expected.
+
+        Disallowing strings also disallows paths to local or network rasters,
+        but those didn't work in the lookup context anyway, since they were
+        never opened for writing, and lookups failed on setting the SRID with:
+
+        GDALException: Raster needs to be opened in write mode to change values
+
+        Still, a network fetch might have occurred before that failure point,
+        so disallow strings altogether.
+        """
+        # Create a vsi-based raster from scratch.
+        vsimem_path = "/vsimem/raster.tif"
+        # Keep a reference to this raster while it is being re-parsed below.
+        # Otherwise, GDALRaster.__del__() will delete the in-memory raster.
+        _rast = gdal.GDALRaster(  # NOQA: F841
+            {
+                "name": vsimem_path,
+                "driver": "tif",
+                "width": 4,
+                "height": 4,
+                "srid": 4326,
+                "bands": [
+                    {
+                        "data": range(16),
+                    }
+                ],
+            }
+        )
+        existing_path = Path(__file__).parent.parent / "data" / "rasters" / "raster.tif"
+        disallowed_cases = [
+            JSON_RASTER,
+            json.loads(JSON_RASTER),
+            "/vsicurl/someurl",
+            "/vsicurl_streaming/someurl",
+            "/vsis3/someurl",
+            vsimem_path,
+            existing_path,
+            existing_path.read_bytes(),
+            b"POINT (invalid)",
+        ]
+        for obj in disallowed_cases:
+            msg = (
+                r"Cannot use object .* for a spatial lookup parameter\. If "
+                r"this is a raster, wrap it with GDALRaster\(\) before using "
+                r"it in a lookup to enable writing or fetching\."
+            )
+            with (
+                self.subTest(obj=obj),
+                self.assertRaisesRegex(DisallowedRasterLookup, msg),
+            ):
+                State.objects.filter(poly__intersects=obj)
+
+        # Strings having nothing to do with rasters raise a more generic error.
+        for obj in str(existing_path), "invalid":
+            msg = "String input unrecognized as WKT EWKT, and HEXEWKB."
+            with self.subTest(obj=obj), self.assertRaisesMessage(ValueError, msg):
+                State.objects.filter(poly__intersects=obj)
+
+    def test_lookup_rejected_value_repr_is_truncated(self):
+        value = b"x" * 5000
+        with self.assertRaises(DisallowedRasterLookup) as ctx:
+            State.objects.filter(poly__intersects=value)
+
+        message = str(ctx.exception)
+        self.assertIn("… <trimmed 5003 bytes string>", message)
+        self.assertNotIn("x" * 4097, message)
+
+    def test_lookup_allows_geos_geometry_string(self):
+        geojson = json.dumps({"type": "Point", "coordinates": [2, 49]})
+        # Just get SQL to avoid gating on connection.supports_raster.
+        State.objects.filter(poly__intersects=geojson).query
+
+    @skipUnlessGISLookup("exact")
+    def test_lookup_against_nested_geometry_collection(self):
+        geom = "POINT(0 0)"
+        for _ in range(6):
+            geom = f"GEOMETRYCOLLECTION({geom})"
+        msg = "WKT contains too many possible GeometryCollections."
+        with self.assertRaisesMessage(ValueError, msg):
+            GeometryCollectionModel.objects.filter(geom=geom)
+
 
 class GeoQuerySetTest(TestCase):
     # TODO: GeoQuerySet is removed, organize these test better.
@@ -807,18 +940,26 @@ class GeoQuerySetTest(TestCase):
             name="Forney",
         )
         tx = Country.objects.get(name="Texas").mpoly
-        # Tolerance is greater than distance between Forney and Dallas, that's
-        # why Dallas is ignored.
+        # Tolerance is greater than the distance between Forney and Dallas, so
+        # either one may be ignored.
         forney_houston = GEOSGeometry(
             "MULTIPOINT(-95.363151 29.763374, -96.467222 32.751389)",
             srid=4326,
         )
+        forney_houston.normalize()
+        dallas_houston = GEOSGeometry(
+            "MULTIPOINT(-95.363151 29.763374, -96.801611 32.782057)",
+            srid=4326,
+        )
+        dallas_houston.normalize()
+        result = City.objects.filter(point__within=tx).aggregate(
+            Union("point", tolerance=32000),
+        )["point__union"]
+        result.normalize()
         self.assertIs(
-            forney_houston.equals_exact(
-                City.objects.filter(point__within=tx).aggregate(
-                    Union("point", tolerance=32000),
-                )["point__union"],
-                tolerance=10e-6,
+            any(
+                expected.equals_exact(result, tolerance=10e-6)
+                for expected in (forney_houston, dallas_houston)
             ),
             True,
         )

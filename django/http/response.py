@@ -7,6 +7,7 @@ import re
 import sys
 import time
 import warnings
+from contextlib import aclosing
 from email.header import Header
 from http.client import responses
 from urllib.parse import urlsplit
@@ -19,8 +20,9 @@ from django.core.exceptions import DisallowedRedirect
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import timezone
+from django.utils.asyncio import maybe_aclosing
 from django.utils.datastructures import CaseInsensitiveMapping
-from django.utils.deprecation import RemovedInDjango71Warning
+from django.utils.deprecation import RemovedInDjango2029Warning
 from django.utils.encoding import iri_to_uri
 from django.utils.functional import cached_property
 from django.utils.http import (
@@ -492,8 +494,9 @@ class StreamingHttpResponse(HttpResponseBase):
             _iterator = self._iterator
 
             async def awrapper():
-                async for part in _iterator:
-                    yield self.make_bytes(part)
+                async with maybe_aclosing(_iterator) as it:
+                    async for part in it:
+                        yield self.make_bytes(part)
 
             return awrapper()
         else:
@@ -528,16 +531,18 @@ class StreamingHttpResponse(HttpResponseBase):
             # async iterator. Consume in async_to_sync and map back.
             async def to_list(_iterator):
                 as_list = []
-                async for chunk in _iterator:
-                    as_list.append(chunk)
+                async with maybe_aclosing(_iterator) as it:
+                    async for chunk in it:
+                        as_list.append(chunk)
                 return as_list
 
             return map(self.make_bytes, iter(async_to_sync(to_list)(self._iterator)))
 
     async def __aiter__(self):
         try:
-            async for part in self.streaming_content:
-                yield part
+            async with aclosing(aiter(self.streaming_content)) as content:
+                async for part in content:
+                    yield part
         except TypeError:
             warnings.warn(
                 "StreamingHttpResponse must consume synchronous iterators in order to "
@@ -749,7 +754,7 @@ class JsonResponse(HttpResponse):
     :param encoder: Should be a json encoder class. Defaults to
       ``django.core.serializers.json.DjangoJSONEncoder``.
     :param safe: Controls if only ``dict`` objects may be serialized. Defaults
-      to ``True``.
+      to ``False``.
     :param json_dumps_params: A dictionary of kwargs passed to json.dumps().
     """
 
@@ -757,21 +762,22 @@ class JsonResponse(HttpResponse):
         self,
         data,
         encoder=DjangoJSONEncoder,
-        # RemovedInDjango71Warning: Remove the safe parameter.
+        # RemovedInDjango2029Warning: Remove the safe parameter from here and
+        # the docstring.
         safe=None,
         json_dumps_params=None,
         **kwargs,
     ):
-        # RemovedInDjango71Warning.
+        # RemovedInDjango2029Warning.
         if safe is None:
             safe = False
         else:
             warnings.warn(
                 "The safe parameter is deprecated.",
-                category=RemovedInDjango71Warning,
+                category=RemovedInDjango2029Warning,
                 skip_file_prefixes=django_file_prefixes(),
             )
-        # RemovedInDjango71Warning.
+        # RemovedInDjango2029Warning.
         if safe and not isinstance(data, dict):
             raise TypeError(
                 "In order to allow non-dict objects to be serialized set the "

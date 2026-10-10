@@ -4,12 +4,14 @@ import unittest
 from importlib import import_module
 from zipimport import zipimporter
 
+import django.utils.module_loading
 from django.test import SimpleTestCase, modify_settings
 from django.test.utils import extend_sys_path
 from django.utils.module_loading import (
     autodiscover_modules,
     import_string,
     module_has_submodule,
+    qualname,
 )
 
 
@@ -255,3 +257,66 @@ class CustomLoader(EggLoader):
     def tearDown(self):
         super().tearDown()
         sys.path_hooks.pop(0)
+
+
+class TopLevelClass:
+    class NestedClass:
+        @classmethod
+        def clsmethod(cls):
+            pass
+
+        def method(self):
+            pass
+
+
+class CustomException(Exception):
+    pass
+
+
+def top_level_func():
+    pass
+
+
+class QualnameTests(SimpleTestCase):
+    def test_classes_and_functions(self):
+        tests = [
+            (int, "builtins.int"),
+            (str, "builtins.str"),
+            (len, "builtins.len"),
+            (ValueError, "builtins.ValueError"),
+            (CustomException, "utils_tests.test_module_loading.CustomException"),
+            (sys, "sys"),
+            (
+                django.utils.module_loading,
+                "django.utils.module_loading",
+            ),
+            (TopLevelClass, "utils_tests.test_module_loading.TopLevelClass"),
+            (
+                TopLevelClass.NestedClass,
+                "utils_tests.test_module_loading.TopLevelClass.NestedClass",
+            ),
+            (
+                TopLevelClass.NestedClass.clsmethod,
+                "utils_tests.test_module_loading.TopLevelClass.NestedClass.clsmethod",
+            ),
+            (top_level_func, "utils_tests.test_module_loading.top_level_func"),
+        ]
+        for val, expected in tests:
+            with self.subTest(val=val):
+                self.assertEqual(qualname(val), expected)
+
+    def test_invalid_values(self):
+        def local_func():
+            pass
+
+        tests = [
+            (lambda: None, "local or anonymous object."),
+            (local_func, "local or anonymous object."),
+            (TopLevelClass(), "no __qualname__ attribute."),
+            (None, "no __module__ attribute."),
+            (123, "no __module__ attribute."),
+            ("str", "no __module__ attribute."),
+        ]
+        for val, msg in tests:
+            with self.subTest(val=val), self.assertRaisesMessage(ValueError, msg):
+                qualname(val)

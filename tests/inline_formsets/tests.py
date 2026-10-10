@@ -113,7 +113,9 @@ class DeletionTests(TestCase):
             obj.save()
         self.assertEqual(school.child_set.count(), 1)
 
-    @skipUnlessDBFeature("supports_uuid4_function", "supports_expression_defaults")
+    @skipUnlessDBFeature(
+        "supports_uuid4_function_in_default", "supports_expression_defaults"
+    )
     def test_add_form_uuid_pk(self):
         ChildFormSet = inlineformset_factory(ParentUUIDPk, ChildUUIDPk, fields=["name"])
         data = {

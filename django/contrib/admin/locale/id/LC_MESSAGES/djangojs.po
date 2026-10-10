@@ -6,13 +6,14 @@
 # oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2020
 # rodin <romihardiyanto@gmail.com>, 2011-2012
 # rodin <romihardiyanto@gmail.com>, 2014,2016
+# Sutrisno Efendi <kangfend@gmail.com>, 2026
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-25 15:04-0500\n"
-"PO-Revision-Date: 2025-09-17 07:59+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2021-2025\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-05 07:59+0000\n"
+"Last-Translator: Sutrisno Efendi <kangfend@gmail.com>, 2026\n"
 "Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -70,7 +71,7 @@ msgstr "(klik untuk membersihkan)"
 
 #, javascript-format
 msgid "Remove all %s"
-msgstr "Pindahkan semua %s"
+msgstr "Hapus semua %s"
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -99,11 +100,11 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"Anda telah memilih tindakan, dan Anda belum membuat perubahan apa pun di "
-"setiap bidang. Anda mungkin mencari tombol Buka daripada tombol Simpan."
+"Anda telah memilih tindakan, tetapi belum membuat perubahan apapun pada "
+"field individual. Anda mungkin mencari tombol Run, bukan tombol Simpan."
 
 msgid "Now"
 msgstr "Sekarang"
@@ -120,15 +121,24 @@ msgstr "Siang"
 msgid "6 p.m."
 msgstr "18.00"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Catatan: Waktu Anda lebih cepat %s jam dibandingkan waktu server."
+msgid "server"
+msgstr ""
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Catatan: Waktu Anda lebih lambat %s jam dibandingkan waktu server."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
+msgstr[0] ""
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
 
 msgid "Choose a Time"
 msgstr "Pilih Waktu"
@@ -142,14 +152,29 @@ msgstr "Batal"
 msgid "Today"
 msgstr "Hari ini"
 
+msgid "Today (%(date)s)"
+msgstr ""
+
 msgid "Choose a Date"
 msgstr "Pilih Tanggal"
 
 msgid "Yesterday"
 msgstr "Kemarin"
 
+msgid "Yesterday (%(date)s)"
+msgstr ""
+
 msgid "Tomorrow"
 msgstr "Besok"
+
+msgid "Tomorrow (%(date)s)"
+msgstr ""
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr ""
+
+msgid "Next (%(month)s %(year)s)"
+msgstr ""
 
 msgid "January"
 msgstr "Januari"
@@ -258,7 +283,7 @@ msgstr "Sabtu"
 
 msgctxt "abbrev. day Sunday"
 msgid "Sun"
-msgstr "Ahd"
+msgstr "Min"
 
 msgctxt "abbrev. day Monday"
 msgid "Mon"
@@ -311,3 +336,18 @@ msgstr "J"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
+
+msgid "%(month)s %(day)s, %(year)s"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr ""

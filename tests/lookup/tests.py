@@ -32,7 +32,7 @@ from django.db.models.lookups import (
 )
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import ignore_warnings, isolate_apps, register_lookup
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .models import (
     Article,
@@ -368,6 +368,94 @@ class LookupTests(TestCase):
             {self.a1.pk: {"headline": "Article 1"}},
         )
 
+    def test_in_bulk_values_annotation(self):
+        arts = (
+            Article.objects.annotate(author_name=F("author__name"))
+            .values("headline", "author_name")
+            .in_bulk([self.a1.pk])
+        )
+        self.assertEqual(
+            arts,
+            {
+                self.a1.pk: {
+                    "headline": "Article 1",
+                    "author_name": "Author 1",
+                }
+            },
+        )
+
+    def test_in_bulk_values_annotation_all_fields(self):
+        arts = (
+            Article.objects.annotate(author_name=F("author__name"))
+            .values()
+            .in_bulk([self.a1.pk])
+        )
+        self.assertEqual(
+            arts,
+            {
+                self.a1.pk: {
+                    "id": self.a1.pk,
+                    "author_id": self.au1.pk,
+                    "headline": "Article 1",
+                    "pub_date": self.a1.pub_date,
+                    "slug": "a1",
+                    "author_name": "Author 1",
+                }
+            },
+        )
+
+    def test_in_bulk_values_extra_select_all_fields(self):
+        arts = (
+            Article.objects.extra(select={"marker": "1"}).values().in_bulk([self.a1.pk])
+        )
+        self.assertEqual(
+            arts,
+            {
+                self.a1.pk: {
+                    "marker": 1,
+                    "id": self.a1.pk,
+                    "author_id": self.au1.pk,
+                    "headline": "Article 1",
+                    "pub_date": self.a1.pub_date,
+                    "slug": "a1",
+                }
+            },
+        )
+
+    def test_in_bulk_values_list_annotation(self):
+        arts = (
+            Article.objects.annotate(author_name=F("author__name"))
+            .values_list("author_name", "headline")
+            .in_bulk([self.a1.pk])
+        )
+        self.assertEqual(arts, {self.a1.pk: ("Author 1", "Article 1")})
+
+    def test_in_bulk_values_list_annotation_before_pk(self):
+        arts = (
+            Article.objects.annotate(author_name=F("author__name"))
+            .values_list("author_name", "pk")
+            .in_bulk([self.a1.pk])
+        )
+        self.assertEqual(arts, {self.a1.pk: ("Author 1", self.a1.pk)})
+
+    def test_in_bulk_values_list_named_annotation(self):
+        arts = (
+            Article.objects.annotate(author_name=F("author__name"))
+            .values_list("headline", "author_name", named=True)
+            .in_bulk([self.a1.pk])
+        )
+        article = arts[self.a1.pk]
+        self.assertEqual(article._fields, ("pk", "headline", "author_name"))
+        self.assertEqual(article, (self.a1.pk, "Article 1", "Author 1"))
+
+    def test_in_bulk_values_list_flat_annotation(self):
+        arts = (
+            Article.objects.annotate(author_name=F("author__name"))
+            .values_list("author_name", flat=True)
+            .in_bulk([self.a1.pk])
+        )
+        self.assertEqual(arts, {self.a1.pk: "Author 1"})
+
     def test_in_bulk_values_fields_including_pk(self):
         arts = Article.objects.values("pk", "headline").in_bulk([self.a1.pk])
         self.assertEqual(
@@ -502,18 +590,18 @@ class LookupTests(TestCase):
         self.assertEqual(arts1.slug, "a1")
         self.assertEqual(arts1.headline, "Article 1")
 
-    # RemovedInDjango70Warning: When the deprecation ends, remove this
+    # RemovedInDjango2028Warning: When the deprecation ends, remove this
     # test.
     def test_in_bulk_values_list_flat_empty(self):
-        with ignore_warnings(category=RemovedInDjango70Warning):
+        with ignore_warnings(category=RemovedInDjango2028Warning):
             arts = Article.objects.values_list(flat=True).in_bulk([])
         self.assertEqual(arts, {})
 
-    # RemovedInDjango70Warning: When the deprecation ends, remove this
+    # RemovedInDjango2028Warning: When the deprecation ends, remove this
     # test.
     def test_in_bulk_values_list_flat_all(self):
         Article.objects.exclude(pk__in=[self.a1.pk, self.a2.pk]).delete()
-        with ignore_warnings(category=RemovedInDjango70Warning):
+        with ignore_warnings(category=RemovedInDjango2028Warning):
             arts = Article.objects.values_list(flat=True).in_bulk()
         self.assertEqual(
             arts,
@@ -523,10 +611,10 @@ class LookupTests(TestCase):
             },
         )
 
-    # RemovedInDjango70Warning: When the deprecation ends, remove this
+    # RemovedInDjango2028Warning: When the deprecation ends, remove this
     # test.
     def test_in_bulk_values_list_flat_pks(self):
-        with ignore_warnings(category=RemovedInDjango70Warning):
+        with ignore_warnings(category=RemovedInDjango2028Warning):
             arts = Article.objects.values_list(flat=True).in_bulk(
                 [self.a1.pk, self.a2.pk]
             )
@@ -824,9 +912,9 @@ class LookupTests(TestCase):
             ],
         )
 
-    # RemovedInDjango70Warning: When the deprecation ends, remove this test.
+    # RemovedInDjango2028Warning: When the deprecation ends, remove this test.
     def test_values_list_flat_no_fields(self):
-        with ignore_warnings(category=RemovedInDjango70Warning):
+        with ignore_warnings(category=RemovedInDjango2028Warning):
             qs = Article.objects.values_list(flat=True)
         self.assertSequenceEqual(
             qs,
@@ -949,7 +1037,7 @@ class LookupTests(TestCase):
         with self.assertRaisesMessage(TypeError, msg):
             Article.objects.values_list("id", "headline", flat=True)
 
-    # RemovedInDjango70Warning: When the deprecation ends, replace with:
+    # RemovedInDjango2028Warning: When the deprecation ends, replace with:
     # def test_values_list_flat_empty_error(self):
     #     msg = (
     #         "'flat' is not valid when values_list is called with no fields."
@@ -962,7 +1050,7 @@ class LookupTests(TestCase):
             "is deprecated. Pass an explicit field name instead, like "
             "'pk'."
         )
-        with self.assertRaisesMessage(RemovedInDjango70Warning, msg):
+        with self.assertRaisesMessage(RemovedInDjango2028Warning, msg):
             Article.objects.values_list(flat=True)
 
     def test_get_next_previous_by(self):
@@ -1086,6 +1174,28 @@ class LookupTests(TestCase):
 
     def test_in_empty_list(self):
         self.assertSequenceEqual(Article.objects.filter(id__in=[]), [])
+
+    def test_in_iterator_rhs(self):
+        tests = [
+            ("direct values", [self.a1.id, self.a2.id]),
+            ("expression", [self.a1.id, Value(self.a2.id)]),
+        ]
+        for case, values in tests:
+            with self.subTest(case=case):
+                self.assertCountEqual(
+                    Article.objects.alias(article_id=F("id")).filter(
+                        article_id__in=iter(values)
+                    ),
+                    [self.a1, self.a2],
+                )
+
+    def test_range_iterator_rhs(self):
+        self.assertCountEqual(
+            Article.objects.alias(article_id=F("id")).filter(
+                article_id__range=iter([self.a1.id, self.a2.id])
+            ),
+            [self.a1, self.a2],
+        )
 
     def test_in_different_database(self):
         with self.assertRaisesMessage(

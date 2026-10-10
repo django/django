@@ -18,6 +18,7 @@ from django.db.migrations.operations.base import Operation
 from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
 from django.db.models.deletion import DatabaseOnDelete
 from django.utils.functional import LazyObject, Promise
+from django.utils.module_loading import qualname
 from django.utils.version import get_docs_version
 
 FUNCTION_TYPES = (types.FunctionType, types.BuiltinFunctionType, types.MethodType)
@@ -202,14 +203,15 @@ class FunctionTypeSerializer(BaseSerializer):
 
         module_name = self.value.__module__
 
-        if "<" not in self.value.__qualname__:  # Qualname can include <locals>
-            return "%s.%s" % (module_name, self.value.__qualname__), {
-                "import %s" % self.value.__module__
-            }
+        try:
+            name = qualname(self.value)
+        except ValueError as e:
+            raise ValueError(
+                "Could not find function %s in %s.\n"
+                % (self.value.__name__, module_name)
+            ) from e
 
-        raise ValueError(
-            "Could not find function %s in %s.\n" % (self.value.__name__, module_name)
-        )
+        return name, {"import %s" % module_name}
 
 
 class FunctoolsPartialSerializer(BaseSerializer):
@@ -342,9 +344,7 @@ class TypeSerializer(BaseSerializer):
             if module == builtins.__name__:
                 return self.value.__name__, set()
             else:
-                return "%s.%s" % (module, self.value.__qualname__), {
-                    "import %s" % module
-                }
+                return qualname(self.value), {"import %s" % module}
 
 
 class UUIDSerializer(BaseSerializer):

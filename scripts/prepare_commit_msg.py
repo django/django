@@ -11,11 +11,13 @@ Additionally, on stable branches:
 - Adds "Backport of <sha> from main." when cherry-picking.
 
 To install:
-  1. Ensure the folder `.git/hooks` exists.
-  2. Create an executable file `.git/hooks/prepare-commit-msg` with content:
+  1. Check out a trusted branch (main).
+  2. Copy this script into the hooks directory:
 
-#!/bin/sh
-exec python scripts/prepare_commit_msg.py "$@"
+cp scripts/prepare_commit_msg.py .git/hooks/prepare-commit-msg
+chmod +x .git/hooks/prepare-commit-msg
+
+Repeat the installation from main to update the hook.
 
 """
 
@@ -63,8 +65,8 @@ def process_commit_message(lines, branch, cherry_sha=None):
 
     summary = body_lines[0].strip()
 
-    # Ensure summary ends with a period.
-    if not summary.endswith("."):
+    # Ensure summary ends with a period, possibly inside a closing quote.
+    if not (summary.endswith(".") or summary.endswith('."')):
         summary += "."
 
     # On stable branches, add the [A.B.x] prefix if missing.

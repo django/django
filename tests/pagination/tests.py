@@ -3,9 +3,11 @@ import inspect
 import pathlib
 import unittest.mock
 import warnings
+from contextlib import aclosing
 from datetime import datetime
 
 from django.core.paginator import (
+    AsyncPage,
     AsyncPaginator,
     BasePaginator,
     EmptyPage,
@@ -15,7 +17,7 @@ from django.core.paginator import (
     UnorderedObjectListWarning,
 )
 from django.test import SimpleTestCase, TestCase
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .custom import AsyncValidAdjacentNumsPaginator, ValidAdjacentNumsPaginator
 from .models import Article
@@ -157,7 +159,7 @@ class PaginationTests(SimpleTestCase):
             await paginator.apage(3)
 
     def test_orphans_value_larger_than_per_page_value(self):
-        # RemovedInDjango70Warning: When the deprecation ends, replace with:
+        # RemovedInDjango2028Warning: When the deprecation ends, replace with:
         # msg = (
         #     "The orphans argument cannot be larger than or equal to the "
         #     "per_page argument."
@@ -165,15 +167,15 @@ class PaginationTests(SimpleTestCase):
         msg = (
             "Support for the orphans argument being larger than or equal to the "
             "per_page argument is deprecated. This will raise a ValueError in "
-            "Django 7.0."
+            "Django 2028."
         )
         for paginator_class in [Paginator, AsyncPaginator]:
             for orphans in [2, 3]:
                 with self.subTest(paginator_class=paginator_class, msg=msg):
-                    # RemovedInDjango70Warning: When the deprecation ends,
+                    # RemovedInDjango2028Warning: When the deprecation ends,
                     # replace with:
                     # with self.assertRaisesMessage(ValueError, msg):
-                    with self.assertWarnsMessage(RemovedInDjango70Warning, msg):
+                    with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
                         paginator_class([1, 2, 3], 2, orphans)
 
     def test_error_messages(self):
@@ -990,3 +992,20 @@ class ModelPaginationTests(TestCase):
         # It returns the same list that was converted on the first call.
         second_called_objs = await p.aget_object_list()
         self.assertEqual(id(first_called_objs), id(second_called_objs))
+
+    async def test_async_page_aiteration_closes_object_list_promptly(self):
+        finally_ran = False
+
+        async def object_list():
+            nonlocal finally_ran
+            try:
+                yield 1
+                yield 2
+            finally:
+                finally_ran = True
+
+        page = AsyncPage(object_list(), number=1, paginator=None)
+        async with aclosing(aiter(page)) as it:
+            async for _ in it:
+                break
+        self.assertTrue(finally_ran)

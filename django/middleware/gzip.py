@@ -13,6 +13,7 @@ class GZipMiddleware(MiddlewareMixin):
     on the Accept-Encoding header.
     """
 
+    async_capable = False
     max_random_bytes = 100
 
     def process_response(self, request, response):

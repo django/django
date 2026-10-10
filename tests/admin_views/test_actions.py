@@ -12,7 +12,7 @@ from django.template.response import TemplateResponse
 from django.test import TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .admin import SubscriberAdmin
 from .admin import __file__ as admin_filename
@@ -181,6 +181,26 @@ class AdminActionsTest(TestCase):
         )
         self.assertEqual(Question.objects.count(), 2)
 
+    def test_delete_protected_message_lists_nothing_when_limit_zero(self):
+        question = Question.objects.create(question="Why?")
+        Answer.objects.bulk_create(
+            [Answer(question=question, answer=f"Because {i}.") for i in range(3)]
+        )
+        response = self.client.post(
+            reverse("admin_zero_display:admin_views_question_changelist"),
+            {
+                ACTION_CHECKBOX_NAME: [question.pk],
+                "action": "delete_selected",
+                "index": 0,
+            },
+        )
+        self.assertContains(
+            response,
+            "Deleting the selected question would require deleting some "
+            "protected related objects.",
+        )
+        self.assertNotContains(response, "Because")
+
     def test_model_admin_default_delete_action_no_change_url(self):
         """
         The default delete action doesn't break if a ModelAdmin removes the
@@ -240,6 +260,21 @@ class AdminActionsTest(TestCase):
         self.assertContains(response, "…and 2 more objects.")
         self.assertNotContains(response, "another object")
         self.assertNotContains(response, "last object")
+
+    def test_delete_selected_hides_objects_when_limit_zero(self):
+        book = Book.objects.create(name="Test Book")
+        response = self.client.post(
+            reverse("admin_zero_display:admin_views_book_changelist"),
+            {
+                ACTION_CHECKBOX_NAME: [book.pk],
+                "action": "delete_selected",
+                "index": 0,
+            },
+        )
+        self.assertContains(response, "<h2>Summary</h2>", html=True)
+        self.assertContains(response, "<ul", count=1)
+        self.assertNotContains(response, "<h2>Objects</h2>", html=True)
+        self.assertNotContains(response, "a deletable object")
 
     def test_custom_function_mail_action(self):
         """A custom action may be defined in a function."""
@@ -867,7 +902,7 @@ class AdminDetailActionsTest(TestCase):
         response = self.client.get(response.url)
         self.assertContains(response, "No action selected.")
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     def test_overridden_admin_action_methods(self):
         self.client.force_login(self.superuser)
         obj = ModelAction.objects.create()
@@ -878,7 +913,7 @@ class AdminDetailActionsTest(TestCase):
             "action_location=ActionLocation.CHANGE_LIST)."
         )
         with self.assertWarnsMessage(
-            RemovedInDjango70Warning, get_actions_overridden_msg
+            RemovedInDjango2028Warning, get_actions_overridden_msg
         ) as warning:
             response = self.client.get(change_url)
         self.assertEqual(warning.filename, admin_filename)
@@ -886,7 +921,7 @@ class AdminDetailActionsTest(TestCase):
 
         changelist_url = reverse("admin:admin_views_modelaction_changelist")
         with warnings.catch_warnings(record=True) as warning_list:
-            warnings.simplefilter("always", RemovedInDjango70Warning)
+            warnings.simplefilter("always", RemovedInDjango2028Warning)
             response = self.client.get(changelist_url)
 
             message_warnings = [str(warning.message) for warning in warning_list]
@@ -918,7 +953,7 @@ class AdminDetailActionsTest(TestCase):
             "action_location=ActionLocation.CHANGE_LIST)."
         )
         with self.assertWarnsMessage(
-            RemovedInDjango70Warning, get_actions_overridden_msg
+            RemovedInDjango2028Warning, get_actions_overridden_msg
         ) as warning:
             response = self.client.post(
                 reverse("admin:admin_views_modelaction_changelist"), action_data

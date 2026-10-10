@@ -18,8 +18,8 @@ class EmailBackend(BaseEmailBackend):
     The dummy outbox is accessible through the outbox instance attribute.
     """
 
-    # RemovedInDjango70Warning: *args. (The only supported posarg will be
-    # removed from BaseEmailBackend in Django 7.0.)
+    # RemovedInDjango2028Warning: *args. (The only supported posarg will be
+    # removed from BaseEmailBackend in Django 2028.)
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if not hasattr(mail, "outbox"):

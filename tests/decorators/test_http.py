@@ -33,15 +33,15 @@ class RequireHttpMethodsTest(SimpleTestCase):
 
         request = HttpRequest()
         request.method = "GET"
-        self.assertIsInstance(my_view(request), HttpResponse)
+        self.assertIs(type(my_view(request)), HttpResponse)
         request.method = "PUT"
-        self.assertIsInstance(my_view(request), HttpResponse)
+        self.assertIs(type(my_view(request)), HttpResponse)
         request.method = "HEAD"
-        self.assertIsInstance(my_view(request), HttpResponseNotAllowed)
+        self.assertIs(type(my_view(request)), HttpResponseNotAllowed)
         request.method = "POST"
-        self.assertIsInstance(my_view(request), HttpResponseNotAllowed)
+        self.assertIs(type(my_view(request)), HttpResponseNotAllowed)
         request.method = "DELETE"
-        self.assertIsInstance(my_view(request), HttpResponseNotAllowed)
+        self.assertIs(type(my_view(request)), HttpResponseNotAllowed)
 
     async def test_require_http_methods_methods_async_view(self):
         @require_http_methods(["GET", "PUT"])
@@ -50,15 +50,15 @@ class RequireHttpMethodsTest(SimpleTestCase):
 
         request = HttpRequest()
         request.method = "GET"
-        self.assertIsInstance(await my_view(request), HttpResponse)
+        self.assertIs(type(await my_view(request)), HttpResponse)
         request.method = "PUT"
-        self.assertIsInstance(await my_view(request), HttpResponse)
+        self.assertIs(type(await my_view(request)), HttpResponse)
         request.method = "HEAD"
-        self.assertIsInstance(await my_view(request), HttpResponseNotAllowed)
+        self.assertIs(type(await my_view(request)), HttpResponseNotAllowed)
         request.method = "POST"
-        self.assertIsInstance(await my_view(request), HttpResponseNotAllowed)
+        self.assertIs(type(await my_view(request)), HttpResponseNotAllowed)
         request.method = "DELETE"
-        self.assertIsInstance(await my_view(request), HttpResponseNotAllowed)
+        self.assertIs(type(await my_view(request)), HttpResponseNotAllowed)
 
 
 class RequireSafeDecoratorTest(SimpleTestCase):
@@ -69,15 +69,15 @@ class RequireSafeDecoratorTest(SimpleTestCase):
         my_safe_view = require_safe(my_view)
         request = HttpRequest()
         request.method = "GET"
-        self.assertIsInstance(my_safe_view(request), HttpResponse)
+        self.assertIs(type(my_safe_view(request)), HttpResponse)
         request.method = "HEAD"
-        self.assertIsInstance(my_safe_view(request), HttpResponse)
+        self.assertIs(type(my_safe_view(request)), HttpResponse)
         request.method = "POST"
-        self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
+        self.assertIs(type(my_safe_view(request)), HttpResponseNotAllowed)
         request.method = "PUT"
-        self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
+        self.assertIs(type(my_safe_view(request)), HttpResponseNotAllowed)
         request.method = "DELETE"
-        self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
+        self.assertIs(type(my_safe_view(request)), HttpResponseNotAllowed)
 
     async def test_require_safe_accepts_only_safe_methods_async_view(self):
         @require_safe
@@ -86,15 +86,15 @@ class RequireSafeDecoratorTest(SimpleTestCase):
 
         request = HttpRequest()
         request.method = "GET"
-        self.assertIsInstance(await async_view(request), HttpResponse)
+        self.assertIs(type(await async_view(request)), HttpResponse)
         request.method = "HEAD"
-        self.assertIsInstance(await async_view(request), HttpResponse)
+        self.assertIs(type(await async_view(request)), HttpResponse)
         request.method = "POST"
-        self.assertIsInstance(await async_view(request), HttpResponseNotAllowed)
+        self.assertIs(type(await async_view(request)), HttpResponseNotAllowed)
         request.method = "PUT"
-        self.assertIsInstance(await async_view(request), HttpResponseNotAllowed)
+        self.assertIs(type(await async_view(request)), HttpResponseNotAllowed)
         request.method = "DELETE"
-        self.assertIsInstance(await async_view(request), HttpResponseNotAllowed)
+        self.assertIs(type(await async_view(request)), HttpResponseNotAllowed)
 
 
 class ConditionDecoratorTest(SimpleTestCase):

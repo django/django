@@ -736,7 +736,14 @@ class BaseModelFormSet(BaseFormSet, AltersData):
         pk_required = i < self.initial_form_count()
         if pk_required:
             if self.is_bound:
-                pk_key = "%s-%s" % (self.add_prefix(i), self.model._meta.pk.name)
+                # Avoid initializing the form only to compute its prefix when
+                # it uses BaseForm.add_prefix().
+                if self.form.add_prefix is BaseForm.add_prefix:
+                    pk_key = "%s-%s" % (self.add_prefix(i), self.model._meta.pk.name)
+                else:
+                    form_kwargs = {"prefix": self.add_prefix(i), **kwargs}
+                    pk_form = self.form(**form_kwargs)
+                    pk_key = pk_form.add_prefix(self.model._meta.pk.name)
                 try:
                     pk = self.data[pk_key]
                 except KeyError:
@@ -956,11 +963,12 @@ class BaseModelFormSet(BaseFormSet, AltersData):
         forms_to_delete = self.deleted_forms
         for form in self.initial_forms:
             obj = form.instance
-            # If the pk is None, it means either:
-            # 1. The object is an unexpected empty model, created by invalid
-            #    POST data such as an object outside the formset's queryset.
+            # If the pk is unset or the instance is being added, it could mean:
+            # 1. The object is an unexpected unfetched instance, created by
+            #    invalid POST data such as an object outside the formset's
+            #    queryset, or a formset with edit_only=True.
             # 2. The object was already deleted from the database.
-            if not obj._is_pk_set():
+            if not obj._is_pk_set() or obj._state.adding:
                 continue
             if form in forms_to_delete:
                 self.deleted_objects.append(obj)

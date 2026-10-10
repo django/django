@@ -297,7 +297,7 @@ class ProxyModelTests(TestCase):
         User.objects.create(name="Bruce")
         u2 = UserProxy.objects.create(name="George")
 
-        resp = [u.name for u in UserProxy.objects.all()]
+        resp = [u.name for u in UserProxy.objects.order_by("name")]
         self.assertEqual(resp, ["Bruce", "George"])
 
         u2.delete()

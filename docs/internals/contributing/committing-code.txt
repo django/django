@@ -25,7 +25,7 @@ standard themselves.
 
 You may want to have Jenkins or GitHub actions test the pull request with one
 of the pull request builders that doesn't run automatically, such as Oracle or
-Selenium. See the `CI wiki page`_ for instructions.
+Playwright. See the `CI wiki page`_ for instructions.
 
 .. _CI wiki page: https://code.djangoproject.com/wiki/CI
 
@@ -256,13 +256,13 @@ The ``scripts/prepare_commit_msg.py`` Python script can be installed as a
 ``prepare-commit-msg`` git hook. It automatically adds the ``[A.B.x]`` prefix
 to the subject line, appends ``Backport of <sha> from main.`` to the commit
 body, and ensures the subject line ends with a period, even when the
-cherry-pick produces conflicts. To install it, create an executable file
-``.git/hooks/prepare-commit-msg`` containing:
+cherry-pick produces conflicts. Copy the script from the main branch, and
+install it as the hook:
 
 .. code-block:: sh
 
-    #!/bin/sh
-    exec python scripts/prepare_commit_msg.py "$@"
+    cp scripts/prepare_commit_msg.py .git/hooks/prepare-commit-msg
+    chmod +x .git/hooks/prepare-commit-msg
 
 Once installed, a plain ``git cherry-pick <sha>`` on a stable branch is
 sufficient; the hook handles the message formatting in all cases.

@@ -1,6 +1,6 @@
 from django.core.exceptions import FieldFetchBlocked
 from django.db import IntegrityError, connection, transaction
-from django.db.models import FETCH_PEERS, RAISE
+from django.db.models import FETCH_PEERS, FETCH_RAISE
 from django.test import TestCase
 
 from .models import (
@@ -643,7 +643,7 @@ class OneToOneTests(TestCase):
             p2.restaurant
 
     def test_fetch_mode_raise_forward(self):
-        r = Restaurant.objects.fetch_mode(RAISE).get(pk=self.r1.pk)
+        r = Restaurant.objects.fetch_mode(FETCH_RAISE).get(pk=self.r1.pk)
         msg = "Fetching of Restaurant.place blocked."
         with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
             r.place
@@ -651,7 +651,7 @@ class OneToOneTests(TestCase):
         self.assertTrue(cm.exception.__suppress_context__)
 
     def test_fetch_mode_raise_reverse(self):
-        p = Place.objects.fetch_mode(RAISE).get(pk=self.p1.pk)
+        p = Place.objects.fetch_mode(FETCH_RAISE).get(pk=self.p1.pk)
         msg = "Fetching of Place.restaurant blocked."
         with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
             p.restaurant

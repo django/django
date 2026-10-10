@@ -6,7 +6,7 @@ from django.core import management, serializers
 from django.core.serializers.base import DeserializationError
 from django.test import SimpleTestCase, TestCase, TransactionTestCase
 
-from .models import Author
+from .models import Article, Author
 from .tests import SerializersTestBase, SerializersTransactionTestBase
 
 try:
@@ -154,6 +154,11 @@ class YamlSerializerTestCase(SerializersTestBase, TestCase):
         with self.assertRaises(DeserializationError):
             for obj in serializers.deserialize("yaml", "{"):
                 pass
+
+    def test_sort_keys_option(self):
+        output = serializers.serialize("yaml", Article.objects.all(), sort_keys=True)
+        # "headline" precedes "categories" on the model but sorts later.
+        self.assertGreater(output.index("headline"), output.index("categories"))
 
 
 @unittest.skipUnless(HAS_YAML, "No yaml library detected")

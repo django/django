@@ -23,6 +23,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import MultiValueDict
 from django.utils.functional import cached_property
 from django.utils.http import RFC3986_SUBDELIMS, escape_leading_slashes
+from django.utils.module_loading import qualname
 from django.utils.regex_helper import _lazy_re_compile, normalize
 from django.utils.translation import get_language
 
@@ -495,9 +496,10 @@ class URLPattern:
             callback = callback.func
         if hasattr(callback, "view_class"):
             callback = callback.view_class
-        elif not hasattr(callback, "__name__"):
+        try:
+            return qualname(callback)
+        except ValueError:
             return callback.__module__ + "." + callback.__class__.__name__
-        return callback.__module__ + "." + callback.__qualname__
 
 
 class URLResolver:

@@ -1,7 +1,6 @@
-import pathlib
 import sys
 
-from django.test import SimpleTestCase
+from sphinx_tests.tests import SimpleSphinxTestCase
 
 
 def last_n_parts(path, n):
@@ -13,16 +12,9 @@ def last_n_parts(path, n):
 github_links = None
 
 
-class GitHubLinkTests(SimpleTestCase):
+class GitHubLinkTests(SimpleSphinxTestCase):
     @classmethod
-    def setUpClass(cls):
-        # The file implementing the code under test is in the docs folder and
-        # is not part of the Django package. This means it cannot be imported
-        # through standard means. Include its parent in the pythonpath for the
-        # duration of the tests to allow the code to be imported.
-        cls.ext_path = str((pathlib.Path(__file__).parents[2] / "docs/_ext").resolve())
-        sys.path.insert(0, cls.ext_path)
-        cls.addClassCleanup(sys.path.remove, cls.ext_path)
+    def docs_module_import(cls):
         cls.addClassCleanup(sys.modules.pop, "github_links", None)
         # Linters/IDEs may not be able to detect this as a valid import.
         import github_links as _github_links
@@ -57,84 +49,86 @@ class I:
 
     def test_get_path_and_line_class(self):
         path, line = github_links.get_path_and_line(
-            module="tests.sphinx.testdata.package.module", fullname="MyClass"
+            module="tests.sphinx_tests.testdata.package.module", fullname="MyClass"
         )
 
         self.assertEqual(
-            last_n_parts(path, 5), "tests/sphinx/testdata/package/module.py"
+            last_n_parts(path, 5), "tests/sphinx_tests/testdata/package/module.py"
         )
         self.assertEqual(line, 12)
 
     def test_get_path_and_line_func(self):
         path, line = github_links.get_path_and_line(
-            module="tests.sphinx.testdata.package.module", fullname="my_function"
+            module="tests.sphinx_tests.testdata.package.module", fullname="my_function"
         )
 
         self.assertEqual(
-            last_n_parts(path, 5), "tests/sphinx/testdata/package/module.py"
+            last_n_parts(path, 5), "tests/sphinx_tests/testdata/package/module.py"
         )
         self.assertEqual(line, 24)
 
     def test_get_path_and_line_method(self):
         path, line = github_links.get_path_and_line(
-            module="tests.sphinx.testdata.package.module", fullname="MyClass.my_method"
+            module="tests.sphinx_tests.testdata.package.module",
+            fullname="MyClass.my_method",
         )
 
         self.assertEqual(
-            last_n_parts(path, 5), "tests/sphinx/testdata/package/module.py"
+            last_n_parts(path, 5), "tests/sphinx_tests/testdata/package/module.py"
         )
         self.assertEqual(line, 16)
 
     def test_get_path_and_line_cached_property(self):
         path, line = github_links.get_path_and_line(
-            module="tests.sphinx.testdata.package.module",
+            module="tests.sphinx_tests.testdata.package.module",
             fullname="MyClass.my_cached_property",
         )
 
         self.assertEqual(
-            last_n_parts(path, 5), "tests/sphinx/testdata/package/module.py"
+            last_n_parts(path, 5), "tests/sphinx_tests/testdata/package/module.py"
         )
         self.assertEqual(line, 20)
 
     def test_get_path_and_line_forwarded_import(self):
         path, line = github_links.get_path_and_line(
-            module="tests.sphinx.testdata.package.module", fullname="MyOtherClass"
+            module="tests.sphinx_tests.testdata.package.module", fullname="MyOtherClass"
         )
 
         self.assertEqual(
-            last_n_parts(path, 5), "tests/sphinx/testdata/package/other_module.py"
+            last_n_parts(path, 5), "tests/sphinx_tests/testdata/package/other_module.py"
         )
         self.assertEqual(line, 1)
 
     def test_get_path_and_line_wildcard_import(self):
         path, line = github_links.get_path_and_line(
-            module="tests.sphinx.testdata.package.module", fullname="WildcardClass"
+            module="tests.sphinx_tests.testdata.package.module",
+            fullname="WildcardClass",
         )
 
         self.assertEqual(
             last_n_parts(path, 5),
-            "tests/sphinx/testdata/package/wildcard_module.py",
+            "tests/sphinx_tests/testdata/package/wildcard_module.py",
         )
         self.assertEqual(line, 4)
 
         path, line = github_links.get_path_and_line(
-            module="tests.sphinx.testdata.package.module",
+            module="tests.sphinx_tests.testdata.package.module",
             fullname="WildcardMixin",
         )
         self.assertEqual(
             last_n_parts(path, 5),
-            "tests/sphinx/testdata/package/wildcard_base.py",
+            "tests/sphinx_tests/testdata/package/wildcard_base.py",
         )
         self.assertEqual(line, 1)
 
     def test_get_path_and_line_forwarded_import_module(self):
         path, line = github_links.get_path_and_line(
-            module="tests.sphinx.testdata.package.module",
+            module="tests.sphinx_tests.testdata.package.module",
             fullname="other_module.MyOtherClass",
         )
 
         self.assertEqual(
-            last_n_parts(path, 5), "tests/sphinx/testdata/package/other_module.py"
+            last_n_parts(path, 5), "tests/sphinx_tests/testdata/package/other_module.py"
         )
         self.assertEqual(line, 1)
 
@@ -177,33 +171,36 @@ class I:
 
     def test_github_linkcode_resolve_link_to_object(self):
         info = {
-            "module": "tests.sphinx.testdata.package.module",
+            "module": "tests.sphinx_tests.testdata.package.module",
             "fullname": "MyClass",
         }
         self.assertEqual(
             github_links.github_linkcode_resolve(
                 "py", info, version="3.2", next_version="3.2"
             ),
-            "https://github.com/django/django/blob/main/tests/sphinx/"
+            "https://github.com/django/django/blob/main/tests/sphinx_tests/"
             "testdata/package/module.py#L12",
         )
 
     def test_github_linkcode_resolve_link_to_class_older_version(self):
         info = {
-            "module": "tests.sphinx.testdata.package.module",
+            "module": "tests.sphinx_tests.testdata.package.module",
             "fullname": "MyClass",
         }
         self.assertEqual(
             github_links.github_linkcode_resolve(
                 "py", info, version="2.2", next_version="3.2"
             ),
-            "https://github.com/django/django/blob/stable/2.2.x/tests/sphinx/"
-            "testdata/package/module.py#L12",
+            "https://github.com/django/django/blob/stable/2.2.x/"
+            "tests/sphinx_tests/testdata/package/module.py#L12",
         )
 
     def test_import_error(self):
-        msg = "Could not import '.....test' in 'tests.sphinx.testdata.package'."
+        msg = (
+            "Could not import '.....test' in " "'tests.sphinx_tests.testdata.package'."
+        )
         with self.assertRaisesMessage(ImportError, msg):
             github_links.get_path_and_line(
-                module="tests.sphinx.testdata.package.import_error", fullname="Test"
+                module="tests.sphinx_tests.testdata.package.import_error",
+                fullname="Test",
             )

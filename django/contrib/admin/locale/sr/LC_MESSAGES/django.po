@@ -2,16 +2,16 @@
 #
 # Translators:
 # Branko Kokanovic <branko@kokanovic.org>, 2018
-# Igor Jerosimić, 2019,2021,2023-2025
+# Igor Jerosimić, 2019,2021,2023-2026
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 07:05+0000\n"
-"Last-Translator: Igor Jerosimić, 2019,2021,2023-2025\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 07:05+0000\n"
+"Last-Translator: Igor Jerosimić, 2019,2021,2023-2026\n"
 "Language-Team: Serbian (http://app.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -182,8 +182,13 @@ msgstr ""
 "Држите „Control“, или „Command“ на Mac-у да бисте обележили више од једне "
 "ставке."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Изабери овај објекат за радњу - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr "Апликација \"%s\" није пронађена."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -246,15 +251,15 @@ msgstr "Измени објекат класе %s"
 msgid "View %s"
 msgstr "Преглед %s"
 
-msgid "Database error"
-msgstr "Грешка у бази података"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "Успешно промењен %(count)s %(name)s."
 msgstr[1] "Успешно промењена %(count)s %(name)s."
 msgstr[2] "Успешно промењених %(count)s %(name)s."
+
+msgid "Database error"
+msgstr "Грешка у бази података"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -280,6 +285,18 @@ msgstr "Историјат измена: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ", "
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] "...и још %(count)d објекат."
+msgstr[1] "...и још %(count)d објекта."
+msgstr[2] "...и још %(count)d објеката."
 
 #, python-format
 msgid ""
@@ -333,9 +350,6 @@ msgstr ""
 msgid "Run"
 msgstr "Покрени"
 
-msgid "Click here to select the objects across all pages"
-msgstr "Изабери све објекте на овој страници."
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Изабери све %(module_name)s од %(total_count)s укупно."
@@ -345,10 +359,6 @@ msgstr "Поништи избор"
 
 msgid "Breadcrumbs"
 msgstr "Мрвице"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Модели у апликацији %(name)s"
 
 msgid "Model name"
 msgstr "Име модела"
@@ -462,6 +472,10 @@ msgstr "Укључи/искључи тему (тренутна тема: све�
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "Укључи/искључи тему (тренутна тема: тамна)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr "Филтрирај по %(field_name)s"
 
 #, python-format
 msgid ""
@@ -670,6 +684,9 @@ msgstr "Обриши одабрани модел %(model)s"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Изабран приказ %(model)s"
+
+msgid "Logout"
+msgstr "Одјави се"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Хвала што сте данас провели време на овом сајту."

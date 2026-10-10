@@ -10,7 +10,7 @@ from django import forms
 from django.db.models import FETCH_PEERS
 from django.test import TestCase
 from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .models import (
     ArticleWithAuthor,
@@ -254,10 +254,10 @@ class ModelInheritanceTest(TestCase):
         """
         Regression test for #11764
         """
-        # RemovedInDjango70Warning: when the deprecation ends, this test can
+        # RemovedInDjango2028Warning: when the deprecation ends, this test can
         # be removed.
         with ignore_warnings(
-            category=RemovedInDjango70Warning,
+            category=RemovedInDjango2028Warning,
             message=r"Calling select_related\(\) with no arguments is deprecated\.",
         ):
             wholesalers = list(Wholesaler.objects.select_related())

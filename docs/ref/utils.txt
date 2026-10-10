@@ -11,6 +11,32 @@ following parts can be considered stable and thus backwards compatible as per
 the :ref:`internal release deprecation policy
 <internal-release-deprecation-policy>`.
 
+``django.utils.asyncio``
+========================
+
+.. module:: django.utils.asyncio
+   :synopsis: Helper functions for use with asyncio.
+
+.. function:: maybe_aclosing(iterator)
+
+.. versionadded:: 6.2
+
+    Return a context manager that calls ``aclose()`` on *iterator* on exit if
+    it has one, otherwise a no-op context manager that yields *iterator*
+    unchanged. Use it to consume a caller-supplied async iterable that may not
+    be a real async generator::
+
+        from django.utils.asyncio import maybe_aclosing
+
+
+        async def consume(iterable):
+            async with maybe_aclosing(aiter(iterable)) as it:
+                async for item in it:
+                    ...
+
+    Wrapping with :func:`contextlib.aclosing` unconditionally would raise
+    ``AttributeError`` at ``__aexit__`` for any iterator without ``aclose()``.
+
 ``django.utils.cache``
 ======================
 
@@ -1139,6 +1165,9 @@ For a complete discussion on the usage of the following see the
     Checks whether there is a global language file for the given language
     code (e.g. 'fr', 'pt_BR'). This is used to decide whether a user-provided
     language is available.
+
+    ``lang_code`` has a maximum accepted length of 500 characters. ``False``
+    is returned if it exceeds this limit, before any language-file lookup.
 
 .. function:: get_language()
 

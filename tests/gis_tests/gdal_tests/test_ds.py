@@ -110,7 +110,7 @@ ds_list = (
                 None,
                 datetime.strptime("2018-11-29T03:02:52", datetime_format),
             ],
-            "time": [time(11, 32, 14, 123000), time(0), time(3, 2, 52)],
+            "time": [time(11, 32, 14, 123000), None, time(3, 2, 52)],
         },
         fids=range(3),
     ),

@@ -9,6 +9,7 @@ urlpatterns = [
     path("middleware_exceptions/exception_in_render/", views.exception_in_render),
     path("middleware_exceptions/template_response/", views.template_response),
     # Async views.
+    path("middleware_exceptions/async_view/", views.async_normal_view),
     path(
         "middleware_exceptions/async_exception_in_render/",
         views.async_exception_in_render,

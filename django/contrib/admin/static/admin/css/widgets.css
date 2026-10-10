@@ -241,7 +241,7 @@
     display: flex;
     height: 30px;
     width: 64px;
-    margin: 0 auto 10px auto;
+    margin: 10px auto;
     background-color: #eee;
     border-radius: 10px;
     transform: none;
@@ -250,11 +250,6 @@
 .stacked .selector-chooser li {
     float: left;
     padding: 3px 3px 3px 5px;
-}
-
-.stacked .selector-chooseall,
-.stacked .selector-clearall {
-    display: none;
 }
 
 .stacked .selector-add {

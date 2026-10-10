@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-25 15:04-0500\n"
-"PO-Revision-Date: 2026-06-01 07:59+0000\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-05 07:59+0000\n"
 "Last-Translator: Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2026\n"
 "Language-Team: Danish (http://app.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -120,17 +120,34 @@ msgstr "Middag"
 msgid "6 p.m."
 msgstr "Klokken 18"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Obs: Du er %s time forud i forhold til servertiden."
-msgstr[1] "Obs: Du er %s timer forud i forhold til servertiden."
+msgid "server"
+msgstr "server"
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Obs: Du er %s time bagud i forhold til servertiden."
-msgstr[1] "Obs: Du er %s timer bagud i forhold til servertiden."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
+msgstr[0] ""
+"Bemærk: Indtast klokkeslæt i tidszonen %(timezone)s. (Du er %(offset)s time "
+"foran.)"
+msgstr[1] ""
+"Bemærk: Indtast klokkeslæt i tidszonen %(timezone)s. (Du er %(offset)s timer "
+"foran.)"
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+"Bemærk: Indtast klokkeslæt i tidszonen %(timezone)s. (Du er %(offset)s time "
+"bagud.)"
+msgstr[1] ""
+"Bemærk: Indtast klokkeslæt i tidszonen %(timezone)s. (Du er %(offset)s timer "
+"bagud.)"
 
 msgid "Choose a Time"
 msgstr "Vælg et Tidspunkt"
@@ -144,14 +161,29 @@ msgstr "Annuller"
 msgid "Today"
 msgstr "I dag"
 
+msgid "Today (%(date)s)"
+msgstr "I dag (%(date)s)"
+
 msgid "Choose a Date"
 msgstr "Vælg en Dato"
 
 msgid "Yesterday"
 msgstr "I går"
 
+msgid "Yesterday (%(date)s)"
+msgstr "I går (%(date)s)"
+
 msgid "Tomorrow"
 msgstr "I morgen"
+
+msgid "Tomorrow (%(date)s)"
+msgstr "I morgen (%(date)s)"
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr "Forrige (%(month)s %(year)s)"
+
+msgid "Next (%(month)s %(year)s)"
+msgstr "Næste (%(month)s %(year)s)"
 
 msgid "January"
 msgstr "Januar"
@@ -313,3 +345,18 @@ msgstr "F"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "L"
+
+msgid "%(month)s %(day)s, %(year)s"
+msgstr "%(day)s. %(month)s %(year)s"
+
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr "%s (i dag, nuværende valg)"
+
+#, javascript-format
+msgid "%s (today)"
+msgstr "%s (i dag)"
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr "%s (nuværende valg)"

@@ -1,12 +1,25 @@
+from django.contrib.auth.models import Permission, User
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.geos import Point
-from django.test import SimpleTestCase, override_settings
+from django.core.exceptions import SuspiciousOperation
+from django.test import RequestFactory, TestCase, override_settings
 
 from .models import City, site, site_gis, site_gis_custom
 
 
 @override_settings(ROOT_URLCONF="django.contrib.gis.tests.geoadmin.urls")
-class GeoAdminTest(SimpleTestCase):
+class GeoAdminTest(TestCase):
     admin_site = site  # ModelAdmin
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user("test", password="password", is_staff=True)
+        cls.user.user_permissions.add(
+            Permission.objects.get(
+                codename="view_city",
+                content_type=ContentType.objects.get_for_model(City),
+            )
+        )
 
     def test_widget_empty_string(self):
         geoadmin = self.admin_site.get_model_admin(City)
@@ -53,6 +66,14 @@ class GeoAdminTest(SimpleTestCase):
         self.assertIs(has_changed(initial, data_same), False)
         self.assertIs(has_changed(initial, data_almost_same), False)
         self.assertIs(has_changed(initial, data_changed), True)
+
+    def test_raster_lookup_not_allowed(self):
+        geoadmin = self.admin_site.get_model_admin(City)
+        request = RequestFactory().get("/city/", data={"point": "/vsicurl/someurl"})
+        request.user = self.user
+        msg = "Cannot use object '/vsicurl/someurl' for a spatial lookup parameter."
+        with self.assertRaisesMessage(SuspiciousOperation, msg):
+            geoadmin.get_changelist_instance(request)
 
 
 class GISAdminTests(GeoAdminTest):

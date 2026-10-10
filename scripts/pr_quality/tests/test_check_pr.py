@@ -5,6 +5,7 @@ import logging
 import tempfile
 import unittest
 import urllib.error
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest import mock
 
@@ -141,6 +142,12 @@ class BaseTestCase(unittest.TestCase):
         logger.addHandler(null_handler)
         self.addCleanup(logger.removeHandler, null_handler)
 
+        self.now = datetime(2026, 10, 6, 12, tzinfo=timezone.utc)
+        mock_datetime = self.enterContext(
+            mock.patch.object(check_pr, "datetime", wraps=datetime)
+        )
+        mock_datetime.now.return_value = self.now
+
     def call_main(
         self,
         repo="test/repo",
@@ -148,13 +155,16 @@ class BaseTestCase(unittest.TestCase):
         pr_author="trusted",
         pr_body="",
         pr_title="",
-        pr_created_at=None,
+        pr_created_at=UNSET,
         pr_number="10",
         total_changes=check_pr.LARGE_PR_THRESHOLD,
         commit_count=0,
         autoclose=True,
         trac_data=UNSET,
+        comments=(),
     ):
+        if pr_created_at is UNSET:
+            pr_created_at = (self.now - timedelta(days=2)).isoformat()
         if trac_data is UNSET:
             trac_data = make_trac_json(stage="Accepted", has_patch="1")
         with (
@@ -165,7 +175,9 @@ class BaseTestCase(unittest.TestCase):
                 check_pr, "get_recent_commit_count", return_value=commit_count
             ),
             mock.patch.object(check_pr, "write_job_summary") as mock_summary,
-            mock.patch.object(check_pr, "github_request", mock.MagicMock()) as mock_gh,
+            mock.patch.object(
+                check_pr, "github_request", return_value=list(comments)
+            ) as mock_gh,
             mock.patch.object(check_pr, "fetch_trac_ticket", return_value=trac_data),
         ):
             result = check_pr.main(
@@ -768,7 +780,43 @@ class TestIntegration(BaseTestCase):
             pr_body=VALID_PR_BODY, pr_title=VALID_PR_TITLE
         )
         self.assertIsNone(result)
-        mock_gh.assert_not_called()
+        self.assertEqual(
+            mock_gh.call_args_list,
+            [
+                mock.call(
+                    "GET",
+                    "/issues/10/comments",
+                    "test-token",
+                    "test/repo",
+                    params={"per_page": check_pr.GITHUB_PER_PAGE, "page": 1},
+                ),
+            ],
+        )
+
+    def test_fully_valid_pr_removes_previous_feedback(self):
+        result, _, mock_gh = self.call_main(
+            pr_body=VALID_PR_BODY,
+            pr_title=VALID_PR_TITLE,
+            comments=[
+                {"id": 123, "body": check_pr.CHECKS_HEADER},
+                {"id": 456, "body": "An unrelated review comment."},
+            ],
+        )
+
+        self.assertIsNone(result)
+        self.assertEqual(
+            mock_gh.call_args_list,
+            [
+                mock.call(
+                    "GET",
+                    "/issues/10/comments",
+                    "test-token",
+                    "test/repo",
+                    params={"per_page": check_pr.GITHUB_PER_PAGE, "page": 1},
+                ),
+                mock.call("DELETE", "/issues/comments/123", "test-token", "test/repo"),
+            ],
+        )
 
     def test_trusted_author_failures_no_close(self):
         body = make_pr_body(ticket="", checked_items=0)
@@ -778,15 +826,21 @@ class TestIntegration(BaseTestCase):
             mock_gh.call_args_list,
             [
                 mock.call(
-                    "GET", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+                    "GET",
+                    "/issues/10/comments",
+                    "test-token",
+                    "test/repo",
+                    params={"per_page": 100, "page": 1},
                 ),
                 mock.call(
                     "POST", "/issues/10/comments", "test-token", "test/repo", mock.ANY
                 ),
             ],
         )
+        comment = mock_gh.call_args_list[-1].args[4]["body"]
+        self.assertNotIn("A daily check may automatically close", comment)
 
-    def test_untrusted_author_failures_posts_comment_and_closes(self):
+    def test_untrusted_author_failures_posts_comment_without_closing(self):
         body = make_pr_body(ticket="", checked_items=0)
         result, _, mock_gh = self.call_main(pr_body=body)
         self.assertEqual(result, 1)
@@ -794,13 +848,14 @@ class TestIntegration(BaseTestCase):
             mock_gh.call_args_list,
             [
                 mock.call(
-                    "GET", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+                    "GET",
+                    "/issues/10/comments",
+                    "test-token",
+                    "test/repo",
+                    params={"per_page": 100, "page": 1},
                 ),
                 mock.call(
                     "POST", "/issues/10/comments", "test-token", "test/repo", mock.ANY
-                ),
-                mock.call(
-                    "PATCH", "/pulls/10", "test-token", "test/repo", {"state": "closed"}
                 ),
             ],
         )
@@ -813,13 +868,14 @@ class TestIntegration(BaseTestCase):
             mock_gh.call_args_list,
             [
                 mock.call(
-                    "GET", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+                    "GET",
+                    "/issues/10/comments",
+                    "test-token",
+                    "test/repo",
+                    params={"per_page": 100, "page": 1},
                 ),
                 mock.call(
                     "POST", "/issues/10/comments", "test-token", "test/repo", mock.ANY
-                ),
-                mock.call(
-                    "PATCH", "/pulls/10", "test-token", "test/repo", {"state": "closed"}
                 ),
             ],
         )
@@ -832,13 +888,19 @@ class TestIntegration(BaseTestCase):
             mock_gh.call_args_list,
             [
                 mock.call(
-                    "GET", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+                    "GET",
+                    "/issues/10/comments",
+                    "test-token",
+                    "test/repo",
+                    params={"per_page": 100, "page": 1},
                 ),
                 mock.call(
                     "POST", "/issues/10/comments", "test-token", "test/repo", mock.ANY
                 ),
             ],
         )
+        comment = mock_gh.call_args_list[-1].args[4]["body"]
+        self.assertNotIn("A daily check may automatically close", comment)
 
     def test_warnings_only_posts_comment_does_not_close(self):
         trac_data = make_trac_json(stage="Accepted", has_patch="0")
@@ -852,7 +914,11 @@ class TestIntegration(BaseTestCase):
             mock_gh.call_args_list,
             [
                 mock.call(
-                    "GET", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+                    "GET",
+                    "/issues/10/comments",
+                    "test-token",
+                    "test/repo",
+                    params={"per_page": 100, "page": 1},
                 ),
                 mock.call(
                     "POST", "/issues/10/comments", "test-token", "test/repo", mock.ANY
@@ -860,25 +926,41 @@ class TestIntegration(BaseTestCase):
             ],
         )
 
-    def test_warnings_alongside_failures_still_closes(self):
+    def test_warnings_alongside_failures_do_not_close(self):
         trac_data = make_trac_json(stage="Accepted", has_patch="0")
-        # Empty body: fatal ticket failure + incorrect title warning.
-        body = make_pr_body(ticket="", checked_items=0)
+        # Missing description fails.
+        # Missing title and has_patch produce warnings.
+        body = make_pr_body(description="")
         result, _, mock_gh = self.call_main(pr_body=body, trac_data=trac_data)
         self.assertEqual(result, 1)
         self.assertEqual(
             mock_gh.call_args_list,
             [
                 mock.call(
-                    "GET", "/issues/10/comments", "test-token", "test/repo", mock.ANY
+                    "GET",
+                    "/issues/10/comments",
+                    "test-token",
+                    "test/repo",
+                    params={"per_page": 100, "page": 1},
                 ),
                 mock.call(
                     "POST", "/issues/10/comments", "test-token", "test/repo", mock.ANY
                 ),
-                mock.call(
-                    "PATCH", "/pulls/10", "test-token", "test/repo", {"state": "closed"}
-                ),
             ],
+        )
+
+    def test_new_contributor_failures_include_closure_notice(self):
+        result, _, mock_gh = self.call_main(
+            pr_body=make_pr_body(description=""),
+            pr_title=VALID_PR_TITLE,
+            pr_created_at=self.now.isoformat(),
+        )
+
+        self.assertEqual(result, 1)
+        comment = mock_gh.call_args_list[-1].args[4]["body"]
+        self.assertIn("A daily check may automatically close", comment)
+        self.assertFalse(
+            any(call.args[0] == "PATCH" for call in mock_gh.call_args_list)
         )
 
 
@@ -999,3 +1081,286 @@ class TestGetRecentCommitCount(BaseTestCase):
         self.assertEqual(params["author"], "someuser")
         self.assertIn("since", params)
         self.assertEqual(params["per_page"], 5)
+
+
+class TestRecheckOpenPRs(BaseTestCase):
+    def setUp(self):
+        super().setUp()
+        self.github = self.enterContext(mock.patch.object(check_pr, "github_request"))
+        self.enterContext(
+            mock.patch.object(check_pr, "get_recent_commit_count", return_value=0)
+        )
+        self.enterContext(
+            mock.patch.object(check_pr, "get_pr_total_changes", return_value=100)
+        )
+        self.enterContext(
+            mock.patch.object(
+                check_pr,
+                "fetch_trac_ticket",
+                return_value=make_trac_json(has_patch="1"),
+            )
+        )
+
+    def make_pr(self, number=10, **overrides):
+        return {
+            "number": number,
+            "created_at": (self.now - timedelta(days=2)).isoformat(),
+            "state": "open",
+            "base": {"ref": "main"},
+            "user": {"login": "new-contributor"},
+            "body": VALID_PR_BODY,
+            "title": VALID_PR_TITLE,
+            **overrides,
+        }
+
+    def test_corrected_pr_is_not_closed(self):
+        listed_pr = self.make_pr(body="")
+        current_pr = self.make_pr()
+        self.github.side_effect = [[listed_pr], current_pr]
+
+        result = check_pr.recheck_open_prs("test/repo", "test-token", True)
+
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            self.github.call_args_list,
+            [
+                mock.call(
+                    "GET",
+                    "/pulls",
+                    "test-token",
+                    "test/repo",
+                    params={
+                        "state": "open",
+                        "base": "main",
+                        "sort": "created",
+                        "direction": "desc",
+                        "per_page": check_pr.GITHUB_PER_PAGE,
+                        "page": 1,
+                    },
+                ),
+                mock.call("GET", "/pulls/10", "test-token", "test/repo"),
+            ],
+        )
+
+    def test_remaining_failures_close_pr_without_modifying_comments(self):
+        pr = self.make_pr(body="")
+        self.github.side_effect = [
+            [pr],  # List open PRs.
+            pr,  # Fetch current PR details.
+            {},  # Close the PR.
+        ]
+
+        result = check_pr.recheck_open_prs("test/repo", "test-token", True)
+
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            self.github.call_args_list,
+            [
+                mock.call(
+                    "GET",
+                    "/pulls",
+                    "test-token",
+                    "test/repo",
+                    params={
+                        "state": "open",
+                        "base": "main",
+                        "sort": "created",
+                        "direction": "desc",
+                        "per_page": check_pr.GITHUB_PER_PAGE,
+                        "page": 1,
+                    },
+                ),
+                mock.call("GET", "/pulls/10", "test-token", "test/repo"),
+                mock.call(
+                    "PATCH", "/pulls/10", "test-token", "test/repo", {"state": "closed"}
+                ),
+            ],
+        )
+
+    def test_pr_within_grace_period_is_not_rechecked(self):
+        pr = self.make_pr(
+            created_at=(self.now - timedelta(hours=23)).isoformat(),
+            body="",
+        )
+        self.github.return_value = [pr]
+
+        result = check_pr.recheck_open_prs("test/repo", "test-token", True)
+
+        self.assertEqual(result, 0)
+        self.github.assert_called_once()
+
+    def test_closed_pr_is_not_rechecked(self):
+        self.github.side_effect = [
+            [self.make_pr(body="")],
+            self.make_pr(body="", state="closed"),
+        ]
+
+        result = check_pr.recheck_open_prs("test/repo", "test-token", True)
+
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            [call.args[0] for call in self.github.call_args_list],
+            ["GET", "GET"],
+        )
+
+    def test_autoclose_disabled_does_not_recheck(self):
+        result = check_pr.recheck_open_prs("test/repo", "test-token", autoclose=False)
+        self.assertEqual(result, 0)
+        self.github.assert_not_called()
+
+    def test_collects_all_pages_before_closing_prs(self):
+        first = self.make_pr(number=10, body="")
+        second = self.make_pr(number=11, body="")
+        self.github.side_effect = [
+            [first],  # First page.
+            [second],  # Second page.
+            [],  # No more PRs.
+            first,  # Fetch PR #10.
+            {},  # Close PR #10.
+            second,  # Fetch PR #11.
+            {},  # Close PR #11.
+        ]
+
+        with mock.patch.object(check_pr, "GITHUB_PER_PAGE", 1):
+            result = check_pr.recheck_open_prs("test/repo", "test-token", True)
+
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            self.github.call_args_list[:3],
+            [
+                mock.call(
+                    "GET",
+                    "/pulls",
+                    "test-token",
+                    "test/repo",
+                    params={
+                        "state": "open",
+                        "base": "main",
+                        "sort": "created",
+                        "direction": "desc",
+                        "per_page": 1,
+                        "page": page,
+                    },
+                )
+                for page in (1, 2, 3)
+            ],
+        )
+        for number in (10, 11):
+            self.github.assert_any_call(
+                "PATCH",
+                f"/pulls/{number}",
+                "test-token",
+                "test/repo",
+                {"state": "closed"},
+            )
+
+    def test_error_checking_one_pr_does_not_prevent_checking_next(self):
+        first = self.make_pr(number=10)
+        second = self.make_pr(number=11, body="")
+        self.github.side_effect = [
+            [first, second],
+            OSError("Connection refused"),
+            second,  # Fetch PR #11.
+            {},  # Close PR #11.
+        ]
+
+        with self.assertLogs(logger, level="ERROR"):
+            result = check_pr.recheck_open_prs("test/repo", "test-token", True)
+
+        self.assertEqual(result, 1)
+        self.github.assert_any_call(
+            "PATCH", "/pulls/11", "test-token", "test/repo", {"state": "closed"}
+        )
+
+    def test_recheck_stops_at_prs_older_than_five_days(self):
+        oldest = self.now - timedelta(days=5)
+        eligible = self.make_pr(
+            number=11,
+            created_at=oldest.isoformat(),
+            body="",
+        )
+        too_old = self.make_pr(
+            number=10,
+            created_at=(oldest - timedelta(seconds=1)).isoformat(),
+            body="",
+        )
+        self.github.side_effect = [
+            [eligible, too_old],
+            eligible,  # Fetch PR #11.
+            {},  # Close PR #11.
+        ]
+
+        with mock.patch.object(check_pr, "GITHUB_PER_PAGE", 2):
+            result = check_pr.recheck_open_prs("test/repo", "test-token", True)
+
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            [call for call in self.github.call_args_list if call.args[0] == "GET"],
+            [
+                mock.call(
+                    "GET",
+                    "/pulls",
+                    "test-token",
+                    "test/repo",
+                    params={
+                        "state": "open",
+                        "base": "main",
+                        "sort": "created",
+                        "direction": "desc",
+                        "per_page": 2,
+                        "page": 1,
+                    },
+                ),
+                mock.call("GET", "/pulls/11", "test-token", "test/repo"),
+            ],
+        )
+        self.github.assert_any_call(
+            "PATCH", "/pulls/11", "test-token", "test/repo", {"state": "closed"}
+        )
+
+    def test_warnings_only_do_not_close_or_modify_comments(self):
+        pr = self.make_pr(title="")
+        self.github.side_effect = [[pr], pr]
+
+        result = check_pr.recheck_open_prs("test/repo", "test-token", True)
+
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            [(call.args[0], call.args[1]) for call in self.github.call_args_list],
+            [("GET", "/pulls"), ("GET", "/pulls/10")],
+        )
+
+    def test_recent_contributor_failures_do_not_close_or_modify_comments(self):
+        pr = self.make_pr(body="")
+        self.github.side_effect = [[pr], pr]
+
+        with mock.patch.object(check_pr, "get_recent_commit_count", return_value=1):
+            result = check_pr.recheck_open_prs("test/repo", "test-token", True)
+
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            [(call.args[0], call.args[1]) for call in self.github.call_args_list],
+            [("GET", "/pulls"), ("GET", "/pulls/10")],
+        )
+
+    def test_pr_at_grace_period_boundary_is_closed(self):
+        pr = self.make_pr(
+            created_at=(self.now - timedelta(days=1)).isoformat(),
+            body="",
+        )
+        self.github.side_effect = [[pr], pr, {}]
+
+        result = check_pr.recheck_open_prs("test/repo", "test-token", True)
+
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            [(call.args[0], call.args[1]) for call in self.github.call_args_list],
+            [
+                ("GET", "/pulls"),
+                ("GET", "/pulls/10"),
+                ("PATCH", "/pulls/10"),
+            ],
+        )
+        self.github.assert_called_with(
+            "PATCH", "/pulls/10", "test-token", "test/repo", {"state": "closed"}
+        )

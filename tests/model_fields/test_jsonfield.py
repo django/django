@@ -49,7 +49,7 @@ from django.test import (
     skipUnlessDBFeature,
 )
 from django.test.utils import CaptureQueriesContext
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .models import (
     CustomJSONDecoder,
@@ -236,8 +236,8 @@ class TestSaveLoad(TestCase):
         self.assertIsNone(obj.value)
 
     @skipUnlessDBFeature("supports_primitives_in_json_field")
-    # RemovedInDjango70Warning.
-    @ignore_warnings(category=RemovedInDjango70Warning)
+    # RemovedInDjango2028Warning.
+    @ignore_warnings(category=RemovedInDjango2028Warning)
     def test_json_null_different_from_sql_null(self):
         json_null = NullableJSONModel.objects.create(value=Value(None, JSONField()))
         NullableJSONModel.objects.update(value=Value(None, JSONField()))
@@ -251,7 +251,7 @@ class TestSaveLoad(TestCase):
         )
         self.assertSequenceEqual(
             NullableJSONModel.objects.filter(value=None),
-            # RemovedInDjango70Warning: When the deprecation ends, replace
+            # RemovedInDjango2028Warning: When the deprecation ends, replace
             # with:
             # [sql_null],
             [json_null],
@@ -1029,6 +1029,56 @@ class TestQuerying(TestCase):
                     NullableJSONModel.objects.filter(value__in=lookup_value), expected
                 )
 
+    @skipUnlessDBFeature("supports_primitives_in_json_field")
+    @skipIfDBFeature("has_native_json_field")
+    def test_in_value_without_explicit_output_field(self):
+        tests = [
+            ([Value(True)], [self.objs[8]]),
+            ([Value(False)], [self.objs[9]]),
+            ([Value("yes")], [self.objs[10]]),
+            ([Value(7)], [self.objs[11]]),
+            ([Value(9.6)], [self.objs[12]]),
+        ]
+        for lookup_value, expected in tests:
+            with self.subTest(value__in=lookup_value), transaction.atomic():
+                self.assertSequenceEqual(
+                    NullableJSONModel.objects.filter(value__in=lookup_value), expected
+                )
+
+    @skipUnlessDBFeature("supports_primitives_in_json_field")
+    @skipIfDBFeature("has_native_json_field")
+    def test_in_value_explicit_output_field(self):
+        tests = [
+            ([Value("7", output_field=IntegerField())], [self.objs[11]]),
+            ([Value("yes", output_field=models.CharField())], [self.objs[10]]),
+            # None with anything but JSONField is almost certainly not what the
+            # user intends--nothing is IN (NULL)--but it shouldn't crash.
+            ([Value(None, output_field=models.CharField())], []),
+        ]
+        for lookup_value, expected in tests:
+            with self.subTest(value__in=lookup_value), transaction.atomic():
+                self.assertSequenceEqual(
+                    NullableJSONModel.objects.filter(value__in=lookup_value), expected
+                )
+
+    def test_in_json_whitespace(self):
+        tests = [
+            ('{"a":1}', {"a": 1}),
+            ('{ "a" : 1 }', {"a": 1}),
+            ("[1,2]", [1, 2]),
+            ("[ 1, 2 ]", [1, 2]),
+        ]
+        for raw, value in tests:
+            with self.subTest(raw=raw):
+                # Use RawSQL to avoid whitespace from Django's serialization.
+                obj = NullableJSONModel.objects.create(
+                    value=RawSQL(self.raw_sql, [raw]),
+                )
+                self.assertSequenceEqual(
+                    NullableJSONModel.objects.filter(pk=obj.pk, value__in=[value]),
+                    [obj],
+                )
+
     def test_key_in(self):
         tests = [
             ("value__c__in", [14], self.objs[3:5]),
@@ -1150,6 +1200,46 @@ class TestQuerying(TestCase):
         self.assertEqual(
             NullableJSONModel.objects.filter(value__o='"quoted"').get(),
             self.objs[4],
+        )
+
+    def test_key_transform_int4_range_overflow(self):
+        # A purely numeric key segment is parsed as an array index. If that
+        # index is outside the range of integer this database's JSON path
+        # support can handle natively (PostgreSQL's int4 range; Oracle's JSON
+        # path parser has its own, much larger, limit), the lookup must not
+        # match rather than error.
+        out_of_range_key = max(connection.ops.integer_field_range("IntegerField")) + 1
+        key = str(out_of_range_key)
+        obj = NullableJSONModel.objects.create(value={key: "x"})
+        self.assertFalse(
+            NullableJSONModel.objects.filter(**{f"value__{key}": "x"}).exists()
+        )
+        if connection.features.supports_json_field_contains:
+            self.assertCountEqual(
+                NullableJSONModel.objects.filter(value__contains={key: "x"}), [obj]
+            )
+
+    def test_key_transform_int4_range_overflow_isnull(self):
+        # __isnull on a key segment outside the range in
+        # test_key_transform_int4_range_overflow() must not match rather than
+        # error, the same as an ordinary exact lookup on that key.
+        out_of_range_key = max(connection.ops.integer_field_range("IntegerField")) + 1
+        key = str(out_of_range_key)
+        obj = NullableJSONModel.objects.create(value={key: "x"})
+        self.assertTrue(
+            NullableJSONModel.objects.filter(
+                pk=obj.pk, **{f"value__{key}__isnull": True}
+            ).exists(),
+        )
+
+    def test_key_transform_int4_range_overflow_isnull_ancestor(self):
+        out_of_range_key = max(connection.ops.integer_field_range("IntegerField")) + 1
+        key = str(out_of_range_key)
+        obj = NullableJSONModel.objects.create(value={"other": {"x": "y"}})
+        self.assertTrue(
+            NullableJSONModel.objects.filter(
+                pk=obj.pk, **{f"value__{key}__x__isnull": True}
+            ).exists(),
         )
 
     @skipUnlessDBFeature("has_json_operators")
@@ -1374,7 +1464,7 @@ class JSONNullTests(TestCase):
     def test_filter_in(self):
         obj = NullableJSONModel.objects.create(value=JSONNull())
         obj2 = NullableJSONModel.objects.create(value=[1])
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableJSONModel.objects.filter(value__in=[JSONNull(), [1], "foo"]),
             [obj, obj2],
         )
@@ -1382,7 +1472,7 @@ class JSONNullTests(TestCase):
     def test_key_in(self):
         obj1 = NullableJSONModel.objects.create(value={"key": None})
         obj2 = NullableJSONModel.objects.create(value={"key": [1]})
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             NullableJSONModel.objects.filter(value__key__in=[JSONNull(), [1], 0]),
             [obj1, obj2],
         )
@@ -1393,9 +1483,8 @@ class JSONNullTests(TestCase):
         obj1.value = JSONNull()
         obj2.value = JSONNull()
         NullableJSONModel.objects.bulk_update([obj1, obj2], fields=["value"])
-        self.assertSequenceEqual(
-            NullableJSONModel.objects.filter(value=JSONNull()),
-            [obj1, obj2],
+        self.assertCountEqual(
+            NullableJSONModel.objects.filter(value=JSONNull()), [obj1, obj2]
         )
 
     def test_case_expression_with_jsonnull_then(self):
@@ -1476,7 +1565,7 @@ class JSONNullTests(TestCase):
         self.assertEqual(obj.value["array"], [1, None])
 
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 @skipUnlessDBFeature("supports_primitives_in_json_field")
 class JSONExactNoneDeprecationTests(TestCase):
     @classmethod
@@ -1489,7 +1578,7 @@ class JSONExactNoneDeprecationTests(TestCase):
         cls.obj = NullableJSONModel.objects.create(value=JSONNull())
 
     def test_filter(self):
-        with self.assertWarnsMessage(RemovedInDjango70Warning, self.msg):
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, self.msg):
             self.assertSequenceEqual(
                 NullableJSONModel.objects.filter(value=None), [self.obj]
             )
@@ -1498,12 +1587,12 @@ class JSONExactNoneDeprecationTests(TestCase):
         qs = NullableJSONModel.objects.annotate(
             has_empty_data=Q(value__isnull=True) | Q(value=None)
         ).filter(has_empty_data=True)
-        with self.assertWarnsMessage(RemovedInDjango70Warning, self.msg):
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, self.msg):
             self.assertSequenceEqual(qs, [self.obj])
 
     def test_case_when(self):
         qs = NullableJSONModel.objects.annotate(
             has_json_null=Case(When(value=None, then=Value(True)), default=Value(False))
         ).filter(has_json_null=True)
-        with self.assertWarnsMessage(RemovedInDjango70Warning, self.msg):
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, self.msg):
             self.assertSequenceEqual(qs, [self.obj])
