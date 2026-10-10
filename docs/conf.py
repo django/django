@@ -95,7 +95,7 @@ spelling_word_list_filename = "spelling_wordlist"
 spelling_warning = True
 
 # Add any paths that contain templates here, relative to this directory.
-# templates_path = []
+templates_path = ["_templates"]
 
 # The suffix of source filenames.
 source_suffix = {".txt": "restructuredtext"}
@@ -209,12 +209,20 @@ suppress_warnings = ["app.add_directive", "epub.duplicated_toc_entry"]
 
 # The theme to use for HTML and HTML Help pages. See the documentation for
 # a list of builtin themes.
-html_theme = "djangodocs"
+html_theme = "pydata_sphinx_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further. For a list of options available for each theme, see the
 # documentation.
-# html_theme_options = {}
+html_theme_options = {
+    "show_nav_level": 2,  # Left nav initially expanded (default 1).
+    "show_toc_level": 3,  # Right nav ("on this page"; default 2).
+    "navbar_start": [],  # Skip the "logo".
+    "navbar_center": ["navbar-nav", "navbar-extra-links"],
+    "header_links_before_dropdown": 6,
+    "footer_start": ["docstitle", "copyright", "last-updated"],
+    "footer_end": ["sphinx-version", "theme-version"],
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 html_theme_path = ["_theme"]
@@ -242,6 +250,11 @@ html_static_path = ["_static"]
 
 html_css_files = [
     "console-tabs.css",
+    "custom.css",
+]
+
+html_js_files = [
+    ("console-tabs.js", {"type": "module"}),
 ]
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
@@ -252,7 +265,12 @@ html_last_updated_fmt = "%b %d, %Y"
 # html_index = ''
 
 # Custom sidebar templates, maps document names to template names.
-# html_sidebars = {}
+html_sidebars = {
+    # Remove "Section navigation" sidebar on pages where it's empty.
+    "genindex": [],
+    "glossary": [],
+    "index": [],
+}
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
