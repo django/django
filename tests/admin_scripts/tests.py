@@ -2258,6 +2258,31 @@ class CommandTypes(AdminScriptTestCase):
         with self.assertRaises(CommandError):
             command.run_from_argv(["", "", "--traceback"])
 
+    def test_run_from_argv_keyboard_interrupt(self):
+        """
+        Test run_from_argv handles KeyboardInterrupt cleanly by printing an
+        error message and exiting with 1.
+        """
+        err = StringIO()
+        command = BaseCommand(stderr=err)
+
+        def raise_keyboard_interrupt(*args, **kwargs):
+            raise KeyboardInterrupt()
+
+        command.execute = raise_keyboard_interrupt
+
+        # If --traceback is not present, should print "Operation cancelled."
+        # and exit with SystemExit(1)
+        err.truncate(0)
+        with self.assertRaises(SystemExit) as cm:
+            command.run_from_argv(["", ""])
+        self.assertEqual(cm.exception.code, 1)
+        self.assertIn("Operation cancelled.", err.getvalue())
+
+        # If --traceback is present, should propagate KeyboardInterrupt
+        with self.assertRaises(KeyboardInterrupt):
+            command.run_from_argv(["", "", "--traceback"])
+
     def test_run_from_argv_non_ascii_error(self):
         """
         Non-ASCII message of CommandError does not raise any
