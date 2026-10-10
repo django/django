@@ -1,0 +1,30 @@
+[1mdiff --git a/docs/topics/performance.txt b/docs/topics/performance.txt[m
+[1mindex 2935f21f67..cc594df72a 100644[m
+[1m--- a/docs/topics/performance.txt[m
+[1m+++ b/docs/topics/performance.txt[m
+[36m@@ -413,25 +413,6 @@[m [mperformance gains for your application to outweigh the potential risks.[m
+ [m
+ With these caveats in mind, you should be aware of:[m
+ [m
+[31m-`PyPy <https://www.pypy.org/>`_[m
+[31m-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m
+[31m-[m
+[31m-`PyPy <https://www.pypy.org/>`_ is an implementation of Python in Python itself[m
+[31m-(the 'standard' Python implementation is in C). PyPy can offer substantial[m
+[31m-performance gains, typically for heavyweight applications.[m
+[31m-[m
+[31m-A key aim of the PyPy project is `compatibility[m
+[31m-<https://www.pypy.org/compat.html>`_ with existing Python APIs and libraries.[m
+[31m-Django is compatible with versions of PyPy corresponding to the supported[m
+[31m-Python versions, but you will need to check the compatibility of other[m
+[31m-libraries you rely on.[m
+[31m-[m
+[31m-That said, a lot of a web framework's work is done by concatenating[m
+[31m-strings, and PyPy has an issue with that (see[m
+[31m-`this PyPy blog[m
+[31m-<https://pypy.org/posts/2023/01/string-concatenation-quadratic.html>`_).[m
+[31m-This may cause performance issues, depending on your use.[m
+[31m-[m
+ C implementations of Python libraries[m
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m
+ [m
