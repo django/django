@@ -690,10 +690,17 @@ class SQLCompiler:
         # might have been masked via values() and alias(). If any masked
         # aliases are added they'll be masked again to avoid fetching
         # the data in the `if qual_aliases` branch below.
-        select = {
-            expr: alias for expr, _, alias in self.get_select(with_col_aliases=True)[0]
-        }
-        select_aliases = set(select.values())
+        # An expression can be selected at more than one position, e.g. when
+        # two lookup paths resolve to the same column, so the aliases of every
+        # selection must be tracked and not only one per expression, otherwise
+        # the masking of the outer query below drops the extra selections.
+        selected = self.get_select(with_col_aliases=True)[0]
+        select = {}
+        selected_aliases = []
+        for expr, _, alias in selected:
+            select.setdefault(expr, alias)
+            selected_aliases.append(alias)
+        select_aliases = set(selected_aliases)
         qual_aliases = set()
         replacements = {}
 
@@ -751,7 +758,7 @@ class SQLCompiler:
         if qual_aliases:
             # If some select aliases were unmasked for filtering purposes they
             # must be masked back.
-            cols = [self.connection.ops.quote_name(alias) for alias in select.values()]
+            cols = [self.connection.ops.quote_name(alias) for alias in selected_aliases]
             result = [
                 "SELECT",
                 ", ".join(cols),
