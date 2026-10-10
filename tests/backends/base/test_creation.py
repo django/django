@@ -100,7 +100,7 @@ class TestDbCreationTests(SimpleTestCase):
             with mock.patch.object(creation, "_destroy_test_db"):
                 creation.destroy_test_db(old_database_name, verbosity=0)
 
-    @mock.patch("django.db.migrations.executor.MigrationRecorder.ensure_schema")
+    @mock.patch("django.db.migrations.recorder.MigrationRecorder.ensure_schema")
     def test_migrate_test_setting_false_ensure_schema(
         self,
         mocked_ensure_schema,

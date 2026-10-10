@@ -34,7 +34,12 @@ from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.migrations.writer import MigrationWriter
 from django.test import TestCase, override_settings, skipUnlessDBFeature
-from django.test.utils import captured_stdout, extend_sys_path, isolate_apps
+from django.test.utils import (
+    CaptureQueriesContext,
+    captured_stdout,
+    extend_sys_path,
+    isolate_apps,
+)
 from django.utils import timezone
 from django.utils.version import get_docs_version
 
@@ -51,6 +56,17 @@ class MigrateTests(MigrationTestBase):
     """
 
     databases = {"default", "other"}
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    def test_migrate_checks_migrations_table_once(self):
+        with CaptureQueriesContext(connection) as context:
+            MigrationRecorder(connection).has_table()
+        has_table_sql = context.captured_queries[-1]["sql"]
+        with CaptureQueriesContext(connection) as context:
+            call_command("migrate", "migrations", "0001", verbosity=0)
+        call_command("migrate", "migrations", "zero", verbosity=0)
+        queries = [query["sql"] for query in context.captured_queries]
+        self.assertEqual(queries.count(has_table_sql), 1)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_migrate(self):
