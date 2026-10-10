@@ -8,7 +8,7 @@ from .models import City, ManyPointModel, MultiFields
 
 
 class GeoExpressionsTests(TestCase):
-    fixtures = ["initial"]
+    fixtures = ["geoapp_initial"]
 
     def test_geometry_value_annotation(self):
         p = Point(1, 1, srid=4326)
