@@ -9,6 +9,7 @@ from django.test import (
     SimpleTestCase,
     TestCase,
     TransactionTestCase,
+    skipIfDBFeature,
     skipUnlessDBFeature,
 )
 
@@ -179,6 +180,13 @@ class TestQuerying(TestCase):
             NullableUUIDModel.objects.filter(field__startswith="550e8400-e29b-4"),
             [self.objs[1]],
         )
+
+    @skipIfDBFeature("has_native_uuid_field")
+    def test_startswith_query_does_not_mutate(self):
+        # Recompiling the same query must not accumulate extra, unbounded
+        # hyphen-stripping on each pass.
+        queryset = NullableUUIDModel.objects.filter(field__startswith="550e8400")
+        self.assertEqual(str(queryset.query), str(queryset.query))
 
     def test_istartswith(self):
         self.assertSequenceEqualWithoutHyphens(

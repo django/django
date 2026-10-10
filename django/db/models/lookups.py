@@ -784,17 +784,18 @@ class UUIDTextMixin:
     a native datatype for UUID.
     """
 
-    def process_rhs(self, qn, connection):
+    def as_sql(self, compiler, connection):
         if not connection.features.has_native_uuid_field:
             from django.db.models.functions import Replace
 
-            if self.rhs_is_direct_value():
-                self.rhs = Value(self.rhs)
-            self.rhs = Replace(
-                self.rhs, Value("-"), Value(""), output_field=CharField()
+            copy = self.copy()
+            if copy.rhs_is_direct_value():
+                copy.rhs = Value(copy.rhs)
+            copy.rhs = Replace(
+                copy.rhs, Value("-"), Value(""), output_field=CharField()
             )
-        rhs, params = super().process_rhs(qn, connection)
-        return rhs, params
+            return super(UUIDTextMixin, copy).as_sql(compiler, connection)
+        return super().as_sql(compiler, connection)
 
 
 @UUIDField.register_lookup
