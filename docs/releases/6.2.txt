@@ -23,8 +23,8 @@ end in April 2028.
 Python compatibility
 ====================
 
-Django 6.2 supports Python 3.12, 3.13 and 3.14. We **highly recommend** and
-only officially support the latest release of each series.
+Django 6.2 supports Python 3.12, 3.13, 3.14, and 3.15. We **highly recommend**
+and only officially support the latest release of each series.
 
 .. _whats-new-6.2:
 

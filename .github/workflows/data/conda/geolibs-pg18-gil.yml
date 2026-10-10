@@ -2,7 +2,7 @@ name: geodjango
 channels:
   - conda-forge
 dependencies:
-  - python-gil=3.14
+  - python-gil=3.15
   - postgresql=18.*
   - postgis=3.6.*
   - libgdal=3.13.*
