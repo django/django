@@ -43,6 +43,7 @@ from django.test import (
     skipUnlessDBFeature,
 )
 from django.test.html import HTMLParseError, parse_html
+from django.test.signals import pre_capture_queries
 from django.test.testcases import DatabaseOperationForbidden
 from django.test.utils import (
     CaptureQueriesContext,
@@ -449,6 +450,39 @@ class CaptureQueriesContextManagerTests(TestCase):
             self.client.get(self.url)
         self.assertEqual(2, len(captured_queries))
 
+    def test_clear_caches_signal(self):
+        calls = []
+
+        def receiver(sender, connection, **kwargs):
+            calls.append((sender, connection))
+
+        pre_capture_queries.connect(receiver)
+        try:
+            with CaptureQueriesContext(connection, clear_caches=False):
+                pass
+            self.assertEqual(len(calls), 0)
+
+            with CaptureQueriesContext(connection, clear_caches=True):
+                pass
+            self.assertEqual(len(calls), 1)
+            self.assertEqual(calls[0], (CaptureQueriesContext, connection))
+        finally:
+            pre_capture_queries.disconnect(receiver)
+
+    def test_clear_caches_callables(self):
+        called = []
+
+        with CaptureQueriesContext(connection, clear_caches=lambda: called.append(1)):
+            pass
+        self.assertEqual(called, [1])
+
+        with CaptureQueriesContext(
+            connection,
+            clear_caches=[lambda: called.append(2), lambda: called.append(3)],
+        ):
+            pass
+        self.assertEqual(called, [1, 2, 3])
+
 
 @override_settings(ROOT_URLCONF="test_utils.urls")
 class AssertNumQueriesContextManagerTests(TestCase):
@@ -495,6 +529,34 @@ class AssertNumQueriesContextManagerTests(TestCase):
             with self.assertNumQueries(0):
                 pass
             self.client.get(self.url)
+
+    def test_clear_caches(self):
+        calls = []
+
+        def receiver(sender, connection, **kwargs):
+            calls.append((sender, connection))
+
+        pre_capture_queries.connect(receiver)
+        try:
+            with self.assertNumQueries(0, clear_caches=False):
+                pass
+            self.assertEqual(len(calls), 0)
+
+            with self.assertNumQueries(0, clear_caches=True):
+                pass
+            self.assertEqual(len(calls), 1)
+
+            calls.clear()
+            self.assertNumQueries(0, lambda: None, clear_caches=True)
+            self.assertEqual(len(calls), 1)
+        finally:
+            pre_capture_queries.disconnect(receiver)
+
+    @mock.patch("django.contrib.contenttypes.models.ContentType.objects.clear_cache")
+    def test_clear_contenttypes_cache_on_signal(self, mock_clear_cache):
+        with self.assertNumQueries(0, clear_caches=True):
+            pass
+        mock_clear_cache.assert_called_once()
 
 
 @override_settings(ROOT_URLCONF="test_utils.urls")
