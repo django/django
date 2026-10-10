@@ -9038,6 +9038,39 @@ class AdminKeepChangeListFiltersTests(TestCase):
         # The action attribute is omitted.
         self.assertContains(response, '<form method="post" id="user_form" novalidate>')
 
+    def test_change_view_with_repeated_preserved_filters(self):
+        viewuser = User.objects.create_user(
+            username="view", password="secret", is_staff=True
+        )
+        viewuser.user_permissions.add(
+            get_perm(User, get_permission_codename("view", User._meta))
+        )
+        self.client.force_login(viewuser)
+
+        changelist_filters = [
+            ("is_staff__exact", "1"),
+            ("is_staff__exact", "0"),
+        ]
+        preserved_filters = urlencode(
+            {"_changelist_filters": urlencode(changelist_filters)}
+        )
+        change_url = "%s?%s" % (
+            reverse(
+                "admin:auth_user_change",
+                args=(self.get_sample_user_id(),),
+                current_app=self.admin_site.name,
+            ),
+            preserved_filters,
+        )
+
+        response = self.client.get(change_url)
+        close_link = re.search(
+            '<a role="button" href="(.*?)" class="closelink">Close</a>', response.text
+        )
+        close_link = close_link[1].replace("&amp;", "&")
+
+        self.assertEqual(parse_qsl(urlsplit(close_link).query), changelist_filters)
+
     def test_add_view(self):
         # Get the `add_view`.
         response = self.client.get(self.get_add_url())
