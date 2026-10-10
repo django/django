@@ -10,9 +10,8 @@ from github_links import get_branch
 from sphinx import addnodes
 from sphinx.directives.code import CodeBlock
 from sphinx.domains.std import Cmdoption, GenericObject
-from sphinx.roles import XRefRole
 from sphinx.util import logging
-from sphinx.util.nodes import split_explicit_title
+from sphinx.util.nodes import make_id, split_explicit_title
 from sphinx.writers.html import HTMLTranslator
 
 logger = logging.getLogger(__name__)
@@ -42,14 +41,12 @@ def setup(app):
         indextemplate="pair: %s; field lookup type",
     )
     app.add_object_type(
-        directivename="django-admin",
-        rolename="djadmin",
+        directivename="django-cli",
+        rolename="djcli",
         indextemplate="pair: %s; django command",
         parse_node=parse_django_cli_node,
     )
-    app.add_directive_to_domain("std", "django-cli", DjangoCLIDirective)
-    app.add_role_to_domain("std", "djcli", DjangoCLIReference())
-    app.add_directive("django-admin-option", Cmdoption)
+    app.add_directive_to_domain("std", "django-cli", DjangoCLIDirective, override=True)
     app.add_directive("django-cli-option", Cmdoption)
     app.add_config_value("django_next_version", "0.0", True)
     app.connect("builder-inited", set_django_html_translator)
@@ -98,16 +95,12 @@ class DjangoCLIDirective(GenericObject):
     indextemplate = "pair: %s; django command"
     parse_node = staticmethod(parse_django_cli_node)
 
-    def run(self):
-        # Keep the original object type to preserve existing command anchors.
-        self.name = "std:django-admin"
-        return super().run()
-
-
-class DjangoCLIReference(XRefRole):
-    def run(self):
-        self.name = "std:djadmin"
-        return super().run()
+    def add_target_and_index(self, name, sig, signode):
+        # Preserve public anchors from before the command rename.
+        signode["ids"].append(
+            make_id(self.env, self.state.document, "django-admin", name)
+        )
+        super().add_target_and_index(name, sig, signode)
 
 
 class ConsoleNode(nodes.literal_block):

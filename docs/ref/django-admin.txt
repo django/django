@@ -63,7 +63,7 @@ functionality. For details on the naming change, see `DEP 16`_.
 Getting runtime help
 --------------------
 
-.. django-admin:: help
+.. django-cli:: help
 
 Run ``django help`` to display usage information and a list of the
 commands provided by each application.
@@ -84,7 +84,7 @@ contains the string ``'mysite.blog'``, the app name is ``blog``.
 Determining the version
 -----------------------
 
-.. django-admin:: version
+.. django-cli:: version
 
 Run ``django version`` to display the current Django version.
 
@@ -120,7 +120,7 @@ Available commands
 ``check``
 ---------
 
-.. django-admin:: check [app_label [app_label ...]]
+.. django-cli:: check [app_label [app_label ...]]
 
 Uses the :doc:`system check framework </ref/checks>` to inspect the entire
 Django project for common problems.
@@ -132,7 +132,7 @@ providing a list of app labels as arguments:
 
     django check auth admin myapp
 
-.. django-admin-option:: --tag TAGS, -t TAGS
+.. django-cli-option:: --tag TAGS, -t TAGS
 
 The system check framework performs many different types of checks that are
 :ref:`categorized with tags <system-check-builtin-tags>`. You can use these
@@ -143,7 +143,7 @@ For example, to perform only models and compatibility checks, run:
 
     django check --tag models --tag compatibility
 
-.. django-admin-option:: --database DATABASE
+.. django-cli-option:: --database DATABASE
 
 Specifies the database to run checks requiring database access:
 
@@ -153,11 +153,11 @@ Specifies the database to run checks requiring database access:
 
 By default, these checks will not be run.
 
-.. django-admin-option:: --list-tags
+.. django-cli-option:: --list-tags
 
 Lists all available tags.
 
-.. django-admin-option:: --deploy
+.. django-cli-option:: --deploy
 
 Activates some additional checks that are only relevant in a deployment
 setting.
@@ -176,7 +176,7 @@ Or you could run it directly on a production or staging deployment to verify
 that the correct settings are in use (omitting ``--settings``). You could even
 make it part of your integration test suite.
 
-.. django-admin-option:: --fail-level {CRITICAL,ERROR,WARNING,INFO,DEBUG}
+.. django-cli-option:: --fail-level {CRITICAL,ERROR,WARNING,INFO,DEBUG}
 
 Specifies the message level that will cause the command to exit with a non-zero
 status. Default is ``ERROR``.
@@ -184,21 +184,21 @@ status. Default is ``ERROR``.
 ``compilemessages``
 -------------------
 
-.. django-admin:: compilemessages
+.. django-cli:: compilemessages
 
-Compiles ``.po`` files created by :djadmin:`makemessages` to ``.mo`` files for
+Compiles ``.po`` files created by :djcli:`makemessages` to ``.mo`` files for
 use with the built-in gettext support. See :doc:`/topics/i18n/index`.
 
-.. django-admin-option:: --locale LOCALE, -l LOCALE
+.. django-cli-option:: --locale LOCALE, -l LOCALE
 
 Specifies the locale(s) to process. If not provided, all locales are processed.
 
-.. django-admin-option:: --exclude EXCLUDE, -x EXCLUDE
+.. django-cli-option:: --exclude EXCLUDE, -x EXCLUDE
 
 Specifies the locale(s) to exclude from processing. If not provided, no locales
 are excluded.
 
-.. django-admin-option:: --use-fuzzy, -f
+.. django-cli-option:: --use-fuzzy, -f
 
 Includes `fuzzy translations`_ into compiled files.
 
@@ -217,7 +217,7 @@ Example usage:
 
 .. _fuzzy translations: https://www.gnu.org/software/gettext/manual/html_node/Fuzzy-Entries.html
 
-.. django-admin-option:: --ignore PATTERN, -i PATTERN
+.. django-cli-option:: --ignore PATTERN, -i PATTERN
 
 Ignores directories matching the given :mod:`glob`-style pattern. Use
 multiple times to ignore more.
@@ -231,18 +231,18 @@ Example usage:
 ``createcachetable``
 --------------------
 
-.. django-admin:: createcachetable
+.. django-cli:: createcachetable
 
 Creates the cache tables for use with the database cache backend using the
 information from your settings file. See :doc:`/topics/cache` for more
 information.
 
-.. django-admin-option:: --database DATABASE
+.. django-cli-option:: --database DATABASE
 
 Specifies the database in which the cache table(s) will be created. Defaults to
 ``default``.
 
-.. django-admin-option:: --dry-run
+.. django-cli-option:: --dry-run
 
 Prints the SQL that would be run without actually running it, so you can
 customize it or use the migrations framework.
@@ -250,7 +250,7 @@ customize it or use the migrations framework.
 ``dbshell``
 -----------
 
-.. django-admin:: dbshell
+.. django-cli:: dbshell
 
 Runs the command-line client for the database engine specified in your
 :setting:`ENGINE <DATABASE-ENGINE>` setting, with the connection parameters
@@ -266,11 +266,11 @@ the program name (``psql``, ``mysql``, ``sqlite3``, ``sqlplus``) will find the
 program in the right place. There's no way to specify the location of the
 program manually.
 
-.. django-admin-option:: --database DATABASE
+.. django-cli-option:: --database DATABASE
 
 Specifies the database onto which to open a shell. Defaults to ``default``.
 
-.. django-admin-option:: -- ARGUMENTS
+.. django-cli-option:: -- ARGUMENTS
 
 Any arguments following a ``--`` divider will be passed on to the underlying
 command-line client. For example, with PostgreSQL you can use the ``psql``
@@ -304,7 +304,7 @@ On MySQL/MariaDB, you can do this with the ``mysql`` command's ``-e`` flag:
 ``diffsettings``
 ----------------
 
-.. django-admin:: diffsettings
+.. django-cli:: diffsettings
 
 Displays differences between the current settings file and Django's default
 settings (or another settings file specified by :option:`--default`).
@@ -314,17 +314,17 @@ example, the default settings don't define :setting:`ROOT_URLCONF`, so
 :setting:`ROOT_URLCONF` is followed by ``"###"`` in the output of
 ``diffsettings``.
 
-.. django-admin-option:: --all
+.. django-cli-option:: --all
 
 Displays all settings, even if they have Django's default value. Such settings
 are prefixed by ``"###"``.
 
-.. django-admin-option:: --default MODULE
+.. django-cli-option:: --default MODULE
 
 The settings module to compare the current settings against. Leave empty to
 compare against Django's default settings.
 
-.. django-admin-option:: --output {hash,unified}
+.. django-cli-option:: --output {hash,unified}
 
 Specifies the output format. Available values are ``hash`` and ``unified``.
 ``hash`` is the default mode that displays the output that's described above.
@@ -335,14 +335,14 @@ plus sign.
 ``dumpdata``
 ------------
 
-.. django-admin:: dumpdata [app_label[.ModelName] [app_label[.ModelName] ...]]
+.. django-cli:: dumpdata [app_label[.ModelName] [app_label[.ModelName] ...]]
 
 Outputs to standard output all data in the database associated with the named
 application(s).
 
 If no application name is provided, all installed applications will be dumped.
 
-The output of ``dumpdata`` can be used as input for :djadmin:`loaddata`.
+The output of ``dumpdata`` can be used as input for :djcli:`loaddata`.
 
 When result of ``dumpdata`` is saved as a file, it can serve as a
 :ref:`fixture <fixtures-explanation>` for
@@ -354,22 +354,22 @@ records to dump. If you're using a :ref:`custom manager <custom-managers>` as
 the default manager and it filters some of the available records, not all of
 the objects will be dumped.
 
-.. django-admin-option:: --all, -a
+.. django-cli-option:: --all, -a
 
 Uses Django's base manager, dumping records which might otherwise be filtered
 or modified by a custom manager.
 
-.. django-admin-option:: --format FORMAT
+.. django-cli-option:: --format FORMAT
 
 Specifies the serialization format of the output. Defaults to JSON. Supported
 formats are listed in :ref:`serialization-formats`.
 
-.. django-admin-option:: --indent INDENT
+.. django-cli-option:: --indent INDENT
 
 Specifies the number of indentation spaces to use in the output. Defaults to
 ``None`` which displays all data on single line.
 
-.. django-admin-option:: --exclude EXCLUDE, -e EXCLUDE
+.. django-cli-option:: --exclude EXCLUDE, -e EXCLUDE
 
 Prevents specific applications or models (specified in the form of
 ``app_label.ModelName``) from being dumped. If you specify a model name, then
@@ -383,11 +383,11 @@ once:
 
     django dumpdata --exclude=auth --exclude=contenttypes
 
-.. django-admin-option:: --database DATABASE
+.. django-cli-option:: --database DATABASE
 
 Specifies the database from which data will be dumped. Defaults to ``default``.
 
-.. django-admin-option:: --natural-foreign
+.. django-cli-option:: --natural-foreign
 
 Uses the ``natural_key()`` model method to serialize any foreign key and
 many-to-many relationship to objects of the type that defines the method. If
@@ -396,18 +396,18 @@ you're dumping ``contrib.auth`` ``Permission`` objects or
 flag. See the :ref:`natural keys <topics-serialization-natural-keys>`
 documentation for more details on this and the next option.
 
-.. django-admin-option:: --natural-primary
+.. django-cli-option:: --natural-primary
 
 Omits the primary key in the serialized data of this object since it can be
 calculated during deserialization.
 
-.. django-admin-option:: --pks PRIMARY_KEYS
+.. django-cli-option:: --pks PRIMARY_KEYS
 
 Outputs only the objects specified by a comma separated list of primary keys.
 This is only available when dumping one model. By default, all the records of
 the model are output.
 
-.. django-admin-option:: --output OUTPUT, -o OUTPUT
+.. django-cli-option:: --output OUTPUT, -o OUTPUT
 
 Specifies a file to write the serialized data to. By default, the data goes to
 standard output.
@@ -429,26 +429,26 @@ For example, to output the data as a compressed JSON file:
 ``flush``
 ---------
 
-.. django-admin:: flush
+.. django-cli:: flush
 
 Removes all data from the database and re-executes any post-synchronization
 handlers. The table of which migrations have been applied is not cleared.
 
 If you would rather start from an empty database and rerun all migrations, you
-should drop and recreate the database and then run :djadmin:`migrate` instead.
+should drop and recreate the database and then run :djcli:`migrate` instead.
 
-.. django-admin-option:: --noinput, --no-input
+.. django-cli-option:: --noinput, --no-input
 
 Suppresses all user prompts.
 
-.. django-admin-option:: --database DATABASE
+.. django-cli-option:: --database DATABASE
 
 Specifies the database to flush. Defaults to ``default``.
 
 ``inspectdb``
 -------------
 
-.. django-admin:: inspectdb [table [table ...]]
+.. django-cli:: inspectdb [table [table ...]]
 
 Introspects the database tables in the database pointed-to by the
 :setting:`NAME` setting and outputs a Django model module (a ``models.py``
@@ -524,24 +524,24 @@ PostgreSQL
 * Models are created for partition tables if
   :option:`--include-partitions` is used.
 
-.. django-admin-option:: --database DATABASE
+.. django-cli-option:: --database DATABASE
 
 Specifies the database to introspect. Defaults to ``default``.
 
-.. django-admin-option:: --include-partitions
+.. django-cli-option:: --include-partitions
 
 If this option is provided, models are also created for partitions.
 
 Only support for PostgreSQL is implemented.
 
-.. django-admin-option:: --include-views
+.. django-cli-option:: --include-views
 
 If this option is provided, models are also created for database views.
 
 ``listurls``
 ------------
 
-.. django-admin:: listurls
+.. django-cli:: listurls
 
 .. versionadded:: 6.2
 
@@ -549,16 +549,16 @@ List URL patterns from the project's root :doc:`URLconf </topics/http/urls>`
 with optional filtering by prefixes, inspired by ``show_urls`` from
 ``django-extensions``.
 
-.. django-admin-option:: --unsorted, -u
+.. django-cli-option:: --unsorted, -u
 
 Lists URLs in the original ordering from ``urlpatterns``. The default ordering
 is alphabetical by route.
 
-.. django-admin-option:: --prefix, -p [prefix ...]
+.. django-cli-option:: --prefix, -p [prefix ...]
 
 Filters URLs by given prefixes.
 
-.. django-admin-option:: --format, -f {tabular,stacked,json}
+.. django-cli-option:: --format, -f {tabular,stacked,json}
 
 Specifies the output format. Available values are ``tabular``, ``stacked``, and
 ``json``. Default is ``tabular``.
@@ -566,32 +566,32 @@ Specifies the output format. Available values are ``tabular``, ``stacked``, and
 ``loaddata``
 ------------
 
-.. django-admin:: loaddata fixture [fixture ...]
+.. django-cli:: loaddata fixture [fixture ...]
 
 Searches for and loads the contents of the named
 :ref:`fixture <fixtures-explanation>` into the database.
 
-.. django-admin-option:: --database DATABASE
+.. django-cli-option:: --database DATABASE
 
 Specifies the database into which the data will be loaded. Defaults to
 ``default``.
 
-.. django-admin-option:: --ignorenonexistent, -i
+.. django-cli-option:: --ignorenonexistent, -i
 
 Ignores fields and models that may have been removed since the fixture was
 originally generated.
 
-.. django-admin-option:: --app APP_LABEL
+.. django-cli-option:: --app APP_LABEL
 
 Specifies a single app to look for fixtures in rather than looking in all apps.
 
-.. django-admin-option:: --format FORMAT
+.. django-cli-option:: --format FORMAT
 
 Specifies the :ref:`serialization format <serialization-formats>` (e.g.,
 ``json`` or ``xml``) for fixtures :ref:`read from stdin
 <loading-fixtures-stdin>`.
 
-.. django-admin-option:: --exclude EXCLUDE, -e EXCLUDE
+.. django-cli-option:: --exclude EXCLUDE, -e EXCLUDE
 
 Excludes loading the fixtures from the given applications and/or models (in the
 form of ``app_label`` or ``app_label.ModelName``). Use the option multiple
@@ -620,7 +620,7 @@ For example:
 
     django dumpdata --format=json --database=test app_label.ModelName | django loaddata --format=json --database=prod -
 
-The :djadmin:`dumpdata` command can be used to generate input for ``loaddata``.
+The :djcli:`dumpdata` command can be used to generate input for ``loaddata``.
 
 .. seealso::
 
@@ -629,24 +629,24 @@ The :djadmin:`dumpdata` command can be used to generate input for ``loaddata``.
 ``makemessages``
 ----------------
 
-.. django-admin:: makemessages
+.. django-cli:: makemessages
 
 Runs over the entire source tree of the current directory and pulls out all
 strings marked for translation. It creates (or updates) a message file in the
 conf/locale (in the Django tree) or locale (for project and application)
 directory. After making changes to the messages files you need to compile them
-with :djadmin:`compilemessages` for use with the builtin gettext support. See
+with :djcli:`compilemessages` for use with the builtin gettext support. See
 the :ref:`i18n documentation <how-to-create-language-files>` for details.
 
 This command doesn't require configured settings. However, when settings aren't
 configured, the command can't ignore the :setting:`MEDIA_ROOT` and
 :setting:`STATIC_ROOT` directories or include :setting:`LOCALE_PATHS`.
 
-.. django-admin-option:: --all, -a
+.. django-cli-option:: --all, -a
 
 Updates the message files for all available languages.
 
-.. django-admin-option:: --extension EXTENSIONS, -e EXTENSIONS
+.. django-cli-option:: --extension EXTENSIONS, -e EXTENSIONS
 
 Specifies a list of file extensions to examine (default: ``html``, ``txt``,
 ``py`` or ``js`` if :option:`--domain` is ``djangojs``).
@@ -664,11 +664,11 @@ multiple times:
 
     django makemessages --locale=de --extension=html,txt --extension xml
 
-.. django-admin-option:: --locale LOCALE, -l LOCALE
+.. django-cli-option:: --locale LOCALE, -l LOCALE
 
 Specifies the locale(s) to process.
 
-.. django-admin-option:: --exclude EXCLUDE, -x EXCLUDE
+.. django-cli-option:: --exclude EXCLUDE, -x EXCLUDE
 
 Specifies the locale(s) to exclude from processing. If not provided, no locales
 are excluded.
@@ -686,14 +686,14 @@ Example usage:
     django makemessages -x pt_BR
     django makemessages -x pt_BR -x fr
 
-.. django-admin-option:: --domain DOMAIN, -d DOMAIN
+.. django-cli-option:: --domain DOMAIN, -d DOMAIN
 
 Specifies the domain of the messages files. Supported options are:
 
 * ``django`` for all ``*.py``, ``*.html`` and ``*.txt`` files (default)
 * ``djangojs`` for ``*.js`` files
 
-.. django-admin-option:: --symlinks, -s
+.. django-cli-option:: --symlinks, -s
 
 Follows symlinks to directories when looking for new translation strings.
 
@@ -703,7 +703,7 @@ Example usage:
 
     django makemessages --locale=de --symlinks
 
-.. django-admin-option:: --ignore PATTERN, -i PATTERN
+.. django-cli-option:: --ignore PATTERN, -i PATTERN
 
 Ignores files or directories matching the given :mod:`glob`-style pattern. Use
 multiple times to ignore more.
@@ -716,21 +716,21 @@ Example usage:
 
     django makemessages --locale=en_US --ignore=apps/* --ignore=secret/*.html
 
-.. django-admin-option:: --no-default-ignore
+.. django-cli-option:: --no-default-ignore
 
 Disables the default values of ``--ignore``.
 
-.. django-admin-option:: --no-wrap
+.. django-cli-option:: --no-wrap
 
 Disables breaking long message lines into several lines in language files.
 
-.. django-admin-option:: --no-location
+.. django-cli-option:: --no-location
 
 Suppresses writing '``#: filename:line``’ comment lines in language files.
 Using this option makes it harder for technically skilled translators to
 understand each message's context.
 
-.. django-admin-option:: --add-location [{full,file,never}]
+.. django-cli-option:: --add-location [{full,file,never}]
 
 Controls ``#: filename:line`` comment lines in language files. If the option
 is:
@@ -742,11 +742,11 @@ is:
 
 Requires ``gettext`` 0.19 or newer.
 
-.. django-admin-option:: --no-obsolete
+.. django-cli-option:: --no-obsolete
 
 Removes obsolete message strings from the ``.po`` files.
 
-.. django-admin-option:: --keep-pot
+.. django-cli-option:: --keep-pot
 
 Prevents deleting the temporary ``.pot`` files generated before creating the
 ``.po`` file. This is useful for debugging errors which may prevent the final
@@ -755,12 +755,12 @@ language files from being created.
 .. seealso::
 
     See :ref:`customizing-makemessages` for instructions on how to customize
-    the keywords that :djadmin:`makemessages` passes to ``xgettext``.
+    the keywords that :djcli:`makemessages` passes to ``xgettext``.
 
 ``makemigrations``
 ------------------
 
-.. django-admin:: makemigrations [app_label [app_label ...]]
+.. django-cli:: makemigrations [app_label [app_label ...]]
 
 Creates new migrations based on the changes detected to your models.
 Migrations, their relationship with apps and more are covered in depth in
@@ -773,48 +773,48 @@ of a ``ForeignKey``, for example).
 To add migrations to an app that doesn't have a ``migrations`` directory, run
 ``makemigrations`` with the app's ``app_label``.
 
-.. django-admin-option:: --noinput, --no-input
+.. django-cli-option:: --noinput, --no-input
 
 Suppresses all user prompts. If a suppressed prompt cannot be resolved
 automatically, the command will exit with error code 3.
 
-.. django-admin-option:: --empty
+.. django-cli-option:: --empty
 
 Outputs an empty migration for the specified apps, for manual editing. This is
 for advanced users and should not be used unless you are familiar with the
 migration format, migration operations, and the dependencies between your
 migrations.
 
-.. django-admin-option:: --dry-run
+.. django-cli-option:: --dry-run
 
 Shows what migrations would be made without actually writing any migrations
 files to disk. Using this option along with ``--verbosity 3`` will also show
 the complete migrations files that would be written.
 
-.. django-admin-option:: --merge
+.. django-cli-option:: --merge
 
 Enables fixing of migration conflicts.
 
-.. django-admin-option:: --name NAME, -n NAME
+.. django-cli-option:: --name NAME, -n NAME
 
 Allows naming the generated migration(s) instead of using a generated name. The
 name must be a valid Python :ref:`identifier <python:identifiers>`.
 
-.. django-admin-option:: --no-header
+.. django-cli-option:: --no-header
 
 Generate migration files without Django version and timestamp header.
 
-.. django-admin-option:: --check
+.. django-cli-option:: --check
 
 Makes ``makemigrations`` exit with a non-zero status when model changes without
 migrations are detected. Implies ``--dry-run``.
 
-.. django-admin-option:: --scriptable
+.. django-cli-option:: --scriptable
 
 Diverts log output and input prompts to ``stderr``, writing only paths of
 generated migration files to ``stdout``.
 
-.. django-admin-option:: --update
+.. django-cli-option:: --update
 
 Merges model changes into the latest migration and optimize the resulting
 operations.
@@ -825,7 +825,7 @@ previous name, set it using ``--name``.
 ``migrate``
 -----------
 
-.. django-admin:: migrate [app_label] [migration_name]
+.. django-cli:: migrate [app_label] [migration_name]
 
 Synchronizes the database state with the current set of models and migrations.
 Migrations, their relationship with apps and more are covered in depth in
@@ -851,11 +851,11 @@ The behavior of this command changes depending on the arguments provided:
     unapplied, regardless of ``<app_label>``. You can use ``--plan`` to check
     which migrations will be unapplied.
 
-.. django-admin-option:: --database DATABASE
+.. django-cli-option:: --database DATABASE
 
 Specifies the database to migrate. Defaults to ``default``.
 
-.. django-admin-option:: --fake
+.. django-cli-option:: --fake
 
 Marks the migrations up to the target one (following the rules above) as
 applied, but without actually running the SQL to change your database schema.
@@ -866,7 +866,7 @@ be warned that using ``--fake`` runs the risk of putting the migration state
 table into a state where manual recovery will be needed to make migrations
 run correctly.
 
-.. django-admin-option:: --fake-initial
+.. django-cli-option:: --fake-initial
 
 Allows Django to skip an app's initial migration if all database tables with
 the names of all models created by all
@@ -877,28 +877,28 @@ option does not, however, check for matching database schema beyond matching
 table names and so is only safe to use if you are confident that your existing
 schema matches what is recorded in your initial migration.
 
-.. django-admin-option:: --plan
+.. django-cli-option:: --plan
 
 Shows the migration operations that will be performed for the given ``migrate``
 command.
 
-.. django-admin-option:: --run-syncdb
+.. django-cli-option:: --run-syncdb
 
 Allows creating tables for apps without migrations. While this isn't
 recommended, the migrations framework is sometimes too slow on large projects
 with hundreds of models.
 
-.. django-admin-option:: --noinput, --no-input
+.. django-cli-option:: --noinput, --no-input
 
 Suppresses all user prompts. An example prompt is asking about removing stale
 content types.
 
-.. django-admin-option:: --check
+.. django-cli-option:: --check
 
 Makes ``migrate`` exit with a non-zero status when unapplied migrations are
 detected.
 
-.. django-admin-option:: --prune
+.. django-cli-option:: --prune
 
 Deletes nonexistent migrations from the ``django_migrations`` table. This is
 useful when migration files replaced by a squashed migration have been removed.
@@ -907,14 +907,14 @@ See :ref:`migration-squashing` for more details.
 ``optimizemigration``
 ---------------------
 
-.. django-admin:: optimizemigration app_label migration_name
+.. django-cli:: optimizemigration app_label migration_name
 
 Optimizes the operations for the named migration and overrides the existing
 file. If the migration contains functions that must be manually copied, the
 command creates a new migration file suffixed with ``_optimized`` that is meant
 to replace the named migration.
 
-.. django-admin-option:: --check
+.. django-cli-option:: --check
 
 Makes ``optimizemigration`` exit with a non-zero status when a migration can be
 optimized.
@@ -922,7 +922,7 @@ optimized.
 ``runserver``
 -------------
 
-.. django-admin:: runserver [addrport]
+.. django-cli:: runserver [addrport]
 
 Starts a lightweight development web server on the local machine. By default,
 the server runs on port 8000 on the IP address ``127.0.0.1``. You can pass in
@@ -972,7 +972,7 @@ more robust change detection, and a reduction in power usage. Django supports
 
 When you start the server, and each time you change Python code while the
 server is running, the system check framework will check your entire Django
-project for some common errors (see the :djadmin:`check` command). If any
+project for some common errors (see the :djcli:`check` command). If any
 errors are found, they will be printed to standard output. You can use the
 ``--skip-checks`` option to skip running system checks.
 
@@ -990,24 +990,24 @@ You can provide an IPv6 address surrounded by brackets
 A hostname containing ASCII-only characters can also be used.
 
 If the :doc:`staticfiles</ref/contrib/staticfiles>` contrib app is enabled
-(default in new projects) the :djadmin:`runserver` command will be overridden
+(default in new projects) the :djcli:`runserver` command will be overridden
 with its own :ref:`runserver<staticfiles-runserver>` command.
 
 Logging of each request and response of the server is sent to the
 :ref:`django-server-logger` logger.
 
-.. django-admin-option:: --noreload
+.. django-cli-option:: --noreload
 
 Disables the auto-reloader. This means any Python code changes you make while
 the server is running will *not* take effect if the particular Python modules
 have already been loaded into memory.
 
-.. django-admin-option:: --nothreading
+.. django-cli-option:: --nothreading
 
 Disables use of threading in the development server. The server is
 multithreaded by default.
 
-.. django-admin-option:: --ipv6, -6
+.. django-cli-option:: --ipv6, -6
 
 Uses IPv6 for the development server. This changes the default IP address from
 ``127.0.0.1`` to ``::1``.
@@ -1099,7 +1099,7 @@ The Django Daphne project provides :ref:`daphne-runserver` that you can use.
 ``sendtestemail``
 -----------------
 
-.. django-admin:: sendtestemail [email [email ...]]
+.. django-cli:: sendtestemail [email [email ...]]
 
 Sends a test email (to confirm email sending through Django is working) to the
 recipient(s) specified. For example:
@@ -1111,19 +1111,19 @@ recipient(s) specified. For example:
 The following options may be used in any combination with each other and with
 recipient email arguments.
 
-.. django-admin-option:: --using ALIAS
+.. django-cli-option:: --using ALIAS
 
 .. versionadded:: 6.1
 
 Specifies the :setting:`MAILERS` alias to use for sending the test email to
 the recipients given as arguments. Defaults to the ``"default"`` mailer.
 
-.. django-admin-option:: --managers
+.. django-cli-option:: --managers
 
 Mails the email addresses specified in :setting:`MANAGERS` using
 :func:`~django.core.mail.mail_managers`.
 
-.. django-admin-option:: --admins
+.. django-cli-option:: --admins
 
 Mails the email addresses specified in :setting:`ADMINS` using
 :func:`~django.core.mail.mail_admins`.
@@ -1131,7 +1131,7 @@ Mails the email addresses specified in :setting:`ADMINS` using
 ``shell``
 ---------
 
-.. django-admin:: shell
+.. django-cli:: shell
 
 Starts the Python interactive interpreter.
 
@@ -1150,7 +1150,7 @@ flag.
 See the guide on :ref:`customizing this behavior
 <customizing-shell-auto-imports>` to add or remove automatic imports.
 
-.. django-admin-option:: --interface {ipython,bpython,python}, -i {ipython,bpython,python}
+.. django-cli-option:: --interface {ipython,bpython,python}, -i {ipython,bpython,python}
 
 Specifies the shell to use. By default, Django will use IPython_ or bpython_ if
 either is installed. If both are installed, specify which one you want like so:
@@ -1177,17 +1177,17 @@ Python interpreter, use ``python`` as the interface name, like so:
 .. _IPython: https://ipython.org/
 .. _bpython: https://bpython-interpreter.org/
 
-.. django-admin-option:: --no-startup
+.. django-cli-option:: --no-startup
 
 Disables reading the startup script for the "plain" Python interpreter. By
 default, the script pointed to by the :envvar:`PYTHONSTARTUP` environment
 variable or the ``~/.pythonrc.py`` script is read.
 
-.. django-admin-option:: --no-imports
+.. django-cli-option:: --no-imports
 
 Disables the automatic import of models from :setting:`INSTALLED_APPS`.
 
-.. django-admin-option:: --command COMMAND, -c COMMAND
+.. django-cli-option:: --command COMMAND, -c COMMAND
 
 Lets you pass a command as a string to execute it as Django, like so:
 
@@ -1210,11 +1210,11 @@ On Windows, the REPL is output due to implementation limits of
 ``showmigrations``
 ------------------
 
-.. django-admin:: showmigrations [app_label [app_label ...]]
+.. django-cli:: showmigrations [app_label [app_label ...]]
 
 Shows all migrations in a project. You can choose from one of two formats:
 
-.. django-admin-option:: --list, -l
+.. django-cli-option:: --list, -l
 
 Lists all of the apps Django knows about, the migrations available for each
 app, and whether or not each migration is applied (marked by an ``[X]`` next to
@@ -1226,7 +1226,7 @@ under them.
 
 This is the default output format.
 
-.. django-admin-option:: --plan, -p
+.. django-cli-option:: --plan, -p
 
 Shows the migration plan Django will follow to apply migrations. Like
 ``--list``, applied migrations are marked by an ``[X]``. For a ``--verbosity``
@@ -1235,26 +1235,26 @@ of 2 and above, all dependencies of a migration will also be shown.
 ``app_label``\s arguments limit the output, however, dependencies of provided
 apps may also be included.
 
-.. django-admin-option:: --database DATABASE
+.. django-cli-option:: --database DATABASE
 
 Specifies the database to examine. Defaults to ``default``.
 
 ``sqlflush``
 ------------
 
-.. django-admin:: sqlflush
+.. django-cli:: sqlflush
 
-Prints the SQL statements that would be executed for the :djadmin:`flush`
+Prints the SQL statements that would be executed for the :djcli:`flush`
 command.
 
-.. django-admin-option:: --database DATABASE
+.. django-cli-option:: --database DATABASE
 
 Specifies the database for which to print the SQL. Defaults to ``default``.
 
 ``sqlmigrate``
 --------------
 
-.. django-admin:: sqlmigrate app_label migration_name
+.. django-cli:: sqlmigrate app_label migration_name
 
 Prints the SQL for the named migration. This requires an active database
 connection, which it will use to resolve constraint names; this means you must
@@ -1262,19 +1262,19 @@ generate the SQL against a copy of the database you wish to later apply it on.
 
 Note that ``sqlmigrate`` doesn't colorize its output.
 
-.. django-admin-option:: --backwards
+.. django-cli-option:: --backwards
 
 Generates the SQL for unapplying the migration. By default, the SQL created is
 for running the migration in the forwards direction.
 
-.. django-admin-option:: --database DATABASE
+.. django-cli-option:: --database DATABASE
 
 Specifies the database for which to generate the SQL. Defaults to ``default``.
 
 ``sqlsequencereset``
 --------------------
 
-.. django-admin:: sqlsequencereset app_label [app_label ...]
+.. django-cli:: sqlsequencereset app_label [app_label ...]
 
 Prints the SQL statements for resetting sequences for the given app name(s).
 
@@ -1284,14 +1284,14 @@ number for automatically incremented fields.
 Use this command to generate SQL which will fix cases where a sequence is out
 of sync with its automatically incremented field data.
 
-.. django-admin-option:: --database DATABASE
+.. django-cli-option:: --database DATABASE
 
 Specifies the database for which to print the SQL. Defaults to ``default``.
 
 ``squashmigrations``
 --------------------
 
-.. django-admin:: squashmigrations app_label [start_migration_name] migration_name
+.. django-cli:: squashmigrations app_label [start_migration_name] migration_name
 
 Squashes the migrations for ``app_label`` up to and including
 ``migration_name`` down into fewer migrations, if possible. The resulting
@@ -1303,7 +1303,7 @@ starting from and including this migration. This helps to mitigate the
 squashing limitation of :class:`~django.db.migrations.operations.RunPython` and
 :class:`django.db.migrations.operations.RunSQL` migration operations.
 
-.. django-admin-option:: --no-optimize
+.. django-cli-option:: --no-optimize
 
 Disables the optimizer when generating a squashed migration. By default, Django
 will try to optimize the operations in your migrations to reduce the size of
@@ -1311,23 +1311,23 @@ the resulting file. Use this option if this process is failing or creating
 incorrect migrations, though please also file a Django bug report about the
 behavior, as optimization is meant to be safe.
 
-.. django-admin-option:: --noinput, --no-input
+.. django-cli-option:: --noinput, --no-input
 
 Suppresses all user prompts.
 
-.. django-admin-option:: --squashed-name SQUASHED_NAME
+.. django-cli-option:: --squashed-name SQUASHED_NAME
 
 Sets the name of the squashed migration. When omitted, the name is based on the
 first and last migration, with ``_squashed_`` in between.
 
-.. django-admin-option:: --no-header
+.. django-cli-option:: --no-header
 
 Generate squashed migration file without Django version and timestamp header.
 
 ``startapp``
 ------------
 
-.. django-admin:: startapp name [directory]
+.. django-cli:: startapp name [directory]
 
 Creates a Django app directory structure for the given app name in the current
 directory or the given destination.
@@ -1348,7 +1348,7 @@ For example:
 
 .. _custom-app-and-project-templates:
 
-.. django-admin-option:: --template TEMPLATE
+.. django-cli-option:: --template TEMPLATE
 
 Provides the path to a directory with a custom app template file, or a path to
 an uncompressed archive (``.tar``) or a compressed archive (``.tar.gz``,
@@ -1382,18 +1382,18 @@ zip files, you can use a URL like:
 
     Contents of templates should be carefully inspected before use.
 
-.. django-admin-option:: --extension EXTENSIONS, -e EXTENSIONS
+.. django-cli-option:: --extension EXTENSIONS, -e EXTENSIONS
 
 Specifies which file extensions in the app template should be rendered with the
 template engine. Defaults to ``py``.
 
-.. django-admin-option:: --name FILES, -n FILES
+.. django-cli-option:: --name FILES, -n FILES
 
 Specifies which files in the app template (in addition to those matching
 ``--extension``) should be rendered with the template engine. Defaults to an
 empty list.
 
-.. django-admin-option:: --exclude DIRECTORIES, -x DIRECTORIES
+.. django-cli-option:: --exclude DIRECTORIES, -x DIRECTORIES
 
 Specifies which directories in the app template should be excluded, in addition
 to ``.git`` and ``__pycache__``. If this option is not provided, directories
@@ -1444,7 +1444,7 @@ matching files is:
 ``startproject``
 ----------------
 
-.. django-admin:: startproject name [directory]
+.. django-cli:: startproject name [directory]
 
 Creates a Django project directory structure for the given project name in
 the current directory or the given destination.
@@ -1468,7 +1468,7 @@ For example:
 
     django startproject myproject /Users/jezdez/Code/myproject_repo
 
-.. django-admin-option:: --template TEMPLATE
+.. django-cli-option:: --template TEMPLATE
 
 Specifies a directory, file path, or URL of a custom project template. See the
 :option:`startapp --template` documentation for examples and usage. The same
@@ -1476,18 +1476,18 @@ Specifies a directory, file path, or URL of a custom project template. See the
 malicious or poorly constructed templates may introduce weaknesses or consume
 excessive resources, and templates should be carefully inspected before use.
 
-.. django-admin-option:: --extension EXTENSIONS, -e EXTENSIONS
+.. django-cli-option:: --extension EXTENSIONS, -e EXTENSIONS
 
 Specifies which file extensions in the project template should be rendered with
 the template engine. Defaults to ``py``.
 
-.. django-admin-option:: --name FILES, -n FILES
+.. django-cli-option:: --name FILES, -n FILES
 
 Specifies which files in the project template (in addition to those matching
 ``--extension``) should be rendered with the template engine. Defaults to an
 empty list.
 
-.. django-admin-option:: --exclude DIRECTORIES, -x DIRECTORIES
+.. django-cli-option:: --exclude DIRECTORIES, -x DIRECTORIES
 
 Specifies which directories in the project template should be excluded, in
 addition to ``.git`` and ``__pycache__``. If this option is not provided,
@@ -1505,26 +1505,26 @@ The template context (see :class:`~django.template.Context`) used is:
 
 Please also see the :ref:`rendering warning <render_warning>` and
 :ref:`trusted code warning <trusted_code_warning>` as mentioned for
-:djadmin:`startapp`.
+:djcli:`startapp`.
 
 ``test``
 --------
 
-.. django-admin:: test [test_label [test_label ...]]
+.. django-cli:: test [test_label [test_label ...]]
 
 Runs tests for all installed apps. See :doc:`/topics/testing/index` for more
 information.
 
-.. django-admin-option:: --failfast
+.. django-cli-option:: --failfast
 
 Stops running tests and reports the failure immediately after a test fails.
 
-.. django-admin-option:: --testrunner TESTRUNNER
+.. django-cli-option:: --testrunner TESTRUNNER
 
 Controls the test runner class that is used to execute tests. This value
 overrides the value provided by the :setting:`TEST_RUNNER` setting.
 
-.. django-admin-option:: --noinput, --no-input
+.. django-cli-option:: --noinput, --no-input
 
 Suppresses all user prompts. A typical prompt is a warning about deleting an
 existing test database.
@@ -1536,7 +1536,7 @@ The ``test`` command receives options on behalf of the specified
 :option:`--testrunner`. These are the options of the default test runner:
 :class:`~django.test.runner.DiscoverRunner`.
 
-.. django-admin-option:: --keepdb
+.. django-cli-option:: --keepdb
 
 Preserves the test database between test runs. This has the advantage of
 skipping both the create and destroy actions which can greatly decrease the
@@ -1546,7 +1546,7 @@ subsequent run. Unless the :setting:`MIGRATE <TEST_MIGRATE>` test setting is
 ``False``, any unapplied migrations will also be applied to the test database
 before running the test suite.
 
-.. django-admin-option:: --shuffle [SEED]
+.. django-cli-option:: --shuffle [SEED]
 
 Randomizes the order of tests before running them. This can help detect tests
 that aren't properly isolated. The test order generated by this option is a
@@ -1562,24 +1562,24 @@ subset of tests, the new order will be the original shuffling restricted to the
 smaller set. Similarly, when adding tests while keeping the seed the same, the
 order of the original tests will be the same in the new order.
 
-.. django-admin-option:: --reverse, -r
+.. django-cli-option:: --reverse, -r
 
 Sorts test cases in the opposite execution order. This may help in debugging
 the side effects of tests that aren't properly isolated. :ref:`Grouping by test
 class <order-of-tests>` is preserved when using this option. This can be used
 in conjunction with ``--shuffle`` to reverse the order for a particular seed.
 
-.. django-admin-option:: --debug-mode
+.. django-cli-option:: --debug-mode
 
 Sets the :setting:`DEBUG` setting to ``True`` prior to running tests. This may
 help troubleshoot test failures.
 
-.. django-admin-option:: --debug-sql, -d
+.. django-cli-option:: --debug-sql, -d
 
 Enables :ref:`SQL logging <django-db-logger>` for failing tests. If
 ``--verbosity`` is ``2``, then queries in passing tests are also output.
 
-.. django-admin-option:: --parallel [N]
+.. django-cli-option:: --parallel [N]
 
 .. envvar:: DJANGO_TEST_PROCESSES
 
@@ -1643,41 +1643,41 @@ Tests that fail to load are always considered matching.
 Excludes tests :ref:`marked with the specified tags <topics-tagging-tests>`.
 May be specified multiple times and combined with :option:`test --tag`.
 
-.. django-admin-option:: -k TEST_NAME_PATTERNS
+.. django-cli-option:: -k TEST_NAME_PATTERNS
 
 Runs test methods and classes matching test name patterns, in the same way as
 :option:`unittest's -k option<unittest.-k>`. Can be specified multiple times.
 
-.. django-admin-option:: --pdb
+.. django-cli-option:: --pdb
 
 Spawns a ``pdb`` debugger at each test error or failure. If you have it
 installed, ``ipdb`` is used instead.
 
-.. django-admin-option:: --buffer, -b
+.. django-cli-option:: --buffer, -b
 
 Discards output (``stdout`` and ``stderr``) for passing tests, in the same way
 as :option:`unittest's --buffer option<unittest.-b>`.
 
-.. django-admin-option:: --no-faulthandler
+.. django-cli-option:: --no-faulthandler
 
 Django automatically calls :func:`faulthandler.enable` when starting the
 tests, which allows it to print a traceback if the interpreter crashes. Pass
 ``--no-faulthandler`` to disable this behavior.
 
-.. django-admin-option:: --timing
+.. django-cli-option:: --timing
 
 Outputs timings, including database setup and total run time.
 
-.. django-admin-option:: --durations N
+.. django-cli-option:: --durations N
 
 Shows the N slowest test cases (N=0 for all).
 
 ``testserver``
 --------------
 
-.. django-admin:: testserver [fixture [fixture ...]]
+.. django-cli:: testserver [fixture [fixture ...]]
 
-Runs a Django development server (as in :djadmin:`runserver`) using data from
+Runs a Django development server (as in :djcli:`runserver`) using data from
 the given fixture(s).
 
 For example, this command:
@@ -1690,8 +1690,8 @@ For example, this command:
 
 #. Create a test database, as described in :ref:`the-test-database`.
 #. Populate the test database with fixture data from the given fixtures.
-   (For more on fixtures, see the documentation for :djadmin:`loaddata` above.)
-#. Runs the Django development server (as in :djadmin:`runserver`), pointed at
+   (For more on fixtures, see the documentation for :djcli:`loaddata` above.)
+#. Runs the Django development server (as in :djcli:`runserver`), pointed at
    this newly created test database instead of your production database.
 
 This is useful in a number of ways:
@@ -1703,20 +1703,20 @@ This is useful in a number of ways:
 * Let's say you're developing your Django application and have a "pristine"
   copy of a database that you'd like to interact with. You can dump your
   database to a :ref:`fixture <fixtures-explanation>` (using the
-  :djadmin:`dumpdata` command, explained above), then use ``testserver`` to run
+  :djcli:`dumpdata` command, explained above), then use ``testserver`` to run
   your web application with that data. With this arrangement, you have the
   flexibility of messing up your data in any way, knowing that whatever data
   changes you're making are only being made to a test database.
 
 Note that this server does *not* automatically detect changes to your Python
-source code (as :djadmin:`runserver` does). It does, however, detect changes to
+source code (as :djcli:`runserver` does). It does, however, detect changes to
 templates.
 
-.. django-admin-option:: --addrport ADDRPORT
+.. django-cli-option:: --addrport ADDRPORT
 
 Specifies a different port, or IP address and port, from the default of
 ``127.0.0.1:8000``. This value follows exactly the same format and serves
-exactly the same function as the argument to the :djadmin:`runserver` command.
+exactly the same function as the argument to the :djcli:`runserver` command.
 
 Examples:
 
@@ -1737,7 +1737,7 @@ To run on 1.2.3.4:7000 with a ``test`` fixture:
 
     django testserver --addrport 1.2.3.4:7000 test
 
-.. django-admin-option:: --noinput, --no-input
+.. django-cli-option:: --noinput, --no-input
 
 Suppresses all user prompts. A typical prompt is a warning about deleting an
 existing test database.
@@ -1756,7 +1756,7 @@ their application.
 ``changepassword``
 ~~~~~~~~~~~~~~~~~~
 
-.. django-admin:: changepassword [<username>]
+.. django-cli:: changepassword [<username>]
 
 This command is only available if Django's :doc:`authentication system
 </topics/auth/index>` (``django.contrib.auth``) is installed.
@@ -1766,7 +1766,7 @@ for the given user. If the entries are identical, this immediately becomes the
 new password. If you do not supply a user, the command will attempt to change
 the password whose username matches the current user.
 
-.. django-admin-option:: --database DATABASE
+.. django-cli-option:: --database DATABASE
 
 Specifies the database to query for the user. Defaults to ``default``.
 
@@ -1779,7 +1779,7 @@ Example usage:
 ``createsuperuser``
 ~~~~~~~~~~~~~~~~~~~
 
-.. django-admin:: createsuperuser
+.. django-cli:: createsuperuser
 
 .. envvar:: DJANGO_SUPERUSER_PASSWORD
 
@@ -1804,20 +1804,20 @@ fields (listed in
 are overridden by a command line argument. For example, to provide an ``email``
 field, you can use ``DJANGO_SUPERUSER_EMAIL`` environment variable.
 
-.. django-admin-option:: --noinput, --no-input
+.. django-cli-option:: --noinput, --no-input
 
 Suppresses all user prompts. If a suppressed prompt cannot be resolved
 automatically, the command will exit with error code 1.
 
-.. django-admin-option:: --username USERNAME
-.. django-admin-option:: --email EMAIL
+.. django-cli-option:: --username USERNAME
+.. django-cli-option:: --email EMAIL
 
 The username and email address for the new account can be supplied by
 using the ``--username`` and ``--email`` arguments on the command
 line. If either of those is not supplied, ``createsuperuser`` will prompt for
 it when running interactively.
 
-.. django-admin-option:: --database DATABASE
+.. django-cli-option:: --database DATABASE
 
 Specifies the database into which the superuser object will be saved.
 
@@ -1835,7 +1835,7 @@ instance.
 ``remove_stale_contenttypes``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. django-admin:: remove_stale_contenttypes
+.. django-cli:: remove_stale_contenttypes
 
 This command is only available if Django's :doc:`contenttypes app
 </ref/contrib/contenttypes>` (:mod:`django.contrib.contenttypes`) is installed.
@@ -1845,11 +1845,11 @@ that depend on the deleted content types will also be deleted. A list of
 deleted objects will be displayed before you confirm it's okay to proceed with
 the deletion.
 
-.. django-admin-option:: --database DATABASE
+.. django-cli-option:: --database DATABASE
 
 Specifies the database to use. Defaults to ``default``.
 
-.. django-admin-option:: --include-stale-apps
+.. django-cli-option:: --include-stale-apps
 
 Deletes stale content types including ones from previously installed apps that
 have been removed from :setting:`INSTALLED_APPS`. Defaults to ``False``.
@@ -1863,7 +1863,7 @@ have been removed from :setting:`INSTALLED_APPS`. Defaults to ``False``.
 This command is only available if :doc:`GeoDjango </ref/contrib/gis/index>`
 (``django.contrib.gis``) is installed.
 
-Please refer to its :djadmin:`description <ogrinspect>` in the GeoDjango
+Please refer to its :djcli:`description <ogrinspect>` in the GeoDjango
 documentation.
 
 ``django.contrib.sessions``
@@ -1872,7 +1872,7 @@ documentation.
 ``clearsessions``
 ~~~~~~~~~~~~~~~~~
 
-.. django-admin:: clearsessions
+.. django-cli:: clearsessions
 
 Can be run as a cron job or directly to clean out expired sessions.
 
@@ -1885,7 +1885,7 @@ Can be run as a cron job or directly to clean out expired sessions.
 This command is only available if the :doc:`static files application
 </howto/static-files/index>` (``django.contrib.staticfiles``) is installed.
 
-Please refer to its :djadmin:`description <collectstatic>` in the
+Please refer to its :djcli:`description <collectstatic>` in the
 :doc:`staticfiles </ref/contrib/staticfiles>` documentation.
 
 ``findstatic``
@@ -1894,7 +1894,7 @@ Please refer to its :djadmin:`description <collectstatic>` in the
 This command is only available if the :doc:`static files application
 </howto/static-files/index>` (``django.contrib.staticfiles``) is installed.
 
-Please refer to its :djadmin:`description <findstatic>` in the
+Please refer to its :djcli:`description <findstatic>` in the
 :doc:`staticfiles </ref/contrib/staticfiles>` documentation.
 
 Default options
@@ -1905,7 +1905,7 @@ Default options
 Although some commands may allow their own custom options, every command
 allows for the following options by default:
 
-.. django-admin-option:: --pythonpath PYTHONPATH
+.. django-cli-option:: --pythonpath PYTHONPATH
 
 Adds the given filesystem path to the Python :data:`sys.path` module
 attribute. If this isn't provided, ``django`` will use the
@@ -1920,7 +1920,7 @@ Example usage:
 
     django migrate --pythonpath='/home/djangoprojects/myproject'
 
-.. django-admin-option:: --settings SETTINGS
+.. django-cli-option:: --settings SETTINGS
 
 Specifies the settings module to use. The settings module should be in Python
 package syntax, e.g. ``mysite.settings``. If this isn't provided,
@@ -1936,13 +1936,13 @@ Example usage:
 
     django migrate --settings=mysite.settings
 
-.. django-admin-option:: --traceback
+.. django-cli-option:: --traceback
 
 Displays a full stack trace when a :exc:`~django.core.management.CommandError`
 is raised. By default, ``django`` will show an error message when a
 ``CommandError`` occurs and a full stack trace for any other exception.
 
-This option is ignored by :djadmin:`runserver`.
+This option is ignored by :djcli:`runserver`.
 
 Example usage:
 
@@ -1950,7 +1950,7 @@ Example usage:
 
     django migrate --traceback
 
-.. django-admin-option:: --verbosity {0,1,2,3}, -v {0,1,2,3}
+.. django-cli-option:: --verbosity {0,1,2,3}, -v {0,1,2,3}
 
 Specifies the amount of notification and debug information that a command
 should print to the console.
@@ -1960,7 +1960,7 @@ should print to the console.
 * ``2`` means verbose output.
 * ``3`` means *very* verbose output.
 
-This option is ignored by :djadmin:`runserver`.
+This option is ignored by :djcli:`runserver`.
 
 Example usage:
 
@@ -1968,7 +1968,7 @@ Example usage:
 
     django migrate --verbosity 2
 
-.. django-admin-option:: --no-color
+.. django-cli-option:: --no-color
 
 Disables colorized command output. Some commands format their output to be
 colorized. For example, errors will be printed to the console in red and SQL
@@ -1980,13 +1980,13 @@ Example usage:
 
     django runserver --no-color
 
-.. django-admin-option:: --force-color
+.. django-cli-option:: --force-color
 
 Forces colorization of the command output if it would otherwise be disabled
 as discussed in :ref:`syntax-coloring`. For example, you may want to pipe
 colored output to another command.
 
-.. django-admin-option:: --skip-checks
+.. django-cli-option:: --skip-checks
 
 Skips running system checks prior to running the command. This option is only
 available if the
@@ -2162,9 +2162,9 @@ See :doc:`/howto/custom-management-commands` for how to add customized actions.
 Black formatting
 ----------------
 
-The Python files created by :djadmin:`startproject`, :djadmin:`startapp`,
-:djadmin:`optimizemigration`, :djadmin:`makemigrations`, and
-:djadmin:`squashmigrations` are formatted using the ``black`` command if it is
+The Python files created by :djcli:`startproject`, :djcli:`startapp`,
+:djcli:`optimizemigration`, :djcli:`makemigrations`, and
+:djcli:`squashmigrations` are formatted using the ``black`` command if it is
 present on your ``PATH``.
 
 If you have ``black`` globally installed, but do not wish it used for the
