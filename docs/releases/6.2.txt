@@ -42,6 +42,13 @@ and ``RemovedInDjango71Warning`` becomes ``RemovedInDjango2029Warning``.
 
 .. _DEP 20: https://github.com/django/deps/blob/main/accepted/0020-annual-release-cycle.rst
 
+``django-admin`` renamed to ``django``
+--------------------------------------
+
+``django`` is now the preferred name for :doc:`Django's command-line
+interface </ref/django-admin>`. ``django-admin`` remains available as an
+alias. Both names provide the same functionality.
+
 Minor features
 --------------
 

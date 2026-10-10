@@ -29,16 +29,6 @@ only officially support, the latest release of each series.
 What's new in Django 6.1
 ========================
 
-The new ``django`` CLI
-----------------------
-
-``django`` is added as the preferred name for :doc:`Django's command-line
-interface </ref/django-admin>`. ``django-admin`` remains as an alias with no
-deprecation timeline.
-For more details on the naming change, see `DEP 16`_.
-
-.. _`DEP 16`: https://github.com/django/deps/blob/main/final/0016-name-the-main-command-django.rst
-
 Model field fetch modes
 -----------------------
 
