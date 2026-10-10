@@ -2587,17 +2587,13 @@ class ExecuteFromCommandLine(SimpleTestCase):
         argument, not sys.argv.
         """
         args = ["help", "shell"]
-        with captured_stdout() as out, captured_stderr() as err:
-            with mock.patch("sys.argv", [None] + args):
-                execute_from_command_line(["django-admin"] + args)
-        self.assertIn("usage: django-admin shell", out.getvalue())
-        self.assertEqual(err.getvalue(), "")
-
-        with captured_stdout() as out, captured_stderr() as err:
-            with mock.patch("sys.argv", [None] + args):
-                execute_from_command_line(["django"] + args)
-        self.assertIn("usage: django shell", out.getvalue())
-        self.assertEqual(err.getvalue(), "")
+        for command in ("django", "django-admin"):
+            with self.subTest(command=command):
+                with captured_stdout() as out, captured_stderr() as err:
+                    with mock.patch("sys.argv", [None] + args):
+                        execute_from_command_line([command] + args)
+                self.assertIn(f"usage: {command} shell", out.getvalue())
+                self.assertEqual(err.getvalue(), "")
 
 
 @override_settings(ROOT_URLCONF="admin_scripts.urls")
