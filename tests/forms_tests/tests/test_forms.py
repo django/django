@@ -575,7 +575,7 @@ aria-describedby="id_birthday_error">
         f = SignupForm(auto_id=False)
         self.assertHTMLEqual(
             str(f["email"]),
-            '<input type="email" name="email" maxlength="320" required>',
+            '<input type="email" name="email" maxlength="320" required dir="ltr">',
         )
         self.assertHTMLEqual(
             str(f["get_spam"]), '<input type="checkbox" name="get_spam" required>'
@@ -585,7 +585,7 @@ aria-describedby="id_birthday_error">
         self.assertHTMLEqual(
             str(f["email"]),
             '<input type="email" name="email" maxlength="320" value="test@example.com" '
-            "required>",
+            'required dir="ltr">',
         )
         self.assertHTMLEqual(
             str(f["get_spam"]),
@@ -3868,7 +3868,8 @@ Options: <select multiple name="options" aria-invalid="true" required>
             <option value="false">No</option>
             </select></li>
             <li><label for="id_email">Email:</label>
-            <input type="email" name="email" id="id_email" maxlength="320"></li>
+            <input type="email" name="email" id="id_email" maxlength="320"
+            dir="ltr"></li>
             <li class="required error"><ul class="errorlist" id="id_age_error">
             <li>This field is required.</li></ul>
             <label class="required" for="id_age">Age:</label>
@@ -3893,7 +3894,8 @@ Options: <select multiple name="options" aria-invalid="true" required>
             <option value="false">No</option>
             </select></p>
             <p><label for="id_email">Email:</label>
-            <input type="email" name="email" id="id_email" maxlength="320"></p>
+            <input type="email" name="email" id="id_email" maxlength="320"
+            dir="ltr"></p>
             <ul class="errorlist" id="id_age_error"><li>This field is required.</li>
             </ul><p class="required error"><label class="required" for="id_age">
             Age:</label><input type="number" name="age" id="id_age" aria-invalid="true"
@@ -3914,7 +3916,7 @@ aria-describedby="id_name_error"></td></tr>
 <option value="false">No</option>
 </select></td></tr>
 <tr><th><label for="id_email">Email:</label></th><td>
-<input type="email" name="email" id="id_email" maxlength="320"></td></tr>
+<input type="email" name="email" id="id_email" maxlength="320" dir="ltr"></td></tr>
 <tr class="required error"><th><label class="required" for="id_age">Age:</label></th>
 <td><ul class="errorlist" id="id_age_error"><li>This field is required.</li></ul>
 <input type="number" name="age" id="id_age" aria-invalid="true" required
@@ -3931,7 +3933,8 @@ aria-describedby="id_age_error"></td></tr>""",
             '<option value="unknown" selected>Unknown</option>'
             '<option value="true">Yes</option><option value="false">No</option>'
             '</select></div><div><label for="id_email">Email:</label>'
-            '<input type="email" name="email" id="id_email" maxlength="320"/></div>'
+            '<input type="email" name="email" id="id_email" maxlength="320" '
+            'dir="ltr"/></div>'
             '<div class="required error"><label for="id_age" class="required">Age:'
             '</label><ul class="errorlist" id="id_age_error"><li>This field is '
             'required.</li></ul><input type="number" name="age" required id="id_age" '
@@ -5526,7 +5529,7 @@ class OverrideTests(SimpleTestCase):
             '<div class="error">Enter a valid email address.</div></div>'
             "<p>Email: "
             '<input type="email" name="email" value="invalid" maxlength="320" '
-            'aria-invalid="true" required></p><div class="errorlist">'
+            'aria-invalid="true" required dir="ltr"></p><div class="errorlist">'
             '<div class="error">This field is required.</div></div>'
             '<p>Comment: <input type="text" name="comment" aria-invalid="true" '
             "required></p>",
