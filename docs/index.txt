@@ -10,8 +10,9 @@ First steps
 ===========
 
 * **Getting started**:
-  :doc:`Overview </intro/overview>` |
-  :doc:`Installation </intro/install>`
+  :doc:`/intro/overview` |
+  :doc:`Installation </intro/install>` |
+  :doc:`Third-party distributions </misc/distributions>`
 
 The tutorial takes you by the hand through a series of steps to create a
 web application.
@@ -96,7 +97,7 @@ processing a user's request and for returning the response.
   :doc:`TemplateResponse objects </ref/template-response>`
 
 * **Class-based views**:
-  :doc:`Overview </topics/class-based-views/index>` |
+  :doc:`Introduction to class-based views </topics/class-based-views/index>` |
   :doc:`Built-in display views </topics/class-based-views/generic-display>` |
   :doc:`Built-in editing views </topics/class-based-views/generic-editing>` |
   :doc:`Using mixins </topics/class-based-views/mixins>` |
@@ -104,7 +105,7 @@ processing a user's request and for returning the response.
   :doc:`Flattened index </ref/class-based-views/flattened-index>`
 
 * **Middleware**:
-  :doc:`Overview </topics/http/middleware>` |
+  :doc:`Introduction to middleware </topics/http/middleware>` |
   :doc:`Built-in middleware classes </ref/middleware>`
 
 * **Other output formats**:
@@ -119,7 +120,7 @@ information to be presented to the user. Template functionality can also be
 customized.
 
 * **The basics**:
-  :doc:`Overview </topics/templates>` |
+  :doc:`/topics/templates` |
   :doc:`Language overview </ref/templates/language>` |
   :doc:`Built-in tags and filters </ref/templates/builtins>` |
   :doc:`Humanization </ref/contrib/humanize>` |
@@ -132,18 +133,16 @@ customized.
 Other core functionality
 ========================
 
-* **Settings**:
-  :doc:`Overview </topics/settings>` |
-  :doc:`Full list of settings </ref/settings>`
-
-* **Applications**:
-  :doc:`Overview </ref/applications>`
+* **Configuration**:
+  :doc:`/topics/settings` |
+  :doc:`Full list of settings </ref/settings>` |
+  :doc:`Applications </ref/applications>`
 
 * **Exceptions**:
-  :doc:`Overview </ref/exceptions>`
+  :doc:`/ref/exceptions`
 
 * **Management commands**:
-  :doc:`Overview </ref/django-admin>` |
+  :doc:`/ref/django-admin` |
   :doc:`Adding custom commands </howto/custom-management-commands>`
 
 User-facing features
@@ -157,13 +156,12 @@ User-facing features
 * **Content**:
   :doc:`Flatpages </ref/contrib/flatpages>` |
   :doc:`Redirects </ref/contrib/redirects>` |
-  :doc:`Unicode in Django </ref/unicode>` |
   :doc:`Pagination </topics/pagination>` |
   :doc:`Messages framework </ref/contrib/messages>`
 
 * **Forms**:
-  :doc:`Overview </topics/forms/index>` |
-  :doc:`Form API </ref/forms/api>` |
+  :doc:`/topics/forms/index` |
+  :doc:`/ref/forms/api` |
   :doc:`Built-in fields </ref/forms/fields>` |
   :doc:`Built-in widgets </ref/forms/widgets>` |
   :doc:`Forms for models </topics/forms/modelforms>` |
@@ -172,17 +170,17 @@ User-facing features
   :doc:`Customizing validation </ref/forms/validation>`
 
 * **Internationalization and localization**:
-  :doc:`Overview </topics/i18n/index>` |
-  :doc:`Internationalization </topics/i18n/translation>` |
-  :ref:`Localization <how-to-create-language-files>` |
-  :doc:`Localized web UI formatting and form input </topics/i18n/formatting>` |
-  :doc:`Time zones </topics/i18n/timezones>`
+  :doc:`Introduction to internationalization </topics/i18n/index>` |
+  :doc:`/topics/i18n/translation` |
+  :doc:`/topics/i18n/formatting` |
+  :doc:`/topics/i18n/timezones` |
+  :doc:`/ref/unicode`
 
 * **Authentication**:
-  :doc:`Overview </topics/auth/index>` |
+  :doc:`/topics/auth/index` |
   :doc:`Using the authentication system </topics/auth/default>` |
-  :doc:`Password management </topics/auth/passwords>` |
-  :doc:`Customizing authentication </topics/auth/customizing>` |
+  :doc:`/topics/auth/passwords` |
+  :doc:`/topics/auth/customizing` |
   :doc:`API Reference </ref/contrib/auth>`
 
 * **Geographic data and representation**:
@@ -221,14 +219,14 @@ Resources and interfaces
   :doc:`Legacy databases </howto/legacy-databases>`
 
 * **Storage**:
-  :doc:`Overview </topics/http/file-uploads>` |
+  :doc:`/topics/http/file-uploads` |
   :doc:`File objects </ref/files/file>` |
   :doc:`Storage API </ref/files/storage>` |
   :doc:`Managing files </topics/files>` |
   :doc:`Custom storage </howto/custom-file-storage>`
 
 * **Deployment**:
-  :doc:`Overview </howto/deployment/index>` |
+  :doc:`/howto/deployment/index` |
   :doc:`WSGI servers </howto/deployment/wsgi/index>` |
   :doc:`ASGI servers </howto/deployment/asgi/index>` |
   :doc:`Deploying static files </howto/static-files/deployment>` |
@@ -241,8 +239,9 @@ Resources and interfaces
 Quality and dependability
 =========================
 
-A key concern in Django's design philosophy is to make it easier to build
-applications that work safely and efficiently, in the real world.
+A key concern in :doc:`Django's design philosophy </misc/design-philosophies>`
+is to make it easier to build applications that work safely and efficiently,
+in the real world.
 
 * **Testing**:
   :doc:`Introduction </topics/testing/index>` |
@@ -277,16 +276,8 @@ supportive community that welcomes new contributors:
 
 * **Processes and policies**:
   :doc:`The release process </internals/release-process>` |
-  :doc:`Security policies </internals/security>`
-
-* **Design philosophies**:
-  :doc:`Overview </misc/design-philosophies>`
-
-* **Documentation**:
-  :doc:`About this documentation </internals/contributing/writing-documentation>`
-
-* **Third-party distributions**:
-  :doc:`Overview </misc/distributions>`
+  :doc:`Security policies </internals/security>` |
+  :doc:`Design philosophies </misc/design-philosophies>`
 
 * **Django over time**:
   :doc:`API stability </misc/api-stability>` |
@@ -321,8 +312,9 @@ help navigate the site:
   steps to create a web application. Start here if you're new to Django or web
   application development.
 
-* :doc:`Topic guides </topics/index>` explain Django's functionality in detail,
-  and provide an overview of key topics and concepts.
+* :doc:`Topic guides </topics/index>` explain Django's functionality in detail
+  and provide an overview of key concepts and how individual parts of Django
+  can be used.
 
 * :doc:`Reference guides </ref/index>` contain technical reference for APIs and
   other aspects of Django's machinery.

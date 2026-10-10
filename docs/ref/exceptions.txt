@@ -1,5 +1,5 @@
 =================
-Django Exceptions
+Django exceptions
 =================
 
 Django raises some of its own exceptions as well as standard Python exceptions.

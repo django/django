@@ -1,6 +1,6 @@
-====================================
-Customizing authentication in Django
-====================================
+==========================
+Customizing authentication
+==========================
 
 The authentication that comes with Django is good enough for most common cases,
 but you may have needs not met by the out-of-the-box defaults. Customizing
