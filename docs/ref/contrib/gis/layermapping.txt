@@ -53,7 +53,7 @@ Example
         UNIT["Degree",0.017453292519943295]]
 
 #. Now we define our corresponding Django model (make sure to use
-   :djadmin:`migrate`)::
+   :djcli:`migrate`)::
 
     from django.contrib.gis.db import models
 

@@ -74,7 +74,7 @@ echo "Testing tarball install ..."
 python3 -m venv django-pip
 . django-pip/bin/activate
 python -m pip install --no-cache-dir "${WORKDIR}/${PKG_TAR}"
-django-admin startproject test_tarball
+django startproject test_tarball
 cd test_tarball
 ./manage.py --help  # Ensure executable bits
 python manage.py migrate
@@ -86,7 +86,7 @@ echo "Testing wheel install ..."
 python3 -m venv django-pip-wheel
 . django-pip-wheel/bin/activate
 python -m pip install --no-cache-dir "${WORKDIR}/${PKG_WHL}"
-django-admin startproject test_wheel
+django startproject test_wheel
 cd test_wheel
 ./manage.py --help  # Ensure executable bits
 python manage.py migrate

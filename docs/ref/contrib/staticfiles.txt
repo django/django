@@ -37,13 +37,13 @@ Management Commands
 ``collectstatic``
 -----------------
 
-.. django-admin:: collectstatic
+.. django-cli:: collectstatic
 
 Collects the static files into :setting:`STATIC_ROOT`.
 
 Duplicate file names are by default resolved in a similar way to how template
 resolution works: the file that is first found in one of the specified
-locations will be used. If you're confused, the :djadmin:`findstatic` command
+locations will be used. If you're confused, the :djcli:`findstatic` command
 can help show you which files are found.
 
 On subsequent ``collectstatic`` runs (if ``STATIC_ROOT`` isn't empty), files
@@ -57,11 +57,11 @@ Files are searched by using the :setting:`enabled finders
 :setting:`STATICFILES_DIRS` and in the ``'static'`` directory of apps
 specified by the :setting:`INSTALLED_APPS` setting.
 
-The :djadmin:`collectstatic` management command calls the
+The :djcli:`collectstatic` management command calls the
 :meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
 method of the ``staticfiles`` storage backend from :setting:`STORAGES` after
 each run and passes a list of paths that have been found by the management
-command. It also receives all command line options of :djadmin:`collectstatic`.
+command. It also receives all command line options of :djcli:`collectstatic`.
 This is used by the
 :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` by
 default.
@@ -88,36 +88,36 @@ Then set the ``staticfiles`` storage backend in :setting:`STORAGES` setting to
 
 Some commonly used options are:
 
-.. django-admin-option:: --noinput, --no-input
+.. django-cli-option:: --noinput, --no-input
 
     Do NOT prompt the user for input of any kind.
 
-.. django-admin-option:: --ignore PATTERN, -i PATTERN
+.. django-cli-option:: --ignore PATTERN, -i PATTERN
 
     Ignore files, directories, or paths matching this glob-style pattern. Use
     multiple times to ignore more. When specifying a path, always use forward
     slashes, even on Windows.
 
-.. django-admin-option:: --dry-run, -n
+.. django-cli-option:: --dry-run, -n
 
     Do everything except modify the filesystem.
 
-.. django-admin-option:: --clear, -c
+.. django-cli-option:: --clear, -c
 
     Clear the existing files before trying to copy or link the original file.
 
-.. django-admin-option:: --link, -l
+.. django-cli-option:: --link, -l
 
     Create a symbolic link to each file instead of copying.
 
-.. django-admin-option:: --no-post-process
+.. django-cli-option:: --no-post-process
 
     Don't call the
     :meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
     method of the configured ``staticfiles`` storage backend from
     :setting:`STORAGES`.
 
-.. django-admin-option:: --no-default-ignore
+.. django-cli-option:: --no-default-ignore
 
     Don't ignore the common private glob-style patterns ``'CVS'``, ``'.*'``
     and ``'*~'``.
@@ -149,7 +149,7 @@ class, override the ``ignore_patterns`` attribute of this class and replace
 ``findstatic``
 --------------
 
-.. django-admin:: findstatic staticfile [staticfile ...]
+.. django-cli:: findstatic staticfile [staticfile ...]
 
 Searches for one or more relative paths with the enabled finders.
 
@@ -164,7 +164,7 @@ For example:
    Found 'admin/js/core.js' here:
      /home/polls.com/src/django/contrib/admin/media/js/core.js
 
-.. django-admin-option:: findstatic --first
+.. django-cli-option:: findstatic --first
 
 By default, all matching locations are found. To only return the first match
 for each relative path, use the ``--first`` option:
@@ -206,16 +206,16 @@ the directories which were searched:
 ``runserver``
 -------------
 
-.. django-admin:: runserver [addrport]
+.. django-cli:: runserver [addrport]
     :noindex:
 
-Overrides the core :djadmin:`runserver` command if the ``staticfiles`` app
+Overrides the core :djcli:`runserver` command if the ``staticfiles`` app
 is :setting:`installed<INSTALLED_APPS>` and adds automatic serving of static
 files. File serving doesn't run through :setting:`MIDDLEWARE`.
 
 The command adds these options:
 
-.. django-admin-option:: --nostatic
+.. django-cli-option:: --nostatic
 
 Use the ``--nostatic`` option to disable serving of static files with the
 :doc:`staticfiles </ref/contrib/staticfiles>` app entirely. This option is
@@ -226,9 +226,9 @@ Example usage:
 
 .. console::
 
-    $ django-admin runserver --nostatic
+    $ django runserver --nostatic
 
-.. django-admin-option:: --insecure
+.. django-cli-option:: --insecure
 
 Use the ``--insecure`` option to force serving of static files with the
 :doc:`staticfiles </ref/contrib/staticfiles>` app even if the :setting:`DEBUG`
@@ -244,7 +244,7 @@ Example usage:
 
 .. console::
 
-    $ django-admin runserver --insecure
+    $ django runserver --insecure
 
 .. _staticfiles-storages:
 
@@ -264,7 +264,7 @@ as the base URL.
 .. method:: storage.StaticFilesStorage.post_process(paths, **options)
 
 If this method is defined on a storage, it's called by the
-:djadmin:`collectstatic` management command after each run and gets passed the
+:djcli:`collectstatic` management command after each run and gets passed the
 local storages and paths of found files as a dictionary, as well as the command
 line options. It yields tuples of three values:
 ``original_path, processed_path, processed``. The path values are strings and
@@ -330,7 +330,7 @@ For example, the ``'css/styles.css'`` file with this content:
     files as they are served, not as stored in the filesystem. This is
     particularly important because depending on how static files are collected,
     their checksum may have changed (for example when using
-    :djadmin:`collectstatic`). At the moment, there is no out-of-the-box
+    :djcli:`collectstatic`). At the moment, there is no out-of-the-box
     tooling available for this.
 
 You can change the location of the manifest file by using a custom
@@ -374,12 +374,12 @@ following requirements are met:
   ``'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'``
 * the :setting:`DEBUG` setting is set to ``False``
 * you've collected all your static files by using the
-  :djadmin:`collectstatic` management command
+  :djcli:`collectstatic` management command
 
 Since creating the MD5 hash can be a performance burden to your website
 during runtime, ``staticfiles`` will automatically store the mapping with
 hashed names for all processed files in a file called ``staticfiles.json``.
-This happens once when you run the :djadmin:`collectstatic` management
+This happens once when you run the :djcli:`collectstatic` management
 command.
 
 .. attribute:: storage.ManifestStaticFilesStorage.manifest_strict
@@ -389,7 +389,7 @@ If a file isn't found in the ``staticfiles.json`` manifest at runtime, a
 ``ManifestStaticFilesStorage`` and setting the ``manifest_strict`` attribute to
 ``False`` -- nonexistent paths will remain unchanged.
 
-Due to the requirement of running :djadmin:`collectstatic`, this storage
+Due to the requirement of running :djcli:`collectstatic`, this storage
 typically shouldn't be used when running tests as ``collectstatic`` isn't run
 as part of the normal test setup. During testing, ensure that ``staticfiles``
 storage backend in the :setting:`STORAGES` setting is set to something else
@@ -494,7 +494,7 @@ This view function serves static files in development.
     on a Red Hat distribution, ``mime-support`` on a Debian distribution, or by
     editing the keys under ``HKEY_CLASSES_ROOT`` in the Windows registry.
 
-This view is automatically enabled by :djadmin:`runserver` (with a
+This view is automatically enabled by :djcli:`runserver` (with a
 :setting:`DEBUG` setting set to ``True``). To use the view with a different
 local development server, add the following snippet to the end of your
 primary URL configuration::
@@ -558,4 +558,4 @@ But given the fact that it makes use of the
 :func:`django.contrib.staticfiles.views.serve` view described above, it can
 transparently overlay at test execution-time the assets provided by the
 ``staticfiles`` finders. This means you don't need to run
-:djadmin:`collectstatic` before or as a part of your tests setup.
+:djcli:`collectstatic` before or as a part of your tests setup.

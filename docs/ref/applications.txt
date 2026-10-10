@@ -22,7 +22,7 @@ Projects and applications
 
 The term **project** describes a Django web application. The project Python
 package is defined primarily by a settings module, but it usually contains
-other things. For example, when you run  ``django-admin startproject mysite``
+other things. For example, when you run  ``django startproject mysite``
 you'll get a ``mysite`` project directory that contains a ``mysite`` Python
 package with ``settings.py``, ``urls.py``, ``asgi.py`` and ``wsgi.py``. The
 project package is often extended to include things like fixtures, CSS, and
@@ -232,7 +232,7 @@ Configurable attributes
     Reusable applications that define models **must** set this attribute to
     ensure migrations included in the application match the models. Otherwise,
     migrations will be generated for the application when a user runs
-    :djadmin:`makemigrations` with a different :setting:`DEFAULT_AUTO_FIELD`,
+    :djcli:`makemigrations` with a different :setting:`DEFAULT_AUTO_FIELD`,
     which may conflict with future migrations shipped by the application.
 
     For example, to keep using :class:`~django.db.models.AutoField`::

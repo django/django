@@ -473,7 +473,7 @@ Fixtures generated with ``USE_TZ = False``, or before Django 1.4, use the
 zone support, you'll see :exc:`RuntimeWarning`\ s when you load them. To get
 rid of the warnings, you must convert your fixtures to the "aware" format.
 
-You can regenerate fixtures with :djadmin:`loaddata` then :djadmin:`dumpdata`.
+You can regenerate fixtures with :djcli:`loaddata` then :djcli:`dumpdata`.
 Or, if they're small enough, you can edit them to add the UTC offset that
 matches your :setting:`TIME_ZONE` to each serialized datetime.
 

@@ -1,6 +1,6 @@
 """
 Base classes for writing management commands (named commands which can
-be executed through ``django-admin`` or ``manage.py``).
+be executed through ``django`` or ``manage.py``).
 """
 
 import argparse
@@ -204,7 +204,7 @@ class BaseCommand:
     the command-parsing and -execution behavior, the normal flow works
     as follows:
 
-    1. ``django-admin`` or ``manage.py`` loads the command class
+    1. ``django`` or ``manage.py`` loads the command class
        and calls its ``run_from_argv()`` method.
 
     2. The ``run_from_argv()`` method calls ``create_parser()`` to get

@@ -28,7 +28,7 @@ You may also find signing useful for the following:
 Protecting ``SECRET_KEY`` and ``SECRET_KEY_FALLBACKS``
 ======================================================
 
-When you create a new Django project using :djadmin:`startproject`, the
+When you create a new Django project using :djcli:`startproject`, the
 ``settings.py`` file is generated automatically and gets a random
 :setting:`SECRET_KEY` value. This value is the key to securing signed
 data -- it is vital you keep this secure, or attackers could use it to

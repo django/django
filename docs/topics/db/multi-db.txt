@@ -81,7 +81,7 @@ If you attempt to access a database that you haven't defined in your
 Synchronizing your databases
 ============================
 
-The :djadmin:`migrate` management command operates on one database at a
+The :djcli:`migrate` management command operates on one database at a
 time. By default, it operates on the ``default`` database, but by
 providing the :option:`--database <migrate --database>` option, you can tell it
 to synchronize a different database. So, to synchronize all models onto
@@ -98,7 +98,7 @@ router<topics-db-multi-db-routing>` that implements a policy
 constraining the availability of particular models.
 
 If, as in the second example above, you've left the ``default`` database empty,
-you must provide a database name each time you run :djadmin:`migrate`. Omitting
+you must provide a database name each time you run :djcli:`migrate`. Omitting
 the database name would raise an error. For the second example:
 
 .. code-block:: shell
@@ -109,11 +109,11 @@ the database name would raise an error. For the second example:
 Using other management commands
 -------------------------------
 
-Most other ``django-admin`` commands that interact with the database operate in
-the same way as :djadmin:`migrate` -- they only ever operate on one database at
+Most other ``django`` commands that interact with the database operate in
+the same way as :djcli:`migrate` -- they only ever operate on one database at
 a time, using ``--database`` to control the database used.
 
-An exception to this rule is the :djadmin:`makemigrations` command. It
+An exception to this rule is the :djcli:`makemigrations` command. It
 validates the migration history in the databases to catch problems with the
 existing migration files (which could be caused by editing them) before
 creating new migrations. By default, it checks only the ``default`` database,
@@ -204,12 +204,12 @@ A database Router is a class that provides up to four methods:
     This method can also be used to determine the availability of a model on a
     given database.
 
-    :djadmin:`makemigrations` always creates migrations for model changes, but
+    :djcli:`makemigrations` always creates migrations for model changes, but
     if ``allow_migrate()`` returns ``False``, any migration operations for the
-    ``model_name`` will be silently skipped when running :djadmin:`migrate` on
+    ``model_name`` will be silently skipped when running :djcli:`migrate` on
     the ``db``. Changing the behavior of ``allow_migrate()`` for models that
     already have migrations may result in broken foreign keys, extra tables,
-    or missing tables. When :djadmin:`makemigrations` verifies the migration
+    or missing tables. When :djcli:`makemigrations` verifies the migration
     history, it skips databases where no app is allowed to migrate.
 
 A router doesn't have to provide *all* these methods -- it may omit one
@@ -780,7 +780,7 @@ how you can split these models across databases:
   in the same database as ``sites``.
 
 In addition, some objects are automatically created just after
-:djadmin:`migrate` creates a table to hold them in a database:
+:djcli:`migrate` creates a table to hold them in a database:
 
 - a default ``Site``,
 - a ``ContentType`` for each model (including those not stored in that

@@ -309,7 +309,7 @@ Advanced features of ``TransactionTestCase``
         of models but no relations between models in different applications.
 
     By default, ``available_apps`` is set to ``None``. After each test, Django
-    calls :djadmin:`flush` to reset the database state. This empties all tables
+    calls :djcli:`flush` to reset the database state. This empties all tables
     and emits the :data:`~django.db.models.signals.post_migrate` signal, which
     recreates one content type and four permissions for each model. This
     operation gets expensive proportionally to the number of models.
@@ -617,7 +617,7 @@ and tear down the test suite.
     Your test runner may also define additional command-line options.
     Create or override an ``add_arguments(cls, parser)`` class method and add
     custom arguments by calling ``parser.add_argument()`` inside the method, so
-    that the :djadmin:`test` command will be able to use those arguments.
+    that the :djcli:`test` command will be able to use those arguments.
 
 Attributes
 ~~~~~~~~~~
@@ -660,7 +660,7 @@ Methods
 .. classmethod:: DiscoverRunner.add_arguments(parser)
 
     Override this class method to add custom arguments accepted by the
-    :djadmin:`test` management command. See
+    :djcli:`test` management command. See
     :meth:`argparse.ArgumentParser.add_argument` for details about adding
     arguments to a parser.
 

@@ -9,7 +9,8 @@ from docutils.statemachine import ViewList
 from github_links import get_branch
 from sphinx import addnodes
 from sphinx.directives.code import CodeBlock
-from sphinx.domains.std import Cmdoption
+from sphinx.domains.std import Cmdoption, GenericObject
+from sphinx.roles import XRefRole
 from sphinx.util import logging
 from sphinx.util.nodes import split_explicit_title
 from sphinx.writers.html import HTMLTranslator
@@ -43,10 +44,13 @@ def setup(app):
     app.add_object_type(
         directivename="django-admin",
         rolename="djadmin",
-        indextemplate="pair: %s; django-admin command",
-        parse_node=parse_django_admin_node,
+        indextemplate="pair: %s; django command",
+        parse_node=parse_django_cli_node,
     )
+    app.add_directive_to_domain("std", "django-cli", DjangoCLIDirective)
+    app.add_role_to_domain("std", "djcli", DjangoCLIReference())
     app.add_directive("django-admin-option", Cmdoption)
+    app.add_directive("django-cli-option", Cmdoption)
     app.add_config_value("django_next_version", "0.0", True)
     app.connect("builder-inited", set_django_html_translator)
     app.add_node(
@@ -82,12 +86,28 @@ class DjangoHTMLTranslator(HTMLTranslator):
         node["ids"] = old_ids
 
 
-def parse_django_admin_node(env, sig, signode):
+def parse_django_cli_node(env, sig, signode):
     command = sig.split(" ")[0]
     env.ref_context["std:program"] = command
-    title = "django-admin %s" % sig
+    title = "django %s" % sig
     signode += addnodes.desc_name(title, title)
     return command
+
+
+class DjangoCLIDirective(GenericObject):
+    indextemplate = "pair: %s; django command"
+    parse_node = staticmethod(parse_django_cli_node)
+
+    def run(self):
+        # Keep the original object type so existing command anchors remain valid.
+        self.name = "std:django-admin"
+        return super().run()
+
+
+class DjangoCLIReference(XRefRole):
+    def run(self):
+        self.name = "std:djadmin"
+        return super().run()
 
 
 class ConsoleNode(nodes.literal_block):
