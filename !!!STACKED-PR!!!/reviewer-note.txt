@@ -1,0 +1,25 @@
+
+  ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┃  CHANGE SELECTED COMMITS BEFORE REVIEW  ┃
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  ⚠️ Reviewers: This is a stacked PR. It includes commits from earlier PRs
+  that must be merged before this one.
+
+  If you're seeing this notice in GitHub's PR review panel, you're looking
+  at those earlier commits. *Please don't try to review them here.*
+
+  Use the "All commits" button ("Select commits to view" popup) at the top
+  of the "Files changed" PR tab. Select ONLY the commits BELOW the one called:
+
+      ⬇️ REVIEW COMMITS AFTER THIS ONE ⬇️.
+
+
+  If you want to review changes in the earlier commits, please go to their
+  own PRs. The first item in the "Discussion" PR tab should link to them.
+  (If the earlier PRs are already merged, please ping the contributor here
+  to rebase and update this PR.)
+
+
+  [This is a (hopefully) temporary workaround until GitHub supports stacked PRs
+  from contributor forks: https://github.com/github/gh-stack/issues/46.]
