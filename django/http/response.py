@@ -71,6 +71,14 @@ class ResponseHeaders(CaseInsensitiveMapping):
                 raise BadHeaderError(
                     f"Header values can't contain newlines (got {value!r})"
                 )
+            if (
+                any(ord(char) < 32 and char != "\t" for char in value)
+                or "\x7f" in value
+            ):
+                raise BadHeaderError(
+                    f"Header values can't contain control characters (got {value!r})"
+                )
+
         except UnicodeError as e:
             # Encoding to a string of the specified charset failed, but we
             # don't know what type that value was, or if it contains newlines,
@@ -94,6 +102,11 @@ class ResponseHeaders(CaseInsensitiveMapping):
 
     def __setitem__(self, key, value):
         key = self._convert_to_charset(key, "ascii")
+        if not key or any(
+            not (char.isascii() and (char.isalnum() or char in "!#$%&'*+-.^_`|~"))
+            for char in key
+        ):
+            raise BadHeaderError(f"Invalid header name {key!r}")
         value = self._convert_to_charset(value, "latin-1", mime_encode=True)
         self._store[key.lower()] = (key, value)
 

@@ -1080,3 +1080,39 @@ class HttpResponseHeadersTestCase(SimpleTestCase):
             response["test\rstr"] = "test"
         with self.assertRaises(BadHeaderError):
             response["test\nstr"] = "test"
+
+    def test_control_characters_in_header_values(self):
+        response = HttpResponse()
+        invalid_chars = (
+            "\x00",
+            "\x01",
+            "\x08",
+            "\x0b",
+            "\x0c",
+            "\x0e",
+            "\x1f",
+            "\x7f",
+        )
+        for char in invalid_chars:
+            with self.subTest(char=repr(char)):
+                with self.assertRaises(BadHeaderError):
+                    response["X-Test"] = f"value{char}"
+
+    def test_horizontal_tab_in_header_value(self):
+        response = HttpResponse()
+        response["X-Test"] = "value\twith-tab"
+        self.assertEqual(response["X-Test"], "value\twith-tab")
+
+    def test_invalid_characters_in_header_names(self):
+        response = HttpResponse()
+        invalid_names = (
+            "X Test",
+            "X:Test",
+            "X/Test",
+            "X(Test)",
+            "X[Test]",
+        )
+        for name in invalid_names:
+            with self.subTest(name=name):
+                with self.assertRaises(BadHeaderError):
+                    response[name] = "value"
