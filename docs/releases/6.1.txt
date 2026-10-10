@@ -34,7 +34,7 @@ The new ``django`` CLI
 
 ``django`` is added as the preferred name for :doc:`Django's command-line
 interface </ref/django-admin>`. ``django-admin`` remains as an alias with no
-deprecation timeline, and prints a notice informing the user of the new name.
+deprecation timeline.
 For more details on the naming change, see `DEP 16`_.
 
 .. _`DEP 16`: https://github.com/django/deps/blob/main/final/0016-name-the-main-command-django.rst

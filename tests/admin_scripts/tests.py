@@ -2591,10 +2591,7 @@ class ExecuteFromCommandLine(SimpleTestCase):
             with mock.patch("sys.argv", [None] + args):
                 execute_from_command_line(["django-admin"] + args)
         self.assertIn("usage: django-admin shell", out.getvalue())
-        self.assertIn(
-            "The django-admin command is being renamed to django.",
-            err.getvalue(),
-        )
+        self.assertEqual(err.getvalue(), "")
 
         with captured_stdout() as out, captured_stderr() as err:
             with mock.patch("sys.argv", [None] + args):
