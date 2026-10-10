@@ -6,6 +6,7 @@ from django.middleware.csp import get_nonce
 from django.utils.csp import CSP
 from django.utils.decorators import method_decorator
 from django.views.debug import default_urlconf, technical_500_response
+from django.views.decorators.cache import cache_control
 from django.views.decorators.common import no_append_slash
 from django.views.decorators.csp import csp_override, csp_report_only_override
 from django.views.decorators.csrf import csrf_exempt
@@ -28,6 +29,11 @@ class SensitiveCBV(View):
 
 
 def csp_nonce(request):
+    return HttpResponse(get_nonce(request))
+
+
+@cache_control(public=True)
+def csp_nonce_public(request):
     return HttpResponse(get_nonce(request))
 
 
