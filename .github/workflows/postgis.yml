@@ -27,16 +27,16 @@ jobs:
         include:
           - conda-environment-file: ".github/workflows/data/conda/geolibs-pg17-gil.yml"
             pg_major: "17"
-            python: "3.14"
+            python: "3.15"
           - conda-environment-file: ".github/workflows/data/conda/geolibs-pg17-freethreading.yml"
             pg_major: "17"
-            python: "3.14t"
+            python: "3.15t"
           - conda-environment-file: ".github/workflows/data/conda/geolibs-pg18-gil.yml"
             pg_major: "18"
-            python: "3.14"
+            python: "3.15"
           - conda-environment-file: ".github/workflows/data/conda/geolibs-pg18-freethreading.yml"
             pg_major: "18"
-            python: "3.14t"
+            python: "3.15t"
     name: PostgreSQL ${{ matrix.pg_major }}, Python ${{ matrix.python }}
     timeout-minutes: 60
     steps:

@@ -19,7 +19,7 @@ jobs:
           - '3.12'
           - '3.13'
           - '3.14'
-          - '3.15-dev'
+          - '3.15'
     name: Windows, SQLite, Python ${{ matrix.python-version }}
     timeout-minutes: 60
     continue-on-error: true
@@ -52,7 +52,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.14'
+          python-version: '3.15'
           cache: 'pip'
       - name: Install system packages
         run: |
@@ -113,7 +113,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.14'
+          python-version: '3.15'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
       - name: Install system packages
@@ -156,7 +156,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.14'
+          python-version: '3.15'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
       - name: Install system packages
@@ -208,7 +208,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.14'
+          python-version: '3.15'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
       - name: Install system packages
