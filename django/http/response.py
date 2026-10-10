@@ -100,20 +100,15 @@ class ResponseHeaders(CaseInsensitiveMapping):
     def __delitem__(self, key):
         self.pop(key)
 
-
     def __setitem__(self, key, value):
         key = self._convert_to_charset(key, "ascii")
         if not key or any(
-            not (
-                char.isascii()
-                and (char.isalnum() or char in "!#$%&'*+-.^_`|~")
-            )
+            not (char.isascii() and (char.isalnum() or char in "!#$%&'*+-.^_`|~"))
             for char in key
         ):
             raise BadHeaderError(f"Invalid header name {key!r}")
         value = self._convert_to_charset(value, "latin-1", mime_encode=True)
         self._store[key.lower()] = (key, value)
-
 
     def pop(self, key, default=None):
         return self._store.pop(key.lower(), default)

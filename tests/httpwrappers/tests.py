@@ -1,4 +1,3 @@
-
 import copy
 import itertools
 import json
@@ -1081,6 +1080,7 @@ class HttpResponseHeadersTestCase(SimpleTestCase):
             response["test\rstr"] = "test"
         with self.assertRaises(BadHeaderError):
             response["test\nstr"] = "test"
+
     def test_control_characters_in_header_values(self):
         response = HttpResponse()
         invalid_chars = (
