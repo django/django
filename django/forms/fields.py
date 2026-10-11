@@ -1363,7 +1363,7 @@ class JSONField(CharField):
             return value
         try:
             converted = json.loads(value, cls=self.decoder)
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, RecursionError):
             raise ValidationError(
                 self.error_messages["invalid"],
                 code="invalid",
@@ -1381,7 +1381,7 @@ class JSONField(CharField):
             return None
         try:
             return json.loads(data, cls=self.decoder)
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, RecursionError):
             return InvalidJSONInput(data)
 
     def prepare_value(self, value):

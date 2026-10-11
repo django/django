@@ -1,4 +1,5 @@
 import json
+from unittest import mock
 
 from django.core import checks, exceptions, serializers
 from django.db import connection
@@ -371,6 +372,13 @@ class TestFormField(PostgreSQLSimpleTestCase):
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean('{"a": "b"')
         self.assertEqual(cm.exception.messages[0], "Could not load JSON data.")
+        self.assertEqual(cm.exception.code, "invalid_json")
+
+    def test_invalid_json_deeply_nested(self):
+        field = forms.HStoreField()
+        with mock.patch.object(json, "loads", side_effect=RecursionError):
+            with self.assertRaises(exceptions.ValidationError) as cm:
+                field.clean('{"a": [[[]]]}')
         self.assertEqual(cm.exception.code, "invalid_json")
 
     def test_non_dict_json(self):
