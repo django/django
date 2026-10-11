@@ -41,13 +41,13 @@ def setup(app):
         indextemplate="pair: %s; field lookup type",
     )
     app.add_object_type(
-        directivename="django-cli",
-        rolename="djcli",
+        directivename="cli",
+        rolename="cli",
         indextemplate="pair: %s; django command",
         parse_node=parse_django_cli_node,
     )
-    app.add_directive_to_domain("std", "django-cli", DjangoCLIDirective, override=True)
-    app.add_directive("django-cli-option", Cmdoption)
+    app.add_directive_to_domain("std", "cli", DjangoCLIDirective, override=True)
+    app.add_directive("cli-option", Cmdoption)
     app.add_config_value("django_next_version", "0.0", True)
     app.connect("builder-inited", set_django_html_translator)
     app.add_node(

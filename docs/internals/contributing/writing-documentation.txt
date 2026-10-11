@@ -617,15 +617,15 @@ define some extra description units:
 
   .. code-block:: rst
 
-        .. django-cli:: migrate
+        .. cli:: migrate
 
-  To link, use ``:djcli:`migrate```.
+  To link, use ``:cli:`migrate```.
 
 * ``django`` command-line options:
 
   .. code-block:: rst
 
-        .. django-cli-option:: --traceback
+        .. cli-option:: --traceback
 
   To link, use ``:option:`command_name --traceback``` (or omit ``command_name``
   for the options shared by all commands like ``--verbosity``).

@@ -232,7 +232,7 @@ Configurable attributes
     Reusable applications that define models **must** set this attribute to
     ensure migrations included in the application match the models. Otherwise,
     migrations will be generated for the application when a user runs
-    :djcli:`makemigrations` with a different :setting:`DEFAULT_AUTO_FIELD`,
+    :cli:`makemigrations` with a different :setting:`DEFAULT_AUTO_FIELD`,
     which may conflict with future migrations shipped by the application.
 
     For example, to keep using :class:`~django.db.models.AutoField`::

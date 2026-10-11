@@ -110,7 +110,7 @@ Seeing which settings you've changed
 The command ``python manage.py diffsettings`` displays differences between the
 current settings file and Django's default settings.
 
-For more, see the :djcli:`diffsettings` documentation.
+For more, see the :cli:`diffsettings` documentation.
 
 Using settings in Python code
 =============================

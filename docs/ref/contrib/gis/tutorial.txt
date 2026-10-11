@@ -289,7 +289,7 @@ This command should produce the following output:
     CREATE INDEX "world_worldborder_mpoly_id" ON "world_worldborder" USING GIST ("mpoly");
     COMMIT;
 
-If this looks correct, run :djcli:`migrate` to create this table in the
+If this looks correct, run :cli:`migrate` to create this table in the
 database:
 
 .. console::
@@ -534,8 +534,8 @@ Try ``ogrinspect``
 
 Now that you've seen how to define geographic models and import data with the
 :doc:`/ref/contrib/gis/layermapping`, it's possible to further automate this
-process with use of the :djcli:`ogrinspect` management command. The
-:djcli:`ogrinspect` command  introspects a GDAL-supported vector data source
+process with use of the :cli:`ogrinspect` management command. The
+:cli:`ogrinspect` command  introspects a GDAL-supported vector data source
 (e.g., a shapefile) and generates a model definition and ``LayerMapping``
 dictionary automatically.
 

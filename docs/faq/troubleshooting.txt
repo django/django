@@ -5,7 +5,7 @@ Troubleshooting
 This page contains some advice about errors and problems commonly encountered
 during the development of Django applications.
 
-.. _troubleshooting-django-cli:
+.. _troubleshooting-cli:
 
 Problems running ``django``
 =================================
