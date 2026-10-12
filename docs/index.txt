@@ -277,7 +277,7 @@ supportive community that welcomes new contributors:
 
 * **Processes and policies**:
   :doc:`The release process </internals/release-process>` |
-  :doc:`Security policies </internals/security>`
+  :doc:`Security policy </internals/security>`
 
 * **Design philosophies**:
   :doc:`Overview </misc/design-philosophies>`
