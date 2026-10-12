@@ -1,4 +1,4 @@
-from io import IOBase
+from io import BytesIO
 
 from django.conf import settings
 from django.core import signals
@@ -10,47 +10,6 @@ from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 
 _slashes_re = _lazy_re_compile(rb"/+")
-
-
-class LimitedStream(IOBase):
-    """
-    Wrap another stream to disallow reading it past a number of bytes.
-
-    Based on the implementation from werkzeug.wsgi.LimitedStream. See:
-    https://github.com/pallets/werkzeug/blob/dbf78f67/src/werkzeug/wsgi.py#L828
-    """
-
-    def __init__(self, stream, limit):
-        self._read = stream.read
-        self._readline = stream.readline
-        self._pos = 0
-        self.limit = limit
-
-    def read(self, size=-1, /):
-        _pos = self._pos
-        limit = self.limit
-        if _pos >= limit:
-            return b""
-        if size == -1 or size is None:
-            size = limit - _pos
-        else:
-            size = min(size, limit - _pos)
-        data = self._read(size)
-        self._pos += len(data)
-        return data
-
-    def readline(self, size=-1, /):
-        _pos = self._pos
-        limit = self.limit
-        if _pos >= limit:
-            return b""
-        if size == -1 or size is None:
-            size = limit - _pos
-        else:
-            size = min(size, limit - _pos)
-        line = self._readline(size)
-        self._pos += len(line)
-        return line
 
 
 class WSGIRequest(HttpRequest):
@@ -75,7 +34,7 @@ class WSGIRequest(HttpRequest):
             content_length = int(environ.get("CONTENT_LENGTH"))
         except (ValueError, TypeError):
             content_length = 0
-        self._stream = LimitedStream(self.environ["wsgi.input"], content_length)
+        self._stream = base.LimitedStream(self.environ["wsgi.input"], content_length)
         self._read_started = False
         self.resolver_match = None
 
@@ -108,6 +67,28 @@ class WSGIRequest(HttpRequest):
         return self._files
 
     POST = property(_get_post, _set_post)
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        errb = b""
+        if self.environ.get("wsgi.errors"):
+            errb = self.environ["wsgi.errors"].getvalue()
+        state["environ"]["wsgi.input"] = self._stream.read()
+        state["environ"]["wsgi.errors"] = errb
+        del state["META"]
+        del state["_stream"]
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.environ["wsgi.input"] = BytesIO(self.environ["wsgi.input"])
+        self.environ["wsgi.errors"] = BytesIO(self.environ["wsgi.errors"])
+        self.META = self.environ
+        try:
+            content_length = int(self.environ.get("CONTENT_LENGTH"))
+        except (ValueError, TypeError):
+            content_length = 0
+        self._stream = base.LimitedStream(self.environ["wsgi.input"], content_length)
 
 
 class WSGIHandler(base.BaseHandler):
@@ -142,6 +123,10 @@ class WSGIHandler(base.BaseHandler):
                 response.file_to_stream, response.block_size
             )
         return response
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.load_middleware(is_async=False)
 
 
 def get_path_info(environ):
