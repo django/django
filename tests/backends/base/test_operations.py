@@ -1,6 +1,7 @@
 import decimal
 
 from django.core.management.color import no_style
+from django.core.management.sql import sql_flush
 from django.db import NotSupportedError, connection, models, transaction
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.models import DurationField
@@ -284,3 +285,28 @@ class SqlFlushTests(TransactionTestCase):
                 self.assertEqual(author.pk, 1)
                 book = Book.objects.create(author=author)
                 self.assertEqual(book.pk, 1)
+
+    def test_sql_flush_ignores_router_to_include_all_managed_tables(self):
+        class RouterBlocksModelRouter:
+            """A router that claims Author doesn't belong to the default DB."""
+
+            def allow_migrate(self, db, app_label, model_name=None, **hints):
+                if app_label == "backends" and model_name == "author":
+                    return db != "default"
+                return None
+
+        # Write an Author directly to the default DB, bypassing the router.
+        Author.objects.using("default").create(name="John Doe")
+        self.assertTrue(Author.objects.using("default").exists())
+
+        with override_settings(DATABASE_ROUTERS=[RouterBlocksModelRouter()]):
+            sql_list = sql_flush(
+                no_style(),
+                connection,
+                reset_sequences=True,
+                allow_cascade=True,
+            )
+            connection.ops.execute_sql_flush(sql_list)
+
+        # Author table must have been flushed.
+        self.assertFalse(Author.objects.using("default").exists())
