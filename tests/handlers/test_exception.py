@@ -23,7 +23,7 @@ class ExceptionHandlerTests(SimpleTestCase):
     @override_settings(DATA_UPLOAD_MAX_MEMORY_SIZE=12)
     def test_data_upload_max_memory_size_exceeded(self):
         response = WSGIHandler()(self.get_suspicious_environ(), lambda *a, **k: None)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 413)
 
     @override_settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=2)
     def test_data_upload_max_number_fields_exceeded(self):
