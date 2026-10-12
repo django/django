@@ -10,7 +10,7 @@ from django.core import management
 from django.db import DEFAULT_DB_ALIAS, router, transaction
 from django.db.models import signals
 from django.db.utils import ConnectionRouter
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings, skipIfDBFeature
 
 from .models import Book, Person, Pet, Review, UserProfile
 from .routers import AuthRouter, TestRouter, WriteRouter
@@ -1965,6 +1965,37 @@ class RouterTestCase(TestCase):
             Book.objects.using("default").get(pk=b.pk).published,
             datetime.date(2009, 5, 4),
         )
+
+    @skipIfDBFeature("interprets_empty_strings_as_nulls")
+    def test_reverse_foreign_object_related_queryset_routes_once(self):
+        """
+        Queryset construction only consults the router for empty related
+        fields, and does so once even when both related fields are empty.
+        """
+
+        class SpyRouter(TestRouter):
+            def db_for_read(self, model, instance=None, **hints):
+                spy.append(model)
+                return super().db_for_read(model, instance=instance, **hints)
+
+        owner = Person.objects.create(name="Bob")
+        for name, first_name, expected_read_router_calls in [
+            ("Wart", "Bob", []),
+            ("", "", [Pet]),
+        ]:
+            with self.subTest(name=name, first_name=first_name):
+                user = User.objects.create(username=name, first_name=first_name)
+                pet = Pet.objects.create(
+                    name=name, owner=owner, owner_first_name=first_name
+                )
+
+                spy = []
+                with override_settings(DATABASE_ROUTERS=[SpyRouter()]):
+                    queryset = user.related_pets.all()
+                    self.assertEqual(spy, expected_read_router_calls)
+                    spy.clear()
+                    self.assertEqual(list(queryset), [pet])
+                    self.assertEqual(spy, [Pet])
 
 
 @override_settings(DATABASE_ROUTERS=[AuthRouter()])
