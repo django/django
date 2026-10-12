@@ -1081,38 +1081,41 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
     """
 
     class ManyRelatedManager(superclass, AltersData):
+        if not reverse:
+            model = rel.model
+            query_field_name = rel.field.related_query_name()
+            prefetch_cache_name = rel.field.name
+            source_field_name = rel.field.m2m_field_name()
+            target_field_name = rel.field.m2m_reverse_field_name()
+            symmetrical = rel.symmetrical
+        else:
+            model = rel.related_model
+            query_field_name = rel.field.name
+            prefetch_cache_name = rel.field.related_query_name()
+            source_field_name = rel.field.m2m_reverse_field_name()
+            target_field_name = rel.field.m2m_field_name()
+            symmetrical = False
+
+        through = rel.through
+        source_field = through._meta.get_field(source_field_name)
+        target_field = through._meta.get_field(target_field_name)
+        pk_field_names = {
+            lh_field.name: rh_field.name
+            for lh_field, rh_field in source_field.related_fields
+        }
+
         def __init__(self, instance=None):
             super().__init__()
 
+            # BaseManager.__init__() sets the instance's model to None.
+            self.model = self.__class__.model
             self.instance = instance
-
-            if not reverse:
-                self.model = rel.model
-                self.query_field_name = rel.field.related_query_name()
-                self.prefetch_cache_name = rel.field.name
-                self.source_field_name = rel.field.m2m_field_name()
-                self.target_field_name = rel.field.m2m_reverse_field_name()
-                self.symmetrical = rel.symmetrical
-            else:
-                self.model = rel.related_model
-                self.query_field_name = rel.field.name
-                self.prefetch_cache_name = rel.field.related_query_name()
-                self.source_field_name = rel.field.m2m_reverse_field_name()
-                self.target_field_name = rel.field.m2m_field_name()
-                self.symmetrical = False
-
-            self.through = rel.through
             self.reverse = reverse
 
-            self.source_field = self.through._meta.get_field(self.source_field_name)
-            self.target_field = self.through._meta.get_field(self.target_field_name)
-
             self.core_filters = {}
-            self.pk_field_names = {}
-            for lh_field, rh_field in self.source_field.related_fields:
+            for rh_field in self.source_field.foreign_related_fields:
                 core_filter_key = "%s__%s" % (self.query_field_name, rh_field.name)
                 self.core_filters[core_filter_key] = getattr(instance, rh_field.attname)
-                self.pk_field_names[lh_field.name] = rh_field.name
 
             self.related_val = self.source_field.get_foreign_related_value(instance)
             if None in self.related_val:
