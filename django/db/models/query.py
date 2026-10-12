@@ -2417,7 +2417,7 @@ class QuerySet(AltersData):
             and self.model._meta.pk
             not in {col.output_field for col in self.query.group_by}
             and set(self.model._meta.pk_fields).difference(
-                {col.target for col in self.query.group_by}
+                {col.target for col in self.query.group_by if hasattr(col, "target")}
             )
         ):
             raise TypeError(

@@ -1,7 +1,8 @@
 from datetime import datetime
 from unittest.mock import patch
 
-from django.db.models import Avg
+from django.db.models import Avg, Count
+from django.db.models.functions import Lower
 from django.test import TestCase
 
 from .models import Article, Comment, IndexErrorArticle, OrderedArticle, Person
@@ -266,6 +267,30 @@ class TestFirstLast(TestCase):
             qs.first()
         with self.assertRaisesMessage(TypeError, msg % "last"):
             qs.last()
+
+    def test_first_last_unordered_qs_aggregation_group_by_annotation(self):
+        Person.objects.create(name="Alice", birthday=datetime(2000, 1, 1))
+        qs = Person.objects.values("name").annotate(
+            lower=Lower("name"), count=Count("id")
+        )
+        msg = (
+            "Cannot use QuerySet.%s() on an unordered queryset performing aggregation. "
+            "Add an ordering with order_by()."
+        )
+        with self.assertRaisesMessage(TypeError, msg % "first"):
+            qs.first()
+        with self.assertRaisesMessage(TypeError, msg % "last"):
+            qs.last()
+
+    def test_first_last_unordered_qs_aggregation_group_by_annotation_pk_selected(self):
+        p = Person.objects.create(name="Alice", birthday=datetime(2000, 1, 1))
+        qs = Person.objects.values("id").annotate(
+            lower=Lower("name"), count=Count("id")
+        )
+        self.assertEqual(
+            qs.first(),
+            {"id": p.id, "lower": "alice", "count": 1},
+        )
 
     def test_first_last_empty_order_by_has_no_pk_ordering(self):
         Article.objects.create(
