@@ -59,3 +59,56 @@ class WriteRouter:
     # A router that only expresses an opinion on writes
     def db_for_write(self, model, **hints):
         return "writer"
+
+
+class ReadWriteRouter:
+    """
+    A router which represents a load balancing configuration
+    'default' is for all the write operations (primary database)
+    'other' represents a read replica of the primary database
+    Since both represent the same database allow_relation always returns True
+    """
+
+    def db_for_write(self, model, **hints):
+        return "default"
+
+    def db_for_read(self, model, **hints):
+        return "other"
+
+    def allow_relation(self, obj1, obj2, **hints):
+        return True
+
+    def allow_migrate(self, db, app_label, **hints):
+        return True
+
+
+class DenyRelationRouter:
+    """
+    Router with two separate databases with relationship denied between them
+    """
+
+    def db_for_write(self, model, **hints):
+        return "default"
+
+    def db_for_read(self, model, **hints):
+        return "other"
+
+    def allow_relation(self, obj1, obj2, **hints):
+        return obj1._state.db == obj2._state.db
+
+    def allow_migrate(self, db, app_label, **hints):
+        return True
+
+
+class NoRelationOpinionRouter:
+    def db_for_write(self, model, **hints):
+        return "default"
+
+    def db_for_read(self, model, **hints):
+        return "other"
+
+    def allow_relation(self, obj1, obj2, **hints):
+        return None
+
+    def allow_migrate(self, db, app_label, **hints):
+        return True
