@@ -240,6 +240,7 @@ class RequestContext(Context):
     ):
         super().__init__(dict_, use_l10n=use_l10n, use_tz=use_tz, autoescape=autoescape)
         self.request = request
+        self.setdefault("request", request)
         self._processors = () if processors is None else tuple(processors)
         self._processors_index = len(self.dicts)
 
