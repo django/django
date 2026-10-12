@@ -172,10 +172,17 @@ class BaseDatabaseSchemaEditor:
 
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is None:
-            for sql in self.deferred_sql:
-                self.execute(sql, None)
+            self.execute_deferred_sql()
         if self.atomic_migration:
             self.atomic.__exit__(exc_type, exc_value, traceback)
+
+    def execute_deferred_sql(self):
+        """Execute and clear deferred SQL."""
+        for sql in self.deferred_sql:
+            self.execute(sql, None)
+        self.deferred_sql.clear()
+
+    flush_deferred_sql = execute_deferred_sql
 
     # Core utility functions
 

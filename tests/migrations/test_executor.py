@@ -813,6 +813,109 @@ class ExecutorTests(MigrationTestBase):
         )
         self.assertTableNotExists("record_migration_model")
 
+    @skipUnlessDBFeature("can_rollback_ddl")
+    def test_migrations_applied_and_recorded_atomically_deferred_sql(self):
+        """
+        Migrations with deferred SQL are applied and recorded atomically.
+        """
+
+        class Migration(migrations.Migration):
+            operations = [
+                migrations.CreateModel(
+                    "model",
+                    [
+                        ("id", models.AutoField(primary_key=True)),
+                    ],
+                ),
+            ]
+
+            def apply(self, project_state, schema_editor, collect_sql=False):
+                schema_editor.deferred_sql.append("SELECT 1")
+                return super().apply(
+                    project_state, schema_editor, collect_sql=collect_sql
+                )
+
+        executor = MigrationExecutor(connection)
+        with mock.patch(
+            "django.db.migrations.executor.MigrationExecutor.record_migration"
+        ) as record_migration:
+            record_migration.side_effect = RuntimeError("Recording migration failed.")
+            with self.assertRaisesMessage(RuntimeError, "Recording migration failed."):
+                executor.apply_migration(
+                    ProjectState(),
+                    Migration("0001_initial", "record_migration"),
+                )
+        # The migration isn't recorded as applied since it failed.
+        migration_recorder = MigrationRecorder(connection)
+        self.assertIs(
+            migration_recorder.migration_qs.filter(
+                app="record_migration",
+                name="0001_initial",
+            ).exists(),
+            False,
+        )
+        try:
+            self.assertTableNotExists("record_migration_model")
+        finally:
+            with connection.cursor() as cursor:
+                cursor.execute("DROP TABLE IF EXISTS record_migration_model")
+
+    @skipUnlessDBFeature("can_rollback_ddl")
+    def test_migrations_unapplied_and_recorded_atomically(self):
+        """Migrations are unapplied and recorded atomically."""
+
+        class Migration(migrations.Migration):
+            operations = [
+                migrations.CreateModel(
+                    "model",
+                    [
+                        ("id", models.AutoField(primary_key=True)),
+                    ],
+                ),
+            ]
+
+        executor = MigrationExecutor(connection)
+        state = executor.apply_migration(
+            ProjectState(),
+            Migration("0001_initial", "record_migration"),
+        )
+        self.assertTableExists("record_migration_model")
+        migration_recorder = MigrationRecorder(connection)
+        self.assertIs(
+            migration_recorder.migration_qs.filter(
+                app="record_migration",
+                name="0001_initial",
+            ).exists(),
+            True,
+        )
+        try:
+            with mock.patch(
+                "django.db.migrations.executor.MigrationExecutor.record_migration"
+            ) as record_migration:
+                record_migration.side_effect = RuntimeError(
+                    "Recording migration failed."
+                )
+                with self.assertRaisesMessage(
+                    RuntimeError, "Recording migration failed."
+                ):
+                    executor.unapply_migration(
+                        state,
+                        Migration("0001_initial", "record_migration"),
+                    )
+            # The migration is still recorded as applied and table exists.
+            self.assertIs(
+                migration_recorder.migration_qs.filter(
+                    app="record_migration",
+                    name="0001_initial",
+                ).exists(),
+                True,
+            )
+            self.assertTableExists("record_migration_model")
+        finally:
+            with connection.cursor() as cursor:
+                cursor.execute("DROP TABLE IF EXISTS record_migration_model")
+            migration_recorder.record_unapplied("record_migration", "0001_initial")
+
     def test_migrations_not_applied_on_deferred_sql_failure(self):
         """Migrations are not recorded if deferred SQL application fails."""
 

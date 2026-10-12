@@ -6078,3 +6078,10 @@ class SchemaTests(TransactionTestCase):
             if connection.vendor == "postgresql":
                 with connection.cursor() as cursor:
                     cursor.execute("DROP COLLATION IF EXISTS case_insensitive")
+
+    def test_execute_deferred_sql(self):
+        with connection.schema_editor() as editor:
+            editor.deferred_sql.append("SELECT 1")
+            self.assertEqual(len(editor.deferred_sql), 1)
+            editor.execute_deferred_sql()
+            self.assertEqual(editor.deferred_sql, [])

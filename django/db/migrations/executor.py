@@ -255,9 +255,9 @@ class MigrationExecutor:
                     atomic=migration.atomic
                 ) as schema_editor:
                     state = migration.apply(state, schema_editor)
-                    if not schema_editor.deferred_sql:
-                        self.record_migration(migration.app_label, migration.name)
-                        migration_recorded = True
+                    schema_editor.execute_deferred_sql()
+                    self.record_migration(migration.app_label, migration.name)
+                    migration_recorded = True
         if not migration_recorded:
             self.record_migration(migration.app_label, migration.name)
         # Report progress
@@ -278,6 +278,7 @@ class MigrationExecutor:
 
     def unapply_migration(self, state, migration, fake=False):
         """Run a migration backwards."""
+        migration_recorded = False
         if self.progress_callback:
             self.progress_callback("unapply_start", migration, fake)
         if not fake:
@@ -285,7 +286,13 @@ class MigrationExecutor:
                 atomic=migration.atomic
             ) as schema_editor:
                 state = migration.unapply(state, schema_editor)
-        self.record_migration(migration.app_label, migration.name, forward=False)
+                schema_editor.execute_deferred_sql()
+                self.record_migration(
+                    migration.app_label, migration.name, forward=False
+                )
+                migration_recorded = True
+        if not migration_recorded:
+            self.record_migration(migration.app_label, migration.name, forward=False)
         # Report progress
         if self.progress_callback:
             self.progress_callback("unapply_success", migration, fake)
