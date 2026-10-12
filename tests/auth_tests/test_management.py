@@ -191,6 +191,17 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         with self.assertRaisesMessage(CommandError, "aborted"):
             call_command("changepassword", username="joe", stdout=self.stdout)
 
+    @mock.patch.object(getpass, "getpass", return_value="password")
+    def test_password_prompt_text(self, mock_get_pass):
+        call_command("changepassword", username="joe", stdout=self.stdout)
+        self.assertEqual(
+            mock_get_pass.call_args_list,
+            [
+                mock.call(prompt="Password (input hidden): "),
+                mock.call(prompt="Password (again, input hidden): "),
+            ],
+        )
+
     @mock.patch.object(changepassword.Command, "_get_pass", return_value="new_password")
     def test_system_username(self, mock_get_pass):
         """The system username is used if --username isn't provided."""
@@ -397,6 +408,24 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         u = User._default_manager.get(username="joe+admin@somewhere.org")
         self.assertEqual(u.email, "joe@somewhere.org")
         self.assertFalse(u.has_usable_password())
+
+    @mock.patch.object(getpass, "getpass", return_value="password")
+    def test_password_prompt_text(self, mock_getpass):
+        call_command(
+            "createsuperuser",
+            interactive=True,
+            username="prompttestuser",
+            email="prompt@example.com",
+            stdout=StringIO(),
+            stdin=MockTTY(),
+        )
+        self.assertEqual(
+            mock_getpass.call_args_list,
+            [
+                mock.call("Password (input hidden): "),
+                mock.call("Password (again, input hidden): "),
+            ],
+        )
 
     @override_settings(AUTH_USER_MODEL="auth_tests.CustomUser")
     def test_swappable_user(self):
