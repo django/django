@@ -288,7 +288,7 @@ def get_language_info(lang_code):
 
     if info:
         info["name_translated"] = gettext_lazy(info["name"])
-    return info
+    return {**info, "code": lang_code}
 
 
 trim_whitespace_re = _lazy_re_compile(r"\s*\n\s*")
