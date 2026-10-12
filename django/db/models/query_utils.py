@@ -458,7 +458,7 @@ def select_related_descend(field, restricted, requested, select_mask):
         return False
     # Prevent invalid usages of `select_related()` and `only()`/`defer()` such
     # as `select_related("a").only("b")` and `select_related("a").defer("a")`.
-    if select_mask and field not in select_mask:
+    if getattr(field, "column", False) and select_mask and field not in select_mask:
         raise FieldError(
             f"Field {field.model._meta.object_name}.{field.name} cannot be both "
             "deferred and traversed using select_related at the same time."
