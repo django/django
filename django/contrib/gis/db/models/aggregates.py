@@ -60,6 +60,7 @@ class GeoAggregate(Aggregate):
 
 class Collect(GeoAggregate):
     name = "Collect"
+    allow_order_by = True
     output_field_class = GeometryCollectionField
 
 
@@ -87,9 +88,11 @@ class Extent3D(GeoAggregate):
 
 class MakeLine(GeoAggregate):
     name = "MakeLine"
+    allow_order_by = True
     output_field_class = LineStringField
 
 
 class Union(GeoAggregate):
     name = "Union"
+    allow_order_by = True
     output_field_class = GeometryField

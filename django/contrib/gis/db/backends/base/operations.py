@@ -1,6 +1,11 @@
 from functools import cached_property
 
-from django.contrib.gis.db.models import GeometryField
+from django.contrib.gis.db.models import (
+    Collect,
+    GeometryField,
+    MakeLine,
+    Union,
+)
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import Area as AreaMeasure
 from django.contrib.gis.measure import Distance as DistanceMeasure
@@ -26,6 +31,9 @@ class BaseSpatialOperations:
 
     # Aggregates
     disallowed_aggregates = ()
+
+    # Aggregates that don't support the order_by argument.
+    disallowed_aggregates_order_by = (Collect, MakeLine, Union)
 
     geom_func_prefix = ""
 
@@ -156,6 +164,14 @@ class BaseSpatialOperations:
             raise NotSupportedError(
                 "%s spatial aggregation is not supported by this database backend."
                 % expression.name
+            )
+        if (
+            isinstance(expression, self.disallowed_aggregates_order_by)
+            and expression.order_by is not None
+        ):
+            raise NotSupportedError(
+                "%s spatial aggregation with order_by is not supported by this "
+                "database backend." % expression.name
             )
         super().check_expression_support(expression)
 
