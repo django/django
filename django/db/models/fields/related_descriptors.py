@@ -744,14 +744,14 @@ def create_reverse_many_to_one_manager(superclass, rel):
                         f'"{field.attname}" before this relationship can be used.'
                     )
 
+        def _empty_strings_as_null(self):
+            db = self._db or router.db_for_read(self.model, instance=self.instance)
+            return connections[db].features.interprets_empty_strings_as_nulls
+
         def _apply_rel_filters(self, queryset):
             """
             Filter the queryset for the instance this manager is bound to.
             """
-            db = self._db or router.db_for_read(self.model, instance=self.instance)
-            empty_strings_as_null = connections[
-                db
-            ].features.interprets_empty_strings_as_nulls
             with queryset._avoid_cloning():
                 queryset._add_hints(instance=self.instance)
                 if self._db:
@@ -759,10 +759,16 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 queryset._fetch_mode = self.instance._state.fetch_mode
                 queryset._defer_next_filter = True
                 queryset = queryset.filter(**self.core_filters)
+            empty_strings_as_null = None
             for field in self.field.foreign_related_fields:
                 val = getattr(self.instance, field.attname)
-                if val is None or (val == "" and empty_strings_as_null):
+                if val is None:
                     return queryset.none()
+                if val == "":
+                    if empty_strings_as_null is None:
+                        empty_strings_as_null = self._empty_strings_as_null()
+                    if empty_strings_as_null:
+                        return queryset.none()
             if self.field.many_to_one:
                 # Guard against field-like objects such as GenericRelation
                 # that abuse create_reverse_many_to_one_manager() with reverse
