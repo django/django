@@ -1112,41 +1112,17 @@ Mails the email addresses specified in :setting:`ADMINS` using
 
 Starts the Python interactive interpreter.
 
-All models from installed apps are automatically imported into the shell environment.
-When multiple models share the same name, the one from the app listed earlier in
-:setting:`INSTALLED_APPS` takes precedence. See
-:ref:`handling-model-name-collisions` for details.
+All models from installed apps are automatically imported into
+the shell environment. Those from apps listed earlier in
+:setting:`INSTALLED_APPS` take precedence in the case of name collisions.
 
-If ``--verbosity`` is ``2`` or higher, the imported objects will be listed.
-To disable automatic importing, use the :option:`--no-imports <shell --no-imports>` flag.
-
-See :ref:`customizing-shell-auto-imports` for guidance on adding or removing automatic imports.
-
-
+See :ref:`customizing-shell-auto-imports` for guidance on adding or removing
+automatic imports.
 
 .. note::
 
-    If the ``isort`` package is installed in the Python environment, the 
-    automatic imports listed in the standard output for verbose option 2 
-    or higher of the `shell` command are sorted by ``isort``. This
-    does not change what is actually imported, meaning that the standard 
-    output of imports may misalign with the true import order.
-
-    For example suppose a Django project has two apps ``cart`` and ``order``, each with model ``Line``, with ``cart`` listed before `order` in :setting:`INSTALLED_APPS`. When the ``shell`` command is run, without `isort`, the output aligns with the precedence::
-
-        from order.models import Line
-        from cart.models import Line
-
-    While with `isort` the imports shown are ordered alphabetically::
-
-        from cart.models import Line
-        from order.models import Line
-
-
-    However, in both cases Line from cart.models will be imported second, since ``cart`` is listed above ``order`` in ``apps`` in ``INSTALLED_APPS``:
-
-        >>> Line
-        <class 'cart.models.Line'>
+    If you have ``isort`` installed, for a ``--verbosity`` of 2 and above it
+    will sort the automatic imports listed when the shell starts.
 
 .. django-admin-option:: --interface {ipython,bpython,python}, -i {ipython,bpython,python}
 
