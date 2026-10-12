@@ -27,21 +27,14 @@ class DatabaseFeatures(BaseSpatialFeatures, OracleDatabaseFeatures):
                     "gis_tests.geoapp.tests.SaveLoadTests."
                     "test_geometrycollectionfield_default_max_ignored_on_read",
                 },
+                "Oracle unpacks 1-element geometry collections.": {
+                    "gis_tests.geogapp.tests.GeographyTest."
+                    "test05_geography_layermapping",
+                    "gis_tests.layermap.tests.LayerMapTest."
+                    "test_layermap_unique_multigeometry_fk",
+                    "gis_tests.layermap.tests.LayerMapTest.test_null_geom_with_unique",
+                    "gis_tests.layermap.tests.LayerMapTest.test_test_fid_range_step",
+                },
             }
         )
-        if self.connection.oracle_version >= (23, 9):
-            skips.update(
-                {
-                    "Oracle 23ai unpacks 1-element geometry collections.": {
-                        "gis_tests.geogapp.tests.GeographyTest."
-                        "test05_geography_layermapping",
-                        "gis_tests.layermap.tests.LayerMapTest."
-                        "test_layermap_unique_multigeometry_fk",
-                        "gis_tests.layermap.tests.LayerMapTest."
-                        "test_null_geom_with_unique",
-                        "gis_tests.layermap.tests.LayerMapTest."
-                        "test_test_fid_range_step",
-                    },
-                },
-            )
         return skips
