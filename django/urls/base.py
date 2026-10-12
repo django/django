@@ -2,9 +2,10 @@ from urllib.parse import unquote, urlencode, urlsplit, urlunsplit
 
 from asgiref.local import Local
 
+from django.conf import settings
 from django.http import QueryDict
 from django.utils.functional import lazy
-from django.utils.translation import override
+from django.utils.translation import get_language_from_path, override
 
 from .exceptions import NoReverseMatch, Resolver404
 from .resolvers import _get_cached_resolver, get_ns_resolver, get_resolver
@@ -185,9 +186,18 @@ def translate_url(url, lang_code):
     Return the original URL if no translated version is found.
     """
     parsed = urlsplit(url)
+    source_lang = get_language_from_path(parsed.path)
+    path = unquote(parsed.path)
     try:
-        # URL may be encoded.
-        match = resolve(unquote(parsed.path))
+        if source_lang is not None:
+            with override(source_lang):
+                match = resolve(path)
+        else:
+            try:
+                match = resolve(path)
+            except Resolver404:
+                with override(settings.LANGUAGE_CODE):
+                    match = resolve(path)
     except Resolver404:
         pass
     else:
