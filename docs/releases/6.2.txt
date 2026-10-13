@@ -76,9 +76,9 @@ method::
             return JsonResponse({"books": list(books.values("title"))})
 
 The query content is available as :attr:`HttpRequest.body
-<django.http.HttpRequest.body>` and is not parsed into
-:attr:`HttpRequest.POST <django.http.HttpRequest.POST>`; parse it yourself
-according to the request's ``Content-Type``.
+<django.http.HttpRequest.body>`, you must parse it according to the 
+request's ``Content-Type``. Django does not automatically parse it into
+:attr:`HttpRequest.POST <django.http.HttpRequest.POST>`.
 
 :class:`~django.middleware.cache.UpdateCacheMiddleware`,
 :class:`~django.middleware.cache.FetchFromCacheMiddleware` and
