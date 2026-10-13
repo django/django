@@ -4,7 +4,8 @@ Django 6.1.3 release notes
 
 *Expected November 3, 2026*
 
-Django 6.1.3 fixes several bugs in 6.1.2.
+Django 6.1.3 fixes several bugs in 6.1.2 and includes a security hardening fix
+for file-based sessions.
 
 Bugfixes
 ========
@@ -20,3 +21,8 @@ Bugfixes
   unintended, since SQL ``NULL`` cannot match any value.
 
 * Added compatibility for ``oracledb`` 26.0.0+ (:ticket:`37411`).
+
+* Fixed a bug where file-based sessions remained accessible server-side after
+  an integer timeout set with
+  :meth:`~django.contrib.sessions.backends.base.SessionBase.set_expiry` had
+  elapsed (:ticket:`37423`).

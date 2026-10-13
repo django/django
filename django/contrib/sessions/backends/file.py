@@ -95,7 +95,11 @@ class SessionStore(SessionBase):
                     self.create()
 
                 # Remove expired sessions.
-                expiry_age = self.get_expiry_age(expiry=self._expiry_date(session_data))
+                expiry = self.get_expiry_date(
+                    modification=self._last_modification(),
+                    expiry=session_data.get("_session_expiry"),
+                )
+                expiry_age = self.get_expiry_age(expiry=expiry)
                 if expiry_age <= 0:
                     session_data = {}
                     self.delete()
