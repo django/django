@@ -2330,6 +2330,9 @@ class CacheUtils(SimpleTestCase):
             ("no-cache,\tmax-age=600", 600),
             # Whitespace after the value is handled by int() transparently.
             ("max-age=300 ", 300),
+            # Whitespace preceding the =.
+            ("max-age =300", 300),
+            ("max-age\t=300", 300),
         ]
         for header_value, expected in tests:
             with self.subTest(header_value=header_value):
