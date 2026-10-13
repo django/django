@@ -907,12 +907,11 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         self._check_referer_rejects(mw, req)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
-        self.assertEqual(response.status_code, 403)
         msg = (
             "Invalid HTTP_HOST header: 'www.disallowed.com'. You may need to "
             "add 'www.disallowed.com' to ALLOWED_HOSTS."
         )
-        self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
+        self.assertForbiddenReason(response, cm, msg)
 
     @override_settings(ALLOWED_HOSTS=["www.example.com"])
     def test_bad_origin_bad_domain(self):
@@ -925,14 +924,12 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         self.assertIs(mw._origin_verified(req, "http://www.example.com"), False)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
-        self.assertEqual(response.status_code, 403)
         msg = (
             "Origin checking failed - 'https://www.evil.org' "
             "does not match 'http://www.example.com' "
             "or any other trusted origins."
         )
         self.assertForbiddenReason(response, cm, msg)
-        self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
 
     @override_settings(ALLOWED_HOSTS=["www.example.com"])
     def test_bad_origin_null_origin(self):
@@ -945,14 +942,12 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         self.assertIs(mw._origin_verified(req, "http://www.example.com"), False)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
-        self.assertEqual(response.status_code, 403)
         msg = (
             "Origin checking failed - 'null' "
             "does not match 'http://www.example.com' "
             "or any other trusted origins."
         )
         self.assertForbiddenReason(response, cm, msg)
-        self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
 
     @override_settings(ALLOWED_HOSTS=["www.example.com"])
     def test_bad_origin_bad_protocol(self):
@@ -966,14 +961,12 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         self.assertIs(mw._origin_verified(req, "https://www.example.com"), False)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
-        self.assertEqual(response.status_code, 403)
         msg = (
             "Origin checking failed - 'http://example.com' "
             "does not match 'https://www.example.com' "
             "or any other trusted origins."
         )
         self.assertForbiddenReason(response, cm, msg)
-        self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
 
     @override_settings(
         ALLOWED_HOSTS=["www.example.com"],
@@ -998,14 +991,12 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         self.assertIs(mw._origin_verified(req, "https://www.example.com"), False)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
-        self.assertEqual(response.status_code, 403)
         msg = (
             "Origin checking failed - 'http://foo.example.com' "
             "does not match 'https://www.example.com' "
             "or any other trusted origins."
         )
         self.assertForbiddenReason(response, cm, msg)
-        self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
         self.assertEqual(mw.allowed_origins_exact, {"http://no-match.com"})
         self.assertEqual(
             mw.allowed_origin_subdomains,
@@ -1029,14 +1020,12 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         self.assertIs(mw._origin_verified(req, "http://www.example.com"), False)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
-        self.assertEqual(response.status_code, 403)
         msg = (
             "Origin checking failed - 'https://[' "
             "does not match 'http://www.example.com' "
             "or any other trusted origins."
         )
         self.assertForbiddenReason(response, cm, msg)
-        self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
 
     @override_settings(ALLOWED_HOSTS=["www.example.com"])
     def test_good_origin_insecure(self):
@@ -1110,16 +1099,15 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         req.META["HTTP_X_FORWARDED_HOST"] = "www.example.com:8080"
         mw = CsrfViewMiddleware(post_form_view)
         self._check_referer_rejects(mw, req)
-        self.assertIs(mw._origin_verified(req, "http://www.example.com:8000"), False)
+        self.assertIs(mw._origin_verified(req, "http://localhost:8000"), False)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
-        self.assertEqual(response.status_code, 403)
         msg = (
             "Origin checking failed - 'http://www.example.com:8080' "
             "does not match 'http://localhost:8000' "
             "or any other trusted origins."
         )
-        self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
+        self.assertForbiddenReason(response, cm, msg)
         self.assertContains(response, "X-Forwarded-Host", status_code=403)
         self.assertContains(
             response, "<code>www.example.com:8080</code>", status_code=403
@@ -1138,13 +1126,12 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         self.assertIs(mw._origin_verified(req, "https://www.example.com"), False)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
-        self.assertEqual(response.status_code, 403)
         msg = (
             "Origin checking failed - 'https://badorigin.example.com' "
             "does not match 'https://www.example.com' "
             "or any other trusted origins."
         )
-        self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
+        self.assertForbiddenReason(response, cm, msg)
         self.assertContains(
             response, "If the expected server origin looks correct", status_code=403
         )
@@ -1163,14 +1150,14 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         self.assertIs(mw._origin_verified(req, "http://localhost"), False)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
-        self.assertEqual(response.status_code, 403)
         msg = (
             "Origin checking failed - 'http://www.example.com' "
             "does not match 'http://localhost' "
             "or any other trusted origins."
         )
-        self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
+        self.assertForbiddenReason(response, cm, msg)
         self.assertContains(response, "X-Forwarded-Host", status_code=403)
+        self.assertNotContains(response, "X-Forwarded-Proto", status_code=403)
 
     @override_settings(ALLOWED_HOSTS=["www.example.com"], DEBUG=True)
     def test_bad_origin_x_forwarded_proto(self):
@@ -1184,15 +1171,15 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         self.assertIs(mw._origin_verified(req, "http://www.example.com"), False)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
-        self.assertEqual(response.status_code, 403)
         msg = (
             "Origin checking failed - 'https://www.example.com' "
             "does not match 'http://www.example.com' "
             "or any other trusted origins."
         )
-        self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
+        self.assertForbiddenReason(response, cm, msg)
         self.assertContains(response, "X-Forwarded-Proto", status_code=403)
         self.assertContains(response, "<code>https</code>", status_code=403)
+        self.assertNotContains(response, "X-Forwarded-Host", status_code=403)
 
     @override_settings(ALLOWED_HOSTS=["www.example.com"], DEBUG=True)
     def test_no_likely_proxy_headers(self):
@@ -1205,13 +1192,12 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         self.assertIs(mw._origin_verified(req, "http://www.example.com"), False)
         with self.assertLogs("django.security.csrf", "WARNING") as cm:
             response = mw.process_view(req, post_form_view, (), {})
-        self.assertEqual(response.status_code, 403)
         msg = (
             "Origin checking failed - 'https://www.example.com' "
             "does not match 'http://www.example.com' "
             "or any other trusted origins."
         )
-        self.assertEqual(cm.records[0].getMessage(), "Forbidden (%s): " % msg)
+        self.assertForbiddenReason(response, cm, msg)
         self.assertContains(
             response, "If the expected server origin looks correct", status_code=403
         )
