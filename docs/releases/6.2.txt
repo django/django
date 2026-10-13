@@ -343,6 +343,11 @@ Requests and responses
   ``django.contrib.admindocs.middleware.XViewMiddleware`` affected, as they did
   not implement ``process_request()`` or ``process_response()``.
 
+* Streaming responses now include configured CSP nonces in their headers, even
+  if those nonces are unused in the response body. Previously allowed inline
+  scripts or styles without a matching nonce may be blocked or trigger
+  violation reports. See :ref:`csp-nonce-generation` for details.
+
 Tests
 -----
 
