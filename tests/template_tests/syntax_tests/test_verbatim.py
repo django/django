@@ -56,6 +56,48 @@ class VerbatimTagTests(SimpleTestCase):
 
     @setup(
         {
+            "single_braces": (
+                "{% verbatim %}{{% endverbatim %}"
+                "text"
+                "{% verbatim %}}{% endverbatim %}"
+            ),
+            "double_braces": (
+                "{% verbatim %}{{{% endverbatim %}"
+                "text"
+                "{% verbatim %}}}{% endverbatim %}"
+            ),
+            "double_braces_with_spaces": (
+                "{% verbatim %}{{ {% endverbatim %}"
+                "text"
+                "{% verbatim %} }}{% endverbatim %}"
+            ),
+            "block_delimiters": (
+                "{% verbatim %}{%{% endverbatim %}"
+                "text"
+                "{% verbatim %}%}{% endverbatim %}"
+            ),
+            "comment_delimiters": (
+                "{% verbatim %}{#{% endverbatim %}"
+                "text"
+                "{% verbatim %}#}{% endverbatim %}"
+            ),
+        }
+    )
+    def test_multiple_verbatim_tags_on_same_line(self):
+        tests = {
+            "single_braces": "{text}",
+            "double_braces": "{{text}}",
+            "double_braces_with_spaces": "{{ text }}",
+            "block_delimiters": "{%text%}",
+            "comment_delimiters": "{#text#}",
+        }
+        for template_name, expected in tests.items():
+            with self.subTest(template_name=template_name):
+                output = self.engine.render_to_string(template_name)
+                self.assertEqual(output, expected)
+
+    @setup(
+        {
             "named_verbatim": (
                 "{% verbatim example %}\n"
                 "{%\n"
@@ -69,6 +111,15 @@ class VerbatimTagTests(SimpleTestCase):
         self.assertEqual(
             output,
             "\n{%\n{% endverbatim %}\n",
+        )
+
+    @setup(
+        {"verbatim": "{% verbatim a  b %}{% endverbatim a b %}{% endverbatim a  b %}"}
+    )
+    def test_named_verbatim_preserves_name_whitespace(self):
+        self.assertEqual(
+            self.engine.render_to_string("verbatim"),
+            "{% endverbatim a b %}",
         )
 
     @setup(
