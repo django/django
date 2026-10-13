@@ -126,3 +126,17 @@ def build_policy(config, nonce=None):
         policy.append(f"{directive} {rendered_value}".rstrip())
 
     return "; ".join(policy)
+
+
+def _csp_policy_contains_nonce(policy):
+    try:
+        policy_values = policy.values()
+    except AttributeError:
+        return False
+    for values in policy_values:
+        try:
+            if values == CSP.NONCE or CSP.NONCE in values:
+                return True
+        except TypeError:
+            pass
+    return False
