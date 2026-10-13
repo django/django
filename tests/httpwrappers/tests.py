@@ -1106,6 +1106,7 @@ class HttpResponseHeadersTestCase(SimpleTestCase):
     def test_invalid_characters_in_header_names(self):
         response = HttpResponse()
         invalid_names = (
+            "",
             "X Test",
             "X:Test",
             "X/Test",
