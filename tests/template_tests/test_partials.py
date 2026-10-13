@@ -602,3 +602,31 @@ INLINE-CONTENT
             "<p>Body</p>\n"
             "{% endpartialdef %}",
         )
+
+    @setup(
+        {
+            "partial_with_named_verbatim_blocks": (
+                "{% partialdef testing-name %}\n"
+                "{% verbatim first %}{{{% partialdef fake-first %}"
+                "{% endverbatim first %}"
+                "{% verbatim second %}{% partialdef fake-second %}}}"
+                "{% endverbatim second %}\n"
+                "<p>Body</p>\n"
+                "{% endpartialdef %}\n"
+            ),
+        },
+        debug_only=True,
+    )
+    def test_partial_with_named_verbatim_blocks(self):
+        template = self.engine.get_template("partial_with_named_verbatim_blocks")
+        self.assertEqual(set(template.extra_data["partials"]), {"testing-name"})
+        self.assertEqual(
+            template.extra_data["partials"]["testing-name"].source,
+            "{% partialdef testing-name %}\n"
+            "{% verbatim first %}{{{% partialdef fake-first %}"
+            "{% endverbatim first %}"
+            "{% verbatim second %}{% partialdef fake-second %}}}"
+            "{% endverbatim second %}\n"
+            "<p>Body</p>\n"
+            "{% endpartialdef %}",
+        )
