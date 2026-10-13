@@ -53,3 +53,38 @@ class VerbatimTagTests(SimpleTestCase):
     def test_verbatim_tag06(self):
         output = self.engine.render_to_string("verbatim-tag06")
         self.assertEqual(output, "Don't {% endverbatim %} just yet")
+
+    @setup(
+        {
+            "named_verbatim": (
+                "{% verbatim example %}\n"
+                "{%\n"
+                "{% endverbatim %}\n"
+                "{% endverbatim example %}"
+            ),
+        }
+    )
+    def test_literal_multiline_opener_in_named_verbatim(self):
+        output = self.engine.render_to_string("named_verbatim")
+        self.assertEqual(
+            output,
+            "\n{%\n{% endverbatim %}\n",
+        )
+
+    @setup(
+        {
+            "verbatim": (
+                "{% verbatim %}\n"
+                "{% if user %}Hello, {{ user }}{% endif %}\n"
+                "{% endverbatim %}"
+            ),
+        }
+    )
+    def test_template_syntax_in_raw_blocks(self):
+        output = self.engine.render_to_string("verbatim")
+        self.assertEqual(output, "\n{% if user %}Hello, {{ user }}{% endif %}\n")
+
+    @setup({"verbatim": "{% verbatim %}\n{%\n{% endverbatim %}"})
+    def test_literal_multiline_block_opener_in_raw_blocks(self):
+        output = self.engine.render_to_string("verbatim")
+        self.assertEqual(output, "\n{%\n")
