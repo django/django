@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.checks import Error, Tags, Warning, register
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.csp import CSP
+from django.utils.csp import _csp_policy_contains_nonce
 
 CROSS_ORIGIN_OPENER_POLICY_VALUES = {
     "same-origin",
@@ -174,20 +174,6 @@ def _csp_middleware():
     return (
         "django.middleware.csp.ContentSecurityPolicyMiddleware" in settings.MIDDLEWARE
     )
-
-
-def _csp_policy_contains_nonce(policy):
-    try:
-        policy_values = policy.values()
-    except AttributeError:
-        return False
-    for values in policy_values:
-        try:
-            if values == CSP.NONCE or CSP.NONCE in values:
-                return True
-        except TypeError:
-            pass
-    return False
 
 
 def _csp_context_processor_configured():
