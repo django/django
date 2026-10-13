@@ -418,9 +418,10 @@ Use the ``django.test.Client`` class to make requests.
         accept a safe, idempotent query in the request body.
 
         When ``data`` is provided, it is used as the request body, and
-        a ``Content-Type`` header is set to ``content_type``. :rfc:`RFC 10008
-        <10008#section-2>` requires servers to reject QUERY requests without a
-        ``Content-Type``, so pass a type matching the query format you send.
+        a ``Content-Type`` header is set to ``content_type``. The
+        ``content_type`` must match the data format, as :rfc:`RFC 10008
+        <10008#section-2>` requires servers to reject requests with a 
+        missing or inconsistent ``Content-Type``.
 
         The ``follow``, ``secure``, ``headers``, ``query_params``, and
         ``extra`` parameters act the same as for :meth:`Client.get`.
