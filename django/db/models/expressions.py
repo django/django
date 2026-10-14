@@ -198,6 +198,13 @@ class BaseExpression:
         """Return the number of columns produced by this expression."""
         return 1
 
+    @property
+    def is_composite(self):
+        try:
+            return self.output_field.is_composite
+        except (AttributeError, FieldError):
+            return False
+
     def __getstate__(self):
         state = self.__dict__.copy()
         state.pop("convert_value", None)
@@ -524,13 +531,6 @@ class BaseExpression:
 @deconstructible
 class Expression(BaseExpression, Combinable):
     """An expression that can be combined with other expressions."""
-
-    @property
-    def is_composite(self):
-        try:
-            return self.output_field.is_composite
-        except FieldError:
-            return False
 
     @classproperty
     @functools.lru_cache(maxsize=128)
@@ -1974,7 +1974,7 @@ class OrderBy(Expression):
         return [self.expression]
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
-        if self.expression.output_field.is_composite:
+        if self.expression.is_composite:
             cols = self.expression.get_source_expressions()
             sql_parts = []
             params = []
