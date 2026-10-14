@@ -67,15 +67,6 @@ class SessionStore(SessionBase):
         tz = datetime.UTC if settings.USE_TZ else None
         return datetime.datetime.fromtimestamp(modification, tz=tz)
 
-    def _expiry_date(self, session_data):
-        """
-        Return the expiry time of the file storing the session's content.
-        """
-        return session_data.get("_session_expiry") or (
-            self._last_modification()
-            + datetime.timedelta(seconds=self.get_session_cookie_age())
-        )
-
     def load(self):
         session_data = {}
         try:
