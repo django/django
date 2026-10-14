@@ -785,6 +785,70 @@ class SchemaTests(TransactionTestCase):
     def test_m2m_db_constraint_inherited(self):
         self._test_m2m_db_constraint(InheritedManyToManyField)
 
+    def mysql_innodb_table(self, model):
+        """Return (table_id, total_row_versions) for the model's table."""
+        # Reading innodb_tables requires the PROCESS privilege.
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT table_id, total_row_versions "
+                    "FROM information_schema.innodb_tables "
+                    "WHERE name = CONCAT(DATABASE(), '/', %s)",
+                    [model._meta.db_table],
+                )
+                row = cursor.fetchone()
+        except DatabaseError:
+            row = None
+        if row is None:
+            self.skipTest("Unable to read information_schema.innodb_tables.")
+        return row
+
+    def assertMySQLAddFieldIsInstant(self, field):
+        if connection.vendor != "mysql" or connection.mysql_is_mariadb:
+            self.skipTest("Requires MySQL (InnoDB row versions).")
+        # A rebuild (ALGORITHM=COPY) gives the table a new table_id and resets
+        # its row version to 0, while ALGORITHM=INSTANT keeps the table_id and
+        # bumps the row version. The table needs rows, otherwise MySQL rebuilds
+        # it trivially.
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        Author.objects.create(name="Andrew")
+        field.set_attributes_from_name("new_field")
+        table_id, row_versions = self.mysql_innodb_table(Author)
+        with connection.schema_editor() as editor:
+            editor.add_field(Author, field)
+        new_table_id, new_row_versions = self.mysql_innodb_table(Author)
+        self.assertEqual(new_table_id, table_id, "The table was rebuilt.")
+        self.assertEqual(new_row_versions, row_versions + 1)
+
+    def test_add_nullable_field_is_instant_mysql(self):
+        self.assertMySQLAddFieldIsInstant(IntegerField(null=True))
+
+    def test_add_nullable_foreign_key_is_instant_mysql(self):
+        self.assertMySQLAddFieldIsInstant(ForeignKey(Author, CASCADE, null=True))
+
+    def test_add_nullable_foreign_key(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        field = ForeignKey(Author, CASCADE, null=True)
+        field.set_attributes_from_name("parent")
+        with connection.schema_editor() as editor:
+            editor.add_field(Author, field)
+        self.assertForeignKeyExists(Author, "parent_id", "schema_author")
+
+    def test_add_non_null_foreign_key_with_default(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        author = Author.objects.create(name="Andrew")
+        field = ForeignKey(Author, CASCADE, default=author.pk)
+        field.set_attributes_from_name("parent")
+        with connection.schema_editor() as editor:
+            editor.add_field(Author, field)
+        self.assertForeignKeyExists(Author, "parent_id", "schema_author")
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT parent_id FROM schema_author")
+            self.assertEqual(list(cursor.fetchall()), [(author.pk,)])
+
     def test_add_field(self):
         """
         Tests adding fields to models
