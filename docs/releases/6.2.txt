@@ -234,7 +234,14 @@ Signals
 Tasks
 ~~~~~
 
-* ...
+* Tasks now support :ref:`metadata <task-metadata>`, additional data stored
+  alongside a task, separate from its arguments. Metadata can be set using
+  :meth:`Task.using() <django.tasks.Task.using>`, and read or modified within
+  a task using :attr:`.TaskContext.metadata`. Backends must set the new
+  :attr:`~django.tasks.backends.base.BaseTaskBackend.supports_metadata` feature
+  flag and implement
+  :meth:`~django.tasks.backends.base.BaseTaskBackend.save_metadata` to support
+  it.
 
 Templates
 ~~~~~~~~~
