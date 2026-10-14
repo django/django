@@ -99,6 +99,22 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 [effective_default],
             )
 
+    def _inline_fk_on_add(self, field):
+        # An inline FK forces ALGORITHM=COPY for the column add as well.
+        return not field.null
+
+    def _add_field_fk(self, model, field, suffix):
+        if not field.null:
+            return super()._add_field_fk(model, field, suffix)
+        # ADD CONSTRAINT FOREIGN KEY can only be ALGORITHM=INPLACE with
+        # foreign_key_checks disabled. Existing rows are all NULL, so there
+        # is nothing to validate.
+        self.execute("SET foreign_key_checks=0")
+        try:
+            self.execute(self._create_fk_sql(model, field, suffix))
+        finally:
+            self.execute("SET foreign_key_checks=1")
+
     def remove_constraint(self, model, constraint):
         if (
             isinstance(constraint, UniqueConstraint)
