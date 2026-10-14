@@ -48,9 +48,9 @@ class Apps:
         # Lock for thread-safe population.
         self._lock = threading.RLock()
         self.loading = False
-        # Labels of app configs whose ready() method succeeded during a
-        # population that hasn't completed yet.
-        self._ready_app_labels = set()
+        # App configs whose ready() method hasn't run yet, while populate() is
+        # in phase 3 or after it failed in phase 3.
+        self._app_configs_pending_ready = None
 
         # Maps ("app_label", "modelname") tuples to lists of functions to be
         # called when the corresponding model is ready. Used by this class's
@@ -86,7 +86,9 @@ class Apps:
                 raise RuntimeError("populate() isn't reentrant")
             self.loading = True
 
-            try:
+            # Phases 1 and 2 are skipped when retrying after a failure in
+            # phase 3.
+            if self._app_configs_pending_ready is None:
                 # Phase 1: initialize app configs and import app modules.
                 for entry in installed_apps:
                     if isinstance(entry, AppConfig):
@@ -123,20 +125,22 @@ class Apps:
 
                 self.models_ready = True
 
-                # Phase 3: run ready() methods of app configs, skipping those
-                # that succeeded during a previous, failed attempt.
-                for app_config in self.get_app_configs():
-                    if app_config.label not in self._ready_app_labels:
-                        app_config.ready()
-                        self._ready_app_labels.add(app_config.label)
-            except Exception:
-                # Reset the registry so that populate() can be retried, e.g.
-                # when a WSGI server imports the application again.
-                self.app_configs = {}
-                self.apps_ready = self.models_ready = self.loading = False
-                raise
+                self._app_configs_pending_ready = list(self.get_app_configs())
 
-            self._ready_app_labels.clear()
+            # Phase 3: run ready() methods of app configs. If one fails,
+            # populate() can be called again, e.g. when a WSGI server imports
+            # the application again, to run the remaining ones. Since no module
+            # is imported again, model classes aren't redefined.
+            pending = self._app_configs_pending_ready
+            while pending:
+                try:
+                    pending[0].ready()
+                except Exception:
+                    self.loading = False
+                    raise
+                del pending[0]
+            self._app_configs_pending_ready = None
+
             self.ready = True
             self.ready_event.set()
 
@@ -372,7 +376,7 @@ class Apps:
         self.stored_app_configs.append(self.app_configs)
         self.app_configs = {}
         self.apps_ready = self.models_ready = self.loading = self.ready = False
-        self._ready_app_labels.clear()
+        self._app_configs_pending_ready = None
         self.clear_cache()
         self.populate(installed)
 

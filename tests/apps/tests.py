@@ -277,7 +277,10 @@ class AppsTests(SimpleTestCase):
             with self.assertRaisesMessage(ValueError, "Oops"):
                 new_apps.set_installed_apps(installed_apps)
             self.assertIs(new_apps.ready, False)
-            new_apps.populate(installed_apps)
+            # Retrying doesn't import models modules again.
+            with patch.object(AppConfig, "import_models") as import_models:
+                new_apps.populate(installed_apps)
+            import_models.assert_not_called()
         self.assertIs(new_apps.ready, True)
         # ready() methods that succeeded aren't called again.
         self.assertEqual(one_ready.call_count, 1)
