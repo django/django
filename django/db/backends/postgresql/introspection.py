@@ -64,7 +64,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_table_list(self, cursor):
         """Return a list of table and view names in the current database."""
-        cursor.execute("""
+        return self._get_table_list(cursor)
+
+    def get_table_list_for_names(self, cursor, table_names):
+        return self._get_table_list(cursor, table_names)
+
+    def _get_table_list(self, cursor, table_names=None):
+        sql = """
             SELECT
                 c.relname,
                 CASE
@@ -78,7 +84,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             WHERE c.relkind IN ('f', 'm', 'p', 'r', 'v')
                 AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
                 AND pg_catalog.pg_table_is_visible(c.oid)
-        """)
+        """
+        params = None
+        if table_names is not None:
+            sql += " AND c.relname = ANY(%s)"
+            params = [sorted(table_names)]
+        cursor.execute(sql, params)
         return [
             TableInfo(*row)
             for row in cursor.fetchall()
