@@ -170,17 +170,9 @@ spelling:
 		"$(BUILDDIR)/spelling/output.txt."
 
 black:
-	@mkdir -p $(BUILDDIR)/black
-	@find . -name "*.txt" -not -path "./_build/*" -not -path "./_ext/*" \
-		-not -path "./_static/*" -not -path "./_theme/*" -not -path "./requirements.txt" \
-		| xargs blacken-docs --rst-literal-block; echo $$? > "$(BUILDDIR)/black/output.txt"
-	@RESULT=`cat $(BUILDDIR)/black/output.txt`; \
-	if [ "$$RESULT" -gt 0 ]; then \
-		echo "💥 📢 Code blocks in documentation must be reformatted with blacken-docs 📢 💥"; \
-		exit $$RESULT; \
-	else \
-		echo "Code blocks in documentation are properly formatted ✅"; \
-	fi
+	$(PYTHON) blacken-sources.py
+	@echo
+	@echo "Code blocks in documentation are properly formatted ✅"
 
 lint:
 	$(PYTHON) lint.py

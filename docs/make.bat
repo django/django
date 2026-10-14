@@ -221,9 +221,8 @@ if "%1" == "check" (
 	exit /b
 
 :run_black
-	for /f "usebackq tokens=*" %%i in (`dir *.txt /s /b ^| findstr /v /c:"_build" /c:"_ext" /c:"_static" /c:"_theme" /c:"requirements.txt"`) do (
-		blacken-docs --rst-literal-block %%i
-	)
+	python blacken-sources.py
+	if errorlevel 1 exit /b 1
 	echo.
 	echo.Code blocks reformatted
 	exit /b

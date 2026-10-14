@@ -4,6 +4,7 @@ from collections import Counter
 from os.path import abspath, dirname, splitext
 from unittest import mock
 
+from _utils import find_sphinx_sources
 from sphinxlint.checkers import (
     _ROLE_BODY,
     _is_long_interpreted_text,
@@ -162,31 +163,15 @@ if __name__ == "__main__":
     directory = dirname(abspath(__file__))
     params = sys.argv[1:] if len(sys.argv) > 1 else []
 
-    print(f"Running sphinxlint for: {directory} {params=}")
+    source_files = find_sphinx_sources(directory, absolute=True)
+    print(f"Running sphinxlint for: {directory} ({len(source_files)} files) {params=}")
 
-    sys.exit(
-        main(
-            [
-                directory,
-                "--jobs",
-                "0",
-                "--ignore",
-                "_build",
-                "--ignore",
-                "_ext",
-                "--ignore",
-                "_static",
-                "--ignore",
-                "_theme",
-                "--ignore",
-                "requirements.txt",
-                "--enable",
-                "all",
-                "--disable",
-                "line-too-long",  # Disable sphinx-lint version
-                "--max-line-length",
-                "79",
-                *params,
-            ]
-        )
-    )
+    args = ["___"]  # sphinxlint.cli.main ignores args[0].
+    args.extend(["--jobs", "0"])
+    args.extend(["--enable", "all"])
+    args.extend(["--disable", "line-too-long"])  # sphinx-lint's version.
+    args.extend(["--max-line-length", "79"])
+    args.extend(params)
+    args.extend(source_files)
+
+    sys.exit(main(args))
