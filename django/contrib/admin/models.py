@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
-from django.utils.text import get_text_list
+from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
@@ -143,7 +143,7 @@ class LogEntry(models.Model):
                 elif "changed" in sub_message:
                     sub_message["changed"]["fields"] = get_text_list(
                         [
-                            gettext(field_name)
+                            capfirst(gettext(field_name))
                             for field_name in sub_message["changed"]["fields"]
                         ],
                         gettext("and"),

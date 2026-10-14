@@ -48,7 +48,7 @@ class AdminHistoryViewTests(TestCase):
         self.assertEqual(
             logentry.get_change_message(),
             "Changed State name (from form’s Meta.labels), "
-            "nolabel_form_field and not_a_form_field. "
+            "Nolabel_form_field and Not_a_form_field. "
             "Changed City verbose_name for city “%s”." % city,
         )
 

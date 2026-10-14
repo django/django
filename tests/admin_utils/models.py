@@ -25,6 +25,11 @@ class Article(models.Model):
         verbose_name=_("History"),
         help_text=_("History help text"),
     )
+    occupation = models.CharField(
+        max_length=100,
+        verbose_name=_("occupation"),
+        blank=True,
+    )
     created = models.DateTimeField(null=True)
 
     def __str__(self):
