@@ -199,6 +199,12 @@ class GDALRasterTests(SimpleTestCase):
         ):
             GDALRaster("nonexistent.tif")
 
+    def test_vector_file(self):
+        vector_path = Path(__file__).parent.parent / "data" / "cities" / "cities.shp"
+        msg = 'Could not open the datasource at "%s"' % vector_path
+        with self.assertRaisesMessage(GDALException, msg):
+            GDALRaster(vector_path)
+
     def test_vsi_raster_creation(self):
         # Open a raster as a file object.
         with open(self.rs_path, "rb") as dat:
