@@ -1,4 +1,5 @@
 import io
+import warnings
 
 from django.conf import settings
 from django.core.cache import cache
@@ -61,6 +62,29 @@ class HttpResponseBaseTests(SimpleTestCase):
         r = HttpResponseBase()
         r.reason_phrase = "test"
         self.assertEqual(r.reason_phrase, "test")
+
+    def test_set_cookie_warns_for_cached_response(self):
+        response = HttpResponse()
+        response._cache_page_cached = True
+
+        with self.assertWarnsMessage(
+            RuntimeWarning,
+            "HttpResponseBase.set_cookie() is setting a cookie on a response that "
+            "has already been cached. Ensure cookies are set before the response "
+            "is cached.",
+        ):
+            response.set_cookie("test_value", "test_cookie")
+
+        self.assertEqual(response.cookies["test_value"].value, "test_cookie")
+
+    def test_set_cookie_does_not_warn_for_uncached_response(self):
+        response = HttpResponse()
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", RuntimeWarning)
+            response.set_cookie("test_value", "test_cookie")
+
+        self.assertEqual(response.cookies["test_value"].value, "test_cookie")
 
 
 class HttpResponseTests(SimpleTestCase):

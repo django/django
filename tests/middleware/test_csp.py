@@ -1,8 +1,12 @@
+import warnings
+
 from playwright_tests import PlaywrightTestCase
 from utils_tests.test_csp import basic_config, basic_policy
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from django.test import SimpleTestCase
+from django.http import HttpResponse
+from django.middleware.csp import ContentSecurityPolicyMiddleware
+from django.test import RequestFactory, SimpleTestCase
 from django.test.utils import modify_settings, override_settings
 from django.utils.csp import CSP
 
@@ -75,6 +79,61 @@ class CSPMiddlewareTest(SimpleTestCase):
         response = self.client.get("/csp-base/")
         self.assertEqual(response[CSP.HEADER_ENFORCE], basic_policy)
         self.assertEqual(response[CSP.HEADER_REPORT_ONLY], basic_policy)
+
+    @override_settings(SECURE_CSP=basic_config, SECURE_CSP_REPORT_ONLY=None)
+    def test_csp_warns_for_cached_response(self):
+        response = HttpResponse()
+        response._cache_page_cached = True
+
+        def view(request):
+            return response
+
+        middleware = ContentSecurityPolicyMiddleware(view)
+        request = RequestFactory().get("/")
+
+        with self.assertWarnsMessage(
+            RuntimeWarning,
+            "ContentSecurityPolicyMiddleware is adding a CSP header to a "
+            "response that has already been cached. Ensure CSP processing "
+            "occurs before the response is cached.",
+        ):
+            result = middleware(request)
+
+        self.assertEqual(result[CSP.HEADER_ENFORCE], basic_policy)
+
+    @override_settings(SECURE_CSP=basic_config, SECURE_CSP_REPORT_ONLY=None)
+    def test_csp_does_not_warn_for_uncached_response(self):
+        response = HttpResponse()
+
+        def view(request):
+            return HttpResponse()
+
+        middleware = ContentSecurityPolicyMiddleware(view)
+        request = RequestFactory().get("/")
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", RuntimeWarning)
+            result = middleware(request)
+
+        self.assertEqual(result[CSP.HEADER_ENFORCE], basic_policy)
+
+    @override_settings(SECURE_CSP=basic_config, SECURE_CSP_REPORT_ONLY=None)
+    def test_csp_does_not_warn_when_header_already_set(self):
+        response = HttpResponse()
+        response._cache_page_cached = True
+        response[CSP.HEADER_ENFORCE] = "default-src 'none'"
+
+        def view(request):
+            return response
+
+        middleware = ContentSecurityPolicyMiddleware(view)
+        request = RequestFactory().get("/")
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", RuntimeWarning)
+            result = middleware(request)
+
+        self.assertEqual(result[CSP.HEADER_ENFORCE], "default-src 'none'")
 
     @override_settings(
         DEBUG=True,

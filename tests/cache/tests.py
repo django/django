@@ -10,6 +10,7 @@ import tempfile
 import threading
 import time
 import unittest
+import warnings
 from functools import wraps
 from pathlib import Path
 from unittest import mock, skipIf
@@ -2316,6 +2317,29 @@ class CacheUtils(SimpleTestCase):
                 patch_vary_headers(response, newheaders)
                 self.assertEqual(response.headers["Vary"], resulting_vary)
 
+    def test_patch_vary_headers_warns_for_cached_response(self):
+        response = HttpResponse()
+        response._cache_page_cached = True
+
+        with self.assertWarnsMessage(
+            RuntimeWarning,
+            "patch_vary_headers() is updating the Vary header on a response that "
+            "has already been cached. Ensure the Vary header is set before "
+            "the response is cached.",
+        ):
+            patch_vary_headers(response, ("Cookie",))
+
+        self.assertEqual(response["Vary"], "Cookie")
+
+    def test_patch_vary_headers_does_not_warn_for_uncached_response(self):
+        response = HttpResponse()
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", RuntimeWarning)
+            patch_vary_headers(response, ("Cookie",))
+
+        self.assertEqual(response["Vary"], "Cookie")
+
     def test_get_max_age_strips_whitespace(self):
         # A max-age directive with surrounding whitespace must be parsed
         # correctly; a leading space (e.g. from manual header construction)
@@ -2956,6 +2980,55 @@ class CacheMiddlewareTest(SimpleTestCase):
         result = timeout_middleware.process_request(request)
         self.assertIsNotNone(result)
         self.assertEqual(result.content, b"Hello World 1")
+
+    def test_response_marked_as_cached(self):
+        middleware = UpdateCacheMiddleware(empty_response)
+        request = self.factory.get("/view/")
+        request._cache_update_cache = True
+
+        response = HttpResponse("Hello World 1")
+        response = middleware.process_response(request, response)
+
+        self.assertIs(response._cache_page_cached, True)
+
+    def test_template_response_marked_as_cached_after_render(self):
+        middleware = UpdateCacheMiddleware(empty_response)
+        request = self.factory.get("/view/")
+        request._cache_update_cache = True
+        template = engines["django"].from_string("This is a test")
+
+        response = TemplateResponse(request, template)
+        response = middleware.process_response(request, response)
+
+        self.assertIs(getattr(response, "_cache_page_cached", False), False)
+        response.render()
+        self.assertIs(response._cache_page_cached, True)
+
+    def test_cached_response_retains_cached_marker(self):
+        middleware = UpdateCacheMiddleware(empty_response)
+        request = self.factory.get("/view/")
+        request._cache_update_cache = True
+
+        response = HttpResponse("Hello World 1")
+        response = middleware.process_response(request, response)
+
+        cached_request = self.factory.get("/view/")
+        cached_response = FetchFromCacheMiddleware(empty_response).process_request(
+            cached_request
+        )
+
+        self.assertIsNotNone(cached_response)
+        self.assertIs(cached_response._cache_page_cached, True)
+
+    def test_streaming_response_not_marked_with_cache(self):
+        middleware = UpdateCacheMiddleware(empty_response)
+        request = self.factory.get("/view/")
+        request._cache_update_cache = True
+
+        response = StreamingHttpResponse(["content"])
+        response = middleware.process_response(request, response)
+
+        self.assertIs(getattr(response, "_cache_page_cached", False), False)
 
     def test_view_decorator(self):
         # decorate the same view with different cache decorators

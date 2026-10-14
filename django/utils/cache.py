@@ -16,6 +16,7 @@ An example: i18n middleware would need to distinguish caches by the
 """
 
 import time
+import warnings
 from collections import defaultdict
 from hashlib import md5
 
@@ -307,6 +308,14 @@ def patch_vary_headers(response, newheaders):
     contains an asterisk, then "Vary" header will consist of a single asterisk
     '*'. Otherwise, existing headers in "Vary" aren't removed.
     """
+    if getattr(response, "_cache_page_cached", False):
+        warnings.warn(
+            "patch_vary_headers() is updating the Vary header on a response that "
+            "has already been cached. Ensure the Vary header is set before "
+            "the response is cached.",
+            RuntimeWarning,
+            stacklevel=2,
+        )
     # Note that we need to keep the original order intact, because cache
     # implementations may rely on the order of the Vary contents in, say,
     # computing an MD5 hash.
