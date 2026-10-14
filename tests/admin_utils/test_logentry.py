@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from unittest import mock
 
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.contrib.admin.utils import quote
@@ -106,6 +107,48 @@ class LogEntryTests(TestCase):
         self.assertEqual(logentry.get_change_message(), "Added.")
         with translation.override("fr"):
             self.assertEqual(logentry.get_change_message(), "Ajout.")
+
+    def test_logentry_change_message_translates_lowercase_verbose_name(self):
+        self.a1.hist = "Some content"
+        self.a1.save(update_fields=["hist"])
+        post_data = {
+            "site": self.site.pk,
+            "title": self.a1.title,
+            "hist": self.a1.hist,
+            "occupation": "Writer",
+            "created_0": "2008-03-12",
+            "created_1": "11:54",
+        }
+        change_url = reverse(
+            "admin:admin_utils_article_change", args=[quote(self.a1.pk)]
+        )
+        response = self.client.post(change_url, post_data)
+        self.assertRedirects(response, reverse("admin:admin_utils_article_changelist"))
+        logentry = LogEntry.objects.filter(
+            content_type__model__iexact="article"
+        ).latest("id")
+        self.assertEqual(
+            json.loads(logentry.change_message),
+            [{"changed": {"fields": ["Occupation"]}}],
+        )
+        self.assertEqual(logentry.get_change_message(), "Changed Occupation.")
+
+        def gettext_with_occupation_translation(message):
+            if message == "occupation":
+                return "profession"
+            return translation.gettext(message)
+
+        with (
+            translation.override("fr"),
+            mock.patch(
+                "django.contrib.admin.models.gettext",
+                side_effect=gettext_with_occupation_translation,
+            ),
+        ):
+            self.assertEqual(
+                logentry.get_change_message(),
+                "Modification de profession.",
+            )
 
     def test_logentry_change_message_not_json(self):
         """LogEntry.change_message was a string before Django 1.10."""

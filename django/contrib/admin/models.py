@@ -115,6 +115,17 @@ class LogEntry(models.Model):
     def is_deletion(self):
         return self.action_flag == DELETION
 
+    @staticmethod
+    def _translate_field_name(field_name):
+        translated = gettext(field_name)
+        if translated == field_name:
+            lower_initial = field_name[:1].lower() + field_name[1:]
+            if lower_initial != field_name:
+                translated_lower = gettext(lower_initial)
+                if translated_lower != lower_initial:
+                    return translated_lower
+        return translated
+
     def get_change_message(self):
         """
         If self.change_message is a JSON structure, interpret it as a change
@@ -143,7 +154,7 @@ class LogEntry(models.Model):
                 elif "changed" in sub_message:
                     sub_message["changed"]["fields"] = get_text_list(
                         [
-                            gettext(field_name)
+                            self._translate_field_name(field_name)
                             for field_name in sub_message["changed"]["fields"]
                         ],
                         gettext("and"),
