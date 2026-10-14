@@ -928,6 +928,35 @@ class FileSessionTests(SessionTestsMixin, SimpleTestCase):
         with self.assertRaises(ImproperlyConfigured):
             self.backend()
 
+    def test_expired_integer_expiry(self):
+        # A session with an expiry given as a number of seconds is expired
+        # once that many seconds have passed since it was last modified.
+        self.session["foo"] = "bar"
+        self.session.set_expiry(10)
+        self.session.save()
+        session_key = self.session.session_key
+        session_file = self.session._key_to_file(session_key)
+        self.addCleanup(self.session.delete, session_key)
+        # Not expired yet.
+        self.assertEqual(self.backend(session_key)["foo"], "bar")
+        # Move the last modification time back past the expiry.
+        past = os.stat(session_file).st_mtime - 20
+        os.utime(session_file, (past, past))
+        new_session = self.backend(session_key)
+        self.addCleanup(new_session.delete)
+        self.assertNotIn("foo", new_session)
+        self.assertNotEqual(new_session.session_key, session_key)
+
+    def test_clearsessions_integer_expiry(self):
+        self.session["foo"] = "bar"
+        self.session.set_expiry(10)
+        self.session.save()
+        session_file = self.session._key_to_file(self.session.session_key)
+        past = os.stat(session_file).st_mtime - 20
+        os.utime(session_file, (past, past))
+        self.backend.clear_expired()
+        self.assertIs(os.path.exists(session_file), False)
+
     def test_invalid_key_backslash(self):
         # Ensure we don't allow directory-traversal.
         # This is tested directly on _key_to_file, as load() will swallow
