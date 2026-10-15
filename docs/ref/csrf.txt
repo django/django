@@ -45,9 +45,10 @@ The CSRF protection is based on the following things:
 
    This part is done by the :ttag:`csrf_token` template tag.
 
-#. For all incoming requests that are not using HTTP GET, HEAD, OPTIONS or
-   TRACE, a CSRF cookie must be present, and the 'csrfmiddlewaretoken' field
-   must be present and correct. If it isn't, the user will get a 403 error.
+#. For all incoming requests that are not using HTTP GET, HEAD, OPTIONS,
+   QUERY, or TRACE, a CSRF cookie must be present, and the
+   'csrfmiddlewaretoken' field must be present and correct. If it isn't, the
+   user will get a 403 error.
 
    When validating the 'csrfmiddlewaretoken' field value, only the secret,
    not the full token, is compared with the secret in the cookie value.

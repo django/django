@@ -161,7 +161,7 @@ class ClientTest(TestCase):
 
     def test_json_serialization(self):
         """The test client serializes JSON data."""
-        methods = ("post", "put", "patch", "delete")
+        methods = ("post", "put", "patch", "delete", "query")
         tests = (
             ({"value": 37}, {"value": 37}),
             ([37, True], [37, True]),
@@ -200,6 +200,19 @@ class ClientTest(TestCase):
         self.assertEqual(response.templates[0].name, "PUT Template")
         self.assertEqual(response.context["data"], "{'foo': 'bar'}")
         self.assertEqual(response.context["Content-Length"], "14")
+
+    def test_query(self):
+        response = self.client.query(
+            "/query_view/",
+            data="q=django",
+            content_type="application/x-www-form-urlencoded",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.templates[0].name, "QUERY Template")
+        self.assertEqual(response.context["data"], "q=django")
+        self.assertEqual(
+            response.context["Content-Type"], "application/x-www-form-urlencoded"
+        )
 
     def test_trace(self):
         """TRACE a view"""
@@ -356,7 +369,17 @@ class ClientTest(TestCase):
         """
         A 307 or 308 redirect preserves the request method after the redirect.
         """
-        methods = ("get", "post", "head", "options", "put", "patch", "delete", "trace")
+        methods = (
+            "get",
+            "post",
+            "head",
+            "options",
+            "put",
+            "patch",
+            "delete",
+            "trace",
+            "query",
+        )
         codes = (307, 308)
         for method, code in itertools.product(methods, codes):
             with self.subTest(method=method, code=code):
@@ -369,7 +392,7 @@ class ClientTest(TestCase):
                 self.assertEqual(response.request["REQUEST_METHOD"], method.upper())
 
     def test_follow_307_and_308_preserves_query_string(self):
-        methods = ("post", "options", "put", "patch", "delete", "trace")
+        methods = ("post", "options", "put", "patch", "delete", "trace", "query")
         codes = (307, 308)
         for method, code in itertools.product(methods, codes):
             with self.subTest(method=method, code=code):
@@ -1086,6 +1109,7 @@ class ClientTest(TestCase):
             "head",
             "options",
             "trace",
+            "query",
         )
         for method in tests:
             with self.subTest(method=method):
@@ -1248,6 +1272,7 @@ class RequestFactoryTest(SimpleTestCase):
             "head",
             "options",
             "trace",
+            "query",
         )
         for method in tests:
             with self.subTest(method=method):
@@ -1304,6 +1329,7 @@ class AsyncClientTest(TestCase):
             "head",
             "options",
             "trace",
+            "query",
         )
         for method_name in tests:
             with self.subTest(method=method_name):
@@ -1327,6 +1353,14 @@ class AsyncClientTest(TestCase):
         response = await self.async_client.post("/post_view/", {"value": 37})
         self.assertContains(response, "Data received: 37 is the value.")
 
+    async def test_query_data(self):
+        response = await self.async_client.query(
+            "/query_view/",
+            data="q=django",
+            content_type="application/x-www-form-urlencoded",
+        )
+        self.assertContains(response, "Query received: q=django is the body.")
+
     async def test_body_read_on_get_data(self):
         response = await self.async_client.get("/post_view/")
         self.assertContains(response, "Viewing GET page.")
@@ -1341,6 +1375,7 @@ class AsyncClientTest(TestCase):
             "head",
             "options",
             "trace",
+            "query",
         )
         for method in tests:
             with self.subTest(method=method):
@@ -1365,6 +1400,7 @@ class AsyncRequestFactoryTest(SimpleTestCase):
             "head",
             "options",
             "trace",
+            "query",
         )
         for method_name in tests:
             with self.subTest(method=method_name):
@@ -1455,6 +1491,7 @@ class AsyncRequestFactoryTest(SimpleTestCase):
             "head",
             "options",
             "trace",
+            "query",
         )
         for method in tests:
             with self.subTest(method=method):
