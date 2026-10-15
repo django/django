@@ -99,6 +99,7 @@ class CookieStorage(BaseStorage):
         retrieved by this storage.
         """
         data = self.request.COOKIES.get(self.cookie_name)
+        self.request._messages_cookie_read = True
         messages = self._decode(data)
         all_retrieved = not (messages and messages[-1] == self.not_finished)
         if messages and not all_retrieved:
