@@ -43,8 +43,9 @@ The parameters sent to the wrappers are:
 
 * ``sql`` -- a ``str``, the SQL query to be sent to the database.
 
-* ``params`` -- a list/tuple of parameter values for the SQL command, or a
-  list/tuple of lists/tuples if the wrapped call is ``executemany()``.
+* ``params`` -- ``None`` or a list/tuple of parameter values for the SQL
+  command, or a list/tuple of lists/tuples if the wrapped call is
+  ``executemany()``.
 
 * ``many`` -- a ``bool`` indicating whether the ultimately invoked call is
   ``execute()`` or ``executemany()`` (and whether ``params`` is expected to be
