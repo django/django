@@ -51,6 +51,7 @@ from django.test.signals import template_rendered
 from django.test.utils import (
     CaptureQueriesContext,
     ContextList,
+    _TestState,
     compare_xml,
     modify_settings,
     override_settings,
@@ -375,6 +376,17 @@ class SimpleTestCase(unittest.TestCase):
                     raise
                 result.addError(self, sys.exc_info())
                 return
+
+        if hasattr(_TestState, "saved_data"):
+            unhandled = getattr(
+                _TestState.saved_data, "unhandled_thread_exceptions", []
+            )
+
+            for exc_info in unhandled:
+                if debug:
+                    raise exc_info[1]
+                result.addError(self, exc_info)
+            unhandled.clear()
 
     @classmethod
     def _pre_setup(cls):
