@@ -187,12 +187,23 @@ class BaseExpression:
     constraint_validation_compatible = True
     # Does the expression possibly return more than one row?
     set_returning = False
-    # Does the expression allow composite expressions?
+    # Does the expression allow composite expressions in source_expressions?
     allows_composite_expressions = False
 
     def __init__(self, output_field=None):
         if output_field is not None:
             self.output_field = output_field
+
+    def __len__(self):
+        """Return the number of columns produced by this expression."""
+        return 1
+
+    @property
+    def is_composite(self):
+        try:
+            return self.output_field.is_composite
+        except (AttributeError, FieldError):
+            return False
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -305,11 +316,12 @@ class BaseExpression:
             for expr in c.get_source_expressions()
         ]
         if not self.allows_composite_expressions and any(
-            isinstance(expr, ColPairs) for expr in source_expressions
+            isinstance(expr, Expression) and expr.is_composite
+            for expr in source_expressions
         ):
             raise ValueError(
                 f"{self.__class__.__name__} expression does not support "
-                "composite primary keys."
+                "composite expressions."
             )
         c.set_source_expressions(source_expressions)
         return c
@@ -560,6 +572,19 @@ class Expression(BaseExpression, Combinable):
 
     def __hash__(self):
         return hash(self.identity)
+
+
+class CompositeFieldExpression(Expression):
+    def _resolve_output_field(self):
+        from django.db.models.fields.composite import CompositeField
+
+        fields = []
+        for index, source in enumerate(self.get_source_expressions()):
+            field = source.output_field.clone()
+            field.name = str(index)
+            field.db_column = None
+            fields.append(field)
+        return CompositeField(*fields)
 
 
 # Type inference for CombinedExpression.output_field.
@@ -1387,7 +1412,7 @@ class Col(Expression):
         ) + self.target.get_db_converters(connection)
 
 
-class ColPairs(Expression):
+class ColPairs(CompositeFieldExpression):
     def __init__(self, alias, targets, sources, output_field):
         super().__init__(output_field=output_field)
         self.alias = alias
@@ -1851,6 +1876,13 @@ class Subquery(BaseExpression, Combinable):
                 self.output_field
             except AttributeError:
                 return resolved.query
+            if (
+                resolved.query.output_field.is_composite
+                and not self.output_field.is_composite
+            ):
+                raise ValueError(
+                    "A multi-column Subquery cannot use a scalar output_field."
+                )
             if self.output_field and type(self.output_field) is not type(
                 resolved.query.output_field
             ):
@@ -1942,10 +1974,11 @@ class OrderBy(Expression):
         return [self.expression]
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
-        if isinstance(self.expression, ColPairs):
+        if self.expression.is_composite:
+            cols = self.expression.get_source_expressions()
             sql_parts = []
             params = []
-            for col in self.expression.get_cols():
+            for col in cols:
                 copy = self.copy()
                 copy.set_source_expressions([col])
                 sql, col_params = compiler.compile(copy)

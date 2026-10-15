@@ -136,6 +136,17 @@ class CompositePKTests(TestCase):
         pk = User._meta.get_field("pk")
         self.assertIsInstance(pk, CompositePrimaryKey)
         self.assertIs(User._meta.pk, pk)
+        self.assertIs(
+            pk.get_field("tenant_id"),
+            User._meta.get_field("tenant_id"),
+        )
+        self.assertSequenceEqual(
+            list(pk.get_fields()),
+            [
+                (("tenant_id",), User._meta.get_field("tenant_id")),
+                (("id",), User._meta.get_field("id")),
+            ],
+        )
 
     def test_error_on_user_pk_conflict(self):
         with self.assertRaises(IntegrityError):
