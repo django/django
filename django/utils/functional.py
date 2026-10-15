@@ -1,6 +1,7 @@
 import copy
 import itertools
 import operator
+import warnings
 from functools import wraps
 
 
@@ -23,6 +24,15 @@ class cached_property:
         )
 
     def __init__(self, func):
+        from django.utils.deprecation import RemovedInDjango2029Warning
+        from django.utils.warnings import django_file_prefixes
+
+        warnings.warn(
+            "django.utils.functional.cached_property is deprecated. "
+            "Use functools.cached_property instead.",
+            category=RemovedInDjango2029Warning,
+            skip_file_prefixes=django_file_prefixes(),
+        )
         self.real_func = func
         self.__doc__ = getattr(func, "__doc__")
 

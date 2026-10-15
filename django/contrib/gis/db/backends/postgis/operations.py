@@ -1,4 +1,5 @@
 import re
+from functools import cached_property
 
 from django.conf import settings
 from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
@@ -13,7 +14,6 @@ from django.db import NotSupportedError, ProgrammingError
 from django.db.backends.postgresql.operations import DatabaseOperations
 from django.db.backends.postgresql.psycopg_any import is_psycopg3
 from django.db.models import Func, Value
-from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
 
 from .adapter import PostGISAdapter

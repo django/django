@@ -8,7 +8,7 @@ import asyncio
 import threading
 import warnings
 from contextlib import contextmanager
-from functools import lru_cache
+from functools import cached_property, lru_cache
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -17,7 +17,6 @@ from django.db import connections
 from django.db.backends.base.base import NO_DB_ALIAS, BaseDatabaseWrapper
 from django.db.backends.utils import CursorDebugWrapper as BaseCursorDebugWrapper
 from django.utils.asyncio import async_unsafe
-from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
 from django.utils.version import get_version_tuple
 

@@ -1,4 +1,5 @@
 import pkgutil
+from functools import cached_property
 from importlib import import_module
 
 from django.conf import settings
@@ -7,7 +8,6 @@ from django.core.exceptions import ImproperlyConfigured
 # For backwards compatibility with Django < 3.2
 from django.utils.connection import ConnectionDoesNotExist  # NOQA: F401
 from django.utils.connection import BaseConnectionHandler
-from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
 DEFAULT_DB_ALIAS = "default"

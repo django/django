@@ -1,5 +1,6 @@
+from functools import cached_property
+
 from django.db import ProgrammingError
-from django.utils.functional import cached_property
 
 
 class BaseDatabaseFeatures:

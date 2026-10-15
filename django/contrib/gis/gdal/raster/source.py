@@ -11,6 +11,7 @@ from ctypes import (
     c_void_p,
     string_at,
 )
+from functools import cached_property
 from pathlib import Path
 
 from django.contrib.gis.gdal.driver import Driver
@@ -29,7 +30,6 @@ from django.contrib.gis.gdal.srs import SpatialReference, SRSException
 from django.contrib.gis.geometry import json_regex
 from django.core.exceptions import SuspiciousOperation
 from django.utils.encoding import force_bytes, force_str
-from django.utils.functional import cached_property
 
 
 class DisallowedRasterLookup(SuspiciousOperation):

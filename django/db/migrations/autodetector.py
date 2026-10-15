@@ -2,6 +2,7 @@ import functools
 import re
 from collections import defaultdict, namedtuple
 from enum import Enum
+from functools import cached_property
 from graphlib import TopologicalSorter
 
 from django.conf import settings
@@ -16,7 +17,6 @@ from django.db.migrations.utils import (
     RegexObject,
     resolve_relation,
 )
-from django.utils.functional import cached_property
 
 
 class OperationDependency(

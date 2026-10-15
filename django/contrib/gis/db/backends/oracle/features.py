@@ -1,8 +1,9 @@
+from functools import cached_property
+
 from django.contrib.gis.db.backends.base.features import BaseSpatialFeatures
 from django.db.backends.oracle.features import (
     DatabaseFeatures as OracleDatabaseFeatures,
 )
-from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseSpatialFeatures, OracleDatabaseFeatures):

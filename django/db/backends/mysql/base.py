@@ -4,12 +4,13 @@ MySQL database backend for Django.
 Requires mysqlclient: https://pypi.org/project/mysqlclient/
 """
 
+from functools import cached_property
+
 from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.utils.asyncio import async_unsafe
-from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 
 try:

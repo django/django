@@ -2,8 +2,9 @@
 Models for testing various aspects of the django.contrib.admindocs app.
 """
 
+from functools import cached_property
+
 from django.db import models
-from django.utils.functional import cached_property
 
 
 class Company(models.Model):

@@ -16,7 +16,6 @@ from django.core.exceptions import FieldError
 from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections, models, transaction
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
-from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 
 logger = logging.getLogger("django.db.models")
@@ -212,7 +211,7 @@ class Q(tree.Node):
             kwargs["_negated"] = True
         return path, args, kwargs
 
-    @cached_property
+    @functools.cached_property
     def identity(self):
         path, args, kwargs = self.deconstruct()
         identity = [path, *kwargs.items()]
@@ -233,7 +232,7 @@ class Q(tree.Node):
     def __hash__(self):
         return hash(self.identity)
 
-    @cached_property
+    @functools.cached_property
     def referenced_base_fields(self):
         """
         Retrieve all base fields referenced directly or through F expressions
