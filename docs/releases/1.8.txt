@@ -228,7 +228,7 @@ Minor features
 
 * The PostGIS 2 ``CREATE EXTENSION postgis`` and the SpatiaLite
   ``SELECT InitSpatialMetaData`` initialization commands are now automatically
-  run by :djadmin:`migrate`.
+  run by :cli:`migrate`.
 
 * The GDAL interface now supports retrieving properties of
   :ref:`raster (image) data file <raster-data-source-objects>`.
@@ -416,15 +416,15 @@ Management Commands
 * The new :option:`makemessages --exclude` and :option:`compilemessages
   --exclude` options allow excluding specific locales from processing.
 
-* :djadmin:`compilemessages` now has a ``--use-fuzzy`` or ``-f`` option which
+* :cli:`compilemessages` now has a ``--use-fuzzy`` or ``-f`` option which
   includes fuzzy translations into compiled files.
 
 * The :option:`loaddata --ignorenonexistent` option now ignores data for models
   that no longer exist.
 
-* :djadmin:`runserver` now uses daemon threads for faster reloading.
+* :cli:`runserver` now uses daemon threads for faster reloading.
 
-* :djadmin:`inspectdb` now outputs ``Meta.unique_together``. It is also able to
+* :cli:`inspectdb` now outputs ``Meta.unique_together``. It is also able to
   introspect :class:`~django.db.models.AutoField` for MySQL and PostgreSQL
   databases.
 
@@ -435,20 +435,20 @@ Management Commands
   by the command is now always the ``dest`` name specified in the command
   option definition (as long as the command uses the :mod:`argparse` module).
 
-* The :djadmin:`dbshell` command now supports MySQL's optional SSL certificate
+* The :cli:`dbshell` command now supports MySQL's optional SSL certificate
   authority setting (``--ssl-ca``).
 
 * The new :option:`makemigrations --name` allows giving the migration(s) a
   custom name instead of a generated one.
 
-* The :djadmin:`loaddata` command now prevents repeated fixture loading. If
+* The :cli:`loaddata` command now prevents repeated fixture loading. If
   :setting:`FIXTURE_DIRS` contains duplicates or a default fixture directory
   path (``app_name/fixtures``), an exception is raised.
 
 * The new ``makemigrations --exit`` option allows exiting with an error
   code if no migrations are created.
 
-* The new :djadmin:`showmigrations` command allows listing all migrations and
+* The new :cli:`showmigrations` command allows listing all migrations and
   their dependencies in a project.
 
 Middleware
@@ -636,7 +636,7 @@ Tests
 * The new :meth:`~django.test.SimpleTestCase.assertJSONNotEqual` assertion
   allows you to test that two JSON fragments are not equal.
 
-* Added options to the :djadmin:`test` command to preserve the test database
+* Added options to the :cli:`test` command to preserve the test database
   (:option:`--keepdb <test --keepdb>`), to run the test cases in reverse order
   (:option:`--reverse <test --reverse>`), and to enable SQL logging for failing
   tests (:option:`--debug-sql <test --debug-sql>`).
@@ -891,7 +891,7 @@ misleading if the user never logged in. If you are using the default user
 in ``contrib.auth``.
 
 If you are using a custom user model that inherits from ``AbstractUser``,
-you'll need to run :djadmin:`makemigrations` and generate a migration for your
+you'll need to run :cli:`makemigrations` and generate a migration for your
 app that contains that model. Also, if wish to set ``last_login`` to ``NULL``
 for users who haven't logged in, you can run this query::
 
@@ -1425,8 +1425,8 @@ arguments by default.
 Listing all migrations in a project
 -----------------------------------
 
-The ``--list`` option of the :djadmin:`migrate` management command is
-deprecated and will be removed in Django 1.10. Use :djadmin:`showmigrations`
+The ``--list`` option of the :cli:`migrate` management command is
+deprecated and will be removed in Django 1.10. Use :cli:`showmigrations`
 instead.
 
 ``cache_choices`` option of ``ModelChoiceField`` and ``ModelMultipleChoiceField``

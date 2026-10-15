@@ -414,7 +414,7 @@ Other new features and changes introduced since Django 1.0 include:
   over an empty sequence. See :doc:`the list of built-in template tags
   </ref/templates/builtins>` for examples of this.
 
-* The :djadmin:`dumpdata` management command now accepts individual
+* The :cli:`dumpdata` management command now accepts individual
   model names as arguments, allowing you to export the data just from
   particular models.
 

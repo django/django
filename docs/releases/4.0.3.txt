@@ -10,7 +10,7 @@ reformatted with :pypi:`black`.
 Bugfixes
 ========
 
-* Prevented, following a regression in Django 4.0.1, :djadmin:`makemigrations`
+* Prevented, following a regression in Django 4.0.1, :cli:`makemigrations`
   from generating infinite migrations for a model with ``ManyToManyField`` to
   a lowercased swappable model such as ``'auth.user'`` (:ticket:`33515`).
 

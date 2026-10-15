@@ -114,7 +114,7 @@ Management Commands
 * The new :option:`--force-color` option forces colorization of the command
   output.
 
-* :djadmin:`inspectdb` now creates models for foreign tables on PostgreSQL.
+* :cli:`inspectdb` now creates models for foreign tables on PostgreSQL.
 
 * :option:`inspectdb --include-views` now creates models for materialized views
   on Oracle and PostgreSQL.
@@ -123,18 +123,18 @@ Management Commands
   models for partition tables on PostgreSQL. In older versions, models are
   created child tables instead the parent.
 
-* :djadmin:`inspectdb` now introspects :class:`~django.db.models.DurationField`
+* :cli:`inspectdb` now introspects :class:`~django.db.models.DurationField`
   for Oracle and PostgreSQL, and :class:`~django.db.models.AutoField` for
   SQLite.
 
-* On Oracle, :djadmin:`dbshell` is wrapped with ``rlwrap``, if available.
+* On Oracle, :cli:`dbshell` is wrapped with ``rlwrap``, if available.
   ``rlwrap`` provides a command history and editing of keyboard input.
 
 * The new :option:`makemigrations --no-header` option avoids writing header
   comments in generated migration file(s). This option is also available for
-  :djadmin:`squashmigrations`.
+  :cli:`squashmigrations`.
 
-* :djadmin:`runserver` can now use `Watchman
+* :cli:`runserver` can now use `Watchman
   <https://facebook.github.io/watchman/>`_ to improve the performance of
   watching a large number of files for changes.
 
@@ -206,7 +206,7 @@ Serialization
 * You can now deserialize data using natural keys containing :ref:`forward
   references <natural-keys-and-forward-references>` by passing
   ``handle_forward_references=True`` to ``serializers.deserialize()``.
-  Additionally, :djadmin:`loaddata` handles forward references automatically.
+  Additionally, :cli:`loaddata` handles forward references automatically.
 
 Tests
 ~~~~~
@@ -372,7 +372,7 @@ Permissions for proxy models
 :ref:`Permissions for proxy models <proxy-models-permissions-topic>` are now
 created using the content type of the proxy model rather than the content type
 of the concrete model. A migration will update existing permissions when you
-run :djadmin:`migrate`.
+run :cli:`migrate`.
 
 In the admin, the change is transparent for proxy models having the same
 ``app_label`` as their concrete model. However, in older versions, users with
@@ -461,7 +461,7 @@ Miscellaneous
   ``django.contrib.sitemaps.ping_google`` function, set the new
   ``sitemap_uses_https`` argument to ``False``.
 
-* :djadmin:`runserver` no longer supports ``pyinotify`` (replaced by Watchman).
+* :cli:`runserver` no longer supports ``pyinotify`` (replaced by Watchman).
 
 * The :class:`~django.db.models.Avg`, :class:`~django.db.models.StdDev`, and
   :class:`~django.db.models.Variance` aggregate functions now return a

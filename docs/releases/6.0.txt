@@ -233,7 +233,7 @@ Minor features
   ensures consistent path ordering in manifest files, making them more
   reproducible and reducing unnecessary diffs.
 
-* The :djadmin:`collectstatic` command now reports only a summary for skipped
+* The :cli:`collectstatic` command now reports only a summary for skipped
   files (and for deleted files when using ``--clear``) at ``--verbosity`` 1. To
   see per-file details for either case, set ``--verbosity`` to 2 or higher.
 
@@ -257,11 +257,11 @@ Internationalization
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* The :djadmin:`startproject` and :djadmin:`startapp` commands now create the
+* The :cli:`startproject` and :cli:`startapp` commands now create the
   custom target directory if it doesn't exist.
 
 * Common utilities, such as ``django.conf.settings``, are now automatically
-  imported to the :djadmin:`shell` by default.
+  imported to the :cli:`shell` by default.
 
 Migrations
 ~~~~~~~~~~
@@ -430,11 +430,11 @@ Email
 ---------------------------------------------------------------
 
 Since Django 3.2, when the :setting:`DEFAULT_AUTO_FIELD` setting was added,
-the default :djadmin:`startproject` template's ``settings.py`` contained::
+the default :cli:`startproject` template's ``settings.py`` contained::
 
     DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-and the default :djadmin:`startapp` template's ``AppConfig`` contained::
+and the default :cli:`startapp` template's ``AppConfig`` contained::
 
     default_auto_field = "django.db.models.BigAutoField"
 

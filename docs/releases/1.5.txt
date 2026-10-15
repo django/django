@@ -264,7 +264,7 @@ Django 1.5 also includes several smaller improvements worth noting:
   ``self.stderr.write('error')`` (see the note on
   :ref:`management commands output <management-commands-output>`).
 
-* The :djadmin:`dumpdata` management command outputs one row at a time,
+* The :cli:`dumpdata` management command outputs one row at a time,
   preventing out-of-memory errors when dumping large datasets.
 
 * In the localflavor for Canada, ``pq`` was added to the acceptable codes for
@@ -799,13 +799,13 @@ the built-in :func:`itertools.product` instead.
 ------------------------------
 
 The ``cleanup`` management command has been deprecated and replaced by
-:djadmin:`clearsessions`.
+:cli:`clearsessions`.
 
 ``daily_cleanup.py`` script
 ---------------------------
 
 The undocumented ``daily_cleanup.py`` script has been deprecated. Use the
-:djadmin:`clearsessions` management command instead.
+:cli:`clearsessions` management command instead.
 
 ``depth`` keyword argument in ``select_related``
 ------------------------------------------------
