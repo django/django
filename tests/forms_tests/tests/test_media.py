@@ -18,6 +18,7 @@ class MediaAssetTestCase(SimpleTestCase):
     def test_eq(self):
         self.assertEqual(MediaAsset("path/to/css"), MediaAsset("path/to/css"))
         self.assertEqual(MediaAsset("path/to/css"), "path/to/css")
+        self.assertNotEqual(MediaAsset("path/to/css", media="all"), "path/to/css")
         self.assertNotEqual(
             MediaAsset("path/to/css", media="all"), MediaAsset("path/to/css")
         )
@@ -786,17 +787,46 @@ class FormsMediaTestCase(SimpleTestCase):
         # c.css comes before a.css because widget1 + widget2 establishes this
         # order.
         self.assertEqual(
-            merged._css, {"screen": ["c.css", "a.css"], "all": ["d.css", "e.css"]}
+            merged._css,
+            {
+                "screen": [
+                    Stylesheet("c.css", media="screen"),
+                    Stylesheet("a.css", media="screen"),
+                ],
+                "all": [
+                    Stylesheet("d.css", media="all"),
+                    Stylesheet("e.css", media="all"),
+                ],
+            },
         )
         merged += widget3
         # widget3 contains an explicit ordering of c.css and a.css.
         self.assertEqual(
             merged._css,
-            {"screen": ["a.css", "b.css", "c.css"], "all": ["d.css", "e.css"]},
+            {
+                "screen": [
+                    Stylesheet("a.css", media="screen"),
+                    Stylesheet("b.css", media="screen"),
+                    Stylesheet("c.css", media="screen"),
+                ],
+                "all": [
+                    Stylesheet("d.css", media="all"),
+                    Stylesheet("e.css", media="all"),
+                ],
+            },
         )
         # Media ordering does not matter.
         merged = widget1 + widget4
-        self.assertEqual(merged._css, {"screen": ["c.css"], "all": ["d.css", "e.css"]})
+        self.assertEqual(
+            merged._css,
+            {
+                "screen": [Stylesheet("c.css", media="screen")],
+                "all": [
+                    Stylesheet("d.css", media="all"),
+                    Stylesheet("e.css", media="all"),
+                ],
+            },
+        )
 
     def test_add_js_deduplication(self):
         widget1 = Media(js=["a", "b", "c"])
@@ -825,24 +855,62 @@ class FormsMediaTestCase(SimpleTestCase):
         widget3 = Media(css={"screen": ["a.css"], "all": ["b.css", "c.css"]})
         widget4 = Media(css={"screen": ["a.css"], "all": ["c.css", "b.css"]})
         merged = widget1 + widget1
-        self.assertEqual(merged._css_lists, [{"screen": ["a.css"], "all": ["b.css"]}])
-        self.assertEqual(merged._css, {"screen": ["a.css"], "all": ["b.css"]})
+        self.assertEqual(
+            merged._css_lists,
+            [
+                {
+                    "screen": [Stylesheet("a.css", media="screen")],
+                    "all": [Stylesheet("b.css", media="all")],
+                }
+            ],
+        )
+        self.assertEqual(
+            merged._css,
+            {
+                "screen": [Stylesheet("a.css", media="screen")],
+                "all": [Stylesheet("b.css", media="all")],
+            },
+        )
         merged = widget1 + widget2
         self.assertEqual(
             merged._css_lists,
             [
-                {"screen": ["a.css"], "all": ["b.css"]},
-                {"screen": ["c.css"]},
+                {
+                    "screen": [Stylesheet("a.css", media="screen")],
+                    "all": [Stylesheet("b.css", media="all")],
+                },
+                {"screen": [Stylesheet("c.css", media="screen")]},
             ],
         )
-        self.assertEqual(merged._css, {"screen": ["a.css", "c.css"], "all": ["b.css"]})
+        self.assertEqual(
+            merged._css,
+            {
+                "screen": [
+                    Stylesheet("a.css", media="screen"),
+                    Stylesheet("c.css", media="screen"),
+                ],
+                "all": [Stylesheet("b.css", media="all")],
+            },
+        )
         merged = widget3 + widget4
         # Ordering within lists is preserved.
         self.assertEqual(
             merged._css_lists,
             [
-                {"screen": ["a.css"], "all": ["b.css", "c.css"]},
-                {"screen": ["a.css"], "all": ["c.css", "b.css"]},
+                {
+                    "screen": [Stylesheet("a.css", media="screen")],
+                    "all": [
+                        Stylesheet("b.css", media="all"),
+                        Stylesheet("c.css", media="all"),
+                    ],
+                },
+                {
+                    "screen": [Stylesheet("a.css", media="screen")],
+                    "all": [
+                        Stylesheet("c.css", media="all"),
+                        Stylesheet("b.css", media="all"),
+                    ],
+                },
             ],
         )
         msg = (
@@ -857,7 +925,9 @@ class FormsMediaTestCase(SimpleTestCase):
         media = Media(css={"screen": ["a.css"]}, js=["a"])
         empty_media = Media()
         merged = media + empty_media
-        self.assertEqual(merged._css_lists, [{"screen": ["a.css"]}])
+        self.assertEqual(
+            merged._css_lists, [{"screen": [Stylesheet("a.css", media="screen")]}]
+        )
         self.assertEqual(merged._js_lists, [["a"]])
 
     def test_add_invalid_type(self):

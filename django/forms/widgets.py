@@ -78,7 +78,7 @@ class MediaAsset:
             self.__class__ is other.__class__
             and self._path == other._path
             and self.attributes == other.attributes
-        ) or (isinstance(other, str) and self._path == other)
+        ) or (isinstance(other, str) and not self.attributes and self._path == other)
 
     def __hash__(self):
         # Compare path and attrs to ensure performant comparison
