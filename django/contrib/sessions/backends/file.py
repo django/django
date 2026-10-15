@@ -1,7 +1,6 @@
 import datetime
 import logging
 import os
-import shutil
 import tempfile
 
 from django.conf import settings
@@ -130,13 +129,13 @@ class SessionStore(SessionBase):
         session_file_name = self._key_to_file()
 
         try:
-            # Make sure the file exists. If it does not already exist, an
-            # empty placeholder file is created.
+            # Open the session file and keep the fd alive for the duration
+            # of the save. Using the fd, we can make a atomic check and
+            # write by checking the existence of file.
             flags = os.O_WRONLY | getattr(os, "O_BINARY", 0)
             if must_create:
                 flags |= os.O_EXCL | os.O_CREAT
             fd = os.open(session_file_name, flags)
-            os.close(fd)
         except FileNotFoundError:
             if not must_create:
                 raise UpdateError
@@ -172,16 +171,22 @@ class SessionStore(SessionBase):
                 finally:
                     os.close(output_file_fd)
 
-                # This will atomically rename the file (os.rename) if the OS
-                # supports it. Otherwise this will result in a shutil.copy2
-                # and os.unlink (for example on Windows). See #9084.
-                shutil.move(output_file_name, session_file_name)
+                # Check whether the session file was unlinked (e.g. by a
+                # concurrent logout) while we were writing to the temp
+                # file.
+                # st_nlink == 0: path was deleted, do NOT resurrect it.
+                # st_nlink >= 1: path is still alive, safe to rename.
+                if not must_create and os.fstat(fd).st_nlink == 0:
+                    raise UpdateError
+                os.rename(output_file_name, session_file_name)
                 renamed = True
             finally:
                 if not renamed:
                     os.unlink(output_file_name)
         except (EOFError, OSError):
             pass
+        finally:
+            os.close(fd)
 
     async def asave(self, must_create=False):
         return self.save(must_create=must_create)
