@@ -107,42 +107,16 @@ vulnerabilities. It is the developer's responsibility to properly handle user
 input. This principle is explained in our :ref:`security documentation
 <sanitize-user-input>`.
 
-For example, the following is **not considered valid** because ``email`` has
+For example, the following is **not considered valid** because ``filename`` has
 not been sanitized::
 
-    from django.core.mail import send_mail
-    from django.http import JsonResponse
+    from django.core.files.storage import default_storage
+    from django.http import HttpResponse
 
 
     def my_proof_of_concept(request):
-        email = request.GET.get("email", "")
-        send_mail("Email subject", "Email body", email, ["admin@example.com"])
-        return JsonResponse(status=200)
-
-Developers must **always validate and sanitize input** before using it. The
-correct approach would be to use a Django form to ensure ``email`` is properly
-validated::
-
-    from django import forms
-    from django.core.mail import send_mail
-    from django.http import JsonResponse
-
-
-    class EmailForm(forms.Form):
-        email = forms.EmailField()
-
-
-    def my_proof_of_concept(request):
-        form = EmailForm(request.GET)
-        if form.is_valid():
-            send_mail(
-                "Email subject",
-                "Email body",
-                form.cleaned_data["email"],
-                ["admin@example.com"],
-            )
-            return JsonResponse(status=200)
-        return JsonResponse(form.errors, status=400)
+        filename = request.GET.get("filename")
+        return HttpResponse(default_storage.open(f"user/{filename}"))
 
 Similarly, as Django's raw SQL constructs (such as :meth:`~.QuerySet.extra`,
 :class:`.RawSQL`, and :ref:`keyword arguments to database functions
@@ -152,17 +126,18 @@ handled. As explained in
 our :ref:`security documentation <sql-injection-protection>`, it is the
 developer's responsibility to safely process user input for these functions.
 
-For instance, the following is **not considered valid** because ``query`` has
-not been sanitized::
+For instance, the following is **not considered valid** because ``function``
+has not been sanitized::
 
-    from django.shortcuts import HttpResponse
-    from .models import MyModel
+    from django.db.models import Func
+    from django.http import JsonResponse
+    from .models import Book
 
 
     def my_proof_of_concept(request):
-        query = request.GET.get("query", "")
-        q = MyModel.objects.extra(select={"id": query})
-        return HttpResponse(q.values())
+        function = request.GET.get("function", "UPPER")
+        books = Book.objects.annotate(title_transformed=Func("title", function=function))
+        return JsonResponse(list(books.values("title_transformed")), safe=False)
 
 Some HTTP headers must also be sanitized by a web server or fronting proxy
 before they can be used, such as ``Remote-User`` and ``X-Forwarded-*``. For
