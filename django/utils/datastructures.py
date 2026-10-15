@@ -71,8 +71,11 @@ class MultiValueDict(dict):
     single name-value pairs.
     """
 
-    def __init__(self, key_to_list_mapping=()):
+    _mutable = True
+
+    def __init__(self, key_to_list_mapping=(), mutable=True):
         super().__init__(key_to_list_mapping)
+        self._mutable = mutable
 
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, super().__repr__())
@@ -92,6 +95,7 @@ class MultiValueDict(dict):
             return []
 
     def __setitem__(self, key, value):
+        self._assert_mutable()
         super().__setitem__(key, [value])
 
     def __copy__(self):
@@ -110,10 +114,15 @@ class MultiValueDict(dict):
         return {**self.__dict__, "_data": {k: self._getlist(k) for k in self}}
 
     def __setstate__(self, obj_dict):
+        self._assert_mutable()
         data = obj_dict.pop("_data", {})
         for k, v in data.items():
             self.setlist(k, v)
         self.__dict__.update(obj_dict)
+
+    def _assert_mutable(self):
+        if not self._mutable:
+            raise AttributeError("This MultiValueDict instance is immutable")
 
     def get(self, key, default=None):
         """
@@ -154,9 +163,11 @@ class MultiValueDict(dict):
         return self._getlist(key, default, force_list=True)
 
     def setlist(self, key, list_):
+        self._assert_mutable()
         super().__setitem__(key, list_)
 
     def setdefault(self, key, default=None):
+        self._assert_mutable()
         if key not in self:
             self[key] = default
             # Do not return default here because __setitem__() may store
@@ -164,6 +175,7 @@ class MultiValueDict(dict):
         return self[key]
 
     def setlistdefault(self, key, default_list=None):
+        self._assert_mutable()
         if key not in self:
             if default_list is None:
                 default_list = []
@@ -172,8 +184,21 @@ class MultiValueDict(dict):
             # another value -- QueryDict.setlist() does. Look it up.
         return self._getlist(key)
 
+    def pop(self, key, *args):
+        self._assert_mutable()
+        return super().pop(key, *args)
+
+    def popitem(self):
+        self._assert_mutable()
+        return super().popitem()
+
+    def clear(self):
+        self._assert_mutable()
+        super().clear()
+
     def appendlist(self, key, value):
         """Append an item to the internal list associated with key."""
+        self._assert_mutable()
         self.setlistdefault(key).append(value)
 
     def items(self):
@@ -199,6 +224,7 @@ class MultiValueDict(dict):
 
     def update(self, *args, **kwargs):
         """Extend rather than replace existing key lists."""
+        self._assert_mutable()
         if len(args) > 1:
             raise TypeError("update expected at most 1 argument, got %d" % len(args))
         if args:
