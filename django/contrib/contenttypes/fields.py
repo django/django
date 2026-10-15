@@ -650,12 +650,12 @@ def create_generic_related_manager(superclass, rel):
             """
             Filter the queryset for the instance this manager is bound to.
             """
-            db = self._db or router.db_for_read(self.model, instance=self.instance)
             with queryset._avoid_cloning():
-                return (
-                    queryset.using(db)
-                    .fetch_mode(self.instance._state.fetch_mode)
-                    .filter(**self.core_filters)
+                queryset._add_hints(instance=self.instance)
+                if self._db:
+                    queryset = queryset.using(self._db)
+                return queryset.fetch_mode(self.instance._state.fetch_mode).filter(
+                    **self.core_filters
                 )
 
         def _remove_prefetched_objects(self):
