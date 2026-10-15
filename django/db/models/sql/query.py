@@ -1399,6 +1399,15 @@ class Query(BaseExpression):
         self.check_alias(alias)
         annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None)
         table_subquery = self._get_multi_column_query(annotation)
+        if (
+            table_subquery is not None
+            and not select
+            and not table_subquery.has_select_fields
+        ):
+            raise ValueError(
+                "Multi-column subqueries assigned with alias() must use values() "
+                "with explicit field names."
+            )
         if table_subquery is not None and LOOKUP_SEP in alias:
             raise ValueError(
                 f"Multi-column subquery alias {alias!r} cannot contain the lookup "

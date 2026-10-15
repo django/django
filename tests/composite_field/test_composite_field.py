@@ -228,15 +228,14 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
 
         self.assertEqual(result, {"max_age": self.ada.age})
 
-    def test_composite_subquery_alias_values_without_fields_db_column(self):
-        comment_info = Comment.objects.filter(pk=self.comment.pk).values()[:1]
-        comments = (
-            User.objects.filter(pk=self.ada.pk)
-            .alias(comment_info=comment_info)
-            .values_list("comment_info__text", flat=True)
+    def test_composite_subquery_alias_requires_explicit_fields(self):
+        post_info = Post.objects.values()
+        msg = (
+            "Multi-column subqueries assigned with alias() must use values() with "
+            "explicit field names."
         )
-
-        self.assertSequenceEqual(comments, [self.comment.text])
+        with self.assertRaisesMessage(ValueError, msg):
+            User.objects.alias(post_info=post_info)
 
     def test_composite_subquery_alias_annotation_db_column(self):
         comment_info = (
@@ -252,11 +251,11 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
 
         self.assertSequenceEqual(comments, [(self.comment.text, 1)])
 
-    def test_composite_subquery_alias_union_values_without_fields_db_column(self):
+    def test_composite_subquery_alias_union_db_column(self):
         comment_info = (
             Comment.objects.filter(pk=self.comment.pk)
-            .values()
-            .union(Comment.objects.filter(pk=-1).values())[:1]
+            .values("post", "user", "text")
+            .union(Comment.objects.filter(pk=-1).values("post", "user", "text"))[:1]
         )
         comments = (
             User.objects.filter(pk=self.ada.pk)
@@ -1122,11 +1121,11 @@ class CompositeFieldTests(CompositeSubqueryTestCase):
             ],
         )
 
-    def test_composite_subquery_alias_values_without_fields(self):
+    def test_composite_subquery_alias_model_and_annotation_fields(self):
         user_info = (
             User.objects.filter(pk=self.ada.pk)
             .annotate(post_count=Count("posts"))
-            .values()
+            .values("name", "post_count")
         )
         organization = (
             Organization.objects.filter(pk=self.acme.pk)

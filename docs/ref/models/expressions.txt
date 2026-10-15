@@ -719,6 +719,10 @@ lookup syntax:
     >>> newest = Comment.objects.order_by("-created_at").values("email", "author__name")[:1]
     >>> Post.objects.alias(newest=newest).values("newest__email", "newest__author__name")
 
+When using a multi-column subquery with :meth:`~.QuerySet.alias`, list its
+fields explicitly in :meth:`~.QuerySet.values`. For example, if the alias is
+``newest``, a field selected as ``email`` is available as ``newest__email``.
+
 A multi-column ``Subquery`` cannot be selected as one annotation because there
 is no single result column for Django to place in ``SELECT``. Assign it using
 :meth:`~.QuerySet.alias` and select its individual subfields instead. Passing
