@@ -19,6 +19,9 @@ permissions:
 
 jobs:
   windows:
+    env:
+      # Python 3.15 will make UTF-8 Mode the default.
+      PYTHONUTF8: 1
     runs-on: windows-latest
     strategy:
       matrix:
