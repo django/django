@@ -1928,6 +1928,19 @@ your test suite.
             Person.objects.create(name="Aaron")
             Person.objects.create(name="Daniel")
 
+    The optional ``clear_caches`` parameter can be passed to clear in-memory
+    query-related caches (such as ``ContentType`` and ``Site`` caches) before
+    running the query count to avoid test ordering dependencies::
+
+        with self.assertNumQueries(2, clear_caches=True):
+            ...
+
+    .. versionchanged:: 6.0
+
+        The ``clear_caches`` argument was added to
+        :meth:`~django.test.TransactionTestCase.assertNumQueries`.
+
+
 .. _topics-tagging-tests:
 
 Tagging tests
