@@ -1926,6 +1926,13 @@ class RouterTestCase(TestCase):
         self.assertEqual(pro.reviews.db_manager("default").db, "default")
         self.assertEqual(pro.reviews.db_manager("default").all().db, "default")
 
+    def test_generic_key_subquery(self):
+        book = Book.objects.create(
+            title="Pro Django", published=datetime.date(2008, 12, 16)
+        )
+        reviews = Review.objects.filter(pk__in=book.reviews.all())
+        self.assertSequenceEqual(reviews, [])
+
     def test_subquery(self):
         """Make sure as_sql works with subqueries and primary/replica."""
         # Create a book and author on the other database
