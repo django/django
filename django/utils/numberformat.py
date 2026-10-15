@@ -83,8 +83,10 @@ def format(
     else:
         int_part, dec_part = str_number, ""
     if decimal_pos is not None:
-        dec_part += "0" * (decimal_pos - len(dec_part))
-    dec_part = dec_part and decimal_sep + dec_part
+        cutoff = Decimal("0." + "1".rjust(decimal_pos, "0"))
+        if abs(number) < cutoff:
+            # For very small numbers, represent as '0' with the specified precision
+            return "0" + decimal_sep + "0" * decimal_pos
     # grouping
     if use_grouping:
         try:
