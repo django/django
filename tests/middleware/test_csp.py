@@ -1,8 +1,14 @@
+from io import BytesIO
+
 from playwright_tests import PlaywrightTestCase
 from utils_tests.test_csp import basic_config, basic_policy
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from django.test import SimpleTestCase
+from django.http import FileResponse, HttpResponse, StreamingHttpResponse
+from django.middleware.csp import ContentSecurityPolicyMiddleware
+from django.template import Context, Template
+from django.template.context_processors import csp
+from django.test import RequestFactory, SimpleTestCase
 from django.test.utils import modify_settings, override_settings
 from django.utils.csp import CSP
 
@@ -171,6 +177,66 @@ class CSPMiddlewareWithDecoratedViewsTest(SimpleTestCase):
         self.assertEqual(
             response[CSP.HEADER_REPORT_ONLY], "default-src 'self'; img-src 'self' data:"
         )
+
+
+class CSPStreamingTests(SimpleTestCase):
+    def test_nonce_generated_during_streaming_is_in_header(self):
+        request = RequestFactory().get("/")
+        template = Template('<script nonce="{{ csp_nonce }}"></script>')
+
+        def view(request):
+            def content():
+                yield template.render(Context(csp(request)))
+
+            return StreamingHttpResponse(content())
+
+        csp_setting = {
+            "default-src": [CSP.SELF],
+            "script-src": [CSP.NONCE],
+        }
+        for csp_header, setting in [
+            (CSP.HEADER_ENFORCE, {"SECURE_CSP": csp_setting}),
+            (CSP.HEADER_REPORT_ONLY, {"SECURE_CSP_REPORT_ONLY": csp_setting}),
+        ]:
+            with self.subTest(csp_header=csp_header):
+                with override_settings(**setting):
+                    response = ContentSecurityPolicyMiddleware(view)(request)
+                    body = b"".join(response.streaming_content).decode()
+                    nonce = body.split('nonce="', 1)[1].split('"', 1)[0]
+                    self.assertTrue(nonce)
+                    self.assertIn(f"'nonce-{nonce}'", response[csp_header])
+
+    @override_settings(
+        SECURE_CSP={
+            "style-src": [CSP.SELF, CSP.UNSAFE_INLINE, CSP.NONCE],
+        }
+    )
+    def test_unused_nonce_with_unsafe_inline(self):
+        body = b'<div style="color: red">Hello</div>'
+        responses = (
+            HttpResponse(body),
+            StreamingHttpResponse(iter([body])),
+            FileResponse(BytesIO(body), content_type="text/html"),
+        )
+
+        for response in responses:
+            with self.subTest(response=type(response).__name__):
+                request = RequestFactory().get("/")
+                try:
+                    response = ContentSecurityPolicyMiddleware(
+                        lambda request: response
+                    )(request)
+                    header = response[CSP.HEADER_ENFORCE]
+                    self.assertIn("'unsafe-inline'", header)
+                    if response.streaming:
+                        self.assertRegex(
+                            header,
+                            r"^style-src 'self' 'unsafe-inline' 'nonce-[^']+'$",
+                        )
+                    else:
+                        self.assertEqual(header, "style-src 'self' 'unsafe-inline'")
+                finally:
+                    response.close()
 
 
 @override_settings(

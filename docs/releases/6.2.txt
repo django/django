@@ -384,6 +384,13 @@ Miscellaneous
   database connections used during error handling are managed by
   ``close_old_connections()``.
 
+* CSP headers now include a nonce when :attr:`~django.utils.csp.CSP.NONCE` is
+  configured for streaming responses, even if the response body never uses it.
+  For enforced policies that also include
+  :attr:`~django.utils.csp.CSP.UNSAFE_INLINE` in the same directive, browsers
+  may now block inline scripts or styles that were previously allowed. See
+  :ref:`csp-nonce-generation` for details.
+
 .. _deprecated-features-6.2:
 
 Features deprecated in 6.2
