@@ -161,7 +161,10 @@ class DayMixin:
 
         The interval is defined by start date <= item date < next start date.
         """
-        return date + datetime.timedelta(days=1)
+        try:
+            return date + datetime.timedelta(days=1)
+        except OverflowError:
+            raise Http404(_("Date out of range"))
 
     def _get_current_day(self, date):
         """Return the start date of the current interval."""
@@ -215,7 +218,10 @@ class WeekMixin:
 
     def _get_current_week(self, date):
         """Return the start date of the current interval."""
-        return date - datetime.timedelta(self._get_weekday(date))
+        try:
+            return date - datetime.timedelta(self._get_weekday(date))
+        except OverflowError:
+            raise Http404(_("Date out of range"))
 
     def _get_weekday(self, date):
         """
@@ -289,7 +295,10 @@ class DateMixin:
         date_field = self.get_date_field()
         if self.uses_datetime_field:
             since = self._make_date_lookup_arg(date)
-            until = self._make_date_lookup_arg(date + datetime.timedelta(days=1))
+            try:
+                until = self._make_date_lookup_arg(date + datetime.timedelta(days=1))
+            except OverflowError:
+                raise Http404(_("Date out of range"))
             return {
                 "%s__gte" % date_field: since,
                 "%s__lt" % date_field: until,
@@ -764,7 +773,10 @@ def _get_next_prev(generic_view, date, is_previous, period):
     # If allow_empty is True, the naive result will be valid
     if allow_empty:
         if is_previous:
-            result = get_current(start - datetime.timedelta(days=1))
+            try:
+                result = get_current(start - datetime.timedelta(days=1))
+            except OverflowError:
+                raise Http404(_("Date out of range"))
         else:
             result = end
 
