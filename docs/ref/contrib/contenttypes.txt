@@ -166,6 +166,9 @@ model with a foreign key to
 :class:`~django.contrib.auth.models.Permission` represent concepts like
 "can add blog entry" or "can delete news story".
 
+:meth:`~ContentType.model_class` returns ``None`` in case of a stale content
+type for a deleted model.
+
 The ``ContentTypeManager``
 --------------------------
 
