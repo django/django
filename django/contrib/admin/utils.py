@@ -447,7 +447,10 @@ def display_for_field(value, field, empty_value_display, avoid_link=False):
 
     # BooleanField needs special-case null-handling, so it comes before the
     # general null test.
-    elif isinstance(field, models.BooleanField):
+    elif isinstance(field, models.BooleanField) or (
+        isinstance(field, models.GeneratedField)
+        and isinstance(field.output_field, models.BooleanField)
+    ):
         if isinstance(value, DatabaseDefault):
             return _boolean_icon(None)
         return _boolean_icon(value)
