@@ -38,7 +38,9 @@ jobs:
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
       - name: Install gettext
-        run: choco install gettext --no-progress -y
+        run: |
+          choco install gettext --no-progress -y
+          "C:\Program Files\gettext-iconv\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip wheel
       - run: python -m pip install -r tests/requirements/py3.txt -e .
