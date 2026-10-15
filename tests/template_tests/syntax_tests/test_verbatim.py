@@ -1,5 +1,7 @@
-from django.template import TemplateSyntaxError
+from django.template import Context, Engine, TemplateSyntaxError
 from django.test import SimpleTestCase
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango2029Warning
 
 from ..utils import setup
 
@@ -113,14 +115,26 @@ class VerbatimTagTests(SimpleTestCase):
             "\n{%\n{% endverbatim %}\n",
         )
 
+    @setup({"verbatim": "{% verbatim %}content{%\nendverbatim\n%}"})
+    def test_multiline_raw_block_closing_tags(self):
+        output = self.engine.render_to_string("verbatim")
+        self.assertEqual(output, "content")
+
     @setup(
         {"verbatim": "{% verbatim a  b %}{% endverbatim a b %}{% endverbatim a  b %}"}
     )
-    def test_named_verbatim_preserves_name_whitespace(self):
-        self.assertEqual(
-            self.engine.render_to_string("verbatim"),
-            "{% endverbatim a b %}",
+    def test_named_verbatim_name_whitespace_not_preserved(self):
+        with self.assertRaises(TemplateSyntaxError):
+            self.engine.render_to_string("verbatim")
+
+    # RemovedInDjango2029Warning.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
+    def test_named_verbatim_preserves_name_whitespace_legacy(self):
+        engine = Engine(allow_multiline_tags=False)
+        template = engine.from_string(
+            "{% verbatim a  b %}{% endverbatim a b %}{% endverbatim a  b %}"
         )
+        self.assertEqual(template.render(Context()), "{% endverbatim a b %}")
 
     @setup(
         {
@@ -139,3 +153,19 @@ class VerbatimTagTests(SimpleTestCase):
     def test_literal_multiline_block_opener_in_raw_blocks(self):
         output = self.engine.render_to_string("verbatim")
         self.assertEqual(output, "\n{%\n")
+
+    @setup(
+        {
+            "verbatim": (
+                "{% verbatim example %}"
+                "content"
+                "{%\n"
+                "    endverbatim\n"
+                "    example\n"
+                "%}"
+            ),
+        }
+    )
+    def test_multiline_named_closing_tag(self):
+        output = self.engine.render_to_string("verbatim")
+        self.assertEqual(output, "content")

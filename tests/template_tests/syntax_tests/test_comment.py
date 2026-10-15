@@ -99,6 +99,11 @@ class CommentSyntaxTests(SimpleTestCase):
         output = self.engine.render_to_string("comment")
         self.assertEqual(output, "visible")
 
+    @setup({"comment": "{% comment %}content{%\nendcomment\n%}"})
+    def test_multiline_raw_block_closing_tags(self):
+        output = self.engine.render_to_string("comment")
+        self.assertEqual(output, "")
+
     @setup(
         {
             "comment": (
