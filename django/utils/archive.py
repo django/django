@@ -182,6 +182,11 @@ class TarArchive(BaseArchive):
             if member.isdir():
                 if filename:
                     os.makedirs(filename, exist_ok=True)
+            elif not (member.isfile() or member.issym() or member.islnk()):
+                # Character/block devices, FIFOs, and other special files.
+                raise SuspiciousOperation(
+                    "Archive contains special file: '%s'" % member.name
+                )
             else:
                 try:
                     extracted = self._archive.extractfile(member)
