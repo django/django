@@ -1,4 +1,5 @@
 import os
+import pickle
 import unittest
 
 from django.forms.renderers import (
@@ -31,6 +32,14 @@ class SharedTests:
             )
         )
         self.assertEqual(tpl.origin.name, expected_path)
+
+    def test_pickle(self):
+        renderer = self.renderer()
+        # Load a template so that the engine is created.
+        renderer.get_template("forms_tests/custom_widget.html")
+        unpickled = pickle.loads(pickle.dumps(renderer))
+        tpl = unpickled.get_template("forms_tests/custom_widget.html")
+        self.assertIn("custom_widget.html", tpl.origin.name)
 
 
 class BaseTemplateRendererTests(SimpleTestCase):

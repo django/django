@@ -1,6 +1,7 @@
 import copy
 import datetime
 import json
+import pickle
 import textwrap
 import uuid
 
@@ -5067,6 +5068,12 @@ class RendererTests(SimpleTestCase):
         form = UserForm(renderer=RendererWithoutBoundFieldClassAttribute())
         self.assertIsInstance(form["name"], BoundField)
         self.assertEqual(form["name"].as_field_group(), "Nice")
+
+    def test_pickle_rendered_form(self):
+        form = Person({"first_name": "John", "last_name": "Lennon"})
+        html = form.render()
+        unpickled = pickle.loads(pickle.dumps(form))
+        self.assertHTMLEqual(unpickled.render(), html)
 
 
 class TemplateTests(SimpleTestCase):

@@ -30,6 +30,13 @@ class BaseRenderer:
 
 
 class EngineMixin:
+    def __getstate__(self):
+        # The engine may not be picklable (e.g. because of its template
+        # libraries) and is recreated when needed.
+        state = self.__dict__.copy()
+        state.pop("engine", None)
+        return state
+
     def get_template(self, template_name):
         return self.engine.get_template(template_name)
 
