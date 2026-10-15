@@ -1,4 +1,5 @@
 import os
+import signal
 import subprocess
 
 
@@ -28,4 +29,16 @@ class BaseDatabaseClient:
             self.connection.settings_dict, parameters
         )
         env = {**os.environ, **env} if env else None
-        subprocess.run(args, env=env, check=True)
+        sigint_handler = None
+        if hasattr(signal, "SIGINT"):
+            sigint_handler = signal.getsignal(signal.SIGINT)
+        try:
+            if sigint_handler is not None:
+                try:
+                    signal.signal(signal.SIGINT, signal.SIG_IGN)
+                except ValueError:
+                    sigint_handler = None
+            subprocess.run(args, env=env, check=True)
+        finally:
+            if sigint_handler is not None:
+                signal.signal(signal.SIGINT, sigint_handler)
