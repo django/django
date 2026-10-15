@@ -11,7 +11,7 @@ from .management import create_contenttypes, inject_rename_contenttypes_operatio
 
 
 class ContentTypesConfig(AppConfig):
-    default_auto_field = "django.db.models.AutoField"
+    default_pk_field = "django.db.models.AutoField"
     name = "django.contrib.contenttypes"
     verbose_name = _("Content Types")
 
