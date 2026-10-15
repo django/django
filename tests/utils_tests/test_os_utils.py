@@ -100,34 +100,53 @@ class SafeMakeDirsTests(unittest.TestCase):
         self.assertDirMode(os.path.normpath(path), 0o755)
         self.assertIs(os.path.isdir(os.path.join(self.base, "a", "c")), True)
 
-    def test_permissions_unaffected_by_process_umask(self):
+    def test_permissions_restricted_by_process_umask(self):
         path = os.path.join(self.base, "a", "b", "c")
         # `umask()` returns the current mask, so it'll be restored on cleanup.
         self.addCleanup(os.umask, os.umask(0o077))
 
         safe_makedirs(path, mode=0o755)
 
-        self.assertDirMode(os.path.join(self.base, "a"), 0o755)
-        self.assertDirMode(os.path.join(self.base, "a", "b"), 0o755)
-        self.assertDirMode(path, 0o755)
+        expected = 0o700
+        self.assertDirMode(os.path.join(self.base, "a"), expected)
+        self.assertDirMode(os.path.join(self.base, "a", "b"), expected)
+        self.assertDirMode(path, expected)
 
-    def test_permissions_correct_despite_concurrent_umask_change(self):
+    def test_permissions_unchanged_with_zero_umask(self):
         path = os.path.join(self.base, "a", "b", "c")
-        original_mkdir = os.mkdir
         # `umask()` returns the current mask, so it'll be restored on cleanup.
         self.addCleanup(os.umask, os.umask(0o000))
 
-        def mkdir_changing_umask(p, mode):
-            # Simulate a concurrent thread changing the process umask.
-            os.umask(0o077)
+        mode = 0o750
+        safe_makedirs(path, mode=mode)
+
+        self.assertDirMode(os.path.join(self.base, "a"), mode)
+        self.assertDirMode(os.path.join(self.base, "a", "b"), mode)
+        self.assertDirMode(path, mode)
+
+    @unittest.skipIf(
+        sys.platform == "win32", "Windows only partially supports umasks and chmod."
+    )
+    def test_process_umask_unchanged(self):
+        path = os.path.join(self.base, "a", "b", "c")
+        original_mkdir = os.mkdir
+        umask = 0o027
+        umasks = []
+        # `umask()` returns the current mask, so it'll be restored on cleanup.
+        self.addCleanup(os.umask, os.umask(umask))
+
+        def mkdir_recording_umask(p, mode):
+            # `umask()` can only be read by setting it, so restore it at once.
+            current = os.umask(umask)
+            os.umask(current)
+            umasks.append(current)
             original_mkdir(p, mode)
 
-        with unittest.mock.patch("os.mkdir", side_effect=mkdir_changing_umask):
+        with unittest.mock.patch("os.mkdir", side_effect=mkdir_recording_umask):
             safe_makedirs(path, mode=0o755)
 
-        self.assertDirMode(os.path.join(self.base, "a"), 0o755)
-        self.assertDirMode(os.path.join(self.base, "a", "b"), 0o755)
-        self.assertDirMode(path, 0o755)
+        self.assertEqual(umasks, [umask, umask, umask])
+        self.assertDirMode(path, 0o750)
 
     def test_race_condition_exist_ok_false(self):
         path = os.path.join(self.base, "a", "b")
