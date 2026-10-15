@@ -104,12 +104,16 @@ def get_format(format_type, lang=None, use_l10n=None):
     format_type is the name of the format, e.g. 'DATE_FORMAT'.
 
     If use_l10n is provided and is not None, it forces the value to
-    be localized (or not), otherwise it's always localized.
+    be localized (or not), otherwise it's localized only when
+    settings.USE_I18N is True.
     """
     if use_l10n is None:
-        use_l10n = True
-    if use_l10n and lang is None:
-        lang = get_language()
+        use_l10n = settings.USE_I18N
+    if use_l10n:
+        if lang is None:
+            lang = get_language()
+    else:
+        lang = None
     format_type = str(format_type)  # format_type may be lazy.
     cache_key = (format_type, lang)
     try:
