@@ -944,6 +944,38 @@ The class:
 
 * Checks deferrable database constraints at the end of each test.
 
+.. admonition:: Catching database errors inside a ``TestCase``
+
+    Because each test runs inside an ``atomic`` block, catching a database
+    error does not end the transaction it broke. Any query attempted before
+    the block exits then raises
+    :class:`~django.db.transaction.TransactionManagementError` rather than the
+    error you expected::
+
+        class UniqueTests(TestCase):
+            def test_unique_constraints(self):
+                with self.assertRaises(IntegrityError):
+                    Person.objects.create(email="jane@example.com")
+                # This raises TransactionManagementError, not IntegrityError,
+                # because the transaction is still broken.
+                with self.assertRaises(IntegrityError):
+                    Person.objects.create(email="john@example.com")
+
+    Wrap each one in its own ``atomic`` block so the failure is rolled back
+    before the next query runs::
+
+        class UniqueTests(TestCase):
+            def test_unique_constraints(self):
+                with self.assertRaises(IntegrityError), transaction.atomic():
+                    Person.objects.create(email="jane@example.com")
+                with self.assertRaises(IntegrityError), transaction.atomic():
+                    Person.objects.create(email="john@example.com")
+
+    This is the same behavior described in :doc:`/topics/db/transactions`
+    under "Avoid catching exceptions inside ``atomic``!"; it is easy to meet
+    for the first time in a test, because ``TestCase`` supplies the ``atomic``
+    block itself.
+
 It also provides an additional method:
 
 .. classmethod:: TestCase.setUpTestData()
