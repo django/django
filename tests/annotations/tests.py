@@ -25,6 +25,7 @@ from django.db.models import (
     Q,
     Subquery,
     Sum,
+    Transform,
     Value,
     When,
 )
@@ -1283,6 +1284,31 @@ class NonAggregateAnnotationTestCase(TestCase):
         ).filter(pk=test_model.pk)
 
         self.assertEqual(qs.count(), len(qs))
+
+    @skipUnless(connection.vendor == "postgresql", "PostgreSQL tests")
+    @skipUnlessDBFeature("supports_json_field")
+    def test_distinct_count_set_returning_transform(self):
+        class JSONBArrayElements(Transform):
+            lookup_name = "elements"
+            function = "jsonb_array_elements"
+            output_field = JSONField()
+            set_returning = True
+
+        tests = [([1, 2], [1, 2]), ([1, 1, 2], [1, 2]), ([], [])]
+        with register_lookup(JSONField, JSONBArrayElements):
+            for pk, (data, expected) in enumerate(tests, start=1):
+                with self.subTest(data=data):
+                    JsonModel.objects.create(pk=pk, data=data)
+                    qs = (
+                        JsonModel.objects.filter(pk=pk)
+                        .values("pk", "data__elements")
+                        .distinct()
+                    )
+                    self.assertEqual(qs.count(), len(expected))
+                    self.assertCountEqual(
+                        qs,
+                        [{"pk": pk, "data__elements": value} for value in expected],
+                    )
 
 
 class AliasTests(TestCase):
