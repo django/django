@@ -1,0 +1,15 @@
+===========================
+Django 6.0.10 release notes
+===========================
+
+*Expected November 3, 2026*
+
+Django 6.0.10 includes a security hardening fix for file-based sessions.
+
+Bugfixes
+========
+
+* Fixed a bug where file-based sessions remained accessible server-side after
+  an integer timeout set with
+  :meth:`~django.contrib.sessions.backends.base.SessionBase.set_expiry` had
+  elapsed (:ticket:`37423`).
