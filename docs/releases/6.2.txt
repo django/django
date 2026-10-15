@@ -72,6 +72,11 @@ Minor features
 * :class:`~django.contrib.gis.gdal.DataSource` now preserves millisecond
   precision when reading time and datetime fields.
 
+* The :class:`~django.contrib.gis.db.models.Collect`,
+  :class:`~django.contrib.gis.db.models.MakeLine`, and
+  :class:`~django.contrib.gis.db.models.Union` aggregates now support the
+  ``order_by`` argument on PostGIS.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
