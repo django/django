@@ -48,6 +48,11 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+* The admin add, change, delete, bulk-delete, and user password-change views
+  now include ``module_name`` in the template context. This is the capitalized
+  plural verbose name of the model, which the history view already provided.
+  The built-in breadcrumb templates for these views use it.
+
 * ...
 
 :mod:`django.contrib.admindocs`

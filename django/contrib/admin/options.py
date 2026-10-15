@@ -2225,6 +2225,7 @@ class ModelAdmin(BaseModelAdmin):
             "inline_admin_formsets": inline_formsets,
             "errors": helpers.AdminErrorList(form, formsets),
             "preserved_filters": self.get_preserved_filters(request),
+            "module_name": str(capfirst(self.opts.verbose_name_plural)),
         }
 
         # Hide the "Save" and "Save and continue" buttons if "Save as New" was
@@ -2461,6 +2462,7 @@ class ModelAdmin(BaseModelAdmin):
 
         context = {
             **self.admin_site.each_context(request),
+            # Uncapitalized for the mid-sentence "Select all N ..." action.
             "module_name": str(self.opts.verbose_name_plural),
             "selection_note": _("0 of %(cnt)s selected") % {"cnt": len(cl.result_list)},
             "selection_note_all": selection_note_all % {"total_count": cl.result_count},
@@ -2570,6 +2572,7 @@ class ModelAdmin(BaseModelAdmin):
             "preserved_filters": self.get_preserved_filters(request),
             "is_popup": IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET,
             "to_field": to_field,
+            "module_name": str(capfirst(self.opts.verbose_name_plural)),
             **(extra_context or {}),
         }
 
