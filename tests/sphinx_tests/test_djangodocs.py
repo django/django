@@ -167,12 +167,14 @@ class ConsoleDirectiveTests(DjangoDocsTestCase):
             " checked>",
             html,
         )
-        self.assertInHTML('<label for="c-tab-0-unix">Unix/macOS</label>', html)
+        self.assertInHTML(
+            '<label for="c-tab-0-unix"><span>Unix/macOS</span></label>', html
+        )
         self.assertInHTML(
             '<input class="c-tab-win" id="c-tab-0-win" type="radio" name="console-0">',
             html,
         )
-        self.assertInHTML('<label for="c-tab-0-win">Windows</label>', html)
+        self.assertInHTML('<label for="c-tab-0-win"><span>Windows</span></label>', html)
 
         # Tab content.
         self.assertInHTML(
