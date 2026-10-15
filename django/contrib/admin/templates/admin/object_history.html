@@ -3,10 +3,10 @@
 
 {% block breadcrumbs %}
 <ol class="breadcrumbs">
-<li><a href="{% url 'admin:index' %}">{% translate 'Home' %}</a></li>
-<li><a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a></li>
-<li><a href="{% url opts|admin_urlname:'changelist' %}">{{ module_name }}</a></li>
-<li><a href="{% url opts|admin_urlname:'change' object.pk|admin_urlquote %}">{{ object|to_object_display_value|truncatewords:"18" }}</a></li>
+<li><a href="{{ model_admin.get_index_url }}">{% translate 'Home' %}</a></li>
+<li><a href="{{ model_admin.get_app_list_url }}">{{ opts.app_config.verbose_name }}</a></li>
+<li><a href="{{ model_admin.get_changelist_url }}">{{ module_name }}</a></li>
+<li><a href="{% get_change_url model_admin object.pk %}">{{ object|to_object_display_value|truncatewords:"18" }}</a></li>
 <li aria-current="page">{% translate 'History' %}</li>
 </ol>
 {% endblock %}

@@ -1783,6 +1783,37 @@ default templates used by the :class:`ModelAdmin` views:
     ``ModelAdmin`` views have ``model_admin`` attributes. Other
     ``AdminSite`` views have ``admin_site`` attributes.
 
+.. method:: ModelAdmin.get_index_url(request=None)
+
+    Returns the URL for the main admin index page. Delegates to
+    :meth:`AdminSite.get_index_url`.
+
+.. method:: ModelAdmin.get_app_list_url(request=None)
+
+    Returns the URL for the app list page for this model's app. Delegates to
+    :meth:`AdminSite.get_app_list_url`.
+
+.. method:: ModelAdmin.get_changelist_url(request=None, **kwargs)
+
+    Returns the URL for the change list page of this model.
+
+.. method:: ModelAdmin.get_add_url(request=None, **kwargs)
+
+    Returns the URL for the add object page of this model.
+
+.. method:: ModelAdmin.get_change_url(object_id, request=None, **kwargs)
+
+    Returns the URL for the change object page of this model for ``object_id``.
+
+.. method:: ModelAdmin.get_delete_url(object_id, request=None, **kwargs)
+
+    Returns the URL for the delete object page of this model for ``object_id``.
+
+.. method:: ModelAdmin.get_history_url(object_id, request=None, **kwargs)
+
+    Returns the URL for the change history page of this model for
+    ``object_id``.
+
 .. method:: ModelAdmin.get_form(request, obj=None, **kwargs)
 
     Returns a :class:`~django.forms.ModelForm` class for use in the admin add
@@ -3148,6 +3179,14 @@ Templates can override or extend base admin templates as described in
     Lists of applications and models are sorted alphabetically by their names.
     You can override this method to change the default order on the admin index
     page.
+
+.. method:: AdminSite.get_index_url(request=None)
+
+    Returns the URL for the admin index page.
+
+.. method:: AdminSite.get_app_list_url(app_label, request=None)
+
+    Returns the URL for the app list page for ``app_label``.
 
 .. method:: AdminSite.has_permission(request)
 
