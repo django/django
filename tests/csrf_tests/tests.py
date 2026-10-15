@@ -1,5 +1,6 @@
 import logging
 import re
+import warnings
 
 from django.conf import settings
 from django.contrib.sessions.backends.cache import SessionStore
@@ -23,8 +24,8 @@ from django.middleware.csrf import (
     get_token,
     rotate_token,
 )
-from django.test import SimpleTestCase, override_settings
-from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
+from django.test import RequestFactory, SimpleTestCase, override_settings
+from django.views.decorators.csrf import csrf_exempt, csrf_protect, requires_csrf_token
 
 from .views import (
     ensure_csrf_cookie_view,
@@ -1220,6 +1221,59 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
                 mw.process_request(req)
                 resp = mw.process_view(req, token_view, (), {})
                 self.assertIsNone(resp)
+
+    def test_csrf_protect_warns_for_cached_response(self):
+        response = HttpResponse()
+        response._cache_page_cached = True
+
+        @csrf_protect
+        def view(request):
+            get_token(request)
+            return response
+
+        request = RequestFactory().get("/")
+
+        with self.assertWarnsMessage(
+            RuntimeWarning,
+            "CsrfViewMiddleware is updating CSRF state on a response "
+            "that has already been cached. Ensure CSRF processing "
+            "occurs before the response is cached.",
+        ):
+            result = view(request)
+
+        self.assertIn("Cookie", result.headers["Vary"])
+
+    def test_csrf_protect_does_not_warn_for_uncached_response(self):
+        response = HttpResponse()
+
+        @csrf_protect
+        def view(request):
+            get_token(request)
+            return response
+
+        request = RequestFactory().get("/")
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", RuntimeWarning)
+            result = view(request)
+
+        self.assertIn("Cookie", result.headers["Vary"])
+
+    def test_csrf_protect_does_not_warn_when_cookie_update_not_needed(self):
+        response = HttpResponse()
+        response._cache_page_cached = True
+
+        @csrf_protect
+        def view(request):
+            return response
+
+        request = RequestFactory().get("/")
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", RuntimeWarning)
+            result = view(request)
+
+        self.assertNotIn(settings.CSRF_COOKIE_NAME, result.cookies)
 
     def test_set_cookie_called_only_once(self):
         """

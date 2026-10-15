@@ -1,3 +1,5 @@
+import warnings
+
 from django.conf import settings
 from django.middleware import MiddlewareMixin
 from django.utils.csp import CSP, LazyNonce, build_policy
@@ -30,6 +32,16 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
             # This allows for views to set their own CSP headers as needed.
             # An empty config means CSP headers are not added to the response.
             if config and header not in response:
+
+                if getattr(response, "_cache_page_cached", False):
+                    warnings.warn(
+                        "ContentSecurityPolicyMiddleware is adding a CSP header to a "
+                        "response that has already been cached. Ensure CSP processing "
+                        "occurs before the response is cached.",
+                        RuntimeWarning,
+                        stacklevel=2,
+                    )
+
                 response.headers[str(header)] = build_policy(config, nonce)
 
         return response
