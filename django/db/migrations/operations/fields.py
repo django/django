@@ -160,6 +160,9 @@ class RemoveField(FieldOperation):
 
     category = OperationCategory.REMOVAL
 
+    def __init__(self, model_name, name, field=None):
+        super().__init__(model_name, name, field=field)
+
     def deconstruct(self):
         kwargs = {
             "model_name": self.model_name,
@@ -193,11 +196,21 @@ class RemoveField(FieldOperation):
     def reduce(self, operation, app_label):
         from .models import DeleteModel
 
-        if (
-            isinstance(operation, DeleteModel)
-            and operation.name_lower == self.model_name_lower
-        ):
-            return [operation]
+        if isinstance(operation, RemoveField):
+            return True
+        elif isinstance(operation, DeleteModel):
+            if operation.name_lower == self.model_name_lower:
+                if operation.fields is None or self.field is None:
+                    return [DeleteModel(operation.name)]
+                existing_names = {f_name.lower() for f_name, _ in operation.fields}
+                new_fields = list(operation.fields)
+                if self.name_lower not in existing_names:
+                    new_fields.append((self.name, self.field))
+                return [DeleteModel(operation.name, new_fields)]
+            elif self.references_model(operation.name, app_label):
+                return False
+            return True
+
         return super().reduce(operation, app_label)
 
 
