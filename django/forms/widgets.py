@@ -444,10 +444,16 @@ class EmailInput(Input):
     input_type = "email"
     template_name = "django/forms/widgets/email.html"
 
+    def __init__(self, attrs=None):
+        super().__init__(attrs={"dir": "ltr", **(attrs or {})})
+
 
 class URLInput(Input):
     input_type = "url"
     template_name = "django/forms/widgets/url.html"
+
+    def __init__(self, attrs=None):
+        super().__init__(attrs={"dir": "ltr", **(attrs or {})})
 
 
 class ColorInput(Input):

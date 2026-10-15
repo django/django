@@ -169,7 +169,8 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* The :class:`~django.forms.EmailInput` and :class:`~django.forms.URLInput`
+  widgets now render with ``dir="ltr"`` by default.
 
 Generic Views
 ~~~~~~~~~~~~~
