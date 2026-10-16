@@ -69,10 +69,13 @@ class BaseCache:
 
         options = params.get("OPTIONS", {})
         max_entries = params.get("max_entries", options.get("MAX_ENTRIES", 300))
-        try:
-            self._max_entries = int(max_entries)
-        except (ValueError, TypeError):
-            self._max_entries = 300
+        if max_entries is None:
+            self._max_entries = None
+        else:
+            try:
+                self._max_entries = int(max_entries)
+            except (ValueError, TypeError):
+                self._max_entries = 300
 
         cull_frequency = params.get("cull_frequency", options.get("CULL_FREQUENCY", 3))
         try:
