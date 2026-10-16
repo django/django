@@ -684,7 +684,9 @@ class EmailMultiAlternatives(EmailMessage):
             for alternative in self.alternatives:
                 maintype, subtype = alternative.mimetype.split("/", 1)
                 content = alternative.content
-                if maintype == "text":
+                if isinstance(content, email.message.MIMEPart):
+                    msg.attach(content)
+                elif maintype == "text":
                     if isinstance(content, bytes):
                         content = content.decode()
                     msg.add_alternative(content, subtype=subtype, charset=encoding)

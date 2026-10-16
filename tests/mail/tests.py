@@ -821,6 +821,50 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
 
         self.assertIn(html_content, msg.message().as_string())
 
+    def test_alternative_mimepart(self):
+        related = MIMEPart()
+        related.set_type("multipart/related")
+        related.set_param("type", "text/html")
+
+        html = MIMEPart()
+        html.set_content(
+            '<img src="cid:image001">',
+            subtype="html",
+        )
+        related.attach(html)
+
+        image = MIMEPart()
+        image.set_content(
+            b"image data",
+            maintype="image",
+            subtype="png",
+            disposition="inline",
+            cid="image001",
+        )
+        related.attach(image)
+
+        email = EmailMultiAlternatives(body="Plain text content")
+        email.attach_alternative(related, "text/html")
+
+        message = email.message()
+        self.assertEqual(message.get_content_type(), "multipart/alternative")
+        self.assertEqual(len(message.get_payload()), 2)
+
+        related_message = message.get_payload(1)
+        self.assertEqual(
+            related_message.get_content_type(), "multipart/related"
+        )
+        self.assertEqual(len(related_message.get_payload()), 2)
+        self.assertEqual(
+            related_message.get_payload(0).get_content_type(), "text/html"
+        )
+        self.assertEqual(
+            related_message.get_payload(1).get_content_type(), "image/png"
+        )
+        self.assertEqual(
+            related_message.get_payload(1)["Content-ID"], "image001"
+        )
+
     def test_alternatives_constructor(self):
         html_content = "<p>This is <strong>html</strong></p>"
         mime_type = "text/html"
