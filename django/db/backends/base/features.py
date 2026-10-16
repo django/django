@@ -5,6 +5,9 @@ from django.utils.functional import cached_property
 class BaseDatabaseFeatures:
     # An optional tuple indicating the minimum supported database version.
     minimum_database_version = None
+    # Does this backend support namespace-style SQL schemas that can qualify
+    # table references, e.g. "schema"."table"?
+    supports_schema_qualified_table_references = False
     gis_enabled = False
     # Oracle can't group by LOB (large object) data types.
     allows_group_by_lob = True
