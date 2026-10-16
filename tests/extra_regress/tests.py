@@ -1,11 +1,14 @@
 import datetime
 
 from django.contrib.auth.models import User
-from django.test import TestCase
+from django.db.models.sql.query import Query
+from django.test import SimpleTestCase, TestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango2029Warning
 
 from .models import Order, RevisionableModel, TestObject
 
 
+@ignore_warnings(category=RemovedInDjango2029Warning)
 class ExtraRegressTests(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -469,3 +472,82 @@ class ExtraRegressTests(TestCase):
         self.assertSequenceEqual(
             qs.order_by("-second_extra").values_list("first"), [("a",), ("a",)]
         )
+
+
+class ExtraDeprecationTests(SimpleTestCase):
+    def test_extra_select_deprecation(self):
+        msg = (
+            "extra(select) is deprecated, use annotate(field=RawSQL('%s', [1])) "
+            "instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, msg) as ctx:
+            TestObject.objects.extra(select={"field": "%s"}, select_params=(1,))
+        self.assertEqual(ctx.filename, __file__)
+
+    def test_extra_where_deprecation(self):
+        msg = (
+            "extra(where) is deprecated, use "
+            "filter(RawSQL('(foo = %s) AND (bar IS NULL)', (1,), BooleanField())) "
+            "instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, msg) as ctx:
+            TestObject.objects.extra(where=["foo = %s", "bar IS NULL"], params=(1,))
+        self.assertEqual(ctx.filename, __file__)
+
+    def test_extra_order_by_deprecation(self):
+        msg = (
+            "extra(order_by) is deprecated, use order_by("
+            "RawSQL('extra_regress_testobject.first', ()), "
+            "RawSQL('random()', ()), "
+            "'second', "
+            "RawSQL('extra_regress_testobject.first', ()).desc(), "
+            "RawSQL('random()', ()).desc(), "
+            "'-second') instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, msg) as ctx:
+            TestObject.objects.extra(
+                order_by=[
+                    "extra_regress_testobject.first",
+                    "random()",
+                    "second",
+                    "-extra_regress_testobject.first",
+                    "-random()",
+                    "-second",
+                ]
+            )
+        self.assertEqual(ctx.filename, __file__)
+
+    def test_query_extra_deprecation_shim(self):
+        query = Query(TestObject)
+        msg = "sql.Query.extra is deprecated and returns an empty dict."
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, msg) as ctx:
+            self.assertEqual(query.extra, {})
+        self.assertEqual(ctx.filename, __file__)
+
+    def test_query_extra_select_deprecation_shim(self):
+        query = Query(TestObject)
+        msg = "sql.Query.extra_select is deprecated and returns an empty dict."
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, msg) as ctx:
+            self.assertEqual(query.extra_select, {})
+        self.assertEqual(ctx.filename, __file__)
+
+    def test_query_extra_select_mask_deprecation_shim(self):
+        query = Query(TestObject)
+        msg = "sql.Query.extra_select_mask is deprecated and returns None."
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, msg) as ctx:
+            self.assertIsNone(query.extra_select_mask)
+        self.assertEqual(ctx.filename, __file__)
+
+    def test_query_set_extra_mask_deprecation_shim(self):
+        query = Query(TestObject)
+        msg = "sql.Query.set_extra_mask is deprecated and is a noop."
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, msg) as ctx:
+            query.set_extra_mask({})
+        self.assertEqual(ctx.filename, __file__)
+
+    def test_query_extra_order_by_deprecation_shim(self):
+        query = Query(TestObject)
+        msg = "sql.Query.extra_order_by is deprecated and returns an empty list."
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, msg) as ctx:
+            self.assertEqual(query.extra_order_by, [])
+        self.assertEqual(ctx.filename, __file__)
