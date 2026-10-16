@@ -1,0 +1,40 @@
+{
+    "type": "GeometryCollection",
+    "geometries": [
+        {
+            "type": "Point",
+            "coordinates": [0, 0]
+        },
+        {
+            "type": "GeometryCollection",
+            "geometries": [
+                {
+                    "type": "Point",
+                    "coordinates": [1, 1]
+                },
+                {
+                    "type": "MultiPolygon",
+                    "coordinates": [
+                        [
+                            [[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]]
+                        ],
+                        [
+                            [[3, 0], [4, 0], [4, 1], [3, 1], [3, 0]]
+                        ]
+                    ],
+                    "crs": {
+                        "type": "link",
+                        "properties": {
+                            "href": "http://[invalid]/later-siblings",
+                            "type": "proj4"
+                        },
+                        "TYPE": "name",
+                        "PROPERTIES": {
+                            "name": "crs84"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

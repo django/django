@@ -1,0 +1,15 @@
+{
+    "type": "Feature",
+    "properties": {},
+    "geometry": {
+        "type": "Point",
+        "coordinates": [0, 0],
+        "crs": {
+            "type": "link",
+            "properties": {
+                "href": "http://[invalid]/feature-geometry",
+                "type": "proj4"
+            }
+        }
+    }
+}

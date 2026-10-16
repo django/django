@@ -1,0 +1,21 @@
+{
+    "type": "GeometryCollection",
+    "geometries": [
+        {
+            "type": "GeometryCollection",
+            "crs": {
+                "type": "link",
+                "properties": {
+                    "href": "http://[invalid]/nested-geometry-collections",
+                    "type": "proj4"
+                }
+            },
+            "geometries": [
+                {
+                    "type": "Point",
+                    "coordinates": [0, 0]
+                }
+            ]
+        }
+    ]
+}

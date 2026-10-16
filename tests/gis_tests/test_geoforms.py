@@ -4,11 +4,12 @@ from django.contrib.gis import forms
 from django.contrib.gis.forms import BaseGeometryWidget, OpenLayersWidget
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos.prototypes.io import MAX_GEOM_COLLECTIONS
-from django.core.exceptions import ValidationError
+from django.core.exceptions import SuspiciousOperation, ValidationError
 from django.template.defaultfilters import json_script
 from django.test import SimpleTestCase, override_settings
 from django.utils.html import escape
 
+from .data.invalid.external_crs import EXTERNAL_CRS_FIXTURES
 from .data.rasters.textrasters import JSON_RASTER
 
 
@@ -44,6 +45,73 @@ class GeometryFieldTest(SimpleTestCase):
         )
         self.assertEqual(cleaned_geom.srid, 32140)
         self.assertTrue(xform_geom.equals_exact(cleaned_geom, tol))
+
+    def test_widgets_reject_external_crs(self):
+        msg = "GeoJSON input specified an external CRS."
+        # No deserialize() on TextInput: it falls back to to_python().
+        for fld in forms.GeometryField(), forms.GeometryField(widget=forms.TextInput):
+            with (
+                self.subTest(widget=type(fld.widget).__name__),
+                self.assertRaisesMessage(SuspiciousOperation, msg),
+            ):
+                fld.clean(EXTERNAL_CRS_FIXTURES["root"])
+
+    def test_nested_external_crs_rejected(self):
+        fld = forms.GeometryField()
+        msg = "GeoJSON input specified an external CRS."
+        for name, payload in EXTERNAL_CRS_FIXTURES.items():
+            if name == "root":
+                continue
+            with (
+                self.subTest(fixture=name),
+                self.assertRaisesMessage(SuspiciousOperation, msg),
+            ):
+                fld.clean(payload)
+
+    def test_external_crs_variants_rejected(self):
+        msg = "GeoJSON input specified an external CRS."
+        external_crs = EXTERNAL_CRS_FIXTURES["root"]
+        cases = {
+            "json-escaped type": external_crs.replace(
+                "type", "\\u0074\\u0079\\u0070\\u0065"
+            ),
+            "json-escaped link": external_crs.replace(
+                "link", "\\u006c\\u0069\\u006e\\u006b"
+            ),
+            "json-escaped uppercase": external_crs.replace(
+                "link", "\\u004c\\u0049\\u004e\\u004b"
+            ),
+            "uppercase key": external_crs.replace('"type"', '"TYPE"'),
+            "uppercase value": external_crs.replace('"link"', '"LINK"'),
+            "prefix matching": external_crs.replace('"link"', '"linkSuffix"'),
+            "trailing space": external_crs.replace('"link"', '"link "'),
+            "URL type": external_crs.replace('"link"', '"url"'),
+            "NUL in key": external_crs.replace('"type"', r'"type\u0000suffix"'),
+        }
+
+        fld = forms.GeometryField()
+        for label, payload in cases.items():
+            with (
+                self.subTest(label=label),
+                self.assertRaisesMessage(SuspiciousOperation, msg),
+            ):
+                fld.clean(payload)
+
+    def test_geojson_comments(self):
+        """GDAL allows comments in JSON; GeoDjango does not."""
+        fld = forms.GeometryField()
+        payload = EXTERNAL_CRS_FIXTURES["root"].replace(
+            '"link"', '/* comment */ "link"'
+        )
+        with self.assertRaises(ValidationError):
+            fld.clean(payload)
+
+    def test_geojson_single_quotes(self):
+        """GDAL allows single quotes in JSON; GeoDjango does not."""
+        fld = forms.GeometryField()
+        payload = EXTERNAL_CRS_FIXTURES["root"].replace('"', "'")
+        with self.assertRaises(ValidationError):
+            fld.clean(payload)
 
     def test_max_geom_collections_default(self):
         """The limit has a default and reaches the widget."""
