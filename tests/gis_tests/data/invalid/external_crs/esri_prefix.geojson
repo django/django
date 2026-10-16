@@ -1,0 +1,10 @@
+{
+    "type": "Point",
+    "coordinates": [0, 0],
+    "crs": {
+        "type": "name",
+        "properties": {
+            "name": "ESRI::[invalid]/esri-prefix"
+        }
+    }
+}

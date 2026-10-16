@@ -249,7 +249,19 @@ WKB / EWKB               ``memoryview``
 =======================  ==============
 
 For the GeoJSON format, the SRID is set based on the ``crs`` member. If ``crs``
-isn't provided, the SRID defaults to 4326.
+isn't provided, the SRID defaults to 4326. (The ``crs`` member was
+:rfc:`removed <7946#section-4>` from the GeoJSON spec, and some clients
+consider it invalid.)
+
+.. admonition:: References to external ``crs`` definitions not allowed
+
+    A ``SuspiciousOperation`` is raised before forwarding inputs to GDAL when
+    a CRS reference to an external resource is found.
+
+.. versionchanged:: 5.2.19
+
+    Raising ``SuspiciousOperation`` for external coordinate reference systems
+    was added.
 
 .. classmethod:: GEOSGeometry.from_gml(gml_string)
 

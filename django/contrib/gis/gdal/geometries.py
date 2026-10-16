@@ -50,6 +50,7 @@ from ctypes import byref, c_char_p, c_double, c_ubyte, c_void_p, string_at
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
 from django.contrib.gis.gdal.error import GDALException, SRSException
+from django.contrib.gis.gdal.geojson import ExternalCRSBlocker
 from django.contrib.gis.gdal.geomtype import OGRGeomType
 from django.contrib.gis.gdal.prototypes import geom as capi
 from django.contrib.gis.gdal.prototypes import srs as srs_api
@@ -95,6 +96,7 @@ class OGRGeometry(GDALBase):
                         byref(c_char_p(wkt_m["wkt"].encode())), None, byref(c_void_p())
                     )
             elif json_m:
+                ExternalCRSBlocker.check(geom_input)
                 g = self._from_json(geom_input.encode())
             else:
                 # Seeing if the input is a valid short-hand string
@@ -171,6 +173,7 @@ class OGRGeometry(GDALBase):
 
     @staticmethod
     def from_json(geom_input):
+        ExternalCRSBlocker.check(geom_input)
         return OGRGeometry(OGRGeometry._from_json(force_bytes(geom_input)))
 
     @classmethod
