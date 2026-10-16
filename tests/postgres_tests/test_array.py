@@ -1251,6 +1251,34 @@ class TestSimpleFormField(PostgreSQLSimpleTestCase):
         self.assertIsInstance(form_field, SimpleArrayField)
         self.assertEqual(form_field.max_length, 4)
 
+    def test_model_field_formfield_base_field_validators(self):
+        model_field = ArrayField(
+            models.IntegerField(validators=[validators.MaxValueValidator(10)])
+        )
+        form_field = model_field.formfield()
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            form_field.clean("51,1")
+        self.assertEqual(
+            cm.exception.messages,
+            [
+                "Item 1 in the array did not validate: Ensure this value is less "
+                "than or equal to 10."
+            ],
+        )
+
+    def test_model_field_formfield_base_field_validators_not_duplicated(self):
+        model_field = ArrayField(models.CharField(max_length=3))
+        form_field = model_field.formfield()
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            form_field.clean("abcd")
+        self.assertEqual(
+            cm.exception.messages,
+            [
+                "Item 1 in the array did not validate: Ensure this value has at "
+                "most 3 characters (it has 4)."
+            ],
+        )
+
     def test_model_field_choices(self):
         model_field = ArrayField(models.IntegerField(choices=((1, "A"), (2, "B"))))
         form_field = model_field.formfield()
