@@ -1,3 +1,4 @@
+import builtins
 import datetime
 import decimal
 import enum
@@ -11,7 +12,7 @@ import time
 import uuid
 import zoneinfo
 from types import NoneType
-from unittest import mock
+from unittest import mock, skipUnless
 
 import custom_migration_operations.more_operations
 import custom_migration_operations.operations
@@ -28,6 +29,7 @@ from django.utils.deconstruct import deconstructible
 from django.utils.functional import SimpleLazyObject
 from django.utils.timezone import get_default_timezone, get_fixed_timezone
 from django.utils.translation import gettext_lazy as _
+from django.utils.version import PY315
 
 from .models import FoodManager, FoodQuerySet
 
@@ -893,6 +895,41 @@ class WriterTests(SimpleTestCase):
         self.assertSerializedResultEqual(
             frozenset("cba"), ("frozenset(['a', 'b', 'c'])", set())
         )
+
+    @skipUnless(PY315, "frozendict requires Python 3.15+")
+    def test_serialize_frozendict(self):
+        values = (
+            builtins.frozendict(),
+            builtins.frozendict(answer=42),
+            builtins.frozendict(b=2, a=1),
+            builtins.frozendict(items=[1, 2], nested=builtins.frozendict(answer=42)),
+            builtins.frozendict(created=datetime.date(2026, 1, 1)),
+        )
+        for value in values:
+            with self.subTest(value=value):
+                result = self.serialize_round_trip(value)
+                self.assertIs(type(result), builtins.frozendict)
+                self.assertEqual(result, value)
+        self.assertSerializedResultEqual(
+            builtins.frozendict(), ("frozendict({})", set())
+        )
+        self.assertSerializedResultEqual(
+            builtins.frozendict(b=2, a=1), ("frozendict({'a': 1, 'b': 2})", set())
+        )
+        self.assertSerializedResultEqual(
+            builtins.frozendict(created=datetime.date(2026, 1, 1)),
+            (
+                "frozendict({'created': datetime.date(2026, 1, 1)})",
+                {"import datetime"},
+            ),
+        )
+
+    @skipUnless(PY315, "frozendict requires Python 3.15+")
+    def test_serialize_frozendict_field_default(self):
+        field = models.JSONField(default=builtins.frozendict(answer=42))
+        result = self.serialize_round_trip(field)
+        self.assertIs(type(result.default), builtins.frozendict)
+        self.assertEqual(result.default, field.default)
 
     def test_serialize_set(self):
         self.assertSerializedEqual(set())
