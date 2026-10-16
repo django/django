@@ -31,6 +31,21 @@ class Bar(models.Model):
     serves_cocktails = models.BooleanField(default=True)
 
 
+class Branch(models.Model):
+    pk = models.CompositePrimaryKey("place", "number")
+    place = models.OneToOneField(Place, models.CASCADE)
+    number = models.SmallIntegerField(default=1)
+
+
+class ProxyPlace(Place):
+    class Meta:
+        proxy = True
+
+
+class PlaceProxyPointer(models.Model):
+    place = models.OneToOneField(ProxyPlace, models.CASCADE)
+
+
 class UndergroundBar(models.Model):
     place = models.OneToOneField(Place, models.SET_NULL, null=True)
     serves_cocktails = models.BooleanField(default=True)
