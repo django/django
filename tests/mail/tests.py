@@ -851,19 +851,11 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(len(message.get_payload()), 2)
 
         related_message = message.get_payload(1)
-        self.assertEqual(
-            related_message.get_content_type(), "multipart/related"
-        )
+        self.assertEqual(related_message.get_content_type(), "multipart/related")
         self.assertEqual(len(related_message.get_payload()), 2)
-        self.assertEqual(
-            related_message.get_payload(0).get_content_type(), "text/html"
-        )
-        self.assertEqual(
-            related_message.get_payload(1).get_content_type(), "image/png"
-        )
-        self.assertEqual(
-            related_message.get_payload(1)["Content-ID"], "image001"
-        )
+        self.assertEqual(related_message.get_payload(0).get_content_type(), "text/html")
+        self.assertEqual(related_message.get_payload(1).get_content_type(), "image/png")
+        self.assertEqual(related_message.get_payload(1)["Content-ID"], "image001")
 
     def test_alternatives_constructor(self):
         html_content = "<p>This is <strong>html</strong></p>"
