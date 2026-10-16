@@ -18,6 +18,7 @@ from django.contrib.gis.geos import (
     Polygon,
     fromstr,
 )
+from django.core.exceptions import SuspiciousOperation
 from django.core.files.temp import NamedTemporaryFile
 from django.core.management import call_command
 from django.db import DatabaseError, NotSupportedError, connection
@@ -25,6 +26,7 @@ from django.db.models import F, OuterRef, Subquery
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
+from ..data.invalid.external_crs import EXTERNAL_CRS_FIXTURES
 from ..data.rasters.textrasters import JSON_RASTER
 from ..utils import skipUnlessGISLookup
 from .models import (
@@ -679,6 +681,19 @@ class GeoLookupTest(TestCase):
             city_point__within=F("poly"),
         )
         self.assertEqual(qs.get(), multifields)
+
+
+class GeoLookupUnsafeTests(TestCase):
+    def test_lookup_rejects_external_crs(self):
+        msg = "GeoJSON input specified an external CRS."
+        for name, payload in EXTERNAL_CRS_FIXTURES.items():
+            with (
+                self.subTest(fixture=name),
+                self.assertRaisesMessage(SuspiciousOperation, msg),
+                # GDAL does not log a failed network request.
+                self.assertNoLogs("django.contrib.gis"),
+            ):
+                State.objects.filter(poly__intersects=payload)
 
     def test_lookup_rejects_writing_or_fetching_rasters(self):
         """

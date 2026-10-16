@@ -88,6 +88,17 @@ each feature in that layer.
         >>> ds.layer_count  # This file only contains one layer
         1
 
+    .. warning::
+
+        **Use with trusted data only**
+
+        The ``DataSource`` utility is intended for loading trusted data only.
+        For instance, unlike :class:`~django.contrib.gis.geos.GEOSGeometry`, it
+        does not raise ``SuspiciousOperation`` before forwarding to GDAL any
+        GeoJSON geometries using the legacy ``crs`` member to specify a
+        URL-based coordinate reference system. Do not use it with untrusted
+        inputs.
+
     .. attribute:: layer_count
 
     Returns the number of layers in the data source.

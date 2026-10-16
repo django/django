@@ -1,0 +1,65 @@
+{
+    "type": "GeometryCollection",
+    "geometries": [
+        {
+            "type": "Point",
+            "coordinates": [0, 0],
+            "crs": {
+                "type": "name",
+                "properties": {
+                    "name": "crs84"
+                }
+            }
+        },
+        {
+            "type": "Point",
+            "coordinates": [1, 1],
+            "crs": {
+                "type": "name",
+                "properties": {
+                    "name": "EPSG:3857"
+                }
+            }
+        },
+        {
+            "type": "Point",
+            "coordinates": [2, 2],
+            "crs": {
+                "type": "name",
+                "properties": {
+                    "name": "MySQL:0"
+                }
+            }
+        },
+        {
+            "type": "Point",
+            "coordinates": [3, 3],
+            "crs": {
+                "type": "name",
+                "properties": {
+                    "name": "urn:ogc:def:crs:EPSG::4326"
+                }
+            }
+        },
+        {
+            "type": "Point",
+            "coordinates": [4, 4],
+            "crs": {
+                "type": "name",
+                "properties": {
+                    "name": "urn:ogc:def:crs:MySQL::0"
+                }
+            }
+        },
+        {
+            "type": "Point",
+            "coordinates": [5, 5],
+            "crs": {
+                "type": "name",
+                "properties": {
+                    "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+                }
+            }
+        }
+    ]
+}
