@@ -1,0 +1,11 @@
+{
+    "type": "Point",
+    "coordinates": [0, 0],
+    "crs": {
+        "type": "link",
+        "properties": {
+            "href": "http://[invalid]/root",
+            "type": "proj4"
+        }
+    }
+}

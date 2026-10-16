@@ -30,3 +30,23 @@ terminals.
 
 This issue has severity "low" according to the :ref:`Django security policy
 <severity-levels>`.
+
+CVE-2026-111362: Server-side request forgery via ``crs`` member of GeoJSON geometries
+=====================================================================================
+
+Earlier versions of the :rfc:`GeoJSON spec <7946#section-4>` allowed specifying
+a coordinate reference system (CRS) by URL. Since GDAL still resolves these
+URLs, any validation, save, or query path where a geometry is instantiated from
+user input allowed an attacker to submit a malicious CRS that would make a
+network request as the Django process user, or read a file, or both.
+
+:ref:`Lookups against spatial fields <spatial-lookups-intro>`, the
+:class:`~django.contrib.gis.forms.GeometryField` form field, and
+:class:`~django.contrib.gis.geos.GEOSGeometry` now reject GeoJSON geometries
+with CRS references to external resources. The
+:class:`~django.contrib.gis.gdal.DataSource` and
+:class:`~django.contrib.gis.utils.LayerMapping` utilities for loading trusted
+data continue to accept these values.
+
+This issue has severity "moderate" according to the :ref:`Django security
+policy <severity-levels>`.
