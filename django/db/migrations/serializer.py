@@ -19,7 +19,7 @@ from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
 from django.db.models.deletion import DatabaseOnDelete
 from django.utils.functional import LazyObject, Promise
 from django.utils.module_loading import qualname
-from django.utils.version import get_docs_version
+from django.utils.version import PY315, get_docs_version
 
 FUNCTION_TYPES = (types.FunctionType, types.BuiltinFunctionType, types.MethodType)
 
@@ -152,6 +152,12 @@ class DictionarySerializer(BaseSerializer):
             imports.update(v_imports)
             strings.append((k_string, v_string))
         return "{%s}" % (", ".join("%s: %s" % (k, v) for k, v in strings)), imports
+
+
+class FrozenDictionarySerializer(DictionarySerializer):
+    def serialize(self):
+        value, imports = super().serialize()
+        return f"frozendict({value})", imports
 
 
 class EnumSerializer(BaseSerializer):
@@ -364,6 +370,7 @@ class Serializer:
         list: SequenceSerializer,
         set: SetSerializer,
         tuple: TupleSerializer,
+        **({frozendict: FrozenDictionarySerializer} if PY315 else {}),
         dict: DictionarySerializer,
         models.Choices: ChoicesSerializer,
         enum.Enum: EnumSerializer,
