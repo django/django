@@ -9,6 +9,7 @@ urlpatterns = [
     path("no_response_cbv/", views.NoResponse()),
     path("streaming/", views.streaming),
     path("async_streaming/", views.async_streaming),
+    path("async_streaming_acmgr/", views.async_streaming_acmgr),
     path("in_transaction/", views.in_transaction),
     path("not_in_transaction/", views.not_in_transaction),
     path("not_in_transaction_async/", views.not_in_transaction_async),

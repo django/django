@@ -3,6 +3,7 @@ import mimetypes
 import os
 import sys
 from collections.abc import Iterable
+from contextlib import asynccontextmanager
 from copy import copy
 from functools import partial
 from http import HTTPStatus
@@ -138,6 +139,17 @@ async def aclosing_iterator_wrapper(iterable, close):
         request_finished.connect(close_old_connections)
 
 
+@asynccontextmanager
+async def aclosing_acmgr_wrapper(acmgr, close):
+    try:
+        async with acmgr as content:
+            yield content
+    finally:
+        request_finished.disconnect(close_old_connections)
+        close()  # will fire request_finished
+        request_finished.connect(close_old_connections)
+
+
 def conditional_content_removal(request, response):
     """
     Simulate the behavior of most web servers by removing the content of
@@ -196,7 +208,11 @@ class ClientHandler(BaseHandler):
 
         # Emulate a WSGI server by calling the close method on completion.
         if response.streaming:
-            if response.is_async:
+            if response.is_acmgr:
+                response.streaming_content = aclosing_acmgr_wrapper(
+                    response.streaming_content, response.close
+                )
+            elif response.is_async:
                 response.streaming_content = aclosing_iterator_wrapper(
                     response.streaming_content, response.close
                 )
@@ -248,7 +264,11 @@ class AsyncClientHandler(BaseHandler):
         response.asgi_request = request
         # Emulate a server by calling the close method on completion.
         if response.streaming:
-            if response.is_async:
+            if response.is_acmgr:
+                response.streaming_content = aclosing_acmgr_wrapper(
+                    response.streaming_content, response.close
+                )
+            elif response.is_async:
                 response.streaming_content = aclosing_iterator_wrapper(
                     response.streaming_content, response.close
                 )

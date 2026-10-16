@@ -7,7 +7,7 @@ import re
 import sys
 import time
 import warnings
-from contextlib import aclosing
+from contextlib import aclosing, asynccontextmanager
 from email.header import Header
 from http.client import responses
 from urllib.parse import urlsplit
@@ -456,6 +456,14 @@ class StreamingHttpResponse(HttpResponseBase):
     This should only be iterated once, when the response is streamed to the
     client. However, it can be appended to or replaced with a new iterator
     that wraps the original content (or yields entirely new content).
+
+    Under ASGI, the content may also be an asynchronous context manager that
+    yields an asynchronous iterator. Such a response must be consumed with
+    ``async with``, which enters the context manager before streaming and
+    exits it once streaming finishes, fails, or is cancelled. This allows the
+    content to be produced by structured concurrency primitives such as
+    ``asyncio.TaskGroup``, which cannot be suspended by an async generator's
+    ``yield`` (see PEP 789).
     """
 
     streaming = True
@@ -488,7 +496,27 @@ class StreamingHttpResponse(HttpResponseBase):
 
     @property
     def streaming_content(self):
-        if self.is_async:
+        if self.is_acmgr:
+            # Pull to lexical scope to capture fixed reference in case
+            # streaming_content is set again later.
+            _acmgr = self._acmgr
+
+            @asynccontextmanager
+            async def acmgr_wrapper():
+                async with _acmgr as iterable:
+
+                    async def awrapper():
+                        async with maybe_aclosing(aiter(iterable)) as it:
+                            async for part in it:
+                                yield self.make_bytes(part)
+
+                    # Close the iterator before exiting the context manager
+                    # that produced it.
+                    async with aclosing(awrapper()) as content:
+                        yield content
+
+            return acmgr_wrapper()
+        elif self.is_async:
             # pull to lexical scope to capture fixed reference in case
             # streaming_content is set again later.
             _iterator = self._iterator
@@ -507,6 +535,14 @@ class StreamingHttpResponse(HttpResponseBase):
         self._set_streaming_content(value)
 
     def _set_streaming_content(self, value):
+        self.is_acmgr = hasattr(value, "__aenter__") and hasattr(value, "__aexit__")
+        if self.is_acmgr:
+            # An async context manager yielding an async iterator. It's
+            # entered and exited when the response is consumed, see
+            # __aenter__() and __aexit__().
+            self._acmgr = value
+            self.is_async = True
+            return
         # Ensure we can never iterate on "value" more than once.
         try:
             self._iterator = iter(value)
@@ -517,7 +553,35 @@ class StreamingHttpResponse(HttpResponseBase):
         if hasattr(value, "close"):
             self._resource_closers.append(value.close)
 
+    async def __aenter__(self):
+        if self.is_acmgr:
+            self._streaming_context = self.streaming_content
+        else:
+            # Consume via `__aiter__` and not `streaming_content` directly, to
+            # allow mapping of a sync iterator.
+            self._streaming_context = aclosing(aiter(self))
+        return await self._streaming_context.__aenter__()
+
+    async def __aexit__(self, *exc_info):
+        return await self._streaming_context.__aexit__(*exc_info)
+
     def __iter__(self):
+        if self.is_acmgr:
+            warnings.warn(
+                "StreamingHttpResponse must consume asynchronous context managers "
+                "in order to serve them synchronously. Use a synchronous iterator "
+                "instead.",
+                Warning,
+                stacklevel=2,
+            )
+
+            # Consume in async_to_sync. Bytes are already mapped by
+            # streaming_content.
+            async def to_list():
+                async with self as content:
+                    return [chunk async for chunk in content]
+
+            return iter(async_to_sync(to_list)())
         try:
             return iter(self.streaming_content)
         except TypeError:
@@ -539,6 +603,14 @@ class StreamingHttpResponse(HttpResponseBase):
             return map(self.make_bytes, iter(async_to_sync(to_list)(self._iterator)))
 
     async def __aiter__(self):
+        if self.is_acmgr:
+            # Iterating here would suspend the context manager's frame on each
+            # yield, which is exactly what asyncio.TaskGroup (PEP 789)
+            # disallows.
+            raise TypeError(
+                "StreamingHttpResponse with asynchronous context manager content "
+                "must be consumed with `async with`, not iterated directly."
+            )
         try:
             async with aclosing(aiter(self.streaming_content)) as content:
                 async for part in content:

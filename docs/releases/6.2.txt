@@ -214,7 +214,10 @@ Models
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :class:`~django.http.StreamingHttpResponse` now accepts an asynchronous
+  context manager yielding an async iterator as its ``streaming_content``. This
+  allows streaming content produced by tasks in an :class:`asyncio.TaskGroup`.
+  See :ref:`request-response-streaming-task-groups` for details.
 
 Security
 ~~~~~~~~

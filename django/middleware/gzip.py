@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from django.middleware import MiddlewareMixin
 from django.utils.cache import patch_vary_headers
 from django.utils.regex_helper import _lazy_re_compile
@@ -32,7 +34,20 @@ class GZipMiddleware(MiddlewareMixin):
             return response
 
         if response.streaming:
-            if response.is_async:
+            if response.is_acmgr:
+                original_acmgr = response.streaming_content
+                max_random_bytes = self.max_random_bytes
+
+                @asynccontextmanager
+                async def compressed_acmgr():
+                    async with original_acmgr as content:
+                        yield acompress_sequence(
+                            content,
+                            max_random_bytes=max_random_bytes,
+                        )
+
+                response.streaming_content = compressed_acmgr()
+            elif response.is_async:
                 response.streaming_content = acompress_sequence(
                     response.streaming_content,
                     max_random_bytes=self.max_random_bytes,
