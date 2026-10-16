@@ -23,6 +23,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_subqueries_in_group_by = False
     ignores_unnecessary_order_by_in_subqueries = False
     supports_tuple_comparison_against_subquery = False
+    supports_same_table_select_as_update = True
     supports_transactions = True
     supports_timezones = False
     has_native_duration_field = True
