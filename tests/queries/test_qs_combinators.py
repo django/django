@@ -800,6 +800,7 @@ class QuerySetSetOperationTests(TestCase):
                 "filter",
                 "only",
                 "prefetch_related",
+                "select_for_update",
                 "select_related",
                 "update",
             ):
@@ -815,6 +816,19 @@ class QuerySetSetOperationTests(TestCase):
             ):
                 obj = Number.objects.first()
                 getattr(qs, combinator)(qs).contains(obj)
+
+    def test_select_for_update_unsupported_on_combined_qs(self):
+        qs = Number.objects.all()
+        msg = "Calling QuerySet.select_for_update() after %s() is not supported."
+        combinators = ["union"]
+        if connection.features.supports_select_difference:
+            combinators.append("difference")
+        if connection.features.supports_select_intersection:
+            combinators.append("intersection")
+        for combinator in combinators:
+            with self.subTest(combinator=combinator):
+                with self.assertRaisesMessage(NotSupportedError, msg % combinator):
+                    getattr(qs, combinator)(qs).select_for_update()
 
     def test_get_with_filters_unsupported_on_combined_qs(self):
         qs = Number.objects.all()
