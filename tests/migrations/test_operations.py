@@ -1,3 +1,4 @@
+import builtins
 import math
 from decimal import Decimal
 from unittest import skipUnless
@@ -1516,7 +1517,7 @@ class OperationTests(OperationTestBase):
             migrations.AddField(
                 model_name="pony",
                 name="config",
-                field=models.JSONField(default=frozendict(answer=42)),
+                field=models.JSONField(default=builtins.frozendict(answer=42)),
             ),
         ]
         # Execute the generated migration rather than the original operation.

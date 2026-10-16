@@ -1,3 +1,4 @@
+import builtins
 import datetime
 import decimal
 import enum
@@ -898,23 +899,25 @@ class WriterTests(SimpleTestCase):
     @skipUnless(PY315, "frozendict requires Python 3.15+")
     def test_serialize_frozendict(self):
         values = (
-            frozendict(),
-            frozendict(answer=42),
-            frozendict(b=2, a=1),
-            frozendict(items=[1, 2], nested=frozendict(answer=42)),
-            frozendict(created=datetime.date(2026, 1, 1)),
+            builtins.frozendict(),
+            builtins.frozendict(answer=42),
+            builtins.frozendict(b=2, a=1),
+            builtins.frozendict(items=[1, 2], nested=builtins.frozendict(answer=42)),
+            builtins.frozendict(created=datetime.date(2026, 1, 1)),
         )
         for value in values:
             with self.subTest(value=value):
                 result = self.serialize_round_trip(value)
-                self.assertIs(type(result), frozendict)
+                self.assertIs(type(result), builtins.frozendict)
                 self.assertEqual(result, value)
-        self.assertSerializedResultEqual(frozendict(), ("frozendict({})", set()))
         self.assertSerializedResultEqual(
-            frozendict(b=2, a=1), ("frozendict({'a': 1, 'b': 2})", set())
+            builtins.frozendict(), ("frozendict({})", set())
         )
         self.assertSerializedResultEqual(
-            frozendict(created=datetime.date(2026, 1, 1)),
+            builtins.frozendict(b=2, a=1), ("frozendict({'a': 1, 'b': 2})", set())
+        )
+        self.assertSerializedResultEqual(
+            builtins.frozendict(created=datetime.date(2026, 1, 1)),
             (
                 "frozendict({'created': datetime.date(2026, 1, 1)})",
                 {"import datetime"},
@@ -923,9 +926,9 @@ class WriterTests(SimpleTestCase):
 
     @skipUnless(PY315, "frozendict requires Python 3.15+")
     def test_serialize_frozendict_field_default(self):
-        field = models.JSONField(default=frozendict(answer=42))
+        field = models.JSONField(default=builtins.frozendict(answer=42))
         result = self.serialize_round_trip(field)
-        self.assertIs(type(result.default), frozendict)
+        self.assertIs(type(result.default), builtins.frozendict)
         self.assertEqual(result.default, field.default)
 
     def test_serialize_set(self):
