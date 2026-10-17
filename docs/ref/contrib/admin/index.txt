@@ -1217,6 +1217,65 @@ subclass::
                     ((line,) for line in instance.get_full_address()),
                 ) or mark_safe("<span class='errors'>I can't determine this address.</span>")
 
+.. attribute:: ModelAdmin.readonly_formfield_overrides
+
+    .. versionadded:: 6.2
+
+    A dictionary mapping a field class to a dict of arguments, used when a
+    field of that class is displayed as read-only. A field is read-only when
+    it's listed in :attr:`ModelAdmin.readonly_fields`, or when the user has
+    view permission but not change permission. Only the ``widget`` argument
+    is read.
+
+    As with :attr:`ModelAdmin.formfield_overrides`, the key is the field
+    class, *not* a string. Here every read-only
+    :class:`~django.db.models.JSONField` renders inside a ``<pre>`` tag
+    instead of as a plain string::
+
+        from django.contrib import admin
+        from django.db import models
+        from django.forms import Widget
+        from django.utils.html import format_html
+
+
+        class PrettyJSONWidget(Widget):
+            def render(self, name, value, attrs=None, renderer=None):
+                return format_html("<pre>{}</pre>", value)
+
+
+        class DogAdmin(admin.ModelAdmin):
+            readonly_formfield_overrides = {
+                models.JSONField: {"widget": PrettyJSONWidget},
+            }
+
+    Django tries the field's own class first, then each of its parent classes
+    in turn, and uses the first entry it finds. An entry for
+    :class:`~django.db.models.Field` therefore covers every read-only model
+    field that no more specific entry matches. To target a single field
+    instead of a class, override
+    :meth:`ModelAdmin.get_readonly_widget`.
+
+    Without a matching entry, read-only values render as text, as described
+    in :attr:`ModelAdmin.readonly_fields`. Read-only entries that don't
+    resolve to a model field, such as a ``ModelAdmin`` method or a model
+    attribute, have no field class, so no override applies to them.
+
+    Django calls the widget's ``render()`` method with the field name and the
+    field's value, and passes no bound form field. The value is the raw
+    attribute value, not the string the admin would otherwise display, so the
+    widget does any formatting itself. Values submitted for read-only fields
+    are ignored, so the widget only controls presentation.
+
+    An entry's ``widget`` may be a class or a configured instance. Django uses
+    an instance as given, so one widget class can serve both the editable and
+    the read-only rendering, selecting between them from its own ``attrs``.
+
+    .. note::
+
+        Django doesn't add assets declared by the widget's ``Media`` class to
+        the page, so a widget that depends on its own CSS or JavaScript won't
+        have them.
+
 .. attribute:: ModelAdmin.save_as
 
     Set ``save_as`` to enable a "save as new" feature on admin change forms.
@@ -1605,6 +1664,31 @@ default templates used by the :class:`ModelAdmin` views:
     ``obj`` being edited (or ``None`` on an add form) and is expected to return
     a ``list`` or ``tuple`` of field names that will be displayed as read-only,
     as described above in the :attr:`ModelAdmin.readonly_fields` section.
+
+.. method:: ModelAdmin.get_readonly_widget(db_field)
+
+    .. versionadded:: 6.2
+
+    The ``get_readonly_widget`` method is given the model field being rendered
+    read-only, and returns the widget to render it with, or ``None`` to use
+    the default rendering. The default implementation resolves
+    :attr:`ModelAdmin.readonly_formfield_overrides`.
+
+    Override this method to target a single field, rather than every field of
+    a class. For example, to render only ``config`` as formatted JSON, while
+    leaving the model's other ``JSONField`` columns alone::
+
+        class DogAdmin(admin.ModelAdmin):
+            def get_readonly_widget(self, db_field):
+                if db_field.name == "config":
+                    return PrettyJSONWidget()
+                return super().get_readonly_widget(db_field)
+
+    Unlike :meth:`ModelAdmin.formfield_for_foreignkey`, this method doesn't
+    receive the ``HttpRequest``. The admin excludes read-only fields from the
+    form, so they're rendered outside the request-aware form machinery. A
+    widget returned here therefore can't vary by user, and it must not embed
+    links or buttons that trigger actions the user may lack permission for.
 
 .. method:: ModelAdmin.get_prepopulated_fields(request, obj=None)
 
