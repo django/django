@@ -1,4 +1,5 @@
 import datetime
+import re
 import uuid
 from functools import lru_cache
 
@@ -17,6 +18,21 @@ from .utils import BoundVar, BulkInsertMapper, Oracle_datetime
 
 
 class DatabaseOperations(BaseDatabaseOperations):
+    def prepare_sql_script(self, sql):
+        statements = super().prepare_sql_script(sql)
+        prepared = []
+        for statement in statements:
+            if statement.strip() == "/":
+                continue
+            if re.match(
+                r"CREATE\s+(?:OR\s+REPLACE\s+)?(?:(?:NON)?EDITIONABLE\s+)?TRIGGER\b",
+                statement.lstrip(),
+                re.IGNORECASE,
+            ):
+                statement = statement.rstrip("/") + "/"
+            prepared.append(statement)
+        return prepared
+
     # Oracle uses NUMBER(5), NUMBER(11), and NUMBER(19) for integer fields.
     # SmallIntegerField uses NUMBER(11) instead of NUMBER(5), which is used by
     # SmallAutoField, to preserve backward compatibility.

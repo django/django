@@ -11,6 +11,19 @@ from ..models import Person, Tag
 class OperationsTests(TransactionTestCase):
     available_apps = ["backends"]
 
+    def test_prepare_sql_script_oracle_trigger(self):
+        sql = """
+            CREATE OR REPLACE TRIGGER test_trigger
+            BEFORE INSERT ON test_table
+            BEGIN
+                NULL;
+            END;
+            /
+        """
+        statements = connection.ops.prepare_sql_script(sql)
+        self.assertEqual(len(statements), 1)
+        self.assertTrue(statements[0].endswith("END;/"))
+
     def test_sequence_name_truncation(self):
         seq_name = connection.ops._get_no_autofield_sequence_name(
             "schema_authorwithevenlongee869"
