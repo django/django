@@ -7,6 +7,7 @@ from operator import attrgetter
 from unittest import expectedFailure
 
 from django import forms
+from django.db import connection
 from django.db.models import FETCH_PEERS
 from django.test import TestCase
 from django.test.utils import ignore_warnings
@@ -439,11 +440,16 @@ class ModelInheritanceTest(TestCase):
 
     def test_inherited_nullable_exclude(self):
         obj = SelfRefChild.objects.create(child_data=37, parent_data=42)
+        nonexistent_pk = connection.ops.get_nonexistent_pk(72)
         self.assertQuerySetEqual(
-            SelfRefParent.objects.exclude(self_data=72), [obj.pk], attrgetter("pk")
+            SelfRefParent.objects.exclude(self_data=nonexistent_pk),
+            [obj.pk],
+            attrgetter("pk"),
         )
         self.assertQuerySetEqual(
-            SelfRefChild.objects.exclude(self_data=72), [obj.pk], attrgetter("pk")
+            SelfRefChild.objects.exclude(self_data=nonexistent_pk),
+            [obj.pk],
+            attrgetter("pk"),
         )
 
     def test_concrete_abstract_concrete_pk(self):

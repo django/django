@@ -12,7 +12,7 @@ from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
-from django.db import models
+from django.db import connection, models
 from django.forms.models import BaseModelFormSet
 from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.urls import path
@@ -722,7 +722,8 @@ class FieldOverridePostAdmin(PostAdmin):
 
 class CustomChangeList(ChangeList):
     def get_queryset(self, request):
-        return self.root_queryset.order_by("pk").filter(pk=9999)  # Doesn't exist
+        nonexistent_pk = connection.ops.get_nonexistent_pk(9999)
+        return self.root_queryset.order_by("pk").filter(pk=nonexistent_pk)
 
 
 class GadgetAdmin(admin.ModelAdmin):
