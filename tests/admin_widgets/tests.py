@@ -787,6 +787,27 @@ class ForeignKeyRawIdWidgetTest(TestCase):
             "Hidden</a></strong></div>" % {"pk": hidden.pk},
         )
 
+    def test_label_and_url_for_value_respects_field_queryset(self):
+        # A narrowed form field queryset (e.g. set via
+        # ModelAdmin.formfield_for_foreignkey()) must also restrict the label
+        # and change link rendered by the widget, so a value outside the
+        # queryset isn't exposed (#37213).
+        apple = Inventory.objects.create(barcode=86, name="Apple")
+        pear = Inventory.objects.create(barcode=22, name="Pear")
+        rel = Inventory._meta.get_field("parent").remote_field
+        # The field copies the widget and sets its queryset, so read the label
+        # back from field.widget (as the admin does when rendering).
+        field = forms.ModelChoiceField(
+            queryset=Inventory._default_manager.exclude(pk=pear.pk),
+            widget=widgets.ForeignKeyRawIdWidget(rel, widget_admin_site),
+        )
+        widget = field.widget
+        self.assertEqual(
+            widget.label_and_url_for_value(apple.barcode),
+            ("Apple", "/admin_widgets/inventory/%s/change/" % apple.pk),
+        )
+        self.assertEqual(widget.label_and_url_for_value(pear.barcode), ("", ""))
+
     def test_render_unsafe_limit_choices_to(self):
         rel = UnsafeLimitChoicesTo._meta.get_field("band").remote_field
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
@@ -806,6 +827,26 @@ class ForeignKeyRawIdWidgetTest(TestCase):
             '<div><input type="text" name="test" class="vForeignKeyRawIdAdminField">'
             '<a href="/admin_widgets/releaseevent/?_to_field=album" '
             'class="related-lookup" id="lookup_id_test" title="Lookup"></a></div>',
+        )
+
+
+@override_settings(ROOT_URLCONF="admin_widgets.urls")
+class ForeignKeyRawIdWidgetMultiDbTest(TestCase):
+    databases = {"default", "other"}
+
+    def test_label_and_url_for_value_preserves_queryset_database(self):
+        # A form field queryset that selected its own database (e.g. via
+        # using()) keeps it when the widget isn't bound to one, instead of
+        # falling back to the default routing (#37213).
+        apple = Inventory.objects.using("other").create(barcode=86, name="Apple")
+        rel = Inventory._meta.get_field("parent").remote_field
+        field = forms.ModelChoiceField(
+            queryset=Inventory.objects.using("other"),
+            widget=widgets.ForeignKeyRawIdWidget(rel, widget_admin_site),
+        )
+        self.assertEqual(
+            field.widget.label_and_url_for_value(apple.barcode),
+            ("Apple", "/admin_widgets/inventory/%s/change/" % apple.pk),
         )
 
 
