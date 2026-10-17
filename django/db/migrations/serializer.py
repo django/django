@@ -26,7 +26,7 @@ FUNCTION_TYPES = (types.FunctionType, types.BuiltinFunctionType, types.MethodTyp
 if isinstance(functools._lru_cache_wrapper, type):
     # When using CPython's _functools C module, LRU cache function decorators
     # present as a class and not a function, so add that class to the list of
-    # function types. In the pure Python implementation and PyPy they present
+    # function types. In the pure Python implementation they present
     # as normal functions which are already handled.
     FUNCTION_TYPES += (functools._lru_cache_wrapper,)
 

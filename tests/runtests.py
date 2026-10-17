@@ -34,7 +34,6 @@ else:
     )
     from django.utils.functional import classproperty
     from django.utils.log import DEFAULT_LOGGING
-    from django.utils.version import PYPY
 
 
 try:
@@ -58,8 +57,7 @@ warnings.simplefilter("error", RuntimeWarning)
 # references, which are a minority, so the garbage collection threshold can be
 # larger than the default threshold of 700 allocations + deallocations without
 # much increase in memory usage.
-if not PYPY:
-    gc.set_threshold(100_000)
+gc.set_threshold(100_000)
 
 RUNTESTS_DIR = os.path.abspath(os.path.dirname(__file__))
 

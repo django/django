@@ -3,7 +3,7 @@ import gc
 from django.core.exceptions import FieldError
 from django.db.models import FETCH_PEERS
 from django.test import SimpleTestCase, TestCase
-from django.test.utils import garbage_collect, ignore_warnings, requires_gil
+from django.test.utils import ignore_warnings, requires_gil
 from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .models import (
@@ -66,11 +66,11 @@ class SelectRelatedTests(TestCase):
         self.addCleanup(gc.set_debug, 0)
         self.addCleanup(gc.enable)
         gc.disable()
-        garbage_collect()
+        gc.collect()
         gc.set_debug(gc.DEBUG_SAVEALL)
 
     def assert_no_local_function_leaks(self):
-        garbage_collect()
+        gc.collect()
         local_functions_leaked = [
             obj for obj in gc.garbage if "<locals>" in getattr(obj, "__qualname__", "")
         ]

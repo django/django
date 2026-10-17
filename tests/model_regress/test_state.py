@@ -2,7 +2,7 @@ import gc
 
 from django.db.models.base import ModelState, ModelStateFieldsCacheDescriptor
 from django.test import SimpleTestCase
-from django.test.utils import garbage_collect, requires_gil
+from django.test.utils import requires_gil
 
 from .models import Worker, WorkerProfile
 
@@ -28,7 +28,7 @@ class ModelStateTests(SimpleTestCase):
         del worker
         del profile
 
-        garbage_collect()
+        gc.collect()
 
         leaked = [obj for obj in gc.garbage if id(obj) == worker_id]
         self.assertEqual(leaked, [])

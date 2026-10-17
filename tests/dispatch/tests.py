@@ -1,3 +1,4 @@
+import gc
 import weakref
 from types import TracebackType
 from unittest import mock
@@ -5,7 +6,7 @@ from unittest import mock
 from django.dispatch import Signal, receiver
 from django.dispatch.dispatcher import _make_id
 from django.test import SimpleTestCase
-from django.test.utils import garbage_collect, override_settings
+from django.test.utils import override_settings
 
 
 def receiver_1_arg(val, **kwargs):
@@ -89,7 +90,7 @@ class DispatcherTests(SimpleTestCase):
         a = Callable()
         a_signal.connect(a.a, sender=self)
         del a
-        garbage_collect()
+        gc.collect()
         result = a_signal.send(sender=self, val="test")
         self.assertEqual(result, [])
         self.assertTestIsClean(a_signal)
@@ -122,7 +123,7 @@ class DispatcherTests(SimpleTestCase):
             self.assertEqual(result, [(first_receiver, "first")])
 
             del sender
-            garbage_collect()
+            gc.collect()
 
             sender = Sender()
             signal.connect(second_receiver, sender)
@@ -142,7 +143,7 @@ class DispatcherTests(SimpleTestCase):
         d_signal.connect(receiver_1_arg)
         d_signal.send(sender, val="garbage")
         del sender
-        garbage_collect()
+        gc.collect()
         try:
             self.assertIsNone(wref())
         finally:
@@ -163,7 +164,7 @@ class DispatcherTests(SimpleTestCase):
         self.assertEqual(len(a_signal.receivers), 1)
         del a
         del result
-        garbage_collect()
+        gc.collect()
         self.assertTestIsClean(a_signal)
 
     def test_uid_registration(self):
@@ -235,7 +236,7 @@ class DispatcherTests(SimpleTestCase):
         a_signal.connect(receiver_3)
         a_signal.disconnect(receiver_1)
         del receiver_2
-        garbage_collect()
+        gc.collect()
         a_signal.disconnect(receiver_3)
         self.assertTestIsClean(a_signal)
 
