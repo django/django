@@ -84,6 +84,9 @@ class BaseCache:
         self.version = params.get("VERSION", 1)
         self.key_func = get_key_func(params.get("KEY_FUNCTION"))
 
+    def check(self, alias, config, **kwargs):
+        return []
+
     def get_backend_timeout(self, timeout=DEFAULT_TIMEOUT):
         """
         Return the timeout value usable by this backend based upon the provided
