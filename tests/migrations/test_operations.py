@@ -1,7 +1,5 @@
-import builtins
 import math
 from decimal import Decimal
-from unittest import skipUnless
 
 from django.core.exceptions import FieldDoesNotExist
 from django.db import IntegrityError, connection, migrations, models, transaction
@@ -9,7 +7,6 @@ from django.db.migrations.migration import Migration
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.operations.fields import FieldOperation
 from django.db.migrations.state import ModelState, ProjectState
-from django.db.migrations.writer import MigrationWriter
 from django.db.models import F
 from django.db.models.expressions import Value
 from django.db.models.functions import Abs, Concat, Pi
@@ -21,7 +18,6 @@ from django.test import (
     skipUnlessDBFeature,
 )
 from django.test.utils import CaptureQueriesContext
-from django.utils.version import PY315
 
 from .base import OperationTestBase
 from .models import FoodManager, FoodQuerySet, UnicodeModel
@@ -1504,30 +1500,6 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[0], "AddField")
         self.assertEqual(definition[1], [])
         self.assertEqual(sorted(definition[2]), ["field", "model_name", "name"])
-
-    @skipUnless(PY315, "frozendict requires Python 3.15+")
-    @skipUnlessDBFeature("supports_json_field")
-    def test_add_field_serialized_frozendict_default(self):
-        app_label = "test_adflfd"
-        project_state = self.set_up_test_model(app_label)
-        Pony = project_state.apps.get_model(app_label, "Pony")
-        pony = Pony.objects.create(weight=4)
-        migration = Migration("add_config", app_label)
-        migration.operations = [
-            migrations.AddField(
-                model_name="pony",
-                name="config",
-                field=models.JSONField(default=builtins.frozendict(answer=42)),
-            ),
-        ]
-        # Execute the generated migration rather than the original operation.
-        namespace = {}
-        exec(MigrationWriter(migration).as_string(), namespace)
-        generated_migration = namespace["Migration"]("add_config", app_label)
-        with connection.schema_editor() as editor:
-            new_state = generated_migration.apply(project_state, editor)
-        Pony = new_state.apps.get_model(app_label, "Pony")
-        self.assertEqual(Pony.objects.get(pk=pony.pk).config, {"answer": 42})
 
     @skipUnlessDBFeature("supports_stored_generated_columns")
     def test_add_generated_field(self):

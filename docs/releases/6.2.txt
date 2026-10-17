@@ -204,9 +204,7 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* Migrations now support serializing ``frozendict`` instances on Python 3.15+,
-  preserving their keys and values. Migrations containing these values require
-  Python 3.15+ to run.
+* ...
 
 Models
 ~~~~~~

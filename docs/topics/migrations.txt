@@ -855,8 +855,7 @@ Django can serialize the following:
 
 - ``int``, ``float``, ``bool``, ``str``, ``bytes``, ``None``, ``NoneType``
 - ``list``, ``set``, ``tuple``, ``dict``, ``range``
-- ``frozendict`` instances (on Python 3.15+). Migrations containing these
-  values require Python 3.15+ to run.
+- ``frozendict`` instances
 - ``datetime.date``, ``datetime.time``, and ``datetime.datetime`` instances
   (include those that are timezone-aware)
 - :class:`zoneinfo.ZoneInfo` instances
