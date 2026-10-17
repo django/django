@@ -64,7 +64,8 @@ Minor features
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :meth:`.ContentType.get_object_for_this_type` now raises :exc:`LookupError`
+  instead of ``AttributeError`` when the model no longer exists.
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
