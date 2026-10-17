@@ -750,8 +750,9 @@ class BaseDatabaseWrapper:
         self.validate_no_atomic_block()
         current_run_on_commit = self.run_on_commit
         self.run_on_commit = []
-        while current_run_on_commit:
-            _, func, robust = current_run_on_commit.pop(0)
+        for index, (_, func, robust) in enumerate(current_run_on_commit):
+            # Release the queue's reference before invoking the callback.
+            current_run_on_commit[index] = None
             if robust:
                 try:
                     func()
