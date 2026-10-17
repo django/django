@@ -214,6 +214,16 @@
             for (i = 0, formCount = forms.length; i < formCount; i++) {
                 updateElementIndex($(forms).get(i), options.prefix, i);
                 $(forms.get(i)).find("*").each(updateElementCallback);
+                $(forms)
+                    .get(i)
+                    .dispatchEvent(
+                        new CustomEvent("formset:id_modified", {
+                            bubbles: true,
+                            detail: {
+                                formsetName: options.prefix,
+                            },
+                        }),
+                    );
             }
         };
 
