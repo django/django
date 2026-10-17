@@ -1,3 +1,6 @@
+import gc
+import traceback
+import weakref
 from functools import partial
 
 from django.db import connection, transaction
@@ -280,6 +283,119 @@ class TestConnectionOnCommit(TransactionTestCase):
             self.do(1)
 
         self.assertDone([1])
+
+    def test_error_in_hook_stops_later_hooks_without_rolling_back_commit(self):
+        error = ForcedError("callback failed")
+
+        def fail():
+            raise error
+
+        with self.assertRaisesMessage(ForcedError, "callback failed") as cm:
+            with transaction.atomic():
+                self.do(1)
+                transaction.on_commit(fail)
+                self.do(2)
+
+        self.assertIs(cm.exception, error)
+        self.assertNotified([1])
+        self.assertEqual(
+            list(Thing.objects.order_by("num").values_list("num", flat=True)), [1, 2]
+        )
+        self.assertEqual(connection.run_on_commit, [])
+        with transaction.atomic():
+            self.do(3)
+        self.assertNotified([1, 3])
+
+    def test_base_exception_in_hook_is_not_suppressed(self):
+        def interrupt():
+            raise KeyboardInterrupt("callback interrupted")
+
+        for robust in (False, True):
+            with self.subTest(robust=robust):
+                self.notified.clear()
+                with self.assertRaisesMessage(
+                    KeyboardInterrupt, "callback interrupted"
+                ):
+                    with transaction.atomic():
+                        transaction.on_commit(lambda: self.notify(1))
+                        transaction.on_commit(interrupt, robust=robust)
+                        transaction.on_commit(lambda: self.notify(2))
+                self.assertNotified([1])
+                self.assertEqual(connection.run_on_commit, [])
+
+    def test_completed_hook_is_released_before_next_hook(self):
+        def callback():
+            self.notify(1)
+
+        callback_ref = weakref.ref(callback)
+
+        def check_released():
+            gc.collect()
+            self.assertIsNone(callback_ref())
+            self.notify(2)
+
+        with transaction.atomic():
+            transaction.on_commit(callback)
+            transaction.on_commit(check_released)
+            del callback
+
+        self.assertNotified([1, 2])
+
+    def test_completed_hook_is_not_retained_by_later_hook_traceback(self):
+        callback_refs = {}
+
+        def make_callback(label):
+            def callback():
+                self.notify(label)
+
+            callback_refs[label] = weakref.ref(callback)
+            return callback
+
+        captured_traceback = None
+        try:
+            with transaction.atomic():
+                transaction.on_commit(make_callback(1))
+                transaction.on_commit(make_callback("error"))
+                transaction.on_commit(make_callback(2))
+        except ForcedError as error:
+            captured_traceback = error.__traceback__
+        try:
+            self.assertIsNotNone(captured_traceback)
+            gc.collect()
+            self.assertIsNone(callback_refs[1]())
+            self.assertIsNotNone(callback_refs["error"]())
+            self.assertIsNotNone(callback_refs[2]())
+            self.assertNotified([1])
+            self.assertEqual(connection.run_on_commit, [])
+        finally:
+            if captured_traceback is not None:
+                traceback.clear_frames(captured_traceback)
+
+    def test_completed_hook_is_not_retained_by_robust_hook_log(self):
+        callback_refs = {}
+
+        def make_callback(label):
+            def callback():
+                self.notify(label)
+
+            callback_refs[label] = weakref.ref(callback)
+            return callback
+
+        with self.assertLogs("django.db.backends.base", "ERROR") as cm:
+            with transaction.atomic():
+                transaction.on_commit(make_callback(1))
+                transaction.on_commit(make_callback("error"), robust=True)
+                transaction.on_commit(make_callback(2))
+        try:
+            gc.collect()
+            self.assertIsNone(callback_refs[1]())
+            self.assertNotified([1, 2])
+            self.assertEqual(connection.run_on_commit, [])
+            self.assertEqual(len(cm.records), 1)
+            self.assertIsInstance(cm.records[0].exc_info[1], ForcedError)
+        finally:
+            for record in cm.records:
+                traceback.clear_frames(record.exc_info[2])
 
     def test_db_query_in_hook(self):
         with transaction.atomic():
