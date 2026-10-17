@@ -515,6 +515,29 @@ not include that field.
 
 .. _section on saving forms: `The save() method`_
 
+.. _modelforms-reverse-many-to-many:
+
+Reverse many-to-many relations
+------------------------------
+
+.. versionadded:: 6.2
+
+To edit a many-to-many relation from the model that doesn't define the
+``ManyToManyField``, name the reverse relation in ``fields`` using its
+:attr:`~django.db.models.ForeignKey.related_query_name`. Since the ``Book``
+model above defines ``authors``, that name is ``book`` on ``Author``::
+
+    class AuthorForm(ModelForm):
+        class Meta:
+            model = Author
+            fields = ["name", "book"]
+
+Saving the form sets the relation on both models.
+
+Neither ``fields = '__all__'`` nor ``exclude`` includes a reverse relation. A
+relation without a reverse accessor, such as a symmetrical ``ManyToManyField``
+to ``'self'``, cannot be used.
+
 .. _modelforms-overriding-default-fields:
 
 Overriding the default fields

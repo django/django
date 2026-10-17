@@ -466,8 +466,8 @@ class BaseModelAdminChecks:
                 return []
             else:
                 if (
-                    isinstance(field, models.ManyToManyField)
-                    and not field.remote_field.through._meta.auto_created
+                    isinstance(field, (models.ManyToManyField, models.ManyToManyRel))
+                    and not field.through._meta.auto_created
                 ):
                     return [
                         checks.Error(
@@ -558,11 +558,11 @@ class BaseModelAdminChecks:
                 field=field_name, option=label, obj=obj, id="admin.E019"
             )
         else:
-            if not field.many_to_many or isinstance(field, models.ManyToManyRel):
+            if not field.many_to_many or field.hidden:
                 return must_be(
                     "a many-to-many field", option=label, obj=obj, id="admin.E020"
                 )
-            elif not field.remote_field.through._meta.auto_created:
+            elif not field.through._meta.auto_created:
                 return [
                     checks.Error(
                         f"The value of '{label}' cannot include the ManyToManyField "
