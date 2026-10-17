@@ -26,7 +26,7 @@ from django.template import Context, Template
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils.choices import BlankChoiceIterator
-from django.utils.version import PY314, PYPY
+from django.utils.version import PY314
 
 from .models import (
     Article,
@@ -3022,10 +3022,10 @@ class OtherModelFormTests(TestCase):
 
         field = ColorModelChoiceField(ColorfulItem.objects.prefetch_related("colors"))
         # CPython < 3.14 calls ModelChoiceField.__len__() when coercing to
-        # tuple. PyPy and Python 3.14+ don't call __len__() and so .count()
+        # tuple. Python 3.14+ doesn't call __len__() and so .count()
         # isn't called on the QuerySet. The following would trigger an extra
         # query if prefetch were ignored.
-        with self.assertNumQueries(2 if PYPY or PY314 else 3):
+        with self.assertNumQueries(2 if PY314 else 3):
             self.assertEqual(
                 tuple(field.choices),
                 (

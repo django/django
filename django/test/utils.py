@@ -27,7 +27,6 @@ from django.template import PartialTemplate, Template
 from django.test.signals import template_rendered
 from django.urls import get_script_prefix, set_script_prefix
 from django.utils.translation import deactivate
-from django.utils.version import PYPY
 
 try:
     import jinja2
@@ -1027,6 +1026,3 @@ def register_lookup(field, *lookups, lookup_name=None):
 
 def garbage_collect():
     gc.collect()
-    if PYPY:
-        # Collecting weakreferences can take two collections on PyPy.
-        gc.collect()
