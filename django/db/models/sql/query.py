@@ -42,7 +42,7 @@ from django.db.models.query_utils import (
 )
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
 from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
-from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
+from django.db.models.sql.where import AND, OR, XOR, ExtraWhere, NothingNode, WhereNode
 from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
@@ -2828,13 +2828,24 @@ class JoinPromoter:
     def __init__(self, connector, num_children, negated):
         self.connector = connector
         self.negated = negated
-        if self.negated:
-            if connector == AND:
+        # Non-negated XOR follows OR's join promotion rules. Negated XOR
+        # promotes joins to LOUTER because an INNER JOIN could remove matching
+        # rows too early.
+        if connector == AND:
+            if negated:
                 self.effective_connector = OR
             else:
                 self.effective_connector = AND
-        else:
-            self.effective_connector = self.connector
+        elif connector == OR:
+            if negated:
+                self.effective_connector = AND
+            else:
+                self.effective_connector = OR
+        elif connector == XOR:
+            if negated:
+                self.effective_connector = XOR
+            else:
+                self.effective_connector = OR
         self.num_children = num_children
         # Maps of table alias to how many times it is seen as required for
         # inner and/or outer joins.
@@ -2865,6 +2876,9 @@ class JoinPromoter:
         # The effective_connector is used so that NOT (a AND b) is treated
         # similarly to (a OR b) for join promotion.
         for table, votes in self.votes.items():
+            if self.effective_connector == XOR:
+                to_promote.add(table)
+                continue
             # We must use outer joins in OR case when the join isn't contained
             # in all of the joins. Otherwise the INNER JOIN itself could remove
             # valid results. Consider the case where a model with rel_a and
