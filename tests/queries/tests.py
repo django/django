@@ -3753,6 +3753,40 @@ class NullJoinPromotionOrTest(TestCase):
         self.assertEqual(str(qs.query).count("INNER JOIN"), 1)
         self.assertEqual(list(qs), [self.a2])
 
+    def test_xor_promotion(self):
+        fk1 = FK1.objects.create(f1="match", f2="value")
+        with_relation = BaseA.objects.create(a=fk1)
+        without_relation = BaseA.objects.create()
+
+        queryset = BaseA.objects.filter(
+            Q(a__f1__isnull=False) ^ Q(pk=without_relation.pk)
+        ).order_by("pk")
+        self.assertEqual(str(queryset.query).count(" LEFT OUTER JOIN "), 1)
+        self.assertSequenceEqual(queryset, [with_relation, without_relation])
+
+        queryset = BaseA.objects.filter(Q(a__f1="match") ^ Q(a__f2="other")).order_by(
+            "pk"
+        )
+        self.assertEqual(str(queryset.query).count(" INNER JOIN "), 1)
+        self.assertSequenceEqual(queryset, [with_relation])
+
+    def test_negated_xor_promotion(self):
+        fk1 = FK1.objects.create(f1="match", f2="value")
+        with_relation = BaseA.objects.create(a=fk1)
+        without_relation = BaseA.objects.create()
+
+        queryset = BaseA.objects.filter(
+            ~(Q(a__f1__isnull=True) ^ Q(pk=without_relation.pk))
+        ).order_by("pk")
+        self.assertEqual(str(queryset.query).count(" LEFT OUTER JOIN "), 1)
+        self.assertSequenceEqual(queryset, [with_relation, without_relation])
+
+        queryset = BaseA.objects.filter(
+            ~(~Q(a__f1__isnull=False) ^ Q(pk=without_relation.pk))
+        ).order_by("pk")
+        self.assertEqual(str(queryset.query).count(" LEFT OUTER JOIN "), 1)
+        self.assertSequenceEqual(queryset, [with_relation, without_relation])
+
     def test_null_join_demotion(self):
         qs = ModelA.objects.filter(Q(b__name__isnull=False) & Q(b__name__isnull=True))
         self.assertIn(" INNER JOIN ", str(qs.query))
