@@ -39,9 +39,10 @@ class AsyncAtomicTests(TransactionTestCase):
                 category=ResourceWarning,
                 message=r"unclosed database in <sqlite3\.Connection object at ",
             ):
-                # Django ignores close() for in-memory SQLite databases. Collect
-                # unreachable worker connections so sqlite3's finalizers close
-                # them while their unclosed-connection warnings are suppressed.
+                # Django ignores close() for in-memory SQLite databases.
+                # Collect unreachable worker connections so sqlite3's
+                # finalizers close them while their unclosed-connection
+                # warnings are suppressed.
                 gc.collect()
 
     async def test_commit(self):
@@ -114,6 +115,48 @@ class AsyncAtomicTests(TransactionTestCase):
             with self.assertRaisesMessage(Exception, "Oops"):
                 await sync_to_async(create_and_fail)()
         self.assertEqual(await Reporter.objects.acount(), 1)
+
+    async def test_sync_atomic_joins_async_atomic(self):
+        get = sync_to_async(current_thread_and_connection)
+
+        def create_in_nested_sync_block():
+            with transaction.atomic():
+                Reporter.objects.create(first_name="Haddock")
+                return (
+                    *current_thread_and_connection(),
+                    len(connection.atomic_blocks),
+                    connection.savepoint_ids[-1],
+                )
+
+        async with transaction.atomic():
+            block_thread, block_connection = await get()
+            thread, conn, depth, sid = await sync_to_async(
+                create_in_nested_sync_block
+            )()
+            # The sync block runs on the async block's worker and connection,
+            # and nests as a savepoint rather than starting a transaction.
+            self.assertIs(thread, block_thread)
+            self.assertIs(conn, block_connection)
+            self.assertEqual(depth, 2)
+            self.assertIsNotNone(sid)
+            # Leaving the sync block releases its savepoint only.
+            self.assertEqual(
+                await sync_to_async(lambda: len(connection.atomic_blocks))(), 1
+            )
+            self.assertEqual(await Reporter.objects.acount(), 1)
+        self.assertEqual(await Reporter.objects.acount(), 1)
+
+    async def test_async_rollback_undoes_sync_atomic(self):
+        def create():
+            with transaction.atomic():
+                Reporter.objects.create(first_name="Haddock")
+
+        with self.assertRaisesMessage(ValueError, "Undo parent"):
+            async with transaction.atomic():
+                await sync_to_async(create)()
+                self.assertEqual(await Reporter.objects.acount(), 1)
+                raise ValueError("Undo parent")
+        self.assertEqual(await Reporter.objects.acount(), 0)
 
     async def test_outermost_block_uses_own_thread_and_connection(self):
         get = sync_to_async(current_thread_and_connection)
