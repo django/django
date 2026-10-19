@@ -5,6 +5,7 @@ rules:
     ignore:
       - labels.yml
       - check_pr_quality.yml
+      - check_pr_limit.yml
   unpinned-uses:
     config:
       policies:
